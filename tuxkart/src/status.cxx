@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.17 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: status.cxx,v 1.18 2004/08/05 23:04:38 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 #include "status.h"
 #include "Driver.h"
 #include "material.h"
-#include "oldgui.h"
+#include "Loader.h"
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
@@ -32,7 +32,10 @@ double time_left = 0.0 ;
 
 float tt[6]={0,0,0,0,0,0};
 
+//FIXME:
 static fntRenderer *text = NULL ;
+static fntTexFont *oldfont ;
+
 static char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 static int  next_string  = 0 ;
 static int  stats_enabled = FALSE ;
@@ -60,6 +63,10 @@ void initStatusDisplay ()
   flamemissile_gst = getMaterial ( "flamemissile.rgb" ) ;
   magnet_gst       = getMaterial ( "magnet.rgb"       ) ;
   zipper_gst       = getMaterial ( "zipper.rgb"       ) ;
+  
+  //FIXME:
+  oldfont = new fntTexFont ;
+  oldfont -> load ( loader->getPath("fonts/sorority.txf").c_str() ) ;
 }
 
 
@@ -98,6 +105,11 @@ void fpsToggle ()
 	show_fps = !show_fps;
 }
 
+bool getShowFPS()
+{
+	return show_fps;
+}
+
 void stPrintf ( char *fmt, ... )
 {
   char *p = debug_strings [ next_string++ ] ;
@@ -120,18 +132,6 @@ void stPrintf ( char *fmt, ... )
   va_end ( ap ) ;
 }
 
-static int    about_timer = 99999 ;
-static int versions_timer = 99999 ;
-static int  credits_timer = 99999 ;
-static int    intro_timer =    0  ;
-static int     help_timer = 99999 ;
-
-void hide_status () { versions_timer = credits_timer =
-                         intro_timer = help_timer = about_timer = 99999 ; }
-void about       () {    about_timer = 0 ; }
-void credits     () {  credits_timer = 0 ; }
-void versions    () { versions_timer = 0 ; }
-void help        () {     help_timer = 0 ; }
 
 void drawText ( char *str, int sz, int x, int y )
 {
@@ -166,176 +166,12 @@ void drawDropShadowText ( char *str, int sz, int x, int y )
 }
 
 
-void drawHelpText ()
-{
-  drawDropShadowText ( "Press SPACE to toggle the menu.",  18, 70, 400 ) ;
-  drawDropShadowText ( "Press ESCAPE to exit the game.",   18, 70, 370 ) ;
-
-  drawDropShadowText ( "Joystick: A - Accellerate.  B - Brake.",
-                                                           18, 70, 330 ) ;
-  drawDropShadowText ( "          C - Use an item.  D - Ask to be rescued.",
-                                                           18, 70, 300 ) ;
-  drawDropShadowText ( "          L - Pop a wheelie R - Jump.",
-                                                           18, 70, 270 ) ;
- 
-  drawDropShadowText ( "Keyboard: ARROWS - Steer, accellerate and brake",
-                                                           18, 70, 230 ) ;
- 
-  drawDropShadowText ( "          A - Pop a Wheelie S - Jump",
-                                                           18, 70, 200 ) ;
-  drawDropShadowText ( "          F - Use an item.  D - Ask to be rescued",
-                                                           18, 70, 170 ) ;
-  drawDropShadowText ( "          R - Restart race. P - Pause.",
-                                                           18, 70, 150 ) ;
-}
-
-
-void drawTitleText ()
-{
-  drawDropShadowText ( "TuxKart", 20, 80, 400 ) ;
-  drawDropShadowText ( "By Steve & Oliver Baker", 12, 180, 385 ) ;
-}
-
-
-void drawIntroText ()
-{
-  drawTitleText () ;
-
-  if ( intro_timer & 8 )
-    drawDropShadowText ( "Press SPACE bar for menu.", 15, 10, 430 ) ;
-}
-
-
-char *aboutText [] =
-{
-  "Written    by Steve Baker",
-  "Playtested by Oliver Baker",
-  "Music      by Matt Thomas",
-  "Track design and other 3D models by Both Bakers.",
-  NULL
-} ;
-
-
-void drawVersionsText ()
-{
-  char str [ 256 ] ;
-
-#ifdef VERSION
-  sprintf ( str, "TuxKart: Version: %s", VERSION ) ;
-#else
-  sprintf ( str, "TuxKart: Unknown Version." ) ;
-#endif
-  drawDropShadowText ( str, 15, 20, 250 ) ;
-
-  sprintf ( str, "PLIB Version: %s", ssgGetVersion() ) ;
-  drawDropShadowText ( str, 15, 20, 225 ) ;
-
-  sprintf ( str, "OpenGL Version: %s", glGetString ( GL_VERSION ) ) ;
-  drawDropShadowText ( str, 15, 20, 200 ) ;
-
-  sprintf ( str, "OpenGL Vendor: %s", glGetString ( GL_VENDOR ) ) ;
-  drawDropShadowText ( str, 15, 20, 175 ) ;
-
-  sprintf ( str, "OpenGL Renderer: %s", glGetString ( GL_RENDERER ) ) ;
-
-  if ( strlen ( str ) > 50 )
-  {
-    int l = strlen ( str ) ;
-    int ll = 0 ;
-
-    for ( int i = 0 ; i < l ; i++, ll++ )
-    {
-      if ( ll > 40 && str[i] == ' ' )
-      {
-        str[i] = '\n' ;
-        ll = 0 ;
-      }
-    }
-  }
-
-  drawDropShadowText ( str, 15, 20, 150 ) ;
-
-  if ( versions_timer & 8 )
-    drawDropShadowText ( "Press SPACE to continue",
-                       15, 10, 430 ) ;
-}
-
-
-void drawAboutText ()
-{
-  drawTitleText () ;
-
-  drawDropShadowText ( "The Rules of TuxKart:",
-                       20, 10, 300 ) ;
-
-  for ( int i = 0 ; aboutText [ i ] != NULL ; i++ )
-    drawDropShadowText ( aboutText [ i ],
-                       16, 10, 280 - 18 * i ) ;
-
-  if ( about_timer & 8 )
-    drawDropShadowText ( "Press SPACE to continue",
-                       15, 10, 430 ) ;
-}
-
-
-char *creditsText [] =
-{
-  "  Steve  Baker    - Coding, design, bug insertion.",
-  "  Oliver Baker    - Modelling, Play Testing, Ideas.",
-  "  Matt  Thomas    - Music.",
-  " ",
-  "Special thanks to:",
-  " ",
-  "  Daryll Strauss, Brian Paul, Linus Torvalds",
-  NULL
-} ;
-
-
-
-void drawCreditsText ()
-{
-  drawTitleText () ;
-
-  drawDropShadowText ( "Credits:",
-                       20, 70, 250 ) ;
-
-  for ( int i = 0 ; creditsText [ i ] != NULL ; i++ )
-    drawDropShadowText ( creditsText [ i ],
-                       12, 100, 230 - 12 * i ) ;
-
-  if ( credits_timer & 8 )
-    drawDropShadowText ( "Press SPACE to continue",
-                       15, 10, 430 ) ;
-}
-
 void drawStatsText ()
 {
   char str [ 256 ] ;
 
   sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
   drawDropShadowText ( str, 18, 5, 300 ) ;
-}
-
-void drawFPSText ()
-{
-  static int fpsCounter;
-  static int fpsSave = 0;
-  static int fpsTimer = SDL_GetTicks();
-  
-  int now = SDL_GetTicks();
-
-  if (now - fpsTimer > 1000)
-    {
-      fpsSave = fpsCounter;
-      fpsCounter = 0;
-      fpsTimer = now;
-    }
-
-  ++fpsCounter;
-
-  char str [ 20 ];
-  sprintf( str, "FPS: %d", fpsSave);
-  drawDropShadowText ( str, 18, 5, 5 ) ;
 }
 
 void drawTimer ()
@@ -456,30 +292,6 @@ void drawGameOverText ()
 }
 
 
-void drawGameIntroText ()
-{
-  static int timer = 0 ;
-
-  if ( timer++ & 8 )
-    drawDropShadowText ( "Press S to start", 15, 10, 430 ) ;
-
-  if ( help_timer++ < 400 )
-    drawHelpText () ;
-  else
-  if ( intro_timer++ < 400 )
-    drawIntroText () ;
-  else
-  if ( credits_timer++ < 1600 )
-    drawCreditsText () ;
-  else
-  if ( about_timer++ < 1600 )
-    drawAboutText () ;
-  else
-  if ( versions_timer++ < 1600 )
-    drawVersionsText () ;
-}
-
-
 void drawGameRunningText ()
 {
   drawScore () ;
@@ -489,21 +301,6 @@ void drawGameRunningText ()
     
   if ( stats_enabled )
     drawStatsText () ;
-    
-  if ( show_fps )
-  	drawFPSText () ;
-
-  if ( help_timer++ < 400 )
-    drawHelpText () ;
-  else
-  if ( credits_timer++ < 1600 )
-    drawCreditsText () ;
-  else
-  if ( about_timer++ < 1600 )
-    drawAboutText () ;
-  else
-  if ( versions_timer++ < 1600 )
-    drawVersionsText () ;
 }
 
 
