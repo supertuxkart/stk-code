@@ -1,4 +1,4 @@
-//  $Id: Lexer.cxx,v 1.1 2004/08/24 19:33:11 matzebraun Exp $
+//  $Id: Lexer.cxx,v 1.2 2004/12/01 20:07:16 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Matthias Braun <matze@braunis.de>
@@ -52,7 +52,8 @@ Lexer::nextChar()
     if(c >= bufend) {
         if(isEof)
             throw EOFException();
-        std::streamsize n = stream.readsome(buffer, BUFFER_SIZE);
+        stream.read(buffer, BUFFER_SIZE);
+        std::streamsize n = stream.gcount();
 
         c = buffer;
         bufend = buffer + n;
@@ -84,7 +85,7 @@ Lexer::getNextToken()
         
         switch(*c) {
             case ';': // comment
-                while(!stream.eof()) {
+                while(true) {
                     nextChar();
                     if(*c == '\n') {
                         ++linenumber;
@@ -102,12 +103,6 @@ Lexer::getNextToken()
                 int startline = linenumber;
                 try {
                     while(1) {
-                        if(stream.eof()) {
-                            std::stringstream msg;
-                            msg << "Parse Error in line " << startline << ": "
-                                << "Couldn't find end of string.";
-                            throw std::runtime_error(msg.str());
-                        }
                         nextChar();
                         if(*c == '"')
                             break;
