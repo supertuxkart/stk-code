@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.29 2004/08/16 11:33:43 grumbel Exp $
+//  $Id: Driver.h,v 1.30 2004/08/23 22:57:04 evilynux Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -114,7 +114,6 @@ protected:
 public:  
   
   /* start - New Physics */
-  sgVec3   acceleration ;
   sgVec3   force ;
 
   float   steer_angle ;

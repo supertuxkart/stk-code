@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.31 2004/08/21 16:02:00 straver Exp $
+//  $Id: Driver.cxx,v 1.32 2004/08/23 22:57:04 evilynux Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -51,7 +51,6 @@ Driver::Driver ()
   shadow = NULL;
     
   /* New Physics */
-  sgZeroVec3 (acceleration);
   sgZeroVec3 (force);
   steer_angle = throttle = brake = 0.0f;
   
@@ -151,6 +150,13 @@ Driver::placeModel ()
     }
 }
 
+static inline float _lateralForce (KartProperties *properties, float cornering, float sideslip)
+{
+  return ( max(-properties->max_grip,
+	       min(properties->max_grip, cornering * sideslip))
+	   * properties->mass * 9.82 / 2 );
+}
+
 void
 Driver::physicsUpdate (float delta)
 {
@@ -159,14 +165,13 @@ Driver::physicsUpdate (float delta)
 	sgVec2 lateral_f;
 	sgVec2 lateral_r;
 	
-	float yawspeed;
 	float wheel_rot_angle;
 	float sideslip;
-	float sideslip_f;
-	float sideslip_r;
 	float torque;
 	float kart_angular_acc;
 	float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
+
+	unsigned int count;
 	
 	const float wheelbase = 1.2;
 	
@@ -175,36 +180,25 @@ Driver::physicsUpdate (float delta)
 	sgZeroVec2 (lateral_f);
 	sgZeroVec2 (lateral_r);
 			
-	// calc yawspeed of wheels
-	yawspeed = kart_angular_vel * wheelbase/2;
-	
 	// rotation angle of wheels
 	if (velocity.xyz[1] == 0)
-		wheel_rot_angle = steer_angle;
-	else
-		wheel_rot_angle = atan2 (yawspeed, velocity.xyz[1]);
-		
-	// side slip angle of kart
-	if (velocity.xyz[1] == 0)
+	  {
 		sideslip = 0;
+		wheel_rot_angle = steer_angle;
+	  }
 	else
+	  {
 		sideslip = atan2 (velocity.xyz[0], velocity.xyz[1]);
+		wheel_rot_angle = atan2 (kart_angular_vel * wheelbase/2,
+					 velocity.xyz[1]);
+	  }
 		
-	// side slip on wheels
-	sideslip_f = sideslip + wheel_rot_angle - steer_angle;
-	sideslip_r = sideslip - wheel_rot_angle;
-	
 	/*----- Lateral Forces -----*/
-	lateral_f[0] = kart_properties.corn_f * sideslip_f;
-	lateral_f[0] = min(kart_properties.max_grip, lateral_f[0]);
-	lateral_f[0] = max(-kart_properties.max_grip, lateral_f[0]);
-	lateral_f[0] *= kart_properties.mass * 9.82 / 2;
-	
-	lateral_r[0] = kart_properties.corn_r * sideslip_r;
-	lateral_r[0] = min(kart_properties.max_grip, lateral_r[0]);
-	lateral_r[0] = max(-kart_properties.max_grip, lateral_r[0]);
-	lateral_r[0] *= kart_properties.mass * 9.82 / 2;
-	
+	lateral_f[0] = _lateralForce(&kart_properties, kart_properties.corn_f,
+				     sideslip + wheel_rot_angle - steer_angle);
+	lateral_r[0] = _lateralForce(&kart_properties, kart_properties.corn_r,
+				     sideslip - wheel_rot_angle);
+
 	// calculate traction
 	traction[0] = 0.0f;
 	traction[1] = 10 * (throttle - brake*sgn(velocity.xyz[1]));
@@ -222,17 +216,11 @@ Driver::physicsUpdate (float delta)
 	// torque - rotation force on kart body
 	torque = (lateral_f[0] * wheelbase/2) - (lateral_r[0] * wheelbase/2);
 	
-	// Acceleration
-	acceleration[0] = force[0] / kart_properties.mass;
-	acceleration[1] = force[1] / kart_properties.mass;
-	acceleration[2] = force[2] / kart_properties.mass;
-	
 	kart_angular_acc = torque / kart_properties.inertia;
 		
 	// velocity
-	velocity.xyz[0] += acceleration[0] * delta;
-	velocity.xyz[1] += acceleration[1] * delta;
-	velocity.xyz[2] += acceleration[2] * delta;
+	for (count = 0; count < 3; count++)
+	  velocity.xyz[count] += (force[count] / kart_properties.mass) * delta;
 	
 	kart_angular_vel = kart_angular_acc * delta;
 	velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
@@ -317,9 +305,9 @@ float Driver::collectIsectData ( sgVec3 start, sgVec3 end )
 
   if ( nsteps > 100 )
   {
-    std::cout << "WARNING: Kart: " << this << std::endl;
-    std::cout << "WARNING: Speed too high for collision detect!" << std::endl;
-    std::cout << "WARNING: Nsteps=" << nsteps << " Speed=" << speed << std::endl;
+    std::cout << "WARNING: Kart: " << this << std::endl
+	      << "WARNING: Speed too high for collision detect!" << std::endl
+	      << "WARNING: Nsteps=" << nsteps << " Speed=" << speed << std::endl;
     nsteps = 100 ;
   }
 

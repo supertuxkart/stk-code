@@ -1,3 +1,10 @@
+2004-08-23  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/Driver.cxx (Driver):
+	- Small code cleanups. Thanks to Wolfgang Sourdeau.
+
+	* src/Driver.h (class Driver): - Removed useless variable.
+
 2004-07-31  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx: - Showing the invocated binary in help
