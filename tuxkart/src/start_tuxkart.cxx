@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.48 2004/08/08 03:45:12 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.49 2004/08/08 16:04:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -228,7 +228,8 @@ void cmdLineHelp (char* invocation)
 	    "Options:\n"
 	    "  -N,  --no-start-screen  Quick race\n"
 	    "  -t,  --track n          Start at track number n (see --list-tracks)\n"
-        "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
+            "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
+            "  --kart FILE             Use the kart defined in FILE (.tkkf)\n"
 	    "  -l,  --list-tracks      Show available tracks.\n"
 	    "  --laps n                Define number of laps to n\n"
 	    "  --players n             Define number of players to either 1, 2 or 4.\n"
@@ -236,7 +237,7 @@ void cmdLineHelp (char* invocation)
 	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -s,  --screensize WIDTHxHEIGHT\n"
-        "                          Set the screen size (e.g. 320x200)\n"
+            "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
@@ -267,6 +268,11 @@ int main ( int argc, char *argv[] )
 	      cmdLineHelp(argv[0]);
 	      return 0;
 	    }
+
+	  else if( (!strcmp(argv[i], "--kart") and argc > 2 ))
+            {
+              kart_file = argv[i+1];
+            }
 
 	  else if( (!strcmp(argv[i], "--track") or !strcmp(argv[i], "-t")) and argc > 2 )
 	    {

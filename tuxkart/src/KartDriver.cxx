@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.12 2004/08/08 11:23:39 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.13 2004/08/08 16:04:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "Herring.h"
 #include "sound.h"
 #include "Loader.h"
+#include "Shadow.h"
 #include "Driver.h"
 
 void KartDriver::useAttachment ()
@@ -392,6 +393,9 @@ KartDriver::load_data()
   this-> addAttachment ( pobj3 ) ;
   this-> addAttachment ( pobj4 ) ;
   this-> addAttachment ( pobj5 ) ;
+
+  shadow = new Shadow(kart_properties.shadow_file, -1, 1, -1, 1);
+  comp_model->addKid ( shadow->getRoot () );
 }
 
 /* EOF */

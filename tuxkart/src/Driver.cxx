@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.17 2004/08/08 10:43:42 grumbel Exp $
+//  $Id: Driver.cxx,v 1.18 2004/08/08 16:04:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,7 +35,7 @@ static inline void relaxation(float& target, float& prev, float rate)
   prev = (target);
 }
 
-Driver::Driver ( )
+Driver::Driver ()
 {
   delta_t = 0.01 ;
 
@@ -46,8 +46,7 @@ Driver::Driver ( )
 
   comp_model->addKid(model);
 
-  shadow = new Shadow("tuxkartshadow.rgb", -1, 1, -1, 1);
-  comp_model->addKid ( shadow->getRoot () );
+  shadow = NULL;
     
   /* New Physics */
   sgZeroVec3 (acceleration);
@@ -153,7 +152,8 @@ void Driver::placeModel ()
       sgMultMat4(res2, res, rot);
       sgMultMat4(res, res2, rot2);
 
-      shadow->getRoot() -> setTransform(res) ;
+      if (shadow)
+        shadow->getRoot() -> setTransform(res);
     }
 }
 
