@@ -28,6 +28,20 @@
 #define MAX_HANDICAP_VELOCITY   ( 70.0f * KILOMETERS_PER_HOUR )
 #define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
 
+/* Start - New Physics Constants */
+#define MAX_THROTTLE 100
+#define ENGINE_POWER 100 	/* Newton */
+#define MAX_WHEEL_TURN (M_PI/6)	/* Radians */
+#define TURN_SPEED (M_PI/6)	/* Radians per Second */
+#define KART_MASS 90		/* Kilograms */
+#define KART_INERTIA 15
+#define AIR_FRICTION 0.8257
+#define SYSTEM_FRICTION 4.8
+#define CORN_F -7.2		/* Cornering stiffness - front */
+#define CORN_R -7.0		/* Cornering stiffness - rear */
+#define MAX_GRIP 1.2		/* maximum wheel force */
+/* End - New Physics Constants */
+
 #define MAX_ACCELLERATION       ( MAX_NATURAL_VELOCITY * 0.3f )
 #define MAX_BRAKING             ( MAX_NATURAL_VELOCITY * 1.0f )
 #define MAX_DECELLERATION       ( MAX_NATURAL_VELOCITY * 0.4f )
@@ -72,6 +86,16 @@ protected:
 
   sgCoord  curr_vel  ;
   sgCoord  velocity  ;
+  
+  /* start - New Physics */
+  sgVec3   acceleration ;
+  sgVec3   force ;
+  float   steer_angle ;
+  
+  float throttle;
+  float brake;
+  bool mkjoo;
+  /* End - New Physics */
 
   ssgTransform *model ;
   int history_index ;
@@ -104,6 +128,12 @@ public:
 
     firsttime = TRUE ;
     model = m ;
+    
+    /* New Physics */
+    sgZeroVec3 (acceleration);
+    sgZeroVec3 (force);
+    steer_angle = throttle = brake = 0.0f;
+    mkjoo = false;
 
     sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
     reset () ;
@@ -196,6 +226,7 @@ public:
   }
 
   void coreUpdate () ;
+  void physicsUpdate () ;
 
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;

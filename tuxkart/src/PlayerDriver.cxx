@@ -16,6 +16,8 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     Delta-t is faked on slow machines for most activities - but
     for the player's joystick, it has to be the true delta-t.
   */
+  
+  mkjoo = true;
 
   float true_delta_t = fclock -> getDeltaTime () ;
 
@@ -55,13 +57,26 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
       rescue = TRUE ;
     }
 
-    if ( j -> buttons & 2 )  /* B == Active Braking */
-      velocity.xyz[1] -= MAX_BRAKING * true_delta_t ;
-    else
-    if ( ( j -> buttons & 1 ) &&
-          velocity.xyz[1] < MAX_NATURAL_VELOCITY *
-                       ( 1.0f + wheelie_angle/90.0f ) )  /* A == Accellerate */
-      velocity.xyz[1] += MAX_ACCELLERATION * true_delta_t ;
+    if ( j -> buttons & 2 ) {  /* B == Active Braking */
+      //velocity.xyz[1] -= MAX_BRAKING * true_delta_t ;
+      brake = MAX_THROTTLE;
+      throttle = 0.0f;
+    } else {
+      brake = 0.0f;
+    }
+      
+    if ( ( j -> buttons & 1 ) 
+    /* && velocity.xyz[1] < MAX_NATURAL_VELOCITY *( 1.0f + wheelie_angle/90.0f ) */ ) 
+    { /* A == Accellerate */
+      // trottle add forward force
+      // velocity.xyz[1] += MAX_ACCELLERATION * true_delta_t ;
+      throttle = MAX_THROTTLE;
+    } else if (throttle > 0) {
+    	throttle -= MAX_THROTTLE * true_delta_t;
+    } else
+    	throttle = 0.0f;
+    
+    /*
     else
     if ( velocity.xyz[1] > MAX_DECELLERATION * true_delta_t )
       velocity.xyz[1] -= MAX_DECELLERATION * true_delta_t ;
@@ -70,22 +85,32 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
       velocity.xyz[1] += MAX_DECELLERATION * true_delta_t ;
     else
       velocity.xyz[1] = 0.0f ;
+     */
 
     if ( wheelie_angle <= 0.0f )
     {
+      /*
       if ( velocity.xyz[1] >= 0.0f )
         velocity.hpr[0] = -MAX_TURN_RATE * sqrt( velocity.xyz[1])* j->data[0];
       else
         velocity.hpr[0] =  MAX_TURN_RATE * sqrt(-velocity.xyz[1])* j->data[0];
+      */
+      
+      steer_angle = -TURN_SPEED * j->data[0];
+      if ( steer_angle > MAX_WHEEL_TURN)
+        steer_angle = MAX_WHEEL_TURN;
+      if ( steer_angle < -MAX_WHEEL_TURN)
+        steer_angle = -MAX_WHEEL_TURN;	
     }
     else
       velocity.hpr[0] = 0.0f ;
 
-    float s = SKID_RATE * velocity.hpr[0] * velocity.xyz[1] ;
-    velocity.xyz[0] = (s >= 0) ? (s*s) : -(s*s) ;
-  }
+    //float s = SKID_RATE * velocity.hpr[0] * velocity.xyz[1] ;
+    //velocity.xyz[0] = (s >= 0) ? (s*s) : -(s*s) ;
+    }
 
-  velocity.xyz[2] -= GRAVITY * true_delta_t ;
+    //velocity.xyz[2] -= GRAVITY * true_delta_t ;
+    force[2] = -GRAVITY * KART_MASS;
 }
 
 #ifdef HAVE_LIBSDL

@@ -1,8 +1,15 @@
 #include "tuxkart.h"
 
+#define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
+#define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
+#define min(m,n) ((m)<(n) ? (m) : (n))	/* macro to return lowest number */
+
 void Driver::update ()
 {
   float dt = fclock->getDeltaTime () ;
+  
+  if (dt > 0.05f)
+  	physicsUpdate ();
 
   while ( dt > 0.05f )
   {
@@ -14,12 +21,101 @@ void Driver::update ()
   if ( dt > 0.0f )
   {
     delta_t = dt ;
+    physicsUpdate ();
     coreUpdate () ;
   }
 
   doObjectInteractions () ;
 }
 
+void Driver::physicsUpdate ()
+{
+	sgVec2 resistance;
+	sgVec2 traction;
+	sgVec2 lateral_f;
+	sgVec2 lateral_r;
+	
+	float yawspeed;
+	float wheel_rot_angle;
+	float sideslip;
+	float sideslip_f;
+	float sideslip_r;
+	float torque;
+	float kart_angular_acc;
+	float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
+	
+	const float wheelbase = 1.2;
+	
+	sgZeroVec2 (resistance);
+	sgZeroVec2 (traction);
+	sgZeroVec2 (lateral_f);
+	sgZeroVec2 (lateral_r);
+			
+	// calc yawspeed of wheels
+	yawspeed = kart_angular_vel * wheelbase/2;
+	
+	// rotation angle of wheels
+	if (velocity.xyz[1] == 0)
+		wheel_rot_angle = 0;
+	else
+		wheel_rot_angle = atan2 (yawspeed, velocity.xyz[1]);
+		
+	// side slip angle of kart
+	if (velocity.xyz[1] == 0)
+		sideslip = 0;
+	else
+		sideslip = atan2 (velocity.xyz[0], velocity.xyz[1]);
+		
+	// side slip on wheels
+	sideslip_f = sideslip + wheel_rot_angle - steer_angle;
+	sideslip_r = sideslip - wheel_rot_angle;
+	
+	/*----- Lateral Forces -----*/
+	lateral_f[0] = CORN_F * sideslip_f;
+	lateral_f[0] = min(MAX_GRIP, lateral_f[0]);
+	lateral_f[0] = max(-MAX_GRIP, lateral_f[0]);
+	lateral_f[0] *= KART_MASS * 9.82 / 2;
+	
+	lateral_r[0] = CORN_R * sideslip_r;
+	lateral_r[0] = min(MAX_GRIP, lateral_r[0]);
+	lateral_r[0] = max(-MAX_GRIP, lateral_r[0]);
+	lateral_r[0] *= KART_MASS * 9.82 / 2;
+	
+	// calculate traction
+	traction[0] = 0.0f;
+	traction[1] = 10 * (throttle - brake*sgn(velocity.xyz[1]));
+	
+	// apply air friction and system friction
+	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * AIR_FRICTION;
+	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * AIR_FRICTION;
+	resistance[0] -= SYSTEM_FRICTION * velocity.xyz[0];
+	resistance[1] -= SYSTEM_FRICTION * velocity.xyz[1];
+	
+	// sum forces
+	force[0] += traction[0] + cos(steer_angle)*lateral_f[0] + lateral_r[1] + resistance[0];
+	force[1] += traction[1] + sin(steer_angle)*lateral_f[1] + lateral_r[1] + resistance[1];
+	
+	// torque - rotation force on kart body
+	torque = (lateral_f[0] * wheelbase/2) - (lateral_r[0] * wheelbase/2);
+	
+	// Acceleration
+	acceleration[0] = force[0] / KART_MASS;
+	acceleration[1] = force[1] / KART_MASS;
+	acceleration[2] = force[2] / KART_MASS;
+	
+	kart_angular_acc = torque / KART_INERTIA;
+		
+	// velocity
+	velocity.xyz[0] += acceleration[0] * delta_t;
+	velocity.xyz[1] += acceleration[1] * delta_t;
+	velocity.xyz[2] += acceleration[2] * delta_t;
+	
+	kart_angular_vel = kart_angular_acc * delta_t;
+	velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
+	
+	// clear forces
+	sgZeroVec3 (force);
+}
 
 void Driver::coreUpdate ()
 {
@@ -30,11 +126,13 @@ void Driver::coreUpdate ()
   sgCopyCoord ( &last_pos        , &curr_pos         ) ;
   sgCopyVec2  ( last_track_coords, curr_track_coords ) ;
 
-  if ( velocity.xyz[1] > MAX_VELOCITY )
+  /*
+  if ( velocity.xyz[1] > MAX_VELOCITY ) asd
     velocity.xyz[1] = MAX_VELOCITY ;
 
   if ( velocity.xyz[1] < MAX_REVERSE_VELOCITY )
     velocity.xyz[1] = MAX_REVERSE_VELOCITY ;
+  */
 
   /* Scale velocities to current time step. */
 
