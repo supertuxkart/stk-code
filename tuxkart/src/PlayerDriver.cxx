@@ -88,33 +88,60 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
   velocity.xyz[2] -= GRAVITY * true_delta_t ;
 }
 
-
-void PlayerKartDriver::incomingKeystroke ( int k )
+#ifdef HAVE_LIBSDL
+void PlayerKartDriver::incomingKeystroke ( const SDL_keysym& key )
 {
-  switch ( k )
+  /* CTRL-R ...infinite ammo cheat. */
+  if ( key.sym == SDLK_r && key.mod & KMOD_CTRL)
   {
-    /* CTRL-R ...infinite ammo cheat. */
-    case  0x12: switch ( rand () % 5 )
-                {
-                  case 0 : collectable = COLLECT_SPARK ;
-                           num_collectables = 1000000 ;
-                           break ;
-                  case 1 : collectable = COLLECT_MISSILE ;
-                           num_collectables = 1000000 ;
-                           break ;
-                  case 2 : collectable = COLLECT_HOMING_MISSILE ;
-                           num_collectables = 1000000 ;
-                           break ;
-                  case 3 : collectable = COLLECT_ZIPPER ;
-                           num_collectables = 1000000 ;
-                           break ;
-                  case 4 : collectable = COLLECT_MAGNET ;
-                           num_collectables = 1000000 ;
-                           break ;
-                }
-                break ;
+    switch ( rand () % 5 )
+    {
+      case 0 : collectable = COLLECT_SPARK ;
+        num_collectables = 1000000 ;
+        break ;
+      case 1 : collectable = COLLECT_MISSILE ;
+        num_collectables = 1000000 ;
+        break ;
+      case 2 : collectable = COLLECT_HOMING_MISSILE ;
+        num_collectables = 1000000 ;
+        break ;
+      case 3 : collectable = COLLECT_ZIPPER ;
+        num_collectables = 1000000 ;
+        break ;
+      case 4 : collectable = COLLECT_MAGNET ;
+        num_collectables = 1000000 ;
+        break ;
+    }
   }
 }
 
+#else
+void PlayerKartDriver::incomingKeystroke ( int k )
+{
+  switch ( k )
+    {
+      /* CTRL-R ...infinite ammo cheat. */
+    case  0x12: switch ( rand () % 5 )
+      {
+      case 0 : collectable = COLLECT_SPARK ;
+        num_collectables = 1000000 ;
+        break ;
+      case 1 : collectable = COLLECT_MISSILE ;
+        num_collectables = 1000000 ;
+        break ;
+      case 2 : collectable = COLLECT_HOMING_MISSILE ;
+        num_collectables = 1000000 ;
+        break ;
+      case 3 : collectable = COLLECT_ZIPPER ;
+        num_collectables = 1000000 ;
+        break ;
+      case 4 : collectable = COLLECT_MAGNET ;
+        num_collectables = 1000000 ;
+        break ;
+      }
+      break ;
+    }
+}
+#endif
 
-
+/* EOF */

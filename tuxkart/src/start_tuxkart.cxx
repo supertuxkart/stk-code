@@ -1,6 +1,10 @@
 
 #include "tuxkart.h"
 
+#include <iostream>
+
+using std::cout;
+
 /***********************************\
 *                                   *
 * These are the PUI widget pointers *
@@ -9,12 +13,13 @@
 
 #define MAX_TRACKS 10
 
-
 static puSlider       *numLapsSlider    ;
 static puButton       *numLapsText      ;
 static puButton       *playButton       ;
 static puButton       *exitButton       ;
+#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
 static puButton       *mirrorButton     ;
+#endif
 static puButton       *reverseButton    ;
 static puButtonBox    *trackButtons     ;
 static puButtonBox    *playerButtons    ;
@@ -76,29 +81,6 @@ static void switchToGame ()
   tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
 }
 
-/*********************************\
-*                                 *
-* These functions capture mouse   *
-* and keystrokes and pass them on *
-* to PUI.                         *
-*                                 *
-\*********************************/
-
-static void startupKeyFn ( int key, int updown, int, int )
-{
-  puKeyboard ( key, updown ) ;
-}
-
-static void startupMotionFn ( int x, int y )
-{
-  puMouse ( x, y ) ;
-}
-
-static void startupMouseFn ( int button, int updown, int x, int y )
-{
-  puMouse ( button, updown, x, y ) ;
-}
-
 /***********************************\
 *                                   *
 * This function redisplays the PUI, *
@@ -142,8 +124,9 @@ static void splashMainLoop (void)
   
     /* Swapbuffers - and off we go again... */
 
-    pwSwapBuffers   () ;
-
+    pollEvents() ;
+    swapBuffers();
+    
     if ( startupCounter > 0 ) startupCounter-- ;
   }
 }
@@ -175,7 +158,7 @@ static void playCB ( puObject * )
 static void exitCB ( puObject * )
 {
   fprintf ( stderr, "Exiting TuxKart starter program.\n" ) ;
-  exit ( 1 ) ;
+  shutdown();
 }
 
 
@@ -305,17 +288,15 @@ static void loadDataDir (int debug)
 
 
 /* Load the datadir, tracklist and plib stuff */
-static void initTuxKart (int noBorder)
+static void initTuxKart (int videoFlags)
 {
   loadDataDir ( TRUE );
   loadTrackList () ;
 
+  initVideo ( videoFlags );
+
   /* Initialise a bunch of PLIB library stuff */
 
-  pwInit  ( 0, 0, getScreenWidth(), getScreenHeight(), FALSE, 
-	    "Tux Kart by Steve Baker", !noBorder, 0 ) ;
-
-  pwSetCallbacks ( startupKeyFn, startupMouseFn, startupMotionFn, NULL, NULL ) ;
   puInit  () ;
   ssgInit () ;
 
@@ -425,18 +406,19 @@ int main ( int argc, char *argv[] )
  
   /* Default values */
   int nbrLaps = 3;
-  int mirror = 0, reverse = 0;
-  int track = 0;
-  int nbrPlayers = 1;
-  int width = 800;
-  int height = 600;
-  int noBorder = FALSE;
-  int noStartScreen = FALSE;
+  int mirror = 0;
+  int reverse = 0;
+  int track         = 0;
+  int nbrPlayers    = 1;
+  int width         = 800;
+  int height        = 600;
+  bool fullscreen   = false;
+  bool noStartScreen = false;
   
   /* Testing if we've given arguments */
   if ( argc > 1) 
     {
-      for(int i = 1; i<argc; i++)
+      for(int i = 1; i < argc; i++)
 	{
 	  if ( argv[i][0] != '-') continue;
 
@@ -465,7 +447,7 @@ int main ( int argc, char *argv[] )
 
 	  else if( !strcmp(argv[i], "--list-tracks") )
 	    {
-	      loadDataDir ( FALSE );
+	      loadDataDir ( false );
 	      loadTrackList () ;
 
 	      fprintf ( stdout, "  Available tracks:\n" );
@@ -481,7 +463,7 @@ int main ( int argc, char *argv[] )
 
 	  else if ( !strcmp(argv[i], "--no-start-screen") )
 	    {
-	      noStartScreen = TRUE;
+	      noStartScreen = true;
 	    }
 
 	  else if ( !strcmp(argv[i], "--reverse") )
@@ -524,26 +506,16 @@ int main ( int argc, char *argv[] )
 
 	  else if ( !strcmp(argv[i], "--fullscreen") )
 	    {
-	      width = -1;
-	      height = -1;
-	      noBorder = TRUE;
-	      // Needs some thinking, borders can't be switched on and off.
-	      noStartScreen = TRUE;
+              fullscreen = true;
 	    }
 
-	  else if ( !strcmp(argv[i], "--screensize") and argc > 3 )
+	  else if ( !strcmp(argv[i], "--screensize") && argc > 3 )
 	    {
-	      width = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
+	      width  = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
 	      height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
 
 	      fprintf ( stdout, "You choose to be in %dx%d.\n",
 			atoi(argv[i+1]), atoi(argv[i+2]) ) ;
-	    }
-
-	  else if ( !strcmp(argv[i], "--no-borders") )
-	    {
-	      fprintf ( stdout, "Disabling window borders.\n" ) ;
-	      noBorder = TRUE;
 	    }
 
 	  else if( !strcmp(argv[i], "--version") )
@@ -561,28 +533,16 @@ int main ( int argc, char *argv[] )
 	}
     }
 
+  initTuxKart ( fullscreen );
 
-  if ( noStartScreen == TRUE )
+  if ( noStartScreen )
     {
-      /* Set screen size */
-      reshape( width, height );
-      /* Load plib stuff */
-      initTuxKart ( noBorder );
-
       tuxkartMain ( nbrLaps, mirror, reverse, trackIdents[track], nbrPlayers ) ;
     }
   else
     {
-      /* Load plib stuff */
-      initTuxKart ( noBorder );
-
       /* Show start screen */
       startScreen ( nbrLaps, mirror, reverse, track, nbrPlayers );
-
-      /* Set screen size */
-      reshape( width, height );
-      pwSetSize( getScreenWidth(), getScreenHeight() );
-
       switchToGame () ; 
     }
 

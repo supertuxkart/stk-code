@@ -1,30 +1,24 @@
 
 class GUI
 {
+private:
   class puMenuBar *main_menu_bar ;
 
-  int hidden ;
   int paused ;
+  int hidden ;
 
 public:
 
   GUI () ;
   void update () ;
   void show   () ;
-  void hide   () ;
+  void hide   () ;  
   int  isHidden () { return hidden ; }
+  int  isPaused () { return paused ; }
 
-  int isPaused () { return paused ; }
-  void keyboardInput () ;
+  void keyboardInput () ; 
   void joystickInput () ;
 } ;
-
-
-void motionfn ( int x, int y ) ;
-void  mousefn ( int button, int updown, int x, int y ) ;
-
-int getKeystroke () ;
-int isKeyDown ( unsigned int k ) ;
 
 extern fntTexFont *font ;
 

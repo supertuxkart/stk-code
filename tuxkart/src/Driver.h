@@ -311,7 +311,12 @@ public:
 
   virtual void update () ;
 
+#ifdef HAVE_LIBSDL
+  void incomingKeystroke ( const SDL_keysym& ) ;
+#else
   void incomingKeystroke ( int k ) ;
+#endif
+
   void incomingJoystick  ( JoyInfo *j ) ;
 } ;
 

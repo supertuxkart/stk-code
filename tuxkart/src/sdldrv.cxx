@@ -1,11 +1,9 @@
-
-#include "sdldrv.h"
-#include "tuxkart.h"
-
+#include <iostream>
 #include <SDL.h>
 #include <plib/pu.h>
 
-#include <iostream>
+#include "sdldrv.h"
+#include "tuxkart.h"
 
 using std::cout;
 
@@ -14,8 +12,13 @@ using std::cout;
 Uint8 *keyState;
 int paused;
 
-void initSDL (int videoFlags)
+void initVideo(bool fullscreen)
 {
+  int videoFlags = SDL_OPENGL;
+
+  if (fullscreen)
+    videoFlags |= SDL_FULLSCREEN;
+
   if ( SDL_Init(SDL_INIT_VIDEO) == -1 )
     {
       cout << "SDL_Init() failed: " << SDL_GetError();
@@ -32,7 +35,7 @@ void initSDL (int videoFlags)
       exit(1);
     }
     
-  int screenWidth = getScreenWidth();
+  int screenWidth  = getScreenWidth();
   int screenHeight = getScreenHeight();
   int bpp = info->vfmt->BitsPerPixel;
   
@@ -155,6 +158,11 @@ void shutdown()
 {
   SDL_Quit( );
   exit (0);
+}
+
+void swapBuffers()
+{
+  SDL_GL_SwapBuffers();
 }
 
 /* EOF */

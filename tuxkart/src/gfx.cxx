@@ -1,5 +1,5 @@
 
-#include  "tuxkart.h"
+#include "tuxkart.h"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -8,7 +8,6 @@
 #include <sys/perm.h>                                                           
 #endif
 
-static unsigned int lastKeystroke = 0 ;
 static int width  = 800 ;
 static int height = 600 ;
 
@@ -30,41 +29,11 @@ int getScreenWidth  () { return width  ; }
 int getScreenHeight () { return height ; }
 
 
-static char keyIsDown [ 512 ] ;
-
-void keystroke ( int key, int updown, int, int )
-{
-  if ( updown == PW_DOWN )
-    lastKeystroke = key ;
-
-  keyIsDown [ key ] = (updown == PW_DOWN) ;
-}
-
-
-int isKeyDown ( unsigned int k )
-{
-  return keyIsDown [ k ] ;
-}
-
-int getKeystroke ()
-{
-  int k = lastKeystroke ;
-  lastKeystroke = 0 ;
-  return k ;
-}
-
-void reshape ( int w, int h )
-{
-  setScreenSize ( w, h ) ;
-}
 
 
 GFX::GFX ( int _mirror )
 {
   mirror = _mirror ;
-
-  for ( int i = 0 ; i < 512 ; i++ )
-    keyIsDown [ i ] = FALSE ;
 
   ssgSetFOV ( 75.0f, 0.0f ) ;
   ssgSetNearFar ( 0.05f, 1000.0f ) ;
@@ -107,7 +76,9 @@ int stereoShift ()
 
 void GFX::done ()
 {
-  pwSwapBuffers () ;
+  pollEvents();
+  swapBuffers();
+  
   glBegin ( GL_POINTS ) ;
   glVertex3f ( 0, 0, 0 ) ;
   glEnd () ;

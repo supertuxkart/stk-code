@@ -16,7 +16,12 @@
 #endif
 #include <math.h>
 
-#include <plib/pw.h>
+#ifdef HAVE_LIBSDL
+#include "sdldrv.h"
+#else
+#include "pwdrv.h"
+#endif
+
 #include <plib/ssg.h>
 #include <plib/sl.h>
 #include <plib/js.h>
@@ -46,6 +51,7 @@ extern ssgRoot *scene           ;
 extern char    *tuxkart_datadir ;
 
 void tuxKartMainLoop () ;
+void shutdown() ;
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 
@@ -82,6 +88,7 @@ ssgBranch *process_userdata ( char *data ) ;
 extern int num_karts ;
 extern int num_laps_in_race ;
 extern int finishing_position ;
+extern int paused;
 
 extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;

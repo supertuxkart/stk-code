@@ -13,16 +13,30 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PROG_INSTALL
 
+AC_MSG_CHECKING([whether we should use SDL])
+AC_ARG_ENABLE(sdl,
+              AC_HELP_STRING([--disable-sdl], [disable SDL support]),, enable_sdl="yes")
+if test "x${enable_sdl}" != "xno"; then
+    AC_MSG_RESULT([yes])
+else
+    AC_MSG_RESULT([no])
+fi
+
 dnl ===========================================================================
 dnl Check for SDL
-SDL_VERSION=1.2.4
-AM_PATH_SDL($SDL_VERSION,
-            :,
-	    AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
-)
-CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
-CFLAGS="$CFLAGS $SDL_CFLAGS"
-LIBS="$LIBS $SDL_LIBS"
+if test "x$enable_sdl" = "xyes"; then
+    SDL_VERSION=1.2.4
+    
+    AM_PATH_SDL($SDL_VERSION,
+        [
+            use_sdl="yes"
+            CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+            CFLAGS="$CFLAGS $SDL_CFLAGS"
+            LIBS="$LIBS $SDL_LIBS"
+            AC_DEFINE(HAVE_LIBSDL, 1, "SDL is present")
+            ],
+        use_sdl="no")
+fi
 
 plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
 

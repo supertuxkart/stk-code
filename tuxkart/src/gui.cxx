@@ -4,42 +4,8 @@
 
 static jsJoystick *joystick ;
 
-static int mouse_x ;
-static int mouse_y ;
-static int mouse_dx = 0 ;
-static int mouse_dy = 0 ;
-static int mouse_buttons = 0 ;
-
 fntTexFont *font ;
 
-void motionfn ( int x, int y )
-{
-  mouse_x = x ;
-  mouse_y = y ;
-  mouse_dx += mouse_x - 320 ;
-  mouse_dy += mouse_y - 240 ;
-  puMouse ( x, y ) ;
-}
-
-
-void mousefn ( int button, int updown, int x, int y )
-{
-  mouse_x = x ;
-  mouse_y = y ;
-
-  if ( updown == PW_DOWN )
-    mouse_buttons |= (1<<button) ;
-  else
-    mouse_buttons &= ~(1<<button) ;
-
-  mouse_dx += mouse_x - 320 ;
-  mouse_dy += mouse_y - 240 ;
-
-  puMouse ( button, updown, x, y ) ;
-
-  if ( updown == PW_DOWN )
-    hide_status () ;
-}
 
 static void credits_cb ( puObject * )
 {
@@ -93,8 +59,6 @@ GUI::GUI ()
 {
   paused = FALSE ;
   hidden = TRUE  ;
-  mouse_x = 320 ;
-  mouse_y = 240 ;
 
 /*
   Already done in start_tuxkart!
@@ -155,9 +119,9 @@ void GUI::update ()
   puDisplay () ;
 }
 
-
 void GUI::keyboardInput ()
 {
+#ifndef HAVE_LIBSDL
   static int isWireframe = FALSE ;
   int c = getKeystroke () ;
 
@@ -166,7 +130,7 @@ void GUI::keyboardInput ()
 
   int i;
   switch ( c )
-  {
+    {
     case 0x1B /* Escape */      :
     case 'x'  /* X */      :
     case 'X'  /* X */      :
@@ -174,19 +138,19 @@ void GUI::keyboardInput ()
 
     case 'r' :
     case 'R' :
-               finishing_position = -1 ;
-               for ( i = 0 ; i < num_karts ; i++ )
-                 kart[i]->reset() ;
-               return ;
+      finishing_position = -1 ;
+      for ( i = 0 ; i < num_karts ; i++ )
+        kart[i]->reset() ;
+      return ;
  
     case 'w' :
     case 'W' : if ( isWireframe )
-                 glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
-               else
-                 glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
-               isWireframe = ! isWireframe ;
+      glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+    else
+      glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+      isWireframe = ! isWireframe ;
 
-               return ;
+      return ;
     case 'z' :
     case 'Z' : stToggle () ; return ;
     case 'h' :
@@ -195,15 +159,15 @@ void GUI::keyboardInput ()
     case 'p' : paused = ! paused ; return ;
 
     case ' ' : if ( isHidden () )
-		 show () ;
-	       else
-		 hide () ;
-	       return ;
+      show () ;
+    else
+      hide () ;
+      return ;
 
     default : ((PlayerKartDriver*)kart[0])->incomingKeystroke ( c ) ; break ;
-  }
+    }
+#endif
 }
-
 
 void GUI::joystickInput ()
 {
@@ -220,6 +184,17 @@ void GUI::joystickInput ()
     ji.data[0] *= 1.3 ;
   }
 
+#ifdef HAVE_LIBSDL
+  if ( keyState [ SDLK_LEFT ] ) ji.data [0] = -1.0f ;
+  if ( keyState [ SDLK_RIGHT ] ) ji.data [0] =  1.0f ;
+  if ( keyState [ SDLK_UP ] ) ji.buttons |= 0x01 ;
+  if ( keyState [ SDLK_DOWN ] )  ji.buttons |= 0x02 ;
+
+  if ( keyState [ SDLK_f ] ) ji.buttons |= 0x04 ;
+  if ( keyState [ SDLK_a ] ) ji.buttons |= 0x20 ;
+  if ( keyState [ SDLK_s ] ) ji.buttons |= 0x10 ;
+  if ( keyState [ SDLK_d ] ) ji.buttons |= 0x08 ;
+#else
   if ( isKeyDown ( PW_KEY_LEFT  ) ) ji.data [0] = -1.0f ;
   if ( isKeyDown ( PW_KEY_RIGHT ) ) ji.data [0] =  1.0f ;
   if ( isKeyDown ( PW_KEY_UP    ) ) ji.buttons |= 0x01 ;
@@ -230,6 +205,7 @@ void GUI::joystickInput ()
   if ( isKeyDown ( 'a' ) || isKeyDown ( 'A' ) ) ji.buttons |= 0x20 ;
   if ( isKeyDown ( 's' ) || isKeyDown ( 'S' ) ) ji.buttons |= 0x10 ;
   if ( isKeyDown ( 'd' ) || isKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;
+#endif
 
   ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
   ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;
@@ -238,5 +214,4 @@ void GUI::joystickInput ()
   ((PlayerKartDriver *)kart [ 0 ]) -> incomingJoystick ( &ji ) ;
 }
 
-
-
+/* EOF */

@@ -1,4 +1,3 @@
-
 #include "tuxkart.h"
 
 int mirror  = 0 ;
@@ -461,7 +460,9 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   Camera::setNumSplits ( numPlayers ) ;
   initCameras () ;
 
+#ifndef HAVE_LIBSDL
   pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
+#endif
 
   /* Start building the scene graph */
 
@@ -603,7 +604,11 @@ void tuxKartMainLoop ()
   {
     /* Stop updating if we are paused */
 
+#ifdef HAVE_LIBSDL
+    if ( ! paused )
+#else
     if ( ! gui -> isPaused () )
+#endif
     {
       int i ;
 
@@ -639,3 +644,4 @@ void tuxKartMainLoop ()
   }
 }
 
+/* EOF */
