@@ -40,6 +40,12 @@ fi
 
 AM_CONDITIONAL(HAVE_LIBSDL, test x$use_sdl = xyes)
 
+AC_CHECK_LIB(SDL_image, IMG_Load,,
+	AC_MSG_ERROR([SDL_image library required]))
+
+AC_CHECK_LIB(SDL_ttf, TTF_OpenFont,,
+	AC_MSG_ERROR([SDL_ttf library required]))
+
 plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
 
 dnl Checks for library functions.
