@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.67 2004/08/20 22:41:15 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.68 2004/08/20 22:50:54 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -107,9 +107,10 @@ void cmdLineHelp (char* invocation)
 	    "Options:\n"
 	    "  -N,  --no-start-screen  Quick race\n"
 	    "  -t,  --track n          Start at track number n (see --list-tracks)\n"
-            "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
-            "  --kart n             Use kart number n\n"
 	    "  -l,  --list-tracks      Show available tracks.\n"
+	    "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
+	    "  --kart n                Use kart number n\n"
+	    "  ---list-karts           Show available karts.\n"
 	    "  --laps n                Define number of laps to n\n"
 	    "  --players n             Define number of players to between 1 and 4.\n"
 	    "  --reverse               Enable reverse mode\n"
@@ -182,6 +183,20 @@ int main ( int argc, char *argv[] )
 	      fprintf ( stdout, "  Available tracks:\n" );
 	      for (unsigned int i = 0; i != track_manager.tracks.size(); i++)
                 fprintf ( stdout, "\t%d: %s\n", i, track_manager.tracks[i].name.c_str() );
+	      
+              fprintf ( stdout, "\n" );
+
+	      return 0;
+	    }
+	    
+	   else if( !strcmp(argv[i], "--list-karts") )
+	    {
+	      loadDataDir ();
+	      kart_manager.loadKartData () ;
+
+	      fprintf ( stdout, "  Available karts:\n" );
+	      for (unsigned int i = 0; i != kart_manager.karts.size(); i++)
+                fprintf ( stdout, "\t%d: %s\n", i, kart_manager.karts[i].name.c_str() );
 	      
               fprintf ( stdout, "\n" );
 
