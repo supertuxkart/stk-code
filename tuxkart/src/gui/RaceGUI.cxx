@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.38 2004/09/06 13:03:36 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.39 2004/09/06 18:19:44 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -201,9 +201,9 @@ void RaceGUI::drawText ( const char *text, int sz, int x, int y, int red, int gr
   int h = (int)(glTexture->h * scale_y);
 
   if(x == SCREEN_CENTERED_TEXT)
-    x = (getScreenWidth() - w) / 2;
+    x = (640 - w) / 2;
   if(y == SCREEN_CENTERED_TEXT)
-    y = (getScreenHeight() - h) / 2;
+    y = (480 - h) / 2;
 
   drawTexture(glTexture->texture, w, h, red, green, blue, x, y);
 }
