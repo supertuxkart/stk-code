@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.4 2004/08/22 22:02:45 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.5 2004/08/23 12:04:54 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,7 +48,6 @@ private:
 	
 	Material *herringbones_gst ;
 	Material *herring_gst ;
-	Material *fuzzy_gst ;
 	Material *spark_gst ;
 	Material *missile_gst ;
 	Material *flamemissile_gst ;

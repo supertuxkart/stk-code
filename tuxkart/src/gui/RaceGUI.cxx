@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.21 2004/08/22 22:02:45 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.22 2004/08/23 12:04:54 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,7 +35,6 @@ RaceGUI::RaceGUI():
 show_fps(false),
 herringbones_gst(NULL),
 herring_gst(NULL),
-fuzzy_gst(NULL),
 spark_gst(NULL),
 missile_gst(NULL),
 flamemissile_gst(NULL),
@@ -62,7 +61,6 @@ text(NULL)
 
 	herringbones_gst = getMaterial ( "herringbones.rgb" ) ;
 	herring_gst      = getMaterial ( "herring.rgb"      ) ;
-	fuzzy_gst        = getMaterial ( "fuzzy.rgb"        ) ;
 	spark_gst        = getMaterial ( "spark.rgb"        ) ;
 	missile_gst      = getMaterial ( "missile.rgb"      ) ;
 	flamemissile_gst = getMaterial ( "flamemissile.rgb" ) ;
@@ -293,7 +291,6 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
 
 void RaceGUI::drawMap ()
 {
-  glDisable ( GL_TEXTURE_2D ) ;
   glColor3f ( 1,1,1 ) ;
   World::current() ->track -> draw2Dview ( 480, 10 ) ;
 
@@ -363,6 +360,8 @@ void RaceGUI::drawPlayerIcons ()
   int y;
   char str[256];
 
+  glEnable(GL_TEXTURE_2D);
+
   for(World::Karts::size_type i = 0; i < World::current()->kart.size() ; i++)
     {
       int position = World::current()->kart[i]->getPosition();
@@ -389,6 +388,8 @@ void RaceGUI::drawPlayerIcons ()
       sprintf (str, "%s", pos_string[position]);
       drawDropShadowText ( str, 20, 55+x, y+15 ) ;
     }
+
+  glDisable(GL_TEXTURE_2D);
 }
 
 
@@ -441,7 +442,7 @@ void RaceGUI::drawCollectableIcons ()
 
   switch ( World::current()->kart[0]->getCollectable () )
   {
-    case COLLECT_NOTHING        : fuzzy_gst        -> apply () ; break ;
+    case COLLECT_NOTHING        : break ;
     case COLLECT_SPARK          : spark_gst        -> apply () ; break ;
     case COLLECT_MISSILE        : missile_gst      -> apply () ; break ;
     case COLLECT_HOMING_MISSILE : flamemissile_gst -> apply () ; break ;
@@ -452,19 +453,32 @@ void RaceGUI::drawCollectableIcons ()
 
   int x1 =  320-32 ;
   int y1 = 400 ;
+
+  if(World::current()->kart[0]->getCollectable () == COLLECT_NOTHING)
+    {
+    // If player doesn't have anything, draw a transparent black square
+
+    glDisable(GL_TEXTURE_2D);
+
+    glBegin ( GL_QUADS ) ;
+      glColor4f ( 0.0, 0.0, 0.0, 0.21 ) ;
+      glVertex2i ( x1   , y1    ) ;
+      glVertex2i ( x1+64, y1    ) ;
+      glVertex2i ( x1+64, y1+64 ) ;
+      glVertex2i ( x1   , y1+64 ) ;
+    glEnd();
+    return;
+    }
+
   int n  = World::current()->kart[0]->getNumCollectables() ;
 
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
 
+  glEnable(GL_TEXTURE_2D);
+
   glBegin ( GL_QUADS ) ;
     glColor4f    ( 1, 1, 1, 1 ) ;
-
-    if(World::current()->kart[0]->getCollectable () == COLLECT_NOTHING)
-      {
-      glDisable(GL_TEXTURE_2D);
-      glColor4f ( 1.0, 1.0, 1.0, 0.25 ) ;
-      }
 
     for ( int i = 0 ; i < n ; i++ )
     {
@@ -489,63 +503,75 @@ void RaceGUI::drawCollectableIcons ()
       }
     }
   glEnd () ;
+
+  glDisable(GL_TEXTURE_2D);
 }
 
 /* Energy meter that gets filled with coins */
 
+/* These definitions serve to make Energy Meter easy to tweak */
+#define METER_POS_X  590
+#define METER_POS_Y  130
+#define METER_WIDTH  24
+#define METER_HEIGHT 220
+
+// Meter fluid color (0 - 255)
+#define METER_TOP_COLOR    230, 0, 0, 225
+#define METER_BOTTOM_COLOR 240, 110, 110, 225 
+
+#define METER_BORDER_WIDTH 1
+// Meter border color (0.0 - 1.0)
+#define METER_BORDER_COLOR 0.0, 0.0, 0.0
+
 void RaceGUI::drawEnergyMeter ( float state )
 {
-  glDisable(GL_TEXTURE_2D);
-
-  // Draw Meter around rectangle
+  // Draw a Meter border
   // left side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( 0.0, 0.0, 0.0 ) ;
-    glVertex2i ( 590-1, 130-1 ) ;
-    glVertex2i ( 590,   130-1 ) ;
-    glVertex2i ( 590,   130 + 220) ;
-    glVertex2i ( 590-1, 130 + 220 ) ;
+  glColor3f ( METER_BORDER_COLOR ) ;
+    glVertex2i ( METER_POS_X-METER_BORDER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X,   METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X,   METER_POS_Y + METER_HEIGHT) ;
+    glVertex2i ( METER_POS_X-METER_BORDER_WIDTH, METER_POS_Y + METER_HEIGHT ) ;
   glEnd () ;
 
   // right side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( 0.0, 0.0, 0.0 ) ;
-    glVertex2i ( 590+24,   130-1 ) ;
-    glVertex2i ( 590+24+1, 130-1 ) ;
-    glVertex2i ( 590+24+1, 130 + 220) ;
-    glVertex2i ( 590+24,   130 + 220 ) ;
+  glColor3f ( METER_BORDER_COLOR ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH,   METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH+METER_BORDER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH+METER_BORDER_WIDTH, METER_POS_Y + METER_HEIGHT) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH,   METER_POS_Y + METER_HEIGHT ) ;
   glEnd () ;
 
   // down side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( 0.0, 0.0, 0.0 ) ;
-    glVertex2i ( 590,    130-1 ) ;
-    glVertex2i ( 590+24, 130-1 ) ;
-    glVertex2i ( 590+24, 130 ) ;
-    glVertex2i ( 590,    130 ) ;
+  glColor3f ( METER_BORDER_COLOR ) ;
+    glVertex2i ( METER_POS_X,    METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y ) ;
+    glVertex2i ( METER_POS_X,    METER_POS_Y ) ;
   glEnd () ;
 
   // up side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( 0.0, 0.0, 0.0 ) ;
-    glVertex2i ( 590,    130+220 ) ;
-    glVertex2i ( 590+24, 130+220 ) ;
-    glVertex2i ( 590+24, 130+220+1 ) ;
-    glVertex2i ( 590,    130+220+1 ) ;
+  glColor3f ( METER_BORDER_COLOR ) ;
+    glVertex2i ( METER_POS_X,    METER_POS_Y+METER_HEIGHT ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y+METER_HEIGHT ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y+METER_HEIGHT+METER_BORDER_WIDTH ) ;
+    glVertex2i ( METER_POS_X,    METER_POS_Y+METER_HEIGHT+METER_BORDER_WIDTH ) ;
   glEnd () ;
 
   // Draw the Meter fluid
   glBegin ( GL_QUADS ) ;
-  glColor4ub ( 230, 0, 0, 225 ) ;
-    glVertex2i ( 590,    130 ) ;
-    glVertex2i ( 590+24, 130 ) ;
+  glColor4ub ( METER_TOP_COLOR ) ;
+    glVertex2i ( METER_POS_X,    METER_POS_Y ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y ) ;
 
-  glColor4ub ( 240, 110, 110, 225 ) ;
-    glVertex2i ( 590+24, 130 + (int)(state * 220.0f) ) ;
-    glVertex2i ( 590,    130 + (int)(state * 220.0f) ) ;
+  glColor4ub ( METER_BOTTOM_COLOR ) ;
+    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y + (int)(state * METER_HEIGHT));
+    glVertex2i ( METER_POS_X,    METER_POS_Y + (int)(state * METER_HEIGHT) ) ;
   glEnd () ;
-
-  glEnable(GL_TEXTURE_2D);
 }
 
 
