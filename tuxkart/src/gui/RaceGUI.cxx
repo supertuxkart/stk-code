@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.28 2004/08/25 13:26:14 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.29 2004/08/25 21:08:21 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,7 @@
 #include "../PlayerDriver.h"
 #include "../Track.h"
 #include "../constants.h"
+#include "../Config.h"
 #include "WidgetSet.h"
 #include "World.h"
 #include "KartDriver.h"
@@ -33,7 +34,6 @@
 #include "Loader.h"
 
 RaceGUI::RaceGUI():
-show_fps(false),
 herringbones_gst(NULL),
 herring_gst(NULL),
 spark_gst(NULL),
@@ -90,7 +90,7 @@ void RaceGUI::update(float dt)
 	
 	drawStatusText (World::current()->raceSetup) ;
 		
-	if ( show_fps )
+	if ( config.displayFPS )
 		drawFPS ();
 }
 
@@ -109,7 +109,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
     
 	switch ( key.sym )
 	{
-	case SDLK_F12: show_fps = !show_fps ; return;
+	case SDLK_F12: config.displayFPS = !config.displayFPS ; return;
 	
 	case SDLK_F11 : 
 		if ( isWireframe )

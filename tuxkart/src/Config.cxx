@@ -123,8 +123,7 @@ void Config::saveConfig()
 }
 
 
-/*write settings to config file
-returns 0 on success, -1 on failure.*/
+/*write settings to config file*/
 void Config::saveConfig(const std::string& filename)
 {
     try {
