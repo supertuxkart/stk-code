@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.h,v 1.4 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: PlayerControls.h,v 1.5 2004/10/11 13:40:07 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,8 @@
 #include "BaseGUI.h"
 #include "Player.h"
 
+#include <string>
+
 class PlayerControls: public BaseGUI
 {
 public:
@@ -34,6 +36,10 @@ public:
 	void keybd(const SDL_keysym& key);
 	void point(int x, int y);
 	void stick(int x, int y);
+      void joybutton(int whichJoy, int button);
+      void addKeyLabel(int change_id, KartControl control, bool start);
+      void changeKeyLabel(int grab_id, KartControl control);
+      std::string getKeyInfoString(KartControl control);
 	
 private:
 	int grab_id;

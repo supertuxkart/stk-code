@@ -1,4 +1,4 @@
-// $Id: Player.h,v 1.3 2004/09/24 15:45:02 matzebraun Exp $
+// $Id: Player.h,v 1.4 2004/10/11 13:40:07 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,7 +37,6 @@ class Player
 public:
     std::string name;
     bool useJoy;    //player is using a joystick
-    int joystick;   //which joystick device belongs to player
     int keys[8]; //keyboard keymap and joystick button map
     int buttons[8];
 

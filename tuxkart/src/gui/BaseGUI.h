@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.15 2004/09/08 17:02:16 jamesgregory Exp $
+//  $Id: BaseGUI.h,v 1.16 2004/10/11 13:40:07 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -70,6 +70,7 @@ public:
 	virtual void keybd(const SDL_keysym& key);
 	virtual void point(int x, int y); 
 	virtual void stick(int whichAxis, int value);
+      virtual void joybutton(int whichJoy, int button);
 	
 protected:
 	int menu_id;

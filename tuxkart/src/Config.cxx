@@ -1,4 +1,4 @@
-// $Id: Config.cxx,v 1.10 2004/09/08 15:00:05 jamesgregory Exp $
+// $Id: Config.cxx,v 1.11 2004/10/11 13:40:07 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -93,6 +93,13 @@ void Config::setDefaults()
   player[0].keys[KC_JUMP]    = SDLK_s;
   player[0].keys[KC_RESCUE]  = SDLK_d;
   player[0].keys[KC_FIRE]    = SDLK_f;
+  /*player 1 default joystick settings*/
+  player[0].buttons[KC_UP]      = 0;
+  player[0].buttons[KC_DOWN]    = 1;
+  player[0].buttons[KC_WHEELIE] = 2;
+  player[0].buttons[KC_JUMP]    = 3;
+  player[0].buttons[KC_RESCUE]  = 4;
+  player[0].buttons[KC_FIRE]    = 5;
   /*player 2 default keyboard settings*/
   player[1].keys[KC_LEFT]    = SDLK_j;
   player[1].keys[KC_RIGHT]   = SDLK_l;
@@ -102,6 +109,28 @@ void Config::setDefaults()
   player[1].keys[KC_JUMP]    = SDLK_w;
   player[1].keys[KC_RESCUE]  = SDLK_e;
   player[1].keys[KC_FIRE]    = SDLK_r;
+  /*player 2 default joystick settings*/
+  player[1].buttons[KC_UP]      = 0;
+  player[1].buttons[KC_DOWN]    = 1;
+  player[1].buttons[KC_WHEELIE] = 2;
+  player[1].buttons[KC_JUMP]    = 3;
+  player[1].buttons[KC_RESCUE]  = 4;
+  player[1].buttons[KC_FIRE]    = 5;
+  
+  /*player 3 default joystick settings*/
+  player[2].buttons[KC_UP]      = 0;
+  player[2].buttons[KC_DOWN]    = 1;
+  player[2].buttons[KC_WHEELIE] = 2;
+  player[2].buttons[KC_JUMP]    = 3;
+  player[2].buttons[KC_RESCUE]  = 4;
+  player[2].buttons[KC_FIRE]    = 5;
+  /*player 4 default joystick settings*/
+  player[3].buttons[KC_UP]      = 0;
+  player[3].buttons[KC_DOWN]    = 1;
+  player[3].buttons[KC_WHEELIE] = 2;
+  player[3].buttons[KC_JUMP]    = 3;
+  player[3].buttons[KC_RESCUE]  = 4;
+  player[3].buttons[KC_FIRE]    = 5;
 }
 
 
@@ -154,8 +183,6 @@ void Config::loadConfig(const std::string& filename)
         throw std::runtime_error(temp);
       }
       reader->get("name",     player[i].name);
-      reader->get("useJoy",   player[i].useJoy);
-      reader->get("joystick", player[i].joystick);
       
       /*get keyboard configuration*/
       reader->get("left",    player[i].keys[KC_LEFT]);
@@ -168,6 +195,8 @@ void Config::loadConfig(const std::string& filename)
       reader->get("fire",    player[i].keys[KC_FIRE]);
 
       /*get joystick configuration*/
+      reader->get("joy-up",      player[i].buttons[KC_UP]);
+      reader->get("joy-down",    player[i].buttons[KC_DOWN]);
       reader->get("joy-wheelie", player[i].buttons[KC_WHEELIE]);
       reader->get("joy-jump",    player[i].buttons[KC_JUMP]);
       reader->get("joy-rescue",  player[i].buttons[KC_RESCUE]);
@@ -227,8 +256,6 @@ void Config::saveConfig(const std::string& filename)
       writer.beginList(temp);
       
       writer.write("name\t", player[i].name);
-      writer.write("useJoy\t", player[i].useJoy);
-      writer.write("joystick\t", player[i].joystick);
       
       writer.writeComment("keyboard layout");
       writer.write("left\t",    player[i].keys[KC_LEFT]);
@@ -241,6 +268,8 @@ void Config::saveConfig(const std::string& filename)
       writer.write("fire\t",    player[i].keys[KC_FIRE]);
 
       writer.writeComment("joystick layout");
+      writer.write("joy-up",        player[i].buttons[KC_UP]);
+      writer.write("joy-down",      player[i].buttons[KC_DOWN]);
       writer.write("joy-wheelie\t", player[i].buttons[KC_WHEELIE]);
       writer.write("joy-jump\t",    player[i].buttons[KC_JUMP]);
       writer.write("joy-rescue\t",  player[i].buttons[KC_RESCUE]);
