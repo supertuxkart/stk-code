@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.15 2004/08/19 12:29:16 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.16 2004/08/20 18:00:26 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,7 +36,7 @@ CharSel::CharSel()
   context = new ssgContext;
 
   menu_id = widgetSet -> vstack(0);
-  widgetSet -> label(menu_id, "Chose a Character", GUI_LRG, GUI_ALL, 0, 0);
+  widgetSet -> label(menu_id, "Choose a Character", GUI_LRG, GUI_ALL, 0, 0);
   widgetSet -> space(menu_id);
         
   int ha = widgetSet -> harray(menu_id);
