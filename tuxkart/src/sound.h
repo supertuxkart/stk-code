@@ -1,4 +1,4 @@
-//  $Id: sound.h,v 1.4 2004/08/01 18:47:15 jamesgregory Exp $
+//  $Id: sound.h,v 1.5 2004/08/23 14:45:59 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -70,7 +70,7 @@ public:
     sched -> setSafetyMargin ( t ) ;
   }
 
-  void  change_track ( char *fname ) ;
+  void  change_track ( const char *fname ) ;
   void disable_music () ;
   void  enable_music () ;
   

@@ -1,4 +1,4 @@
-//  $Id: sound.cxx,v 1.5 2004/08/01 18:47:14 jamesgregory Exp $
+//  $Id: sound.cxx,v 1.6 2004/08/23 14:45:59 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,7 +48,7 @@ void SoundSystem::resume_music()
 }
 
 
-void SoundSystem::change_track ( char *fname )
+void SoundSystem::change_track ( const char *fname )
 {
   if ( fname == NULL )
     fname = "" ;
