@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.12 2004/08/03 15:12:22 straver Exp $
+//  $Id: PlayerDriver.cxx,v 1.13 2004/08/07 03:38:37 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,7 +29,7 @@ void PlayerKartDriver::update ()
 }
 
 
-void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
+void PlayerKartDriver::incomingJoystick  (JoyInfo& ji)
 {
   /*
     Delta-t is faked on slow machines for most activities - but
@@ -38,7 +38,7 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
 
   float true_delta_t = fclock -> getDeltaTime () ;
 
-  if ( j -> hits & 0x04 )  /* C == Fire */
+  if ( ji.fire ) 
   {
     if ( collectable == COLLECT_NOTHING )
       sound -> playSfx ( SOUND_BEEP ) ;
@@ -48,8 +48,8 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
 
   if ( on_ground )
   {
-    if ( ( j -> buttons & 0x20 ) &&
-         velocity.xyz[1] >= MIN_WHEELIE_VELOCITY )  /* D == Wheelie */
+    if ( ( ji.wheelie ) &&
+         velocity.xyz[1] >= MIN_WHEELIE_VELOCITY ) 
     {
       if ( wheelie_angle < WHEELIE_PITCH )
         wheelie_angle += WHEELIE_PITCH_RATE * true_delta_t ;
@@ -65,23 +65,23 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
         wheelie_angle = 0.0f ;
     }
  
-    if ( j -> hits & 0x10 )  /* R == Jump */
+    if ( ji.jump )
       velocity.xyz[2] += JUMP_IMPULSE ;
 
-    if ( j -> hits & 0x08 )  /* D == Unused */
+    if ( ji.rescue )
     {
       sound -> playSfx ( SOUND_BEEP ) ;
       rescue = TRUE ;
     }
     
-    if ( j -> buttons & 1 ) { /* A == Accellerate */
+    if ( ji.accel ) {
       throttle = MAX_THROTTLE;
     } else if (throttle > 0) {
     	throttle -= MAX_THROTTLE * true_delta_t;
     } else
     	throttle = 0.0f;
 
-    if ( j -> buttons & 2 ) {  /* B == Active Braking */
+    if ( ji.brake ) {  
       if (velocity.xyz[1] > 0) {
       	brake = MAX_THROTTLE;
       	throttle = 0.0f;
@@ -94,7 +94,7 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     }
       
     if ( wheelie_angle <= 0.0f ) {      
-      steer_angle = -turn_speed * j->data[0];
+      steer_angle = -turn_speed * ji.lr;
       if ( steer_angle > MAX_WHEEL_TURN)
         steer_angle = MAX_WHEEL_TURN;
       if ( steer_angle < -MAX_WHEEL_TURN)
@@ -105,39 +105,44 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
   }
   
   /* Physics debugging control*/
-  if (j -> hits & 0x40) { // 1
+  if ( keyState [ SDLK_1 ] ) {
   	printf ("Selected Inertia - value: %f\n", inertia);
 	selected_property = &inertia;
   }
-  if (j -> hits & 0x80) { // 2
+  if ( keyState [ SDLK_2 ] ) {
   	printf ("Selected corner stiffness front - value: %f\n", corn_f);
 	selected_property = &corn_f;
   }
-  if (j -> hits & 0x100) { // 3
+  
+  if ( keyState [ SDLK_3 ] ) {
   	printf ("Selected corner stiffness rear - value: %f\n", corn_r);
 	selected_property = &corn_r;
   }
-  if (j -> hits & 0x200) { // 4
+  
+  if ( keyState [ SDLK_4 ] ) {
   	printf ("Selected maximum grip - value: %f\n", max_grip);
 	selected_property = &max_grip;
   }
-  if (j -> hits & 0x400) { // 5
+  
+  if ( keyState [ SDLK_5 ] ) {
   	printf ("Selected mass of kart - value: %f\n", mass);
 	selected_property = &mass;
   }
-  if (j -> hits & 0x800) { // 6
+  
+  if ( keyState [ SDLK_6 ] ) {
   	printf ("Selected wheels turn degree - value: %f\n", turn_speed);
 	selected_property = &turn_speed;
   }
-  if (j -> hits & 0x1000) { // +
+  
+  if ( keyState [ SDLK_PLUS ] ) {
   	*selected_property += 0.1f;
   	printf ("Increased selected value to: %f\n", *selected_property);
   }
-  if (j -> hits & 0x2000) { // -
+  
+  if ( keyState [ SDLK_MINUS ] ) {
   	*selected_property -= 0.1f;
   	printf ("Decreased selected value to: %f\n", *selected_property);
-  }
-  
+  }  
 
   force[2] = -GRAVITY * KART_MASS;
 }

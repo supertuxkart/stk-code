@@ -1,4 +1,4 @@
-//  $Id: joystick.h,v 1.3 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: joystick.h,v 1.4 2004/08/07 03:38:37 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,16 +20,19 @@
 #ifndef HEADER_JOYSTICK_H
 #define HEADER_JOYSTICK_H
 
-#include <plib/js.h>
+const int JOY_MAX = 32767;
+const int JOY_MID = 16383;
 
 struct JoyInfo
 {
-  float data [ _JS_MAX_AXES ] ;
-  int buttons     ;
-  int hits        ;
-  int releases    ;
-  int old_buttons ;
-} ;
+	float lr;
+	bool accel;
+	bool brake;
+	bool wheelie;
+	bool jump;
+	bool rescue;
+	bool fire;
+};
 
 #endif
 

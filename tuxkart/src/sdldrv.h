@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.6 2004/08/05 10:19:49 jamesgregory Exp $
+//  $Id: sdldrv.h,v 1.7 2004/08/07 03:38:37 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -21,9 +21,17 @@
 #define HEADER_SDLDRV_H
 
 #include <SDL.h>
+#include <map>
+
+enum KartControl {KC_LEFT, KC_RIGHT, KC_UP, KC_DOWN, KC_WHEELIE, KC_JUMP, KC_RESCUE, KC_FIRE};
+
+struct ControlConfig
+{
+	std::map<KartControl, SDLKey> keys;
+	bool useJoy;
+};
 
 extern Uint8 *keyState;
-extern SDL_Surface *sdl_screen;
 
 void initVideo (int w, int h, bool fullscreen);
 void shutdownVideo();
@@ -33,6 +41,8 @@ void keyboardInput (const SDL_keysym& key);
 void swapBuffers();
 int  getScreenWidth();
 int  getScreenHeight();
+
+void setupControls();
 
 #endif
 

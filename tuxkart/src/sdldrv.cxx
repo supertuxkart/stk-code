@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.16 2004/08/06 00:38:26 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.17 2004/08/07 03:38:37 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -17,23 +17,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
-#include <SDL.h>
-#include <plib/pw.h>
-
 #include "sdldrv.h"
 #include "WidgetSet.h"
 #include "gui/BaseGUI.h"
 #include "tuxkart.h"
 #include "Driver.h"
 
-using std::cout;
+#include <iostream>
+#include <SDL.h>
+#include <vector>
 
+using std::cout;
+using std::vector;
 
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
-static jsJoystick *joystick ;
-static SDL_Joystick *joy;
+static vector<SDL_Joystick*> joys;
+
+std::vector<ControlConfig> controlCon;
 
 void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
@@ -53,21 +54,51 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
       cout << "SDL_SetVideoMode() failed: " << SDL_GetError();
       exit(1);
     }
-    
-  keyState = SDL_GetKeyState(NULL);
+    	
+	setupControls();
+}
+
+void setupControls()
+{
+	keyState = SDL_GetKeyState(NULL);
+	
+	controlCon.resize(4);
   
-  joystick = new jsJoystick ( 0 ) ;
-  joystick -> setDeadBand ( 0, 0.1 ) ;
-  joystick -> setDeadBand ( 1, 0.1 ) ;
-  
-  if ( SDL_NumJoysticks() > 0 )
-  	joy = SDL_JoystickOpen( 0 );
+	int numJoys = SDL_NumJoysticks();
+	
+	int i;
+	for (i = 0; i != numJoys; ++i)
+	{
+  		joys.push_back( SDL_JoystickOpen( i ) );
+		controlCon[i].useJoy = true;
+	}
+	
+	for (; i != 4; ++i)
+		controlCon[i].useJoy = false;
+	
+	controlCon[0].keys[KC_LEFT] = SDLK_LEFT;
+	controlCon[0].keys[KC_RIGHT] = SDLK_RIGHT;
+	controlCon[0].keys[KC_UP] = SDLK_UP;
+	controlCon[0].keys[KC_DOWN] = SDLK_DOWN;
+	controlCon[0].keys[KC_WHEELIE] = SDLK_a;
+	controlCon[0].keys[KC_JUMP] = SDLK_s;
+	controlCon[0].keys[KC_RESCUE] = SDLK_d;
+	controlCon[0].keys[KC_FIRE] = SDLK_f;
+	
+	controlCon[1].keys[KC_LEFT] = SDLK_j;
+	controlCon[1].keys[KC_RIGHT] = SDLK_l;
+	controlCon[1].keys[KC_UP] = SDLK_i;
+	controlCon[1].keys[KC_DOWN] = SDLK_k;
+	controlCon[1].keys[KC_WHEELIE] = SDLK_q;
+	controlCon[1].keys[KC_JUMP] = SDLK_w;
+	controlCon[1].keys[KC_RESCUE] = SDLK_e;
+	controlCon[1].keys[KC_FIRE] = SDLK_r;
 }
 
 void shutdownVideo ()
 {	
-	if ( SDL_JoystickOpened ( 0 ) )
-    		SDL_JoystickClose ( joy );
+	for (uint i = 0; i != joys.size(); ++i)
+    		SDL_JoystickClose ( joys[i] );
 		
 	SDL_Quit( );
 }
@@ -135,46 +166,38 @@ void keyboardInput (const SDL_keysym& key)
 }
 
 void kartInput()
-{
-  static JoyInfo ji ;
-
-  if ( joystick -> notWorking () )
-  {
-    ji.data[0] = ji.data[1] = 0.0f ;
-    ji.buttons = 0 ;
-  }
-  else
-  {
-    joystick -> read ( & ji.buttons, ji.data ) ;
-    ji.data[0] *= 1.3 ;
-  }
-
-  if ( keyState [ SDLK_LEFT ] ) ji.data [0] = -1.0f ;
-  if ( keyState [ SDLK_RIGHT ] ) ji.data [0] =  1.0f ;
-  if ( keyState [ SDLK_UP ] ) ji.buttons |= 0x01 ;
-  if ( keyState [ SDLK_DOWN ] )  ji.buttons |= 0x02 ;
-
-  if ( keyState [ SDLK_f ] ) ji.buttons |= 0x04 ;
-  if ( keyState [ SDLK_a ] ) ji.buttons |= 0x20 ;
-  if ( keyState [ SDLK_s ] ) ji.buttons |= 0x10 ;
-  if ( keyState [ SDLK_d ] ) ji.buttons |= 0x08 ;
-  
-  // physics debugging keys
-  if ( keyState [ SDLK_1 ] ) ji.buttons |= 0x40 ;
-  if ( keyState [ SDLK_2 ] ) ji.buttons |= 0x80 ;
-  if ( keyState [ SDLK_3 ] ) ji.buttons |= 0x100 ;
-  if ( keyState [ SDLK_4 ] ) ji.buttons |= 0x200 ;
-  if ( keyState [ SDLK_5 ] ) ji.buttons |= 0x400 ;
-  if ( keyState [ SDLK_6 ] ) ji.buttons |= 0x800 ;
-  if ( keyState [ SDLK_PLUS ] ) ji.buttons |= 0x1000 ;
-  if ( keyState [ SDLK_MINUS ] ) ji.buttons |= 0x2000 ;
-  
-
-  ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
-  ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;
-  ji.old_buttons =  ji.buttons ;
-
-  ((PlayerKartDriver *)kart [ 0 ]) -> incomingJoystick ( &ji ) ;
+{	
+	static JoyInfo ji;
+	
+	for (int i = 0; i != raceSetup.numPlayers; ++i)
+	{
+		memset(&ji, 0, sizeof(ji));
+		
+		ControlConfig& cc = controlCon[i];
+		
+		if ( controlCon[i].useJoy )
+		{			
+			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / 1000;
+			ji.accel = SDL_JoystickGetButton (joys[i], 0);
+			ji.brake = SDL_JoystickGetButton (joys[i], 1);
+			ji.wheelie = SDL_JoystickGetButton (joys[i], 2);
+			ji.jump = SDL_JoystickGetButton (joys[i], 3);
+			ji.rescue = SDL_JoystickGetButton (joys[i], 4);
+			ji.fire = SDL_JoystickGetButton (joys[i], 5);
+		}
+		
+		if ( keyState [ cc.keys[KC_LEFT] ] ) ji.lr = -1.0f ;
+		if ( keyState [ cc.keys[KC_RIGHT] ] ) ji.lr =  1.0f ;
+		if ( keyState [ cc.keys[KC_UP] ] ) ji.accel = true ;
+		if ( keyState [ cc.keys[KC_DOWN] ] )  ji.brake = true ;
+		
+		if ( keyState [ cc.keys[KC_WHEELIE] ] ) ji.wheelie = true ;
+		if ( keyState [ cc.keys[KC_JUMP] ] ) ji.jump = true ;
+		if ( keyState [ cc.keys[KC_RESCUE] ] ) ji.rescue = true ;	
+		if ( keyState [ cc.keys[KC_FIRE] ] ) ji.fire = true ;
+	
+		((PlayerKartDriver *)kart [ i ]) -> incomingJoystick ( ji ) ;
+	}     
 }
 
 void swapBuffers()
