@@ -1,5 +1,5 @@
 
-#include <plib/pu.h>
+#include <plib/puSDL.h>
 
 class OldGUI
 {

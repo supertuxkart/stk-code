@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.33 2004/08/01 18:52:50 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.34 2004/08/01 20:24:12 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/pw.h>
-#include <plib/pu.h>
+#include <plib/puSDL.h>
 
 #include "tuxkart.h"
 

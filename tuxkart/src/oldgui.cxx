@@ -3,7 +3,7 @@
 #include "oldgui.h"
 #include "status.h"
 #include "sound.h"
-#include <plib/pu.h>
+#include <plib/puSDL.h>
 
 #include "Loader.h"
 
