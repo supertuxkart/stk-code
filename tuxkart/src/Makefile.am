@@ -77,6 +77,8 @@ tuxkart_SOURCES = \
   lispreader.h \
   World.h \
   World.cxx \
+  ParticleSystem.h \
+  ParticleSystem.cxx \
   gui/RaceGUI.cxx \
   gui/RaceGUI.h \
   gui/MainMenu.cxx \

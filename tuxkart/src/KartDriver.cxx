@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.24 2004/08/13 18:57:04 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.25 2004/08/13 21:57:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,7 +28,37 @@
 #include "SkidMark.h"
 #include "World.h"
 
-static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
+KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
+                                       int num, int initial_num,
+                                       float _create_rate, int _ttf,
+                                       float sz, float bsphere_size)                                       
+  : ParticleSystem (num, initial_num, _create_rate, _ttf,
+                    sz, bsphere_size),
+    kart(kart_)
+{
+  getBSphere () -> setCenter ( 0, 0, 0 ) ;
+  getBSphere () -> setRadius ( 1000.0f ) ;
+  dirtyBSphere();
+}
+
+void
+KartParticleSystem::update ( float t ) 
+{
+  if (0)
+    {
+  std::cout << "BSphere: r:" << getBSphere()->radius 
+            << " ("  << getBSphere()->center[0]
+            << ", "  << getBSphere()->center[1]
+            << ", "  << getBSphere()->center[2]
+            << ")"
+            << std::endl;
+    }
+  getBSphere () -> setRadius ( 1000.0f ) ;
+  ParticleSystem::update(t);
+}
+
+void
+KartParticleSystem::particle_create(int, Particle *p)
 {
   sgSetVec4 ( p -> col, 1, 1, 1, .5 ) ;  /* initially white */
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;     /* start off on the ground */
@@ -37,42 +67,22 @@ static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
   p->size = .5f;
   p -> time_to_live = 1 ;               /* Droplets evaporate after 5 seconds */
   
-  KartParticleSystem* ksystem = dynamic_cast<KartParticleSystem*>(system);
-  if (ksystem)
-    {
-      KartDriver* kart = ksystem->kart;
-      sgCoord* pos = kart->getCoord();
-      //sgCoord* vel = kart->getVelocity();
+  sgCoord* pos = kart->getCoord();
+  //sgCoord* vel = kart->getVelocity();
 
-      sgCopyVec3 (p->pos, pos->xyz);     /* start off on the ground */
-      //sgCopyVec3 (p->vel, vel->xyz);
-      (void)pos;
-      //std::cout << "KartDriver: " << pos->xyz[0] << ", " << pos->xyz[1] << std::endl;
-    }
+  sgCopyVec3 (p->pos, pos->xyz);     /* start off on the ground */
+  //sgCopyVec3 (p->vel, vel->xyz);
+  (void)pos;
+  //std::cout << "KartDriver: " << pos->xyz[0] << ", " << pos->xyz[1] << std::endl;
+
+  getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
 }
 
-static void update_smoke (float delta, ssgaParticleSystem* system_, int, 
-                          ssgaParticle * particle)
+void
+KartParticleSystem::particle_update (float delta, int, Particle * particle)
 {
-  KartParticleSystem* system = dynamic_cast<KartParticleSystem*>(system_);
-  (void)system;
-  /* some funny stuff - add options to turn it off*/
-  particle->size += delta*2.0f;
+  particle->size    += delta*2.0f;
   particle->col[3]  -= delta * 2.0f;
-}
-
-KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
-                                       int num, int initial_num,
-                                       float _create_rate, int _ttf,
-                                       float sz, float bsphere_size,
-                                       ssgaParticleCreateFunc _particle_create,
-                                       ssgaParticleUpdateFunc _particle_update,
-                                       ssgaParticleDeleteFunc _particle_delete)
-  : ssgaParticleSystem (num, initial_num, _create_rate, _ttf,
-                        sz, bsphere_size, _particle_create,
-                        _particle_update, _particle_delete),
-    kart(kart_)
-{
 }
 
 void KartDriver::useAttachment ()
@@ -610,8 +620,7 @@ KartDriver::load_data()
   
   // Attach Particle System
   sgCoord pipe_pos = {{-.2, -.8, .3}, {0, 0, 0}} ;
-  smoke_system = new KartParticleSystem(this, 20, 5, 5.0f, TRUE, 0.35f, 1000, 
-                                        create_smoke, update_smoke) ;
+  smoke_system = new KartParticleSystem(this, 20, 5, 15.0f, TRUE, 0.35f, 1000);
   smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;

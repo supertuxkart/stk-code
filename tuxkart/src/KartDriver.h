@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.6 2004/08/13 18:57:04 grumbel Exp $
+//  $Id: KartDriver.h,v 1.7 2004/08/13 21:57:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,25 +21,23 @@
 #define HEADER_KARTDRIVER_H
 
 #include <plib/ssg.h>
-#include <plib/ssgAux.h>
 #include "Driver.h"
+#include "ParticleSystem.h"
   
-//static void create_smoke (ssgaParticleSystem *, int, ssgaParticle *p);
-//static void update_smoke (float delta_t, ssgaParticleSystem *, int, ssgaParticle *p);
-
 class SkidMark;
 
-class KartParticleSystem : public ssgaParticleSystem
+class KartParticleSystem : public ParticleSystem
 {
 public:
+  KartDriver* kart;
+
   KartParticleSystem ( KartDriver* kart, int num, int initial_num,
                        float _create_rate, int _turn_to_face,
-                       float sz, float bsphere_size,
-                       ssgaParticleCreateFunc _particle_create,
-                       ssgaParticleUpdateFunc _particle_update = NULL,
-                       ssgaParticleDeleteFunc _particle_delete = NULL );
+                       float sz, float bsphere_size);
 
-  KartDriver* kart;
+  virtual void update ( float t ) ;
+  virtual void particle_create( int index, Particle *p );
+  virtual void particle_update( float deltaTime, int index, Particle *p );
 };
 
 class KartDriver : public Driver
