@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.4 2004/08/07 03:33:25 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.5 2004/08/08 16:32:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -120,7 +120,7 @@ public:
 	
 	/*---------------------------------------------------------------------------*/
 	
-	/* creation functions, the first argument is the parent id of the new widget (0 if no parent */
+	/* creation functions, the first argument is the parent id of the new widget (0 if no parent) */
 	
 	/* arrays, these are used to setup the layout of your widgets*/	
 	
