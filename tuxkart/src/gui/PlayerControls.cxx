@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.cxx,v 1.5 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: PlayerControls.cxx,v 1.6 2004/09/08 17:02:16 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -93,24 +93,7 @@ void PlayerControls::keybd(const SDL_keysym& key)
 		widgetSet -> set_label(grab_id, SDL_GetKeyName((SDLKey)config.player[config_index].keys[editKey]));
 	}
 	else
-	{
-		switch ( key.sym )
-		{
-		case SDLK_LEFT:
-		case SDLK_RIGHT:
-		case SDLK_UP:
-		case SDLK_DOWN:
-			widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
-			break;
-			
-		case SDLK_RETURN: select(); break;
-		
-		case SDLK_ESCAPE:
-			guiStack.pop_back();
-			
-		default: break;
-		}
-	}
+		BaseGUI::keybd(key);
 }
 
 void PlayerControls::point(int x, int y)

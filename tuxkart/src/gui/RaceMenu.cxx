@@ -1,4 +1,4 @@
-//  $Id: RaceMenu.cxx,v 1.9 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: RaceMenu.cxx,v 1.10 2004/09/08 17:02:16 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -76,21 +76,14 @@ void RaceMenu::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
-	case SDLK_LEFT:    
-	case SDLK_RIGHT:    
-	case SDLK_UP:    
-	case SDLK_DOWN:
-		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
-		break;
-		
-	case SDLK_RETURN: select(); break;
-	
 	case SDLK_ESCAPE:
 		widgetSet -> tgl_paused();
 		guiStack.pop_back();
 		break;
 		
-	default: break;
+	default:
+		BaseGUI::keybd(key);
+		break;
 	}
 }
 

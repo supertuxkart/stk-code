@@ -1,4 +1,4 @@
-//  $Id: Difficulty.h,v 1.5 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: Difficulty.h,v 1.6 2004/09/08 17:02:16 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,7 +31,6 @@ public:
 	
 	void update(float dt);
 	void select();
-	void keybd(const SDL_keysym& key);
 };
 
 #endif
