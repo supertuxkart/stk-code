@@ -121,14 +121,14 @@ static void play_cb ( puObject * )
   trackButtons -> getValue ( & t ) ;
   nl = atoi ( numLapsText->getLegend () ) ;
 
-  delete numLapsSlider ;
-  delete numLapsText   ;
-  delete playButton    ;
-  delete exitButton    ;
-  delete trackButtons  ;
-  delete intro_gst     ;
-  delete sorority      ;
-  delete fnt           ;
+  puDeleteObject ( numLapsSlider ) ;
+  puDeleteObject ( numLapsText   ) ;
+  puDeleteObject ( playButton    ) ;
+  puDeleteObject ( exitButton    ) ;
+  puDeleteObject ( trackButtons  ) ;
+  puDeleteObject ( intro_gst     ) ;
+  puDeleteObject ( sorority      ) ;
+  puDeleteObject ( fnt           ) ;
 
   tuxkart_main ( nl, track_idents[t] ) ;
 }

@@ -9,7 +9,8 @@ ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst,
                *explode_gst, *flamemissile_gst, *players_gst, *magnet_gst,
                *brick_gst, *grid_gst, *lava_gst, *stone_gst,
                *pebble_gst, *floor_gst, *railing_gst, *wood_gst,
-               *tinytux_gst, *butterfly_gst,
+               *tinytux_gst, *butterfly_gst, *sandstorm_gst, *sand_gst,
+               *pyramidwall_gst, *egypt_gst,
                *bzzt_gst, *herringbones_gst, *goldwall_gst, *rainbow_gst ;
 
 ssgSimpleState *blank_gst ;
@@ -36,8 +37,14 @@ Material gs_setup [] =
   { &stone_gst   , "images/stonewall.rgb",NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &pebble_gst  , "images/pebbles.rgb" , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &floor_gst   , "images/floor.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
+  { &sand_gst    , "images/sand.rgb"    , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
+  { &egypt_gst   , "images/egypt.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
+  { &pyramidwall_gst,
+                   "images/pyramidwall.rgb",
+                                          NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &lava_gst    , "images/lava.rgb"    , NOCLAMP,FALSE,0.0, FALSE,1.0, MAT_RESET },
   { &grid_gst    , "images/metalgrid.rgb",NOCLAMP,TRUE ,0.3, TRUE ,1.0, 0 },
+  { &sandstorm_gst,"images/fuzzy_sand.rgb",NOCLAMP,TRUE,0.0, FALSE,1.0, MAT_IGN },
   { &roadway_gst , "images/roadway.rgb" , UCLAMP ,TRUE ,0.0, TRUE ,1.0, 0 },
   { &rainbow_gst , "images/rainbow.rgb" , NOCLAMP,TRUE ,0.0, FALSE,1.0, 0 },
   { &tinytux_gst , "images/tinytux.rgb" , UVCLAMP,TRUE ,0.8, FALSE,1.0, MAT_IGN },
@@ -67,6 +74,7 @@ void Material::install ( int index )
 {
   *gst = new ssgSimpleState ;
 
+  (*gst) -> ref () ;
   (*gst) -> setExternalPropertyIndex ( index ) ;
 
   if ( texture_map [ 0 ] != '\0' )

@@ -188,7 +188,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
       are handled by the height-of-terrain code anyway.
     */
 
-    if ( h -> plane[2] > 0.5 )
+    if ( h -> plane[2] > 0.4 )
       continue ;
 
     if ( dist > 0 && dist < sphere.getRadius() )
