@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.26 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.27 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "Herring.h"
+#include "Driver.h"
+#include "Explosion.h"
+#include "isect.h"
+#include "loader.h"
+#include "status.h"
+#include "Camera.h"
+#include "level.h"
+#include "gui.h"
+#include "gfx.h"
+#include "preprocessor.h"
+#include "material.h"
 
 int mirror  = 0 ;
 int reverse = 0 ;

@@ -56,5 +56,3 @@ tuxkart_SOURCES = \
   utils.h
 
 # EOF #
-
-

@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.13 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: status.cxx,v 1.14 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,8 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tuxkart.h"
 #include <stdarg.h>
+#include <plib/fnt.h>
+#include "tuxkart.h"
+#include "status.h"
+#include "gui.h"
+#include "Driver.h"
+#include "material.h"
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256

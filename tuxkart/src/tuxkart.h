@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.15 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: tuxkart.h,v 1.16 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,12 +43,6 @@
 #include "pwdrv.h"
 #endif
 
-#include <plib/ssg.h>
-#include <plib/sl.h>
-#include <plib/js.h>
-#include <plib/fnt.h>
-#include <plib/pu.h>
-
 #include "guNet.h"
 #include "constants.h"
 #include "utils.h"
@@ -76,22 +70,6 @@ void shutdown() ;
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 
-#include "sound.h"
-#include "Track.h"
-#include "Herring.h"
-#include "joystick.h"
-#include "Driver.h"
-#include "Explosion.h"
-#include "Camera.h"
-#include "gfx.h"
-#include "gui.h"
-#include "material.h"
-#include "status.h"
-#include "loader.h"
-#include "level.h"
-#include "isect.h"
-#include "preprocessor.h"
-
 #define NUM_KARTS        8
 #define NUM_TRAFFIC      2
 #define NUM_PROJECTILES  8
@@ -111,6 +89,10 @@ extern int num_laps_in_race ;
 extern int finishing_position ;
 extern bool paused ;
 extern bool show_fps ;
+
+class KartDriver;
+class Projectile;
+class Explosion;
 
 extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;

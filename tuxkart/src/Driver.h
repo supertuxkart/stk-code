@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.7 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: Driver.h,v 1.8 2004/08/01 00:13:27 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,11 @@
 
 #ifndef HEADER_DRIVER_H
 #define HEADER_DRIVER_H
+
+#include <plib/ssg.h>
+#include "tuxkart.h"
+#include "Track.h"
+#include "joystick.h"
 
 #define HISTORY_FRAMES 128
 

@@ -1,4 +1,4 @@
-//  $Id: Explosion.h,v 1.2 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: Explosion.h,v 1.3 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,8 @@
 
 #ifndef HEADER_EXPLOSION_H
 #define HEADER_EXPLOSION_H
+
+#include "sound.h"
 
 class Explosion
 {

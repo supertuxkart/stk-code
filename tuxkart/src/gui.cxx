@@ -1,4 +1,4 @@
-//  $Id: gui.cxx,v 1.14 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: gui.cxx,v 1.15 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,8 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tuxkart.h"
+#include <plib/pw.h>
 #include <plib/pu.h>
+#include <plib/js.h>
+#include "tuxkart.h"
+#include "gui.h"
+#include "sound.h"
+#include "status.h"
+#include "Driver.h"
+#include "joystick.h"
 
 static jsJoystick *joystick ;
 

@@ -1,4 +1,4 @@
-//  $Id: sound.cxx,v 1.3 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: sound.cxx,v 1.4 2004/08/01 00:13:28 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "sound.h"
 
 struct Sound
 {
@@ -118,4 +119,4 @@ void SoundSystem::update ()
   sched -> update () ;
 }
 
-
+/* EOF */
