@@ -103,4 +103,4 @@ ParticleSystem::recalcBSphere();
   int getNumActiveParticles () { return num_active    ; }
 } ;
 
-
+/* EOF */

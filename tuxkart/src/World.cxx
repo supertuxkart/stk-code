@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.11 2004/08/14 14:10:49 grumbel Exp $
+//  $Id: World.cxx,v 1.12 2004/08/14 17:40:26 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -240,18 +240,23 @@ World::update()
 {
   /* Stop updating if we are paused */
 
-  if (fclock->getAbsTime() > 3.0 && ready_set_go == 1)
+  if (fclock->getAbsTime() > 1.0 && ready_set_go == 0)
+    {
+      ready_set_go = -1;
+    }
+  else if (fclock->getAbsTime() > 2.0 && ready_set_go == 1)
     {
       std::cout << "Go!" << std::endl;
       ready_set_go = 0;
       phase = RACE_PHASE;
+      fclock->reset();
     }
-  else if (fclock->getAbsTime() > 2.0 && ready_set_go == 2)
+  else if (fclock->getAbsTime() > 1.0 && ready_set_go == 2)
     {
       std::cout << "Set" << std::endl;
       ready_set_go = 1;
     }
-  else if (fclock->getAbsTime() > 1.0 && ready_set_go == 3)
+  else if (fclock->getAbsTime() > 0.0 && ready_set_go == 3)
     {
       std::cout << "Ready" << std::endl;
       ready_set_go = 2;

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.31 2004/08/14 14:10:49 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.32 2004/08/14 17:40:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -448,7 +448,11 @@ void KartDriver::update ()
   // Lock the vehicle in its start position until the race has
   // really started
   if (World::current()->getPhase() == World::START_PHASE)
-    sgCopyCoord(&curr_pos, &temp);
+    {
+      sgCopyCoord(&curr_pos, &temp);
+      sgCopyCoord(&last_pos, &temp);
+      sgCopyCoord(&last_relax_pos, &temp);
+    }
 }
 
 

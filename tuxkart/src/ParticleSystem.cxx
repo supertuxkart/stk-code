@@ -147,7 +147,6 @@ void ParticleSystem::draw_geometry ()
   }
 }
 
-
 ParticleSystem::~ParticleSystem ()
 {
   for ( int i = 0 ; i < num_particles ; i++ )
@@ -156,7 +155,6 @@ ParticleSystem::~ParticleSystem ()
 
   delete [] particle ;
 }
-
 
 void ParticleSystem::update ( float t )
 {
@@ -194,4 +192,5 @@ void ParticleSystem::update ( float t )
     }
 }
 
+/* EOF */
 
