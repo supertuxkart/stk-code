@@ -1,4 +1,4 @@
-//  $Id: SkidMark.cxx,v 1.3 2004/08/13 22:58:16 grumbel Exp $
+//  $Id: SkidMark.cxx,v 1.4 2004/08/13 23:34:19 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -29,6 +29,12 @@ SkidMark::SkidMark()
 {
   ref();
   World::current()->scene->addKid(this);
+  
+  
+  ssgSimpleState *skidstate;
+  skidstate = new ssgSimpleState ();
+  skidstate -> enable (GL_BLEND);
+  this -> setState (skidstate);
 }
 
 SkidMark::~SkidMark()
