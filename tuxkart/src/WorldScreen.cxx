@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.7 2004/08/24 21:01:44 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.8 2004/08/25 11:29:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include <plib/ul.h>
 #include "World.h"
 #include "tuxkart.h"

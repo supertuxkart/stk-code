@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.29 2004/08/25 00:21:23 grumbel Exp $
+//  $Id: World.cxx,v 1.30 2004/08/25 11:29:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -131,7 +131,7 @@ World::World(const RaceSetup& raceSetup_)
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
     init_pos.xyz [ 0 ] = (pos % 2 == 0) ? 1.5f : -1.5f ;
-    init_pos.xyz [ 1 ] = pos * 1.5f ;
+    init_pos.xyz [ 1 ] = -pos * 1.5f ;
 
     if ( raceSetup.reverse ) init_pos.hpr[0] = 180.0f ;
 

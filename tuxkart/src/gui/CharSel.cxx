@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.22 2004/08/24 21:01:45 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.23 2004/08/25 11:29:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -148,9 +148,28 @@ void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
 	
+        int player = 0;
+        switch(guiStack.back())
+          {
+          case GUIS_CHARSEL:
+            player = 0;
+            break;
+          case GUIS_CHARSELP2:
+            player = 1;
+            break;
+          case GUIS_CHARSELP3:
+            player = 2;
+            break;
+          case GUIS_CHARSELP4:
+            player = 3;
+            break;
+          default:
+            break;
+          }
+
 	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
-          RaceManager::instance()->setPlayerKart(0, kart_manager.getKartById(token).ident);
-	
+          RaceManager::instance()->setPlayerKart(player, kart_manager.getKartById(token).ident);
+
 	if (RaceManager::instance()->getNumPlayers() > 1)
 	{
 		if (guiStack.back() == GUIS_CHARSEL)

@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.5 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: RaceManager.h,v 1.6 2004/08/25 11:29:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,12 +40,12 @@ class GrandPrixMode : public RaceMode
 private:
   void start_race(int n);
 public:
-  std::string kart;
+  std::vector<std::string> players;
   CupData cup;
   RaceDifficulty difficulty;
   GrandPrixSetup stat;
 
-  GrandPrixMode(const std::string& kart_, 
+  GrandPrixMode(const std::vector<std::string>& players_, 
                 const CupData& cup_,
                 RaceDifficulty difficulty_);
   virtual ~GrandPrixMode() {}
@@ -58,10 +58,10 @@ class QuickRaceMode : public RaceMode
 {
 public:
   std::string track;
-  std::string kart;
+  std::vector<std::string> players;
   RaceDifficulty difficulty;
 
-  QuickRaceMode(const std::string& track_, const std::string& kart_, RaceDifficulty difficulty_);
+  QuickRaceMode(const std::string& track_, const std::vector<std::string>& players_, RaceDifficulty difficulty_);
   virtual ~QuickRaceMode() {}
 
   void start();
