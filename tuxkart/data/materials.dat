@@ -42,6 +42,8 @@
 "zipper.png"       N N     N      0.0     N     N   1.0     N   Y    N    N
 "mnm.png"          Y Y     Y      0.5     N     N   1.0     N   Y    N    N
 "fuzzy.png"        Y Y     Y      0.2     N     N   0.0     Y   N    N    N
+"mriceblockshadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"mriceblockicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "tuxkartshadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushishadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushiicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
