@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.13 2004/08/08 16:04:08 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.14 2004/08/09 15:24:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,12 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include "tuxkart.h"
 #include "Herring.h"
 #include "sound.h"
 #include "Loader.h"
 #include "Shadow.h"
-#include "Driver.h"
+#include "KartDriver.h"
+#include "Projectile.h"
 
 void KartDriver::useAttachment ()
 {
@@ -348,6 +350,32 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
   attachment           = NULL ;
   attachment_time_left = 0.0f ;
   attachment_type      = ATTACH_NOTHING ;
+
+  wheel_front_l = NULL;
+  wheel_front_r = NULL;
+  wheel_rear_l  = NULL;
+  wheel_rear_r  = NULL;
+}
+
+void print_model(ssgEntity* entity, int indent)
+{
+  for(int i = 0; i < indent; ++i)
+    std::cout << "  ";
+
+  std::cout << entity->getTypeName() << " '" 
+            << entity->getPrintableName() 
+            << "' '" 
+            << (entity->getName() ? entity->getName() : "null")
+            << "' " << int(entity) << std::endl;
+  
+  ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
+  if (branch)
+    {
+      for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
+        {
+          print_model(i, indent + 1);
+        }
+    }
 }
 
 void
@@ -358,6 +386,27 @@ KartDriver::load_data()
   char *magnet_file    = "magnet.ac"     ;
   char *magnet2_file   = "magnetbzzt.ac" ;
   char *anvil_file     = "anvil.ac"      ;
+
+  float r [ 2 ] = { -10.0f, 100.0f } ;
+
+  ssgEntity *obj = ssgLoadAC ( kart_properties.model_file.c_str(), loader ) ;
+
+  if (kart_properties.model_file == "mrcube.ac")
+    print_model(model, 0);
+
+  // Optimize the model
+  ssgBranch *newobj = new ssgBranch () ;
+  newobj -> addKid ( obj ) ;
+  ssgFlatten    ( obj ) ;
+  ssgStripify   ( newobj ) ;
+  obj = newobj;
+    
+  ssgRangeSelector *lod = new ssgRangeSelector ;
+
+  lod -> addKid ( obj ) ;
+  lod -> setRanges ( r, 2 ) ;
+
+  this-> getModel() -> addKid ( lod ) ;
 
   // Load data for this kart (bonus objects, the kart model, etc)
   ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
@@ -370,23 +419,12 @@ KartDriver::load_data()
   ssgTransform *ttt = new ssgTransform ( & cc ) ;
   ttt -> addKid ( ssgLoad ( tinytux_file  , loader ) ) ;
 
-  ssgEntity *pobj5 = ttt ;
-
-  float r [ 2 ] = { -10.0f, 100.0f } ;
-
-  ssgEntity *obj = ssgLoad ( kart_properties.model_file.c_str(), loader ) ;
-
   sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
   ssgTransform *xxx = new ssgTransform ( & cc ) ;
   xxx -> addKid ( obj ) ;
   obj = xxx ;
-    
-  ssgRangeSelector *lod = new ssgRangeSelector ;
 
-  lod -> addKid ( obj ) ;
-  lod -> setRanges ( r, 2 ) ;
-
-  this-> getModel() -> addKid ( lod ) ;
+  ssgEntity *pobj5 = ttt ;
 
   this-> addAttachment ( pobj1 ) ;
   this-> addAttachment ( pobj2 ) ;

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.21 2004/08/08 16:35:27 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.22 2004/08/09 15:24:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -22,6 +22,7 @@
 #include "gui/BaseGUI.h"
 #include "tuxkart.h"
 #include "Driver.h"
+#include "KartDriver.h"
 
 #include <iostream>
 #include <SDL.h>

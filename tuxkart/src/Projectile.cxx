@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.4 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: Projectile.cxx,v 1.5 2004/08/09 15:24:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,8 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <plib/sg.h>
 #include "tuxkart.h"
-#include "Driver.h"
+#include "Projectile.h"
+#include "KartDriver.h"
 #include "Explosion.h"
 
 void Projectile::update ()
@@ -143,5 +145,16 @@ void Projectile::doCollisionAnalysis  ( float /* hot */ )
     }
   }
 }
+
+void
+Projectile::fire ( KartDriver *who, int _type )
+{
+  owner = who ;
+  setCoord ( who->getCoord() ) ;
+  setType  ( _type ) ;
+}
+
+/* EOF */
+
 
 

@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.14 2004/08/08 10:43:42 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.15 2004/08/09 15:24:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,7 @@
 #include "tuxkart.h"
 #include "sound.h"
 #include "KartProperties.h"
-#include "Driver.h"
+#include "KartDriver.h"
 
 int check_hint = 0 ;
 

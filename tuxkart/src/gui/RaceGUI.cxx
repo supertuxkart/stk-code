@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.6 2004/08/08 16:35:26 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.7 2004/08/09 15:24:02 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,7 @@
 #include "status.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
-#include "Driver.h"
+#include "KartDriver.h"
 
 RaceGUI::RaceGUI()
 {

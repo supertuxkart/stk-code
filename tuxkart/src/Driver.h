@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.20 2004/08/08 11:23:39 grumbel Exp $
+//  $Id: Driver.h,v 1.21 2004/08/09 15:24:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #define HEADER_DRIVER_H
 
 #include <plib/ssg.h>
+#include <plib/sg.h>
 #include "tuxkart.h"
 #include "Track.h"
 #include "joystick.h"
@@ -91,6 +92,8 @@ class Shadow;
 #define ZIPPER_VELOCITY      (100.0f * KILOMETERS_PER_HOUR )
 
 #define MAX_HERRING_EATEN    20
+
+class KartDriver;
 
 class Driver
 {
@@ -223,193 +226,6 @@ public:
   virtual void doZipperProcessing   () ;
   virtual void doCollisionAnalysis  ( float hot ) ;
   virtual void update               () ;
-} ;
-
-
-class KartDriver : public Driver
-{
-protected:
-  int num_collectables ;
-  int grid_position ;
-  int collectable ;
-  float attachment_time_left ;
-  int   attachment_type ;
-  int num_herring_gobbled ;
-  ssgSelector *attachment ;
-
-public:
-
-  KartDriver ( const KartProperties& kart_properties_, int position_ ) ;
-  virtual ~KartDriver() {}
-
-  void load_data();
-
-  void addAttachment ( ssgEntity *e )
-  {
-    if ( attachment == NULL )
-    {
-      attachment = new ssgSelector () ;
-      getModel() -> addKid ( attachment ) ;
-    }
-
-    attachment -> addKid ( e ) ;
-    attachment -> select ( 0 ) ;
-  }
-
-  void attach ( int which, float time )
-  {
-    attachment -> selectStep ( which ) ;
-    attachment_time_left = time ;
-    attachment_type = which ;
-  }
-
-  int getAttachment      () { return  attachment_type ; }
-  int getCollectable     () { return     collectable  ; }
-  int getNumCollectables () { return num_collectables ; }
-  int getNumHerring      () { return num_herring_gobbled ; }
-
-  virtual void useAttachment        () ;
-  virtual void forceCrash           () ;
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float hot ) ;
-  virtual void update               () ;
-} ;
-
-
-
-
-class NetworkKartDriver : public KartDriver
-{
-public:
-  NetworkKartDriver ( const KartProperties& kart_properties_, int _pos )
-    : KartDriver (kart_properties_, _pos)
-  {
-  }
-
-  virtual ~NetworkKartDriver() {}
-
-  virtual void update () ;
-} ;
-
-
-
-class TrafficDriver : public KartDriver
-{
-public:
-  TrafficDriver ( const KartProperties& kart_properties_, sgVec3 _pos )
-    : KartDriver ( kart_properties_, 0 )
-  {
-    sgCopyVec3 ( reset_pos.xyz, _pos ) ;
-    reset () ;
-  }
-
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void update () ;
-} ;
-
-
-class AutoKartDriver : public KartDriver
-{
-  float time_since_last_shoot ;
-public:
-  AutoKartDriver ( const KartProperties& kart_properties_, int _pos ) 
-    : KartDriver ( kart_properties_, _pos )
-  {
-    time_since_last_shoot = 0.0f ;
-  }
-
-  virtual ~AutoKartDriver() {}
-
-  virtual void update () ;
-} ;
-
-
-class PlayerKartDriver : public KartDriver
-{  
-protected:
-  float    tscale ;
-  float    rscale ;
-  
-  // physics debugging
-  float *selected_property;
-
-public:
-  PlayerKartDriver ( const KartProperties& kart_properties_, int _pos ) 
-    : KartDriver ( kart_properties_, _pos )
-  {
-    tscale = 10.0 ;
-    rscale =  3.0 ;
-  }
-
-  virtual void update () ;
-
-  void incomingKeystroke ( const SDL_keysym& ) ;
-  void incomingJoystick  ( JoyInfo& ji ) ;
-} ;
-
-
-class Projectile : public Driver
-{
-  KartDriver *owner ;
-  int type ;
-
-  void setType ( int _type )
-  {
-    type = _type ;
-
-    switch ( type )
-    {
-      case COLLECT_NOTHING :
-      case COLLECT_ZIPPER  :
-      case COLLECT_MAGNET  :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> select ( 0 ) ;
-        break ;
-
-      case COLLECT_SPARK :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 0 ) ;
-        break ;
-
-      case COLLECT_MISSILE :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 1 ) ;
-        break ;
-
-      case COLLECT_HOMING_MISSILE :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 2 ) ;
-        break ;
-    }
-  }
-
-public:
-  Projectile ( ) : Driver ( )
-  {
-    type = COLLECT_NOTHING ;
-  }
-
-  virtual ~Projectile() {}
-
-  void off ()
-  {
-    setType ( COLLECT_NOTHING ) ;
-  }
-
-  void fire ( KartDriver *who, int _type )
-  {
-    owner = who ;
-    setCoord ( who->getCoord() ) ;
-    setType  ( _type ) ;
-  }
-
-
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float hot ) ;
-  virtual void update               () ;
-
 } ;
 
 #endif
