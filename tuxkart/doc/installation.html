@@ -1,0 +1,99 @@
+<TITLE>Tuxedo T. Penguin stars in TuxKart!</TITLE>
+<BODY BACKGROUND="background.png">
+<TABLE>
+<TR>
+<TD>
+<center>
+<A href="http://sourceforge.net">
+<IMG src="http://sourceforge.net/sflogo.php?group_id=2554&type=1" width="88" height="31" border="0"></A>
+</center>
+<p>
+<center>
+    <FONT SIZE=+7><b>T</b></FONT SIZE><b>UXEDO</b>
+    <FONT SIZE=+7><b>T. P</b></FONT SIZE><b>ENGUIN STARS IN</b>
+    <FONT SIZE=+7><b>T</b></FONT SIZE><b>UX</b><FONT SIZE=+7><b>K</b></FONT SIZE><b>ART!</b>
+</center>
+<br>
+<center>by Steve and Oliver Baker</center>
+</TD>
+<TD>
+<IMG SRC="title_screen.png">
+</TD>
+</TR>
+</TABLE>
+<TABLE>
+<TR>
+<TD valign=top align=left>
+<A HREF="index.html"><IMG SRC="homepage_button.png" ALT="HomePage" BORDER="0"></A><br>
+<A HREF="screenshots.html"><IMG SRC="screenshots_button.png" ALT="Screenshots" BORDER="0"></A><br>
+<A HREF="downloads.html"><IMG SRC="downloads_button.png" ALT="Downloads" BORDER="0"></A><br>
+<A HREF="installation.html"><IMG SRC="installation_button.png" ALT="Installation" BORDER="0"></A><br>
+<A HREF="trackdesign.html"><IMG SRC="trackdesign_button.png" ALT="TrackDesign" BORDER="0"></A><br>
+<A HREF="requirements.html"><IMG SRC="requirements_button.png" ALT="Requirements" BORDER="0"></A><br>
+<A HREF="license.html"><IMG SRC="license_button.png" ALT="License" BORDER="0"></A><br>
+<A HREF="controls.html"><IMG SRC="controls_button.png" ALT="Controls" BORDER="0"></A><br>
+<A HREF="support.html"><IMG SRC="support_button.png" ALT="Support" BORDER="0"></A><br>
+<A HREF="links.html"><IMG SRC="links_button.png" ALT="Links" BORDER="0"></A><br>
+</TD>
+<TD>
+<H2>INSTALLATION:</H2>
+First, make sure that you have the following packages
+installed:
+<ul>
+<li> <A HREF="http://www.opengl.org">OpenGL</A>
+     (or <A HREF="http://www.mesa3d.org"> Mesa 3.0 or later</A>)
+<li> GLUT 3.7 or <A HREF="http://freeglut.sourceforge.net">freeglut</A>
+<li> <A HREF="http://plib.sourceforge.net"> PLIB version 1.6.0 or later </A>.
+</ul>                                                                                        
+Unpack the files from the tarball like this:
+<pre>
+
+  gunzip tuxkart-*.tar.gz
+  tar xvf tuxkart-*.tar
+  rm tuxkart-*.tar
+  cd tuxkart-*
+
+</pre>
+(where '*' is the version of TuxKart you downloaded - eg 0.2.0)
+...and then:
+<pre>
+
+  ./configure
+  make
+
+</pre>
+<p>
+You can run the game from the directory you downloaded it
+into - or (as 'root') you can install it into
+/usr/local/share/games/tuxkart by typing;
+<pre>
+
+ make install
+
+</pre>
+
+<H2>But it didn't work!</H2>
+Well, the most common (by FAR) reason for problems is that
+your OpenGL/Mesa is incorrectly installed - so before you
+complain to any of the PLIB or TuxKart mailing lists, first
+try running one of the example programs that comes with your
+OpenGL implementation - or one of the Mesa or GLUT sample
+programs.
+<p>
+If you those examples run OK - then go to the
+<A HREF="http://plib.sourceforge.net">PLIB home page</A> and
+download the PLIB examples.
+<p>
+If THOSE run correctly - but TuxKart doesn't then please get
+in touch with the TuxKart mailing list and
+we'll do our best to get you up and racing.
+</TD>
+</TR>
+</TABLE>
+<hr>
+Steve Baker
+<br>
+<A HREF="mailto:sjbaker1@airmail.net">&lt;sjbaker1@airmail.net&gt;</A>
+<br>
+<A HREF="http://www.sjbaker.org">http://www.sjbaker.org</A>
+

@@ -1,0 +1,375 @@
+<TITLE>Tuxedo T. Penguin stars in TuxKart!</TITLE>
+<BODY BACKGROUND="background.png">
+<TABLE>
+<TR>
+<TD>
+<center>
+<A href="http://sourceforge.net">
+<IMG src="http://sourceforge.net/sflogo.php?group_id=2554&type=1" width="88" height="31" border="0"></A>
+</center>
+<p>
+<center>
+    <FONT SIZE=+7><b>T</b></FONT SIZE><b>UXEDO</b>
+    <FONT SIZE=+7><b>T. P</b></FONT SIZE><b>ENGUIN STARS IN</b>
+    <FONT SIZE=+7><b>T</b></FONT SIZE><b>UX</b><FONT SIZE=+7><b>K</b></FONT SIZE><b>ART!</b>
+</center>
+<br>
+<center>by Steve and Oliver Baker</center>
+</TD>
+<TD>
+<IMG SRC="title_screen.png">
+</TD>
+</TR>
+</TABLE>
+<TABLE>
+<TR>
+<TD valign=top align=left>
+<A HREF="index.html"><IMG SRC="homepage_button.png" ALT="HomePage" BORDER="0"></A><br>
+<A HREF="screenshots.html"><IMG SRC="screenshots_button.png" ALT="Screenshots" BORDER="0"></A><br>
+<A HREF="downloads.html"><IMG SRC="downloads_button.png" ALT="Downloads" BORDER="0"></A><br>
+<A HREF="installation.html"><IMG SRC="installation_button.png" ALT="Installation" BORDER="0"></A><br>
+<A HREF="trackdesign.html"><IMG SRC="trackdesign_button.png" ALT="TrackDesign" BORDER="0"></A><br>
+<A HREF="requirements.html"><IMG SRC="requirements_button.png" ALT="Requirements" BORDER="0"></A><br>
+<A HREF="license.html"><IMG SRC="license_button.png" ALT="License" BORDER="0"></A><br>
+<A HREF="controls.html"><IMG SRC="controls_button.png" ALT="Controls" BORDER="0"></A><br>
+<A HREF="support.html"><IMG SRC="support_button.png" ALT="Support" BORDER="0"></A><br>
+<A HREF="links.html"><IMG SRC="links_button.png" ALT="Links" BORDER="0"></A><br>
+</TD>
+<TD>
+
+<H2>DESIGNING YOUR OWN TUXKART RACETRACKS.</H2>
+A TuxKart 'level' (a race track) is just a bunch of static models - perhaps
+just one if it's simple enough.
+<p>
+The model files can be in any format that PLIB's "SSG" library can load -
+there are quite a few loaders now for a range of common formats.  I havn't
+tested many of them though and I suspect that some of them are 'patchy'
+in implementation.
+<p>
+I've been using AC3D to model stuff for TuxKart - and the AC3D file format
+is pretty well supported.
+<p>
+
+<H2>RACETRACK MODELS.</H2>
+The race always starts at the origin of the model - with the players facing
+due north. The karts start out spaced a couple of meters apart - so make
+sure the track is wide enough!
+<p>
+Karts are dropped onto the track - it's very important that the road
+surface at X==0, Y==0 is slightly below Z==0.  That may seem a nasty
+restriction that I should fix - but think about what would happen if
+you wanted to start the race inside a tunnel or something where there
+were multiple layers of polygons above the origin...the program would
+have no way to know which layer you wanted to start at.
+<p>
+I've had to 'extend' the AC3D format a little by using the "Object Data" field
+to contain the additional parameters.  The TuxKart engine knows how to do
+simple repetitive motion on either whole objects or texture maps based on
+that data...eg, I have moving water and lava streams by setting up a moving
+texture in the AC3D Object Data field.  There are various other similar
+extensions for 'model switched' animations and such like.
+<p>
+It would be easy to add other kinds of effects into the model in that way.
+<p>
+Since most model formats allow for some kind of text field to be attached
+to nodes in the database, this same technique should work for other model
+formats - although we may need to get the authors of those loaders to
+support the callback function that the AC3D loader uses to tell the
+application program that this happened.
+
+<H2>IMAGE AND TEXTURE FILES:</H2>
+All 2D icons and texture maps have to be in either BMP or SGI 'RGB'
+format.  I greatly prefer the latter because BMP changes often
+and my loader can't keep up.
+<p>
+All images and textures have to obey the rules for OpenGL texture
+maps - they must be even powers of two in size (ie the X and Y
+dimensions must be 2,4,8,16,32,64,128,256,etc).  You can have
+rectangular maps (eg 128x64).
+<p>
+Whilst there is no limit to the size of a texture map or image - you
+need to be aware that 3Dfx cards (which are VERY commonly used) cannot
+cope with maps larger than 256x256.  The map loader will downsize your
+maps as necessary to make them fit - but beware that this will make them
+fuzzy.
+<p>
+3Dfx cards also have a limitation that maps must not have an aspect
+ratio of more than 8:1 or less than 1:8.  That's rarely a practical
+limitation.
+<p>
+Textures are ALWAYS MIPmapped and displayed using the highest quality
+settings.
+<p>
+Ideally, all the maps for one track should fit into texture memory -
+and on early Voodoo-1 cards, that could be as little as 2Mb...of
+course with a GeForce-2 you get something like 64Mb of compressed
+texture memory - perhaps 100Mb.  How much can you use?  That's your
+problem!
+
+<H2>COORDINATE SYSTEMS:</H2>
+I have chosen one 'unit' in the database to be one meter in the real
+world - but since we don't really know how big Tux and his friends are,
+this is pretty arbitary.  Another way to think of this is that Tux is
+one meter tall (that's just how big I think of him as being) - so one
+'unit' is one 'tux' high - which is one meter.  Real world penguins
+do get as big as a meter tall - but Tux is a 'Jackass Penguin' and
+they only grow to about 30cm...however, if he was that small, it
+would be hard to make levels because he ends up being too short to
+reach furniture, door knobs, etc convincingly.
+<p>
+I come from a flight-simulation background where we use the convention
+that Z-is-up - so all my software works like that.  However, the
+PLIB loaders know that some modellers use Y-is-up and do the axis
+swap as needed.  Hence, in AC3D, Y-is-up - but in the game, your
+models will be converted to Z-is-up.  If you find this confusing,
+forget I mentioned it - everything comes out OK automagically.
+
+<H2>RACETRACK MATERIALS.</H2>
+Another kind of effect comes from which texture map you use. I find
+that model file formats don't tell me all I need to know about a polygon.
+<p>
+For example - do you crash if you hit it?  Yes - if it's a brick wall,
+No - if it's a cloud of smoke.  What is the coefficient of friction?
+Different for Ice than for Concrete.
+<p>
+These things will eventually be listed in a 'Material Reference File'
+for the level - but for now, it's hard-compiled into the game.  Hence,
+if you need an icy surface, you apply the texture "ice.rgb" and when
+the model loads, I check that filename against my list of materials
+and note that "ice.rgb" is a slippery material.  This means that you
+can't re-use the ice texture map for anything that isn't supposed to
+be slippery - but what the heck...that's a really easy solution.  It
+also allows me to add new material properties without going back into
+every single model adding that property into every single polygon.
+<p>
+If you feel the need to play with this, you'll need to hand-edit the
+table at the start of 'src/material.cxx'.
+<pre>
+
+    { &aarmco_gst  , "images/aarmco.rgb"  , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
+
+</pre>
+The fields (in order) are:
+<ul>
+<li> &aarmco_gst -- the name of the material inside the C++ code.
+<li> "images/aarmco.rgb" -- the filename for the texture map.
+<li> VCLAMP -- this should be either: NOCLAMP, VCLAMP, UCLAMP or UVCLAMP and
+     determines whether the map:
+     <ul>
+     <li> NOCLAMP - repeats endlessly.
+     <li> UCLAMP - repeats in the V (ie Y) direction only.
+     <li> VCLAMP - or only in the U (ie X) direction.
+     <li> UVCLAMP - makes the texture not repeat at all.
+     </ul>
+     If the polygon is larger than the map and the map is clamped then
+     the edge texels of the map will be repeated endlessly.
+<li> TRUE -- is the texture transparent?
+<li> 0.5  -- the 'alpha clamp' value - pixels with an alpha less than this are
+     not rendered.
+<li> TRUE -- is 'lighting' enabled for this polygon?  If not, the polygon will
+     be drawn at it's full brightness and it'll glow in the dark.
+<li> 1.0 -- the frictional coefficient. 1.0 is 'normal', larger numbers represent
+     rougher surfaces, smaller are more slippery.
+<li> 0 -- the effect on the Kart of touching polygons made of this material.
+     <ul>
+     <li> 0 means that this is a 'drivable surface' - or for a vertical surface,
+         that karts that hit it will only slow down a little and can 'slide' along
+         the polygons.
+     <li> MAT_CRASH means that any kart that hits this polygon will crash and drop
+     to zero speed.
+     <li> MAT_ZIP means that this polygon has the effect of a zipper...probably, this
+     should only be used for actual zippers...think CAREFULLY before you do differently!
+     <li> MAT_IGN means that this material is purely decorative and karts can drive
+     right through it.
+     </ul>
+</ul>
+
+<H2>THE 'LOCATION' FILE.</H2>
+There is a 'data/xxx.loc' file (where 'xxx' is the name of your level) that
+contains the location of each model file in (x,y,z) and (h,p,r) - Heading,
+Pitch and Roll.
+<p>
+It's convenient to have some objects automatically 'conform' to sit on the
+terrain.  If you wish to do that, then you can replace the Z coordinate
+with a pair of curly braces '{}'...you can also leave out either Pitch
+or Roll (using '{}') - and they will be computed so as to position the
+object onto the underlying surface.
+<p>
+Since objects are added to the scene in order, the track models needs to
+appear earlier in the file than things you wish to conform to it.
+<p> 
+There are some models that are 'built-in' to the game engine - notably the
+the various colours of herring.
+<p>
+Comments can be placed into the '.loc' file by placing a '#' at the start
+of the line.
+<p>
+The easiest way to understand the '.loc' file format is to look at some
+of those from existing levels - the format is easy enough.
+Here is an example:
+<pre>
+
+#
+# The track itself.
+#
+"bsodcastle.ac",0,0,0,0,0,0
+#
+# Two Zippers (clamped to the track)
+#
+"zipper.ac",-70,0,{},90,{},{}
+"zipper.ac",-75,0,{},180,{},{}
+#
+# An advert for SuSE Linux
+#
+"susesign.ac",130,-40,5,-90,0,0
+#
+# A Gold (Yellow) herring
+#
+YHERRING,-45,-140
+#
+# Two Red herring
+# 
+RHERRING,29,-139
+RHERRING,29,-141
+#
+# Two Silver herring 
+#
+SHERRING,20,80
+SHERRING,120,-65
+#
+# Two Green herring
+# 
+GHERRING,25,70
+GHERRING,30,70
+
+</pre>
+You can change the car models used for a given level by specifying
+a 'players' file:
+<pre>
+
+PLAYERS "data/filename.dat"
+
+</pre>
+The default players file is 'data/players.dat'.
+<H2>THE 'DRIVE LINE' FILE.</H2>
+The second file you need is 'data/xxx.drv' - which is an ordered list
+of 2D points that lie along the approximate centerline of the track -
+starting at the start line, going all the way around the track and
+ending again at the start line.
+<p>
+The DRIVE LINE file is used for several things:
+<ul>
+<li> To tell the computer players where to steer.
+<li> To let me figure out how far around the 'lap' each player is.
+<li> I also use it to generate a 'plan view' of the track with
+     coloured dots for the players.
+</ul>
+Here is an example of a typical 'drv' file.
+<pre>
+
+1.6556,-2.09912
+-0.6416,15.1328
+-7.5344,35.8112
+-22.469,54.192
+-40.8496,59.936
+-59.2304,51.8944
+-75.3136,33.5136
+-83.3552,22.0256
+-100.587,1.34728
+-122.414,-8.99188
+
+</pre>
+The simplest way to generate such a file is to load your track into a
+suitable 3D modeller and digitize a 'polyline' (or 'line loop' or whatever)
+around the track.  Then delete all the other things in the model and
+SaveAs to a separate file.  Presuming your modeller can export an ASCII
+format of some kind, you can easily hand edit the points to delete the
+vertical coordinate and all the non-vertex data from the file.
+<p>
+You can test whether you got it right by loading the model and drv file into
+TuxKart and driving Tux around the track.  Observing the planview as you
+go around will make it easy to tell whether you got it right.
+<p>
+The computer-controlled players have a hard time making it around tight corners,
+so please try to have the drv file take a 'racing line' through the turn to
+give them a better chance.
+
+<H2> KART MODELS:</H2>
+Right now, the Karts in TuxKart are pretty simple - just a plain rigid
+model.   That's going to have to change so the characters do stuff like
+leaning into the corners, turning their heads, waving their fists (oh - wait,
+none of them *have* fists :-)  ...however, remarkably little of that happens
+in MarioKart - and my first goal is just to be AS GOOD AS MK64 - being better
+than it can come later!
+<p>
+The Karts also need 2D icons for use in various parts of the game.
+<p>
+The filenames for the four Kart models are set in the 'players.dat' file
+(which can be overriddeng for each level). The icons and
+icons for the various collectibles are hard-coded into the game.  The
+herrings and zippers plus sundry other things like the shadows of the
+karts, missiles and herrings are also hard-coded into the game with
+no model files to change.
+<p>
+<p>
+Finally, you 'connect' your new model into the game by editing the
+file 'data/levels.dat'.  Add a new line containing the base
+name of the '.loc' and '.drv' files followed by a space and
+then the Human-readable name for the level as shown on the menu
+in the startup screen.
+<pre>
+   eg
+
+     penguinpark Penguin Park
+
+</pre>
+This causes the game to add 'Penguin Park' to the startup menu,
+and if that item is selected, will cause it to load 'data/penguinpark.loc'
+and 'data/penguinpark.drv'.  This feature was not available prior to version 0.0.2.
+<H2>THE 'PLAYERS' FILE.</H2>
+This is a straight list of filenames containing the 3D models of the
+players and their vehicles.  The order of the entries in the file is
+significant.
+<pre>
+#
+# These have to be in the order: Tux, Geeko, BSOD and Gown.
+#
+tuxkart.ac
+geekokart.ac
+bsodkart.ac
+gownkart.ac
+
+</pre>
+
+<H2>DIRECTORY STRUCTURE:</H2>
+
+<pre>
+src     -- Where the source code lives.
+
+data    -- This contains all kinds of miscellaneous data
+           files. Right now, this is limited to the level
+           description files '.loc' and '.drv' and 'levels.dat'.
+
+doc     -- Documentation - all in '.html'
+
+images  -- Texture maps and other images needed by the
+           game. These are currently all in SGI '.rgb'
+           image format.
+
+wavs    -- Sound files - sound effects in '.wav' format.
+
+mods    -- Music files - in '.mod' format.
+
+models  -- 3D models - in '.ac' format.
+</pre>
+
+</TD>
+</TR>
+</TABLE>
+<hr>
+Steve Baker
+<br>
+<A HREF="mailto:sjbaker1@airmail.net">&lt;sjbaker1@airmail.net&gt;</A>
+<br>
+<A HREF="http://www.sjbaker.org">http://www.sjbaker.org</A>
+
