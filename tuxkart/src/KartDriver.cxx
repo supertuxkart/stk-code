@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.45 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.46 2004/08/27 14:46:10 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -73,7 +73,7 @@ KartParticleSystem::particle_create(int, Particle *p)
   p -> time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
   
   sgCoord* pos = kart->getVisiCoord ();
-  //sgCoord* vel = kart->getVelocity ();
+  sgCoord* vel = kart->getVelocity ();
    
   float xDirection = sgCos (pos->hpr[0] - 90.0f); // Point at the rear 
   float yDirection = sgSin (pos->hpr[0] - 90.0f); // Point at the rear
@@ -83,8 +83,15 @@ KartParticleSystem::particle_create(int, Particle *p)
   p->pos[0] += xDirection * 0.7;
   p->pos[1] += yDirection * 0.7;
   
- // p->vel[0] = xDirection * -vel->xyz[0] * 1.0;
-  //p->vel[1] = yDirection * -vel->xyz[0] * 1.0;
+  float abs_vel = sqrt((vel->xyz[0] * vel->xyz[0]) + (vel->xyz[1] * vel->xyz[1]));
+  
+  p->vel[0] = xDirection * -abs_vel/2;
+  p->vel[1] = yDirection * -abs_vel/2;
+  
+  p->vel[0] += sgCos (rand()%180) * 1;
+  p->vel[1] += sgSin (rand()%180) * 1;
+  p->vel[2] += sgSin (rand()%100) * 1;
+  
 
   getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
 }
@@ -95,8 +102,9 @@ KartParticleSystem::particle_update (float delta, int, Particle * particle)
   particle->size    += delta*2.0f;
   particle->col[3]  -= delta * 2.0f;
   
-  //particle->pos[0] += particle->vel[0] * delta;
-  //particle->pos[1] += particle->vel[1] * delta;
+  particle->pos[0] += particle->vel[0] * delta;
+  particle->pos[1] += particle->vel[1] * delta;
+  particle->pos[2] += particle->vel[2] * delta;
 }
 
 KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
