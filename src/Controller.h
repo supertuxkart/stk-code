@@ -32,7 +32,7 @@
    public:
        Controller() { kart = 0; }
        virtual void setKart(KartDriver* kart_) { kart = kart_; }
-       virtual void update(float delta) {}
+       virtual void update(float delta) {(void)delta; }
    };
 
 #endif

@@ -37,6 +37,7 @@
    void 
     PlayerDriver::update (float delta)
    {
+    (void)delta;
    
    /* //Uncomment this to test the AI's steering algorithm with a player kart
       //You also have to include "Track.h" and <math.h> to use it.
