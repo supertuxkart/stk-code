@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.4 2004/08/06 13:30:00 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.5 2004/08/08 16:32:53 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -498,19 +498,11 @@ int WidgetSet::space(int pd)
 
 int WidgetSet::pause(int pd)
 {
-    const char *text = "Paused";
     int id;
 
     if ((id = add_widget(pd, GUI_PAUSE)))
     {
-        widgets[id].text_img = make_image_from_font(NULL, NULL,
-                                                   &widgets[id].w,
-                                                   &widgets[id].h,
-                                                   text, font[GUI_LRG]);
-        widgets[id].color0 = gui_wht;
-        widgets[id].color1 = gui_wht;
         widgets[id].value  = 0;
-        widgets[id].size   = GUI_LRG;
         widgets[id].rect   = GUI_ALL;
     }
     return id;
