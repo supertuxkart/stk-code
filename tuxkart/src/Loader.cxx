@@ -85,11 +85,17 @@ Loader::listFiles(std::set<std::string>& result, const std::string& dir)
 {
     struct stat mystat;
 
+#ifdef DEBUG
+    // don't list directories with a slash on the end, it'll fail on win32
+    assert(dir[dir.size()-1] != '/');
+#endif
+
     result.clear();
     for(std::vector<std::string>::const_iterator i = searchPath.begin();
             i != searchPath.end(); ++i) {
         std::string path = *i;
-        path += '/';
+
+	path += '/';
         path += dir;
 
         if(stat(path.c_str(), &mystat) < 0)

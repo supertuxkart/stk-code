@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.59 2004/08/12 14:54:55 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.60 2004/08/15 13:16:17 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,7 +45,7 @@ Characters characters;
 static void loadCharacters()
 {
   std::set<std::string> result;
-  loader->listFiles(result, "data/");
+  loader->listFiles(result, "data");
 
   // Findout which characters are available and load them
   for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
