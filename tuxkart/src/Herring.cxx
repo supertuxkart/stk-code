@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.6 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: Herring.cxx,v 1.7 2004/08/02 12:10:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -62,7 +62,25 @@ Herring::Herring ( sgVec3 colour )
   ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
   gset -> setState ( getMaterial ( "herring.rgb" ) -> getState () ) ;
+  
+  h = 0.0f ;
  
+  sh = new Shadow ( -0.5, 0.5, -0.25, 0.25 ) ;
+ 
+  tr = new ssgTransform () ;
+ 
+  tr -> addKid ( sh -> getRoot () ) ;
+  tr -> addKid ( gset ) ;
+  tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
+}
+
+Herring::Herring ( ssgEntity* model )
+{
+  ssgEntity *gset = model ;
+  
+  //turn off collision detection. 
+  gset -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ; 
+  
   h = 0.0f ;
  
   sh = new Shadow ( -0.5, 0.5, -0.25, 0.25 ) ;

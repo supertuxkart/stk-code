@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.30 2004/08/01 18:52:50 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.31 2004/08/02 12:10:01 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -512,8 +512,9 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   sgVec3 green  = { 0.0, 0.8, 0.0 } ;
  
   silver_h  = new Herring ( cyan   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
-  gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), mirror ) ;
-  red_h     = new Herring ( red    ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
+    gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), mirror ) ;
+  //red_h     = new Herring ( red    ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
+  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
   green_h   = new Herring ( green  ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
 
   /* Load the Karts */
