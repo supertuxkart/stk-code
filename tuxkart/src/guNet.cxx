@@ -19,10 +19,10 @@
 
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #if defined(_MSC_VER)
  #include <winsock.h>
 #else
+ #include <sys/socket.h>
  #include <sys/param.h>
  #include <netinet/in.h>
  #ifndef __CYGWIN__

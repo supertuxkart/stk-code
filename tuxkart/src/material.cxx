@@ -10,7 +10,7 @@ ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst,
                *brick_gst, *grid_gst, *lava_gst, *stone_gst,
                *pebble_gst, *floor_gst, *railing_gst, *wood_gst,
                *tinytux_gst, *butterfly_gst, *sandstorm_gst, *sand_gst,
-               *pyramidwall_gst, *egypt_gst, *flames_gst,
+               *pyramidwall_gst, *egypt_gst, *flames_gst, *ruler_gst,
                *bzzt_gst, *herringbones_gst, *goldwall_gst, *rainbow_gst ;
 
 ssgSimpleState *blank_gst ;
@@ -27,6 +27,7 @@ Material gs_setup [] =
                "images/candy_stripe.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
   { &aarmco_gst  , "images/aarmco.rgb"  , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
   { &railing_gst , "images/railing.rgb" , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
+  { &ruler_gst   , "images/ruler.rgb"   , NOCLAMP,TRUE ,0.5, TRUE ,1.0, 0 },
   { &goldwall_gst,
            "images/embossed_herring.rgb", NOCLAMP,TRUE ,0.5, TRUE ,1.0, 0 },
 

@@ -84,9 +84,6 @@ static void displayfn (void)
   glDisable      ( GL_ALPHA_TEST ) ;
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
                                                                                 
-int depthbits = 0 ;
-glGetIntegerv ( GL_DEPTH_BITS, & depthbits ) ;
-fprintf(stderr, "%d Depth bits\n", depthbits ) ;
   intro_gst -> force () ;
 
   glBegin ( GL_QUADS ) ;

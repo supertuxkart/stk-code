@@ -1,7 +1,14 @@
 #
 # Track itself.
 #
-"gownsbow.ac",0,0,0,0,0,0
+"olivermath.ac",0,0,0,0,0,0
+"desk.ac",10,0,{},0,{},{}
+"backpack.ac",0,0,{},0,{},{}
+"desk.ac",-10,0,{},0,{},{}
+"desk.ac",10,-10,{},0,{},{}
+"backpack.ac",0,-10,{},0,{},{}
+"desk.ac",-10,-10,{},0,{},{}
+"ruler.ac",-15,-15,{},0,{},{}
 #
 MUSIC "mods/tk5a.mod"
 
