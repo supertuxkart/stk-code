@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.h,v 1.3 2004/10/24 08:15:00 cosmosninja Exp $
+//  $Id: PlayerDriver.h,v 1.4 2004/11/01 17:41:23 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,7 +34,7 @@
 
 /** PlayerDriver manages controll events from the player and moves
     them to the Kart */
-    class PlayerDriver : public Controller
+   class PlayerDriver : public Controller
    {
    private:
       float    tscale ;
@@ -44,7 +44,7 @@
       float *selected_property;
    
    public:
-      PlayerDriver();
+      PlayerDriver(float);
    
       //void update();
       void incomingJoystick  (JoyInfo& ji);
