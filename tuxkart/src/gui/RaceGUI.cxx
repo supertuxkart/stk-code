@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.22 2004/08/23 12:04:54 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.23 2004/08/23 13:33:11 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -292,7 +292,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
 void RaceGUI::drawMap ()
 {
   glColor3f ( 1,1,1 ) ;
-  World::current() ->track -> draw2Dview ( 480, 10 ) ;
+  World::current() ->track -> draw2Dview ( 520, 40, 120, 120, false ) ;
 
   glBegin ( GL_QUADS ) ;
 
