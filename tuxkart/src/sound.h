@@ -1,4 +1,4 @@
-//  $Id: sound.h,v 1.3 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: sound.h,v 1.4 2004/08/01 18:47:15 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,11 +33,31 @@
 #define SOUND_BZZT              8
 #define SOUND_BEEP              9
 #define SOUND_SHOOMF           10
- 
+
+#define NUM_SOUNDS 11
+
+#include <plib/sl.h>
+
+#include <string>
+
+using std::string;
+
+class Sound
+{
+public:
+	Sound() { s = NULL ; }
+   string fname ;
+   slSample *s ;
+} ;
+
 class SoundSystem
 {
   char current_track [ 256 ] ;
   slScheduler *sched ;
+  
+  Sound sfx [NUM_SOUNDS] ; 
+  bool music_off;
+  bool   sfx_off;
 
 public:
   SoundSystem () ;
@@ -53,6 +73,9 @@ public:
   void  change_track ( char *fname ) ;
   void disable_music () ;
   void  enable_music () ;
+  
+  void pause_music () ;
+  void resume_music ();
 
   void disable_sfx   () ;
   void  enable_sfx   () ;

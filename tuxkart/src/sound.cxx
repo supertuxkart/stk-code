@@ -1,4 +1,4 @@
-//  $Id: sound.cxx,v 1.4 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: sound.cxx,v 1.5 2004/08/01 18:47:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,32 +19,8 @@
 
 #include "tuxkart.h"
 #include "sound.h"
+#include "Loader.h"
 
-struct Sound
-{
-   char *fname ;
-   slSample *s ;
-} ;
-
-
-static Sound sfx [] =
-{
-  { "wavs/ugh.wav"	, NULL },
-  { "wavs/boing.wav"	, NULL },
-  { "wavs/bonk.wav"	, NULL },
-  { "wavs/burp.wav"	, NULL },
-  { "wavs/laser.wav"	, NULL },
-  { "wavs/ow.wav"	, NULL },
-  { "wavs/wee.wav"	, NULL },
-  { "wavs/explosion.wav", NULL },
-  { "wavs/bzzt.wav"	, NULL },
-  { "wavs/horn.wav"	, NULL },
-  { "wavs/shoomf.wav"	, NULL },
-  { NULL, NULL }
-} ;
-
-static int music_off = FALSE ;
-static int   sfx_off = FALSE ;
 
 void SoundSystem::disable_music ()
 {
@@ -53,6 +29,22 @@ void SoundSystem::disable_music ()
   sched -> update    () ;  /* Ugh! Nasty Kludge! */
 
   music_off = TRUE  ;
+}
+
+void SoundSystem::pause_music()
+{
+  sched -> pauseMusic () ;
+  //FIXME: I'm just copying disable_music, no idea if the following is neccessary, let alone twice
+  sched -> update    () ;  /* Ugh! Nasty Kludge! */
+  sched -> update    () ;  /* Ugh! Nasty Kludge! */
+}
+
+void SoundSystem::resume_music()
+{
+  sched -> resumeMusic () ;
+  //FIXME: I'm just copying disable_music, no idea if the following is neccessary, let alone twice
+  sched -> update    () ;  /* Ugh! Nasty Kludge! */
+  sched -> update    () ;  /* Ugh! Nasty Kludge! */
 }
 
 
@@ -93,14 +85,30 @@ void SoundSystem::playSfx ( int sfx_num )
 }
 
 
-SoundSystem::SoundSystem ()
+SoundSystem::SoundSystem ():
+music_off(FALSE), sfx_off(FALSE)
 {
   sched = new slScheduler ;
+  
+  sfx[SOUND_UGH].fname = "wavs/ugh.wav";
+  sfx[SOUND_BOING].fname = "wavs/boing.wav";
+  sfx[SOUND_BONK].fname = "wavs/bonk.wav";
+  sfx[SOUND_BURP].fname = "wavs/burp.wav";
+  sfx[SOUND_LASER].fname = "wavs/laser.wav";
+  sfx[SOUND_OW].fname = "wavs/ow.wav";
+  sfx[SOUND_WEE].fname = "wavs/wee.wav";
+  sfx[SOUND_EXPLOSION].fname = "wavs/explosion.wav";
+  sfx[SOUND_BZZT].fname = "wavs/bzzt.wav";
+  sfx[SOUND_BEEP].fname = "wavs/horn.wav";
+  sfx[SOUND_SHOOMF].fname = "wavs/shoomf.wav";
 
   setSafetyMargin () ;
-
-  for ( Sound *currsfx = &(sfx[0]) ; currsfx -> fname != NULL ; currsfx++ )
-    currsfx -> s  = new slSample ( currsfx -> fname, sched ) ;
+  
+  for (int i = 0; i != NUM_SOUNDS; i++)
+  {
+    std::string path = loader->getPath(sfx[i].fname);
+      sfx[i].s  = new slSample ( path.c_str(), sched ) ;
+  }
 
   enable_sfx   () ;
   change_track ( "" ) ;
