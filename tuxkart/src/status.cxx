@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.14 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: status.cxx,v 1.15 2004/08/01 20:07:08 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,7 @@
 #include "gui.h"
 #include "Driver.h"
 #include "material.h"
+#include "oldgui.h"
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
@@ -125,7 +126,7 @@ void help        () {     help_timer = 0 ; }
 
 void drawText ( char *str, int sz, int x, int y )
 {
-  text -> setFont      ( font ) ;
+  text -> setFont      ( oldfont ) ;
   text -> setPointSize ( sz ) ;
 
   text -> begin () ;
@@ -300,8 +301,6 @@ void drawCreditsText ()
 
 void drawFPSText ()
 {
-  #ifdef HAVE_LIBSDL
-  
   static int fpsCounter;
   static int fpsSave = 0;
   static int fpsTimer = SDL_GetTicks();
@@ -320,8 +319,6 @@ void drawFPSText ()
   char str [ 20 ];
   sprintf( str, "FPS: %d", fpsSave);
   drawDropShadowText( str, 18, 0 , 0);
-  
-  #endif
 }
 
 void drawStatsText ()
@@ -479,9 +476,6 @@ void drawGameRunningText ()
   drawTimer () ;
 
   glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
-  
-  if ( show_fps )
-    drawFPSText () ;
     
   if ( stats_enabled )
     drawStatsText () ;

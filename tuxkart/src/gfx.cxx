@@ -1,4 +1,4 @@
-//  $Id: gfx.cxx,v 1.16 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: gfx.cxx,v 1.17 2004/08/01 20:07:08 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -79,7 +79,6 @@ int stereoShift ()
 
 void GFX::done ()
 {
-  pollEvents();
   swapBuffers();
   
   glBegin ( GL_POINTS ) ;

@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.8 2004/08/01 00:13:27 grumbel Exp $
+//  $Id: Driver.h,v 1.9 2004/08/01 20:07:08 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -368,12 +368,7 @@ public:
 
   virtual void update () ;
 
-#ifdef HAVE_LIBSDL
   void incomingKeystroke ( const SDL_keysym& ) ;
-#else
-  void incomingKeystroke ( int k ) ;
-#endif
-
   void incomingJoystick  ( JoyInfo *j ) ;
 } ;
 

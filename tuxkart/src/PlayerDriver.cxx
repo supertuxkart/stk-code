@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.9 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.10 2004/08/01 20:07:08 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -132,7 +132,6 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     force[2] = -GRAVITY * KART_MASS;
 }
 
-#ifdef HAVE_LIBSDL
 void PlayerKartDriver::incomingKeystroke ( const SDL_keysym& key )
 {
   /* CTRL-R ...infinite ammo cheat. */
@@ -158,34 +157,5 @@ void PlayerKartDriver::incomingKeystroke ( const SDL_keysym& key )
     }
   }
 }
-
-#else
-void PlayerKartDriver::incomingKeystroke ( int k )
-{
-  switch ( k )
-    {
-      /* CTRL-R ...infinite ammo cheat. */
-    case  0x12: switch ( rand () % 5 )
-      {
-      case 0 : collectable = COLLECT_SPARK ;
-        num_collectables = 1000000 ;
-        break ;
-      case 1 : collectable = COLLECT_MISSILE ;
-        num_collectables = 1000000 ;
-        break ;
-      case 2 : collectable = COLLECT_HOMING_MISSILE ;
-        num_collectables = 1000000 ;
-        break ;
-      case 3 : collectable = COLLECT_ZIPPER ;
-        num_collectables = 1000000 ;
-        break ;
-      case 4 : collectable = COLLECT_MAGNET ;
-        num_collectables = 1000000 ;
-        break ;
-      }
-      break ;
-    }
-}
-#endif
 
 /* EOF */
