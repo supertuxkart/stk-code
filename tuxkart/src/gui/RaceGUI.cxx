@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.24 2004/08/23 21:14:55 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.25 2004/08/24 18:07:32 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -523,7 +523,6 @@ void RaceGUI::drawCollectableIcons ()
 
 void RaceGUI::drawEnergyMeter ( float state )
 {
-state=0.6;
   // Draw a Meter border
   // left side
   glBegin ( GL_QUADS ) ;
