@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.11 2004/08/03 15:12:22 straver Exp $
+//  $Id: Driver.cxx,v 1.12 2004/08/05 12:53:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,6 +48,26 @@ void Driver::update ()
   }
 
   doObjectInteractions () ;
+}
+
+void Driver::placeModel ()
+{
+  if ( model != NULL )
+    {
+      sgCoord c ;
+      
+      sgCopyCoord ( &c, &curr_pos ) ;
+
+      c.hpr[1] += wheelie_angle ;
+
+      // Rotate the kart a bit to get a feeling for drifting even if
+      // it isn't there in reality, not 100% sure if this is a good
+      // idea, but its worth a try
+      c.hpr[0] += steer_angle*10.0f;
+
+      c.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
+      model -> setTransform ( & c ) ;
+    }
 }
 
 void Driver::physicsUpdate ()

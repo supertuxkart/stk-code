@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.11 2004/08/05 01:10:30 evilynux Exp $
+//  $Id: Driver.h,v 1.12 2004/08/05 12:53:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -185,6 +185,7 @@ public:
   int  getLap      ()        { return lap      ; }
   int  getPosition ()        { return position ; }
   void setPosition ( int p ) { position = p    ; }
+  float getSteerAngle() const { return steer_angle; }
 
   void reset ()
   {
@@ -243,19 +244,7 @@ public:
     update () ;
   }
 
-  virtual void placeModel ()
-  {
-    if ( model != NULL )
-    {
-      sgCoord c ;
-
-      sgCopyCoord ( &c, &curr_pos ) ;
-
-      c.hpr[1] += wheelie_angle ;
-      c.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
-      model -> setTransform ( & c ) ;
-    }
-  }
+  virtual void placeModel ();
 
   sgCoord *getHistory ( int delay )
   {

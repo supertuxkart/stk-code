@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.5 2004/08/05 12:25:25 grumbel Exp $
+//  $Id: Camera.cxx,v 1.6 2004/08/05 12:53:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -101,11 +101,19 @@ void Camera::update ()
   sgMakeCoordMat4 (tokart, kartcoord);
 
   // Relative position from the middle of the kart
-  sgCoord relative_coord;
   sgMat4 relative;
-  sgSetCoord(&relative_coord, 0.f, -3.5f, 1.5f, 
-             0, -5, 0);
-  sgMakeCoordMat4 (relative, &relative_coord);
+  sgMat4 cam_pos;
+  sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
+  if (0)
+    {
+    sgMat4 cam_rot;
+    sgMakeRotMat4(cam_rot, kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
+    sgMultMat4(relative, cam_rot, cam_pos);
+    }
+  else
+    {
+      sgCopyMat4(relative, cam_pos);
+    }
 
   sgMat4 result;
   sgMultMat4(result, tokart, relative);
