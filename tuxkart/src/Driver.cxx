@@ -2,7 +2,7 @@
 
 void Driver::update ()
 {
-  float dt = clock->getDeltaTime () ;
+  float dt = fclock->getDeltaTime () ;
 
   while ( dt > 0.05f )
   {

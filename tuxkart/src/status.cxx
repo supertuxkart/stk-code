@@ -1,10 +1,5 @@
 
 #include "tuxkart.h"
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 #include <stdarg.h>
 
 #define MAX_STRING          30
@@ -254,7 +249,7 @@ void drawTimer ()
 {
   char str [ 256 ] ;
 
-  time_left = clock->getAbsTime () ;
+  time_left = fclock->getAbsTime () ;
 
   int min     = (int) floor ( time_left / 60.0 ) ;
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
@@ -494,7 +489,7 @@ void drawEmergencyText ()
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
        kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
-    wrong_timer += clock -> getDeltaTime () ;
+    wrong_timer += fclock -> getDeltaTime () ;
 
     if ( wrong_timer > 2.0f )
     {

@@ -94,7 +94,7 @@ void HerringInstance::update ()
 {
   if ( eaten )
   {
-    float t = time_to_return - clock->getAbsTime () ;
+    float t = time_to_return - fclock->getAbsTime () ;
 
     if ( t > 0 )
     {

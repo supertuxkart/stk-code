@@ -116,7 +116,7 @@ void autodcsHook ( ssgBranch *br, void *param )
   sgCopyCoord ( & now, & ( p -> init  ) ) ;
   sgCopyCoord ( & add, & ( p -> delta ) ) ;
  
-  float timer = clock -> getAbsTime () + p -> phase ;
+  float timer = fclock -> getAbsTime () + p -> phase ;
  
   if ( p->cycle != 0.0 && p->mode != MODE_FORWARD )
   {

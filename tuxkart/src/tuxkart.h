@@ -4,6 +4,9 @@
 #include <ctype.h>
 #include <string.h>
 #ifdef WIN32
+#ifdef __CYGWIN__
+#include <unistd.h>
+#endif
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -33,7 +36,7 @@ extern GUI         *gui   ;
 extern SoundSystem *sound ;
 extern Track       *track ;
 extern Level        level ;
-extern guClock     *clock ;
+extern guClock     *fclock ;
 
 extern int      game_state ;
 

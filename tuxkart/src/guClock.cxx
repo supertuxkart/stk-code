@@ -1,8 +1,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef WIN32
+#if defined(WIN32)
 #include <windows.h>
+ #ifdef __CYGWIN__
+  typedef long long _int64;
+  #define LARGEINTEGER _int64
+//  #include <largeint.h>
+ #endif
 #include <time.h>
 #else
 #include <sys/time.h>
@@ -12,7 +17,7 @@
 
 double guClock::getRawTime ()
 {
-#if defined( WIN32 ) && !defined( __CYGWIN32__ )
+#if defined(WIN32)
   _int64 u, v ;
   QueryPerformanceCounter   ((LARGE_INTEGER*) &u ) ;
   QueryPerformanceFrequency ((LARGE_INTEGER*) &v ) ;

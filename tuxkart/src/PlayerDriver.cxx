@@ -19,7 +19,7 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     for the player's joystick, it has to be the true delta-t.
   */
 
-  float true_delta_t = clock -> getDeltaTime () ;
+  float true_delta_t = fclock -> getDeltaTime () ;
 
   if ( j -> hits & 0x04 )  /* C == Fire */
   {

@@ -95,7 +95,7 @@ void KartDriver::doObjectInteractions ()
     if ( sgDistanceSquaredVec2 ( hpos, getCoord()->xyz ) < 0.8f )
     {
       herring [ i ] . eaten = TRUE ;
-      herring [ i ] . time_to_return = clock->getAbsTime() + 2.0f  ;
+      herring [ i ] . time_to_return = fclock->getAbsTime() + 2.0f  ;
 
       if ( this == kart[0] )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
@@ -214,7 +214,7 @@ void KartDriver::doCollisionAnalysis ( float hot )
 
 void KartDriver::update ()
 {
-  attachment_time_left -= clock->getDeltaTime () ;
+  attachment_time_left -= fclock->getDeltaTime () ;
 
   if ( attachment_time_left <= 0.0f && attachment != NULL )
   {

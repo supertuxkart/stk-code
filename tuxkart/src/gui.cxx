@@ -153,6 +153,7 @@ void GUI::show ()
   if ( mousetrap )
     glutWarpPointer ( 320, 240 ) ;
 
+  glutSetCursor(GLUT_CURSOR_INHERIT);
   puShowCursor () ;
   main_menu_bar -> reveal () ;
 }
@@ -161,6 +162,7 @@ void GUI::hide ()
 {
   hidden = TRUE ;
   hide_status () ;
+  glutSetCursor(GLUT_CURSOR_NONE);
   puHideCursor () ;
   main_menu_bar -> hide () ;
 }

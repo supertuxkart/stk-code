@@ -55,7 +55,7 @@ char *magnet2_file   = "magnetbzzt.ac" ;
 char *anvil_file     = "anvil.ac"      ;
 
 
-guClock      *clock = NULL ;
+guClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 GFX            *gfx = NULL ;
 GUI            *gui = NULL ;
@@ -356,7 +356,7 @@ static void cmdline_help ()
 int tuxkart_main ( int num_laps, char *level_name )
 {
   net   = new guUDPConnection ;
-  clock = new guClock ;
+  fclock = new guClock ;
 
   num_laps_in_race = num_laps ;
 
@@ -598,7 +598,7 @@ void tuxKartMainLoop ()
 
   if ( ! gui -> isPaused () )
   {
-    clock->update () ;
+    fclock->update () ;
   ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
     updateWorld () ;
 

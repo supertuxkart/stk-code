@@ -1,7 +1,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef WIN32
+#if defined(WIN32)
+#if defined(__CYGWIN32__)
+#include <unistd.h>
+#endif
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -175,7 +178,7 @@ int guUDPConnection::sendMessage ( char *mesg, int length )
 
 int guUDPConnection::recvMessage ( char *mesg, int length )
 {
-  unsigned int len = sizeof ( in_addr ) ;
+  socklen_t len = (socklen_t) sizeof ( in_addr ) ;
 
   int r = recvfrom ( sockfd, mesg, length, 0, (sockaddr *) in_addr, &len );
 
