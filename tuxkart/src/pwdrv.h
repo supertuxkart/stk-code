@@ -1,6 +1,6 @@
-//  $Id: pwdrv.h,v 1.2 2004/07/31 11:35:14 grumbel Exp $
+//  $Id: pwdrv.h,v 1.3 2004/07/31 23:46:18 grumbel Exp $
 // 
-//  TuxKart - A Fun Gokart Game
+//  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
 //  This program is free software; you can redistribute it and/or
