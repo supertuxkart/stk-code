@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.4 2004/08/10 22:23:21 grumbel Exp $
+//  $Id: KartDriver.h,v 1.5 2004/08/13 17:25:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,7 @@
 //static void create_smoke (ssgaParticleSystem *, int, ssgaParticle *p);
 //static void update_smoke (float delta_t, ssgaParticleSystem *, int, ssgaParticle *p);
 
-class ParticleSystem ;
+class SkidMark;
 
 class KartParticleSystem : public ssgaParticleSystem
 {
@@ -63,6 +63,8 @@ protected:
   ssgTransform *wheel_front_r;
   ssgTransform *wheel_rear_l;
   ssgTransform *wheel_rear_r;
+
+  SkidMark* skidmark;
   
   /** Search the given branch of objects that match the wheel names
       and if so assign them to wheel_* variables */

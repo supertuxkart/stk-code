@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.22 2004/08/13 13:58:31 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.23 2004/08/13 17:25:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,7 @@
 #include "Shadow.h"
 #include "KartDriver.h"
 #include "Projectile.h"
+#include "SkidMark.h"
 #include "World.h"
 
 static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
@@ -389,6 +390,9 @@ void KartDriver::update ()
   if (smoke_system != NULL)
     smoke_system->update (delta_t);
 
+  if (skidmark)
+    skidmark->add(getCoord()->xyz[0], getCoord()->xyz[1]);
+
   Driver::update () ;
 }
 
@@ -406,6 +410,7 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
   smokepuff	       = NULL;
   smoke_system	       = NULL;
   exhaust_pipe         = NULL;
+  skidmark             = NULL;
 
   wheel_position = 0;
 
@@ -608,6 +613,8 @@ KartDriver::load_data()
   this-> addAttachment ( pobj4 ) ;
   this-> addAttachment ( pobj5 ) ;
 
+
+  //skidmark = new SkidMark();
   shadow = new Shadow(kart_properties.shadow_file, -1, 1, -1, 1);
   comp_model->addKid ( shadow->getRoot () );
 }
