@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.9 2004/08/17 18:55:23 straver Exp $
+//  $Id: CharSel.cxx,v 1.10 2004/08/17 21:01:18 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,7 @@
 #include "Loader.h"
 #include "CharSel.h"
 #include "tuxkart.h"
+#include "Loader.h"
 #include "KartManager.h"
 #include "WidgetSet.h"
 
@@ -32,16 +33,32 @@ CharSel::CharSel()
 
         context = new ssgContext;
 
-        menu_id = widgetSet -> varray(0);
+        menu_id = widgetSet -> vstack(0);
+        //int lb = 
+        widgetSet -> label(menu_id, "Chose a Character", GUI_LRG, GUI_ALL, 0, 0);
+        widgetSet -> space(menu_id);
+        //widgetSet -> filler(lb);
+	//widgetSet -> space(menu_id);
+        
+        int ha = widgetSet -> harray(menu_id);
+        widgetSet -> filler(ha);
+        int va = widgetSet -> varray(ha);
 
-        for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
-        {
-          widgetSet -> start(menu_id, kart_manager.karts[i].name.c_str(),   GUI_SML, i, 0);
-        }
-	widgetSet -> space(menu_id);
-	widgetSet -> space(menu_id);
-	
-	widgetSet -> layout(menu_id, 0, -1);
+        int row1 = widgetSet -> harray(va);
+        int row2 = widgetSet -> harray(va);
+        for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
+          {
+            widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+            // FIXME: images needs to be 'clickable'
+            //widgetSet ->image(va, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), 128, 128);
+          }
+        for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
+          {
+            widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+          }
+
+        widgetSet -> filler(ha);
+	widgetSet -> layout(menu_id, 0, 1);
 
         clock = 0;
 }
@@ -58,8 +75,7 @@ void CharSel::switch_to_character(int n)
                 current_kart = n;
                 kart = new ssgTransform;
                 kart->ref();
-                ssgEntity* kartentity = ssgLoadAC ( kart_manager.karts[n].model_file.c_str(), loader ) ;
-                kartentity->ref();
+                ssgEntity* kartentity = kart_manager.karts[n].getModel();
                 kart->addKid(kartentity);
         }
 }
@@ -76,8 +92,11 @@ void CharSel::update(float dt)
         if (kart)
         {
                 glClear(GL_DEPTH_BUFFER_BIT);
+                // FIXME: A bit hackish...
+                glViewport ( 0, 0, 800, 320);
+
                 //context -> ref();
-                context -> setFOV ( 75.0f, 0.0f ) ;
+                context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
                 context -> setNearFar ( 0.05f, 1000.0f ) ;
 
                 sgCoord cam_pos;
@@ -87,9 +106,12 @@ void CharSel::update(float dt)
 		glEnable (GL_DEPTH_TEST);
                 context -> makeCurrent () ;
                 sgCoord trans;
-                sgSetCoord(&trans, 0, 2, -.2, clock, 0, 0);
+                sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
                 kart->setTransform (&trans) ;
                 ssgCullAndDraw ( kart ) ;
+                
+                glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
+
 		glDisable (GL_DEPTH_TEST);
                 //delete context;
         }

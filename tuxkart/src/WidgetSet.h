@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.5 2004/08/08 16:32:05 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.6 2004/08/17 21:01:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -135,7 +135,8 @@ public:
 	int  image(int, const char *, int, int);
 	int  start(int, const char *, int, int, int);
 	int  state(int, const char *, int, int, int);
-	int  label(int, const char *, int, int, const float *, const float *);
+        int  label(int pd, const char *text, int size, int rect, const float *c0, const float *c1);
+
 	int  multi(int, const char *, int, int, const float *, const float *);
 	int  count(int, int, int, int);
 	int  clock(int, int, int, int);

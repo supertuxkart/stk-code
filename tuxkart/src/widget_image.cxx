@@ -1,4 +1,4 @@
-//  $Id: widget_image.cxx,v 1.3 2004/08/06 13:30:00 jamesgregory Exp $
+//  $Id: widget_image.cxx,v 1.4 2004/08/17 21:01:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -245,8 +245,11 @@ GLuint make_image_from_file(int *W, int *H,
 
     src = IMG_Load(name);
     if(!src)
+      {
+        fprintf(stderr, "Error: GUI couldn't load image '%s'\n", name);
         return 0;
-    
+      }
+
     int w2;
     int h2;
 

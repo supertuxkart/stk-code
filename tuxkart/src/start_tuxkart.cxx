@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.62 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.63 2004/08/17 21:01:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include <plib/pw.h>
 #include <vector>
 #include <string>
@@ -167,7 +168,7 @@ int main ( int argc, char *argv[] )
 	    }
 
 	  else if( (!strcmp(argv[i], "--numkarts") or !strcmp(argv[i], "-k")) && argc > 2)
-	  {
+            {
 	      raceSetup.numKarts = atoi(argv[i+1]);
 
 	      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
@@ -182,7 +183,7 @@ int main ( int argc, char *argv[] )
 	      for (unsigned int i = 0; i != track_manager.tracks.size(); i++)
                 fprintf ( stdout, "\t%d: %s\n", i, track_manager.tracks[i].name.c_str() );
 	      
-		fprintf ( stdout, "\n" );
+              fprintf ( stdout, "\n" );
 
 	      return 0;
 	    }
@@ -245,13 +246,13 @@ int main ( int argc, char *argv[] )
                   exit(EXIT_FAILURE);
                 }
 	    }
-	  #ifdef VERSION
+#ifdef VERSION
 	  else if( !strcmp(argv[i], "--version") or  !strcmp(argv[i], "-v") )
 	    {
 	      fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
 	      return 0;
 	    }
-	  #endif
+#endif
 
 	  else
 	    {
@@ -262,22 +263,26 @@ int main ( int argc, char *argv[] )
 	}
     }
 
-  initTuxKart ( width,  height, fullscreen );
+  try {
+    initTuxKart ( width,  height, fullscreen );
 
-  ScreenManager screen_manager;
+    ScreenManager screen_manager;
 
-  if ( noStartScreen )
-    {
-      screen_manager.set_screen(new WorldScreen(raceSetup));
-    }
-  else
-    {
-      screen_manager.set_screen(new StartScreen());      
-    }
+    if ( noStartScreen )
+      {
+        screen_manager.set_screen(new WorldScreen(raceSetup));
+      }
+    else
+      {
+        screen_manager.set_screen(new StartScreen());      
+      }
 
-  screen_manager.run();
+    screen_manager.run();
 
-  deinitTuxKart();
+    deinitTuxKart();
+  } catch (const std::exception& err) {
+    std::cout << "Error: " << err.what() << std::endl;
+  }
 
   return 0 ;
 }
