@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.66 2004/08/20 22:32:31 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.67 2004/08/20 22:41:15 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -111,7 +111,7 @@ void cmdLineHelp (char* invocation)
             "  --kart n             Use kart number n\n"
 	    "  -l,  --list-tracks      Show available tracks.\n"
 	    "  --laps n                Define number of laps to n\n"
-	    "  --players n             Define number of players to either 1, 2 or 4.\n"
+	    "  --players n             Define number of players to between 1 and 4.\n"
 	    "  --reverse               Enable reverse mode\n"
 	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  -f,  --fullscreen       Fullscreen display.\n"
