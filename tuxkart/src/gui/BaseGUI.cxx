@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.22 2004/09/08 17:02:16 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.23 2004/09/08 17:29:09 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -121,6 +121,9 @@ void updateGUI()
 		gui -> update( (now - then) / 1000.f );
 		
 	then = now;
+	
+	if(guiStack.empty())
+		screenManager->abort();
 }
 
 void BaseGUI::keybd(const SDL_keysym& key)

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.38 2004/09/08 15:00:06 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.39 2004/09/08 17:29:10 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -147,7 +147,7 @@ void pollEvents ()
 		break;
 	  
 	case SDL_QUIT:
-	  deinitTuxKart();
+	  guiStack.clear();
 	  break;
     }
   }

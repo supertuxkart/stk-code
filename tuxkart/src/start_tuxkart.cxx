@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.79 2004/09/05 21:26:24 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.80 2004/09/08 17:29:10 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -318,7 +318,7 @@ int main ( int argc, char *argv[] )
     deinitTuxKart();
 
     // shutdown SDL
-    SDL_Quit();
+    shutdownVideo();
 #ifndef DEBUG
   } catch (const TuxkartError& err) {
     std::cout << "TuxkartError: " << err.what() << std::endl;
