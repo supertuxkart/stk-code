@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.31 2004/08/17 21:06:39 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.32 2004/08/20 19:22:46 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -135,8 +135,10 @@ void pollEvents ()
 		break;
 	
 	case SDL_MOUSEBUTTONDOWN:
-		if (gui)
+		if (gui && event.button.button == SDL_BUTTON_LEFT)
 			gui -> select();
+		else if (guiStack.size() > 1 && event.button.button == SDL_BUTTON_RIGHT)
+			guiStack.pop_back();
 	  break;
 	 
 	case SDL_MOUSEMOTION:
