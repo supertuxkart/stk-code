@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.40 2004/08/05 18:33:52 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.41 2004/08/05 18:58:25 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -113,6 +113,7 @@ static void splashMainLoop (void)
    //The old splash screen stuff
    
    //Setup for boring 2D rendering
+   */
     
     glMatrixMode   ( GL_PROJECTION ) ;
     glLoadIdentity () ;
@@ -123,7 +124,7 @@ static void splashMainLoop (void)
     glDisable      ( GL_FOG        ) ;
     glDisable      ( GL_CULL_FACE  ) ;
     glDisable      ( GL_ALPHA_TEST ) ;
-    glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
+    //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
     //Draw the splash screen
 
@@ -131,20 +132,20 @@ static void splashMainLoop (void)
 
     glBegin ( GL_QUADS ) ;
     glColor3f    ( 1, 1, 1 ) ;
-    glTexCoord2f ( 0, 0 ) ; glVertex2i (   0,   0 ) ;
-    glTexCoord2f ( 1, 0 ) ; glVertex2i ( 640,   0 ) ;
-    glTexCoord2f ( 1, 1 ) ; glVertex2i ( 640, 480 ) ;
-    glTexCoord2f ( 0, 1 ) ; glVertex2i (   0, 480 ) ;
+    glTexCoord2f ( 0, 0 ) ; glVertex2i (   -1,   -1 ) ;
+    glTexCoord2f ( 1, 0 ) ; glVertex2i (   1,   -1 ) ;
+    glTexCoord2f ( 1, 1 ) ; glVertex2i (   1,   1 ) ;
+    glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
     glEnd () ;
 
+    /*
     //Make PUI redraw
-
     glEnable ( GL_BLEND ) ;
     puDisplay () ;
     */
     
-    glClearColor(0.2, 0.2, 0.2, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClearColor(0.2, 0.2, 0.2, 0.0);
+    //glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
 	
     /* Swapbuffers - and off we go again... */
