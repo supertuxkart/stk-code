@@ -1,4 +1,4 @@
-//  $Id: ConfigControls.cxx,v 1.4 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: ConfigControls.cxx,v 1.5 2004/08/29 00:55:30 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,15 +23,16 @@
 
 ConfigControls::ConfigControls()
 {
-	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Player 1",  GUI_SML, 1, 0);
-	widgetSet -> state(menu_id, "Player 2",  GUI_SML, 2, 0);
-	widgetSet -> state(menu_id, "Player 3",  GUI_SML, 3, 0);
-	widgetSet -> state(menu_id, "Player 4",  GUI_SML, 4, 0);
-	widgetSet -> space(menu_id);
-	widgetSet -> space(menu_id);
+	menu_id = widgetSet -> vstack(0);
+	widgetSet -> label(menu_id, "Edit controls for which player?", GUI_LRG, GUI_ALL, 0, 0);
 	
-	widgetSet -> layout(menu_id, 0, -1);
+	int va = widgetSet -> varray(menu_id);
+	widgetSet -> start(va, "Player 1",  GUI_MED, 1, 0);
+	widgetSet -> state(va, "Player 2",  GUI_MED, 2, 0);
+	widgetSet -> state(va, "Player 3",  GUI_MED, 3, 0);
+	widgetSet -> state(va, "Player 4",  GUI_MED, 4, 0);
+	
+	widgetSet -> layout(menu_id, 0, 0);
 }
 
 ConfigControls::~ConfigControls()

@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.cxx,v 1.2 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: PlayerControls.cxx,v 1.3 2004/08/29 00:55:30 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,35 +25,33 @@ PlayerControls::PlayerControls(int whichPlayer):
 config_index(whichPlayer),
 grabInput(false)
 {
-	menu_id = widgetSet -> harray(0);
+	menu_id = widgetSet -> vstack(0);
+	char output[60];
+	sprintf(output, "Choose your controls, Player %d", config_index + 1);
+	widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
 	
-	int change_id = widgetSet -> varray(menu_id);
-		widgetSet -> start(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_LEFT]),  GUI_SML, KC_LEFT, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_RIGHT]),  GUI_SML, KC_RIGHT, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_UP]),  GUI_SML, KC_UP, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_DOWN]),  GUI_SML, KC_DOWN, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_WHEELIE]),  GUI_SML, KC_WHEELIE, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_JUMP]),  GUI_SML, KC_JUMP, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_RESCUE]),  GUI_SML, KC_RESCUE, 0);
-		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_FIRE]),  GUI_SML, KC_FIRE, 0);
-		widgetSet -> state(change_id, "Back",  GUI_SML, MENU_RETURN, 0);
-		widgetSet -> space(change_id);
-		widgetSet -> space(change_id);
+	int ha = widgetSet -> harray(menu_id);
+	int change_id = widgetSet -> varray(ha);
+		widgetSet -> start(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_LEFT]),  GUI_MED, KC_LEFT, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_RIGHT]),  GUI_MED, KC_RIGHT, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_UP]),  GUI_MED, KC_UP, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_DOWN]),  GUI_MED, KC_DOWN, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_WHEELIE]),  GUI_MED, KC_WHEELIE, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_JUMP]),  GUI_MED, KC_JUMP, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_RESCUE]),  GUI_MED, KC_RESCUE, 0);
+		widgetSet -> state(change_id, SDL_GetKeyName(controlCon[config_index].keys[KC_FIRE]),  GUI_MED, KC_FIRE, 0);
 	
-	int label_id = widgetSet -> varray(menu_id);
-		widgetSet -> label(label_id, "Left",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Right",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Accelerate",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Brake",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Pull wheelie",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Jump",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Call for rescue",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> label(label_id, "Fire",  GUI_SML, GUI_ALL, 0, 0);
-		widgetSet -> space(label_id);
-		widgetSet -> space(label_id);
-		widgetSet -> space(label_id);
+	int label_id = widgetSet -> varray(ha);
+		widgetSet -> label(label_id, "Left",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Right",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Accelerate",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Brake",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Pull wheelie",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Jump",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Call for rescue",  GUI_MED, GUI_ALL, 0, 0);
+		widgetSet -> label(label_id, "Fire",  GUI_MED, GUI_ALL, 0, 0);
 	
-	widgetSet -> layout(menu_id, 0, -1);
+	widgetSet -> layout(menu_id, 0, 0);
 }
 
 PlayerControls::~PlayerControls()

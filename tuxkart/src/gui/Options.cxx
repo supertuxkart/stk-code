@@ -1,4 +1,4 @@
-//  $Id: Options.cxx,v 1.6 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: Options.cxx,v 1.7 2004/08/29 00:55:30 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,10 +24,11 @@
 Options::Options()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Controls",  GUI_SML, MENU_CONTROLS, 0);
-	widgetSet -> state(menu_id, "Display",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Sound",  GUI_SML, 0, 0);
-	widgetSet -> space(menu_id);
+
+	widgetSet -> label(menu_id, "Options", GUI_LRG, GUI_ALL, 0, 0);
+	widgetSet -> start(menu_id, "Controls",  GUI_MED, MENU_CONTROLS, 0);
+	widgetSet -> state(menu_id, "Display",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "Sound",  GUI_MED, 0, 0);
 	widgetSet -> space(menu_id);
 	
 	widgetSet -> layout(menu_id, 0, -1);
