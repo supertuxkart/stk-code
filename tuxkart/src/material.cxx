@@ -1,4 +1,4 @@
-//  $Id: material.cxx,v 1.11 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: material.cxx,v 1.12 2004/08/01 15:13:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "Loader.h"
 #include "material.h"
 
 #define UCLAMP   1
@@ -358,7 +359,8 @@ void initMaterials ()
 
   sprintf ( fname, "data/materials.dat" ) ;
 
-  FILE *fd = fopen ( fname, "ra" ) ;
+  std::string path = loader->getPath(fname);
+  FILE *fd = fopen ( path.c_str(), "ra" ) ;
 
   if ( fd == NULL )
   {

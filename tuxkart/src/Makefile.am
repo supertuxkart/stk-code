@@ -25,7 +25,7 @@ tuxkart_SOURCES = \
   guNet.cxx  \
   isect.cxx  \
   joystick.h  \
-  loader.cxx  \
+  WorldLoader.cxx  \
   sound.cxx  \
   utils.cxx  \
   status.h  \
@@ -51,8 +51,10 @@ tuxkart_SOURCES = \
   guNet.h  \
   isect.h  \
   level.h  \
-  loader.h  \
+  WorldLoader.h  \
   sound.h  \
-  utils.h
+  utils.h \
+  Loader.cxx \
+  Loader.h
 
 # EOF #

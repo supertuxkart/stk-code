@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.27 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.28 2004/08/01 15:13:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "Loader.h"
 #include "Herring.h"
 #include "Driver.h"
 #include "Explosion.h"
@@ -26,6 +27,7 @@
 #include "status.h"
 #include "Camera.h"
 #include "level.h"
+#include "WorldLoader.h"
 #include "gui.h"
 #include "gfx.h"
 #include "preprocessor.h"
@@ -38,7 +40,6 @@ int player  = 0 ;
 int finishing_position = -1 ;
 
 guUDPConnection *net = NULL ;
-ssgLoaderOptions *loadOpts = NULL ;
 
 int network_enabled = FALSE ;
 int network_testing = FALSE ;
@@ -103,11 +104,12 @@ ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
 
 
-void load_players ( char *fname )
+void load_players ( const char *fname )
 {
   int i ;
  
-  FILE *fd = fopen ( fname, "r" ) ;
+  std::string path = loader->getPath(fname);
+  FILE *fd = fopen ( path.c_str(), "r" ) ;
 
   if ( fd == NULL )
   {
@@ -145,15 +147,15 @@ void load_players ( char *fname )
 
   for ( i = 0 ; i < num_karts ; i++ )
   {
-    ssgEntity *pobj1 = ssgLoad ( parachute_file, loadOpts ) ;
-    ssgEntity *pobj2 = ssgLoad ( magnet_file   , loadOpts ) ;
-    ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loadOpts ) ;
-    ssgEntity *pobj4 = ssgLoad ( anvil_file    , loadOpts ) ;
+    ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
+    ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader ) ;
+    ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader ) ;
+    ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader ) ;
 
     sgCoord cc ;
     sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
     ssgTransform *ttt = new ssgTransform ( & cc ) ;
-    ttt -> addKid ( ssgLoad ( tinytux_file  , loadOpts ) ) ;
+    ttt -> addKid ( ssgLoad ( tinytux_file  , loader ) ) ;
 
     ssgEntity *pobj5 = ttt ;
 
@@ -168,7 +170,7 @@ void load_players ( char *fname )
     else
       kart_id = i ;
  
-    ssgEntity *obj = ssgLoad ( player_files [ kart_id ], loadOpts ) ;
+    ssgEntity *obj = ssgLoad ( player_files [ kart_id ], loader ) ;
 
 {
     sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
@@ -196,14 +198,14 @@ void load_players ( char *fname )
     projectile[i]-> getModel() -> addKid ( sel ) ;
 
     for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
-      sel -> addKid ( ssgLoad ( projectile_files [ j ], loadOpts ) ) ;
+      sel -> addKid ( ssgLoad ( projectile_files [ j ], loader ) ) ;
 
     projectile[i] -> off () ;
   }
 
   for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
   {
-    ssgBranch *b = (ssgBranch *) ssgLoad ( explosion_file, loadOpts ) ;
+    ssgBranch *b = (ssgBranch *) ssgLoad ( explosion_file, loader ) ;
     explosion[i] = new Explosion ( b ) ;
   }
 }
@@ -248,9 +250,10 @@ static void herring_command ( char *s, char *str )
 }
 
 
-void load_track ( char *fname )
+void load_track (const char *fname )
 {
-  FILE *fd = fopen ( fname, "r" ) ;
+  std::string path = loader->getPath(fname);
+  FILE *fd = fopen (path.c_str(), "r" ) ;
 
   if ( fd == NULL )
   {
@@ -386,7 +389,7 @@ void load_track ( char *fname )
 	}
       }
 
-      ssgEntity        *obj   = ssgLoad ( fname, loadOpts ) ;
+      ssgEntity        *obj   = ssgLoad ( fname, loader ) ;
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;
 
@@ -474,10 +477,9 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   /* Set the SSG loader options */
 
-  loadOpts = new ssgLoaderOptions () ;
-  loadOpts -> setCreateStateCallback  ( getAppState ) ;
-  loadOpts -> setCreateBranchCallback ( process_userdata ) ;
-  ssgSetCurrentOptions ( loadOpts ) ;
+  loader -> setCreateStateCallback  ( getAppState ) ;
+  loader -> setCreateBranchCallback ( process_userdata ) ;
+  ssgSetCurrentOptions ( loader ) ;
   ssgModelPath         ( "models" ) ;
   ssgTexturePath       ( "images" ) ;
 

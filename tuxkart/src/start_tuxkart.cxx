@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.31 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.32 2004/08/01 15:13:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,8 +22,7 @@
 #include <plib/pu.h>
 
 #include "tuxkart.h"
-
-using std::cout;
+#include "Loader.h"
 
 /***********************************\
 *                                   *
@@ -31,7 +30,7 @@ using std::cout;
 *                                   *
 \***********************************/
 
-#define MAX_TRACKS 10
+#define MAX_TRACKS 100
 
 static puSlider       *numLapsSlider    ;
 static puButton       *numLapsText      ;
@@ -51,7 +50,6 @@ static char           *trackNames    [ MAX_TRACKS ] ;
 static char           *playerOptions [      4     ] ;
 static char           *trackIdents   [ MAX_TRACKS ] ;
 static char            numLapsLegend [     100    ] ;
-static char           *datadir        =  0 ;
 static int             numLaps        =  5 ;
 static int             startupCounter = -1 ;
 
@@ -219,91 +217,69 @@ static void installMaterial ()
   introMaterial -> setShininess ( 0 ) ;
 }
 
+static std::string loadTrackDescription(const std::string& mapfile)
+{
+  std::string path = loader->getPath(std::string("data/") + mapfile + ".track");
+  FILE* file = fopen(path.c_str(), "r");
+  if(file == 0)
+    return mapfile;
+
+  char buf[1024];
+  if(fgets(buf, 1024, file) == 0)
+    buf[0] = 0;
+  
+  fclose(file);
+
+  return std::string(buf);  
+}
 
 static void loadTrackList ()
 {
   /* Load up a list of tracks - and their names */
+  std::set<std::string> files;
+  loader->listFiles(files, "data");
+  int t = 0;
+  for(std::set<std::string>::iterator i = files.begin();
+          i != files.end(); ++i) {
+    if(i->size() < 6)
+      continue;
+    if(i->compare(i->size() - 6, 6, ".track") != 0)
+      continue;
+   
+    std::string trackName = i->substr(0, i->size()-6);
+    trackIdents[t] = new char[trackName.size() + 1];
+    strcpy(trackIdents[t], trackName.c_str());
 
-  char *fname = "data/levels.dat" ;
+    std::string description = loadTrackDescription(trackName);
+    trackNames[t] = new char[description.size() + 1];
+    strcpy(trackNames[t], description.c_str());
 
-  if ( getenv ( "TUXKART_TRACKLIST" ) != NULL )
-    fname = getenv ( "TUXKART_TRACKLIST" ) ;
-
-  FILE *fd = fopen ( fname, "ra" ) ;
-
-  if ( fd == NULL )
-  {
-    fprintf ( stderr, "tuxkart: Can't open '%s'\n", fname ) ;
-    exit ( 1 ) ;
+    ++t;
+    if(t >= MAX_TRACKS-1)
+      break;
   }
-
-  int i = 0 ;
-
-  while ( i < MAX_TRACKS && ! feof ( fd ) )
-  {
-    char *p ;
-    char  s [ 1024 ] ;
-
-    if ( fgets ( s, 1023, fd ) == NULL )
-      break ;
- 
-    if ( *s == '#' )
-      continue ;
-
-    for ( p = s ; *p > ' ' && *p != '\0' ; p++ )
-      /* Search for a space */ ;
-
-    if ( *p == ' ' )
-    {
-      *p = '\0' ;
-      trackIdents [ i ] = new char [ strlen(s)+1 ] ;
-      strcpy ( trackIdents [ i ], s ) ;
-      p++ ;
-
-      while ( *p <= ' ' && *p != '\0' )
-        p++ ; 
-
-      trackNames [ i ] = new char [ strlen(p)+1 ] ;
-      strcpy ( trackNames [ i ], p ) ;
-
-      i++ ;
-    }
-  }
-
-  trackNames  [ i ] = NULL ;
-  trackIdents [ i ] = NULL ;
-
-  fclose ( fd ) ;
+  trackNames[t] = 0;
+  trackIdents[t] = 0;
 }
 
 
 /* Initialize the datadir */
 static void loadDataDir (int debug)
 {
-  /* Set to the correct directory */
- 
-  if ( datadir == NULL )
-  {
-    if ( getenv ( "TUXKART_DATADIR" ) != NULL )
-      datadir = getenv ( "TUXKART_DATADIR" ) ;
-    else
-    if ( canAccess ( "data/levels.dat" ) )
-      datadir = "." ;
-    else
-    if ( canAccess ( "../data/levels.dat" ) )
-      datadir = ".." ;
-    else
-      datadir = TUXKART_DATADIR ;
+  if(!loader)
+    loader = new Loader();
+    
+  /* initialize search path of the loader */
+  if ( getenv ( "TUXKART_DATADIR" ) != NULL )
+    loader->addSearchPath(getenv ( "TUXKART_DATADIR" )) ;
+  if (getenv ("HOME") != NULL) {
+    std::string homepath = getenv("HOME");
+    homepath += "/.tuxkart";
+    loader->addSearchPath(homepath);
   }
- 
-  if ( debug )
-    fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
- 
-  if ( chDir ( datadir ) )
-  {
-    fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
-    exit ( 1 ) ;
-  }
+  loader->addSearchPath(".");
+  loader->addSearchPath("..");
+  loader->addSearchPath(TUXKART_DATADIR);
 }
 
 
