@@ -4,6 +4,8 @@
 	(main): - Added fullscreen, version, noStartScreen and nbrPlayers.
 	- Display error message on invalid command line argument.
 	- StartScreen is shown unless fullscreen is specified.
+	(startScreen):
+	- Added arguments to the function, needed for cmdLine options.
 
 2004-07-18  Pascal Giard  <evilynux@yahoo.com>
 
