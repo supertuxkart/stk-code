@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.30 2004/08/23 22:57:04 evilynux Exp $
+//  $Id: Driver.h,v 1.31 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -191,7 +191,6 @@ public:
   void setVelocity ( sgCoord *vel )
   {
     sgCopyCoord ( & velocity, vel ) ;
-    //FIXME:update () ;
   }
 
   sgCoord *getVisiCoord ()
@@ -207,7 +206,6 @@ public:
   void setCoord ( sgCoord *pos )
   {
     sgCopyCoord ( & curr_pos, pos ) ;
-    //FIXME:update () ;
   }
 
   /** Reposition the model in the scene */

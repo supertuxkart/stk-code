@@ -1,4 +1,4 @@
-//  $Id: StringUtils.h,v 1.2 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: StringUtils.h,v 1.3 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>,
@@ -22,6 +22,7 @@
 #define HEADER_STRING_UTILS_H
 
 #include <string>
+#include <sstream>
 
 namespace StringUtils {
 
@@ -32,6 +33,39 @@ std::string basename(const std::string& filename);
 
 std::string without_extension(const std::string& filename);
 std::string extension(const std::string& filename);
+
+template <class T>
+std::string to_string (const T& any)
+{
+  std::ostringstream oss;
+  oss << any ;
+  return oss.str();
+}
+
+/** Convert the contents in string \a rep to type \a T, if conversion
+    fails false is returned and the value of \a x is unchanged, if
+    true is returned the conversation was successfull. */
+template <class T>
+bool from_string(const std::string& rep, T& x)
+{
+ // this is necessary so that if "x" is not modified if the conversion fails
+  T temp;
+  std::istringstream iss(rep);
+  iss >> temp;
+
+  if (iss.fail())
+    {
+      return false;
+    }
+  else
+    {
+      x = temp;
+      return true;
+    }
+}
+
+std::string upcase (const std::string&);
+std::string downcase (const std::string&);
 
 } // namespace StringUtils
 

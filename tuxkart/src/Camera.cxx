@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.18 2004/08/21 07:53:43 jamesgregory Exp $
+//  $Id: Camera.cxx,v 1.19 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -92,7 +92,7 @@ void Camera::init ()
   context = new ssgContext ;
 
   // FIXME: clipping should be configurable for slower machines
-  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
+  const TrackData& track_data = track_manager.getTrack(World::current()->raceSetup.track);
   if (track_data.use_fog)
     context -> setNearFar ( 0.05f, track_data.fog_end ) ;
   else

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.26 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: World.cxx,v 1.27 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -88,7 +88,7 @@ World::World(const RaceSetup& raceSetup_)
 #endif
 
   // Grab the track centerline file
-  track = new Track ( track_manager.tracks[raceSetup.track],
+  track = new Track ( track_manager.getTrack(raceSetup.track),
                       raceSetup.mirror, raceSetup.reverse ) ;
 
   // Start building the scene graph
@@ -109,29 +109,29 @@ World::World(const RaceSetup& raceSetup_)
   preProcessObj ( red_h -> getRoot(),    raceSetup.mirror );
   preProcessObj ( green_h -> getRoot(),  raceSetup.mirror );
 
-  if (raceSetup.numKarts == -1)
-    raceSetup.numKarts = kart_manager.karts.size();
-
   // Create the karts and fill the kart vector with them
-  for ( int i = 0 ; i < raceSetup.numKarts ; i++ )
+
+  assert(raceSetup.karts.size() > 0);
+
+  for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ; i != raceSetup.karts.end() ; ++i )
   {
     /* Kart[0] is always the player. */
     KartDriver* newkart;
+    int pos = kart.size();
 
-    if ( i < raceSetup.numPlayers )
+    if ( pos < raceSetup.getNumPlayers() )
     {
-      int kartIndex = raceSetup.kart_choices[i];
-      newkart = new KartDriver ( kart_manager.karts[kartIndex], i, new PlayerDriver ) ;
+      newkart = new KartDriver ( kart_manager.getKart(*i), pos, new PlayerDriver ) ;
     }
     else if ( network_enabled )
-      newkart = new KartDriver ( kart_manager.karts[i], i, new NetworkDriver ) ;
+      newkart = new KartDriver ( kart_manager.getKart(*i), pos, new NetworkDriver ) ;
     else
-      newkart = new KartDriver ( kart_manager.karts[i], i, new AutoDriver ) ;
+      newkart = new KartDriver ( kart_manager.getKart(*i), pos, new AutoDriver ) ;
     
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
-    init_pos.xyz [ 0 ] = (i % 2 == 0) ? 1.5f : -1.5f ;
-    init_pos.xyz [ 1 ] = i * 1.5f ;
+    init_pos.xyz [ 0 ] = (pos % 2 == 0) ? 1.5f : -1.5f ;
+    init_pos.xyz [ 1 ] = pos * 1.5f ;
 
     if ( raceSetup.reverse ) init_pos.hpr[0] = 180.0f ;
 
@@ -153,7 +153,7 @@ World::World(const RaceSetup& raceSetup_)
   }
 
   // Load the track models
-  load_track   ( track_manager.tracks[raceSetup.track].loc_filename.c_str() ) ;
+  load_track   ( track_manager.getTrack(raceSetup.track).loc_filename.c_str() ) ;
   load_players ( ) ;
 
   preProcessObj ( scene, raceSetup.mirror ) ;
@@ -164,7 +164,7 @@ World::World(const RaceSetup& raceSetup_)
 	
   guiStack.push_back(GUIS_RACE);
 
-  std::string music = track_manager.tracks[raceSetup.track].music_filename;
+  std::string music = track_manager.getTrack(raceSetup.track).music_filename;
   
   if (!music.empty())
     sound -> change_track ( music.c_str() );
@@ -200,7 +200,7 @@ World::draw()
 {
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> placeModel() ;
 
-  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
+  const TrackData& track_data = track_manager.getTrack(World::current()->raceSetup.track);
 
   ssgGetLight ( 0 ) -> setPosition ( track_data.sun_position ) ;
   ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track_data.ambientcol  ) ;

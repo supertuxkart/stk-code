@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.7 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.8 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -103,11 +103,11 @@ StartScreen::switchToGame()
   switch(raceSetup.mode)
     {
     case RaceSetup::RM_TIME_TRIAL:
-      RaceManager::instance()->set_timetrial(track_manager.tracks[raceSetup.track].ident);
+      RaceManager::instance()->set_timetrial(raceSetup.track);
       break;
 
     case RaceSetup::RM_QUICK_RACE:
-      RaceManager::instance()->set_quickrace(track_manager.tracks[raceSetup.track].ident, 
+      RaceManager::instance()->set_quickrace(raceSetup.track, 
                                              raceSetup.difficulty);
       break;
 

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.32 2004/08/23 22:57:04 evilynux Exp $
+//  $Id: Driver.cxx,v 1.33 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -81,7 +81,6 @@ Driver::reset ()
   track_hint = World::current() ->track -> absSpatialToTrack ( curr_track_coords,
                                                  curr_pos.xyz ) ;
 
-  //FIXME:update () ;
 }
 
 void

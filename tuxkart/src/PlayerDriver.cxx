@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.20 2004/08/16 00:17:22 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.21 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,7 +36,6 @@ void
 PlayerDriver::update ()
 {
   assert(kart);
-  //FIXME:KartDriver::update () ;
 }
 
 void

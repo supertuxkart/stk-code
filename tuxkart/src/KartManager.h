@@ -1,4 +1,4 @@
-//  $Id: KartManager.h,v 1.1 2004/08/17 13:37:36 grumbel Exp $
+//  $Id: KartManager.h,v 1.2 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -26,12 +26,15 @@
 class KartManager
 {
 public:
-  /** All available kart configurations, FIXME: having a
-      CharacterManager might be a good idea */
   typedef std::vector<KartProperties> Data;
+  /** All available kart configurations */
   Data karts;
   
   KartManager();
+
+  const KartProperties& getKartById(int i);
+  const KartProperties& getKart(const std::string ident);
+  int  getKartId(const std::string ident);
   
   void loadKartData();
 };

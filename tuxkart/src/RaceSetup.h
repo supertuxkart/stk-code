@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.5 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: RaceSetup.h,v 1.6 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #ifndef HEADER_RACESETUP_H
 #define HEADER_RACESETUP_H
 
+#include <string>
 #include <vector>
 
 enum RaceDifficulty { RD_EASY, RD_MEDIUM, RD_HARD };
@@ -37,23 +38,31 @@ public:
 		numLaps    = 3; 
 		mirror     = false; 
 		reverse    = false; 
-		track      = 0;
-		numKarts   = 4; //-1 to use all available karts
-		numPlayers = 1;
-
-		kart_choices.resize(4, 0);
-	}
+		track      = "race";
+        }
 
 	RaceMode  mode;
 	RaceDifficulty  difficulty;
 	int   numLaps;
 	bool  mirror;
 	bool  reverse;
-	int   track;
-	int   numKarts;
-	int   numPlayers;
-	
-	std::vector<int> kart_choices;
+
+        /** Ident of the track to use */
+	std::string track;
+
+        // FIXME: This could probally be a bit more robust/easier to understand
+  
+        typedef std::vector<int> Players;
+        /** Positions of the karts which should be controlled by
+            players */
+        Players players;
+
+	typedef std::vector<std::string> Karts;
+        /** kart idents that should be used in the race, the karts
+            will be used in the order in which they are given */
+        Karts karts;
+
+        int getNumPlayers() const { return players.size(); }
 };
 
 #endif

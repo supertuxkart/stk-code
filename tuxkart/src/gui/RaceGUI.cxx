@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.25 2004/08/24 18:07:32 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.26 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -98,7 +98,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	static int isWireframe = FALSE ;
 	
 	//in single player only we have an infinite ammo cheat
-	if (key.mod & KMOD_CTRL && World::current()->raceSetup.numPlayers == 1)
+	if (key.mod & KMOD_CTRL && World::current()->raceSetup.getNumPlayers() == 1)
 	{
           PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ 0 ]->getDriver());
           if (driver)

@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.6 2004/08/17 21:51:35 grumbel Exp $
+//  $Id: MainMenu.cxx,v 1.7 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "MainMenu.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
+#include "StartScreen.h"
 
 MainMenu::MainMenu()
 {
@@ -49,11 +50,25 @@ void MainMenu::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_SINGLE:		guiStack.push_back(GUIS_GAMEMODE);	break;
-	case MENU_MULTI: 		guiStack.push_back(GUIS_NUMPLAYERS);break;
-	case MENU_REPLAY:		break;
-	case MENU_OPTIONS:	guiStack.push_back(GUIS_OPTIONS);	break;
-	case MENU_QUIT:		deinitTuxKart(); break;
+	case MENU_SINGLE:	       
+                StartScreen::current()->raceSetup.players.clear();
+                StartScreen::current()->raceSetup.players.push_back(0);
+                guiStack.push_back(GUIS_GAMEMODE);     
+                break;
+	case MENU_MULTI:
+ 		guiStack.push_back(GUIS_NUMPLAYERS);
+                break;
+                
+	case MENU_REPLAY:		
+                break;
+
+	case MENU_OPTIONS:     
+                guiStack.push_back(GUIS_OPTIONS);	
+                break;
+
+	case MENU_QUIT:	       
+                deinitTuxKart(); 
+                break;
 	}
 }
 

@@ -1,4 +1,4 @@
-//  $Id: TrackManager.h,v 1.3 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: TrackManager.h,v 1.4 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,6 +36,8 @@ public:
   /** get TrackData by the track ident (aka filename without
       .track) */
   const TrackData& getTrack(const std::string& ident);
+
+  const TrackData& getTrackById(int id);
 
   /** get the id of a track ident */
   int getTrackId(const std::string& ident);

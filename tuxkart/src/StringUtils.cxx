@@ -1,4 +1,4 @@
-//  $Id: StringUtils.cxx,v 1.2 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: StringUtils.cxx,v 1.3 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>,
@@ -61,6 +61,20 @@ std::string extension(const std::string& filename)
       }
     }
   return filename;  
+}
+
+std::string upcase (const std::string& str)
+{
+  std::string name = str;
+  std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+  return name;
+}
+
+std::string downcase (const std::string& str)
+{
+  std::string name = str;
+  std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+  return name;
 }
 
 } // namespace StringUtils

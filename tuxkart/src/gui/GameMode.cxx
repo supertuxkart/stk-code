@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.12 2004/08/24 00:07:05 grumbel Exp $
+//  $Id: GameMode.cxx,v 1.13 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,7 +33,7 @@ GameMode::GameMode(RaceSetup& raceSetup_)
 	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
 	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
 	
-	if (raceSetup.numPlayers == 1)
+	if (raceSetup.getNumPlayers() == 1)
 		widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
@@ -56,17 +56,14 @@ void GameMode::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_GP:
-		raceSetup.numKarts = 4;
 		raceSetup.mode     = RaceSetup::RM_GRAND_PRIX;
 		guiStack.push_back(GUIS_DIFFICULTYGP);
 		break;
 	case MENU_QUICKRACE:
-		raceSetup.numKarts = 4;
 		raceSetup.mode     = RaceSetup::RM_QUICK_RACE;
 		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	case MENU_TIMETRIAL:
-		raceSetup.numKarts = 1;
 		raceSetup.mode     = RaceSetup::RM_TIME_TRIAL;
 		guiStack.push_back(GUIS_CHARSEL); //difficulty makes no sense here
 		break;

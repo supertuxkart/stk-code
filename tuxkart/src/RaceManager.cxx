@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.2 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.3 2004/08/24 18:17:50 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,8 +40,14 @@ GrandPrixMode::start_race(int n)
   raceSetup.mode       = RaceSetup::RM_GRAND_PRIX;
   raceSetup.difficulty = difficulty;
   raceSetup.numLaps    = 3; 
-  raceSetup.track      = track_manager.getTrackId(cup.tracks[n]);
-  raceSetup.numKarts   = 4;
+  raceSetup.track      = cup.tracks[n];
+
+  raceSetup.karts.push_back("tuxkart");
+  raceSetup.karts.push_back("pennykart");
+  raceSetup.karts.push_back("dinokart");
+  raceSetup.karts.push_back("eviltux");
+
+  raceSetup.players.push_back(0);
 
   ScreenManager::current()->set_screen(new WorldScreen(raceSetup)); 
 }
@@ -78,6 +84,16 @@ void
 QuickRaceMode::start()
 {
   RaceSetup raceSetup;
+
+  raceSetup.track = data.ident;
+
+  raceSetup.karts.push_back("tuxkart");
+  raceSetup.karts.push_back("pennykart");
+  raceSetup.karts.push_back("dinokart");
+  raceSetup.karts.push_back("eviltux");
+
+  raceSetup.players.push_back(0);
+
   ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
 }
 
@@ -95,6 +111,16 @@ void
 TimeTrialMode::start()
 {
   RaceSetup raceSetup;
+
+  raceSetup.track = data.ident;
+
+  raceSetup.karts.push_back("tuxkart");
+  raceSetup.karts.push_back("pennykart");
+  raceSetup.karts.push_back("dinokart");
+  raceSetup.karts.push_back("eviltux");
+
+  raceSetup.players.push_back(0);
+
   ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
 }
 
