@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.41 2004/08/05 18:58:25 straver Exp $
+//  $Id: start_tuxkart.cxx,v 1.42 2004/08/05 23:01:03 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,11 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/pw.h>
-#include <plib/puSDL.h>
 
 #include "tuxkart.h"
 
-#include "oldgui.h"
 #include "WidgetSet.h"
 #include "sound.h"
 #include "Loader.h"
@@ -36,66 +34,16 @@
 
 #define MAX_TRACKS 100
 
-static puSlider       *numLapsSlider    ;
-static puButton       *numLapsText      ;
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-static puButton       *mirrorButton     ;
-#endif
-static puButton       *reverseButton    ;
-static puButtonBox    *trackButtons     ;
-static puButtonBox    *playerButtons    ;
-static puButton       *pleaseWaitButton ;
-static puFont         *sorority         ;
-static fntTexFont     *fnt              ;
 static ssgSimpleState *introMaterial    ;
 static char           *trackNames    [ MAX_TRACKS ] ;
-static char           *playerOptions [      4     ] ;
 static char           *trackIdents   [ MAX_TRACKS ] ;
-static char            numLapsLegend [     100    ] ;
-static int             numLaps        =  5 ;
 
 
-void switchToGame ()
+void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers)
 {
-  /* Collect the selected track and number of laps */
-
-  int t ;
-  int nl, np  ;
-  int mirror  ;
-  int reverse ;
-
-  trackButtons -> getValue ( & t ) ;
-  nl = atoi ( numLapsText->getLegend () ) ;
-  playerButtons -> getValue ( & np ) ;
-
-  np = 1 << np ;
-
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  mirrorButton -> getValue ( & mirror ) ;
-#else
-  mirror = 0 ;
-#endif
-
-  reverseButton -> getValue ( & reverse ) ;
-
-  /* Get rid of all the GUI widgets */
-
-  puDeleteObject ( pleaseWaitButton ) ;
-  puDeleteObject ( numLapsSlider  ) ;
-  puDeleteObject ( numLapsText    ) ;
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  puDeleteObject ( mirrorButton   ) ;
-#endif
-  puDeleteObject ( reverseButton  ) ;
-  puDeleteObject ( trackButtons   ) ;
-  puDeleteObject ( playerButtons  ) ;
   delete introMaterial ;
-  delete sorority  ;
-  delete fnt       ;
 
-  /* Start the main program */
-
-  tuxkartMain ( nl, mirror, reverse, trackIdents[t], np, 4 ) ;
+  tuxkartMain ( numLaps, mirror, reverse, trackIdents[track], nPlayers, 4 ) ;
 }
 
 /***********************************\
@@ -154,31 +102,6 @@ static void splashMainLoop (void)
     updateGUI();
     swapBuffers();
   }
-}
-
-
-/***********************************\
-*                                   *
-* Here are the PUI widget callback  *
-* functions.                        *
-*                                   *
-\***********************************/
-
-
-
-static void numLapsSliderCB ( puObject *)
-{
-  float d ;
-
-  numLapsSlider->getValue ( & d ) ;
-
-  numLaps = 1 + (int)( d / 0.05f ) ;
-
-  if ( numLaps <  1 ) numLaps =  1 ;
-  if ( numLaps > 20 ) numLaps = 20 ;
-
-  sprintf ( numLapsLegend, "%2d", numLaps ) ;
-  numLapsText->setLegend ( numLapsLegend ) ;
 }
 
 
@@ -279,76 +202,19 @@ static void initTuxKart (int width, int height, int videoFlags)
   
   /* Initialise a bunch of PLIB library stuff */
 
-  puInit  () ;
   ssgInit () ;
   ssgSetCurrentOptions(loader);
   registerImageLoaders();
-
-  fnt = new fntTexFont ;
-  fnt -> load ( loader->getPath("fonts/sorority.txf").c_str()) ;
-  sorority = new puFont ( fnt, 12 ) ;
-
-  puSetDefaultFonts        ( *sorority, *sorority ) ;
-  puSetDefaultStyle        ( PUSTYLE_SMALL_SHADED ) ;
-  puSetDefaultColourScheme ( 243.0f/255.0f, 140.0f/255.0f, 34.0f/255.0f, 1.0) ;
   
   sound      = new SoundSystem ;
   widgetSet        = new WidgetSet ;
-  oldgui        = new OldGUI ;
 }
 
 
 /* Draw the startScreen */
-static void startScreen ( int nbrLaps, int mirror, int reverse,
-			  int track, int nbrPlayers )
+static void startScreen ( )
 {
-  (void)mirror;
-
-  /* Create all of the GUI elements */
   guiSwitch = GUIS_MAINMENU;
-
-  playerOptions [ 0 ] = "1 Player"  ;
-  playerOptions [ 1 ] = "2 Players" ;
-  playerOptions [ 2 ] = "4 Players" ;
-  playerOptions [ 3 ] = NULL ;
-
-  numLapsSlider = new puSlider   ( 10, 80, 150      ) ;
-  numLapsSlider -> setLabelPlace ( PUPLACE_ABOVE    ) ;
-  numLapsSlider -> setLabel      ( "How Many Laps?" ) ;
-  numLapsSlider -> setDelta      ( 0.05 ) ;
-  numLapsSlider -> setCBMode     ( PUSLIDER_ALWAYS  ) ;
-  numLapsSlider -> setValue      ( (int) ( nbrLaps - 1) * 0.05f ) ;
-  //  numLapsSlider -> setValue      ( 1.0f*0.05f*(5.0f-1.0f) ) ;
-  numLapsSlider -> setCallback   ( numLapsSliderCB  ) ;
-
-  numLapsText = new puButton     ( 160, 80, " 5" ) ;
-  numLapsText -> setStyle        ( PUSTYLE_BOXED    ) ;
-  sprintf ( numLapsLegend, "%2d", nbrLaps ) ;
-  numLapsText->setLegend ( numLapsLegend ) ;
-
-  playerButtons = new puButtonBox ( 10, 150, 150, 230, playerOptions, TRUE ) ;
-  playerButtons -> setLabel       ( "How Many Players?"   ) ;
-  playerButtons -> setLabelPlace  ( PUPLACE_ABOVE    ) ;
-  playerButtons -> setValue       ( nbrPlayers/2     ) ; 
-
-  trackButtons = new puButtonBox ( 400, 10, 630, 150, trackNames, TRUE ) ;
-  trackButtons -> setLabel       ( "Which Track?"   ) ;
-  trackButtons -> setLabelPlace  ( PUPLACE_ABOVE    ) ;
-  trackButtons -> setValue       ( track            ) ; 
-
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  mirrorButton = new puButton    ( 260, 40, "Mirror Track" ) ;
-  mirrorButton -> setValue       ( mirror           ) ;
-#endif
-   
-  reverseButton = new puButton    ( 260, 10, "Reverse Track" ) ;
-  reverseButton -> setValue       ( reverse         ) ;
-
-  /*
-    Load up the splash screen texture,
-    loop until user hits the START button,
-    then start the game running.
-  */
 
   installMaterial () ;
   splashMainLoop  () ;
@@ -542,7 +408,7 @@ int main ( int argc, char *argv[] )
   else
     {
       /* Show start screen */
-      startScreen ( nbrLaps, mirror, reverse, track, nbrPlayers );
+      startScreen ();
     }
 
   return 0 ;
