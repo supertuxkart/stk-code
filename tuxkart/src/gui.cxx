@@ -205,6 +205,7 @@ void GUI::update ()
 
 void GUI::keyboardInput ()
 {
+  static int isWireframe = FALSE ;
   int c = getGLUTKeystroke () ;
 
   if ( c <= 0 )
@@ -226,9 +227,13 @@ void GUI::keyboardInput ()
                return ;
  
     case 'w' :
-    case 'W' : glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ; return ;
-    case 'f' :
-    case 'F' : glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ; return ;
+    case 'W' : if ( isWireframe )
+                 glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+               else
+                 glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+               isWireframe = ! isWireframe ;
+
+               return ;
     case 'z' :
     case 'Z' : stToggle () ; return ;
     case 'h' :
@@ -258,7 +263,8 @@ void GUI::joystickInput ()
   if ( isGLUTKeyDown ( GLUT_KEY_UP   +256 ) ) ji.buttons |= 0x01 ;
   if ( isGLUTKeyDown ( GLUT_KEY_DOWN +256 ) ) ji.buttons |= 0x02 ;
 
-  if ( isGLUTKeyDown ( '\r' )|| isGLUTKeyDown ( '\n' )) ji.buttons |= 0x04 ;
+  if ( isGLUTKeyDown ( 'f' ) || isGLUTKeyDown ( 'F' ) ||
+       isGLUTKeyDown ( '\r' )|| isGLUTKeyDown ( '\n' )) ji.buttons |= 0x04 ;
   if ( isGLUTKeyDown ( 'a' ) || isGLUTKeyDown ( 'A' ) ) ji.buttons |= 0x20 ;
   if ( isGLUTKeyDown ( 's' ) || isGLUTKeyDown ( 'S' ) ) ji.buttons |= 0x10 ;
   if ( isGLUTKeyDown ( 'd' ) || isGLUTKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;

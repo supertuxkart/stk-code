@@ -10,7 +10,7 @@
 
 /* Handy constants */
 
-#define GRAVITY              9.80665f
+#define GRAVITY              (4.0f * 9.80665f)
 #define MILE                 1609.344f
 #define KILOMETER            1000.000f
 #define HOUR                 (60.0f * 60.0f)

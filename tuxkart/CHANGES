@@ -2,6 +2,21 @@
 TuxKart Change Log.
 ===================
 
+TuxKart v0.0.2 (July 2nd 2000)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Added ability to add new tracks without
+    recompiling.
+
+  * Can now drive using keyboard only - no joystick
+    required.
+
+  * Should compile and run under Windoze using CygWin.
+
+TuxKart v0.0.1 (July 1st 2000)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Fixed a couple of files missing in initial
+    Distro.
+
 TuxKart v0.0.0 (June 29th 2000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * First CVS release.

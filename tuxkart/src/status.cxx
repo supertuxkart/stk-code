@@ -112,8 +112,25 @@ void drawDropShadowText ( char *str, int sz, int x, int y )
 
 void drawHelpText ()
 {
-  drawDropShadowText ( "Press SPACE to toggle the menu.", 18, 70, 400 ) ;
-  drawDropShadowText ( "Press ESCAPE to exit the game.", 18, 70, 370 ) ;
+  drawDropShadowText ( "Press SPACE to toggle the menu.",  18, 70, 400 ) ;
+  drawDropShadowText ( "Press ESCAPE to exit the game.",   18, 70, 370 ) ;
+
+  drawDropShadowText ( "Joystick: A - Accellerate.  B - Brake.",
+                                                           18, 70, 330 ) ;
+  drawDropShadowText ( "          C - Use an item.  D - unused.",
+                                                           18, 70, 300 ) ;
+  drawDropShadowText ( "          L - Pop a wheelie R - Jump.",
+                                                           18, 70, 270 ) ;
+ 
+  drawDropShadowText ( "Keyboard: ARROWS - Steer, accellerate and brake",
+                                                           18, 70, 230 ) ;
+ 
+  drawDropShadowText ( "          A - Pop a Wheelie S - Jump",
+                                                           18, 70, 200 ) ;
+  drawDropShadowText ( "          F - Use an item.  D - Unused",
+                                                           18, 70, 170 ) ;
+  drawDropShadowText ( "          R - Restart race. P - Pause.",
+                                                           18, 70, 150 ) ;
 }
 
 
@@ -129,18 +146,15 @@ void drawIntroText ()
   drawTitleText () ;
 
   if ( intro_timer & 8 )
-    drawDropShadowText ( "Press SPACE bar for menu.",
-                       15, 10, 430 ) ;
+    drawDropShadowText ( "Press SPACE bar for menu.", 15, 10, 430 ) ;
 }
 
 
 char *aboutText [] =
 {
-  "Tux Kart blah, blah, blah",
-  "Tux Kart blah, blah, blah",
-  "Tux Kart blah, blah, blah",
-  "Tux Kart blah, blah, blah",
-  "Tux Kart blah, blah, blah",
+  "Written    by Steve Baker",
+  "Playtested by Oliver Baker",
+  "Track design and other 3D models by Both Bakers.",
   NULL
 } ;
 
