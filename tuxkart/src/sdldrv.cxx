@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.18 2004/08/07 04:30:55 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.19 2004/08/07 19:37:57 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -29,6 +29,8 @@
 
 using std::cout;
 using std::vector;
+
+const uint MOUSE_HIDE_TIME = 2000;
 
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
@@ -106,6 +108,7 @@ void shutdownVideo ()
 void pollEvents ()
 {
   static SDL_Event event;
+  static int lastMouseMove;
   
   if ( SDL_PollEvent(&event) )
   {
@@ -122,6 +125,7 @@ void pollEvents ()
 	 
 	case SDL_MOUSEMOTION:
 		SDL_ShowCursor(SDL_ENABLE);
+		lastMouseMove = SDL_GetTicks();
 		if (gui)
 	  		gui -> point ( event.motion.x, getScreenHeight() - event.motion.y );
 	  	break;
@@ -155,6 +159,9 @@ void pollEvents ()
 	  break;
     }
   }
+  
+  if (SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE && SDL_GetTicks() - lastMouseMove > MOUSE_HIDE_TIME)
+  	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void keyboardInput (const SDL_keysym& key)
