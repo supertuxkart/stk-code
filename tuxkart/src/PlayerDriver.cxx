@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.21 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.22 2004/08/26 23:01:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,7 @@
 #include "KartProperties.h"
 #include "KartDriver.h"
 #include "World.h"
+#include "WorldScreen.h"
 #include "PlayerDriver.h"
 
 PlayerDriver::PlayerDriver()
@@ -75,11 +76,18 @@ PlayerDriver::incomingJoystick  (JoyInfo& ji)
   }
   
   if ( keyState [ SDLK_7 ] ) {
-    std::cout << "Use non fake-drifting" << std::endl;
+    std::cout << "Camera: use non fake-drifting" << std::endl;
+    WorldScreen::current()->getCamera(0)->setMode(Camera::CM_NORMAL);
     use_fake_drift = true;
   }
-  if ( keyState [ SDLK_8 ] ) {
+  else if ( keyState [ SDLK_8 ] ) {
     std::cout << "Use non real-drifting" << std::endl;
+    WorldScreen::current()->getCamera(0)->setMode(Camera::CM_NO_FAKE_DRIFT);
+    use_fake_drift = false;
+  }
+  else if ( keyState [ SDLK_9 ] ) {
+    std::cout << "Camera: use replay cam" << std::endl;
+    WorldScreen::current()->getCamera(0)->setMode(Camera::CM_SIMPLE_REPLAY);
     use_fake_drift = false;
   }
 

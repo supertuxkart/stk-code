@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.21 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: Camera.cxx,v 1.22 2004/08/26 23:01:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,63 +33,41 @@ static inline void relaxation(float& target, float& prev, float rate)
 }
 
 void
-Camera::setScreenPosition ( int pos )
+Camera::setScreenPosition ( int numPlayers, int pos )
 {
-  switch ( mode )
-    {
-    case ONE_SPLIT : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 1.0f ;
-      context -> setFOV ( 75.0f, 0.0f ) ;
-      break;
+  assert(pos >= 0 && pos <= 3);
 
-    case TWO_SPLIT :
+  if (numPlayers == 1)
+    {
+      context -> setFOV ( 75.0f, 0.0f ) ;
+      x = 0.0f; y = 0.0f; w = 1.0f; h = 1.0f ;
+    }
+  else if (numPlayers == 2)
+    {
       context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
       switch ( pos )
         {
-        case 0 :
-          x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ;
-          break;
-        case 1 : 
-          x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ;
-          
-          break;
+        case 0 : x = 0.0f; y = 0.5f; w = 1.0f; h = 0.5f; break;
+        case 1 : x = 0.0f; y = 0.0f; w = 1.0f; h = 0.5f; break;
         }
-      break ;
-
-    case FOUR_SPLIT :
-      context -> setFOV ( 50.0f, 0.0f ) ;
+    }
+  else if (numPlayers == 3 || numPlayers == 4)
+    {
+      context -> setFOV ( 50.0f, 0.0f );
       switch ( pos )
         {
-        case 0 :
-          x = 0.0f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;
-          break;
-        case 1 :
-          x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;         
-          break;
-        case 2 :
-          x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
-          break;
-        case 3 : 
-          x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
-          break;
+        case 0 : x = 0.0f; y = 0.5f; w = 0.5f; h = 0.5f; break;
+        case 1 : x = 0.5f; y = 0.5f; w = 0.5f; h = 0.5f; break;
+        case 2 : x = 0.0f; y = 0.0f; w = 0.5f; h = 0.5f; break;
+        case 3 : x = 0.5f; y = 0.0f; w = 0.5f; h = 0.5f; break;
         }
-      break ;
     }
 }
 
-Camera::Camera ( Mode mode_, int which )
+Camera::Camera ( int numPlayers, int which_ )
 {
-  context = NULL ;
-  init () ;
-  whichKart = which ;   // Just for now
-  mode = mode_;
-  setScreenPosition ( which ) ;
-  last_steer_offset = 0;
-}
-
-
-void Camera::init ()
-{
-  delete context ;
+  whichKart = which_ ;   // Just for now
+  mode = CM_NORMAL;
   context = new ssgContext ;
 
   // FIXME: clipping should be configurable for slower machines
@@ -99,8 +77,14 @@ void Camera::init ()
   else
     context -> setNearFar ( 0.05f, 1000.0f ) ;
 
-  whichKart  = 0 ;
-  setScreenPosition ( 0 ) ;
+  setScreenPosition ( numPlayers, whichKart ) ;
+  last_steer_offset = 0;
+}
+
+void
+Camera::setMode(Mode mode_)
+{
+  mode = mode_;
 }
 
 void Camera::update ()
@@ -114,6 +98,9 @@ void Camera::update ()
   kartcoord.hpr[2] = 0;
   kartcoord.hpr[1] = 0;
 
+  if (mode == CM_SIMPLE_REPLAY)
+    kartcoord.hpr[0] = 0;
+
   // Uncomment this for a simple MarioKart-like replay-camera
   // kartcoord.hpr[0] = 0;
 
@@ -126,7 +113,7 @@ void Camera::update ()
   sgMat4 cam_pos;
   sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
 
-  if (!use_fake_drift)
+  if (mode == CM_NO_FAKE_DRIFT)
     {
       float steer_offset = World::current()->getPlayerKart(whichKart)->getSteerAngle()*-10.0f;
       relaxation(steer_offset, last_steer_offset, .25);
@@ -140,7 +127,7 @@ void Camera::update ()
     }
   else
     {
-      sgMat4 cam_rot;
+      sgMat4 cam_rot;       
       sgMakeRotMat4(cam_rot, 0, -5, 0);
       sgMultMat4(relative, cam_pos, cam_rot);
     }
@@ -153,7 +140,6 @@ void Camera::update ()
 
   context -> setCamera (&cam) ;
 }
-
 
 void Camera::apply ()
 {

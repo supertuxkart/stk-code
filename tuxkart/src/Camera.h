@@ -1,4 +1,4 @@
-//  $Id: Camera.h,v 1.7 2004/08/16 00:17:22 grumbel Exp $
+//  $Id: Camera.h,v 1.8 2004/08/26 23:01:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,9 +23,12 @@
 class Camera
 {
 public:
-  enum Mode { ONE_SPLIT, TWO_SPLIT, FOUR_SPLIT }; 
+  enum Mode { 
+    CM_NORMAL, 
+    CM_NO_FAKE_DRIFT,
+    CM_SIMPLE_REPLAY
+  }; 
 protected:
-
   ssgContext *context  ;
 
   int    whichKart ;
@@ -33,12 +36,13 @@ protected:
   float last_steer_offset;
   float x, y, w, h ;
 
-  void init () ;
-
 public:
-  Camera ( Mode mode, int id ) ;
+  Camera ( int numPlayers, int id ) ;
 
-  void setScreenPosition ( int pos ) ;
+  /** Set the camera to the given mode */
+  void setMode(Mode mode_);
+
+  void setScreenPosition ( int numPlayers, int pos ) ;
 
   void update () ;
   void apply  () ;

@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.h,v 1.2 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: WorldScreen.h,v 1.3 2004/08/26 23:01:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,9 +40,14 @@ private:
   typedef std::vector<Camera*> Cameras;
   Cameras cameras;
 
+  static WorldScreen* current_;
 public:
+  static WorldScreen* current() { return current_; }
+
   WorldScreen(const RaceSetup& racesetup);
   virtual ~WorldScreen();
+
+  Camera* getCamera(int i) const;
 
   void draw();
   void update();

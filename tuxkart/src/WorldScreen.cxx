@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.9 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.10 2004/08/26 23:01:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,24 +32,18 @@
 #include "TrackManager.h"
 #include "gfx.h"
 
+WorldScreen* WorldScreen::current_ = 0;
+
 WorldScreen::WorldScreen(const RaceSetup& raceSetup)
   : world(new World(raceSetup)),
     overtime(0)
 {
+  current_ = this;
   fclock = new ulClock;
   fclock->reset();
   
-  Camera::Mode camera_mode;
-
-  if (raceSetup.getNumPlayers() == 1)
-    camera_mode = Camera::ONE_SPLIT;
-  else if (raceSetup.getNumPlayers() == 2)
-    camera_mode = Camera::TWO_SPLIT;
-  else 
-    camera_mode = Camera::FOUR_SPLIT; 
-
   for(int i = 0; i < raceSetup.getNumPlayers(); ++i)
-    cameras.push_back(new Camera(camera_mode, i));
+    cameras.push_back(new Camera(raceSetup.getNumPlayers(), i));
 }
 
 WorldScreen::~WorldScreen()
@@ -146,6 +140,15 @@ WorldScreen::draw()
 
   glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 
+}
+
+Camera*
+WorldScreen::getCamera(int i) const
+{
+  if (i >= 0 && i < int(cameras.size()))
+    return cameras[i];
+  else
+    return 0;
 }
 
 /* EOF */
