@@ -1,4 +1,4 @@
-//  $Id: GrandPrixSetup.h,v 1.3 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: GrandPrixSetup.h,v 1.4 2004/08/25 00:21:23 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -28,7 +28,7 @@ class GrandPrixSetup
 {
 public:
   struct Stat {
-    Stat();
+    Stat(const std::string& ident, int points_, int position_);
 
     /** ident of the kart (aka. .tkkf filename without .tkkf) */
     std::string ident;

@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.5 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.6 2004/08/25 00:21:23 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,7 +34,19 @@ GrandPrixMode::GrandPrixMode(const std::string& kart_,
                              const CupData& cup_,
                              RaceDifficulty difficulty_)
   : kart(kart_), cup(cup_), difficulty(difficulty_)
-{}
+{
+  // Decide which karts should be used in the GrandPrix
+  std::vector<std::string> karts;
+  karts.resize(6);
+  karts[5] = kart; // Player starts last in the first race
+  kart_manager.fillWithRandomKarts(karts);
+
+  stat.race = 0;
+  for(int i = 0; i < int(karts.size()); ++i)
+    {
+      stat.karts.push_back(GrandPrixSetup::Stat(karts[i], 0, i));
+    }
+}
 
 void
 GrandPrixMode::start_race(int n)
@@ -46,10 +58,14 @@ GrandPrixMode::start_race(int n)
   raceSetup.numLaps    = 3; 
   raceSetup.track      = cup.tracks[n];
 
-  raceSetup.karts = kart_manager.getRandomKarts(5);
-  raceSetup.karts.push_back(kart);
-  
-  raceSetup.players.push_back(raceSetup.karts.size()-1);
+  raceSetup.karts.resize(stat.karts.size());
+  raceSetup.players.resize(1);
+  for(int i = 0; i < int(stat.karts.size()); ++i)
+    {
+      raceSetup.karts[stat.karts[i].position] = stat.karts[i].ident;
+      if (stat.karts[i].ident == kart)
+        raceSetup.players[0] = i;
+    }
 
   ScreenManager::current()->set_screen(new WorldScreen(raceSetup)); 
 }
@@ -88,10 +104,10 @@ QuickRaceMode::start()
   RaceSetup raceSetup;
 
   raceSetup.track = track;
-  raceSetup.karts = kart_manager.getRandomKarts(5);
-  raceSetup.karts.push_back(kart);
-  
-  raceSetup.players.push_back(raceSetup.karts.size()-1);
+  raceSetup.karts.resize(6);
+  raceSetup.karts[5] = kart;
+  kart_manager.fillWithRandomKarts(raceSetup.karts);
+  raceSetup.players.push_back(5);
 
   ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
 }

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.43 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.44 2004/08/25 00:21:23 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -124,8 +124,6 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ ,
   wheel_front_r = NULL;
   wheel_rear_l  = NULL;
   wheel_rear_r  = NULL;
-
-  std::cout << "KartDriver: " << this << std::endl;
 }
 
 KartDriver::~KartDriver()

@@ -1,4 +1,4 @@
-//  $Id: KartManager.h,v 1.3 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: KartManager.h,v 1.4 2004/08/25 00:21:23 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -40,6 +40,9 @@ public:
 
   /** Return \a len random karts */
   std::vector<std::string> getRandomKarts(int len);
+
+  /** Will the empty positions in the given vector with random karts */
+  void fillWithRandomKarts(std::vector<std::string>& vec);
 };
 
 extern KartManager kart_manager;

@@ -1,4 +1,4 @@
-//  $Id: KartManager.cxx,v 1.3 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: KartManager.cxx,v 1.4 2004/08/25 00:21:23 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <set>
+#include <iostream>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "KartManager.h"
@@ -95,6 +96,35 @@ KartManager::getRandomKarts(int len)
   all_karts.resize(len);
 
   return all_karts;
+}
+
+void
+KartManager::fillWithRandomKarts(std::vector<std::string>& vec)
+{
+  std::vector<std::string> all_karts;
+
+  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
+    all_karts.push_back(i->ident);
+
+  std::random_shuffle(all_karts.begin(), all_karts.end());
+
+  int new_kart = 0;
+  for(int i = 0; i < int(vec.size()); ++i)
+    {
+      while(vec[i].empty())
+        {
+          if (std::find(vec.begin(), vec.end(), all_karts[new_kart]) == vec.end())
+            { // Found a new kart, so use it
+              vec[i] = all_karts[new_kart];
+            }
+          else if (!all_karts.size() >= vec.size())
+            { // We need to fill more karts than we have available, so don't care about dups
+              vec[i] = all_karts[new_kart];
+            }
+          
+          new_kart += 1;
+        }
+    }  
 }
 
 /* EOF */
