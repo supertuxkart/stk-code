@@ -1,4 +1,4 @@
-//  $Id: Shadow.h,v 1.1 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Shadow.h,v 1.2 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,11 +25,11 @@
 
 class Shadow
 {
-  ssgBranch *sh ;
+  ssgTransform *sh ;
  
 public:
   Shadow ( const std::string& name, float x1, float x2, float y1, float y2 ) ;
-  ssgEntity *getRoot () { return sh ; }
+  ssgTransform *getRoot () { return sh ; }
 };
 
 #endif

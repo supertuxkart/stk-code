@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.17 2004/08/08 03:18:56 grumbel Exp $
+//  $Id: Driver.h,v 1.18 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,8 @@
 #include "tuxkart.h"
 #include "Track.h"
 #include "joystick.h"
+
+class Shadow;
 
 #define HISTORY_FRAMES 128
 
@@ -135,7 +137,15 @@ protected:
   
   /* End - New Physics */
 
+  /** Complete model, including shadow */
+  ssgBranch    *comp_model;
+
+  /** Kart model alone, without the shadow */
   ssgTransform *model ;
+
+  /** The Karts shadow */
+  Shadow* shadow;
+
   int history_index ;
   float wheelie_angle ;
 
@@ -158,6 +168,10 @@ protected:
   sgVec2 last_track_coords ;
   sgVec2 curr_track_coords ;
 
+  /** Height of the terrain at the current position of the kart, used
+      for shadow calculation */
+  float height_of_terrain;
+
 public:
 
   Driver ( );
@@ -175,6 +189,7 @@ public:
   }
 
   ssgTransform *getModel () { return model ; }
+  ssgEntity *getRoot () { return comp_model ; }
 
   sgCoord *getVelocity ()
   {

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.15 2004/08/08 03:18:56 grumbel Exp $
+//  $Id: Driver.cxx,v 1.16 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include "tuxkart.h"
 #include "material.h"
 #include "sound.h"
@@ -38,7 +39,14 @@ Driver::Driver ( )
   delta_t = 0.01 ;
 
   firsttime = TRUE ;
+  
+  comp_model = new ssgBranch;
   model = new ssgTransform ;
+
+  comp_model->addKid(model);
+
+  shadow = new Shadow("tuxkartshadow.rgb", -1, 1, -1, 1);
+  comp_model->addKid ( shadow->getRoot () );
     
   /* New Physics */
   sgZeroVec3 (acceleration);
@@ -133,6 +141,27 @@ void Driver::placeModel ()
       relaxation(relax_pos.hpr[2], last_relax_pos.hpr[2], .5);
 
       model -> setTransform ( & relax_pos ) ;
+
+      sgMat4 res;
+      sgVec3 hpr;
+
+      pr_from_normal(hpr, curr_normal);
+
+      sgMat4 rot;
+      sgMat4 rot2;
+
+      relax_pos.xyz[2] = height_of_terrain;
+
+      sgMakeTransMat4(res, relax_pos.xyz);
+      sgMakeRotMat4(rot, hpr[0], hpr[1], hpr[2]);
+      sgMakeRotMat4(rot2, relax_pos.hpr[0]-hpr[0], 0, 0);
+      //sgMakeRotMat4(rot2, , 0, 0);
+
+      sgMat4 res2;
+      sgMultMat4(res2, res, rot);
+      sgMultMat4(res, res2, rot2);
+
+      shadow->getRoot() -> setTransform(res) ;
     }
 }
 
@@ -260,7 +289,8 @@ void Driver::coreUpdate ()
   sgVec3 end   ; sgCopyVec3 ( end  , result[3]    ) ;
 
   float hot = collectIsectData ( start, end ) ;
-
+  height_of_terrain = hot;
+  
   sgCopyVec3 ( result[3], end ) ;
 
   sgSetCoord ( &curr_pos, result  ) ;

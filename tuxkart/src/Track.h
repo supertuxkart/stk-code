@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.6 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: Track.h,v 1.7 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,28 +25,29 @@
 
 class Track
 {
-    sgVec2 min ;
-    sgVec2 max ;
-    sgVec2 center ;
-    float  scale ;
+private:
+  sgVec2 min ;
+  sgVec2 max ;
+  sgVec2 center ;
+  float  scale ;
 
-    float  total_distance ;
+  float  total_distance ;
 
-  public:
-    Track ( char *drv_fname, int mirror, int reverse ) ;
+public:
+  Track ( char *drv_fname, int mirror, int reverse ) ;
 
-    void glVtx ( sgVec2 v, float xoff, float yoff )
-    {
-      glVertex2f ( xoff + ( v[0] - center[0] ) * scale,
-                   yoff + ( v[1] - center[1] ) * scale ) ;
-    }
+  void glVtx ( sgVec2 v, float xoff, float yoff )
+  {
+    glVertex2f ( xoff + ( v[0] - center[0] ) * scale,
+                 yoff + ( v[1] - center[1] ) * scale ) ;
+  }
 
-    int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
-    int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
-    void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
+  int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
+  int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
+  void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
 
-    float getTrackLength () { return total_distance ; }
-    void draw2Dview ( float x, float y ) ;
+  float getTrackLength () { return total_distance ; }
+  void draw2Dview ( float x, float y ) ;
 } ;
 
 

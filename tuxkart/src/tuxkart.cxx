@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.45 2004/08/08 05:03:43 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.46 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -143,7 +143,6 @@ void load_players ( )
     lod -> setRanges ( r, 2 ) ;
 
     kart[i]-> getModel() -> addKid ( lod ) ;
-    kart[i]-> getModel() -> addKid ( Shadow("tuxkartshadow.rgb", -1, 1, -1, 1).getRoot () ) ;
 
     kart[i]-> addAttachment ( pobj1 ) ;
     kart[i]-> addAttachment ( pobj2 ) ;
@@ -493,7 +492,7 @@ int tuxkartMain ()
     newkart -> reset    () ;
     newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-    scene -> addKid ( newkart -> getModel() ) ;
+    scene -> addKid ( newkart -> getRoot() ) ;
 
     kart.push_back(newkart);
   }

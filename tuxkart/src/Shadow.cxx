@@ -1,4 +1,4 @@
-//  $Id: Shadow.cxx,v 1.2 2004/08/08 03:51:55 grumbel Exp $
+//  $Id: Shadow.cxx,v 1.3 2004/08/08 06:07:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,7 +40,7 @@ Shadow::Shadow ( const std::string& name, float x1, float x2, float y1, float y2
   sgSetVec2 ( t, 0.0, 1.0 ) ; ta->add(t) ;
   sgSetVec2 ( t, 1.0, 1.0 ) ; ta->add(t) ;
  
-  sh = new ssgBranch ;
+  sh = new ssgTransform ;
   sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
  
   sh -> setName ( "Shadow" ) ;
