@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.19 2004/12/10 03:43:35 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.20 2004/12/12 01:25:02 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -49,6 +49,9 @@
    
    */
    
+   
+   //If you want to try the new steering algorithm with the player kart check
+   //PlayerDriver.cxx in the update function.
    
    /*New steering algorithm. We find out which is the next dot that the AI
    should follow, then we calculate rotation needed to go in a straight

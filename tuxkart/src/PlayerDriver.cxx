@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.27 2004/11/04 06:43:42 cosmosninja Exp $
+//  $Id: PlayerDriver.cxx,v 1.28 2004/12/12 01:25:02 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,6 +32,8 @@
 #include "WorldScreen.h"
 #include "PlayerDriver.h"
 
+#include "Track.h"
+#include <math.h>
    PlayerDriver::PlayerDriver()
    {
       tscale = 10.0 ;
@@ -41,9 +43,39 @@
    void 
     PlayerDriver::update (float delta)
    {
+   
+   /* //Uncomment this to test the AI's steering algorithm with a player kart
+      //You also have to include "Track.h" and <math.h> to use it.
+      size_t next ;
+   
+      next = (kart->track_hint + 1 >= world->track->driveline.size()) ? 0 :
+            kart->track_hint + 1;
+   
+      SGfloat adjacent_line, opposite_line, theta;
+      adjacent_line = world->track->driveline[next][0] - 
+         kart->getCoord()->xyz[0];
+      opposite_line = world->track->driveline[next][1] - 
+         kart->getCoord()->xyz[1];
+   
+      theta = atanf(opposite_line/adjacent_line) * SG_RADIANS_TO_DEGREES;
+      
+      if (adjacent_line < 0.0f) theta = theta + 90.0f;
+      else theta = theta - 90.0f;
+      
+      float rotation_direction = kart->getCoord()->hpr[0] - theta;
+      if (rotation_direction > 180.0f)
+         kart->getVelocity()->hpr[0] = 3.5f * kart->getVelocity()->xyz[1];
+      else if (rotation_direction < -180.0f )
+         kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
+      else
+      {
+         kart->getVelocity()->hpr[0] = 0.3f * -rotation_direction * kart->getVelocity()->xyz[1];
+      }
+   //*/
+   
       assert(kart);
    }
-
+   
    void
     PlayerDriver::incomingJoystick  (JoyInfo& ji)
    {
