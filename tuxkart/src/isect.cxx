@@ -1,4 +1,4 @@
-//  $Id: isect.cxx,v 1.3 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: isect.cxx,v 1.4 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "World.h"
 #include "isect.h"
 
 float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal )
@@ -38,7 +39,7 @@ float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal )
 
   sgSetVec3 ( HOTvec, 0.0f, 0.0f, my_position [ 2 ] ) ;
 
-  num_hits = ssgHOT ( scene, HOTvec, invmat, &results ) ;
+  num_hits = ssgHOT ( World::current()->scene, HOTvec, invmat, &results ) ;
   
   hot = DEEPEST_HELL ;
 

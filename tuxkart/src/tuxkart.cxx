@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.62 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.63 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -39,6 +39,7 @@
 #include "preprocessor.h"
 #include "material.h"
 #include "RaceSetup.h"
+#include "World.h"
 
 #include <vector>
 
@@ -56,18 +57,13 @@ BaseGUI	*gui = NULL;
 
 std::vector<GUISwitch> guiStack;
 
-Karts kart;
-Projectile *projectile [ NUM_PROJECTILES ] ;
-Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
-
-ssgRoot      *scene = NULL ;
-Track        *track = NULL ;
-
 void restartRace()
 {
   finishing_position = -1 ;
   
-  for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
+  for ( World::Karts::iterator i = World::current()->kart.begin(); 
+        i != World::current()->kart.end() ; 
+        ++i )
     (*i)->reset() ;
 }
 

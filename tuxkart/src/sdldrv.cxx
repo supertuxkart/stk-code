@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.24 2004/08/10 16:45:42 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.25 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -28,6 +28,7 @@
 #include "Driver.h"
 #include "KartDriver.h"
 #include "RaceSetup.h"
+#include "World.h"
 
 using std::cout;
 using std::vector;
@@ -211,7 +212,7 @@ void kartInput(RaceSetup& raceSetup)
 		if ( keyState [ cc.keys[KC_RESCUE] ] ) ji.rescue = true ;	
 		if ( keyState [ cc.keys[KC_FIRE] ] ) ji.fire = true ;
 	
-		((PlayerKartDriver *)kart [ i ]) -> incomingJoystick ( ji ) ;
+		((PlayerKartDriver *)World::current()->kart [ i ]) -> incomingJoystick ( ji ) ;
 	}     
 }
 

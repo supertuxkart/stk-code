@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.12 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: Camera.cxx,v 1.13 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include <plib/sg.h>
 #include "tuxkart.h"
 #include "KartDriver.h"
+#include "World.h"
 #include "Camera.h"
 
 Camera *camera [ 4 ] = { NULL, NULL, NULL, NULL } ;
@@ -89,10 +90,10 @@ void Camera::init ()
 void Camera::update ()
 {
   // Update the camera
-  if ( whichKart >= int(kart.size()) || whichKart < 0 ) whichKart = 0 ;
+  if ( whichKart >= int(World::current()->kart.size()) || whichKart < 0 ) whichKart = 0 ;
 
   sgCoord kartcoord;
-  sgCopyCoord(&kartcoord, kart[whichKart]->getCoord());
+  sgCopyCoord(&kartcoord, World::current()->kart[whichKart]->getCoord());
 
   kartcoord.hpr[2] = 0;
   kartcoord.hpr[1] = 0;
@@ -112,7 +113,7 @@ void Camera::update ()
   if (0)
     {
       sgMat4 cam_rot;
-      sgMakeRotMat4(cam_rot, kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
+      sgMakeRotMat4(cam_rot, World::current()->kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
       sgMultMat4(relative, cam_rot, cam_pos);
     }
   else
@@ -137,7 +138,7 @@ void Camera::apply ()
   int width  = getScreenWidth  () ;
   int height = getScreenHeight () ;
 
-  assert ( scene != NULL ) ;
+  assert ( World::current()->scene != NULL ) ;
 
   glViewport ( (int)((float)width  * x),
                (int)((float)height * y),

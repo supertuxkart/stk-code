@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.33 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: tuxkart.h,v 1.34 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,8 +66,6 @@ extern SoundSystem *sound ;
 extern Track       *track ;
 extern ulClock     *fclock ;
 
-extern ssgRoot *scene ;
-
 void tuxKartMainLoop (RaceSetup& raceSetup) ;
 void backToSplash () ;
 void shutdown() ;
@@ -75,9 +73,6 @@ void restartRace();
 
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
-
-#define NUM_PROJECTILES  8
-#define NUM_EXPLOSIONS   6
 
 #define MAX_HOME_DIST  50.0f
 #define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)
@@ -89,15 +84,6 @@ ssgBranch *process_userdata ( char *data ) ;
 #endif
 
 extern int finishing_position ;
-
-class KartDriver;
-class Projectile;
-class Explosion;
-
-typedef std::vector<KartDriver*> Karts;
-extern Karts kart;
-extern Projectile *projectile [ NUM_PROJECTILES ] ;
-extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
 #endif
 

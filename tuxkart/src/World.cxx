@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.1 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: World.cxx,v 1.2 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -42,6 +42,9 @@ World::World(RaceSetup& raceSetup)
 {
   std::cout << "Creating world: " << this << std::endl;
   current_ = this;
+
+  scene = NULL;
+  track = NULL;
 
   net = NULL ;
   network_enabled = FALSE ;

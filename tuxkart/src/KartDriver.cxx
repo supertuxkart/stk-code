@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.17 2004/08/10 22:23:21 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.18 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,7 @@
 #include "Shadow.h"
 #include "KartDriver.h"
 #include "Projectile.h"
+#include "World.h"
 
 static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
 {
@@ -86,7 +87,7 @@ void KartDriver::useAttachment ()
 
         if ( ++m >= NUM_PROJECTILES ) m = 0 ;
 
-	projectile[m]->fire ( this, collectable ) ;
+	World::current()->projectile[m]->fire ( this, collectable ) ;
       }
       break ;
 
@@ -124,23 +125,23 @@ void KartDriver::doObjectInteractions ()
 
     sgVec3 xyz ;
 
-    sgSubVec3 ( xyz, getCoord()->xyz, kart [ i ] -> getCoord () -> xyz ) ;
+    sgSubVec3 ( xyz, getCoord()->xyz, World::current()->kart [ i ] -> getCoord () -> xyz ) ;
 
     if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
     {
-      if ( this == kart[0] || i == 0 )
+      if ( this == World::current()->kart[0] || i == 0 )
         sound->playSfx ( SOUND_OW ) ;
 
       sgNormalizeVec2 ( xyz ) ;
 
-      if ( velocity.xyz[1] > kart[i]->getVelocity()->xyz[1] )
+      if ( velocity.xyz[1] > World::current()->kart[i]->getVelocity()->xyz[1] )
       {
         forceCrash () ;
-        sgSubVec2 ( kart[i]->getCoord()->xyz, xyz ) ;
+        sgSubVec2 ( World::current()->kart[i]->getCoord()->xyz, xyz ) ;
       }
       else
       {
-        kart[i]->forceCrash () ;
+        World::current()->kart[i]->forceCrash () ;
         sgAddVec2 ( getCoord()->xyz, xyz ) ;
       }
     } 
@@ -161,7 +162,7 @@ void KartDriver::doObjectInteractions ()
       herring [ i ] . eaten = TRUE ;
       herring [ i ] . time_to_return = fclock->getAbsTime() + 2.0f  ;
 
-      if ( this == kart[0] )
+      if ( this == World::current()->kart[0] )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
                           SOUND_UGH : SOUND_BURP ) ;
 
@@ -233,7 +234,7 @@ void KartDriver::doZipperProcessing ()
 
 void KartDriver::forceCrash ()
 {
-  if ( this == kart[0] )
+  if ( this == World::current()->kart[0] )
     sound->playSfx ( SOUND_BONK ) ;
 
   wheelie_angle = CRASH_PITCH ;
@@ -327,15 +328,15 @@ void KartDriver::update ()
     float cdist = SG_MAX ;
     int   closest = -1 ;
 
-    for ( Karts::size_type i = 0; i < kart.size() ; ++i )
+    for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
     {
-      if ( kart[i] == this ) continue ;
+      if ( World::current()->kart[i] == this ) continue ;
 
-      if ( kart[i]->getDistanceDownTrack() < getDistanceDownTrack() )
+      if ( World::current()->kart[i]->getDistanceDownTrack() < getDistanceDownTrack() )
         continue ;
 
       float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                        kart[i]->getCoord()->xyz ) ;
+                                        World::current()->kart[i]->getCoord()->xyz ) ;
 
       if ( d < cdist && d < MAGNET_RANGE_SQD )
       {
@@ -348,7 +349,7 @@ void KartDriver::update ()
     {
       if ( getAttachment () == ATTACH_MAGNET )
       {
-        if ( this == kart[0] || closest == 0 )
+        if ( this == World::current()->kart[0] || closest == 0 )
           sound -> playSfx ( SOUND_BZZT ) ;
 
         attach ( ATTACH_MAGNET_BZZT,
@@ -356,13 +357,13 @@ void KartDriver::update ()
       }
 
       sgVec3 vec ;
-      sgSubVec2 ( vec, kart[closest]->getCoord()->xyz, getCoord()->xyz ) ;
+      sgSubVec2 ( vec, World::current()->kart[closest]->getCoord()->xyz, getCoord()->xyz ) ;
       vec [ 2 ] = 0.0f ;
       sgNormalizeVec3 ( vec ) ;
 
       sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
 
-      float tgt_velocity = kart[closest]->getVelocity()->xyz[1] ;
+      float tgt_velocity = World::current()->kart[closest]->getVelocity()->xyz[1] ;
 
       if ( cdist > MAGNET_MIN_RANGE_SQD )
       {
@@ -572,7 +573,7 @@ KartDriver::load_data()
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;
   //this-> getModel() -> addKid (exhaust_pipe) ;
-  scene -> addKid (exhaust_pipe);
+  World::current()->scene -> addKid (exhaust_pipe);
 
   // Load data for this kart (bonus objects, the kart model, etc)
   ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;

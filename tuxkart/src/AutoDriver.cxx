@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.3 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: AutoDriver.cxx,v 1.4 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "World.h"
 #include "KartDriver.h"
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
@@ -39,12 +40,12 @@ void AutoKartDriver::update ()
 
   /* Slow down if we get too far ahead of the player... */
 
-  if ( position < kart[0]->getPosition () &&
+  if ( position < World::current()->kart[0]->getPosition () &&
        velocity.xyz[1] > MIN_HANDICAP_VELOCITY )
     velocity.xyz[1] -= MAX_BRAKING * delta_t * 0.1f ;
   else
   /* Speed up if we get too far behind the player... */
-  if ( position > kart[0]->getPosition () &&
+  if ( position > World::current()->kart[0]->getPosition () &&
        velocity.xyz[1] < MAX_HANDICAP_VELOCITY )
     velocity.xyz[1] += MAX_ACCELLERATION * delta_t * 1.1f ;
   else

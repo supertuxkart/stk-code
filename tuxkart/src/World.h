@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.1 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: World.h,v 1.2 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,9 +20,20 @@
 #ifndef HEADER_WORLD_H
 #define HEADER_WORLD_H
 
+#include <plib/ssg.h>
+#include <vector>
 #include "RaceSetup.h"
 
+#define NUM_PROJECTILES  8
+#define NUM_EXPLOSIONS   6
+
 class Herring;
+class KartDriver;
+class Projectile;
+class Explosion;
+class Track;
+class guUDPConnection;
+class GFX;
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
@@ -33,7 +44,17 @@ private:
 public:
   static World* current() { return current_; }
 
+public:
+  ssgRoot      *scene;
+
+  typedef std::vector<KartDriver*> Karts;
+  Karts kart;
+
+  Projectile *projectile [ NUM_PROJECTILES ] ;
+  Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
+
 private:
+  Track        *track;
   guUDPConnection *net;
   int network_enabled;
   int network_testing;

@@ -1,4 +1,4 @@
-//  $Id: gfx.cxx,v 1.18 2004/08/10 16:54:36 grumbel Exp $
+//  $Id: gfx.cxx,v 1.19 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,6 +27,7 @@
 #include "tuxkart.h"
 #include "Camera.h"
 #include "gfx.h"
+#include "World.h"
 
 static sgVec3 sunposn   ;
 static sgVec4 skyfogcol ;
@@ -57,7 +58,7 @@ void GFX::update ()
 
   if ( mirror ) glFrontFace ( GL_CW ) ;
 
-  ssgCullAndDraw ( scene ) ;
+  ssgCullAndDraw ( World::current()->scene ) ;
 }
 
 

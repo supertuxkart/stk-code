@@ -1,4 +1,4 @@
-//  $Id: Explosion.cxx,v 1.3 2004/08/01 00:13:27 grumbel Exp $
+//  $Id: Explosion.cxx,v 1.4 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include "tuxkart.h"
 #include "Explosion.h"
+#include "World.h"
 
 static sgVec3 hell = { -1000000, -1000000, -1000000 } ;
 
@@ -62,7 +63,7 @@ Explosion::Explosion ( ssgBranch *b )
   cut = new ssgCutout ;
   seq = (ssgSelector *) e ;
 
-  scene -> addKid ( dcs ) ;
+  World::current()->scene -> addKid ( dcs ) ;
   dcs   -> addKid ( cut ) ;
   cut   -> addKid ( seq ) ;
 

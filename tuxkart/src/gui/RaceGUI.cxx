@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.8 2004/08/10 16:45:42 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.9 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "status.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
+#include "World.h"
 #include "KartDriver.h"
 
 RaceGUI::RaceGUI()
@@ -48,7 +49,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	
 	if (key.mod & KMOD_CTRL)
 	{
-      	((PlayerKartDriver*)kart[0])->incomingKeystroke ( key ) ;
+      	((PlayerKartDriver*)World::current()->kart[0])->incomingKeystroke ( key ) ;
       	return;
 	}
     

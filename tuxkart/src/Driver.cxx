@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.19 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: Driver.cxx,v 1.20 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,6 +26,7 @@
 #include "Driver.h"
 #include "KartDriver.h"
 #include "KartProperties.h"
+#include "World.h"
 
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
 #define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
@@ -392,7 +393,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
   if ( firsttime )
     num_hits = 0 ;
   else
-    num_hits = ssgIsect ( scene, &sphere, invmat, &results ) ;
+    num_hits = ssgIsect ( World::current()->scene, &sphere, invmat, &results ) ;
  
   sgSetVec3 ( surface_avoidance_vector, 0.0f, 0.0f, 0.0f ) ;
 
@@ -460,7 +461,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
   sgSetVec3 ( HOTvec, 0.0f, 0.0f, top ) ;
 
-  num_hits = ssgHOT ( scene, HOTvec, invmat, &results ) ;
+  num_hits = ssgHOT ( World::current()->scene, HOTvec, invmat, &results ) ;
   
   hot = -1000000.0f ;
 
@@ -484,7 +485,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
       if ( getMaterial ( h->leaf ) -> isZipper () )
       {
-        if ( this == kart[0] )
+        if ( this == World::current()->kart[0] )
           sound->playSfx ( SOUND_WEE ) ;
 
         wheelie_angle = 45.0f ;

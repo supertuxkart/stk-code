@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.24 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: status.cxx,v 1.25 2004/08/11 00:36:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,7 @@
 #include "KartDriver.h"
 #include "material.h"
 #include "RaceSetup.h"
+#include "World.h"
 #include "Loader.h"
 
 #define MAX_STRING          30
@@ -189,30 +190,32 @@ void drawScore (RaceSetup& raceSetup)
 {
   char str [ 20 ] ;
 
-  if ( kart[0]->getVelocity()->xyz[1] < 0 )
+  KartDriver* player_kart = World::current()->kart[0];
+
+  if ( player_kart->getVelocity()->xyz[1] < 0 )
     sprintf ( str, "Reverse" ) ;
   else
-    sprintf(str,"%3dmph",(int)(kart[0]->getVelocity()->xyz[1]/MILES_PER_HOUR));
+    sprintf(str,"%3dmph",(int)(player_kart->getVelocity()->xyz[1]/MILES_PER_HOUR));
 
   drawDropShadowText ( str, 18, 450, 410 ) ;
 
-  if ( kart[0]->getLap() < 0 )
+  if ( player_kart->getLap() < 0 )
     sprintf ( str, "Not Started Yet!" ) ;
   else
-  if ( kart[0]->getLap() < raceSetup.numLaps - 1 )
+  if ( player_kart->getLap() < raceSetup.numLaps - 1 )
     sprintf ( str, "%s - Lap %d",
-      pos_string [ kart[0]->getPosition() ],
-                   kart[0]->getLap() + 1 ) ;
+      pos_string [ player_kart->getPosition() ],
+                   player_kart->getLap() + 1 ) ;
   else
   {
     static int flasher = 0 ;
 
     if ( ++flasher & 32 )
       sprintf ( str, "%s - Last Lap!",
-        pos_string [ kart[0]->getPosition() ] ) ;
+        pos_string [ player_kart->getPosition() ] ) ;
     else
       sprintf ( str, "%s",
-        pos_string [ kart[0]->getPosition() ] ) ;
+        pos_string [ player_kart->getPosition() ] ) ;
   }
 
   drawDropShadowText ( str, 18, 450, 390 ) ;
@@ -230,13 +233,13 @@ void drawMap ()
 
   glBegin ( GL_QUADS ) ;
 
-  for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
+  for ( World::Karts::size_type i = 0 ; i < World::current()->kart.size() ; ++i )
   {
     sgCoord *c ;
 
-    c = kart[i]->getCoord () ;
+    c = World::current()->kart[i]->getCoord () ;
 
-    glColor3fv ( kart[i]->getKartProperties().color ) ;
+    glColor3fv ( World::current()->kart[i]->getKartProperties().color ) ;
 
     curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
     curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+3 ) ;
@@ -257,7 +260,7 @@ void drawGameOverText ()
               sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5 ) ;
 
   if ( finishing_position < 0 )
-    finishing_position = kart[0]->getPosition() ;
+    finishing_position = World::current()->kart[0]->getPosition() ;
 
   if ( finishing_position > 1 )
   {
@@ -294,16 +297,16 @@ void drawPlayerIcons ()
   float w = 640.0f - 64.0f ;
 
   // FIXME: Draw more intelligent so that player is always on top
-  for ( Karts::size_type i = 0; i < kart.size() ; ++i )
+  for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
     {
-      Material* players_gst = kart[i]->getKartProperties().getIconMaterial();
+      Material* players_gst = World::current()->kart[i]->getKartProperties().getIconMaterial();
       players_gst -> apply ();
 
       glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;
 
       /* Geeko */
-      x = (int) ( w * kart [i] -> getDistanceDownTrack () /
+      x = (int) ( w * World::current()->kart [i] -> getDistanceDownTrack () /
                   curr_track -> getTrackLength () ) ;
       glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
       glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+64, y    ) ;
@@ -320,11 +323,11 @@ void drawEmergencyText ()
   static float last_dist = -1000000.0f ;
   static int last_lap = -1 ;
 
-  float d = kart [ 0 ] -> getDistanceDownTrack () ;
-  int   l = kart [ 0 ] -> getLap () ;
+  float d = World::current()->kart [ 0 ] -> getDistanceDownTrack () ;
+  int   l = World::current()->kart [ 0 ] -> getLap () ;
 
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
-       kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
+       World::current()->kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
     wrong_timer += fclock -> getDeltaTime () ;
 
@@ -361,7 +364,7 @@ void drawCollectableIcons ()
 {
   int zz = FALSE ;
 
-  switch ( kart[0]->getCollectable () )
+  switch ( World::current()->kart[0]->getCollectable () )
   {
     case COLLECT_NOTHING        : fuzzy_gst        -> apply () ; break ;
     case COLLECT_SPARK          : spark_gst        -> apply () ; break ;
@@ -374,7 +377,7 @@ void drawCollectableIcons ()
 
   int x1 =  20 ;
   int y1 = 400 ;
-  int n  = kart[0]->getNumCollectables() ;
+  int n  = World::current()->kart[0]->getNumCollectables() ;
 
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
@@ -456,15 +459,15 @@ void drawStatusText (RaceSetup& raceSetup)
 
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
-  if ( kart[0]->getLap () >= raceSetup.numLaps )
+  if ( World::current()->kart[0]->getLap () >= raceSetup.numLaps )
     drawGameOverText     () ;
   else
   {
     drawGameRunningText  (raceSetup) ;
     drawEmergencyText    () ;
     drawCollectableIcons () ;
-    drawPartlyDigestedHerring ( (float)(kart[0]->getNumHerring()) /
-                                                     MAX_HERRING_EATEN ) ;
+    drawPartlyDigestedHerring ( (float)(World::current()->kart[0]->getNumHerring()) /
+                                MAX_HERRING_EATEN ) ;
     drawPlayerIcons      () ;
     drawMap              () ;
   }
