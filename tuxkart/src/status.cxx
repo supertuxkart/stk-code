@@ -154,6 +154,7 @@ char *aboutText [] =
 {
   "Written    by Steve Baker",
   "Playtested by Oliver Baker",
+  "Music      by Matt Thomas",
   "Track design and other 3D models by Both Bakers.",
   NULL
 } ;
@@ -225,6 +226,7 @@ char *creditsText [] =
 {
   "  Steve  Baker    - Coding, design, bug insertion.",
   "  Oliver Baker    - Modelling, Play Testing, Ideas.",
+  "  Matt  Thomas    - Music.",
   " ",
   "Special thanks to:",
   " ",

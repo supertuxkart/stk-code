@@ -10,6 +10,8 @@ TuxKart v0.0.4 (??)
 
   * Changes for compatibility with PLIB 1.3.1 and later.
 
+  * Added new music courtesy of Matt Thomas.
+
 TuxKart v0.0.3 (July 4th 2000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Fixed bug in Keyboard driver when no
