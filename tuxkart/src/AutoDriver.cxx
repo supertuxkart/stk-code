@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.13 2004/10/24 08:14:59 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.14 2004/10/27 03:32:21 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,19 +43,21 @@
       else
          kart->getVelocity()->hpr[0] = sgnsq(kart->curr_track_coords[0])*12.0f ;
    
+      kart->throttle = kart->kart_properties->max_throttle;
+   
       /*if (0) // use handicap
          {
       /* Slow down if we get too far ahead of the player... */
-      if ( kart->getPosition() < world->getPlayerKart(0)->getPosition () &&
+      /*if ( kart->getPosition() < world->getPlayerKart(0)->getPosition () &&
             kart->getVelocity()->xyz[1] > MIN_HANDICAP_VELOCITY )
          kart->getVelocity()->xyz[1] -= MAX_BRAKING * delta * 0.1f ;
-      else
+      else*/
          /* Speed up if we get too far behind the player... */
-         if ( kart->getPosition() > world->getPlayerKart(0)->getPosition () &&
+         /*if ( kart->getPosition() > world->getPlayerKart(0)->getPosition () &&
                kart->getVelocity()->xyz[1] < MAX_HANDICAP_VELOCITY )
             kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta * 1.1f ;
          else
-            kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta ;
+            kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta ;*/
          //}
    
       //kart->getVelocity()->xyz[2] -= GRAVITY * delta ;
