@@ -54,33 +54,13 @@ dnl check for OpenGL related libraries
 
 AC_CHECK_HEADER(windows.h, AC_DEFINE(WIN32))
 
-if test "x$ac_cv_header_windows_h" = "xno" ; then
-
-  dnl Check for X11
-
-  AC_PATH_XTRA
-
-  x_suffix="$X_LIBS $X_PRE_LIBS -lpthread -lX11 -lXi -lXext -lXmu $X_EXTRA_LIBS -lm"
-
-  dnl Reasonable stuff non-windoze variants ... :-)
-
-  AC_CHECK_LIB(GL, glNewList,,,$x_suffix)
-
-  if test "x$ac_cv_lib_GL_glNewList" = "xno" ; then
-    dnl if no GL, check for MesaGL
-    AC_CHECK_LIB(MesaGL, glNewList,,,$x_suffix)
-  fi
-
-  opengl_LIBS="$LIBS $x_suffix"
-
-  LIBS="$plib_suffix $LIBS $x_suffix"
-
+AX_CHECK_GL
+if test "x$no_gl" = "xyes"; then
+    AC_MSG_ERROR(["Couldn't detect OpenGL"])
 else
-
-  dnl CygWin under Windoze.
-
-  LIBS="$plib_suffix $LIBS -lm -lwinmm -lopengl32 -luser32 -lgdi32"
-
+    CFLAGS="$CFLAGS $GL_CFLAGS"
+    CXXFLAGS="$CXXFLAGS $GL_CFLAGS"
+    LIBS="$plib_suffix $LIBS $GL_LIBS"
 fi
 
 dnl Check SGI audio library
@@ -96,7 +76,6 @@ dnl Checks for header files.
 
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(GL/gl.h)
 AC_CHECK_HEADER(windows.h, AC_DEFINE(WIN32))
 AC_CHECK_HEADER(joystick.h, AC_DEFINE(JOYSTICK_IS_PRESENT))
 AC_CHECK_HEADER(linux/joystick.h, AC_DEFINE(LINUX_JOYSTICK_IS_PRESENT))
