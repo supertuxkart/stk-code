@@ -1,3 +1,7 @@
+2004-07-22  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx (cmdLineHelp): - Conventionnal naming scheme.
+
 2004-07-21  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (main):

@@ -395,26 +395,24 @@ static void startScreen ( int nbrLaps, int mirror, int reverse,
 void cmdLineHelp ()
 {
   fprintf ( stdout, 
-	    "Usage: tuxkart [--version] [--track n] [--nbrLaps n] [--nbrPlayers n]\n"
-	    "\t\t[--fullscreen|--screenMode n [--noBorder] [--noStartScreen]] \n"
-	    "\t\t[--reverse] [--mirror]\n\n"
+	    "Usage: tuxkart [options...]\n\n"
 
 	    "Run TuxKart, a racing game with go-kart that features"
 	    " the well-known linux\nmascott Tux. The game is heavily"
 	    " inspired by Super-Mario-Kart and Wacky Wheels.\n\n"
 
 	    "Options:\n"
-	    "--noStartScreen"  "\t\tQuick race.\n"
-	    "--track n"        "\t\tStart at track number n (see --listTracks).\n"
-	    "--listTracks"     "\t\tShow available tracks.\n"
-	    "--nbrLaps n"      "\t\tDefine number of laps to n.\n"
-	    "--nbrPlayers n"   "\t\tDefine number of players to either 1, 2 or 4.\n"
-	    "--reverse"        "\t\tEnable reverse mode.\n"
-	    "--mirror"         "\t\tEnable mirror mode (when supported).\n"
-	    "--fullscreen"     "\t\tFullscreen display (doesn't work with --resolution).\n"
-	    "--noBorder"       "\t\tDisable window borders/decorations.\n"
-	    "--resolution X Y" "\tSet the screen resolution (e.g. 320 200).\n"
-	    "--version"        "\t\tShow version.\n"
+	    "--no-start-screen" "\t\tQuick race.\n"
+	    "--track n"         "\t\t\tStart at track number n (see --list-tracks).\n"
+	    "--list-tracks"     "\t\t\tShow available tracks.\n"
+	    "--laps n"          "\t\t\tDefine number of laps to n.\n"
+	    "--players n"       "\t\t\tDefine number of players to either 1, 2 or 4.\n"
+	    "--reverse"        "\t\t\tEnable reverse mode.\n"
+	    "--mirror"         "\t\t\tEnable mirror mode (when supported).\n"
+	    "--fullscreen"     "\t\t\tFullscreen display.\n"
+	    "--no-borders"     "\t\t\tDisable window borders/decorations.\n"
+	    "--screensize WIDTH HEIGHT" "\tSet the screen size (e.g. 320 200).\n"
+	    "--version"        "\t\t\tShow version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
 	    "http://tuxkart.sourceforge.net\n\n"
@@ -465,7 +463,7 @@ int main ( int argc, char *argv[] )
 	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
 	    }
 
-	  else if( !strcmp(argv[i], "--listTracks") )
+	  else if( !strcmp(argv[i], "--list-tracks") )
 	    {
 	      loadDataDir ( FALSE );
 	      loadTrackList () ;
@@ -481,7 +479,7 @@ int main ( int argc, char *argv[] )
 	      return 0;
 	    }
 
-	  else if ( !strcmp(argv[i], "--noStartScreen") )
+	  else if ( !strcmp(argv[i], "--no-start-screen") )
 	    {
 	      noStartScreen = TRUE;
 	    }
@@ -502,13 +500,13 @@ int main ( int argc, char *argv[] )
 #endif
 	    }
 
-	  else if ( !strcmp(argv[i], "--nbrLaps") and argc > 2 )
+	  else if ( !strcmp(argv[i], "--laps") and argc > 2 )
 	    {
 	      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
 	      nbrLaps = atoi(argv[i+1]);
 	    }
 
-	  else if ( !strcmp(argv[i], "--nbrPlayers") and argc > 2 )
+	  else if ( !strcmp(argv[i], "--players") and argc > 2 )
 	    {
 	      nbrPlayers = atoi(argv[i+1]);
 
@@ -533,7 +531,7 @@ int main ( int argc, char *argv[] )
 	      noStartScreen = TRUE;
 	    }
 
-	  else if ( !strcmp(argv[i], "--resolution") and argc > 3 )
+	  else if ( !strcmp(argv[i], "--screensize") and argc > 3 )
 	    {
 	      width = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
 	      height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
@@ -542,7 +540,7 @@ int main ( int argc, char *argv[] )
 			atoi(argv[i+1]), atoi(argv[i+2]) ) ;
 	    }
 
-	  else if ( !strcmp(argv[i], "--noBorder") )
+	  else if ( !strcmp(argv[i], "--no-borders") )
 	    {
 	      fprintf ( stdout, "Disabling window borders.\n" ) ;
 	      noBorder = TRUE;
@@ -566,7 +564,7 @@ int main ( int argc, char *argv[] )
 
   if ( noStartScreen == TRUE )
     {
-      /* Set screen resolution */
+      /* Set screen size */
       reshape( width, height );
       /* Load plib stuff */
       initTuxKart ( noBorder );
@@ -581,7 +579,7 @@ int main ( int argc, char *argv[] )
       /* Show start screen */
       startScreen ( nbrLaps, mirror, reverse, track, nbrPlayers );
 
-      /* Set screen resolution */
+      /* Set screen size */
       reshape( width, height );
       pwSetSize( getScreenWidth(), getScreenHeight() );
 
