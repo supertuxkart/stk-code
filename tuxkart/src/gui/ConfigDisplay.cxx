@@ -1,4 +1,4 @@
-//  $Id: ConfigDisplay.cxx,v 1.2 2004/10/21 18:55:38 rmcruz Exp $
+//  $Id: ConfigDisplay.cxx,v 1.3 2004/10/23 11:45:03 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -44,10 +44,11 @@ ConfigDisplay::~ConfigDisplay()
 void ConfigDisplay::update(float dt)
 {
 	widgetSet -> timer(menu_id, dt) ;
+  // This menu can be triggered from the game, when it is paused
+  // so we have to check it and draw it as in pause
+  if(widgetSet -> get_paused())
+    widgetSet -> blank() ;
 	widgetSet -> paint(menu_id) ;
-
-/* FIXME: it should check ask is_fullscreen() and toggle
-  the 'Fullscreen mode' button. */
 }
 
 void ConfigDisplay::select()

@@ -1,4 +1,4 @@
-//  $Id: Options.cxx,v 1.10 2004/10/21 11:51:06 rmcruz Exp $
+//  $Id: Options.cxx,v 1.11 2004/10/23 11:45:03 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -41,8 +41,11 @@ Options::~Options()
 	
 void Options::update(float dt)
 {
-	
 	widgetSet -> timer(menu_id, dt) ;
+  // This menu can be triggered from the game, when it is paused
+  // so we have to check it and draw it as in pause
+  if(widgetSet -> get_paused())
+    widgetSet -> blank() ;
 	widgetSet -> paint(menu_id) ;
 }
 
