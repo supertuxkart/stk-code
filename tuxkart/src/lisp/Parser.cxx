@@ -1,4 +1,4 @@
-//  $Id: Parser.cxx,v 1.1 2004/08/24 19:33:11 matzebraun Exp $
+//  $Id: Parser.cxx,v 1.2 2004/08/24 20:16:07 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Matthias Braun <matze@braunis.de>
@@ -145,8 +145,8 @@ Parser::readList()
 
     while(token != Lexer::TOKEN_CLOSE_PAREN && token != Lexer::TOKEN_EOF) {
         Lisp* newlisp = new Lisp(Lisp::TYPE_CONS);
-        newlisp->v.cons.cdr = result;
         newlisp->v.cons.car = read();
+        newlisp->v.cons.cdr = result;
         result = newlisp;
     }
 

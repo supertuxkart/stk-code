@@ -1,4 +1,4 @@
-//  $Id: Lisp.h,v 1.1 2004/08/24 19:33:11 matzebraun Exp $
+//  $Id: Lisp.h,v 1.2 2004/08/24 20:16:07 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Matthias Braun <matze@braunis.de>
@@ -145,7 +145,7 @@ public:
             return false;
 
         child = child->getCdr();
-        while(child != 0) {
+        for(child = child->getCdr(); child != 0; child = child->getCdr()) {
             T val;
             if(!child->getCar())
                 continue;
