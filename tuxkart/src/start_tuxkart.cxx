@@ -488,8 +488,18 @@ int main ( int argc, char *argv[] )
 
 	  else if ( !strcmp(argv[i], "--nbrPlayers") and argc > 2 )
 	    {
-	      fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
 	      nbrPlayers = atoi(argv[i+1]);
+
+	      if ( nbrPlayers < 0 or nbrPlayers > 4)
+		{
+		  fprintf ( stderr,
+			    "You choose an invalid number of players: %d.\n",
+			    nbrPlayers );
+		  cmdLineHelp();
+		  return 0;
+		}
+
+	      fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
 	    }
 
 	  else if ( !strcmp(argv[i], "--fullscreen") )
@@ -540,6 +550,13 @@ int main ( int argc, char *argv[] )
 		case 8:
 		  width = 1280;
 		  height = 1024;
+		  break;
+		default:
+		  fprintf ( stderr,
+			    "You choose an invalid screen mode: %s.\n",
+			     argv[i+1]);
+		  cmdLineHelp();
+		  return 0;
 		  break;
 		}
 	      fprintf ( stdout, "You choose to have screen mode %d.\n", atoi(argv[i+1]) ) ;
