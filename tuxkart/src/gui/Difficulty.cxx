@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: Difficulty.cxx,v 1.3 2004/08/06 02:37:30 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -54,9 +54,9 @@ void Difficulty::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_EASY:	guiSwitch = GUIS_TRACKSEL;	break;
-	case MENU_MEDIUM:	guiSwitch = GUIS_TRACKSEL;	break;
-	case MENU_HARD:	guiSwitch = GUIS_TRACKSEL;	break;
+	case MENU_EASY:	guiSwitch = GUIS_CHARSEL;	break;
+	case MENU_MEDIUM:	guiSwitch = GUIS_CHARSEL;	break;
+	case MENU_HARD:	guiSwitch = GUIS_CHARSEL;	break;
 	default: break;
 	}
 }
