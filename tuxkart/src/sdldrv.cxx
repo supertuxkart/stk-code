@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.10 2004/08/04 16:36:12 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.11 2004/08/05 09:11:03 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -48,20 +48,8 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
       cout << "SDL_Init() failed: " << SDL_GetError();
       exit(1);
     }
-    
-  const SDL_VideoInfo* info = NULL;
-
-  info = SDL_GetVideoInfo();
-
-  if ( !info ) 
-    {
-      cout << "SDL_GetVideoInfo() failed: " << SDL_GetError();
-      exit(1);
-    }
-    
-  int bpp = info->vfmt->BitsPerPixel;
   
-  if ( ( sdl_screen = SDL_SetVideoMode( screenWidth, screenHeight, bpp, videoFlags )) == 0 )
+  if ( ( sdl_screen = SDL_SetVideoMode( screenWidth, screenHeight, 0, videoFlags )) == 0 )
     {
       cout << "SDL_SetVideoMode() failed: " << SDL_GetError();
       exit(1);
