@@ -25,7 +25,6 @@
 #include "Projectile.h"
 #include "Explosion.h"
 #include "Shadow.h"
-#include "isect.h"
 
 #include "Camera.h"
 #include "WidgetSet.h"

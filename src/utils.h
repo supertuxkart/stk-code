@@ -29,7 +29,12 @@
 void  pr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
 void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
 
-bool canAccess ( char *fname ) ;
+float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal);
+
+inline float getHeight(ssgBranch* branch, sgVec3 my_position)
+{
+  return getHeightAndNormal(branch, my_position, 0);
+}
 
 #endif
 

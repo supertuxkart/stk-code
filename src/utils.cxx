@@ -18,6 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/sg.h>
+#include <limits.h>
+
+#include "utils.h"
 #include "tuxkart.h"
 
 void pr_from_normal ( sgVec3 hpr, sgVec3 nrm )
@@ -29,20 +32,50 @@ void pr_from_normal ( sgVec3 hpr, sgVec3 nrm )
   hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy + nrm[0] * sy, nrm[2] ) ;
 }
 
-
 void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm )
 {
   hpr[0] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[0], nrm[1] ) ;
   pr_from_normal ( hpr, nrm ) ;
 }
 
-
-bool canAccess ( char *fname )
+float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal)
 {
-#ifdef WIN32 
-  return _access ( fname, 04 ) == 0 ;
-#else
-  return access ( fname, F_OK ) == 0 ;
-#endif
+  /* Look for the nearest polygon *beneath* my_position */
+
+  ssgHit *results ;
+  int num_hits ;
+
+  float hot ;        /* H.O.T == Height Of Terrain */
+  sgVec3 HOTvec ;
+
+  sgMat4 invmat ;
+  sgMakeIdentMat4 ( invmat ) ;
+  invmat[3][0] = - my_position [0] ;
+  invmat[3][1] = - my_position [1] ;
+  invmat[3][2] = 0.0 ;
+
+  sgSetVec3 ( HOTvec, 0.0f, 0.0f, my_position [ 2 ] ) ;
+
+  num_hits = ssgHOT (branch, HOTvec, invmat, &results ) ;
+  
+  hot = - FLT_MAX ;
+
+  for ( int i = 0 ; i < num_hits ; i++ )
+  {
+    ssgHit *h = &results [ i ] ;
+
+    float hgt = - h->plane[3] / h->plane[2] ;
+
+    if ( hgt >= hot )
+    {
+      hot = hgt ;
+
+      if ( normal != NULL )
+        sgCopyVec3 ( normal, h->plane ) ;
+    }
+  }
+
+  return hot ;
 }
 
+/* EOF */
