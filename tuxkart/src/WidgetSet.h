@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.6 2004/08/17 21:01:17 grumbel Exp $
+//  $Id: WidgetSet.h,v 1.7 2004/08/20 18:29:46 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -128,18 +128,38 @@ public:
 	int  varray(int);
 	int  hstack(int);
 	int  vstack(int);
+	
+	/* constructors - add new widget of type x */
+	
+	//fills up space
 	int  filler(int);
 	
-	/* constructors - add new widget of type x */	
-	
+	//a widget that consists of an image
 	int  image(int, const char *, int, int);
+	
+	//a normal text menu entry, except that it is automatically immediately activated
 	int  start(int, const char *, int, int, int);
+	
+	//a normal text menu entry
 	int  state(int, const char *, int, int, int);
-        int  label(int pd, const char *text, int size, int rect, const float *c0, const float *c1);
-
+	
+	//a text label (cannot be selected). c0 and c1 are two colours that the text is shaded with
+	int  label(int pd, const char *text, int size, int rect, const float *c0, const float *c1);
+	
+	/*
+	* Create  a multi-line  text box  using a  vertical array  of labels.
+	* Parse the  text for '\'  characters and treat them  as line-breaks.
+	* Preserve the rect specifation across the entire array.
+	*/ 
 	int  multi(int, const char *, int, int, const float *, const float *);
+	
+	//widget is a single number - e.g. an fps counter or whatever
 	int  count(int, int, int, int);
+	
+	//widget consists of a time in minutes and seconds
 	int  clock(int, int, int, int);
+	
+	//just a blank space
 	int  space(int);
 	
 	/*---------------------------------------------------------------------------*/
@@ -149,8 +169,7 @@ public:
 	
 	/* use this after you have first created your widgets to set their positioning 
 	   xd and yd have possible values of 1, 0, -1, I think these mean "left, middle, right; top, middle, bottom */
-	void layout(int id, int xd, int yd);
-	
+	void layout(int id, int xd, int yd);	
 	
 	int  search(int, int, int);
 	int  activate_widget(int, int, int);
@@ -160,14 +179,14 @@ public:
 	
 	/*---------------------------------------------------------------------------*/
 	
-	/* call one a frame to update your widgets on the screen
+	/* call once a frame to update your widgets on the screen
 	   You only need to call this for parents, children will automatically be painted by their parents */
 	void paint(int);
 	
 	/* call "gui_pulse(gui_point(id, x, y), 1.2f);" whenever the mouse moves to make widgets pulse when the mouse goes over them */
 	void pulse(int, float);
 	
-	/* call one a frame, passing on the value given to BaseGUI::update(int)
+	/* call once a frame, passing on the value given to BaseGUI::update(int)
 	   You only need to call this for parents, children will automatically be updated by their parents */
 	void timer(int, float);
 	
