@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.13 2004/09/05 18:14:48 oaf_thadres Exp $
+//  $Id: sdldrv.h,v 1.14 2004/10/21 11:51:06 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -31,6 +31,9 @@ extern Uint8 *keyState;
 
 void initVideo (int w, int h, bool fullscreen);
 void shutdownVideo();
+void toggle_fullscreen();
+bool is_fullscreen();
+
 void pollEvents();
 void kartInput(RaceSetup& raceSetup);
 void swapBuffers();

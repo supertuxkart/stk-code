@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.41 2004/10/11 13:40:07 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.42 2004/10/21 11:51:06 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -33,12 +33,14 @@
 #include "Config.h"
 
 using std::cout;
+using std::cerr;
 using std::vector;
 
 const unsigned int MOUSE_HIDE_TIME = 2000;
 
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
+bool fullscreen_mode;
 
 static vector<SDL_Joystick*> joys;
 
@@ -46,8 +48,12 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
     int videoFlags = SDL_OPENGL;
 
+    fullscreen_mode = false;
     if (fullscreen)
+        {
         videoFlags |= SDL_FULLSCREEN;
+        fullscreen_mode = true;
+        }
 
     if ( ( sdl_screen = SDL_SetVideoMode( screenWidth, screenHeight, 0, videoFlags )) == 0 )
     {
@@ -82,6 +88,41 @@ void shutdownVideo ()
         SDL_JoystickClose ( joys[i] );
 
     SDL_Quit( );
+}
+
+void toggle_fullscreen()
+{
+    int videoFlags = SDL_OPENGL;
+    int w = sdl_screen->w;
+    int h = sdl_screen->h;
+
+    SDL_FreeSurface(sdl_screen);
+
+    fullscreen_mode = !fullscreen_mode;
+    if (fullscreen_mode)
+        {
+        videoFlags |= SDL_FULLSCREEN;
+        }
+
+    if ( ( sdl_screen = SDL_SetVideoMode( w, h, 0, videoFlags )) == 0 )
+    {
+        cout << "SDL_SetVideoMode() failed: " << SDL_GetError();
+        exit(1);
+    }
+
+// This would be the elegant way to do it:
+// (unfortanely, this function is only supported for X11 systems)
+/*  
+  if(SDL_WM_ToggleFullScreen(sdl_screen))
+    fullscreen_mode = !fullscreen_mode;
+  else
+    cerr << "Error: Could not set fullscreen mode.\n";
+*/
+}
+
+bool is_fullscreen()
+{
+  return fullscreen_mode;
 }
 
 void pollEvents ()
