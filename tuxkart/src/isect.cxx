@@ -1,4 +1,4 @@
-//  $Id: isect.cxx,v 1.6 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: isect.cxx,v 1.7 2004/09/24 18:41:26 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,11 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <limits.h>
 #include "tuxkart.h"
-#include "World.h"
 #include "isect.h"
 
-float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal )
+float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal)
 {
   /* Look for the nearest polygon *beneath* my_position */
 
@@ -39,9 +39,9 @@ float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal )
 
   sgSetVec3 ( HOTvec, 0.0f, 0.0f, my_position [ 2 ] ) ;
 
-  num_hits = ssgHOT ( world->trackBranch, HOTvec, invmat, &results ) ;
+  num_hits = ssgHOT (branch, HOTvec, invmat, &results ) ;
   
-  hot = DEEPEST_HELL ;
+  hot = - FLT_MAX ;
 
   for ( int i = 0 ; i < num_hits ; i++ )
   {
@@ -60,5 +60,4 @@ float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal )
 
   return hot ;
 }
-
 

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.34 2004/09/24 18:27:25 matzebraun Exp $
+//  $Id: World.cxx,v 1.35 2004/09/24 18:41:26 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -272,7 +272,7 @@ World::herring_command (char *s, char *str )
   sscanf ( s, "%f,%f", &xyz[0], &xyz[1] ) ;
  
   xyz[2] = 1000000.0f ;
-  xyz[2] = getHeight ( xyz ) + 0.06 ;
+  xyz[2] = getHeight ( trackBranch, xyz ) + 0.06 ;
  
   sgCoord c ;
  
@@ -416,7 +416,7 @@ World::loadTrack()
 	sgVec3 nrm ;
 
 	loc.xyz[2] = 1000.0f ;
-	loc.xyz[2] = getHeightAndNormal ( loc.xyz, nrm ) ;
+	loc.xyz[2] = getHeightAndNormal ( trackBranch, loc.xyz, nrm ) ;
 
 	if ( fit_skin )
 	{

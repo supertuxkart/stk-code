@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.15 2004/09/24 18:27:25 matzebraun Exp $
+//  $Id: World.h,v 1.16 2004/09/24 18:41:26 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -84,8 +84,7 @@ public:
   /** debug text that will be overlaid to the screen */
   std::string debugtext[10];
   
-  /** Reference to the track inside the scene, must not be deleted,
-      the scene itself takes care of it */
+  /** Reference to the track inside the scene */
   ssgBranch *trackBranch ;
 
   World(const RaceSetup& raceSetup);

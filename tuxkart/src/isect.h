@@ -1,4 +1,4 @@
-//  $Id: isect.h,v 1.2 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: isect.h,v 1.3 2004/09/24 18:41:26 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,13 +20,13 @@
 #ifndef HEADER_ISECT_H
 #define HEADER_ISECT_H
 
-#define DEEPEST_HELL -1000000.0f
+#include <plib/ssg.h>
 
-float getHeightAndNormal ( sgVec3 my_position, sgVec3 normal ) ;
+float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal);
 
-inline float getHeight ( sgVec3 my_position )
+inline float getHeight(ssgBranch* branch, sgVec3 my_position)
 {
-  return getHeightAndNormal ( my_position, NULL ) ;
+  return getHeightAndNormal(branch, my_position, 0);
 }
 
 #endif
