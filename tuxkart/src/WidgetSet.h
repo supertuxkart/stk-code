@@ -1,7 +1,7 @@
-//  $Id: WidgetSet.h,v 1.2 2004/08/05 18:33:00 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.3 2004/08/06 13:30:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  This code originally from Neverball copyright (C) 2003 Robert Kooima
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
