@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.31 2004/09/01 15:22:54 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.32 2004/09/01 21:45:46 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,11 +27,9 @@
 #include "World.h"
 #include "KartDriver.h"
 #include "StartScreen.h"
-
-//includes copied from status.cxx, some could be unnecessary
-#include <stdarg.h>
-#include "RaceSetup.h"
+#include "../widget_image.h"
 #include "Loader.h"
+#include "RaceSetup.h"
 
 RaceGUI::RaceGUI():
 herringbones_gst(NULL),
@@ -43,8 +41,7 @@ magnet_gst(NULL),
 zipper_gst(NULL),
 time_left(0.0),
 stats_enabled(false),
-next_string(0),
-text(NULL)
+next_string(0)
 {
 	pos_string[0] = "?!?";
 	pos_string[1] = "1st";
@@ -67,11 +64,7 @@ text(NULL)
 	flamemissile_gst = getMaterial ( "flamemissile.rgb" ) ;
 	magnet_gst       = getMaterial ( "magnet.rgb"       ) ;
 	zipper_gst       = getMaterial ( "zipper.rgb"       ) ;
-	
-	//FIXME:
-	oldfont = new fntTexFont ;
-	oldfont -> load ( loader->getPath("fonts/sorority.txf").c_str() ) ;
-  
+
 	if ((fps_id = widgetSet -> count(0, 1000, GUI_SML, GUI_SE)))
 		widgetSet -> layout(fps_id, -1, 1);
 }
@@ -81,7 +74,6 @@ RaceGUI::~RaceGUI()
 	widgetSet -> delete_widget(fps_id) ;
 	
 	//FIXME: does all that material stuff need freeing somehow?
-	//also need to unload oldfont somehow
 }
 	
 void RaceGUI::update(float dt)
@@ -191,35 +183,78 @@ void RaceGUI::stPrintf ( char *fmt, ... )
   va_end ( ap ) ;
 }
 
-void RaceGUI::drawText ( char *str, int sz, int x, int y )
+void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, int blue )
 {
-  text -> setFont      ( oldfont ) ;
-  text -> setPointSize ( sz ) ;
+  // FIXME: instead of always loading a font, we could make a cache system
+  std::string path = loader->getPath(GUI_FACE);
+  TTF_Font* font = TTF_OpenFont(path.c_str(), sz);
 
-  text -> begin () ;
-    text -> start2f ( x, y ) ;
-    text -> puts ( str ) ;
-  text -> end () ;
+  int w, h;
+  GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text, font);
+  TTF_CloseFont(font);
+
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, gl_texture);
+
+  glColor3ub ( red, green, blue ) ;
+  glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    glVertex2f(x, (float)h+y);
+
+    glTexCoord2f(1, 0);
+    glVertex2f((float)w+x, (float)h+y);
+
+    glTexCoord2f(1, 1);
+    glVertex2f((float)w+x, y);
+
+    glTexCoord2f(0, 1);
+    glVertex2f(x, y);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+}
+
+void RaceGUI::drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue )
+{
+  // FIXME: instead of always loading a font, we could make a cache system
+  std::string path = loader->getPath(GUI_FACE);
+  TTF_Font* font = TTF_OpenFont(path.c_str(), std::max(w, h));
+
+  GLuint gl_texture = make_image_from_font(NULL, NULL, NULL, NULL, text, font);
+  TTF_CloseFont(font);
+
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, gl_texture);
+
+  glColor3ub ( red, green, blue ) ;
+  glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    glVertex2f(x, (float)h+y);
+
+    glTexCoord2f(1, 0);
+    glVertex2f((float)w+x, (float)h+y);
+
+    glTexCoord2f(1, 1);
+    glVertex2f((float)w+x, y);
+
+    glTexCoord2f(0, 1);
+    glVertex2f(x, y);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 }
 
 
 void RaceGUI::drawInverseDropShadowText ( char *str, int sz, int x, int y )
 {
-  glColor4f ( 1.0f, 1.0f, 1.0f, 1.0f ) ;
-  drawText ( str, sz, x, y ) ;
-  glColor4f ( 0.0f, 0.0f, 0.0f, 1.0f ) ;
-  drawText ( str, sz, x+1, y+1 ) ;
+  drawText ( str, sz, x, y, 255, 255, 255 ) ;
+  drawText ( str, sz, x+1, y+1, 0, 0, 0 ) ;
 }
 
 void RaceGUI::drawDropShadowText ( char *str, int sz, int x, int y )
 {
-  glColor4f ( 0.0f, 0.0f, 0.0f, 1.0f ) ;
-
-  drawText ( str, sz, x, y ) ;
-
-  glColor4f ( 1.0f, 1.0f, 1.0f, 1.0f ) ;
-
-  drawText ( str, sz, x+1, y+1 ) ;
+  drawText ( str, sz, x, y, 0, 0, 0 ) ;
+  drawText ( str, sz, x+1, y+1, 255, 255, 255 ) ;
 }
 
 void RaceGUI::drawTimer ()
@@ -232,9 +267,10 @@ void RaceGUI::drawTimer ()
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
-  sprintf ( str, "%3d`%02d\"%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( "Time:", 14, 500, 450 ) ;
-  drawDropShadowText ( str,     25, 480, 420 ) ;
+  sprintf ( str, "%3d:%02d\"%d", min,  sec,  tenths ) ;
+  drawDropShadowText ( "Time:", 24, 500, 430 ) ;
+  drawStretchedText ( str, 460, 400, 620-460, 30, 255, 255, 255 ) ;
+//  drawDropShadowText ( str,     25, 480, 400 ) ;
 }
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
@@ -265,18 +301,18 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
     static int flasher = 0 ;
 
     if ( ++flasher & 32 )
-      sprintf ( str, "%s - Last Lap!",
+      sprintf ( str, "Last Lap!",
         pos_string [ player_kart->getPosition() ] ) ;
     else
       sprintf ( str, "%s",
         pos_string [ player_kart->getPosition() ] ) ;
   }
 
-  drawDropShadowText ( str, (int)(24*ratio_y), (int)(10*ratio_x)+offset_x, (int)(450*ratio_y)+offset_y ) ;
+  drawDropShadowText ( str, (int)(38*ratio_y), (int)(10*ratio_x)+offset_x, (int)(422*ratio_y)+offset_y ) ;
 
   /* Show player's position */
   sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
-  drawDropShadowText ( str, (int)(55*ratio_y), (int)(22*ratio_x)+offset_x, (int)(22*ratio_y)+offset_y );
+  drawDropShadowText ( str, (int)(74*ratio_y), (int)(16*ratio_x)+offset_x, (int)(2*ratio_y)+offset_y );
 }
 
 
@@ -313,22 +349,23 @@ void RaceGUI::drawGameOverText ()
 {
   static int timer = 0 ;
 
-  glColor4f ( sin ( (float)timer/5.1f ) / 2.0f + 0.5f,
-              sin ( (float)timer/6.3f ) / 2.0f + 0.5f,
-              sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5 ) ;
+  /* Calculate a color. This will result in an animation effect. */
+  int red   = (int)(255 * sin ( (float)timer/5.1f ) / 2.0f + 0.5f);
+  int green = (int)(255 * (sin ( (float)timer/6.3f ) / 2.0f + 0.5f));
+  int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5);
 
   if ( finishing_position < 0 )
     finishing_position = World::current()->getPlayerKart(0)->getPosition() ;
 
   if ( finishing_position > 1 )
   {
-    drawText ( "YOU FINISHED"    , 50, 50, 280 ) ;
-    drawText ( pos_string [ finishing_position ], 150, 150, 150 ) ;
+    drawText ( "YOU FINISHED"    , 90, 130, 210, red, green, blue ) ;
+    drawText ( pos_string [ finishing_position ], 90, 130, 210, red, green, blue ) ;
   }
   else
   {
-    drawText ( "CONGRATULATIONS"  , 40, 50, 330 ) ;
-    drawText ( "YOU WON THE RACE!", 40, 50, 280 ) ;
+    drawText ( "CONGRATULATIONS"  , 90, 130, 210, red, green, blue ) ;
+    drawText ( "YOU WON THE RACE!", 90, 130, 210, red, green, blue ) ;
   }
 }
 
@@ -340,8 +377,6 @@ void RaceGUI::drawPlayerIcons ()
   int x = 10;
   int y;
   char str[256];
-
-  glEnable(GL_TEXTURE_2D);
 
   for(int i = 0; i < World::current()->getNumKarts() ; i++)
     {
@@ -356,6 +391,7 @@ void RaceGUI::drawPlayerIcons ()
           World::current()->getKart(i)->getKartProperties().getIconMaterial();
       players_gst -> apply ();
 
+      glEnable(GL_TEXTURE_2D);
       glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;
 
@@ -364,13 +400,13 @@ void RaceGUI::drawPlayerIcons ()
       glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+55, y+55 ) ;
       glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+55 ) ;
       glEnd () ;
+      glDisable(GL_TEXTURE_2D);
 
       // draw text
       sprintf (str, "%s", pos_string[position]);
-      drawDropShadowText ( str, 20, 55+x, y+15 ) ;
+      drawDropShadowText ( str, 28, 55+x, y+10 ) ;
     }
 
-  glDisable(GL_TEXTURE_2D);
 }
 
 
@@ -392,21 +428,33 @@ void RaceGUI::drawEmergencyText ( int player_nb, int offset_x, int offset_y, flo
     {
       static int i = FALSE ;
 
+      int red, green, blue;
       if ( i )
-        glColor4f ( 1.0f, 0.0f, 1.0f, 1.0f ) ;
+        {
+        red = blue = 255;
+        green = 0;
+        }
       else
-        glColor4f ( 0.0f, 1.0f, 0.0f, 1.0f ) ;
+        {
+        red = blue = 0;
+        green = 255;
+        }
 
-      drawText ( "WRONG WAY!", (int)(50*ratio_y), (int)(100*ratio_x)+offset_x,
-                                                  (int)(240*ratio_y)+offset_y ) ;
-
+      drawText ( "WRONG WAY!", (int)(90*ratio_y), (int)(130*ratio_x)+offset_x,
+                               (int)(210*ratio_y)+offset_y, red, green, blue ) ;
       if ( ! i )
-        glColor4f ( 1.0f, 0.0f, 1.0f, 1.0f ) ;
+        {
+        red = blue = 255;
+        green = 0;
+        }
       else
-        glColor4f ( 0.0f, 1.0f, 0.0f, 1.0f ) ;
+        {
+        red = blue = 0;
+        green = 255;
+        }
 
-      drawText ( "WRONG WAY!", (int)(50*ratio_y), (int)((100+2)*ratio_x)+offset_x,
-                                                  (int)((240+2)*ratio_y)+offset_y ) ;
+      drawText ( "WRONG WAY!", (int)(90*ratio_y), (int)((130+2)*ratio_x)+offset_x,
+                               (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
 
       i = ! i ;
     }
@@ -558,9 +606,6 @@ void RaceGUI::drawEnergyMeter ( float state, int offset_x, int offset_y, float r
 
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
 {
-  if ( text == NULL )
-    text = new fntRenderer () ;
-
   glMatrixMode   ( GL_MODELVIEW ) ;
   glPushMatrix   () ;
   glLoadIdentity () ;
@@ -583,16 +628,13 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   switch (World::current()->ready_set_go)
     {
     case 2:
-      glColor3ub ( 230, 170, 160 ) ;
-      drawText ( "Ready!", 65, 370-(3*65), 220 ) ;
+      drawText ( "Ready!", 80, 370-(3*80), 220, 230, 170, 160 ) ;
       break;
     case 1:
-      glColor3ub ( 230, 230, 160 ) ;
-      drawText ( "Set!", 65, 370-(2*65), 220 ) ;
+      drawText ( "Set!", 80, 370-(2*80), 220, 230, 230, 160 ) ;
       break;
     case 0:
-      glColor3ub ( 100, 210, 100 ) ;
-      drawText ( "Go!", 65, 370-(int)(1.5*65), 220 ) ;
+      drawText ( "Go!", 80, 370-(int)(1.5*80), 220, 100, 210, 100 ) ;
       break;
     }
 

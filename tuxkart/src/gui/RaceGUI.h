@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.9 2004/09/01 15:22:55 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.10 2004/09/01 21:45:46 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -67,9 +67,13 @@ private:
 	void drawTimer ();
 
   /* Text drawing */
+	void drawText ( char* text, int sz, int x, int y, int red, int green, int blue );
+  // This functions allows one to draw text by specifying both width and height
+  // and so be able to do a stretching
+	void drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue );
+
 	void drawDropShadowText ( char *str, int sz, int x, int y );
 	void drawInverseDropShadowText ( char *str, int sz, int x, int y );
-	void drawText ( char *str, int sz, int x, int y );
 
 
 	char *pos_string [10];
@@ -81,10 +85,6 @@ private:
 	float tt[6] ;
 	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 	int  next_string ;
-	
-	//FIXME: these probably want changing to use SDL_ttf
-	fntRenderer *text ;
-	fntTexFont *oldfont ;
 };
 
 #endif
