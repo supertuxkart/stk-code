@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.27 2004/08/13 23:14:22 straver Exp $
+//  $Id: KartDriver.cxx,v 1.28 2004/08/13 23:42:45 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -61,7 +61,7 @@ KartParticleSystem::update ( float t )
 void
 KartParticleSystem::particle_create(int, Particle *p)
 {
-  sgSetVec4 ( p -> col, 1, 1, 1, .5 ) ;  /* initially white */
+  sgSetVec4 ( p -> col, 1, 1, 1, 1 ) ;  /* initially white */
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;     /* start off on the ground */
   sgSetVec3 ( p -> vel, 0, 0, 0 ) ;
   sgSetVec3 ( p -> acc, 0, 0, 1.0f ) ; /* Gravity */
