@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.7 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: Camera.cxx,v 1.8 2004/08/06 12:19:35 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -94,11 +94,15 @@ void Camera::update ()
   // Update the camera
   if ( whichKart >= int(kart.size()) || whichKart < 0 ) whichKart = 0 ;
 
-  sgCoord* kartcoord = kart[whichKart]->getCoord();
+  sgCoord kartcoord;
+  sgCopyCoord(&kartcoord, kart[whichKart]->getCoord());
+
+  kartcoord.hpr[2] = 0;
+  kartcoord.hpr[1] = 0;
 
   // Matrix that transforms stuff to kart-space
   sgMat4 tokart;
-  sgMakeCoordMat4 (tokart, kartcoord);
+  sgMakeCoordMat4 (tokart, &kartcoord);
 
   // Relative position from the middle of the kart
   sgMat4 relative;
@@ -106,9 +110,9 @@ void Camera::update ()
   sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
   if (0)
     {
-    sgMat4 cam_rot;
-    sgMakeRotMat4(cam_rot, kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
-    sgMultMat4(relative, cam_rot, cam_pos);
+      sgMat4 cam_rot;
+      sgMakeRotMat4(cam_rot, kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
+      sgMultMat4(relative, cam_rot, cam_pos);
     }
   else
     {
