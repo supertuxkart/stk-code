@@ -8,6 +8,10 @@
 #include <unistd.h>
 #endif
 #include <windows.h>
+#ifdef _MSC_VER
+#include <io.h>
+#include <direct.h>
+#endif
 #else
 #include <unistd.h>
 #endif

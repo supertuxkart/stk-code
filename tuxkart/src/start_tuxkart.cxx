@@ -247,10 +247,18 @@ int main ( int argc, char **argv )
     if ( getenv ( "TUXKART_DATADIR" ) != NULL )
       datadir = getenv ( "TUXKART_DATADIR" ) ;
     else
+#ifdef _MSC_VER
+    if ( _access ( "data/levels.dat", 04 ) == 0 )
+#else
     if ( access ( "data/levels.dat", F_OK ) == 0 )
+#endif
       datadir = "." ;
     else
+#ifdef _MSC_VER
+    if ( _access ( "../data/levels.dat", 04 ) == 0 )
+#else
     if ( access ( "../data/levels.dat", F_OK ) == 0 )
+#endif
       datadir = ".." ;
     else
 #ifdef TUXKART_DATADIR
@@ -263,7 +271,11 @@ int main ( int argc, char **argv )
   fprintf ( stderr, "Data files will be fetched from: '%s'\n",
                                                     datadir ) ;
  
+#ifdef _MSC_VER
+  if ( _chdir ( datadir ) == -1 )
+#else
   if ( chdir ( datadir ) == -1 )
+#endif
   {
     fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
     exit ( 1 ) ;
@@ -287,7 +299,7 @@ int main ( int argc, char **argv )
 #else
   char game_mode_str[256];
   sprintf( game_mode_str, "width=640 height=480 bpp=16" );
-  glutGameModeString( game_mode_str );
+  //glutGameModeString( game_mode_str );
   glutEnterGameMode();
 #endif
 

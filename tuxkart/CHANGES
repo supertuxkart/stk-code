@@ -2,6 +2,14 @@
 TuxKart Change Log.
 ===================
 
+TuxKart v0.0.4 (??)
+~~~~~~~~~~~~~~~~~~~
+  * Changes to suit rassin-frassin-Windoze-junk.
+
+  * Steady-cam camera - courtesy of cowtan@ysbl.york.ac.uk
+
+  * Changes for compatibility with PLIB 1.3.1 and later.
+
 TuxKart v0.0.3 (July 4th 2000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Fixed bug in Keyboard driver when no

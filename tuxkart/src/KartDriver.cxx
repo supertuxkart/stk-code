@@ -53,7 +53,8 @@ void KartDriver::doLapCounting ()
 
 void KartDriver::doObjectInteractions ()
 {
-  for ( int i = 0 ; i < grid_position ; i++ )
+  int i;
+  for ( i = 0 ; i < grid_position ; i++ )
   {
     if ( i == grid_position )
       continue ;
@@ -83,7 +84,7 @@ void KartDriver::doObjectInteractions ()
   }
 
 
-  for ( int i = 0 ; i < MAX_HERRING ; i++ )
+  for ( i = 0 ; i < MAX_HERRING ; i++ )
   {
     if ( herring[i].her == NULL || herring[i].eaten )
       continue ;

@@ -211,6 +211,7 @@ void GUI::keyboardInput ()
   if ( c <= 0 )
     return ;
 
+  int i;
   switch ( c )
   {
     case 0x1B /* Escape */      :
@@ -222,7 +223,7 @@ void GUI::keyboardInput ()
     case (256+GLUT_KEY_PAGE_DOWN) : cam_follow++ ; break ;
 
     case 'r' :
-    case 'R' : for ( int i = 0 ; i < num_karts ; i++ )
+    case 'R' : for ( i = 0 ; i < num_karts ; i++ )
                  kart[i]->reset() ;
                return ;
  

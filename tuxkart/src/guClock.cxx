@@ -15,13 +15,40 @@
 
 #include "guClock.h"
 
+
 double guClock::getRawTime ()
 {
 #if defined(WIN32)
-  _int64 u, v ;
-  QueryPerformanceCounter   ((LARGE_INTEGER*) &u ) ;
-  QueryPerformanceFrequency ((LARGE_INTEGER*) &v ) ;
-  return (double)u / (double)v ;
+
+  static double res ;
+  static int perf_timer = -1 ;
+
+  /* Use Performance Timer if it's available, mmtimer if not.  */
+
+  if ( perf_timer == -1 )
+  {
+    __int64 frequency ;
+
+    perf_timer = QueryPerformanceFrequency ( (LARGE_INTEGER *) & frequency ) ;
+
+    if ( perf_timer )
+    {
+      res = 1.0 / (double) frequency ;
+      perf_timer = 1 ;
+    }
+  }
+
+  if ( perf_timer )
+  {
+    __int64 t ;
+ 
+    QueryPerformanceCounter ( (LARGE_INTEGER *) &t ) ;
+ 
+    return res * (double) t ;
+  }
+ 
+  return (double) timeGetTime() * 0.001 ;
+
 #else
   timeval tv ;
 
@@ -39,10 +66,11 @@ void guClock::update ()
   delta = now - last_time ;
 
   /*
-    KLUDGE: If the frame rate drops below 5Hz, then
+    KLUDGE: If the frame rate drops below ~5Hz, then
             control will be very difficult.  It's
             actually easier to give up and slow
-            down the action.
+            down the action. max_delta defaults to
+            200ms for that reason.
 
     KLUDGE: If update is called very rapidly, then
             delta can be zero which causes some
@@ -50,7 +78,7 @@ void guClock::update ()
             a millionth of a second.
   */
 
-  if ( delta >  0.2 ) delta = 0.2 ;
+  if ( delta >  max_delta ) delta = max_delta ;
   if ( delta <= 0.0 ) delta = 0.0000001 ;
 
   last_time = now ;

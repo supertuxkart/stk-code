@@ -13,6 +13,8 @@ AC_PROG_RANLIB
 
 plib_suffix="-lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg"
 
+AC_CHECK_LIB(plibul, ulInit,,,)
+
 dnl Checks for library functions.
 dnl check for OpenGL related libraries
 

@@ -6,6 +6,10 @@
   #include <unistd.h>
  #endif
  #include <windows.h>
+ #if defined(_MSC_VER)
+  #include <io.h>
+  #include <direct.h>
+ #endif
 #else
  #include <unistd.h>
 #endif
@@ -15,17 +19,20 @@
 
 #include <string.h>
 #include <sys/types.h>
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#ifndef __CYGWIN__
-#include <netinet/tcp.h>
+#if defined(_MSC_VER)
+ #include <winsock.h>
+#else
+ #include <sys/param.h>
+ #include <netinet/in.h>
+ #ifndef __CYGWIN__
+  #include <netinet/tcp.h>
+ #endif
+ #include <netdb.h>
+ #include <sys/uio.h>
+ #include <arpa/inet.h>
+ #include <sys/errno.h>
 #endif
-#include <netdb.h>
-#include <sys/uio.h>
-#include <arpa/inet.h>
 #include <fcntl.h>
-#include <sys/errno.h>
 
 #ifndef SHUT_RDWR
 #define SHUT_RDWR 2

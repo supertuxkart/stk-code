@@ -44,6 +44,11 @@ void reshape ( int w, int h )
   glViewport ( 0, 0, w, h ) ;
 }
 
+void idleFunc( void )
+{
+	glutPostRedisplay();
+}
+
 void initWindow ( int w, int h )
 {
 /*
@@ -71,7 +76,7 @@ void initWindow ( int w, int h )
   glutKeyboardUpFunc     ( getGLUTUpKeystroke ) ;
   glutSpecialUpFunc      ( getGLUTUpSpecialKeystroke ) ;
   glutReshapeFunc        ( reshape ) ;
-  glutIdleFunc           ( glutPostRedisplay ) ;
+  glutIdleFunc           ( idleFunc ) ;
 }
 
 

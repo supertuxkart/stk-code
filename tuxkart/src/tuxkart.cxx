@@ -2,7 +2,7 @@
 #include "tuxkart.h"
 
 #define MIN_CAM_DISTANCE      5.0f  
-#define MAX_CAM_DISTANCE     15.0f  
+#define MAX_CAM_DISTANCE     10.0f  // Was 15
 
 static guClock ck2 ;
 extern float tt[6];
@@ -24,7 +24,8 @@ char *trackname = "tuxtrack" ;
 
 HerringInstance herring [ MAX_HERRING ] ;
 
-
+sgCoord steady_cam ;
+ 
 char *player_files [] =
 {
   "tuxkart.ac" , "geekokart.ac",
@@ -109,8 +110,9 @@ void load_players ()
   ttt -> addKid ( ssgLoad ( tinytux_file  , process_userdata ) ) ;
 
   ssgEntity *pobj5 = ttt ;
+  int i ;
 
-  for ( int i = 0 ; player_files [ i ] != NULL && i < NUM_KARTS ; i++ )
+  for ( i = 0 ; player_files [ i ] != NULL && i < NUM_KARTS ; i++ )
   {
     ssgRangeSelector *lod = new ssgRangeSelector ;
     float r [ 2 ] = { -10.0f, 100.0f } ;
@@ -129,7 +131,7 @@ void load_players ()
     num_karts = i + 1 ;
   }
 
-  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ )
+  for ( i = 0 ; i < NUM_PROJECTILES ; i++ )
   {
     ssgSelector *sel = new ssgSelector ;
     projectile[i]-> getModel() -> addKid ( sel ) ;
@@ -140,7 +142,7 @@ void load_players ()
     projectile[i] -> off () ;
   }
 
-  for ( int i = 0 ; i < NUM_EXPLOSIONS ; i++ )
+  for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
   {
     explosion[i] = new Explosion ( (ssgBranch *) ssgLoad ( explosion_file,
                                                     process_userdata ) ) ;
@@ -335,6 +337,9 @@ void load_track ( ssgBranch *trackb, char *fname )
 
   }
   fclose ( fd ) ;
+
+  sgSetVec3  ( steady_cam.xyz, 0.0f, 0.0f, 0.0f ) ;
+  sgSetVec3  ( steady_cam.hpr, 0.0f, 0.0f, 0.0f ) ;
 }
 
 
@@ -388,7 +393,11 @@ int tuxkart_main ( int num_laps, char *level_name )
     {
       char buffer [ 20 ] ;
 
-      sleep ( 1 ) ;
+#ifdef _MSC_VER
+      Sleep ( 1000 ) ;
+#else
+	  sleep ( 1 ) ;
+#endif
 
       if ( net->recvMessage( buffer, 20 ) > 0 )
 	fprintf ( stderr, "%s\n", buffer ) ;
@@ -406,10 +415,18 @@ int tuxkart_main ( int num_laps, char *level_name )
     if ( getenv ( "TUXKART_DATADIR" ) != NULL )
       datadir = getenv ( "TUXKART_DATADIR" ) ;
     else
+#ifdef _MSC_VER
+    if ( _access ( "data/levels.dat", 04 ) == 0 )
+#else
     if ( access ( "data/levels.dat", F_OK ) == 0 )
+#endif
       datadir = "." ;
     else
+#ifdef _MSC_VER
+    if ( _access ( "../data/levels.dat", 04 ) == 0 )
+#else
     if ( access ( "../data/levels.dat", F_OK ) == 0 )
+#endif
       datadir = ".." ;
     else
 #ifdef TUXKART_DATADIR
@@ -422,7 +439,11 @@ int tuxkart_main ( int num_laps, char *level_name )
   fprintf ( stderr, "Data files will be fetched from: '%s'\n",
                                                     datadir ) ;
 
+#ifdef _MSC_VER
+  if ( _chdir ( datadir ) == -1 )
+#else
   if ( chdir ( datadir ) == -1 )
+#endif
   {
     fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
     exit ( 1 ) ;
@@ -472,7 +493,8 @@ int tuxkart_main ( int num_laps, char *level_name )
   scene -> addKid ( kart[1] -> getModel() ) ;
   kart[1]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-  for ( int i = 2 ; i < NUM_KARTS ; i++ )
+  int i;
+  for ( i = 2 ; i < NUM_KARTS ; i++ )
   {
     kart[i] = new AutoKartDriver ( i, new ssgTransform ) ;
     scene -> addKid ( kart[i] -> getModel() ) ;
@@ -480,7 +502,7 @@ int tuxkart_main ( int num_laps, char *level_name )
   }
 
 
-  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ )
+  for ( i = 0 ; i < NUM_PROJECTILES ; i++ )
   {
     projectile[i] = new Projectile ( new ssgTransform ) ;
     scene -> addKid ( projectile[i] -> getModel() ) ;
@@ -521,14 +543,15 @@ void updateWorld ()
     }
   }
 
+  int i;
   ck2.update() ; tt[1] = ck2.getDeltaTime()*1000.0f ;
-  for ( int i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
+  for ( i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
   ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
-  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
+  for ( i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
   ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
-  for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+  for ( i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
 
-  for ( int i = 0 ; i < num_karts ; i++ )
+  for ( i = 0 ; i < num_karts ; i++ )
   {
     int p = 1 ;
 
@@ -567,7 +590,7 @@ void updateWorld ()
 
   if ( cam_follow < num_karts )
   {
-    sgCoord cam, target ;
+    sgCoord cam, target, diff ;
 
     sgCopyCoord ( &target, kart[cam_follow]->getCoord   () ) ;
     sgCopyCoord ( &cam   , kart[cam_follow]->getHistory ( (int)cam_delay ) ) ;
@@ -593,7 +616,24 @@ void updateWorld ()
     cam.hpr[1] = -5.0f ;
     cam.hpr[2] = 0.0f;
 
+#ifdef OLD_CAMERA
     ssgSetCamera ( &cam ) ;
+#else
+    sgSubVec3 ( diff.xyz, cam.xyz, steady_cam.xyz ) ;
+    sgSubVec3 ( diff.hpr, cam.hpr, steady_cam.hpr ) ;
+
+    diff.hpr[0] += ( diff.hpr[0] >  180.f ) ? -360.f : 0.f ;
+    diff.hpr[0] += ( diff.hpr[0] < -180.f ) ?  360.f : 0.f ;
+
+    steady_cam.xyz[0] = steady_cam.xyz[0] + 0.2f * diff.xyz[0] ;
+    steady_cam.xyz[1] = steady_cam.xyz[1] + 0.2f * diff.xyz[1] ;
+    steady_cam.xyz[2] = steady_cam.xyz[2] + 0.2f * diff.xyz[2] ;
+    steady_cam.hpr[0] = steady_cam.hpr[0] + 0.1f * diff.hpr[0] ;
+    steady_cam.hpr[1] = steady_cam.hpr[1] + 0.1f * diff.hpr[1] ;
+    steady_cam.hpr[2] = steady_cam.hpr[2] + 0.1f * diff.hpr[2] ;
+
+    ssgSetCamera ( &steady_cam ) ;
+#endif
   }
   else
   if ( cam_follow < num_karts + MAX_FIXED_CAMERA )

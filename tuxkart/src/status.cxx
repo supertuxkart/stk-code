@@ -117,7 +117,7 @@ void drawHelpText ()
 
   drawDropShadowText ( "Joystick: A - Accellerate.  B - Brake.",
                                                            18, 70, 330 ) ;
-  drawDropShadowText ( "          C - Use an item.  D - unused.",
+  drawDropShadowText ( "          C - Use an item.  D - Ask to be rescued.",
                                                            18, 70, 300 ) ;
   drawDropShadowText ( "          L - Pop a wheelie R - Jump.",
                                                            18, 70, 270 ) ;
@@ -127,7 +127,7 @@ void drawHelpText ()
  
   drawDropShadowText ( "          A - Pop a Wheelie S - Jump",
                                                            18, 70, 200 ) ;
-  drawDropShadowText ( "          F - Use an item.  D - Unused",
+  drawDropShadowText ( "          F - Use an item.  D - Ask to be rescued",
                                                            18, 70, 170 ) ;
   drawDropShadowText ( "          R - Restart race. P - Pause.",
                                                            18, 70, 150 ) ;
