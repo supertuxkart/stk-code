@@ -44,6 +44,8 @@
 "tuxkartshadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushishadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushiicon.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"dinoshadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"dinoicon.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "pennyshadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "spark.rgb"        Y Y     N      0.2     N     N   0.0     Y   N    N    N
 "explode.rgb"      Y Y     Y      0.2     N     N   0.0     Y   N    N    N
