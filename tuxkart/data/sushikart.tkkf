@@ -11,13 +11,13 @@
        
  (max-throttle   100)
  (engine-power   60)
- (corn-f         -15.2)
- (corn-r         -1.0)
+ (corn-f         -5.2)
+ (corn-r         -4.0)
  (mass           50)
- (inertia        13)
+ (inertia        20)
  (turn-speed     10.1415926535897931)
  (max-wheel-turn 1.5707963267948966)
- (max-grip        4.0)
+ (max-grip        0.4)
  (air-friction    0.8257))
 
 ;; EOF ;;

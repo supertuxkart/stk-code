@@ -15,10 +15,10 @@
  (corn-f         -1.0)
  (corn-r         -0.1)
  (mass           100)
- (inertia        13)
+ (inertia        20)
  (turn-speed     3.1415926535897931)
  (max-wheel-turn 1.5707963267948966)
- (max-grip        10.0)
+ (max-grip        0.5)
  (air-friction    0.8257))
 
 ;; EOF ;;

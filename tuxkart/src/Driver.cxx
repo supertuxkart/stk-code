@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.35 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: Driver.cxx,v 1.36 2004/08/28 12:45:34 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -222,7 +222,7 @@ Driver::physicsUpdate (float delta)
 	for (count = 0; count < 3; count++)
 	  velocity.xyz[count] += (force[count] / kart_properties.mass) * delta;
 	
-	kart_angular_vel = kart_angular_acc * delta;
+	kart_angular_vel += kart_angular_acc * delta;
 	velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
 	
 	// clear forces
