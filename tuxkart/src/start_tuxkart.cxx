@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.54 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.55 2004/08/10 19:55:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -262,8 +262,8 @@ int main ( int argc, char *argv[] )
 	      track_manager.loadTrackList () ;
 
 	      fprintf ( stdout, "  Available tracks:\n" );
-	      for (uint i = 0; i != track_manager.trackNames.size(); i++)
-		       fprintf ( stdout, "\t%d: %s\n", i, track_manager.trackNames[i].c_str() );
+	      for (uint i = 0; i != track_manager.tracks.size(); i++)
+                fprintf ( stdout, "\t%d: %s\n", i, track_manager.tracks[i].name.c_str() );
 	      
 		fprintf ( stdout, "\n" );
 

@@ -1,4 +1,4 @@
-//  $Id: TrackManager.h,v 1.1 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: TrackManager.h,v 1.2 2004/08/10 19:55:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,21 +21,18 @@
 #define HEADER_TRACKMANAGER_H
 
 #include <string>
+#include "TrackData.h"
 
 /** Simple class to load and manage track data, track names and
     such */
 class TrackManager
 {
 public:
-  std::vector<std::string> trackIdents;
-  std::vector<std::string> trackNames;
+  std::vector<TrackData>   tracks;
 
   TrackManager();
   
   void loadTrackList ();
-
-private:
-  std::string loadTrackDescription(const std::string& mapfile);
 };
 
 extern TrackManager track_manager;

@@ -1,1 +1,7 @@
-Little Vulcano
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Little Vulcano"))
+
+;; EOF ;;
+

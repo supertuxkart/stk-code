@@ -1,1 +1,7 @@
-Oliver's Math Class
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Oliver's Math Class"))
+
+;; EOF ;;
+

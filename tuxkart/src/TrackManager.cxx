@@ -1,4 +1,4 @@
-//  $Id: TrackManager.cxx,v 1.1 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: TrackManager.cxx,v 1.2 2004/08/10 19:55:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,32 +38,9 @@ TrackManager::loadTrackList ()
     {
       if(StringUtils::has_suffix(*i, ".track"))
         {
-          std::string trackName = i->substr(0, i->size()-6);
-          trackIdents.push_back(trackName);
-
-          std::string description = loadTrackDescription(trackName);
-          trackNames.push_back(description);
+          tracks.push_back(TrackData("data/" + *i));
         }
     }
-}
-
-std::string
-TrackManager::loadTrackDescription(const std::string& mapfile)
-{
-  std::string path = loader->getPath(std::string("data/") + mapfile + ".track");
-  FILE* file = fopen(path.c_str(), "r");
-  if(file == 0)
-    return mapfile;
-
-  char buf[1024];
-  if(fgets(buf, 1024, file) == 0)
-    buf[0] = 0;
-  
-  fclose(file);
-	
-  std::string ret =  buf;
-  ret = ret.substr(0, ret.find('\n'));
-  return ret;
 }
 
 /* EOF */

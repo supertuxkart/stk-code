@@ -1,1 +1,7 @@
-Race Track
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Race Track"))
+
+;; EOF ;;
+

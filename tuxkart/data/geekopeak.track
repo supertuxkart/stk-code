@@ -1,1 +1,7 @@
-Geeko Peak
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Geeko Peak"))
+
+;; EOF ;;
+

@@ -1,1 +1,7 @@
-Sub Sea
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Sub Sea"))
+
+;; EOF ;;
+

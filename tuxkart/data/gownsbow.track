@@ -1,1 +1,7 @@
-Gowns Bow
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Gowns Bow"))
+
+;; EOF ;;
+

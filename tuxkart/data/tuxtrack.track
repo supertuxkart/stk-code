@@ -1,2 +1,8 @@
-Tux Tollway
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Tux Tollway"))
+
+;; EOF ;;
+
 

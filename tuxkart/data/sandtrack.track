@@ -1,1 +1,7 @@
-Shifting Sands
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Shifting Sands"))
+
+;; EOF ;;
+

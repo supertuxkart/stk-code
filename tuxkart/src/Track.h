@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.7 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: Track.h,v 1.8 2004/08/10 19:55:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,7 +34,7 @@ private:
   float  total_distance ;
 
 public:
-  Track ( char *drv_fname, int mirror, int reverse ) ;
+  Track ( const char *drv_fname, int mirror, int reverse ) ;
 
   void glVtx ( sgVec2 v, float xoff, float yoff )
   {

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.59 2004/08/10 16:54:36 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.60 2004/08/10 19:55:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -360,10 +360,8 @@ int tuxkartMain (RaceSetup& raceSetup)
   loader -> setCreateBranchCallback ( process_userdata ) ;
 
   // Grab the track centerline file
-  char fname [ 100 ] ;
-  sprintf ( fname, "data/%s.drv", track_manager.trackIdents[raceSetup.track].c_str() ) ;
-
-  curr_track = new Track ( fname, raceSetup.mirror, raceSetup.reverse ) ;
+  curr_track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
+                           raceSetup.mirror, raceSetup.reverse ) ;
   gfx        = new GFX ( raceSetup.mirror ) ;
 
   int numSplits = raceSetup.numPlayers;
@@ -432,10 +430,8 @@ int tuxkartMain (RaceSetup& raceSetup)
     projectile[j]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
   }
 
-  /* Load the track models */
-
-  sprintf ( fname, "data/%s.loc", track_manager.trackIdents[raceSetup.track].c_str() ) ;
-  load_track   ( raceSetup, fname ) ;
+  // Load the track models
+  load_track   ( raceSetup, track_manager.tracks[raceSetup.track].loc_filename.c_str() ) ;
   load_players ( ) ;
 
   preProcessObj ( scene, raceSetup.mirror ) ;
