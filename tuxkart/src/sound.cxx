@@ -91,11 +91,11 @@ SoundSystem::SoundSystem ()
 
 void SoundSystem::update ()
 {
-/*
-  Comment this next line out if the
-  sound causes big glitches on your
-  IRIX machine!
-*/
+  /*
+    Comment this next line out if the
+    sound causes big glitches on your
+    IRIX machine!
+  */
 
   sched -> update () ;
 }

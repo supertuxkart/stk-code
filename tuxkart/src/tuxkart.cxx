@@ -217,6 +217,11 @@ void load_track ( ssgBranch *trackb, char *fname )
 
     char htype = '\0' ;
 
+    if ( sscanf ( s, "MUSIC \"%[^\"]\"", fname ) == 1 )
+    {
+      sound -> change_track ( fname ) ;
+    }
+    else
     if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                      &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
     {
@@ -458,8 +463,9 @@ int tuxkart_main ( int num_laps, char *level_name )
   gfx   = new GFX ;
 
   sound = new SoundSystem ;
+/*
   sound -> change_track ( "mods/mfarmer.mod" ) ;
-
+*/
   gui   = new GUI ;
 
   ssgModelPath   ( "models" ) ;
