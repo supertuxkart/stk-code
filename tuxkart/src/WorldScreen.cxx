@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.11 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: WorldScreen.cxx,v 1.12 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,7 +28,6 @@
 #include "WorldLoader.h"
 #include "sound.h"
 #include "Camera.h"
-#include "TrackData.h"
 #include "TrackManager.h"
 #include "gfx.h"
 
@@ -98,35 +97,34 @@ WorldScreen::update()
 void 
 WorldScreen::draw()
 {
-  const TrackData* track_data 
-    = track_manager->getTrack(world->raceSetup.track);
+  const Track* track = world->track;
 
   glEnable ( GL_DEPTH_TEST ) ;
 
-  if (track_data->use_fog)
+  if (track->use_fog)
     {
       glEnable ( GL_FOG ) ;
       
-      glFogf ( GL_FOG_DENSITY, track_data->fog_density ) ;
-      glFogfv( GL_FOG_COLOR  , track_data->fog_color ) ;
-      glFogf ( GL_FOG_START  , track_data->fog_start ) ;
-      glFogf ( GL_FOG_END    , track_data->fog_end ) ;
+      glFogf ( GL_FOG_DENSITY, track->fog_density ) ;
+      glFogfv( GL_FOG_COLOR  , track->fog_color ) ;
+      glFogf ( GL_FOG_START  , track->fog_start ) ;
+      glFogf ( GL_FOG_END    , track->fog_end ) ;
       glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
       glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 
       /* Clear the screen */
-      glClearColor (track_data->fog_color[0], 
-                    track_data->fog_color[1], 
-                    track_data->fog_color[2], 
-                    track_data->fog_color[3]);
+      glClearColor (track->fog_color[0], 
+                    track->fog_color[1], 
+                    track->fog_color[2], 
+                    track->fog_color[3]);
     }
   else
     {
       /* Clear the screen */
-      glClearColor (track_data->sky_color[0], 
-                    track_data->sky_color[1], 
-                    track_data->sky_color[2], 
-                    track_data->sky_color[3]);
+      glClearColor (track->sky_color[0], 
+                    track->sky_color[1], 
+                    track->sky_color[2], 
+                    track->sky_color[3]);
     }
 
   glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
@@ -137,13 +135,12 @@ WorldScreen::draw()
       world->draw() ;
     }
 
-  if (track_data->use_fog)
+  if (track->use_fog)
     {
       glDisable ( GL_FOG ) ;
     }
 
   glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
-
 }
 
 Camera*

@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.14 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: Track.h,v 1.15 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,26 +20,81 @@
 #ifndef HEADER_TRACK_H
 #define HEADER_TRACK_H
 
-#include "TrackData.h"
+#include <plib/sg.h>
 
 class Track
 {
+public:
+  std::string ident;
+
+  std::string name;
+  std::string music_filename;
+
+  sgVec4 sky_color;
+
+  bool   use_fog;
+  sgVec4 fog_color;
+  float  fog_density;
+  float  fog_start;
+  float  fog_end;
+
+  /** Position of the sun */
+  sgVec3 sun_position;
+
+  sgVec4 ambientcol;
+  sgVec4 specularcol;
+  sgVec4 diffusecol;
+
+  /** sgVec3 is a float[3] array, so unfortunately we can't put it in a
+   * std::vector because it lacks a copy-constructor, this hack should help...
+   */
+  class sgVec3Wrapper
+  {
+  private:
+    sgVec3 vec;
+
+  public:
+    sgVec3Wrapper(const sgVec3& o) {
+      sgCopyVec3(vec, o);
+    }
+
+    operator const float* () const {
+      return vec;
+    }
+
+    operator float* () {
+      return vec;
+    }
+  };
+  std::vector<sgVec3Wrapper> driveline;
+
+  sgVec2 driveline_min;
+  sgVec2 driveline_max;
+  sgVec2 driveline_center;
+
 private:
-  const TrackData* track_data;
+  float total_distance;
 
 public:
-  Track(const TrackData* track_data ) ;
+  Track(const std::string& filename);
   ~Track();
 
-  int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
-  int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
-  void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
+  int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) const ;
+  int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) const ;
+  void trackToSpatial ( sgVec3 xyz, int last_hint ) const ;
 
   float getTrackLength () const
-  { return track_data->total_distance ; }
+  { return total_distance ; }
+
+  const std::string& getIdent() const
+  { return ident; }
 
   /* Draw track preview.   Warning: w and h is not in pixels. */
-  void draw2Dview ( float x, float y, float w, float h, bool stretch ) ;
+  void draw2Dview ( float x, float y, float w, float h, bool stretch ) const ;
+
+private:
+  void loadTrack(const std::string& filename);
+  void loadDriveline();
 };
 
 #endif

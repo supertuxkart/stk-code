@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.7 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: RaceSetup.h,v 1.8 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -44,7 +44,7 @@ public:
 	int   numLaps;
 
         /** Ident of the track to use */
-	std::string track;
+        std::string track;
 
         // FIXME: This could probally be a bit more robust/easier to understand
   

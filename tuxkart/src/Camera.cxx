@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.24 2004/09/24 15:45:01 matzebraun Exp $
+//  $Id: Camera.cxx,v 1.25 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,7 +22,6 @@
 #include "tuxkart.h"
 #include "KartDriver.h"
 #include "World.h"
-#include "TrackData.h"
 #include "TrackManager.h"
 #include "Camera.h"
 
@@ -71,9 +70,9 @@ Camera::Camera ( int numPlayers, int which_ )
   context = new ssgContext ;
 
   // FIXME: clipping should be configurable for slower machines
-  const TrackData* track_data = track_manager->getTrack(world->raceSetup.track);
-  if (track_data->use_fog)
-    context -> setNearFar ( 0.05f, track_data->fog_end ) ;
+  const Track* track = track_manager->getTrack(world->raceSetup.track);
+  if (track->use_fog)
+    context -> setNearFar ( 0.05f, track->fog_end ) ;
   else
     context -> setNearFar ( 0.05f, 1000.0f ) ;
 

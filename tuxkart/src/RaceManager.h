@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.7 2004/08/25 20:36:18 grumbel Exp $
+//  $Id: RaceManager.h,v 1.8 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,6 @@
 #define HEADER_RACEMANAGER_H
 
 #include "GrandPrixSetup.h"
-#include "TrackData.h"
 #include "RaceSetup.h"
 
 class RaceMode

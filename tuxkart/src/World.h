@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.14 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: World.h,v 1.15 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -72,7 +72,7 @@ public:
 
   int ready_set_go;
 
-  Track* track;
+  const Track* track;
 private:
   Herring *silver_h ;
   Herring *gold_h   ;
@@ -103,8 +103,8 @@ public:
   Phase getPhase() const { return phase; }
 private:
   void updateLapCounter ( int k );
-  void load_track(const char *fname );
-  void load_players();
+  void loadTrack();
+  void loadPlayers();
   void herring_command(char *s, char *str );
   void checkRaceStatus();
 };

@@ -1,4 +1,4 @@
-//  $Id: TrackManager.cxx,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: TrackManager.cxx,v 1.6 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,7 +35,7 @@ TrackManager::~TrackManager()
     delete *i;
 }
 
-const TrackData*
+const Track*
 TrackManager::getTrack(const std::string& ident) const
 {
   for(Tracks::const_iterator i = tracks.begin(); i != tracks.end(); ++i)
@@ -47,7 +47,7 @@ TrackManager::getTrack(const std::string& ident) const
   throw std::runtime_error("TrackManager: Couldn't find track: '" + ident + "'");
 }
 
-const TrackData*
+const Track*
 TrackManager::getTrack(size_t id) const
 {
   return tracks[id];
@@ -69,7 +69,7 @@ TrackManager::loadTrackList ()
     {
       if(StringUtils::has_suffix(*i, ".track"))
         {
-          tracks.push_back(new TrackData("data/" + *i));
+          tracks.push_back(new Track("data/" + *i));
         }
     }
 }

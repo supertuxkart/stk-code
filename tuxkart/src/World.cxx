@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.33 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: World.cxx,v 1.34 2004/09/24 18:27:25 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,8 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include "guNet.h"
 #include "preprocessor.h"
 #include "Explosion.h"
@@ -53,7 +55,7 @@ World::World(const RaceSetup& raceSetup_)
   clock           = 0.0f;
   
   // Grab the track centerline file
-  track = new Track ( track_manager->getTrack(raceSetup.track) ) ;
+  track = track_manager->getTrack(raceSetup.track) ;
 
   // Start building the scene graph
   scene       = new ssgRoot   ;
@@ -104,8 +106,8 @@ World::World(const RaceSetup& raceSetup_)
   }
 
   // Load the track models
-  load_track   ( track_manager->getTrack(raceSetup.track)->loc_filename.c_str() ) ;
-  load_players ( ) ;
+  loadTrack   ( ) ;
+  loadPlayers ( ) ;
 
   preProcessObj ( scene ) ;
 
@@ -145,7 +147,6 @@ World::~World()
   delete red_h;
   delete green_h;
 
-  delete track;
   delete scene ; 
 }
 
@@ -154,12 +155,10 @@ World::draw()
 {
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> placeModel() ;
 
-  const TrackData* track_data = track_manager->getTrack(world->raceSetup.track);
-
-  ssgGetLight ( 0 ) -> setPosition ( track_data->sun_position ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track_data->ambientcol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track_data->diffusecol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track_data->specularcol ) ;
+  ssgGetLight ( 0 ) -> setPosition ( track->sun_position ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track->ambientcol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track->diffusecol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track->specularcol ) ;
 
   ssgCullAndDraw ( world->scene ) ;
 }
@@ -237,7 +236,7 @@ World::updateLapCounter ( int k )
 }
 
 void
-World::load_players()
+World::loadPlayers()
 {
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
     {
@@ -297,15 +296,19 @@ World::herring_command (char *s, char *str )
 
 
 void
-World::load_track(const char *fname )
+World::loadTrack()
 {
-  std::string path = loader->getPath(fname);
+  std::string path = "data/";
+  path += track->getIdent();
+  path += ".loc";
+  path = loader->getPath(path);
   FILE *fd = fopen (path.c_str(), "r" ) ;
 
   if ( fd == NULL )
   {
-    fprintf ( stderr, "tuxkart: Can't open track file '%s'\n", fname ) ;
-    exit ( 1 ) ;
+    std::stringstream msg;
+    msg << "Can't open track location file '" << path << "'.";
+    throw std::runtime_error(msg.str());
   }
 
   initWorld () ;
@@ -402,9 +405,10 @@ World::load_track(const char *fname )
       }
       else
       {
-	fprintf ( stderr, "tuxkart: Syntax error in '%s':\n", fname ) ;
-	fprintf ( stderr, "  %s\n", s ) ;
-	exit ( 1 ) ;
+        fclose(fd);
+        std::stringstream msg;
+        msg << "Syntax error in '" << path << "': " << s;
+        throw std::runtime_error(msg.str());
       }
 
       if ( need_hat )
@@ -439,9 +443,10 @@ World::load_track(const char *fname )
     }
     else
     {
-      fprintf ( stderr, "tuxkart: Syntax error in '%s':\n", fname ) ;
-      fprintf ( stderr, "  %s\n", s ) ;
-      exit ( 1 ) ;
+      fclose(fd);
+      std::stringstream msg;
+      msg << "Syntax error in '" << path << "': " << s;
+      throw std::runtime_error(msg.str());
     }
   }
 
