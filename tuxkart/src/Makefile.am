@@ -40,20 +40,12 @@ tuxkart_SOURCES = \
   WidgetSet.h  \
   widget_image.cxx \
   widget_image.h \
-  BaseGUI.cxx \
-  BaseGUI.h \
-  MainMenu.cxx \
-  MainMenu.h \
-  RaceGUI.cxx \
-  RaceGUI.h \
   isect.cxx  \
   isect.h  \
   joystick.h  \
   level.h  \
   material.cxx  \
   material.h  \
-  oldgui.cxx \
-  oldgui.h \
   preprocessor.cxx  \
   preprocessor.h  \
   sound.cxx  \
@@ -65,6 +57,23 @@ tuxkart_SOURCES = \
   tuxkart.cxx  \
   tuxkart.h  \
   utils.cxx  \
-  utils.h
+  utils.h \
+  gui/RaceGUI.cxx \
+  gui/RaceGUI.h \
+  gui/MainMenu.cxx \
+  gui/MainMenu.h \
+  gui/BaseGUI.cxx \
+  gui/BaseGUI.h \
+  gui/CharSel.cxx \
+  gui/CharSel.h \
+  gui/Difficulty.cxx \
+  gui/Difficulty.h \
+  gui/GameMode.cxx \
+  gui/GameMode.h \
+  gui/Options.cxx \
+  gui/Options.h \
+  gui/TrackSel.cxx \
+  gui/TrackSel.h
+  
 
 # EOF #
