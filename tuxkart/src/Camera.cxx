@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.17 2004/08/17 14:30:34 grumbel Exp $
+//  $Id: Camera.cxx,v 1.18 2004/08/21 07:53:43 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,10 +45,11 @@ Camera::setScreenPosition ( int pos )
       switch ( pos )
         {
         case 0 :
-          x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ;
+          x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ;
           break;
         case 1 : 
-          x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ;
+          x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ;
+          
           break;
         }
       break ;
@@ -58,16 +59,16 @@ Camera::setScreenPosition ( int pos )
       switch ( pos )
         {
         case 0 :
-          x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
-          break;
-        case 1 :
           x = 0.0f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;
           break;
+        case 1 :
+          x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;         
+          break;
         case 2 :
-          x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
+          x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
           break;
         case 3 : 
-          x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;
+          x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
           break;
         }
       break ;
