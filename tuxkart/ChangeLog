@@ -1,3 +1,10 @@
+2004-07-18  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx (main):
+	- Added support for screen mode selection at the command line.
+	- Added --noBorder, hopefully will become --fullscreen.
+	- Small fixes in messages output.
+
 2004-07-16  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (main):

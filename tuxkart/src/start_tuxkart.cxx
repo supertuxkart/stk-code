@@ -274,7 +274,7 @@ static void loadTrackList ()
 }
 
 /* Initialize the datadir, tracklist and plib stuff */
-static void initTuxKart ()
+static void initTuxKart (int noBorder)
 {
   /* Set tux_aqfh_datadir to the correct directory */
  
@@ -303,9 +303,8 @@ static void initTuxKart ()
   loadTrackList () ;
 
   /* Initialise a bunch of PLIB library stuff */
-
   pwInit  ( 0, 0, getScreenWidth(), getScreenHeight(), FALSE, 
-            "Tux Kart by Steve Baker", TRUE, 0 ) ;
+	    "Tux Kart by Steve Baker", !noBorder, 0 ) ;
 
   pwSetCallbacks ( startupKeyFn, startupMouseFn, startupMotionFn, NULL, NULL ) ;
   puInit  () ;
@@ -387,6 +386,9 @@ int main ( int argc, char *argv[] )
   int mirror = 0, reverse = 0;
   int t = 0;
   int np = 1;
+  int width = 800;
+  int height = 600;
+  int noBorder = FALSE;
   
   /* Testing if we've given arguments */
   if ( argc > 1) 
@@ -401,17 +403,23 @@ int main ( int argc, char *argv[] )
 	    {
 	      fprintf ( stdout, 
 			"Usage: tuxkart [--track n] [--nbrLaps n]"
-			" [--reverse] [--mirror]\n"
+			" [--reverse] [--mirror] [--screenMode n]\n"
 			"\n"
 			"Run TuxKart, a racing game with go-kart that features"
-			" the well-known linux mascott Tux. The game is heavily"
+			" the well-known linux\nmascott Tux. The game is heavily"
 			" inspired by Super-Mario-Kart and Wacky Wheels.\n"
 			"\n"
 			"Options:\n"
-			"--track n\t\tStart at track number n. First track is 0.\n"
-			"--nbrLaps n\t\tDefine number of laps to n.\n"
-			"--reverse\t\tEnable reverse mode.\n"
-			"--mirror\t\tEnable mirror mode.\n"
+			"--track n\tStart at track number n. First track is 0.\n"
+			"--nbrLaps n\tDefine number of laps to n.\n"
+			"--reverse\tEnable reverse mode.\n"
+			"--mirror\tEnable mirror mode (when supported).\n"
+			"--screenMode n\tSet the screen mode to:\n"
+			"\t\t 0: 320x240\t5: 960x720\n"
+			"\t\t 1: 400x300\t6: 1024x768\n"
+			"\t\t 2: 512x384\t7: 1152x864\n"
+			"\t\t 3: 640x480\t8: 1280x1024\n"
+			"\t\t 4: 800x600\n"
 			"\n"
 			"You can visit TuxKart's homepage at "
 			"http://tuxkart.sourceforge.net\n\n"
@@ -439,19 +447,70 @@ int main ( int argc, char *argv[] )
 	    }
 	  else if ( !strcmp(argv[i], "--nbrLaps") and argc > 2 )
 	    {
-	      fprintf ( stdout, "You choose to have %d laps.\n", argv[i+1] ) ;
+	      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
 	      nl = atoi(argv[i+1]);
 	    }
+	  else if ( !strcmp(argv[i], "--screenMode") and argc > 2 )
+	    {
+	      switch (atoi(argv[i+1]))
+		{
+		case 0:
+		  width = 320;
+		  height = 240;
+		  break;
+		case 1:
+		  width = 400;
+		  height = 300;
+		  break;
+		case 2:
+		  width = 512;
+		  height = 384;
+		  break;
+		case 3:
+		  width = 640;
+		  height = 480;
+		  break;
+		case 4:
+		  width = 800;
+		  height = 600;
+		  break;
+		case 5:
+		  width = 960;
+		  height = 720;
+		  break;
+		case 6:
+		  width = 1024;
+		  height = 768;
+		  break;
+		case 7:
+		  width = 1152;
+		  height = 864;
+		  break;
+		case 8:
+		  width = 1280;
+		  height = 1024;
+		  break;
+		}
+	      fprintf ( stdout, "You choose to have screen mode %d.\n", atoi(argv[i+1]) ) ;
+	    }
+	  else if ( !strcmp(argv[i], "--noBorder") )
+	    {
+	      fprintf ( stdout, "Disabling window borders.\n" ) ;
+	      noBorder = TRUE;
+	    }
 	}
+      /* Set screen resolution */
+      reshape( width, height );
+
       /* Load plib stuff */
-      initTuxKart ();
+      initTuxKart (noBorder);
       /* Start the main program */
       tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
     }
   else
     {
       /* Load plib stuff */
-      initTuxKart ();
+      initTuxKart (noBorder);
 
       // Show start screen
       startScreen ();
