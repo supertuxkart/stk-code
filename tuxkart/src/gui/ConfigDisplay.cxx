@@ -1,4 +1,4 @@
-//  $Id: ConfigDisplay.cxx,v 1.3 2004/10/23 11:45:03 rmcruz Exp $
+//  $Id: ConfigDisplay.cxx,v 1.4 2004/11/01 20:17:21 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,7 +28,7 @@ ConfigDisplay::ConfigDisplay()
 	widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
 	
 	int va = widgetSet -> varray(menu_id);
-	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, FULLSCREEN_MENU_TOKEN, 0);
+	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, MENU_FULLSCREEN_TOGGLE, 0);
 
 	widgetSet -> layout(menu_id, 0, 0);
 
@@ -55,7 +55,7 @@ void ConfigDisplay::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case FULLSCREEN_MENU_TOKEN:
+	case MENU_FULLSCREEN_TOGGLE:
     toggle_fullscreen();
     if(is_fullscreen())
       widgetSet->set_label(fullscreen_menu_id, "Window mode");

@@ -1,4 +1,4 @@
-//  $Id: ConfigDisplay.h,v 1.2 2004/10/21 18:55:38 rmcruz Exp $
+//  $Id: ConfigDisplay.h,v 1.3 2004/11/01 20:17:21 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,10 +21,6 @@
 #define HEADER_CONFIGDISPLAY_H
 
 #include "BaseGUI.h"
-
-enum {
-  FULLSCREEN_MENU_TOKEN
-  };
 
 class ConfigDisplay: public BaseGUI
 {
