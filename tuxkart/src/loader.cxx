@@ -59,9 +59,9 @@ Steve:
  
   Hook *h = (Hook *) (ent -> getUserData ()) ;
  
-  if ( ent -> isAKindOf ( SSG_TYPE_BASETRANSFORM ) )
+  if ( ent -> isAKindOf ( ssgTypeBaseTransform() ) )
   {
-    if ( ent -> isAKindOf ( SSG_TYPE_TEXTRANS ) )
+    if ( ent -> isAKindOf ( ssgTypeTexTrans() ) )
     {
     }
     else

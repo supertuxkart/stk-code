@@ -17,7 +17,6 @@ tuxkart_SOURCES = \
        guNet.cxx     guNet.h     \
        loader.cxx    loader.h    \
        joystick.h    constants.h \
-       guClock.cxx   guClock.h   \
        Track.cxx     Track.h     \
        Driver.cxx    Driver.h    \
        Herring.cxx   Herring.h   \

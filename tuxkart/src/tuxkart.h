@@ -22,7 +22,6 @@
 #include <plib/js.h>
 #include <plib/fnt.h>
 
-#include "guClock.h"
 #include "guNet.h"
 #include "constants.h"
 #include "utils.h"
@@ -38,7 +37,7 @@ extern GUI         *gui   ;
 extern SoundSystem *sound ;
 extern Track       *track ;
 extern Level        level ;
-extern guClock     *fclock ;
+extern ulClock     *fclock ;
 
 extern int      game_state ;
 

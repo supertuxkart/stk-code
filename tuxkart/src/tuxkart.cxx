@@ -4,7 +4,7 @@
 #define MIN_CAM_DISTANCE      5.0f  
 #define MAX_CAM_DISTANCE     10.0f  // Was 15
 
-static guClock ck2 ;
+static ulClock ck2 ;
 extern float tt[6];
 guUDPConnection *net = NULL ;
 ssgLoaderOptions *loader_opts = NULL ;
@@ -58,7 +58,7 @@ char *magnet2_file   = "magnetbzzt.ac" ;
 char *anvil_file     = "anvil.ac"      ;
 
 
-guClock      *fclock = NULL ;
+ulClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 GFX            *gfx = NULL ;
 GUI            *gui = NULL ;
@@ -376,12 +376,14 @@ static void cmdline_help ()
 int tuxkart_main ( int num_laps, char *level_name )
 {
   net   = new guUDPConnection ;
-  fclock = new guClock ;
+  fclock = new ulClock ;
 
   if ( loader_opts == NULL )
   {
-    loader_opts = new ssgLoaderOptions ( getAppState, NULL,
-                                    process_userdata, NULL ) ;
+    loader_opts = new ssgLoaderOptions () ;
+    loader_opts -> setCreateStateCallback ( getAppState ) ;
+    loader_opts -> setCreateBranchCallback ( process_userdata ) ;
+    ssgSetCurrentOptions ( loader_opts ) ;
   }
 
   num_laps_in_race = num_laps ;
