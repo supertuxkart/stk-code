@@ -6,6 +6,8 @@ void initMaterials () ;
 class Material
 {
   ssgState *state ;
+  ssgCallback predraw ;
+  ssgCallback postdraw ;
 
   int   index ;
 
@@ -18,6 +20,7 @@ class Material
 
   int   clamp_tex    ;
   bool  lighting     ;
+  bool  spheremap    ;
   bool  transparency ;
   float alpha_ref    ;
   float friction     ;
@@ -44,9 +47,12 @@ public:
 
   bool isIgnore    () { return ignore      ; }
   bool isZipper    () { return zipper      ; }
+  bool isSphereMap () { return spheremap   ; }
   bool isCrashable () { return collideable ; }
   bool isReset     () { return resetter    ; }
   float getFriction() { return friction    ; }
+
+  void applyToLeaf ( ssgLeaf *l ) ;
 
   ssgState *getState () { return state ; }
   void      apply    () { state -> apply () ; }

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main ()
+int main ( int argc, char **argv )
 {
-  char *fname = "bs.drv" ;
+  char *fname = argv[1] ;
   FILE *fd = fopen ( fname, "ra" ) ;
  
   if ( fd == NULL )
@@ -30,8 +30,8 @@ int main ()
       exit ( 1 ) ;
     }
  
-    x -= 82.993 ;
-    y = (-y) + 37.17 ;
+    x -= 66.68 ;
+    y = (-y) + 5.39 ;
 
     printf ( "%g,%g\n", x, y ) ;
   }

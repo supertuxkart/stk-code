@@ -7,6 +7,24 @@
 static ulList *materials = NULL ;
 
 
+int clearSpheremap ( ssgEntity * )
+{
+  glDisable   ( GL_TEXTURE_GEN_S ) ;
+  glDisable   ( GL_TEXTURE_GEN_T ) ;
+  return TRUE ;
+}
+
+
+int setSpheremap ( ssgEntity * )
+{
+  glTexGeni   ( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP ) ;
+  glTexGeni   ( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP ) ;
+  glEnable    ( GL_TEXTURE_GEN_S ) ;
+  glEnable    ( GL_TEXTURE_GEN_T ) ;
+  return TRUE ;
+}
+
+
 bool Material::parseBool ( char **p )
 {
   /* Skip leading spaces */
@@ -47,6 +65,7 @@ Material::Material ()
 {
   texname = new char [ 1 ] ;
   texname [ 0 ] = '\0' ;
+  predraw  = postdraw = NULL ;
 
   init    () ;
   install () ;
@@ -57,6 +76,7 @@ Material::Material ( char *fname, char *description )
 {
   texname = new char [ strlen ( fname ) + 1 ] ;
   strcpy ( texname, fname ) ;
+  predraw  = postdraw = NULL ;
 
   init () ;
 
@@ -66,6 +86,7 @@ Material::Material ( char *fname, char *description )
   transparency = parseBool  ( & description ) ;
   alpha_ref    = parseFloat ( & description ) ;
   lighting     = parseBool  ( & description ) ;
+  spheremap    = parseBool  ( & description ) ;
   friction     = parseFloat ( & description ) ;
   ignore       = parseBool  ( & description ) ;
   zipper       = parseBool  ( & description ) ;
@@ -85,6 +106,7 @@ void Material::init ()
   transparency = false ;
   alpha_ref    = 0.1   ;
   lighting     = true  ;
+  spheremap    = false ;
   friction     = 1.0   ;
   ignore       = false ;
   zipper       = false ;
@@ -93,8 +115,21 @@ void Material::init ()
 }
 
 
+void Material::applyToLeaf ( ssgLeaf *l )
+{
+  if ( predraw  ) l -> setCallback ( SSG_CALLBACK_PREDRAW , predraw  ) ;
+  if ( postdraw ) l -> setCallback ( SSG_CALLBACK_POSTDRAW, postdraw ) ;
+}
+
+
 void Material::install ()
 {
+  if ( isSphereMap () )
+  {
+    predraw  =   setSpheremap ;
+    postdraw = clearSpheremap ;
+  }
+
   ssgSimpleState *s = new ssgSimpleState ;
 
   state = s ;
@@ -157,7 +192,7 @@ char *parseFileName ( char **str )
 
   if ( *p != '"' )
   {
-    fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n" ) ;
+    fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n");
     fprintf ( stderr, "ERROR: Offending line is '%s'\n", *str ) ;
     return NULL ;
   }
@@ -210,9 +245,8 @@ int parseMaterial ( FILE *fd )
 
 Material *getMaterial ( ssgLeaf *l )
 {
-  int m = l -> getExternalPropertyIndex () ;
-
-  return (Material *) materials -> getEntity ( m ) ;
+  return (Material *) materials -> getEntity (
+                                   l -> getExternalPropertyIndex () ) ;
 }
 
 
@@ -296,8 +330,6 @@ ssgState *getAppState ( char *fname )
 
 void initMaterials ()
 {
-  fprintf ( stderr, "Loading Materials.\n" ) ;
-
   /* Create list - and default material zero */
 
   materials = new ulList ( 100 ) ;

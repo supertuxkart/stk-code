@@ -1,14 +1,13 @@
 
 #include "tuxkart.h"
 
-int width=800,height=600,fullscreen=0;
-extern int player;
-
 /***********************************\
 *                                   *
 * These are the PUI widget pointers *
 *                                   *
 \***********************************/
+
+#define MAX_TRACKS 10
 
 
 static puSlider       *numLapsSlider    ;
@@ -21,16 +20,12 @@ static puButton       *pleaseWaitButton ;
 static puFont         *sorority         ;
 static fntTexFont     *fnt              ;
 static ssgSimpleState *introMaterial    ;
-
-#define MAX_TRACKS 10
-
-static char *trackNames    [ MAX_TRACKS ] ;
-static char *trackIdents   [ MAX_TRACKS ] ;
-static char  numLapsLegend [     100    ] ;
-
-static char *datadir        =  0 ;
-static int   numLaps        =  5 ;
-static int   startupCounter = -1 ;
+static char           *trackNames    [ MAX_TRACKS ] ;
+static char           *trackIdents   [ MAX_TRACKS ] ;
+static char            numLapsLegend [     100    ] ;
+static char           *datadir        =  0 ;
+static int             numLaps        =  5 ;
+static int             startupCounter = -1 ;
 
 
 static void switchToGame ()
@@ -299,7 +294,7 @@ int main ( int argc, char **argv )
 
   /* Initialise a bunch of PLIB library stuff */
 
-  pwInit  ( 0, 0, width, height, FALSE, "Tux Kart by Steve Baker", TRUE, 0 ) ;
+  pwInit  ( 0, 0, 800, 600, FALSE, "Tux Kart by Steve Baker", TRUE, 0 ) ;
   pwSetCallbacks ( startupKeyFn, startupMouseFn, startupMotionFn, NULL, NULL ) ;
   puInit  () ;
   ssgInit () ;

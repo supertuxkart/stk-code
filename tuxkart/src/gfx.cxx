@@ -46,20 +46,6 @@ GFX::GFX ( int _mirror )
   for ( int i = 0 ; i < 512 ; i++ )
     keyIsDown [ i ] = FALSE ;
 
-/*
-  Already done in start_tuxkart
-
-  ssgInit  () ;
-*/
- 
-  static int firsttime = 1 ;
-
-  if ( firsttime )
-  {
-    firsttime = 0 ;
-    initMaterials () ;
-  }
-
   ssgSetFOV ( 75.0f, 0.0f ) ;
   ssgSetNearFar ( 0.05f, 1000.0f ) ;
 

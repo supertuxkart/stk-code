@@ -65,6 +65,7 @@ extern int cam_follow ;
 #include "loader.h"
 #include "level.h"
 #include "isect.h"
+#include "preprocessor.h"
 
 #define NUM_KARTS        8
 #define NUM_TRAFFIC      2
@@ -82,13 +83,11 @@ extern int cam_follow ;
 
 extern int num_karts ;
 extern int num_laps_in_race ;
+extern int finishing_position ;
+
 extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
-
-extern int stats_enabled ;
-
-extern int finishing_position ;
 
 extern int tuxkartMain ( int nl, int mirror, char *track ) ;
 

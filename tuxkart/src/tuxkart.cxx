@@ -214,39 +214,6 @@ static void herring_command ( char *s, char *str )
 }
 
 
-void flipObj ( ssgEntity *n )
-{
-  if ( n == NULL || !mirror ) return ;
-
-  n -> dirtyBSphere () ;
-
-  if ( n -> isAKindOf ( ssgTypeLeaf() ) )
-  {
-    for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
-      ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
-
-    return ;
-  }
-
-  if ( n -> isAKindOf ( ssgTypeTransform () ) )
-  {
-    sgMat4 xform ;
-
-    ((ssgTransform *)n) -> getTransform ( xform ) ;
-    xform [ 0 ][ 0 ] *= -1.0f ;
-    xform [ 1 ][ 0 ] *= -1.0f ;
-    xform [ 2 ][ 0 ] *= -1.0f ;
-    xform [ 3 ][ 0 ] *= -1.0f ;
-    ((ssgTransform *)n) -> setTransform ( xform ) ;
-  }
-
-  ssgBranch *b = (ssgBranch *) n ;
-
-  for ( int i = 0 ; i < b -> getNumKids () ; i++ )
-    flipObj ( b -> getKid ( i ) ) ;
-}
-
-
 void load_track ( char *fname )
 {
   FILE *fd = fopen ( fname, "r" ) ;
@@ -503,10 +470,10 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   sgVec3 red    = { 0.8, 0.0, 0.0 } ;
   sgVec3 green  = { 0.0, 0.8, 0.0 } ;
  
-  silver_h  = new Herring ( cyan   ) ; flipObj ( silver_h -> getRoot() ) ;
-  gold_h    = new Herring ( yellow ) ; flipObj ( gold_h -> getRoot() ) ;
-  red_h     = new Herring ( red    ) ; flipObj ( red_h -> getRoot() ) ;
-  green_h   = new Herring ( green  ) ; flipObj ( green_h -> getRoot() ) ;
+  silver_h  = new Herring ( cyan   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
+  gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), mirror ) ;
+  red_h     = new Herring ( red    ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
+  green_h   = new Herring ( green  ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
 
   /* Load the Karts */
 
@@ -541,7 +508,7 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   load_track   ( fname        ) ;
   load_players ( playersfname ) ;
 
-  flipObj ( scene ) ;
+  preProcessObj ( scene, mirror ) ;
 
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED

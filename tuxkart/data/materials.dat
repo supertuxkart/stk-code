@@ -7,46 +7,49 @@
 #   Transparency = No
 #   AlphaRef     = 0.1
 #   Lighting     = Yes
+#   Spheremap    = No
 #   Friction     = 1.0
 #   Ignore       = No
 #   Zipper       = No
 #   Resetter     = No
 #   Collide      = Yes   (Yes if you want a collision to stop the kart dead)
 #
-# TextureName        UVClamp Trans AlphaRef Light Friction Ign Zip Reset Collide
-"railing.rgb"          N Y     Y      0.5     Y     1.0     N   N    N    N
-"ruler.rgb"            N N     Y      0.2     Y     1.0     N   N    N    N
-"embossed_herring.rgb" N N     Y      0.5     Y     1.0     N   N    N    N
-"adverts.rgb"          N N     N      0.0     Y     1.0     N   N    N    Y  
-"wood.rgb"             N N     N      0.0     Y     1.0     N   N    N    N
-"concrete.rgb"         N N     N      0.0     Y     1.0     N   N    N    Y  
-"brick.rgb"            N N     N      0.0     Y     1.0     N   N    N    Y     
-"stonewall.rgb"        N N     N      0.0     Y     1.0     N   N    N    N
-"pebbles.rgb"          N N     N      0.0     Y     1.0     N   N    N    N
-"floor.rgb"            N N     N      0.0     Y     1.0     N   N    N    N
-"sand.rgb"             N N     N      0.0     Y     1.0     N   N    N    N
-"egypt.rgb"            N N     N      0.0     Y     1.0     N   N    N    Y  
-"pyramidwall.rgb"      N N     N      0.0     Y     1.0     N   N    N    N
-"lava.rgb"             N N     N      0.0     N     1.0     N   N    Y    Y  
-"metalgrid.rgb"        N N     Y      0.3     Y     1.0     N   N    N    N
-"fuzzy_sand.rgb"       N N     Y      0.0     N     1.0     Y   N    N    N  
-"roadway.rgb"          Y N     Y      0.0     Y     1.0     N   N    N    N
-"rainbow.rgb"          N N     Y      0.0     N     1.0     N   N    N    N
-"tinytux.rgb"          Y Y     Y      0.8     N     1.0     Y   N    N    N  
-"butterfly.rgb"        Y Y     Y      0.8     N     1.0     Y   N    N    N     
-"Penguin_orig.rgb"     N N     N      0.0     Y     1.0     N   N    N    N
-"grass.rgb"            N N     N      0.0     Y     1.0     N   N    N    N
-"zipper.rgb"           N N     N      0.0     N     1.0     N   Y    N    N
-"mnm.rgb"              Y Y     Y      0.5     N     1.0     N   Y    N    N
-"fuzzy.rgb"            Y Y     Y      0.2     N     0.0     Y   N    N    N 
-"spark.rgb"            Y Y     N      0.2     N     0.0     Y   N    N    N 
-"explode.rgb"          Y Y     Y      0.2     N     0.0     Y   N    N    N 
-"players.rgb"          Y Y     Y      0.9     N     0.0     Y   N    N    N 
-"missile.rgb"          Y Y     Y      0.9     N     0.0     Y   N    N    N 
-"flames.rgb"           N N     N      0.9     N     0.0     Y   N    N    N 
-"magnet.rgb"           Y Y     Y      0.1     N     0.0     Y   N    N    N 
-"bzzt.rgb"             N N     Y      0.1     N     0.0     Y   N    N    N 
-"flamemissile.rgb"     Y Y     Y      0.9     N     0.0     Y   N    N    N 
-"herring.rgb"          Y Y     Y      0.9     N     0.0     Y   N    N    N 
-"herringbones.rgb"     Y Y     Y      0.2     N     0.0     Y   N    N    N 
+# TextureName    UVClamp Trans AlphaRef Light SphMp Frctn Ign Zip Rst Cold
+"chrome.rgb"       N N     N      0.0     N     Y   0.0     N   N    N    N
+"railing.rgb"      N Y     Y      0.5     Y     N   1.0     N   N    N    N
+"ruler.rgb"        N N     Y      0.2     Y     N   1.0     N   N    N    N
+"herringwall.rgb"  N N     Y      0.5     Y     N   1.0     N   N    N    N
+"adverts.rgb"      N N     N      0.0     Y     N   1.0     N   N    N    Y
+"wood.rgb"         N N     N      0.0     Y     N   1.0     N   N    N    N
+"concrete.rgb"     N N     N      0.0     Y     N   1.0     N   N    N    Y
+"brick.rgb"        N N     N      0.0     Y     N   1.0     N   N    N    Y
+"stonewall.rgb"    N N     N      0.0     Y     N   1.0     N   N    N    N
+"pebbles.rgb"      N N     N      0.0     Y     N   1.0     N   N    N    N
+"floor.rgb"        N N     N      0.0     Y     N   1.0     N   N    N    N
+"sand.rgb"         N N     N      0.0     Y     N   1.0     N   N    N    N
+"egypt.rgb"        N N     N      0.0     Y     N   1.0     N   N    N    Y
+"pyramidwall.rgb"  N N     N      0.0     Y     N   1.0     N   N    N    N
+"lava.rgb"         N N     N      0.0     N     N   1.0     N   N    Y    Y
+"metalgrid.rgb"    N N     Y      0.3     Y     N   1.0     N   N    N    N
+"fuzzy_sand.rgb"   N N     Y      0.0     N     N   1.0     Y   N    N    N
+"roadway.rgb"      Y N     Y      0.0     Y     N   1.0     N   N    N    N
+"tracktex.rgb"     N N     N      0.0     Y     N   1.0     N   N    N    Y
+"rainbow.rgb"      N N     Y      0.0     N     N   1.0     N   N    N    N
+"tinytux.rgb"      Y Y     Y      0.8     N     N   1.0     Y   N    N    N
+"butterfly.rgb"    Y Y     Y      0.8     N     N   1.0     Y   N    N    N
+"Penguin_orig.rgb" N N     N      0.0     Y     N   1.0     N   N    N    N
+"grass.rgb"        N N     N      0.0     Y     N   1.0     N   N    N    N
+"zipper.rgb"       N N     N      0.0     N     N   1.0     N   Y    N    N
+"mnm.rgb"          Y Y     Y      0.5     N     N   1.0     N   Y    N    N
+"fuzzy.rgb"        Y Y     Y      0.2     N     N   0.0     Y   N    N    N
+"spark.rgb"        Y Y     N      0.2     N     N   0.0     Y   N    N    N
+"explode.rgb"      Y Y     Y      0.2     N     N   0.0     Y   N    N    N
+"players.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"missile.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"flames.rgb"       N N     N      0.9     N     N   0.0     Y   N    N    N
+"magnet.rgb"       Y Y     Y      0.1     N     N   0.0     Y   N    N    N
+"bzzt.rgb"         N N     Y      0.1     N     N   0.0     Y   N    N    N
+"flamemissile.rgb" Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"herring.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"herringbones.rgb" Y Y     Y      0.2     N     N   0.0     Y   N    N    N
 

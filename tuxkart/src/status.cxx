@@ -10,10 +10,9 @@ double time_left = 0.0 ;
 float tt[6]={0,0,0,0,0,0};
 
 static fntRenderer *text = NULL ;
-
-char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
-int next_string   = 0 ;
-int stats_enabled = FALSE ;
+static char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
+static int  next_string  = 0 ;
+static int  stats_enabled = FALSE ;
 
 static Material *players_gst      = NULL ;
 static Material *herringbones_gst = NULL ;
@@ -492,7 +491,7 @@ void drawPlayerIcons ()
     /*
       Draw Tux last so he doesn't get covered up
       by the others
-   */
+    */
 
     x = (int) ( w * kart [ 0 ] -> getDistanceDownTrack () /
                     curr_track -> getTrackLength () ) ;

@@ -6,7 +6,7 @@ kids 65
 OBJECT poly
 name "rect"
 loc -2.00697 1.9102 -11.1747
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -0.879352 -0.54014 -23.015
@@ -135,7 +135,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -11.6831 1.45463 -26.3383
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -21.9579 -2.81799 -39.8767
@@ -264,7 +264,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -30.6401 1.53056 -24.5216
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -47.8197 -1.07164 -20.2118
@@ -393,7 +393,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -45.6361 2.44171 -8.17159
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -58.6673 -0.76793 -2.82325
@@ -522,7 +522,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -62.7858 1.22684 1.9116
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -75.54 -3.80508 0.574075
@@ -651,7 +651,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -81.1318 0.467563 -2.12995
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -88.8888 -3.04578 -8.83925
@@ -780,7 +780,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -91.0484 0.410832 -22.0709
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -92.4307 -3.21597 -39.4587
@@ -909,7 +909,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -100.946 1.14833 -41.7188
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -108.561 -1.68425 -54.015
@@ -1038,7 +1038,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -118.883 1.31852 -48.4768
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -132.467 -0.4929 -53.4484
@@ -1167,7 +1167,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -132.606 1.31852 -37.0109
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -148.388 -3.89674 -32.3095
@@ -1296,7 +1296,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -133.597 1.31852 -14.1261
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -142.403 -1.51406 -0.598464
@@ -1425,7 +1425,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -120.69 1.43198 -0.89999
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -114.198 -1.28712 10.0471
@@ -1554,7 +1554,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -102.028 1.63054 -6.89222
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -92.9138 0.44316 -7.26834
@@ -1683,7 +1683,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -87.63 1.88582 -26.1874
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -80.6298 -2.42174 -34.7564
@@ -1812,7 +1812,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -70.3756 0.112998 -37.3959
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -64.3078 -3.71236 -35.5835
@@ -1941,7 +1941,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -53.6233 -1.57474 -32.3342
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -54.2677 -6.10924 -24.2052
@@ -2070,7 +2070,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -46.6496 -1.57474 -12.736
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -53.9292 -6.10924 -0.785064
@@ -2199,7 +2199,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -37.0413 -0.936517 2.4277
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -32.7831 -2.66286 16.0768
@@ -2328,7 +2328,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -17.9567 -0.367647 0.611015
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 -6.7452 -4.64029 -3.58829
@@ -2457,7 +2457,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -2.88476 -1.35473 -15.7389
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 3.7228 -6.08293 -20.9769
@@ -2586,7 +2586,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 14.189 -0.595437 -25.8222
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 20.368 -3.80506 -24.374
@@ -2715,7 +2715,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 32.5687 0.602547 -21.7806
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 33.9866 -3.18075 -14.9608
@@ -2844,7 +2844,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 42.519 1.04125 -1.83969
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 37.9916 -2.40459 15.6585
@@ -2973,7 +2973,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 52.3832 0.602547 17.8081
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 53.9998 -3.18075 30.2145
@@ -3102,7 +3102,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 70.4573 0.467563 24.5663
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 77.7685 -3.04578 29.6486
@@ -3231,7 +3231,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 83.2437 0.467563 13.1005
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 91.2233 -3.04578 8.50927
@@ -3360,7 +3360,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 84.2345 0.467563 -9.7844
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 85.9177 -3.04578 -23.2014
@@ -3489,7 +3489,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 72.2969 0.298833 -23.0106
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 59.4661 -2.87705 -33.8472
@@ -3618,7 +3618,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 53.5554 -0.781037 -17.0182
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 38.8509 -5.20552 -16.5316
@@ -3747,7 +3747,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 39.1573 -1.00882 2.27698
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 25.9988 -4.0666 10.9564
@@ -3876,7 +3876,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 21.8127 0.0710478 13.4853
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 9.4056 -2.64927 11.7832
@@ -4005,7 +4005,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 5.02668 0.923133 8.42355
-texture "/usr/batcave1/tuxkart/images/embossed_herring.rgb"
+texture "/u/tuxkart/images/herringwall.rgb"
 texrep 2 1
 numvert 20
 3.99912 -2.28649 0.405486
