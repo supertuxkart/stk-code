@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.69 2004/09/24 19:06:22 matzebraun Exp $
+//  $Id: tuxkart.cxx,v 1.70 2004/09/24 19:53:05 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,7 +33,6 @@
 #include "WorldLoader.h"
 #include "TrackManager.h"
 
-#include "gfx.h"
 #include "preprocessor.h"
 #include "material.h"
 #include "RaceSetup.h"

@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.12 2004/09/24 18:27:25 matzebraun Exp $
+//  $Id: WorldScreen.cxx,v 1.13 2004/09/24 19:53:05 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,7 +29,6 @@
 #include "sound.h"
 #include "Camera.h"
 #include "TrackManager.h"
-#include "gfx.h"
 
 WorldScreen* WorldScreen::current_ = 0;
 
