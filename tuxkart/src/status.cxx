@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.15 2004/08/01 20:07:08 jamesgregory Exp $
+//  $Id: status.cxx,v 1.16 2004/08/04 16:35:39 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,6 @@
 #include <plib/fnt.h>
 #include "tuxkart.h"
 #include "status.h"
-#include "gui.h"
 #include "Driver.h"
 #include "material.h"
 #include "oldgui.h"
@@ -37,6 +36,7 @@ static fntRenderer *text = NULL ;
 static char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 static int  next_string  = 0 ;
 static int  stats_enabled = FALSE ;
+static bool show_fps = FALSE ;
 
 static Material *players_gst      = NULL ;
 static Material *herringbones_gst = NULL ;
@@ -88,6 +88,10 @@ void stToggle ()
   }
 }
 
+void fpsToggle () 
+{
+	show_fps = !show_fps;
+}
 
 void stPrintf ( char *fmt, ... )
 {
@@ -299,6 +303,14 @@ void drawCreditsText ()
                        15, 10, 430 ) ;
 }
 
+void drawStatsText ()
+{
+  char str [ 256 ] ;
+
+  sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
+  drawDropShadowText ( str, 18, 5, 300 ) ;
+}
+
 void drawFPSText ()
 {
   static int fpsCounter;
@@ -318,15 +330,7 @@ void drawFPSText ()
 
   char str [ 20 ];
   sprintf( str, "FPS: %d", fpsSave);
-  drawDropShadowText( str, 18, 0 , 0);
-}
-
-void drawStatsText ()
-{
-  char str [ 256 ] ;
-
-  sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
-  drawDropShadowText ( str, 18, 5, 300 ) ;
+  drawDropShadowText ( str, 18, 5, 5 ) ;
 }
 
 void drawTimer ()
@@ -419,6 +423,7 @@ void drawMap ()
   glEnd () ;
 }
 
+
 void drawGameOverText ()
 {
   static int timer = 0 ;
@@ -479,6 +484,9 @@ void drawGameRunningText ()
     
   if ( stats_enabled )
     drawStatsText () ;
+    
+  if ( show_fps )
+  	drawFPSText () ;
 
   if ( help_timer++ < 400 )
     drawHelpText () ;
