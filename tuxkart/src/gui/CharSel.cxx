@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.12 2004/08/17 21:51:35 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.13 2004/08/17 22:35:20 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,36 +28,50 @@
 
 CharSel::CharSel()
 {
-        current_kart = -1;
-        switch_to_character(0);
+  current_kart = -1;
+  switch_to_character(0);
 
-        context = new ssgContext;
+  context = new ssgContext;
 
-        menu_id = widgetSet -> vstack(0);
-        widgetSet -> label(menu_id, "Chose a Character", GUI_LRG, GUI_ALL, 0, 0);
-        widgetSet -> space(menu_id);
+  menu_id = widgetSet -> vstack(0);
+  widgetSet -> label(menu_id, "Chose a Character", GUI_LRG, GUI_ALL, 0, 0);
+  widgetSet -> space(menu_id);
         
-        int ha = widgetSet -> harray(menu_id);
-        widgetSet -> filler(ha);
-        int va = widgetSet -> varray(ha);
+  int ha = widgetSet -> harray(menu_id);
+  widgetSet -> filler(ha);
+  int va = widgetSet -> varray(ha);
 
-        int row1 = widgetSet -> harray(va);
-        int row2 = widgetSet -> harray(va);
-        for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
-          {
-            widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-            // FIXME: images needs to be 'clickable'
-            //widgetSet ->image(va, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), 128, 128);
-          }
-        for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
-          {
-            widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-          }
+  int icon_size = 64;
 
-        widgetSet -> filler(ha);
-	widgetSet -> layout(menu_id, 0, 1);
+  int row1 = widgetSet -> harray(va);
+  for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
+    {
+      //widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+      int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+      widgetSet -> activate_widget(c, i, 0);
+    }
+  if (0)
+    {
+      int row2 = widgetSet -> harray(va);
+      for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
+        {
+          //widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+          // FIXME: images needs to be 'clickable'
+          int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+          widgetSet -> activate_widget(c, i, 0);
+        }
+      for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
+        {
+          //widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+          int c = widgetSet -> image(row2, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+          widgetSet -> activate_widget(c, i, 0);
+        }
+    }
 
-        clock = 0;
+  widgetSet -> filler(ha);
+  widgetSet -> layout(menu_id, 0, 1);
+
+  clock = 0;
 }
 
 CharSel::~CharSel()
