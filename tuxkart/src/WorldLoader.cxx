@@ -1,4 +1,4 @@
-//  $Id: WorldLoader.cxx,v 1.1 2004/08/01 15:11:56 grumbel Exp $
+//  $Id: WorldLoader.cxx,v 1.2 2004/08/02 13:03:32 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -249,7 +249,7 @@ void *invisibleInit ( ssgBranch **br, char * )
 }
                                                                                 
 
-void *switchInit ( ssgBranch **br, char *data )
+void *switchInit ( ssgBranch **br, char* )
 {
   *br = new ssgSelector ;
 

@@ -198,7 +198,8 @@ GLuint make_image_from_surf(int *w, int *h, SDL_Surface *s)
     }
     else
     {
-    /* Load the unscaled image. */
+    // Load the unscaled image.
+    */
    
 
     if (s->format->BitsPerPixel == 32)
@@ -237,35 +238,37 @@ GLuint make_image_from_file(int *W, int *H,
 
     /* Load the file. */
 
-    if (src = IMG_Load(name))
+    src = IMG_Load(name);
+    if(!src)
+        return 0;
+    
+    int w2;
+    int h2;
+
+    image_size(&w2, &h2, src->w, src->h);
+
+    if (w) *w = src->w;
+    if (h) *h = src->h;
+
+    /* Create a new destination surface. */
+    
+    if ((dst = SDL_CreateRGBSurface(SDL_SWSURFACE, w2, h2, 32,
+                                    RMASK, GMASK, BMASK, AMASK)))
     {
-        int w2;
-        int h2;
+        /* Copy source pixels to the center of the destination. */
 
-        image_size(&w2, &h2, src->w, src->h);
+        rect.x = (Sint16) (w2 - src->w) / 2;
+        rect.y = (Sint16) (h2 - src->h) / 2;
 
-        if (w) *w = src->w;
-        if (h) *h = src->h;
+        SDL_SetAlpha(src, 0, 0);
+        SDL_BlitSurface(src, NULL, dst, &rect);
 
-        /* Create a new destination surface. */
-        
-        if ((dst = SDL_CreateRGBSurface(SDL_SWSURFACE, w2, h2, 32,
-                                        RMASK, GMASK, BMASK, AMASK)))
-        {
-            /* Copy source pixels to the center of the destination. */
+        o = make_image_from_surf(W, H, dst);
 
-            rect.x = (Sint16) (w2 - src->w) / 2;
-            rect.y = (Sint16) (h2 - src->h) / 2;
-
-            SDL_SetAlpha(src, 0, 0);
-            SDL_BlitSurface(src, NULL, dst, &rect);
-
-            o = make_image_from_surf(W, H, dst);
-
-            SDL_FreeSurface(dst);
-        }
-        SDL_FreeSurface(src);
+        SDL_FreeSurface(dst);
     }
+
+    SDL_FreeSurface(src);
     return o;
 }
 

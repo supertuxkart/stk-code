@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.34 2004/08/01 20:24:12 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.35 2004/08/02 13:03:32 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -205,7 +205,8 @@ static void installMaterial ()
   /* Make a simplestate for the title screen texture */
 
   introMaterial = new ssgSimpleState ;
-  introMaterial -> setTexture  ( "images/title_screen.rgb", TRUE, TRUE ) ;
+  introMaterial -> setTexture( 
+          loader->createTexture("title_screen.rgb", true, true, false));
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
   introMaterial -> disable     ( GL_LIGHTING  ) ;
   introMaterial -> disable     ( GL_CULL_FACE ) ;
@@ -267,10 +268,11 @@ static void loadTrackList ()
 }
 
 /* Initialize the datadir */
-static void loadDataDir (int debug)
+static void loadDataDir()
 {
-  if(!loader)
-    loader = new Loader();
+  loader = new Loader();
+  loader->setModelDir("models");
+  loader->setTextureDir("images");
     
   /* initialize search path of the loader */
   if ( getenv ( "TUXKART_DATADIR" ) != NULL )
@@ -288,7 +290,7 @@ static void loadDataDir (int debug)
 /* Load the datadir, tracklist and plib stuff */
 static void initTuxKart (int width, int height, int videoFlags)
 {
-  loadDataDir ( TRUE );
+  loadDataDir ();
   loadTrackList () ;
 
   initVideo ( width, height, videoFlags );
@@ -448,7 +450,7 @@ int main ( int argc, char *argv[] )
 
 	  else if( !strcmp(argv[i], "--list-tracks") )
 	    {
-	      loadDataDir ( false );
+	      loadDataDir ();
 	      loadTrackList () ;
 
 	      fprintf ( stdout, "  Available tracks:\n" );

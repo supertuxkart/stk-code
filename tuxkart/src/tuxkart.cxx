@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.31 2004/08/02 12:10:01 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.32 2004/08/02 13:03:32 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -482,9 +482,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   loader -> setCreateStateCallback  ( getAppState ) ;
   loader -> setCreateBranchCallback ( process_userdata ) ;
-  ssgSetCurrentOptions ( loader ) ;
-  ssgModelPath         ( "models" ) ;
-  ssgTexturePath       ( "images" ) ;
+  ssgSetCurrentOptions (loader);
 
   /* Grab the track centerline file */
 
@@ -508,7 +506,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   sgVec3 cyan   = { 0.4, 1.0, 1.0 } ;
   sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
-  sgVec3 red    = { 0.8, 0.0, 0.0 } ;
+  //sgVec3 red    = { 0.8, 0.0, 0.0 } ;
   sgVec3 green  = { 0.0, 0.8, 0.0 } ;
  
   silver_h  = new Herring ( cyan   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
