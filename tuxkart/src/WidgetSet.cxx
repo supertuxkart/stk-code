@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.10 2004/08/22 06:12:48 oaf_thadres Exp $
+//  $Id: WidgetSet.cxx,v 1.11 2004/08/22 09:11:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -1503,14 +1503,14 @@ int WidgetSet::stick(int id, int x, int y)
 
     /* Find a new active widget in the direction of joystick motion. */
 
-    if (!x || -JOY_MID <= x && x <= +JOY_MID)
+    if (x && -JOY_MID <= x && x <= +JOY_MID)
         xflag = 1;
     else if (x < -JOY_MID && xflag && (jd = stick_L(id, active)))
         xflag = 0;
     else if (x > +JOY_MID && xflag && (jd = stick_R(id, active)))
         xflag = 0;
 
-    if (!y || -JOY_MID <= y && y <= +JOY_MID)
+    if (y && -JOY_MID <= y && y <= +JOY_MID)
         yflag = 1;
     else if (y < -JOY_MID && yflag && (jd = stick_U(id, active)))
         yflag = 0;
