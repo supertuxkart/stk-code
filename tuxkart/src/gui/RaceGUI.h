@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.12 2004/09/02 13:48:42 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.13 2004/09/04 11:17:49 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -71,9 +71,13 @@ private:
 	void drawTimer ();
 
   /* Text drawing */
-	void drawText ( char* text, int sz, int x, int y, int red, int green, int blue );
-  // This functions allows one to draw text by specifying both width and height
-  // and so be able to do a stretching
+  /** Draw text to screen.
+      scale_x and scale_y could be used to a simple resize (for instance, for multiplayer
+      split screens, though, currently, we reduce fonts size to half). */
+	void drawText ( char* text, int sz, int x, int y, int red, int green, int blue,
+                  float scale_x = 1.0, float scale_y = 1.0 );
+  /** This functions allows one to draw text by specifying both width and height
+      and so be able to do a stretching */
 	void drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue );
 
 	void drawDropShadowText ( char *str, int sz, int x, int y );

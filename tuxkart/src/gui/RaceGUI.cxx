@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.34 2004/09/02 13:48:42 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.35 2004/09/04 11:17:49 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -187,7 +187,7 @@ void RaceGUI::stPrintf ( char *fmt, ... )
   va_end ( ap ) ;
 }
 
-void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, int blue )
+void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, int blue, float scale_x, float scale_y )
 {
   /** This is a chache system to avoid TTF_Font calls.
       Though I dunno if this is really needed, since I dunno how expensive
@@ -207,6 +207,9 @@ void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, i
   int w, h;
   GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text,
                                            fonts_cache.find(sz)->second);
+
+  w = (int)(w * scale_x);
+  h = (int)(h * scale_y);
 
   if(x == SCREEN_CENTERED_TEXT)
     x = (640 - w) / 2;
