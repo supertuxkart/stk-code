@@ -1,4 +1,4 @@
-//  $Id: Herring.h,v 1.5 2004/08/10 16:54:36 grumbel Exp $
+//  $Id: Herring.h,v 1.6 2004/08/11 00:13:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,8 @@
 
 #ifndef HEADER_HERRING_H
 #define HEADER_HERRING_H
+
+#include <plib/ssg.h>
  
 class Shadow;
 
@@ -84,11 +86,6 @@ public:
   int      effect ;
   void update () ;
 } ;
-
-extern Herring *silver_h ;
-extern Herring *gold_h   ;
-extern Herring *red_h    ;
-extern Herring *green_h  ;                                                     
 
 extern int num_herring   ;                                                      
 

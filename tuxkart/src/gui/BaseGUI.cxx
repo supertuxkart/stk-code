@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.7 2004/08/10 16:45:42 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.8 2004/08/11 00:13:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -89,7 +89,7 @@ void updateGUI(RaceSetup& raceSetup)
 				break;
 			case GUIS_EXITRACE:
 				guiStack.clear();
-				backToSplash();
+				//FIXME:backToSplash();
 			}
 		}
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts

@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.9 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: Track.cxx,v 1.10 2004/08/11 00:13:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,8 @@
 
 static int npoints ;
 static sgVec3 driveline[MAX_DRIVELINE] ;
+
+Track     *curr_track  ;
 
 Track::Track ( const char *fname, int mirror, int reverse )
 {
@@ -241,3 +243,4 @@ void Track::draw2Dview ( float x, float y )
   glEnd () ;
 }
 
+/* EOF */

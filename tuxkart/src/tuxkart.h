@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.32 2004/08/10 23:17:33 grumbel Exp $
+//  $Id: tuxkart.h,v 1.33 2004/08/11 00:13:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -50,9 +50,7 @@ class GFX ;
 class WidgetSet;
 class SoundSystem ;
 class Track ;
-class Level ;
 
-extern GFX         *gfx ;
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
 extern std::vector<GUISwitch> guiStack;
@@ -66,7 +64,6 @@ extern KartProperties kart_props;
 
 extern SoundSystem *sound ;
 extern Track       *track ;
-extern Level        level ;
 extern ulClock     *fclock ;
 
 extern ssgRoot *scene ;
@@ -101,8 +98,6 @@ typedef std::vector<KartDriver*> Karts;
 extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
-
-int tuxkartMain(RaceSetup& raceSetup) ;
 
 #endif
 

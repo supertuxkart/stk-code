@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.1 2004/08/10 23:17:33 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.2 2004/08/11 00:13:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "Loader.h"
 #include "RaceSetup.h"
 #include "tuxkart.h"
+#include "World.h"
 #include "StartScreen.h"
 
 StartScreen* StartScreen::current_ = 0;
@@ -100,8 +101,9 @@ StartScreen::switchToGame(RaceSetup& raceSetup)
   delete introMaterial ;
   
   guiStack.clear();
-
-  tuxkartMain(raceSetup);
+  
+  World world(raceSetup);
+  world.run(raceSetup);
 }
 
 /* EOF */

@@ -72,6 +72,8 @@ tuxkart_SOURCES = \
   utils.h \
   lispreader.cxx \
   lispreader.h \
+  World.h \
+  World.cxx \
   gui/RaceGUI.cxx \
   gui/RaceGUI.h \
   gui/MainMenu.cxx \
