@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.21 2004/12/12 22:01:01 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.22 2004/12/14 03:35:52 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,7 +22,6 @@
 #include "KartDriver.h"
 #include "AutoDriver.h"
 
-#include <iostream>
 #include "Track.h"
 #include <math.h>
 
