@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.11 2004/08/22 09:11:12 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.12 2004/08/22 22:22:58 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -31,130 +31,130 @@
 
 
 WidgetSet::WidgetSet()
-    : active(0), pause_id(0), paused(0)
+	: active(0), pause_id(0), paused(0)
 {
 	font[0] = NULL;
 	font[1] = NULL;
 	font[2] = NULL;
 
 	const float *c0 = gui_yel;
-    const float *c1 = gui_red;
+	const float *c1 = gui_red;
 
-    int w = getScreenWidth();
-    int h = getScreenHeight();
-    int i, j, s = (h < w) ? h : w;
+	int w = getScreenWidth();
+	int h = getScreenHeight();
+	int i, j, s = (h < w) ? h : w;
 
-    /* Initialize font rendering. */
+	/* Initialize font rendering. */
 
-    if (TTF_Init() == 0)
-    {
-        memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
+	if (TTF_Init() == 0)
+	{
+		memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
 
-        /* Load small, medium, and large typefaces. */
-	  std::string path = loader->getPath(GUI_FACE);
-		
-	  //Neverball sizes:
-        //font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
-        //font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 12);
-        //font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  6);
+		/* Load small, medium, and large typefaces. */
+		std::string path = loader->getPath(GUI_FACE);
+
+		//Neverball sizes:
+		//font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
+		//font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 12);
+		//font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  6);
 		
 		font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
-        font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 15);
-        font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  10);
-        radius = s / 60;
+		font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 15);
+		font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  10);
+		radius = s / 60;
 
-        /* Initialize the global pause GUI. */
+		/* Initialize the global pause GUI. */
 
-        if ((pause_id = pause(0)))
-            layout(pause_id, 0, 0);
+		if ((pause_id = pause(0)))
+			layout(pause_id, 0, 0);
 
-        /* Initialize digit glyphs and lists for counters and clocks. */
+		/* Initialize digit glyphs and lists for counters and clocks. */
 
-        for (i = 0; i < 3; i++)
-        {
-            char text[2];
+		for (i = 0; i < 3; i++)
+		{
+			char text[2];
 
-            /* Draw digits 0 throught 9. */
+			/* Draw digits 0 throught 9. */
 
-            for (j = 0; j < 10; j++)
-            {
-                text[0] = '0' + (char) j;
-                text[1] =  0;
+			for (j = 0; j < 10; j++)
+			{
+				text[0] = '0' + (char) j;
+				text[1] =  0;
 
-                digit_text[i][j] = make_image_from_font(NULL, NULL,
-                                                        &digit_w[i][j],
-                                                        &digit_h[i][j],
-                                                        text, font[i]);
-                digit_list[i][j] = list(-digit_w[i][j] / 2,
-                                            -digit_h[i][j] / 2,
-                                            +digit_w[i][j],
-                                            +digit_h[i][j], c0, c1);
-            }
+				digit_text[i][j] = make_image_from_font(NULL, NULL,
+				                                        &digit_w[i][j],
+				                                        &digit_h[i][j],
+				                                        text, font[i]);
+				digit_list[i][j] = list(-digit_w[i][j] / 2,
+				                        -digit_h[i][j] / 2,
+				                        +digit_w[i][j],
+				                        +digit_h[i][j], c0, c1);
+			}
 
-            /* Draw the colon for the clock. */
+			/* Draw the colon for the clock. */
 
-            digit_text[i][j] = make_image_from_font(NULL, NULL,
-                                                    &digit_w[i][10],
-                                                    &digit_h[i][10],
-                                                    ":", font[i]);
-            digit_list[i][j] = list(-digit_w[i][10] / 2,
-                                        -digit_h[i][10] / 2,
-                                        +digit_w[i][10],
-                                        +digit_h[i][10], c0, c1);
-        }
-    }
+			digit_text[i][j] = make_image_from_font(NULL, NULL,
+			                                        &digit_w[i][10],
+			                                        &digit_h[i][10],
+			                                        ":", font[i]);
+			digit_list[i][j] = list(-digit_w[i][10] / 2,
+			                        -digit_h[i][10] / 2,
+			                        +digit_w[i][10],
+			                        +digit_h[i][10], c0, c1);
+		}
+	}
 }
 
 WidgetSet::~WidgetSet()
 {
 	int i, j, id;
 
-    /* Release any remaining widget texture and display list indices. */
+	/* Release any remaining widget texture and display list indices. */
 
-    for (id = 1; id < MAXWIDGETS; id++)
-    {
-        if (glIsTexture(widgets[id].text_img))
-            glDeleteTextures(1, &widgets[id].text_img);
+	for (id = 1; id < MAXWIDGETS; id++)
+	{
+		if (glIsTexture(widgets[id].text_img))
+			glDeleteTextures(1, &widgets[id].text_img);
 
-        if (glIsList(widgets[id].text_obj))
-            glDeleteLists(widgets[id].text_obj, 1);
-        if (glIsList(widgets[id].rect_obj))
-            glDeleteLists(widgets[id].rect_obj, 1);
+		if (glIsList(widgets[id].text_obj))
+			glDeleteLists(widgets[id].text_obj, 1);
+		if (glIsList(widgets[id].rect_obj))
+			glDeleteLists(widgets[id].rect_obj, 1);
 
-        widgets[id].type     = GUI_FREE;
-        widgets[id].text_img = 0;
-        widgets[id].text_obj = 0;
-        widgets[id].rect_obj = 0;
-        widgets[id].cdr      = 0;
-        widgets[id].car      = 0;
-    }
+		widgets[id].type     = GUI_FREE;
+		widgets[id].text_img = 0;
+		widgets[id].text_obj = 0;
+		widgets[id].rect_obj = 0;
+		widgets[id].cdr      = 0;
+		widgets[id].car      = 0;
+	}
 
-    /* Release all digit textures and display lists. */
+	/* Release all digit textures and display lists. */
 
-    for (i = 0; i < 3; i++)
-        for (j = 0; j < 11; j++)
-        {
-            if (glIsTexture(digit_text[i][j]))
-                glDeleteTextures(1, &digit_text[i][j]);
+	for (i = 0; i < 3; i++)
+		for (j = 0; j < 11; j++)
+		{
+			if (glIsTexture(digit_text[i][j]))
+				glDeleteTextures(1, &digit_text[i][j]);
 
-            if (glIsList(digit_list[i][j]))
-                glDeleteLists(digit_list[i][j], 1);
-        }
+			if (glIsList(digit_list[i][j]))
+				glDeleteLists(digit_list[i][j], 1);
+		}
 
-    /* Release all loaded fonts and finalize font rendering. */
+	/* Release all loaded fonts and finalize font rendering. */
 
-    if (font[GUI_LRG]) TTF_CloseFont(font[GUI_LRG]);
-    if (font[GUI_MED]) TTF_CloseFont(font[GUI_MED]);
-    if (font[GUI_SML]) TTF_CloseFont(font[GUI_SML]);
+	if (font[GUI_LRG]) TTF_CloseFont(font[GUI_LRG]);
+	if (font[GUI_MED]) TTF_CloseFont(font[GUI_MED]);
+	if (font[GUI_SML]) TTF_CloseFont(font[GUI_SML]);
 
-    TTF_Quit();
+	TTF_Quit();
 }
 
 
 
 int WidgetSet::hot(int id)
 {
-    return (widgets[id].type & GUI_STATE);
+	return (widgets[id].type & GUI_STATE);
 }
 
 
@@ -167,45 +167,45 @@ int WidgetSet::hot(int id)
 
 GLuint WidgetSet::list(int x, int y, int w, int h, const float *c0, const float *c1)
 {
-    GLuint list = glGenLists(1);
+	GLuint list = glGenLists(1);
 
-    GLfloat s0, t0;
-    GLfloat s1, t1;
+	GLfloat s0, t0;
+	GLfloat s1, t1;
 
-    int W, H, d = h / 16;
+	int W, H, d = h / 16;
 
-    /* Assume the applied texture size is rect size rounded to power-of-two. */
+	/* Assume the applied texture size is rect size rounded to power-of-two. */
 
-    image_size(&W, &H, w, h);
+	image_size(&W, &H, w, h);
 
-    s0 = 0.5f * (W - w) / W;
-    t0 = 0.5f * (H - h) / H;
-    s1 = 1.0f - s0;
-    t1 = 1.0f - t0;
+	s0 = 0.5f * (W - w) / W;
+	t0 = 0.5f * (H - h) / H;
+	s1 = 1.0f - s0;
+	t1 = 1.0f - t0;
 
-    glNewList(list, GL_COMPILE);
-    {
-        glBegin(GL_QUADS);
-        {
-            glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-            glTexCoord2f(s0, t1); glVertex2i(x     + d, y     - d);
-            glTexCoord2f(s1, t1); glVertex2i(x + w + d, y     - d);
-            glTexCoord2f(s1, t0); glVertex2i(x + w + d, y + h - d);
-            glTexCoord2f(s0, t0); glVertex2i(x     + d, y + h - d);
+	glNewList(list, GL_COMPILE);
+	{
+		glBegin(GL_QUADS);
+		{
+			glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+			glTexCoord2f(s0, t1); glVertex2i(x     + d, y     - d);
+			glTexCoord2f(s1, t1); glVertex2i(x + w + d, y     - d);
+			glTexCoord2f(s1, t0); glVertex2i(x + w + d, y + h - d);
+			glTexCoord2f(s0, t0); glVertex2i(x     + d, y + h - d);
 
-            glColor4fv(c0);
-            glTexCoord2f(s0, t1); glVertex2i(x,     y);
-            glTexCoord2f(s1, t1); glVertex2i(x + w, y);
+			glColor4fv(c0);
+			glTexCoord2f(s0, t1); glVertex2i(x,     y);
+			glTexCoord2f(s1, t1); glVertex2i(x + w, y);
 
-            glColor4fv(c1);
-            glTexCoord2f(s1, t0); glVertex2i(x + w, y + h);
-            glTexCoord2f(s0, t0); glVertex2i(x,     y + h);
-        }
-        glEnd();
-    }
-    glEndList();
+			glColor4fv(c1);
+			glTexCoord2f(s1, t0); glVertex2i(x + w, y + h);
+			glTexCoord2f(s0, t0); glVertex2i(x,     y + h);
+		}
+		glEnd();
+	}
+	glEndList();
 
-    return list;
+	return list;
 }
 
 
@@ -1375,28 +1375,28 @@ void WidgetSet::toggle(int id)
 
 int WidgetSet::vert_test(int id, int jd)
 {
-    /* Determine whether widget id is in vertical contact with widget jd. */
+	/* Determine whether widget id is in vertical contact with widget jd. */
 
-    if (id && hot(id) && jd && hot(jd))
-    {
-        int i0 = widgets[id].x;
-        int i1 = widgets[id].x + widgets[id].w;
-        int j0 = widgets[jd].x;
-        int j1 = widgets[jd].x + widgets[jd].w;
+	if (id && hot(id) && jd && hot(jd))
+	{
+		int i0 = widgets[id].x;
+		int i1 = widgets[id].x + widgets[id].w;
+		int j0 = widgets[jd].x;
+		int j1 = widgets[jd].x + widgets[jd].w;
 
-        /* Is widget id's top edge is in contact with jd's bottom edge? */
+		/* Is widget id's top edge is in contact with jd's bottom edge? */
 
-        if (widgets[id].y + widgets[id].h == widgets[jd].y)
-        {
-            /* Do widgets id and jd overlap horizontally? */
+		if (widgets[id].y + widgets[id].h == widgets[jd].y)
+		{
+			/* Do widgets id and jd overlap horizontally? */
 
-            if (j0 <= i0 && i0 <  j1) return 1;
-            if (j0 <  i1 && i1 <= j1) return 1;
-            if (i0 <= j0 && j0 <  i1) return 1;
-            if (i0 <  j1 && j1 <= i1) return 1;
-        }
-    }
-    return 0;
+			if (j0 <= i0 && i0 <  j1) return 1;
+			if (j0 <  i1 && i1 <= j1) return 1;
+			if (i0 <= j0 && j0 <  i1) return 1;
+			if (i0 <  j1 && j1 <= i1) return 1;
+		}
+	}
+	return 0;
 }
 
 int WidgetSet::horz_test(int id, int jd)
@@ -1461,18 +1461,18 @@ int WidgetSet::stick_R(int id, int dd)
 
 int WidgetSet::stick_D(int id, int dd)
 {
-    int jd, kd;
+	int jd, kd;
 
-    /* Find a widget below widget dd. */
+	/* Find a widget below widget dd. */
 
-    if (vert_test(id, dd))
-        return id;
+	if (vert_test(id, dd))
+		return id;
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
-        if ((kd = stick_D(jd, dd)))
-            return kd;
+	for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+		if ((kd = stick_D(jd, dd)))
+			return kd;
 
-    return 0;
+	return 0;
 }
 
 int WidgetSet::stick_U(int id, int dd)
@@ -1502,15 +1502,16 @@ int WidgetSet::stick(int id, int x, int y)
     int jd = 0;
 
     /* Find a new active widget in the direction of joystick motion. */
-
-    if (x && -JOY_MID <= x && x <= +JOY_MID)
+    /* Reset flag when x is 0 to support digital sticks/pads */
+    if (!x || -JOY_MID <= x && x <= +JOY_MID)
         xflag = 1;
     else if (x < -JOY_MID && xflag && (jd = stick_L(id, active)))
         xflag = 0;
     else if (x > +JOY_MID && xflag && (jd = stick_R(id, active)))
         xflag = 0;
 
-    if (y && -JOY_MID <= y && y <= +JOY_MID)
+    /* Reset flag when y is 0 to support digital sticks/pads */
+    if (!y || -JOY_MID <= y && y <= +JOY_MID)
         yflag = 1;
     else if (y < -JOY_MID && yflag && (jd = stick_U(id, active)))
         yflag = 0;

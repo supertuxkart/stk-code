@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.18 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.19 2004/08/22 22:22:58 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,53 +32,57 @@
 CharSel::CharSel(int whichPlayer):
 playerIndex(whichPlayer)
 {
-  current_kart = -1;
-  switch_to_character(0);
+	current_kart = -1;
+	switch_to_character(3);
 
-  context = new ssgContext;
+	context = new ssgContext;
 
-  menu_id = widgetSet -> vstack(0);
-  char output[60];
-  sprintf(output, "Player %d, choose your character", playerIndex + 1);
-  widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
-  widgetSet -> space(menu_id);
-        
-  int ha = widgetSet -> harray(menu_id);
-  widgetSet -> filler(ha);
-  int va = widgetSet -> varray(ha);
+	menu_id = widgetSet -> vstack(0);
+	char output[60];
+	sprintf(output, "Player %d, choose your character", playerIndex + 1);
+	widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
+	widgetSet -> space(menu_id);
 
-  int icon_size = 64;
+	int ha = widgetSet -> harray(menu_id);
+	widgetSet -> filler(ha);
+	int va = widgetSet -> varray(ha);
 
-  int row1 = widgetSet -> harray(va);
-  for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
-    {
-      //widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-      int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
-      widgetSet -> activate_widget(c, i, 0);
-    }
-  if (0)
-    {
-      int row2 = widgetSet -> harray(va);
-      for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
-        {
-          //widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-          // FIXME: images needs to be 'clickable'
-          int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
-          widgetSet -> activate_widget(c, i, 0);
-        }
-      for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
-        {
-          //widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-          int c = widgetSet -> image(row2, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
-          widgetSet -> activate_widget(c, i, 0);
-        }
-    }
+	int icon_size = 64;
 
-  widgetSet -> filler(ha);
+	int row1 = widgetSet -> harray(va);
+	for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
+	{
+		//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+		int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+		widgetSet -> activate_widget(c, i, 0);
+	}
 
-  widgetSet -> layout(menu_id, 0, 1);
+	if (0)
+	{
+		int row2 = widgetSet -> harray(va);
+		for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
+		{
+			//widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+			// FIXME: images needs to be 'clickable'
+			int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+			widgetSet -> activate_widget(c, i, 0);
+		}
+		for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
+		{
+			//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+			int c = widgetSet -> image(row2, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+			widgetSet -> activate_widget(c, i, 0);
+		}
+	}
 
-  clock = 0;
+
+	widgetSet -> filler(ha);
+
+	widgetSet -> layout(menu_id, 0, 1);
+
+	clock = 0;
+	//test
+
 }
 
 CharSel::~CharSel()
@@ -88,55 +92,55 @@ CharSel::~CharSel()
 
 void CharSel::switch_to_character(int n)
 {
-        if (current_kart != n && n >= 0 && n < int(kart_manager.karts.size()))
-        {
-                current_kart = n;
-                kart = new ssgTransform;
-                kart->ref();
-                ssgEntity* kartentity = kart_manager.karts[n].getModel();
+	if (current_kart != n && n >= 0 && n < int(kart_manager.karts.size()))
+	{
+		current_kart = n;
+		kart = new ssgTransform;
+		kart->ref();
+		ssgEntity* kartentity = kart_manager.karts[n].getModel();
 
-                kart->addKid(kartentity);
+		kart->addKid(kartentity);
 
-                preProcessObj ( kart, 0 );
-        }
+		preProcessObj ( kart, 0 );
+	}
 }
 	
 void CharSel::update(float dt)
 {
-        clock += dt * 40.0f;
+	clock += dt * 40.0f;
 
-        widgetSet -> timer(menu_id, dt) ;
+	widgetSet -> timer(menu_id, dt) ;
 	widgetSet -> paint(menu_id) ;
 
-        switch_to_character(widgetSet->token(widgetSet->click()));
+	switch_to_character(widgetSet->token(widgetSet->click()));
 
-        if (kart)
-        {
-                glClear(GL_DEPTH_BUFFER_BIT);
-                // FIXME: A bit hackish...
-                glViewport ( 0, 0, 800, 320);
+	if (kart)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+		// FIXME: A bit hackish...
+		glViewport ( 0, 0, 800, 320);
 
-                //context -> ref();
-                context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
-                context -> setNearFar ( 0.05f, 1000.0f ) ;
+		//context -> ref();
+		context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
+		context -> setNearFar ( 0.05f, 1000.0f ) ;
 
-                sgCoord cam_pos;
-                sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
-                context -> setCamera ( &cam_pos ) ;
+		sgCoord cam_pos;
+		sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+		context -> setCamera ( &cam_pos ) ;
 
 		glEnable (GL_DEPTH_TEST);
-                context -> makeCurrent () ;
-                sgCoord trans;
-                sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
-                kart->setTransform (&trans) ;
-                //glShadeModel(GL_SMOOTH);
-                ssgCullAndDraw ( kart ) ;
-                
-                glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
+		context -> makeCurrent () ;
+		sgCoord trans;
+		sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
+		kart->setTransform (&trans) ;
+		//glShadeModel(GL_SMOOTH);
+		ssgCullAndDraw ( kart ) ;
+
+		glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 
 		glDisable (GL_DEPTH_TEST);
-                //delete context;
-        }
+		//delete context;
+	}
 }
 
 void CharSel::select()
@@ -180,9 +184,9 @@ void CharSel::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
-	case SDLK_LEFT:    
-	case SDLK_RIGHT:    
-	case SDLK_UP:    
+	case SDLK_LEFT:
+	case SDLK_RIGHT:
+	case SDLK_UP:
 	case SDLK_DOWN:
 		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
 		break;

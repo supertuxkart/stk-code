@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.7 2004/08/20 18:29:46 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.8 2004/08/22 22:22:58 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -81,25 +81,25 @@ const GLfloat gui_gry[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
 
 struct Widget
 {
-    int     type;
-    int     token;
-    int     value;
-    int     size;
-    int     rect;
+	int     type;
+	int     token;
+	int     value;
+	int     size;
+	int     rect;
 
-    int     x, y;
-    int     w, h;
-    int     car;
-    int     cdr;
+	int     x, y;
+	int     w, h;
+	int     car;
+	int     cdr;
 
-    GLuint  text_img;
-    GLuint  text_obj;
-    GLuint  rect_obj;
+	GLuint  text_img;
+	GLuint  text_obj;
+	GLuint  rect_obj;
 
-    const GLfloat *color0;
-    const GLfloat *color1;
+	const GLfloat *color0;
+	const GLfloat *color1;
 
-    GLfloat  scale;
+	GLfloat  scale;
 };
 
 class WidgetSet
