@@ -109,14 +109,14 @@ void KartDriver::doObjectInteractions ()
           {
             case 0 : attach ( ATTACH_PARACHUTE, 4.0f ) ;
 
-                     if ( this == kart[0] )
-                       sound -> playSfx ( SOUND_SHOOMF ) ;
+                     // if ( this == kart[0] )
+                     //   sound -> playSfx ( SOUND_SHOOMF ) ;
                      break ;
 
             case 1 : attach ( ATTACH_ANVIL, 2.0f ) ;
 
-                     if ( this == kart[0] )
-                       sound -> playSfx ( SOUND_SHOOMF ) ;
+                     // if ( this == kart[0] )
+                     //   sound -> playSfx ( SOUND_SHOOMF ) ;
                      break ;
           }
           break ;

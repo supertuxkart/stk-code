@@ -500,10 +500,10 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   sgVec3 red    = { 0.8, 0.0, 0.0 } ;
   sgVec3 green  = { 0.0, 0.8, 0.0 } ;
  
-  silver_h  = new Herring ( cyan   ) ;
-  gold_h    = new Herring ( yellow ) ;
-  red_h     = new Herring ( red    ) ;
-  green_h   = new Herring ( green  ) ;
+  silver_h  = new Herring ( cyan   ) ; flipObj ( silver_h -> getRoot() ) ;
+  gold_h    = new Herring ( yellow ) ; flipObj ( gold_h -> getRoot() ) ;
+  red_h     = new Herring ( red    ) ; flipObj ( red_h -> getRoot() ) ;
+  green_h   = new Herring ( green  ) ; flipObj ( green_h -> getRoot() ) ;
 
   /* Load the Karts */
 
