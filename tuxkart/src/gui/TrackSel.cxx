@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.27 2004/09/24 18:27:26 matzebraun Exp $
+//  $Id: TrackSel.cxx,v 1.28 2004/09/26 19:00:08 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -62,30 +62,27 @@ TrackSel::~TrackSel()
 	
 void TrackSel::update(float dt)
 {
-	
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
+  widgetSet -> timer(menu_id, dt) ;
+  widgetSet -> paint(menu_id) ;
 
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
-		if( widgetSet -> token (widgetSet -> click()) != MENU_RETURN ) {
-			const Track* track
-                          = track_manager->getTrack(widgetSet->token (widgetSet -> click()));
+  {
+  glClear(GL_DEPTH_BUFFER_BIT);
+  if( widgetSet -> token (widgetSet -> click()) != MENU_RETURN )
+    {
 
-			float x     = 0.5f;
-			float y     = 0.0f;
-			float scale = .003f;
+    // draw a track preview of the currently highlighted track menu entry
+    const Track* track =
+          track_manager->getTrack(widgetSet->token (widgetSet -> click()));
 
-			glBegin ( GL_LINE_LOOP ) ;
-			for ( size_t i = 0 ;
-                            i < track->driveline.size() ; ++i )
-			{
-                          glVertex2f ( x + ( track->driveline[i][0] ) * scale,
-                              y + ( track->driveline[i][1] ) * scale ) ;
-			}
-			glEnd () ;
-		}
-	}
+    // preview's map color
+    glColor3f ( 1, 1, 1 ) ;
+
+    // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
+    // NOTE: it's weird that these values do not fit at all with the glOrtho()
+    track->draw2Dview(0.0, -0.7,
+                      1.0, 0.3, true);  // (x, y, w, h, stretch)
+    }
+  }
 }
 
 void TrackSel::select()
