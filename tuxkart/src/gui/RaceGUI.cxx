@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.32 2004/09/01 21:45:46 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.33 2004/09/01 22:15:11 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,6 +30,7 @@
 #include "../widget_image.h"
 #include "Loader.h"
 #include "RaceSetup.h"
+#include <iostream>
 
 RaceGUI::RaceGUI():
 herringbones_gst(NULL),
@@ -72,7 +73,10 @@ next_string(0)
 RaceGUI::~RaceGUI()
 {
 	widgetSet -> delete_widget(fps_id) ;
-	
+
+	for(FontsCache::iterator i = fonts_cache.begin(); i != fonts_cache.end(); ++i)
+		TTF_CloseFont(i->second);
+
 	//FIXME: does all that material stuff need freeing somehow?
 }
 	
@@ -185,13 +189,24 @@ void RaceGUI::stPrintf ( char *fmt, ... )
 
 void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, int blue )
 {
-  // FIXME: instead of always loading a font, we could make a cache system
-  std::string path = loader->getPath(GUI_FACE);
-  TTF_Font* font = TTF_OpenFont(path.c_str(), sz);
+  /** This is a chache system to avoid TTF_Font calls.
+      Though I dunno if this is really needed, since I dunno how expensive
+      such call is. */
+  if(fonts_cache.find(sz) == fonts_cache.end()) // font not yet cached
+    {
+#ifdef DEBUG
+    std::cout << "RaceGUI: Caching font size: " << sz << std::endl;
+#endif
+
+    std::string path = loader->getPath(GUI_FACE);
+    TTF_Font* font = TTF_OpenFont(path.c_str(), sz);  // freeing will be done on exit
+
+    fonts_cache[sz] = font;
+    }
 
   int w, h;
-  GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text, font);
-  TTF_CloseFont(font);
+  GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text,
+                                           fonts_cache.find(sz)->second);
 
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, gl_texture);
@@ -216,12 +231,21 @@ void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, i
 
 void RaceGUI::drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue )
 {
-  // FIXME: instead of always loading a font, we could make a cache system
-  std::string path = loader->getPath(GUI_FACE);
-  TTF_Font* font = TTF_OpenFont(path.c_str(), std::max(w, h));
+  int sz = std::max(w/2, h/2);
+  if(fonts_cache.find(sz) == fonts_cache.end()) // font not yet cached
+    {
+#ifdef DEBUG
+    std::cout << "RaceGUI: Caching font size: " << sz << std::endl;
+#endif
 
-  GLuint gl_texture = make_image_from_font(NULL, NULL, NULL, NULL, text, font);
-  TTF_CloseFont(font);
+    std::string path = loader->getPath(GUI_FACE);
+    TTF_Font* font = TTF_OpenFont(path.c_str(), sz);  // freeing will be done on exit
+
+    fonts_cache[sz] = font;
+    }
+
+  GLuint gl_texture = make_image_from_font(NULL, NULL, NULL, NULL, text,
+                                           fonts_cache.find(sz)->second);
 
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, gl_texture);
@@ -268,9 +292,9 @@ void RaceGUI::drawTimer ()
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
   sprintf ( str, "%3d:%02d\"%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( "Time:", 24, 500, 430 ) ;
-  drawStretchedText ( str, 460, 400, 620-460, 30, 255, 255, 255 ) ;
-//  drawDropShadowText ( str,     25, 480, 400 ) ;
+  drawDropShadowText ( "Time:", 28, 500, 430 ) ;
+  drawStretchedText ( str, 460, 400, 620-460, 30, 0, 0, 0 ) ;            // do the drop
+  drawStretchedText ( str, 460, 400, 620-460+1, 30+1, 255, 255, 255 ) ;  // shadow effect
 }
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)

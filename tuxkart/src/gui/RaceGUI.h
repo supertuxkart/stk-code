@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.10 2004/09/01 21:45:46 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.11 2004/09/01 22:15:11 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,9 @@
 
 #include "BaseGUI.h"
 #include "material.h"
-#include <plib/fnt.h>
+//#include <plib/fnt.h>
+#include <SDL_ttf.h>
+#include <map>
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
@@ -85,6 +87,9 @@ private:
 	float tt[6] ;
 	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 	int  next_string ;
+
+	typedef std::map <int, TTF_Font*> FontsCache;
+	FontsCache fonts_cache;
 };
 
 #endif
