@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.19 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: World.cxx,v 1.20 2004/08/17 21:35:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -87,9 +87,6 @@ World::World(const RaceSetup& raceSetup_)
     }
   }
 #endif
-
-  initMaterials     () ;
-
   /* Set the SSG loader options */
 
   loader -> setCreateStateCallback  ( getAppState ) ;

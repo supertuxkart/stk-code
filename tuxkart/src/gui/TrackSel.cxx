@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.13 2004/08/17 21:01:18 grumbel Exp $
+//  $Id: TrackSel.cxx,v 1.14 2004/08/17 21:35:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,22 +32,21 @@ TrackSel::TrackSel(RaceSetup& raceSetup_)
 {
 	menu_id = widgetSet -> vstack(0);
 
-        int lb = widgetSet -> label(menu_id, "Chose a Track", GUI_MED, GUI_TOP, 0, 0);
-        widgetSet -> filler(lb);
-	//widgetSet -> space(menu_id);
+        widgetSet -> label(menu_id, "Chose a Track", GUI_LRG, GUI_TOP, 0, 0);
+	widgetSet -> space(menu_id);
         
         int ha = widgetSet -> harray(menu_id);
 
-        widgetSet -> filler(ha);
-        int va = widgetSet -> varray(ha);
+        int col1 = widgetSet -> varray(ha);
+        int col2 = widgetSet -> varray(ha);
 
-        widgetSet -> start(va, track_manager.tracks[0].name.c_str(),  GUI_SML, 0, 0);
-        for (unsigned int i = 1; i != track_manager.tracks.size(); ++i)
-                widgetSet -> state(va, track_manager.tracks[i].name.c_str(),  GUI_SML, i, 0);
-		
-        widgetSet -> filler(ha);
+        for (unsigned int i = 0; i != track_manager.tracks.size()/2; ++i)
+                widgetSet -> state(col1, track_manager.tracks[i].name.c_str(),  GUI_SML, i, 0);
 
-	widgetSet -> layout(menu_id, 0, -1);
+        for (unsigned int i = track_manager.tracks.size()/2; i != track_manager.tracks.size(); ++i)
+                widgetSet -> state(col2, track_manager.tracks[i].name.c_str(),  GUI_SML, i, 0);
+        
+	widgetSet -> layout(menu_id, 0, 1);
 }
 
 TrackSel::~TrackSel()

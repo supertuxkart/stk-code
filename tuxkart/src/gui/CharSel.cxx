@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.10 2004/08/17 21:01:18 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.11 2004/08/17 21:35:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -108,6 +108,7 @@ void CharSel::update(float dt)
                 sgCoord trans;
                 sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
                 kart->setTransform (&trans) ;
+                //glShadeModel(GL_SMOOTH);
                 ssgCullAndDraw ( kart ) ;
                 
                 glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
