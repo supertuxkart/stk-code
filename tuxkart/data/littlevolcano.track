@@ -1,7 +1,7 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Little Vulcano")
+ (name "Little Volcano")
  (use-fog      #t)
  (sky-color    0.45 0.0 0.0 0.0)
  (fog-color    0.45 0.0 0.0 0.0)
