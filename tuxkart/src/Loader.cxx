@@ -56,6 +56,24 @@ Loader::addSearchPath(const std::string& path)
     searchPath.push_back(path);
 }
 
+void
+Loader::initConfigDir()
+{
+#ifdef WIN32
+	/*nothing*/
+#else
+	/*if HOME environment variable exists
+	create directory $HOME/.tuxkart*/
+	if(getenv("HOME")!=NULL)
+	{
+		char *pathname = new char[strlen(getenv("HOME")) + strlen("/.tuxkart")];
+		sprintf(pathname, "%s/.tuxkart", getenv("HOME"));
+		mkdir(pathname, 0755);
+		delete pathname;
+	}
+#endif
+}
+
 std::string
 Loader::getPath(const std::string& fname) const
 {

@@ -15,6 +15,8 @@ tuxkart_SOURCES = \
   AutoDriver.cxx  \
   Camera.cxx  \
   Camera.h  \
+  Config.cxx  \
+  Config.h  \
   CupData.h \
   CupData.cxx \
   Driver.cxx  \

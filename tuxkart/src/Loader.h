@@ -20,6 +20,7 @@ public:
         const;
 
     void addSearchPath(const std::string& path);
+    void initConfigDir();
 
 private:
     void make_path(char* path, const char* dir, const char* fname) const;

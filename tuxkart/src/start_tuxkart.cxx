@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.71 2004/08/22 18:54:59 evilynux Exp $
+//  $Id: start_tuxkart.cxx,v 1.72 2004/08/23 18:34:23 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,6 +36,7 @@
 #include "material.h"
 #include "KartManager.h"
 #include "StartScreen.h"
+#include "Config.h"
 
 /***********************************\
 *                                   *
@@ -50,7 +51,10 @@ static void loadDataDir()
   loader = new Loader();
   loader->setModelDir("models");
   loader->setTextureDir("images");
-    
+
+  /*create $HOME/.tuxkart if necessary*/
+  loader->initConfigDir();
+
   /* initialize search path of the loader */
   if ( getenv ( "TUXKART_DATADIR" ) != NULL )
     loader->addSearchPath(getenv ( "TUXKART_DATADIR" )) ;
@@ -91,7 +95,10 @@ void deinitTuxKart()
 		delete widgetSet;
 
 	shutdownVideo ();
-  
+
+	/*write configuration to disk*/
+	config.saveConfig();
+
 	exit (0);
 }
 
@@ -116,8 +123,9 @@ void cmdLineHelp (char* invocation)
 	    "  --reverse               Enable reverse mode\n"
 	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  -f,  --fullscreen       Fullscreen display.\n"
+	    "  -w,  --windowed         Windowed display. (default)\n"
 	    "  -s,  --screensize WIDTHxHEIGHT\n"
-            "                          Set the screen size (e.g. 320x200)\n"
+	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
@@ -128,13 +136,13 @@ void cmdLineHelp (char* invocation)
 
 int main ( int argc, char *argv[] )
 {
-  /* Default values */
-  int  width  = 800;
-  int  height = 600;
-  bool fullscreen   = false;
+
   bool noStartScreen = false;
   RaceSetup raceSetup;
-    
+
+	/*load options from configuration file*/
+	config.loadConfig();
+
   /* Testing if we've given arguments */
   if ( argc > 1) 
     {
@@ -248,13 +256,18 @@ int main ( int argc, char *argv[] )
 
 	  else if ( !strcmp(argv[i], "--fullscreen") or !strcmp(argv[i], "-f"))
 	    {
-              fullscreen = true;
+             config.fullscreen = true;
+	    }
+
+	  else if ( !strcmp(argv[i], "--windowed") or !strcmp(argv[i], "-w"))
+	    {
+              config.fullscreen = false;
 	    }
 
 	  else if ( !strcmp(argv[i], "--screensize") or !strcmp(argv[i], "-s") )
 	    {
-	      if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
-                fprintf ( stdout, "You choose to be in %dx%d.\n", width, height );
+	      if (sscanf(argv[i+1], "%dx%d", &config.width, &config.height) == 2)
+                fprintf ( stdout, "You choose to be in %dx%d.\n", config.width, config.height );
               else
                 {
                   fprintf ( stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
@@ -279,8 +292,8 @@ int main ( int argc, char *argv[] )
     }
 
   try {
-    initTuxKart ( width,  height, fullscreen );
-    initMaterials     () ;
+    initTuxKart ( config.width, config.height, config.fullscreen );
+    initMaterials () ;
 
     /* Set the SSG loader options */
     loader -> setCreateStateCallback  ( getAppState ) ;
