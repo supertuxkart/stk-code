@@ -1,4 +1,4 @@
-//  $Id: guNet.cxx,v 1.7 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: guNet.cxx,v 1.8 2004/08/01 14:17:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,14 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if defined(WIN32)
- #if defined(__CYGWIN__)
-  #include <unistd.h>
- #endif
  #include <windows.h>
- #if defined(_MSC_VER)
-  #include <io.h>
-  #include <direct.h>
- #endif
+ #include <io.h>
+ #include <direct.h>
 #else
  #include <unistd.h>
 #endif
@@ -37,15 +32,13 @@
 
 #include <string.h>
 #include <sys/types.h>
-#if defined(_MSC_VER)
+#if defined(WIN32)
  #include <winsock.h>
 #else
  #include <sys/socket.h>
  #include <sys/param.h>
  #include <netinet/in.h>
- #ifndef __CYGWIN__
-  #include <netinet/tcp.h>
- #endif
+ #include <netinet/tcp.h>
  #include <netdb.h>
  #include <sys/uio.h>
  #include <arpa/inet.h>

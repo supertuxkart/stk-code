@@ -1,4 +1,4 @@
-//  $Id: pwdrv.cxx,v 1.4 2004/08/01 14:05:07 grumbel Exp $
+//  $Id: pwdrv.cxx,v 1.5 2004/08/01 14:17:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,10 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pu.h>
-#include "status.h" 
 #include "pwdrv.h"
 #include "tuxkart.h"
+#include "status.h"
+#include <plib/pu.h>
 
 static int width  = 800 ;
 static int height = 600 ;

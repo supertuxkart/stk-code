@@ -1,4 +1,4 @@
-//  $Id: utils.cxx,v 1.3 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: utils.cxx,v 1.4 2004/08/01 14:17:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,7 +38,7 @@ void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm )
 
 bool canAccess ( char *fname )
 {
-#ifdef _MSC_VER
+#ifdef WIN32 
   return _access ( fname, 04 ) == 0 ;
 #else
   return access ( fname, F_OK ) == 0 ;
@@ -48,7 +48,7 @@ bool canAccess ( char *fname )
 
 bool chDir ( char *dir )
 {
-#ifdef _MSC_VER
+#ifdef WIN32 
   return _chdir ( dir ) == -1 ;
 #else
   return chdir ( dir ) == -1 ;
@@ -58,7 +58,7 @@ bool chDir ( char *dir )
 
 void secondSleep ( int s )
 {
-#ifdef _MSC_VER
+#ifdef WIN32 
   Sleep ( 1000 * s ) ;
 #else
   sleep ( s ) ;
