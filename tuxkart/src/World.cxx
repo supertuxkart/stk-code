@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.35 2004/09/24 18:41:26 matzebraun Exp $
+//  $Id: World.cxx,v 1.36 2004/09/24 18:46:35 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,6 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include "guNet.h"
 #include "preprocessor.h"
 #include "Explosion.h"
 #include "Herring.h"
