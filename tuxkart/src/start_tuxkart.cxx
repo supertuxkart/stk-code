@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.36 2004/08/02 14:21:18 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.37 2004/08/02 17:07:10 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -320,6 +320,8 @@ static void initTuxKart (int width, int height, int videoFlags)
 static void startScreen ( int nbrLaps, int mirror, int reverse,
 			  int track, int nbrPlayers )
 {
+  (void)mirror;
+
   /* Create all of the GUI elements */
 
   playButton = new puButton      ( 10, 10, 150, 50  ) ;
