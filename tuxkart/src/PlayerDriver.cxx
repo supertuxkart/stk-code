@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.22 2004/08/26 23:01:25 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.23 2004/08/26 23:08:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -89,6 +89,11 @@ PlayerDriver::incomingJoystick  (JoyInfo& ji)
     std::cout << "Camera: use replay cam" << std::endl;
     WorldScreen::current()->getCamera(0)->setMode(Camera::CM_SIMPLE_REPLAY);
     use_fake_drift = false;
+  }
+  else if ( keyState [ SDLK_0 ] ) {
+    std::cout << "Camera: use closeup" << std::endl;
+    WorldScreen::current()->getCamera(0)->setMode(Camera::CM_CLOSEUP);
+    use_fake_drift = true;
   }
 
   if ( keyState [ SDLK_PLUS ] ) {

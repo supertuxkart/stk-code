@@ -1,4 +1,4 @@
-//  $Id: Camera.h,v 1.8 2004/08/26 23:01:25 grumbel Exp $
+//  $Id: Camera.h,v 1.9 2004/08/26 23:08:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,7 @@ class Camera
 public:
   enum Mode { 
     CM_NORMAL, 
+    CM_CLOSEUP, 
     CM_NO_FAKE_DRIFT,
     CM_SIMPLE_REPLAY
   }; 
