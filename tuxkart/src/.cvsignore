@@ -1,2 +1,6 @@
-.deps/
+.deps
+Makefile
+Makefile.in
+tuxkart
+tuxkart.exe
 
