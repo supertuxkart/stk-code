@@ -273,10 +273,11 @@ static void loadTrackList ()
   fclose ( fd ) ;
 }
 
-/* Initialize the datadir, tracklist and plib stuff */
-static void initTuxKart (int noBorder)
+
+/* Initialize the datadir */
+static void loadDataDir (int debug)
 {
-  /* Set tux_aqfh_datadir to the correct directory */
+  /* Set to the correct directory */
  
   if ( datadir == NULL )
   {
@@ -292,14 +293,21 @@ static void initTuxKart (int noBorder)
       datadir = TUXKART_DATADIR ;
   }
  
-  fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
+  if ( debug )
+    fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
  
   if ( chDir ( datadir ) )
   {
     fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
     exit ( 1 ) ;
   }
+}
 
+
+/* Load the datadir, tracklist and plib stuff */
+static void initTuxKart (int noBorder)
+{
+  loadDataDir ( TRUE );
   loadTrackList () ;
 
   /* Initialise a bunch of PLIB library stuff */
@@ -383,38 +391,36 @@ static void startScreen ( int nbrLaps, int mirror, int reverse,
   splashMainLoop  () ;
 }
 
+
 void cmdLineHelp ()
 {
   fprintf ( stdout, 
 	    "Usage: tuxkart [--version] [--track n] [--nbrLaps n] [--nbrPlayers n]\n"
 	    "\t\t[--fullscreen|--screenMode n [--noBorder] [--noStartScreen]] \n"
-	    "\t\t[--reverse] [--mirror]\n"
-	    "\n"
+	    "\t\t[--reverse] [--mirror]\n\n"
+
 	    "Run TuxKart, a racing game with go-kart that features"
 	    " the well-known linux\nmascott Tux. The game is heavily"
-	    " inspired by Super-Mario-Kart and Wacky Wheels.\n"
-	    "\n"
+	    " inspired by Super-Mario-Kart and Wacky Wheels.\n\n"
+
 	    "Options:\n"
-	    "--noStartScreen\tQuick race.\n"
-	    "--track n\tStart at track number n. First track is 0.\n"
-	    "--nbrLaps n\tDefine number of laps to n.\n"
-	    "--nbrPlayers n\tDefine number of players to either 1, 2 or 4.\n"
-	    "--reverse\tEnable reverse mode.\n"
-	    "--mirror\tEnable mirror mode (when supported).\n"
-	    "--fullscreen\tFullscreen display (doesn't work with --screenMode).\n"
-	    "--noBorder\tDisable window borders/decorations.\n"
-	    "--screenMode n\tSet the screen mode to:\n"
-	    "\t\t 0: 320x240\t5: 960x720\n"
-	    "\t\t 1: 400x300\t6: 1024x768\n"
-	    "\t\t 2: 512x384\t7: 1152x864\n"
-	    "\t\t 3: 640x480\t8: 1280x1024\n"
-	    "\t\t 4: 800x600\n"
-	    "--version\tShow version.\n"
+	    "--noStartScreen"  "\t\tQuick race.\n"
+	    "--track n"        "\t\tStart at track number n (see --listTracks).\n"
+	    "--listTracks"     "\t\tShow available tracks.\n"
+	    "--nbrLaps n"      "\t\tDefine number of laps to n.\n"
+	    "--nbrPlayers n"   "\t\tDefine number of players to either 1, 2 or 4.\n"
+	    "--reverse"        "\t\tEnable reverse mode.\n"
+	    "--mirror"         "\t\tEnable mirror mode (when supported).\n"
+	    "--fullscreen"     "\t\tFullscreen display (doesn't work with --screenMode).\n"
+	    "--noBorder"       "\t\tDisable window borders/decorations.\n"
+	    "--resolution X Y" "\tSet the screen resolution (e.g. 320 200).\n"
+	    "--version"        "\t\tShow version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
 	    "http://tuxkart.sourceforge.net\n\n"
 	    );
 }
+
 
 int main ( int argc, char *argv[] )
 {
@@ -457,6 +463,22 @@ int main ( int argc, char *argv[] )
 		}
 
 	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+	    }
+
+	  else if( !strcmp(argv[i], "--listTracks") )
+	    {
+	      loadDataDir ( FALSE );
+	      loadTrackList () ;
+
+	      fprintf ( stdout, "  Available tracks:\n" );
+	      for (int i = 0; i < MAX_TRACKS; i++)
+		{
+		  if ( trackNames[i] != '\0' )
+		       fprintf ( stdout, "\t%d: %s", i, trackNames[i] );
+		}
+	      fprintf ( stdout, "\n" );
+
+	      return 0;
 	    }
 
 	  else if ( !strcmp(argv[i], "--noStartScreen") )
@@ -507,59 +529,17 @@ int main ( int argc, char *argv[] )
 	      width = -1;
 	      height = -1;
 	      noBorder = TRUE;
-	      // We can't switch to fullscreen after having shown the StartScreen
+	      // Needs some thinking, borders can't be switched on and off.
 	      noStartScreen = TRUE;
 	    }
 
-	  else if ( !strcmp(argv[i], "--screenMode") and argc > 2 )
+	  else if ( !strcmp(argv[i], "--resolution") and argc > 3 )
 	    {
-	      switch (atoi(argv[i+1]))
-		{
-		case 0:
-		  width = 320;
-		  height = 240;
-		  break;
-		case 1:
-		  width = 400;
-		  height = 300;
-		  break;
-		case 2:
-		  width = 512;
-		  height = 384;
-		  break;
-		case 3:
-		  width = 640;
-		  height = 480;
-		  break;
-		case 4:
-		  width = 800;
-		  height = 600;
-		  break;
-		case 5:
-		  width = 960;
-		  height = 720;
-		  break;
-		case 6:
-		  width = 1024;
-		  height = 768;
-		  break;
-		case 7:
-		  width = 1152;
-		  height = 864;
-		  break;
-		case 8:
-		  width = 1280;
-		  height = 1024;
-		  break;
-		default:
-		  fprintf ( stderr,
-			    "You choose an invalid screen mode: %s.\n",
-			     argv[i+1]);
-		  cmdLineHelp();
-		  return 0;
-		  break;
-		}
-	      fprintf ( stdout, "You choose to have screen mode %d.\n", atoi(argv[i+1]) ) ;
+	      width = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
+	      height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
+
+	      fprintf ( stdout, "You choose to be in %dx%d.\n",
+			atoi(argv[i+1]), atoi(argv[i+2]) ) ;
 	    }
 
 	  else if ( !strcmp(argv[i], "--noBorder") )

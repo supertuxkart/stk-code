@@ -1,3 +1,10 @@
+2004-07-21  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx (main):
+	- Modified --screenMode, became --resolution and gives more flexibility.
+	- Added --listTracks, shows available tracks.
+	(loadDataDir): - New function, was with graphical stuff.
+
 2004-07-20  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (cmdLineHelp): - Now has its own function.
