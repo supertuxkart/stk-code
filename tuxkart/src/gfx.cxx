@@ -8,41 +8,28 @@
 #include <sys/perm.h>                                                           
 #endif
 
-static unsigned int lastGLUTKeystroke = 0 ;
+static unsigned int lastKeystroke = 0 ;
 
 static char keyIsDown [ 512 ] ;
 
-static void getGLUTUpSpecialKeystroke ( int key, int, int )
+void keystroke ( int key, int updown, int, int )
 {
-  keyIsDown [ 256 + key ] = FALSE ;
+  if ( updown == PW_DOWN )
+    lastKeystroke = key ;
+
+  keyIsDown [ key ] = (updown == PW_DOWN) ;
 }
 
-static void getGLUTUpKeystroke ( unsigned char key, int, int )
-{
-  keyIsDown [ key ] = FALSE ;
-}
 
-static void getGLUTSpecialKeystroke ( int key, int, int )
-{
-  lastGLUTKeystroke = 256 + key ;
-  keyIsDown [ 256 + key ] = TRUE ;
-}
-
-static void getGLUTKeystroke ( unsigned char key, int, int )
-{
-  lastGLUTKeystroke = key ;
-  keyIsDown [ key ] = TRUE ;
-}
-
-int isGLUTKeyDown ( unsigned int k )
+int isKeyDown ( unsigned int k )
 {
   return keyIsDown [ k ] ;
 }
 
-int getGLUTKeystroke ()
+int getKeystroke ()
 {
-  int k = lastGLUTKeystroke ;
-  lastGLUTKeystroke = 0 ;
+  int k = lastKeystroke ;
+  lastKeystroke = 0 ;
   return k ;
 }
 
@@ -51,45 +38,11 @@ void reshape ( int w, int h )
   glViewport ( 0, 0, w, h ) ;
 }
 
-void idleFunc( void )
-{
-	glutPostRedisplay();
-}
-
-void initWindow ( int w, int h )
-{
-/*
-  Already done in start_tuxkart
-
-  int fake_argc = 1 ;
-  char *fake_argv[3] ;
-
-  for ( int i = 0 ; i < 512 ; i++ )
-    keyIsDown [ i ] = FALSE ;
-
-  fake_argv[0] = "Tux Kart" ;
-  fake_argv[1] = "Tux Kart by Steve Baker." ;
-  fake_argv[2] = NULL ;
-
-  glutInitWindowPosition ( 0, 0 ) ;
-  glutInitWindowSize     ( w, h ) ;
-  glutInit               ( &fake_argc, fake_argv ) ;
-  glutInitDisplayMode    ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH ) ;
-  glutCreateWindow       ( fake_argv[1] ) ;
-*/
-  glutDisplayFunc        ( tuxKartMainLoop ) ;
-  glutKeyboardFunc       ( getGLUTKeystroke ) ;
-  glutSpecialFunc        ( getGLUTSpecialKeystroke ) ;
-  glutKeyboardUpFunc     ( getGLUTUpKeystroke ) ;
-  glutSpecialUpFunc      ( getGLUTUpSpecialKeystroke ) ;
-  glutReshapeFunc        ( reshape ) ;
-  glutIdleFunc           ( idleFunc ) ;
-}
-
 
 GFX::GFX ()
 {
-  initWindow ( 640, 480 ) ;
+  for ( int i = 0 ; i < 512 ; i++ )
+    keyIsDown [ i ] = FALSE ;
 
 /*
   Already done in start_tuxkart
@@ -178,8 +131,7 @@ int stereoShift ()
 
 void GFX::done ()
 {
-  glutPostRedisplay () ;
-  glutSwapBuffers () ;
+  pwSwapBuffers () ;
   glBegin ( GL_POINTS ) ;
   glVertex3f ( 0, 0, 0 ) ;
   glEnd () ;

@@ -20,8 +20,11 @@ public:
 } ;
 
 
-int getGLUTKeystroke () ;
-int isGLUTKeyDown ( unsigned int k ) ;
+void motionfn ( int x, int y ) ;
+void  mousefn ( int button, int updown, int x, int y ) ;
+
+int getKeystroke () ;
+int isKeyDown ( unsigned int k ) ;
 
 extern fntTexFont *font ;
 

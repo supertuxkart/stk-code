@@ -17,8 +17,8 @@
 #endif
 #include <math.h>
 #include <signal.h>
-#include <GL/glut.h>
 
+#include <plib/pw.h>
 #include <plib/ssg.h>
 #include <plib/sl.h>
 #include <plib/js.h>

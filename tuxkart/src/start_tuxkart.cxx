@@ -43,8 +43,6 @@ static void switch_to_game ()
   trackButtons -> getValue ( & t ) ;
   nl = atoi ( numLapsText->getLegend () ) ;
 
-  glutWarpPointer ( 320, 240 ) ;
-
   puDeleteObject ( pleaseWaitButton ) ;
   puDeleteObject ( numLapsSlider ) ;
   puDeleteObject ( numLapsText   ) ;
@@ -58,51 +56,38 @@ static void switch_to_game ()
   tuxkart_main ( nl, track_idents[t] ) ;
 }
 
-/**************************************\
-*                                      *
-* These four functions capture mouse   *
-* and keystrokes (special and mundane) *
-* from GLUT and pass them on to PUI.   *
-*                                      *
-\**************************************/
+/*********************************\
+*                                 *
+* These functions capture mouse   *
+* and keystrokes and pass them on *
+* to PUI.                         *
+*                                 *
+\*********************************/
 
-static void specialfn ( int key, int, int )
+static void keyfn ( int key, int updown, int, int )
 {
-  puKeyboard ( key + PU_KEY_GLUT_SPECIAL_OFFSET, PU_DOWN ) ;
-  glutPostRedisplay () ;
-}
-
-static void keyfn ( unsigned char key, int, int )
-{
-  puKeyboard ( key, PU_DOWN ) ;
-  glutPostRedisplay () ;
+  puKeyboard ( key, updown ) ;
 }
 
 static void motionfn ( int x, int y )
 {
   puMouse ( x, y ) ;
-  glutPostRedisplay () ;
 }
 
 static void mousefn ( int button, int updown, int x, int y )
 {
   puMouse ( button, updown, x, y ) ;
-  glutPostRedisplay () ;
 }
 
 /***********************************\
 *                                   *
 * This function redisplays the PUI, *
-* flips the double buffer and then  *
-* asks GLUT to post a redisplay     *
-* command - so we re-render at      *
-* maximum rate.                     *
+* and flips the double buffer.      *
 *                                   *
 \***********************************/
 
 static void displayfn (void)
 {
-
   glMatrixMode   ( GL_PROJECTION ) ;
   glLoadIdentity () ;
   glMatrixMode   ( GL_MODELVIEW ) ;
@@ -131,8 +116,7 @@ static void displayfn (void)
   
   /* Off we go again... */
 
-  glutSwapBuffers   () ;
-  /* glutPostRedisplay () ; */
+  pwSwapBuffers   () ;
 
   if ( startup_counter > 0 )
   {
@@ -306,41 +290,12 @@ int main ( int argc, char **argv )
 
   loadTrackList () ;
 
-  int fake_argc = 1 ;
-  char *fake_argv[3] ;
- 
-  fake_argv[0] = "Tux Kart" ;
-  fake_argv[1] = "Tux Kart by Steve Baker." ;
-  fake_argv[2] = NULL ;
- 
-  glutInitWindowPosition ( 0, 0 ) ;
-  glutInitWindowSize     ( width, height ) ;
-  glutInit               ( &fake_argc, fake_argv ) ;
-  glutInitDisplayMode    ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH ) ;
-#ifndef WIN32
-  glutCreateWindow       ( fake_argv[1] ) ;
-#else
-  char game_mode_str[256];
-  sprintf( game_mode_str, "width=640 height=480 bpp=16" );
-  //glutGameModeString( game_mode_str );
-  glutEnterGameMode();
-#endif
+  pwInit ( 0, 0, width, height, FALSE, "Tux Kart by Steve Baker", TRUE, 0 ) ;
 
-  glutDisplayFunc       ( displayfn ) ;
-  glutKeyboardFunc      ( keyfn     ) ;
-  glutSpecialFunc       ( specialfn ) ;
-  glutMouseFunc         ( mousefn   ) ;
-  glutMotionFunc        ( motionfn  ) ;
-  glutPassiveMotionFunc ( motionfn  ) ;
-  glutIdleFunc          ( displayfn ) ;
+  pwSetCallbacks ( keyfn, mousefn, motionfn, NULL, NULL ) ;
 
   puInit () ;
   ssgInit () ;
-
-  if ( getenv ( "MESA_GLX_FX" ) != NULL )
-    puShowCursor () ;
-
-  glutWarpPointer ( 320, 240 ) ;
 
   fnt = new fntTexFont ;
   fnt -> load ( "fonts/sorority.txf" ) ;
@@ -374,14 +329,14 @@ int main ( int argc, char **argv )
   trackButtons -> setLabel ( "Which Track?" ) ;
   trackButtons -> setLabelPlace ( PUPLACE_ABOVE ) ;
   trackButtons -> setValue ( 0 ) ; 
-   
-   
-   
+
   install_material () ;
 
   signal ( 11, SIG_DFL ) ;
-  if (fullscreen){ glutFullScreen(); } 
-  glutMainLoop () ;
+
+  while ( 1 )
+    displayfn () ;
+
   return 0 ;
 }
 

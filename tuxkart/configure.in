@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/tuxkart.cxx)
-AM_INIT_AUTOMAKE(tuxkart, 0.2.0)
+AM_INIT_AUTOMAKE(tuxkart, 0.4.0)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -11,7 +11,7 @@ AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 
-plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibul"
+plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
 
 dnl Checks for library functions.
 dnl check for OpenGL related libraries
@@ -35,22 +35,7 @@ if test "x$ac_cv_header_windows_h" = "xno" ; then
     AC_CHECK_LIB(MesaGL, glNewList,,,$x_suffix)
   fi
 
-  AC_CHECK_LIB(GLU, gluLookAt,,,$x_suffix)
-
-  if test "x$ac_cv_lib_GLU_gluLookAt" = "xno" ; then
-    dnl if no GLU, check for MesaGLU
-    AC_CHECK_LIB(MesaGLU, gluLookAt,,,$x_suffix)
-  fi
-
   opengl_LIBS="$LIBS $x_suffix"
-
-  dnl check for glut
-  AC_CHECK_LIB(glut, glutGetModifiers,,,$opengl_LIBS)
-
-  if test "x$ac_cv_lib_glut_glutGetModifiers" = "xno" ; then
-    dnl if no GLUT, check for freeglut
-    AC_CHECK_LIB(freeglut, glutGetModifiers,,,$opengl_LIBS)
-  fi                                                                            
 
   LIBS="$plib_suffix $LIBS $x_suffix"
 
@@ -58,7 +43,7 @@ else
 
   dnl CygWin under Windoze.
 
-  LIBS="$plib_suffix $LIBS -lm -lwinmm -lglut32 -lglu32 -lopengl32 -luser32 -lgdi32"
+  LIBS="$plib_suffix $LIBS -lm -lwinmm -lopengl32 -luser32 -lgdi32"
 
 fi
 
@@ -77,7 +62,7 @@ dnl Checks for header files.
 
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glut.h)
+AC_CHECK_HEADERS(GL/gl.h)
 AC_CHECK_HEADER(windows.h, AC_DEFINE(WIN32))
 AC_CHECK_HEADER(joystick.h, AC_DEFINE(JOYSTICK_IS_PRESENT))
 AC_CHECK_HEADER(linux/joystick.h, AC_DEFINE(LINUX_JOYSTICK_IS_PRESENT))

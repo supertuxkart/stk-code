@@ -526,10 +526,10 @@ int tuxkart_main ( int num_laps, char *level_name )
   gfx   = new GFX ;
 
   sound = new SoundSystem ;
-/*
-  sound -> change_track ( "mods/mfarmer.mod" ) ;
-*/
+  // sound -> change_track ( "mods/Boom_boom_boom.mod" ) ;
   gui   = new GUI ;
+
+  pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
 
   ssgModelPath   ( "models" ) ;
   ssgTexturePath ( "images" ) ;
@@ -587,6 +587,9 @@ int tuxkart_main ( int num_laps, char *level_name )
 
   load_track ( trackb, fname ) ;
 
+fprintf ( stderr, "READY TO RACE!!\n" ) ;
+
+  tuxKartMainLoop () ;
   return TRUE ;
 }
 
@@ -622,8 +625,6 @@ void updateWorld ()
   for ( i = 0 ; i < num_karts ; i++ )
   {
     int p = 1 ;
-
-fprintf(stderr,"Kart %d Dist=%f\n", i, kart[i]->getDistanceDownTrack() ) ;
 
     for ( int j = 0 ; j < num_karts ; j++ )
     {
@@ -729,40 +730,42 @@ fprintf(stderr,"Kart %d Dist=%f\n", i, kart[i]->getDistanceDownTrack() ) ;
 
 void tuxKartMainLoop ()
 {
-
-  if ( ! gui -> isPaused () )
+  while ( 1 )
   {
-    fclock->update () ;
-  ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
-    updateWorld () ;
+    if ( ! gui -> isPaused () )
+    {
+      fclock->update () ;
+      ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
+      updateWorld () ;
 
-    for ( int i = 0 ; i < MAX_HERRING ; i++ )
-      if ( herring [ i ] . her != NULL )
-        herring [ i ] . update () ;
+      for ( int i = 0 ; i < MAX_HERRING ; i++ )
+        if ( herring [ i ] . her != NULL )
+          herring [ i ] . update () ;
 
-    silver_h -> update () ;
-    gold_h   -> update () ;
-    red_h    -> update () ;
-    green_h  -> update () ;
+      silver_h -> update () ;
+      gold_h   -> update () ;
+      red_h    -> update () ;
+      green_h  -> update () ;
 
-    update_hooks () ;
-  }
-  else
-  {
-  ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
-  ck2.update() ; tt[1] = ck2.getDeltaTime()*1000.0f ;
-  ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
-  ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
-  }
+      update_hooks () ;
+    }
+    else
+    {
+      ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
+      ck2.update() ; tt[1] = ck2.getDeltaTime()*1000.0f ;
+      ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
+      ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
+    }
 
 /*track  -> update () ; */
 
-  ck2.update() ; tt[4] = ck2.getDeltaTime()*1000.0f ;
-  gfx    -> update () ;
-  gui    -> update () ;
-  sound  -> update () ;
-  gfx    -> done   () ;  /* Swap buffers! */
-  ck2.update() ; tt[5] = ck2.getDeltaTime()*1000.0f ;
+    ck2.update() ; tt[4] = ck2.getDeltaTime()*1000.0f ;
+    gfx    -> update () ;
+    gui    -> update () ;
+    sound  -> update () ;
+    gfx    -> done   () ;  /* Swap buffers! */
+    ck2.update() ; tt[5] = ck2.getDeltaTime()*1000.0f ;
+  }
 }
 
 

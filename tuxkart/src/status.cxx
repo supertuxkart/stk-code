@@ -410,20 +410,7 @@ void drawGameRunningText ()
   glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
 
   if ( stats_enabled )
-#ifdef FANCY_TEXT_STATS
-    for ( int i = 0 ; i < MAX_STRING ; i++ )
-    {
-      glRasterPos2f ( 10, 480 - 12 * (i + 2) ) ;
-
-      int m = (i+next_string) % MAX_STRING ;
-      char *s = debug_strings [ m ] ;
-
-      for ( char *q = s ; *q != '\0' ; q++ )
-	glutBitmapCharacter ( GLUT_BITMAP_9_BY_15, *q ) ;
-    }
-#else
     drawStatsText () ;
-#endif
 
   if ( help_timer++ < 400 )
     drawHelpText () ;

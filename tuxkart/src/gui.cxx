@@ -9,11 +9,10 @@ static int mouse_y ;
 static int mouse_dx = 0 ;
 static int mouse_dy = 0 ;
 static int mouse_buttons = 0 ;
-static int mousetrap = FALSE ;
 
 fntTexFont *font ;
 
-static void motionfn ( int x, int y )
+void motionfn ( int x, int y )
 {
   mouse_x = x ;
   mouse_y = y ;
@@ -22,12 +21,13 @@ static void motionfn ( int x, int y )
   puMouse ( x, y ) ;
 }
 
-static void mousefn ( int button, int updown, int x, int y )
+
+void mousefn ( int button, int updown, int x, int y )
 {
   mouse_x = x ;
   mouse_y = y ;
 
-  if ( updown == GLUT_DOWN )
+  if ( updown == PW_DOWN )
     mouse_buttons |= (1<<button) ;
   else
     mouse_buttons &= ~(1<<button) ;
@@ -37,7 +37,7 @@ static void mousefn ( int button, int updown, int x, int y )
 
   puMouse ( button, updown, x, y ) ;
 
-  if ( updown == GLUT_DOWN )
+  if ( updown == PW_DOWN )
     hide_status () ;
 }
 
@@ -65,11 +65,6 @@ static void help_cb ( puObject * )
   help () ;
 }
 
-static void fullscreencb ( puObject * ){ glutFullScreen();  }
-static void nofullscreencb ( puObject * ){ glutReshapeWindow(640,480); glutPositionWindow(12,12); }
-
-static void mousetrap_off_cb ( puObject * ) { mousetrap = FALSE ; } 
-static void mousetrap_on_cb  ( puObject * ) { mousetrap = TRUE  ; } 
 static void music_off_cb     ( puObject * ) { sound->disable_music () ; } 
 static void music_on_cb      ( puObject * ) { sound->enable_music  () ; } 
 static void sfx_off_cb       ( puObject * ) { sound->disable_sfx   () ; } 
@@ -89,13 +84,6 @@ static puCallback exit_submenu_cb [] = { exit_cb, NULL } ;
 static char      *sound_submenu    [] = { "Turn off Music", "Turn off Sounds", "Turn on Music", "Turn on Sounds", NULL } ;
 static puCallback sound_submenu_cb [] = {  music_off_cb,        sfx_off_cb,     music_on_cb,        sfx_on_cb, NULL } ;
 
-static char      *view_submenu    [] = { "Mousetrap Mode",   "No Mousetrap", NULL } ;
-static puCallback view_submenu_cb [] = { mousetrap_on_cb , mousetrap_off_cb, NULL } ;
-
-static char      *mode_submenu    [] = { "Fullscreen","No Fulllscreen",NULL };
-static puCallback mode_submenu_cb    [] = { fullscreencb,nofullscreencb,NULL };
-
-
 static char      *help_submenu    [] = { "Versions...", "Credits...", "About...",  "Help", NULL } ;
 static puCallback help_submenu_cb [] = {   versions_cb,   credits_cb,   about_cb, help_cb, NULL } ;
 
@@ -108,10 +96,6 @@ GUI::GUI ()
   mouse_x = 320 ;
   mouse_y = 240 ;
 
-  glutMouseFunc         ( mousefn   ) ;
-  glutMotionFunc        ( motionfn  ) ;
-  glutPassiveMotionFunc ( motionfn  ) ;
- 
 /*
   Already done in start_tuxkart!
 
@@ -132,8 +116,6 @@ GUI::GUI ()
   {
     main_menu_bar -> add_submenu ( "Exit", exit_submenu, exit_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Sound", sound_submenu, sound_submenu_cb ) ;
-    main_menu_bar -> add_submenu ( "View", view_submenu, view_submenu_cb ) ;
-    main_menu_bar -> add_submenu ( "Mode", mode_submenu, mode_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Help", help_submenu, help_submenu_cb ) ;
   }
 
@@ -150,12 +132,6 @@ void GUI::show ()
 {
   hide_status () ;
   hidden = FALSE ;
-
-  if ( mousetrap )
-    glutWarpPointer ( 320, 240 ) ;
-
-  glutSetCursor(GLUT_CURSOR_INHERIT);
-  puShowCursor () ;
   main_menu_bar -> reveal () ;
 }
 
@@ -163,8 +139,6 @@ void GUI::hide ()
 {
   hidden = TRUE ;
   hide_status () ;
-  glutSetCursor(GLUT_CURSOR_NONE);
-  puHideCursor () ;
   main_menu_bar -> hide () ;
 }
 
@@ -179,35 +153,13 @@ void GUI::update ()
   glEnable    ( GL_BLEND ) ;
 
   puDisplay () ;
-
-  /*
-    Don't let the cursor escape from the screen!
-  */
-
-  if ( isHidden () )
-    glutWarpPointer ( 320, 240 ) ;
-  else
-  {
-    int warp = FALSE ;
-
-    if ( mouse_x < 1 ) { mouse_x = 2 ; warp = TRUE ; }
-    else if ( mouse_x > 639 ) { mouse_x = 638 ; warp = TRUE ; }
-    if ( mouse_y < 1 ) { mouse_y = 2 ; warp = TRUE ; }
-    else if ( mouse_y > 479 ) { mouse_y = 478 ; warp = TRUE ; }
-
-    if ( warp && mousetrap )
-      glutWarpPointer ( mouse_x, mouse_y ) ;
-
-    mouse_dx = mouse_dy = 0 ;
-    mouse_buttons = 0 ;
-  }
 }
 
 
 void GUI::keyboardInput ()
 {
   static int isWireframe = FALSE ;
-  int c = getGLUTKeystroke () ;
+  int c = getKeystroke () ;
 
   if ( c <= 0 )
     return ;
@@ -220,8 +172,8 @@ void GUI::keyboardInput ()
     case 'X'  /* X */      :
     case 0x03 /* Control-C */   : exit ( 0 ) ;
 
-    case (256+GLUT_KEY_PAGE_UP)   : cam_follow-- ; break ;
-    case (256+GLUT_KEY_PAGE_DOWN) : cam_follow++ ; break ;
+    case PW_KEY_PAGE_UP   : cam_follow-- ; break ;
+    case PW_KEY_PAGE_DOWN : cam_follow++ ; break ;
 
     case 'r' :
     case 'R' :
@@ -271,16 +223,16 @@ void GUI::joystickInput ()
     ji.data[0] *= 1.3 ;
   }
 
-  if ( isGLUTKeyDown ( GLUT_KEY_LEFT +256 ) ) ji.data [0] = -1.0f ;
-  if ( isGLUTKeyDown ( GLUT_KEY_RIGHT+256 ) ) ji.data [0] =  1.0f ;
-  if ( isGLUTKeyDown ( GLUT_KEY_UP   +256 ) ) ji.buttons |= 0x01 ;
-  if ( isGLUTKeyDown ( GLUT_KEY_DOWN +256 ) ) ji.buttons |= 0x02 ;
+  if ( isKeyDown ( PW_KEY_LEFT  ) ) ji.data [0] = -1.0f ;
+  if ( isKeyDown ( PW_KEY_RIGHT ) ) ji.data [0] =  1.0f ;
+  if ( isKeyDown ( PW_KEY_UP    ) ) ji.buttons |= 0x01 ;
+  if ( isKeyDown ( PW_KEY_DOWN  ) ) ji.buttons |= 0x02 ;
 
-  if ( isGLUTKeyDown ( 'f' ) || isGLUTKeyDown ( 'F' ) ||
-       isGLUTKeyDown ( '\r' )|| isGLUTKeyDown ( '\n' )) ji.buttons |= 0x04 ;
-  if ( isGLUTKeyDown ( 'a' ) || isGLUTKeyDown ( 'A' ) ) ji.buttons |= 0x20 ;
-  if ( isGLUTKeyDown ( 's' ) || isGLUTKeyDown ( 'S' ) ) ji.buttons |= 0x10 ;
-  if ( isGLUTKeyDown ( 'd' ) || isGLUTKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;
+  if ( isKeyDown ( 'f' ) || isKeyDown ( 'F' ) ||
+       isKeyDown ( '\r' )|| isKeyDown ( '\n' )) ji.buttons |= 0x04 ;
+  if ( isKeyDown ( 'a' ) || isKeyDown ( 'A' ) ) ji.buttons |= 0x20 ;
+  if ( isKeyDown ( 's' ) || isKeyDown ( 'S' ) ) ji.buttons |= 0x10 ;
+  if ( isKeyDown ( 'd' ) || isKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;
 
   ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
   ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;
