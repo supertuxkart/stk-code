@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.54 2004/08/08 21:25:21 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.55 2004/08/08 21:33:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -94,15 +94,6 @@ Track        *track = NULL ;
 
 void load_players ( )
 {
-  std::vector<std::string> player_files;
-
-  player_files.push_back("tuxkart.ac");
-  player_files.push_back("geekokart.ac");
-  player_files.push_back("bsodkart.ac");
-  player_files.push_back("gownkart.ac");
-
-  assert( player_files.size() >= kart.size() );
-
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
     {
       kart[i]->load_data();
@@ -420,6 +411,9 @@ int tuxkartMain ()
   red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), raceSetup.mirror ) ;
   green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), raceSetup.mirror ) ;
 
+  if (raceSetup.numKarts == -1)
+    raceSetup.numKarts = characters.size();
+
   // Create the karts and fill the kart vector with them
   for ( int i = 0 ; i < raceSetup.numKarts ; i++ )
   {
@@ -429,9 +423,9 @@ int tuxkartMain ()
     if ( i < raceSetup.numPlayers )
       newkart = new PlayerKartDriver  ( kart_props, i ) ;
     else if ( network_enabled )
-      newkart = new NetworkKartDriver ( KartProperties(), i ) ;
+      newkart = new NetworkKartDriver ( characters[i], i ) ;
     else
-      newkart = new AutoKartDriver    ( KartProperties(), i ) ;
+      newkart = new AutoKartDriver    ( characters[i], i ) ;
 
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 

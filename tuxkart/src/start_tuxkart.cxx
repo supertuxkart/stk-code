@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.51 2004/08/08 21:25:21 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.52 2004/08/08 21:33:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -317,14 +317,6 @@ int main ( int argc, char *argv[] )
 	  else if( (!strcmp(argv[i], "--numkarts") or !strcmp(argv[i], "-k")) && argc > 2)
 	  {
 	      raceSetup.numKarts = atoi(argv[i+1]);
-
-	      if (raceSetup.numKarts < 0 || raceSetup.numKarts > 4)
-		{
-		  fprintf ( stderr,
-			    "You must choose between 1 and 4 karts, you chose: %d.\n", raceSetup.numKarts );
-		  cmdLineHelp(argv[0]);
-		  return 0;
-		}
 
 	      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
 	    }

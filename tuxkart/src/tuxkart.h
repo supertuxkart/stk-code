@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.28 2004/08/08 21:25:21 grumbel Exp $
+//  $Id: tuxkart.h,v 1.29 2004/08/08 21:33:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -55,7 +55,14 @@ class Level ;
 class RaceSetup
 {
 public:
-	RaceSetup() { numLaps = 3; mirror = false; reverse = false; track = 0; numKarts = 4; numPlayers = 1; }
+	RaceSetup() { 
+                numLaps    = 3; 
+                mirror     = false; 
+                reverse    = false; 
+                track      = 0;
+                numKarts   = -1; // use all available karts
+                numPlayers = 1; 
+        }
 	int numLaps;
 	bool mirror;
 	bool reverse;
