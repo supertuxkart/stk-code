@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.53 2004/08/08 20:27:00 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.54 2004/08/08 21:25:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -104,26 +104,26 @@ void load_players ( )
   assert( player_files.size() >= kart.size() );
 
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
-  {
-    kart[i]->load_data();
-  }
+    {
+      kart[i]->load_data();
+    }
 
   for ( int i = 0 ; i < NUM_PROJECTILES ; i++ )
-  {
-    ssgSelector *sel = new ssgSelector ;
-    projectile[i]-> getModel() -> addKid ( sel ) ;
+    {
+      ssgSelector *sel = new ssgSelector ;
+      projectile[i]-> getModel() -> addKid ( sel ) ;
 
-    for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
-      sel -> addKid ( ssgLoad ( projectile_files [ j ], loader ) ) ;
+      for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
+        sel -> addKid ( ssgLoad ( projectile_files [ j ], loader ) ) ;
 
-    projectile[i] -> off () ;
-  }
+      projectile[i] -> off () ;
+    }
 
   for ( int i = 0 ; i < NUM_EXPLOSIONS ; i++ )
-  {
-    ssgBranch *b = (ssgBranch *) ssgLoad ( "explode.ac", loader ) ;
-    explosion[i] = new Explosion ( b ) ;
-  }
+    {
+      ssgBranch *b = (ssgBranch *) ssgLoad ( "explode.ac", loader ) ;
+      explosion[i] = new Explosion ( b ) ;
+    }
 }
 
 

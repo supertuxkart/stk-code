@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.50 2004/08/08 20:27:00 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.51 2004/08/08 21:25:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,7 @@ static ssgSimpleState *introMaterial    ;
 std::vector<std::string> trackIdents ;
 std::vector<std::string> trackNames ;
 
+Characters characters;
 
 void switchToGame ()
 {
@@ -142,6 +143,29 @@ static std::string loadTrackDescription(const std::string& mapfile)
   return ret;
 }
 
+static bool has_suffix(const std::string& lhs, const std::string rhs)
+{
+  if (lhs.length() < rhs.length())
+    return false;
+  else
+    return lhs.compare(lhs.length() - rhs.length(), rhs.length(), rhs) == 0;
+}
+
+static void loadCharacters()
+{
+  std::set<std::string> result;
+  loader->listFiles(result, "data/");
+
+  // Findout which characters are available and load them
+  for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
+    {
+      if (has_suffix(*i, ".tkkf"))
+        {
+          characters.push_back(KartProperties("data/" + *i));
+        }
+    }
+}
+
 static void loadTrackList ()
 {
   /* Load up a list of tracks - and their names */
@@ -192,6 +216,7 @@ static void initTuxKart (int width, int height, int videoFlags)
 {
   loadDataDir ();
   loadTrackList () ;
+  loadCharacters();
 
   initVideo ( width, height, videoFlags );
   
