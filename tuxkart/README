@@ -13,10 +13,8 @@ and are covered in the documentation directory 'doc'.
 First make sure that you have the following packages
 installed:
 
-   GLIDE (if you have a 3Dfx card)
    OpenGL (or Mesa)
-   GLUT (the GL Utility Toolkit)
-   PLIB version 1.2.0 or later - which can be obtained from:
+   PLIB version 1.8.0 or later - which can be obtained from:
      http://plib.sourceforge.net
 
 Once that is done, it should be a simple matter of changing
@@ -39,19 +37,8 @@ All documents are in HTML - so view them with your web browser.
 
 STARTING THE GAME:
 
-Just 'cd' into the download directory and run 'src/tuxkart',
+Just 'cd' into the download directory and run './src/tuxkart',
 or run '/usr/local/games/tuxkart' if you did a 'make install'.
-
-If you have a Voodoo graphics card, don't forget the usual:
-
-  csh/tcsh:
-
-    setenv MESA_GLX_FX fullscreen
-
-  or for sh/bash:
-
-    MESA_GLX_FX=fullscreen
-    export MESA_GLX_FX
 
 Select the number of laps and which course you'd like to race
 on then click 'start game' to get going.
@@ -78,9 +65,7 @@ P key - Pause.
 SPACE - Pop up or Hide the menu bar.
 
 From the Menu bar, you can turn sound effects and music
-on and off, enable or disable the 'mousetrap' (which keeps
-the mouse in the window to stop you accidentally losing
-the mouse pointer on Voodoo-1/2 hardware)
+on and off, get Help and see the Credits screen.
 
 LICENSE:
 
