@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.h,v 1.3 2004/08/26 23:01:25 grumbel Exp $
+//  $Id: WorldScreen.h,v 1.4 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,8 +30,6 @@ class RaceSetup;
 class WorldScreen : public Screen
 {
 private:
-  World* world;
-  
   /** Delta time that didn't get used in the last run */
   float overtime;
 

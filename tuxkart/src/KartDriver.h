@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.13 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: KartDriver.h,v 1.14 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,7 @@
 #include "Driver.h"
 #include "joystick.h"
 #include "ParticleSystem.h"
+#include "World.h"
 
 class Controller;  
 class SkidMark;
@@ -84,8 +85,8 @@ private:
       steering */
   Controller* driver;
 public:
-  KartDriver (const KartProperties* kart_properties_, int position_,
-      Controller* driver_ = 0 ) ;
+  KartDriver (World* world, const KartProperties* kart_properties_,
+      int position_, Controller* driver_ = 0 ) ;
   virtual ~KartDriver();
 
   void load_data();
@@ -137,8 +138,9 @@ public:
 class TrafficDriver : public KartDriver
 {
 public:
-  TrafficDriver (const KartProperties* kart_properties_, sgVec3 _pos )
-    : KartDriver ( kart_properties_, 0 )
+  TrafficDriver (World* world, const KartProperties* kart_properties_,
+                sgVec3 _pos )
+    : KartDriver (world, kart_properties_, 0 )
   {
     sgCopyVec3 ( reset_pos.xyz, _pos ) ;
     reset () ;

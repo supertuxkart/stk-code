@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.80 2004/09/08 17:29:10 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.81 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,7 +37,6 @@
 #include "material.h"
 #include "KartManager.h"
 #include "StartScreen.h"
-#include "TuxkartError.h"
 #include "RaceManager.h"
 #include "Config.h"
 
@@ -78,7 +77,8 @@ static void initTuxKart (int width, int height, int videoFlags)
   initializeLoader();
 
   initMaterials () ;
-  track_manager.loadTrackList () ;
+  track_manager = new TrackManager();
+  track_manager->loadTrackList () ;
   kart_manager.loadKartData();
   
   sound     = new SoundSystem ;
@@ -89,6 +89,8 @@ void deinitTuxKart()
 {
   delete gui;
   delete widgetSet;
+  delete track_manager;
+  track_manager = 0;
 
   /*write configuration to disk*/
   config.saveConfig();
@@ -178,15 +180,18 @@ int main ( int argc, char *argv[] )
             else if( !strcmp(argv[i], "--list-tracks") or !strcmp(argv[i], "-l") )
               {
                 initializeLoader ();
-                track_manager.loadTrackList () ;
+                track_manager = new TrackManager();
+                track_manager->loadTrackList () ;
 
                 fprintf ( stdout, "  Available tracks:\n" );
-                for (unsigned int i = 0; i != track_manager.tracks.size(); i++)
+                for (size_t i = 0; i != track_manager->getTrackCount(); i++)
                   fprintf ( stdout, "\t%10s: %s\n", 
-                            track_manager.tracks[i].ident.c_str(),
-                            track_manager.tracks[i].name.c_str());
+                            track_manager->getTrack(i)->ident.c_str(),
+                            track_manager->getTrack(i)->name.c_str());
                 
                 fprintf ( stdout, "Use --track N to choose track.\n\n" );
+                delete track_manager;
+                track_manager = 0;
 
                 return 0;
               }
@@ -320,8 +325,6 @@ int main ( int argc, char *argv[] )
     // shutdown SDL
     shutdownVideo();
 #ifndef DEBUG
-  } catch (const TuxkartError& err) {
-    std::cout << "TuxkartError: " << err.what() << std::endl;
   } catch (const std::exception& err) {
     std::cout << "Error: " << err.what() << std::endl;
   }

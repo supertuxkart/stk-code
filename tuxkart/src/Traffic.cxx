@@ -1,4 +1,4 @@
-//  $Id: Traffic.cxx,v 1.7 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: Traffic.cxx,v 1.8 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -42,7 +42,7 @@ void TrafficDriver::update (float delta)
     velocity.hpr[0] = sgnsq(curr_track_coords[0])*12.0f ;
 
   velocity.xyz[1]  = TRAFFIC_VELOCITY ;
-  velocity.xyz[2] -= GRAVITY * delta ;
+  //velocity.xyz[2] -= GRAVITY * delta ;
 
   if ( wheelie_angle != 0.0f )
     wheelie_angle = 0.0f ;

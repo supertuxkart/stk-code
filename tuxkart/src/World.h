@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.13 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: World.h,v 1.14 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,11 +38,6 @@ class guUDPConnection;
     etc. */
 class World
 {
-private:
-  static World* current_;
-public:
-  static World* current() { return current_; }
-
 public:
   ssgRoot      *scene;
 
@@ -51,9 +46,17 @@ private:
   Karts kart;
 
 public:
-  Projectile *projectile [ NUM_PROJECTILES ] ;
+  typedef std::vector<Projectile*> Projectiles;
+  Projectiles projectiles;
   Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
   float clock;
+
+  /** resources, this should be put in a separate class or replaced by a smart
+   * resource manager
+   */
+  ssgEntity* projectile_spark;
+  ssgEntity* projectile_missle;
+  ssgEntity* projectile_flamemissle;
 
   RaceSetup raceSetup;
 
@@ -71,10 +74,6 @@ public:
 
   Track* track;
 private:
-  guUDPConnection *net;
-  int network_enabled;
-  int network_testing;
-  
   Herring *silver_h ;
   Herring *gold_h   ;
   Herring *red_h    ;
@@ -82,6 +81,9 @@ private:
 
   Phase phase;
 public:
+  /** debug text that will be overlaid to the screen */
+  std::string debugtext[10];
+  
   /** Reference to the track inside the scene, must not be deleted,
       the scene itself takes care of it */
   ssgBranch *trackBranch ;
@@ -100,14 +102,14 @@ public:
   /** Returns the phase of the game */
   Phase getPhase() const { return phase; }
 private:
-  void updateNetworkRead ();
   void updateLapCounter ( int k );
-  void updateNetworkWrite ();
   void load_track(const char *fname );
   void load_players();
   void herring_command(char *s, char *str );
   void checkRaceStatus();
 };
+
+extern World* world;
 
 #endif
 

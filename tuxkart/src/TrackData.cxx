@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.11 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: TrackData.cxx,v 1.12 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,9 +27,6 @@
 
 TrackData::TrackData(const std::string& filename_)
 {
-  mirrored = false;
-  reversed = false;
-
   filename = filename_;
 
   std::string path = StringUtils::without_extension(filename);
@@ -81,11 +78,15 @@ TrackData::TrackData(const std::string& filename_)
   }
   delete root;
 
-  load_drv();
+  loadDriveline();
+}
+
+TrackData::~TrackData()
+{
 }
 
 void
-TrackData::load_drv()
+TrackData::loadDriveline()
 {
   std::string path = loader->getPath(drv_filename);
   FILE *fd = fopen ( path.c_str(), "ra" ) ;
@@ -125,23 +126,30 @@ TrackData::load_drv()
     }
 
   fclose ( fd ) ;
+
+  sgSetVec2 ( driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
+  sgSetVec2 ( driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
+
+  float d = 0.0f ;
+  for ( size_t i = 0 ; i < driveline.size() ; i++ )
+  {
+    if ( driveline[i][0] < driveline_min[0] )
+      driveline_min[0] = driveline[i][0] ;
+    if ( driveline[i][1] < driveline_min[1] ) 
+      driveline_min[1] = driveline[i][1] ;
+    if ( driveline[i][0] > driveline_max[0] )
+      driveline_max[0] = driveline[i][0] ;
+    if ( driveline[i][1] > driveline_max[1] )
+      driveline_max[1] = driveline[i][1] ;
+    
+    driveline [i][2] = d ;
+
+    if ( i == driveline.size() - 1 )
+      d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
+    else
+      d += sgDistanceVec2 ( driveline[i], driveline[i+1] ) ;
+  }
+
+  total_distance = d;
+  sgAddScaledVec2(driveline_center, driveline_min, driveline_max, 0.5);
 }
-
-void
-TrackData::reverse()
-{
-  reversed = !reversed;
-
-  std::reverse(driveline.begin(), driveline.end());
-}
-
-void
-TrackData::mirror()
-{
-  mirrored = !mirrored;
-
-  for ( int i = 0 ; i < int(driveline.size()); ++i )
-    driveline[i][0] = -driveline[i][0];
-}
-
-/* EOF */

@@ -1,4 +1,4 @@
-//  $Id: preprocessor.h,v 1.3 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: preprocessor.h,v 1.4 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,7 +22,7 @@
 
 #include <plib/ssg.h>
 
-void preProcessObj ( ssgEntity *n, int mirror ) ;
+void preProcessObj ( ssgEntity *n, bool mirror = false ) ;
 
 #endif
 

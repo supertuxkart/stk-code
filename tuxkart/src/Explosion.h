@@ -1,4 +1,4 @@
-//  $Id: Explosion.h,v 1.4 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: Explosion.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,8 +24,11 @@
 #include "tuxkart.h"
 #include "sound.h"
 
+class World;
+
 class Explosion
 {
+  World* world;
   ssgTransform *dcs ;
   ssgSelector  *seq ;
 
@@ -33,7 +36,7 @@ class Explosion
 
 public:
 
-  Explosion ( ssgBranch *b ) ;
+  Explosion ( World* world, ssgBranch *b ) ;
 
   void update () ;
   void start  ( sgVec3 where )

@@ -1,4 +1,4 @@
-//  $Id: Explosion.cxx,v 1.4 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: Explosion.cxx,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -46,7 +46,8 @@ static ssgSelector *find_selector ( ssgBranch *b )
 }
  
 
-Explosion::Explosion ( ssgBranch *b )
+Explosion::Explosion ( World* newworld, ssgBranch *b )
+  : world(newworld)
 {
   ssgSelector *e = find_selector ( b ) ;
   ssgCutout *cut ;
@@ -63,7 +64,7 @@ Explosion::Explosion ( ssgBranch *b )
   cut = new ssgCutout ;
   seq = (ssgSelector *) e ;
 
-  World::current()->scene -> addKid ( dcs ) ;
+  world -> scene -> addKid ( dcs ) ;
   dcs   -> addKid ( cut ) ;
   cut   -> addKid ( seq ) ;
 

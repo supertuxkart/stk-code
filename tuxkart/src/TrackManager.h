@@ -1,4 +1,4 @@
-//  $Id: TrackManager.h,v 1.4 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: TrackManager.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,28 +27,26 @@
     such */
 class TrackManager
 {
-public:
-  typedef std::vector<TrackData>   Tracks;
+private:
+  typedef std::vector<TrackData*> Tracks;
   Tracks tracks;
 
+public:
   TrackManager();
+  ~TrackManager();
   
   /** get TrackData by the track ident (aka filename without
       .track) */
-  const TrackData& getTrack(const std::string& ident);
+  const TrackData* getTrack(const std::string& ident) const;
+  const TrackData* getTrack(size_t id) const;
 
-  const TrackData& getTrackById(int id);
-
-  /** get the id of a track ident */
-  int getTrackId(const std::string& ident);
+  size_t getTrackCount() const;
 
   /** initialize the track list by searching through all directories
       for .track files */
   void loadTrackList ();
 };
 
-extern TrackManager track_manager;
+extern TrackManager* track_manager;
 
 #endif
-
-/* EOF */

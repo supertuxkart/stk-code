@@ -1,4 +1,4 @@
-//  $Id: KartManager.cxx,v 1.5 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: KartManager.cxx,v 1.6 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -19,10 +19,10 @@
 
 #include <set>
 #include <iostream>
+#include <stdexcept>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "KartManager.h"
-#include "TuxkartError.h"
 
 KartManager kart_manager;
 
@@ -48,7 +48,7 @@ KartManager::getKartId(const std::string ident)
       ++j;
     }
 
-  throw TuxkartError("KartManager: Couldn't find kart: '" + ident + "'");
+  throw std::runtime_error("KartManager: Couldn't find kart: '" + ident + "'");
 }
 
 const KartProperties*
@@ -61,14 +61,14 @@ KartManager::getKart(const std::string ident)
         return *i;
     }
 
-  throw TuxkartError("KartManager: Couldn't find kart: '" + ident + "'");
+  throw std::runtime_error("KartManager: Couldn't find kart: '" + ident + "'");
 }
 
 const KartProperties*
 KartManager::getKartById(int i)
 {
   if (i < 0 || i >= int(karts.size()))
-    throw TuxkartError("KartManager: Couldn't find kart: '" + StringUtils::to_string(i) + "'");
+    throw std::runtime_error("KartManager: Couldn't find kart: '" + StringUtils::to_string(i) + "'");
     
   return karts[i];
 }

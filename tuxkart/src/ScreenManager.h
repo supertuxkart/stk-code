@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.h,v 1.4 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: ScreenManager.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -40,7 +40,6 @@ public:
   /** Set the current active screen, the screen will get delete'ed
       automatically once it is no longer needed */
   void setScreen(Screen* screen);
-  void shutdown();
 };
 
 extern ScreenManager* screenManager;

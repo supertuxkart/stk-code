@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.cxx,v 1.4 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: ScreenManager.cxx,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <assert.h>
 #include "ScreenManager.h"
 
 ScreenManager* screenManager = 0;
@@ -30,12 +31,14 @@ ScreenManager::ScreenManager()
 
 ScreenManager::~ScreenManager()
 {
+  delete next_screen;
+  delete current_screen;
 }
 
 void
 ScreenManager::setScreen(Screen* screen)
 {
-  delete next_screen;
+  assert(next_screen == 0);
   next_screen = screen;
 }
 
@@ -60,13 +63,6 @@ void
 ScreenManager::abort()
 {
   do_abort = true;
-}
-
-void
-ScreenManager::shutdown()
-{
-  delete current_screen;
-  current_screen = 0;
 }
 
 /* EOF */

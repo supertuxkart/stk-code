@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.32 2004/09/05 20:09:58 matzebraun Exp $
+//  $Id: Driver.h,v 1.33 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -89,6 +89,7 @@
 #define MAX_HERRING_EATEN    20
 
 class KartDriver;
+class World;
 
 class Driver : public NoCopy
 {
@@ -106,10 +107,10 @@ protected:
   sgCoord last_relax_pos;
 
   sgCoord  reset_pos ;
-  sgCoord  position  ;
   sgCoord  last_pos  ;
 
-  sgCoord  velocity  ;
+  sgCoord position;
+  sgCoord velocity;
 public:  
   
   /* start - New Physics */
@@ -123,13 +124,15 @@ protected:
   /** Complete model, including shadow */
   ssgBranch    *comp_model;
 
-  /** Kart model alone, without the shadow */
-  ssgTransform *model ;
+  ssgTransform* model;
 
   /** The Karts shadow */
   ssgTransform* shadow;
 
   int history_index ;
+
+  World* world;
+
 public:
   float wheelie_angle ;
   int race_position ;
@@ -141,7 +144,7 @@ public:
   float zipper_time_left ;
 
   sgVec3 surface_avoidance_vector ;
-  sgVec3 curr_normal ;
+  sgVec3 ground_normal ;
   bool   on_ground ; 
   int    firsttime ;
   float getIsectData     ( sgVec3 start, sgVec3 end ) ;
@@ -158,7 +161,7 @@ public:
 public:
   /*const*/ KartProperties* kart_properties;
 
-  Driver ( const KartProperties* kart_properties );
+  Driver ( World* world, const KartProperties* kart_properties );
   virtual ~Driver();
 
   float getDistanceDownTrack () { return curr_track_coords[1] ; }
@@ -173,7 +176,7 @@ public:
     sgCopyCoord ( & reset_pos, pos ) ;
   }
 
-  ssgTransform *getModel () { return model ; }
+  ssgBranch *getModel () { return model ; }
   ssgEntity *getRoot () { return comp_model ; }
 
   const KartProperties* getKartProperties() const
@@ -212,7 +215,7 @@ public:
   void updateVisiPos(float delta);
   void coreUpdate (float delta) ;
   void physicsUpdate (float delta) ;
-  bool is_on_ground() { return on_ground; }
+  bool isOnGround() const { return on_ground; }
 
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;

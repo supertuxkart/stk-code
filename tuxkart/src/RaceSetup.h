@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.6 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: RaceSetup.h,v 1.7 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,16 +36,12 @@ public:
 		mode       = RM_QUICK_RACE;
 		difficulty = RD_EASY;
 		numLaps    = 3; 
-		mirror     = false; 
-		reverse    = false; 
 		track      = "race";
         }
 
 	RaceMode  mode;
 	RaceDifficulty  difficulty;
 	int   numLaps;
-	bool  mirror;
-	bool  reverse;
 
         /** Ident of the track to use */
 	std::string track;

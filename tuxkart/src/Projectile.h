@@ -1,4 +1,4 @@
-//  $Id: Projectile.h,v 1.3 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: Projectile.h,v 1.4 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,66 +20,25 @@
 #ifndef HEADER_PROJECTILE_H
 #define HEADER_PROJECTILE_H
 
-#include "Driver.h"
+class World;
+class KartDriver;
 
-class Projectile : public Driver
+class Projectile
 {
+private:
+  World* world;
   KartDriver *owner ;
-  int type ;
+  int type;
 
-  void setType ( int _type )
-  {
-    type = _type ;
-
-    switch ( type )
-    {
-      case COLLECT_NOTHING :
-      case COLLECT_ZIPPER  :
-      case COLLECT_MAGNET  :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> select ( 0 ) ;
-        break ;
-
-      case COLLECT_SPARK :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 0 ) ;
-        break ;
-
-      case COLLECT_MISSILE :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 1 ) ;
-        break ;
-
-      case COLLECT_HOMING_MISSILE :
-        ((ssgSelector *)(getModel () -> getKid ( 0 ))) -> selectStep ( 2 ) ;
-        break ;
-    }
-  }
-
-  KartProperties props;
+  sgCoord velocity;
 
 public:
-  Projectile ( ) 
-    : Driver (&props)
-  {
-    type = COLLECT_NOTHING ;
-  }
-
-  virtual ~Projectile()
-  {}
-
-  void off ()
-  {
-    setType ( COLLECT_NOTHING ) ;
-  }
+  Projectile(World* world, KartDriver* _owner, int type);
+  virtual ~Projectile();
 
   void fire ( KartDriver *who, int _type );
 
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float delta , float hot ) ;
-  virtual void update               ( float delta ) ;
-
-} ;
+  virtual void update ( float delta_t ) ;
+};
 
 #endif
-
-/* EOF */

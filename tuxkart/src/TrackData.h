@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.7 2004/08/23 14:46:51 grumbel Exp $
+//  $Id: TrackData.h,v 1.8 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,9 +36,6 @@ public:
 
   std::string music_filename;
 
-  bool mirrored;
-  bool reversed;
-
   std::string name;
   sgVec4 sky_color;
 
@@ -57,18 +54,40 @@ public:
   sgVec4 specularcol;
   sgVec4 diffusecol;
 
-  std::vector<sgVec3Wrap> driveline;
+  /** sgVec3 is a float[3] array, so unfortunately we can't put it in a
+   * std::vector because it lacks a copy-constructor, this hack should help...
+   */
+  class sgVec3Wrapper
+  {
+  private:
+    sgVec3 vec;
+    
+  public:
+    sgVec3Wrapper(const sgVec3& o) {
+      sgCopyVec3(vec, o);
+    }
+    
+    operator const float* () const {
+      return vec;
+    }
+
+    operator float* () {
+      return vec;
+    }                                   
+  };
+  std::vector<sgVec3Wrapper> driveline;
+
+  sgVec2 driveline_min;
+  sgVec2 driveline_max;
+  sgVec2 driveline_center;
+  float total_distance;
+
+private:
+  void loadDriveline();
 
 public:
   TrackData(const std::string& filename);
-
-  void load_drv();
-
-  /** Reverse the track */
-  void reverse();
-
-  /** Mirror the track */
-  void mirror();
+  ~TrackData();
 };
 
 #endif

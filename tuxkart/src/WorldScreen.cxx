@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.10 2004/08/26 23:01:25 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.11 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,9 +35,11 @@
 WorldScreen* WorldScreen::current_ = 0;
 
 WorldScreen::WorldScreen(const RaceSetup& raceSetup)
-  : world(new World(raceSetup)),
-    overtime(0)
+  : overtime(0)
 {
+  delete world;
+  world = new World(raceSetup);
+
   current_ = this;
   fclock = new ulClock;
   fclock->reset();
@@ -52,14 +54,15 @@ WorldScreen::~WorldScreen()
     delete *i;
 
   delete fclock;
+
   delete world;
+  world = 0;
 }
 
 void
 WorldScreen::update()
 {
   fclock->update    () ;
-  //updateNetworkRead () ;
 
   float inc = 0.02f;
   float dt = fclock->getDeltaTime () + overtime;
@@ -95,34 +98,35 @@ WorldScreen::update()
 void 
 WorldScreen::draw()
 {
-  const TrackData& track_data = track_manager.getTrack(World::current()->raceSetup.track);
+  const TrackData* track_data 
+    = track_manager->getTrack(world->raceSetup.track);
 
   glEnable ( GL_DEPTH_TEST ) ;
 
-  if (track_data.use_fog)
+  if (track_data->use_fog)
     {
       glEnable ( GL_FOG ) ;
       
-      glFogf ( GL_FOG_DENSITY, track_data.fog_density ) ;
-      glFogfv( GL_FOG_COLOR  , track_data.fog_color ) ;
-      glFogf ( GL_FOG_START  , track_data.fog_start ) ;
-      glFogf ( GL_FOG_END    , track_data.fog_end ) ;
+      glFogf ( GL_FOG_DENSITY, track_data->fog_density ) ;
+      glFogfv( GL_FOG_COLOR  , track_data->fog_color ) ;
+      glFogf ( GL_FOG_START  , track_data->fog_start ) ;
+      glFogf ( GL_FOG_END    , track_data->fog_end ) ;
       glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
       glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 
       /* Clear the screen */
-      glClearColor (track_data.fog_color[0], 
-                    track_data.fog_color[1], 
-                    track_data.fog_color[2], 
-                    track_data.fog_color[3]);
+      glClearColor (track_data->fog_color[0], 
+                    track_data->fog_color[1], 
+                    track_data->fog_color[2], 
+                    track_data->fog_color[3]);
     }
   else
     {
       /* Clear the screen */
-      glClearColor (track_data.sky_color[0], 
-                    track_data.sky_color[1], 
-                    track_data.sky_color[2], 
-                    track_data.sky_color[3]);
+      glClearColor (track_data->sky_color[0], 
+                    track_data->sky_color[1], 
+                    track_data->sky_color[2], 
+                    track_data->sky_color[3]);
     }
 
   glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
@@ -133,7 +137,7 @@ WorldScreen::draw()
       world->draw() ;
     }
 
-  if (track_data.use_fog)
+  if (track_data->use_fog)
     {
       glDisable ( GL_FOG ) ;
     }

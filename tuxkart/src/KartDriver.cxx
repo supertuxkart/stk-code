@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.49 2004/09/05 21:26:24 matzebraun Exp $
+//  $Id: KartDriver.cxx,v 1.50 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -109,9 +109,9 @@ KartParticleSystem::particle_delete (int , Particle* )
 {
 }
 
-KartDriver::KartDriver (const KartProperties* kart_properties_,
+KartDriver::KartDriver (World* world, const KartProperties* kart_properties_,
     int position_ , Controller* driver_ ) 
-  : Driver(kart_properties_)
+  : Driver(world, kart_properties_)
 {
   grid_position        = position_ ;
   num_collectables     = 0 ;
@@ -175,7 +175,8 @@ KartDriver::useAttachment ()
 
         if ( ++m >= NUM_PROJECTILES ) m = 0 ;
 
-	World::current()->projectile[m]->fire ( this, collectable ) ;
+        Projectile* projectile = new Projectile(world, this, collectable);
+        world->projectiles.push_back(projectile);
       }
       break ;
 
@@ -213,23 +214,23 @@ void KartDriver::doObjectInteractions ()
 
     sgVec3 xyz ;
 
-    sgSubVec3 ( xyz, getCoord()->xyz, World::current()->getKart(i) -> getCoord () -> xyz ) ;
+    sgSubVec3 ( xyz, getCoord()->xyz, world->getKart(i) -> getCoord () -> xyz ) ;
 
     if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
     {
-      if ( this == World::current()->getPlayerKart(0) || i == 0 )
+      if ( this == world->getPlayerKart(0) || i == 0 )
         sound->playSfx ( SOUND_OW ) ;
 
       sgNormalizeVec2 ( xyz ) ;
 
-      if ( velocity.xyz[1] > World::current()->getKart(i)->getVelocity()->xyz[1] )
+      if ( velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] )
       {
         forceCrash () ;
-        sgSubVec2 ( World::current()->getKart(i)->getCoord()->xyz, xyz ) ;
+        sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
       }
       else
       {
-        World::current()->getKart(i)->forceCrash () ;
+        world->getKart(i)->forceCrash () ;
         sgAddVec2 ( getCoord()->xyz, xyz ) ;
       }
     } 
@@ -248,9 +249,9 @@ void KartDriver::doObjectInteractions ()
     if ( sgDistanceSquaredVec2 ( hpos, getCoord()->xyz ) < 0.8f )
     {
       herring [ i ] . eaten = TRUE ;
-      herring [ i ] . time_to_return = World::current()->clock + 2.0f  ;
+      herring [ i ] . time_to_return = world->clock + 2.0f  ;
 
-      if ( this == World::current()->getPlayerKart(0) )
+      if ( this == world->getPlayerKart(0) )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
                           SOUND_UGH : SOUND_BURP ) ;
 
@@ -322,7 +323,7 @@ void KartDriver::doZipperProcessing ( float delta)
 
 void KartDriver::forceCrash ()
 {
-  if ( this == World::current()->getPlayerKart(0) )
+  if ( this == world->getPlayerKart(0) )
     sound->playSfx ( SOUND_BONK ) ;
 
   wheelie_angle = CRASH_PITCH ;
@@ -390,12 +391,12 @@ void KartDriver::doCollisionAnalysis ( float delta, float hot )
         wheelie_angle = 0.0f ;
     }
 
-  if ( is_on_ground() )
+  if ( isOnGround() )
     {
       position.xyz[2] = hot ;
       velocity.xyz[2] = 0.0f ;
 
-      pr_from_normal( position.hpr, curr_normal ) ;
+      pr_from_normal( position.hpr, ground_normal ) ;
     }
 }
 
@@ -418,7 +419,7 @@ KartDriver::update (float delta)
     attach ( ATTACH_TINYTUX, 4.0f ) ;
   }
 
-  attachment_time_left -= World::current()->clock ;
+  attachment_time_left -= world->clock ;
 
   if ( attachment_time_left <= 0.0f && attachment != NULL )
   {
@@ -429,7 +430,7 @@ KartDriver::update (float delta)
 
       float d = position.xyz[2] ;
 
-      World::current() ->track -> trackToSpatial ( position.xyz, track_hint ) ;
+      world ->track -> trackToSpatial ( position.xyz, track_hint ) ;
 
       position.xyz[2] = d ;
     }
@@ -454,7 +455,7 @@ KartDriver::update (float delta)
 
   // Lock the vehicle in its start position until the race has
   // really started
-  if (World::current()->getPhase() == World::START_PHASE)
+  if (world->getPhase() == World::START_PHASE)
     {
       sgCopyCoord(&position, &temp);
       sgCopyCoord(&last_pos, &temp);
@@ -572,7 +573,7 @@ KartDriver::processInput(float delta)
   } else {
     brake = 0.0f;
   }
-  
+
   if ( wheelie_angle <= 0.0f ) {      
     steer_angle = -kart_properties->turn_speed * controlls.lr;
   
@@ -583,9 +584,6 @@ KartDriver::processInput(float delta)
   }
   else
     getVelocity()->hpr[0] = 0.0f ;
-
-  // XXX this should be handled in physicsUpdate or when doing CD...
-  force[2] = -GRAVITY * kart_properties->mass;
 }
 
 void print_model(ssgEntity* entity, int indent)
@@ -751,7 +749,7 @@ KartDriver::load_data()
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;
   comp_model-> addKid (exhaust_pipe) ;
-  //World::current()->scene -> addKid (exhaust_pipe);
+  //world->scene -> addKid (exhaust_pipe);
 
   // Load data for this kart (bonus objects, the kart model, etc)
   ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
@@ -785,11 +783,11 @@ KartDriver::load_data()
     {
       skidmark_left  = new SkidMark();
       skidmark_left->ref();
-      World::current()->scene->addKid(skidmark_left);
+      world->scene->addKid(skidmark_left);
       
       skidmark_right = new SkidMark();
       skidmark_right->ref();
-      World::current()->scene->addKid(skidmark_right);
+      world->scene->addKid(skidmark_right);
     }
 
   shadow = createShadow(kart_properties->shadow_file, -1, 1, -1, 1);
@@ -847,15 +845,15 @@ KartDriver::processAttachments(float delta)
       float cdist = SG_MAX ;
       int   closest = -1 ;
 
-      for ( int i = 0; i < World::current()->getNumKarts() ; ++i )
+      for ( int i = 0; i < world->getNumKarts() ; ++i )
         {
-          if ( World::current()->getKart(i) == this ) continue ;
+          if ( world->getKart(i) == this ) continue ;
 
-          if ( World::current()->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
+          if ( world->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
             continue ;
 
           float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                            World::current()->getKart(i)->getCoord()->xyz ) ;
+                                            world->getKart(i)->getCoord()->xyz ) ;
 
           if ( d < cdist && d < MAGNET_RANGE_SQD )
             {
@@ -868,7 +866,7 @@ KartDriver::processAttachments(float delta)
         {
           if ( getAttachment () == ATTACH_MAGNET )
             {
-              if ( this == World::current()->getKart(0) || closest == 0 )
+              if ( this == world->getKart(0) || closest == 0 )
                 sound -> playSfx ( SOUND_BZZT ) ;
 
               attach ( ATTACH_MAGNET_BZZT,
@@ -876,13 +874,13 @@ KartDriver::processAttachments(float delta)
             }
 
           sgVec3 vec ;
-          sgSubVec2 ( vec, World::current()->getKart(closest)->getCoord()->xyz, getCoord()->xyz ) ;
+          sgSubVec2 ( vec, world->getKart(closest)->getCoord()->xyz, getCoord()->xyz ) ;
           vec [ 2 ] = 0.0f ;
           sgNormalizeVec3 ( vec ) ;
 
           sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
 
-          float tgt_velocity = World::current()->getKart(closest)->getVelocity()->xyz[1] ;
+          float tgt_velocity = world->getKart(closest)->getVelocity()->xyz[1] ;
 
           if ( cdist > MAGNET_MIN_RANGE_SQD )
             {

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.40 2004/09/06 07:39:06 evilynux Exp $
+//  $Id: Driver.cxx,v 1.41 2004/09/24 15:45:01 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,7 @@
 #include "KartProperties.h"
 #include "Track.h"
 #include "World.h"
+#include "constants.h"
 
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
 #define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
@@ -40,7 +41,8 @@ static inline void relaxation(float& target, float& prev, float rate)
   prev = (target);
 }
 
-Driver::Driver (const KartProperties* kart_properties)
+Driver::Driver (World* _world, const KartProperties* kart_properties)
+    : world(_world)
 {
   // hack for now (const_cast should be removed later)
   this->kart_properties = const_cast<KartProperties*> (kart_properties);
@@ -83,15 +85,15 @@ Driver::reset ()
   wheelie_angle = 0.0f ;
 
   sgZeroCoord ( &velocity ) ;
-  sgZeroVec3 ( curr_normal ) ;
+  sgZeroVec3 ( ground_normal ) ;
   sgCopyCoord ( &last_pos, &reset_pos ) ;
   sgCopyCoord ( &position, &reset_pos ) ;
   sgCopyCoord ( &visi_pos, &reset_pos ) ;
   sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
 
-  track_hint = World::current() ->track -> absSpatialToTrack ( last_track_coords,
+  track_hint = world ->track -> absSpatialToTrack ( last_track_coords,
                                                  last_pos.xyz ) ;
-  track_hint = World::current() ->track -> absSpatialToTrack ( curr_track_coords,
+  track_hint = world ->track -> absSpatialToTrack ( curr_track_coords,
                                                  position.xyz ) ;
 
 }
@@ -113,6 +115,7 @@ Driver::updateVisiPos(float delta)
 
   visi_pos.hpr[1] += wheelie_angle ;
 
+#if 0
   if (use_fake_drift)
     {
       // Rotate the kart a bit to get a feeling for drifting even if
@@ -120,6 +123,7 @@ Driver::updateVisiPos(float delta)
       // idea, but its worth a try
       visi_pos.hpr[0] += steer_angle*10.0f;
     }
+#endif
 
   visi_pos.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
 
@@ -141,7 +145,7 @@ Driver::placeModel ()
       sgMat4 res;
       sgVec3 hpr;
 
-      pr_from_normal(hpr, curr_normal);
+      hpr_from_normal(hpr, ground_normal);
 
       sgMat4 rot;
       sgMat4 rot2;
@@ -187,6 +191,9 @@ Driver::physicsUpdate (float delta)
 	unsigned int count;
 	
 	const float wheelbase = 1.2;
+
+        // gravity
+        force[2] = -GRAVITY * kart_properties->mass;
 	
 	sgZeroVec2 (resistance);
 	sgZeroVec2 (traction);
@@ -273,7 +280,7 @@ Driver::coreUpdate (float delta)
 
   doCollisionAnalysis ( delta, hot ) ;
 
-  track_hint = World::current() ->track -> spatialToTrack ( curr_track_coords,
+  track_hint = world ->track -> spatialToTrack ( curr_track_coords,
                                                             position.xyz,
                                                             track_hint ) ;
 
@@ -365,7 +372,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
   if ( firsttime )
     num_hits = 0 ;
   else
-    num_hits = ssgIsect ( World::current()->trackBranch, &sphere, invmat, &results ) ;
+    num_hits = ssgIsect ( world->trackBranch, &sphere, invmat, &results ) ;
  
   sgSetVec3 ( surface_avoidance_vector, 0.0f, 0.0f, 0.0f ) ;
 
@@ -433,7 +440,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
   sgSetVec3 ( HOTvec, 0.0f, 0.0f, top ) ;
 
-  num_hits = ssgHOT ( World::current()->trackBranch, HOTvec, invmat, &results ) ;
+  num_hits = ssgHOT ( world->trackBranch, HOTvec, invmat, &results ) ;
   
   hot = -1000000.0f ;
 
@@ -451,13 +458,13 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
     if ( hgt >= hot )
     {
       hot = hgt ;
-      sgCopyVec3 ( curr_normal, h->plane ) ;
+      sgCopyVec3 ( ground_normal, h->plane ) ;
 
       need_rescue = getMaterial ( h->leaf ) -> isReset  () ;
 
       if ( getMaterial ( h->leaf ) -> isZipper () )
       {
-        if ( this == World::current()->getPlayerKart(0) )
+        if ( this == world->getPlayerKart(0) )
           sound->playSfx ( SOUND_WEE ) ;
 
         wheelie_angle = 45.0f ;

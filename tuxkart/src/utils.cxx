@@ -1,4 +1,4 @@
-//  $Id: utils.cxx,v 1.5 2004/08/25 13:26:14 grumbel Exp $
+//  $Id: utils.cxx,v 1.6 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,8 +32,8 @@ void pr_from_normal ( sgVec3 hpr, sgVec3 nrm )
 
 void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm )
 {
-  pr_from_normal ( hpr, nrm ) ;
   hpr[0] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[0], nrm[1] ) ;
+  pr_from_normal ( hpr, nrm ) ;
 }
 
 
@@ -45,17 +45,6 @@ bool canAccess ( char *fname )
   return access ( fname, F_OK ) == 0 ;
 #endif
 }
-
-
-bool chDir ( char *dir )
-{
-#ifdef WIN32 
-  return _chdir ( dir ) == -1 ;
-#else
-  return chdir ( dir ) == -1 ;
-#endif
-}
-
 
 void secondSleep ( int s )
 {

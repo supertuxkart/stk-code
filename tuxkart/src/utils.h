@@ -1,4 +1,4 @@
-//  $Id: utils.h,v 1.4 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: utils.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,7 +36,6 @@ void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
 */
 
 bool canAccess ( char *fname ) ;
-bool chDir     ( char *dir   ) ;
 void secondSleep ( int s ) ;
 
 #endif

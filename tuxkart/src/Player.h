@@ -1,4 +1,4 @@
-// $Id: Player.h,v 1.2 2004/09/08 15:00:06 jamesgregory Exp $
+// $Id: Player.h,v 1.3 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,7 +34,7 @@ enum KartControl { KC_LEFT,
 /*class for managing player name and control configuration*/
 class Player
 {
-  public:
+public:
     std::string name;
     bool useJoy;    //player is using a joystick
     int joystick;   //which joystick device belongs to player

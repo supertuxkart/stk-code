@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.43 2004/09/07 12:44:38 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.44 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,7 +66,7 @@ next_string(0)
 	magnet_gst       = getMaterial ( "magnet.rgb"       ) ;
 	zipper_gst       = getMaterial ( "zipper.rgb"       ) ;
 
-  nCachedTextures = World::current()->raceSetup.getNumPlayers() * TEXTURES_PER_PLAYER;
+  nCachedTextures = world->raceSetup.getNumPlayers() * TEXTURES_PER_PLAYER;
 
 	if ((fps_id = widgetSet -> count(0, 1000, GUI_SML, GUI_SE)))
 		widgetSet -> layout(fps_id, -1, 1);
@@ -92,7 +92,7 @@ void RaceGUI::update(float dt)
 {
 	widgetSet -> timer(fps_id, dt) ;
 	
-	drawStatusText (World::current()->raceSetup) ;
+	drawStatusText (world->raceSetup) ;
 		
 	if ( config.displayFPS )
 		drawFPS ();
@@ -103,9 +103,9 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	static int isWireframe = FALSE ;
 	
 	//in single player only we have an infinite ammo cheat
-	if (key.mod & KMOD_CTRL && World::current()->raceSetup.getNumPlayers() == 1)
+	if (key.mod & KMOD_CTRL && world->raceSetup.getNumPlayers() == 1)
 	{
-          PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->getPlayerKart(0)->getDriver());
+          PlayerDriver* driver = dynamic_cast<PlayerDriver*>(world->getPlayerKart(0)->getDriver());
           if (driver)
             driver -> incomingKeystroke ( key ) ;
       	return;
@@ -301,7 +301,7 @@ void RaceGUI::drawTimer ()
 {
   char str [ 256 ] ;
 
-  time_left = World::current()->clock;
+  time_left = world->clock;
 
   int min     = (int) floor ( time_left / 60.0 ) ;
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
@@ -316,7 +316,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
 {
   char str [ 256 ] ;
 
-  KartDriver* player_kart = World::current()->getPlayerKart(player_nb);
+  KartDriver* player_kart = world->getPlayerKart(player_nb);
 
 #ifdef DEBUG
   /* Show velocity */
@@ -358,17 +358,17 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
 void RaceGUI::drawMap ()
 {
   glColor3f ( 1,1,1 ) ;
-  World::current() ->track -> draw2Dview ( 520, 40, 120, 120, false ) ;
+  world ->track -> draw2Dview ( 520, 40, 120, 120, false ) ;
 
   glBegin ( GL_QUADS ) ;
 
-  for ( int i = 0 ; i < World::current()->getNumKarts() ; ++i )
+  for ( int i = 0 ; i < world->getNumKarts() ; ++i )
   {
     sgCoord *c ;
 
-    c = World::current()->getKart(i)->getCoord () ;
+    c = world->getKart(i)->getCoord () ;
 
-    glColor3fv ( World::current()->getKart(i)->getKartProperties()->color ) ;
+    glColor3fv ( world->getKart(i)->getKartProperties()->color ) ;
 
     /* 
        FIXME:
@@ -393,7 +393,7 @@ void RaceGUI::drawGameOverText ()
   int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
 
   if ( finishing_position < 0 )
-    finishing_position = World::current()->getPlayerKart(0)->getPosition() ;
+    finishing_position = world->getPlayerKart(0)->getPosition() ;
 
   if ( finishing_position > 1 )
   {
@@ -415,9 +415,9 @@ void RaceGUI::drawPlayerIcons ()
   int x = 10;
   int y;
 
-  for(int i = 0; i < World::current()->getNumKarts() ; i++)
+  for(int i = 0; i < world->getNumKarts() ; i++)
     {
-      int position = World::current()->getKart(i)->getPosition();
+      int position = world->getKart(i)->getPosition();
       if(position > 4)  // only draw the first four karts
         continue;
 
@@ -425,7 +425,7 @@ void RaceGUI::drawPlayerIcons ()
 
       // draw icon
       Material* players_gst =
-          World::current()->getKart(i)->getKartProperties()->getIconMaterial();
+          world->getKart(i)->getKartProperties()->getIconMaterial();
       players_gst -> apply ();
 
       glEnable(GL_TEXTURE_2D);
@@ -452,13 +452,13 @@ void RaceGUI::drawEmergencyText ( int player_nb, int offset_x, int offset_y, flo
   static float last_dist = -1000000.0f ;
   static int last_lap = -1 ;
 
-  float d = World::current()->getPlayerKart(player_nb)-> getDistanceDownTrack () ;
-  int   l = World::current()->getPlayerKart(player_nb)-> getLap () ;
+  float d = world->getPlayerKart(player_nb)-> getDistanceDownTrack () ;
+  int   l = world->getPlayerKart(player_nb)-> getLap () ;
 
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
-       World::current()->getPlayerKart(player_nb) -> getVelocity () -> xyz [ 1 ] > 0.0f )
+       world->getPlayerKart(player_nb) -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
-    wrong_timer += 0.05f; // FIXME: was World::current()->clock -> getDeltaTime () ;
+    wrong_timer += 0.05f; // FIXME: was world->clock -> getDeltaTime () ;
 
     if ( wrong_timer > 2.0f )
     {
@@ -507,7 +507,7 @@ void RaceGUI::drawCollectableIcons ( int player_nb, int offset_x, int offset_y, 
 {
   int zz = FALSE ;
 
-  switch ( World::current()->getPlayerKart(player_nb)->getCollectable () )
+  switch ( world->getPlayerKart(player_nb)->getCollectable () )
   {
     case COLLECT_NOTHING        : break ;
     case COLLECT_SPARK          : spark_gst        -> apply () ; break ;
@@ -532,10 +532,10 @@ void RaceGUI::drawCollectableIcons ( int player_nb, int offset_x, int offset_y, 
   glEnd();
 
   // If player doesn't have anything, just let the transparent black square
-  if(World::current()->getPlayerKart(player_nb)->getCollectable () == COLLECT_NOTHING)
+  if(world->getPlayerKart(player_nb)->getCollectable () == COLLECT_NOTHING)
     return;
 
-  int n  = World::current()->getPlayerKart(player_nb)->getNumCollectables() ;
+  int n  = world->getPlayerKart(player_nb)->getNumCollectables() ;
 
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
@@ -661,7 +661,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
 
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
-  switch (World::current()->ready_set_go)
+  switch (world->ready_set_go)
     {
     case 2:
       drawText ( "Ready!", 80, SCREEN_CENTERED_TEXT, SCREEN_CENTERED_TEXT, 230, 170, 160 ) ;
@@ -674,6 +674,11 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
       break;
     }
 
+  for(int i = 0; i < 10; ++i) {
+    if(world->debugtext[i] != "")
+      drawText(world->debugtext[i].c_str(), 20, 20, 200 - i*20, 100, 210, 100);
+  }
+
   float split_screen_ratio_x, split_screen_ratio_y;
   split_screen_ratio_x = split_screen_ratio_y = 1.0;
   if(raceSetup.getNumPlayers() >= 2)
@@ -681,7 +686,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   if(raceSetup.getNumPlayers() >= 3)
     split_screen_ratio_x = 0.5;
 
-  if ( World::current()->getPhase() == World::FINISH_PHASE )
+  if ( world->getPhase() == World::FINISH_PHASE )
     {
       drawGameOverText     () ;
     }
@@ -699,7 +704,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
 
         drawCollectableIcons ( pla, offset_x, offset_y,
                                split_screen_ratio_x, split_screen_ratio_y ) ;
-        drawEnergyMeter ( (float)(World::current()->getPlayerKart(pla)->getNumHerring()) /
+        drawEnergyMeter ( (float)(world->getPlayerKart(pla)->getNumHerring()) /
                                MAX_HERRING_EATEN, offset_x, offset_y,
                                split_screen_ratio_x, split_screen_ratio_y ) ;
         drawScore       ( raceSetup, pla, offset_x, offset_y,

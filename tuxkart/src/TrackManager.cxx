@@ -1,4 +1,4 @@
-//  $Id: TrackManager.cxx,v 1.4 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: TrackManager.cxx,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,52 +18,47 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <set>
-#include "TuxkartError.h"
+#include <stdexcept>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "TrackManager.h"
 
-TrackManager track_manager;
+TrackManager* track_manager = 0;
 
 TrackManager::TrackManager()
 {
 }
 
-int
-TrackManager::getTrackId(const std::string& ident)
-{
-  int j = 0;
-  for(Tracks::iterator i = tracks.begin(); i != tracks.end(); ++i)
-    {
-      if (i->ident == ident)
-        return j;
-      ++j;
-    }
-
-  throw TuxkartError("TrackManager: Couldn't find track: '" + ident + "'");
-}
-
-const TrackData&
-TrackManager::getTrack(const std::string& ident)
+TrackManager::~TrackManager()
 {
   for(Tracks::iterator i = tracks.begin(); i != tracks.end(); ++i)
+    delete *i;
+}
+
+const TrackData*
+TrackManager::getTrack(const std::string& ident) const
+{
+  for(Tracks::const_iterator i = tracks.begin(); i != tracks.end(); ++i)
     {
-      if (i->ident == ident)
-        return (*i);
+      if ((*i)->ident == ident)
+        return *i;
     }
 
-  throw TuxkartError("TrackManager: Couldn't find track: '" + ident + "'");
+  throw std::runtime_error("TrackManager: Couldn't find track: '" + ident + "'");
 }
 
-const TrackData&
-TrackManager::getTrackById(int id)
+const TrackData*
+TrackManager::getTrack(size_t id) const
 {
-  if (id >= 0 && id < int(tracks.size()))
-    return tracks[id];
-
-  throw TuxkartError("TrackManager: Couldn't find track-id: '" + StringUtils::to_string(id) + "'");  
+  return tracks[id];
 }
- 
+
+size_t
+TrackManager::getTrackCount() const
+{
+  return tracks.size();
+}
+
 void
 TrackManager::loadTrackList ()
 {
@@ -74,10 +69,8 @@ TrackManager::loadTrackList ()
     {
       if(StringUtils::has_suffix(*i, ".track"))
         {
-          tracks.push_back(TrackData("data/" + *i));
+          tracks.push_back(new TrackData("data/" + *i));
         }
     }
 }
-
-/* EOF */
 

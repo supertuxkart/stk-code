@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.10 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: Projectile.cxx,v 1.11 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,44 +25,54 @@
 #include "Explosion.h"
 #include "World.h"
 
-void Projectile::update (float delta)
+Projectile::Projectile(World* _world, KartDriver* _owner, int _type)
+  : world(_world), owner(_owner), type(_type)
 {
-  wheelie_angle = 0 ;
-  zipper_time_left = 0.0f ;
-
-  if ( type == COLLECT_HOMING_MISSILE )
-    velocity.xyz[1] = MAX_HOMING_PROJECTILE_VELOCITY ;
-  else
-  if ( type == COLLECT_MISSILE )
-    velocity.xyz[1] = MAX_PROJECTILE_VELOCITY ;
-  else
-    velocity.xyz[1] = MAX_PROJECTILE_VELOCITY / 5.0f ;
-
-  Driver::update (delta) ;
-  wheelie_angle = 0 ;
-  zipper_time_left = 0.0f ;
+  sgZeroCoord(&velocity);
+  
+  // TODO load model, handle more types
+  switch(type) {
+    case COLLECT_MISSILE:
+    {
+      sgMat4 mat;
+      sgMakeRotMat4(mat, owner->getCoord()->hpr);
+      sgVec3 kart_unit = { 0, 1, 0 };
+      sgXformPnt3(kart_unit, mat);
+      sgScaleVec3(velocity.xyz, kart_unit, MAX_PROJECTILE_VELOCITY);
+      break;
+    }
+    default:
+      break;
+  }
 }
 
-void Projectile::doObjectInteractions ()
+Projectile::~Projectile()
 {
+}
+
+void Projectile::update (float delta)
+{
+  (void) delta;
+  // TODO
+#if 0
   float ndist = SG_MAX ;
   int nearest = -1 ;
 
-  for ( int i = 0 ; i < World::current()->getNumKarts() ; ++i )
+  for ( int i = 0 ; i < world->getNumKarts() ; ++i )
   {
     sgCoord *pos ;
  
-    pos = World::current()->getKart(i) -> getCoord () ;
+    pos = world->getKart(i) -> getCoord () ;
  
-    if ( type != COLLECT_NOTHING && World::current()->getKart(i) != owner )
+    if ( type != COLLECT_NOTHING && world->getKart(i) != owner )
     {
       float d = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
 
       if ( d < 2.0f )
       {
-        World::current()->getKart(i) -> forceCrash () ;
+        world->getKart(i) -> forceCrash () ;
         position.xyz[2] += 1.2f ;
-        World::current()->explosion[0]->start(position.xyz);
+        world->explosion[0]->start(position.xyz);
         off () ;
       }
       else
@@ -79,7 +89,7 @@ void Projectile::doObjectInteractions ()
   {
     sgVec3 delta ;
     sgVec3 hpr ;
-    sgCoord *k = World::current()->getKart(nearest)->getCoord() ;
+    sgCoord *k = world->getKart(nearest)->getCoord() ;
 
     sgSubVec3 ( delta, k->xyz, position.xyz ) ;
 
@@ -117,12 +127,10 @@ void Projectile::doObjectInteractions ()
   }
   else
     velocity.hpr[0] = velocity.hpr[1] = 0.0f ;
-
+#endif
 }
 
-void Projectile::doLapCounting        () {}
-void Projectile::doZipperProcessing   () {}
-
+#if 0
 void Projectile::doCollisionAnalysis  ( float /* delta*/,  float /* hot */ )
 {
   if ( collided || crashed )
@@ -142,21 +150,10 @@ void Projectile::doCollisionAnalysis  ( float /* delta*/,  float /* hot */ )
     if ( type != COLLECT_NOTHING )
     {
       position.xyz[2] += 1.2f ;
-      World::current()->explosion[0]->start(position.xyz);
+      world->explosion[0]->start(position.xyz);
       off () ;
     }
   }
 }
-
-void
-Projectile::fire ( KartDriver *who, int _type )
-{
-  owner = who ;
-  setCoord ( who->getCoord() ) ;
-  setType  ( _type ) ;
-}
-
-/* EOF */
-
-
+#endif
 

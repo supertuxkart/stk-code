@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.25 2004/09/08 17:02:16 jamesgregory Exp $
+//  $Id: TrackSel.cxx,v 1.26 2004/09/24 15:45:02 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,27 +31,28 @@ using std::string;
 
 TrackSel::TrackSel()
 {
-	menu_id = widgetSet -> vstack(0);
+  menu_id = widgetSet -> vstack(0);
 
-	widgetSet -> label(menu_id, "Choose a Track", GUI_LRG, GUI_TOP, 0, 0);
-	widgetSet -> space(menu_id);
+  widgetSet -> label(menu_id, "Choose a Track", GUI_LRG, GUI_TOP, 0, 0);
+  widgetSet -> space(menu_id);
 
-	int ha = widgetSet -> harray(menu_id);
+  int ha = widgetSet -> harray(menu_id);
 
-	int col1 = widgetSet -> varray(ha);
-	int col2 = widgetSet -> varray(ha);
+  int col1 = widgetSet -> varray(ha);
+  int col2 = widgetSet -> varray(ha);
 
-	for (unsigned int i = 0; i != track_manager.tracks.size()/2; ++i)
-		widgetSet -> state(col1, track_manager.tracks[i].name.c_str(), GUI_SML, i, 0);
+  for (size_t i = 0; i != track_manager->getTrackCount()/2; ++i)
+    widgetSet -> state(col1, track_manager->getTrack(i)->name.c_str(), GUI_SML, i, 0);
 
-	for (unsigned int i = track_manager.tracks.size()/2; i != track_manager.tracks.size(); ++i)
-	{
-		int tmp = widgetSet -> state(col2, track_manager.tracks[i].name.c_str(), GUI_SML, i, 0);
-		if (i == track_manager.tracks.size()/2)
-			widgetSet -> set_active(tmp);
-	}
+  for (size_t i = track_manager->getTrackCount()/2; 
+      i != track_manager->getTrackCount(); ++i)
+  {
+    int tmp = widgetSet -> state(col2, track_manager->getTrack(i)->name.c_str(), GUI_SML, i, 0);
+    if (i == track_manager->getTrackCount()/2)
+      widgetSet -> set_active(tmp);
+  }
 
-	widgetSet -> layout(menu_id, 0, 1);
+  widgetSet -> layout(menu_id, 0, 1);
 }
 
 TrackSel::~TrackSel()
@@ -68,17 +69,19 @@ void TrackSel::update(float dt)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 		if( widgetSet -> token (widgetSet -> click()) != MENU_RETURN ) {
-			TrackData track_data = track_manager.tracks[widgetSet -> token (widgetSet -> click())];
+			const TrackData* track_data
+                          = track_manager->getTrack(widgetSet->token (widgetSet -> click()));
 
 			float x     = 0.5f;
 			float y     = 0.0f;
 			float scale = .003f;
 
 			glBegin ( GL_LINE_LOOP ) ;
-			for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
+			for ( size_t i = 0 ;
+                            i < track_data->driveline.size() ; ++i )
 			{
-				glVertex2f ( x + ( track_data.driveline[i][0] ) * scale,
-				             y + ( track_data.driveline[i][1] ) * scale ) ;
+                          glVertex2f ( x + ( track_data->driveline[i][0] ) * scale,
+                              y + ( track_data->driveline[i][1] ) * scale ) ;
 			}
 			glEnd () ;
 		}
@@ -87,8 +90,10 @@ void TrackSel::update(float dt)
 
 void TrackSel::select()
 {
-        RaceManager::instance()->setTrack(track_manager.getTrackById(widgetSet -> token ( widgetSet -> click() )).ident);
-	startScreen->switchToGame();
+  RaceManager::instance()->setTrack(
+      track_manager->getTrack(widgetSet -> token ( widgetSet -> click()
+          ))->ident);
+  startScreen->switchToGame();
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.23 2004/08/26 23:08:42 grumbel Exp $
+//  $Id: Camera.cxx,v 1.24 2004/09/24 15:45:01 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -71,9 +71,9 @@ Camera::Camera ( int numPlayers, int which_ )
   context = new ssgContext ;
 
   // FIXME: clipping should be configurable for slower machines
-  const TrackData& track_data = track_manager.getTrack(World::current()->raceSetup.track);
-  if (track_data.use_fog)
-    context -> setNearFar ( 0.05f, track_data.fog_end ) ;
+  const TrackData* track_data = track_manager->getTrack(world->raceSetup.track);
+  if (track_data->use_fog)
+    context -> setNearFar ( 0.05f, track_data->fog_end ) ;
   else
     context -> setNearFar ( 0.05f, 1000.0f ) ;
 
@@ -90,10 +90,10 @@ Camera::setMode(Mode mode_)
 void Camera::update ()
 {
   // Update the camera
-  if ( whichKart >= int(World::current()->getNumKarts()) || whichKart < 0 ) whichKart = 0 ;
+  if ( whichKart >= int(world->getNumKarts()) || whichKart < 0 ) whichKart = 0 ;
 
   sgCoord kartcoord;
-  sgCopyCoord(&kartcoord, World::current()->getPlayerKart(whichKart)->getCoord());
+  sgCopyCoord(&kartcoord, world->getPlayerKart(whichKart)->getCoord());
 
   kartcoord.hpr[2] = 0;
   kartcoord.hpr[1] = 0;
@@ -119,7 +119,7 @@ void Camera::update ()
 
   if (mode == CM_NO_FAKE_DRIFT)
     {
-      float steer_offset = World::current()->getPlayerKart(whichKart)->getSteerAngle()*-10.0f;
+      float steer_offset = world->getPlayerKart(whichKart)->getSteerAngle()*-10.0f;
       relaxation(steer_offset, last_steer_offset, .25);
                  
       sgMat4 cam_rot;
@@ -153,7 +153,7 @@ void Camera::apply ()
   int width  = getScreenWidth  () ;
   int height = getScreenHeight () ;
 
-  assert ( World::current()->scene != NULL ) ;
+  assert ( world->scene != NULL ) ;
 
   glViewport ( (int)((float)width  * x),
                (int)((float)height * y),
