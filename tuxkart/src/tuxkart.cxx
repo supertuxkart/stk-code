@@ -1,8 +1,9 @@
 
 #include "tuxkart.h"
 
-int mirror = 0 ;
-int player = 0 ;
+int mirror  = 0 ;
+int reverse = 0 ;
+int player  = 0 ;
 
 int finishing_position = -1 ;
 
@@ -386,7 +387,8 @@ static void banner ()
 }
 
 
-int tuxkartMain ( int _numLaps, int _mirror, char *_levelName, int numPlayers )
+int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
+                  char *_levelName, int numPlayers )
 {
   /* Say "Hi!" to the nice user. */
 
@@ -396,6 +398,7 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName, int numPlayers )
 
   fclock           = new ulClock ;
   mirror           = _mirror     ;
+  reverse          = _reverse    ;
   num_laps_in_race = _numLaps    ;
   trackname        = _levelName  ;
 
@@ -450,7 +453,7 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName, int numPlayers )
   char fname [ 100 ] ;
   sprintf ( fname, "data/%s.drv", trackname ) ;
 
-  curr_track = new Track ( fname, mirror ) ;
+  curr_track = new Track ( fname, mirror, reverse ) ;
   gfx        = new GFX ( mirror ) ;
   sound      = new SoundSystem ;
   gui        = new GUI ;
@@ -492,8 +495,18 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName, int numPlayers )
     else
       kart[i] = new AutoKartDriver    ( i, new ssgTransform ) ;
 
+    sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
+
+    init_pos.xyz [ 0 ] = (float)(i-2) * 2.0f ;
+    init_pos.xyz [ 1 ] = 2.0f ;
+
+    if ( reverse ) init_pos.hpr[0] = 180.0f ;
+
+    kart[i] -> setReset ( & init_pos ) ;
+    kart[i] -> reset    () ;
+    kart[i] -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+
     scene -> addKid ( kart[i] -> getModel() ) ;
-    kart[i] -> getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
   }
 
   /* Load the Projectiles */

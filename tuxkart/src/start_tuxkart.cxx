@@ -15,6 +15,7 @@ static puButton       *numLapsText      ;
 static puButton       *playButton       ;
 static puButton       *exitButton       ;
 static puButton       *mirrorButton     ;
+static puButton       *reverseButton    ;
 static puButtonBox    *trackButtons     ;
 static puButtonBox    *playerButtons    ;
 static puButton       *pleaseWaitButton ;
@@ -35,8 +36,9 @@ static void switchToGame ()
   /* Collect the selected track and number of laps */
 
   int t ;
-  int nl, np ;
-  int mirror ;
+  int nl, np  ;
+  int mirror  ;
+  int reverse ;
 
   trackButtons -> getValue ( & t ) ;
   nl = atoi ( numLapsText->getLegend () ) ;
@@ -50,25 +52,28 @@ static void switchToGame ()
   mirror = 0 ;
 #endif
 
+  reverseButton -> getValue ( & reverse ) ;
+
   /* Get rid of all the GUI widgets */
 
   puDeleteObject ( pleaseWaitButton ) ;
-  puDeleteObject ( numLapsSlider ) ;
-  puDeleteObject ( numLapsText   ) ;
+  puDeleteObject ( numLapsSlider  ) ;
+  puDeleteObject ( numLapsText    ) ;
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  puDeleteObject ( mirrorButton  ) ;
+  puDeleteObject ( mirrorButton   ) ;
 #endif
-  puDeleteObject ( playButton    ) ;
-  puDeleteObject ( exitButton    ) ;
-  puDeleteObject ( trackButtons  ) ;
-  puDeleteObject ( playerButtons ) ;
+  puDeleteObject ( reverseButton  ) ;
+  puDeleteObject ( playButton     ) ;
+  puDeleteObject ( exitButton     ) ;
+  puDeleteObject ( trackButtons   ) ;
+  puDeleteObject ( playerButtons  ) ;
   delete introMaterial ;
   delete sorority  ;
   delete fnt       ;
 
   /* Start the main program */
 
-  tuxkartMain ( nl, mirror, trackIdents[t], np ) ;
+  tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
 }
 
 /*********************************\
@@ -352,10 +357,13 @@ int main ( int argc, char **argv )
   trackButtons -> setValue       ( 0                ) ; 
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  mirrorButton = new puButton    ( 260, 10, "Mirror Track" ) ;
+  mirrorButton = new puButton    ( 260, 40, "Mirror Track" ) ;
   mirrorButton -> setValue       ( 0                ) ;
 #endif
    
+  reverseButton = new puButton    ( 260, 10, "Reverse Track" ) ;
+  reverseButton -> setValue       ( 0                ) ;
+
   /*
     Load up the splash screen texture,
     loop until user hits the START button,

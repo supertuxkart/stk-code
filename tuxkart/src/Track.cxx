@@ -4,7 +4,7 @@
 static int npoints ;
 static sgVec3 driveline[MAX_DRIVELINE] ;
 
-Track::Track ( char *fname, int mirror )
+Track::Track ( char *fname, int mirror, int reverse )
 {
   int i ;
   float d = 0.0f ;
@@ -42,6 +42,17 @@ Track::Track ( char *fname, int mirror )
   }
 
   fclose ( fd ) ;
+
+  if ( reverse )
+    for ( i = 0 ; i < npoints/2 ; i++ )
+    {
+      int j = npoints - i - 1 ;
+      float tmp ;
+
+      tmp=driveline[i][0];driveline[i][0]=driveline[j][0];driveline[j][0]=tmp;
+      tmp=driveline[i][1];driveline[i][1]=driveline[j][1];driveline[j][1]=tmp;
+      tmp=driveline[i][2];driveline[i][2]=driveline[j][2];driveline[j][2]=tmp;
+    }
 
   sgSetVec2 ( min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
   sgSetVec2 ( max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;

@@ -87,6 +87,7 @@ extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-extern int tuxkartMain ( int nl, int mirror, char *track, int numPlayers ) ;
+extern int tuxkartMain ( int nl, int mirror, int reverse, 
+                         char *track, int numPlayers ) ;
 
 

@@ -325,10 +325,5 @@ KartDriver::KartDriver ( int _position, ssgTransform *m ) : Driver ( m )
   attachment = NULL ;
   attachment_time_left = 0.0f ;
   attachment_type = ATTACH_NOTHING ;
-
-  reset_pos.xyz[0] += (float) (grid_position-2) * 2.0f ;
-  reset_pos.xyz[1] += 2.0f ;
-
-  reset () ;
 }
 

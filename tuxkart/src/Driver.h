@@ -106,7 +106,6 @@ public:
     model = m ;
 
     sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
-
     reset () ;
   }
 
