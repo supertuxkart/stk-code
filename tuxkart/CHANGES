@@ -2,6 +2,16 @@
 TuxKart Change Log.
 ===================
 
+TuxKart v0.0.3 (July 4th 2000)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Fixed bug in Keyboard driver when no
+    joystick driver is installed.
+
+  * More CygWin fixes.
+
+  * Started new feature to allow you to be
+    rescued from lava, etc.
+
 TuxKart v0.0.2 (July 2nd 2000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Added ability to add new tracks without
