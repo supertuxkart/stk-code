@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.11 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: BaseGUI.h,v 1.12 2004/08/22 05:06:11 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,7 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
-#include <SDL.h>
+#include <SDL.h> //this should be "SDL.h" for portability?
 
 class RaceSetup;
 

@@ -1,4 +1,4 @@
-//  $Id: Difficulty.h,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: Difficulty.h,v 1.3 2004/08/22 05:06:11 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,12 +20,15 @@
 #ifndef HEADER_DIFFICULTY_H
 #define HEADER_DIFFICULTY_H
 
+#include "../RaceSetup.h"
 #include "BaseGUI.h"
 
 class Difficulty: public BaseGUI
 {
+private:
+	RaceSetup& raceSetup;
 public:
-	Difficulty();
+	Difficulty(RaceSetup& raceSetup);
 	~Difficulty();
 	
 	void update(float dt);

@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.10 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: GameMode.cxx,v 1.11 2004/08/22 05:06:11 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,16 +56,16 @@ void GameMode::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_GP:
-		raceSetup.numKarts = -1;
+		raceSetup.numKarts = 4;
 		guiStack.push_back(GUIS_DIFFICULTYGP);
 		break;
 	case MENU_QUICKRACE:
-		raceSetup.numKarts = -1;
+		raceSetup.numKarts = 4;
 		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	case MENU_TIMETRIAL:
 		raceSetup.numKarts = 1;
-		guiStack.push_back(GUIS_DIFFICULTYSR);
+		guiStack.push_back(GUIS_CHARSEL); //difficulty makes no sense here
 		break;
 	default: break;
 	}
@@ -75,9 +75,9 @@ void GameMode::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
-	case SDLK_LEFT:    
-	case SDLK_RIGHT:    
-	case SDLK_UP:    
+	case SDLK_LEFT:
+	case SDLK_RIGHT:
+	case SDLK_UP:
 	case SDLK_DOWN:
 		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
 		break;

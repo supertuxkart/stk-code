@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.10 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: Difficulty.cxx,v 1.11 2004/08/22 05:06:11 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,29 +23,30 @@
 
 #include <algorithm>
 
-Difficulty::Difficulty()
+Difficulty::Difficulty(RaceSetup& raceSetup_)
+  : raceSetup(raceSetup_)
 {
-        menu_id = widgetSet -> vstack(0);
+	menu_id = widgetSet -> vstack(0);
 
-        widgetSet -> label(menu_id, "Choose a Difficulty", GUI_LRG, GUI_ALL, 0, 0);
+	widgetSet -> label(menu_id, "Choose a Difficulty", GUI_LRG, GUI_ALL, 0, 0);
 
 	int va = widgetSet -> varray(menu_id);
-	widgetSet -> start(va, "Easy",  GUI_MED, MENU_EASY, 0);
-	widgetSet -> state(va, "Medium",  GUI_MED, MENU_MEDIUM, 0);
-	widgetSet -> state(va, "Hard",  GUI_MED, MENU_HARD, 0);
+	widgetSet -> start(va, "Easy", GUI_MED, MENU_EASY, 0);
+	widgetSet -> state(va, "Medium", GUI_MED, MENU_MEDIUM, 0);
+	widgetSet -> state(va, "Hard", GUI_MED, MENU_HARD, 0);
 	
-        if (0)
-        {
-                if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYSR) != guiStack.end())
-                {
-                        widgetSet -> state(menu_id, "Number of Laps",  GUI_SML, 0, 0);
-                        widgetSet -> state(menu_id, "Reverse Track",  GUI_SML, 0, 0);
+	if (0)
+	{
+		if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYSR) != guiStack.end())
+		{
+			widgetSet -> state(menu_id, "Number of Laps", GUI_SML, 0, 0);
+			widgetSet -> state(menu_id, "Reverse Track", GUI_SML, 0, 0);
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-                        widgetSet -> state(menu_id, "Mirror Track",  GUI_SML, 0, 0);
+			widgetSet -> state(menu_id, "Mirror Track", GUI_SML, 0, 0);
 #endif
-                }
-        }
-	
+		}
+	}
+
 	widgetSet -> layout(menu_id, 0, 0);
 }
 
@@ -65,9 +66,18 @@ void Difficulty::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_EASY:	guiStack.push_back(GUIS_CHARSEL);	break;
-	case MENU_MEDIUM:	guiStack.push_back(GUIS_CHARSEL);	break;
-	case MENU_HARD:	guiStack.push_back(GUIS_CHARSEL);	break;
+	case MENU_EASY:
+		raceSetup.difficulty = RaceSetup::RD_EASY;
+		guiStack.push_back(GUIS_CHARSEL);
+		break;
+	case MENU_MEDIUM:
+		raceSetup.difficulty = RaceSetup::RD_MEDIUM;
+		guiStack.push_back(GUIS_CHARSEL);
+		break;
+	case MENU_HARD:
+		raceSetup.difficulty = RaceSetup::RD_HARD;
+		guiStack.push_back(GUIS_CHARSEL);
+		break;
 	default: break;
 	}
 }
@@ -76,9 +86,9 @@ void Difficulty::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
-	case SDLK_LEFT:    
-	case SDLK_RIGHT:    
-	case SDLK_UP:    
+	case SDLK_LEFT:
+	case SDLK_RIGHT:
+	case SDLK_UP:
 	case SDLK_DOWN:
 		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
 		break;

@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.3 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: RaceSetup.h,v 1.4 2004/08/22 05:06:11 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,21 +27,25 @@
 class RaceSetup
 {
 public:
-        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
+	enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
+	enum RaceDiff { RD_EASY, RD_MEDIUM, RD_HARD };
+	
 
 	RaceSetup() { 
-                mode       = RM_QUICK_RACE;
-                numLaps    = 3; 
-                mirror     = false; 
-                reverse    = false; 
-                track      = 0;
-                numKarts   = -1; // use all available karts
-                numPlayers = 1; 
-		    
-		    kart_choices.resize(4, 0);
-        }
-        
-        RaceMode  mode;
+		mode       = RM_QUICK_RACE;
+		difficulty = RD_EASY;
+		numLaps    = 3; 
+		mirror     = false; 
+		reverse    = false; 
+		track      = 0;
+		numKarts   = 4; //-1 to use all available karts
+		numPlayers = 1;
+
+		kart_choices.resize(4, 0);
+	}
+
+	RaceMode  mode;
+	RaceDiff  difficulty;
 	int   numLaps;
 	bool  mirror;
 	bool  reverse;
