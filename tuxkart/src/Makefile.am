@@ -36,6 +36,8 @@ tuxkart_SOURCES = \
   Track.cxx  \
   Track.h  \
   Controller.h \
+  GrandPrixSetup.h \
+  GrandPrixSetup.cxx \
   TrackManager.cxx \
   TrackManager.h \
   Traffic.cxx  \
@@ -108,6 +110,8 @@ tuxkart_SOURCES = \
   gui/ConfigControls.h \
   gui/PlayerControls.cxx \
   gui/PlayerControls.h \
+  gui/RaceResultsGUI.cxx \
+  gui/RaceResultsGUI.h \
   gui/RaceMenu.cxx \
   gui/RaceMenu.h
 
