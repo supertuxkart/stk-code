@@ -62,7 +62,7 @@ click 'start game' to get going.
 
 PLAYING THE GAME:
 
-Ideally, you need a 'gamepad' style joystick with at leasti six buttons:
+Ideally, you need a 'gamepad' style joystick with at least six buttons:
 
   Joystick Left/Right:  Steer.
 
@@ -74,11 +74,11 @@ Ideally, you need a 'gamepad' style joystick with at leasti six buttons:
   R button - Jump.
 
 
-In addition, you can drive from the keyboard:
+In addition, you can drive from the keyboard. The controls are changeable from the in-game options menu, but the defaults are:
 
   LEFT/RIGHT ARROW: Steer.
 
-  UP-ARROW   - Same as 'A' button - Accellerate
+  UP-ARROW   - Same as 'A' button - Accelerate
   DOWN-ARROW - Same as 'B' button - Brake
 
   A key - Same as 'L' button - pop a Wheelie
@@ -89,11 +89,9 @@ In addition, you can drive from the keyboard:
 
 The following keys control the in-game GUI:
 
-  SPACE - Pop up or Hide the menu bar.
-  R key - Restart the race.
-  P key - Pause.
-
-  ESCAPE- Exit the game.
+  Joystick/keyboard cursors/mouse - highlight menu options
+  Enter/fire button/fire key/left mouse button - select menu options
+  Escape/brake button/brake key/right mouse button - return to previous menu
 
 
 There are also some debug functions left in for developers:
