@@ -38,6 +38,8 @@ if test "x$enable_sdl" = "xyes"; then
         use_sdl="no")
 fi
 
+AM_CONDITIONAL(HAVE_LIBSDL, test x$use_sdl = xyes)
+
 plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
 
 dnl Checks for library functions.

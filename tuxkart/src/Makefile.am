@@ -4,7 +4,14 @@ bindir=$(prefix)/games
 
 bin_PROGRAMS = tuxkart
 
+if HAVE_LIBSDL
+VIDEO_FILES = sdldrv.cxx sdldrv.h
+else
+VIDEO_FILES = pwdrv.cxx pwdrv.h
+endif
+
 tuxkart_SOURCES = \
+  $(VIDEO_FILES) \
   AutoDriver.cxx  \
   Camera.cxx  \
   Driver.cxx  \
@@ -19,8 +26,6 @@ tuxkart_SOURCES = \
   isect.cxx  \
   joystick.h  \
   loader.cxx  \
-  pwdrv.cxx  \
-  pwdrv.h  \
   sound.cxx  \
   utils.cxx  \
   status.h  \
