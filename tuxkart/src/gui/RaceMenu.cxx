@@ -1,4 +1,4 @@
-//  $Id: RaceMenu.cxx,v 1.2 2004/08/08 05:03:42 jamesgregory Exp $
+//  $Id: RaceMenu.cxx,v 1.3 2004/08/08 05:10:28 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -50,7 +50,7 @@ void RaceMenu::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_RETURN:	guiStack.pop_back(); break;
-	case MENU_RESTART: restartRace(); break;
+	case MENU_RESTART: guiStack.pop_back(); restartRace(); break;
 	case MENU_EXIT:	guiStack.push_back(GUIS_EXITRACE); break;
 	default: break;
 	}
