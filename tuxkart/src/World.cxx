@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.23 2004/08/20 22:32:31 jamesgregory Exp $
+//  $Id: World.cxx,v 1.24 2004/08/23 14:52:11 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -129,7 +129,7 @@ World::World(const RaceSetup& raceSetup_)
       newkart = new KartDriver ( kart_manager.karts[i], i, new NetworkDriver ) ;
     else
       newkart = new KartDriver ( kart_manager.karts[i], i, new AutoDriver ) ;
-
+    
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
     init_pos.xyz [ 0 ] = (i % 2 == 0) ? 1.5f : -1.5f ;
@@ -165,6 +165,11 @@ World::World(const RaceSetup& raceSetup_)
 #endif
 	
   guiStack.push_back(GUIS_RACE);
+
+  std::string music = track_manager.tracks[raceSetup.track].music_filename;
+  
+  if (!music.empty())
+    sound -> change_track ( music.c_str() );
 
   ready_set_go = 3;
 }
@@ -425,11 +430,6 @@ World::load_track(const char *fname )
 
     char htype = '\0' ;
 
-    if ( sscanf ( s, "MUSIC \"%[^\"]\"", fname ) == 1 )
-    {
-      sound -> change_track ( fname ) ;
-    }
-    else
     if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                      &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
     {

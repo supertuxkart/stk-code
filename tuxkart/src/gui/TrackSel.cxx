@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.18 2004/08/22 22:22:58 oaf_thadres Exp $
+//  $Id: TrackSel.cxx,v 1.19 2004/08/23 14:52:11 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -115,3 +115,4 @@ void TrackSel::stick(int x, int y)
 	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }
 
+/* EOF */
