@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.1 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: KartDriver.h,v 1.2 2004/08/09 17:20:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,17 +34,24 @@ protected:
   int num_herring_gobbled ;
   ssgSelector *attachment ;
 
+  float wheel_position;
+
   ssgTransform *wheel_front_l;
   ssgTransform *wheel_front_r;
   ssgTransform *wheel_rear_l;
   ssgTransform *wheel_rear_r;
+  
+  /** Search the given branch of objects that match the wheel names
+      and if so assign them to wheel_* variables */
+  void load_wheels(ssgBranch* obj);
 
 public:
-
   KartDriver ( const KartProperties& kart_properties_, int position_ ) ;
   virtual ~KartDriver() {}
 
   void load_data();
+
+  virtual void placeModel ();
 
   void addAttachment ( ssgEntity *e )
   {

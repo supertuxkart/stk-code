@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.14 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.15 2004/08/09 17:20:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -239,6 +239,8 @@ void KartDriver::doCollisionAnalysis ( float hot )
 
 void KartDriver::update ()
 {
+  wheel_position += sgLengthVec3(velocity.xyz);
+
   if ( rescue )
   {
     rescue = FALSE ;
@@ -351,6 +353,8 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
   attachment_time_left = 0.0f ;
   attachment_type      = ATTACH_NOTHING ;
 
+  wheel_position = 0;
+
   wheel_front_l = NULL;
   wheel_front_r = NULL;
   wheel_rear_l  = NULL;
@@ -359,21 +363,99 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
 
 void print_model(ssgEntity* entity, int indent)
 {
-  for(int i = 0; i < indent; ++i)
-    std::cout << "  ";
+  if (entity)
+    {
+      for(int i = 0; i < indent; ++i)
+        std::cout << "  ";
 
-  std::cout << entity->getTypeName() << " '" 
-            << entity->getPrintableName() 
-            << "' '" 
-            << (entity->getName() ? entity->getName() : "null")
-            << "' " << int(entity) << std::endl;
+      std::cout << entity->getTypeName() << " " << entity->getType() << " '" 
+                << entity->getPrintableName() 
+                << "' '" 
+                << (entity->getName() ? entity->getName() : "null")
+                << "' " << int(entity) << std::endl;
   
-  ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
+      ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
+  
+      if (branch)
+        {
+          for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
+            {
+              print_model(i, indent + 1);
+            }
+        }
+    }
+}
+
+static ssgTransform* add_transform(ssgBranch* branch)
+{
+  if (branch)
+    {
+      //std::cout << "1 BEGIN: " << std::endl;
+      //print_model(branch, 0);
+      //std::cout << "1 END: " << std::endl;
+
+      ssgTransform* transform = new ssgTransform;
+      transform->ref();
+      for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
+        {
+          transform->addKid(i);
+        }
+
+      branch->removeAllKids();
+      branch->addKid(transform);
+
+      // Set some user data, so that the wheel isn't ssgFlatten()'ed
+      branch->setUserData(new ssgBase());
+      transform->setUserData(new ssgBase());
+
+
+      //std::cout << "2 BEGIN: " << std::endl;
+      //print_model(branch, 0);
+      //std::cout << "2 END: " << std::endl;
+
+      return transform;
+    }
+  else
+    {
+      return NULL;
+    }
+}
+
+void
+KartDriver::load_wheels(ssgBranch* branch)
+{
   if (branch)
     {
       for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
         {
-          print_model(i, indent + 1);
+          if (i->getName())
+            { // We found something that might be a wheel
+              if (strcmp(i->getName(), "WheelFront.L") == 0)
+                {
+                  wheel_front_l = add_transform(dynamic_cast<ssgTransform*>(i));
+                }
+              else if (strcmp(i->getName(), "WheelFront.R") == 0)
+                {
+                  wheel_front_r = add_transform(dynamic_cast<ssgTransform*>(i));
+                }
+              else if (strcmp(i->getName(), "WheelRear.L") == 0) 
+                {
+                  wheel_rear_l = add_transform(dynamic_cast<ssgTransform*>(i));
+                }
+              else if (strcmp(i->getName(), "WheelRear.R") == 0)
+                {
+                  wheel_rear_r = add_transform(dynamic_cast<ssgTransform*>(i));
+                }
+              else
+                {
+                  // Wasn't a wheel, continue searching
+                  load_wheels(dynamic_cast<ssgBranch*>(i));
+                }
+            }
+          else
+            { // Can't be a wheel,continue searching
+              load_wheels(dynamic_cast<ssgBranch*>(i));
+            }
         }
     }
 }
@@ -391,8 +473,21 @@ KartDriver::load_data()
 
   ssgEntity *obj = ssgLoadAC ( kart_properties.model_file.c_str(), loader ) ;
 
-  if (kart_properties.model_file == "mrcube.ac")
-    print_model(model, 0);
+  //if (kart_properties.model_file == "mrcube.ac")
+  //print_model(obj, 0);
+
+  load_wheels(dynamic_cast<ssgBranch*>(obj));
+
+  /*if (kart_properties.model_file == "mrcube.ac")
+    {
+  std::cout << "WHEELS: " << std::endl;
+  print_model(wheel_front_l, 0);
+  print_model(wheel_front_r, 0);
+
+  print_model(wheel_rear_l, 0);
+  print_model(wheel_rear_r, 0);
+    }
+  */
 
   // Optimize the model
   ssgBranch *newobj = new ssgBranch () ;
@@ -400,7 +495,10 @@ KartDriver::load_data()
   ssgFlatten    ( obj ) ;
   ssgStripify   ( newobj ) ;
   obj = newobj;
-    
+
+  /*if (kart_properties.model_file == "mrcube.ac")
+    print_model(obj, 0);*/
+  
   ssgRangeSelector *lod = new ssgRangeSelector ;
 
   lod -> addKid ( obj ) ;
@@ -434,6 +532,27 @@ KartDriver::load_data()
 
   shadow = new Shadow(kart_properties.shadow_file, -1, 1, -1, 1);
   comp_model->addKid ( shadow->getRoot () );
+}
+
+void
+KartDriver::placeModel ()
+{
+  sgMat4 wheel_front;
+  sgMat4 wheel_steer;
+  sgMat4 wheel_rot;
+  
+  sgMakeRotMat4( wheel_rot, 0, -wheel_position, 0);
+  sgMakeRotMat4( wheel_steer, getSteerAngle()/M_PI * 180.0f * 0.25f, 0, 0);
+
+  sgMultMat4(wheel_front, wheel_steer, wheel_rot);
+
+  if (wheel_front_l) wheel_front_l->setTransform(wheel_front);
+  if (wheel_front_r) wheel_front_r->setTransform(wheel_front);
+  
+  if (wheel_rear_l) wheel_rear_l->setTransform(wheel_rot);
+  if (wheel_rear_r) wheel_rear_r->setTransform(wheel_rot);
+
+  Driver::placeModel();
 }
 
 /* EOF */
