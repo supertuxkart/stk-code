@@ -1,4 +1,4 @@
-//  $Id: Controller.h,v 1.1 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: Controller.h,v 1.2 2004/10/24 08:15:00 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,20 +17,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*Some edits:
+ *Added float delta in virtual void update so it would call the AutoDriver::update func
+ */
 #ifndef HEADER_CONTROLLER_H
 #define HEADER_CONTROLLER_H
 
-class KartDriver;
+   class KartDriver;
 
-class Controller
-{
-protected:
-  KartDriver* kart;
-public:
-  Controller() { kart = 0; }
-  virtual void setKart(KartDriver* kart_) { kart = kart_; }
-  virtual void update() {}
-};
+    class Controller
+   {
+   protected:
+      KartDriver* kart;
+   public:
+       Controller() { kart = 0; }
+       virtual void setKart(KartDriver* kart_) { kart = kart_; }
+       virtual void update(float delta) {}
+   };
 
 #endif
 

@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.h,v 1.2 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: PlayerDriver.h,v 1.3 2004/10/24 08:15:00 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
+/*Some edits:
+ *Commented out the func PlayerDriver::update.. seems unneeded and has 'issues' with
+ *AutoDriver::update.
+ */
+
 #ifndef HEADER_PLAYERDRIVER_H
 #define HEADER_PLAYERDRIVER_H
 
@@ -24,26 +30,26 @@
 #include "Controller.h"
 #include "sdldrv.h"
 
-class KartDriver;
+   class KartDriver;
 
 /** PlayerDriver manages controll events from the player and moves
     them to the Kart */
-class PlayerDriver : public Controller
-{
-private:
-  float    tscale ;
-  float    rscale ;
-  
-  // physics debugging
-  float *selected_property;
-
-public:
-  PlayerDriver();
-
-  void update();
-  void incomingJoystick  (JoyInfo& ji);
-  void incomingKeystroke ( const SDL_keysym& key );
-};
+    class PlayerDriver : public Controller
+   {
+   private:
+      float    tscale ;
+      float    rscale ;
+   
+   // physics debugging
+      float *selected_property;
+   
+   public:
+      PlayerDriver();
+   
+      //void update();
+      void incomingJoystick  (JoyInfo& ji);
+      void incomingKeystroke ( const SDL_keysym& key );
+   };
 
 #endif
 
