@@ -369,8 +369,8 @@ void drawGameOverText ()
   }
   else
   {
-    drawText ( "CONGRATULATIONS"  , 50, 50, 330 ) ;
-    drawText ( "YOU WON THE RACE!", 50, 50, 280 ) ;
+    drawText ( "CONGRATULATIONS"  , 40, 50, 330 ) ;
+    drawText ( "YOU WON THE RACE!", 40, 50, 280 ) ;
   }
 
   if ( timer++ & 16 )
