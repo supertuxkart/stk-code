@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.52 2004/12/12 22:01:01 cosmosninja Exp $
+//  $Id: KartDriver.cxx,v 1.53 2004/12/14 00:50:41 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -592,7 +592,7 @@
          brake = 0.0f;
       }
    
-      if ( wheelie_angle <= 0.0f ) {      
+      if ((wheelie_angle <= 0.0f) && (on_ground)) {      
          steer_angle = -kart_properties->turn_speed * controlls.lr;
       
          if ( steer_angle > kart_properties->max_wheel_turn)

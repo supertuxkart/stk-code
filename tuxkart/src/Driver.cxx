@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.42 2004/11/04 06:43:42 cosmosninja Exp $
+//  $Id: Driver.cxx,v 1.43 2004/12/14 00:50:42 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -313,9 +313,17 @@
    
       doCollisionAnalysis ( delta, hot ) ;
    
-      track_hint = world ->track -> spatialToTrack ( curr_track_coords,
+      //The next lines before firsttime = FALSE ensure no dot jumping
+      int possible_hint = world ->track -> spatialToTrack ( curr_track_coords,
                                                             position.xyz,
                                                             track_hint ) ;
+      if (((possible_hint + 1 <= (int)track_hint + 2) &&
+            (possible_hint - 1 >= (int)track_hint - 2)) || 
+               ((possible_hint == (int)world->track->driveline.size() - 1) && 
+                  (track_hint == 0)) || ((possible_hint == 0) &&
+                     (track_hint == world->track->driveline.size() - 1 )))
+         track_hint = possible_hint;
+      
    
       firsttime = FALSE ;
       doLapCounting () ;
