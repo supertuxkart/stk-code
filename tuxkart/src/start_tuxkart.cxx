@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.76 2004/08/25 20:36:18 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.77 2004/08/28 22:41:52 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -143,6 +143,7 @@ int main ( int argc, char *argv[] )
 
   /*load options from configuration file*/
   config.loadConfig();
+  RaceManager::instance()->setNumKarts(config.karts);
 
   /* Testing if we've given arguments */
   if ( argc > 1) 
@@ -172,7 +173,7 @@ int main ( int argc, char *argv[] )
 
 	  else if( (!strcmp(argv[i], "--numkarts") or !strcmp(argv[i], "-k")) && argc > 2)
             {
-	      RaceManager::instance()->setNumKarts(atoi(argv[i+1]));
+	      RaceManager::instance()->setNumKarts(config.karts = atoi(argv[i+1]));
 	      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
 	    }
 
