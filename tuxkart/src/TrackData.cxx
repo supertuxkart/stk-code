@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.9 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.10 2004/08/24 19:33:10 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,7 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <iostream>
-#include "lispreader.h"
+#include <stdexcept>
+#include "lisp/Lisp.h"
+#include "lisp/Parser.h"
 #include "Loader.h"
 #include "TrackData.h"
 #include "StringUtils.h"
@@ -49,33 +51,35 @@ TrackData::TrackData(const std::string& filename_)
   sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
   sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
 
+  const lisp::Lisp* lisp = 0;
   try {
-    LispReader* track = LispReader::load(loader ? loader->getPath(filename) : filename, "tuxkart-track");
-    assert(track);
-    
-    LispReader reader(track->get_lisp());
-    
-    reader.read_string("name", name);
-    reader.read_string("music", music_filename);
-    reader.read_sgVec4("sky-color", sky_color);
+    lisp::Parser parser;
+    lisp = parser.parse(loader->getPath(filename));
 
-    reader.read_bool ("use-fog",      use_fog);
-    reader.read_sgVec4("fog-color",   fog_color);
-    reader.read_float("fog-density", fog_density);
-    reader.read_float("fog-start",    fog_start);
-    reader.read_float("fog-end",      fog_end);
+    lisp = lisp->getLisp("tuxkart-track");
+    if(!lisp) {
+        throw std::runtime_error("no tuxkart-track node");
+    }
+        
+    lisp->get("name",        name);
+    lisp->get("music",       music_filename);
+    lisp->get("sky-color",   sky_color);
 
-    reader.read_sgVec3("sun-position", sun_position);
-    reader.read_sgVec4("sun-ambient",  ambientcol);
-    reader.read_sgVec4("sun-specular", specularcol);
-    reader.read_sgVec4("sun-diffuse",  diffusecol);
+    lisp->get("use-fog",     use_fog);
+    lisp->get("fog-color",   fog_color);
+    lisp->get("fog-density", fog_density);
+    lisp->get("fog-start",   fog_start);
+    lisp->get("fog-end",     fog_end);
 
-    delete track;
-  } catch(LispReaderException& err) {
-    std::cout << "LispReaderException: " << err.message << std::endl;
+    lisp->get("sun-position", sun_position);
+    lisp->get("sun-ambient",  ambientcol);
+    lisp->get("sun-specular", specularcol);
+    lisp->get("sun-diffuse",  diffusecol);
   } catch(std::exception& err) {
-    std::cout << "Catched std::exception: " << err.what() << std::endl;
+    std::cout << "Error while reading '" << filename
+              << ": " << err.what() << "\n";
   }
+  delete lisp;
 
   load_drv();
 }

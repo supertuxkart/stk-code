@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-#include "Config.h"
-#include "lispreader.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdexcept>
 
+#include "Config.h"
+#include "lisp/Lisp.h"
+#include "lisp/Parser.h"
+#include "lisp/Writer.h"
 
 Config config;
-
 
 Config::Config()
 {
@@ -86,28 +87,32 @@ void Config::loadConfig()
 /*load configuration values from file*/
 void Config::loadConfig(const std::string& filename)
 {
-	/*make sure file exists/is readable*/
-	FILE *file = fopen(filename.c_str(), "r");
-	if(file) 
-	{
-                fclose(file);
+    const lisp::Lisp* lisp = 0;
+    try {
+        lisp::Parser parser;
+        lisp = parser.parse(filename);
 
-		LispReader* config = LispReader::load(filename.c_str(), "tuxkart-config");
-		LispReader reader(config->get_lisp());
+        lisp = lisp->getLisp("tuxkart-config");
+        if(!lisp)
+            throw std::runtime_error("No tuxkart-config node");
 
-		/*get toggles*/
-		reader.read_bool("fullscreen", fullscreen);
-		reader.read_bool("sound", sound);
-		reader.read_bool("music", music);
-		reader.read_bool("displayFPS", displayFPS);
-
-		/*get resolution width/height*/
-		reader.read_int("width", width);
-		reader.read_int("height", height);
-
-		/*get number of karts*/
-		reader.read_int("karts", karts);
-	}
+        /*get toggles*/
+        lisp->get("fullscreen", fullscreen);
+        lisp->get("sound", sound);
+        lisp->get("music", music);
+        lisp->get("displayFPS", displayFPS);
+        
+        /*get resolution width/height*/
+        lisp->get("width", width);
+        lisp->get("height", height);
+        
+        /*get number of karts*/
+        lisp->get("karts", karts);
+    } catch(std::exception& e) {
+        std::cout << "Error while parsing config '" << filename
+            << "': " << e.what() << "\n";
+    }
+    delete lisp;
 }
 
 
@@ -122,28 +127,27 @@ void Config::saveConfig()
 returns 0 on success, -1 on failure.*/
 void Config::saveConfig(const std::string& filename)
 {
-	FILE *config = fopen(filename.c_str(), "w");
+    try {
+        lisp::Writer writer(filename);
 
-	if(config)
-	{
-                fclose(config);
-		fprintf(config, "(tuxkart-config\n");
+        writer.beginList("tuxkart-config");
+        writer.writeComment("the following options can be set to #t or #f:");
+        writer.write("fullscreen", fullscreen);
+	writer.write("sound", sound);
+        writer.write("music", music);
+        writer.write("displayFPS", displayFPS);
+        
+        writer.writeComment("screen resolution");
+        writer.write("width", width);
+        writer.write("height", height);
+        
+        writer.writeComment("number of karts. -1 means use all");
+        writer.write("karts", karts);
 
-		fprintf(config, "\t;; the following options can be set to #t or #f:\n");
-		fprintf(config, "\t(fullscreen %s)\n", fullscreen ? "#t" : "#f");
-		fprintf(config, "\t(sound      %s)\n", sound      ? "#t" : "#f");
-		fprintf(config, "\t(music      %s)\n", music      ? "#t" : "#f");
-		fprintf(config, "\t(displayFPS %s)\n", displayFPS ? "#t" : "#f");
-
-		fprintf(config, "\t;; screen resolution\n");
-		fprintf(config, "\t(width      %d)\n", width);
-		fprintf(config, "\t(height     %d)\n", height);
-
-		fprintf(config, "\t;; number of karts. -1 means use all\n");
-		fprintf(config, "\t(karts      %d)\n", karts);
-
-		fprintf(config, ")\n");
-	}
+        writer.endList("tuxkart-config");
+    } catch(std::exception& e) {
+        std::cout << "Couldn't write config: " << e.what() << "\n";
+    }
 }
 
 /*EOF*/

@@ -1,7 +1,8 @@
-//  $Id: CupData.cxx,v 1.3 2004/08/24 19:33:10 matzebraun Exp $
+//  $Id: Parser.h,v 1.1 2004/08/24 19:33:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2004 Matthias Braun <matze@braunis.de>
+//  code in this file based on lispreader from Mark Probst
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,36 +17,35 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#ifndef __LISPPARSER_H__
+#define __LISPPARSER_H__
 
-#include <iostream>
-#include <stdexcept>
-#include "Loader.h"
-#include "lisp/Parser.h"
-#include "lisp/Lisp.h"
-#include "CupData.h"
+#include <string>
+#include "Lexer.h"
 
-CupData::CupData()
+namespace lisp
 {
-}
 
-CupData::CupData(const std::string& filename)
+class Lisp;
+
+class Parser
 {
-  const lisp::Lisp* lisp = 0;
-  try {
-    lisp::Parser parser;
-    lisp = parser.parse(loader->getPath(filename));
-    
-    lisp = lisp->getLisp("tuxkart-cup");
-    if(!lisp)
-        throw std::runtime_error("No tuxkart-cup node");
-    
-    lisp->get("name", name);
-    lisp->getVector("tracks", tracks);
-  } catch(std::exception& err) {
-    std::cout << "Error while reading cup: " << err.what() << "\n";
-  }
+public:
+    Parser();
+    ~Parser();
 
-  delete lisp;
-}
+    Lisp* parse(const std::string& filename);
+    Lisp* parse(std::istream& stream);
 
-/* EOF */
+private:
+    Lisp* read();
+    Lisp* readList();
+    
+    Lexer* lexer;
+    Lexer::TokenType token;
+};
+
+} // end of namespace lisp
+
+#endif
+

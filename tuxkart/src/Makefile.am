@@ -84,14 +84,20 @@ tuxkart_SOURCES = \
   TrackData.cxx \
   utils.cxx  \
   utils.h \
-  lispreader.cxx \
-  lispreader.h \
   World.h \
   World.cxx \
   WorldScreen.h \
   WorldScreen.cxx \
   ParticleSystem.h \
   ParticleSystem.cxx \
+  lisp/Lisp.h \
+  lisp/Lisp.cxx \
+  lisp/Lexer.h \
+  lisp/Lexer.cxx \
+  lisp/Parser.h \
+  lisp/Parser.cxx \
+  lisp/Writer.h \
+  lisp/Writer.cxx \
   gui/RaceGUI.cxx \
   gui/RaceGUI.h \
   gui/MainMenu.cxx \

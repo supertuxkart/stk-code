@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.13 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.14 2004/08/24 19:33:10 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,10 +18,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <iostream>
+#include <stdexcept>
 #include <plib/ssg.h>
 #include <math.h>
 #include "material.h"
-#include "lispreader.h"
+#include "lisp/Parser.h"
+#include "lisp/Lisp.h"
 #include "Loader.h"
 #include "preprocessor.h"
 #include "StringUtils.h"
@@ -36,40 +38,40 @@ KartProperties::KartProperties(const std::string& filename)
 {
   init_defaults();
 
+  const lisp::Lisp* lisp = 0;
   ident = StringUtils::basename(StringUtils::without_extension(filename));
 
-
   try {
-    LispReader* kart = LispReader::load(loader ? loader->getPath(filename) : filename, "tuxkart-kart");
-    assert(kart);
+    lisp::Parser parser;
+    lisp = parser.parse(loader->getPath(filename));
+    
+    lisp = lisp->getLisp("tuxkart-kart");
+    if(!lisp)
+        throw std::runtime_error("No tuxkart-kart node found");
   
-    LispReader reader(kart->get_lisp());
+    lisp->get("name",   name);
+    lisp->get("model",  model_file);
+    lisp->get("icon",   icon_file);
+    lisp->get("shadow", shadow_file);
+    lisp->get("red",     color[0]);
+    lisp->get("green",   color[1]);
+    lisp->get("blue",    color[2]);
 
-    reader.read_string("name",   name);
-    reader.read_string("model",  model_file);
-    reader.read_string("icon",   icon_file);
-    reader.read_string("shadow", shadow_file);
-    reader.read_float("red",     color[0]);
-    reader.read_float("green",   color[1]);
-    reader.read_float("blue",    color[2]);
-
-    reader.read_float("max-grip",       max_grip);
-    reader.read_float("corn-f",         corn_f);
-    reader.read_float("corn-r",         corn_r);
-    reader.read_float("mass",           mass);
-    reader.read_float("inertia",        inertia);
-    reader.read_float("turn-speed",     turn_speed);
-    reader.read_float("max-wheel-turn", max_wheel_turn);
-    reader.read_float("engine-power",   engine_power);
-    reader.read_float("max-throttle",   max_throttle);
-    reader.read_float("air-friction",   air_friction);
-
-    delete kart;
-  } catch(LispReaderException& err) {
-    std::cout << "LispReaderException: " << err.message << std::endl;
+    lisp->get("max-grip",       max_grip);
+    lisp->get("corn-f",         corn_f);
+    lisp->get("corn-r",         corn_r);
+    lisp->get("mass",           mass);
+    lisp->get("inertia",        inertia);
+    lisp->get("turn-speed",     turn_speed);
+    lisp->get("max-wheel-turn", max_wheel_turn);
+    lisp->get("engine-power",   engine_power);
+    lisp->get("max-throttle",   max_throttle);
+    lisp->get("air-friction",   air_friction);
   } catch(std::exception& err) {
-    std::cout << "Catched std::exception: " << err.what() << std::endl;
+    std::cout << "Error while parsing KartProperties '" << filename
+              << ": " << err.what() << "\n";
   }
+  delete lisp;
 }
 
 void
