@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.14 2004/09/05 19:05:06 jamesgregory Exp $
+//  $Id: RaceGUI.h,v 1.15 2004/09/06 13:03:36 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,11 +26,28 @@
 //#include <plib/fnt.h>
 #include <SDL_ttf.h>
 #include <map>
+#include <string>
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
 
 #define SCREEN_CENTERED_TEXT -1
+
+const int N_CACHED_TEXTURES = 10;
+
+class TextTexture
+{
+public:
+  TextTexture() {lastUsed = -1;}
+  
+	GLuint texture;
+	int w;
+	int h;
+  std::string text;
+  int sz;
+
+  int lastUsed;
+};
 
 class RaceGUI: public BaseGUI
 {
@@ -74,19 +91,21 @@ private:
   /** Draw text to screen.
       scale_x and scale_y could be used to a simple resize (for instance, for multiplayer
       split screens, though, currently, we reduce fonts size to half). */
-	void drawText ( char* text, int sz, int x, int y, int red, int green, int blue,
+	void drawText ( const char* text, int sz, int x, int y, int red, int green, int blue,
                   float scale_x = 1.0, float scale_y = 1.0 );
-  /** This functions allows one to draw text by specifying both width and height
-      and so be able to do a stretching */
-	void drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue );
+  void drawTexture(const GLuint texture, int w, int h, int red, int green, int blue, int x, int y);
 
-	void drawDropShadowText ( char *str, int sz, int x, int y );
-	void drawInverseDropShadowText ( char *str, int sz, int x, int y );
+	void drawDropShadowText ( const char *str, int sz, int x, int y );
+	void drawInverseDropShadowText ( const char *str, int sz, int x, int y );
 	
 	void cacheFont(int sz);
+  TextTexture* cacheTexture(const char* text, int sz);
 
+  TextTexture cachedTextures[N_CACHED_TEXTURES];
 
 	char *pos_string [10];
+
+	
 	
 	//debugging arrays and functions, never actually get used for anything at the moment
 	void stToggle ();

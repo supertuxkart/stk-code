@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.37 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: RaceGUI.cxx,v 1.38 2004/09/06 13:03:36 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -76,6 +76,12 @@ RaceGUI::~RaceGUI()
 
 	for(FontsCache::iterator i = fonts_cache.begin(); i != fonts_cache.end(); ++i)
 		TTF_CloseFont(i->second);
+
+  for (int i = 0; i != N_CACHED_TEXTURES; ++i)
+  {
+    if (cachedTextures[i].lastUsed != -1)
+      glDeleteTextures(1, &(cachedTextures[i].texture));
+  }
 
 	//FIXME: does all that material stuff need freeing somehow?
 }
@@ -187,88 +193,54 @@ void RaceGUI::stPrintf ( char *fmt, ... )
   va_end ( ap ) ;
 }
 
-void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, int blue, float scale_x, float scale_y )
+void RaceGUI::drawText ( const char *text, int sz, int x, int y, int red, int green, int blue, float scale_x, float scale_y )
 {
-  cacheFont(sz);
+  TextTexture* glTexture = cacheTexture(text, sz);
 
-  int w, h;
-  GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text,
-                                           fonts_cache.find(sz)->second);
-
-  w = (int)(w * scale_x);
-  h = (int)(h * scale_y);
+  int w = (int)(glTexture->w * scale_x);
+  int h = (int)(glTexture->h * scale_y);
 
   if(x == SCREEN_CENTERED_TEXT)
-    x = (640 - w) / 2;
+    x = (getScreenWidth() - w) / 2;
   if(y == SCREEN_CENTERED_TEXT)
-    y = (480 - h) / 2;
+    y = (getScreenHeight() - h) / 2;
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, gl_texture);
-
-  glColor3ub ( red, green, blue ) ;
-  glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);
-    glVertex2f(x, (float)h+y);
-
-    glTexCoord2f(1, 0);
-    glVertex2f((float)w+x, (float)h+y);
-
-    glTexCoord2f(1, 1);
-    glVertex2f((float)w+x, y);
-
-    glTexCoord2f(0, 1);
-    glVertex2f(x, y);
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
-  
-  glDeleteTextures(1, &gl_texture);
+  drawTexture(glTexture->texture, w, h, red, green, blue, x, y);
 }
 
-
-void RaceGUI::drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue )
-{
-  int sz = std::max(w/2, h/2);
-  
-  cacheFont(sz);
-  
-  GLuint gl_texture = make_image_from_font(NULL, NULL, NULL, NULL, text,                                 fonts_cache.find(sz)->second);
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, gl_texture);
-
-  glColor3ub ( red, green, blue ) ;
-  glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);
-    glVertex2f(x, (float)h+y);
-
-    glTexCoord2f(1, 0);
-    glVertex2f((float)w+x, (float)h+y);
-
-    glTexCoord2f(1, 1);
-    glVertex2f((float)w+x, y);
-
-    glTexCoord2f(0, 1);
-    glVertex2f(x, y);
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
-  
-  glDeleteTextures(1, &gl_texture);
-}
-
-
-void RaceGUI::drawInverseDropShadowText ( char *str, int sz, int x, int y )
+void RaceGUI::drawInverseDropShadowText ( const char *str, int sz, int x, int y )
 {
   drawText ( str, sz, x, y, 255, 255, 255 ) ;
   drawText ( str, sz, x+1, y+1, 0, 0, 0 ) ;
 }
 
-void RaceGUI::drawDropShadowText ( char *str, int sz, int x, int y )
+void RaceGUI::drawDropShadowText (const char *str, int sz, int x, int y )
 {
   drawText ( str, sz, x, y, 0, 0, 0 ) ;
   drawText ( str, sz, x+1, y+1, 255, 255, 255 ) ;
+}
+
+void RaceGUI::drawTexture(const GLuint texture, int w, int h, int red, int green, int blue, int x, int y)
+{
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glColor3ub ( red, green, blue ) ;
+  glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    glVertex2f(x, (float)h+y);
+
+    glTexCoord2f(1, 0);
+    glVertex2f((float)w+x, (float)h+y);
+
+    glTexCoord2f(1, 1);
+    glVertex2f((float)w+x, y);
+
+    glTexCoord2f(0, 1);
+    glVertex2f(x, y);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 }
 
 /** This is a chache system to avoid TTF_Font calls.
@@ -289,6 +261,40 @@ void RaceGUI::cacheFont(int sz)
 	} 
 }
 
+TextTexture* RaceGUI::cacheTexture(const char* text, int sz)
+{
+  for (int i = 0; i != N_CACHED_TEXTURES; ++i)
+  {
+    if (cachedTextures[i].text == text && cachedTextures[i].sz == sz)
+    {
+      cachedTextures[i].lastUsed = SDL_GetTicks();
+      return &(cachedTextures[i]);
+    }
+  }
+
+  //not found, going to have to load a new texture
+
+  cacheFont(sz);
+
+  int replace = 0;
+  for (int i = 1; i != N_CACHED_TEXTURES; ++i)
+  {
+    if (cachedTextures[i].lastUsed < cachedTextures[replace].lastUsed)
+      replace = i;
+  }
+
+  if (cachedTextures[replace].lastUsed != -1)
+    glDeleteTextures(1, &(cachedTextures[replace].texture));  
+
+  cachedTextures[replace].texture = make_image_from_font(NULL, NULL, &(cachedTextures[replace].w), &(cachedTextures[replace].h), text, fonts_cache.find(sz)->second);
+  
+  cachedTextures[replace].text = text;
+  cachedTextures[replace].sz = sz;
+  cachedTextures[replace].lastUsed = SDL_GetTicks();
+
+  return &(cachedTextures[replace]);
+}
+
 void RaceGUI::drawTimer ()
 {
   char str [ 256 ] ;
@@ -301,8 +307,7 @@ void RaceGUI::drawTimer ()
 
   sprintf ( str, "%3d:%02d\"%d", min,  sec,  tenths ) ;
   drawDropShadowText ( "Time:", 28, 500, 430 ) ;
-  drawStretchedText ( str, 460, 400, 620-460, 30, 0, 0, 0 ) ;            // do the drop
-  drawStretchedText ( str, 460, 400, 620-460+1, 30+1, 255, 255, 255 ) ;  // shadow effect
+  drawDropShadowText ( str, 36, 460, 400) ;
 }
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
@@ -407,7 +412,6 @@ void RaceGUI::drawPlayerIcons ()
 
   int x = 10;
   int y;
-  char str[256];
 
   for(int i = 0; i < World::current()->getNumKarts() ; i++)
     {
@@ -434,8 +438,7 @@ void RaceGUI::drawPlayerIcons ()
       glDisable(GL_TEXTURE_2D);
 
       // draw text
-      sprintf (str, "%s", pos_string[position]);
-      drawDropShadowText ( str, 28, 55+x, y+10 ) ;
+      drawDropShadowText ( pos_string[position], 28, 55+x, y+10 ) ;
     }
 
 }
