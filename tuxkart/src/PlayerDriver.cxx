@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.29 2004/12/12 22:01:01 cosmosninja Exp $
+//  $Id: PlayerDriver.cxx,v 1.30 2004/12/14 00:56:23 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -13,7 +13,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
-//  You should have received xa copy of the GNU General Public License
+//  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
