@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.33 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: Driver.h,v 1.34 2004/12/09 19:32:20 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -88,141 +88,150 @@
 
 #define MAX_HERRING_EATEN    20
 
-class KartDriver;
-class World;
+   class KartDriver;
+   class World;
 
-class Driver : public NoCopy
-{
-protected:
-  /** The interpolated position of the kart, this might differ a bit
+   class Driver : public NoCopy
+   {
+   protected:
+   /** The interpolated position of the kart, this might differ a bit
       from the real position, but it is used to both give a smoother
       movement and to better visualize turns and such, use it for
       everything that needs to be visual (smoke, skidmarks, kart
       placement), but don't use it for physics, thats what position is
       for */
-  sgCoord visi_pos;
-
-  /** Used to save the last position of the kart, which is then
+      sgCoord visi_pos;
+   
+   /** Used to save the last position of the kart, which is then
       interpolated with the new one to form a smooth movement */
-  sgCoord last_relax_pos;
-
-  sgCoord  reset_pos ;
-  sgCoord  last_pos  ;
-
-  sgCoord position;
-  sgCoord velocity;
-public:  
-  
-  /* start - New Physics */
-  sgVec3   force ;
-
-  float   steer_angle ;
-
-  float throttle;
-  float brake;
-protected:
-  /** Complete model, including shadow */
-  ssgBranch    *comp_model;
-
-  ssgTransform* model;
-
-  /** The Karts shadow */
-  ssgTransform* shadow;
-
-  int history_index ;
-
-  World* world;
-
-public:
-  float wheelie_angle ;
-  int race_position ;
-  int race_lap      ;
-
-  int collided ;
-  int crashed  ;
-  int rescue   ;
-  float zipper_time_left ;
-
-  sgVec3 surface_avoidance_vector ;
-  sgVec3 ground_normal ;
-  bool   on_ground ; 
-  int    firsttime ;
-  float getIsectData     ( sgVec3 start, sgVec3 end ) ;
-  float collectIsectData ( sgVec3 start, sgVec3 end ) ;
-
-  int    track_hint ;
-  sgVec2 last_track_coords ;
-  sgVec2 curr_track_coords ;
-
-  /** Height of the terrain at the current position of the kart, used
+      sgCoord last_relax_pos;
+   
+      sgCoord  reset_pos ;
+      sgCoord  last_pos  ;
+   
+      sgCoord position;
+      sgCoord velocity;
+   public:  
+   
+   /* start - New Physics */
+      sgVec3   force ;
+   
+      float   steer_angle ;
+   
+      float throttle;
+      float brake;
+   protected:
+   /** Complete model, including shadow */
+      ssgBranch    *comp_model;
+   
+      ssgTransform* model;
+   
+   /** The Karts shadow */
+      ssgTransform* shadow;
+   
+      int history_index ;
+   
+      World* world;
+   
+   public:
+      float wheelie_angle ;
+      int race_position ;
+      int race_lap      ;
+   
+      int collided ;
+      int crashed  ;
+      int rescue   ;
+      float zipper_time_left ;
+   
+      sgVec3 surface_avoidance_vector ;
+      sgVec3 ground_normal ;
+      bool   on_ground ;
+      int    firsttime ;
+      float getIsectData     ( sgVec3 start, sgVec3 end ) ;
+      float collectIsectData ( sgVec3 start, sgVec3 end ) ;
+   
+      unsigned int track_hint;
+      sgVec2 last_track_coords ;
+      sgVec2 curr_track_coords ;
+      
+   
+   /** Height of the terrain at the current position of the kart, used
       for shadow calculation */
-  float height_of_terrain;
-
-public:
-  /*const*/ KartProperties* kart_properties;
-
-  Driver ( World* world, const KartProperties* kart_properties );
-  virtual ~Driver();
-
-  float getDistanceDownTrack () { return curr_track_coords[1] ; }
-  int  getLap      () const  { return race_lap      ; }
-  int  getPosition () const  { return race_position ; }
-  void setPosition ( int p ) { race_position = p    ; }
-  float getSteerAngle() const { return steer_angle; }
-
-  void reset ();
-  void setReset ( sgCoord *pos )
-  {
-    sgCopyCoord ( & reset_pos, pos ) ;
-  }
-
-  ssgBranch *getModel () { return model ; }
-  ssgEntity *getRoot () { return comp_model ; }
-
-  const KartProperties* getKartProperties() const
-  {
-    return kart_properties;
-  }
-
-  sgCoord *getVelocity ()
-  {
-    return &velocity ;
-  }
-
-  void setVelocity ( sgCoord *vel )
-  {
-    sgCopyCoord ( & velocity, vel ) ;
-  }
-
-  sgCoord *getVisiCoord ()
-  {
-    return & visi_pos ;
-  }
-
-  sgCoord *getCoord ()
-  {
-    return & position ;
-  }
-
-  void setCoord ( sgCoord *pos )
-  {
-    sgCopyCoord ( & position, pos ) ;
-  }
-
-  /** Reposition the model in the scene */
-  virtual void placeModel ();
-
-  void updateVisiPos(float delta);
-  void coreUpdate (float delta) ;
-  void physicsUpdate (float delta) ;
-  bool isOnGround() const { return on_ground; }
-
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float delta, float hot ) ;
-  virtual void update               (float delta) ;
-} ;
+      float height_of_terrain;
+   
+   public:
+   /*const*/ KartProperties* kart_properties;
+   
+      Driver ( World* world, const KartProperties* kart_properties );
+      virtual ~Driver();
+   
+      float getDistanceDownTrack () { 
+         return curr_track_coords[1] ; }
+      int  getLap      () const  { 
+         return race_lap      ; }
+      int  getPosition () const  { 
+         return race_position ; }
+      void setPosition ( int p ) { 
+         race_position = p    ; }
+      float getSteerAngle() const { 
+         return steer_angle; }
+   
+      void reset ();
+      void setReset ( sgCoord *pos )
+      {
+         sgCopyCoord ( & reset_pos, pos ) ;
+      }
+   
+      ssgBranch *getModel () { 
+         return model ; }
+      ssgEntity *getRoot () { 
+         return comp_model ; }
+   
+      const KartProperties* getKartProperties() const
+      {
+         return kart_properties;
+      }
+   
+      sgCoord *getVelocity ()
+      {
+         return &velocity ;
+      }
+   
+      void setVelocity ( sgCoord *vel )
+      {
+         sgCopyCoord ( & velocity, vel ) ;
+      }
+   
+      sgCoord *getVisiCoord ()
+      {
+         return & visi_pos ;
+      }
+   
+      sgCoord *getCoord ()
+      {
+         return & position ;
+      }
+   
+      void setCoord ( sgCoord *pos )
+      {
+         sgCopyCoord ( & position, pos ) ;
+      }
+   
+   /** Reposition the model in the scene */
+      virtual void placeModel ();
+   
+      void updateVisiPos(float delta);
+      void coreUpdate (float delta) ;
+      void physicsUpdate (float delta) ;
+      bool isOnGround() const { 
+         return on_ground; }
+   
+      virtual void doObjectInteractions () ;
+      virtual void doLapCounting        () ;
+      virtual void doZipperProcessing   () ;
+      virtual void doCollisionAnalysis  ( float delta, float hot ) ;
+      virtual void update               (float delta) ;
+   } ;
 
 #endif
 
