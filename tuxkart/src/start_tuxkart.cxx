@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.46 2004/08/07 04:31:49 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.47 2004/08/07 05:49:53 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,13 +27,6 @@
 
 #include <vector>
 #include <string>
-
-
-/***********************************\
-*                                   *
-* These are the PUI widget pointers *
-*                                   *
-\***********************************/
 
 
 static ssgSimpleState *introMaterial    ;
@@ -231,18 +224,18 @@ void cmdLineHelp (char* invocation)
 	    " inspired by Super-Mario-Kart and Wacky Wheels.\n\n"
 
 	    "Options:\n"
-	    "  --no-start-screen  Quick race\n"
-	    "  --track n          Start at track number n (see --list-tracks)\n"
-            "  --numkarts NUM     Number of karts on the racetrack\n"
-	    "  --list-tracks      Show available tracks.\n"
-	    "  --laps n           Define number of laps to n\n"
-	    "  --players n        Define number of players to either 1, 2 or 4.\n"
-	    "  --reverse          Enable reverse mode\n"
-	    "  --mirror           Enable mirror mode (when supported)\n"
-	    "  --fullscreen       Fullscreen display.\n"
-	    "  --screensize WIDTHxHEIGHT\n"
-            "                     Set the screen size (e.g. 320x200)\n"
-	    "  --version          Show version.\n"
+	    "  -N,  --no-start-screen  Quick race\n"
+	    "  -t,  --track n          Start at track number n (see --list-tracks)\n"
+        "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
+	    "  -l,  --list-tracks      Show available tracks.\n"
+	    "  --laps n                Define number of laps to n\n"
+	    "  --players n             Define number of players to either 1, 2 or 4.\n"
+	    "  --reverse               Enable reverse mode\n"
+	    "  --mirror                Enable mirror mode (when supported)\n"
+	    "  -f,  --fullscreen       Fullscreen display.\n"
+	    "  -s,  --screensize WIDTHxHEIGHT\n"
+        "                          Set the screen size (e.g. 320x200)\n"
+	    "  -v,  --version          Show version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
 	    "http://tuxkart.sourceforge.net\n\n", invocation
@@ -273,7 +266,7 @@ int main ( int argc, char *argv[] )
 	      return 0;
 	    }
 
-	  else if( !strcmp(argv[i], "--track") and argc > 2 )
+	  else if( (!strcmp(argv[i], "--track") or !strcmp(argv[i], "-t")) and argc > 2 )
 	    {
 	      raceSetup.track = atoi(argv[i+1]);
 
@@ -288,7 +281,7 @@ int main ( int argc, char *argv[] )
 	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
 	    }
 
-	  else if( !strcmp(argv[i], "--numkarts") && argc > 2)
+	  else if( (!strcmp(argv[i], "--numkarts") or !strcmp(argv[i], "-k")) && argc > 2)
 	  {
 	      raceSetup.numKarts = atoi(argv[i+1]);
 
@@ -303,7 +296,7 @@ int main ( int argc, char *argv[] )
 	      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
 	    }
 
-	  else if( !strcmp(argv[i], "--list-tracks") )
+	  else if( !strcmp(argv[i], "--list-tracks") or !strcmp(argv[i], "-l") )
 	    {
 	      loadDataDir ();
 	      loadTrackList () ;
@@ -317,7 +310,7 @@ int main ( int argc, char *argv[] )
 	      return 0;
 	    }
 
-	  else if ( !strcmp(argv[i], "--no-start-screen") )
+	  else if ( !strcmp(argv[i], "--no-start-screen") or !strcmp(argv[i], "-N") )
 	    {
 	      noStartScreen = true;
 	    }
@@ -360,12 +353,12 @@ int main ( int argc, char *argv[] )
 	      fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
 	    }
 
-	  else if ( !strcmp(argv[i], "--fullscreen") )
+	  else if ( !strcmp(argv[i], "--fullscreen") or !strcmp(argv[i], "-f"))
 	    {
               fullscreen = true;
 	    }
 
-	  else if ( !strcmp(argv[i], "--screensize") )
+	  else if ( !strcmp(argv[i], "--screensize") or !strcmp(argv[i], "-s") )
 	    {
 	      if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
                 fprintf ( stdout, "You choose to be in %dx%d.\n", width, height );
@@ -376,7 +369,7 @@ int main ( int argc, char *argv[] )
                 }
 	    }
 	  #ifdef VERSION
-	  else if( !strcmp(argv[i], "--version") )
+	  else if( !strcmp(argv[i], "--version") or  !strcmp(argv[i], "-v") )
 	    {
 	      fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
 	      return 0;
