@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.11 2004/09/08 17:02:16 jamesgregory Exp $
+//  $Id: NumPlayers.cxx,v 1.12 2004/11/01 20:51:56 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,44 +24,39 @@
 
 NumPlayers::NumPlayers()
 {
-	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Two Players",  GUI_MED, 2, 0);
-	widgetSet -> state(menu_id, "Three Players",  GUI_MED, 3, 0);
-	widgetSet -> state(menu_id, "Four Players",  GUI_MED, 4, 0);
-	widgetSet -> state(menu_id, "Network Game",  GUI_MED, MENU_NETWORK, 0);
-	widgetSet -> space(menu_id);
-	widgetSet -> space(menu_id);
-	
-	widgetSet -> layout(menu_id, 0, -1);
+  menu_id = widgetSet -> varray(0);
+  widgetSet -> start(menu_id, "Two Players",  GUI_MED, 2, 0);
+  widgetSet -> state(menu_id, "Three Players",  GUI_MED, 3, 0);
+  widgetSet -> state(menu_id, "Four Players",  GUI_MED, 4, 0);
+  widgetSet -> state(menu_id, "Network Game",  GUI_MED, MENU_NETWORK, 0);
+  widgetSet -> space(menu_id);
+  widgetSet -> space(menu_id);
+
+  widgetSet -> layout(menu_id, 0, -1);
 }
 
 NumPlayers::~NumPlayers()
 {
-	widgetSet -> delete_widget(menu_id) ;
-	
-        /* FIXME
-	if (std::find(guiStack.begin(), guiStack.end(), GUIS_GAMEMODE) == guiStack.end())
-		raceSetup.numPlayers = 1;
-        */
+  widgetSet -> delete_widget(menu_id) ;
 }
-	
+
 void NumPlayers::update(float dt)
 {
-	
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
+  widgetSet -> timer(menu_id, dt) ;
+  widgetSet -> paint(menu_id) ;
 }
 
 void NumPlayers::select()
 {
-	switch ( widgetSet -> token (widgetSet -> click()) )
-	{
-	case MENU_NETWORK:	break;
-	default: 
-                RaceManager::instance()->setNumPlayers(widgetSet -> token ( widgetSet -> click() ));
-                guiStack.push_back(GUIS_GAMEMODE);
-		break;
-	}
+  switch ( widgetSet -> token (widgetSet -> click()) )
+  {
+  case MENU_NETWORK:
+    break;
+  default: 
+    RaceManager::instance()->setNumPlayers(widgetSet -> token ( widgetSet -> click() ));
+    guiStack.push_back(GUIS_GAMEMODE);
+    break;
+  }
 }
 
 
