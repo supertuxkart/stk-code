@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.81 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.82 2004/10/20 22:33:40 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -152,32 +152,32 @@ int main ( int argc, char *argv[] )
           {
             if ( argv[i][0] != '-') continue;
 
-            if ( !strcmp(argv[i], "--help") or
-                 !strcmp(argv[i], "-help") or
+            if ( !strcmp(argv[i], "--help") ||
+                 !strcmp(argv[i], "-help") ||
                  !strcmp(argv[i], "-h") )
               {
                 cmdLineHelp(argv[0]);
                 return 0;
               }
 
-            else if( (!strcmp(argv[i], "--kart") and argc > 2 ))
+            else if( (!strcmp(argv[i], "--kart") && argc > 2 ))
               {
                 RaceManager::instance()->setPlayerKart(0, argv[i+1]);
               }
 
-            else if( (!strcmp(argv[i], "--track") or !strcmp(argv[i], "-t")) and argc > 2 )
+            else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t")) && argc > 2 )
               {
                 RaceManager::instance()->setTrack(argv[i+1]);
                 fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
               }
 
-            else if( (!strcmp(argv[i], "--numkarts") or !strcmp(argv[i], "-k")) && argc > 2)
+            else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) && argc > 2)
               {
                 RaceManager::instance()->setNumKarts(config.karts = atoi(argv[i+1]));
                 fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
               }
 
-            else if( !strcmp(argv[i], "--list-tracks") or !strcmp(argv[i], "-l") )
+            else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
               {
                 initializeLoader ();
                 track_manager = new TrackManager();
@@ -212,7 +212,7 @@ int main ( int argc, char *argv[] )
                 return 0;
               }
 
-            else if ( !strcmp(argv[i], "--no-start-screen") or !strcmp(argv[i], "-N") )
+            else if ( !strcmp(argv[i], "--no-start-screen") || !strcmp(argv[i], "-N") )
               {
                 noStartScreen = true;
               }
@@ -233,17 +233,17 @@ int main ( int argc, char *argv[] )
   #endif
               }
 
-            else if ( !strcmp(argv[i], "--laps") and argc > 2 )
+            else if ( !strcmp(argv[i], "--laps") && argc > 2 )
               {
                 fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
                 RaceManager::instance()->setNumLaps(atoi(argv[i+1]));
               }
             /* FIXME:
-            else if ( !strcmp(argv[i], "--players") and argc > 2 )
+            else if ( !strcmp(argv[i], "--players") && argc > 2 )
               {
                 raceSetup.numPlayers = atoi(argv[i+1]);
 
-                if ( raceSetup.numPlayers < 0 or raceSetup.numPlayers > 4)
+                if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4)
                   {
                     fprintf ( stderr,
                               "You choose an invalid number of players: %d.\n",
@@ -255,17 +255,17 @@ int main ( int argc, char *argv[] )
                 fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
               }
             */
-            else if ( !strcmp(argv[i], "--fullscreen") or !strcmp(argv[i], "-f"))
+            else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
               {
                config.fullscreen = true;
               }
 
-            else if ( !strcmp(argv[i], "--windowed") or !strcmp(argv[i], "-w"))
+            else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
               {
                 config.fullscreen = false;
               }
 
-            else if ( !strcmp(argv[i], "--screensize") or !strcmp(argv[i], "-s") )
+            else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
               {
                 if (sscanf(argv[i+1], "%dx%d", &config.width, &config.height) == 2)
                   fprintf ( stdout, "You choose to be in %dx%d.\n", config.width, config.height );
@@ -276,7 +276,7 @@ int main ( int argc, char *argv[] )
                   }
               }
   #ifdef VERSION
-            else if( !strcmp(argv[i], "--version") or  !strcmp(argv[i], "-v") )
+            else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
               {
                 fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
                 return 0;
