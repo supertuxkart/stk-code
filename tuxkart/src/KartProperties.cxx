@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.3 2004/08/08 11:52:08 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.4 2004/08/08 12:17:59 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,7 +40,7 @@ KartProperties::KartProperties()
   max_grip       = 4.0f;
   air_friction   = 0.8257;
 
-  icon_file = "players.rgb";
+  icon_file = "tuxicon.rgb";
 
   icon_material = NULL;
 }
