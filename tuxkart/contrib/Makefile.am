@@ -1,3 +1,3 @@
 # contrib/
 
-EXTRA_DIST = README tuxkart.sh
+EXTRA_DIST = 
