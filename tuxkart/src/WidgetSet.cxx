@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.14 2004/09/08 15:00:06 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.15 2004/09/08 16:42:36 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -1551,6 +1551,11 @@ int WidgetSet::cursor(int id, SDLKey key)
         return 0;
     else
         return active = jd;
+}
+
+void WidgetSet::set_active(int id)
+{
+	active = id;
 }
 
 /*---------------------------------------------------------------------------*/

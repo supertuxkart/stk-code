@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.27 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.28 2004/09/08 16:42:35 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -65,6 +65,9 @@ CharSel::CharSel(int whichPlayer)
                       "images/" + kart_manager.karts[i]->icon_file).c_str(),
                     icon_size, icon_size);
 		widgetSet -> activate_widget(c, i, 0);
+		
+		if (i == kart_manager.karts.size() - 1)
+			widgetSet -> set_active(c);
 	}
 
 	if (0)

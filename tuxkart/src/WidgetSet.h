@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.9 2004/09/08 15:00:06 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.10 2004/09/08 16:42:36 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -172,6 +172,12 @@ public:
 	void layout(int id, int xd, int yd);	
 	
 	int  search(int, int, int);
+	
+	/*
+	* Activate a widget, allowing it  to behave as a normal state widget.
+	* This may  be used  to create  image buttons, or  cause an  array of
+	* widgets to behave as a single state widget.
+	*/
 	int  activate_widget(int, int, int);
 	
 	/* you only need to call this for parents, children will automatically be deleted by their parents */
@@ -200,7 +206,7 @@ public:
 	int cursor(int id, SDLKey key);
 	
 	/* mouse click */
-	int  click();
+	int click();
 	
 	/* called if the game is paused */
 	void blank();
@@ -211,6 +217,9 @@ public:
 	int  value(int) const;
 	/* where id's value is being used as a bool, this toggles it */
 	void toggle(int);
+	
+	//force id to be the current active widget
+	void set_active(int id);
 	
 	/*---------------------------------------------------------------------------*/
 	

@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.23 2004/09/08 15:00:05 jamesgregory Exp $
+//  $Id: TrackSel.cxx,v 1.24 2004/09/08 16:42:35 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,7 +45,11 @@ TrackSel::TrackSel()
 		widgetSet -> state(col1, track_manager.tracks[i].name.c_str(), GUI_SML, i, 0);
 
 	for (unsigned int i = track_manager.tracks.size()/2; i != track_manager.tracks.size(); ++i)
-		widgetSet -> state(col2, track_manager.tracks[i].name.c_str(), GUI_SML, i, 0);
+	{
+		int tmp = widgetSet -> state(col2, track_manager.tracks[i].name.c_str(), GUI_SML, i, 0);
+		if (i == track_manager.tracks.size()/2)
+			widgetSet -> set_active(tmp);
+	}
 
 	widgetSet -> layout(menu_id, 0, 1);
 }
