@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.51 2004/08/08 16:04:08 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.52 2004/08/08 16:33:58 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -398,7 +398,10 @@ int tuxkartMain ()
   curr_track = new Track ( fname, raceSetup.mirror, raceSetup.reverse ) ;
   gfx        = new GFX ( raceSetup.mirror ) ;
 
-  Camera::setNumSplits ( raceSetup.numPlayers ) ;
+  int numSplits = raceSetup.numPlayers;
+  if (numSplits == 3)
+    numSplits++;
+  Camera::setNumSplits ( numSplits ) ;
   initCameras () ;
 
 
