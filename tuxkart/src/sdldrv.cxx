@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.14 2004/08/05 18:33:00 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.15 2004/08/05 22:57:58 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -20,12 +20,10 @@
 #include <iostream>
 #include <SDL.h>
 #include <plib/pw.h>
-#include <plib/puSDL.h>
 
 #include "sdldrv.h"
 #include "WidgetSet.h"
-#include "oldgui.h"
-#include "BaseGUI.h"
+#include "gui/BaseGUI.h"
 #include "status.h"
 #include "tuxkart.h"
 #include "Driver.h"
@@ -89,44 +87,12 @@ void pollEvents ()
 	case SDL_MOUSEBUTTONDOWN:
 		if (gui)
 			gui -> select();
-	case SDL_MOUSEBUTTONUP:
-	{
-	  int puButton = PU_NOBUTTON;
-	  int puState  = PU_UP;
-	  
-	  switch (event.button.button)
-	  {
-	    case SDL_BUTTON_LEFT:
-	      puButton = PU_LEFT_BUTTON;
-	      break;
-		
-	    case SDL_BUTTON_MIDDLE:
-	      puButton = PU_MIDDLE_BUTTON;
-	      break;
-	
-	    case SDL_BUTTON_RIGHT:
-	      puButton = PU_RIGHT_BUTTON;
-	      break;
-	  }
-	  
-	  switch (event.button.state)
-	  {
-          case SDL_PRESSED:
-            puState = PU_DOWN;
-            break;
-          case SDL_RELEASED:
-            puState = PU_UP;
-            break;
-	  }
-	  puMouse ( puButton, puState, event.button.x, event.button.y );
 	  break;
-	}
 	 
 	case SDL_MOUSEMOTION:
 		SDL_ShowCursor(SDL_ENABLE);
 		if (gui)
 	  		gui -> point ( event.motion.x, getScreenHeight() - event.motion.y );
-	  	puMouse ( event.motion.x, event.motion.y );
 	  	break;
 	 
 	 case SDL_JOYAXISMOTION:
@@ -202,14 +168,7 @@ void keyboardInput (const SDL_keysym& key)
 
       return ;
     case SDLK_z : stToggle () ; return ;
-    case SDLK_h : hide_status () ; help  () ; return ;
     case SDLK_p : widgetSet -> tgl_paused(); return ;
-
-    case SDLK_SPACE : if ( oldgui->isHidden () )
-      oldgui->show () ;
-    else
-      oldgui->hide () ;
-      return ;
              
     default:
       break;
