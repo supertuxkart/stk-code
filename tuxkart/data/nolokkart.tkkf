@@ -3,7 +3,7 @@
 (tuxkart-kart
  (name "Nolok")
  (model "nolokkart.ac")
- (icon  "tuxicon.png")
+ (icon  "nolokicon.png")
  (shadow "tuxkartshadow.png")
  
  (red   0.8)
