@@ -36,10 +36,16 @@ tuxkart_SOURCES = \
   gfx.h  \
   guNet.cxx  \
   guNet.h  \
-  gui.cxx  \
-  gui.h  \
-  gui_image.cxx \
-  gui_image.h \
+  WidgetSet.cxx  \
+  WidgetSet.h  \
+  widget_image.cxx \
+  widget_image.h \
+  BaseGUI.cxx \
+  BaseGUI.h \
+  MainMenu.cxx \
+  MainMenu.h \
+  RaceGUI.cxx \
+  RaceGUI.h \
   isect.cxx  \
   isect.h  \
   joystick.h  \
