@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.14 2004/08/17 12:10:47 grumbel Exp $
+//  $Id: Track.cxx,v 1.15 2004/08/17 13:37:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,8 @@
 #include "Loader.h"
 #include "TrackData.h"
 #include "Track.h"
+
+#define TRACKVIEW_SIZE 150.0f
 
 Track::Track ( const TrackData& track_data_, int mirror, int reverse )
   : track_data(track_data_)

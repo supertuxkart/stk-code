@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.6 2004/08/17 12:10:47 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.7 2004/08/17 13:37:37 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -118,7 +118,6 @@ TrackData::load_drv()
 
   fclose ( fd ) ;
 }
-
 
 void
 TrackData::reverse()

@@ -1,7 +1,7 @@
-//  $Id: Track.h,v 1.12 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: KartManager.h,v 1.1 2004/08/17 13:37:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,32 +17,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRACK_H
-#define HEADER_TRACK_H
+#ifndef HEADER_KARTMANAGER_H
+#define HEADER_KARTMANAGER_H
 
-#include "TrackData.h"
+#include <vector>
+#include "KartProperties.h"
 
-class Track
+class KartManager
 {
-private:
-  TrackData track_data;
-  sgVec2 min ;
-  sgVec2 max ;
-  sgVec2 center ;
-  float  scale ;
-
-  float  total_distance ;
-
 public:
-  Track ( const TrackData& track_data, int mirror, int reverse ) ;
-
-  int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
-  int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
-  void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
-
-  float getTrackLength () { return total_distance ; }
-  void draw2Dview ( float x, float y ) ;
+  /** All available kart configurations, FIXME: having a
+      CharacterManager might be a good idea */
+  typedef std::vector<KartProperties> Data;
+  Data karts;
+  
+  KartManager();
+  
+  void loadKartData();
 };
+
+extern KartManager kart_manager;
 
 #endif
 

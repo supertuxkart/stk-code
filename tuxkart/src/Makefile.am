@@ -23,6 +23,8 @@ tuxkart_SOURCES = \
   Herring.h  \
   KartProperties.h \
   KartProperties.cxx \
+  KartManager.h \
+  KartManager.cxx \
   KartDriver.cxx  \
   Loader.cxx \
   Loader.h \

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.61 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.62 2004/08/17 13:37:37 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,9 +31,8 @@
 #include "RaceSetup.h"
 #include "Loader.h"
 #include "WorldScreen.h"
+#include "KartManager.h"
 #include "StartScreen.h"
-
-Characters characters;
 
 /***********************************\
 *                                   *
@@ -41,21 +40,6 @@ Characters characters;
 * and flips the double buffer.      *
 *                                   *
 \***********************************/
-
-static void loadCharacters()
-{
-  std::set<std::string> result;
-  loader->listFiles(result, "data");
-
-  // Findout which characters are available and load them
-  for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
-    {
-      if (StringUtils::has_suffix(*i, ".tkkf"))
-        {
-          characters.push_back(KartProperties("data/" + *i));
-        }
-    }
-}
 
 // Initialize the datadir
 static void loadDataDir()
@@ -82,7 +66,7 @@ static void initTuxKart (int width, int height, int videoFlags)
 {
   loadDataDir ();
   track_manager.loadTrackList () ;
-  loadCharacters();
+  kart_manager.loadKartData();
 
   initVideo ( width, height, videoFlags );
   

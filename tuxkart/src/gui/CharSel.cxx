@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.6 2004/08/08 21:25:27 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.7 2004/08/17 13:37:37 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,15 +21,16 @@
 #include "Loader.h"
 #include "CharSel.h"
 #include "tuxkart.h"
+#include "KartManager.h"
 #include "WidgetSet.h"
 
 CharSel::CharSel()
 {
         menu_id = widgetSet -> varray(0);
 
-        for(Characters::size_type i = 0; i < characters.size(); ++i)
+        for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
         {
-                widgetSet -> start(menu_id, characters[i].name.c_str(),   GUI_SML, i, 0);
+          widgetSet -> start(menu_id, kart_manager.karts[i].name.c_str(),   GUI_SML, i, 0);
         }
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
@@ -53,8 +54,8 @@ void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
         
-        if (token >= 0 && token < static_cast<int>(characters.size()))
-                kart_props = characters[token];
+        if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
+                kart_props = kart_manager.karts[token];
         
         guiStack.push_back(GUIS_TRACKSEL); 
 }
