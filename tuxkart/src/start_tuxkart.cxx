@@ -282,7 +282,14 @@ int main ( int argc, char **argv )
   glutInitWindowSize     ( 640, 480 ) ;
   glutInit               ( &fake_argc, fake_argv ) ;
   glutInitDisplayMode    ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH ) ;
+#ifndef WIN32
   glutCreateWindow       ( fake_argv[1] ) ;
+#else
+  char game_mode_str[256];
+  sprintf( game_mode_str, "width=640 height=480 bpp=16" );
+  glutGameModeString( game_mode_str );
+  glutEnterGameMode();
+#endif
 
   glutDisplayFunc       ( displayfn ) ;
   glutKeyboardFunc      ( keyfn     ) ;

@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if defined(WIN32)
-#if defined(__CYGWIN32__)
-#include <unistd.h>
-#endif
-#include <windows.h>
+ #if defined(__CYGWIN__)
+  #include <unistd.h>
+ #endif
+ #include <windows.h>
 #else
-#include <unistd.h>
+ #include <unistd.h>
 #endif
+
 
 #include "guNet.h"
 
@@ -17,7 +18,9 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#ifndef __CYGWIN__
 #include <netinet/tcp.h>
+#endif
 #include <netdb.h>
 #include <sys/uio.h>
 #include <arpa/inet.h>
@@ -45,6 +48,9 @@ guUDPConnection::~guUDPConnection ()
 
 void guUDPConnection::disconnect ()
 {
+#ifdef WIN32
+	return;
+#else
   if ( sockfd > 0 )
     shutdown ( sockfd, SHUT_RDWR ) ;
 
@@ -53,11 +59,15 @@ void guUDPConnection::disconnect ()
   sockfd   = 0    ;
   in_addr  = NULL ;
   out_addr = NULL ;
+#endif
 }
 
 
 int guUDPConnection::connect ( char *hostname, int _port )
 {
+#ifdef WIN32
+	return 1;
+#else
   in_addr  = new sockaddr_in ;
   out_addr = new sockaddr_in ;
   port     = _port ;
@@ -144,11 +154,15 @@ int guUDPConnection::connect ( char *hostname, int _port )
   fcntl ( sockfd, F_SETFL, FNDELAY ) ;
 
   return 1 ;
+#endif
 }
 
 
 int guUDPConnection::sendMessage ( char *mesg, int length )
 {
+#ifdef WIN32
+  return 1;
+#else
   while ( 1 )
   {
     int r = sendto ( sockfd, mesg, length, 0, (sockaddr *) out_addr,
@@ -172,15 +186,19 @@ int guUDPConnection::sendMessage ( char *mesg, int length )
       exit ( 1 ) ;
     }
   }
+#endif
 }
 
 
 
 int guUDPConnection::recvMessage ( char *mesg, int length )
 {
-  socklen_t len = (socklen_t) sizeof ( in_addr ) ;
+#ifdef WIN32
+  return 0;
+#else
+  unsigned int len = sizeof ( in_addr ) ;
 
-  int r = recvfrom ( sockfd, mesg, length, 0, (sockaddr *) in_addr, &len );
+  int r = recvfrom ( sockfd, mesg, length, 0, (sockaddr *) in_addr, (unsigned int *)(&len) );
 
   if ( r < 0 && errno != EAGAIN      &&
                 errno != EWOULDBLOCK &&
@@ -188,6 +206,7 @@ int guUDPConnection::recvMessage ( char *mesg, int length )
     perror ( "RecvFrom" ) ;
 
   return r ;
+#endif
 }
 
 
