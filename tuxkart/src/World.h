@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.5 2004/08/11 12:33:17 grumbel Exp $
+//  $Id: World.h,v 1.6 2004/08/13 22:19:03 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -65,14 +65,14 @@ private:
   
   GFX* gfx;
 
-  ssgBranch *trackBranch ;
-
   Herring *silver_h ;
   Herring *gold_h   ;
   Herring *red_h    ;
   Herring *green_h  ;
 
 public:
+  ssgBranch *trackBranch ;
+
   World(const RaceSetup& raceSetup);
   virtual ~World();
 

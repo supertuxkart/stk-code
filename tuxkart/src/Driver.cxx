@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.21 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: Driver.cxx,v 1.22 2004/08/13 22:19:03 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -393,7 +393,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
   if ( firsttime )
     num_hits = 0 ;
   else
-    num_hits = ssgIsect ( World::current()->scene, &sphere, invmat, &results ) ;
+    num_hits = ssgIsect ( World::current()->trackBranch, &sphere, invmat, &results ) ;
  
   sgSetVec3 ( surface_avoidance_vector, 0.0f, 0.0f, 0.0f ) ;
 
@@ -461,7 +461,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
   sgSetVec3 ( HOTvec, 0.0f, 0.0f, top ) ;
 
-  num_hits = ssgHOT ( World::current()->scene, HOTvec, invmat, &results ) ;
+  num_hits = ssgHOT ( World::current()->trackBranch, HOTvec, invmat, &results ) ;
   
   hot = -1000000.0f ;
 
