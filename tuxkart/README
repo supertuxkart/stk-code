@@ -1,0 +1,111 @@
+
+TuxKart.
+~~~~~~~~
+                           by Steve Baker
+                           <sjbaker1@airmail.net>
+                           http://web2.airmail.net/sjbaker1
+
+INSTALLATION:
+
+Installation instructions are pretty basic,
+and are covered in the documentation directory 'doc'.
+
+First make sure that you have the following packages
+installed:
+
+   GLIDE (if you have a 3Dfx card)
+   OpenGL (or Mesa)
+   GLUT (the GL Utility Toolkit)
+   PLIB version 1.2.0 or later - which can be obtained from:
+     http://plib.sourceforge.net
+
+Once that is done, it should be a simple matter of changing
+to the directory where all this stuff is unpacked and type:
+
+ ./configure
+ make
+
+You can run the game from the directoryyou downloaded it
+into - or (as 'root') you can install it into
+/usr/local/share/games/tuxkart by typing;
+
+ make install
+
+However, you might want to check the full documentation -
+especially if you need to install Mesa/GLIDE/GLUT before
+you can start.
+
+All documents are in HTML - so view them with your web browser.
+
+STARTING THE GAME:
+
+Just 'cd' into the download directory and run 'src/tuxkart',
+or run '/usr/local/games/tuxkart' if you did a 'make install'.
+
+If you have a Voodoo graphics card, don't forget the usual:
+
+  csh/tcsh:
+
+    setenv MESA_GLX_FX fullscreen
+
+  or for sh/bash:
+
+    MESA_GLX_FX=fullscreen
+    export MESA_GLX_FX
+
+Select the number of laps and which course you'd like to race
+on then click 'start game' to get going.
+
+PLAYING THE GAME:
+
+Ideally, you should get a joystick with at least six buttons
+(I use a 'MakoPad-PC' gamepad).
+
+Joystick Left/Right:  Steer.
+
+A button - Accellerate.
+B button - Brake.
+C button - Use an item (see below).
+D button - unused.
+L button - Pop a wheelie (if you are going fast enough).
+R button - Jump.
+
+In addition, from the keyboard:
+
+R key - Restart the race.
+X key - Exit the game.
+P key - Pause.
+SPACE - Pop up or Hide the menu bar.
+
+From the Menu bar, you can turn sound effects and music
+on and off, enable or disable the 'mousetrap' (which keeps
+the mouse in the window to stop you accidentally losing
+the mouse pointer on Voodoo-1/2 hardware)
+
+LICENSE:
+
+This software is released under the provisions of
+the GNU General Public License (GPL) which can be
+found in the file 'LICENSE' in the current directory.
+
+DIRECTORY STRUCTURE:
+
+src     -- Where the source code lives.
+
+data    -- This contains all kinds of miscellaneous data
+           files. Right now, this is limited to the level
+           description files.
+
+doc     -- Documentation - all in HTML
+
+images  -- Texture maps and other images needed by the
+           game. These are currently all in 'SGI' image
+           format.
+
+wavs    -- Sound files - sound effects in 'wav' format.
+
+mods    -- Music files - in 'mod' format.
+
+models  -- 3D models - in '.ac' format.
+
+
