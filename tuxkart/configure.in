@@ -1,6 +1,9 @@
 dnl Process this file with autoconf to produce a configure script.
 
+AC_PREREQ([2.54])
+
 AC_INIT(src/tuxkart.cxx)
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(tuxkart, 0.4.0)
 
 dnl Checks for programs.
@@ -9,7 +12,17 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PROG_INSTALL
-AC_PROG_RANLIB
+
+dnl ===========================================================================
+dnl Check for SDL
+SDL_VERSION=1.2.4
+AM_PATH_SDL($SDL_VERSION,
+            :,
+	    AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+)
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+LIBS="$LIBS $SDL_LIBS"
 
 plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
 
@@ -46,8 +59,6 @@ else
   LIBS="$plib_suffix $LIBS -lm -lwinmm -lopengl32 -luser32 -lgdi32"
 
 fi
-
-
 
 dnl Check SGI audio library
 
