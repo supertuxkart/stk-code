@@ -2,7 +2,7 @@
 #include "tuxkart.h"
 
 
-ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst,
+ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst, *mnm_gst,
                *clouds_gst, *aarmco_gst, *roadway_gst, *adverts_gst,
                *concrete_gst, *penguin_gst, *fuzzy_gst, *herring_gst,
                *zipper_gst, *spark_gst, *missile_gst, *candystripe_gst,
@@ -27,7 +27,7 @@ Material gs_setup [] =
                "images/candy_stripe.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
   { &aarmco_gst  , "images/aarmco.rgb"  , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
   { &railing_gst , "images/railing.rgb" , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
-  { &ruler_gst   , "images/ruler.rgb"   , NOCLAMP,TRUE ,0.5, TRUE ,1.0, 0 },
+  { &ruler_gst   , "images/ruler.rgb"   , NOCLAMP,TRUE ,0.2, TRUE ,1.0, 0 },
   { &goldwall_gst,
            "images/embossed_herring.rgb", NOCLAMP,TRUE ,0.5, TRUE ,1.0, 0 },
 
@@ -54,6 +54,7 @@ Material gs_setup [] =
                "images/Penguin_orig.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &grass_gst   , "images/grass.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &zipper_gst  , "images/zipper.rgb"  , NOCLAMP,FALSE,0.0, FALSE,1.0,MAT_ZIP},
+  { &mnm_gst     , "images/mnm.rgb"     , UVCLAMP,TRUE ,0.5, FALSE,1.0,MAT_ZIP},
   { &fuzzy_gst   , "images/fuzzy.rgb"   , UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},
   { &spark_gst   , "images/spark.rgb"   , UVCLAMP,FALSE,0.2, FALSE,0.0,MAT_IGN},
   { &explode_gst , "images/explode.rgb" , UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},

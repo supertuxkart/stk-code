@@ -111,6 +111,7 @@ float Driver::collectIsectData ( sgVec3 start, sgVec3 end )
   if ( nsteps > 100 )
   {
     fprintf ( stderr, "WARNING: Speed too high for collision detect!\n" ) ;
+    fprintf ( stderr, "WARNING: Nsteps=%d, Speed=%f!\n", nsteps,speed ) ;
     nsteps = 100 ;
   }
 

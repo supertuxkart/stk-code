@@ -1,0 +1,62 @@
+AC3Db
+MATERIAL "ac3dmat1" rgb 1 1 1  amb 0.2 0.2 0.2  emis 0 0 0  spec 0.5 0.5 0.5  shi 10  trans 0
+MATERIAL "ac3dmat0" rgb 0 0 0  amb 0.2 0.2 0.2  emis 0 0 0  spec 0.502 0.502 0.502  shi 10  trans 0.459
+OBJECT world
+kids 2
+OBJECT poly
+name "poly"
+loc 0.0266665 0.60274 -1.21825
+texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texrep 0.5 0.5
+texoff 0.25 0.47
+numvert 9
+-0.0619272 -0.613174 -4.53208
+-2.79529 0.363147 4.16499
+-0.480325 -0.00889319 4.19926
+2.81514 -0.636248 4.25288
+0.461591 -0.0722395 4.19311
+-0.061929 -0.613174 -4.53208
+-0.228614 -0.59615 4.53208
+0.461591 -0.0722389 4.19311
+-0.480325 -0.00888944 4.19923
+numsurf 4
+SURF 0x0
+mat 0
+refs 3
+0 1 1
+1 0 0
+2 0.833333 0
+SURF 0x0
+mat 0
+refs 3
+4 0.833333 0
+3 0 0
+0 1 1
+SURF 0x0
+mat 0
+refs 3
+5 1 1
+6 0 0
+7 0 1
+SURF 0x0
+mat 0
+refs 3
+6 0 1
+5 1 1
+8 0 0
+kids 0
+OBJECT poly
+name "poly"
+loc 0.0500001 0.1 -1.15
+numvert 3
+-0.15 0 -3.45
+-2.85 0 4.15
+1.75 -0.1 4.35
+numsurf 1
+SURF 0x0
+mat 1
+refs 3
+0 0.491228 1
+1 0 0.0229885
+2 1 -2.74044e-08
+kids 0

@@ -24,10 +24,34 @@ static ssgSimpleState *intro_gst ;
 
 #define MAX_TRACKS 10
 
+static puButton    *pleaseWaitButton    ;
+static int startup_counter = 0 ;
+
 static char *track_names  [ MAX_TRACKS ] ;
 static char *track_idents [ MAX_TRACKS ] ;
 
 extern int tuxkart_main ( int nl, char *track ) ;
+
+static void switch_to_game ()
+{
+  int t ;
+  int nl ;
+
+  trackButtons -> getValue ( & t ) ;
+  nl = atoi ( numLapsText->getLegend () ) ;
+
+  puDeleteObject ( pleaseWaitButton ) ;
+  puDeleteObject ( numLapsSlider ) ;
+  puDeleteObject ( numLapsText   ) ;
+  puDeleteObject ( playButton    ) ;
+  puDeleteObject ( exitButton    ) ;
+  puDeleteObject ( trackButtons  ) ;
+  delete intro_gst ;
+  delete sorority  ;
+  delete fnt       ;
+
+  tuxkart_main ( nl, track_idents[t] ) ;
+}
 
 /**************************************\
 *                                      *
@@ -73,6 +97,7 @@ static void mousefn ( int button, int updown, int x, int y )
 
 static void displayfn (void)
 {
+
   glMatrixMode   ( GL_PROJECTION ) ;
   glLoadIdentity () ;
   glMatrixMode   ( GL_MODELVIEW ) ;
@@ -83,15 +108,10 @@ static void displayfn (void)
   glDisable      ( GL_CULL_FACE  ) ;
   glDisable      ( GL_ALPHA_TEST ) ;
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
-                                                                                
+
   intro_gst -> force () ;
 
   glBegin ( GL_QUADS ) ;
-/*
-static int x = 1 ;
-  glColor3f    ( 1, (float)x, 1 ) ;
-x= !x ;
-*/
   glColor3f    ( 1, 1, 1 ) ;
   glTexCoord2f ( 0, 0 ) ; glVertex2i (   0,   0 ) ;
   glTexCoord2f ( 1, 0 ) ; glVertex2i ( 640,   0 ) ;
@@ -108,6 +128,12 @@ x= !x ;
 
   glutSwapBuffers   () ;
   /* glutPostRedisplay () ; */
+
+  if ( startup_counter > 0 )
+  {
+    if ( --startup_counter <= 0 )
+      switch_to_game () ;
+  }
 }
 
 
@@ -120,22 +146,11 @@ x= !x ;
 
 static void play_cb ( puObject * )
 {
-  int t ;
-  int nl ;
+  puSetDefaultColourScheme ( 123.0f/255.0f, 0.0f/255.0f, 34.0f/255.0f, 1.0) ;
+  pleaseWaitButton = new puButton ( 100, 240,
+                               "LOADING: PLEASE WAIT FOR A MINUTE OR TWO"  ) ;
 
-  trackButtons -> getValue ( & t ) ;
-  nl = atoi ( numLapsText->getLegend () ) ;
-
-  puDeleteObject ( numLapsSlider ) ;
-  puDeleteObject ( numLapsText   ) ;
-  puDeleteObject ( playButton    ) ;
-  puDeleteObject ( exitButton    ) ;
-  puDeleteObject ( trackButtons  ) ;
-  delete intro_gst ;
-  delete sorority  ;
-  delete fnt       ;
-
-  tuxkart_main ( nl, track_idents[t] ) ;
+  startup_counter = 3 ;
 }
 
 

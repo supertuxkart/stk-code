@@ -263,7 +263,10 @@ void GUI::joystickInput ()
     ji.buttons = 0 ;
   }
   else
+  {
     joystick -> read ( & ji.buttons, ji.data ) ;
+    ji.data[0] *= 1.3 ;
+  }
 
   if ( isGLUTKeyDown ( GLUT_KEY_LEFT +256 ) ) ji.data [0] = -1.0f ;
   if ( isGLUTKeyDown ( GLUT_KEY_RIGHT+256 ) ) ji.data [0] =  1.0f ;
