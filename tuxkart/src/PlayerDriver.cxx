@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.19 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.20 2004/08/16 00:17:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include <assert.h>
 #include "tuxkart.h"
 #include "sound.h"
@@ -74,6 +75,15 @@ PlayerDriver::incomingJoystick  (JoyInfo& ji)
     selected_property = &kart->kart_properties.turn_speed;
   }
   
+  if ( keyState [ SDLK_7 ] ) {
+    std::cout << "Use non fake-drifting" << std::endl;
+    use_fake_drift = true;
+  }
+  if ( keyState [ SDLK_8 ] ) {
+    std::cout << "Use non real-drifting" << std::endl;
+    use_fake_drift = false;
+  }
+
   if ( keyState [ SDLK_PLUS ] ) {
     *selected_property += 0.1f;
     printf ("Increased selected value to: %f\n", *selected_property);

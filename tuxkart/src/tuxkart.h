@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.36 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: tuxkart.h,v 1.37 2004/08/16 00:17:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -49,6 +49,8 @@
 class WidgetSet;
 class SoundSystem ;
 class Track ;
+
+extern bool use_fake_drift;
 
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;

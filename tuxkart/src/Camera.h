@@ -1,4 +1,4 @@
-//  $Id: Camera.h,v 1.6 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: Camera.h,v 1.7 2004/08/16 00:17:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,6 +30,7 @@ protected:
 
   int    whichKart ;
   Mode mode; 
+  float last_steer_offset;
   float x, y, w, h ;
 
   void init () ;

@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.14 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: Camera.cxx,v 1.15 2004/08/16 00:17:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,12 @@
 #include "KartDriver.h"
 #include "World.h"
 #include "Camera.h"
+
+static inline void relaxation(float& target, float& prev, float rate)
+{
+  target = (prev) + (rate) * ((target) - (prev));
+  prev = (target);
+}
 
 void
 Camera::setScreenPosition ( int pos )
@@ -73,6 +79,7 @@ Camera::Camera ( Mode mode_, int which )
   whichKart = which ;   // Just for now
   mode = mode_;
   setScreenPosition ( which ) ;
+  last_steer_offset = 0;
 }
 
 
@@ -112,11 +119,17 @@ void Camera::update ()
   sgMat4 cam_pos;
   sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
 
-  if (0)
+  if (!use_fake_drift)
     {
+      float steer_offset = World::current()->kart[whichKart]->getSteerAngle()*-10.0f;
+      relaxation(steer_offset, last_steer_offset, .25);
+                 
       sgMat4 cam_rot;
-      sgMakeRotMat4(cam_rot, World::current()->kart[whichKart]->getSteerAngle()*-5.0f, -5, 0);
-      sgMultMat4(relative, cam_rot, cam_pos);
+      sgMat4 tmp;
+      sgMakeRotMat4(cam_rot, 0, -5, 0);
+      sgMultMat4(tmp, cam_pos, cam_rot);
+      sgMakeRotMat4(cam_rot, steer_offset, 0, 0);
+      sgMultMat4(relative, cam_rot, tmp);
     }
   else
     {
