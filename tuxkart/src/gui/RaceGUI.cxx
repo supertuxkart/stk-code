@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.33 2004/09/01 22:15:11 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.34 2004/09/02 13:48:42 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -208,6 +208,11 @@ void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, i
   GLuint gl_texture = make_image_from_font(NULL, NULL, &w, &h, text,
                                            fonts_cache.find(sz)->second);
 
+  if(x == SCREEN_CENTERED_TEXT)
+    x = (640 - w) / 2;
+  if(y == SCREEN_CENTERED_TEXT)
+    y = (480 - h) / 2;
+
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, gl_texture);
 
@@ -228,6 +233,7 @@ void RaceGUI::drawText ( char *text, int sz, int x, int y, int red, int green, i
 
   glDisable(GL_TEXTURE_2D);
 }
+
 
 void RaceGUI::drawStretchedText ( char *text, int x, int y, int w, int h, int red, int green, int blue )
 {
@@ -652,13 +658,13 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   switch (World::current()->ready_set_go)
     {
     case 2:
-      drawText ( "Ready!", 80, 370-(3*80), 220, 230, 170, 160 ) ;
+      drawText ( "Ready!", 80, SCREEN_CENTERED_TEXT, SCREEN_CENTERED_TEXT, 230, 170, 160 ) ;
       break;
     case 1:
-      drawText ( "Set!", 80, 370-(2*80), 220, 230, 230, 160 ) ;
+      drawText ( "Set!", 80, SCREEN_CENTERED_TEXT, SCREEN_CENTERED_TEXT, 230, 230, 160 ) ;
       break;
     case 0:
-      drawText ( "Go!", 80, 370-(int)(1.5*80), 220, 100, 210, 100 ) ;
+      drawText ( "Go!", 80, SCREEN_CENTERED_TEXT, SCREEN_CENTERED_TEXT, 100, 210, 100 ) ;
       break;
     }
 

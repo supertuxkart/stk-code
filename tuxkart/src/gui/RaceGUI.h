@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.11 2004/09/01 22:15:11 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.12 2004/09/02 13:48:42 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,8 @@
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
+
+#define SCREEN_CENTERED_TEXT -1
 
 class RaceGUI: public BaseGUI
 {
