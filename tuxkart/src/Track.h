@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.12 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: Track.h,v 1.13 2004/08/23 13:32:08 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,14 +34,15 @@ private:
   float  total_distance ;
 
 public:
-  Track ( const TrackData& track_data, int mirror, int reverse ) ;
+  Track ( const TrackData& track_data, bool mirror, bool reverse ) ;
 
   int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
   int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
   void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
 
   float getTrackLength () { return total_distance ; }
-  void draw2Dview ( float x, float y ) ;
+  /* Draw track preview.   Warning: w and h is not in pixels. */
+  void draw2Dview ( float x, float y, float w, float h, bool stretch ) ;
 };
 
 #endif

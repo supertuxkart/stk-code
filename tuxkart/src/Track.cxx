@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.15 2004/08/17 13:37:36 grumbel Exp $
+//  $Id: Track.cxx,v 1.16 2004/08/23 13:32:08 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,9 +22,7 @@
 #include "TrackData.h"
 #include "Track.h"
 
-#define TRACKVIEW_SIZE 150.0f
-
-Track::Track ( const TrackData& track_data_, int mirror, int reverse )
+Track::Track ( const TrackData& track_data_, bool mirror, bool reverse )
   : track_data(track_data_)
 {
   // Mirror the track if requested
@@ -182,22 +180,24 @@ void Track::trackToSpatial ( sgVec3 xyz, int hint )
   sgCopyVec3 ( xyz, track_data.driveline [ hint ] ) ;
 }
 
-
-void Track::draw2Dview ( float x, float y )
+void Track::draw2Dview ( float x, float y, float w, float h, bool stretch )
 {
   sgVec2 sc ;
 
   sgAddScaledVec2 ( center, min, max, 0.5f ) ;
   sgSubVec2 ( sc, max, center ) ;
 
-  scale = ( sc[0] > sc[1] ) ? ( TRACKVIEW_SIZE / sc[0] ) :
-    ( TRACKVIEW_SIZE / sc[1] ) ;
+  float scale_x = w / sc[0] ;
+  float scale_y = h / sc[1] ;
+
+  if(stretch == false)
+    scale_x = scale_y = std::min(scale_x, scale_y);
  
   glBegin ( GL_LINE_LOOP ) ;
   for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
     {
-      glVertex2f ( x + ( track_data.driveline[i][0] - center[0] ) * scale,
-                   y + ( track_data.driveline[i][1] - center[1] ) * scale ) ;
+      glVertex2f ( x + ( track_data.driveline[i][0] - center[0] ) * scale_x,
+                   y + ( track_data.driveline[i][1] - center[1] ) * scale_y ) ;
     }
   glEnd () ;
 }
