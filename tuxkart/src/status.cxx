@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.21 2004/08/08 11:23:39 grumbel Exp $
+//  $Id: status.cxx,v 1.22 2004/08/08 11:52:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -41,7 +41,6 @@ static int  next_string  = 0 ;
 static int  stats_enabled = FALSE ;
 static bool show_fps = FALSE ;
 
-static Material *players_gst      = NULL ;
 static Material *herringbones_gst = NULL ;
 static Material *herring_gst      = NULL ;
 static Material *fuzzy_gst        = NULL ;
@@ -54,7 +53,6 @@ static Material *zipper_gst       = NULL ;
 
 void initStatusDisplay ()
 {
-  players_gst      = getMaterial ( "players.rgb"      ) ;
   herringbones_gst = getMaterial ( "herringbones.rgb" ) ;
   herring_gst      = getMaterial ( "herring.rgb"      ) ;
   fuzzy_gst        = getMaterial ( "fuzzy.rgb"        ) ;
@@ -288,57 +286,30 @@ void drawGameRunningText ()
 
 void drawPlayerIcons ()
 {
-  if (kart.size() != 4) return;
-
   int x =  0 ;
   int y = 10 ;
+
+  // FIXME: Use getScreenSize and do more intelligent icon placement
   float w = 640.0f - 64.0f ;
 
-  players_gst -> apply () ;
+  // FIXME: Draw more intelligent so that player is always on top
+  for ( Karts::size_type i = 0; i < kart.size() ; ++i )
+    {
+      Material* players_gst = kart[i]->getKartProperties().getIconMaterial();
+      players_gst -> apply ();
 
-  glBegin ( GL_QUADS ) ;
-    glColor4f    ( 1, 1, 1, 1 ) ;
+      glBegin ( GL_QUADS ) ;
+      glColor4f    ( 1, 1, 1, 1 ) ;
 
-    /* Geeko */
-
-    x = (int) ( w * kart [ 1 ] -> getDistanceDownTrack () /
-                    curr_track -> getTrackLength () ) ;
-    glTexCoord2f ( .5,  0 ) ; glVertex2i ( x   , y    ) ;
-    glTexCoord2f (  1,  0 ) ; glVertex2i ( x+64, y    ) ;
-    glTexCoord2f (  1, .5 ) ; glVertex2i ( x+64, y+64 ) ;
-    glTexCoord2f ( .5, .5 ) ; glVertex2i ( x   , y+64 ) ;
-
-    /* BSOD */
-
-    x = (int) ( w * kart [ 2 ] -> getDistanceDownTrack () /
-                    curr_track -> getTrackLength () ) ;
-    glTexCoord2f ( .5, .5 ) ; glVertex2i ( x   , y    ) ;
-    glTexCoord2f (  1, .5 ) ; glVertex2i ( x+64, y    ) ;
-    glTexCoord2f (  1,  1 ) ; glVertex2i ( x+64, y+64 ) ;
-    glTexCoord2f ( .5,  1 ) ; glVertex2i ( x   , y+64 ) ;
-
-    /* Gown */
-
-    x = (int) ( w * kart [ 3 ] -> getDistanceDownTrack () /
-                    curr_track -> getTrackLength () ) ;
-    glTexCoord2f (  0,  0 ) ; glVertex2i ( x   , y    ) ;
-    glTexCoord2f ( .5,  0 ) ; glVertex2i ( x+64, y    ) ;
-    glTexCoord2f ( .5, .5 ) ; glVertex2i ( x+64, y+64 ) ;
-    glTexCoord2f (  0, .5 ) ; glVertex2i ( x   , y+64 ) ;
-
-    /*
-      Draw Tux last so he doesn't get covered up
-      by the others
-    */
-
-    x = (int) ( w * kart [ 0 ] -> getDistanceDownTrack () /
-                    curr_track -> getTrackLength () ) ;
-    glTexCoord2f (  0, .5 ) ; glVertex2i ( x   , y    ) ;
-    glTexCoord2f ( .5, .5 ) ; glVertex2i ( x+64, y    ) ;
-    glTexCoord2f ( .5,  1 ) ; glVertex2i ( x+64, y+64 ) ;
-    glTexCoord2f (  0,  1 ) ; glVertex2i ( x   , y+64 ) ;
-
-  glEnd () ;
+      /* Geeko */
+      x = (int) ( w * kart [i] -> getDistanceDownTrack () /
+                  curr_track -> getTrackLength () ) ;
+      glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
+      glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+64, y    ) ;
+      glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+64, y+64 ) ;
+      glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+64 ) ;
+      glEnd () ;
+    }
 }
 
 

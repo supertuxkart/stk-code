@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.2 2004/08/08 11:23:39 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.3 2004/08/08 11:52:08 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <math.h>
+#include "material.h"
 #include "KartProperties.h"
 
 KartProperties::KartProperties()
@@ -38,6 +39,26 @@ KartProperties::KartProperties()
   max_wheel_turn = M_PI/2;
   max_grip       = 4.0f;
   air_friction   = 0.8257;
+
+  icon_file = "players.rgb";
+
+  icon_material = NULL;
+}
+
+Material*
+KartProperties::getIconMaterial()
+{
+  if (icon_material)
+    {
+      return icon_material; 
+    }
+  else
+    {
+      char* icon_file_c = strdup(icon_file.c_str());
+      icon_material = getMaterial(icon_file_c);
+      free(icon_file_c);
+      return icon_material;
+    }
 }
 
 /* EOF */
