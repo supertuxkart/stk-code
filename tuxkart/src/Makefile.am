@@ -73,7 +73,9 @@ tuxkart_SOURCES = \
   gui/Options.cxx \
   gui/Options.h \
   gui/TrackSel.cxx \
-  gui/TrackSel.h
+  gui/TrackSel.h \
+  gui/NumPlayers.cxx \
+  gui/NumPlayers.h
   
 
 # EOF #
