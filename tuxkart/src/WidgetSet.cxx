@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.7 2004/08/12 15:14:12 matzebraun Exp $
+//  $Id: WidgetSet.cxx,v 1.8 2004/08/20 19:28:25 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -52,10 +52,15 @@ WidgetSet::WidgetSet()
 
         /* Load small, medium, and large typefaces. */
 	  std::string path = loader->getPath(GUI_FACE);
-
-        font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
-        font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 12);
-        font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  6);
+		
+	  //Neverball sizes:
+        //font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
+        //font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 12);
+        //font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  6);
+		
+		font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
+        font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 15);
+        font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  10);
         radius = s / 60;
 
         /* Initialize the global pause GUI. */
