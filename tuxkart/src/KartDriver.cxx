@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.26 2004/08/13 22:58:16 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.27 2004/08/13 23:14:22 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,6 +27,7 @@
 #include "Projectile.h"
 #include "SkidMark.h"
 #include "World.h"
+#include "material.h"
 
 KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
                                        int num, int initial_num,
@@ -621,7 +622,8 @@ KartDriver::load_data()
   // Attach Particle System
   sgCoord pipe_pos = {{-.2, -.8, .3}, {0, 0, 0}} ;
   smoke_system = new KartParticleSystem(this, 20, 5, 15.0f, TRUE, 0.35f, 1000);
-  smoke_system -> setState ( smokepuff ) ;
+  smoke_system -> setState (getMaterial ("smoke.png")-> getState() );
+  //smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;
   comp_model-> addKid (exhaust_pipe) ;

@@ -50,7 +50,7 @@
 "dinoicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "pennyshadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "spark.png"        Y Y     N      0.2     N     N   0.0     Y   N    N    N
-"smoke.png"        Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"smoke.png"        Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "explode.png"      Y Y     Y      0.2     N     N   0.0     Y   N    N    N
 "players.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "tuxicon.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
