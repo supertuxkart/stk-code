@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.19 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.20 2004/08/11 17:37:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,10 +29,11 @@
 
 static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
 {
-  sgSetVec4 ( p -> col, 1, 1, 1, 1 ) ;  /* initially white */
+  sgSetVec4 ( p -> col, 1, 1, 1, .5 ) ;  /* initially white */
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;     /* start off on the ground */
-  sgSetVec3 ( p -> vel, 0, -3, 0 ) ;
-  sgSetVec3 ( p -> acc, 0, 0, 0.3f ) ; /* Gravity */
+  sgSetVec3 ( p -> vel, 0, 0, 0 ) ;
+  sgSetVec3 ( p -> acc, 0, 0, 1.0f ) ; /* Gravity */
+  p->size = .5f;
   p -> time_to_live = 1 ;               /* Droplets evaporate after 5 seconds */
   
   KartParticleSystem* ksystem = dynamic_cast<KartParticleSystem*>(system);
@@ -40,17 +41,24 @@ static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
     {
       KartDriver* kart = ksystem->kart;
       sgCoord* pos = kart->getCoord();
+      //sgCoord* vel = kart->getVelocity();
+
+      sgCopyVec3 (p->pos, pos->xyz);     /* start off on the ground */
+      //sgCopyVec3 (p->vel, vel->xyz);
       (void)pos;
       //std::cout << "KartDriver: " << pos->xyz[0] << ", " << pos->xyz[1] << std::endl;
     }
 }
 
-#if 0
-static void update_smoke (float , ssgaParticleSystem *, int, ssgaParticle *)
+static void update_smoke (float delta, ssgaParticleSystem* system_, int, 
+                          ssgaParticle * particle)
 {
+  KartParticleSystem* system = dynamic_cast<KartParticleSystem*>(system_);
+  (void)system;
   /* some funny stuff - add options to turn it off*/
+  particle->size += delta*2.0f;
+  particle->col[3]  -= delta * 2.0f;
 }
-#endif
 
 KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
                                        int num, int initial_num,
@@ -518,7 +526,7 @@ KartDriver::load_data()
   float r [ 2 ] = { -10.0f, 100.0f } ;
   
   smokepuff = new ssgSimpleState ();
-  smokepuff -> setTexture        (loader->createTexture ("spark.rgb", true, true, true)) ;
+  smokepuff -> setTexture        (loader->createTexture ("smoke.rgb", true, true, true)) ;
   smokepuff -> setTranslucent    () ;
   smokepuff -> enable            ( GL_TEXTURE_2D ) ;
   smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
@@ -567,13 +575,14 @@ KartDriver::load_data()
   this-> getModel() -> addKid ( lod ) ;
   
   // Attach Particle System
-  sgCoord pipe_pos = {0, -1, 0.2, 0, 0, 0} ;
-  smoke_system = new KartParticleSystem(this, 20, 5, 5.0f, TRUE, 0.5f, 50, create_smoke) ;
+  sgCoord pipe_pos = {-.2, -.8, .3, 0, 0, 0} ;
+  smoke_system = new KartParticleSystem(this, 20, 5, 5.0f, TRUE, 0.35f, 1000, 
+                                        create_smoke, update_smoke) ;
   smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;
-  //this-> getModel() -> addKid (exhaust_pipe) ;
-  World::current()->scene -> addKid (exhaust_pipe);
+  comp_model-> addKid (exhaust_pipe) ;
+  //World::current()->scene -> addKid (exhaust_pipe);
 
   // Load data for this kart (bonus objects, the kart model, etc)
   ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
