@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.42 2004/09/06 19:37:08 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.43 2004/09/07 12:44:38 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,6 +66,8 @@ next_string(0)
 	magnet_gst       = getMaterial ( "magnet.rgb"       ) ;
 	zipper_gst       = getMaterial ( "zipper.rgb"       ) ;
 
+  nCachedTextures = World::current()->raceSetup.getNumPlayers() * TEXTURES_PER_PLAYER;
+
 	if ((fps_id = widgetSet -> count(0, 1000, GUI_SML, GUI_SE)))
 		widgetSet -> layout(fps_id, -1, 1);
 }
@@ -77,7 +79,7 @@ RaceGUI::~RaceGUI()
 	for(FontsCache::iterator i = fonts_cache.begin(); i != fonts_cache.end(); ++i)
 		TTF_CloseFont(i->second);
 
-  for (int i = 0; i != N_CACHED_TEXTURES; ++i)
+  for (int i = 0; i != nCachedTextures; ++i)
   {
     if (cachedTextures[i].lastUsed != -1)
       glDeleteTextures(1, &(cachedTextures[i].texture));
@@ -263,7 +265,7 @@ void RaceGUI::cacheFont(int sz)
 
 TextTexture* RaceGUI::cacheTexture(const char* text, int sz)
 {
-  for (int i = 0; i != N_CACHED_TEXTURES; ++i)
+  for (int i = 0; i != nCachedTextures; ++i)
   {
     if (cachedTextures[i].text == text && cachedTextures[i].sz == sz)
     {
@@ -277,7 +279,7 @@ TextTexture* RaceGUI::cacheTexture(const char* text, int sz)
   cacheFont(sz);
 
   int replace = 0;
-  for (int i = 1; i != N_CACHED_TEXTURES; ++i)
+  for (int i = 1; i != nCachedTextures; ++i)
   {
     if (cachedTextures[i].lastUsed < cachedTextures[replace].lastUsed)
       replace = i;

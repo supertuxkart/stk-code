@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.15 2004/09/06 13:03:36 jamesgregory Exp $
+//  $Id: RaceGUI.h,v 1.16 2004/09/07 12:44:38 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,7 @@
 
 #include "BaseGUI.h"
 #include "material.h"
+#include "Config.h"
 //#include <plib/fnt.h>
 #include <SDL_ttf.h>
 #include <map>
@@ -33,7 +34,7 @@
 
 #define SCREEN_CENTERED_TEXT -1
 
-const int N_CACHED_TEXTURES = 10;
+const int TEXTURES_PER_PLAYER = 10;
 
 class TextTexture
 {
@@ -76,6 +77,11 @@ private:
 	
 	double time_left ;
 
+  TextTexture cachedTextures[PLAYERS * TEXTURES_PER_PLAYER];
+  int nCachedTextures;
+
+	char *pos_string [10];
+
   /* Display informat on screen */
 	void drawStatusText (const RaceSetup& raceSetup);
 	void drawEnergyMeter ( float state, int offset_x, int offset_y, float ratio_x, float ratio_y );
@@ -101,12 +107,6 @@ private:
 	void cacheFont(int sz);
   TextTexture* cacheTexture(const char* text, int sz);
 
-  TextTexture cachedTextures[N_CACHED_TEXTURES];
-
-	char *pos_string [10];
-
-	
-	
 	//debugging arrays and functions, never actually get used for anything at the moment
 	void stToggle ();
 	void stPrintf ( char *fmt, ... );
