@@ -2,9 +2,13 @@
 #include "tuxkart.h"
 
 
+int check_hint = 0 ;
+
 void PlayerKartDriver::update ()
 {
+check_hint = 1 ;
   KartDriver::update () ;
+check_hint = 0 ;
 }
 
 

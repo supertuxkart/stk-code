@@ -90,6 +90,7 @@ protected:
   float getIsectData     ( sgVec3 start, sgVec3 end ) ;
   float collectIsectData ( sgVec3 start, sgVec3 end ) ;
 
+  int    track_hint ;
   sgVec2 last_track_coords ;
   sgVec2 curr_track_coords ;
 
@@ -130,8 +131,10 @@ public:
     for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
       sgCopyCoord ( &(history[i]), &reset_pos ) ;
 
-    curr_track -> spatialToTrack ( last_track_coords, last_pos.xyz ) ;
-    curr_track -> spatialToTrack ( curr_track_coords, curr_pos.xyz ) ;
+    track_hint = curr_track -> absSpatialToTrack ( last_track_coords,
+                                                   last_pos.xyz ) ;
+    track_hint = curr_track -> absSpatialToTrack ( curr_track_coords,
+                                                   curr_pos.xyz ) ;
 
     update () ;
   }

@@ -64,7 +64,9 @@ void Driver::coreUpdate ()
 
   doCollisionAnalysis ( hot ) ;
 
-  curr_track -> spatialToTrack ( curr_track_coords, curr_pos.xyz ) ;
+  track_hint = curr_track -> spatialToTrack ( curr_track_coords,
+                                              curr_pos.xyz,
+                                              track_hint ) ;
 
   sgCopyCoord ( & history[history_index], & curr_pos ) ;
   placeModel () ;

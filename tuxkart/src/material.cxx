@@ -171,6 +171,8 @@ printf("No texture.\n");
     }
   }
 
+  strcpy ( fname, basename  ) ;
+  strcat ( fname, ".rgb"    ) ;
   return NULL ;
 }
 

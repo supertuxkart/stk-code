@@ -21,7 +21,8 @@ class Track
                    yoff + ( v[1] - center[1] ) * scale ) ;
     }
 
-    void spatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
+    int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
+    int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
     void trackToSpatial ( sgVec3 xyz, sgVec2 src ) ;
 
     float getTrackLength () { return total_distance ; }

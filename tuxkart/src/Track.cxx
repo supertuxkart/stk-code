@@ -67,22 +67,82 @@ Track::Track ( char *fname )
 
 
 
-void Track::spatialToTrack ( sgVec3 res, sgVec3 xyz )
+extern int check_hint ;
+
+int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint )
 {
   int nearest = 0 ;
   float d ;
   float nearest_d = 99999 ;
 
-  for ( int i = 0 ; i < npoints ; i++ )
-  {
-    d = sgDistanceVec2 ( driveline[i], xyz ) ;
+  /*
+    If we don't have a good hint, search all the
+    points on the track to find our nearest centerline point
+  */
 
-    if ( d < nearest_d )
+/*
+if ( check_hint )
+fprintf(stderr,"ih=%d ", hint ) ;
+  if ( hint < 0 || hint >= npoints )
+*/
+  {
+    for ( int i = 0 ; i < npoints ; i++ )
     {
-      nearest_d = d ;
-      nearest = i ;
+      d = sgDistanceVec2 ( driveline[i], xyz ) ;
+
+      if ( d < nearest_d )
+      {
+        nearest_d = d ;
+        nearest = i ;
+      }
     }
+
+    hint = nearest ;
+/*
+if ( check_hint )
+fprintf(stderr,"hint=%d\n", hint ) ;
+*/
   }
+
+  /*
+    Check the two points on the centerline either side
+    of the hint.
+  */
+
+/*
+  int hp = ( hint <=      0     ) ? (npoints-1) : (hint-1) ;
+  int hn = ( hint >= (npoints-1)) ?      0      : (hint+1) ;
+
+  float dp = sgDistanceVec2 ( driveline[ hp ], xyz ) ;
+  float d0 = sgDistanceVec2 ( driveline[hint], xyz ) ;
+  float dn = sgDistanceVec2 ( driveline[ hn ], xyz ) ;
+
+if ( check_hint )
+fprintf(stderr,"d=(%f->%f->%f), %d/%d/%d ", dp,d0,dn, hp,hint,hn ) ;
+
+  if ( d0 < dp && d0 < dn )
+  {
+    nearest   = hint ;
+    nearest_d =  d0  ;
+  }
+  else
+  if ( dp < dn )
+  {
+    nearest   = hp ;
+    nearest_d = dp ;
+  }
+  else
+  {
+    nearest   = hn ;
+    nearest_d = dn ;
+  }
+
+if ( check_hint )
+fprintf(stderr,"new hint=%d\n", nearest ) ;
+*/
+  /*
+    OK - so we have the closest point
+  */
 
   int    prev,  next ;
   float dprev, dnext ;
@@ -117,7 +177,15 @@ void Track::spatialToTrack ( sgVec3 res, sgVec3 xyz )
   sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
 
   res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + driveline[p1][2] ;
+
+  return nearest ;
 }
+
+int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz )
+{
+  return spatialToTrack ( res, xyz, 100000 ) ;
+}
+
 
 void Track::trackToSpatial ( sgVec3 xyz, sgVec2 src )
 {
