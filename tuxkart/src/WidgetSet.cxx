@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.5 2004/08/08 16:32:53 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.6 2004/08/12 14:54:55 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -895,7 +895,8 @@ void WidgetSet::layout(int id, int xd, int yd)
 int WidgetSet::search(int id, int x, int y)
 {
     int jd, kd;
-
+    assert(id < MAXWIDGETS);
+    
     /* Search the hierarchy for the widget containing the given point. */
 
     if (id && (widgets[id].x <= x && x < widgets[id].x + widgets[id].w &&

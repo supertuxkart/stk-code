@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.7 2004/08/11 22:11:53 jamesgregory Exp $
+//  $Id: World.cxx,v 1.8 2004/08/12 14:54:55 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -195,7 +195,7 @@ World::~World()
   //unload_players ( ) ;
   //unload_track ( ) ;
   
-  for ( uint i = 0 ; i < kart.size() ; i++ )
+  for ( unsigned int i = 0 ; i < kart.size() ; i++ )
     delete kart[i];
 
   kart.clear();

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.20 2004/08/11 17:37:36 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.21 2004/08/12 14:54:55 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -575,7 +575,7 @@ KartDriver::load_data()
   this-> getModel() -> addKid ( lod ) ;
   
   // Attach Particle System
-  sgCoord pipe_pos = {-.2, -.8, .3, 0, 0, 0} ;
+  sgCoord pipe_pos = {{-.2, -.8, .3}, {0, 0, 0}} ;
   smoke_system = new KartParticleSystem(this, 20, 5, 5.0f, TRUE, 0.35f, 1000, 
                                         create_smoke, update_smoke) ;
   smoke_system -> setState ( smokepuff ) ;

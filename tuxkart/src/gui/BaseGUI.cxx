@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.11 2004/08/11 11:36:40 grumbel Exp $
+//  $Id: BaseGUI.cxx,v 1.12 2004/08/12 14:54:55 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,7 +35,7 @@
 
 void updateGUI(RaceSetup& raceSetup)
 {
-	static uint rememberSize = 0;
+	static unsigned int rememberSize = 0;
 	
 	if (rememberSize != guiStack.size())
 	{

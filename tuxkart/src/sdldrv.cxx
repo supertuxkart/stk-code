@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.26 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.27 2004/08/12 14:54:55 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -33,7 +33,7 @@
 using std::cout;
 using std::vector;
 
-const uint MOUSE_HIDE_TIME = 2000;
+const unsigned int MOUSE_HIDE_TIME = 2000;
 
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
@@ -102,7 +102,7 @@ void setupControls()
 
 void shutdownVideo ()
 {	
-	for (uint i = 0; i != joys.size(); ++i)
+	for (unsigned int i = 0; i != joys.size(); ++i)
     		SDL_JoystickClose ( joys[i] );
 		
 	SDL_Quit( );
