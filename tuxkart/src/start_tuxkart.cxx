@@ -303,6 +303,7 @@ static void initTuxKart (int noBorder)
   loadTrackList () ;
 
   /* Initialise a bunch of PLIB library stuff */
+
   pwInit  ( 0, 0, getScreenWidth(), getScreenHeight(), FALSE, 
 	    "Tux Kart by Steve Baker", !noBorder, 0 ) ;
 
@@ -321,7 +322,8 @@ static void initTuxKart (int noBorder)
 
 
 /* Draw the startScreen */
-static void startScreen () 
+static void startScreen ( int nbrLaps, int mirror, int reverse,
+			  int track, int nbrPlayers )
 {
   /* Create all of the GUI elements */
 
@@ -344,29 +346,32 @@ static void startScreen ()
   numLapsSlider -> setLabel      ( "How Many Laps?" ) ;
   numLapsSlider -> setDelta      ( 0.05 ) ;
   numLapsSlider -> setCBMode     ( PUSLIDER_ALWAYS  ) ;
-  numLapsSlider -> setValue      ( 1.0f*0.05f*(5.0f-1.0f) ) ;
+  numLapsSlider -> setValue      ( (int) ( nbrLaps - 1) * 0.05f ) ;
+  //  numLapsSlider -> setValue      ( 1.0f*0.05f*(5.0f-1.0f) ) ;
   numLapsSlider -> setCallback   ( numLapsSliderCB  ) ;
 
-  numLapsText = new puButton     ( 160, 80, " 5"    ) ;
+  numLapsText = new puButton     ( 160, 80, " 5" ) ;
   numLapsText -> setStyle        ( PUSTYLE_BOXED    ) ;
+  sprintf ( numLapsLegend, "%2d", nbrLaps ) ;
+  numLapsText->setLegend ( numLapsLegend ) ;
 
   playerButtons = new puButtonBox ( 10, 150, 150, 230, playerOptions, TRUE ) ;
   playerButtons -> setLabel       ( "How Many Players?"   ) ;
   playerButtons -> setLabelPlace  ( PUPLACE_ABOVE    ) ;
-  playerButtons -> setValue       ( 0                ) ; 
+  playerButtons -> setValue       ( nbrPlayers/2     ) ; 
 
   trackButtons = new puButtonBox ( 400, 10, 630, 150, trackNames, TRUE ) ;
   trackButtons -> setLabel       ( "Which Track?"   ) ;
   trackButtons -> setLabelPlace  ( PUPLACE_ABOVE    ) ;
-  trackButtons -> setValue       ( 0                ) ; 
+  trackButtons -> setValue       ( track            ) ; 
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
   mirrorButton = new puButton    ( 260, 40, "Mirror Track" ) ;
-  mirrorButton -> setValue       ( 0                ) ;
+  mirrorButton -> setValue       ( mirror           ) ;
 #endif
    
   reverseButton = new puButton    ( 260, 10, "Reverse Track" ) ;
-  reverseButton -> setValue       ( 0                ) ;
+  reverseButton -> setValue       ( reverse         ) ;
 
   /*
     Load up the splash screen texture,
@@ -381,16 +386,19 @@ static void startScreen ()
 void cmdLineHelp ()
 {
   fprintf ( stdout, 
-	    "Usage: tuxkart [--track n] [--nbrLaps n] [--reverse] [--mirror]\n"
-	    "\t\t[--fullscreen|--screenMode n [--noBorder]]\n"
+	    "Usage: tuxkart [--version] [--track n] [--nbrLaps n] [--nbrPlayers n]\n"
+	    "\t\t[--fullscreen|--screenMode n [--noBorder] [--noStartScreen]] \n"
+	    "\t\t[--reverse] [--mirror]\n"
 	    "\n"
 	    "Run TuxKart, a racing game with go-kart that features"
 	    " the well-known linux\nmascott Tux. The game is heavily"
 	    " inspired by Super-Mario-Kart and Wacky Wheels.\n"
 	    "\n"
 	    "Options:\n"
+	    "--noStartScreen\tQuick race.\n"
 	    "--track n\tStart at track number n. First track is 0.\n"
 	    "--nbrLaps n\tDefine number of laps to n.\n"
+	    "--nbrPlayers n\tDefine number of players to either 1, 2 or 4.\n"
 	    "--reverse\tEnable reverse mode.\n"
 	    "--mirror\tEnable mirror mode (when supported).\n"
 	    "--fullscreen\tFullscreen display (doesn't work with --screenMode).\n"
@@ -412,13 +420,14 @@ int main ( int argc, char *argv[] )
 {
  
   /* Default values */
-  int nl = 3;
+  int nbrLaps = 3;
   int mirror = 0, reverse = 0;
-  int t = 0;
-  int np = 1;
+  int track = 0;
+  int nbrPlayers = 1;
   int width = 800;
   int height = 600;
   int noBorder = FALSE;
+  int noStartScreen = FALSE;
   
   /* Testing if we've given arguments */
   if ( argc > 1) 
@@ -437,16 +446,22 @@ int main ( int argc, char *argv[] )
 
 	  else if( !strcmp(argv[i], "--track") and argc > 2 )
 	    {
-	      t = atoi(argv[i+1]);
+	      track = atoi(argv[i+1]);
 
-	      if ( t < 0 )
+	      if ( track < 0 )
 		{
-		  fprintf ( stderr, "You choose an invalid track number: %d.\n", t ) ;
+		  fprintf ( stderr,
+			    "You choose an invalid track number: %d.\n", track );
 		  cmdLineHelp();
 		  return 0;
 		}
 
 	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+	    }
+
+	  else if ( !strcmp(argv[i], "--noStartScreen") )
+	    {
+	      noStartScreen = TRUE;
 	    }
 
 	  else if ( !strcmp(argv[i], "--reverse") )
@@ -468,7 +483,13 @@ int main ( int argc, char *argv[] )
 	  else if ( !strcmp(argv[i], "--nbrLaps") and argc > 2 )
 	    {
 	      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
-	      nl = atoi(argv[i+1]);
+	      nbrLaps = atoi(argv[i+1]);
+	    }
+
+	  else if ( !strcmp(argv[i], "--nbrPlayers") and argc > 2 )
+	    {
+	      fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
+	      nbrPlayers = atoi(argv[i+1]);
 	    }
 
 	  else if ( !strcmp(argv[i], "--fullscreen") )
@@ -476,6 +497,8 @@ int main ( int argc, char *argv[] )
 	      width = -1;
 	      height = -1;
 	      noBorder = TRUE;
+	      // We can't switch to fullscreen after having shown the StartScreen
+	      noStartScreen = TRUE;
 	    }
 
 	  else if ( !strcmp(argv[i], "--screenMode") and argc > 2 )
@@ -541,25 +564,32 @@ int main ( int argc, char *argv[] )
 	      return 0;
 	    }
 	}
-      /* Set screen resolution */
-      reshape( width, height );
-
-      /* Load plib stuff */
-      initTuxKart (noBorder);
-      /* Start the main program */
-      tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
     }
 
-  /* No command line parameters as been specified */
+
+  if ( noStartScreen == TRUE )
+    {
+      /* Set screen resolution */
+      reshape( width, height );
+      /* Load plib stuff */
+      initTuxKart ( noBorder );
+
+      tuxkartMain ( nbrLaps, mirror, reverse, trackIdents[track], nbrPlayers ) ;
+    }
   else
     {
       /* Load plib stuff */
-      initTuxKart (noBorder);
+      initTuxKart ( noBorder );
 
       /* Show start screen */
-      startScreen ();
+      startScreen ( nbrLaps, mirror, reverse, track, nbrPlayers );
+
+      /* Set screen resolution */
+      reshape( width, height );
+      pwSetSize( getScreenWidth(), getScreenHeight() );
 
       switchToGame () ; 
-      return 0 ;
     }
+
+  return 0 ;
 }

@@ -1,8 +1,9 @@
 2004-07-20  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (cmdLineHelp): - Now has its own function.
-	(main): - Added --fullscreen and --version.
+	(main): - Added fullscreen, version, noStartScreen and nbrPlayers.
 	- Display error message on invalid command line argument.
+	- StartScreen is shown unless fullscreen is specified.
 
 2004-07-18  Pascal Giard  <evilynux@yahoo.com>
 
