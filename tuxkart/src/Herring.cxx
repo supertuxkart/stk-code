@@ -41,7 +41,7 @@ Herring::Herring ( sgVec3 colour )
 
   ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
-  gset -> setState ( herring_gst ) ;
+  gset -> setState ( getMaterial ( "herring.rgb" ) -> getState () ) ;
  
   h = 0.0f ;
  
@@ -84,7 +84,7 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
   ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
   gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-  gs -> setState ( fuzzy_gst ) ;
+  gs -> setState ( getMaterial ( "fuzzy.rgb" ) -> getState () ) ;
   sh -> addKid ( gs ) ;
   sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }

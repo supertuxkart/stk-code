@@ -1,130 +1,225 @@
 
 #include "tuxkart.h"
 
+#define UCLAMP   1
+#define VCLAMP   2
 
-ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst, *mnm_gst,
-               *clouds_gst, *aarmco_gst, *roadway_gst, *adverts_gst,
-               *concrete_gst, *penguin_gst, *fuzzy_gst, *herring_gst,
-               *zipper_gst, *spark_gst, *missile_gst, *candystripe_gst,
-               *explode_gst, *flamemissile_gst, *players_gst, *magnet_gst,
-               *brick_gst, *grid_gst, *lava_gst, *stone_gst,
-               *pebble_gst, *floor_gst, *railing_gst, *wood_gst,
-               *tinytux_gst, *butterfly_gst, *sandstorm_gst, *sand_gst,
-               *pyramidwall_gst, *egypt_gst, *flames_gst, *ruler_gst,
-               *bzzt_gst, *herringbones_gst, *goldwall_gst, *rainbow_gst ;
+static ulList *materials = NULL ;
 
-ssgSimpleState *blank_gst ;
 
-#define NOCLAMP 0
-#define UCLAMP  1
-#define VCLAMP  2
-#define UVCLAMP 3
-
-Material gs_setup [] =
+bool Material::parseBool ( char **p )
 {
-  /*    gst          texture_map          clamp , trans,aref,light,frctn,0 */
-  { &candystripe_gst,
-               "images/candy_stripe.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
-  { &aarmco_gst  , "images/aarmco.rgb"  , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
-  { &railing_gst , "images/railing.rgb" , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
-  { &ruler_gst   , "images/ruler.rgb"   , NOCLAMP,TRUE ,0.2, TRUE ,1.0, 0 },
-  { &goldwall_gst,
-           "images/embossed_herring.rgb", NOCLAMP,TRUE ,0.5, TRUE ,1.0, 0 },
+  /* Skip leading spaces */
 
-  { &adverts_gst , "images/adverts.rgb" , NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
-  { &wood_gst    , "images/wood.rgb"    , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &concrete_gst, "images/concrete.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
-  { &brick_gst   , "images/brick.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
-  { &stone_gst   , "images/stonewall.rgb",NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &pebble_gst  , "images/pebbles.rgb" , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &floor_gst   , "images/floor.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &sand_gst    , "images/sand.rgb"    , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &egypt_gst   , "images/egypt.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, MAT_CRASH },
-  { &pyramidwall_gst,
-                   "images/pyramidwall.rgb",
-                                          NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &lava_gst    , "images/lava.rgb"    , NOCLAMP,FALSE,0.0, FALSE,1.0, MAT_RESET },
-  { &grid_gst    , "images/metalgrid.rgb",NOCLAMP,TRUE ,0.3, TRUE ,1.0, 0 },
-  { &sandstorm_gst,"images/fuzzy_sand.rgb",NOCLAMP,TRUE,0.0, FALSE,1.0, MAT_IGN },
-  { &roadway_gst , "images/roadway.rgb" , UCLAMP ,TRUE ,0.0, TRUE ,1.0, 0 },
-  { &rainbow_gst , "images/rainbow.rgb" , NOCLAMP,TRUE ,0.0, FALSE,1.0, 0 },
-  { &tinytux_gst , "images/tinytux.rgb" , UVCLAMP,TRUE ,0.8, FALSE,1.0, MAT_IGN },
-  { &butterfly_gst,"images/butterfly.rgb",UVCLAMP,TRUE ,0.8, FALSE,1.0, MAT_IGN },
-  { &penguin_gst ,
-               "images/Penguin_orig.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &grass_gst   , "images/grass.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &zipper_gst  , "images/zipper.rgb"  , NOCLAMP,FALSE,0.0, FALSE,1.0,MAT_ZIP},
-  { &mnm_gst     , "images/mnm.rgb"     , UVCLAMP,TRUE ,0.5, FALSE,1.0,MAT_ZIP},
-  { &fuzzy_gst   , "images/fuzzy.rgb"   , UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},
-  { &spark_gst   , "images/spark.rgb"   , UVCLAMP,FALSE,0.2, FALSE,0.0,MAT_IGN},
-  { &explode_gst , "images/explode.rgb" , UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},
-  { &players_gst , "images/players.rgb" , UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
-  { &missile_gst , "images/missile.rgb" , UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
-  { &flames_gst  , "images/flames.rgb"  , NOCLAMP,FALSE,0.9, FALSE,0.0,MAT_IGN},
-  { &magnet_gst  , "images/magnet.rgb"  , UVCLAMP,TRUE ,0.1, FALSE,0.0,MAT_IGN},
-  { &bzzt_gst    , "images/bzzt.rgb"    , NOCLAMP,TRUE ,0.1, FALSE,0.0,MAT_IGN},
-  { &flamemissile_gst,
-               "images/flamemissile.rgb", UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
-  { &herring_gst , "images/herring.rgb" , UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
-  { &herringbones_gst,
-               "images/herringbones.rgb", UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},
-  { &blank_gst   , ""                   , NOCLAMP,FALSE,0.0, TRUE ,1.0,MAT_CRASH},
-  { NULL, "", FALSE, FALSE, 0.0, FALSE, 1.0, 0 }
-} ;
+  while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
+
+  bool res = ( ( **p == 'Y' ) || ( **p == 'y' ) ) ;
+
+  while ( **p > ' ' && **p != '\0' ) (*p)++ ;
+
+  return res ;
+}
 
 
-void Material::install ( int index )
+int Material::parseInt ( char **p )
 {
-  *gst = new ssgSimpleState ;
+  /* Skip leading spaces */
 
-  (*gst) -> ref () ;
-  (*gst) -> setExternalPropertyIndex ( index ) ;
+  while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
 
-  if ( texture_map [ 0 ] != '\0' )
+  return strtol ( *p, p, 0 ) ;
+}
+
+
+
+float Material::parseFloat ( char **p )
+{
+  /* Skip leading spaces */
+
+  while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
+
+  return strtod ( *p, p ) ;
+}
+
+
+
+Material::Material ()
+{
+  texname = new char [ 1 ] ;
+  texname [ 0 ] = '\0' ;
+
+  init    () ;
+  install () ;
+}
+
+
+Material::Material ( char *fname, char *description )
+{
+  texname = new char [ strlen ( fname ) + 1 ] ;
+  strcpy ( texname, fname ) ;
+
+  init () ;
+
+  clamp_tex    = parseBool  ( & description ) ? UCLAMP : 0 ;
+  clamp_tex   += parseBool  ( & description ) ? VCLAMP : 0 ;
+
+  transparency = parseBool  ( & description ) ;
+  alpha_ref    = parseFloat ( & description ) ;
+  lighting     = parseBool  ( & description ) ;
+  friction     = parseFloat ( & description ) ;
+  ignore       = parseBool  ( & description ) ;
+  zipper       = parseBool  ( & description ) ;
+  resetter     = parseBool  ( & description ) ;
+  collideable  = parseBool  ( & description ) ;
+
+  install () ;
+}
+
+
+void Material::init ()
+{
+  materials -> addEntity ( this ) ;
+  index = materials -> searchForEntity ( this ) ;
+
+  clamp_tex    = 0     ;
+  transparency = false ;
+  alpha_ref    = 0.1   ;
+  lighting     = true  ;
+  friction     = 1.0   ;
+  ignore       = false ;
+  zipper       = false ;
+  resetter     = false ;
+  collideable  = true  ;
+}
+
+
+void Material::install ()
+{
+  ssgSimpleState *s = new ssgSimpleState ;
+
+  state = s ;
+
+  s -> ref () ;
+  s -> setExternalPropertyIndex ( index ) ;
+
+  if ( texname != NULL && texname [ 0 ] != '\0' )
   {
-    (*gst) -> setTexture ( texture_map, !(clamp_tex & UCLAMP),
-                                        !(clamp_tex & VCLAMP) ) ;
-    (*gst) -> enable ( GL_TEXTURE_2D ) ;
+    char fn [ 1024 ] ;
+    sprintf ( fn, "images/%s", texname ) ;
+
+    s -> setTexture ( fn, !(clamp_tex & UCLAMP),
+                          !(clamp_tex & VCLAMP) ) ;
+    s -> enable  ( GL_TEXTURE_2D ) ;
   }
   else
-    (*gst) -> disable ( GL_TEXTURE_2D ) ;
+    s -> disable ( GL_TEXTURE_2D ) ;
 
   if ( lighting )
-    (*gst) -> enable ( GL_LIGHTING ) ;
+    s -> enable  ( GL_LIGHTING ) ;
   else
-    (*gst) -> disable ( GL_LIGHTING ) ;
+    s -> disable ( GL_LIGHTING ) ;
 
-  (*gst) -> setShadeModel ( GL_SMOOTH ) ;
-  (*gst) -> enable ( GL_COLOR_MATERIAL ) ;
-  (*gst) -> enable ( GL_CULL_FACE      ) ;
-  (*gst) -> setColourMaterial ( GL_AMBIENT_AND_DIFFUSE ) ;
-  (*gst) -> setMaterial ( GL_EMISSION, 0, 0, 0, 1 ) ;
-  (*gst) -> setMaterial ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-  (*gst) -> setShininess ( 0 ) ;
+  s -> setShadeModel ( GL_SMOOTH ) ;
+  s -> enable        ( GL_COLOR_MATERIAL ) ;
+  s -> enable        ( GL_CULL_FACE      ) ;
+  s -> setColourMaterial ( GL_AMBIENT_AND_DIFFUSE ) ;
+  s -> setMaterial   ( GL_EMISSION, 0, 0, 0, 1 ) ;
+  s -> setMaterial   ( GL_SPECULAR, 0, 0, 0, 1 ) ;
+  s -> setShininess  ( 0 ) ;
 
   if ( transparency )
   {
-    (*gst) -> setTranslucent () ;
-    (*gst) -> enable ( GL_ALPHA_TEST ) ;
-    (*gst) -> setAlphaClamp ( alpha_ref ) ;
-    (*gst) -> enable ( GL_BLEND ) ;
+    s -> setTranslucent () ;
+    s -> enable         ( GL_ALPHA_TEST ) ;
+    s -> setAlphaClamp  ( alpha_ref ) ;
+    s -> enable         ( GL_BLEND ) ;
   }
   else
   {
-    (*gst) -> setOpaque () ;
-    (*gst) -> disable ( GL_BLEND ) ;
+    s -> setOpaque () ;
+    s -> disable   ( GL_BLEND ) ;
   }
 }
 
 
+char *parseFileName ( char **str )
+{
+  char *p = *str ;
 
-ssgState *getAppState ( char *fname )
+  /* Skip leading spaces */
+
+  while ( *p <= ' ' && *p != '\0' ) p++ ;
+
+  /* Skip blank lines and comments */
+
+  if ( *p == '#' || *p == '\0' )
+    return NULL ;
+
+  if ( *p != '"' )
+  {
+    fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n" ) ;
+    fprintf ( stderr, "ERROR: Offending line is '%s'\n", *str ) ;
+    return NULL ;
+  }
+
+  /* Filename? */
+
+  char *f = ++p ;
+
+  while ( *p != '"' && *p != '\0' ) p++ ;
+
+  if ( *p != '"' )
+  {
+    fprintf ( stderr,
+      "ERROR: Unterminated string constant '%s' in materials file.\n", *str ) ;
+    return NULL ;
+  }
+
+  *p = '\0' ;
+  *str = ++p ;
+
+  return f ;
+}
+
+
+int parseMaterial ( FILE *fd )
+{
+  char str [ 1024 ] ;
+
+  while ( ! feof ( fd ) )
+  {
+    char *s = str ;
+
+    if ( fgets ( s, 1024, fd ) == NULL )
+      return false ;
+
+    s [ strlen(s) - 1 ] = '\0' ;
+
+    char *f = parseFileName ( & s ) ;
+
+    if ( f != NULL )
+    {
+      new Material ( f, s ) ;
+      return true ;
+    }
+  }
+ 
+  return false ;
+}
+
+
+Material *getMaterial ( ssgLeaf *l )
+{
+  int m = l -> getExternalPropertyIndex () ;
+
+  return (Material *) materials -> getEntity ( m ) ;
+}
+
+
+Material *getMaterial ( char *fname )
 {
   if ( fname == NULL || fname[0] == '\0' )
-{
-printf("No texture.\n");
-    return gs_setup [ 0 ] . getState() ;
-}
+    return (Material *) materials -> getEntity ( 0 ) ;
 
   char *fn ;
 
@@ -150,9 +245,9 @@ printf("No texture.\n");
   if ( *fn == '.' )
     *fn = '\0' ;
 
-  for ( int i = 0 ; ! gs_setup [ i ] . isNull () ; i++ )
+  for ( int i = 0 ; i < materials -> getNumEntities () ; i++ )
   {
-    char *fname2 = gs_setup [ i ] . getTexFname () ;
+    char *fname2 = ((Material *)(materials -> getEntity(i)))-> getTexFname () ;
 
     if ( fname2 != NULL && fname2[0] != '\0' )
     {
@@ -181,7 +276,7 @@ printf("No texture.\n");
         *fn2 = '\0' ;
 
       if ( strcmp ( basename, basename2 ) == 0 )
-        return gs_setup [ i ] . getState() ;
+        return (Material *) materials -> getEntity ( i ) ;
     }
   }
 
@@ -191,24 +286,40 @@ printf("No texture.\n");
 }
 
 
+ssgState *getAppState ( char *fname )
+{
+  Material *m = getMaterial ( fname ) ;
+
+  return ( m == NULL ) ? NULL : m -> getState () ;
+}
+
 
 void initMaterials ()
 {
-  for ( int i = 0 ; ! gs_setup [ i ] . isNull () ; i++ )
-    gs_setup [ i ] . install ( i ) ;
+  fprintf ( stderr, "Loading Materials.\n" ) ;
+
+  /* Create list - and default material zero */
+
+  materials = new ulList ( 100 ) ;
+  materials -> addEntity ( new Material () ) ;
+
+  char fname [ 1000 ] ;
+
+  sprintf ( fname, "data/materials.dat" ) ;
+
+  FILE *fd = fopen ( fname, "ra" ) ;
+
+  if ( fd == NULL )
+  {
+    fprintf ( stderr, "FATAL: No Such File as '%s'\n", fname ) ;
+    exit ( 1 ) ;
+  }
+
+  while ( parseMaterial ( fd ) ) 
+    /* Read file */ ;
+
+  fclose ( fd ) ;
 
   ssgSetAppStateCallback ( getAppState ) ;
-}
-
-
-Material *getMaterial ( ssgState *s )
-{
-  return & ( gs_setup [ s -> getExternalPropertyIndex () ] ) ;
-}
-
-
-Material *getMaterial ( ssgLeaf *l )
-{
-  return getMaterial ( l -> getState () ) ;
 }
 

@@ -15,6 +15,30 @@ char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 int next_string   = 0 ;
 int stats_enabled = FALSE ;
 
+static Material *players_gst      = NULL ;
+static Material *herringbones_gst = NULL ;
+static Material *herring_gst      = NULL ;
+static Material *fuzzy_gst        = NULL ;
+static Material *spark_gst        = NULL ;
+static Material *missile_gst      = NULL ;
+static Material *flamemissile_gst = NULL ;
+static Material *magnet_gst       = NULL ;
+static Material *zipper_gst       = NULL ;
+
+
+void initStatusDisplay ()
+{
+  players_gst      = getMaterial ( "players.rgb"      ) ;
+  herringbones_gst = getMaterial ( "herringbones.rgb" ) ;
+  herring_gst      = getMaterial ( "herring.rgb"      ) ;
+  fuzzy_gst        = getMaterial ( "fuzzy.rgb"        ) ;
+  spark_gst        = getMaterial ( "spark.rgb"        ) ;
+  missile_gst      = getMaterial ( "missile.rgb"      ) ;
+  flamemissile_gst = getMaterial ( "flamemissile.rgb" ) ;
+  magnet_gst       = getMaterial ( "magnet.rgb"       ) ;
+  zipper_gst       = getMaterial ( "zipper.rgb"       ) ;
+}
+
 
 sgVec3 player_colour [ NUM_KARTS ] =
 {
@@ -424,6 +448,7 @@ void drawGameRunningText ()
   if ( versions_timer++ < 1600 )
     drawVersionsText () ;
 }
+
 
 
 void drawPlayerIcons ()

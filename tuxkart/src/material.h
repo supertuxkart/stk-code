@@ -1,48 +1,63 @@
 
-#define MAT_IGN    1
-#define MAT_CRASH  2
-#define MAT_ZIP    4
-#define MAT_RESET  8
+#include <plib/ssg.h>
 
-struct Material
+void initMaterials () ;
+
+class Material
 {
-public:
-  ssgSimpleState **gst ;
+  ssgState *state ;
 
-  char *texture_map  ;
+  int   index ;
+
+  char *texname      ;
+
+  bool  collideable  ;
+  bool  zipper       ;
+  bool  resetter     ;
+  bool  ignore       ;
+
   int   clamp_tex    ;
-  int   transparency ;
+  bool  lighting     ;
+  bool  transparency ;
   float alpha_ref    ;
-  int   lighting     ;
   float friction     ;
-  unsigned int flags ;
 
-  int  isNull ()    { return gst == NULL ; } ;
-  int  isIgnore()   { return flags & MAT_IGN   ; }
-  int  isCrashable(){ return flags & MAT_CRASH ; }
-  int  isZipper()   { return flags & MAT_ZIP   ; }
-  int  isReset()    { return flags & MAT_RESET ; }
-  void install ( int index ) ;
-  
-  ssgState *getState    () { return *gst ; }
-  char     *getTexFname () { return texture_map ; }
+  bool  parseBool  ( char **p ) ;
+  int   parseInt   ( char **p ) ;
+  float parseFloat ( char **p ) ;
+
+  void init    () ;
+  void install () ;
+
+public:
+
+  Material () ;
+  Material ( char *fname, char *description ) ;
+
+  ~Material ()
+  {
+    ssgDeRefDelete ( state ) ;
+    delete texname ;
+  }
+
+  int matches ( char *tx ) ;
+
+  bool isIgnore    () { return ignore      ; }
+  bool isZipper    () { return zipper      ; }
+  bool isCrashable () { return collideable ; }
+  bool isReset     () { return resetter    ; }
+  float getFriction() { return friction    ; }
+
+  ssgState *getState () { return state ; }
+  void      apply    () { state -> apply () ; }
+
+  char *getTexFname    () { return texname     ; }
+
 } ;
 
 
-void initMaterials () ;
-Material *getMaterial ( ssgState *s ) ;
-Material *getMaterial ( ssgLeaf  *l ) ;
+Material *getMaterial ( char *texname ) ;
+Material *getMaterial ( ssgLeaf *lf ) ;
 
 ssgState *getAppState ( char *fname ) ;
-
-extern ssgSimpleState *default_gst ;
-extern ssgSimpleState *fuzzy_gst   ;
-extern ssgSimpleState *herring_gst ;
-extern ssgSimpleState *herringbones_gst ;
-extern ssgSimpleState *spark_gst   ;
-extern ssgSimpleState *flamemissile_gst ;
-extern ssgSimpleState *missile_gst ;
-extern ssgSimpleState *magnet_gst  ;
-extern ssgSimpleState *players_gst ;
-extern ssgSimpleState *zipper_gst  ;
 

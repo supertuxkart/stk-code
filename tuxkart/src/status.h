@@ -10,6 +10,7 @@ void credits     () ;
 void versions    () ;
 void help        () ;
 void hide_status () ;
+void initStatusDisplay () ;
 
 void start_stopwatch () ;
 

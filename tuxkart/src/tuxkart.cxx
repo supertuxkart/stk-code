@@ -421,6 +421,10 @@ static void banner ()
 
 int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
 {
+  /* Say "Hi!" to the nice user. */
+
+  banner () ;
+
   /* Initialise some horrid globals */
 
   fclock           = new ulClock ;
@@ -462,6 +466,9 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   }
 #endif
 
+  initMaterials     () ;
+  initStatusDisplay () ;
+
   /* Set the SSG loader options */
 
   loadOpts = new ssgLoaderOptions () ;
@@ -470,10 +477,6 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   ssgSetCurrentOptions ( loadOpts ) ;
   ssgModelPath         ( "models" ) ;
   ssgTexturePath       ( "images" ) ;
-
-  /* Say "Hi!" to the nice user. */
-
-  banner () ;
 
   /* Grab the track centerline file */
 
@@ -650,5 +653,4 @@ void tuxKartMainLoop ()
     gfx      -> done   () ;
   }
 }
-
 
