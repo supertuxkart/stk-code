@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.4 2004/08/01 00:13:27 grumbel Exp $
+//  $Id: Camera.cxx,v 1.5 2004/08/05 12:25:25 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -83,8 +83,6 @@ void Camera::init ()
   context = new ssgContext ;
   context -> setNearFar ( 0.05f, 1000.0f ) ;
 
-  sgSetVec3 ( location.xyz, 0, 0, 0 ) ;
-  sgSetVec3 ( location.hpr, 0, 0, 0 ) ;
   whichKart  = 0 ;
   setScreenPosition ( 0 ) ;
   cam_delay  = 10.0f ;
@@ -93,59 +91,29 @@ void Camera::init ()
 
 void Camera::update ()
 {
-  /* Update the camera */
-
+  // Update the camera
   if ( whichKart >= num_karts || whichKart < 0 ) whichKart = 0 ;
 
-  sgCoord cam, target, diff ;
+  sgCoord* kartcoord = kart[whichKart]->getCoord();
 
-  sgCopyCoord ( &target, kart[whichKart]->getCoord   () ) ;
-  sgCopyCoord ( &cam   , kart[whichKart]->getHistory ( (int)cam_delay ) ) ;
+  // Matrix that transforms stuff to kart-space
+  sgMat4 tokart;
+  sgMakeCoordMat4 (tokart, kartcoord);
 
-  float dist = 5.0f + sgDistanceVec3 ( target.xyz, cam.xyz ) ;
+  // Relative position from the middle of the kart
+  sgCoord relative_coord;
+  sgMat4 relative;
+  sgSetCoord(&relative_coord, 0.f, -3.5f, 1.5f, 
+             0, -5, 0);
+  sgMakeCoordMat4 (relative, &relative_coord);
 
-  if ( dist < MIN_CAM_DISTANCE && cam_delay < 50 ) cam_delay++ ; 
-  if ( dist > MAX_CAM_DISTANCE && cam_delay >  1 ) cam_delay-- ;
+  sgMat4 result;
+  sgMultMat4(result, tokart, relative);
 
-  sgVec3 offset ;
-  sgMat4 cam_mat ;
+  sgCoord cam;
+  sgSetCoord(&cam, result);
 
-  sgSetVec3 ( offset, -0.5f, -5.0f, 1.5f ) ;
-  sgMakeCoordMat4 ( cam_mat, &cam ) ;
-
-  sgXformPnt3 ( offset, cam_mat ) ;
-
-  sgCopyVec3 ( cam.xyz, offset ) ;
-
-  cam.hpr[1] = -5.0f ;
-  cam.hpr[2] = 0.0f;
-
-  sgSubVec3 ( diff.xyz, cam.xyz, location.xyz ) ;
-  sgSubVec3 ( diff.hpr, cam.hpr, location.hpr ) ;
-
-  while ( diff.hpr[0] >  180.0f ) diff.hpr[0] -= 360.0f ;
-  while ( diff.hpr[0] < -180.0f ) diff.hpr[0] += 360.0f ;
-  while ( diff.hpr[1] >  180.0f ) diff.hpr[1] -= 360.0f ;
-  while ( diff.hpr[1] < -180.0f ) diff.hpr[1] += 360.0f ;
-  while ( diff.hpr[2] >  180.0f ) diff.hpr[2] -= 360.0f ;
-  while ( diff.hpr[2] < -180.0f ) diff.hpr[2] += 360.0f ;
-
-  location.xyz[0] += 0.2f * diff.xyz[0] ;
-  location.xyz[1] += 0.2f * diff.xyz[1] ;
-  location.xyz[2] += 0.2f * diff.xyz[2] ;
-  location.hpr[0] += 0.1f * diff.hpr[0] ;
-  location.hpr[1] += 0.1f * diff.hpr[1] ;
-  location.hpr[2] += 0.1f * diff.hpr[2] ;
-
-  final_camera = location ;
-
-  // sgVec3 interfovealOffset ;
-  // sgMat4 mat ;
-  // sgSetVec3 ( interfovealOffset, 0.2 * (float)stereoShift(), 0, 0 ) ;
-  // sgMakeCoordMat4 ( mat, &final_camera ) ;
-  // sgXformPnt3 ( final_camera.xyz, interfovealOffset, mat ) ;
-
-  context -> setCamera ( & final_camera ) ;
+  context -> setCamera (&cam) ;
 }
 
 
