@@ -1,4 +1,4 @@
-//  $Id: KartProperties.h,v 1.5 2004/08/17 21:01:17 grumbel Exp $
+//  $Id: KartProperties.h,v 1.6 2004/08/21 16:02:00 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -60,6 +60,7 @@ public:
   float engine_power;
   float max_throttle;
   float air_friction;
+  float system_friction;
 
   KartProperties();
   KartProperties(const std::string& filename);

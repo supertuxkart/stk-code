@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.11 2004/08/19 12:29:16 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.12 2004/08/21 16:02:00 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -82,16 +82,17 @@ KartProperties::init_defaults()
   color[1] = 0.0f;
   color[2] = 0.0f;
   
-  max_throttle   = 100;
-  engine_power   = 60;
-  corn_f         = -7.2f;
-  corn_r         = -5.0;
-  mass           = 90;
-  inertia        = 13;
-  turn_speed     = M_PI;
-  max_wheel_turn = M_PI/2;
-  max_grip       = 4.0f;
-  air_friction   = 0.8257;
+  max_throttle    = 100;
+  engine_power    = 60;
+  corn_f          = -7.2f;
+  corn_r          = -5.0;
+  mass            = 90;
+  inertia         = 13;
+  turn_speed      = M_PI;
+  max_wheel_turn  = M_PI/2;
+  max_grip        = 4.0f;
+  air_friction    = 0.8257;
+  system_friction = 4.8f;
   
   model = NULL;
 }

@@ -8,7 +8,7 @@
 #   AlphaRef     = 0.1
 #   Lighting     = Yes
 #   Spheremap    = No
-#   Friction     = 1.0
+#   Friction     = 4.8
 #   Ignore       = No
 #   Zipper       = No
 #   Resetter     = No
@@ -27,18 +27,21 @@
 "stonewall.png"    N N     N      0.0     Y     N   1.0     N   N    N    N
 "pebbles.png"      N N     N      0.0     Y     N   1.0     N   N    N    N
 "floor.png"        N N     N      0.0     Y     N   1.0     N   N    N    N
-"sand.png"         N N     N      0.0     Y     N   1.0     N   N    N    N
+"sand.png"         N N     N      0.0     Y     N   99.0    N   N    N    N
+"sandgrass.png"    N N     N      0.0     Y     N   99.0    N   N    N    N
 "egypt.png"        N N     N      0.0     Y     N   1.0     N   N    N    Y
 "pyramidwall.png"  N N     N      0.0     Y     N   1.0     N   N    N    N
 "lava.png"         N N     N      0.0     N     N   1.0     N   N    Y    Y
 "metalgrid.png"    N N     Y      0.3     Y     N   1.0     N   N    N    N
 "fuzzy_sand.png"   N N     Y      0.0     N     N   1.0     Y   N    N    N
-"roadway.png"      Y N     Y      0.0     Y     N   1.0     N   N    N    N
+"roadway.png"      Y N     Y      0.0     Y     N   4.8     N   N    N    N
+"track.png"        Y N     Y      0.0     Y     N   4.8     N   N    N    N
 "rainbow.png"      N N     Y      0.0     N     N   1.0     N   N    N    N
 "tinytux.png"      Y Y     Y      0.8     N     N   1.0     Y   N    N    N
 "butterfly.png"    Y Y     Y      0.8     N     N   1.0     Y   N    N    N
 "Penguin_orig.png" N N     N      0.0     Y     N   1.0     N   N    N    N
-"grass.png"        N N     N      0.0     Y     N   1.0     N   N    N    N
+"grass.png"        N N     N      0.0     Y     N  99.0     N   N    N    N
+"track2.png"       N N     N      0.0     Y     N  20.0     N   N    N    N
 "zipper.png"       N N     N      0.0     N     N   1.0     N   Y    N    N
 "mnm.png"          Y Y     Y      0.5     N     N   1.0     N   Y    N    N
 "fuzzy.png"        Y Y     Y      0.2     N     N   0.0     Y   N    N    N

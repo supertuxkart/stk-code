@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.30 2004/08/16 11:33:43 grumbel Exp $
+//  $Id: Driver.cxx,v 1.31 2004/08/21 16:02:00 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -212,8 +212,8 @@ Driver::physicsUpdate (float delta)
 	// apply air friction and system friction
 	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * kart_properties.air_friction;
 	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * kart_properties.air_friction;
-	resistance[0] -= 10 * SYSTEM_FRICTION * velocity.xyz[0];
-	resistance[1] -= SYSTEM_FRICTION * velocity.xyz[1];
+	resistance[0] -= 10 * kart_properties.system_friction * velocity.xyz[0];
+	resistance[1] -= kart_properties.system_friction * velocity.xyz[1];
 	
 	// sum forces
 	force[0] += traction[0] + cos(steer_angle)*lateral_f[0] + lateral_r[1] + resistance[0];
@@ -468,6 +468,10 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
         wheelie_angle = 45.0f ;
         zipper_time_left = ZIPPER_TIME ;
       }
+      
+      // toying with diffrent frictions for materials
+      kart_properties.system_friction = getMaterial ( h->leaf ) -> getFriction ();
+      
     }
   }
 
