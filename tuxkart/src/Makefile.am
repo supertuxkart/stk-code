@@ -58,7 +58,6 @@ tuxkart_SOURCES = \
   material.cxx  \
   material.h  \
   plibwrap.h \
-  plibwrap.cxx \
   preprocessor.cxx  \
   preprocessor.h  \
   sound.cxx  \
