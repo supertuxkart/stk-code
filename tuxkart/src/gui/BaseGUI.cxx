@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.3 2004/08/08 03:45:09 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.4 2004/08/08 04:32:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -76,6 +76,7 @@ void updateGUI()
 				gui = new RaceMenu;
 				break;
 			case GUIS_EXITRACE:
+				guiStack.clear();
 				backToSplash();
 			}
 		}
