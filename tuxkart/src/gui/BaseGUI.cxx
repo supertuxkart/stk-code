@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.10 2004/08/11 11:27:22 grumbel Exp $
+//  $Id: BaseGUI.cxx,v 1.11 2004/08/11 11:36:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,8 @@
 #include "ConfigControls.h"
 #include "PlayerControls.h"
 #include "RaceGUI.h"
+#include "ScreenManager.h"
+#include "StartScreen.h"
 #include "RaceMenu.h"
 
 void updateGUI(RaceSetup& raceSetup)
@@ -89,8 +91,7 @@ void updateGUI(RaceSetup& raceSetup)
 				break;
 			case GUIS_EXITRACE:
 				guiStack.clear();
-				//FIXME:backToSplash();
-				deinitTuxKart();
+                                ScreenManager::current()->set_screen(new StartScreen()); 
 			}
 		}
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts

@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.h,v 1.1 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: ScreenManager.h,v 1.2 2004/08/11 11:36:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -30,7 +30,6 @@ public:
   static ScreenManager* current() { return current_; }
 private:
   static ScreenManager* current_;
-  bool quit;
   Screen* current_screen;
 
 public:
