@@ -31,13 +31,7 @@ HerringInstance herring [ MAX_HERRING ] ;
 
 sgCoord steady_cam ;
  
-char *player_files [] =
-{
-  "tuxkart.ac" , "geekokart.ac",
-  "bsodkart.ac", "gownkart.ac",
-  NULL
-} ;
-
+char player_files [ NUM_KARTS ][ 256 ] ;
 
 char *traffic_files [] =
 {
@@ -100,7 +94,7 @@ sgCoord fixedpos [ MAX_FIXED_CAMERA ] =
 Level level ;
 
 
-void load_players ()
+void load_players ( char *fname )
 {
   ssgEntity *obj;
 
@@ -117,19 +111,60 @@ void load_players ()
   ssgEntity *pobj5 = ttt ;
   int i ;
  
-   
-  for ( i = 0 ; player_files [ i ] != NULL && i < NUM_KARTS ; i++ )
+  FILE *fd = fopen ( fname, "r" ) ;
+
+  if ( fd == NULL )
+  {
+    fprintf ( stderr, "tuxkart: Can't open '%s':\n", fname ) ;
+    exit ( 1 ) ;
+  }
+
+  num_karts = 0 ;
+
+  while ( num_karts < NUM_KARTS )
+  {
+    if ( fgets ( player_files [ num_karts ], 256, fd ) != NULL )
+    {
+      if ( player_files [ num_karts ][ 0 ] <= ' ' ||
+           player_files [ num_karts ][ 0 ] == '#' )
+        continue ;
+
+      /* Trim off the '\n' */
+
+      int len = strlen ( player_files [ num_karts ] ) - 1 ;
+
+      if ( player_files [ num_karts ][ len ] <= ' ' )
+        player_files [ num_karts ][ len ] = '\0' ;
+
+      num_karts++ ;
+    }
+    else
+      break ;
+  }
+ 
+  fclose ( fd ) ;
+
+  if ( player >= num_karts )
+    player = 0 ;
+
+  for ( i = 0 ; i < num_karts ; i++ )
   {
     ssgRangeSelector *lod = new ssgRangeSelector ;
     float r [ 2 ] = { -10.0f, 100.0f } ;
+    int kart_id ;
 
-    if (i!=0){
-    obj = ssgLoad ( player_files [ i ], loader_opts ) ;
-    } else {
-    obj = ssgLoad ( player_files [ player ], loader_opts );  
-    }
-    lod -> addKid ( obj   ) ;
-    lod -> setRanges ( r, 2  ) ;
+    if ( i == 0 )
+      kart_id = player ;
+    else
+    if ( i == player )
+      kart_id = 0 ;
+    else
+      kart_id = i ;
+ 
+    obj = ssgLoad ( player_files [ kart_id ], loader_opts ) ;
+
+    lod -> addKid ( obj ) ;
+    lod -> setRanges ( r, 2 ) ;
     
     kart[i]-> getModel() -> addKid ( lod ) ;
     kart[i]-> addAttachment ( pobj1 ) ;
@@ -137,9 +172,6 @@ void load_players ()
     kart[i]-> addAttachment ( pobj3 ) ;
     kart[i]-> addAttachment ( pobj4 ) ;
     kart[i]-> addAttachment ( pobj5 ) ;
-    
-    num_karts = i + 1 ;
-    
   }
 
   for ( i = 0 ; i < NUM_PROJECTILES ; i++ )
@@ -203,6 +235,9 @@ static void herring_command ( char *s, char *str )
 void load_track ( ssgBranch *trackb, char *fname )
 {
   FILE *fd = fopen ( fname, "r" ) ;
+  char playersfname [ 256 ] ;
+
+  strcpy ( playersfname, "data/players.dat" ) ;
 
   if ( fd == NULL )
   {
@@ -228,6 +263,11 @@ void load_track ( ssgBranch *trackb, char *fname )
 
     char htype = '\0' ;
 
+    if ( sscanf ( s, "PLAYERS \"%[^\"]\"", fname ) == 1 )
+    {
+      strcpy ( playersfname, fname ) ;
+    }
+    else
     if ( sscanf ( s, "MUSIC \"%[^\"]\"", fname ) == 1 )
     {
       sound -> change_track ( fname ) ;
@@ -350,12 +390,14 @@ void load_track ( ssgBranch *trackb, char *fname )
       fprintf ( stderr, "  %s\n", s ) ;
       exit ( 1 ) ;
     }
-
   }
+
   fclose ( fd ) ;
 
   sgSetVec3  ( steady_cam.xyz, 0.0f, 0.0f, 0.0f ) ;
   sgSetVec3  ( steady_cam.hpr, 0.0f, 0.0f, 0.0f ) ;
+
+  load_players ( playersfname ) ;
 }
 
 
@@ -542,7 +584,6 @@ int tuxkart_main ( int num_laps, char *level_name )
   sprintf ( fname, "data/%s.loc", trackname ) ;
 
   load_track ( trackb, fname ) ;
-  load_players () ;
 
   return TRUE ;
 }

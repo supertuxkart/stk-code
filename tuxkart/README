@@ -94,7 +94,7 @@ src     -- Where the source code lives.
 
 data    -- This contains all kinds of miscellaneous data
            files. Right now, this is limited to the level
-           description files.
+           description files and lists of players vehicles.
 
 doc     -- Documentation - all in HTML
 
