@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.23 2004/08/23 13:33:11 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.24 2004/08/23 21:14:55 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -454,21 +454,19 @@ void RaceGUI::drawCollectableIcons ()
   int x1 =  320-32 ;
   int y1 = 400 ;
 
+  glDisable(GL_TEXTURE_2D);
+
+  glBegin ( GL_QUADS ) ;
+    glColor4f ( 0.0, 0.0, 0.0, 0.16 ) ;
+    glVertex2i ( x1   , y1    ) ;
+    glVertex2i ( x1+64, y1    ) ;
+    glVertex2i ( x1+64, y1+64 ) ;
+    glVertex2i ( x1   , y1+64 ) ;
+  glEnd();
+
+  // If player doesn't have anything, just let the transparent black square
   if(World::current()->kart[0]->getCollectable () == COLLECT_NOTHING)
-    {
-    // If player doesn't have anything, draw a transparent black square
-
-    glDisable(GL_TEXTURE_2D);
-
-    glBegin ( GL_QUADS ) ;
-      glColor4f ( 0.0, 0.0, 0.0, 0.21 ) ;
-      glVertex2i ( x1   , y1    ) ;
-      glVertex2i ( x1+64, y1    ) ;
-      glVertex2i ( x1+64, y1+64 ) ;
-      glVertex2i ( x1   , y1+64 ) ;
-    glEnd();
     return;
-    }
 
   int n  = World::current()->kart[0]->getNumCollectables() ;
 
@@ -516,8 +514,8 @@ void RaceGUI::drawCollectableIcons ()
 #define METER_HEIGHT 220
 
 // Meter fluid color (0 - 255)
-#define METER_TOP_COLOR    230, 0, 0, 225
-#define METER_BOTTOM_COLOR 240, 110, 110, 225 
+#define METER_TOP_COLOR    230, 0, 0, 210
+#define METER_BOTTOM_COLOR 240, 110, 110, 210 
 
 #define METER_BORDER_WIDTH 1
 // Meter border color (0.0 - 1.0)
@@ -525,6 +523,7 @@ void RaceGUI::drawCollectableIcons ()
 
 void RaceGUI::drawEnergyMeter ( float state )
 {
+state=0.6;
   // Draw a Meter border
   // left side
   glBegin ( GL_QUADS ) ;
@@ -594,7 +593,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   glDisable      ( GL_FOG        ) ;
   glDisable      ( GL_CULL_FACE  ) ;
   glEnable       ( GL_ALPHA_TEST ) ;
-  glAlphaFunc    ( GL_GREATER, 0.2 ) ;
+  glAlphaFunc    ( GL_GREATER, 0.1 ) ;
   glEnable       ( GL_BLEND      ) ;
 
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
