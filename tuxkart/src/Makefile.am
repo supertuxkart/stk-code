@@ -88,6 +88,8 @@ tuxkart_SOURCES = \
   gui/NumPlayers.h \
   gui/ConfigControls.cxx \
   gui/ConfigControls.h \
+  gui/PlayerControls.cxx \
+  gui/PlayerControls.h \
   gui/RaceMenu.cxx \
   gui/RaceMenu.h
 

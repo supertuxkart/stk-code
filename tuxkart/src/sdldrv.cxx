@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.23 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.24 2004/08/10 16:45:42 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -118,7 +118,18 @@ void pollEvents ()
     {
       case SDL_KEYDOWN:
 		if (gui)
+		{
+			for (int i = 0; i != 4; ++i)
+			{
+				if ( event.key.keysym.sym == controlCon[i].keys[KC_FIRE] )
+				{
+					gui -> select();
+					break;
+				}
+			}
+			
 			gui -> keybd(event.key.keysym);
+		}
 		break;
 	
 	case SDL_MOUSEBUTTONDOWN:
@@ -179,7 +190,7 @@ void kartInput(RaceSetup& raceSetup)
 		
 		ControlConfig& cc = controlCon[i];
 		
-		if ( controlCon[i].useJoy )
+		if ( cc.useJoy )
 		{			
 			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / JOY_MAX;
 			ji.accel = SDL_JoystickGetButton (joys[i], 0);

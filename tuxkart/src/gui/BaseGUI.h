@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.7 2004/08/10 16:22:32 grumbel Exp $
+//  $Id: BaseGUI.h,v 1.8 2004/08/10 16:45:42 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,10 @@ GUIS_DIFFICULTYQR,
 GUIS_GAMEMODE,
 GUIS_OPTIONS,
 GUIS_CONFIGCONTROLS,
+GUIS_CONFIGP1,
+GUIS_CONFIGP2,
+GUIS_CONFIGP3,
+GUIS_CONFIGP4,
 GUIS_TRACKSEL,
 GUIS_NUMPLAYERS,
 GUIS_RACE,

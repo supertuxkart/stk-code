@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.9 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: sdldrv.h,v 1.10 2004/08/10 16:45:42 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -22,6 +22,7 @@
 
 #include <SDL.h>
 #include <map>
+#include <vector>
 
 class RaceSetup;
 
@@ -34,6 +35,7 @@ struct ControlConfig
 };
 
 extern Uint8 *keyState;
+extern std::vector<ControlConfig> controlCon;
 
 void initVideo (int w, int h, bool fullscreen);
 void shutdownVideo();

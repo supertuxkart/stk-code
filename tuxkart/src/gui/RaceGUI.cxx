@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.7 2004/08/09 15:24:02 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.8 2004/08/10 16:45:42 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,7 +56,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	{
 	case SDLK_F12: fpsToggle() ; return;
 	
-	case SDLK_w : 
+	case SDLK_F11 : 
 		if ( isWireframe )
 			glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 		else
@@ -65,7 +65,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 		return ;
 	
 	#ifdef DEBUG
-	case SDLK_z : stToggle () ; return ;
+	case SDLK_F10 : stToggle () ; return ;
 	#endif
 	
 	case SDLK_ESCAPE:
