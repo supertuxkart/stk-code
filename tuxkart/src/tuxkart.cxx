@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.41 2004/08/07 03:41:14 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.42 2004/08/08 03:18:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -470,12 +470,12 @@ int tuxkartMain ()
     KartDriver* newkart;
 
     if ( i < raceSetup.numPlayers )
-      newkart = new PlayerKartDriver  ( i, new ssgTransform ) ;
+      newkart = new PlayerKartDriver  ( i ) ;
     else
     if ( network_enabled )
-      newkart = new NetworkKartDriver ( i, new ssgTransform ) ;
+      newkart = new NetworkKartDriver ( i ) ;
     else
-      newkart = new AutoKartDriver    ( i, new ssgTransform ) ;
+      newkart = new AutoKartDriver    ( i ) ;
 
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
@@ -497,7 +497,7 @@ int tuxkartMain ()
 
   for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
   {
-    projectile[j] = new Projectile ( new ssgTransform ) ;
+    projectile[j] = new Projectile ( ) ;
     scene -> addKid ( projectile[j] -> getModel() ) ;
     projectile[j]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
   }

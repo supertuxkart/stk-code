@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.9 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.10 2004/08/08 03:18:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -336,7 +336,7 @@ void KartDriver::update ()
 }
 
 
-KartDriver::KartDriver ( int _position, ssgTransform *m ) : Driver ( m )
+KartDriver::KartDriver ( int _position ) : Driver ()
 {
   grid_position = _position ;
   num_collectables = 0 ;

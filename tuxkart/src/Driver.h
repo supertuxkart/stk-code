@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.16 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Driver.h,v 1.17 2004/08/08 03:18:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -160,7 +160,7 @@ protected:
 
 public:
 
-  Driver ( ssgTransform *m );
+  Driver ( );
 
   float getDistanceDownTrack () { return curr_track_coords[1] ; }
   int  getLap      ()        { return lap      ; }
@@ -234,7 +234,7 @@ protected:
   ssgSelector *attachment ;
 public:
 
-  KartDriver ( int _position, ssgTransform *m ) ;
+  KartDriver ( int _position ) ;
 
   void addAttachment ( ssgEntity *e )
   {
@@ -275,7 +275,7 @@ public:
 class NetworkKartDriver : public KartDriver
 {
 public:
-  NetworkKartDriver ( int _pos, ssgTransform *m ) : KartDriver ( _pos, m )
+  NetworkKartDriver ( int _pos ) : KartDriver ( _pos )
   {
   }
 
@@ -287,7 +287,7 @@ public:
 class TrafficDriver : public KartDriver
 {
 public:
-  TrafficDriver ( sgVec3 _pos, ssgTransform *m ) : KartDriver ( 0, m )
+  TrafficDriver ( sgVec3 _pos ) : KartDriver ( 0 )
   {
     sgCopyVec3 ( reset_pos.xyz, _pos ) ;
     reset () ;
@@ -304,7 +304,7 @@ class AutoKartDriver : public KartDriver
 {
   float time_since_last_shoot ;
 public:
-  AutoKartDriver ( int _pos, ssgTransform *m ) : KartDriver ( _pos, m )
+  AutoKartDriver ( int _pos ) : KartDriver ( _pos )
   {
     time_since_last_shoot = 0.0f ;
   }
@@ -323,7 +323,7 @@ protected:
   float *selected_property;
 
 public:
-  PlayerKartDriver ( int _pos, ssgTransform *m ) : KartDriver ( _pos, m )
+  PlayerKartDriver ( int _pos ) : KartDriver ( _pos )
   {
     tscale = 10.0 ;
     rscale =  3.0 ;
@@ -368,7 +368,7 @@ class Projectile : public Driver
   }
 
 public:
-  Projectile ( ssgTransform *m ) : Driver ( m )
+  Projectile ( ) : Driver ( )
   {
     type = COLLECT_NOTHING ;
   }

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.14 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Driver.cxx,v 1.15 2004/08/08 03:18:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,12 +33,12 @@ static inline void relaxation(float& target, float& prev, float rate)
   prev = (target);
 }
 
-Driver::Driver ( ssgTransform *m )
+Driver::Driver ( )
 {
   delta_t = 0.01 ;
 
   firsttime = TRUE ;
-  model = m ;
+  model = new ssgTransform ;
     
   /* New Physics */
   sgZeroVec3 (acceleration);
