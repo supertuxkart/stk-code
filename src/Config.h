@@ -1,6 +1,6 @@
 // $Id$
 //
-//  TuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //  Modelled after Supertux's configfile.h
 //

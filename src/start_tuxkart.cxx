@@ -52,16 +52,16 @@ static void initializeLoader()
     loader->initConfigDir();
 
     /* initialize search path of the loader */
-    if ( getenv ( "TUXKART_DATADIR" ) != NULL )
-      loader->addSearchPath(getenv ( "TUXKART_DATADIR" )) ;
+    if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
+      loader->addSearchPath(getenv ( "SUPERTUXKART_DATADIR" )) ;
     if (getenv ("HOME") != NULL) {
       std::string homepath = getenv("HOME");
-      homepath += "/.tuxkart";
+      homepath += "/.supertuxkart";
       loader->addSearchPath(homepath);
     }
     loader->addSearchPath(".");
     loader->addSearchPath("..");
-    loader->addSearchPath(TUXKART_DATADIR);
+    loader->addSearchPath(SUPERTUXKART_DATADIR);
 
     ssgSetCurrentOptions(loader);
     registerImageLoaders();
@@ -101,9 +101,8 @@ void cmdLineHelp (char* invocation)
   fprintf ( stdout, 
 	    "Usage: %s [OPTIONS]\n\n"
 
-	    "Run TuxKart, a racing game with go-kart that features"
-	    " the well-known linux\nmascott Tux. The game is heavily"
-	    " inspired by Super-Mario-Kart and Wacky Wheels.\n\n"
+	    "Run SuperTuxKart, a racing game with go-kart that features"
+	    " the Tux and friends.\n\n"
 
 	    "Options:\n"
 	    "  -N,  --no-start-screen  Quick race\n"
@@ -122,8 +121,8 @@ void cmdLineHelp (char* invocation)
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
 	    "\n"
-	    "You can visit TuxKart's homepage at "
-	    "http://tuxkart.sourceforge.net\n\n", invocation
+	    "You can visit SuperTuxKart's homepage at "
+	    "http://supertuxkart.berlios.de\n\n", invocation
 	    );
 }
 
@@ -278,7 +277,7 @@ int main ( int argc, char *argv[] )
   #ifdef VERSION
             else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
               {
-                fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
+                fprintf ( stdout, "SuperTuxkart %s\n", VERSION ) ;
                 return 0;
               }
   #endif
@@ -301,7 +300,7 @@ int main ( int argc, char *argv[] )
 
     /* Set Window's title */
     char title[256];
-    sprintf(title, "TuxKart %s", VERSION);
+    sprintf(title, "SuperTuxKart %s", VERSION);
     SDL_WM_SetCaption(title, title);
 
     screenManager = new ScreenManager();

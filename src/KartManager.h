@@ -1,6 +1,6 @@
 //  $Id$
 //
-//  TuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or

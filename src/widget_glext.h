@@ -1,6 +1,6 @@
 //  $Id$
 //
-//  TuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
 //
 //  This program is free software; you can redistribute it and/or

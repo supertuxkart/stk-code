@@ -1,6 +1,6 @@
 //  $Id$
 //
-//  TuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
 //  This program is free software; you can redistribute it and/or
@@ -41,8 +41,8 @@ void deinitTuxKart();
 
 #define DEFAULT_NUM_LAPS_IN_RACE 5
 
-#ifndef TUXKART_DATADIR
-#define TUXKART_DATADIR "/usr/local/share/games/tuxkart"
+#ifndef SUPERTUXKART_DATADIR
+#define SUPERTUXKART_DATADIR "/usr/local/share/games/tuxkart"
 #endif
 
 extern int finishing_position ;
