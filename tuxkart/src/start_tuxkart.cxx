@@ -22,26 +22,10 @@ static puFont      *sorority      ;
 
 static ssgSimpleState *intro_gst ;
 
-static char *track_names [] =
-{
-  "Tux Tollway"      ,
-  "Geeko Peak"       ,
-  "Gowns Bow"        ,
-  "BSODs Battlements",
-/* "Penguin Park"     , */
-  NULL
-} ;
+#define MAX_TRACKS 10
 
-
-static char *track_idents [] =
-{
-  "tuxtrack"   ,
-  "geekopeak"  ,
-  "gownsbow"   ,
-  "bsodcastle" ,
-/* "penguinpark", */
-  NULL
-} ;
+static char *track_names  [ MAX_TRACKS ] ;
+static char *track_idents [ MAX_TRACKS ] ;
 
 extern int tuxkart_main ( int nl, char *track ) ;
 
@@ -199,6 +183,60 @@ static void install_material ()
 }
                                                                                 
 
+static void loadTrackList ()
+{
+  char *fname = "data/levels.dat" ;
+
+  if ( getenv ( "TUXKART_TRACKLIST" ) != NULL )
+    fname = getenv ( "TUXKART_TRACKLIST" ) ;
+
+  FILE *fd = fopen ( fname, "ra" ) ;
+
+  if ( fd == NULL )
+  {
+    fprintf ( stderr, "tuxkart: Can't open '%s'\n", fname ) ;
+    exit ( 1 ) ;
+  }
+
+  int i = 0 ;
+
+  while ( i < MAX_TRACKS && ! feof ( fd ) )
+  {
+    char *p ;
+    char  s [ 1024 ] ;
+
+    if ( fgets ( s, 1023, fd ) == NULL )
+      break ;
+ 
+    if ( *s == '#' )
+      continue ;
+
+    for ( p = s ; *p > ' ' && *p != '\0' ; p++ )
+      /* Search for a space */ ;
+
+    if ( *p == ' ' )
+    {
+      *p = '\0' ;
+      track_idents [ i ] = new char [ strlen(s)+1 ] ;
+      strcpy ( track_idents [ i ], s ) ;
+      p++ ;
+
+      while ( *p <= ' ' && *p != '\0' )
+        p++ ; 
+
+      track_names [ i ] = new char [ strlen(p)+1 ] ;
+      strcpy ( track_names [ i ], p ) ;
+
+      i++ ;
+    }
+  }
+
+  track_names  [ i ] = NULL ;
+  track_idents [ i ] = NULL ;
+
+  fclose ( fd ) ;
+}
+
 
 int main ( int argc, char **argv )
 {
@@ -230,6 +268,8 @@ int main ( int argc, char **argv )
     fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
     exit ( 1 ) ;
   }                                                                             
+
+  loadTrackList () ;
 
   int fake_argc = 1 ;
   char *fake_argv[3] ;
