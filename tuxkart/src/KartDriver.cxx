@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.51 2004/10/24 08:15:00 cosmosninja Exp $
+//  $Id: KartDriver.cxx,v 1.52 2004/12/12 22:01:01 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -39,20 +39,20 @@
 #include "material.h"
 #include "Config.h"
 
-    KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
+   KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
                                        int num, float _create_rate, int _ttf,
                                        float sz, float bsphere_size)                                       
     : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
     kart(kart_)
-      {
+   {
       getBSphere () -> setCenter ( 0, 0, 0 ) ;
       getBSphere () -> setRadius ( 1000.0f ) ;
       dirtyBSphere();
-      }
+   }
 
-    void
+   void
     KartParticleSystem::update ( float t ) 
-      {
+   {
    #if 0
       std::cout << "BSphere: r:" << getBSphere()->radius 
                 << " ("  << getBSphere()->center[0]
@@ -63,11 +63,11 @@
    #endif
       getBSphere () -> setRadius ( 1000.0f ) ;
       ParticleSystem::update(t);
-      }
+   }
 
-    void
+   void
     KartParticleSystem::particle_create(int, Particle *p)
-      {
+   {
       sgSetVec4 ( p -> col, 1, 1, 1, 1 ) ; /* initially white */
       sgSetVec3 ( p -> pos, 0, 0, 0 ) ;    /* start off on the ground */
       sgSetVec3 ( p -> vel, 0, 0, 0 ) ;
@@ -96,28 +96,28 @@
       p->vel[2] += sgSin (rand()%100) * 1;
    
       getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
-      }
+   }
 
-    void
+   void
     KartParticleSystem::particle_update (float delta, int, Particle * particle)
-      {
+   {
       particle->size    += delta*2.0f;
       particle->col[3]  -= delta * 2.0f;
    
       particle->pos[0] += particle->vel[0] * delta;
       particle->pos[1] += particle->vel[1] * delta;
       particle->pos[2] += particle->vel[2] * delta;
-      }
+   }
 
-    void
+   void
     KartParticleSystem::particle_delete (int , Particle* )
-      {
-      }
+   {
+   }
 
-    KartDriver::KartDriver (World* world, const KartProperties* kart_properties_,
+   KartDriver::KartDriver (World* world, const KartProperties* kart_properties_,
                       int position_ , Controller* driver_ ) 
     : Driver(world, kart_properties_)
-      {
+   {
       grid_position        = position_ ;
       num_collectables     = 0 ;
       num_herring_gobbled  = 0 ;
@@ -142,10 +142,10 @@
       wheel_front_r = NULL;
       wheel_rear_l  = NULL;
       wheel_rear_r  = NULL;
-      }
+   }
 
-    KartDriver::~KartDriver()
-      {
+   KartDriver::~KartDriver()
+   {
       delete driver;
       delete smokepuff;
    
@@ -156,13 +156,13 @@
    
       ssgDeRefDelete(skidmark_left);
       ssgDeRefDelete(skidmark_right);
-      }
+   }
 
-    void
+   void
     KartDriver::useAttachment ()
-      {
+   {
       switch ( collectable )
-         {
+      {
          case COLLECT_MAGNET  :
             attach ( ATTACH_MAGNET, 10.0f ) ;
             break ;
@@ -175,30 +175,30 @@
          case COLLECT_SPARK :
          case COLLECT_MISSILE :
          case COLLECT_HOMING_MISSILE :
-               {
+            {
                static int m = 0 ;
             
                if ( ++m >= NUM_PROJECTILES ) m = 0 ;
             
                Projectile* projectile = new Projectile(world, this, collectable);
                world->projectiles.push_back(projectile);
-               }
+            }
             break ;
       
          case COLLECT_NOTHING :
          default :
             break ;
-         }
+      }
    
       if ( --num_collectables <= 0 )
-         {
+      {
          collectable = COLLECT_NOTHING ;
          num_collectables = 0 ;
-         }                                                                           
-      }
+      }                                                                           
+   }
 
-    void KartDriver::doLapCounting ()
-      {
+   void KartDriver::doLapCounting ()
+   {
       if ( last_track_coords[1] > 100.0f &&
          curr_track_coords[1] <  20.0f )
          race_lap++ ;
@@ -206,14 +206,14 @@
          if ( curr_track_coords[1] > 100.0f &&
             last_track_coords[1] <  20.0f )
             race_lap-- ;
-      }
+   }
 
 
-    void KartDriver::doObjectInteractions ()
-      {
+   void KartDriver::doObjectInteractions ()
+   {
       int i;
       for ( i = 0 ; i < grid_position ; i++ )
-         {
+      {
          if ( i == grid_position )
             continue ;
       
@@ -222,28 +222,28 @@
          sgSubVec3 ( xyz, getCoord()->xyz, world->getKart(i) -> getCoord () -> xyz ) ;
       
          if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
-            {
+         {
             if ( this == world->getPlayerKart(0) || i == 0 )
                sound->playSfx ( SOUND_OW ) ;
          
             sgNormalizeVec2 ( xyz ) ;
          
             if ( velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] )
-               {
+            {
                forceCrash () ;
                sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
-               }
+            }
             else
-               {
+            {
                world->getKart(i)->forceCrash () ;
                sgAddVec2 ( getCoord()->xyz, xyz ) ;
-               }
-            } 
-         }
+            }
+         } 
+      }
    
    
       for ( i = 0 ; i < MAX_HERRING ; i++ )
-         {
+      {
          if ( herring[i].her == NULL || herring[i].eaten )
             continue ;
       
@@ -252,7 +252,7 @@
          herring [ i ] . getPos ( hpos ) ;
       
          if ( sgDistanceSquaredVec2 ( hpos, getCoord()->xyz ) < 0.8f )
-            {
+         {
             herring [ i ] . eaten = TRUE ;
             herring [ i ] . time_to_return = world->clock + 2.0f  ;
          
@@ -261,10 +261,10 @@
                               SOUND_UGH : SOUND_BURP ) ;
          
             switch ( herring [ i ] . type )
-               {
+            {
                case HE_GREEN  : 
                   switch ( rand () % 2 )
-                     {
+                  {
                      case 0 : attach ( ATTACH_PARACHUTE, 4.0f ) ;
                      
                      // if ( this == kart[0] )
@@ -276,7 +276,7 @@
                      // if ( this == kart[0] )
                      //   sound -> playSfx ( SOUND_SHOOMF ) ;
                         break ;
-                     }
+                  }
                   break ;
             
                case HE_SILVER : num_herring_gobbled++ ; 
@@ -286,11 +286,11 @@
             
                case HE_RED   :
                   if ( collectable == COLLECT_NOTHING )
-                     {
+                  {
                      int n = 0 ;
                   
                      switch ( rand () % 5 )
-                        {
+                     {
                         case 0 : n = 1 ; collectable = COLLECT_SPARK          ; 
                            break ; 
                         case 1 : n = 1 ; collectable = COLLECT_MISSILE        ; 
@@ -301,40 +301,40 @@
                            break ;
                         case 4 : n = 1 ; collectable = COLLECT_MAGNET         ; 
                            break ;
-                        }
+                     }
                   
                      if ( num_collectables < 1 + getNumHerring() /
                         (MAX_HERRING_EATEN/4) )
                         num_collectables = 1 + getNumHerring() / (MAX_HERRING_EATEN/4) ;
-                     }
+                  }
                   break ;
-               }
+            }
          
             if ( num_herring_gobbled > MAX_HERRING_EATEN )
                num_herring_gobbled = MAX_HERRING_EATEN ;
-            } 
-         }
+         } 
       }
+   }
 
 
 
-    void KartDriver::doZipperProcessing ( float delta)
-      {
+   void KartDriver::doZipperProcessing ( float delta)
+   {
       if ( zipper_time_left > delta )
-         {
+      {
          zipper_time_left -= delta ;  
       
          if ( velocity.xyz[1] < ZIPPER_VELOCITY )
             velocity.xyz[1] = ZIPPER_VELOCITY ;
-         }
+      }
       else
          zipper_time_left = 0.0f ;                                                   
-      }
+   }
 
 
 
-    void KartDriver::forceCrash ()
-      {
+   void KartDriver::forceCrash ()
+   {
       if ( this == world->getPlayerKart(0) )
          sound->playSfx ( SOUND_BONK ) ;
    
@@ -342,10 +342,10 @@
    
       velocity.xyz[0] = velocity.xyz[1] = velocity.xyz[2] =
          velocity.hpr[0] = velocity.hpr[1] = velocity.hpr[2] = 0.0f ;
-      }
+   }
 
-    void KartDriver::beginPowerslide ()
-      {
+   void KartDriver::beginPowerslide ()
+   {
    // deactivated for now... kart_properties shouldn't be changed, rather add
    // more values to Driver or so...
    #if 0
@@ -359,10 +359,10 @@
     powersliding = true;
    }
    #endif
-      }
+   }
 
-    void KartDriver::endPowerslide ()
-      {	
+   void KartDriver::endPowerslide ()
+   {	
    #if 0
    if (powersliding) {
     kart_properties.corn_f /= 20;
@@ -374,47 +374,47 @@
     powersliding = false;
    }
    #endif
-      }
+   }
 
 
-    void KartDriver::doCollisionAnalysis ( float delta, float hot )
-      {
+   void KartDriver::doCollisionAnalysis ( float delta, float hot )
+   {
       if ( collided )
-         {
+      {
          if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY )
-            {
+         {
             velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
-            }
-         else if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
-            {
-            velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
-            }
          }
+         else if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
+         {
+            velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
+         }
+      }
    
       if ( crashed && velocity.xyz[1] > MIN_CRASH_VELOCITY )
-         {
+      {
          forceCrash () ;
-         }
+      }
       else if ( wheelie_angle < 0.0f )
-         {
+      {
          wheelie_angle += PITCH_RESTORE_RATE * delta ;
       
          if ( wheelie_angle >= 0.0f )
             wheelie_angle = 0.0f ;
-         }
+      }
    
       if ( isOnGround() )
-         {
+      {
          position.xyz[2] = hot ;
          velocity.xyz[2] = 0.0f ;
       
          pr_from_normal( position.hpr, ground_normal ) ;
-         }
       }
+   }
 
-    void
+   void
     KartDriver::update (float delta)
-      {
+   {
       sgCoord temp;
       sgCopyCoord(&temp, &position);
     
@@ -426,17 +426,17 @@
       wheel_position += sgLengthVec3(velocity.xyz) * delta;
    
       if ( rescue )
-         {
+      {
          rescue = FALSE ;
          attach ( ATTACH_TINYTUX, 4.0f ) ;
-         }
+      }
    
       attachment_time_left -= world->clock ;
    
       if ( attachment_time_left <= 0.0f && attachment != NULL )
-         {
+      {
          if ( getAttachment () == ATTACH_TINYTUX )
-            {
+         {
             if ( track_hint > 0 )
                track_hint-- ;
          
@@ -445,20 +445,20 @@
             world ->track -> trackToSpatial ( position.xyz, track_hint ) ;
          
             position.xyz[2] = d ;
-            }
+         }
       
          attachment -> select ( 0 ) ;
          attachment_type = ATTACH_NOTHING ;
-         }
+      }
    
       processAttachments(delta);
    
    /*smoke drawing control point*/
       if ( config.smoke )
-         {
+      {
          if (smoke_system != NULL)
             smoke_system->update (delta);
-         }
+      }
    
       Driver::update (delta) ;
       processInput(delta);
@@ -468,20 +468,20 @@
    // Lock the vehicle in its start position until the race has
    // really started
       if (world->getPhase() == World::START_PHASE)
-         {
+      {
          sgCopyCoord(&position, &temp);
          sgCopyCoord(&last_pos, &temp);
          sgCopyCoord(&last_relax_pos, &temp);
-         }
-   
-   
       }
+   
+   
+   }
 
-    void
+   void
     KartDriver::processSkidMarks()
-      {
+   {
       if (skidmark_left && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
-         {
+      {
          float angle  = -43;
          float length = 0.57;
       
@@ -492,20 +492,20 @@
          wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
       
          if (skidmark_left->newSkidmark)
-            {
+         {
             skidmark_left->addBreak (&wheelpos);
             skidmark_left->newSkidmark--;
-            } 
+         } 
          else
             skidmark_left->add(&wheelpos);
-         } 
+      } 
       else if (skidmark_left)
-         {
+      {
          skidmark_left->newSkidmark = 2;
-         }
+      }
    
       if (skidmark_right && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
-         {
+      {
          float angle  = 43;
          float length = 0.57;
       
@@ -516,81 +516,81 @@
          wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
       
          if (skidmark_right->newSkidmark)
-            {
+         {
             skidmark_right->addBreak (&wheelpos);
             skidmark_right->newSkidmark--;
-            } 
+         } 
          else
             skidmark_right->add(&wheelpos);
-         }
-      else if (skidmark_right)
-         { 
-         skidmark_right->newSkidmark = 2;
-         }
       }
+      else if (skidmark_right)
+      { 
+         skidmark_right->newSkidmark = 2;
+      }
+   }
 
-    void
+   void
     KartDriver::processInput(float delta)
-      {
+   {
       if ( controlls.fire ) 
-         {
+      {
          if ( getCollectable() == COLLECT_NOTHING ) 
             beginPowerslide ();  
         //sound -> playSfx ( SOUND_BEEP ) ;
       
          useAttachment () ;      
-         } 
+      } 
       else
          endPowerslide ();
       
       if ( ( controlls.wheelie ) &&
          getVelocity()->xyz[1] >= MIN_WHEELIE_VELOCITY ) 
-         {
+      {
          if ( wheelie_angle < WHEELIE_PITCH )
             wheelie_angle += WHEELIE_PITCH_RATE * delta ;
          else
             wheelie_angle = WHEELIE_PITCH ;
-         }
+      }
       else
          if ( wheelie_angle > 0.0f )
-            {
+         {
             wheelie_angle -= PITCH_RESTORE_RATE ;
          
             if ( wheelie_angle <= 0.0f )
                wheelie_angle = 0.0f ;
-            }
+         }
    
-      if ( controlls.jump )
+      if ((controlls.jump) && (on_ground))
          getVelocity()->xyz[2] += JUMP_IMPULSE ;
    
       if ( controlls.rescue )
-         {
+      {
          sound -> playSfx ( SOUND_BEEP ) ;
          rescue = TRUE ;
-         }
+      }
    
-      if ( controlls.accel ) {
+      if ((controlls.accel) && (on_ground)) {
          throttle = kart_properties->max_throttle;
-         } 
+      } 
       else if (throttle > 0) {
          throttle -= kart_properties->max_throttle * delta;
-         } 
+      } 
       else
          throttle = 0.0f;
    
-      if ( controlls.brake ) {  
+      if ((controlls.brake) && (on_ground)) {  
          if (getVelocity()->xyz[1] > 0) {
             brake = kart_properties->max_throttle/2;
             throttle = 0.0f;
-            } 
+         } 
          else {
             brake = 0.0f;
             throttle = -kart_properties->max_throttle/2;
-            }
-         } 
+         }
+      } 
       else {
          brake = 0.0f;
-         }
+      }
    
       if ( wheelie_angle <= 0.0f ) {      
          steer_angle = -kart_properties->turn_speed * controlls.lr;
@@ -599,15 +599,15 @@
             steer_angle = kart_properties->max_wheel_turn;
          if ( steer_angle < -kart_properties->max_wheel_turn)
             steer_angle = -kart_properties->max_wheel_turn;	
-         }
+      }
       else
          getVelocity()->hpr[0] = 0.0f ;
-      }
+   }
 
-    void print_model(ssgEntity* entity, int indent)
-      {
+   void print_model(ssgEntity* entity, int indent)
+   {
       if (entity)
-         {
+      {
          for(int i = 0; i < indent; ++i)
             std::cout << "  ";
       
@@ -620,17 +620,17 @@
          ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
       
          if (branch)
-            {
+         {
             for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
-               {
+            {
                print_model(i, indent + 1);
-               }
             }
          }
       }
+   }
 
-    static ssgTransform* add_transform(ssgBranch* branch)
-      {
+   static ssgTransform* add_transform(ssgBranch* branch)
+   {
       if (!branch)
          return 0;
    
@@ -641,9 +641,9 @@
       ssgTransform* transform = new ssgTransform;
       transform->ref();
       for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
-         {
+      {
          transform->addKid(i);
-         }
+      }
    
       branch->removeAllKids();
       branch->addKid(transform);
@@ -657,50 +657,50 @@
    //std::cout << "2 END: " << std::endl;
    
       return transform;
-      }
+   }
 
-    void
+   void
     KartDriver::load_wheels(ssgBranch* branch)
-      {
+   {
       if (branch)
-         {
+      {
          for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
-            {
+         {
             if (i->getName())
-               { // We found something that might be a wheel
+            { // We found something that might be a wheel
                if (strcmp(i->getName(), "WheelFront.L") == 0)
-                  {
+               {
                   wheel_front_l = add_transform(dynamic_cast<ssgTransform*>(i));
-                  }
+               }
                else if (strcmp(i->getName(), "WheelFront.R") == 0)
-                  {
+               {
                   wheel_front_r = add_transform(dynamic_cast<ssgTransform*>(i));
-                  }
+               }
                else if (strcmp(i->getName(), "WheelRear.L") == 0) 
-                  {
+               {
                   wheel_rear_l = add_transform(dynamic_cast<ssgTransform*>(i));
-                  }
+               }
                else if (strcmp(i->getName(), "WheelRear.R") == 0)
-                  {
+               {
                   wheel_rear_r = add_transform(dynamic_cast<ssgTransform*>(i));
-                  }
+               }
                else
-                  {
+               {
                   // Wasn't a wheel, continue searching
                   load_wheels(dynamic_cast<ssgBranch*>(i));
-                  }
                }
+            }
             else
-               { // Can't be a wheel,continue searching
+            { // Can't be a wheel,continue searching
                load_wheels(dynamic_cast<ssgBranch*>(i));
-               }
             }
          }
       }
+   }
 
-    void
+   void
     KartDriver::load_data()
-      {
+   {
       const char *tinytux_file   = "tinytux_magnet.ac" ;
       const char *parachute_file = "parachute.ac"  ;
       const char *magnet_file    = "magnet.ac"     ;
@@ -798,7 +798,7 @@
       this-> addAttachment ( pobj5 ) ;
    
       if (1)
-         {
+      {
          skidmark_left  = new SkidMark();
          skidmark_left->ref();
          world->scene->addKid(skidmark_left);
@@ -806,16 +806,16 @@
          skidmark_right = new SkidMark();
          skidmark_right->ref();
          world->scene->addKid(skidmark_right);
-         }
+      }
    
       shadow = createShadow(kart_properties->shadow_file, -1, 1, -1, 1);
       shadow->ref();
       comp_model->addKid ( shadow );
-      }
+   }
 
-    void
+   void
     KartDriver::placeModel ()
-      {
+   {
       sgMat4 wheel_front;
       sgMat4 wheel_steer;
       sgMat4 wheel_rot;
@@ -835,36 +835,36 @@
    //exhaust_pipe -> setTransform (position.xyz);
    
       Driver::placeModel();
-      }
+   }
 
-    void 
+   void 
     KartDriver::processAttachments(float delta)
-      {
+   {
       if ( getAttachment () == ATTACH_TINYTUX )
-         {
+      {
          sgZeroVec3 ( velocity.xyz ) ;
          sgZeroVec3 ( velocity.hpr ) ;
          velocity.xyz[2] = 1.1 * GRAVITY * delta ;
-         }
+      }
       else if ( getAttachment () == ATTACH_PARACHUTE &&
               velocity.xyz[1] > MAX_PARACHUTE_VELOCITY )
-         {
+      {
          velocity.xyz[1] = MAX_PARACHUTE_VELOCITY ;
-         }
+      }
       else if ( getAttachment () == ATTACH_ANVIL &&
               velocity.xyz[1] > MAX_ANVIL_VELOCITY )
-         {
+      {
          velocity.xyz[1] = MAX_ANVIL_VELOCITY ;
-         }
+      }
    
       if ( getAttachment () == ATTACH_MAGNET ||
          getAttachment () == ATTACH_MAGNET_BZZT )
-         {
+      {
          float cdist = SG_MAX ;
          int   closest = -1 ;
       
          for ( int i = 0; i < world->getNumKarts() ; ++i )
-            {
+         {
             if ( world->getKart(i) == this ) 
                continue ;
          
@@ -875,22 +875,22 @@
                                             world->getKart(i)->getCoord()->xyz ) ;
          
             if ( d < cdist && d < MAGNET_RANGE_SQD )
-               {
+            {
                cdist = d ;
                closest = i ;
-               }
             }
+         }
       
          if ( closest != -1 )
-            {
+         {
             if ( getAttachment () == ATTACH_MAGNET )
-               {
+            {
                if ( this == world->getKart(0) || closest == 0 )
                   sound -> playSfx ( SOUND_BZZT ) ;
             
                attach ( ATTACH_MAGNET_BZZT,
                        attachment_time_left < 4.0f ? 4.0f : attachment_time_left ) ;
-               }
+            }
          
             sgVec3 vec ;
             sgSubVec2 ( vec, world->getKart(closest)->getCoord()->xyz, getCoord()->xyz ) ;
@@ -902,17 +902,17 @@
             float tgt_velocity = world->getKart(closest)->getVelocity()->xyz[1] ;
          
             if ( cdist > MAGNET_MIN_RANGE_SQD )
-               {
+            {
                if ( velocity.xyz[1] < tgt_velocity )
                   velocity.xyz[1] = tgt_velocity * 1.4 ;
-               }
+            }
             else
                velocity.xyz[1] = tgt_velocity ;
-            }
+         }
          else
             if ( getAttachment () == ATTACH_MAGNET_BZZT )
                attach ( ATTACH_MAGNET, attachment_time_left ) ;
-         } 
-      }
+      } 
+   }
 
 /* EOF */
