@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.1 2004/08/04 16:34:31 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.2 2004/08/05 16:47:18 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,7 @@ RaceGUI::~RaceGUI()
 {
 }
 	
-void RaceGUI::update(int dt)
+void RaceGUI::update(float dt)
 {
 	(void)dt;
 }

@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.2 2004/08/05 10:21:21 jamesgregory Exp $
+//  $Id: MainMenu.cxx,v 1.3 2004/08/05 16:47:18 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,14 +21,16 @@
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
+enum MenuOption {MENU_SINGLE, MENU_MULTI, MENU_REPLAY, MENU_OPTIONS, MENU_QUIT } ;
+
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "start",  GUI_MED, 0, 0);
-	widgetSet -> state(menu_id, "state1",  GUI_MED, 0, 0);
-	widgetSet -> state(menu_id, "state2",  GUI_MED, 0, 0);
-	widgetSet -> state(menu_id, "state3",  GUI_MED, 0, 0);
-	widgetSet -> state(menu_id, "state4",  GUI_MED, 0, 0);
+	widgetSet -> start(menu_id, "Single Player",  GUI_SML, MENU_SINGLE, 0);
+	widgetSet -> state(menu_id, "Multiplayer",  GUI_SML, MENU_MULTI, 0);
+	widgetSet -> state(menu_id, "Watch replay",  GUI_SML, MENU_REPLAY, 0);
+	widgetSet -> state(menu_id, "Options",  GUI_SML, MENU_OPTIONS, 0);
+	widgetSet -> state(menu_id, "Quit",  GUI_SML, MENU_QUIT, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -38,7 +40,7 @@ MainMenu::~MainMenu()
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void MainMenu::update(int dt)
+void MainMenu::update(float dt)
 {
 	
 	widgetSet -> timer(menu_id, dt) ;
