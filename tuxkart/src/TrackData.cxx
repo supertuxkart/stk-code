@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.4 2004/08/16 15:07:39 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.5 2004/08/17 11:58:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -69,6 +69,49 @@ TrackData::TrackData(const std::string& filename_)
   } catch(std::exception& err) {
     std::cout << "Catched std::exception: " << err.what() << std::endl;
   }
+}
+
+void
+TrackData::load_drv()
+{
+  std::string path = loader->getPath(drv_filename);
+  FILE *fd = fopen ( path.c_str(), "ra" ) ;
+
+  if ( fd == NULL )
+    {
+      fprintf ( stderr, "Can't open '%s' for reading.\n", drv_filename.c_str() ) ;
+      exit ( 1 ) ;
+    } 
+
+  while(!feof(fd))
+    {
+      char s [ 1024 ] ;
+
+      if ( fgets ( s, 1023, fd ) == NULL )
+        break ;
+
+      if ( *s == '#' || *s < ' ' )
+        continue ;
+
+      float x = 0.0f;
+      float y = 0.0f;
+      float z = 0.0f;
+
+      if ( sscanf ( s, "%f,%f", &x, &y ) != 2 && sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
+        {
+          fprintf ( stderr, "Syntax error in '%s'\n", drv_filename.c_str() ) ;
+          exit ( 1 ) ;
+        } 
+
+      sgVec3 point;
+      point[0] = x;
+      point[1] = y;
+      point[2] = z;
+
+      driveline.push_back(point);
+    }
+
+  fclose ( fd ) ;
 }
 
 /* EOF */

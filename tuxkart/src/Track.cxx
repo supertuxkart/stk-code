@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.12 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Track.cxx,v 1.13 2004/08/17 11:58:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,57 +19,26 @@
 
 #include "tuxkart.h"
 #include "Loader.h"
+#include "TrackData.h"
 #include "Track.h"
 
-Track::Track ( const char *fname, int mirror, int reverse )
+Track::Track ( const TrackData& track_data_, int mirror, int reverse )
+  : track_data(track_data_)
 {
-  std::string path = loader->getPath(fname);
-  FILE *fd = fopen ( path.c_str(), "ra" ) ;
-
-  if ( fd == NULL )
-    {
-      fprintf ( stderr, "Can't open '%s' for reading.\n", fname ) ;
-      exit ( 1 ) ;
-    } 
-
-  while(!feof(fd))
-    {
-      char s [ 1024 ] ;
-
-      if ( fgets ( s, 1023, fd ) == NULL )
-        break ;
-
-      if ( *s == '#' || *s < ' ' )
-        continue ;
-
-      float x, y ;
-
-      if ( sscanf ( s, "%f,%f", &x, &y ) != 2 )
-        {
-          fprintf ( stderr, "Syntax error in '%s'\n", fname ) ;
-          exit ( 1 ) ;
-        } 
-
-      sgVec3 point;
-      point[0] = mirror ? -x : x;
-      point[1] = y;
-      point[2] = 0.0f;
-
-      driveline.push_back(point);
-    }
-
-  fclose ( fd ) ;
+  // Mirror the track if requested
+  for ( int i = 0 ; i < int(track_data.driveline.size()); ++i )
+    track_data.driveline[i][0] = mirror ? -track_data.driveline[i][0] : track_data.driveline[i][0];
 
   if ( reverse )
     {
-      for ( int i = 0 ; i < int(driveline.size())/2 ; ++i )
+      for ( int i = 0 ; i < int(track_data.driveline.size())/2 ; ++i )
         {
-          int j = int(driveline.size()) - i - 1 ;
+          int j = int(track_data.driveline.size()) - i - 1 ;
           float tmp ;
 
-          tmp=driveline[i][0];driveline[i][0]=driveline[j][0];driveline[j][0]=tmp;
-          tmp=driveline[i][1];driveline[i][1]=driveline[j][1];driveline[j][1]=tmp;
-          tmp=driveline[i][2];driveline[i][2]=driveline[j][2];driveline[j][2]=tmp;
+          tmp=track_data.driveline[i][0];track_data.driveline[i][0]=track_data.driveline[j][0];track_data.driveline[j][0]=tmp;
+          tmp=track_data.driveline[i][1];track_data.driveline[i][1]=track_data.driveline[j][1];track_data.driveline[j][1]=tmp;
+          tmp=track_data.driveline[i][2];track_data.driveline[i][2]=track_data.driveline[j][2];track_data.driveline[j][2]=tmp;
         }
     }
 
@@ -78,19 +47,19 @@ Track::Track ( const char *fname, int mirror, int reverse )
 
   float d = 0.0f ;
 
-  for ( int i = 0 ; i < int(driveline.size()) ; i++ )
+  for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
     {
-      if ( driveline[i][0] < min[0] ) min[0] = driveline[i][0] ;
-      if ( driveline[i][1] < min[1] ) min[1] = driveline[i][1] ;
-      if ( driveline[i][0] > max[0] ) max[0] = driveline[i][0] ;
-      if ( driveline[i][1] > max[1] ) max[1] = driveline[i][1] ;
+      if ( track_data.driveline[i][0] < min[0] ) min[0] = track_data.driveline[i][0] ;
+      if ( track_data.driveline[i][1] < min[1] ) min[1] = track_data.driveline[i][1] ;
+      if ( track_data.driveline[i][0] > max[0] ) max[0] = track_data.driveline[i][0] ;
+      if ( track_data.driveline[i][1] > max[1] ) max[1] = track_data.driveline[i][1] ;
 
-      driveline [i][2] = d ;
+      track_data.driveline [i][2] = d ;
 
-      if ( i == int(driveline.size()) - 1 )
-        d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
+      if ( i == int(track_data.driveline.size()) - 1 )
+        d += sgDistanceVec2 ( track_data.driveline[i], track_data.driveline[0] ) ;
       else
-        d += sgDistanceVec2 ( driveline[i], driveline[i+1] ) ;
+        d += sgDistanceVec2 ( track_data.driveline[i], track_data.driveline[i+1] ) ;
     }
 
   total_distance = d ;
@@ -118,9 +87,9 @@ fprintf(stderr,"ih=%d ", hint ) ;
   if ( hint < 0 || hint >= npoints )
 */
   {
-    for ( int i = 0 ; i < int(driveline.size()) ; i++ )
+    for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
     {
-      d = sgDistanceVec2 ( driveline[i], xyz ) ;
+      d = sgDistanceVec2 ( track_data.driveline[i], xyz ) ;
 
       if ( d < nearest_d )
       {
@@ -145,9 +114,9 @@ fprintf(stderr,"hint=%d\n", hint ) ;
   int hp = ( hint <=      0     ) ? (npoints-1) : (hint-1) ;
   int hn = ( hint >= (npoints-1)) ?      0      : (hint+1) ;
 
-  float dp = sgDistanceVec2 ( driveline[ hp ], xyz ) ;
-  float d0 = sgDistanceVec2 ( driveline[hint], xyz ) ;
-  float dn = sgDistanceVec2 ( driveline[ hn ], xyz ) ;
+  float dp = sgDistanceVec2 ( track_data.driveline[ hp ], xyz ) ;
+  float d0 = sgDistanceVec2 ( track_data.driveline[hint], xyz ) ;
+  float dn = sgDistanceVec2 ( track_data.driveline[ hn ], xyz ) ;
 
 if ( check_hint )
 fprintf(stderr,"d=(%f->%f->%f), %d/%d/%d ", dp,d0,dn, hp,hint,hn ) ;
@@ -179,11 +148,11 @@ fprintf(stderr,"new hint=%d\n", nearest ) ;
   int    prev,  next ;
   float dprev, dnext ;
 
-  prev = ( nearest   ==   0     ) ? (int(driveline.size()) - 1) : (nearest - 1) ;
-  next = ( nearest+1 >= int(driveline.size()) ) ?      0        : (nearest + 1) ;
+  prev = ( nearest   ==   0     ) ? (int(track_data.driveline.size()) - 1) : (nearest - 1) ;
+  next = ( nearest+1 >= int(track_data.driveline.size()) ) ?      0        : (nearest + 1) ;
 
-  dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
-  dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
+  dprev = sgDistanceVec2 ( track_data.driveline[prev], xyz ) ;
+  dnext = sgDistanceVec2 ( track_data.driveline[next], xyz ) ;
 
   int   p1, p2 ;
   float d1, d2 ;
@@ -202,13 +171,13 @@ fprintf(stderr,"new hint=%d\n", nearest ) ;
   sgVec3 line_eqn ;
   sgVec3 tmp ;
 
-  sgMake2DLine ( line_eqn, driveline[p1], driveline[p2] ) ;
+  sgMake2DLine ( line_eqn, track_data.driveline[p1], track_data.driveline[p2] ) ;
 
   res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
 
   sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
 
-  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + driveline[p1][2] ;
+  res [ 1 ] = sgDistanceVec2 ( tmp, track_data.driveline[p1] ) + track_data.driveline[p1][2] ;
 
   return nearest ;
 }
@@ -221,7 +190,7 @@ int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz )
 
 void Track::trackToSpatial ( sgVec3 xyz, int hint )
 {
-  sgCopyVec3 ( xyz, driveline [ hint ] ) ;
+  sgCopyVec3 ( xyz, track_data.driveline [ hint ] ) ;
 }
 
 
@@ -236,10 +205,10 @@ void Track::draw2Dview ( float x, float y )
     ( TRACKVIEW_SIZE / sc[1] ) ;
  
   glBegin ( GL_LINE_LOOP ) ;
-  for ( int i = 0 ; i < int(driveline.size()) ; i++ )
+  for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
     {
-      glVertex2f ( x + ( driveline[i][0] - center[0] ) * scale,
-                   y + ( driveline[i][1] - center[1] ) * scale ) ;
+      glVertex2f ( x + ( track_data.driveline[i][0] - center[0] ) * scale,
+                   y + ( track_data.driveline[i][1] - center[1] ) * scale ) ;
     }
   glEnd () ;
 }

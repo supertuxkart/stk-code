@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.4 2004/08/11 12:33:17 grumbel Exp $
+//  $Id: TrackData.h,v 1.5 2004/08/17 11:58:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,9 @@
 #define HEADER_TRACKDATA_H
 
 #include <string>
+#include <vector>
 #include <plib/sg.h>
+#include "plibwrap.h"
 
 /** */
 class TrackData
@@ -50,8 +52,11 @@ public:
   sgVec4 specularcol;
   sgVec4 diffusecol;
 
+  std::vector<sgVec3Wrap> driveline;
 public:
   TrackData(const std::string& filename);
+
+  void load_drv();
 };
 
 #endif

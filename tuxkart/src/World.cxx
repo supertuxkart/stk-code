@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.17 2004/08/15 16:46:51 grumbel Exp $
+//  $Id: World.cxx,v 1.18 2004/08/17 11:58:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -95,7 +95,7 @@ World::World(const RaceSetup& raceSetup_)
   loader -> setCreateBranchCallback ( process_userdata ) ;
 
   // Grab the track centerline file
-  track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
+  track = new Track ( track_manager.tracks[raceSetup.track],
                       raceSetup.mirror, raceSetup.reverse ) ;
 
   // Start building the scene graph
