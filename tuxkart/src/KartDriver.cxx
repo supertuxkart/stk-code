@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.35 2004/08/15 16:06:15 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.36 2004/08/15 17:36:41 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -317,8 +317,7 @@ void KartDriver::doCollisionAnalysis ( float delta, float hot )
   {
     forceCrash () ;
   }
-  else
-  if ( wheelie_angle < 0.0f )
+  else if ( wheelie_angle < 0.0f )
   {
     wheelie_angle += PITCH_RESTORE_RATE * delta ;
 
@@ -326,7 +325,7 @@ void KartDriver::doCollisionAnalysis ( float delta, float hot )
       wheelie_angle = 0.0f ;
   }
 
-  if ( on_ground )
+  if ( is_on_ground() )
   {
     curr_pos.xyz[2] = hot ;
     velocity.xyz[2] = 0.0f ;
@@ -343,7 +342,7 @@ void KartDriver::update (float delta)
   if (driver)
     driver->update();
   
-  wheel_position += sgLengthVec3(velocity.xyz);
+  wheel_position += sgLengthVec3(velocity.xyz) * delta;
 
   if ( rescue )
   {
@@ -411,8 +410,11 @@ KartDriver::processSkidMarks()
 	  skidmark_left->newSkidmark--;
 	} else
           skidmark_left->add(&wheelpos);
-    } else if (skidmark_left)
+    } 
+  else if (skidmark_left)
+    {
       skidmark_left->newSkidmark = 2;
+    }
 
   if (skidmark_right && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
@@ -431,8 +433,11 @@ KartDriver::processSkidMarks()
 	  skidmark_right->newSkidmark--;
 	} else
           skidmark_right->add(&wheelpos);
-    } else if (skidmark_right)
+    }
+  else if (skidmark_right)
+    { 
       skidmark_right->newSkidmark = 2;
+    }
 }
 
 void

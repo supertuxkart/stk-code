@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.26 2004/08/15 16:46:51 grumbel Exp $
+//  $Id: Driver.h,v 1.27 2004/08/15 17:36:41 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -137,7 +137,7 @@ public:
 
   sgVec3 surface_avoidance_vector ;
   sgVec3 curr_normal ;
-  int    on_ground ; 
+  bool   on_ground ; 
   int    firsttime ;
   float getIsectData     ( sgVec3 start, sgVec3 end ) ;
   float collectIsectData ( sgVec3 start, sgVec3 end ) ;

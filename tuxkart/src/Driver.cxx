@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.26 2004/08/15 16:46:51 grumbel Exp $
+//  $Id: Driver.cxx,v 1.27 2004/08/15 17:36:41 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -65,7 +65,7 @@ Driver::reset ()
   lap = 0 ;
   position = 9 ;
   rescue = FALSE ;
-  on_ground = TRUE ;
+  on_ground = true ;
   zipper_time_left = 0.0f ;
   collided = crashed = FALSE ;
   history_index = 0 ;
@@ -85,7 +85,8 @@ Driver::reset ()
   //FIXME:update () ;
 }
 
-void Driver::update (float delta)
+void
+Driver::update (float delta)
 {
   physicsUpdate (delta);
   coreUpdate (delta) ;
@@ -93,7 +94,8 @@ void Driver::update (float delta)
   doObjectInteractions () ;
 }
 
-void Driver::placeModel ()
+void
+Driver::placeModel ()
 {
   if ( model != NULL )
     {
@@ -140,7 +142,8 @@ void Driver::placeModel ()
     }
 }
 
-void Driver::physicsUpdate (float delta)
+void
+Driver::physicsUpdate (float delta)
 {
 	sgVec2 resistance;
 	sgVec2 traction;
@@ -229,7 +232,8 @@ void Driver::physicsUpdate (float delta)
 	sgZeroVec3 (force);
 }
 
-void Driver::coreUpdate (float delta)
+void
+Driver::coreUpdate (float delta)
 {
   sgCoord scaled_velocity ;
 
