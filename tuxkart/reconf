@@ -1,0 +1,15 @@
+#!/bin/csh
+
+echo "Getting rid of old config.junk"
+rm -f config.*
+echo "Running aclocal"
+aclocal
+echo "Running automake"
+automake --add-missing
+echo "Running autoconf"
+autoconf 
+echo "Configuring"
+./configure
+echo "Make"
+\make  |& tee config.errors
+
