@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.9 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: Projectile.cxx,v 1.10 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -61,8 +61,8 @@ void Projectile::doObjectInteractions ()
       if ( d < 2.0f )
       {
         World::current()->getKart(i) -> forceCrash () ;
-        curr_pos.xyz[2] += 1.2f ;
-        World::current()->explosion[0]->start(curr_pos.xyz);
+        position.xyz[2] += 1.2f ;
+        World::current()->explosion[0]->start(position.xyz);
         off () ;
       }
       else
@@ -81,13 +81,13 @@ void Projectile::doObjectInteractions ()
     sgVec3 hpr ;
     sgCoord *k = World::current()->getKart(nearest)->getCoord() ;
 
-    sgSubVec3 ( delta, k->xyz, curr_pos.xyz ) ;
+    sgSubVec3 ( delta, k->xyz, position.xyz ) ;
 
     delta[2] = 0.0f ;
  
     sgHPRfromVec3 ( hpr, delta ) ;
 
-    sgSubVec3 ( hpr, curr_pos.hpr ) ;
+    sgSubVec3 ( hpr, position.hpr ) ;
 
     if ( hpr[0] >  180.0f ) hpr[0] -= 360.0f ;
     if ( hpr[0] < -180.0f ) hpr[0] += 360.0f ;
@@ -133,16 +133,16 @@ void Projectile::doCollisionAnalysis  ( float /* delta*/,  float /* hot */ )
       sgVec3 direction ;
 
       sgNormalizeVec3 ( bouncevec, surface_avoidance_vector ) ;
-      sgSubVec3 ( direction, curr_pos.xyz, last_pos.xyz ) ;
+      sgSubVec3 ( direction, position.xyz, last_pos.xyz ) ;
       sgReflectInPlaneVec3 ( direction, bouncevec ) ;
 
-      sgHPRfromVec3 ( curr_pos.hpr, direction ) ;
+      sgHPRfromVec3 ( position.hpr, direction ) ;
     }
     else
     if ( type != COLLECT_NOTHING )
     {
-      curr_pos.xyz[2] += 1.2f ;
-      World::current()->explosion[0]->start(curr_pos.xyz);
+      position.xyz[2] += 1.2f ;
+      World::current()->explosion[0]->start(position.xyz);
       off () ;
     }
   }

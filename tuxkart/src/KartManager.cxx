@@ -1,4 +1,4 @@
-//  $Id: KartManager.cxx,v 1.4 2004/08/25 00:21:23 grumbel Exp $
+//  $Id: KartManager.cxx,v 1.5 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -30,13 +30,20 @@ KartManager::KartManager()
 {
 }
 
+KartManager::~KartManager()
+{
+  for(KartPropertiesVector::iterator i = karts.begin(); i != karts.end(); ++i)
+    delete *i;
+}
+
 int
 KartManager::getKartId(const std::string ident)
 {
   int j = 0;
-  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
+  for(KartPropertiesVector::const_iterator i = karts.begin();
+      i != karts.end(); ++i)
     {
-      if (i->ident == ident)
+      if ((*i)->ident == ident)
         return j;
       ++j;
     }
@@ -44,19 +51,20 @@ KartManager::getKartId(const std::string ident)
   throw TuxkartError("KartManager: Couldn't find kart: '" + ident + "'");
 }
 
-const KartProperties&
+const KartProperties*
 KartManager::getKart(const std::string ident)
 {
-  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
+  for(KartPropertiesVector::const_iterator i = karts.begin();
+      i != karts.end(); ++i)
     {
-      if (i->ident == ident)
+      if ((*i)->ident == ident)
         return *i;
     }
 
   throw TuxkartError("KartManager: Couldn't find kart: '" + ident + "'");
 }
 
-const KartProperties&
+const KartProperties*
 KartManager::getKartById(int i)
 {
   if (i < 0 || i >= int(karts.size()))
@@ -76,7 +84,7 @@ KartManager::loadKartData()
     {
       if (StringUtils::has_suffix(*i, ".tkkf"))
         {
-          karts.push_back(KartProperties("data/" + *i));
+          karts.push_back(new KartProperties("data/" + *i));
         }
     }
 }
@@ -86,9 +94,10 @@ KartManager::getRandomKarts(int len)
 {
   std::vector<std::string> all_karts;
 
-  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
+  for(KartPropertiesVector::const_iterator i = karts.begin();
+      i != karts.end(); ++i)
     {
-      all_karts.push_back(i->ident);
+      all_karts.push_back((*i)->ident);
     }
 
   std::random_shuffle(all_karts.begin(), all_karts.end());
@@ -103,8 +112,9 @@ KartManager::fillWithRandomKarts(std::vector<std::string>& vec)
 {
   std::vector<std::string> all_karts;
 
-  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
-    all_karts.push_back(i->ident);
+  for(KartPropertiesVector::const_iterator i = karts.begin();
+      i != karts.end(); ++i)
+    all_karts.push_back((*i)->ident);
 
   std::random_shuffle(all_karts.begin(), all_karts.end());
 

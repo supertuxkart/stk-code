@@ -22,6 +22,10 @@ case "`$AUTOMAKE --version`" in
         ;;
 esac
 
+# automake tends to fail sometimes if Makefile or Makefile.in are left from old
+# runs
+find -name "Makefile" -o -name "Makefile.in" -exec rm {} ';'
+
 echo "Running $ACLOCAL"
 $ACLOCAL -I m4
 echo "Running $AUTOMAKE"

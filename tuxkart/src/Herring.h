@@ -1,4 +1,4 @@
-//  $Id: Herring.h,v 1.6 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: Herring.h,v 1.7 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,15 +26,19 @@ class Shadow;
 
 class Herring
 {
-  float h ;
-  ssgTransform *tr ;
- 
-  Shadow *sh ;
+  float rotation ;
+  
+  ssgTransform *transform ;
+  ssgTransform *shadow ;
  
 public:
-  Herring ( sgVec4 colour ) ;
+  Herring ( sgVec3 colour ) ;
   Herring ( ssgEntity* model ) ;
-  ssgTransform *getRoot () { return tr ; }
+  ~Herring () ;
+  
+  ssgTransform* getRoot () const
+  { return transform; }
+
   void update () ;
 } ;
  

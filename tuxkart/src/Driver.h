@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.31 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: Driver.h,v 1.32 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,11 +22,10 @@
 
 #include <plib/ssg.h>
 #include <plib/sg.h>
+#include "NoCopy.h"
 #include "tuxkart.h"
 #include "joystick.h"
 #include "KartProperties.h"
-
-class Shadow;
 
 #define COLLECT_NOTHING         0
 #define COLLECT_SPARK           1
@@ -91,14 +90,14 @@ class Shadow;
 
 class KartDriver;
 
-class Driver
+class Driver : public NoCopy
 {
 protected:
   /** The interpolated position of the kart, this might differ a bit
       from the real position, but it is used to both give a smoother
       movement and to better visualize turns and such, use it for
       everything that needs to be visual (smoke, skidmarks, kart
-      placement), but don't use it for physics, thats what curr_pos is
+      placement), but don't use it for physics, thats what position is
       for */
   sgCoord visi_pos;
 
@@ -107,7 +106,7 @@ protected:
   sgCoord last_relax_pos;
 
   sgCoord  reset_pos ;
-  sgCoord  curr_pos  ;
+  sgCoord  position  ;
   sgCoord  last_pos  ;
 
   sgCoord  velocity  ;
@@ -128,13 +127,13 @@ protected:
   ssgTransform *model ;
 
   /** The Karts shadow */
-  Shadow* shadow;
+  ssgTransform* shadow;
 
   int history_index ;
 public:
   float wheelie_angle ;
-  int position ;
-  int lap      ;
+  int race_position ;
+  int race_lap      ;
 
   int collided ;
   int crashed  ;
@@ -157,16 +156,15 @@ public:
   float height_of_terrain;
 
 public:
-  KartProperties kart_properties;
+  /*const*/ KartProperties* kart_properties;
 
-  Driver ( );
-
-  virtual ~Driver() {}
+  Driver ( const KartProperties* kart_properties );
+  virtual ~Driver();
 
   float getDistanceDownTrack () { return curr_track_coords[1] ; }
-  int  getLap      ()        { return lap      ; }
-  int  getPosition ()        { return position ; }
-  void setPosition ( int p ) { position = p    ; }
+  int  getLap      () const  { return race_lap      ; }
+  int  getPosition () const  { return race_position ; }
+  void setPosition ( int p ) { race_position = p    ; }
   float getSteerAngle() const { return steer_angle; }
 
   void reset ();
@@ -178,7 +176,7 @@ public:
   ssgTransform *getModel () { return model ; }
   ssgEntity *getRoot () { return comp_model ; }
 
-  KartProperties& getKartProperties()
+  const KartProperties* getKartProperties() const
   {
     return kart_properties;
   }
@@ -200,12 +198,12 @@ public:
 
   sgCoord *getCoord ()
   {
-    return & curr_pos ;
+    return & position ;
   }
 
   void setCoord ( sgCoord *pos )
   {
-    sgCopyCoord ( & curr_pos, pos ) ;
+    sgCopyCoord ( & position, pos ) ;
   }
 
   /** Reposition the model in the scene */

@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.25 2004/08/25 18:19:50 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.26 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,13 +31,17 @@
 #include "RaceManager.h"
 #include "StartScreen.h"
 
-CharSel::CharSel(int whichPlayer):
-playerIndex(whichPlayer)
+CharSel::CharSel(int whichPlayer)
+  : kart(0), playerIndex(whichPlayer)
 {
 	current_kart = -1;
 	switch_to_character(3);
 
+        // for some strange reasons plib calls makeCurrent() in ssgContext
+        // constructor, so we have to save the old one here and restore it
+        ssgContext* oldContext = ssgGetCurrentContext();
 	context = new ssgContext;
+        oldContext->makeCurrent();
 
 	menu_id = widgetSet -> vstack(0);
 	char output[60];
@@ -52,27 +56,37 @@ playerIndex(whichPlayer)
 	int icon_size = 64;
 
 	int row1 = widgetSet -> harray(va);
-	for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
+	for(KartManager::KartPropertiesVector::size_type i = 0;
+            i < kart_manager.karts.size(); ++i)
 	{
 		//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-		int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+		int c = widgetSet -> image(row1,
+                    loader->getPath(
+                      "images/" + kart_manager.karts[i]->icon_file).c_str(),
+                    icon_size, icon_size);
 		widgetSet -> activate_widget(c, i, 0);
 	}
 
 	if (0)
 	{
 		int row2 = widgetSet -> harray(va);
-		for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size()/2; ++i)
+		for(KartManager::KartPropertiesVector::size_type i = 0;
+                    i < kart_manager.karts.size()/2; ++i)
 		{
 			//widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
 			// FIXME: images needs to be 'clickable'
-			int c = widgetSet -> image(row1, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+			int c = widgetSet -> image(row1,
+                            loader->getPath(
+                              "images/" + kart_manager.karts[i]->icon_file).c_str(),
+                            icon_size, icon_size);
 			widgetSet -> activate_widget(c, i, 0);
 		}
-		for(KartManager::Data::size_type i = kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
+		for(KartManager::KartPropertiesVector::size_type i =
+                    kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
 		{
 			//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-			int c = widgetSet -> image(row2, loader->getPath("images/" + kart_manager.karts[i].icon_file).c_str(), icon_size, icon_size);
+			int c = widgetSet -> image(row2,
+                            loader->getPath("images/" + kart_manager.karts[i]->icon_file).c_str(), icon_size, icon_size);
 			widgetSet -> activate_widget(c, i, 0);
 		}
 	}
@@ -90,6 +104,9 @@ playerIndex(whichPlayer)
 CharSel::~CharSel()
 {
 	widgetSet -> delete_widget(menu_id) ;
+        ssgDeRefDelete(kart);
+
+        delete context;
 }
 
 void CharSel::switch_to_character(int n)
@@ -97,9 +114,10 @@ void CharSel::switch_to_character(int n)
 	if (current_kart != n && n >= 0 && n < int(kart_manager.karts.size()))
 	{
 		current_kart = n;
+                ssgDeRefDelete(kart);
 		kart = new ssgTransform;
 		kart->ref();
-		ssgEntity* kartentity = kart_manager.karts[n].getModel();
+		ssgEntity* kartentity = kart_manager.karts[n]->getModel();
 
 		kart->addKid(kartentity);
 
@@ -118,11 +136,13 @@ void CharSel::update(float dt)
 
 	if (kart)
 	{
+                ssgContext* oldContext = ssgGetCurrentContext();
+                context -> makeCurrent();                                   
+            
 		glClear(GL_DEPTH_BUFFER_BIT);
 		// FIXME: A bit hackish...
 		glViewport ( 0, 0, 800, 320);
 
-		//context -> ref();
 		context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
 		context -> setNearFar ( 0.05f, 1000.0f ) ;
 
@@ -131,7 +151,6 @@ void CharSel::update(float dt)
 		context -> setCamera ( &cam_pos ) ;
 
 		glEnable (GL_DEPTH_TEST);
-		context -> makeCurrent () ;
 		sgCoord trans;
 		sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
 		kart->setTransform (&trans) ;
@@ -141,7 +160,7 @@ void CharSel::update(float dt)
 		glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 
 		glDisable (GL_DEPTH_TEST);
-		//delete context;
+                oldContext->makeCurrent();
 	}
 }
 
@@ -150,7 +169,8 @@ void CharSel::select()
 	int token = widgetSet -> token (widgetSet -> click());
 
 	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
-          RaceManager::instance()->setPlayerKart(playerIndex, kart_manager.getKartById(token).ident);
+          RaceManager::instance()->setPlayerKart(playerIndex,
+              kart_manager.getKartById(token)->ident);
 
 	if (RaceManager::instance()->getNumPlayers() > 1)
 	{
@@ -182,7 +202,7 @@ void CharSel::select()
         if (RaceManager::instance()->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
           guiStack.push_back(GUIS_TRACKSEL); 
         else
-          StartScreen::current()->switchToGame();
+          startScreen->switchToGame();
 }
 
 void CharSel::keybd(const SDL_keysym& key)

@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.19 2004/08/24 21:01:44 grumbel Exp $
+//  $Id: BaseGUI.cxx,v 1.20 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,11 +40,8 @@ void updateGUI()
 	
 	if (rememberSize != guiStack.size())
 	{
-		if (gui)
-		{
-			delete gui;
-			gui = NULL;
-		}
+		delete gui;
+		gui = 0;
 		
 		rememberSize = guiStack.size();
 		
@@ -108,6 +105,7 @@ void updateGUI()
 			case GUIS_EXITRACE:
 				guiStack.clear();
                                 RaceManager::instance()->next();
+                                break;
                         }
 		}
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts

@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.h,v 1.3 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: ScreenManager.h,v 1.4 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -26,20 +26,24 @@
     main-loop is */
 class ScreenManager
 {
-public:
-  static ScreenManager* current() { return current_; }
 private:
-  static ScreenManager* current_;
+  bool do_abort;
   Screen* current_screen;
   Screen* next_screen;
+
 public:
   ScreenManager();
+  ~ScreenManager();
   void run();
+  /** aborts the main loop */
+  void abort();
   /** Set the current active screen, the screen will get delete'ed
       automatically once it is no longer needed */
-  void set_screen(Screen* screen);
+  void setScreen(Screen* screen);
   void shutdown();
 };
+
+extern ScreenManager* screenManager;
 
 #endif
 

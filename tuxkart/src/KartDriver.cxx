@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.47 2004/08/28 22:05:35 oaf_thadres Exp $
+//  $Id: KartDriver.cxx,v 1.48 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,11 +35,9 @@
 #include "Config.h"
 
 KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
-                                       int num, int initial_num,
-                                       float _create_rate, int _ttf,
+                                       int num, float _create_rate, int _ttf,
                                        float sz, float bsphere_size)                                       
-  : ParticleSystem (num, initial_num, _create_rate, _ttf,
-                    sz, bsphere_size),
+  : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
     kart(kart_)
 {
   getBSphere () -> setCenter ( 0, 0, 0 ) ;
@@ -50,15 +48,14 @@ KartParticleSystem::KartParticleSystem(KartDriver* kart_,
 void
 KartParticleSystem::update ( float t ) 
 {
-  if (0)
-    {
+#if 0
       std::cout << "BSphere: r:" << getBSphere()->radius 
                 << " ("  << getBSphere()->center[0]
                 << ", "  << getBSphere()->center[1]
                 << ", "  << getBSphere()->center[2]
                 << ")"
                 << std::endl;
-    }
+#endif
   getBSphere () -> setRadius ( 1000.0f ) ;
   ParticleSystem::update(t);
 }
@@ -70,11 +67,11 @@ KartParticleSystem::particle_create(int, Particle *p)
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;    /* start off on the ground */
   sgSetVec3 ( p -> vel, 0, 0, 0 ) ;
   sgSetVec3 ( p -> acc, 0, 0, 2.0f ) ; /* Gravity */
-  p->size = .5f;
+  p -> size = .5f;
   p -> time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
   
-  sgCoord* pos = kart->getVisiCoord ();
-  sgCoord* vel = kart->getVelocity ();
+  const sgCoord* pos = kart->getVisiCoord ();
+  const sgCoord* vel = kart->getVelocity ();
    
   float xDirection = sgCos (pos->hpr[0] - 90.0f); // Point at the rear 
   float yDirection = sgSin (pos->hpr[0] - 90.0f); // Point at the rear
@@ -92,7 +89,6 @@ KartParticleSystem::particle_create(int, Particle *p)
   p->vel[0] += sgCos (rand()%180) * 1;
   p->vel[1] += sgSin (rand()%180) * 1;
   p->vel[2] += sgSin (rand()%100) * 1;
-  
 
   getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
 }
@@ -108,9 +104,15 @@ KartParticleSystem::particle_update (float delta, int, Particle * particle)
   particle->pos[2] += particle->vel[2] * delta;
 }
 
-KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
+void
+KartParticleSystem::particle_delete (int , Particle* )
 {
-  kart_properties      = kart_properties_;
+}
+
+KartDriver::KartDriver (const KartProperties* kart_properties_,
+    int position_ , Controller* driver_ ) 
+  : Driver(kart_properties_)
+{
   grid_position        = position_ ;
   num_collectables     = 0 ;
   num_herring_gobbled  = 0 ;
@@ -140,6 +142,15 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ ,
 KartDriver::~KartDriver()
 {
   delete driver;
+  delete smokepuff;
+
+  ssgDeRefDelete(wheel_front_l);
+  ssgDeRefDelete(wheel_front_r);
+  ssgDeRefDelete(wheel_rear_l);
+  ssgDeRefDelete(wheel_rear_r);
+
+  ssgDeRefDelete(skidmark_left);
+  ssgDeRefDelete(skidmark_right);
 }
 
 void
@@ -184,11 +195,11 @@ void KartDriver::doLapCounting ()
 {
   if ( last_track_coords[1] > 100.0f &&
        curr_track_coords[1] <  20.0f )
-    lap++ ;
+    race_lap++ ;
   else
   if ( curr_track_coords[1] > 100.0f &&
        last_track_coords[1] <  20.0f )
-    lap-- ;
+    race_lap-- ;
 }
 
 
@@ -321,29 +332,35 @@ void KartDriver::forceCrash ()
 }
 
 void KartDriver::beginPowerslide ()
-{	
-	if (!powersliding) {
-		kart_properties.corn_f *= 20;
-		kart_properties.corn_r /= 5;
-		kart_properties.max_grip /= 1.5;
-		//kart_properties.max_wheel_turn = M_PI;
-		kart_properties.inertia *= 1;
+{
+  // deactivated for now... kart_properties shouldn't be changed, rather add
+  // more values to Driver or so...
+#if 0
+  if (!powersliding) {
+    kart_properties.corn_f *= 20;
+    kart_properties.corn_r /= 5;
+    kart_properties.max_grip /= 1.5;
+    //kart_properties.max_wheel_turn = M_PI;
+    kart_properties.inertia *= 1;
 		
-		powersliding = true;
-	}
+    powersliding = true;
+  }
+#endif
 }
 
 void KartDriver::endPowerslide ()
 {	
-	if (powersliding) {
-		kart_properties.corn_f /= 20;
-		kart_properties.corn_r *= 5;
-		kart_properties.max_grip *= 1.5;
-		//kart_properties.max_wheel_turn = M_PI/2;
-		kart_properties.inertia /= 1;
-		
-		powersliding = false;
-	}
+#if 0
+  if (powersliding) {
+    kart_properties.corn_f /= 20;
+    kart_properties.corn_r *= 5;
+    kart_properties.max_grip *= 1.5;
+    //kart_properties.max_wheel_turn = M_PI/2;
+    kart_properties.inertia /= 1;
+    
+    powersliding = false;
+  }
+#endif
 }
 
 
@@ -375,10 +392,10 @@ void KartDriver::doCollisionAnalysis ( float delta, float hot )
 
   if ( is_on_ground() )
     {
-      curr_pos.xyz[2] = hot ;
+      position.xyz[2] = hot ;
       velocity.xyz[2] = 0.0f ;
 
-      pr_from_normal( curr_pos.hpr, curr_normal ) ;
+      pr_from_normal( position.hpr, curr_normal ) ;
     }
 }
 
@@ -386,7 +403,7 @@ void
 KartDriver::update (float delta)
 {
   sgCoord temp;
-  sgCopyCoord(&temp, &curr_pos);
+  sgCopyCoord(&temp, &position);
     
   if (driver)
     driver->update();
@@ -410,11 +427,11 @@ KartDriver::update (float delta)
       if ( track_hint > 0 )
         track_hint-- ;
 
-      float d = curr_pos.xyz[2] ;
+      float d = position.xyz[2] ;
 
-      World::current() ->track -> trackToSpatial ( curr_pos.xyz, track_hint ) ;
+      World::current() ->track -> trackToSpatial ( position.xyz, track_hint ) ;
 
-      curr_pos.xyz[2] = d ;
+      position.xyz[2] = d ;
     }
 
     attachment -> select ( 0 ) ;
@@ -439,7 +456,7 @@ KartDriver::update (float delta)
   // really started
   if (World::current()->getPhase() == World::START_PHASE)
     {
-      sgCopyCoord(&curr_pos, &temp);
+      sgCopyCoord(&position, &temp);
       sgCopyCoord(&last_pos, &temp);
       sgCopyCoord(&last_relax_pos, &temp);
     }
@@ -511,69 +528,64 @@ KartDriver::processInput(float delta)
   else
       endPowerslide ();
       
-
-    
-
-  if ( is_on_ground() )
+  if ( ( controlls.wheelie ) &&
+       getVelocity()->xyz[1] >= MIN_WHEELIE_VELOCITY ) 
     {
-      if ( ( controlls.wheelie ) &&
-           getVelocity()->xyz[1] >= MIN_WHEELIE_VELOCITY ) 
-        {
-          if ( wheelie_angle < WHEELIE_PITCH )
-            wheelie_angle += WHEELIE_PITCH_RATE * delta ;
-          else
-            wheelie_angle = WHEELIE_PITCH ;
-        }
+      if ( wheelie_angle < WHEELIE_PITCH )
+        wheelie_angle += WHEELIE_PITCH_RATE * delta ;
       else
-        if ( wheelie_angle > 0.0f )
-          {
-            wheelie_angle -= PITCH_RESTORE_RATE ;
+        wheelie_angle = WHEELIE_PITCH ;
+    }
+  else
+    if ( wheelie_angle > 0.0f )
+      {
+        wheelie_angle -= PITCH_RESTORE_RATE ;
 
-            if ( wheelie_angle <= 0.0f )
-              wheelie_angle = 0.0f ;
-          }
- 
-      if ( controlls.jump )
-        getVelocity()->xyz[2] += JUMP_IMPULSE ;
-
-      if ( controlls.rescue )
-        {
-          sound -> playSfx ( SOUND_BEEP ) ;
-          rescue = TRUE ;
-        }
-    
-      if ( controlls.accel ) {
-        throttle = kart_properties.max_throttle;
-      } else if (throttle > 0) {
-        throttle -= kart_properties.max_throttle * delta;
-      } else
-        throttle = 0.0f;
-
-      if ( controlls.brake ) {  
-        if (getVelocity()->xyz[1] > 0) {
-          brake = kart_properties.max_throttle/2;
-          throttle = 0.0f;
-        } else {
-          brake = 0.0f;
-          throttle = -kart_properties.max_throttle/2;
-        }
-      } else {
-        brake = 0.0f;
+        if ( wheelie_angle <= 0.0f )
+          wheelie_angle = 0.0f ;
       }
-      
-      if ( wheelie_angle <= 0.0f ) {      
-        steer_angle = -kart_properties.turn_speed * controlls.lr;
-      
-        if ( steer_angle > kart_properties.max_wheel_turn)
-          steer_angle = kart_properties.max_wheel_turn;
-        if ( steer_angle < -kart_properties.max_wheel_turn)
-          steer_angle = -kart_properties.max_wheel_turn;	
-      }
-      else
-        getVelocity()->hpr[0] = 0.0f ;
-    } 
 
-  force[2] = -GRAVITY * kart_properties.mass;
+  if ( controlls.jump )
+    getVelocity()->xyz[2] += JUMP_IMPULSE ;
+
+  if ( controlls.rescue )
+    {
+      sound -> playSfx ( SOUND_BEEP ) ;
+      rescue = TRUE ;
+    }
+
+  if ( controlls.accel ) {
+    throttle = kart_properties->max_throttle;
+  } else if (throttle > 0) {
+    throttle -= kart_properties->max_throttle * delta;
+  } else
+    throttle = 0.0f;
+
+  if ( controlls.brake ) {  
+    if (getVelocity()->xyz[1] > 0) {
+      brake = kart_properties->max_throttle/2;
+      throttle = 0.0f;
+    } else {
+      brake = 0.0f;
+      throttle = -kart_properties->max_throttle/2;
+    }
+  } else {
+    brake = 0.0f;
+  }
+  
+  if ( wheelie_angle <= 0.0f ) {      
+    steer_angle = -kart_properties->turn_speed * controlls.lr;
+  
+    if ( steer_angle > kart_properties->max_wheel_turn)
+      steer_angle = kart_properties->max_wheel_turn;
+    if ( steer_angle < -kart_properties->max_wheel_turn)
+      steer_angle = -kart_properties->max_wheel_turn;	
+  }
+  else
+    getVelocity()->hpr[0] = 0.0f ;
+
+  // XXX this should be handled in physicsUpdate or when doing CD...
+  //force[2] = -GRAVITY * kart_properties.mass;
 }
 
 void print_model(ssgEntity* entity, int indent)
@@ -603,37 +615,32 @@ void print_model(ssgEntity* entity, int indent)
 
 static ssgTransform* add_transform(ssgBranch* branch)
 {
-  if (branch)
+  if (!branch)
+    return 0;
+  
+  //std::cout << "1 BEGIN: " << std::endl;
+  //print_model(branch, 0);
+  //std::cout << "1 END: " << std::endl;
+
+  ssgTransform* transform = new ssgTransform;
+  transform->ref();
+  for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
     {
-      //std::cout << "1 BEGIN: " << std::endl;
-      //print_model(branch, 0);
-      //std::cout << "1 END: " << std::endl;
-
-      ssgTransform* transform = new ssgTransform;
-      transform->ref();
-      for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
-        {
-          transform->addKid(i);
-        }
-
-      branch->removeAllKids();
-      branch->addKid(transform);
-
-      // Set some user data, so that the wheel isn't ssgFlatten()'ed
-      branch->setUserData(new ssgBase());
-      transform->setUserData(new ssgBase());
-
-
-      //std::cout << "2 BEGIN: " << std::endl;
-      //print_model(branch, 0);
-      //std::cout << "2 END: " << std::endl;
-
-      return transform;
+      transform->addKid(i);
     }
-  else
-    {
-      return NULL;
-    }
+
+  branch->removeAllKids();
+  branch->addKid(transform);
+
+  // Set some user data, so that the wheel isn't ssgFlatten()'ed
+  branch->setUserData(new ssgBase());
+  transform->setUserData(new ssgBase());
+
+  //std::cout << "2 BEGIN: " << std::endl;
+  //print_model(branch, 0);
+  //std::cout << "2 END: " << std::endl;
+
+  return transform;
 }
 
 void
@@ -678,11 +685,11 @@ KartDriver::load_wheels(ssgBranch* branch)
 void
 KartDriver::load_data()
 {
-  char *tinytux_file   = "tinytux_magnet.ac" ;
-  char *parachute_file = "parachute.ac"  ;
-  char *magnet_file    = "magnet.ac"     ;
-  char *magnet2_file   = "magnetbzzt.ac" ;
-  char *anvil_file     = "anvil.ac"      ;
+  const char *tinytux_file   = "tinytux_magnet.ac" ;
+  const char *parachute_file = "parachute.ac"  ;
+  const char *magnet_file    = "magnet.ac"     ;
+  const char *magnet2_file   = "magnetbzzt.ac" ;
+  const char *anvil_file     = "anvil.ac"      ;
 
   float r [ 2 ] = { -10.0f, 100.0f } ;
   
@@ -700,7 +707,7 @@ KartDriver::load_data()
   smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
   smokepuff -> setShininess      (  0 ) ;
 
-  ssgEntity *obj = ssgLoadAC ( kart_properties.model_file.c_str(), loader ) ;
+  ssgEntity *obj = kart_properties->getModel();
 
   //if (kart_properties.model_file == "mrcube.ac")
   //print_model(obj, 0);
@@ -737,7 +744,8 @@ KartDriver::load_data()
   
   // Attach Particle System
   sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
-  smoke_system = new KartParticleSystem(this, 50, 5, 100.0f, TRUE, 0.35f, 1000);
+  smoke_system = new KartParticleSystem(this, 50, 100.0f, TRUE, 0.35f, 1000);
+  smoke_system -> init(5);
   smoke_system -> setState (getMaterial ("smoke.png")-> getState() );
   //smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
@@ -757,9 +765,13 @@ KartDriver::load_data()
   ttt -> addKid ( ssgLoad ( tinytux_file  , loader ) ) ;
 
   sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
+
+#if 0
+  // matze: does this have any effect?
   ssgTransform *xxx = new ssgTransform ( & cc ) ;
   xxx -> addKid ( obj ) ;
   obj = xxx ;
+#endif
 
   ssgEntity *pobj5 = ttt ;
 
@@ -772,11 +784,17 @@ KartDriver::load_data()
   if (1)
     {
       skidmark_left  = new SkidMark();
+      skidmark_left->ref();
+      World::current()->scene->addKid(skidmark_left);
+      
       skidmark_right = new SkidMark();
+      skidmark_right->ref();
+      World::current()->scene->addKid(skidmark_right);
     }
 
-  shadow = new Shadow(kart_properties.shadow_file, -1, 1, -1, 1);
-  comp_model->addKid ( shadow->getRoot () );
+  shadow = createShadow(kart_properties->shadow_file, -1, 1, -1, 1);
+  shadow->ref();
+  comp_model->addKid ( shadow );
 }
 
 void
@@ -797,8 +815,8 @@ KartDriver::placeModel ()
   if (wheel_rear_l) wheel_rear_l->setTransform(wheel_rot);
   if (wheel_rear_r) wheel_rear_r->setTransform(wheel_rot);
   
-  //printf ("meep: %f\n", curr_pos.xyz[0]);
-  //exhaust_pipe -> setTransform (curr_pos.xyz);
+  //printf ("meep: %f\n", position.xyz[0]);
+  //exhaust_pipe -> setTransform (position.xyz);
 
   Driver::placeModel();
 }

@@ -1,4 +1,4 @@
-//  $Id: Projectile.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Projectile.h,v 1.3 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -53,13 +53,17 @@ class Projectile : public Driver
     }
   }
 
+  KartProperties props;
+
 public:
-  Projectile ( ) : Driver ( )
+  Projectile ( ) 
+    : Driver (&props)
   {
     type = COLLECT_NOTHING ;
   }
 
-  virtual ~Projectile() {}
+  virtual ~Projectile()
+  {}
 
   void off ()
   {

@@ -1,4 +1,4 @@
-//  $Id: StartScreen.h,v 1.4 2004/08/24 21:01:44 grumbel Exp $
+//  $Id: StartScreen.h,v 1.5 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,19 +27,18 @@
 class StartScreen : public Screen
 {
 private:
-  static StartScreen* current_;
-
   ssgSimpleState *introMaterial ;
 
   void installMaterial();
 public:
-  static StartScreen* current() { return current_; }
-
   StartScreen();
+  ~StartScreen();
 
   void switchToGame();
   void update(); 
 };
+
+extern StartScreen* startScreen;
 
 #endif
 

@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.21 2004/08/24 21:01:45 grumbel Exp $
+//  $Id: TrackSel.cxx,v 1.22 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -84,7 +84,7 @@ void TrackSel::update(float dt)
 void TrackSel::select()
 {
         RaceManager::instance()->setTrack(track_manager.getTrackById(widgetSet -> token ( widgetSet -> click() )).ident);
-	StartScreen::current()->switchToGame();
+	startScreen->switchToGame();
 }
 
 void TrackSel::keybd(const SDL_keysym& key)

@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.23 2004/08/26 23:08:42 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.24 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -47,32 +47,37 @@ PlayerDriver::incomingJoystick  (JoyInfo& ji)
 
   /* Physics debugging control*/
   if ( keyState [ SDLK_1 ] ) {
-    printf ("Selected Inertia - value: %f\n", kart->kart_properties.inertia);
-    selected_property = &kart->kart_properties.inertia;
+    printf ("Selected Inertia - value: %f\n", kart->kart_properties->inertia);
+    selected_property = &kart->kart_properties->inertia;
   }
   if ( keyState [ SDLK_2 ] ) {
-    printf ("Selected corner stiffness front - value: %f\n", kart->kart_properties.corn_f);
-    selected_property = &kart->kart_properties.corn_f;
+    printf ("Selected corner stiffness front - value: %f\n",
+        kart->kart_properties->corn_f);
+    selected_property = &kart->kart_properties->corn_f;
   }
   
   if ( keyState [ SDLK_3 ] ) {
-    printf ("Selected corner stiffness rear - value: %f\n", kart->kart_properties.corn_r);
-    selected_property = &kart->kart_properties.corn_r;
+    printf ("Selected corner stiffness rear - value: %f\n",
+        kart->kart_properties->corn_r);
+    selected_property = &kart->kart_properties->corn_r;
   }
   
   if ( keyState [ SDLK_4 ] ) {
-    printf ("Selected maximum grip - value: %f\n", kart->kart_properties.max_grip);
-    selected_property = &kart->kart_properties.max_grip;
+    printf ("Selected maximum grip - value: %f\n",
+        kart->kart_properties->max_grip);
+    selected_property = &kart->kart_properties->max_grip;
   }
   
   if ( keyState [ SDLK_5 ] ) {
-    printf ("Selected mass of kart - value: %f\n", kart->kart_properties.mass);
-    selected_property = &kart->kart_properties.mass;
+    printf ("Selected mass of kart - value: %f\n",
+        kart->kart_properties->mass);
+    selected_property = &kart->kart_properties->mass;
   }
   
   if ( keyState [ SDLK_6 ] ) {
-    printf ("Selected wheels turn degree - value: %f\n", kart->kart_properties.turn_speed);
-    selected_property = &kart->kart_properties.turn_speed;
+    printf ("Selected wheels turn degree - value: %f\n",
+        kart->kart_properties->turn_speed);
+    selected_property = &kart->kart_properties->turn_speed;
   }
   
   if ( keyState [ SDLK_7 ] ) {

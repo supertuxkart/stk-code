@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.36 2004/09/05 19:05:06 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.37 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -333,8 +333,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
     static int flasher = 0 ;
 
     if ( ++flasher & 32 )
-      sprintf ( str, "Last Lap!",
-        pos_string [ player_kart->getPosition() ] ) ;
+      sprintf ( str, "Last Lap!" );
     else
       sprintf ( str, "%s",
         pos_string [ player_kart->getPosition() ] ) ;
@@ -362,7 +361,7 @@ void RaceGUI::drawMap ()
 
     c = World::current()->getKart(i)->getCoord () ;
 
-    glColor3fv ( World::current()->getKart(i)->getKartProperties().color ) ;
+    glColor3fv ( World::current()->getKart(i)->getKartProperties()->color ) ;
 
     /* 
        FIXME:
@@ -384,7 +383,7 @@ void RaceGUI::drawGameOverText ()
   /* Calculate a color. This will result in an animation effect. */
   int red   = (int)(255 * sin ( (float)timer/5.1f ) / 2.0f + 0.5f);
   int green = (int)(255 * (sin ( (float)timer/6.3f ) / 2.0f + 0.5f));
-  int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5);
+  int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
 
   if ( finishing_position < 0 )
     finishing_position = World::current()->getPlayerKart(0)->getPosition() ;
@@ -420,7 +419,7 @@ void RaceGUI::drawPlayerIcons ()
 
       // draw icon
       Material* players_gst =
-          World::current()->getKart(i)->getKartProperties().getIconMaterial();
+          World::current()->getKart(i)->getKartProperties()->getIconMaterial();
       players_gst -> apply ();
 
       glEnable(GL_TEXTURE_2D);

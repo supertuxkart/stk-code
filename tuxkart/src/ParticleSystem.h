@@ -48,7 +48,7 @@ public:
     sgZeroVec3 ( vel ) ;
     sgZeroVec3 ( acc ) ;
     time_to_live = 0 ;
-    userData = NULL ;
+    userData = 0 ;
     size = 1.0f ;
   } 
 
@@ -63,7 +63,7 @@ class ParticleSystem : public ssgVtxTable
   int num_verts      ;
   int turn_to_face   ;
   int num_active     ;
-  Particle *particle ;
+  Particle* particles ;
 
   float create_error ;
   float create_rate ;
@@ -72,35 +72,28 @@ class ParticleSystem : public ssgVtxTable
 
 public:
 
-  ParticleSystem ( int num, int initial_num,
-                   float _create_rate, int _turn_to_face,
+  ParticleSystem ( int num, float _create_rate, int _turn_to_face,
                    float sz, float bsphere_size);
-
   virtual ~ParticleSystem () ;
   virtual void update ( float t ) ;
 
-  virtual void particle_create( int index, Particle *p ) 
-  { (void)index; (void)p; }
+  virtual void particle_create( int index, Particle *p ) = 0;
+  virtual void particle_update( float deltaTime, int index, Particle *p ) = 0;
+  virtual void particle_delete( int index, Particle* p ) = 0;
 
-  virtual void particle_update( float deltaTime, int index, Particle *p ) 
-  { (void)deltaTime; (void)index; (void)p; }
-
-  virtual void particle_delete( int index, Particle *p )
-  { (void)index; (void)p; }
-
-void
-ParticleSystem::recalcBSphere();
+  void init(int initial_num);
+  void recalcBSphere();
 
   void setSize ( float sz ) { size = sz ; }
-  float getSize () { return size ; }
+  float getSize () const { return size ; }
 
   void draw_geometry () ;
 
   void  setCreationRate ( float cr ) { create_rate = cr ; }
-  float getCreationRate () { return create_rate ; }
+  float getCreationRate () const { return create_rate ; }
 
-  int getNumParticles       () { return num_particles ; }
-  int getNumActiveParticles () { return num_active    ; }
+  int getNumParticles       () const { return num_particles ; }
+  int getNumActiveParticles () const { return num_active    ; }
 } ;
 
 /* EOF */

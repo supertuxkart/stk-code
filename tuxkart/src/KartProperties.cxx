@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.14 2004/08/24 19:33:10 matzebraun Exp $
+//  $Id: KartProperties.cxx,v 1.15 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,6 +35,7 @@ KartProperties::KartProperties()
 }
 
 KartProperties::KartProperties(const std::string& filename)
+    : icon_material(0), model(0)
 {
   init_defaults();
 
@@ -72,6 +73,19 @@ KartProperties::KartProperties(const std::string& filename)
               << ": " << err.what() << "\n";
   }
   delete lisp;
+
+  // load material
+  icon_material = getMaterial(icon_file.c_str());
+
+  // load model
+  model = ssgLoadAC ( model_file.c_str(), loader ) ;
+  preProcessObj(model, 0);
+  model->ref();
+}
+
+KartProperties::~KartProperties()
+{
+  ssgDeRefDelete(model);
 }
 
 void
@@ -105,30 +119,14 @@ KartProperties::init_defaults()
 }
 
 Material*
-KartProperties::getIconMaterial()
+KartProperties::getIconMaterial() const
 {
-  if (icon_material)
-    {
-      return icon_material; 
-    }
-  else
-    {
-      char* icon_file_c = strdup(icon_file.c_str());
-      icon_material = getMaterial(icon_file_c);
-      free(icon_file_c);
-      return icon_material;
-    }
+  return icon_material;
 }
 
 ssgEntity*
-KartProperties::getModel()
+KartProperties::getModel() const
 {
-  if (!model)
-    {
-      model = ssgLoadAC ( model_file.c_str(), loader ) ;
-      preProcessObj(model, 0);
-    }
-
   return model;
 }
 

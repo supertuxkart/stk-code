@@ -1,4 +1,4 @@
-//  $Id: KartProperties.h,v 1.7 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: KartProperties.h,v 1.8 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,15 +21,17 @@
 #define HEADER_KARTPROPERTIES_H
 
 #include <string>
+#include "NoCopy.h"
 
 class Material;
 class ssgEntity;
 
-class KartProperties
+class KartProperties : public NoCopy
 {
 private:
   Material* icon_material;
   ssgEntity* model;
+
 public:
   /** The human readable Name of the karts driver */
   std::string name;
@@ -65,13 +67,15 @@ public:
   float air_friction;
   float system_friction;
 
+  // ideally this constructor would be deleted
   KartProperties();
   KartProperties(const std::string& filename);
+  ~KartProperties();
   
   void init_defaults();
 
-  Material* getIconMaterial();
-  ssgEntity* getModel();
+  Material* getIconMaterial() const;
+  ssgEntity* getModel() const;
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.10 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.11 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <stdexcept>
+
 #include "sdldrv.h"
 #include "Loader.h"
 #include "RaceSetup.h"
@@ -27,14 +29,17 @@
 #include "TrackManager.h"
 #include "StartScreen.h"
 
-StartScreen* StartScreen::current_ = 0;
+StartScreen* startScreen = 0;
 
 StartScreen::StartScreen()
+    : introMaterial(0)
 {
-  current_ = this;
-
   guiStack.push_back(GUIS_MAINMENU);
   installMaterial();
+}
+
+StartScreen::~StartScreen()
+{
 }
 
 void
@@ -69,6 +74,9 @@ StartScreen::update()
   pollEvents() ;
   updateGUI();
   swapBuffers();
+
+  if(guiStack.empty())
+    screenManager->abort();
 }
 
 void
@@ -77,8 +85,14 @@ StartScreen::installMaterial()
   /* Make a simplestate for the title screen texture */
 
   introMaterial = new ssgSimpleState ;
-  introMaterial -> setTexture( 
-          loader->createTexture("title_screen.png", true, true, false));
+  ssgTexture* texture = loader->createTexture("title_screen.png", true, true,
+          false);
+  if(!texture) {
+    delete introMaterial;
+    introMaterial = 0;
+    throw std::runtime_error("Couldn't load title_screen.png");
+  }
+  introMaterial -> setTexture(texture);
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
   introMaterial -> disable     ( GL_LIGHTING  ) ;
   introMaterial -> disable     ( GL_CULL_FACE ) ;
@@ -98,6 +112,7 @@ void
 StartScreen::switchToGame()
 {
   delete introMaterial ;
+  introMaterial = 0;
   
   guiStack.clear();
   

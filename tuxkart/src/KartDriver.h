@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.12 2004/08/21 18:15:13 straver Exp $
+//  $Id: KartDriver.h,v 1.13 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,13 +33,13 @@ class KartParticleSystem : public ParticleSystem
 public:
   KartDriver* kart;
 
-  KartParticleSystem ( KartDriver* kart, int num, int initial_num,
-                       float _create_rate, int _turn_to_face,
-                       float sz, float bsphere_size);
+  KartParticleSystem ( KartDriver* kart, int num, float _create_rate,
+      int _turn_to_face, float sz, float bsphere_size);
 
   virtual void update ( float t ) ;
-  virtual void particle_create( int index, Particle *p );
+  virtual void particle_create( int index, Particle* p );
   virtual void particle_update( float deltaTime, int index, Particle *p );
+  virtual void particle_delete( int index, Particle* p );
 };
 
 class KartDriver : public Driver
@@ -62,6 +62,7 @@ private:
   ssgSelector *attachment ;
   
   ssgSimpleState     *smokepuff ;
+  // don't delete the following 2 vars (they're kids in the hirarchy)
   KartParticleSystem *smoke_system ;
   ssgTransform       *exhaust_pipe ;
 
@@ -83,7 +84,8 @@ private:
       steering */
   Controller* driver;
 public:
-  KartDriver ( const KartProperties& kart_properties_, int position_, Controller* driver_ = 0 ) ;
+  KartDriver (const KartProperties* kart_properties_, int position_,
+      Controller* driver_ = 0 ) ;
   virtual ~KartDriver();
 
   void load_data();
@@ -135,7 +137,7 @@ public:
 class TrafficDriver : public KartDriver
 {
 public:
-  TrafficDriver ( const KartProperties& kart_properties_, sgVec3 _pos )
+  TrafficDriver (const KartProperties* kart_properties_, sgVec3 _pos )
     : KartDriver ( kart_properties_, 0 )
   {
     sgCopyVec3 ( reset_pos.xyz, _pos ) ;

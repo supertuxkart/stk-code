@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.12 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Herring.cxx,v 1.13 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,7 +24,9 @@
 #include "World.h"
 
 Herring::Herring ( sgVec3 colour )
+  : rotation(0)
 {
+  // create a cube
   ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
   ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
   ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
@@ -48,49 +50,47 @@ Herring::Herring ( sgVec3 colour )
   sgSetVec2(t, 0.0, 0.0 ) ; ta->add(t) ;
   sgSetVec2(t, 1.0, 0.0 ) ; ta->add(t) ;
  
-
-  ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
- 
-  gset -> setState ( getMaterial ( "herring.png" ) -> getState () ) ;
+  ssgVtxTable* cube = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
+  cube -> setState ( getMaterial ( "herring.png" ) -> getState () ) ;
   
-  h = 0.0f ;
+  shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
+  shadow->ref();
  
-  sh = new Shadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
- 
-  tr = new ssgTransform () ;
- 
-  tr -> addKid ( sh -> getRoot () ) ;
-  tr -> addKid ( gset ) ;
-  tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
+  transform = new ssgTransform () ;
+  transform->ref();
+  transform -> addKid ( shadow ) ;
+  transform -> addKid ( cube ) ;
 }
 
 Herring::Herring ( ssgEntity* model )
+  : rotation(0)
 {
-  ssgEntity *gset = model ;
-  
   //turn off collision detection. 
-  gset -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ; 
+  model -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ; 
   
-  h = 0.0f ;
+  shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
+  shadow -> ref ();
  
-  sh = new Shadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
- 
-  tr = new ssgTransform () ;
- 
-  tr -> addKid ( sh -> getRoot () ) ;
-  tr -> addKid ( gset ) ;
-  tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
+  transform = new ssgTransform () ;
+  transform -> ref () ;
+  transform -> addKid ( shadow ) ;
+  transform -> addKid ( model ) ;
+}
+
+Herring::~Herring ()
+{
+  ssgDeRefDelete(shadow);
+  ssgDeRefDelete(transform);
 }
 
 void Herring::update ()
 {
   sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
- 
-  c . hpr [ 0 ] = h ;
- 
-  h += 5.0f ;
- 
-  tr -> setTransform ( &c ) ;
+
+  c . hpr [ 0 ] = rotation ;
+  transform -> setTransform ( &c ) ;
+
+  rotation += 5.0f ;
 }
 
 void HerringInstance::update ()

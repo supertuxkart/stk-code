@@ -1,4 +1,4 @@
-//  $Id: material.h,v 1.6 2004/07/31 23:46:18 grumbel Exp $
+//  $Id: material.h,v 1.7 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -58,11 +58,7 @@ public:
   Material () ;
   Material ( char *fname, char *description ) ;
 
-  ~Material ()
-  {
-    ssgDeRefDelete ( state ) ;
-    delete texname ;
-  }
+  ~Material ();
 
   int matches ( char *tx ) ;
 
@@ -83,7 +79,7 @@ public:
 } ;
 
 
-Material *getMaterial ( char *texname ) ;
+Material *getMaterial ( const char *texname ) ;
 Material *getMaterial ( ssgLeaf *lf ) ;
 
 ssgState *getAppState ( char *fname ) ;

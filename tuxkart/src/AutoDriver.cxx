@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.9 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: AutoDriver.cxx,v 1.10 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,12 +45,12 @@ void AutoDriver::update (float delta)
   if (0) // use handicap
     {
       /* Slow down if we get too far ahead of the player... */
-      if ( kart->position < World::current()->getPlayerKart(0)->getPosition () &&
+      if ( kart->getPosition() < World::current()->getPlayerKart(0)->getPosition () &&
            kart->getVelocity()->xyz[1] > MIN_HANDICAP_VELOCITY )
         kart->getVelocity()->xyz[1] -= MAX_BRAKING * delta * 0.1f ;
       else
         /* Speed up if we get too far behind the player... */
-        if ( kart->position > World::current()->getPlayerKart(0)->getPosition () &&
+        if ( kart->getPosition() > World::current()->getPlayerKart(0)->getPosition () &&
              kart->getVelocity()->xyz[1] < MAX_HANDICAP_VELOCITY )
           kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta * 1.1f ;
         else

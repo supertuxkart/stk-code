@@ -1,4 +1,4 @@
-//  $Id: Shadow.cxx,v 1.3 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: Shadow.cxx,v 1.4 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,8 @@
 #include "material.h"
 #include "Shadow.h"
 
-Shadow::Shadow ( const std::string& name, float x1, float x2, float y1, float y2 )
+ssgTransform* createShadow( const std::string& name,
+    float x1, float x2, float y1, float y2 )
 {
   ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
   ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
@@ -40,10 +41,10 @@ Shadow::Shadow ( const std::string& name, float x1, float x2, float y1, float y2
   sgSetVec2 ( t, 0.0, 1.0 ) ; ta->add(t) ;
   sgSetVec2 ( t, 1.0, 1.0 ) ; ta->add(t) ;
  
-  sh = new ssgTransform ;
-  sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
+  ssgTransform* result = new ssgTransform ;
+  result -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
  
-  sh -> setName ( "Shadow" ) ;
+  result -> setName ( "Shadow" ) ;
  
   ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
@@ -54,8 +55,9 @@ Shadow::Shadow ( const std::string& name, float x1, float x2, float y1, float y2
   gs -> setState ( getMaterial ( name_c ) -> getState () ) ;
   free(name_c);
 
-  sh -> addKid ( gs ) ;
-  sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
+  result -> addKid ( gs ) ;
+
+  return result;
 }
 
 /* EOF */

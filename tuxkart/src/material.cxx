@@ -1,4 +1,4 @@
-//  $Id: material.cxx,v 1.13 2004/08/13 13:58:31 grumbel Exp $
+//  $Id: material.cxx,v 1.14 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -116,6 +116,11 @@ Material::Material ( char *fname, char *description )
   install () ;
 }
 
+Material::~Material()
+{
+  ssgDeRefDelete(state);
+  delete[] texname;
+}
 
 void Material::init ()
 {
@@ -270,12 +275,12 @@ Material *getMaterial ( ssgLeaf *l )
 }
 
 
-Material *getMaterial ( char *fname )
+Material *getMaterial ( const char *fname )
 {
   if ( fname == NULL || fname[0] == '\0' )
     return (Material *) materials -> getEntity ( 0 ) ;
 
-  char *fn ;
+  const char *fn ;
 
   /* Remove all leading path information. */
 
@@ -292,12 +297,13 @@ Material *getMaterial ( char *fname )
 
   /* Remove last trailing extension. */
 
-  for ( fn = & basename [ strlen ( basename ) - 1 ] ; fn != basename &&
-                                                     *fn != '.' ; fn-- )
+  char* fno;
+  for ( fno = & basename [ strlen ( basename ) - 1 ] ; fno != basename &&
+                                                     *fno != '.' ; fno-- )
     /* Search back for a '.' */ ;
 
-  if ( *fn == '.' )
-    *fn = '\0' ;
+  if ( *fno == '.' )
+    *fno = '\0' ;
 
   for ( int i = 0 ; i < materials -> getNumEntities () ; i++ )
   {
@@ -334,8 +340,11 @@ Material *getMaterial ( char *fname )
     }
   }
 
+#if 0
+  // matze: what is this code good for?
   strcpy ( fname, basename  ) ;
   strcat ( fname, ".png"    ) ;
+#endif
   return NULL ;
 }
 

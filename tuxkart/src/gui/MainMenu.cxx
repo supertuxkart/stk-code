@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.8 2004/08/24 21:01:45 grumbel Exp $
+//  $Id: MainMenu.cxx,v 1.9 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,8 +66,8 @@ void MainMenu::select()
                 guiStack.push_back(GUIS_OPTIONS);	
                 break;
 
-	case MENU_QUIT:	       
-                deinitTuxKart(); 
+	case MENU_QUIT:
+                guiStack.clear();
                 break;
 	}
 }

@@ -23,14 +23,13 @@
 #include <iostream>
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem ( int num, int initial_num,
-                                 float _create_rate, int _ttf,
+ParticleSystem::ParticleSystem ( int num, float _create_rate, int _ttf,
                                  float sz, float bsphere_size)
   : ssgVtxTable ( GL_QUADS, 
-                  new ssgVertexArray   ( num * 4, new sgVec3 [ num * 4 ] ), 
-                  new ssgNormalArray   ( num * 4, new sgVec3 [ num * 4 ] ), 
-                  new ssgTexCoordArray ( num * 4, new sgVec2 [ num * 4 ] ), 
-                  new ssgColourArray   ( num * 4, new sgVec4 [ num * 4 ] ) )
+                  new ssgVertexArray   ( num * 4 /*, new sgVec3 [ num * 4 ]*/ ), 
+                  new ssgNormalArray   ( num * 4 /*, new sgVec3 [ num * 4 ]*/ ), 
+                  new ssgTexCoordArray ( num * 4 /*, new sgVec2 [ num * 4 ]*/ ), 
+                  new ssgColourArray   ( num * 4 /*, new sgVec4 [ num * 4 ]*/ ) )
 {
   turn_to_face = _ttf ;
   create_error = 0 ;
@@ -44,7 +43,7 @@ ParticleSystem::ParticleSystem ( int num, int initial_num,
   num_particles = num ;
   num_verts     = num * 4 ;
 
-  particle = new Particle [ num ] ;
+  particles = new Particle [ num ] ;
 
   int i ;
 
@@ -64,9 +63,13 @@ ParticleSystem::ParticleSystem ( int num, int initial_num,
   }
 
   num_active = 0 ;
+}
 
-  for ( i = 0 ; i < initial_num ; i++ )
-    particle_create(i, & particle [ i ] ) ;
+void
+ParticleSystem::init(int initial_num)
+{
+  for ( int i = 0 ; i < initial_num ; i++ )
+    particle_create(i, & particles [ i ] ) ;
 }
 
 void
@@ -113,22 +116,22 @@ void ParticleSystem::draw_geometry ()
   {
     /* Make them disappear if not needed */
 
-    if ( particle[i].time_to_live <= 0.0f )
+    if ( particles[i].time_to_live <= 0.0f )
       continue ;
 
-    sgCopyVec4 ( getColour ( j + 0 ), particle[i].col ) ;
-    sgCopyVec4 ( getColour ( j + 1 ), particle[i].col ) ;
-    sgCopyVec4 ( getColour ( j + 2 ), particle[i].col ) ;
-    sgCopyVec4 ( getColour ( j + 3 ), particle[i].col ) ;
+    sgCopyVec4 ( getColour ( j + 0 ), particles[i].col ) ;
+    sgCopyVec4 ( getColour ( j + 1 ), particles[i].col ) ;
+    sgCopyVec4 ( getColour ( j + 2 ), particles[i].col ) ;
+    sgCopyVec4 ( getColour ( j + 3 ), particles[i].col ) ;
 
-    sgAddScaledVec3 ( getVertex ( j + 0 ), particle[i].pos,
-                                     nxny, particle[i].size ) ;
-    sgAddScaledVec3 ( getVertex ( j + 1 ), particle[i].pos,
-                                     xxny, particle[i].size ) ;
-    sgAddScaledVec3 ( getVertex ( j + 2 ), particle[i].pos,
-                                     xxyy, particle[i].size ) ;
-    sgAddScaledVec3 ( getVertex ( j + 3 ), particle[i].pos,
-                                     nxyy, particle[i].size ) ;
+    sgAddScaledVec3 ( getVertex ( j + 0 ), particles[i].pos,
+                                     nxny, particles[i].size ) ;
+    sgAddScaledVec3 ( getVertex ( j + 1 ), particles[i].pos,
+                                     xxny, particles[i].size ) ;
+    sgAddScaledVec3 ( getVertex ( j + 2 ), particles[i].pos,
+                                     xxyy, particles[i].size ) ;
+    sgAddScaledVec3 ( getVertex ( j + 3 ), particles[i].pos,
+                                     nxyy, particles[i].size ) ;
 
     j += 4 ;
   }
@@ -149,11 +152,10 @@ void ParticleSystem::draw_geometry ()
 
 ParticleSystem::~ParticleSystem ()
 {
-  for ( int i = 0 ; i < num_particles ; i++ )
-    if ( particle [ i ] . time_to_live >= 0.0 )
-      particle_delete ( i, & particle [ i ] ) ;
-
-  delete [] particle ;
+  // TODO we should call particle_delete here, but that's not possible, because
+  // the functions are virtual (illegal in destructor)
+  
+  delete[] particles ;
 }
 
 void ParticleSystem::update ( float t )
@@ -166,23 +168,23 @@ void ParticleSystem::update ( float t )
 
   /* Call the update routine for all the particles */
   for ( i = 0 ; i < num_particles ; i++ )
-    if ( particle [ i ] . time_to_live > 0.0f )
+    if ( particles [ i ] . time_to_live > 0.0f )
       {
-        particle [ i ] . update ( t ) ;
-        particle_update( t, i, & particle [ i ] ) ;
+        particles [ i ] . update ( t ) ;
+        particle_update( t, i, & particles [ i ] ) ;
       }
 
   /* Check for death of particles */
   for ( i = 0 ; i < num_particles ; i++ )
-    if ( particle [ i ] . time_to_live <= 0.0 )
+    if ( particles [ i ] . time_to_live <= 0.0 )
     {
-      particle_delete ( i, & particle [ i ] ) ;
+      particle_delete ( i, & particles [ i ] ) ;
 
-      particle [ i ] . pos [ 2 ] = -1000000.0f ;
+      particles [ i ] . pos [ 2 ] = -1000000.0f ;
 
       if ( create_error >= 1.0f )
       {
-	particle_create( i, & particle [ i ] ) ;
+	particle_create( i, & particles [ i ] ) ;
 	create_error -= 1.0f ;
       }
     }

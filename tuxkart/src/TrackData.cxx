@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.10 2004/08/24 19:33:10 matzebraun Exp $
+//  $Id: TrackData.cxx,v 1.11 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -51,12 +51,12 @@ TrackData::TrackData(const std::string& filename_)
   sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
   sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
 
-  const lisp::Lisp* lisp = 0;
+  const lisp::Lisp* root = 0;
   try {
     lisp::Parser parser;
-    lisp = parser.parse(loader->getPath(filename));
+    root = parser.parse(loader->getPath(filename));
 
-    lisp = lisp->getLisp("tuxkart-track");
+    const lisp::Lisp* lisp = root->getLisp("tuxkart-track");
     if(!lisp) {
         throw std::runtime_error("no tuxkart-track node");
     }
@@ -79,7 +79,7 @@ TrackData::TrackData(const std::string& filename_)
     std::cout << "Error while reading '" << filename
               << ": " << err.what() << "\n";
   }
-  delete lisp;
+  delete root;
 
   load_drv();
 }

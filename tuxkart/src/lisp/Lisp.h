@@ -1,4 +1,4 @@
-//  $Id: Lisp.h,v 1.3 2004/08/24 20:58:40 matzebraun Exp $
+//  $Id: Lisp.h,v 1.4 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Matthias Braun <matze@braunis.de>
@@ -157,6 +157,8 @@ public:
     }
     
     const Lisp* getLisp(const char* name) const;
+    const Lisp* getLisp(const std::string& name) const
+    { return getLisp(name.c_str()); }
 
     // for debugging
     void print(int indent = 0) const;

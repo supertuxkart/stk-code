@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.36 2004/09/05 18:14:48 oaf_thadres Exp $
+//  $Id: sdldrv.cxx,v 1.37 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -40,9 +40,7 @@ const unsigned int MOUSE_HIDE_TIME = 2000;
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
 
-
 static vector<SDL_Joystick*> joys;
-
 
 void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
@@ -51,19 +49,13 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
   if (fullscreen)
     videoFlags |= SDL_FULLSCREEN;
 
-  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1 )
-    {
-      cout << "SDL_Init() failed: " << SDL_GetError();
-      exit(1);
-    }
-  
   if ( ( sdl_screen = SDL_SetVideoMode( screenWidth, screenHeight, 0, videoFlags )) == 0 )
     {
       cout << "SDL_SetVideoMode() failed: " << SDL_GetError();
       exit(1);
     }
     
-	setupControls();
+  setupControls();
 }
 
 void setupControls()

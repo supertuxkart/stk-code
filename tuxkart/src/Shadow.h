@@ -1,4 +1,4 @@
-//  $Id: Shadow.h,v 1.2 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: Shadow.h,v 1.3 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,14 +23,8 @@
 #include <string>
 #include <plib/ssg.h>
 
-class Shadow
-{
-  ssgTransform *sh ;
- 
-public:
-  Shadow ( const std::string& name, float x1, float x2, float y1, float y2 ) ;
-  ssgTransform *getRoot () { return sh ; }
-};
+ssgTransform* createShadow(const std::string& name,
+    float x1, float x2, float y1, float y2 );
 
 #endif
 

@@ -1,4 +1,4 @@
-// $Id: Config.cxx,v 1.8 2004/09/05 18:14:47 oaf_thadres Exp $
+// $Id: Config.cxx,v 1.9 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -116,16 +116,15 @@ void Config::loadConfig()
 void Config::loadConfig(const std::string& filename)
 {
   std::string temp;
-  const lisp::Lisp *reader;
-  const lisp::Lisp* lisp = 0;
+  const lisp::Lisp* root = 0;
   int i;
 
   try
   {
     lisp::Parser parser;
-    lisp = parser.parse(filename);
+    root = parser.parse(filename);
 
-    lisp = lisp->getLisp("tuxkart-config");
+    const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
     if(!lisp)
       throw std::runtime_error("No tuxkart-config node");
 
@@ -148,11 +147,12 @@ void Config::loadConfig(const std::string& filename)
     {
       temp = "player-";
       temp += i+'1';
-      reader = lisp->getLisp(temp.c_str());
+      
+      const lisp::Lisp* reader = lisp->getLisp(temp);
       if(!reader) {
         temp = "No " + temp + " node";
         throw std::runtime_error(temp);
-        }
+      }
       reader->get("name",     player[i].name);
       reader->get("useJoy",   player[i].useJoy);
       reader->get("joystick", player[i].joystick);
@@ -179,7 +179,7 @@ void Config::loadConfig(const std::string& filename)
     std::cout << "Error while parsing config '" << filename
               << "': " << e.what() << "\n";
   }
-  delete lisp;
+  delete root;
 }
 
 

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.36 2004/08/28 12:45:34 straver Exp $
+//  $Id: Driver.cxx,v 1.37 2004/09/05 20:09:58 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,16 +40,20 @@ static inline void relaxation(float& target, float& prev, float rate)
   prev = (target);
 }
 
-Driver::Driver ()
+Driver::Driver (const KartProperties* kart_properties)
 {
+  // hack for now (const_cast should be removed later)
+  this->kart_properties = const_cast<KartProperties*> (kart_properties);
   firsttime = TRUE ;
   
   comp_model = new ssgBranch;
+  comp_model->ref();
   model = new ssgTransform ;
+  model->ref();
 
   comp_model->addKid(model);
 
-  shadow = NULL;
+  shadow = 0;
     
   /* New Physics */
   sgZeroVec3 (force);
@@ -59,11 +63,18 @@ Driver::Driver ()
   reset () ;
 }
 
+Driver::~Driver()
+{
+  ssgDeRefDelete(shadow);
+  ssgDeRefDelete(model);
+  ssgDeRefDelete(comp_model);
+}
+
 void
 Driver::reset ()
 {
-  lap = 0 ;
-  position = 9 ;
+  race_lap = 0 ;
+  race_position = 9 ;
   rescue = FALSE ;
   on_ground = true ;
   zipper_time_left = 0.0f ;
@@ -74,13 +85,13 @@ Driver::reset ()
   sgZeroVec3 ( velocity.xyz ) ;
   sgZeroVec3 ( velocity.hpr ) ;
   sgCopyCoord ( &last_pos, &reset_pos ) ;
-  sgCopyCoord ( &curr_pos, &reset_pos ) ;
+  sgCopyCoord ( &position, &reset_pos ) ;
   sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
 
   track_hint = World::current() ->track -> absSpatialToTrack ( last_track_coords,
                                                  last_pos.xyz ) ;
   track_hint = World::current() ->track -> absSpatialToTrack ( curr_track_coords,
-                                                 curr_pos.xyz ) ;
+                                                 position.xyz ) ;
 
 }
 
@@ -97,7 +108,7 @@ Driver::update (float delta)
 void
 Driver::updateVisiPos(float delta)
 {
-  sgCopyCoord ( &visi_pos, &curr_pos ) ;
+  sgCopyCoord ( &visi_pos, &position ) ;
 
   visi_pos.hpr[1] += wheelie_angle ;
 
@@ -146,11 +157,12 @@ Driver::placeModel ()
       sgMultMat4(res, res2, rot2);
 
       if (shadow)
-        shadow->getRoot() -> setTransform(res);
+        shadow -> setTransform(res);
     }
 }
 
-static inline float _lateralForce (KartProperties *properties, float cornering, float sideslip)
+static inline float _lateralForce (const KartProperties *properties,
+    float cornering, float sideslip)
 {
   return ( max(-properties->max_grip,
 	       min(properties->max_grip, cornering * sideslip))
@@ -194,9 +206,9 @@ Driver::physicsUpdate (float delta)
 	  }
 		
 	/*----- Lateral Forces -----*/
-	lateral_f[0] = _lateralForce(&kart_properties, kart_properties.corn_f,
+	lateral_f[0] = _lateralForce(kart_properties, kart_properties->corn_f,
 				     sideslip + wheel_rot_angle - steer_angle);
-	lateral_r[0] = _lateralForce(&kart_properties, kart_properties.corn_r,
+	lateral_r[0] = _lateralForce(kart_properties, kart_properties->corn_r,
 				     sideslip - wheel_rot_angle);
 
 	// calculate traction
@@ -204,10 +216,12 @@ Driver::physicsUpdate (float delta)
 	traction[1] = 10 * (throttle - brake*sgn(velocity.xyz[1]));
 	
 	// apply air friction and system friction
-	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * kart_properties.air_friction;
-	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * kart_properties.air_friction;
-	resistance[0] -= 10 * kart_properties.system_friction * velocity.xyz[0];
-	resistance[1] -= kart_properties.system_friction * velocity.xyz[1];
+	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) *
+          kart_properties->air_friction;
+	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) *
+          kart_properties->air_friction;
+	resistance[0] -= 10 * kart_properties->system_friction * velocity.xyz[0];
+	resistance[1] -= kart_properties->system_friction * velocity.xyz[1];
 	
 	// sum forces
 	force[0] += traction[0] + cos(steer_angle)*lateral_f[0] + lateral_r[1] + resistance[0];
@@ -216,11 +230,11 @@ Driver::physicsUpdate (float delta)
 	// torque - rotation force on kart body
 	torque = (lateral_f[0] * wheelbase/2) - (lateral_r[0] * wheelbase/2);
 	
-	kart_angular_acc = torque / kart_properties.inertia;
+	kart_angular_acc = torque / kart_properties->inertia;
 		
 	// velocity
 	for (count = 0; count < 3; count++)
-	  velocity.xyz[count] += (force[count] / kart_properties.mass) * delta;
+	  velocity.xyz[count] += (force[count] / kart_properties->mass) * delta;
 	
 	kart_angular_vel += kart_angular_acc * delta;
 	velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
@@ -236,7 +250,7 @@ Driver::coreUpdate (float delta)
 
   doZipperProcessing () ;
 
-  sgCopyCoord ( &last_pos        , &curr_pos         ) ;
+  sgCopyCoord ( &last_pos        , &position         ) ;
   sgCopyVec2  ( last_track_coords, curr_track_coords ) ;
 
   /* Scale velocities to current time step. */
@@ -249,9 +263,9 @@ Driver::coreUpdate (float delta)
 
   /* Form new matrix */
   sgMakeCoordMat4 ( mdelta, & scaled_velocity ) ;
-  sgMakeCoordMat4 ( mat  , & curr_pos        ) ;
+  sgMakeCoordMat4 ( mat  , & position        ) ;
   sgMultMat4      ( result, mat, mdelta ) ;
-  sgVec3 start ; sgCopyVec3 ( start, curr_pos.xyz ) ;
+  sgVec3 start ; sgCopyVec3 ( start, position.xyz ) ;
   sgVec3 end   ; sgCopyVec3 ( end  , result[3]    ) ;
 
   float hot = collectIsectData ( start, end ) ;
@@ -259,15 +273,15 @@ Driver::coreUpdate (float delta)
   
   sgCopyVec3 ( result[3], end ) ;
 
-  sgSetCoord ( &curr_pos, result  ) ;
-  float hat = curr_pos.xyz[2]-hot ;
+  sgSetCoord ( &position, result  ) ;
+  float hat = position.xyz[2]-hot ;
    
   on_ground = ( hat <= 0.01 ) ;
 
   doCollisionAnalysis ( delta, hot ) ;
 
   track_hint = World::current() ->track -> spatialToTrack ( curr_track_coords,
-                                                            curr_pos.xyz,
+                                                            position.xyz,
                                                             track_hint ) ;
 
   firsttime = FALSE ;
@@ -458,7 +472,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
       }
       
       // toying with diffrent frictions for materials
-      kart_properties.system_friction = getMaterial ( h->leaf ) -> getFriction ();
+      kart_properties->system_friction = getMaterial ( h->leaf ) -> getFriction ();
       
     }
   }

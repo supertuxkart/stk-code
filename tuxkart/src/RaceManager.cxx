@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.8 2004/08/25 20:36:18 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.9 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -73,7 +73,7 @@ GrandPrixMode::start_race(int n)
         }
     }
 
-  ScreenManager::current()->set_screen(new WorldScreen(raceSetup)); 
+  screenManager->setScreen(new WorldScreen(raceSetup)); 
 }
 
 void
@@ -95,7 +95,7 @@ GrandPrixMode::next()
   else
     {
       // FIXME: Insert credits/extro stuff here
-      ScreenManager::current()->set_screen(new StartScreen()); 
+      screenManager->setScreen(new StartScreen()); 
     }
 }
 
@@ -123,13 +123,13 @@ QuickRaceMode::start()
   
   kart_manager.fillWithRandomKarts(raceSetup.karts);
   
-  ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
+  screenManager->setScreen(new WorldScreen(raceSetup));
 }
 
 void
 QuickRaceMode::next()
 {
-  ScreenManager::current()->set_screen(new StartScreen());
+  screenManager->setScreen(new StartScreen());
 }
 
 TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_)
@@ -145,13 +145,13 @@ TimeTrialMode::start()
   raceSetup.karts.push_back(kart);
   raceSetup.players.push_back(0);
 
-  ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
+  screenManager->setScreen(new WorldScreen(raceSetup));
 }
 
 void
 TimeTrialMode::next()
 {
-  ScreenManager::current()->set_screen(new StartScreen());
+  screenManager->setScreen(new StartScreen());
 }
 
 RaceManager::RaceManager()

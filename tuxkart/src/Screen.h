@@ -1,4 +1,4 @@
-//  $Id: Screen.h,v 1.2 2004/08/20 22:29:23 jamesgregory Exp $
+//  $Id: Screen.h,v 1.3 2004/09/05 20:09:59 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -23,8 +23,9 @@
 class Screen
 {
 public:
-	virtual ~Screen() {}
-  virtual void update() =0;
+  virtual ~Screen()
+  {}
+  virtual void update() = 0;
 };
 
 #endif
