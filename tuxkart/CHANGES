@@ -2,6 +2,17 @@
 TuxKart Change Log.
 ===================
 
+TuxKart v0.4.0 (Sept 3rd 2002)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Changes for compatibility with PLIB 1.8.0 and later.
+  * Removed some features that were only there to support
+    truly ancient graphics cards like 3Dfx Voodoo-1/2.
+
+TuxKart v0.3.0 (??)
+~~~~~~~~~~~~~~~~~~~
+  * Converted to use the new PLIB/PW library and thus
+    avoid the need to link to GLUT.
+
 TuxKart v0.2.0 (Sept 3rd 2002)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Changes for compatibility with PLIB 1.6.0 and later.
