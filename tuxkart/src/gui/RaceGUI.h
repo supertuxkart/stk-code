@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.13 2004/09/04 11:17:49 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.14 2004/09/05 19:05:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -82,6 +82,8 @@ private:
 
 	void drawDropShadowText ( char *str, int sz, int x, int y );
 	void drawInverseDropShadowText ( char *str, int sz, int x, int y );
+	
+	void cacheFont(int sz);
 
 
 	char *pos_string [10];
