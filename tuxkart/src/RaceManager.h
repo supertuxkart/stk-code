@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.1 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: RaceManager.h,v 1.2 2004/08/23 21:05:48 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,8 @@ public:
   static RaceManager* instance() { return instance_ ? instance_ : (instance_ = new RaceManager()); }
 
   RaceManager();
+
+  void next_race();
   
 };
 
