@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.16 2004/08/10 21:57:25 straver Exp $
+//  $Id: KartDriver.cxx,v 1.17 2004/08/10 22:23:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,7 +26,7 @@
 #include "KartDriver.h"
 #include "Projectile.h"
 
-static void create_smoke (ParticleSystem */*s*/, int, ssgaParticle *p)
+static void create_smoke(ssgaParticleSystem* system, int, ssgaParticle *p)
 {
   sgSetVec4 ( p -> col, 1, 1, 1, 1 ) ;  /* initially white */
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;     /* start off on the ground */
@@ -34,32 +34,35 @@ static void create_smoke (ParticleSystem */*s*/, int, ssgaParticle *p)
   sgSetVec3 ( p -> acc, 0, 0, 0.3f ) ; /* Gravity */
   p -> time_to_live = 1 ;               /* Droplets evaporate after 5 seconds */
   
-  /* SEGFAULT CODE
-  if (s->userdata != NULL) {
-  	KartDriver *drv;
-  	drv = (KartDriver*)(s->userdata);
-  	printf ("cre: %i\n", drv->getNumHerring());
-  }
-  */
+  KartParticleSystem* ksystem = dynamic_cast<KartParticleSystem*>(system);
+  if (ksystem)
+    {
+      KartDriver* kart = ksystem->kart;
+      sgCoord* pos = kart->getCoord();
+      (void)pos;
+      //std::cout << "KartDriver: " << pos->xyz[0] << ", " << pos->xyz[1] << std::endl;
+    }
 }
 
+#if 0
 static void update_smoke (float , ssgaParticleSystem *, int, ssgaParticle *)
 {
   /* some funny stuff - add options to turn it off*/
 }
+#endif
 
-ParticleSystem::ParticleSystem ( int num, int initial_num,
-                                 float _create_rate, int _ttf,
-                                 float sz, float bsphere_size,
-                                 ParticleCreateFunc _particle_create,
-                                 ssgaParticleUpdateFunc _particle_update,
-                                 ssgaParticleDeleteFunc _particle_delete ) : 
-				 
-				 ssgaParticleSystem (num, initial_num, _create_rate, _ttf,
-				 		     sz, bsphere_size, (ssgaParticleCreateFunc)_particle_create,
-						     _particle_update, _particle_delete)
+KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
+                                       int num, int initial_num,
+                                       float _create_rate, int _ttf,
+                                       float sz, float bsphere_size,
+                                       ssgaParticleCreateFunc _particle_create,
+                                       ssgaParticleUpdateFunc _particle_update,
+                                       ssgaParticleDeleteFunc _particle_delete)
+  : ssgaParticleSystem (num, initial_num, _create_rate, _ttf,
+                        sz, bsphere_size, _particle_create,
+                        _particle_update, _particle_delete),
+    kart(kart_)
 {
-	userdata = NULL;
 }
 
 void KartDriver::useAttachment ()
@@ -375,7 +378,7 @@ void KartDriver::update ()
   }
   
   if (smoke_system != NULL)
-  	smoke_system->update (delta_t);
+    smoke_system->update (delta_t);
 
   Driver::update () ;
 }
@@ -564,8 +567,7 @@ KartDriver::load_data()
   
   // Attach Particle System
   sgCoord pipe_pos = {0, -1, 0.2, 0, 0, 0} ;
-  smoke_system = new ParticleSystem (20, 5, 5.0f, TRUE, 0.5f, 50, create_smoke) ;
-  smoke_system -> userdata = this;
+  smoke_system = new KartParticleSystem(this, 20, 5, 5.0f, TRUE, 0.5f, 50, create_smoke) ;
   smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
   exhaust_pipe -> addKid (smoke_system) ;

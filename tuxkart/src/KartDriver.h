@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.3 2004/08/10 21:57:25 straver Exp $
+//  $Id: KartDriver.h,v 1.4 2004/08/10 22:23:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,22 +29,17 @@
 
 class ParticleSystem ;
 
-typedef void (* ParticleCreateFunc) ( ParticleSystem *ps,
-                                      int index,
-                                      ssgaParticle *p ) ;
-
-class ParticleSystem : public ssgaParticleSystem
+class KartParticleSystem : public ssgaParticleSystem
 {
-	public:
-	ParticleSystem ( int num, int initial_num,
-                         float _create_rate, int _turn_to_face,
-                         float sz, float bsphere_size,
-                         ParticleCreateFunc _particle_create,
-                         ssgaParticleUpdateFunc _particle_update = NULL,
-                         ssgaParticleDeleteFunc _particle_delete = NULL );
-	//virtual ~ParticleSystem ();
-	
-	void *userdata;
+public:
+  KartParticleSystem ( KartDriver* kart, int num, int initial_num,
+                       float _create_rate, int _turn_to_face,
+                       float sz, float bsphere_size,
+                       ssgaParticleCreateFunc _particle_create,
+                       ssgaParticleUpdateFunc _particle_update = NULL,
+                       ssgaParticleDeleteFunc _particle_delete = NULL );
+
+  KartDriver* kart;
 };
 
 class KartDriver : public Driver
@@ -59,7 +54,7 @@ protected:
   ssgSelector *attachment ;
   
   ssgSimpleState     *smokepuff ;
-  ParticleSystem     *smoke_system ;
+  KartParticleSystem *smoke_system ;
   ssgTransform       *exhaust_pipe ;
 
   float wheel_position;
