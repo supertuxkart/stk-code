@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.33 2004/08/14 20:59:27 straver Exp $
+//  $Id: KartDriver.cxx,v 1.34 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,6 +28,7 @@
 #include "PlayerDriver.h"
 #include "SkidMark.h"
 #include "World.h"
+#include "Track.h"
 #include "material.h"
 
 KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
@@ -87,7 +88,43 @@ KartParticleSystem::particle_update (float delta, int, Particle * particle)
   particle->col[3]  -= delta * 2.0f;
 }
 
-void KartDriver::useAttachment ()
+KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
+{
+  kart_properties      = kart_properties_;
+  grid_position        = position_ ;
+  num_collectables     = 0 ;
+  num_herring_gobbled  = 0 ;
+  collectable          = COLLECT_NOTHING ;
+  attachment           = NULL ;
+  attachment_time_left = 0.0f ;
+  attachment_type      = ATTACH_NOTHING ;
+  smokepuff	       = NULL;
+  smoke_system	       = NULL;
+  exhaust_pipe         = NULL;
+  skidmark_left        = NULL;
+  skidmark_right       = NULL;
+
+  driver               = driver_;
+  if (driver)
+    driver->setKart(this);
+
+  wheel_position = 0;
+
+  wheel_front_l = NULL;
+  wheel_front_r = NULL;
+  wheel_rear_l  = NULL;
+  wheel_rear_r  = NULL;
+
+  std::cout << "KartDriver: " << this << std::endl;
+}
+
+KartDriver::~KartDriver()
+{
+  delete driver;
+}
+
+void
+KartDriver::useAttachment ()
 {
   switch ( collectable )
   {
@@ -122,11 +159,6 @@ void KartDriver::useAttachment ()
     collectable = COLLECT_NOTHING ;
     num_collectables = 0 ;
   }                                                                           
-}
-
-KartDriver::~KartDriver()
-{
-  delete driver;
 }
 
 void KartDriver::doLapCounting ()
@@ -186,7 +218,7 @@ void KartDriver::doObjectInteractions ()
     if ( sgDistanceSquaredVec2 ( hpos, getCoord()->xyz ) < 0.8f )
     {
       herring [ i ] . eaten = TRUE ;
-      herring [ i ] . time_to_return = World::current()->fclock->getAbsTime() + 2.0f  ;
+      herring [ i ] . time_to_return = World::current()->clock + 2.0f  ;
 
       if ( this == World::current()->kart[0] )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
@@ -243,11 +275,11 @@ void KartDriver::doObjectInteractions ()
 
 
 
-void KartDriver::doZipperProcessing ()
+void KartDriver::doZipperProcessing ( float delta)
 {
-  if ( zipper_time_left > delta_t )
+  if ( zipper_time_left > delta )
   {
-    zipper_time_left -= delta_t ;  
+    zipper_time_left -= delta ;  
 
     if ( velocity.xyz[1] < ZIPPER_VELOCITY )
       velocity.xyz[1] = ZIPPER_VELOCITY ;
@@ -270,15 +302,15 @@ void KartDriver::forceCrash ()
 }
 
 
-void KartDriver::doCollisionAnalysis ( float hot )
+void KartDriver::doCollisionAnalysis ( float delta, float hot )
 {
   if ( collided )
   {
     if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY )
-      velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta_t ;
+      velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
     else
     if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
-      velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta_t ;
+      velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
   }
 
   if ( crashed && velocity.xyz[1] > MIN_CRASH_VELOCITY )
@@ -288,7 +320,7 @@ void KartDriver::doCollisionAnalysis ( float hot )
   else
   if ( wheelie_angle < 0.0f )
   {
-    wheelie_angle += PITCH_RESTORE_RATE * delta_t ;
+    wheelie_angle += PITCH_RESTORE_RATE * delta ;
 
     if ( wheelie_angle >= 0.0f )
       wheelie_angle = 0.0f ;
@@ -303,7 +335,7 @@ void KartDriver::doCollisionAnalysis ( float hot )
   }
 }
 
-void KartDriver::update ()
+void KartDriver::update (float delta)
 {
   sgCoord temp;
   sgCopyCoord(&temp, &curr_pos);
@@ -319,7 +351,7 @@ void KartDriver::update ()
     attach ( ATTACH_TINYTUX, 4.0f ) ;
   }
 
-  attachment_time_left -= World::current()->fclock->getDeltaTime () ;
+  attachment_time_left -= World::current()->clock ;
 
   if ( attachment_time_left <= 0.0f && attachment != NULL )
   {
@@ -330,7 +362,7 @@ void KartDriver::update ()
 
       float d = curr_pos.xyz[2] ;
 
-      curr_track -> trackToSpatial ( curr_pos.xyz, track_hint ) ;
+      World::current() ->track -> trackToSpatial ( curr_pos.xyz, track_hint ) ;
 
       curr_pos.xyz[2] = d ;
     }
@@ -343,7 +375,7 @@ void KartDriver::update ()
   {
     sgZeroVec3 ( velocity.xyz ) ;
     sgZeroVec3 ( velocity.hpr ) ;
-    velocity.xyz[2] = 1.1 * GRAVITY * delta_t ;
+    velocity.xyz[2] = 1.1 * GRAVITY * delta ;
   }
   else
   if ( getAttachment () == ATTACH_PARACHUTE &&
@@ -411,9 +443,10 @@ void KartDriver::update ()
   }
   
   if (smoke_system != NULL)
-    smoke_system->update (delta_t);
+    smoke_system->update (delta);
 
-  Driver::update () ;
+  Driver::update (delta) ;
+  processInput(delta);
 
   if (skidmark_left && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
@@ -465,33 +498,77 @@ void KartDriver::update ()
     }
 }
 
-
-KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
+void
+KartDriver::processInput(float delta)
 {
-  kart_properties      = kart_properties_;
-  grid_position        = position_ ;
-  num_collectables     = 0 ;
-  num_herring_gobbled  = 0 ;
-  collectable          = COLLECT_NOTHING ;
-  attachment           = NULL ;
-  attachment_time_left = 0.0f ;
-  attachment_type      = ATTACH_NOTHING ;
-  smokepuff	       = NULL;
-  smoke_system	       = NULL;
-  exhaust_pipe         = NULL;
-  skidmark_left        = NULL;
-  skidmark_right       = NULL;
+  if ( controlls.fire ) 
+    {
+      if ( getCollectable() == COLLECT_NOTHING )
+        sound -> playSfx ( SOUND_BEEP ) ;
 
-  driver               = driver_;
-  if (driver)
-    driver->setKart(this);
+      useAttachment () ;
+    }
 
-  wheel_position = 0;
+  if ( is_on_ground() )
+    {
+      if ( ( controlls.wheelie ) &&
+           getVelocity()->xyz[1] >= MIN_WHEELIE_VELOCITY ) 
+        {
+          if ( wheelie_angle < WHEELIE_PITCH )
+            wheelie_angle += WHEELIE_PITCH_RATE * delta ;
+          else
+            wheelie_angle = WHEELIE_PITCH ;
+        }
+      else
+        if ( wheelie_angle > 0.0f )
+          {
+            wheelie_angle -= PITCH_RESTORE_RATE ;
 
-  wheel_front_l = NULL;
-  wheel_front_r = NULL;
-  wheel_rear_l  = NULL;
-  wheel_rear_r  = NULL;
+            if ( wheelie_angle <= 0.0f )
+              wheelie_angle = 0.0f ;
+          }
+ 
+      if ( controlls.jump )
+        getVelocity()->xyz[2] += JUMP_IMPULSE ;
+
+      if ( controlls.rescue )
+        {
+          sound -> playSfx ( SOUND_BEEP ) ;
+          rescue = TRUE ;
+        }
+    
+      if ( controlls.accel ) {
+        throttle = kart_properties.max_throttle;
+      } else if (throttle > 0) {
+        throttle -= kart_properties.max_throttle * delta;
+      } else
+        throttle = 0.0f;
+
+      if ( controlls.brake ) {  
+        if (getVelocity()->xyz[1] > 0) {
+          brake = kart_properties.max_throttle;
+          throttle = 0.0f;
+        } else {
+          brake = 0.0f;
+          throttle = -kart_properties.max_throttle/2;
+        }
+      } else {
+        brake = 0.0f;
+      }
+      
+      if ( wheelie_angle <= 0.0f ) {      
+        steer_angle = -kart_properties.turn_speed * controlls.lr;
+      
+        if ( steer_angle > kart_properties.max_wheel_turn)
+          steer_angle = kart_properties.max_wheel_turn;
+        if ( steer_angle < -kart_properties.max_wheel_turn)
+          steer_angle = -kart_properties.max_wheel_turn;	
+      }
+      else
+        getVelocity()->hpr[0] = 0.0f ;
+    } 
+
+  force[2] = -GRAVITY * kart_properties.mass;
 }
 
 void print_model(ssgEntity* entity, int indent)

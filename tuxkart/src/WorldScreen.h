@@ -1,4 +1,4 @@
-//  $Id: joystick.h,v 1.5 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: WorldScreen.h,v 1.1 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,22 +17,29 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_JOYSTICK_H
-#define HEADER_JOYSTICK_H
+#ifndef HEADER_WORLDSCREEN_H
+#define HEADER_WORLDSCREEN_H
 
-struct JoyInfo
+#include "Screen.h"
+
+class ulClock;
+class World;
+class RaceSetup;
+
+class WorldScreen : public Screen
 {
-  float lr;
-  bool accel;
-  bool brake;
-  bool wheelie;
-  bool jump;
-  bool rescue;
-  bool fire;
+private:
+  World* world;
+  
+  /** Delta time that didn't get used in the last run */
+  float overtime;
 
-  JoyInfo() 
-    : lr(0.0f), accel(false), brake(false), wheelie(false), jump(false), rescue(false), fire(false)
-  {}
+  ulClock     *fclock ;
+public:
+  WorldScreen(const RaceSetup& racesetup);
+  virtual ~WorldScreen();
+
+  void update();
 };
 
 #endif

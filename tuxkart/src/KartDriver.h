@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.9 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: KartDriver.h,v 1.10 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,7 @@
 
 #include <plib/ssg.h>
 #include "Driver.h"
+#include "joystick.h"
 #include "ParticleSystem.h"
 
 class Controller;  
@@ -49,6 +50,9 @@ public:
   int grid_position ;
 
   int collectable ;
+
+  /** The position of the karts controlls */
+  JoyInfo controlls;
 private:
   float attachment_time_left ;
   int   attachment_type ;
@@ -114,9 +118,10 @@ public:
   virtual void forceCrash           () ;
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float hot ) ;
-  virtual void update               () ;
+  virtual void doZipperProcessing   ( float delta ) ;
+  virtual void doCollisionAnalysis  ( float delta, float hot ) ;
+  virtual void update               ( float delta ) ;
+  virtual void processInput         ( float delta ) ; 
 } ;
 
 class TrafficDriver : public KartDriver
@@ -132,7 +137,7 @@ public:
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
   virtual void doZipperProcessing   () ;
-  virtual void update () ;
+  virtual void update (float delta) ;
 } ;
 
 #endif

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.60 2004/08/15 13:16:17 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.61 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,7 +30,7 @@
 #include "sound.h"
 #include "RaceSetup.h"
 #include "Loader.h"
-#include "World.h"
+#include "WorldScreen.h"
 #include "StartScreen.h"
 
 Characters characters;
@@ -284,7 +284,7 @@ int main ( int argc, char *argv[] )
 
   if ( noStartScreen )
     {
-      screen_manager.set_screen(new World(raceSetup));
+      screen_manager.set_screen(new WorldScreen(raceSetup));
     }
   else
     {

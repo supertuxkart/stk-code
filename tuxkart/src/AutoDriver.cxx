@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.5 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: AutoDriver.cxx,v 1.6 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 
-void AutoDriver::update ()
+void AutoDriver::update (float delta)
 {
   assert(kart);
 
@@ -41,44 +41,46 @@ void AutoDriver::update ()
   else
     kart->velocity.hpr[0] = sgnsq(kart->curr_track_coords[0])*12.0f ;
 
-  /* Slow down if we get too far ahead of the player... */
+  if (0) // use handicap
+    {
+      /* Slow down if we get too far ahead of the player... */
+      if ( kart->position < World::current()->kart[0]->getPosition () &&
+           kart->velocity.xyz[1] > MIN_HANDICAP_VELOCITY )
+        kart->velocity.xyz[1] -= MAX_BRAKING * delta * 0.1f ;
+      else
+        /* Speed up if we get too far behind the player... */
+        if ( kart->position > World::current()->kart[0]->getPosition () &&
+             kart->velocity.xyz[1] < MAX_HANDICAP_VELOCITY )
+          kart->velocity.xyz[1] += MAX_ACCELLERATION * delta * 1.1f ;
+        else
+          kart->velocity.xyz[1] += MAX_ACCELLERATION * delta ;
+    }
 
-  if ( kart->position < World::current()->kart[0]->getPosition () &&
-       kart->velocity.xyz[1] > MIN_HANDICAP_VELOCITY )
-    kart->velocity.xyz[1] -= MAX_BRAKING * kart->delta_t * 0.1f ;
-  else
-  /* Speed up if we get too far behind the player... */
-  if ( kart->position > World::current()->kart[0]->getPosition () &&
-       kart->velocity.xyz[1] < MAX_HANDICAP_VELOCITY )
-    kart->velocity.xyz[1] += MAX_ACCELLERATION * kart->delta_t * 1.1f ;
-  else
-    kart->velocity.xyz[1] += MAX_ACCELLERATION * kart->delta_t ;
-
-  kart->velocity.xyz[2] -= GRAVITY * kart->delta_t ;
+  kart->velocity.xyz[2] -= GRAVITY * delta ;
 
   if ( kart->wheelie_angle > 0.0f )
-  {
-    kart->wheelie_angle -= PITCH_RESTORE_RATE ;
+    {
+      kart->wheelie_angle -= PITCH_RESTORE_RATE ;
  
-    if ( kart->wheelie_angle <= 0.0f )
-      kart->wheelie_angle = 0.0f ;
-  }
+      if ( kart->wheelie_angle <= 0.0f )
+        kart->wheelie_angle = 0.0f ;
+    }
 
   if ( kart->collectable != COLLECT_NOTHING )
-  {
-    time_since_last_shoot += kart->delta_t ;
-
-    if ( time_since_last_shoot > 10.0f )
     {
-      kart->useAttachment () ;
-      time_since_last_shoot = 0.0f ;
+      time_since_last_shoot += delta ;
+
+      if ( time_since_last_shoot > 10.0f )
+        {
+          kart->useAttachment () ;
+          time_since_last_shoot = 0.0f ;
+        }
     }
-  }
 }
 
-
-void NetworkDriver::update ()
+void NetworkDriver::update (float delta)
 {
+  (void)delta;
 }
 
 

@@ -57,6 +57,8 @@ tuxkart_SOURCES = \
   level.h  \
   material.cxx  \
   material.h  \
+  plibwrap.h \
+  plibwrap.cxx \
   preprocessor.cxx  \
   preprocessor.h  \
   sound.cxx  \
@@ -79,6 +81,8 @@ tuxkart_SOURCES = \
   lispreader.h \
   World.h \
   World.cxx \
+  WorldScreen.h \
+  WorldScreen.cxx \
   ParticleSystem.h \
   ParticleSystem.cxx \
   gui/RaceGUI.cxx \

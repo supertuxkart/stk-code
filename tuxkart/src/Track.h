@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.9 2004/08/14 23:25:19 grumbel Exp $
+//  $Id: Track.h,v 1.10 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 #include <vector>
 #include "plibwrap.h"
 
-#define TRACKVIEW_SIZE 100.0f
+#define TRACKVIEW_SIZE 150.0f
 
 class Track
 {
@@ -40,22 +40,13 @@ private:
 public:
   Track ( const char *drv_fname, int mirror, int reverse ) ;
 
-  void glVtx ( sgVec2 v, float xoff, float yoff )
-  {
-    glVertex2f ( xoff + ( v[0] - center[0] ) * scale,
-                 yoff + ( v[1] - center[1] ) * scale ) ;
-  }
-
   int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
   int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
   void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
 
   float getTrackLength () { return total_distance ; }
   void draw2Dview ( float x, float y ) ;
-} ;
-
-
-extern Track *curr_track ;
+};
 
 #endif
 

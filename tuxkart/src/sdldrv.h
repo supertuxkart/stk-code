@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.10 2004/08/10 16:45:42 jamesgregory Exp $
+//  $Id: sdldrv.h,v 1.11 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -25,6 +25,9 @@
 #include <vector>
 
 class RaceSetup;
+
+const int JOY_MAX = 32767;
+const int JOY_MID = 16383;
 
 enum KartControl {KC_LEFT, KC_RIGHT, KC_UP, KC_DOWN, KC_WHEELIE, KC_JUMP, KC_RESCUE, KC_FIRE};
 

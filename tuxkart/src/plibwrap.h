@@ -1,4 +1,4 @@
-//  $Id: plibwrap.h,v 1.1 2004/08/14 23:25:19 grumbel Exp $
+//  $Id: plibwrap.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -20,11 +20,13 @@
 #ifndef HEADER_PLIBWRAP_H
 #define HEADER_PLIBWRAP_H
 
-// Collection of little wrapper classes to make plib a bit more STL friendly
+#include <plib/sg.h>
 
 struct sgVec3Wrap
 {
   sgVec3 vec;
+
+  inline sgVec3Wrap() {}
 
   inline sgVec3Wrap(const sgVec3& vec_)
   {

@@ -1,4 +1,4 @@
-//  $Id: WorldLoader.cxx,v 1.4 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: WorldLoader.cxx,v 1.5 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -135,7 +135,7 @@ void autodcsHook ( ssgBranch *br, void *param )
   sgCopyCoord ( & now, & ( p -> init  ) ) ;
   sgCopyCoord ( & add, & ( p -> delta ) ) ;
  
-  float timer = World::current()->fclock -> getAbsTime () + p -> phase ;
+  float timer = World::current()->clock + p -> phase ;
  
   if ( p->cycle != 0.0 && p->mode != MODE_FORWARD )
   {

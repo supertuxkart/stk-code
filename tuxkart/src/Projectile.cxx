@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.6 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: Projectile.cxx,v 1.7 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,7 +24,7 @@
 #include "Explosion.h"
 #include "World.h"
 
-void Projectile::update ()
+void Projectile::update (float delta)
 {
   wheelie_angle = 0 ;
   zipper_time_left = 0.0f ;
@@ -37,7 +37,7 @@ void Projectile::update ()
   else
     velocity.xyz[1] = MAX_PROJECTILE_VELOCITY / 5.0f ;
 
-  Driver::update () ;
+  Driver::update (delta) ;
   wheelie_angle = 0 ;
   zipper_time_left = 0.0f ;
 }
@@ -82,8 +82,8 @@ void Projectile::doObjectInteractions ()
 
     sgSubVec3 ( delta, k->xyz, curr_pos.xyz ) ;
 
-delta[2] = 0.0f ;
-
+    delta[2] = 0.0f ;
+ 
     sgHPRfromVec3 ( hpr, delta ) ;
 
     sgSubVec3 ( hpr, curr_pos.hpr ) ;
@@ -122,7 +122,7 @@ delta[2] = 0.0f ;
 void Projectile::doLapCounting        () {}
 void Projectile::doZipperProcessing   () {}
 
-void Projectile::doCollisionAnalysis  ( float /* hot */ )
+void Projectile::doCollisionAnalysis  ( float /* delta*/,  float /* hot */ )
 {
   if ( collided || crashed )
   {

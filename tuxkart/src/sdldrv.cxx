@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.29 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.30 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -195,28 +195,28 @@ void kartInput(RaceSetup& raceSetup)
 		if ( cc.useJoy )
 		{			
 			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / JOY_MAX;
-			ji.accel = SDL_JoystickGetButton (joys[i], 0);
-			ji.brake = SDL_JoystickGetButton (joys[i], 1);
+			ji.accel   = SDL_JoystickGetButton (joys[i], 0);
+			ji.brake   = SDL_JoystickGetButton (joys[i], 1);
 			ji.wheelie = SDL_JoystickGetButton (joys[i], 2);
-			ji.jump = SDL_JoystickGetButton (joys[i], 3);
-			ji.rescue = SDL_JoystickGetButton (joys[i], 4);
-			ji.fire = SDL_JoystickGetButton (joys[i], 5);
+			ji.jump    = SDL_JoystickGetButton (joys[i], 3);
+			ji.rescue  = SDL_JoystickGetButton (joys[i], 4);
+			ji.fire    = SDL_JoystickGetButton (joys[i], 5);
 		}
 		
-		if ( keyState [ cc.keys[KC_LEFT] ] ) ji.lr = -1.0f ;
+		if ( keyState [ cc.keys[KC_LEFT] ] )  ji.lr = -1.0f ;
 		if ( keyState [ cc.keys[KC_RIGHT] ] ) ji.lr =  1.0f ;
-		if ( keyState [ cc.keys[KC_UP] ] ) ji.accel = true ;
+		if ( keyState [ cc.keys[KC_UP] ] )    ji.accel = true ;
 		if ( keyState [ cc.keys[KC_DOWN] ] )  ji.brake = true ;
 		
 		if ( keyState [ cc.keys[KC_WHEELIE] ] ) ji.wheelie = true ;
-		if ( keyState [ cc.keys[KC_JUMP] ] ) ji.jump = true ;
-		if ( keyState [ cc.keys[KC_RESCUE] ] ) ji.rescue = true ;	
-		if ( keyState [ cc.keys[KC_FIRE] ] ) ji.fire = true ;
+		if ( keyState [ cc.keys[KC_JUMP] ] )    ji.jump = true ;
+		if ( keyState [ cc.keys[KC_RESCUE] ] )  ji.rescue = true ;	
+		if ( keyState [ cc.keys[KC_FIRE] ] )    ji.fire = true ;
 	
 		PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ i ]->getDriver());
                 if (driver)
                   driver -> incomingJoystick ( ji ) ;
-	}     
+	}
 }
 
 void swapBuffers()

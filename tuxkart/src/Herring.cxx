@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.11 2004/08/13 13:58:31 grumbel Exp $
+//  $Id: Herring.cxx,v 1.12 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -97,7 +97,7 @@ void HerringInstance::update ()
 {
   if ( ! eaten || her == NULL ) return ;
 
-  float t = time_to_return - World::current()->fclock->getAbsTime () ;
+  float t = time_to_return - World::current()->clock;
 
   if ( t > 0 )
   {

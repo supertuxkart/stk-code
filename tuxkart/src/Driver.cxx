@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.23 2004/08/14 20:08:07 straver Exp $
+//  $Id: Driver.cxx,v 1.24 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,6 +26,7 @@
 #include "Driver.h"
 #include "KartDriver.h"
 #include "KartProperties.h"
+#include "Track.h"
 #include "World.h"
 
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
@@ -40,8 +41,6 @@ static inline void relaxation(float& target, float& prev, float rate)
 
 Driver::Driver ()
 {
-  delta_t = 0.01 ;
-
   firsttime = TRUE ;
   
   comp_model = new ssgBranch;
@@ -81,35 +80,18 @@ Driver::reset ()
   for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
     sgCopyCoord ( &(history[i]), &reset_pos ) ;
 
-  track_hint = curr_track -> absSpatialToTrack ( last_track_coords,
+  track_hint = World::current() ->track -> absSpatialToTrack ( last_track_coords,
                                                  last_pos.xyz ) ;
-  track_hint = curr_track -> absSpatialToTrack ( curr_track_coords,
+  track_hint = World::current() ->track -> absSpatialToTrack ( curr_track_coords,
                                                  curr_pos.xyz ) ;
 
-  update () ;
+  //FIXME:update () ;
 }
 
-void Driver::update ()
+void Driver::update (float delta)
 {
-  float dt = World::current()->fclock->getDeltaTime () ;
-  
-  //if (dt > 0.05f)
-  //	physicsUpdate ();
-
-  while ( dt > 0.05f )
-  {
-    delta_t = 0.05f ;
-    physicsUpdate ();
-    coreUpdate () ;
-    dt -= 0.05f ;
-  }
-
-  if ( dt > 0.0f )
-  {
-    delta_t = dt ;
-    physicsUpdate ();
-    coreUpdate () ;
-  }
+  physicsUpdate (delta);
+  coreUpdate (delta) ;
 
   doObjectInteractions () ;
 }
@@ -161,7 +143,7 @@ void Driver::placeModel ()
     }
 }
 
-void Driver::physicsUpdate ()
+void Driver::physicsUpdate (float delta)
 {
 	sgVec2 resistance;
 	sgVec2 traction;
@@ -239,18 +221,18 @@ void Driver::physicsUpdate ()
 	kart_angular_acc = torque / kart_properties.inertia;
 		
 	// velocity
-	velocity.xyz[0] += acceleration[0] * delta_t;
-	velocity.xyz[1] += acceleration[1] * delta_t;
-	velocity.xyz[2] += acceleration[2] * delta_t;
+	velocity.xyz[0] += acceleration[0] * delta;
+	velocity.xyz[1] += acceleration[1] * delta;
+	velocity.xyz[2] += acceleration[2] * delta;
 	
-	kart_angular_vel = kart_angular_acc * delta_t;
+	kart_angular_vel = kart_angular_acc * delta;
 	velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
 	
 	// clear forces
 	sgZeroVec3 (force);
 }
 
-void Driver::coreUpdate ()
+void Driver::coreUpdate (float delta)
 {
   sgCoord scaled_velocity ;
 
@@ -269,18 +251,18 @@ void Driver::coreUpdate ()
 
   /* Scale velocities to current time step. */
 
-  sgScaleVec3 ( scaled_velocity.xyz, velocity.xyz, delta_t ) ;
-  sgScaleVec3 ( scaled_velocity.hpr, velocity.hpr, delta_t ) ;
+  sgScaleVec3 ( scaled_velocity.xyz, velocity.xyz, delta ) ;
+  sgScaleVec3 ( scaled_velocity.hpr, velocity.hpr, delta ) ;
 
   sgMat4 mat    ;
   sgMat4 result ;
-  sgMat4 delta  ;
+  sgMat4 mdelta  ;
 
   /* Form new matrix */
 
-  sgMakeCoordMat4 ( delta, & scaled_velocity ) ;
+  sgMakeCoordMat4 ( mdelta, & scaled_velocity ) ;
   sgMakeCoordMat4 ( mat  , & curr_pos        ) ;
-  sgMultMat4      ( result, mat, delta ) ;
+  sgMultMat4      ( result, mat, mdelta ) ;
   sgVec3 start ; sgCopyVec3 ( start, curr_pos.xyz ) ;
   sgVec3 end   ; sgCopyVec3 ( end  , result[3]    ) ;
 
@@ -296,9 +278,9 @@ void Driver::coreUpdate ()
 
   doCollisionAnalysis ( hot ) ;
 
-  track_hint = curr_track -> spatialToTrack ( curr_track_coords,
-                                              curr_pos.xyz,
-                                              track_hint ) ;
+  track_hint = World::current() ->track -> spatialToTrack ( curr_track_coords,
+                                                            curr_pos.xyz,
+                                                            track_hint ) ;
 
   sgCopyCoord ( & history[history_index], & curr_pos ) ;
   placeModel () ;
@@ -342,8 +324,9 @@ float Driver::collectIsectData ( sgVec3 start, sgVec3 end )
 
   if ( nsteps > 100 )
   {
-    fprintf ( stderr, "WARNING: Speed too high for collision detect!\n" ) ;
-    fprintf ( stderr, "WARNING: Nsteps=%d, Speed=%f!\n", nsteps,speed ) ;
+    std::cout << "WARNING: Kart: " << this << std::endl;
+    std::cout << "WARNING: Speed too high for collision detect!" << std::endl;
+    std::cout << "WARNING: Nsteps=" << nsteps << " Speed=" << speed << std::endl;
     nsteps = 100 ;
   }
 

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.13 2004/08/14 23:24:34 grumbel Exp $
+//  $Id: World.cxx,v 1.14 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,6 +35,7 @@
 #include "PlayerDriver.h"
 #include "AutoDriver.h"
 #include "isect.h"
+#include "Track.h"
 #include "TrackManager.h"
 
 World* World::current_ = 0;
@@ -55,10 +56,7 @@ World::World(const RaceSetup& raceSetup_)
 
   gfx = NULL;
 
-  //int tuxkartMain (RaceSetup& raceSetup)
-
-  /* Initialise some horrid globals */
-  fclock           = new ulClock ;
+  clock           = 0.0f;
   
   /* Network initialisation -- NOT WORKING YET */
 
@@ -100,8 +98,8 @@ World::World(const RaceSetup& raceSetup_)
   loader -> setCreateBranchCallback ( process_userdata ) ;
 
   // Grab the track centerline file
-  curr_track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
-                           raceSetup.mirror, raceSetup.reverse ) ;
+  track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
+                      raceSetup.mirror, raceSetup.reverse ) ;
   gfx        = new GFX ( raceSetup.mirror ) ;
 
   int numSplits = raceSetup.numPlayers;
@@ -131,6 +129,8 @@ World::World(const RaceSetup& raceSetup_)
 
   if (raceSetup.numKarts == -1)
     raceSetup.numKarts = characters.size();
+
+  std::cout << "Karts: " << raceSetup.numKarts << std::endl;
 
   // Create the karts and fill the kart vector with them
   for ( int i = 0 ; i < raceSetup.numKarts ; i++ )
@@ -162,7 +162,6 @@ World::World(const RaceSetup& raceSetup_)
   }
 
   /* Load the Projectiles */
-
   for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
   {
     projectile[j] = new Projectile ( ) ;
@@ -184,24 +183,10 @@ World::World(const RaceSetup& raceSetup_)
   guiStack.push_back(GUIS_RACE);
 
   ready_set_go = 3;
-  fclock->reset();
 }
 
 World::~World()
 {  
-/* This whole function needs some serious fixing - whatever was done
-   in tuxKartMain (the function immediately above this one) needs
-   undoing. I've simply taken the above function, reversed the order
-   of all the statements, replaced all the "new"s with "delete"s and
-   all the "init()"s with commented out and non-existent
-   "deinit()"s */
-
-  //FIXME: in load we had preProcessObj ( scene, raceSetup.mirror ) ;
-  
-  //FIXME:
-  //unload_players ( ) ;
-  //unload_track ( ) ;
-  
   for ( unsigned int i = 0 ; i < kart.size() ; i++ )
     delete kart[i];
 
@@ -218,17 +203,8 @@ World::~World()
   delete trackBranch ;
   delete scene ; 
   
-  //FIXME:
-  //deinitCameras () ;
-  
   delete gfx ;
   
-  //FIXME:
-  //deinitMaterials     () ;
-  //the destructor of RaceGUI;
-  
-delete fclock ;
-
 #ifdef ENABLE_NETWORKING
   net->disconnect ( ) ;
 #endif  
@@ -236,27 +212,27 @@ delete fclock ;
 }
 
 void
-World::update()
+World::update(float delta)
 {
-  /* Stop updating if we are paused */
+  clock += delta;
 
-  if (fclock->getAbsTime() > 1.0 && ready_set_go == 0)
+  if (clock > 1.0 && ready_set_go == 0)
     {
       ready_set_go = -1;
     }
-  else if (fclock->getAbsTime() > 2.0 && ready_set_go == 1)
+  else if (clock > 2.0 && ready_set_go == 1)
     {
       std::cout << "Go!" << std::endl;
       ready_set_go = 0;
       phase = RACE_PHASE;
-      fclock->reset();
+      clock = 0.0f;
     }
-  else if (fclock->getAbsTime() > 1.0 && ready_set_go == 2)
+  else if (clock > 1.0 && ready_set_go == 2)
     {
       std::cout << "Set" << std::endl;
       ready_set_go = 1;
     }
-  else if (fclock->getAbsTime() > 0.0 && ready_set_go == 3)
+  else if (clock > 0.0 && ready_set_go == 3)
     {
       std::cout << "Ready" << std::endl;
       ready_set_go = 2;
@@ -267,39 +243,22 @@ World::update()
       phase = FINISH_PHASE;
     }
 
-  if ( ! widgetSet -> get_paused () )
-    {
-      fclock->update    () ;
-      updateNetworkRead () ;
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta) ;
+  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update (delta) ;
+          
+  for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+  for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
+
+  updateNetworkWrite () ;
+  updateCameras      () ;
+  updateWorld        () ;
       
-      for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update () ;
-      for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
-      for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
-      for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
-      for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
-
-      updateNetworkWrite () ;
-      updateCameras      () ;
-      updateWorld        () ;
-    }
-
   /* Routine stuff we do even when paused */
-
   silver_h -> update () ;
   gold_h   -> update () ;
   red_h    -> update () ;
   green_h  -> update () ;
-
-  updateGFX ( gfx ) ;
-
-  pollEvents();
-  kartInput (raceSetup) ;
-  updateGUI(raceSetup);
-  sound    -> update () ;
-
-  /* Swap graphics buffers last! */
-
-  gfx      -> done   () ;
 }
 
 void
@@ -595,7 +554,7 @@ World::restartRace()
 {
   ready_set_go = 3;
   finishing_position = -1 ;
-  fclock->reset();
+  clock = 0.0f;
   phase = START_PHASE;
 
   for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )

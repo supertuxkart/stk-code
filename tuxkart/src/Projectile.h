@@ -1,4 +1,4 @@
-//  $Id: Projectile.h,v 1.1 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: Projectile.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -71,8 +71,8 @@ public:
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
   virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float hot ) ;
-  virtual void update               () ;
+  virtual void doCollisionAnalysis  ( float delta , float hot ) ;
+  virtual void update               ( float delta ) ;
 
 } ;
 

@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.11 2004/08/14 23:25:19 grumbel Exp $
+//  $Id: Track.cxx,v 1.12 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,8 +20,6 @@
 #include "tuxkart.h"
 #include "Loader.h"
 #include "Track.h"
-
-Track     *curr_track  ;
 
 Track::Track ( const char *fname, int mirror, int reverse )
 {
@@ -235,11 +233,14 @@ void Track::draw2Dview ( float x, float y )
   sgSubVec2 ( sc, max, center ) ;
 
   scale = ( sc[0] > sc[1] ) ? ( TRACKVIEW_SIZE / sc[0] ) :
-                              ( TRACKVIEW_SIZE / sc[1] ) ;
+    ( TRACKVIEW_SIZE / sc[1] ) ;
  
   glBegin ( GL_LINE_LOOP ) ;
-    for ( int i = 0 ; i < int(driveline.size()) ; i++ )
-      glVtx ( driveline[i], x, y ) ;
+  for ( int i = 0 ; i < int(driveline.size()) ; i++ )
+    {
+      glVertex2f ( x + ( driveline[i][0] - center[0] ) * scale,
+                   y + ( driveline[i][1] - center[1] ) * scale ) ;
+    }
   glEnd () ;
 }
 

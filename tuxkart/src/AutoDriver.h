@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.h,v 1.1 2004/08/14 17:40:39 grumbel Exp $
+//  $Id: AutoDriver.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,7 +31,7 @@ public:
 
   virtual ~NetworkDriver() {}
 
-  virtual void update () ;
+  virtual void update (float delta) ;
 };
 
 class AutoDriver : public Controller
@@ -46,7 +46,7 @@ public:
 
   virtual ~AutoDriver() {}
 
-  virtual void update () ;
+  virtual void update (float delta) ;
 };
 
 #endif

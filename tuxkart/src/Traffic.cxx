@@ -1,4 +1,4 @@
-//  $Id: Traffic.cxx,v 1.5 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: Traffic.cxx,v 1.6 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,7 +24,7 @@
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 
-void TrafficDriver::update ()
+void TrafficDriver::update (float delta)
 {
   /* Steering algorithm */
 
@@ -41,12 +41,12 @@ void TrafficDriver::update ()
     velocity.hpr[0] = sgnsq(curr_track_coords[0])*12.0f ;
 
   velocity.xyz[1]  = TRAFFIC_VELOCITY ;
-  velocity.xyz[2] -= GRAVITY * delta_t ;
+  velocity.xyz[2] -= GRAVITY * delta ;
 
   if ( wheelie_angle != 0.0f )
     wheelie_angle = 0.0f ;
 
-  KartDriver::update () ;
+  KartDriver::update (delta) ;
 }
 
 void TrafficDriver::doObjectInteractions () {}

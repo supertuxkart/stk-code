@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.15 2004/08/14 23:20:22 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.16 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "RaceGUI.h"
 #include "tuxkart.h"
 #include "../PlayerDriver.h"
+#include "../Track.h"
 #include "WidgetSet.h"
 #include "World.h"
 #include "KartDriver.h"
@@ -234,7 +235,7 @@ void RaceGUI::drawTimer ()
 {
   char str [ 256 ] ;
 
-  time_left = World::current()->fclock->getAbsTime () ;
+  time_left = World::current()->clock;
 
   int min     = (int) floor ( time_left / 60.0 ) ;
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
@@ -284,10 +285,8 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
 void RaceGUI::drawMap ()
 {
   glDisable ( GL_TEXTURE_2D ) ;
-  glColor3f ( 0,0,1 ) ;
-  curr_track -> draw2Dview ( 430+TRACKVIEW_SIZE  , TRACKVIEW_SIZE   ) ;
-  glColor3f ( 1,1,0 ) ;
-  curr_track -> draw2Dview ( 430+TRACKVIEW_SIZE+1, TRACKVIEW_SIZE+1 ) ;
+  glColor3f ( 1,1,1 ) ;
+  World::current() ->track -> draw2Dview ( 200*2, 200  ) ;
 
   glBegin ( GL_QUADS ) ;
 
@@ -299,10 +298,13 @@ void RaceGUI::drawMap ()
 
     glColor3fv ( World::current()->kart[i]->getKartProperties().color ) ;
 
-    curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
-    curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+3 ) ;
-    curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+0 ) ;
-    curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+0 ) ;
+    /* 
+       FIXME:
+       curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
+       curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+3 ) ;
+       curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+0 ) ;
+       curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+0 ) ;
+    */
   }
 
   glEnd () ;
@@ -365,7 +367,7 @@ void RaceGUI::drawPlayerIcons ()
 
       /* Geeko */
       x = (int) ( w * World::current()->kart [i] -> getDistanceDownTrack () /
-                  curr_track -> getTrackLength () ) ;
+                  World::current() ->track -> getTrackLength () ) ;
       glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
       glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+64, y    ) ;
       glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+64, y+64 ) ;
@@ -387,7 +389,7 @@ void RaceGUI::drawEmergencyText ()
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
        World::current()->kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
-    wrong_timer += World::current()->fclock -> getDeltaTime () ;
+    wrong_timer += 0.05f; // FIXME: was World::current()->clock -> getDeltaTime () ;
 
     if ( wrong_timer > 2.0f )
     {

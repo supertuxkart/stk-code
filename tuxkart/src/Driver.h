@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.24 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: Driver.h,v 1.25 2004/08/15 13:57:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,6 @@
 #include <plib/ssg.h>
 #include <plib/sg.h>
 #include "tuxkart.h"
-#include "Track.h"
 #include "joystick.h"
 #include "KartProperties.h"
 
@@ -96,9 +95,6 @@ class KartDriver;
 
 class Driver
 {
-public:
-  float delta_t ;
-
 protected:
   sgCoord  history [ HISTORY_FRAMES ] ;
   
@@ -194,7 +190,7 @@ public:
   void setVelocity ( sgCoord *vel )
   {
     sgCopyCoord ( & velocity, vel ) ;
-    update () ;
+    //FIXME:update () ;
   }
 
   sgCoord *getCoord ()
@@ -205,7 +201,7 @@ public:
   void setCoord ( sgCoord *pos )
   {
     sgCopyCoord ( & curr_pos, pos ) ;
-    update () ;
+    //FIXME:update () ;
   }
 
   virtual void placeModel ();
@@ -220,15 +216,15 @@ public:
     return & history [ q ] ;
   }
 
-  void coreUpdate () ;
-  void physicsUpdate () ;
+  void coreUpdate (float delta) ;
+  void physicsUpdate (float delta) ;
   bool is_on_ground() { return on_ground; }
 
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
   virtual void doZipperProcessing   () ;
   virtual void doCollisionAnalysis  ( float hot ) ;
-  virtual void update               () ;
+  virtual void update               (float delta) ;
 } ;
 
 #endif
