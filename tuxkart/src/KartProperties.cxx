@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.4 2004/08/08 12:17:59 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.5 2004/08/08 13:34:09 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,13 +17,61 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
 #include <math.h>
 #include "material.h"
+#include "lispreader.h"
+#include "Loader.h"
 #include "KartProperties.h"
 
 KartProperties::KartProperties()
 {
+  init_defaults();
+}
+
+KartProperties::KartProperties(const std::string& filename)
+{
+  init_defaults();
+
+  try {
+    LispReader* kart = LispReader::load(loader->getPath(filename), "tuxkart-kart");
+    assert(kart);
+  
+    LispReader reader(lisp_cdr(kart->get_lisp()));
+
+    reader.read_string("name",   name);
+    reader.read_string("model",  model_file);
+    reader.read_string("icon",   icon_file);
+    reader.read_string("shadow", shadow_file);
+    reader.read_float("red",     color[0]);
+    reader.read_float("green",   color[1]);
+    reader.read_float("blue",    color[2]);
+
+    reader.read_float("max-grip",       max_grip);
+    reader.read_float("corn-f",         corn_f);
+    reader.read_float("corn-r",         corn_r);
+    reader.read_float("mass",           mass);
+    reader.read_float("inertia",        inertia);
+    reader.read_float("turn-speed",     turn_speed);
+    reader.read_float("max-wheel-turn", max_wheel_turn);
+    reader.read_float("engine-power",   engine_power);
+    reader.read_float("max-throttle",   max_throttle);
+    reader.read_float("air-friction",   air_friction);
+
+    delete kart;
+  } catch(LispReaderException& err) {
+    std::cout << "LispReaderException: " << err.message << std::endl;
+  } catch(std::exception& err) {
+    std::cout << "Catched std::exception: " << err.what() << std::endl;
+  }
+}
+
+void
+KartProperties::init_defaults()
+{
   model_file = "tuxkart.ac";
+  icon_file = "tuxicon.rgb";
+  icon_material = NULL;
 
   color[0] = 1.0f;
   color[1] = 0.0f;
@@ -39,10 +87,6 @@ KartProperties::KartProperties()
   max_wheel_turn = M_PI/2;
   max_grip       = 4.0f;
   air_friction   = 0.8257;
-
-  icon_file = "tuxicon.rgb";
-
-  icon_material = NULL;
 }
 
 Material*

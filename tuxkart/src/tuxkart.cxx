@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.49 2004/08/08 12:59:59 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.50 2004/08/08 13:34:09 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -424,7 +424,7 @@ int tuxkartMain ()
     KartDriver* newkart;
 
     if ( i < raceSetup.numPlayers )
-      newkart = new PlayerKartDriver  ( KartProperties(), i ) ;
+      newkart = new PlayerKartDriver  ( KartProperties("data/tuxkart.tkkf"), i ) ;
     else if ( network_enabled )
       newkart = new NetworkKartDriver ( KartProperties(), i ) ;
     else

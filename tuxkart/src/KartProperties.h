@@ -1,4 +1,4 @@
-//  $Id: KartProperties.h,v 1.3 2004/08/08 11:52:08 grumbel Exp $
+//  $Id: KartProperties.h,v 1.4 2004/08/08 13:34:09 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,6 +30,9 @@ private:
   Material* icon_material;
 
 public:
+  /** Name of the karts driver */
+  std::string name;
+
   /** Filename of the 3d model that is used for things kart */
   std::string model_file;
 
@@ -58,7 +61,10 @@ public:
   float air_friction;
 
   KartProperties();
+  KartProperties(const std::string& filename);
   
+  void init_defaults();
+
   Material* getIconMaterial();
 };
 
