@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.3 2004/08/06 13:30:00 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.4 2004/08/07 03:33:25 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -21,6 +21,7 @@
 #define HEADER_WIDGETSET_H
 
 #include "widget_glext.h"
+#include "joystick.h"
 
 #include <SDL_ttf.h>
 
@@ -67,9 +68,6 @@
 //previously in config.h:
 
 #define MAXSTR 256
-
-#define JOY_MAX 32767
-#define JOY_MID 16383
 
 /*---------------------------------------------------------------------------*/
 
