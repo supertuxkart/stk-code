@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.32 2004/08/01 15:13:43 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.33 2004/08/01 18:52:50 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,12 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
 #include <plib/pw.h>
 #include <plib/pu.h>
 
 #include "tuxkart.h"
+
+#include "oldgui.h"
+#include "gui.h"
+#include "sound.h"
 #include "Loader.h"
+
 
 /***********************************\
 *                                   *
@@ -262,7 +266,6 @@ static void loadTrackList ()
   trackIdents[t] = 0;
 }
 
-
 /* Initialize the datadir */
 static void loadDataDir (int debug)
 {
@@ -282,7 +285,6 @@ static void loadDataDir (int debug)
   loader->addSearchPath(TUXKART_DATADIR);
 }
 
-
 /* Load the datadir, tracklist and plib stuff */
 static void initTuxKart (int width, int height, int videoFlags)
 {
@@ -290,19 +292,23 @@ static void initTuxKart (int width, int height, int videoFlags)
   loadTrackList () ;
 
   initVideo ( width, height, videoFlags );
-
+  
   /* Initialise a bunch of PLIB library stuff */
 
   puInit  () ;
   ssgInit () ;
 
   fnt = new fntTexFont ;
-  fnt -> load ( "fonts/sorority.txf" ) ;
+  fnt -> load ( loader->getPath("fonts/sorority.txf").c_str()) ;
   sorority = new puFont ( fnt, 12 ) ;
 
   puSetDefaultFonts        ( *sorority, *sorority ) ;
   puSetDefaultStyle        ( PUSTYLE_SMALL_SHADED ) ;
   puSetDefaultColourScheme ( 243.0f/255.0f, 140.0f/255.0f, 34.0f/255.0f, 1.0) ;
+  
+  sound      = new SoundSystem ;
+  gui        = new GUI ;
+  oldgui        = new OldGUI ;
 }
 
 
@@ -399,7 +405,6 @@ void cmdLineHelp (char* invocation)
 
 int main ( int argc, char *argv[] )
 {
- 
   /* Default values */
   int nbrLaps = 3;
   int mirror = 0;

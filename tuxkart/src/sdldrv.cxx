@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.6 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.7 2004/08/01 18:52:50 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -22,6 +22,7 @@
 #include <plib/pw.h>
 #include <plib/pu.h>
 
+#include "oldgui.h"
 #include "gui.h"
 #include "status.h"
 #include "tuxkart.h"
@@ -30,8 +31,10 @@
 
 using std::cout;
 
+
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
+static jsJoystick *joystick ;
 
 void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
@@ -65,6 +68,10 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
     }
     
   keyState = SDL_GetKeyState(NULL);
+  
+  joystick = new jsJoystick ( 0 ) ;
+  joystick -> setDeadBand ( 0, 0.1 ) ;
+  joystick -> setDeadBand ( 1, 0.1 ) ;
 }
 
 void pollEvents ()
@@ -143,7 +150,7 @@ void keyboardInput (const SDL_keysym& key)
     case SDLK_ESCAPE : shutdown() ;
     
     case SDLK_F12:
-      show_fps = !show_fps;
+      //FIXME: do something to our widgets
 	break;
 
     case SDLK_r :
@@ -164,12 +171,12 @@ void keyboardInput (const SDL_keysym& key)
       return ;
     case SDLK_z : stToggle () ; return ;
     case SDLK_h : hide_status () ; help  () ; return ;
-    case SDLK_p : paused = ! paused ; return ;
+    case SDLK_p : gui->tgl_paused(); return ;
 
-    case SDLK_SPACE : if ( gui->isHidden () )
-      gui->show () ;
+    case SDLK_SPACE : if ( oldgui->isHidden () )
+      oldgui->show () ;
     else
-      gui->hide () ;
+      oldgui->hide () ;
       return ;
              
     default:
@@ -177,10 +184,36 @@ void keyboardInput (const SDL_keysym& key)
     }
 }
 
-void shutdown()
+void kartInput()
 {
-  SDL_Quit( );
-  exit (0);
+  static JoyInfo ji ;
+
+  if ( joystick -> notWorking () )
+  {
+    ji.data[0] = ji.data[1] = 0.0f ;
+    ji.buttons = 0 ;
+  }
+  else
+  {
+    joystick -> read ( & ji.buttons, ji.data ) ;
+    ji.data[0] *= 1.3 ;
+  }
+
+  if ( keyState [ SDLK_LEFT ] ) ji.data [0] = -1.0f ;
+  if ( keyState [ SDLK_RIGHT ] ) ji.data [0] =  1.0f ;
+  if ( keyState [ SDLK_UP ] ) ji.buttons |= 0x01 ;
+  if ( keyState [ SDLK_DOWN ] )  ji.buttons |= 0x02 ;
+
+  if ( keyState [ SDLK_f ] ) ji.buttons |= 0x04 ;
+  if ( keyState [ SDLK_a ] ) ji.buttons |= 0x20 ;
+  if ( keyState [ SDLK_s ] ) ji.buttons |= 0x10 ;
+  if ( keyState [ SDLK_d ] ) ji.buttons |= 0x08 ;
+
+  ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
+  ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;
+  ji.old_buttons =  ji.buttons ;
+
+  ((PlayerKartDriver *)kart [ 0 ]) -> incomingJoystick ( &ji ) ;
 }
 
 void swapBuffers()

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.16 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: tuxkart.h,v 1.17 2004/08/01 18:52:50 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,24 +37,24 @@
 #endif
 #include <math.h>
 
-#ifdef HAVE_LIBSDL
 #include "sdldrv.h"
-#else
-#include "pwdrv.h"
-#endif
 
 #include "guNet.h"
 #include "constants.h"
 #include "utils.h"
 
 class GFX ;
-class GUI ;
+class GUI;
+class OldGUI ;
 class SoundSystem ;
 class Track ;
 class Level ;
 
+
 extern GFX         *gfx   ;
 extern GUI         *gui   ;
+extern OldGUI      *oldgui ;
+
 extern SoundSystem *sound ;
 extern Track       *track ;
 extern Level        level ;
@@ -63,7 +63,6 @@ extern ulClock     *fclock ;
 extern int      game_state ;
 
 extern ssgRoot *scene           ;
-extern char    *tuxkart_datadir ;
 
 void tuxKartMainLoop () ;
 void shutdown() ;
@@ -87,8 +86,6 @@ ssgBranch *process_userdata ( char *data ) ;
 extern int num_karts ;
 extern int num_laps_in_race ;
 extern int finishing_position ;
-extern bool paused ;
-extern bool show_fps ;
 
 class KartDriver;
 class Projectile;

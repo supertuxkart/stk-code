@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.29 2004/08/01 18:00:06 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.30 2004/08/01 18:52:50 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,14 +23,18 @@
 #include "Driver.h"
 #include "Explosion.h"
 #include "isect.h"
+
 #include "status.h"
 #include "Camera.h"
 #include "level.h"
-#include "WorldLoader.h"
 #include "gui.h"
+#include "oldgui.h"
+#include "WorldLoader.h"
+
 #include "gfx.h"
 #include "preprocessor.h"
 #include "material.h"
+
 
 int mirror  = 0 ;
 int reverse = 0 ;
@@ -61,9 +65,6 @@ HerringInstance herring [ MAX_HERRING ] ;
 
 char player_files [ NUM_KARTS ][ 256 ] ;
 
-bool paused ;
-bool show_fps = 0 ;
-
 char *traffic_files [] =
 {
   "icecreamtruck.ac", "truck1.ac",
@@ -87,11 +88,14 @@ char *magnet2_file   = "magnetbzzt.ac" ;
 char *anvil_file     = "anvil.ac"      ;
 
 
-ulClock     *fclock = NULL ;
+
+ulClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
-GFX            *gfx = NULL ;
-GUI            *gui = NULL ;
-Level         level ;
+GFX          *gfx = NULL ;
+GUI          *gui = NULL ;
+OldGUI       *oldgui = NULL ;
+Level        level ;
+
 
 KartDriver       *kart [ NUM_KARTS       ] ;
 TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
@@ -436,7 +440,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   reverse          = _reverse    ;
   num_laps_in_race = _numLaps    ;
   trackname        = _levelName  ;
-
+  
   strcpy ( playersfname, "data/players.dat" ) ;
 
   /* Network initialisation -- NOT WORKING YET */
@@ -489,15 +493,10 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   curr_track = new Track ( fname, mirror, reverse ) ;
   gfx        = new GFX ( mirror ) ;
-  sound      = new SoundSystem ;
-  gui        = new GUI ;
 
   Camera::setNumSplits ( numPlayers ) ;
   initCameras () ;
 
-#ifndef HAVE_LIBSDL
-  pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
-#endif
 
   /* Start building the scene graph */
 
@@ -557,7 +556,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   /* Load the track models */
 
   sprintf ( fname, "data/%s.loc", trackname ) ;
-  load_track   ( fname        ) ;
+  load_track   ( fname ) ;
   load_players ( playersfname ) ;
 
   preProcessObj ( scene, mirror ) ;
@@ -639,11 +638,7 @@ void tuxKartMainLoop ()
   {
     /* Stop updating if we are paused */
 
-#ifdef HAVE_LIBSDL
-    if ( ! paused )
-#else
-    if ( ! gui -> isPaused () )
-#endif
+    if ( ! gui -> get_paused () )
     {
       int i ;
 
@@ -670,13 +665,22 @@ void tuxKartMainLoop ()
 
     updateGFX ( gfx ) ;
 
-    gui      -> update () ;
+    pollEvents();
+    kartInput () ;
+    oldgui      -> update () ;
     sound    -> update () ;
 
     /* Swap graphics buffers last! */
 
     gfx      -> done   () ;
   }
+}
+
+void shutdown()
+{
+	delete gui;
+  SDL_Quit( );
+  exit (0);
 }
 
 /* EOF */
