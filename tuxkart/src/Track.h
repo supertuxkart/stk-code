@@ -1,4 +1,4 @@
-//  $Id: Track.h,v 1.8 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: Track.h,v 1.9 2004/08/14 23:25:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,9 @@
 #ifndef HEADER_TRACK_H
 #define HEADER_TRACK_H
 
-#define MAX_DRIVELINE  1000
+#include <vector>
+#include "plibwrap.h"
+
 #define TRACKVIEW_SIZE 100.0f
 
 class Track
@@ -32,6 +34,8 @@ private:
   float  scale ;
 
   float  total_distance ;
+
+  std::vector<sgVec3Wrap> driveline;
 
 public:
   Track ( const char *drv_fname, int mirror, int reverse ) ;

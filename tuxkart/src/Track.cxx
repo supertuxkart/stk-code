@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.10 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: Track.cxx,v 1.11 2004/08/14 23:25:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,79 +21,79 @@
 #include "Loader.h"
 #include "Track.h"
 
-static int npoints ;
-static sgVec3 driveline[MAX_DRIVELINE] ;
-
 Track     *curr_track  ;
 
 Track::Track ( const char *fname, int mirror, int reverse )
 {
-  int i ;
-  float d = 0.0f ;
-
   std::string path = loader->getPath(fname);
   FILE *fd = fopen ( path.c_str(), "ra" ) ;
 
   if ( fd == NULL )
-  {
-    fprintf ( stderr, "Can't open '%s' for reading.\n", fname ) ;
-    exit ( 1 ) ;
-  } 
-
-  for ( i = 0 ; i < MAX_DRIVELINE && !feof(fd) ; i++ )
-  {
-    char s [ 1024 ] ;
-
-    if ( fgets ( s, 1023, fd ) == NULL )
-      break ;
-
-    if ( *s == '#' || *s < ' ' )
-      continue ;
-
-    float x, y ;
-
-    if ( sscanf ( s, "%f,%f", &x, &y ) != 2 )
     {
-      fprintf ( stderr, "Syntax error in '%s'\n", fname ) ;
+      fprintf ( stderr, "Can't open '%s' for reading.\n", fname ) ;
       exit ( 1 ) ;
     } 
 
-    driveline[i][0] = mirror ? -x : x ;
-    driveline[i][1] = y ;
-    driveline[i][2] = 0.0f ;
-    npoints = i + 1 ;
-  }
+  while(!feof(fd))
+    {
+      char s [ 1024 ] ;
+
+      if ( fgets ( s, 1023, fd ) == NULL )
+        break ;
+
+      if ( *s == '#' || *s < ' ' )
+        continue ;
+
+      float x, y ;
+
+      if ( sscanf ( s, "%f,%f", &x, &y ) != 2 )
+        {
+          fprintf ( stderr, "Syntax error in '%s'\n", fname ) ;
+          exit ( 1 ) ;
+        } 
+
+      sgVec3 point;
+      point[0] = mirror ? -x : x;
+      point[1] = y;
+      point[2] = 0.0f;
+
+      driveline.push_back(point);
+    }
 
   fclose ( fd ) ;
 
   if ( reverse )
-    for ( i = 0 ; i < npoints/2 ; i++ )
     {
-      int j = npoints - i - 1 ;
-      float tmp ;
+      for ( int i = 0 ; i < int(driveline.size())/2 ; ++i )
+        {
+          int j = int(driveline.size()) - i - 1 ;
+          float tmp ;
 
-      tmp=driveline[i][0];driveline[i][0]=driveline[j][0];driveline[j][0]=tmp;
-      tmp=driveline[i][1];driveline[i][1]=driveline[j][1];driveline[j][1]=tmp;
-      tmp=driveline[i][2];driveline[i][2]=driveline[j][2];driveline[j][2]=tmp;
+          tmp=driveline[i][0];driveline[i][0]=driveline[j][0];driveline[j][0]=tmp;
+          tmp=driveline[i][1];driveline[i][1]=driveline[j][1];driveline[j][1]=tmp;
+          tmp=driveline[i][2];driveline[i][2]=driveline[j][2];driveline[j][2]=tmp;
+        }
     }
 
   sgSetVec2 ( min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
   sgSetVec2 ( max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
 
-  for ( i = 0 ; i < npoints ; i++ )
-  {
-    if ( driveline[i][0] < min[0] ) min[0] = driveline[i][0] ;
-    if ( driveline[i][1] < min[1] ) min[1] = driveline[i][1] ;
-    if ( driveline[i][0] > max[0] ) max[0] = driveline[i][0] ;
-    if ( driveline[i][1] > max[1] ) max[1] = driveline[i][1] ;
+  float d = 0.0f ;
 
-    driveline [i][2] = d ;
+  for ( int i = 0 ; i < int(driveline.size()) ; i++ )
+    {
+      if ( driveline[i][0] < min[0] ) min[0] = driveline[i][0] ;
+      if ( driveline[i][1] < min[1] ) min[1] = driveline[i][1] ;
+      if ( driveline[i][0] > max[0] ) max[0] = driveline[i][0] ;
+      if ( driveline[i][1] > max[1] ) max[1] = driveline[i][1] ;
 
-    if ( i == npoints - 1 )
-      d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
-    else
-      d += sgDistanceVec2 ( driveline[i], driveline[i+1] ) ;
-  }
+      driveline [i][2] = d ;
+
+      if ( i == int(driveline.size()) - 1 )
+        d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
+      else
+        d += sgDistanceVec2 ( driveline[i], driveline[i+1] ) ;
+    }
 
   total_distance = d ;
 }
@@ -120,7 +120,7 @@ fprintf(stderr,"ih=%d ", hint ) ;
   if ( hint < 0 || hint >= npoints )
 */
   {
-    for ( int i = 0 ; i < npoints ; i++ )
+    for ( int i = 0 ; i < int(driveline.size()) ; i++ )
     {
       d = sgDistanceVec2 ( driveline[i], xyz ) ;
 
@@ -181,8 +181,8 @@ fprintf(stderr,"new hint=%d\n", nearest ) ;
   int    prev,  next ;
   float dprev, dnext ;
 
-  prev = ( nearest   ==   0     ) ? (npoints - 1) : (nearest - 1) ;
-  next = ( nearest+1 >= npoints ) ?      0        : (nearest + 1) ;
+  prev = ( nearest   ==   0     ) ? (int(driveline.size()) - 1) : (nearest - 1) ;
+  next = ( nearest+1 >= int(driveline.size()) ) ?      0        : (nearest + 1) ;
 
   dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
   dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
@@ -238,7 +238,7 @@ void Track::draw2Dview ( float x, float y )
                               ( TRACKVIEW_SIZE / sc[1] ) ;
  
   glBegin ( GL_LINE_LOOP ) ;
-    for ( int i = 0 ; i < npoints ; i++ )
+    for ( int i = 0 ; i < int(driveline.size()) ; i++ )
       glVtx ( driveline[i], x, y ) ;
   glEnd () ;
 }
