@@ -6,7 +6,7 @@ kids 12
 OBJECT poly
 name "line"
 loc 0.0500001 1.7 2.65
-texture "./../images/lunchbox2.rgb"
+texture "../images/lunchbox2.png"
 numvert 26
 0.55 -0.6 -1.05
 0.55 -0.884701 2.11252
@@ -323,7 +323,7 @@ kids 0
 OBJECT poly
 name "line"
 loc 0.0500001 1.8 -1.65
-texture "././../images/lunchbox.rgb"
+texture "../images/lunchbox.png"
 texrep 0.9 0.8
 texoff 0.07 -0.02
 numvert 26
@@ -642,7 +642,7 @@ kids 0
 OBJECT poly
 name "line"
 loc 0.75 1.7 -5.85
-texture "./../images/lunchbox2.rgb"
+texture "../images/lunchbox2.png"
 numvert 26
 0.55 -0.6 -1.05
 0.55 -0.884701 2.11252
@@ -959,7 +959,7 @@ kids 0
 OBJECT poly
 name "line"
 loc 0.75 1.8 -10.15
-texture "././../images/lunchbox.rgb"
+texture "../images/lunchbox.png"
 texrep 0.9 0.8
 texoff 0.07 -0.02
 numvert 26
@@ -1278,7 +1278,7 @@ kids 0
 OBJECT poly
 name "line"
 loc -0.55 1.7 11.25
-texture "./../images/lunchbox2.rgb"
+texture "../images/lunchbox2.png"
 numvert 26
 0.55 -0.6 -1.05
 0.55 -0.884701 2.11252
@@ -1595,7 +1595,7 @@ kids 0
 OBJECT poly
 name "line"
 loc -0.55 1.8 6.95
-texture "././../images/lunchbox.rgb"
+texture "../images/lunchbox.png"
 texrep 0.9 0.8
 texoff 0.07 -0.02
 numvert 26

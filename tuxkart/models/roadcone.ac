@@ -5,7 +5,7 @@ kids 1
 OBJECT poly
 name "cylinder"
 loc 5.96046e-08 1.13906 0.118125
-texture "../images/candy_stripe.rgb"
+texture "../images/candy_stripe.png"
 numvert 25
 -0.00344123 -0.365268 -0.114602
 0.172562 -1.06558 0.0852665

@@ -167,7 +167,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -2.11588 2.28957 3.05333
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -321,7 +321,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.988244 2.29548 0.279467
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 0.00827026 2.17634 0.317287
@@ -630,7 +630,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 1.29498 2.09143 8.01343
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -784,7 +784,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 0.280109 2.09676 10.4199
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 -0.00744379 1.95871 -0.285559
@@ -1093,7 +1093,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.801914 1.1989 11.9734
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -1247,7 +1247,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.0145066 1.20186 10.7547
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 -0.0234754 1.08817 0.156951
@@ -1556,7 +1556,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 2.11588 2.28957 23.5467
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -1710,7 +1710,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 0.988243 2.29548 26.3205
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 -0.00827026 2.17634 -0.317287
@@ -2019,7 +2019,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -1.29498 2.09143 18.5866
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -2173,7 +2173,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.280109 2.09676 16.1801
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 0.00744385 1.95871 0.285561
@@ -2482,7 +2482,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 0.801915 1.1989 14.6266
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -2636,7 +2636,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 0.0145071 1.20186 15.8453
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 0.0234752 1.08817 -0.156952
@@ -2945,7 +2945,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 2.21588 2.28957 34.2467
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -3099,7 +3099,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 1.08824 2.29548 37.0205
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 -1.44841 2.17634 -0.317291
@@ -3408,7 +3408,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -1.19498 2.09143 29.2866
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -3562,7 +3562,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.180109 2.09676 26.8801
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 1.07258 1.95871 0.285561

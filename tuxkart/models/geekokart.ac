@@ -270,7 +270,7 @@ kids 0
 OBJECT poly
 name "body"
 loc -0.0816188 0.047205 0
-texture "../images/lscales.rgb"
+texture "../images/lscales.png"
 texrep 3 2
 numvert 311
 0.0764408 0.152225 0.312603
@@ -4503,7 +4503,7 @@ refs 4
 kids 0
 OBJECT poly
 name "disk"
-texture "../images/Penguin_orig.rgb"
+texture "../images/Penguin_orig.png"
 numvert 8
 -0.0707347 0.171887 -0.307493
 -0.0707347 0.384091 -0.20139

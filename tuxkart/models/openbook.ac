@@ -162,7 +162,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -0.724976 1.1989 -1.28171
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texrep -1 1
 texoff -0.02 0
 numvert 20
@@ -316,7 +316,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 0.724976 1.20186 -1.33573
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/homework.rgb"
+texture "../images/homework.png"
 texoff -0.02 0
 numvert 20
 -0.142032 1.08817 0.0707934

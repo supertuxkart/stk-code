@@ -6,7 +6,7 @@ kids 4
 OBJECT poly
 name "box"
 loc 0.0500002 7.46802 -3.259
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/wood.rgb"
+texture "../images/wood.png"
 texrep 7 5
 numvert 8
 -4.477 -0.120998 -2.904
@@ -871,7 +871,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.291997 3.60658 -0.211647
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/shine.rgb"
+texture "../images/shine.png"
 numvert 48
 -3.993 -3.61192 -5.53627
 -3.993 3.76155 -4.98243

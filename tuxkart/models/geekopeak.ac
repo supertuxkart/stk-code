@@ -4,7 +4,7 @@ OBJECT world
 kids 18
 OBJECT poly
 name "mesh"
-texture "../images/dirtwall.rgb"
+texture "../images/dirtwall.png"
 texrep 4 4
 numvert 364
 14.9603 -9.17087 -43.9271
@@ -2818,7 +2818,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -53.3 -0.95 64.175
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 62.0242 -0.500002 -64.1607
@@ -2864,7 +2864,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -55.0881 -0.95 -9.90364
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 25.7308 -0.475001 -23.8936
@@ -2910,7 +2910,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -54.079 -0.95 -8.89448
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 -59.2759 5.79452 -30.3698
@@ -2956,7 +2956,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -133.407 5.10496 -10.1834
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 -22.0501 1.3862 28.7224
@@ -3002,7 +3002,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -145.668 5.10496 -10.6375
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 -5.30229 11.1528 145.179
@@ -3048,7 +3048,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -143.398 5.10496 -8.3669
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 86.1794 18.0579 155.61
@@ -3094,7 +3094,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -142.725 5.10496 -7.69412
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 135.418 20.5352 113.773
@@ -3140,7 +3140,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -143.066 5.10496 -47.8839
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 48.5535 27.4849 124.455
@@ -3186,7 +3186,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -173.605 5.10496 -68.2059
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 94.1983 25.6785 75.3079
@@ -3232,7 +3232,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -172.596 5.10496 -67.1967
-texture "../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 19 1
 numvert 10
 138.413 8.34283 141.239
@@ -3278,7 +3278,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 35.9946 8.88038 55.6618
-texture "../images/brick.rgb"
+texture "../images/brick.png"
 texrep 10 1
 numvert 12
 25.0973 -7.8799 7.59945
@@ -3375,7 +3375,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 50.4272 2.44108 98.4132
-texture "../images/brick.rgb"
+texture "../images/brick.png"
 texrep 10 1
 numvert 12
 -40.2324 -3.71829 -6.51381
@@ -3472,7 +3472,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 22.3752 7.74153 81.0515
-texture "../images/brick.rgb"
+texture "../images/brick.png"
 texrep 10 1
 numvert 16
 -12.5636 -9.01875 -7.92723
@@ -3610,7 +3610,7 @@ name "rect"
 loc -67.4236 -5.98762e-05 71.0771
 data 14
 @autotex y=0.1
-texture "../images/lava.rgb"
+texture "../images/lava.png"
 texrep 16 16
 numvert 4
 -688.671 -9.30145 -678.86
@@ -3628,7 +3628,7 @@ refs 4
 kids 0
 OBJECT poly
 name "mesh"
-texture "../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 40 20
 numvert 4
 59.5306 1.34772 90.63
@@ -3646,7 +3646,7 @@ refs 4
 kids 0
 OBJECT poly
 name "mesh"
-texture "../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 40 20
 numvert 4
 60.3189 1.71022 63.4748
@@ -3665,7 +3665,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc -33.6184 17.0977 53.7734
-texture "../images/dirt.rgb"
+texture "../images/dirt.png"
 texrep 10 10
 numvert 295
 39.72 -18.4774 -87.9338

@@ -7,7 +7,7 @@ kids 317
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -25,7 +25,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -43,7 +43,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -61,7 +61,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -79,7 +79,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -97,7 +97,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -115,7 +115,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -133,7 +133,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -151,7 +151,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -169,7 +169,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -187,7 +187,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -205,7 +205,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -223,7 +223,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -241,7 +241,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -259,7 +259,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -277,7 +277,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -295,7 +295,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -313,7 +313,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -331,7 +331,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -349,7 +349,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -367,7 +367,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -385,7 +385,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -403,7 +403,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -421,7 +421,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -439,7 +439,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -457,7 +457,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -475,7 +475,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -493,7 +493,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -511,7 +511,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -529,7 +529,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -547,7 +547,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -565,7 +565,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -583,7 +583,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -601,7 +601,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -619,7 +619,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -637,7 +637,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -655,7 +655,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -673,7 +673,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -691,7 +691,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -709,7 +709,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -727,7 +727,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -745,7 +745,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -763,7 +763,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -781,7 +781,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -799,7 +799,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -817,7 +817,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -835,7 +835,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -853,7 +853,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -871,7 +871,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -889,7 +889,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -907,7 +907,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -925,7 +925,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -943,7 +943,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -961,7 +961,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -979,7 +979,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -997,7 +997,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -1015,7 +1015,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1033,7 +1033,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1051,7 +1051,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1069,7 +1069,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -1087,7 +1087,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1105,7 +1105,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1123,7 +1123,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1141,7 +1141,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1159,7 +1159,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1177,7 +1177,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -1195,7 +1195,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1213,7 +1213,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1231,7 +1231,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1249,7 +1249,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1267,7 +1267,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1285,7 +1285,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -1303,7 +1303,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1321,7 +1321,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1339,7 +1339,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1357,7 +1357,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1375,7 +1375,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1393,7 +1393,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -1411,7 +1411,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1429,7 +1429,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1447,7 +1447,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1465,7 +1465,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1483,7 +1483,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1501,7 +1501,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -1519,7 +1519,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1537,7 +1537,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1555,7 +1555,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1573,7 +1573,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1591,7 +1591,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1609,7 +1609,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -1627,7 +1627,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1645,7 +1645,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1663,7 +1663,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1681,7 +1681,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1699,7 +1699,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1717,7 +1717,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -1735,7 +1735,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1753,7 +1753,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1771,7 +1771,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1789,7 +1789,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1807,7 +1807,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1825,7 +1825,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -1843,7 +1843,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1861,7 +1861,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1879,7 +1879,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -1897,7 +1897,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -1915,7 +1915,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -1933,7 +1933,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -1951,7 +1951,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -1969,7 +1969,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -1987,7 +1987,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2005,7 +2005,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2023,7 +2023,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2041,7 +2041,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2059,7 +2059,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -2077,7 +2077,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -2095,7 +2095,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -2113,7 +2113,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -2131,7 +2131,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -2149,7 +2149,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -2167,7 +2167,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2185,7 +2185,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2203,7 +2203,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2221,7 +2221,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2239,7 +2239,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2257,7 +2257,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -2275,7 +2275,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -2293,7 +2293,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -2311,7 +2311,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -2329,7 +2329,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -2347,7 +2347,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -2365,7 +2365,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -2383,7 +2383,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -2401,7 +2401,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -2419,7 +2419,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2437,7 +2437,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2455,7 +2455,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2473,7 +2473,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -2491,7 +2491,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2509,7 +2509,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2527,7 +2527,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2545,7 +2545,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2563,7 +2563,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2581,7 +2581,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -2599,7 +2599,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2617,7 +2617,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2635,7 +2635,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2653,7 +2653,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2671,7 +2671,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2689,7 +2689,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -2707,7 +2707,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2725,7 +2725,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2743,7 +2743,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2761,7 +2761,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2779,7 +2779,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2797,7 +2797,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -2815,7 +2815,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2833,7 +2833,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2851,7 +2851,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2869,7 +2869,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2887,7 +2887,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2905,7 +2905,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -2923,7 +2923,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2941,7 +2941,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -2959,7 +2959,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -2977,7 +2977,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -2995,7 +2995,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -3013,7 +3013,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -3031,7 +3031,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -3049,7 +3049,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -3067,7 +3067,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3085,7 +3085,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3103,7 +3103,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3121,7 +3121,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -3139,7 +3139,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3157,7 +3157,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3175,7 +3175,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3193,7 +3193,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3211,7 +3211,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3229,7 +3229,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3247,7 +3247,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3265,7 +3265,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3283,7 +3283,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3301,7 +3301,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3319,7 +3319,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3337,7 +3337,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3355,7 +3355,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3373,7 +3373,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3391,7 +3391,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3409,7 +3409,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3427,7 +3427,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3445,7 +3445,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3463,7 +3463,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3481,7 +3481,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3499,7 +3499,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3517,7 +3517,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3535,7 +3535,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3553,7 +3553,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3571,7 +3571,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3589,7 +3589,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3607,7 +3607,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -3625,7 +3625,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -3643,7 +3643,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -3661,7 +3661,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3679,7 +3679,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -3697,7 +3697,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -3715,7 +3715,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -3733,7 +3733,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -3751,7 +3751,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -3769,7 +3769,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -3787,7 +3787,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -3805,7 +3805,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -3823,7 +3823,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -3841,7 +3841,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -3859,7 +3859,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -3877,7 +3877,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -3895,7 +3895,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -3913,7 +3913,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -3931,7 +3931,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -3949,7 +3949,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -3967,7 +3967,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -3985,7 +3985,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4003,7 +4003,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4021,7 +4021,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -4039,7 +4039,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -4057,7 +4057,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -4075,7 +4075,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -4093,7 +4093,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -4111,7 +4111,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4129,7 +4129,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4147,7 +4147,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4165,7 +4165,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4183,7 +4183,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4201,7 +4201,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4219,7 +4219,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -4237,7 +4237,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -4255,7 +4255,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -4273,7 +4273,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -4291,7 +4291,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -4309,7 +4309,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -4327,7 +4327,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -4345,7 +4345,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -4363,7 +4363,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4381,7 +4381,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4399,7 +4399,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4417,7 +4417,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -4435,7 +4435,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4453,7 +4453,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4471,7 +4471,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4489,7 +4489,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4507,7 +4507,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4525,7 +4525,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 0.100033 -1.83094
 -0.164348 0.100033 -1.83094
@@ -4543,7 +4543,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4561,7 +4561,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4579,7 +4579,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4597,7 +4597,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4615,7 +4615,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4633,7 +4633,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 0.173232 -1.83094
 -0.0911484 0.173232 -1.83094
@@ -4651,7 +4651,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4669,7 +4669,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4687,7 +4687,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4705,7 +4705,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4723,7 +4723,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4741,7 +4741,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 0.200025 -1.83094
 0.00884444 0.200025 -1.83094
@@ -4759,7 +4759,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4777,7 +4777,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4795,7 +4795,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4813,7 +4813,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4831,7 +4831,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4849,7 +4849,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 0.173234 -1.83094
 0.108837 0.173234 -1.83094
@@ -4867,7 +4867,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4885,7 +4885,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4903,7 +4903,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4921,7 +4921,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4939,7 +4939,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4957,7 +4957,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 0.10003 -1.83094
 0.182037 0.10003 -1.83094
@@ -4975,7 +4975,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -4993,7 +4993,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -5011,7 +5011,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5029,7 +5029,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5047,7 +5047,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5065,7 +5065,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.20883 4.1306e-05 -1.83094
 0.20883 4.1306e-05 -1.83094
@@ -5083,7 +5083,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5101,7 +5101,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5119,7 +5119,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5137,7 +5137,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5155,7 +5155,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5173,7 +5173,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.182037 -0.0999516 -1.83094
 0.182037 -0.0999516 -1.83094
@@ -5191,7 +5191,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5209,7 +5209,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5227,7 +5227,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5245,7 +5245,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5263,7 +5263,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5281,7 +5281,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.108837 -0.173152 -1.83094
 0.108837 -0.173152 -1.83094
@@ -5299,7 +5299,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5317,7 +5317,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5335,7 +5335,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5353,7 +5353,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5371,7 +5371,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5389,7 +5389,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 0.00884444 -0.199945 -1.83094
 0.00884444 -0.199945 -1.83094
@@ -5407,7 +5407,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5425,7 +5425,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5443,7 +5443,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5461,7 +5461,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5479,7 +5479,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5497,7 +5497,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.0911484 -0.173152 -1.83094
 -0.0911484 -0.173152 -1.83094
@@ -5515,7 +5515,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5533,7 +5533,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5551,7 +5551,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -5569,7 +5569,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -5587,7 +5587,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.191141 4.13656e-05 -1.83094
 -0.191141 4.13656e-05 -1.83094
@@ -5605,7 +5605,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0110999 0.221101 0.90475
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 4
 -0.164348 -0.0999516 -1.83094
 -0.164348 -0.0999516 -1.83094
@@ -5623,7 +5623,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.00691538 0.225417 -1.0851
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 13
 0.0102166 -0.00585836 -0.176891
 0.177852 0.095716 0.158908
@@ -5715,7 +5715,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc -0.00221103 0.221101 -0.326362
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 24
 -0.173205 0.1 0.6
 -0.100037 0.173232 -0.599832
@@ -5890,7 +5890,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc -0.00221095 0.221101 0.473638
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 24
 -0.173205 0.1 0.2
 -0.1 0.173205 -0.2
@@ -6158,7 +6158,7 @@ name "cylinder"
 loc 0.00534001 0.221101 0.864918
 data 17
 @autotex R=23.123
-texture "../images/flames.rgb"
+texture "../images/flames.png"
 numvert 13
 -0.00228041 -0.0015291 -0.404276
 0.101338 0.173205 0.404276

@@ -716,7 +716,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.466027 1.5143 2.63439
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/ruler.rgb"
+texture "../images/ruler.png"
 texrep 1 5
 numvert 16
 -1.02356 -1.53663 4.49148

@@ -46,7 +46,7 @@ kids 0
 OBJECT poly
 name "body"
 loc -0.0816188 0.047205 0
-texture "/hda1/tuxkart/images/lscales.rgb"
+texture "../images/lscales.png"
 texrep 3 2
 numvert 311
 0.0764408 -0.143384 0.491687

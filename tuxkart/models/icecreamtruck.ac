@@ -8,7 +8,7 @@ kids 8
 OBJECT poly
 name "disk"
 loc 0.3 0 -0.9
-texture "/usr/batcave1/tuxkart/models/../images/wheel.rgb"
+texture "../images/wheel.png"
 numvert 20
 -1.8294 0.466469 -0.821142
 -1.8294 0.803854 -0.974642
@@ -206,7 +206,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc 0.3 0 -0.9
-texture "/usr/batcave1/tuxkart/models/../images/wheel.rgb"
+texture "../images/wheel.png"
 numvert 20
 0.798175 0.466469 4.42766
 0.798175 0.803854 4.27416
@@ -404,7 +404,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc 0.3 0 -0.9
-texture "/usr/batcave1/tuxkart/models/../images/wheel.rgb"
+texture "../images/wheel.png"
 numvert 20
 -1.76061 0.466469 4.39485
 -1.76061 0.803854 4.24136
@@ -602,7 +602,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc 0.3 0 -0.9
-texture "/usr/batcave1/tuxkart/models/../images/wheel.rgb"
+texture "../images/wheel.png"
 numvert 20
 0.882565 0.466469 -0.821142
 0.882565 0.803854 -0.974642
@@ -1011,7 +1011,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -0.1 2.03477 1.21828
-texture "/usr/batcave1/tuxkart/models/../images/icecreamtruck.rgb"
+texture "../images/icecreamtruck.png"
 numvert 8
 1.7 -1.50903 -2.6244
 1.7 1.50903 -2.6244

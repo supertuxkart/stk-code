@@ -6,7 +6,7 @@ kids 23
 OBJECT poly
 name "rect"
 loc -1.35 -1.45 86.0574
-texture "/hda1/tuxkart/models/../images/wood.rgb"
+texture "../images/wood.png"
 texrep 64 64
 numvert 146
 -5.28655 0.0693009 -65.7993
@@ -888,7 +888,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -72.3308 -7.30701 68.4241
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 -4.28973 -0.182209 -52.2696
@@ -932,7 +932,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -72.3308 -7.50701 136.224
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 15.5885 2.14445 -11.3987
@@ -976,7 +976,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -71.8308 -7.50701 177.424
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 15.0885 2.14445 -52.5987
@@ -1020,7 +1020,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -71.8308 -7.70701 245.224
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 95.1327 26.3032 -60.3178
@@ -1064,7 +1064,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 35.7692 -7.30701 214.224
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 -12.4673 25.9032 -29.3178
@@ -1108,7 +1108,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 35.7692 -7.50701 282.024
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 67.4136 37.0944 -127.564
@@ -1152,7 +1152,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 36.2692 -7.50701 323.224
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 66.9136 37.0944 -168.764
@@ -1196,7 +1196,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 36.2692 -7.70701 391.024
-texture "/hda1/tuxkart/models/../images/metalgrid.rgb"
+texture "../images/metalgrid.png"
 texrep 28 6
 numvert 8
 84.0479 34.8533 -286.671
@@ -1242,7 +1242,7 @@ name "box"
 loc 21.4869 3.14996 118.96
 data 14
 @autotex Y=0.5
-texture "/hda1/tuxkart/models/../images/lava.rgb"
+texture "../images/lava.png"
 texrep 4 1
 numvert 61
 2.43055 35.1926 29.5257
@@ -1537,7 +1537,7 @@ name "rect"
 loc -88.87 17.9295 -74.2175
 data 15
 @autotex Y=0.01
-texture "/hda1/tuxkart/models/../images/lava.rgb"
+texture "../images/lava.png"
 texrep 1 0.02
 numvert 4
 26.78 -20.4295 95.6324
@@ -1558,7 +1558,7 @@ name "rect"
 loc -88.87 17.9295 -74.2175
 data 16
 @autotex Y=-0.04
-texture "/hda1/tuxkart/models/../images/lava.rgb"
+texture "../images/lava.png"
 numvert 18
 -233.03 25.5705 175.017
 233.17 25.5705 175.017
@@ -1660,7 +1660,7 @@ kids 0
 OBJECT poly
 name "poly"
 loc -72.2812 -4.9 15.5946
-texture "/hda1/tuxkart/models/../images/brick.rgb"
+texture "../images/brick.png"
 texrep 6 4
 numvert 24
 4.95 -2.6 -2.15
@@ -1956,7 +1956,7 @@ kids 0
 OBJECT poly
 name "poly"
 loc 116.554 -5.2693 97.0377
-texture "/hda1/tuxkart/models/../images/brick.rgb"
+texture "../images/brick.png"
 texrep 6 4
 numvert 24
 6.08566 30.9374 -1.80956
@@ -2252,7 +2252,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 1.74659 25.177 43.374
-texture "/hda1/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 numvert 16
 22.3151 6.3511 -21.9626
 31.5405 7.03485 -21.9176
@@ -2310,7 +2310,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -2.70895 17.9836 37.506
-texture "/hda1/tuxkart/models/../images/stonewall.rgb"
+texture "../images/stonewall.png"
 texrep 5 5
 numvert 112
 36.9514 -19.316 -17.7411
@@ -2963,7 +2963,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 29.4043 17.9836 63.612
-texture "/hda1/tuxkart/models/../images/stonewall.rgb"
+texture "../images/stonewall.png"
 texrep 5 5
 numvert 18
 4.97595 -22.1105 7.82151
@@ -3085,7 +3085,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -3.66838 8.1639 38.0048
-texture "/hda1/tuxkart/models/../images/floor.rgb"
+texture "../images/floor.png"
 texrep 5 5
 numvert 18
 24.5222 -4.3203 9.11489
@@ -3167,7 +3167,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -3.66838 13.365 37.9914
-texture "/hda1/tuxkart/models/../images/pebbles.rgb"
+texture "../images/pebbles.png"
 texrep 3 3
 numvert 36
 7.65542 -12.8257 -9.7332
@@ -3404,7 +3404,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 9.75 23.2 64.5
-texture "/hda1/tuxkart/images/railing.rgb"
+texture "/hda1/tuxkart/images/railing.png"
 texrep 11 1
 numvert 10
 -23.45 -5.5 4.60001
@@ -3450,7 +3450,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -2.23341 23.2 -22.7754
-texture "/hda1/tuxkart/images/railing.rgb"
+texture "/hda1/tuxkart/images/railing.png"
 texrep 11 1
 numvert 10
 4.81802 -24.6905 -11.0797
@@ -3496,7 +3496,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 78.6338 15.4 56.9276
-texture "/hda1/tuxkart/models/../images/wood.rgb"
+texture "../images/wood.png"
 texrep 64 64
 numvert 112
 31.8535 11.7308 47.5266

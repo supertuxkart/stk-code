@@ -5,7 +5,7 @@ kids 3
 OBJECT poly
 name "rect"
 loc 0 0 -0.05
-texture "/u/steve/icefield.rgb"
+texture "../images/icefield.png"
 numvert 4
 -4.1 0 -5.55
 4.3 0 -5.55
@@ -27,7 +27,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.1 -3.9 -4.6
-texture "/u/steve/icefield.rgb"
+texture "../images/icefield.png"
 texrep 1 0.3
 texoff 0 0.7
 numvert 4

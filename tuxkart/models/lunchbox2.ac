@@ -6,7 +6,7 @@ kids 2
 OBJECT poly
 name "line"
 loc 0.0500001 1.6 0.25
-texture "./../images/lunchbox2.rgb"
+texture "../images/lunchbox2.png"
 numvert 26
 0.55 -0.6 -1.05
 0.55 -0.884701 2.11252

@@ -473,7 +473,7 @@ name "rect"
 loc 0 0.25 -1.85
 data 14
 @autotex Y=2.0
-texture "/hda1/tuxkart/images/bzzt.rgb"
+texture "../images/bzzt.png"
 numvert 8
 -1.7 0.75 -1.35
 -0.154546 1.25 -1.35

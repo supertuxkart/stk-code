@@ -7,7 +7,7 @@ kids 3
 OBJECT poly
 name "poly"
 loc 1.39699e-08 0.369441 -0.00958636
-texture "/usr/batcave1/tuxkart/models/../images/candy_stripe.rgb"
+texture "../images/candy_stripe.png"
 texrep 2 2
 numvert 36
 -0.502033 -0.37125 0.806835

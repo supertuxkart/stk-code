@@ -5,7 +5,7 @@ kids 1
 OBJECT poly
 name "rect"
 loc 0.0261096 0.0456918 0
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mnm.rgb"
+texture "../images/mnm.png"
 numvert 4
 -1 0 -0.6
 1 0 -0.6
