@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.22 2004/12/14 03:35:52 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.23 2004/12/16 00:14:18 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -93,11 +93,34 @@
          kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
       else //If it's neither, the rotation doesn't jumps the gap
       {
-         kart->getVelocity()->hpr[0] = 0.3f * -rotation_direction * kart->getVelocity()->xyz[1];
+         switch(world->raceSetup.difficulty)
+            {
+               case RD_EASY:
+                  kart->getVelocity()->hpr[0] = 0.15f * -rotation_direction * kart->getVelocity()->xyz[1];
+                  break;
+               case RD_MEDIUM:
+                  kart->getVelocity()->hpr[0] = 0.25f * -rotation_direction * kart->getVelocity()->xyz[1];
+                  break;
+               case RD_HARD:
+                  kart->getVelocity()->hpr[0] = 0.3f * -rotation_direction * kart->getVelocity()->xyz[1];
+                  break;
+            }
+
       } //End of the new steering algorithm
       
    
-      kart->throttle = kart->kart_properties->max_throttle;
+      switch(world->raceSetup.difficulty)
+         {
+            case RD_EASY:
+               kart->throttle = kart->kart_properties->max_throttle * 0.7f;
+               break;
+            case RD_MEDIUM:
+               kart->throttle = kart->kart_properties->max_throttle * 0.9f;
+               break;
+            case RD_HARD:
+               kart->throttle = kart->kart_properties->max_throttle;
+               break;
+         }
    }
    
       /*if (0) // use handicap

@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.11 2004/10/20 22:44:14 jamesgregory Exp $
+//  $Id: RaceManager.cxx,v 1.12 2004/12/16 00:14:18 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -114,6 +114,9 @@ QuickRaceMode::start()
 {
   RaceSetup raceSetup;
 
+
+  raceSetup.mode       = RaceSetup::RM_QUICK_RACE;
+  raceSetup.difficulty = difficulty;
   raceSetup.track = track;
   raceSetup.karts.resize(numKarts);
 
