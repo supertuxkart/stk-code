@@ -1,6 +1,6 @@
 # src/
 
-bindir=$(prefix)/games
+bindir=@bindir@
 
 bin_PROGRAMS = supertuxkart
 
