@@ -1,0 +1,8 @@
+2004-07-16  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx (main):
+	- Added support for command line parameters: track, nbrLaps,
+	  reverse, mirror and help.
+	- Shortened the main(), created two new functions: startScreen()
+	  and initTuxKart().
+

@@ -273,8 +273,8 @@ static void loadTrackList ()
   fclose ( fd ) ;
 }
 
-
-int main ( int argc, char **argv )
+/* Initialize the datadir, tracklist and plib stuff */
+static void initTuxKart ()
 {
   /* Set tux_aqfh_datadir to the correct directory */
  
@@ -318,7 +318,12 @@ int main ( int argc, char **argv )
   puSetDefaultFonts        ( *sorority, *sorority ) ;
   puSetDefaultStyle        ( PUSTYLE_SMALL_SHADED ) ;
   puSetDefaultColourScheme ( 243.0f/255.0f, 140.0f/255.0f, 34.0f/255.0f, 1.0) ;
+}
 
+
+/* Draw the startScreen */
+static void startScreen () 
+{
   /* Create all of the GUI elements */
 
   playButton = new puButton      ( 10, 10, 150, 50  ) ;
@@ -372,8 +377,86 @@ int main ( int argc, char **argv )
 
   installMaterial () ;
   splashMainLoop  () ;
-  switchToGame    () ; 
-  return 0 ;
 }
 
+int main ( int argc, char *argv[] )
+{
+ 
+  /* Default values */
+  int nl = 3;
+  int mirror = 0, reverse = 0;
+  int t = 0;
+  int np = 1;
+  
+  /* Testing if we've given arguments */
+  if ( argc > 1) 
+    {
+      for(int i = 1; i<argc; i++)
+	{
+	  if ( argv[i][0] != '-') continue;
 
+	  if ( !strcmp(argv[i], "--help") or
+	       !strcmp(argv[i], "-help") or
+	       !strcmp(argv[i], "-h") )
+	    {
+	      fprintf ( stdout, 
+			"Usage: tuxkart [--track n] [--nbrLaps n]"
+			" [--reverse] [--mirror]\n"
+			"\n"
+			"Run TuxKart, a racing game with go-kart that features"
+			" the well-known linux mascott Tux. The game is heavily"
+			" inspired by Super-Mario-Kart and Wacky Wheels.\n"
+			"\n"
+			"Options:\n"
+			"--track n\t\tStart at track number n. First track is 0.\n"
+			"--nbrLaps n\t\tDefine number of laps to n.\n"
+			"--reverse\t\tEnable reverse mode.\n"
+			"--mirror\t\tEnable mirror mode.\n"
+			"\n"
+			"You can visit TuxKart's homepage at "
+			"http://tuxkart.sourceforge.net\n\n"
+			);
+	      return 0;
+	    }
+	  else if( !strcmp(argv[i], "--track") and argc > 2 )
+	    {
+	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+	      t = atoi(argv[i+1]);
+	    }
+	  else if ( !strcmp(argv[i], "--reverse") )
+	    {
+	      fprintf ( stdout, "Enabling reverse mode.\n" ) ;
+	      reverse = 1;
+	    }
+	  else if ( !strcmp(argv[i], "--mirror") )
+	    {
+#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
+	      fprintf ( stdout, "Enabling mirror mode.\n" ) ;
+	      mirror = 1;
+#else
+	      mirror = 0 ;
+#endif
+	    }
+	  else if ( !strcmp(argv[i], "--nbrLaps") and argc > 2 )
+	    {
+	      fprintf ( stdout, "You choose to have %d laps.\n", argv[i+1] ) ;
+	      nl = atoi(argv[i+1]);
+	    }
+	}
+      /* Load plib stuff */
+      initTuxKart ();
+      /* Start the main program */
+      tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
+    }
+  else
+    {
+      /* Load plib stuff */
+      initTuxKart ();
+
+      // Show start screen
+      startScreen ();
+
+      switchToGame () ; 
+      return 0 ;
+    }
+}
