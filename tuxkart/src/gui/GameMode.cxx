@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.6 2004/08/17 22:53:44 grumbel Exp $
+//  $Id: GameMode.cxx,v 1.7 2004/08/18 09:11:30 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,17 +22,18 @@
 #include "WidgetSet.h"
 #include "World.h"
 
-GameMode::GameMode()
+GameMode::GameMode(RaceSetup& raceSetup_)
+  : raceSetup(raceSetup_)
 {
-        menu_id = widgetSet -> vstack(0);
-        
-        widgetSet -> label(menu_id, "Chose a Race Mode", GUI_LRG, GUI_ALL, 0, 0);
+	menu_id = widgetSet -> vstack(0);
 
-        int va = widgetSet -> varray(menu_id);
+	widgetSet -> label(menu_id, "Chose a Race Mode", GUI_LRG, GUI_ALL, 0, 0);
+
+	int va = widgetSet -> varray(menu_id);
 	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
 	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
 	widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
-        widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
+	widgetSet -> state(va, "Back",  GUI_SML, MENU_RETURN, 0);
 	widgetSet -> space(va);
 	widgetSet -> space(menu_id);
 	
@@ -56,13 +57,16 @@ void GameMode::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_GP:
+		raceSetup.numKarts = -1;
 		guiStack.push_back(GUIS_DIFFICULTYGP);
 		break;
 	case MENU_QUICKRACE:
+		raceSetup.numKarts = -1;
 		guiStack.push_back(GUIS_DIFFICULTYQR);
 		break;
 	case MENU_TIMETRIAL:
-		guiStack.push_back(GUIS_TRACKSEL);
+		raceSetup.numKarts = 1;
+		guiStack.push_back(GUIS_CHARSEL);
 		break;
 	case MENU_RETURN:
 		guiStack.pop_back();

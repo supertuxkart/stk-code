@@ -1,4 +1,4 @@
-//  $Id: GameMode.h,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: GameMode.h,v 1.3 2004/08/18 09:11:30 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,12 +20,15 @@
 #ifndef HEADER_GAMEMODE_H
 #define HEADER_GAMEMODE_H
 
+#include "../RaceSetup.h"
 #include "BaseGUI.h"
 
 class GameMode: public BaseGUI
 {
+private:
+	RaceSetup& raceSetup;
 public:
-	GameMode();
+	GameMode(RaceSetup& raceSetup);
 	~GameMode();
 	
 	void update(float dt);
