@@ -48,6 +48,7 @@ char *projectile_files [] =
 } ;
 
 
+char *tinytux_file   = "tinytux_magnet.ac" ;
 char *explosion_file = "explode.ac"    ;
 char *parachute_file = "parachute.ac"  ;
 char *magnet_file    = "magnet.ac"     ;
@@ -98,9 +99,16 @@ void load_players ()
   ssgEntity *obj ;
 
   ssgEntity *pobj1 = ssgLoad ( parachute_file, process_userdata ) ;
-  ssgEntity *pobj2 = ssgLoad ( magnet_file, process_userdata ) ;
-  ssgEntity *pobj3 = ssgLoad ( magnet2_file, process_userdata ) ;
-  ssgEntity *pobj4 = ssgLoad ( anvil_file, process_userdata ) ;
+  ssgEntity *pobj2 = ssgLoad ( magnet_file   , process_userdata ) ;
+  ssgEntity *pobj3 = ssgLoad ( magnet2_file  , process_userdata ) ;
+  ssgEntity *pobj4 = ssgLoad ( anvil_file    , process_userdata ) ;
+
+  sgCoord cc ;
+  sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
+  ssgTransform *ttt = new ssgTransform ( & cc ) ;
+  ttt -> addKid ( ssgLoad ( tinytux_file  , process_userdata ) ) ;
+
+  ssgEntity *pobj5 = ttt ;
 
   for ( int i = 0 ; player_files [ i ] != NULL && i < NUM_KARTS ; i++ )
   {
@@ -117,6 +125,7 @@ void load_players ()
     kart[i]-> addAttachment ( pobj2 ) ;
     kart[i]-> addAttachment ( pobj3 ) ;
     kart[i]-> addAttachment ( pobj4 ) ;
+    kart[i]-> addAttachment ( pobj5 ) ;
     num_karts = i + 1 ;
   }
 

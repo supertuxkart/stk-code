@@ -2,6 +2,7 @@
 #define MAT_IGN    1
 #define MAT_CRASH  2
 #define MAT_ZIP    4
+#define MAT_RESET  8
 
 struct Material
 {
@@ -20,6 +21,7 @@ public:
   int  isIgnore()   { return flags & MAT_IGN   ; }
   int  isCrashable(){ return flags & MAT_CRASH ; }
   int  isZipper()   { return flags & MAT_ZIP   ; }
+  int  isReset()    { return flags & MAT_RESET ; }
   void install ( int index ) ;
   
   ssgState *getState    () { return *gst ; }

@@ -12,6 +12,7 @@
 #define ATTACH_MAGNET           1
 #define ATTACH_MAGNET_BZZT      2
 #define ATTACH_ANVIL            3
+#define ATTACH_TINYTUX          4
 #define ATTACH_NOTHING          999
 
 /* Limits of Kart performance */
@@ -81,6 +82,7 @@ protected:
 
   int collided ;
   int crashed  ;
+  int rescue   ;
   float zipper_time_left ;
 
   sgVec3 surface_avoidance_vector ;
@@ -117,6 +119,7 @@ public:
   {
     lap = 0 ;
     position = 9 ;
+    rescue = FALSE ;
     on_ground = TRUE ;
     zipper_time_left = 0.0f ;
     collided = crashed = FALSE ;

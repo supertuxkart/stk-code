@@ -256,7 +256,13 @@ void GUI::joystickInput ()
 {
   static JoyInfo ji ;
 
-  joystick -> read ( & ji.buttons, ji.data ) ;
+  if ( joystick -> notWorking () )
+  {
+    ji.data[0] = ji.data[1] = 0.0f ;
+    ji.buttons = 0 ;
+  }
+  else
+    joystick -> read ( & ji.buttons, ji.data ) ;
 
   if ( isGLUTKeyDown ( GLUT_KEY_LEFT +256 ) ) ji.data [0] = -1.0f ;
   if ( isGLUTKeyDown ( GLUT_KEY_RIGHT+256 ) ) ji.data [0] =  1.0f ;

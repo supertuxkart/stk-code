@@ -50,7 +50,10 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
       velocity.xyz[2] += JUMP_IMPULSE ;
 
     if ( j -> hits & 0x08 )  /* D == Unused */
+    {
       sound -> playSfx ( SOUND_BEEP ) ;
+      rescue = TRUE ;
+    }
 
     if ( j -> buttons & 2 )  /* B == Active Braking */
       velocity.xyz[1] -= MAX_BRAKING * true_delta_t ;

@@ -187,8 +187,9 @@ int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz )
 }
 
 
-void Track::trackToSpatial ( sgVec3 xyz, sgVec2 src )
+void Track::trackToSpatial ( sgVec3 xyz, int hint )
 {
+  sgCopyVec3 ( xyz, driveline [ hint ] ) ;
 }
 
 

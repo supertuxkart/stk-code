@@ -9,6 +9,7 @@ ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst,
                *explode_gst, *flamemissile_gst, *players_gst, *magnet_gst,
                *brick_gst, *grid_gst, *lava_gst, *stone_gst,
                *pebble_gst, *floor_gst, *railing_gst, *wood_gst,
+               *tinytux_gst, *butterfly_gst,
                *bzzt_gst, *herringbones_gst, *goldwall_gst, *rainbow_gst ;
 
 ssgSimpleState *blank_gst ;
@@ -35,10 +36,12 @@ Material gs_setup [] =
   { &stone_gst   , "images/stonewall.rgb",NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &pebble_gst  , "images/pebbles.rgb" , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &floor_gst   , "images/floor.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
-  { &lava_gst    , "images/lava.rgb"    , NOCLAMP,FALSE,0.0, FALSE,1.0, MAT_CRASH },
+  { &lava_gst    , "images/lava.rgb"    , NOCLAMP,FALSE,0.0, FALSE,1.0, MAT_RESET },
   { &grid_gst    , "images/metalgrid.rgb",NOCLAMP,TRUE ,0.3, TRUE ,1.0, 0 },
   { &roadway_gst , "images/roadway.rgb" , UCLAMP ,TRUE ,0.0, TRUE ,1.0, 0 },
   { &rainbow_gst , "images/rainbow.rgb" , NOCLAMP,TRUE ,0.0, FALSE,1.0, 0 },
+  { &tinytux_gst , "images/tinytux.rgb" , UVCLAMP,TRUE ,0.8, FALSE,1.0, MAT_IGN },
+  { &butterfly_gst,"images/butterfly.rgb",UVCLAMP,TRUE ,0.8, FALSE,1.0, MAT_IGN },
   { &penguin_gst ,
                "images/Penguin_orig.rgb", NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },
   { &grass_gst   , "images/grass.rgb"   , NOCLAMP,FALSE,0.0, TRUE ,1.0, 0 },

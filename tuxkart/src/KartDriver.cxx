@@ -214,14 +214,39 @@ void KartDriver::doCollisionAnalysis ( float hot )
 
 void KartDriver::update ()
 {
+  if ( rescue )
+  {
+    rescue = FALSE ;
+    attach ( ATTACH_TINYTUX, 4.0f ) ;
+  }
+
   attachment_time_left -= fclock->getDeltaTime () ;
 
   if ( attachment_time_left <= 0.0f && attachment != NULL )
   {
+    if ( getAttachment () == ATTACH_TINYTUX )
+    {
+      if ( track_hint > 0 )
+        track_hint-- ;
+
+      float d = curr_pos.xyz[2] ;
+
+      curr_track -> trackToSpatial ( curr_pos.xyz, track_hint ) ;
+
+      curr_pos.xyz[2] = d ;
+    }
+
     attachment -> select ( 0 ) ;
     attachment_type = ATTACH_NOTHING ;
   }
 
+  if ( getAttachment () == ATTACH_TINYTUX )
+  {
+    sgZeroVec3 ( velocity.xyz ) ;
+    sgZeroVec3 ( velocity.hpr ) ;
+    velocity.xyz[2] = 1.1 * GRAVITY * delta_t ;
+  }
+  else
   if ( getAttachment () == ATTACH_PARACHUTE &&
        velocity.xyz[1] > MAX_PARACHUTE_VELOCITY )
     velocity.xyz[1] = MAX_PARACHUTE_VELOCITY ;

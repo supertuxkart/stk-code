@@ -207,11 +207,9 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
       collided = TRUE ;
 
-      if ( getMaterial ( h->leaf ) -> isZipper () )
-        collided = FALSE ;
-
-      if ( getMaterial ( h->leaf ) -> isCrashable () )
-        crashed = TRUE ;
+      if ( getMaterial ( h->leaf ) -> isZipper    () ) collided = FALSE ;
+      if ( getMaterial ( h->leaf ) -> isCrashable () ) crashed  = TRUE  ;
+      if ( getMaterial ( h->leaf ) -> isReset     () ) rescue   = TRUE  ;
     }
   }
 
@@ -235,6 +233,8 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
   
   hot = -1000000.0f ;
 
+  int need_rescue = FALSE ;
+
   for ( i = 0 ; i < num_hits ; i++ )
   {
     ssgHit *h = &results [ i ] ;
@@ -249,6 +249,8 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
       hot = hgt ;
       sgCopyVec3 ( curr_normal, h->plane ) ;
 
+      need_rescue = getMaterial ( h->leaf ) -> isReset  () ;
+
       if ( getMaterial ( h->leaf ) -> isZipper () )
       {
         if ( this == kart[0] )
@@ -261,7 +263,12 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
   }
 
   if ( end [ 2 ] < hot )
+  {
     end [ 2 ] = hot ;
+
+    if ( need_rescue )
+      rescue = TRUE ;
+  }
 
   return hot ;
 }

@@ -23,7 +23,7 @@ class Track
 
     int  absSpatialToTrack ( sgVec2 dst, sgVec3 xyz ) ;
     int  spatialToTrack ( sgVec2 last_pos, sgVec3 xyz, int hint ) ;
-    void trackToSpatial ( sgVec3 xyz, sgVec2 src ) ;
+    void trackToSpatial ( sgVec3 xyz, int last_hint ) ;
 
     float getTrackLength () { return total_distance ; }
     void draw2Dview ( float x, float y ) ;
