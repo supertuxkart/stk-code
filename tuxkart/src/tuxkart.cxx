@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.48 2004/08/08 11:23:39 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.49 2004/08/08 12:59:59 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -410,17 +410,10 @@ int tuxkartMain ()
 
   /* Load the Herring */
 
-  //sgVec3 cyan   = { 0.4, 1.0, 1.0 } ;
   sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
-  //sgVec3 red    = { 0.8, 0.0, 0.0 } ;
-  //sgVec3 green  = { 0.0, 0.8, 0.0 } ;
- 
-  //red_h     = new Herring ( red    ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
-  //green_h   = new Herring ( green  ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
-  //silver_h  = new Herring ( cyan   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
-  
+
   gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), raceSetup.mirror ) ;
-  silver_h     = new Herring ( ssgLoad ( "coin.ac", loader )   ) ; preProcessObj ( silver_h -> getRoot(), raceSetup.mirror ) ;
+  silver_h  = new Herring ( ssgLoad ( "coin.ac", loader )   ) ; preProcessObj ( silver_h -> getRoot(), raceSetup.mirror ) ;
   red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), raceSetup.mirror ) ;
   green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), raceSetup.mirror ) ;
 
