@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.29 2004/08/25 21:08:21 oaf_thadres Exp $
+//  $Id: RaceGUI.cxx,v 1.30 2004/08/29 17:24:09 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -222,15 +222,15 @@ void RaceGUI::drawDropShadowText ( char *str, int sz, int x, int y )
   drawText ( str, sz, x+1, y+1 ) ;
 }
 
-
+#if 0
 void RaceGUI::drawStatsText ()
 {
-/*  char str [ 256 ] ;
+  char str [ 256 ] ;
 
   sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
-  drawDropShadowText ( str, 18, 5, 300 ) ;*/
+  drawDropShadowText ( str, 18, 5, 300 ) ;
 }
-
+#endif
 void RaceGUI::drawTimer ()
 {
   char str [ 256 ] ;
@@ -246,11 +246,11 @@ void RaceGUI::drawTimer ()
   drawDropShadowText ( str,     25, 480, 420 ) ;
 }
 
-void RaceGUI::drawScore (const RaceSetup& raceSetup)
+void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
 {
   char str [ 256 ] ;
 
-  KartDriver* player_kart = World::current()->getPlayerKart(0);
+  KartDriver* player_kart = World::current()->getPlayerKart(player_nb);
 
 #ifdef DEBUG
   /* Show velocity */
@@ -259,7 +259,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
   else
     sprintf(str,"%3dmph",(int)(player_kart->getVelocity()->xyz[1]/MILES_PER_HOUR));
 
-  drawDropShadowText ( str, 18, 640-((strlen(str)-1)*18), 0 ) ;
+  drawDropShadowText ( str, (int)(18*ratio_y), (int)((640-((strlen(str)-1)*18))*ratio_x)+offset_x, offset_y ) ;
 #endif
 
   /* Show lap number */
@@ -281,11 +281,11 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
         pos_string [ player_kart->getPosition() ] ) ;
   }
 
-  drawDropShadowText ( str, 24, 10, 450 ) ;
+  drawDropShadowText ( str, (int)(24*ratio_y), (int)(10*ratio_x)+offset_x, (int)(450*ratio_y)+offset_y ) ;
 
   /* Show player's position */
   sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
-  drawDropShadowText ( str, 55, 22, 22 );
+  drawDropShadowText ( str, (int)(55*ratio_y), (int)(22*ratio_x)+offset_x, (int)(22*ratio_y)+offset_y );
 }
 
 
@@ -342,15 +342,15 @@ void RaceGUI::drawGameOverText ()
 }
 
 
-void RaceGUI::drawGameRunningText (const RaceSetup& raceSetup)
+void RaceGUI::drawGameRunningText (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
 {
-  drawScore (raceSetup) ;
+  drawScore (raceSetup, player_nb, offset_x, offset_y, ratio_x, ratio_y) ;
   drawTimer () ;
 
   glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
-    
-  if ( stats_enabled )
-    drawStatsText () ;
+
+//  if ( stats_enabled )
+//    drawStatsText () ;
 }
 
 void RaceGUI::drawPlayerIcons ()
@@ -394,17 +394,17 @@ void RaceGUI::drawPlayerIcons ()
 }
 
 
-void RaceGUI::drawEmergencyText ()
+void RaceGUI::drawEmergencyText ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y )
 {
   static float wrong_timer = 0.0f ;
   static float last_dist = -1000000.0f ;
   static int last_lap = -1 ;
 
-  float d = World::current()->getPlayerKart(0)-> getDistanceDownTrack () ;
-  int   l = World::current()->getPlayerKart(0)-> getLap () ;
+  float d = World::current()->getPlayerKart(player_nb)-> getDistanceDownTrack () ;
+  int   l = World::current()->getPlayerKart(player_nb)-> getLap () ;
 
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
-       World::current()->getPlayerKart(0) -> getVelocity () -> xyz [ 1 ] > 0.0f )
+       World::current()->getPlayerKart(player_nb) -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
     wrong_timer += 0.05f; // FIXME: was World::current()->clock -> getDeltaTime () ;
 
@@ -417,14 +417,16 @@ void RaceGUI::drawEmergencyText ()
       else
         glColor4f ( 0.0f, 1.0f, 0.0f, 1.0f ) ;
 
-      drawText ( "WRONG WAY!", 50, 100, 240 ) ;
+      drawText ( "WRONG WAY!", (int)(50*ratio_y), (int)(100*ratio_x)+offset_x,
+                                                  (int)(240*ratio_y)+offset_y ) ;
 
       if ( ! i )
         glColor4f ( 1.0f, 0.0f, 1.0f, 1.0f ) ;
       else
         glColor4f ( 0.0f, 1.0f, 0.0f, 1.0f ) ;
 
-      drawText ( "WRONG WAY!", 50, 100+2, 240+2 ) ;
+      drawText ( "WRONG WAY!", (int)(50*ratio_y), (int)((100+2)*ratio_x)+offset_x,
+                                                  (int)((240+2)*ratio_y)+offset_y ) ;
 
       i = ! i ;
     }
@@ -437,11 +439,11 @@ void RaceGUI::drawEmergencyText ()
 }
 
 
-void RaceGUI::drawCollectableIcons ()
+void RaceGUI::drawCollectableIcons ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y )
 {
   int zz = FALSE ;
 
-  switch ( World::current()->getPlayerKart(0)->getCollectable () )
+  switch ( World::current()->getPlayerKart(player_nb)->getCollectable () )
   {
     case COLLECT_NOTHING        : break ;
     case COLLECT_SPARK          : spark_gst        -> apply () ; break ;
@@ -452,24 +454,24 @@ void RaceGUI::drawCollectableIcons ()
                                   zz = TRUE ; break ;
   }
 
-  int x1 =  320-32 ;
-  int y1 = 400 ;
+  int x1 = (int)((320-32) * ratio_x) + offset_x ;
+  int y1 = (int)(400 * ratio_y)      + offset_y;
 
   glDisable(GL_TEXTURE_2D);
 
   glBegin ( GL_QUADS ) ;
     glColor4f ( 0.0, 0.0, 0.0, 0.16 ) ;
-    glVertex2i ( x1   , y1    ) ;
-    glVertex2i ( x1+64, y1    ) ;
-    glVertex2i ( x1+64, y1+64 ) ;
-    glVertex2i ( x1   , y1+64 ) ;
+    glVertex2i ( x1                  , y1    ) ;
+    glVertex2i ( x1+(int)(64*ratio_x), y1    ) ;
+    glVertex2i ( x1+(int)(64*ratio_x), y1+(int)(64*ratio_y) ) ;
+    glVertex2i ( x1                  , y1+(int)(64*ratio_y) ) ;
   glEnd();
 
   // If player doesn't have anything, just let the transparent black square
-  if(World::current()->getPlayerKart(0)->getCollectable () == COLLECT_NOTHING)
+  if(World::current()->getPlayerKart(player_nb)->getCollectable () == COLLECT_NOTHING)
     return;
 
-  int n  = World::current()->getPlayerKart(0)->getNumCollectables() ;
+  int n  = World::current()->getPlayerKart(player_nb)->getNumCollectables() ;
 
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
@@ -483,22 +485,22 @@ void RaceGUI::drawCollectableIcons ()
     {
       if ( zz )
       {
-	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1   , y1    ) ;
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+32, y1    ) ;
-	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+64, y1+32 ) ;
-	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1+32, y1+32 ) ;
+	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1                  , y1    ) ;
+	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1    ) ;
+	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+(int)(64*ratio_x), y1+(int)(32*ratio_y) ) ;
+	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(32*ratio_y) ) ;
 
-	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1+32, y1+32 ) ;
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+64, y1+32 ) ;
-	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+32, y1+64 ) ;
-	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1   , y1+64 ) ;
+	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(32*ratio_y) ) ;
+	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+(int)(64*ratio_x), y1+(int)(32*ratio_y) ) ;
+	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(64*ratio_y) ) ;
+	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1                  , y1+(int)(64*ratio_y) ) ;
       }
       else
       {
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*30 + x1   , y1    ) ;
-	glTexCoord2f ( 1, 0 ) ; glVertex2i ( i*30 + x1+64, y1    ) ;
-	glTexCoord2f ( 1, 1 ) ; glVertex2i ( i*30 + x1+64, y1+64 ) ;
-	glTexCoord2f ( 0, 1 ) ; glVertex2i ( i*30 + x1   , y1+64 ) ;
+	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*30 + x1                  , y1    ) ;
+	glTexCoord2f ( 1, 0 ) ; glVertex2i ( i*30 + x1+(int)(64*ratio_x), y1    ) ;
+	glTexCoord2f ( 1, 1 ) ; glVertex2i ( i*30 + x1+(int)(64*ratio_x), y1+(int)(64*ratio_y) ) ;
+	glTexCoord2f ( 0, 1 ) ; glVertex2i ( i*30 + x1                  , y1+(int)(64*ratio_y) ) ;
       }
     }
   glEnd () ;
@@ -508,68 +510,68 @@ void RaceGUI::drawCollectableIcons ()
 
 /* Energy meter that gets filled with coins */
 
-/* These definitions serve to make Energy Meter easy to tweak */
-#define METER_POS_X  590
-#define METER_POS_Y  130
-#define METER_WIDTH  24
-#define METER_HEIGHT 220
-
 // Meter fluid color (0 - 255)
 #define METER_TOP_COLOR    230, 0, 0, 210
 #define METER_BOTTOM_COLOR 240, 110, 110, 210 
-
-#define METER_BORDER_WIDTH 1
 // Meter border color (0.0 - 1.0)
 #define METER_BORDER_COLOR 0.0, 0.0, 0.0
 
-void RaceGUI::drawEnergyMeter ( float state )
+void RaceGUI::drawEnergyMeter ( float state, int offset_x, int offset_y, float ratio_x, float ratio_y )
 {
+  int x = (int)(590 * ratio_x) + offset_x;
+  int y = (int)(130 * ratio_y) + offset_y;
+  int w = (int)(24 * ratio_x);
+  int h = (int)(220 * ratio_y);
+  int wl = (int)(1 * ratio_x);
+  if(wl < 1)
+    wl = 1;
+
   // Draw a Meter border
   // left side
   glBegin ( GL_QUADS ) ;
   glColor3f ( METER_BORDER_COLOR ) ;
-    glVertex2i ( METER_POS_X-METER_BORDER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X,   METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X,   METER_POS_Y + METER_HEIGHT) ;
-    glVertex2i ( METER_POS_X-METER_BORDER_WIDTH, METER_POS_Y + METER_HEIGHT ) ;
+    glVertex2i ( x-wl, y-wl ) ;
+    glVertex2i ( x,    y-wl ) ;
+    glVertex2i ( x,    y + h) ;
+    glVertex2i ( x-wl, y + h ) ;
   glEnd () ;
 
   // right side
   glBegin ( GL_QUADS ) ;
   glColor3f ( METER_BORDER_COLOR ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH,   METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH+METER_BORDER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH+METER_BORDER_WIDTH, METER_POS_Y + METER_HEIGHT) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH,   METER_POS_Y + METER_HEIGHT ) ;
+    glVertex2i ( x+w,    y-wl ) ;
+    glVertex2i ( x+w+wl, y-wl ) ;
+    glVertex2i ( x+w+wl, y + h) ;
+    glVertex2i ( x+w,    y + h ) ;
   glEnd () ;
 
   // down side
   glBegin ( GL_QUADS ) ;
   glColor3f ( METER_BORDER_COLOR ) ;
-    glVertex2i ( METER_POS_X,    METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y-METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y ) ;
-    glVertex2i ( METER_POS_X,    METER_POS_Y ) ;
+    glVertex2i ( x,   y-wl ) ;
+    glVertex2i ( x+w, y-wl ) ;
+    glVertex2i ( x+w, y ) ;
+    glVertex2i ( x,   y ) ;
   glEnd () ;
 
   // up side
   glBegin ( GL_QUADS ) ;
   glColor3f ( METER_BORDER_COLOR ) ;
-    glVertex2i ( METER_POS_X,    METER_POS_Y+METER_HEIGHT ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y+METER_HEIGHT ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y+METER_HEIGHT+METER_BORDER_WIDTH ) ;
-    glVertex2i ( METER_POS_X,    METER_POS_Y+METER_HEIGHT+METER_BORDER_WIDTH ) ;
+    glVertex2i ( x,   y+h ) ;
+    glVertex2i ( x+w, y+h ) ;
+    glVertex2i ( x+w, y+h+wl ) ;
+    glVertex2i ( x,   y+h+wl ) ;
   glEnd () ;
 
   // Draw the Meter fluid
   glBegin ( GL_QUADS ) ;
   glColor4ub ( METER_TOP_COLOR ) ;
-    glVertex2i ( METER_POS_X,    METER_POS_Y ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y ) ;
+    glVertex2i ( x,   y ) ;
+    glVertex2i ( x+w, y ) ;
 
   glColor4ub ( METER_BOTTOM_COLOR ) ;
-    glVertex2i ( METER_POS_X+METER_WIDTH, METER_POS_Y + (int)(state * METER_HEIGHT));
-    glVertex2i ( METER_POS_X,    METER_POS_Y + (int)(state * METER_HEIGHT) ) ;
+    glVertex2i ( x+w, y + (int)(state * h));
+    glVertex2i ( x,   y + (int)(state * h) ) ;
   glEnd () ;
 }
 
@@ -602,17 +604,24 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
     {
     case 2:
       glColor3ub ( 230, 170, 160 ) ;
-      drawText ( "Ready!", 65, 370-(3*65), 260 ) ;
+      drawText ( "Ready!", 65, 370-(3*65), 220 ) ;
       break;
     case 1:
       glColor3ub ( 230, 230, 160 ) ;
-      drawText ( "Set!", 65, 370-(2*65), 260 ) ;
+      drawText ( "Set!", 65, 370-(2*65), 220 ) ;
       break;
     case 0:
       glColor3ub ( 100, 210, 100 ) ;
-      drawText ( "Go!", 65, 370-(int)(1.5*65), 260 ) ;
+      drawText ( "Go!", 65, 370-(int)(1.5*65), 220 ) ;
       break;
     }
+
+  float split_screen_ratio_x, split_screen_ratio_y;
+  split_screen_ratio_x = split_screen_ratio_y = 1.0;
+  if(raceSetup.getNumPlayers() >= 2)
+    split_screen_ratio_y = 0.5;
+  if(raceSetup.getNumPlayers() >= 3)
+    split_screen_ratio_x = 0.5;
 
   if ( World::current()->getPhase() == World::FINISH_PHASE )
     {
@@ -620,12 +629,29 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
     }
   else
     {
-      drawGameRunningText  (raceSetup) ;
-      drawEmergencyText    () ;
-      drawCollectableIcons () ;
-      drawEnergyMeter ( (float)(World::current()->getPlayerKart(0)->getNumHerring()) /
-                                  MAX_HERRING_EATEN ) ;
-      drawPlayerIcons      () ;
+      for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++)
+        {
+        int offset_x, offset_y;
+        offset_x = offset_y = 0;
+        if((pla == 0 && raceSetup.getNumPlayers() > 1) ||
+           pla == 2)
+          offset_y = 240;
+        if((pla == 2 || pla == 3) && raceSetup.getNumPlayers() > 2)
+          offset_x = 320;
+
+        drawCollectableIcons ( pla, offset_x, offset_y,
+                               split_screen_ratio_x, split_screen_ratio_y ) ;
+        drawEnergyMeter ( (float)(World::current()->getPlayerKart(pla)->getNumHerring()) /
+                               MAX_HERRING_EATEN, offset_x, offset_y,
+                               split_screen_ratio_x, split_screen_ratio_y ) ;
+        drawGameRunningText  ( raceSetup, pla, offset_x, offset_y,
+                               split_screen_ratio_x, split_screen_ratio_y ) ;
+        drawEmergencyText    ( pla, offset_x, offset_y,
+                               split_screen_ratio_x, split_screen_ratio_y ) ;
+        }
+
+      if(raceSetup.getNumPlayers() == 1)
+        drawPlayerIcons      () ;
       drawMap              () ;
     }
 

@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.7 2004/08/25 21:08:21 oaf_thadres Exp $
+//  $Id: RaceGUI.h,v 1.8 2004/08/29 17:24:09 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,14 +56,14 @@ private:
 	double time_left ;
 	
 	void drawStatusText (const RaceSetup& raceSetup);
-	void drawEnergyMeter ( float state );
-	void drawCollectableIcons ();
-	void drawEmergencyText ();
+	void drawEnergyMeter ( float state, int offset_x, int offset_y, float ratio_x, float ratio_y );
+	void drawCollectableIcons ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y );
+	void drawEmergencyText ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y );
 	void drawPlayerIcons ();
-	void drawGameRunningText (const RaceSetup& raceSetup);
+	void drawGameRunningText (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y);
 	void drawGameOverText ();
 	void drawMap ();
-	void drawScore (const RaceSetup& raceSetup);
+	void drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y);
 	void drawTimer ();
 	void drawDropShadowText ( char *str, int sz, int x, int y );
 	void drawInverseDropShadowText ( char *str, int sz, int x, int y );
@@ -74,7 +74,7 @@ private:
 	//debugging arrays and functions, never actually get used for anything at the moment
 	void stToggle ();
 	void stPrintf ( char *fmt, ... );
-	void drawStatsText () ;
+//	void drawStatsText () ;
 	bool stats_enabled ;
 	float tt[6] ;
 	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
