@@ -8,3 +8,6 @@ public:
    void done   () ;
 } ;
 
+
+int stereoShift () ;
+

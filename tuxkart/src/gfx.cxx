@@ -1,6 +1,13 @@
 
 #include  "tuxkart.h"
 
+#ifndef WIN32
+#include <unistd.h>
+#include <string.h>
+#include <sys/io.h>
+#include <sys/perm.h>                                                           
+#endif
+
 static unsigned int lastGLUTKeystroke = 0 ;
 
 static char keyIsDown [ 512 ] ;
@@ -153,9 +160,65 @@ void GFX::update ()
 }
 
 
+
+/* Address of the parallel port. */
+
+#define LPBASE 0x378L
+
+/* -1 left-eye, +1 right-eye, 0 center (ie No Stereo) */
+
+static int stereo = 0 ;
+
+
+int stereoShift ()
+{
+  return stereo ;
+}
+
+
 void GFX::done ()
 {
   glutPostRedisplay () ;
   glutSwapBuffers () ;
+  glBegin ( GL_POINTS ) ;
+  glVertex3f ( 0, 0, 0 ) ;
+  glEnd () ;
+  glFlush () ;
+
+  static int firsttime = TRUE ;
+
+  if ( firsttime )
+  {
+    firsttime = FALSE ;
+
+    if ( getenv ( "TUXKART_STEREO" ) == NULL )
+    {
+      stereo = 0 ;
+      return ;
+    }
+
+    fprintf ( stderr, "Requesting control of parallel printer port...\n" ) ;
+ 
+    int res = ioperm ( LPBASE, 8, 1 ) ;
+ 
+    if ( res != 0 )
+    {
+      perror ( "parport" ) ;
+      fprintf ( stderr, "Need to run as 'root' to get stereo.\n" ) ;
+      stereo = 0 ;
+    }
+    else
+    {
+      fprintf ( stderr, "Stereo Enabled!\n" ) ;
+      stereo = -1 ;
+    }
+  }
+
+  if ( stereo != 0 )
+  {
+    outb ( (stereo==-1) ? ~3 : ~2, LPBASE+2 ) ;
+    stereo = -stereo ;
+  }
 }
+
 
