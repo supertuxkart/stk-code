@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.39 2004/09/06 18:19:44 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.40 2004/09/06 18:58:15 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -201,9 +201,9 @@ void RaceGUI::drawText ( const char *text, int sz, int x, int y, int red, int gr
   int h = (int)(glTexture->h * scale_y);
 
   if(x == SCREEN_CENTERED_TEXT)
-    x = (640 - w) / 2;
+    x = (getScreenWidth() - w) / 2;
   if(y == SCREEN_CENTERED_TEXT)
-    y = (480 - h) / 2;
+    y = (getScreenHeight() - h) / 2;
 
   drawTexture(glTexture->texture, w, h, red, green, blue, x, y);
 }
@@ -306,8 +306,8 @@ void RaceGUI::drawTimer ()
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
   sprintf ( str, "%3d:%02d\"%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( "Time:", 28, 500, 430 ) ;
-  drawDropShadowText ( str, 36, 460, 400) ;
+  drawDropShadowText ( "Time:", 28, getScreenWidth() - 140, getScreenHeight() - 50 ) ;
+  drawDropShadowText ( str, 36, getScreenWidth() - 180, getScreenHeight() - 80) ;
 }
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
@@ -323,7 +323,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
   else
     sprintf(str,"%3dmph",(int)(player_kart->getVelocity()->xyz[1]/MILES_PER_HOUR));
 
-  drawDropShadowText ( str, (int)(18*ratio_y), (int)((640-((strlen(str)-1)*18))*ratio_x)+offset_x, offset_y ) ;
+  drawDropShadowText ( str, (int)(18*ratio_y), (int)((getScreenWidth()-((strlen(str)-1)*18))*ratio_x)+offset_x, offset_y ) ;
 #endif
 
   /* Show lap number */
@@ -344,7 +344,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
         pos_string [ player_kart->getPosition() ] ) ;
   }
 
-  drawDropShadowText ( str, (int)(38*ratio_y), (int)(10*ratio_x)+offset_x, (int)(422*ratio_y)+offset_y ) ;
+  drawDropShadowText ( str, (int)(38*ratio_y), (int)(10*ratio_x)+offset_x, (int)((getScreenHeight() - 58)*ratio_y)+offset_y ) ;
 
   /* Show player's position */
   sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
@@ -356,7 +356,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x
 void RaceGUI::drawMap ()
 {
   glColor3f ( 1,1,1 ) ;
-  World::current() ->track -> draw2Dview ( 520, 40, 120, 120, false ) ;
+  World::current() ->track -> draw2Dview ( getScreenWidth() - 120, 40, 120, 120, false ) ;
 
   glBegin ( GL_QUADS ) ;
 
@@ -657,7 +657,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   glAlphaFunc    ( GL_GREATER, 0.1 ) ;
   glEnable       ( GL_BLEND      ) ;
 
-  glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
+  glOrtho        ( 0, getScreenWidth(), 0, getScreenHeight(), 0, 100 ) ;
 
   switch (World::current()->ready_set_go)
     {
