@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cpp,v 1.1 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.1 2004/08/23 19:20:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,12 @@ RaceManager* RaceManager::instance_ = 0;
 
 RaceManager::RaceManager()
 {  
+}
+
+void
+RaceManager::next_race()
+{
+  
 }
 
 /* EOF */
