@@ -1,4 +1,4 @@
-//  $Id: KartManager.cxx,v 1.6 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: KartManager.cxx,v 1.7 2004/10/20 22:44:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -20,6 +20,7 @@
 #include <set>
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "KartManager.h"

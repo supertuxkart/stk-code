@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.10 2004/09/05 21:26:24 matzebraun Exp $
+//  $Id: RaceManager.cxx,v 1.11 2004/10/20 22:44:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <algorithm>
 #include "Loader.h"
 #include "TrackManager.h"
 #include "RaceSetup.h"

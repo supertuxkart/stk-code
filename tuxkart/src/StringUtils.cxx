@@ -1,4 +1,4 @@
-//  $Id: StringUtils.cxx,v 1.3 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: StringUtils.cxx,v 1.4 2004/10/20 22:44:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>,
@@ -17,6 +17,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include <algorithm>
 
 #include "StringUtils.h"
 
