@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.1 2004/08/10 16:54:36 grumbel Exp $
+//  $Id: TrackData.h,v 1.2 2004/08/10 16:59:19 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,5 +48,7 @@ public:
 public:
   TrackData();
 };
+
+#endif
 
 /* EOF */
