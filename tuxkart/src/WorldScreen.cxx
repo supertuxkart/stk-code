@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.3 2004/08/15 16:06:15 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.4 2004/08/15 16:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -69,9 +69,6 @@ WorldScreen::update()
   float dt = fclock->getDeltaTime () + overtime;
   overtime = 0;
 
-  for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
-    (*i)->update();
-
   while ( dt > inc )
     {
       if ( ! widgetSet -> get_paused () )
@@ -82,6 +79,10 @@ WorldScreen::update()
 
   if ( dt > 0.0f )
     overtime = dt;
+
+
+  for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
+    (*i)->update();
 
   draw();
 

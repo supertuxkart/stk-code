@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.16 2004/08/15 16:06:15 grumbel Exp $
+//  $Id: World.cxx,v 1.17 2004/08/15 16:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -201,6 +201,8 @@ World::~World()
 void
 World::draw()
 {
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> placeModel() ;
+
   TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
 
   ssgGetLight ( 0 ) -> setPosition ( track_data.sun_position ) ;

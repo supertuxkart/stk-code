@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.25 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: Driver.cxx,v 1.26 2004/08/15 16:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -76,9 +76,6 @@ Driver::reset ()
   sgCopyCoord ( &last_pos, &reset_pos ) ;
   sgCopyCoord ( &curr_pos, &reset_pos ) ;
   sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
-
-  for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
-    sgCopyCoord ( &(history[i]), &reset_pos ) ;
 
   track_hint = World::current() ->track -> absSpatialToTrack ( last_track_coords,
                                                  last_pos.xyz ) ;
@@ -250,7 +247,6 @@ void Driver::coreUpdate (float delta)
   sgMat4 mdelta  ;
 
   /* Form new matrix */
-
   sgMakeCoordMat4 ( mdelta, & scaled_velocity ) ;
   sgMakeCoordMat4 ( mat  , & curr_pos        ) ;
   sgMultMat4      ( result, mat, mdelta ) ;
@@ -273,16 +269,9 @@ void Driver::coreUpdate (float delta)
                                                             curr_pos.xyz,
                                                             track_hint ) ;
 
-  sgCopyCoord ( & history[history_index], & curr_pos ) ;
-  placeModel () ;
-
-  if ( ++history_index >= HISTORY_FRAMES )
-    history_index = 0 ;
-
   firsttime = FALSE ;
   doLapCounting () ;
 }
-
 
 void Driver::doObjectInteractions () { /* Empty by Default. */ } 
 void Driver::doLapCounting        () { /* Empty by Default. */ } 

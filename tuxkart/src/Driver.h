@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.25 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Driver.h,v 1.26 2004/08/15 16:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,8 +27,6 @@
 #include "KartProperties.h"
 
 class Shadow;
-
-#define HISTORY_FRAMES 128
 
 #define COLLECT_NOTHING         0
 #define COLLECT_SPARK           1
@@ -96,8 +94,6 @@ class KartDriver;
 class Driver
 {
 protected:
-  sgCoord  history [ HISTORY_FRAMES ] ;
-  
   /** Used to save the last position of the kart, which is then
       interpolated with the new one to form a smooth movement */
   sgCoord last_relax_pos;
@@ -204,17 +200,8 @@ public:
     //FIXME:update () ;
   }
 
+  /** Reposition the model in the scene */
   virtual void placeModel ();
-
-  sgCoord *getHistory ( int delay )
-  {
-    int q = history_index - delay ;
-
-    if ( q < 0 )
-      q += HISTORY_FRAMES ;
-
-    return & history [ q ] ;
-  }
 
   void coreUpdate (float delta) ;
   void physicsUpdate (float delta) ;
