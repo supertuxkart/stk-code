@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.7 2004/08/25 11:29:51 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.8 2004/08/25 20:36:18 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,8 +32,9 @@ RaceManager* RaceManager::instance_ = 0;
 
 GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_, 
                              const CupData& cup_,
-                             RaceDifficulty difficulty_)
-  : players(players_), cup(cup_), difficulty(difficulty_)
+                             RaceDifficulty difficulty_, 
+                             int numKarts_)
+  : difficulty(difficulty_), numKarts(numKarts_), players(players_), cup(cup_)
 {
   // Decide which karts should be used in the GrandPrix
   std::vector<std::string> karts;
@@ -101,8 +102,9 @@ GrandPrixMode::next()
 
 QuickRaceMode::QuickRaceMode(const std::string& track_, 
                              const std::vector<std::string>& players_, 
-                             RaceDifficulty difficulty_)
-  : track(track_), players(players_), difficulty(difficulty_)
+                             RaceDifficulty difficulty_, 
+                             int numKarts_)
+  : track(track_), players(players_), difficulty(difficulty_), numKarts(numKarts_)
 {}
 
 void
@@ -111,12 +113,12 @@ QuickRaceMode::start()
   RaceSetup raceSetup;
 
   raceSetup.track = track;
-  raceSetup.karts.resize(6);
+  raceSetup.karts.resize(numKarts);
 
   for(int i = 0; i < int(players.size()); ++i)
     {
-      raceSetup.karts[5-i] = players[i]; // Players starts last in the first race
-      raceSetup.players.push_back(5-i);
+      raceSetup.karts[numKarts-i-1] = players[i]; // Players starts last in the first race
+      raceSetup.players.push_back(numKarts-i-1);
     }
   
   kart_manager.fillWithRandomKarts(raceSetup.karts);
@@ -154,9 +156,11 @@ TimeTrialMode::next()
 
 RaceManager::RaceManager()
 { 
-  mode = 0;
+  mode       = 0;
+  numKarts   = 6;
   difficulty = RD_MEDIUM;
-  track = "race";
+  race_mode  = RaceSetup::RM_QUICK_RACE;
+  track      = "race";
   players.push_back("tuxkart");
 }
 
@@ -181,8 +185,13 @@ RaceManager::setRaceMode(RaceSetup::RaceMode mode)
 void
 RaceManager::setPlayerKart(int player, const std::string& kart)
 {
-  if (player >= 0 && player < int(players.size()))
-    players[player] = kart;
+  if (player >= 0 && player < 4)
+    {
+       if (player >= getNumPlayers())
+         setNumPlayers(player+1);
+
+      players[player] = kart;
+    }
   else
     std::cout << "Warning: player " << player << " is out of range" << std::endl;
 }
@@ -212,6 +221,12 @@ RaceManager::setNumPlayers(int num)
     }
 }
 
+void
+RaceManager::setNumKarts(int i)
+{
+  numKarts = i;
+}
+
 void 
 RaceManager::start()
 {
@@ -221,13 +236,13 @@ RaceManager::start()
   switch(race_mode)
     {
     case RaceSetup::RM_GRAND_PRIX:
-      mode = new GrandPrixMode(players, CupData(loader->getPath("data/herring.cup")), difficulty);
+      mode = new GrandPrixMode(players, CupData(loader->getPath("data/herring.cup")), difficulty, numKarts);
       break;
     case RaceSetup::RM_TIME_TRIAL:
       mode = new TimeTrialMode(track, players[0]);
       break;
     case RaceSetup::RM_QUICK_RACE:
-      mode = new QuickRaceMode(track, players, difficulty);
+      mode = new QuickRaceMode(track, players, difficulty, numKarts);
       break;
     default:
       assert(!"Unknown game mode");
@@ -241,6 +256,24 @@ RaceManager::next()
 { 
   assert(mode);
   mode->next();
+}
+
+void
+RaceManager::setNumLaps(int num)
+{
+  (void)num;
+}
+
+void
+RaceManager::setMirror()
+{
+  // FIXME
+}
+
+void
+RaceManager::setReverse()
+{
+  // FIXME
 }
 
 /* EOF */

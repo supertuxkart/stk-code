@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.6 2004/08/25 11:29:51 grumbel Exp $
+//  $Id: RaceManager.h,v 1.7 2004/08/25 20:36:18 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -39,15 +39,18 @@ class GrandPrixMode : public RaceMode
 {
 private:
   void start_race(int n);
+
+  RaceDifficulty difficulty;
+  int numKarts;
 public:
   std::vector<std::string> players;
   CupData cup;
-  RaceDifficulty difficulty;
   GrandPrixSetup stat;
 
   GrandPrixMode(const std::vector<std::string>& players_, 
                 const CupData& cup_,
-                RaceDifficulty difficulty_);
+                RaceDifficulty difficulty_,
+                int numKarts);
   virtual ~GrandPrixMode() {}
 
   void start();
@@ -60,8 +63,12 @@ public:
   std::string track;
   std::vector<std::string> players;
   RaceDifficulty difficulty;
+  int numKarts;
 
-  QuickRaceMode(const std::string& track_, const std::vector<std::string>& players_, RaceDifficulty difficulty_);
+  QuickRaceMode(const std::string& track_, 
+                const std::vector<std::string>& players_, 
+                RaceDifficulty difficulty_,
+                int numKarts);
   virtual ~QuickRaceMode() {}
 
   void start();
@@ -99,18 +106,25 @@ private:
   typedef std::vector<std::string> Players;
   Players players;
   std::string track;
+  
+  int numKarts;
 public:
   RaceManager();
 
   RaceSetup::RaceMode getRaceMode() const;
   int getNumPlayers() const;
 
+  void setNumKarts(int i);
+  int  getNumKarts() const { return numKarts; }
   void setTrack(const std::string& track);
   void setRaceMode(RaceSetup::RaceMode mode);
   void setDifficulty(RaceDifficulty difficulty_);
   void setPlayerKart(int player, const std::string& kart);
   void setNumPlayers(int num);
-  
+
+  void setNumLaps(int num);
+  void setMirror();
+  void setReverse();
   void start();
 
   /** Start the next race or go back to the start screen, depending on
