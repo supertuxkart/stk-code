@@ -111,10 +111,22 @@ AC_DEFINE_UNQUOTED(TUXKART_DATADIR, "$tuxkart_datadir")
 
 AC_MSG_CHECKING(for debug mode)
 AC_ARG_ENABLE(debug,
-              AC_HELP_STRING([--enable-debug], [enable debugging mode]),, enable_debug="yes")
+              AC_HELP_STRING([--enable-debug], [enable debugging mode]),
+              enable_debug="$enableval", enable_debug="no")
 if test "x${enable_debug}" != "xno"; then
     CXXFLAGS="$CXXFLAGS -Wall -W -Werror -DDEBUG -g -O0"
     CFLAGS="$CFLAGS -Wall -W -Werror -DDEBUG -g -O0"
+    AC_MSG_RESULT([enabled])
+else
+    AC_MSG_RESULT([disabled])
+fi
+AC_MSG_CHECKING([for profile mode])
+AC_ARG_ENABLE(profile,
+        AC_HELP_STRING([--enable-profile], [enable profiling mode]),
+        enable_profile="$enableval", enable_profile="no")
+if test "x$enable_profile" != "xno"; then
+    CXXFLAGS="$CXXFLAGS -Wall -W -pg -O3"
+    CFLAGS="$CFLAGS -Wall -W -pg -O3"
     AC_MSG_RESULT([enabled])
 else
     AC_MSG_RESULT([disabled])
