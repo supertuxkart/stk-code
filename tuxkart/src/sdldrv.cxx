@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.8 2004/08/01 20:24:12 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.9 2004/08/01 22:48:18 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -208,6 +208,17 @@ void kartInput()
   if ( keyState [ SDLK_a ] ) ji.buttons |= 0x20 ;
   if ( keyState [ SDLK_s ] ) ji.buttons |= 0x10 ;
   if ( keyState [ SDLK_d ] ) ji.buttons |= 0x08 ;
+  
+  // physics debugging keys
+  if ( keyState [ SDLK_1 ] ) ji.buttons |= 0x40 ;
+  if ( keyState [ SDLK_2 ] ) ji.buttons |= 0x80 ;
+  if ( keyState [ SDLK_3 ] ) ji.buttons |= 0x100 ;
+  if ( keyState [ SDLK_4 ] ) ji.buttons |= 0x200 ;
+  if ( keyState [ SDLK_5 ] ) ji.buttons |= 0x400 ;
+  if ( keyState [ SDLK_6 ] ) ji.buttons |= 0x800 ;
+  if ( keyState [ SDLK_PLUS ] ) ji.buttons |= 0x1000 ;
+  if ( keyState [ SDLK_MINUS ] ) ji.buttons |= 0x2000 ;
+  
 
   ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
   ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;

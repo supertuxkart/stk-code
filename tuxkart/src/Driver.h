@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.9 2004/08/01 20:07:08 jamesgregory Exp $
+//  $Id: Driver.h,v 1.10 2004/08/01 22:48:18 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -60,12 +60,12 @@
 #define MAX_WHEEL_TURN (M_PI/6)	/* Radians */
 #define TURN_SPEED (M_PI/6)	/* Radians per Second */
 #define KART_MASS 90		/* Kilograms */
-#define KART_INERTIA 15
+#define KART_INERTIA 13
 #define AIR_FRICTION 0.8257
 #define SYSTEM_FRICTION 4.8
 #define CORN_F -7.2		/* Cornering stiffness - front */
-#define CORN_R -7.0		/* Cornering stiffness - rear */
-#define MAX_GRIP 1.2		/* maximum wheel force */
+#define CORN_R -5.0		/* Cornering stiffness - rear */
+#define MAX_GRIP 1.4		/* maximum wheel force */
 /* End - New Physics Constants */
 
 #define MAX_ACCELLERATION       ( MAX_NATURAL_VELOCITY * 0.3f )
@@ -120,7 +120,15 @@ protected:
   
   float throttle;
   float brake;
-  bool mkjoo;
+  
+  // debug physics
+  float mass;
+  float inertia;
+  float corn_f;
+  float corn_r;
+  float max_grip;
+  float turn_speed;
+  
   /* End - New Physics */
 
   ssgTransform *model ;
@@ -159,7 +167,15 @@ public:
     sgZeroVec3 (acceleration);
     sgZeroVec3 (force);
     steer_angle = throttle = brake = 0.0f;
-    mkjoo = false;
+    
+    // debug physics
+    mass = KART_MASS;
+    inertia = KART_INERTIA;
+    corn_r = CORN_R;
+    corn_f = CORN_F;
+    max_grip = MAX_GRIP;
+    turn_speed = TURN_SPEED;    
+    /* End New Physics */
 
     sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
     reset () ;
@@ -358,6 +374,9 @@ class PlayerKartDriver : public KartDriver
 protected:
   float    tscale ;
   float    rscale ;
+  
+  // physics debugging
+  float *selected_property;
 
 public:
   PlayerKartDriver ( int _pos, ssgTransform *m ) : KartDriver ( _pos, m )

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.9 2004/08/01 00:13:27 grumbel Exp $
+//  $Id: Driver.cxx,v 1.10 2004/08/01 22:48:18 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -93,15 +93,15 @@ void Driver::physicsUpdate ()
 	sideslip_r = sideslip - wheel_rot_angle;
 	
 	/*----- Lateral Forces -----*/
-	lateral_f[0] = CORN_F * sideslip_f;
-	lateral_f[0] = min(MAX_GRIP, lateral_f[0]);
-	lateral_f[0] = max(-MAX_GRIP, lateral_f[0]);
-	lateral_f[0] *= KART_MASS * 9.82 / 2;
+	lateral_f[0] = corn_f * sideslip_f;
+	lateral_f[0] = min(max_grip, lateral_f[0]);
+	lateral_f[0] = max(-max_grip, lateral_f[0]);
+	lateral_f[0] *= mass * 9.82 / 2;
 	
-	lateral_r[0] = CORN_R * sideslip_r;
-	lateral_r[0] = min(MAX_GRIP, lateral_r[0]);
-	lateral_r[0] = max(-MAX_GRIP, lateral_r[0]);
-	lateral_r[0] *= KART_MASS * 9.82 / 2;
+	lateral_r[0] = corn_r * sideslip_r;
+	lateral_r[0] = min(max_grip, lateral_r[0]);
+	lateral_r[0] = max(-max_grip, lateral_r[0]);
+	lateral_r[0] *= mass * 9.82 / 2;
 	
 	// calculate traction
 	traction[0] = 0.0f;
@@ -121,11 +121,11 @@ void Driver::physicsUpdate ()
 	torque = (lateral_f[0] * wheelbase/2) - (lateral_r[0] * wheelbase/2);
 	
 	// Acceleration
-	acceleration[0] = force[0] / KART_MASS;
-	acceleration[1] = force[1] / KART_MASS;
-	acceleration[2] = force[2] / KART_MASS;
+	acceleration[0] = force[0] / mass;
+	acceleration[1] = force[1] / mass;
+	acceleration[2] = force[2] / mass;
 	
-	kart_angular_acc = torque / KART_INERTIA;
+	kart_angular_acc = torque / inertia;
 		
 	// velocity
 	velocity.xyz[0] += acceleration[0] * delta_t;

@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.10 2004/08/01 20:07:08 jamesgregory Exp $
+//  $Id: PlayerDriver.cxx,v 1.11 2004/08/01 22:48:18 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,8 +35,6 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     Delta-t is faked on slow machines for most activities - but
     for the player's joystick, it has to be the true delta-t.
   */
-  
-  mkjoo = true;
 
   float true_delta_t = fclock -> getDeltaTime () ;
 
@@ -77,45 +75,21 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     }
 
     if ( j -> buttons & 2 ) {  /* B == Active Braking */
-      //velocity.xyz[1] -= MAX_BRAKING * true_delta_t ;
       brake = MAX_THROTTLE;
       throttle = 0.0f;
     } else {
       brake = 0.0f;
     }
       
-    if ( ( j -> buttons & 1 ) 
-    /* && velocity.xyz[1] < MAX_NATURAL_VELOCITY *( 1.0f + wheelie_angle/90.0f ) */ ) 
-    { /* A == Accellerate */
-      // trottle add forward force
-      // velocity.xyz[1] += MAX_ACCELLERATION * true_delta_t ;
+    if ( j -> buttons & 1 ) { /* A == Accellerate */
       throttle = MAX_THROTTLE;
     } else if (throttle > 0) {
     	throttle -= MAX_THROTTLE * true_delta_t;
     } else
     	throttle = 0.0f;
-    
-    /*
-    else
-    if ( velocity.xyz[1] > MAX_DECELLERATION * true_delta_t )
-      velocity.xyz[1] -= MAX_DECELLERATION * true_delta_t ;
-    else
-    if ( velocity.xyz[1] < -MAX_DECELLERATION * true_delta_t )
-      velocity.xyz[1] += MAX_DECELLERATION * true_delta_t ;
-    else
-      velocity.xyz[1] = 0.0f ;
-     */
 
-    if ( wheelie_angle <= 0.0f )
-    {
-      /*
-      if ( velocity.xyz[1] >= 0.0f )
-        velocity.hpr[0] = -MAX_TURN_RATE * sqrt( velocity.xyz[1])* j->data[0];
-      else
-        velocity.hpr[0] =  MAX_TURN_RATE * sqrt(-velocity.xyz[1])* j->data[0];
-      */
-      
-      steer_angle = -TURN_SPEED * j->data[0];
+    if ( wheelie_angle <= 0.0f ) {      
+      steer_angle = -turn_speed * j->data[0];
       if ( steer_angle > MAX_WHEEL_TURN)
         steer_angle = MAX_WHEEL_TURN;
       if ( steer_angle < -MAX_WHEEL_TURN)
@@ -123,13 +97,44 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     }
     else
       velocity.hpr[0] = 0.0f ;
+  }
+  
+  /* Physics debugging control*/
+  if (j -> hits & 0x40) { // 1
+  	printf ("Selected Inertia - value: %f\n", inertia);
+	selected_property = &inertia;
+  }
+  if (j -> hits & 0x80) { // 2
+  	printf ("Selected corner stiffness front - value: %f\n", corn_f);
+	selected_property = &corn_f;
+  }
+  if (j -> hits & 0x100) { // 3
+  	printf ("Selected corner stiffness rear - value: %f\n", corn_r);
+	selected_property = &corn_r;
+  }
+  if (j -> hits & 0x200) { // 4
+  	printf ("Selected maximum grip - value: %f\n", max_grip);
+	selected_property = &max_grip;
+  }
+  if (j -> hits & 0x400) { // 5
+  	printf ("Selected mass of kart - value: %f\n", mass);
+	selected_property = &mass;
+  }
+  if (j -> hits & 0x800) { // 6
+  	printf ("Selected wheels turn degree - value: %f\n", turn_speed);
+	selected_property = &turn_speed;
+  }
+  if (j -> hits & 0x1000) { // +
+  	*selected_property += 0.1f;
+  	printf ("Increased selected value to: %f\n", *selected_property);
+  }
+  if (j -> hits & 0x2000) { // -
+  	*selected_property -= 0.1f;
+  	printf ("Decreased selected value to: %f\n", *selected_property);
+  }
+  
 
-    //float s = SKID_RATE * velocity.hpr[0] * velocity.xyz[1] ;
-    //velocity.xyz[0] = (s >= 0) ? (s*s) : -(s*s) ;
-    }
-
-    //velocity.xyz[2] -= GRAVITY * true_delta_t ;
-    force[2] = -GRAVITY * KART_MASS;
+  force[2] = -GRAVITY * KART_MASS;
 }
 
 void PlayerKartDriver::incomingKeystroke ( const SDL_keysym& key )
