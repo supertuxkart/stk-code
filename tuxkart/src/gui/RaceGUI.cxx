@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.17 2004/08/19 12:29:17 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.18 2004/08/20 20:24:41 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -99,9 +99,9 @@ void RaceGUI::keybd(const SDL_keysym& key)
 {
 	static int isWireframe = FALSE ;
 	
-	if (key.mod & KMOD_CTRL)
+	//in single player only we have an infinite ammo cheat
+	if (key.mod & KMOD_CTRL && numPlayers == 1)
 	{
-          // FIXME: '0' alone can't be correct, can it?
           PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ 0 ]->getDriver());
           if (driver)
             driver -> incomingKeystroke ( key ) ;
