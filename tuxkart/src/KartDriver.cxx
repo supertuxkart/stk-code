@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.36 2004/08/15 17:36:41 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.37 2004/08/15 18:06:38 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -305,33 +305,36 @@ void KartDriver::forceCrash ()
 void KartDriver::doCollisionAnalysis ( float delta, float hot )
 {
   if ( collided )
-  {
-    if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY )
-      velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
-    else
-    if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
-      velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
-  }
+    {
+      if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY )
+        {
+          velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
+        }
+      else if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
+        {
+          velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
+        }
+    }
 
   if ( crashed && velocity.xyz[1] > MIN_CRASH_VELOCITY )
-  {
-    forceCrash () ;
-  }
+    {
+      forceCrash () ;
+    }
   else if ( wheelie_angle < 0.0f )
-  {
-    wheelie_angle += PITCH_RESTORE_RATE * delta ;
+    {
+      wheelie_angle += PITCH_RESTORE_RATE * delta ;
 
-    if ( wheelie_angle >= 0.0f )
-      wheelie_angle = 0.0f ;
-  }
+      if ( wheelie_angle >= 0.0f )
+        wheelie_angle = 0.0f ;
+    }
 
   if ( is_on_ground() )
-  {
-    curr_pos.xyz[2] = hot ;
-    velocity.xyz[2] = 0.0f ;
+    {
+      curr_pos.xyz[2] = hot ;
+      velocity.xyz[2] = 0.0f ;
 
-    pr_from_normal( curr_pos.hpr, curr_normal ) ;
-  }
+      pr_from_normal( curr_pos.hpr, curr_normal ) ;
+    }
 }
 
 void KartDriver::update (float delta)
@@ -342,6 +345,8 @@ void KartDriver::update (float delta)
   if (driver)
     driver->update();
   
+  //std::cout << on_ground << " " 
+  //<< velocity.xyz[0] << ", " << velocity.xyz[1] << ", " << velocity.xyz[2] << std::endl;
   wheel_position += sgLengthVec3(velocity.xyz) * delta;
 
   if ( rescue )

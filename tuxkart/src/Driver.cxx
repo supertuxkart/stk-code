@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.27 2004/08/15 17:36:41 grumbel Exp $
+//  $Id: Driver.cxx,v 1.28 2004/08/15 18:06:38 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -267,7 +267,7 @@ Driver::coreUpdate (float delta)
    
   on_ground = ( hat <= 0.01 ) ;
 
-  doCollisionAnalysis ( hot ) ;
+  doCollisionAnalysis ( delta, hot ) ;
 
   track_hint = World::current() ->track -> spatialToTrack ( curr_track_coords,
                                                             curr_pos.xyz,
@@ -280,7 +280,7 @@ Driver::coreUpdate (float delta)
 void Driver::doObjectInteractions () { /* Empty by Default. */ } 
 void Driver::doLapCounting        () { /* Empty by Default. */ } 
 void Driver::doZipperProcessing   () { /* Empty by Default. */ } 
-void Driver::doCollisionAnalysis  ( float ) { /* Empty by Default. */ }
+void Driver::doCollisionAnalysis  ( float delta, float hot ) { (void)delta; (void)hot; }
 
 #define ISECT_STEP_SIZE         0.4f
 #define COLLISION_SPHERE_RADIUS 0.6f

@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.27 2004/08/15 17:36:41 grumbel Exp $
+//  $Id: Driver.h,v 1.28 2004/08/15 18:06:38 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -102,9 +102,8 @@ protected:
   sgCoord  curr_pos  ;
   sgCoord  last_pos  ;
 
-  sgCoord  curr_vel  ;
-public:  
   sgCoord  velocity  ;
+public:  
   
   /* start - New Physics */
   sgVec3   acceleration ;
@@ -179,8 +178,7 @@ public:
 
   sgCoord *getVelocity ()
   {
-    sgCopyCoord ( & curr_vel, & velocity ) ;
-    return & curr_vel ;
+    return &velocity ;
   }
 
   void setVelocity ( sgCoord *vel )
@@ -210,7 +208,7 @@ public:
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
   virtual void doZipperProcessing   () ;
-  virtual void doCollisionAnalysis  ( float hot ) ;
+  virtual void doCollisionAnalysis  ( float delta, float hot ) ;
   virtual void update               (float delta) ;
 } ;
 
