@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.12 2004/08/05 12:53:08 grumbel Exp $
+//  $Id: Driver.h,v 1.13 2004/08/05 15:31:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,7 +56,7 @@
 
 /* Start - New Physics Constants */
 #define MAX_THROTTLE 100
-#define ENGINE_POWER 100 	/* Newton */
+#define ENGINE_POWER 60 	/* Newton */
 #define MAX_WHEEL_TURN (M_PI/2)	/* Radians */
 #define TURN_SPEED (M_PI)	/* Radians per Second */
 #define KART_MASS 90		/* Kilograms */
@@ -65,7 +65,7 @@
 #define SYSTEM_FRICTION 4.8
 #define CORN_F -7.2		/* Cornering stiffness - front */
 #define CORN_R -5.0		/* Cornering stiffness - rear */
-#define MAX_GRIP 7.4		/* maximum wheel force */
+#define MAX_GRIP 4.0		/* maximum wheel force */
 /* End - New Physics Constants */
 
 #define MAX_ACCELLERATION       ( MAX_NATURAL_VELOCITY * 0.3f )
