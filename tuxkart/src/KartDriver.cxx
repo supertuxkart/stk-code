@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.38 2004/08/15 22:27:30 straver Exp $
+//  $Id: KartDriver.cxx,v 1.39 2004/08/15 23:19:49 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,24 +66,24 @@ KartParticleSystem::particle_create(int, Particle *p)
   sgSetVec4 ( p -> col, 1, 1, 1, 1 ) ; /* initially white */
   sgSetVec3 ( p -> pos, 0, 0, 0 ) ;    /* start off on the ground */
   sgSetVec3 ( p -> vel, 0, 0, 0 ) ;
-  sgSetVec3 ( p -> acc, 0, 0, 1.0f ) ; /* Gravity */
+  sgSetVec3 ( p -> acc, 0, 0, 2.0f ) ; /* Gravity */
   p->size = .5f;
-  p -> time_to_live = 0.8 ;            /* Droplets evaporate after 5 seconds */
+  p -> time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
   
-  (void)pos;
-  
+  sgCoord* pos = kart->getCoord ();
+  sgCoord* vel = kart->getVelocity ();
+  //sgCopyVec3 (p->vel, vel->xyz);
+   
   float xDirection = sgCos (pos->hpr[0] - 90.0f); // Point at the rear 
   float yDirection = sgSin (pos->hpr[0] - 90.0f); // Point at the rear
   
-  sgCoord* pos = kart->getCoord ();
   sgCopyVec3 (p->pos, pos->xyz);
   
   p->pos[0] += xDirection * 0.7;
   p->pos[1] += yDirection * 0.7;
   
-  //sgCopyVec3 (p->vel, vel->xyz);
-  //p->vel[0] = xDirection * vel->xyz[0] * 1.0;
-  //p->vel[1] = yDirection * vel->xyz[1] * 1.0;
+  p->vel[0] = xDirection * -vel->xyz[0] * 0.0;
+  p->vel[1] = yDirection * -vel->xyz[0] * 0.0;
 
   getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
 }
@@ -93,6 +93,7 @@ KartParticleSystem::particle_update (float delta, int, Particle * particle)
 {
   particle->size    += delta*2.0f;
   particle->col[3]  -= delta * 2.0f;
+  //sgScaleVec3 (particle->pos, particle->vel, delta);
 }
 
 KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
@@ -686,7 +687,7 @@ KartDriver::load_data()
   
   // Attach Particle System
   sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
-  smoke_system = new KartParticleSystem(this, 25, 5, 20.0f, TRUE, 0.35f, 1000);
+  smoke_system = new KartParticleSystem(this, 50, 5, 100.0f, TRUE, 0.35f, 1000);
   smoke_system -> setState (getMaterial ("smoke.png")-> getState() );
   //smoke_system -> setState ( smokepuff ) ;
   exhaust_pipe = new ssgTransform (&pipe_pos);
