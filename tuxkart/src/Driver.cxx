@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.22 2004/08/13 22:19:03 grumbel Exp $
+//  $Id: Driver.cxx,v 1.23 2004/08/14 20:08:07 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -93,12 +93,13 @@ void Driver::update ()
 {
   float dt = World::current()->fclock->getDeltaTime () ;
   
-  if (dt > 0.05f)
-  	physicsUpdate ();
+  //if (dt > 0.05f)
+  //	physicsUpdate ();
 
   while ( dt > 0.05f )
   {
     delta_t = 0.05f ;
+    physicsUpdate ();
     coreUpdate () ;
     dt -= 0.05f ;
   }
