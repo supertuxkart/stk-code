@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include <sys/types.h>
+#include <sys/socket.h>
 #if defined(_MSC_VER)
  #include <winsock.h>
 #else
