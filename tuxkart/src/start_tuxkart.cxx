@@ -126,9 +126,9 @@ static void play_cb ( puObject * )
   puDeleteObject ( playButton    ) ;
   puDeleteObject ( exitButton    ) ;
   puDeleteObject ( trackButtons  ) ;
-  puDeleteObject ( intro_gst     ) ;
-  puDeleteObject ( sorority      ) ;
-  puDeleteObject ( fnt           ) ;
+  delete intro_gst ;
+  delete sorority  ;
+  delete fnt       ;
 
   tuxkart_main ( nl, track_idents[t] ) ;
 }
