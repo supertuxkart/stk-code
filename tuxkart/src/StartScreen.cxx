@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.8 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.9 2004/08/24 21:01:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -66,7 +66,7 @@ StartScreen::update()
 	
   // Swapbuffers - and off we go again...
   pollEvents() ;
-  updateGUI(raceSetup);
+  updateGUI();
   swapBuffers();
 }
 
@@ -100,22 +100,6 @@ StartScreen::switchToGame()
   
   guiStack.clear();
   
-  switch(raceSetup.mode)
-    {
-    case RaceSetup::RM_TIME_TRIAL:
-      RaceManager::instance()->set_timetrial(raceSetup.track);
-      break;
-
-    case RaceSetup::RM_QUICK_RACE:
-      RaceManager::instance()->set_quickrace(raceSetup.track, 
-                                             raceSetup.difficulty);
-      break;
-
-    case RaceSetup::RM_GRAND_PRIX:
-      RaceManager::instance()->set_grandprix("herring", raceSetup.difficulty);
-      break;
-    }
-
   RaceManager::instance()->start();
 }
 

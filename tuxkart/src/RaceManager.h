@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.3 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: RaceManager.h,v 1.4 2004/08/24 21:01:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -77,6 +77,9 @@ public:
   void next();
 };
 
+/** RaceManager keeps track of the game mode, number of players and
+    such, the GUI calls the RaceManager to setup and start a race,
+    grandprix or similar stuff */
 class RaceManager
 {
 private:
@@ -87,13 +90,27 @@ public:
 private:
   RaceMode*       mode;
 
+  RaceDifficulty difficulty;
+  RaceSetup::RaceMode race_mode;
+  typedef std::vector<std::string> Players;
+  Players players;
+  std::string track;
 public:
   RaceManager();
-  
+  /*  
   void set_grandprix(const std::string& cup, RaceDifficulty difficulty_);
   void set_quickrace(const std::string& track, RaceDifficulty difficulty_);
   void set_timetrial(const std::string& track);
+  */
+  RaceSetup::RaceMode getRaceMode() const;
+  int getNumPlayers() const;
 
+  void setTrack(const std::string& track);
+  void setRaceMode(RaceSetup::RaceMode mode);
+  void setDifficulty(RaceDifficulty difficulty_);
+  void setPlayerKart(int player, const std::string& kart);
+  void setNumPlayers(int num);
+  
   void start();
 
   /** Start the next race or go back to the start screen, depending on

@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.7 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: NumPlayers.cxx,v 1.8 2004/08/24 21:01:45 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,10 +19,10 @@
 
 #include "NumPlayers.h"
 #include "tuxkart.h"
+#include "RaceManager.h"
 #include "WidgetSet.h"
 
-NumPlayers::NumPlayers(RaceSetup& raceSetup_)
-  : raceSetup(raceSetup_)
+NumPlayers::NumPlayers()
 {
 	menu_id = widgetSet -> varray(0);
 	widgetSet -> start(menu_id, "Two Players",  GUI_SML, 2, 0);
@@ -58,10 +58,7 @@ void NumPlayers::select()
 	{
 	case MENU_NETWORK:	break;
 	default: 
-                raceSetup.players.clear();
-                int numPlayers = widgetSet -> token ( widgetSet -> click() );
-                for (int i = 0; i < numPlayers; ++i)
-                        raceSetup.players.push_back(i);
+                RaceManager::instance()->setNumPlayers(widgetSet -> token ( widgetSet -> click() ));
                 guiStack.push_back(GUIS_GAMEMODE);
 		break;
 	}

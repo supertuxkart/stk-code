@@ -1,4 +1,4 @@
-//  $Id: StartScreen.h,v 1.3 2004/08/11 22:08:01 jamesgregory Exp $
+//  $Id: StartScreen.h,v 1.4 2004/08/24 21:01:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,9 +38,7 @@ public:
   StartScreen();
 
   void switchToGame();
-  void update();
-  
-  RaceSetup raceSetup;
+  void update(); 
 };
 
 #endif

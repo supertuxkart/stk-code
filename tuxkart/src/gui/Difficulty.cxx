@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.12 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: Difficulty.cxx,v 1.13 2004/08/24 21:01:45 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,12 +19,12 @@
 
 #include "Difficulty.h"
 #include "tuxkart.h"
+#include "RaceManager.h"
 #include "WidgetSet.h"
 
 #include <algorithm>
 
-Difficulty::Difficulty(RaceSetup& raceSetup_)
-  : raceSetup(raceSetup_)
+Difficulty::Difficulty()
 {
 	menu_id = widgetSet -> vstack(0);
 
@@ -67,15 +67,15 @@ void Difficulty::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_EASY:
-		raceSetup.difficulty = RD_EASY;
+                RaceManager::instance()->setDifficulty(RD_EASY);
 		guiStack.push_back(GUIS_CHARSEL);
 		break;
 	case MENU_MEDIUM:
-		raceSetup.difficulty = RD_MEDIUM;
+                RaceManager::instance()->setDifficulty(RD_MEDIUM);
 		guiStack.push_back(GUIS_CHARSEL);
 		break;
 	case MENU_HARD:
-		raceSetup.difficulty = RD_HARD;
+                RaceManager::instance()->setDifficulty(RD_HARD);
 		guiStack.push_back(GUIS_CHARSEL);
 		break;
 	default: break;

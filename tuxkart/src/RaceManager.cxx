@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.3 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: RaceManager.cxx,v 1.4 2004/08/24 21:01:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <assert.h>
+#include <iostream>
 #include "Loader.h"
 #include "TrackManager.h"
 #include "RaceSetup.h"
@@ -133,8 +135,11 @@ TimeTrialMode::next()
 RaceManager::RaceManager()
 { 
   mode = 0;
+  difficulty = RD_MEDIUM;
+  track = "race";
+  players.push_back("tuxkart");
 }
-
+/*
 void
 RaceManager::set_grandprix(const std::string& cup, RaceDifficulty difficulty_)
 {
@@ -156,11 +161,79 @@ RaceManager::set_timetrial(const std::string& track)
   delete mode;
   mode = new TimeTrialMode(track_manager.getTrack(track));
 }
+*/
+void
+RaceManager::setDifficulty(RaceDifficulty difficulty_)
+{
+  difficulty = difficulty_;
+}
+
+RaceSetup::RaceMode
+RaceManager::getRaceMode() const
+{
+  return race_mode;
+}
+
+void
+RaceManager::setRaceMode(RaceSetup::RaceMode mode)
+{
+  race_mode = mode;
+}
+
+void
+RaceManager::setPlayerKart(int player, const std::string& kart)
+{
+  if (player >= 0 && player < int(players.size()))
+    players[player] = kart;
+  else
+    std::cout << "Warning: player " << player << " is out of range" << std::endl;
+}
+
+void
+RaceManager::setTrack(const std::string& track_)
+{
+  track = track_;
+}
+
+int
+RaceManager::getNumPlayers() const
+{
+  return players.size();
+}
+
+void
+RaceManager::setNumPlayers(int num)
+{
+  players.resize(num);
+  for(Players::iterator i = players.begin(); i != players.end(); ++i)
+    {
+      if (i->empty())
+        {
+          *i = "tuxkart";
+        }
+    }
+}
 
 void 
 RaceManager::start()
 {
-  assert(mode);
+  delete mode;
+
+  switch(race_mode)
+    {
+    case RaceSetup::RM_GRAND_PRIX:
+      mode = new GrandPrixMode(CupData(loader->getPath("data/herring.cup")), difficulty);
+      break;
+    case RaceSetup::RM_TIME_TRIAL:
+      mode = new TimeTrialMode(track_manager.getTrack(track));
+      break;
+    case RaceSetup::RM_QUICK_RACE:
+      mode = new QuickRaceMode(track_manager.getTrack(track), difficulty);
+      break;
+    default:
+      assert(!"Unknown game mode");
+    }
+
   mode->start();
 }
 

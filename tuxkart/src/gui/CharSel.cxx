@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.21 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.22 2004/08/24 21:01:45 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,6 +27,7 @@
 #include "KartManager.h"
 #include "preprocessor.h"
 #include "WidgetSet.h"
+#include "RaceManager.h"
 #include "StartScreen.h"
 
 CharSel::CharSel(int whichPlayer):
@@ -148,9 +149,9 @@ void CharSel::select()
 	int token = widgetSet -> token (widgetSet -> click());
 	
 	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
-		StartScreen::current()->raceSetup.karts.push_back(kart_manager.getKartById(token).ident);
+          RaceManager::instance()->setPlayerKart(0, kart_manager.getKartById(token).ident);
 	
-	if (StartScreen::current()->raceSetup.getNumPlayers() > 1)
+	if (RaceManager::instance()->getNumPlayers() > 1)
 	{
 		if (guiStack.back() == GUIS_CHARSEL)
 		{
@@ -158,7 +159,7 @@ void CharSel::select()
 			return;
 		}
 			
-		if (StartScreen::current()->raceSetup.getNumPlayers() > 2)
+		if (RaceManager::instance()->getNumPlayers() > 2)
 		{
 			if (guiStack.back() == GUIS_CHARSELP2)
 			{
@@ -166,7 +167,7 @@ void CharSel::select()
 				return;
 			}
 
-			if (StartScreen::current()->raceSetup.getNumPlayers() > 3)
+			if (RaceManager::instance()->getNumPlayers() > 3)
 			{
 				if (guiStack.back() == GUIS_CHARSELP3)
 				{
@@ -177,7 +178,7 @@ void CharSel::select()
 		}	
 	}
 	
-        if (StartScreen::current()->raceSetup.mode != RaceSetup::RM_GRAND_PRIX)
+        if (RaceManager::instance()->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
           guiStack.push_back(GUIS_TRACKSEL); 
         else
           StartScreen::current()->switchToGame();
