@@ -1,4 +1,4 @@
-// $Id: Config.cxx,v 1.7 2004/09/01 02:21:24 oaf_thadres Exp $
+// $Id: Config.cxx,v 1.8 2004/09/05 18:14:47 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,10 +23,12 @@
 #include <stdexcept>
 
 #include "Config.h"
+
 #include "lisp/Lisp.h"
 #include "lisp/Parser.h"
 #include "lisp/Writer.h"
 
+#include "SDL.h"
 
 Config config;
 
@@ -82,6 +84,24 @@ void Config::setDefaults()
   player[1].setName("Player 2");
   player[2].setName("Player 3");
   player[3].setName("Player 4");
+  /*player 1 default keyboard settings*/
+  player[0].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_LEFT;
+  player[0].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_RIGHT;
+  player[0].keys[CD_KEYBOARD][KC_UP]      = SDLK_UP;
+  player[0].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_DOWN;
+  player[0].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_a;
+  player[0].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_s;
+  player[0].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_d;
+  player[0].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_f;
+  /*player 2 default keyboard settings*/
+  player[1].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_j;
+  player[1].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_l;
+  player[1].keys[CD_KEYBOARD][KC_UP]      = SDLK_i;
+  player[1].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_k;
+  player[1].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_q;
+  player[1].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_w;
+  player[1].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_e;
+  player[1].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_r;
 }
 
 
@@ -148,10 +168,10 @@ void Config::loadConfig(const std::string& filename)
       reader->get("fire",    player[i].keys[CD_KEYBOARD][KC_FIRE]);
 
       /*get joystick configuration*/
-      reader->get("wheelie", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
-      reader->get("jump",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
-      reader->get("rescue",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
-      reader->get("fire",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
+      reader->get("joy-wheelie", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
+      reader->get("joy-jump",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
+      reader->get("joy-rescue",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
+      reader->get("joy-fire",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
     }
   }
   catch(std::exception& e)
@@ -213,7 +233,7 @@ void Config::saveConfig(const std::string& filename)
       writer.writeComment("keyboard layout");
       writer.write("left\t",    player[i].keys[CD_KEYBOARD][KC_LEFT]);
       writer.write("right\t",   player[i].keys[CD_KEYBOARD][KC_RIGHT]);
-      writer.write("up\t\t",      player[i].keys[CD_KEYBOARD][KC_UP]);
+      writer.write("up\t\t",    player[i].keys[CD_KEYBOARD][KC_UP]);
       writer.write("down\t",    player[i].keys[CD_KEYBOARD][KC_DOWN]);
       writer.write("wheelie\t", player[i].keys[CD_KEYBOARD][KC_WHEELIE]);
       writer.write("jump\t",    player[i].keys[CD_KEYBOARD][KC_JUMP]);
@@ -221,10 +241,10 @@ void Config::saveConfig(const std::string& filename)
       writer.write("fire\t",    player[i].keys[CD_KEYBOARD][KC_FIRE]);
 
       writer.writeComment("joystick layout");
-      writer.write("wheelie\t", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
-      writer.write("jump\t",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
-      writer.write("rescue\t",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
-      writer.write("fire\t",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
+      writer.write("joy-wheelie\t", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
+      writer.write("joy-jump\t",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
+      writer.write("joy-rescue\t",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
+      writer.write("joy-fire\t",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
 
       writer.endList(temp);
     }

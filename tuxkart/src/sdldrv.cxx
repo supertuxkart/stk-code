@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.35 2004/08/29 19:50:45 oaf_thadres Exp $
+//  $Id: sdldrv.cxx,v 1.36 2004/09/05 18:14:48 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -70,7 +70,6 @@ void setupControls()
 {
 	keyState = SDL_GetKeyState(NULL);
 
-
 	int numJoys = SDL_NumJoysticks();
 	
 	int i;
@@ -80,30 +79,12 @@ void setupControls()
 		/*open all joysticks, but don't access players that don't exist*/
 		if(i < PLAYERS)
 			config.player[i].useJoy = true;
+			config.player[i].joystick = i;
 	}
 
 	for (; i != PLAYERS; ++i)
 		config.player[i].useJoy = false;
 
-	/*player 1 default keyboard settings*/
-	config.player[0].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_LEFT;
-	config.player[0].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_RIGHT;
-	config.player[0].keys[CD_KEYBOARD][KC_UP]      = SDLK_UP;
-	config.player[0].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_DOWN;
-	config.player[0].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_a;
-	config.player[0].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_s;
-	config.player[0].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_d;
-	config.player[0].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_f;
-
-	/*player 2 default keyboard settings*/
-	config.player[1].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_j;
-	config.player[1].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_l;
-	config.player[1].keys[CD_KEYBOARD][KC_UP]      = SDLK_i;
-	config.player[1].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_k;
-	config.player[1].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_q;
-	config.player[1].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_w;
-	config.player[1].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_e;
-	config.player[1].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_r;
 }
 
 void shutdownVideo ()

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.12 2004/08/29 19:50:45 oaf_thadres Exp $
+//  $Id: sdldrv.h,v 1.13 2004/09/05 18:14:48 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -21,8 +21,6 @@
 #define HEADER_SDLDRV_H
 
 #include <SDL.h>
-#include <map>
-#include <vector>
 
 class RaceSetup;
 
