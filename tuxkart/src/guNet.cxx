@@ -1,4 +1,4 @@
-//  $Id: guNet.cxx,v 1.8 2004/08/01 14:17:42 grumbel Exp $
+//  $Id: guNet.cxx,v 1.9 2004/08/02 14:47:26 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -85,7 +85,9 @@ void guUDPConnection::disconnect ()
 int guUDPConnection::connect ( char *hostname, int _port )
 {
 #ifdef WIN32
-	return 1;
+    (void) hostname;
+    (void) _port;
+    return 1;
 #else
   in_addr  = new sockaddr_in ;
   out_addr = new sockaddr_in ;
@@ -180,7 +182,9 @@ int guUDPConnection::connect ( char *hostname, int _port )
 int guUDPConnection::sendMessage ( char *mesg, int length )
 {
 #ifdef WIN32
-  return 1;
+    (void) mesg;
+    (void) length;
+    return 1;
 #else
   while ( 1 )
   {
@@ -213,7 +217,9 @@ int guUDPConnection::sendMessage ( char *mesg, int length )
 int guUDPConnection::recvMessage ( char *mesg, int length )
 {
 #ifdef WIN32
-  return 0;
+    (void) mesg;
+    (void) length;
+    return 0;
 #else
   unsigned int len = sizeof ( in_addr ) ;
 
