@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 #ifdef WIN32
 #ifdef __CYGWIN__
 #include <unistd.h>
@@ -20,6 +21,7 @@
 #include <plib/sl.h>
 #include <plib/js.h>
 #include <plib/fnt.h>
+#include <plib/pu.h>
 
 #include "guNet.h"
 #include "constants.h"
@@ -73,6 +75,10 @@ extern int cam_follow ;
 
 #define DEFAULT_NUM_LAPS_IN_RACE 5
 
+#ifndef TUXKART_DATADIR
+#define TUXKART_DATADIR "/usr/local/share/games/tuxkart"
+#endif
+
 extern int num_karts ;
 extern int num_laps_in_race ;
 extern KartDriver *kart       [ NUM_KARTS       ] ;
@@ -82,4 +88,7 @@ extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 extern int stats_enabled ;
 
 extern int finishing_position ;
+
+extern int tuxkartMain ( int nl, int mirror, char *track ) ;
+
 

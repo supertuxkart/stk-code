@@ -4,8 +4,10 @@
 #define MIN_CAM_DISTANCE      5.0f  
 #define MAX_CAM_DISTANCE     10.0f  // Was 15
 
-int player=0;
+int mirror = 0 ;
+int player = 0 ;
 
+void mirror_scene ( ssgEntity *n ) ;
 int finishing_position = -1 ;
 
 static ulClock ck2 ;
@@ -67,7 +69,6 @@ Projectile *projectile [ NUM_PROJECTILES ] ;
 Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
 int       num_karts = 0 ;
-char       *datadir = NULL ;
 ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
 int      cam_follow =  0 ;
@@ -103,10 +104,16 @@ void load_players ( char *fname )
   ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader_opts ) ;
   ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader_opts ) ;
 
+  mirror_scene ( pobj1 ) ;
+  mirror_scene ( pobj2 ) ;
+  mirror_scene ( pobj3 ) ;
+  mirror_scene ( pobj4 ) ;
+
   sgCoord cc ;
   sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
   ssgTransform *ttt = new ssgTransform ( & cc ) ;
   ttt -> addKid ( ssgLoad ( tinytux_file  , loader_opts ) ) ;
+  mirror_scene ( ttt ) ;
 
   ssgEntity *pobj5 = ttt ;
   int i ;
@@ -136,8 +143,6 @@ void load_players ( char *fname )
       if ( player_files [ num_karts ][ len ] <= ' ' )
         player_files [ num_karts ][ len ] = '\0' ;
 
-fprintf(stderr,"Kart %d == '%s'\n", num_karts, player_files [ num_karts ] ) ;
-
       num_karts++ ;
     }
     else
@@ -164,10 +169,11 @@ fprintf(stderr,"Kart %d == '%s'\n", num_karts, player_files [ num_karts ] ) ;
       kart_id = i ;
  
     obj = ssgLoad ( player_files [ kart_id ], loader_opts ) ;
+    mirror_scene ( obj ) ;
 
     lod -> addKid ( obj ) ;
     lod -> setRanges ( r, 2 ) ;
-    
+
     kart[i]-> getModel() -> addKid ( lod ) ;
     kart[i]-> addAttachment ( pobj1 ) ;
     kart[i]-> addAttachment ( pobj2 ) ;
@@ -184,14 +190,13 @@ fprintf(stderr,"Kart %d == '%s'\n", num_karts, player_files [ num_karts ] ) ;
     for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
       sel -> addKid ( ssgLoad ( projectile_files [ j ], loader_opts ) ) ;
 
+    mirror_scene ( sel ) ;
     projectile[i] -> off () ;
   }
 
   for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
-  {
     explosion[i] = new Explosion ( (ssgBranch *) ssgLoad ( explosion_file,
                                                     loader_opts ) ) ;
-  }
 }
 
 
@@ -232,6 +237,38 @@ static void herring_command ( char *s, char *str )
   num_herring++ ;
 }
 
+
+void mirror_scene ( ssgEntity *n )
+{
+  if ( n == NULL || !mirror ) return ;
+
+  n -> dirtyBSphere () ;
+
+  if ( n -> isAKindOf ( ssgTypeLeaf() ) )
+  {
+    for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
+      ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
+
+    return ;
+  }
+
+  if ( n -> isAKindOf ( ssgTypeTransform () ) )
+  {
+    sgMat4 xform ;
+
+    ((ssgTransform *)n) -> getTransform ( xform ) ;
+    xform [ 0 ][ 0 ] = - xform [ 0 ] [ 0 ] ;
+    xform [ 1 ][ 0 ] = - xform [ 1 ] [ 0 ] ;
+    xform [ 2 ][ 0 ] = - xform [ 2 ] [ 0 ] ;
+    xform [ 3 ][ 0 ] = - xform [ 3 ] [ 0 ] ;
+    ((ssgTransform *)n) -> setTransform ( xform ) ;
+  }
+
+  ssgBranch *b = (ssgBranch *) n ;
+
+  for ( int i = 0 ; i < b -> getNumKids () ; i++ )
+    mirror_scene ( b -> getKid ( i ) ) ;
+}
 
 
 void load_track ( ssgBranch *trackb, char *fname )
@@ -394,6 +431,12 @@ void load_track ( ssgBranch *trackb, char *fname )
     }
   }
 
+#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
+  ssgSetBackFaceCollisions ( mirror ) ;
+#endif
+
+  mirror_scene ( trackb ) ;
+
   fclose ( fd ) ;
 
   sgSetVec3  ( steady_cam.xyz, 0.0f, 0.0f, 0.0f ) ;
@@ -427,8 +470,9 @@ static void cmdline_help ()
 }
 
 
-int tuxkart_main ( int num_laps, char *level_name )
+int tuxkartMain ( int num_laps, int m, char *level_name )
 {
+  mirror = m ;
   net   = new guUDPConnection ;
   fclock = new ulClock ;
 
@@ -461,11 +505,7 @@ int tuxkart_main ( int num_laps, char *level_name )
     {
       char buffer [ 20 ] ;
 
-#ifdef _MSC_VER
-      Sleep ( 1000 ) ;
-#else
-	  sleep ( 1 ) ;
-#endif
+      secondSleep ( 1 ) ;
 
       if ( net->recvMessage( buffer, 20 ) > 0 )
 	fprintf ( stderr, "%s\n", buffer ) ;
@@ -476,57 +516,15 @@ int tuxkart_main ( int num_laps, char *level_name )
     }
   }
 
-  /* Set tux_aqfh_datadir to the correct directory */
-
-  if ( datadir == NULL )
-  {
-    if ( getenv ( "TUXKART_DATADIR" ) != NULL )
-      datadir = getenv ( "TUXKART_DATADIR" ) ;
-    else
-#ifdef _MSC_VER
-    if ( _access ( "data/levels.dat", 04 ) == 0 )
-#else
-    if ( access ( "data/levels.dat", F_OK ) == 0 )
-#endif
-      datadir = "." ;
-    else
-#ifdef _MSC_VER
-    if ( _access ( "../data/levels.dat", 04 ) == 0 )
-#else
-    if ( access ( "../data/levels.dat", F_OK ) == 0 )
-#endif
-      datadir = ".." ;
-    else
-#ifdef TUXKART_DATADIR
-      datadir = TUXKART_DATADIR ;
-#else
-      datadir = "/usr/local/share/games/tuxkart" ;
-#endif
-  }
-
-  fprintf ( stderr, "Data files will be fetched from: '%s'\n",
-                                                    datadir ) ;
-
-#ifdef _MSC_VER
-  if ( _chdir ( datadir ) == -1 )
-#else
-  if ( chdir ( datadir ) == -1 )
-#endif
-  {
-    fprintf ( stderr, "Couldn't chdir() to '%s'.\n", datadir ) ;
-    exit ( 1 ) ;
-  }
-
   banner () ;
 
   char fname [ 100 ] ;
   sprintf ( fname, "data/%s.drv", trackname ) ;
 
-  curr_track = new Track ( fname ) ;
+  curr_track = new Track ( fname, mirror ) ;
   gfx   = new GFX ;
 
   sound = new SoundSystem ;
-  // sound -> change_track ( "mods/Boom_boom_boom.mod" ) ;
   gui   = new GUI ;
 
   pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
@@ -563,6 +561,7 @@ int tuxkart_main ( int num_laps, char *level_name )
   kart[1]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
   int i;
+
   for ( i = 2 ; i < NUM_KARTS ; i++ )
   {
     kart[i] = new AutoKartDriver ( i, new ssgTransform ) ;
@@ -586,8 +585,6 @@ int tuxkart_main ( int num_laps, char *level_name )
   sprintf ( fname, "data/%s.loc", trackname ) ;
 
   load_track ( trackb, fname ) ;
-
-fprintf ( stderr, "READY TO RACE!!\n" ) ;
 
   tuxKartMainLoop () ;
   return TRUE ;
@@ -756,6 +753,9 @@ void tuxKartMainLoop ()
       ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
       ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
     }
+
+    if ( mirror )
+      glFrontFace ( GL_CW ) ;
 
 /*track  -> update () ; */
 

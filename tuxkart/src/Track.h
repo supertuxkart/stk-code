@@ -13,7 +13,7 @@ class Track
     float  total_distance ;
 
   public:
-    Track ( char *drv_fname ) ;
+    Track ( char *drv_fname, int mirror ) ;
 
     void glVtx ( sgVec2 v, float xoff, float yoff )
     {

@@ -4,7 +4,7 @@
 static int npoints ;
 static sgVec3 driveline[MAX_DRIVELINE] ;
 
-Track::Track ( char *fname )
+Track::Track ( char *fname, int mirror )
 {
   int i ;
   float d = 0.0f ;
@@ -35,7 +35,7 @@ Track::Track ( char *fname )
       exit ( 1 ) ;
     } 
 
-    driveline[i][0] = x ;
+    driveline[i][0] = mirror ? -x : x ;
     driveline[i][1] = y ;
     driveline[i][2] = 0.0f ;
     npoints = i + 1 ;
