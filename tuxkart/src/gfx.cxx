@@ -39,8 +39,10 @@ void reshape ( int w, int h )
 }
 
 
-GFX::GFX ()
+GFX::GFX ( int _mirror )
 {
+  mirror = _mirror ;
+
   for ( int i = 0 ; i < 512 ; i++ )
     keyIsDown [ i ] = FALSE ;
 
@@ -100,6 +102,8 @@ void GFX::update ()
   glFogf ( GL_FOG_START  , 0.0       ) ;
   glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
   glHint ( GL_FOG_HINT   , GL_NICEST ) ;
+
+  if ( mirror ) glFrontFace ( GL_CW ) ;
 
 /*
   sgCoord cam ;

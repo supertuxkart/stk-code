@@ -7,11 +7,8 @@
 int mirror = 0 ;
 int player = 0 ;
 
-void mirror_scene ( ssgEntity *n ) ;
 int finishing_position = -1 ;
 
-static ulClock ck2 ;
-extern float tt[6];
 guUDPConnection *net = NULL ;
 ssgLoaderOptions *loader_opts = NULL ;
 
@@ -23,7 +20,9 @@ Herring *gold_h   ;
 Herring *red_h    ;
 Herring *green_h  ;
  
-Track *curr_track ;
+Track     *curr_track  ;
+ssgBranch *trackBranch ;
+
 int num_herring   ;
 int num_laps_in_race ;
 
@@ -75,6 +74,8 @@ int      cam_follow =  0 ;
 float    cam_delay  = 10.0f ;
 
 #define MAX_FIXED_CAMERA 9
+
+void mirror_scene ( ssgEntity *n ) ;
 
 sgCoord fixedpos [ MAX_FIXED_CAMERA ] =
 {
@@ -271,7 +272,7 @@ void mirror_scene ( ssgEntity *n )
 }
 
 
-void load_track ( ssgBranch *trackb, char *fname )
+void load_track ( char *fname )
 {
   FILE *fd = fopen ( fname, "r" ) ;
   char playersfname [ 256 ] ;
@@ -418,10 +419,10 @@ void load_track ( ssgBranch *trackb, char *fname )
 
       float r [ 2 ] = { -10.0f, 2000.0f } ;
 
-      lod    -> addKid ( obj   ) ;
-      trans  -> addKid ( lod   ) ;
-      trackb -> addKid ( trans ) ;
-      lod -> setRanges ( r, 2  ) ;
+      lod         -> addKid    ( obj   ) ;
+      trans       -> addKid    ( lod   ) ;
+      trackBranch -> addKid    ( trans ) ;
+      lod         -> setRanges ( r, 2  ) ;
     }
     else
     {
@@ -435,7 +436,7 @@ void load_track ( ssgBranch *trackb, char *fname )
   ssgSetBackFaceCollisions ( mirror ) ;
 #endif
 
-  mirror_scene ( trackb ) ;
+  mirror_scene ( trackBranch ) ;
 
   fclose ( fd ) ;
 
@@ -470,30 +471,24 @@ static void cmdline_help ()
 }
 
 
-int tuxkartMain ( int num_laps, int m, char *level_name )
+int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
 {
-  mirror = m ;
-  net   = new guUDPConnection ;
-  fclock = new ulClock ;
+  /* Initialise some horrid globals */
 
-  if ( loader_opts == NULL )
-  {
-    loader_opts = new ssgLoaderOptions () ;
-    loader_opts -> setCreateStateCallback ( getAppState ) ;
-    loader_opts -> setCreateBranchCallback ( process_userdata ) ;
-    ssgSetCurrentOptions ( loader_opts ) ;
-  }
+  fclock           = new ulClock ;
+  mirror           = _mirror     ;
+  num_laps_in_race = _numLaps    ;
+  trackname        = _levelName  ;
 
-  num_laps_in_race = num_laps ;
+  /* Network initialisation -- NOT WORKING YET */
 
-  trackname = level_name ;
+  net              = new guUDPConnection ;
+  network_testing  = FALSE ;
+  network_enabled  = FALSE ;
 
-  network_testing = FALSE ;
-  network_enabled = FALSE ;
-/*
-  network_enabled = TRUE ;
+#ifdef ENABLE_NETWORKING
+  network_enabled  = TRUE ;
   net->connect ( argv[i] ) ;
-*/
 
   if ( network_enabled && network_testing )
   {
@@ -515,28 +510,41 @@ int tuxkartMain ( int num_laps, int m, char *level_name )
       net->sendMessage ( "Testing...", 11 ) ;
     }
   }
+#endif
+
+  /* Set the SSG loader options */
+
+  loader_opts = new ssgLoaderOptions () ;
+  loader_opts -> setCreateStateCallback  ( getAppState ) ;
+  loader_opts -> setCreateBranchCallback ( process_userdata ) ;
+  ssgSetCurrentOptions ( loader_opts ) ;
+  ssgModelPath         ( "models" ) ;
+  ssgTexturePath       ( "images" ) ;
+
+
+  /* Say "Hi!" to the nice user. */
 
   banner () ;
+
+  /* Grab the track centerline file */
 
   char fname [ 100 ] ;
   sprintf ( fname, "data/%s.drv", trackname ) ;
 
   curr_track = new Track ( fname, mirror ) ;
-  gfx   = new GFX ;
-
-  sound = new SoundSystem ;
-  gui   = new GUI ;
+  gfx        = new GFX ( mirror ) ;
+  sound      = new SoundSystem ;
+  gui        = new GUI ;
 
   pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
 
-  ssgModelPath   ( "models" ) ;
-  ssgTexturePath ( "images" ) ;
+  /* Start building the scene graph */
 
-  ssgBranch *trackb ;
+  scene       = new ssgRoot   ;
+  trackBranch = new ssgBranch ;
+  scene -> addKid ( trackBranch ) ;
 
-  scene  = new ssgRoot ;
-  trackb = new ssgBranch ;
-  scene -> addKid ( trackb ) ;
+  /* Load the Herring */
 
   sgVec3 cyan   = { 0.4, 1.0, 1.0 } ;
   sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
@@ -548,43 +556,39 @@ int tuxkartMain ( int num_laps, int m, char *level_name )
   red_h     = new Herring ( red    ) ;
   green_h   = new Herring ( green  ) ;
 
-  kart[0] = new PlayerKartDriver ( 0, new ssgTransform ) ;
-  scene -> addKid ( kart[0] -> getModel() ) ;
-  kart[0]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+  /* Load the Karts */
 
-  if ( network_enabled )
-    kart[1] = new NetworkKartDriver ( 1, new ssgTransform ) ;
-  else
-    kart[1] = new AutoKartDriver ( 1, new ssgTransform ) ;
-
-  scene -> addKid ( kart[1] -> getModel() ) ;
-  kart[1]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
-
-  int i;
-
-  for ( i = 2 ; i < NUM_KARTS ; i++ )
+  for ( int i = 0 ; i < NUM_KARTS ; i++ )
   {
-    kart[i] = new AutoKartDriver ( i, new ssgTransform ) ;
+    /* Kart[0] is always the player. */
+
+    if ( i == 0 )
+      kart[i] = new PlayerKartDriver  ( i, new ssgTransform ) ;
+    else
+    if ( network_enabled )
+      kart[i] = new NetworkKartDriver ( i, new ssgTransform ) ;
+    else
+      kart[i] = new AutoKartDriver    ( i, new ssgTransform ) ;
+
     scene -> addKid ( kart[i] -> getModel() ) ;
-    kart[i]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+    kart[i] -> getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
   }
 
+  /* Load the Projectiles */
 
-  for ( i = 0 ; i < NUM_PROJECTILES ; i++ )
+  for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
   {
-    projectile[i] = new Projectile ( new ssgTransform ) ;
-    scene -> addKid ( projectile[i] -> getModel() ) ;
-    projectile[i]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+    projectile[j] = new Projectile ( new ssgTransform ) ;
+    scene -> addKid ( projectile[j] -> getModel() ) ;
+    projectile[j]->getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
   }
 
-  /*
-    Load the models - optimise them a bit
-    and then add them into the scene.
-  */
+  /* Load the track models */
 
   sprintf ( fname, "data/%s.loc", trackname ) ;
+  load_track ( fname ) ;
 
-  load_track ( trackb, fname ) ;
+  /* Play Ball! */
 
   tuxKartMainLoop () ;
   return TRUE ;
@@ -612,11 +616,8 @@ void updateWorld ()
   }
 
   int i;
-  ck2.update() ; tt[1] = ck2.getDeltaTime()*1000.0f ;
   for ( i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
-  ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
   for ( i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
-  ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
   for ( i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
 
   for ( i = 0 ; i < num_karts ; i++ )
@@ -727,12 +728,15 @@ void updateWorld ()
 
 void tuxKartMainLoop ()
 {
+  /* Loop forever updating everything */
+
   while ( 1 )
   {
+    /* Stop updating if we are paused */
+
     if ( ! gui -> isPaused () )
     {
       fclock->update () ;
-      ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
       updateWorld () ;
 
       for ( int i = 0 ; i < MAX_HERRING ; i++ )
@@ -746,25 +750,13 @@ void tuxKartMainLoop ()
 
       update_hooks () ;
     }
-    else
-    {
-      ck2.update() ; tt[0] = ck2.getDeltaTime()*1000.0f ;
-      ck2.update() ; tt[1] = ck2.getDeltaTime()*1000.0f ;
-      ck2.update() ; tt[2] = ck2.getDeltaTime()*1000.0f ;
-      ck2.update() ; tt[3] = ck2.getDeltaTime()*1000.0f ;
-    }
 
-    if ( mirror )
-      glFrontFace ( GL_CW ) ;
+    /* Routine stuff we do even when paused */
 
-/*track  -> update () ; */
-
-    ck2.update() ; tt[4] = ck2.getDeltaTime()*1000.0f ;
     gfx    -> update () ;
     gui    -> update () ;
     sound  -> update () ;
-    gfx    -> done   () ;  /* Swap buffers! */
-    ck2.update() ; tt[5] = ck2.getDeltaTime()*1000.0f ;
+    gfx    -> done   () ;  /* Swap graphics buffers last! */
   }
 }
 

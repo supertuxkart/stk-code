@@ -1,9 +1,11 @@
 
 class GFX
 {
+  int mirror ;
+
 public:
 
-   GFX () ;
+   GFX ( int _mirror ) ;
    void update () ;
    void done   () ;
 } ;
