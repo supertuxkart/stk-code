@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.4 2004/08/15 16:46:51 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.5 2004/08/16 15:07:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -107,10 +107,10 @@ WorldScreen::draw()
     {
       glEnable ( GL_FOG ) ;
       
-      glFogf ( GL_FOG_DENSITY, 1.0f / 100.0f ) ;
+      glFogf ( GL_FOG_DENSITY, track_data.fog_density ) ;
       glFogfv( GL_FOG_COLOR  , track_data.fog_color ) ;
-      glFogf ( GL_FOG_START  , 0.0       ) ;
-      glFogf ( GL_FOG_END    , 1000.0      ) ;
+      glFogf ( GL_FOG_START  , track_data.fog_start ) ;
+      glFogf ( GL_FOG_END    , track_data.fog_end ) ;
       glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
       glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 

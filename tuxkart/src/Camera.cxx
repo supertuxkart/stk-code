@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.15 2004/08/16 00:17:22 grumbel Exp $
+//  $Id: Camera.cxx,v 1.16 2004/08/16 15:07:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,8 @@
 #include "tuxkart.h"
 #include "KartDriver.h"
 #include "World.h"
+#include "TrackData.h"
+#include "TrackManager.h"
 #include "Camera.h"
 
 static inline void relaxation(float& target, float& prev, float rate)
@@ -89,7 +91,11 @@ void Camera::init ()
   context = new ssgContext ;
 
   // FIXME: clipping should be configurable for slower machines
-  context -> setNearFar ( 0.05f, 1000.0f ) ;
+  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
+  if (track_data.use_fog)
+    context -> setNearFar ( 0.05f, track_data.fog_end ) ;
+  else
+    context -> setNearFar ( 0.05f, 1000.0f ) ;
 
   whichKart  = 0 ;
   setScreenPosition ( 0 ) ;

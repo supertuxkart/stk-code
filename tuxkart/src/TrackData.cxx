@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.3 2004/08/11 12:33:17 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.4 2004/08/16 15:07:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,6 +31,11 @@ TrackData::TrackData(const std::string& filename_)
   
   // Default values
   use_fog = false;
+  sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;
+  fog_density = 1.0f/100.0f;
+  fog_start   = 0.0f;
+  fog_end     = 1000.0f;
+
   sgSetVec3 ( sun_position, 0.4, 0.4, 0.4 ) ;
   sgSetVec4 ( sky_color  , 0.3, 0.7, 0.9, 1.0 ) ;
   sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;
@@ -47,11 +52,11 @@ TrackData::TrackData(const std::string& filename_)
     reader.read_string("name", name);
     reader.read_sgVec4("sky-color", sky_color);
 
-    reader.read_bool ("use-fog", use_fog);
-    reader.read_sgVec4("fog-color", fog_color);
-    reader.read_float("fog-densitiy", fog_density);
-    reader.read_float("fog-start", fog_start);
-    reader.read_float("fog-end", fog_end);
+    reader.read_bool ("use-fog",      use_fog);
+    reader.read_sgVec4("fog-color",   fog_color);
+    reader.read_float("fog-density", fog_density);
+    reader.read_float("fog-start",    fog_start);
+    reader.read_float("fog-end",      fog_end);
 
     reader.read_sgVec3("sun-position", sun_position);
     reader.read_sgVec4("sun-ambient",  ambientcol);
