@@ -136,6 +136,8 @@ void load_players ( char *fname )
       if ( player_files [ num_karts ][ len ] <= ' ' )
         player_files [ num_karts ][ len ] = '\0' ;
 
+fprintf(stderr,"Kart %d == '%s'\n", num_karts, player_files [ num_karts ] ) ;
+
       num_karts++ ;
     }
     else
@@ -620,6 +622,8 @@ void updateWorld ()
   for ( i = 0 ; i < num_karts ; i++ )
   {
     int p = 1 ;
+
+fprintf(stderr,"Kart %d Dist=%f\n", i, kart[i]->getDistanceDownTrack() ) ;
 
     for ( int j = 0 ; j < num_karts ; j++ )
     {
