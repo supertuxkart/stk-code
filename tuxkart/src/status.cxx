@@ -371,10 +371,7 @@ void drawGameOverText ()
   }
 
   if ( timer++ & 16 )
-  {
     drawDropShadowText ( "Press R to replay this track", 15, 10, 30 ) ;
-    drawDropShadowText ( "Press S to start next track", 15, 10, 60 ) ;
-  }
 }
 
 
