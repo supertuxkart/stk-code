@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.10 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: World.cxx,v 1.11 2004/08/14 14:10:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,6 +43,8 @@ World::World(const RaceSetup& raceSetup_)
   : raceSetup(raceSetup_)
 {
   current_ = this;
+
+  phase = START_PHASE;
 
   scene = NULL;
   track = NULL;
@@ -180,6 +182,9 @@ World::World(const RaceSetup& raceSetup_)
 #endif
 	
   guiStack.push_back(GUIS_RACE);
+
+  ready_set_go = 3;
+  fclock->reset();
 }
 
 World::~World()
@@ -234,6 +239,23 @@ void
 World::update()
 {
   /* Stop updating if we are paused */
+
+  if (fclock->getAbsTime() > 3.0 && ready_set_go == 1)
+    {
+      std::cout << "Go!" << std::endl;
+      ready_set_go = 0;
+      phase = RACE_PHASE;
+    }
+  else if (fclock->getAbsTime() > 2.0 && ready_set_go == 2)
+    {
+      std::cout << "Set" << std::endl;
+      ready_set_go = 1;
+    }
+  else if (fclock->getAbsTime() > 1.0 && ready_set_go == 3)
+    {
+      std::cout << "Ready" << std::endl;
+      ready_set_go = 2;
+    }
 
   if ( ! widgetSet -> get_paused () )
     {
@@ -561,8 +583,11 @@ World::load_track(const char *fname )
 void
 World::restartRace()
 {
+  ready_set_go = 3;
   finishing_position = -1 ;
-  
+  fclock->reset();
+  phase = START_PHASE;
+
   for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
     (*i)->reset() ;
 }

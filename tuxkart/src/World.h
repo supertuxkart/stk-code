@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.7 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: World.h,v 1.8 2004/08/14 14:10:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -67,6 +67,8 @@ public:
     // the other players is displayed, controll is automatic
     FINISH_PHASE 
   };
+
+  int ready_set_go;
 private:
   Track        *track;
   guUDPConnection *net;

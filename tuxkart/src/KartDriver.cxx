@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.30 2004/08/14 12:53:29 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.31 2004/08/14 14:10:49 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,12 +48,12 @@ KartParticleSystem::update ( float t )
 {
   if (0)
     {
-  std::cout << "BSphere: r:" << getBSphere()->radius 
-            << " ("  << getBSphere()->center[0]
-            << ", "  << getBSphere()->center[1]
-            << ", "  << getBSphere()->center[2]
-            << ")"
-            << std::endl;
+      std::cout << "BSphere: r:" << getBSphere()->radius 
+                << " ("  << getBSphere()->center[0]
+                << ", "  << getBSphere()->center[1]
+                << ", "  << getBSphere()->center[2]
+                << ")"
+                << std::endl;
     }
   getBSphere () -> setRadius ( 1000.0f ) ;
   ParticleSystem::update(t);
@@ -305,9 +305,12 @@ void KartDriver::doCollisionAnalysis ( float hot )
 
 void KartDriver::update ()
 {
+  sgCoord temp;
+  sgCopyCoord(&temp, &curr_pos);
+    
   if (driver)
     driver->update();
-
+  
   wheel_position += sgLengthVec3(velocity.xyz);
 
   if ( rescue )
@@ -412,7 +415,6 @@ void KartDriver::update ()
 
   Driver::update () ;
 
-
   if (skidmark_left)
     {
       {
@@ -442,6 +444,11 @@ void KartDriver::update ()
 
       skidmark_right->add(&wheelpos);
     }
+
+  // Lock the vehicle in its start position until the race has
+  // really started
+  if (World::current()->getPhase() == World::START_PHASE)
+    sgCopyCoord(&curr_pos, &temp);
 }
 
 
