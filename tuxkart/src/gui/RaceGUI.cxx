@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.40 2004/09/06 18:58:15 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.41 2004/09/06 19:20:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -515,9 +515,9 @@ void RaceGUI::drawCollectableIcons ( int player_nb, int offset_x, int offset_y, 
     case COLLECT_ZIPPER         : zipper_gst       -> apply () ;
                                   zz = TRUE ; break ;
   }
-
-  int x1 = (int)((320-32) * ratio_x) + offset_x ;
-  int y1 = (int)(400 * ratio_y)      + offset_y;
+  
+  int x1 = (int)((getScreenWidth() / 2 - 32) * ratio_x) + offset_x ;
+  int y1 = (int)((getScreenHeight() - 80) * ratio_y)      + offset_y;
 
   glDisable(GL_TEXTURE_2D);
 
@@ -580,8 +580,8 @@ void RaceGUI::drawCollectableIcons ( int player_nb, int offset_x, int offset_y, 
 
 void RaceGUI::drawEnergyMeter ( float state, int offset_x, int offset_y, float ratio_x, float ratio_y )
 {
-  int x = (int)(590 * ratio_x) + offset_x;
-  int y = (int)(130 * ratio_y) + offset_y;
+  int x = (int)((getScreenWidth() - 50) * ratio_x) + offset_x;
+  int y = (int)((getScreenHeight() - 350) * ratio_y) + offset_y;
   int w = (int)(24 * ratio_x);
   int h = (int)(220 * ratio_y);
   int wl = (int)(1 * ratio_x);
