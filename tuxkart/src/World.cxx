@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.6 2004/08/11 22:05:46 jamesgregory Exp $
+//  $Id: World.cxx,v 1.7 2004/08/11 22:11:53 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -223,7 +223,7 @@ World::~World()
 delete fclock ;
 
 #ifdef ENABLE_NETWORKING
-  net->disconnect ( argv[i] ) ;
+  net->disconnect ( ) ;
 #endif  
   delete net ;
 }
