@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.47 2004/08/08 10:43:42 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.48 2004/08/08 11:23:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -75,16 +75,6 @@ char *projectile_files [] =
   NULL
 } ;
 
-
-char *tinytux_file   = "tinytux_magnet.ac" ;
-char *explosion_file = "explode.ac"    ;
-char *parachute_file = "parachute.ac"  ;
-char *magnet_file    = "magnet.ac"     ;
-char *magnet2_file   = "magnetbzzt.ac" ;
-char *anvil_file     = "anvil.ac"      ;
-
-
-
 ulClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 GFX          *gfx = NULL ;
@@ -115,39 +105,7 @@ void load_players ( )
 
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
   {
-    ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
-    ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader ) ;
-    ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader ) ;
-    ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader ) ;
-
-    sgCoord cc ;
-    sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
-    ssgTransform *ttt = new ssgTransform ( & cc ) ;
-    ttt -> addKid ( ssgLoad ( tinytux_file  , loader ) ) ;
-
-    ssgEntity *pobj5 = ttt ;
-
-    float r [ 2 ] = { -10.0f, 100.0f } ;
-
-    ssgEntity *obj = ssgLoad ( player_files [ i ].c_str(), loader ) ;
-
-    sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
-    ssgTransform *xxx = new ssgTransform ( & cc ) ;
-    xxx -> addKid ( obj ) ;
-    obj = xxx ;
-    
-    ssgRangeSelector *lod = new ssgRangeSelector ;
-
-    lod -> addKid ( obj ) ;
-    lod -> setRanges ( r, 2 ) ;
-
-    kart[i]-> getModel() -> addKid ( lod ) ;
-
-    kart[i]-> addAttachment ( pobj1 ) ;
-    kart[i]-> addAttachment ( pobj2 ) ;
-    kart[i]-> addAttachment ( pobj3 ) ;
-    kart[i]-> addAttachment ( pobj4 ) ;
-    kart[i]-> addAttachment ( pobj5 ) ;
+    kart[i]->load_data();
   }
 
   for ( int i = 0 ; i < NUM_PROJECTILES ; i++ )
@@ -163,7 +121,7 @@ void load_players ( )
 
   for ( int i = 0 ; i < NUM_EXPLOSIONS ; i++ )
   {
-    ssgBranch *b = (ssgBranch *) ssgLoad ( explosion_file, loader ) ;
+    ssgBranch *b = (ssgBranch *) ssgLoad ( "explode.ac", loader ) ;
     explosion[i] = new Explosion ( b ) ;
   }
 }
@@ -473,12 +431,11 @@ int tuxkartMain ()
     KartDriver* newkart;
 
     if ( i < raceSetup.numPlayers )
-      newkart = new PlayerKartDriver  ( i ) ;
+      newkart = new PlayerKartDriver  ( KartProperties(), i ) ;
+    else if ( network_enabled )
+      newkart = new NetworkKartDriver ( KartProperties(), i ) ;
     else
-    if ( network_enabled )
-      newkart = new NetworkKartDriver ( i ) ;
-    else
-      newkart = new AutoKartDriver    ( i ) ;
+      newkart = new AutoKartDriver    ( KartProperties(), i ) ;
 
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 

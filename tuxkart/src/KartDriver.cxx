@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.11 2004/08/08 03:51:55 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.12 2004/08/08 11:23:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "tuxkart.h"
 #include "Herring.h"
 #include "sound.h"
+#include "Loader.h"
 #include "Driver.h"
 
 void KartDriver::useAttachment ()
@@ -336,15 +337,61 @@ void KartDriver::update ()
 }
 
 
-KartDriver::KartDriver ( int _position ) : Driver ()
+KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  ) 
 {
-  grid_position = _position ;
-  num_collectables = 0 ;
-  num_herring_gobbled = 0 ;
-  collectable = COLLECT_NOTHING ;
-  attachment = NULL ;
+  kart_properties      = kart_properties_;
+  grid_position        = position_ ;
+  num_collectables     = 0 ;
+  num_herring_gobbled  = 0 ;
+  collectable          = COLLECT_NOTHING ;
+  attachment           = NULL ;
   attachment_time_left = 0.0f ;
-  attachment_type = ATTACH_NOTHING ;
+  attachment_type      = ATTACH_NOTHING ;
+}
+
+void
+KartDriver::load_data()
+{
+  char *tinytux_file   = "tinytux_magnet.ac" ;
+  char *parachute_file = "parachute.ac"  ;
+  char *magnet_file    = "magnet.ac"     ;
+  char *magnet2_file   = "magnetbzzt.ac" ;
+  char *anvil_file     = "anvil.ac"      ;
+
+  // Load data for this kart (bonus objects, the kart model, etc)
+  ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
+  ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader ) ;
+  ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader ) ;
+  ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader ) ;
+
+  sgCoord cc ;
+  sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
+  ssgTransform *ttt = new ssgTransform ( & cc ) ;
+  ttt -> addKid ( ssgLoad ( tinytux_file  , loader ) ) ;
+
+  ssgEntity *pobj5 = ttt ;
+
+  float r [ 2 ] = { -10.0f, 100.0f } ;
+
+  ssgEntity *obj = ssgLoad ( kart_properties.model_file.c_str(), loader ) ;
+
+  sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
+  ssgTransform *xxx = new ssgTransform ( & cc ) ;
+  xxx -> addKid ( obj ) ;
+  obj = xxx ;
+    
+  ssgRangeSelector *lod = new ssgRangeSelector ;
+
+  lod -> addKid ( obj ) ;
+  lod -> setRanges ( r, 2 ) ;
+
+  this-> getModel() -> addKid ( lod ) ;
+
+  this-> addAttachment ( pobj1 ) ;
+  this-> addAttachment ( pobj2 ) ;
+  this-> addAttachment ( pobj3 ) ;
+  this-> addAttachment ( pobj4 ) ;
+  this-> addAttachment ( pobj5 ) ;
 }
 
 /* EOF */

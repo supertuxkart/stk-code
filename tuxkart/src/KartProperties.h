@@ -1,4 +1,4 @@
-//  $Id: KartProperties.h,v 1.1 2004/08/08 10:43:42 grumbel Exp $
+//  $Id: KartProperties.h,v 1.2 2004/08/08 11:23:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -54,8 +54,6 @@ public:
 
   KartProperties();
 };
-
-extern KartProperties kart_properties;
 
 #endif
 

@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.19 2004/08/08 10:43:42 grumbel Exp $
+//  $Id: Driver.h,v 1.20 2004/08/08 11:23:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,7 @@
 #include "tuxkart.h"
 #include "Track.h"
 #include "joystick.h"
+#include "KartProperties.h"
 
 class Shadow;
 
@@ -152,9 +153,12 @@ protected:
       for shadow calculation */
   float height_of_terrain;
 
+  KartProperties kart_properties;
 public:
 
   Driver ( );
+
+  virtual ~Driver() {}
 
   float getDistanceDownTrack () { return curr_track_coords[1] ; }
   int  getLap      ()        { return lap      ; }
@@ -170,6 +174,11 @@ public:
 
   ssgTransform *getModel () { return model ; }
   ssgEntity *getRoot () { return comp_model ; }
+
+  KartProperties& getKartProperties()
+  {
+    return kart_properties;
+  }
 
   sgCoord *getVelocity ()
   {
@@ -227,9 +236,13 @@ protected:
   int   attachment_type ;
   int num_herring_gobbled ;
   ssgSelector *attachment ;
+
 public:
 
-  KartDriver ( int _position ) ;
+  KartDriver ( const KartProperties& kart_properties_, int position_ ) ;
+  virtual ~KartDriver() {}
+
+  void load_data();
 
   void addAttachment ( ssgEntity *e )
   {
@@ -270,9 +283,12 @@ public:
 class NetworkKartDriver : public KartDriver
 {
 public:
-  NetworkKartDriver ( int _pos ) : KartDriver ( _pos )
+  NetworkKartDriver ( const KartProperties& kart_properties_, int _pos )
+    : KartDriver (kart_properties_, _pos)
   {
   }
+
+  virtual ~NetworkKartDriver() {}
 
   virtual void update () ;
 } ;
@@ -282,7 +298,8 @@ public:
 class TrafficDriver : public KartDriver
 {
 public:
-  TrafficDriver ( sgVec3 _pos ) : KartDriver ( 0 )
+  TrafficDriver ( const KartProperties& kart_properties_, sgVec3 _pos )
+    : KartDriver ( kart_properties_, 0 )
   {
     sgCopyVec3 ( reset_pos.xyz, _pos ) ;
     reset () ;
@@ -299,10 +316,13 @@ class AutoKartDriver : public KartDriver
 {
   float time_since_last_shoot ;
 public:
-  AutoKartDriver ( int _pos ) : KartDriver ( _pos )
+  AutoKartDriver ( const KartProperties& kart_properties_, int _pos ) 
+    : KartDriver ( kart_properties_, _pos )
   {
     time_since_last_shoot = 0.0f ;
   }
+
+  virtual ~AutoKartDriver() {}
 
   virtual void update () ;
 } ;
@@ -318,7 +338,8 @@ protected:
   float *selected_property;
 
 public:
-  PlayerKartDriver ( int _pos ) : KartDriver ( _pos )
+  PlayerKartDriver ( const KartProperties& kart_properties_, int _pos ) 
+    : KartDriver ( kart_properties_, _pos )
   {
     tscale = 10.0 ;
     rscale =  3.0 ;
@@ -367,6 +388,8 @@ public:
   {
     type = COLLECT_NOTHING ;
   }
+
+  virtual ~Projectile() {}
 
   void off ()
   {

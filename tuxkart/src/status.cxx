@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.20 2004/08/08 05:03:43 jamesgregory Exp $
+//  $Id: status.cxx,v 1.21 2004/08/08 11:23:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -68,22 +68,6 @@ void initStatusDisplay ()
   oldfont = new fntTexFont ;
   oldfont -> load ( loader->getPath("fonts/sorority.txf").c_str() ) ;
 }
-
-
-/** FIXME: Turn this and all other player related information into a
-    struct and export it to a datafile */
-sgVec3 player_colour [ ] =
-{
-  { 1, 0, 0 }, /* Tux   */
-  { 0, 1, 0 }, /* Geeko */
-  { 0, 0, 1 }, /* BSOD  */
-  { 1, 0, 1 }, /* Gown  */
-  { 0, 1, 1 },
-  { 1, 1, 0 }, 
-  { 0, 0, 0 }, 
-  { 1, 1, 1 }
-} ;
-
 
 void stToggle ()
 {
@@ -253,7 +237,7 @@ void drawMap ()
 
     c = kart[i]->getCoord () ;
 
-    glColor3fv ( player_colour [ i ] ) ;
+    glColor3fv ( kart[i]->getKartProperties().color ) ;
 
     curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
     curr_track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+3 ) ;
