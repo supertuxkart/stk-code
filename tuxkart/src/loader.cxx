@@ -37,7 +37,7 @@ Hook *hooklist [ MAX_HOOKS ] ;
  
 
 
-void init_hooks ()
+void initWorld ()
 {
   for ( int i = 0 ; i < MAX_HOOKS ; i++ )
   {
@@ -77,7 +77,7 @@ Steve:
 
 
  
-void update_hooks ()
+void updateWorld ()
 {
   for ( int i = 0 ; i < next_hook ; i++ )
     if ( hooklist [ i ] -> hook != NULL )

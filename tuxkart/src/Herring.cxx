@@ -92,27 +92,26 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
 
 void HerringInstance::update ()
 {
-  if ( eaten )
+  if ( ! eaten || her == NULL ) return ;
+
+  float t = time_to_return - fclock->getAbsTime () ;
+
+  if ( t > 0 )
   {
-    float t = time_to_return - fclock->getAbsTime () ;
+    sgVec3 hell ;
+    sgCopyVec3 ( hell, xyz ) ;
 
-    if ( t > 0 )
-    {
-      sgVec3 hell ;
-      sgCopyVec3 ( hell, xyz ) ;
-
-      if ( t > 1.0f )
-        hell [ 2 ] = -1000000.0f ;
-      else
-        hell [ 2 ] = -t / 2.0f ;
-
-      scs -> setTransform ( hell ) ;
-    }
+    if ( t > 1.0f )
+      hell [ 2 ] = -1000000.0f ;
     else
-    {
-      eaten = FALSE ;
-      scs -> setTransform ( xyz ) ;
-    }
+      hell [ 2 ] = -t / 2.0f ;
+
+    scs -> setTransform ( hell ) ;
+  }
+  else
+  {
+    eaten = FALSE ;
+    scs -> setTransform ( xyz ) ;
   }
 }
 

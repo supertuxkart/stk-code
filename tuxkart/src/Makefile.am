@@ -21,6 +21,7 @@ tuxkart_SOURCES = \
        Driver.cxx    Driver.h    \
        Herring.cxx   Herring.h   \
        Explosion.cxx Explosion.h \
+       Camera.cxx    Camera.h    \
        KartDriver.cxx    level.h \
        Traffic.cxx       \
        PlayerDriver.cxx  \

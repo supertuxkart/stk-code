@@ -57,6 +57,7 @@ extern int cam_follow ;
 #include "joystick.h"
 #include "Driver.h"
 #include "Explosion.h"
+#include "Camera.h"
 #include "gfx.h"
 #include "gui.h"
 #include "material.h"

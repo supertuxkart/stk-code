@@ -1,9 +1,6 @@
 
 #include "tuxkart.h"
 
-#define MIN_CAM_DISTANCE      5.0f  
-#define MAX_CAM_DISTANCE     10.0f  // Was 15
-
 int mirror = 0 ;
 int player = 0 ;
 
@@ -26,12 +23,11 @@ ssgBranch *trackBranch ;
 int num_herring   ;
 int num_laps_in_race ;
 
+char playersfname [ 256 ] ;
 char *trackname = "tuxtrack" ;
 
 HerringInstance herring [ MAX_HERRING ] ;
 
-sgCoord steady_cam ;
- 
 char player_files [ NUM_KARTS ][ 256 ] ;
 
 char *traffic_files [] =
@@ -57,10 +53,11 @@ char *magnet2_file   = "magnetbzzt.ac" ;
 char *anvil_file     = "anvil.ac"      ;
 
 
-ulClock      *fclock = NULL ;
+ulClock     *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 GFX            *gfx = NULL ;
 GUI            *gui = NULL ;
+Level         level ;
 
 KartDriver       *kart [ NUM_KARTS       ] ;
 TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
@@ -70,30 +67,8 @@ Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 int       num_karts = 0 ;
 ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
-int      cam_follow =  0 ;
-float    cam_delay  = 10.0f ;
-
-#define MAX_FIXED_CAMERA 9
 
 void mirror_scene ( ssgEntity *n ) ;
-
-sgCoord fixedpos [ MAX_FIXED_CAMERA ] =
-{
-  { {    0,    0, 500 }, {    0, -90, 0 } },
-
-  { {    0,  180,  30 }, {  180, -15, 0 } },
-  { {    0, -180,  40 }, {    0, -15, 0 } },
-
-  { {  300,    0,  60 }, {   90, -15, 0 } },
-  { { -300,    0,  60 }, {  -90, -15, 0 } },
-
-  { {  200,  100,  30 }, {  120, -15, 0 } },
-  { {  200, -100,  40 }, {   60, -15, 0 } },
-  { { -200, -100,  30 }, {  -60, -15, 0 } },
-  { { -200,  100,  40 }, { -120, -15, 0 } }
-} ;
-
-Level level ;
 
 
 void load_players ( char *fname )
@@ -275,9 +250,6 @@ void mirror_scene ( ssgEntity *n )
 void load_track ( char *fname )
 {
   FILE *fd = fopen ( fname, "r" ) ;
-  char playersfname [ 256 ] ;
-
-  strcpy ( playersfname, "data/players.dat" ) ;
 
   if ( fd == NULL )
   {
@@ -285,7 +257,7 @@ void load_track ( char *fname )
     exit ( 1 ) ;
   }
 
-  init_hooks () ;
+  initWorld () ;
 
   char s [ 1024 ] ;
 
@@ -439,13 +411,7 @@ void load_track ( char *fname )
   mirror_scene ( trackBranch ) ;
 
   fclose ( fd ) ;
-
-  sgSetVec3  ( steady_cam.xyz, 0.0f, 0.0f, 0.0f ) ;
-  sgSetVec3  ( steady_cam.hpr, 0.0f, 0.0f, 0.0f ) ;
-
-  load_players ( playersfname ) ;
 }
-
 
 
 static void banner ()
@@ -458,18 +424,6 @@ static void banner ()
   printf ( "\n\n" ) ;
 }
 
-static void cmdline_help ()
-{
-  banner () ;
-
-  printf ( "Usage:\n\n" ) ;
-  printf ( "    tuxkart [OPTIONS] [machine_name]\n\n" ) ;
-  printf ( "Options:\n" ) ;
-  printf ( "  -h     Display this help message.\n" ) ;
-  printf ( "  -t     Run a network test.\n" ) ;
-  printf ( "\n" ) ;
-}
-
 
 int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
 {
@@ -479,6 +433,8 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   mirror           = _mirror     ;
   num_laps_in_race = _numLaps    ;
   trackname        = _levelName  ;
+
+  strcpy ( playersfname, "data/players.dat" ) ;
 
   /* Network initialisation -- NOT WORKING YET */
 
@@ -586,7 +542,8 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   /* Load the track models */
 
   sprintf ( fname, "data/%s.loc", trackname ) ;
-  load_track ( fname ) ;
+  load_track   ( fname        ) ;
+  load_players ( playersfname ) ;
 
   /* Play Ball! */
 
@@ -595,133 +552,59 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
 }
 
 
-void updateWorld ()
+void updateLapCounter ( int k )
 {
-  if ( network_enabled )
-  {
-    char buffer [ 1024 ] ;
-    int len = 0 ;
-    int got_one = FALSE ;
+  int p = 1 ;
 
-    while ( (len = net->recvMessage ( buffer, 1024 )) > 0 )
-      got_one = TRUE ;
+  /* Find position of kart 'k' */
+
+  for ( int j = 0 ; j < num_karts ; j++ )
+  {
+    if ( j == k ) continue ;
+
+    if ( kart[j]->getLap() >  kart[k]->getLap() ||
+         ( kart[j]->getLap() == kart[k]->getLap() && 
+           kart[j]->getDistanceDownTrack() >
+                            kart[k]->getDistanceDownTrack() ))
+      p++ ;      
+  }
+
+  kart [ k ] -> setPosition ( p ) ;
+}
+
+
+void updateNetworkRead ()
+{
+  if ( ! network_enabled ) return ;
+
+  char buffer [ 1024 ] ;
+  int len = 0 ;
+  int got_one = FALSE ;
+
+  while ( (len = net->recvMessage ( buffer, 1024 )) > 0 )
+    got_one = TRUE ;
   
-    if ( got_one )
-    {
-      char *p = buffer ;
-
-      kart[1]->setCoord    ( (sgCoord *) p ) ; p += sizeof(sgCoord) ;
-      kart[1]->setVelocity ( (sgCoord *) p ) ; p += sizeof(sgCoord) ;
-    }
-  }
-
-  int i;
-  for ( i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
-  for ( i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
-  for ( i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
-
-  for ( i = 0 ; i < num_karts ; i++ )
+  if ( got_one )
   {
-    int p = 1 ;
-
-    for ( int j = 0 ; j < num_karts ; j++ )
-    {
-      if ( j == i ) continue ;
-
-      if ( kart[j]->getLap() >  kart[i]->getLap() ||
-           ( kart[j]->getLap() == kart[i]->getLap() && 
-             kart[j]->getDistanceDownTrack() >
-                              kart[i]->getDistanceDownTrack() ))
-        p++ ;      
-    }
-
-    kart [ i ] -> setPosition ( p ) ;
-  }
-
-  if ( network_enabled )
-  {
-    char buffer [ 1024 ] ;
     char *p = buffer ;
 
-    memcpy ( p, kart[0]->getCoord   (), sizeof(sgCoord) ) ;
-    p += sizeof(sgCoord) ;
-    memcpy ( p, kart[0]->getVelocity(), sizeof(sgCoord) ) ;
-    p += sizeof(sgCoord) ;
-
-    net->sendMessage ( buffer, p - buffer ) ;
+    kart[1]->setCoord    ( (sgCoord *) p ) ; p += sizeof(sgCoord) ;
+    kart[1]->setVelocity ( (sgCoord *) p ) ; p += sizeof(sgCoord) ;
   }
+}
 
-  if ( cam_follow < 0 )
-    cam_follow = 18 + MAX_FIXED_CAMERA - 1 ;
-  else
-  if ( cam_follow >= 18 + MAX_FIXED_CAMERA )
-    cam_follow = 0 ;
 
-  sgCoord final_camera ;
+void updateNetworkWrite ()
+{
+  if ( ! network_enabled ) return ;
 
-  if ( cam_follow < num_karts )
-  {
-    sgCoord cam, target, diff ;
+  char buffer [ 1024 ] ;
+  char *p = buffer ;
 
-    sgCopyCoord ( &target, kart[cam_follow]->getCoord   () ) ;
-    sgCopyCoord ( &cam   , kart[cam_follow]->getHistory ( (int)cam_delay ) ) ;
+  memcpy ( p, kart[0]->getCoord   (), sizeof(sgCoord) ) ; p += sizeof(sgCoord) ;
+  memcpy ( p, kart[0]->getVelocity(), sizeof(sgCoord) ) ; p += sizeof(sgCoord) ;
 
-    float dist = 5.0f + sgDistanceVec3 ( target.xyz, cam.xyz ) ;
-
-    if ( dist < MIN_CAM_DISTANCE && cam_delay < 50 )
-      cam_delay++ ;
-
-    if ( dist > MAX_CAM_DISTANCE && cam_delay > 1 )
-      cam_delay-- ;
-
-    sgVec3 offset ;
-    sgMat4 cam_mat ;
-
-    sgSetVec3 ( offset, -0.5f, -5.0f, 1.5f ) ;
-    sgMakeCoordMat4 ( cam_mat, &cam ) ;
-
-    sgXformPnt3 ( offset, cam_mat ) ;
-
-    sgCopyVec3 ( cam.xyz, offset ) ;
-
-    cam.hpr[1] = -5.0f ;
-    cam.hpr[2] = 0.0f;
-
-    sgSubVec3 ( diff.xyz, cam.xyz, steady_cam.xyz ) ;
-    sgSubVec3 ( diff.hpr, cam.hpr, steady_cam.hpr ) ;
-
-    while ( diff.hpr[0] >  180.0f ) diff.hpr[0] -= 360.0f ;
-    while ( diff.hpr[0] < -180.0f ) diff.hpr[0] += 360.0f ;
-    while ( diff.hpr[1] >  180.0f ) diff.hpr[1] -= 360.0f ;
-    while ( diff.hpr[1] < -180.0f ) diff.hpr[1] += 360.0f ;
-    while ( diff.hpr[2] >  180.0f ) diff.hpr[2] -= 360.0f ;
-    while ( diff.hpr[2] < -180.0f ) diff.hpr[2] += 360.0f ;
-
-    steady_cam.xyz[0] += 0.2f * diff.xyz[0] ;
-    steady_cam.xyz[1] += 0.2f * diff.xyz[1] ;
-    steady_cam.xyz[2] += 0.2f * diff.xyz[2] ;
-    steady_cam.hpr[0] += 0.1f * diff.hpr[0] ;
-    steady_cam.hpr[1] += 0.1f * diff.hpr[1] ;
-    steady_cam.hpr[2] += 0.1f * diff.hpr[2] ;
-
-    final_camera = steady_cam ;
-  }
-  else
-  if ( cam_follow < num_karts + MAX_FIXED_CAMERA )
-  {
-    final_camera = fixedpos[cam_follow-num_karts] ;
-  }
-  else
-    final_camera = steady_cam ;
-
-  sgVec3 interfovealOffset ;
-  sgMat4 mat ;
-
-  sgSetVec3 ( interfovealOffset, 0.2 * (float)stereoShift(), 0, 0 ) ;
-  sgMakeCoordMat4 ( mat, &final_camera ) ;
-  sgXformPnt3 ( final_camera.xyz, interfovealOffset, mat ) ;
-
-  ssgSetCamera ( &final_camera ) ;
+  net->sendMessage ( buffer, p - buffer ) ;
 }
 
 
@@ -736,27 +619,35 @@ void tuxKartMainLoop ()
 
     if ( ! gui -> isPaused () )
     {
-      fclock->update () ;
-      updateWorld () ;
+      int i ;
 
-      for ( int i = 0 ; i < MAX_HERRING ; i++ )
-        if ( herring [ i ] . her != NULL )
-          herring [ i ] . update () ;
+      fclock->update    () ;
+      updateNetworkRead () ;
 
-      silver_h -> update () ;
-      gold_h   -> update () ;
-      red_h    -> update () ;
-      green_h  -> update () ;
+      for ( i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
+      for ( i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
+      for ( i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+      for ( i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
+      for ( i = 0 ; i < num_karts       ; i++ ) updateLapCounter ( i ) ;
 
-      update_hooks () ;
+      updateNetworkWrite () ;
+      updateCamera       () ;
+      updateWorld        () ;
     }
 
     /* Routine stuff we do even when paused */
 
-    gfx    -> update () ;
-    gui    -> update () ;
-    sound  -> update () ;
-    gfx    -> done   () ;  /* Swap graphics buffers last! */
+    silver_h -> update () ;
+    gold_h   -> update () ;
+    red_h    -> update () ;
+    green_h  -> update () ;
+    gfx      -> update () ;
+    gui      -> update () ;
+    sound    -> update () ;
+
+    /* Swap graphics buffers last! */
+
+    gfx      -> done   () ;
   }
 }
 
