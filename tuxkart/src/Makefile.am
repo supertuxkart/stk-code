@@ -54,6 +54,8 @@ tuxkart_SOURCES = \
   start_tuxkart.h  \
   status.cxx  \
   status.h  \
+  Shadow.h \
+  Shadow.cxx \
   tuxkart.cxx  \
   tuxkart.h  \
   utils.cxx  \
@@ -76,6 +78,6 @@ tuxkart_SOURCES = \
   gui/TrackSel.h \
   gui/NumPlayers.cxx \
   gui/NumPlayers.h
-  
+
 
 # EOF #

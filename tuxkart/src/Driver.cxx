@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.13 2004/08/06 13:03:31 grumbel Exp $
+//  $Id: Driver.cxx,v 1.14 2004/08/08 03:14:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "tuxkart.h"
 #include "material.h"
 #include "sound.h"
+#include "Shadow.h"
 #include "Driver.h"
 
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
@@ -30,6 +31,60 @@ static inline void relaxation(float& target, float& prev, float rate)
 {
   target = (prev) + (rate) * ((target) - (prev));
   prev = (target);
+}
+
+Driver::Driver ( ssgTransform *m )
+{
+  delta_t = 0.01 ;
+
+  firsttime = TRUE ;
+  model = m ;
+    
+  /* New Physics */
+  sgZeroVec3 (acceleration);
+  sgZeroVec3 (force);
+  steer_angle = throttle = brake = 0.0f;
+    
+  // debug physics
+  mass = KART_MASS;
+  inertia = KART_INERTIA;
+  corn_r = CORN_R;
+  corn_f = CORN_F;
+  max_grip = MAX_GRIP;
+  turn_speed = TURN_SPEED;    
+  /* End New Physics */
+
+  sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
+  reset () ;
+}
+
+void
+Driver::reset ()
+{
+  lap = 0 ;
+  position = 9 ;
+  rescue = FALSE ;
+  on_ground = TRUE ;
+  zipper_time_left = 0.0f ;
+  collided = crashed = FALSE ;
+  history_index = 0 ;
+  wheelie_angle = 0.0f ;
+
+  sgZeroVec3 ( velocity.xyz ) ;
+  sgZeroVec3 ( velocity.hpr ) ;
+  sgCopyCoord ( &last_pos, &reset_pos ) ;
+  sgCopyCoord ( &curr_pos, &reset_pos ) ;
+  sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
+
+  for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
+    sgCopyCoord ( &(history[i]), &reset_pos ) ;
+
+  track_hint = curr_track -> absSpatialToTrack ( last_track_coords,
+                                                 last_pos.xyz ) ;
+  track_hint = curr_track -> absSpatialToTrack ( curr_track_coords,
+                                                 curr_pos.xyz ) ;
+
+  update () ;
 }
 
 void Driver::update ()
@@ -424,4 +479,6 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
   return hot ;
 }
+
+/* EOF */
 

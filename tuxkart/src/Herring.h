@@ -1,4 +1,4 @@
-//  $Id: Herring.h,v 1.3 2004/08/02 12:10:01 grumbel Exp $
+//  $Id: Herring.h,v 1.4 2004/08/08 03:14:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,16 +20,8 @@
 #ifndef HEADER_HERRING_H
 #define HEADER_HERRING_H
  
-class Shadow
-{
-  ssgBranch *sh ;
- 
-public:
-  Shadow ( float x1, float x2, float y1, float y2 ) ;
-  ssgEntity *getRoot () { return sh ; }
-} ;                                                                             
+class Shadow;
 
- 
 class Herring
 {
   float h ;
@@ -43,8 +35,6 @@ public:
   ssgTransform *getRoot () { return tr ; }
   void update () ;
 } ;
-
-
  
 class ActiveThingInstance
 {

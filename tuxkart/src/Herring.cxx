@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.7 2004/08/02 12:10:01 grumbel Exp $
+//  $Id: Herring.cxx,v 1.8 2004/08/08 03:14:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include "tuxkart.h"
 #include "material.h"
+#include "Shadow.h"
 #include "Herring.h"
 
 void Herring::update ()
@@ -65,7 +66,7 @@ Herring::Herring ( sgVec3 colour )
   
   h = 0.0f ;
  
-  sh = new Shadow ( -0.5, 0.5, -0.25, 0.25 ) ;
+  sh = new Shadow ( "fuzzy.rgb", -0.5, 0.5, -0.25, 0.25 ) ;
  
   tr = new ssgTransform () ;
  
@@ -83,7 +84,7 @@ Herring::Herring ( ssgEntity* model )
   
   h = 0.0f ;
  
-  sh = new Shadow ( -0.5, 0.5, -0.25, 0.25 ) ;
+  sh = new Shadow ( "fuzzy.rgb", -0.5, 0.5, -0.25, 0.25 ) ;
  
   tr = new ssgTransform () ;
  
@@ -94,39 +95,6 @@ Herring::Herring ( ssgEntity* model )
 
 
  
-Shadow::Shadow ( float x1, float x2, float y1, float y2 )
-{
-  ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-  ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-  ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-  ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
-
-  sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
-  sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
- 
-  sgSetVec3 ( v, x1, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x1, y2, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y2, 0.10 ) ; va->add(v) ;
- 
-  sgSetVec2 ( t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 0.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 1.0 ) ; ta->add(t) ;
- 
-  sh = new ssgBranch ;
-  sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
- 
-  sh -> setName ( "Shadow" ) ;
- 
-  ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
- 
-  gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-  gs -> setState ( getMaterial ( "fuzzy.rgb" ) -> getState () ) ;
-  sh -> addKid ( gs ) ;
-  sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
-}
-
 
 void HerringInstance::update ()
 {
@@ -153,4 +121,4 @@ void HerringInstance::update ()
   }
 }
 
-
+/* EOF */

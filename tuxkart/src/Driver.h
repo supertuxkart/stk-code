@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.15 2004/08/07 03:38:37 jamesgregory Exp $
+//  $Id: Driver.h,v 1.16 2004/08/08 03:14:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -105,8 +105,9 @@ protected:
   float delta_t ;
 
   sgCoord  history [ HISTORY_FRAMES ] ;
-
-  sgCoord relax_pos;
+  
+  /** Used to save the last position of the kart, which is then
+      interpolated with the new one to form a smooth movement */
   sgCoord last_relax_pos;
 
   sgCoord  reset_pos ;
@@ -159,30 +160,7 @@ protected:
 
 public:
 
-  Driver ( ssgTransform *m )
-  {
-    delta_t = 0.01 ;
-
-    firsttime = TRUE ;
-    model = m ;
-    
-    /* New Physics */
-    sgZeroVec3 (acceleration);
-    sgZeroVec3 (force);
-    steer_angle = throttle = brake = 0.0f;
-    
-    // debug physics
-    mass = KART_MASS;
-    inertia = KART_INERTIA;
-    corn_r = CORN_R;
-    corn_f = CORN_F;
-    max_grip = MAX_GRIP;
-    turn_speed = TURN_SPEED;    
-    /* End New Physics */
-
-    sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
-    reset () ;
-  }
+  Driver ( ssgTransform *m );
 
   float getDistanceDownTrack () { return curr_track_coords[1] ; }
   int  getLap      ()        { return lap      ; }
@@ -190,35 +168,7 @@ public:
   void setPosition ( int p ) { position = p    ; }
   float getSteerAngle() const { return steer_angle; }
 
-  void reset ()
-  {
-    lap = 0 ;
-    position = 9 ;
-    rescue = FALSE ;
-    on_ground = TRUE ;
-    zipper_time_left = 0.0f ;
-    collided = crashed = FALSE ;
-    history_index = 0 ;
-    wheelie_angle = 0.0f ;
-
-    sgZeroVec3 ( velocity.xyz ) ;
-    sgZeroVec3 ( velocity.hpr ) ;
-    sgCopyCoord ( &last_pos, &reset_pos ) ;
-    sgCopyCoord ( &curr_pos, &reset_pos ) ;
-    sgCopyCoord ( &relax_pos, &reset_pos ) ;
-    sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
-
-    for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
-      sgCopyCoord ( &(history[i]), &reset_pos ) ;
-
-    track_hint = curr_track -> absSpatialToTrack ( last_track_coords,
-                                                   last_pos.xyz ) ;
-    track_hint = curr_track -> absSpatialToTrack ( curr_track_coords,
-                                                   curr_pos.xyz ) ;
-
-    update () ;
-  }
-
+  void reset ();
   void setReset ( sgCoord *pos )
   {
     sgCopyCoord ( & reset_pos, pos ) ;
