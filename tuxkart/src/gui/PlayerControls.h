@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.h,v 1.2 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: PlayerControls.h,v 1.3 2004/08/29 19:50:46 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,7 @@
 #define HEADER_PLAYERCONTROLS_H
 
 #include "BaseGUI.h"
-#include "sdldrv.h"
+#include "Player.h"
 
 class PlayerControls: public BaseGUI
 {

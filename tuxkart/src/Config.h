@@ -1,3 +1,5 @@
+// $Id: Config.h,v 1.4 2004/08/29 19:50:45 oaf_thadres Exp $
+//
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //  Modelled after Supertux's configfile.h
@@ -19,34 +21,39 @@
 #ifndef TUXKART_CONFIG_H
 #define TUXKART_CONFIG_H
 
+#define PLAYERS 4
+
+#include "Player.h"
 #include <string>
+
 
 /*class for managing general tuxkart configuration data*/
 class Config
 {
-	private:
-	        std::string filename;
+  private:
+    std::string filename;
 
-		void setFilename();
+    void setFilename();
 
-	public:
-		bool fullscreen;
-		bool sound;
-		bool music;
-		bool smoke;
-		bool displayFPS;
-		int width;
-		int height;
-		int karts;
+  public:
+    bool fullscreen;
+    bool sound;
+    bool music;
+    bool smoke;
+    bool displayFPS;
+    int width;
+    int height;
+    int karts;
+    Player player[PLAYERS];
 
-		Config();
-		Config(const std::string& filename);
-		~Config();
-		void setDefaults();
-		void loadConfig();
-		void loadConfig(const std::string& filename);
-		void saveConfig();
-		void saveConfig(const std::string& filename);
+    Config();
+    Config(const std::string& filename);
+    ~Config();
+    void setDefaults();
+    void loadConfig();
+    void loadConfig(const std::string& filename);
+    void saveConfig();
+    void saveConfig(const std::string& filename);
 };
 
 

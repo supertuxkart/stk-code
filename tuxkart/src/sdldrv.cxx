@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.34 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.35 2004/08/29 19:50:45 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -30,6 +30,7 @@
 #include "PlayerDriver.h"
 #include "RaceSetup.h"
 #include "World.h"
+#include "Config.h"
 
 using std::cout;
 using std::vector;
@@ -38,9 +39,10 @@ const unsigned int MOUSE_HIDE_TIME = 2000;
 
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
+
+
 static vector<SDL_Joystick*> joys;
 
-std::vector<ControlConfig> controlCon;
 
 void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
@@ -67,38 +69,41 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 void setupControls()
 {
 	keyState = SDL_GetKeyState(NULL);
-	
-	controlCon.resize(4);
-  
+
+
 	int numJoys = SDL_NumJoysticks();
 	
 	int i;
 	for (i = 0; i != numJoys; ++i)
 	{
-  		joys.push_back( SDL_JoystickOpen( i ) );
-		controlCon[i].useJoy = true;
+		joys.push_back( SDL_JoystickOpen( i ) );
+		/*open all joysticks, but don't access players that don't exist*/
+		if(i < PLAYERS)
+			config.player[i].useJoy = true;
 	}
-	
-	for (; i != 4; ++i)
-		controlCon[i].useJoy = false;
-	
-	controlCon[0].keys[KC_LEFT] = SDLK_LEFT;
-	controlCon[0].keys[KC_RIGHT] = SDLK_RIGHT;
-	controlCon[0].keys[KC_UP] = SDLK_UP;
-	controlCon[0].keys[KC_DOWN] = SDLK_DOWN;
-	controlCon[0].keys[KC_WHEELIE] = SDLK_a;
-	controlCon[0].keys[KC_JUMP] = SDLK_s;
-	controlCon[0].keys[KC_RESCUE] = SDLK_d;
-	controlCon[0].keys[KC_FIRE] = SDLK_f;
-	
-	controlCon[1].keys[KC_LEFT] = SDLK_j;
-	controlCon[1].keys[KC_RIGHT] = SDLK_l;
-	controlCon[1].keys[KC_UP] = SDLK_i;
-	controlCon[1].keys[KC_DOWN] = SDLK_k;
-	controlCon[1].keys[KC_WHEELIE] = SDLK_q;
-	controlCon[1].keys[KC_JUMP] = SDLK_w;
-	controlCon[1].keys[KC_RESCUE] = SDLK_e;
-	controlCon[1].keys[KC_FIRE] = SDLK_r;
+
+	for (; i != PLAYERS; ++i)
+		config.player[i].useJoy = false;
+
+	/*player 1 default keyboard settings*/
+	config.player[0].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_LEFT;
+	config.player[0].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_RIGHT;
+	config.player[0].keys[CD_KEYBOARD][KC_UP]      = SDLK_UP;
+	config.player[0].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_DOWN;
+	config.player[0].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_a;
+	config.player[0].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_s;
+	config.player[0].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_d;
+	config.player[0].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_f;
+
+	/*player 2 default keyboard settings*/
+	config.player[1].keys[CD_KEYBOARD][KC_LEFT]    = SDLK_j;
+	config.player[1].keys[CD_KEYBOARD][KC_RIGHT]   = SDLK_l;
+	config.player[1].keys[CD_KEYBOARD][KC_UP]      = SDLK_i;
+	config.player[1].keys[CD_KEYBOARD][KC_DOWN]    = SDLK_k;
+	config.player[1].keys[CD_KEYBOARD][KC_WHEELIE] = SDLK_q;
+	config.player[1].keys[CD_KEYBOARD][KC_JUMP]    = SDLK_w;
+	config.player[1].keys[CD_KEYBOARD][KC_RESCUE]  = SDLK_e;
+	config.player[1].keys[CD_KEYBOARD][KC_FIRE]    = SDLK_r;
 }
 
 void shutdownVideo ()
@@ -123,7 +128,7 @@ void pollEvents ()
 		{
 			for (int i = 0; i != 4; ++i)
 			{
-				if ( event.key.keysym.sym == controlCon[i].keys[KC_FIRE] )
+				if ( event.key.keysym.sym == config.player[i].keys[CD_KEYBOARD][KC_FIRE] )
 				{
 					gui -> select();
 					break;
@@ -192,9 +197,9 @@ void kartInput(RaceSetup& raceSetup)
 	{
 		memset(&ji, 0, sizeof(ji));
 		
-		ControlConfig& cc = controlCon[i];
+		Player& plyr = config.player[i];
 		
-		if ( cc.useJoy )
+		if ( plyr.useJoy )
 		{			
 			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / JOY_MAX;
 			ji.accel   = SDL_JoystickGetButton (joys[i], 0);
@@ -205,15 +210,15 @@ void kartInput(RaceSetup& raceSetup)
 			ji.fire    = SDL_JoystickGetButton (joys[i], 5);
 		}
 		
-		if ( keyState [ cc.keys[KC_LEFT] ] )  ji.lr = -1.0f ;
-		if ( keyState [ cc.keys[KC_RIGHT] ] ) ji.lr =  1.0f ;
-		if ( keyState [ cc.keys[KC_UP] ] )    ji.accel = true ;
-		if ( keyState [ cc.keys[KC_DOWN] ] )  ji.brake = true ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_LEFT] ] )  ji.lr = -1.0f ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_RIGHT] ] ) ji.lr =  1.0f ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_UP] ] )    ji.accel = true ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_DOWN] ] )  ji.brake = true ;
 		
-		if ( keyState [ cc.keys[KC_WHEELIE] ] ) ji.wheelie = true ;
-		if ( keyState [ cc.keys[KC_JUMP] ] )    ji.jump = true ;
-		if ( keyState [ cc.keys[KC_RESCUE] ] )  ji.rescue = true ;	
-		if ( keyState [ cc.keys[KC_FIRE] ] )    ji.fire = true ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_WHEELIE] ] ) ji.wheelie = true ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_JUMP] ] )    ji.jump = true ;
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_RESCUE] ] )  ji.rescue = true ;	
+		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_FIRE] ] )    ji.fire = true ;
 	
 		PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->getPlayerKart(i)->getDriver());
                 if (driver)

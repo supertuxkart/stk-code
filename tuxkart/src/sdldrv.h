@@ -1,4 +1,4 @@
-//  $Id: sdldrv.h,v 1.11 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: sdldrv.h,v 1.12 2004/08/29 19:50:45 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -29,16 +29,7 @@ class RaceSetup;
 const int JOY_MAX = 32767;
 const int JOY_MID = 16383;
 
-enum KartControl {KC_LEFT, KC_RIGHT, KC_UP, KC_DOWN, KC_WHEELIE, KC_JUMP, KC_RESCUE, KC_FIRE};
-
-struct ControlConfig
-{
-	std::map<KartControl, SDLKey> keys;
-	bool useJoy;
-};
-
 extern Uint8 *keyState;
-extern std::vector<ControlConfig> controlCon;
 
 void initVideo (int w, int h, bool fullscreen);
 void shutdownVideo();
