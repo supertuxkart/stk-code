@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.18 2004/12/10 02:08:57 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.19 2004/12/10 03:43:35 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -88,14 +88,7 @@
          kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
       else //If it's neither, the rotation doesn't jumps the gap
       {
-         if(rotation_direction > 10.0f)
-            kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
-         else if(rotation_direction < -10.0f)
-            kart->getVelocity()->hpr[0] = 3.5f * kart->getVelocity()->xyz[1];
-         else
-         {
-            kart->getVelocity()->hpr[0] = -rotation_direction;
-         }
+         kart->getVelocity()->hpr[0] = 0.3f * -rotation_direction * kart->getVelocity()->xyz[1];
       } //End of the new steering algorithm
       
    
