@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.21 2004/08/12 14:54:55 matzebraun Exp $
+//  $Id: KartDriver.cxx,v 1.22 2004/08/13 13:58:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -526,7 +526,7 @@ KartDriver::load_data()
   float r [ 2 ] = { -10.0f, 100.0f } ;
   
   smokepuff = new ssgSimpleState ();
-  smokepuff -> setTexture        (loader->createTexture ("smoke.rgb", true, true, true)) ;
+  smokepuff -> setTexture        (loader->createTexture ("smoke.png", true, true, true)) ;
   smokepuff -> setTranslucent    () ;
   smokepuff -> enable            ( GL_TEXTURE_2D ) ;
   smokepuff -> setShadeModel     ( GL_SMOOTH ) ;

@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.8 2004/08/09 11:25:35 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.9 2004/08/13 13:58:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -72,8 +72,8 @@ KartProperties::init_defaults()
   // Default to a standard Tux configuration in case anything goes wrong
   name = "Tux";
   model_file = "tuxkart.ac";
-  icon_file = "tuxicon.rgb";
-  shadow_file = "tuxkartshadow.rgb";
+  icon_file = "tuxicon.png";
+  shadow_file = "tuxkartshadow.png";
   icon_material = NULL;
 
   color[0] = 1.0f;

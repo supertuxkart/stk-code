@@ -1,4 +1,4 @@
-//  $Id: material.cxx,v 1.12 2004/08/01 15:13:43 grumbel Exp $
+//  $Id: material.cxx,v 1.13 2004/08/13 13:58:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -335,7 +335,7 @@ Material *getMaterial ( char *fname )
   }
 
   strcpy ( fname, basename  ) ;
-  strcat ( fname, ".rgb"    ) ;
+  strcat ( fname, ".png"    ) ;
   return NULL ;
 }
 
