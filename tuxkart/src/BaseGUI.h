@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.2 2004/08/05 16:47:18 jamesgregory Exp $
+//  $Id: BaseGUI.h,v 1.3 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,8 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
+#include <SDL.h>
+
 enum GUISwitch
 {
 GUIS_CURRENT,
@@ -36,7 +38,8 @@ public:
 	virtual ~BaseGUI() {}
 	
 	virtual void update(float dt) = 0;
-	virtual void click(int button, int x, int y) = 0;
+	virtual void select() = 0;
+	virtual void cursor(SDLKey key) = 0;
 	virtual void point(int x, int y) = 0; 
 	virtual void stick(int x, int y) = 0;
 };

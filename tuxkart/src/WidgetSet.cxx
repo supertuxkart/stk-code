@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.1 2004/08/04 16:33:32 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.2 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -1525,6 +1525,26 @@ int WidgetSet::stick(int id, int x, int y)
         return active = jd;
 }
 
+int WidgetSet::cursor(int id, SDLKey key)
+{
+	int jd = 0;
+	
+	switch (key)
+	{
+	case SDLK_LEFT: jd = stick_L(id, active); break;
+	case SDLK_RIGHT: jd = stick_R(id, active); break;
+	case SDLK_UP: jd = stick_U(id, active); break;
+	case SDLK_DOWN: jd = stick_D(id, active); break;
+	default: return 0;
+	}
+	
+    /* If the active widget has changed, return the new active id. */
+
+    if (jd == 0 || jd == active)
+        return 0;
+    else
+        return active = jd;
+}
 
 /*---------------------------------------------------------------------------*/
 

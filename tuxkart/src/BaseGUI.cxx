@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.2 2004/08/05 16:47:18 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.3 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,10 +43,13 @@ void updateGUI()
 		}
 		
 		guiSwitch = GUIS_CURRENT;
+		SDL_ShowCursor(SDL_DISABLE);
 	}
 	
 	static int then = SDL_GetTicks();
 	int now = SDL_GetTicks();
+	
+	glEnable(GL_TEXTURE_2D);
 	
 	if (gui)
 		gui -> update( (now - then) / 1000.f );

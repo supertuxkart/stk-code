@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.1 2004/08/04 16:33:32 jamesgregory Exp $
+//  $Id: WidgetSet.h,v 1.2 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -177,6 +177,9 @@ public:
 	
 	/* joystick movement */
 	int  stick(int, int xrel, int yrel);
+	
+	/* keyboard cursors */
+	int cursor(int id, SDLKey key);
 	
 	/* mouse click */
 	int  click();

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.13 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.14 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -83,11 +83,12 @@ void pollEvents ()
     switch (event.type)
     {
       case SDL_KEYDOWN:
-	  if ( !puKeyboard ( event.key.keysym.sym, PU_DOWN ) )
 	  	keyboardInput (event.key.keysym);
 	  break;
 	
 	case SDL_MOUSEBUTTONDOWN:
+		if (gui)
+			gui -> select();
 	case SDL_MOUSEBUTTONUP:
 	{
 	  int puButton = PU_NOBUTTON;
@@ -117,17 +118,16 @@ void pollEvents ()
             puState = PU_UP;
             break;
 	  }
-	  if (gui)
-	  	gui -> click (event.button.button, event.button.x,  getScreenHeight() - event.button.y );
 	  puMouse ( puButton, puState, event.button.x, event.button.y );
 	  break;
 	}
 	 
 	case SDL_MOUSEMOTION:
-	if (gui)
-	  	gui -> point ( event.motion.x, getScreenHeight() - event.motion.y );
-	  puMouse ( event.motion.x, event.motion.y );
-	  break;
+		SDL_ShowCursor(SDL_ENABLE);
+		if (gui)
+	  		gui -> point ( event.motion.x, getScreenHeight() - event.motion.y );
+	  	puMouse ( event.motion.x, event.motion.y );
+	  	break;
 	 
 	 case SDL_JOYAXISMOTION:
 		{
@@ -148,6 +148,11 @@ void pollEvents ()
 	  	gui -> point ( event.jball.xrel,  getScreenHeight() - event.jball.yrel );
 	  break;
 	  
+      case SDL_JOYBUTTONDOWN:
+		if (gui)
+			gui -> select();
+		break;
+	  
 	case SDL_QUIT:
 	  shutdown ();
 	  break;
@@ -167,6 +172,14 @@ void keyboardInput (const SDL_keysym& key)
 
   switch ( key.sym )
     {
+    case SDLK_RETURN: if (gui) gui -> select(); break;
+    
+    case SDLK_LEFT:    
+    case SDLK_RIGHT:    
+    case SDLK_UP:    
+    case SDLK_DOWN:
+    	if (gui) gui -> cursor(key.sym); break;
+    
     case SDLK_ESCAPE : shutdown() ;
     
     case SDLK_F12:

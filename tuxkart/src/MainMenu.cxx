@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.3 2004/08/05 16:47:18 jamesgregory Exp $
+//  $Id: MainMenu.cxx,v 1.4 2004/08/05 18:33:00 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,7 +28,7 @@ MainMenu::MainMenu()
 	menu_id = widgetSet -> varray(0);
 	widgetSet -> start(menu_id, "Single Player",  GUI_SML, MENU_SINGLE, 0);
 	widgetSet -> state(menu_id, "Multiplayer",  GUI_SML, MENU_MULTI, 0);
-	widgetSet -> state(menu_id, "Watch replay",  GUI_SML, MENU_REPLAY, 0);
+	widgetSet -> state(menu_id, "Watch Replay",  GUI_SML, MENU_REPLAY, 0);
 	widgetSet -> state(menu_id, "Options",  GUI_SML, MENU_OPTIONS, 0);
 	widgetSet -> state(menu_id, "Quit",  GUI_SML, MENU_QUIT, 0);
 	
@@ -47,11 +47,21 @@ void MainMenu::update(float dt)
 	widgetSet -> paint(menu_id) ;
 }
 
-void MainMenu::click(int button, int x, int y)
+void MainMenu::select()
 {
-	(void)button;
-	(void)x;
-	(void)y;
+	switch ( widgetSet -> token (widgetSet -> click()) )
+	{
+	case MENU_SINGLE:		singlePlayer();	break;
+	case MENU_MULTI: 		break;
+	case MENU_REPLAY:		break;
+	case MENU_OPTIONS:	break;
+	case MENU_QUIT:		shutdown(); break;
+	}
+}
+
+void MainMenu::cursor(SDLKey key)
+{
+	widgetSet -> pulse(widgetSet -> cursor(menu_id, key), 1.2f);
 }
 
 void MainMenu::point(int x, int y)
@@ -64,3 +74,7 @@ void MainMenu::stick(int x, int y)
 	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }
 
+void MainMenu::singlePlayer()
+{
+	switchToGame () ;
+}
