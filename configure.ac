@@ -106,8 +106,8 @@ else
   CXXFLAGS="$CXXFLAGS -O6 -Wall $MACH -malign-double -I/usr/local/include -L/usr/local/lib"
 fi
 
-MY_EXPAND_DIR(tuxkart_datadir, "$datadir/games/$PACKAGE")
-AC_DEFINE_UNQUOTED(TUXKART_DATADIR, "$tuxkart_datadir")
+MY_EXPAND_DIR(supertuxkart_datadir, "$datadir/games/$PACKAGE")
+AC_DEFINE_UNQUOTED(SUPERTUXKART_DATADIR, "$supertuxkart_datadir")
 
 AC_MSG_CHECKING(for debug mode)
 AC_ARG_ENABLE(debug,

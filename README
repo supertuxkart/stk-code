@@ -6,6 +6,16 @@ friends covered under the GNU GPL (see COPYING for details). It is
 based on TuxKart by Steve Baker, but contains improved graphics and
 userinterface.
 
+The SuperTuxKart webpage is located at:
+
+ * http://supertuxkart.berlios.de
+
+Questions and Comments should go to supertuxkart-devel@lists.berlios.de
+Mailing list subscribe information is available at:
+
+  http://supertuxkart.berlios.de/contact.html
+
+
 PLAYING THE GAME:
 
 Ideally, you need a 'gamepad' style joystick with at least six buttons:
@@ -114,11 +124,8 @@ KNOWN BUGS:
 
     * No drive-with-the-mouse support.
     * Slow performance on CPU's less than ~450MHz.
-    * No way to return to title screen at end of race.
-    * You always play as Tux - there is no way to change players.
     * After you cross the finish line, if someone overtakes you, your final
       position changes!
-    * No "Ready, Steady, Go!" sequence.
     * The computer players get confused and 'stuck' on tracks that
       self-intersect (eg figure-8 shaped tracks). The lap counter and
       current player positions are also screwed up on those kinds of tracks.
@@ -129,13 +136,7 @@ KNOWN BUGS:
     * Sometimes you can be pushed through a solid object if you are hit by
       another player when in contact with the surface. 
 
-I'm sure there are lots more!
-
-LICENSE:
-
-This software is released under the provisions of
-the GNU General Public License (GPL) which can be
-found in the file 'LICENSE' in the current directory.
+We're sure there are lots more!
 
 DIRECTORY STRUCTURE:
 

@@ -12,8 +12,7 @@ Then simply run:
   $ ./configure
   $ make
 
-You can then run the game from the directory you downloaded it into
-via:
+You can then run the game from the directory you extracted it to run:
 
   $ src/tuxkart
 

@@ -48,7 +48,7 @@ static void initializeLoader()
     loader->setModelDir("models");
     loader->setTextureDir("images");
 
-    /*create $HOME/.tuxkart if necessary*/
+    /*create $HOME/.supertuxkart if necessary*/
     loader->initConfigDir();
 
     /* initialize search path of the loader */

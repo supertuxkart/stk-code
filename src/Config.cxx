@@ -62,7 +62,7 @@ void Config::setFilename()
   if(getenv("HOME")!=NULL)
   {
     filename = getenv("HOME");
-    filename += "/.tuxkart/config";
+    filename += "/.supertuxkart/config";
   }
 #endif
 }

@@ -72,7 +72,7 @@ Loader::initConfigDir()
   {
     std::string pathname;
     pathname = getenv("HOME");
-    pathname += "/.tuxkart";
+    pathname += "/.supertuxkart";
     mkdir(pathname.c_str(), 0755);
   }
 #endif
