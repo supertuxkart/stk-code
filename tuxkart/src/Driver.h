@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.13 2004/08/05 15:31:22 grumbel Exp $
+//  $Id: Driver.h,v 1.14 2004/08/06 13:03:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -106,6 +106,9 @@ protected:
 
   sgCoord  history [ HISTORY_FRAMES ] ;
 
+  sgCoord relax_pos;
+  sgCoord last_relax_pos;
+
   sgCoord  reset_pos ;
   sgCoord  curr_pos  ;
   sgCoord  last_pos  ;
@@ -202,6 +205,8 @@ public:
     sgZeroVec3 ( velocity.hpr ) ;
     sgCopyCoord ( &last_pos, &reset_pos ) ;
     sgCopyCoord ( &curr_pos, &reset_pos ) ;
+    sgCopyCoord ( &relax_pos, &reset_pos ) ;
+    sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
 
     for ( int i = 0 ; i < HISTORY_FRAMES ; i++ )
       sgCopyCoord ( &(history[i]), &reset_pos ) ;

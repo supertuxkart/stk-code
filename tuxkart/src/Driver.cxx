@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.12 2004/08/05 12:53:08 grumbel Exp $
+//  $Id: Driver.cxx,v 1.13 2004/08/06 13:03:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,12 @@
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
 #define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
 #define min(m,n) ((m)<(n) ? (m) : (n))	/* macro to return lowest number */
+
+static inline void relaxation(float& target, float& prev, float rate)
+{
+  target = (prev) + (rate) * ((target) - (prev));
+  prev = (target);
+}
 
 void Driver::update ()
 {
@@ -54,19 +60,24 @@ void Driver::placeModel ()
 {
   if ( model != NULL )
     {
-      sgCoord c ;
+      sgCoord relax_pos ;
       
-      sgCopyCoord ( &c, &curr_pos ) ;
+      sgCopyCoord ( &relax_pos, &curr_pos ) ;
 
-      c.hpr[1] += wheelie_angle ;
+      relax_pos.hpr[1] += wheelie_angle ;
 
       // Rotate the kart a bit to get a feeling for drifting even if
       // it isn't there in reality, not 100% sure if this is a good
       // idea, but its worth a try
-      c.hpr[0] += steer_angle*10.0f;
+      relax_pos.hpr[0] += steer_angle*10.0f;
 
-      c.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
-      model -> setTransform ( & c ) ;
+      relax_pos.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
+
+      relaxation(relax_pos.hpr[0], last_relax_pos.hpr[0], .5);
+      relaxation(relax_pos.hpr[1], last_relax_pos.hpr[1], .5);
+      relaxation(relax_pos.hpr[2], last_relax_pos.hpr[2], .5);
+
+      model -> setTransform ( & relax_pos ) ;
     }
 }
 
