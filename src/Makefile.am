@@ -1,7 +1,5 @@
 # src/
 
-bindir=@bindir@
-
 bin_PROGRAMS = supertuxkart
 
 supertuxkart_SOURCES = \
