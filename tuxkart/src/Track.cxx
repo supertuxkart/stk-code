@@ -1,4 +1,4 @@
-//  $Id: Track.cxx,v 1.13 2004/08/17 11:58:00 grumbel Exp $
+//  $Id: Track.cxx,v 1.14 2004/08/17 12:10:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,21 +26,11 @@ Track::Track ( const TrackData& track_data_, int mirror, int reverse )
   : track_data(track_data_)
 {
   // Mirror the track if requested
-  for ( int i = 0 ; i < int(track_data.driveline.size()); ++i )
-    track_data.driveline[i][0] = mirror ? -track_data.driveline[i][0] : track_data.driveline[i][0];
+  if (mirror)
+    track_data.mirror();
 
-  if ( reverse )
-    {
-      for ( int i = 0 ; i < int(track_data.driveline.size())/2 ; ++i )
-        {
-          int j = int(track_data.driveline.size()) - i - 1 ;
-          float tmp ;
-
-          tmp=track_data.driveline[i][0];track_data.driveline[i][0]=track_data.driveline[j][0];track_data.driveline[j][0]=tmp;
-          tmp=track_data.driveline[i][1];track_data.driveline[i][1]=track_data.driveline[j][1];track_data.driveline[j][1]=tmp;
-          tmp=track_data.driveline[i][2];track_data.driveline[i][2]=track_data.driveline[j][2];track_data.driveline[j][2]=tmp;
-        }
-    }
+  if (reverse)
+    track_data.reverse();
 
   sgSetVec2 ( min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
   sgSetVec2 ( max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
@@ -64,9 +54,6 @@ Track::Track ( const TrackData& track_data_, int mirror, int reverse )
 
   total_distance = d ;
 }
-
-
-
 
 extern int check_hint ;
 

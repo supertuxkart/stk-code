@@ -1,4 +1,4 @@
-//  $Id: plibwrap.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: plibwrap.h,v 1.3 2004/08/17 12:10:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -27,6 +27,11 @@ struct sgVec3Wrap
   sgVec3 vec;
 
   inline sgVec3Wrap() {}
+
+  inline sgVec3Wrap(const sgVec3Wrap& arg)
+  {
+    sgCopyVec3(vec, arg.vec);
+  }
 
   inline sgVec3Wrap(const sgVec3& vec_)
   {

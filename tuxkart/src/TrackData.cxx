@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.5 2004/08/17 11:58:00 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.6 2004/08/17 12:10:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +24,9 @@
 
 TrackData::TrackData(const std::string& filename_)
 {
+  mirrored = false;
+  reversed = false;
+
   filename = filename_;
   ident    = filename.substr(0, filename.length() - 6);
   loc_filename = ident + ".loc";
@@ -69,6 +72,8 @@ TrackData::TrackData(const std::string& filename_)
   } catch(std::exception& err) {
     std::cout << "Catched std::exception: " << err.what() << std::endl;
   }
+
+  load_drv();
 }
 
 void
@@ -112,6 +117,24 @@ TrackData::load_drv()
     }
 
   fclose ( fd ) ;
+}
+
+
+void
+TrackData::reverse()
+{
+  reversed = !reversed;
+
+  std::reverse(driveline.begin(), driveline.end());
+}
+
+void
+TrackData::mirror()
+{
+  mirrored = !mirrored;
+
+  for ( int i = 0 ; i < int(driveline.size()); ++i )
+    driveline[i][0] = -driveline[i][0];
 }
 
 /* EOF */

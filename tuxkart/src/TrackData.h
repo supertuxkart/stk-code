@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.5 2004/08/17 11:58:00 grumbel Exp $
+//  $Id: TrackData.h,v 1.6 2004/08/17 12:10:47 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,6 +34,9 @@ public:
   std::string drv_filename;
   std::string loc_filename;
 
+  bool mirrored;
+  bool reversed;
+
   std::string name;
   sgVec4 sky_color;
 
@@ -53,10 +56,17 @@ public:
   sgVec4 diffusecol;
 
   std::vector<sgVec3Wrap> driveline;
+
 public:
   TrackData(const std::string& filename);
 
   void load_drv();
+
+  /** Reverse the track */
+  void reverse();
+
+  /** Mirror the track */
+  void mirror();
 };
 
 #endif
