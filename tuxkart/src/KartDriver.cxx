@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.48 2004/09/05 20:09:58 matzebraun Exp $
+//  $Id: KartDriver.cxx,v 1.49 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -585,7 +585,7 @@ KartDriver::processInput(float delta)
     getVelocity()->hpr[0] = 0.0f ;
 
   // XXX this should be handled in physicsUpdate or when doing CD...
-  //force[2] = -GRAVITY * kart_properties.mass;
+  force[2] = -GRAVITY * kart_properties->mass;
 }
 
 void print_model(ssgEntity* entity, int indent)

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.78 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.79 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -312,8 +312,8 @@ int main ( int argc, char *argv[] )
       }
 
     screenManager->run();
-    delete startScreen;
     delete screenManager;
+    screenManager = 0;
 
     deinitTuxKart();
 

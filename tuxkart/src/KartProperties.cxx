@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.15 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: KartProperties.cxx,v 1.16 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -39,14 +39,14 @@ KartProperties::KartProperties(const std::string& filename)
 {
   init_defaults();
 
-  const lisp::Lisp* lisp = 0;
+  const lisp::Lisp* root = 0;
   ident = StringUtils::basename(StringUtils::without_extension(filename));
 
   try {
     lisp::Parser parser;
-    lisp = parser.parse(loader->getPath(filename));
+    root = parser.parse(loader->getPath(filename));
     
-    lisp = lisp->getLisp("tuxkart-kart");
+    const lisp::Lisp* lisp = root->getLisp("tuxkart-kart");
     if(!lisp)
         throw std::runtime_error("No tuxkart-kart node found");
   
@@ -72,7 +72,7 @@ KartProperties::KartProperties(const std::string& filename)
     std::cout << "Error while parsing KartProperties '" << filename
               << ": " << err.what() << "\n";
   }
-  delete lisp;
+  delete root;
 
   // load material
   icon_material = getMaterial(icon_file.c_str());

@@ -1,4 +1,4 @@
-//  $Id: RaceManager.cxx,v 1.9 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: RaceManager.cxx,v 1.10 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -95,7 +95,8 @@ GrandPrixMode::next()
   else
     {
       // FIXME: Insert credits/extro stuff here
-      screenManager->setScreen(new StartScreen()); 
+      startScreen = new StartScreen();
+      screenManager->setScreen(startScreen); 
     }
 }
 
@@ -129,7 +130,8 @@ QuickRaceMode::start()
 void
 QuickRaceMode::next()
 {
-  screenManager->setScreen(new StartScreen());
+  startScreen = new StartScreen();
+  screenManager->setScreen(startScreen);
 }
 
 TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_)
@@ -151,7 +153,8 @@ TimeTrialMode::start()
 void
 TimeTrialMode::next()
 {
-  screenManager->setScreen(new StartScreen());
+  startScreen = new StartScreen();
+  screenManager->setScreen(startScreen);
 }
 
 RaceManager::RaceManager()

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.31 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: World.cxx,v 1.32 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -182,12 +182,15 @@ World::~World()
   
   for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
     delete projectile[j];
+  for ( int i = 0 ; i < NUM_EXPLOSIONS ; ++i )
+    delete explosion[i];
     
   delete gold_h;
   delete silver_h;
   delete red_h;
   delete green_h;
-  
+
+  delete track;
   delete scene ; 
   
 #ifdef ENABLE_NETWORKING

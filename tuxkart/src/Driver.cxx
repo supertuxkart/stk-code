@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.37 2004/09/05 20:09:58 matzebraun Exp $
+//  $Id: Driver.cxx,v 1.38 2004/09/05 21:26:24 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -82,10 +82,11 @@ Driver::reset ()
   history_index = 0 ;
   wheelie_angle = 0.0f ;
 
-  sgZeroVec3 ( velocity.xyz ) ;
-  sgZeroVec3 ( velocity.hpr ) ;
+  sgZeroCoord ( &velocity ) ;
+  sgZeroVec3 ( curr_normal ) ;
   sgCopyCoord ( &last_pos, &reset_pos ) ;
   sgCopyCoord ( &position, &reset_pos ) ;
+  sgCopyCoord ( &visi_pos, &reset_pos ) ;
   sgCopyCoord ( &last_relax_pos, &reset_pos ) ;
 
   track_hint = World::current() ->track -> absSpatialToTrack ( last_track_coords,
