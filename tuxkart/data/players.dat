@@ -2,8 +2,7 @@
 # The files containing the Kart models.
 # These have to be in the order: Tux, Geeko, BSOD and Gown.
 #
-#tuxkart.ac
-bsodkart2.ac
+tuxkart.ac
 geekokart.ac
 bsodkart.ac
 gownkart.ac
