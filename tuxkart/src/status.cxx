@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.25 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: status.cxx,v 1.26 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -162,7 +162,7 @@ void drawTimer ()
 {
   char str [ 256 ] ;
 
-  time_left = fclock->getAbsTime () ;
+  time_left = World::current()->fclock->getAbsTime () ;
 
   int min     = (int) floor ( time_left / 60.0 ) ;
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
@@ -329,7 +329,7 @@ void drawEmergencyText ()
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
        World::current()->kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
-    wrong_timer += fclock -> getDeltaTime () ;
+    wrong_timer += World::current()->fclock -> getDeltaTime () ;
 
     if ( wrong_timer > 2.0f )
     {
@@ -478,3 +478,4 @@ void drawStatusText (RaceSetup& raceSetup)
   glPopMatrix  () ;
 }
 
+/* EOF */

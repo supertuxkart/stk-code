@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.18 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.19 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -160,7 +160,7 @@ void KartDriver::doObjectInteractions ()
     if ( sgDistanceSquaredVec2 ( hpos, getCoord()->xyz ) < 0.8f )
     {
       herring [ i ] . eaten = TRUE ;
-      herring [ i ] . time_to_return = fclock->getAbsTime() + 2.0f  ;
+      herring [ i ] . time_to_return = World::current()->fclock->getAbsTime() + 2.0f  ;
 
       if ( this == World::current()->kart[0] )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
@@ -287,7 +287,7 @@ void KartDriver::update ()
     attach ( ATTACH_TINYTUX, 4.0f ) ;
   }
 
-  attachment_time_left -= fclock->getDeltaTime () ;
+  attachment_time_left -= World::current()->fclock->getDeltaTime () ;
 
   if ( attachment_time_left <= 0.0f && attachment != NULL )
   {

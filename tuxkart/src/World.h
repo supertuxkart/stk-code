@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.2 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: World.h,v 1.3 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -52,13 +52,14 @@ public:
 
   Projectile *projectile [ NUM_PROJECTILES ] ;
   Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
+  ulClock     *fclock ;
 
 private:
   Track        *track;
   guUDPConnection *net;
   int network_enabled;
   int network_testing;
-
+  
   GFX* gfx;
 
   ssgBranch *trackBranch ;

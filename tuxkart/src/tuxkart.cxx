@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.63 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.64 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -50,7 +50,6 @@ int num_herring   ;
 KartProperties kart_props;
 HerringInstance herring [ MAX_HERRING ] ;
 
-ulClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 WidgetSet          *widgetSet = NULL ;
 BaseGUI	*gui = NULL;
@@ -66,9 +65,6 @@ void restartRace()
         ++i )
     (*i)->reset() ;
 }
-
-
-
 
 void shutdown()
 {

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.34 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: tuxkart.h,v 1.35 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -53,26 +53,19 @@ class Track ;
 
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
+extern SoundSystem *sound ;
 extern std::vector<GUISwitch> guiStack;
 
-/** All available kart configurations */
+/** The players kart configuration, FIXME: should be part of RaceSetup */
+extern KartProperties kart_props;
+
+/** All available kart configurations, FIXME: having a
+    CharacterManager might be a good idea */
 typedef std::vector<KartProperties> Characters;
 extern Characters characters;
 
-/** The players kart configuration */
-extern KartProperties kart_props;
-
-extern SoundSystem *sound ;
-extern Track       *track ;
-extern ulClock     *fclock ;
-
-void tuxKartMainLoop (RaceSetup& raceSetup) ;
-void backToSplash () ;
 void shutdown() ;
 void restartRace();
-
-void initMaterials   () ;
-ssgBranch *process_userdata ( char *data ) ;
 
 #define MAX_HOME_DIST  50.0f
 #define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)

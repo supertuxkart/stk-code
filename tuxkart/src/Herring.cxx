@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.9 2004/08/10 16:54:36 grumbel Exp $
+//  $Id: Herring.cxx,v 1.10 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "material.h"
 #include "Shadow.h"
 #include "Herring.h"
+#include "World.h"
 
 Herring::Herring ( sgVec3 colour )
 {
@@ -96,7 +97,7 @@ void HerringInstance::update ()
 {
   if ( ! eaten || her == NULL ) return ;
 
-  float t = time_to_return - fclock->getAbsTime () ;
+  float t = time_to_return - World::current()->fclock->getAbsTime () ;
 
   if ( t > 0 )
   {

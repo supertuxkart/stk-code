@@ -1,4 +1,4 @@
-//  $Id: WorldLoader.cxx,v 1.3 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: WorldLoader.cxx,v 1.4 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tuxkart.h"
+#include "World.h"
 #include "WorldLoader.h"
  
 static void to_uppercase ( char *s )
@@ -134,7 +135,7 @@ void autodcsHook ( ssgBranch *br, void *param )
   sgCopyCoord ( & now, & ( p -> init  ) ) ;
   sgCopyCoord ( & add, & ( p -> delta ) ) ;
  
-  float timer = fclock -> getAbsTime () + p -> phase ;
+  float timer = World::current()->fclock -> getAbsTime () + p -> phase ;
  
   if ( p->cycle != 0.0 && p->mode != MODE_FORWARD )
   {

@@ -1,4 +1,4 @@
-//  $Id: WorldLoader.h,v 1.1 2004/08/01 15:11:56 grumbel Exp $
+//  $Id: WorldLoader.h,v 1.2 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,6 +27,7 @@
 
 void initWorld   () ;
 void updateWorld () ;
+ssgBranch *process_userdata ( char *data ) ;
 
 #endif
 

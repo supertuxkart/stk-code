@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.15 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.16 2004/08/11 00:57:56 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "sound.h"
 #include "KartProperties.h"
 #include "KartDriver.h"
+#include "World.h"
 
 int check_hint = 0 ;
 
@@ -37,7 +38,7 @@ void PlayerKartDriver::incomingJoystick  (JoyInfo& ji)
     for the player's joystick, it has to be the true delta-t.
   */
 
-  float true_delta_t = fclock -> getDeltaTime () ;
+  float true_delta_t = World::current()->fclock -> getDeltaTime () ;
 
   if ( ji.fire ) 
   {
