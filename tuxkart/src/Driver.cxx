@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.38 2004/09/05 21:26:24 matzebraun Exp $
+//  $Id: Driver.cxx,v 1.39 2004/09/06 07:38:18 evilynux Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -183,6 +183,7 @@ Driver::physicsUpdate (float delta)
 	float torque;
 	float kart_angular_acc;
 	float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
+	bool backward = false;
 
 	unsigned int count;
 	
@@ -192,20 +193,12 @@ Driver::physicsUpdate (float delta)
 	sgZeroVec2 (traction);
 	sgZeroVec2 (lateral_f);
 	sgZeroVec2 (lateral_r);
-			
+
 	// rotation angle of wheels
-	if (velocity.xyz[1] == 0)
-	  {
-		sideslip = 0;
-		wheel_rot_angle = steer_angle;
-	  }
-	else
-	  {
-		sideslip = atan2 (velocity.xyz[0], velocity.xyz[1]);
-		wheel_rot_angle = atan2 (kart_angular_vel * wheelbase/2,
-					 velocity.xyz[1]);
-	  }
-		
+	sideslip = atan2 (velocity.xyz[0], velocity.xyz[1]);
+	wheel_rot_angle = atan2 (kart_angular_vel * wheelbase/2,
+				 velocity.xyz[1]);
+
 	/*----- Lateral Forces -----*/
 	lateral_f[0] = _lateralForce(kart_properties, kart_properties->corn_f,
 				     sideslip + wheel_rot_angle - steer_angle);
