@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.45 2004/08/07 03:41:14 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.46 2004/08/07 04:31:49 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -395,12 +395,12 @@ int main ( int argc, char *argv[] )
   initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
-  {
+    {
       guiSwitch = GUIS_RACE;
       tuxkartMain ( ) ;
-  }
+    }
   else
-      startScreen ();
+    startScreen ();
 
   return 0 ;
 }
