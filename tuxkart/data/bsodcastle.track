@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "BSODs Battlements"))
+ (name "BSODs Battlements")
+ (music "mods/tuxr.mod"))
 
 ;; EOF ;;
 

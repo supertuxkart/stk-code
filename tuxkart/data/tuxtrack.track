@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Tux Tollway"))
+ (name "Tux Tollway")
+ (music "mods/tk2.mod"))
 
 ;; EOF ;;
 

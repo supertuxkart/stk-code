@@ -2,7 +2,7 @@
 
 (tuxkart-kart
  (name "Dino")
- (model "dinokart.ac")
+ (model "dinokart-high.ac")
  (icon  "dinoicon.png")
  (shadow "dinoshadow.png")
  (red   0.8)

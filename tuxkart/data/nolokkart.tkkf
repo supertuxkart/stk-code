@@ -2,7 +2,7 @@
 
 (tuxkart-kart
  (name "Nolok")
- (model "nolokkart.ac")
+ (model "nolokkart-high.ac")
  (icon  "nolokicon.png")
  (shadow "tuxkartshadow.png")
  

@@ -2,7 +2,7 @@
 
 (tuxkart-kart
  (name "Penny")
- (model "pennykart.ac")
+ (model "pennykart-med.ac")
  (icon  "pennyicon.png")
  (shadow "pennyshadow.png")
  (red   0.8)

@@ -1,8 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Possi")
- (model "possi.ac")
+ (name "Skirpy")
+ (model "skirpy-high.ac")
  (icon  "possiicon.png")
  (shadow "tuxkartshadow.png")
  

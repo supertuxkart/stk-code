@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Geeko Peak"))
+ (name "Geeko Peak")
+ (music "mods/tk2.mod"))
 
 ;; EOF ;;
 
