@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.52 2004/08/08 16:33:58 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.53 2004/08/08 20:27:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,7 +56,7 @@ ssgBranch *trackBranch ;
 int num_herring   ;
 
 char playersfname [ 256 ] ;
-std::string kart_file = "data/pennykart.tkkf";
+KartProperties kart_props;
 HerringInstance herring [ MAX_HERRING ] ;
 
 RaceSetup raceSetup;
@@ -427,7 +427,7 @@ int tuxkartMain ()
     KartDriver* newkart;
 
     if ( i < raceSetup.numPlayers )
-      newkart = new PlayerKartDriver  ( KartProperties(kart_file), i ) ;
+      newkart = new PlayerKartDriver  ( kart_props, i ) ;
     else if ( network_enabled )
       newkart = new NetworkKartDriver ( KartProperties(), i ) ;
     else

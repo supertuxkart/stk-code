@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.6 2004/08/08 16:04:08 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.7 2004/08/08 20:27:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,7 +37,7 @@ KartProperties::KartProperties(const std::string& filename)
     LispReader* kart = LispReader::load(loader->getPath(filename), "tuxkart-kart");
     assert(kart);
   
-    LispReader reader(lisp_cdr(kart->get_lisp()));
+    LispReader reader(kart->get_lisp());
 
     reader.read_string("name",   name);
     reader.read_string("model",  model_file);
@@ -69,6 +69,8 @@ KartProperties::KartProperties(const std::string& filename)
 void
 KartProperties::init_defaults()
 {
+  // Default to a standard Tux configuration in case anything goes wrong
+  name = "Tux";
   model_file = "tuxkart.ac";
   icon_file = "tuxicon.rgb";
   shadow_file = "tuxkartshadow.rgb";

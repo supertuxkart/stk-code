@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.49 2004/08/08 16:04:08 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.50 2004/08/08 20:27:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -271,7 +271,7 @@ int main ( int argc, char *argv[] )
 
 	  else if( (!strcmp(argv[i], "--kart") and argc > 2 ))
             {
-              kart_file = argv[i+1];
+              kart_props = KartProperties(argv[i+1]);
             }
 
 	  else if( (!strcmp(argv[i], "--track") or !strcmp(argv[i], "-t")) and argc > 2 )

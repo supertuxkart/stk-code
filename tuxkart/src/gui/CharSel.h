@@ -1,4 +1,4 @@
-//  $Id: CharSel.h,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: CharSel.h,v 1.3 2004/08/08 20:27:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,10 +20,15 @@
 #ifndef HEADER_CHARSEL_H
 #define HEADER_CHARSEL_H
 
+#include <vector>
+#include "../KartProperties.h"
 #include "BaseGUI.h"
 
 class CharSel: public BaseGUI
 {
+private:
+        typedef std::vector<KartProperties> Characters;
+        Characters characters;
 public:
 	CharSel();
 	~CharSel();

@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.5 2004/08/08 20:27:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,18 +17,40 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <set>
+#include "Loader.h"
 #include "CharSel.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
+static bool has_suffix(const std::string& lhs, const std::string rhs)
+{
+  if (lhs.length() < rhs.length())
+    return false;
+  else
+    return lhs.compare(lhs.length() - rhs.length(), rhs.length(), rhs) == 0;
+}
+
 CharSel::CharSel()
 {
-	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Tux",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Penny",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Someone else",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Etc",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Etc",  GUI_SML, 0, 0);
+        std::set<std::string> result;
+        loader->listFiles(result, "data/");
+
+        // Findout which characters are available and load them
+        for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
+        {
+                if (has_suffix(*i, ".tkkf"))
+                {
+                        characters.push_back(KartProperties("data/" + *i));
+                }
+        }
+
+        menu_id = widgetSet -> varray(0);
+
+        for(Characters::size_type i = 0; i < characters.size(); ++i)
+        {
+                widgetSet -> start(menu_id, characters[i].name.c_str(),   GUI_SML, i, 0);
+        }
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
@@ -49,10 +71,12 @@ void CharSel::update(float dt)
 
 void CharSel::select()
 {
-	switch ( widgetSet -> token (widgetSet -> click()) )
-	{
-	default: guiStack.push_back(GUIS_TRACKSEL); break;
-	}
+	int token = widgetSet -> token (widgetSet -> click());
+        
+        if (token >= 0 && token < static_cast<int>(characters.size()))
+                kart_props = characters[token];
+        
+        guiStack.push_back(GUIS_TRACKSEL); 
 }
 
 void CharSel::keybd(const SDL_keysym& key)
