@@ -47,7 +47,7 @@ AC_CHECK_LIB(SDL_image, IMG_Load,,
 AC_CHECK_LIB(SDL_ttf, TTF_OpenFont,,
 	AC_MSG_ERROR([SDL_ttf library required]))
 
-plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul"
+plib_suffix="-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul -lplibssgaux"
 
 dnl Checks for library functions.
 dnl check for OpenGL related libraries

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.2 2004/08/09 17:20:22 grumbel Exp $
+//  $Id: KartDriver.h,v 1.3 2004/08/10 21:57:25 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,31 @@
 #define HEADER_KARTDRIVER_H
 
 #include <plib/ssg.h>
+#include <plib/ssgAux.h>
 #include "Driver.h"
+  
+//static void create_smoke (ssgaParticleSystem *, int, ssgaParticle *p);
+//static void update_smoke (float delta_t, ssgaParticleSystem *, int, ssgaParticle *p);
+
+class ParticleSystem ;
+
+typedef void (* ParticleCreateFunc) ( ParticleSystem *ps,
+                                      int index,
+                                      ssgaParticle *p ) ;
+
+class ParticleSystem : public ssgaParticleSystem
+{
+	public:
+	ParticleSystem ( int num, int initial_num,
+                         float _create_rate, int _turn_to_face,
+                         float sz, float bsphere_size,
+                         ParticleCreateFunc _particle_create,
+                         ssgaParticleUpdateFunc _particle_update = NULL,
+                         ssgaParticleDeleteFunc _particle_delete = NULL );
+	//virtual ~ParticleSystem ();
+	
+	void *userdata;
+};
 
 class KartDriver : public Driver
 {
@@ -33,6 +57,10 @@ protected:
   int   attachment_type ;
   int num_herring_gobbled ;
   ssgSelector *attachment ;
+  
+  ssgSimpleState     *smokepuff ;
+  ParticleSystem     *smoke_system ;
+  ssgTransform       *exhaust_pipe ;
 
   float wheel_position;
 
@@ -44,7 +72,7 @@ protected:
   /** Search the given branch of objects that match the wheel names
       and if so assign them to wheel_* variables */
   void load_wheels(ssgBranch* obj);
-
+    
 public:
   KartDriver ( const KartProperties& kart_properties_, int position_ ) ;
   virtual ~KartDriver() {}
