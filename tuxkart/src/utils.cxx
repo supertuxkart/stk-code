@@ -1,4 +1,4 @@
-//  $Id: utils.cxx,v 1.4 2004/08/01 14:17:42 grumbel Exp $
+//  $Id: utils.cxx,v 1.5 2004/08/25 13:26:14 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <plib/sg.h>
 #include "tuxkart.h"
 
 void pr_from_normal ( sgVec3 hpr, sgVec3 nrm )

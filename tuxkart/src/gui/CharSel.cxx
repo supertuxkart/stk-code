@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.23 2004/08/25 11:29:51 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.24 2004/08/25 13:26:14 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include <set>
 #include <iostream>
+#include "sdldrv.h"
 #include "Loader.h"
 #include "CharSel.h"
 #include "tuxkart.h"

@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.20 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: Camera.cxx,v 1.21 2004/08/25 13:26:13 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/sg.h>
+#include "sdldrv.h"
 #include "tuxkart.h"
 #include "KartDriver.h"
 #include "World.h"

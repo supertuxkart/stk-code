@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.39 2004/08/20 22:32:31 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.40 2004/08/25 13:26:14 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,29 +21,6 @@
 #define HEADER_TUXKART_H
 
 #include <vector>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-#ifdef WIN32
-#ifdef __CYGWIN__
-#include <unistd.h>
-#endif
-#include <windows.h>
-#include <io.h>
-//#include <direct.h>
-#else
-#include <unistd.h>
-#endif
-#include <math.h>
-
-#include "sdldrv.h"
-
-#include "KartProperties.h"
-#include "guNet.h"
-#include "constants.h"
-#include "utils.h"
 #include "gui/BaseGUI.h"
 
 class WidgetSet;

@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.8 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: AutoDriver.cxx,v 1.9 2004/08/25 13:26:13 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "constants.h"
 #include "World.h"
 #include "KartDriver.h"
 #include "AutoDriver.h"

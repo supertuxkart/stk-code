@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.74 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.75 2004/08/25 13:26:13 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 #include <string>
 
 #include "tuxkart.h"
-
+#include "sdldrv.h"
 #include "ScreenManager.h"
 #include "TrackManager.h"
 #include "StringUtils.h"

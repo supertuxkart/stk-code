@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.27 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.28 2004/08/25 13:26:14 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "tuxkart.h"
 #include "../PlayerDriver.h"
 #include "../Track.h"
+#include "../constants.h"
 #include "WidgetSet.h"
 #include "World.h"
 #include "KartDriver.h"

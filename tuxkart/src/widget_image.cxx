@@ -1,4 +1,4 @@
-//  $Id: widget_image.cxx,v 1.4 2004/08/17 21:01:17 grumbel Exp $
+//  $Id: widget_image.cxx,v 1.5 2004/08/25 13:26:14 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "sdldrv.h"
 #include "widget_glext.h"
 #include "widget_image.h"
 #include "tuxkart.h"

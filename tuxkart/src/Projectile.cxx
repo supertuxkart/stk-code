@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.8 2004/08/24 23:28:54 grumbel Exp $
+//  $Id: Projectile.cxx,v 1.9 2004/08/25 13:26:13 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include <plib/sg.h>
 #include "tuxkart.h"
+#include "constants.h"
 #include "Projectile.h"
 #include "KartDriver.h"
 #include "Explosion.h"

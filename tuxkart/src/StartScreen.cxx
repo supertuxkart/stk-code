@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.9 2004/08/24 21:01:44 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.10 2004/08/25 13:26:13 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "sdldrv.h"
 #include "Loader.h"
 #include "RaceSetup.h"
 #include "tuxkart.h"
