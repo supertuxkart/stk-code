@@ -373,10 +373,10 @@ static void startScreen ( int nbrLaps, int mirror, int reverse,
 }
 
 
-void cmdLineHelp ()
+void cmdLineHelp (char* invocation)
 {
   fprintf ( stdout, 
-	    "Usage: tuxkart [options...]\n\n"
+	    "Usage: %s [OPTIONS]\n\n"
 
 	    "Run TuxKart, a racing game with go-kart that features"
 	    " the well-known linux\nmascott Tux. The game is heavily"
@@ -396,7 +396,7 @@ void cmdLineHelp ()
 	    "  --version          Show version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
-	    "http://tuxkart.sourceforge.net\n\n"
+	    "http://tuxkart.sourceforge.net\n\n", invocation
 	    );
 }
 
@@ -426,7 +426,7 @@ int main ( int argc, char *argv[] )
 	       !strcmp(argv[i], "-help") or
 	       !strcmp(argv[i], "-h") )
 	    {
-	      cmdLineHelp();
+	      cmdLineHelp(argv[0]);
 	      return 0;
 	    }
 
@@ -438,7 +438,7 @@ int main ( int argc, char *argv[] )
 		{
 		  fprintf ( stderr,
 			    "You choose an invalid track number: %d.\n", track );
-		  cmdLineHelp();
+		  cmdLineHelp(argv[0]);
 		  return 0;
 		}
 
@@ -497,7 +497,7 @@ int main ( int argc, char *argv[] )
 		  fprintf ( stderr,
 			    "You choose an invalid number of players: %d.\n",
 			    nbrPlayers );
-		  cmdLineHelp();
+		  cmdLineHelp(argv[0]);
 		  return 0;
 		}
 
@@ -530,7 +530,7 @@ int main ( int argc, char *argv[] )
 	  else
 	    {
 	      fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
-	      cmdLineHelp();
+	      cmdLineHelp(argv[0]);
 	      return 0;
 	    }
 	}

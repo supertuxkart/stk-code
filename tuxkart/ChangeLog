@@ -1,3 +1,8 @@
+2004-07-31  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx: - Showing the invocated binary in help
+	msg instead of the generic 'tuxkart' as suggested by Ricardo Cruz.
+	
 2004-07-22  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (cmdLineHelp): - Conventionnal naming scheme.
