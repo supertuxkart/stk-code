@@ -1,4 +1,4 @@
-//  $Id: sound.h,v 1.5 2004/08/23 14:45:59 grumbel Exp $
+//  $Id: sound.h,v 1.6 2004/08/28 22:22:38 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,8 +56,6 @@ class SoundSystem
   slScheduler *sched ;
   
   Sound sfx [NUM_SOUNDS] ; 
-  bool music_off;
-  bool   sfx_off;
 
 public:
   SoundSystem () ;

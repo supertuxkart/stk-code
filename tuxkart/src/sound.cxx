@@ -1,4 +1,4 @@
-//  $Id: sound.cxx,v 1.6 2004/08/23 14:45:59 grumbel Exp $
+//  $Id: sound.cxx,v 1.7 2004/08/28 22:22:38 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "tuxkart.h"
 #include "sound.h"
 #include "Loader.h"
+#include "Config.h"
 
 
 void SoundSystem::disable_music ()
@@ -28,7 +29,7 @@ void SoundSystem::disable_music ()
   sched -> update    () ;  /* Ugh! Nasty Kludge! */
   sched -> update    () ;  /* Ugh! Nasty Kludge! */
 
-  music_off = TRUE  ;
+  config.music = false;
 }
 
 void SoundSystem::pause_music()
@@ -57,7 +58,7 @@ void SoundSystem::change_track ( const char *fname )
   {
     strcpy ( current_track, fname ) ;
 
-    if ( ! music_off )
+    if ( config.music )
       enable_music  () ;
   }
 }
@@ -69,24 +70,23 @@ void SoundSystem::enable_music ()
   if ( current_track [ 0 ] != '\0' )
     sched -> loopMusic ( current_track ) ;
  
-  music_off = FALSE ;
+  config.music = true;
 }
 
 
-void SoundSystem::disable_sfx () { sfx_off = TRUE  ; }
-void SoundSystem:: enable_sfx () { sfx_off = FALSE ; }
+void SoundSystem::disable_sfx () { config.sound = false; }
+void SoundSystem:: enable_sfx () { config.sound = true; }
 
 
 
 void SoundSystem::playSfx ( int sfx_num )
 {
-  if ( ! sfx_off )
+  if ( config.sound )
     sched -> playSample ( sfx[sfx_num].s, 1, SL_SAMPLE_MUTE, 2, NULL ) ;
 }
 
 
-SoundSystem::SoundSystem ():
-music_off(FALSE), sfx_off(FALSE)
+SoundSystem::SoundSystem ()
 {
   sched = new slScheduler ;
   
@@ -110,9 +110,7 @@ music_off(FALSE), sfx_off(FALSE)
       sfx[i].s  = new slSample ( path.c_str(), sched ) ;
   }
 
-  enable_sfx   () ;
   change_track ( "" ) ;
-  enable_music () ;
 }
 
 
