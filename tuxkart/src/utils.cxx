@@ -1,4 +1,4 @@
-//  $Id: utils.cxx,v 1.6 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: utils.cxx,v 1.7 2004/09/24 19:39:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,14 +45,4 @@ bool canAccess ( char *fname )
   return access ( fname, F_OK ) == 0 ;
 #endif
 }
-
-void secondSleep ( int s )
-{
-#ifdef WIN32 
-  Sleep ( 1000 * s ) ;
-#else
-  sleep ( s ) ;
-#endif
-}
-
 

@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.11 2004/09/24 15:45:01 matzebraun Exp $
+//  $Id: AutoDriver.cxx,v 1.12 2004/09/24 19:39:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -78,10 +78,4 @@ void AutoDriver::update (float delta)
         }
     }
 }
-
-void NetworkDriver::update (float delta)
-{
-  (void)delta;
-}
-
 

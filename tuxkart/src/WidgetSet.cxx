@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.15 2004/09/08 16:42:36 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.16 2004/09/24 19:39:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "sdldrv.h"
 #include "WidgetSet.h"
 #include "widget_image.h"
-#include "widget_mathdef.h"
 
 #include "tuxkart.h"
 #include "Loader.h"
@@ -231,9 +231,9 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
 
             for (i = 0; i <= n; i++)
             {
-                float a = 0.5f * V_PI * (float) i / (float) n;
-                float s = r * fsinf(a);
-                float c = r * fcosf(a);
+                float a = 0.5f * M_PI * (float) i / (float) n;
+                float s = r * sin(a);
+                float c = r * cos(a);
 
                 float X  = x     + r - c;
                 float Ya = y + h + ((f & GUI_NW) ? (s - r) : 0);
@@ -250,9 +250,9 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
 
             for (i = 0; i <= n; i++)
             {
-                float a = 0.5f * V_PI * (float) i / (float) n;
-                float s = r * fsinf(a);
-                float c = r * fcosf(a);
+                float a = 0.5f * M_PI * (float) i / (float) n;
+                float s = r * sin(a);
+                float c = r * cos(a);
 
                 float X  = x + w - r + s;
                 float Ya = y + h + ((f & GUI_NE) ? (c - r) : 0);
@@ -1586,7 +1586,7 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
 {
     GLdouble m[4][4];
 
-    GLdouble r = fov / 2 * V_PI / 180;
+    GLdouble r = fov / 2 * M_PI / 180;
     GLdouble s = sin(r);
     GLdouble c = cos(r) / s;
 

@@ -1,4 +1,4 @@
-//  $Id: utils.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: utils.h,v 1.6 2004/09/24 19:39:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,14 +29,7 @@
 void  pr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
 void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
 
-/*
-  Special stdio wrappers for stuff that
-  the *nice* Mr Gates decided to make
-  horribly non-standard.
-*/
-
 bool canAccess ( char *fname ) ;
-void secondSleep ( int s ) ;
 
 #endif
 

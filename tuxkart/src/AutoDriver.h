@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.h,v 1.2 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: AutoDriver.h,v 1.3 2004/09/24 19:39:11 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,18 +21,6 @@
 #define HEADER_AUTODRIVER_H
 
 #include "Controller.h"
-
-class NetworkDriver : public Controller
-{
-public:
-  NetworkDriver()
-  {
-  }
-
-  virtual ~NetworkDriver() {}
-
-  virtual void update (float delta) ;
-};
 
 class AutoDriver : public Controller
 {
