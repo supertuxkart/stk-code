@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.17 2004/08/07 03:38:37 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.18 2004/08/07 04:30:55 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -177,7 +177,7 @@ void kartInput()
 		
 		if ( controlCon[i].useJoy )
 		{			
-			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / 1000;
+			ji.lr = static_cast<float>(SDL_JoystickGetAxis(joys[i], 0 )) / JOY_MAX;
 			ji.accel = SDL_JoystickGetButton (joys[i], 0);
 			ji.brake = SDL_JoystickGetButton (joys[i], 1);
 			ji.wheelie = SDL_JoystickGetButton (joys[i], 2);
