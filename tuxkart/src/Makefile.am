@@ -35,6 +35,8 @@ tuxkart_SOURCES = \
   Traffic.cxx  \
   WorldLoader.cxx  \
   WorldLoader.h  \
+  StartScreen.h \
+  StartScreen.cxx \
   constants.h  \
   gfx.cxx  \
   gfx.h  \

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.31 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: tuxkart.h,v 1.32 2004/08/10 23:17:33 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -73,7 +73,6 @@ extern ssgRoot *scene ;
 
 void tuxKartMainLoop (RaceSetup& raceSetup) ;
 void backToSplash () ;
-void startScreen() ;
 void shutdown() ;
 void restartRace();
 
@@ -103,9 +102,7 @@ extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-void switchToGame (RaceSetup& raceSetup);
-
-int tuxkartMain (RaceSetup& raceSetup) ;
+int tuxkartMain(RaceSetup& raceSetup) ;
 
 #endif
 

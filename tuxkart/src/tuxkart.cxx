@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.60 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.61 2004/08/10 23:17:33 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -509,7 +509,7 @@ delete fclock ;
 void backToSplash()
 {
   unloadRace();
-  startScreen();
+  //FIXME:startScreen();
 }
 
 void restartRace()

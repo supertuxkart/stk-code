@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.55 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.56 2004/08/10 23:17:33 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,19 +29,9 @@
 #include "sound.h"
 #include "RaceSetup.h"
 #include "Loader.h"
-
-static ssgSimpleState *introMaterial ;
+#include "StartScreen.h"
 
 Characters characters;
-
-void switchToGame (RaceSetup& raceSetup)
-{
-  delete introMaterial ;
-  
-  guiStack.clear();
-
-  tuxkartMain (raceSetup) ;
-}
 
 /***********************************\
 *                                   *
@@ -49,67 +39,6 @@ void switchToGame (RaceSetup& raceSetup)
 * and flips the double buffer.      *
 *                                   *
 \***********************************/
-
-static void splashMainLoop ()
-{
-  RaceSetup raceSetup;
-
-  while ( 1 )
-  {
-    //Setup for boring 2D rendering
-    glMatrixMode   ( GL_PROJECTION ) ;
-    glLoadIdentity () ;
-    glMatrixMode   ( GL_MODELVIEW ) ;
-    glLoadIdentity () ;
-    glDisable      ( GL_DEPTH_TEST ) ;
-    glDisable      ( GL_LIGHTING   ) ;
-    glDisable      ( GL_FOG        ) ;
-    glDisable      ( GL_CULL_FACE  ) ;
-    glDisable      ( GL_ALPHA_TEST ) ;
-    //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
-
-    //Draw the splash screen
-    introMaterial -> force () ;
-
-    glBegin ( GL_QUADS ) ;
-    glColor3f    ( 1, 1, 1 ) ;
-    glTexCoord2f ( 0, 0 ) ; glVertex2i (   -1,   -1 ) ;
-    glTexCoord2f ( 1, 0 ) ; glVertex2i (   1,   -1 ) ;
-    glTexCoord2f ( 1, 1 ) ; glVertex2i (   1,   1 ) ;
-    glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
-    glEnd () ;
-
-    glFlush();
-	
-    // Swapbuffers - and off we go again...
-    pollEvents() ;
-    updateGUI(raceSetup);
-    swapBuffers();
-  }
-}
-
-
-static void installMaterial ()
-{
-  /* Make a simplestate for the title screen texture */
-
-  introMaterial = new ssgSimpleState ;
-  introMaterial -> setTexture( 
-          loader->createTexture("title_screen.png", true, true, false));
-  introMaterial -> enable      ( GL_TEXTURE_2D ) ;
-  introMaterial -> disable     ( GL_LIGHTING  ) ;
-  introMaterial -> disable     ( GL_CULL_FACE ) ;
-  introMaterial -> setOpaque   () ;
-  introMaterial -> disable     ( GL_BLEND ) ;
-  introMaterial -> setShadeModel ( GL_SMOOTH ) ;
-  introMaterial -> disable     ( GL_COLOR_MATERIAL ) ;
-  introMaterial -> enable      ( GL_CULL_FACE      ) ;
-  introMaterial -> setMaterial ( GL_EMISSION, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-  introMaterial -> setShininess ( 0 ) ;
-}
 
 static void loadCharacters()
 {
@@ -163,17 +92,6 @@ static void initTuxKart (int width, int height, int videoFlags)
   sound     = new SoundSystem ;
   widgetSet = new WidgetSet ;
 }
-
-
-/* Draw the startScreen */
-void startScreen ( )
-{
-  guiStack.push_back(GUIS_MAINMENU);
-
-  installMaterial () ;
-  splashMainLoop  () ;
-}
-
 
 void cmdLineHelp (char* invocation)
 {
@@ -348,9 +266,16 @@ int main ( int argc, char *argv[] )
   initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
+    {
       tuxkartMain (raceSetup) ;
+    }
   else
-    startScreen ( );
+    {
+      StartScreen startScreen;
+      startScreen.run();
+    }
 
   return 0 ;
 }
+
+/* EOF */
