@@ -1,4 +1,4 @@
-//  $Id: CupData.cxx,v 1.3 2004/08/24 19:33:10 matzebraun Exp $
+//  $Id: CupData.cxx,v 1.4 2004/09/24 18:43:37 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,10 +23,6 @@
 #include "lisp/Parser.h"
 #include "lisp/Lisp.h"
 #include "CupData.h"
-
-CupData::CupData()
-{
-}
 
 CupData::CupData(const std::string& filename)
 {

@@ -1,4 +1,4 @@
-//  $Id: CupData.h,v 1.2 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: CupData.h,v 1.3 2004/09/24 18:43:37 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -32,8 +32,6 @@ public:
       means the filename of the .track file without .track extension
       (ie. 'volcano') */
   std::vector<std::string> tracks;
-
-  CupData();
 
   /** Load the CupData from the given filename */
   CupData(const std::string& filename);
