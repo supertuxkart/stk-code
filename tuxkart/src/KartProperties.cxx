@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.10 2004/08/17 21:01:17 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.11 2004/08/19 12:29:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,7 @@
 #include "material.h"
 #include "lispreader.h"
 #include "Loader.h"
+#include "preprocessor.h"
 #include "KartProperties.h"
 
 KartProperties::KartProperties()
@@ -117,6 +118,7 @@ KartProperties::getModel()
   if (!model)
     {
       model = ssgLoadAC ( model_file.c_str(), loader ) ;
+      preProcessObj(model, 0);
     }
 
   return model;

@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.16 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.17 2004/08/19 12:29:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,6 +56,7 @@ text(NULL)
 	pos_string[7] = "7th";
 	pos_string[8] = "8th";
 	pos_string[9] = "9th";
+	pos_string[10] = "10th";
 	
 	memset(tt, 0, sizeof(float) * 6);
 
@@ -247,7 +248,7 @@ void RaceGUI::drawTimer ()
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup)
 {
-  char str [ 20 ] ;
+  char str [ 256 ] ;
 
   KartDriver* player_kart = World::current()->kart[0];
 

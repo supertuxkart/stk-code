@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.21 2004/08/18 19:16:48 grumbel Exp $
+//  $Id: World.cxx,v 1.22 2004/08/19 12:29:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -57,7 +57,6 @@ World::World(const RaceSetup& raceSetup_)
   clock           = 0.0f;
   
   /* Network initialisation -- NOT WORKING YET */
-
   net              = new guUDPConnection ;
   network_testing  = FALSE ;
   network_enabled  = FALSE ;
@@ -87,10 +86,6 @@ World::World(const RaceSetup& raceSetup_)
     }
   }
 #endif
-  /* Set the SSG loader options */
-
-  loader -> setCreateStateCallback  ( getAppState ) ;
-  loader -> setCreateBranchCallback ( process_userdata ) ;
 
   // Grab the track centerline file
   track = new Track ( track_manager.tracks[raceSetup.track],
@@ -102,7 +97,6 @@ World::World(const RaceSetup& raceSetup_)
   scene -> addKid ( trackBranch ) ;
 
   /* Load the Herring */
-
   sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
 
   gold_h    = new Herring ( yellow ) ; 
@@ -136,7 +130,7 @@ World::World(const RaceSetup& raceSetup_)
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
     init_pos.xyz [ 0 ] = (i % 2 == 0) ? 1.5f : -1.5f ;
-    init_pos.xyz [ 1 ] = i * 1.0f ;
+    init_pos.xyz [ 1 ] = i * 1.5f ;
 
     if ( raceSetup.reverse ) init_pos.hpr[0] = 180.0f ;
 

@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.14 2004/08/17 22:53:44 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.15 2004/08/19 12:29:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,9 @@
 #include "CharSel.h"
 #include "tuxkart.h"
 #include "Loader.h"
+#include "material.h"
 #include "KartManager.h"
+#include "preprocessor.h"
 #include "WidgetSet.h"
 
 CharSel::CharSel()
@@ -69,7 +71,7 @@ CharSel::CharSel()
     }
 
   widgetSet -> filler(ha);
-
+  widgetSet -> space(menu_id);
   widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 
   widgetSet -> layout(menu_id, 0, 1);
@@ -90,7 +92,10 @@ void CharSel::switch_to_character(int n)
                 kart = new ssgTransform;
                 kart->ref();
                 ssgEntity* kartentity = kart_manager.karts[n].getModel();
+
                 kart->addKid(kartentity);
+
+                preProcessObj ( kart, 0 );
         }
 }
 	
