@@ -47,8 +47,9 @@ void initWindow ( int w, int h )
   glutKeyboardFunc       ( getGLUTKeystroke ) ;
   glutSpecialFunc        ( getGLUTSpecialKeystroke ) ;
   glutReshapeFunc        ( reshape ) ;
-/*glutIdleFunc           ( glutPostRedisplay ) ; */
-  glutPostRedisplay      () ;
+#ifndef WIN32
+  glutIdleFunc           ( glutPostRedisplay ) ;
+#endif
 }
 
 
