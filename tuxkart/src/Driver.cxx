@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.39 2004/09/06 07:38:18 evilynux Exp $
+//  $Id: Driver.cxx,v 1.40 2004/09/06 07:39:06 evilynux Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -183,7 +183,6 @@ Driver::physicsUpdate (float delta)
 	float torque;
 	float kart_angular_acc;
 	float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
-	bool backward = false;
 
 	unsigned int count;
 	
