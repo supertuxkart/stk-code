@@ -1,4 +1,4 @@
-//  $Id: Shadow.cxx,v 1.1 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Shadow.cxx,v 1.2 2004/08/08 03:51:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,10 +30,10 @@ Shadow::Shadow ( const std::string& name, float x1, float x2, float y1, float y2
   sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
   sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
  
-  sgSetVec3 ( v, x1, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x1, y2, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y2, 0.10 ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y1, 0.05 ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y1, 0.05 ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y2, 0.05 ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y2, 0.05 ) ; va->add(v) ;
  
   sgSetVec2 ( t, 0.0, 0.0 ) ; ta->add(t) ;
   sgSetVec2 ( t, 1.0, 0.0 ) ; ta->add(t) ;

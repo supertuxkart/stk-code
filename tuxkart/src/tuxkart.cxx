@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.43 2004/08/08 03:45:12 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.44 2004/08/08 03:51:55 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,7 @@
 #include "Herring.h"
 #include "Driver.h"
 #include "Explosion.h"
+#include "Shadow.h"
 #include "isect.h"
 
 #include "status.h"
@@ -142,6 +143,8 @@ void load_players ( )
     lod -> setRanges ( r, 2 ) ;
 
     kart[i]-> getModel() -> addKid ( lod ) ;
+    kart[i]-> getModel() -> addKid ( Shadow("tuxkartshadow.rgb", -1, 1, -1, 1).getRoot () ) ;
+
     kart[i]-> addAttachment ( pobj1 ) ;
     kart[i]-> addAttachment ( pobj2 ) ;
     kart[i]-> addAttachment ( pobj3 ) ;
