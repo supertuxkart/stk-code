@@ -77,7 +77,8 @@ tuxkart_SOURCES = \
   gui/TrackSel.cxx \
   gui/TrackSel.h \
   gui/NumPlayers.cxx \
-  gui/NumPlayers.h
-
+  gui/NumPlayers.h \
+  gui/RaceMenu.cxx \
+  gui/RaceMenu.h
 
 # EOF #
