@@ -1,4 +1,4 @@
-//  $Id: CharSel.h,v 1.4 2004/08/08 21:25:27 grumbel Exp $
+//  $Id: CharSel.h,v 1.5 2004/08/17 14:30:35 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,15 +21,26 @@
 #define HEADER_CHARSEL_H
 
 #include <vector>
+#include <plib/sg.h>
 #include "../KartProperties.h"
 #include "BaseGUI.h"
 
+class ssgBranch;
+class ssgTransform;
+class ssgContext;
+
 class CharSel: public BaseGUI
 {
+private:
+        ssgContext* context;
+        ssgTransform* kart;
+        int current_kart;
+        float clock;
 public:
 	CharSel();
 	~CharSel();
 	
+        void switch_to_character(int n);
 	void update(float dt);
 	void select();
 	void keybd(const SDL_keysym& key);

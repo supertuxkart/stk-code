@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.16 2004/08/16 15:07:39 grumbel Exp $
+//  $Id: Camera.cxx,v 1.17 2004/08/17 14:30:34 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -100,7 +100,6 @@ void Camera::init ()
   whichKart  = 0 ;
   setScreenPosition ( 0 ) ;
 }
-
 
 void Camera::update ()
 {

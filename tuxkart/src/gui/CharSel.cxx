@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.7 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: CharSel.cxx,v 1.8 2004/08/17 14:30:35 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <set>
+#include <iostream>
 #include "Loader.h"
 #include "CharSel.h"
 #include "tuxkart.h"
@@ -26,6 +27,11 @@
 
 CharSel::CharSel()
 {
+        current_kart = -1;
+        switch_to_character(0);
+
+        context = new ssgContext;
+
         menu_id = widgetSet -> varray(0);
 
         for(KartManager::Data::size_type i = 0; i < kart_manager.karts.size(); ++i)
@@ -36,18 +42,55 @@ CharSel::CharSel()
 	widgetSet -> space(menu_id);
 	
 	widgetSet -> layout(menu_id, 0, -1);
+
+        clock = 0;
 }
 
 CharSel::~CharSel()
 {
 	widgetSet -> delete_widget(menu_id) ;
 }
+
+void CharSel::switch_to_character(int n)
+{
+        if (current_kart != n && n >= 0 && n < int(kart_manager.karts.size()))
+        {
+                current_kart = n;
+                kart = new ssgTransform;
+                kart->ref();
+                ssgEntity* kartentity = ssgLoadAC ( kart_manager.karts[n].model_file.c_str(), loader ) ;
+                kartentity->ref();
+                kart->addKid(kartentity);
+        }
+}
 	
 void CharSel::update(float dt)
 {
-	
-	widgetSet -> timer(menu_id, dt) ;
+        clock += dt * 40.0f;
+
+        widgetSet -> timer(menu_id, dt) ;
 	widgetSet -> paint(menu_id) ;
+
+        switch_to_character(widgetSet->token(widgetSet->click()));
+
+        if (kart)
+        {
+                glClear(GL_DEPTH_BUFFER_BIT);
+                //context -> ref();
+                context -> setFOV ( 75.0f, 0.0f ) ;
+                context -> setNearFar ( 0.05f, 1000.0f ) ;
+
+                sgCoord cam_pos;
+                sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+                context -> setCamera ( &cam_pos ) ;
+
+                context -> makeCurrent () ;
+                sgCoord trans;
+                sgSetCoord(&trans, 0, 2, -.2, clock, 0, 0);
+                kart->setTransform (&trans) ;
+                ssgCullAndDraw ( kart ) ;
+                //delete context;
+        }
 }
 
 void CharSel::select()
