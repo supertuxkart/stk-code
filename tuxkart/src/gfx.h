@@ -13,11 +13,5 @@ public:
 
 int stereoShift () ;
 
-
-int getScreenWidth  () ;
-int getScreenHeight () ;
-
-void setScreenSize ( int w, int h ) ;
-
 void updateGFX ( GFX *gfx ) ;
 

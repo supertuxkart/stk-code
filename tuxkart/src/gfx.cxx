@@ -8,28 +8,11 @@
 #include <sys/perm.h>                                                           
 #endif
 
-static int width  = 800 ;
-static int height = 600 ;
-
 static sgVec3 sunposn   ;
 static sgVec4 skyfogcol ;
 static sgVec4 ambientcol ;
 static sgVec4 specularcol ;
 static sgVec4 diffusecol ;
-
-void setScreenSize ( int w, int h )
-{
-  width  = w ;
-  height = h ;
-  glViewport ( 0, 0, w, h ) ;
-}
-
-
-int getScreenWidth  () { return width  ; }
-int getScreenHeight () { return height ; }
-
-
-
 
 GFX::GFX ( int _mirror )
 {

@@ -1,4 +1,4 @@
-//  $Id: pwdrv.cxx,v 1.1 2004/07/30 18:36:55 grumbel Exp $
+//  $Id: pwdrv.cxx,v 1.2 2004/07/31 11:35:14 grumbel Exp $
 //
 //  TuxKart - A Fun Gokart Game
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,8 @@
 #include "pwdrv.h"
 #include "tuxkart.h"
 
+static int width  = 800 ;
+static int height = 600 ;
 static int mouse_x ;
 static int mouse_y ;
 static int mouse_dx = 0 ;
@@ -59,7 +61,9 @@ int getKeystroke ()
 
 void reshape ( int w, int h )
 {
-  setScreenSize ( w, h ) ;
+  width  = w ;
+  height = h ;
+  glViewport ( 0, 0, w, h ) ;
 }
 
 void motionfn ( int x, int y )
@@ -114,8 +118,10 @@ static void startupMouseFn ( int button, int updown, int x, int y )
   puMouse ( button, updown, x, y ) ;
 }
 
-void initVideo(bool fullscreen)
+void initVideo(int w, int h, bool fullscreen)
 {
+  width  = w;
+  height = h;
   pwInit  ( 0, 0, getScreenWidth(), getScreenHeight(), FALSE, 
             "TuxKart " VERSION, 1, 0 ) ;
   pwSetCallbacks ( startupKeyFn, startupMouseFn, startupMotionFn, NULL, NULL ) ;
@@ -127,6 +133,16 @@ void initVideo(bool fullscreen)
 void shutdown()
 {
   exit(0);
+}
+
+int getScreenWidth  () 
+{
+ return width  ; 
+}
+
+int getScreenHeight () 
+{
+ return height ; 
 }
 
 /* EOF */

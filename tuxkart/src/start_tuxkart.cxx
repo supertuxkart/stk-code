@@ -288,12 +288,12 @@ static void loadDataDir (int debug)
 
 
 /* Load the datadir, tracklist and plib stuff */
-static void initTuxKart (int videoFlags)
+static void initTuxKart (int width, int height, int videoFlags)
 {
   loadDataDir ( TRUE );
   loadTrackList () ;
 
-  initVideo ( videoFlags );
+  initVideo ( width, height, videoFlags );
 
   /* Initialise a bunch of PLIB library stuff */
 
@@ -383,17 +383,17 @@ void cmdLineHelp ()
 	    " inspired by Super-Mario-Kart and Wacky Wheels.\n\n"
 
 	    "Options:\n"
-	    "--no-start-screen" "\t\tQuick race.\n"
-	    "--track n"         "\t\t\tStart at track number n (see --list-tracks).\n"
-	    "--list-tracks"     "\t\t\tShow available tracks.\n"
-	    "--laps n"          "\t\t\tDefine number of laps to n.\n"
-	    "--players n"       "\t\t\tDefine number of players to either 1, 2 or 4.\n"
-	    "--reverse"        "\t\t\tEnable reverse mode.\n"
-	    "--mirror"         "\t\t\tEnable mirror mode (when supported).\n"
-	    "--fullscreen"     "\t\t\tFullscreen display.\n"
-	    "--no-borders"     "\t\t\tDisable window borders/decorations.\n"
-	    "--screensize WIDTH HEIGHT" "\tSet the screen size (e.g. 320 200).\n"
-	    "--version"        "\t\t\tShow version.\n"
+	    "  --no-start-screen  Quick race\n"
+	    "  --track n          Start at track number n (see --list-tracks)\n"
+	    "  --list-tracks      Show available tracks.\n"
+	    "  --laps n           Define number of laps to n\n"
+	    "  --players n        Define number of players to either 1, 2 or 4.\n"
+	    "  --reverse          Enable reverse mode\n"
+	    "  --mirror           Enable mirror mode (when supported)\n"
+	    "  --fullscreen       Fullscreen display.\n"
+	    "  --screensize WIDTHxHEIGHT\n"
+            "                     Set the screen size (e.g. 320x200)\n"
+	    "  --version          Show version.\n"
 	    "\n"
 	    "You can visit TuxKart's homepage at "
 	    "http://tuxkart.sourceforge.net\n\n"
@@ -410,14 +410,15 @@ int main ( int argc, char *argv[] )
   int reverse = 0;
   int track         = 0;
   int nbrPlayers    = 1;
-
+  int  width  = 800;
+  int  height = 600;
   bool fullscreen   = false;
   bool noStartScreen = false;
   
   /* Testing if we've given arguments */
   if ( argc > 1) 
     {
-      for(int i = 1; i < argc; i++)
+      for(int i = 1; i < argc; ++i)
 	{
 	  if ( argv[i][0] != '-') continue;
 
@@ -508,14 +509,15 @@ int main ( int argc, char *argv[] )
               fullscreen = true;
 	    }
 
-	  else if ( !strcmp(argv[i], "--screensize") && argc > 3 )
+	  else if ( !strcmp(argv[i], "--screensize") )
 	    {
-	      int width  = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
-	      int height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
-		setScreenSize ( width, height );
-
-	      fprintf ( stdout, "You choose to be in %dx%d.\n",
-			atoi(argv[i+1]), atoi(argv[i+2]) ) ;
+	      if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
+                fprintf ( stdout, "You choose to be in %dx%d.\n", width, height );
+              else
+                {
+                  fprintf ( stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
+                  exit(EXIT_FAILURE);
+                }
 	    }
 	  #ifdef VERSION
 	  else if( !strcmp(argv[i], "--version") )
@@ -534,7 +536,7 @@ int main ( int argc, char *argv[] )
 	}
     }
 
-  initTuxKart ( fullscreen );
+  initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
     {

@@ -7,9 +7,10 @@
 
 using std::cout;
 
-Uint8 *keyState;
+Uint8 *keyState = 0;
+SDL_Surface *sdl_screen = 0;
 
-void initVideo(bool fullscreen)
+void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
   int videoFlags = SDL_OPENGL;
 
@@ -32,11 +33,9 @@ void initVideo(bool fullscreen)
       exit(1);
     }
     
-  int screenWidth  = getScreenWidth();
-  int screenHeight = getScreenHeight();
   int bpp = info->vfmt->BitsPerPixel;
   
-  if ( SDL_SetVideoMode( screenWidth, screenHeight, bpp, videoFlags ) == 0 )
+  if ( ( sdl_screen = SDL_SetVideoMode( screenWidth, screenHeight, bpp, videoFlags )) == 0 )
     {
       cout << "SDL_SetVideoMode() failed: " << SDL_GetError();
       exit(1);
@@ -164,6 +163,16 @@ void shutdown()
 void swapBuffers()
 {
   SDL_GL_SwapBuffers();
+}
+
+int  getScreenWidth()
+{
+  return sdl_screen->w;
+}
+
+int  getScreenHeight()
+{
+  return sdl_screen->h;
 }
 
 /* EOF */

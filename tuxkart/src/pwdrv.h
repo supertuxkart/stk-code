@@ -1,4 +1,4 @@
-//  $Id: pwdrv.h,v 1.1 2004/07/30 18:36:55 grumbel Exp $
+//  $Id: pwdrv.h,v 1.2 2004/07/31 11:35:14 grumbel Exp $
 // 
 //  TuxKart - A Fun Gokart Game
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,9 +28,10 @@ void keystroke( int key, int updown, int, int );
 int  isKeyDown( unsigned int k );
 int  getKeystroke();
 void reshape( int w, int h );
-void initVideo(bool fullscreen);
+void initVideo(int w, int h, bool fullscreen);
 void shutdown();
-
+int getScreenWidth  ();
+int getScreenHeight ();
 void motionfn ( int x, int y ) ;
 void mousefn ( int button, int updown, int x, int y ) ;
 
