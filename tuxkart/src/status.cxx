@@ -359,10 +359,13 @@ void drawGameOverText ()
               sin ( (float)timer/6.3f ) / 2.0f + 0.5f,
               sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5 ) ;
 
-  if ( kart[0]->getPosition() > 1 )
+  if ( finishing_position < 0 )
+    finishing_position = kart[0]->getPosition() ;
+
+  if ( finishing_position > 1 )
   {
     drawText ( "YOU FINISHED"    , 50, 50, 280 ) ;
-    drawText ( pos_string [ kart[0]->getPosition() ], 150, 150, 150 ) ;
+    drawText ( pos_string [ finishing_position ], 150, 150, 150 ) ;
   }
   else
   {

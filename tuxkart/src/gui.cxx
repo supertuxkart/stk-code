@@ -9,8 +9,7 @@ static int mouse_y ;
 static int mouse_dx = 0 ;
 static int mouse_dy = 0 ;
 static int mouse_buttons = 0 ;
-static int mousetrap = TRUE ;
-static int mousemode = FALSE ;
+static int mousetrap = FALSE ;
 
 fntTexFont *font ;
 
@@ -66,8 +65,6 @@ static void help_cb ( puObject * )
   help () ;
 }
 
-static void mouse_off_cb     ( puObject * ) { mousemode = FALSE ; } 
-static void mouse_on_cb      ( puObject * ) { mousemode = TRUE  ; } 
 static void mousetrap_off_cb ( puObject * ) { mousetrap = FALSE ; } 
 static void mousetrap_on_cb  ( puObject * ) { mousetrap = TRUE  ; } 
 static void music_off_cb     ( puObject * ) { sound->disable_music () ; } 
@@ -91,9 +88,6 @@ static puCallback sound_submenu_cb [] = {  music_off_cb,        sfx_off_cb,     
 
 static char      *view_submenu    [] = { "Mousetrap Mode",   "No Mousetrap", NULL } ;
 static puCallback view_submenu_cb [] = { mousetrap_on_cb , mousetrap_off_cb, NULL } ;
-
-static char      *ctrl_submenu    [] = { "Use Mouse",   "Use Joystick", NULL } ;
-static puCallback ctrl_submenu_cb [] = { mouse_on_cb , mouse_off_cb, NULL } ;
 
 static char      *help_submenu    [] = { "Versions...", "Credits...", "About...",  "Help", NULL } ;
 static puCallback help_submenu_cb [] = {   versions_cb,   credits_cb,   about_cb, help_cb, NULL } ;
@@ -132,7 +126,6 @@ GUI::GUI ()
     main_menu_bar -> add_submenu ( "Exit", exit_submenu, exit_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Sound", sound_submenu, sound_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "View", view_submenu, view_submenu_cb ) ;
-    main_menu_bar -> add_submenu ( "Control", ctrl_submenu, ctrl_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Help", help_submenu, help_submenu_cb ) ;
   }
 
@@ -223,7 +216,9 @@ void GUI::keyboardInput ()
     case (256+GLUT_KEY_PAGE_DOWN) : cam_follow++ ; break ;
 
     case 'r' :
-    case 'R' : for ( i = 0 ; i < num_karts ; i++ )
+    case 'R' :
+               finishing_position = -1 ;
+               for ( i = 0 ; i < num_karts ; i++ )
                  kart[i]->reset() ;
                return ;
  

@@ -82,3 +82,5 @@ extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
 extern int stats_enabled ;
 
+extern int finishing_position ;
+

@@ -40,6 +40,8 @@ static void switch_to_game ()
   trackButtons -> getValue ( & t ) ;
   nl = atoi ( numLapsText->getLegend () ) ;
 
+  glutWarpPointer ( 320, 240 ) ;
+
   puDeleteObject ( pleaseWaitButton ) ;
   puDeleteObject ( numLapsSlider ) ;
   puDeleteObject ( numLapsText   ) ;
@@ -335,10 +337,9 @@ int main ( int argc, char **argv )
   ssgInit () ;
 
   if ( getenv ( "MESA_GLX_FX" ) != NULL )
-  {
     puShowCursor () ;
-    glutWarpPointer ( 320, 240 ) ;
-  }
+
+  glutWarpPointer ( 320, 240 ) ;
 
   fnt = new fntTexFont ;
   fnt -> load ( "fonts/sorority.txf" ) ;

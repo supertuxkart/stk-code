@@ -4,6 +4,8 @@
 #define MIN_CAM_DISTANCE      5.0f  
 #define MAX_CAM_DISTANCE     10.0f  // Was 15
 
+int finishing_position = -1 ;
+
 static ulClock ck2 ;
 extern float tt[6];
 guUDPConnection *net = NULL ;
