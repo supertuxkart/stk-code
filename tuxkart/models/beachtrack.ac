@@ -3447,7 +3447,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.116-sub7"
-texture "../images/models/palm.png"
+texture "../images/palm.png"
 texrep 1 1
 numvert 40
 47.881207 12.738472 -66.463052
@@ -5469,7 +5469,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub6"
-texture "../images/models/palmtree.png"
+texture "../images/palmtree.png"
 texrep 1 1
 numvert 192
 48.144196 12.646819 -65.897775
@@ -6865,7 +6865,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub8"
-texture "../images/models/palm.png"
+texture "../images/palm.png"
 texrep 1 1
 numvert 642
 47.790596 12.684995 -66.011331
@@ -13818,7 +13818,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub5"
-texture "../images/models/palmtree.png"
+texture "../images/palmtree.png"
 texrep 1 1
 numvert 128
 37.578285 10.004969 -101.424691
@@ -14915,7 +14915,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub7"
-texture "../images/models/palm.png"
+texture "../images/palm.png"
 texrep 1 1
 numvert 501
 37.25478 10.043143 -101.242287
@@ -18844,7 +18844,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub5"
-texture "../images/models/palmtree.png"
+texture "../images/palmtree.png"
 texrep 1 1
 numvert 128
 -10.118686 5.057718 -76.328377
@@ -19883,7 +19883,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub7"
-texture "../images/models/palm.png"
+texture "../images/palm.png"
 texrep 1 1
 numvert 411
 -9.761414 5.095893 -76.22696
@@ -22573,7 +22573,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub4"
-texture "../images/models/palmtree.png"
+texture "../images/palmtree.png"
 texrep 1 1
 numvert 256
 -5.980962 8.810454 8.308235
@@ -24512,7 +24512,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub7"
-texture "../images/models/palm.png"
+texture "../images/palm.png"
 texrep 1 1
 numvert 896
 -5.673388 8.84863 8.100085
