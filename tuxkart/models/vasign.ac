@@ -6,7 +6,7 @@ kids 2
 OBJECT poly
 name "box"
 loc -10.6399 1.27563 29.3717
-texture "/hda1/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep -0.48 0.28
 texoff 0.47 0.33
 numvert 4

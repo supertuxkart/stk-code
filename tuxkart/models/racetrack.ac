@@ -10,7 +10,7 @@ OBJECT world
 kids 18
 OBJECT poly
 name "Plane.013"
-texture "/home/ingo/projects/tuxkart/start.rgb"
+texture "../images/start.png"
 texrep 1 1
 numvert 4
 4.885944 -0.016695 -40.831284
@@ -28,7 +28,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.012"
-texture "/home/ingo/projects/tuxkart/start.rgb"
+texture "../images/start.png"
 texrep 1 1
 numvert 4
 4.885944 -0.016695 -31.831284
@@ -46,7 +46,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.011"
-texture "/home/ingo/projects/tuxkart/start.rgb"
+texture "../images/start.png"
 texrep 1 1
 numvert 4
 4.885944 -0.016695 -21.831284
@@ -64,7 +64,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.010"
-texture "/home/ingo/projects/tuxkart/start.rgb"
+texture "../images/start.png"
 texrep 1 1
 numvert 4
 4.885944 -0.016695 -10.831284
@@ -82,7 +82,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.001"
-texture "/home/ingo/projects/tuxkart/start.rgb"
+texture "../images/start.png"
 texrep 1 1
 numvert 4
 4.885944 -0.016695 -0.831284
@@ -100,7 +100,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.009"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 16.852559 0.554796 50.682994
@@ -231,7 +231,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.008"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 -84.861629 0.554796 50.682994
@@ -362,7 +362,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.007"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 17.080287 0.554796 50.959267
@@ -493,7 +493,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.005"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 17.396088 0.554796 -72.83094
@@ -624,7 +624,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.006"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 -9.682163 0.554796 -46.878221
@@ -755,7 +755,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.004"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 -30.126798 0.554796 -17.338749
@@ -886,7 +886,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.003"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 -50.000508 0.554796 -46.657391
@@ -1017,7 +1017,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Plane.002"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 16
 -9.859548 0.554796 -46.657391
@@ -1148,7 +1148,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Curve.005"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 160
 -17.966124 -0.018948 -50.441197
@@ -1875,7 +1875,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Curve.004"
-texture "/home/ingo/projects/tuxkart/redwhite.png"
+texture "../images/redwhite.png"
 texrep 1 1
 numvert 160
 -17.971828 -0.018948 -62.691196
@@ -2602,7 +2602,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Curve.002"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 177
 -111.513066 -0.019427 -59.055687
@@ -3830,7 +3830,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Curve"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 240
 -9.42395 -0.018948 -62.69648

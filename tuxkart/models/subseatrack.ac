@@ -4,7 +4,7 @@ OBJECT world
 kids 2
 OBJECT poly
 name "Plane"
-texture "/home/ingo/projects/tuxkart/cvs/images/sand.rgb"
+texture "../images/sand.png"
 texrep 1 1
 numvert 4
 451.468475 -1.373519 -451.52356
@@ -25,7 +25,7 @@ name "Mesh"
 kids 4
 OBJECT poly
 name "Mesh-sub0"
-texture "/home/ingo/projects/tuxkart/cvs/images/window.rgb"
+texture "../images/window.png"
 texrep 1 1
 numvert 584
 -83.921829 4.967478 -16.444717
@@ -4035,7 +4035,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh-sub1"
-texture "/home/ingo/projects/tuxkart/cvs/images/track2.rgb"
+texture "../images/track2.png"
 texrep 1 1
 numvert 197
 -83.567749 -0.478566 -16.36438
@@ -4931,7 +4931,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh-sub2"
-texture "/home/ingo/projects/tuxkart/cvs/images/chrome2.rgb"
+texture "../images/chrome2.png"
 texrep 1 1
 numvert 394
 -84.275909 -0.478566 -16.525059
@@ -6711,7 +6711,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh-sub3"
-texture "/home/ingo/projects/tuxkart/cvs/images/sand.rgb"
+texture "../images/sand.png"
 texrep 1 1
 numvert 391
 -85.692215 -0.478566 -16.846416

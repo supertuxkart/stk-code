@@ -5,7 +5,7 @@ OBJECT world
 kids 1
 OBJECT poly
 name "Plane.002"
-texture "/home/ingo/projects/tuxkart/cvs/images/rainbow2.png"
+texture "../images/rainbow2.png"
 texrep 1 1
 numvert 608
 -5.787504 3.206863 0.426805

@@ -5,7 +5,7 @@ kids 3
 OBJECT poly
 name "box"
 loc 0 -0.3 0
-texture "../images/spark.rgb"
+texture "../images/spark.png"
 numvert 4
 0.00353554 0.28162 0.454694
 -0.555078 0.602028 -0.00289614
@@ -23,7 +23,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0 -0.3 0
-texture "../images/spark.rgb"
+texture "../images/spark.png"
 numvert 4
 -0.279308 1.08786 0.000635528
 0.279308 0.767456 0.458226
@@ -41,7 +41,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0 -0.3 0
-texture "../images/spark.rgb"
+texture "../images/spark.png"
 numvert 4
 -0.275772 0.114164 -0.00353168
 -0.275772 0.769484 0.45533

@@ -12,7 +12,7 @@ kids 322
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -8.77211 0 -19.1804
 -4.28923 0 -19.5726
@@ -41,7 +41,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -5.78352 1 -19.4419
@@ -85,7 +85,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -8.77211 5.5 -19.1804
@@ -129,7 +129,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -9.3098 0 -27.6416
 -4.96314 0 -28.8063
@@ -158,7 +158,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -6.41202 1 -28.4181
@@ -202,7 +202,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -9.3098 5.5 -27.6416
@@ -246,7 +246,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -11.2971 0 -35.8315
 -7.21877 0 -37.7333
@@ -275,7 +275,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -8.57823 1 -37.0993
@@ -319,7 +319,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -11.2971 5.5 -35.8315
@@ -363,7 +363,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -14.7737 0 -43.5372
 -11.0875 0 -46.1183
@@ -392,7 +392,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -12.3163 1 -45.2579
@@ -436,7 +436,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -14.7737 5.5 -43.5372
@@ -480,7 +480,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -18.3214 0 -49.5798
 -15.7403 0 -53.266
@@ -509,7 +509,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -16.6007 1 -52.0373
@@ -553,7 +553,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -18.3214 5.5 -49.5798
@@ -597,7 +597,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -25.1719 0 -54.5557
 -23.2701 0 -58.6341
@@ -626,7 +626,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -23.904 1 -57.2747
@@ -670,7 +670,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -25.1719 5.5 -54.5557
@@ -714,7 +714,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -32.8219 0.174983 -58.2552
 -31.6212 0 -62.6019
@@ -743,7 +743,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -32.0094 1 -61.153
@@ -787,7 +787,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -32.3425 5.65405 -58.2552
@@ -831,7 +831,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -40.913 0.882859 -60.585
 -40.5222 0.848675 -65.0679
@@ -860,7 +860,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -40.5653 1.85626 -63.5736
@@ -904,7 +904,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -40.4336 6.36193 -60.585
@@ -948,7 +948,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -49.2986 1.6165 -61.492
 -49.6893 1.65069 -65.9749
@@ -977,7 +977,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -49.4719 2.63549 -64.4806
@@ -1021,7 +1021,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -48.8192 7.09558 -61.492
@@ -1065,7 +1065,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -57.6973 2.3513 -60.8791
 -58.8575 2.45281 -65.2258
@@ -1094,7 +1094,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -58.3837 3.41517 -63.7768
@@ -1138,7 +1138,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -57.218 7.83037 -60.8791
@@ -1182,7 +1182,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -65.8681 3.06615 -58.8531
 -67.7627 3.2319 -62.9314
@@ -1211,7 +1211,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -67.044 4.17285 -61.572
@@ -1255,7 +1255,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -65.3888 8.54522 -58.8531
@@ -1299,7 +1299,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -76.3881 3.98653 -54.0617
 -77.5484 4.08804 -58.4083
@@ -1328,7 +1328,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -77.0745 5.0504 -56.9595
@@ -1372,7 +1372,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -75.9087 9.4656 -54.0617
@@ -1416,7 +1416,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -87.538 4.96202 -51.2013
 -87.9287 4.9962 -55.6842
@@ -1445,7 +1445,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -87.7114 5.98101 -54.1899
@@ -1489,7 +1489,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -87.0586 10.4411 -51.2013
@@ -1533,7 +1533,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -99.009 5.9656 -50.3209
 -98.6183 5.93142 -54.8038
@@ -1562,7 +1562,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -98.6614 6.93901 -53.3095
@@ -1606,7 +1606,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -98.5296 11.4447 -50.3209
@@ -1650,7 +1650,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -110.467 6.96801 -51.4125
 -109.306 6.8665 -55.7591
@@ -1679,7 +1679,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -109.606 7.89653 -54.3103
@@ -1723,7 +1723,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -109.987 12.4471 -51.4125
@@ -1767,7 +1767,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -122.28 8.00157 -54.8922
 -120.039 7.80547 -58.7893
@@ -1796,7 +1796,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -120.699 8.86703 -57.4903
@@ -1840,7 +1840,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -121.801 13.4806 -54.8922
@@ -1884,7 +1884,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -133.237 8.96019 -61.8637
 -129.803 8.65975 -64.7562
@@ -1913,7 +1913,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -130.861 9.7561 -63.792
@@ -1957,7 +1957,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -132.758 14.4393 -61.8637
@@ -2001,7 +2001,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -140.866 9.62763 -71.5326
 -136.803 9.27217 -73.4343
@@ -2030,7 +2030,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -138.07 10.3869 -72.8004
@@ -2074,7 +2074,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -140.387 15.1067 -71.5326
@@ -2118,7 +2118,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -145.864 10.0649 -84.4374
 -141.381 9.67269 -84.4374
@@ -2147,7 +2147,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -142.788 10.7996 -84.4374
@@ -2191,7 +2191,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -145.385 15.544 -84.4374
@@ -2235,7 +2235,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -144.577 9.95226 -98.7854
 -140.695 9.6126 -96.5354
@@ -2264,7 +2264,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -141.901 10.722 -97.2855
@@ -2308,7 +2308,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -144.097 15.4313 -98.7854
@@ -2352,7 +2352,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -137.536 9.33631 -109.808
 -134.655 9.0842 -106.361
@@ -2381,7 +2381,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -135.528 10.1644 -107.51
@@ -2425,7 +2425,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -137.057 14.8154 -109.808
@@ -2469,7 +2469,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -127.135 8.42629 -117.735
 -125.601 8.29216 -113.506
@@ -2498,7 +2498,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -126.026 9.33306 -114.916
@@ -2542,7 +2542,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -126.655 13.9054 -117.735
@@ -2586,7 +2586,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -113.819 7.26128 -121.524
 -114.21 7.29546 -117.041
@@ -2615,7 +2615,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -113.992 8.28026 -118.535
@@ -2659,7 +2659,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -113.339 12.7404 -121.524
@@ -2703,7 +2703,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -103.895 6.39304 -124.7
 -104.285 6.42723 -119.206
@@ -2732,7 +2732,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -104.068 7.41202 -121.037
@@ -2776,7 +2776,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -103.415 11.8721 -124.7
@@ -2820,7 +2820,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -93.9707 5.52481 -124
 -94.3613 5.55899 -118.73
@@ -2849,7 +2849,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -94.144 6.54379 -120.487
@@ -2893,7 +2893,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -93.4913 11.0039 -124
@@ -2937,7 +2937,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -84.0466 4.65656 -122.975
 -84.4373 4.69074 -117.706
@@ -2966,7 +2966,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -84.2199 5.67554 -119.462
@@ -3010,7 +3010,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -83.5672 10.1356 -122.975
@@ -3054,7 +3054,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -74.1225 3.78832 -121.951
 -74.5133 3.8225 -116.681
@@ -3083,7 +3083,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -74.2959 4.8073 -118.438
@@ -3127,7 +3127,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -73.6432 9.26739 -121.951
@@ -3171,7 +3171,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -64.1985 2.92008 -120.926
 -64.5892 2.95427 -115.656
@@ -3200,7 +3200,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -64.3718 3.93906 -117.413
@@ -3244,7 +3244,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -63.7192 8.39915 -120.926
@@ -3288,7 +3288,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -54.2745 2.05184 -119.902
 -54.6652 2.08602 -114.632
@@ -3317,7 +3317,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -54.4478 3.07083 -116.388
@@ -3361,7 +3361,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -53.7951 7.53091 -119.902
@@ -3405,7 +3405,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -44.3504 1.1836 -118.877
 -44.7411 1.21778 -113.607
@@ -3434,7 +3434,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -44.5238 2.20259 -115.364
@@ -3478,7 +3478,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -43.8711 6.66267 -118.877
@@ -3522,7 +3522,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -34.4264 0.315361 -117.853
 -34.8172 0.349546 -112.583
@@ -3551,7 +3551,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -34.5998 1.33435 -114.339
@@ -3595,7 +3595,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -33.9471 5.79443 -117.853
@@ -3639,7 +3639,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -24.4345 0 -116.828
 -24.8267 0 -111.558
@@ -3668,7 +3668,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -24.696 1 -113.315
@@ -3712,7 +3712,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -24.4345 5.5 -116.828
@@ -3756,7 +3756,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -14.4726 0 -112.808
 -14.8648 0 -108.326
@@ -3785,7 +3785,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -14.7341 1 -109.82
@@ -3829,7 +3829,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -14.4726 5.5 -112.808
@@ -3873,7 +3873,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -2.94063 0 -111.609
 -4.10532 0 -107.262
@@ -3902,7 +3902,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -3.71707 1 -108.711
@@ -3946,7 +3946,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -2.94063 5.5 -111.609
@@ -3990,7 +3990,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 9.62192 0 -107.444
 7.04077 0 -103.758
@@ -4019,7 +4019,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 7.90121 1 -104.987
@@ -4063,7 +4063,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 9.62192 5.5 -107.444
@@ -4107,7 +4107,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 19.9926 0 -99.4858
 16.3064 0 -96.9046
@@ -4136,7 +4136,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 17.5352 1 -97.765
@@ -4180,7 +4180,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 19.9926 5.5 -99.4858
@@ -4224,7 +4224,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 25.7284 0 -91.2943
 22.0422 0 -88.7132
@@ -4253,7 +4253,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 23.2709 1 -89.5735
@@ -4297,7 +4297,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 25.7284 5.5 -91.2943
@@ -4341,7 +4341,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 31.4642 0 -83.1027
 27.778 0 -80.5217
@@ -4370,7 +4370,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 29.0068 1 -81.382
@@ -4414,7 +4414,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 31.4642 5.5 -83.1027
@@ -4458,7 +4458,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 38.0256 0 -73.5267
 33.9473 0 -71.6249
@@ -4487,7 +4487,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 35.3066 1 -72.2588
@@ -4531,7 +4531,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 38.0256 5.5 -73.5267
@@ -4575,7 +4575,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 43.1038 0 -61.3681
 38.6209 0 -60.9758
@@ -4604,7 +4604,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 40.1152 1 -61.1066
@@ -4648,7 +4648,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 43.1038 5.5 -61.3681
@@ -4692,7 +4692,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 44.0076 0 -49.7628
 39.5248 0 -50.1551
@@ -4721,7 +4721,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 41.0191 1 -50.0242
@@ -4765,7 +4765,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 44.0076 5.5 -49.7628
@@ -4809,7 +4809,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 50.436 0 -39.6009
 45.9532 0 -39.9931
@@ -4838,7 +4838,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 47.4475 1 -39.7624
@@ -4882,7 +4882,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 50.436 5.5 -39.6009
@@ -4926,7 +4926,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 49.5395 0 -29.664
 45.0817 0 -30.0312
@@ -4955,7 +4955,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 46.5759 1 -29.8004
@@ -4999,7 +4999,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 49.5145 5.5 -29.689
@@ -5043,7 +5043,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 41.393 0 -19.877
 36.91 0 -20.2691
@@ -5072,7 +5072,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 38.4043 1 -20.1384
@@ -5116,7 +5116,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 41.393 5.5 -19.877
@@ -5160,7 +5160,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 40.5554 0 -11.4965
 36.0725 0 -11.1044
@@ -5189,7 +5189,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 37.5668 1 -11.2351
@@ -5233,7 +5233,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 40.5554 5.5 -11.4965
@@ -5277,7 +5277,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 41.1766 0 -3.12733
 36.8299 0 -1.96248
@@ -5306,7 +5306,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 38.2787 1 -2.35072
@@ -5350,7 +5350,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 41.1766 5.5 -3.12733
@@ -5394,7 +5394,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 43.1729 0 5.10279
 39.0944 0 7.00447
@@ -5423,7 +5423,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 40.4539 1 6.37051
@@ -5467,7 +5467,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 43.1729 5.5 5.10279
@@ -5511,7 +5511,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 46.0584 0 12.0517
 42.6113 0 14.9443
@@ -5540,7 +5540,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 43.7603 1 13.9801
@@ -5584,7 +5584,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 46.0584 5.5 12.0517
@@ -5628,7 +5628,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 49.429 0 16.9804
 47.5273 0 21.0588
@@ -5657,7 +5657,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 48.1612 1 19.6993
@@ -5701,7 +5701,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 49.429 5.5 16.9804
@@ -5745,7 +5745,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 55.4952 0 20.3977
 55.1031 0 24.8805
@@ -5774,7 +5774,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 55.2338 1 23.3863
@@ -5818,7 +5818,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 55.4952 5.5 20.3977
@@ -5862,7 +5862,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 62.9803 0 21.3169
 63.7617 0 25.7486
@@ -5891,7 +5891,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 63.5013 1 24.2713
@@ -5935,7 +5935,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 62.9803 5.5 21.3169
@@ -5979,7 +5979,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 74.4534 -0.0276408 19.5282
 74.4534 -0.419843 24.0111
@@ -6008,7 +6008,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 74.3662 0.703292 22.6036
@@ -6052,7 +6052,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 73.974 5.43058 20.0058
@@ -6096,7 +6096,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 85.9734 0.959775 19.8061
 85.1949 0.505687 24.2149
@@ -6125,7 +6125,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 85.3672 1.64944 22.8321
@@ -6169,7 +6169,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 85.4941 6.418 20.2836
@@ -6213,7 +6213,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 97.3979 1.76098 22.1164
 95.8647 1.25881 26.3171
@@ -6242,7 +6242,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 96.2886 2.4186 25.0037
@@ -6286,7 +6286,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 96.9185 7.2192 22.5939
@@ -6330,7 +6330,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 108.887 2.36312 26.7666
 106.315 1.81775 30.4191
@@ -6359,7 +6359,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 107.085 2.99194 29.2884
@@ -6403,7 +6403,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 108.407 7.82135 27.2441
@@ -6447,7 +6447,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 119.353 2.57802 34.8162
 115.681 2.03302 37.3595
@@ -6476,7 +6476,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 116.817 3.20709 36.5985
@@ -6520,7 +6520,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 118.873 8.03625 35.2938
@@ -6564,7 +6564,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 126.543 2.16016 46.8104
 122.129 1.70728 47.5554
@@ -6593,7 +6593,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 123.513 2.85064 47.3938
@@ -6637,7 +6637,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 126.064 7.61839 47.288
@@ -6681,7 +6681,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 128.179 1.17125 59.7554
 123.764 0.854594 58.9432
@@ -6710,7 +6710,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 125.148 1.95254 59.3008
@@ -6754,7 +6754,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 127.699 6.62948 60.2329
@@ -6798,7 +6798,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 125.853 0 71.7081
 121.774 0 69.8063
@@ -6827,7 +6827,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 123.134 1 70.4402
@@ -6871,7 +6871,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 125.853 5.5 71.7081
@@ -6915,7 +6915,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 120.863 0 82.1611
 117.176 0 79.5801
@@ -6944,7 +6944,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 118.405 1 80.4404
@@ -6988,7 +6988,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 120.863 5.5 82.1611
@@ -7032,7 +7032,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 115.127 0 90.3529
 111.44 0 87.7717
@@ -7061,7 +7061,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 112.669 1 88.6319
@@ -7105,7 +7105,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 115.127 5.5 90.3529
@@ -7149,7 +7149,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 109.391 0 98.5442
 105.704 0 95.9632
@@ -7178,7 +7178,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 106.934 1 96.8235
@@ -7222,7 +7222,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 109.391 5.5 98.5442
@@ -7266,7 +7266,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 103.655 0 106.736
 99.9692 0 104.155
@@ -7295,7 +7295,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 101.198 1 105.015
@@ -7339,7 +7339,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 103.655 5.5 106.736
@@ -7383,7 +7383,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 96.3745 0 116.809
 93.4818 0 113.362
@@ -7412,7 +7412,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 94.4461 1 114.511
@@ -7456,7 +7456,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 96.3745 5.5 116.809
@@ -7500,7 +7500,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 87.4089 0 124.28
 85.159 0 120.383
@@ -7529,7 +7529,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 85.9089 1 121.682
@@ -7573,7 +7573,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 87.4089 5.5 124.28
@@ -7617,7 +7617,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 78.7487 0 129.28
 76.4987 0 125.383
@@ -7646,7 +7646,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 77.2486 1 126.682
@@ -7690,7 +7690,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 78.7487 5.5 129.28
@@ -7734,7 +7734,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 70.0885 0 134.28
 67.8384 0 130.383
@@ -7763,7 +7763,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 68.5884 1 131.682
@@ -7807,7 +7807,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 70.0885 5.5 134.28
@@ -7851,7 +7851,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 61.4281 0 139.28
 59.1781 0 135.383
@@ -7880,7 +7880,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 59.9281 1 136.682
@@ -7924,7 +7924,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 61.4281 5.5 139.28
@@ -7968,7 +7968,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 50.6709 0 145.049
 49.506 0 140.702
@@ -7997,7 +7997,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 49.8942 1 142.151
@@ -8041,7 +8041,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 50.6709 5.5 145.049
@@ -8085,7 +8085,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 40.2586 0 147.806
 39.4771 0 143.375
@@ -8114,7 +8114,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 39.7377 1 144.852
@@ -8158,7 +8158,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 40.2586 5.5 147.806
@@ -8202,7 +8202,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 28.9299 0.7 149.782
 28.93 0.7 145.282
@@ -8231,7 +8231,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 28.9298 1.7 146.782
@@ -8275,7 +8275,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 28.9299 6.2 149.782
@@ -8319,7 +8319,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 11.6299 1.4 149.782
 11.6299 1.4 145.282
@@ -8348,7 +8348,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 11.6298 2.4 146.782
@@ -8392,7 +8392,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 11.6299 6.9 149.782
@@ -8436,7 +8436,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 1.62977 2.1 149.782
 1.6299 2.1 145.282
@@ -8465,7 +8465,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 1.62978 3.1 146.782
@@ -8509,7 +8509,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 1.62977 7.6 149.782
@@ -8553,7 +8553,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -8.3701 3 149.782
 -8.37014 3 145.282
@@ -8582,7 +8582,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -8.37003 4 146.782
@@ -8626,7 +8626,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -8.3701 8.5 149.782
@@ -8670,7 +8670,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -18.3701 3 149.782
 -18.3699 3 145.282
@@ -8699,7 +8699,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -18.3701 4 146.782
@@ -8743,7 +8743,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -18.3701 8.5 149.782
@@ -8787,7 +8787,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -28.3699 3 149.782
 -28.3699 3 145.282
@@ -8816,7 +8816,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -28.3703 4 146.782
@@ -8860,7 +8860,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -28.3699 8.5 149.782
@@ -8904,7 +8904,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -38.1429 7.3291 145.8
 -38.3699 2.1 145.282
@@ -8933,7 +8933,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -38.1429 12.8291 145.8
@@ -8977,7 +8977,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -40.9926 2.21455 145.8
 -41.2199 -3.01456 145.282
@@ -9006,7 +9006,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -40.3952 12.4581 145.8
@@ -9050,7 +9050,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -54.1956 1.96431 149.241
 -52.8898 -3.39892 145.012
@@ -9079,7 +9079,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -53.3541 9.91897 149.241
@@ -9123,7 +9123,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -65.2646 -2.31628 145.166
 -63.0231 -2.51238 141.269
@@ -9152,7 +9152,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -64.7852 3.16279 145.166
@@ -9196,7 +9196,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -75.7469 -1.39919 138.777
 -72.5768 -1.67654 135.594
@@ -9225,7 +9225,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -75.2676 4.07988 138.777
@@ -9269,7 +9269,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -84.1623 -0.662941 129.951
 -80.28 -1.0026 127.701
@@ -9298,7 +9298,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -81.487 0.106823 128.451
@@ -9342,7 +9342,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -83.6829 4.81613 129.951
@@ -9386,7 +9386,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -90.1032 -0.143179 118.774
 -85.6883 -0.529427 117.993
@@ -9415,7 +9415,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -87.0729 0.595523 118.253
@@ -9459,7 +9459,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -89.6238 5.33589 118.774
@@ -9503,7 +9503,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -91.6224 -0.0102663 105.621
 -87.2076 -0.396506 106.402
@@ -9532,7 +9532,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -88.5922 0.728444 106.142
@@ -9576,7 +9576,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -91.143 5.4688 105.621
@@ -9620,7 +9620,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -89.0482 -0.235477 93.6092
 -84.9853 -0.590933 95.511
@@ -9649,7 +9649,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -86.2525 0.52375 94.8772
@@ -9693,7 +9693,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -88.5689 5.24359 93.6092
@@ -9737,7 +9737,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -82.9482 0 78.8587
 -79.1934 -1.09767 82.7692
@@ -9766,7 +9766,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -80.4617 0.0171227 81.4657
@@ -9810,7 +9810,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -82.9482 5.5 78.8587
@@ -9854,7 +9854,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -73.8089 0 70.1011
 -69.9263 -0.9 74.0119
@@ -9883,7 +9883,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -71.0874 1 72.7082
@@ -9927,7 +9927,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -73.8089 5.5 70.1011
@@ -9971,7 +9971,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -64.6691 0 61.3439
 -60.587 0 65.2544
@@ -10000,7 +10000,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -61.9475 1 63.9509
@@ -10044,7 +10044,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -64.6691 5.5 61.3439
@@ -10088,7 +10088,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -55.5295 0 52.5862
 -51.4474 0 56.497
@@ -10117,7 +10117,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -52.8083 1 55.1935
@@ -10161,7 +10161,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -55.5295 5.5 52.5862
@@ -10205,7 +10205,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -46.3904 0 43.8291
 -42.3079 0 47.7398
@@ -10234,7 +10234,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -43.6686 1 46.4362
@@ -10278,7 +10278,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -46.3904 5.5 43.8291
@@ -10322,7 +10322,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -38.4415 0 36.6011
 -33.7419 0 39.7432
@@ -10351,7 +10351,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -35.3082 1 38.6957
@@ -10395,7 +10395,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -38.4415 5.5 36.6011
@@ -10439,7 +10439,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -30.9614 0 26.3896
 -26.2617 0 29.5317
@@ -10468,7 +10468,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -27.8282 1 28.4846
@@ -10512,7 +10512,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -30.9614 5.5 26.3896
@@ -10556,7 +10556,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -23.4812 0 16.178
 -16.8445 0 17.4731
@@ -10585,7 +10585,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -18.3 1 16.361
@@ -10629,7 +10629,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -23.4812 5.5 16.178
@@ -10673,7 +10673,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -15.5543 0 6.1298
 -10.5806 0 8.06115
@@ -10702,7 +10702,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -12.2386 1 7.41727
@@ -10746,7 +10746,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -15.5543 5.5 6.1298
@@ -10790,7 +10790,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -10.1482 0 -3.2
 -5.41132 0 -2.23421
@@ -10819,7 +10819,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -6.99027 1 -2.55624
@@ -10863,7 +10863,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -10.1482 5.5 -3.2
@@ -10907,7 +10907,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 1.10452 0.8493 0.567803
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep -0.37 0.3
 texoff 0 0.01
 numvert 4
@@ -11076,7 +11076,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/grass.rgb"
+texture "../images/grass.png"
 numvert 8
 -9 0 -10
 -4.5 0 -10
@@ -11105,7 +11105,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/aarmco.rgb"
+texture "../images/aarmco.png"
 texrep 4 1
 numvert 8
 -6 1 -10
@@ -11149,7 +11149,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.0999985 0 0
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 3 1.5
 numvert 8
 -9 5.5 -10
@@ -11193,7 +11193,7 @@ kids 0
 OBJECT poly
 name "poly"
 loc 41.3316 0 -35.2121
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.3 3
 texoff -1 -1
 numvert 6
@@ -11232,7 +11232,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 6.40452 4.1493 151.768
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep -0.48 0.28
 texoff 0.47 0.33
 numvert 4
@@ -11402,7 +11402,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 111.97 1.3493 36.0879
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep -0.41 0.34
 texoff -0.58 0.66
 numvert 4
@@ -11572,7 +11572,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -73.2874 4.44288 -117.913
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 0.55 0.27
 texoff -0.54 0.6
 numvert 4
@@ -11592,7 +11592,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -66.2151 3.92451 -116.663
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 0.5 0.27
 numvert 4
 -3.51552 1.06043 -0.633804
@@ -11611,7 +11611,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -59.1861 3.30955 -115.216
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 0.53 0.28
 texoff -0.53 0.32
 numvert 4
@@ -11631,7 +11631,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -122.933 8.04996 -87.4828
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 36
 -17.8621 1.56264 -9.0529
@@ -11801,7 +11801,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -49.1125 3.2478 -107.796
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 42
 -55.2723 3.17944 -11.4106
@@ -12005,7 +12005,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -60.042 3.43325 -64.1033
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 37
 44.2018 -3.43325 10.8373
@@ -12190,7 +12190,7 @@ kids 0
 OBJECT poly
 name "road"
 loc 20.6017 0 -46.475
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 44
 -13.6609 0 -57.283
@@ -12410,7 +12410,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -10.8926 0 -12.8242
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 36
 -15.4691 0 42.3559
@@ -12580,7 +12580,7 @@ kids 0
 OBJECT poly
 name "road"
 loc 77.2508 0.414384 32.9738
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 42
 -38.2564 -0.414384 -25.9693
@@ -12784,7 +12784,7 @@ kids 0
 OBJECT poly
 name "road"
 loc 80.7391 0.427297 100.347
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 42
 42.9245 0.427297 -41.4038
@@ -13002,7 +13002,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -20.5014 -0.266533 134.241
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 45
 59.8785 0.266533 9.13374
@@ -13223,7 +13223,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -51.2344 -0.904645 78.6161
-texture "/u/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 texrep 0.5 1
 numvert 39
 -29.1456 -0.0979519 49.0844
@@ -13410,7 +13410,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 4 1
 numvert 4
 -8.8146 -1.7 -3.14164
@@ -13429,7 +13429,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 4 1
 numvert 4
 8.6146 1.7 5.64164
@@ -13448,7 +13448,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 4 1
 numvert 4
 8.6146 -1.7 5.64164
@@ -13467,7 +13467,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 4 1
 numvert 4
 -11.1253 -1.7 0.926183
@@ -13486,7 +13486,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/concrete.rgb"
+texture "../images/concrete.png"
 texrep 8 4
 texoff -5.00488e-05 1.7775
 numvert 4
@@ -13506,7 +13506,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.41412 6.4 -0.0171237
-texture "/u/tuxkart/models/../images/Penguin_orig.rgb"
+texture "../images/Penguin_orig.png"
 texrep 1 2
 numvert 4
 -11.1253 -1.7 0.926183
@@ -13542,7 +13542,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 22.15 9.15 140.75
-texture "/u/tuxkart/models/../images/adverts.rgb"
+texture "../images/adverts.png"
 texrep 0.5 0.15
 texoff 0.49 0.86
 numvert 8
@@ -13603,7 +13603,7 @@ name "zipper"
 loc -95.7795 5.76328 -116.312
 data 20
 @autotex Y=4.0 C=1.0
-texture "/u/tuxkart/models/../images/zipper.rgb"
+texture "../images/zipper.png"
 texrep 1 -1
 numvert 6
 -0.130676 0.0114355 0.033493
@@ -13633,7 +13633,7 @@ name "zipper"
 loc -46.4279 1.44487 -104.678
 data 20
 @autotex Y=4.0 C=1.0
-texture "/u/tuxkart/models/../images/zipper.rgb"
+texture "../images/zipper.png"
 texrep 1 -1
 numvert 6
 -0.847866 0.011445 0.00100708

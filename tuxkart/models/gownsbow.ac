@@ -6,7 +6,7 @@ kids 65
 OBJECT poly
 name "rect"
 loc -2.00697 1.9102 -11.1747
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -0.879352 -0.54014 -23.015
@@ -90,7 +90,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -2.00957 1.5277 -11.1996
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -10.2419 -1.68764 -18.6672
 -0.902154 -1.68764 -23.0446
@@ -135,7 +135,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -11.6831 1.45463 -26.3383
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -21.9579 -2.81799 -39.8767
@@ -219,7 +219,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -11.6918 1.07213 -26.351
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -22.8882 -3.96549 -29.5924
 -22.0092 -3.96549 -39.8696
@@ -264,7 +264,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -30.6401 1.53056 -24.5216
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -47.8197 -1.07164 -20.2118
@@ -348,7 +348,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -30.6595 1.14806 -24.5177
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -40.5351 -2.21914 -12.8941
 -47.8427 -2.21914 -20.1733
@@ -393,7 +393,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -45.6361 2.44171 -8.17159
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -58.6673 -0.76793 -2.82325
@@ -477,7 +477,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -45.6479 2.05921 -8.1593
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -52.0559 -1.91543 5.09166
 -58.7015 -1.91543 -2.79696
@@ -522,7 +522,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -62.7858 1.22684 1.9116
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -75.54 -3.80508 0.574075
@@ -606,7 +606,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -62.8041 0.844348 1.91579
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -76.4609 -4.95255 10.8418
 -75.5817 -4.95255 0.564685
@@ -651,7 +651,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -81.1318 0.467563 -2.12995
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -88.8888 -3.04578 -8.83925
@@ -735,7 +735,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -81.1458 0.0850629 -2.13719
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -98.24 -4.19328 -4.50922
 -88.9 -4.19328 -8.88645
@@ -780,7 +780,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -91.0484 0.410832 -22.0709
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -92.4307 -3.21597 -39.4587
@@ -864,7 +864,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -91.0545 0.0283329 -22.0892
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -102.358 -4.13655 -35.9501
 -92.4449 -4.36347 -39.4969
@@ -909,7 +909,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -100.946 1.14833 -41.7188
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -108.561 -1.68425 -54.015
@@ -993,7 +993,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -100.955 0.765833 -41.7355
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -113.289 -4.87405 -44.6667
 -108.607 -2.83175 -54.0235
@@ -1038,7 +1038,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -118.883 1.31852 -48.4768
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -132.467 -0.4929 -53.4484
@@ -1122,7 +1122,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -118.898 0.936023 -48.4823
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -129.303 -5.04424 -43.7373
 -132.509 -1.6404 -53.4225
@@ -1167,7 +1167,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -132.606 1.31852 -37.0109
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -148.388 -3.89674 -32.3095
@@ -1251,7 +1251,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -132.621 0.936023 -37.0003
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -135.041 -5.04424 -31.3813
 -148.381 -5.04424 -32.2605
@@ -1296,7 +1296,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -133.597 1.31852 -14.1261
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -142.403 -1.51406 -0.598464
@@ -1380,7 +1380,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -133.597 0.936023 -14.1111
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -131.068 -5.04424 -5.73587
 -142.372 -2.66156 -0.561464
@@ -1425,7 +1425,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -120.69 1.43198 -0.89999
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -114.198 -1.28712 10.0471
@@ -1509,7 +1509,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -120.679 1.04948 -0.8868
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -115.408 -5.1577 -0.244163
 -114.148 -2.43462 10.0286
@@ -1554,7 +1554,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -102.028 1.63054 -6.89222
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -92.9138 0.44316 -7.26834
@@ -1638,7 +1638,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -102.009 1.24804 -6.89857
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -102.185 -1.7255 -12.4536
 -92.9008 -0.70434 -7.314
@@ -1683,7 +1683,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -87.63 1.88582 -26.1874
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -80.6298 -2.42174 -34.7564
@@ -1767,7 +1767,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -87.6198 1.50332 -26.2004
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -86.5233 -3.56924 -43.215
 -80.5909 -3.56924 -34.7778
@@ -1812,7 +1812,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -70.3756 0.112998 -37.3959
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -64.3078 -3.71236 -35.5835
@@ -1896,7 +1896,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -70.3573 -0.269504 -37.4002
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -63.3877 -4.85986 -45.8504
 -64.2665 -4.85986 -35.574
@@ -1941,7 +1941,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -53.6233 -1.57474 -32.3342
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -54.2677 -6.10924 -24.2052
@@ -2025,7 +2025,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -53.6092 -1.95724 -32.3269
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -44.5762 -7.25674 -27.7029
 -54.2614 -7.25674 -24.1565
@@ -2070,7 +2070,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -46.6496 -1.57474 -12.736
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -53.9292 -6.10924 -0.785064
@@ -2154,7 +2154,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -46.649 -1.95724 -12.7111
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -44.5646 -7.25674 -5.13296
 -53.9046 -7.25674 -0.755564
@@ -2199,7 +2199,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -37.0413 -0.936517 2.4277
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -32.7831 -2.66286 16.0768
@@ -2283,7 +2283,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -37.0327 -1.31902 2.44046
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -31.8525 -3.81036 5.79214
 -32.7317 -3.81036 16.0693
@@ -2328,7 +2328,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -17.9567 -0.367647 0.611015
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 -6.7452 -4.64029 -3.58829
@@ -2412,7 +2412,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -17.9373 -0.750152 0.607136
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -14.0298 -5.18035 -10.9063
 -6.7218 -5.78779 -3.62691
@@ -2457,7 +2457,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -2.88476 -1.35473 -15.7389
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 3.7228 -6.08293 -20.9769
@@ -2541,7 +2541,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -2.87296 -1.73723 -15.7513
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -2.88844 -7.23043 -28.8917
 3.757 -7.23043 -21.0033
@@ -2586,7 +2586,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 14.189 -0.595437 -25.8222
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 20.368 -3.80506 -24.374
@@ -2670,7 +2670,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 14.2074 -0.977937 -25.8263
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 21.2886 -4.95256 -34.6419
 20.4096 -4.95256 -24.3647
@@ -2715,7 +2715,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 32.5687 0.602547 -21.7806
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 33.9866 -3.18075 -14.9608
@@ -2799,7 +2799,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 32.5828 0.220047 -21.7733
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 43.3377 -4.32825 -19.2909
 33.9981 -4.32825 -14.9137
@@ -2844,7 +2844,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 42.519 1.04125 -1.83969
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 37.9916 -2.40459 15.6585
@@ -2928,7 +2928,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 42.5253 0.658745 -1.8214
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 47.6917 -3.55209 12.15
 38.0057 -3.55209 15.6966
@@ -2973,7 +2973,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 52.3832 0.602547 17.8081
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 53.9998 -3.18075 30.2145
@@ -3057,7 +3057,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 52.3918 0.220047 17.8248
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 58.3864 -4.32825 20.8666
 54.0456 -4.32825 30.2233
@@ -3102,7 +3102,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 70.4573 0.467563 24.5663
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 77.7685 -3.04578 29.6486
@@ -3186,7 +3186,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 70.4718 0.0850629 24.5718
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 74.264 -4.19328 19.9373
 77.8104 -4.19328 29.6224
@@ -3231,7 +3231,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 83.2437 0.467563 13.1005
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 91.2233 -3.04578 8.50927
@@ -3315,7 +3315,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 83.2581 0.0850629 13.0898
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 80.9377 -4.19328 7.58124
 91.2141 -4.19328 8.46027
@@ -3360,7 +3360,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 84.2345 0.467563 -9.7844
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 85.9177 -3.04578 -23.2014
@@ -3444,7 +3444,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 84.2345 0.0850629 -9.7994
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 76.9657 -4.19328 -18.064
 85.8877 -4.19328 -23.2384
@@ -3489,7 +3489,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 72.2969 0.298833 -23.0106
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 59.4661 -2.87705 -33.8472
@@ -3573,7 +3573,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 72.2863 -0.0836671 -23.0237
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 60.3359 -4.02455 -23.5557
 59.4171 -4.02455 -33.8289
@@ -3618,7 +3618,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 53.5554 -0.781037 -17.0182
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 38.8509 -5.20552 -16.5316
@@ -3702,7 +3702,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 53.5371 -1.16354 -17.0119
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 47.7816 -6.35302 -11.3463
 38.8392 -6.35302 -16.4859
@@ -3747,7 +3747,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 39.1573 -1.00882 2.27698
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 25.9988 -4.0666 10.9564
@@ -3831,7 +3831,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 39.1471 -1.39133 2.28988
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 31.8924 -5.21409 19.415
 25.96 -5.21409 10.9775
@@ -3876,7 +3876,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 21.8127 0.0710478 13.4853
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 9.4056 -2.64927 11.7832
@@ -3960,7 +3960,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 21.7943 -0.311452 13.4896
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 8.48541 -3.79677 22.0502
 9.36438 -3.79677 11.7738
@@ -4005,7 +4005,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 5.02668 0.923133 8.42355
-texture "/u/tuxkart/images/herringwall.rgb"
+texture "../images/herringwall.png"
 texrep 2 1
 numvert 20
 3.99912 -2.28649 0.405486
@@ -4089,7 +4089,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 5.01256 0.540634 8.41632
-texture "/usr/batcave1/tuxkart/images/rainbow.rgb"
+texture "../images/rainbow.png"
 numvert 10
 -15.2924 -3.43399 3.90271
 3.99284 -3.43399 0.356316
@@ -4134,7 +4134,7 @@ kids 0
 OBJECT poly
 name "sphere"
 loc -42.0895 318.714 -7.325
-texture "/usr/batcave1/tuxkart/images/Tuxclouds.rgb"
+texture "../images/Tuxclouds.png"
 texrep 5 5
 numvert 32
 355.625 -615.961 0

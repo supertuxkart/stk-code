@@ -148,7 +148,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Circle.001-sub2.040"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 4
 111.605759 -6.583515 -130.975845
@@ -166,7 +166,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Circle.001-sub2.039"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 16
 11.426978 4.038807 -18.685122
@@ -394,7 +394,7 @@ name "Mesh.118"
 kids 6
 OBJECT poly
 name "Mesh.118-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 12
 95.914825 9.431472 -41.745961
@@ -441,7 +441,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.118-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 18
 83.245583 7.692297 -55.017876
@@ -522,7 +522,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.118-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 24
 88.313499 8.69719 -92.72696
@@ -623,7 +623,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.118-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 30
 89.756775 8.69719 -92.743615
@@ -744,7 +744,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.118-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 30
 91.109688 8.69719 -92.759225
@@ -865,7 +865,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.118-sub5"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 23
 88.313499 8.69719 -92.72696
@@ -982,7 +982,7 @@ name "Mesh.117"
 kids 7
 OBJECT poly
 name "Mesh.117-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 49
 105.952774 -15.640594 -135.108306
@@ -1364,7 +1364,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.117-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 28
 74.785362 6.608465 -116.122193
@@ -1490,7 +1490,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.117-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 58
 46.857643 3.780131 -100.446999
@@ -1768,7 +1768,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.117-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 56
 90.407005 8.631287 -99.370904
@@ -2013,7 +2013,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.117-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 56
 49.56068 4.058418 -109.227166
@@ -2258,7 +2258,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.117-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 58
 80.601479 6.922214 -126.204316
@@ -2582,7 +2582,7 @@ name "Mesh.116"
 kids 8
 OBJECT poly
 name "Mesh.116-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 13
 54.208809 4.106283 -67.289406
@@ -2747,7 +2747,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.116-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 22
 59.202869 4.69224 -59.824444
@@ -2839,7 +2839,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.116-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 38
 58.918713 4.058418 -105.919541
@@ -2996,7 +2996,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.116-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 38
 57.602882 3.745574 -93.581963
@@ -3153,7 +3153,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.116-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 36
 58.982468 4.69224 -59.776764
@@ -3301,7 +3301,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.116-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 25
 43.097988 4.832885 -62.02343
@@ -3447,7 +3447,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.116-sub7"
-texture "/home/ingo/projects/tuxkart/models/palm.png"
+texture "../images/models/palm.png"
 texrep 1 1
 numvert 40
 47.881207 12.738472 -66.463052
@@ -3659,7 +3659,7 @@ name "Mesh.115"
 kids 9
 OBJECT poly
 name "Mesh.115-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 76
 43.573536 2.004401 -39.233166
@@ -4117,7 +4117,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.115-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 58
 38.282169 1.634123 -41.706989
@@ -4364,7 +4364,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 87
 42.68425 1.869328 -40.332707
@@ -4737,7 +4737,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.115-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 86
 56.268394 4.542211 -40.205632
@@ -5110,7 +5110,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 86
 38.481457 1.634123 -41.812515
@@ -5469,7 +5469,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub6"
-texture "/home/ingo/projects/tuxkart/models/palmtree.png"
+texture "../images/models/palmtree.png"
 texrep 1 1
 numvert 192
 48.144196 12.646819 -65.897775
@@ -6676,7 +6676,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 44
 58.85083 -2.095697 -20.844389
@@ -6865,7 +6865,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.115-sub8"
-texture "/home/ingo/projects/tuxkart/models/palm.png"
+texture "../images/models/palm.png"
 texrep 1 1
 numvert 642
 47.790596 12.684995 -66.011331
@@ -10211,7 +10211,7 @@ name "Mesh.114"
 kids 8
 OBJECT poly
 name "Mesh.114-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 42
 78.440163 8.763104 -38.960923
@@ -10467,7 +10467,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.114-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 12
 89.756615 7.763105 -39.149594
@@ -10521,7 +10521,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.114-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 28
 93.032188 7.635246 -45.82103
@@ -10633,7 +10633,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.114-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 26
 97.406639 9.320154 -16.401891
@@ -10736,7 +10736,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.114-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 28
 90.249237 7.635246 -46.094739
@@ -10848,7 +10848,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.114-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 34
 78.629066 7.763104 -38.558285
@@ -11016,7 +11016,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.114-sub7"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 4
 107.552071 -8.176886 -9.818133
@@ -11037,7 +11037,7 @@ name "Mesh.113"
 kids 6
 OBJECT poly
 name "Mesh.113-sub0"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 4
 61.833126 2.618775 45.635246
@@ -11055,7 +11055,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.113-sub1"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 4
 51.959175 1.502574 37.633797
@@ -11073,7 +11073,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.113-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 6
 60.814983 0.958764 33.206654
@@ -11100,7 +11100,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.113-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 10
 50.716938 6.538426 32.996189
@@ -11138,7 +11138,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.113-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 4
 55.49477 1.892538 40.557655
@@ -11156,7 +11156,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.113-sub5"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 4
 59.879543 0.833387 32.107437
@@ -11241,7 +11241,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.112-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 20
 41.003643 -0.231576 20.168646
@@ -11331,7 +11331,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.112-sub2"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 4
 50.673019 4.754285 30.834093
@@ -11349,7 +11349,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.112-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 22
 87.171577 -0.623054 5.69825
@@ -11441,7 +11441,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.112-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 22
 86.184883 -0.623054 6.62402
@@ -11533,7 +11533,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.112-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 22
 86.020432 -0.623054 6.778316
@@ -11625,7 +11625,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.112-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 13
 50.848938 0.607332 27.248707
@@ -11675,7 +11675,7 @@ name "Mesh.111"
 kids 7
 OBJECT poly
 name "Mesh.111-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 14
 46.562523 -0.725925 -18.874214
@@ -11849,7 +11849,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.111-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 4
 45.748737 2.672684 -34.014599
@@ -11867,7 +11867,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.111-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 18
 45.370197 -0.623053 8.167785
@@ -11941,7 +11941,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.111-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 18
 35.898567 2.15178 -28.923693
@@ -12015,7 +12015,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.111-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 24
 46.775204 -0.622132 8.887252
@@ -12109,7 +12109,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.111-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 31
 10.42698 -0.623055 -13.850859
@@ -12280,7 +12280,7 @@ name "Mesh.110"
 kids 7
 OBJECT poly
 name "Mesh.110-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 18
 22.16946 -0.63821 -52.785683
@@ -12503,7 +12503,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.110-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 4
 36.599693 1.390632 -49.620865
@@ -12521,7 +12521,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.110-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 28
 29.709929 1.634124 -37.167797
@@ -12647,7 +12647,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.110-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 28
 29.709929 1.634124 -37.167797
@@ -12773,7 +12773,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.110-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 30
 31.104927 1.634124 -37.906479
@@ -12901,7 +12901,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.110-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 31
 20.286928 0.4434 -71.11937
@@ -13075,7 +13075,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Circle.001-sub2.028"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 35
 25.627117 4.990008 -103.677277
@@ -13299,7 +13299,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.108-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 18
 17.121855 0.214548 -99.143974
@@ -13380,7 +13380,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 32
 16.683002 0.214547 -102.133804
@@ -13517,7 +13517,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 34
 16.892618 0.214547 -100.705742
@@ -13663,7 +13663,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 36
 17.089104 0.214547 -99.367081
@@ -13818,7 +13818,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub5"
-texture "/home/ingo/projects/tuxkart/models/palmtree.png"
+texture "../images/models/palmtree.png"
 texrep 1 1
 numvert 128
 37.578285 10.004969 -101.424691
@@ -14625,7 +14625,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 59
 20.012608 0.363044 -85.551468
@@ -14915,7 +14915,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.108-sub7"
-texture "/home/ingo/projects/tuxkart/models/palm.png"
+texture "../images/models/palm.png"
 texrep 1 1
 numvert 501
 37.25478 10.043143 -101.242287
@@ -17731,7 +17731,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.107-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 36
 0.829863 -0.623055 -32.308922
@@ -17893,7 +17893,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 72
 11.640167 -0.623058 -50.612503
@@ -18210,7 +18210,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 72
 18.334024 0.214548 -90.885597
@@ -18527,7 +18527,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 72
 0.605244 -0.623055 -32.328812
@@ -18844,7 +18844,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub5"
-texture "/home/ingo/projects/tuxkart/models/palmtree.png"
+texture "../images/models/palmtree.png"
 texrep 1 1
 numvert 128
 -10.118686 5.057718 -76.328377
@@ -19651,7 +19651,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 47
 19.29612 0.336219 -87.609444
@@ -19883,7 +19883,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.107-sub7"
-texture "/home/ingo/projects/tuxkart/models/palm.png"
+texture "../images/models/palm.png"
 texrep 1 1
 numvert 411
 -9.761414 5.095893 -76.22696
@@ -22128,7 +22128,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.106-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 20
 -0.762128 -0.623054 4.498089
@@ -22218,7 +22218,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 42
 13.614505 -0.096324 22.151518
@@ -22400,7 +22400,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 40
 1.430609 -0.019112 23.180321
@@ -22573,7 +22573,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub4"
-texture "/home/ingo/projects/tuxkart/models/palmtree.png"
+texture "../images/models/palmtree.png"
 texrep 1 1
 numvert 256
 -5.980962 8.810454 8.308235
@@ -24180,7 +24180,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 40
 2.672143 -0.060061 22.642536
@@ -24353,7 +24353,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 33
 23.038462 -0.623056 -30.019207
@@ -24512,7 +24512,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.106-sub7"
-texture "/home/ingo/projects/tuxkart/models/palm.png"
+texture "../images/models/palm.png"
 texrep 1 1
 numvert 896
 -5.673388 8.84863 8.100085
@@ -29293,7 +29293,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.105-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 22
 47.918011 0.080818 24.428717
@@ -29392,7 +29392,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.105-sub2"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 42
 34.926308 7.443927 47.641994
@@ -29567,7 +29567,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.105-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 42
 16.864998 0.047252 24.018661
@@ -29756,7 +29756,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.105-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 74
 8.942722 11.345588 57.705852
@@ -30107,7 +30107,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.105-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 44
 48.109997 0.090634 24.547003
@@ -30298,7 +30298,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.105-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 60
 -13.231917 2.343462 59.974258
@@ -30614,7 +30614,7 @@ name "Mesh.104"
 kids 9
 OBJECT poly
 name "Mesh.104-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 30
 99.550064 -9.669557 26.028376
@@ -30848,7 +30848,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.104-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 16
 55.49477 1.892538 40.557655
@@ -30920,7 +30920,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 14
 60.524338 3.234323 17.861336
@@ -30983,7 +30983,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 44
 63.294025 -0.623054 3.921562
@@ -31174,7 +31174,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 56
 57.784649 5.829985 25.973663
@@ -31424,7 +31424,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 46
 55.318779 1.873224 40.416668
@@ -31624,7 +31624,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 50
 64.191559 2.902506 47.524566
@@ -31883,7 +31883,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.104-sub8"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 14
 89.394028 -8.248031 38.697053
@@ -31949,7 +31949,7 @@ name "Mesh.103"
 kids 8
 OBJECT poly
 name "Mesh.103-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 4
 59.707428 11.796772 82.144012
@@ -32031,7 +32031,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.103-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 24
 22.213383 6.283653 73.581001
@@ -32132,7 +32132,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.103-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 52
 34.926308 7.443927 47.641994
@@ -32345,7 +32345,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.103-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 44
 57.845959 6.80291 71.586097
@@ -32522,7 +32522,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.103-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 79
 59.707428 11.796772 82.144012
@@ -32903,7 +32903,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.103-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 44
 22.100454 6.252432 73.38581
@@ -33080,7 +33080,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.103-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 50
 48.917515 7.405908 71.560417
@@ -33362,7 +33362,7 @@ name "Mesh.102"
 kids 9
 OBJECT poly
 name "Mesh.102-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 20
 88.749779 -5.297769 57.365067
@@ -33509,7 +33509,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.102-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 22
 85.108635 9.52696 90.104675
@@ -33608,7 +33608,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.102-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 12
 66.288071 11.314367 80.778129
@@ -33662,7 +33662,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.102-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 46
 80.763084 9.705922 91.54766
@@ -33862,7 +33862,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.102-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 61
 69.15815 12.3263 88.020934
@@ -34142,7 +34142,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.102-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 46
 84.903954 9.515006 90.01004
@@ -34342,7 +34342,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.102-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 32
 80.763084 9.705922 91.54766
@@ -34505,7 +34505,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.102-sub8"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 9
 95.050797 -3.296363 69.484223
@@ -34561,7 +34561,7 @@ name "Mesh.101"
 kids 9
 OBJECT poly
 name "Mesh.101-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 26
 106.366623 13.455164 95.486998
@@ -34774,7 +34774,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.101-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 26
 55.140205 10.15227 90.377578
@@ -34891,7 +34891,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.101-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 12
 67.642349 12.966463 93.569831
@@ -34945,7 +34945,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.101-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 52
 78.461967 11.31321 110.014312
@@ -35184,7 +35184,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.101-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 52
 56.633137 10.087661 89.864906
@@ -35411,7 +35411,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.101-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 52
 55.353481 10.143087 90.304343
@@ -35638,7 +35638,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.101-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 46
 30.692684 8.655498 131.28067
@@ -35852,7 +35852,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.101-sub8"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 9
 101.18483 1.664849 120.218658
@@ -35962,7 +35962,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.100-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 12
 14.16759 6.521025 80.112396
@@ -36016,7 +36016,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.100-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 28
 -1.366529 7.178563 118.691093
@@ -36135,7 +36135,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.100-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 28
 0.076629 7.178563 118.715835
@@ -36254,7 +36254,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.100-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 28
 1.429433 7.178562 118.739021
@@ -36373,7 +36373,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.100-sub5"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 24
 -21.721968 -6.785216 81.436959
@@ -36504,7 +36504,7 @@ name "Mesh.099"
 kids 8
 OBJECT poly
 name "Mesh.099-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 89
 95.776398 10.320154 -16.727937
@@ -37192,7 +37192,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.099-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 22
 97.770683 9.320153 -26.094931
@@ -37291,7 +37291,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.099-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 56
 100.167503 8.386055 -75.891251
@@ -37529,7 +37529,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.099-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 56
 101.202644 10.61393 -30.163901
@@ -37767,7 +37767,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.099-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 54
 97.45742 9.320154 -17.753939
@@ -37996,7 +37996,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.099-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 21
 113.840897 10.86865 -60.829495
@@ -38096,7 +38096,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.099-sub7"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 6
 116.496948 -8.150025 -25.723533
@@ -38126,7 +38126,7 @@ name "Mesh.098"
 kids 7
 OBJECT poly
 name "Mesh.098-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 59
 101.872948 10.652048 -63.107976
@@ -38720,7 +38720,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.098-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 22
 102.774078 10.86865 -62.132359
@@ -38819,7 +38819,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.098-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 48
 99.772926 10.86865 -62.48568
@@ -39021,7 +39021,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.098-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 42
 101.206398 10.86865 -62.316922
@@ -39203,7 +39203,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.098-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 42
 127.287994 11.673375 -92.017014
@@ -39385,7 +39385,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.098-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 43
 108.82225 10.878151 -91.882027
@@ -39610,7 +39610,7 @@ name "Mesh.097"
 kids 7
 OBJECT poly
 name "Mesh.097-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 69
 130.69841 11.649235 -101.761804
@@ -40138,7 +40138,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.097-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 14
 130.596298 11.890427 -100.352242
@@ -40201,7 +40201,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.097-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 33
 137.637466 12.62248 -86.408196
@@ -40357,7 +40357,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.097-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 32
 127.287994 11.673375 -92.017014
@@ -40494,7 +40494,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.097-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 30
 127.261238 11.673375 -92.240914
@@ -40622,7 +40622,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.097-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 26
 130.872955 11.890426 -103.356942
@@ -40740,7 +40740,7 @@ name "Mesh.096"
 kids 7
 OBJECT poly
 name "Mesh.096-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 62
 151.633118 12.608249 -76.699983
@@ -41259,7 +41259,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.096-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 18
 147.092468 12.526161 -59.855912
@@ -41340,7 +41340,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.096-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 32
 139.1436 12.813198 -72.124688
@@ -41477,7 +41477,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.096-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 32
 141.74791 12.853489 -80.469865
@@ -41614,7 +41614,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.096-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 34
 150.083771 12.853488 -82.469621
@@ -41760,7 +41760,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.096-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 32
 139.028687 12.853489 -79.817529
@@ -41900,7 +41900,7 @@ name "Mesh.095"
 kids 8
 OBJECT poly
 name "Mesh.095-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 64
 141.64122 11.542965 -42.813443
@@ -42367,7 +42367,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.095-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 16
 140.414658 11.781535 -41.865331
@@ -42439,7 +42439,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.095-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 26
 129.800278 11.569407 -27.433249
@@ -42549,7 +42549,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.095-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 26
 143.138672 11.944502 -45.633641
@@ -42659,7 +42659,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.095-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 34
 141.852859 11.944502 -46.054669
@@ -42805,7 +42805,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.095-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 14
 122.950844 11.23165 -31.917548
@@ -42865,7 +42865,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.095-sub7"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 6
 130.951523 -8.04159 -16.1823
@@ -42900,7 +42900,7 @@ name "Mesh.094"
 kids 8
 OBJECT poly
 name "Mesh.094-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 47
 142.971252 11.693844 14.65359
@@ -43238,7 +43238,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.094-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 6
 139.949387 11.693892 14.655231
@@ -43265,7 +43265,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.094-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 12
 142.971252 11.693844 14.65359
@@ -43312,7 +43312,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.094-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 12
 130.249512 11.69405 14.660502
@@ -43359,7 +43359,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.094-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 12
 140.174881 11.693888 14.655108
@@ -43406,7 +43406,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.094-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 9
 128.806137 11.694071 14.661286
@@ -43449,7 +43449,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.094-sub7"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 30
 132.451645 -8.13519 -14.685375
@@ -43610,7 +43610,7 @@ name "Mesh.092"
 kids 7
 OBJECT poly
 name "Mesh.092-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 39
 143.140228 11.700734 18.521373
@@ -43939,7 +43939,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.092-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 24
 140.12767 11.689066 18.28428
@@ -44047,7 +44047,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.092-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 48
 128.291351 11.326852 44.086135
@@ -44249,7 +44249,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.092-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 48
 141.701309 11.695126 18.408126
@@ -44458,7 +44458,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.092-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 48
 140.352478 11.689927 18.301972
@@ -44667,7 +44667,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.092-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 26
 141.228271 15.06043 44.266349
@@ -44812,7 +44812,7 @@ name "Mesh.091"
 kids 8
 OBJECT poly
 name "Mesh.091-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 59
 111.750687 13.371107 89.45954
@@ -45149,7 +45149,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.091-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 26
 125.39608 11.689883 51.349853
@@ -45266,7 +45266,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.091-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 44
 141.700089 18.214384 72.475775
@@ -45464,7 +45464,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.091-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 52
 128.370438 11.53158 50.836513
@@ -45691,7 +45691,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.091-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 83
 159.55574 12.40963 60.328029
@@ -46127,7 +46127,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.091-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 52
 125.618294 11.679446 51.311809
@@ -46354,7 +46354,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.091-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 52
 140.268448 13.261884 70.100631
@@ -46595,7 +46595,7 @@ name "Mesh.090"
 kids 4
 OBJECT poly
 name "Mesh.090-sub0"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 3
 67.821434 7.399343 135.760833
@@ -46656,7 +46656,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.090-sub2"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 10
 86.702782 1.256507 125.746361
@@ -46701,7 +46701,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.090-sub3"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 19
 108.921188 12.548477 117.597198
@@ -46802,7 +46802,7 @@ name "Mesh.089"
 kids 9
 OBJECT poly
 name "Mesh.089-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 32
 111.750687 13.371107 89.45954
@@ -47033,7 +47033,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.089-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 38
 162.897064 13.996477 89.721099
@@ -47204,7 +47204,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub3"
-texture "/home/ingo/projects/tuxkart/stonegrass.png"
+texture "../images/stonegrass.png"
 texrep 1 1
 numvert 4
 140.053741 18.470406 84.97666
@@ -47222,7 +47222,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub4"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 72
 149.838898 13.893547 90.245757
@@ -47532,7 +47532,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 74
 130.286133 11.373604 126.022086
@@ -47858,7 +47858,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub6"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 74
 163.113007 13.997075 89.785788
@@ -48184,7 +48184,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 58
 119.363106 13.062949 108.061248
@@ -48459,7 +48459,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.089-sub8"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 8
 115.157394 8.618342 134.086395
@@ -48508,7 +48508,7 @@ name "Mesh.088"
 kids 8
 OBJECT poly
 name "Mesh.088-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 40
 156.769516 -7.776265 173.187333
@@ -48799,7 +48799,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.088-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 38
 149.676956 10.748257 129.655898
@@ -48970,7 +48970,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.088-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 72
 145.593872 8.148098 156.090392
@@ -49287,7 +49287,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.088-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 72
 135.761749 6.239888 173.360458
@@ -49604,7 +49604,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.088-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 70
 139.581818 10.883793 129.232207
@@ -49912,7 +49912,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.088-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 85
 123.507858 7.625707 158.619079
@@ -50410,7 +50410,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.088-sub7"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 24
 134.766602 8.618342 137.699691
@@ -50559,7 +50559,7 @@ name "Mesh.087"
 kids 3
 OBJECT poly
 name "Mesh.087-sub0"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 5
 48.165058 8.681774 150.044936
@@ -50615,7 +50615,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.087-sub2"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 15
 54.422771 7.106244 168.067733
@@ -50715,7 +50715,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.086-sub1"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 8
 5.633901 5.220704 150.603561
@@ -50751,7 +50751,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.086-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 16
 2.707341 5.220704 151.356567
@@ -50816,7 +50816,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.086-sub3"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 16
 4.105187 5.220704 150.996902
@@ -50881,7 +50881,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.086-sub4"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 16
 5.415509 5.220704 150.659759
@@ -50946,7 +50946,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.086-sub5"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 24
 -27.575012 -6.532675 150.980378
@@ -51057,7 +51057,7 @@ name "Mesh.085"
 kids 7
 OBJECT poly
 name "Mesh.085-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 15
 39.150883 6.587679 150.22229
@@ -51164,7 +51164,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.085-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 18
 8.567651 4.519644 160.282959
@@ -51245,7 +51245,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.085-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 34
 44.168926 0.620835 177.550644
@@ -51391,7 +51391,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.085-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 32
 43.739277 0.587675 178.833618
@@ -51528,7 +51528,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.085-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 30
 39.024658 0.957306 177.356369
@@ -51656,7 +51656,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.085-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 50
 40.129131 0.269604 189.613937
@@ -51930,7 +51930,7 @@ name "Mesh.084"
 kids 7
 OBJECT poly
 name "Mesh.084-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 4
 50.239388 0.062434 175.558868
@@ -52012,7 +52012,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.084-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 62
 61.993851 -5.732788 175.779862
@@ -52282,7 +52282,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.084-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 52
 91.365143 -1.626956 202.302933
@@ -52509,7 +52509,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.084-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 54
 77.034538 -0.839282 197.225739
@@ -52745,7 +52745,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.084-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 56
 92.09848 -1.57947 199.604828
@@ -52990,7 +52990,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.084-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 16
 49.264351 0.394177 177.601944
@@ -53080,7 +53080,7 @@ name "Mesh.083"
 kids 7
 OBJECT poly
 name "Mesh.083-sub0"
-texture "/home/ingo/projects/tuxkart/stonetex.png"
+texture "../images/stonetex.png"
 texrep 1 1
 numvert 62
 116.041733 -12.805012 218.89676
@@ -53475,7 +53475,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.083-sub2"
-texture "/home/ingo/projects/tuxkart/track.png"
+texture "../images/track.png"
 texrep 1 1
 numvert 46
 96.023346 -7.104656 183.91832
@@ -53673,7 +53673,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.083-sub3"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 70
 109.172966 6.414981 167.55223
@@ -53981,7 +53981,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.083-sub4"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 68
 112.993958 -0.423997 196.15686
@@ -54280,7 +54280,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.083-sub5"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 70
 102.854057 -1.068376 194.106674
@@ -54588,7 +54588,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.083-sub6"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 57
 116.948296 -0.178845 192.1633
@@ -54874,7 +54874,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Circle.001-sub2.001"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 4
 414.904663 -4.439693 -313.923401

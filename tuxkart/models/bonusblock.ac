@@ -5,7 +5,7 @@ OBJECT world
 kids 2
 OBJECT poly
 name "Mesh.001"
-texture "/home/ingo/projects/tuxkart/bonusblock.png"
+texture "../images/bonusblock.png"
 texrep 1 1
 numvert 24
 -0.337727 0.999186 -0.337727

@@ -10,7 +10,7 @@ kids 20
 OBJECT poly
 name "box"
 loc 8.975 20.4 -1.2
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclassnorth.rgb"
+texture "../images/mathclassnorth.png"
 numvert 4
 56.5 -19.9 -99.6
 56.5 19.9 -99.6
@@ -28,7 +28,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 8.975 20.4 -1.2
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasssouth.rgb"
+texture "../images/mathclasssouth.png"
 texrep -1 1
 numvert 4
 -55.5 -19.9 20
@@ -47,7 +47,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 8.975 20.4 -1.2
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasswest.rgb"
+texture "../images/mathclasswest.png"
 texrep -1 1
 numvert 4
 -55.5 -19.9 -99.6
@@ -66,7 +66,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 8.975 20.4 -1.2
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclassceiling.rgb"
+texture "../images/mathclassceiling.png"
 texrep -4 -4
 numvert 4
 56.5 19.9 -99.6
@@ -85,7 +85,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 8.975 20.4 -1.2
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclassfloor.rgb"
+texture "../images/mathclassfloor.png"
 texrep 16 16
 numvert 4
 56.5 -19.9 20
@@ -104,7 +104,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 58.475 9.9 -28
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/roadway.rgb"
+texture "../images/roadway.png"
 numvert 8
 -5.7 -10 -44.6
 -5.7 10 -44.6
@@ -161,7 +161,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 45.775 9.3 -59
-texture "/hda1/tuxkart_cvs/tuxkart/models/./../images/wood.rgb"
+texture "./../images/wood.png"
 texrep 2 4
 numvert 4
 6.8 9 -37.6
@@ -180,7 +180,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 45.775 9.3 -59
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclassnorth.rgb"
+texture "../images/mathclassnorth.png"
 texrep 0.1 0.4
 texoff 0.78 0.04
 numvert 4
@@ -200,7 +200,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 45.775 9.3 -59
-texture "/hda1/tuxkart_cvs/tuxkart/models/./../images/wood.rgb"
+texture "./../images/wood.png"
 texrep 2 4
 numvert 4
 -5.8 -9 -37.6
@@ -219,7 +219,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 45.775 9.3 -59
-texture "/hda1/tuxkart_cvs/tuxkart/models/./../images/wood.rgb"
+texture "./../images/wood.png"
 texrep 2 4
 numvert 4
 -5.8 9 -42
@@ -238,7 +238,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -43.225 16.5 -13
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasswest.rgb"
+texture "../images/mathclasswest.png"
 texrep 0.8 0.8
 texoff 0.2 0
 numvert 32
@@ -503,7 +503,7 @@ kids 0
 OBJECT poly
 name "mesh"
 loc 55.2252 31.644 -22
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/usaflag.rgb"
+texture "../images/usaflag.png"
 numvert 25
 2.30969 5.78404 -39.8
 1.37123 3.7564 -39.8
@@ -727,7 +727,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc 64.875 20.4 -1.19999
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasseast.rgb"
+texture "../images/mathclasseast.png"
 numvert 38
 0.500008 19.9 -99.6
 0.499992 19.9 -13.6
@@ -842,7 +842,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -29.6913 27.4 -54.0226
-texture "/hda1/tuxkart_cvs/tuxkart/models/./../images/tv.rgb"
+texture "./../images/tv.png"
 numvert 8
 -5.17931 -4.9 -38.1674
 -5.17931 4.9 -38.1674
@@ -1067,7 +1067,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 7.175 12.55 -17.25
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasswest.rgb"
+texture "../images/mathclasswest.png"
 texrep 0.07 0.1
 texoff 0.6 0.28
 numvert 8
@@ -1126,7 +1126,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -46.175 17.45 -32.595
-texture "/hda1/tuxkart_cvs/tuxkart/models/../images/mathclasswest.rgb"
+texture "../images/mathclasswest.png"
 texrep 0.03 0.05
 texoff 0.75 0.42
 numvert 8

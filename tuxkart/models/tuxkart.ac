@@ -15,7 +15,7 @@ OBJECT poly
 name "Plane.001"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc 0.00323 0.169401 -0.020018
-texture "/home/ingo/projects/tuxkart/cvs/images/tuxkarttex.rgb"
+texture "../images/tuxkarttex.png"
 texrep 1 1
 numvert 189
 -0.003343 0.341152 0.765774
@@ -4292,7 +4292,7 @@ OBJECT poly
 name "Cube.014"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc -0.004972 0.375933 0.026515
-texture "/home/ingo/projects/tuxkart/cvs/images/tuxtex.rgb"
+texture "../images/tuxtex.png"
 texrep 1 1
 numvert 90
 -0.121579 -0.228776 0.097808
@@ -5007,7 +5007,7 @@ OBJECT poly
 name "Curve"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc -0.168557 0.316283 0.527532
-texture "/home/ingo/projects/tuxkart/cvs/images/chrome.rgb"
+texture "../images/chrome.png"
 texrep 1 1
 numvert 209
 0.231446 -0.016577 -0.202331
@@ -7679,7 +7679,7 @@ OBJECT poly
 name "Cube.008"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc 0.01396 0.334497 0.362601
-texture "/home/ingo/projects/tuxkart/cvs/images/chrome2.rgb"
+texture "../images/chrome2.png"
 texrep 1 1
 numvert 140
 -0.052991 0.003869 0.194772

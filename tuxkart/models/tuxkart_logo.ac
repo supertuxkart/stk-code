@@ -5775,7 +5775,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_body.rgb"
+texture "../images/Penguin_body.png"
 numvert 78
 -0.213326 0.918228 -0.0285474
 -0.175675 0.918228 -0.156779
@@ -8162,7 +8162,7 @@ kids 0
 OBJECT poly
 name "noname"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_body.rgb"
+texture "../images/Penguin_body.png"
 numvert 7
 -0.287144 0.818206 0.020554
 -0.35341 0.617284 -0.0108992
@@ -8206,7 +8206,7 @@ kids 0
 OBJECT poly
 name "noname"
 loc -0.112114 -0.549874 0.824914
-texture "/u/tuxkart/models/../images/Penguin_body.rgb"
+texture "../images/Penguin_body.png"
 numvert 7
 -0.0192397 0.897722 -0.239795
 0.0622662 0.711551 -0.306484
@@ -8367,7 +8367,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_orig.rgb"
+texture "../images/Penguin_orig.png"
 numvert 8
 0.14147 0.343774 0.614986
 0.14147 0.768182 0.40278
@@ -8410,7 +8410,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_body.rgb"
+texture "../images/Penguin_body.png"
 numvert 34
 -0.103117 1.33869 -0.110971
 0.0238576 1.38181 -0.029369
@@ -8891,7 +8891,7 @@ kids 0
 OBJECT poly
 name "tuxbeak"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_beak.rgb"
+texture "../images/Penguin_beak.png"
 numvert 12
 0.145192 0.91555 0.408106
 0.0606967 0.925942 0.437308
@@ -8994,7 +8994,7 @@ kids 0
 OBJECT poly
 name "tuxbeak"
 loc -0.4 -0.443662 0.528775
-texture "/u/tuxkart/models/../images/Penguin_beak.rgb"
+texture "../images/Penguin_beak.png"
 numvert 10
 0.0474007 0.97837 0.42458
 0.0581663 0.899852 0.451534

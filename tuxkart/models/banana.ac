@@ -4,7 +4,7 @@ OBJECT world
 kids 1
 OBJECT poly
 name "Cube"
-texture "/home/ingo/projects/tuxkart/banana.png"
+texture "../images/banana.png"
 texrep 1 1
 numvert 39
 0.231637 0.221473 -0.005138

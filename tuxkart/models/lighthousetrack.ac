@@ -6,7 +6,7 @@ OBJECT world
 kids 8
 OBJECT poly
 name "Plane"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 4
 2481.443874 -14.738798 -2442.308459
@@ -2163,7 +2163,7 @@ refs 2
 kids 0
 OBJECT poly
 name "Mesh.001-sub1"
-texture "/home/ingo/projects/tuxkart/trackborder.png"
+texture "../images/trackborder.png"
 texrep 1 1
 numvert 344
 5.813888 -0.610112 1.251382
@@ -3718,7 +3718,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub2"
-texture "/home/ingo/projects/tuxkart/sandgrass.png"
+texture "../images/sandgrass.png"
 texrep 1 1
 numvert 375
 -14.145264 -1.184347 40.693839
@@ -5415,7 +5415,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub3"
-texture "/home/ingo/projects/tuxkart/stones.png"
+texture "../images/stones.png"
 texrep 1 1
 numvert 94
 41.378001 -20.403295 -65.857342
@@ -5889,7 +5889,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.001-sub4"
-texture "/home/ingo/projects/tuxkart/fence.png"
+texture "../images/fence.png"
 texrep 1 1
 numvert 156
 20.964193 0.150273 -46.24189
@@ -6591,7 +6591,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub5"
-texture "/home/ingo/projects/tuxkart/grass.png"
+texture "../images/grass.png"
 texrep 1 1
 numvert 440
 -13.285047 -0.046025 38.787577
@@ -9531,7 +9531,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.001-sub6"
-texture "/home/ingo/projects/tuxkart/track2.png"
+texture "../images/track2.png"
 texrep 1 1
 numvert 172
 5.277828 -0.610112 -2.438872
@@ -10305,7 +10305,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub7"
-texture "/home/ingo/projects/tuxkart/sand.png"
+texture "../images/sand.png"
 texrep 1 1
 numvert 344
 7.42964 -0.174428 1.245235
@@ -11860,7 +11860,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub8"
-texture "/home/ingo/projects/tuxkart/water.png"
+texture "../images/water.png"
 texrep 1 1
 numvert 17
 -14.145264 -1.184347 40.693839
@@ -11980,7 +11980,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.001-sub9"
-texture "/home/ingo/projects/tuxkart/chess.png"
+texture "../images/chess.png"
 texrep 1 1
 numvert 4
 5.277828 -0.610112 -2.438872
