@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.5 2004/08/11 11:27:22 grumbel Exp $
+//  $Id: MainMenu.cxx,v 1.6 2004/08/17 21:51:35 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,14 +24,13 @@
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Single Player",  GUI_SML, MENU_SINGLE, 0);
-	widgetSet -> state(menu_id, "Multiplayer",  GUI_SML, MENU_MULTI, 0);
-	widgetSet -> state(menu_id, "Watch Replay",  GUI_SML, MENU_REPLAY, 0);
-	widgetSet -> state(menu_id, "Options",  GUI_SML, MENU_OPTIONS, 0);
-	widgetSet -> state(menu_id, "Quit",  GUI_SML, MENU_QUIT, 0);
-	widgetSet -> space(menu_id);
-	widgetSet -> space(menu_id);
-	
+	widgetSet -> start(menu_id, "Single Player",  GUI_MED, MENU_SINGLE, 0);
+	widgetSet -> state(menu_id, "Multiplayer",  GUI_MED, MENU_MULTI, 0);
+	widgetSet -> state(menu_id, "Options",  GUI_MED, MENU_OPTIONS, 0);
+	//widgetSet -> state(menu_id, "Credits",  GUI_MED, MENU_REPLAY, 0);
+	widgetSet -> state(menu_id, "Quit",  GUI_MED, MENU_QUIT, 0);
+        widgetSet -> space(menu_id);
+
 	widgetSet -> layout(menu_id, 0, -1);
 }
 
