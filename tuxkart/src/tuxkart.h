@@ -49,8 +49,6 @@ void tuxKartMainLoop () ;
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 
-extern int cam_follow ;
-
 #include "sound.h"
 #include "Track.h"
 #include "Herring.h"
@@ -89,6 +87,6 @@ extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-extern int tuxkartMain ( int nl, int mirror, char *track ) ;
+extern int tuxkartMain ( int nl, int mirror, char *track, int numPlayers ) ;
 
 

@@ -172,9 +172,6 @@ void GUI::keyboardInput ()
     case 'X'  /* X */      :
     case 0x03 /* Control-C */   : exit ( 0 ) ;
 
-    case PW_KEY_PAGE_UP   : cam_follow-- ; break ;
-    case PW_KEY_PAGE_DOWN : cam_follow++ ; break ;
-
     case 'r' :
     case 'R' :
                finishing_position = -1 ;

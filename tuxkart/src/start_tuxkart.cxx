@@ -16,11 +16,13 @@ static puButton       *playButton       ;
 static puButton       *exitButton       ;
 static puButton       *mirrorButton     ;
 static puButtonBox    *trackButtons     ;
+static puButtonBox    *playerButtons    ;
 static puButton       *pleaseWaitButton ;
 static puFont         *sorority         ;
 static fntTexFont     *fnt              ;
 static ssgSimpleState *introMaterial    ;
 static char           *trackNames    [ MAX_TRACKS ] ;
+static char           *playerOptions [      4     ] ;
 static char           *trackIdents   [ MAX_TRACKS ] ;
 static char            numLapsLegend [     100    ] ;
 static char           *datadir        =  0 ;
@@ -33,11 +35,14 @@ static void switchToGame ()
   /* Collect the selected track and number of laps */
 
   int t ;
-  int nl ;
+  int nl, np ;
   int mirror ;
 
   trackButtons -> getValue ( & t ) ;
   nl = atoi ( numLapsText->getLegend () ) ;
+  playerButtons -> getValue ( & np ) ;
+
+  np = 1 << np ;
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
   mirrorButton -> getValue ( & mirror ) ;
@@ -56,13 +61,14 @@ static void switchToGame ()
   puDeleteObject ( playButton    ) ;
   puDeleteObject ( exitButton    ) ;
   puDeleteObject ( trackButtons  ) ;
+  puDeleteObject ( playerButtons ) ;
   delete introMaterial ;
   delete sorority  ;
   delete fnt       ;
 
   /* Start the main program */
 
-  tuxkartMain ( nl, mirror, trackIdents[t] ) ;
+  tuxkartMain ( nl, mirror, trackIdents[t], np ) ;
 }
 
 /*********************************\
@@ -166,7 +172,6 @@ static void exitCB ( puObject * )
   fprintf ( stderr, "Exiting TuxKart starter program.\n" ) ;
   exit ( 1 ) ;
 }
-
 
 
 static void numLapsSliderCB ( puObject *)
@@ -294,7 +299,9 @@ int main ( int argc, char **argv )
 
   /* Initialise a bunch of PLIB library stuff */
 
-  pwInit  ( 0, 0, 800, 600, FALSE, "Tux Kart by Steve Baker", TRUE, 0 ) ;
+  pwInit  ( 0, 0, getScreenWidth(), getScreenHeight(), FALSE, 
+            "Tux Kart by Steve Baker", TRUE, 0 ) ;
+
   pwSetCallbacks ( startupKeyFn, startupMouseFn, startupMotionFn, NULL, NULL ) ;
   puInit  () ;
   ssgInit () ;
@@ -317,7 +324,12 @@ int main ( int argc, char **argv )
   exitButton = new puButton      ( 180, 10, 250, 50 ) ;
   exitButton -> setLegend        ( "Quit"           ) ;
   exitButton -> setCallback      ( exitCB           ) ;
-   
+
+  playerOptions [ 0 ] = "1 Player"  ;
+  playerOptions [ 1 ] = "2 Players" ;
+  playerOptions [ 2 ] = "4 Players" ;
+  playerOptions [ 3 ] = NULL ;
+
   numLapsSlider = new puSlider   ( 10, 80, 150      ) ;
   numLapsSlider -> setLabelPlace ( PUPLACE_ABOVE    ) ;
   numLapsSlider -> setLabel      ( "How Many Laps?" ) ;
@@ -328,6 +340,11 @@ int main ( int argc, char **argv )
 
   numLapsText = new puButton     ( 160, 80, " 5"    ) ;
   numLapsText -> setStyle        ( PUSTYLE_BOXED    ) ;
+
+  playerButtons = new puButtonBox ( 10, 150, 150, 230, playerOptions, TRUE ) ;
+  playerButtons -> setLabel       ( "How Many Players?"   ) ;
+  playerButtons -> setLabelPlace  ( PUPLACE_ABOVE    ) ;
+  playerButtons -> setValue       ( 0                ) ; 
 
   trackButtons = new puButtonBox ( 400, 10, 630, 150, trackNames, TRUE ) ;
   trackButtons -> setLabel       ( "Which Track?"   ) ;

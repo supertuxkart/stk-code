@@ -386,7 +386,7 @@ static void banner ()
 }
 
 
-int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
+int tuxkartMain ( int _numLaps, int _mirror, char *_levelName, int numPlayers )
 {
   /* Say "Hi!" to the nice user. */
 
@@ -454,6 +454,9 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   gfx        = new GFX ( mirror ) ;
   sound      = new SoundSystem ;
   gui        = new GUI ;
+
+  Camera::setNumSplits ( numPlayers ) ;
+  initCameras () ;
 
   pwSetCallbacks ( keystroke, mousefn, motionfn, reshape, NULL ) ;
 
@@ -601,7 +604,7 @@ void tuxKartMainLoop ()
       for ( i = 0 ; i < num_karts       ; i++ ) updateLapCounter ( i ) ;
 
       updateNetworkWrite () ;
-      updateCamera       () ;
+      updateCameras      () ;
       updateWorld        () ;
     }
 
@@ -611,7 +614,9 @@ void tuxKartMainLoop ()
     gold_h   -> update () ;
     red_h    -> update () ;
     green_h  -> update () ;
-    gfx      -> update () ;
+
+    updateGFX ( gfx ) ;
+
     gui      -> update () ;
     sound    -> update () ;
 

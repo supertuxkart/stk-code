@@ -9,6 +9,26 @@
 #endif
 
 static unsigned int lastKeystroke = 0 ;
+static int width  = 800 ;
+static int height = 600 ;
+
+static sgVec3 sunposn   ;
+static sgVec4 skyfogcol ;
+static sgVec4 ambientcol ;
+static sgVec4 specularcol ;
+static sgVec4 diffusecol ;
+
+void setScreenSize ( int w, int h )
+{
+  width  = w ;
+  height = h ;
+  glViewport ( 0, 0, w, h ) ;
+}
+
+
+int getScreenWidth  () { return width  ; }
+int getScreenHeight () { return height ; }
+
 
 static char keyIsDown [ 512 ] ;
 
@@ -35,7 +55,7 @@ int getKeystroke ()
 
 void reshape ( int w, int h )
 {
-  glViewport ( 0, 0, w, h ) ;
+  setScreenSize ( w, h ) ;
 }
 
 
@@ -58,48 +78,14 @@ GFX::GFX ( int _mirror )
 
 void GFX::update ()
 {
-  sgVec3 sunposn   ;
-  sgVec4 skyfogcol ;
-  sgVec4 ambientcol ;
-  sgVec4 specularcol ;
-  sgVec4 diffusecol ;
-
-  sgSetVec3 ( sunposn, 0.4, 0.4, 0.4 ) ;
-
-  sgSetVec4 ( skyfogcol  , 0.3, 0.7, 0.9, 1.0 ) ;
-  sgSetVec4 ( ambientcol , 0.5, 0.5, 0.5, 1.0 ) ;
-  sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
-  sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
-
   ssgGetLight ( 0 ) -> setPosition ( sunposn ) ;
   ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambientcol  ) ;
   ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffusecol  ) ;
   ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specularcol ) ;
 
-  /* Clear the screen */
-
-  glClearColor ( skyfogcol[0], skyfogcol[1], skyfogcol[2], skyfogcol[3] ) ;
-  glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
-
-  glEnable ( GL_DEPTH_TEST ) ;
-
-  glFogf ( GL_FOG_DENSITY, 0.005 / 100.0f ) ;
-  glFogfv( GL_FOG_COLOR  , skyfogcol ) ;
-  glFogf ( GL_FOG_START  , 0.0       ) ;
-  glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
-  glHint ( GL_FOG_HINT   , GL_NICEST ) ;
-
   if ( mirror ) glFrontFace ( GL_CW ) ;
 
-/*
-  sgCoord cam ;
-  sgSetVec3 ( cam.xyz, 0, 0, 0 ) ;
-  sgSetVec3 ( cam.hpr, 0, 0, 0 ) ;
-  ssgSetCamera ( & cam ) ;
-*/
-  glEnable ( GL_FOG ) ;
   ssgCullAndDraw ( scene ) ;
-  glDisable ( GL_FOG ) ;
 }
 
 
@@ -163,6 +149,40 @@ void GFX::done ()
     stereo = -stereo ;
   }
 #endif
+}
+
+
+void updateGFX ( GFX *gfx )
+{
+  sgSetVec3 ( sunposn, 0.4, 0.4, 0.4 ) ;
+
+  sgSetVec4 ( skyfogcol  , 0.3, 0.7, 0.9, 1.0 ) ;
+  sgSetVec4 ( ambientcol , 0.5, 0.5, 0.5, 1.0 ) ;
+  sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
+  sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
+
+  glEnable ( GL_DEPTH_TEST ) ;
+
+  glFogf ( GL_FOG_DENSITY, 0.005 / 100.0f ) ;
+  glFogfv( GL_FOG_COLOR  , skyfogcol ) ;
+  glFogf ( GL_FOG_START  , 0.0       ) ;
+  glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
+  glHint ( GL_FOG_HINT   , GL_NICEST ) ;
+
+  glEnable ( GL_FOG ) ;
+  /* Clear the screen */
+
+  glClearColor ( skyfogcol[0], skyfogcol[1], skyfogcol[2], skyfogcol[3] ) ;
+  glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
+
+  for ( int i = 0 ; i < Camera::getNumSplits() ; i++ )
+  {
+    camera [ i ] -> apply () ;
+    gfx -> update () ;
+  }
+
+  glDisable ( GL_FOG ) ;
+  glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 }
 
 

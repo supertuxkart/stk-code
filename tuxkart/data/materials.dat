@@ -33,7 +33,6 @@
 "metalgrid.rgb"    N N     Y      0.3     Y     N   1.0     N   N    N    N
 "fuzzy_sand.rgb"   N N     Y      0.0     N     N   1.0     Y   N    N    N
 "roadway.rgb"      Y N     Y      0.0     Y     N   1.0     N   N    N    N
-"tracktex.rgb"     N N     N      0.0     Y     N   1.0     N   N    N    Y
 "rainbow.rgb"      N N     Y      0.0     N     N   1.0     N   N    N    N
 "tinytux.rgb"      Y Y     Y      0.8     N     N   1.0     Y   N    N    N
 "butterfly.rgb"    Y Y     Y      0.8     N     N   1.0     Y   N    N    N

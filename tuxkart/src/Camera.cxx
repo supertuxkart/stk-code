@@ -5,103 +5,161 @@
 #define MAX_CAM_DISTANCE     10.0f  // Was 15
 #define MAX_FIXED_CAMERA      9
 
-int   cam_follow =  0    ;
+Camera *camera [ 4 ] = { NULL, NULL, NULL, NULL } ;
 
-static sgCoord fixedpos [ MAX_FIXED_CAMERA ] =
+int Camera::numSplits = 4 ;
+
+
+void Camera::setScreenPosition ( int pos )
 {
-  { {    0,    0, 500 }, {    0, -90, 0 } },
+  switch ( numSplits )
+  {
+    case 1 : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 1.0f ;
+             context -> setFOV ( 75.0f, 0.0f ) ;
+             return ;
 
-  { {    0,  180,  30 }, {  180, -15, 0 } },
-  { {    0, -180,  40 }, {    0, -15, 0 } },
+    case 2 :
+      context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
+      switch ( pos )
+      {
+        case 0 : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ; return ;
+        case 1 : x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ; return ;
+        default: break ;
+      }
+      break ;
 
-  { {  300,    0,  60 }, {   90, -15, 0 } },
-  { { -300,    0,  60 }, {  -90, -15, 0 } },
+    case 4 :
+      context -> setFOV ( 50.0f, 0.0f ) ;
+      switch ( pos )
+      {
+        case 0 : x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ; return ;
+        case 1 : x = 0.0f ; y = 0.5f ; w = 0.5f ; h = 0.5f ; return ;
+        case 2 : x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ; return ;
+        case 3 : x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ; return ;
+        default: break ;
+      }
+      break ;
 
-  { {  200,  100,  30 }, {  120, -15, 0 } },
-  { {  200, -100,  40 }, {   60, -15, 0 } },
-  { { -200, -100,  30 }, {  -60, -15, 0 } },
-  { { -200,  100,  40 }, { -120, -15, 0 } }
-} ;
+    default:
+      break ;
+  }
+
+  x = 0.0f ; y = 0.0f ; w = 0.0f ; h = 0.0f ;
+}
 
 
-static sgCoord steady_cam = {{ 0, 0, 0 }, { 0, 0, 0 }} ;
-
-
-void updateCamera ()
+Camera::Camera ( int which )
 {
-  static float cam_delay  = 10.0f ;
+  context = NULL ;
+  init () ;
+  whichKart = which ;   // Just for now
+  setScreenPosition ( which ) ;
+}
 
+
+void Camera::init ()
+{
+  delete context ;
+  context = new ssgContext ;
+  context -> setNearFar ( 0.05f, 1000.0f ) ;
+
+  sgSetVec3 ( location.xyz, 0, 0, 0 ) ;
+  sgSetVec3 ( location.hpr, 0, 0, 0 ) ;
+  whichKart  = 0 ;
+  setScreenPosition ( 0 ) ;
+  cam_delay  = 10.0f ;
+}
+
+
+void Camera::update ()
+{
   /* Update the camera */
 
-  if ( cam_follow < 0 )
-    cam_follow = 18 + MAX_FIXED_CAMERA - 1 ;
-  else
-  if ( cam_follow >= 18 + MAX_FIXED_CAMERA )
-    cam_follow = 0 ;
+  if ( whichKart >= num_karts || whichKart < 0 ) whichKart = 0 ;
 
-  sgCoord final_camera ;
+  sgCoord cam, target, diff ;
 
-  if ( cam_follow < num_karts )
-  {
-    sgCoord cam, target, diff ;
+  sgCopyCoord ( &target, kart[whichKart]->getCoord   () ) ;
+  sgCopyCoord ( &cam   , kart[whichKart]->getHistory ( (int)cam_delay ) ) ;
 
-    sgCopyCoord ( &target, kart[cam_follow]->getCoord   () ) ;
-    sgCopyCoord ( &cam   , kart[cam_follow]->getHistory ( (int)cam_delay ) ) ;
+  float dist = 5.0f + sgDistanceVec3 ( target.xyz, cam.xyz ) ;
 
-    float dist = 5.0f + sgDistanceVec3 ( target.xyz, cam.xyz ) ;
+  if ( dist < MIN_CAM_DISTANCE && cam_delay < 50 ) cam_delay++ ; 
+  if ( dist > MAX_CAM_DISTANCE && cam_delay >  1 ) cam_delay-- ;
 
-    if ( dist < MIN_CAM_DISTANCE && cam_delay < 50 )
-      cam_delay++ ;
+  sgVec3 offset ;
+  sgMat4 cam_mat ;
 
-    if ( dist > MAX_CAM_DISTANCE && cam_delay > 1 )
-      cam_delay-- ;
+  sgSetVec3 ( offset, -0.5f, -5.0f, 1.5f ) ;
+  sgMakeCoordMat4 ( cam_mat, &cam ) ;
 
-    sgVec3 offset ;
-    sgMat4 cam_mat ;
+  sgXformPnt3 ( offset, cam_mat ) ;
 
-    sgSetVec3 ( offset, -0.5f, -5.0f, 1.5f ) ;
-    sgMakeCoordMat4 ( cam_mat, &cam ) ;
+  sgCopyVec3 ( cam.xyz, offset ) ;
 
-    sgXformPnt3 ( offset, cam_mat ) ;
+  cam.hpr[1] = -5.0f ;
+  cam.hpr[2] = 0.0f;
 
-    sgCopyVec3 ( cam.xyz, offset ) ;
+  sgSubVec3 ( diff.xyz, cam.xyz, location.xyz ) ;
+  sgSubVec3 ( diff.hpr, cam.hpr, location.hpr ) ;
 
-    cam.hpr[1] = -5.0f ;
-    cam.hpr[2] = 0.0f;
+  while ( diff.hpr[0] >  180.0f ) diff.hpr[0] -= 360.0f ;
+  while ( diff.hpr[0] < -180.0f ) diff.hpr[0] += 360.0f ;
+  while ( diff.hpr[1] >  180.0f ) diff.hpr[1] -= 360.0f ;
+  while ( diff.hpr[1] < -180.0f ) diff.hpr[1] += 360.0f ;
+  while ( diff.hpr[2] >  180.0f ) diff.hpr[2] -= 360.0f ;
+  while ( diff.hpr[2] < -180.0f ) diff.hpr[2] += 360.0f ;
 
-    sgSubVec3 ( diff.xyz, cam.xyz, steady_cam.xyz ) ;
-    sgSubVec3 ( diff.hpr, cam.hpr, steady_cam.hpr ) ;
+  location.xyz[0] += 0.2f * diff.xyz[0] ;
+  location.xyz[1] += 0.2f * diff.xyz[1] ;
+  location.xyz[2] += 0.2f * diff.xyz[2] ;
+  location.hpr[0] += 0.1f * diff.hpr[0] ;
+  location.hpr[1] += 0.1f * diff.hpr[1] ;
+  location.hpr[2] += 0.1f * diff.hpr[2] ;
 
-    while ( diff.hpr[0] >  180.0f ) diff.hpr[0] -= 360.0f ;
-    while ( diff.hpr[0] < -180.0f ) diff.hpr[0] += 360.0f ;
-    while ( diff.hpr[1] >  180.0f ) diff.hpr[1] -= 360.0f ;
-    while ( diff.hpr[1] < -180.0f ) diff.hpr[1] += 360.0f ;
-    while ( diff.hpr[2] >  180.0f ) diff.hpr[2] -= 360.0f ;
-    while ( diff.hpr[2] < -180.0f ) diff.hpr[2] += 360.0f ;
+  final_camera = location ;
 
-    steady_cam.xyz[0] += 0.2f * diff.xyz[0] ;
-    steady_cam.xyz[1] += 0.2f * diff.xyz[1] ;
-    steady_cam.xyz[2] += 0.2f * diff.xyz[2] ;
-    steady_cam.hpr[0] += 0.1f * diff.hpr[0] ;
-    steady_cam.hpr[1] += 0.1f * diff.hpr[1] ;
-    steady_cam.hpr[2] += 0.1f * diff.hpr[2] ;
+  // sgVec3 interfovealOffset ;
+  // sgMat4 mat ;
+  // sgSetVec3 ( interfovealOffset, 0.2 * (float)stereoShift(), 0, 0 ) ;
+  // sgMakeCoordMat4 ( mat, &final_camera ) ;
+  // sgXformPnt3 ( final_camera.xyz, interfovealOffset, mat ) ;
 
-    final_camera = steady_cam ;
-  }
-  else
-  if ( cam_follow < num_karts + MAX_FIXED_CAMERA )
-    final_camera = fixedpos[cam_follow-num_karts] ;
-  else
-    final_camera = steady_cam ;
-
-  sgVec3 interfovealOffset ;
-  sgMat4 mat ;
-
-  sgSetVec3 ( interfovealOffset, 0.2 * (float)stereoShift(), 0, 0 ) ;
-  sgMakeCoordMat4 ( mat, &final_camera ) ;
-  sgXformPnt3 ( final_camera.xyz, interfovealOffset, mat ) ;
-
-  ssgSetCamera ( &final_camera ) ;
+  context -> setCamera ( & final_camera ) ;
 }
+
+
+void Camera::apply ()
+{
+  int width  = getScreenWidth  () ;
+  int height = getScreenHeight () ;
+
+  assert ( scene != NULL ) ;
+
+  glViewport ( (int)((float)width  * x),
+               (int)((float)height * y),
+               (int)((float)width  * w),
+               (int)((float)height * h) ) ;
+
+  context -> makeCurrent () ;
+}
+
+
+void updateCameras ()
+{
+  for ( int i = 0 ; i < Camera::getNumSplits() ; i++ )
+    camera [ i ] -> update () ;
+}
+
+
+void initCameras ()
+{
+  for ( int i = 0 ; i < 4 ; i++ )
+  {
+    delete camera [ i ] ;
+    camera [ i ] = new Camera ( i ) ;
+  }
+}
+
 
 
