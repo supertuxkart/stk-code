@@ -275,6 +275,31 @@ void drawCreditsText ()
                        15, 10, 430 ) ;
 }
 
+void drawFPSText ()
+{
+  #ifdef HAVE_LIBSDL
+  
+  static int fpsCounter;
+  static int fpsSave = 0;
+  static int fpsTimer = SDL_GetTicks();
+  
+  int now = SDL_GetTicks();
+
+  if (now - fpsTimer > 1000)
+    {
+      fpsSave = fpsCounter;
+      fpsCounter = 0;
+      fpsTimer = now;
+    }
+
+  ++fpsCounter;
+
+  char str [ 20 ];
+  sprintf( str, "FPS: %d", fpsSave);
+  drawDropShadowText( str, 18, 0 , 0);
+  
+  #endif
+}
 
 void drawStatsText ()
 {
@@ -431,7 +456,10 @@ void drawGameRunningText ()
   drawTimer () ;
 
   glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
-
+  
+  if ( show_fps )
+    drawFPSText () ;
+    
   if ( stats_enabled )
     drawStatsText () ;
 

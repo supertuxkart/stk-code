@@ -30,6 +30,9 @@ HerringInstance herring [ MAX_HERRING ] ;
 
 char player_files [ NUM_KARTS ][ 256 ] ;
 
+bool paused ;
+bool show_fps = 0 ;
+
 char *traffic_files [] =
 {
   "icecreamtruck.ac", "truck1.ac",

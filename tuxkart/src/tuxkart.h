@@ -88,7 +88,8 @@ ssgBranch *process_userdata ( char *data ) ;
 extern int num_karts ;
 extern int num_laps_in_race ;
 extern int finishing_position ;
-extern int paused;
+extern bool paused ;
+extern bool show_fps ;
 
 extern KartDriver *kart       [ NUM_KARTS       ] ;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;

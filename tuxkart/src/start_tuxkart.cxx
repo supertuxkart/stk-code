@@ -410,8 +410,7 @@ int main ( int argc, char *argv[] )
   int reverse = 0;
   int track         = 0;
   int nbrPlayers    = 1;
-  int width         = 800;
-  int height        = 600;
+
   bool fullscreen   = false;
   bool noStartScreen = false;
   
@@ -511,18 +510,20 @@ int main ( int argc, char *argv[] )
 
 	  else if ( !strcmp(argv[i], "--screensize") && argc > 3 )
 	    {
-	      width  = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
-	      height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
+	      int width  = ( atoi(argv[i+1]) > 0 ) ? atoi(argv[i+1]) : width;
+	      int height = ( atoi(argv[i+2]) > 0 ) ? atoi(argv[i+2]) : height;
+		setScreenSize ( width, height );
 
 	      fprintf ( stdout, "You choose to be in %dx%d.\n",
 			atoi(argv[i+1]), atoi(argv[i+2]) ) ;
 	    }
-
+	  #ifdef VERSION
 	  else if( !strcmp(argv[i], "--version") )
 	    {
 	      fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
 	      return 0;
 	    }
+	  #endif
 
 	  else
 	    {

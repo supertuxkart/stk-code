@@ -1,4 +1,5 @@
 
+void drawFPSText () ;
 void drawStatusText () ;
 
 void stPrintf ( char *fmt, ... ) ;

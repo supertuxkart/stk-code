@@ -7,10 +7,7 @@
 
 using std::cout;
 
-//global, you could deglobalise them and prevent them from being changed by making them part of a class or making them static and having a getValue function, if you wanted
-
 Uint8 *keyState;
-int paused;
 
 void initVideo(bool fullscreen)
 {
@@ -122,6 +119,10 @@ void keyboardInput (const SDL_keysym& key)
   switch ( key.sym )
     {
     case SDLK_ESCAPE : shutdown() ;
+    
+    case SDLK_F12:
+      show_fps = !show_fps;
+	break;
 
     case SDLK_r :
       {
