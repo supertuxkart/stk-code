@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.19 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: tuxkart.h,v 1.20 2004/08/05 18:33:52 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -99,6 +99,8 @@ typedef std::vector<KartDriver*> Karts;
 extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
+
+extern void switchToGame ();
 
 extern int tuxkartMain ( int nl, int mirror, int reverse, 
                          char *track, int numPlayers, int numKarts ) ;

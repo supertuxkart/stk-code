@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.39 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.40 2004/08/05 18:33:52 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,8 +38,6 @@
 
 static puSlider       *numLapsSlider    ;
 static puButton       *numLapsText      ;
-static puButton       *playButton       ;
-static puButton       *exitButton       ;
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
 static puButton       *mirrorButton     ;
 #endif
@@ -55,10 +53,9 @@ static char           *playerOptions [      4     ] ;
 static char           *trackIdents   [ MAX_TRACKS ] ;
 static char            numLapsLegend [     100    ] ;
 static int             numLaps        =  5 ;
-static int             startupCounter = -1 ;
 
 
-static void switchToGame ()
+void switchToGame ()
 {
   /* Collect the selected track and number of laps */
 
@@ -90,8 +87,6 @@ static void switchToGame ()
   puDeleteObject ( mirrorButton   ) ;
 #endif
   puDeleteObject ( reverseButton  ) ;
-  puDeleteObject ( playButton     ) ;
-  puDeleteObject ( exitButton     ) ;
   puDeleteObject ( trackButtons   ) ;
   puDeleteObject ( playerButtons  ) ;
   delete introMaterial ;
@@ -112,10 +107,13 @@ static void switchToGame ()
 
 static void splashMainLoop (void)
 {
-  while ( startupCounter != 0 )
+  while ( 1 )
   {
-    /* Setup for boring 2D rendering */
-
+   /* 
+   //The old splash screen stuff
+   
+   //Setup for boring 2D rendering
+    
     glMatrixMode   ( GL_PROJECTION ) ;
     glLoadIdentity () ;
     glMatrixMode   ( GL_MODELVIEW ) ;
@@ -127,7 +125,7 @@ static void splashMainLoop (void)
     glDisable      ( GL_ALPHA_TEST ) ;
     glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
-    /* Draw the splash screen */
+    //Draw the splash screen
 
     introMaterial -> force () ;
 
@@ -139,18 +137,21 @@ static void splashMainLoop (void)
     glTexCoord2f ( 0, 1 ) ; glVertex2i (   0, 480 ) ;
     glEnd () ;
 
-    /* Make PUI redraw */
+    //Make PUI redraw
 
     glEnable ( GL_BLEND ) ;
     puDisplay () ;
-  
+    */
+    
+    glClearColor(0.2, 0.2, 0.2, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glFlush();
+	
     /* Swapbuffers - and off we go again... */
 
     pollEvents() ;
     updateGUI();
     swapBuffers();
-    
-    if ( startupCounter > 0 ) startupCounter-- ;
   }
 }
 
@@ -162,27 +163,6 @@ static void splashMainLoop (void)
 *                                   *
 \***********************************/
 
-
-static void playCB ( puObject * )
-{
-  puSetDefaultColourScheme ( 123.0f/255.0f, 0.0f/255.0f, 34.0f/255.0f, 1.0) ;
-  pleaseWaitButton = new puButton ( 100, 240,
-                               "LOADING: PLEASE WAIT FOR A MINUTE OR TWO"  ) ;
-
-  /*
-    Set up a few frames of delay to ensure the above message gets onto
-    the front-buffer and onto the screen before we flip out to the game.
-  */
-
-  startupCounter = 3 ;
-}
-
-
-static void exitCB ( puObject * )
-{
-  fprintf ( stderr, "Exiting TuxKart starter program.\n" ) ;
-  shutdown();
-}
 
 
 static void numLapsSliderCB ( puObject *)
@@ -325,15 +305,6 @@ static void startScreen ( int nbrLaps, int mirror, int reverse,
 
   /* Create all of the GUI elements */
   guiSwitch = GUIS_MAINMENU;
-
-  playButton = new puButton      ( 10, 10, 150, 50  ) ;
-  playButton -> setLegend        ( "Start Game"     ) ;
-  playButton -> setCallback      ( playCB           ) ;
-  playButton -> makeReturnDefault( TRUE             ) ;
-
-  exitButton = new puButton      ( 180, 10, 250, 50 ) ;
-  exitButton -> setLegend        ( "Quit"           ) ;
-  exitButton -> setCallback      ( exitCB           ) ;
 
   playerOptions [ 0 ] = "1 Player"  ;
   playerOptions [ 1 ] = "2 Players" ;
@@ -571,7 +542,6 @@ int main ( int argc, char *argv[] )
     {
       /* Show start screen */
       startScreen ( nbrLaps, mirror, reverse, track, nbrPlayers );
-      switchToGame () ; 
     }
 
   return 0 ;
