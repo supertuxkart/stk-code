@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.3 2004/08/07 03:42:34 jamesgregory Exp $
+//  $Id: NumPlayers.cxx,v 1.1 2004/08/07 03:42:34 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,48 +17,48 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "MainMenu.h"
+#include "NumPlayers.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
-MainMenu::MainMenu()
+NumPlayers::NumPlayers()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Single Player",  GUI_SML, MENU_SINGLE, 0);
-	widgetSet -> state(menu_id, "Multiplayer",  GUI_SML, MENU_MULTI, 0);
-	widgetSet -> state(menu_id, "Watch Replay",  GUI_SML, MENU_REPLAY, 0);
-	widgetSet -> state(menu_id, "Options",  GUI_SML, MENU_OPTIONS, 0);
-	widgetSet -> state(menu_id, "Quit",  GUI_SML, MENU_QUIT, 0);
+	widgetSet -> start(menu_id, "Two Players",  GUI_SML, 2, 0);
+	widgetSet -> state(menu_id, "Three Players",  GUI_SML, 3, 0);
+	widgetSet -> state(menu_id, "Four Players",  GUI_SML, 4, 0);
+	widgetSet -> state(menu_id, "Network Game",  GUI_SML, MENU_NETWORK, 0);
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
 	widgetSet -> layout(menu_id, 0, -1);
 }
 
-MainMenu::~MainMenu()
+NumPlayers::~NumPlayers()
 {
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void MainMenu::update(float dt)
-{	
+void NumPlayers::update(float dt)
+{
+	
 	widgetSet -> timer(menu_id, dt) ;
 	widgetSet -> paint(menu_id) ;
 }
 
-void MainMenu::select()
+void NumPlayers::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_SINGLE:		guiSwitch = GUIS_GAMEMODE;	break;
-	case MENU_MULTI: 		guiSwitch = GUIS_NUMPLAYERS;	break;
-	case MENU_REPLAY:		break;
-	case MENU_OPTIONS:	guiSwitch = GUIS_OPTIONS;	break;
-	case MENU_QUIT:		shutdown(); break;
+	case MENU_NETWORK:	break;
+	default: 
+		raceSetup.numPlayers = widgetSet -> token ( widgetSet -> click() );
+		guiSwitch = GUIS_GAMEMODE;
+		break;
 	}
 }
 
-void MainMenu::keybd(const SDL_keysym& key)
+void NumPlayers::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
@@ -72,18 +72,18 @@ void MainMenu::keybd(const SDL_keysym& key)
 	case SDLK_RETURN: select(); break;
 	
 	case SDLK_ESCAPE:
-		shutdown();
+		guiSwitch = GUIS_MAINMENU;
 		
 	default: break;
 	}
 }
 
-void MainMenu::point(int x, int y)
+void NumPlayers::point(int x, int y)
 {
 	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
 }
 
-void MainMenu::stick(int x, int y)
+void NumPlayers::stick(int x, int y)
 {
 	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }

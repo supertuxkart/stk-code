@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.1 2004/08/05 22:53:56 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.2 2004/08/07 03:42:34 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,7 @@
 #include "GameMode.h"
 #include "Options.h"
 #include "TrackSel.h"
+#include "NumPlayers.h"
 #include "RaceGUI.h"
 
 void updateGUI()
@@ -55,6 +56,9 @@ void updateGUI()
 			break;
 		case GUIS_TRACKSEL:
 			gui = new TrackSel;
+			break;
+		case GUIS_NUMPLAYERS:
+			gui = new NumPlayers;
 			break;
 		case GUIS_RACE:
 			gui = new RaceGUI;
