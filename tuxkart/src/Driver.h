@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.28 2004/08/15 18:06:38 grumbel Exp $
+//  $Id: Driver.h,v 1.29 2004/08/16 11:33:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -94,6 +94,14 @@ class KartDriver;
 class Driver
 {
 protected:
+  /** The interpolated position of the kart, this might differ a bit
+      from the real position, but it is used to both give a smoother
+      movement and to better visualize turns and such, use it for
+      everything that needs to be visual (smoke, skidmarks, kart
+      placement), but don't use it for physics, thats what curr_pos is
+      for */
+  sgCoord visi_pos;
+
   /** Used to save the last position of the kart, which is then
       interpolated with the new one to form a smooth movement */
   sgCoord last_relax_pos;
@@ -187,6 +195,11 @@ public:
     //FIXME:update () ;
   }
 
+  sgCoord *getVisiCoord ()
+  {
+    return & visi_pos ;
+  }
+
   sgCoord *getCoord ()
   {
     return & curr_pos ;
@@ -201,6 +214,7 @@ public:
   /** Reposition the model in the scene */
   virtual void placeModel ();
 
+  void updateVisiPos(float delta);
   void coreUpdate (float delta) ;
   void physicsUpdate (float delta) ;
   bool is_on_ground() { return on_ground; }

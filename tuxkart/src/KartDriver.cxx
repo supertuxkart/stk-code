@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.40 2004/08/15 23:33:34 straver Exp $
+//  $Id: KartDriver.cxx,v 1.41 2004/08/16 11:33:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -70,7 +70,7 @@ KartParticleSystem::particle_create(int, Particle *p)
   p->size = .5f;
   p -> time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
   
-  sgCoord* pos = kart->getCoord ();
+  sgCoord* pos = kart->getVisiCoord ();
   //sgCoord* vel = kart->getVelocity ();
    
   float xDirection = sgCos (pos->hpr[0] - 90.0f); // Point at the rear 
@@ -346,7 +346,8 @@ void KartDriver::doCollisionAnalysis ( float delta, float hot )
     }
 }
 
-void KartDriver::update (float delta)
+void
+KartDriver::update (float delta)
 {
   sgCoord temp;
   sgCopyCoord(&temp, &curr_pos);
@@ -402,6 +403,8 @@ void KartDriver::update (float delta)
       sgCopyCoord(&last_pos, &temp);
       sgCopyCoord(&last_relax_pos, &temp);
     }
+
+  
 }
 
 void
@@ -413,7 +416,7 @@ KartDriver::processSkidMarks()
       float length = 0.57;
 
       sgCoord wheelpos;
-      sgCopyCoord(&wheelpos, getCoord());
+      sgCopyCoord(&wheelpos, getVisiCoord());
 
       wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
       wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
@@ -436,7 +439,7 @@ KartDriver::processSkidMarks()
       float length = 0.57;
 
       sgCoord wheelpos;
-      sgCopyCoord(&wheelpos, getCoord());
+      sgCopyCoord(&wheelpos, getVisiCoord());
 
       wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
       wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);

@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.29 2004/08/16 00:17:22 grumbel Exp $
+//  $Id: Driver.cxx,v 1.30 2004/08/16 11:33:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -92,6 +92,29 @@ Driver::update (float delta)
   coreUpdate (delta) ;
 
   doObjectInteractions () ;
+  updateVisiPos(delta);
+}
+
+void
+Driver::updateVisiPos(float delta)
+{
+  sgCopyCoord ( &visi_pos, &curr_pos ) ;
+
+  visi_pos.hpr[1] += wheelie_angle ;
+
+  if (use_fake_drift)
+    {
+      // Rotate the kart a bit to get a feeling for drifting even if
+      // it isn't there in reality, not 100% sure if this is a good
+      // idea, but its worth a try
+      visi_pos.hpr[0] += steer_angle*10.0f;
+    }
+
+  visi_pos.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
+
+  relaxation(visi_pos.hpr[0], last_relax_pos.hpr[0], 25.0f * delta);
+  relaxation(visi_pos.hpr[1], last_relax_pos.hpr[1], 25.0f * delta);
+  relaxation(visi_pos.hpr[2], last_relax_pos.hpr[2], 25.0f * delta);
 }
 
 void
@@ -99,25 +122,8 @@ Driver::placeModel ()
 {
   if ( model != NULL )
     {
-      sgCoord relax_pos ;
-      
-      sgCopyCoord ( &relax_pos, &curr_pos ) ;
-
-      relax_pos.hpr[1] += wheelie_angle ;
-
-      if (use_fake_drift)
-        {
-          // Rotate the kart a bit to get a feeling for drifting even if
-          // it isn't there in reality, not 100% sure if this is a good
-          // idea, but its worth a try
-          relax_pos.hpr[0] += steer_angle*10.0f;
-        }
-
-      relax_pos.xyz[2] += fabs( sin ( wheelie_angle * SG_DEGREES_TO_RADIANS )) * 0.3f ;
-
-      relaxation(relax_pos.hpr[0], last_relax_pos.hpr[0], .5);
-      relaxation(relax_pos.hpr[1], last_relax_pos.hpr[1], .5);
-      relaxation(relax_pos.hpr[2], last_relax_pos.hpr[2], .5);
+      sgCoord relax_pos;
+      sgCopyCoord ( &relax_pos, &visi_pos ) ;
 
       model -> setTransform ( & relax_pos ) ;
 
