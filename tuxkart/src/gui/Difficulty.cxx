@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.8 2004/08/20 18:37:45 jamesgregory Exp $
+//  $Id: Difficulty.cxx,v 1.9 2004/08/20 19:29:13 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,8 +33,6 @@ Difficulty::Difficulty()
 	widgetSet -> start(va, "Easy",  GUI_MED, MENU_EASY, 0);
 	widgetSet -> state(va, "Medium",  GUI_MED, MENU_MEDIUM, 0);
 	widgetSet -> state(va, "Hard",  GUI_MED, MENU_HARD, 0);
-        widgetSet -> space(va);
-        widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 	
         if (0)
         {
@@ -70,7 +68,6 @@ void Difficulty::select()
 	case MENU_EASY:	guiStack.push_back(GUIS_CHARSEL);	break;
 	case MENU_MEDIUM:	guiStack.push_back(GUIS_CHARSEL);	break;
 	case MENU_HARD:	guiStack.push_back(GUIS_CHARSEL);	break;
-	case MENU_RETURN:	guiStack.pop_back();	break;
 	default: break;
 	}
 }

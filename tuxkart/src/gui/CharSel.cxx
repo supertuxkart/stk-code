@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.16 2004/08/20 18:00:26 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.17 2004/08/20 19:29:13 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -71,8 +71,6 @@ CharSel::CharSel()
     }
 
   widgetSet -> filler(ha);
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 
   widgetSet -> layout(menu_id, 0, 1);
 
@@ -140,11 +138,6 @@ void CharSel::update(float dt)
 void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
-	if ( token == MENU_RETURN)
-	{
-		guiStack.pop_back();
-		return;
-	}
 
 	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
 		kart_props = kart_manager.karts[token];

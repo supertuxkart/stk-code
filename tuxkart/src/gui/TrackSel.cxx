@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.16 2004/08/20 18:37:45 jamesgregory Exp $
+//  $Id: TrackSel.cxx,v 1.17 2004/08/20 19:29:13 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -45,8 +45,7 @@ TrackSel::TrackSel(RaceSetup& raceSetup_)
 
         for (unsigned int i = track_manager.tracks.size()/2; i != track_manager.tracks.size(); ++i)
                 widgetSet -> state(col2, track_manager.tracks[i].name.c_str(),  GUI_SML, i, 0);
-        
-        widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
+
 	widgetSet -> layout(menu_id, 0, 1);
 }
 
@@ -83,11 +82,6 @@ void TrackSel::update(float dt)
 
 void TrackSel::select()
 {
-	if ( widgetSet -> token ( widgetSet -> click() ) == MENU_RETURN)
-	{
-		guiStack.pop_back();
-		return;
-	}
 	raceSetup.track = widgetSet -> token ( widgetSet -> click() );
 	StartScreen::current()->switchToGame();
 }
