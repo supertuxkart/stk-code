@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.9 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: GameMode.cxx,v 1.10 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,7 +32,9 @@ GameMode::GameMode(RaceSetup& raceSetup_)
 	int va = widgetSet -> varray(menu_id);
 	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
 	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
-	widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
+	
+	if (raceSetup.numPlayers == 1)
+		widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -59,11 +61,11 @@ void GameMode::select()
 		break;
 	case MENU_QUICKRACE:
 		raceSetup.numKarts = -1;
-		guiStack.push_back(GUIS_DIFFICULTYQR);
+		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	case MENU_TIMETRIAL:
 		raceSetup.numKarts = 1;
-		guiStack.push_back(GUIS_CHARSEL);
+		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	default: break;
 	}

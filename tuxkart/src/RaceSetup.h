@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.2 2004/08/17 22:53:43 grumbel Exp $
+//  $Id: RaceSetup.h,v 1.3 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,8 @@
 #ifndef HEADER_RACESETUP_H
 #define HEADER_RACESETUP_H
 
+#include <vector>
+
 /** A class that manages all configurations that are needed for a
     single race */
 class RaceSetup
@@ -35,6 +37,8 @@ public:
                 track      = 0;
                 numKarts   = -1; // use all available karts
                 numPlayers = 1; 
+		    
+		    kart_choices.resize(4, 0);
         }
         
         RaceMode  mode;
@@ -44,6 +48,8 @@ public:
 	int   track;
 	int   numKarts;
 	int   numPlayers;
+	
+	std::vector<int> kart_choices;
 };
 
 #endif

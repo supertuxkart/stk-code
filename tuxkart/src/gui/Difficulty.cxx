@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.9 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: Difficulty.cxx,v 1.10 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,7 +36,7 @@ Difficulty::Difficulty()
 	
         if (0)
         {
-                if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYQR) != guiStack.end())
+                if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYSR) != guiStack.end())
                 {
                         widgetSet -> state(menu_id, "Number of Laps",  GUI_SML, 0, 0);
                         widgetSet -> state(menu_id, "Reverse Track",  GUI_SML, 0, 0);

@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.10 2004/08/17 22:53:44 grumbel Exp $
+//  $Id: BaseGUI.h,v 1.11 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,8 +28,11 @@ enum GUISwitch
 {
 GUIS_MAINMENU,
 GUIS_CHARSEL,
+GUIS_CHARSELP2,
+GUIS_CHARSELP3,
+GUIS_CHARSELP4,
 GUIS_DIFFICULTYGP,
-GUIS_DIFFICULTYQR,
+GUIS_DIFFICULTYSR,
 GUIS_GAMEMODE,
 GUIS_OPTIONS,
 GUIS_CONFIGCONTROLS,

@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.h,v 1.1 2004/08/10 16:46:29 jamesgregory Exp $
+//  $Id: PlayerControls.h,v 1.2 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,7 +26,7 @@
 class PlayerControls: public BaseGUI
 {
 public:
-	PlayerControls();
+	PlayerControls(int whichPlayer);
 	~PlayerControls();
 	
 	void update(float dt);

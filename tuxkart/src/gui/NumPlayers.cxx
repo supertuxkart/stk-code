@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.5 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: NumPlayers.cxx,v 1.6 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,6 +38,9 @@ NumPlayers::NumPlayers(RaceSetup& raceSetup_)
 NumPlayers::~NumPlayers()
 {
 	widgetSet -> delete_widget(menu_id) ;
+	
+	if (std::find(guiStack.begin(), guiStack.end(), GUIS_GAMEMODE) == guiStack.end())
+		raceSetup.numPlayers = 1;
 }
 	
 void NumPlayers::update(float dt)

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.22 2004/08/19 12:29:16 grumbel Exp $
+//  $Id: World.cxx,v 1.23 2004/08/20 22:32:31 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -121,7 +121,10 @@ World::World(const RaceSetup& raceSetup_)
     KartDriver* newkart;
 
     if ( i < raceSetup.numPlayers )
-      newkart = new KartDriver ( kart_props, i, new PlayerDriver ) ;
+    {
+      int kartIndex = raceSetup.kart_choices[i];
+      newkart = new KartDriver ( kart_manager.karts[kartIndex], i, new PlayerDriver ) ;
+    }
     else if ( network_enabled )
       newkart = new KartDriver ( kart_manager.karts[i], i, new NetworkDriver ) ;
     else

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.65 2004/08/19 12:29:16 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.66 2004/08/20 22:32:31 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -108,7 +108,7 @@ void cmdLineHelp (char* invocation)
 	    "  -N,  --no-start-screen  Quick race\n"
 	    "  -t,  --track n          Start at track number n (see --list-tracks)\n"
             "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
-            "  --kart FILE             Use the kart defined in FILE (.tkkf)\n"
+            "  --kart n             Use kart number n\n"
 	    "  -l,  --list-tracks      Show available tracks.\n"
 	    "  --laps n                Define number of laps to n\n"
 	    "  --players n             Define number of players to either 1, 2 or 4.\n"
@@ -150,9 +150,7 @@ int main ( int argc, char *argv[] )
 	    }
 
 	  else if( (!strcmp(argv[i], "--kart") and argc > 2 ))
-            {
-              kart_props = KartProperties(argv[i+1]);
-            }
+              raceSetup.kart_choices[0] = atoi(argv[i+1]);
 
 	  else if( (!strcmp(argv[i], "--track") or !strcmp(argv[i], "-t")) and argc > 2 )
 	    {

@@ -1,4 +1,4 @@
-//  $Id: CharSel.h,v 1.5 2004/08/17 14:30:35 grumbel Exp $
+//  $Id: CharSel.h,v 1.6 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,8 +36,12 @@ private:
         ssgTransform* kart;
         int current_kart;
         float clock;
+	  
+	int menu_id;
+	int playerIndex;
+	
 public:
-	CharSel();
+	CharSel(int whichPlayer);
 	~CharSel();
 	
         void switch_to_character(int n);
@@ -45,10 +49,7 @@ public:
 	void select();
 	void keybd(const SDL_keysym& key);
 	void point(int x, int y);
-	void stick(int x, int y);
-	
-private:
-	int menu_id;
+	void stick(int x, int y);	
 };
 
 #endif

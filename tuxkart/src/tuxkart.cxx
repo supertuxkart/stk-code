@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.67 2004/08/16 00:17:22 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.68 2004/08/20 22:32:31 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -46,7 +46,6 @@ int finishing_position = -1 ;
 bool use_fake_drift = true; 
 int num_herring   ;
 
-KartProperties kart_props;
 HerringInstance herring [ MAX_HERRING ] ;
 
 SoundSystem  *sound = NULL ;

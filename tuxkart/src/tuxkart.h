@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.38 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: tuxkart.h,v 1.39 2004/08/20 22:32:31 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,9 +56,6 @@ extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
 extern SoundSystem *sound ;
 extern std::vector<GUISwitch> guiStack;
-
-/** The players kart configuration, FIXME: should be part of RaceSetup */
-extern KartProperties kart_props;
 
 void deinitTuxKart();
 

@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.17 2004/08/20 19:29:13 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.18 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,8 +27,10 @@
 #include "KartManager.h"
 #include "preprocessor.h"
 #include "WidgetSet.h"
+#include "StartScreen.h"
 
-CharSel::CharSel()
+CharSel::CharSel(int whichPlayer):
+playerIndex(whichPlayer)
 {
   current_kart = -1;
   switch_to_character(0);
@@ -36,7 +38,9 @@ CharSel::CharSel()
   context = new ssgContext;
 
   menu_id = widgetSet -> vstack(0);
-  widgetSet -> label(menu_id, "Choose a Character", GUI_LRG, GUI_ALL, 0, 0);
+  char output[60];
+  sprintf(output, "Player %d, choose your character", playerIndex + 1);
+  widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
   widgetSet -> space(menu_id);
         
   int ha = widgetSet -> harray(menu_id);
@@ -138,10 +142,37 @@ void CharSel::update(float dt)
 void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
-
+	
 	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
-		kart_props = kart_manager.karts[token];
+		StartScreen::current()->raceSetup.kart_choices[playerIndex] = token;
+	
+	if (StartScreen::current()->raceSetup.numPlayers > 1)
+	{
+		if (guiStack.back() == GUIS_CHARSEL)
+		{
+			guiStack.push_back(GUIS_CHARSELP2); 
+			return;
+		}
+			
+		if (StartScreen::current()->raceSetup.numPlayers > 2)
+		{
+			if (guiStack.back() == GUIS_CHARSELP2)
+			{
+				guiStack.push_back(GUIS_CHARSELP3); 
+				return;
+			}
 
+			if (StartScreen::current()->raceSetup.numPlayers > 3)
+			{
+				if (guiStack.back() == GUIS_CHARSELP3)
+				{
+					guiStack.push_back(GUIS_CHARSELP4); 
+					return;
+				}
+			}	
+		}	
+	}
+	
 	guiStack.push_back(GUIS_TRACKSEL); 
 }
 

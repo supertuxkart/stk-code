@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.13 2004/08/18 09:11:30 grumbel Exp $
+//  $Id: BaseGUI.cxx,v 1.14 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -55,10 +55,19 @@ void updateGUI(RaceSetup& raceSetup)
 				gui = new MainMenu;
 				break;
 			case GUIS_CHARSEL:
-				gui = new CharSel;
+				gui = new CharSel(0);
+				break;
+			case GUIS_CHARSELP2:
+				gui = new CharSel(1);
+				break;
+			case GUIS_CHARSELP3:
+				gui = new CharSel(2);
+				break;
+			case GUIS_CHARSELP4:
+				gui = new CharSel(3);
 				break;
 			case GUIS_DIFFICULTYGP:
-			case GUIS_DIFFICULTYQR:
+			case GUIS_DIFFICULTYSR:
 				gui = new Difficulty;
 				break;
 			case GUIS_GAMEMODE:
@@ -77,10 +86,16 @@ void updateGUI(RaceSetup& raceSetup)
 				gui = new ConfigControls;
 				break;
 			case GUIS_CONFIGP1:
+				gui = new PlayerControls(0);
+				break;
 			case GUIS_CONFIGP2:
+				gui = new PlayerControls(1);
+				break;
 			case GUIS_CONFIGP3:
+				gui = new PlayerControls(2);
+				break;
 			case GUIS_CONFIGP4:
-				gui = new PlayerControls;
+				gui = new PlayerControls(3);
 				break;
 			
 			case GUIS_RACE:

@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.cxx,v 1.1 2004/08/10 16:46:29 jamesgregory Exp $
+//  $Id: PlayerControls.cxx,v 1.2 2004/08/20 22:32:17 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,18 +21,10 @@
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
-PlayerControls::PlayerControls():
+PlayerControls::PlayerControls(int whichPlayer):
+config_index(whichPlayer),
 grabInput(false)
 {
-	if (guiStack.back() == GUIS_CONFIGP1)
-		config_index = 0;
-	else if (guiStack.back() == GUIS_CONFIGP2)
-		config_index = 1;
-	else if (guiStack.back() == GUIS_CONFIGP3)
-		config_index = 2;
-	else if (guiStack.back() == GUIS_CONFIGP4)
-		config_index = 3;
-		
 	menu_id = widgetSet -> harray(0);
 	
 	int change_id = widgetSet -> varray(menu_id);
