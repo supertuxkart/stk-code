@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.33 2004/08/02 13:34:15 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.34 2004/08/02 14:21:18 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -482,7 +482,6 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   loader -> setCreateStateCallback  ( getAppState ) ;
   loader -> setCreateBranchCallback ( process_userdata ) ;
-  ssgSetCurrentOptions (loader);
 
   /* Grab the track centerline file */
 

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.35 2004/08/02 13:03:32 matzebraun Exp $
+//  $Id: start_tuxkart.cxx,v 1.36 2004/08/02 14:21:18 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -206,7 +206,7 @@ static void installMaterial ()
 
   introMaterial = new ssgSimpleState ;
   introMaterial -> setTexture( 
-          loader->createTexture("title_screen.rgb", true, true, false));
+          loader->createTexture("title_screen.png", true, true, false));
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
   introMaterial -> disable     ( GL_LIGHTING  ) ;
   introMaterial -> disable     ( GL_CULL_FACE ) ;
@@ -299,6 +299,8 @@ static void initTuxKart (int width, int height, int videoFlags)
 
   puInit  () ;
   ssgInit () ;
+  ssgSetCurrentOptions(loader);
+  registerImageLoaders();
 
   fnt = new fntTexFont ;
   fnt -> load ( loader->getPath("fonts/sorority.txf").c_str()) ;

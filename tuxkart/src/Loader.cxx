@@ -3,6 +3,8 @@
 #include <dirent.h>
 #include <stdexcept>
 #include <sstream>
+#include <SDL.h>
+#include <SDL_image.h>
 #include "Loader.h"
 
 Loader* loader = 0;
@@ -107,3 +109,53 @@ Loader::listFiles(std::set<std::string>& result, const std::string& dir)
     }
 }
 
+// PNG and JPEG loader (with help of SDL_Image)
+
+bool ssgLoadIMG(const char* fname, ssgTextureInfo* info)
+{
+    SDL_Surface* surface = IMG_Load(fname);
+    if(!surface) {
+        ulSetError(UL_WARNING, "ssgLoadPNG: Failed to load '%s': %s",
+                fname, SDL_GetError());
+        return false;
+    }
+    if(surface->pitch != surface->w * surface->format->BytesPerPixel) {
+        ulSetError(UL_WARNING, "ssgLoadPNG: incompatible surface while "
+                "loading '%s' (pitch mismatch)", fname);
+        return false;
+    }
+
+    if(info != 0) {
+        info->width = surface->w;
+        info->height = surface->h;
+        info->depth = surface->format->BytesPerPixel;
+        info->alpha = surface->format->BytesPerPixel > 3;
+    }
+
+    // create mipmaps
+    int bpp = surface->format->BytesPerPixel;
+
+    // grrr, ssgMakeMipMaps calls delete[] on the data, it also seems to need
+    // the texture upsidedown...
+    size_t datasize = surface->w * surface->h * bpp;
+    GLubyte* data = new GLubyte[datasize];
+    GLubyte* dest = data + surface->pitch * (surface->h - 1);
+    GLubyte* src = (GLubyte*) surface->pixels;
+    for(int i = 0; i < surface->h; ++i) {
+        memcpy(dest, src, surface->pitch);
+        dest -= surface->pitch;
+        src += surface->pitch;
+    }
+        
+    bool result = ssgMakeMipMaps(data, surface->w, surface->h, bpp);
+    SDL_FreeSurface(surface);
+
+    return result;
+}
+
+void registerImageLoaders()
+{
+    ssgAddTextureFormat(".png", ssgLoadIMG);
+    ssgAddTextureFormat(".jpg", ssgLoadIMG);
+    ssgAddTextureFormat(".jpeg", ssgLoadIMG);    
+}
