@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.10 2004/08/01 22:48:18 straver Exp $
+//  $Id: Driver.cxx,v 1.11 2004/08/03 15:12:22 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -78,7 +78,7 @@ void Driver::physicsUpdate ()
 	
 	// rotation angle of wheels
 	if (velocity.xyz[1] == 0)
-		wheel_rot_angle = 0;
+		wheel_rot_angle = steer_angle;
 	else
 		wheel_rot_angle = atan2 (yawspeed, velocity.xyz[1]);
 		
@@ -110,7 +110,7 @@ void Driver::physicsUpdate ()
 	// apply air friction and system friction
 	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * AIR_FRICTION;
 	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * AIR_FRICTION;
-	resistance[0] -= SYSTEM_FRICTION * velocity.xyz[0];
+	resistance[0] -= 10 * SYSTEM_FRICTION * velocity.xyz[0];
 	resistance[1] -= SYSTEM_FRICTION * velocity.xyz[1];
 	
 	// sum forces

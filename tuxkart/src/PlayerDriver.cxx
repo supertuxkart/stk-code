@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.11 2004/08/01 22:48:18 straver Exp $
+//  $Id: PlayerDriver.cxx,v 1.12 2004/08/03 15:12:22 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -73,14 +73,7 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
       sound -> playSfx ( SOUND_BEEP ) ;
       rescue = TRUE ;
     }
-
-    if ( j -> buttons & 2 ) {  /* B == Active Braking */
-      brake = MAX_THROTTLE;
-      throttle = 0.0f;
-    } else {
-      brake = 0.0f;
-    }
-      
+    
     if ( j -> buttons & 1 ) { /* A == Accellerate */
       throttle = MAX_THROTTLE;
     } else if (throttle > 0) {
@@ -88,6 +81,18 @@ void PlayerKartDriver::incomingJoystick  ( JoyInfo *j )
     } else
     	throttle = 0.0f;
 
+    if ( j -> buttons & 2 ) {  /* B == Active Braking */
+      if (velocity.xyz[1] > 0) {
+      	brake = MAX_THROTTLE;
+      	throttle = 0.0f;
+      } else {
+      	brake = 0.0f;
+	throttle = -MAX_THROTTLE/2;
+      }
+    } else {
+      brake = 0.0f;
+    }
+      
     if ( wheelie_angle <= 0.0f ) {      
       steer_angle = -turn_speed * j->data[0];
       if ( steer_angle > MAX_WHEEL_TURN)
