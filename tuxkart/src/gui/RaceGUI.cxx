@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.5 2004/08/08 05:03:42 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,15 +56,6 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	{
 	case SDLK_F12: fpsToggle() ; return;
 	
-	case SDLK_r :
-      {
-        finishing_position = -1 ;
-        for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
-          (*i)->reset() ;
-        return ;
-      }
-      break;
-	
 	case SDLK_w : 
 		if ( isWireframe )
 			glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
@@ -72,8 +63,10 @@ void RaceGUI::keybd(const SDL_keysym& key)
       		glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
       	isWireframe = ! isWireframe ;
 		return ;
-		
+	
+	#ifdef DEBUG
 	case SDLK_z : stToggle () ; return ;
+	#endif
 	
 	case SDLK_ESCAPE:
 		guiStack.push_back(GUIS_RACEMENU);

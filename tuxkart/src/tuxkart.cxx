@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.44 2004/08/08 03:51:55 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.45 2004/08/08 05:03:43 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -584,6 +584,14 @@ void backToSplash()
 {
 	unloadRace();
 	startScreen();
+}
+
+void restartRace()
+{
+  finishing_position = -1 ;
+  
+  for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
+    (*i)->reset() ;
 }
 
 void updateLapCounter ( int k )

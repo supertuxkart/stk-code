@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.24 2004/08/08 03:45:12 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.25 2004/08/08 05:03:43 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -85,6 +85,8 @@ void tuxKartMainLoop () ;
 void backToSplash () ;
 void startScreen() ;
 void shutdown() ;
+void restartRace();
+
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 

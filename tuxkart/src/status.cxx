@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.19 2004/08/07 03:41:14 jamesgregory Exp $
+//  $Id: status.cxx,v 1.20 2004/08/08 05:03:43 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -286,9 +286,6 @@ void drawGameOverText ()
     drawText ( "CONGRATULATIONS"  , 40, 50, 330 ) ;
     drawText ( "YOU WON THE RACE!", 40, 50, 280 ) ;
   }
-
-  if ( timer++ & 16 )
-    drawDropShadowText ( "Press R to replay this track", 15, 10, 30 ) ;
 }
 
 
