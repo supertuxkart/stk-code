@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.11 2004/08/05 09:11:03 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.12 2004/08/05 10:19:49 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -35,6 +35,7 @@ using std::cout;
 Uint8 *keyState = 0;
 SDL_Surface *sdl_screen = 0;
 static jsJoystick *joystick ;
+static SDL_Joystick *joy;
 
 void initVideo(int screenWidth, int screenHeight, bool fullscreen)
 {
@@ -43,7 +44,7 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
   if (fullscreen)
     videoFlags |= SDL_FULLSCREEN;
 
-  if ( SDL_Init(SDL_INIT_VIDEO) == -1 )
+  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1 )
     {
       cout << "SDL_Init() failed: " << SDL_GetError();
       exit(1);
@@ -60,6 +61,17 @@ void initVideo(int screenWidth, int screenHeight, bool fullscreen)
   joystick = new jsJoystick ( 0 ) ;
   joystick -> setDeadBand ( 0, 0.1 ) ;
   joystick -> setDeadBand ( 1, 0.1 ) ;
+  
+  if ( SDL_NumJoysticks() > 0 )
+  	joy = SDL_JoystickOpen( 0 );
+}
+
+void shutdownVideo ()
+{	
+	if ( SDL_JoystickOpened ( 0 ) )
+    		SDL_JoystickClose ( joy );
+		
+	SDL_Quit( );
 }
 
 void pollEvents ()
@@ -106,14 +118,14 @@ void pollEvents ()
             break;
 	  }
 	  if (gui)
-	  	gui -> click (event.button.button, event.button.x, event.button.y );
+	  	gui -> click (event.button.button, event.button.x,  getScreenHeight() - event.button.y );
 	  puMouse ( puButton, puState, event.button.x, event.button.y );
 	  break;
 	}
 	 
 	case SDL_MOUSEMOTION:
 	if (gui)
-	  	gui -> point ( event.motion.x, event.motion.y );
+	  	gui -> point ( event.motion.x, getScreenHeight() - event.motion.y );
 	  puMouse ( event.motion.x, event.motion.y );
 	  break;
 	 
@@ -121,15 +133,19 @@ void pollEvents ()
 		{
 			int x = 0;
 			int y = 0;
-			//FIXME: we have to look at event.jaxis.axis index to find out whether event.jaxis.value is x or y
+			
+			if (event.jaxis.axis == 0)
+				x = event.jaxis.value;
+			else if (event.jaxis.axis == 1)
+				y = event.jaxis.value;
 			if (gui)
-				gui -> stick ( x, y );
+				gui -> stick ( x,  y );
 		}
 		break;
 	  
 	case SDL_JOYBALLMOTION:
 	  if (gui)
-	  	gui -> point ( event.jball.xrel, event.jball.yrel );
+	  	gui -> point ( event.jball.xrel,  getScreenHeight() - event.jball.yrel );
 	  break;
 	  
 	case SDL_QUIT:
