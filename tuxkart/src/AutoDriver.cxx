@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.16 2004/12/09 19:40:46 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.17 2004/12/10 02:05:17 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,7 @@
 #include "KartDriver.h"
 #include "AutoDriver.h"
 
+#include <iostream>
 #include "Track.h"
 #include <math.h>
 
@@ -45,8 +46,8 @@
          kart->getVelocity()->hpr[0] = sgnsq(kart->curr_track_coords[0])*3.0f ;
       else
          kart->getVelocity()->hpr[0] = sgnsq(kart->curr_track_coords[0])*12.0f ;
-   */
    
+   */
    
    
    /*New steering algorithm. We find out which is the next dot that the AI
@@ -61,6 +62,8 @@
    
       next = (kart->track_hint + 1 >= world->track->driveline.size()) ? 0 :
          kart->track_hint + 1;
+         
+      std::cout << kart->getPosition() << "," << next << std::endl;
    
    //2. Calculate the rotation we need using trigonometry, we get the sides
    //of a right triangle where the 2 points that define the hypotenuse are
@@ -87,9 +90,9 @@
          kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
       else //If it's neither, the rotation doesn't jumps the gap
       {
-         if(rotation_direction > 3.5f)
+         if(rotation_direction > 10.0f)
             kart->getVelocity()->hpr[0] = -3.5f * kart->getVelocity()->xyz[1];
-         else if(rotation_direction < -3.5f)
+         else if(rotation_direction < -10.0f)
             kart->getVelocity()->hpr[0] = 3.5f * kart->getVelocity()->xyz[1];
          else
          {
@@ -113,7 +116,7 @@
             kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta * 1.1f ;
          else
             kart->getVelocity()->xyz[1] += MAX_ACCELLERATION * delta ;*/
-         //}
+         //}x
    
       //kart->getVelocity()->xyz[2] -= GRAVITY * delta ;
    
