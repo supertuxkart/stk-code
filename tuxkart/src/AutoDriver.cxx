@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.15 2004/12/09 19:32:20 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.16 2004/12/09 19:40:46 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -101,7 +101,7 @@
       kart->throttle = kart->kart_properties->max_throttle;
    
       /*if (0) // use handicap
-         {
+         {*/
       /* Slow down if we get too far ahead of the player... */
       /*if ( kart->getPosition() < world->getPlayerKart(0)->getPosition () &&
             kart->getVelocity()->xyz[1] > MIN_HANDICAP_VELOCITY )
