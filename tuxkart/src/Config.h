@@ -19,12 +19,13 @@
 #ifndef TUXKART_CONFIG_H
 #define TUXKART_CONFIG_H
 
+#include <string>
 
 /*class for managing general tuxkart configuration data*/
 class Config
 {
 	private:
-		char *filename;
+	        std::string filename;
 
 		void setFilename();
 
@@ -38,13 +39,13 @@ class Config
 		int karts;
 
 		Config();
-		Config(const char *filename);
+		Config(const std::string& filename);
 		~Config();
 		void setDefaults();
 		void loadConfig();
-		void loadConfig(const char *filename);
+		void loadConfig(const std::string& filename);
 		void saveConfig();
-		void saveConfig(const char *filename);
+		void saveConfig(const std::string& filename);
 };
 
 

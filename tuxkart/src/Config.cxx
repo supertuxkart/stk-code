@@ -32,7 +32,7 @@ Config::Config()
 }
 
 
-Config::Config(const char *filename)
+Config::Config(const std::string& filename)
 {
 	setDefaults();
 	loadConfig(filename);
@@ -41,7 +41,6 @@ Config::Config(const char *filename)
 
 Config::~Config()
 {
-	delete filename;
 }
 
 
@@ -50,21 +49,14 @@ void Config::setFilename()
 {
 #ifdef WIN32
 	/*creates config file in current working directory*/
-	filename = new char[strlen("tuxkart.cfg")];
-	strcpy(filename, "tuxkart.cfg");
+	filename = "tuxkart.cfg";
 #else
 	/*if HOME environment variable exists
 	create config file as $HOME/.tuxkart/config*/
 	if(getenv("HOME")!=NULL)
 	{
-		filename = new char[strlen(getenv("HOME")) + strlen("/.tuxkart/config")];
-		/*FIXME: .tuxkart directory is not guaranteed to exist*/
-		sprintf(filename, "%s/.tuxkart/config", getenv("HOME"));
-	}
-	else
-	{
-		/*effectively eliminate config file reading/writing*/
-		filename[0]='\0';
+		filename = getenv("HOME");
+                filename += "/.tuxkart/config";
 	}
 #endif
 }
@@ -92,14 +84,15 @@ void Config::loadConfig()
 
 
 /*load configuration values from file*/
-void Config::loadConfig(const char *filename)
+void Config::loadConfig(const std::string& filename)
 {
 	/*make sure file exists/is readable*/
-	FILE *file = fopen(filename, "r");
+	FILE *file = fopen(filename.c_str(), "r");
 	if(file) 
 	{
+                fclose(file);
 
-		LispReader* config = LispReader::load(filename, "tuxkart-config");
+		LispReader* config = LispReader::load(filename.c_str(), "tuxkart-config");
 		LispReader reader(config->get_lisp());
 
 		/*get toggles*/
@@ -127,12 +120,13 @@ void Config::saveConfig()
 
 /*write settings to config file
 returns 0 on success, -1 on failure.*/
-void Config::saveConfig(const char *filename)
+void Config::saveConfig(const std::string& filename)
 {
-	FILE *config = fopen(filename, "w");
+	FILE *config = fopen(filename.c_str(), "w");
 
 	if(config)
 	{
+                fclose(config);
 		fprintf(config, "(tuxkart-config\n");
 
 		fprintf(config, "\t;; the following options can be set to #t or #f:\n");
