@@ -20,7 +20,7 @@ dnl check for OpenGL related libraries
 
 AC_CHECK_HEADER(windows.h, AC_DEFINE(WIN32))
 
-if test "x$ac_cv_header_windows_h" != "xyes" ; then
+if test "x$ac_cv_header_windows_h" = "xno" ; then
 
   dnl Check for X11
 
@@ -31,22 +31,14 @@ if test "x$ac_cv_header_windows_h" != "xyes" ; then
   dnl Reasonable stuff non-windoze variants ... :-)
 
   AC_CHECK_LIB(GL, glNewList,,,$x_suffix)
+
   if test "x$ac_cv_lib_GL_glNewList" = "xno" ; then
     dnl if no GL, check for MesaGL
     AC_CHECK_LIB(MesaGL, glNewList,,,$x_suffix)
   fi
 
-  dnl if using mesa, check for xmesa.h
-  if test "x$ac_cv_lib_MesaGL_glNewList" = "xyes" ; then
-    AC_CHECK_HEADER(GL/xmesa.h)
-    AM_CONDITIONAL(ENABLE_XMESA_FX, \
-                test "x$ac_cv_header_GL_xmesa_h" = "xyes")
-  else
-    dnl force a failed check
-    AM_CONDITIONAL(ENABLE_XMESA_FX, test "no" = "yes")
-  fi
-
   AC_CHECK_LIB(GLU, gluLookAt,,,$x_suffix)
+
   if test "x$ac_cv_lib_GLU_gluLookAt" = "xno" ; then
     dnl if no GLU, check for MesaGLU
     AC_CHECK_LIB(MesaGLU, gluLookAt,,,$x_suffix)
@@ -57,12 +49,21 @@ if test "x$ac_cv_header_windows_h" != "xyes" ; then
   dnl check for glut
   AC_CHECK_LIB(glut, glutGetModifiers,,,$opengl_LIBS)
 
+  if test "x$ac_cv_lib_glut_glutGetModifiers" = "xno" ; then
+    dnl if no GLUT, check for freeglut
+    AC_CHECK_LIB(freeglut, glutGetModifiers,,,$opengl_LIBS)
+  fi                                                                            
+
   LIBS="$plib_suffix $LIBS $x_suffix"
+
 else
+
   dnl CygWin under Windoze.
 
   LIBS="$plib_suffix $LIBS -lm -lwinmm -lglut32 -lglu32 -lopengl32 -luser32 -lgdi32"
+
 fi
+
 
 
 dnl Check SGI audio library
@@ -78,7 +79,7 @@ dnl Checks for header files.
 
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(GL/gl.h GL/glut.h)
+AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glut.h)
 AC_CHECK_HEADER(windows.h, AC_DEFINE(WIN32))
 AC_CHECK_HEADER(joystick.h, AC_DEFINE(JOYSTICK_IS_PRESENT))
 AC_CHECK_HEADER(linux/joystick.h, AC_DEFINE(LINUX_JOYSTICK_IS_PRESENT))
