@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.42 2004/08/05 23:01:03 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.43 2004/08/06 00:39:44 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,9 @@
 #include "sound.h"
 #include "Loader.h"
 
+#include <vector>
+#include <string>
+
 
 /***********************************\
 *                                   *
@@ -32,11 +35,10 @@
 *                                   *
 \***********************************/
 
-#define MAX_TRACKS 100
 
 static ssgSimpleState *introMaterial    ;
-static char           *trackNames    [ MAX_TRACKS ] ;
-static char           *trackIdents   [ MAX_TRACKS ] ;
+std::vector<std::string> trackIdents ;
+std::vector<std::string> trackNames ;
 
 
 void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers)
@@ -139,8 +141,10 @@ static std::string loadTrackDescription(const std::string& mapfile)
     buf[0] = 0;
   
   fclose(file);
-
-  return std::string(buf);  
+	
+  string ret =  buf;
+  ret = ret.substr(0, ret.find('\n'));
+  return ret;
 }
 
 static void loadTrackList ()
@@ -157,19 +161,15 @@ static void loadTrackList ()
       continue;
    
     std::string trackName = i->substr(0, i->size()-6);
-    trackIdents[t] = new char[trackName.size() + 1];
-    strcpy(trackIdents[t], trackName.c_str());
+    trackIdents.push_back(trackName);
 
     std::string description = loadTrackDescription(trackName);
-    trackNames[t] = new char[description.size() + 1];
-    strcpy(trackNames[t], description.c_str());
+    trackNames.push_back(description);
 
     ++t;
     if(t >= MAX_TRACKS-1)
       break;
   }
-  trackNames[t] = 0;
-  trackIdents[t] = 0;
 }
 
 /* Initialize the datadir */
@@ -314,12 +314,10 @@ int main ( int argc, char *argv[] )
 	      loadTrackList () ;
 
 	      fprintf ( stdout, "  Available tracks:\n" );
-	      for (int i = 0; i < MAX_TRACKS; i++)
-		{
-		  if ( trackNames[i] != '\0' )
-		       fprintf ( stdout, "\t%d: %s", i, trackNames[i] );
-		}
-	      fprintf ( stdout, "\n" );
+	      for (uint i = 0; i != trackNames.size(); i++)
+		       fprintf ( stdout, "\t%d: %s", i, trackNames[i].c_str() );
+	      
+		fprintf ( stdout, "\n" );
 
 	      return 0;
 	    }

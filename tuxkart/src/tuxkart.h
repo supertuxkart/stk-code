@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.21 2004/08/05 22:56:26 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.22 2004/08/06 00:39:44 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -62,6 +62,8 @@ extern SoundSystem *sound ;
 extern Track       *track ;
 extern Level        level ;
 extern ulClock     *fclock ;
+#define MAX_TRACKS 100
+extern std::vector<std::string> trackNames ;
 
 extern int      game_state ;
 
@@ -100,7 +102,7 @@ extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 extern void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers);
 
 extern int tuxkartMain ( int nl, int mirror, int reverse, 
-                         char *track, int numPlayers, int numKarts ) ;
+                         std::string& track, int numPlayers, int numKarts ) ;
 
 
 #endif

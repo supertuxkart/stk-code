@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.39 2004/08/05 22:56:26 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.40 2004/08/06 00:39:44 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -58,7 +58,7 @@ int num_herring   ;
 int num_laps_in_race ;
 
 char playersfname [ 256 ] ;
-char *trackname = "tuxtrack" ;
+const char *trackname = "tuxtrack" ;
 
 HerringInstance herring [ MAX_HERRING ] ;
 
@@ -383,7 +383,7 @@ static void banner ()
 
 
 int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
-                  char *_levelName, int numPlayers, int numKarts )
+                  std::string& _levelName, int numPlayers, int numKarts )
 {
   /* Say "Hi!" to the nice user. */
 
@@ -395,7 +395,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   mirror           = _mirror     ;
   reverse          = _reverse    ;
   num_laps_in_race = _numLaps    ;
-  trackname        = _levelName  ;
+  trackname        = _levelName.c_str()  ;
   
   /* Network initialisation -- NOT WORKING YET */
 
