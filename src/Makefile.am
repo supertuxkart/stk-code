@@ -54,8 +54,6 @@ supertuxkart_SOURCES = \
   WidgetSet.h  \
   widget_image.cxx \
   widget_image.h \
-  isect.cxx  \
-  isect.h  \
   joystick.h  \
   material.cxx  \
   material.h  \
