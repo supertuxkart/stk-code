@@ -5,7 +5,7 @@ AC_PREREQ([2.54])
 AC_INIT(src/tuxkart.cxx)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(tuxkart, 0.4.0)
+AM_INIT_AUTOMAKE(supertuxkart, 0.0.0)
 
 dnl Checks for programs.
 AC_PROG_CC

@@ -2,16 +2,11 @@
 
 bindir=$(prefix)/games
 
-bin_PROGRAMS = tuxkart
+bin_PROGRAMS = supertuxkart
 
-if HAVE_LIBSDL
-VIDEO_FILES = sdldrv.cxx sdldrv.h
-else
-VIDEO_FILES = pwdrv.cxx pwdrv.h
-endif
-
-tuxkart_SOURCES = \
-  $(VIDEO_FILES) \
+supertuxkart_SOURCES = \
+  sdldrv.cxx \
+  sdldrv.h \
   AutoDriver.cxx  \
   Camera.cxx  \
   Camera.h  \
@@ -64,13 +59,11 @@ tuxkart_SOURCES = \
   joystick.h  \
   material.cxx  \
   material.h  \
-  plibwrap.h \
   preprocessor.cxx  \
   preprocessor.h  \
   sound.cxx  \
   sound.h  \
   start_tuxkart.cxx  \
-  start_tuxkart.h  \
   StringUtils.h \
   StringUtils.cxx \
   SkidMark.h \

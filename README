@@ -1,64 +1,10 @@
+SuperTuxKart
+============
 
-TuxKart.
-~~~~~~~~
-                           by Steve Baker
-                           <sjbaker1@airmail.net>
-                           http://www.sjbaker.org
-
-INSTALLATION:
-~~~~~~~~~~~~~
-Installation instructions are pretty basic,
-and are covered in detail in the documentation directory 'doc',
-and in the file INSTALL or online at http://tuxkart.sf.net 
-
-First, make sure that you have the following packages installed:
-
-    * OpenGL (or Mesa 3.0 or later)
-    * PLIB version 1.8.0 or later . 
-
-Optionally, for fullscreen play you also need:
-
-	* SDL version 1.2.4 or later
-
-Unpack the files from the tarball like this:
-
-  tar xzf tuxkart-*.tar.gz
-  cd tuxkart-*
-
-
-(where '*' is the version of TuxKart you downloaded - eg 0.4.0) ...and then:
-
-  ./configure
-  make
-
-You can run the game from the directory you downloaded it into - or (as 'root') you can install it into /usr/local/share/games/tuxkart by typing;
-
- make install
-
-
-BUT IT DIDN'T WORK!
-~~~~~~~~~~~~~~~~~~~
-
-The most common (by FAR) reason for problems is that your OpenGL/Mesa
-is incorrectly installed - so before you complain to any of the PLIB
-or TuxKart mailing lists, first try running one of the example programs
-that comes with your OpenGL implementation - or one of the Mesa or GLUT
-sample programs.
-
-If you those examples run OK - then go to the PLIB home page and download
-the PLIB examples.
-
-If THOSE run correctly - but TuxKart doesn't then please get in touch with
-the TuxKart mailing list and we'll do our best to get you up and racing.
-
-STARTING THE GAME:
-
-Just 'cd' into the download directory and run './src/tuxkart', or run
-'/usr/local/games/tuxkart' if you did a 'make install'.
-
-Select the number of laps and which course you'd like to race on then
-click 'start game' to get going.
-
+SuperTuxKart is a free kart racing gaming featuring Tux and his
+friends covered under the GNU GPL (see COPYING for details). It is
+based on TuxKart by Steve Baker, but contains improved graphics and
+userinterface.
 
 PLAYING THE GAME:
 
@@ -73,8 +19,8 @@ Ideally, you need a 'gamepad' style joystick with at least six buttons:
   L button - Pop a wheelie (if you are going fast enough).
   R button - Jump.
 
-
-In addition, you can drive from the keyboard. The controls are changeable from the in-game options menu, but the defaults are:
+In addition, you can drive from the keyboard. The controls are
+changeable from the in-game options menu, but the defaults are:
 
   LEFT/RIGHT ARROW: Steer.
 
@@ -102,15 +48,17 @@ There are also some debug functions left in for developers:
 
 From the Menu bar, you can turn sound effects and music on and off,
 enable or disable the 'mousetrap' (which keeps the mouse in the window
-to stop you accidentally losing the mouse pointer on Voodoo-1/2 hardware)
+to stop you accidentally losing the mouse pointer on Voodoo-1/2
+hardware)
 
 On the tracks, you'll find Red, Silver and Gold Herring (Yum - good!),
-and Green Herring (Yuk - bad!) - also arrow-shaped red and black 'zippers'
-that give you a quick speedup.
+and Green Herring (Yuk - bad!) - also arrow-shaped red and black
+'zippers' that give you a quick speedup.
 
-Use the 'rescue' key if you crash and can't get back onto the track. It's
-sometimes activated automatically if (for example) you get stuck in hot
-lava. TinyTux will lift your cart up and put it back onto the track.
+Use the 'rescue' key if you crash and can't get back onto the track.
+It's sometimes activated automatically if (for example) you get stuck
+in hot lava. TinyTux will lift your cart up and put it back onto the
+track.
 
 
 POWERUPS:
@@ -210,3 +158,4 @@ mods    -- Music files - in 'mod' format.
 models  -- 3D models - in '.ac' format.
 
 
+# EOF #
