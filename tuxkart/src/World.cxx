@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.5 2004/08/11 12:33:17 grumbel Exp $
+//  $Id: World.cxx,v 1.6 2004/08/11 22:05:46 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,7 +25,6 @@
 #include "KartDriver.h"
 #include "WidgetSet.h"
 #include "tuxkart.h"
-#include "status.h"
 #include "Loader.h"
 #include "material.h"
 #include "World.h"
@@ -90,7 +89,6 @@ World::World(const RaceSetup& raceSetup_)
 #endif
 
   initMaterials     () ;
-  initStatusDisplay () ;
 
   /* Set the SSG loader options */
 
@@ -220,12 +218,12 @@ World::~World()
   
   //FIXME:
   //deinitMaterials     () ;
-  //deinitStatusDisplay () ;
+  //the destructor of RaceGUI;
   
 delete fclock ;
 
 #ifdef ENABLE_NETWORKING
-  //FIXME: disconnect from network as we ran net->connect ( argv[i] ) ;
+  net->disconnect ( argv[i] ) ;
 #endif  
   delete net ;
 }
@@ -262,7 +260,6 @@ World::update()
 
   pollEvents();
   kartInput (raceSetup) ;
-  drawStatusText (raceSetup) ;
   updateGUI(raceSetup);
   sound    -> update () ;
 

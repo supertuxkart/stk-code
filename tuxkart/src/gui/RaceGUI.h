@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: RaceGUI.h,v 1.3 2004/08/11 22:05:43 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,11 @@
 #define HEADER_RACEGUI_H
 
 #include "BaseGUI.h"
+#include "material.h"
+#include <plib/fnt.h>
+
+#define MAX_STRING          30
+#define MAX_STRING_LENGTH  256
 
 class RaceGUI: public BaseGUI
 {
@@ -35,10 +40,51 @@ public:
 	void point(int x, int y) { (void)x; (void)y; }
 	void stick(int x, int y) { (void)x; (void)y; }
 	
-private:
+private:	
 	void drawFPS();
 	
 	int fps_id;
+	bool show_fps;	
+	
+	Material *herringbones_gst ;
+	Material *herring_gst ;
+	Material *fuzzy_gst ;
+	Material *spark_gst ;
+	Material *missile_gst ;
+	Material *flamemissile_gst ;
+	Material *magnet_gst ;
+	Material *zipper_gst ;
+	
+	double time_left ;
+	
+	void drawStatusText (const RaceSetup& raceSetup);
+	void drawPartlyDigestedHerring ( float state );
+	void drawCollectableIcons ();
+	void drawEmergencyText ();
+	void drawPlayerIcons ();
+	void drawGameRunningText (const RaceSetup& raceSetup);
+	void drawGameOverText ();
+	void drawMap ();
+	void drawScore (const RaceSetup& raceSetup);
+	void drawTimer ();
+	void drawDropShadowText ( char *str, int sz, int x, int y );
+	void drawInverseDropShadowText ( char *str, int sz, int x, int y );
+	void drawText ( char *str, int sz, int x, int y );
+	
+	char *pos_string [10];
+	
+	//debugging arrays and functions, never actually get used for anything at the moment
+	void stToggle ();
+	void stPrintf ( char *fmt, ... );
+	void drawStatsText () ;
+	bool stats_enabled ;
+	float tt[6] ;
+	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
+	int  next_string ;
+	
+	//FIXME: these probably want changing to use SDL_ttf
+	fntRenderer *text ;
+	fntTexFont *oldfont ;
 };
 #endif
 

@@ -63,8 +63,6 @@ tuxkart_SOURCES = \
   start_tuxkart.h  \
   StringUtils.h \
   StringUtils.cxx \
-  status.cxx  \
-  status.h  \
   Shadow.h \
   Shadow.cxx \
   tuxkart.cxx  \

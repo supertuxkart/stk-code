@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.65 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.66 2004/08/11 22:05:46 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,6 @@
 #include "Shadow.h"
 #include "isect.h"
 
-#include "status.h"
 #include "Camera.h"
 #include "level.h"
 #include "WidgetSet.h"
