@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.1 2004/08/04 16:34:31 jamesgregory Exp $
+//  $Id: MainMenu.cxx,v 1.2 2004/08/05 10:21:21 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,9 +24,11 @@
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> label(menu_id, "label", GUI_SML, GUI_ALL, gui_yel, gui_red);
-	widgetSet -> start(menu_id, "start",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "state",  GUI_SML, 0, 0);
+	widgetSet -> start(menu_id, "start",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "state1",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "state2",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "state3",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "state4",  GUI_MED, 0, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -52,13 +54,11 @@ void MainMenu::click(int button, int x, int y)
 
 void MainMenu::point(int x, int y)
 {
-	(void)x;
-	(void)y;
+	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
 }
 
 void MainMenu::stick(int x, int y)
 {
-	(void)x;
-	(void)y;
+	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }
 
