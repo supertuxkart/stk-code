@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.7 2004/08/19 12:29:17 grumbel Exp $
+//  $Id: Difficulty.cxx,v 1.8 2004/08/20 18:37:45 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,7 @@ Difficulty::Difficulty()
 {
         menu_id = widgetSet -> vstack(0);
 
-        widgetSet -> label(menu_id, "Chose a Difficulty", GUI_LRG, GUI_ALL, 0, 0);
+        widgetSet -> label(menu_id, "Choose a Difficulty", GUI_LRG, GUI_ALL, 0, 0);
 
 	int va = widgetSet -> varray(menu_id);
 	widgetSet -> start(va, "Easy",  GUI_MED, MENU_EASY, 0);
