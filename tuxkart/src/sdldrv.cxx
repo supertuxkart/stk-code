@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.37 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: sdldrv.cxx,v 1.38 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -101,7 +101,7 @@ void pollEvents ()
 		{
 			for (int i = 0; i != 4; ++i)
 			{
-				if ( event.key.keysym.sym == config.player[i].keys[CD_KEYBOARD][KC_FIRE] )
+				if ( event.key.keysym.sym == config.player[i].keys[KC_FIRE] )
 				{
 					gui -> select();
 					break;
@@ -127,16 +127,10 @@ void pollEvents ()
 	  	break;
 	 
 	 case SDL_JOYAXISMOTION:
+		if (gui)
 		{
-			int x = 0;
-			int y = 0;
-			
-			if (event.jaxis.axis == 0)
-				x = event.jaxis.value;
-			else if (event.jaxis.axis == 1)
-				y = event.jaxis.value;
-			if (gui)
-				gui -> stick ( x,  y );
+			if (event.jaxis.axis == 0 || event.jaxis.axis == 1)
+				gui -> stick ( event.jaxis.axis,  event.jaxis.value );
 		}
 		break;
 	  
@@ -183,15 +177,15 @@ void kartInput(RaceSetup& raceSetup)
 			ji.fire    = SDL_JoystickGetButton (joys[i], 5);
 		}
 		
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_LEFT] ] )  ji.lr = -1.0f ;
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_RIGHT] ] ) ji.lr =  1.0f ;
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_UP] ] )    ji.accel = true ;
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_DOWN] ] )  ji.brake = true ;
+		if ( keyState [ plyr.keys[KC_LEFT] ] )  ji.lr = -1.0f ;
+		if ( keyState [ plyr.keys[KC_RIGHT] ] ) ji.lr =  1.0f ;
+		if ( keyState [ plyr.keys[KC_UP] ] )    ji.accel = true ;
+		if ( keyState [ plyr.keys[KC_DOWN] ] )  ji.brake = true ;
 		
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_WHEELIE] ] ) ji.wheelie = true ;
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_JUMP] ] )    ji.jump = true ;
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_RESCUE] ] )  ji.rescue = true ;	
-		if ( keyState [ plyr.keys[CD_KEYBOARD][KC_FIRE] ] )    ji.fire = true ;
+		if ( keyState [ plyr.keys[KC_WHEELIE] ] ) ji.wheelie = true ;
+		if ( keyState [ plyr.keys[KC_JUMP] ] )    ji.jump = true ;
+		if ( keyState [ plyr.keys[KC_RESCUE] ] )  ji.rescue = true ;	
+		if ( keyState [ plyr.keys[KC_FIRE] ] )    ji.fire = true ;
 	
 		PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->getPlayerKart(i)->getDriver());
                 if (driver)

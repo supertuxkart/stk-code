@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.13 2004/08/25 13:26:13 grumbel Exp $
+//  $Id: WidgetSet.cxx,v 1.14 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -1493,7 +1493,7 @@ int WidgetSet::stick_U(int id, int dd)
 }
 
 
-int WidgetSet::stick(int id, int x, int y)
+int WidgetSet::stick(int id, int whichAxis, int value)
 {
     /* Flag the axes to prevent uncontrolled scrolling. */
 
@@ -1503,21 +1503,26 @@ int WidgetSet::stick(int id, int x, int y)
     int jd = 0;
 
     /* Find a new active widget in the direction of joystick motion. */
-    /* Reset flag when x is 0 to support digital sticks/pads */
-    if (!x || -JOY_MID <= x && x <= +JOY_MID)
-        xflag = 1;
-    else if (x < -JOY_MID && xflag && (jd = stick_L(id, active)))
-        xflag = 0;
-    else if (x > +JOY_MID && xflag && (jd = stick_R(id, active)))
-        xflag = 0;
-
-    /* Reset flag when y is 0 to support digital sticks/pads */
-    if (!y || -JOY_MID <= y && y <= +JOY_MID)
-        yflag = 1;
-    else if (y < -JOY_MID && yflag && (jd = stick_U(id, active)))
-        yflag = 0;
-    else if (y > +JOY_MID && yflag && (jd = stick_D(id, active)))
-        yflag = 0;
+    
+    if (whichAxis == 0)
+    {
+        if (-JOY_MID <= value && value <= +JOY_MID)
+            xflag = 1;
+        else if (value < -JOY_MID && xflag && (jd = stick_L(id, active)))
+            xflag = 0;
+        else if (value > +JOY_MID && xflag && (jd = stick_R(id, active)))
+            xflag = 0;
+    }
+    
+    else //whichAxis must equal 1
+    {
+        if (-JOY_MID <= value && value <= +JOY_MID)
+            yflag = 1;
+        else if (value < -JOY_MID && yflag && (jd = stick_U(id, active)))
+            yflag = 0;
+        else if (value > +JOY_MID && yflag && (jd = stick_D(id, active)))
+            yflag = 0;
+    }
 
     /* If the active widget has changed, return the new active id. */
 

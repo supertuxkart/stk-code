@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.h,v 1.3 2004/08/29 19:50:46 oaf_thadres Exp $
+//  $Id: PlayerControls.h,v 1.4 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,7 +36,6 @@ public:
 	void stick(int x, int y);
 	
 private:
-	int menu_id;
 	int grab_id;
 	int config_index;
 	bool grabInput;

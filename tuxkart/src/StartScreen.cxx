@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.11 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: StartScreen.cxx,v 1.12 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -69,12 +69,12 @@ StartScreen::update()
   glEnd () ;
 
   glFlush();
-	
+  
   // Swapbuffers - and off we go again...
   pollEvents() ;
   updateGUI();
   swapBuffers();
-
+  
   if(guiStack.empty())
     screenManager->abort();
 }

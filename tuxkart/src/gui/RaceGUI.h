@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.16 2004/09/07 12:44:38 jamesgregory Exp $
+//  $Id: RaceGUI.h,v 1.17 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -60,9 +60,9 @@ public:
 	void select() {}
 	void keybd(const SDL_keysym& key);
 	void point(int x, int y) { (void)x; (void)y; }
-	void stick(int x, int y) { (void)x; (void)y; }
+	void stick(int whichAxis, int value) { (void)whichAxis; (void)value; }
 	
-private:	
+private:
 	void drawFPS();
 	
 	int fps_id;

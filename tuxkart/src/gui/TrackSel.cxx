@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.22 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: TrackSel.cxx,v 1.23 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -104,16 +104,6 @@ void TrackSel::keybd(const SDL_keysym& key)
 		guiStack.pop_back();
 	default: break;
 	}
-}
-
-void TrackSel::point(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
-}
-
-void TrackSel::stick(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id: RaceMenu.h,v 1.1 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: RaceMenu.h,v 1.2 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,11 +31,6 @@ public:
 	void update(float dt);
 	void select();
 	void keybd(const SDL_keysym& key);
-	void point(int x, int y);
-	void stick(int x, int y);
-	
-private:
-	int menu_id;
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.9 2004/08/29 00:55:30 jamesgregory Exp $
+//  $Id: NumPlayers.cxx,v 1.10 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -84,13 +84,4 @@ void NumPlayers::keybd(const SDL_keysym& key)
 	}
 }
 
-void NumPlayers::point(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
-}
-
-void NumPlayers::stick(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
-}
 

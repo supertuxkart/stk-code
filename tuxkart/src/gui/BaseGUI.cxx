@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.20 2004/09/05 20:09:59 matzebraun Exp $
+//  $Id: BaseGUI.cxx,v 1.21 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,7 @@
 #include "ScreenManager.h"
 #include "StartScreen.h"
 #include "RaceMenu.h"
+#include "WidgetSet.h"
 
 void updateGUI()
 {
@@ -108,6 +109,7 @@ void updateGUI()
                                 break;
                         }
 		}
+		
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts
 		SDL_ShowCursor(SDL_DISABLE);
 	}
@@ -121,4 +123,15 @@ void updateGUI()
 	then = now;
 }
 
-/*---------------------------------------------------------------------------*/
+void BaseGUI::point(int x, int y)
+{
+	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
+}
+
+void BaseGUI::stick(int whichAxis, int value)
+{
+	widgetSet -> pulse(widgetSet -> stick(menu_id, whichAxis, value), 1.2f);
+}
+
+
+

@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.14 2004/08/24 21:01:45 grumbel Exp $
+//  $Id: GameMode.cxx,v 1.15 2004/09/08 15:00:05 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -91,13 +91,4 @@ void GameMode::keybd(const SDL_keysym& key)
 	}
 }
 
-void GameMode::point(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
-}
-
-void GameMode::stick(int x, int y)
-{
-	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
-}
 

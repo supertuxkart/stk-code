@@ -1,4 +1,4 @@
-// $Id: Player.h,v 1.1 2004/09/01 02:21:24 oaf_thadres Exp $
+// $Id: Player.h,v 1.2 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,7 +30,6 @@ enum KartControl { KC_LEFT,
                    KC_JUMP,
                    KC_RESCUE,
                    KC_FIRE };
-enum ControlDevice { CD_KEYBOARD, CD_JOYSTICK };
 
 /*class for managing player name and control configuration*/
 class Player
@@ -39,12 +38,13 @@ class Player
     std::string name;
     bool useJoy;    //player is using a joystick
     int joystick;   //which joystick device belongs to player
-    int keys[2][8]; //keyboard keymap and joystick button map
+    int keys[8]; //keyboard keymap and joystick button map
+    int buttons[8];
 
     Player();
     Player(const std::string &name);
     void setName(const std::string &name);
-    void setKeys(enum ControlDevice device,
+    void setKeys(bool joystick,
                  int left,
                  int right,
                  int up,
@@ -53,7 +53,8 @@ class Player
                  int jump,
                  int rescue,
                  int fire);
-    void setKey(enum ControlDevice device, enum KartControl action, int button);
+    void setKey(KartControl action, int key);
+    void setButton(KartControl action, int button);
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.8 2004/08/22 22:22:58 oaf_thadres Exp $
+//  $Id: WidgetSet.h,v 1.9 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -194,7 +194,7 @@ public:
 	int  point(int, int x, int y);	
 	
 	/* joystick movement */
-	int  stick(int, int xrel, int yrel);
+	int  stick(int, int whichAxis, int value);
 	
 	/* keyboard cursors */
 	int cursor(int id, SDLKey key);

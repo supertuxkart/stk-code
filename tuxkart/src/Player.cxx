@@ -1,4 +1,4 @@
-// $Id: Player.cxx,v 1.1 2004/09/01 02:21:24 oaf_thadres Exp $
+// $Id: Player.cxx,v 1.2 2004/09/08 15:00:06 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,9 +37,9 @@ Player::setName(const std::string &name)
   Player::name=name;
 }
 
-
+//FIXMEJAMES: never used???
 void
-Player::setKeys(enum ControlDevice device,
+Player::setKeys(bool joystick,
                      int left,
                      int right,
                      int up,
@@ -49,22 +49,35 @@ Player::setKeys(enum ControlDevice device,
                      int rescue,
                      int fire)
 {
-  keys[device][KC_LEFT]    = left;
-  keys[device][KC_RIGHT]   = right;
-  keys[device][KC_UP]      = up;
-  keys[device][KC_DOWN]    = down;
-  keys[device][KC_WHEELIE] = wheelie;
-  keys[device][KC_JUMP]    = jump;
-  keys[device][KC_RESCUE]  = rescue;
-  keys[device][KC_FIRE]    = fire;
+	if (joystick) {
+		buttons[KC_LEFT]    = left;
+		buttons[KC_RIGHT]   = right;
+		buttons[KC_UP]      = up;
+		buttons[KC_DOWN]    = down;
+		buttons[KC_WHEELIE] = wheelie;
+		buttons[KC_JUMP]    = jump;
+		buttons[KC_FIRE]    = fire;
+	}
+	else {
+		keys[KC_LEFT]    = left;
+		keys[KC_RIGHT]   = right;
+		keys[KC_UP]      = up;
+		keys[KC_DOWN]    = down;
+		keys[KC_WHEELIE] = wheelie;
+		keys[KC_JUMP]    = jump;
+		keys[KC_RESCUE]  = rescue;
+		keys[KC_FIRE]    = fire;
+  }
 }
 
-
-/*associate a key or joystick button w/ an action*/
-void
-Player::setKey(enum ControlDevice device, enum KartControl action, int button)
+void Player::setKey(KartControl action, int key)
 {
-  keys[device][action]=button;
+  keys[action]=key;
+}
+
+void Player::setButton(KartControl action, int button)
+{
+  buttons[action]=button;
 }
 
 /*EOF*/
