@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.18 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: Driver.h,v 1.19 2004/08/08 10:43:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -57,17 +57,7 @@ class Shadow;
 #define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
 
 /* Start - New Physics Constants */
-#define MAX_THROTTLE 100
-#define ENGINE_POWER 60 	/* Newton */
-#define MAX_WHEEL_TURN (M_PI/2)	/* Radians */
-#define TURN_SPEED (M_PI)	/* Radians per Second */
-#define KART_MASS 90		/* Kilograms */
-#define KART_INERTIA 13
-#define AIR_FRICTION 0.8257
 #define SYSTEM_FRICTION 4.8
-#define CORN_F -7.2		/* Cornering stiffness - front */
-#define CORN_R -5.0		/* Cornering stiffness - rear */
-#define MAX_GRIP 4.0		/* maximum wheel force */
 /* End - New Physics Constants */
 
 #define MAX_ACCELLERATION       ( MAX_NATURAL_VELOCITY * 0.3f )
@@ -127,16 +117,6 @@ protected:
   float throttle;
   float brake;
   
-  // debug physics
-  float mass;
-  float inertia;
-  float corn_f;
-  float corn_r;
-  float max_grip;
-  float turn_speed;
-  
-  /* End - New Physics */
-
   /** Complete model, including shadow */
   ssgBranch    *comp_model;
 

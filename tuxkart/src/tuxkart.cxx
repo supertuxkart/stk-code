@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.46 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.47 2004/08/08 10:43:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -101,7 +101,6 @@ Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
 ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
-
 
 void load_players ( )
 {

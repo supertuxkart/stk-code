@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.16 2004/08/08 06:07:36 grumbel Exp $
+//  $Id: Driver.cxx,v 1.17 2004/08/08 10:43:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,7 @@
 #include "sound.h"
 #include "Shadow.h"
 #include "Driver.h"
+#include "KartProperties.h"
 
 #define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
 #define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
@@ -52,16 +53,7 @@ Driver::Driver ( )
   sgZeroVec3 (acceleration);
   sgZeroVec3 (force);
   steer_angle = throttle = brake = 0.0f;
-    
-  // debug physics
-  mass = KART_MASS;
-  inertia = KART_INERTIA;
-  corn_r = CORN_R;
-  corn_f = CORN_F;
-  max_grip = MAX_GRIP;
-  turn_speed = TURN_SPEED;    
-  /* End New Physics */
-
+  
   sgZeroVec3 ( reset_pos.xyz ) ; sgZeroVec3 ( reset_pos.hpr ) ;
   reset () ;
 }
@@ -208,23 +200,23 @@ void Driver::physicsUpdate ()
 	sideslip_r = sideslip - wheel_rot_angle;
 	
 	/*----- Lateral Forces -----*/
-	lateral_f[0] = corn_f * sideslip_f;
-	lateral_f[0] = min(max_grip, lateral_f[0]);
-	lateral_f[0] = max(-max_grip, lateral_f[0]);
-	lateral_f[0] *= mass * 9.82 / 2;
+	lateral_f[0] = kart_properties.corn_f * sideslip_f;
+	lateral_f[0] = min(kart_properties.max_grip, lateral_f[0]);
+	lateral_f[0] = max(-kart_properties.max_grip, lateral_f[0]);
+	lateral_f[0] *= kart_properties.mass * 9.82 / 2;
 	
-	lateral_r[0] = corn_r * sideslip_r;
-	lateral_r[0] = min(max_grip, lateral_r[0]);
-	lateral_r[0] = max(-max_grip, lateral_r[0]);
-	lateral_r[0] *= mass * 9.82 / 2;
+	lateral_r[0] = kart_properties.corn_r * sideslip_r;
+	lateral_r[0] = min(kart_properties.max_grip, lateral_r[0]);
+	lateral_r[0] = max(-kart_properties.max_grip, lateral_r[0]);
+	lateral_r[0] *= kart_properties.mass * 9.82 / 2;
 	
 	// calculate traction
 	traction[0] = 0.0f;
 	traction[1] = 10 * (throttle - brake*sgn(velocity.xyz[1]));
 	
 	// apply air friction and system friction
-	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * AIR_FRICTION;
-	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * AIR_FRICTION;
+	resistance[0] -= velocity.xyz[0] * fabs (velocity.xyz[0]) * kart_properties.air_friction;
+	resistance[1] -= velocity.xyz[1] * fabs (velocity.xyz[1]) * kart_properties.air_friction;
 	resistance[0] -= 10 * SYSTEM_FRICTION * velocity.xyz[0];
 	resistance[1] -= SYSTEM_FRICTION * velocity.xyz[1];
 	
@@ -236,11 +228,11 @@ void Driver::physicsUpdate ()
 	torque = (lateral_f[0] * wheelbase/2) - (lateral_r[0] * wheelbase/2);
 	
 	// Acceleration
-	acceleration[0] = force[0] / mass;
-	acceleration[1] = force[1] / mass;
-	acceleration[2] = force[2] / mass;
+	acceleration[0] = force[0] / kart_properties.mass;
+	acceleration[1] = force[1] / kart_properties.mass;
+	acceleration[2] = force[2] / kart_properties.mass;
 	
-	kart_angular_acc = torque / inertia;
+	kart_angular_acc = torque / kart_properties.inertia;
 		
 	// velocity
 	velocity.xyz[0] += acceleration[0] * delta_t;

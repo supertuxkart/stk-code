@@ -21,6 +21,8 @@ tuxkart_SOURCES = \
   Explosion.h  \
   Herring.cxx  \
   Herring.h  \
+  KartProperties.h \
+  KartProperties.cxx \
   KartDriver.cxx  \
   Loader.cxx \
   Loader.h \

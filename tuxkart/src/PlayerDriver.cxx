@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.13 2004/08/07 03:38:37 jamesgregory Exp $
+//  $Id: PlayerDriver.cxx,v 1.14 2004/08/08 10:43:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include "tuxkart.h"
 #include "sound.h"
+#include "KartProperties.h"
 #include "Driver.h"
 
 int check_hint = 0 ;
@@ -75,30 +76,30 @@ void PlayerKartDriver::incomingJoystick  (JoyInfo& ji)
     }
     
     if ( ji.accel ) {
-      throttle = MAX_THROTTLE;
+      throttle = kart_properties.max_throttle;
     } else if (throttle > 0) {
-    	throttle -= MAX_THROTTLE * true_delta_t;
+    	throttle -= kart_properties.max_throttle * true_delta_t;
     } else
     	throttle = 0.0f;
 
     if ( ji.brake ) {  
       if (velocity.xyz[1] > 0) {
-      	brake = MAX_THROTTLE;
+      	brake = kart_properties.max_throttle;
       	throttle = 0.0f;
       } else {
       	brake = 0.0f;
-	throttle = -MAX_THROTTLE/2;
+	throttle = -kart_properties.max_throttle/2;
       }
     } else {
       brake = 0.0f;
     }
       
     if ( wheelie_angle <= 0.0f ) {      
-      steer_angle = -turn_speed * ji.lr;
-      if ( steer_angle > MAX_WHEEL_TURN)
-        steer_angle = MAX_WHEEL_TURN;
-      if ( steer_angle < -MAX_WHEEL_TURN)
-        steer_angle = -MAX_WHEEL_TURN;	
+      steer_angle = -kart_properties.turn_speed * ji.lr;
+      if ( steer_angle > kart_properties.max_wheel_turn)
+        steer_angle = kart_properties.max_wheel_turn;
+      if ( steer_angle < -kart_properties.max_wheel_turn)
+        steer_angle = -kart_properties.max_wheel_turn;	
     }
     else
       velocity.hpr[0] = 0.0f ;
@@ -106,32 +107,32 @@ void PlayerKartDriver::incomingJoystick  (JoyInfo& ji)
   
   /* Physics debugging control*/
   if ( keyState [ SDLK_1 ] ) {
-  	printf ("Selected Inertia - value: %f\n", inertia);
-	selected_property = &inertia;
+       printf ("Selected Inertia - value: %f\n", kart_properties.inertia);
+       selected_property = &kart_properties.inertia;
   }
   if ( keyState [ SDLK_2 ] ) {
-  	printf ("Selected corner stiffness front - value: %f\n", corn_f);
-	selected_property = &corn_f;
+  	printf ("Selected corner stiffness front - value: %f\n", kart_properties.corn_f);
+	selected_property = &kart_properties.corn_f;
   }
   
   if ( keyState [ SDLK_3 ] ) {
-  	printf ("Selected corner stiffness rear - value: %f\n", corn_r);
-	selected_property = &corn_r;
+  	printf ("Selected corner stiffness rear - value: %f\n", kart_properties.corn_r);
+	selected_property = &kart_properties.corn_r;
   }
   
   if ( keyState [ SDLK_4 ] ) {
-  	printf ("Selected maximum grip - value: %f\n", max_grip);
-	selected_property = &max_grip;
+  	printf ("Selected maximum grip - value: %f\n", kart_properties.max_grip);
+	selected_property = &kart_properties.max_grip;
   }
   
   if ( keyState [ SDLK_5 ] ) {
-  	printf ("Selected mass of kart - value: %f\n", mass);
-	selected_property = &mass;
+  	printf ("Selected mass of kart - value: %f\n", kart_properties.mass);
+	selected_property = &kart_properties.mass;
   }
   
   if ( keyState [ SDLK_6 ] ) {
-  	printf ("Selected wheels turn degree - value: %f\n", turn_speed);
-	selected_property = &turn_speed;
+  	printf ("Selected wheels turn degree - value: %f\n", kart_properties.turn_speed);
+	selected_property = &kart_properties.turn_speed;
   }
   
   if ( keyState [ SDLK_PLUS ] ) {
@@ -144,7 +145,7 @@ void PlayerKartDriver::incomingJoystick  (JoyInfo& ji)
   	printf ("Decreased selected value to: %f\n", *selected_property);
   }  
 
-  force[2] = -GRAVITY * KART_MASS;
+  force[2] = -GRAVITY * kart_properties.mass;
 }
 
 void PlayerKartDriver::incomingKeystroke ( const SDL_keysym& key )
