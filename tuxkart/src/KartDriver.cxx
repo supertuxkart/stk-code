@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.32 2004/08/14 17:40:21 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.33 2004/08/14 20:59:27 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -415,9 +415,8 @@ void KartDriver::update ()
 
   Driver::update () ;
 
-  if (skidmark_left)
+  if (skidmark_left && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
-      {
       float angle  = -43;
       float length = 0.57;
 
@@ -427,11 +426,16 @@ void KartDriver::update ()
       wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
       wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
 
-      skidmark_left->add(&wheelpos);
-      }
-    }
+      if (skidmark_left->newSkidmark)
+        {
+	  skidmark_left->addBreak (&wheelpos);
+	  skidmark_left->newSkidmark--;
+	} else
+          skidmark_left->add(&wheelpos);
+    } else if (skidmark_left)
+    	skidmark_left->newSkidmark = 2;
 
-  if (skidmark_right)
+  if (skidmark_right && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
       float angle  = 43;
       float length = 0.57;
@@ -441,9 +445,15 @@ void KartDriver::update ()
 
       wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
       wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
-
-      skidmark_right->add(&wheelpos);
-    }
+      
+      if (skidmark_right->newSkidmark)
+        {
+	  skidmark_right->addBreak (&wheelpos);
+	  skidmark_right->newSkidmark--;
+	} else
+          skidmark_right->add(&wheelpos);
+    } else if (skidmark_right)
+        skidmark_right->newSkidmark = 2;
 
   // Lock the vehicle in its start position until the race has
   // really started

@@ -1,4 +1,4 @@
-//  $Id: SkidMark.h,v 1.3 2004/08/13 22:58:16 grumbel Exp $
+//  $Id: SkidMark.h,v 1.4 2004/08/14 20:59:27 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -31,8 +31,11 @@ public:
 
   /** Add a position where the skidmark is */
   void add(sgCoord* coord);
+  void addBreak (sgCoord *coord);
 
   void recalcBSphere();
+  
+  int newSkidmark;
 };
 
 #endif

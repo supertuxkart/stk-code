@@ -1,4 +1,4 @@
-//  $Id: SkidMark.cxx,v 1.5 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: SkidMark.cxx,v 1.6 2004/08/14 20:59:27 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -35,6 +35,8 @@ SkidMark::SkidMark()
   skidstate = new ssgSimpleState ();
   skidstate -> enable (GL_BLEND);
   this -> setState (skidstate);
+  
+  newSkidmark = 2;
 }
 
 SkidMark::~SkidMark()
@@ -69,6 +71,39 @@ SkidMark::add(sgCoord* coord)
 
   sgSetVec3(norm, 0, 0, 1);
   sgSetVec4(color, 0, 0, 0, .5);
+
+  normals->add(norm); normals->add(norm);
+  colours->add(color); colours->add(color);
+}
+
+void
+SkidMark::addBreak(sgCoord* coord)
+{
+  sgVec3 pos;
+  sgVec3 norm;
+  sgVec4 color;
+  // Amount of which the skidmark is lifted above the track to avoid
+  // z-buffer errors
+  float track_offset = 0.03f;
+  
+  // Width of the skidmark
+  float width = 0.1f;
+
+  sgSetVec3(pos,
+            coord->xyz[0] + sgSin(coord->hpr[0]-90) * width,
+            coord->xyz[1] - sgCos(coord->hpr[0]-90) * width, 
+            coord->xyz[2] + track_offset);
+  vertices->add(pos);
+
+  sgSetVec3(pos,
+            coord->xyz[0] + sgSin(coord->hpr[0]+90) * width,
+            coord->xyz[1] - sgCos(coord->hpr[0]+90) * width,
+            coord->xyz[2] + track_offset);
+  vertices->add(pos);
+
+
+  sgSetVec3(norm, 0, 0, 1);
+  sgSetVec4(color, 0, 0, 0, .0);
 
   normals->add(norm); normals->add(norm);
   colours->add(color); colours->add(color);
