@@ -1,4 +1,4 @@
-//  $Id: Camera.h,v 1.4 2004/08/05 12:25:25 grumbel Exp $
+//  $Id: Camera.h,v 1.5 2004/08/10 14:56:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,11 +25,9 @@ class Camera
 protected:
 
   ssgContext *context  ;
-  sgCoord final_camera ;
 
   int    whichKart ;
   float x, y, w, h ;
-  float cam_delay ;
 
   static int numSplits ;
 

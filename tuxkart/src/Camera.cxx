@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.10 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: Camera.cxx,v 1.11 2004/08/10 14:56:00 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,14 +22,9 @@
 #include "KartDriver.h"
 #include "Camera.h"
 
-#define MIN_CAM_DISTANCE      5.0f
-#define MAX_CAM_DISTANCE     10.0f  // Was 15
-#define MAX_FIXED_CAMERA      9
-
 Camera *camera [ 4 ] = { NULL, NULL, NULL, NULL } ;
 
 int Camera::numSplits = 4 ;
-
 
 void Camera::setScreenPosition ( int pos )
 {
@@ -82,11 +77,12 @@ void Camera::init ()
 {
   delete context ;
   context = new ssgContext ;
+
+  // FIXME: clipping should be configurable for slower machines
   context -> setNearFar ( 0.05f, 1000.0f ) ;
 
   whichKart  = 0 ;
   setScreenPosition ( 0 ) ;
-  cam_delay  = 10.0f ;
 }
 
 
@@ -100,6 +96,9 @@ void Camera::update ()
 
   kartcoord.hpr[2] = 0;
   kartcoord.hpr[1] = 0;
+
+  // Uncomment this for a simple MarioKart-like replay-camera
+  // kartcoord.hpr[0] = 0;
 
   // Matrix that transforms stuff to kart-space
   sgMat4 tokart;
