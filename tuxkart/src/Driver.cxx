@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.43 2004/12/14 00:50:42 cosmosninja Exp $
+//  $Id: Driver.cxx,v 1.44 2004/12/14 01:40:36 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -108,7 +108,7 @@
    void
    Driver::reset ()
    {
-      race_lap = 0 ;
+      race_lap = -1 ;
       race_position = 9 ;
       rescue = FALSE ;
       on_ground = true ;
