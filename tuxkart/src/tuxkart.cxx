@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.40 2004/08/06 00:39:44 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.41 2004/08/07 03:41:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,10 +35,6 @@
 #include "preprocessor.h"
 #include "material.h"
 
-
-int mirror  = 0 ;
-int reverse = 0 ;
-
 int finishing_position = -1 ;
 
 guUDPConnection *net = NULL ;
@@ -55,12 +51,12 @@ Track     *curr_track  ;
 ssgBranch *trackBranch ;
 
 int num_herring   ;
-int num_laps_in_race ;
 
 char playersfname [ 256 ] ;
-const char *trackname = "tuxtrack" ;
 
 HerringInstance herring [ MAX_HERRING ] ;
+
+RaceSetup raceSetup;
 
 char *traffic_files [] =
 {
@@ -197,7 +193,7 @@ static void herring_command ( char *s, char *str )
   if ( str[0]=='R' || str[0]=='r' ){ h->her = red_h    ; h->type = HE_RED    ;}
   if ( str[0]=='S' || str[0]=='s' ){ h->her = silver_h ; h->type = HE_SILVER ;}
  
-  if ( mirror ) xyz[0] *= -1.0f ;
+  if ( raceSetup.mirror ) xyz[0] *= -1.0f ;
   sgCopyVec3 ( h->xyz, xyz ) ;
   h->eaten = FALSE ;
   h->scs   = new ssgTransform ;
@@ -382,20 +378,16 @@ static void banner ()
 }
 
 
-int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
-                  std::string& _levelName, int numPlayers, int numKarts )
+int tuxkartMain ()
 {
   /* Say "Hi!" to the nice user. */
 
   banner () ;
+  std::string trackname = trackIdents[raceSetup.track];
 
   /* Initialise some horrid globals */
 
   fclock           = new ulClock ;
-  mirror           = _mirror     ;
-  reverse          = _reverse    ;
-  num_laps_in_race = _numLaps    ;
-  trackname        = _levelName.c_str()  ;
   
   /* Network initialisation -- NOT WORKING YET */
 
@@ -440,12 +432,12 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   /* Grab the track centerline file */
 
   char fname [ 100 ] ;
-  sprintf ( fname, "data/%s.drv", trackname ) ;
+  sprintf ( fname, "data/%s.drv", trackname.c_str() ) ;
 
-  curr_track = new Track ( fname, mirror, reverse ) ;
-  gfx        = new GFX ( mirror ) ;
+  curr_track = new Track ( fname, raceSetup.mirror, raceSetup.reverse ) ;
+  gfx        = new GFX ( raceSetup.mirror ) ;
 
-  Camera::setNumSplits ( numPlayers ) ;
+  Camera::setNumSplits ( raceSetup.numPlayers ) ;
   initCameras () ;
 
 
@@ -466,18 +458,18 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   //green_h   = new Herring ( green  ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
   //silver_h  = new Herring ( cyan   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
   
-  gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), mirror ) ;
-  silver_h     = new Herring ( ssgLoad ( "coin.ac", loader )   ) ; preProcessObj ( silver_h -> getRoot(), mirror ) ;
-  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
-  green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
+  gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), raceSetup.mirror ) ;
+  silver_h     = new Herring ( ssgLoad ( "coin.ac", loader )   ) ; preProcessObj ( silver_h -> getRoot(), raceSetup.mirror ) ;
+  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), raceSetup.mirror ) ;
+  green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), raceSetup.mirror ) ;
 
   // Create the karts and fill the kart vector with them
-  for ( int i = 0 ; i < numKarts ; i++ )
+  for ( int i = 0 ; i < raceSetup.numKarts ; i++ )
   {
     /* Kart[0] is always the player. */
     KartDriver* newkart;
 
-    if ( i == 0 )
+    if ( i < raceSetup.numPlayers )
       newkart = new PlayerKartDriver  ( i, new ssgTransform ) ;
     else
     if ( network_enabled )
@@ -490,7 +482,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
     init_pos.xyz [ 0 ] = (float)(i-2) * 2.0f ;
     init_pos.xyz [ 1 ] = 2.0f ;
 
-    if ( reverse ) init_pos.hpr[0] = 180.0f ;
+    if ( raceSetup.reverse ) init_pos.hpr[0] = 180.0f ;
 
     newkart -> setReset ( & init_pos ) ;
     newkart -> reset    () ;
@@ -512,15 +504,15 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   /* Load the track models */
 
-  sprintf ( fname, "data/%s.loc", trackname ) ;
+  sprintf ( fname, "data/%s.loc", trackname.c_str() ) ;
   load_track   ( fname ) ;
   load_players ( ) ;
 
-  preProcessObj ( scene, mirror ) ;
+  preProcessObj ( scene, raceSetup.mirror ) ;
 
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  ssgSetBackFaceCollisions ( mirror ) ;
+  ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
 #endif
 	
 	guiSwitch = GUIS_RACE;

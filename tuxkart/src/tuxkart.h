@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.22 2004/08/06 00:39:44 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.23 2004/08/07 03:41:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -51,12 +51,23 @@ class SoundSystem ;
 class Track ;
 class Level ;
 
+class RaceSetup
+{
+public:
+	RaceSetup() { numLaps = 3; mirror = false; reverse = false; track = 0; numKarts = 4; numPlayers = 1; }
+	int numLaps;
+	bool mirror;
+	bool reverse;
+	int track;
+	int numKarts;
+	int numPlayers;
+};
+
 
 extern GFX         *gfx ;
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
-
-extern GUISwitch guiSwitch;
+extern GUISwitch   guiSwitch;
 
 extern SoundSystem *sound ;
 extern Track       *track ;
@@ -64,10 +75,11 @@ extern Level        level ;
 extern ulClock     *fclock ;
 #define MAX_TRACKS 100
 extern std::vector<std::string> trackNames ;
+extern std::vector<std::string> trackIdents ;
 
-extern int      game_state ;
+extern RaceSetup raceSetup;
 
-extern ssgRoot *scene           ;
+extern ssgRoot *scene ;
 
 void tuxKartMainLoop () ;
 void shutdown() ;
@@ -87,7 +99,6 @@ ssgBranch *process_userdata ( char *data ) ;
 #define TUXKART_DATADIR "/usr/local/share/games/tuxkart"
 #endif
 
-extern int num_laps_in_race ;
 extern int finishing_position ;
 
 class KartDriver;
@@ -99,10 +110,9 @@ extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-extern void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers);
+extern void switchToGame ();
 
-extern int tuxkartMain ( int nl, int mirror, int reverse, 
-                         std::string& track, int numPlayers, int numKarts ) ;
+extern int tuxkartMain () ;
 
 
 #endif

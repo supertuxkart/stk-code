@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.44 2004/08/06 23:05:28 evilynux Exp $
+//  $Id: start_tuxkart.cxx,v 1.45 2004/08/07 03:41:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -41,11 +41,11 @@ std::vector<std::string> trackIdents ;
 std::vector<std::string> trackNames ;
 
 
-void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers)
+void switchToGame ()
 {
   delete introMaterial ;
 
-  tuxkartMain ( numLaps, mirror, reverse, trackIdents[track], nPlayers, 4 ) ;
+  tuxkartMain () ;
 }
 
 /***********************************\
@@ -253,14 +253,8 @@ void cmdLineHelp (char* invocation)
 int main ( int argc, char *argv[] )
 {
   /* Default values */
-  int nbrLaps = 3;
-  int mirror = 0;
-  int reverse = 0;
-  int track         = 0;
-  int nbrPlayers    = 1;
   int  width  = 800;
   int  height = 600;
-  int numKarts = 4;
   bool fullscreen   = false;
   bool noStartScreen = false;
   
@@ -281,12 +275,12 @@ int main ( int argc, char *argv[] )
 
 	  else if( !strcmp(argv[i], "--track") and argc > 2 )
 	    {
-	      track = atoi(argv[i+1]);
+	      raceSetup.track = atoi(argv[i+1]);
 
-	      if ( track < 0 )
+	      if ( raceSetup.track < 0 )
 		{
 		  fprintf ( stderr,
-			    "You choose an invalid track number: %d.\n", track );
+			    "You choose an invalid track number: %d.\n", raceSetup.track );
 		  cmdLineHelp(argv[0]);
 		  return 0;
 		}
@@ -295,18 +289,19 @@ int main ( int argc, char *argv[] )
 	    }
 
 	  else if( !strcmp(argv[i], "--numkarts") && argc > 2)
-            {
-	      if (sscanf(argv[i+1], "%d", &numKarts) == 1)
-                {
-                  if (numKarts < 0 || numKarts > 4)
-                    puts("Warning: numkarts must be between 1 and 4");
-                }
-              else
-                {
-                  puts("Error: Argument to numkarts must be a number");
-                  exit(EXIT_FAILURE);
-                }
-            }
+	  {
+	      raceSetup.numKarts = atoi(argv[i+1]);
+
+	      if (raceSetup.numKarts < 0 || raceSetup.numKarts > 4)
+		{
+		  fprintf ( stderr,
+			    "You must choose between 1 and 4 karts, you chose: %d.\n", raceSetup.numKarts );
+		  cmdLineHelp(argv[0]);
+		  return 0;
+		}
+
+	      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
+	    }
 
 	  else if( !strcmp(argv[i], "--list-tracks") )
 	    {
@@ -330,34 +325,34 @@ int main ( int argc, char *argv[] )
 	  else if ( !strcmp(argv[i], "--reverse") )
 	    {
 	      fprintf ( stdout, "Enabling reverse mode.\n" ) ;
-	      reverse = 1;
+	      raceSetup.reverse = 1;
 	    }
 
 	  else if ( !strcmp(argv[i], "--mirror") )
 	    {
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
 	      fprintf ( stdout, "Enabling mirror mode.\n" ) ;
-	      mirror = 1;
+	      raceSetup.mirror = 1;
 #else
-	      mirror = 0 ;
+	      raceSetup.mirror = 0 ;
 #endif
 	    }
 
 	  else if ( !strcmp(argv[i], "--laps") and argc > 2 )
 	    {
 	      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
-	      nbrLaps = atoi(argv[i+1]);
+	      raceSetup.numLaps = atoi(argv[i+1]);
 	    }
 
 	  else if ( !strcmp(argv[i], "--players") and argc > 2 )
 	    {
-	      nbrPlayers = atoi(argv[i+1]);
+	      raceSetup.numPlayers = atoi(argv[i+1]);
 
-	      if ( nbrPlayers < 0 or nbrPlayers > 4)
+	      if ( raceSetup.numPlayers < 0 or raceSetup.numPlayers > 4)
 		{
 		  fprintf ( stderr,
 			    "You choose an invalid number of players: %d.\n",
-			    nbrPlayers );
+			    raceSetup.numPlayers );
 		  cmdLineHelp(argv[0]);
 		  return 0;
 		}
@@ -400,14 +395,12 @@ int main ( int argc, char *argv[] )
   initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
-    {
-      tuxkartMain ( nbrLaps, mirror, reverse, trackIdents[track], nbrPlayers, numKarts ) ;
-    }
+  {
+      guiSwitch = GUIS_RACE;
+      tuxkartMain ( ) ;
+  }
   else
-    {
-      /* Show start screen */
       startScreen ();
-    }
 
   return 0 ;
 }

@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.18 2004/08/05 23:04:38 jamesgregory Exp $
+//  $Id: status.cxx,v 1.19 2004/08/07 03:41:14 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -216,7 +216,7 @@ void drawScore ()
   if ( kart[0]->getLap() < 0 )
     sprintf ( str, "Not Started Yet!" ) ;
   else
-  if ( kart[0]->getLap() < num_laps_in_race - 1 )
+  if ( kart[0]->getLap() < raceSetup.numLaps - 1 )
     sprintf ( str, "%s - Lap %d",
       pos_string [ kart[0]->getPosition() ],
                    kart[0]->getLap() + 1 ) ;
@@ -503,7 +503,7 @@ void drawStatusText ()
 
   glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
-  if ( kart[0]->getLap () >= num_laps_in_race )
+  if ( kart[0]->getLap () >= raceSetup.numLaps )
     drawGameOverText     () ;
   else
   {
