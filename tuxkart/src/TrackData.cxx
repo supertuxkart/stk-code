@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.7 2004/08/17 13:37:37 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.8 2004/08/23 14:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -53,6 +53,7 @@ TrackData::TrackData(const std::string& filename_)
     LispReader reader(track->get_lisp());
     
     reader.read_string("name", name);
+    reader.read_string("music", music_filename);
     reader.read_sgVec4("sky-color", sky_color);
 
     reader.read_bool ("use-fog",      use_fog);

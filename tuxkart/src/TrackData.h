@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.6 2004/08/17 12:10:47 grumbel Exp $
+//  $Id: TrackData.h,v 1.7 2004/08/23 14:46:51 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,8 @@ public:
   std::string filename;
   std::string drv_filename;
   std::string loc_filename;
+
+  std::string music_filename;
 
   bool mirrored;
   bool reversed;
