@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.3 2004/08/07 22:12:16 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,7 +25,7 @@
 
 RaceGUI::RaceGUI()
 {
-	if ((fps_id = widgetSet -> count(0, 0, GUI_SML, GUI_SE)))
+	if ((fps_id = widgetSet -> count(0, 1000, GUI_SML, GUI_SE)))
 		widgetSet -> layout(fps_id, -1, 1);
 }
 
