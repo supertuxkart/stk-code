@@ -1,4 +1,4 @@
-//  $Id: TrackData.h,v 1.3 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: TrackData.h,v 1.4 2004/08/11 12:33:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,7 +33,7 @@ public:
   std::string loc_filename;
 
   std::string name;
-  sgVec3 skycolor;
+  sgVec4 sky_color;
 
   bool   use_fog;
   sgVec4 fog_color;

@@ -1,4 +1,4 @@
-/* $Id: lispreader.h,v 1.1 2004/08/08 12:59:59 grumbel Exp $ */
+/* $Id: lispreader.h,v 1.2 2004/08/11 12:33:17 grumbel Exp $ */
 /*
  * lispreader.h
  *
@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <plib/sg.h>
 
 #include <zlib.h>
 
@@ -65,10 +66,10 @@ public:
   std::string file;
   unsigned int line;
 
-  LispReaderException(const char* _message = "lispreader error",
-                      const char* _file = "", 
+  LispReaderException(const std::string& _message = "lispreader error",
+                      const std::string& _file = "", 
                       const unsigned int _line = 0)
-      : message(_message),
+      : message(_message + " " + _file),
         file(_file),
         line(_line)
   {};
@@ -190,6 +191,8 @@ public:
   LispReader(lisp_object_t* l);
   ~LispReader();
 
+  bool read_sgVec4(const char* name, sgVec4& color);
+  bool read_sgVec3(const char* name, sgVec3& color);
   bool read_int_vector(const char* name, std::vector<int>& vec);
   bool read_int_vector(const char* name, std::vector<unsigned int>& vec);
   bool read_char_vector(const char* name, std::vector<char>& vec);

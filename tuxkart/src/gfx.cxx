@@ -1,4 +1,4 @@
-//  $Id: gfx.cxx,v 1.19 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: gfx.cxx,v 1.20 2004/08/11 12:33:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,13 +27,9 @@
 #include "tuxkart.h"
 #include "Camera.h"
 #include "gfx.h"
+#include "TrackData.h"
+#include "TrackManager.h"
 #include "World.h"
-
-static sgVec3 sunposn   ;
-static sgVec4 skyfogcol ;
-static sgVec4 ambientcol ;
-static sgVec4 specularcol ;
-static sgVec4 diffusecol ;
 
 GFX::GFX ( int _mirror )
 {
@@ -51,10 +47,12 @@ GFX::GFX ( int _mirror )
 
 void GFX::update ()
 {
-  ssgGetLight ( 0 ) -> setPosition ( sunposn ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambientcol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffusecol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specularcol ) ;
+  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
+
+  ssgGetLight ( 0 ) -> setPosition ( track_data.sun_position ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track_data.ambientcol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track_data.diffusecol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track_data.specularcol ) ;
 
   if ( mirror ) glFrontFace ( GL_CW ) ;
 
@@ -128,35 +126,49 @@ void GFX::done ()
 
 void updateGFX ( GFX *gfx )
 {
-  sgSetVec3 ( sunposn, 0.4, 0.4, 0.4 ) ;
-
-  sgSetVec4 ( skyfogcol  , 0.3, 0.7, 0.9, 1.0 ) ;
-  sgSetVec4 ( ambientcol , 0.5, 0.5, 0.5, 1.0 ) ;
-  sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
-  sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
+  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
 
   glEnable ( GL_DEPTH_TEST ) ;
 
-  glFogf ( GL_FOG_DENSITY, 1.0f / 100.0f ) ;
-  glFogfv( GL_FOG_COLOR  , skyfogcol ) ;
-  glFogf ( GL_FOG_START  , 0.0       ) ;
-  glFogf ( GL_FOG_END    , 1000.0      ) ;
-  glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
-  glHint ( GL_FOG_HINT   , GL_NICEST ) ;
+  if (track_data.use_fog)
+    {
+      glEnable ( GL_FOG ) ;
+      
+      glFogf ( GL_FOG_DENSITY, 1.0f / 100.0f ) ;
+      glFogfv( GL_FOG_COLOR  , track_data.fog_color ) ;
+      glFogf ( GL_FOG_START  , 0.0       ) ;
+      glFogf ( GL_FOG_END    , 1000.0      ) ;
+      glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
+      glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 
-  glEnable ( GL_FOG ) ;
-  /* Clear the screen */
+      /* Clear the screen */
+      glClearColor (track_data.fog_color[0], 
+                    track_data.fog_color[1], 
+                    track_data.fog_color[2], 
+                    track_data.fog_color[3]);
+    }
+  else
+    {
+      /* Clear the screen */
+      glClearColor (track_data.sky_color[0], 
+                    track_data.sky_color[1], 
+                    track_data.sky_color[2], 
+                    track_data.sky_color[3]);
+    }
 
-  glClearColor ( skyfogcol[0], skyfogcol[1], skyfogcol[2], skyfogcol[3] ) ;
   glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
 
   for ( int i = 0 ; i < Camera::getNumSplits() ; i++ )
-  {
-    camera [ i ] -> apply () ;
-    gfx -> update () ;
-  }
+    {
+      camera [ i ] -> apply () ;
+      gfx -> update () ;
+    }
 
-  glDisable ( GL_FOG ) ;
+  if (track_data.use_fog)
+    {
+      glDisable ( GL_FOG ) ;
+    }
+
   glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 }
 

@@ -1,4 +1,4 @@
-/* $Id: lispreader.cxx,v 1.1 2004/08/08 12:59:59 grumbel Exp $ */
+/* $Id: lispreader.cxx,v 1.2 2004/08/11 12:33:17 grumbel Exp $ */
 /*
  * lispreader.c
  *
@@ -1148,6 +1148,48 @@ LispReader::read_string_vector (const char* name, std::vector<std::string>& vec)
       throw LispReaderException("LispReader expected type string at token: ", name);
     vec.push_back(lisp_string(lisp_car(obj)));
     obj = lisp_cdr(obj);
+  }
+  return true;
+}
+
+bool
+LispReader::read_sgVec3(const char* name, sgVec3& color)
+{
+  lisp_object_t* obj = search_for (name);
+  if (!obj)
+    return false;
+
+  int i = 0;
+  while(!lisp_nil_p(obj) && i < 3)
+  {
+    if (!lisp_real_p(lisp_car(obj)))
+      throw LispReaderException("LispReader expected type float at token: ", name);
+    
+    color[i] = lisp_real(lisp_car(obj));
+
+    obj = lisp_cdr(obj);
+    i += 1;
+  }
+  return true;
+}
+
+bool
+LispReader::read_sgVec4(const char* name, sgVec4& color)
+{
+  lisp_object_t* obj = search_for (name);
+  if (!obj)
+    return false;
+
+  int i = 0;
+  while(!lisp_nil_p(obj) && i < 4)
+  {
+    if (!lisp_real_p(lisp_car(obj)))
+      throw LispReaderException("LispReader expected type float at token: ", name);
+    
+    color[i] = lisp_real(lisp_car(obj));
+
+    obj = lisp_cdr(obj);
+    i += 1;
   }
   return true;
 }

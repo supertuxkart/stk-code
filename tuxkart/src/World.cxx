@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.4 2004/08/11 11:36:40 grumbel Exp $
+//  $Id: World.cxx,v 1.5 2004/08/11 12:33:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -184,24 +184,12 @@ World::World(const RaceSetup& raceSetup_)
 
 World::~World()
 {  
-  // FIXME:
-  return;
-
 /* This whole function needs some serious fixing - whatever was done
    in tuxKartMain (the function immediately above this one) needs
    undoing. I've simply taken the above function, reversed the order
    of all the statements, replaced all the "new"s with "delete"s and
    all the "init()"s with commented out and non-existent
    "deinit()"s */
-
-  //FIXME: when this is fixed obviously this can be deleted:
-  deinitTuxKart();
-
-  /*FIXME: in load we had
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
-#endif
-*/
 
   //FIXME: in load we had preProcessObj ( scene, raceSetup.mirror ) ;
   

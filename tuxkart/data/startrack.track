@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Star Track"))
+ (name "Star Track")
+ (sky-color    0.0 0.0 0.0 0.0))
 
 ;; EOF ;;
 

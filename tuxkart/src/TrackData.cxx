@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.2 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.3 2004/08/11 12:33:17 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,15 @@ TrackData::TrackData(const std::string& filename_)
   loc_filename = ident + ".loc";
   drv_filename = ident + ".drv";
   
+  // Default values
+  use_fog = false;
+  sgSetVec3 ( sun_position, 0.4, 0.4, 0.4 ) ;
+  sgSetVec4 ( sky_color  , 0.3, 0.7, 0.9, 1.0 ) ;
+  sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;
+  sgSetVec4 ( ambientcol , 0.5, 0.5, 0.5, 1.0 ) ;
+  sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
+  sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
+
   try {
     LispReader* track = LispReader::load(loader ? loader->getPath(filename) : filename, "tuxkart-track");
     assert(track);
@@ -36,6 +45,18 @@ TrackData::TrackData(const std::string& filename_)
     LispReader reader(track->get_lisp());
     
     reader.read_string("name", name);
+    reader.read_sgVec4("sky-color", sky_color);
+
+    reader.read_bool ("use-fog", use_fog);
+    reader.read_sgVec4("fog-color", fog_color);
+    reader.read_float("fog-densitiy", fog_density);
+    reader.read_float("fog-start", fog_start);
+    reader.read_float("fog-end", fog_end);
+
+    reader.read_sgVec3("sun-position", sun_position);
+    reader.read_sgVec4("sun-ambient",  ambientcol);
+    reader.read_sgVec4("sun-specular", specularcol);
+    reader.read_sgVec4("sun-diffuse",  diffusecol);
 
     delete track;
   } catch(LispReaderException& err) {
