@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.11 2004/08/15 16:06:15 grumbel Exp $
+//  $Id: KartDriver.h,v 1.12 2004/08/21 18:15:13 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -50,6 +50,8 @@ public:
   int grid_position ;
 
   int collectable ;
+  
+  bool powersliding;
 
   /** The position of the karts controlls */
   JoyInfo controlls;
@@ -122,7 +124,10 @@ public:
   virtual void doCollisionAnalysis  ( float delta, float hot ) ;
   virtual void update               ( float delta ) ;
   virtual void processInput         ( float delta ) ; 
-
+  
+  void beginPowerslide ();
+  void endPowerslide ();
+  
   void processAttachments(float delta);
   void processSkidMarks();
 } ;

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.41 2004/08/16 11:33:43 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.42 2004/08/21 18:15:13 straver Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -104,6 +104,7 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ ,
   num_collectables     = 0 ;
   num_herring_gobbled  = 0 ;
   collectable          = COLLECT_NOTHING ;
+  powersliding	       = false;
   attachment           = NULL ;
   attachment_time_left = 0.0f ;
   attachment_type      = ATTACH_NOTHING ;
@@ -310,6 +311,32 @@ void KartDriver::forceCrash ()
     velocity.hpr[0] = velocity.hpr[1] = velocity.hpr[2] = 0.0f ;
 }
 
+void KartDriver::beginPowerslide ()
+{	
+	if (!powersliding) {
+		kart_properties.corn_f *= 20;
+		kart_properties.corn_r /= 5;
+		kart_properties.max_grip /= 1.5;
+		//kart_properties.max_wheel_turn = M_PI;
+		kart_properties.inertia *= 1;
+		
+		powersliding = true;
+	}
+}
+
+void KartDriver::endPowerslide ()
+{	
+	if (powersliding) {
+		kart_properties.corn_f /= 20;
+		kart_properties.corn_r *= 5;
+		kart_properties.max_grip *= 1.5;
+		//kart_properties.max_wheel_turn = M_PI/2;
+		kart_properties.inertia /= 1;
+		
+		powersliding = false;
+	}
+}
+
 
 void KartDriver::doCollisionAnalysis ( float delta, float hot )
 {
@@ -462,11 +489,17 @@ KartDriver::processInput(float delta)
 {
   if ( controlls.fire ) 
     {
-      if ( getCollectable() == COLLECT_NOTHING )
-        sound -> playSfx ( SOUND_BEEP ) ;
+      if ( getCollectable() == COLLECT_NOTHING ) 
+         beginPowerslide ();  
+        //sound -> playSfx ( SOUND_BEEP ) ;
 
-      useAttachment () ;
-    }
+      useAttachment () ;      
+    } 
+  else
+      endPowerslide ();
+      
+
+    
 
   if ( is_on_ground() )
     {
@@ -505,7 +538,7 @@ KartDriver::processInput(float delta)
 
       if ( controlls.brake ) {  
         if (getVelocity()->xyz[1] > 0) {
-          brake = kart_properties.max_throttle;
+          brake = kart_properties.max_throttle/2;
           throttle = 0.0f;
         } else {
           brake = 0.0f;
