@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.56 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.57 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,7 @@
 #include "WidgetSet.h"
 #include "gui/BaseGUI.h"
 #include "WorldLoader.h"
+#include "TrackManager.h"
 
 #include "gfx.h"
 #include "preprocessor.h"
@@ -63,12 +64,6 @@ HerringInstance herring [ MAX_HERRING ] ;
 
 RaceSetup raceSetup;
 
-char *traffic_files [] =
-{
-  "icecreamtruck.ac", "truck1.ac",
-} ;
-
-
 char *projectile_files [] =
 {
   "spark.ac",         /* COLLECT_SPARK          */
@@ -87,7 +82,6 @@ Level        level ;
 std::vector<GUISwitch> guiStack;
 
 Karts kart;
-TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
 Projectile *projectile [ NUM_PROJECTILES ] ;
 Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
@@ -320,27 +314,9 @@ void load_track (const char *fname )
   fclose ( fd ) ;
 }
 
-
-static void banner ()
-{
-  printf ( "\n\n" ) ;
-  printf ( "   TUXEDO T. PENGUIN stars in TUXKART!\n" ) ;
-  printf ( "               by Steve and Oliver Baker\n" ) ;
-  printf ( "                 <sjbaker1@airmail.net>\n" ) ;
-  printf ( "                  http://tuxkart.sourceforge.net\n" ) ;
-  printf ( "\n\n" ) ;
-}
-
-
 int tuxkartMain ()
 {
-  /* Say "Hi!" to the nice user. */
-
-  banner () ;
-  std::string trackname = trackIdents[raceSetup.track];
-
   /* Initialise some horrid globals */
-
   fclock           = new ulClock ;
   
   /* Network initialisation -- NOT WORKING YET */
@@ -386,7 +362,7 @@ int tuxkartMain ()
   /* Grab the track centerline file */
 
   char fname [ 100 ] ;
-  sprintf ( fname, "data/%s.drv", trackname.c_str() ) ;
+  sprintf ( fname, "data/%s.drv", track_manager.trackIdents[raceSetup.track].c_str() ) ;
 
   curr_track = new Track ( fname, raceSetup.mirror, raceSetup.reverse ) ;
   gfx        = new GFX ( raceSetup.mirror ) ;
@@ -456,7 +432,7 @@ int tuxkartMain ()
 
   /* Load the track models */
 
-  sprintf ( fname, "data/%s.loc", trackname.c_str() ) ;
+  sprintf ( fname, "data/%s.loc", track_manager.trackIdents[raceSetup.track].c_str() ) ;
   load_track   ( fname ) ;
   load_players ( ) ;
 
@@ -477,7 +453,12 @@ int tuxkartMain ()
 
 void unloadRace()
 {  
-/* This whole function needs some serious fixing - whatever was done in tuxKartMain (the function immediately above this one) needs undoing. I've simply taken the above function, reversed the order of all the statements, replaced all the "new"s with "delete"s and all the "init()"s with commented out and non-existent "deinit()"s */
+/* This whole function needs some serious fixing - whatever was done
+   in tuxKartMain (the function immediately above this one) needs
+   undoing. I've simply taken the above function, reversed the order
+   of all the statements, replaced all the "new"s with "delete"s and
+   all the "init()"s with commented out and non-existent
+   "deinit()"s */
 
   //FIXME: when this is fixed obviously this can be deleted:
   shutdown();
@@ -529,8 +510,8 @@ delete fclock ;
 
 void backToSplash()
 {
-	unloadRace();
-	startScreen();
+  unloadRace();
+  startScreen();
 }
 
 void restartRace()

@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.21 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: Driver.h,v 1.22 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -56,7 +56,6 @@ class Shadow;
 #define MAX_REVERSE_VELOCITY    ( -5.0f * KILOMETERS_PER_HOUR )
 #define MIN_HANDICAP_VELOCITY   ( 50.0f * KILOMETERS_PER_HOUR )
 #define MAX_HANDICAP_VELOCITY   ( 70.0f * KILOMETERS_PER_HOUR )
-#define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
 
 /* Start - New Physics Constants */
 #define SYSTEM_FRICTION 4.8

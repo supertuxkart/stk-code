@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.11 2004/08/10 14:56:00 grumbel Exp $
+//  $Id: Camera.cxx,v 1.12 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -164,5 +164,4 @@ void initCameras ()
   }
 }
 
-
-
+/* EOF */

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.29 2004/08/08 21:33:49 grumbel Exp $
+//  $Id: tuxkart.h,v 1.30 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -55,7 +55,10 @@ class Level ;
 class RaceSetup
 {
 public:
+        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE };
+
 	RaceSetup() { 
+                mode       = RM_QUICK_RACE;
                 numLaps    = 3; 
                 mirror     = false; 
                 reverse    = false; 
@@ -63,12 +66,14 @@ public:
                 numKarts   = -1; // use all available karts
                 numPlayers = 1; 
         }
-	int numLaps;
-	bool mirror;
-	bool reverse;
-	int track;
-	int numKarts;
-	int numPlayers;
+        
+        RaceMode  mode;
+	int   numLaps;
+	bool  mirror;
+	bool  reverse;
+	int   track;
+	int   numKarts;
+	int   numPlayers;
 };
 
 
@@ -77,16 +82,17 @@ extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
 extern std::vector<GUISwitch> guiStack;
 
+/** All available kart configurations */
 typedef std::vector<KartProperties> Characters;
 extern Characters characters;
+
+/** The players kart configuration */
 extern KartProperties kart_props;
+
 extern SoundSystem *sound ;
 extern Track       *track ;
 extern Level        level ;
 extern ulClock     *fclock ;
-#define MAX_TRACKS 100
-extern std::vector<std::string> trackNames ;
-extern std::vector<std::string> trackIdents ;
 
 extern RaceSetup raceSetup;
 
@@ -101,7 +107,6 @@ void restartRace();
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 
-#define NUM_TRAFFIC      2
 #define NUM_PROJECTILES  8
 #define NUM_EXPLOSIONS   6
 

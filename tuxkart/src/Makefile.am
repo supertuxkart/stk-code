@@ -30,6 +30,8 @@ tuxkart_SOURCES = \
   Projectile.cxx  \
   Track.cxx  \
   Track.h  \
+  TrackManager.cxx \
+  TrackManager.h \
   Traffic.cxx  \
   WorldLoader.cxx  \
   WorldLoader.h  \
@@ -54,6 +56,8 @@ tuxkart_SOURCES = \
   sound.h  \
   start_tuxkart.cxx  \
   start_tuxkart.h  \
+  StringUtils.h \
+  StringUtils.cxx \
   status.cxx  \
   status.h  \
   Shadow.h \

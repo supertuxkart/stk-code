@@ -1,4 +1,4 @@
-//  $Id: Traffic.cxx,v 1.4 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: Traffic.cxx,v 1.5 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,8 @@
 
 #include "tuxkart.h"
 #include "KartDriver.h"
+
+#define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 

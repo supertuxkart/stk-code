@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.52 2004/08/08 21:33:49 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.53 2004/08/10 15:35:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,20 +18,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/pw.h>
+#include <vector>
+#include <string>
 
 #include "tuxkart.h"
 
+#include "TrackManager.h"
+#include "StringUtils.h"
 #include "WidgetSet.h"
 #include "sound.h"
 #include "Loader.h"
 
-#include <vector>
-#include <string>
-
-
-static ssgSimpleState *introMaterial    ;
-std::vector<std::string> trackIdents ;
-std::vector<std::string> trackNames ;
+static ssgSimpleState *introMaterial ;
 
 Characters characters;
 
@@ -55,12 +53,7 @@ static void splashMainLoop (void)
 {
   while ( 1 )
   {
-   /* 
-   //The old splash screen stuff
-   
-   //Setup for boring 2D rendering
-   */
-    
+    //Setup for boring 2D rendering
     glMatrixMode   ( GL_PROJECTION ) ;
     glLoadIdentity () ;
     glMatrixMode   ( GL_MODELVIEW ) ;
@@ -73,7 +66,6 @@ static void splashMainLoop (void)
     //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
     //Draw the splash screen
-
     introMaterial -> force () ;
 
     glBegin ( GL_QUADS ) ;
@@ -84,18 +76,9 @@ static void splashMainLoop (void)
     glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
     glEnd () ;
 
-    /*
-    //Make PUI redraw
-    glEnable ( GL_BLEND ) ;
-    puDisplay () ;
-    */
-    
-    //glClearColor(0.2, 0.2, 0.2, 0.0);
-    //glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
 	
-    /* Swapbuffers - and off we go again... */
-
+    // Swapbuffers - and off we go again...
     pollEvents() ;
     updateGUI();
     swapBuffers();
@@ -125,32 +108,6 @@ static void installMaterial ()
   introMaterial -> setShininess ( 0 ) ;
 }
 
-static std::string loadTrackDescription(const std::string& mapfile)
-{
-  std::string path = loader->getPath(std::string("data/") + mapfile + ".track");
-  FILE* file = fopen(path.c_str(), "r");
-  if(file == 0)
-    return mapfile;
-
-  char buf[1024];
-  if(fgets(buf, 1024, file) == 0)
-    buf[0] = 0;
-  
-  fclose(file);
-	
-  string ret =  buf;
-  ret = ret.substr(0, ret.find('\n'));
-  return ret;
-}
-
-static bool has_suffix(const std::string& lhs, const std::string rhs)
-{
-  if (lhs.length() < rhs.length())
-    return false;
-  else
-    return lhs.compare(lhs.length() - rhs.length(), rhs.length(), rhs) == 0;
-}
-
 static void loadCharacters()
 {
   std::set<std::string> result;
@@ -159,39 +116,14 @@ static void loadCharacters()
   // Findout which characters are available and load them
   for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
     {
-      if (has_suffix(*i, ".tkkf"))
+      if (StringUtils::has_suffix(*i, ".tkkf"))
         {
           characters.push_back(KartProperties("data/" + *i));
         }
     }
 }
 
-static void loadTrackList ()
-{
-  /* Load up a list of tracks - and their names */
-  std::set<std::string> files;
-  loader->listFiles(files, "data");
-  int t = 0;
-  for(std::set<std::string>::iterator i = files.begin();
-          i != files.end(); ++i) {
-    if(i->size() < 6)
-      continue;
-    if(i->compare(i->size() - 6, 6, ".track") != 0)
-      continue;
-   
-    std::string trackName = i->substr(0, i->size()-6);
-    trackIdents.push_back(trackName);
-
-    std::string description = loadTrackDescription(trackName);
-    trackNames.push_back(description);
-
-    ++t;
-    if(t >= MAX_TRACKS-1)
-      break;
-  }
-}
-
-/* Initialize the datadir */
+// Initialize the datadir
 static void loadDataDir()
 {
   loader = new Loader();
@@ -211,23 +143,22 @@ static void loadDataDir()
   loader->addSearchPath(TUXKART_DATADIR);
 }
 
-/* Load the datadir, tracklist and plib stuff */
+// Load the datadir, tracklist and plib stuff
 static void initTuxKart (int width, int height, int videoFlags)
 {
   loadDataDir ();
-  loadTrackList () ;
+  track_manager.loadTrackList () ;
   loadCharacters();
 
   initVideo ( width, height, videoFlags );
   
-  /* Initialise a bunch of PLIB library stuff */
-
+  // Initialise a bunch of PLIB library stuff
   ssgInit () ;
   ssgSetCurrentOptions(loader);
   registerImageLoaders();
   
-  sound      = new SoundSystem ;
-  widgetSet        = new WidgetSet ;
+  sound     = new SoundSystem ;
+  widgetSet = new WidgetSet ;
 }
 
 
@@ -324,11 +255,11 @@ int main ( int argc, char *argv[] )
 	  else if( !strcmp(argv[i], "--list-tracks") or !strcmp(argv[i], "-l") )
 	    {
 	      loadDataDir ();
-	      loadTrackList () ;
+	      track_manager.loadTrackList () ;
 
 	      fprintf ( stdout, "  Available tracks:\n" );
-	      for (uint i = 0; i != trackNames.size(); i++)
-		       fprintf ( stdout, "\t%d: %s\n", i, trackNames[i].c_str() );
+	      for (uint i = 0; i != track_manager.trackNames.size(); i++)
+		       fprintf ( stdout, "\t%d: %s\n", i, track_manager.trackNames[i].c_str() );
 	      
 		fprintf ( stdout, "\n" );
 
