@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.22 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.23 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -17,16 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
+#include <SDL.h>
+#include <vector>
+
 #include "sdldrv.h"
 #include "WidgetSet.h"
 #include "gui/BaseGUI.h"
 #include "tuxkart.h"
 #include "Driver.h"
 #include "KartDriver.h"
-
-#include <iostream>
-#include <SDL.h>
-#include <vector>
+#include "RaceSetup.h"
 
 using std::cout;
 using std::vector;
@@ -168,7 +169,7 @@ void pollEvents ()
   	SDL_ShowCursor(SDL_DISABLE);
 }
 
-void kartInput()
+void kartInput(RaceSetup& raceSetup)
 {	
 	static JoyInfo ji;
 	

@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.53 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.54 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,19 +27,20 @@
 #include "StringUtils.h"
 #include "WidgetSet.h"
 #include "sound.h"
+#include "RaceSetup.h"
 #include "Loader.h"
 
 static ssgSimpleState *introMaterial ;
 
 Characters characters;
 
-void switchToGame ()
+void switchToGame (RaceSetup& raceSetup)
 {
   delete introMaterial ;
   
   guiStack.clear();
 
-  tuxkartMain () ;
+  tuxkartMain (raceSetup) ;
 }
 
 /***********************************\
@@ -49,8 +50,10 @@ void switchToGame ()
 *                                   *
 \***********************************/
 
-static void splashMainLoop (void)
+static void splashMainLoop ()
 {
+  RaceSetup raceSetup;
+
   while ( 1 )
   {
     //Setup for boring 2D rendering
@@ -80,7 +83,7 @@ static void splashMainLoop (void)
 	
     // Swapbuffers - and off we go again...
     pollEvents() ;
-    updateGUI();
+    updateGUI(raceSetup);
     swapBuffers();
   }
 }
@@ -209,7 +212,8 @@ int main ( int argc, char *argv[] )
   int  height = 600;
   bool fullscreen   = false;
   bool noStartScreen = false;
-  
+  RaceSetup raceSetup;
+    
   /* Testing if we've given arguments */
   if ( argc > 1) 
     {
@@ -344,7 +348,7 @@ int main ( int argc, char *argv[] )
   initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
-      tuxkartMain ( ) ;
+      tuxkartMain (raceSetup) ;
   else
     startScreen ( );
 

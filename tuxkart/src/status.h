@@ -1,4 +1,4 @@
-//  $Id: status.h,v 1.6 2004/08/05 23:04:38 jamesgregory Exp $
+//  $Id: status.h,v 1.7 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,7 @@
 #ifndef HEADER_STATUS_H
 #define HEADER_STATUS_H
 
-void drawStatusText () ;
+void drawStatusText (RaceSetup& raceSetup) ;
 
 void stPrintf ( char *fmt, ... ) ;
 void stToggle () ;

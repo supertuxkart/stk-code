@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.57 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.58 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,6 +38,7 @@
 #include "gfx.h"
 #include "preprocessor.h"
 #include "material.h"
+#include "RaceSetup.h"
 
 #include <vector>
 
@@ -61,8 +62,6 @@ int num_herring   ;
 char playersfname [ 256 ] ;
 KartProperties kart_props;
 HerringInstance herring [ MAX_HERRING ] ;
-
-RaceSetup raceSetup;
 
 char *projectile_files [] =
 {
@@ -115,7 +114,7 @@ void load_players ( )
 
 
  
-static void herring_command ( char *s, char *str )
+static void herring_command (RaceSetup& raceSetup, char *s, char *str )
 {
   if ( num_herring >= MAX_HERRING )
   {
@@ -142,6 +141,7 @@ static void herring_command ( char *s, char *str )
   if ( str[0]=='S' || str[0]=='s' ){ h->her = silver_h ; h->type = HE_SILVER ;}
  
   if ( raceSetup.mirror ) xyz[0] *= -1.0f ;
+
   sgCopyVec3 ( h->xyz, xyz ) ;
   h->eaten = FALSE ;
   h->scs   = new ssgTransform ;
@@ -153,7 +153,7 @@ static void herring_command ( char *s, char *str )
 }
 
 
-void load_track (const char *fname )
+void load_track(RaceSetup& raceSetup, const char *fname )
 {
   std::string path = loader->getPath(fname);
   FILE *fd = fopen (path.c_str(), "r" ) ;
@@ -195,7 +195,7 @@ void load_track (const char *fname )
     if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                      &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
     {
-      herring_command ( & s [ strlen ( "*HERRING," ) ], s ) ;
+      herring_command ( raceSetup, & s [ strlen ( "*HERRING," ) ], s ) ;
     }
     else
     if ( s[0] == '\"' )
@@ -314,7 +314,7 @@ void load_track (const char *fname )
   fclose ( fd ) ;
 }
 
-int tuxkartMain ()
+int tuxkartMain (RaceSetup& raceSetup)
 {
   /* Initialise some horrid globals */
   fclock           = new ulClock ;
@@ -433,7 +433,7 @@ int tuxkartMain ()
   /* Load the track models */
 
   sprintf ( fname, "data/%s.loc", track_manager.trackIdents[raceSetup.track].c_str() ) ;
-  load_track   ( fname ) ;
+  load_track   ( raceSetup, fname ) ;
   load_players ( ) ;
 
   preProcessObj ( scene, raceSetup.mirror ) ;
@@ -447,7 +447,7 @@ int tuxkartMain ()
 
   /* Play Ball! */
 
-  tuxKartMainLoop () ;
+  tuxKartMainLoop (raceSetup) ;
   return TRUE ;
 }
 
@@ -579,7 +579,7 @@ void updateNetworkWrite ()
 
 
 
-void tuxKartMainLoop ()
+void tuxKartMainLoop (RaceSetup& raceSetup)
 {
   /* Loop forever updating everything */
 
@@ -613,9 +613,9 @@ void tuxKartMainLoop ()
     updateGFX ( gfx ) ;
 
     pollEvents();
-    kartInput () ;
-    drawStatusText () ;
-    updateGUI();
+    kartInput (raceSetup) ;
+    drawStatusText (raceSetup) ;
+    updateGUI(raceSetup);
     sound    -> update () ;
 
     /* Swap graphics buffers last! */

@@ -1,4 +1,4 @@
-//  $Id: TrackSel.h,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
+//  $Id: TrackSel.h,v 1.3 2004/08/10 16:22:32 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,12 +20,15 @@
 #ifndef HEADER_TRACKSEL_H
 #define HEADER_TRACKSEL_H
 
+#include "../RaceSetup.h"
 #include "BaseGUI.h"
 
 class TrackSel: public BaseGUI
 {
+private:
+  RaceSetup& raceSetup;
 public:
-	TrackSel();
+	TrackSel(RaceSetup& raceSetup);
 	~TrackSel();
 	
 	void update(float dt);

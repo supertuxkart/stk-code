@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.h,v 1.1 2004/08/07 03:42:34 jamesgregory Exp $
+//  $Id: NumPlayers.h,v 1.2 2004/08/10 16:22:32 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,12 +20,15 @@
 #ifndef HEADER_NUMPLAYERS_H
 #define HEADER_NUMPLAYERS_H
 
+#include "../RaceSetup.h"
 #include "BaseGUI.h"
 
 class NumPlayers: public BaseGUI
 {
+private:
+  RaceSetup& raceSetup;
 public:
-	NumPlayers();
+	NumPlayers(RaceSetup& raceSetup);
 	~NumPlayers();
 	
 	void update(float dt);

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.30 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: tuxkart.h,v 1.31 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -52,31 +52,6 @@ class SoundSystem ;
 class Track ;
 class Level ;
 
-class RaceSetup
-{
-public:
-        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE };
-
-	RaceSetup() { 
-                mode       = RM_QUICK_RACE;
-                numLaps    = 3; 
-                mirror     = false; 
-                reverse    = false; 
-                track      = 0;
-                numKarts   = -1; // use all available karts
-                numPlayers = 1; 
-        }
-        
-        RaceMode  mode;
-	int   numLaps;
-	bool  mirror;
-	bool  reverse;
-	int   track;
-	int   numKarts;
-	int   numPlayers;
-};
-
-
 extern GFX         *gfx ;
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
@@ -94,11 +69,9 @@ extern Track       *track ;
 extern Level        level ;
 extern ulClock     *fclock ;
 
-extern RaceSetup raceSetup;
-
 extern ssgRoot *scene ;
 
-void tuxKartMainLoop () ;
+void tuxKartMainLoop (RaceSetup& raceSetup) ;
 void backToSplash () ;
 void startScreen() ;
 void shutdown() ;
@@ -130,10 +103,9 @@ extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-extern void switchToGame ();
+void switchToGame (RaceSetup& raceSetup);
 
-extern int tuxkartMain () ;
-
+int tuxkartMain (RaceSetup& raceSetup) ;
 
 #endif
 

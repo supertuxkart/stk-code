@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.6 2004/08/08 16:36:23 jamesgregory Exp $
+//  $Id: BaseGUI.h,v 1.7 2004/08/10 16:22:32 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,8 @@
 #define HEADER_BASEGUI_H
 
 #include <SDL.h>
+
+class RaceSetup;
 
 enum GUISwitch
 {
@@ -47,7 +49,7 @@ MENU_CONTROLS,
 MENU_RETURN, MENU_RESTART, MENU_EXIT
 } ;
 
-void updateGUI();
+void updateGUI(RaceSetup& raceSetup);
 
 class BaseGUI
 {

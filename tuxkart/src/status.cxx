@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.23 2004/08/09 15:24:01 grumbel Exp $
+//  $Id: status.cxx,v 1.24 2004/08/10 16:22:31 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,7 @@
 #include "status.h"
 #include "KartDriver.h"
 #include "material.h"
+#include "RaceSetup.h"
 #include "Loader.h"
 
 #define MAX_STRING          30
@@ -184,7 +185,7 @@ static char *pos_string [] =
   "9th"
 } ;
 
-void drawScore ()
+void drawScore (RaceSetup& raceSetup)
 {
   char str [ 20 ] ;
 
@@ -271,9 +272,9 @@ void drawGameOverText ()
 }
 
 
-void drawGameRunningText ()
+void drawGameRunningText (RaceSetup& raceSetup)
 {
-  drawScore () ;
+  drawScore (raceSetup) ;
   drawTimer () ;
 
   glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
@@ -431,7 +432,7 @@ void drawPartlyDigestedHerring ( float state )
 }
 
 
-void drawStatusText ()
+void drawStatusText (RaceSetup& raceSetup)
 {
   if ( text == NULL )
     text = new fntRenderer () ;
@@ -459,7 +460,7 @@ void drawStatusText ()
     drawGameOverText     () ;
   else
   {
-    drawGameRunningText  () ;
+    drawGameRunningText  (raceSetup) ;
     drawEmergencyText    () ;
     drawCollectableIcons () ;
     drawPartlyDigestedHerring ( (float)(kart[0]->getNumHerring()) /
