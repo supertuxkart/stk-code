@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.11 2004/08/12 14:54:55 matzebraun Exp $
+//  $Id: TrackSel.cxx,v 1.12 2004/08/17 15:48:33 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -53,6 +53,23 @@ void TrackSel::update(float dt)
 	
 	widgetSet -> timer(menu_id, dt) ;
 	widgetSet -> paint(menu_id) ;
+
+        {
+                glClear(GL_DEPTH_BUFFER_BIT);
+                TrackData track_data = track_manager.tracks[widgetSet -> token (widgetSet -> click())];
+
+                float x     = 0.5f;
+                float y     = 0.0f;
+                float scale = .003f;
+
+                glBegin ( GL_LINE_LOOP ) ;
+                for ( int i = 0 ; i < int(track_data.driveline.size()) ; i++ )
+                {
+                        glVertex2f ( x + ( track_data.driveline[i][0] ) * scale,
+                                     y + ( track_data.driveline[i][1] ) * scale ) ;
+                }
+                glEnd () ;
+        }
 }
 
 void TrackSel::select()

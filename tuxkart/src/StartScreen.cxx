@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.5 2004/08/17 14:30:35 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.6 2004/08/17 15:48:32 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -74,7 +74,6 @@ StartScreen::installMaterial()
   /* Make a simplestate for the title screen texture */
 
   introMaterial = new ssgSimpleState ;
-  introMaterial -> ref();
   introMaterial -> setTexture( 
           loader->createTexture("title_screen.png", true, true, false));
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
