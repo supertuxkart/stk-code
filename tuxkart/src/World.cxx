@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.2 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: World.cxx,v 1.3 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,7 +38,8 @@
 
 World* World::current_ = 0;
 
-World::World(RaceSetup& raceSetup)
+World::World(const RaceSetup& raceSetup_)
+  : raceSetup(raceSetup_)
 {
   std::cout << "Creating world: " << this << std::endl;
   current_ = this;
@@ -169,7 +170,7 @@ World::World(RaceSetup& raceSetup)
   }
 
   // Load the track models
-  load_track   ( raceSetup, track_manager.tracks[raceSetup.track].loc_filename.c_str() ) ;
+  load_track   ( track_manager.tracks[raceSetup.track].loc_filename.c_str() ) ;
   load_players ( ) ;
 
   preProcessObj ( scene, raceSetup.mirror ) ;
@@ -195,7 +196,7 @@ World::~World()
    "deinit()"s */
 
   //FIXME: when this is fixed obviously this can be deleted:
-  shutdown();
+  deinitTuxKart();
 
   /*FIXME: in load we had
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
@@ -243,15 +244,11 @@ delete fclock ;
 }
 
 void
-World::run(RaceSetup& raceSetup)
+World::update()
 {
-  /* Loop forever updating everything */
+  /* Stop updating if we are paused */
 
-  while ( 1 )
-  {
-    /* Stop updating if we are paused */
-
-    if ( ! widgetSet -> get_paused () )
+  if ( ! widgetSet -> get_paused () )
     {
       fclock->update    () ;
       updateNetworkRead () ;
@@ -267,25 +264,24 @@ World::run(RaceSetup& raceSetup)
       updateWorld        () ;
     }
 
-    /* Routine stuff we do even when paused */
+  /* Routine stuff we do even when paused */
 
-    silver_h -> update () ;
-    gold_h   -> update () ;
-    red_h    -> update () ;
-    green_h  -> update () ;
+  silver_h -> update () ;
+  gold_h   -> update () ;
+  red_h    -> update () ;
+  green_h  -> update () ;
 
-    updateGFX ( gfx ) ;
+  updateGFX ( gfx ) ;
 
-    pollEvents();
-    kartInput (raceSetup) ;
-    drawStatusText (raceSetup) ;
-    updateGUI(raceSetup);
-    sound    -> update () ;
+  pollEvents();
+  kartInput (raceSetup) ;
+  drawStatusText (raceSetup) ;
+  updateGUI(raceSetup);
+  sound    -> update () ;
 
-    /* Swap graphics buffers last! */
+  /* Swap graphics buffers last! */
 
-    gfx      -> done   () ;
-  }
+  gfx      -> done   () ;
 }
 
 void
@@ -380,7 +376,7 @@ World::load_players()
 }
 
 void
-World::herring_command (RaceSetup& raceSetup, char *s, char *str )
+World::herring_command (char *s, char *str )
 {
   if ( num_herring >= MAX_HERRING )
   {
@@ -420,7 +416,7 @@ World::herring_command (RaceSetup& raceSetup, char *s, char *str )
 
 
 void
-World::load_track(RaceSetup& raceSetup, const char *fname )
+World::load_track(const char *fname )
 {
   std::string path = loader->getPath(fname);
   FILE *fd = fopen (path.c_str(), "r" ) ;
@@ -457,7 +453,7 @@ World::load_track(RaceSetup& raceSetup, const char *fname )
     if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                      &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
     {
-      herring_command ( raceSetup, & s [ strlen ( "*HERRING," ) ], s ) ;
+      herring_command ( & s [ strlen ( "*HERRING," ) ], s ) ;
     }
     else
     if ( s[0] == '\"' )
@@ -574,6 +570,15 @@ World::load_track(RaceSetup& raceSetup, const char *fname )
   }
 
   fclose ( fd ) ;
+}
+
+void
+World::restartRace()
+{
+  finishing_position = -1 ;
+  
+  for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
+    (*i)->reset() ;
 }
 
 /* EOF */

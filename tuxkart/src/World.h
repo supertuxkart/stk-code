@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.3 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: World.h,v 1.4 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,6 +27,8 @@
 #define NUM_PROJECTILES  8
 #define NUM_EXPLOSIONS   6
 
+#include "Screen.h"
+
 class Herring;
 class KartDriver;
 class Projectile;
@@ -37,7 +39,7 @@ class GFX;
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
-class World
+class World : public Screen
 {
 private:
   static World* current_;
@@ -55,6 +57,7 @@ public:
   ulClock     *fclock ;
 
 private:
+  RaceSetup raceSetup;
   Track        *track;
   guUDPConnection *net;
   int network_enabled;
@@ -70,18 +73,18 @@ private:
   Herring *green_h  ;
 
 public:
-  World(RaceSetup& raceSetup);
-  ~World();
+  World(const RaceSetup& raceSetup);
+  virtual ~World();
 
-  void run(RaceSetup& raceSetup);
-
+  void update();
+  void restartRace();
 private:
   void updateNetworkRead ();
   void updateLapCounter ( int k );
   void updateNetworkWrite ();
-  void load_track(RaceSetup& raceSetup, const char *fname );
+  void load_track(const char *fname );
   void load_players();
-  void herring_command (RaceSetup& raceSetup, char *s, char *str );
+  void herring_command(char *s, char *str );
 };
 
 #endif

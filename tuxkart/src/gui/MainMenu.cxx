@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: MainMenu.cxx,v 1.5 2004/08/11 11:27:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -54,7 +54,7 @@ void MainMenu::select()
 	case MENU_MULTI: 		guiStack.push_back(GUIS_NUMPLAYERS);break;
 	case MENU_REPLAY:		break;
 	case MENU_OPTIONS:	guiStack.push_back(GUIS_OPTIONS);	break;
-	case MENU_QUIT:		shutdown(); break;
+	case MENU_QUIT:		deinitTuxKart(); break;
 	}
 }
 
@@ -72,7 +72,7 @@ void MainMenu::keybd(const SDL_keysym& key)
 	case SDLK_RETURN: select(); break;
 	
 	case SDLK_ESCAPE:
-		shutdown();
+          deinitTuxKart();
 		
 	default: break;
 	}
@@ -88,3 +88,4 @@ void MainMenu::stick(int x, int y)
 	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }
 
+/* EOF */

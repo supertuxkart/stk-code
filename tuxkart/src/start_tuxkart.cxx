@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.57 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.58 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,6 +23,7 @@
 
 #include "tuxkart.h"
 
+#include "ScreenManager.h"
 #include "TrackManager.h"
 #include "StringUtils.h"
 #include "WidgetSet.h"
@@ -92,6 +93,19 @@ static void initTuxKart (int width, int height, int videoFlags)
   
   sound     = new SoundSystem ;
   widgetSet = new WidgetSet ;
+}
+
+void deinitTuxKart()
+{
+	if (gui)
+		delete gui;
+	
+	if (widgetSet)
+		delete widgetSet;
+
+	shutdownVideo ();
+  
+	exit (0);
 }
 
 void cmdLineHelp (char* invocation)
@@ -266,16 +280,20 @@ int main ( int argc, char *argv[] )
 
   initTuxKart ( width,  height, fullscreen );
 
+  ScreenManager screen_manager;
+
   if ( noStartScreen )
     {
-      World world(raceSetup);
-      world.run(raceSetup);
+      screen_manager.set_screen(new World(raceSetup));
     }
   else
     {
-      StartScreen startScreen;
-      startScreen.run();
+      screen_manager.set_screen(new StartScreen());      
     }
+
+  screen_manager.run();
+
+  deinitTuxKart();
 
   return 0 ;
 }

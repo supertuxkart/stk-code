@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.2 2004/08/11 00:13:05 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.3 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "RaceSetup.h"
 #include "tuxkart.h"
 #include "World.h"
+#include "ScreenManager.h"
 #include "StartScreen.h"
 
 StartScreen* StartScreen::current_ = 0;
@@ -28,48 +29,43 @@ StartScreen* StartScreen::current_ = 0;
 StartScreen::StartScreen()
 {
   current_ = this;
+
+  guiStack.push_back(GUIS_MAINMENU);
+  installMaterial();
 }
 
 void
-StartScreen::run()
+StartScreen::update()
 {
-  guiStack.push_back(GUIS_MAINMENU);
-  installMaterial();
+  //Setup for boring 2D rendering
+  glMatrixMode   ( GL_PROJECTION ) ;
+  glLoadIdentity () ;
+  glMatrixMode   ( GL_MODELVIEW ) ;
+  glLoadIdentity () ;
+  glDisable      ( GL_DEPTH_TEST ) ;
+  glDisable      ( GL_LIGHTING   ) ;
+  glDisable      ( GL_FOG        ) ;
+  glDisable      ( GL_CULL_FACE  ) ;
+  glDisable      ( GL_ALPHA_TEST ) ;
+  //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
-  RaceSetup raceSetup;
+  //Draw the splash screen
+  introMaterial -> force () ;
 
-  while ( 1 )
-  {
-    //Setup for boring 2D rendering
-    glMatrixMode   ( GL_PROJECTION ) ;
-    glLoadIdentity () ;
-    glMatrixMode   ( GL_MODELVIEW ) ;
-    glLoadIdentity () ;
-    glDisable      ( GL_DEPTH_TEST ) ;
-    glDisable      ( GL_LIGHTING   ) ;
-    glDisable      ( GL_FOG        ) ;
-    glDisable      ( GL_CULL_FACE  ) ;
-    glDisable      ( GL_ALPHA_TEST ) ;
-    //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
+  glBegin ( GL_QUADS ) ;
+  glColor3f    ( 1, 1, 1 ) ;
+  glTexCoord2f ( 0, 0 ) ; glVertex2i (   -1,   -1 ) ;
+  glTexCoord2f ( 1, 0 ) ; glVertex2i (   1,   -1 ) ;
+  glTexCoord2f ( 1, 1 ) ; glVertex2i (   1,   1 ) ;
+  glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
+  glEnd () ;
 
-    //Draw the splash screen
-    introMaterial -> force () ;
-
-    glBegin ( GL_QUADS ) ;
-    glColor3f    ( 1, 1, 1 ) ;
-    glTexCoord2f ( 0, 0 ) ; glVertex2i (   -1,   -1 ) ;
-    glTexCoord2f ( 1, 0 ) ; glVertex2i (   1,   -1 ) ;
-    glTexCoord2f ( 1, 1 ) ; glVertex2i (   1,   1 ) ;
-    glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
-    glEnd () ;
-
-    glFlush();
+  glFlush();
 	
-    // Swapbuffers - and off we go again...
-    pollEvents() ;
-    updateGUI(raceSetup);
-    swapBuffers();
-  }
+  // Swapbuffers - and off we go again...
+  pollEvents() ;
+  updateGUI(raceSetup);
+  swapBuffers();
 }
 
 void
@@ -96,14 +92,13 @@ StartScreen::installMaterial()
 }
 
 void
-StartScreen::switchToGame(RaceSetup& raceSetup)
+StartScreen::switchToGame()
 {
   delete introMaterial ;
   
   guiStack.clear();
   
-  World world(raceSetup);
-  world.run(raceSetup);
+  ScreenManager::current()->set_screen(new World(raceSetup));
 }
 
 /* EOF */

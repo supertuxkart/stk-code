@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.35 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: tuxkart.h,v 1.36 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -46,7 +46,6 @@
 #include "utils.h"
 #include "gui/BaseGUI.h"
 
-class GFX ;
 class WidgetSet;
 class SoundSystem ;
 class Track ;
@@ -64,8 +63,7 @@ extern KartProperties kart_props;
 typedef std::vector<KartProperties> Characters;
 extern Characters characters;
 
-void shutdown() ;
-void restartRace();
+void deinitTuxKart();
 
 #define MAX_HOME_DIST  50.0f
 #define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)

@@ -1,7 +1,7 @@
-//  $Id: StartScreen.h,v 1.2 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: Screen.h,v 1.1 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,29 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STARTSCREEN_H
-#define HEADER_STARTSCREEN_H
+#ifndef HEADER_SCREEN_H
+#define HEADER_SCREEN_H
 
-#include <plib/ssg.h>
-#include "Screen.h"
-#include "RaceSetup.h"
-
-class StartScreen : public Screen
+class Screen
 {
-private:
-  static StartScreen* current_;
-
-  ssgSimpleState *introMaterial ;
-  RaceSetup raceSetup;
-
-  void installMaterial();
 public:
-  static StartScreen* current() { return current_; }
-
-  StartScreen();
-
-  void switchToGame();
-  void update();
+  virtual void update() =0;
 };
 
 #endif

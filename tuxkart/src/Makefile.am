@@ -37,6 +37,9 @@ tuxkart_SOURCES = \
   WorldLoader.h  \
   StartScreen.h \
   StartScreen.cxx \
+  Screen.h \
+  ScreenManager.h \
+  ScreenManager.cxx \
   constants.h  \
   gfx.cxx  \
   gfx.h  \

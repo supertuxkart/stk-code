@@ -1,7 +1,7 @@
-//  $Id: StartScreen.h,v 1.2 2004/08/11 11:27:21 grumbel Exp $
+//  $Id: ScreenManager.cxx,v 1.1 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,31 +17,37 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STARTSCREEN_H
-#define HEADER_STARTSCREEN_H
+#include "ScreenManager.h"
 
-#include <plib/ssg.h>
-#include "Screen.h"
-#include "RaceSetup.h"
+ScreenManager* ScreenManager::current_ = 0;
 
-class StartScreen : public Screen
+ScreenManager::ScreenManager()
 {
-private:
-  static StartScreen* current_;
+  current_ = this;
+  quit = false;
+  current_screen = 0;
+}
 
-  ssgSimpleState *introMaterial ;
-  RaceSetup raceSetup;
+void
+ScreenManager::set_screen(Screen* screen)
+{
+  delete current_screen;
+  current_screen = screen;
+}
 
-  void installMaterial();
-public:
-  static StartScreen* current() { return current_; }
+void
+ScreenManager::run()
+{
+  while(!quit)
+    {
+      current_screen->update();
+    }
+}
 
-  StartScreen();
-
-  void switchToGame();
-  void update();
-};
-
-#endif
+void
+ScreenManager::shutdown()
+{
+  quit = true;
+}
 
 /* EOF */

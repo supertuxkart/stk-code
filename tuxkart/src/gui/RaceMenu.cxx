@@ -1,4 +1,4 @@
-//  $Id: RaceMenu.cxx,v 1.4 2004/08/08 16:35:26 jamesgregory Exp $
+//  $Id: RaceMenu.cxx,v 1.5 2004/08/11 11:27:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -19,6 +19,7 @@
 
 #include "RaceMenu.h"
 #include "tuxkart.h"
+#include "World.h"
 #include "WidgetSet.h"
 
 RaceMenu::RaceMenu()
@@ -52,7 +53,7 @@ void RaceMenu::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_RETURN:	guiStack.pop_back(); break;
-	case MENU_RESTART: guiStack.pop_back(); restartRace(); break;
+	case MENU_RESTART: guiStack.pop_back(); World::current()->restartRace(); break;
 	case MENU_EXIT:	guiStack.push_back(GUIS_EXITRACE); break;
 	default: break;
 	}

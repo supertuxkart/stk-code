@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.64 2004/08/11 00:57:56 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.65 2004/08/11 11:27:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -55,28 +55,5 @@ WidgetSet          *widgetSet = NULL ;
 BaseGUI	*gui = NULL;
 
 std::vector<GUISwitch> guiStack;
-
-void restartRace()
-{
-  finishing_position = -1 ;
-  
-  for ( World::Karts::iterator i = World::current()->kart.begin(); 
-        i != World::current()->kart.end() ; 
-        ++i )
-    (*i)->reset() ;
-}
-
-void shutdown()
-{
-	if (gui)
-		delete gui;
-	
-	if (widgetSet)
-		delete widgetSet;
-
-	shutdownVideo ();
-  
-	exit (0);
-}
 
 /* EOF */
