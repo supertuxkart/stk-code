@@ -9,6 +9,10 @@ First, make sure that you have the following packages installed:
     * OpenGL (or Mesa 3.0 or later)
     * PLIB version 1.8.0 or later . 
 
+Optionally, for fullscreen play you also need:
+
+	* SDL version 1.2.4 or later
+
 Unpack the files from the tarball like this:
 
   tar xzf tuxkart-*.tar.gz

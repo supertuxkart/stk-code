@@ -16,6 +16,10 @@ First, make sure that you have the following packages installed:
     * OpenGL (or Mesa 3.0 or later)
     * PLIB version 1.8.0 or later . 
 
+Optionally, for fullscreen play you also need:
+
+	* SDL version 1.2.4 or later
+
 Unpack the files from the tarball like this:
 
   tar xzf tuxkart-*.tar.gz
@@ -62,7 +66,7 @@ Ideally, you need a 'gamepad' style joystick with at leasti six buttons:
 
   Joystick Left/Right:  Steer.
 
-  A button - Accellerate.
+  A button - Accelerate.
   B button - Brake.
   C button - Use an item you've collected from a Red Herring
   D button - Ask to be rescued by tinytux.
@@ -81,13 +85,14 @@ In addition, you can drive from the keyboard:
   S key - Same as 'R' button - Jump
   D key - Same as 'D' button - Rescue Me Please!
   F key - Same as 'C' button - Use an item
-  ENTER - Same as 'C' button - Use an item
+
+
+The following keys control the in-game GUI:
 
   SPACE - Pop up or Hide the menu bar.
   R key - Restart the race.
   P key - Pause.
 
-  X key - Exit the game.
   ESCAPE- Exit the game.
 
 
@@ -95,6 +100,7 @@ There are also some debug functions left in for developers:
 
   W key - Toggle wireframe view
   Z key - Toggle statistics gathering
+  F12 - Display FPS counter
 
 From the Menu bar, you can turn sound effects and music on and off,
 enable or disable the 'mousetrap' (which keeps the mouse in the window
