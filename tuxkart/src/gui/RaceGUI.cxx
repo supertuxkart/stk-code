@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.19 2004/08/20 22:32:17 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.20 2004/08/22 13:15:18 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -263,8 +263,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
     sprintf ( str, "Not Started Yet!" ) ;
   else
   if ( player_kart->getLap() < raceSetup.numLaps - 1 )
-    sprintf ( str, "%s - Lap %d",
-      pos_string [ player_kart->getPosition() ],
+    sprintf ( str, "Lap %d",
                    player_kart->getLap() + 1 ) ;
   else
   {
@@ -348,32 +347,35 @@ void RaceGUI::drawGameRunningText (const RaceSetup& raceSetup)
 }
 
 
-
 void RaceGUI::drawPlayerIcons ()
 {
-  int x =  0 ;
-  int y = 10 ;
+  /** Draw players position on the race */
 
-  // FIXME: Use getScreenSize and do more intelligent icon placement
-  float w = 640.0f - 64.0f ;
+  int x = 10;
+  int y;
+  char str[256];
 
-  // FIXME: Draw more intelligent so that player is always on top
-  for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
+  for(World::Karts::size_type i = 0; i < World::current()->kart.size() ; i++)
     {
-      Material* players_gst = World::current()->kart[i]->getKartProperties().getIconMaterial();
+      y = 400 - (World::current()->kart[i]->getPosition()-1) * 40;
+
+      // draw icon
+      Material* players_gst =
+          World::current()->kart[i]->getKartProperties().getIconMaterial();
       players_gst -> apply ();
 
       glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;
 
-      /* Geeko */
-      x = (int) ( w * World::current()->kart [i] -> getDistanceDownTrack () /
-                  World::current() ->track -> getTrackLength () ) ;
       glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
-      glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+64, y    ) ;
-      glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+64, y+64 ) ;
-      glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+64 ) ;
+      glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+40, y    ) ;
+      glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+40, y+40 ) ;
+      glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+40 ) ;
       glEnd () ;
+
+      // draw text
+      sprintf (str, "%s", pos_string[World::current()->kart[i]->getPosition()]);
+      drawDropShadowText ( str, 20, 40+x, y ) ;
     }
 }
 
