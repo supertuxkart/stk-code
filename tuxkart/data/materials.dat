@@ -45,6 +45,7 @@
 "mriceblockshadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "mriceblockicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "tuxkartshadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"eviltuxicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushishadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "sushiicon.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "yetishadow.png" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
@@ -57,6 +58,7 @@
 "explode.png"      Y Y     Y      0.2     N     N   0.0     Y   N    N    N
 "players.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "tuxicon.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"possiicon.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "pennyicon.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "missile.png"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "flames.png"       N N     N      0.9     N     N   0.0     Y   N    N    N
