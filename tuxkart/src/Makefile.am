@@ -64,6 +64,8 @@ tuxkart_SOURCES = \
   Shadow.cxx \
   tuxkart.cxx  \
   tuxkart.h  \
+  TrackData.h \
+  TrackData.cxx \
   utils.cxx  \
   utils.h \
   lispreader.cxx \

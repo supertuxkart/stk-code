@@ -1,4 +1,4 @@
-//  $Id: gfx.cxx,v 1.17 2004/08/01 20:07:08 jamesgregory Exp $
+//  $Id: gfx.cxx,v 1.18 2004/08/10 16:54:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -136,9 +136,10 @@ void updateGFX ( GFX *gfx )
 
   glEnable ( GL_DEPTH_TEST ) ;
 
-  glFogf ( GL_FOG_DENSITY, 0.005 / 100.0f ) ;
+  glFogf ( GL_FOG_DENSITY, 1.0f / 100.0f ) ;
   glFogfv( GL_FOG_COLOR  , skyfogcol ) ;
   glFogf ( GL_FOG_START  , 0.0       ) ;
+  glFogf ( GL_FOG_END    , 1000.0      ) ;
   glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
   glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 

@@ -1,4 +1,4 @@
-//  $Id: preprocessor.cxx,v 1.3 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: preprocessor.cxx,v 1.4 2004/08/10 16:54:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -54,4 +54,4 @@ void preProcessObj ( ssgEntity *n, int mirror )
     preProcessObj ( b -> getKid ( i ), mirror ) ;
 }
 
-
+/* EOF */

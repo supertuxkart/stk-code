@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.58 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.59 2004/08/10 16:54:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -359,8 +359,7 @@ int tuxkartMain (RaceSetup& raceSetup)
   loader -> setCreateStateCallback  ( getAppState ) ;
   loader -> setCreateBranchCallback ( process_userdata ) ;
 
-  /* Grab the track centerline file */
-
+  // Grab the track centerline file
   char fname [ 100 ] ;
   sprintf ( fname, "data/%s.drv", track_manager.trackIdents[raceSetup.track].c_str() ) ;
 
@@ -373,9 +372,7 @@ int tuxkartMain (RaceSetup& raceSetup)
   Camera::setNumSplits ( numSplits ) ;
   initCameras () ;
 
-
-  /* Start building the scene graph */
-
+  // Start building the scene graph
   scene       = new ssgRoot   ;
   trackBranch = new ssgBranch ;
   scene -> addKid ( trackBranch ) ;
@@ -384,10 +381,15 @@ int tuxkartMain (RaceSetup& raceSetup)
 
   sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
 
-  gold_h    = new Herring ( yellow ) ; preProcessObj ( gold_h -> getRoot(), raceSetup.mirror ) ;
-  silver_h  = new Herring ( ssgLoad ( "coin.ac", loader )   ) ; preProcessObj ( silver_h -> getRoot(), raceSetup.mirror ) ;
-  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), raceSetup.mirror ) ;
-  green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), raceSetup.mirror ) ;
+  gold_h    = new Herring ( yellow ) ; 
+  silver_h  = new Herring ( ssgLoad ( "coin.ac", loader )   ) ;
+  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; 
+  green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; 
+
+  preProcessObj ( gold_h -> getRoot(),   raceSetup.mirror );
+  preProcessObj ( silver_h -> getRoot(), raceSetup.mirror );
+  preProcessObj ( red_h -> getRoot(),    raceSetup.mirror );
+  preProcessObj ( green_h -> getRoot(),  raceSetup.mirror );
 
   if (raceSetup.numKarts == -1)
     raceSetup.numKarts = characters.size();

@@ -1,4 +1,4 @@
-//  $Id: Herring.cxx,v 1.8 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Herring.cxx,v 1.9 2004/08/10 16:54:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,18 +21,6 @@
 #include "material.h"
 #include "Shadow.h"
 #include "Herring.h"
-
-void Herring::update ()
-{
-  sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
- 
-  c . hpr [ 0 ] = h ;
- 
-  h += 5.0f ;
- 
-  tr -> setTransform ( &c ) ;
-}
-
 
 Herring::Herring ( sgVec3 colour )
 {
@@ -93,8 +81,16 @@ Herring::Herring ( ssgEntity* model )
   tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }
 
-
+void Herring::update ()
+{
+  sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
  
+  c . hpr [ 0 ] = h ;
+ 
+  h += 5.0f ;
+ 
+  tr -> setTransform ( &c ) ;
+}
 
 void HerringInstance::update ()
 {

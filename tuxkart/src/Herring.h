@@ -1,4 +1,4 @@
-//  $Id: Herring.h,v 1.4 2004/08/08 03:14:17 grumbel Exp $
+//  $Id: Herring.h,v 1.5 2004/08/10 16:54:36 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -84,7 +84,6 @@ public:
   int      effect ;
   void update () ;
 } ;
-
 
 extern Herring *silver_h ;
 extern Herring *gold_h   ;
