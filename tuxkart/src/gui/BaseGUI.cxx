@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.24 2004/10/11 13:40:07 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.25 2004/10/19 11:43:51 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -158,6 +158,8 @@ void BaseGUI::stick(int whichAxis, int value)
 
 void BaseGUI::joybutton(int whichJoy, int button)
 {
+    (void)whichJoy;
+    
     if (button == 0)
         select();
     else if (guiStack.size() > 1 && button == 1)
