@@ -132,55 +132,75 @@ For example - do you crash if you hit it?  Yes - if it's a brick wall,
 No - if it's a cloud of smoke.  What is the coefficient of friction?
 Different for Ice than for Concrete.
 <p>
-These things will eventually be listed in a 'Material Reference File'
-for the level - but for now, it's hard-compiled into the game.  Hence,
+These things are listed in a 'Material Reference File' called
+'data/materials.dat'.  Since the
+default settings are generally what you want, most textures needn't
+be listed in the material file.  It's really there for special
+materials such as those that make up the 'zippers'.
+<p>
+Hence,
 if you need an icy surface, you apply the texture "ice.rgb" and when
 the model loads, I check that filename against my list of materials
-and note that "ice.rgb" is a slippery material.  This means that you
+in 'data/materials.dat' and note that "ice.rgb" is a slippery material.
+This means that you
 can't re-use the ice texture map for anything that isn't supposed to
 be slippery - but what the heck...that's a really easy solution.  It
 also allows me to add new material properties without going back into
 every single model adding that property into every single polygon.
 <p>
-If you feel the need to play with this, you'll need to hand-edit the
-table at the start of 'src/material.cxx'.
+The format of 'data/materials.dat' is described in the file itself
+in comments.  Each material is on a line of it's own.  Start with
+the texturemap name in double-quotes, then follow a number of boolean
+or numeric fields separated by spaces.
+<p>
+An example of a line in this file is:
 <pre>
 
-    { &aarmco_gst  , "images/aarmco.rgb"  , VCLAMP ,TRUE ,0.5, TRUE ,1.0, 0 },
+# TextureName        UVClamp Trans AlphaRef Light Friction Ign Zip Reset Collide
+"lava.rgb"             N N     N      0.0     N     1.0     N   N    Y    Y
 
 </pre>
+<p>
 The fields (in order) are:
 <ul>
-<li> &aarmco_gst -- the name of the material inside the C++ code.
-<li> "images/aarmco.rgb" -- the filename for the texture map.
-<li> VCLAMP -- this should be either: NOCLAMP, VCLAMP, UCLAMP or UVCLAMP and
-     determines whether the map:
+<li> TextureName -- the name of the texture map - stripped of it's pathname.
+     (All textures should be in the 'images' directory).
+
+<li> UVCLAMP -- two booleans - the first indicates whether the texture
+     coordinates should be clamped in the U direction - the second for
+     the V direction.
      <ul>
-     <li> NOCLAMP - repeats endlessly.
-     <li> UCLAMP - repeats in the V (ie Y) direction only.
-     <li> VCLAMP - or only in the U (ie X) direction.
-     <li> UVCLAMP - makes the texture not repeat at all.
+     <li> N N - repeats endlessly.
+     <li> Y N - repeats in the V (ie Y) direction only.
+     <li> N Y - or only in the U (ie X) direction.
+     <li> Y Y - makes the texture not repeat at all.
      </ul>
      If the polygon is larger than the map and the map is clamped then
      the edge texels of the map will be repeated endlessly.
-<li> TRUE -- is the texture transparent?
-<li> 0.5  -- the 'alpha clamp' value - pixels with an alpha less than this are
-     not rendered.
-<li> TRUE -- is 'lighting' enabled for this polygon?  If not, the polygon will
-     be drawn at it's full brightness and it'll glow in the dark.
-<li> 1.0 -- the frictional coefficient. 1.0 is 'normal', larger numbers represent
-     rougher surfaces, smaller are more slippery.
-<li> 0 -- the effect on the Kart of touching polygons made of this material.
+
+<li> Trans -- True if the polygon or texture is likely to be transparent and
+     therefore rendered with GL_BLEND enabled.
+
+<li> AlphaRef -- the 'alpha clamp' value - pixels with an alpha less than
+     this are not rendered.
+<li> Light -- is 'lighting' enabled for this polygon?  If not, the polygon
+     will be drawn at it's full brightness and it'll glow in the dark.
+<li> Friction -- the frictional coefficient. 1.0 is 'normal', larger numbers
+     represent rougher surfaces, smaller are more slippery.
+<li> Ign/Zip/Reset/Collide -- four booleans that describe the effect on the
+     Kart of touching polygons made of this material:
      <ul>
-     <li> 0 means that this is a 'drivable surface' - or for a vertical surface,
-         that karts that hit it will only slow down a little and can 'slide' along
-         the polygons.
-     <li> MAT_CRASH means that any kart that hits this polygon will crash and drop
-     to zero speed.
-     <li> MAT_ZIP means that this polygon has the effect of a zipper...probably, this
-     should only be used for actual zippers...think CAREFULLY before you do differently!
-     <li> MAT_IGN means that this material is purely decorative and karts can drive
-     right through it.
+     <li> Ign -- Ignore this polygon for the purposes of collision testing.
+     <li> Zip -- means that this is a 'zipper'.  If a kart touches it, the
+          kart will accellerate to high speed.
+     <li> Reset -- This material is "fatal" to karts - if you touch it then
+          the rescue squad will come and hoist you away from it and up onto
+          the track.
+     <li> Collide -- if no set for a horizontal surface, it means that a kart
+          can drive on it - for a vertical surface, karts that hit it will
+          only slow down a little and can 'slide' along the polygons.
+          If set, it means that any kart that hits this polygon will crash
+          and drop to zero speed.
      </ul>
 </ul>
 
