@@ -1,4 +1,4 @@
-//  $Id: ConfigControls.cxx,v 1.2 2004/08/10 16:45:42 jamesgregory Exp $
+//  $Id: ConfigControls.cxx,v 1.3 2004/08/17 22:53:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,6 +28,7 @@ ConfigControls::ConfigControls()
 	widgetSet -> state(menu_id, "Player 2",  GUI_SML, 2, 0);
 	widgetSet -> state(menu_id, "Player 3",  GUI_SML, 3, 0);
 	widgetSet -> state(menu_id, "Player 4",  GUI_SML, 4, 0);
+	widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
@@ -61,6 +62,9 @@ void ConfigControls::select()
 		break;
 	case 4:
 		guiStack.push_back(GUIS_CONFIGP4);
+		break;
+	case MENU_RETURN:
+		guiStack.pop_back();
 		break;
 	default: break;
 	}

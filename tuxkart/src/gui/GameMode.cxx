@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.5 2004/08/17 21:51:35 grumbel Exp $
+//  $Id: GameMode.cxx,v 1.6 2004/08/17 22:53:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #include "GameMode.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
+#include "World.h"
 
 GameMode::GameMode()
 {
@@ -31,6 +32,7 @@ GameMode::GameMode()
 	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
 	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
 	widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
+        widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 	widgetSet -> space(va);
 	widgetSet -> space(menu_id);
 	
@@ -53,9 +55,18 @@ void GameMode::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_GP:	guiStack.push_back(GUIS_DIFFICULTYGP); break;
-	case MENU_QUICKRACE:	guiStack.push_back(GUIS_DIFFICULTYQR); break;
-        case MENU_TIMETRIAL:    guiStack.push_back(GUIS_TRACKSEL); break;
+	case MENU_GP:
+		guiStack.push_back(GUIS_DIFFICULTYGP);
+		break;
+	case MENU_QUICKRACE:
+		guiStack.push_back(GUIS_DIFFICULTYQR);
+		break;
+	case MENU_TIMETRIAL:
+		guiStack.push_back(GUIS_TRACKSEL);
+		break;
+	case MENU_RETURN:
+		guiStack.pop_back();
+		break;
 	default: break;
 	}
 }

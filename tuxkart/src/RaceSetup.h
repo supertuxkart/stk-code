@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.1 2004/08/10 16:22:31 grumbel Exp $
+//  $Id: RaceSetup.h,v 1.2 2004/08/17 22:53:43 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,7 +25,7 @@
 class RaceSetup
 {
 public:
-        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE };
+        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
 
 	RaceSetup() { 
                 mode       = RM_QUICK_RACE;

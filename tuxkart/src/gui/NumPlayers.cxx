@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.3 2004/08/10 16:22:32 grumbel Exp $
+//  $Id: NumPlayers.cxx,v 1.4 2004/08/17 22:53:44 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,7 @@ NumPlayers::NumPlayers(RaceSetup& raceSetup_)
 	widgetSet -> state(menu_id, "Three Players",  GUI_SML, 3, 0);
 	widgetSet -> state(menu_id, "Four Players",  GUI_SML, 4, 0);
 	widgetSet -> state(menu_id, "Network Game",  GUI_SML, MENU_NETWORK, 0);
+	widgetSet -> state(menu_id, "Back",  GUI_SML, MENU_RETURN, 0);
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
@@ -52,6 +53,7 @@ void NumPlayers::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_NETWORK:	break;
+	case MENU_RETURN:	guiStack.pop_back();	break;
 	default: 
 		raceSetup.numPlayers = widgetSet -> token ( widgetSet -> click() );
 		guiStack.push_back(GUIS_GAMEMODE);
