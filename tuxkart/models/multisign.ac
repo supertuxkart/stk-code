@@ -1,0 +1,63 @@
+AC3Db
+MATERIAL "ac3dmat1" rgb 1 1 1  amb 0.2 0.2 0.2  emis 0 0 0  spec 0.5 0.5 0.5  shi 10  trans 0
+OBJECT world
+kids 3
+OBJECT poly
+name "rect"
+loc -73.3841 4.44288 -116.711
+texture "/hda1/tuxkart/models/../images/adverts.rgb"
+texrep 0.55 0.27
+texoff -0.54 0.6
+numvert 4
+62.6413 -2.75681 116.68
+69.7413 -2.74738 116.684
+69.7435 -4.44718 116.71
+62.6435 -4.45662 116.705
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+3 0 0
+2 1 0
+1 1 1
+0 0 1
+kids 0
+OBJECT poly
+name "rect"
+loc -66.2021 3.92451 -116.708
+texture "/hda1/tuxkart/models/../images/adverts.rgb"
+texrep 0.5 0.27
+numvert 4
+62.5593 -2.22902 116.681
+69.7593 -2.21945 116.686
+69.7615 -3.91925 116.711
+62.5615 -3.92882 116.707
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+3 0 0
+2 1 0
+1 1 1
+0 0 1
+kids 0
+OBJECT poly
+name "rect"
+loc -59.0287 3.30955 -116.504
+texture "/hda1/tuxkart/models/../images/adverts.rgb"
+texrep 0.53 0.28
+texoff -0.53 0.32
+numvert 4
+62.5857 -1.6045 116.481
+69.7856 -1.5919 116.539
+69.7878 -3.2917 116.565
+62.5879 -3.3043 116.507
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+3 0 0
+2 1 0
+1 1 1
+0 0 1
+kids 0
