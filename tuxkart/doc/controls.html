@@ -37,20 +37,9 @@
 </TD>
 <TD>
 <H2>STARTING THE GAME:</H2>
-Just 'cd' into the download directory and run 'src/tuxkart',
+Just 'cd' into the download directory and run './src/tuxkart',
 or run '/usr/local/games/tuxkart' if you did a 'make install'.
 <p>
-If you have a Voodoo-1/2 graphics card, don't forget the usual:
-<p>
-  csh/tcsh:
-<pre>
-    setenv MESA_GLX_FX fullscreen
-</pre>
-  or for sh/bash:
-<pre>
-    MESA_GLX_FX=fullscreen
-    export MESA_GLX_FX
-</pre>
 Select the number of laps and which course you'd like to race
 on then click 'start game' to get going.
 <center>
@@ -75,8 +64,8 @@ Gown's Bow.
 </center>
 
 <H2>PLAYING THE GAME:</H2>
-Ideally, you need a joystick with at least six buttons
-(I use a 'MakoPad-PC' gamepad).
+Ideally, you need a 'gamepad' style joystick with at leasti
+six buttons:
 <pre>
 
   Joystick Left/Right:  Steer.
@@ -89,7 +78,7 @@ Ideally, you need a joystick with at least six buttons
   R button - Jump.
 
 </pre>
-In addition, from the keyboard:
+In addition, you can drive from the keyboard:
 <pre>
 
   LEFT/RIGHT ARROW: Steer.
@@ -203,10 +192,6 @@ Bad Things:
      always manage to put you back onto the track correctly.
      If this happens, you may need to type 'R' to restart the race
      - Sorry.
-<li> Several Mesa lighting bugs are shown up particularly badly
-     in this game. Mesa 3.3 on CVS has these fixed - and the
-     nVidia OpenGL for Linux doesn't exhibit them - so it's not
-     my fault!
 <li> Sometimes you can be pushed through a solid object if
      you are hit by another player when in contact with the
      surface.

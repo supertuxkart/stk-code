@@ -6,66 +6,178 @@ TuxKart.
                            http://www.sjbaker.org
 
 INSTALLATION:
-
+~~~~~~~~~~~~~
 Installation instructions are pretty basic,
-and are covered in the documentation directory 'doc'.
+and are covered in detail in the documentation directory 'doc',
+and in the file INSTALL or online at http://tuxkart.sf.net 
 
-First make sure that you have the following packages
-installed:
+First, make sure that you have the following packages installed:
 
-   OpenGL (or Mesa)
-   PLIB version 1.8.0 or later - which can be obtained from:
-     http://plib.sourceforge.net
+    * OpenGL (or Mesa 3.0 or later)
+    * PLIB version 1.8.0 or later . 
 
-Once that is done, it should be a simple matter of changing
-to the directory where all this stuff is unpacked and type:
+Unpack the files from the tarball like this:
 
- ./configure
- make
+  tar xzf tuxkart-*.tar.gz
+  cd tuxkart-*
 
-You can run the game from the directoryyou downloaded it
-into - or (as 'root') you can install it into
-/usr/local/share/games/tuxkart by typing;
+
+(where '*' is the version of TuxKart you downloaded - eg 0.4.0) ...and then:
+
+  ./configure
+  make
+
+You can run the game from the directory you downloaded it into - or (as 'root') you can install it into /usr/local/share/games/tuxkart by typing;
 
  make install
 
-However, you might want to check the full documentation -
-especially if you need to install Mesa/GLIDE/GLUT before
-you can start.
 
-All documents are in HTML - so view them with your web browser.
+BUT IT DIDN'T WORK!
+~~~~~~~~~~~~~~~~~~~
+
+The most common (by FAR) reason for problems is that your OpenGL/Mesa
+is incorrectly installed - so before you complain to any of the PLIB
+or TuxKart mailing lists, first try running one of the example programs
+that comes with your OpenGL implementation - or one of the Mesa or GLUT
+sample programs.
+
+If you those examples run OK - then go to the PLIB home page and download
+the PLIB examples.
+
+If THOSE run correctly - but TuxKart doesn't then please get in touch with
+the TuxKart mailing list and we'll do our best to get you up and racing.
 
 STARTING THE GAME:
 
-Just 'cd' into the download directory and run './src/tuxkart',
-or run '/usr/local/games/tuxkart' if you did a 'make install'.
+Just 'cd' into the download directory and run './src/tuxkart', or run
+'/usr/local/games/tuxkart' if you did a 'make install'.
 
-Select the number of laps and which course you'd like to race
-on then click 'start game' to get going.
+Select the number of laps and which course you'd like to race on then
+click 'start game' to get going.
+
 
 PLAYING THE GAME:
 
-Ideally, you should get a joystick with at least six buttons
-(I use a 'MakoPad-PC' gamepad).
+Ideally, you need a 'gamepad' style joystick with at leasti six buttons:
 
-Joystick Left/Right:  Steer.
+  Joystick Left/Right:  Steer.
 
-A button - Accellerate.
-B button - Brake.
-C button - Use an item (see below).
-D button - unused.
-L button - Pop a wheelie (if you are going fast enough).
-R button - Jump.
+  A button - Accellerate.
+  B button - Brake.
+  C button - Use an item you've collected from a Red Herring
+  D button - Ask to be rescued by tinytux.
+  L button - Pop a wheelie (if you are going fast enough).
+  R button - Jump.
 
-In addition, from the keyboard:
 
-R key - Restart the race.
-X key - Exit the game.
-P key - Pause.
-SPACE - Pop up or Hide the menu bar.
+In addition, you can drive from the keyboard:
 
-From the Menu bar, you can turn sound effects and music
-on and off, get Help and see the Credits screen.
+  LEFT/RIGHT ARROW: Steer.
+
+  UP-ARROW   - Same as 'A' button - Accellerate
+  DOWN-ARROW - Same as 'B' button - Brake
+
+  A key - Same as 'L' button - pop a Wheelie
+  S key - Same as 'R' button - Jump
+  D key - Same as 'D' button - Rescue Me Please!
+  F key - Same as 'C' button - Use an item
+  ENTER - Same as 'C' button - Use an item
+
+  SPACE - Pop up or Hide the menu bar.
+  R key - Restart the race.
+  P key - Pause.
+
+  X key - Exit the game.
+  ESCAPE- Exit the game.
+
+
+There are also some debug functions left in for developers:
+
+  W key - Toggle wireframe view
+  Z key - Toggle statistics gathering
+
+From the Menu bar, you can turn sound effects and music on and off,
+enable or disable the 'mousetrap' (which keeps the mouse in the window
+to stop you accidentally losing the mouse pointer on Voodoo-1/2 hardware)
+
+On the tracks, you'll find Red, Silver and Gold Herring (Yum - good!),
+and Green Herring (Yuk - bad!) - also arrow-shaped red and black 'zippers'
+that give you a quick speedup.
+
+Use the 'rescue' key if you crash and can't get back onto the track. It's
+sometimes activated automatically if (for example) you get stuck in hot
+lava. TinyTux will lift your cart up and put it back onto the track.
+
+
+POWERUPS:
+
+I currently have many 'good things' (triggered by eating a Red Herring)
+and a few 'bad things' (triggered by eating a Green Herring by mistake).
+
+Good things are collectables - you pick them up by driving through the
+Red Herring and activate them by pushing the 'C' button on the joystick
+(or ENTER on the keyboard).
+
+Bad things happen immediately - and last for a few seconds before 'going
+away' by themselves.
+
+Notice that (unlike some kart games), the computer controlled players
+also collect and use powerups.
+
+Silver and Gold Herrings gradually fill up Tux's tummy (represented by
+the herring bone at the top of the screen) - as you eat more herring,
+you'll find that a Red Herring will subsequently give you two, three,
+four or five powerups at one time!
+
+
+Good Things:
+
+    * Missiles - unguided but fast. If they hit anything, they explode
+      impressively. The effect on a Kart is to stop it dead - so you have to
+      accellerate again.
+    * Homing missiles - slower than the regular kind - but they track
+      the nearest kart and are quite hard to shake off.
+    * Fuzzy blobs - even slower still - a kart can outrun them quite
+      easily. They ricochet off the sides of the track and only explode
+      when they hit a Kart.
+    * Magnets - if you activate a magnet then it hangs around for about
+      15 seconds. If anyone comes within about 20 meters, you'll be
+      pulled towards them and end up glued to their tail until the magnet
+      'expires'. Great for catching up with someone - hopeless for passing
+      them.
+    * Portable Zippers - these are just like the zippers on the track
+      itself - they give you a sudden accelleration and temporarily
+      increase the top speed of your kart.
+
+Bad Things:
+
+    * Parachute - this pops out the back of your kart and slows you down
+      a little for a few seconds only. Enough to drop you back one place
+      if it's a close race though.
+    * Anvil - gets dragged behind your kart on a rope for an even shorter
+      amount of time than the parachute...but the drag effect is much
+      stronger - your kart hardly moves at all. 
+
+KNOWN BUGS:
+
+    * No drive-with-the-mouse support.
+    * Slow performance on CPU's less than ~450MHz.
+    * No way to return to title screen at end of race.
+    * You always play as Tux - there is no way to change players.
+    * After you cross the finish line, if someone overtakes you, your final
+      position changes!
+    * No "Ready, Steady, Go!" sequence.
+    * The computer players get confused and 'stuck' on tracks that
+      self-intersect (eg figure-8 shaped tracks). The lap counter and
+      current player positions are also screwed up on those kinds of tracks.
+    * If you (or one of the computer players) goes off the edge of the track,
+      or calls for rescue then tiny-tux doesn't always manage to put you
+      back onto the track correctly. If this happens, you may need to type
+      'R' to restart the race - Sorry.
+    * Sometimes you can be pushed through a solid object if you are hit by
+      another player when in contact with the surface. 
+
+I'm sure there are lots more!
 
 LICENSE:
 
