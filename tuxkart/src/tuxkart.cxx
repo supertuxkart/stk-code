@@ -7,7 +7,7 @@ int player = 0 ;
 int finishing_position = -1 ;
 
 guUDPConnection *net = NULL ;
-ssgLoaderOptions *loader_opts = NULL ;
+ssgLoaderOptions *loadOpts = NULL ;
 
 int network_enabled = FALSE ;
 int network_testing = FALSE ;
@@ -68,30 +68,9 @@ int       num_karts = 0 ;
 ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
 
-void mirror_scene ( ssgEntity *n ) ;
-
 
 void load_players ( char *fname )
 {
-  ssgEntity *obj;
-
-  ssgEntity *pobj1 = ssgLoad ( parachute_file, loader_opts ) ;
-  ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader_opts ) ;
-  ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader_opts ) ;
-  ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader_opts ) ;
-
-  mirror_scene ( pobj1 ) ;
-  mirror_scene ( pobj2 ) ;
-  mirror_scene ( pobj3 ) ;
-  mirror_scene ( pobj4 ) ;
-
-  sgCoord cc ;
-  sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
-  ssgTransform *ttt = new ssgTransform ( & cc ) ;
-  ttt -> addKid ( ssgLoad ( tinytux_file  , loader_opts ) ) ;
-  mirror_scene ( ttt ) ;
-
-  ssgEntity *pobj5 = ttt ;
   int i ;
  
   FILE *fd = fopen ( fname, "r" ) ;
@@ -132,7 +111,18 @@ void load_players ( char *fname )
 
   for ( i = 0 ; i < num_karts ; i++ )
   {
-    ssgRangeSelector *lod = new ssgRangeSelector ;
+    ssgEntity *pobj1 = ssgLoad ( parachute_file, loadOpts ) ;
+    ssgEntity *pobj2 = ssgLoad ( magnet_file   , loadOpts ) ;
+    ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loadOpts ) ;
+    ssgEntity *pobj4 = ssgLoad ( anvil_file    , loadOpts ) ;
+
+    sgCoord cc ;
+    sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
+    ssgTransform *ttt = new ssgTransform ( & cc ) ;
+    ttt -> addKid ( ssgLoad ( tinytux_file  , loadOpts ) ) ;
+
+    ssgEntity *pobj5 = ttt ;
+
     float r [ 2 ] = { -10.0f, 100.0f } ;
     int kart_id ;
 
@@ -144,8 +134,16 @@ void load_players ( char *fname )
     else
       kart_id = i ;
  
-    obj = ssgLoad ( player_files [ kart_id ], loader_opts ) ;
-    mirror_scene ( obj ) ;
+    ssgEntity *obj = ssgLoad ( player_files [ kart_id ], loadOpts ) ;
+
+{
+    sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
+    ssgTransform *xxx = new ssgTransform ( & cc ) ;
+    xxx -> addKid ( obj ) ;
+    obj = xxx ;
+}
+
+    ssgRangeSelector *lod = new ssgRangeSelector ;
 
     lod -> addKid ( obj ) ;
     lod -> setRanges ( r, 2 ) ;
@@ -164,15 +162,16 @@ void load_players ( char *fname )
     projectile[i]-> getModel() -> addKid ( sel ) ;
 
     for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
-      sel -> addKid ( ssgLoad ( projectile_files [ j ], loader_opts ) ) ;
+      sel -> addKid ( ssgLoad ( projectile_files [ j ], loadOpts ) ) ;
 
-    mirror_scene ( sel ) ;
     projectile[i] -> off () ;
   }
 
   for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
-    explosion[i] = new Explosion ( (ssgBranch *) ssgLoad ( explosion_file,
-                                                    loader_opts ) ) ;
+  {
+    ssgBranch *b = (ssgBranch *) ssgLoad ( explosion_file, loadOpts ) ;
+    explosion[i] = new Explosion ( b ) ;
+  }
 }
 
 
@@ -195,26 +194,27 @@ static void herring_command ( char *s, char *str )
  
   sgCoord c ;
  
-  sgCopyVec3 ( h->xyz, xyz ) ;
   sgSetVec3  ( c.hpr, 0.0f, 0.0f, 0.0f ) ;
-  sgCopyVec3 ( c.xyz, h->xyz ) ;
+  sgCopyVec3 ( c.xyz, xyz ) ;
  
   if ( str[0]=='Y' || str[0]=='y' ){ h->her = gold_h   ; h->type = HE_GOLD   ;}
   if ( str[0]=='G' || str[0]=='g' ){ h->her = green_h  ; h->type = HE_GREEN  ;}
   if ( str[0]=='R' || str[0]=='r' ){ h->her = red_h    ; h->type = HE_RED    ;}
   if ( str[0]=='S' || str[0]=='s' ){ h->her = silver_h ; h->type = HE_SILVER ;}
  
+  if ( mirror ) xyz[0] *= -1.0f ;
+  sgCopyVec3 ( h->xyz, xyz ) ;
   h->eaten = FALSE ;
   h->scs   = new ssgTransform ;
   h->scs -> setTransform ( &c ) ;
   h->scs -> addKid ( h->her->getRoot () ) ;
   scene  -> addKid ( h->scs ) ;
- 
+
   num_herring++ ;
 }
 
 
-void mirror_scene ( ssgEntity *n )
+void flipObj ( ssgEntity *n )
 {
   if ( n == NULL || !mirror ) return ;
 
@@ -233,17 +233,17 @@ void mirror_scene ( ssgEntity *n )
     sgMat4 xform ;
 
     ((ssgTransform *)n) -> getTransform ( xform ) ;
-    xform [ 0 ][ 0 ] = - xform [ 0 ] [ 0 ] ;
-    xform [ 1 ][ 0 ] = - xform [ 1 ] [ 0 ] ;
-    xform [ 2 ][ 0 ] = - xform [ 2 ] [ 0 ] ;
-    xform [ 3 ][ 0 ] = - xform [ 3 ] [ 0 ] ;
+    xform [ 0 ][ 0 ] *= -1.0f ;
+    xform [ 1 ][ 0 ] *= -1.0f ;
+    xform [ 2 ][ 0 ] *= -1.0f ;
+    xform [ 3 ][ 0 ] *= -1.0f ;
     ((ssgTransform *)n) -> setTransform ( xform ) ;
   }
 
   ssgBranch *b = (ssgBranch *) n ;
 
   for ( int i = 0 ; i < b -> getNumKids () ; i++ )
-    mirror_scene ( b -> getKid ( i ) ) ;
+    flipObj ( b -> getKid ( i ) ) ;
 }
 
 
@@ -385,7 +385,7 @@ void load_track ( char *fname )
 	}
       }
 
-      ssgEntity        *obj   = ssgLoad ( fname, loader_opts ) ;
+      ssgEntity        *obj   = ssgLoad ( fname, loadOpts ) ;
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;
 
@@ -403,12 +403,6 @@ void load_track ( char *fname )
       exit ( 1 ) ;
     }
   }
-
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-  ssgSetBackFaceCollisions ( mirror ) ;
-#endif
-
-  mirror_scene ( trackBranch ) ;
 
   fclose ( fd ) ;
 }
@@ -470,13 +464,12 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
 
   /* Set the SSG loader options */
 
-  loader_opts = new ssgLoaderOptions () ;
-  loader_opts -> setCreateStateCallback  ( getAppState ) ;
-  loader_opts -> setCreateBranchCallback ( process_userdata ) ;
-  ssgSetCurrentOptions ( loader_opts ) ;
+  loadOpts = new ssgLoaderOptions () ;
+  loadOpts -> setCreateStateCallback  ( getAppState ) ;
+  loadOpts -> setCreateBranchCallback ( process_userdata ) ;
+  ssgSetCurrentOptions ( loadOpts ) ;
   ssgModelPath         ( "models" ) ;
   ssgTexturePath       ( "images" ) ;
-
 
   /* Say "Hi!" to the nice user. */
 
@@ -544,6 +537,13 @@ int tuxkartMain ( int _numLaps, int _mirror, char *_levelName )
   sprintf ( fname, "data/%s.loc", trackname ) ;
   load_track   ( fname        ) ;
   load_players ( playersfname ) ;
+
+  flipObj ( scene ) ;
+
+
+#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
+  ssgSetBackFaceCollisions ( mirror ) ;
+#endif
 
   /* Play Ball! */
 
