@@ -616,14 +616,15 @@ void updateWorld ()
     cam.hpr[1] = -5.0f ;
     cam.hpr[2] = 0.0f;
 
-#ifdef OLD_CAMERA
-    ssgSetCamera ( &cam ) ;
-#else
     sgSubVec3 ( diff.xyz, cam.xyz, steady_cam.xyz ) ;
     sgSubVec3 ( diff.hpr, cam.hpr, steady_cam.hpr ) ;
 
-    diff.hpr[0] += ( diff.hpr[0] >  180.f ) ? -360.f : 0.f ;
-    diff.hpr[0] += ( diff.hpr[0] < -180.f ) ?  360.f : 0.f ;
+    while ( diff.hpr[0] >  180.0f ) diff.hpr[0] -= 360.0f ;
+    while ( diff.hpr[0] < -180.0f ) diff.hpr[0] += 360.0f ;
+    while ( diff.hpr[1] >  180.0f ) diff.hpr[1] -= 360.0f ;
+    while ( diff.hpr[1] < -180.0f ) diff.hpr[1] += 360.0f ;
+    while ( diff.hpr[2] >  180.0f ) diff.hpr[2] -= 360.0f ;
+    while ( diff.hpr[2] < -180.0f ) diff.hpr[2] += 360.0f ;
 
     steady_cam.xyz[0] = steady_cam.xyz[0] + 0.2f * diff.xyz[0] ;
     steady_cam.xyz[1] = steady_cam.xyz[1] + 0.2f * diff.xyz[1] ;
@@ -633,7 +634,6 @@ void updateWorld ()
     steady_cam.hpr[2] = steady_cam.hpr[2] + 0.1f * diff.hpr[2] ;
 
     ssgSetCamera ( &steady_cam ) ;
-#endif
   }
   else
   if ( cam_follow < num_karts + MAX_FIXED_CAMERA )
