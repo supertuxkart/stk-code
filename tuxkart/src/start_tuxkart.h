@@ -4,6 +4,9 @@
 #include <string.h>
 #include <time.h>
 #ifdef WIN32
+#ifdef __CYGWIN__
+#include <unistd.h>
+#endif
 #include <windows.h>
 #else
 #include <unistd.h>

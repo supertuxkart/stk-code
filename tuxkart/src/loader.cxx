@@ -216,6 +216,13 @@ void *autotexInit ( ssgBranch **br, char *data )
 }
  
 
+void *billboardInit ( ssgBranch **br, char * )
+{
+  *br = new ssgCutout () ;
+  return NULL ;
+}
+                                                                                
+
 void *invisibleInit ( ssgBranch **br, char * )
 {
   *br = new ssgInvisible () ;
@@ -291,6 +298,18 @@ ssgBranch *process_userdata ( char *data )
     return NULL ;
 
   data++ ;   /* Skip the '@' */
+
+  if ( strncmp ( "billboard", data, strlen ( "billboard" ) ) == 0 )
+  {
+    billboardInit ( &b, data ) ;
+    return b ;
+  }
+
+  if ( strncmp ( "invisible", data, strlen ( "invisible" ) ) == 0 )
+  {
+    invisibleInit ( &b, data ) ;
+    return b ;
+  }
 
   if ( strncmp ( "switch", data, strlen ( "switch" ) ) == 0 )
   {
