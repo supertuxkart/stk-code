@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.12 2004/08/24 00:07:04 grumbel Exp $
+//  $Id: World.h,v 1.13 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -47,8 +47,10 @@ public:
   ssgRoot      *scene;
 
   typedef std::vector<KartDriver*> Karts;
+private:
   Karts kart;
 
+public:
   Projectile *projectile [ NUM_PROJECTILES ] ;
   Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
   float clock;
@@ -90,6 +92,10 @@ public:
   void draw();
   void update(float delta);
   void restartRace();
+  
+  KartDriver* getPlayerKart(int player);
+  KartDriver* getKart(int kart); 
+  int getNumKarts() const { return kart.size(); }
   
   /** Returns the phase of the game */
   Phase getPhase() const { return phase; }

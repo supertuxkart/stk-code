@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.19 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: Camera.cxx,v 1.20 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -105,10 +105,10 @@ void Camera::init ()
 void Camera::update ()
 {
   // Update the camera
-  if ( whichKart >= int(World::current()->kart.size()) || whichKart < 0 ) whichKart = 0 ;
+  if ( whichKart >= int(World::current()->getNumKarts()) || whichKart < 0 ) whichKart = 0 ;
 
   sgCoord kartcoord;
-  sgCopyCoord(&kartcoord, World::current()->kart[whichKart]->getCoord());
+  sgCopyCoord(&kartcoord, World::current()->getPlayerKart(whichKart)->getCoord());
 
   kartcoord.hpr[2] = 0;
   kartcoord.hpr[1] = 0;
@@ -127,7 +127,7 @@ void Camera::update ()
 
   if (!use_fake_drift)
     {
-      float steer_offset = World::current()->kart[whichKart]->getSteerAngle()*-10.0f;
+      float steer_offset = World::current()->getPlayerKart(whichKart)->getSteerAngle()*-10.0f;
       relaxation(steer_offset, last_steer_offset, .25);
                  
       sgMat4 cam_rot;

@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.42 2004/08/21 18:15:13 straver Exp $
+//  $Id: KartDriver.cxx,v 1.43 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -193,23 +193,23 @@ void KartDriver::doObjectInteractions ()
 
     sgVec3 xyz ;
 
-    sgSubVec3 ( xyz, getCoord()->xyz, World::current()->kart [ i ] -> getCoord () -> xyz ) ;
+    sgSubVec3 ( xyz, getCoord()->xyz, World::current()->getKart(i) -> getCoord () -> xyz ) ;
 
     if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
     {
-      if ( this == World::current()->kart[0] || i == 0 )
+      if ( this == World::current()->getPlayerKart(0) || i == 0 )
         sound->playSfx ( SOUND_OW ) ;
 
       sgNormalizeVec2 ( xyz ) ;
 
-      if ( velocity.xyz[1] > World::current()->kart[i]->getVelocity()->xyz[1] )
+      if ( velocity.xyz[1] > World::current()->getKart(i)->getVelocity()->xyz[1] )
       {
         forceCrash () ;
-        sgSubVec2 ( World::current()->kart[i]->getCoord()->xyz, xyz ) ;
+        sgSubVec2 ( World::current()->getKart(i)->getCoord()->xyz, xyz ) ;
       }
       else
       {
-        World::current()->kart[i]->forceCrash () ;
+        World::current()->getKart(i)->forceCrash () ;
         sgAddVec2 ( getCoord()->xyz, xyz ) ;
       }
     } 
@@ -230,7 +230,7 @@ void KartDriver::doObjectInteractions ()
       herring [ i ] . eaten = TRUE ;
       herring [ i ] . time_to_return = World::current()->clock + 2.0f  ;
 
-      if ( this == World::current()->kart[0] )
+      if ( this == World::current()->getPlayerKart(0) )
         sound->playSfx ( ( herring[i].type == HE_GREEN ) ?
                           SOUND_UGH : SOUND_BURP ) ;
 
@@ -302,7 +302,7 @@ void KartDriver::doZipperProcessing ( float delta)
 
 void KartDriver::forceCrash ()
 {
-  if ( this == World::current()->kart[0] )
+  if ( this == World::current()->getPlayerKart(0) )
     sound->playSfx ( SOUND_BONK ) ;
 
   wheelie_angle = CRASH_PITCH ;
@@ -816,15 +816,15 @@ KartDriver::processAttachments(float delta)
       float cdist = SG_MAX ;
       int   closest = -1 ;
 
-      for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
+      for ( int i = 0; i < World::current()->getNumKarts() ; ++i )
         {
-          if ( World::current()->kart[i] == this ) continue ;
+          if ( World::current()->getKart(i) == this ) continue ;
 
-          if ( World::current()->kart[i]->getDistanceDownTrack() < getDistanceDownTrack() )
+          if ( World::current()->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
             continue ;
 
           float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                            World::current()->kart[i]->getCoord()->xyz ) ;
+                                            World::current()->getKart(i)->getCoord()->xyz ) ;
 
           if ( d < cdist && d < MAGNET_RANGE_SQD )
             {
@@ -837,7 +837,7 @@ KartDriver::processAttachments(float delta)
         {
           if ( getAttachment () == ATTACH_MAGNET )
             {
-              if ( this == World::current()->kart[0] || closest == 0 )
+              if ( this == World::current()->getKart(0) || closest == 0 )
                 sound -> playSfx ( SOUND_BZZT ) ;
 
               attach ( ATTACH_MAGNET_BZZT,
@@ -845,13 +845,13 @@ KartDriver::processAttachments(float delta)
             }
 
           sgVec3 vec ;
-          sgSubVec2 ( vec, World::current()->kart[closest]->getCoord()->xyz, getCoord()->xyz ) ;
+          sgSubVec2 ( vec, World::current()->getKart(closest)->getCoord()->xyz, getCoord()->xyz ) ;
           vec [ 2 ] = 0.0f ;
           sgNormalizeVec3 ( vec ) ;
 
           sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
 
-          float tgt_velocity = World::current()->kart[closest]->getVelocity()->xyz[1] ;
+          float tgt_velocity = World::current()->getKart(closest)->getVelocity()->xyz[1] ;
 
           if ( cdist > MAGNET_MIN_RANGE_SQD )
             {

@@ -1,4 +1,4 @@
-//  $Id: RaceManager.h,v 1.4 2004/08/24 21:01:44 grumbel Exp $
+//  $Id: RaceManager.h,v 1.5 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -40,11 +40,13 @@ class GrandPrixMode : public RaceMode
 private:
   void start_race(int n);
 public:
+  std::string kart;
   CupData cup;
   RaceDifficulty difficulty;
   GrandPrixSetup stat;
 
-  GrandPrixMode(const CupData& cup_,
+  GrandPrixMode(const std::string& kart_, 
+                const CupData& cup_,
                 RaceDifficulty difficulty_);
   virtual ~GrandPrixMode() {}
 
@@ -55,10 +57,11 @@ public:
 class QuickRaceMode : public RaceMode
 {
 public:
-  TrackData data;
+  std::string track;
+  std::string kart;
   RaceDifficulty difficulty;
 
-  QuickRaceMode(const TrackData& data_, RaceDifficulty difficulty_);
+  QuickRaceMode(const std::string& track_, const std::string& kart_, RaceDifficulty difficulty_);
   virtual ~QuickRaceMode() {}
 
   void start();
@@ -68,9 +71,10 @@ public:
 class TimeTrialMode : public RaceMode
 {
 public:
-  TrackData data;
+  std::string track;
+  std::string kart;
 
-  TimeTrialMode(const TrackData& data_);
+  TimeTrialMode(const std::string& track_, const std::string& kart_);
   virtual ~TimeTrialMode() {}
   
   void start();
@@ -97,11 +101,7 @@ private:
   std::string track;
 public:
   RaceManager();
-  /*  
-  void set_grandprix(const std::string& cup, RaceDifficulty difficulty_);
-  void set_quickrace(const std::string& track, RaceDifficulty difficulty_);
-  void set_timetrial(const std::string& track);
-  */
+
   RaceSetup::RaceMode getRaceMode() const;
   int getNumPlayers() const;
 

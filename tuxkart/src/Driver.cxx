@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.33 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: Driver.cxx,v 1.34 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -449,7 +449,7 @@ float Driver::getIsectData ( sgVec3 start, sgVec3 end )
 
       if ( getMaterial ( h->leaf ) -> isZipper () )
       {
-        if ( this == World::current()->kart[0] )
+        if ( this == World::current()->getPlayerKart(0) )
           sound->playSfx ( SOUND_WEE ) ;
 
         wheelie_angle = 45.0f ;

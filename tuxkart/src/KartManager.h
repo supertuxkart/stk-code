@@ -1,4 +1,4 @@
-//  $Id: KartManager.h,v 1.2 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: KartManager.h,v 1.3 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -37,6 +37,9 @@ public:
   int  getKartId(const std::string ident);
   
   void loadKartData();
+
+  /** Return \a len random karts */
+  std::vector<std::string> getRandomKarts(int len);
 };
 
 extern KartManager kart_manager;

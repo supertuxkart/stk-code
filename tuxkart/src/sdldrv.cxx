@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.33 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: sdldrv.cxx,v 1.34 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -215,7 +215,7 @@ void kartInput(RaceSetup& raceSetup)
 		if ( keyState [ cc.keys[KC_RESCUE] ] )  ji.rescue = true ;	
 		if ( keyState [ cc.keys[KC_FIRE] ] )    ji.fire = true ;
 	
-		PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ raceSetup.players[i] ]->getDriver());
+		PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->getPlayerKart(i)->getDriver());
                 if (driver)
                   driver -> incomingJoystick ( ji ) ;
 	}

@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.27 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: World.cxx,v 1.28 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <assert.h>
 #include <iostream>
 #include "preprocessor.h"
 #include "Explosion.h"
@@ -115,14 +116,13 @@ World::World(const RaceSetup& raceSetup_)
 
   for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ; i != raceSetup.karts.end() ; ++i )
   {
-    /* Kart[0] is always the player. */
     KartDriver* newkart;
     int pos = kart.size();
 
-    if ( pos < raceSetup.getNumPlayers() )
-    {
-      newkart = new KartDriver ( kart_manager.getKart(*i), pos, new PlayerDriver ) ;
-    }
+    if (std::find(raceSetup.players.begin(), raceSetup.players.end(), pos) != raceSetup.players.end())
+      { // the given position belongs to a player
+        newkart = new KartDriver ( kart_manager.getKart(*i), pos, new PlayerDriver ) ;
+      }
     else if ( network_enabled )
       newkart = new KartDriver ( kart_manager.getKart(*i), pos, new NetworkDriver ) ;
     else
@@ -559,6 +559,19 @@ World::restartRace()
 
   for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
     (*i)->reset() ;
+}
+
+KartDriver*
+World::getKart(int kartId)
+{
+  assert(kartId >= 0 && kartId < int(kart.size()));
+  return kart[kartId];
+}
+
+KartDriver*
+World::getPlayerKart(int player)
+{
+  return kart[raceSetup.players[player]];
 }
 
 /* EOF */

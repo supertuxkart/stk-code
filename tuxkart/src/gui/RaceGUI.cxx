@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.26 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.27 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -100,7 +100,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	//in single player only we have an infinite ammo cheat
 	if (key.mod & KMOD_CTRL && World::current()->raceSetup.getNumPlayers() == 1)
 	{
-          PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ 0 ]->getDriver());
+          PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->getPlayerKart(0)->getDriver());
           if (driver)
             driver -> incomingKeystroke ( key ) ;
       	return;
@@ -249,7 +249,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
 {
   char str [ 256 ] ;
 
-  KartDriver* player_kart = World::current()->kart[0];
+  KartDriver* player_kart = World::current()->getPlayerKart(0);
 
 #ifdef DEBUG
   /* Show velocity */
@@ -296,13 +296,13 @@ void RaceGUI::drawMap ()
 
   glBegin ( GL_QUADS ) ;
 
-  for ( World::Karts::size_type i = 0 ; i < World::current()->kart.size() ; ++i )
+  for ( int i = 0 ; i < World::current()->getNumKarts() ; ++i )
   {
     sgCoord *c ;
 
-    c = World::current()->kart[i]->getCoord () ;
+    c = World::current()->getKart(i)->getCoord () ;
 
-    glColor3fv ( World::current()->kart[i]->getKartProperties().color ) ;
+    glColor3fv ( World::current()->getKart(i)->getKartProperties().color ) ;
 
     /* 
        FIXME:
@@ -326,7 +326,7 @@ void RaceGUI::drawGameOverText ()
               sin ( (float)timer/7.2f ) / 2.0f + 0.5f, 0.5 ) ;
 
   if ( finishing_position < 0 )
-    finishing_position = World::current()->kart[0]->getPosition() ;
+    finishing_position = World::current()->getPlayerKart(0)->getPosition() ;
 
   if ( finishing_position > 1 )
   {
@@ -362,9 +362,9 @@ void RaceGUI::drawPlayerIcons ()
 
   glEnable(GL_TEXTURE_2D);
 
-  for(World::Karts::size_type i = 0; i < World::current()->kart.size() ; i++)
+  for(int i = 0; i < World::current()->getNumKarts() ; i++)
     {
-      int position = World::current()->kart[i]->getPosition();
+      int position = World::current()->getKart(i)->getPosition();
       if(position > 4)  // only draw the first four karts
         continue;
 
@@ -372,7 +372,7 @@ void RaceGUI::drawPlayerIcons ()
 
       // draw icon
       Material* players_gst =
-          World::current()->kart[i]->getKartProperties().getIconMaterial();
+          World::current()->getKart(i)->getKartProperties().getIconMaterial();
       players_gst -> apply ();
 
       glBegin ( GL_QUADS ) ;
@@ -399,11 +399,11 @@ void RaceGUI::drawEmergencyText ()
   static float last_dist = -1000000.0f ;
   static int last_lap = -1 ;
 
-  float d = World::current()->kart [ 0 ] -> getDistanceDownTrack () ;
-  int   l = World::current()->kart [ 0 ] -> getLap () ;
+  float d = World::current()->getPlayerKart(0)-> getDistanceDownTrack () ;
+  int   l = World::current()->getPlayerKart(0)-> getLap () ;
 
   if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
-       World::current()->kart [ 0 ] -> getVelocity () -> xyz [ 1 ] > 0.0f )
+       World::current()->getPlayerKart(0) -> getVelocity () -> xyz [ 1 ] > 0.0f )
   {
     wrong_timer += 0.05f; // FIXME: was World::current()->clock -> getDeltaTime () ;
 
@@ -440,7 +440,7 @@ void RaceGUI::drawCollectableIcons ()
 {
   int zz = FALSE ;
 
-  switch ( World::current()->kart[0]->getCollectable () )
+  switch ( World::current()->getPlayerKart(0)->getCollectable () )
   {
     case COLLECT_NOTHING        : break ;
     case COLLECT_SPARK          : spark_gst        -> apply () ; break ;
@@ -465,10 +465,10 @@ void RaceGUI::drawCollectableIcons ()
   glEnd();
 
   // If player doesn't have anything, just let the transparent black square
-  if(World::current()->kart[0]->getCollectable () == COLLECT_NOTHING)
+  if(World::current()->getPlayerKart(0)->getCollectable () == COLLECT_NOTHING)
     return;
 
-  int n  = World::current()->kart[0]->getNumCollectables() ;
+  int n  = World::current()->getPlayerKart(0)->getNumCollectables() ;
 
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
@@ -622,7 +622,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
       drawGameRunningText  (raceSetup) ;
       drawEmergencyText    () ;
       drawCollectableIcons () ;
-      drawEnergyMeter ( (float)(World::current()->kart[0]->getNumHerring()) /
+      drawEnergyMeter ( (float)(World::current()->getPlayerKart(0)->getNumHerring()) /
                                   MAX_HERRING_EATEN ) ;
       drawPlayerIcons      () ;
       drawMap              () ;

@@ -1,4 +1,4 @@
-//  $Id: Projectile.cxx,v 1.7 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Projectile.cxx,v 1.8 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -47,19 +47,19 @@ void Projectile::doObjectInteractions ()
   float ndist = SG_MAX ;
   int nearest = -1 ;
 
-  for ( World::Karts::size_type i = 0 ; i < World::current()->kart.size() ; ++i )
+  for ( int i = 0 ; i < World::current()->getNumKarts() ; ++i )
   {
     sgCoord *pos ;
  
-    pos = World::current()->kart [ i ] -> getCoord () ;
+    pos = World::current()->getKart(i) -> getCoord () ;
  
-    if ( type != COLLECT_NOTHING && World::current()->kart[i] != owner )
+    if ( type != COLLECT_NOTHING && World::current()->getKart(i) != owner )
     {
       float d = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
 
       if ( d < 2.0f )
       {
-        World::current()->kart [ i ] -> forceCrash () ;
+        World::current()->getKart(i) -> forceCrash () ;
         curr_pos.xyz[2] += 1.2f ;
         World::current()->explosion[0]->start(curr_pos.xyz);
         off () ;
@@ -78,7 +78,7 @@ void Projectile::doObjectInteractions ()
   {
     sgVec3 delta ;
     sgVec3 hpr ;
-    sgCoord *k = World::current()->kart[nearest]->getCoord() ;
+    sgCoord *k = World::current()->getKart(nearest)->getCoord() ;
 
     sgSubVec3 ( delta, k->xyz, curr_pos.xyz ) ;
 

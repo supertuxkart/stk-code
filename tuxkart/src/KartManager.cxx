@@ -1,4 +1,4 @@
-//  $Id: KartManager.cxx,v 1.2 2004/08/24 18:17:50 grumbel Exp $
+//  $Id: KartManager.cxx,v 1.3 2004/08/24 23:28:54 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -78,6 +78,23 @@ KartManager::loadKartData()
           karts.push_back(KartProperties("data/" + *i));
         }
     }
+}
+
+std::vector<std::string>
+KartManager::getRandomKarts(int len)
+{
+  std::vector<std::string> all_karts;
+
+  for(Data::iterator i = karts.begin(); i != karts.end(); ++i)
+    {
+      all_karts.push_back(i->ident);
+    }
+
+  std::random_shuffle(all_karts.begin(), all_karts.end());
+
+  all_karts.resize(len);
+
+  return all_karts;
 }
 
 /* EOF */
