@@ -14,47 +14,51 @@ tuxkart_SOURCES = \
   $(VIDEO_FILES) \
   AutoDriver.cxx  \
   Camera.cxx  \
+  Camera.h  \
   Driver.cxx  \
+  Driver.h  \
   Explosion.cxx  \
+  Explosion.h  \
   Herring.cxx  \
+  Herring.h  \
   KartDriver.cxx  \
+  Loader.cxx \
+  Loader.h \
   PlayerDriver.cxx  \
   Projectile.cxx  \
   Track.cxx  \
+  Track.h  \
   Traffic.cxx  \
-  guNet.cxx  \
-  isect.cxx  \
-  joystick.h  \
   WorldLoader.cxx  \
-  sound.cxx  \
-  utils.cxx  \
-  status.h  \
+  WorldLoader.h  \
+  constants.h  \
   gfx.cxx  \
   gfx.h  \
+  guNet.cxx  \
+  guNet.h  \
   gui.cxx  \
   gui.h  \
+  gui_image.cxx \
+  gui_image.h \
+  isect.cxx  \
+  isect.h  \
+  joystick.h  \
+  level.h  \
   material.cxx  \
   material.h  \
+  oldgui.cxx \
+  oldgui.h \
   preprocessor.cxx  \
   preprocessor.h  \
+  sound.cxx  \
+  sound.h  \
   start_tuxkart.cxx  \
   start_tuxkart.h  \
   status.cxx  \
+  status.h  \
   tuxkart.cxx  \
   tuxkart.h  \
-  Camera.h  \
-  Driver.h  \
-  Explosion.h  \
-  Herring.h  \
-  Track.h  \
-  constants.h  \
-  guNet.h  \
-  isect.h  \
-  level.h  \
-  WorldLoader.h  \
-  sound.h  \
-  utils.h \
-  Loader.cxx \
-  Loader.h
+  utils.cxx  \
+  utils.h
 
 # EOF #
