@@ -259,8 +259,8 @@ void GUI::joystickInput ()
   if ( isGLUTKeyDown ( GLUT_KEY_DOWN +256 ) ) ji.buttons |= 0x02 ;
 
   if ( isGLUTKeyDown ( '\r' )|| isGLUTKeyDown ( '\n' )) ji.buttons |= 0x04 ;
-  if ( isGLUTKeyDown ( 'a' ) || isGLUTKeyDown ( 'A' ) ) ji.buttons |= 0x10 ;
-  if ( isGLUTKeyDown ( 's' ) || isGLUTKeyDown ( 'S' ) ) ji.buttons |= 0x20 ;
+  if ( isGLUTKeyDown ( 'a' ) || isGLUTKeyDown ( 'A' ) ) ji.buttons |= 0x20 ;
+  if ( isGLUTKeyDown ( 's' ) || isGLUTKeyDown ( 'S' ) ) ji.buttons |= 0x10 ;
   if ( isGLUTKeyDown ( 'd' ) || isGLUTKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;
 
   ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
