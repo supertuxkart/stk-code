@@ -1,4 +1,4 @@
-//  $Id: GrandPrixSetup.cxx,v 1.1 2004/08/23 16:44:47 grumbel Exp $
+//  $Id: GrandPrixSetup.cxx,v 1.2 2004/08/23 18:20:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -19,6 +19,8 @@
 
 #include "GrandPrixSetup.h"
 
+GrandPrixSetup grand_prix_setup;
+
 GrandPrixSetup::Stat::Stat()
 {
   points = 0;
@@ -31,6 +33,12 @@ GrandPrixSetup::GrandPrixSetup()
 
 GrandPrixSetup::~GrandPrixSetup()
 {
+}
+
+void
+GrandPrixSetup::clear()
+{
+  karts.clear();
 }
 
 /* EOF */

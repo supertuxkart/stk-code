@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.24 2004/08/23 14:52:11 grumbel Exp $
+//  $Id: World.cxx,v 1.25 2004/08/23 18:20:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -111,8 +111,6 @@ World::World(const RaceSetup& raceSetup_)
 
   if (raceSetup.numKarts == -1)
     raceSetup.numKarts = kart_manager.karts.size();
-
-  std::cout << "Karts: " << raceSetup.numKarts << std::endl;
 
   // Create the karts and fill the kart vector with them
   for ( int i = 0 ; i < raceSetup.numKarts ; i++ )

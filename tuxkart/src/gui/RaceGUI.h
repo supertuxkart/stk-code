@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.5 2004/08/23 12:04:54 rmcruz Exp $
+//  $Id: RaceGUI.h,v 1.6 2004/08/23 18:20:41 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -85,5 +85,6 @@ private:
 	fntRenderer *text ;
 	fntTexFont *oldfont ;
 };
+
 #endif
 

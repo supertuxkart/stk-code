@@ -1,4 +1,4 @@
-//  $Id: GrandPrixSetup.h,v 1.1 2004/08/23 16:44:47 grumbel Exp $
+//  $Id: GrandPrixSetup.h,v 1.2 2004/08/23 18:20:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <string>
+#include "CupData.h"
 
 class GrandPrixSetup
 {
@@ -40,13 +41,19 @@ public:
     int position;
   };
 
-  GrandPrixSetup();
-  ~GrandPrixSetup();
+  CupData cup_data;
 
   /** The karts that participate in the GrandPrix and there point,
       position, etc. */
   std::vector<Stat> karts;
+
+  GrandPrixSetup();
+  ~GrandPrixSetup();
+
+  void clear();
 };
+
+extern GrandPrixSetup grand_prix_setup;
 
 #endif
 

@@ -1,4 +1,4 @@
-//  $Id: CupData.cxx,v 1.2 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: RaceManager.cpp,v 1.1 2004/08/23 18:20:40 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,31 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
-#include "Loader.h"
-#include "lispreader.h"
-#include "CupData.h"
+#include "RaceManager.h"
 
-CupData::CupData()
-{
-}
+RaceManager* RaceManager::instance_ = 0;
 
-CupData::CupData(const std::string& filename)
-{
-  try {
-    LispReader* cup = LispReader::load(loader ? loader->getPath(filename) : filename, "tuxkart-cup");
-    assert(cup);
-    
-    LispReader reader(cup->get_lisp());
-    reader.read_string("name", name);
-    reader.read_string_vector("tracks", tracks);
-    
-    delete cup;
-  } catch(LispReaderException& err) {
-    std::cout << "CupData: LispReaderException: " << err.message << std::endl;
-  } catch(std::exception& err) {
-    std::cout << "CupData: Catched std::exception: " << err.what() << std::endl;
-  }
+RaceManager::RaceManager()
+{  
 }
 
 /* EOF */
