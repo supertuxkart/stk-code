@@ -137,6 +137,7 @@ void GFX::done ()
   glEnd () ;
   glFlush () ;
 
+#ifdef UL_LINUX
   static int firsttime = TRUE ;
 
   if ( firsttime )
@@ -171,6 +172,7 @@ void GFX::done ()
     outb ( (stereo==-1) ? ~3 : ~2, LPBASE+2 ) ;
     stereo = -stereo ;
   }
+#endif
 }
 
 
