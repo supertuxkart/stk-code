@@ -119,8 +119,8 @@ if test "x$ac_cv_header_windows_h" != "xyes" ; then
     CFLAGS="$CFLAGS -I/usr/local/include -L/usr/local/lib"
     CXXFLAGS="$CXXFLAGS -I/usr/local/include -L/usr/local/lib"
   else
-    CFLAGS="$CFLAGS -O6 -Wall"
-    CXXFLAGS="$CXXFLAGS -O6 -Wall"
+    CFLAGS="$CFLAGS -Wall"
+    CXXFLAGS="$CXXFLAGS -Wall"
   fi
 else
   CFLAGS="$CFLAGS -O6 -Wall $MACH -malign-double -I/usr/local/include -L/usr/local/lib"
@@ -134,8 +134,8 @@ AC_MSG_CHECKING(for debug mode)
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [enable debugging mode]),, enable_debug="yes")
 if test "x${enable_debug}" != "xno"; then
-    CXXFLAGS="$CXXFLAGS -Wall -W -Werror -DDEBUG -g"
-    CFLAGS="$CFLAGS -Wall -W -Werror -DDEBUG -g"
+    CXXFLAGS="$CXXFLAGS -Wall -W -Werror -DDEBUG -g -O0"
+    CFLAGS="$CFLAGS -Wall -W -Werror -DDEBUG -g -O0"
     AC_MSG_RESULT([enabled])
 else
     AC_MSG_RESULT([disabled])

@@ -1,7 +1,7 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Tux")
+ (name "Mr. Cube")
  (model "mrcube.ac")
  (icon  "tuxicon.rgb")
  (shadow "tuxkartshadow.rgb")

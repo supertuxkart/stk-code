@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.10 2004/08/11 22:05:43 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.11 2004/08/13 20:03:39 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -86,7 +86,7 @@ void RaceGUI::update(float dt)
 {
 	widgetSet -> timer(fps_id, dt) ;
 	
-	drawStatusText (StartScreen::current()->raceSetup) ;
+	drawStatusText (World::current()->raceSetup) ;
 		
 	if ( show_fps )
 		drawFPS ();
