@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.36 2004/09/24 18:46:35 matzebraun Exp $
+//  $Id: World.cxx,v 1.37 2004/09/24 19:06:22 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -134,12 +134,13 @@ World::~World()
   for(Projectiles::iterator i = projectiles.begin();
       i != projectiles.end(); ++i)
     delete *i;
-  for ( int i = 0 ; i < NUM_EXPLOSIONS ; ++i )
-    delete explosion[i];
+  for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
+    delete *i;
 
   ssgDeRefDelete(projectile_spark);
   ssgDeRefDelete(projectile_missle);
   ssgDeRefDelete(projectile_flamemissle);
+  ssgDeRefDelete(explode);
     
   delete gold_h;
   delete silver_h;
@@ -173,8 +174,8 @@ World::update(float delta)
   for(Projectiles::iterator i = projectiles.begin();
       i != projectiles.end(); ++i)
     (*i)->update(delta);
-          
-  for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+  for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
+      (*i)->update(delta);
   for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
 
@@ -248,12 +249,8 @@ World::loadPlayers()
   projectile_missle->ref();
   projectile_flamemissle = ssgLoad("flamemissile.ac");
   projectile_flamemissle->ref();
-
-  for ( int i = 0 ; i < NUM_EXPLOSIONS ; i++ )
-    {
-      ssgBranch *b = (ssgBranch *) ssgLoad ( "explode.ac", loader ) ;
-      explosion[i] = new Explosion ( this, b ) ;
-    }
+  explode = ssgLoad("explode.ac");
+  explode->ref();
 }
 
 void

@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.16 2004/09/24 18:41:26 matzebraun Exp $
+//  $Id: World.h,v 1.17 2004/09/24 19:06:22 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -48,7 +48,8 @@ private:
 public:
   typedef std::vector<Projectile*> Projectiles;
   Projectiles projectiles;
-  Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
+  typedef std::vector<Explosion*> Explosions;
+  Explosions explosions;
   float clock;
 
   /** resources, this should be put in a separate class or replaced by a smart
@@ -57,6 +58,7 @@ public:
   ssgEntity* projectile_spark;
   ssgEntity* projectile_missle;
   ssgEntity* projectile_flamemissle;
+  ssgEntity* explode;
 
   RaceSetup raceSetup;
 

@@ -62,7 +62,6 @@ tuxkart_SOURCES = \
   isect.cxx  \
   isect.h  \
   joystick.h  \
-  level.h  \
   material.cxx  \
   material.h  \
   plibwrap.h \

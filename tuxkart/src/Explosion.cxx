@@ -1,4 +1,4 @@
-//  $Id: Explosion.cxx,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: Explosion.cxx,v 1.6 2004/09/24 19:06:22 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -74,7 +74,7 @@ Explosion::Explosion ( World* newworld, ssgBranch *b )
 
 
 
-void Explosion::update ()
+void Explosion::update (float )
 {
   if ( step < 0 )
   {

@@ -1,4 +1,4 @@
-//  $Id: Explosion.h,v 1.5 2004/09/24 15:45:02 matzebraun Exp $
+//  $Id: Explosion.h,v 1.6 2004/09/24 19:06:22 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,7 +38,7 @@ public:
 
   Explosion ( World* world, ssgBranch *b ) ;
 
-  void update () ;
+  void update (float delta_t) ;
   void start  ( sgVec3 where )
   {
     sound -> playSfx ( SOUND_EXPLOSION ) ;
