@@ -6,9 +6,7 @@ int check_hint = 0 ;
 
 void PlayerKartDriver::update ()
 {
-check_hint = 1 ;
   KartDriver::update () ;
-check_hint = 0 ;
 }
 
 
@@ -112,20 +110,6 @@ void PlayerKartDriver::incomingKeystroke ( int k )
                            break ;
                 }
                 break ;
-
-    /* CTRL-C ...exit. */
-    case  0x03: exit ( 0 ) ;
-
-    case  'r' :
-    case  'R' : for ( int i = 0 ; i < num_karts ; i++ )
-		  kart[i]->reset() ;
-		break ;
-    case  'w' :
-    case  'W' : glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ; break ;
-    case  'f' :
-    case  'F' : glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ; break ;
-    case  's' :
-    case  'S' : stToggle () ; break ;
   }
 }
 

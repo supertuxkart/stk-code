@@ -213,13 +213,27 @@ void GUI::keyboardInput ()
   switch ( c )
   {
     case 0x1B /* Escape */      :
+    case 'x'  /* X */      :
+    case 'X'  /* X */      :
     case 0x03 /* Control-C */   : exit ( 0 ) ;
 
     case (256+GLUT_KEY_PAGE_UP)   : cam_follow-- ; break ;
     case (256+GLUT_KEY_PAGE_DOWN) : cam_follow++ ; break ;
 
-    case 'h' : hide_status () ; help  () ; return ;
-
+    case 'r' :
+    case 'R' : for ( int i = 0 ; i < num_karts ; i++ )
+                 kart[i]->reset() ;
+               return ;
+ 
+    case 'w' :
+    case 'W' : glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ; return ;
+    case 'f' :
+    case 'F' : glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ; return ;
+    case 'z' :
+    case 'Z' : stToggle () ; return ;
+    case 'h' :
+    case 'H' : hide_status () ; help  () ; return ;
+    case 'P' :
     case 'p' : paused = ! paused ; return ;
 
     case ' ' : if ( isHidden () )
@@ -232,11 +246,22 @@ void GUI::keyboardInput ()
   }
 }
 
+
 void GUI::joystickInput ()
 {
   static JoyInfo ji ;
 
   joystick -> read ( & ji.buttons, ji.data ) ;
+
+  if ( isGLUTKeyDown ( GLUT_KEY_LEFT +256 ) ) ji.data [0] = -1.0f ;
+  if ( isGLUTKeyDown ( GLUT_KEY_RIGHT+256 ) ) ji.data [0] =  1.0f ;
+  if ( isGLUTKeyDown ( GLUT_KEY_UP   +256 ) ) ji.buttons |= 0x01 ;
+  if ( isGLUTKeyDown ( GLUT_KEY_DOWN +256 ) ) ji.buttons |= 0x02 ;
+
+  if ( isGLUTKeyDown ( '\r' )|| isGLUTKeyDown ( '\n' )) ji.buttons |= 0x04 ;
+  if ( isGLUTKeyDown ( 'a' ) || isGLUTKeyDown ( 'A' ) ) ji.buttons |= 0x10 ;
+  if ( isGLUTKeyDown ( 's' ) || isGLUTKeyDown ( 'S' ) ) ji.buttons |= 0x20 ;
+  if ( isGLUTKeyDown ( 'd' ) || isGLUTKeyDown ( 'D' ) ) ji.buttons |= 0x08 ;
 
   ji.hits        = (ji.buttons ^ ji.old_buttons) &  ji.buttons ;
   ji.releases    = (ji.buttons ^ ji.old_buttons) & ~ji.buttons ;
@@ -244,4 +269,6 @@ void GUI::joystickInput ()
 
   ((PlayerKartDriver *)kart [ 0 ]) -> incomingJoystick ( &ji ) ;
 }
+
+
 

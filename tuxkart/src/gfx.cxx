@@ -3,14 +3,33 @@
 
 static unsigned int lastGLUTKeystroke = 0 ;
 
+static char keyIsDown [ 512 ] ;
+
+static void getGLUTUpSpecialKeystroke ( int key, int, int )
+{
+  keyIsDown [ 256 + key ] = FALSE ;
+}
+
+static void getGLUTUpKeystroke ( unsigned char key, int, int )
+{
+  keyIsDown [ key ] = FALSE ;
+}
+
 static void getGLUTSpecialKeystroke ( int key, int, int )
 {
   lastGLUTKeystroke = 256 + key ;
+  keyIsDown [ 256 + key ] = TRUE ;
 }
 
 static void getGLUTKeystroke ( unsigned char key, int, int )
 {
   lastGLUTKeystroke = key ;
+  keyIsDown [ key ] = TRUE ;
+}
+
+int isGLUTKeyDown ( unsigned int k )
+{
+  return keyIsDown [ k ] ;
 }
 
 int getGLUTKeystroke ()
@@ -33,6 +52,9 @@ void initWindow ( int w, int h )
   int fake_argc = 1 ;
   char *fake_argv[3] ;
 
+  for ( int i = 0 ; i < 512 ; i++ )
+    keyIsDown [ i ] = FALSE ;
+
   fake_argv[0] = "Tux Kart" ;
   fake_argv[1] = "Tux Kart by Steve Baker." ;
   fake_argv[2] = NULL ;
@@ -46,6 +68,8 @@ void initWindow ( int w, int h )
   glutDisplayFunc        ( tuxKartMainLoop ) ;
   glutKeyboardFunc       ( getGLUTKeystroke ) ;
   glutSpecialFunc        ( getGLUTSpecialKeystroke ) ;
+  glutKeyboardUpFunc     ( getGLUTUpKeystroke ) ;
+  glutSpecialUpFunc      ( getGLUTUpSpecialKeystroke ) ;
   glutReshapeFunc        ( reshape ) ;
 #ifndef WIN32
   glutIdleFunc           ( glutPostRedisplay ) ;

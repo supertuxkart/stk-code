@@ -21,6 +21,7 @@ public:
 
 
 int getGLUTKeystroke () ;
+int isGLUTKeyDown ( unsigned int k ) ;
 
 extern fntTexFont *font ;
 
