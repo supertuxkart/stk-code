@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.37 2004/08/02 17:07:10 grumbel Exp $
+//  $Id: start_tuxkart.cxx,v 1.38 2004/08/04 16:36:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 #include "tuxkart.h"
 
 #include "oldgui.h"
-#include "gui.h"
+#include "WidgetSet.h"
 #include "sound.h"
 #include "Loader.h"
 
@@ -147,6 +147,7 @@ static void splashMainLoop (void)
     /* Swapbuffers - and off we go again... */
 
     pollEvents() ;
+    updateGUI();
     swapBuffers();
     
     if ( startupCounter > 0 ) startupCounter-- ;
@@ -311,7 +312,7 @@ static void initTuxKart (int width, int height, int videoFlags)
   puSetDefaultColourScheme ( 243.0f/255.0f, 140.0f/255.0f, 34.0f/255.0f, 1.0) ;
   
   sound      = new SoundSystem ;
-  gui        = new GUI ;
+  widgetSet        = new WidgetSet ;
   oldgui        = new OldGUI ;
 }
 
@@ -323,6 +324,7 @@ static void startScreen ( int nbrLaps, int mirror, int reverse,
   (void)mirror;
 
   /* Create all of the GUI elements */
+  guiSwitch = GUIS_MAINMENU;
 
   playButton = new puButton      ( 10, 10, 150, 50  ) ;
   playButton -> setLegend        ( "Start Game"     ) ;

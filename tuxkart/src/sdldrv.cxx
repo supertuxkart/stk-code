@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.9 2004/08/01 22:48:18 straver Exp $
+//  $Id: sdldrv.cxx,v 1.10 2004/08/04 16:36:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -22,13 +22,13 @@
 #include <plib/pw.h>
 #include <plib/puSDL.h>
 
+#include "sdldrv.h"
+#include "WidgetSet.h"
 #include "oldgui.h"
-#include "gui.h"
+#include "BaseGUI.h"
 #include "status.h"
 #include "tuxkart.h"
 #include "Driver.h"
-#include "sdldrv.h"
-
 using std::cout;
 
 
@@ -117,13 +117,31 @@ void pollEvents ()
             puState = PU_UP;
             break;
 	  }
-	  
+	  if (gui)
+	  	gui -> click (event.button.button, event.button.x, event.button.y );
 	  puMouse ( puButton, puState, event.button.x, event.button.y );
 	  break;
 	}
 	 
 	case SDL_MOUSEMOTION:
+	if (gui)
+	  	gui -> point ( event.motion.x, event.motion.y );
 	  puMouse ( event.motion.x, event.motion.y );
+	  break;
+	 
+	 case SDL_JOYAXISMOTION:
+		{
+			int x = 0;
+			int y = 0;
+			//FIXME: we have to look at event.jaxis.axis index to find out whether event.jaxis.value is x or y
+			if (gui)
+				gui -> stick ( x, y );
+		}
+		break;
+	  
+	case SDL_JOYBALLMOTION:
+	  if (gui)
+	  	gui -> point ( event.jball.xrel, event.jball.yrel );
 	  break;
 	  
 	case SDL_QUIT:
@@ -150,8 +168,7 @@ void keyboardInput (const SDL_keysym& key)
     case SDLK_ESCAPE : shutdown() ;
     
     case SDLK_F12:
-      //FIXME: do something to our widgets
-	break;
+      fpsToggle() ; return;
 
     case SDLK_r :
       {
@@ -171,7 +188,7 @@ void keyboardInput (const SDL_keysym& key)
       return ;
     case SDLK_z : stToggle () ; return ;
     case SDLK_h : hide_status () ; help  () ; return ;
-    case SDLK_p : gui->tgl_paused(); return ;
+    case SDLK_p : widgetSet -> tgl_paused(); return ;
 
     case SDLK_SPACE : if ( oldgui->isHidden () )
       oldgui->show () ;

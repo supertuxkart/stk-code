@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.35 2004/08/03 14:36:55 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.36 2004/08/04 16:36:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,8 @@
 #include "status.h"
 #include "Camera.h"
 #include "level.h"
-#include "gui.h"
+#include "WidgetSet.h"
+#include "BaseGUI.h"
 #include "oldgui.h"
 #include "WorldLoader.h"
 
@@ -92,10 +93,12 @@ char *anvil_file     = "anvil.ac"      ;
 ulClock      *fclock = NULL ;
 SoundSystem  *sound = NULL ;
 GFX          *gfx = NULL ;
-GUI          *gui = NULL ;
+WidgetSet          *widgetSet = NULL ;
+BaseGUI	*gui = NULL;
 OldGUI       *oldgui = NULL ;
 Level        level ;
 
+GUISwitch guiSwitch = GUIS_CURRENT;
 
 KartDriver       *kart [ NUM_KARTS       ] ;
 TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
@@ -566,6 +569,8 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
   ssgSetBackFaceCollisions ( mirror ) ;
 #endif
+	
+	guiSwitch = GUIS_RACE;
 
   /* Play Ball! */
 
@@ -639,7 +644,7 @@ void tuxKartMainLoop ()
   {
     /* Stop updating if we are paused */
 
-    if ( ! gui -> get_paused () )
+    if ( ! widgetSet -> get_paused () )
     {
       int i ;
 
@@ -668,6 +673,7 @@ void tuxKartMainLoop ()
 
     pollEvents();
     kartInput () ;
+    updateGUI();
     oldgui      -> update () ;
     sound    -> update () ;
 
@@ -679,9 +685,15 @@ void tuxKartMainLoop ()
 
 void shutdown()
 {
-	delete gui;
-  SDL_Quit( );
-  exit (0);
+	if (gui)
+		delete gui;
+	
+	if (widgetSet)
+		delete widgetSet;
+	
+	SDL_Quit( );
+  
+	exit (0);
 }
 
 /* EOF */
