@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.15 2004/08/05 22:57:58 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.16 2004/08/06 00:38:26 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -24,9 +24,9 @@
 #include "sdldrv.h"
 #include "WidgetSet.h"
 #include "gui/BaseGUI.h"
-#include "status.h"
 #include "tuxkart.h"
 #include "Driver.h"
+
 using std::cout;
 
 
@@ -128,51 +128,10 @@ void pollEvents ()
 
 void keyboardInput (const SDL_keysym& key)
 {
-  static int isWireframe = FALSE ;
-
-  if (key.mod & KMOD_CTRL)
-    {
-      ((PlayerKartDriver*)kart[0])->incomingKeystroke ( key ) ;
-      return;
-    }
-
-  switch ( key.sym )
-    {
-    case SDLK_RETURN: if (gui) gui -> select(); break;
-    
-    case SDLK_LEFT:    
-    case SDLK_RIGHT:    
-    case SDLK_UP:    
-    case SDLK_DOWN:
-    	if (gui) gui -> cursor(key.sym); break;
-    
-    case SDLK_ESCAPE : shutdown() ;
-    
-    case SDLK_F12:
-      fpsToggle() ; return;
-
-    case SDLK_r :
-      {
-        finishing_position = -1 ;
-        for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
-          (*i)->reset() ;
-        return ;
-      }
-      break;
- 
-    case SDLK_w : if ( isWireframe )
-      glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
-    else
-      glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
-      isWireframe = ! isWireframe ;
-
-      return ;
-    case SDLK_z : stToggle () ; return ;
-    case SDLK_p : widgetSet -> tgl_paused(); return ;
-             
-    default:
-      break;
-    }
+	if (key.sym == SDLK_p)
+		widgetSet -> tgl_paused();
+	else if (gui)
+		gui -> keybd(key);
 }
 
 void kartInput()
