@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.20 2004/08/22 13:15:18 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.21 2004/08/22 22:02:45 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -226,10 +226,10 @@ void RaceGUI::drawDropShadowText ( char *str, int sz, int x, int y )
 
 void RaceGUI::drawStatsText ()
 {
-  char str [ 256 ] ;
+/*  char str [ 256 ] ;
 
   sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
-  drawDropShadowText ( str, 18, 5, 300 ) ;
+  drawDropShadowText ( str, 18, 5, 300 ) ;*/
 }
 
 void RaceGUI::drawTimer ()
@@ -242,8 +242,9 @@ void RaceGUI::drawTimer ()
   int sec     = (int) floor ( time_left - (double) ( 60 * min ) ) ;
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
-  sprintf ( str, "%3d:%02d.%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( str, 18, 450, 430 ) ;
+  sprintf ( str, "%3d`%02d\"%d", min,  sec,  tenths ) ;
+  drawDropShadowText ( "Time:", 14, 500, 450 ) ;
+  drawDropShadowText ( str,     25, 480, 420 ) ;
 }
 
 void RaceGUI::drawScore (const RaceSetup& raceSetup)
@@ -252,19 +253,23 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
 
   KartDriver* player_kart = World::current()->kart[0];
 
+#ifdef DEBUG
+  /* Show velocity */
   if ( player_kart->getVelocity()->xyz[1] < 0 )
     sprintf ( str, "Reverse" ) ;
   else
     sprintf(str,"%3dmph",(int)(player_kart->getVelocity()->xyz[1]/MILES_PER_HOUR));
 
-  drawDropShadowText ( str, 18, 450, 410 ) ;
+  drawDropShadowText ( str, 18, 640-((strlen(str)-1)*18), 0 ) ;
+#endif
 
+  /* Show lap number */
   if ( player_kart->getLap() < 0 )
     sprintf ( str, "Not Started Yet!" ) ;
   else
   if ( player_kart->getLap() < raceSetup.numLaps - 1 )
-    sprintf ( str, "Lap %d",
-                   player_kart->getLap() + 1 ) ;
+    sprintf ( str, "Lap: %d/%d",
+                   player_kart->getLap() + 1, raceSetup.numLaps ) ;
   else
   {
     static int flasher = 0 ;
@@ -277,7 +282,11 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup)
         pos_string [ player_kart->getPosition() ] ) ;
   }
 
-  drawDropShadowText ( str, 18, 450, 390 ) ;
+  drawDropShadowText ( str, 24, 10, 450 ) ;
+
+  /* Show player's position */
+  sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
+  drawDropShadowText ( str, 55, 22, 22 );
 }
 
 
@@ -286,7 +295,7 @@ void RaceGUI::drawMap ()
 {
   glDisable ( GL_TEXTURE_2D ) ;
   glColor3f ( 1,1,1 ) ;
-  World::current() ->track -> draw2Dview ( 200*2, 200  ) ;
+  World::current() ->track -> draw2Dview ( 480, 10 ) ;
 
   glBegin ( GL_QUADS ) ;
 
@@ -346,7 +355,6 @@ void RaceGUI::drawGameRunningText (const RaceSetup& raceSetup)
     drawStatsText () ;
 }
 
-
 void RaceGUI::drawPlayerIcons ()
 {
   /** Draw players position on the race */
@@ -357,7 +365,11 @@ void RaceGUI::drawPlayerIcons ()
 
   for(World::Karts::size_type i = 0; i < World::current()->kart.size() ; i++)
     {
-      y = 400 - (World::current()->kart[i]->getPosition()-1) * 40;
+      int position = World::current()->kart[i]->getPosition();
+      if(position > 4)  // only draw the first four karts
+        continue;
+
+      y = 310 - ((position-1)*(55+5));
 
       // draw icon
       Material* players_gst =
@@ -368,14 +380,14 @@ void RaceGUI::drawPlayerIcons ()
       glColor4f    ( 1, 1, 1, 1 ) ;
 
       glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
-      glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+40, y    ) ;
-      glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+40, y+40 ) ;
-      glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+40 ) ;
+      glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+55, y    ) ;
+      glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+55, y+55 ) ;
+      glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+55 ) ;
       glEnd () ;
 
       // draw text
-      sprintf (str, "%s", pos_string[World::current()->kart[i]->getPosition()]);
-      drawDropShadowText ( str, 20, 40+x, y ) ;
+      sprintf (str, "%s", pos_string[position]);
+      drawDropShadowText ( str, 20, 55+x, y+15 ) ;
     }
 }
 
@@ -438,7 +450,7 @@ void RaceGUI::drawCollectableIcons ()
                                   zz = TRUE ; break ;
   }
 
-  int x1 =  20 ;
+  int x1 =  320-32 ;
   int y1 = 400 ;
   int n  = World::current()->kart[0]->getNumCollectables() ;
 
@@ -447,6 +459,12 @@ void RaceGUI::drawCollectableIcons ()
 
   glBegin ( GL_QUADS ) ;
     glColor4f    ( 1, 1, 1, 1 ) ;
+
+    if(World::current()->kart[0]->getCollectable () == COLLECT_NOTHING)
+      {
+      glDisable(GL_TEXTURE_2D);
+      glColor4f ( 1.0, 1.0, 1.0, 0.25 ) ;
+      }
 
     for ( int i = 0 ; i < n ; i++ )
     {
@@ -473,28 +491,61 @@ void RaceGUI::drawCollectableIcons ()
   glEnd () ;
 }
 
+/* Energy meter that gets filled with coins */
 
-void RaceGUI::drawPartlyDigestedHerring ( float state )
+void RaceGUI::drawEnergyMeter ( float state )
 {
-  herringbones_gst -> apply () ;
- 
+  glDisable(GL_TEXTURE_2D);
+
+  // Draw Meter around rectangle
+  // left side
   glBegin ( GL_QUADS ) ;
-  glColor3f    ( 1, 1, 1 ) ;
-  glTexCoord2f ( 0, 0 ) ; glVertex2i ( 200, 400 ) ;
-  glTexCoord2f ( 1, 0 ) ; glVertex2i ( 300, 400 ) ;
-  glTexCoord2f ( 1, 1 ) ; glVertex2i ( 300, 440 ) ;
-  glTexCoord2f ( 0, 1 ) ; glVertex2i ( 200, 440 ) ;
+  glColor3f ( 0.0, 0.0, 0.0 ) ;
+    glVertex2i ( 590-1, 130-1 ) ;
+    glVertex2i ( 590,   130-1 ) ;
+    glVertex2i ( 590,   130 + 220) ;
+    glVertex2i ( 590-1, 130 + 220 ) ;
   glEnd () ;
- 
-  herring_gst -> apply () ;
- 
+
+  // right side
   glBegin ( GL_QUADS ) ;
-  glColor3f    ( 0.7, 1, 1 ) ;
-  glTexCoord2f ( 0, 0 ) ; glVertex2i ( 200,  400 ) ;
-  glTexCoord2f ( state, 0 ) ; glVertex2i ( 200 + (int)(state * 100.0f), 400 ) ;
-  glTexCoord2f ( state, 1 ) ; glVertex2i ( 200 + (int)(state * 100.0f), 440 ) ;
-  glTexCoord2f ( 0, 1 ) ; glVertex2i ( 200, 440 ) ;
-  glEnd () ;                                                                    
+  glColor3f ( 0.0, 0.0, 0.0 ) ;
+    glVertex2i ( 590+24,   130-1 ) ;
+    glVertex2i ( 590+24+1, 130-1 ) ;
+    glVertex2i ( 590+24+1, 130 + 220) ;
+    glVertex2i ( 590+24,   130 + 220 ) ;
+  glEnd () ;
+
+  // down side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( 0.0, 0.0, 0.0 ) ;
+    glVertex2i ( 590,    130-1 ) ;
+    glVertex2i ( 590+24, 130-1 ) ;
+    glVertex2i ( 590+24, 130 ) ;
+    glVertex2i ( 590,    130 ) ;
+  glEnd () ;
+
+  // up side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( 0.0, 0.0, 0.0 ) ;
+    glVertex2i ( 590,    130+220 ) ;
+    glVertex2i ( 590+24, 130+220 ) ;
+    glVertex2i ( 590+24, 130+220+1 ) ;
+    glVertex2i ( 590,    130+220+1 ) ;
+  glEnd () ;
+
+  // Draw the Meter fluid
+  glBegin ( GL_QUADS ) ;
+  glColor4ub ( 230, 0, 0, 225 ) ;
+    glVertex2i ( 590,    130 ) ;
+    glVertex2i ( 590+24, 130 ) ;
+
+  glColor4ub ( 240, 110, 110, 225 ) ;
+    glVertex2i ( 590+24, 130 + (int)(state * 220.0f) ) ;
+    glVertex2i ( 590,    130 + (int)(state * 220.0f) ) ;
+  glEnd () ;
+
+  glEnable(GL_TEXTURE_2D);
 }
 
 
@@ -525,13 +576,16 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
   switch (World::current()->ready_set_go)
     {
     case 2:
-      drawText ( "Ready!", 40, 50, 280 ) ;
+      glColor3ub ( 230, 170, 160 ) ;
+      drawText ( "Ready!", 65, 370-(3*65), 260 ) ;
       break;
     case 1:
-      drawText ( "Set!", 40, 50, 280 ) ;
+      glColor3ub ( 230, 230, 160 ) ;
+      drawText ( "Set!", 65, 370-(2*65), 260 ) ;
       break;
     case 0:
-      drawText ( "Go!", 40, 50, 280 ) ;
+      glColor3ub ( 100, 210, 100 ) ;
+      drawText ( "Go!", 65, 370-(int)(1.5*65), 260 ) ;
       break;
     }
 
@@ -544,7 +598,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
       drawGameRunningText  (raceSetup) ;
       drawEmergencyText    () ;
       drawCollectableIcons () ;
-      drawPartlyDigestedHerring ( (float)(World::current()->kart[0]->getNumHerring()) /
+      drawEnergyMeter ( (float)(World::current()->kart[0]->getNumHerring()) /
                                   MAX_HERRING_EATEN ) ;
       drawPlayerIcons      () ;
       drawMap              () ;

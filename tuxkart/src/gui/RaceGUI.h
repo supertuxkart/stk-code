@@ -1,5 +1,5 @@
 
-//  $Id: RaceGUI.h,v 1.3 2004/08/11 22:05:43 jamesgregory Exp $
+//  $Id: RaceGUI.h,v 1.4 2004/08/22 22:02:45 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -58,7 +58,7 @@ private:
 	double time_left ;
 	
 	void drawStatusText (const RaceSetup& raceSetup);
-	void drawPartlyDigestedHerring ( float state );
+	void drawEnergyMeter ( float state );
 	void drawCollectableIcons ();
 	void drawEmergencyText ();
 	void drawPlayerIcons ();
