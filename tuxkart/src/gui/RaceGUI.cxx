@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.14 2004/08/14 17:40:26 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.15 2004/08/14 23:20:22 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -530,7 +530,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
       break;
     }
 
-  if ( World::current()->kart[0]->getLap () >= raceSetup.numLaps )
+  if ( World::current()->getPhase() == World::FINISH_PHASE )
     {
       drawGameOverText     () ;
     }

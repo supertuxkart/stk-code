@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.12 2004/08/14 17:40:26 grumbel Exp $
+//  $Id: World.cxx,v 1.13 2004/08/14 23:24:34 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -260,6 +260,11 @@ World::update()
     {
       std::cout << "Ready" << std::endl;
       ready_set_go = 2;
+    }
+
+  if ( World::current()->kart[0]->getLap () >= raceSetup.numLaps )
+    {
+      phase = FINISH_PHASE;
     }
 
   if ( ! widgetSet -> get_paused () )
