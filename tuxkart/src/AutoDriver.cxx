@@ -1,4 +1,4 @@
-//  $Id: AutoDriver.cxx,v 1.17 2004/12/10 02:05:17 cosmosninja Exp $
+//  $Id: AutoDriver.cxx,v 1.18 2004/12/10 02:08:57 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -62,9 +62,7 @@
    
       next = (kart->track_hint + 1 >= world->track->driveline.size()) ? 0 :
          kart->track_hint + 1;
-         
-      std::cout << kart->getPosition() << "," << next << std::endl;
-   
+            
    //2. Calculate the rotation we need using trigonometry, we get the sides
    //of a right triangle where the 2 points that define the hypotenuse are
    //the next dot and the current kart position. The angle adyacent to the
