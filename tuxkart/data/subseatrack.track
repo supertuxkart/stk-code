@@ -3,11 +3,11 @@
 (tuxkart-track
  (name "Sub Sea")
  (use-fog #t)
- (sky-color    0.0 0.0 0.0 0.0)
- (fog-color    0.0 0.0 0.0 0.0)
+ (sky-color    0.0 0.0 0.2 0.0)
+ (fog-color    0.0 0.0 0.2 0.0)
  (fog-start    0.0)
- (fog-end      30.0)
- (fog-density     .3)
+ (fog-end      500.0)
+ (fog-density    0.01)
  
  (sun-ambient  0.3 0.4 0.5 0.0)
  (sun-diffuse  0.3 0.4 0.5 0.0)

@@ -16,6 +16,7 @@
 #
 # TextureName    UVClamp Trans AlphaRef Light SphMp Frctn Ign Zip Rst Cold
 "chrome.png"       N N     N      0.0     N     Y   0.0     N   N    N    N
+"chrome2.png"       N N     N      0.0     N     Y   0.0     N   N    N    N
 "railing.png"      N Y     Y      0.5     Y     N   1.0     N   N    N    N
 "ruler.png"        N N     Y      0.2     Y     N   1.0     N   N    N    N
 "herringwall.png"  N N     Y      0.5     Y     N   1.0     N   N    N    N
