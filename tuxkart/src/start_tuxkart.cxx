@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.38 2004/08/04 16:36:12 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.39 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -100,7 +100,7 @@ static void switchToGame ()
 
   /* Start the main program */
 
-  tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
+  tuxkartMain ( nl, mirror, reverse, trackIdents[t], np, 4 ) ;
 }
 
 /***********************************\
@@ -395,6 +395,7 @@ void cmdLineHelp (char* invocation)
 	    "Options:\n"
 	    "  --no-start-screen  Quick race\n"
 	    "  --track n          Start at track number n (see --list-tracks)\n"
+            "  --numkarts NUM     Number of karts on the racetrack\n"
 	    "  --list-tracks      Show available tracks.\n"
 	    "  --laps n           Define number of laps to n\n"
 	    "  --players n        Define number of players to either 1, 2 or 4.\n"
@@ -421,6 +422,7 @@ int main ( int argc, char *argv[] )
   int nbrPlayers    = 1;
   int  width  = 800;
   int  height = 600;
+  int numKarts = 4;
   bool fullscreen   = false;
   bool noStartScreen = false;
   
@@ -453,6 +455,20 @@ int main ( int argc, char *argv[] )
 
 	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
 	    }
+
+	  else if( !strcmp(argv[i], "--numkarts") && argc > 2)
+            {
+	      if (sscanf(argv[i+1], "%d", &numKarts) == 1)
+                {
+                  if (numKarts < 0 || numKarts > 4)
+                    puts("Warning: numkarts must be between 1 and 4");
+                }
+              else
+                {
+                  puts("Error: Argument to numkarts must be a number");
+                  exit(EXIT_FAILURE);
+                }
+            }
 
 	  else if( !strcmp(argv[i], "--list-tracks") )
 	    {
@@ -549,7 +565,7 @@ int main ( int argc, char *argv[] )
 
   if ( noStartScreen )
     {
-      tuxkartMain ( nbrLaps, mirror, reverse, trackIdents[track], nbrPlayers ) ;
+      tuxkartMain ( nbrLaps, mirror, reverse, trackIdents[track], nbrPlayers, numKarts ) ;
     }
   else
     {

@@ -1,4 +1,4 @@
-//  $Id: status.cxx,v 1.16 2004/08/04 16:35:39 jamesgregory Exp $
+//  $Id: status.cxx,v 1.17 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -63,13 +63,18 @@ void initStatusDisplay ()
 }
 
 
-sgVec3 player_colour [ NUM_KARTS ] =
+/** FIXME: Turn this and all other player related information into a
+    struct and export it to a datafile */
+sgVec3 player_colour [ ] =
 {
   { 1, 0, 0 }, /* Tux   */
   { 0, 1, 0 }, /* Geeko */
   { 0, 0, 1 }, /* BSOD  */
   { 1, 0, 1 }, /* Gown  */
-  { 0, 1, 1 }, { 1, 1, 0 }, { 0, 0, 0 }, { 1, 1, 1 }
+  { 0, 1, 1 },
+  { 1, 1, 0 }, 
+  { 0, 0, 0 }, 
+  { 1, 1, 1 }
 } ;
 
 
@@ -406,7 +411,7 @@ void drawMap ()
 
   glBegin ( GL_QUADS ) ;
 
-  for ( int i = 0 ; i < num_karts ; i++ )
+  for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
   {
     sgCoord *c ;
 
@@ -505,6 +510,8 @@ void drawGameRunningText ()
 
 void drawPlayerIcons ()
 {
+  if (kart.size() != 4) return;
+
   int x =  0 ;
   int y = 10 ;
   float w = 640.0f - 64.0f ;

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.12 2004/08/05 10:19:49 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.13 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -159,8 +159,6 @@ void keyboardInput (const SDL_keysym& key)
 {
   static int isWireframe = FALSE ;
 
-  int i;
-
   if (key.mod & KMOD_CTRL)
     {
       ((PlayerKartDriver*)kart[0])->incomingKeystroke ( key ) ;
@@ -177,8 +175,8 @@ void keyboardInput (const SDL_keysym& key)
     case SDLK_r :
       {
         finishing_position = -1 ;
-        for ( i = 0 ; i < num_karts ; i++ )
-          kart[i]->reset() ;
+        for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
+          (*i)->reset() ;
         return ;
       }
       break;

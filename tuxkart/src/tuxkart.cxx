@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.37 2004/08/05 10:20:30 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.38 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -39,7 +39,6 @@
 
 int mirror  = 0 ;
 int reverse = 0 ;
-int player  = 0 ;
 
 int finishing_position = -1 ;
 
@@ -63,8 +62,6 @@ char playersfname [ 256 ] ;
 char *trackname = "tuxtrack" ;
 
 HerringInstance herring [ MAX_HERRING ] ;
-
-char player_files [ NUM_KARTS ][ 256 ] ;
 
 char *traffic_files [] =
 {
@@ -100,58 +97,27 @@ Level        level ;
 
 GUISwitch guiSwitch = GUIS_CURRENT;
 
-KartDriver       *kart [ NUM_KARTS       ] ;
+Karts kart;
 TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
 Projectile *projectile [ NUM_PROJECTILES ] ;
 Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-int       num_karts = 0 ;
 ssgRoot      *scene = NULL ;
 Track        *track = NULL ;
 
 
-void load_players ( const char *fname )
+void load_players ( )
 {
-  int i ;
- 
-  std::string path = loader->getPath(fname);
-  FILE *fd = fopen ( path.c_str(), "r" ) ;
+  std::vector<std::string> player_files;
 
-  if ( fd == NULL )
-  {
-    fprintf ( stderr, "tuxkart: Can't open '%s':\n", fname ) ;
-    exit ( 1 ) ;
-  }
+  player_files.push_back("tuxkart.ac");
+  player_files.push_back("geekokart.ac");
+  player_files.push_back("bsodkart.ac");
+  player_files.push_back("gownkart.ac");
 
-  num_karts = 0 ;
+  assert( player_files.size() >= kart.size() );
 
-  while ( num_karts < NUM_KARTS )
-  {
-    if ( fgets ( player_files [ num_karts ], 256, fd ) != NULL )
-    {
-      if ( player_files [ num_karts ][ 0 ] <= ' ' ||
-           player_files [ num_karts ][ 0 ] == '#' )
-        continue ;
-
-      /* Trim off the '\n' */
-
-      int len = strlen ( player_files [ num_karts ] ) - 1 ;
-
-      if ( player_files [ num_karts ][ len ] <= ' ' )
-        player_files [ num_karts ][ len ] = '\0' ;
-
-      num_karts++ ;
-    }
-    else
-      break ;
-  }
- 
-  fclose ( fd ) ;
-
-  if ( player >= num_karts )
-    player = 0 ;
-
-  for ( i = 0 ; i < num_karts ; i++ )
+  for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
   {
     ssgEntity *pobj1 = ssgLoad ( parachute_file, loader ) ;
     ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader ) ;
@@ -166,25 +132,14 @@ void load_players ( const char *fname )
     ssgEntity *pobj5 = ttt ;
 
     float r [ 2 ] = { -10.0f, 100.0f } ;
-    int kart_id ;
 
-    if ( i == 0 )
-      kart_id = player ;
-    else
-    if ( i == player )
-      kart_id = 0 ;
-    else
-      kart_id = i ;
- 
-    ssgEntity *obj = ssgLoad ( player_files [ kart_id ], loader ) ;
+    ssgEntity *obj = ssgLoad ( player_files [ i ].c_str(), loader ) ;
 
-{
     sgSetCoord ( &cc, 0, 0, 0, 0, 0, 0 ) ;
     ssgTransform *xxx = new ssgTransform ( & cc ) ;
     xxx -> addKid ( obj ) ;
     obj = xxx ;
-}
-
+    
     ssgRangeSelector *lod = new ssgRangeSelector ;
 
     lod -> addKid ( obj ) ;
@@ -198,7 +153,7 @@ void load_players ( const char *fname )
     kart[i]-> addAttachment ( pobj5 ) ;
   }
 
-  for ( i = 0 ; i < NUM_PROJECTILES ; i++ )
+  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ )
   {
     ssgSelector *sel = new ssgSelector ;
     projectile[i]-> getModel() -> addKid ( sel ) ;
@@ -209,7 +164,7 @@ void load_players ( const char *fname )
     projectile[i] -> off () ;
   }
 
-  for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
+  for ( int i = 0 ; i < NUM_EXPLOSIONS ; i++ )
   {
     ssgBranch *b = (ssgBranch *) ssgLoad ( explosion_file, loader ) ;
     explosion[i] = new Explosion ( b ) ;
@@ -430,7 +385,7 @@ static void banner ()
 
 
 int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
-                  char *_levelName, int numPlayers )
+                  char *_levelName, int numPlayers, int numKarts )
 {
   /* Say "Hi!" to the nice user. */
 
@@ -444,8 +399,6 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   num_laps_in_race = _numLaps    ;
   trackname        = _levelName  ;
   
-  strcpy ( playersfname, "data/players.dat" ) ;
-
   /* Network initialisation -- NOT WORKING YET */
 
   net              = new guUDPConnection ;
@@ -520,19 +473,19 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
   red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; preProcessObj ( red_h -> getRoot(), mirror ) ;
   green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; preProcessObj ( green_h -> getRoot(), mirror ) ;
 
-  /* Load the Karts */
-
-  for ( int i = 0 ; i < NUM_KARTS ; i++ )
+  // Create the karts and fill the kart vector with them
+  for ( int i = 0 ; i < numKarts ; i++ )
   {
     /* Kart[0] is always the player. */
+    KartDriver* newkart;
 
     if ( i == 0 )
-      kart[i] = new PlayerKartDriver  ( i, new ssgTransform ) ;
+      newkart = new PlayerKartDriver  ( i, new ssgTransform ) ;
     else
     if ( network_enabled )
-      kart[i] = new NetworkKartDriver ( i, new ssgTransform ) ;
+      newkart = new NetworkKartDriver ( i, new ssgTransform ) ;
     else
-      kart[i] = new AutoKartDriver    ( i, new ssgTransform ) ;
+      newkart = new AutoKartDriver    ( i, new ssgTransform ) ;
 
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
@@ -541,11 +494,13 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
     if ( reverse ) init_pos.hpr[0] = 180.0f ;
 
-    kart[i] -> setReset ( & init_pos ) ;
-    kart[i] -> reset    () ;
-    kart[i] -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+    newkart -> setReset ( & init_pos ) ;
+    newkart -> reset    () ;
+    newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-    scene -> addKid ( kart[i] -> getModel() ) ;
+    scene -> addKid ( newkart -> getModel() ) ;
+
+    kart.push_back(newkart);
   }
 
   /* Load the Projectiles */
@@ -561,7 +516,7 @@ int tuxkartMain ( int _numLaps, int _mirror, int _reverse,
 
   sprintf ( fname, "data/%s.loc", trackname ) ;
   load_track   ( fname ) ;
-  load_players ( playersfname ) ;
+  load_players ( ) ;
 
   preProcessObj ( scene, mirror ) ;
 
@@ -585,9 +540,9 @@ void updateLapCounter ( int k )
 
   /* Find position of kart 'k' */
 
-  for ( int j = 0 ; j < num_karts ; j++ )
+  for ( Karts::size_type j = 0 ; j < kart.size() ; ++j )
   {
-    if ( j == k ) continue ;
+    if ( int(j) == k ) continue ;
 
     if ( kart[j]->getLap() >  kart[k]->getLap() ||
          ( kart[j]->getLap() == kart[k]->getLap() && 
@@ -646,16 +601,14 @@ void tuxKartMainLoop ()
 
     if ( ! widgetSet -> get_paused () )
     {
-      int i ;
-
       fclock->update    () ;
       updateNetworkRead () ;
-
-      for ( i = 0 ; i < num_karts       ; i++ ) kart       [ i ] -> update () ;
-      for ( i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
-      for ( i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
-      for ( i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
-      for ( i = 0 ; i < num_karts       ; i++ ) updateLapCounter ( i ) ;
+      
+      for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update () ;
+      for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update () ;
+      for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+      for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
+      for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
 
       updateNetworkWrite () ;
       updateCameras      () ;

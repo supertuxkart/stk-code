@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.8 2004/08/01 00:13:28 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.9 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -282,7 +282,7 @@ void KartDriver::update ()
     float cdist = SG_MAX ;
     int   closest = -1 ;
 
-    for ( int i = 0 ; i < num_karts ; i++ )
+    for ( Karts::size_type i = 0; i < kart.size() ; ++i )
     {
       if ( kart[i] == this ) continue ;
 
@@ -290,7 +290,7 @@ void KartDriver::update ()
         continue ;
 
       float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                     kart[i]->getCoord()->xyz ) ;
+                                        kart[i]->getCoord()->xyz ) ;
 
       if ( d < cdist && d < MAGNET_RANGE_SQD )
       {

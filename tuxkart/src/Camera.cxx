@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.6 2004/08/05 12:53:08 grumbel Exp $
+//  $Id: Camera.cxx,v 1.7 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -92,7 +92,7 @@ void Camera::init ()
 void Camera::update ()
 {
   // Update the camera
-  if ( whichKart >= num_karts || whichKart < 0 ) whichKart = 0 ;
+  if ( whichKart >= int(kart.size()) || whichKart < 0 ) whichKart = 0 ;
 
   sgCoord* kartcoord = kart[whichKart]->getCoord();
 

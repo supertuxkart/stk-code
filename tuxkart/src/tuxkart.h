@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.18 2004/08/04 16:36:12 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.19 2004/08/05 14:35:42 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #ifndef HEADER_TUXKART_H
 #define HEADER_TUXKART_H
 
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -74,7 +75,6 @@ void shutdown() ;
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;
 
-#define NUM_KARTS        8
 #define NUM_TRAFFIC      2
 #define NUM_PROJECTILES  8
 #define NUM_EXPLOSIONS   6
@@ -88,7 +88,6 @@ ssgBranch *process_userdata ( char *data ) ;
 #define TUXKART_DATADIR "/usr/local/share/games/tuxkart"
 #endif
 
-extern int num_karts ;
 extern int num_laps_in_race ;
 extern int finishing_position ;
 
@@ -96,12 +95,13 @@ class KartDriver;
 class Projectile;
 class Explosion;
 
-extern KartDriver *kart       [ NUM_KARTS       ] ;
+typedef std::vector<KartDriver*> Karts;
+extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
 extern int tuxkartMain ( int nl, int mirror, int reverse, 
-                         char *track, int numPlayers ) ;
+                         char *track, int numPlayers, int numKarts ) ;
 
 
 #endif
