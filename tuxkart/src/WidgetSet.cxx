@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.6 2004/08/12 14:54:55 matzebraun Exp $
+//  $Id: WidgetSet.cxx,v 1.7 2004/08/12 15:14:12 matzebraun Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -30,8 +30,8 @@
 #include "sound.h"
 
 
-WidgetSet::WidgetSet():
-paused(0)
+WidgetSet::WidgetSet()
+    : active(0), pause_id(0), paused(0)
 {
 	font[0] = NULL;
 	font[1] = NULL;
@@ -98,8 +98,6 @@ paused(0)
                                         +digit_h[i][10], c0, c1);
         }
     }
-
-    active = 0;
 }
 
 WidgetSet::~WidgetSet()
