@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.h,v 1.4 2004/11/01 17:41:23 cosmosninja Exp $
+//  $Id: PlayerDriver.h,v 1.5 2004/11/01 17:52:11 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -46,7 +46,7 @@
    public:
       PlayerDriver(float);
    
-      //void update();
+      void update(float);
       void incomingJoystick  (JoyInfo& ji);
       void incomingKeystroke ( const SDL_keysym& key );
    };
