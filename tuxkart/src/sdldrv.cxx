@@ -1,4 +1,4 @@
-//  $Id: sdldrv.cxx,v 1.20 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: sdldrv.cxx,v 1.21 2004/08/08 16:35:27 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 James Gregory <james.gregory@btinternet.com>
@@ -115,8 +115,9 @@ void pollEvents ()
     switch (event.type)
     {
       case SDL_KEYDOWN:
-	  	keyboardInput (event.key.keysym);
-	  break;
+		if (gui)
+			gui -> keybd(event.key.keysym);
+		break;
 	
 	case SDL_MOUSEBUTTONDOWN:
 		if (gui)
@@ -164,14 +165,6 @@ void pollEvents ()
   
   if (SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE && SDL_GetTicks() - lastMouseMove > MOUSE_HIDE_TIME)
   	SDL_ShowCursor(SDL_DISABLE);
-}
-
-void keyboardInput (const SDL_keysym& key)
-{
-	if (key.sym == SDLK_p)
-		widgetSet -> tgl_paused();
-	else if (gui)
-		gui -> keybd(key);
 }
 
 void kartInput()
