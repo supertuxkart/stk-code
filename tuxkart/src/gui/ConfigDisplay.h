@@ -1,4 +1,4 @@
-//  $Id: ConfigDisplay.h,v 1.1 2004/10/21 12:22:45 rmcruz Exp $
+//  $Id: ConfigDisplay.h,v 1.2 2004/10/21 18:55:38 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,7 @@
 #include "BaseGUI.h"
 
 enum {
-  FULLSCREEN_MENU_ID
+  FULLSCREEN_MENU_TOKEN
   };
 
 class ConfigDisplay: public BaseGUI
@@ -34,6 +34,9 @@ public:
 	
 	void update(float dt);
 	void select();
+
+private:
+  int fullscreen_menu_id;
 };
 
 #endif
