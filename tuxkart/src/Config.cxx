@@ -1,4 +1,4 @@
-// $Id: Config.cxx,v 1.6 2004/08/29 19:50:45 oaf_thadres Exp $
+// $Id: Config.cxx,v 1.7 2004/09/01 02:21:24 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,6 +26,7 @@
 #include "lisp/Lisp.h"
 #include "lisp/Parser.h"
 #include "lisp/Writer.h"
+
 
 Config config;
 
@@ -94,7 +95,11 @@ void Config::loadConfig()
 /*load configuration values from file*/
 void Config::loadConfig(const std::string& filename)
 {
+  std::string temp;
+  const lisp::Lisp *reader;
   const lisp::Lisp* lisp = 0;
+  int i;
+
   try
   {
     lisp::Parser parser;
@@ -117,6 +122,37 @@ void Config::loadConfig(const std::string& filename)
 
     /*get number of karts*/
     lisp->get("karts", karts);
+
+    /*get player configurations*/
+    for(i=0; i<PLAYERS; ++i)
+    {
+      temp = "player-";
+      temp += i+'1';
+      reader = lisp->getLisp(temp.c_str());
+      if(!reader) {
+        temp = "No " + temp + " node";
+        throw std::runtime_error(temp);
+        }
+      reader->get("name",     player[i].name);
+      reader->get("useJoy",   player[i].useJoy);
+      reader->get("joystick", player[i].joystick);
+      
+      /*get keyboard configuration*/
+      reader->get("left",    player[i].keys[CD_KEYBOARD][KC_LEFT]);
+      reader->get("right",   player[i].keys[CD_KEYBOARD][KC_RIGHT]);
+      reader->get("up",      player[i].keys[CD_KEYBOARD][KC_UP]);
+      reader->get("down",    player[i].keys[CD_KEYBOARD][KC_DOWN]);
+      reader->get("wheelie", player[i].keys[CD_KEYBOARD][KC_WHEELIE]);
+      reader->get("jump",    player[i].keys[CD_KEYBOARD][KC_JUMP]);
+      reader->get("rescue",  player[i].keys[CD_KEYBOARD][KC_RESCUE]);
+      reader->get("fire",    player[i].keys[CD_KEYBOARD][KC_FIRE]);
+
+      /*get joystick configuration*/
+      reader->get("wheelie", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
+      reader->get("jump",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
+      reader->get("rescue",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
+      reader->get("fire",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
+    }
   }
   catch(std::exception& e)
   {
@@ -137,24 +173,61 @@ void Config::saveConfig()
 /*write settings to config file*/
 void Config::saveConfig(const std::string& filename)
 {
+  std::string temp;
+  int i;
+
   try
   {
     lisp::Writer writer(filename);
 
     writer.beginList("tuxkart-config");
     writer.writeComment("the following options can be set to #t or #f:");
-    writer.write("fullscreen", fullscreen);
-    writer.write("sound", sound);
-    writer.write("music", music);
-    writer.write("smoke", smoke);
-    writer.write("displayFPS", displayFPS);
+    writer.write("fullscreen\t", fullscreen);
+    writer.write("sound\t", sound);
+    writer.write("music\t", music);
+    writer.write("smoke\t", smoke);
+    writer.write("displayFPS\t", displayFPS);
 
     writer.writeComment("screen resolution");
-    writer.write("width", width);
-    writer.write("height", height);
+    writer.write("width\t", width);
+    writer.write("height\t", height);
 
     writer.writeComment("number of karts. -1 means use all");
-    writer.write("karts", karts);
+    writer.write("karts\t", karts);
+
+    /*write player configurations*/
+    for(i=0; i<PLAYERS; ++i)
+    {
+      temp = "player ";
+      temp += i+'1';
+      temp += " settings";
+      writer.writeComment(temp);
+      temp = "player-";
+      temp += i+'1';
+      writer.beginList(temp);
+      
+      writer.write("name\t", player[i].name);
+      writer.write("useJoy\t", player[i].useJoy);
+      writer.write("joystick\t", player[i].joystick);
+      
+      writer.writeComment("keyboard layout");
+      writer.write("left\t",    player[i].keys[CD_KEYBOARD][KC_LEFT]);
+      writer.write("right\t",   player[i].keys[CD_KEYBOARD][KC_RIGHT]);
+      writer.write("up\t\t",      player[i].keys[CD_KEYBOARD][KC_UP]);
+      writer.write("down\t",    player[i].keys[CD_KEYBOARD][KC_DOWN]);
+      writer.write("wheelie\t", player[i].keys[CD_KEYBOARD][KC_WHEELIE]);
+      writer.write("jump\t",    player[i].keys[CD_KEYBOARD][KC_JUMP]);
+      writer.write("rescue\t",  player[i].keys[CD_KEYBOARD][KC_RESCUE]);
+      writer.write("fire\t",    player[i].keys[CD_KEYBOARD][KC_FIRE]);
+
+      writer.writeComment("joystick layout");
+      writer.write("wheelie\t", player[i].keys[CD_JOYSTICK][KC_WHEELIE]);
+      writer.write("jump\t",    player[i].keys[CD_JOYSTICK][KC_JUMP]);
+      writer.write("rescue\t",  player[i].keys[CD_JOYSTICK][KC_RESCUE]);
+      writer.write("fire\t",    player[i].keys[CD_JOYSTICK][KC_FIRE]);
+
+      writer.endList(temp);
+    }
 
     writer.endList("tuxkart-config");
   }
