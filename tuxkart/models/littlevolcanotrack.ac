@@ -12122,7 +12122,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.002-sub1"
-texture "../images/cvs/images/lava2.png"
+texture "../images/lava2.png"
 texrep 1 1
 numvert 32
 -203.214533 9.256362 -26.426125
