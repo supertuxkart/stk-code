@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.28 2004/08/13 23:42:45 straver Exp $
+//  $Id: KartDriver.cxx,v 1.29 2004/08/14 12:26:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -25,6 +25,7 @@
 #include "Shadow.h"
 #include "KartDriver.h"
 #include "Projectile.h"
+#include "PlayerDriver.h"
 #include "SkidMark.h"
 #include "World.h"
 #include "material.h"
@@ -436,7 +437,7 @@ void KartDriver::update ()
 }
 
 
-KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  ) 
+KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , PlayerDriver* driver_ ) 
 {
   kart_properties      = kart_properties_;
   grid_position        = position_ ;
@@ -451,6 +452,10 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
   exhaust_pipe         = NULL;
   skidmark_left        = NULL;
   skidmark_right       = NULL;
+
+  driver               = driver_;
+  if (driver)
+    driver->setKart(this);
 
   wheel_position = 0;
 

@@ -1,4 +1,4 @@
-//  $Id: SkidMark.cxx,v 1.4 2004/08/13 23:34:19 straver Exp $
+//  $Id: SkidMark.cxx,v 1.5 2004/08/14 12:26:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -49,7 +49,7 @@ SkidMark::add(sgCoord* coord)
   sgVec4 color;
   // Amount of which the skidmark is lifted above the track to avoid
   // z-buffer errors
-  float track_offset = 0.003f;
+  float track_offset = 0.03f;
   
   // Width of the skidmark
   float width = 0.1f;
@@ -72,8 +72,6 @@ SkidMark::add(sgCoord* coord)
 
   normals->add(norm); normals->add(norm);
   colours->add(color); colours->add(color);
-
-  //vtxtable->dirtyBSphere();
 }
 
 void

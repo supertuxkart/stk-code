@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.6 2004/08/13 22:19:03 grumbel Exp $
+//  $Id: World.h,v 1.7 2004/08/14 12:26:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -57,6 +57,16 @@ public:
   ulClock     *fclock ;
 
   RaceSetup raceSetup;
+
+  enum Phase { 
+    // The traffic light is shown and all players stay in position
+    START_PHASE,
+    // The traffic light turned green and all driver, drive around the track
+    RACE_PHASE,
+    // The player crossed the finishing line and his and the time of
+    // the other players is displayed, controll is automatic
+    FINISH_PHASE 
+  };
 private:
   Track        *track;
   guUDPConnection *net;
@@ -70,6 +80,7 @@ private:
   Herring *red_h    ;
   Herring *green_h  ;
 
+  Phase phase;
 public:
   ssgBranch *trackBranch ;
 
@@ -78,6 +89,9 @@ public:
 
   void update();
   void restartRace();
+  
+  /** Returns the phase of the game */
+  Phase getPhase() const { return phase; }
 private:
   void updateNetworkRead ();
   void updateLapCounter ( int k );

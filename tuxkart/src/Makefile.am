@@ -26,6 +26,7 @@ tuxkart_SOURCES = \
   KartDriver.cxx  \
   Loader.cxx \
   Loader.h \
+  PlayerDriver.h  \
   PlayerDriver.cxx  \
   Projectile.cxx  \
   Track.cxx  \

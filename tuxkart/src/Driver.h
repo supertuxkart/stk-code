@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.22 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: Driver.h,v 1.23 2004/08/14 12:26:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -112,14 +112,16 @@ protected:
   sgCoord  curr_vel  ;
   sgCoord  velocity  ;
   
+public:  
   /* start - New Physics */
   sgVec3   acceleration ;
   sgVec3   force ;
+
   float   steer_angle ;
-  
+
   float throttle;
   float brake;
-  
+protected:
   /** Complete model, including shadow */
   ssgBranch    *comp_model;
 
@@ -130,8 +132,8 @@ protected:
   Shadow* shadow;
 
   int history_index ;
+public:
   float wheelie_angle ;
-
   int position ;
   int lap      ;
 
@@ -140,6 +142,7 @@ protected:
   int rescue   ;
   float zipper_time_left ;
 
+protected:
   sgVec3 surface_avoidance_vector ;
   sgVec3 curr_normal ;
   int    on_ground ; 
@@ -155,8 +158,8 @@ protected:
       for shadow calculation */
   float height_of_terrain;
 
-  KartProperties kart_properties;
 public:
+  KartProperties kart_properties;
 
   Driver ( );
 
@@ -219,6 +222,7 @@ public:
 
   void coreUpdate () ;
   void physicsUpdate () ;
+  bool is_on_ground() { return on_ground; }
 
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;

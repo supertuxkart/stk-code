@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.7 2004/08/13 21:57:40 grumbel Exp $
+//  $Id: KartDriver.h,v 1.8 2004/08/14 12:26:21 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,7 +23,8 @@
 #include <plib/ssg.h>
 #include "Driver.h"
 #include "ParticleSystem.h"
-  
+
+class PlayerDriver;  
 class SkidMark;
 
 class KartParticleSystem : public ParticleSystem
@@ -43,9 +44,12 @@ public:
 class KartDriver : public Driver
 {
 protected:
+public:
   int num_collectables ;
   int grid_position ;
+
   int collectable ;
+private:
   float attachment_time_left ;
   int   attachment_type ;
   int num_herring_gobbled ;
@@ -69,13 +73,18 @@ protected:
       and if so assign them to wheel_* variables */
   void load_wheels(ssgBranch* obj);
     
+  /** The Driver for this kart, ie. the object that controlls the
+      steering */
+  PlayerDriver* driver;
 public:
-  KartDriver ( const KartProperties& kart_properties_, int position_ ) ;
+  KartDriver ( const KartProperties& kart_properties_, int position_, PlayerDriver* driver_ = 0 ) ;
   virtual ~KartDriver() {}
 
   void load_data();
 
   virtual void placeModel ();
+
+  PlayerDriver* getDriver() const { return driver; }
 
   void addAttachment ( ssgEntity *e )
   {
@@ -156,30 +165,6 @@ public:
   virtual ~AutoKartDriver() {}
 
   virtual void update () ;
-} ;
-
-
-class PlayerKartDriver : public KartDriver
-{  
-protected:
-  float    tscale ;
-  float    rscale ;
-  
-  // physics debugging
-  float *selected_property;
-
-public:
-  PlayerKartDriver ( const KartProperties& kart_properties_, int _pos ) 
-    : KartDriver ( kart_properties_, _pos )
-  {
-    tscale = 10.0 ;
-    rscale =  3.0 ;
-  }
-
-  virtual void update () ;
-
-  void incomingKeystroke ( const SDL_keysym& ) ;
-  void incomingJoystick  ( JoyInfo& ji ) ;
 } ;
 
 #endif
