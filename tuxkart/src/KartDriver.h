@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.5 2004/08/13 17:25:50 grumbel Exp $
+//  $Id: KartDriver.h,v 1.6 2004/08/13 18:57:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -64,7 +64,8 @@ protected:
   ssgTransform *wheel_rear_l;
   ssgTransform *wheel_rear_r;
 
-  SkidMark* skidmark;
+  SkidMark* skidmark_left;
+  SkidMark* skidmark_right;
   
   /** Search the given branch of objects that match the wheel names
       and if so assign them to wheel_* variables */

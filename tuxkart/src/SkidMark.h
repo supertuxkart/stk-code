@@ -1,4 +1,4 @@
-//  $Id: SkidMark.h,v 1.1 2004/08/13 17:25:50 grumbel Exp $
+//  $Id: SkidMark.h,v 1.2 2004/08/13 18:57:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -31,12 +31,14 @@ private:
   ssgVertexArray* vertices;
   ssgNormalArray* normals;
   ssgColourArray* colors;
+
+  int detail;
 public:
   SkidMark();
   ~SkidMark();
 
   /** Add a position where the skidmark is */
-  void add(float x, float y);
+  void add(sgCoord* coord);
 };
 
 #endif

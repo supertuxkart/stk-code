@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.23 2004/08/13 17:25:50 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.24 2004/08/13 18:57:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -390,10 +390,38 @@ void KartDriver::update ()
   if (smoke_system != NULL)
     smoke_system->update (delta_t);
 
-  if (skidmark)
-    skidmark->add(getCoord()->xyz[0], getCoord()->xyz[1]);
-
   Driver::update () ;
+
+
+  if (skidmark_left)
+    {
+      {
+      float angle  = -43;
+      float length = 0.57;
+
+      sgCoord wheelpos;
+      sgCopyCoord(&wheelpos, getCoord());
+
+      wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+      wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+
+      skidmark_left->add(&wheelpos);
+      }
+    }
+
+  if (skidmark_right)
+    {
+      float angle  = 43;
+      float length = 0.57;
+
+      sgCoord wheelpos;
+      sgCopyCoord(&wheelpos, getCoord());
+
+      wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+      wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+
+      skidmark_right->add(&wheelpos);
+    }
 }
 
 
@@ -410,7 +438,8 @@ KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_  
   smokepuff	       = NULL;
   smoke_system	       = NULL;
   exhaust_pipe         = NULL;
-  skidmark             = NULL;
+  skidmark_left        = NULL;
+  skidmark_right       = NULL;
 
   wheel_position = 0;
 
@@ -553,12 +582,12 @@ KartDriver::load_data()
 
   /*if (kart_properties.model_file == "mrcube.ac")
     {
-  std::cout << "WHEELS: " << std::endl;
-  print_model(wheel_front_l, 0);
-  print_model(wheel_front_r, 0);
+    std::cout << "WHEELS: " << std::endl;
+    print_model(wheel_front_l, 0);
+    print_model(wheel_front_r, 0);
 
-  print_model(wheel_rear_l, 0);
-  print_model(wheel_rear_r, 0);
+    print_model(wheel_rear_l, 0);
+    print_model(wheel_rear_r, 0);
     }
   */
 
@@ -613,8 +642,12 @@ KartDriver::load_data()
   this-> addAttachment ( pobj4 ) ;
   this-> addAttachment ( pobj5 ) ;
 
+  if (0)
+    {
+      skidmark_left  = new SkidMark();
+      skidmark_right = new SkidMark();
+    }
 
-  //skidmark = new SkidMark();
   shadow = new Shadow(kart_properties.shadow_file, -1, 1, -1, 1);
   comp_model->addKid ( shadow->getRoot () );
 }
