@@ -1,3 +1,9 @@
+2004-07-20  Pascal Giard  <evilynux@yahoo.com>
+
+	* src/start_tuxkart.cxx (cmdLineHelp): - Now has its own function.
+	(main): - Added --fullscreen and --version.
+	- Display error message on invalid command line argument.
+
 2004-07-18  Pascal Giard  <evilynux@yahoo.com>
 
 	* src/start_tuxkart.cxx (main):

@@ -378,6 +378,36 @@ static void startScreen ()
   splashMainLoop  () ;
 }
 
+void cmdLineHelp ()
+{
+  fprintf ( stdout, 
+	    "Usage: tuxkart [--track n] [--nbrLaps n] [--reverse] [--mirror]\n"
+	    "\t\t[--fullscreen|--screenMode n [--noBorder]]\n"
+	    "\n"
+	    "Run TuxKart, a racing game with go-kart that features"
+	    " the well-known linux\nmascott Tux. The game is heavily"
+	    " inspired by Super-Mario-Kart and Wacky Wheels.\n"
+	    "\n"
+	    "Options:\n"
+	    "--track n\tStart at track number n. First track is 0.\n"
+	    "--nbrLaps n\tDefine number of laps to n.\n"
+	    "--reverse\tEnable reverse mode.\n"
+	    "--mirror\tEnable mirror mode (when supported).\n"
+	    "--fullscreen\tFullscreen display (doesn't work with --screenMode).\n"
+	    "--noBorder\tDisable window borders/decorations.\n"
+	    "--screenMode n\tSet the screen mode to:\n"
+	    "\t\t 0: 320x240\t5: 960x720\n"
+	    "\t\t 1: 400x300\t6: 1024x768\n"
+	    "\t\t 2: 512x384\t7: 1152x864\n"
+	    "\t\t 3: 640x480\t8: 1280x1024\n"
+	    "\t\t 4: 800x600\n"
+	    "--version\tShow version.\n"
+	    "\n"
+	    "You can visit TuxKart's homepage at "
+	    "http://tuxkart.sourceforge.net\n\n"
+	    );
+}
+
 int main ( int argc, char *argv[] )
 {
  
@@ -401,41 +431,30 @@ int main ( int argc, char *argv[] )
 	       !strcmp(argv[i], "-help") or
 	       !strcmp(argv[i], "-h") )
 	    {
-	      fprintf ( stdout, 
-			"Usage: tuxkart [--track n] [--nbrLaps n]"
-			" [--reverse] [--mirror] [--screenMode n]\n"
-			"\n"
-			"Run TuxKart, a racing game with go-kart that features"
-			" the well-known linux\nmascott Tux. The game is heavily"
-			" inspired by Super-Mario-Kart and Wacky Wheels.\n"
-			"\n"
-			"Options:\n"
-			"--track n\tStart at track number n. First track is 0.\n"
-			"--nbrLaps n\tDefine number of laps to n.\n"
-			"--reverse\tEnable reverse mode.\n"
-			"--mirror\tEnable mirror mode (when supported).\n"
-			"--screenMode n\tSet the screen mode to:\n"
-			"\t\t 0: 320x240\t5: 960x720\n"
-			"\t\t 1: 400x300\t6: 1024x768\n"
-			"\t\t 2: 512x384\t7: 1152x864\n"
-			"\t\t 3: 640x480\t8: 1280x1024\n"
-			"\t\t 4: 800x600\n"
-			"\n"
-			"You can visit TuxKart's homepage at "
-			"http://tuxkart.sourceforge.net\n\n"
-			);
+	      cmdLineHelp();
 	      return 0;
 	    }
+
 	  else if( !strcmp(argv[i], "--track") and argc > 2 )
 	    {
-	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
 	      t = atoi(argv[i+1]);
+
+	      if ( t < 0 )
+		{
+		  fprintf ( stderr, "You choose an invalid track number: %d.\n", t ) ;
+		  cmdLineHelp();
+		  return 0;
+		}
+
+	      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
 	    }
+
 	  else if ( !strcmp(argv[i], "--reverse") )
 	    {
 	      fprintf ( stdout, "Enabling reverse mode.\n" ) ;
 	      reverse = 1;
 	    }
+
 	  else if ( !strcmp(argv[i], "--mirror") )
 	    {
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
@@ -445,11 +464,20 @@ int main ( int argc, char *argv[] )
 	      mirror = 0 ;
 #endif
 	    }
+
 	  else if ( !strcmp(argv[i], "--nbrLaps") and argc > 2 )
 	    {
 	      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
 	      nl = atoi(argv[i+1]);
 	    }
+
+	  else if ( !strcmp(argv[i], "--fullscreen") )
+	    {
+	      width = -1;
+	      height = -1;
+	      noBorder = TRUE;
+	    }
+
 	  else if ( !strcmp(argv[i], "--screenMode") and argc > 2 )
 	    {
 	      switch (atoi(argv[i+1]))
@@ -493,10 +521,24 @@ int main ( int argc, char *argv[] )
 		}
 	      fprintf ( stdout, "You choose to have screen mode %d.\n", atoi(argv[i+1]) ) ;
 	    }
+
 	  else if ( !strcmp(argv[i], "--noBorder") )
 	    {
 	      fprintf ( stdout, "Disabling window borders.\n" ) ;
 	      noBorder = TRUE;
+	    }
+
+	  else if( !strcmp(argv[i], "--version") )
+	    {
+	      fprintf ( stdout, "Tuxkart %s\n", VERSION ) ;
+	      return 0;
+	    }
+
+	  else
+	    {
+	      fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
+	      cmdLineHelp();
+	      return 0;
 	    }
 	}
       /* Set screen resolution */
@@ -507,12 +549,14 @@ int main ( int argc, char *argv[] )
       /* Start the main program */
       tuxkartMain ( nl, mirror, reverse, trackIdents[t], np ) ;
     }
+
+  /* No command line parameters as been specified */
   else
     {
       /* Load plib stuff */
       initTuxKart (noBorder);
 
-      // Show start screen
+      /* Show start screen */
       startScreen ();
 
       switchToGame () ; 
