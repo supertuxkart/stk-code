@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.9 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: World.h,v 1.10 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -87,6 +87,7 @@ public:
   World(const RaceSetup& raceSetup);
   virtual ~World();
 
+  void draw();
   void update(float delta);
   void restartRace();
   

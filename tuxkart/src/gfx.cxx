@@ -1,4 +1,4 @@
-//  $Id: gfx.cxx,v 1.20 2004/08/11 12:33:17 grumbel Exp $
+//  $Id: gfx.cxx,v 1.21 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,23 +43,6 @@ GFX::GFX ( int _mirror )
   sgSetVec3 ( cam.hpr, 0, 0, 0 ) ;
   ssgSetCamera ( & cam ) ;
 }
-
-
-void GFX::update ()
-{
-  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
-
-  ssgGetLight ( 0 ) -> setPosition ( track_data.sun_position ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track_data.ambientcol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track_data.diffusecol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track_data.specularcol ) ;
-
-  if ( mirror ) glFrontFace ( GL_CW ) ;
-
-  ssgCullAndDraw ( World::current()->scene ) ;
-}
-
-
 
 /* Address of the parallel port. */
 
@@ -121,55 +104,6 @@ void GFX::done ()
     stereo = -stereo ;
   }
 #endif
-}
-
-
-void updateGFX ( GFX *gfx )
-{
-  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
-
-  glEnable ( GL_DEPTH_TEST ) ;
-
-  if (track_data.use_fog)
-    {
-      glEnable ( GL_FOG ) ;
-      
-      glFogf ( GL_FOG_DENSITY, 1.0f / 100.0f ) ;
-      glFogfv( GL_FOG_COLOR  , track_data.fog_color ) ;
-      glFogf ( GL_FOG_START  , 0.0       ) ;
-      glFogf ( GL_FOG_END    , 1000.0      ) ;
-      glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
-      glHint ( GL_FOG_HINT   , GL_NICEST ) ;
-
-      /* Clear the screen */
-      glClearColor (track_data.fog_color[0], 
-                    track_data.fog_color[1], 
-                    track_data.fog_color[2], 
-                    track_data.fog_color[3]);
-    }
-  else
-    {
-      /* Clear the screen */
-      glClearColor (track_data.sky_color[0], 
-                    track_data.sky_color[1], 
-                    track_data.sky_color[2], 
-                    track_data.sky_color[3]);
-    }
-
-  glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
-
-  for ( int i = 0 ; i < Camera::getNumSplits() ; i++ )
-    {
-      camera [ i ] -> apply () ;
-      gfx -> update () ;
-    }
-
-  if (track_data.use_fog)
-    {
-      glDisable ( GL_FOG ) ;
-    }
-
-  glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
 }
 
 /* EOF */

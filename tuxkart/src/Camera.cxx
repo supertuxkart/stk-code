@@ -1,4 +1,4 @@
-//  $Id: Camera.cxx,v 1.13 2004/08/11 00:36:19 grumbel Exp $
+//  $Id: Camera.cxx,v 1.14 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,53 +23,55 @@
 #include "World.h"
 #include "Camera.h"
 
-Camera *camera [ 4 ] = { NULL, NULL, NULL, NULL } ;
-
-int Camera::numSplits = 4 ;
-
-void Camera::setScreenPosition ( int pos )
+void
+Camera::setScreenPosition ( int pos )
 {
-  switch ( numSplits )
-  {
-    case 1 : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 1.0f ;
-             context -> setFOV ( 75.0f, 0.0f ) ;
-             return ;
+  switch ( mode )
+    {
+    case ONE_SPLIT : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 1.0f ;
+      context -> setFOV ( 75.0f, 0.0f ) ;
+      break;
 
-    case 2 :
+    case TWO_SPLIT :
       context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
       switch ( pos )
-      {
-        case 0 : x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ; return ;
-        case 1 : x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ; return ;
-        default: break ;
-      }
+        {
+        case 0 :
+          x = 0.0f ; y = 0.0f ; w = 1.0f ; h = 0.5f ;
+          break;
+        case 1 : 
+          x = 0.0f ; y = 0.5f ; w = 1.0f ; h = 0.5f ;
+          break;
+        }
       break ;
 
-    case 4 :
+    case FOUR_SPLIT :
       context -> setFOV ( 50.0f, 0.0f ) ;
       switch ( pos )
-      {
-        case 0 : x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ; return ;
-        case 1 : x = 0.0f ; y = 0.5f ; w = 0.5f ; h = 0.5f ; return ;
-        case 2 : x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ; return ;
-        case 3 : x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ; return ;
-        default: break ;
-      }
+        {
+        case 0 :
+          x = 0.0f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
+          break;
+        case 1 :
+          x = 0.0f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;
+          break;
+        case 2 :
+          x = 0.5f ; y = 0.0f ; w = 0.5f ; h = 0.5f ;
+          break;
+        case 3 : 
+          x = 0.5f ; y = 0.5f ; w = 0.5f ; h = 0.5f ;
+          break;
+        }
       break ;
-
-    default:
-      break ;
-  }
-
-  x = 0.0f ; y = 0.0f ; w = 0.0f ; h = 0.0f ;
+    }
 }
 
-
-Camera::Camera ( int which )
+Camera::Camera ( Mode mode_, int which )
 {
   context = NULL ;
   init () ;
   whichKart = which ;   // Just for now
+  mode = mode_;
   setScreenPosition ( which ) ;
 }
 
@@ -146,23 +148,6 @@ void Camera::apply ()
                (int)((float)height * h) ) ;
 
   context -> makeCurrent () ;
-}
-
-
-void updateCameras ()
-{
-  for ( int i = 0 ; i < Camera::getNumSplits() ; i++ )
-    camera [ i ] -> update () ;
-}
-
-
-void initCameras ()
-{
-  for ( int i = 0 ; i < 4 ; i++ )
-  {
-    delete camera [ i ] ;
-    camera [ i ] = new Camera ( i ) ;
-  }
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id: Camera.h,v 1.5 2004/08/10 14:56:00 grumbel Exp $
+//  $Id: Camera.h,v 1.6 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,35 +22,26 @@
 
 class Camera
 {
+public:
+  enum Mode { ONE_SPLIT, TWO_SPLIT, FOUR_SPLIT }; 
 protected:
 
   ssgContext *context  ;
 
   int    whichKart ;
+  Mode mode; 
   float x, y, w, h ;
-
-  static int numSplits ;
 
   void init () ;
 
 public:
-
-  Camera ( int id ) ;
-
-  static void setNumSplits ( int ns ) { numSplits = ns ; }
-  static int  getNumSplits () { return numSplits ; }
+  Camera ( Mode mode, int id ) ;
 
   void setScreenPosition ( int pos ) ;
 
   void update () ;
   void apply  () ;
 } ;
-
-
-extern Camera *camera [ 4 ] ;
-
-void initCameras   () ;
-void updateCameras () ;
 
 #endif
 

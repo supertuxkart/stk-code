@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.h,v 1.1 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: WorldScreen.h,v 1.2 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,7 @@
 #ifndef HEADER_WORLDSCREEN_H
 #define HEADER_WORLDSCREEN_H
 
+#include "Camera.h"
 #include "Screen.h"
 
 class ulClock;
@@ -35,10 +36,15 @@ private:
   float overtime;
 
   ulClock     *fclock ;
+  
+  typedef std::vector<Camera*> Cameras;
+  Cameras cameras;
+
 public:
   WorldScreen(const RaceSetup& racesetup);
   virtual ~WorldScreen();
 
+  void draw();
   void update();
 };
 

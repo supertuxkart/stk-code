@@ -1,4 +1,4 @@
-//  $Id: Driver.cxx,v 1.24 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: Driver.cxx,v 1.25 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -241,16 +241,7 @@ void Driver::coreUpdate (float delta)
   sgCopyCoord ( &last_pos        , &curr_pos         ) ;
   sgCopyVec2  ( last_track_coords, curr_track_coords ) ;
 
-  /*
-  if ( velocity.xyz[1] > MAX_VELOCITY ) asd
-    velocity.xyz[1] = MAX_VELOCITY ;
-
-  if ( velocity.xyz[1] < MAX_REVERSE_VELOCITY )
-    velocity.xyz[1] = MAX_REVERSE_VELOCITY ;
-  */
-
   /* Scale velocities to current time step. */
-
   sgScaleVec3 ( scaled_velocity.xyz, velocity.xyz, delta ) ;
   sgScaleVec3 ( scaled_velocity.hpr, velocity.hpr, delta ) ;
 
@@ -318,7 +309,7 @@ float Driver::collectIsectData ( sgVec3 start, sgVec3 end )
     At very high speeds, this is getting costly...so beware!
   */
 
-  int nsteps = (int) ceil ( speed / ISECT_STEP_SIZE ) ;
+  int nsteps = (int) ceil ( speed / ISECT_STEP_SIZE );
 
   if ( nsteps == 0 ) nsteps = 1 ;
 

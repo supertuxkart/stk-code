@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.14 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: World.cxx,v 1.15 2004/08/15 15:25:07 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -101,12 +101,6 @@ World::World(const RaceSetup& raceSetup_)
   track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
                       raceSetup.mirror, raceSetup.reverse ) ;
   gfx        = new GFX ( raceSetup.mirror ) ;
-
-  int numSplits = raceSetup.numPlayers;
-  if (numSplits == 3)
-    numSplits++;
-  Camera::setNumSplits ( numSplits ) ;
-  initCameras () ;
 
   // Start building the scene graph
   scene       = new ssgRoot   ;
@@ -212,6 +206,21 @@ World::~World()
 }
 
 void
+World::draw()
+{
+  TrackData& track_data = track_manager.tracks[World::current()->raceSetup.track];
+
+  ssgGetLight ( 0 ) -> setPosition ( track_data.sun_position ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track_data.ambientcol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track_data.diffusecol  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track_data.specularcol ) ;
+
+  if ( raceSetup.mirror ) glFrontFace ( GL_CW ) ;
+
+  ssgCullAndDraw ( World::current()->scene ) ;
+}
+
+void
 World::update(float delta)
 {
   clock += delta;
@@ -251,8 +260,6 @@ World::update(float delta)
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
 
   updateNetworkWrite () ;
-  updateCameras      () ;
-  updateWorld        () ;
       
   /* Routine stuff we do even when paused */
   silver_h -> update () ;
