@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.17 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: PlayerDriver.cxx,v 1.18 2004/08/14 12:53:29 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,7 +26,6 @@
 #include "PlayerDriver.h"
 
 PlayerDriver::PlayerDriver()
-  : kart(0)
 {
     tscale = 10.0 ;
     rscale =  3.0 ; 

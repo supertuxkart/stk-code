@@ -1,4 +1,4 @@
-//  $Id: Driver.h,v 1.23 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: Driver.h,v 1.24 2004/08/14 12:53:29 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -96,9 +96,10 @@ class KartDriver;
 
 class Driver
 {
-protected:
+public:
   float delta_t ;
 
+protected:
   sgCoord  history [ HISTORY_FRAMES ] ;
   
   /** Used to save the last position of the kart, which is then
@@ -110,9 +111,9 @@ protected:
   sgCoord  last_pos  ;
 
   sgCoord  curr_vel  ;
+public:  
   sgCoord  velocity  ;
   
-public:  
   /* start - New Physics */
   sgVec3   acceleration ;
   sgVec3   force ;
@@ -142,7 +143,6 @@ public:
   int rescue   ;
   float zipper_time_left ;
 
-protected:
   sgVec3 surface_avoidance_vector ;
   sgVec3 curr_normal ;
   int    on_ground ; 

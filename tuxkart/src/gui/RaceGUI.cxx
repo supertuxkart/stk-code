@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.12 2004/08/14 12:26:22 grumbel Exp $
+//  $Id: RaceGUI.cxx,v 1.13 2004/08/14 12:53:30 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -100,7 +100,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	if (key.mod & KMOD_CTRL)
 	{
           // FIXME: '0' alone can't be correct, can it?
-          PlayerDriver* driver = World::current()->kart [ 0 ]->getDriver();
+          PlayerDriver* driver = dynamic_cast<PlayerDriver*>(World::current()->kart [ 0 ]->getDriver());
           if (driver)
             driver -> incomingKeystroke ( key ) ;
       	return;

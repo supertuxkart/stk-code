@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.8 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: KartDriver.h,v 1.9 2004/08/14 12:53:29 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -24,7 +24,7 @@
 #include "Driver.h"
 #include "ParticleSystem.h"
 
-class PlayerDriver;  
+class Controller;  
 class SkidMark;
 
 class KartParticleSystem : public ParticleSystem
@@ -75,16 +75,16 @@ private:
     
   /** The Driver for this kart, ie. the object that controlls the
       steering */
-  PlayerDriver* driver;
+  Controller* driver;
 public:
-  KartDriver ( const KartProperties& kart_properties_, int position_, PlayerDriver* driver_ = 0 ) ;
-  virtual ~KartDriver() {}
+  KartDriver ( const KartProperties& kart_properties_, int position_, Controller* driver_ = 0 ) ;
+  virtual ~KartDriver();
 
   void load_data();
 
   virtual void placeModel ();
 
-  PlayerDriver* getDriver() const { return driver; }
+  Controller* getDriver() const { return driver; }
 
   void addAttachment ( ssgEntity *e )
   {
@@ -119,22 +119,6 @@ public:
   virtual void update               () ;
 } ;
 
-
-class NetworkKartDriver : public KartDriver
-{
-public:
-  NetworkKartDriver ( const KartProperties& kart_properties_, int _pos )
-    : KartDriver (kart_properties_, _pos)
-  {
-  }
-
-  virtual ~NetworkKartDriver() {}
-
-  virtual void update () ;
-} ;
-
-
-
 class TrafficDriver : public KartDriver
 {
 public:
@@ -148,22 +132,6 @@ public:
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
   virtual void doZipperProcessing   () ;
-  virtual void update () ;
-} ;
-
-
-class AutoKartDriver : public KartDriver
-{
-  float time_since_last_shoot ;
-public:
-  AutoKartDriver ( const KartProperties& kart_properties_, int _pos ) 
-    : KartDriver ( kart_properties_, _pos )
-  {
-    time_since_last_shoot = 0.0f ;
-  }
-
-  virtual ~AutoKartDriver() {}
-
   virtual void update () ;
 } ;
 

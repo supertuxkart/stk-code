@@ -31,6 +31,7 @@ tuxkart_SOURCES = \
   Projectile.cxx  \
   Track.cxx  \
   Track.h  \
+  Controller.h \
   TrackManager.cxx \
   TrackManager.h \
   Traffic.cxx  \

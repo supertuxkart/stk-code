@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.29 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.30 2004/08/14 12:53:29 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -122,6 +122,11 @@ void KartDriver::useAttachment ()
     collectable = COLLECT_NOTHING ;
     num_collectables = 0 ;
   }                                                                           
+}
+
+KartDriver::~KartDriver()
+{
+  delete driver;
 }
 
 void KartDriver::doLapCounting ()
@@ -300,6 +305,9 @@ void KartDriver::doCollisionAnalysis ( float hot )
 
 void KartDriver::update ()
 {
+  if (driver)
+    driver->update();
+
   wheel_position += sgLengthVec3(velocity.xyz);
 
   if ( rescue )
@@ -437,7 +445,7 @@ void KartDriver::update ()
 }
 
 
-KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , PlayerDriver* driver_ ) 
+KartDriver::KartDriver ( const KartProperties& kart_properties_, int position_ , Controller* driver_ ) 
 {
   kart_properties      = kart_properties_;
   grid_position        = position_ ;

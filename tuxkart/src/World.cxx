@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.9 2004/08/14 12:26:21 grumbel Exp $
+//  $Id: World.cxx,v 1.10 2004/08/14 12:53:29 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,6 +33,7 @@
 #include "RaceSetup.h"
 #include "WorldLoader.h"
 #include "PlayerDriver.h"
+#include "AutoDriver.h"
 #include "isect.h"
 #include "TrackManager.h"
 
@@ -138,9 +139,9 @@ World::World(const RaceSetup& raceSetup_)
     if ( i < raceSetup.numPlayers )
       newkart = new KartDriver ( kart_props, i, new PlayerDriver ) ;
     else if ( network_enabled )
-      newkart = new NetworkKartDriver ( characters[i], i ) ;
+      newkart = new KartDriver ( characters[i], i, new NetworkDriver ) ;
     else
-      newkart = new AutoKartDriver    ( characters[i], i ) ;
+      newkart = new KartDriver ( characters[i], i, new AutoDriver ) ;
 
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
