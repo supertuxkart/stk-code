@@ -1,4 +1,4 @@
-//  $Id: KartDriver.h,v 1.10 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: KartDriver.h,v 1.11 2004/08/15 16:06:15 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -122,6 +122,9 @@ public:
   virtual void doCollisionAnalysis  ( float delta, float hot ) ;
   virtual void update               ( float delta ) ;
   virtual void processInput         ( float delta ) ; 
+
+  void processAttachments(float delta);
+  void processSkidMarks();
 } ;
 
 class TrafficDriver : public KartDriver

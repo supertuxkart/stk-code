@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.10 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: World.h,v 1.11 2004/08/15 16:06:15 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -33,7 +33,6 @@ class Projectile;
 class Explosion;
 class Track;
 class guUDPConnection;
-class GFX;
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
@@ -69,7 +68,6 @@ public:
   int ready_set_go;
 
   Track* track;
-  GFX*   gfx;
 private:
   guUDPConnection *net;
   int network_enabled;
@@ -100,6 +98,7 @@ private:
   void load_track(const char *fname );
   void load_players();
   void herring_command(char *s, char *str );
+  void checkRaceStatus();
 };
 
 #endif

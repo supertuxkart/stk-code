@@ -1,4 +1,4 @@
-//  $Id: WorldScreen.cxx,v 1.2 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: WorldScreen.cxx,v 1.3 2004/08/15 16:06:15 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -92,8 +92,7 @@ WorldScreen::update()
 
   updateWorld        () ;
 
-  /* Swap graphics buffers last! */
-  world->gfx      -> done   () ;
+  swapBuffers() ;
 }
 
 void 

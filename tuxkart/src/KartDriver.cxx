@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.34 2004/08/15 13:57:55 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.35 2004/08/15 16:06:15 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -371,83 +371,29 @@ void KartDriver::update (float delta)
     attachment_type = ATTACH_NOTHING ;
   }
 
-  if ( getAttachment () == ATTACH_TINYTUX )
-  {
-    sgZeroVec3 ( velocity.xyz ) ;
-    sgZeroVec3 ( velocity.hpr ) ;
-    velocity.xyz[2] = 1.1 * GRAVITY * delta ;
-  }
-  else
-  if ( getAttachment () == ATTACH_PARACHUTE &&
-       velocity.xyz[1] > MAX_PARACHUTE_VELOCITY )
-    velocity.xyz[1] = MAX_PARACHUTE_VELOCITY ;
-  else
-  if ( getAttachment () == ATTACH_ANVIL &&
-       velocity.xyz[1] > MAX_ANVIL_VELOCITY )
-    velocity.xyz[1] = MAX_ANVIL_VELOCITY ;
-
-  if ( getAttachment () == ATTACH_MAGNET ||
-       getAttachment () == ATTACH_MAGNET_BZZT )
-  {
-    float cdist = SG_MAX ;
-    int   closest = -1 ;
-
-    for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
-    {
-      if ( World::current()->kart[i] == this ) continue ;
-
-      if ( World::current()->kart[i]->getDistanceDownTrack() < getDistanceDownTrack() )
-        continue ;
-
-      float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                        World::current()->kart[i]->getCoord()->xyz ) ;
-
-      if ( d < cdist && d < MAGNET_RANGE_SQD )
-      {
-        cdist = d ;
-        closest = i ;
-      }
-    }
-
-    if ( closest != -1 )
-    {
-      if ( getAttachment () == ATTACH_MAGNET )
-      {
-        if ( this == World::current()->kart[0] || closest == 0 )
-          sound -> playSfx ( SOUND_BZZT ) ;
-
-        attach ( ATTACH_MAGNET_BZZT,
-             attachment_time_left < 4.0f ? 4.0f : attachment_time_left ) ;
-      }
-
-      sgVec3 vec ;
-      sgSubVec2 ( vec, World::current()->kart[closest]->getCoord()->xyz, getCoord()->xyz ) ;
-      vec [ 2 ] = 0.0f ;
-      sgNormalizeVec3 ( vec ) ;
-
-      sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
-
-      float tgt_velocity = World::current()->kart[closest]->getVelocity()->xyz[1] ;
-
-      if ( cdist > MAGNET_MIN_RANGE_SQD )
-      {
-        if ( velocity.xyz[1] < tgt_velocity )
-          velocity.xyz[1] = tgt_velocity * 1.4 ;
-      }
-      else
-        velocity.xyz[1] = tgt_velocity ;
-    }
-    else
-    if ( getAttachment () == ATTACH_MAGNET_BZZT )
-      attach ( ATTACH_MAGNET, attachment_time_left ) ;
-  }
+  processAttachments(delta);
   
   if (smoke_system != NULL)
     smoke_system->update (delta);
 
   Driver::update (delta) ;
   processInput(delta);
+  processSkidMarks();
 
+
+  // Lock the vehicle in its start position until the race has
+  // really started
+  if (World::current()->getPhase() == World::START_PHASE)
+    {
+      sgCopyCoord(&curr_pos, &temp);
+      sgCopyCoord(&last_pos, &temp);
+      sgCopyCoord(&last_relax_pos, &temp);
+    }
+}
+
+void
+KartDriver::processSkidMarks()
+{
   if (skidmark_left && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
       float angle  = -43;
@@ -466,7 +412,7 @@ void KartDriver::update (float delta)
 	} else
           skidmark_left->add(&wheelpos);
     } else if (skidmark_left)
-    	skidmark_left->newSkidmark = 2;
+      skidmark_left->newSkidmark = 2;
 
   if (skidmark_right && (velocity.hpr[0] > 20.0f || velocity.hpr[0] < -20))
     {
@@ -486,16 +432,7 @@ void KartDriver::update (float delta)
 	} else
           skidmark_right->add(&wheelpos);
     } else if (skidmark_right)
-        skidmark_right->newSkidmark = 2;
-
-  // Lock the vehicle in its start position until the race has
-  // really started
-  if (World::current()->getPhase() == World::START_PHASE)
-    {
-      sgCopyCoord(&curr_pos, &temp);
-      sgCopyCoord(&last_pos, &temp);
-      sgCopyCoord(&last_relax_pos, &temp);
-    }
+      skidmark_right->newSkidmark = 2;
 }
 
 void
@@ -796,6 +733,83 @@ KartDriver::placeModel ()
   //exhaust_pipe -> setTransform (curr_pos.xyz);
 
   Driver::placeModel();
+}
+
+void 
+KartDriver::processAttachments(float delta)
+{
+  if ( getAttachment () == ATTACH_TINYTUX )
+    {
+      sgZeroVec3 ( velocity.xyz ) ;
+      sgZeroVec3 ( velocity.hpr ) ;
+      velocity.xyz[2] = 1.1 * GRAVITY * delta ;
+    }
+  else if ( getAttachment () == ATTACH_PARACHUTE &&
+            velocity.xyz[1] > MAX_PARACHUTE_VELOCITY )
+    {
+      velocity.xyz[1] = MAX_PARACHUTE_VELOCITY ;
+    }
+  else if ( getAttachment () == ATTACH_ANVIL &&
+            velocity.xyz[1] > MAX_ANVIL_VELOCITY )
+    {
+      velocity.xyz[1] = MAX_ANVIL_VELOCITY ;
+    }
+
+  if ( getAttachment () == ATTACH_MAGNET ||
+       getAttachment () == ATTACH_MAGNET_BZZT )
+    {
+      float cdist = SG_MAX ;
+      int   closest = -1 ;
+
+      for ( World::Karts::size_type i = 0; i < World::current()->kart.size() ; ++i )
+        {
+          if ( World::current()->kart[i] == this ) continue ;
+
+          if ( World::current()->kart[i]->getDistanceDownTrack() < getDistanceDownTrack() )
+            continue ;
+
+          float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
+                                            World::current()->kart[i]->getCoord()->xyz ) ;
+
+          if ( d < cdist && d < MAGNET_RANGE_SQD )
+            {
+              cdist = d ;
+              closest = i ;
+            }
+        }
+
+      if ( closest != -1 )
+        {
+          if ( getAttachment () == ATTACH_MAGNET )
+            {
+              if ( this == World::current()->kart[0] || closest == 0 )
+                sound -> playSfx ( SOUND_BZZT ) ;
+
+              attach ( ATTACH_MAGNET_BZZT,
+                       attachment_time_left < 4.0f ? 4.0f : attachment_time_left ) ;
+            }
+
+          sgVec3 vec ;
+          sgSubVec2 ( vec, World::current()->kart[closest]->getCoord()->xyz, getCoord()->xyz ) ;
+          vec [ 2 ] = 0.0f ;
+          sgNormalizeVec3 ( vec ) ;
+
+          sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
+
+          float tgt_velocity = World::current()->kart[closest]->getVelocity()->xyz[1] ;
+
+          if ( cdist > MAGNET_MIN_RANGE_SQD )
+            {
+              if ( velocity.xyz[1] < tgt_velocity )
+                velocity.xyz[1] = tgt_velocity * 1.4 ;
+            }
+          else
+            velocity.xyz[1] = tgt_velocity ;
+        }
+      else
+        if ( getAttachment () == ATTACH_MAGNET_BZZT )
+          attach ( ATTACH_MAGNET, attachment_time_left ) ;
+    } 
 }
 
 /* EOF */

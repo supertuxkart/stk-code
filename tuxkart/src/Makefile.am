@@ -43,8 +43,6 @@ tuxkart_SOURCES = \
   ScreenManager.h \
   ScreenManager.cxx \
   constants.h  \
-  gfx.cxx  \
-  gfx.h  \
   guNet.cxx  \
   guNet.h  \
   WidgetSet.cxx  \

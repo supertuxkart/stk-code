@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.15 2004/08/15 15:25:07 grumbel Exp $
+//  $Id: World.cxx,v 1.16 2004/08/15 16:06:15 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,7 +28,6 @@
 #include "Loader.h"
 #include "material.h"
 #include "World.h"
-#include "gfx.h"
 #include "Camera.h"
 #include "RaceSetup.h"
 #include "WorldLoader.h"
@@ -53,8 +52,6 @@ World::World(const RaceSetup& raceSetup_)
   net = NULL ;
   network_enabled = FALSE ;
   network_testing = FALSE ;
-
-  gfx = NULL;
 
   clock           = 0.0f;
   
@@ -100,7 +97,6 @@ World::World(const RaceSetup& raceSetup_)
   // Grab the track centerline file
   track = new Track ( track_manager.tracks[raceSetup.track].drv_filename.c_str(),
                       raceSetup.mirror, raceSetup.reverse ) ;
-  gfx        = new GFX ( raceSetup.mirror ) ;
 
   // Start building the scene graph
   scene       = new ssgRoot   ;
@@ -156,7 +152,7 @@ World::World(const RaceSetup& raceSetup_)
   }
 
   /* Load the Projectiles */
-  for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
+  for ( int j = 0 ; j < NUM_PROJECTILES ; ++j )
   {
     projectile[j] = new Projectile ( ) ;
     scene -> addKid ( projectile[j] -> getModel() ) ;
@@ -168,7 +164,6 @@ World::World(const RaceSetup& raceSetup_)
   load_players ( ) ;
 
   preProcessObj ( scene, raceSetup.mirror ) ;
-
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
   ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
@@ -197,8 +192,6 @@ World::~World()
   delete trackBranch ;
   delete scene ; 
   
-  delete gfx ;
-  
 #ifdef ENABLE_NETWORKING
   net->disconnect ( ) ;
 #endif  
@@ -225,6 +218,27 @@ World::update(float delta)
 {
   clock += delta;
 
+  checkRaceStatus();
+
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta) ;
+  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update (delta) ;
+          
+  for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
+  for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
+
+  updateNetworkWrite () ;
+      
+  /* Routine stuff we do even when paused */
+  silver_h -> update () ;
+  gold_h   -> update () ;
+  red_h    -> update () ;
+  green_h  -> update () ;
+}
+
+void
+World::checkRaceStatus()
+{
   if (clock > 1.0 && ready_set_go == 0)
     {
       ready_set_go = -1;
@@ -251,21 +265,6 @@ World::update(float delta)
     {
       phase = FINISH_PHASE;
     }
-
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta) ;
-  for ( int i = 0 ; i < NUM_PROJECTILES ; i++ ) projectile [ i ] -> update (delta) ;
-          
-  for ( int i = 0 ; i < NUM_EXPLOSIONS  ; i++ ) explosion  [ i ] -> update () ;
-  for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
-
-  updateNetworkWrite () ;
-      
-  /* Routine stuff we do even when paused */
-  silver_h -> update () ;
-  gold_h   -> update () ;
-  red_h    -> update () ;
-  green_h  -> update () ;
 }
 
 void
