@@ -1,4 +1,4 @@
-//  $Id: PlayerDriver.cxx,v 1.26 2004/11/01 17:52:11 cosmosninja Exp $
+//  $Id: PlayerDriver.cxx,v 1.27 2004/11/04 06:43:42 cosmosninja Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -38,12 +38,11 @@
       rscale =  3.0 ; 
    }
 
-    void 
+   void 
     PlayerDriver::update (float delta)
-      {
-      printf ("From PlayerDriver.cxx");
+   {
       assert(kart);
-      }
+   }
 
    void
     PlayerDriver::incomingJoystick  (JoyInfo& ji)
