@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.36 2004/08/04 16:36:12 jamesgregory Exp $
+//  $Id: tuxkart.cxx,v 1.37 2004/08/05 10:20:30 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -690,8 +690,8 @@ void shutdown()
 	
 	if (widgetSet)
 		delete widgetSet;
-	
-	SDL_Quit( );
+
+	shutdownVideo ();
   
 	exit (0);
 }
