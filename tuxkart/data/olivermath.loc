@@ -9,6 +9,11 @@
 "backpack.ac",0,-10,{},0,{},{}
 "desk.ac",-10,-10,{},0,{},{}
 "ruler.ac",-15,-15,{},0,{},{}
+"openbook.ac",-20,-15,{},0,{},{}
+"yellow_openbook.ac",-16,-15,{},0,{},{}
+"black_openbook.ac",-12,-15,{},0,{},{}
+"ruler_bridge.ac",-14,15,{},0,{},{}
+"ruler_jump.ac",-18,15,{},0,{},{}
 #
-MUSIC "mods/tk5a.mod"
+MUSIC "mods/Cchips46.mod"
 
