@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.30 2004/08/29 17:24:09 rmcruz Exp $
+//  $Id: RaceGUI.cxx,v 1.31 2004/09/01 15:22:54 rmcruz Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -222,15 +222,6 @@ void RaceGUI::drawDropShadowText ( char *str, int sz, int x, int y )
   drawText ( str, sz, x+1, y+1 ) ;
 }
 
-#if 0
-void RaceGUI::drawStatsText ()
-{
-  char str [ 256 ] ;
-
-  sprintf ( str, "%3d,%3d,%3d,%3d,%3d,%3d", (int)tt[0],(int)tt[1],(int)tt[2],(int)tt[3],(int)tt[4],(int)tt[5]) ;
-  drawDropShadowText ( str, 18, 5, 300 ) ;
-}
-#endif
 void RaceGUI::drawTimer ()
 {
   char str [ 256 ] ;
@@ -341,17 +332,6 @@ void RaceGUI::drawGameOverText ()
   }
 }
 
-
-void RaceGUI::drawGameRunningText (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y)
-{
-  drawScore (raceSetup, player_nb, offset_x, offset_y, ratio_x, ratio_y) ;
-  drawTimer () ;
-
-  glColor4f ( 0.6, 0.0, 0.6, 1.0 ) ;
-
-//  if ( stats_enabled )
-//    drawStatsText () ;
-}
 
 void RaceGUI::drawPlayerIcons ()
 {
@@ -644,7 +624,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
         drawEnergyMeter ( (float)(World::current()->getPlayerKart(pla)->getNumHerring()) /
                                MAX_HERRING_EATEN, offset_x, offset_y,
                                split_screen_ratio_x, split_screen_ratio_y ) ;
-        drawGameRunningText  ( raceSetup, pla, offset_x, offset_y,
+        drawScore       ( raceSetup, pla, offset_x, offset_y,
                                split_screen_ratio_x, split_screen_ratio_y ) ;
         drawEmergencyText    ( pla, offset_x, offset_y,
                                split_screen_ratio_x, split_screen_ratio_y ) ;
@@ -652,6 +632,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup)
 
       if(raceSetup.getNumPlayers() == 1)
         drawPlayerIcons      () ;
+
+      drawTimer () ;
       drawMap              () ;
     }
 
