@@ -4,6 +4,8 @@
 #define MIN_CAM_DISTANCE      5.0f  
 #define MAX_CAM_DISTANCE     10.0f  // Was 15
 
+int player=0;
+
 int finishing_position = -1 ;
 
 static ulClock ck2 ;
@@ -100,7 +102,7 @@ Level level ;
 
 void load_players ()
 {
-  ssgEntity *obj ;
+  ssgEntity *obj;
 
   ssgEntity *pobj1 = ssgLoad ( parachute_file, loader_opts ) ;
   ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader_opts ) ;
@@ -114,24 +116,30 @@ void load_players ()
 
   ssgEntity *pobj5 = ttt ;
   int i ;
-
+ 
+   
   for ( i = 0 ; player_files [ i ] != NULL && i < NUM_KARTS ; i++ )
   {
     ssgRangeSelector *lod = new ssgRangeSelector ;
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
+    if (i!=0){
     obj = ssgLoad ( player_files [ i ], loader_opts ) ;
-
+    } else {
+    obj = ssgLoad ( player_files [ player ], loader_opts );  
+    }
     lod -> addKid ( obj   ) ;
     lod -> setRanges ( r, 2  ) ;
- 
+    
     kart[i]-> getModel() -> addKid ( lod ) ;
     kart[i]-> addAttachment ( pobj1 ) ;
     kart[i]-> addAttachment ( pobj2 ) ;
     kart[i]-> addAttachment ( pobj3 ) ;
     kart[i]-> addAttachment ( pobj4 ) ;
     kart[i]-> addAttachment ( pobj5 ) ;
+    
     num_karts = i + 1 ;
+    
   }
 
   for ( i = 0 ; i < NUM_PROJECTILES ; i++ )

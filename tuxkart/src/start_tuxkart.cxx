@@ -1,6 +1,9 @@
 
 #include "start_tuxkart.h"
 
+int width=800,height=600,fullscreen=0;
+extern int player;
+
 /***********************************\
 *                                   *
 * These are the PUI widget pointers *
@@ -179,7 +182,6 @@ static void numLapsSlider_cb ( puObject *)
   numLapsText->setLegend ( numLapsLegend ) ;
 }
 
-
 static void install_material ()
 {
   intro_gst = new ssgSimpleState ;
@@ -204,7 +206,6 @@ static void install_material ()
   intro_gst -> setShininess ( 0 ) ;
 }
                                                                                 
-
 static void loadTrackList ()
 {
   char *fname = "data/levels.dat" ;
@@ -313,7 +314,7 @@ int main ( int argc, char **argv )
   fake_argv[2] = NULL ;
  
   glutInitWindowPosition ( 0, 0 ) ;
-  glutInitWindowSize     ( 640, 480 ) ;
+  glutInitWindowSize     ( width, height ) ;
   glutInit               ( &fake_argc, fake_argv ) ;
   glutInitDisplayMode    ( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH ) ;
 #ifndef WIN32
@@ -357,7 +358,7 @@ int main ( int argc, char **argv )
   exitButton = new puButton     ( 180, 10, 250, 50 ) ;
   exitButton->setLegend         ( "Quit"  ) ;
   exitButton->setCallback       ( exit_cb ) ;
-
+   
   numLapsSlider = new puSlider  ( 10, 80, 150 ) ;
   numLapsSlider->setLabelPlace ( PUPLACE_ABOVE ) ;
   numLapsSlider->setLabel  ( "How Many Laps?" ) ;
@@ -372,11 +373,14 @@ int main ( int argc, char **argv )
   trackButtons = new puButtonBox ( 400, 10, 630, 150, track_names, TRUE ) ;
   trackButtons -> setLabel ( "Which Track?" ) ;
   trackButtons -> setLabelPlace ( PUPLACE_ABOVE ) ;
-  trackButtons -> setValue ( 0 ) ;
-
+  trackButtons -> setValue ( 0 ) ; 
+   
+   
+   
   install_material () ;
 
   signal ( 11, SIG_DFL ) ;
+  if (fullscreen){ glutFullScreen(); } 
   glutMainLoop () ;
   return 0 ;
 }

@@ -2,6 +2,10 @@
 TuxKart Change Log.
 ===================
 
+TuxKart v0.2.0 (Sept 3rd 2002)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Changes for compatibility with PLIB 1.6.0 and later.
+
 TuxKart v0.0.5 (??)
 ~~~~~~~~~~~~~~~~~~~
   * Changes for compatibility with PLIB 1.4.0 and later.

@@ -65,6 +65,9 @@ static void help_cb ( puObject * )
   help () ;
 }
 
+static void fullscreencb ( puObject * ){ glutFullScreen();  }
+static void nofullscreencb ( puObject * ){ glutReshapeWindow(640,480); glutPositionWindow(12,12); }
+
 static void mousetrap_off_cb ( puObject * ) { mousetrap = FALSE ; } 
 static void mousetrap_on_cb  ( puObject * ) { mousetrap = TRUE  ; } 
 static void music_off_cb     ( puObject * ) { sound->disable_music () ; } 
@@ -88,6 +91,10 @@ static puCallback sound_submenu_cb [] = {  music_off_cb,        sfx_off_cb,     
 
 static char      *view_submenu    [] = { "Mousetrap Mode",   "No Mousetrap", NULL } ;
 static puCallback view_submenu_cb [] = { mousetrap_on_cb , mousetrap_off_cb, NULL } ;
+
+static char      *mode_submenu    [] = { "Fullscreen","No Fulllscreen",NULL };
+static puCallback mode_submenu_cb    [] = { fullscreencb,nofullscreencb,NULL };
+
 
 static char      *help_submenu    [] = { "Versions...", "Credits...", "About...",  "Help", NULL } ;
 static puCallback help_submenu_cb [] = {   versions_cb,   credits_cb,   about_cb, help_cb, NULL } ;
@@ -126,6 +133,7 @@ GUI::GUI ()
     main_menu_bar -> add_submenu ( "Exit", exit_submenu, exit_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Sound", sound_submenu, sound_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "View", view_submenu, view_submenu_cb ) ;
+    main_menu_bar -> add_submenu ( "Mode", mode_submenu, mode_submenu_cb ) ;
     main_menu_bar -> add_submenu ( "Help", help_submenu, help_submenu_cb ) ;
   }
 
