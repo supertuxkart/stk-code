@@ -33,6 +33,8 @@ void initMaterials () ;
 Material *getMaterial ( ssgState *s ) ;
 Material *getMaterial ( ssgLeaf  *l ) ;
 
+ssgState *getAppState ( char *fname ) ;
+
 extern ssgSimpleState *default_gst ;
 extern ssgSimpleState *fuzzy_gst   ;
 extern ssgSimpleState *herring_gst ;

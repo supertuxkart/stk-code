@@ -87,6 +87,11 @@ static void displayfn (void)
   intro_gst -> force () ;
 
   glBegin ( GL_QUADS ) ;
+/*
+static int x = 1 ;
+  glColor3f    ( 1, (float)x, 1 ) ;
+x= !x ;
+*/
   glColor3f    ( 1, 1, 1 ) ;
   glTexCoord2f ( 0, 0 ) ; glVertex2i (   0,   0 ) ;
   glTexCoord2f ( 1, 0 ) ; glVertex2i ( 640,   0 ) ;
@@ -102,7 +107,7 @@ static void displayfn (void)
   /* Off we go again... */
 
   glutSwapBuffers   () ;
-  glutPostRedisplay () ;
+  /* glutPostRedisplay () ; */
 }
 
 

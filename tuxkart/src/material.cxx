@@ -10,7 +10,7 @@ ssgSimpleState *grass_gst, *dirt_gst, *stone1_gst,
                *brick_gst, *grid_gst, *lava_gst, *stone_gst,
                *pebble_gst, *floor_gst, *railing_gst, *wood_gst,
                *tinytux_gst, *butterfly_gst, *sandstorm_gst, *sand_gst,
-               *pyramidwall_gst, *egypt_gst,
+               *pyramidwall_gst, *egypt_gst, *flames_gst,
                *bzzt_gst, *herringbones_gst, *goldwall_gst, *rainbow_gst ;
 
 ssgSimpleState *blank_gst ;
@@ -58,6 +58,7 @@ Material gs_setup [] =
   { &explode_gst , "images/explode.rgb" , UVCLAMP,TRUE ,0.2, FALSE,0.0,MAT_IGN},
   { &players_gst , "images/players.rgb" , UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
   { &missile_gst , "images/missile.rgb" , UVCLAMP,TRUE ,0.9, FALSE,0.0,MAT_IGN},
+  { &flames_gst  , "images/flames.rgb"  , NOCLAMP,FALSE,0.9, FALSE,0.0,MAT_IGN},
   { &magnet_gst  , "images/magnet.rgb"  , UVCLAMP,TRUE ,0.1, FALSE,0.0,MAT_IGN},
   { &bzzt_gst    , "images/bzzt.rgb"    , NOCLAMP,TRUE ,0.1, FALSE,0.0,MAT_IGN},
   { &flamemissile_gst,

@@ -5845,7 +5845,7 @@ name "cylinder"
 loc 0.00534001 0.221101 0.864918
 data 17
 @autotex R=23.123
-texture "/usr/batcave1/tux-1.0/images/flames.rgb"
+texture "../images/flames.rgb"
 numvert 13
 -0.00228041 -0.0015291 -0.404276
 0.101338 0.173205 0.404276

@@ -7,6 +7,7 @@
 static guClock ck2 ;
 extern float tt[6];
 guUDPConnection *net = NULL ;
+ssgLoaderOptions *loader_opts = NULL ;
 
 int network_enabled = FALSE ;
 int network_testing = FALSE ;
@@ -99,15 +100,15 @@ void load_players ()
 {
   ssgEntity *obj ;
 
-  ssgEntity *pobj1 = ssgLoad ( parachute_file, process_userdata ) ;
-  ssgEntity *pobj2 = ssgLoad ( magnet_file   , process_userdata ) ;
-  ssgEntity *pobj3 = ssgLoad ( magnet2_file  , process_userdata ) ;
-  ssgEntity *pobj4 = ssgLoad ( anvil_file    , process_userdata ) ;
+  ssgEntity *pobj1 = ssgLoad ( parachute_file, loader_opts ) ;
+  ssgEntity *pobj2 = ssgLoad ( magnet_file   , loader_opts ) ;
+  ssgEntity *pobj3 = ssgLoad ( magnet2_file  , loader_opts ) ;
+  ssgEntity *pobj4 = ssgLoad ( anvil_file    , loader_opts ) ;
 
   sgCoord cc ;
   sgSetCoord ( &cc, 0, 0, 2, 0, 0, 0 ) ;
   ssgTransform *ttt = new ssgTransform ( & cc ) ;
-  ttt -> addKid ( ssgLoad ( tinytux_file  , process_userdata ) ) ;
+  ttt -> addKid ( ssgLoad ( tinytux_file  , loader_opts ) ) ;
 
   ssgEntity *pobj5 = ttt ;
   int i ;
@@ -117,7 +118,7 @@ void load_players ()
     ssgRangeSelector *lod = new ssgRangeSelector ;
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
-    obj = ssgLoad ( player_files [ i ], process_userdata ) ;
+    obj = ssgLoad ( player_files [ i ], loader_opts ) ;
 
     lod -> addKid ( obj   ) ;
     lod -> setRanges ( r, 2  ) ;
@@ -137,7 +138,7 @@ void load_players ()
     projectile[i]-> getModel() -> addKid ( sel ) ;
 
     for ( int j = 0 ; projectile_files [ j ] != NULL ; j++ )
-      sel -> addKid ( ssgLoad ( projectile_files [ j ], process_userdata ) ) ;
+      sel -> addKid ( ssgLoad ( projectile_files [ j ], loader_opts ) ) ;
 
     projectile[i] -> off () ;
   }
@@ -145,7 +146,7 @@ void load_players ()
   for ( i = 0 ; i < NUM_EXPLOSIONS ; i++ )
   {
     explosion[i] = new Explosion ( (ssgBranch *) ssgLoad ( explosion_file,
-                                                    process_userdata ) ) ;
+                                                    loader_opts ) ) ;
   }
 }
 
@@ -322,7 +323,7 @@ void load_track ( ssgBranch *trackb, char *fname )
 	}
       }
 
-      ssgEntity        *obj   = ssgLoadAC ( fname, process_userdata ) ;
+      ssgEntity        *obj   = ssgLoad ( fname, loader_opts ) ;
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;
 
@@ -376,6 +377,12 @@ int tuxkart_main ( int num_laps, char *level_name )
 {
   net   = new guUDPConnection ;
   fclock = new guClock ;
+
+  if ( loader_opts == NULL )
+  {
+    loader_opts = new ssgLoaderOptions ( getAppState, NULL,
+                                    process_userdata, NULL ) ;
+  }
 
   num_laps_in_race = num_laps ;
 
