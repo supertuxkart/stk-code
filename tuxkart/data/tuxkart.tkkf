@@ -3,8 +3,8 @@
 (tuxkart-kart
  (name "Tux")
  (model "tuxkart.ac")
- (icon  "tuxicon.rgb")
- (shadow "tuxkartshadow.rgb")
+ (icon  "tuxicon.png")
+ (shadow "tuxkartshadow.png")
  
  (red   0.8)
  (green 0.0)

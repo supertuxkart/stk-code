@@ -3,8 +3,8 @@
 (tuxkart-kart
  (name "Mr. Cube")
  (model "mrcube.ac")
- (icon  "tuxicon.rgb")
- (shadow "tuxkartshadow.rgb")
+ (icon  "tuxicon.png")
+ (shadow "tuxkartshadow.png")
 
  (left-wheel  "tuxkart-left.ac")
  (right-wheel "tuxkart-left.ac")

@@ -3,8 +3,8 @@
 (tuxkart-kart
  (name "Penny")
  (model "pennykart.ac")
- (icon  "pennyicon.rgb")
- (shadow "pennyshadow.rgb")
+ (icon  "pennyicon.png")
+ (shadow "pennyshadow.png")
  (red   0.8)
  (green 0.0)
  (blue  0.0)

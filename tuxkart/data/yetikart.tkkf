@@ -3,8 +3,8 @@
 (tuxkart-kart
  (name "Yeti")
  (model "yetikart.ac")
- (icon  "yetiicon.rgb")
- (shadow "yetishadow.rgb")
+ (icon  "yetiicon.png")
+ (shadow "yetishadow.png")
  
  (red   0.8)
  (green 0.0)

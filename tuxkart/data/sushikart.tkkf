@@ -3,8 +3,8 @@
 (tuxkart-kart
  (name "Sushi")
  (model "sushikart.ac")
- (icon  "sushiicon.rgb")
- (shadow "sushishadow.rgb")
+ (icon  "sushiicon.png")
+ (shadow "sushishadow.png")
  (red   0.8)
  (green 0.0)
  (blue  0.0)
