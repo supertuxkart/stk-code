@@ -411,7 +411,7 @@ void cmdLineHelp ()
 	    "--nbrPlayers n"   "\t\tDefine number of players to either 1, 2 or 4.\n"
 	    "--reverse"        "\t\tEnable reverse mode.\n"
 	    "--mirror"         "\t\tEnable mirror mode (when supported).\n"
-	    "--fullscreen"     "\t\tFullscreen display (doesn't work with --screenMode).\n"
+	    "--fullscreen"     "\t\tFullscreen display (doesn't work with --resolution).\n"
 	    "--noBorder"       "\t\tDisable window borders/decorations.\n"
 	    "--resolution X Y" "\tSet the screen resolution (e.g. 320 200).\n"
 	    "--version"        "\t\tShow version.\n"
