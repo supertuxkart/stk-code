@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.cxx,v 1.2 2004/08/05 18:33:00 jamesgregory Exp $
+//  $Id: WidgetSet.cxx,v 1.3 2004/08/05 22:48:46 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -1253,6 +1253,10 @@ void WidgetSet::paint(int id)
 	}
 	glPopAttrib();
 
+	//this isn't here in the Neverball code, it's somewhere in Neverball's main code, however it is neccessary
+	//for fonts to be displayed
+	glEnable(GL_TEXTURE_2D);
+	
 	paint_text(id);
 
         config_pop_matrix();
