@@ -42,10 +42,14 @@
 "mnm.rgb"          Y Y     Y      0.5     N     N   1.0     N   Y    N    N
 "fuzzy.rgb"        Y Y     Y      0.2     N     N   0.0     Y   N    N    N
 "tuxkartshadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"sushishadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"sushiicon.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
+"pennyshadow.rgb" Y Y     Y      0.0     N     N   0.0     Y   N    N    N
 "spark.rgb"        Y Y     N      0.2     N     N   0.0     Y   N    N    N
 "explode.rgb"      Y Y     Y      0.2     N     N   0.0     Y   N    N    N
 "players.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "tuxicon.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
+"pennyicon.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "missile.rgb"      Y Y     Y      0.9     N     N   0.0     Y   N    N    N
 "flames.rgb"       N N     N      0.9     N     N   0.0     Y   N    N    N
 "magnet.rgb"       Y Y     Y      0.1     N     N   0.0     Y   N    N    N
