@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.42 2004/08/08 03:18:56 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.43 2004/08/08 03:45:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,6 +34,8 @@
 #include "gfx.h"
 #include "preprocessor.h"
 #include "material.h"
+
+#include <vector>
 
 int finishing_position = -1 ;
 
@@ -89,7 +91,7 @@ WidgetSet          *widgetSet = NULL ;
 BaseGUI	*gui = NULL;
 Level        level ;
 
-GUISwitch guiSwitch = GUIS_CURRENT;
+std::vector<GUISwitch> guiStack;
 
 Karts kart;
 TrafficDriver *traffic [ NUM_TRAFFIC     ] ;
@@ -515,7 +517,7 @@ int tuxkartMain ()
   ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
 #endif
 	
-	guiSwitch = GUIS_RACE;
+	guiStack.push_back(GUIS_RACE);
 
   /* Play Ball! */
 
@@ -523,6 +525,63 @@ int tuxkartMain ()
   return TRUE ;
 }
 
+void unloadRace()
+{  
+/* This whole function needs some serious fixing - whatever was done in tuxKartMain (the function immediately above this one) needs undoing. I've simply taken the above function, reversed the order of all the statements, replaced all the "new"s with "delete"s and all the "init()"s with commented out and non-existent "deinit()"s */
+
+  //FIXME: when this is fixed obviously this can be deleted:
+  shutdown();
+
+  /*FIXME: in load we had
+#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
+  ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
+#endif
+*/
+
+  //FIXME: in load we had preProcessObj ( scene, raceSetup.mirror ) ;
+  
+  //FIXME:
+  //unload_players ( ) ;
+  //unload_track ( ) ;
+  
+  for ( uint i = 0 ; i < kart.size() ; i++ )
+    delete kart[i];
+
+  kart.clear();
+  
+  for ( int j = 0 ; j < NUM_PROJECTILES ; j++ )
+    delete projectile[j];
+    
+  delete gold_h;
+  delete silver_h;
+  delete red_h;
+  delete green_h;
+  
+  delete trackBranch ;
+  delete scene ; 
+  
+  //FIXME:
+  //deinitCameras () ;
+  
+  delete gfx ;
+  
+  //FIXME:
+  //deinitMaterials     () ;
+  //deinitStatusDisplay () ;
+  
+delete fclock ;
+
+#ifdef ENABLE_NETWORKING
+  //FIXME: disconnect from network as we ran net->connect ( argv[i] ) ;
+#endif  
+  delete net ;
+}
+
+void backToSplash()
+{
+	unloadRace();
+	startScreen();
+}
 
 void updateLapCounter ( int k )
 {

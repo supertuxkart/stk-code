@@ -1,4 +1,4 @@
-//  $Id: NumPlayers.cxx,v 1.1 2004/08/07 03:42:34 jamesgregory Exp $
+//  $Id: NumPlayers.cxx,v 1.2 2004/08/08 03:45:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -53,7 +53,7 @@ void NumPlayers::select()
 	case MENU_NETWORK:	break;
 	default: 
 		raceSetup.numPlayers = widgetSet -> token ( widgetSet -> click() );
-		guiSwitch = GUIS_GAMEMODE;
+		guiStack.push_back(GUIS_GAMEMODE);
 		break;
 	}
 }
@@ -72,7 +72,7 @@ void NumPlayers::keybd(const SDL_keysym& key)
 	case SDLK_RETURN: select(); break;
 	
 	case SDLK_ESCAPE:
-		guiSwitch = GUIS_MAINMENU;
+		guiStack.pop_back();
 		
 	default: break;
 	}

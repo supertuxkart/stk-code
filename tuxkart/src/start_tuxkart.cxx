@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.47 2004/08/07 05:49:53 jamesgregory Exp $
+//  $Id: start_tuxkart.cxx,v 1.48 2004/08/08 03:45:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -37,6 +37,8 @@ std::vector<std::string> trackNames ;
 void switchToGame ()
 {
   delete introMaterial ;
+  
+  guiStack.clear();
 
   tuxkartMain () ;
 }
@@ -205,9 +207,9 @@ static void initTuxKart (int width, int height, int videoFlags)
 
 
 /* Draw the startScreen */
-static void startScreen ( )
+void startScreen ( )
 {
-  guiSwitch = GUIS_MAINMENU;
+  guiStack.push_back(GUIS_MAINMENU);
 
   installMaterial () ;
   splashMainLoop  () ;
@@ -388,12 +390,9 @@ int main ( int argc, char *argv[] )
   initTuxKart ( width,  height, fullscreen );
 
   if ( noStartScreen )
-    {
-      guiSwitch = GUIS_RACE;
       tuxkartMain ( ) ;
-    }
   else
-    startScreen ();
+    startScreen ( );
 
   return 0 ;
 }

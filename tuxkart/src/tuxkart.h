@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.23 2004/08/07 03:41:14 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.24 2004/08/08 03:45:12 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -67,7 +67,7 @@ public:
 extern GFX         *gfx ;
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
-extern GUISwitch   guiSwitch;
+extern std::vector<GUISwitch> guiStack;
 
 extern SoundSystem *sound ;
 extern Track       *track ;
@@ -82,6 +82,8 @@ extern RaceSetup raceSetup;
 extern ssgRoot *scene ;
 
 void tuxKartMainLoop () ;
+void backToSplash () ;
+void startScreen() ;
 void shutdown() ;
 void initMaterials   () ;
 ssgBranch *process_userdata ( char *data ) ;

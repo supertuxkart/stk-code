@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.h,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: RaceMenu.h,v 1.1 2004/08/08 03:45:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,47 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BASEGUI_H
-#define HEADER_BASEGUI_H
+#ifndef HEADER_RACEMENU_H
+#define HEADER_RACEMENU_H
 
-#include <SDL.h>
+#include "BaseGUI.h"
 
-enum GUISwitch
-{
-GUIS_MAINMENU,
-GUIS_CHARSEL,
-GUIS_DIFFICULTYGP,
-GUIS_DIFFICULTYQR,
-GUIS_GAMEMODE,
-GUIS_OPTIONS,
-GUIS_TRACKSEL,
-GUIS_NUMPLAYERS,
-GUIS_RACE,
-GUIS_RACEMENU,
-GUIS_EXITRACE
-};
-
-enum MenuOption {MENU_SINGLE, MENU_MULTI, MENU_REPLAY, MENU_OPTIONS, MENU_QUIT,
-MENU_GP, MENU_QUICKRACE,
-MENU_TRACK,
-MENU_EASY, MENU_MEDIUM, MENU_HARD,
-MENU_NETWORK,
-MENU_RETURN, MENU_EXIT
-} ;
-
-void updateGUI();
-
-class BaseGUI
+class RaceMenu: public BaseGUI
 {
 public:
-	BaseGUI() {}
-	virtual ~BaseGUI() {}
+	RaceMenu();
+	~RaceMenu();
 	
-	virtual void update(float dt) = 0;
-	virtual void select() = 0;
-	virtual void keybd(const SDL_keysym& key) = 0;
-	virtual void point(int x, int y) = 0; 
-	virtual void stick(int x, int y) = 0;
+	void update(float dt);
+	void select();
+	void keybd(const SDL_keysym& key);
+	void point(int x, int y);
+	void stick(int x, int y);
+	
+private:
+	int menu_id;
 };
 
 #endif

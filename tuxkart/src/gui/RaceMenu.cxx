@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.5 2004/08/08 03:45:11 jamesgregory Exp $
+//  $Id: RaceMenu.cxx,v 1.1 2004/08/08 03:45:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,48 +17,44 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "TrackSel.h"
+#include "RaceMenu.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
-#include <string>
-
-using std::string;
-
-TrackSel::TrackSel()
+RaceMenu::RaceMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	
-	widgetSet -> start(menu_id, trackNames[0].c_str(),  GUI_SML, 0, 0);
-	
-	for (uint i = 1; i != trackNames.size(); ++i)
-		widgetSet -> state(menu_id, trackNames[i].c_str(),  GUI_SML, i, 0);
-	
+	widgetSet -> start(menu_id, "Return To Race",  GUI_SML, MENU_RETURN, 0);
+	widgetSet -> state(menu_id, "Exit Race",  GUI_SML, MENU_EXIT, 0);
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
 	widgetSet -> layout(menu_id, 0, -1);
 }
 
-TrackSel::~TrackSel()
+RaceMenu::~RaceMenu()
 {
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void TrackSel::update(float dt)
+void RaceMenu::update(float dt)
 {
 	
 	widgetSet -> timer(menu_id, dt) ;
 	widgetSet -> paint(menu_id) ;
 }
 
-void TrackSel::select()
+void RaceMenu::select()
 {
-	raceSetup.track = widgetSet -> token ( widgetSet -> click() );
-	switchToGame () ;
+	switch ( widgetSet -> token (widgetSet -> click()) )
+	{
+	case MENU_RETURN:	guiStack.pop_back(); break;
+	case MENU_EXIT:	guiStack.push_back(GUIS_EXITRACE); break;
+	default: break;
+	}
 }
 
-void TrackSel::keybd(const SDL_keysym& key)
+void RaceMenu::keybd(const SDL_keysym& key)
 {
 	switch ( key.sym )
 	{
@@ -73,16 +69,17 @@ void TrackSel::keybd(const SDL_keysym& key)
 	
 	case SDLK_ESCAPE:
 		guiStack.pop_back();
+	
 	default: break;
 	}
 }
 
-void TrackSel::point(int x, int y)
+void RaceMenu::point(int x, int y)
 {
 	widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
 }
 
-void TrackSel::stick(int x, int y)
+void RaceMenu::stick(int x, int y)
 {
 	widgetSet -> pulse(widgetSet -> stick(menu_id, x, y), 1.2f);
 }

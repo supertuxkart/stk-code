@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.2 2004/08/07 03:42:34 jamesgregory Exp $
+//  $Id: BaseGUI.cxx,v 1.3 2004/08/08 03:45:09 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,45 +27,59 @@
 #include "TrackSel.h"
 #include "NumPlayers.h"
 #include "RaceGUI.h"
+#include "RaceMenu.h"
 
 void updateGUI()
 {
-	if (guiSwitch != GUIS_CURRENT)
+	static uint rememberSize = 0;
+	
+	if (rememberSize != guiStack.size())
 	{
-		delete gui;
-		gui = NULL;
-		
-		switch (guiSwitch)
+		if (gui)
 		{
-		case GUIS_CURRENT:
-			break;
-		case GUIS_MAINMENU:
-			gui = new MainMenu;
-			break;
-		case GUIS_CHARSEL:
-			gui = new CharSel;
-			break;
-		case GUIS_DIFFICULTY:
-			gui = new Difficulty;
-			break;
-		case GUIS_GAMEMODE:
-			gui = new GameMode;
-			break;
-		case GUIS_OPTIONS:
-			gui = new Options;
-			break;
-		case GUIS_TRACKSEL:
-			gui = new TrackSel;
-			break;
-		case GUIS_NUMPLAYERS:
-			gui = new NumPlayers;
-			break;
-		case GUIS_RACE:
-			gui = new RaceGUI;
-			break;
+			delete gui;
+			gui = NULL;
 		}
 		
-		guiSwitch = GUIS_CURRENT;
+		rememberSize = guiStack.size();
+		
+		if (guiStack.size())
+		{		
+			switch (guiStack.back())
+			{
+			case GUIS_MAINMENU:
+				gui = new MainMenu;
+				break;
+			case GUIS_CHARSEL:
+				gui = new CharSel;
+				break;
+			case GUIS_DIFFICULTYGP:
+			case GUIS_DIFFICULTYQR:
+				gui = new Difficulty;
+				break;
+			case GUIS_GAMEMODE:
+				gui = new GameMode;
+				break;
+			case GUIS_OPTIONS:
+				gui = new Options;
+				break;
+			case GUIS_TRACKSEL:
+				gui = new TrackSel;
+				break;
+			case GUIS_NUMPLAYERS:
+				gui = new NumPlayers;
+				break;
+			case GUIS_RACE:
+				gui = new RaceGUI;
+				break;
+			case GUIS_RACEMENU:
+				gui = new RaceMenu;
+				break;
+			case GUIS_EXITRACE:
+				backToSplash();
+			}
+		}
+		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts
 		SDL_ShowCursor(SDL_DISABLE);
 	}
 	

@@ -1,4 +1,4 @@
-//  $Id: Difficulty.cxx,v 1.3 2004/08/06 02:37:30 jamesgregory Exp $
+//  $Id: Difficulty.cxx,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,17 +21,23 @@
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
+#include <algorithm>
+
 Difficulty::Difficulty()
 {
 	menu_id = widgetSet -> varray(0);
 	widgetSet -> start(menu_id, "Easy",  GUI_SML, MENU_EASY, 0);
 	widgetSet -> state(menu_id, "Medium",  GUI_SML, MENU_MEDIUM, 0);
 	widgetSet -> state(menu_id, "Hard",  GUI_SML, MENU_HARD, 0);
-	widgetSet -> state(menu_id, "If not GP, Num Laps",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "If not GP, Reverse Track",  GUI_SML, 0, 0);
-	#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-	widgetSet -> state(menu_id, "If not GP, Mirror Track",  GUI_SML, 0, 0);
-	#endif
+	
+	if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYQR) != guiStack.end())
+	{
+		widgetSet -> state(menu_id, "Number of Laps",  GUI_SML, 0, 0);
+		widgetSet -> state(menu_id, "Reverse Track",  GUI_SML, 0, 0);
+		#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
+		widgetSet -> state(menu_id, "Mirror Track",  GUI_SML, 0, 0);
+		#endif
+	}
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
@@ -54,9 +60,9 @@ void Difficulty::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_EASY:	guiSwitch = GUIS_CHARSEL;	break;
-	case MENU_MEDIUM:	guiSwitch = GUIS_CHARSEL;	break;
-	case MENU_HARD:	guiSwitch = GUIS_CHARSEL;	break;
+	case MENU_EASY:	guiStack.push_back(GUIS_CHARSEL);	break;
+	case MENU_MEDIUM:	guiStack.push_back(GUIS_CHARSEL);	break;
+	case MENU_HARD:	guiStack.push_back(GUIS_CHARSEL);	break;
 	default: break;
 	}
 }
@@ -75,7 +81,7 @@ void Difficulty::keybd(const SDL_keysym& key)
 	case SDLK_RETURN: select(); break;
 	
 	case SDLK_ESCAPE:
-		guiSwitch = GUIS_MAINMENU;
+		guiStack.pop_back();
 		
 	default: break;
 	}

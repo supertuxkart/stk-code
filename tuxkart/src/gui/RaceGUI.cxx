@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.3 2004/08/07 22:12:16 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.4 2004/08/08 03:45:11 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -76,7 +76,7 @@ void RaceGUI::keybd(const SDL_keysym& key)
 	case SDLK_z : stToggle () ; return ;
 	
 	case SDLK_ESCAPE:
-		guiSwitch = GUIS_MAINMENU;
+		guiStack.push_back(GUIS_RACEMENU);
 		
 	default: break;
 	}
