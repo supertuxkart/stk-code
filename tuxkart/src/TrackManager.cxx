@@ -1,4 +1,4 @@
-//  $Id: TrackManager.cxx,v 1.2 2004/08/10 19:55:47 grumbel Exp $
+//  $Id: TrackManager.cxx,v 1.3 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <set>
+#include "TuxkartError.h"
 #include "Loader.h"
 #include "StringUtils.h"
 #include "TrackManager.h"
@@ -26,6 +27,32 @@ TrackManager track_manager;
 
 TrackManager::TrackManager()
 {
+}
+
+int
+TrackManager::getTrackId(const std::string& ident)
+{
+  int j = 0;
+  for(Tracks::iterator i = tracks.begin(); i != tracks.end(); ++i)
+    {
+      if (i->ident == ident)
+        return j;
+      ++j;
+    }
+
+  throw TuxkartError("TrackManager: Couldn't find track: '" + ident + "'");
+}
+
+const TrackData&
+TrackManager::getTrack(const std::string& ident)
+{
+  for(Tracks::iterator i = tracks.begin(); i != tracks.end(); ++i)
+    {
+      if (i->ident == ident)
+        return (*i);
+    }
+
+  throw TuxkartError("TrackManager: Couldn't find track: '" + ident + "'");
 }
  
 void

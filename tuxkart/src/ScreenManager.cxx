@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.cxx,v 1.2 2004/08/11 11:36:40 grumbel Exp $
+//  $Id: ScreenManager.cxx,v 1.3 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -23,23 +23,32 @@ ScreenManager* ScreenManager::current_ = 0;
 
 ScreenManager::ScreenManager()
 {
-  current_ = this;
+  current_       = this;
   current_screen = 0;
+  next_screen    = 0;
 }
 
 void
 ScreenManager::set_screen(Screen* screen)
 {
-  delete current_screen;
-  current_screen = screen;
+  delete next_screen;
+  next_screen = screen;
 }
 
 void
 ScreenManager::run()
 {
-  while(current_screen)
+  while(current_screen || next_screen)
     {
-      current_screen->update();
+      if (current_screen)
+        current_screen->update();
+
+      if (next_screen)
+        {
+          delete current_screen;
+          current_screen = next_screen;
+          next_screen    = 0;
+        }
     }
 }
 

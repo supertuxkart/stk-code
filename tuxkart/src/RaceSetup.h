@@ -1,4 +1,4 @@
-//  $Id: RaceSetup.h,v 1.4 2004/08/22 05:06:11 oaf_thadres Exp $
+//  $Id: RaceSetup.h,v 1.5 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,14 +22,14 @@
 
 #include <vector>
 
+enum RaceDifficulty { RD_EASY, RD_MEDIUM, RD_HARD };
+
 /** A class that manages all configurations that are needed for a
     single race */
 class RaceSetup
 {
 public:
-	enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
-	enum RaceDiff { RD_EASY, RD_MEDIUM, RD_HARD };
-	
+        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
 
 	RaceSetup() { 
 		mode       = RM_QUICK_RACE;
@@ -45,7 +45,7 @@ public:
 	}
 
 	RaceMode  mode;
-	RaceDiff  difficulty;
+	RaceDifficulty  difficulty;
 	int   numLaps;
 	bool  mirror;
 	bool  reverse;

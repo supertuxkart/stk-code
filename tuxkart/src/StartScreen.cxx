@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.6 2004/08/17 15:48:32 grumbel Exp $
+//  $Id: StartScreen.cxx,v 1.7 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +22,8 @@
 #include "tuxkart.h"
 #include "WorldScreen.h"
 #include "ScreenManager.h"
+#include "RaceManager.h"
+#include "TrackManager.h"
 #include "StartScreen.h"
 
 StartScreen* StartScreen::current_ = 0;
@@ -98,7 +100,23 @@ StartScreen::switchToGame()
   
   guiStack.clear();
   
-  ScreenManager::current()->set_screen(new WorldScreen(raceSetup));
+  switch(raceSetup.mode)
+    {
+    case RaceSetup::RM_TIME_TRIAL:
+      RaceManager::instance()->set_timetrial(track_manager.tracks[raceSetup.track].ident);
+      break;
+
+    case RaceSetup::RM_QUICK_RACE:
+      RaceManager::instance()->set_quickrace(track_manager.tracks[raceSetup.track].ident, 
+                                             raceSetup.difficulty);
+      break;
+
+    case RaceSetup::RM_GRAND_PRIX:
+      RaceManager::instance()->set_grandprix("herring", raceSetup.difficulty);
+      break;
+    }
+
+  RaceManager::instance()->start();
 }
 
 /* EOF */

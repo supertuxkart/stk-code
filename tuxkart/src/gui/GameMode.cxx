@@ -1,4 +1,4 @@
-//  $Id: GameMode.cxx,v 1.11 2004/08/22 05:06:11 oaf_thadres Exp $
+//  $Id: GameMode.cxx,v 1.12 2004/08/24 00:07:05 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -57,14 +57,17 @@ void GameMode::select()
 	{
 	case MENU_GP:
 		raceSetup.numKarts = 4;
+		raceSetup.mode     = RaceSetup::RM_GRAND_PRIX;
 		guiStack.push_back(GUIS_DIFFICULTYGP);
 		break;
 	case MENU_QUICKRACE:
 		raceSetup.numKarts = 4;
+		raceSetup.mode     = RaceSetup::RM_QUICK_RACE;
 		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	case MENU_TIMETRIAL:
 		raceSetup.numKarts = 1;
+		raceSetup.mode     = RaceSetup::RM_TIME_TRIAL;
 		guiStack.push_back(GUIS_CHARSEL); //difficulty makes no sense here
 		break;
 	default: break;

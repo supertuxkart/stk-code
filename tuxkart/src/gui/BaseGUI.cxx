@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.17 2004/08/23 18:20:41 grumbel Exp $
+//  $Id: BaseGUI.cxx,v 1.18 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -29,6 +29,7 @@
 #include "ConfigControls.h"
 #include "PlayerControls.h"
 #include "RaceGUI.h"
+#include "RaceManager.h"
 #include "ScreenManager.h"
 #include "StartScreen.h"
 #include "RaceMenu.h"
@@ -106,21 +107,8 @@ void updateGUI(RaceSetup& raceSetup)
 				break;
 			case GUIS_EXITRACE:
 				guiStack.clear();
-                                
-                                // FIXME: This should probally moved elsewhere, RaceManager or so?
-                                switch (raceSetup.mode)
-                                  {
-                                  case RaceSetup::RM_QUICK_RACE:
-                                  case RaceSetup::RM_TIME_TRIAL:
-                                    ScreenManager::current()->set_screen(new StartScreen()); 
-                                    break;
-                                    
-                                  case RaceSetup::RM_GRAND_PRIX:
-                                    ScreenManager::current()->set_screen(new StartScreen()); 
-                                    //ScreenManager::current()->set_screen(new World()); 
-                                    break;
-                                  }
-			}
+                                RaceManager::instance()->next();
+                        }
 		}
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts
 		SDL_ShowCursor(SDL_DISABLE);

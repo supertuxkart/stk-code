@@ -1,4 +1,4 @@
-//  $Id: World.cxx,v 1.25 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: World.cxx,v 1.26 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -187,7 +187,6 @@ World::~World()
   delete red_h;
   delete green_h;
   
-  delete trackBranch ;
   delete scene ; 
   
 #ifdef ENABLE_NETWORKING

@@ -1,4 +1,4 @@
-//  $Id: StringUtils.cxx,v 1.1 2004/08/10 15:35:54 grumbel Exp $
+//  $Id: StringUtils.cxx,v 1.2 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>,
@@ -28,6 +28,39 @@ bool has_suffix(const std::string& lhs, const std::string rhs)
     return false;
   else
     return lhs.compare(lhs.length() - rhs.length(), rhs.length(), rhs) == 0;
+}
+
+std::string basename(const std::string& filename)
+{
+  for(int i = int(filename.size()) - 1; i >= 0; --i)
+    {
+      if (filename[i] == '/') {
+	return filename.substr(i+1);
+      }
+    }
+  return filename;
+}
+
+std::string without_extension(const std::string& filename)
+{
+  for(int i = int(filename.size()) - 1; i >= 0; --i)
+    {
+      if (filename[i] == '.') {
+	return filename.substr(0, i);
+      }
+    }
+  return filename;  
+}
+
+std::string extension(const std::string& filename)
+{
+  for(int i = int(filename.size()) - 1; i >= 0; --i)
+    {
+      if (filename[i] == '.') {
+	return filename.substr(i+1);
+      }
+    }
+  return filename;  
 }
 
 } // namespace StringUtils

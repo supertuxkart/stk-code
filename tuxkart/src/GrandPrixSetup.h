@@ -1,4 +1,4 @@
-//  $Id: GrandPrixSetup.h,v 1.2 2004/08/23 18:20:40 grumbel Exp $
+//  $Id: GrandPrixSetup.h,v 1.3 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -41,7 +41,8 @@ public:
     int position;
   };
 
-  CupData cup_data;
+  /** The number of races which alread have been completed */
+  int race;
 
   /** The karts that participate in the GrandPrix and there point,
       position, etc. */

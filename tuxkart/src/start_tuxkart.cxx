@@ -1,4 +1,4 @@
-//  $Id: start_tuxkart.cxx,v 1.72 2004/08/23 18:34:23 oaf_thadres Exp $
+//  $Id: start_tuxkart.cxx,v 1.73 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -36,6 +36,7 @@
 #include "material.h"
 #include "KartManager.h"
 #include "StartScreen.h"
+#include "TuxkartError.h"
 #include "Config.h"
 
 /***********************************\
@@ -318,10 +319,11 @@ int main ( int argc, char *argv[] )
     screen_manager.run();
 
     deinitTuxKart();
+  } catch (const TuxkartError& err) {
+    std::cout << "TuxkartyError: " << err.what() << std::endl;
   } catch (const std::exception& err) {
     std::cout << "Error: " << err.what() << std::endl;
   }
-
   return 0 ;
 }
 

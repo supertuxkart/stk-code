@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.19 2004/08/22 22:22:58 oaf_thadres Exp $
+//  $Id: CharSel.cxx,v 1.20 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -177,7 +177,10 @@ void CharSel::select()
 		}	
 	}
 	
-	guiStack.push_back(GUIS_TRACKSEL); 
+        if (StartScreen::current()->raceSetup.mode != RaceSetup::RM_GRAND_PRIX)
+          guiStack.push_back(GUIS_TRACKSEL); 
+        else
+          StartScreen::current()->switchToGame();
 }
 
 void CharSel::keybd(const SDL_keysym& key)

@@ -1,4 +1,4 @@
-//  $Id: TrackData.cxx,v 1.8 2004/08/23 14:46:51 grumbel Exp $
+//  $Id: TrackData.cxx,v 1.9 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,6 +21,7 @@
 #include "lispreader.h"
 #include "Loader.h"
 #include "TrackData.h"
+#include "StringUtils.h"
 
 TrackData::TrackData(const std::string& filename_)
 {
@@ -28,10 +29,12 @@ TrackData::TrackData(const std::string& filename_)
   reversed = false;
 
   filename = filename_;
-  ident    = filename.substr(0, filename.length() - 6);
-  loc_filename = ident + ".loc";
-  drv_filename = ident + ".drv";
-  
+
+  std::string path = StringUtils::without_extension(filename);
+  loc_filename = path + ".loc";
+  drv_filename = path + ".drv";
+  ident    = StringUtils::basename(path);
+
   // Default values
   use_fog = false;
   sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;

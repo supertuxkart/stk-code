@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.11 2004/08/15 16:06:15 grumbel Exp $
+//  $Id: World.h,v 1.12 2004/08/24 00:07:04 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -80,6 +80,8 @@ private:
 
   Phase phase;
 public:
+  /** Reference to the track inside the scene, must not be deleted,
+      the scene itself takes care of it */
   ssgBranch *trackBranch ;
 
   World(const RaceSetup& raceSetup);
