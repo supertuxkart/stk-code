@@ -1,4 +1,4 @@
-//  $Id: KartProperties.cxx,v 1.7 2004/08/08 20:27:00 grumbel Exp $
+//  $Id: KartProperties.cxx,v 1.8 2004/08/09 11:25:35 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,7 +34,7 @@ KartProperties::KartProperties(const std::string& filename)
   init_defaults();
 
   try {
-    LispReader* kart = LispReader::load(loader->getPath(filename), "tuxkart-kart");
+    LispReader* kart = LispReader::load(loader ? loader->getPath(filename) : filename, "tuxkart-kart");
     assert(kart);
   
     LispReader reader(kart->get_lisp());
