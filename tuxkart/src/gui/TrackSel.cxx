@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.1 2004/08/05 22:53:56 jamesgregory Exp $
+//  $Id: TrackSel.cxx,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,12 +21,19 @@
 #include "tuxkart.h"
 #include "WidgetSet.h"
 
+#include <string>
+
+using std::string;
+
 TrackSel::TrackSel()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Track 1",  GUI_SML, 0, 0);
-	widgetSet -> state(menu_id, "Track 2",  GUI_SML, 1, 0);
-	widgetSet -> state(menu_id, "Track 3",  GUI_SML, 2, 0);
+	
+	widgetSet -> start(menu_id, trackNames[0].c_str(),  GUI_SML, 0, 0);
+	
+	for (uint i = 1; i != trackNames.size(); ++i)
+		widgetSet -> state(menu_id, trackNames[i].c_str(),  GUI_SML, i, 0);
+	
 	widgetSet -> space(menu_id);
 	widgetSet -> space(menu_id);
 	
@@ -55,9 +62,23 @@ void TrackSel::select()
 	}
 }
 
-void TrackSel::cursor(SDLKey key)
+void TrackSel::keybd(const SDL_keysym& key)
 {
-	widgetSet -> pulse(widgetSet -> cursor(menu_id, key), 1.2f);
+	switch ( key.sym )
+	{
+	case SDLK_LEFT:    
+	case SDLK_RIGHT:    
+	case SDLK_UP:    
+	case SDLK_DOWN:
+		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
+		break;
+		
+	case SDLK_RETURN: select(); break;
+	
+	case SDLK_ESCAPE:
+		guiSwitch = GUIS_MAINMENU;
+	default: break;
+	}
 }
 
 void TrackSel::point(int x, int y)

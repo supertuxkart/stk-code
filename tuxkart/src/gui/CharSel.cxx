@@ -1,4 +1,4 @@
-//  $Id: CharSel.cxx,v 1.1 2004/08/05 22:53:56 jamesgregory Exp $
+//  $Id: CharSel.cxx,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -55,9 +55,24 @@ void CharSel::select()
 	}
 }
 
-void CharSel::cursor(SDLKey key)
+void CharSel::keybd(const SDL_keysym& key)
 {
-	widgetSet -> pulse(widgetSet -> cursor(menu_id, key), 1.2f);
+	switch ( key.sym )
+	{
+	case SDLK_LEFT:    
+	case SDLK_RIGHT:    
+	case SDLK_UP:    
+	case SDLK_DOWN:
+		widgetSet -> pulse(widgetSet -> cursor(menu_id, key.sym), 1.2f);
+		break;
+		
+	case SDLK_RETURN: select(); break;
+	
+	case SDLK_ESCAPE:
+		guiSwitch = GUIS_MAINMENU;
+		
+	default: break;
+	}
 }
 
 void CharSel::point(int x, int y)

@@ -1,4 +1,4 @@
-//  $Id: RaceGUI.cxx,v 1.1 2004/08/05 22:53:56 jamesgregory Exp $
+//  $Id: RaceGUI.cxx,v 1.2 2004/08/06 00:37:41 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,10 +21,11 @@
 #include "status.h"
 #include "tuxkart.h"
 #include "WidgetSet.h"
+#include "Driver.h"
 
 RaceGUI::RaceGUI()
 {
-	if ((fps_id = widgetSet -> count(0, 1000, GUI_SML, GUI_SE)))
+	if ((fps_id = widgetSet -> count(0, 0, GUI_SML, GUI_SE)))
 		widgetSet -> layout(fps_id, -1, 1);
 }
 
@@ -39,6 +40,46 @@ void RaceGUI::update(float dt)
 	
 	if ( getShowFPS() )
 		drawFPS ();
+}
+
+void RaceGUI::keybd(const SDL_keysym& key)
+{
+	static int isWireframe = FALSE ;
+	
+	if (key.mod & KMOD_CTRL)
+	{
+      	((PlayerKartDriver*)kart[0])->incomingKeystroke ( key ) ;
+      	return;
+	}
+    
+	switch ( key.sym )
+	{
+	case SDLK_F12: fpsToggle() ; return;
+	
+	case SDLK_r :
+      {
+        finishing_position = -1 ;
+        for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
+          (*i)->reset() ;
+        return ;
+      }
+      break;
+	
+	case SDLK_w : 
+		if ( isWireframe )
+			glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+		else
+      		glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+      	isWireframe = ! isWireframe ;
+		return ;
+		
+	case SDLK_z : stToggle () ; return ;
+	
+	case SDLK_ESCAPE:
+		guiSwitch = GUIS_MAINMENU;
+		
+	default: break;
+	}
 }
 
 void RaceGUI::drawFPS ()
