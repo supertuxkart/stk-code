@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.25 2004/08/13 21:57:40 grumbel Exp $
+//  $Id: KartDriver.cxx,v 1.26 2004/08/13 22:58:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -651,7 +651,7 @@ KartDriver::load_data()
   this-> addAttachment ( pobj4 ) ;
   this-> addAttachment ( pobj5 ) ;
 
-  if (0)
+  if (1)
     {
       skidmark_left  = new SkidMark();
       skidmark_right = new SkidMark();

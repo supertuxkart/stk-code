@@ -1,4 +1,4 @@
-//  $Id: SkidMark.cxx,v 1.2 2004/08/13 18:57:04 grumbel Exp $
+//  $Id: SkidMark.cxx,v 1.3 2004/08/13 22:58:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -21,22 +21,14 @@
 #include "SkidMark.h"
 
 SkidMark::SkidMark()
+  : ssgVtxTable ( GL_QUAD_STRIP, 
+                  new ssgVertexArray,
+                  new ssgNormalArray,
+                  new ssgTexCoordArray,
+                  new ssgColourArray )
 {
-  vertices = new ssgVertexArray;
-  normals  = new ssgNormalArray;
-  colors   = new ssgColourArray;
-
-  vertices->ref();
-  normals->ref();
-  colors->ref();
-
-  //GL_TRIANGLE_STRIP
-  vtxtable = new ssgVtxTable(GL_LINE_STRIP, vertices, normals, NULL, colors);
-  vtxtable->ref();
- 
-  World::current()->scene->addKid(vtxtable);
-  
-  detail = 0;
+  ref();
+  World::current()->scene->addKid(this);
 }
 
 SkidMark::~SkidMark()
@@ -46,13 +38,6 @@ SkidMark::~SkidMark()
 void
 SkidMark::add(sgCoord* coord)
 {
-  if (detail != 0)
-    {
-      detail -= 1;
-      return;
-    }
-
-  detail = 2;
   sgVec3 pos;
   sgVec3 norm;
   sgVec4 color;
@@ -77,12 +62,19 @@ SkidMark::add(sgCoord* coord)
 
 
   sgSetVec3(norm, 0, 0, 1);
-  sgSetVec4(color, 1, 1, 1, 1);
+  sgSetVec4(color, 0, 0, 0, .5);
 
   normals->add(norm); normals->add(norm);
-  colors->add(color); colors->add(color);
+  colours->add(color); colours->add(color);
 
-  vtxtable->dirtyBSphere();
+  //vtxtable->dirtyBSphere();
+}
+
+void
+SkidMark::recalcBSphere()
+{
+  bsphere . setRadius ( 1000.0f ) ;
+  bsphere . setCenter ( 0, 0, 0 ) ;
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id: SkidMark.h,v 1.2 2004/08/13 18:57:04 grumbel Exp $
+//  $Id: SkidMark.h,v 1.3 2004/08/13 22:58:16 grumbel Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -23,22 +23,16 @@
 #include <plib/ssg.h>
 
 /** Helper class to manage a skidmark */
-class SkidMark
+class SkidMark : public ssgVtxTable
 {
-private:
-  ssgBranch*      scene;
-  ssgVtxTable*    vtxtable;
-  ssgVertexArray* vertices;
-  ssgNormalArray* normals;
-  ssgColourArray* colors;
-
-  int detail;
 public:
   SkidMark();
   ~SkidMark();
 
   /** Add a position where the skidmark is */
   void add(sgCoord* coord);
+
+  void recalcBSphere();
 };
 
 #endif
