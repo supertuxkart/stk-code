@@ -33,6 +33,7 @@ class Config
 		bool fullscreen;
 		bool sound;
 		bool music;
+		bool smoke;
 		bool displayFPS;
 		int width;
 		int height;

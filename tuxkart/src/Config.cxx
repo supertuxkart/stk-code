@@ -70,6 +70,7 @@ void Config::setDefaults()
 	fullscreen = false;
 	sound      = true;
 	music      = true;
+	smoke      = false;
 	displayFPS = false;
 	width      = 800;
 	height     = 600;
@@ -100,6 +101,7 @@ void Config::loadConfig(const std::string& filename)
         lisp->get("fullscreen", fullscreen);
         lisp->get("sound", sound);
         lisp->get("music", music);
+        lisp->get("smoke", smoke);
         lisp->get("displayFPS", displayFPS);
         
         /*get resolution width/height*/
@@ -132,8 +134,9 @@ void Config::saveConfig(const std::string& filename)
         writer.beginList("tuxkart-config");
         writer.writeComment("the following options can be set to #t or #f:");
         writer.write("fullscreen", fullscreen);
-	writer.write("sound", sound);
+        writer.write("sound", sound);
         writer.write("music", music);
+        writer.write("smoke", smoke);
         writer.write("displayFPS", displayFPS);
         
         writer.writeComment("screen resolution");

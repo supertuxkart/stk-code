@@ -1,4 +1,4 @@
-//  $Id: KartDriver.cxx,v 1.46 2004/08/27 14:46:10 straver Exp $
+//  $Id: KartDriver.cxx,v 1.47 2004/08/28 22:05:35 oaf_thadres Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -32,6 +32,7 @@
 #include "World.h"
 #include "Track.h"
 #include "material.h"
+#include "Config.h"
 
 KartParticleSystem::KartParticleSystem(KartDriver* kart_, 
                                        int num, int initial_num,
@@ -421,9 +422,13 @@ KartDriver::update (float delta)
   }
 
   processAttachments(delta);
-  
-  if (smoke_system != NULL)
-    smoke_system->update (delta);
+
+  /*smoke drawing control point*/
+  if ( config.smoke )
+  {
+    if (smoke_system != NULL)
+      smoke_system->update (delta);
+  }
 
   Driver::update (delta) ;
   processInput(delta);
