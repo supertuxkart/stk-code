@@ -1,4 +1,4 @@
-//  $Id: tuxkart.cxx,v 1.38 2004/08/05 14:35:42 grumbel Exp $
+//  $Id: tuxkart.cxx,v 1.39 2004/08/05 22:56:26 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -28,8 +28,7 @@
 #include "Camera.h"
 #include "level.h"
 #include "WidgetSet.h"
-#include "BaseGUI.h"
-#include "oldgui.h"
+#include "gui/BaseGUI.h"
 #include "WorldLoader.h"
 
 #include "gfx.h"
@@ -92,7 +91,6 @@ SoundSystem  *sound = NULL ;
 GFX          *gfx = NULL ;
 WidgetSet          *widgetSet = NULL ;
 BaseGUI	*gui = NULL;
-OldGUI       *oldgui = NULL ;
 Level        level ;
 
 GUISwitch guiSwitch = GUIS_CURRENT;
@@ -626,8 +624,8 @@ void tuxKartMainLoop ()
 
     pollEvents();
     kartInput () ;
+    drawStatusText () ;
     updateGUI();
-    oldgui      -> update () ;
     sound    -> update () ;
 
     /* Swap graphics buffers last! */

@@ -1,4 +1,4 @@
-//  $Id: tuxkart.h,v 1.20 2004/08/05 18:33:52 jamesgregory Exp $
+//  $Id: tuxkart.h,v 1.21 2004/08/05 22:56:26 jamesgregory Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -43,12 +43,10 @@
 #include "guNet.h"
 #include "constants.h"
 #include "utils.h"
-#include "BaseGUI.h"
+#include "gui/BaseGUI.h"
 
 class GFX ;
 class WidgetSet;
-class BaseGUI;
-class OldGUI ;
 class SoundSystem ;
 class Track ;
 class Level ;
@@ -57,7 +55,6 @@ class Level ;
 extern GFX         *gfx ;
 extern WidgetSet   *widgetSet ;
 extern BaseGUI     *gui ;
-extern OldGUI      *oldgui ;
 
 extern GUISwitch guiSwitch;
 
@@ -100,7 +97,7 @@ extern Karts kart;
 extern Projectile *projectile [ NUM_PROJECTILES ] ;
 extern Explosion   *explosion [ NUM_EXPLOSIONS  ] ;
 
-extern void switchToGame ();
+extern void switchToGame (int numLaps, int mirror, int reverse, int track, int nPlayers);
 
 extern int tuxkartMain ( int nl, int mirror, int reverse, 
                          char *track, int numPlayers, int numKarts ) ;
