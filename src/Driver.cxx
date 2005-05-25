@@ -281,7 +281,7 @@
    {
       sgCoord scaled_velocity ;
    
-      doZipperProcessing () ;
+      doZipperProcessing (delta) ;
    
       sgCopyCoord ( &last_pos        , &position         ) ;
       sgCopyVec2  ( last_track_coords, curr_track_coords ) ;
@@ -313,7 +313,8 @@
    
       doCollisionAnalysis ( delta, hot ) ;
    
-      //The next lines before firsttime = FALSE ensure no dot jumping
+      /*The next lines before firsttime = FALSE are to
+	  are ensure no driveline points jumping*/
       int possible_hint = world ->track -> spatialToTrack ( curr_track_coords,
                                                             position.xyz,
                                                             track_hint ) ;
@@ -333,7 +334,7 @@
    } 
    void Driver::doLapCounting        () { /* Empty by Default. */ 
    } 
-   void Driver::doZipperProcessing   () { /* Empty by Default. */ 
+   void Driver::doZipperProcessing   (float delta) { /* Empty by Default. */ 
    } 
    void Driver::doCollisionAnalysis  ( float delta, float hot ) { 
       (void)delta; (void)hot; }
@@ -529,7 +530,7 @@
          if ( need_rescue )
             rescue = TRUE ;
       }
-   
+	  
       return hot ;
    }
 

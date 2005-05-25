@@ -52,5 +52,5 @@ void TrafficDriver::update (float delta)
 
 void TrafficDriver::doObjectInteractions () {}
 void TrafficDriver::doLapCounting        () {}
-void TrafficDriver::doZipperProcessing   () {}
+void TrafficDriver::doZipperProcessing   (float delta) {}
 

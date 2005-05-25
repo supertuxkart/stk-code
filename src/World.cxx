@@ -171,10 +171,19 @@ World::update(float delta)
 
   checkRaceStatus();
 
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta) ;
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta);
   for(Projectiles::iterator i = projectiles.begin();
-      i != projectiles.end(); ++i)
+      i != projectiles.end();)
+  {
     (*i)->update(delta);
+	if((*i)->hasExploded())
+	{
+	    delete *i;
+		i = projectiles.erase(i);
+	}
+	else
+		++i;
+  }
   for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
       (*i)->update(delta);
   for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;

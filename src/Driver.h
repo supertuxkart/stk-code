@@ -46,6 +46,7 @@
 #define MAX_VELOCITY            (200.0f * KILOMETERS_PER_HOUR )
 #define MAX_PROJECTILE_VELOCITY (200.0f * KILOMETERS_PER_HOUR )
 #define MAX_HOMING_PROJECTILE_VELOCITY (105.0f * KILOMETERS_PER_HOUR )
+#define MAX_SPARK_VELOCITY (40.0f * KILOMETERS_PER_HOUR )
 #define MAX_NATURAL_VELOCITY    ( 60.0f * KILOMETERS_PER_HOUR )
 #define MAX_PARACHUTE_VELOCITY  ( 40.0f * KILOMETERS_PER_HOUR )
 #define MAX_ANVIL_VELOCITY      ( 10.0f * KILOMETERS_PER_HOUR )
@@ -228,7 +229,7 @@
    
       virtual void doObjectInteractions () ;
       virtual void doLapCounting        () ;
-      virtual void doZipperProcessing   () ;
+      virtual void doZipperProcessing   (float delta) ;
       virtual void doCollisionAnalysis  ( float delta, float hot ) ;
       virtual void update               (float delta) ;
    } ;

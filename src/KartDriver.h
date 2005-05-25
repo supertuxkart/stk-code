@@ -148,7 +148,7 @@ public:
 
   virtual void doObjectInteractions () ;
   virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
+  virtual void doZipperProcessing   (float delta) ;
   virtual void update (float delta) ;
 } ;
 

@@ -17,11 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-/*Some edits:
- *In KartDriver::update it called driver->update() without passing delta, added it so
- *it would call the AutoDriver::update func.
- */
-
 #include <iostream>
 #include "tuxkart.h"
 #include "constants.h"
@@ -179,7 +174,7 @@
                static int m = 0 ;
             
                if ( ++m >= NUM_PROJECTILES ) m = 0 ;
-            
+
                Projectile* projectile = new Projectile(world, this, collectable);
                world->projectiles.push_back(projectile);
             }

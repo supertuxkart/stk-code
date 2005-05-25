@@ -20,6 +20,17 @@
 #ifndef HEADER_PROJECTILE_H
 #define HEADER_PROJECTILE_H
 
+#define PROJECTILE_ISECT_STEP_SIZE 0.4f
+
+#define MISSILE_COLLISION_SPHERE_RADIUS 0.7f
+#define HOMING_MISSILE_COLLISION_SPHERE_RADIUS 0.7f
+#define SPARK_COLLISION_SPHERE_RADIUS 0.6f
+
+//After a certain amount of seconds, projectiles should explode
+#define MISSILE_LIFETIME 3.0f
+#define HOMING_MISSILE_LIFETIME 6.5f
+#define SPARK_LIFETIME 45.0f
+
 class World;
 class KartDriver;
 
@@ -31,12 +42,47 @@ private:
   int type;
 
   sgCoord velocity;
+  sgCoord position;
+  sgCoord last_pos;
+  
+  ssgTransform* model;
 
+  float collision_sphere_radius;
+  int collided;
+  int exploded;
+  
+  sgVec3 surface_avoidance_vector ;
+  
+  float lifetime_limit_secs;
+  float current_lifetime;//How much time has the projectile lived
+  
+  
+  float collectIsectData ( sgVec3 start, sgVec3 end);
+  float getIsectData ( sgVec3 start, sgVec3 end );
+  void doCollisionAnalysis  ( float  delta,  float  hot  );
+  
+  void updateLifetime(float delta);
+  
 public:
   Projectile(World* world, KartDriver* _owner, int type);
   virtual ~Projectile();
 
-  void fire ( KartDriver *who, int _type );
+  sgCoord *getCoord ()
+  {
+     return & position ;
+  }
+
+  void setCoord ( sgCoord *pos )
+  {
+     sgCopyCoord ( & position, pos ) ;
+  }
+  
+  int hasExploded ()
+  {
+     return exploded;
+  }
+  
+  //void fire ( KartDriver *who, int _type );
 
   virtual void update ( float delta_t ) ;
 };
