@@ -98,19 +98,22 @@ void updateGUI()
 				gui = new PlayerControls(3);
 				break;
 			case GUIS_CONFIGDISPLAY:
-        gui = new ConfigDisplay();
-        break;
+                gui = new ConfigDisplay();
+                break;
 			case GUIS_RACE:
 				gui = new RaceGUI;
 				break;
+            case GUIS_NEXTRACE:
+                RaceManager::instance()->next();
+				break;    
 			case GUIS_RACEMENU:
 				gui = new RaceMenu;
 				break;
 			case GUIS_EXITRACE:
-				guiStack.clear();
-                                RaceManager::instance()->next();
-                                break;
-                        }
+                guiStack.clear();
+                RaceManager::instance()->next();
+                break;
+            }
 		}
 		
 		//something somewhere (most likely in the WidgetSet stuff) means the cursor will get enabled again before the game starts if you just call this when the game starts

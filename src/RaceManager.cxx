@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <iostream>
 #include <algorithm>
+#include "tuxkart.h"
 #include "Loader.h"
 #include "TrackManager.h"
 #include "RaceSetup.h"
@@ -89,16 +90,24 @@ GrandPrixMode::next()
 {
   stat.race += 1;
 
-  if (stat.race < int(cup.tracks.size()))
-    {
-      start_race(stat.race);
-    }
+  if (guiStack.back() == GUIS_NEXTRACE)
+      if (stat.race	< int(cup.tracks.size()))
+	    {
+	      start_race(stat.race);
+	    }
+      else
+	    {
+	  // FIXME:	Insert credits/extro stuff here
+	      startScreen =	new	StartScreen();
+	      screenManager->setScreen(startScreen); 
+	    }
   else
     {
-      // FIXME: Insert credits/extro stuff here
-      startScreen = new StartScreen();
-      screenManager->setScreen(startScreen); 
+      startScreen =	new	StartScreen();
+	  screenManager->setScreen(startScreen); 
     }
+  
+
 }
 
 

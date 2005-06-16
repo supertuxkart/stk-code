@@ -170,6 +170,9 @@ World::update(float delta)
   clock += delta;
 
   checkRaceStatus();
+  
+  if ( getPhase() == World::FINISH_PHASE )
+    guiStack.push_back(GUIS_NEXTRACE);
 
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta);
   for(Projectiles::iterator i = projectiles.begin();

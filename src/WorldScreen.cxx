@@ -53,8 +53,10 @@ WorldScreen::~WorldScreen()
 
   delete fclock;
 
-  delete world;
-  world = 0;
+  if(current() == this){
+    delete world;
+    world = 0;
+  }
 }
 
 void
