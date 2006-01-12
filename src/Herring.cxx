@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <cassert>
 #include "tuxkart.h"
 #include "material.h"
 #include "Shadow.h"
@@ -52,9 +53,11 @@ Herring::Herring ( sgVec3 colour )
  
   ssgVtxTable* cube = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
   cube -> setState ( getMaterial ( "herring.png" ) -> getState () ) ;
-  
+
   shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
+#if 0
   shadow->ref();
+#endif
  
   transform = new ssgTransform () ;
   transform->ref();
@@ -67,10 +70,12 @@ Herring::Herring ( ssgEntity* model )
 {
   //turn off collision detection. 
   model -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ; 
-  
+
   shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
+#if 0
   shadow -> ref ();
- 
+#endif
+
   transform = new ssgTransform () ;
   transform -> ref () ;
   transform -> addKid ( shadow ) ;
@@ -79,7 +84,9 @@ Herring::Herring ( ssgEntity* model )
 
 Herring::~Herring ()
 {
+#if 0
   ssgDeRefDelete(shadow);
+#endif
   ssgDeRefDelete(transform);
 }
 
@@ -95,10 +102,14 @@ void Herring::update ()
 
 void HerringInstance::update ()
 {
+#if 0
   if ( ! eaten || her == NULL ) return ;
+#endif
+  if(!eaten) return;
+
+  assert(her != NULL);
 
   float t = time_to_return - world -> clock;
-
   if ( t > 0 )
   {
     sgVec3 hell ;

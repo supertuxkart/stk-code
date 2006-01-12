@@ -20,22 +20,61 @@
 #ifndef HEADER_SKIDMARK_CXX
 #define HEADER_SKIDMARK_CXX
 
+#include <vector>
+
 #include <plib/ssg.h>
 
-/** Helper class to manage a skidmark */
+#if 0
 class SkidMark : public ssgVtxTable
+#endif
+class SkidMark
 {
 public:
   SkidMark();
   ~SkidMark();
 
-  /** Add a position where the skidmark is */
+  // Add a position where the skidmark is
   void add(sgCoord* coord);
+  //Begin or finish an skidmark
   void addBreak (sgCoord *coord);
 
+#if 0
   void recalcBSphere();
-  
+
   int newSkidmark;
+#endif
+#if 1
+  bool wasSkidMarking() const;
+private:
+
+  class SkidMarkPos : public ssgVtxTable
+  {
+  public:
+    SkidMarkPos();
+    SkidMarkPos( ssgVertexArray* vertices,
+                 ssgNormalArray* normals,
+                 ssgColourArray* colors,
+                 float global_track_offset);
+    ~SkidMarkPos();
+
+    void recalcBSphere();
+
+    // Add a position where the skidmark is
+    void add(sgCoord* coord);
+    void addEnd (sgCoord *coord);
+  private:
+    //Amount of which the skidmark is lifted above the track to avoid
+    //z-buffer errors
+    float track_offset;
+  };
+
+  bool SkidMarking;
+  //This is to make Z-fighting between skidmarks less likely, specially
+  //the skidmarks made by the AI
+  static float globalTrackOffset;
+  std::vector <SkidMarkPos *> SkidMarks;
+  ssgSimpleState *skidstate;
+#endif
 };
 
 #endif

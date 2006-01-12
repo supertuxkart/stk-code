@@ -75,6 +75,8 @@ World::World(const RaceSetup& raceSetup_)
   preProcessObj ( red_h -> getRoot());
   preProcessObj ( green_h -> getRoot());
 
+  num_herring = 0;
+
   // Create the karts and fill the kart vector with them
 
   assert(raceSetup.karts.size() > 0);
@@ -126,7 +128,7 @@ World::World(const RaceSetup& raceSetup_)
 }
 
 World::~World()
-{  
+{
   for ( unsigned int i = 0 ; i < kart.size() ; i++ )
     delete kart[i];
 
@@ -142,7 +144,7 @@ World::~World()
   ssgDeRefDelete(projectile_missle);
   ssgDeRefDelete(projectile_flamemissle);
   ssgDeRefDelete(explode);
-    
+
   delete gold_h;
   delete silver_h;
   delete red_h;
@@ -189,7 +191,7 @@ World::update(float delta)
   }
   for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
       (*i)->update(delta);
-  for ( int i = 0 ; i < MAX_HERRING     ; i++ ) herring    [ i ] .  update () ;
+  for ( int i = 0 ; i < num_herring ; i++ ) herring    [ i ] .  update () ;
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
 
   /* Routine stuff we do even when paused */
@@ -242,7 +244,7 @@ World::updateLapCounter ( int k )
          ( kart[j]->getLap() == kart[k]->getLap() && 
            kart[j]->getDistanceDownTrack() >
                             kart[k]->getDistanceDownTrack() ))
-      p++ ;      
+      p++ ;
   }
 
   kart [ k ] -> setPosition ( p ) ;
