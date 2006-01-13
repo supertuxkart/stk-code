@@ -31,45 +31,20 @@
 #include "World.h"
 #include "constants.h"
 
-#define sgn(x) ((x<0)?-1:((x>0)?1:0)) 	/* macro to return the sign of a number */
+#define sgn(x) ((x<0)?-1:((x>0)?1:0))	/* macro to return the sign of a number */
 #define max(m,n) ((m)>(n) ? (m) : (n))	/* macro to return highest number */
 #define min(m,n) ((m)<(n) ? (m) : (n))	/* macro to return lowest number */
 
    static inline void relaxation(float& target, float& prev, float rate)
    {
-   //This function rotates to the closest! so no +180 or -180º rotations!
-   
-      if (target * prev < 0.0f)//if one is positive and the other is negative
-      {
-         float rotation_direction = target - prev;
-         if (rotation_direction > 180.0f)//rotate counter-clockwise (prev=neg)
-         {                                 
-            float distance_prev, distance_target, rotation;
-            distance_prev = (180.0f + prev);
-            distance_target =  (180.0f - target);
-            rotation = prev - (distance_prev * rate + distance_target * rate);
-            if (rotation < -180.0f)//The visible rotation doesn't jumps the gap
-               target = rotation;
-            else//It does jumps the -180 & 180 gap
-               target = 360 + rotation;
-         }
-         else if (rotation_direction < -180.0f )//Rotate clockwise (prev=pos)
-         {
-            float distance_prev, distance_target, rotation;
-            distance_prev = (180.0f - prev);
-            distance_target =  (180.0f + target);
-            rotation = prev + (distance_prev * rate + distance_target * rate);
-            if (rotation < 180.0f)//The visible rotation doesn't jumps the gap
-               target = rotation;
-            else//It does jumps the -180 & 180 gap
-               target = -360 + rotation;
-         }
-         else //The given target & prev don't jump the gap
-            target = (prev) + rate * ((target) - (prev));
-      }
-      else
-         target = (prev) + (rate) * ((target) - (prev));
-        
+         const float direction = target - prev;
+         if(direction > 180.0f)
+                prev = 360 + prev;
+         else if (direction < -180.0f)
+                prev = -360 + prev;
+
+         target = prev + (rate * (target - prev));
+
       prev = (target);
    }
 
