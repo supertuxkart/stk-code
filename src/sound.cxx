@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: sound.cxx,v 1.6 2005/07/13 17:23:57 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,35 +17,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tuxkart.h"
 #include "sound.h"
 #include "Loader.h"
 #include "Config.h"
 
+SoundSystem *sound ;
 
+//FIXME: Not used.
 void SoundSystem::disable_music ()
 {
   sched -> stopMusic () ;
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
-
-  config.music = false;
+  config->music = false;
 }
 
 void SoundSystem::pause_music()
 {
   sched -> pauseMusic () ;
-  //FIXME: I'm just copying disable_music, no idea if the following is neccessary, let alone twice
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
 }
 
 void SoundSystem::resume_music()
 {
   sched -> resumeMusic () ;
-  //FIXME: I'm just copying disable_music, no idea if the following is neccessary, let alone twice
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
-  sched -> update    () ;  /* Ugh! Nasty Kludge! */
 }
 
 
@@ -53,12 +45,14 @@ void SoundSystem::change_track ( const char *fname )
 {
   if ( fname == NULL )
     fname = "" ;
+  std::string path;
+  path=loader->getPath(fname);
 
-  if ( strcmp ( fname, current_track ) != 0  )
+  if ( strcmp ( path.c_str(), current_track ) != 0  )
   {
-    strcpy ( current_track, fname ) ;
+    strcpy ( current_track, path.c_str() ) ;
 
-    if ( config.music )
+    if ( config->music )
       enable_music  () ;
   }
 }
@@ -70,18 +64,18 @@ void SoundSystem::enable_music ()
   if ( current_track [ 0 ] != '\0' )
     sched -> loopMusic ( current_track ) ;
  
-  config.music = true;
+  config->music = true;
 }
 
 
-void SoundSystem::disable_sfx () { config.sound = false; }
-void SoundSystem:: enable_sfx () { config.sound = true; }
+void SoundSystem::disable_sfx () { config->sound = false; }
+void SoundSystem:: enable_sfx () { config->sound = true; }
 
 
 
 void SoundSystem::playSfx ( int sfx_num )
 {
-  if ( config.sound )
+  if ( config->sound )
     sched -> playSample ( sfx[sfx_num].s, 1, SL_SAMPLE_MUTE, 2, NULL ) ;
 }
 

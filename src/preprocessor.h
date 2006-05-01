@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: preprocessor.h,v 1.1 2005/05/25 21:53:43 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,7 @@
 #ifndef HEADER_PREPROCESSOR_H
 #define HEADER_PREPROCESSOR_H
 
-#include <plib/ssg.h>
+class ssgEntity;
 
 void preProcessObj ( ssgEntity *n, bool mirror = false ) ;
 

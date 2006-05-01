@@ -1,4 +1,4 @@
-//  $Id$
+    //  $Id: utils.h,v 1.2 2005/08/19 20:51:56 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,25 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
 #ifndef HEADER_UTILS_H
 #define HEADER_UTILS_H
 
-#include <plib/ssg.h>
-
-/*
-  Some 3D geometry functions.
-*/
-
-void  pr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
-void hpr_from_normal ( sgVec3 hpr, sgVec3 nrm ) ;
-
-float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal);
-
-inline float getHeight(ssgBranch* branch, sgVec3 my_position)
-{
-  return getHeightAndNormal(branch, my_position, 0);
-}
-
 #endif
-
-/* EOF */

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: TrackManager.h,v 1.1 2005/05/25 21:52:09 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,8 @@
 #define HEADER_TRACKMANAGER_H
 
 #include <string>
-#include "Track.h"
+#include <vector>
+class Track;
 
 /** Simple class to load and manage track data, track names and
     such */

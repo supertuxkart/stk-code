@@ -20,7 +20,6 @@
 
 */
 
-#include <iostream>
 #include "ParticleSystem.h"
 
 ParticleSystem::ParticleSystem ( int num, float _create_rate, int _ttf,
@@ -81,7 +80,6 @@ ParticleSystem::recalcBSphere()
 
 void ParticleSystem::draw_geometry ()
 {
-  //std::cout << "Draw geometry" << std::endl;
   sgVec3 nxny, xxny, xxyy, nxyy ;
 
   float sz = size / 2.0f ;

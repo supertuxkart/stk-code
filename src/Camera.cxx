@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Camera.cxx,v 1.2 2005/08/17 22:36:30 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,52 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/sg.h>
-#include "sdldrv.h"
-#include "tuxkart.h"
-#include "KartDriver.h"
+#include <plib/ssg.h>
 #include "World.h"
+#include "PlayerKart.h"
 #include "TrackManager.h"
+#include "Track.h"
 #include "Camera.h"
-
-   static inline void relaxation(float& target, float& prev, float rate)
-   {
-//This function rotates to the closest! so no +180 or -180º rotations!
-   
-      if (target * prev < 0.0f)//if one is positive and the other is negative
-      {
-         float rotation_direction = target - prev;
-         if (rotation_direction > 180.0f)//rotate counter-clockwise (prev=neg)
-         {                                 
-            float distance_prev, distance_target, rotation;
-            distance_prev = (180.0f + prev);
-            distance_target =  (180.0f - target);
-            rotation = prev - (distance_prev * rate + distance_target * rate);
-            if (rotation < -180.0f)//The visible rotation doesn't jumps the gap
-               target = rotation;
-            else//It does jumps the -180 & 180 gap
-               target = 360 + rotation;
-         }
-         else if (rotation_direction < -180.0f )//Rotate clockwise (prev=pos)
-         {
-            float distance_prev, distance_target, rotation;
-            distance_prev = (180.0f - prev);
-            distance_target =  (180.0f + target);
-            rotation = prev + (distance_prev * rate + distance_target * rate);
-            if (rotation < 180.0f)//The visible rotation doesn't jumps the gap
-               target = rotation;
-            else//It does jumps the -180 & 180 gap
-               target = -360 + rotation;
-         }
-         else //The given target & prev don't jump the gap
-            target = (prev) + rate * ((target) - (prev));
-      }
-      else
-         target = (prev) + (rate) * ((target) - (prev));
-        
-      prev = (target);
-
-   }
 
    void
    Camera::setScreenPosition ( int numPlayers, int pos )
@@ -110,8 +70,8 @@
    
    // FIXME: clipping should be configurable for slower machines
       const Track* track = track_manager->getTrack(world->raceSetup.track);
-      if (track->use_fog)
-         context -> setNearFar ( 0.05f, track->fog_end ) ;
+      if (track->useFog())
+         context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
       else
          context -> setNearFar ( 0.05f, 1000.0f ) ;
    
@@ -158,8 +118,7 @@
       if (mode == CM_NO_FAKE_DRIFT)
       {
          float steer_offset = world->getPlayerKart(whichKart)->getSteerAngle()*-10.0f;
-         relaxation(steer_offset, last_steer_offset, .25);
-                 
+
          sgMat4 cam_rot;
          sgMat4 tmp;
          sgMakeRotMat4(cam_rot, 0, -5, 0);
@@ -188,8 +147,10 @@
 
    void Camera::apply ()
    {
-      int width  = getScreenWidth  () ;
-      int height = getScreenHeight () ;
+     //JH      int width  = getScreenWidth  () ;
+      int width  = 800 ;
+      //JH      int height = getScreenHeight () ;
+      int height = 600;
    
       assert ( world->scene != NULL ) ;
    

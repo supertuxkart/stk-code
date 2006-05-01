@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: start_tuxkart.cxx 304 2006-01-20 17:57:08Z joh $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,88 +17,42 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
-#include <plib/pw.h>
-#include <vector>
-#include <string>
-#include <stdexcept>
+//Fixme: Not sure this is needed (Coz).
+#ifdef WIN32
+#  ifdef __CYGWIN__
+#    include <unistd.h>
+#  endif
+#  include <windows.h>
+#  ifdef _MSC_VER
+#    include <io.h>
+#    include <direct.h>
+#  endif
+#else
+#  include <unistd.h>
+#endif
 
-#include "tuxkart.h"
-#include "sdldrv.h"
-#include "ScreenManager.h"
-#include "TrackManager.h"
-#include "StringUtils.h"
-#include "WidgetSet.h"
-#include "sound.h"
-#include "RaceSetup.h"
-#include "Loader.h"
-#include "WorldScreen.h"
-#include "WorldLoader.h"
-#include "material.h"
-#include "KartManager.h"
-#include "StartScreen.h"
-#include "RaceManager.h"
+#include "start_tuxkart.h"
 #include "Config.h"
+#include "TrackManager.h"
+#include "Track.h"
+#include "KartManager.h"
+#include "Kart.h"
+#include "ProjectileManager.h"
+#include "RaceManager.h"
+#include "Loader.h"
+#include "ScreenManager.h"
+#include "StartScreen.h"
+#include "gui/SingleWindowMenu.h"
+#include "WidgetSet.h"
+#include "MaterialManager.h"
+#include "plibdrv.h"
+#include "HookManager.h"
+#include "History.h"
+#include "HerringManager.h"
+#include "sound.h"
 
-// Initialize the datadir
-static void initializeLoader()
-{
-  if(!loader) {
-    loader = new Loader();
-    loader->setModelDir("models");
-    loader->setTextureDir("images");
-
-    /*create $HOME/.supertuxkart if necessary*/
-    loader->initConfigDir();
-
-    /* initialize search path of the loader */
-    if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-      loader->addSearchPath(getenv ( "SUPERTUXKART_DATADIR" )) ;
-    if (getenv ("HOME") != NULL) {
-      std::string homepath = getenv("HOME");
-      homepath += "/.supertuxkart";
-      loader->addSearchPath(homepath);
-    }
-    loader->addSearchPath(".");
-    loader->addSearchPath("..");
-    loader->addSearchPath(SUPERTUXKART_DATADIR);
-
-    ssgSetCurrentOptions(loader);
-    registerImageLoaders();
-  }
-}
-
-// Load the datadir, tracklist and plib stuff
-static void initTuxKart (int width, int height, int videoFlags)
-{
-  initVideo ( width, height, videoFlags );
-  ssgInit();
-  
-  initializeLoader();
-
-  initMaterials () ;
-  track_manager = new TrackManager();
-  track_manager->loadTrackList () ;
-  kart_manager.loadKartData();
-  
-  sound     = new SoundSystem ;
-  widgetSet = new WidgetSet ;
-}
-
-void deinitTuxKart()
-{
-  delete gui;
-  delete widgetSet;
-  delete track_manager;
-  track_manager = 0;
-
-  /*write configuration to disk*/
-  config.saveConfig();
-}
-
-void cmdLineHelp (char* invocation)
-{
-  fprintf ( stdout, 
+void cmdLineHelp (char* invocation) {
+  fprintf ( stdout,
 	    "Usage: %s [OPTIONS]\n\n"
 
 	    "Run SuperTuxKart, a racing game with go-kart that features"
@@ -115,220 +69,229 @@ void cmdLineHelp (char* invocation)
 	    "  --players n             Define number of players to between 1 and 4.\n"
 	    "  --reverse               Enable reverse mode\n"
 	    "  --mirror                Enable mirror mode (when supported)\n"
+	    "  --herring style         Herring style to use\n"
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -w,  --windowed         Windowed display. (default)\n"
+	    "  --mwm                   New multi-window menu\n"
+	    "  --swm                   Original single-window menu\n"
+	    "  --oldstatus             Original status display\n"
 	    "  -s,  --screensize WIDTHxHEIGHT\n"
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
+	    // should not be used by unaware users:
+        // "  --profile            Enable automatic driven profile mode\n"
+	    // "  --history            Replay history file 'history.dat'\n"
 	    "\n"
 	    "You can visit SuperTuxKart's homepage at "
 	    "http://supertuxkart.berlios.de\n\n", invocation
 	    );
-}
+}   // cmdLineHelp
 
+// =============================================================================
+int handleCmdLine(int argc, char **argv) {
+  int n;
+  for(int i=1; i<argc; i++) {
+    if(argv[i][0] != '-') continue;
+    if ( !strcmp(argv[i], "--help") ||
+	 !strcmp(argv[i], "-help" ) ||
+	 !strcmp(argv[i], "-h")      ) {
+      cmdLineHelp(argv[0]);
+      return 0;
+    } else if( (!strcmp(argv[i], "--kart") && i+1<argc )) {
+      race_manager->setPlayerKart(0, argv[i+1]);
+    } else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
+	       && argc > 2                                             ) {
+      race_manager->setTrack(argv[i+1]);
+      fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+    } else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
+	       i+1<argc ) {
+      race_manager->setNumKarts(config->karts = atoi(argv[i+1]));
+      fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
+    } else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") ) {
 
-int main ( int argc, char *argv[] )
-{
-#ifndef DEBUG // in debugmode we wanna have a backtrace of the exception in gdb
-  try {
-#endif
-    // Initialize SDL
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0) {
-      std::stringstream msg;
-      msg << "Couldn't initialize SDL: " << SDL_GetError();
-      throw std::runtime_error(msg.str());                                   
-    }
+      fprintf ( stdout, "  Available tracks:\n" );
+      for (size_t i = 0; i != track_manager->getTrackCount(); i++)
+	fprintf ( stdout, "\t%10s: %s\n",
+		  track_manager->getTrack(i)->getIdent().c_str(),
+		  track_manager->getTrack(i)->getName().c_str());
 
-    /*load options from configuration file*/
-    config.loadConfig();
-    RaceManager::instance()->setNumKarts(config.karts);
+      fprintf ( stdout, "Use --track N to choose track.\n\n" );
+      delete track_manager;
+      track_manager = 0;
 
-    bool noStartScreen = false;
-    /* Testing if we've given arguments */
-    if ( argc > 1) 
-      {
-        for(int i = 1; i < argc; ++i)
-          {
-            if ( argv[i][0] != '-') continue;
+      return 0;
+    } else if( !strcmp(argv[i], "--list-karts") ) {
+      kart_manager->loadKartData () ;
 
-            if ( !strcmp(argv[i], "--help") ||
-                 !strcmp(argv[i], "-help") ||
-                 !strcmp(argv[i], "-h") )
-              {
-                cmdLineHelp(argv[0]);
-                return 0;
-              }
+      fprintf ( stdout, "  Available karts:\n" );
+      for (unsigned int i = 0; i != kart_manager->karts.size(); i++)
+	fprintf ( stdout, "\t%10s: %s\n",
+		  kart_manager->karts[i]->ident.c_str(),
+		  kart_manager->karts[i]->name.c_str() );
 
-            else if( (!strcmp(argv[i], "--kart") && argc > 2 ))
-              {
-                RaceManager::instance()->setPlayerKart(0, argv[i+1]);
-              }
+      fprintf ( stdout, "\n" );
 
-            else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t")) && argc > 2 )
-              {
-                RaceManager::instance()->setTrack(argv[i+1]);
-                fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
-              }
-
-            else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) && argc > 2)
-              {
-                RaceManager::instance()->setNumKarts(config.karts = atoi(argv[i+1]));
-                fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
-              }
-
-            else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
-              {
-                initializeLoader ();
-                track_manager = new TrackManager();
-                track_manager->loadTrackList () ;
-
-                fprintf ( stdout, "  Available tracks:\n" );
-                for (size_t i = 0; i != track_manager->getTrackCount(); i++)
-                  fprintf ( stdout, "\t%10s: %s\n", 
-                            track_manager->getTrack(i)->ident.c_str(),
-                            track_manager->getTrack(i)->name.c_str());
-                
-                fprintf ( stdout, "Use --track N to choose track.\n\n" );
-                delete track_manager;
-                track_manager = 0;
-
-                return 0;
-              }
-              
-             else if( !strcmp(argv[i], "--list-karts") )
-              {
-                initializeLoader ();
-                kart_manager.loadKartData () ;
-
-                fprintf ( stdout, "  Available karts:\n" );
-                for (unsigned int i = 0; i != kart_manager.karts.size(); i++)
-                  fprintf ( stdout, "\t%10s: %s\n", 
-                            kart_manager.karts[i]->ident.c_str(),
-                            kart_manager.karts[i]->name.c_str() );
-                
-                fprintf ( stdout, "\n" );
-
-                return 0;
-              }
-
-            else if ( !strcmp(argv[i], "--no-start-screen") || !strcmp(argv[i], "-N") )
-              {
-                noStartScreen = true;
-              }
-
-            else if ( !strcmp(argv[i], "--reverse") )
-              {
-                fprintf ( stdout, "Enabling reverse mode.\n" ) ;
-                //FIXME:raceSetup.reverse = 1;
-              }
-
-            else if ( !strcmp(argv[i], "--mirror") )
-              {
+      return 0;
+    } else if (    !strcmp(argv[i], "--no-start-screen")
+		|| !strcmp(argv[i], "-N")                ) {
+      config->noStartScreen = true;
+    } else if ( !strcmp(argv[i], "--reverse") ) {
+      fprintf ( stdout, "Enabling reverse mode.\n" ) ;
+      //FIXME:raceSetup.reverse = 1;
+    } else if ( !strcmp(argv[i], "--mirror") ) {
   #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-                fprintf ( stdout, "Enabling mirror mode.\n" ) ;
-                //raceSetup.mirror = 1;
+      fprintf ( stdout, "Enabling mirror mode.\n" ) ;
+      //raceSetup.mirror = 1;
   #else
-                //raceSetup.mirror = 0 ;
+      //raceSetup.mirror = 0 ;
   #endif
-              }
+    } else if ( !strcmp(argv[i], "--laps") && i+1<argc ) {
+      fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
+      race_manager->setNumLaps(atoi(argv[i+1]));
+    }
+    /* FIXME:
+    else if ( !strcmp(argv[i], "--players") && i+1<argc ) {
+      raceSetup.numPlayers = atoi(argv[i+1]);
 
-            else if ( !strcmp(argv[i], "--laps") && argc > 2 )
-              {
-                fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
-                RaceManager::instance()->setNumLaps(atoi(argv[i+1]));
-              }
-            /* FIXME:
-            else if ( !strcmp(argv[i], "--players") && argc > 2 )
-              {
-                raceSetup.numPlayers = atoi(argv[i+1]);
-
-                if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4)
-                  {
-                    fprintf ( stderr,
-                              "You choose an invalid number of players: %d.\n",
-                              raceSetup.numPlayers );
-                    cmdLineHelp(argv[0]);
-                    return 0;
-                  }
-
-                fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
-              }
-            */
-            else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
-              {
-               config.fullscreen = true;
-              }
-
-            else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
-              {
-                config.fullscreen = false;
-              }
-
-            else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
-              {
-                if (sscanf(argv[i+1], "%dx%d", &config.width, &config.height) == 2)
-                  fprintf ( stdout, "You choose to be in %dx%d.\n", config.width, config.height );
-                else
-                  {
-                    fprintf ( stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
-                    exit(EXIT_FAILURE);
-                  }
-              }
+      if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4) {
+	fprintf ( stderr,
+		  "You choose an invalid number of players: %d.\n",
+		  raceSetup.numPlayers );
+	cmdLineHelp(argv[0]);
+	return 0;
+      }
+      fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
+    }
+    */
+    else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {
+      config->fullscreen = true;
+    } else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w")) {
+      config->fullscreen = false;
+    } else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") ) {
+      if (sscanf(argv[i+1], "%dx%d", &config->width, &config->height) == 2)
+	fprintf ( stdout, "You choose to be in %dx%d.\n", config->width,
+		  config->height );
+      else {
+	fprintf ( stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
+	exit(EXIT_FAILURE);
+      }
+    }
   #ifdef VERSION
-            else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
-              {
-                fprintf ( stdout, "SuperTuxkart %s\n", VERSION ) ;
-                return 0;
-              }
+    else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") ) {
+      fprintf ( stdout, "SuperTuxkart %s\n", VERSION ) ;
+      return 0;
+    }
   #endif
-
-            else
-              {
-                fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
-                cmdLineHelp(argv[0]);
-                return 0;
-              }
-          }
-      }
-
-    // now we can really start the game
-    initTuxKart ( config.width, config.height, config.fullscreen );
-
-    /* Set the SSG loader options */
-    loader -> setCreateStateCallback  ( getAppState ) ;
-    loader -> setCreateBranchCallback ( process_userdata ) ;
-
-    /* Set Window's title */
-    char title[256];
-    sprintf(title, "SuperTuxKart %s", VERSION);
-    SDL_WM_SetCaption(title, title);
-
-    screenManager = new ScreenManager();
-
-    if ( noStartScreen )
-      {
-        RaceManager::instance()->start();
-      }
-    else
-      {
-        startScreen = new StartScreen();
-        screenManager->setScreen(startScreen);      
-      }
-
-    screenManager->run();
-    delete screenManager;
-    screenManager = 0;
-
-    deinitTuxKart();
-
-    // shutdown SDL
-    shutdownVideo();
-#ifndef DEBUG
-  } catch (const std::exception& err) {
-    std::cout << "Error: " << err.what() << std::endl;
+    else if( !strcmp(argv[i], "--mwm") ) {
+      config->singleWindowMenu=false;
+    } else if( !strcmp(argv[i], "--swm") ) {
+      config->singleWindowMenu=true;
+    } else if( !strcmp(argv[i], "--oldstatus") ) {
+      config->oldStatusDisplay=true;
+    } else if( sscanf(argv[i], "--profile=%d",&n)==1) {
+      config->profile=n;
+    } else if( !strcmp(argv[i], "--profile") ) {
+      config->profile=500;
+    } else if( !strcmp(argv[i], "--history") ) {
+      config->replayHistory=true;
+    } else if( !strcmp(argv[i], "--oldhot") ) {
+      config->oldHOT=true;
+    } else if( !strcmp(argv[i], "--herring") && i+1<argc ) {
+      config->herringStyle=argv[i+1];
+    } else {
+      fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
+      cmdLineHelp(argv[0]);
+      return 0;
+    }
+  }   // for i <argc
+  if(config->profile) {
+    printf("Profiling: %d frames.\n",config->profile);
   }
-#endif
+  return 1;
+}   /* handleCmdLine */
 
-  return 0 ;
+// =============================================================================
+void InitTuxkart() {
+  loader = new Loader();
+  loader->setModelDir("models");
+  loader->setTextureDir("images");
+  loader->setCreateStateCallback(getAppState);
+  loader->setCreateBranchCallback(process_userdata);
+  config = new Config();
+  sound  = new SoundSystem();
+
+  history             = new History           ();
+  material_manager    = new MaterialManager   ();
+  track_manager       = new TrackManager      ();
+  kart_manager        = new KartManager       ();
+  projectile_manager  = new ProjectileManager ();
+  collectable_manager = new CollectableManager();
+  race_manager        = new RaceManager       ();
+  screen_manager      = new ScreenManager     ();
+  hook_manager        = new HookManager       ();
+  herring_manager     = new HerringManager    ();
+  track_manager   ->loadTrackList () ;
 }
+
+// =============================================================================
+int main ( int argc, char **argv ) {
+  InitTuxkart();
+  //handleCmdLine() needs InitTuxkart() so it can't be called first
+  if(!handleCmdLine(argc, argv)) exit(0);
+
+  InitPlib();
+  // loadMaterials needs ssgLoadTextures (internally), which can
+  // only be called after ssgInit (since this adds the actual loader)
+  // so this next call can't be in InitTuxkart. And InitPlib needs
+  // config, which gets defined in InitTuxkart, so swapping those two
+  // calls is not possible either ... so loadMaterial has to be done here :(
+  material_manager   ->loadMaterial   ();
+  kart_manager       ->loadKartData   ();
+  projectile_manager ->loadData       ();
+  collectable_manager->loadCollectable();
+  herring_manager    ->loadAllHerrings();
+  startScreen = new StartScreen();
+  widgetSet   = new WidgetSet;
+  if(config->replayHistory) {
+    // This will setup the race manager etc.
+    history->Load();
+    startScreen->switchToGame();
+    screen_manager->run();
+  } else {
+    if(!config->profile) {
+      if(config->singleWindowMenu) {
+	if(SingleWindowMenu()) exit(0);   // Quit selected
+	startScreen->switchToGame();
+      } else if (!config->noStartScreen ) {
+	screen_manager->setScreen(startScreen);
+      } else {
+	race_manager->setNumPlayers(1);
+	race_manager->setNumKarts  (4);
+	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
+	race_manager->setDifficulty(RD_MEDIUM);
+	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
+	race_manager->setNumLaps   (1);
+	race_manager->setTrack     ("tuxtrack");
+	//race_manager->setTrack     ("olivermath");
+	startScreen->switchToGame();
+      }
+    } else {
+      /* For profiling just set the values we wanted to profile */
+      race_manager->setNumPlayers(1);
+      race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
+      race_manager->setNumKarts  (4);
+      race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
+      race_manager->setDifficulty(RD_MEDIUM);
+      race_manager->setNumLaps   (1);
+      race_manager->setTrack     ("littlevolcano");
+      //race_manager->setTrack     ("tuxtrack");
+      //race_manager->setTrack     ("olivermath");
+      startScreen->switchToGame();
+    }
+    screen_manager->run();
+  }
+  config->saveConfig();
+return 0 ;
+}
+
 

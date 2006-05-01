@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: preprocessor.cxx,v 1.3 2005/07/19 08:42:19 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,8 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tuxkart.h"
-#include "material.h"
+#include <plib/ssg.h>
+#include "preprocessor.h"
+#include "MaterialManager.h"
+#include "Material.h"
 
 void preProcessObj ( ssgEntity *n, bool mirror )
 {
@@ -32,7 +34,7 @@ void preProcessObj ( ssgEntity *n, bool mirror )
       for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
         ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
 
-    getMaterial ( (ssgLeaf *) n ) -> applyToLeaf ( (ssgLeaf *) n ) ;
+    material_manager->getMaterial ( (ssgLeaf *) n ) -> applyToLeaf ( (ssgLeaf *) n ) ;
     return ;
   }
 

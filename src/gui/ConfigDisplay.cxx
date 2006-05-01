@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: ConfigDisplay.cxx,v 1.2 2005/05/27 10:25:52 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,21 +18,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "ConfigDisplay.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
-#include "sdldrv.h"
+#include "Config.h"
 
 ConfigDisplay::ConfigDisplay()
 {
 	menu_id = widgetSet -> vstack(0);
 	widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
-	
+
 	int va = widgetSet -> varray(menu_id);
 	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, MENU_FULLSCREEN_TOGGLE, 0);
 
 	widgetSet -> layout(menu_id, 0, 0);
 
-  if(is_fullscreen())
+  if(config->fullscreen)
     widgetSet->set_label(fullscreen_menu_id, "Window mode");
 }
 
@@ -40,7 +39,7 @@ ConfigDisplay::~ConfigDisplay()
 {
 	widgetSet -> delete_widget(menu_id) ;
 }
-	
+
 void ConfigDisplay::update(float dt)
 {
 	widgetSet -> timer(menu_id, dt) ;
@@ -56,8 +55,8 @@ void ConfigDisplay::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_FULLSCREEN_TOGGLE:
-    toggle_fullscreen();
-    if(is_fullscreen())
+	  //JHtoggle_fullscreen();
+    if(config->fullscreen)
       widgetSet->set_label(fullscreen_menu_id, "Window mode");
     else
       widgetSet->set_label(fullscreen_menu_id, "Fullscreen mode");

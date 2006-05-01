@@ -1,5 +1,4 @@
-
-//  $Id$
+//  $Id: RaceGUI.h,v 1.9 2005/08/17 22:36:34 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,92 +21,78 @@
 #define HEADER_RACEGUI_H
 
 #include "BaseGUI.h"
-#include "material.h"
+#include "Material.h"
 #include "Config.h"
-//#include <plib/fnt.h>
-#include <SDL_ttf.h>
-#include <map>
-#include <string>
+#include "PlayerKart.h"
+#include "plibdrv.h"
 
 #define MAX_STRING          30
 #define MAX_STRING_LENGTH  256
 
-#define SCREEN_CENTERED_TEXT -1
-
 const int TEXTURES_PER_PLAYER = 10;
 
-class TextTexture
-{
-public:
-  TextTexture() {lastUsed = -1;}
-  
-	GLuint texture;
-	int w;
-	int h;
-  std::string text;
-  int sz;
-
-  int lastUsed;
-};
-
-class RaceGUI: public BaseGUI
-{
+class RaceGUI: public BaseGUI {
+  // A mapping for the assigned keys (like fire, ...) to
+  // the kart which is using them
+  PlayerKart* keysToKart[MAXKEYS];
+  int         typeForKey[MAXKEYS];
 public:
 	RaceGUI();
 	~RaceGUI();
-	
+
 	void update(float dt);
 	void select() {}
-	void keybd(const SDL_keysym& key);
+	void keybd(int key);
 	void point(int x, int y) { (void)x; (void)y; }
-	void stick(int whichAxis, int value) { (void)whichAxis; (void)value; }
-	
+	void stick(const int &whichAxis, const float &value) ;
+    void joybuttons(int whichJoy, int hold, int presses, int releases ) ;
+
 private:
-	void drawFPS();
-	
-	int fps_id;
-	
-	Material *herringbones_gst ;
-	Material *herring_gst ;
-	Material *spark_gst ;
-	Material *missile_gst ;
-	Material *flamemissile_gst ;
-	Material *magnet_gst ;
-	Material *zipper_gst ;
-	
+	ulClock  fpsTimer;
+	int      fpsCounter;
+	char     fpsString[10];
+
 	double time_left ;
 
-  TextTexture cachedTextures[PLAYERS * TEXTURES_PER_PLAYER];
-  int nCachedTextures;
-
-	char *pos_string [10];
+	char *pos_string [11];
 
   /* Display informat on screen */
-	void drawStatusText (const RaceSetup& raceSetup);
-	void drawEnergyMeter ( float state, int offset_x, int offset_y, float ratio_x, float ratio_y );
-	void drawCollectableIcons ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y );
-	void drawEmergencyText ( int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y );
-	void drawPlayerIcons ();
-	void drawGameOverText ();
-	void drawMap ();
-	void drawScore (const RaceSetup& raceSetup, int player_nb, int offset_x, int offset_y, float ratio_x, float ratio_y);
-	void drawTimer ();
+	void drawStatusText        (const RaceSetup& raceSetup);
+	void drawEnergyMeter       (Kart *player_kart, 
+				    int   offset_x, int   offset_y, 
+				    float ratio_x,  float ratio_y  );
+	void drawCollectableIcons  (Kart* player_kart, 
+				    int   offset_x, int   offset_y, 
+				    float ratio_x,  float ratio_y  );
+	void drawEmergencyText     (Kart* player_kart, 
+				    int   offset_x, int   offset_y, 
+				    float ratio_x,  float ratio_y  );
+	void drawScore             (const RaceSetup& raceSetup,
+				    Kart* player_kart, 
+				    int   offset_x, int   offset_y, 
+				    float ratio_x,  float ratio_y  );
+	void UpdateKeyboardMappings();
+	void drawPlayerIcons       ();
+	void oldDrawPlayerIcons    ();
+	void drawGameOverText      ();
+	void drawMap               ();
+	void drawTimer             ();
+	void drawFPS               ();
 
   /* Text drawing */
   /** Draw text to screen.
-      scale_x and scale_y could be used to a simple resize (for instance, for multiplayer
-      split screens, though, currently, we reduce fonts size to half). */
-	void drawText ( const char* text, int sz, int x, int y, int red, int green, int blue,
-                  float scale_x = 1.0, float scale_y = 1.0 );
-  void drawTexture(const GLuint texture, int w, int h, int red, int green, int blue, int x, int y);
+      scale_x and scale_y could be used to a simple resize (for instance, 
+      for multiplayer split screens, though, currently, we reduce fonts
+      size to half). */
 
-	void drawDropShadowText ( const char *str, int sz, int x, int y );
-	void drawInverseDropShadowText ( const char *str, int sz, int x, int y );
+	void drawTexture(const GLuint texture, int w, int h, int red, 
+			 int green, int blue, int x, int y);
+
+	void drawDropShadowText (const char *str, int sz, int x, int y );
+	void drawInverseDropShadowText (const char *str, int sz, int x, int y);
 	
-	void cacheFont(int sz);
-  TextTexture* cacheTexture(const char* text, int sz);
-
-	//debugging arrays and functions, never actually get used for anything at the moment
+	//debugging arrays and functions, never actually get used for
+	//anything at the moment
 	void stToggle ();
 	void stPrintf ( char *fmt, ... );
 	bool stats_enabled ;
@@ -115,8 +100,6 @@ private:
 	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
 	int  next_string ;
 
-	typedef std::map <int, TTF_Font*> FontsCache;
-	FontsCache fonts_cache;
 };
 
 #endif

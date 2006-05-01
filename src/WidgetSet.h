@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: WidgetSet.h,v 1.6 2005/07/13 17:28:23 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -20,17 +20,20 @@
 #ifndef HEADER_WIDGETSET_H
 #define HEADER_WIDGETSET_H
 
-#include "widget_glext.h"
-#include "joystick.h"
-
-#include <SDL_ttf.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+#include <plib/fnt.h>
 
 /*---------------------------------------------------------------------------*/
 
-#define GUI_FACE "fonts/VeraBd.ttf"
-#define GUI_SML  0
-#define GUI_MED  1
-#define GUI_LRG  2
+//The next line isn't used? [Coz]
+//#define GUI_FACE "fonts/VeraBd.ttf"
+#define GUI_SML  18
+#define GUI_MED  24
+#define GUI_LRG  30
 
 #define GUI_NW   1
 #define GUI_SW   2
@@ -42,6 +45,9 @@
 #define GUI_TOP  (GUI_NW  | GUI_NE)
 #define GUI_BOT  (GUI_SW  | GUI_SE)
 #define GUI_ALL  (GUI_TOP | GUI_BOT)
+
+#define SCREEN_CENTERED_TEXT -1
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -89,11 +95,14 @@ struct Widget
 
 	int     x, y;
 	int     w, h;
+        int     yOffset;
 	int     car;
 	int     cdr;
 
+        const char    *_text;
+        char    *count_text;
+        int     text_width;
 	GLuint  text_img;
-	GLuint  text_obj;
 	GLuint  rect_obj;
 
 	const GLfloat *color0;
@@ -113,7 +122,6 @@ public:
 	/* change the value of variables stored by already-existing widgets*/	
 	
 	void set_label(int, const char *);
-	void set_image(int, const char *);
 	void set_multi(int, const char *);
 	void set_count(int, int);
 	void set_clock(int, int);
@@ -161,7 +169,9 @@ public:
 	
 	//just a blank space
 	int  space(int);
-	
+	void drawText(const char *text, int sz, int x, int y, 
+		      int red, int green, int blue, 
+		      float scale_x=1.0, float scale_y=1.0);
 	/*---------------------------------------------------------------------------*/
 	
 	/* prints out debugging info */
@@ -203,7 +213,7 @@ public:
 	int  stick(int, int whichAxis, int value);
 	
 	/* keyboard cursors */
-	int cursor(int id, SDLKey key);
+	int cursor(int id, int key);
 	
 	/* mouse click */
 	int click();
@@ -278,7 +288,6 @@ private:
 	void config_push_persp(float, float, float);
 	void config_push_ortho();
 	void config_pop_matrix();
-	void config_clear();
 	
 	/*---------------------------------------------------------------------------*/
 	
@@ -290,18 +299,14 @@ private:
 	Widget widgets[MAXWIDGETS];
 	int           active;
 	int           radius;
-	TTF_Font     *font[3];
-	
-	GLuint digit_text[3][11];
-	GLuint digit_list[3][11];
-	int    digit_w[3][11];
-	int    digit_h[3][11];
+	fntTexFont    *fnt;
+	fntRenderer   *textOut;
 	
 	int pause_id;
 	bool paused;
 };
 
-
+extern WidgetSet *widgetSet;
 #endif
 
 /* EOF */

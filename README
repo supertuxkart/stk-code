@@ -1,68 +1,112 @@
-SuperTuxKart
-============
 
-SuperTuxKart is a free kart racing gaming featuring Tux and his
-friends covered under the GNU GPL (see COPYING for details). It is
-based on TuxKart by Steve Baker, but has improved graphics and an 
-improved user interface.
+TuxKart.
+~~~~~~~~
+                           by Steve Baker
+                           <sjbaker1@airmail.net>
+                           http://www.sjbaker.org
 
-The SuperTuxKart webpage is located at:
+INSTALLATION:
+~~~~~~~~~~~~~
+Installation instructions are pretty basic,
+and are covered in detail in the documentation directory 'doc',
+and in the file INSTALL or online at http://tuxkart.sf.net 
 
- * http://supertuxkart.berlios.de
+First, make sure that you have the following packages installed:
 
-Questions and Comments should go to supertuxkart-devel@lists.berlios.de
-Mailing list subscribe information is available at:
+    * OpenGL (or Mesa 3.0 or later)
+    * PLIB version 1.8.0 or later . 
 
-  http://supertuxkart.berlios.de/contact.html
+Unpack the files from the tarball like this:
+
+  tar xzf tuxkart-*.tar.gz
+  cd tuxkart-*
+
+
+(where '*' is the version of TuxKart you downloaded - eg 0.4.0) ...and then:
+
+  ./configure
+  make
+
+You can run the game from the directory you downloaded it into - or (as 'root') you can install it into /usr/local/share/games/tuxkart by typing;
+
+ make install
+
+
+BUT IT DIDN'T WORK!
+~~~~~~~~~~~~~~~~~~~
+
+The most common (by FAR) reason for problems is that your OpenGL/Mesa
+is incorrectly installed - so before you complain to any of the PLIB
+or TuxKart mailing lists, first try running one of the example programs
+that comes with your OpenGL implementation - or one of the Mesa or GLUT
+sample programs.
+
+If you those examples run OK - then go to the PLIB home page and download
+the PLIB examples.
+
+If THOSE run correctly - but TuxKart doesn't then please get in touch with
+the TuxKart mailing list and we'll do our best to get you up and racing.
+
+STARTING THE GAME:
+
+Just 'cd' into the download directory and run './src/tuxkart', or run
+'/usr/local/games/tuxkart' if you did a 'make install'.
+
+Select the number of laps and which course you'd like to race on then
+click 'start game' to get going.
 
 
 PLAYING THE GAME:
 
-Ideally, you need a 'gamepad' style joystick with at least six buttons.
-The controls are configurable from the in-game options menu, but the defaults are:
+Ideally, you need a 'gamepad' style joystick with at leasti six buttons:
 
   Joystick Left/Right:  Steer.
 
-  A button - Accelerate.
+  A button - Accellerate.
   B button - Brake.
   C button - Use an item you've collected from a Red Herring
   D button - Ask to be rescued by tinytux.
   L button - Pop a wheelie (if you are going fast enough).
   R button - Jump.
 
-In addition, you can drive from the keyboard. Again, the controls are
-changeable from the in-game options menu, but the defaults are:
+
+In addition, you can drive from the keyboard:
 
   LEFT/RIGHT ARROW: Steer.
 
-  UP-ARROW   - Same as 'A' button - Accelerate
+  UP-ARROW   - Same as 'A' button - Accellerate
   DOWN-ARROW - Same as 'B' button - Brake
 
   A key - Same as 'L' button - pop a Wheelie
   S key - Same as 'R' button - Jump
   D key - Same as 'D' button - Rescue Me Please!
   F key - Same as 'C' button - Use an item
+  ENTER - Same as 'C' button - Use an item
 
-The following keys control the in-game GUI:
+  SPACE - Pop up or Hide the menu bar.
+  R key - Restart the race.
+  P key - Pause.
 
-  Joystick / keyboard cursors / mouse - Highlight menu options
-  Enter / fire button/fire key / left mouse button - Select menu options
-  Escape / brake button/brake key / right mouse button - Return to previous menu
+  X key - Exit the game.
+  ESCAPE- Exit the game.
 
 
 There are also some debug functions left in for developers:
 
-  F12 - Display FPS counter
   W key - Toggle wireframe view
+  Z key - Toggle statistics gathering
+
+From the Menu bar, you can turn sound effects and music on and off,
+enable or disable the 'mousetrap' (which keeps the mouse in the window
+to stop you accidentally losing the mouse pointer on Voodoo-1/2 hardware)
 
 On the tracks, you'll find Red, Silver and Gold Herring (Yum - good!),
-and Green Herring (Yuk - bad!) - also arrow-shaped red and black
-'zippers' that give you a quick speedup.
+and Green Herring (Yuk - bad!) - also arrow-shaped red and black 'zippers'
+that give you a quick speedup.
 
-Use the 'rescue' key if you crash and can't get back onto the track.
-It's sometimes activated automatically if (for example) you get stuck
-in hot lava. TinyTux will lift your cart up and put it back onto the
-track.
+Use the 'rescue' key if you crash and can't get back onto the track. It's
+sometimes activated automatically if (for example) you get stuck in hot
+lava. TinyTux will lift your cart up and put it back onto the track.
 
 
 POWERUPS:
@@ -114,12 +158,15 @@ Bad Things:
       amount of time than the parachute...but the drag effect is much
       stronger - your kart hardly moves at all. 
 
-
 KNOWN BUGS:
 
-    * Serious framerate issues
+    * No drive-with-the-mouse support.
+    * Slow performance on CPU's less than ~450MHz.
+    * No way to return to title screen at end of race.
+    * You always play as Tux - there is no way to change players.
     * After you cross the finish line, if someone overtakes you, your final
       position changes!
+    * No "Ready, Steady, Go!" sequence.
     * The computer players get confused and 'stuck' on tracks that
       self-intersect (eg figure-8 shaped tracks). The lap counter and
       current player positions are also screwed up on those kinds of tracks.
@@ -130,7 +177,13 @@ KNOWN BUGS:
     * Sometimes you can be pushed through a solid object if you are hit by
       another player when in contact with the surface. 
 
-We're sure there are lots more!
+I'm sure there are lots more!
+
+LICENSE:
+
+This software is released under the provisions of
+the GNU General Public License (GPL) which can be
+found in the file 'LICENSE' in the current directory.
 
 DIRECTORY STRUCTURE:
 
@@ -143,7 +196,7 @@ data    -- This contains all kinds of miscellaneous data
 doc     -- Documentation - all in HTML
 
 images  -- Texture maps and other images needed by the
-           game. These are currently all in 'png' image
+           game. These are currently all in 'SGI' image
            format.
 
 wavs    -- Sound files - sound effects in 'wav' format.
@@ -152,4 +205,4 @@ mods    -- Music files - in 'mod' format.
 
 models  -- 3D models - in '.ac' format.
 
-# EOF #
+

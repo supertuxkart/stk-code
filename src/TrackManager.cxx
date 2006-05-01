@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: TrackManager.cxx,v 1.1 2005/05/25 21:52:09 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,11 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <set>
 #include <stdexcept>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "TrackManager.h"
+#include "Track.h"
 
 TrackManager* track_manager = 0;
 
@@ -40,7 +40,7 @@ TrackManager::getTrack(const std::string& ident) const
 {
   for(Tracks::const_iterator i = tracks.begin(); i != tracks.end(); ++i)
     {
-      if ((*i)->ident == ident)
+      if ((*i)->getIdent() == ident)
         return *i;
     }
 

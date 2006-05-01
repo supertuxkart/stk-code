@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: TrackSel.cxx,v 1.4 2005/08/31 17:25:27 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,16 +18,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "TrackSel.h"
-#include "TrackManager.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
-#include "StartScreen.h"
 #include "RaceManager.h"
 #include "TrackManager.h"
-
-#include <string>
-
-using std::string;
+#include "Track.h"
 
 TrackSel::TrackSel()
 {
@@ -42,12 +36,12 @@ TrackSel::TrackSel()
   int col2 = widgetSet -> varray(ha);
 
   for (size_t i = 0; i != track_manager->getTrackCount()/2; ++i)
-    widgetSet -> state(col1, track_manager->getTrack(i)->name.c_str(), GUI_SML, i, 0);
+    widgetSet -> state(col1, track_manager->getTrack(i)->getName().c_str(), GUI_SML, i, 0);
 
   for (size_t i = track_manager->getTrackCount()/2; 
       i != track_manager->getTrackCount(); ++i)
   {
-    int tmp = widgetSet -> state(col2, track_manager->getTrack(i)->name.c_str(), GUI_SML, i, 0);
+    int tmp = widgetSet -> state(col2, track_manager->getTrack(i)->getName().c_str(), GUI_SML, i, 0);
     if (i == track_manager->getTrackCount()/2)
       widgetSet -> set_active(tmp);
   }
@@ -79,18 +73,16 @@ void TrackSel::update(float dt)
 
     // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
     // NOTE: it's weird that these values do not fit at all with the glOrtho()
-    track->draw2Dview(0.0, -0.7,
-                      1.0, 0.3, true);  // (x, y, w, h, stretch)
+    track->drawScaled2D(0.0, -0.7, 1.0, 0.3, true);  // (x, y, w, h, stretch)
     }
   }
 }
 
-void TrackSel::select()
-{
-  RaceManager::instance()->setTrack(
-      track_manager->getTrack(widgetSet -> token ( widgetSet -> click()
-          ))->ident);
-  startScreen->switchToGame();
+void TrackSel::select() {
+  race_manager->setTrack(track_manager->
+			 getTrack(widgetSet->token(widgetSet->click()))->getIdent());
+
+  guiStack.push_back(GUIS_NUMLAPS);
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Shadow.cxx,v 1.3 2005/07/19 08:42:19 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,7 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "material.h"
+#include "MaterialManager.h"
+#include "Material.h"
 #include "Shadow.h"
 
 ssgTransform* createShadow( const std::string& name,
@@ -52,7 +53,7 @@ ssgTransform* createShadow( const std::string& name,
 
   // FIXME: necessary since getMaterial modifies the argument
   char* name_c = strdup(name.c_str());
-  gs -> setState ( getMaterial ( name_c ) -> getState () ) ;
+  gs -> setState ( material_manager->getMaterial ( name_c ) -> getState () ) ;
   free(name_c);
 
   result -> addKid ( gs ) ;

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: StartScreen.h,v 1.1 2005/05/25 21:52:09 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,9 +20,10 @@
 #ifndef HEADER_STARTSCREEN_H
 #define HEADER_STARTSCREEN_H
 
-#include <plib/ssg.h>
 #include "Screen.h"
-#include "RaceSetup.h"
+
+class ssgSimpleState;
+
 
 class StartScreen : public Screen
 {

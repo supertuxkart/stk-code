@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: MainMenu.h,v 1.2 2005/05/27 10:25:52 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,10 +27,10 @@ class MainMenu: public BaseGUI
 public:
 	MainMenu();
 	~MainMenu();
-	
+
 	void update(float dt);
 	void select();
-	void keybd(const SDL_keysym& key);
+	void keybd(int key);
 };
 
 #endif

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Explosion.h,v 1.5 2005/08/16 08:19:24 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,33 +20,22 @@
 #ifndef HEADER_EXPLOSION_H
 #define HEADER_EXPLOSION_H
 
-#include <plib/ssg.h>
-#include "tuxkart.h"
-#include "sound.h"
+class ssgSelector;
+class Projectile;
 
-class World;
 
-class Explosion
-{
-  World* world;
-  ssgTransform *dcs ;
-  ssgSelector  *seq ;
-
+class Explosion : public ssgTransform {
+ public:
   int step ;
-
+  ssgSelector  *seq ;
 public:
 
-  Explosion ( World* world, ssgBranch *b ) ;
+       Explosion(Projectile* p);
+  int  inUse    ()              {return (step >= 0); }
+  void init     (Projectile *p);
+  void update   (float delta_t);
+  bool hasEnded () {return step>=seq->getNumKids();}
 
-  void update (float delta_t) ;
-  void start  ( sgVec3 where )
-  {
-    sound -> playSfx ( SOUND_EXPLOSION ) ;
-    dcs -> setTransform ( where ) ;
-    step = 0 ;
-  }
-
-  int  inUse  () { return (step >= 0) ; }
 } ;
 
 #endif

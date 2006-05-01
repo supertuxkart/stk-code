@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: World.cxx,v 1.16 2005/09/30 16:51:53 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,97 +18,115 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <assert.h>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include <algorithm>
-#include "preprocessor.h"
-#include "Explosion.h"
-#include "Herring.h"
-#include "Projectile.h"
-#include "KartDriver.h"
-#include "WidgetSet.h"
-#include "tuxkart.h"
-#include "Loader.h"
-#include "material.h"
 #include "World.h"
-#include "Camera.h"
-#include "RaceSetup.h"
-#include "WorldLoader.h"
-#include "PlayerDriver.h"
-#include "AutoDriver.h"
-#include "utils.h"
+#include "preprocessor.h"
+#include "HerringManager.h"
+#include "ProjectileManager.h"
+#include "gui/BaseGUI.h"
+#include "Loader.h"
+#include "PlayerKart.h"
+#include "AutoKart.h"
+#include "isect.h"
 #include "Track.h"
 #include "KartManager.h"
 #include "TrackManager.h"
+#include "Config.h"
+#include "HookManager.h"
+#include "History.h"
+#include "constants.h"
+#include "sound.h"
 
 World* world = 0;
 
-World::World(const RaceSetup& raceSetup_)
-  : raceSetup(raceSetup_)
-{
+World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
+  delete world;
+  world = this;
   phase = START_PHASE;
 
   scene = NULL;
   track = NULL;
 
-  clock           = 0.0f;
-  
-  // Grab the track centerline file
-  track = track_manager->getTrack(raceSetup.track) ;
+  clock = 0.0f;
+
+  // Grab the track file
+  try {
+    track = track_manager->getTrack(raceSetup.track) ;
+  } catch(std::runtime_error) {
+    printf("Track '%s' not found.\n",raceSetup.track.c_str());
+    exit(1);
+  }
 
   // Start building the scene graph
   scene       = new ssgRoot   ;
   trackBranch = new ssgBranch ;
   scene -> addKid ( trackBranch ) ;
 
-  /* Load the Herring */
-  sgVec3 yellow = { 1.0, 1.0, 0.4 } ;
-
-  gold_h    = new Herring ( yellow ) ; 
-  silver_h  = new Herring ( ssgLoad ( "coin.ac", loader )   ) ;
-  red_h     = new Herring ( ssgLoad ( "bonusblock.ac", loader )   ) ; 
-  green_h   = new Herring ( ssgLoad ( "banana.ac", loader )   ) ; 
-
-  preProcessObj ( gold_h -> getRoot());
-  preProcessObj ( silver_h -> getRoot());
-  preProcessObj ( red_h -> getRoot());
-  preProcessObj ( green_h -> getRoot());
-
-  num_herring = 0;
-
-  // Create the karts and fill the kart vector with them
+  //Clear textures that might be stored from things like the character select
+  //screen, otherwise, the tracks could get textures where they aren't
+  //suppposed to be, and if there is no texture, it just looks white.
+  if(raceSetup.mode != RaceSetup::RM_GRAND_PRIX)
+      loader->shared_textures.removeAll();
 
   assert(raceSetup.karts.size() > 0);
 
-  for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ; i != raceSetup.karts.end() ; ++i )
-  {
-    KartDriver* newkart;
-    int pos = kart.size();
+  // Clear all hooks, which might still be stored there from a previous race.
+  hook_manager->clearAll();
 
-    if (std::find(raceSetup.players.begin(), raceSetup.players.end(), pos) != raceSetup.players.end())
-      { // the given position belongs to a player
-        newkart = new KartDriver ( this, kart_manager.getKart(*i), pos, new PlayerDriver ) ;
+  // Load the track models - this must be done before the karts so that the
+  // karts can be positioned properly on (and not in) the tracks.
+  loadTrack   ( ) ;
+
+  staticSSG = new StaticSSG(trackBranch, 1000);
+  //staticSSG->Draw(scene);
+  //  exit(-1);
+  int pos = 0;
+  int playerIndex = 0;
+  for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ;
+                                  i != raceSetup.karts.end() ; ++i ) {
+    Kart* newkart;
+    if(config->profile)
+    {
+      // In profile mode, load only the old kart
+      newkart = new AutoKart (kart_manager->getKart("tuxkart"), pos);
+    } else {
+      if (std::find(raceSetup.players.begin(),
+		    raceSetup.players.end(), pos) != raceSetup.players.end())
+      {
+	// the given position belongs to a player
+	    newkart = new PlayerKart (kart_manager->getKart(*i), pos,
+                      &(config->player[playerIndex++]));
+      } else {
+	newkart = new AutoKart   (kart_manager->getKart(*i), pos);
       }
-    else
-      newkart = new KartDriver ( this, kart_manager.getKart(*i), pos, new AutoDriver ) ;
-    
+    }   // if config->profile else
+    if(config->replayHistory) {
+      history->LoadKartData(newkart, pos);
+    }
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
-    init_pos.xyz [ 0 ] = (pos % 2 == 0) ? 1.5f : -1.5f ;
-    init_pos.xyz [ 1 ] = -pos * 1.5f ;
 
+    float hot = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
+    //float hot=0.0;
+    // Bug fix/workaround: sometimes the first kart would be too close
+    // to the first driveline point and not to the last one -->
+    // This kart would not get any lap counting done in the first
+    // lap! Therefor -1.5 is subtracted from the y position - which
+    // is a somewhat arbitrary value.
+    init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
+    init_pos.xyz[1] = -pos * 1.5f -1.5;
+    init_pos.xyz[2] = hot;
     newkart -> setReset ( & init_pos ) ;
     newkart -> reset    () ;
     newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-    scene -> addKid ( newkart -> getRoot() ) ;
+    scene -> addKid ( newkart -> getModel() ) ;
 
     kart.push_back(newkart);
-  }
+    pos++;
+  }  // for i
 
-  // Load the track models
-  loadTrack   ( ) ;
   loadPlayers ( ) ;
 
   preProcessObj ( scene ) ;
@@ -116,117 +134,106 @@ World::World(const RaceSetup& raceSetup_)
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
   //ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
 #endif
-	
+
   guiStack.push_back(GUIS_RACE);
 
-  std::string music = track_manager->getTrack(raceSetup.track)->music_filename;
-  
+  const std::string music = track_manager->getTrack(raceSetup.track)->getMusic();
+
   if (!music.empty())
     sound -> change_track ( music.c_str() );
 
   ready_set_go = 3;
+  phase        = START_PHASE;
 }
 
-World::~World()
-{
+World::~World() {
   for ( unsigned int i = 0 ; i < kart.size() ; i++ )
     delete kart[i];
 
   kart.clear();
- 
-  for(Projectiles::iterator i = projectiles.begin();
-      i != projectiles.end(); ++i)
-    delete *i;
-  for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
-    delete *i;
+  projectile_manager->cleanup();
 
-  ssgDeRefDelete(projectile_spark);
-  ssgDeRefDelete(projectile_missle);
-  ssgDeRefDelete(projectile_flamemissle);
-  ssgDeRefDelete(explode);
-
-  delete gold_h;
-  delete silver_h;
-  delete red_h;
-  delete green_h;
-
-  delete scene ; 
+  delete scene ;
 }
 
-void
-World::draw()
-{
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> placeModel() ;
+void World::draw() {
 
-  ssgGetLight ( 0 ) -> setPosition ( track->sun_position ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track->ambientcol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track->diffusecol  ) ;
-  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track->specularcol ) ;
+  ssgGetLight ( 0 ) -> setPosition ( track->getSunPos() ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track->getAmbientCol()  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track->getDiffuseCol() ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track->getSpecularCol() ) ;
 
   ssgCullAndDraw ( world->scene ) ;
 }
 
-void
-World::update(float delta)
-{
+void World::update(float delta) {
+  if(config->replayHistory) delta=history->GetNextDelta();
   clock += delta;
 
   checkRaceStatus();
-  
-  if ( getPhase() == World::FINISH_PHASE )
-    guiStack.push_back(GUIS_NEXTRACE);
 
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) kart[ i ] -> update (delta);
-  for(Projectiles::iterator i = projectiles.begin();
-      i != projectiles.end();)
-  {
-    (*i)->update(delta);
-	if((*i)->hasExploded())
-	{
-	    delete *i;
-		i = projectiles.erase(i);
-	}
-	else
-		++i;
+  if( getPhase() == World::FINISH_PHASE ) {
+    guiStack.push_back ( GUIS_NEXTRACE );
   }
-  for(Explosions::iterator i = explosions.begin(); i != explosions.end(); ++i)
-      (*i)->update(delta);
-  for ( int i = 0 ; i < num_herring ; i++ ) herring    [ i ] .  update () ;
+
+  float inc = 0.05;
+  float dt  = delta;
+  while (dt>0.0) {
+    if(dt>=inc) {
+      dt-=inc;
+      if(config->replayHistory) delta=history->GetNextDelta();
+    } else {
+      inc=dt;
+      dt=0.0;
+    }
+    // The same delta is stored over and over again! This helps to use
+    // the same index in History:allDeltas, and the history* arrays here,
+    // and makes writing easier, since we had to write delta the first
+    // time, and then inc from then on.
+    if(!config->replayHistory) history->StoreDelta(delta);
+    for ( Karts::size_type i = 0 ; i < kart.size(); ++i) {
+      kart[i]->update(inc) ;
+    }
+  }   // while dt>0
+
+  projectile_manager->update(delta);
+  herring_manager->update(delta);
+  
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
 
   /* Routine stuff we do even when paused */
-  silver_h -> update () ;
-  gold_h   -> update () ;
-  red_h    -> update () ;
-  green_h  -> update () ;
+  hook_manager->update();
 }
 
-void
-World::checkRaceStatus()
-{
-  if (clock > 1.0 && ready_set_go == 0)
-    {
+void World::checkRaceStatus() {
+  if (clock > 1.0 && ready_set_go == 0) {
       ready_set_go = -1;
-    }
-  else if (clock > 2.0 && ready_set_go == 1)
-    {
-      ready_set_go = 0;
-      phase = RACE_PHASE;
-      clock = 0.0f;
-    }
-  else if (clock > 1.0 && ready_set_go == 2)
-    {
-      ready_set_go = 1;
-    }
-  else if (clock > 0.0 && ready_set_go == 3)
-    {
-      ready_set_go = 2;
-    }
+  } else if (clock > 2.0 && ready_set_go == 1) {
+    ready_set_go = 0;
+    phase = RACE_PHASE;
+    clock = 0.0f;
+  } else if (clock > 1.0 && ready_set_go == 2) {
+    ready_set_go = 1;
+  } else if (clock > 0.0 && ready_set_go == 3) {
+    ready_set_go = 2;
+  }
 
-  if ( world->kart[0]->getLap () >= raceSetup.numLaps )
-    {
-      phase = FINISH_PHASE;
-    }
+  /*if all players have finished, or if only one kart is not finished when
+    not in time trial mode, the race is over. Players are the last in the
+    vector, so substracting the number of players finds the first player's
+    position.*/
+  unsigned int finished_karts = 0;
+  unsigned int finished_plyrs = 0;
+  for ( Karts::size_type i = 0; i < kart.size(); ++i)
+  {
+      if ( world->kart[i]->getLap () >= raceSetup.numLaps )
+      {
+          ++finished_karts;
+          if(i >= kart.size() - raceSetup.players.size()) ++finished_plyrs;
+      }
+  }
+  if(finished_plyrs == raceSetup.players.size()) phase = FINISH_PHASE;
+  else if(finished_karts == kart.size() - 1 && raceSetup.mode != RaceSetup::RM_TIME_TRIAL) phase = FINISH_PHASE;
 }
 
 void
@@ -241,7 +248,7 @@ World::updateLapCounter ( int k )
     if ( int(j) == k ) continue ;
 
     if ( kart[j]->getLap() >  kart[k]->getLap() ||
-         ( kart[j]->getLap() == kart[k]->getLap() && 
+         ( kart[j]->getLap() == kart[k]->getLap() &&
            kart[j]->getDistanceDownTrack() >
                             kart[k]->getDistanceDownTrack() ))
       p++ ;
@@ -250,84 +257,53 @@ World::updateLapCounter ( int k )
   kart [ k ] -> setPosition ( p ) ;
 }
 
-void
-World::loadPlayers()
-{
+void World::loadPlayers() {
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
     {
       kart[i]->load_data();
     }
 
-  projectile_spark = ssgLoad("spark.ac");
-  projectile_spark->ref();
-  projectile_missle = ssgLoad("missile.ac");
-  projectile_missle->ref();
-  projectile_flamemissle = ssgLoad("flamemissile.ac");
-  projectile_flamemissle->ref();
-  explode = ssgLoad("explode.ac");
-  explode->ref();
 }
 
-void
-World::herring_command (char *s, char *str )
-{
-  if ( num_herring >= MAX_HERRING )
-  {
-    fprintf ( stderr, "Too many herring\n" ) ;
-    return ;
-  }
- 
-  HerringInstance *h = & herring[num_herring] ;
+void World::herring_command (char *s, char *str ) {
+
   sgVec3 xyz ;
- 
+
   sscanf ( s, "%f,%f", &xyz[0], &xyz[1] ) ;
- 
-  xyz[2] = 1000000.0f ;
+  // The height must be defined here, since getHeight only looks below
+  xyz[2] = 1000000.0f;
   xyz[2] = getHeight ( trackBranch, xyz ) + 0.06 ;
- 
-  sgCoord c ;
- 
-  sgSetVec3  ( c.hpr, 0.0f, 0.0f, 0.0f ) ;
-  sgCopyVec3 ( c.xyz, xyz ) ;
- 
-  if ( str[0]=='Y' || str[0]=='y' ){ h->her = gold_h   ; h->type = HE_GOLD   ;}
-  if ( str[0]=='G' || str[0]=='g' ){ h->her = green_h  ; h->type = HE_GREEN  ;}
-  if ( str[0]=='R' || str[0]=='r' ){ h->her = red_h    ; h->type = HE_RED    ;}
-  if ( str[0]=='S' || str[0]=='s' ){ h->her = silver_h ; h->type = HE_SILVER ;}
- 
-  sgCopyVec3 ( h->xyz, xyz ) ;
-  h->eaten = FALSE ;
-  h->scs   = new ssgTransform ;
-  h->scs -> setTransform ( &c ) ;
-  h->scs -> addKid ( h->her->getRoot () ) ;
-  scene  -> addKid ( h->scs ) ;
 
-  num_herring++ ;
-}
+  herringType type=HE_GREEN;
+  if ( str[0]=='Y' || str[0]=='y' ){ type = HE_GOLD   ;}
+  if ( str[0]=='G' || str[0]=='g' ){ type = HE_GREEN  ;}
+  if ( str[0]=='R' || str[0]=='r' ){ type = HE_RED    ;}
+  if ( str[0]=='S' || str[0]=='s' ){ type = HE_SILVER ;}
+  herring_manager->newHerring(type, xyz);
+}   // herring_command
 
 
-void
-World::loadTrack()
-{
+void World::loadTrack() {
   std::string path = "data/";
   path += track->getIdent();
   path += ".loc";
   path = loader->getPath(path);
-  FILE *fd = fopen (path.c_str(), "r" ) ;
 
-  if ( fd == NULL )
-  {
+  // remove old herrings (from previous race), and remove old
+  // track specific herring models
+  herring_manager->cleanup();
+  herring_manager->loadHerringData(track->getHerringStyle(),
+				   HerringManager::ISTRACKDATA);
+  FILE *fd = fopen (path.c_str(), "r" ) ;
+  if ( fd == NULL ) {
     std::stringstream msg;
     msg << "Can't open track location file '" << path << "'.";
     throw std::runtime_error(msg.str());
   }
 
-  initWorld () ;
-
   char s [ 1024 ] ;
 
-  while ( fgets ( s, 1023, fd ) != NULL )
-  {
+  while ( fgets ( s, 1023, fd ) != NULL ) {
     if ( *s == '#' || *s < ' ' )
       continue ;
 
@@ -341,105 +317,74 @@ World::loadTrack()
     char htype = '\0' ;
 
     if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
-                     &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-    {
+                     &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) {
       herring_command ( & s [ strlen ( "*HERRING," ) ], s ) ;
-    }
-    else
-    if ( s[0] == '\"' )
-    {
+    } else if ( s[0] == '\"' ) {
       if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
-		 fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-			&(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 )
-      {
+		    fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
+		    &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 ) {
 	/* All 6 DOF specified */
-	need_hat = FALSE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]),
-			  &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 6 )
-      {
+	need_hat = FALSE;
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]),
+			   &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 ){
 	/* All 6 DOF specified - but need height */
 	need_hat = TRUE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-			  &(loc.hpr[0]) ) == 5 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
+			   &(loc.hpr[0]) ) == 5 ) {
 	/* No Roll/Pitch specified - assumed zero */
 	need_hat = FALSE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.hpr[0]) ) == 3 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]),
+			   &(loc.hpr[0]) ) == 3 ) {
 	/* All 6 DOF specified - but need height, roll, pitch */
 	need_hat = TRUE ;
 	fit_skin = TRUE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]),
-			  &(loc.hpr[0]) ) == 4 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]),
+			   &(loc.hpr[0]) ) == 4 ) {
 	/* No Roll/Pitch specified - but need height */
 	need_hat = TRUE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]),
+			   &(loc.xyz[2]) ) == 4 ) {
 	/* No Heading/Roll/Pitch specified - but need height */
 	need_hat = FALSE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) {
 	/* No Roll/Pitch specified - but need height */
 	need_hat = TRUE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\",%f,%f",
-		   fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
+			   fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) {
 	/* No Z/Heading/Roll/Pitch specified */
 	need_hat = FALSE ;
-      }
-      else 
-      if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 )
-      {
+      } else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 ) {
 	/* Nothing specified */
 	need_hat = FALSE ;
-      }
-      else
-      {
+      } else {
         fclose(fd);
         std::stringstream msg;
         msg << "Syntax error in '" << path << "': " << s;
         throw std::runtime_error(msg.str());
       }
 
-      if ( need_hat )
-      {
+      if ( need_hat ) {
 	sgVec3 nrm ;
 
 	loc.xyz[2] = 1000.0f ;
 	loc.xyz[2] = getHeightAndNormal ( trackBranch, loc.xyz, nrm ) ;
 
-	if ( fit_skin )
-	{
+	if ( fit_skin ) {
 	  float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
 	  float cy = cos ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
-   
+
 	  loc.hpr[2] =  SG_RADIANS_TO_DEGREES * atan2 ( nrm[0] * cy -
 							nrm[1] * sy, nrm[2] ) ;
 	  loc.hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy +
-							nrm[0] * sy, nrm[2] ) ; 
+							nrm[0] * sy, nrm[2] ) ;
 	}
-      }
+      }   // if need_hat
 
       ssgEntity        *obj   = ssgLoad ( fname, loader ) ;
       ssgRangeSelector *lod   = new ssgRangeSelector ;
@@ -451,24 +396,19 @@ World::loadTrack()
       trans       -> addKid    ( lod   ) ;
       trackBranch -> addKid    ( trans ) ;
       lod         -> setRanges ( r, 2  ) ;
-    }
-    else
-    {
+    } else {
       fclose(fd);
       std::stringstream msg;
       msg << "Syntax error in '" << path << "': " << s;
       throw std::runtime_error(msg.str());
     }
-  }
+  }   // while fgets
 
   fclose ( fd ) ;
 }
 
-void
-World::restartRace()
-{
+void World::restartRace() {
   ready_set_go = 3;
-  finishing_position = -1 ;
   clock = 0.0f;
   phase = START_PHASE;
 
@@ -476,17 +416,13 @@ World::restartRace()
     (*i)->reset() ;
 }
 
-KartDriver*
-World::getKart(int kartId)
-{
+Kart* World::getKart(int kartId) {
   assert(kartId >= 0 && kartId < int(kart.size()));
   return kart[kartId];
 }
 
-KartDriver*
-World::getPlayerKart(int player)
-{
-  return kart[raceSetup.players[player]];
+PlayerKart* World::getPlayerKart(int player) {
+  return (PlayerKart*)kart[raceSetup.players[player]];
 }
 
 /* EOF */

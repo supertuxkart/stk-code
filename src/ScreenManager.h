@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: ScreenManager.h,v 1.2 2005/05/26 09:14:17 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -20,7 +20,7 @@
 #ifndef HEADER_SCREENMANAGER_H
 #define HEADER_SCREENMANAGER_H
 
-#include "Screen.h"
+class Screen;
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
@@ -42,7 +42,7 @@ public:
   void setScreen(Screen* screen);
 };
 
-extern ScreenManager* screenManager;
+extern ScreenManager* screen_manager;
 
 #endif
 

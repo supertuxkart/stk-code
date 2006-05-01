@@ -3,12 +3,12 @@
 (tuxkart-kart
  (name "Eviltux")
  (model "eviltux.ac")
- (icon  "eviltuxicon.png")
- (shadow "tuxkartshadow.png")
+ (icon  "eviltuxicon.rgb")
+ (shadow "tuxkartshadow.rgb")
  
- (red   0.8)
+ (red   0.0)
  (green 0.0)
- (blue  0.0)
+ (blue  0.8)
        
  (max-throttle   100)
  (engine-power   60)
@@ -18,7 +18,7 @@
  (inertia        13)
  (turn-speed     3.1415926535897931)
  (max-wheel-turn 1.5707963267948966)
- (max-grip        0.4)
+ (tire-grip        0.4)
  (air-friction    0.8257))
 
 ;; EOF ;;

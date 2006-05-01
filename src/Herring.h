@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Herring.h,v 1.4 2005/08/19 20:46:40 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,92 +20,33 @@
 #ifndef HEADER_HERRING_H
 #define HEADER_HERRING_H
 
-#include <plib/ssg.h>
- 
-class Shadow;
+#include <plib/sg.h>
 
-class Herring
-{
-  float rotation ;
-  
-  ssgTransform *transform ;
-  ssgTransform *shadow ;
- 
-public:
-  Herring ( sgVec3 colour ) ;
-  Herring ( ssgEntity* model ) ;
-  ~Herring () ;
-  
-  ssgTransform* getRoot () const
-  { return transform; }
+class Kart;
+class ssgTransform;
+class ssgEntity;
 
-  void update () ;
-} ;
+// HE_SILVER must be the last entry, it is used in HerringManager
+enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
  
-class ActiveThingInstance
-{
-public:
-  sgVec3 xyz ;
-  ssgTransform *scs ;
+// ----------------------------------------------------------------------------- 
+class Herring {
+  herringType   type;         // Herring type
+  bool          bEaten;       // true if herring  was eaten & is not displayed
+  float         time_to_return;  // world->clock when an eaten herring reappears
+  sgCoord       coord;        // Original coordinates, used mainly when 
+                              // eaten herrings reappear.
+  ssgTransform* root;         // The actual root of the herring
+  ssgTransform* rotate;       // Just below root is a node only rotating
+  float         rotation;     // Amount of rotation
  
-  ssgTransform *setup ( ssgEntity *thing, sgCoord *pos )
-  {
-    sgCopyVec3 ( xyz, pos->xyz );
- 
-    scs = new ssgTransform ;
-    scs -> setTransform ( pos ) ;
-    scs -> addKid ( thing ) ;
- 
-    return scs ;
-  }
- 
-  ssgTransform *setup ( ssgEntity *thing, sgVec3 pos )
-  {
-    sgCoord c ;
-    sgSetVec3  ( c.hpr, 0.0f, 0.0f, 0.0f ) ;
-    sgCopyVec3 ( c.xyz, pos ) ;
-    return setup ( thing, &c ) ;
-  }
- 
-  int active () { return xyz [ 2 ] > -1000000.0f ; }
- 
-  void getPos ( sgVec3 pos ) { sgCopyVec3 ( pos, xyz ) ; } 
-  void setPos ( sgVec3 pos )
-  {
-    sgCopyVec3 ( xyz, pos ) ;
-    scs -> setTransform ( pos ) ;
-  }
- 
-  virtual void update () = 0 ;
-} ;                                                                             
-
- 
-class HerringInstance : public ActiveThingInstance
-{
-public:
-  Herring *her    ;
-  float    time_to_return ;
-  int      eaten  ;
-  int      type   ;
-  int      effect ;
-  void update () ;
-} ;
-
-extern int num_herring   ;                                                      
-
-#define EFFECT_DEFAULT   0
-#define EFFECT_SPEEDUP   1
-#define EFFECT_ROCKET    2
-
-#define HE_RED           0
-#define HE_GREEN         1
-#define HE_GOLD          2
-#define HE_SILVER        3
- 
-#define MAX_HERRING     50
-
-extern HerringInstance herring [ MAX_HERRING ] ;                             
+ public:
+              Herring   (herringType type, sgVec3 xyz, ssgEntity* model);
+  void        update    (float delta);
+  bool        wasEaten  ()            {return bEaten;}
+  void        isEaten   ();
+  herringType getType   ()            {return type;}
+  int         hitKart   (Kart* kart );
+};   // class Herring
 
 #endif
-
-/* EOF */

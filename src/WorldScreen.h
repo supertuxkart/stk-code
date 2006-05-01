@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: WorldScreen.h,v 1.3 2005/09/30 16:49:03 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,20 +20,21 @@
 #ifndef HEADER_WORLDSCREEN_H
 #define HEADER_WORLDSCREEN_H
 
-#include "Camera.h"
+#include <plib/ul.h>
 #include "Screen.h"
 
-class ulClock;
+
+class Camera;
 class World;
 class RaceSetup;
 
 class WorldScreen : public Screen
 {
 private:
-  /** Delta time that didn't get used in the last run */
-  float overtime;
 
-  ulClock     *fclock ;
+  ulClock fclock ;
+  ulClock frameClock;
+  int     frameCount;
   
   typedef std::vector<Camera*> Cameras;
   Cameras cameras;

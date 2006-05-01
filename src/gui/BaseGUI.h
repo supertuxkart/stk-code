@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: BaseGUI.h,v 1.5 2005/08/19 20:51:47 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +20,7 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
-#include <SDL.h> //this should be "SDL.h" for portability?
+#include <vector>
 
 class RaceSetup;
 
@@ -42,12 +42,15 @@ GUIS_CONFIGP2,
 GUIS_CONFIGP3,
 GUIS_CONFIGP4,
 GUIS_TRACKSEL,
+GUIS_NUMLAPS,
 GUIS_NUMPLAYERS,
 GUIS_RACE,
 GUIS_NEXTRACE,
 GUIS_RACEMENU,
 GUIS_EXITRACE
 };
+
+extern std::vector<GUISwitch> guiStack;
 
 enum MenuOption {
   MENU_SINGLE, MENU_MULTI, MENU_REPLAY, MENU_OPTIONS, MENU_QUIT,
@@ -67,16 +70,17 @@ class BaseGUI
 public:
 	BaseGUI() {}
 	virtual ~BaseGUI() {}
-	
-	virtual void update(float dt) = 0;
+
+    virtual void update(float dt) = 0;
 	virtual void select() = 0;
-	virtual void keybd(const SDL_keysym& key);
-	virtual void point(int x, int y); 
-	virtual void stick(int whichAxis, int value);
-      virtual void joybutton(int whichJoy, int button);
-	
+	virtual void keybd(int key);
+	virtual void point(int x, int y);
+	virtual void stick(const int &whichAxis, const float &value);
+    virtual void joybuttons(int whichJoy, int hold, int presses, int releases);
+
 protected:
 	int menu_id;
 };
 
+extern BaseGUI *gui;
 #endif

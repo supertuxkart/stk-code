@@ -1,4 +1,4 @@
-// $Id$
+// $Id: Config.cxx,v 1.8 2005/09/30 16:42:15 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,97 +18,127 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdexcept>
 
-#include "Config.h"
+// for mkdir:
+#ifndef WIN32
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#endif
 
+#include <plib/pw.h>
+#include <plib/ul.h>
+
+#include "Config.h"
 #include "lisp/Lisp.h"
 #include "lisp/Parser.h"
 #include "lisp/Writer.h"
 
-#include "SDL.h"
+Config *config;
 
-Config config;
-
-Config::Config()
-{
+Config::Config() {
   setDefaults();
-}
+  loadConfig();
+}   // Config
 
-
-Config::Config(const std::string& filename)
-{
+// -----------------------------------------------------------------------------
+Config::Config(const std::string& filename) {
   setDefaults();
   loadConfig(filename);
+}   // Config
+
+
+// -----------------------------------------------------------------------------
+Config::~Config() {
 }
 
-
-Config::~Config()
-{
-}
-
-
-/*set the config filename for this platform*/
-void Config::setFilename()
-{
+// -----------------------------------------------------------------------------
+std::string Config::getConfigDir() {
+  std::string dirname;
 #ifdef WIN32
-  /*creates config file in current working directory*/
-  filename = "tuxkart.cfg";
+  // For now the old windows config way is used: store a config file
+  // in the current directory (in other OS a special subdirectory is created)
+  dirname=".";
 #else
-  /*if HOME environment variable exists
-  create config file as $HOME/.tuxkart/config*/
-  if(getenv("HOME")!=NULL)
-  {
-    filename = getenv("HOME");
-    filename += "/.supertuxkart/config";
+  if(getenv("HOME")!=NULL) {
+    dirname = getenv("HOME");
+  } else{
+    dirname = ".";
   }
+  dirname += "/";
+  dirname += CONFIGDIR;
 #endif
-}
+  return dirname;
+}  // getConfigDir
 
+// -----------------------------------------------------------------------------
+/*set the config filename for this platform*/
+void Config::setFilename() {
+  filename = getConfigDir();
+  filename += "/";
+#ifdef WIN32
+  filename += "tuxkart.cfg";
+#else
+  filename += "config";
+#endif
+}   // setFilename
 
+// -----------------------------------------------------------------------------
 /*load default values for options*/
-void Config::setDefaults()
-{
+void Config::setDefaults() {
   setFilename();
-  fullscreen = false;
-  sound      = true;
-  music      = true;
-  smoke      = false;
-  displayFPS = false;
-  width      = 800;
-  height     = 600;
-  karts      = 4;
+  fullscreen       = false;
+  noStartScreen    = false;
+  sound            = true;
+  music            = true;
+  smoke            = false;
+  displayFPS       = false;
+  singleWindowMenu = false;
+  oldStatusDisplay = false;
+  herringStyle     = "default";
+  disableMagnet    = false;
+  profile          = 0;
+  newPhysics       = 0;
+  oldHOT           = false;
+  useKPH           = false;
+  replayHistory    = false;
+  width            = 800;
+  height           = 600;
+  karts            = 4;
   player[0].setName("Player 1");
   player[1].setName("Player 2");
   player[2].setName("Player 3");
   player[3].setName("Player 4");
+
+  player[0].useJoy = true;
+  player[1].useJoy = false;
+  player[2].useJoy = false;
+  player[3].useJoy = false;
   /*player 1 default keyboard settings*/
-  player[0].keys[KC_LEFT]    = SDLK_LEFT;
-  player[0].keys[KC_RIGHT]   = SDLK_RIGHT;
-  player[0].keys[KC_UP]      = SDLK_UP;
-  player[0].keys[KC_DOWN]    = SDLK_DOWN;
-  player[0].keys[KC_WHEELIE] = SDLK_a;
-  player[0].keys[KC_JUMP]    = SDLK_s;
-  player[0].keys[KC_RESCUE]  = SDLK_d;
-  player[0].keys[KC_FIRE]    = SDLK_f;
+  player[0].keys[KC_LEFT]    = PW_KEY_LEFT;
+  player[0].keys[KC_RIGHT]   = PW_KEY_RIGHT;
+  player[0].keys[KC_UP]      = PW_KEY_UP;
+  player[0].keys[KC_DOWN]    = PW_KEY_DOWN;
+  player[0].keys[KC_WHEELIE] = 'a';
+  player[0].keys[KC_JUMP]    = 's';
+  player[0].keys[KC_RESCUE]  = 'd';
+  player[0].keys[KC_FIRE]    = 'f';
   /*player 1 default joystick settings*/
-  player[0].buttons[KC_UP]      = 0;
+  player[0].buttons[KC_UP]      = 2;
   player[0].buttons[KC_DOWN]    = 1;
-  player[0].buttons[KC_WHEELIE] = 2;
-  player[0].buttons[KC_JUMP]    = 3;
-  player[0].buttons[KC_RESCUE]  = 4;
-  player[0].buttons[KC_FIRE]    = 5;
+  player[0].buttons[KC_WHEELIE] = 0x20;
+  player[0].buttons[KC_JUMP]    = 0x10;
+  player[0].buttons[KC_RESCUE]  = 0x04;
+  player[0].buttons[KC_FIRE]    = 0x08;
   /*player 2 default keyboard settings*/
-  player[1].keys[KC_LEFT]    = SDLK_j;
-  player[1].keys[KC_RIGHT]   = SDLK_l;
-  player[1].keys[KC_UP]      = SDLK_i;
-  player[1].keys[KC_DOWN]    = SDLK_k;
-  player[1].keys[KC_WHEELIE] = SDLK_q;
-  player[1].keys[KC_JUMP]    = SDLK_w;
-  player[1].keys[KC_RESCUE]  = SDLK_e;
-  player[1].keys[KC_FIRE]    = SDLK_r;
+  player[1].keys[KC_LEFT]    = 'j';
+  player[1].keys[KC_RIGHT]   = 'l';
+  player[1].keys[KC_UP]      = 'i';
+  player[1].keys[KC_DOWN]    = 'k';
+  player[1].keys[KC_WHEELIE] = 'q';
+  player[1].keys[KC_JUMP]    = 'w';
+  player[1].keys[KC_RESCUE]  = 'e';
+  player[1].keys[KC_FIRE]    = 'r';
   /*player 2 default joystick settings*/
   player[1].buttons[KC_UP]      = 0;
   player[1].buttons[KC_DOWN]    = 1;
@@ -116,7 +146,7 @@ void Config::setDefaults()
   player[1].buttons[KC_JUMP]    = 3;
   player[1].buttons[KC_RESCUE]  = 4;
   player[1].buttons[KC_FIRE]    = 5;
-  
+
   /*player 3 default joystick settings*/
   player[2].buttons[KC_UP]      = 0;
   player[2].buttons[KC_DOWN]    = 1;
@@ -131,25 +161,58 @@ void Config::setDefaults()
   player[3].buttons[KC_JUMP]    = 3;
   player[3].buttons[KC_RESCUE]  = 4;
   player[3].buttons[KC_FIRE]    = 5;
-}
+}   // setDefaults
 
 
+// -----------------------------------------------------------------------------
 /*load default configuration file for this platform*/
-void Config::loadConfig()
-{
+void Config::loadConfig() {
   loadConfig(filename);
-}
+}   // loadConfig
 
+// -----------------------------------------------------------------------------
+// Checks for existance of the tuxkart configuration directory. If the 
+// directory does not exist, it will be created. Return values:
+// 1: config dir exists
+// 2: does not exist, but was created
+// 0: does not exist, and could not be created.
+int Config::CheckAndCreateDir() {
+  std::string dirname = getConfigDir();
+  ulDir*      u       = ulOpenDir(dirname.c_str());
+  if(u) {  // OK, directory exists
+    ulCloseDir(u);
+    return 1;
+  }
+  // The directory does not exist, try to create it
+  int bError;
+#if defined(WIN32) && !defined(__CYGWIN__)
+  bError = mkdir(dirname.c_str()      ) != 0;
+#else
+  bError = mkdir(dirname.c_str(), 0755) != 0;
+#endif
+  if(bError) {
+    fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
+	    dirname.c_str());
+    return 0;
+  } else {
+    printf("Config directory '%s' successfully created.\n",dirname.c_str());
+    return 2;
+  }
 
+}   // CheckAndCreateDir
+
+// -----------------------------------------------------------------------------
 /*load configuration values from file*/
-void Config::loadConfig(const std::string& filename)
-{
+void Config::loadConfig(const std::string& filename) {
   std::string temp;
   const lisp::Lisp* root = 0;
   int i;
-
-  try
-  {
+  int dirExist = CheckAndCreateDir();
+  // Check if the config directory exists. If not, exit without an error
+  // message, an appropriate message was printed by CheckAndCreateDir
+  if (dirExist != 1) return;
+  
+  try {
     lisp::Parser parser;
     root = parser.parse(filename);
 
@@ -158,32 +221,38 @@ void Config::loadConfig(const std::string& filename)
       throw std::runtime_error("No tuxkart-config node");
 
     /*get toggles*/
-    lisp->get("fullscreen", fullscreen);
-    lisp->get("sound", sound);
-    lisp->get("music", music);
-    lisp->get("smoke", smoke);
-    lisp->get("displayFPS", displayFPS);
+    lisp->get("fullscreen",       fullscreen);
+    lisp->get("sound",            sound);
+    lisp->get("nostartscreen",    noStartScreen);
+    lisp->get("music",            music);
+    lisp->get("smoke",            smoke);
+    lisp->get("displayFPS",       displayFPS);
+    lisp->get("singlewindowmenu", singleWindowMenu);
+    lisp->get("oldStatusDisplay", oldStatusDisplay);
+    lisp->get("herringStyle",     herringStyle);
+    lisp->get("disableMagnet",    disableMagnet);
+    lisp->get("newPhysics",       newPhysics);
+    lisp->get("useKPH",           useKPH);
 
     /*get resolution width/height*/
-    lisp->get("width", width);
-    lisp->get("height", height);
+    lisp->get("width",            width);
+    lisp->get("height",           height);
 
     /*get number of karts*/
     lisp->get("karts", karts);
 
     /*get player configurations*/
-    for(i=0; i<PLAYERS; ++i)
-    {
+    for(i=0; i<PLAYERS; ++i) {
       temp = "player-";
       temp += i+'1';
-      
+
       const lisp::Lisp* reader = lisp->getLisp(temp);
       if(!reader) {
         temp = "No " + temp + " node";
         throw std::runtime_error(temp);
       }
       reader->get("name",     player[i].name);
-      
+
       /*get keyboard configuration*/
       reader->get("left",    player[i].keys[KC_LEFT]);
       reader->get("right",   player[i].keys[KC_RIGHT]);
@@ -202,31 +271,35 @@ void Config::loadConfig(const std::string& filename)
       reader->get("joy-rescue",  player[i].buttons[KC_RESCUE]);
       reader->get("joy-fire",    player[i].buttons[KC_FIRE]);
     }
-  }
-  catch(std::exception& e)
-  {
+  } catch(std::exception& e) {
     std::cout << "Error while parsing config '" << filename
               << "': " << e.what() << "\n";
   }
   delete root;
-}
+}   // loadConfig
 
 
+// -----------------------------------------------------------------------------
 /*call saveConfig w/ the default filename for this platform*/
-void Config::saveConfig()
-{
+void Config::saveConfig() {
   saveConfig(filename);
-}
+}   // saveConfig
 
-
+// -----------------------------------------------------------------------------
 /*write settings to config file*/
-void Config::saveConfig(const std::string& filename)
-{
+void Config::saveConfig(const std::string& filename) {
   std::string temp;
   int i;
 
-  try
-  {
+  int dirExist = CheckAndCreateDir();
+  // Check if the config directory exists (again, since it was already checked 
+  // when reading the config file - this is done in case that the problem was
+  // fixed while tuxkart is running). If the directory does not exist and
+  // can not be created, an error message was already printed to stderr,
+  // and we can exit here without any further messages.
+  if (dirExist == 0) return;
+
+  try {
     lisp::Writer writer(filename);
 
     writer.beginList("tuxkart-config");
@@ -236,6 +309,12 @@ void Config::saveConfig(const std::string& filename)
     writer.write("music\t", music);
     writer.write("smoke\t", smoke);
     writer.write("displayFPS\t", displayFPS);
+    writer.write("singleWindowMenu\t", singleWindowMenu);
+    writer.write("oldStatusDisplay\t", oldStatusDisplay);
+    writer.write("herringStyle\t", herringStyle);
+    writer.write("disableMagnet\t", disableMagnet);
+    writer.write("newPhysics", newPhysics);
+    writer.write("useKPH\t", useKPH);
 
     writer.writeComment("screen resolution");
     writer.write("width\t", width);
@@ -245,8 +324,7 @@ void Config::saveConfig(const std::string& filename)
     writer.write("karts\t", karts);
 
     /*write player configurations*/
-    for(i=0; i<PLAYERS; ++i)
-    {
+    for(i=0; i<PLAYERS; ++i) {
       temp = "player ";
       temp += i+'1';
       temp += " settings";
@@ -254,9 +332,9 @@ void Config::saveConfig(const std::string& filename)
       temp = "player-";
       temp += i+'1';
       writer.beginList(temp);
-      
+
       writer.write("name\t", player[i].name);
-      
+
       writer.writeComment("keyboard layout");
       writer.write("left\t",    player[i].keys[KC_LEFT]);
       writer.write("right\t",   player[i].keys[KC_RIGHT]);
@@ -276,14 +354,12 @@ void Config::saveConfig(const std::string& filename)
       writer.write("joy-fire\t",    player[i].buttons[KC_FIRE]);
 
       writer.endList(temp);
-    }
+    }   // for i
 
     writer.endList("tuxkart-config");
-  }
-  catch(std::exception& e)
-  {
+  } catch(std::exception& e) {
     std::cout << "Couldn't write config: " << e.what() << "\n";
   }
-}
+}   // saveConfig
 
 /*EOF*/

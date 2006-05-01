@@ -1,0 +1,7 @@
+;; -*- mode: lisp -*-
+
+;; nothing specified --> chose the default models
+(herring
+)
+
+;; EOF ;;

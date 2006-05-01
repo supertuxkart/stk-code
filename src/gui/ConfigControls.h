@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: ConfigControls.h,v 1.1 2005/05/25 21:47:54 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -27,7 +27,7 @@ class ConfigControls: public BaseGUI
 public:
 	ConfigControls();
 	~ConfigControls();
-	
+
 	void update(float dt);
 	void select();
 };

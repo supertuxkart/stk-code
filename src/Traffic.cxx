@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Traffic.cxx,v 1.5 2005/08/19 20:51:56 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,15 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tuxkart.h"
+#include "Kart.h"
 #include "constants.h"
-#include "KartDriver.h"
-
-#define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 
-void TrafficDriver::update (float delta)
+
+void TrafficDriver::update (float dt)
 {
   /* Steering algorithm */
 
@@ -42,15 +40,15 @@ void TrafficDriver::update (float delta)
     velocity.hpr[0] = sgnsq(curr_track_coords[0])*12.0f ;
 
   velocity.xyz[1]  = TRAFFIC_VELOCITY ;
-  //velocity.xyz[2] -= GRAVITY * delta ;
+  velocity.xyz[2] -= GRAVITY * dt ;
 
   if ( wheelie_angle != 0.0f )
     wheelie_angle = 0.0f ;
 
-  KartDriver::update (delta) ;
+  Kart::update (dt) ;
 }
 
 void TrafficDriver::doObjectInteractions () {}
 void TrafficDriver::doLapCounting        () {}
-void TrafficDriver::doZipperProcessing   (float delta) {}
+void TrafficDriver::doZipperProcessing   () {}
 

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: RaceMenu.cxx,v 1.2 2005/05/27 10:25:52 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,10 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "RaceMenu.h"
-#include "tuxkart.h"
 #include "World.h"
-#include "StartScreen.h"
-#include "ScreenManager.h"
 #include "WidgetSet.h"
 
 RaceMenu::RaceMenu()
@@ -79,11 +76,11 @@ void RaceMenu::select()
 	}
 }
 
-void RaceMenu::keybd(const SDL_keysym& key)
+void RaceMenu::keybd(int key)
 {
-	switch ( key.sym )
+	switch ( key )
 	{
-	case SDLK_ESCAPE:
+	case 27: //ESC
 		widgetSet -> tgl_paused();
 		guiStack.pop_back();
 		break;

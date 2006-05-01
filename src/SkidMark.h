@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: SkidMark.h 518 2006-01-12 04:54:56Z coz $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -24,57 +24,40 @@
 
 #include <plib/ssg.h>
 
-#if 0
-class SkidMark : public ssgVtxTable
-#endif
-class SkidMark
-{
-public:
-  SkidMark();
-  ~SkidMark();
+class SkidMark {
 
-  // Add a position where the skidmark is
-  void add(sgCoord* coord);
-  //Begin or finish an skidmark
-  void addBreak (sgCoord *coord);
-
-#if 0
-  void recalcBSphere();
-
-  int newSkidmark;
-#endif
-#if 1
+ public:
+        SkidMark();
+       ~SkidMark();
+  void add           (sgCoord* coord);  // Add a position where the skidmark is
+  void addBreak      (sgCoord *coord);   //Begin or finish an skidmark
   bool wasSkidMarking() const;
+
 private:
 
-  class SkidMarkPos : public ssgVtxTable
-  {
+  class SkidMarkPos : public ssgVtxTable {
   public:
-    SkidMarkPos();
-    SkidMarkPos( ssgVertexArray* vertices,
-                 ssgNormalArray* normals,
-                 ssgColourArray* colors,
-                 float global_track_offset);
-    ~SkidMarkPos();
-
+         SkidMarkPos   ();
+         SkidMarkPos  (ssgVertexArray* vertices,
+		       ssgNormalArray* normals,
+		       ssgColourArray* colors,
+		       float global_track_offset);
+         ~SkidMarkPos ();
     void recalcBSphere();
-
-    // Add a position where the skidmark is
-    void add(sgCoord* coord);
-    void addEnd (sgCoord *coord);
+    void add          (sgCoord* coord); // Add a position where the skidmark is
+    void addEnd       (sgCoord *coord);
   private:
-    //Amount of which the skidmark is lifted above the track to avoid
-    //z-buffer errors
-    float track_offset;
-  };
+    float track_offset;                 // Amount of which the skidmark is lifted
+                                        // above the track to avoid z-buffer errors
+  };  // SkidMarkPos
 
   bool SkidMarking;
-  //This is to make Z-fighting between skidmarks less likely, specially
-  //the skidmarks made by the AI
-  static float globalTrackOffset;
+  static float globalTrackOffset;       // This is to make Z-fighting between 
+                                        // skidmarks less likely, specially the
+                                        // skidmarks made by the AI
+
   std::vector <SkidMarkPos *> SkidMarks;
   ssgSimpleState *skidstate;
-#endif
 };
 
 #endif

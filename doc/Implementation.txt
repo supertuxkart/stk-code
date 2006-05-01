@@ -1,0 +1,48 @@
+Some more or less unsorted implementation details. Some comments
+are included in [].
+
+
+1) Collectables
+===============
+A collectable is an object used once in each kart. It stores:
+- a type (e.g. zipper)
+- an icon (displayed in the gui)
+- a number (how many of this items have been collected)
+- can have a model (for missiles etc). 
+The information about collectables is stored in several data files
+(data/*.collectables, and data/*.projectiles). The mapping from
+collectableType to data file is currently hard-coded in 
+CollectableManager (look for initCollectableType and ict).
+
+When a red herring is hit, Collectable::hitRedHerring for
+the collectable being used in the current kart is called. When a
+collectable is used, Collectable::use is called from PlayerKart::update
+or AutoKart::update. 
+
+2) Projectiles
+==============
+Projectiles inherit from Moveables. The projectile_manager
+maintains a dynamical list of unused projectils (deletedProjectils). 
+If a new projectile is needed (because of the use of a collectable):
+- one projectile from this list will be used (and removed from
+  this list) if one is available,
+- otherwise a new one will created.
+The new projectile is added to the list activeProjectiles, see 
+ProjectileManager::newProjectile. When the projectile hits
+something, the 'somethingWasHit' flag gets set. This flag
+get tested after updating (i.e. moving) all projectiles from
+ProjectileManager::update. In case of a hit, a new explosion
+object is used (similarly from either a list of unused explosions
+or created newly, see ProjectileManager::newExplosion), the
+projectile is removed from the scene, and put in the dynamical
+list of available projectils for later reuse (deletedProjectiles).
+The speed and model of the projectile are taken from the
+collectable_manager (who takes this information from the files
+data/*.projectile).
+[Note: this design is a little bit awkward, since not all 
+collectables have/need speed. A more complicated implementation 
+might make the ProjectileManager inherit from the CollectableManager,
+... - but on the other hands, that makes (imho) all further handling
+more complicated: e.g. depending on whether the collectable is
+a missile or not, different managers have to be called ...]
+

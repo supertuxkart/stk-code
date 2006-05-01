@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: KartManager.h,v 1.2 2005/07/14 15:38:05 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -21,7 +21,8 @@
 #define HEADER_KARTMANAGER_H
 
 #include <vector>
-#include "KartProperties.h"
+
+struct KartProperties;
 
 class KartManager
 {
@@ -46,7 +47,7 @@ public:
   void fillWithRandomKarts(std::vector<std::string>& vec);
 };
 
-extern KartManager kart_manager;
+extern KartManager *kart_manager;
 
 #endif
 

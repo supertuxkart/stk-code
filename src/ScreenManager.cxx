@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: ScreenManager.cxx,v 1.3 2005/08/19 20:49:27 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -19,49 +19,42 @@
 
 #include <assert.h>
 #include "ScreenManager.h"
+#include "Screen.h"
 
-ScreenManager* screenManager = 0;
+ScreenManager* screen_manager = 0;
 
-ScreenManager::ScreenManager()
-  : do_abort(false)
-{
+ScreenManager::ScreenManager() : do_abort(false) {
   current_screen = 0;
   next_screen    = 0;
-}
+}  // ScreenManager
 
-ScreenManager::~ScreenManager()
-{
+// -----------------------------------------------------------------------------
+ScreenManager::~ScreenManager() {
   delete next_screen;
   delete current_screen;
-}
+}   // ~ScreenManager
 
-void
-ScreenManager::setScreen(Screen* screen)
-{
+// -----------------------------------------------------------------------------
+void ScreenManager::setScreen(Screen* screen) {
   assert(next_screen == 0);
   next_screen = screen;
-}
+}   // setScreen
 
-void
-ScreenManager::run()
-{
-  while(!do_abort)
-    {
-      if (current_screen)
-        current_screen->update();
+// -----------------------------------------------------------------------------
+void ScreenManager::run() {
+  while(!do_abort) {
+    if (current_screen) current_screen->update();
 
-      if (next_screen)
-        {
-          delete current_screen;
-          current_screen = next_screen;
-          next_screen    = 0;
-        }
-    }
-}
+    if (next_screen) {
+      delete current_screen;
+      current_screen = next_screen;
+      next_screen    = 0;
+    }   // if next_screen
+  }  // while !do_abort
+}   // run
 
-void
-ScreenManager::abort()
-{
+// -----------------------------------------------------------------------------
+void ScreenManager::abort() {
   do_abort = true;
 }
 

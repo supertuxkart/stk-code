@@ -1,0 +1,15 @@
+;; -*- mode: lisp -*-
+
+(herring
+  (silver 
+   (name  "coin")
+   (model "coin.ac")   )
+  (green
+   (name  "banana")
+   (model "banana.ac") )
+  (red
+   (name  "bonusblock")
+   (model "bonusblock.ac") )
+)
+
+;; EOF ;;

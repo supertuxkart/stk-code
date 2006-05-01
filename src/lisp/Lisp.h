@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Lisp.h,v 1.1 2005/05/25 21:48:12 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Matthias Braun <matze@braunis.de>

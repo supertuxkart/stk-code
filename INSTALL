@@ -1,26 +1,44 @@
-SuperTuxKart Installation
-=========================
+TUXKART INSTALLATION INSTRUCTIONS.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+INSTALLATION:
+~~~~~~~~~~~~~
 
 First, make sure that you have the following packages installed:
 
-  * OpenGL (or Mesa 3.0 or later)
-  * PLIB version 1.8.0 or later . 
-  * SDL version 1.2.4 or later
+    * OpenGL (or Mesa 3.0 or later)
+    * PLIB version 1.8.4 or later . 
 
-Then simply run:
+Unpack the files from the tarball like this:
 
-  $ ./configure
-  $ make
+  tar xzf tuxkart-*.tar.gz
+  cd tuxkart-*
 
-You can then run the game from the directory you extracted it to run:
 
-  $ src/tuxkart
+(where '*' is the version of TuxKart you downloaded - eg 0.4.0) ...and then:
 
-or (as 'root') you can install it into /usr/local/share/games/tuxkart
-by typing;
+  ./configure
+  make
 
-  $  make install
 
-See the file README for detailed instructions on how to play the game.
+You can run the game from the directory you downloaded it into - or (as
+'root') you can install it into /usr/local/share/games/tuxkart by typing;
 
-# EOF #
+ make install
+
+
+But it didn't work!
+~~~~~~~~~~~~~~~~~~~
+
+Well, the most common (by FAR) reason for problems is that your OpenGL/Mesa
+is incorrectly installed - so before you complain to any of the PLIB or
+TuxKart mailing lists, first try running one of the example programs
+that comes with your OpenGL implementation - or one of the Mesa or GLUT
+sample programs.
+
+If you those examples run OK - then go to the PLIB home page and download
+the PLIB examples.
+
+If THOSE run correctly - but TuxKart doesn't then please get in touch with
+the TuxKart mailing list and we'll do our best to get you up and racing.
+

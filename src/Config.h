@@ -1,4 +1,4 @@
-// $Id$
+// $Id: Config.h,v 1.6 2005/09/30 16:42:15 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,24 +26,36 @@
 #include "Player.h"
 #include <string>
 
-
+#define CONFIGDIR ".tuxkart"
 /*class for managing general tuxkart configuration data*/
-class Config
-{
+class Config {
   private:
     std::string filename;
 
-    void setFilename();
-
+    void        setFilename      ();
+    int         CheckAndCreateDir();
+    std::string getConfigDir     ();
+    
   public:
-    bool fullscreen;
-    bool sound;
-    bool music;
-    bool smoke;
-    bool displayFPS;
-    int width;
-    int height;
-    int karts;
+    bool   fullscreen;
+    bool   noStartScreen;
+    bool   sound;
+    bool   music;
+    bool   smoke;
+    bool   displayFPS;
+    bool   singleWindowMenu;
+    bool   oldStatusDisplay;
+    int    profile;         // Number of frames to profile, default 500
+                            // -1 if no profiling. Never saved in config file!
+    int    newPhysics;      // true if the new physics should be used.
+    std::string herringStyle;
+    bool   disableMagnet;   // true if a magnet can be dis- and enabled
+    bool   oldHOT;
+    bool   replayHistory;
+    bool   useKPH;
+    int    width;
+    int    height;
+    int    karts;
     Player player[PLAYERS];
 
     Config();
@@ -57,7 +69,7 @@ class Config
 };
 
 
-extern Config config;
+extern Config *config;
 
 #endif
 

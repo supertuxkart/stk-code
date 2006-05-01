@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: MainMenu.cxx,v 1.3 2005/05/31 00:49:50 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,10 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "MainMenu.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
 #include "RaceManager.h"
-#include "StartScreen.h"
 
 MainMenu::MainMenu()
 {
@@ -33,7 +31,7 @@ MainMenu::MainMenu()
 	widgetSet -> state(menu_id, "Quit",  GUI_MED, MENU_QUIT, 0);
         widgetSet -> space(menu_id);
 
-	widgetSet -> layout(menu_id, 0, -1);
+	widgetSet -> layout(menu_id, 0, 0);
 }
 
 MainMenu::~MainMenu()
@@ -52,7 +50,7 @@ void MainMenu::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_SINGLE:	       
-                RaceManager::instance()->setNumPlayers(1);
+                race_manager->setNumPlayers(1);
                 guiStack.push_back(GUIS_GAMEMODE);     
                 break;
 	case MENU_MULTI:
@@ -72,16 +70,16 @@ void MainMenu::select()
 	}
 }
 
-void MainMenu::keybd(const SDL_keysym& key)
+void MainMenu::keybd(int key)
 {
-	switch ( key.sym )
+	switch ( key )
 	{
-	case SDLK_ESCAPE:
-          guiStack.clear();
-	    break;
-		
+	case 27:   //ESC
+	        guiStack.clear();
+		break;
+
 	default:
-		BaseGUI::keybd(key);
+	        BaseGUI::keybd(key);
 		break;
 	}
 }

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: WidgetSet.cxx,v 1.7 2005/09/30 16:46:42 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima
@@ -17,98 +17,35 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+#include <plib/pw.h>
 
-#include "sdldrv.h"
 #include "WidgetSet.h"
-#include "widget_image.h"
 
-#include "tuxkart.h"
 #include "Loader.h"
+#include "Config.h"
 #include "sound.h"
 
+WidgetSet *widgetSet;
 
 WidgetSet::WidgetSet()
 	: active(0), pause_id(0), paused(0)
 {
-	font[0] = NULL;
-	font[1] = NULL;
-	font[2] = NULL;
-
-	const float *c0 = gui_yel;
-	const float *c1 = gui_red;
-
-	int w = getScreenWidth();
-	int h = getScreenHeight();
-	int i, j, s = (h < w) ? h : w;
+	int w   = config->width;
+	int h   = config->height;
+	int s   = (h < w) ? h : w;
+	radius  = s/60;
+	fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	textOut = new fntRenderer();
+	textOut->setFont(fnt);
 
 	/* Initialize font rendering. */
+	memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
 
-	if (TTF_Init() == 0)
-	{
-		memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
-
-		/* Load small, medium, and large typefaces. */
-		std::string path = loader->getPath(GUI_FACE);
-
-		//Neverball sizes:
-		//font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
-		//font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 12);
-		//font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  6);
-		
-		font[GUI_SML] = TTF_OpenFont(path.c_str(), s / 24);
-		font[GUI_MED] = TTF_OpenFont(path.c_str(), s / 15);
-		font[GUI_LRG] = TTF_OpenFont(path.c_str(), s /  10);
-		radius = s / 60;
-
-		/* Initialize the global pause GUI. */
-
-		if ((pause_id = pause(0)))
-			layout(pause_id, 0, 0);
-
-		/* Initialize digit glyphs and lists for counters and clocks. */
-
-		for (i = 0; i < 3; i++)
-		{
-			char text[2];
-
-			/* Draw digits 0 throught 9. */
-
-			for (j = 0; j < 10; j++)
-			{
-				text[0] = '0' + (char) j;
-				text[1] =  0;
-
-				digit_text[i][j] = make_image_from_font(NULL, NULL,
-				                                        &digit_w[i][j],
-				                                        &digit_h[i][j],
-				                                        text, font[i]);
-				digit_list[i][j] = list(-digit_w[i][j] / 2,
-				                        -digit_h[i][j] / 2,
-				                        +digit_w[i][j],
-				                        +digit_h[i][j], c0, c1);
-			}
-
-			/* Draw the colon for the clock. */
-
-			digit_text[i][j] = make_image_from_font(NULL, NULL,
-			                                        &digit_w[i][10],
-			                                        &digit_h[i][10],
-			                                        ":", font[i]);
-			digit_list[i][j] = list(-digit_w[i][10] / 2,
-			                        -digit_h[i][10] / 2,
-			                        +digit_w[i][10],
-			                        +digit_h[i][10], c0, c1);
-		}
-	}
 }
 
 WidgetSet::~WidgetSet()
 {
-	int i, j, id;
+	int id;
 
 	/* Release any remaining widget texture and display list indices. */
 
@@ -117,41 +54,17 @@ WidgetSet::~WidgetSet()
 		if (glIsTexture(widgets[id].text_img))
 			glDeleteTextures(1, &widgets[id].text_img);
 
-		if (glIsList(widgets[id].text_obj))
-			glDeleteLists(widgets[id].text_obj, 1);
 		if (glIsList(widgets[id].rect_obj))
 			glDeleteLists(widgets[id].rect_obj, 1);
 
 		widgets[id].type     = GUI_FREE;
 		widgets[id].text_img = 0;
-		widgets[id].text_obj = 0;
 		widgets[id].rect_obj = 0;
 		widgets[id].cdr      = 0;
 		widgets[id].car      = 0;
 	}
 
-	/* Release all digit textures and display lists. */
-
-	for (i = 0; i < 3; i++)
-		for (j = 0; j < 11; j++)
-		{
-			if (glIsTexture(digit_text[i][j]))
-				glDeleteTextures(1, &digit_text[i][j]);
-
-			if (glIsList(digit_list[i][j]))
-				glDeleteLists(digit_list[i][j], 1);
-		}
-
-	/* Release all loaded fonts and finalize font rendering. */
-
-	if (font[GUI_LRG]) TTF_CloseFont(font[GUI_LRG]);
-	if (font[GUI_MED]) TTF_CloseFont(font[GUI_MED]);
-	if (font[GUI_SML]) TTF_CloseFont(font[GUI_SML]);
-
-	TTF_Quit();
 }
-
-
 
 int WidgetSet::hot(int id)
 {
@@ -160,56 +73,6 @@ int WidgetSet::hot(int id)
 
 
 /*---------------------------------------------------------------------------*/
-/*
- * Initialize a  display list  containing a  rectangle (x, y, w, h) to
- * which a  rendered-font texture  may be applied.   Colors  c0 and c1
- * determine the top-to-bottom color gradiant of the text.
- */
-
-GLuint WidgetSet::list(int x, int y, int w, int h, const float *c0, const float *c1)
-{
-	GLuint list = glGenLists(1);
-
-	GLfloat s0, t0;
-	GLfloat s1, t1;
-
-	int W, H, d = h / 16;
-
-	/* Assume the applied texture size is rect size rounded to power-of-two. */
-
-	image_size(&W, &H, w, h);
-
-	s0 = 0.5f * (W - w) / W;
-	t0 = 0.5f * (H - h) / H;
-	s1 = 1.0f - s0;
-	t1 = 1.0f - t0;
-
-	glNewList(list, GL_COMPILE);
-	{
-		glBegin(GL_QUADS);
-		{
-			glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-			glTexCoord2f(s0, t1); glVertex2i(x     + d, y     - d);
-			glTexCoord2f(s1, t1); glVertex2i(x + w + d, y     - d);
-			glTexCoord2f(s1, t0); glVertex2i(x + w + d, y + h - d);
-			glTexCoord2f(s0, t0); glVertex2i(x     + d, y + h - d);
-
-			glColor4fv(c0);
-			glTexCoord2f(s0, t1); glVertex2i(x,     y);
-			glTexCoord2f(s1, t1); glVertex2i(x + w, y);
-
-			glColor4fv(c1);
-			glTexCoord2f(s1, t0); glVertex2i(x + w, y + h);
-			glTexCoord2f(s0, t0); glVertex2i(x,     y + h);
-		}
-		glEnd();
-	}
-	glEndList();
-
-	return list;
-}
-
-
 /*
  * Initialize a display list containing a rounded-corner rectangle (x,
  * y, w, h).  Generate texture coordinates to properly apply a texture
@@ -238,7 +101,6 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
                 float X  = x     + r - c;
                 float Ya = y + h + ((f & GUI_NW) ? (s - r) : 0);
                 float Yb = y     + ((f & GUI_SW) ? (r - s) : 0);
-
                 glTexCoord2f((X - x) / w, 1 - (Ya - y) / h);
                 glVertex2f(X, Ya);
 
@@ -284,23 +146,24 @@ int WidgetSet::add_widget(int pd, int type)
     /* Find an unused entry in the widget table. */
 
     for (id = 1; id < MAXWIDGETS; id++)
+      {
         if (widgets[id].type == GUI_FREE)
         {
             /* Set the type and default properties. */
 
-            widgets[id].type     = type;
-            widgets[id].token    = 0;
-            widgets[id].value    = 0;
-            widgets[id].size     = 0;
-            widgets[id].rect     = GUI_NW | GUI_SW | GUI_NE | GUI_SE;
-            widgets[id].w        = 0;
-            widgets[id].h        = 0;
-            widgets[id].text_img = 0;
-            widgets[id].text_obj = 0;
-            widgets[id].rect_obj = 0;
-            widgets[id].color0   = gui_wht;
-            widgets[id].color1   = gui_wht;
-            widgets[id].scale    = 1.0f;
+            widgets[id].type       = type;
+            widgets[id].token      = 0;
+            widgets[id].value      = 0;
+            widgets[id].size       = 0;
+            widgets[id].rect       = GUI_NW | GUI_SW | GUI_NE | GUI_SE;
+            widgets[id].w          = 0;
+            widgets[id].h          = 0;
+            widgets[id].text_img   = 0;
+            widgets[id].rect_obj   = 0;
+            widgets[id].color0     = gui_wht;
+            widgets[id].color1     = gui_wht;
+            widgets[id].scale      = 1.0f;
+            widgets[id].count_text = (char*)NULL;
 
             /* Insert the new widget into the parents's widget list. */
 
@@ -317,7 +180,8 @@ int WidgetSet::add_widget(int pd, int type)
             }
 
             return id;
-        }
+	}
+      }   // for i
 
     fprintf(stderr, "Out of widget IDs\n");
 
@@ -334,31 +198,34 @@ int WidgetSet::filler(int pd) { return add_widget(pd, GUI_FILLER); }
 
 void WidgetSet::set_label(int id, const char *text)
 {
-    int w, h;
-
     if (glIsTexture(widgets[id].text_img))
         glDeleteTextures(1, &widgets[id].text_img);
-    if (glIsList(widgets[id].text_obj))
-        glDeleteLists(widgets[id].text_obj, 1);
-
-    widgets[id].text_img = make_image_from_font(NULL, NULL, &w, &h,
-                                               text, font[widgets[id].size]);
-    widgets[id].text_obj = list(-w / 2, -h / 2, w, h,
-                                   widgets[id].color0, widgets[id].color1);
+    float l,r,b,t;
+    fnt->getBBox(text, widgets[id].size, 0, &l, &r, &b, &t);
+    widgets[id].yOffset    = (int)b;
+    widgets[id].text_width = (int)(r-l+0.99);
+    widgets[id]._text      = text;
+    // There is a potential bug here: if the label being set is
+    // larger than the current width, the container (parent) does
+    // not get wider ... the layout will be broken. Unfortunately,
+    // that's somewhat difficult to fix, since layout will in turn
+    // add the radius to width of button (see button_up), ...
+    // So for now we only print a warning:
+    if(widgets[id].text_width > widgets[id].w) {
+      fprintf(stderr,
+     "set_label increased width of parent container, layout will be invalid\n");
+    }
 }
 
-void WidgetSet::set_image(int id, const char *file)
-{
-    if (glIsTexture(widgets[id].text_img))
-        glDeleteTextures(1, &widgets[id].text_img);
-
-    widgets[id].text_img = make_image_from_file(NULL, NULL, NULL, NULL, file);
-}
-
-void WidgetSet::set_count(int id, int value)
-{
-    widgets[id].value = value;
-}
+void WidgetSet::set_count(int id, int value) {
+  widgets[id].value = value;
+  sprintf(widgets[id].count_text,"%d",value);
+  float l,r,b,t;
+  fnt->getBBox(widgets[id].count_text, widgets[id].size, 0, &l, &r, &b, &t);
+  widgets[id].yOffset    = (int)(b);
+  widgets[id].w          = (int)(r-l+0.99);
+  widgets[id].h          = (int)(t-b+0.99);
+}   // set_count
 
 void WidgetSet::set_clock(int id, int value)
 {
@@ -398,10 +265,9 @@ int WidgetSet::image(int pd, const char *file, int w, int h)
 
     if ((id = add_widget(pd, GUI_IMAGE)))
     {
-        widgets[id].text_img = make_image_from_file(NULL, NULL,
-                                                   NULL, NULL, file);
-        widgets[id].w     = w;
-        widgets[id].h     = h;
+      widgets[id].text_img = loader->createTexture((char*)file)->getHandle();
+      widgets[id].w     = w;
+      widgets[id].h     = h;
     }
     return id;
 }
@@ -422,13 +288,21 @@ int WidgetSet::state(int pd, const char *text, int size, int token, int value)
 
     if ((id = add_widget(pd, GUI_STATE)))
     {
-        widgets[id].text_img = make_image_from_font(NULL, NULL,
-                                                   &widgets[id].w,
-                                                   &widgets[id].h,
-                                                   text, font[size]);
-        widgets[id].size  = size;
-        widgets[id].token = token;
-        widgets[id].value = value;
+      widgets[id]._text = text;
+      float l,r,b,t;
+      fnt->getBBox(text, size, 0, &l, &r, &b, &t);
+      // Apparently the font system allows charater to be
+      // under the y=0 line (e.g the character g, p, y)
+      // Since the text will not be centered because of this,
+      // the distance to the baseline y=0 is saved and during
+      // output added to the y location.
+      widgets[id].w          = (int)(r-l+0.99);
+      widgets[id].text_width = widgets[id].w;
+      widgets[id].h          = (int)(t-b+0.99);
+      widgets[id].yOffset    = (int)b - widgets[id].h/4 ;
+      widgets[id].size       = size;
+      widgets[id].token      = token;
+      widgets[id].value      = value;
     }
     return id;
 }
@@ -440,45 +314,50 @@ int WidgetSet::label(int pd, const char *text, int size, int rect, const float *
 
     if ((id = add_widget(pd, GUI_LABEL)))
     {
-        widgets[id].text_img = make_image_from_font(NULL, NULL,
-                                                   &widgets[id].w,
-                                                   &widgets[id].h,
-                                                   text, font[size]);
-        widgets[id].size   = size;
-        widgets[id].color0 = c0 ? c0 : gui_yel;
-        widgets[id].color1 = c1 ? c1 : gui_red;
-        widgets[id].rect   = rect;
+      widgets[id]._text = text;
+      float l,r,b,t;
+      fnt->getBBox(text, size, 0, &l, &r, &b, &t);
+      widgets[id].yOffset    = (int)(b);
+      widgets[id].w          = (int)(r-l+0.99);
+      widgets[id].h          = (int)(t-b+0.99);
+      widgets[id].text_width = widgets[id].w;
+      widgets[id].size       = size;
+      widgets[id].color0     = c0 ? c0 : gui_yel;
+      widgets[id].color1     = c1 ? c1 : gui_red;
+      widgets[id].rect       = rect;
     }
     return id;
 }
+// -----------------------------------------------------------------------------
+int WidgetSet::count(int pd, int value, int size, int rect) {
+    int  id;
 
-int WidgetSet::count(int pd, int value, int size, int rect)
-{
-    int i, id;
-
-    if ((id = add_widget(pd, GUI_COUNT)))
-    {
-        for (i = value; i; i /= 10)
-            widgets[id].w += digit_w[size][0];
-
-        widgets[id].h      = digit_h[size][0];
-        widgets[id].value  = value;
-        widgets[id].size   = size;
-        widgets[id].color0 = gui_yel;
-        widgets[id].color1 = gui_red;
-        widgets[id].rect   = rect;
+    if ((id = add_widget(pd, GUI_COUNT))) {
+      widgets[id].value  = value;
+      widgets[id].size   = size;
+      widgets[id].color0 = gui_yel;
+      widgets[id].color1 = gui_red;
+      widgets[id].rect   = rect;
+      widgets[id].count_text  = new char[20];
+      sprintf(widgets[id].count_text,"%d",value);
+      float l,r,b,t;
+      fnt->getBBox(widgets[id].count_text, size, 0, &l, &r, &b, &t);
+      widgets[id].yOffset    = (int)(b);
+      widgets[id].w          = (int)(r-l+0.99);
+      widgets[id].h          = (int)(t-b+0.99);
     }
     return id;
-}
+}   // count
 
-int WidgetSet::clock(int pd, int value, int size, int rect)
-{
+// -----------------------------------------------------------------------------
+int WidgetSet::clock(int pd, int value, int size, int rect) {
     int id;
 
     if ((id = add_widget(pd, GUI_CLOCK)))
     {
-        widgets[id].w      = digit_w[size][0] * 6;
-        widgets[id].h      = digit_h[size][0];
+      printf("clock: FIXME\n");
+      //widgets[id].w      = digit_w[size][0] * 6;
+      //widgets[id].h      = digit_h[size][0];
         widgets[id].value  = value;
         widgets[id].size   = size;
         widgets[id].color0 = gui_yel;
@@ -499,6 +378,29 @@ int WidgetSet::space(int pd)
     }
     return id;
 }
+void WidgetSet::drawText (const char *text, int sz, int x, int y, 
+			  int red, int green, int blue, 
+			  float scale_x, float scale_y ) {
+  float l,r,t,b;
+  sz = (int)(sz*(scale_x>scale_y ? scale_x:scale_y));
+  fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
+  int w = (int)((r-l+0.99)*scale_x);
+  int h = (int)((t-b+0.99)*scale_y);
+  if(x == SCREEN_CENTERED_TEXT) {
+    x = (config->width - w) / 2;
+  }
+  if(y == SCREEN_CENTERED_TEXT) {
+    y = (config->height - h) / 2;
+  }
+  
+  textOut->begin();
+    textOut->setPointSize(sz);
+    textOut->start2f((GLfloat)x, (GLfloat)y);
+    glColor3ub(red, green, blue);
+    textOut->puts(text);
+  textOut->end();
+}
+
 
 int WidgetSet::pause(int pd)
 {
@@ -657,8 +559,8 @@ void WidgetSet::paused_up(int id)
 
     /* The pause widget fills the screen. */
 
-    widgets[id].w = getScreenWidth();
-    widgets[id].h = getScreenHeight();
+    widgets[id].w = config->width;
+    widgets[id].h = config->height;
 }
 
 void WidgetSet::button_up(int id)
@@ -674,9 +576,9 @@ void WidgetSet::button_up(int id)
 
     /* Padded text elements look a little nicer. */
 
-    if (widgets[id].w < getScreenWidth())
+    if (widgets[id].w < config->width)
         widgets[id].w += radius;
-    if (widgets[id].h < getScreenWidth())
+    if (widgets[id].h < config->height)
         widgets[id].h += radius;
 }
 
@@ -827,22 +729,15 @@ void WidgetSet::button_dn(int id, int x, int y, int w, int h)
 {
     /* Recall stored width and height for text rendering. */
 
-    int W = widgets[id].x;
-    int H = widgets[id].y;
     int R = widgets[id].rect;
     int r = ((widgets[id].type & GUI_TYPE) == GUI_PAUSE ? radius * 4 : radius);
-
-    const float *c0 = widgets[id].color0;
-    const float *c1 = widgets[id].color1;
 
     widgets[id].x = x;
     widgets[id].y = y;
     widgets[id].w = w;
     widgets[id].h = h;
-
     /* Create display lists for the text area and rounded rectangle. */
 
-    widgets[id].text_obj = list(-W / 2, -H / 2, W, H, c0, c1);
     widgets[id].rect_obj = rect(-w / 2, -h / 2, w, h, R, r);
 }
 
@@ -873,14 +768,13 @@ void WidgetSet::layout(int id, int xd, int yd)
 {
     int x, y;
 
-    int w, W = getScreenWidth();
-    int h, H = getScreenHeight();
+    int w, W = config->width;
+    int h, H = config->height;
 
     widget_up(id);
 
     w = widgets[id].w;
     h = widgets[id].h;
-
     if      (xd < 0) x = 0;
     else if (xd > 0) x = (W - w);
     else             x = (W - w) / 2;
@@ -930,10 +824,8 @@ int WidgetSet::activate_widget(int id, int token, int value)
     return id;
 }
 
-int WidgetSet::delete_widget(int id)
-{
-    if (id)
-    {
+int WidgetSet::delete_widget(int id) {
+    if (id) {
         /* Recursively delete all subwidgets. */
 
         delete_widget(widgets[id].cdr);
@@ -944,16 +836,15 @@ int WidgetSet::delete_widget(int id)
         if (glIsTexture(widgets[id].text_img))
             glDeleteTextures(1, &widgets[id].text_img);
 
-        if (glIsList(widgets[id].text_obj))
-            glDeleteLists(widgets[id].text_obj, 1);
         if (glIsList(widgets[id].rect_obj))
             glDeleteLists(widgets[id].rect_obj, 1);
 
         /* Mark this widget unused. */
-
+	if(widgets[id].type==GUI_COUNT) {
+	  delete widgets[id].count_text;
+	}
         widgets[id].type     = GUI_FREE;
         widgets[id].text_img = 0;
-        widgets[id].text_obj = 0;
         widgets[id].rect_obj = 0;
         widgets[id].cdr      = 0;
         widgets[id].car      = 0;
@@ -987,7 +878,6 @@ void WidgetSet::paint_rect(int id, int st)
     if (hot(id))
         i = st | (((widgets[id].value) ? 2 : 0) |
                   ((id == active)     ? 1 : 0));
-
     switch (widgets[id].type & GUI_TYPE)
     {
     case GUI_IMAGE:
@@ -1010,11 +900,10 @@ void WidgetSet::paint_rect(int id, int st)
     default:
 
         /* Draw a leaf's background, colored by widget state. */
-
         glPushMatrix();
         {
-            glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-                         (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
+	  glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
+		       (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
 
             glColor4fv(back[i]);
             glCallList(widgets[id].rect_obj);
@@ -1057,77 +946,39 @@ void WidgetSet::paint_image(int id)
     {
         glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
                      (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
-
+	/* For whatever reasons the icons are upside down, 
+	   so we mirror them back to the right orientation */
         glScalef(widgets[id].scale,
-                 widgets[id].scale,
+                 -widgets[id].scale,
                  widgets[id].scale);
 
         glBindTexture(GL_TEXTURE_2D, widgets[id].text_img);
-        glColor4fv(gui_wht);
+	glColor4fv(gui_wht);
         glCallList(widgets[id].rect_obj);
     }
     glPopMatrix();
 }
 
-void WidgetSet::paint_count(int id)
-{
-    int j, i = widgets[id].size;
-
-    glPushMatrix();
-    {
-        glColor4fv(gui_wht);
-
-        /* Translate to the widget center, and apply the pulse scale. */
-
-        glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-                     (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
-
-        glScalef(widgets[id].scale,
-                 widgets[id].scale,
-                 widgets[id].scale);
-
-        if (widgets[id].value)
-        {
-            /* Translate left by half the total width of the rendered value. */
-
-            for (j = widgets[id].value; j; j /= 10)
-                glTranslatef((GLfloat) +digit_w[i][j % 10] / 2.0f, 0.0f, 0.0f);
-
-            glTranslatef((GLfloat) -digit_w[i][0] / 2.0f, 0.0f, 0.0f);
-
-            /* Render each digit, moving right after each. */
-
-            for (j = widgets[id].value; j; j /= 10)
-            {
-                glBindTexture(GL_TEXTURE_2D, digit_text[i][j % 10]);
-                glCallList(digit_list[i][j % 10]);
-                glTranslatef((GLfloat) -digit_w[i][j % 10], 0.0f, 0.0f);
-            }
-        }
-        else
-        {
-            /* If the value is zero, just display a zero in place. */
-
-            glBindTexture(GL_TEXTURE_2D, digit_text[i][0]);
-            glCallList(digit_list[i][0]);
-        }
-    }
-    glPopMatrix();
-}
+void WidgetSet::paint_count(int id) {
+  drawText(widgets[id].count_text, widgets[id].size, widgets[id].x,widgets[id].y,
+	   255,255,255,1.0, 1.0);
+  return;
+}   // paint_count
 
 void WidgetSet::paint_clock(int id)
 {
-    int i  =   widgets[id].size;
-    int mt =  (widgets[id].value / 6000) / 10;
-    int mo =  (widgets[id].value / 6000) % 10;
-    int st = ((widgets[id].value % 6000) / 100) / 10;
-    int so = ((widgets[id].value % 6000) / 100) % 10;
-    int ht = ((widgets[id].value % 6000) % 100) / 10;
-    int ho = ((widgets[id].value % 6000) % 100) % 10;
+  //int i  =   widgets[id].size;
+  int mt =  (widgets[id].value / 6000) / 10;
+  //int mo =  (widgets[id].value / 6000) % 10;
+  //int st = ((widgets[id].value % 6000) / 100) / 10;
+  //int so = ((widgets[id].value % 6000) / 100) % 10;
+  //int ht = ((widgets[id].value % 6000) % 100) / 10;
+  //int ho = ((widgets[id].value % 6000) % 100) % 10;
 
-    GLfloat dx_large = (GLfloat) digit_w[i][0];
-    GLfloat dx_small = (GLfloat) digit_w[i][0] * 0.75f;
+    GLfloat dx_large=1.0;// FIXME = (GLfloat) digit_w[i][0];
+    GLfloat dx_small=0.1;// = (GLfloat) digit_w[i][0] * 0.75f;
 
+    printf("paint_clock: FIXME\n");
     glPushMatrix();
     {
         glColor4fv(gui_wht);
@@ -1152,41 +1003,41 @@ void WidgetSet::paint_clock(int id)
 
         if (mt > 0)
         {
-            glBindTexture(GL_TEXTURE_2D, digit_text[i][mt]);
-            glCallList(digit_list[i][mt]);
-            glTranslatef(dx_large, 0.0f, 0.0f);
+	  //glBindTexture(GL_TEXTURE_2D, digit_text[i][mt]);
+	  // glCallList(digit_list[i][mt]);
+	  // glTranslatef(dx_large, 0.0f, 0.0f);
         }
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][mo]);
-        glCallList(digit_list[i][mo]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][mo]);
+        //glCallList(digit_list[i][mo]);
         glTranslatef(dx_small, 0.0f, 0.0f);
 
         /* Render the colon. */
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][10]);
-        glCallList(digit_list[i][10]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][10]);
+        //glCallList(digit_list[i][10]);
         glTranslatef(dx_small, 0.0f, 0.0f);
 
         /* Render the seconds counter. */
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][st]);
-        glCallList(digit_list[i][st]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][st]);
+        //glCallList(digit_list[i][st]);
         glTranslatef(dx_large, 0.0f, 0.0f);
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][so]);
-        glCallList(digit_list[i][so]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][so]);
+        //glCallList(digit_list[i][so]);
         glTranslatef(dx_small, 0.0f, 0.0f);
 
         /* Render hundredths counter half size. */
 
         glScalef(0.5f, 0.5f, 1.0f);
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][ht]);
-        glCallList(digit_list[i][ht]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][ht]);
+        //glCallList(digit_list[i][ht]);
         glTranslatef(dx_large, 0.0f, 0.0f);
 
-        glBindTexture(GL_TEXTURE_2D, digit_text[i][ho]);
-        glCallList(digit_list[i][ho]);
+        //glBindTexture(GL_TEXTURE_2D, digit_text[i][ho]);
+        //glCallList(digit_list[i][ho]);
     }
     glPopMatrix();
 }
@@ -1197,15 +1048,19 @@ void WidgetSet::paint_label(int id)
 
     glPushMatrix();
     {
-        glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-                     (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
+      // These offsets are rather horrible, but at least they
+      // seem to give the right visuals
+      glTranslatef((GLfloat) (widgets[id].x + widgets[id].w+
+			      (radius-widgets[id].text_width)/2),
+		   (GLfloat) (widgets[id].y + (widgets[id].h-radius)/2), 0.f);
 
-        glScalef(widgets[id].scale,
-                 widgets[id].scale,
-                 widgets[id].scale);
-
-        glBindTexture(GL_TEXTURE_2D, widgets[id].text_img);
-        glCallList(widgets[id].text_obj);
+      glScalef(widgets[id].scale, widgets[id].scale, widgets[id].scale);
+      textOut->begin(); {
+	    textOut->setPointSize(widgets[id].size);
+        textOut->start2f((GLfloat)-widgets[id].w/2 , (GLfloat)widgets[id].yOffset);
+        textOut->puts(widgets[id]._text);
+      }
+      textOut->end();
     }
     glPopMatrix();
 }
@@ -1240,20 +1095,23 @@ void WidgetSet::paint(int id)
 	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_CULL_FACE  ) ;
 
 	glPushAttrib(GL_TEXTURE_BIT);
 	{
-		glDisable(GL_TEXTURE_2D);
-		paint_rect(id, 0);
+	  glDisable(GL_TEXTURE_2D);
+	  paint_rect(id, 0);
 	}
 	glPopAttrib();
 
-	//this isn't here in the Neverball code, it's somewhere in Neverball's main code, however it is neccessary
-	//for fonts to be displayed
-	glEnable(GL_TEXTURE_2D);
-	
+	// Makes the font white ... not sure how to get 
+	if(widgets[id].color0) {
+	  glColor4fv(widgets[id].color0);
+	} else {
+	  glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
+	  glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f });
+	}
 	paint_text(id);
 
         config_pop_matrix();
@@ -1482,13 +1340,14 @@ int WidgetSet::stick_U(int id, int dd)
 
     /* Find a widget above widget dd. */
 
-    if (vert_test(dd, id))
+    if (vert_test(dd, id)) {
         return id;
-
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
-        if ((kd = stick_U(jd, dd)))
+    }
+    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr) {
+      if ((kd = stick_U(jd, dd))) {
             return kd;
-
+      }
+    }
     return 0;
 }
 
@@ -1497,31 +1356,40 @@ int WidgetSet::stick(int id, int whichAxis, int value)
 {
     /* Flag the axes to prevent uncontrolled scrolling. */
 
-    static int xflag = 1;
-    static int yflag = 1;
+    static int x_not_pressed = 1;
+    static int y_not_pressed = 1;
 
     int jd = 0;
 
     /* Find a new active widget in the direction of joystick motion. */
-    
+
     if (whichAxis == 0)
     {
-        if (-JOY_MID <= value && value <= +JOY_MID)
-            xflag = 1;
-        else if (value < -JOY_MID && xflag && (jd = stick_L(id, active)))
-            xflag = 0;
-        else if (value > +JOY_MID && xflag && (jd = stick_R(id, active)))
-            xflag = 0;
+        if(value == 0) x_not_pressed = 1;
+        else if(value == -1 && x_not_pressed)
+        {
+            jd = stick_L(id, active);
+            x_not_pressed = 0;
+        }
+        else if (value == 1 && x_not_pressed)
+        {
+            jd = stick_R(id, active);
+            x_not_pressed = 0;
+        }
     }
-    
-    else //whichAxis must equal 1
+    else if(whichAxis == 1)
     {
-        if (-JOY_MID <= value && value <= +JOY_MID)
-            yflag = 1;
-        else if (value < -JOY_MID && yflag && (jd = stick_U(id, active)))
-            yflag = 0;
-        else if (value > +JOY_MID && yflag && (jd = stick_D(id, active)))
-            yflag = 0;
+        if(value == 0) y_not_pressed = 1;
+        else if(value == -1 && y_not_pressed)
+        {
+            jd = stick_U(id, active);
+            y_not_pressed = 0;
+        }
+        else if (value == 1 && y_not_pressed)
+        {
+            jd = stick_D(id, active);
+            y_not_pressed = 0;
+        }
     }
 
     /* If the active widget has changed, return the new active id. */
@@ -1532,16 +1400,16 @@ int WidgetSet::stick(int id, int whichAxis, int value)
         return active = jd;
 }
 
-int WidgetSet::cursor(int id, SDLKey key)
+int WidgetSet::cursor(int id, int key)
 {
 	int jd = 0;
-	
+
 	switch (key)
 	{
-	case SDLK_LEFT: jd = stick_L(id, active); break;
-	case SDLK_RIGHT: jd = stick_R(id, active); break;
-	case SDLK_UP: jd = stick_U(id, active); break;
-	case SDLK_DOWN: jd = stick_D(id, active); break;
+	case PW_KEY_LEFT:  jd = stick_L(id, active); break;
+	case PW_KEY_RIGHT: jd = stick_R(id, active); break;
+	case PW_KEY_UP:    jd = stick_U(id, active); break;
+	case PW_KEY_DOWN:  jd = stick_D(id, active); break;
 	default: return 0;
 	}
 	
@@ -1568,7 +1436,7 @@ void WidgetSet::set_paused()
 
 void WidgetSet::clr_paused()
 {
-	 sound -> resume_music() ;
+	sound -> resume_music() ;
     paused = false;
 }
 
@@ -1590,8 +1458,7 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
     GLdouble s = sin(r);
     GLdouble c = cos(r) / s;
 
-    GLdouble a = ((GLdouble) getScreenWidth() / 
-                  (GLdouble) getScreenHeight());
+    GLdouble a = (GLdouble)config->width/(GLdouble)config->height;
 
     glMatrixMode(GL_PROJECTION);
     {
@@ -1622,8 +1489,8 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
 
 void WidgetSet::config_push_ortho()
 {
-    GLdouble w = (GLdouble) getScreenWidth();
-    GLdouble h = (GLdouble) getScreenHeight();
+  GLdouble w = (GLdouble) config->width;
+  GLdouble h = (GLdouble) config->height;
 
     glMatrixMode(GL_PROJECTION);
     {
@@ -1643,21 +1510,6 @@ void WidgetSet::config_pop_matrix()
     glMatrixMode(GL_MODELVIEW);
 }
 
-void WidgetSet::config_clear()
-{
-/* CONFIG REFLECTION not defined in tuxkart, and in fact this entire function is never used. 
-All this code is originally from Neverball
-    if (option_d[CONFIG_REFLECTION])
-        glClear(GL_COLOR_BUFFER_BIT |
-                GL_DEPTH_BUFFER_BIT |
-                GL_STENCIL_BUFFER_BIT);
-		    else
-		    */
-    
-        glClear(GL_COLOR_BUFFER_BIT |
-                GL_DEPTH_BUFFER_BIT);
-}
-	
 /*---------------------------------------------------------------------------*/
 
 

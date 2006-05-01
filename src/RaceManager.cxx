@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: RaceManager.cxx,v 1.6 2005/08/23 19:57:16 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,10 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>
 #include <iostream>
-#include <algorithm>
-#include "tuxkart.h"
 #include "Loader.h"
 #include "TrackManager.h"
 #include "RaceSetup.h"
@@ -29,27 +26,36 @@
 #include "WorldScreen.h"
 #include "KartManager.h"
 #include "RaceManager.h"
+#include "gui/BaseGUI.h"
 
-RaceManager* RaceManager::instance_ = 0;
+RaceManager* race_manager=0;
 
 GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_, 
                              const CupData& cup_,
                              RaceDifficulty difficulty_, 
                              int numKarts_)
-  : difficulty(difficulty_), numKarts(numKarts_), players(players_), cup(cup_)
+  : difficulty(difficulty_), numKarts(numKarts_), players(players_),
+    cup(cup_), track(0)
 {
-  // Decide which karts should be used in the GrandPrix
-  std::vector<std::string> karts;
-  karts.resize(6);
-  for(int i = 0; i < int(players.size()); ++i)
-    karts[5-i] = players[i]; // Players starts last in the first race
-  kart_manager.fillWithRandomKarts(karts);
 
-  stat.race = 0;
-  for(int i = 0; i < int(karts.size()); ++i)
-    {
-      stat.karts.push_back(GrandPrixSetup::Stat(karts[i], 0, i));
-    }
+  std::vector<std::string> kart_names;
+  kart_names.resize(numKarts);
+
+  const int numPlayers = players.size();
+  for(int i = 0; i < numPlayers; ++i){
+    /*Players position is behind the AI in the first race*/
+    kart_names[numKarts-1 - i] = players[numPlayers - 1 - i];
+  }
+
+  kart_manager->fillWithRandomKarts(kart_names);
+
+  const int numAIKarts = numKarts - numPlayers;
+  //Add the AI karts
+  for(int i = 0; i < numAIKarts; ++i)
+      karts.push_back(KartStatus(kart_names[i], 0, i, numPlayers));
+  //Add the player karts
+  for(int i = 0; i < numPlayers; ++i)
+      karts.push_back(KartStatus(kart_names[i+numAIKarts], 0, i+numAIKarts, i));
 }
 
 void
@@ -59,63 +65,56 @@ GrandPrixMode::start_race(int n)
 
   raceSetup.mode       = RaceSetup::RM_GRAND_PRIX;
   raceSetup.difficulty = difficulty;
-  raceSetup.numLaps    = 3; 
+  raceSetup.numLaps    = 3;
   raceSetup.track      = cup.tracks[n];
 
-  raceSetup.karts.resize(stat.karts.size());
+  raceSetup.karts.resize(karts.size());
   raceSetup.players.resize(players.size());
-  // FIXME: This still isn't really good enough, can't handle multiple of the same kart and stuff
-  for(int i = 0; i < int(stat.karts.size()); ++i)
+
+  
+  for(int i = 0; i < int(karts.size()); ++i)
     {
-      raceSetup.karts[stat.karts[i].position] = stat.karts[i].ident;
-      std::vector<std::string>::iterator j = std::find(players.begin(), players.end(), stat.karts[i].ident);
-      if (j != players.end())
+      raceSetup.karts[karts[i].prev_finish_pos] = karts[i].ident;
+      if (karts[i].player < int(players.size()))
         {
-          raceSetup.players[j - players.begin()] = i;
+          raceSetup.players[karts[i].player] = i;
         }
     }
 
-  screenManager->setScreen(new WorldScreen(raceSetup)); 
+  screen_manager->setScreen(new WorldScreen(raceSetup));
 }
 
 void
 GrandPrixMode::start()
 {
-  stat.race = 0;
-  start_race(stat.race);
+//FIXME: Is this needed?
+//track = 0;
+  start_race(track);
 }
 
 void
 GrandPrixMode::next()
 {
-  stat.race += 1;
+  track += 1;
 
-  if (guiStack.back() == GUIS_NEXTRACE)
-      if (stat.race	< int(cup.tracks.size()))
-	    {
-	      start_race(stat.race);
-	    }
-      else
-	    {
-	  // FIXME:	Insert credits/extro stuff here
-	      startScreen =	new	StartScreen();
-	      screenManager->setScreen(startScreen); 
-	    }
-  else
+
+ if( guiStack.back() == GUIS_NEXTRACE )
+   if( track < int ( cup.tracks.size() ) ) start_race(track);
+   else
     {
-      startScreen =	new	StartScreen();
-	  screenManager->setScreen(startScreen); 
+      // FIXME: Insert credits/extro stuff here
+      startScreen = new StartScreen();
+      screen_manager->setScreen(startScreen); 
     }
-  
-
 }
 
 
 QuickRaceMode::QuickRaceMode(const std::string& track_, 
                              const std::vector<std::string>& players_, 
                              RaceDifficulty difficulty_, 
-                             int numKarts_)
-  : track(track_), players(players_), difficulty(difficulty_), numKarts(numKarts_)
+                             int numKarts_, int numLaps_)
+  : track(track_), players(players_), difficulty(difficulty_), 
+    numKarts(numKarts_), numLaps(numLaps_)
 {}
 
 void
@@ -123,28 +122,29 @@ QuickRaceMode::start()
 {
   RaceSetup raceSetup;
 
-
   raceSetup.mode       = RaceSetup::RM_QUICK_RACE;
   raceSetup.difficulty = difficulty;
-  raceSetup.track = track;
+  raceSetup.track      = track;
+  raceSetup.numLaps    = numLaps;
   raceSetup.karts.resize(numKarts);
 
+  int first_player = numKarts - players.size();
   for(int i = 0; i < int(players.size()); ++i)
     {
-      raceSetup.karts[numKarts-i-1] = players[i]; // Players starts last in the first race
-      raceSetup.players.push_back(numKarts-i-1);
+      raceSetup.karts[first_player + i] = players[i]; // Players starts last in the first race
+      raceSetup.players.push_back(first_player + i);
     }
-  
-  kart_manager.fillWithRandomKarts(raceSetup.karts);
-  
-  screenManager->setScreen(new WorldScreen(raceSetup));
+
+  kart_manager->fillWithRandomKarts(raceSetup.karts);
+
+  screen_manager->setScreen(new WorldScreen(raceSetup));
 }
 
 void
 QuickRaceMode::next()
 {
   startScreen = new StartScreen();
-  screenManager->setScreen(startScreen);
+  screen_manager->setScreen(startScreen);
 }
 
 TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_)
@@ -156,18 +156,19 @@ TimeTrialMode::start()
 {
   RaceSetup raceSetup;
 
+  raceSetup.mode       = RaceSetup::RM_TIME_TRIAL;
   raceSetup.track = track;
   raceSetup.karts.push_back(kart);
   raceSetup.players.push_back(0);
 
-  screenManager->setScreen(new WorldScreen(raceSetup));
+  screen_manager->setScreen(new WorldScreen(raceSetup));
 }
 
 void
 TimeTrialMode::next()
 {
   startScreen = new StartScreen();
-  screenManager->setScreen(startScreen);
+  screen_manager->setScreen(startScreen);
 }
 
 RaceManager::RaceManager()
@@ -218,12 +219,6 @@ RaceManager::setTrack(const std::string& track_)
   track = track_;
 }
 
-int
-RaceManager::getNumPlayers() const
-{
-  return players.size();
-}
-
 void
 RaceManager::setNumPlayers(int num)
 {
@@ -242,6 +237,23 @@ RaceManager::setNumKarts(int i)
 {
   numKarts = i;
 }
+void
+RaceManager::setNumLaps(int num)
+{
+  numLaps=num;
+}
+
+void
+RaceManager::setMirror()
+{
+  // FIXME
+}
+
+void
+RaceManager::setReverse()
+{
+  // FIXME
+}
 
 void 
 RaceManager::start()
@@ -252,13 +264,15 @@ RaceManager::start()
   switch(race_mode)
     {
     case RaceSetup::RM_GRAND_PRIX:
-      mode = new GrandPrixMode(players, CupData(loader->getPath("data/herring.cup")), difficulty, numKarts);
+      mode = new GrandPrixMode(players, 
+			       CupData("data/herring.cup"),
+			       difficulty, numKarts);
       break;
     case RaceSetup::RM_TIME_TRIAL:
       mode = new TimeTrialMode(track, players[0]);
       break;
     case RaceSetup::RM_QUICK_RACE:
-      mode = new QuickRaceMode(track, players, difficulty, numKarts);
+      mode = new QuickRaceMode(track, players, difficulty, numKarts, numLaps);
       break;
     default:
       assert(!"Unknown game mode");
@@ -272,24 +286,6 @@ RaceManager::next()
 { 
   assert(mode);
   mode->next();
-}
-
-void
-RaceManager::setNumLaps(int num)
-{
-  (void)num;
-}
-
-void
-RaceManager::setMirror()
-{
-  // FIXME
-}
-
-void
-RaceManager::setReverse()
-{
-  // FIXME
 }
 
 /* EOF */

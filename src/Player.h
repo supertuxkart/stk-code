@@ -1,4 +1,4 @@
-// $Id$
+// $Id: Player.h,v 1.2 2005/07/13 17:18:53 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,14 +22,17 @@
 
 #include <string>
 
-enum KartControl { KC_LEFT,
-                   KC_RIGHT,
-                   KC_UP,
-                   KC_DOWN,
-                   KC_WHEELIE,
-                   KC_JUMP,
-                   KC_RESCUE,
-                   KC_FIRE };
+// Some part (e.g. gui/PlayerControls) depend on KC_LEFT being the first
+// entry, and KC_FIRE being the last - so any action added should be
+// added in between those two values.
+enum KartActions { KC_LEFT,
+		   KC_RIGHT,
+		   KC_UP,
+		   KC_DOWN,
+		   KC_WHEELIE,
+		   KC_JUMP,
+		   KC_RESCUE,
+		   KC_FIRE };
 
 /*class for managing player name and control configuration*/
 class Player
@@ -40,20 +43,11 @@ public:
     int keys[8]; //keyboard keymap and joystick button map
     int buttons[8];
 
-    Player();
-    Player(const std::string &name);
-    void setName(const std::string &name);
-    void setKeys(bool joystick,
-                 int left,
-                 int right,
-                 int up,
-                 int down,
-                 int wheelie,
-                 int jump,
-                 int rescue,
-                 int fire);
-    void setKey(KartControl action, int key);
-    void setButton(KartControl action, int button);
+    Player(){}
+    Player(const std::string &name_):name(name_){}
+    void setName(const std::string &name_){name = name_;}
+    void setKey(KartActions action, int key){keys[action]=key;}
+    void setButton(KartActions action, int button){buttons[action]=button;}
 };
 
 #endif

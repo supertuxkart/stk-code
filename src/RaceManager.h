@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: RaceManager.h,v 1.4 2005/08/23 19:56:17 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,18 +20,20 @@
 #ifndef HEADER_RACEMANAGER_H
 #define HEADER_RACEMANAGER_H
 
-#include "GrandPrixSetup.h"
+#include <vector>
+#include <string>
+
 #include "RaceSetup.h"
+#include "CupData.h"
 
 class RaceMode
 {
 public:
-  /** Start the mode and go into the first race */
-  virtual void start() =0;
-
-  /** Do the 'next thing' after the race is finished, ie. return to
-      the start screen or start a new race */
-  virtual void next() =0;
+  virtual      ~RaceMode() {};	// avoid compiler warning
+  virtual void start()    = 0;  // Start the mode and go into the first race 
+  virtual void next ()    = 0;  // Do the 'next thing' after the race is 
+                                // finished, ie. return to the start screen or
+                                // start a new race
 };
 
 class GrandPrixMode : public RaceMode
@@ -41,10 +43,26 @@ private:
 
   RaceDifficulty difficulty;
   int numKarts;
+
+  struct KartStatus
+  {
+      std::string ident;//The .tkkf filename without the .tkkf
+      int score;
+      int prev_finish_pos;
+      int player;//Which player controls the kart, for the AI this is
+                 //the number of players.
+
+      KartStatus(const std::string& ident_, const int& score_,
+                 const int& prev_finish_pos_, const int& player_) :
+          ident(ident_), score(score_), prev_finish_pos(prev_finish_pos_),
+          player(player_) {}
+  };
+
 public:
   std::vector<std::string> players;
   CupData cup;
-  GrandPrixSetup stat;
+  std::vector<KartStatus> karts;
+  int track;
 
   GrandPrixMode(const std::vector<std::string>& players_, 
                 const CupData& cup_,
@@ -62,12 +80,12 @@ public:
   std::string track;
   std::vector<std::string> players;
   RaceDifficulty difficulty;
-  int numKarts;
+  int numKarts, numLaps;
 
   QuickRaceMode(const std::string& track_, 
                 const std::vector<std::string>& players_, 
                 RaceDifficulty difficulty_,
-                int numKarts);
+                int numKarts, int numLaps);
   virtual ~QuickRaceMode() {}
 
   void start();
@@ -92,36 +110,34 @@ public:
     grandprix or similar stuff */
 class RaceManager
 {
-private:
-  static RaceManager* instance_;
 public:
-  static RaceManager* instance() { return instance_ ? instance_ : (instance_ = new RaceManager()); }
 
 private:
-  RaceMode*       mode;
-
-  RaceDifficulty difficulty;
-  RaceSetup::RaceMode race_mode;
+  RaceMode*                        mode;
+  RaceDifficulty                   difficulty;
+  RaceSetup::RaceMode              race_mode;
   typedef std::vector<std::string> Players;
-  Players players;
-  std::string track;
-  
-  int numKarts;
+  Players                          players;
+  std::string                      track;
+  int                              numLaps;
+  int                              numKarts;
+
 public:
   RaceManager();
 
   RaceSetup::RaceMode getRaceMode() const;
-  int getNumPlayers() const;
 
   void setNumKarts(int i);
-  int  getNumKarts() const { return numKarts; }
+  int  getNumKarts() const   { return numKarts; }
+  void setNumPlayers(int num);
+  int  getNumPlayers() const {return players.size();}
+  void setNumLaps(int num);
+  int  getNumLaps() const    {return numLaps;}
   void setTrack(const std::string& track);
   void setRaceMode(RaceSetup::RaceMode mode);
   void setDifficulty(RaceDifficulty difficulty_);
   void setPlayerKart(int player, const std::string& kart);
-  void setNumPlayers(int num);
 
-  void setNumLaps(int num);
   void setMirror();
   void setReverse();
   void start();
@@ -131,6 +147,7 @@ public:
   void next();
 };
 
+extern RaceManager *race_manager;
 #endif
 
 /* EOF */

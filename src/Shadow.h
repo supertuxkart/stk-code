@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Shadow.h,v 1.1 2005/05/25 21:52:09 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,8 @@
 #define HEADER_SHADOW_H
 
 #include <string>
-#include <plib/ssg.h>
+
+class ssgTransform;
 
 ssgTransform* createShadow(const std::string& name,
     float x1, float x2, float y1, float y2 );

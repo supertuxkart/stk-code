@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: RaceResultsGUI.h,v 1.1 2005/05/25 21:47:54 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -21,7 +21,6 @@
 #define HEADER_RACERESULTSGUI_H
 
 #include "BaseGUI.h"
-#include "material.h"
 
 /** GUI that shows the RaceResults, times and such */
 class RaceResultsGUI : public BaseGUI

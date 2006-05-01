@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Oliver's Math Class"))
+ (name "Oliver's Math Class")
+ (music "mods/Boom_boom_boom.mod"))
 
 ;; EOF ;;
 

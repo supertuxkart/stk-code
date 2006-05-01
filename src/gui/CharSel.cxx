@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: CharSel.cxx,v 1.7 2005/07/27 08:08:53 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,19 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <set>
-#include <iostream>
-#include "sdldrv.h"
 #include "Loader.h"
 #include "CharSel.h"
-#include "tuxkart.h"
-#include "Loader.h"
-#include "material.h"
 #include "KartManager.h"
 #include "preprocessor.h"
 #include "WidgetSet.h"
 #include "RaceManager.h"
 #include "StartScreen.h"
+#include "Config.h"
 
 CharSel::CharSel(int whichPlayer)
   : kart(0), playerIndex(whichPlayer)
@@ -44,7 +39,7 @@ CharSel::CharSel(int whichPlayer)
         oldContext->makeCurrent();
 
 	menu_id = widgetSet -> vstack(0);
-	char output[60];
+	static char output[60];
 	sprintf(output, "Player %d, choose your character", playerIndex + 1);
 	widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> space(menu_id);
@@ -54,42 +49,49 @@ CharSel::CharSel(int whichPlayer)
 	int va = widgetSet -> varray(ha);
 
 	int icon_size = 64;
+	/* plib keeps track of textures which are already loaded.
+	   Since the icons are deleted, the texture 'cache' needs
+	   to be cleared. This problem actually appears only if
+	   in the next menu (track) ESC is pressed and control
+	   returns to this menu: all icons are simply white then.
+	   Clearing the texture cache can either be done with:
+	   loader->shared_textures.removeAll(); or
+	   loader->endLoad(); which calls removeAll() */
+    loader->shared_textures.removeAll();   // remove cached textures
 
 	int row1 = widgetSet -> harray(va);
 	for(KartManager::KartPropertiesVector::size_type i = 0;
-            i < kart_manager.karts.size(); ++i)
+            i < kart_manager->karts.size(); ++i)
 	{
-		//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
-		int c = widgetSet -> image(row1,
-                    loader->getPath(
-                      "images/" + kart_manager.karts[i]->icon_file).c_str(),
-                    icon_size, icon_size);
-		widgetSet -> activate_widget(c, i, 0);
-		
-		if (i == kart_manager.karts.size() - 1)
-			widgetSet -> set_active(c);
+	  int c = widgetSet -> image(row1,
+				     kart_manager->karts[i]->icon_file.c_str(),
+				     icon_size, icon_size);
+	  widgetSet -> activate_widget(c, i, 0);
+
+	  if (i == kart_manager->karts.size() - 1)
+	    widgetSet -> set_active(c);
 	}
 
 	if (0)
 	{
 		int row2 = widgetSet -> harray(va);
 		for(KartManager::KartPropertiesVector::size_type i = 0;
-                    i < kart_manager.karts.size()/2; ++i)
+                    i < kart_manager->karts.size()/2; ++i)
 		{
-			//widgetSet ->state(row1, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+			//widgetSet ->state(row1, kart_manager->karts[i].name.c_str(), GUI_MED, i, 0);
 			// FIXME: images needs to be 'clickable'
 			int c = widgetSet -> image(row1,
                             loader->getPath(
-                              "images/" + kart_manager.karts[i]->icon_file).c_str(),
+                              "images/" + kart_manager->karts[i]->icon_file).c_str(),
                             icon_size, icon_size);
 			widgetSet -> activate_widget(c, i, 0);
 		}
 		for(KartManager::KartPropertiesVector::size_type i =
-                    kart_manager.karts.size()/2; i < kart_manager.karts.size(); ++i)
+                    kart_manager->karts.size()/2; i < kart_manager->karts.size(); ++i)
 		{
-			//widgetSet ->state(row2, kart_manager.karts[i].name.c_str(), GUI_MED, i, 0);
+			//widgetSet ->state(row2, kart_manager->karts[i].name.c_str(), GUI_MED, i, 0);
 			int c = widgetSet -> image(row2,
-                            loader->getPath("images/" + kart_manager.karts[i]->icon_file).c_str(), icon_size, icon_size);
+                            loader->getPath("images/" + kart_manager->karts[i]->icon_file).c_str(), icon_size, icon_size);
 			widgetSet -> activate_widget(c, i, 0);
 		}
 	}
@@ -114,20 +116,20 @@ CharSel::~CharSel()
 
 void CharSel::switch_to_character(int n)
 {
-	if (current_kart != n && n >= 0 && n < int(kart_manager.karts.size()))
+	if (current_kart != n && n >= 0 && n < int(kart_manager->karts.size()))
 	{
 		current_kart = n;
                 ssgDeRefDelete(kart);
 		kart = new ssgTransform;
 		kart->ref();
-		ssgEntity* kartentity = kart_manager.karts[n]->getModel();
+		ssgEntity* kartentity = kart_manager->karts[n]->getModel();
 
 		kart->addKid(kartentity);
 
 		preProcessObj ( kart, 0 );
 	}
 }
-	
+
 void CharSel::update(float dt)
 {
 	clock += dt * 40.0f;
@@ -140,8 +142,8 @@ void CharSel::update(float dt)
 	if (kart)
 	{
                 ssgContext* oldContext = ssgGetCurrentContext();
-                context -> makeCurrent();                                   
-            
+                context -> makeCurrent();
+
 		glClear(GL_DEPTH_BUFFER_BIT);
 		// FIXME: A bit hackish...
 		glViewport ( 0, 0, 800, 320);
@@ -159,8 +161,7 @@ void CharSel::update(float dt)
 		kart->setTransform (&trans) ;
 		//glShadeModel(GL_SMOOTH);
 		ssgCullAndDraw ( kart ) ;
-
-		glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
+		glViewport ( 0, 0, config->width, config->height ) ;
 
 		glDisable (GL_DEPTH_TEST);
                 oldContext->makeCurrent();
@@ -171,19 +172,19 @@ void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
 
-	if (token >= 0 && token < static_cast<int>(kart_manager.karts.size()))
-          RaceManager::instance()->setPlayerKart(playerIndex,
-              kart_manager.getKartById(token)->ident);
+	if (token >= 0 && token < static_cast<int>(kart_manager->karts.size()))
+          race_manager->setPlayerKart(playerIndex,
+              kart_manager->getKartById(token)->ident);
 
-	if (RaceManager::instance()->getNumPlayers() > 1)
+	if (race_manager->getNumPlayers() > 1)
 	{
 		if (guiStack.back() == GUIS_CHARSEL)
 		{
 			guiStack.push_back(GUIS_CHARSELP2); 
 			return;
 		}
-			
-		if (RaceManager::instance()->getNumPlayers() > 2)
+
+		if (race_manager->getNumPlayers() > 2)
 		{
 			if (guiStack.back() == GUIS_CHARSELP2)
 			{
@@ -191,7 +192,7 @@ void CharSel::select()
 				return;
 			}
 
-			if (RaceManager::instance()->getNumPlayers() > 3)
+			if (race_manager->getNumPlayers() > 3)
 			{
 				if (guiStack.back() == GUIS_CHARSELP3)
 				{
@@ -201,8 +202,8 @@ void CharSel::select()
 			}	
 		}	
 	}
-	
-        if (RaceManager::instance()->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
+
+        if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
           guiStack.push_back(GUIS_TRACKSEL); 
         else
           startScreen->switchToGame();

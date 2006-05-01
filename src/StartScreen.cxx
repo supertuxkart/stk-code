@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: StartScreen.cxx,v 1.8 2005/07/19 08:23:40 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,17 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <stdexcept>
+#include <unistd.h>   // for usleep
+#include <plib/pw.h>
 
-#include "sdldrv.h"
 #include "Loader.h"
-#include "RaceSetup.h"
-#include "tuxkart.h"
-#include "WorldScreen.h"
-#include "ScreenManager.h"
 #include "RaceManager.h"
-#include "TrackManager.h"
 #include "StartScreen.h"
+#include "gui/BaseGUI.h"
+#include "plibdrv.h"
 
 StartScreen* startScreen = 0;
 
@@ -36,6 +33,7 @@ StartScreen::StartScreen()
 {
   guiStack.push_back(GUIS_MAINMENU);
   installMaterial();
+  pwSetCallbacks(keystroke, gui_mousefn, gui_motionfn, NULL, NULL);
 }
 
 StartScreen::~StartScreen()
@@ -55,8 +53,19 @@ StartScreen::update()
   glDisable      ( GL_FOG        ) ;
   glDisable      ( GL_CULL_FACE  ) ;
   glDisable      ( GL_ALPHA_TEST ) ;
-  //glOrtho        ( 0, 640, 0, 480, 0, 100 ) ;
 
+  // On at least one platform the X server apparently gets overloaded
+  // by the large texture, resulting in buffering of key events. This
+  // results in the menu being very unresponsive/slow - it can sometimes
+  // take (say) half a second before the menu reacts to a pressed key.
+  // This is caused by X buffering the key events, delivering them
+  // later (and sometimes even several at the same frame). This issue
+  // could either be solved by a lazy drawing of the background picture
+  // (i.e. draw the background only if something has changed) - which is
+  // a lot of implementation work ... or by sleeping for a little while,
+  // which apparently reduces the load for the X server, so that no 
+  // buffering is done --> all key events are handled in time.
+  usleep(2000);
   //Draw the splash screen
   introMaterial -> force () ;
 
@@ -69,11 +78,10 @@ StartScreen::update()
   glEnd () ;
 
   glFlush();
-  
   // Swapbuffers - and off we go again...
   pollEvents() ;
   updateGUI();
-  swapBuffers();
+  pwSwapBuffers();
 }
 
 void
@@ -82,14 +90,15 @@ StartScreen::installMaterial()
   /* Make a simplestate for the title screen texture */
 
   introMaterial = new ssgSimpleState ;
-  ssgTexture* texture = loader->createTexture("title_screen.png", true, true,
-          false);
-  if(!texture) {
-    delete introMaterial;
-    introMaterial = 0;
-    throw std::runtime_error("Couldn't load title_screen.png");
-  }
-  introMaterial -> setTexture(texture);
+  //  ssgTexture* texture = loader->createTexture("../images/st_title_screen.rgb", true, true,
+  //       false);
+  //if(!texture) {
+  //  delete introMaterial;
+  //  introMaterial = 0;
+  //  throw std::runtime_error("Couldn't load title_screen.png");
+  // }
+  //introMaterial -> setTexture(texture);
+  introMaterial -> setTexture(loader->getPath("images/st_title_screen.rgb").c_str(),TRUE,TRUE);
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
   introMaterial -> disable     ( GL_LIGHTING  ) ;
   introMaterial -> disable     ( GL_CULL_FACE ) ;
@@ -113,7 +122,7 @@ StartScreen::switchToGame()
   
   guiStack.clear();
   
-  RaceManager::instance()->start();
+  race_manager->start();
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Options.cxx,v 1.1 2005/05/25 21:47:54 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,7 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Options.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
 
 Options::Options()
@@ -31,7 +30,7 @@ Options::Options()
 	widgetSet -> state(menu_id, "Sound",  GUI_MED, 0, 0);
 	widgetSet -> space(menu_id);
 	
-	widgetSet -> layout(menu_id, 0, -1);
+	widgetSet -> layout(menu_id, 0, 0);
 }
 
 Options::~Options()

@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: GameMode.cxx,v 1.2 2005/05/27 10:25:52 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -18,10 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "GameMode.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
 #include "RaceManager.h"
-#include "World.h"
 
 GameMode::GameMode()
 {
@@ -33,7 +31,7 @@ GameMode::GameMode()
 	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
 	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
 	
-	if (RaceManager::instance()->getNumPlayers() == 1)
+	if (race_manager->getNumPlayers() == 1)
 		widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
@@ -56,15 +54,15 @@ void GameMode::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case MENU_GP:
-		RaceManager::instance()->setRaceMode(RaceSetup::RM_GRAND_PRIX);
+		race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
 		guiStack.push_back(GUIS_DIFFICULTYGP);
 		break;
 	case MENU_QUICKRACE:
-		RaceManager::instance()->setRaceMode(RaceSetup::RM_QUICK_RACE);
+		race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
 		guiStack.push_back(GUIS_DIFFICULTYSR);
 		break;
 	case MENU_TIMETRIAL:
-		RaceManager::instance()->setRaceMode(RaceSetup::RM_TIME_TRIAL);
+		race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);
 		guiStack.push_back(GUIS_CHARSEL); //difficulty makes no sense here
 		break;
 	default: break;

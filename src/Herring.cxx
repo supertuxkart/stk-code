@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: Herring.cxx,v 1.5 2005/08/19 20:51:56 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,116 +17,65 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <cassert>
-#include "tuxkart.h"
-#include "material.h"
-#include "Shadow.h"
-#include "Herring.h"
 #include "World.h"
+#include "Herring.h"
+#include "Kart.h"
 
-Herring::Herring ( sgVec3 colour )
-  : rotation(0)
-{
-  // create a cube
-  ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-  ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-  ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-  ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
+// =============================================================================
+Herring::Herring(herringType _type, sgVec3 xyz, ssgEntity* model) {
+  sgSetVec3(coord.hpr, 0.0f, 0.0f, 0.0f);
 
-  sgSetVec3(v, -0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v, -0.5, 0.0, 0.5 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.5 ) ; va->add(v) ;
-  sgSetVec3(v, -0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.0 ) ; va->add(v) ;
+  sgCopyVec3(coord.xyz, xyz);
+  root   = new ssgTransform();
+  root->ref();
+  root->setTransform(&coord);
 
-  sgSetVec3(n,  0.0f,  1.0f,  0.0f ) ; na->add(n) ;
+  rotate = new ssgTransform();
+  rotate->ref();
+  rotate->addKid(model);
+  root->addKid(rotate);
+  world->addToScene(root);
 
-  sgCopyVec3 ( c, colour ) ; c[ 3 ] = 1.0f ; ca->add(c) ;
- 
-  sgSetVec2(t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 0.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 0.0 ) ; ta->add(t) ;
- 
-  ssgVtxTable* cube = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
-  cube -> setState ( getMaterial ( "herring.png" ) -> getState () ) ;
+  type           = _type;
+  bEaten         = FALSE;
+  rotation       = 0.0;
+  time_to_return = 0.0;  // not strictly necessary, see isEaten()
+}   // Herring
 
-  shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
-#if 0
-  shadow->ref();
-#endif
- 
-  transform = new ssgTransform () ;
-  transform->ref();
-  transform -> addKid ( shadow ) ;
-  transform -> addKid ( cube ) ;
-}
+// -----------------------------------------------------------------------------
+int Herring::hitKart(Kart* kart) {
+  return sgDistanceSquaredVec2 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
+}   // hitKart
 
-Herring::Herring ( ssgEntity* model )
-  : rotation(0)
-{
-  //turn off collision detection. 
-  model -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ; 
+// -----------------------------------------------------------------------------
+void Herring::update(float delta) {  
+  if(bEaten) {
+    float t = time_to_return - world->clock;
+    if ( t > 0 ) {
+      sgVec3 hell;
+      sgCopyVec3(hell, coord.xyz);
 
-  shadow = createShadow ( "fuzzy.png", -0.5, 0.5, -0.25, 0.25 ) ;
-#if 0
-  shadow -> ref ();
-#endif
-
-  transform = new ssgTransform () ;
-  transform -> ref () ;
-  transform -> addKid ( shadow ) ;
-  transform -> addKid ( model ) ;
-}
-
-Herring::~Herring ()
-{
-#if 0
-  ssgDeRefDelete(shadow);
-#endif
-  ssgDeRefDelete(transform);
-}
-
-void Herring::update ()
-{
-  sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
-
-  c . hpr [ 0 ] = rotation ;
-  transform -> setTransform ( &c ) ;
-
-  rotation += 5.0f ;
-}
-
-void HerringInstance::update ()
-{
-#if 0
-  if ( ! eaten || her == NULL ) return ;
-#endif
-  if(!eaten) return;
-
-  assert(her != NULL);
-
-  float t = time_to_return - world -> clock;
-  if ( t > 0 )
-  {
-    sgVec3 hell ;
-    sgCopyVec3 ( hell, xyz ) ;
-
-    if ( t > 1.0f )
-      hell [ 2 ] = -1000000.0f ;
-    else
-      hell [ 2 ] = -t / 2.0f ;
-
-    scs -> setTransform ( hell ) ;
+      hell[2] = ( t > 1.0f ) ? -1000000.0f : coord.xyz[2] - t / 2.0f;
+      root -> setTransform(hell);
+    } else {
+      bEaten   = FALSE;
+      rotation = 0.0f;
+      root -> setTransform(&coord);
+    }   // t>0
+    
+  } else {   // not bEaten
+    sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
+    c.hpr[0] = rotation;
+    rotation += 180.0f*delta;
+    rotate -> setTransform ( &c ) ;
   }
-  else
-  {
-    eaten = FALSE ;
-    scs -> setTransform ( xyz ) ;
-  }
+}   // update
+
+// -----------------------------------------------------------------------------
+
+void Herring::isEaten()
+{
+    bEaten=TRUE;
+    time_to_return=world->clock+2.0f;
 }
 
-/* EOF */

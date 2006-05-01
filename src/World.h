@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: World.h,v 1.8 2005/09/30 16:49:48 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,46 +20,39 @@
 #ifndef HEADER_WORLD_H
 #define HEADER_WORLD_H
 
-#include <plib/ssg.h>
 #include <vector>
 #include "RaceSetup.h"
+#include "StaticSSG.h"
 
-#define NUM_PROJECTILES  8
-#define NUM_EXPLOSIONS   6
+class PlayerKart;
+
+class ssgRoot;
+class ssgBranch;
+class ssgLeaf;
+class ssgEntity;
+
+class Track;
 
 class Herring;
-class KartDriver;
-class Projectile;
-class Explosion;
-class Track;
 class guUDPConnection;
+class Kart;
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
-class World
-{
+class World {
 public:
   ssgRoot      *scene;
 
-  typedef std::vector<KartDriver*> Karts;
+  typedef std::vector<Kart*> Karts;
 private:
-  Karts kart;
-
+  Karts      kart;
+  StaticSSG* staticSSG;
 public:
-  typedef std::vector<Projectile*> Projectiles;
-  Projectiles projectiles;
-  typedef std::vector<Explosion*> Explosions;
-  Explosions explosions;
-  float clock;
+  float      clock;
 
   /** resources, this should be put in a separate class or replaced by a smart
    * resource manager
    */
-  ssgEntity* projectile_spark;
-  ssgEntity* projectile_missle;
-  ssgEntity* projectile_flamemissle;
-  ssgEntity* explode;
-
   RaceSetup raceSetup;
 
   enum Phase { 
@@ -76,11 +69,6 @@ public:
 
   const Track* track;
 private:
-  Herring *silver_h ;
-  Herring *gold_h   ;
-  Herring *red_h    ;
-  Herring *green_h  ;
-
   Phase phase;
 public:
   /** debug text that will be overlaid to the screen */
@@ -91,14 +79,20 @@ public:
 
   World(const RaceSetup& raceSetup);
   virtual ~World();
+  float World::GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf ) 
+                              {return staticSSG->hot(start, end, leaf);}
+  int   World::Collision(sgSphere* s, AllHits *a) 
+                              {return staticSSG->collision(s,a);       }
 
   void draw();
   void update(float delta);
   void restartRace();
   
-  KartDriver* getPlayerKart(int player);
-  KartDriver* getKart(int kart); 
+  PlayerKart* getPlayerKart(int player);
+  Kart* getKart(int kart); 
   int getNumKarts() const { return kart.size(); }
+  void addToScene(ssgEntity *kid) {scene->addKid(kid); }
+  void removeFromScene(ssgEntity *kid) {scene->removeKid(kid);}
   
   /** Returns the phase of the game */
   Phase getPhase() const { return phase; }

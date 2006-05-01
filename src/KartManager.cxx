@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: KartManager.cxx,v 1.3 2005/08/10 07:57:52 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -17,15 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <set>
-#include <iostream>
 #include <stdexcept>
-#include <algorithm>
 #include "Loader.h"
 #include "StringUtils.h"
 #include "KartManager.h"
+#include "KartProperties.h"
 
-KartManager kart_manager;
+KartManager *kart_manager=0;
 
 KartManager::KartManager()
 {
@@ -81,14 +79,17 @@ KartManager::loadKartData()
   loader->listFiles(result, "data");
 
   // Findout which characters are available and load them
-  for(std::set<std::string>::iterator i = result.begin(); i != result.end(); ++i)
-    {
-      if (StringUtils::has_suffix(*i, ".tkkf"))
-        {
-          karts.push_back(new KartProperties("data/" + *i));
-        }
-    }
-}
+  for(std::set<std::string>::iterator i = result.begin(); 
+                                      i != result.end(); ++i) {
+    if (StringUtils::has_suffix(*i, ".tkkf")) {
+      karts.push_back(new KartProperties("data/" + *i));
+    }   // if
+  }   // for i
+  for(KartPropertiesVector::iterator i = karts.begin(); 
+                                     i != karts.end(); ++ i) {
+    (*i)->loadModel();
+  }   // for i
+}   // loadKartData
 
 std::vector<std::string>
 KartManager::getRandomKarts(int len)

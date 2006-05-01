@@ -1,116 +1,71 @@
 # src/
 
-bin_PROGRAMS = supertuxkart
+bindir=$(prefix)/games
 
-supertuxkart_SOURCES = \
-  sdldrv.cxx \
-  sdldrv.h \
-  AutoDriver.cxx  \
-  Camera.cxx  \
-  Camera.h  \
-  Config.cxx  \
-  Config.h  \
-  CupData.h \
-  CupData.cxx \
-  Driver.cxx  \
-  Driver.h  \
-  Explosion.cxx  \
-  Explosion.h  \
-  Herring.cxx  \
-  Herring.h  \
-  KartProperties.h \
-  KartProperties.cxx \
-  KartManager.h \
-  KartManager.cxx \
-  KartDriver.cxx  \
-  Loader.cxx \
-  Loader.h \
-  Player.h \
-  Player.cxx \
-  PlayerDriver.h  \
-  PlayerDriver.cxx  \
-  Projectile.cxx  \
-  Track.cxx  \
-  Track.h  \
-  Controller.h \
-  RaceManager.h \
-  RaceManager.cxx \
-  GrandPrixSetup.h \
-  GrandPrixSetup.cxx \
-  TrackManager.cxx \
-  TrackManager.h \
-  Traffic.cxx  \
-  WorldLoader.cxx  \
-  WorldLoader.h  \
-  StartScreen.h \
-  StartScreen.cxx \
-  Screen.h \
-  ScreenManager.h \
-  ScreenManager.cxx \
-  constants.h  \
-  WidgetSet.cxx  \
-  WidgetSet.h  \
-  widget_image.cxx \
-  widget_image.h \
-  joystick.h  \
-  material.cxx  \
-  material.h  \
-  preprocessor.cxx  \
-  preprocessor.h  \
-  sound.cxx  \
-  sound.h  \
-  start_tuxkart.cxx  \
-  StringUtils.h \
-  StringUtils.cxx \
-  SkidMark.h \
-  SkidMark.cxx \
-  Shadow.h \
-  Shadow.cxx \
-  tuxkart.cxx  \
-  tuxkart.h  \
-  utils.cxx  \
-  utils.h \
-  World.h \
-  World.cxx \
-  WorldScreen.h \
-  WorldScreen.cxx \
-  ParticleSystem.h \
-  ParticleSystem.cxx \
-  lisp/Lisp.h \
-  lisp/Lisp.cxx \
-  lisp/Lexer.h \
-  lisp/Lexer.cxx \
-  lisp/Parser.h \
-  lisp/Parser.cxx \
-  lisp/Writer.h \
-  lisp/Writer.cxx \
-  gui/RaceGUI.cxx \
-  gui/RaceGUI.h \
-  gui/MainMenu.cxx \
-  gui/MainMenu.h \
-  gui/BaseGUI.cxx \
-  gui/BaseGUI.h \
-  gui/CharSel.cxx \
-  gui/CharSel.h \
-  gui/Difficulty.cxx \
-  gui/Difficulty.h \
-  gui/GameMode.cxx \
-  gui/GameMode.h \
-  gui/Options.cxx \
-  gui/Options.h \
-  gui/TrackSel.cxx \
-  gui/TrackSel.h \
-  gui/NumPlayers.cxx \
-  gui/NumPlayers.h \
-  gui/ConfigControls.cxx \
-  gui/ConfigControls.h \
-  gui/ConfigDisplay.cxx \
-  gui/ConfigDisplay.h \
-  gui/PlayerControls.cxx \
-  gui/PlayerControls.h \
-  gui/RaceResultsGUI.cxx \
-  gui/RaceResultsGUI.h \
-  gui/RaceMenu.cxx \
-  gui/RaceMenu.h
+bin_PROGRAMS = tuxkart
 
-# EOF #
+tuxkart_SOURCES =                                       \
+	start_tuxkart.cxx	 start_tuxkart.h        \
+	Material.cxx		 Material.h             \
+	MaterialManager.cxx	 MaterialManager.h      \
+	Attachment.cxx		 Attachment.h	        \
+	Collectable.cxx		 Collectable.h	        \
+	CollectableManager.cxx	 CollectableManager.h   \
+	sound.cxx		 sound.h                \
+	utils.cxx		 utils.h                \
+	isect.cxx		 isect.h                \
+	guNet.cxx		 guNet.h                \
+	Track.cxx		 Track.h                \
+	Herring.cxx 		 Herring.h              \
+	HerringManager.cxx	 HerringManager.h       \
+	Explosion.cxx		 Explosion.h            \
+	Config.cxx 		 Config.h               \
+	CupData.cxx   		 CupData.h              \
+	KartManager.cxx		 KartManager.h          \
+	ProjectileManager.cxx	 ProjectileManager.h    \
+	KartProperties.cxx	 KartProperties.h       \
+	Loader.cxx          	 Loader.h               \
+	RaceManager.cxx		 RaceManager.h          \
+	StringUtils.cxx		 StringUtils.h          \
+	TrackManager.cxx	 TrackManager.h         \
+	World.cxx		 World.h                \
+	preprocessor.cxx	 preprocessor.h	        \
+	HookManager.cxx		 HookManager.h	        \
+	SkidMark.cxx		 SkidMark.h	        \
+	Shadow.cxx		 Shadow.h	        \
+	StartScreen.cxx		 StartScreen.h	        \
+	WorldScreen.cxx		 WorldScreen.h	        \
+	ParticleSystem.cxx	 ParticleSystem.h       \
+	ScreenManager.cxx	 ScreenManager.h        \
+	WidgetSet.cxx		 WidgetSet.h	        \
+	Camera.cxx		 Camera.h	        \
+	plibdrv.cxx		 plibdrv.h	        \
+	Moveable.cxx 		 Moveable.h             \
+	Kart.cxx		 Kart.h		        \
+	AutoKart.cxx		 AutoKart.h             \
+	PlayerKart.cxx		 PlayerKart.h	        \
+	Projectile.cxx 		 Projectile.h	        \
+	StaticSSG.cxx 		 StatigSSG.h	        \
+	History.cxx		 History.h	        \
+	RaceSetup.h	   	 NoCopy.h	        \
+	KartControl.h		 constants.h            \
+	Traffic.cxx 				        \
+	lisp/Lisp.cxx		 lisp/Lisp.h            \
+	lisp/Lexer.cxx		 lisp/Lexer.h           \
+	lisp/Parser.cxx		 lisp/Parser.h          \
+	lisp/Writer.cxx		 lisp/Writer.h	        \
+	gui/BaseGUI.cxx		 gui/BaseGUI.h	        \
+	gui/RaceGUI.cxx		 gui/RaceGUI.h	        \
+	gui/NumLaps.cxx		 gui/NumLaps.h	        \
+	gui/RaceMenu.cxx	 gui/RaceMenu.h	        \
+	gui/NumPlayers.cxx	 gui/NumPlayers.h       \
+	gui/TrackSel.cxx	 gui/TrackSel.h	        \
+	gui/PlayerControls.cxx	 gui/PlayerControls.h   \
+	gui/ConfigDisplay.cxx	 gui/ConfigDisplay.h    \
+	gui/ConfigControls.cxx	 gui/ConfigControls.h   \
+	gui/Options.cxx		 gui/Options	        \
+	gui/GameMode.cxx	 gui/GameMode.h	        \
+	gui/Difficulty.cxx	 gui/Difficulty.h       \
+	gui/CharSel.cxx		 gui/CharSel.h	        \
+	gui/MainMenu.cxx	 gui/MainMenu.h         \
+	gui/SingleWindowMenu.cxx gui/SingleWindowMenu.h

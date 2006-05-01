@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: WorldScreen.cxx,v 1.6 2005/09/30 16:49:03 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,33 +17,37 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
-#include <plib/ul.h>
-#include "sdldrv.h"
+#include <plib/pw.h>
 #include "World.h"
-#include "tuxkart.h"
 #include "WidgetSet.h"
-#include "RaceSetup.h"
 #include "WorldScreen.h"
-#include "WorldLoader.h"
 #include "sound.h"
 #include "Camera.h"
+#include "Config.h"
 #include "TrackManager.h"
+#include "Track.h"
+#include "plibdrv.h"
+#include "gui/BaseGUI.h"
 
 WorldScreen* WorldScreen::current_ = 0;
 
 WorldScreen::WorldScreen(const RaceSetup& raceSetup)
-  : overtime(0)
 {
-  delete world;
-  world = new World(raceSetup);
+  // the constructor assigns this object to the global
+  // variable world. Admittedly a bit ugly, but simplifies
+  // handling of objects which get created in the constructor
+  // and need world to be defined.
+  new World(raceSetup);
 
   current_ = this;
-  fclock = new ulClock;
-  fclock->reset();
-  
+
   for(int i = 0; i < raceSetup.getNumPlayers(); ++i)
     cameras.push_back(new Camera(raceSetup.getNumPlayers(), i));
+  fclock.reset();
+  fclock.setMaxDelta(1.0);
+  frameClock.reset();
+  frameClock.setMaxDelta(100000.0);
+  frameCount = 0;
 }
 
 WorldScreen::~WorldScreen()
@@ -51,34 +55,18 @@ WorldScreen::~WorldScreen()
   for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
     delete *i;
 
-  delete fclock;
-
-  if(current() == this){
-    delete world;
-    world = 0;
+  if(current() == this) {
+  delete world;
+  world = 0;
   }
 }
 
-void
-WorldScreen::update()
-{
-  fclock->update    () ;
+void WorldScreen::update() {
+  fclock.update();
 
-  float inc = 0.02f;
-  float dt = fclock->getDeltaTime () + overtime;
-  overtime = 0;
-
-  while ( dt > inc )
-    {
-      if ( ! widgetSet -> get_paused () )
-        world->update(inc);
-
-      dt -= inc ;
-    }
-
-  if ( dt > 0.0f )
-    overtime = dt;
-
+  if ( ! widgetSet -> get_paused () ) {
+    world->update(fclock.getDeltaTime());
+  }
 
   for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
     (*i)->update();
@@ -86,46 +74,49 @@ WorldScreen::update()
   draw();
 
   pollEvents();
-  kartInput (world->raceSetup) ;
-  updateGUI();
-  sound    -> update () ;
+  updateGUI() ;
+  sound->update() ;
+  if(config->profile) {
+    if(frameCount++ == config->profile) {
+      frameClock.update();
+      exit(2);
+    }
+  }
 
-  updateWorld        () ;
-
-  swapBuffers() ;
+  pwSwapBuffers() ;
 }
 
-void 
+void
 WorldScreen::draw()
 {
   const Track* track = world->track;
 
   glEnable ( GL_DEPTH_TEST ) ;
 
-  if (track->use_fog)
+  if (track->useFog())
     {
       glEnable ( GL_FOG ) ;
-      
-      glFogf ( GL_FOG_DENSITY, track->fog_density ) ;
-      glFogfv( GL_FOG_COLOR  , track->fog_color ) ;
-      glFogf ( GL_FOG_START  , track->fog_start ) ;
-      glFogf ( GL_FOG_END    , track->fog_end ) ;
+
+      glFogf ( GL_FOG_DENSITY, track->getFogDensity() ) ;
+      glFogfv( GL_FOG_COLOR  , track->getFogColor() ) ;
+      glFogf ( GL_FOG_START  , track->getFogStart() ) ;
+      glFogf ( GL_FOG_END    , track->getFogEnd() ) ;
       glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
       glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 
       /* Clear the screen */
-      glClearColor (track->fog_color[0], 
-                    track->fog_color[1], 
-                    track->fog_color[2], 
-                    track->fog_color[3]);
+      glClearColor (track->getFogColor()[0],
+                    track->getFogColor()[1],
+                    track->getFogColor()[2],
+                    track->getFogColor()[3]);
     }
   else
     {
       /* Clear the screen */
-      glClearColor (track->sky_color[0], 
-                    track->sky_color[1], 
-                    track->sky_color[2], 
-                    track->sky_color[3]);
+      glClearColor (track->getSkyColor()[0],
+                    track->getSkyColor()[1],
+                    track->getSkyColor()[2],
+                    track->getSkyColor()[3]);
     }
 
   glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
@@ -136,12 +127,12 @@ WorldScreen::draw()
       world->draw() ;
     }
 
-  if (track->use_fog)
+  if (track->useFog())
     {
       glDisable ( GL_FOG ) ;
     }
 
-  glViewport ( 0, 0, getScreenWidth(), getScreenHeight() ) ;
+  glViewport ( 0, 0, config->width, config->height ) ;
 }
 
 Camera*

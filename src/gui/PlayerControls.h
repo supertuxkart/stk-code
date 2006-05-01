@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: PlayerControls.h,v 1.3 2005/07/13 17:17:47 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,22 +30,26 @@ class PlayerControls: public BaseGUI
 public:
 	PlayerControls(int whichPlayer);
 	~PlayerControls();
-	
+
 	void update(float dt);
 	void select();
-	void keybd(const SDL_keysym& key);
+	void keybd(int key);
 	void point(int x, int y);
-	void stick(int x, int y);
-      void joybutton(int whichJoy, int button);
-      void addKeyLabel(int change_id, KartControl control, bool start);
-      void changeKeyLabel(int grab_id, KartControl control);
-      std::string getKeyInfoString(KartControl control);
-	
+	void stick(const int &whichAxis, const float &value);
+	void joybuttons(int whichJoy, int hold, int presses, int releases);
+	void addKeyLabel(int change_id, KartActions control, bool start);
+	void changeKeyLabel(int grab_id, KartActions control);
+	void setKeyInfoString(KartActions control);
+
 private:
 	int grab_id;
-	int config_index;
+	int player_index;
 	bool grabInput;
-	KartControl editKey;
+	KartActions editAction;
+	// Stores the heading - making this an attribute here avoids
+	// memory leaks or complicated memory management
+	char Heading[60];
+	std::string KeyNames[KC_FIRE+1];
 };
 
 #endif

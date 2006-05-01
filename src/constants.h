@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: constants.h,v 1.5 2005/09/30 16:56:14 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +20,8 @@
 #ifndef HEADER_CONSTANTS_H
 #define HEADER_CONSTANTS_H
 
+
+#define MAX_HISTORY           1000   /* number of history events */
 /*
   All final units are in meters (or meters/sec or meters/sec^2)
   and degrees (or degrees/sec).
@@ -40,6 +42,18 @@
 
 #define MILES_PER_HOUR       (MILE/HOUR)
 #define KILOMETERS_PER_HOUR  (KILOMETER/HOUR)
+
+// Zipper related constants:
+// =========================
+#define ZIPPER_ANGLE          45.0    
+#define ZIPPER_TIME           1.5f   /* Seconds */
+#define ZIPPER_VELOCITY      (100.0f * KILOMETERS_PER_HOUR )
+
+
+#define MAX_HOME_DIST  50.0f
+#define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)
+
+#define DEFAULT_NUM_LAPS_IN_RACE 5
 
 /* M$ compilers don't define M_PI... */
 

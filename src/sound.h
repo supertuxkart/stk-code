@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: sound.h,v 1.3 2005/06/06 00:47:12 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -35,8 +35,6 @@
 #define SOUND_SHOOMF           10
 
 #define NUM_SOUNDS 11
-
-#include <plib/sl.h>
 
 #include <string>
 
@@ -78,6 +76,8 @@ public:
   void disable_sfx   () ;
   void  enable_sfx   () ;
 } ;
+
+extern SoundSystem *sound ;
 
 #endif
 
