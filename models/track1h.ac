@@ -6,7 +6,7 @@ kids 12
 OBJECT poly
 name "box"
 loc -0.683315 6.68672 -1.21164
-texture "../images/adverts.png"
+texture "../images/adverts.rgb"
 texrep 4 1
 numvert 4
 -9.56998 -1.7 -1.95775
@@ -25,7 +25,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 8.0313 6.68672 3.18001
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 4 1
 numvert 4
 -0.85537 1.7 2.4339
@@ -44,7 +44,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -2.69398 6.68672 3.25616
-texture "../images/adverts.png"
+texture "../images/adverts.rgb"
 texrep 4 1
 numvert 4
 9.86992 -1.7 2.35775
@@ -63,7 +63,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -9.97366 6.68672 -2.57042
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 4 1
 numvert 4
 -1.15534 -1.7 2.0339
@@ -82,7 +82,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.83861 8.38672 1.22226
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 8 4
 texoff -5.00488e-05 1.7775
 numvert 4
@@ -102,7 +102,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -1.83861 4.98672 1.22226
-texture "../images/Penguin_orig.png"
+texture "../images/Penguin_orig.rgb"
 texrep 1 2
 numvert 4
 -10.7253 0 -0.323851
@@ -121,7 +121,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -59.6196 6.22355 -8.83145
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 3 1.5
 numvert 44
 34.4477 -6.22355 -45.7243
@@ -320,7 +320,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -48.3333 6.0205 -9.9762
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 3 1.5
 numvert 44
 57.4927 -6.0205 -10.773
@@ -519,7 +519,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -52.3162 3.43312 -19.9749
-texture "../images/roadway.png"
+texture "../images/roadway.rgb"
 texrep 0.5 1
 numvert 70
 36.5747 -3.43318 -33.2907
@@ -863,7 +863,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -50.6538 3.484 -9.9762
-texture "../images/grass.png"
+texture "../images/grass.rgb"
 numvert 88
 -48.3552 2.4816 -40.3447
 -47.9645 2.44741 -44.8276
@@ -1252,7 +1252,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -57.7383 3.94827 -9.0222
-texture "../images/aarmco.png"
+texture "../images/aarmco.rgb"
 texrep 4 1
 numvert 44
 33.8343 -3.94827 -48.2525
@@ -1451,7 +1451,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -50.2141 3.81292 -9.7854
-texture "../images/aarmco.png"
+texture "../images/aarmco.rgb"
 texrep 4 1
 numvert 44
 56.3849 -3.81292 -10.7023

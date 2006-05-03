@@ -1662,7 +1662,7 @@ refs 4
 kids 0
 OBJECT poly
 name "disk"
-texture "../images/Penguin_orig.png"
+texture "/u/tuxkart/models/../images/Penguin_orig.rgb"
 numvert 8
 -0.0707347 0.171887 -0.307493
 -0.0707347 0.384091 -0.20139
@@ -1725,7 +1725,7 @@ kids 0
 OBJECT poly
 name "tuxbeak"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_beak.png"
+texture "/u/tuxkart/models/../images/Gown_beak.rgb"
 numvert 3
 0.0943902 -0.619132 0.0961674
 0.0378216 -0.647132 0.0961674
@@ -1765,7 +1765,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc -0.0538762 1.1845 -0.139342
-texture "../images/bow.png"
+texture "/u/tuxkart/models/../images/bow.rgb"
 texrep 6 1
 numvert 22
 -0.1104 -0.9085 0.0945681
@@ -1927,7 +1927,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 34
 -0.0299795 -0.426 0.218019
 0.028908 -0.406 0.180174
@@ -2397,7 +2397,7 @@ kids 0
 OBJECT poly
 name "closedline"
 loc -0.0250002 1.0845 -0.128389
-texture "../images/bow.png"
+texture "/u/tuxkart/models/../images/bow.rgb"
 numvert 24
 0.130343 -0.289002 0.180174
 0.130343 -0.339002 0.180174
@@ -2554,7 +2554,7 @@ kids 0
 OBJECT poly
 name "tuxbeak"
 loc -0.0362129 1.06435 -0.000206515
-texture "../images/Gown_beak.png"
+texture "/u/tuxkart/models/../images/Gown_beak.rgb"
 numvert 12
 0.0826052 -0.622242 -0.107922
 0.0434185 -0.617422 -0.118067
@@ -2657,7 +2657,7 @@ kids 0
 OBJECT poly
 name "tuxbeak"
 loc -0.0373865 1.09824 -0.000206515
-texture "../images/Gown_beak.png"
+texture "/u/tuxkart/models/../images/Gown_beak.rgb"
 numvert 10
 0.0395994 -0.593107 -0.113645
 0.0445922 -0.629522 -0.123008
@@ -2854,7 +2854,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 -0.0810917 -0.621 0.180174
 numsurf 1
@@ -2866,7 +2866,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 -0.0636298 -0.621 0.239644
 numsurf 1
@@ -2878,7 +2878,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 -0.0167875 -0.621 0.280233
 numsurf 1
@@ -2890,7 +2890,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.0445628 -0.621 0.289054
 numsurf 1
@@ -2902,7 +2902,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.100943 -0.621 0.263306
 numsurf 1
@@ -2914,7 +2914,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.134452 -0.621 0.211164
 numsurf 1
@@ -2926,7 +2926,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.134452 -0.621 0.149183
 numsurf 1
@@ -2938,7 +2938,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.100943 -0.621 0.0970414
 numsurf 1
@@ -2950,7 +2950,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 0.0445627 -0.621 0.0712936
 numsurf 1
@@ -2962,7 +2962,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 -0.0167875 -0.621 0.0801144
 numsurf 1
@@ -2974,7 +2974,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0375002 1.0845 -0.128389
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 1
 -0.0636298 -0.621 0.120703
 numsurf 1
@@ -2986,7 +2986,7 @@ kids 0
 OBJECT poly
 name "tuxbody"
 loc -0.0205885 0.338844 0.0346083
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 55
 -0.0805414 0.124659 0.0766473
 -0.0980034 0.124659 0.0171768
@@ -3630,7 +3630,7 @@ refs 3
 kids 0
 OBJECT poly
 name "noname"
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 7
 0.144851 0.313637 0.0736605
 0.1453 0.412832 0.0734972
@@ -3674,7 +3674,7 @@ kids 0
 OBJECT poly
 name "noname"
 loc -0.356481 0 0.00360082
-texture "../images/Gown_body.png"
+texture "/u/tuxkart/models/../images/Gown_body.rgb"
 numvert 7
 0.249623 0.313637 0.0736605
 0.249175 0.412832 0.0734972

@@ -4,7 +4,7 @@ OBJECT world
 kids 1
 OBJECT poly
 name "Cube"
-texture "../images/banana.png"
+texture "banana.rgb"
 texrep 1 1
 numvert 39
 0.231637 0.221473 -0.005138

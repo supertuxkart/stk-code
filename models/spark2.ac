@@ -5,7 +5,7 @@ kids 3
 OBJECT poly
 name "disk"
 loc -0.0386448 0 -1.19799
-texture "../images/Iooove_this_painting.png"
+texture "../images/Iooove_this_painting.rgb"
 numvert 20
 10.5501 0 0
 9.97843 0 3.12445
@@ -146,7 +146,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.448538 0.150507 -1.19799
-texture "../images/Iooove_this_painting.png"
+texture "../images/Iooove_this_painting.rgb"
 numvert 20
 -3.57628e-07 -10.5501 0
 -4.17233e-07 -9.97844 3.12445
@@ -287,7 +287,7 @@ kids 0
 OBJECT poly
 name "disk"
 loc -0.0122709 0.150507 -1.02742
-texture "../images/Iooove_this_painting.png"
+texture "../images/Iooove_this_painting.rgb"
 numvert 20
 0 -10.5501 0
 3.37838 -9.97844 4.76837e-07

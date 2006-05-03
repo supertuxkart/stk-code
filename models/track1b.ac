@@ -5,7 +5,7 @@ kids 5
 OBJECT poly
 name "walls"
 loc -10.9653 6.0044 -9.788
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 3 1.5
 numvert 40
 -34.0054 -0.47959 -14.2115
@@ -179,7 +179,7 @@ kids 0
 OBJECT poly
 name "aarmco"
 loc -10.4445 3.70601 -15.428
-texture "../images/aarmco.png"
+texture "../images/aarmco.rgb"
 texrep 4 1
 numvert 20
 -34.7866 1.84158 -5.0585
@@ -270,7 +270,7 @@ kids 0
 OBJECT poly
 name "aarmco"
 loc -11.4885 3.75159 -2.15
-texture "../images/aarmco.png"
+texture "../images/aarmco.rgb"
 texrep 4 1
 numvert 20
 14.8357 -2.45405 0.838799
@@ -361,7 +361,7 @@ kids 0
 OBJECT poly
 name "road"
 loc -0.0125 3.24816 -7.795
-texture "../images/roadway.png"
+texture "../images/roadway.rgb"
 texrep 0.5 1
 numvert 40
 -55.2725 3.17944 -11.411
@@ -563,7 +563,7 @@ kids 0
 OBJECT poly
 name "grass"
 loc -10.9653 3.26488 -9.788
-texture "../images/grass.png"
+texture "../images/grass.rgb"
 numvert 40
 -24.0813 1.39167 -13.1865
 -24.472 1.42586 -7.91755

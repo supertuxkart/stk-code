@@ -15,7 +15,7 @@ OBJECT poly
 name "Plane.001"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc 0.00323 0.169401 -0.020018
-texture "../images/tuxkarttex.png"
+texture "../images/tuxkarttex.rgb"
 texrep 1 1
 numvert 189
 -0.003343 0.341152 0.765774
@@ -4292,7 +4292,7 @@ OBJECT poly
 name "Cube.014"
 rot 1.0 0.0 -0.0  -0.0 1.0 0.0  0.0 0.0 1.0
 loc -0.004972 0.375933 0.026515
-texture "../images/tuxtex.png"
+texture "../images/tuxtex.rgb"
 texrep 1 1
 numvert 90
 -0.121579 -0.228776 0.097808

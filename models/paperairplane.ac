@@ -6,7 +6,7 @@ kids 2
 OBJECT poly
 name "poly"
 loc 0.0266665 0.60274 -1.21825
-texture "../images/homework.png"
+texture "../images/homework.rgb"
 texrep 0.5 0.5
 texoff 0.25 0.47
 numvert 9

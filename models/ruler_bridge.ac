@@ -716,7 +716,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.211071 1.2514 -4.28353
-texture "../images/ruler.png"
+texture "../images/ruler.rgb"
 texrep 1 5
 numvert 16
 -1.02356 -1.23663 4.49148
@@ -1518,7 +1518,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.148368 1.34118 -30.2472
-texture "../images/ruler.png"
+texture "../images/ruler.rgb"
 texrep 1 5
 numvert 16
 1.41113 -1.34611 -4.38518
@@ -1612,7 +1612,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -0.513282 2.55713 -16.9981
-texture "../images/ruler.png"
+texture "../images/ruler.rgb"
 texrep 1 5
 numvert 16
 -1.02356 -0.0320115 4.6585

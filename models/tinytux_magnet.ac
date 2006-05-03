@@ -21,7 +21,7 @@ kids 6
 OBJECT poly
 name "wings"
 loc -0.0833333 0 -0.0833333
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.6 0.5 -0.245333
 0 0.5 -0.0453331
@@ -48,7 +48,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.6 0.5 -0.5
 -0.1 0.5 -0.145333
@@ -75,7 +75,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.5 0.5 -0.6
 -0.1 0.5 -0.145333
@@ -102,7 +102,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.4 0.5 -0.7
 -0.1 0.5 -0.145333
@@ -129,7 +129,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.3 0.5 -0.8
 -0.1 0.5 -0.145333
@@ -156,7 +156,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.2 0.5 -0.953198
 -0.1 0.5 -0.145333
@@ -183,7 +183,7 @@ kids 0
 OBJECT poly
 name "body"
 loc -0.0416667 -0.025 -0.0416667
-texture "../images/tinytux.png"
+texture "../images/tinytux.rgb"
 numvert 4
 -0.3 0.25 0
 0.3 0.25 0
@@ -667,7 +667,7 @@ name "rect"
 loc 0 0.25 -1.85
 data 14
 @autotex Y=2.0
-texture "/hda1/tuxkart/images/bzzt.png"
+texture "../images/bzzt.rgb"
 numvert 8
 1.7 -3.25 2.55
 0.154546 -3.25 3.05

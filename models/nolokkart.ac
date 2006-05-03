@@ -1144,7 +1144,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Cylinder.004"
-texture "../images/chrome.png"
+texture "../images/chrome.rgb"
 texrep 1 1
 numvert 145
 0.394147 0.035129 0.133712
@@ -12350,7 +12350,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Cylinder.002"
-texture "../images/chrome.png"
+texture "../images/chrome.rgb"
 texrep 1 1
 numvert 145
 -0.388409 0.035129 0.133712

@@ -6,7 +6,7 @@ kids 4
 OBJECT poly
 name "box"
 loc -0.168385 1.225 0.308664
-texture "../images/tv.png"
+texture "../images/tv.rgb"
 numvert 8
 -0.408137 -1.225 -1.41983
 -0.408137 1.225 -1.41983

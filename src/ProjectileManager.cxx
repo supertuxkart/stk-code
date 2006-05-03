@@ -34,7 +34,7 @@ void ProjectileManager::loadData() {
   // Load the explosion model and find the actual selector branch in int
   explosionModel = find_selector((ssgBranch*)ssgLoad("explode.ac", loader));
   if ( explosionModel == NULL ) {
-    fprintf ( stderr, "Explode.ac doesn't have an 'explosion' object.\n" ) ;
+    fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
     exit ( 1 ) ;
   }
   

@@ -8,7 +8,7 @@ name "Mesh.001"
 kids 4
 OBJECT poly
 name "Mesh.001-sub0"
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 1 1
 numvert 620
 2.546425 -0.981783 38.50562
@@ -2805,7 +2805,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub1"
-texture "../images/stones.png"
+texture "../images/stones.rgb"
 texrep 1 1
 numvert 908
 3.391538 -0.981783 38.827725
@@ -9288,7 +9288,7 @@ refs 3
 kids 0
 OBJECT poly
 name "Mesh.001-sub2"
-texture "../images/track.png"
+texture "../images/track.rgb"
 texrep 1 1
 numvert 310
 -8.784264 -0.981783 -57.978434
@@ -10690,7 +10690,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Mesh.001-sub3"
-texture "../images/trackborder.png"
+texture "../images/trackborder.rgb"
 texrep 1 1
 numvert 620
 1.701313 -0.981783 38.183516

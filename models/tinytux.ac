@@ -19,7 +19,7 @@ kids 6
 OBJECT poly
 name "wings"
 loc -0.0833333 0 -0.0833333
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.6 0.6 -0.245333
 0 0.6 -0.0453331
@@ -46,7 +46,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.6 0.6 -0.5
 -0.1 0.6 -0.145333
@@ -73,7 +73,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.5 0.6 -0.6
 -0.1 0.6 -0.145333
@@ -100,7 +100,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.4 0.6 -0.7
 -0.1 0.6 -0.145333
@@ -127,7 +127,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.3 0.6 -0.8
 -0.1 0.6 -0.145333
@@ -154,7 +154,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.png"
+texture "../images/butterfly.rgb"
 numvert 6
 -0.2 0.6 -0.953198
 -0.1 0.6 -0.145333
@@ -181,7 +181,7 @@ kids 0
 OBJECT poly
 name "body"
 loc -0.0416667 -0.025 -0.0416667
-texture "../images/tinytux.png"
+texture "../images/tinytux.rgb"
 numvert 4
 -0.3 0.35 0
 0.3 0.35 0

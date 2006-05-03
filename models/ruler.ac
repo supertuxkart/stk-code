@@ -5,7 +5,7 @@ kids 1
 OBJECT poly
 name "box"
 loc 0.000699515 0.0656771 -0.0373434
-texture "../images/ruler.png"
+texture "../images/ruler.rgb"
 texrep 1 5
 numvert 16
 -0.511782 -0.0160058 2.32925

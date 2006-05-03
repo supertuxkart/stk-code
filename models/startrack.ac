@@ -5083,7 +5083,7 @@ refs 4
 kids 0
 OBJECT poly
 name "Profile.001"
-texture "../images/rainbow3.png"
+texture "../images/rainbow3.rgb"
 texrep 1 1
 numvert 570
 -58.936922 2.032266 -119.849487

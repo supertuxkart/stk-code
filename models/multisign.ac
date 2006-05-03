@@ -5,7 +5,7 @@ kids 3
 OBJECT poly
 name "rect"
 loc -73.3841 4.44288 -116.711
-texture "../images/adverts.png"
+texture "../images/adverts.rgb"
 texrep 0.55 0.27
 texoff -0.54 0.6
 numvert 4
@@ -25,7 +25,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -66.2021 3.92451 -116.708
-texture "../images/adverts.png"
+texture "../images/adverts.rgb"
 texrep 0.5 0.27
 numvert 4
 62.5593 -2.22902 116.681
@@ -44,7 +44,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -59.0287 3.30955 -116.504
-texture "../images/adverts.png"
+texture "../images/adverts.rgb"
 texrep 0.53 0.28
 texoff -0.53 0.32
 numvert 4

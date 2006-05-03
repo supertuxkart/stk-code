@@ -6,7 +6,7 @@ kids 7
 OBJECT poly
 name "box"
 loc 0.85 10.8 0.15
-texture "../images/wood.png"
+texture "../images/wood.rgb"
 texrep 9 7
 numvert 8
 -5.35 -0.400002 -10.05
@@ -64,7 +64,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.850001 5.2 -6.4
-texture "../images/roadway.png"
+texture "../images/../images/roadway.rgb"
 numvert 8
 -4.65 -2.6 -3.1
 -4.65 5.2 -3.1
@@ -121,7 +121,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 1.05 5.2 6.5
-texture "../images/roadway.png"
+texture "../images/../images/roadway.rgb"
 numvert 8
 -4.65 -2.6 -3.1
 -4.65 5.2 -3.1
@@ -178,7 +178,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -3.65 5.2 -9.4
-texture "../images/shine.png"
+texture "../images/../images/shine.rgb"
 numvert 8
 -0.25 -5.2 -0.3
 -0.25 5.2 -0.3
@@ -235,7 +235,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -3.65 5.2 9.6
-texture "../images/shine.png"
+texture "../images/../images/shine.rgb"
 numvert 8
 -0.25 -5.2 -0.3
 -0.25 5.2 -0.3
@@ -292,7 +292,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 5.65 5.2 9.7
-texture "../images/shine.png"
+texture "../images/../images/shine.rgb"
 numvert 8
 -0.25 -5.2 -0.3
 -0.25 5.2 -0.3
@@ -349,7 +349,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 5.55 5.2 -9.4
-texture "../images/shine.png"
+texture "../images/../images/shine.rgb"
 numvert 8
 -0.25 -5.2 -0.3
 -0.25 5.2 -0.3

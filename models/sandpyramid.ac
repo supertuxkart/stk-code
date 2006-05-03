@@ -12,7 +12,7 @@ OBJECT world
 kids 39
 OBJECT poly
 name "box"
-texture "../images/wood.png"
+texture "../images/wood.rgb"
 numvert 8
 -16.1853 -9.24864 -199.212
 -15.9996 -13.1554 -199.314
@@ -68,7 +68,7 @@ refs 4
 kids 0
 OBJECT poly
 name "mesh"
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 4 4
 numvert 8
 -78.0061 -117.412 -173.299
@@ -119,7 +119,7 @@ refs 3
 kids 0
 OBJECT poly
 name "mesh"
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 1 4
 numvert 81
 -301.386 23.972 -177.647
@@ -939,7 +939,7 @@ refs 3
 kids 0
 OBJECT poly
 name "tuxbody"
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 numvert 234
 -89.7769 10.4147 -11.0059
 -87.4843 10.9857 -7.05224
@@ -3476,7 +3476,7 @@ name "sandstorm"
 loc -44.1926 -3.3201 -42.4286
 data 14
 @autotex X=0.5
-texture "../images/fuzzy_sand.png"
+texture "../images/fuzzy_sand.rgb"
 texrep 40 40
 texoff 0.04 0
 numvert 40
@@ -3783,7 +3783,7 @@ kids 0
 OBJECT poly
 name "poly"
 loc -70.5086 0.973743 -7.48568
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 1 2
 numvert 12
 -28.8211 19.3657 89.6305
@@ -3845,7 +3845,7 @@ kids 0
 OBJECT poly
 name "poly"
 loc -70.6882 -3.73161 -13.659
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 1 2
 numvert 12
 -23.5529 14.0553 86.5059
@@ -3903,7 +3903,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -70.6882 2.31126 13.741
-texture "../images/floor.png"
+texture "../images/floor.rgb"
 texrep 4 4
 numvert 4
 17.9691 -24.0387 134.64
@@ -3922,7 +3922,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -70.6882 2.31126 13.741
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 2 2
 numvert 14
 -32.7059 -24.0387 153.297
@@ -4006,7 +4006,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -24.2 -9.3 5.8
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 5 0.5
 numvert 4
 -43.7723 -12.4425 101.108
@@ -4025,7 +4025,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -24.2 -9.3 5.8
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 5 0.5
 numvert 4
 -0.320747 2.70144 105.918
@@ -4044,7 +4044,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -24.2 -9.3 5.8
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 5 0.5
 numvert 4
 -43.8635 -3.45 100.858
@@ -4063,7 +4063,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -24.2 -9.3 5.8
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 texrep 5 0.5
 numvert 4
 -40.1335 -12.7091 111.106
@@ -4082,7 +4082,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -71.216 18.6362 9.21343
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 4 4
 numvert 4
 -97.409 -32.4138 72.5942
@@ -4101,7 +4101,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -78.2381 12.3313 8.01343
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 4 4
 numvert 21
 -5.11345 72.0911 117.83
@@ -4225,7 +4225,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -38.7 0 -3.9
-texture "../images/sand.png"
+texture "../images/sand.rgb"
 numvert 4
 -11.6531 -7.55 60.0257
 5.26145 -7.55 53.8693
@@ -4243,7 +4243,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -39.35 -2 12.65
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 8
 10.7487 -5.15 100.899
 10.7487 3.65 100.899
@@ -4300,7 +4300,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -41.1 6.7 -28.5
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 8
 -21.1573 -12.65 44.9015
 -21.1573 -1.45 44.9015
@@ -4357,7 +4357,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -88.95 -2.625 -78.6
-texture "../images/concrete.png"
+texture "../images/concrete.rgb"
 texrep 1 11
 numvert 8
 -59.726 -5.725 -67.0165
@@ -4415,7 +4415,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -88.05 -3.15 -77.95
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 8
 -63.582 -5.2 -69.3571
 -63.582 1.4 -69.3571
@@ -4530,7 +4530,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 3.55 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 numvert 3
 29.8446 9.05 26.2911
 32.8111 5.5 28.5911
@@ -4546,7 +4546,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 3.55 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 numvert 3
 -12.7136 5.5 28.6411
 -10.0893 9.05 26.2911
@@ -4562,7 +4562,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 3.55 -35.673
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 4
 -12.7136 5.5 23.9911
 -10.0893 9.05 26.2911
@@ -4580,7 +4580,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 3.55 -35.673
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 4
 32.8111 5.5 28.5911
 29.8446 9.05 26.2911
@@ -4598,7 +4598,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 3.55 -35.673
-texture "../images/egypt.png"
+texture "../images/egypt.rgb"
 numvert 2
 -10.0893 9.05 26.2911
 29.8446 9.05 26.2911
@@ -4612,7 +4612,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -15.7942 -4.9 23.9911
@@ -4631,7 +4631,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -4.61271 7.3 28.6911
@@ -4650,7 +4650,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -2.55896 -4.9 28.6911
@@ -4669,7 +4669,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -15.7942 -4.9 28.6911
@@ -4688,7 +4688,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -12.7136 7.25 23.9911
@@ -4707,7 +4707,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 -15.7942 -4.9 28.6911
@@ -4726,7 +4726,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 21.8578 -4.9 23.9911
@@ -4745,7 +4745,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 21.8578 -4.9 28.5911
@@ -4764,7 +4764,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 21.8578 -4.9 28.5911
@@ -4783,7 +4783,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 24.3679 7.3 23.9911
@@ -4802,7 +4802,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 32.8111 7.25 28.5911
@@ -4821,7 +4821,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/pyramidwall.png"
+texture "../images/pyramidwall.rgb"
 texrep 1 3
 numvert 4
 36.0058 -4.9 28.5911
@@ -4840,7 +4840,7 @@ kids 0
 OBJECT poly
 name "box"
 loc -10.0058 1.8 -35.673
-texture "../images/wood.png"
+texture "../images/wood.rgb"
 texrep 1 3
 numvert 4
 -12.7136 7.25 28.6411

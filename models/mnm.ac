@@ -5,7 +5,7 @@ kids 1
 OBJECT poly
 name "rect"
 loc 0.0261096 0.0456918 0
-texture "../images/mnm.png"
+texture "../images/mnm.rgb"
 numvert 4
 -1 0 -0.6
 1 0 -0.6

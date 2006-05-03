@@ -1465,7 +1465,7 @@ refs 4
 kids 0
 OBJECT poly
 name "disk"
-texture "../images/Penguin_orig.png"
+texture "/u/tuxkart/models/../images/Penguin_orig.rgb"
 numvert 8
 -0.0707347 0.171887 -0.307493
 -0.0707347 0.384091 -0.20139
