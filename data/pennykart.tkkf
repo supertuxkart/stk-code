@@ -1,23 +1,14 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Penny")
- (model "pennykart-med.ac")
- (icon  "pennyicon.rgb")
- (shadow "pennyshadow.rgb")
+ (name        "Penny")
+ (model-file  "pennykart-med.ac")
+ (icon-file   "pennyicon.rgb")
+ (shadow-file "pennyshadow.rgb")
+
  (red   0.8)
  (green 0.8)
  (blue  0.8)
        
- (max-throttle   100)
- (engine-power   60)
- (corn-f         -5.2)
- (corn-r         -6.0)
- (mass           50)
- (inertia        13)
- (turn-speed     10.1415926535897931)
- (max-wheel-turn 1.5707963267948966)
- (tire-grip        0.4)
- (air-friction    0.8257))
-
+)
 ;; EOF ;;

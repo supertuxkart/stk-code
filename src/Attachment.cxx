@@ -37,16 +37,17 @@ initAttachmentType iat[]={
   {ATTACH_MAX,         ""},
 
 };
-
+// -----------------------------------------------------------------------------
 AttachmentManager::AttachmentManager() {
   for(int i=0; iat[i].attachment!=ATTACH_MAX; i++) {
     attachments[iat[i].attachment]=ssgLoadAC(iat[i].file, loader);
   }   // for
 }   //AttachmentManager
 
-
+// -----------------------------------------------------------------------------
 AttachmentManager *Attachment::attachment_manager=0;
 
+// =============================================================================
 Attachment::Attachment(Kart* _kart) {
   if(!attachment_manager) {
     attachment_manager=new AttachmentManager();
@@ -62,23 +63,25 @@ Attachment::Attachment(Kart* _kart) {
     holder->addKid(p);
   }
   holder->select(0);
-}
+}   // Attachmetn
 
+// -----------------------------------------------------------------------------
 Attachment::~Attachment() {
-    if(attachment_manager)
-    {
-      delete attachment_manager;
-      attachment_manager = 0;
-    }
-
+  if(attachment_manager) {
+    delete attachment_manager;
+    attachment_manager = 0;
+  }
     ssgDeRefDelete(holder);
-}
+}   // ~Attachment
+
+// -----------------------------------------------------------------------------
 void Attachment::set(attachmentType _type, float time) {
   holder->selectStep(_type);
   type      = _type;
   time_left = time;
 }   // set
 
+// -----------------------------------------------------------------------------
 void Attachment::hitGreenHerring() {
   switch (rand()%2) {
     case 0: set( ATTACH_PARACHUTE, 4.0f ) ;
@@ -92,26 +95,21 @@ void Attachment::hitGreenHerring() {
   }   // switch rand()%2
 }   // hitGreenHerring
 
+// -----------------------------------------------------------------------------
 void Attachment::update(float dt, sgCoord *velocity) {
   if(type==ATTACH_NOTHING) return;
   time_left -=dt;
 
   switch (type) {
+   case ATTACH_PARACHUTE:  // handled in Kart::updatePhysics
+   case ATTACH_ANVIL:      // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:       break;
     case ATTACH_TINYTUX:   if(time_left<=0.0) kart->handleRescue();
                            sgZeroVec3 ( velocity->xyz ) ;
                            sgZeroVec3 ( velocity->hpr ) ;
 			   velocity->xyz[2] = 1.1 * GRAVITY * dt *10;
-               break;
-    case ATTACH_PARACHUTE: if(velocity->xyz[1]>MAX_PARACHUTE_VELOCITY) {
-			     velocity->xyz[1]=MAX_PARACHUTE_VELOCITY;
-			   }
-                           break;
-    case ATTACH_ANVIL:     if(velocity->xyz[1]>MAX_ANVIL_VELOCITY) {
-			     velocity->xyz[1]=MAX_ANVIL_VELOCITY;
-			   }
-                           break;
+			   break;
     case ATTACH_MAGNET:    break;
     case ATTACH_MAGNET_BZZT: float cdist; int closest;
                              kart->getClosestKart(&cdist, &closest);
@@ -139,3 +137,4 @@ void Attachment::update(float dt, sgCoord *velocity) {
     clear();
   }   // if time_left<0
 }   // update
+// -----------------------------------------------------------------------------

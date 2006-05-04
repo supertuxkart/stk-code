@@ -1,0 +1,32 @@
+;; -*- mode: lisp -*-
+
+(physics
+
+;; Attachment related parameters
+;; -----------------------------
+ (anvil-weight        50.0   )
+ (parachute-friction   1.0   )
+ (magnet-range        30.0   )
+ (magnet-min-range     4.0   )
+
+
+;; Other kart relates values
+;; -------------------------
+ (jump-impulse         0.3   )  ;; percentage of gravity!
+
+;; The following files are the defaults for karts
+// ----------------------------------------------
+ (wheel-base           1.2   )
+ (heightCOG            0.5   )
+ (engine-power       600     )
+ (mass                90     )
+ (air-friction         0.8257)
+ (roll-resistance      0.05  )
+ (tire-grip            0.9   )
+ (max-steer-angle     90     )
+ 
+ (corn-f              -7.2   )
+ (corn-r              -5     )
+ (inertia             15     )
+)
+;; EOF ;;

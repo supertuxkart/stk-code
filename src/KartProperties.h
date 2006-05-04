@@ -21,6 +21,7 @@
 #define HEADER_KARTPROPERTIES_H
 
 #include <string>
+#include "lisp/Lisp.h"
 #include "NoCopy.h"
 
 class Material;
@@ -54,24 +55,22 @@ class KartProperties : public NoCopy {
   float heightCOG;          // height of center of gravity
   float engine_power;       // maximum force from engine
   float tire_grip;          // grip of tires in longitudinal direction
+  float max_steer_angle;    // maximum steering angle
 
   /** old properties */
   float corn_f;
   float corn_r;
   float inertia;
-  float turn_speed;
-  float max_wheel_turn;
 
-  // ideally this constructor would be deleted
-  KartProperties();
-  KartProperties(const std::string& filename,
-		 char *node="tuxkart-kart");
-  ~KartProperties();
+               KartProperties ();
+  virtual     ~KartProperties ();
   
-  void       init_defaults  ();
-  void       loadModel      ();
-  Material*  getIconMaterial() const   { return icon_material; }
-  ssgEntity* getModel       () const   { return model;         }
+  virtual void init_defaults  ();
+  virtual void getAllData     (const lisp::Lisp* lisp);
+  virtual void load           (const std::string& filename, 
+			       char *node="tuxkart-kart");
+  Material*    getIconMaterial() const   { return icon_material; }
+  ssgEntity*   getModel       () const   { return model;         }
 };
 
 #endif

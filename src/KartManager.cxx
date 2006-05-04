@@ -82,12 +82,10 @@ KartManager::loadKartData()
   for(std::set<std::string>::iterator i = result.begin(); 
                                       i != result.end(); ++i) {
     if (StringUtils::has_suffix(*i, ".tkkf")) {
-      karts.push_back(new KartProperties("data/" + *i));
+      KartProperties* kp = new KartProperties();
+      kp->load("data/" + *i);
+      karts.push_back(kp);
     }   // if
-  }   // for i
-  for(KartPropertiesVector::iterator i = karts.begin(); 
-                                     i != karts.end(); ++ i) {
-    (*i)->loadModel();
   }   // for i
 }   // loadKartData
 

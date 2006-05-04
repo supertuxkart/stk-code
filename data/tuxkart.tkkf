@@ -1,24 +1,14 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Tux")
- (model "tuxkart.ac")
- (icon  "tuxicon.rgb")
- (shadow "tuxkartshadow.rgb")
+ (name        "Tux")
+ (model-file  "tuxkart.ac")
+ (icon-file   "tuxicon.rgb")
+ (shadow-file "tuxkartshadow.rgb")
  
- (red   0.8)
- (green 0.0)
- (blue  0.0)
+ (red         0.8)
+ (green       0.0)
+ (blue        0.0)
        
- (max-throttle   100)
- (engine-power   60)
- (corn-f         -7.2)
- (corn-r         -5.0)
- (mass           90)
- (inertia        15)
- (turn-speed     3.1415926535897931)
- (max-wheel-turn 1.5707963267948966)
- (tire-grip        0.4)
- (air-friction    0.8257))
-
+)
 ;; EOF ;;

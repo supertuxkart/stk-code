@@ -1,24 +1,14 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Yeti")
- (model "yetikart.ac")
- (icon  "yetiicon.rgb")
- (shadow "yetishadow.rgb")
+ (name        "Yeti")
+ (model-file  "yetikart.ac")
+ (icon-file   "yetiicon.rgb")
+ (shadow-file "yetishadow.rgb")
  
- (red   0.2)
- (green 0.0)
- (blue  0.2)
+ (red         0.2)
+ (green       0.0)
+ (blue        0.2)
        
- (max-throttle   100)
- (engine-power   50)
- (corn-f         -1.0)
- (corn-r         -0.1)
- (mass           100)
- (inertia        20)
- (turn-speed     3.1415926535897931)
- (max-wheel-turn 1.5707963267948966)
- (tire-grip        0.5)
- (air-friction    0.8257))
-
+)
 ;; EOF ;;

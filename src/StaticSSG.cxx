@@ -168,7 +168,7 @@ void StaticSSG::StoreTriangle(ssgLeaf* l, int indx, sgVec3 vv1,
 }   // StoreTriangle
 
 // -----------------------------------------------------------------------------
-float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf) {
+float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) {
 
   float hot      = NOINTERSECT;
   int nHashStart = GetHash(start[0], start[1]);
@@ -178,8 +178,9 @@ float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf) {
     InfoTriangle *t = (*buckets)[nHashStart][i];
     float hotnew = t->hot(start);
     if(hotnew>hot) {
-      hot  = hotnew;
+      hot   = hotnew;
       *leaf = t->leaf;
+      *nrm  = &t->plane;
     }
   }   // for i <nTriangles
 

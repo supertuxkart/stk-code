@@ -27,15 +27,22 @@
 #include "preprocessor.h"
 #include "StringUtils.h"
 #include "KartProperties.h"
+#include "PhysicsParameters.h"
 
-KartProperties::KartProperties() {
-  init_defaults();
+// This constructor would be a bit more useful, nicer, if we could call 
+// init_defaults() and load from here. Unfortunately, this object is used
+// as a base class for PhysicsParameters, which has to overwrite
+// init_defaults() and getAllData(). But during the call of this constructor,
+// the PhysicsParameters object does not (yet) exist, so the overwriting
+// functions do NOT get called, only the virtual functions here would be
+// called. Therefore, a two step initialisation is necessary: the constructor
+// doing not much, but then in load the overwriting functions can be used.
+KartProperties::KartProperties() : icon_material(0), model(0) {
 }   // KartProperties
 
 // -----------------------------------------------------------------------------
-KartProperties::KartProperties(const std::string& filename,
-			       char *node)
-              : icon_material(0), model(0) {
+void KartProperties::load(const std::string& filename, char *node) {
+
   init_defaults();
 
   const lisp::Lisp* root = 0;
@@ -47,40 +54,30 @@ KartProperties::KartProperties(const std::string& filename,
     
     const lisp::Lisp* lisp = root->getLisp(node);
     if(!lisp) {
-      std::string s="No ";
+      std::string s="No '";
       s+=node;
-      s+=" node found";
+      s+="' node found";
       throw std::runtime_error(s);
     }
-  
-    lisp->get("name",   name);
-    lisp->get("model",  model_file);
-    lisp->get("icon",   icon_file);
-    lisp->get("shadow", shadow_file);
-    lisp->get("red",     color[0]);
-    lisp->get("green",   color[1]);
-    lisp->get("blue",    color[2]);
-
-    lisp->get("tire-grip",      tire_grip);
-    lisp->get("corn-f",         corn_f);
-    lisp->get("corn-r",         corn_r);
-    lisp->get("mass",           mass);
-    lisp->get("inertia",        inertia);
-    lisp->get("turn-speed",     turn_speed);
-    lisp->get("max-wheel-turn", max_wheel_turn);
-    lisp->get("wheel-base",     wheel_base);
-    lisp->get("heightCOG",      heightCOG);
-    lisp->get("engine-power",   engine_power);
-    lisp->get("air-friction",   air_friction);
+    getAllData(lisp);
   } catch(std::exception& err) {
     std::cout << "Error while parsing KartProperties '" << filename
               << ": " << err.what() << "\n";
   }
   delete root;
 
-  // load material
+  // Load material
   icon_material = material_manager->getMaterial(icon_file.c_str());
-}   // KartProperties
+
+  // Load model
+  if(model_file.length()>0) {
+    //JH    model         = ssgLoadAC ( ("models/"+model_file).c_str(), loader ) ;
+    model         = ssgLoadAC ( model_file.c_str(), loader ) ;
+    preProcessObj(model, 0);
+    model->ref();
+  }
+
+}   // load
 
 // -----------------------------------------------------------------------------
 KartProperties::~KartProperties() {
@@ -88,41 +85,54 @@ KartProperties::~KartProperties() {
 }   // ~KartProperties
 
 // -----------------------------------------------------------------------------
+void KartProperties::getAllData(const lisp::Lisp* lisp) {
+    lisp->get("name",            name);
+    lisp->get("model-file",      model_file);
+    lisp->get("icon-file",       icon_file);
+    lisp->get("shadow-file",     shadow_file);
+    lisp->get("red",             color[0]);
+    lisp->get("green",           color[1]);
+    lisp->get("blue",            color[2]);
+
+    lisp->get("wheel-base",      wheel_base);
+    lisp->get("heightCOG",       heightCOG);
+    lisp->get("engine-power",    engine_power);
+    lisp->get("roll-resistance", roll_resistance); 
+    lisp->get("mass",            mass);
+    lisp->get("air-friction",    air_friction);
+    lisp->get("tire-grip",       tire_grip);
+    lisp->get("max-steer-angle", max_steer_angle);
+
+    lisp->get("corn-f",          corn_f);
+    lisp->get("corn-r",          corn_r);
+    lisp->get("inertia",         inertia);
+}   // getAllData
+// -----------------------------------------------------------------------------
 void KartProperties::init_defaults() {
-  // Default to a standard Tux configuration in case anything goes wrong
+
   name          = "Tux";
   ident         = "tux";
   model_file    = "tuxkart.ac";
   icon_file     = "tuxicon.png";
   shadow_file   = "tuxkartshadow.png";
-  icon_material = NULL;
 
-  color[0] = 1.0f;
-  color[1] = 0.0f;
-  color[2] = 0.0f;
-    
-  wheel_base      = 1.2f;
-  heightCOG       = 0.5f;
-  engine_power    = 100.0f;
-  roll_resistance = 4.8f;
-  mass            = 90;
-  air_friction    = 0.8257;
-  tire_grip       = 4.0f;
+  color[0] = 1.0f; color[1] = 0.0f; color[2] = 0.0f;
 
-  corn_f          = -7.2f;
-  corn_r          = -5.0;
-  inertia         = 13;
-  turn_speed      = M_PI;
-  max_wheel_turn  = M_PI/2;
-  
-  model = NULL;
+  wheel_base      = physicsParameters->wheel_base;
+  heightCOG       = physicsParameters->heightCOG;
+  engine_power    = physicsParameters->engine_power;
+  roll_resistance = physicsParameters->roll_resistance;
+  mass            = physicsParameters->mass;
+  air_friction    = physicsParameters->air_friction;
+  tire_grip       = physicsParameters->tire_grip;
+  max_steer_angle = physicsParameters->max_steer_angle;
+
+
+  corn_f          = physicsParameters->corn_f;
+  corn_r          = physicsParameters->corn_r;
+  inertia         = physicsParameters->inertia;
+
 }   // init_defaults
 
 // -----------------------------------------------------------------------------
-void KartProperties::loadModel() {
-  model = ssgLoadAC ( model_file.c_str(), loader ) ;
-  preProcessObj(model, 0);
-  model->ref();
-}   // loadModel
-
 /* EOF */

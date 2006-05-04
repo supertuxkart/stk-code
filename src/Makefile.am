@@ -24,6 +24,7 @@ tuxkart_SOURCES =                                       \
 	KartManager.cxx		 KartManager.h          \
 	ProjectileManager.cxx	 ProjectileManager.h    \
 	KartProperties.cxx	 KartProperties.h       \
+	PhysicsParameters.cxx	 PhysicsParameters.h    \
 	Loader.cxx          	 Loader.h               \
 	RaceManager.cxx		 RaceManager.h          \
 	StringUtils.cxx		 StringUtils.h          \

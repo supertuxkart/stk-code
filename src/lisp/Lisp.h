@@ -64,9 +64,9 @@ public:
     }
     bool get(float& val) const
     {
-        if(type != TYPE_REAL)
+      if(type != TYPE_REAL && type != TYPE_INTEGER)
             return false;
-        val = v.real;
+        val = type==TYPE_REAL ? v.real : v.integer;
         return true;
     }
     bool get(bool& val) const

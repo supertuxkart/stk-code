@@ -66,7 +66,7 @@ void History::Save() {
 
   int k;
   for(k=0; k<nKarts; k++) {
-    fprintf(fd, "model %d: %s\n",k, world->getKart(k)->kart_properties->name.c_str());
+    fprintf(fd, "model %d: %s\n",k, world->getKart(k)->kartProperties->name.c_str());
   }
   fprintf(fd, "size:     %d\n", GetCount());
 

@@ -23,15 +23,13 @@
 #include <vector>
 #include "RaceSetup.h"
 #include "StaticSSG.h"
-
-class PlayerKart;
+#include "Track.h"
+#include "PlayerKart.h"
 
 class ssgRoot;
 class ssgBranch;
 class ssgLeaf;
 class ssgEntity;
-
-class Track;
 
 class Herring;
 class guUDPConnection;
@@ -79,8 +77,8 @@ public:
 
   World(const RaceSetup& raceSetup);
   virtual ~World();
-  float World::GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf ) 
-                              {return staticSSG->hot(start, end, leaf);}
+  float World::GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) 
+                              {return staticSSG->hot(start, end, leaf, nrm);}
   int   World::Collision(sgSphere* s, AllHits *a) 
                               {return staticSSG->collision(s,a);       }
 
@@ -96,6 +94,7 @@ public:
   
   /** Returns the phase of the game */
   Phase getPhase() const { return phase; }
+  float getGravity() const { return track->getGravity();}
 private:
   void updateLapCounter ( int k );
   void loadTrack();

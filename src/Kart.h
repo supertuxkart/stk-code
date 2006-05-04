@@ -60,8 +60,6 @@ protected:
   sgVec2       last_track_coords;
   sgVec2       curr_track_coords;
   float        prevAccel;          // acceleration at previous time step
-  float        steer_angle;
-  float        throttle;
   bool         skidding;           // true if the kart is currently skidding
 
 private:
@@ -91,18 +89,18 @@ private:
   void  load_wheels          (ssgBranch* obj);
     
 public:
-  const KartProperties *kart_properties;
+  const KartProperties *kartProperties;
 
-  Kart(const KartProperties* kart_properties_, int position_ ) ;
+  Kart(const KartProperties* kartProperties_, int position_ ) ;
   virtual ~Kart();
 
   void load_data();
 
   virtual void placeModel ();
   const KartProperties* getKartProperties() const 
-                                        { return kart_properties; }
+                                        { return kartProperties; }
   void           setKartProperties   (const KartProperties *kp) 
-                                        { kart_properties=kp;}
+                                        { kartProperties=kp;}
   void           attach              (attachmentType attachment_, float time)
                                         { attachment.set(attachment_, time);}
   void           gotZipper           (float angle, float time)
@@ -121,8 +119,7 @@ public:
   int            getLap              () { return  raceLap;                  }
   int            getFinishingPosition() { return  finishingPosition;        }
   int            getPosition         () { return  racePosition ;            }
-  const sgVec3*  getColour           () { return &kart_properties->color;   }
-  float          getSteerAngle() const  { return steer_angle;               }
+  float          getSteerAngle() const  { return  velocity.hpr[0];          }
   void           handleRescue        ();
   void           beginPowerslide     ();
   void           endPowerslide       ();
@@ -135,14 +132,17 @@ public:
   // Functions to access the current kart properties (which might get changed,
   // e.g. mass increase or air_friction increase depending on attachment etc.)
   // -------------------------------------------------------------------------
-  float          getMass          () const {return kart_properties->mass;      }
-  float          getAirFriction   () const {return kart_properties->air_friction;}
-  float          getRollResistance() const {return kart_properties->roll_resistance;}
-  float          getMaxPower      () const {return kart_properties->engine_power;}
-  float          getWheelBase     () const {return kart_properties->wheel_base;}
-  float          getHeightCOG     () const {return kart_properties->heightCOG; }
-  float          getTireGrip      () const {return kart_properties->tire_grip; }
-
+  const sgVec3*  getColour        () const {return &kartProperties->color;   }
+  float          getMass          () const {return kartProperties->mass
+                                                 + attachment.WeightAdjust();  }
+  float          getAirFriction   () const {return kartProperties->air_friction
+                                                 + attachment.AirFrictAdjust();}
+  float          getRollResistance() const {return kartProperties->roll_resistance;}
+  float          getMaxPower      () const {return kartProperties->engine_power;}
+  float          getWheelBase     () const {return kartProperties->wheel_base;}
+  float          getHeightCOG     () const {return kartProperties->heightCOG; }
+  float          getTireGrip      () const {return kartProperties->tire_grip; }
+  float          getMaxSteerAngle () const {return kartProperties->max_steer_angle;}
 
   virtual void   collectedHerring    (Herring* herring);
   virtual void   reset               ();
@@ -158,8 +158,8 @@ public:
 
 class TrafficDriver : public Kart {
 public:
-  TrafficDriver (const KartProperties* kart_properties_, sgVec3 _pos )
-    : Kart (kart_properties_, 0 )
+  TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos )
+    : Kart (kartProperties_, 0 )
   {
     sgCopyVec3 ( reset_pos.xyz, _pos ) ;
     reset () ;

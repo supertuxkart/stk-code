@@ -50,6 +50,7 @@
 #include "History.h"
 #include "HerringManager.h"
 #include "sound.h"
+#include "PhysicsParameters.h"
 
 void cmdLineHelp (char* invocation) {
   fprintf ( stdout,
@@ -194,8 +195,6 @@ int handleCmdLine(int argc, char **argv) {
       config->profile=500;
     } else if( !strcmp(argv[i], "--history") ) {
       config->replayHistory=true;
-    } else if( !strcmp(argv[i], "--oldhot") ) {
-      config->oldHOT=true;
     } else if( !strcmp(argv[i], "--herring") && i+1<argc ) {
       config->herringStyle=argv[i+1];
     } else {
@@ -220,16 +219,20 @@ void InitTuxkart() {
   config = new Config();
   sound  = new SoundSystem();
 
-  history             = new History           ();
-  material_manager    = new MaterialManager   ();
-  track_manager       = new TrackManager      ();
-  kart_manager        = new KartManager       ();
-  projectile_manager  = new ProjectileManager ();
-  collectable_manager = new CollectableManager();
-  race_manager        = new RaceManager       ();
-  screen_manager      = new ScreenManager     ();
-  hook_manager        = new HookManager       ();
-  herring_manager     = new HerringManager    ();
+  // The order here can be important, e.g. KartManager needs 
+  // defaultKartProperties.
+  history               = new History           ();
+  material_manager      = new MaterialManager   ();
+  track_manager         = new TrackManager      ();
+  physicsParameters     = new PhysicsParameters ();
+  physicsParameters->load("data/physics.data");
+  kart_manager          = new KartManager       ();
+  projectile_manager    = new ProjectileManager ();
+  collectable_manager   = new CollectableManager();
+  race_manager          = new RaceManager       ();
+  screen_manager        = new ScreenManager     ();
+  hook_manager          = new HookManager       ();
+  herring_manager       = new HerringManager    ();
   track_manager   ->loadTrackList () ;
 }
 
@@ -252,6 +255,9 @@ int main ( int argc, char **argv ) {
   herring_manager    ->loadAllHerrings();
   startScreen = new StartScreen();
   widgetSet   = new WidgetSet;
+
+  // Replay a race
+  // =============
   if(config->replayHistory) {
     // This will setup the race manager etc.
     history->Load();
@@ -260,23 +266,36 @@ int main ( int argc, char **argv ) {
   } else {
     if(!config->profile) {
       if(config->singleWindowMenu) {
+
+  // Single Window Menu
+  // ==================
 	if(SingleWindowMenu()) exit(0);   // Quit selected
 	startScreen->switchToGame();
       } else if (!config->noStartScreen ) {
+
+  // Normal multi window start
+  // =========================
 	screen_manager->setScreen(startScreen);
       } else {
+
+  // Quickstart (-n)
+  // ===============
 	race_manager->setNumPlayers(1);
 	race_manager->setNumKarts  (4);
+	race_manager->setNumKarts  (1);
 	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
 	race_manager->setDifficulty(RD_MEDIUM);
 	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
 	race_manager->setNumLaps   (1);
-	race_manager->setTrack     ("tuxtrack");
-	//race_manager->setTrack     ("olivermath");
+	//race_manager->setTrack     ("tuxtrack");
+	//race_manager->setTrack     ("sandtrack");
+	race_manager->setTrack     ("race");
 	startScreen->switchToGame();
       }
     } else {
-      /* For profiling just set the values we wanted to profile */
+
+  // Profiling
+  // =========
       race_manager->setNumPlayers(1);
       race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
       race_manager->setNumKarts  (4);

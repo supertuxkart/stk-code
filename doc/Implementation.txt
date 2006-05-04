@@ -46,3 +46,71 @@ might make the ProjectileManager inherit from the CollectableManager,
 more complicated: e.g. depending on whether the collectable is
 a missile or not, different managers have to be called ...]
 
+
+3) Default parameters 
+=====================
+All default parameters (mostly physics related, including default
+kart properties) are stored in data/physics.data, and managed by
+PhysicsParameters, which has KartProperties as a base class, so it
+can automatically store all kart data as well.
+This class checks if all necessary parameters are defined, so 
+missing data in data/physics.data will be detected.
+To add another parameter:
+1) add the parameter to data/physics.data
+2) add a variable to PhysicsParameter.h
+3) add a call to list->get to PhysicsParameter::getAllData
+4) add an initialisation to PhysicsParameter::init_defaults
+   (this value if possible should be <-99, since this is used
+   to detect missing values. If this value should be a valid
+   value for the new parameter, find something else and adjust
+   the test in PhysicsParameters::load accordingly).
+5) add a test to PhysicsParameters::load to see if this value
+   was defined.
+
+4) Menu handling
+================
+The ScreenManager contains the main event/redraw loop in its 
+ScreenManager::run function. The next screen can be defined, which
+means that the ScreenManager will delete the currenct screen, and
+replace it with the next screen. The main loop for the 
+ScreenManager can be aborted by calling ScreenManager::abort().
+
+There are currently two screens:
+- StartScreen
+  --> background rendered image of tuxkart
+- WorldScreen
+  --> Handles the display of the actual race, but is also
+      used when the race menu pops up
+The screens are then mainly responsible for:
+- drawing the actual screen (background image for StartScreen,
+  race track, karts etc for WorldScreen)
+- calling plibdrv.pollEvents (which manages all input)
+- calling updateGUI to handle keyboard etc.
+- swapping the display buffers
+
+StartScreen
+-----------
+A gui-stack (gui/BaseGUI) is responsible for handling the
+menus. StartScreen pushes GUI_MAINMENU on the guistack, which
+is the first menu. When a choice is made, the next menu
+(see BaseGUI the function updateGUI) is pushed on the stack.
+The updateGUI function then updates the current gui.
+
+When the main menu is finished, StartScreen::switchToGame
+gets called, either from:
+- start_tuxkart (profiling, quick start)
+- gui/CharSel   (GrandPrix)
+- gui/NumLaps   (all other racing modes)
+switchToGame clears the guiStack and calls RaceManager::start(). 
+There, a RaceMode object is created and start() gets called, 
+where (after some setup) a new WorldScreen is created and set 
+in the screen_manager.
+
+If a race is over (or aborted), a new StartStreen is created
+(see ::next() of all racing modes in RaceManager), and the
+menu handling starts again.
+
+WorldScreen
+-----------
+Similarly to StartScreen, WorldScreen::update gets called
+regularly by the ScreenManager.

@@ -79,7 +79,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   loadTrack   ( ) ;
 
   staticSSG = new StaticSSG(trackBranch, 1000);
-  //staticSSG->Draw(scene);
+  //  staticSSG->Draw(scene);
   //  exit(-1);
   int pos = 0;
   int playerIndex = 0;
@@ -233,7 +233,9 @@ void World::checkRaceStatus() {
       }
   }
   if(finished_plyrs == raceSetup.players.size()) phase = FINISH_PHASE;
-  else if(finished_karts == kart.size() - 1 && raceSetup.mode != RaceSetup::RM_TIME_TRIAL) phase = FINISH_PHASE;
+  //JH debug only, to be able to run with a single player kart
+  // !!!!!!!!!!!!!!!!!!!!!
+  // else if(finished_karts == kart.size() - 1 && raceSetup.mode != RaceSetup::RM_TIME_TRIAL) phase = FINISH_PHASE;
 }
 
 void

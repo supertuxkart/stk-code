@@ -21,39 +21,15 @@
 #define HEADER_MOVEABLE_H
 
 #include <plib/ssg.h>
+#include "Material.h"
 
 /* Limits of Kart performance */
-
-#define MAX_VELOCITY            (200.0f * KILOMETERS_PER_HOUR )
-#define MAX_NATURAL_VELOCITY    ( 60.0f * KILOMETERS_PER_HOUR )
-#define MAX_PARACHUTE_VELOCITY  ( 40.0f * KILOMETERS_PER_HOUR )
-#define MAX_ANVIL_VELOCITY      ( 10.0f * KILOMETERS_PER_HOUR )
-#define MAX_REVERSE_VELOCITY    ( -5.0f * KILOMETERS_PER_HOUR )
-#define MIN_HANDICAP_VELOCITY   ( 50.0f * KILOMETERS_PER_HOUR )
-#define MAX_HANDICAP_VELOCITY   ( 70.0f * KILOMETERS_PER_HOUR )
-#define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
-
-#define MAX_ACCELLERATION       ( MAX_NATURAL_VELOCITY * 0.3f )
-#define MAX_BRAKING             ( MAX_NATURAL_VELOCITY * 1.0f )
-#define MAX_DECELLERATION       ( MAX_NATURAL_VELOCITY * 0.4f )
-
-#define MAX_TURN_RATE             22.5f  /* Degrees per second. */
-#define HOMING_MISSILE_TURN_RATE  (MAX_TURN_RATE*6.0f)
-#define HOMING_MISSILE_PITCH_RATE (MAX_TURN_RATE/2.0f)
-#define SKID_RATE                  0.0007f
-
-#define MAGNET_RANGE         30.0f
-#define MAGNET_RANGE_SQD     (MAGNET_RANGE * MAGNET_RANGE)
-#define MAGNET_MIN_RANGE     4.0f
-#define MAGNET_MIN_RANGE_SQD (MAGNET_MIN_RANGE * MAGNET_MIN_RANGE)
-
-#define JUMP_IMPULSE         (0.3*GRAVITY)
-
 #define CRASH_PITCH          -45.0f
 #define WHEELIE_PITCH         45.0f
 #define WHEELIE_PITCH_RATE    60.0f
 #define PITCH_RESTORE_RATE    90.0f
 
+#define MAX_NATURAL_VELOCITY    ( 60.0f * KILOMETERS_PER_HOUR )
 #define MIN_WHEELIE_VELOCITY (MAX_NATURAL_VELOCITY * 0.9f)
 #define MIN_CRASH_VELOCITY   (MAX_NATURAL_VELOCITY * 0.2f)
 #define MIN_COLLIDE_VELOCITY (MAX_NATURAL_VELOCITY * 0.1f)
@@ -67,11 +43,9 @@ protected:
   sgCoord       reset_pos;      /* Where to start in case of a reset           */
   sgCoord       curr_pos;       /* current position                            */
   sgCoord       velocity;       /* current velocity                            */
-  sgVec3        abs_velocity;   /* world coordinates' velocity vector        */
-//FIXME:Is the last_relax_pos variable used anywhere?
-  sgCoord       last_relax_pos; /* Used to save the last position of the kart, 
-				   which is then interpolated with the new one
-				   to form a smooth movement                   */
+  sgVec3        abs_velocity;   /* world coordinates' velocity vector          */
+  sgVec4*       normalHOT;      /* plane on which HOT was computed             */
+  Material*     materialHOT;    /* Material at HOT                             */
   ssgTransform* model;
   ssgTransform* shadow;
   int           collided;

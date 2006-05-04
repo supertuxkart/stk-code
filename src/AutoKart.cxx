@@ -22,7 +22,6 @@
 #include "World.h"
 #include "Track.h"
 #include "AutoKart.h"
-#include "Config.h"
 
 void AutoKart::update (float delta) {
   // perhaps add a bit of delay depending on the difficulty?
@@ -69,26 +68,28 @@ void AutoKart::update (float delta) {
   SGfloat distance;
   
   float check_width;
-  for(int i = steps; i > -1 ; --i) 
-  {
-          sgAddScaledVec3(future_coords2, curr_pos.xyz, future_coords, kart_length * i);
-          future_hint = world->track->spatialToTrack( future_track_coords, future_coords2, future_hint);
+  for(int i = steps; i > -1 ; --i) {
+    sgAddScaledVec3(future_coords2, curr_pos.xyz, 
+		    future_coords, kart_length * i);
+    future_hint = world->track->spatialToTrack( future_track_coords, 
+						future_coords2, future_hint);
     
-	  distance = future_track_coords[0] > 0.0f ? future_track_coords[0] : -future_track_coords[0];
+    distance = future_track_coords[0] > 0.0f ?  future_track_coords[0] 
+                                             : -future_track_coords[0];
 
-          check_width = world->track->getWidth()[future_hint] > 
-              world->track->getWidth()[trackHint] ? world->track->getWidth()[trackHint] :
-              world->track->getWidth()[future_hint];
+    check_width = world->track->getWidth()[future_hint] >
+                  world->track->getWidth()[trackHint] 
+                ? world->track->getWidth()[trackHint] 
+                : world->track->getWidth()[future_hint];
 
-          if (distance + 0.75f > check_width) 
-          {
-              steer = true;
-              break;
-          }
-      }
+    if (distance + 0.75f > check_width) {
+      steer = true;
+      break;
+    }
+  }   // for i
 
-      //FIXME: if the kart if crashing constantly(like with a wall) make it move backwards in a straight line, 
-      //then move forward while turning.
+  //FIXME: if the kart if crashing constantly(like with a wall) make it move 
+  //       backwards in a straight line, then move forward while turning.
   //FIXME: if the kart is going the wrong way make it move backwards while 
   //       turning.
   //FIXME: if the kart's curr_pos are at less than 1 kart from crashing with 
@@ -99,53 +100,50 @@ void AutoKart::update (float delta) {
   //       the track with most space.
   //FIXME: rotation should be dependant on how much each kart can rotate, so we 
   //       don't have crazy cars.
-
-if(steer && wheelie_angle <= 0.0f) getVelocity()->hpr[0] = sqrt(velocity.xyz[1]) * (future_track_coords[0] > 0.0f ? MAX_TURN_RATE : -MAX_TURN_RATE) * difficulty;
-
-  if(!config->newPhysics) {
-    if (velocity.xyz[1] < MAX_NATURAL_VELOCITY * ( 1.0f + wheelie_angle/90.0f ) ) 
-      velocity.xyz[1] += MAX_ACCELLERATION * delta * difficulty ;
-    else if ( velocity.xyz[1] > MAX_DECELLERATION * delta ) 
-      velocity.xyz[1] -= MAX_DECELLERATION * delta * difficulty;
-    else if ( velocity.xyz[1] < -MAX_DECELLERATION * delta ) 
-      velocity.xyz[1] += MAX_DECELLERATION * delta * difficulty;
-    else 
-      velocity.xyz[1] = 0.0f ;
-
-  } else { // new physics
-    if (velocity.xyz[1] < MAX_NATURAL_VELOCITY * (1.0f + wheelie_angle/90.0f) ) {
-      throttle = 1.0f;
-    } else if ( velocity.xyz[1] > MAX_DECELLERATION * delta ) {
-      throttle = -1.0f;
-    } else if ( velocity.xyz[1] < -MAX_DECELLERATION * delta ) {
-      throttle = 1.0f;
-    } else {
-      throttle = 0.0f;
-    }
+    
+  if(steer && wheelie_angle <= 0.0f) {
+    controls.lr = sqrt(velocity.xyz[1]) * difficulty 
+                * (future_track_coords[0] > 0.0f ?  -1.0f : 1.0f);
+  }
+  // JH FIXME: Since there is no max_natural_velocity anymore, we need
+  //           a better way of determining when to slow down! For now,
+  //           only consider accelerating less when skidding
+  // Original code:
+  //if (velocity.xyz[1] < MAX_NATURAL_VELOCITY * (1.0f + wheelie_angle/90.0f) ) {
+  //  throttle = 1.0f;
+  //} else if ( velocity.xyz[1] > MAX_DECELLERATION * delta ) {
+  //  throttle = -1.0f;
+  //} else if ( velocity.xyz[1] < -MAX_DECELLERATION * delta ) {
+  //  throttle = 1.0f;
+  //} else {
+  //  throttle = 0.0f;
+  //}
+  if(skidding) {
+    controls.accel = 0.5;
+  } else {
+    controls.accel = 1.0;
   }
 
-//Check if we should do a wheelie. It's the same as steering, only this one
-//checks the line that goes from velocity to velocity * 1.35
-//FIXME: instead of using 1.35, it find out how much time it will pass to stop
-//doing the wheelie completely from the current state.
-  if(world->raceSetup.difficulty != RD_EASY)
-  {
+  //Check if we should do a wheelie. It's the same as steering, only this one
+  //checks the line that goes from velocity to velocity * 1.35
+  //FIXME: instead of using 1.35, it find out how much time it will pass to stop
+  //doing the wheelie completely from the current state.
+  if(world->raceSetup.difficulty != RD_EASY) {
     bool do_wheelie = true;
     const int wheelie_steps = int((velocity.xyz[1] * 1.35f)/ kart_length );
-    for(int i = wheelie_steps; i > steps - 1; --i) 
-    {
-          sgAddScaledVec3(future_track_coords, curr_pos.xyz, future_coords, kart_length * i);
+    for(int i = wheelie_steps; i > steps - 1; --i) {
+      sgAddScaledVec3(future_track_coords, curr_pos.xyz, future_coords, 
+		      kart_length * i);
+      world->track->spatialToTrack( future_track_coords, future_track_coords, 
+				    future_hint);
+      distance = future_track_coords[0] > 0.0f ?  future_track_coords[0] 
+                                               : -future_track_coords[0];
 
-	  world->track->spatialToTrack( future_track_coords, future_track_coords, future_hint);
-
-	  distance = future_track_coords[0] > 0.0f ?  future_track_coords[0] : -future_track_coords[0];
-
-      if (distance > world->track->getWidth()[trackHint]) 
-      {
+      if (distance > world->track->getWidth()[trackHint]) {
 	do_wheelie = false;
 	break;
       }
-    }   
+    }   // for i
     if ( do_wheelie && !steer && velocity.xyz[1] >= MIN_WHEELIE_VELOCITY ) {
       if ( wheelie_angle < WHEELIE_PITCH )
 	wheelie_angle += WHEELIE_PITCH_RATE * delta;
@@ -155,7 +153,7 @@ if(steer && wheelie_angle <= 0.0f) getVelocity()->hpr[0] = sqrt(velocity.xyz[1])
       wheelie_angle -= PITCH_RESTORE_RATE * delta;
       if ( wheelie_angle <= 0.0f ) wheelie_angle = 0.0f ;
     }
-  }
+  }   // if difficulty!=RD_EASY
 
   if ( collectable.getType() != COLLECT_NOTHING ) {
     time_since_last_shoot += delta ;

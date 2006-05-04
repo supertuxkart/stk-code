@@ -222,6 +222,7 @@ void Track::loadTrack(const std::string& filename) {
   fog_density = 1.0f/100.0f;
   fog_start   = 0.0f;
   fog_end     = 1000.0f;
+  gravity     = 9.80665f;
 
   sgSetVec3 ( sun_position, 0.4, 0.4, 0.4 ) ;
   sgSetVec4 ( sky_color  , 0.3, 0.7, 0.9, 1.0 ) ;
@@ -257,6 +258,7 @@ void Track::loadTrack(const std::string& filename) {
   lisp->get("sun-ambient",   ambientcol);
   lisp->get("sun-specular",  specularcol);
   lisp->get("sun-diffuse",   diffusecol);
+  lisp->get("gravity",       gravity);
   delete root;
 }
 

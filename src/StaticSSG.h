@@ -66,7 +66,7 @@ class StaticSSG {
  public:
   StaticSSG(ssgEntity* start, int n);
   void Draw(ssgBranch* b);
-  float hot(sgVec3 start, sgVec3 end, ssgLeaf** l);
+  float hot(sgVec3 start, sgVec3 end, ssgLeaf** l, sgVec4** nrm);
   int collision(sgSphere *s, AllHits *allHits);
 };
 #endif

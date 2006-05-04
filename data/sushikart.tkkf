@@ -1,23 +1,14 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-kart
- (name "Sushi")
- (model "sushikart.ac")
- (icon  "sushiicon.rgb")
- (shadow "sushishadow.rgb")
- (red   0.2)
- (green 0.2)
- (blue  0.0)
-       
- (max-throttle   100)
- (engine-power   60)
- (corn-f         -5.2)
- (corn-r         -4.0)
- (mass           50)
- (inertia        20)
- (turn-speed     10.1415926535897931)
- (max-wheel-turn 1.5707963267948966)
- (tire-grip        0.4)
- (air-friction    0.8257))
+ (name        "Sushi")
+ (model-file  "sushikart.ac")
+ (icon-file   "sushiicon.rgb")
+ (shadow-file "sushishadow.rgb")
 
+ (red         0.2)
+ (green       0.2)
+ (blue        0.0)
+       
+)
 ;; EOF ;;

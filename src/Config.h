@@ -47,10 +47,8 @@ class Config {
     bool   oldStatusDisplay;
     int    profile;         // Number of frames to profile, default 500
                             // -1 if no profiling. Never saved in config file!
-    int    newPhysics;      // true if the new physics should be used.
     std::string herringStyle;
     bool   disableMagnet;   // true if a magnet can be dis- and enabled
-    bool   oldHOT;
     bool   replayHistory;
     bool   useKPH;
     int    width;
