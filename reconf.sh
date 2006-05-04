@@ -11,5 +11,5 @@ autoconf
 echo "Configuring"
 ./configure
 echo "Make"
-\make  |& tee config.errors
+make  | tee config.errors
 
