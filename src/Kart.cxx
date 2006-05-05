@@ -145,15 +145,16 @@ Kart::~Kart() {
 
 // -----------------------------------------------------------------------------
 void Kart::reset() {
+  Moveable::reset();
+
   raceLap        = -1;
   racePosition   = 9;
   ZipperTimeLeft = 0.0f ;
   rescue         = FALSE;
   attachment.clear();
-  Moveable::reset();
   num_herring_gobbled = 0;
   trackHint = world -> track -> absSpatialToTrack(curr_track_coords,
-						  curr_pos.xyz      );
+						  curr_pos.xyz);
 }   // reset
 
 // -----------------------------------------------------------------------------
@@ -284,9 +285,10 @@ void Kart::doCollisionAnalysis ( float delta, float hot ) {
 
 // -----------------------------------------------------------------------------
 void Kart::update (float dt) {
-    
-  wheel_position += sgLengthVec3(velocity.xyz) * dt;
-   
+  //wheel_position gives the rotation around the X-axis, and since velocity's
+  //timeframe is the delta time, we don't have to multiply it with dt.
+  wheel_position += sgLengthVec3(velocity.xyz);
+
   if ( rescue ) {
     rescue = FALSE ;
     attachment.set( ATTACH_TINYTUX, 4.0f ) ;
@@ -622,10 +624,10 @@ void Kart::placeModel () {
   sgMat4 wheel_front;
   sgMat4 wheel_steer;
   sgMat4 wheel_rot;
-  
+
   sgMakeRotMat4( wheel_rot, 0, -wheel_position, 0);
-  sgMakeRotMat4( wheel_steer, getSteerAngle()/M_PI * 180.0f * 0.25f, 0, 0);
-  
+  sgMakeRotMat4( wheel_steer, getSteerAngle()/M_PI , 0, 0);
+
   sgMultMat4(wheel_front, wheel_steer, wheel_rot);
   
   if (wheel_front_l) wheel_front_l->setTransform(wheel_front);
