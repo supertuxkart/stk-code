@@ -52,7 +52,7 @@ Lexer::nextChar()
     if(c >= bufend) {
         if(isEof)
             throw EOFException();
-        stream.read(buffer, BUFFER_SIZE);
+        stream.read(buffer, LEXER_BUFFER_SIZE);
         std::streamsize n = stream.gcount();
 
         c = buffer;
@@ -61,7 +61,7 @@ Lexer::nextChar()
         // the following is a hack that appends an additional ' ' at the end of
         // the file to avoid problems when parsing symbols/elements and a sudden
         // EOF. This is faster than relying on unget and IMO also nicer.
-        if(n < BUFFER_SIZE || n == 0) {
+        if(n < LEXER_BUFFER_SIZE || n == 0) {
             *bufend = ' ';
             ++bufend;
             isEof = true;

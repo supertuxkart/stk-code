@@ -50,7 +50,7 @@ public:
 private:
     enum {
         MAX_TOKEN_LENGTH = 4096,
-        BUFFER_SIZE = 1024
+        LEXER_BUFFER_SIZE = 1024
     };
     
     inline void nextChar();
@@ -58,7 +58,7 @@ private:
     std::istream& stream;
     bool isEof;
     int linenumber;
-    char buffer[BUFFER_SIZE+1];
+    char buffer[LEXER_BUFFER_SIZE+1];
     char* bufend;
     char* c;
     char token_string[MAX_TOKEN_LENGTH + 1];

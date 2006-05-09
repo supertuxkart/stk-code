@@ -20,6 +20,10 @@
 #include <dirent.h>
 #include <stdexcept>
 #include <sstream>
+#if !defined(WIN32) || defined(__CYGWIN__)
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#endif
 #include "Loader.h"
 
 Loader* loader = 0;

@@ -21,7 +21,7 @@
 #include <stdexcept>
 
 // for mkdir:
-#ifndef WIN32
+#if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
 #  include <sys/types.h>
 #endif
