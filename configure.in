@@ -44,6 +44,7 @@ else
   dnl CygWin under Windoze.
 
   LIBS="$plib_suffix $LIBS -lm -lwinmm -lopengl32 -luser32 -lgdi32"
+  AC_DEFINE(NOMINMAX)
 
 fi
 

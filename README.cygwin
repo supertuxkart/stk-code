@@ -10,14 +10,19 @@ Some short instruction on how to compile supertuxkart with cygwin:
 3) Compile and install plib
    This should work straight out of the box.
 
-4) Unpack supteruxkart and run ./configure
+4) Unpack supteruxkart and run ./configure  and  make.
 
-5) Unless the configure scripts gets fixed:
-   - add -DNOMINMAX to the variables DEFS in src/Makefile
-     This appears to be a problem with specific g++ version,
-     which can have a 'min' and 'max' defined, causing 
-     problems with std::min and std::max
-   - add -I<path to GL/freeglut> to DEFAULT_INCLUDES in src/Makefile
-     E.g with the standard cygwin distribution the GL
-     headers are installed in /usr/X11R6/include/GL
-     --> add "-I/usr/X11R6/include"
+That should be all.
+
+
+Comments: 
+1) A -DNOMINMAX is added for cygwin compilations, since otherwise
+   min and max are #defined, causing problems will all std::min and
+   std::max constructs.
+2) The order in which plib/pu.h and plib/pw.h are included appears
+   to be important - pw should be included first.
+
+If you have any problems, please post on the mailing list - I am 
+not a regular windows user, so am probably not able to help you.
+
+   hiker

@@ -18,8 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <signal.h>
-#include <plib/pu.h>
 #include <plib/pw.h>
+#include <plib/pu.h>
 #include "SingleWindowMenu.h"
 #include "TrackManager.h"
 #include "Track.h"
