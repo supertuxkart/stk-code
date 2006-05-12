@@ -110,7 +110,7 @@ void PlayerControls::joybuttons(int whichJoy, int hold, int presses,
   if(grabInput)
   {
       if (editAction != KC_LEFT && editAction != KC_RIGHT &&
-          whichJoy == player_index && presses)
+          editAction != KC_ACCEL && whichJoy == player_index && presses)
       {
           config->player[player_index].buttons[editAction] = presses;
           grabInput = false;
@@ -180,6 +180,7 @@ void PlayerControls::setKeyInfoString(KartActions control) {
     char joyInfo[60];
     if      (control == KC_LEFT)  sprintf(joyInfo, " or stick left");
     else if (control == KC_RIGHT) sprintf(joyInfo, " or stick right");
+    else if (control == KC_ACCEL) sprintf(joyInfo, " or stick up");
     else
     {
         const int TARGET_BUTTON = config->player[player_index].buttons[control];

@@ -27,8 +27,8 @@
 // added in between those two values.
 enum KartActions { KC_LEFT,
 		   KC_RIGHT,
-		   KC_UP,
-		   KC_DOWN,
+		   KC_ACCEL,
+		   KC_BRAKE,
 		   KC_WHEELIE,
 		   KC_JUMP,
 		   KC_RESCUE,

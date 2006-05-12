@@ -27,7 +27,7 @@ struct KartControl {
   int   presses;
   int   releases;
   float lr;
-  bool  accel;
+  float accel;
   bool  brake;
   bool  wheelie;
   bool  jump;
@@ -35,7 +35,7 @@ struct KartControl {
   bool  fire;
 
   KartControl() : buttons(0), presses(0),
-          releases(0), lr(0.0f), accel(false), brake(false),
+          releases(0), lr(0.0f), accel(0.0f), brake(false),
           wheelie(false), jump(false),  rescue(false), fire(false){}
 };
 

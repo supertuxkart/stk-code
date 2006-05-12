@@ -29,8 +29,8 @@
 void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
   //Steering keys(hold)
   controls.lr      = ctrl.data[0];
-  controls.accel   = player->buttons[KC_UP     ] & ctrl.buttons;
-  controls.brake   = player->buttons[KC_DOWN   ] & ctrl.buttons;
+  controls.accel   = -ctrl.data[1];
+  controls.brake   = player->buttons[KC_BRAKE  ] & ctrl.buttons;
   controls.wheelie = player->buttons[KC_WHEELIE] & ctrl.buttons;
 
   //One time press keys; these are cleared each frame so we don't have to
@@ -46,9 +46,9 @@ void PlayerKart::doSteering() {
 
   if(isKeyDown(player->keys[KC_LEFT]   )) controls.lr      = -1.0f;
   if(isKeyDown(player->keys[KC_RIGHT]  )) controls.lr      =  1.0f;
-  if(isKeyDown(player->keys[KC_UP]     )) controls.accel   =  1;
-  if(isKeyDown(player->keys[KC_DOWN]   )) controls.brake   =  1;
-  if(isKeyDown(player->keys[KC_WHEELIE])) controls.wheelie = true;
+  if(isKeyDown(player->keys[KC_ACCEL]  )) controls.accel   =  1.0f;
+  if(isKeyDown(player->keys[KC_BRAKE]  )) controls.brake   =  true;
+  if(isKeyDown(player->keys[KC_WHEELIE])) controls.wheelie =  true;
 
 }   // doSteering
 
@@ -69,7 +69,7 @@ void PlayerKart::action(int key) {
 void PlayerKart::update(float dt) {
   doSteering();
   if(world->getPhase()==World::START_PHASE) {
-    if(controls.lr!=0.0 || controls.accel!=0.0 || controls.brake!=0.0 ||
+    if(controls.lr!=0.0 || controls.accel!=0.0 || controls.brake!=false ||
        controls.fire|controls.wheelie|controls.jump) {
       //JH Some sound here?
       penaltyTime=1.0;
@@ -113,7 +113,7 @@ void PlayerKart::update(float dt) {
   Kart::update(dt);
   controls.lr      = 0.0f;
   controls.accel   = 0.0f;
-  controls.brake   = 0;
+  controls.brake   = false;
   controls.wheelie = false;
   controls.jump    = 0.0f;
 }   // update
