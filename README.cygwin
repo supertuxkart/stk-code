@@ -17,7 +17,7 @@ That should be all.
 
 Comments: 
 1) A -DNOMINMAX is added for cygwin compilations, since otherwise
-   min and max are #defined, causing problems will all std::min and
+   min and max are #defined, causing problems with all std::min and
    std::max constructs.
 2) The order in which plib/pu.h and plib/pw.h are included appears
    to be important - pw should be included first.

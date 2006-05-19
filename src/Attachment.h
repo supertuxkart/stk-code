@@ -53,15 +53,17 @@ class Attachment {
   Attachment(Kart* _kart);
   void           set            (attachmentType _type, float time);
   void           set            (attachmentType _type)
-                                   {set(_type, time_left);                   }
+                                   {set(_type, time_left);                    }
   void           clear          () {type=ATTACH_NOTHING; time_left=0.0;
-                                    holder->select(0);                       }
-  attachmentType getType        () {return type;                             }
-  float          getTimeLeft    () {return time_left;                        }
+                                    holder->select(0);                        }
+  attachmentType getType        () {return type;                              }
+  float          getTimeLeft    () {return time_left;                         }
   float          WeightAdjust   () const {return type==ATTACH_ANVIL    
-                                          ?physicsParameters->anvilWeight:0.0f;}
+                                         ?physicsParameters->anvilWeight:0.0f;}
   float          AirFrictAdjust () const {return type==ATTACH_PARACHUTE
-                                    ?physicsParameters->parachuteFriction:0.0f;}
+                                   ?physicsParameters->parachuteFriction:0.0f;}
+  float          SpeedAdjust    () const {return type==ATTACH_ANVIL
+                                    ?physicsParameters->anvilSpeedFactor:1.0; }
   void           hitGreenHerring();
   void           update         (float dt, sgCoord *velocity);
   ~Attachment();

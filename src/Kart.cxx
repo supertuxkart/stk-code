@@ -113,7 +113,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
   grid_position        = position_ ;
   num_herring_gobbled  = 0;
   finishingPosition    = 0;
-  brake                = 0.0;
   prevAccel            = 0.0;
   powersliding	       = false;
   smokepuff	       = NULL;
@@ -316,15 +315,13 @@ void Kart::update (float dt) {
 }   // update
 
 // -----------------------------------------------------------------------------
-#define sgn(x) ((x<0)?-1:((x>0)?1:0))   /* return the sign of a number */
-#define max(m,n) ((m)>(n) ? (m) : (n))	/* return highest number */
-#define min(m,n) ((m)<(n) ? (m) : (n))	/* return lowest number */
+#define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
+#define max(m,n) ((m)>(n) ? (m) : (n))
+#define min(m,n) ((m)<(n) ? (m) : (n))
 
-static inline float _lateralForce (const Kart* kart,
-				   float cornering, float sideslip) {
-  return ( max(-kart->getTireGrip(),
-	       min(kart->getTireGrip(), cornering * sideslip))
-	   * kart->getMass() * 9.82 / 2 );
+float Kart::_lateralForce (float cornering, float sideslip) {
+  return ( max(-getTireGrip(), min(getTireGrip(), cornering * sideslip))
+	   * getMass() * 9.82 / 2 );
 }   // _lateralForce
 
 // -----------------------------------------------------------------------------
@@ -341,12 +338,9 @@ void Kart::updatePhysics (float dt) {
   //  if(materialHOT) rollResist +=materialHOT->getFriction();
   float throttle=0.0f;
   if(on_ground) {
-    if(controls.brake) {
-      throttle = -1.0;
-    } else {
-      throttle = controls.accel;
-    }
+    throttle =  controls.brake ? -getBrakeFactor() : controls.accel;
   }  // if on_ground
+
   force[1]           = throttle * getMaxPower();
   force[0]           = 0;
 
@@ -375,67 +369,127 @@ void Kart::updatePhysics (float dt) {
   
   // Compute longitudinal acceleration for slipping
   // ----------------------------------------------
-  float effForce    = (force[1]-AirResistance[1]-SysResistance[1]);
+  float effForce          = (force[1]-AirResistance[1]-SysResistance[1]);
+  float ForceOnRearTire   = 0.5f*mass*gravity + prevAccel*mass*getHeightCOG()/wheelBase;
+  float ForceOnFrontTire  =      mass*gravity - ForceOnRearTire;
+  float maxGrip           = max(ForceOnRearTire,ForceOnFrontTire)*getTireGrip();
 
-  // Simplified skidding algorithm: Assume 50:50 weight distribution, and 
-  // compute only the maximum grip for the tire with the highest load, 
-  // i.e. front tire while breaking, rear tire when  accelerating. 
-  // Use only this value to detect skidding caused by braking or acceleration.
-  float max_weight = 0.5f*mass*gravity + fabs(prevAccel)*mass*getHeightCOG()/wheelBase;
-
-  float maxGrip = max_weight * getTireGrip();
-
-  // If the kart is on a plane, modify the grip by the friction 
+  // If the kart is on ground, modify the grip by the friction 
   // modifier for the texture/terrain.
   if(on_ground && materialHOT) maxGrip *= materialHOT->getFriction();
+
 #undef PHYSICS_DEBUG
-#ifdef PHYSICS_DEBUG    
-  printf("v=%f, f[1]=%f, ar=%f, sy=%f, throttle=%f, effForce = %f, maxGrip=%f\n", 
-	 velocity.xyz[1],force[1],AirResistance[1], SysResistance[1],throttle,
-	 effForce, maxGrip);
-#endif
 
   // Slipping: more force than what can be supported by the back wheels
   // --> reduce the effective force acting on the kart - currently
   //     by an arbitrary value.
   while(fabs(effForce)>maxGrip) {
     effForce *= 0.6f;
-#ifdef PHYSICS_DEBUG    
-    printf("             f[1]=%f, ar=%f, sy=%f, throttle=%f, effForce = %f, maxGrip=%f\n", 
-	   force[1],AirResistance[1], SysResistance[1],throttle,
-	   effForce, maxGrip);
-#endif    
     skidding  = true;
   }   // while effForce>maxGrip
 
   float accel       = effForce / mass;
-  prevAccel         = accel;
-  // 'Integrate' accelleration to get speed
-  velocity.xyz[0] = 0.0;
-  velocity.xyz[1] += effForce / mass * dt;
-  velocity.xyz[2] += force[2] / mass * dt;
 
-  // For now: old turning algorithm
+
+#undef  ORIGINAL_STEERING
+#undef  STK_STEERING
+#define NEW_STEERING
+
+#ifdef ORIGINAL_STEERING
   if(wheelie_angle <= 0.0f && on_ground) {
     float msa = getMaxSteerAngle();
-    velocity.hpr[0] = -msa*controls.lr;
+    velocity.hpr[0] = msa*controls.lr;
     if(velocity.hpr[0]>msa ) velocity.hpr[0] =  msa;
     if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;
   } else {   // wheelie or not on ground
     velocity.hpr[0]=0.0;
   }   // wheelie or not on ground
+#endif
 
-  // The turning part: for now, only low speed turning
-  //    if(steer_angle) {
-  //      float radius = getWheelDistance()/sgSin(steer_angle);
-  //      float angVelo = velocity.xyz[1]/radius;
-  //      velocity.hpr[0] = angVelo*180/M_PI;
-  //    } else {
-  //      velocity.hpr[0] = 0;
-  //    }  // if steer_an./tugle
-  
+#ifdef STK_STEERING
+  // Supertuxkart steering
+  float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
+  float sideslip         = atan2 (velocity.xyz[0], velocity.xyz[1]);
+  float wheel_rot_angle  = atan2 (kart_angular_vel * wheelBase/2,
+				  velocity.xyz[1]);
+  float steer_angle      = getMaxSteerAngle()*controls.lr;
+  /*----- Lateral Forces -----*/
+  float lateral_f = _lateralForce(getCornerStiffF(),
+				  sideslip + wheel_rot_angle - steer_angle);
+  float lateral_r = _lateralForce(getCornerStiffR(),
+				  sideslip - wheel_rot_angle);
+  // torque - rotation force on kart body
+  float torque = (lateral_f * wheelBase/2) - (lateral_r * wheelBase/2);
+
+  float kart_angular_acc = torque / getInertia();
+  kart_angular_vel += kart_angular_acc * dt;
+  velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
+#endif
+
+#ifdef NEW_STEERING
+  float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0;
+  float AngVelocity    = velocity.hpr[0]*M_PI/180.0f;
+  float slipAngleFront, slipAngleRear;
+  if(fabsf(velocity.xyz[1])<0.01) {
+    slipAngleFront = 0.0f;
+    slipAngleRear  = 0.0f;
+  } else {
+    float turnSpeed = velocity.xyz[0]+AngVelocity*wheelBase/2;
+    slipAngleFront  = atan(turnSpeed/velocity.xyz[1])
+                    - sgn(velocity.xyz[1])*steer_angle;
+    turnSpeed       = velocity.xyz[0]-AngVelocity*wheelBase/2;
+    slipAngleRear   = atan(turnSpeed/velocity.xyz[1]);
+  }
+#  ifdef PHYSICS_DEBUG    
+  printf("v[0]= %f v[1]= %f sa= %f saf= %f sar= %f", velocity.xyz[0],
+	 velocity.xyz[1], steer_angle, slipAngleFront, slipAngleRear);
+#  endif
+
+  float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
+                       * ForceOnFrontTire;
+  float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
+                       * ForceOnRearTire;
+  float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
+  velocity.xyz[0]      = cornerForce/mass*dt;
+  float torque         =                  ForceLatRear *wheelBase/2
+                       - cos(steer_angle)*ForceLatFront*wheelBase/2; 
+  float angAcc         = torque/getInertia();
+  // A certain percentage (which should probably depend on tire grip, road 
+  // surface etc) gets lost. This is necessary to stop the kart from 
+  // rotating when going in a straight line after turning.
+  float grip = getTireGrip();
+  if(on_ground&&materialHOT) grip *= materialHOT->getFriction();
+   
+  // Temporary for skidding: damping is how much rotational energy is lost
+  // due to friction. High friction surface --> better grip, kart reacts
+  // quicker to steering, so previous rotational energy must be reduced.
+  // Low friction surface --> kart will keep on rotating in the direction
+  // it was rotating before, less energy is lost.
+  float damping = 0.9 + (1-grip)/10.0f;
+#  ifdef PHYSICS_DEBUG    
+  printf("fF %f rF %f t %f g %f\n",ForceLatFront, ForceLatRear, torque, grip);
+#  endif
+
+  velocity.hpr[0] = (AngVelocity*damping + angAcc*dt)*180.0f/M_PI;
+#endif
+
+  // 'Integrate' accelleration to get speed
+  //  velocity.xyz[0] = 0.0;
+  velocity.xyz[1] += accel           * dt;
+  velocity.xyz[2] += force[2] / mass * dt;
+  prevAccel         = accel;
+
 }   // updatePhysics
 
+// -----------------------------------------------------------------------------
+float Kart::NormalizedLateralForce(float alpha, float corner) const {
+  float const maxAlpha=3.14;
+  if(fabsf(alpha)<maxAlpha) {
+    return corner*alpha;
+  } else {
+    return alpha>0.0f ? corner*maxAlpha : -corner*maxAlpha;
+  }
+}   // NormalizedLateralForce
 // -----------------------------------------------------------------------------
 void Kart::handleRescue() {
   if ( trackHint > 0 ) trackHint-- ;

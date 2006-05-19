@@ -54,6 +54,7 @@ class KartProperties : public NoCopy {
   float wheel_base;         // distance between front and read wheels
   float heightCOG;          // height of center of gravity
   float engine_power;       // maximum force from engine
+  float brake_factor;       // braking factor * engine_power = braking force
   float tire_grip;          // grip of tires in longitudinal direction
   float max_steer_angle;    // maximum steering angle
 

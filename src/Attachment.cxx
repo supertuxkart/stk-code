@@ -28,6 +28,23 @@
 
 struct  initAttachmentType {attachmentType attachment; char*file;};
 
+/* Some explanations to the attachments:
+   Parachute: This will increase the air friction, reducing the maximum speed.
+              It will not have too much of an effect on slow speeds, since air
+              friction only becomes important at higher speeds.
+   Anvil:     It increases the weight of the kart.But this will NOT have any
+              effect on karts already driving at highest speed: the accelerating
+	      force is independent of the mass, so it is 0 at highest speed 
+	      (engine force = air- plus system-force) and only this value gets
+	      divided by the mass later --> at highest speed there would be no 
+	      effect when the mass is changed, only at lower speeds the acting 
+	      acceleration will be lower.Reducing the power slows the kart down,
+	      but doesn't give the feeling of a sudden weight increase. 
+	      Therefore the anvil will reduce by a certain factor (see physics
+	      parameters) once when it is attached. Together with the mass 
+	      increase (lower acceleration) it's sufficient negative.
+*/
+
 initAttachmentType iat[]={
   {ATTACH_PARACHUTE,   "parachute.ac"},
   {ATTACH_MAGNET,      "magnet.ac"},
@@ -91,6 +108,9 @@ void Attachment::hitGreenHerring() {
     case 1: set( ATTACH_ANVIL, 2.0f ) ;
             // if ( kart == kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
+            // Reduce speed once (see description above), all other changes are
+            // handled in Kart::updatePhysics
+            kart->getVelocity()->xyz[1] *= physicsParameters->anvilSpeedFactor;
             break ;
   }   // switch rand()%2
 }   // hitGreenHerring

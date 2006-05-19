@@ -44,8 +44,8 @@ void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
 // are handled here, not 'one time action' keys like fire, ...
 void PlayerKart::doSteering() {
 
-  if(isKeyDown(player->keys[KC_LEFT]   )) controls.lr      = -1.0f;
-  if(isKeyDown(player->keys[KC_RIGHT]  )) controls.lr      =  1.0f;
+  if(isKeyDown(player->keys[KC_LEFT]   )) controls.lr      =  1.0f;
+  if(isKeyDown(player->keys[KC_RIGHT]  )) controls.lr      = -1.0f;
   if(isKeyDown(player->keys[KC_ACCEL]  )) controls.accel   =  1.0f;
   if(isKeyDown(player->keys[KC_BRAKE]  )) controls.brake   =  true;
   if(isKeyDown(player->keys[KC_WHEELIE])) controls.wheelie =  true;

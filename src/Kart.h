@@ -80,7 +80,6 @@ private:
   
   int                 raceLap;             // number of finished(!) laps
   int                 finishingPosition;    // saves the end rank
-  float               brake;
  protected:
   int                 rescue;
 
@@ -128,22 +127,27 @@ public:
   void           handleMagnet        (float cdist, int closest);
   void           doZipperProcessing  (float dt);
   void           updatePhysics       (float dt);
+  float          NormalizedLateralForce(float alpha, float corner) const;
 
   // Functions to access the current kart properties (which might get changed,
   // e.g. mass increase or air_friction increase depending on attachment etc.)
   // -------------------------------------------------------------------------
-  const sgVec3*  getColour        () const {return &kartProperties->color;   }
+  const sgVec3*  getColour        () const {return &kartProperties->color;     }
   float          getMass          () const {return kartProperties->mass
                                                  + attachment.WeightAdjust();  }
   float          getAirFriction   () const {return kartProperties->air_friction
                                                  + attachment.AirFrictAdjust();}
   float          getRollResistance() const {return kartProperties->roll_resistance;}
   float          getMaxPower      () const {return kartProperties->engine_power;}
-  float          getWheelBase     () const {return kartProperties->wheel_base;}
-  float          getHeightCOG     () const {return kartProperties->heightCOG; }
-  float          getTireGrip      () const {return kartProperties->tire_grip; }
+  float          getBrakeFactor   () const {return kartProperties->brake_factor;}
+  float          getWheelBase     () const {return kartProperties->wheel_base; }
+  float          getHeightCOG     () const {return kartProperties->heightCOG;  }
+  float          getTireGrip      () const {return kartProperties->tire_grip;  }
   float          getMaxSteerAngle () const {return kartProperties->max_steer_angle;}
-
+  float          getCornerStiffF  () const {return kartProperties->corn_f;     }
+  float          getCornerStiffR  () const {return kartProperties->corn_r;     }
+  float          getInertia       () const {return kartProperties->inertia;    }
+  float _lateralForce(float cornering, float sideslip);
   virtual void   collectedHerring    (Herring* herring);
   virtual void   reset               ();
   virtual void   handleZipper        ();

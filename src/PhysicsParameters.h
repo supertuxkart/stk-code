@@ -26,6 +26,7 @@
 class PhysicsParameters : public KartProperties {
  public:
   float anvilWeight;           // Additional kart weight if anvil is attached
+  float anvilSpeedFactor;      // To decrease speed once when attached
   float parachuteFriction;     // Increased air friction when parachute
   float magnetRangeSQ;         // Squared range for magnets
   float magnetMinRangeSQ;      // Squared minimum range for magnets

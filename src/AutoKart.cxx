@@ -104,7 +104,9 @@ void AutoKart::update (float delta) {
 
   if(steer && wheelie_angle <= 0.0f) {
     controls.lr = sqrt(velocity.xyz[1]) * difficulty
-                * (future_track_coords[0] > 0.0f ?  -1.0f : 1.0f);
+                * (future_track_coords[0] > 0.0f ?  1.0f : -1.0f);
+    if(controls.lr>1.0f) controls.lr=1.0f;
+    else if (controls.lr<-1.0f) controls.lr=-1.0f;
   }
   else controls.lr = 0.0f;
   // JH FIXME: Since there is no max_natural_velocity anymore, we need
