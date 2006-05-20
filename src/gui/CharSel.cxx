@@ -29,14 +29,11 @@
 CharSel::CharSel(int whichPlayer)
   : kart(0), playerIndex(whichPlayer)
 {
-	current_kart = -1;
-	switch_to_character(3);
-
-        // for some strange reasons plib calls makeCurrent() in ssgContext
-        // constructor, so we have to save the old one here and restore it
-        ssgContext* oldContext = ssgGetCurrentContext();
+    // for some strange reasons plib calls makeCurrent() in ssgContext
+    // constructor, so we have to save the old one here and restore it
+    ssgContext* oldContext = ssgGetCurrentContext();
 	context = new ssgContext;
-        oldContext->makeCurrent();
+    oldContext->makeCurrent();
 
 	menu_id = widgetSet -> vstack(0);
 	static char output[60];
@@ -71,35 +68,12 @@ CharSel::CharSel(int whichPlayer)
 	  if (i == kart_manager->karts.size() - 1)
 	    widgetSet -> set_active(c);
 	}
-
-	if (0)
-	{
-		int row2 = widgetSet -> harray(va);
-		for(KartManager::KartPropertiesVector::size_type i = 0;
-                    i < kart_manager->karts.size()/2; ++i)
-		{
-			//widgetSet ->state(row1, kart_manager->karts[i].name.c_str(), GUI_MED, i, 0);
-			// FIXME: images needs to be 'clickable'
-			int c = widgetSet -> image(row1,
-                            loader->getPath(
-                              "images/" + kart_manager->karts[i]->icon_file).c_str(),
-                            icon_size, icon_size);
-			widgetSet -> activate_widget(c, i, 0);
-		}
-		for(KartManager::KartPropertiesVector::size_type i =
-                    kart_manager->karts.size()/2; i < kart_manager->karts.size(); ++i)
-		{
-			//widgetSet ->state(row2, kart_manager->karts[i].name.c_str(), GUI_MED, i, 0);
-			int c = widgetSet -> image(row2,
-                            loader->getPath("images/" + kart_manager->karts[i]->icon_file).c_str(), icon_size, icon_size);
-			widgetSet -> activate_widget(c, i, 0);
-		}
-	}
-
-
 	widgetSet -> filler(ha);
-
+    kart_name_label = widgetSet -> label(menu_id, "", GUI_MED, GUI_ALL, 0, 0);
 	widgetSet -> layout(menu_id, 0, 1);
+
+	current_kart = -1;
+	switch_to_character(3);
 
 	clock = 0;
 	//test
@@ -109,17 +83,19 @@ CharSel::CharSel(int whichPlayer)
 CharSel::~CharSel()
 {
 	widgetSet -> delete_widget(menu_id) ;
-        ssgDeRefDelete(kart);
+    ssgDeRefDelete(kart);
 
-        delete context;
+    delete context;
 }
 
 void CharSel::switch_to_character(int n)
 {
 	if (current_kart != n && n >= 0 && n < int(kart_manager->karts.size()))
 	{
+        widgetSet -> set_label(kart_name_label, kart_manager->karts[n]->name.c_str());
+
 		current_kart = n;
-                ssgDeRefDelete(kart);
+        ssgDeRefDelete(kart);
 		kart = new ssgTransform;
 		kart->ref();
 		ssgEntity* kartentity = kart_manager->karts[n]->getModel();
@@ -141,8 +117,8 @@ void CharSel::update(float dt)
 
 	if (kart)
 	{
-                ssgContext* oldContext = ssgGetCurrentContext();
-                context -> makeCurrent();
+        ssgContext* oldContext = ssgGetCurrentContext();
+        context -> makeCurrent();
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		// FIXME: A bit hackish...
@@ -164,7 +140,7 @@ void CharSel::update(float dt)
 		glViewport ( 0, 0, config->width, config->height ) ;
 
 		glDisable (GL_DEPTH_TEST);
-                oldContext->makeCurrent();
+        oldContext->makeCurrent();
 	}
 }
 
@@ -180,7 +156,7 @@ void CharSel::select()
 	{
 		if (guiStack.back() == GUIS_CHARSEL)
 		{
-			guiStack.push_back(GUIS_CHARSELP2); 
+			guiStack.push_back(GUIS_CHARSELP2);
 			return;
 		}
 
@@ -188,7 +164,7 @@ void CharSel::select()
 		{
 			if (guiStack.back() == GUIS_CHARSELP2)
 			{
-				guiStack.push_back(GUIS_CHARSELP3); 
+				guiStack.push_back(GUIS_CHARSELP3);
 				return;
 			}
 
@@ -196,15 +172,15 @@ void CharSel::select()
 			{
 				if (guiStack.back() == GUIS_CHARSELP3)
 				{
-					guiStack.push_back(GUIS_CHARSELP4); 
+					guiStack.push_back(GUIS_CHARSELP4);
 					return;
 				}
-			}	
-		}	
+			}
+		}
 	}
 
         if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
-          guiStack.push_back(GUIS_TRACKSEL); 
+          guiStack.push_back(GUIS_TRACKSEL);
         else
           startScreen->switchToGame();
 }
