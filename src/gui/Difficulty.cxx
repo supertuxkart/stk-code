@@ -30,17 +30,6 @@ Difficulty::Difficulty() {
   widgetSet -> start(va, "Easy", GUI_MED, MENU_EASY, 0);
   widgetSet -> state(va, "Medium", GUI_MED, MENU_MEDIUM, 0);
   widgetSet -> state(va, "Hard", GUI_MED, MENU_HARD, 0);
-  
-  if (0) {
-    if (std::find(guiStack.begin(), guiStack.end(), GUIS_DIFFICULTYSR) != 
-	guiStack.end()) {
-      widgetSet -> state(menu_id, "Number of Laps", GUI_SML, 0, 0);
-      widgetSet -> state(menu_id, "Reverse Track", GUI_SML, 0, 0);
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-      widgetSet -> state(menu_id, "Mirror Track", GUI_SML, 0, 0);
-#endif
-    }   // if not guiStack.end()
-  }   // if (0)
 
   widgetSet -> layout(menu_id, 0, 0);
 }   // Difficulty

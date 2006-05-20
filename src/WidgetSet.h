@@ -29,8 +29,6 @@
 
 /*---------------------------------------------------------------------------*/
 
-//The next line isn't used? [Coz]
-//#define GUI_FACE "fonts/VeraBd.ttf"
 #define GUI_SML  18
 #define GUI_MED  24
 #define GUI_LRG  30

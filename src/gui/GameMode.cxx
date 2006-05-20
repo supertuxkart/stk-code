@@ -55,11 +55,11 @@ void GameMode::select()
 	{
 	case MENU_GP:
 		race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
-		guiStack.push_back(GUIS_DIFFICULTYGP);
+		guiStack.push_back(GUIS_DIFFICULTY);
 		break;
 	case MENU_QUICKRACE:
 		race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
-		guiStack.push_back(GUIS_DIFFICULTYSR);
+		guiStack.push_back(GUIS_DIFFICULTY);
 		break;
 	case MENU_TIMETRIAL:
 		race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);

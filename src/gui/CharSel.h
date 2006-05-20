@@ -31,10 +31,11 @@ class ssgContext;
 class CharSel: public BaseGUI
 {
 private:
-        ssgContext* context;
-        ssgTransform* kart;
-        int current_kart;
-        float clock;
+    ssgContext* context;
+    ssgTransform* kart;
+    int current_kart;
+    int kart_name_label;
+    float clock;
 
 	int playerIndex;
 	
