@@ -69,7 +69,7 @@ CharSel::CharSel(int whichPlayer)
 	    widgetSet -> set_active(c);
 	}
 	widgetSet -> filler(ha);
-    kart_name_label = widgetSet -> label(menu_id, "", GUI_MED, GUI_ALL, 0, 0);
+    kart_name_label = widgetSet -> label(menu_id, "No driver choosed", GUI_MED, GUI_ALL, 0, 0);
 	widgetSet -> layout(menu_id, 0, 1);
 
 	current_kart = -1;
