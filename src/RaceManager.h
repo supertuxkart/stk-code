@@ -34,6 +34,8 @@ public:
   virtual void next ()    = 0;  // Do the 'next thing' after the race is 
                                 // finished, ie. return to the start screen or
                                 // start a new race
+  virtual int  getKartScore(int kart) const {return 0;}
+  virtual void setKartScore(int kart, int pos) {}
 };
 
 class GrandPrixMode : public RaceMode
@@ -72,6 +74,10 @@ public:
 
   void start();
   void next();
+
+  int  getKartScore(int kart) const { return karts[kart].score; }
+  void setKartScore(int kart, int pos)
+      { karts[kart].score = pos > 4 ? 0 : 4 - pos; }
 };
 
 class QuickRaceMode : public RaceMode
@@ -97,8 +103,10 @@ class TimeTrialMode : public RaceMode
 public:
   std::string track;
   std::string kart;
+  int numLaps;
 
-  TimeTrialMode(const std::string& track_, const std::string& kart_);
+  TimeTrialMode(const std::string& track_, const std::string& kart_,
+                const int& numLaps_);
   virtual ~TimeTrialMode() {}
   
   void start();
@@ -110,8 +118,6 @@ public:
     grandprix or similar stuff */
 class RaceManager
 {
-public:
-
 private:
   RaceMode*                        mode;
   RaceDifficulty                   difficulty;
@@ -121,25 +127,30 @@ private:
   std::string                      track;
   int                              numLaps;
   int                              numKarts;
+  int                              numFinishedKarts;
 
 public:
   RaceManager();
 
-  RaceSetup::RaceMode getRaceMode() const;
+  RaceSetup::RaceMode getRaceMode() const { return race_mode; }
 
-  void setNumKarts(int i);
+  void setNumKarts(int num) { numKarts = num; }
   int  getNumKarts() const   { return numKarts; }
   void setNumPlayers(int num);
-  int  getNumPlayers() const {return players.size();}
-  void setNumLaps(int num);
-  int  getNumLaps() const    {return numLaps;}
-  void setTrack(const std::string& track);
-  void setRaceMode(RaceSetup::RaceMode mode);
-  void setDifficulty(RaceDifficulty difficulty_);
+  int  getNumPlayers() const { return players.size(); }
+  void setNumLaps(int num) { numLaps = num; }
+  int  getNumLaps() const    { return numLaps; }
+  void setTrack(const std::string& track_) { track = track_; }
+  void setRaceMode(RaceSetup::RaceMode mode) { race_mode = mode; }
+  void setDifficulty(RaceDifficulty difficulty_) { difficulty = difficulty_; }
   void setPlayerKart(int player, const std::string& kart);
+  unsigned int getFinishedKarts() const { return numFinishedKarts; }
+  void addFinishedKarts(int num) { numFinishedKarts += num; }
+  int  getKartScore(int kart) const { return mode->getKartScore(kart); }
+  void setKartScore(int kart, int pos) { mode->setKartScore(kart, pos); }
 
-  void setMirror();
-  void setReverse();
+  void setMirror() {/*FIXME*/}
+  void setReverse(){/*FIXME*/}
   void start();
 
   /** Start the next race or go back to the start screen, depending on

@@ -58,7 +58,8 @@ public:
             will be used in the order in which they are given */
         Karts karts;
 
-        int getNumPlayers() const { return players.size(); }
+        unsigned int getNumKarts()  const { return karts.size(); }
+        unsigned int getNumPlayers() const { return players.size(); }
 };
 
 #endif

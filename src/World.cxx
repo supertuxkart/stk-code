@@ -32,6 +32,7 @@
 #include "Track.h"
 #include "KartManager.h"
 #include "TrackManager.h"
+#include "RaceManager.h"
 #include "Config.h"
 #include "HookManager.h"
 #include "History.h"
@@ -172,9 +173,8 @@ void World::update(float delta) {
 
   checkRaceStatus();
 
-  if( getPhase() == World::FINISH_PHASE ) {
-    guiStack.push_back ( GUIS_NEXTRACE );
-  }
+      if( getPhase() == FINISH_PHASE )
+      guiStack.push_back ( GUIS_RACERESULT );
 
   float inc = 0.05;
   float dt  = delta;
@@ -222,20 +222,26 @@ void World::checkRaceStatus() {
     not in time trial mode, the race is over. Players are the last in the
     vector, so substracting the number of players finds the first player's
     position.*/
-  unsigned int finished_karts = 0;
-  unsigned int finished_plyrs = 0;
+  int new_finished_karts = 0;
   for ( Karts::size_type i = 0; i < kart.size(); ++i)
   {
-      if ( world->kart[i]->getLap () >= raceSetup.numLaps )
+      if ((kart[i]->getLap () >= raceSetup.numLaps) && !kart[i]->raceIsFinished())
       {
-          ++finished_karts;
-          if(i >= kart.size() - raceSetup.players.size()) ++finished_plyrs;
+          kart[i]->setFinishingState (kart[i]->getPosition(), clock);
+
+          race_manager->setKartScore(i, kart[i]->getPosition());
+
+          ++new_finished_karts;
       }
   }
-  if(finished_plyrs == raceSetup.players.size()) phase = FINISH_PHASE;
-  //JH debug only, to be able to run with a single player kart
-  // !!!!!!!!!!!!!!!!!!!!!
-  // else if(finished_karts == kart.size() - 1 && raceSetup.mode != RaceSetup::RM_TIME_TRIAL) phase = FINISH_PHASE;
+
+  race_manager->addFinishedKarts(new_finished_karts);
+  if(raceSetup.mode == RaceSetup::RM_TIME_TRIAL)
+  {
+     if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
+  }
+  else
+     if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) phase = FINISH_PHASE;
 }
 
 void

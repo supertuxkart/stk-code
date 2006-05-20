@@ -31,6 +31,7 @@
 #include "ConfigDisplay.h"
 #include "PlayerControls.h"
 #include "RaceGUI.h"
+#include "RaceResultsGUI.h"
 #include "RaceManager.h"
 #include "ScreenManager.h"
 #include "StartScreen.h"
@@ -55,8 +56,7 @@ void updateGUI() {
         case GUIS_CHARSELP2:      gui = new CharSel(1);                   break;
         case GUIS_CHARSELP3:      gui = new CharSel(2);                   break;
         case GUIS_CHARSELP4:      gui = new CharSel(3);                   break;
-        case GUIS_DIFFICULTYGP:
-        case GUIS_DIFFICULTYSR:   gui = new Difficulty();                 break;
+        case GUIS_DIFFICULTY:     gui = new Difficulty();                 break;
         case GUIS_GAMEMODE:       gui = new GameMode();                   break;
         case GUIS_OPTIONS:        gui = new Options;                      break;
         case GUIS_TRACKSEL:       gui = new TrackSel();                   break;
@@ -69,6 +69,7 @@ void updateGUI() {
         case GUIS_CONFIGP4:       gui = new PlayerControls(3);            break;
         case GUIS_CONFIGDISPLAY:  gui = new ConfigDisplay();              break;
         case GUIS_RACE:           gui = new RaceGUI;                      break;
+        case GUIS_RACERESULT:     gui = new RaceResultsGUI();              break;
         case GUIS_NEXTRACE:       race_manager->next();                   break;
         case GUIS_RACEMENU:       gui = new RaceMenu;                     break;
         case GUIS_EXITRACE:       guiStack.clear(); race_manager->next(); break;

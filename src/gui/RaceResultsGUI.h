@@ -28,6 +28,9 @@ class RaceResultsGUI : public BaseGUI
 public:
   RaceResultsGUI();
   ~RaceResultsGUI();
+
+  void update(float dt);
+  void select();
 };
 
 #endif

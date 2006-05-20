@@ -65,7 +65,7 @@ GrandPrixMode::start_race(int n)
 
   raceSetup.mode       = RaceSetup::RM_GRAND_PRIX;
   raceSetup.difficulty = difficulty;
-  raceSetup.numLaps    = 3;
+  raceSetup.numLaps    = 1;
   raceSetup.track      = cup.tracks[n];
 
   raceSetup.karts.resize(karts.size());
@@ -87,8 +87,6 @@ GrandPrixMode::start_race(int n)
 void
 GrandPrixMode::start()
 {
-//FIXME: Is this needed?
-//track = 0;
   start_race(track);
 }
 
@@ -99,13 +97,16 @@ GrandPrixMode::next()
 
 
  if( guiStack.back() == GUIS_NEXTRACE )
+{
    if( track < int ( cup.tracks.size() ) ) start_race(track);
    else
     {
-      // FIXME: Insert credits/extro stuff here
+      // FIXME: Insert credits/extra stuff here
       startScreen = new StartScreen();
       screen_manager->setScreen(startScreen); 
     }
+}
+
 }
 
 
@@ -147,8 +148,9 @@ QuickRaceMode::next()
   screen_manager->setScreen(startScreen);
 }
 
-TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_)
-  : track(track_), kart(kart_)
+TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_,
+                             const int& numLaps_)
+  : track(track_), kart(kart_), numLaps(numLaps_)
 {}
 
 void
@@ -157,7 +159,8 @@ TimeTrialMode::start()
   RaceSetup raceSetup;
 
   raceSetup.mode       = RaceSetup::RM_TIME_TRIAL;
-  raceSetup.track = track;
+  raceSetup.track      = track;
+  raceSetup.numLaps    = numLaps;
   raceSetup.karts.push_back(kart);
   raceSetup.players.push_back(0);
 
@@ -182,24 +185,6 @@ RaceManager::RaceManager()
 }
 
 void
-RaceManager::setDifficulty(RaceDifficulty difficulty_)
-{
-  difficulty = difficulty_;
-}
-
-RaceSetup::RaceMode
-RaceManager::getRaceMode() const
-{
-  return race_mode;
-}
-
-void
-RaceManager::setRaceMode(RaceSetup::RaceMode mode)
-{
-  race_mode = mode;
-}
-
-void
 RaceManager::setPlayerKart(int player, const std::string& kart)
 {
   if (player >= 0 && player < 4)
@@ -210,13 +195,7 @@ RaceManager::setPlayerKart(int player, const std::string& kart)
       players[player] = kart;
     }
   else
-    std::cout << "Warning: player " << player << " is out of range" << std::endl;
-}
-
-void
-RaceManager::setTrack(const std::string& track_)
-{
-  track = track_;
+    std::cout << "Warning: player " << player << " doesn't exists" << std::endl;
 }
 
 void
@@ -233,33 +212,12 @@ RaceManager::setNumPlayers(int num)
 }
 
 void
-RaceManager::setNumKarts(int i)
-{
-  numKarts = i;
-}
-void
-RaceManager::setNumLaps(int num)
-{
-  numLaps=num;
-}
-
-void
-RaceManager::setMirror()
-{
-  // FIXME
-}
-
-void
-RaceManager::setReverse()
-{
-  // FIXME
-}
-
-void 
 RaceManager::start()
 {
+  numFinishedKarts = 0;
+
   delete mode;
-  
+
   assert(players.size() > 0);
   switch(race_mode)
     {
@@ -269,7 +227,7 @@ RaceManager::start()
 			       difficulty, numKarts);
       break;
     case RaceSetup::RM_TIME_TRIAL:
-      mode = new TimeTrialMode(track, players[0]);
+      mode = new TimeTrialMode(track, players[0], numLaps);
       break;
     case RaceSetup::RM_QUICK_RACE:
       mode = new QuickRaceMode(track, players, difficulty, numKarts, numLaps);
@@ -283,8 +241,9 @@ RaceManager::start()
 
 void
 RaceManager::next()
-{ 
+{
   assert(mode);
+  numFinishedKarts = 0;
   mode->next();
 }
 

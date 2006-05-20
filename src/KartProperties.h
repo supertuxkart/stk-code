@@ -36,6 +36,7 @@ class KartProperties : public NoCopy {
  public:
   /* Display and gui */
   /* --------------- */
+//FIXME: maybe these should be private and have get and/or set functions?
   std::string name;         // The human readable Name of the karts driver
   std::string ident;        // The computer readable-name of the karts driver
   std::string model_file;   // Filename of 3d model that is used for kart

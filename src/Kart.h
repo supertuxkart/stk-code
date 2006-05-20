@@ -77,9 +77,13 @@ private:
 
   SkidMark*           skidmark_left;
   SkidMark*           skidmark_right;
-  
+
   int                 raceLap;             // number of finished(!) laps
-  int                 finishingPosition;    // saves the end rank
+  int                 finishingPosition;   // saves the end rank
+  int                 finishingMins;       // saves the finishing time
+  int                 finishingSecs;
+  int                 finishingTenths;
+  bool                finishedRace;
  protected:
   int                 rescue;
 
@@ -116,9 +120,14 @@ public:
   int            getNumCollectables  () { return  collectable.getNum();     }
   int            getNumHerring       () { return  num_herring_gobbled;      }
   int            getLap              () { return  raceLap;                  }
-  int            getFinishingPosition() { return  finishingPosition;        }
   int            getPosition         () { return  racePosition ;            }
-  float          getSteerAngle() const  { return  velocity.hpr[0];          }
+  int            getFinishPosition()    { return  finishingPosition;        }
+  void           setFinishingState   (int pos, float time);
+  bool           raceIsFinished () const { return finishedRace;             }
+  int            getFinishMins ()    { return finishingMins;             }
+  int            getFinishSecs ()     { return finishingSecs;             }
+  int            getFinishTenths ()   { return finishingTenths;           }
+  float          getSteerAngle() const  { return velocity.hpr[0];           }
   void           handleRescue        ();
   void           beginPowerslide     ();
   void           endPowerslide       ();

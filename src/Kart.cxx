@@ -112,10 +112,14 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
   kartProperties       = kartProperties_;
   grid_position        = position_ ;
   num_herring_gobbled  = 0;
-  finishingPosition    = 0;
+  finishedRace         = false;
+  finishingPosition    = 9;
+  finishingMins        = 0;
+  finishingSecs        = 0;
+  finishingTenths      = 0;
   prevAccel            = 0.0;
   powersliding	       = false;
-  smokepuff	       = NULL;
+  smokepuff	           = NULL;
   smoke_system	       = NULL;
   exhaust_pipe         = NULL;
   skidmark_left        = NULL;
@@ -148,10 +152,17 @@ void Kart::reset() {
 
   raceLap        = -1;
   racePosition   = 9;
+  finishedRace         = false;
+  finishingPosition    = 9;
+  finishingMins        = 0;
+  finishingSecs        = 0;
+  finishingTenths      = 0;
+
   ZipperTimeLeft = 0.0f ;
   rescue         = FALSE;
   attachment.clear();
   num_herring_gobbled = 0;
+  wheel_position = 0;
   trackHint = world -> track -> absSpatialToTrack(curr_track_coords,
 						  curr_pos.xyz);
 }   // reset
@@ -790,5 +801,18 @@ void print_model(ssgEntity* entity, int indent, int maxLevel) {
     }   // if branch
   }   // if entity
 }   // print_model
+
+// =============================================================================
+void Kart::setFinishingState (int pos, float time)
+{
+    finishedRace = true;
+
+    finishingPosition = pos;
+
+    finishingMins = (int) floor ( time / 60.0 ) ;
+    finishingSecs = (int) floor ( time - (double) ( 60 * finishingMins ) ) ;
+    finishingTenths = (int) floor ( 10.0f * (time - (double)(finishingSecs +
+        60*finishingMins)));
+}
 
 /* EOF */

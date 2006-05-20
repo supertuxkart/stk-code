@@ -327,7 +327,7 @@ void RaceGUI::drawGameOverText () {
   int green = (int)(255 * (sin ( (float)timer/6.3f ) / 2.0f + 0.5f));
   int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
 
-  int finishing_position = world->getPlayerKart(0)->getFinishingPosition();
+  int finishing_position = world->getPlayerKart(0)->getFinishPosition();
   if ( finishing_position < 0 )
     finishing_position = world->getPlayerKart(0)->getPosition() ;
 

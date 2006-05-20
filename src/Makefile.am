@@ -57,6 +57,7 @@ tuxkart_SOURCES =                                       \
 	lisp/Writer.cxx		 lisp/Writer.h	        \
 	gui/BaseGUI.cxx		 gui/BaseGUI.h	        \
 	gui/RaceGUI.cxx		 gui/RaceGUI.h	        \
+	gui/RaceResultsGUI.cxx gui/RaceResultsGUI.h \
 	gui/NumLaps.cxx		 gui/NumLaps.h	        \
 	gui/RaceMenu.cxx	 gui/RaceMenu.h	        \
 	gui/NumPlayers.cxx	 gui/NumPlayers.h       \
