@@ -59,7 +59,7 @@ public:
         Karts karts;
 
         unsigned int getNumKarts()  const { return karts.size(); }
-        unsigned int getNumPlayers() const { return players.size(); }
+        int getNumPlayers() const { return players.size(); }
 };
 
 #endif
