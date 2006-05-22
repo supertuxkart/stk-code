@@ -28,7 +28,7 @@
 // -----------------------------------------------------------------------------
 void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
   //Steering keys(hold)
-  controls.lr      = ctrl.data[0];
+  controls.lr      = -ctrl.data[0];
   controls.accel   = -ctrl.data[1];
   controls.brake   = player->buttons[KC_BRAKE  ] & ctrl.buttons;
   controls.wheelie = player->buttons[KC_WHEELIE] & ctrl.buttons;

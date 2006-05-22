@@ -24,12 +24,12 @@
 Difficulty::Difficulty() {
   menu_id = widgetSet -> vstack(0);
 
-  widgetSet -> label(menu_id, "Choose a Difficulty", GUI_LRG, GUI_ALL, 0, 0);
+  widgetSet -> label(menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
   
   int va = widgetSet -> varray(menu_id);
-  widgetSet -> start(va, "Easy", GUI_MED, MENU_EASY, 0);
-  widgetSet -> state(va, "Medium", GUI_MED, MENU_MEDIUM, 0);
-  widgetSet -> state(va, "Hard", GUI_MED, MENU_HARD, 0);
+  widgetSet -> state(va, "Racer", GUI_MED, MENU_HARD, 0);
+  widgetSet -> state(va, "Driver", GUI_MED, MENU_MEDIUM, 0);
+  widgetSet -> start(va, "Novice", GUI_MED, MENU_EASY, 0);
 
   widgetSet -> layout(menu_id, 0, 0);
 }   // Difficulty

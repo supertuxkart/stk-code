@@ -270,15 +270,16 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 
   /* Show lap number */
   if ( player_kart->getLap() < 0 ) {
-    //JH sprintf ( str, "Not Started Yet!" ) ;  Don't like this text; besides
-    // it's messed up because of the wrong lap count anyway.
-    sprintf ( str, " " ) ;  // One space to avoid warning about empty string
+    sprintf ( str, "Lap:0/%d", raceSetup.numLaps ) ;
   }  else if ( player_kart->getLap() < raceSetup.numLaps - 1 ) {
     sprintf ( str, "Lap:%d/%d",
 	      player_kart->getLap() + 1, raceSetup.numLaps ) ;
+  } else if ( player_kart->getLap() == raceSetup.numLaps - 1 ) {
+    sprintf ( str, "Last lap!" );
   } else {
-    sprintf ( str, "Last Lap!" );
+    sprintf ( str, "Finished race!" );
   }
+
   drawDropShadowText ( str, (int)(38*ratio_y), 
 		       (int)(offset_x+TEXT_START_X        *ratio_x),
 		       (int)(offset_y+(config->height-250)*ratio_y) );
