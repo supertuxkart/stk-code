@@ -277,7 +277,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
   } else if ( player_kart->getLap() == raceSetup.numLaps - 1 ) {
     sprintf ( str, "Last lap!" );
   } else {
-    sprintf ( str, "Finished race!" );
+    sprintf ( str, "Finished!" );
   }
 
   drawDropShadowText ( str, (int)(38*ratio_y), 
