@@ -173,8 +173,8 @@ void World::update(float delta) {
 
   checkRaceStatus();
 
-      if( getPhase() == FINISH_PHASE )
-      guiStack.push_back ( GUIS_RACERESULT );
+  if( getPhase() == FINISH_PHASE )
+  guiStack.push_back ( GUIS_RACERESULT );
 
   float inc = 0.05;
   float dt  = delta;
@@ -236,7 +236,7 @@ void World::checkRaceStatus() {
   }
 
   race_manager->addFinishedKarts(new_finished_karts);
-  if(raceSetup.mode == RaceSetup::RM_TIME_TRIAL)
+  if(raceSetup.getNumKarts() == 1)
   {
      if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
   }

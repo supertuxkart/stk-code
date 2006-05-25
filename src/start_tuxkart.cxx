@@ -278,11 +278,10 @@ int main ( int argc, char **argv ) {
 	screen_manager->setScreen(startScreen);
       } else {
 
-  // Quickstart (-n)
+  // Quickstart (-N)
   // ===============
 	race_manager->setNumPlayers(1);
 	race_manager->setNumKarts  (4);
-	race_manager->setNumKarts  (1);
 	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
 	race_manager->setDifficulty(RD_MEDIUM);
 	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
