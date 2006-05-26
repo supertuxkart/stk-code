@@ -19,15 +19,15 @@
 
 #include <plib/pw.h>
 #include "RaceGUI.h"
-#include "../History.h"
+#include "History.h"
 #include "WidgetSet.h"
 #include "World.h"
 #include "Track.h"
+#include "MaterialManager.h"
 
 #define TEXT_START_X  (config->width-220)
-RaceGUI::RaceGUI(): time_left(0.0),
-		    stats_enabled(false),
-		    next_string(0)             {
+
+RaceGUI::RaceGUI(): time_left(0.0) {
   if(!config->profile) {
     UpdateKeyboardMappings();
   }   // if !config->profile
@@ -45,8 +45,8 @@ RaceGUI::RaceGUI(): time_left(0.0),
   pos_string[9] = "9th";
   pos_string[10] = "10th";
   fpsTimer.reset();
+  fpsTimer.update();
   fpsTimer.setMaxDelta(1000);
-  memset(tt, 0, sizeof(float) * 6);
   
 }   // RaceGUI
 
@@ -119,12 +119,8 @@ void RaceGUI::keybd(int key) {
 		       // configuration, so we need to redefine the mappings
 		       UpdateKeyboardMappings();
 		       break;
-//JH for debugging only.
-    case PW_KEY_F10: history->Save(); return;
-#ifdef DEBUG
-      case PW_KEY_F10: stToggle () ; return ;
-#endif
-     default:   break;
+      case PW_KEY_F10: history->Save(); return;
+      default:         break;
     }   // switch
   }   // if(keysToKart[key] else
 } // keybd
@@ -147,7 +143,7 @@ void RaceGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawFPS () {
-  if (++fpsCounter>=10) {
+  if (++fpsCounter>=50) {
     fpsTimer.update();
     sprintf(fpsString, "%d",(int)(fpsCounter/fpsTimer.getDeltaTime()));
     fpsCounter = 0;
@@ -155,43 +151,6 @@ void RaceGUI::drawFPS () {
   }    
   widgetSet->drawText (fpsString, 36, 0, config->height-36, 255, 255, 255 ) ;
 }   // drawFPS
-
-// -----------------------------------------------------------------------------
-void RaceGUI::stToggle () {
-  if ( stats_enabled )
-    stats_enabled = FALSE ;
-  else
-  {
-    stats_enabled = TRUE ;
-
-    for ( int i = 0 ; i < MAX_STRING ; i++ )
-       debug_strings [ i ][ 0 ] = '\0' ;
-
-    next_string = 0 ;
-  }
-}   // stToggle
-
-// -----------------------------------------------------------------------------
-void RaceGUI::stPrintf ( char *fmt, ... ) {
-  char *p = debug_strings [ next_string++ ] ;
-
-  if ( next_string >= MAX_STRING )
-    next_string = 0 ;
-
-  va_list ap ;
-  va_start ( ap, fmt ) ;
-/*
-  Ideally, we should use this:
-
-     vsnprintf ( p, MAX_STRING_LENGTH, fmt, ap ) ;
-
-  ...but it's only in Linux   :-(
-*/
-
-  vsprintf ( p, fmt, ap ) ;
-
-  va_end ( ap ) ;
-}   // stPrintf
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawInverseDropShadowText ( const char *str, int sz, 
@@ -256,7 +215,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
     sprintf ( str, "Reverse" ) ;
   else {
     if(config->useKPH) {
-      sprintf(str,"%d kph",
+      sprintf(str,"%d km/h",
 	      (int)(player_kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR));
     } else {
       sprintf(str,"%d mph",
@@ -601,6 +560,11 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 
 
 // -----------------------------------------------------------------------------
+void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
+			   float ratio_x, float ratio_y           ) {
+} // drawSteering
+
+// -----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup) {
   glMatrixMode   ( GL_MODELVIEW ) ;
   glPushMatrix   () ;
@@ -655,45 +619,38 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup) {
 
   if ( world->getPhase() == World::FINISH_PHASE ) {
     drawGameOverText     () ;
-  } else {
+  }   // if FINISH_PHASE
+  if ( world->getPhase() == World::RACE_PHASE   ) {
     for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++) {
       int offset_x, offset_y;
       offset_x = offset_y = 0;
-      if((pla == 0 && raceSetup.getNumPlayers() > 1) ||
-          pla == 2)
-	    offset_y = config->height/2;
-      if((pla == 2 || pla == 3) && raceSetup.getNumPlayers() > 2)
-	    offset_x = config->width/2;
+      if((pla==2          ) || (pla == 0 && raceSetup.getNumPlayers() > 1))
+	offset_y = config->height/2;
+      if((pla==2 || pla==3) && (            raceSetup.getNumPlayers() > 2))
+	offset_x = config->width/2;
 
       Kart* player_kart=world->getPlayerKart(pla);
-      if(world->getPhase()==World::RACE_PHASE) {
-        drawCollectableIcons( player_kart, offset_x, offset_y,
-		  split_screen_ratio_x, split_screen_ratio_y ) ;
-	    drawEnergyMeter( player_kart, offset_x, offset_y,
-          split_screen_ratio_x, split_screen_ratio_y ) ;
-        drawScore( raceSetup, player_kart, offset_x, offset_y,
-          split_screen_ratio_x, split_screen_ratio_y ) ;
-      }
-      drawEmergencyText(player_kart, offset_x, offset_y,
-			split_screen_ratio_x, split_screen_ratio_y ) ;
+      drawCollectableIcons(player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawEnergyMeter     (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawSteering        (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawScore           (raceSetup, player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y ) ;
+      drawEmergencyText   (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y ) ;
     }   // for pla
-
-    if(world->getPhase()==World::RACE_PHASE) {
-
-        drawTimer ();
-      drawMap   ();
-      if ( config->displayFPS ) drawFPS ();
-
-      //      if(raceSetup.getNumPlayers() == 1) {
-	  if(config->oldStatusDisplay) {
-	    oldDrawPlayerIcons();
-	  } else {
-	    drawPlayerIcons() ;
-	  }
-	//      }   // if getNumPlayers==1
-
-    }   // if RACE_PHASE
-  }   // not game over
+    drawTimer ();
+    drawMap   ();
+    if ( config->displayFPS ) drawFPS ();
+    if(config->oldStatusDisplay) {
+      oldDrawPlayerIcons();
+    } else {
+      drawPlayerIcons() ;
+      //drawSteering        (world->getPlayerKart(0), 100, 100, 1.0, 1.0 );
+    }
+  }   // if RACE_PHASE
 
   glPopAttrib  () ;
   glPopMatrix  () ;

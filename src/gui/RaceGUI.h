@@ -37,69 +37,55 @@ class RaceGUI: public BaseGUI {
   PlayerKart* keysToKart[MAXKEYS];
   int         typeForKey[MAXKEYS];
 public:
-	RaceGUI();
-	~RaceGUI();
-
-	void update(float dt);
-	void select() {}
-	void keybd(int key);
-	void point(int x, int y) { (void)x; (void)y; }
-	void stick(const int &whichAxis, const float &value) ;
-    void joybuttons(int whichJoy, int hold, int presses, int releases ) ;
+       RaceGUI();
+       ~RaceGUI();
+  void update(float dt);
+  void select() {}
+  void keybd(int key);
+  void point(int x, int y) { (void)x; (void)y; }
+  void stick     (const int &whichAxis, const float &value) ;
+  void joybuttons(int whichJoy, int hold, int presses, int releases ) ;
 
 private:
-	ulClock  fpsTimer;
-	int      fpsCounter;
-	char     fpsString[10];
+    ulClock  fpsTimer;
+    int      fpsCounter;
+    char     fpsString[10];
+    double time_left ;
+    char *pos_string [11];
 
-	double time_left ;
-
-	char *pos_string [11];
-
-  /* Display informat on screen */
-	void drawStatusText        (const RaceSetup& raceSetup);
-	void drawEnergyMeter       (Kart *player_kart, 
-				    int   offset_x, int   offset_y, 
-				    float ratio_x,  float ratio_y  );
-	void drawCollectableIcons  (Kart* player_kart, 
-				    int   offset_x, int   offset_y, 
-				    float ratio_x,  float ratio_y  );
-	void drawEmergencyText     (Kart* player_kart, 
-				    int   offset_x, int   offset_y, 
-				    float ratio_x,  float ratio_y  );
-	void drawScore             (const RaceSetup& raceSetup,
-				    Kart* player_kart, 
-				    int   offset_x, int   offset_y, 
-				    float ratio_x,  float ratio_y  );
-	void UpdateKeyboardMappings();
-	void drawPlayerIcons       ();
-	void oldDrawPlayerIcons    ();
-	void drawGameOverText      ();
-	void drawMap               ();
-	void drawTimer             ();
-	void drawFPS               ();
-
+    /* Display informat on screen */
+    void drawStatusText        (const RaceSetup& raceSetup);
+    void drawEnergyMeter       (Kart *player_kart, 
+				int   offset_x, int   offset_y, 
+				float ratio_x,  float ratio_y  );
+    void drawCollectableIcons  (Kart* player_kart, 
+				int   offset_x, int   offset_y, 
+				float ratio_x,  float ratio_y  );
+    void drawEmergencyText     (Kart* player_kart, 
+				int   offset_x, int   offset_y, 
+				float ratio_x,  float ratio_y  );
+    void drawScore             (const RaceSetup& raceSetup,
+				Kart* player_kart, 
+				int   offset_x, int   offset_y, 
+				float ratio_x,  float ratio_y  );
+    void UpdateKeyboardMappings();
+    void drawPlayerIcons       ();
+    void oldDrawPlayerIcons    ();
+    void drawGameOverText      ();
+    void drawMap               ();
+    void drawTimer             ();
+    void drawFPS               ();
+    
   /* Text drawing */
   /** Draw text to screen.
-      scale_x and scale_y could be used to a simple resize (for instance, 
-      for multiplayer split screens, though, currently, we reduce fonts
-      size to half). */
-
-	void drawTexture(const GLuint texture, int w, int h, int red, 
-			 int green, int blue, int x, int y);
-
-	void drawDropShadowText (const char *str, int sz, int x, int y );
-	void drawInverseDropShadowText (const char *str, int sz, int x, int y);
-	
-	//debugging arrays and functions, never actually get used for
-	//anything at the moment
-	void stToggle ();
-	void stPrintf ( char *fmt, ... );
-	bool stats_enabled ;
-	float tt[6] ;
-	char debug_strings [ MAX_STRING ][ MAX_STRING_LENGTH ] ;
-	int  next_string ;
-
+      scale_x and scale_y could be used to a simple resize (e.g. for multiplayer
+      split screens, though, currently, we reduce fonts size to half).        */
+    void drawTexture              (const GLuint texture, int w, int h, int red,
+				   int green, int blue, int x, int y);
+    void drawDropShadowText       (const char *str, int sz, int x, int y );
+    void drawInverseDropShadowText(const char *str, int sz, int x, int y);
+    void drawSteering             (Kart* kart, int offset_x, int offset_y,
+				   float ratio_x, float ratio_y           );
 };
 
 #endif
