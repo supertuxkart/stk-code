@@ -330,11 +330,6 @@ void Kart::update (float dt) {
 #define max(m,n) ((m)>(n) ? (m) : (n))
 #define min(m,n) ((m)<(n) ? (m) : (n))
 
-float Kart::_lateralForce (float cornering, float sideslip) {
-  return ( max(-getTireGrip(), min(getTireGrip(), cornering * sideslip))
-	   * getMass() * 9.82 / 2 );
-}   // _lateralForce
-
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) {
   skidding = false;
@@ -359,7 +354,7 @@ void Kart::updatePhysics (float dt) {
   AirResistance[0]   = 0.0f;
   AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
   AirResistance[2]   = 0.0f;
-  SysResistance[0]   = 0.0f;
+  SysResistance[0]   = rollResist*velocity.xyz[0];;
   SysResistance[1]   = rollResist*velocity.xyz[1];
   SysResistance[2]   = 0.0f;
   
@@ -403,7 +398,6 @@ void Kart::updatePhysics (float dt) {
 
 
 #undef  ORIGINAL_STEERING
-#undef  STK_STEERING
 #define NEW_STEERING
 
 #ifdef ORIGINAL_STEERING
@@ -417,25 +411,6 @@ void Kart::updatePhysics (float dt) {
   }   // wheelie or not on ground
 #endif
 
-#ifdef STK_STEERING
-  // Supertuxkart steering
-  float kart_angular_vel = 2*M_PI * velocity.hpr[0] / 360.0f;
-  float sideslip         = atan2 (velocity.xyz[0], velocity.xyz[1]);
-  float wheel_rot_angle  = atan2 (kart_angular_vel * wheelBase/2,
-				  velocity.xyz[1]);
-  float steer_angle      = getMaxSteerAngle()*controls.lr;
-  /*----- Lateral Forces -----*/
-  float lateral_f = _lateralForce(getCornerStiffF(),
-				  sideslip + wheel_rot_angle - steer_angle);
-  float lateral_r = _lateralForce(getCornerStiffR(),
-				  sideslip - wheel_rot_angle);
-  // torque - rotation force on kart body
-  float torque = (lateral_f * wheelBase/2) - (lateral_r * wheelBase/2);
-
-  float kart_angular_acc = torque / getInertia();
-  kart_angular_vel += kart_angular_acc * dt;
-  velocity.hpr[0] = kart_angular_vel * 360.0f / (2*M_PI);
-#endif
 
 #ifdef NEW_STEERING
   float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0;
@@ -445,21 +420,38 @@ void Kart::updatePhysics (float dt) {
     slipAngleFront = 0.0f;
     slipAngleRear  = 0.0f;
   } else {
+#define XX
+#ifdef XX
     float turnSpeed = velocity.xyz[0]+AngVelocity*wheelBase/2;
     slipAngleFront  = atan(turnSpeed/velocity.xyz[1])
                     - sgn(velocity.xyz[1])*steer_angle;
     turnSpeed       = velocity.xyz[0]-AngVelocity*wheelBase/2;
     slipAngleRear   = atan(turnSpeed/velocity.xyz[1]);
+#else
+    float turnSpeed = velocity.xyz[0];
+    slipAngleFront  = atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
+                    - sgn(velocity.xyz[1])*steer_angle;
+		    //    turnSpeed       = velocity.xyz[0]
+    slipAngleRear   = atan(velocity.xyz[0]/velocity.xyz[1])-AngVelocity*wheelBase/2*dt;
+#endif
   }
+#undef   PHYSICS_DEBUG
 #  ifdef PHYSICS_DEBUG    
-  printf("v[0]= %f v[1]= %f sa= %f saf= %f sar= %f", velocity.xyz[0],
+  printf("%f<>%f<>%fv[0]= %f v[1]= %f sa= %f saf= %f sar= %f ", 
+	 atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
+	 - sgn(velocity.xyz[1])*steer_angle,
+	 atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity/2.0f
+	 - sgn(velocity.xyz[1])*steer_angle,
+	 atan((velocity.xyz[0]+AngVelocity*wheelBase/2)/velocity.xyz[1])
+	 - sgn(velocity.xyz[1])*steer_angle,
+	 velocity.xyz[0],
 	 velocity.xyz[1], steer_angle, slipAngleFront, slipAngleRear);
 #  endif
 
   float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
-                       * ForceOnFrontTire;
+    * ForceOnFrontTire - SysResistance[0]*0.5;
   float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
-                       * ForceOnRearTire;
+    * ForceOnRearTire  - SysResistance[0]*0.5;
   float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
   velocity.xyz[0]      = cornerForce/mass*dt;
   float torque         =                  ForceLatRear *wheelBase/2
@@ -471,17 +463,11 @@ void Kart::updatePhysics (float dt) {
   float grip = getTireGrip();
   if(on_ground&&materialHOT) grip *= materialHOT->getFriction();
    
-  // Temporary for skidding: damping is how much rotational energy is lost
-  // due to friction. High friction surface --> better grip, kart reacts
-  // quicker to steering, so previous rotational energy must be reduced.
-  // Low friction surface --> kart will keep on rotating in the direction
-  // it was rotating before, less energy is lost.
-  float damping = 0.9 + (1-grip)/10.0f;
 #  ifdef PHYSICS_DEBUG    
-  printf("fF %f rF %f t %f g %f\n",ForceLatFront, ForceLatRear, torque, grip);
+  printf("fF %f rF %f t %f\n",ForceLatFront, ForceLatRear, torque);
 #  endif
 
-  velocity.hpr[0] = (AngVelocity*damping + angAcc*dt)*180.0f/M_PI;
+  velocity.hpr[0] += angAcc*dt*180.0f/M_PI;
 #endif
 
   // 'Integrate' accelleration to get speed
@@ -494,7 +480,7 @@ void Kart::updatePhysics (float dt) {
 
 // -----------------------------------------------------------------------------
 float Kart::NormalizedLateralForce(float alpha, float corner) const {
-  float const maxAlpha=3.14;
+  float const maxAlpha=3.14/4;
   if(fabsf(alpha)<maxAlpha) {
     return corner*alpha;
   } else {

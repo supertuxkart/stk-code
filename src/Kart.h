@@ -127,7 +127,6 @@ public:
   int            getFinishMins ()    { return finishingMins;             }
   int            getFinishSecs ()     { return finishingSecs;             }
   int            getFinishTenths ()   { return finishingTenths;           }
-  float          getSteerAngle() const  { return velocity.hpr[0];           }
   void           handleRescue        ();
   void           beginPowerslide     ();
   void           endPowerslide       ();
@@ -156,7 +155,7 @@ public:
   float          getCornerStiffF  () const {return kartProperties->corn_f;     }
   float          getCornerStiffR  () const {return kartProperties->corn_r;     }
   float          getInertia       () const {return kartProperties->inertia;    }
-  float _lateralForce(float cornering, float sideslip);
+  float          getSteerAngle    () const {return controls.lr*getMaxSteerAngle();}
   virtual void   collectedHerring    (Herring* herring);
   virtual void   reset               ();
   virtual void   handleZipper        ();
