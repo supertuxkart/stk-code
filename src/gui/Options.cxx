@@ -27,7 +27,7 @@ Options::Options()
 	widgetSet -> label(menu_id, "Options", GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> start(menu_id, "Controls",  GUI_MED, MENU_CONTROLS, 0);
 	widgetSet -> state(menu_id, "Display",  GUI_MED, MENU_DISPLAY, 0);
-	widgetSet -> state(menu_id, "Sound",  GUI_MED, 0, 0);
+	widgetSet -> state(menu_id, "Sound",  GUI_MED, MENU_SOUND, 0);
 	widgetSet -> space(menu_id);
 	
 	widgetSet -> layout(menu_id, 0, 0);
@@ -54,6 +54,7 @@ void Options::select()
 	{
 	case MENU_CONTROLS: guiStack.push_back(GUIS_CONFIGCONTROLS); break;
 	case MENU_DISPLAY: guiStack.push_back(GUIS_CONFIGDISPLAY); break;
+	case MENU_SOUND: guiStack.push_back(GUIS_CONFIGSOUND); break;
 	default: break;
 	}
 }

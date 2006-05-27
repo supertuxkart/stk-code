@@ -138,10 +138,9 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
 
   guiStack.push_back(GUIS_RACE);
 
-  const std::string music = track_manager->getTrack(raceSetup.track)->getMusic();
+  const std::string MUSIC = track_manager->getTrack(raceSetup.track)->getMusic();
 
-  if (!music.empty())
-    sound -> change_track ( music.c_str() );
+  if (!MUSIC.empty()) sound -> play_track ( MUSIC.c_str() );
 
   ready_set_go = 3;
   phase        = START_PHASE;
@@ -155,6 +154,8 @@ World::~World() {
   projectile_manager->cleanup();
 
   delete scene ;
+
+  sound -> stop_music();
 }
 
 void World::draw() {

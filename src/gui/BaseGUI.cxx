@@ -29,6 +29,7 @@
 #include "NumPlayers.h"
 #include "ConfigControls.h"
 #include "ConfigDisplay.h"
+#include "ConfigSound.h"
 #include "PlayerControls.h"
 #include "RaceGUI.h"
 #include "RaceResultsGUI.h"
@@ -68,8 +69,9 @@ void updateGUI() {
         case GUIS_CONFIGP3:       gui = new PlayerControls(2);            break;
         case GUIS_CONFIGP4:       gui = new PlayerControls(3);            break;
         case GUIS_CONFIGDISPLAY:  gui = new ConfigDisplay();              break;
+        case GUIS_CONFIGSOUND:    gui = new ConfigSound();                break;
         case GUIS_RACE:           gui = new RaceGUI;                      break;
-        case GUIS_RACERESULT:     gui = new RaceResultsGUI();              break;
+        case GUIS_RACERESULT:     gui = new RaceResultsGUI();             break;
         case GUIS_NEXTRACE:       race_manager->next();                   break;
         case GUIS_RACEMENU:       gui = new RaceMenu;                     break;
         case GUIS_EXITRACE:       guiStack.clear(); race_manager->next(); break;

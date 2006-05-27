@@ -64,6 +64,7 @@ tuxkart_SOURCES =                                       \
 	gui/TrackSel.cxx	 gui/TrackSel.h	        \
 	gui/PlayerControls.cxx	 gui/PlayerControls.h   \
 	gui/ConfigDisplay.cxx	 gui/ConfigDisplay.h    \
+	gui/ConfigSound.cxx	     gui/ConfigSound.h    \
 	gui/ConfigControls.cxx	 gui/ConfigControls.h   \
 	gui/Options.cxx		 gui/Options	        \
 	gui/GameMode.cxx	 gui/GameMode.h	        \

@@ -17,73 +17,47 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <iostream>
+
 #include "sound.h"
 #include "Loader.h"
 #include "Config.h"
 
 SoundSystem *sound ;
 
-//FIXME: Not used.
-void SoundSystem::disable_music ()
-{
-  sched -> stopMusic () ;
-  config->music = false;
-}
-
-void SoundSystem::pause_music()
-{
-  sched -> pauseMusic () ;
-}
-
-void SoundSystem::resume_music()
-{
-  sched -> resumeMusic () ;
-}
-
-
-void SoundSystem::change_track ( const char *fname )
+void SoundSystem::play_track ( const char *fname )
 {
   if ( fname == NULL )
-    fname = "" ;
-  std::string path;
-  path=loader->getPath(fname);
-
-  if ( strcmp ( path.c_str(), current_track ) != 0  )
   {
-    strcpy ( current_track, path.c_str() ) ;
+      std::cerr << "WARNING: tried to play a NULL file\n";
+      return;
+  }
 
-    if ( config->music )
-      enable_music  () ;
+  if(config->music)
+  {
+      std::string PATH = loader->getPath(fname);
+
+      if ( strcmp ( PATH.c_str(), current_track ) != 0  )
+      {
+        strcpy ( current_track, PATH.c_str() ) ;
+
+        sched -> stopMusic () ;
+        sched -> loopMusic ( current_track ) ;
+      }
   }
 }
 
-void SoundSystem::enable_music ()
-{
-  sched -> stopMusic () ;
-
-  if ( current_track [ 0 ] != '\0' )
-    sched -> loopMusic ( current_track ) ;
- 
-  config->music = true;
-}
-
-
-void SoundSystem::disable_sfx () { config->sound = false; }
-void SoundSystem:: enable_sfx () { config->sound = true; }
-
-
-
 void SoundSystem::playSfx ( int sfx_num )
 {
-  if ( config->sound )
-    sched -> playSample ( sfx[sfx_num].s, 1, SL_SAMPLE_MUTE, 2, NULL ) ;
+    if(config->sfx)
+        sched -> playSample ( sfx[sfx_num].s, 1, SL_SAMPLE_MUTE, 2, NULL ) ;
 }
 
 
 SoundSystem::SoundSystem ()
 {
   sched = new slScheduler ;
-  
+
   sfx[SOUND_UGH].fname = "wavs/ugh.wav";
   sfx[SOUND_BOING].fname = "wavs/boing.wav";
   sfx[SOUND_BONK].fname = "wavs/bonk.wav";
@@ -97,14 +71,14 @@ SoundSystem::SoundSystem ()
   sfx[SOUND_SHOOMF].fname = "wavs/shoomf.wav";
 
   setSafetyMargin () ;
-  
+
   for (int i = 0; i != NUM_SOUNDS; i++)
   {
     std::string path = loader->getPath(sfx[i].fname);
       sfx[i].s  = new slSample ( path.c_str(), sched ) ;
   }
 
-  change_track ( "" ) ;
+  play_track ( "" ) ;
 }
 
 

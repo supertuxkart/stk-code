@@ -31,8 +31,8 @@ ConfigDisplay::ConfigDisplay()
 
 	widgetSet -> layout(menu_id, 0, 0);
 
-  if(config->fullscreen)
-    widgetSet->set_label(fullscreen_menu_id, "Window mode");
+    if(config->fullscreen)
+      widgetSet->set_label(fullscreen_menu_id, "Window mode");
 }
 
 ConfigDisplay::~ConfigDisplay()

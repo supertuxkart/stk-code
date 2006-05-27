@@ -89,7 +89,7 @@ void Config::setDefaults() {
   setFilename();
   fullscreen       = false;
   noStartScreen    = false;
-  sound            = true;
+  sfx              = true;
   music            = true;
   smoke            = false;
   displayFPS       = false;
@@ -219,7 +219,7 @@ void Config::loadConfig(const std::string& filename) {
 
     /*get toggles*/
     lisp->get("fullscreen",       fullscreen);
-    lisp->get("sound",            sound);
+    lisp->get("sfx" ,             sfx);
     lisp->get("nostartscreen",    noStartScreen);
     lisp->get("music",            music);
     lisp->get("smoke",            smoke);
@@ -301,7 +301,7 @@ void Config::saveConfig(const std::string& filename) {
     writer.beginList("tuxkart-config");
     writer.writeComment("the following options can be set to #t or #f:");
     writer.write("fullscreen\t", fullscreen);
-    writer.write("sound\t", sound);
+    writer.write("sfx\t",   sfx);
     writer.write("music\t", music);
     writer.write("smoke\t", smoke);
     writer.write("displayFPS\t", displayFPS);

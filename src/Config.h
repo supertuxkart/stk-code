@@ -39,7 +39,7 @@ class Config {
   public:
     bool   fullscreen;
     bool   noStartScreen;
-    bool   sound;
+    bool   sfx;
     bool   music;
     bool   smoke;
     bool   displayFPS;

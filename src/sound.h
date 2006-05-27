@@ -20,6 +20,8 @@
 #ifndef HEADER_SOUND_H
 #define HEADER_SOUND_H
 
+#include <string>
+
 #include <plib/sl.h>
 
 #define SOUND_UGH		0
@@ -36,7 +38,6 @@
 
 #define NUM_SOUNDS 11
 
-#include <string>
 
 using std::string;
 
@@ -52,8 +53,8 @@ class SoundSystem
 {
   char current_track [ 256 ] ;
   slScheduler *sched ;
-  
-  Sound sfx [NUM_SOUNDS] ; 
+
+  Sound sfx [NUM_SOUNDS] ;
 
 public:
   SoundSystem () ;
@@ -66,15 +67,11 @@ public:
     sched -> setSafetyMargin ( t ) ;
   }
 
-  void  change_track ( const char *fname ) ;
-  void disable_music () ;
-  void  enable_music () ;
-  
-  void pause_music () ;
-  void resume_music ();
+  void play_track ( const char *fname );
 
-  void disable_sfx   () ;
-  void  enable_sfx   () ;
+  void stop_music () { sched -> stopMusic(); }
+  void pause_music () { sched -> pauseMusic(); }
+  void resume_music () { sched -> resumeMusic(); }
 } ;
 
 extern SoundSystem *sound ;
