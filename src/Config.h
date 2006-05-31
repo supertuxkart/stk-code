@@ -27,6 +27,7 @@
 #include <string>
 
 #define CONFIGDIR ".tuxkart"
+
 /*class for managing general tuxkart configuration data*/
 class Config {
   private:
@@ -48,6 +49,7 @@ class Config {
     int    profile;         // Number of frames to profile, default 500
                             // -1 if no profiling. Never saved in config file!
     std::string herringStyle;
+    bool   newKeyboardStyle;// use the new keyboard style
     bool   disableMagnet;   // true if a magnet can be dis- and enabled
     bool   replayHistory;
     bool   useKPH;

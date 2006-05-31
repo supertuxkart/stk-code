@@ -155,7 +155,9 @@ public:
   float          getCornerStiffF  () const {return kartProperties->corn_f;     }
   float          getCornerStiffR  () const {return kartProperties->corn_r;     }
   float          getInertia       () const {return kartProperties->inertia;    }
-  float          getSteerAngle    () const {return controls.lr*getMaxSteerAngle();}
+  float          getSteerAngle    () const {return controls.lr*
+                                               kartProperties->max_steer_angle;}
+  float          getSteerPercent  () const {return controls.lr;                }
   virtual void   collectedHerring    (Herring* herring);
   virtual void   reset               ();
   virtual void   handleZipper        ();

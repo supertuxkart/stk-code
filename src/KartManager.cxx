@@ -35,7 +35,7 @@ KartManager::~KartManager()
     delete *i;
 }
 
-int
+const int
 KartManager::getKartId(const std::string ident)
 {
   int j = 0;
@@ -73,8 +73,8 @@ KartManager::getKartById(int i)
 }
 
 void
-KartManager::loadKartData()
-{
+KartManager::loadKartData() {
+  maxSteerAngle = -1.0f;
   std::set<std::string> result;
   loader->listFiles(result, "data");
 
@@ -85,6 +85,9 @@ KartManager::loadKartData()
       KartProperties* kp = new KartProperties();
       kp->load("data/" + *i);
       karts.push_back(kp);
+      if(kp->max_steer_angle>maxSteerAngle) {
+	maxSteerAngle = kp->max_steer_angle;
+      }
     }   // if
   }   // for i
 }   // loadKartData

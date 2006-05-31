@@ -389,8 +389,8 @@ void Kart::updatePhysics (float dt) {
   // Slipping: more force than what can be supported by the back wheels
   // --> reduce the effective force acting on the kart - currently
   //     by an arbitrary value.
-  while(fabs(effForce)>maxGrip) {
-    effForce *= 0.6f;
+  if(fabs(effForce)>maxGrip) {
+    effForce *= 0.4f;
     skidding  = true;
   }   // while effForce>maxGrip
 
@@ -420,14 +420,15 @@ void Kart::updatePhysics (float dt) {
     slipAngleFront = 0.0f;
     slipAngleRear  = 0.0f;
   } else {
-#define XX
-#ifdef XX
+
     float turnSpeed = velocity.xyz[0]+AngVelocity*wheelBase/2;
-    slipAngleFront  = atan(turnSpeed/velocity.xyz[1])
+    slipAngleFront  = atan(turnSpeed/fabsf(velocity.xyz[1]))
                     - sgn(velocity.xyz[1])*steer_angle;
     turnSpeed       = velocity.xyz[0]-AngVelocity*wheelBase/2;
-    slipAngleRear   = atan(turnSpeed/velocity.xyz[1]);
-#else
+    slipAngleRear   = atan(turnSpeed/fabsf(velocity.xyz[1]));
+#ifdef CAN_BE_DELETED
+    // different ways of calculating the slip angles, but they 
+    // tend to be less stable
     float turnSpeed = velocity.xyz[0];
     slipAngleFront  = atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
                     - sgn(velocity.xyz[1])*steer_angle;
@@ -437,32 +438,20 @@ void Kart::updatePhysics (float dt) {
   }
 #undef   PHYSICS_DEBUG
 #  ifdef PHYSICS_DEBUG    
-  printf("%f<>%f<>%fv[0]= %f v[1]= %f sa= %f saf= %f sar= %f ", 
-	 atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
-	 - sgn(velocity.xyz[1])*steer_angle,
-	 atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity/2.0f
-	 - sgn(velocity.xyz[1])*steer_angle,
-	 atan((velocity.xyz[0]+AngVelocity*wheelBase/2)/velocity.xyz[1])
-	 - sgn(velocity.xyz[1])*steer_angle,
-	 velocity.xyz[0],
+  printf("v[0]= %f v[1]= %f sa= %f saf= %f sar= %f ", velocity.xyz[0],
 	 velocity.xyz[1], steer_angle, slipAngleFront, slipAngleRear);
 #  endif
 
   float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
-    * ForceOnFrontTire - SysResistance[0]*0.5;
+                       * ForceOnFrontTire - SysResistance[0]*0.5;
   float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
-    * ForceOnRearTire  - SysResistance[0]*0.5;
+                       * ForceOnRearTire  - SysResistance[0]*0.5;
   float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
   velocity.xyz[0]      = cornerForce/mass*dt;
   float torque         =                  ForceLatRear *wheelBase/2
                        - cos(steer_angle)*ForceLatFront*wheelBase/2; 
   float angAcc         = torque/getInertia();
-  // A certain percentage (which should probably depend on tire grip, road 
-  // surface etc) gets lost. This is necessary to stop the kart from 
-  // rotating when going in a straight line after turning.
-  float grip = getTireGrip();
-  if(on_ground&&materialHOT) grip *= materialHOT->getFriction();
-   
+
 #  ifdef PHYSICS_DEBUG    
   printf("fF %f rF %f t %f\n",ForceLatFront, ForceLatRear, torque);
 #  endif
@@ -474,11 +463,13 @@ void Kart::updatePhysics (float dt) {
   //  velocity.xyz[0] = 0.0;
   velocity.xyz[1] += accel           * dt;
   velocity.xyz[2] += force[2] / mass * dt;
-  prevAccel         = accel;
+  prevAccel        = accel;
 
 }   // updatePhysics
 
 // -----------------------------------------------------------------------------
+// PHORS recommends: f=B*alpha/(1+fabs(A*alpha)^p), where A, B, and p
+//                   are appropriately chosen constants.
 float Kart::NormalizedLateralForce(float alpha, float corner) const {
   float const maxAlpha=3.14/4;
   if(fabsf(alpha)<maxAlpha) {

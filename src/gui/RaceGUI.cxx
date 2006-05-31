@@ -32,7 +32,6 @@ RaceGUI::RaceGUI(): time_left(0.0) {
     UpdateKeyboardMappings();
   }   // if !config->profile
 
-  fpsCounter = 0;
   pos_string[0] = "?!?";
   pos_string[1] = "1st";
   pos_string[2] = "2nd";
@@ -44,6 +43,12 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   pos_string[8] = "8th";
   pos_string[9] = "9th";
   pos_string[10] = "10th";
+
+  // Temporary, we need a better icon here
+  SteeringWheelIcon = material_manager->getMaterial("wheel.rgb");
+
+  fpsCounter = 0;
+  fpsString[0]=0;
   fpsTimer.reset();
   fpsTimer.update();
   fpsTimer.setMaxDelta(1000);
@@ -84,7 +89,7 @@ void RaceGUI::UpdateKeyboardMappings() {
 
 // -----------------------------------------------------------------------------
 void RaceGUI::update(float dt) {
-	drawStatusText (world->raceSetup) ;
+  drawStatusText (world->raceSetup, dt);
 }   // update
 
 // -----------------------------------------------------------------------------
@@ -279,13 +284,14 @@ void RaceGUI::drawMap () {
 }   // drawMap
 
 // -----------------------------------------------------------------------------
-void RaceGUI::drawGameOverText () {
-  static int timer = 0 ;
+void RaceGUI::drawGameOverText (const float dt) {
+  static float timer = 0 ;
 
   /* Calculate a color. This will result in an animation effect. */
   int red   = (int)(255 * sin ( (float)timer/5.1f ) / 2.0f + 0.5f);
   int green = (int)(255 * (sin ( (float)timer/6.3f ) / 2.0f + 0.5f));
   int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
+  timer += dt;
 
   int finishing_position = world->getPlayerKart(0)->getFinishPosition();
   if ( finishing_position < 0 )
@@ -562,10 +568,37 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 // -----------------------------------------------------------------------------
 void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
+
+  offset_x += (int)((config->width-220)*ratio_x);
+#define WHEELWIDTH 32  
+  int width  = (int)(WHEELWIDTH*ratio_x);
+  int height = (int)(WHEELWIDTH*ratio_y);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+    glLoadIdentity();
+    glTranslatef(offset_x+width/2, offset_y+height/2, 0.0f);
+    // for now we display the maximum steering as a 45 degree angle.
+    // One the steering angle for all karts are fixed, this should be
+    // changed, so that the user gets feedback about how much steering
+    // is currently done, since it will vary from kart to kart.
+    float displayedAngle = 45.0f * kart->getSteerPercent();
+    glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
+    glTranslatef(-offset_x-width/2, -offset_y-height/2, 0.0f);
+    glEnable(GL_TEXTURE_2D);
+    SteeringWheelIcon->apply();
+    glBegin ( GL_QUADS ) ;
+      glColor4f    ( 1, 1, 1, 1 ) ;
+      glTexCoord2f(-1,-1);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f( 1,-1);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f( 1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(-1, 1);glVertex2i(offset_x      , offset_y+height);
+     glEnd () ;
+
+  glPopMatrix();
 } // drawSteering
 
 // -----------------------------------------------------------------------------
-void RaceGUI::drawStatusText (const RaceSetup& raceSetup) {
+void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
   glMatrixMode   ( GL_MODELVIEW ) ;
   glPushMatrix   () ;
   glLoadIdentity () ;
@@ -618,7 +651,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup) {
     split_screen_ratio_x = 0.5;
 
   if ( world->getPhase() == World::FINISH_PHASE ) {
-    drawGameOverText     () ;
+    drawGameOverText(dt) ;
   }   // if FINISH_PHASE
   if ( world->getPhase() == World::RACE_PHASE   ) {
     for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++) {

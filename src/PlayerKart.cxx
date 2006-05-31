@@ -24,11 +24,13 @@
 #include "plibdrv.h"
 #include "Herring.h"
 #include "World.h"
+#include "Config.h"
 
 // -----------------------------------------------------------------------------
 void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
   //Steering keys(hold)
   controls.lr      = -ctrl.data[0];
+  joystickWasMoved = fabsf(controls.lr)>0.01;
   controls.accel   = -ctrl.data[1];
   controls.brake   = player->buttons[KC_BRAKE  ] & ctrl.buttons;
   controls.wheelie = player->buttons[KC_WHEELIE] & ctrl.buttons;
@@ -42,15 +44,34 @@ void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
 // -----------------------------------------------------------------------------
 // Only keys which must keep on working when still being pressed
 // are handled here, not 'one time action' keys like fire, ...
-void PlayerKart::doSteering() {
-  controls.lr=0.0f;
-  if(isKeyDown(player->keys[KC_LEFT]   )) controls.lr      =  1.0f;
-  if(isKeyDown(player->keys[KC_RIGHT]  )) controls.lr      = -1.0f;
+void PlayerKart::handleKeyboard(float dt) {
+#define TIMEFORFULLSTEER 0.5f
+
+  if(!config->newKeyboardStyle) {
+    controls.lr = isKeyDown(player->keys[KC_LEFT ]) ?  1.0f 
+                : isKeyDown(player->keys[KC_RIGHT]) ? -1.0f : 0.0f;
+  } else {
+    float steerChange = dt/TIMEFORFULLSTEER;  // amount the steering is changed
+    if       (isKeyDown(player->keys[KC_LEFT ])) { controls.lr += steerChange;
+    } else if(isKeyDown(player->keys[KC_RIGHT])) { controls.lr -= steerChange; 
+    } else {   // no key is pressed
+      if(controls.lr>0.0f) {
+	controls.lr -= steerChange;
+	if(controls.lr<0.0f) controls.lr=0.0f;
+      } else {   // controls.lr<=0.0f;
+	controls.lr += steerChange;
+	if(controls.lr>0.0f) controls.lr=0.0f;
+      }   // if controls.lr<=0.0f
+    }   // no key is pressed
+  }   // not old steering
+    // clamp control value to be within  [-1,1]
+  controls.lr = std::min(1.0f, std::max(-1.0f, controls.lr));
+
   if(isKeyDown(player->keys[KC_ACCEL]  )) controls.accel   =  1.0f;
   if(isKeyDown(player->keys[KC_BRAKE]  )) controls.brake   =  true;
   if(isKeyDown(player->keys[KC_WHEELIE])) controls.wheelie =  true;
 
-}   // doSteering
+}   // handleKeyboard
 
 // -----------------------------------------------------------------------------
 // Gets called by RaceGUI when one of the non-steering keys
@@ -67,7 +88,10 @@ void PlayerKart::action(int key) {
 
 // -----------------------------------------------------------------------------
 void PlayerKart::update(float dt) {
-  doSteering();
+  // Joystick values takes precedence over keyboard, only
+  // do the keyboard handling if joystick wasn't moved.
+  if(!joystickWasMoved) handleKeyboard(dt);
+
   if(world->getPhase()==World::START_PHASE) {
     if(controls.lr!=0.0 || controls.accel!=0.0 || controls.brake!=false ||
        controls.fire|controls.wheelie|controls.jump) {

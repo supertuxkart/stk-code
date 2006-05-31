@@ -99,6 +99,7 @@ void Config::setDefaults() {
   disableMagnet    = false;
   profile          = 0;
   useKPH           = false;
+  newKeyboardStyle = false;
   replayHistory    = false;
   width            = 800;
   height           = 600;
@@ -228,6 +229,7 @@ void Config::loadConfig(const std::string& filename) {
     lisp->get("oldStatusDisplay", oldStatusDisplay);
     lisp->get("herringStyle",     herringStyle);
     lisp->get("disableMagnet",    disableMagnet);
+    lisp->get("newKeyboardStyle", newKeyboardStyle);
     lisp->get("useKPH",           useKPH);
 
     /*get resolution width/height*/
@@ -304,12 +306,20 @@ void Config::saveConfig(const std::string& filename) {
     writer.write("sfx\t",   sfx);
     writer.write("music\t", music);
     writer.write("smoke\t", smoke);
+    writer.writeComment("Display frame per seconds");
     writer.write("displayFPS\t", displayFPS);
+    writer.writeComment("Use the old, one-window style menu at startup");
     writer.write("singleWindowMenu\t", singleWindowMenu);
+    writer.writeComment("Display kart icons in bottom row instead of at the left");
     writer.write("oldStatusDisplay\t", oldStatusDisplay);
+    writer.writeComment("Name of the .herring file to use.");
     writer.write("herringStyle\t", herringStyle);
+    writer.writeComment("Allow players to disable a magnet");
     writer.write("disableMagnet\t", disableMagnet);
+    writer.writeComment("Use of kilometers per hours (km/h) instead of mph");
     writer.write("useKPH\t", useKPH);
+    writer.writeComment("0: old, 1: new gradual, 2: as 1, but steering reduces when no key is pressed");
+    writer.write("newKeyboardStyle\t", newKeyboardStyle);
 
     writer.writeComment("screen resolution");
     writer.write("width\t", width);

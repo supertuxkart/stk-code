@@ -47,14 +47,15 @@ public:
   void joybuttons(int whichJoy, int hold, int presses, int releases ) ;
 
 private:
-    ulClock  fpsTimer;
-    int      fpsCounter;
-    char     fpsString[10];
-    double time_left ;
-    char *pos_string [11];
+    ulClock   fpsTimer;
+    int       fpsCounter;
+    char      fpsString[10];
+    double    time_left ;
+    char*     pos_string [11];
+    Material* SteeringWheelIcon;
 
     /* Display informat on screen */
-    void drawStatusText        (const RaceSetup& raceSetup);
+    void drawStatusText        (const RaceSetup& raceSetup, const float dt);
     void drawEnergyMeter       (Kart *player_kart, 
 				int   offset_x, int   offset_y, 
 				float ratio_x,  float ratio_y  );
@@ -71,7 +72,7 @@ private:
     void UpdateKeyboardMappings();
     void drawPlayerIcons       ();
     void oldDrawPlayerIcons    ();
-    void drawGameOverText      ();
+    void drawGameOverText      (const float dt);
     void drawMap               ();
     void drawTimer             ();
     void drawFPS               ();

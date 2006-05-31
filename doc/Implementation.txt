@@ -22,7 +22,7 @@ or AutoKart::update.
 2) Projectiles
 ==============
 Projectiles inherit from Moveables. The projectile_manager
-maintains a dynamical list of unused projectils (deletedProjectils). 
+maintains a dynamical list of unused projectiles (deletedProjectiles).
 If a new projectile is needed (because of the use of a collectable):
 - one projectile from this list will be used (and removed from
   this list) if one is available,
@@ -71,7 +71,7 @@ To add another parameter:
 ================
 The ScreenManager contains the main event/redraw loop in its 
 ScreenManager::run function. The next screen can be defined, which
-means that the ScreenManager will delete the currenct screen, and
+means that the ScreenManager will delete the current screen, and
 replace it with the next screen. The main loop for the 
 ScreenManager can be aborted by calling ScreenManager::abort().
 
@@ -114,3 +114,138 @@ WorldScreen
 -----------
 Similarly to StartScreen, WorldScreen::update gets called
 regularly by the ScreenManager.
+
+
+5) Physics
+==========
+The new physics (esp. new turning code) enables (well, soon)
+karts to start sliding when driving too fast in too tight
+curves. There are quite a few parameters which can and must
+be tuned to get the right feeling. All these parameters
+are stored in data/physics.data and can be changed with
+any editor - no recompilation is necessary, but tuxkart
+has to be started again for the new parameters to be used.
+Here a short explanation on how the parameters interact 
+with each other:
+- Driving in straight lines
+  The engine force is defined by 'engine-power', which
+  results in a force pushing the kart forward. There are
+  two forces countering this: rolling resistance (see
+  roll-resistance), and air-friction. Rolling resistance
+  increases linearly with the velocity of the kart
+  (speed * roll_resistance); while air friction increases
+  with the squared speed of the kart 
+  (speed*speed*air_friction). Rolling resistance is more
+  important at lower speed, while air-friction is most
+  effective at higher speed (and it's ultimate responsible
+  for the top speed of the kart).Therefore:
+  - engine_power and roll_resistance determine how fast
+    a kart can accelerate
+  - engine_power and air_friction determine the maximum
+    speed of the kart.
+  E.g., to make the kart accelerate faster, without changing
+  the maximum speed: either decrease roll-resistance (the
+  effect to the maximum speed can be neglected); or increase
+  engine power and air friction.
+  Additional effects are the tire grip and the surface the
+  kart is driving on: tire-force*tire_grip*surface_grip 
+  is the maximum grip (tire-force = force on the tire, caused
+  by the weight of the kart), and if the forward force is
+  greater than the maximum grip, slipping occurs: the 
+  effective force is reduced to 40% (arbitrary value), and
+  skid marks are drawn.
+- Turning
+  Turning is implemented by computing two lateral forces 
+  acting on the tires. These forces are caused by the 
+  difference of the direction the kart is driving (velocity,
+  which is a vector), and the direction the tires are 
+  facing. This is called the slip angle. For example, 
+  consider a kart driving in a straight line, when suddenly
+  the steering wheel is turned left. At this time, the front
+  tire will face in a different direction than the direction
+  the kart is travelling, but the rear tire will still face
+  in the same direction as the velocity. Therefore, a force
+  will act on the front tires pushing them to the left, 
+  while no such force acts on the rear tires. As a result of
+  this, two changes take place in the kart:
+  1) The force pushes the kart a bit to the left
+     --> this is responsible for the centre of gravity
+         to describe a circle
+  2) this force causes a turning moment to the kart,
+     causing the kart to rotate to the left.
+  Notice that these two effects are to a certain degree
+  independent: if the turning moment is too small (close
+  to zero), the kart will be sliding to the left, but not
+  actually face in the direction. If the turning moment
+  is too big, the kart will rotate too much - not facing
+  the direction of travel either.
+  Later in the turn the behaviour is quite similar, except
+  that the rear tires will (usually) face in a different
+  direction than the velocity, causing a force there as 
+  well. So the correct description is:
+  1) The sum of the forces on the front and rear tire
+     cause the centre of gravity of the kart to move
+     sideways
+  2) The difference of the two forces causes a turning
+     moment on the kart.
+  Well, that's somewhat simplified, since there are a
+  few cos(alpha), sin(delta), ... happening, but that
+  is enough to understand the parameters in the
+  data/physics.data file. For more details see:
+  http://home.planet.nl/~monstrous/tutcar.html
+  This page is currently down :((
+  Another recommended read is Ted Zuvich's "Vehicle
+  Dynamics for Racing Games" (available on
+  gamasutra, just google to find it). More information
+  can be found online, search for slip angle, car
+  physics, ...
+
+  The slip angles for front and rear tires depend on:
+  - steering angle (obviously only for front tires)
+  - distance between tires and centre of gravity
+    (and rotational velocity of the kart).
+    The CoG is assumed to be in the middle of the kart, so
+    this distance is wheel-base/2. The longer the wheel
+    base, the longer the way the tires will move as
+    a result of the kart rotation, the more lateral force
+    will be produced.
+  The force acting on the tires is then linearly dependent
+  on the slip_angle:  slip_angle * corner_force
+  (well, it's only linear for small angles, and the function
+  Kart::NormalizedLateralForce will cap the values if the
+  angle is too big). The acting force for the front tire
+  is modified by cos(steer_angle) to compute the lateral 
+  force on the centre of gravity from the lateral force
+  on the tire.
+  The sum of these two lateral forces causes the sideway
+  movement of the kart, and the difference between these
+  two forces multiplied by wheel_base/2 causes the turning
+  moment or torque, which gets divided by the inertia of the
+  kart to computer the rotational acceleration.
+
+  To tweak these values, consider:
+  - increasing the cornering forces for the tires will 
+    result in larger forces to work on the tires
+    --> the radius of the turn will be smaller, since the 
+        force pulling the kart to the middle is bigger,
+    --> the kart will rotate more, since the difference of 
+        the two forces will be bigger as well.
+  - increasing max_steer_angle will increase the force, but 
+    at the same time decrease the later component for the 
+    front tire (see cos(steer_angle) above)
+    --> tighter curve, but less rotation of the kart
+  - increasing the wheel base will increase the turning 
+    velocity, causing more force
+  - increasing the inertia will reduce the effect of the
+    turning moment on the kart, resulting in less rotation,
+    but the same pulling force causing the kart to go in
+    a circle, so the kart will not 'oversteer'2
+
+All those parameters are tightly coupled, and sometimes even
+minor changes will result in big changes in playability, i.e.
+the kart might suddenly only rotate on the spot, or hardly
+turn at all. Testing and tweaking and tweaking and testing
+is necessary.
+    
+  
+    
