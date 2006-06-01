@@ -38,6 +38,7 @@
 #include "History.h"
 #include "constants.h"
 #include "sound.h"
+#include "WidgetSet.h"
 
 World* world = 0;
 
@@ -174,8 +175,10 @@ void World::update(float delta) {
 
   checkRaceStatus();
 
-  if( getPhase() == FINISH_PHASE )
-  guiStack.push_back ( GUIS_RACERESULT );
+  if( getPhase() == FINISH_PHASE ) {
+    widgetSet->tgl_paused();
+    guiStack.push_back ( GUIS_RACERESULT );
+  }
 
   float inc = 0.05;
   float dt  = delta;
