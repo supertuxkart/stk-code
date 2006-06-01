@@ -576,22 +576,24 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
     glLoadIdentity();
-    glTranslatef(offset_x+width/2, offset_y+height/2, 0.0f);
     // for now we display the maximum steering as a 45 degree angle.
     // One the steering angle for all karts are fixed, this should be
     // changed, so that the user gets feedback about how much steering
     // is currently done, since it will vary from kart to kart.
     float displayedAngle = 45.0f * kart->getSteerPercent();
+
+    int tw = width/2; int th = height/2;
+    glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
     glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
-    glTranslatef(-offset_x-width/2, -offset_y-height/2, 0.0f);
+    glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
     glEnable(GL_TEXTURE_2D);
     SteeringWheelIcon->apply();
     glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;
-      glTexCoord2f(-1,-1);glVertex2i(offset_x      , offset_y       );
-      glTexCoord2f( 1,-1);glVertex2i(offset_x+width, offset_y       );
-      glTexCoord2f( 1, 1);glVertex2i(offset_x+width, offset_y+height);
-      glTexCoord2f(-1, 1);glVertex2i(offset_x      , offset_y+height);
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
      glEnd () ;
 
   glPopMatrix();
