@@ -245,7 +245,15 @@ void World::checkRaceStatus() {
      if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
   }
   else
-     if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) phase = FINISH_PHASE;
+    if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) {
+      phase = FINISH_PHASE;
+      for ( Karts::size_type i = 0; i < kart.size(); ++i) {
+	if(!kart[i]->raceIsFinished()) {
+	  // The time will actually not be displaced for the last kart
+	  kart[i]->setFinishingState(raceSetup.getNumKarts(), clock);
+	}   // if !raceIsFinished
+      }   // for i
+    }
 }
 
 void

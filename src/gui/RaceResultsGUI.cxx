@@ -26,43 +26,62 @@
 
 RaceResultsGUI::RaceResultsGUI()
 {
-	menu_id = widgetSet -> vstack(0);
+    menu_id = widgetSet -> vstack(0);
     const unsigned int MAX_STR_LEN = 60;
     widgetSet -> label(menu_id, "Race results", GUI_LRG, GUI_ALL, 0, 0);
 
-	static char score[MAX_STR_LEN][6];
-	for(unsigned int i = 0; i < world->raceSetup.getNumKarts(); ++i)
+    unsigned int numKarts = world->getNumKarts();
+    int*  order;
+    score = new char[numKarts * MAX_STR_LEN];
+    order = new int [numKarts              ];
+    unsigned int maxNameLen = 1;
+    for(unsigned int i=0; i<numKarts; i++) {
+      Kart *k = world->getKart(i);
+      order[k->getFinishPosition()-1] = i;
+      unsigned int l = k->getKartProperties()->name.length();
+      if(l>maxNameLen) maxNameLen = l;
+    }   // for i
+    
+    for(unsigned int i = 0; i < numKarts; ++i)
     {
-    //This shows position + driver name + time + points earned + total points
-        sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %d:%d''%d +%d %d",
-            world->getKart(i)->getFinishPosition(),
-            world->getKart(i)->getKartProperties()->name.c_str(),
-            world->getKart(i)->getFinishMins(),
-            world->getKart(i)->getFinishSecs(),
-            world->getKart(i)->getFinishTenths(),
-            world->getKart(i)->getFinishPosition() > 4 ? 0 :
-                4 - world->getKart(i)->getFinishPosition(),
-            race_manager->getKartScore(i));
-
-        widgetSet -> label(menu_id, (char*)(score + MAX_STR_LEN * i), GUI_MED, GUI_LFT, 0, 0);
+      Kart *kart = world->getKart(order[i]);
+      std::string kartName = kart->getKartProperties()->name;
+      kartName.resize(maxNameLen,' ');
+      char sTime[20];
+      if(i==numKarts-1) {
+	sprintf(sTime,"          ");
+      } else {
+	sprintf(sTime,"%3d:%02d''%02d", kart->getFinishMins(),
+		kart->getFinishSecs(), kart->getFinishTenths());
+      }
+      //This shows position + driver name + time + points earned + total points
+      sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
+	      kart->getFinishPosition(), kartName.c_str(), sTime,
+	      race_manager->getPositionScore(i+1),
+	      race_manager->getKartScore(order[i]));
+      widgetSet -> label(menu_id, (char*)(score + MAX_STR_LEN * i), 
+			 GUI_MED, GUI_LFT, 0, 0);
     }
-	widgetSet -> space(menu_id);
+
+    delete order;
+    widgetSet -> space(menu_id);
 
     int va = widgetSet -> varray(menu_id);
-	widgetSet -> start(va, "Continue",  GUI_MED, MENU_CONTINUE, 0);
-
-	widgetSet -> layout(menu_id, 0, 1);
+    widgetSet -> start(va, "Continue",  GUI_MED, MENU_CONTINUE, 0);
+    
+    widgetSet -> layout(menu_id, 0, 1);
 }
 
 RaceResultsGUI::~RaceResultsGUI()
 {
-	widgetSet -> delete_widget(menu_id) ;
+    widgetSet -> delete_widget(menu_id) ;
+    delete score;
 }
 
 void RaceResultsGUI::update(float dt)
 {
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
+    widgetSet -> timer(menu_id, dt) ;
+    widgetSet -> paint(menu_id) ;
 }
 
 void RaceResultsGUI::select()
@@ -71,6 +90,7 @@ void RaceResultsGUI::select()
     {
         case MENU_CONTINUE:
             guiStack.push_back(GUIS_NEXTRACE);
+	    widgetSet->tgl_paused();
             break;
         default:
             break;

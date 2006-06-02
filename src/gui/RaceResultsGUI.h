@@ -25,6 +25,8 @@
 /** GUI that shows the RaceResults, times and such */
 class RaceResultsGUI : public BaseGUI
 {
+ private:
+  char* score;
 public:
   RaceResultsGUI();
   ~RaceResultsGUI();
