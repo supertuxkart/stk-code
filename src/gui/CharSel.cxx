@@ -61,7 +61,7 @@ CharSel::CharSel(int whichPlayer)
             i < kart_manager->karts.size(); ++i)
 	{
 	  int c = widgetSet -> image(row1,
-				     kart_manager->karts[i]->icon_file.c_str(),
+				     kart_manager->karts[i]->getIconFile(),
 				     icon_size, icon_size);
 	  widgetSet -> activate_widget(c, i, 0);
 
@@ -92,7 +92,7 @@ void CharSel::switch_to_character(int n)
 {
 	if (current_kart != n && n >= 0 && n < int(kart_manager->karts.size()))
 	{
-        widgetSet -> set_label(kart_name_label, kart_manager->karts[n]->name.c_str());
+        widgetSet -> set_label(kart_name_label, kart_manager->karts[n]->getName());
 
 		current_kart = n;
         ssgDeRefDelete(kart);
@@ -150,7 +150,7 @@ void CharSel::select()
 
 	if (token >= 0 && token < static_cast<int>(kart_manager->karts.size()))
           race_manager->setPlayerKart(playerIndex,
-              kart_manager->getKartById(token)->ident);
+              kart_manager->getKartById(token)->getIdent());
 
 	if (race_manager->getNumPlayers() > 1)
 	{

@@ -654,7 +654,7 @@ void Kart::load_data() {
   skidmark_left  = new SkidMark();
   skidmark_right = new SkidMark();
 
-  shadow = createShadow(kartProperties->shadow_file, -1, 1, -1, 1);
+  shadow = createShadow(kartProperties->getShadowFile(), -1, 1, -1, 1);
   shadow->ref();
   model->addKid ( shadow );
 }   // load_data

@@ -42,7 +42,7 @@ KartManager::getKartId(const std::string ident)
   for(KartPropertiesVector::const_iterator i = karts.begin();
       i != karts.end(); ++i)
     {
-      if ((*i)->ident == ident)
+      if ((*i)->getIdent() == ident)
         return j;
       ++j;
     }
@@ -56,7 +56,7 @@ KartManager::getKart(const std::string ident)
   for(KartPropertiesVector::const_iterator i = karts.begin();
       i != karts.end(); ++i)
     {
-      if ((*i)->ident == ident)
+      if ((*i)->getIdent() == ident)
         return *i;
     }
 
@@ -85,8 +85,8 @@ KartManager::loadKartData() {
       KartProperties* kp = new KartProperties();
       kp->load("data/" + *i);
       karts.push_back(kp);
-      if(kp->max_steer_angle>maxSteerAngle) {
-	maxSteerAngle = kp->max_steer_angle;
+      if(kp->getMaxSteerAngle() > maxSteerAngle) {
+	maxSteerAngle = kp->getMaxSteerAngle();
       }
     }   // if
   }   // for i
@@ -100,7 +100,7 @@ KartManager::getRandomKarts(int len)
   for(KartPropertiesVector::const_iterator i = karts.begin();
       i != karts.end(); ++i)
     {
-      all_karts.push_back((*i)->ident);
+      all_karts.push_back((*i)->getIdent());
     }
 
   std::random_shuffle(all_karts.begin(), all_karts.end());
@@ -117,7 +117,7 @@ KartManager::fillWithRandomKarts(std::vector<std::string>& vec)
 
   for(KartPropertiesVector::const_iterator i = karts.begin();
       i != karts.end(); ++i)
-    all_karts.push_back((*i)->ident);
+    all_karts.push_back((*i)->getIdent());
 
   std::random_shuffle(all_karts.begin(), all_karts.end());
 

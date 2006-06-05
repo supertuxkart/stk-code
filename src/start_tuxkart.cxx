@@ -127,8 +127,8 @@ int handleCmdLine(int argc, char **argv) {
       fprintf ( stdout, "  Available karts:\n" );
       for (unsigned int i = 0; i != kart_manager->karts.size(); i++)
 	fprintf ( stdout, "\t%10s: %s\n",
-		  kart_manager->karts[i]->ident.c_str(),
-		  kart_manager->karts[i]->name.c_str() );
+		  kart_manager->karts[i]->getIdent(),
+		  kart_manager->karts[i]->getName() );
 
       fprintf ( stdout, "\n" );
 
@@ -284,7 +284,7 @@ int main ( int argc, char **argv ) {
 	race_manager->setNumKarts  (4);
 	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
 	race_manager->setDifficulty(RD_MEDIUM);
-	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
+	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
 	race_manager->setNumLaps   (1);
 	//race_manager->setTrack     ("tuxtrack");
 	//race_manager->setTrack     ("sandtrack");
@@ -296,7 +296,7 @@ int main ( int argc, char **argv ) {
   // Profiling
   // =========
       race_manager->setNumPlayers(1);
-      race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->ident);
+      race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
       race_manager->setNumKarts  (4);
       race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
       race_manager->setDifficulty(RD_MEDIUM);

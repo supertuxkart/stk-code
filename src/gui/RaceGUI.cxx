@@ -271,7 +271,7 @@ void RaceGUI::drawMap () {
     sgCoord *c ;
 
     Kart* kart = world->getKart(i);
-    glColor3fv ( *kart->getColour());
+    glColor3fv ( *kart->getColor());
     c          = kart->getCoord () ;
 
     world -> track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
@@ -570,7 +570,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
   offset_x += (int)((config->width-220)*ratio_x);
-#define WHEELWIDTH 32  
+#define WHEELWIDTH 64  
   int width  = (int)(WHEELWIDTH*ratio_x);
   int height = (int)(WHEELWIDTH*ratio_y);
   glMatrixMode(GL_MODELVIEW);

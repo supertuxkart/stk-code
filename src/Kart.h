@@ -140,23 +140,23 @@ public:
   // Functions to access the current kart properties (which might get changed,
   // e.g. mass increase or air_friction increase depending on attachment etc.)
   // -------------------------------------------------------------------------
-  const sgVec3*  getColour        () const {return &kartProperties->color;     }
-  float          getMass          () const {return kartProperties->mass
-                                                 + attachment.WeightAdjust();  }
-  float          getAirFriction   () const {return kartProperties->air_friction
+  const sgVec3*  getColor         () const {return kartProperties->getColor(); }
+  float          getMass          () const {return kartProperties->getMass()
+                                                 + attachment.WeightAdjust(); }
+  float          getAirFriction   () const {return kartProperties->getAirFriction()
                                                  + attachment.AirFrictAdjust();}
-  float          getRollResistance() const {return kartProperties->roll_resistance;}
-  float          getMaxPower      () const {return kartProperties->engine_power;}
-  float          getBrakeFactor   () const {return kartProperties->brake_factor;}
-  float          getWheelBase     () const {return kartProperties->wheel_base; }
-  float          getHeightCOG     () const {return kartProperties->heightCOG;  }
-  float          getTireGrip      () const {return kartProperties->tire_grip;  }
-  float          getMaxSteerAngle () const {return kartProperties->max_steer_angle;}
-  float          getCornerStiffF  () const {return kartProperties->corn_f;     }
-  float          getCornerStiffR  () const {return kartProperties->corn_r;     }
-  float          getInertia       () const {return kartProperties->inertia;    }
+  float          getRollResistance() const {return kartProperties->getRollResistance();}
+  float          getMaxPower      () const {return kartProperties->getMaxPower();}
+  float          getBrakeFactor   () const {return kartProperties->getBrakeFactor();}
+  float          getWheelBase     () const {return kartProperties->getWheelBase(); }
+  float          getHeightCOG     () const {return kartProperties->getHeightCOG(); }
+  float          getTireGrip      () const {return kartProperties->getTireGrip(); }
+  float          getMaxSteerAngle () const {return kartProperties->getMaxSteerAngle(); }
+  float          getCornerStiffF  () const {return kartProperties->getCornerStiffF(); }
+  float          getCornerStiffR  () const {return kartProperties->getCornerStiffR(); }
+  float          getInertia       () const {return kartProperties->getInertia(); }
   float          getSteerAngle    () const {return controls.lr*
-                                               kartProperties->max_steer_angle;}
+                                               kartProperties->getMaxSteerAngle();}
   float          getSteerPercent  () const {return controls.lr;                }
   virtual void   collectedHerring    (Herring* herring);
   virtual void   reset               ();

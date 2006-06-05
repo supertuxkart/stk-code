@@ -208,7 +208,7 @@ int SingleWindowMenu() {
   /* Set some defaults, since those values currenlty
      can't be set with the single window menu        */
   race_manager->setNumPlayers(1);
-  race_manager->setPlayerKart(0, kart_manager->getKartById(0)->ident);
+  race_manager->setPlayerKart(0, kart_manager->getKartById(0)->getIdent());
   race_manager->setNumKarts  (4);
   race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
   race_manager->setDifficulty(RD_MEDIUM);
