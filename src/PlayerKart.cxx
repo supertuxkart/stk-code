@@ -132,8 +132,6 @@ void PlayerKart::update(float dt) {
     }
   }
 
-  velocity.xyz[2] -= GRAVITY * dt ;
-
   Kart::update(dt);
   controls.accel   = 0.0f;
   controls.brake   = false;
