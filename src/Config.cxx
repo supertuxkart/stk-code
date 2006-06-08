@@ -104,61 +104,64 @@ void Config::setDefaults() {
   width            = 800;
   height           = 600;
   karts            = 4;
+  
   player[0].setName("Player 1");
   player[1].setName("Player 2");
   player[2].setName("Player 3");
   player[3].setName("Player 4");
 
-  player[0].useJoy = true;
-  player[1].useJoy = false;
-  player[2].useJoy = false;
-  player[3].useJoy = false;
+  player[0].setUseJoystick(true);
+  player[1].setUseJoystick(false);
+  player[2].setUseJoystick(false);
+  player[3].setUseJoystick(false);
+  
   /*player 1 default keyboard settings*/
-  player[0].keys[KC_LEFT]    = PW_KEY_LEFT;
-  player[0].keys[KC_RIGHT]   = PW_KEY_RIGHT;
-  player[0].keys[KC_ACCEL]   = PW_KEY_UP;
-  player[0].keys[KC_BRAKE]   = PW_KEY_DOWN;
-  player[0].keys[KC_WHEELIE] = 'a';
-  player[0].keys[KC_JUMP]    = 's';
-  player[0].keys[KC_RESCUE]  = 'd';
-  player[0].keys[KC_FIRE]    = 'f';
+  player[0].setKey(KC_LEFT,    PW_KEY_LEFT);
+  player[0].setKey(KC_RIGHT,   PW_KEY_RIGHT);
+  player[0].setKey(KC_ACCEL,   PW_KEY_UP);
+  player[0].setKey(KC_BRAKE,   PW_KEY_DOWN);
+  player[0].setKey(KC_WHEELIE, 'a');
+  player[0].setKey(KC_JUMP,    's');
+  player[0].setKey(KC_RESCUE,  'd');
+  player[0].setKey(KC_FIRE,    'f');
   /*player 1 default joystick settings*/
-  player[0].buttons[KC_BRAKE]   = 1;
-  player[0].buttons[KC_WHEELIE] = 0x20;
-  player[0].buttons[KC_JUMP]    = 0x10;
-  player[0].buttons[KC_RESCUE]  = 0x04;
-  player[0].buttons[KC_FIRE]    = 0x08;
+  player[0].setButton(KC_BRAKE,     1);
+  player[0].setButton(KC_WHEELIE,   0x20);
+  player[0].setButton(KC_JUMP,      0x10);
+  player[0].setButton(KC_RESCUE,    0x04);
+  player[0].setButton(KC_FIRE,      0x08);
+  
   /*player 2 default keyboard settings*/
-  player[1].keys[KC_LEFT]    = 'j';
-  player[1].keys[KC_RIGHT]   = 'l';
-  player[1].keys[KC_ACCEL]   = 'i';
-  player[1].keys[KC_BRAKE]   = 'k';
-  player[1].keys[KC_WHEELIE] = 'q';
-  player[1].keys[KC_JUMP]    = 'w';
-  player[1].keys[KC_RESCUE]  = 'e';
-  player[1].keys[KC_FIRE]    = 'r';
+  player[1].setKey(KC_LEFT,      'j');
+  player[1].setKey(KC_RIGHT,     'l');
+  player[1].setKey(KC_ACCEL,     'i');
+  player[1].setKey(KC_BRAKE,     'k');
+  player[1].setKey(KC_WHEELIE,   'q');
+  player[1].setKey(KC_JUMP,      'w');
+  player[1].setKey(KC_RESCUE,    'e');
+  player[1].setKey(KC_FIRE,      'r');
   /*player 2 default joystick settings*/
-  player[1].buttons[KC_ACCEL]   = 0;
-  player[1].buttons[KC_BRAKE]   = 1;
-  player[1].buttons[KC_WHEELIE] = 2;
-  player[1].buttons[KC_JUMP]    = 3;
-  player[1].buttons[KC_RESCUE]  = 4;
-  player[1].buttons[KC_FIRE]    = 5;
+  player[1].setButton(KC_ACCEL,     0);
+  player[1].setButton(KC_BRAKE,     1);
+  player[1].setButton(KC_WHEELIE,   2);
+  player[1].setButton(KC_JUMP,      3);
+  player[1].setButton(KC_RESCUE,    4);
+  player[1].setButton(KC_FIRE,      5);
 
   /*player 3 default joystick settings*/
-  player[2].buttons[KC_ACCEL]   = 0;
-  player[2].buttons[KC_BRAKE]   = 1;
-  player[2].buttons[KC_WHEELIE] = 2;
-  player[2].buttons[KC_JUMP]    = 3;
-  player[2].buttons[KC_RESCUE]  = 4;
-  player[2].buttons[KC_FIRE]    = 5;
+  player[2].setButton(KC_ACCEL,     0);
+  player[2].setButton(KC_BRAKE,     1);
+  player[2].setButton(KC_WHEELIE,   2);
+  player[2].setButton(KC_JUMP,      3);
+  player[2].setButton(KC_RESCUE,    4);
+  player[2].setButton(KC_FIRE,      5);
   /*player 4 default joystick settings*/
-  player[3].buttons[KC_ACCEL]   = 0;
-  player[3].buttons[KC_BRAKE]   = 1;
-  player[3].buttons[KC_WHEELIE] = 2;
-  player[3].buttons[KC_JUMP]    = 3;
-  player[3].buttons[KC_RESCUE]  = 4;
-  player[3].buttons[KC_FIRE]    = 5;
+  player[3].setButton(KC_ACCEL,     0);
+  player[3].setButton(KC_BRAKE,     1);
+  player[3].setButton(KC_WHEELIE,   2);
+  player[3].setButton(KC_JUMP,      3);
+  player[3].setButton(KC_RESCUE,    4);
+  player[3].setButton(KC_FIRE,      5);
 }   // setDefaults
 
 
@@ -249,29 +252,31 @@ void Config::loadConfig(const std::string& filename) {
         temp = "No " + temp + " node";
         throw std::runtime_error(temp);
       }
-      reader->get("name",     player[i].name);
+      std::string name;
+      reader->get("name", name);
+      player[i].setName(name);
 
+      int tmp= 0;
       /*get keyboard configuration*/
-      reader->get("left",    player[i].keys[KC_LEFT]);
-      reader->get("right",   player[i].keys[KC_RIGHT]);
-      reader->get("up",      player[i].keys[KC_ACCEL]);
-      reader->get("down",    player[i].keys[KC_BRAKE]);
-      reader->get("wheelie", player[i].keys[KC_WHEELIE]);
-      reader->get("jump",    player[i].keys[KC_JUMP]);
-      reader->get("rescue",  player[i].keys[KC_RESCUE]);
-      reader->get("fire",    player[i].keys[KC_FIRE]);
+      reader->get("left", tmp);    player[i].setKey(KC_LEFT, tmp);
+      reader->get("right", tmp);   player[i].setKey(KC_RIGHT, tmp);
+      reader->get("up", tmp);      player[i].setKey(KC_ACCEL, tmp);
+      reader->get("down", tmp);    player[i].setKey(KC_BRAKE, tmp);
+      reader->get("wheelie", tmp); player[i].setKey(KC_WHEELIE, tmp);
+      reader->get("jump", tmp);    player[i].setKey(KC_JUMP, tmp);
+      reader->get("rescue", tmp);  player[i].setKey(KC_RESCUE, tmp);
+      reader->get("fire", tmp);    player[i].setKey(KC_FIRE, tmp);
 
       /*get joystick configuration*/
-      reader->get("joy-up",      player[i].buttons[KC_ACCEL]);
-      reader->get("joy-down",    player[i].buttons[KC_BRAKE]);
-      reader->get("joy-wheelie", player[i].buttons[KC_WHEELIE]);
-      reader->get("joy-jump",    player[i].buttons[KC_JUMP]);
-      reader->get("joy-rescue",  player[i].buttons[KC_RESCUE]);
-      reader->get("joy-fire",    player[i].buttons[KC_FIRE]);
+      reader->get("joy-up", tmp);      player[i].setButton(KC_ACCEL, tmp);
+      reader->get("joy-down", tmp);    player[i].setButton(KC_BRAKE, tmp);
+      reader->get("joy-wheelie", tmp); player[i].setButton(KC_WHEELIE, tmp);
+      reader->get("joy-jump", tmp);    player[i].setButton(KC_JUMP, tmp);
+      reader->get("joy-rescue", tmp);  player[i].setButton(KC_RESCUE, tmp);
+      reader->get("joy-fire", tmp);    player[i].setButton(KC_FIRE, tmp);
     }
   } catch(std::exception& e) {
-    std::cout << "Error while parsing config '" << filename
-              << "': " << e.what() << "\n";
+    std::cout << "Error while parsing config '" << filename << "': " << e.what() << "\n";
   }
   delete root;
 }   // loadConfig
@@ -338,25 +343,25 @@ void Config::saveConfig(const std::string& filename) {
       temp += i+'1';
       writer.beginList(temp);
 
-      writer.write("name\t", player[i].name);
+      writer.write("name\t", player[i].getName());
 
       writer.writeComment("keyboard layout");
-      writer.write("left\t",    player[i].keys[KC_LEFT]);
-      writer.write("right\t",   player[i].keys[KC_RIGHT]);
-      writer.write("up\t\t",    player[i].keys[KC_ACCEL]);
-      writer.write("down\t",    player[i].keys[KC_BRAKE]);
-      writer.write("wheelie\t", player[i].keys[KC_WHEELIE]);
-      writer.write("jump\t",    player[i].keys[KC_JUMP]);
-      writer.write("rescue\t",  player[i].keys[KC_RESCUE]);
-      writer.write("fire\t",    player[i].keys[KC_FIRE]);
+      writer.write("left\t",    player[i].getKey(KC_LEFT));
+      writer.write("right\t",   player[i].getKey(KC_RIGHT));
+      writer.write("up\t\t",    player[i].getKey(KC_ACCEL));
+      writer.write("down\t",    player[i].getKey(KC_BRAKE));
+      writer.write("wheelie\t", player[i].getKey(KC_WHEELIE));
+      writer.write("jump\t",    player[i].getKey(KC_JUMP));
+      writer.write("rescue\t",  player[i].getKey(KC_RESCUE));
+      writer.write("fire\t",    player[i].getKey(KC_FIRE));
 
       writer.writeComment("joystick layout");
-      writer.write("joy-up",        player[i].buttons[KC_ACCEL]);
-      writer.write("joy-down",      player[i].buttons[KC_BRAKE]);
-      writer.write("joy-wheelie\t", player[i].buttons[KC_WHEELIE]);
-      writer.write("joy-jump\t",    player[i].buttons[KC_JUMP]);
-      writer.write("joy-rescue\t",  player[i].buttons[KC_RESCUE]);
-      writer.write("joy-fire\t",    player[i].buttons[KC_FIRE]);
+      writer.write("joy-up",        player[i].getButton(KC_ACCEL));
+      writer.write("joy-down",      player[i].getButton(KC_BRAKE));
+      writer.write("joy-wheelie\t", player[i].getButton(KC_WHEELIE));
+      writer.write("joy-jump\t",    player[i].getButton(KC_JUMP));
+      writer.write("joy-rescue\t",  player[i].getButton(KC_RESCUE));
+      writer.write("joy-fire\t",    player[i].getButton(KC_FIRE));
 
       writer.endList(temp);
     }   // for i

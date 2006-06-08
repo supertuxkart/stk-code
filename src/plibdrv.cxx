@@ -129,7 +129,7 @@ void InitPlib() {
   for ( int i = 0 ; i < 512 ; i++ )
     keyIsDown [ i ] = FALSE ;
   joystick = new jsJoystick ( 0 );
-  if( joystick -> notWorking () ) config->player[0].useJoy = false;
+  if( joystick -> notWorking () ) config->player[0].setUseJoystick(false);
     else
   {
     joystick -> setDeadBand( 0, 0.1 );

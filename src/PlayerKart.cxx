@@ -32,13 +32,13 @@ void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
   controls.lr      = -ctrl.data[0];
   joystickWasMoved = fabsf(controls.lr)>0.01;
   controls.accel   = -ctrl.data[1];
-  controls.brake   = player->buttons[KC_BRAKE  ] & ctrl.buttons;
-  controls.wheelie = player->buttons[KC_WHEELIE] & ctrl.buttons;
+  controls.brake   = player->getButton(KC_BRAKE)   & ctrl.buttons;
+  controls.wheelie = player->getButton(KC_WHEELIE) & ctrl.buttons;
 
   //One time press keys; these are cleared each frame so we don't have to
-  if (player->buttons[KC_RESCUE] & ctrl.presses) controls.rescue = true;
-  if (player->buttons[KC_FIRE  ] & ctrl.presses) controls.fire   = true;
-  if (player->buttons[KC_JUMP  ] & ctrl.presses) controls.jump   = true;
+  if (player->getButton(KC_RESCUE) & ctrl.presses) controls.rescue = true;
+  if (player->getButton(KC_FIRE)   & ctrl.presses) controls.fire   = true;
+  if (player->getButton(KC_JUMP)   & ctrl.presses) controls.jump   = true;
 }   // incomingJoystick
 
 // -----------------------------------------------------------------------------
@@ -48,12 +48,12 @@ void PlayerKart::handleKeyboard(float dt) {
 #define TIMEFORFULLSTEER 0.5f
 
   if(!config->newKeyboardStyle) {
-    controls.lr = isKeyDown(player->keys[KC_LEFT ]) ?  1.0f 
-                : isKeyDown(player->keys[KC_RIGHT]) ? -1.0f : 0.0f;
+    controls.lr = isKeyDown(player->getKey(KC_LEFT))  ?  1.0f 
+                : isKeyDown(player->getKey(KC_RIGHT)) ? -1.0f : 0.0f;
   } else {
     float steerChange = dt/TIMEFORFULLSTEER;  // amount the steering is changed
-    if       (isKeyDown(player->keys[KC_LEFT ])) { controls.lr += steerChange;
-    } else if(isKeyDown(player->keys[KC_RIGHT])) { controls.lr -= steerChange; 
+    if       (isKeyDown(player->getKey(KC_LEFT)))  { controls.lr += steerChange;
+    } else if(isKeyDown(player->getKey(KC_RIGHT))) { controls.lr -= steerChange; 
     } else {   // no key is pressed
       if(controls.lr>0.0f) {
 	controls.lr -= steerChange;
@@ -67,9 +67,9 @@ void PlayerKart::handleKeyboard(float dt) {
     // clamp control value to be within  [-1,1]
   controls.lr = std::min(1.0f, std::max(-1.0f, controls.lr));
 
-  if(isKeyDown(player->keys[KC_ACCEL]  )) controls.accel   =  1.0f;
-  if(isKeyDown(player->keys[KC_BRAKE]  )) controls.brake   =  true;
-  if(isKeyDown(player->keys[KC_WHEELIE])) controls.wheelie =  true;
+  if(isKeyDown(player->getKey(KC_ACCEL)))   controls.accel   =  1.0f;
+  if(isKeyDown(player->getKey(KC_BRAKE)))   controls.brake   =  true;
+  if(isKeyDown(player->getKey(KC_WHEELIE))) controls.wheelie =  true;
 
 }   // handleKeyboard
 

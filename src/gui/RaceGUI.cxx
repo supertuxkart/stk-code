@@ -76,14 +76,14 @@ void RaceGUI::UpdateKeyboardMappings() {
   for(int i=0; i<world->raceSetup.getNumPlayers(); i++) {
     PlayerKart* kart = world->getPlayerKart(i);
     Player*     p    = kart->getPlayer();
-    keysToKart[p->keys[KC_WHEELIE]] = kart;
-    keysToKart[p->keys[KC_JUMP]   ] = kart;
-    keysToKart[p->keys[KC_RESCUE] ] = kart;
-    keysToKart[p->keys[KC_FIRE]   ] = kart;
-    typeForKey[p->keys[KC_WHEELIE]] = KC_WHEELIE;
-    typeForKey[p->keys[KC_JUMP]   ] = KC_JUMP   ;
-    typeForKey[p->keys[KC_RESCUE] ] = KC_RESCUE ;
-    typeForKey[p->keys[KC_FIRE]   ] = KC_FIRE   ;
+    keysToKart[p->getKey(KC_WHEELIE)] = kart;
+    keysToKart[p->getKey(KC_JUMP)   ] = kart;
+    keysToKart[p->getKey(KC_RESCUE) ] = kart;
+    keysToKart[p->getKey(KC_FIRE)   ] = kart;
+    typeForKey[p->getKey(KC_WHEELIE)] = KC_WHEELIE;
+    typeForKey[p->getKey(KC_JUMP)   ] = KC_JUMP;
+    typeForKey[p->getKey(KC_RESCUE) ] = KC_RESCUE;
+    typeForKey[p->getKey(KC_FIRE)   ] = KC_FIRE;
   }
 }   // UpdateKeyControl
 

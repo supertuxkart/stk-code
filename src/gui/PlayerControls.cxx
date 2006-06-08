@@ -27,8 +27,7 @@
 PlayerControls::PlayerControls(int whichPlayer): player_index(whichPlayer),
 						 grabInput(false)          {
   menu_id = widgetSet -> vstack(0);
-  sprintf(Heading, "Choose your controls, %s",
-	  config->player[player_index].name.c_str());
+  sprintf(Heading, "Choose your controls, %s", config->player[player_index].getName());
   widgetSet -> label(menu_id, Heading, GUI_LRG, GUI_ALL, 0, 0);
 
   int ha = widgetSet -> harray(menu_id);
@@ -85,7 +84,7 @@ void PlayerControls::keybd(int key) {
   if (grabInput) {
     //    printf("Setting %d: %lx: from %d to %d\n",
     //	   player_index, config->player[player_index],config->player[player_index].keys[editAction],key);
-    config->player[player_index].keys[editAction] = key;
+    config->player[player_index].setKey(editAction, key);
     grabInput = false;
     changeKeyLabel(grab_id, editAction);
   } else
@@ -112,7 +111,7 @@ void PlayerControls::joybuttons(int whichJoy, int hold, int presses,
       if (editAction != KC_LEFT && editAction != KC_RIGHT &&
           editAction != KC_ACCEL && whichJoy == player_index && presses)
       {
-          config->player[player_index].buttons[editAction] = presses;
+          config->player[player_index].setButton(editAction, presses);
           grabInput = false;
           changeKeyLabel(grab_id, editAction);
       }
@@ -147,7 +146,7 @@ void PlayerControls::changeKeyLabel(int grab_id, KartActions control) {
 // -----------------------------------------------------------------------------
 void PlayerControls::setKeyInfoString(KartActions control) {
   std::string ret;
-  int key = config->player[player_index].keys[control];
+  int key = config->player[player_index].getKey(control);
 
   switch (key) {
     case PW_KEY_RIGHT     : ret="right"  ; break;
@@ -176,14 +175,14 @@ void PlayerControls::setKeyInfoString(KartActions control) {
     default:                ret=" ";
                             ret[0]=key;
   }
-  if (config->player[player_index].useJoy) {
+  if (config->player[player_index].IsUsingJoystick()) {
     char joyInfo[60];
     if      (control == KC_LEFT)  sprintf(joyInfo, " or stick left");
     else if (control == KC_RIGHT) sprintf(joyInfo, " or stick right");
     else if (control == KC_ACCEL) sprintf(joyInfo, " or stick up");
     else
     {
-        const int TARGET_BUTTON = config->player[player_index].buttons[control];
+        const int TARGET_BUTTON = config->player[player_index].getButton(control);
         int button_number = 0;
         while((1 << button_number != TARGET_BUTTON) && (button_number < 16))
             ++button_number;
@@ -199,7 +198,3 @@ void PlayerControls::setKeyInfoString(KartActions control) {
   KeyNames[control] = ret;
 
 }   // setKeyInfoString
-
-
-
-

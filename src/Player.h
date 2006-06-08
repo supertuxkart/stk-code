@@ -37,17 +37,24 @@ enum KartActions { KC_LEFT,
 /*class for managing player name and control configuration*/
 class Player
 {
-public:
+private:
     std::string name;
     bool useJoy;    //player is using a joystick
     int keys[8]; //keyboard keymap and joystick button map
     int buttons[8];
 
+public:
     Player(){}
     Player(const std::string &name_):name(name_){}
     void setName(const std::string &name_){name = name_;}
     void setKey(KartActions action, int key){keys[action]=key;}
     void setButton(KartActions action, int button){buttons[action]=button;}
+    void setUseJoystick(bool set){useJoy= set;}
+    
+    const char* getName() {return name.c_str();}
+	int getKey(KartActions action){return keys[action];}
+    int getButton(KartActions action){return buttons[action];}
+    bool IsUsingJoystick() {return useJoy; }
 };
 
 #endif

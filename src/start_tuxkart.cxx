@@ -124,12 +124,12 @@ int handleCmdLine(int argc, char **argv) {
     } else if( !strcmp(argv[i], "--list-karts") ) {
       kart_manager->loadKartData () ;
 
-      fprintf ( stdout, "  Available karts:\n" );
-      for (unsigned int i = 0; i != kart_manager->karts.size(); i++)
-	fprintf ( stdout, "\t%10s: %s\n",
-		  kart_manager->karts[i]->getIdent(),
-		  kart_manager->karts[i]->getName() );
-
+      fprintf ( stdout, "  Available karts:\n" );    
+      for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++)
+      {
+      	const KartProperties* kp= kart_manager->getKartById(i);
+		fprintf (stdout, "\t%10s: %s\n", kp->getIdent(), kp->getName());
+      }
       fprintf ( stdout, "\n" );
 
       return 0;

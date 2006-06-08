@@ -27,11 +27,12 @@ struct KartProperties;
 class KartManager {
  protected:
   float maxSteerAngle;
-public:
+
   typedef std::vector<KartProperties*> KartPropertiesVector;
   /** All available kart configurations */
   KartPropertiesVector karts;
-  
+
+public:  
   KartManager();
   ~KartManager();
 
@@ -40,6 +41,7 @@ public:
   const int                getKartId              (const std::string ident);
         void               loadKartData           ();
   const float              getMaximumSteeringAngle() {return maxSteerAngle;}
+  
   /** Return \a len random karts */
   std::vector<std::string> getRandomKarts         (int len);
 

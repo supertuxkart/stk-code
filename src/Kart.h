@@ -34,9 +34,10 @@ class Herring;
 
 class KartParticleSystem : public ParticleSystem
 {
-public:
+private:
   Kart* kart;
 
+public:
   KartParticleSystem ( Kart* kart, int num, float _create_rate,
       int _turn_to_face, float sz, float bsphere_size);
 
@@ -86,15 +87,14 @@ private:
   bool                finishedRace;
  protected:
   int                 rescue;
-
+  const KartProperties *kartProperties;  
+  
   /** Search the given branch of objects that match the wheel names
       and if so assign them to wheel_* variables */
   void  load_wheels          (ssgBranch* obj);
     
 public:
-  const KartProperties *kartProperties;
-
-  Kart(const KartProperties* kartProperties_, int position_ ) ;
+  Kart(const KartProperties* kartProperties_, int position_);
   virtual ~Kart();
 
   void load_data();
@@ -166,9 +166,8 @@ public:
   virtual void   doLapCounting       ();
   virtual void   doCollisionAnalysis (float dt, float hot );
   virtual void   update              (float dt );
-  virtual void   OutsideTrack        (int isReset) {rescue=true;}
-  
-} ;
+  virtual void   OutsideTrack        (int isReset) {rescue=true;} 
+};
 
 class TrafficDriver : public Kart {
 public:

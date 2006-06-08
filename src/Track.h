@@ -28,12 +28,13 @@
 #include <plib/sg.h>
 #include <string>
 #include <vector>
+
+
 class Track {
  private:
     float       gravity;
     std::string ident;
-  
- public:
+
     std::string name;
     std::string music_filename;
     std::string herringStyle;
@@ -48,6 +49,7 @@ class Track {
     sgVec4      specularcol;
     sgVec4      diffusecol;
 
+public:
     /** sgVec3 is a float[3] array, so unfortunately we can't put it in a
     * std::vector because it lacks a copy-constructor, this hack should help...
     */

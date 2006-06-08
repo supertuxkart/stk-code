@@ -57,16 +57,15 @@ CharSel::CharSel(int whichPlayer)
     loader->shared_textures.removeAll();   // remove cached textures
 
 	int row1 = widgetSet -> harray(va);
-	for(KartManager::KartPropertiesVector::size_type i = 0;
-            i < kart_manager->karts.size(); ++i)
+	
+	for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++)
 	{
-	  int c = widgetSet -> image(row1,
-				     kart_manager->karts[i]->getIconFile(),
-				     icon_size, icon_size);
-	  widgetSet -> activate_widget(c, i, 0);
+      	const KartProperties* kp= kart_manager->getKartById(i);
+		int c = widgetSet->image(row1, kp->getIconFile(), icon_size, icon_size);
+		widgetSet->activate_widget(c, i, 0);
 
-	  if (i == kart_manager->karts.size() - 1)
-	    widgetSet -> set_active(c);
+		if (NULL == kart_manager->getKartById(i + 1)) // last in the list
+			widgetSet -> set_active(c);
 	}
 	widgetSet -> filler(ha);
     kart_name_label = widgetSet -> label(menu_id, "No driver choosed", GUI_MED, GUI_ALL, 0, 0);
@@ -90,15 +89,16 @@ CharSel::~CharSel()
 
 void CharSel::switch_to_character(int n)
 {
-	if (current_kart != n && n >= 0 && n < int(kart_manager->karts.size()))
+	const KartProperties* kp= kart_manager->getKartById(n);
+	if (current_kart != n && kp != NULL)
 	{
-        widgetSet -> set_label(kart_name_label, kart_manager->karts[n]->getName());
+        widgetSet -> set_label(kart_name_label, kp->getName());
 
 		current_kart = n;
         ssgDeRefDelete(kart);
 		kart = new ssgTransform;
 		kart->ref();
-		ssgEntity* kartentity = kart_manager->karts[n]->getModel();
+		ssgEntity* kartentity = kp->getModel();
 
 		kart->addKid(kartentity);
 
@@ -147,10 +147,9 @@ void CharSel::update(float dt)
 void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
-
-	if (token >= 0 && token < static_cast<int>(kart_manager->karts.size()))
-          race_manager->setPlayerKart(playerIndex,
-              kart_manager->getKartById(token)->getIdent());
+	const KartProperties* kp= kart_manager->getKartById(token);
+	if (kp != NULL)
+          race_manager->setPlayerKart(playerIndex, kp->getIdent());
 
 	if (race_manager->getNumPlayers() > 1)
 	{

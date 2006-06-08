@@ -31,6 +31,7 @@ enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
  
 // ----------------------------------------------------------------------------- 
 class Herring {
+private:
   herringType   type;         // Herring type
   bool          bEaten;       // true if herring  was eaten & is not displayed
   float         time_to_return;  // world->clock when an eaten herring reappears
