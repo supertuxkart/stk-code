@@ -34,7 +34,12 @@ class Track {
  private:
     float       gravity;
     std::string ident;
+<<<<<<< .mine
 
+ public:
+=======
+
+>>>>>>> .r617
     std::string name;
     std::string music_filename;
     std::string herringStyle;
@@ -71,13 +76,17 @@ public:
       return vec;
     }
     };
+    //FIXME: Maybe the next 4 vectors should be inside an struct and be used
+    //from a vector of structs?
     //FIXME: should the driveline be set as a sgVec2?
     std::vector<sgVec3Wrapper> driveline;
     std::vector<SGfloat> path_width;
+    std::vector<SGfloat> angle;
 
     sgVec2 driveline_min;
     sgVec2 driveline_max;
     sgVec2 driveline_center;
+
 
     float total_distance;
 

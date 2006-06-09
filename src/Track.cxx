@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -47,12 +48,11 @@ int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const {
   float d ;
   float nearest_d = 99999 ;
 
-
   const unsigned int driveline_size = driveline.size();
   int temp_i;
-  //This checks which from the previous two, current, and next two hints is
-  //the closest, however checking for the previous, current, and next hint
-  //is enough on my machine, but it might not be on older computers.
+  //Checks from the previous two hints to the next two which is the closest,
+  //checking from the previous to the next works on my machine but might not
+  //work on slower computers.
   for(int i = hint - 2; i < hint + 3; ++i)
   {
       temp_i = i;
@@ -282,6 +282,8 @@ Track::loadDriveline()
 
   SGfloat width;
   driveline.reserve(driveline_size);
+  path_width.reserve(driveline_size);
+  angle.reserve(driveline_size);
   for(unsigned int i = 0; i < driveline_size; ++i)
   {
       //Reuse the left_driveline as the center driveline to avoid copying
@@ -294,6 +296,31 @@ Track::loadDriveline()
       width = sgLengthVec3(right_driveline[i]);
       if(width > 0.0f) path_width.push_back(width);
       else path_width.push_back(-width);
+  }
+
+  size_t next;
+  const int NUM_POINTS = 1;
+  SGfloat adjacent_line, opposite_line, theta, prev[NUM_POINTS];
+
+  for(int i = 0; i < NUM_POINTS; ++i) prev[i] = 0.0f;
+
+  for(unsigned int i = 0; i < driveline_size; ++i)
+  {
+      next = i + 1 >= driveline_size ? 0 : i + 1;
+      adjacent_line = left_driveline[next][0] - left_driveline[i][0];
+      opposite_line = left_driveline[next][1] - left_driveline[i][1];
+
+      theta = atanf(opposite_line/adjacent_line) * SG_RADIANS_TO_DEGREES;
+
+      if (adjacent_line < 0.0f) theta = theta + 90.0f;
+      else theta = theta - 90.0f;
+
+
+      SGfloat add = 0.0f;
+      for(int j = 1; j < NUM_POINTS; ++j) add += prev[i];
+      angle.push_back((theta + add) / NUM_POINTS);
+      for(int j = 1; j < NUM_POINTS; ++j) prev[j] = prev[j - 1];
+      prev[0] = theta;
   }
 
   sgSetVec2 ( driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
