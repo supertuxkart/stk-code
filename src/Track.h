@@ -34,12 +34,9 @@ class Track {
  private:
     float       gravity;
     std::string ident;
-<<<<<<< .mine
 
  public:
-=======
 
->>>>>>> .r617
     std::string name;
     std::string music_filename;
     std::string herringStyle;
