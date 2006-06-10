@@ -1,11 +1,9 @@
 # src/
 
-bindir=$(prefix)/games
-
 bin_PROGRAMS = tuxkart
+noinst_LIBRARIES = libMain.a
 
-tuxkart_SOURCES =                                       \
-	start_tuxkart.cxx	 start_tuxkart.h        \
+libMain_a_SOURCES = \
 	Material.cxx		 Material.h             \
 	MaterialManager.cxx	 MaterialManager.h      \
 	Attachment.cxx		 Attachment.h	        \
@@ -72,3 +70,11 @@ tuxkart_SOURCES =                                       \
 	gui/CharSel.cxx		 gui/CharSel.h	        \
 	gui/MainMenu.cxx	 gui/MainMenu.h         \
 	gui/SingleWindowMenu.cxx gui/SingleWindowMenu.h
+
+tuxkart_SOURCES = \
+  start_tuxkart.cxx start_tuxkart.h
+
+tuxkart_LDADD = \
+	$(top_builddir)/src/libMain.a \
+	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul \
+	$(opengl_LIBS)

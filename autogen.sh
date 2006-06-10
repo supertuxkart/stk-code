@@ -1,36 +1,47 @@
 #!/bin/sh
 
-set -e
-
-WANT_AUTOMAKE=1.7
-
-if [ -n "`which automake-1.7`" ]; then
-    ACLOCAL="aclocal-1.7"
-    AUTOMAKE="automake-1.7"
-elif [ -n "`which automake-1.6`" ]; then
-    ACLOCAL="aclocal-1.6"
-    AUTOMAKE="automake-1.6"
-else
-    ACLOCAL="aclocal"
-    AUTOMAKE="automake"
+OSTYPE=`uname -s`
+MACHINE=`uname -m`
+AUTO_MAKE_VERSION=`automake --version | head -1 | awk '{print $4}' | sed -e 's/\.\([0-9]*\).*/\1/'`
+if test $AUTO_MAKE_VERSION -lt 15; then
+    echo ""
+    echo "You need to upgrade to automake version 1.5 or greater."
+    echo "Most distributions have packages available to install or you can"
+    echo "find the source for the most recent version at"
+    echo "ftp://ftp.gnu.org/gnu/automake"
+    exit 1
 fi
 
-case "`$AUTOMAKE --version`" in
-    *1.5* | *1.4*)
-        echo "Error: You need automake 1.6 or larger"
-        exit 1
-        ;;
-esac
+echo "Host info: $OSTYPE $MACHINE"
+echo -n " automake: `automake --version | head -1 | awk '{print $4}'`"
+echo " ($AUTO_MAKE_VERSION)"
+echo ""
 
-# automake tends to fail sometimes if Makefile or Makefile.in are left from old
-# runs
-find -name "Makefile" -o -name "Makefile.in" -exec rm {} ';'
+echo "Running aclocal"
+aclocal
 
-echo "Running $ACLOCAL"
-$ACLOCAL -I m4
-echo "Running $AUTOMAKE"
-$AUTOMAKE --add-missing --copy
+echo "Running automake --add-missing"
+automake --add-missing
+
 echo "Running autoconf"
-autoconf 
+autoconf
+
+if [ ! -e configure ]; then
+    echo "ERROR: configure was not created!"
+    exit 1
+fi
+
+echo ""
+echo "======================================"
+
+if [ -f config.cache ]; then
+    echo "config.cache exists.  Removing the config.cache file will force"
+    echo "the ./configure script to rerun all it's tests rather than using"
+    echo "the previously cached values."
+    echo ""
+fi
+
+echo "Now you are ready to run './configure'"
+echo "======================================"
 
 # EOF #
