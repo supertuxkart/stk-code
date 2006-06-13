@@ -77,9 +77,9 @@ public:
 
   World(const RaceSetup& raceSetup);
   virtual ~World();
-  float World::GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) 
+  float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) 
                               {return staticSSG->hot(start, end, leaf, nrm);}
-  int   World::Collision(sgSphere* s, AllHits *a) 
+  int   Collision(sgSphere* s, AllHits *a) 
                               {return staticSSG->collision(s,a);       }
 
   void draw();
