@@ -26,24 +26,27 @@ class AutoKart : public Kart {
 private:
   float time_since_last_shoot ;
   size_t future_hint;
-
-  bool lane_change;
-  float start_lane_pos;
-  float target_lane_pos;
+  float starting_delay;
 
   struct CrashTypes
   {
-      SGfloat curve;
-      SGfloat kart;
-      CrashTypes() : curve(0.0f), kart(0.0f) {};
-  };
+      bool curve; //true if we are going to 'crash' with a curve
+      int kart; //-1 if no crash, pos numbers are the kart it crashes with
+      CrashTypes() : curve(false), kart(-1) {};
+      void clear() {curve = false; kart = -1;}
+  } crashes;
+
+
+  enum STEER_SIDE {STEER_LEFT, STEER_RIGHT};
+
+  SGfloat steer_to_side(const size_t &NEXT_HINT, const STEER_SIDE &SIDE);
+  SGfloat steer_to_parallel(const size_t &NEXT_HINT);
+  SGfloat steer_to_point(const sgVec2 POINT);
 
   bool do_wheelie(const int &STEPS);
-  SGfloat change_lane(const size_t &NEXT_HINT);
-  SGfloat find_steer_to_paralel(const size_t &NEXT_HINT);
-  SGfloat find_steer_to_point(const sgVec2 POINT);
-  void check_crashes(CrashTypes &crashes, const int &STEPS);
+  void check_crashes(const int &STEPS);
   float guess_accel (const float throttle);
+  void remove_angle_excess (float &angle);
 public:
   AutoKart(const KartProperties *kart_properties, int position);
 

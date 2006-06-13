@@ -17,7 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -299,10 +298,8 @@ Track::loadDriveline()
   }
 
   size_t next;
-  const int NUM_POINTS = 1;
-  SGfloat adjacent_line, opposite_line, theta, prev[NUM_POINTS];
-
-  for(int i = 0; i < NUM_POINTS; ++i) prev[i] = 0.0f;
+  float adjacent_line, opposite_line;
+  SGfloat theta;
 
   for(unsigned int i = 0; i < driveline_size; ++i)
   {
@@ -310,17 +307,10 @@ Track::loadDriveline()
       adjacent_line = left_driveline[next][0] - left_driveline[i][0];
       opposite_line = left_driveline[next][1] - left_driveline[i][1];
 
-      theta = atanf(opposite_line/adjacent_line) * SG_RADIANS_TO_DEGREES;
+      theta = sgATan(opposite_line/adjacent_line);
+      theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
 
-      if (adjacent_line < 0.0f) theta = theta + 90.0f;
-      else theta = theta - 90.0f;
-
-
-      SGfloat add = 0.0f;
-      for(int j = 1; j < NUM_POINTS; ++j) add += prev[i];
-      angle.push_back((theta + add) / NUM_POINTS);
-      for(int j = 1; j < NUM_POINTS; ++j) prev[j] = prev[j - 1];
-      prev[0] = theta;
+      angle.push_back(theta);
   }
 
   sgSetVec2 ( driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;

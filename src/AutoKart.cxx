@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <cstdlib>
-#include <cmath>
+#include <ctime>
 #include <cstdio>
 #include <iostream>
 #include "constants.h"
@@ -30,20 +30,32 @@ AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
     time_since_last_shoot = 0.0f;
     future_hint = 0;
 
-    lane_change = false;
-    start_lane_pos = 0.0f;
-    target_lane_pos = 0.0f;
+    srand((unsigned)time(0));
 }
 
 //TODO: if the AI is crashing constantly, make it move backwards in a straight line, then move forward while turning.
 //TODO: rotation should be dependant on how much each kart can rotate, so we don't have crazy cars.
 //TODO: change_steering amount and accel by difficulties with world->raceSetup.difficulty (RD_EASY, RD_MEDIUM, RD_HARD)
-//TODO: add delay to starting the race and to turning, depending on the difficulty.
-//TODO: only change lanes when the kart in front of the AI is traveling at less speed than the AI
-void AutoKart::update (float delta) {
+void AutoKart::update (float delta)
+{
 
   if (world->getPhase()==World::START_PHASE) {
     placeModel();
+    if(starting_delay <  0.0f)
+    {
+        switch(world->raceSetup.difficulty)
+        {
+            case RD_EASY:
+                starting_delay = (float)rand()/RAND_MAX * 0.5f;
+                break;
+            case RD_MEDIUM:
+                starting_delay = (float)rand()/RAND_MAX * 0.3f;
+                break;
+            case RD_HARD:
+                starting_delay = (float)rand()/RAND_MAX * 0.15f;
+                break;
+        }
+    }
     return;
   }
 
@@ -51,17 +63,15 @@ void AutoKart::update (float delta) {
   //these values for now, it won't work correctly on big or small karts.
   const float KART_LENGTH = 1.5f;
   const int MIN_STEPS = 2;
-  const int MAX_STEPS = int((world->track->getWidth()[trackHint] * 2.0f) ) + MIN_STEPS;
+  const int MAX_STEPS = int(world->track->getWidth()[trackHint] * 2.0f) + MIN_STEPS;
 
   int steps = int(velocity.xyz[1] / KART_LENGTH);
 
   if(steps < MIN_STEPS) steps = MIN_STEPS;
   else if(steps > MAX_STEPS) steps = MAX_STEPS;
 
-  CrashTypes crashes;
-  check_crashes(crashes, steps);
+  check_crashes(steps);
 
-//The next block of code sorta works but the lane change doesn't works properly yet
 //#define DETECT_TIGHT_CURVES
 #ifdef DETECT_TIGHT_CURVES
     float total_dist = 0.0f, angle_diff = 0.0f;
@@ -92,30 +102,24 @@ void AutoKart::update (float delta) {
     }
 #endif
 
-if(lane_change)
-{
-    if(!crashes.curve)
-    crashes.kart = true;
+controls.lr = 0.0f;
 
-    if(curr_track_coords[0] - start_lane_pos > target_lane_pos - 1.0f)
-    lane_change = false;
+const size_t NEXT = trackHint + 1 >= world->track->driveline.size() ? 0 : trackHint + 1;
+float first = curr_track_coords[0] > 0.0f ?  curr_track_coords[0]
+                                         : -curr_track_coords[0];
+if(first + KART_LENGTH * 0.75f > world->track->getWidth()[trackHint])
+    controls.lr = steer_to_point(world->track->driveline[NEXT]);
+else if(crashes.curve && wheelie_angle <= 0.0f)
+{
+      controls.lr = steer_to_parallel(NEXT);
+}
+else if(crashes.kart != -1)
+{
+    controls.lr = curr_track_coords[0] > world->getKart(crashes.kart)->
+        getDistanceToCenter() ? steer_to_side(NEXT, STEER_RIGHT) :
+        steer_to_side(NEXT, STEER_LEFT);
 }
 
-controls.lr = 0.0f;
-size_t next = trackHint + 1 >= world->track->driveline.size() ? 0 : trackHint + 1;
-if(crashes.kart) controls.lr = change_lane(next);
-    else
-if(crashes.curve && wheelie_angle <= 0.0f) {
-
-    float first = curr_track_coords[0] > 0.0f ?  curr_track_coords[0]
-                                             : -curr_track_coords[0];
-    if(first + KART_LENGTH > world->track->getWidth()[trackHint])
-      controls.lr = find_steer_to_point(world->track->driveline[next]);
-    else
-    {
-      controls.lr = find_steer_to_paralel(next);
-    }
-  }
 
 bool brake = false;
 //At the moment the AI brakes too much
@@ -127,23 +131,33 @@ float time = (velocity.xyz[1]/ -guess_accel(-1.0f));
 float braking_distance = velocity.xyz[1] * time - (-guess_accel(-1.0f) / 2) * time * time;
 if(crashes.curve && braking_distance > crashes.curve) brake = true;
 #endif
-if(!brake)
+if(starting_delay < 0.0f)
 {
+    if(!brake)
+    {
 
-    controls.accel = 1.0f;
-    controls.brake = false;
+        controls.accel = 1.0f;
+        controls.brake = false;
+    }
+    else
+    {
+
+        controls.accel = 0.0f;
+        controls.brake = true;
+    }
 }
 else
 {
-
     controls.accel = 0.0f;
-    controls.brake = true;
+    controls.brake = false;
+    starting_delay -= delta;
 }
 
 //TODO: this won't work for now, but when the wheelie code is moved to the
 //Kart class it will.
   if(world->raceSetup.difficulty != RD_EASY && !crashes.curve)
     controls.wheelie = do_wheelie(steps);
+
 
   if ( collectable.getType() != COLLECT_NOTHING ) {
     time_since_last_shoot += delta ;
@@ -155,6 +169,7 @@ else
   }   // if COLLECT_NOTHING
   Kart::update(delta);
 }   // update
+
 
 bool AutoKart::do_wheelie ( const int &STEPS )
 {
@@ -201,29 +216,14 @@ bool AutoKart::do_wheelie ( const int &STEPS )
   return true;
 }
 
-SGfloat AutoKart::change_lane ( const size_t &NEXT_HINT )
+
+SGfloat AutoKart::steer_to_side (const size_t &NEXT_HINT, const STEER_SIDE &SIDE)
 {
-    sgLineSegment3 path;
-    sgCopyVec2(path.a, world->track->driveline[trackHint]);
-    sgCopyVec2(path.b, world->track->driveline[NEXT_HINT]);
+    float steer_angle = world->track->angle[NEXT_HINT] - curr_pos.hpr[0];
+    remove_angle_excess(steer_angle);
 
-    const SGfloat CURR_DIST = sgDistanceVec2(curr_pos.xyz, world->track->driveline[trackHint]);
-    const SGfloat NEXT_DIST = sgDistanceVec2(curr_pos.xyz, world->track->driveline[NEXT_HINT]) - CURR_DIST;
-    const SGfloat PERC = (sgDistToLineSegmentVec3 ( path, curr_pos.xyz ) -
-        CURR_DIST) / NEXT_DIST * 0.01f;
-
-    const SGfloat RESULT = world->track->angle[NEXT_HINT] * PERC +
-        world->track->angle[NEXT_HINT] * (1.0f - PERC);
-
-    SGfloat steer_angle = RESULT - curr_pos.hpr[0];
-
-    if (steer_angle < -180.0){ steer_angle += 180; steer_angle = -steer_angle;}
-    else if (steer_angle > 180.0){ steer_angle -= 180; steer_angle = -steer_angle;}
-
-    const float LANE_ANGLE = curr_track_coords[0] - start_lane_pos <
-        target_lane_pos / 2 ? -90.0f : 90.0f;
-    steer_angle = (LANE_ANGLE + steer_angle) / 2;
-
+    steer_angle += SIDE ? -90.0f : 90.0f;
+    remove_angle_excess(steer_angle);
     steer_angle /= getMaxSteerAngle();
 
     if(steer_angle > 1.0f) return 1.0f;
@@ -232,55 +232,43 @@ SGfloat AutoKart::change_lane ( const size_t &NEXT_HINT )
     return steer_angle;
 }
 
-SGfloat AutoKart::find_steer_to_paralel (const size_t &NEXT_HINT)
+
+SGfloat AutoKart::steer_to_parallel (const size_t &NEXT_HINT)
 {
-    sgLineSegment3 path;
-    sgCopyVec2(path.a, world->track->driveline[trackHint]);
-    sgCopyVec2(path.b, world->track->driveline[NEXT_HINT]);
+    //Desired angle minus current angle equals how many angles to turn
+    float steer_angle = world->track->angle[NEXT_HINT] - curr_pos.hpr[0];
+    remove_angle_excess(steer_angle);
 
-    const SGfloat CURR_DIST = sgDistanceVec2(curr_pos.xyz, world->track->driveline[trackHint]);
-    const SGfloat NEXT_DIST = sgDistanceVec2(curr_pos.xyz, world->track->driveline[NEXT_HINT]) - CURR_DIST;
-    const SGfloat PERC = (sgDistToLineSegmentVec3 ( path, curr_pos.xyz ) -
-        CURR_DIST) / NEXT_DIST * 0.01f;
-
-    const SGfloat RESULT = world->track->angle[NEXT_HINT] * PERC +
-        world->track->angle[NEXT_HINT] * (1.0f - PERC);
-
-    SGfloat steer_angle = RESULT - curr_pos.hpr[0];
-
-    if (steer_angle < -180.0){ steer_angle += 180; steer_angle = -steer_angle;}
-    else if (steer_angle > 180.0){ steer_angle -= 180; steer_angle = -steer_angle;}
-
+    //Traslate the angle to control steering
     steer_angle /= getMaxSteerAngle();
-
     if(steer_angle > 1.0f) return 1.0f;
     else if (steer_angle < -1.0f) return -1.0f;
 
     return steer_angle;
 }
 
-SGfloat AutoKart::find_steer_to_point(const sgVec2 POINT)
+
+SGfloat AutoKart::steer_to_point(const sgVec2 POINT)
 {
-      SGfloat adjacent_line = POINT[0] - curr_pos.xyz[0];
-      SGfloat opposite_line = POINT[1] - curr_pos.xyz[1];
-      SGfloat theta = atanf(opposite_line/adjacent_line) * SG_RADIANS_TO_DEGREES;
+      const SGfloat ADJACENT_LINE = POINT[0] - curr_pos.xyz[0];
+      const SGfloat OPPOSITE_LINE = POINT[1] - curr_pos.xyz[1];
+      SGfloat theta = sgATan(OPPOSITE_LINE/ADJACENT_LINE);
 
       //The real value depends on the side of the track that the kart is
-      theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
+      theta += ADJACENT_LINE < 0.0f ? 90.0f : -90.0f;
 
       float rot = theta - getCoord()->hpr[0];
-
-      if (rot > 180.0f) rot = -rot + 180.0f;
-      else if (rot < -180.0f ) rot = -rot - 180.0f;
-
+      remove_angle_excess(rot);
       rot /= getMaxSteerAngle();
+
       if(rot > 1.0f) return 1.0f;
       else if(rot < -1.0f) return -1.0f;
 
       return rot;
 }
 
-void AutoKart::check_crashes(AutoKart::CrashTypes &crashes, const int &STEPS)
+
+void AutoKart::check_crashes(const int &STEPS)
 {
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work optimally on big or small karts.
@@ -288,6 +276,8 @@ void AutoKart::check_crashes(AutoKart::CrashTypes &crashes, const int &STEPS)
 
     sgVec2 vel_normal, step_coord, step_track_coord;
     SGfloat distance, check_width, kart_distance;
+
+    crashes.clear();
 
     const size_t NUM_KARTS = world->getNumKarts();
     sgNormalizeVec2(vel_normal, abs_velocity);
@@ -297,7 +287,7 @@ void AutoKart::check_crashes(AutoKart::CrashTypes &crashes, const int &STEPS)
         sgAddScaledVec2(step_coord, curr_pos.xyz, vel_normal, KART_LENGTH * i);
 
         //Don't try to find a kart to dodge if we already have found one
-        if(!crashes.kart)
+        if(crashes.kart == -1)
             for (size_t j = 0; j < NUM_KARTS; ++j)
             {
                 if(world->getKart(j) == this) continue;
@@ -305,11 +295,21 @@ void AutoKart::check_crashes(AutoKart::CrashTypes &crashes, const int &STEPS)
                 kart_distance = sgDistanceVec2(step_coord,
                     world->getKart(j)->getCoord()->xyz);
 
-                if(kart_distance < KART_LENGTH/2)
+                if(i != 1)
                 {
-                    if(kart_distance > 1.5f) kart_distance = 1.5f;
-                    crashes.kart = kart_distance;
+                    if(kart_distance < KART_LENGTH/2)
+                        if(velocity.xyz[1] > world->getKart(j)->
+                           getVelocity()->xyz[1] * 0.75f) crashes.kart = j;
                 }
+                else
+                {
+                    if(kart_distance < KART_LENGTH)
+                    {
+                        if(velocity.xyz[1] > world->getKart(j)->
+                           getVelocity()->xyz[1]) crashes.kart = j;
+                    }
+                }
+
             }
 
         future_hint = world->track->spatialToTrack( step_track_coord,
@@ -325,45 +325,45 @@ void AutoKart::check_crashes(AutoKart::CrashTypes &crashes, const int &STEPS)
 
         if (distance + KART_LENGTH/2 > check_width)
         {
-            crashes.curve = sgDistanceVec2(curr_pos.xyz, step_coord);
+            crashes.curve = true;
             break;
         }
     }
 }
 
+
 float AutoKart::guess_accel(const float throttle)
 {
-  float  rollResist  = getRollResistance();
-  float  airFriction = getAirFriction();   // includes attachmetn.AirFrictAdjust
+    const float SysResistance   = getRollResistance() * velocity.xyz[1];
+    const float AirResistance   = getAirFriction() * velocity.xyz[1] * fabs(velocity.xyz[1]);
+    const float force           = throttle * getMaxPower();
 
-  float SysResistance   = rollResist*velocity.xyz[1];
-  float AirResistance   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
-  float force           = throttle * getMaxPower();
+    const float  mass        = getMass();
+    float effForce     = (force-AirResistance-SysResistance);
 
-  float  mass        = getMass();          // includes attachment.WeightAdjust
-  float effForce     = (force-AirResistance-SysResistance);
+    const float gravity     = world->getGravity();
+    const float ForceOnRearTire   = 0.5f*mass*gravity + prevAccel*mass*getHeightCOG()/getWheelBase();
+    const float ForceOnFrontTire  =      mass*gravity - ForceOnRearTire;
+    const float maxGrip           = (ForceOnRearTire > ForceOnFrontTire ?
+      ForceOnRearTire : ForceOnFrontTire) * getTireGrip();
 
-  float  gravity     = world->getGravity();
-  float  wheelBase   = getWheelBase();
-  float ForceOnRearTire   = 0.5f*mass*gravity + prevAccel*mass*getHeightCOG()/wheelBase;
-  float ForceOnFrontTire  =      mass*gravity - ForceOnRearTire;
-#define max(m,n) ((m)>(n) ? (m) : (n))
-  float maxGrip           = max(ForceOnRearTire,ForceOnFrontTire)*getTireGrip();
   // Slipping: more force than what can be supported by the back wheels
   // --> reduce the effective force acting on the kart - currently
   //     by an arbitrary value.
-  while(fabs(effForce)>maxGrip) {
-    effForce *= 0.6f;
-    skidding  = true;
-  }   // while effForce>maxGrip
+  while(fabs(effForce)>maxGrip) effForce *= 0.4f;
 
-  float accel       = effForce / mass;
-
-  return accel;
+  return effForce / mass;
 }
 
 void AutoKart::reset() {
     future_hint = 0;
+    starting_delay = -1.0f;
 
     Kart::reset();
+}
+
+inline void AutoKart::remove_angle_excess(float &angle)
+{
+      if (angle > 180.0f) angle = -angle + 180.0f;
+      else if (angle < -180.0f ) angle = -angle - 180.0f;
 }

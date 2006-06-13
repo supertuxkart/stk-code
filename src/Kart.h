@@ -110,23 +110,24 @@ public:
                                         { wheelie_angle=angle; 
 					  ZipperTimeLeft=time;              }
   void           setCollectable      (collectableType t, int n) 
-                                        { collectable.set(t, n);            }
-  void           setPosition         (int p)    {racePosition = p;          }
-  float          getDistanceDownTrack() { return curr_track_coords[1];      }
-  attachmentType getAttachment       () { return  attachment.getType();     }
+                                         { collectable.set(t, n);            }
+  void           setPosition          (int p)    {racePosition = p;          }
+  float          getDistanceDownTrack () { return curr_track_coords[1];      }
+  float          getDistanceToCenter  () { return curr_track_coords[0];      }
+  attachmentType getAttachment        () { return  attachment.getType();     }
   void           setAttachmentType   (attachmentType t)
-                                        { attachment.set(t);                }
-  Collectable   *getCollectable      () { return &collectable;              }
-  int            getNumCollectables  () { return  collectable.getNum();     }
-  int            getNumHerring       () { return  num_herring_gobbled;      }
-  int            getLap              () { return  raceLap;                  }
-  int            getPosition         () { return  racePosition ;            }
-  int            getFinishPosition()    { return  finishingPosition;        }
+                                         { attachment.set(t);                }
+  Collectable   *getCollectable       () { return &collectable;              }
+  int            getNumCollectables   () { return  collectable.getNum();     }
+  int            getNumHerring        () { return  num_herring_gobbled;      }
+  int            getLap               () { return  raceLap;                  }
+  int            getPosition          () { return  racePosition ;            }
+  int            getFinishPosition()     { return  finishingPosition;        }
   void           setFinishingState   (int pos, float time);
-  bool           raceIsFinished () const { return finishedRace;             }
-  int            getFinishMins ()    { return finishingMins;             }
-  int            getFinishSecs ()     { return finishingSecs;             }
-  int            getFinishTenths ()   { return finishingTenths;           }
+  bool           raceIsFinished ()  const { return finishedRace;             }
+  int            getFinishMins ()        { return finishingMins;             }
+  int            getFinishSecs ()        { return finishingSecs;             }
+  int            getFinishTenths ()      { return finishingTenths;           }
   void           handleRescue        ();
   void           beginPowerslide     ();
   void           endPowerslide       ();
