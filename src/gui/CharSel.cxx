@@ -25,6 +25,7 @@
 #include "RaceManager.h"
 #include "StartScreen.h"
 #include "Config.h"
+#include "MenuManager.h"
 
 CharSel::CharSel(int whichPlayer)
   : kart(0), playerIndex(whichPlayer)
@@ -153,25 +154,25 @@ void CharSel::select()
 
 	if (race_manager->getNumPlayers() > 1)
 	{
-		if (guiStack.back() == GUIS_CHARSEL)
+		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
 		{
-			guiStack.push_back(GUIS_CHARSELP2);
+			menu_manager->pushMenu(MENUID_CHARSEL_P2);
 			return;
 		}
 
 		if (race_manager->getNumPlayers() > 2)
 		{
-			if (guiStack.back() == GUIS_CHARSELP2)
+			if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
 			{
-				guiStack.push_back(GUIS_CHARSELP3);
+				menu_manager->pushMenu(MENUID_CHARSEL_P3);
 				return;
 			}
 
 			if (race_manager->getNumPlayers() > 3)
 			{
-				if (guiStack.back() == GUIS_CHARSELP3)
+				if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
 				{
-					guiStack.push_back(GUIS_CHARSELP4);
+					menu_manager->pushMenu(MENUID_CHARSEL_P4);
 					return;
 				}
 			}
@@ -179,7 +180,7 @@ void CharSel::select()
 	}
 
         if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
-          guiStack.push_back(GUIS_TRACKSEL);
+          menu_manager->pushMenu(MENUID_TRACKSEL);
         else
           startScreen->switchToGame();
 }

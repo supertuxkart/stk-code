@@ -22,6 +22,14 @@
 #include "RaceManager.h"
 #include "TrackManager.h"
 #include "Track.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_RETURN,
+  WTOK_OPTIONS,
+  WTOK_RESTART,
+  WTOK_EXIT,
+};
 
 TrackSel::TrackSel()
 {
@@ -59,30 +67,26 @@ void TrackSel::update(float dt)
   widgetSet -> timer(menu_id, dt) ;
   widgetSet -> paint(menu_id) ;
 
-  {
   glClear(GL_DEPTH_BUFFER_BIT);
-  if( widgetSet -> token (widgetSet -> click()) != MENU_RETURN )
-    {
 
-    // draw a track preview of the currently highlighted track menu entry
-    const Track* track =
-          track_manager->getTrack(widgetSet->token (widgetSet -> click()));
+  // draw a track preview of the currently highlighted track menu entry
+  int clicked_token= widgetSet->token(widgetSet->click());
+  const Track* track= track_manager->getTrack(clicked_token);
 
-    // preview's map color
-    glColor3f ( 1, 1, 1 ) ;
+  // preview's map color
+  glColor3f ( 1, 1, 1 ) ;
 
-    // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
-    // NOTE: it's weird that these values do not fit at all with the glOrtho()
-    track->drawScaled2D(0.0, -0.7, 1.0, 0.3, true);  // (x, y, w, h, stretch)
-    }
-  }
+  // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
+  // NOTE: it's weird that these values do not fit at all with the glOrtho()
+  track->drawScaled2D(0.0, -0.7, 1.0, 0.3, true);  // (x, y, w, h, stretch)
 }
 
 void TrackSel::select() {
-  race_manager->setTrack(track_manager->
-			 getTrack(widgetSet->token(widgetSet->click()))->getIdent());
+  int clicked_token= widgetSet->token(widgetSet->click());
+  const Track* track= track_manager->getTrack(clicked_token);
+  race_manager->setTrack(track->getIdent());
 
-  guiStack.push_back(GUIS_NUMLAPS);
+  menu_manager->pushMenu(MENUID_NUMLAPS);
 }
 
 /* EOF */

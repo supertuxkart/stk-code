@@ -20,14 +20,20 @@
 #include "NumPlayers.h"
 #include "RaceManager.h"
 #include "WidgetSet.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_PLAYER_2= 2,
+  WTOK_PLAYER_3,
+  WTOK_PLAYER_4,
+};
 
 NumPlayers::NumPlayers()
 {
   menu_id = widgetSet -> varray(0);
-  widgetSet -> start(menu_id, "Two Players",   GUI_MED, 2, 0);
-  widgetSet -> state(menu_id, "Three Players", GUI_MED, 3, 0);
-  widgetSet -> state(menu_id, "Four Players",  GUI_MED, 4, 0);
-  widgetSet -> state(menu_id, "Network Game",  GUI_MED, MENU_NETWORK, 0);
+  widgetSet -> start(menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2, 0);
+  widgetSet -> state(menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3, 0);
+  widgetSet -> state(menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4, 0);
   widgetSet -> space(menu_id);
   widgetSet -> space(menu_id);
 
@@ -47,14 +53,16 @@ void NumPlayers::update(float dt)
 
 void NumPlayers::select()
 {
-  switch ( widgetSet -> token (widgetSet -> click()) )
-  {
-  case MENU_NETWORK:
-    break;
-  default: 
-    race_manager->setNumPlayers(widgetSet -> token ( widgetSet -> click() ));
-    guiStack.push_back(GUIS_GAMEMODE);
-    break;
+  int clicked_id= widgetSet -> token (widgetSet -> click());
+  switch (clicked_id) {
+    case WTOK_PLAYER_2:
+    case WTOK_PLAYER_3:
+    case WTOK_PLAYER_4:
+      race_manager->setNumPlayers(clicked_id);
+      menu_manager->pushMenu(MENUID_GAMEMODE);
+      break;
+    default:
+      break;
   }
 }
 

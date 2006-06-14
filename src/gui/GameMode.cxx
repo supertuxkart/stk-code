@@ -20,6 +20,13 @@
 #include "GameMode.h"
 #include "WidgetSet.h"
 #include "RaceManager.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_GP,
+  WTOK_QUICKRACE,
+  WTOK_TIMETRIAL,
+};
 
 GameMode::GameMode()
 {
@@ -28,11 +35,11 @@ GameMode::GameMode()
 	widgetSet -> label(menu_id, "Choose a Race Mode", GUI_LRG, GUI_ALL, 0, 0);
 
 	int va = widgetSet -> varray(menu_id);
-	widgetSet -> start(va, "Grand Prix",  GUI_MED, MENU_GP, 0);
-	widgetSet -> state(va, "Quick Race",  GUI_MED, MENU_QUICKRACE, 0);
+	widgetSet -> start(va, "Grand Prix",  GUI_MED, WTOK_GP, 0);
+	widgetSet -> state(va, "Quick Race",  GUI_MED, WTOK_QUICKRACE, 0);
 	
 	if (race_manager->getNumPlayers() == 1)
-		widgetSet -> state(va, "Time Trial",  GUI_MED, MENU_TIMETRIAL, 0);
+		widgetSet -> state(va, "Time Trial",  GUI_MED, WTOK_TIMETRIAL, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -53,17 +60,17 @@ void GameMode::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_GP:
+	case WTOK_GP:
 		race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
-		guiStack.push_back(GUIS_DIFFICULTY);
+		menu_manager->pushMenu(MENUID_DIFFICULTY);
 		break;
-	case MENU_QUICKRACE:
+	case WTOK_QUICKRACE:
 		race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
-		guiStack.push_back(GUIS_DIFFICULTY);
+		menu_manager->pushMenu(MENUID_DIFFICULTY);
 		break;
-	case MENU_TIMETRIAL:
+	case WTOK_TIMETRIAL:
 		race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);
-		guiStack.push_back(GUIS_CHARSEL); //difficulty makes no sense here
+		menu_manager->pushMenu(MENUID_CHARSEL_P1); //difficulty makes no sense here
 		break;
 	default: break;
 	}

@@ -20,6 +20,11 @@
 #include "ConfigDisplay.h"
 #include "WidgetSet.h"
 #include "Config.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_FULLSCREEN_TOGGLE,
+};
 
 ConfigDisplay::ConfigDisplay()
 {
@@ -27,7 +32,7 @@ ConfigDisplay::ConfigDisplay()
 	widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
 
 	int va = widgetSet -> varray(menu_id);
-	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, MENU_FULLSCREEN_TOGGLE, 0);
+	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, WTOK_FULLSCREEN_TOGGLE, 0);
 
 	widgetSet -> layout(menu_id, 0, 0);
 
@@ -54,7 +59,7 @@ void ConfigDisplay::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_FULLSCREEN_TOGGLE:
+	case WTOK_FULLSCREEN_TOGGLE:
 	  //JHtoggle_fullscreen();
     if(config->fullscreen)
       widgetSet->set_label(fullscreen_menu_id, "Window mode");

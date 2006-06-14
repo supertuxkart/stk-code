@@ -24,7 +24,7 @@
 #include "preprocessor.h"
 #include "HerringManager.h"
 #include "ProjectileManager.h"
-#include "gui/BaseGUI.h"
+#include "gui/MenuManager.h"
 #include "Loader.h"
 #include "PlayerKart.h"
 #include "AutoKart.h"
@@ -137,7 +137,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   //ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
 #endif
 
-  guiStack.push_back(GUIS_RACE);
+  menu_manager->pushMenu(MENUID_RACE);
 
   const std::string MUSIC = track_manager->getTrack(raceSetup.track)->getMusic();
 
@@ -177,7 +177,7 @@ void World::update(float delta) {
 
   if( getPhase() == FINISH_PHASE ) {
     widgetSet->tgl_paused();
-    guiStack.push_back ( GUIS_RACERESULT );
+    menu_manager->pushMenu(MENUID_RACERESULT);
   }
 
   float inc = 0.05;

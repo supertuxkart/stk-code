@@ -20,6 +20,12 @@
 #include "ConfigSound.h"
 #include "WidgetSet.h"
 #include "Config.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_MUSIC_TOGGLE,
+  WTOK_SFX_TOGGLE,
+};
 
 ConfigSound::ConfigSound()
 {
@@ -27,8 +33,8 @@ ConfigSound::ConfigSound()
 	widgetSet -> label(menu_id, "Sound Settings", GUI_LRG, GUI_ALL, 0, 0);
 
 	int va = widgetSet -> varray(menu_id);
-	music_menu_id = widgetSet -> start(va, "Turn on music",  GUI_MED, MENU_MUSIC_TOGGLE, 0);
-	sfx_menu_id = widgetSet -> start(va, "Turn on sound effects",  GUI_MED, MENU_SFX_TOGGLE, 0);
+	music_menu_id = widgetSet -> start(va, "Turn on music",  GUI_MED, WTOK_MUSIC_TOGGLE, 0);
+	sfx_menu_id = widgetSet -> start(va, "Turn on sound effects",  GUI_MED, WTOK_SFX_TOGGLE, 0);
 
 	widgetSet -> layout(menu_id, 0, 0);
 
@@ -55,7 +61,7 @@ void ConfigSound::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-    case MENU_MUSIC_TOGGLE:
+    case WTOK_MUSIC_TOGGLE:
         if(config->music)
         {
           config->music = false;
@@ -67,7 +73,7 @@ void ConfigSound::select()
           widgetSet->set_label(music_menu_id, "Turn off music");
         }
         break;
-    case MENU_SFX_TOGGLE:
+    case WTOK_SFX_TOGGLE:
         if(config->sfx)
         {
           config->sfx = false;

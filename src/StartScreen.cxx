@@ -23,7 +23,7 @@
 #include "Loader.h"
 #include "RaceManager.h"
 #include "StartScreen.h"
-#include "gui/BaseGUI.h"
+#include "gui/MenuManager.h"
 #include "plibdrv.h"
 
 StartScreen* startScreen = 0;
@@ -31,7 +31,7 @@ StartScreen* startScreen = 0;
 StartScreen::StartScreen()
     : introMaterial(0)
 {
-  guiStack.push_back(GUIS_MAINMENU);
+  menu_manager->pushMenu(MENUID_MAINMENU);
   installMaterial();
   pwSetCallbacks(keystroke, gui_mousefn, gui_motionfn, NULL, NULL);
 }
@@ -78,9 +78,10 @@ StartScreen::update()
   glEnd () ;
 
   glFlush();
-  // Swapbuffers - and off we go again...
   pollEvents() ;
-  updateGUI();
+  menu_manager->update();
+
+  // Swapbuffers - and off we go again...
   pwSwapBuffers();
 }
 
@@ -120,7 +121,7 @@ StartScreen::switchToGame()
   delete introMaterial ;
   introMaterial = 0;
   
-  guiStack.clear();
+  menu_manager->clearMenus();
   
   race_manager->start();
 }

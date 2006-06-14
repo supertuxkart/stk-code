@@ -26,7 +26,7 @@
 #include "WorldScreen.h"
 #include "KartManager.h"
 #include "RaceManager.h"
-#include "gui/BaseGUI.h"
+#include "gui/MenuManager.h"
 
 RaceManager* race_manager=0;
 
@@ -96,7 +96,7 @@ GrandPrixMode::next()
   track += 1;
 
 
- if( guiStack.back() == GUIS_NEXTRACE )
+ if( menu_manager->isCurrentMenu(MENUID_NEXTRACE) )
 {
    if( track < int ( cup.tracks.size() ) ) start_race(track);
    else

@@ -20,15 +20,24 @@
 #include "MainMenu.h"
 #include "WidgetSet.h"
 #include "RaceManager.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_SINGLE,
+  WTOK_MULTI,
+  WTOK_OPTIONS,
+  WTOK_REPLAY,
+  WTOK_QUIT,
+};
 
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Single Player",  GUI_MED, MENU_SINGLE, 0);
-	widgetSet -> state(menu_id, "Multiplayer",  GUI_MED, MENU_MULTI, 0);
-	widgetSet -> state(menu_id, "Options",  GUI_MED, MENU_OPTIONS, 0);
-	//widgetSet -> state(menu_id, "Credits",  GUI_MED, MENU_REPLAY, 0);
-	widgetSet -> state(menu_id, "Quit",  GUI_MED, MENU_QUIT, 0);
+	widgetSet -> start(menu_id, "Single Player",  GUI_MED, WTOK_SINGLE, 0);
+	widgetSet -> state(menu_id, "Multiplayer",    GUI_MED, WTOK_MULTI, 0);
+	widgetSet -> state(menu_id, "Options",        GUI_MED, WTOK_OPTIONS, 0);
+	//widgetSet -> state(menu_id, "Credits",  GUI_MED, WTOK_REPLAY, 0);
+	widgetSet -> state(menu_id, "Quit",           GUI_MED, WTOK_QUIT, 0);
         widgetSet -> space(menu_id);
 
 	widgetSet -> layout(menu_id, 0, 0);
@@ -49,23 +58,23 @@ void MainMenu::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
-	case MENU_SINGLE:	       
+	case WTOK_SINGLE:	       
                 race_manager->setNumPlayers(1);
-                guiStack.push_back(GUIS_GAMEMODE);     
+                menu_manager->pushMenu(MENUID_GAMEMODE);     
                 break;
-	case MENU_MULTI:
- 		guiStack.push_back(GUIS_NUMPLAYERS);
+	case WTOK_MULTI:
+ 		            menu_manager->pushMenu(MENUID_NUMPLAYERS);
                 break;
                 
-	case MENU_REPLAY:
+	case WTOK_REPLAY:
                 break;
 
-	case MENU_OPTIONS:     
-                guiStack.push_back(GUIS_OPTIONS);	
+	case WTOK_OPTIONS:     
+                menu_manager->pushMenu(MENUID_OPTIONS);	
                 break;
 
-	case MENU_QUIT:
-                guiStack.clear();
+	case WTOK_QUIT:
+                menu_manager->clearMenus();
                 break;
 	}
 }
@@ -75,7 +84,7 @@ void MainMenu::keybd(int key)
 	switch ( key )
 	{
 	case 27:   //ESC
-	        guiStack.clear();
+	        menu_manager->clearMenus();
 		break;
 
 	default:

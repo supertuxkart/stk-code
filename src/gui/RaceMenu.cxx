@@ -20,16 +20,25 @@
 #include "RaceMenu.h"
 #include "World.h"
 #include "WidgetSet.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_RETURN,
+  WTOK_OPTIONS,
+  WTOK_RESTART,
+  WTOK_EXIT,
+};
 
 RaceMenu::RaceMenu()
 {
 	menu_id = widgetSet -> vstack(0);
-        widgetSet -> label(menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
-	int va = widgetSet -> varray(menu_id);
-	widgetSet -> start(va, "Return To Race",  GUI_MED, MENU_RETURN, 0);
-	widgetSet -> state(va, "Options",  GUI_MED, MENU_OPTIONS, 0);
-	widgetSet -> state(va, "Restart Race",  GUI_MED, MENU_RESTART, 0);
-	widgetSet -> state(va, "Exit Race",  GUI_MED, MENU_EXIT, 0);
+  widgetSet -> label(menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
+	
+  int va = widgetSet -> varray(menu_id);
+	widgetSet -> start(va, "Return To Race",  GUI_MED, WTOK_RETURN, 0);
+	widgetSet -> state(va, "Options",         GUI_MED, WTOK_OPTIONS, 0);
+	widgetSet -> state(va, "Restart Race",    GUI_MED, WTOK_RESTART, 0);
+	widgetSet -> state(va, "Exit Race",       GUI_MED, WTOK_EXIT, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -48,27 +57,27 @@ void RaceMenu::update(float dt)
 
 void RaceMenu::select()
 {
-  int clicked_id = widgetSet -> token (widgetSet -> click());
-  if(clicked_id != MENU_OPTIONS)
+  int clicked_token = widgetSet->token(widgetSet->click());
+  if(clicked_token != WTOK_OPTIONS)
 	  widgetSet -> tgl_paused();
 	
-	switch ( clicked_id )
+	switch (clicked_token)
 	{
-	case MENU_RETURN:	
-                guiStack.pop_back(); 
+	case WTOK_RETURN:	
+                menu_manager->popMenu(); 
                 break;
 
-	case MENU_RESTART:
-                guiStack.pop_back(); 
+	case WTOK_RESTART:
+                menu_manager->popMenu(); 
                 world->restartRace();
                 break;
 
-	case MENU_OPTIONS:
-                guiStack.push_back(GUIS_OPTIONS);	
+	case WTOK_OPTIONS:
+                menu_manager->pushMenu(MENUID_OPTIONS);	
                 break;
 
-	case MENU_EXIT:	
-                guiStack.push_back(GUIS_EXITRACE); 
+	case WTOK_EXIT:	
+                menu_manager->pushMenu(MENUID_EXITRACE); 
                 break;
                 
 	default:
@@ -82,7 +91,7 @@ void RaceMenu::keybd(int key)
 	{
 	case 27: //ESC
 		widgetSet -> tgl_paused();
-		guiStack.pop_back();
+		menu_manager->popMenu();
 		break;
 		
 	default:

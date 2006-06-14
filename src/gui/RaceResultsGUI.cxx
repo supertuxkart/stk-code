@@ -23,6 +23,11 @@
 #include "WidgetSet.h"
 #include "KartProperties.h"
 #include "World.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_CONTINUE,
+};
 
 RaceResultsGUI::RaceResultsGUI()
 {
@@ -66,7 +71,7 @@ RaceResultsGUI::RaceResultsGUI()
     widgetSet -> space(menu_id);
 
     int va = widgetSet -> varray(menu_id);
-    widgetSet -> start(va, "Continue",  GUI_MED, MENU_CONTINUE, 0);
+    widgetSet -> start(va, "Continue",  GUI_MED, WTOK_CONTINUE, 0);
     
     widgetSet -> layout(menu_id, 0, 1);
 }
@@ -87,9 +92,9 @@ void RaceResultsGUI::select()
 {
     switch( widgetSet->token( widgetSet->click() ) )
     {
-        case MENU_CONTINUE:
-            guiStack.push_back(GUIS_NEXTRACE);
-	    widgetSet->tgl_paused();
+        case WTOK_CONTINUE:
+            menu_manager->pushMenu(MENUID_NEXTRACE);
+            widgetSet->tgl_paused();
             break;
         default:
             break;

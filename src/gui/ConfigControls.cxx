@@ -19,6 +19,7 @@
 
 #include "ConfigControls.h"
 #include "WidgetSet.h"
+#include "MenuManager.h"
 
 ConfigControls::ConfigControls()
 {
@@ -55,16 +56,16 @@ void ConfigControls::select()
 	switch ( widgetSet -> token (widgetSet -> click()) )
 	{
 	case 1:
-		guiStack.push_back(GUIS_CONFIGP1);
+		menu_manager->pushMenu(MENUID_CONFIG_P1);
 		break;
 	case 2:
-		guiStack.push_back(GUIS_CONFIGP2);
+		menu_manager->pushMenu(MENUID_CONFIG_P2);
 		break;
 	case 3:
-		guiStack.push_back(GUIS_CONFIGP3);
+		menu_manager->pushMenu(MENUID_CONFIG_P3);
 		break;
 	case 4:
-		guiStack.push_back(GUIS_CONFIGP4);
+		menu_manager->pushMenu(MENUID_CONFIG_P4);
 		break;
 	default: break;
 	}

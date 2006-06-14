@@ -27,7 +27,7 @@
 #include "TrackManager.h"
 #include "Track.h"
 #include "plibdrv.h"
-#include "gui/BaseGUI.h"
+#include "gui/MenuManager.h"
 
 WorldScreen* WorldScreen::current_ = 0;
 
@@ -74,7 +74,7 @@ void WorldScreen::update() {
   draw();
 
   pollEvents();
-  updateGUI() ;
+  menu_manager->update();
   sound->update() ;
   if(config->profile) {
     if(frameCount++ == config->profile) {

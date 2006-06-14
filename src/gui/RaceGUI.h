@@ -31,6 +31,8 @@
 
 const int TEXTURES_PER_PLAYER = 10;
 
+class RaceSetup;
+
 class RaceGUI: public BaseGUI {
   // A mapping for the assigned keys (like fire, ...) to
   // the kart which is using them

@@ -53,6 +53,7 @@ libMain_a_SOURCES = \
 	lisp/Lexer.cxx		 lisp/Lexer.h           \
 	lisp/Parser.cxx		 lisp/Parser.h          \
 	lisp/Writer.cxx		 lisp/Writer.h	        \
+	gui/MenuManager.cxx  gui/MenuManager.h     \
 	gui/BaseGUI.cxx		 gui/BaseGUI.h	        \
 	gui/RaceGUI.cxx		 gui/RaceGUI.h	        \
 	gui/RaceResultsGUI.cxx gui/RaceResultsGUI.h \

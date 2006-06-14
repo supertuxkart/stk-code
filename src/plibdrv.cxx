@@ -25,7 +25,7 @@
 #include "Config.h"
 #include "plibdrv.h"
 
-#include "gui/BaseGUI.h"
+#include "gui/MenuManager.h"
 #include "KartControl.h"
 
 /*********************************\
@@ -41,44 +41,47 @@ void keyfn ( int key, int updown, int, int ) {
 }
 
 void gui_motionfn ( int x, int y ) {
-  if(gui) {
-    gui->point(x,config->height-y);
+  BaseGUI* menu= menu_manager->getCurrentMenu();
+  if(menu != NULL) {
+    menu->point(x,config->height-y);
   }
   puMouse ( x, y ) ;
 }
 
 void gui_mousefn ( int button, int updown, int x, int y ) {
-  if (button==0 && updown==0 && gui) {
-    gui->select();
-  } else if (guiStack.size()>1 && button==2 && updown==0) {
-    guiStack.pop_back();
+  if (button==0 && updown==0) {
+    BaseGUI* menu= menu_manager->getCurrentMenu();
+    if (menu != NULL) {
+      menu->select();
+    }
+  } else if (button==2 && updown==0) {
+    menu_manager->popMenu();
   }
-  puMouse ( button, updown, x, y ) ;
+  puMouse(button, updown, x, y ) ;
 }
 
 static jsJoystick *joystick ;
 
 void pollEvents() {
-  if(gui)
-  {
-    int k=getKeystroke();
+  BaseGUI* menu= menu_manager->getCurrentMenu();
+  if(menu != NULL) {
+    int k= getKeystroke();
     if(k) {
-      gui->keybd(k);
+      menu->keybd(k);
     }   // if k
 
     if( !( joystick -> notWorking () ) )
     {
       static KartControl controls;
       int prev_buttons = controls.buttons;
-      joystick -> read ( &controls.buttons, controls.data) ;
-      gui -> stick( 0, controls.data[0]);
-      gui -> stick( 1, controls.data[1]);
+      joystick->read ( &controls.buttons, controls.data) ;
+      menu->stick( 0, controls.data[0]);
+      menu->stick( 1, controls.data[1]);
 
       int changed_states = prev_buttons ^ controls.buttons;
       controls.presses = controls.buttons & changed_states;
       controls.releases = !controls.buttons & changed_states;
-      gui -> joybuttons( 0, controls.buttons, controls.presses,
-          controls.releases );
+      menu->joybuttons(0, controls.buttons, controls.presses, controls.releases);
     }
   }
 }

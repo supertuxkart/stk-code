@@ -21,6 +21,7 @@
 #include "PlayerControls.h"
 #include "WidgetSet.h"
 #include "Config.h"
+#include "MenuManager.h"
 
 #include <string>
 
@@ -69,14 +70,9 @@ void PlayerControls::select() {
   grab_id        = widgetSet -> click();
   int menuChoice = widgetSet -> token (grab_id);
 
-  if ( menuChoice == MENU_RETURN) {
-    config->saveConfig();
-    guiStack.pop_back();
-  } else {
-    editAction   = static_cast<KartActions>(menuChoice);
-    grabInput = true;
-    widgetSet->set_label(grab_id,"Press key");
-  }
+  editAction   = static_cast<KartActions>(menuChoice);
+  grabInput = true;
+  widgetSet->set_label(grab_id,"Press key");
 }   // select
 
 // -----------------------------------------------------------------------------

@@ -20,6 +20,13 @@
 #include "Difficulty.h"
 #include "RaceManager.h"
 #include "WidgetSet.h"
+#include "MenuManager.h"
+
+enum WidgetTokens {
+  WTOK_HARD,
+  WTOK_MEDIUM,
+  WTOK_EASY,
+};
 
 Difficulty::Difficulty() {
   menu_id = widgetSet -> vstack(0);
@@ -27,9 +34,9 @@ Difficulty::Difficulty() {
   widgetSet -> label(menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
   
   int va = widgetSet -> varray(menu_id);
-  widgetSet -> state(va, "Racer", GUI_MED, MENU_HARD, 0);
-  widgetSet -> state(va, "Driver", GUI_MED, MENU_MEDIUM, 0);
-  widgetSet -> start(va, "Novice", GUI_MED, MENU_EASY, 0);
+  widgetSet -> state(va, "Racer",  GUI_MED, WTOK_HARD, 0);
+  widgetSet -> state(va, "Driver", GUI_MED, WTOK_MEDIUM, 0);
+  widgetSet -> start(va, "Novice", GUI_MED, WTOK_EASY, 0);
 
   widgetSet -> layout(menu_id, 0, 0);
 }   // Difficulty
@@ -49,15 +56,18 @@ void Difficulty::update(float dt) {
 // -----------------------------------------------------------------------------
 void Difficulty::select() {
   switch ( widgetSet -> token (widgetSet -> click()) ) {
-    case MENU_EASY:   race_manager->setDifficulty(RD_EASY);
-	  	      guiStack.push_back(GUIS_CHARSEL);
-		      break;
-    case MENU_MEDIUM: race_manager->setDifficulty(RD_MEDIUM);
-	  	      guiStack.push_back(GUIS_CHARSEL);
-		      break;
-    case MENU_HARD:   race_manager->setDifficulty(RD_HARD);
-                      guiStack.push_back(GUIS_CHARSEL);
-		      break;
+    case WTOK_EASY:
+      race_manager->setDifficulty(RD_EASY);
+	  	menu_manager->pushMenu(MENUID_CHARSEL_P1);
+      break;
+    case WTOK_MEDIUM:
+      race_manager->setDifficulty(RD_MEDIUM);
+      menu_manager->pushMenu(MENUID_CHARSEL_P1);
+      break;
+    case WTOK_HARD:
+      race_manager->setDifficulty(RD_HARD);
+      menu_manager->pushMenu(MENUID_CHARSEL_P1);
+      break;
     default: break;
   }   // switch
 }   // select

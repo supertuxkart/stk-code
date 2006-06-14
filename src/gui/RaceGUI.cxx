@@ -24,6 +24,7 @@
 #include "World.h"
 #include "Track.h"
 #include "MaterialManager.h"
+#include "MenuManager.h"
 
 #define TEXT_START_X  (config->width-220)
 
@@ -118,9 +119,11 @@ void RaceGUI::keybd(int key) {
 				       isWireframe ? GL_FILL : GL_LINE);
 	               isWireframe = ! isWireframe ;
 		       return ;
-      case 27:         widgetSet -> tgl_paused();    // ESC
-	  	       guiStack.push_back(GUIS_RACEMENU);
-		       // The player might have changed the keyboard 
+      case 27: // ESC
+           widgetSet->tgl_paused();
+           menu_manager->pushMenu(MENUID_RACEMENU);
+
+           // The player might have changed the keyboard 
 		       // configuration, so we need to redefine the mappings
 		       UpdateKeyboardMappings();
 		       break;

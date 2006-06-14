@@ -20,70 +20,21 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
-#include <vector>
-
-class RaceSetup;
-
-enum GUISwitch
-{
-GUIS_MAINMENU,
-GUIS_CHARSEL,
-GUIS_CHARSELP2,
-GUIS_CHARSELP3,
-GUIS_CHARSELP4,
-GUIS_DIFFICULTY,
-GUIS_GAMEMODE,
-GUIS_OPTIONS,
-GUIS_CONFIGCONTROLS,
-GUIS_CONFIGDISPLAY,
-GUIS_CONFIGSOUND,
-GUIS_CONFIGP1,
-GUIS_CONFIGP2,
-GUIS_CONFIGP3,
-GUIS_CONFIGP4,
-GUIS_TRACKSEL,
-GUIS_NUMLAPS,
-GUIS_NUMPLAYERS,
-GUIS_RACE,
-GUIS_RACERESULT,
-GUIS_NEXTRACE,
-GUIS_RACEMENU,
-GUIS_EXITRACE
-};
-
-extern std::vector<GUISwitch> guiStack;
-
-enum MenuOption {
-  MENU_SINGLE, MENU_MULTI, MENU_REPLAY, MENU_OPTIONS, MENU_QUIT,
-  MENU_GP, MENU_QUICKRACE, MENU_TIMETRIAL,
-  MENU_TRACK,
-  MENU_EASY, MENU_MEDIUM, MENU_HARD,
-  MENU_NETWORK,
-  MENU_CONTROLS, MENU_DISPLAY, MENU_SOUND,
-  MENU_FULLSCREEN_TOGGLE,
-  MENU_MUSIC_TOGGLE, MENU_SFX_TOGGLE,
-  MENU_RETURN, MENU_RESTART, MENU_EXIT,
-  MENU_CONTINUE
-} ;
-
-void updateGUI();
-
 class BaseGUI
 {
 public:
 	BaseGUI() {}
 	virtual ~BaseGUI() {}
 
-    virtual void update(float dt) = 0;
+	virtual void update(float dt) = 0;
 	virtual void select() = 0;
 	virtual void keybd(int key);
 	virtual void point(int x, int y);
 	virtual void stick(const int &whichAxis, const float &value);
-    virtual void joybuttons(int whichJoy, int hold, int presses, int releases);
+	virtual void joybuttons(int whichJoy, int hold, int presses, int releases);
 
 protected:
 	int menu_id;
 };
 
-extern BaseGUI *gui;
-#endif
+#endif // HEADER_BASEGUI_H
