@@ -22,7 +22,7 @@
 PhysicsParameters* physicsParameters=0;
 
 // -----------------------------------------------------------------------------
-void PhysicsParameters::load(const std::string& filename, char *node) {
+void PhysicsParameters::load(const char* filename, char *node) {
 
   KartProperties::load(filename, node);
 
@@ -31,7 +31,7 @@ void PhysicsParameters::load(const std::string& filename, char *node) {
 
 #define CHECK_NEG(  a,strA) if(a<-99) {                                    \
              fprintf(stderr,"Missing default value for '%s' in '%s'.\n",   \
-		     strA,filename.c_str());exit(-1);                       \
+		     strA,filename);exit(-1);                       \
              }
 
   CHECK_NEG(corn_r,"corn_r");      CHECK_NEG(wheel_base,"wheel-base");

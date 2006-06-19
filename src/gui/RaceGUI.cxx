@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/pw.h>
+
 #include "RaceGUI.h"
 #include "History.h"
 #include "WidgetSet.h"
@@ -75,8 +76,10 @@ void RaceGUI::UpdateKeyboardMappings() {
   }
   
   for(int i=0; i<world->raceSetup.getNumPlayers(); i++) {
+    assert(world != NULL);
     PlayerKart* kart = world->getPlayerKart(i);
-    Player*     p    = kart->getPlayer();
+    Player* p        = kart->getPlayer();
+    
     keysToKart[p->getKey(KC_WHEELIE)] = kart;
     keysToKart[p->getKey(KC_JUMP)   ] = kart;
     keysToKart[p->getKey(KC_RESCUE) ] = kart;
@@ -90,53 +93,56 @@ void RaceGUI::UpdateKeyboardMappings() {
 
 // -----------------------------------------------------------------------------
 void RaceGUI::update(float dt) {
-  drawStatusText (world->raceSetup, dt);
+  assert(world != NULL);
+  drawStatusText(world->raceSetup, dt);
 }   // update
 
 // -----------------------------------------------------------------------------
 void RaceGUI::keybd(int key) {
   static int isWireframe = FALSE ;
-  // Check if it's a user assigned key
-  if(keysToKart[key]) {
-    keysToKart[key]->action(typeForKey[key]);
-  } else {
-    switch ( key ) {
-      case 0x12      : if(world->raceSetup.getNumPlayers()==1) {   // ctrl-r
-                         Kart* kart = world->getPlayerKart(0);
-			 kart->setCollectable((rand()%2)?COLLECT_MISSILE
-					                :COLLECT_HOMING_MISSILE,
-					      10000);
-                        }
-                       break;
-      case PW_KEY_F12: config->displayFPS = !config->displayFPS ;
-	               if(config->displayFPS) {
-			 fpsTimer.reset();
-			 fpsTimer.setMaxDelta(1000);
-			 fpsCounter=0;
-		       }
-		       return;
-      case PW_KEY_F11: glPolygonMode ( GL_FRONT_AND_BACK, 
-				       isWireframe ? GL_FILL : GL_LINE);
-	               isWireframe = ! isWireframe ;
-		       return ;
-      case 27: // ESC
-           widgetSet->tgl_paused();
-           menu_manager->pushMenu(MENUID_RACEMENU);
-
-           // The player might have changed the keyboard 
-		       // configuration, so we need to redefine the mappings
-		       UpdateKeyboardMappings();
-		       break;
-      case PW_KEY_F10: history->Save(); return;
-      default:         break;
-    }   // switch
-  }   // if(keysToKart[key] else
+  switch ( key ) {
+    case 0x12:
+      if(world->raceSetup.getNumPlayers()==1) {   // ctrl-r
+        Kart* kart = world->getPlayerKart(0);
+        kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
+      }
+      break;
+    case PW_KEY_F12:
+      config->displayFPS = !config->displayFPS;
+	  if(config->displayFPS) {
+        fpsTimer.reset();
+        fpsTimer.setMaxDelta(1000);
+        fpsCounter=0;
+      }
+      break;
+    case PW_KEY_F11:
+      glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
+      isWireframe = ! isWireframe;
+      break;
+    case 27: // ESC
+      widgetSet->tgl_paused();
+      menu_manager->pushMenu(MENUID_RACEMENU);
+      // The player might have changed the keyboard 
+      // configuration, so we need to redefine the mappings
+      UpdateKeyboardMappings();
+      break;
+    case PW_KEY_F10:
+      history->Save();
+      break;
+    default:
+      // Check if it's a user assigned key
+      if (keysToKart[key] != 0) {
+        keysToKart[key]->action(typeForKey[key]);
+      }
+      break;
+    } // switch
 } // keybd
 
 // -----------------------------------------------------------------------------
 void RaceGUI::stick(const int &whichAxis, const float &value){
   KartControl controls;
   controls.data[whichAxis] = value;
+  assert(world != NULL);
   world -> getPlayerKart(0) -> incomingJoystick ( controls );
 }   // stick
 
@@ -146,6 +152,7 @@ void RaceGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
   controls.buttons = hold;
   controls.presses = presses;
   controls.releases = releases;
+  assert(world != NULL);
   world -> getPlayerKart(whichJoy) -> incomingJoystick ( controls );
 }   // joybuttons
 
@@ -202,6 +209,7 @@ void RaceGUI::drawTimer () {
   if(world->getPhase()!=World::RACE_PHASE) return;
   char str [ 256 ] ;
 
+  assert(world != NULL);
   time_left = world->clock;
 
   int min     = (int) floor ( time_left / 60.0 ) ;
@@ -264,6 +272,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 void RaceGUI::drawMap () {
   glDisable ( GL_TEXTURE_2D ) ;
   glColor3f ( 0,0,1 ) ;
+  assert(world != NULL);
   world -> track -> draw2Dview ( 430+TRACKVIEW_SIZE  , TRACKVIEW_SIZE   ) ;
   glColor3f ( 1,1,0 ) ;
   world -> track -> draw2Dview ( 430+TRACKVIEW_SIZE+1, TRACKVIEW_SIZE+1 ) ;
@@ -296,6 +305,7 @@ void RaceGUI::drawGameOverText (const float dt) {
   int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
   timer += dt;
 
+  assert(world != NULL);
   int finishing_position = world->getPlayerKart(0)->getFinishPosition();
   if ( finishing_position < 0 )
     finishing_position = world->getPlayerKart(0)->getPosition() ;
@@ -312,6 +322,8 @@ void RaceGUI::drawGameOverText (const float dt) {
 
 // -----------------------------------------------------------------------------
 void RaceGUI::oldDrawPlayerIcons () {
+  assert(world != NULL);
+  
   int   x =  0 ;
   int   y = 10 ;
   float w = 640.0f - 64.0f ;
@@ -344,9 +356,11 @@ void RaceGUI::oldDrawPlayerIcons () {
 }   // oldDrawPlayerIcons
 
 // -----------------------------------------------------------------------------
-void RaceGUI::drawPlayerIcons () {
-  /** Draw players position on the race */
 
+// Draw players position on the race
+void RaceGUI::drawPlayerIcons () {
+  assert(world != NULL);
+  
   int x = 10;
   int y;
 
@@ -604,6 +618,8 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
+  assert(world != NULL);
+
   glMatrixMode   ( GL_MODELVIEW ) ;
   glPushMatrix   () ;
   glLoadIdentity () ;

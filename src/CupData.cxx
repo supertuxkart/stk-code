@@ -24,7 +24,7 @@
 #include "lisp/Lisp.h"
 #include "CupData.h"
 
-CupData::CupData(const std::string& filename)
+CupData::CupData(const char* filename)
 {
   const lisp::Lisp* lisp = 0;
   try {

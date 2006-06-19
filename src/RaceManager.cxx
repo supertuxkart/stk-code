@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <iostream>
+
 #include "Loader.h"
 #include "TrackManager.h"
 #include "RaceSetup.h"
@@ -28,7 +29,22 @@
 #include "RaceManager.h"
 #include "gui/MenuManager.h"
 
-RaceManager* race_manager=0;
+RaceManager* race_manager= NULL;
+
+
+void
+RaceMode::next()
+{
+  exit_race();
+}
+
+void
+RaceMode::exit_race()
+{
+  startScreen = new StartScreen();
+  screen_manager->setScreen(startScreen);
+}
+
 
 GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_, 
                              const CupData& cup_,
@@ -94,19 +110,12 @@ void
 GrandPrixMode::next()
 {
   track += 1;
-
-
- if( menu_manager->isCurrentMenu(MENUID_NEXTRACE) )
-{
-   if( track < int ( cup.tracks.size() ) ) start_race(track);
-   else
-    {
-      // FIXME: Insert credits/extra stuff here
-      startScreen = new StartScreen();
-      screen_manager->setScreen(startScreen); 
-    }
-}
-
+  if (track < cup.tracks.size()) {
+    start_race(track);
+  
+  } else {
+    exit_race();
+  }
 }
 
 
@@ -141,12 +150,6 @@ QuickRaceMode::start()
   screen_manager->setScreen(new WorldScreen(raceSetup));
 }
 
-void
-QuickRaceMode::next()
-{
-  startScreen = new StartScreen();
-  screen_manager->setScreen(startScreen);
-}
 
 TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_,
                              const int& numLaps_)
@@ -167,12 +170,6 @@ TimeTrialMode::start()
   screen_manager->setScreen(new WorldScreen(raceSetup));
 }
 
-void
-TimeTrialMode::next()
-{
-  startScreen = new StartScreen();
-  screen_manager->setScreen(startScreen);
-}
 
 RaceManager::RaceManager()
 { 
@@ -245,6 +242,12 @@ RaceManager::next()
   assert(mode);
   numFinishedKarts = 0;
   mode->next();
+}
+
+void
+RaceManager::exit_race()
+{
+  mode->exit_race();
 }
 
 /* EOF */

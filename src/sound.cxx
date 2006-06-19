@@ -74,7 +74,7 @@ SoundSystem::SoundSystem ()
 
   for (int i = 0; i != NUM_SOUNDS; i++)
   {
-    std::string path = loader->getPath(sfx[i].fname);
+    std::string path = loader->getPath(sfx[i].fname.c_str());
       sfx[i].s  = new slSample ( path.c_str(), sched ) ;
   }
 

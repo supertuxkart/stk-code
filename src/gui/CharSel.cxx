@@ -17,6 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <sstream>
+#include <string>
+
 #include "Loader.h"
 #include "CharSel.h"
 #include "KartManager.h"
@@ -26,6 +29,7 @@
 #include "StartScreen.h"
 #include "Config.h"
 #include "MenuManager.h"
+#include "KartProperties.h"
 
 CharSel::CharSel(int whichPlayer)
   : kart(0), playerIndex(whichPlayer)
@@ -37,9 +41,10 @@ CharSel::CharSel(int whichPlayer)
     oldContext->makeCurrent();
 
 	menu_id = widgetSet -> vstack(0);
-	static char output[60];
-	sprintf(output, "Player %d, choose your character", playerIndex + 1);
-	widgetSet -> label(menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
+
+    std::ostringstream tmp;
+    tmp << "Player " << playerIndex + 1 << ", choose your character";
+	widgetSet -> label(menu_id, tmp.str().c_str(), GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> space(menu_id);
 
 	int ha = widgetSet -> harray(menu_id);
@@ -116,7 +121,7 @@ void CharSel::update(float dt)
 
 	switch_to_character(widgetSet->token(widgetSet->click()));
 
-	if (kart)
+	if (kart != NULL)
 	{
         ssgContext* oldContext = ssgGetCurrentContext();
         context -> makeCurrent();
@@ -159,30 +164,28 @@ void CharSel::select()
 			menu_manager->pushMenu(MENUID_CHARSEL_P2);
 			return;
 		}
+    }
 
-		if (race_manager->getNumPlayers() > 2)
+	if (race_manager->getNumPlayers() > 2)
+	{
+		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
 		{
-			if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
-			{
-				menu_manager->pushMenu(MENUID_CHARSEL_P3);
-				return;
-			}
+			menu_manager->pushMenu(MENUID_CHARSEL_P3);
+			return;
+		}
+    }
 
-			if (race_manager->getNumPlayers() > 3)
-			{
-				if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
-				{
-					menu_manager->pushMenu(MENUID_CHARSEL_P4);
-					return;
-				}
-			}
+	if (race_manager->getNumPlayers() > 3)
+	{
+		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
+		{
+			menu_manager->pushMenu(MENUID_CHARSEL_P4);
+			return;
 		}
 	}
 
-        if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
-          menu_manager->pushMenu(MENUID_TRACKSEL);
-        else
-          startScreen->switchToGame();
+    if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
+        menu_manager->pushMenu(MENUID_TRACKSEL);
+    else
+        startScreen->switchToGame();
 }
-
-

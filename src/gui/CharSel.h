@@ -20,8 +20,6 @@
 #ifndef HEADER_CHARSEL_H
 #define HEADER_CHARSEL_H
 
-#include <vector>
-#include "../KartProperties.h"
 #include "BaseGUI.h"
 
 class ssgBranch;
@@ -43,7 +41,7 @@ public:
 	CharSel(int whichPlayer);
 	~CharSel();
 	
-        void switch_to_character(int n);
+    void switch_to_character(int n);
 	void update(float dt);
 	void select();
 };

@@ -33,17 +33,18 @@ enum MenuManagerIDs
   MENUID_CHARSEL_P4,
   MENUID_DIFFICULTY,
   MENUID_GAMEMODE,
-  MENUID_RACE,
   MENUID_RACERESULT,
+#if 0 // no needed yet
   MENUID_NEXTRACE,
+#endif
   MENUID_RACEMENU,
-  MENUID_EXITRACE,
   MENUID_TRACKSEL,
   MENUID_NUMLAPS,
   MENUID_NUMPLAYERS,
   MENUID_OPTIONS,
+  MENUID_EXITGAME,
 
-  // configuration
+  // menu configuration
   MENUID_CONFIG_DISPLAY,
   MENUID_CONFIG_SOUND,
   MENUID_CONFIG_CONTROLS,
@@ -51,17 +52,24 @@ enum MenuManagerIDs
   MENUID_CONFIG_P2,
   MENUID_CONFIG_P3,
   MENUID_CONFIG_P4,
+  
+  // race gui
+  MENUID_RACE,
 };
 
 class MenuManager
 {
 public:
-	MenuManager();
-	virtual ~MenuManager();
+  MenuManager();
+  virtual ~MenuManager();
+  
+  // general functions
+  void switchToRace();
+  void switchToMainMenu();
 
+  // use this function within menu classes
   void pushMenu(MenuManagerIDs id);
   void popMenu();
-  void clearMenus();
 
   bool isCurrentMenu(MenuManagerIDs id) {return (m_menuStack.back() == id);}
   BaseGUI* getCurrentMenu() {return m_currentMenu;}

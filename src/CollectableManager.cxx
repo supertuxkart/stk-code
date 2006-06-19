@@ -25,8 +25,10 @@
 #include "Material.h"
 #include "preprocessor.h"
 
-typedef struct {collectableType collectable; std::string dataFile;} 
-  initCollectableType;
+typedef struct {
+  collectableType collectable;
+  const char*const dataFile;
+} initCollectableType;
 
 initCollectableType ict[]={
   {COLLECT_ZIPPER,         "zipper.collectable"       },
@@ -41,17 +43,18 @@ CollectableManager* collectable_manager=0;
 
 // -----------------------------------------------------------------------------
 void CollectableManager::loadCollectable() {
-  for(int i=0; ict[i].collectable!=COLLECT_MAX; i++) {
+  for(int i=0; ict[i].collectable != COLLECT_MAX; i++) {
     Load(ict[i].collectable, ict[i].dataFile);
   }
 }  // loadCollectable
 
 // -----------------------------------------------------------------------------
-void CollectableManager::Load(int collectType, const std::string filename) {
+void CollectableManager::Load(int collectType, const char* filename) {
   const lisp::Lisp* root = 0;
   try {
     lisp::Parser parser;
-    root = parser.parse(loader->getPath("data/"+filename));
+    std::string tmp= "data/" + (std::string)filename;
+    root = parser.parse(loader->getPath(tmp.c_str()));
     
     const lisp::Lisp* lisp = root->getLisp("tuxkart-collectable");
     if(!lisp) {

@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <assert.h>
+
 #include "MenuManager.h"
 
 #include "MainMenu.h"
@@ -48,7 +50,7 @@ MenuManager::MenuManager() {
 }
 
 MenuManager::~MenuManager() {
-
+  delete m_currentMenu;
 }
 
 void MenuManager::pushMenu(MenuManagerIDs id) {
@@ -59,10 +61,6 @@ void MenuManager::popMenu() {
   m_menuStack.pop_back();
 }
 
-void MenuManager::clearMenus() {
-  m_menuStack.clear();
-}
-
 void MenuManager::update() {
 
   if (m_handeldSize != m_menuStack.size()) {
@@ -70,7 +68,7 @@ void MenuManager::update() {
     m_currentMenu= NULL;
 
     m_handeldSize= m_menuStack.size();
-    if (m_handeldSize) {
+    if (m_handeldSize > 0) {
       MenuManagerIDs id= m_menuStack.back();
       switch (id) {
         case MENUID_MAINMENU:
@@ -93,7 +91,7 @@ void MenuManager::update() {
           break;
         case MENUID_TRACKSEL:
           m_currentMenu= new TrackSel();
-                   break;
+          break;
         case MENUID_NUMLAPS:
           m_currentMenu= new NumLaps();
           break;
@@ -106,14 +104,17 @@ void MenuManager::update() {
         case MENUID_RACERESULT:
           m_currentMenu= new RaceResultsGUI();
           break;
+#if 0
         case MENUID_NEXTRACE:
           race_manager->next();
           break;
+#endif
         case MENUID_RACEMENU:
           m_currentMenu= new RaceMenu();
           break;
-        case MENUID_EXITRACE:
-          m_menuStack.clear(); race_manager->next();
+        case MENUID_EXITGAME:
+          m_menuStack.clear();
+          screen_manager->abort();
           break;
 
         case MENUID_CONFIG_CONTROLS:
@@ -134,8 +135,8 @@ void MenuManager::update() {
         default:
           break;
       }   // switch
-    }   // if guiStack.size()
-  }   // if rememberSize!=guiStack.size()
+    }
+  }
 
   static ulClock now  = ulClock();
   now.update();
@@ -143,8 +144,22 @@ void MenuManager::update() {
   if (m_currentMenu != NULL) {
     m_currentMenu->update(now.getDeltaTime());
   }
-
-  if (m_menuStack.empty()) {
-    screen_manager->abort();
-  }
 }   // update
+
+void MenuManager::switchToRace()
+{
+  m_menuStack.clear();
+  pushMenu(MENUID_RACE);
+}
+
+void MenuManager::switchToMainMenu()
+{
+  if (m_currentMenu != NULL) {
+    delete m_currentMenu;
+    m_currentMenu= NULL;
+  }
+  m_handeldSize= 0;
+  
+  m_menuStack.clear();    
+  pushMenu(MENUID_MAINMENU);
+}

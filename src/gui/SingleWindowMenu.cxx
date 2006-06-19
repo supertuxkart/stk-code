@@ -179,7 +179,7 @@ int SingleWindowMenu() {
   unsigned int nTracks = track_manager->getTrackCount();
   track_names = new char*[nTracks+1];
   for(size_t i=0; i<nTracks; i++) {
-    track_names[i] = (char *)track_manager->getTrack(i)->getIdent().c_str();
+    track_names[i] = (char *)track_manager->getTrack(i)->getIdent();
   }
   track_names[nTracks]=NULL;
 

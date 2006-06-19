@@ -44,12 +44,12 @@ TrackSel::TrackSel()
   int col2 = widgetSet -> varray(ha);
 
   for (size_t i = 0; i != track_manager->getTrackCount()/2; ++i)
-    widgetSet -> state(col1, track_manager->getTrack(i)->getName().c_str(), GUI_SML, i, 0);
+    widgetSet -> state(col1, track_manager->getTrack(i)->getName(), GUI_SML, i, 0);
 
   for (size_t i = track_manager->getTrackCount()/2; 
       i != track_manager->getTrackCount(); ++i)
   {
-    int tmp = widgetSet -> state(col2, track_manager->getTrack(i)->getName().c_str(), GUI_SML, i, 0);
+    int tmp = widgetSet -> state(col2, track_manager->getTrack(i)->getName(), GUI_SML, i, 0);
     if (i == track_manager->getTrackCount()/2)
       widgetSet -> set_active(tmp);
   }

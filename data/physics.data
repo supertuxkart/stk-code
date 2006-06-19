@@ -26,7 +26,7 @@
  (air-friction         1.3   )
  (roll-resistance      0.05  )
  (tire-grip            0.9   )
- (max-steer-angle      8     )
+ (max-steer-angle      5     )
  
  (corn-f               4     )
  (corn-r               4     )

@@ -26,11 +26,6 @@
 #include "PlayerKart.h"
 #include "plibdrv.h"
 
-#define MAX_STRING          30
-#define MAX_STRING_LENGTH  256
-
-const int TEXTURES_PER_PLAYER = 10;
-
 class RaceSetup;
 
 class RaceGUI: public BaseGUI {
@@ -92,4 +87,3 @@ private:
 };
 
 #endif
-

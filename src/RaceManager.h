@@ -29,11 +29,11 @@
 class RaceMode
 {
 public:
-  virtual      ~RaceMode() {};	// avoid compiler warning
+  virtual ~RaceMode() {};       // avoid compiler warning
   virtual void start()    = 0;  // Start the mode and go into the first race 
-  virtual void next ()    = 0;  // Do the 'next thing' after the race is 
-                                // finished, ie. return to the start screen or
-                                // start a new race
+  virtual void next ();         // go to the next race if there is any, otherwise main menu
+  virtual void exit_race ();    // go directly to main menu
+  
   virtual void setKartScore    (int kart, int pos) {}
   virtual int  getKartScore    (int kart) const {return 0;}
   virtual int  getPositionScore(int pos ) const {return 0;}
@@ -97,7 +97,6 @@ public:
   virtual ~QuickRaceMode() {}
 
   void start();
-  void next();
 };
 
 class TimeTrialMode : public RaceMode
@@ -112,7 +111,6 @@ public:
   virtual ~TimeTrialMode() {}
   
   void start();
-  void next();
 };
 
 /** RaceManager keeps track of the game mode, number of players and
@@ -154,11 +152,10 @@ public:
 
   void setMirror() {/*FIXME*/}
   void setReverse(){/*FIXME*/}
-  void start();
-
-  /** Start the next race or go back to the start screen, depending on
-      the currently set game mode */
-  void next();
+  
+  void start(); // start a new race
+  void next(); // start the next race or go back to the start screen
+  void exit_race();
 };
 
 extern RaceManager *race_manager;

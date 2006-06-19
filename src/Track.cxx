@@ -27,7 +27,7 @@
 #include "lisp/Parser.h"
 
 
-Track::Track (const std::string& filename, float w, float h, bool stretch) {
+Track::Track (const char* filename, float w, float h, bool stretch) {
   herringStyle  = "";
   track2DWidth  = w;
   track2DHeight = h;
@@ -211,7 +211,7 @@ void Track::draw2Dview (float x, float y) const {
 }   // draw2Dview
 
 // -----------------------------------------------------------------------------
-void Track::loadTrack(const std::string& filename) {
+void Track::loadTrack(const char* filename) {
   ident = StringUtils::basename(StringUtils::without_extension(filename));
   std::string path = StringUtils::without_extension(filename);
 
@@ -355,7 +355,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
   std::string path = "data/";
   path += ident;
   path += file_ext;
-  path = loader->getPath(path);
+  path = loader->getPath(path.c_str());
 
   FILE *fd = fopen ( path.c_str(), "ra" ) ;
 

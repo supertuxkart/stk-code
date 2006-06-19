@@ -18,12 +18,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <iostream>
+
 #include "RaceResultsGUI.h"
-#include "RaceManager.h"
 #include "WidgetSet.h"
 #include "KartProperties.h"
 #include "World.h"
 #include "MenuManager.h"
+#include "RaceManager.h"
 
 enum WidgetTokens {
   WTOK_CONTINUE,
@@ -93,8 +94,8 @@ void RaceResultsGUI::select()
     switch( widgetSet->token( widgetSet->click() ) )
     {
         case WTOK_CONTINUE:
-            menu_manager->pushMenu(MENUID_NEXTRACE);
             widgetSet->tgl_paused();
+            race_manager->next();
             break;
         default:
             break;

@@ -34,7 +34,7 @@ public:
   std::vector<std::string> tracks;
 
   /** Load the CupData from the given filename */
-  CupData(const std::string& filename);
+  CupData(const char* filename);
 };
 
 #endif

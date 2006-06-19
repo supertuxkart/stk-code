@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <sstream>
 #include <stdexcept>
+
 #include "World.h"
 #include "preprocessor.h"
 #include "HerringManager.h"
@@ -137,11 +138,10 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   //ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
 #endif
 
-  menu_manager->pushMenu(MENUID_RACE);
+  menu_manager->switchToRace();
 
-  const std::string MUSIC = track_manager->getTrack(raceSetup.track)->getMusic();
-
-  if (!MUSIC.empty()) sound -> play_track ( MUSIC.c_str() );
+  const char* music_name= track_manager->getTrack(raceSetup.track)->getMusic();
+  if (music_name != NULL) sound->play_track(music_name);
 
   ready_set_go = 3;
   phase        = START_PHASE;
@@ -307,7 +307,7 @@ void World::loadTrack() {
   std::string path = "data/";
   path += track->getIdent();
   path += ".loc";
-  path = loader->getPath(path);
+  path = loader->getPath(path.c_str());
 
   // remove old herrings (from previous race), and remove old
   // track specific herring models

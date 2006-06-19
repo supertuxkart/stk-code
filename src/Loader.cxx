@@ -116,7 +116,7 @@ void Loader::initConfigDir() {
 #endif
 }
 
-std::string Loader::getPath(const std::string& fname) const {
+std::string Loader::getPath(const char* fname) const {
   struct stat mystat;
   std::string result;
    

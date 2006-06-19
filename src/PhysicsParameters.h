@@ -35,7 +35,7 @@ class PhysicsParameters : public KartProperties {
        PhysicsParameters() : KartProperties() {};
   void init_defaults    ();
   void getAllData       (const lisp::Lisp* lisp);
-  void load             (const std::string& filename, 
+  void load             (const char* filename, 
 			 char *node="physics");
 
 };   // PhysicsParameters

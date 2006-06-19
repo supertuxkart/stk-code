@@ -62,7 +62,7 @@ void History::Save() {
   fprintf(fd, "numkarts: %d\n",   nKarts);
   fprintf(fd, "numplayers: %d\n", world->raceSetup.getNumPlayers());
   fprintf(fd, "difficulty: %d\n", world->raceSetup.difficulty);
-  fprintf(fd, "track: %s\n",      world->track->getIdent().c_str());
+  fprintf(fd, "track: %s\n",      world->track->getIdent());
 
   int k;
   for(k=0; k<nKarts; k++) {

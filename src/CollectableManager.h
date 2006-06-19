@@ -40,7 +40,7 @@ class CollectableManager {
  public:
   CollectableManager          (){}
   void         loadCollectable();
-  void         Load           (int collectType, std::string filename);
+  void         Load           (int collectType, const char* filename);
   Material*    getIcon        (int type) {return allIcons [type];}
   float        getSpeed       (int type) {return allSpeeds[type];}
   ssgEntity*   getModel       (int type) {return allModels[type];}

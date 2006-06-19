@@ -26,18 +26,20 @@
 #include "gui/MenuManager.h"
 #include "plibdrv.h"
 
-StartScreen* startScreen = 0;
+StartScreen* startScreen = NULL;
 
-StartScreen::StartScreen()
-    : introMaterial(0)
+StartScreen::StartScreen() 
+    : introMaterial(NULL)
 {
-  menu_manager->pushMenu(MENUID_MAINMENU);
+  menu_manager->switchToMainMenu();
   installMaterial();
   pwSetCallbacks(keystroke, gui_mousefn, gui_motionfn, NULL, NULL);
 }
 
 StartScreen::~StartScreen()
 {
+  delete introMaterial;
+  introMaterial= NULL;
 }
 
 void
@@ -89,17 +91,8 @@ void
 StartScreen::installMaterial()
 {
   /* Make a simplestate for the title screen texture */
-
-  introMaterial = new ssgSimpleState ;
-  //  ssgTexture* texture = loader->createTexture("../images/st_title_screen.rgb", true, true,
-  //       false);
-  //if(!texture) {
-  //  delete introMaterial;
-  //  introMaterial = 0;
-  //  throw std::runtime_error("Couldn't load title_screen.png");
-  // }
-  //introMaterial -> setTexture(texture);
-  introMaterial -> setTexture(loader->getPath("images/st_title_screen.rgb").c_str(),TRUE,TRUE);
+  introMaterial = new ssgSimpleState;
+  introMaterial -> setTexture(loader->getPath("images/st_title_screen.rgb").c_str(), TRUE, TRUE);
   introMaterial -> enable      ( GL_TEXTURE_2D ) ;
   introMaterial -> disable     ( GL_LIGHTING  ) ;
   introMaterial -> disable     ( GL_CULL_FACE ) ;
@@ -118,11 +111,9 @@ StartScreen::installMaterial()
 void
 StartScreen::switchToGame()
 {
-  delete introMaterial ;
-  introMaterial = 0;
-  
-  menu_manager->clearMenus();
-  
+  delete introMaterial;
+  introMaterial= NULL;
+
   race_manager->start();
 }
 

@@ -38,7 +38,7 @@ MainMenu::MainMenu()
 	widgetSet -> state(menu_id, "Options",        GUI_MED, WTOK_OPTIONS, 0);
 	//widgetSet -> state(menu_id, "Credits",  GUI_MED, WTOK_REPLAY, 0);
 	widgetSet -> state(menu_id, "Quit",           GUI_MED, WTOK_QUIT, 0);
-        widgetSet -> space(menu_id);
+    widgetSet -> space(menu_id);
 
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -63,7 +63,7 @@ void MainMenu::select()
                 menu_manager->pushMenu(MENUID_GAMEMODE);     
                 break;
 	case WTOK_MULTI:
- 		            menu_manager->pushMenu(MENUID_NUMPLAYERS);
+                menu_manager->pushMenu(MENUID_NUMPLAYERS);
                 break;
                 
 	case WTOK_REPLAY:
@@ -74,7 +74,7 @@ void MainMenu::select()
                 break;
 
 	case WTOK_QUIT:
-                menu_manager->clearMenus();
+                menu_manager->pushMenu(MENUID_EXITGAME);
                 break;
 	}
 }
@@ -84,11 +84,11 @@ void MainMenu::keybd(int key)
 	switch ( key )
 	{
 	case 27:   //ESC
-	        menu_manager->clearMenus();
+        menu_manager->pushMenu(MENUID_EXITGAME);
 		break;
 
 	default:
-	        BaseGUI::keybd(key);
+        BaseGUI::keybd(key);
 		break;
 	}
 }

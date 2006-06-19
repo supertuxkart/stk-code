@@ -20,27 +20,30 @@
 #include "RaceMenu.h"
 #include "World.h"
 #include "WidgetSet.h"
+
 #include "MenuManager.h"
+#include "RaceManager.h"
+
 
 enum WidgetTokens {
-  WTOK_RETURN,
+  WTOK_RETURN_RACE,
   WTOK_OPTIONS,
-  WTOK_RESTART,
-  WTOK_EXIT,
+  WTOK_RESTART_RACE,
+  WTOK_EXIT_RACE,
 };
 
 RaceMenu::RaceMenu()
 {
-	menu_id = widgetSet -> vstack(0);
+  menu_id = widgetSet -> vstack(0);
   widgetSet -> label(menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
 	
   int va = widgetSet -> varray(menu_id);
-	widgetSet -> start(va, "Return To Race",  GUI_MED, WTOK_RETURN, 0);
-	widgetSet -> state(va, "Options",         GUI_MED, WTOK_OPTIONS, 0);
-	widgetSet -> state(va, "Restart Race",    GUI_MED, WTOK_RESTART, 0);
-	widgetSet -> state(va, "Exit Race",       GUI_MED, WTOK_EXIT, 0);
+  widgetSet -> start(va, "Return To Race",  GUI_MED, WTOK_RETURN_RACE, 0);
+  widgetSet -> state(va, "Options",         GUI_MED, WTOK_OPTIONS, 0);
+  widgetSet -> state(va, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
+  widgetSet -> state(va, "Exit Race",       GUI_MED, WTOK_EXIT_RACE, 0);
 	
-	widgetSet -> layout(menu_id, 0, 0);
+  widgetSet -> layout(menu_id, 0, 0);
 }
 
 RaceMenu::~RaceMenu()
@@ -63,11 +66,11 @@ void RaceMenu::select()
 	
 	switch (clicked_token)
 	{
-	case WTOK_RETURN:	
+	case WTOK_RETURN_RACE:	
                 menu_manager->popMenu(); 
                 break;
 
-	case WTOK_RESTART:
+	case WTOK_RESTART_RACE:
                 menu_manager->popMenu(); 
                 world->restartRace();
                 break;
@@ -76,8 +79,8 @@ void RaceMenu::select()
                 menu_manager->pushMenu(MENUID_OPTIONS);	
                 break;
 
-	case WTOK_EXIT:	
-                menu_manager->pushMenu(MENUID_EXITRACE); 
+	case WTOK_EXIT_RACE:	
+                race_manager->exit_race();
                 break;
                 
 	default:
