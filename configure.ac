@@ -37,6 +37,19 @@ AC_CHECK_HEADER(windows.h)
 
 dnl check for OpenGL related libraries
 case "${host}" in
+*-*-cygwin* | *-*-mingw32*)
+    dnl CygWin under Windoze.
+
+    echo Win32 specific hacks...
+    AC_DEFINE([WIN32], 1, [Define for Win32 platforms])
+    AC_DEFINE([NOMINMAX], 1, [Define for Win32 platforms])
+
+    LIBS="$LIBS -lglut32 -lglu32 -lopengl32 -luser32 -lgdi32 -lm -lwinmm"
+    joystick_LIBS="$joystick_LIBS -lwinmm"
+
+    echo "Will link apps with $LIBS"
+    ;;
+
 *)
    dnl X-Windows based machines
 
