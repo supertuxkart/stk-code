@@ -12,12 +12,17 @@ dnl set the $host variable based on local machine/os
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(supertuxkart, 0.0.0)
 
-
-dnl Checks for programs.
-AC_PROG_MAKE_SET
+dnl Check for compilers.
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+
+dnl Set compiler flags
+CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
+CXXFLAGS="$CXXFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
+
+dnl Checks for programs.
+AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
