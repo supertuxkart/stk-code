@@ -19,7 +19,7 @@ AC_PROG_CXX
 
 dnl Set compiler flags
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
-CXXFLAGS="$CXXFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
+CXXFLAGS="$CXXFLAGS -Wall"
 
 dnl Checks for programs.
 AC_PROG_MAKE_SET

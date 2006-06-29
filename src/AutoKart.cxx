@@ -87,9 +87,22 @@ void AutoKart::update (float delta)
     //If we are going to crash against a kart, avoid it
     else if(crashes.kart != -1)
     {
+        const float PERCENTAGE = curr_track_coords[0] /
+            world->track->getWidth()[trackHint];
+
+        if(curr_track_coords[0] > world->getKart(crashes.kart)->
+           getDistanceToCenter())
+        {
+            if(PERCENTAGE < 0.25f) controls.lr = steer_to_angle(NEXT_HINT, -90.0f);
+        }
+        else
+        {
+            if(PERCENTAGE > -0.25f) controls.lr = steer_to_angle(NEXT_HINT, 90.0f);
+        }
+/*
         controls.lr = curr_track_coords[0] > world->getKart(crashes.kart)->
             getDistanceToCenter() ? steer_to_angle(NEXT_HINT, -90.0f) :
-            steer_to_angle(NEXT_HINT, 90.0f);
+            steer_to_angle(NEXT_HINT, 90.0f);*/
     }
     //Steer to the fartest point in a straight line without crashing
     else
@@ -407,8 +420,8 @@ bool AutoKart::handle_tight_curves()
 
 bool AutoKart::hint_is_behind(const int& HINT)
 {
-    const size_t DRIVELINE_SIZE = world->track->driveline.size();
-    int pos = int(DRIVELINE_SIZE) - int(trackHint) + HINT;
+    const int DRIVELINE_SIZE = world->track->driveline.size();
+    int pos = DRIVELINE_SIZE - int(trackHint) + HINT;
     if(pos > DRIVELINE_SIZE) pos -= DRIVELINE_SIZE;
     if(pos > DRIVELINE_SIZE * 0.5f) return true;
 
@@ -418,7 +431,7 @@ bool AutoKart::hint_is_behind(const int& HINT)
 
 int AutoKart::find_curve(const int& HINT)
 {
-    const size_t DRIVELINE_SIZE = world->track->driveline.size();
+    const int DRIVELINE_SIZE = world->track->driveline.size();
     float total_dist = 0.0f;
     size_t next_hint;
 
@@ -440,7 +453,7 @@ int AutoKart::find_curve(const int& HINT)
 int AutoKart::find_check_hint()
 {
    //Find where to start checking for curves
-    const size_t DRIVELINE_SIZE = world->track->driveline.size();
+    const int DRIVELINE_SIZE = world->track->driveline.size();
     float total_dist = 0.0f;
     size_t next_hint = trackHint;
 
@@ -457,7 +470,7 @@ int AutoKart::find_check_hint()
 void AutoKart::setup_curve_handling()
 {
   size_t next_hint;
-  const size_t DRIVELINE_SIZE = world->track->driveline.size();
+  const int DRIVELINE_SIZE = world->track->driveline.size();
 
   float total_ang_diff = 0.0f, total_dist = 0.0f;
   float dist, ang_diff, pos_ang_diff;
