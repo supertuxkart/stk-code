@@ -26,7 +26,16 @@ class AutoKart : public Kart {
 private:
   float time_since_last_shoot ;
   size_t future_hint;
+
   float starting_delay;
+
+  int next_curve_hint;
+  int next_straight_hint;
+  bool on_curve;
+  bool handle_curve;
+
+  enum DIRECTION{LEFT, RIGHT};
+  DIRECTION curve_direction;
 
   struct CrashTypes
   {
@@ -37,16 +46,23 @@ private:
   } crashes;
 
 
-  enum STEER_SIDE {STEER_LEFT, STEER_RIGHT};
+  float steer_to_angle(const size_t& NEXT_HINT, const float& ANGLE);
+  float steer_to_point(const sgVec2 POINT);
+  float steer_for_tight_curve();
 
-  SGfloat steer_to_side(const size_t &NEXT_HINT, const STEER_SIDE &SIDE);
-  SGfloat steer_to_parallel(const size_t &NEXT_HINT);
-  SGfloat steer_to_point(const sgVec2 POINT);
+  bool do_wheelie(const int& STEPS);
+  void check_crashes(const int& STEPS);
+  int find_non_crashing_hint();
+  bool handle_tight_curves();
 
-  bool do_wheelie(const int &STEPS);
-  void check_crashes(const int &STEPS);
   float guess_accel (const float throttle);
-  void remove_angle_excess (float &angle);
+  void remove_angle_excess (float& angle);
+  int calc_steps();
+  bool hint_is_behind(const int& HINT);
+  int find_curve(const int& HINT);
+  int find_check_hint();
+  void setup_curve_handling();
+
 public:
   AutoKart(const KartProperties *kart_properties, int position);
 

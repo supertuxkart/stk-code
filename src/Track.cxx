@@ -72,8 +72,8 @@ int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const {
   size_t prev,  next ;
   float  dprev, dnext ;
 
-  prev = ( nearest   ==   0              ) ? driveline.size()-1 : (nearest - 1);
-  next = ( nearest+1 >= driveline.size() ) ?      0             : (nearest + 1);
+  prev = ( nearest   ==   0              ) ? driveline_size - 1 : (nearest - 1);
+  next = ( nearest+1 >= driveline_size ) ?      0             : (nearest + 1);
 
   dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
   dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
@@ -133,8 +133,8 @@ int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz ) const {
   size_t prev,  next ;
   float  dprev, dnext ;
 
-  prev = ( nearest   ==   0              ) ? driveline.size()-1 : (nearest - 1);
-  next = ( nearest+1 >= driveline.size() ) ?      0             : (nearest + 1);
+  prev = ( nearest   ==   0              ) ? driveline_size-1 : (nearest - 1);
+  next = ( nearest+1 >= driveline_size ) ?      0             : (nearest + 1);
 
   dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
   dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
@@ -280,19 +280,18 @@ Track::loadDriveline()
           << " points long. Track is " << name << " ." << std::endl;
 
   SGfloat width;
+  sgVec3 center_point, width_vector;
   driveline.reserve(driveline_size);
   path_width.reserve(driveline_size);
   angle.reserve(driveline_size);
   for(unsigned int i = 0; i < driveline_size; ++i)
   {
-      //Reuse the left_driveline as the center driveline to avoid copying
-      sgAddVec3(left_driveline[i], right_driveline[i]);
-      sgScaleVec3(left_driveline[i], 0.5f);
-      driveline.push_back(left_driveline[i]);
+      sgAddVec3(center_point, left_driveline[i], right_driveline[i]);
+      sgScaleVec3(center_point, 0.5f);
+      driveline.push_back(center_point);
 
-      //Reuse the right_driveline as the width of the track to avoid copying
-      sgSubVec3(right_driveline[i], left_driveline[i]);
-      width = sgLengthVec3(right_driveline[i]);
+      sgSubVec3(width_vector, right_driveline[i], center_point);
+      width = sgLengthVec3(width_vector);
       if(width > 0.0f) path_width.push_back(width);
       else path_width.push_back(-width);
   }
@@ -304,8 +303,8 @@ Track::loadDriveline()
   for(unsigned int i = 0; i < driveline_size; ++i)
   {
       next = i + 1 >= driveline_size ? 0 : i + 1;
-      adjacent_line = left_driveline[next][0] - left_driveline[i][0];
-      opposite_line = left_driveline[next][1] - left_driveline[i][1];
+      adjacent_line = driveline[next][0] - driveline[i][0];
+      opposite_line = driveline[next][1] - driveline[i][1];
 
       theta = sgATan(opposite_line/adjacent_line);
       theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
@@ -404,15 +403,21 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
       }
 
 
-//FIXME: make a warning for points with more than 15.0f distance between them.
+//1.5f was choosen because it's more or less the length of the tuxkart
       if(prev_distance > 1.5f)
       {
+#if 0
+          if(prev_distance > 15.0f)
+              std::cerr << "In file " << path << " point " <<
+                  prev_point + 1 << " is too far(+15.0) from previous point.\n";
+#endif
+
           line.push_back(point);
           ++prev_point;
           prev_distance -= 1.5f;
       }
       else std::cerr << "In file " << path << " point " << prev_point + 1 <<
-          " is too close to previous point." << std::endl;
+          " is too close(less than 1.5) to previous point.\n";
     }
 
   fclose ( fd ) ;
