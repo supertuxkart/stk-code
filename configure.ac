@@ -1,5 +1,4 @@
-dnl Process this file with autogen.sh to produce a working configure
-dnl script.
+dnl Process this file with autogen.sh to produce a configure script.
 
 AC_INIT
 AC_CONFIG_SRCDIR([src/start_tuxkart.cxx])
@@ -11,7 +10,7 @@ AC_PREREQ(2.52)
 dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(tuxkart, 0.4.0)
+AM_INIT_AUTOMAKE(supertuxkart, 0.0.0)
 
 
 dnl Checks for programs.
