@@ -247,5 +247,6 @@ the kart might suddenly only rotate on the spot, or hardly
 turn at all. Testing and tweaking and tweaking and testing
 is necessary.
     
-  
-    
+6) Conventions
+The filenames should be lowercase, with underscores between words. Use the .cpp extension for C++ implementation files, and .hpp for C++ headers, .c for C files and .h for C headers.
+
