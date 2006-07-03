@@ -39,9 +39,6 @@ AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
 
 //TODO: if the AI is crashing constantly, make it move backwards in a straight line, then move forward while turning.
 //TODO: rotation should be dependant on how much each kart can rotate, so we don't have crazy cars.
-//TODO: change_steering amount and accel by difficulties with world->raceSetup.difficulty (RD_EASY, RD_MEDIUM, RD_HARD)
-//TODO: turn into constants all the stuff called from world or kart that are used constantly
-//TODO: make the AI steer differently based on the difficulty
 void AutoKart::update (float delta)
 {
     if( world->getPhase() == World::START_PHASE )
@@ -83,32 +80,32 @@ void AutoKart::update (float delta)
     else if(handle_tight_curves()) controls.lr = steer_for_tight_curve();
     //If it seems like the kart will crash with a curve, try to remain
     //in the same direction of the track
-    else if(crashes.curve) controls.lr = steer_to_angle(NEXT_HINT, 0.0f);
+    else if(crashes.curve && world->raceSetup.difficulty == RD_HARD)
+        controls.lr = steer_to_angle(NEXT_HINT, 0.0f);
     //If we are going to crash against a kart, avoid it
     else if(crashes.kart != -1)
     {
-        const float PERCENTAGE = curr_track_coords[0] /
-            world->track->getWidth()[trackHint];
-
-        if(curr_track_coords[0] > world->getKart(crashes.kart)->
-           getDistanceToCenter())
-        {
-            if(PERCENTAGE < 0.25f) controls.lr = steer_to_angle(NEXT_HINT, -90.0f);
-        }
-        else
-        {
-            if(PERCENTAGE > -0.25f) controls.lr = steer_to_angle(NEXT_HINT, 90.0f);
-        }
-/*
         controls.lr = curr_track_coords[0] > world->getKart(crashes.kart)->
             getDistanceToCenter() ? steer_to_angle(NEXT_HINT, -90.0f) :
-            steer_to_angle(NEXT_HINT, 90.0f);*/
+            steer_to_angle(NEXT_HINT, 90.0f);
     }
-    //Steer to the fartest point in a straight line without crashing
     else
-        controls.lr = steer_to_point(
-            world->track->driveline[ find_non_crashing_hint() ] );
-
+        switch(world->raceSetup.difficulty)
+        {
+            //Steer to the fartest point in a straight line without crashing
+            case RD_HARD:
+                controls.lr = steer_to_point(
+                    world->track->driveline[ find_non_crashing_hint() ] );
+                break;
+            //Remain parallel to the track
+            case RD_MEDIUM:
+                controls.lr = steer_to_angle(NEXT_HINT, 0.0f);
+                break;
+            //Just drive in a straight line
+            case RD_EASY:
+                controls.lr = 0.0f;
+                break;
+        }
 
     bool brake = false;
 //At the moment the AI brakes too much
@@ -120,12 +117,35 @@ void AutoKart::update (float delta)
     float braking_distance = velocity.xyz[1] * time - (-guess_accel(-1.0f) / 2) * time * time;
     if(crashes.curve && braking_distance > crashes.curve) brake = true;
 #endif
+
+    bool player_winning = false;
+    for(int i = 0; i < world->raceSetup.getNumPlayers(); ++i)
+        if(racePosition > world->getPlayerKart(i)->getPosition())
+            player_winning = true;
+
+    float difficulty_multiplier = 1.0f;
+    if(!player_winning)
+        switch(world->raceSetup.difficulty)
+        {
+            case RD_EASY:
+                difficulty_multiplier = 0.9f;
+                break;
+            case RD_MEDIUM:
+                difficulty_multiplier = 0.95f;
+                break;
+            case RD_HARD:
+                difficulty_multiplier = 1.0f;
+                break;
+        }
+
+    controls.lr *= difficulty_multiplier;
+
     if(starting_delay < 0.0f)
     {
         if(!brake)
         {
 
-            controls.accel = 1.0f;
+            controls.accel = 1.0f * difficulty_multiplier;
             controls.brake = false;
         }
         else
@@ -256,15 +276,15 @@ void AutoKart::check_crashes(const int &STEPS)
 
                 if(i != 1)
                 {
-                    if(kart_distance < KART_LENGTH*0.5f)
+                    if(kart_distance < KART_LENGTH * 0.5f)
                         if(velocity.xyz[1] > world->getKart(j)->
                            getVelocity()->xyz[1] * 0.75f) crashes.kart = j;
                 }
                 else
                   if(kart_distance < KART_LENGTH)
                   {
-                      if(velocity.xyz[1] > world->getKart(j)->
-                         getVelocity()->xyz[1]) crashes.kart = j;
+                     if(velocity.xyz[1] > world->getKart(j)->
+                         getVelocity()->xyz[1] * 0.95f) crashes.kart = j;
                   }
             }
 
@@ -381,11 +401,26 @@ int AutoKart::calc_steps()
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work correctly on big or small karts.
     const float KART_LENGTH = 1.5f;
-    const int MIN_STEPS = 2;
-    const int MAX_STEPS = int(world->track->getWidth()[trackHint] * 2.0f) + MIN_STEPS;
+
+    int min_steps = 2;
+
+    switch(world->raceSetup.difficulty)
+    {
+        case RD_EASY:
+            min_steps = 0;
+            break;
+        case RD_MEDIUM:
+            min_steps = 1;
+            break;
+        case RD_HARD:
+            min_steps = 2;
+            break;
+    }
+
+    const int MAX_STEPS = int(world->track->getWidth()[trackHint] * 2.0f) + min_steps;
 
     int steps = int(velocity.xyz[1] / KART_LENGTH);
-    if(steps < MIN_STEPS) steps = MIN_STEPS;
+    if(steps < min_steps) steps = min_steps;
     else if(steps > MAX_STEPS) steps = MAX_STEPS;
 
     return steps;
