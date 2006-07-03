@@ -122,7 +122,7 @@ void printkeys() {
 
 void InitPlib() {
   pwInit ( 0, 0, config->width, config->height,
-	   FALSE, "Tux Kart by Steve Baker", TRUE, 0 ) ;
+	   FALSE, "Super Tux Kart", TRUE, 0 ) ;
 
   puInit () ;
   ssgInit () ;
