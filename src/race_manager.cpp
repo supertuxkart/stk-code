@@ -110,7 +110,7 @@ void
 GrandPrixMode::next()
 {
   track += 1;
-  if (track < cup.tracks.size()) {
+  if (track < int(cup.tracks.size())) {
     start_race(track);
   
   } else {
