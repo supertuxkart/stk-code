@@ -54,7 +54,7 @@ void gui_mousefn ( int button, int updown, int x, int y ) {
     if (menu != NULL) {
       menu->select();
     }
-  } else if (button==2 && updown==0) {
+  } else if (button==2 && updown==0 && menu_manager->getMenuStackSize() > 1) {
     menu_manager->popMenu();
   }
   puMouse(button, updown, x, y ) ;

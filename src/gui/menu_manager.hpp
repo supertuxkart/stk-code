@@ -62,7 +62,7 @@ class MenuManager
 public:
   MenuManager();
   virtual ~MenuManager();
-  
+
   // general functions
   void switchToRace();
   void switchToMainMenu();
@@ -70,6 +70,8 @@ public:
   // use this function within menu classes
   void pushMenu(MenuManagerIDs id);
   void popMenu();
+
+  int getMenuStackSize() {return m_menuStack.size();}
 
   bool isCurrentMenu(MenuManagerIDs id) {return (m_menuStack.back() == id);}
   BaseGUI* getCurrentMenu() {return m_currentMenu;}
