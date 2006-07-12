@@ -65,12 +65,11 @@ static jsJoystick *joystick ;
 void pollEvents() {
   BaseGUI* menu= menu_manager->getCurrentMenu();
   if(menu != NULL) {
-    int k= getKeystroke();
+    int k = getKeystroke();
     if(k) {
       menu->keybd(k);
     }   // if k
-
-    if( !( joystick -> notWorking () ) )
+    else if( !( joystick -> notWorking () ) )
     {
       static KartControl controls;
       int prev_buttons = controls.buttons;
