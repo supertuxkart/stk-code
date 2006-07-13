@@ -157,6 +157,18 @@ World::~World() {
   delete scene ;
 
   sound -> stop_music();
+
+  sgVec3 sun_pos;
+  sgVec4 ambient_col, specular_col, diffuse_col;
+  sgSetVec3 ( sun_pos, 0.0, 0.0, 1.0 ) ;
+  sgSetVec4 ( ambient_col , 0.2, 0.2, 0.2, 1.0 ) ;
+  sgSetVec4 ( specular_col, 1.0, 1.0, 1.0, 1.0 ) ;
+  sgSetVec4 ( diffuse_col , 1.0, 1.0, 1.0, 1.0 ) ;
+
+  ssgGetLight ( 0 ) -> setPosition ( sun_pos ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffuse_col ) ;
+  ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
 }
 
 void World::draw() {
