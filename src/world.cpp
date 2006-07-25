@@ -245,7 +245,7 @@ void World::checkRaceStatus() {
       {
           kart[i]->setFinishingState (kart[i]->getPosition(), clock);
 
-          race_manager->setKartScore(i, kart[i]->getPosition());
+          race_manager->addKartScore(i, kart[i]->getPosition());
 
           ++new_finished_karts;
       }

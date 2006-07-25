@@ -34,7 +34,7 @@ public:
   virtual void next ();         // go to the next race if there is any, otherwise main menu
   virtual void exit_race ();    // go directly to main menu
 
-  virtual void setKartScore    (int kart, int pos) {}
+  virtual void addKartScore    (int kart, int pos) {}
   virtual int  getKartScore    (int kart) const {return 0;}
   virtual int  getPositionScore(int pos ) const {return 0;}
 };
@@ -78,7 +78,7 @@ public:
 
   int  getKartScore    (int kart) const    { return karts[kart].score;}
   int  getPositionScore(int pos)  const    { return pos>4 ? 0 : 4-pos;}
-  void setKartScore    (int kart, int pos) { karts[kart].score = 
+  void addKartScore    (int kart, int pos) { karts[kart].score += 
                                                getPositionScore(pos); }
 };
 
@@ -147,7 +147,7 @@ public:
   unsigned int getFinishedKarts() const { return numFinishedKarts;           }
   int  getKartScore(int kart   )  const { return mode->getKartScore(kart);   }
   int  getPositionScore(int pos)  const { return mode->getPositionScore(pos);}
-  void setKartScore(int kart, int pos)  { mode->setKartScore(kart, pos);     }
+  void addKartScore(int kart, int pos)  { mode->addKartScore(kart, pos);     }
   void addFinishedKarts(int num)        { numFinishedKarts += num;           }
 
   void setMirror() {/*FIXME*/}
