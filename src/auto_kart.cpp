@@ -341,7 +341,7 @@ int AutoKart::find_non_crashing_hint()
             distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
                                                   : -step_track_coord[0];
 
-            if (distance + KART_LENGTH * 0.25f > world->track->getWidth()[trackHint])
+            if (distance + KART_LENGTH * 0.5f > world->track->getWidth()[trackHint])
             {
 
                 target_hint = target_hint - 1 < 0 ? DRIVELINE_SIZE - 1 : target_hint - 1;
