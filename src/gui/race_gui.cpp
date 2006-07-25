@@ -404,20 +404,15 @@ void RaceGUI::drawPlayerIcons () {
 }   // drawPlayerIcons
 
 // -----------------------------------------------------------------------------
-void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x, 
+void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
 				 int offset_y, float ratio_x, float ratio_y ) {
-  static float wrong_timer = 0.0f ;
-  static float last_dist = -1000000.0f ;
-  static int last_lap = -1 ;
 
-  float d = player_kart->getDistanceDownTrack () ;
-  int   l = player_kart->getLap () ;
+  float angle_diff = player_kart->getCoord()->hpr[0] - world->track->angle[player_kart->getHint()];
+  if(angle_diff > 180.0f) angle_diff -= 360.0f;
+  else if (angle_diff < -180.0f) angle_diff += 360.0f;
 
-  if ( ( l < last_lap || ( l == last_lap && d < last_dist ) ) &&
-       player_kart -> getVelocity () -> xyz [ 1 ] > 0.0f         ) {
-    wrong_timer += 0.05f; // JH FIXME: was world->clock -> getDeltaTime () ;
-
-    if ( wrong_timer > 2.0f ) {
+  if ((angle_diff > 120.0f || angle_diff < -120.0f) &&
+      player_kart -> getVelocity () -> xyz [ 1 ] > 0.0 ) {
       static int i = FALSE ;
 
       int red, green, blue;
@@ -445,12 +440,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
 			    (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
 
       i = ! i ;
-    }   // if wrong_timer>2.0
-  } else
-    wrong_timer = 0.0f ;
-
-  last_dist = d ;
-  last_lap  = l ;
+  }
 }   //drawEmergencyText
 
 // -----------------------------------------------------------------------------
