@@ -300,8 +300,8 @@ void Kart::update (float dt) {
   wheel_position += sgLengthVec3(velocity.xyz);
 
   if ( rescue ) {
-    rescue = FALSE ;
-    attachment.set( ATTACH_TINYTUX, 4.0f ) ;
+    if(attachment.getType() != ATTACH_TINYTUX)
+        attachment.set( ATTACH_TINYTUX, 4.0f ) ;
   }
   attachment.update(dt, &velocity);
    
@@ -482,6 +482,8 @@ void Kart::handleRescue() {
   float d = curr_pos.xyz[2] ;
   world ->track -> trackToSpatial ( curr_pos.xyz, trackHint ) ;
   curr_pos.xyz[2] = d ;
+  curr_pos.hpr[0] = world->track->angle[trackHint] ;
+  rescue = FALSE ;
 }   // handleRescue
 
 // -----------------------------------------------------------------------------

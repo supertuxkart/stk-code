@@ -112,6 +112,7 @@ public:
   void           setCollectable      (collectableType t, int n) 
                                          { collectable.set(t, n);            }
   void           setPosition          (int p)    {racePosition = p;          }
+  int            getHint              () { return trackHint;                 }
   float          getDistanceDownTrack () { return curr_track_coords[1];      }
   float          getDistanceToCenter  () { return curr_track_coords[0];      }
   attachmentType getAttachment        () { return  attachment.getType();     }
