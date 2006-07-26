@@ -387,9 +387,8 @@ void RaceGUI::drawPlayerIcons () {
       if(last_players_gst==players_gst) {
 	players_gst->getState()->force();
       }
-      //After calling apply the text appears aliased, since it seems the
-      //icon material isn't appropiated for text, so all text output should
-      //be done before this call.
+      //The material of the icons should not have a non-zero alpha_ref value,
+      //because if so the next call can make the text look aliased.
       players_gst -> apply ();
       last_players_gst = players_gst;
       glBegin ( GL_QUADS ) ;
