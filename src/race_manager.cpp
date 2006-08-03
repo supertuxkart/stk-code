@@ -25,8 +25,11 @@
 #include "screen_manager.hpp"
 #include "start_screen.hpp"
 #include "world_screen.hpp"
+#include "empty_screen.hpp"
 #include "kart_manager.hpp"
 #include "race_manager.hpp"
+
+//Is this include needed?
 #include "gui/menu_manager.hpp"
 
 RaceManager* race_manager= NULL;
@@ -116,6 +119,20 @@ GrandPrixMode::next()
   } else {
     exit_race();
   }
+}
+
+void
+GrandPrixMode::exit_race()
+{
+    if (track < int(cup.tracks.size()))
+    {
+        RaceMode::exit_race();
+    }
+    else
+    {
+        screen_manager->setScreen(new EmptyScreen());
+        menu_manager->switchToGrandPrixEnding();
+    }
 }
 
 

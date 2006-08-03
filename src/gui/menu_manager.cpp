@@ -35,6 +35,7 @@
 #include "player_controls.hpp"
 #include "race_gui.hpp"
 #include "race_results_gui.hpp"
+#include "grand_prix_ending.hpp"
 #include "race_manager.hpp"
 #include "screen_manager.hpp"
 #include "start_screen.hpp"
@@ -104,6 +105,9 @@ void MenuManager::update() {
         case MENUID_RACERESULT:
           m_currentMenu= new RaceResultsGUI();
           break;
+        case MENUID_GRANDPRIXEND:
+          m_currentMenu= new GrandPrixEnd();
+          break;
 #if 0
         case MENUID_NEXTRACE:
           race_manager->next();
@@ -145,6 +149,12 @@ void MenuManager::update() {
     m_currentMenu->update(now.getDeltaTime());
   }
 }   // update
+
+void MenuManager::switchToGrandPrixEnding()
+{
+    m_menuStack.clear();
+    pushMenu(MENUID_GRANDPRIXEND);
+}
 
 void MenuManager::switchToRace()
 {

@@ -34,6 +34,7 @@ enum MenuManagerIDs
   MENUID_DIFFICULTY,
   MENUID_GAMEMODE,
   MENUID_RACERESULT,
+  MENUID_GRANDPRIXEND,
 #if 0 // no needed yet
   MENUID_NEXTRACE,
 #endif
@@ -64,6 +65,7 @@ public:
   virtual ~MenuManager();
 
   // general functions
+  void switchToGrandPrixEnding();
   void switchToRace();
   void switchToMainMenu();
 

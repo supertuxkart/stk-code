@@ -36,6 +36,7 @@ public:
 
   virtual void addKartScore    (int kart, int pos) {}
   virtual int  getKartScore    (int kart) const {return 0;}
+  virtual std::string getKartName(int kart) const { return "";}
   virtual int  getPositionScore(int pos ) const {return 0;}
 };
 
@@ -75,9 +76,11 @@ public:
 
   void start();
   void next();
+  void exit_race();
 
   int  getKartScore    (int kart) const    { return karts[kart].score;}
   int  getPositionScore(int pos)  const    { return pos>4 ? 0 : 4-pos;}
+  std::string getKartName(int kart) const  { return karts[kart].ident;}
   void addKartScore    (int kart, int pos) { karts[kart].score += 
                                                getPositionScore(pos); }
 };
@@ -147,6 +150,7 @@ public:
   unsigned int getFinishedKarts() const { return numFinishedKarts;           }
   int  getKartScore(int kart   )  const { return mode->getKartScore(kart);   }
   int  getPositionScore(int pos)  const { return mode->getPositionScore(pos);}
+  std::string getKartName(int kart) const { return mode->getKartName(kart);  }
   void addKartScore(int kart, int pos)  { mode->addKartScore(kart, pos);     }
   void addFinishedKarts(int num)        { numFinishedKarts += num;           }
 

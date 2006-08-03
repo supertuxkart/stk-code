@@ -33,6 +33,7 @@ libMain_a_SOURCES = \
 	shadow.cpp		 shadow.hpp	        \
 	start_screen.cpp		 start_screen.h	        \
 	world_screen.cpp		 world_screen.h	        \
+	empty_screen.cpp		 empty_screen.h	        \
 	particle_system.cpp	 particle_system.hpp       \
 	screen_manager.cpp	 screen_manager.hpp        \
 	widget_set.cpp		 widget_set.hpp	        \
@@ -56,6 +57,7 @@ libMain_a_SOURCES = \
 	gui/base_gui.cpp		 gui/base_gui.hpp	        \
 	gui/race_gui.cpp		 gui/race_gui.hpp	        \
 	gui/race_results_gui.cpp gui/race_results_gui.hpp \
+	gui/grand_prix_ending.cpp gui/grand_prix_ending.hpp \
 	gui/num_laps.cpp		 gui/num_laps.hpp	        \
 	gui/race_menu.cpp	 gui/race_menu.hpp	        \
 	gui/num_players.cpp	 gui/num_players.hpp       \
