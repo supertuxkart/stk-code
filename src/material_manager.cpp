@@ -135,25 +135,27 @@ Material *MaterialManager::getMaterial ( ssgLeaf *l )
 }
 
 
-Material *MaterialManager::getMaterial ( const char *fname )
+Material *MaterialManager::getMaterial ( const char* fname )
 {
   if ( fname == NULL || fname[0] == '\0' )
     return getEntity ( 0 ) ;
 
-  const char *fn ;
-
+  //This copy is made so the original fname is not modified
+  char *fname_copy = strdup(fname);
+  const char *fn;
   /* Remove all leading path information. */
 
-  for ( fn = & fname [ strlen ( fname ) - 1 ] ; fn != fname &&
-                                               *fn != '/' ; fn-- )
+  for ( fn = & fname_copy [ strlen ( fname_copy ) - 1 ] ;
+        fn != fname_copy && *fn != '/' ; fn-- )
     /* Search back for a '/' */ ;
 
-  if ( *fn == '/' )
-    fn++ ;
+    if ( *fn == '/' )
+      fn++ ;
 
   char basename [ 1024 ] ;
 
   strcpy ( basename, fn ) ;
+  free(fname_copy);
 
   /* Remove last trailing extension. */
 

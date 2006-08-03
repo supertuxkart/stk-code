@@ -50,11 +50,7 @@ ssgTransform* createShadow( const std::string& name,
   ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
   gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-
-  // FIXME: necessary since getMaterial modifies the argument
-  char* name_c = strdup(name.c_str());
-  gs -> setState ( material_manager->getMaterial ( name_c ) -> getState () ) ;
-  free(name_c);
+  gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
 
   result -> addKid ( gs ) ;
 
