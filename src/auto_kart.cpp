@@ -80,7 +80,7 @@ void AutoKart::update (float delta)
     else if(handle_tight_curves()) controls.lr = steer_for_tight_curve();
     //If it seems like the kart will crash with a curve, try to remain
     //in the same direction of the track
-    else if(crashes.curve && world->raceSetup.difficulty == RD_HARD)
+    else if(crashes.curve && world->raceSetup.difficulty != RD_MEDIUM)
         controls.lr = steer_to_angle(NEXT_HINT, 0.0f);
     //If we are going to crash against a kart, avoid it
     else if(crashes.kart != -1)
