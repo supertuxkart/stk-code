@@ -42,10 +42,10 @@ public:
         void               loadKartData           ();
   const float              getMaximumSteeringAngle() {return maxSteerAngle;}
   
-  /** Return \a len random karts */
+  /** Return len random karts */
   std::vector<std::string> getRandomKarts         (int len);
 
-  /** Will the empty positions in the given vector with random karts */
+  /** Fill the empty positions in the given vector with random karts */
   void fillWithRandomKarts (std::vector<std::string>& vec);
 };
 
