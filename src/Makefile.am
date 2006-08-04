@@ -74,7 +74,7 @@ libMain_a_SOURCES = \
 	gui/single_window_menu.cpp gui/single_window_menu.hpp
 
 supertuxkart_SOURCES = \
-  start_tuxkart.cpp
+  main.cpp
 
 supertuxkart_LDADD = \
 	$(top_builddir)/src/libMain.a \

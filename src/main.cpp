@@ -1,5 +1,3 @@
-//  $Id: start_tuxkart.cxx 304 2006-01-20 17:57:08Z joh $
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
@@ -17,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//Fixme: Not sure this is needed (Coz).
+//FIXME: Not sure this is needed (Coz).
 #ifdef WIN32
 #  ifdef __CYGWIN__
 #    include <unistd.h>
