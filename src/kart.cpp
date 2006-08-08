@@ -668,7 +668,7 @@ void Kart::placeModel () {
   sgMat4 wheel_rot;
 
   sgMakeRotMat4( wheel_rot, 0, -wheel_position, 0);
-  sgMakeRotMat4( wheel_steer, getSteerAngle()/M_PI , 0, 0);
+  sgMakeRotMat4( wheel_steer, getSteerAngle()/getMaxSteerAngle() * 30.0f , 0, 0);
 
   sgMultMat4(wheel_front, wheel_steer, wheel_rot);
   
