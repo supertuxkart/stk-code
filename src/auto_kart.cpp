@@ -44,6 +44,11 @@ void AutoKart::update (float delta)
     if( world->getPhase() == World::START_PHASE )
     {
         placeModel();
+        //Each kart starts at a different, random time, and the time is
+        //smaller depending on the difficulty.
+        //FIXME: make karts able to get a penalty for accelerating too soon
+        //like players, should happen to about 25% of the karts in easy, and
+        //1% of the karts in hard.
         if(starting_delay <  0.0f)
         {
             switch(world->raceSetup.difficulty)
@@ -249,6 +254,12 @@ float AutoKart::steer_to_point(const sgVec2 POINT)
 
 void AutoKart::check_crashes(const int &STEPS)
 {
+    //Right now there are 2 kind of 'crashes': with other karts and another
+    //with the track. The sight line is used to find if the karts crash with
+    //each other, but the first step is twice as big as other steps to avoid
+    //having karts too close in any direction. The crash with the track can
+    //tell when a kart is going to get out of the track so it steers.
+
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work optimally on big or small karts.
     const float KART_LENGTH = 1.5f;
@@ -398,6 +409,9 @@ inline void AutoKart::remove_angle_excess(float &angle)
 
 int AutoKart::calc_steps()
 {
+    //calc_steps divides the velocity vector by the lenght of the kart and get the number
+    //of steps to use for the sight line of the kart based on that
+
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work correctly on big or small karts.
     const float KART_LENGTH = 1.5f;
