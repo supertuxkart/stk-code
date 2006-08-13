@@ -297,7 +297,7 @@ void Kart::doCollisionAnalysis ( float delta, float hot ) {
 void Kart::update (float dt) {
   //wheel_position gives the rotation around the X-axis, and since velocity's
   //timeframe is the delta time, we don't have to multiply it with dt.
-  wheel_position += sgLengthVec3(velocity.xyz);
+  wheel_position += velocity.xyz[1];
 
   if ( rescue ) {
     if(attachment.getType() != ATTACH_TINYTUX)
