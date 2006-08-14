@@ -1,7 +1,7 @@
 dnl Process this file with autogen.sh to produce a configure script.
 
 AC_INIT
-AC_CONFIG_SRCDIR([src/start_tuxkart.cpp])
+AC_CONFIG_SRCDIR([src/main.cpp])
 
 dnl Require at least automake 2.52
 AC_PREREQ(2.52)
