@@ -80,7 +80,8 @@ private:
       split screens, though, currently, we reduce fonts size to half).        */
     void drawTexture              (const GLuint texture, int w, int h, int red,
 				   int green, int blue, int x, int y);
-    void drawDropShadowText       (const char *str, int sz, int x, int y );
+    void drawDropShadowText       (const char *str, int sz, int x, int y, 
+				   int red=255, int green=255, int blue=255);
     void drawInverseDropShadowText(const char *str, int sz, int x, int y);
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );

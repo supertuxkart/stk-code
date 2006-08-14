@@ -175,9 +175,10 @@ void RaceGUI::drawInverseDropShadowText ( const char *str, int sz,
 }   // drawInverseDropShadowText
 
 // -----------------------------------------------------------------------------
-void RaceGUI::drawDropShadowText (const char *str, int sz, int x, int y ) {
+void RaceGUI::drawDropShadowText (const char *str, int sz, 
+				  int x, int y, int red, int green, int blue) {
   widgetSet->drawText ( str, sz, x, y, 0, 0, 0 ) ;
-  widgetSet->drawText ( str, sz, x+1, y+1, 255, 255, 255 ) ;
+  widgetSet->drawText ( str, sz, x+1, y+1, red, green, blue ) ;
 }  // drawDropShadowText
 
 // -----------------------------------------------------------------------------
@@ -239,9 +240,14 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
     }   // use KPH
   }   // velocity<0
 
+  int red=255, green=255, blue=255;
+  if(!player_kart->isOnGround()) {
+    green=0; blue=0;
+  }
   drawDropShadowText ( str, (int)(36*ratio_y), 
 		       (int)(offset_x+TEXT_START_X        *ratio_x),
-		       (int)(offset_y+(config->height-200)*ratio_y) );
+		       (int)(offset_y+(config->height-200)*ratio_y),
+		       red, green, blue);
 
   /* Show lap number */
   if ( player_kart->getLap() < 0 ) {
