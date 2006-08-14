@@ -110,7 +110,6 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
     sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
 
 
-    float hot = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
     //float hot=0.0;
     // Bug fix/workaround: sometimes the first kart would be too close
     // to the first driveline point and not to the last one -->
@@ -119,6 +118,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
     // is a somewhat arbitrary value.
     init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
     init_pos.xyz[1] = -pos * 1.5f -1.5;
+    float hot = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
     init_pos.xyz[2] = hot;
     newkart -> setReset ( & init_pos ) ;
     newkart -> reset    () ;
