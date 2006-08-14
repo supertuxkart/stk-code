@@ -45,7 +45,7 @@ void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
 // Only keys which must keep on working when still being pressed
 // are handled here, not 'one time action' keys like fire, ...
 void PlayerKart::handleKeyboard(float dt) {
-#define TIMEFORFULLSTEER 0.5f
+#define TIMEFORFULLSTEER 0.3f
 
   if(!config->newKeyboardStyle) {
     controls.lr = isKeyDown(player->getKey(KC_LEFT))  ?  1.0f 

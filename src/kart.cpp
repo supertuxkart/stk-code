@@ -332,7 +332,7 @@ void Kart::update (float dt) {
 
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) {
-  skidding = false;
+  skidFront = skidRear = false;
   sgVec3 AirResistance, SysResistance;
   // Get some values once, to avoid calling them more than once.
   float  gravity     = world->getGravity();
@@ -354,6 +354,7 @@ void Kart::updatePhysics (float dt) {
   }   // if !on_ground
 
 
+#ifndef NEW_PHYSICS
   // apply air friction and system friction
   AirResistance[0]   = 0.0f;
   AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
@@ -439,7 +440,7 @@ void Kart::updatePhysics (float dt) {
   //     by an arbitrary value.
   if(fabs(effForce)>maxGrip) {
     effForce *= 0.4f;
-    skidding  = true;
+    skidRear  = true;
   }   // while effForce>maxGrip
   float accel       = effForce / mass;
 
@@ -462,6 +463,176 @@ void Kart::updatePhysics (float dt) {
     ForceGravity   = -gravity * mass;
   }
   velocity.xyz[2] += ForceGravity / mass * dt;
+#else     // new physics
+
+  // apply air friction and system friction
+  SysResistance[0]   = rollResist*velocity_wc[0]*10;
+  SysResistance[1]   = rollResist*velocity_wc[1];
+  SysResistance[2]   = 0.0f;
+  
+  // 
+  // Compute longitudinal acceleration for slipping
+  // ----------------------------------------------
+  float ForceOnRearTire   = 0.5f*mass*gravity;// + prevAccel*mass*getHeightCOG()/wheelBase;
+  float ForceOnFrontTire  =      mass*gravity - ForceOnRearTire;
+  float maxGrip           = max(ForceOnRearTire,ForceOnFrontTire)*getTireGrip();
+
+  // If the kart is on ground, modify the grip by the friction 
+  // modifier for the texture/terrain.
+  if(on_ground && materialHOT) maxGrip *= materialHOT->getFriction();
+
+  // Longitudinal accelleration 
+  // ==========================
+  float ForceLong = throttle * getMaxPower();
+
+  // Turning forces
+  // ==============
+  float ForceLatFront;
+  float ForceLatRear;
+  float cos_s_a;
+  if(wheelie_angle <= 0.0f && on_ground) {
+    // At low speed, the advanced turning mode can result in 'flickering', i.e.
+    // very quick left/right movements. The reason might be:
+    // 1) integration timestep to big
+    // 2) the kart turning too much, thus 'oversteering', which then gets
+    //    corrected (which might be caused by wrongly tuned physics parameters,
+    //    or the too big timestep mentioned above)
+    // Since at lower speed the simple turning algorithm is good enough, 
+    // the advanced sliding turn algorithm is only used at higher speeds.
+    float speed=sqrt(velocity.xyz[0]*velocity.xyz[0]+velocity.xyz[1]*velocity.xyz[1]);
+    if(speed<1.5/100000.0f) {
+      float steerAngleDegrees = controls.lr * getMaxSteerAngle();
+      curr_pos.hpr[0] += steerAngleDegrees*dt;
+      if(ForceLong>maxGrip) {
+	skidRear=true;
+	ForceLong *= 0.4;
+      }
+      cos_s_a = cos(steerAngleDegrees*M_PI/180.0f);
+      ForceLatRear  = 0.0f;
+      ForceLatFront = 0.0f;
+    } else {   // speed high enough to justify advanced sliding steer algorithm
+      float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0f;
+      float TurnDistance   = velocity.hpr[0]*M_PI/180.0f * wheelBase/2.0f;
+      float slipAngleFront = atan((velocity.xyz[0]+TurnDistance)
+				  /fabsf(velocity.xyz[1]))
+                           - sgn(velocity.xyz[1])*steer_angle;
+      float slipAngleRear  = atan((velocity.xyz[0]-TurnDistance)
+				  /fabsf(velocity.xyz[1]));
+
+#define   PHYSICS_DEBUG
+
+      cos_s_a       = cos(steer_angle);
+      ForceLatFront = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
+                    * ForceOnFrontTire - SysResistance[0]*0.5;
+      ForceLatRear  = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
+                    * ForceOnRearTire  - SysResistance[0]*0.5;
+#  ifdef PHYSICS_DEBUG    
+      printf("steera % 5.3f saf % 5.3f sar % 5.3f v: % 7.3f , % 7.3f sqsum % 7.3f ", 
+	     steer_angle, slipAngleFront, slipAngleRear,
+	     velocity.xyz[0],velocity.xyz[1],speed	     );
+#  endif
+      float torque      = ForceLatRear  * wheelBase/2
+	                - ForceLatFront * wheelBase/2 * cos_s_a; 
+
+      float angAcc      = torque/getInertia();
+      float rotResist   = 0.0f;
+      if(on_ground && materialHOT) rotResist = velocity.hpr[0]*materialHOT->getFriction()*10.0f;
+      velocity.hpr[0] += (angAcc*180.0f/M_PI-rotResist)*dt;
+      curr_pos.hpr[0] += velocity.hpr[0]*dt;
+      
+#  ifdef PHYSICS_DEBUG    
+      printf(" flo % 6.2f flaf % 8.2f flar % 8.2f skid %1d%1d angAcc % 5.3f v_h[0] % 5.3f p_h[0] % 5.3f td % 5.3f dt %f",ForceLong, 
+	     ForceLatFront, ForceLatRear,
+	     skidFront, skidRear, angAcc, velocity.hpr[0]*dt, curr_pos.hpr[0],
+	     TurnDistance,dt);
+#  endif
+    }   // fabsf(velocity.xyz[1])<1.5
+  } else {   // wheelie_angle <=0.0f && on_ground
+    ForceLatRear  = 0.0f;
+    ForceLatFront = 0.0f;
+    cos_s_a       = 1.0f;
+  }
+
+  // Longitudinal accelleration 
+  // ==========================
+  AirResistance[0]   = airFriction*velocity.xyz[0]*fabs(velocity.xyz[0]);;
+  AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
+  AirResistance[2]   = 0.0f;
+  float accelLong     = (ForceLong-AirResistance[1]) / mass;
+
+  float cornerForce   = ForceLatRear + cos_s_a*ForceLatFront-AirResistance[0]-SysResistance[0];
+  float accelLat      = (cornerForce-AirResistance[0])/mass;
+
+  float kartAngle    = curr_pos.hpr[0]*M_PI/180.0f;
+  float sinKartAngle = sin(kartAngle);
+  float cosKartAngle = cos(kartAngle);
+  float aX =  cosKartAngle * accelLat + sinKartAngle * accelLong;
+  float aY = -sinKartAngle * accelLat + cosKartAngle * accelLong;
+
+  velocity_wc[0]    += aX * dt;
+  velocity_wc[1]    += aY * dt;
+  prevAccel          = accelLong;
+  printf(" ax % 5.3f ay % 5.3f %d\n", accelLat, accelLong,on_ground);
+
+  // Gravity handling
+  // ================
+  float GravityForce;
+  if(on_ground) {
+    if(normalHOT) {
+      //      printf("Normal: %f,%f,%f, %f,angl:%f\n", (*normalHOT)[0],
+      //      (*normalHOT)[1],(*normalHOT)[2], (*normalHOT)[3], 
+      //      this->curr_pos.hpr[0]);
+    }
+    if(controls.jump) { // ignore gravity down when jumping
+      GravityForce = physicsParameters->jumpImpulse*gravity;
+    } else {
+      GravityForce = -gravity * mass;
+    }
+  } else {  // kart is not on ground, gravity applies all to z axis.
+    GravityForce   = -gravity * mass;
+  }
+  velocity.xyz[2] += GravityForce / mass * dt;
+
+
+
+  // Now transpose the velocity from world coordinates into kart coordinates
+  // =====================================================================
+  velocity.xyz[0] =  cosKartAngle*velocity_wc[0] - sinKartAngle*velocity_wc[1];
+  velocity.xyz[1] =  sinKartAngle*velocity_wc[0] + cosKartAngle*velocity_wc[1];
+
+// -----------------------------------------------------------------------------
+
+#ifdef CAN_BE_DELETED
+      // different ways of calculating the slip angles, but they 
+      // tend to be less stable
+      float AngVelocity = velocity.hpr[0]*M_PI/180.0f;
+      float turnSpeed = velocity.xyz[0];
+      slipAngleFront  = atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
+                      - sgn(velocity.xyz[1])*steer_angle;
+      //    turnSpeed       = velocity.xyz[0]
+      slipAngleRear   = atan(velocity.xyz[0]/velocity.xyz[1])-AngVelocity*wheelBase/2*dt;
+#endif
+
+
+#ifdef SLIPPING
+      float flo2  = ForceLong        * ForceLong;
+      float flf2  = ForceLatFront    * ForceLatFront;
+      float foft2 = ForceOnFrontTire * ForceOnFrontTire;
+      if( flf2 + flo2 > foft2*10000.0f ) {
+	ForceLatFront *= foft2 / (flf2 + flo2);
+	ForceLong     *= flo2  / (flf2 + flo2);
+	skidFront      = true;
+      }
+      float flr2  = ForceLatRear    * ForceLatRear;
+      float fort2 = ForceOnRearTire * ForceOnRearTire;
+      if( flr2   + flo2 > fort2*10000.0f  ) {
+	ForceLatRear *= flr2 /(flr2+flo2);
+	ForceLong    *= flo2 /(flr2+flo2);
+	skidRear      = true;
+      }
+#endif
+
+#endif
 
 }   // updatePhysics
 
@@ -476,6 +647,33 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const {
     return alpha>0.0f ? corner*maxAlpha : -corner*maxAlpha;
   }
 }   // NormalizedLateralForce
+// -----------------------------------------------------------------------------
+#ifdef NEW_PHYSICS
+void Kart::updatePosition(float dt, sgMat4 result) {
+  // what should happen here:
+  // new_position = old_position + dt*velocity.xyz
+  // new_angle    = old_angle    + dt*velocity.angle (????)
+  // currently:
+  // new_position = old_position + dt*velocity.xyz*curr_pos.alpha
+  // new_angle    = old_angle    + dt*velocity.angle
+
+  sgCoord scaled_velocity ;
+  /* Scale velocities to current time step. */
+  sgScaleVec3(scaled_velocity.xyz, velocity_wc, dt );
+  sgCoord result1; sgAddVec3(result1.xyz, curr_pos.xyz, scaled_velocity.xyz);
+  sgCopyVec3(result1.hpr,curr_pos.hpr);
+  sgMakeCoordMat4(result, &result1);
+  return;
+  /*
+  sgZeroVec3 (scaled_velocity.hpr);
+  sgMat4 delta;  sgMakeCoordMat4 (delta, & scaled_velocity );
+  sgCoord posit;  sgZeroCoord(&posit);sgCopyVec3(posit.xyz,curr_pos.xyz);
+  sgMat4 mat;     sgMakeCoordMat4 (mat  , & posit        );
+  sgMultMat4      (result, mat, delta       );
+  */
+
+}   // updatePosition
+#endif
 // -----------------------------------------------------------------------------
 void Kart::handleRescue() {
   if ( trackHint > 0 ) trackHint-- ;
@@ -492,7 +690,7 @@ void Kart::processSkidMarks() {
   assert(skidmark_left);
   assert(skidmark_right);
   
-  if(skidding) {
+  if(skidRear || skidFront) {
     if(on_ground) {
       const float length = 0.57f;
       if(skidmark_left) {
@@ -551,7 +749,7 @@ void Kart::processSkidMarks() {
         skidmark_right->addBreak(&wheelpos);
       }   // if skidmark_right
     }   // on ground
-  } else {   // !skidding
+  } else {   // !skidRear && !skidFront
     if(skidmark_left)
       if(skidmark_left->wasSkidMarking()) {
         const float angle  = -43.0f;
@@ -671,7 +869,7 @@ void Kart::placeModel () {
   sgMakeRotMat4( wheel_steer, getSteerAngle()/getMaxSteerAngle() * 30.0f , 0, 0);
 
   sgMultMat4(wheel_front, wheel_steer, wheel_rot);
-  
+ 
   if (wheel_front_l) wheel_front_l->setTransform(wheel_front);
   if (wheel_front_r) wheel_front_r->setTransform(wheel_front);
   

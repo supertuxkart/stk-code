@@ -69,7 +69,6 @@ void Moveable::reset () {
 
 // -----------------------------------------------------------------------------
 void Moveable::update (float dt) {
-  sgCoord scaled_velocity ;
   if(historyVelocity) {
     if(config->replayHistory) {
       sgCoord tmp;
@@ -86,14 +85,9 @@ void Moveable::update (float dt) {
     }
   }   // if historyVelocity
 
-  /* Scale velocities to current time step. */
-  sgScaleVec3 ( scaled_velocity.xyz, velocity.xyz, dt );
-  sgScaleVec3 ( scaled_velocity.hpr, velocity.hpr, dt );
+  sgMat4 result; 
+  updatePosition(dt,result);
 
-  sgMat4 delta ; sgMakeCoordMat4 (delta, & scaled_velocity );
-
-  sgMat4 mat   ; sgMakeCoordMat4 (mat  , & curr_pos        );
-  sgMat4 result; sgMultMat4      (result, mat, delta       );
   sgVec3 start ; sgCopyVec3      (start, curr_pos.xyz      );
   sgVec3 end   ; sgCopyVec3      (end  , result[3]         );
   
@@ -124,13 +118,25 @@ void Moveable::update (float dt) {
   float hat = curr_pos.xyz[2]-hot;
    
   on_ground = ( hat <= 0.01 );
-
   doCollisionAnalysis(dt, hot);
 
   placeModel () ;
 
   firsttime = FALSE ;
 }   // update
+
+// -----------------------------------------------------------------------------
+// Computes the new position and hpr of the kart after a single time step.
+void Moveable::updatePosition(float dt, sgMat4 result) {
+  sgCoord scaled_velocity ;
+  sgMat4  delta, mat; 
+  /* Scale velocities to current time step. */
+  sgScaleVec3    (scaled_velocity.xyz, velocity.xyz, dt);
+  sgScaleVec3    (scaled_velocity.hpr, velocity.hpr, dt);
+  sgMakeCoordMat4(delta, & scaled_velocity             );
+  sgMakeCoordMat4(mat  , & curr_pos                    );
+  sgMultMat4     (result, mat, delta                   );
+}   // updatePosition
 
 // -----------------------------------------------------------------------------
 void Moveable::WriteHistory(char* s, int kartNumber, int indx) {

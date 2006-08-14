@@ -20,6 +20,7 @@
 #ifndef HEADER_KART_H
 #define HEADER_KART_H
 
+#include <plib/sg.h>
 #include "moveable.hpp"
 #include "kart_control.hpp"
 #include "particle_system.hpp"
@@ -32,19 +33,17 @@ class SkidMark;
 class Kart;
 class Herring;
 
-class KartParticleSystem : public ParticleSystem
-{
+class KartParticleSystem : public ParticleSystem {
 private:
   Kart* kart;
 
 public:
-  KartParticleSystem ( Kart* kart, int num, float _create_rate,
-      int _turn_to_face, float sz, float bsphere_size);
-
-  virtual void update ( float t ) ;
-  virtual void particle_create( int index, Particle* p );
-  virtual void particle_update( float deltaTime, int index, Particle *p );
-  virtual void particle_delete( int index, Particle* p );
+  KartParticleSystem          (Kart* kart, int num, float _create_rate,
+			       int _turn_to_face, float sz, float bsphere_size);
+  virtual void update         (float t                                        );
+  virtual void particle_create(int index, Particle* p                         );
+  virtual void particle_update(float deltaTime, int index, Particle *p        );
+  virtual void particle_delete(int index, Particle* p                         );
 };
 
 class Kart : public Moveable {
@@ -60,8 +59,10 @@ protected:
   float        ZipperTimeLeft;
   sgVec2       last_track_coords;
   sgVec2       curr_track_coords;
+  sgVec3       velocity_wc;        // velocity in world coordinates
   float        prevAccel;          // acceleration at previous time step
-  bool         skidding;           // true if the kart is currently skidding
+  bool         skidFront;          // true if front tires are skidding
+  bool         skidRear;           // true if rear tires are skidding
 
 private:
   int                 num_herring_gobbled;
@@ -166,8 +167,11 @@ public:
   virtual void   forceCrash          ();
   virtual void   doObjectInteractions();
   virtual void   doLapCounting       ();
-  virtual void   doCollisionAnalysis (float dt, float hot );
-  virtual void   update              (float dt );
+  virtual void   doCollisionAnalysis (float dt, float hot    );
+  virtual void   update              (float dt               );
+#ifdef NEW_PHYSICS
+  virtual void   updatePosition      (float dt, sgMat4 result);
+#endif
   virtual void   OutsideTrack        (int isReset) {rescue=true;} 
 };
 

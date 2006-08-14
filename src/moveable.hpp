@@ -42,7 +42,7 @@ class Moveable {
 protected:
   sgCoord       reset_pos;      /* Where to start in case of a reset           */
   sgCoord       curr_pos;       /* current position                            */
-  sgCoord       velocity;       /* current velocity                            */
+  sgCoord       velocity;       /* current velocity in local coordinates       */
   sgVec3        abs_velocity;   /* world coordinates' velocity vector          */
   sgVec4*       normalHOT;      /* plane on which HOT was computed             */
   Material*     materialHOT;    /* Material at HOT                             */
@@ -77,6 +77,7 @@ public:
   virtual void  handleZipper ()              {};
   virtual void  reset        ();
   virtual void  update       (float dt) ;
+  virtual void  updatePosition(float dt, sgMat4 result);
   virtual void  doCollisionAnalysis(float dt, float hot);
 
   // Gets called when no high of terrain can be determined (isReset=0), or 
