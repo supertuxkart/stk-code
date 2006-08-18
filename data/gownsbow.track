@@ -2,6 +2,7 @@
 
 (tuxkart-track
  (name "Gowns Bow")
+ (gravity 78.0)
  (music "mods/tk5a.mod"))
 
 ;; EOF ;;
