@@ -14,7 +14,7 @@
 #   Resetter     = No
 #   Collide      = Yes   (Yes if you want a collision to stop the kart dead)
 #
-# TextureName    UVClamp Trans AlphaRef Light SphMp Frctn Ign Zip Rst Cold
+# TextureName      UVClamp Trans AlphaRef Light SphMp Frctn   Ign Zip  Rst Cold
 "chrome.rgb"           N N     N      0.0     N     Y   0.5     N   N    N    N
 "chrome2.rgb"          N N     N      0.0     N     Y   0.5     N   N    N    N
 "railing.rgb"          N Y     Y      0.5     Y     N   1.0     N   N    N    N
@@ -71,5 +71,6 @@
 "herring.rgb"          Y Y     Y      0.9     N     N   1.0     Y   N    N    N
 "herringbones.rgb"     Y Y     Y      0.2     N     N   1.0     Y   N    N    N
 "wheel.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
+"water.rgb"            N N     N      0.1     Y     N   1.0     N   N    Y    N
 
 # EOF #
