@@ -40,11 +40,10 @@ public:
   void doCollisionAnalysis (float dt, float hot);
   void doObjectInteractions();
   void explode             ();
-  bool hasHit              () {return hasHitSomething;}
-  void reset               () {Moveable::reset();
-                               sgCopyCoord ( &last_pos, &reset_pos );}
-  void OutsideTrack        (int isReset) {
-    printf("Outside track %p\n",this); explode();}
+  bool hasHit              ()            {return hasHitSomething;            }
+  void reset               ()            {Moveable::reset();
+                                          sgCopyCoord(&last_pos,&reset_pos );}
+  void OutsideTrack        (int isReset) {explode();                         }
 
 } ;
 

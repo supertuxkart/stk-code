@@ -323,7 +323,7 @@ void Config::saveConfig(const std::string& filename) {
     writer.write("disableMagnet\t", disableMagnet);
     writer.writeComment("Use of kilometers per hours (km/h) instead of mph");
     writer.write("useKPH\t", useKPH);
-    writer.writeComment("0: old, 1: new gradual, 2: as 1, but steering reduces when no key is pressed");
+    writer.writeComment("#f: old 'digital' style, #t:new analog style, allows for better turning");
     writer.write("newKeyboardStyle\t", newKeyboardStyle);
 
     writer.writeComment("screen resolution");
