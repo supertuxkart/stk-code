@@ -20,13 +20,13 @@
 ;; marked with ";;OLD" are the parameters for the old physics
  (wheel-base           1.2   )
  (heightCOG            0.2   )
- (engine-power       600     )
+ (engine-power       400     )
  (brake-factor         5     )
- (mass                40     )
- (air-friction         1.3   )
- (roll-resistance      0.05  )
+ (mass               125     )
+ (air-friction         1.8   )
+ (roll-resistance      1.05  )
  (tire-grip            0.9   )
- (max-steer-angle      5     )
+ (max-steer-angle     90     )
  
  (corn-f               4     )
  (corn-r               4     )

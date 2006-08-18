@@ -383,7 +383,11 @@ void Kart::updatePhysics (float dt) {
     //    or the too big timestep mentioned above
     // Since at lower speed the simple turning algorithm is good enough, 
     // the advanced sliding turn algorithm is only used at higher speeds.
-    if(fabsf(velocity.xyz[1])<1.5) {
+
+    // FIXME: for now, only use the simple steering algorithm.
+    //        so the test for 'lower speed' is basically disabled for now,
+    //        since the velocity will always be lower than 1.5*100000.0f
+    if(fabsf(velocity.xyz[1])<1.5*100000.0f) {
       float msa       = getMaxSteerAngle();
       velocity.hpr[0] = msa*controls.lr;
       if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;
@@ -396,23 +400,6 @@ void Kart::updatePhysics (float dt) {
                            - sgn(velocity.xyz[1])*steer_angle;
       float slipAngleRear  = atan((velocity.xyz[0]-TurnDistance)
 				  /fabsf(velocity.xyz[1]));
-#ifdef CAN_BE_DELETED
-      // different ways of calculating the slip angles, but they 
-      // tend to be less stable
-      float AngVelocity = velocity.hpr[0]*M_PI/180.0f;
-      float turnSpeed = velocity.xyz[0];
-      slipAngleFront  = atan(velocity.xyz[0]/velocity.xyz[1])+AngVelocity*wheelBase/2*dt
-                      - sgn(velocity.xyz[1])*steer_angle;
-      //    turnSpeed       = velocity.xyz[0]
-      slipAngleRear   = atan(velocity.xyz[0]/velocity.xyz[1])-AngVelocity*wheelBase/2*dt;
-#endif
-
-#undef   PHYSICS_DEBUG
-#  ifdef PHYSICS_DEBUG    
-      printf("v[0]= %f v[1]= %f sa= %f saf= %f sar= %f ", velocity.xyz[0],
-	     velocity.xyz[1], steer_angle, slipAngleFront, slipAngleRear);
-#  endif
-
       float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
                            * ForceOnFrontTire - SysResistance[0]*0.5;
       float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
@@ -422,10 +409,6 @@ void Kart::updatePhysics (float dt) {
       float torque         =                  ForceLatRear *wheelBase/2
                            - cos(steer_angle)*ForceLatFront*wheelBase/2; 
       float angAcc         = torque/getInertia();
-
-#  ifdef PHYSICS_DEBUG    
-      printf("fF %f rF %f t %f\n",ForceLatFront, ForceLatRear, torque);
-#  endif
 
       velocity.hpr[0] += angAcc*dt*180.0f/M_PI;
     }   // fabsf(velocity.xyz[1])<0.5
@@ -439,8 +422,8 @@ void Kart::updatePhysics (float dt) {
   // --> reduce the effective force acting on the kart - currently
   //     by an arbitrary value.
   if(fabs(effForce)>maxGrip) {
-    effForce *= 0.4f;
-    skidRear  = true;
+    //    effForce *= 0.4f;
+    //    skidRear  = true;
   }   // while effForce>maxGrip
   float accel       = effForce / mass;
 
