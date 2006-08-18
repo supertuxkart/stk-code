@@ -48,7 +48,7 @@ Moveable::~Moveable() {
     delete historyVelocity;
     delete historyPosition;
   }
-  // JH what about model?
+  // FIXME what about model?
 }   // ~Moveable
 
 // -----------------------------------------------------------------------------
@@ -118,6 +118,7 @@ void Moveable::update (float dt) {
   float hat = curr_pos.xyz[2]-hot;
    
   on_ground = ( hat <= 0.01 );
+
   doCollisionAnalysis(dt, hot);
 
   placeModel () ;
@@ -282,7 +283,7 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end ) {
 
   // H.O.T == Height Of Terrain 
   // ==========================
-  float top = COLLISION_SPHERE_RADIUS + ((start[2]>end[2]) ? start[2] : end[2]);
+  float top = COLLISION_SPHERE_RADIUS + max(start[2],end[2]);
   sgVec3 dstart; sgCopyVec3(dstart, end);
   sgVec3 dummy; sgCopyVec3(dummy, end);
   dummy[2]=top;
@@ -290,7 +291,14 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end ) {
   float hot = world->GetHOT(dummy, dummy, &leaf, &normalHOT);
   if(leaf) {
     materialHOT = material_manager->getMaterial(leaf);
-    if(materialHOT->isReset()) OutsideTrack(1);
+    // Only rescue the kart if it (nearly) touches the reset-material,
+    // not only when it is above it. The condition for touching
+    // a material is coarser then for the on_ground condition
+    // (which tests for <0.01) - since the kart might have been falling
+    // for quite some time, it might be really fast, so I guess a somewhat
+    // coarser test is better for that case.
+    if(materialHOT->isReset() &&
+       fabs(top-COLLISION_SPHERE_RADIUS - hot)<0.2) OutsideTrack(1);
     if(materialHOT->isZipper()) handleZipper();
   } else {
     printf("No leaf found for %p, hot=%f\n",this, hot);
