@@ -673,10 +673,19 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
     for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++) {
       int offset_x, offset_y;
       offset_x = offset_y = 0;
-      if((pla==2          ) || (pla == 0 && raceSetup.getNumPlayers() > 1))
-	offset_y = config->height/2;
-      if((pla==2 || pla==3) && (            raceSetup.getNumPlayers() > 2))
-	offset_x = config->width/2;
+
+      if(raceSetup.getNumPlayers() == 2)
+      {
+          if(pla == 0) offset_y = config->height/2;
+      }
+      else if(raceSetup.getNumPlayers() > 2)
+      {
+          if((pla == 0 && raceSetup.getNumPlayers() > 1) || (pla == 1))
+              offset_y = config->height/2;
+
+          if((pla == 1) || pla == 3)
+              offset_x = config->width/2;
+      }
 
       Kart* player_kart=world->getPlayerKart(pla);
       drawCollectableIcons(player_kart, offset_x, offset_y,
