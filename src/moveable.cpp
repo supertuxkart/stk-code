@@ -301,7 +301,6 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end ) {
        fabs(top-COLLISION_SPHERE_RADIUS - hot)<0.2) OutsideTrack(1);
     if(materialHOT->isZipper()) handleZipper();
   } else {
-    printf("No leaf found for %p, hot=%f\n",this, hot);
     OutsideTrack(0);
   }
   

@@ -173,7 +173,7 @@ float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) {
   float hot      = NOINTERSECT;
   int nHashStart = GetHash(start[0], start[1]);
   int nTriangles = (*buckets)[nHashStart].size();
-
+  *leaf          = NULL;
   for(int i=0; i<nTriangles; i++) {
     InfoTriangle *t = (*buckets)[nHashStart][i];
     float hotnew = t->hot(start);
