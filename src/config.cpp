@@ -77,7 +77,7 @@ void Config::setFilename() {
   filename = getConfigDir();
   filename += "/";
 #ifdef WIN32
-  filename += "tuxkart.cfg";
+  filename += "supertuxkart.cfg";
 #else
   filename += "config";
 #endif

@@ -26,7 +26,7 @@
 #include <string>
 #include "player.hpp"
 
-#define CONFIGDIR ".tuxkart"
+#define CONFIGDIR ".supertuxkart"
 
 /*class for managing general tuxkart configuration data*/
 class Config {
