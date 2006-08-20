@@ -355,6 +355,7 @@ void Kart::updatePhysics (float dt) {
 
 
 #ifndef NEW_PHYSICS
+
   // apply air friction and system friction
   AirResistance[0]   = 0.0f;
   AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
@@ -387,11 +388,11 @@ void Kart::updatePhysics (float dt) {
     // FIXME: for now, only use the simple steering algorithm.
     //        so the test for 'lower speed' is basically disabled for now,
     //        since the velocity will always be lower than 1.5*100000.0f
-    if(fabsf(velocity.xyz[1])<1.5*100000.0f) {
+    if(fabsf(velocity.xyz[1])<150000.0f) {
       float msa       = getMaxSteerAngle();
       velocity.hpr[0] = msa*controls.lr;
-      if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;
-      if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;
+      if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;  // In case the AI sets
+      if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;  // controls.lr >1 or <-1
     } else {
       float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0;
       float TurnDistance   = velocity.hpr[0]*M_PI/180.0f * wheelBase/2.0f;
@@ -435,7 +436,29 @@ void Kart::updatePhysics (float dt) {
   float ForceGravity;
   if(on_ground) {
     if(normalHOT) {
-      //      printf("Normal: %f,%f,%f, %f,angl:%f\n", (*normalHOT)[0],(*normalHOT)[1],(*normalHOT)[2], (*normalHOT)[3], this->curr_pos.hpr[0]);
+      // Adjust pitch and roll according to the current terrain. To compute
+      // the correspondant angles, we consider first a normalised line 
+      // pointing into the direction the kart is facing (pointing from (0,0,0) 
+      // to (x,y,0)). The angle between this line and the triangle the kart is 
+      // on determines the pitch. Similartly the roll is computed, using a 
+      // normalised line pointing to the right of the kart, for which we simply
+      // use (-y,x,0).
+      float kartAngle = curr_pos.hpr[0]*M_PI/180.0f;
+      float x = -sin(kartAngle);
+      float y =  cos(kartAngle);
+      // Compute the angle between the normal of the plane and the line to 
+      // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane, 
+      // simplifying the computation of the scalar product.
+      float pitch = ( (*normalHOT)[0]*x + (*normalHOT)[1]*y );  // use ( x,y,0)
+      float roll  = (-(*normalHOT)[0]*y + (*normalHOT)[1]*x );  // use (-y,x,0)
+
+      // The actual angle computed above is between the normal and the (x,y,0) 
+      // line, so to compute the actual angles 90 degrees must be subtracted.
+      pitch = acosf(pitch)/M_PI*180.0f-90.0f;
+      roll  = acosf(roll )/M_PI*180.0f-90.0f;
+#define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*50.0f)
+      curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
+      curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
     }
     if(controls.jump) { // ignore gravity down when jumping
       ForceGravity = physicsParameters->jumpImpulse*gravity;
