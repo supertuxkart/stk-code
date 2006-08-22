@@ -27,7 +27,7 @@
  (roll-resistance      1.05  )
  (tire-grip            0.9   )
  (max-steer-angle     90     )
- 
+ (time-full-steer      0.3   )
  (corn-f               4     )
  (corn-r               4     )
 ;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating

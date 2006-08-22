@@ -40,9 +40,9 @@ class KartProperties : public NoCopy {
   std::string ident;        // The computer readable-name of the karts driver
   std::string model_file;   // Filename of 3d model that is used for kart
   std::string icon_file;    // Filename of icon that represents the kart in
-			                      // the statusbar and the character select screen  
+                            // the statusbar and the character select screen  
   std::string shadow_file;  // Filename of the image file that contains the 
-			                      // shadow for this kart
+			    // shadow for this kart
   float color[3];           // Color the represents the kart in the status
 			                      // bar and on the track-view
   
@@ -57,6 +57,7 @@ class KartProperties : public NoCopy {
   float brake_factor;       // braking factor * engine_power = braking force
   float tire_grip;          // grip of tires in longitudinal direction
   float max_steer_angle;    // maximum steering angle
+  float time_full_steer;    // time for player karts to reach full steer angle
 
   /** old properties */
   float corn_f;
@@ -81,7 +82,8 @@ class KartProperties : public NoCopy {
   float         getMass()           const {return mass;               }
   float         getAirFriction()    const {return air_friction;       }
   float         getRollResistance() const {return roll_resistance;    }
-  float         getMaxPower()       const { return engine_power;      }
+  float         getMaxPower()       const {return engine_power;       }
+  float         getTimeFullSteer()  const {return time_full_steer; }
   float         getBrakeFactor()    const {return brake_factor;       }
   float         getWheelBase()      const {return wheel_base;         }
   float         getHeightCOG()      const {return heightCOG;          }

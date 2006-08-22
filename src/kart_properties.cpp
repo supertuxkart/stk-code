@@ -97,6 +97,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp) {
     lisp->get("wheel-base",      wheel_base);
     lisp->get("heightCOG",       heightCOG);
     lisp->get("engine-power",    engine_power);
+    lisp->get("time-full-steer", time_full_steer);
     lisp->get("brake-factor",    brake_factor);
     lisp->get("roll-resistance", roll_resistance); 
     lisp->get("mass",            mass);
@@ -122,6 +123,7 @@ void KartProperties::init_defaults() {
   wheel_base      = physicsParameters->wheel_base;
   heightCOG       = physicsParameters->heightCOG;
   engine_power    = physicsParameters->engine_power;
+  time_full_steer = physicsParameters->time_full_steer;
   brake_factor    = physicsParameters->brake_factor;
   roll_resistance = physicsParameters->roll_resistance;
   mass            = physicsParameters->mass;

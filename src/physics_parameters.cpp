@@ -44,6 +44,7 @@ void PhysicsParameters::load(const char* filename, char *node) {
   CHECK_NEG(jumpImpulse,"jump-impulse");
   CHECK_NEG(magnetMinRangeSQ,"magnet-min-range");
   CHECK_NEG(parachuteFriction,"parachute-friction");
+  CHECK_NEG(time_full_steer, "time-full-steer");
 
   // Precompute some handy values to reduce work later
   magnetRangeSQ    = magnetRangeSQ   *magnetRangeSQ;
@@ -58,8 +59,8 @@ void PhysicsParameters::init_defaults() {
   wheel_base     = heightCOG   = magnetMinRangeSQ  = roll_resistance = mass   =
     air_friction = tire_grip   = max_steer_angle   = corn_f          = corn_r =
     inertia      = anvilWeight = parachuteFriction = engine_power    =
-    magnetRangeSQ= jumpImpulse = brake_factor      = anvilSpeedFactor
-    = -99.9; 
+    magnetRangeSQ= jumpImpulse = brake_factor      = anvilSpeedFactor=
+    time_full_steer            = -99.9; 
 }   // init_defaults
 
 // -----------------------------------------------------------------------------

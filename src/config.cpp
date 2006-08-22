@@ -99,7 +99,7 @@ void Config::setDefaults() {
   disableMagnet    = false;
   profile          = 0;
   useKPH           = false;
-  newKeyboardStyle = false;
+  newKeyboardStyle = true;
   replayHistory    = false;
   width            = 800;
   height           = 600;

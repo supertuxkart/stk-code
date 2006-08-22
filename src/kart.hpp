@@ -150,6 +150,7 @@ public:
                                                  + attachment.AirFrictAdjust();}
   float          getRollResistance() const {return kartProperties->getRollResistance();}
   float          getMaxPower      () const {return kartProperties->getMaxPower();}
+  float          getTimeFullSteer () const {return kartProperties->getTimeFullSteer();}
   float          getBrakeFactor   () const {return kartProperties->getBrakeFactor();}
   float          getWheelBase     () const {return kartProperties->getWheelBase(); }
   float          getHeightCOG     () const {return kartProperties->getHeightCOG(); }
