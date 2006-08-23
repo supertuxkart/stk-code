@@ -456,9 +456,18 @@ void Kart::updatePhysics (float dt) {
       // line, so to compute the actual angles 90 degrees must be subtracted.
       pitch = acosf(pitch)/M_PI*180.0f-90.0f;
       roll  = acosf(roll )/M_PI*180.0f-90.0f;
-#define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*50.0f)
-      curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
-      curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
+      // if dt is too big, the relaxation will overshoot, and the
+      // karts will either be hopping, or even turn upside down etc.
+      if(dt<=0.05) {
+#define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*20.0f)
+	curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
+	curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
+      } else {
+	curr_pos.hpr[1] = pitch;
+	curr_pos.hpr[2] = roll ;
+      }
+      if(fabsf(curr_pos.hpr[1])>fabsf(pitch)) curr_pos.hpr[1]=pitch;
+      if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
     }
     if(controls.jump) { // ignore gravity down when jumping
       ForceGravity = physicsParameters->jumpImpulse*gravity;
