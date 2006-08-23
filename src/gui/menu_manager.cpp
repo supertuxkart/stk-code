@@ -40,7 +40,8 @@
 #include "screen_manager.hpp"
 #include "start_screen.hpp"
 #include "race_menu.hpp"
-
+#include "help_menu.hpp"
+#include "credits_menu.hpp"
 
 
 MenuManager* menu_manager= new MenuManager();
@@ -136,6 +137,12 @@ void MenuManager::update() {
         case MENUID_CONFIG_SOUND:
           m_currentMenu= new ConfigSound();
           break;
+        case MENUID_HELP:
+          m_currentMenu = new HelpMenu();
+	  break;
+        case MENUID_CREDITS:
+          m_currentMenu = new CreditsMenu();
+	  break;
         default:
           break;
       }   // switch

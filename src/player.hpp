@@ -34,6 +34,7 @@ enum KartActions { KC_LEFT,
 		   KC_RESCUE,
 		   KC_FIRE };
 
+extern char *sKartAction2String[KC_FIRE+1];
 /*class for managing player name and control configuration*/
 class Player
 {

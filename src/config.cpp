@@ -371,5 +371,59 @@ void Config::saveConfig(const std::string& filename) {
     std::cout << "Couldn't write config: " << e.what() << "\n";
   }
 }   // saveConfig
+// -----------------------------------------------------------------------------
+std::string Config::GetKeyAsString(int player_index, KartActions control) {
+  int key         = player[player_index].getKey(control);
+  int useJoystick = player[player_index].IsUsingJoystick();
+  std::string ret;
+  switch (key) {
+    case PW_KEY_RIGHT     : ret="right"  ; break;
+    case PW_KEY_LEFT      : ret="left"   ; break;
+    case PW_KEY_UP        : ret="up"     ; break;
+    case PW_KEY_DOWN      : ret="down"   ; break;
+    case PW_KEY_F1        : ret="F1"     ; break;
+    case PW_KEY_F2        : ret="F2"     ; break;
+    case PW_KEY_F3        : ret="F3"     ; break;
+    case PW_KEY_F4        : ret="F4"     ; break;
+    case PW_KEY_F5        : ret="F5"     ; break;
+    case PW_KEY_F6        : ret="F6"     ; break;
+    case PW_KEY_F7        : ret="F7"     ; break;
+    case PW_KEY_F8        : ret="F8"     ; break;
+    case PW_KEY_F9        : ret="F9"     ; break;
+    case PW_KEY_F10       : ret="F10"    ; break;
+    case PW_KEY_F11       : ret="F11"    ; break;
+    case PW_KEY_F12       : ret="F12"    ; break;
+    case PW_KEY_PAGE_UP   : ret="pg up"  ; break;
+    case PW_KEY_PAGE_DOWN : ret="pg down"; break;
+    case PW_KEY_HOME      : ret="home"   ; break;
+    case PW_KEY_END       : ret="end"    ; break;
+    case PW_KEY_INSERT    : ret="insert" ; break;
+    case 13               : ret="enter"  ; break;
+    case 32               : ret="space"  ; break;
+    default:                ret=" ";
+                            ret[0]=key;
+  }
+  if (useJoystick) {
+    char joyInfo[60];
+    if      (control == KC_LEFT)  sprintf(joyInfo, " or stick left");
+    else if (control == KC_RIGHT) sprintf(joyInfo, " or stick right");
+    else if (control == KC_ACCEL) sprintf(joyInfo, " or stick up");
+    else
+    {
+        const int TARGET_BUTTON = config->player[player_index].getButton(control);
+        int button_number = 0;
+        while((1 << button_number != TARGET_BUTTON) && (button_number < 16))
+            ++button_number;
+
+        if(button_number < 16)
+            sprintf(joyInfo, " or joybutton %d", button_number + 1 );
+        else
+            sprintf(joyInfo, " or unassigned" );
+
+    }
+    ret += joyInfo;
+  }
+  return ret;
+}   // GetKeyAsString
 
 /*EOF*/

@@ -53,7 +53,10 @@ enum MenuManagerIDs
   MENUID_CONFIG_P2,
   MENUID_CONFIG_P3,
   MENUID_CONFIG_P4,
-  
+
+  // help and credit menu
+  MENUID_HELP,
+  MENUID_CREDITS,
   // race gui
   MENUID_RACE,
 };

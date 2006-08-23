@@ -28,7 +28,6 @@ public:
 	NumPlayers();
 	~NumPlayers();
 
-	void update(float dt);
 	void select();
 };
 

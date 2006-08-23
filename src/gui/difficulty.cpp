@@ -47,13 +47,6 @@ Difficulty::~Difficulty() {
 }   // ~Difficulty
 	
 // -----------------------------------------------------------------------------
-void Difficulty::update(float dt) {
-	
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
-}   // update
-
-// -----------------------------------------------------------------------------
 void Difficulty::select() {
   switch ( widgetSet -> token (widgetSet -> click()) ) {
     case WTOK_EASY:

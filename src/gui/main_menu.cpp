@@ -28,17 +28,20 @@ enum WidgetTokens {
   WTOK_OPTIONS,
   WTOK_REPLAY,
   WTOK_QUIT,
+  WTOK_HELP,
+  WTOK_CREDITS,
 };
 
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
-	widgetSet -> start(menu_id, "Single Player",  GUI_MED, WTOK_SINGLE, 0);
-	widgetSet -> state(menu_id, "Multiplayer",    GUI_MED, WTOK_MULTI, 0);
-	widgetSet -> state(menu_id, "Options",        GUI_MED, WTOK_OPTIONS, 0);
-	//widgetSet -> state(menu_id, "Credits",  GUI_MED, WTOK_REPLAY, 0);
-	widgetSet -> state(menu_id, "Quit",           GUI_MED, WTOK_QUIT, 0);
-    widgetSet -> space(menu_id);
+	widgetSet -> start(menu_id, "Single Player", GUI_MED, WTOK_SINGLE,  0);
+	widgetSet -> state(menu_id, "Multiplayer",   GUI_MED, WTOK_MULTI,   0);
+	widgetSet -> state(menu_id, "Options",       GUI_MED, WTOK_OPTIONS, 0);
+	widgetSet -> state(menu_id, "Quit",          GUI_MED, WTOK_QUIT,    0);
+	widgetSet -> state(menu_id, "Help",          GUI_SML, WTOK_HELP,    0);
+	widgetSet -> state(menu_id, "Credits",       GUI_SML, WTOK_CREDITS, 0);
+	widgetSet -> space(menu_id);
 
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -48,12 +51,6 @@ MainMenu::~MainMenu()
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void MainMenu::update(float dt)
-{	
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
-}
-
 void MainMenu::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )
@@ -75,6 +72,12 @@ void MainMenu::select()
 
 	case WTOK_QUIT:
                 menu_manager->pushMenu(MENUID_EXITGAME);
+                break;
+	case WTOK_HELP:
+                menu_manager->pushMenu(MENUID_HELP);
+                break;
+	case WTOK_CREDITS:
+                menu_manager->pushMenu(MENUID_CREDITS);
                 break;
 	}
 }

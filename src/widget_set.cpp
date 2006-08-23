@@ -429,22 +429,24 @@ int WidgetSet::multi(int pd, const char *text, int size, int rect, const float *
     if (text && (id = varray(pd)))
     {
         const char *p;
-
-        char s[8][MAXSTR];
-        int  r[8];
+#define MAX_NUMBER_OF_LINES 20
+	// Important; this s must be static, otherwise the strings will be
+	// lost when returning --> garbage will be displayed.
+        static char s[MAX_NUMBER_OF_LINES][MAXSTR];
+        int  r[MAX_NUMBER_OF_LINES];
         int  i, j;
 
         size_t n = 0;
 
         /* Copy each delimited string to a line buffer. */
 
-        for (p = text, j = 0; *p && j < 8; j++)
+        for (p = text, j = 0; *p && j < MAX_NUMBER_OF_LINES; j++)
         {
-            strncpy(s[j], p, (n = strcspn(p, "\\")));
+            strncpy(s[j], p, (n = strcspn(p, "\n")));
             s[j][n] = 0;
             r[j]    = 0;
 
-            if (*(p += n) == '\\') p++;
+            if (*(p += n) == '\n') p++;
         }
 
         /* Set the curves for the first and last lines. */

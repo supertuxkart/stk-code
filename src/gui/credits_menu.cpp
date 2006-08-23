@@ -1,4 +1,4 @@
-//  $Id: NumLaps.cxx,v 1.1 2005/08/19 20:43:04 joh Exp $
+//  $Id: credits_menu.hpp, v 1.3 2005/05/31 00:49:50 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,37 +17,39 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "num_laps.hpp"
-#include "race_manager.hpp"
-#include "start_screen.hpp"
+#include "credits_menu.hpp"
 #include "widget_set.hpp"
+#include "race_manager.hpp"
+#include "menu_manager.hpp"
+#include "config.hpp"
+#include "player.hpp"
 
-NumLaps::NumLaps() {
-  menu_id = widgetSet -> varray(0);
-
-  widgetSet -> label(menu_id, "Choose number of laps", GUI_LRG, GUI_ALL, 0, 0);
-
-  widgetSet -> start(menu_id, "One",   GUI_MED, 1, 0);
-  widgetSet -> state(menu_id, "Two",   GUI_MED, 2, 0);
-  widgetSet -> state(menu_id, "Three", GUI_MED, 3, 0);
-  widgetSet -> state(menu_id, "Four",  GUI_MED, 4, 0);
-  widgetSet -> state(menu_id, "Five",  GUI_MED, 5, 0);
-  widgetSet -> space(menu_id);
-
-  widgetSet -> layout(menu_id, 0, 0);
-}
+CreditsMenu::CreditsMenu(){
+  menu_id = widgetSet->vstack(0);
+  widgetSet->multi(menu_id, 
+"Project leader:\n\
+Joerg Henrichs (hiker); Coz (coz)\n\
+Developers:\n\
+Patrick Ammann, ???\n\
+Original Tuxkart Developer:\n\
+Steve Baker\n\
+GotM Team:\n\
+Ingo Ruhnke (grumbel), ???\n\
+Art work:\n\
+Steve Baker, Oliver Baker, ???\n", GUI_SML);
+  widgetSet->label(menu_id,"Press <ESC> to go back", GUI_SML);
+  widgetSet->layout(menu_id, 0, 0);
+}   // CreditsMenu
 
 // -----------------------------------------------------------------------------
-NumLaps::~NumLaps() {
+CreditsMenu::~CreditsMenu() {
   widgetSet -> delete_widget(menu_id) ;
-}   // ~NumLaps
-
+}   // ~CreditsMenu
+	
 // -----------------------------------------------------------------------------
-void NumLaps::select() {
-  race_manager->setNumLaps(widgetSet->token(widgetSet->click() ));
-  startScreen->switchToGame();
-  
+void CreditsMenu::select() {
+  return;
 }   // select
 
-
-
+// -----------------------------------------------------------------------------
+/* EOF */

@@ -50,8 +50,8 @@ void ConfigDisplay::update(float dt)
 	widgetSet -> timer(menu_id, dt) ;
   // This menu can be triggered from the game, when it is paused
   // so we have to check it and draw it as in pause
-  if(widgetSet -> get_paused())
-    widgetSet -> blank() ;
+	if(widgetSet -> get_paused())
+	  widgetSet -> blank() ;
 	widgetSet -> paint(menu_id) ;
 }
 

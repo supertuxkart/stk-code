@@ -150,14 +150,16 @@ public:
 	int  state(int, const char *, int, int, int);
 	
 	//a text label (cannot be selected). c0 and c1 are two colours that the text is shaded with
-	int  label(int pd, const char *text, int size, int rect, const float *c0, const float *c1);
+	int  label(int pd, const char *text, int size=GUI_MED, int rect=GUI_ALL,
+		   const float *c0=0, const float *c1=0);
 	
 	/*
 	* Create  a multi-line  text box  using a  vertical array  of labels.
 	* Parse the  text for '\'  characters and treat them  as line-breaks.
 	* Preserve the rect specifation across the entire array.
 	*/ 
-	int  multi(int, const char *, int, int, const float *, const float *);
+	int  multi(int, const char *, int size=GUI_MED, int rect=GUI_ALL, 
+		   const float *c0=0, const float *c1=0);
 	
 	//widget is a single number - e.g. an fps counter or whatever
 	int  count(int, int, int, int);

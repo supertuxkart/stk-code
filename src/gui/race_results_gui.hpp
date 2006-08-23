@@ -31,7 +31,6 @@ public:
   RaceResultsGUI();
   ~RaceResultsGUI();
 
-  void update(float dt);
   void select();
 };
 

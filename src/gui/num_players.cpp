@@ -45,12 +45,6 @@ NumPlayers::~NumPlayers()
   widgetSet -> delete_widget(menu_id) ;
 }
 
-void NumPlayers::update(float dt)
-{
-  widgetSet -> timer(menu_id, dt) ;
-  widgetSet -> paint(menu_id) ;
-}
-
 void NumPlayers::select()
 {
   int clicked_id= widgetSet -> token (widgetSet -> click());

@@ -49,13 +49,6 @@ GameMode::~GameMode()
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void GameMode::update(float dt)
-{
-	
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
-}
-
 void GameMode::select()
 {
 	switch ( widgetSet -> token (widgetSet -> click()) )

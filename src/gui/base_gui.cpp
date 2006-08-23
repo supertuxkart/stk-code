@@ -46,18 +46,21 @@ void BaseGUI::keybd(int key) {
   }   // switch
 }   // keybd
 
+// -----------------------------------------------------------------------------
 void BaseGUI::point(int x, int y) {
   if(widgetSet) {
     widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
   }
 }   // point
 
+// -----------------------------------------------------------------------------
 void BaseGUI::stick(const int &whichAxis, const float &value) {
   if(widgetSet) {
     widgetSet -> pulse(widgetSet -> stick(menu_id, whichAxis, (int)value), 1.2f);
   }
 }   // stick
 
+// -----------------------------------------------------------------------------
 void BaseGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
   (void)whichJoy; (void)hold; (void)releases;
 
@@ -69,5 +72,11 @@ void BaseGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
     menu_manager->popMenu();
   }
 }   // joybuttons
+// -----------------------------------------------------------------------------
+
+void BaseGUI::update(float dt) {
+  widgetSet -> timer(menu_id, dt) ;
+  widgetSet -> paint(menu_id) ;
+}   // update
 
 /* EOF */

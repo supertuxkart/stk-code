@@ -117,9 +117,7 @@ void CharSel::switch_to_character(int n)
 void CharSel::update(float dt)
 {
 	clock += dt * 40.0f;
-
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
+	BaseGUI::update(dt);
 
 	switch_to_character(widgetSet->token(widgetSet->click()));
 

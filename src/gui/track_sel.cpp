@@ -62,10 +62,8 @@ TrackSel::~TrackSel()
 	widgetSet -> delete_widget(menu_id) ;
 }
 	
-void TrackSel::update(float dt)
-{
-  widgetSet -> timer(menu_id, dt) ;
-  widgetSet -> paint(menu_id) ;
+void TrackSel::update(float dt) {
+  BaseGUI::update(dt);
 
   glClear(GL_DEPTH_BUFFER_BIT);
 

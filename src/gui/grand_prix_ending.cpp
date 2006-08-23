@@ -89,9 +89,7 @@ void GrandPrixEnd::update(float dt)
 
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> paint(menu_id) ;
+    BaseGUI::update(dt);
 
     ssgContext* oldContext = ssgGetCurrentContext();
     context -> makeCurrent();

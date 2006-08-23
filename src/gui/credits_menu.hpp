@@ -1,4 +1,4 @@
-//  $Id: Difficulty.h,v 1.1 2005/05/25 21:47:54 joh Exp $
+//  $Id: credit_menu.hpp,v 1.2 2005/05/27 10:25:52 joh Exp $
 //
 //  TuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -17,18 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DIFFICULTY_H
-#define HEADER_DIFFICULTY_H
+#ifndef HEADER_CREDITSMENU_H
+#define HEADER_CREDITSMENU_H
 
+#include <string>
 #include "base_gui.hpp"
+#include "player.hpp"
 
-class Difficulty: public BaseGUI
-{
+class CreditsMenu: public BaseGUI {
+protected:
+  std::string allKeys[KC_FIRE+1];
 public:
-	Difficulty();
-	~Difficulty();
-	
-	void select();
+       CreditsMenu();
+      ~CreditsMenu();
+  void select  ();
 };
 
 #endif

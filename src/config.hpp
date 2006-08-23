@@ -66,6 +66,7 @@ class Config {
     void loadConfig(const std::string& filename);
     void saveConfig();
     void saveConfig(const std::string& filename);
+    std::string GetKeyAsString(int player_index, KartActions control);
 };
 
 

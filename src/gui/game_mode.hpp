@@ -28,7 +28,6 @@ public:
 	GameMode();
 	~GameMode();
 	
-	void update(float dt);
 	void select();
 };
 

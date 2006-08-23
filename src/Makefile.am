@@ -71,7 +71,9 @@ libMain_a_SOURCES = \
 	gui/difficulty.cpp	 gui/difficulty.hpp       \
 	gui/char_sel.cpp		 gui/char_sel.hpp	        \
 	gui/main_menu.cpp	 gui/main_menu.hpp         \
-	gui/single_window_menu.cpp gui/single_window_menu.hpp
+	gui/single_window_menu.cpp gui/single_window_menu.hpp		\
+	gui/help_menu.cpp 	 gui/help_menu.hpp 			\
+	gui/credits_menu.cpp	 gui/credits_menu.hpp
 
 supertuxkart_SOURCES = \
   main.cpp

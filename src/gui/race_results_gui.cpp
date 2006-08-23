@@ -83,12 +83,6 @@ RaceResultsGUI::~RaceResultsGUI()
     delete score;
 }
 
-void RaceResultsGUI::update(float dt)
-{
-    widgetSet -> timer(menu_id, dt) ;
-    widgetSet -> paint(menu_id) ;
-}
-
 void RaceResultsGUI::select()
 {
     switch( widgetSet->token( widgetSet->click() ) )

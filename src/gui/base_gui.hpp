@@ -26,7 +26,7 @@ public:
 	BaseGUI() {}
 	virtual ~BaseGUI() {}
 
-	virtual void update(float dt) = 0;
+	virtual void update(float dt);
 	virtual void select() = 0;
 	virtual void keybd(int key);
 	virtual void point(int x, int y);

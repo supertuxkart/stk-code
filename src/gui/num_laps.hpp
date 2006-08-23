@@ -27,7 +27,6 @@ public:
   NumLaps();
   ~NumLaps();
   
-  void update(float dt);
   void select();
 };
 

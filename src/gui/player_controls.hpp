@@ -31,7 +31,6 @@ public:
 	PlayerControls(int whichPlayer);
 	~PlayerControls();
 
-	void update(float dt);
 	void select();
 	void keybd(int key);
 	void point(int x, int y);
