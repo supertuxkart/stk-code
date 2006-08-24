@@ -28,7 +28,7 @@ CreditsMenu::CreditsMenu(){
   menu_id = widgetSet->vstack(0);
   widgetSet->multi(menu_id, 
 "Project leader:\n\
-Joerg Henrichs (hiker); Coz (coz)\n\
+Joerg Henrichs (hiker); Eduardo Hernandez Munoz (coz)\n\
 Developers:\n\
 Patrick Ammann, ???\n\
 Original Tuxkart Developer:\n\
@@ -36,8 +36,10 @@ Steve Baker\n\
 GotM Team:\n\
 Ingo Ruhnke (grumbel), ???\n\
 Art work:\n\
-Steve Baker, Oliver Baker, ???\n", GUI_SML);
-  widgetSet->label(menu_id,"Press <ESC> to go back", GUI_SML);
+Steve Baker, Oliver Baker, ???\n\
+Music:\n\
+Matt Thomas", GUI_SML);
+  widgetSet->start(menu_id,"Press <ESC> to go back", GUI_SML, 1, 0);
   widgetSet->layout(menu_id, 0, 0);
 }   // CreditsMenu
 
@@ -48,7 +50,8 @@ CreditsMenu::~CreditsMenu() {
 	
 // -----------------------------------------------------------------------------
 void CreditsMenu::select() {
-  return;
+  // must be esc, nothing else is available. So just pop this menu
+  menu_manager->popMenu();
 }   // select
 
 // -----------------------------------------------------------------------------

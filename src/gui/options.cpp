@@ -25,17 +25,25 @@ enum WidgetTokens {
   WTOK_CONTROLS,
   WTOK_DISPLAY,
   WTOK_SOUND,
+  WTOK_BACK,
 };
 
 Options::Options()
 {
 	menu_id = widgetSet -> varray(0);
 
+	widgetSet -> space(menu_id);
+	widgetSet -> space(menu_id);
 	widgetSet -> label(menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> start(menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
+#if !defined(WIN32) && !defined(__CYGWIN__) 	
+	// Display-options only allow setting of fullscreen, which isn't
+	// supported for windows anyway, so it can just be skipped
 	widgetSet -> state(menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
+#endif
 	widgetSet -> state(menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);
 	widgetSet -> space(menu_id);
+	widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
 	
 	widgetSet -> layout(menu_id, 0, 0);
 }
@@ -55,20 +63,21 @@ void Options::update(float dt)
 	widgetSet -> paint(menu_id) ;
 }
 
-void Options::select()
-{
-	switch ( widgetSet -> token (widgetSet -> click()) )
-	{
-	case WTOK_CONTROLS:
-    menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);
-    break;
-	case WTOK_DISPLAY:
-    menu_manager->pushMenu(MENUID_CONFIG_DISPLAY);
-    break;
-	case WTOK_SOUND:
-    menu_manager->pushMenu(MENUID_CONFIG_SOUND);
-    break;
-	default:
-    break;
-	}
+void Options::select() {
+  switch ( widgetSet -> token (widgetSet -> click()) ) 	{
+    case WTOK_CONTROLS:
+      menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);
+      break;
+    case WTOK_DISPLAY:
+      menu_manager->pushMenu(MENUID_CONFIG_DISPLAY);
+      break;
+    case WTOK_SOUND:
+      menu_manager->pushMenu(MENUID_CONFIG_SOUND);
+      break;
+    case WTOK_BACK:
+      menu_manager->popMenu();
+      break;
+    default:
+      break;
+  }  // switch
 }

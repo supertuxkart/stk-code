@@ -26,6 +26,7 @@ enum WidgetTokens {
   WTOK_HARD,
   WTOK_MEDIUM,
   WTOK_EASY,
+  WTOK_BACK
 };
 
 Difficulty::Difficulty() {
@@ -34,9 +35,13 @@ Difficulty::Difficulty() {
   widgetSet -> label(menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
   
   int va = widgetSet -> varray(menu_id);
+  widgetSet -> space(menu_id);
+  widgetSet -> space(menu_id);
   widgetSet -> state(va, "Racer",  GUI_MED, WTOK_HARD, 0);
   widgetSet -> state(va, "Driver", GUI_MED, WTOK_MEDIUM, 0);
   widgetSet -> start(va, "Novice", GUI_MED, WTOK_EASY, 0);
+  widgetSet -> space(menu_id);
+  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
 
   widgetSet -> layout(menu_id, 0, 0);
 }   // Difficulty
@@ -60,6 +65,9 @@ void Difficulty::select() {
     case WTOK_HARD:
       race_manager->setDifficulty(RD_HARD);
       menu_manager->pushMenu(MENUID_CHARSEL_P1);
+      break;
+    case WTOK_BACK:
+      menu_manager->popMenu();
       break;
     default: break;
   }   // switch

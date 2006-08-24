@@ -21,17 +21,23 @@
 #include "race_manager.hpp"
 #include "start_screen.hpp"
 #include "widget_set.hpp"
+#include "menu_manager.hpp"
 
 NumLaps::NumLaps() {
   menu_id = widgetSet -> varray(0);
 
-  widgetSet -> label(menu_id, "Choose number of laps", GUI_LRG, GUI_ALL, 0, 0);
+  widgetSet -> space(menu_id);
+  widgetSet -> space(menu_id);
+  widgetSet -> space(menu_id);
+  widgetSet -> label(menu_id, "Choose number of laps",  GUI_LRG   );
 
-  widgetSet -> start(menu_id, "One",   GUI_MED, 1, 0);
-  widgetSet -> state(menu_id, "Two",   GUI_MED, 2, 0);
-  widgetSet -> state(menu_id, "Three", GUI_MED, 3, 0);
-  widgetSet -> state(menu_id, "Four",  GUI_MED, 4, 0);
-  widgetSet -> state(menu_id, "Five",  GUI_MED, 5, 0);
+  widgetSet -> start(menu_id, "One",                    GUI_MED,  1);
+  widgetSet -> state(menu_id, "Two",                    GUI_MED,  2);
+  widgetSet -> state(menu_id, "Three",                  GUI_MED,  3);
+  widgetSet -> state(menu_id, "Four",                   GUI_MED,  4);
+  widgetSet -> state(menu_id, "Five",                   GUI_MED,  5);
+  widgetSet -> space(menu_id);
+  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML,  6);
   widgetSet -> space(menu_id);
 
   widgetSet -> layout(menu_id, 0, 0);
@@ -44,9 +50,13 @@ NumLaps::~NumLaps() {
 
 // -----------------------------------------------------------------------------
 void NumLaps::select() {
-  race_manager->setNumLaps(widgetSet->token(widgetSet->click() ));
-  startScreen->switchToGame();
-  
+  int n = widgetSet->token(widgetSet->click() );
+  if(n==6) {
+    menu_manager->popMenu();
+  } else {
+    race_manager->setNumLaps(n);
+    startScreen->switchToGame();
+  }
 }   // select
 
 

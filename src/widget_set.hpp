@@ -144,10 +144,10 @@ public:
 	int  image(int, const char *, int, int);
 	
 	//a normal text menu entry, except that it is automatically immediately activated
-	int  start(int, const char *, int, int, int);
+	int  start(int, const char *, int, int, int value=0);
 	
 	//a normal text menu entry
-	int  state(int, const char *, int, int, int);
+	int  state(int, const char *, int, int, int value=0);
 	
 	//a text label (cannot be selected). c0 and c1 are two colours that the text is shaded with
 	int  label(int pd, const char *text, int size=GUI_MED, int rect=GUI_ALL,

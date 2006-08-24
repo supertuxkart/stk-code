@@ -55,12 +55,12 @@ GrandPrixEnd::GrandPrixEnd()
     std::stringstream output;
     //FIXME: when a long string is used the output gets corrupted.
     output << "The winner is " << winning_kart->getName() << "!";
-	widgetSet -> label(menu_id, output.str().c_str(), GUI_LRG, GUI_ALL, 0, 0);
-	widgetSet -> space(menu_id);
-
-	widgetSet -> label(menu_id, "Back to the main menu", GUI_LRG, GUI_ALL, 0, 0);
-
-	widgetSet -> layout(menu_id, 0, 1);
+    widgetSet -> label(menu_id, output.str().c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> space(menu_id);
+    
+    widgetSet -> label(menu_id, "Back to the main menu", GUI_LRG, GUI_ALL, 0, 0);
+    
+    widgetSet -> layout(menu_id, 0, 1);
 
     kart = new ssgTransform;
     kart->ref();

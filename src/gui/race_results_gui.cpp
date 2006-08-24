@@ -72,7 +72,7 @@ RaceResultsGUI::RaceResultsGUI()
     widgetSet -> space(menu_id);
 
     int va = widgetSet -> varray(menu_id);
-    widgetSet -> start(va, "Continue",  GUI_MED, WTOK_CONTINUE, 0);
+    widgetSet -> start(va, "Continue",  GUI_MED, WTOK_CONTINUE);
     
     widgetSet -> layout(menu_id, 0, 1);
 }

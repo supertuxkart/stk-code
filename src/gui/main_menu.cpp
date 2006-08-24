@@ -35,10 +35,13 @@ enum WidgetTokens {
 MainMenu::MainMenu()
 {
 	menu_id = widgetSet -> varray(0);
+	widgetSet -> space(menu_id);
+	widgetSet -> space(menu_id);
 	widgetSet -> start(menu_id, "Single Player", GUI_MED, WTOK_SINGLE,  0);
 	widgetSet -> state(menu_id, "Multiplayer",   GUI_MED, WTOK_MULTI,   0);
 	widgetSet -> state(menu_id, "Options",       GUI_MED, WTOK_OPTIONS, 0);
 	widgetSet -> state(menu_id, "Quit",          GUI_MED, WTOK_QUIT,    0);
+	widgetSet -> space(menu_id);
 	widgetSet -> state(menu_id, "Help",          GUI_SML, WTOK_HELP,    0);
 	widgetSet -> state(menu_id, "Credits",       GUI_SML, WTOK_CREDITS, 0);
 	widgetSet -> space(menu_id);

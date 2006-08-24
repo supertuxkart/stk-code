@@ -42,9 +42,10 @@ PlayerControls::PlayerControls(int whichPlayer): player_index(whichPlayer),
 
   for(int i=KC_LEFT; i<=KC_FIRE; i++) {
     addKeyLabel(change_id, (KartActions)i,    i==0 );
-    widgetSet->label(label_id, sKartAction2String[i], GUI_MED, GUI_ALL, 0, 0);
+    widgetSet->label(label_id, sKartAction2String[i]);
   }
 
+  widgetSet->state(menu_id,"Press <ESC> to go back", GUI_SML, -1);
   widgetSet -> layout(menu_id, 0, 0);
 }   // PlayerControls
 
@@ -59,6 +60,10 @@ void PlayerControls::select() {
 
   grab_id        = widgetSet -> click();
   int menuChoice = widgetSet -> token (grab_id);
+  if(menuChoice==-1) {
+    menu_manager->popMenu();
+    return;
+  }
 
   editAction   = static_cast<KartActions>(menuChoice);
   grabInput = true;
@@ -115,11 +120,9 @@ void PlayerControls::addKeyLabel(int change_id, KartActions control, bool start)
   setKeyInfoString(control);
 
   if (start)
-    widgetSet -> start(change_id, KeyNames[control].c_str(), GUI_MED,
-		       control, 0);
+    widgetSet -> start(change_id, KeyNames[control].c_str(), GUI_MED, control);
   else
-    widgetSet -> state(change_id, KeyNames[control].c_str(), GUI_MED,
-		       control, 0);
+    widgetSet -> state(change_id, KeyNames[control].c_str(), GUI_MED, control);
 }   // addKeyLabel
 
 // -----------------------------------------------------------------------------
@@ -131,7 +134,5 @@ void PlayerControls::changeKeyLabel(int grab_id, KartActions control) {
 
 // -----------------------------------------------------------------------------
 void PlayerControls::setKeyInfoString(KartActions control) {
-  std::string ret = config->GetKeyAsString(player_index, control);
-  KeyNames[control] = ret;
-
+  KeyNames[control] = config->GetKeyAsString(player_index, control);
 }   // setKeyInfoString

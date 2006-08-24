@@ -26,15 +26,18 @@ enum WidgetTokens {
   WTOK_PLAYER_2= 2,
   WTOK_PLAYER_3,
   WTOK_PLAYER_4,
+  WTOK_BACK
 };
 
 NumPlayers::NumPlayers()
 {
   menu_id = widgetSet -> varray(0);
-  widgetSet -> start(menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2, 0);
-  widgetSet -> state(menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3, 0);
-  widgetSet -> state(menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4, 0);
   widgetSet -> space(menu_id);
+  widgetSet -> start(menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2);
+  widgetSet -> state(menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3);
+  widgetSet -> state(menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4);
+  widgetSet -> space(menu_id);
+  widgetSet -> state(menu_id,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
   widgetSet -> space(menu_id);
 
   widgetSet -> layout(menu_id, 0, 0);
@@ -54,6 +57,9 @@ void NumPlayers::select()
     case WTOK_PLAYER_4:
       race_manager->setNumPlayers(clicked_id);
       menu_manager->pushMenu(MENUID_GAMEMODE);
+      break;
+    case WTOK_BACK:
+      menu_manager->popMenu();
       break;
     default:
       break;

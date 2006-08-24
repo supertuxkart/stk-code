@@ -23,52 +23,52 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_FULLSCREEN_TOGGLE,
+  WTOK_FULLSCREEN, WTOK_BACK
 };
 
-ConfigDisplay::ConfigDisplay()
-{
-	menu_id = widgetSet -> vstack(0);
-	widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
+ConfigDisplay::ConfigDisplay() {
+  menu_id = widgetSet -> vstack(0);
+  widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
 
-	int va = widgetSet -> varray(menu_id);
-	fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, WTOK_FULLSCREEN_TOGGLE, 0);
-
-	widgetSet -> layout(menu_id, 0, 0);
-
-    if(config->fullscreen)
-      widgetSet->set_label(fullscreen_menu_id, "Window mode");
+  int va = widgetSet -> varray(menu_id);
+  fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, 
+					  WTOK_FULLSCREEN);
+  
+  
+  if(config->fullscreen)
+    widgetSet->set_label(fullscreen_menu_id, "Window mode");
+  widgetSet -> space(menu_id);
+  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
+  widgetSet -> layout(menu_id, 0, 0);
 }
 
-ConfigDisplay::~ConfigDisplay()
-{
+ConfigDisplay::~ConfigDisplay() {
 	widgetSet -> delete_widget(menu_id) ;
 }
 
-void ConfigDisplay::update(float dt)
-{
-	widgetSet -> timer(menu_id, dt) ;
+void ConfigDisplay::update(float dt) {
+  widgetSet -> timer(menu_id, dt) ;
   // This menu can be triggered from the game, when it is paused
   // so we have to check it and draw it as in pause
-	if(widgetSet -> get_paused())
-	  widgetSet -> blank() ;
-	widgetSet -> paint(menu_id) ;
+  if(widgetSet -> get_paused())
+    widgetSet -> blank() ;
+  widgetSet -> paint(menu_id) ;
 }
 
-void ConfigDisplay::select()
-{
-	switch ( widgetSet -> token (widgetSet -> click()) )
-	{
-	case WTOK_FULLSCREEN_TOGGLE:
-	  //JHtoggle_fullscreen();
+void ConfigDisplay::select() {
+  switch ( widgetSet -> token (widgetSet -> click()) )  {
+  case WTOK_FULLSCREEN:
+    //JHtoggle_fullscreen();
     if(config->fullscreen)
       widgetSet->set_label(fullscreen_menu_id, "Window mode");
     else
       widgetSet->set_label(fullscreen_menu_id, "Fullscreen mode");
-
     break;
-	default: break;
-	}
+  case WTOK_BACK:
+    menu_manager->popMenu();
+    break;
+  default: break;
+  }
 }
 
 

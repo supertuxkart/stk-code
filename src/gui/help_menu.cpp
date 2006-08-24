@@ -41,7 +41,7 @@ before all other players. Key bindings:",GUI_SML );
     widgetSet->label(change_id, allKeys[i].c_str(),    GUI_SML);
     widgetSet->label(label_id,  sKartAction2String[i], GUI_SML);
   }
-  widgetSet->label(menu_id,"Press <ESC> to go back", GUI_SML);
+  widgetSet->start(menu_id,"Press <ESC> to go back", GUI_SML, 1);
   widgetSet->layout(menu_id, 0, 0);
 }   // HelpMenu
 
@@ -52,7 +52,8 @@ HelpMenu::~HelpMenu() {
 	
 // -----------------------------------------------------------------------------
 void HelpMenu::select() {
-  return;
+  // must be esc, nothing else is available. So just pop this menu
+  menu_manager->popMenu();
 }   // select
 
 // -----------------------------------------------------------------------------

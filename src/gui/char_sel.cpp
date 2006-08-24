@@ -40,13 +40,16 @@ CharSel::CharSel(int whichPlayer)
 	context = new ssgContext;
     oldContext->makeCurrent();
 
-	menu_id = widgetSet -> vstack(0);
+    menu_id = widgetSet -> vstack(0);
 
     std::ostringstream tmp;
     //FIXME: when a long string is used, like the previous one which was
     //"Player #, choose a character" the output gets corrupted.
     tmp << "Player " << playerIndex + 1 << ", choose a driver";
-	widgetSet -> label(menu_id, tmp.str().c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    // Due to widgetSet constraints, this must be static!
+    static std::string heading;
+    heading = tmp.str();
+    widgetSet -> label(menu_id, heading.c_str(), GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> space(menu_id);
 
 	int ha = widgetSet -> harray(menu_id);

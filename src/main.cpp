@@ -68,8 +68,10 @@ void cmdLineHelp (char* invocation) {
 	    "  --reverse               Enable reverse mode\n"
 	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  --herring style         Herring style to use\n"
+#if !defined(WIN32) && !defined(__CYGWIN)
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -w,  --windowed         Windowed display. (default)\n"
+#endif
 	    "  --mwm                   New multi-window menu\n"
 	    "  --swm                   Original single-window menu\n"
 	    "  --oldstatus             Original status display\n"
@@ -77,7 +79,7 @@ void cmdLineHelp (char* invocation) {
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
 	    // should not be used by unaware users:
-        // "  --profile            Enable automatic driven profile mode\n"
+            // "  --profile            Enable automatic driven profile mode\n"
 	    // "  --history            Replay history file 'history.dat'\n"
 	    "\n"
 	    "You can visit SuperTuxKart's homepage at "
@@ -161,11 +163,14 @@ int handleCmdLine(int argc, char **argv) {
       fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
     }
     */
+#if !defined(WIN32) && !defined(__CYGWIN)
     else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {
       config->fullscreen = true;
     } else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w")) {
       config->fullscreen = false;
-    } else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") ) {
+    } 
+#endif
+    else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") ) {
       if (sscanf(argv[i+1], "%dx%d", &config->width, &config->height) == 2)
 	fprintf ( stdout, "You choose to be in %dx%d.\n", config->width,
 		  config->height );
