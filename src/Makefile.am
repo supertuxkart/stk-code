@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = supertuxkart
 noinst_LIBRARIES = libMain.a
-
+AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 libMain_a_SOURCES = \
 	material.cpp		 material.hpp           \
 	material_manager.cpp	 material_manager.hpp    \

@@ -31,25 +31,25 @@ Loader* loader = 0;
 Loader::Loader() {
   char *datadir;
 
-  if ( getenv ( "TUXKART_DATADIR" ) != NULL )
-    datadir = getenv ( "TUXKART_DATADIR" ) ;
+  if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
+    datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
   else
 #ifdef _MSC_VER
-    if ( _access ( "data/levels.dat", 04 ) == 0 )
+    if ( _access ( "data/tuxtrack.track", 04 ) == 0 )
 #else
-    if ( access ( "data/levels.dat", F_OK ) == 0 )
+    if ( access ( "data/tuxtrack.track", F_OK ) == 0 )
 #endif
       datadir = "." ;
     else
 #ifdef _MSC_VER
-      if ( _access ( "../data/levels.dat", 04 ) == 0 )
+      if ( _access ( "../data/tuxtrack.track", 04 ) == 0 )
 #else
-      if ( access ( "../data/levels.dat", F_OK ) == 0 )
+      if ( access ( "../data/tuxtrack.track", F_OK ) == 0 )
 #endif
 	datadir = ".." ;
       else
-#ifdef TUXKART_DATADIR
-	datadir = TUXKART_DATADIR ;
+#ifdef SUPERTUXKART_DATADIR
+	datadir = SUPERTUXKART_DATADIR ;
 #else
       datadir = "/usr/local/share/games/tuxkart" ;
 #endif
