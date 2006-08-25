@@ -692,9 +692,7 @@ void Kart::updatePosition(float dt, sgMat4 result) {
 // -----------------------------------------------------------------------------
 void Kart::handleRescue() {
   if ( trackHint > 0 ) trackHint-- ;
-  float d = curr_pos.xyz[2] ;
   world ->track -> trackToSpatial ( curr_pos.xyz, trackHint ) ;
-  curr_pos.xyz[2] = d ;
   curr_pos.hpr[0] = world->track->angle[trackHint] ;
   rescue = FALSE ;
 }   // handleRescue
