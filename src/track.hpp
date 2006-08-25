@@ -77,6 +77,7 @@ public:
     //from a vector of structs?
     //FIXME: should the driveline be set as a sgVec2?
     std::vector<sgVec3Wrapper> driveline;
+    std::vector<SGfloat> distance_from_start;
     std::vector<SGfloat> path_width;
     std::vector<SGfloat> angle;
 

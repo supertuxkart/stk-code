@@ -98,9 +98,9 @@ int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const {
 
   sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
 
-  // driveline[i][2] contains the sum of the distances between
-  // all driveline points up to point i.
-  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + driveline[p1][2] ;
+  // distance_from_start[p1] contains the sum of the distances between
+  // all driveline points up to point p1.
+  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + distance_from_start[p1];
 
   return nearest ;
 }
@@ -159,9 +159,7 @@ int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz ) const {
 
   sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
 
-  // driveline[i][2] contains the sum of the distances between
-  // all driveline points up to point i.
-  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + driveline[p1][2] ;
+  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + distance_from_start[p1];
 
   return nearest ;
 }
@@ -315,6 +313,8 @@ Track::loadDriveline()
   sgSetVec2 ( driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
   sgSetVec2 ( driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
 
+
+  distance_from_start.reserve(driveline_size);
   float d = 0.0f ;
   for ( size_t i = 0 ; i < driveline_size ; ++i )
   {
@@ -327,7 +327,7 @@ Track::loadDriveline()
     if ( driveline[i][1] > driveline_max[1] )
       driveline_max[1] = driveline[i][1] ;
 
-    driveline [i][2] = d ;
+    distance_from_start[i] = d;
 
     if ( i == driveline_size - 1 )
       d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
@@ -382,7 +382,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
       float y = 0.0f;
       float z = 0.0f;
 
-      if ( sscanf ( s, "%f,%f", &x, &y ) != 2 && sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
+      if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
         {
           fprintf ( stderr, "Syntax error in '%s'\n", path.c_str() ) ;
           exit ( 1 ) ;
@@ -391,13 +391,12 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
       sgVec3 point;
       point[0] = x;
       point[1] = y;
-      //FIXME: the driveline probably should be made 2D instead of this hack.
-      point[2] = 0.0f;
+      point[2] = z;
 
       SGfloat distance;
       if(prev_point != -1)
       {
-          distance = sgDistanceVec3 ( point, line[prev_point]);
+          distance = sgDistanceVec2 ( point, line[prev_point]);
           if(distance < 0.0f) distance = -distance;
           prev_distance += distance;
       }
