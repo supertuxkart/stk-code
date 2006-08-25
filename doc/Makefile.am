@@ -1,6 +1,6 @@
 # doc/
 
-pkgdatadir = $(datadir)/games/@PACKAGE@/data
+pkgdatadir = $(datadir)/games/@PACKAGE@/doc
 
 pkgdata_DATA = $(wildcard *.html) $(wildcard *.png)
 

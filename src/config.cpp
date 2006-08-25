@@ -96,7 +96,7 @@ void Config::setDefaults() {
   singleWindowMenu = false;
   oldStatusDisplay = false;
   herringStyle     = "default";
-  disableMagnet    = false;
+  disableMagnet    = true;
   profile          = 0;
   useKPH           = false;
   newKeyboardStyle = true;

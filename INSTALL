@@ -1,44 +1,52 @@
-TUXKART INSTALLATION INSTRUCTIONS.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SUPERTUXKART INSTALLATION INSTRUCTIONS.
+=======================================
 
 INSTALLATION:
-~~~~~~~~~~~~~
+-------------
 
 First, make sure that you have the following packages installed:
 
-    * OpenGL (or Mesa 3.0 or later)
-    * PLIB version 1.8.4 or later . 
+  * OpenGL (or Mesa 3.0 or later)
+  * PLIB version 1.8.4 or later
 
 Unpack the files from the tarball like this:
 
-  tar xzf tuxkart-*.tar.gz
-  cd tuxkart-*
+  tar xzf supertuxkart-*.tar.gz
+  cd supertuxkart-*
 
 
-(where '*' is the version of TuxKart you downloaded - eg 0.4.0) ...and then:
+where '*' is the version of SuperTuxkart you downloaded - eg 0.2.0. Then:
 
   ./configure
   make
 
+To test the compilation, supertuxkart can be run from the build
+directory by ./src/supertuxkart  (./src/supertuxkart.exe on windows).
 
-You can run the game from the directory you downloaded it into - or (as
-'root') you can install it into /usr/local/share/games/tuxkart by typing;
+To install the file, as root execute:
 
- make install
+  make install
+
+The default install location is /usr/local, i.e. the data files will
+be written to /usr/local/share/games/supertuxkart, the executable
+will be copied to /usr/local/bin. To change the default installation
+location, use the "--prefix" option of configure, e.g. --prefix=/usr
+See the --help output of configure for further options.
 
 
 But it didn't work!
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Well, the most common (by FAR) reason for problems is that your OpenGL/Mesa
 is incorrectly installed - so before you complain to any of the PLIB or
-TuxKart mailing lists, first try running one of the example programs
+Supertuxkart mailing lists, first try running one of the example programs
 that comes with your OpenGL implementation - or one of the Mesa or GLUT
 sample programs.
 
 If you those examples run OK - then go to the PLIB home page and download
 the PLIB examples.
 
-If THOSE run correctly - but TuxKart doesn't then please get in touch with
-the TuxKart mailing list and we'll do our best to get you up and racing.
+If THOSE run correctly - but Supertuxkart doesn't then please get in touch 
+with the SupertuxKkrt mailing list and we'll do our best to get you up and 
+racing.
 
