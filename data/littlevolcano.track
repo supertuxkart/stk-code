@@ -2,6 +2,8 @@
 
 (tuxkart-track
  (name "Little Volcano")
+ (herring "new")
+ 
  (use-fog      #t)
  (sky-color    0.45 0.0 0.0 0.0)
  (fog-color    0.45 0.0 0.0 0.0)

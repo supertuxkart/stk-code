@@ -1,6 +1,7 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Around the Lighthouse"))
+ (name "Around the Lighthouse")
+ (herring "new"))
 
 ;; EOF ;;

@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Race Track"))
+ (name "Race Track")
+ (herring "new"))
 
 ;; EOF ;;
 

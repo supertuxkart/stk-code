@@ -3,7 +3,8 @@
 (tuxkart-track
  (name "Star Track")
  (sky-color    0.0 0.0 0.0 0.0)
- (music "mods/tk5a.mod"))
+ (music "mods/tk5a.mod")
+ (herring "new"))
 
 ;; EOF ;;
 
