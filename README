@@ -12,7 +12,7 @@ more details on:
   http://supertuxkart.berlios.de
 
 
-Supertuxkart needs hardware OpenGL support, and has currently only one
+SuperTuxKart needs hardware OpenGL support, and has currently only one
 software dependency: plib, see http://plib.sourceforge.net
 
 A big "thank you" to Steve Baker for designing and implementing
@@ -20,7 +20,7 @@ the original tuxkart, to the GotM team for their invaluable work.
 See the AUTHORS file for individual credits.
 
 To contact the current maintainers, please send an email to the
-supertuxkart development list at:
+SuperTuxKart development list at:
 
 supertuxkart-devel@list.berlios.de
 
@@ -29,10 +29,33 @@ Hope you enjoy te game
    Hiker & Coz
 
 
+REQUIREMENTS
+============
+Hardware:
+    * You need a 3D graphics card that can support OpenGL or Mesa.
+    * Ideally, you want a joystick - preferably one with at least 
+      6 buttons - you can also drive from the keyboard.
+    * You should have a CPU that's running at 266MHz or better.
+    * A sound card would be nice - but it's not essential.
+    * You'll need at least 32Mb RAM. 
+
+SuperTuxKart is not yet optimised for slower CPU's so performance will 
+be 'chunky' on machines under about 450MHz.
+
+Software:
+Right now, SuperTuxKart runs under Linux and under Windoze using the 
+CygWin package. We anticipate MSVC/Windoze, MacOS, BSD, BeOS, 
+etc. ports to follow very soon.
+
+Make sure that you have the following packages installed:
+
+    * OpenGL (or Mesa 2.1 or later)
+    * PLIB version 1.8.0 or later . 
+
 
 PLAYING THE GAME
 ================
-Supertuxkart is a kart racing game. Basically, you run a certain
+SuperTuxKart is a kart racing game. Basically, you run a certain
 number of laps and try to be faster than your opponents. Power 
 ups, like accelerator, rockets, can help you to achieve this
 goal. By collecting coins you build up your power, which enables
@@ -66,7 +89,7 @@ case. Network multiplayer is not yet supported.
 
 
 CONTROLLING YOUR KART
-=====================
+---------------------
 Ideally, you need a 'gamepad' style joystick with at least six buttons:
 
   Joystick Left/Right:  Steer.
@@ -177,16 +200,51 @@ KNOWN BUGS:
 
 There might of course be more.
 
+COMMAND LINE OPTIONS:
+=====================
+Useful command line options:
+
+-N, --no-start-screen   Quick start without any menus
+-t, --track NAME        Load track NAME
+-l, --list-tracks       List all tracks
+-k, --numkarts NUM      Overall number of karts
+    --kart NAME         Use kart NAME
+    --list-karts        Lists all available karts
+    --laps NUM          Number of laps to play
+-s, --screensize WxH    Set screensize, e.g. -s 800x600
+-v, --version           Show version
+
+SUPPORT:
+========
+The main webpage is at:
+
+  http://supertuxkart.berlios.de
+
+If you have any problems, please contact the SuperTuxKart
+mailing list at
+
+  supertuxkart-devel@list.berlios.de
+
+The archives of this mailing list can be found at:
+
+  http://<FIXME>
+
+Or post a bug report on the SuperTuxKart webpage
+
+  <FIXME link here>
+
+A wiki will be installed in the near future, too.
+
 
 LICENSE:
-
+========
 This software is released under the provisions of
 the GNU General Public License (GPL) which can be
 found in the file 'LICENSE' in the current directory.
 
 
 DIRECTORY STRUCTURE:
-
+====================
 src     -- Where the source code lives.
 
 data    -- This contains all kinds of miscellaneous data
@@ -194,7 +252,7 @@ data    -- This contains all kinds of miscellaneous data
            karts, constants for the physics, grand prix
            data, collectables.
 
-doc     -- Documentation - all in HTML
+doc     -- Implementation documentation.
 
 images  -- Texture maps and other images needed by the
            game. These are currently all in 'SGI' image
@@ -206,4 +264,5 @@ mods    -- Music files - in 'mod' format.
 
 models  -- 3D models - in '.ac' format.
 
+contrib -- Unsorted contributed files.
 

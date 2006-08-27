@@ -109,9 +109,7 @@ int main() {
 
 AC_CONFIG_FILES([      \
  Makefile             \
- contrib/Makefile     \
  data/Makefile        \
- doc/Makefile         \
  fonts/Makefile       \
  images/Makefile      \
  models/Makefile      \
