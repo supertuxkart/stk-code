@@ -364,10 +364,8 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
       exit ( 1 ) ;
     }
 
-  static int prev_point;
-  static SGfloat prev_distance;
-  prev_point = -1;
-  prev_distance = 1.51f;
+  int prev_hint = -1;
+  SGfloat prev_distance = 1.51f;
   while(!feof(fd))
     {
       char s [ 1024 ] ;
@@ -393,30 +391,31 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
       point[1] = y;
       point[2] = z;
 
-      SGfloat distance;
-      if(prev_point != -1)
+      if(prev_hint != -1) prev_distance = sgDistanceVec2 ( point, line[prev_hint]);
+
+      //1.5f was choosen because it's more or less the length of the tuxkart
+      if(prev_distance == 0)
       {
-          distance = sgDistanceVec2 ( point, line[prev_point]);
-          if(distance < 0.0f) distance = -distance;
-          prev_distance += distance;
+        std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
+            "duplicated!.\n";
       }
-
-
-//1.5f was choosen because it's more or less the length of the tuxkart
-      if(prev_distance > 1.5f)
+      else if(prev_distance < 1.5f)
       {
+        std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
+            "too close(<1.5) to previous point.\n";
+      }
 #if 0
-          if(prev_distance > 15.0f)
-              std::cerr << "In file " << path << " point " <<
-                  prev_point + 1 << " is too far(+15.0) from previous point.\n";
+      if(prev_distance > 15.0f)
+      {
+        std::cerr << "In file " << path << " point " <<
+            prev_hint << " is too far(>15.0) from next point at " <<
+            prev_distance << " .\n";
+      }
 #endif
 
           line.push_back(point);
-          ++prev_point;
+          ++prev_hint;
           prev_distance -= 1.5f;
-      }
-      else std::cerr << "In file " << path << " point " << prev_point + 1 <<
-          " is too close(less than 1.5) to previous point.\n";
     }
 
   fclose ( fd ) ;
