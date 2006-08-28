@@ -22,6 +22,7 @@
 #include "world.hpp"
 #include "projectile_manager.hpp"
 #include "projectile.hpp"
+#include "sound.hpp"
 
 
 // -----------------------------------------------------------------------------
@@ -40,6 +41,8 @@ Explosion::Explosion(Projectile* p) : ssgTransform() {
 // -----------------------------------------------------------------------------
 void Explosion::init(Projectile* p) {
   //JH some kind of sound here???
+  sound->playSfx( SOUND_EXPLOSION );
+
   setTransform(p->getCoord());
   step = -1;
   world->addToScene(this);
