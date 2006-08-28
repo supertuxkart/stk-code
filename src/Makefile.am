@@ -80,5 +80,5 @@ supertuxkart_SOURCES = \
 
 supertuxkart_LDADD = \
 	$(top_builddir)/src/libMain.a \
-	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul \
+	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg -lplibpw -lplibul -lplibssgaux\
 	$(opengl_LIBS)

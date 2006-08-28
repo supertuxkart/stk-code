@@ -24,7 +24,7 @@
 
 class AutoKart : public Kart {
 private:
-  float time_since_last_shoot ;
+  float time_since_last_shot;
   size_t future_hint;
 
   float starting_delay;
@@ -34,34 +34,44 @@ private:
   bool on_curve;
   bool handle_curve;
 
-  enum DIRECTION{LEFT, RIGHT};
-  DIRECTION curve_direction;
-
   struct CrashTypes
   {
-      bool curve; //true if we are going to 'crash' with a curve
+      bool track; //true if we are going to 'crash' with a curve
       int kart; //-1 if no crash, pos numbers are the kart it crashes with
-      CrashTypes() : curve(false), kart(-1) {};
-      void clear() {curve = false; kart = -1;}
+      CrashTypes() : track(false), kart(-1) {};
+      void clear() {track = false; kart = -1;}
   } crashes;
 
+  int start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-  float steer_to_angle(const size_t& NEXT_HINT, const float& ANGLE);
+  void handle_race_start();
+
+  float steer_to_angle(const size_t NEXT_HINT, const float ANGLE);
   float steer_to_point(const sgVec2 POINT);
-  float steer_for_tight_curve();
 
-  bool do_wheelie(const int& STEPS);
-  void check_crashes(const int& STEPS);
-  int find_non_crashing_hint();
-  bool handle_tight_curves();
+  bool do_wheelie(const int STEPS);
+  void check_crashes(const int STEPS, sgVec3 pos);
+  void find_non_crashing_point(sgVec2 result);
 
-  float guess_accel (const float throttle);
-  void remove_angle_excess (float& angle);
+  void remove_angle_excess (float &angle);
   int calc_steps();
-  bool hint_is_behind(const int& HINT);
-  int find_curve(const int& HINT);
+
+  float angle_to_control(float angle);
+#if 0
+  //Functions currently not being used, but that might be useful in the future.
   int find_check_hint();
+  float guess_accel (const float throttle);
+  bool handle_tight_curves();
+  bool hint_is_behind(const int HINT);
+  int find_curve();
   void setup_curve_handling();
+  float steer_for_tight_curve();
+#endif
+
+#if 0
+  enum Direction {LEFT, RIGHT};
+  Direction curve_direction;
+#endif
 
 public:
   AutoKart(const KartProperties *kart_properties, int position);
