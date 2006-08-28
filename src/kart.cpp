@@ -994,7 +994,10 @@ void print_model(ssgEntity* entity, int indent, int maxLevel) {
 void Kart::setFinishingState (int pos, float time)
 {
     finishedRace = true;
-
+    //FIXME: The finishing position is not necessary anymore, since the
+    //       racing position is now always correct (being the finishing
+    //       position when a kart has finished the race). So this can be 
+    //       simplified/removed
     finishingPosition = pos;
 
     finishingMins = (int) floor ( time / 60.0 ) ;

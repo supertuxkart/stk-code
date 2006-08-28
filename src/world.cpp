@@ -215,7 +215,9 @@ void World::update(float delta) {
   projectile_manager->update(delta);
   herring_manager->update(delta);
   
-  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) updateLapCounter ( i ) ;
+  for ( Karts::size_type i = 0 ; i < kart.size(); ++i) {
+    if(!kart[i]->raceIsFinished()) updateRacePosition(i);
+  }
 
   /* Routine stuff we do even when paused */
   hook_manager->update();
@@ -269,7 +271,7 @@ void World::checkRaceStatus() {
 }
 
 void
-World::updateLapCounter ( int k )
+World::updateRacePosition ( int k )
 {
   int p = 1 ;
 
@@ -279,15 +281,18 @@ World::updateLapCounter ( int k )
   {
     if ( int(j) == k ) continue ;
 
-    if ( kart[j]->getLap() >  kart[k]->getLap() ||
-         ( kart[j]->getLap() == kart[k]->getLap() &&
-           kart[j]->getDistanceDownTrack() >
-                            kart[k]->getDistanceDownTrack() ))
+    // Count karts ahead of the current kart, i.e. kart that are already 
+    // finished (the current kart k has not yet finished!!), have done more
+    // laps, or the same number of laps, but a greater distance.
+    if (kart[j]->raceIsFinished()                                          ||
+	kart[j]->getLap() >  kart[k]->getLap()                             ||
+        (kart[j]->getLap() == kart[k]->getLap() &&
+	 kart[j]->getDistanceDownTrack() > kart[k]->getDistanceDownTrack()) )
       p++ ;
   }
 
   kart [ k ] -> setPosition ( p ) ;
-}
+}   // updateRacePosition
 
 void World::loadPlayers() {
   for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )

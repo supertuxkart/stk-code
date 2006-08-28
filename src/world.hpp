@@ -96,7 +96,7 @@ public:
   Phase getPhase() const { return phase; }
   float getGravity() const { return track->getGravity();}
 private:
-  void updateLapCounter ( int k );
+  void updateRacePosition( int k );
   void loadTrack();
   void loadPlayers();
   void herring_command(char *s, char *str );
