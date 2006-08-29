@@ -1,4 +1,4 @@
-//  $Id: history.cpp,v 1.1 2005/09/28 17:00:42 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

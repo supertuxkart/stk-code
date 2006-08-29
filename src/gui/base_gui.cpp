@@ -1,4 +1,4 @@
-//  $Id: BaseGUI.cxx,v 1.5 2005/08/19 20:51:07 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

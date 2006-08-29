@@ -1,4 +1,4 @@
-//  $Id: MainMenu.cxx,v 1.3 2005/05/31 00:49:50 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

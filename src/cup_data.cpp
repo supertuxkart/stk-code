@@ -1,4 +1,4 @@
-//  $Id: cup_data.cpp,v 1.1 2005/05/25 21:53:43 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>

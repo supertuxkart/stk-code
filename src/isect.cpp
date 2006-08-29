@@ -1,4 +1,4 @@
-//  $Id: isect.cpp,v 1.2 2005/05/25 22:00:46 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>

@@ -1,4 +1,4 @@
-//  $Id: ScreenManager.cxx,v 1.3 2005/08/19 20:49:27 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>

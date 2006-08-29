@@ -1,4 +1,5 @@
 /*
+     $Id$
      PLIB - A Suite of Portable Game Libraries
      Copyright (C) 1998,2002  Steve Baker
  

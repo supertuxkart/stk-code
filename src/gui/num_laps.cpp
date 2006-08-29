@@ -1,4 +1,4 @@
-//  $Id: NumLaps.cxx,v 1.1 2005/08/19 20:43:04 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

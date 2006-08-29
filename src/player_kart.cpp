@@ -1,4 +1,4 @@
-//  $Id: player_kart.cpp,v 1.11 2005/08/30 08:56:31 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>

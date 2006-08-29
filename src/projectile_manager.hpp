@@ -1,4 +1,4 @@
-//  $Id: ProjectileManager.h,v 1.5 2005/08/17 22:36:30 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

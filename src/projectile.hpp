@@ -1,4 +1,4 @@
-//  $Id: Projectile.h,v 1.7 2005/08/19 20:51:56 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>

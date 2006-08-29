@@ -1,4 +1,4 @@
-//  $Id: StartScreen.cxx,v 1.8 2005/07/19 08:23:40 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKartTeam

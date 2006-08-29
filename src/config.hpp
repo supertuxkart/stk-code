@@ -1,4 +1,4 @@
-// $Id: config.hpp,v 1.6 2005/09/30 16:42:15 joh Exp $
+// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

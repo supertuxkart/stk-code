@@ -1,4 +1,4 @@
-//  $Id: Collectable.cxx,v 1.6 2005/08/23 20:00:57 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

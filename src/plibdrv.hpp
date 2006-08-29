@@ -1,4 +1,4 @@
-//  $Id: plibdrv.hpp,v 1.6 2005/08/19 20:51:56 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>

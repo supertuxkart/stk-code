@@ -1,4 +1,4 @@
-//  $Id: physics_parameter.cpp,v 1.2 2005/07/14 15:43:44 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

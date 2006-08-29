@@ -1,4 +1,4 @@
-//  $Id: camera.hpp,v 1.1 2005/05/25 21:54:15 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>

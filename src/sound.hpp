@@ -1,4 +1,4 @@
-//  $Id: sound.h,v 1.3 2005/06/06 00:47:12 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>

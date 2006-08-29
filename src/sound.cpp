@@ -1,4 +1,4 @@
-//  $Id: sound.cxx,v 1.6 2005/07/13 17:23:57 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>

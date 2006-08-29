@@ -1,4 +1,4 @@
-//  $Id: SkidMark.cxx 518 2006-01-12 04:54:56Z coz $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>

@@ -1,4 +1,4 @@
-//  $Id: kart_properties.cpp,v 1.5 2005/08/10 07:58:10 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

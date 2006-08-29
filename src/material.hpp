@@ -1,4 +1,4 @@
-//  $Id: material.hpp,v 1.5 2005/07/23 22:45:26 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>

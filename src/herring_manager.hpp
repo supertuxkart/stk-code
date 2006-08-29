@@ -1,4 +1,4 @@
-//  $Id: herring_manager.hpp,v 1.4 2005/08/19 20:46:40 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

@@ -1,4 +1,4 @@
-//  $Id: PlayerControls.h,v 1.3 2005/07/13 17:17:47 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

@@ -1,4 +1,4 @@
-//  $Id: attachment.cpp,v 1.6 2005/08/19 20:51:56 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

@@ -1,4 +1,4 @@
-//  $Id: WidgetSet.h,v 1.6 2005/07/13 17:28:23 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  This code originally from Neverball copyright (C) 2003 Robert Kooima

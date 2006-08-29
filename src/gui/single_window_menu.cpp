@@ -1,4 +1,4 @@
-//  $Id: SingleWindowMenu.cxx 305 2006-01-20 18:02:01Z joh $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>

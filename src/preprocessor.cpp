@@ -1,4 +1,4 @@
-//  $Id: preprocessor.cpp,v 1.3 2005/07/19 08:42:19 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

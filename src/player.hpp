@@ -1,4 +1,4 @@
-// $Id: player.hpp,v 1.2 2005/07/13 17:18:53 joh Exp $
+// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

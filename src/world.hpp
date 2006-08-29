@@ -1,4 +1,4 @@
-//  $Id: World.h,v 1.8 2005/09/30 16:49:48 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 SuperTuxKart-Team

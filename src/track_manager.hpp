@@ -1,4 +1,4 @@
-//  $Id: TrackManager.h,v 1.1 2005/05/25 21:52:09 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team

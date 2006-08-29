@@ -1,4 +1,4 @@
-//  $Id: TrackSel.cxx,v 1.4 2005/08/31 17:25:27 joh Exp $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team
