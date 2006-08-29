@@ -357,6 +357,8 @@ void Kart::updatePhysics (float dt) {
 
 #ifndef NEW_PHYSICS
 
+  float ForceLong = throttle * getMaxPower();
+
   // apply air friction and system friction
   AirResistance[0]   = 0.0f;
   AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
@@ -375,6 +377,67 @@ void Kart::updatePhysics (float dt) {
   // If the kart is on ground, modify the grip by the friction 
   // modifier for the texture/terrain.
   if(on_ground && materialHOT) maxGrip *= materialHOT->getFriction();
+
+  // Gravity handling
+  // ================
+  float ForceGravity;
+  if(on_ground) {
+    if(normalHOT) {
+      // Adjust pitch and roll according to the current terrain. To compute
+      // the correspondant angles, we consider first a normalised line 
+      // pointing into the direction the kart is facing (pointing from (0,0,0) 
+      // to (x,y,0)). The angle between this line and the triangle the kart is 
+      // on determines the pitch. Similartly the roll is computed, using a 
+      // normalised line pointing to the right of the kart, for which we simply
+      // use (-y,x,0).
+      float kartAngle = curr_pos.hpr[0]*M_PI/180.0f;
+      float x = -sin(kartAngle);
+      float y =  cos(kartAngle);
+      // Compute the angle between the normal of the plane and the line to 
+      // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane, 
+      // simplifying the computation of the scalar product.
+      float pitch = ( (*normalHOT)[0]*x + (*normalHOT)[1]*y );  // use ( x,y,0)
+      float roll  = (-(*normalHOT)[0]*y + (*normalHOT)[1]*x );  // use (-y,x,0)
+
+      // The actual angle computed above is between the normal and the (x,y,0) 
+      // line, so to compute the actual angles 90 degrees must be subtracted.
+      pitch = acosf(pitch)/M_PI*180.0f-90.0f;
+      roll  = acosf(roll )/M_PI*180.0f-90.0f;
+      // if dt is too big, the relaxation will overshoot, and the
+      // karts will either be hopping, or even turn upside down etc.
+      if(dt<=0.05) {
+#define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*20.0f)
+	curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
+	curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
+      } else {
+	curr_pos.hpr[1] = pitch;
+	curr_pos.hpr[2] = roll ;
+      }
+      if(fabsf(curr_pos.hpr[1])>fabsf(pitch)) curr_pos.hpr[1]=pitch;
+      if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
+    }
+    if(controls.jump) { // ignore gravity down when jumping
+      ForceGravity = physicsParameters->jumpImpulse*gravity;
+    } else {   // kart is on groud and not jumping
+      if(config->improvedPhysics) {
+	// FIXME:
+	// While these physics computation is correct, it is very difficult
+	// to drive, esp. the sandtrack: the grades (with the current
+	// physics parameters) are too steep, so the kart needs a very high
+	// initial velocity to be able to reach the top. Especially the
+	// AI gets stuck very easily! Perhaps reduce the forces somewhat?
+	float pitch_in_rad = curr_pos.hpr[1]*M_PI/180.0f;
+	ForceGravity   = -gravity * mass * cos(pitch_in_rad);
+	ForceLong     -=  gravity * mass * sin(pitch_in_rad);
+      } else {
+	ForceGravity   = -gravity * mass;
+      }
+    }
+  } else {  // kart is not on ground, gravity applies all to z axis.
+    ForceGravity = -gravity * mass;
+  }
+  velocity.xyz[2] += ForceGravity / mass * dt;
+
 
   if(wheelie_angle <= 0.0f && on_ground) {
     // At low speed, the advanced turning mode can result in 'flickering', i.e.
@@ -418,7 +481,6 @@ void Kart::updatePhysics (float dt) {
 
   // Longitudinal accelleration 
   // ==========================
-  float ForceLong = throttle * getMaxPower();
   float effForce  = (ForceLong-AirResistance[1]-SysResistance[1]);
   // Slipping: more force than what can be supported by the back wheels
   // --> reduce the effective force acting on the kart - currently
@@ -432,53 +494,6 @@ void Kart::updatePhysics (float dt) {
   velocity.xyz[1] += accel           * dt;
   prevAccel        = accel;
 
-  // Gravity handling
-  // ================
-  float ForceGravity;
-  if(on_ground) {
-    if(normalHOT) {
-      // Adjust pitch and roll according to the current terrain. To compute
-      // the correspondant angles, we consider first a normalised line 
-      // pointing into the direction the kart is facing (pointing from (0,0,0) 
-      // to (x,y,0)). The angle between this line and the triangle the kart is 
-      // on determines the pitch. Similartly the roll is computed, using a 
-      // normalised line pointing to the right of the kart, for which we simply
-      // use (-y,x,0).
-      float kartAngle = curr_pos.hpr[0]*M_PI/180.0f;
-      float x = -sin(kartAngle);
-      float y =  cos(kartAngle);
-      // Compute the angle between the normal of the plane and the line to 
-      // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane, 
-      // simplifying the computation of the scalar product.
-      float pitch = ( (*normalHOT)[0]*x + (*normalHOT)[1]*y );  // use ( x,y,0)
-      float roll  = (-(*normalHOT)[0]*y + (*normalHOT)[1]*x );  // use (-y,x,0)
-
-      // The actual angle computed above is between the normal and the (x,y,0) 
-      // line, so to compute the actual angles 90 degrees must be subtracted.
-      pitch = acosf(pitch)/M_PI*180.0f-90.0f;
-      roll  = acosf(roll )/M_PI*180.0f-90.0f;
-      // if dt is too big, the relaxation will overshoot, and the
-      // karts will either be hopping, or even turn upside down etc.
-      if(dt<=0.05) {
-#define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*20.0f)
-	curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
-	curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
-      } else {
-	curr_pos.hpr[1] = pitch;
-	curr_pos.hpr[2] = roll ;
-      }
-      if(fabsf(curr_pos.hpr[1])>fabsf(pitch)) curr_pos.hpr[1]=pitch;
-      if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
-    }
-    if(controls.jump) { // ignore gravity down when jumping
-      ForceGravity = physicsParameters->jumpImpulse*gravity;
-    } else {
-      ForceGravity = -gravity * mass;
-    }
-  } else {  // kart is not on ground, gravity applies all to z axis.
-    ForceGravity   = -gravity * mass;
-  }
-  velocity.xyz[2] += ForceGravity / mass * dt;
 #else     // new physics
 
   // apply air friction and system friction

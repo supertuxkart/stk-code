@@ -53,6 +53,7 @@ class Config {
     bool   disableMagnet;   // true if a magnet can be dis- and enabled
     bool   replayHistory;
     bool   useKPH;
+    bool   improvedPhysics;
     int    width;
     int    height;
     int    karts;

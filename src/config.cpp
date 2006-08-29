@@ -99,6 +99,7 @@ void Config::setDefaults() {
   disableMagnet    = true;
   profile          = 0;
   useKPH           = false;
+  improvedPhysics  = false;
   newKeyboardStyle = true;
   replayHistory    = false;
   width            = 800;
@@ -234,6 +235,7 @@ void Config::loadConfig(const std::string& filename) {
     lisp->get("disableMagnet",    disableMagnet);
     lisp->get("newKeyboardStyle", newKeyboardStyle);
     lisp->get("useKPH",           useKPH);
+    lisp->get("improvedPhysics",  improvedPhysics);
 
     /*get resolution width/height*/
     lisp->get("width",            width);
@@ -323,6 +325,9 @@ void Config::saveConfig(const std::string& filename) {
     writer.write("disableMagnet\t", disableMagnet);
     writer.writeComment("Use of kilometers per hours (km/h) instead of mph");
     writer.write("useKPH\t", useKPH);
+    writer.writeComment("With improved physics the gravity on a non-horizontal");
+    writer.writeComment("plane will add an accelerating force on the kart");
+    writer.write("improvedPhysics\t", improvedPhysics);
     writer.writeComment("#f: old 'digital' style, #t:new analog style, allows for better turning");
     writer.write("newKeyboardStyle\t", newKeyboardStyle);
 
