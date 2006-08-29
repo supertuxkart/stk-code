@@ -73,6 +73,9 @@ void KartProperties::load(const char* filename, char *node) {
   if(model_file.length()>0) {
     //JH    model         = ssgLoadAC ( ("models/"+model_file).c_str(), loader ) ;
     model         = ssgLoadAC ( model_file.c_str(), loader ) ;
+
+    ssgStripify(model);
+
     preProcessObj(model, 0);
     model->ref();
   }

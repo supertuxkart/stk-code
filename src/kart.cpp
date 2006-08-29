@@ -841,12 +841,10 @@ void Kart::load_data() {
 
   load_wheels(dynamic_cast<ssgBranch*>(obj));
 
-  // Optimize the model
-  ssgBranch *newobj = new ssgBranch () ;
-  newobj -> addKid ( obj ) ;
-  ssgFlatten    ( obj ) ;
-  ssgStripify   ( newobj ) ;
-  obj = newobj;
+  // Optimize the model, this can't be done while loading the model
+  // because it seems that it removes the name of the wheels or something
+  // else needed to load the wheels as a separate object.
+  ssgFlatten(obj);
 
   ssgRangeSelector *lod = new ssgRangeSelector ;
 
