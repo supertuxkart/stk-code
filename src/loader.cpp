@@ -51,7 +51,7 @@ Loader::Loader() {
 #ifdef SUPERTUXKART_DATADIR
 	datadir = SUPERTUXKART_DATADIR ;
 #else
-      datadir = "/usr/local/share/games/tuxkart" ;
+      datadir = "/usr/local/share/games/supertuxkart" ;
 #endif
   fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
   addSearchPath(datadir);
@@ -105,7 +105,7 @@ void Loader::initConfigDir() {
   /*nothing*/
 #else
   /*if HOME environment variable exists
-    create directory $HOME/.tuxkart*/
+    create directory $HOME/.supertuxkart*/
   if(getenv("HOME")!=NULL) 
   {
     std::string pathname;
