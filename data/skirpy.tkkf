@@ -3,7 +3,7 @@
 (tuxkart-kart
  (name        "Skirpy")
  (model-file  "skirpy-high.ac")
- (icon-file   "possiicon.rgb")
+ (icon-file   "skirpyicon.rgb")
  (shadow-file "tuxkartshadow.rgb")
  
  (red   0.0)
