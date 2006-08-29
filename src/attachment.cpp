@@ -1,7 +1,7 @@
-//  $Id: Attachment.cxx,v 1.6 2005/08/19 20:51:56 joh Exp $
+//  $Id: attachment.cpp,v 1.6 2005/08/19 20:51:56 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -121,8 +121,8 @@ void Attachment::update(float dt, sgCoord *velocity) {
   time_left -=dt;
 
   switch (type) {
-   case ATTACH_PARACHUTE:  // handled in Kart::updatePhysics
-   case ATTACH_ANVIL:      // handled in Kart::updatePhysics
+    case ATTACH_PARACHUTE:  // handled in Kart::updatePhysics
+    case ATTACH_ANVIL:      // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:       break;
     case ATTACH_TINYTUX:   if(time_left<=0.0) kart->handleRescue();

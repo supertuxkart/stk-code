@@ -1,7 +1,7 @@
 //  $Id: TrackSel.cxx,v 1.4 2005/08/31 17:25:27 joh Exp $
 //
-//  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2006 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

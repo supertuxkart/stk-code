@@ -1,7 +1,7 @@
-//  $Id: KartProperties.h,v 1.2 2005/07/14 15:43:44 joh Exp $
+//  $Id: kart_properties.hpp,v 1.2 2005/07/14 15:43:44 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

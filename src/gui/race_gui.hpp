@@ -1,7 +1,8 @@
 //  $Id: RaceGUI.h,v 1.9 2005/08/17 22:36:34 joh Exp $
 //
-//  TuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

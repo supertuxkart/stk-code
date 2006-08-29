@@ -1,7 +1,7 @@
-//  $Id: History.h,v 1.1 2005/09/28 17:00:42 joh Exp $
+//  $Id: history.hpp,v 1.1 2005/09/28 17:00:42 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

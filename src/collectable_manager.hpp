@@ -1,7 +1,7 @@
-//  $Id: Collectable.h,v 1.4 2005/08/19 20:51:56 joh Exp $
+//  $Id: collectable_manager.hpp,v 1.4 2005/08/19 20:51:56 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

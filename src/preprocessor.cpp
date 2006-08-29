@@ -1,7 +1,7 @@
-//  $Id: preprocessor.cxx,v 1.3 2005/07/19 08:42:19 joh Exp $
+//  $Id: preprocessor.cpp,v 1.3 2005/07/19 08:42:19 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

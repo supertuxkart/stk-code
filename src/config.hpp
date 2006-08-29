@@ -1,7 +1,7 @@
-// $Id: Config.h,v 1.6 2005/09/30 16:42:15 joh Exp $
+// $Id: config.hpp,v 1.6 2005/09/30 16:42:15 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006 SuperTuxKart-Team
 //  Modelled after Supertux's configfile.h
 //
 //  This program is free software; you can redistribute it and/or

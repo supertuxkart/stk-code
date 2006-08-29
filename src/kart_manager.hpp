@@ -1,7 +1,7 @@
-//  $Id: KartManager.h,v 1.2 2005/07/14 15:38:05 joh Exp $
+//  $Id: kart_manager.hpp,v 1.2 2005/07/14 15:38:05 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

@@ -1,4 +1,4 @@
-//  $Id: MaterialManager.cxx,v 1.2 2005/07/23 23:05:39 joh Exp $
+//  $Id: material_manager.cpp,v 1.2 2005/07/23 23:05:39 joh Exp $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
