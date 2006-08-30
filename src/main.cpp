@@ -71,7 +71,7 @@ void cmdLineHelp (char* invocation) {
 	    "  --reverse               Enable reverse mode\n"
 	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  --herring style         Herring style to use\n"
-#if !defined(WIN32) && !defined(__CYGWIN)
+#if FULLSCREEN_IS_CURRENTLY_DISABLED
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -w,  --windowed         Windowed display. (default)\n"
 #endif

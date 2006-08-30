@@ -36,9 +36,7 @@ Options::Options()
 	widgetSet -> space(menu_id);
 	widgetSet -> label(menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> start(menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
-#if !defined(WIN32) && !defined(__CYGWIN__) 	
-	// Display-options only allow setting of fullscreen, which isn't
-	// supported for windows anyway, so it can just be skipped
+#if FULLSCREEN_IS_CURRENTLY_DISABLED
 	widgetSet -> state(menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
 #endif
 	widgetSet -> state(menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);

@@ -59,9 +59,6 @@ Urgent for release
 - Fix wheelies (make all wheelie parameters easily changeable without
   recompile, and if possible dependent on physic parameters.
   [hiker, in progress]
-- Disable fullscreen (it doesn't work currently, and I expect it's
-  too much work to fix this on all platforms before the release).
-  [hiker, in progress]
 - Restart race does not work (when in a (quick) race, press esc,
   select Restart --> nothing happens).
 - Improve AI
@@ -111,6 +108,7 @@ while the second and third appear to be too unimportant to fix for now
 
 Things that would be nice to fix, but are not urgent
 =====================================================
+- Enable real fullscreen support
 - Improved sound
    - More sounds, music, ...
 - Performance tuning
@@ -189,3 +187,5 @@ DONE
 - Physics
    - slow down when driving upwards, accelerate when driving
      down 
+- Disable fullscreen (it doesn't work currently, and I expect it's
+  too much work to fix this on all platforms before the release).
