@@ -1,0 +1,191 @@
+SuperTuxKart is looking for additional man power to make this
+one of the best free linux games out there :) We need (in 
+no particular order):
+
+1) Musicians/sound engineers
+   - Create additional background soundtrack
+   - Create sound effects
+
+2) Artists and track designer
+   - Create additional tracks
+   - Create additional art work for tracks,
+     background images
+
+3) Developers
+   - See todo list below - it's rather long at the moment :)
+
+4) Web master
+   - Add wiki
+   - Keep web page up to date
+
+5) Tester
+   - For just about everything
+   - Esp. different platforms
+
+6) Package creators
+   - Create packages For 
+     - most common linux Distributors
+     - Windows
+     - MaxOS (?? currently not sure if STK works on Macs)
+
+7) Writers
+   - Write documentation, ranging from man page, to
+     a description for the web, to a design document, ...
+
+If you want to help the SuperTuxKart - Project, please
+contact us on the email list:
+
+  supertuxkart-devel@list.berlios.de
+
+Thanks in advance!
+   The SuperTuxKart-Team
+
+
+********************************
+********************************
+**                            **
+**  Incomplete(!!) TODO List  **
+**                            **
+********************************
+********************************
+
+Urgent for release
+===================
+- Find acceptable physics parameters (e.g. kart engine and
+  air resistance will determine highest speed).
+  Perhaps make the maximum speed dependent on the skill level:
+  higher skill levels --> faster karts [partly hiker, but feedback
+  from all needed]
+- Fix wheelies (make all wheelie parameters easily changeable without
+  recompile, and if possible dependent on physic parameters.
+  [hiker, in progress]
+- Disable fullscreen (it doesn't work currently, and I expect it's
+  too much work to fix this on all platforms before the release).
+  [hiker, in progress]
+- Restart race does not work (when in a (quick) race, press esc,
+  select Restart --> nothing happens).
+- Improve AI
+  - tight/wide corner steering. [coz, in progress]
+  - I've seen it once or twice that the AI would drive into a
+    wall (towards the right of the track), and it would then
+    just keep on driving into the same wall.  [coz, in progress]
+  - Generally, the AI should be able to finish all tracks.  [coz, in progress]
+- Fix gui bug: run grand prix, back to menu -> textures are wrong
+  in character selection menu
+  It is known that this can be fixed by removing
+  loader->shared_textures.removeAll
+  in gui/char_sel.cpp, but then the same problem happens when going
+  from the next menu back to the char-sel menu.
+- Decide which tracks should be included - some tracks appear to be
+  somewhat unfinished.
+- Give credit to the track designer (perhaps add a one line comment
+  to each track, which is displayed when selecting a track?? Or just
+  add then to the credits list?)
+- Collect a list of 'new' items, which can be used for advertising
+  the new release. [hiker, in progress]
+- Update the web page, make more screen shots, ...
+- Valgrind for memory bugs.
+- Create a native windows executable.
+
+Most likely too difficult/time consuming to be fixed before the release
+=======================================================================
+This contains either hard, or not reproducible errors. They are most 
+likely to be ignored for now. The first problem appears to be very
+difficult (and most likely related to the X driver and plib interaction),
+while the second and third appear to be too unimportant to fix for now
+
+- Fix keyboard bug: see bug 6168
+  Might be difficult to fix! Worst case, document this, blame X/plib
+  :)) and leave it.
+- Fix 'fall through track' bug #8384
+  This appears to be a very special bug, which only happens on a certain
+  configuration (Suse 10.1, dual core 32-bit Intel, ATI graphics card),
+  and the error does NOT happen when using the same source code with
+  wine under windows, or on a AMD 64 bit machine. Therefore rather low 
+  priority for now, unless we know that this happens more often. It might 
+  be a compiler bug! [hiker]
+- Fix not-reproducible ref-count error (I haven't seen this bug for
+  a while, perhaps it was fixed when fixing something else?? Any
+  reports on this would be helpful, otherwise we assume that this
+  is fixed).
+
+Things that would be nice to fix, but are not urgent
+=====================================================
+- Improved sound
+   - More sounds, music, ...
+- Performance tuning
+   - It's not too bad at the moment, but might be worth
+     having a look again. [hiker]
+- Re-activate wiki or create new one
+   - Esp. include information on how to create/edit
+     tracks.
+- Top 10 lists for time trial, and grand prix.
+- Scale fonts dependent on resolution.
+- Add a screen dump of each track to be displayed, instead
+  of the outline.
+- Add a 3rd dimension to herring data, so that the subsea
+  and gownsbow can have herrings as well (currently, herring
+  data is 2d only, the height is taken from computing the height
+  of the track - which doesn't work correctly in case of lanes
+  running on top of each other (gown), or a track running inside
+  a tube (subsea).
+
+long term
+=========
+- OpenAL support (optional)  [patrick]
+- Improved physics to support skidding
+- Improved collision handling
+- Add network multiplayer
+- Make full use of OpenAL
+- Performance tuning
+  - Support for multi-core CPUs
+    (while this is not strictly necessary, it might be a nice headline
+    for news entries. The physics/collision detection would be
+    easy to parallelise)
+- More gadgets
+  - Positive: - squirt oil on track to make karts slip, ...
+  - Negative: - 'dirt on windscreen' - partial blackout of screen
+- More flexibility for items. E.g. 
+  - Tracks might hard code some items, change the distribution of some
+    others (e.g. only a rocket at a certain location, but random choice
+    which one the kart gets. Instead of jsut specifying 
+    GREENHERRING, one could write: ZIPPER:ANVIL and one of the listed
+    things would be picked randomly)
+  - Grand prixs might want to overwrite this, e.g.:
+    "war" grand prix: only rockets for all gadgets
+  - Perhaps make good and bad things indistinguishable?
+- More tracks
+- More grand prixs
+- Support for translations(?)
+- Support for easy-to-plugin different AIs, and allow different karts
+  to have different AIs
+
+
+DONE
+====
+- Fix 'not on triangle' bug
+    A crash happens if a kart should leave the track completely
+- Rename configuration directory/file from .tuxkart to .supertuxkart
+- Make steering wheel speed adjustable
+- Make game installable in a configurable directory
+- Add short 'help' screen
+- Add 'about' screen
+- Update readme
+- Update (c) information in sources
+- Update/add todo/known bugs list
+- Adding item boxes to levels which don't have them.
+- Remove obstacle/road-work on tuxtrack, since the AI doesn't
+  know about it and might very likely just drive into it ...
+  over and over again (work around, till the AI becomes better)
+- Giving material in tracks, from which the kart can't go back
+  to the race, a 'reset' property (e.g. hole in volcano, or under
+  bridge of sand track, where the karts can fall it but can't come
+  back from), so that karts falling into these paces will be rescued
+  automatically
+- Update doc directory: most of the information is tuxkart only,
+  and still the useful documentation should be merged into the
+  Implementation.txt file for now.
+- Work-around rescue problems 
+- Physics
+   - slow down when driving upwards, accelerate when driving
+     down 
