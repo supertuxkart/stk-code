@@ -82,7 +82,10 @@ void Collectable::use() {
 
 // -----------------------------------------------------------------------------
 void Collectable::hitRedHerring(int n) {
-  collectableType newC=(collectableType)(rand()%5+1);
+  //rand() is moduled by COLLECT_MAX - 1 because it's the number of
+  //collectables, but since it might give a result of 0(and that position isn't
+  //a valid collectable) we have to add 1.
+  collectableType newC=(collectableType)(rand()%(COLLECT_MAX - 1) + 1);
   if(type==COLLECT_NOTHING) {
     type=newC;
     number=n;

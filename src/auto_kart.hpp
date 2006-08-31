@@ -37,10 +37,10 @@ private:
 
   struct CrashTypes
   {
-      bool track; //true if we are going to 'crash' with a curve
+      bool road; //true if we are going to 'crash' with the bounds of the road
       int kart; //-1 if no crash, pos numbers are the kart it crashes with
-      CrashTypes() : track(false), kart(-1) {};
-      void clear() {track = false; kart = -1;}
+      CrashTypes() : road(false), kart(-1) {};
+      void clear() {road = false; kart = -1;}
   } crashes;
 
   int start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.

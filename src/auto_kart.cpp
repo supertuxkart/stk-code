@@ -21,7 +21,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-//#define AI_DEBUG
+#define AI_DEBUG
 
 #ifdef AI_DEBUG
 #define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
@@ -97,7 +97,7 @@ void AutoKart::update (float delta)
         steer_angle = steer_to_point(world->track->driveline[NEXT_HINT]);
 
         #ifdef AI_DEBUG
-        std::cout << "Action 1: Steer towards center." << std::endl;
+        std::cout << "Action: Steer towards center." << std::endl;
         #endif
     }
 
@@ -116,12 +116,12 @@ void AutoKart::update (float delta)
 
     //If it seems like the kart will crash with a curve, try to remain
     //in the same direction of the track
-    else if(crashes.track)// && world->raceSetup.difficulty != RD_HARD)
+    else if(crashes.road)// && world->raceSetup.difficulty != RD_HARD)
     {
-        steer_angle = steer_to_angle(NEXT_HINT, 0.0f);
+        steer_angle = steer_to_angle(trackHint, 0.0f);
 
         #ifdef AI_DEBUG
-        std::cout << "Action 3: Avoid crashing with the track." << std::endl;
+        std::cout << "Action: Avoid crashing with the track." << std::endl;
         #endif
     }
     //If we are going to crash against a kart, avoid it
@@ -153,7 +153,7 @@ void AutoKart::update (float delta)
         }
 
         #ifdef AI_DEBUG
-        std::cout << "Action 4: Avoid crashing with karts." << std::endl;
+        std::cout << "Action: Avoid crashing with karts." << std::endl;
         #endif
     }
     else
@@ -180,7 +180,7 @@ void AutoKart::update (float delta)
         }
 
         #ifdef AI_DEBUG
-        std::cout << "Action 5: Fallback."  << std::endl;
+        std::cout << "Action: Fallback."  << std::endl;
         #endif
     }
 
@@ -194,7 +194,7 @@ void AutoKart::update (float delta)
 
 //Braking distance is in openGL units.
     float braking_distance = velocity.xyz[1] * time - (-guess_accel(-1.0f) / 2) * time * time;
-    if(crashes.track && braking_distance > crashes.track) brake = true;
+    if(crashes.road && braking_distance > crashes.road) brake = true;
 #endif
 
     bool player_winning = false;
@@ -241,11 +241,9 @@ void AutoKart::update (float delta)
         starting_delay -= delta;
     }
 
-/*Handle wheelies*/
-//TODO: this won't work for now, but when the wheelie code is moved to the
-//Kart class it will.
-    if(world->raceSetup.difficulty != RD_EASY && !crashes.track)
-        controls.wheelie = do_wheelie(STEPS);
+    /*Handle wheelies*/
+    if(world->raceSetup.difficulty != RD_EASY && !crashes.road)
+        controls.wheelie = 0;do_wheelie(STEPS);
 
     /*Handle specials*/
     time_since_last_shot += delta;
@@ -272,7 +270,8 @@ void AutoKart::update (float delta)
                 {
                     float angle = fabsf(world->track->angle[trackHint] -
                         curr_pos.hpr[0]);
-                    if(time_since_last_shot > 10.0f && angle < 45.0f)
+                    if(time_since_last_shot > 10.0f && angle < 45.0f &&
+                       !crashes.road)
                     {
                         collectable.use();
                         time_since_last_shot = 0.0f;
@@ -348,14 +347,26 @@ void AutoKart::handle_race_start()
 
 //=============================================================================
 
+//TODO: change NEXT_HINT for HINT.
 float AutoKart::steer_to_angle (const size_t NEXT_HINT, const float ANGLE)
 {
+    float dist1 = sgDistanceVec2(world->track->driveline[NEXT_HINT], curr_pos.xyz);
+    float dist2 = sgDistanceVec2(world->track->driveline[trackHint], curr_pos.xyz);
+    float angle = world->track->angle[NEXT_HINT] * dist1 + world->track->angle[trackHint] * dist2;
+    angle /= dist1 + dist2;
+    
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = world->track->angle[NEXT_HINT] - curr_pos.hpr[0];
+    float steer_angle = angle - curr_pos.hpr[0];
+    std::cout << "track angle: " << world->track->angle[NEXT_HINT] << std::endl;
+    std::cout << "hpr: " << curr_pos.hpr[0] << std::endl;
+    std::cout << "steer angle 1: " << steer_angle << std::endl;
     remove_angle_excess(steer_angle);
+    std::cout << "steer angle 2: " << steer_angle << std::endl;
 
     steer_angle += ANGLE;
+    std::cout << "steer angle 3: " << steer_angle << std::endl;
     remove_angle_excess(steer_angle);
+    std::cout << "steer angle 4: " << steer_angle << std::endl;
 
     return steer_angle;
 }
@@ -373,6 +384,7 @@ float AutoKart::steer_to_point(const sgVec2 POINT)
 
       //FIXME: change 'rot' for steer_angle
       float rot = theta - getCoord()->hpr[0];
+      std::cout << "rot: " << rot << ",theta: " << theta << ", hpr: " << getCoord()->hpr[0] << std::endl;
       remove_angle_excess(rot);
 
       return rot;
@@ -476,7 +488,7 @@ void AutoKart::check_crashes(const int STEPS, sgVec3 pos)
 
         if (distance + KART_LENGTH * 0.5f > check_width)
         {
-            crashes.track = true;
+            crashes.road = true;
             break;
         }
     }
