@@ -692,8 +692,6 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       }
 
       Kart* player_kart=world->getPlayerKart(pla);
-      drawCollectableIcons(player_kart, offset_x, offset_y,
-			   split_screen_ratio_x, split_screen_ratio_y );
       drawEnergyMeter     (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawSteering        (player_kart, offset_x, offset_y,
@@ -702,6 +700,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
       drawEmergencyText   (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
+      drawCollectableIcons(player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
     }   // for pla
     drawTimer ();
     drawMap   ();
