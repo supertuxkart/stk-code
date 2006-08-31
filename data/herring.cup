@@ -2,6 +2,6 @@
 
 (tuxkart-cup
  (name "Herring Cup")
- (tracks "race"))
+ (tracks "startrack" "lighthouse" "sandtrack" :"volcano" "gownsbow" "beach" "bsodcastle" "geekopeak" "littlevolcano" "olivermath" "race" "subseatrack" "tuxtrack"))
 
 ;; EOF ;;

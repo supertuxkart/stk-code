@@ -21,7 +21,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#define AI_DEBUG
+//#define AI_DEBUG
 
 #ifdef AI_DEBUG
 #define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
@@ -361,16 +361,10 @@ float AutoKart::steer_to_angle (const size_t HINT, const float ANGLE)
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - curr_pos.hpr[0];
-    std::cout << "track angle: " << world->track->angle[HINT] << std::endl;
-    std::cout << "hpr: " << curr_pos.hpr[0] << std::endl;
-    std::cout << "steer angle 1: " << steer_angle << std::endl;
     remove_angle_excess(steer_angle);
-    std::cout << "steer angle 2: " << steer_angle << std::endl;
 
     steer_angle += ANGLE;
-    std::cout << "steer angle 3: " << steer_angle << std::endl;
     remove_angle_excess(steer_angle);
-    std::cout << "steer angle 4: " << steer_angle << std::endl;
 
     return steer_angle;
 }
@@ -386,12 +380,10 @@ float AutoKart::steer_to_point(const sgVec2 POINT)
       //The real value depends on the side of the track that the kart is
       theta += ADJACENT_LINE < 0.0f ? 90.0f : -90.0f;
 
-      //FIXME: change 'rot' for steer_angle
-      float rot = theta - getCoord()->hpr[0];
-      std::cout << "rot: " << rot << ",theta: " << theta << ", hpr: " << getCoord()->hpr[0] << std::endl;
-      remove_angle_excess(rot);
+      float steer_angle = theta - getCoord()->hpr[0];
+      remove_angle_excess(steer_angle);
 
-      return rot;
+      return steer_angle;
 }
 
 //=============================================================================
@@ -512,7 +504,7 @@ void AutoKart::find_non_crashing_point(sgVec2 result)
 
     const unsigned int DRIVELINE_SIZE = world->track->driveline.size();
 
-    int hint = trackHint + 1 < DRIVELINE_SIZE ? trackHint + 1 : 0;
+    unsigned int hint = trackHint + 1 < DRIVELINE_SIZE ? trackHint + 1 : 0;
     int target_hint;
 
     sgVec2 direction;
