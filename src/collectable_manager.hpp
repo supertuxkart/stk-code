@@ -28,7 +28,10 @@ class ssgEntity;
 
 enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE, 
 		      COLLECT_SPARK,   COLLECT_HOMING_MISSILE,
-		      COLLECT_ZIPPER,  COLLECT_MAGNET, 
+		      COLLECT_ZIPPER,  
+#ifdef USE_MAGNETS
+                      COLLECT_MAGNET, 
+#endif
 		      COLLECT_MAX};
 
 class CollectableManager {

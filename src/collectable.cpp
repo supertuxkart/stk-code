@@ -48,6 +48,7 @@ Material *Collectable::getIcon() {
 
 // -----------------------------------------------------------------------------
 void Collectable::use() {
+#ifdef USE_MAGNET
   if(config->disableMagnet) {
     attachmentType at=owner->getAttachment();
     if(at==ATTACH_MAGNET) {
@@ -56,10 +57,13 @@ void Collectable::use() {
       owner->setAttachmentType(ATTACH_MAGNET     );
     }   // if MAGNET_BZZT
   }  // config->disableMagnet
+#endif
   number--;
   switch (type) {
+#ifdef USE_MAGNET
     case COLLECT_MAGNET:   owner->attach(ATTACH_MAGNET_BZZT, 10.0f);
                            break ;
+#endif
     case COLLECT_ZIPPER:   owner->handleZipper();
 			   break ;
     case COLLECT_HOMING_MISSILE:

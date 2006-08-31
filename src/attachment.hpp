@@ -27,8 +27,11 @@ class ssgEntity;
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
 // and TINYTUX being the last one. So if new elemts are added, make sure
 // to add them in between those values.
-enum attachmentType { ATTACH_PARACHUTE, ATTACH_MAGNET,
-		      ATTACH_MAGNET_BZZT, ATTACH_ANVIL, ATTACH_TINYTUX,
+enum attachmentType { ATTACH_PARACHUTE, 
+#ifdef USE_MAGNET
+                      ATTACH_MAGNET, ATTACH_MAGNET_BZZT, 
+#endif
+		      ATTACH_ANVIL, ATTACH_TINYTUX,
                       ATTACH_MAX, ATTACH_NOTHING};
 
 

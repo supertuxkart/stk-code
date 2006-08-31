@@ -47,8 +47,10 @@ struct  initAttachmentType {attachmentType attachment; char*file;};
 
 initAttachmentType iat[]={
   {ATTACH_PARACHUTE,   "parachute.ac"},
+#ifdef USE_MAGNET
   {ATTACH_MAGNET,      "magnet.ac"},
   {ATTACH_MAGNET_BZZT, "magnetbzzt.ac"},
+#endif
   {ATTACH_ANVIL,       "anvil.ac"},
   {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
   {ATTACH_MAX,         ""},
@@ -130,6 +132,7 @@ void Attachment::update(float dt, sgCoord *velocity) {
                            sgZeroVec3 ( velocity->hpr ) ;
 			   velocity->xyz[2] = 1.1 * GRAVITY * dt *10;
 			   break;
+#ifdef USE_MAGNET
     case ATTACH_MAGNET:    break;
     case ATTACH_MAGNET_BZZT: float cdist; int closest;
                              kart->getClosestKart(&cdist, &closest);
@@ -151,6 +154,7 @@ void Attachment::update(float dt, sgCoord *velocity) {
 			     }
 			     kart->handleMagnet(cdist, closest);
 			     break;
+#endif
   }   // switch
 
   if ( time_left <= 0.0f) {
