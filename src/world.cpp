@@ -17,6 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+//#define DEBUG_SHOW_DRIVEPOINTS //This would place a small sphere in every point
+                               //of the driveline, the one at the first point
+                               //is purple, the others are yellow.
+#ifdef DEBUG_SHOW_DRIVEPOINTS
+#include <plib/ssgAux.h>
+#endif
+
 #include <assert.h>
 #include <sstream>
 #include <stdexcept>
@@ -433,6 +440,33 @@ void World::loadTrack() {
       trans       -> addKid    ( lod   ) ;
       trackBranch -> addKid    ( trans ) ;
       lod         -> setRanges ( r, 2  ) ;
+
+      #ifdef DEBUG_SHOW_DRIVEPOINTS
+      ssgaSphere *sphere;
+      sgVec3 center;
+      sgVec4 colour;
+      for(unsigned int i = 0; i < track->driveline.size(); ++i)
+      {
+          sphere = new ssgaSphere;
+          sgCopyVec3(center, track->driveline[i]);
+          sphere->setCenter(center);
+          sphere->setSize(1.0f);
+
+          if(i == 0)
+          {
+              colour[0] = colour[2] = colour[3] = 255;
+              colour[1] = 0;
+          }
+          else
+          {
+              colour[0] = colour[1] = colour[3] = 255;
+              colour[2] = 0;
+          }
+          sphere->setColour(colour);
+          scene->addKid(sphere);
+      }
+      #endif
+
     } else {
       fclose(fd);
       std::stringstream msg;
