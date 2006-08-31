@@ -248,7 +248,6 @@ void World::checkRaceStatus() {
     vector, so substracting the number of players finds the first player's
     position.*/
   int new_finished_karts   = 0;
-  int new_finished_players = 0;
   for ( Karts::size_type i = 0; i < kart.size(); ++i)
   {
       if ((kart[i]->getLap () >= raceSetup.numLaps) && !kart[i]->raceIsFinished())
@@ -263,23 +262,42 @@ void World::checkRaceStatus() {
 	  }
       }
   }
-
   race_manager->addFinishedKarts(new_finished_karts);
-  if(raceSetup.getNumKarts() == 1)
-  {
-     if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
-  }
-  else
-    if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) {
-      phase = FINISH_PHASE;
-      for ( Karts::size_type i = 0; i < kart.size(); ++i) {
-	if(!kart[i]->raceIsFinished()) {
-	  // The time will actually not be displaced for the last kart
-	  kart[i]->setFinishingState(clock);
-	}   // if !raceIsFinished
-      }   // for i
-    }
-}
+  // Different ending conditions:
+  // 1) all players are finished -->
+  //    wait TIME_DELAY_TILL_FINISH seconds - if no other end condition
+  //    applies, end the game (and make up some artificial times for the
+  //    outstanding karts).
+  // 2) If only one kart is playing, finish when one kart is finished.
+  // 3) Otherwise, wait till all karts except one is finished - the last
+  //    kart obviously becoming the last
+  if(race_manager->allPlayerFinished() && phase == RACE_PHASE) {
+    phase = DELAY_FINISH_PHASE;
+    finishDelayStartTime = clock;
+  } else if(phase==DELAY_FINISH_PHASE && 
+	    clock-finishDelayStartTime>TIME_DELAY_TILL_FINISH) {
+    phase = FINISH_PHASE;
+    for ( Karts::size_type i = 0; i < kart.size(); ++i) {
+      if(!kart[i]->raceIsFinished()) {
+	// FIXME: Add some tenths to have different times - a better solution
+	//        would be to estimate the distance to go and use this to
+	//        determine better times.
+	kart[i]->setFinishingState(clock+kart[i]->getPosition()*0.3f);
+      }   // if !raceIsFinished
+    }   // for i
+    
+  } else if(raceSetup.getNumKarts() == 1) {
+    if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
+  } else if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) {
+    phase = FINISH_PHASE;
+    for ( Karts::size_type i = 0; i < kart.size(); ++i) {
+      if(!kart[i]->raceIsFinished()) {
+	kart[i]->setFinishingState(clock);
+      }   // if !raceIsFinished
+    }   // for i
+  }   // if getFinishedKarts()>=geNumKarts()
+
+}  // checkRaceStatus
 
 void
 World::updateRacePosition ( int k )
@@ -484,11 +502,14 @@ void World::loadTrack() {
 
 void World::restartRace() {
   ready_set_go = 3;
-  clock = 0.0f;
-  phase = START_PHASE;
+  clock        = 0.0f;
+  phase        = START_PHASE;
 
-  for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i )
-    (*i)->reset() ;
+  for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i ) {
+    (*i)->reset();
+  }
+  herring_manager->reset();
+  race_manager->reset();
 }
 
 Kart* World::getKart(int kartId) {

@@ -198,6 +198,11 @@ RaceManager::RaceManager()
   players.push_back("tuxkart");
 }
 
+void RaceManager::reset() {
+  numFinishedKarts   = 0;
+  numFinishedPlayers = 0;
+}  // reset
+
 void
 RaceManager::setPlayerKart(int player, const std::string& kart)
 {

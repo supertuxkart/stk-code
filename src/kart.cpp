@@ -159,6 +159,7 @@ void Kart::reset() {
   ZipperTimeLeft      = 0.0f ;
   rescue              = FALSE;
   attachment.clear();
+  collectable.clear();
   num_herring_gobbled = 0;
   wheel_position      = 0;
   trackHint = 0;
@@ -475,7 +476,7 @@ void Kart::updatePhysics (float dt) {
     //        since the velocity will always be lower than 1.5*100000.0f
     if(fabsf(velocity.xyz[1])<150000.0f) {
       float msa       = getMaxSteerAngle();
-      velocity.hpr[0] = msa*controls.lr;
+      velocity.hpr[0] = controls.lr * ((velocity.xyz[1]>=0.0f) ? msa : -msa);
       if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;  // In case the AI sets
       if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;  // controls.lr >1 or <-1
     } else {

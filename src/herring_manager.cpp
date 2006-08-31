@@ -124,6 +124,15 @@ void HerringManager::cleanup() {
 }   // cleanup
 
 // -----------------------------------------------------------------------------
+// Remove all herring instances, and the track specific models. This is used
+// just before a new track is loaded and a race is started
+void HerringManager::reset() {
+  for(AllHerringType::iterator i =allHerrings.begin(); 
+                               i!=allHerrings.end();  i++) {
+    (*i)->reset();
+  }  // for i
+}   // reset
+// -----------------------------------------------------------------------------
 void HerringManager::update(float delta) {
   for(AllHerringType::iterator i =allHerrings.begin(); 
                                i!=allHerrings.end();  i++) {

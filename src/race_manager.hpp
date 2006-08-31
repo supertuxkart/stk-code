@@ -130,8 +130,8 @@ private:
   std::string                      track;
   int                              numLaps;
   int                              numKarts;
-  int                              numFinishedKarts;
-  int                              numFinishedPlayers;
+  unsigned int                     numFinishedKarts;
+  unsigned int                     numFinishedPlayers;
 
 public:
   RaceManager();
@@ -140,6 +140,7 @@ public:
 
   void setPlayerKart(int player, const std::string& kart);
   void setNumPlayers(int num);
+  void reset();
   void setDifficulty(RaceDifficulty difficulty_) { difficulty = difficulty_; }
   void setNumLaps(int num)                   { numLaps = num;                }
   void setTrack(const std::string& track_)   { track = track_;               }
@@ -156,6 +157,7 @@ public:
   void addKartScore(int kart, int pos)  { mode->addKartScore(kart, pos);     }
   void addFinishedKarts(int num)        { numFinishedKarts += num;           }
   void PlayerFinishes()                 { numFinishedPlayers++;              }
+  int  allPlayerFinished()        {return numFinishedPlayers==players.size();}
 
   void setMirror() {/*FIXME*/}
   void setReverse(){/*FIXME*/}

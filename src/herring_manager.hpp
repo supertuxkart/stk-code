@@ -61,6 +61,7 @@ public:
   void        update         (float delta);
   void        hitHerring     (Kart* kart);
   void        cleanup        ();
+  void        reset          ();
 };
 
 extern HerringManager* herring_manager;

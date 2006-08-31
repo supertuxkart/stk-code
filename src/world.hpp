@@ -45,6 +45,7 @@ public:
 private:
   Karts      kart;
   StaticSSG* staticSSG;
+  float      finishDelayStartTime;
 public:
   float      clock;
 
@@ -58,6 +59,9 @@ public:
     START_PHASE,
     // The traffic light turned green and all driver, drive around the track
     RACE_PHASE,
+    // All players have finished, now wait a certain amount of time for AI 
+    // karts to finish. If they do not finish in that time, finish the race
+    DELAY_FINISH_PHASE,
     // The player crossed the finishing line and his and the time of
     // the other players is displayed, controll is automatic
     FINISH_PHASE 

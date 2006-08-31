@@ -208,7 +208,8 @@ void RaceGUI::drawTexture(const GLuint texture, int w, int h,
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawTimer () {
-  if(world->getPhase()!=World::RACE_PHASE) return;
+  if(world->getPhase()!=World::RACE_PHASE         &&
+     world->getPhase()!=World::DELAY_FINISH_PHASE   ) return;
   char str [ 256 ] ;
 
   assert(world != NULL);
@@ -671,7 +672,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
   if ( world->getPhase() == World::FINISH_PHASE ) {
     drawGameOverText(dt) ;
   }   // if FINISH_PHASE
-  if ( world->getPhase() == World::RACE_PHASE   ) {
+  if ( world->getPhase() == World::RACE_PHASE         ||
+       world->getPhase() == World::DELAY_FINISH_PHASE   ) {
     for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++) {
       int offset_x, offset_y;
       offset_x = offset_y = 0;

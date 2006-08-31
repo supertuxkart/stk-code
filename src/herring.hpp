@@ -48,6 +48,7 @@ private:
   void        isEaten   ();
   herringType getType   ()            {return type;}
   int         hitKart   (Kart* kart );
+  void        reset     ();
 };   // class Herring
 
 #endif

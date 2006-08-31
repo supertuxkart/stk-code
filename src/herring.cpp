@@ -38,10 +38,16 @@ Herring::Herring(herringType _type, sgVec3 xyz, ssgEntity* model) {
 
   type           = _type;
   bEaten         = FALSE;
-  rotation       = 0.0;
-  time_to_return = 0.0;  // not strictly necessary, see isEaten()
+  rotation       = 0.0f;
+  time_to_return = 0.0f;  // not strictly necessary, see isEaten()
 }   // Herring
 
+// -----------------------------------------------------------------------------
+void Herring::reset() {
+  bEaten         = false;
+  time_to_return = 0.0f;
+  root->setTransform(&coord);
+}   // reset
 // -----------------------------------------------------------------------------
 int Herring::hitKart(Kart* kart) {
   return sgDistanceSquaredVec2 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
