@@ -21,7 +21,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-//#define AI_DEBUG
+#define AI_DEBUG
 
 #ifdef AI_DEBUG
 #define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
@@ -127,7 +127,7 @@ void AutoKart::update (float delta)
     //If we are going to crash against a kart, avoid it
     else if(crashes.kart != -1)
     {
-/*        if(start_kart_crash_direction == 1) //-1 = left, 1 = right, 0 = no crash.
+        if(start_kart_crash_direction == 1) //-1 = left, 1 = right, 0 = no crash.
         {
             steer_angle = steer_to_angle(NEXT_HINT, -90.0f);
             start_kart_crash_direction = 0;
@@ -137,7 +137,7 @@ void AutoKart::update (float delta)
             steer_angle = steer_to_angle(NEXT_HINT, 90.0f);
             start_kart_crash_direction = 0;
         }
-        else*/
+        else
         {
             if(curr_track_coords[0] > world->getKart(crashes.kart)->
                 getDistanceToCenter())
@@ -242,8 +242,8 @@ void AutoKart::update (float delta)
     }
 
     /*Handle wheelies*/
-    if(world->raceSetup.difficulty != RD_EASY && !crashes.road)
-        controls.wheelie = 0;do_wheelie(STEPS);
+    if(world->raceSetup.difficulty != RD_EASY)
+        controls.wheelie = do_wheelie(STEPS);
 
     /*Handle specials*/
     time_since_last_shot += delta;
@@ -289,6 +289,8 @@ void AutoKart::update (float delta)
 
 bool AutoKart::do_wheelie ( const int STEPS )
 {
+    if(crashes.road) return false;
+
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work optimally on big or small karts.
     const float KART_LENGTH = 1.5f;
@@ -298,9 +300,12 @@ bool AutoKart::do_wheelie ( const int STEPS )
 
     sgNormalizeVec2(vel_normal, abs_velocity);
 
-  //FIXME: instead of using 1.35, it should find out how much time it will
-  //pass to stop doing the wheelie completely from the current state.
-    const int WHEELIE_STEPS = int((velocity.xyz[1] * 1.35f)/ KART_LENGTH );
+    //FIXME: instead of using 1.35 and 1.5, it should find out how much time it
+    //will pass to stop doing the wheelie completely from the current state.
+    const float CHECK_DIST = world->raceSetup.difficulty == RD_HARD ? 1.35f :
+        1.5f;
+
+    const int WHEELIE_STEPS = int((velocity.xyz[1] * CHECK_DIST)/ KART_LENGTH);
     for(int i = WHEELIE_STEPS; i > STEPS - 1; --i)
     {
       sgAddScaledVec2(step_coord, curr_pos.xyz, vel_normal, KART_LENGTH * i);
@@ -347,17 +352,16 @@ void AutoKart::handle_race_start()
 
 //=============================================================================
 
-//TODO: change NEXT_HINT for HINT.
-float AutoKart::steer_to_angle (const size_t NEXT_HINT, const float ANGLE)
+float AutoKart::steer_to_angle (const size_t HINT, const float ANGLE)
 {
-    float dist1 = sgDistanceVec2(world->track->driveline[NEXT_HINT], curr_pos.xyz);
+    float dist1 = sgDistanceVec2(world->track->driveline[HINT], curr_pos.xyz);
     float dist2 = sgDistanceVec2(world->track->driveline[trackHint], curr_pos.xyz);
-    float angle = world->track->angle[NEXT_HINT] * dist1 + world->track->angle[trackHint] * dist2;
-    angle /= dist1 + dist2;
-    
+    float angle = (world->track->angle[HINT] * dist1 +
+        world->track->angle[trackHint] * dist2) / (dist1 + dist2);
+
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - curr_pos.hpr[0];
-    std::cout << "track angle: " << world->track->angle[NEXT_HINT] << std::endl;
+    std::cout << "track angle: " << world->track->angle[HINT] << std::endl;
     std::cout << "hpr: " << curr_pos.hpr[0] << std::endl;
     std::cout << "steer angle 1: " << steer_angle << std::endl;
     remove_angle_excess(steer_angle);

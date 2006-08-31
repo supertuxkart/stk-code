@@ -47,7 +47,7 @@ private:
 
   void handle_race_start();
 
-  float steer_to_angle(const size_t NEXT_HINT, const float ANGLE);
+  float steer_to_angle(const size_t HINT, const float ANGLE);
   float steer_to_point(const sgVec2 POINT);
 
   bool do_wheelie(const int STEPS);
