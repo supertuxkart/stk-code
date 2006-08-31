@@ -286,9 +286,9 @@ int main ( int argc, char **argv ) {
   // Quickstart (-N)
   // ===============
 	race_manager->setNumPlayers(1);
-	race_manager->setNumKarts  (2);
+	race_manager->setNumKarts  (4);
 	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-	race_manager->setDifficulty(RD_HARD);
+	race_manager->setDifficulty(RD_MEDIUM);
 	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
 	race_manager->setNumLaps   (3);
 	//race_manager->setTrack     ("tuxtrack");
