@@ -140,22 +140,22 @@ with each other:
   The engine force is defined by 'engine-power', which
   results in a force pushing the kart forward. There are
   two forces countering this: rolling resistance (see
-  roll-resistance), and air-friction. Rolling resistance
+  roll-resistance), and air-resistance. Rolling resistance
   increases linearly with the velocity of the kart
-  (speed * roll_resistance); while air friction increases
+  (speed * roll_resistance); while air resistance increases
   with the squared speed of the kart 
-  (speed*speed*air_friction). Rolling resistance is more
-  important at lower speed, while air-friction is most
+  (speed*speed*air_resistance). Rolling resistance is more
+  important at lower speed, while air-resistance is most
   effective at higher speed (and it's ultimate responsible
   for the top speed of the kart).Therefore:
   - engine_power and roll_resistance determine how fast
     a kart can accelerate
-  - engine_power and air_friction determine the maximum
+  - engine_power and air_resistance determine the maximum
     speed of the kart.
   E.g., to make the kart accelerate faster, without changing
   the maximum speed: either decrease roll-resistance (the
   effect to the maximum speed can be neglected); or increase
-  engine power and air friction.
+  engine power and air resistance.
   Additional effects are the tire grip and the surface the
   kart is driving on: tire-force*tire_grip*surface_grip 
   is the maximum grip (tire-force = force on the tire, caused

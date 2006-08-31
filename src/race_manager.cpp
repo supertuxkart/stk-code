@@ -228,8 +228,8 @@ RaceManager::setNumPlayers(int num)
 void
 RaceManager::start()
 {
-  numFinishedKarts = 0;
-
+  numFinishedKarts   = 0;
+  numFinishedPlayers = 0;
   delete mode;
 
   assert(players.size() > 0);
@@ -257,7 +257,8 @@ void
 RaceManager::next()
 {
   assert(mode);
-  numFinishedKarts = 0;
+  numFinishedKarts   = 0;
+  numFinishedPlayers = 0;
   mode->next();
 }
 

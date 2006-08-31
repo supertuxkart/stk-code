@@ -77,8 +77,9 @@ private:
 public:
   AutoKart(const KartProperties *kart_properties, int position);
 
-  void update (float delta) ;
-  void reset  ();
+  void update      (float delta) ;
+  void reset       ();
+  int  isPlayerKart() const {return 0;}
 };
 
 #endif

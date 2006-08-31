@@ -114,22 +114,10 @@ void PlayerKart::update(float dt) {
     collectable.use() ;
     controls.fire = false;
   }
-  if ( on_ground ) {
-    if ( controls.wheelie && velocity.xyz[1] >= MIN_WHEELIE_VELOCITY ) {
-      if ( wheelie_angle < WHEELIE_PITCH )
-        wheelie_angle += WHEELIE_PITCH_RATE * dt ;
-      else
-        wheelie_angle = WHEELIE_PITCH ;
-    } else if ( wheelie_angle > 0.0f ) {
-      wheelie_angle -= PITCH_RESTORE_RATE * dt;
-      if ( wheelie_angle <= 0.0f ) wheelie_angle = 0.0f ;
-    }
-
-    if ( controls.rescue ) {
-      sound -> playSfx ( SOUND_BEEP ) ;
-      rescue = TRUE ;
-      controls.rescue=false;
-    }
+  if ( on_ground  &&  controls.rescue ) {
+    sound -> playSfx ( SOUND_BEEP ) ;
+    rescue = TRUE ;
+    controls.rescue=false;
   }
 
   Kart::update(dt);

@@ -247,16 +247,20 @@ void World::checkRaceStatus() {
     not in time trial mode, the race is over. Players are the last in the
     vector, so substracting the number of players finds the first player's
     position.*/
-  int new_finished_karts = 0;
+  int new_finished_karts   = 0;
+  int new_finished_players = 0;
   for ( Karts::size_type i = 0; i < kart.size(); ++i)
   {
       if ((kart[i]->getLap () >= raceSetup.numLaps) && !kart[i]->raceIsFinished())
       {
-          kart[i]->setFinishingState (kart[i]->getPosition(), clock);
+          kart[i]->setFinishingState(clock);
 
           race_manager->addKartScore(i, kart[i]->getPosition());
 
           ++new_finished_karts;
+	  if(kart[i]->isPlayerKart()) {
+	    race_manager->PlayerFinishes();
+	  }
       }
   }
 
@@ -271,7 +275,7 @@ void World::checkRaceStatus() {
       for ( Karts::size_type i = 0; i < kart.size(); ++i) {
 	if(!kart[i]->raceIsFinished()) {
 	  // The time will actually not be displaced for the last kart
-	  kart[i]->setFinishingState(raceSetup.getNumKarts(), clock);
+	  kart[i]->setFinishingState(clock);
 	}   // if !raceIsFinished
       }   // for i
     }

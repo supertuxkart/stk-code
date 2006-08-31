@@ -114,17 +114,18 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
   grid_position        = position_ ;
   num_herring_gobbled  = 0;
   finishedRace         = false;
-  finishingPosition    = 9;
-  finishingMins        = 0;
-  finishingSecs        = 0;
-  finishingTenths      = 0;
-  prevAccel            = 0.0;
+  finishTime           = 0.0f;
+  prevAccel            = 0.0f;
   powersliding         = false;
   smokepuff                = NULL;
   smoke_system         = NULL;
   exhaust_pipe         = NULL;
   skidmark_left        = NULL;
   skidmark_right       = NULL;
+  // Neglecting the roll resistance (which is small for high speeds compared
+  // to the air resistance), maximum speed is reached when the engine
+  // power equals the air resistance force, resulting in this formula:
+  maxSpeed             = sqrt(getMaxPower()/getAirResistance());
 
   wheel_position = 0;
 
@@ -151,19 +152,15 @@ Kart::~Kart() {
 void Kart::reset() {
   Moveable::reset();
 
-  raceLap        = -1;
-  racePosition   = 9;
-  finishedRace         = false;
-  finishingPosition    = 9;
-  finishingMins        = 0;
-  finishingSecs        = 0;
-  finishingTenths      = 0;
-
-  ZipperTimeLeft = 0.0f ;
-  rescue         = FALSE;
+  raceLap             = -1;
+  racePosition        = 9;
+  finishedRace        = false;
+  finishTime          = 0.0f;
+  ZipperTimeLeft      = 0.0f ;
+  rescue              = FALSE;
   attachment.clear();
   num_herring_gobbled = 0;
-  wheel_position = 0;
+  wheel_position      = 0;
   trackHint = 0;
   world -> track -> absSpatialToTrack(curr_track_coords,
                                                   curr_pos.xyz);
@@ -282,10 +279,11 @@ void Kart::doCollisionAnalysis ( float delta, float hot ) {
       velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
     }
   }   // if collided
+
   if ( crashed && velocity.xyz[1] > MIN_CRASH_VELOCITY ) {
     forceCrash () ;
   } else if ( wheelie_angle < 0.0f ) {
-    wheelie_angle += PITCH_RESTORE_RATE * delta ;
+    wheelie_angle += getWheelieRestoreRate() * delta;
     if ( wheelie_angle >= 0.0f ) wheelie_angle = 0.0f ;
   }
    
@@ -339,27 +337,49 @@ void Kart::updatePhysics (float dt) {
   // Get some values once, to avoid calling them more than once.
   float  gravity     = world->getGravity();
   float  wheelBase   = getWheelBase();
-  float  mass        = getMass();          // includes attachment.WeightAdjust
-  float  airFriction = getAirFriction();   // includes attachmetn.AirFrictAdjust
+  float  mass        = getMass();         // includes attachment.WeightAdjust
+  float  airFriction = getAirResistance(); // includes attachmetn.AirFrictAdjust
   float  rollResist  = getRollResistance();
 
   //  if(materialHOT) rollResist +=materialHOT->getFriction();
   float throttle;
+
+  if(wheelie_angle>0.0f) {
+    velocity.xyz[1]-=getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+  }
+
+
+  // Handle throttle and brakes
+  // ==========================
   if(on_ground) {
     if(controls.brake) {
       throttle = velocity.xyz[1]<0.0 ? -1.0f : -getBrakeFactor();
     } else {   // not breaking
 	throttle =  controls.accel;
     }
+    // Handle wheelies
+    // ===============
+    if ( controls.wheelie && velocity.xyz[1] >= 
+	 getMaxSpeed()*getWheelieMaxSpeedRatio()) {
+      velocity.hpr[0]=0.0;
+      if ( wheelie_angle < getWheelieMaxPitch() )
+        wheelie_angle += getWheeliePitchRate() * dt;
+      else
+        wheelie_angle = getWheelieMaxPitch();
+    } else if ( wheelie_angle > 0.0f ) {
+      wheelie_angle -= getWheelieRestoreRate() * dt;
+      if ( wheelie_angle <= 0.0f ) wheelie_angle = 0.0f ;
+    }
   } else {   // not on ground
     throttle = 0.0;
   }   // if !on_ground
 
 
+
+
 #ifndef NEW_PHYSICS
 
   float ForceLong = throttle * getMaxPower();
-
   // apply air friction and system friction
   AirResistance[0]   = 0.0f;
   AirResistance[1]   = airFriction*velocity.xyz[1]*fabs(velocity.xyz[1]);
@@ -666,6 +686,10 @@ void Kart::updatePhysics (float dt) {
 
 #endif
 
+      if(wheelie_angle>0.0f) {
+	velocity.xyz[1]+=
+	  getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+      }
 }   // updatePhysics
 
 // -----------------------------------------------------------------------------
@@ -1006,19 +1030,9 @@ void print_model(ssgEntity* entity, int indent, int maxLevel) {
 }   // print_model
 
 // =============================================================================
-void Kart::setFinishingState (int pos, float time)
-{
-    finishedRace = true;
-    //FIXME: The finishing position is not necessary anymore, since the
-    //       racing position is now always correct (being the finishing
-    //       position when a kart has finished the race). So this can be 
-    //       simplified/removed
-    finishingPosition = pos;
-
-    finishingMins = (int) floor ( time / 60.0 ) ;
-    finishingSecs = (int) floor ( time - (double) ( 60 * finishingMins ) ) ;
-    finishingTenths = (int) floor ( 10.0f * (time - (double)(finishingSecs +
-        60*finishingMins)));
+void Kart::setFinishingState(float time) {
+  finishedRace = true;
+  finishTime   = time;
 }
 
 /* EOF */

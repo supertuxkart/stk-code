@@ -313,17 +313,15 @@ void RaceGUI::drawGameOverText (const float dt) {
   timer += dt;
 
   assert(world != NULL);
-  int finishing_position = world->getPlayerKart(0)->getFinishPosition();
-  if ( finishing_position < 0 )
-    finishing_position = world->getPlayerKart(0)->getPosition() ;
+  int finishing_position = world->getPlayerKart(0)->getPosition();
 
   if ( finishing_position > 1 ) {
-    widgetSet->drawText ( "YOU FINISHED"    , 90, 130, 210, red, green, blue ) ;
-    widgetSet->drawText ( pos_string [ finishing_position ], 90, 130, 210, 
-			  red, green, blue ) ;
+    char s[255];
+    sprintf(s,"YOU FINISHED %s",pos_string[finishing_position]);
+    widgetSet->drawText ( s  , 50, 130, 300, red, green, blue ) ;
   } else {
-    widgetSet->drawText ( "CONGRATULATIONS"  , 90, 130, 210, red, green, blue ) ;
-    widgetSet->drawText ( "YOU WON THE RACE!", 90, 130, 210, red, green, blue ) ;
+    widgetSet->drawText ( "CONGRATULATIONS"  , 50, 130, 300, red, green, blue ) ;
+    widgetSet->drawText ( "YOU WON THE RACE!", 50, 130, 210, red, green, blue ) ;
   }
 }   // drawGameOverText
 
@@ -417,8 +415,11 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
   if(angle_diff > 180.0f) angle_diff -= 360.0f;
   else if (angle_diff < -180.0f) angle_diff += 360.0f;
 
-  if ((angle_diff > 120.0f || angle_diff < -120.0f) &&
-      player_kart -> getVelocity () -> xyz [ 1 ] > 0.0 ) {
+  // Display a warning message if the kart is going back way (unless
+  // the kart has already finished the race).
+  if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
+      player_kart->getVelocity () -> xyz [ 1 ] > 0.0  &&
+      !player_kart->raceIsFinished()                       ) {
       static int i = FALSE ;
 
       int red, green, blue;
@@ -430,7 +431,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(90*ratio_y), 
+      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_y), 
 			    (int)(130*ratio_x)+offset_x,
 			    (int)(210*ratio_y)+offset_y, red, green, blue ) ;
       if ( ! i ) {
@@ -441,7 +442,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(90*ratio_y), 
+      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_y), 
 			    (int)((130+2)*ratio_x)+offset_x,
 			    (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
 

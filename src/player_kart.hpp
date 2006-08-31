@@ -49,6 +49,7 @@ class PlayerKart : public Kart {
   void    forceCrash        ();
   void    handleZipper      ();
   void    collectedHerring  (Herring* herring);
+  int     isPlayerKart      () const {return 1;}
 };
 
 #endif

@@ -60,7 +60,7 @@ class Attachment {
   float          getTimeLeft    () {return time_left;                         }
   float          WeightAdjust   () const {return type==ATTACH_ANVIL    
                                          ?physicsParameters->anvilWeight:0.0f;}
-  float          AirFrictAdjust () const {return type==ATTACH_PARACHUTE
+  float          AirResistanceAdjust () const {return type==ATTACH_PARACHUTE
                                    ?physicsParameters->parachuteFriction:0.0f;}
   float          SpeedAdjust    () const {return type==ATTACH_ANVIL
                                     ?physicsParameters->anvilSpeedFactor:1.0; }

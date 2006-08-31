@@ -43,7 +43,7 @@ RaceResultsGUI::RaceResultsGUI()
     unsigned int maxNameLen = 1;
     for(unsigned int i=0; i<numKarts; i++) {
       Kart *k = world->getKart(i);
-      order[k->getFinishPosition()-1] = i;
+      order[k->getPosition()-1] = i;
       unsigned int l = strlen(k->getKartProperties()->getName());
       if(l>maxNameLen) maxNameLen = l;
     }   // for i
@@ -56,12 +56,15 @@ RaceResultsGUI::RaceResultsGUI()
       if(i==numKarts-1) {
 	sprintf(sTime,"          ");
       } else {
-	sprintf(sTime,"%3d:%02d''%02d", kart->getFinishMins(),
-		kart->getFinishSecs(), kart->getFinishTenths());
+	float t      = kart->getFinishTime();
+	int   mins   = (int) floor ( t / 60.0 ) ;
+	int   secs   = (int) floor ( t - (float) ( 60 * mins ) ) ;
+	int   tenths = (int) floor ( 10.0f * (t - (float)(secs + 60*mins)));
+	sprintf(sTime,"%3d:%02d.%01d", mins, secs, tenths);
       }
       //This shows position + driver name + time + points earned + total points
       sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
-	      kart->getFinishPosition(), kartName, sTime,
+	      kart->getPosition(), kartName, sTime,
 	      race_manager->getPositionScore(i+1),
 	      race_manager->getKartScore(order[i]));
       widgetSet -> label(menu_id, (char*)(score + MAX_STR_LEN * i), 

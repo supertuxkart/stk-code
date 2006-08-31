@@ -89,28 +89,32 @@ KartProperties::~KartProperties() {
 
 // -----------------------------------------------------------------------------
 void KartProperties::getAllData(const lisp::Lisp* lisp) {
-    lisp->get("name",            name);
-    lisp->get("model-file",      model_file);
-    lisp->get("icon-file",       icon_file);
-    lisp->get("shadow-file",     shadow_file);
-    lisp->get("red",             color[0]);
-    lisp->get("green",           color[1]);
-    lisp->get("blue",            color[2]);
+    lisp->get("name",                    name);
+    lisp->get("model-file",              model_file);
+    lisp->get("icon-file",               icon_file);
+    lisp->get("shadow-file",             shadow_file);
+    lisp->get("red",                     color[0]);
+    lisp->get("green",                   color[1]);
+    lisp->get("blue",                    color[2]);
 
-    lisp->get("wheel-base",      wheel_base);
-    lisp->get("heightCOG",       heightCOG);
-    lisp->get("engine-power",    engine_power);
-    lisp->get("time-full-steer", time_full_steer);
-    lisp->get("brake-factor",    brake_factor);
-    lisp->get("roll-resistance", roll_resistance); 
-    lisp->get("mass",            mass);
-    lisp->get("air-friction",    air_friction);
-    lisp->get("tire-grip",       tire_grip);
-    lisp->get("max-steer-angle", max_steer_angle);
-
-    lisp->get("corn-f",          corn_f);
-    lisp->get("corn-r",          corn_r);
-    lisp->get("inertia",         inertia);
+    lisp->get("wheel-base",              wheel_base);
+    lisp->get("heightCOG",               heightCOG);
+    lisp->get("engine-power",            engine_power);
+    lisp->get("time-full-steer",         time_full_steer);
+    lisp->get("brake-factor",            brake_factor);
+    lisp->get("roll-resistance",         roll_resistance); 
+    lisp->get("mass",                    mass);
+    lisp->get("air-resistance",          air_resistance);
+    lisp->get("tire-grip",               tire_grip);
+    lisp->get("max-steer-angle",         max_steer_angle);
+    lisp->get("corn-f",                  corn_f);
+    lisp->get("corn-r",                  corn_r);
+    lisp->get("inertia",                 inertia);
+    lisp->get("wheelie-max-speed-ratio", wheelieMaxSpeedRatio);
+    lisp->get("wheelie-max-pitch",       wheelieMaxPitch     );
+    lisp->get("wheelie-pitch-rate",      wheeliePitchRate    );
+    lisp->get("wheelie-restore-rate",    wheelieRestoreRate  );
+    lisp->get("wheelie-speed-boost",     wheelieSpeedBoost   );
 }   // getAllData
 // -----------------------------------------------------------------------------
 void KartProperties::init_defaults() {
@@ -123,22 +127,24 @@ void KartProperties::init_defaults() {
 
   color[0] = 1.0f; color[1] = 0.0f; color[2] = 0.0f;
 
-  wheel_base      = physicsParameters->wheel_base;
-  heightCOG       = physicsParameters->heightCOG;
-  engine_power    = physicsParameters->engine_power;
-  time_full_steer = physicsParameters->time_full_steer;
-  brake_factor    = physicsParameters->brake_factor;
-  roll_resistance = physicsParameters->roll_resistance;
-  mass            = physicsParameters->mass;
-  air_friction    = physicsParameters->air_friction;
-  tire_grip       = physicsParameters->tire_grip;
-  max_steer_angle = physicsParameters->max_steer_angle;
-
-
-  corn_f          = physicsParameters->corn_f;
-  corn_r          = physicsParameters->corn_r;
-  inertia         = physicsParameters->inertia;
-
+  wheel_base           = physicsParameters->wheel_base;
+  heightCOG            = physicsParameters->heightCOG;
+  engine_power         = physicsParameters->engine_power;
+  time_full_steer      = physicsParameters->time_full_steer;
+  brake_factor         = physicsParameters->brake_factor;
+  roll_resistance      = physicsParameters->roll_resistance;
+  mass                 = physicsParameters->mass;
+  air_resistance       = physicsParameters->air_resistance;
+  tire_grip            = physicsParameters->tire_grip;
+  max_steer_angle      = physicsParameters->max_steer_angle;
+  corn_f               = physicsParameters->corn_f;
+  corn_r               = physicsParameters->corn_r;
+  inertia              = physicsParameters->inertia;
+  wheelieMaxSpeedRatio = physicsParameters->wheelieMaxSpeedRatio;
+  wheelieMaxPitch      = physicsParameters->wheelieMaxPitch;
+  wheeliePitchRate     = physicsParameters->wheeliePitchRate;
+  wheelieRestoreRate   = physicsParameters->wheelieRestoreRate;
+  wheelieSpeedBoost    = physicsParameters->wheelieSpeedBoost;
 }   // init_defaults
 
 // -----------------------------------------------------------------------------

@@ -51,16 +51,20 @@ Thanks in advance!
 
 Urgent for release
 ===================
+- 
 - Find acceptable physics parameters (e.g. kart engine and
   air resistance will determine highest speed).
   Perhaps make the maximum speed dependent on the skill level:
   higher skill levels --> faster karts [partly hiker, but feedback
   from all needed]
-- Fix wheelies (make all wheelie parameters easily changeable without
-  recompile, and if possible dependent on physic parameters.
-  [hiker, in progress]
-- Restart race does not work (when in a (quick) race, press esc,
-  select Restart --> nothing happens).
+- Collectables are not returned when a race is restart [hiker, in progress]
+- The number of finished karts is not reset during a restart, resulting
+  in the restarted race to finish too early [hiker, in progress]
+- Wait for a limited amount of time after the last player kart
+  is finished, and then end the game. Helps if 2 (or more) AI
+  karts are stuck somewhere.
+- If a herring is gone during a restart, it will not be
+  there at all in the restarted race [hiker, in progress]
 - Improve AI
   - tight/wide corner steering. [coz, in progress]
   - I've seen it once or twice that the AI would drive into a
@@ -127,6 +131,9 @@ Things that would be nice to fix, but are not urgent
   of the track - which doesn't work correctly in case of lanes
   running on top of each other (gown), or a track running inside
   a tube (subsea).
+- Create a widget displaying slowly scrolling text, which would
+  enable a much longer and complete credit lists (and perhaps
+  help texts as well).
 
 long term
 =========
@@ -189,3 +196,8 @@ DONE
      down 
 - Disable fullscreen (it doesn't work currently, and I expect it's
   too much work to fix this on all platforms before the release).
+- Fix wheelies (make all wheelie parameters easily changeable without
+  recompile, and if possible dependent on physic parameters.
+- Restart race does not work (when in a (quick) race, press esc,
+  select Restart --> nothing happens) --> could not be reproduced.
+

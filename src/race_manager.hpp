@@ -131,6 +131,7 @@ private:
   int                              numLaps;
   int                              numKarts;
   int                              numFinishedKarts;
+  int                              numFinishedPlayers;
 
 public:
   RaceManager();
@@ -148,11 +149,13 @@ public:
   int  getNumPlayers()            const { return players.size();             }
   int  getNumLaps()               const { return numLaps;                    }
   unsigned int getFinishedKarts() const { return numFinishedKarts;           }
+  unsigned int getFinishedPlayers() const { return numFinishedPlayers;       }
   int  getKartScore(int kart   )  const { return mode->getKartScore(kart);   }
   int  getPositionScore(int pos)  const { return mode->getPositionScore(pos);}
   std::string getKartName(int kart) const { return mode->getKartName(kart);  }
   void addKartScore(int kart, int pos)  { mode->addKartScore(kart, pos);     }
   void addFinishedKarts(int num)        { numFinishedKarts += num;           }
+  void PlayerFinishes()                 { numFinishedPlayers++;              }
 
   void setMirror() {/*FIXME*/}
   void setReverse(){/*FIXME*/}

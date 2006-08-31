@@ -49,7 +49,7 @@ class KartProperties : public NoCopy {
   /* Physic properties */
   /* ----------------- */
   float mass;               // weight of kart
-  float air_friction;       // air friction
+  float air_resistance;     // air resistance
   float roll_resistance;    // rolling resistance etc
   float wheel_base;         // distance between front and read wheels
   float heightCOG;          // height of center of gravity
@@ -58,11 +58,14 @@ class KartProperties : public NoCopy {
   float tire_grip;          // grip of tires in longitudinal direction
   float max_steer_angle;    // maximum steering angle
   float time_full_steer;    // time for player karts to reach full steer angle
-
-  /** old properties */
   float corn_f;
   float corn_r;
   float inertia;
+  float wheelieMaxSpeedRatio;  // percentage of maximum speed for wheelies
+  float wheelieMaxPitch;       // maximum pitch for wheelies
+  float wheeliePitchRate;      // rate/sec with which kart goes up
+  float wheelieRestoreRate;    // rate/sec with which kart does down
+  float wheelieSpeedBoost;     // speed boost while doing a wheelie
 
  public:
                 KartProperties   ();
@@ -72,27 +75,31 @@ class KartProperties : public NoCopy {
   virtual void  getAllData       (const lisp::Lisp* lisp);
   virtual void  load             (const char* filename, char* node="tuxkart-kart");
 
-  Material*     getIconMaterial()   const { return icon_material;     }
-  ssgEntity*    getModel()          const {return model;              }
-  const char*   getName()           const {return name.c_str();       }
-  const char*   getIdent()          const {return ident.c_str();      }
-  const char*   getShadowFile()     const {return shadow_file.c_str();}
-  const char*   getIconFile()       const {return icon_file.c_str();  }
-  const sgVec3* getColor()          const {return &color;             }
-  float         getMass()           const {return mass;               }
-  float         getAirFriction()    const {return air_friction;       }
-  float         getRollResistance() const {return roll_resistance;    }
-  float         getMaxPower()       const {return engine_power;       }
-  float         getTimeFullSteer()  const {return time_full_steer; }
-  float         getBrakeFactor()    const {return brake_factor;       }
-  float         getWheelBase()      const {return wheel_base;         }
-  float         getHeightCOG()      const {return heightCOG;          }
-  float         getTireGrip()       const {return tire_grip;          }
-  float         getMaxSteerAngle()  const {return max_steer_angle;    }
-  float         getCornerStiffF()   const {return corn_f;             }
-  float         getCornerStiffR()   const {return corn_r;             }
-  float         getInertia()        const {return inertia;            }
-
+  Material*     getIconMaterial        () const { return icon_material;      }
+  ssgEntity*    getModel               () const {return model;               }
+  const char*   getName                () const {return name.c_str();        }
+  const char*   getIdent               () const {return ident.c_str();       }
+  const char*   getShadowFile          () const {return shadow_file.c_str(); }
+  const char*   getIconFile            () const {return icon_file.c_str();   }
+  const sgVec3* getColor               () const {return &color;              }
+  float         getMass                () const {return mass;                }
+  float         getAirResistance       () const {return air_resistance;      }
+  float         getRollResistance      () const {return roll_resistance;     }
+  float         getMaxPower            () const {return engine_power;        }
+  float         getTimeFullSteer       () const {return time_full_steer;     }
+  float         getBrakeFactor         () const {return brake_factor;        }
+  float         getWheelBase           () const {return wheel_base;          }
+  float         getHeightCOG           () const {return heightCOG;           }
+  float         getTireGrip            () const {return tire_grip;           }
+  float         getMaxSteerAngle       () const {return max_steer_angle;     }
+  float         getCornerStiffF        () const {return corn_f;              }
+  float         getCornerStiffR        () const {return corn_r;              }
+  float         getInertia             () const {return inertia;             }
+  float         getWheelieMaxSpeedRatio() const {return wheelieMaxSpeedRatio;}
+  float         getWheelieMaxPitch     () const {return wheelieMaxPitch;     }
+  float         getWheeliePitchRate    () const {return wheeliePitchRate;    }
+  float         getWheelieRestoreRate  () const {return wheelieRestoreRate;  }
+  float         getWheelieSpeedBoost   () const {return wheelieSpeedBoost;   }
 };
 
 #endif

@@ -2,36 +2,43 @@
 
 (physics
 
-;; Attachment related parameters
-;; -----------------------------
- (anvil-weight       150.0   )
- (anvil-speed-factor  0.2   )
- (parachute-friction   2.0   )
- (magnet-range        30.0   )
- (magnet-min-range     4.0   )
+ ;; Attachment related parameters
+ ;; -----------------------------
+ (anvil-weight             150.0 )
+ (anvil-speed-factor         0.2 )
+ (parachute-friction         2.0 )
+ (magnet-range              30.0 )
+ (magnet-min-range           4.0 )
 
 
-;; Other kart relates values
-;; -------------------------
- (jump-impulse         0.3   )  ;; percentage of gravity!
+ ;; Other kart relates values
+ ;; -------------------------
+ (jump-impulse               0.3 )  ;; percentage of gravity!
 
-;; The following files are the defaults for karts
-;; ----------------------------------------------
-;; marked with ";;OLD" are the parameters for the old physics
- (wheel-base           1.2   )
- (heightCOG            0.2   )
- (engine-power       400     )
- (brake-factor         5     )
- (mass               125     )
- (air-friction         1.8   )
- (roll-resistance      1.05  )
- (tire-grip            0.9   )
- (max-steer-angle     90     )
- (time-full-steer      0.3   )
- (corn-f               4     )
- (corn-r               4     )
-;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating
-;; around the center of gravity, where a and b are the width and length 
- (inertia              5.0   )
+ ;; The following files are the defaults for karts
+ ;; ----------------------------------------------
+ (kart-defaults
+   (wheel-base               1.2 )
+   (heightCOG                0.2 )
+   (engine-power           400   )
+   (brake-factor             5   )
+   (mass                   125   )
+   (air-resistance           1.8 )
+   (roll-resistance          1.05)
+   (tire-grip                0.9 )
+   (max-steer-angle         90   )
+   (time-full-steer          0.3 )
+   (corn-f                   4   )
+   (corn-r                   4   )
+   (wheelie-max-speed-ratio  0.9 ) ;; percentage of max speed for wheelies to work
+   (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
+   (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
+   (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
+   (wheelie-speed-boost     10.0 ) ;; speed boost while doing a wheelie
+
+   ;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating
+   ;; around the center of gravity, where a and b are the width and length 
+   (inertia                  5.0 )
+  )   ;; end kart-defaults
 )
 ;; EOF ;;
