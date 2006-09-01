@@ -373,20 +373,30 @@ void RaceGUI::drawPlayerIcons () {
 
   glEnable(GL_TEXTURE_2D);
   Material *last_players_gst = 0;
-  for(int i = 0; i < world->getNumKarts() ; i++)
-    {
-      int position = world->getKart(i)->getPosition();
+  int bFirst =1;
+  for(int i = 0; i < world->getNumKarts() ; i++) {
+      Kart* kart   = world->getKart(i);
+      int position = kart->getPosition();
+      int lap      = kart->getLap();
       if(position > 4)  // only draw the first four karts
         continue;
-
+      
       y = config->width/2-20 - ((position-1)*(55+5));
 
       // draw text
-      drawDropShadowText ( pos_string[position], 28, 55+x, y+10 ) ;
-
+      int red=255, green=255, blue=255;
+      if(lap==world->raceSetup.numLaps) {  // kart is finished
+	red=0; blue=0;
+      } else if(lap==world->raceSetup.numLaps-1 &&
+		world->raceSetup.numLaps>1              ) {
+	blue=0; green=0;
+      }
+      glDisable(GL_CULL_FACE);
+      drawDropShadowText(pos_string[position], 28, 55+x, y+10, 
+			 red, green, blue);
+      bFirst = 0;
       // draw icon
-      Material* players_gst =
-	        world->getKart(i)->getKartProperties()->getIconMaterial();
+      Material* players_gst = kart->getKartProperties()->getIconMaterial();
       // Hmm - if the same icon is displayed more than once in a row,
       // plib does only do the first setTexture, therefore nothing is
       // displayed for the remaining icons. So we have to call force() if
@@ -585,10 +595,11 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
+  float minRatio = std::min(ratio_x, ratio_y);
   offset_x += (int)((config->width-220)*ratio_x);
 #define WHEELWIDTH 64  
-  int width  = (int)(WHEELWIDTH*ratio_x);
-  int height = (int)(WHEELWIDTH*ratio_y);
+  int width  = (int)(WHEELWIDTH*minRatio);
+  int height = (int)(WHEELWIDTH*minRatio);
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
     glLoadIdentity();
