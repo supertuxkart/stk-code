@@ -56,10 +56,6 @@ Urgent for release
   Perhaps make the maximum speed dependent on the skill level:
   higher skill levels --> faster karts [partly hiker, but feedback
   from all needed]
-- No GUI (e.g. speed etc) is displayed if a kart has a spark
-  as a collectable.
-- No new 3D model for gold coins, the old herring is still used.
-  Is there an easy way to make two coins, one silver, one gold?
 - Improve AI
   - tight/wide corner steering. [coz, in progress]
   - I've seen it once or twice that the AI would drive into a
@@ -122,12 +118,6 @@ Things that would be nice to fix, but are not urgent
   of the outline.
 - Add track sections which must be passed in order to finish
   a lap. This would avoid karts taking shortcuts.
-- Add a 3rd dimension to herring data, so that the subsea
-  and gownsbow can have herrings as well (currently, herring
-  data is 2d only, the height is taken from computing the height
-  of the track - which doesn't work correctly in case of lanes
-  running on top of each other (gown), or a track running inside
-  a tube (subsea).
 - Create a widget displaying slowly scrolling text, which would
   enable a much longer and complete credit lists (and perhaps
   help texts as well).
@@ -156,6 +146,11 @@ long term
   - Grand prixs might want to overwrite this, e.g.:
     "war" grand prix: only rockets for all gadgets
   - Perhaps make good and bad things indistinguishable?
+- sound/music manager needed
+  Make it easy to replace sounds (which are currently hardcoded), e.g
+  via a config file. Sound/music should be selectable for a track,
+  but a grand prix should be able to overwrite this to create a consistent
+  ambience
 - More tracks
 - More grand prixs
 - Support for translations(?)
@@ -205,4 +200,14 @@ DONE
 - Wait for a limited amount of time after the last player kart
   is finished, and then end the game. Helps if 2 (or more) AI
   karts are stuck somewhere.
+- No new 3D model for gold coins, the old herring is still used.
+  Is there an easy way to make two coins, one silver, one gold?
+- No GUI (e.g. speed etc) is displayed if a kart has a spark
+  as a collectable.
+- Add a 3rd dimension to herring data, so that the subsea
+  and gownsbow can have herrings as well (currently, herring
+  data is 2d only, the height is taken from computing the height
+  of the track - which doesn't work correctly in case of lanes
+  running on top of each other (gown), or a track running inside
+  a tube (subsea).
 

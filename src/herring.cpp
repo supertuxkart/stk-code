@@ -22,10 +22,10 @@
 #include "kart.hpp"
 
 // =============================================================================
-Herring::Herring(herringType _type, sgVec3 xyz, ssgEntity* model) {
+Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) {
   sgSetVec3(coord.hpr, 0.0f, 0.0f, 0.0f);
 
-  sgCopyVec3(coord.xyz, xyz);
+  sgCopyVec3(coord.xyz, *xyz);
   root   = new ssgTransform();
   root->ref();
   root->setTransform(&coord);
@@ -50,7 +50,7 @@ void Herring::reset() {
 }   // reset
 // -----------------------------------------------------------------------------
 int Herring::hitKart(Kart* kart) {
-  return sgDistanceSquaredVec2 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
+  return sgDistanceSquaredVec3 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
 }   // hitKart
 
 // -----------------------------------------------------------------------------

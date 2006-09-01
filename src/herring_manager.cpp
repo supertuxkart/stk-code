@@ -82,7 +82,7 @@ HerringManager::HerringManager() {
 }   // HerringManager
 
 // -----------------------------------------------------------------------------
-Herring* HerringManager::newHerring(herringType type, sgVec3 xyz) {
+Herring* HerringManager::newHerring(herringType type, sgVec3* xyz) {
   ssgEntity* m;
   // This test determines the order in which models are used: user model
   // overwrite track models, which in turn overwrite default models.

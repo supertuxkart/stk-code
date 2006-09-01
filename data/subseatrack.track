@@ -2,6 +2,7 @@
 
 (tuxkart-track
  (name "Sub Sea")
+ (herring "new")
  (use-fog #t)
  (sky-color    0.0 0.0 0.2 0.0)
  (fog-color    0.0 0.0 0.2 0.0)

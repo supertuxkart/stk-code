@@ -42,7 +42,7 @@ private:
   float         rotation;     // Amount of rotation
  
  public:
-              Herring   (herringType type, sgVec3 xyz, ssgEntity* model);
+              Herring   (herringType type, sgVec3* xyz, ssgEntity* model);
   void        update    (float delta);
   bool        wasEaten  ()            {return bEaten;}
   void        isEaten   ();

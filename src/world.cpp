@@ -331,20 +331,18 @@ void World::loadPlayers() {
 
 }
 
-void World::herring_command (char *s, char *str ) {
+void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight ) {
 
-  sgVec3 xyz ;
+  // if only 2d coordinates are given, let the herring fall from very heigh
+  if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
-  sscanf ( s, "%f,%f", &xyz[0], &xyz[1] ) ;
-  // The height must be defined here, since getHeight only looks below
-  xyz[2] = 1000000.0f;
-  xyz[2] = getHeight ( trackBranch, xyz ) + 0.06 ;
-
+  // Even if 3d data are given, make sure that the herring is on the ground
+  (*xyz)[2] = getHeight ( trackBranch, *xyz ) + 0.06 ;
   herringType type=HE_GREEN;
-  if ( str[0]=='Y' || str[0]=='y' ){ type = HE_GOLD   ;}
-  if ( str[0]=='G' || str[0]=='g' ){ type = HE_GREEN  ;}
-  if ( str[0]=='R' || str[0]=='r' ){ type = HE_RED    ;}
-  if ( str[0]=='S' || str[0]=='s' ){ type = HE_SILVER ;}
+  if ( htype=='Y' || htype=='y' ){ type = HE_GOLD   ;}
+  if ( htype=='G' || htype=='g' ){ type = HE_GREEN  ;}
+  if ( htype=='R' || htype=='r' ){ type = HE_RED    ;}
+  if ( htype=='S' || htype=='s' ){ type = HE_SILVER ;}
   herring_manager->newHerring(type, xyz);
 }   // herring_command
 
@@ -382,9 +380,12 @@ void World::loadTrack() {
 
     char htype = '\0' ;
 
-    if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
+    if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
+		  &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 ) {
+      herring_command(&loc.xyz, htype, false) ;
+    } else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                      &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) {
-      herring_command ( & s [ strlen ( "*HERRING," ) ], s ) ;
+      herring_command (&loc.xyz, htype, true) ;
     } else if ( s[0] == '\"' ) {
       if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
 		    fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),

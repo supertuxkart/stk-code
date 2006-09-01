@@ -57,7 +57,7 @@ public:
   HerringManager();
   void        loadAllHerrings();
   void        loadHerringData(const std::string filename, int isUser);
-  Herring*    newHerring     (herringType type, sgVec3 xyz);
+  Herring*    newHerring     (herringType type, sgVec3* xyz);
   void        update         (float delta);
   void        hitHerring     (Kart* kart);
   void        cleanup        ();
