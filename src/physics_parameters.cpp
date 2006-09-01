@@ -42,6 +42,8 @@ void PhysicsParameters::load(const char* filename, char *node) {
   CHECK_NEG(inertia,  "inertia"  );CHECK_NEG(magnetRangeSQ,  "magnet-range"   );
   CHECK_NEG(brake_factor,        "brake-factor"           );
   CHECK_NEG(jumpImpulse,         "jump-impulse"           );
+  CHECK_NEG(airResReduce[1],     "reduce-air-resistance-driver");
+  CHECK_NEG(airResReduce[2],     "reduce-air-resistance-racer" );
   CHECK_NEG(wheelieMaxSpeedRatio,"wheelie-max-speed-ratio");
   CHECK_NEG(wheelieMaxPitch,     "wheelie-max-pitch"      );
   CHECK_NEG(wheeliePitchRate,    "wheelie-pitch-rate"     );
@@ -67,7 +69,9 @@ void PhysicsParameters::init_defaults() {
     inertia          = anvilWeight       = parachuteFriction = engine_power    =
     magnetRangeSQ    = jumpImpulse       = brake_factor      = anvilSpeedFactor=
     time_full_steer  = wheelieMaxPitch   = wheelieMaxSpeedRatio                =
-    wheeliePitchRate = wheelieRestoreRate= wheelieSpeedBoost = -99.9; 
+    wheeliePitchRate = wheelieRestoreRate= wheelieSpeedBoost = airResReduce[2] =
+    airResReduce[1]  = -99.9; 
+  airResReduce[0]    = 1.0;
 }   // init_defaults
 
 // -----------------------------------------------------------------------------
@@ -75,12 +79,14 @@ void PhysicsParameters::getAllData(const lisp::Lisp* lisp) {
 
   // Get the values which are not part of the default KartProperties
   // ---------------------------------------------------------------
-  lisp->get("anvil-weight",            anvilWeight         );
-  lisp->get("anvil-speed-factor",      anvilSpeedFactor    );
-  lisp->get("parachute-friction",      parachuteFriction   );
-  lisp->get("magnet-range",            magnetRangeSQ       );
-  lisp->get("magnet-min-range",        magnetMinRangeSQ    );
-  lisp->get("jump-impulse",            jumpImpulse         );
+  lisp->get("anvil-weight",                 anvilWeight         );
+  lisp->get("anvil-speed-factor",           anvilSpeedFactor    );
+  lisp->get("parachute-friction",           parachuteFriction   );
+  lisp->get("magnet-range",                 magnetRangeSQ       );
+  lisp->get("magnet-min-range",             magnetMinRangeSQ    );
+  lisp->get("jump-impulse",                 jumpImpulse         );
+  lisp->get("reduce-air-resistance-racer",  airResReduce[2]     );
+  lisp->get("reduce-air-resistance-driver", airResReduce[1]     );
 
   // Get the default KartProperties
   // ------------------------------

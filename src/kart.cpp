@@ -740,6 +740,13 @@ void Kart::handleRescue() {
 }   // handleRescue
 
 // -----------------------------------------------------------------------------
+float Kart::getAirResistance() const {
+  return (kartProperties->getAirResistance() +
+          attachment.AirResistanceAdjust()    )
+    * physicsParameters->airResReduce[world->raceSetup.difficulty];
+}
+
+// -----------------------------------------------------------------------------
 void Kart::processSkidMarks() {
 
   assert(skidmark_left);

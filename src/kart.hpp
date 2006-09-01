@@ -143,8 +143,6 @@ public:
   const sgVec3*  getColor         () const {return kartProperties->getColor();}
   float          getMass          () const {return kartProperties->getMass()
                                                  + attachment.WeightAdjust();}
-  float          getAirResistance () const {return kartProperties->getAirResistance()
-                                                 + attachment.AirResistanceAdjust();}
   float          getRollResistance() const {return kartProperties->getRollResistance();}
   float          getMaxPower      () const {return kartProperties->getMaxPower();}
   float          getTimeFullSteer () const {return kartProperties->getTimeFullSteer();}
@@ -168,6 +166,7 @@ public:
                                      {return kartProperties->getWheelieSpeedBoost(); }
   float          getSteerAngle    () const {return controls.lr*
                                                kartProperties->getMaxSteerAngle();}
+  float          getAirResistance () const;
   float          getSteerPercent  () const {return controls.lr;}
   float          getMaxSpeed      () const {return maxSpeed;   }
   virtual int    isPlayerKart     () const {return 0;          }

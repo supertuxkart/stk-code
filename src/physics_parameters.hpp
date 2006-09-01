@@ -31,6 +31,7 @@ class PhysicsParameters : public KartProperties {
   float magnetRangeSQ;         // Squared range for magnets
   float magnetMinRangeSQ;      // Squared minimum range for magnets
   float jumpImpulse;           // percentage of gravity when jumping
+  float airResReduce[3];       // air resistance reduction for the three levels
 
        PhysicsParameters() : KartProperties() {};
   void init_defaults    ();
