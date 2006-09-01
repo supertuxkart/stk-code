@@ -49,6 +49,7 @@ RaceGUI::RaceGUI(): time_left(0.0) {
 
   // Temporary, we need a better icon here
   SteeringWheelIcon = material_manager->getMaterial("wheel.rgb");
+  SteeringWheelIcon->getState()->disable(GL_CULL_FACE);
 
   fpsCounter = 0;
   fpsString[0]=0;
@@ -692,6 +693,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       }
 
       Kart* player_kart=world->getPlayerKart(pla);
+      drawCollectableIcons(player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
       drawEnergyMeter     (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawSteering        (player_kart, offset_x, offset_y,
@@ -700,8 +703,6 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
       drawEmergencyText   (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
-      drawCollectableIcons(player_kart, offset_x, offset_y,
-			   split_screen_ratio_x, split_screen_ratio_y );
     }   // for pla
     drawTimer ();
     drawMap   ();
@@ -710,7 +711,6 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       oldDrawPlayerIcons();
     } else {
       drawPlayerIcons() ;
-      //drawSteering        (world->getPlayerKart(0), 100, 100, 1.0, 1.0 );
     }
   }   // if RACE_PHASE
 
