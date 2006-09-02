@@ -258,24 +258,41 @@ void AutoKart::update (float delta)
                 break;
             case RD_MEDIUM:
             case RD_HARD:
-                if (collectable.getType() != COLLECT_ZIPPER)
+                switch(collectable.getType())
                 {
-                    if (time_since_last_shot > 5.0f && crashes.kart != -1)
-                    {
-                        collectable.use() ;
-                        time_since_last_shot = 0.0f;
-                    }
-                }
-                else
-                {
-                    float angle = fabsf(world->track->angle[trackHint] -
-                        curr_pos.hpr[0]);
-                    if(time_since_last_shot > 10.0f && angle < 45.0f &&
-                       !crashes.road)
-                    {
-                        collectable.use();
-                        time_since_last_shot = 0.0f;
-                    }
+                    case COLLECT_ZIPPER:
+                        float angle = fabsf(world->track->angle[trackHint] -
+                            curr_pos.hpr[0]);
+                        if(time_since_last_shot > 10.0f && angle < 30.0f &&
+                           !crashes.road)
+                        {
+                            collectable.use();
+                            time_since_last_shot = 0.0f;
+                        }
+                        break;
+                    case COLLECT_MISSILE:
+                    case COLLECT_HOMING_MISSILE:
+                        if (time_since_last_shot > 5.0f && crashes.kart != -1)
+                        {
+                            if(sgDistanceVec2(curr_pos.xyz,
+                                world->getKart(crashes.kart)->getCoord()->xyz) >
+                                KART_LENGTH * 2.5f)
+                               {
+                                    collectable.use() ;
+                                    time_since_last_shot = 0.0f;
+                            }
+                        }
+                        break;
+                    case COLLECT_SPARK:
+                        if (time_since_last_shot > 3.0f && crashes.kart != -1)
+                        {
+                                collectable.use() ;
+                                time_since_last_shot = 0.0f;
+                        }
+                        break;
+                    /*TODO: teach AI to use the magnet*/
+                    default:
+                        break;
                 }
                 break;
         }
@@ -290,6 +307,7 @@ void AutoKart::update (float delta)
 bool AutoKart::do_wheelie ( const int STEPS )
 {
     if(crashes.road) return false;
+    if(crashes.kart != -1) return false;
 
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work optimally on big or small karts.
