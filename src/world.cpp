@@ -473,7 +473,7 @@ void World::loadTrack() {
           sphere = new ssgaSphere;
           sgCopyVec3(center, track->driveline[i]);
           sphere->setCenter(center);
-          sphere->setSize(1.0f);
+          sphere->setSize(track->getWidth()[i] / 4.0f);
 
           if(i == 0)
           {
