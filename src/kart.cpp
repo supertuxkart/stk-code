@@ -162,8 +162,7 @@ void Kart::reset() {
   collectable.clear();
   num_herring_gobbled = 0;
   wheel_position      = 0;
-  trackHint = 0;
-  world -> track -> absSpatialToTrack(curr_track_coords,
+  trackHint = world -> track -> absSpatialToTrack(curr_track_coords,
                                                   curr_pos.xyz);
 }   // reset
 
