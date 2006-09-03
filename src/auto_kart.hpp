@@ -25,6 +25,11 @@
 
 class AutoKart : public Kart {
 private:
+
+  //The crash percentage is how much of the time the AI has been crashing,
+  //if the AI has been crashing for some time, use the rescue.
+  float crash_perc;
+
   float time_since_last_shot;
   size_t future_hint;
 

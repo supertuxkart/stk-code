@@ -301,7 +301,7 @@ void Kart::update (float dt) {
 
   if ( rescue ) {
     if(attachment.getType() != ATTACH_TINYTUX)
-        attachment.set( ATTACH_TINYTUX, 4.0f ) ;
+        attachment.set( ATTACH_TINYTUX, 2.0f ) ;
   }
   attachment.update(dt, &velocity);
    

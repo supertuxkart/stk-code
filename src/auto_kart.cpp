@@ -51,6 +51,8 @@ AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
     next_straight_hint = -1;
     on_curve = false;
     handle_curve = false;
+
+    crash_perc = 0.0;
 }
 
 //=============================================================================
@@ -64,6 +66,7 @@ void AutoKart::update (float delta)
         handle_race_start();
         return;
     }
+
 
     /*Get information about the track*/
     //Detect if we are going to crash with the track and/or karts
@@ -81,12 +84,38 @@ void AutoKart::update (float delta)
 
     const float KART_LENGTH = 1.5f;
 
+    crash_perc += collided ? 3.0f * delta : -0.25 * delta;
+    if(crash_perc < 0.0f) crash_perc = 0.0f;
+
+    //Find if any player is ahead of this kart
+    bool player_winning = false;
+    for(int i = 0; i < world->raceSetup.getNumPlayers(); ++i)
+        if(racePosition > world->getPlayerKart(i)->getPosition())
+            player_winning = true;
+
+    float difficulty_multiplier = 1.0f;
+    if(!player_winning)
+        switch(world->raceSetup.difficulty)
+        {
+            case RD_EASY:
+                difficulty_multiplier = 0.9f;
+                break;
+
+            case RD_MEDIUM:
+                difficulty_multiplier = 0.95f;
+                break;
+
+            default:
+                break;
+        }
+
 #if 0
     //This is used for tight curves, but since right now the steering
     //is so wide, there is no need for this.
     //Find the hint at which the next curve starts
     next_curve_hint = find_curve();
 #endif
+
 
     /*Steer based on the information we just gathered*/
     float steer_angle = 0.0f;
@@ -163,16 +192,20 @@ void AutoKart::update (float delta)
             //Steer to the farest point that the kart can drive to in a
             //straight line without crashing with the track.
             case RD_HARD:
-                //Find a suitable point to drive to in a straight line
-                sgVec2 straight_point;
-                find_non_crashing_point(straight_point);
+                {
+                    //Find a suitable point to drive to in a straight line
+                    sgVec2 straight_point;
+                    find_non_crashing_point(straight_point);
 
-                steer_angle = steer_to_point(straight_point);
+                    steer_angle = steer_to_point(straight_point);
+                }
                 break;
+
             //Remain parallel to the track
             case RD_MEDIUM:
                 steer_angle = steer_to_angle(NEXT_HINT, 0.0f);
                 break;
+
             //Just drive in a straight line
             case RD_EASY:
                 steer_angle = 0.0f;
@@ -184,9 +217,9 @@ void AutoKart::update (float delta)
         #endif
     }
 
-    controls.lr = angle_to_control(steer_angle);
+    controls.lr = angle_to_control(steer_angle) * difficulty_multiplier;
 
-    /*Control braking and acceleration*/
+    /*Handle braking*/
     controls.brake = false;
 //At the moment this makes the AI brake too much
 #if 0
@@ -197,36 +230,22 @@ void AutoKart::update (float delta)
     if(crashes.road && braking_distance > crashes.road) brake = true;
 #endif
 
-    bool player_winning = false;
-    for(int i = 0; i < world->raceSetup.getNumPlayers(); ++i)
-        if(racePosition > world->getPlayerKart(i)->getPosition())
-            player_winning = true;
-
-    float difficulty_multiplier = 1.0f;
-    if(!player_winning)
-        switch(world->raceSetup.difficulty)
-        {
-            case RD_EASY:
-                difficulty_multiplier = 0.9f;
-                break;
-            case RD_MEDIUM:
-                difficulty_multiplier = 0.95f;
-                break;
-            case RD_HARD:
-                difficulty_multiplier = 1.0f;
-                break;
-        }
-
-    controls.lr *= difficulty_multiplier;
-
+    /*Handle acceleration*/
     if(starting_delay < 0.0f)
     {
-            controls.accel = 1.0f * difficulty_multiplier;
+        controls.accel = 1.0f * difficulty_multiplier;
     }
     else
     {
         controls.accel = 0.0f;
         starting_delay -= delta;
+    }
+
+    /*Handle rescue*/
+    if(crash_perc > 3.0f)
+    {
+        rescue = true;
+        crash_perc = 0.0f;
     }
 
     /*Handle wheelies*/
@@ -248,17 +267,19 @@ void AutoKart::update (float delta)
             case RD_HARD:
                 switch(collectable.getType())
                 {
-		     case COLLECT_ZIPPER: {
-                        float angle = fabsf(world->track->angle[trackHint] -
-                            curr_pos.hpr[0]);
-                        if(time_since_last_shot > 10.0f && angle < 30.0f &&
-                           !crashes.road)
+		            case COLLECT_ZIPPER:
                         {
-                            collectable.use();
-                            time_since_last_shot = 0.0f;
+                            float angle = fabsf(world->track->angle[trackHint]-
+                                                curr_pos.hpr[0]);
+                            if(time_since_last_shot > 10.0f && angle < 30.0f &&
+                               !crashes.road)
+                            {
+                                collectable.use();
+                                time_since_last_shot = 0.0f;
+                            }
                         }
-		        }
                         break;
+
                     case COLLECT_MISSILE:
                     case COLLECT_HOMING_MISSILE:
                         if (time_since_last_shot > 5.0f && crashes.kart != -1)
@@ -272,6 +293,7 @@ void AutoKart::update (float delta)
                             }
                         }
                         break;
+
                     case COLLECT_SPARK:
                         if (time_since_last_shot > 3.0f && crashes.kart != -1)
                         {
@@ -649,6 +671,8 @@ void AutoKart::reset() {
     next_straight_hint = -1;
     on_curve = false;
     handle_curve = false;
+
+    crash_perc = 0.0f;
 
     Kart::reset();
 }
