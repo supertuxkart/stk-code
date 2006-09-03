@@ -187,7 +187,7 @@ void AutoKart::update (float delta)
     controls.lr = angle_to_control(steer_angle);
 
     /*Control braking and acceleration*/
-    bool controls.brake = false;
+    controls.brake = false;
 //At the moment this makes the AI brake too much
 #if 0
     float time = (velocity.xyz[1]/ -guess_accel(-1.0f));
@@ -248,7 +248,7 @@ void AutoKart::update (float delta)
             case RD_HARD:
                 switch(collectable.getType())
                 {
-                    case COLLECT_ZIPPER:
+		     case COLLECT_ZIPPER: {
                         float angle = fabsf(world->track->angle[trackHint] -
                             curr_pos.hpr[0]);
                         if(time_since_last_shot > 10.0f && angle < 30.0f &&
@@ -257,6 +257,7 @@ void AutoKart::update (float delta)
                             collectable.use();
                             time_since_last_shot = 0.0f;
                         }
+		        }
                         break;
                     case COLLECT_MISSILE:
                     case COLLECT_HOMING_MISSILE:
