@@ -187,7 +187,7 @@ void AutoKart::update (float delta)
     controls.lr = angle_to_control(steer_angle);
 
     /*Control braking and acceleration*/
-    bool brake = false;
+    bool controls.brake = false;
 //At the moment this makes the AI brake too much
 #if 0
     float time = (velocity.xyz[1]/ -guess_accel(-1.0f));
@@ -221,23 +221,11 @@ void AutoKart::update (float delta)
 
     if(starting_delay < 0.0f)
     {
-        if(!brake)
-        {
-
             controls.accel = 1.0f * difficulty_multiplier;
-            controls.brake = false;
-        }
-        else
-        {
-
-            controls.accel = 0.0f;
-            controls.brake = true;
-        }
     }
     else
     {
         controls.accel = 0.0f;
-        controls.brake = false;
         starting_delay -= delta;
     }
 
