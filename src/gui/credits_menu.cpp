@@ -18,41 +18,28 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "credits_menu.hpp"
-#include "widget_set.hpp"
-#include "race_manager.hpp"
-#include "menu_manager.hpp"
-#include "config.hpp"
-#include "player.hpp"
+#include "loader.hpp"
 
 CreditsMenu::CreditsMenu(){
-  menu_id = widgetSet->vstack(0);
-  widgetSet->multi(menu_id, 
-"Project leader:\n\
-Joerg Henrichs (hiker); Eduardo Hernandez Munoz (coz)\n\
-Developers:\n\
-Patrick Ammann, ???\n\
-Original Tuxkart Developer:\n\
-Steve Baker\n\
-GotM Team:\n\
-Ingo Ruhnke (grumbel), ???\n\
-Art work:\n\
-Steve Baker, Oliver Baker, ???\n\
-Music:\n\
-Matt Thomas", GUI_SML);
-  widgetSet->start(menu_id,"Press <ESC> to go back", GUI_SML, 1, 0);
-  widgetSet->layout(menu_id, 0, 0);
+
+  std::string filename = loader->getPath("data/CREDITS");
+  FILE *fd = fopen(filename.c_str(), "r");
+  
+  char s[1024];
+  while(fgets(s, 1023, fd)) {
+    char *p = strdup(s);
+    sl.push_back(p);
+  }
+  fclose(fd);
+  setText(sl);
 }   // CreditsMenu
 
 // -----------------------------------------------------------------------------
 CreditsMenu::~CreditsMenu() {
-  widgetSet -> delete_widget(menu_id) ;
+  while(sl.size()>0) {
+    char*p=sl.back();
+    sl.pop_back();
+  }
 }   // ~CreditsMenu
 	
-// -----------------------------------------------------------------------------
-void CreditsMenu::select() {
-  // must be esc, nothing else is available. So just pop this menu
-  menu_manager->popMenu();
-}   // select
-
-// -----------------------------------------------------------------------------
 /* EOF */

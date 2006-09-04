@@ -394,6 +394,9 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
   }
  
   textOut->begin();
+    if(config->width<800){
+      sz = (int)((float)sz*(float)config->width/800.0f);
+    }
     textOut->setPointSize(sz);
     textOut->start2f((GLfloat)x, (GLfloat)y);
     glColor3ub(red, green, blue);

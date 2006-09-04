@@ -21,16 +21,22 @@
 #define HEADER_CREDITSMENU_H
 
 #include <string>
+#include <plib/fnt.h>
+#include "scrolled_text.hpp"
 #include "base_gui.hpp"
 #include "player.hpp"
 
-class CreditsMenu: public BaseGUI {
+
+class CreditsMenu: public ScrolledText {
 protected:
-  std::string allKeys[KC_FIRE+1];
+  int        xLeft, xRight, yBottom, yTop;
+  float      yPos, ySpeed;
+  int        numberOfLines;
+  int        fontSize;
+  StringList sl;
 public:
        CreditsMenu();
       ~CreditsMenu();
-  void select  ();
 };
 
 #endif

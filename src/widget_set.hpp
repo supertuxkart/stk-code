@@ -237,12 +237,12 @@ public:
 	
 	void tgl_paused();
 	bool get_paused() const { return paused; }
+	GLuint rect(int x, int y, int w, int h, int f, int r);
 	
 private:
 	int hot(int id);
 	
 	GLuint list(int x, int y, int w, int h, const float *c0, const float *c1);
-	GLuint rect(int x, int y, int w, int h, int f, int r);
 	int add_widget(int pd, int type);
 	
 	int pause(int);
