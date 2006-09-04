@@ -54,7 +54,7 @@ RaceMenu::~RaceMenu()
 void RaceMenu::update(float dt)
 {
 	widgetSet -> timer(menu_id, dt) ;
-	widgetSet -> blank();
+//	widgetSet -> blank();
 	widgetSet -> paint(menu_id) ;
 }
 

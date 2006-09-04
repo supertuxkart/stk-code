@@ -392,7 +392,7 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
   if(y == SCREEN_CENTERED_TEXT) {
     y = (config->height - h) / 2;
   }
-  
+ 
   textOut->begin();
     textOut->setPointSize(sz);
     textOut->start2f((GLfloat)x, (GLfloat)y);
@@ -1093,38 +1093,40 @@ void WidgetSet::paint(int id)
                      GL_DEPTH_BUFFER_BIT);
         config_push_ortho();
 
-	glEnable(GL_BLEND);
-	glEnable(GL_COLOR_MATERIAL);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE  ) ;
+        glEnable(GL_BLEND);
+        glEnable(GL_COLOR_MATERIAL);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_DEPTH_TEST);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_CULL_FACE  ) ;
 
-	glPushAttrib(GL_TEXTURE_BIT);
-	{
-	  glDisable(GL_TEXTURE_2D);
-	  paint_rect(id, 0);
-	}
-	glPopAttrib();
+        glPushAttrib(GL_TEXTURE_BIT);
+        {
+            glDisable(GL_TEXTURE_2D);
+            paint_rect(id, 0);
+        }
+        glPopAttrib();
 
-	// Makes the font white ... not sure how to get 
-	if(widgets[id].color0) {
-	  glColor4fv(widgets[id].color0);
-	} else {
-	  glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
-	  glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f });
-	}
-	paint_text(id);
+        // Makes the font white ... not sure how to get 
+        if(widgets[id].color0) {
+            glColor4fv(widgets[id].color0);
+        } else {
+            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
+            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f });
+        }
+        paint_text(id);
 
         config_pop_matrix();
         glPopAttrib();
     }
 }
 
+#if 0
 void WidgetSet::blank()
 {
     paint(pause_id);
 }
+#endif
 
 /*---------------------------------------------------------------------------*/
 

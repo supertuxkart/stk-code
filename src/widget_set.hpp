@@ -217,9 +217,11 @@ public:
 	
 	/* mouse click */
 	int click();
-	
+
+#if 0
 	/* called if the game is paused */
 	void blank();
+#endif
 	
 	/* returns value of id's token */
 	int  token(int) const;

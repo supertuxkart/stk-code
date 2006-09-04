@@ -184,6 +184,8 @@ void RaceGUI::drawDropShadowText (const char *str, int sz,
 }  // drawDropShadowText
 
 // -----------------------------------------------------------------------------
+#if 0
+//This is not being used..
 void RaceGUI::drawTexture(const GLuint texture, int w, int h, 
 			  int red, int green, int blue, int x, int y) {
   glEnable(GL_TEXTURE_2D);
@@ -206,7 +208,7 @@ void RaceGUI::drawTexture(const GLuint texture, int w, int h,
 
   glDisable(GL_TEXTURE_2D);
 }   // drawTexture
-
+#endif
 // -----------------------------------------------------------------------------
 void RaceGUI::drawTimer () {
   if(world->getPhase()!=World::RACE_PHASE         &&
@@ -302,6 +304,7 @@ void RaceGUI::drawMap () {
   }
 
   glEnd () ;
+  glEnable ( GL_TEXTURE_2D ) ;
 }   // drawMap
 
 // -----------------------------------------------------------------------------
@@ -371,7 +374,7 @@ void RaceGUI::drawPlayerIcons () {
   int x = 10;
   int y;
 
-  glEnable(GL_TEXTURE_2D);
+  //glEnable(GL_TEXTURE_2D);
   Material *last_players_gst = 0;
   int bFirst =1;
   for(int i = 0; i < world->getNumKarts() ; i++) {
@@ -391,9 +394,12 @@ void RaceGUI::drawPlayerIcons () {
 		world->raceSetup.numLaps>1              ) {
 	blue=0; green=0;
       }
+
       glDisable(GL_CULL_FACE);
       drawDropShadowText(pos_string[position], 28, 55+x, y+10, 
 			 red, green, blue);
+      glEnable(GL_CULL_FACE);
+
       bFirst = 0;
       // draw icon
       Material* players_gst = kart->getKartProperties()->getIconMaterial();
@@ -516,7 +522,7 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
     }   // for i
   glEnd () ;
 
-  glDisable(GL_TEXTURE_2D);
+//  glDisable(GL_TEXTURE_2D);
 }   // drawCollectableIcons
 
 // -----------------------------------------------------------------------------
@@ -597,7 +603,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 
   float minRatio = std::min(ratio_x, ratio_y);
   offset_x += (int)((config->width-220)*ratio_x);
-#define WHEELWIDTH 64  
+#define WHEELWIDTH 64
   int width  = (int)(WHEELWIDTH*minRatio);
   int height = (int)(WHEELWIDTH*minRatio);
   glMatrixMode(GL_MODELVIEW);
@@ -613,8 +619,8 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
     glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
     glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
     glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
-    glEnable(GL_TEXTURE_2D);
-    SteeringWheelIcon->apply();
+//    glEnable(GL_TEXTURE_2D);
+    SteeringWheelIcon->getState()->force();
     glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;
       glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );

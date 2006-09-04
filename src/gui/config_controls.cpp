@@ -43,11 +43,12 @@ ConfigControls::~ConfigControls() {
 
 void ConfigControls::update(float dt) {
   widgetSet -> timer(menu_id, dt) ;
+#if 0
   // This menu can be triggered from the game, when it is paused
   // so we have to check it and draw it as in pause
   if(widgetSet -> get_paused())
     widgetSet -> blank() ;
-  
+#endif
   widgetSet -> paint(menu_id) ;
 }
 
