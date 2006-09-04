@@ -51,33 +51,25 @@ Thanks in advance!
 
 Urgent for release
 ===================
-- Find acceptable physics parameters (e.g. kart engine and
-  air resistance will determine highest speed).
-  Perhaps make the maximum speed dependent on the skill level:
-  higher skill levels --> faster karts [partly hiker, but feedback
-  from all needed]
-- Improve AI
-  - tight/wide corner steering. [coz, in progress]
-  - I've seen it once or twice that the AI would drive into a
-    wall (towards the right of the track), and it would then
-    just keep on driving into the same wall.  [coz, in progress]
-  - Generally, the AI should be able to finish all tracks.  [coz, in progress]
 - Fix gui bug: run grand prix, back to menu -> textures are wrong
   in character selection menu
   It is known that this can be fixed by removing
   loader->shared_textures.removeAll
   in gui/char_sel.cpp, but then the same problem happens when going
   from the next menu back to the char-sel menu.
-- Decide which tracks should be included - some tracks appear to be
-  somewhat unfinished.
+  A similar problems occurs (sometimes??) when first running a 
+  quick race, then a grand prix: some textures on the track will be
+  missing (usually in tuxtrack there are no textures for the lower
+  barriers to the left and right of the road).
 - Give credit to the track designer (perhaps add a one line comment
   to each track, which is displayed when selecting a track?? Or just
   add then to the credits list?)
 - Collect a list of 'new' items, which can be used for advertising
   the new release. [hiker, in progress]
-- Update the web page, make more screen shots, ...
-- Valgrind for memory bugs.
 - Create a native windows executable.
+- Valgrind for memory bugs.
+- Update the web page, make more screen shots, ...
+
 
 Most likely too difficult/time consuming to be fixed before the release
 =======================================================================
@@ -103,9 +95,21 @@ while the second and third appear to be too unimportant to fix for now
 
 Things that would be nice to fix, but are not urgent
 =====================================================
+- Write some documentation (a scrolling widget will help 
+  displaying the additional information). Things to include:
+  - taking shortcuts might result in not finishing a lap
+  - speed display is red if the kart is not on ground
+  - lap display for other karts is red if kart is on last 
+    track, green if finished.
+- Support for several grand prix (mainly: add menu for this,
+  STK should be able to handle different GPs anyway)  [hiker, 
+  in progress]
+- Add scrolling text window for credits, so that longer credits
+  can be displayed [hiker, in progress]
+- Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
 - Enable real fullscreen support
 - Improved sound
-   - More sounds, music, ...
+   - More sounds, music, ... [coz, in progress]
 - Performance tuning
    - It's not too bad at the moment, but might be worth
      having a look again. [hiker]
@@ -113,14 +117,20 @@ Things that would be nice to fix, but are not urgent
    - Esp. include information on how to create/edit
      tracks.
 - Top 10 lists for time trial, and grand prix.
-- Scale fonts dependent on resolution.
+- Scale fonts dependent on resolution [hiker, in progress].
 - Add a screen dump of each track to be displayed, instead
   of the outline.
 - Add track sections which must be passed in order to finish
   a lap. This would avoid karts taking shortcuts.
+  That's already in the code, but currently the user does 
+  not get any feedback if a wayline is skipped --> after 
+  crossing the finishing line, the race might not end for a
+  kart.
 - Create a widget displaying slowly scrolling text, which would
   enable a much longer and complete credit lists (and perhaps
   help texts as well).
+- Tight/wide corner steering for AI. The AI is hitting the wall
+  in very tight corners (e.g. subseatrack) [coz, in progress]
 
 long term
 =========
@@ -210,4 +220,14 @@ DONE
   of the track - which doesn't work correctly in case of lanes
   running on top of each other (gown), or a track running inside
   a tube (subsea).
-
+- Find acceptable physics parameters (e.g. kart engine and
+  air resistance will determine highest speed).
+  Perhaps make the maximum speed dependent on the skill level:
+  higher skill levels --> faster karts 
+- Improve AI
+  - I've seen it once or twice that the AI would drive into a
+    wall (towards the right of the track), and it would then
+    just keep on driving into the same wall.  [coz, in progress]
+  - Generally, the AI should be able to finish all tracks.  [coz, in progress]
+- Decide which tracks should be included - some tracks appear to be
+  somewhat unfinished.
