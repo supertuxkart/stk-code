@@ -25,18 +25,23 @@
 #include <plib/sl.h>
 
 #define SOUND_UGH		0
-#define SOUND_BOING		1
-#define SOUND_BONK		2
-#define SOUND_BURP		3
-#define SOUND_LASER		4
+#define SOUND_WINNER    1
+#define SOUND_CRASH		2
+#define SOUND_GRAB		3
+#define SOUND_SHOT		4
 #define SOUND_OW		5
 #define SOUND_WEE		6
 #define SOUND_EXPLOSION         7
 #define SOUND_BZZT              8
 #define SOUND_BEEP              9
-#define SOUND_SHOOMF           10
+#define SOUND_BACK_MENU         10
+#define SOUND_SELECT_MENU       11
+#define SOUND_MOVE_MENU         12
+#define SOUND_FULL              13
+#define SOUND_PRESTART          14
+#define SOUND_START             15
 
-#define NUM_SOUNDS 11
+#define NUM_SOUNDS 16
 
 
 using std::string;

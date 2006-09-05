@@ -145,8 +145,7 @@ void Attachment::update(float dt, sgCoord *velocity) {
 			     }
 			     // Otherwise: set type to active magnet.
 			     if(type==ATTACH_MAGNET) {
-                 //FIXME: This shouldn't be for the first player only.
-			       if(kart==world->getKart(0) || closest==0) {
+			       if(kart->isPlayerKart() || closest==0) {
 				 sound->playSfx(SOUND_BZZT);
 			       }
 			       set(ATTACH_MAGNET_BZZT,

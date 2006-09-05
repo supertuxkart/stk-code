@@ -209,6 +209,7 @@ void Kart::doObjectInteractions () {
 // -----------------------------------------------------------------------------
 void Kart::collectedHerring(Herring* herring) {
   herringType type = herring->getType();
+  int old_herring_gobbled = num_herring_gobbled;
 
   switch (type) {
     case HE_GREEN  : attachment.hitGreenHerring(); break;
@@ -217,8 +218,13 @@ void Kart::collectedHerring(Herring* herring) {
     case HE_RED    : int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
                      collectable.hitRedHerring(n); break;
   }   // switch type
+
   if ( num_herring_gobbled > MAX_HERRING_EATEN )
-    num_herring_gobbled = MAX_HERRING_EATEN ;
+    num_herring_gobbled = MAX_HERRING_EATEN;
+
+  if(old_herring_gobbled < num_herring_gobbled &&
+     num_herring_gobbled == MAX_HERRING_EATEN)
+      sound->playSfx(SOUND_FULL);
 }   // hitHerring
 // -----------------------------------------------------------------------------
 void Kart::doZipperProcessing (float delta) {
@@ -301,7 +307,10 @@ void Kart::update (float dt) {
 
   if ( rescue ) {
     if(attachment.getType() != ATTACH_TINYTUX)
+    {
+        sound -> playSfx ( SOUND_BZZT ) ;
         attachment.set( ATTACH_TINYTUX, 2.0f ) ;
+    }
   }
   attachment.update(dt, &velocity);
    

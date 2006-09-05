@@ -21,6 +21,7 @@
 #include <string>
 
 #include "loader.hpp"
+#include "sound.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_manager.hpp"
 #include "preprocessor.hpp"
@@ -69,6 +70,8 @@ GrandPrixEnd::GrandPrixEnd()
     ssgEntity* kartentity = winning_kart->getModel();
     kart->addKid(kartentity);
     preProcessObj ( kart, 0 );
+
+    sound->playSfx(SOUND_WINNER);
 
 	clock = 0;
 }

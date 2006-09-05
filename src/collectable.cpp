@@ -21,6 +21,7 @@
 #include "config.hpp"
 #include "projectile_manager.hpp"
 #include "kart.hpp"
+#include "sound.hpp"
 
 // -----------------------------------------------------------------------------
 Collectable::Collectable(Kart* kart_) {
@@ -68,7 +69,10 @@ void Collectable::use() {
 			   break ;
     case COLLECT_HOMING_MISSILE:
     case COLLECT_SPARK:
-    case COLLECT_MISSILE:  projectile_manager->newProjectile(owner, type);
+    case COLLECT_MISSILE:
+			               if(owner->isPlayerKart())
+				               sound->playSfx(SOUND_SHOT);
+                           projectile_manager->newProjectile(owner, type);
                            break ;
 
     case COLLECT_NOTHING:

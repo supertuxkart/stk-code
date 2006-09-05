@@ -59,16 +59,24 @@ SoundSystem::SoundSystem ()
   sched = new slScheduler ;
 
   sfx[SOUND_UGH].fname = "wavs/ugh.wav";
-  sfx[SOUND_BOING].fname = "wavs/boing.wav";
-  sfx[SOUND_BONK].fname = "wavs/bonk.wav";
-  sfx[SOUND_BURP].fname = "wavs/burp.wav";
-  sfx[SOUND_LASER].fname = "wavs/laser.wav";
+  sfx[SOUND_WINNER].fname = "wavs/radio/grandprix_winner.wav";
+  sfx[SOUND_CRASH].fname = "wavs/tintagel/crash.wav";
+  sfx[SOUND_GRAB].fname = "wavs/tintagel/grab_collectable.wav";
+  sfx[SOUND_SHOT].fname = "wavs/radio/shot.wav";
   sfx[SOUND_OW].fname = "wavs/ow.wav";
   sfx[SOUND_WEE].fname = "wavs/wee.wav";
   sfx[SOUND_EXPLOSION].fname = "wavs/explosion.wav";
   sfx[SOUND_BZZT].fname = "wavs/bzzt.wav";
-  sfx[SOUND_BEEP].fname = "wavs/horn.wav";
-  sfx[SOUND_SHOOMF].fname = "wavs/shoomf.wav";
+  sfx[SOUND_BEEP].fname = "wavs/radio/horn.wav";
+
+  //FIXME: The following 3 sounds are not used in the game yet.
+  sfx[SOUND_BACK_MENU].fname = "wavs/tintagel/deselect_option.wav";
+  sfx[SOUND_SELECT_MENU].fname = "wavs/tintagel/select_option.wav";
+  sfx[SOUND_MOVE_MENU].fname = "wavs/tintagel/move_option.wav";
+
+  sfx[SOUND_FULL].fname = "wavs/tintagel/energy_bar_full.wav";
+  sfx[SOUND_PRESTART].fname = "wavs/tintagel/pre_start_race.wav";
+  sfx[SOUND_START].fname = "wavs/tintagel/start_race.wav";
 
   setSafetyMargin () ;
 

@@ -237,9 +237,12 @@ void World::checkRaceStatus() {
     ready_set_go = 0;
     phase = RACE_PHASE;
     clock = 0.0f;
+    sound->playSfx(SOUND_START);
   } else if (clock > 1.0 && ready_set_go == 2) {
+    sound->playSfx(SOUND_PRESTART);
     ready_set_go = 1;
   } else if (clock > 0.0 && ready_set_go == 3) {
+    sound->playSfx(SOUND_PRESTART);
     ready_set_go = 2;
   }
 

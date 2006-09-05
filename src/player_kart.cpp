@@ -130,7 +130,7 @@ void PlayerKart::update(float dt) {
 // -----------------------------------------------------------------------------
 void PlayerKart::forceCrash() {
   Kart::forceCrash();
-  sound->playSfx( SOUND_BONK );
+  sound->playSfx( SOUND_CRASH );
 }
 
 // -----------------------------------------------------------------------------
@@ -142,6 +142,6 @@ void PlayerKart::handleZipper() {
 // -----------------------------------------------------------------------------
 void PlayerKart::collectedHerring(Herring* herring) {
     Kart::collectedHerring(herring);
-    sound->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_BURP);
+    sound->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }
 /* EOF */

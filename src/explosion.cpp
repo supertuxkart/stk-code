@@ -40,7 +40,6 @@ Explosion::Explosion(Projectile* p) : ssgTransform() {
 
 // -----------------------------------------------------------------------------
 void Explosion::init(Projectile* p) {
-  //JH some kind of sound here???
   sound->playSfx( SOUND_EXPLOSION );
 
   setTransform(p->getCoord());
