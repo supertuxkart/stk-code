@@ -149,7 +149,7 @@ public:
             if(!child->getCar())
                 continue;
             if(child->getCar()->get(val)) {
-                vec.push_back(val);
+	      vec.insert(vec.begin(),val);
             }
         }
 

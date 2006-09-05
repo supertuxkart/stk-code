@@ -2,7 +2,9 @@
 
 (tuxkart-track
  (name "Shifting Sands")
- (music "mods/tk7.mod"))
+ (description "Created by Oliver&Steve Baker")
+ (music "mods/tk7.mod")
+)
 
 ;; EOF ;;
 

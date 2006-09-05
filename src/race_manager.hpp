@@ -128,6 +128,7 @@ private:
   typedef std::vector<std::string> Players;
   Players                          players;
   std::string                      track;
+  CupData                          cup;
   int                              numLaps;
   int                              numKarts;
   unsigned int                     numFinishedKarts;
@@ -141,7 +142,8 @@ public:
   void setPlayerKart(int player, const std::string& kart);
   void setNumPlayers(int num);
   void reset();
-  void setDifficulty(RaceDifficulty difficulty_) { difficulty = difficulty_; }
+  void setGrandPrix(CupData *cup_)           { cup = *cup_;                  }
+  void setDifficulty(RaceDifficulty diff_)   { difficulty = diff_;           }
   void setNumLaps(int num)                   { numLaps = num;                }
   void setTrack(const std::string& track_)   { track = track_;               }
   void setRaceMode(RaceSetup::RaceMode mode) { race_mode = mode;             }
@@ -149,6 +151,7 @@ public:
   int  getNumKarts()              const { return numKarts;                   }
   int  getNumPlayers()            const { return players.size();             }
   int  getNumLaps()               const { return numLaps;                    }
+  CupData *getGrandPrix()               { return &cup;                       }
   unsigned int getFinishedKarts() const { return numFinishedKarts;           }
   unsigned int getFinishedPlayers() const { return numFinishedPlayers;       }
   int  getKartScore(int kart   )  const { return mode->getKartScore(kart);   }

@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006      Joerg Henirchs, Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,11 +23,11 @@
 
 /** Simple class that hold the data relevant to a 'cup', aka. a number
     of races that has to be completed one after the other */
-class CupData
-{
+class CupData {
+  std::string name;         // The name of the cup 
+  std::string description;  // Description for this track 
+
 public:
-  /** The name of the cup, for example "Herring Cup" */
-  std::string name;
 
   /** The ident of the tracks in this cup in their right order, ident
       means the filename of the .track file without .track extension
@@ -34,7 +35,10 @@ public:
   std::vector<std::string> tracks;
 
   /** Load the CupData from the given filename */
-  CupData(const char* filename);
+              CupData       (const std::string filename);
+              CupData       ()       {}; // empty for initialising
+  std::string getName       () const { return name;        }
+  std::string getDescription() const { return description; }
 };
 
 #endif

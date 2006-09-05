@@ -74,7 +74,8 @@ libMain_a_SOURCES = \
 	gui/single_window_menu.cpp gui/single_window_menu.hpp		\
 	gui/help_menu.cpp 	 gui/help_menu.hpp 			\
 	gui/credits_menu.cpp	 gui/credits_menu.hpp			\
-	gui/scrolled_text.cpp	 gui/scrolled_text.hpp
+	gui/scrolled_text.cpp	 gui/scrolled_text.hpp			\
+	gui/grand_prix_select.cpp	gui/grand_prix_select.hpp
 
 supertuxkart_SOURCES = \
   main.cpp

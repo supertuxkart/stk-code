@@ -3,8 +3,10 @@
 (tuxkart-track
  (name "Star Track")
  (sky-color    0.0 0.0 0.0 0.0)
+ (description "Created by Ingo Ruhnke")
  (music "mods/tk5a.mod")
- (herring "new"))
+ (herring "new")
+)
 
 ;; EOF ;;
 

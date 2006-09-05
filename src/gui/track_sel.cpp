@@ -23,6 +23,7 @@
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "menu_manager.hpp"
+#include "config.hpp"
 
 enum WidgetTokens {
   WTOK_RETURN,
@@ -31,8 +32,7 @@ enum WidgetTokens {
   WTOK_EXIT,
 };
 
-TrackSel::TrackSel()
-{
+TrackSel::TrackSel() {
   menu_id = widgetSet -> vstack(0);
 
   widgetSet -> label(menu_id, "Choose a Track", GUI_LRG, GUI_TOP, 0, 0);
@@ -55,11 +55,12 @@ TrackSel::TrackSel()
   }
 
   widgetSet -> layout(menu_id, 0, 1);
+  rect = widgetSet->rect(10, 10, config->width-20, 34, GUI_ALL, 10);
 }
 
-TrackSel::~TrackSel()
-{
-	widgetSet -> delete_widget(menu_id) ;
+TrackSel::~TrackSel() {
+  widgetSet -> delete_widget(menu_id);
+  glDeleteLists(rect, 1);
 }
 	
 void TrackSel::update(float dt) {
@@ -77,6 +78,26 @@ void TrackSel::update(float dt) {
   // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
   // NOTE: it's weird that these values do not fit at all with the glOrtho()
   track->drawScaled2D(0.0, -0.7, 1.0, 0.3, true);  // (x, y, w, h, stretch)
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
+  glMatrixMode(GL_MODELVIEW);
+  glEnable(GL_BLEND);
+
+  glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    const GLfloat backgroundColour[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
+    glColor4fv(backgroundColour);
+    glCallList(rect);
+  glPopMatrix();
+  widgetSet->drawText(track->getDescription(), GUI_MED, SCREEN_CENTERED_TEXT, 10,
+		      255,255,255);
+  glDisable(GL_BLEND);
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  
 }
 
 void TrackSel::select() {

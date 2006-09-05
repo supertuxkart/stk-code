@@ -241,6 +241,7 @@ void Track::loadTrack(const char* filename) {
   }
 
   lisp->get("name",          name);
+  lisp->get("description",   description);
   lisp->get("music",         music_filename);
   lisp->get("herring",       herringStyle);
   lisp->get("sky-color",     sky_color);

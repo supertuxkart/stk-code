@@ -1,7 +1,8 @@
 ;; -*- mode: lisp -*-
 
-(tuxkart-cup
- (name "Herring Cup")
- (tracks "startrack" "lighthouse" "sandtrack" "volcano" "gownsbow" "beach" "bsodcastle" "geekopeak" "littlevolcano" "olivermath" "race" "subseatrack" "tuxtrack"))
+(supertuxkart-cup
+ (name "All tracks")
+ (description "All tracks included in SuperTuxKart")
+ (tracks "beach" "startrack" "lighthouse" "sandtrack" "volcano" "gownsbow" "beach" "bsodcastle" "geekopeak" "littlevolcano" "olivermath" "race" "subseatrack" "tuxtrack"))
 
 ;; EOF ;;

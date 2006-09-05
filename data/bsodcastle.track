@@ -2,7 +2,9 @@
 
 (tuxkart-track
  (name "BSODs Battlements")
- (music "mods/tuxr.mod"))
+ (description "Created by Oliver&Steve Baker")
+ (music "mods/tuxr.mod")
+)
 
 ;; EOF ;;
 

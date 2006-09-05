@@ -2,7 +2,9 @@
 
 (tuxkart-track
  (name "Geeko Peak")
- (music "mods/tk2.mod"))
+ (description "Created by Oliver&Steve Baker")
+ (music "mods/tk2.mod")
+)
 
 ;; EOF ;;
 

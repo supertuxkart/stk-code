@@ -35,6 +35,7 @@ public:
     virtual void makeTexturePath(char* path, const char* fname) const;
 
     std::string getPath(const char* name) const;
+    std::string getPath(const std::string name) const {return getPath(name.c_str());}
     void listFiles(std::set<std::string>& result, const std::string& dir)
         const;
 

@@ -42,7 +42,7 @@
 #include "race_menu.hpp"
 #include "help_menu.hpp"
 #include "credits_menu.hpp"
-
+#include "grand_prix_select.hpp"
 
 MenuManager* menu_manager= new MenuManager();
 
@@ -108,6 +108,9 @@ void MenuManager::update() {
           break;
         case MENUID_GRANDPRIXEND:
           m_currentMenu= new GrandPrixEnd();
+          break;
+        case MENUID_GRANDPRIXSELECT:
+          m_currentMenu= new GrandPrixSelect();
           break;
 #if 0
         case MENUID_NEXTRACE:

@@ -2,7 +2,9 @@
 
 (tuxkart-track
  (name "On the Beach")
- (herring "new"))
+ (description "Created by Ingo Ruhnke")
+ (herring "new")
+)
 
 ;; EOF ;;
 

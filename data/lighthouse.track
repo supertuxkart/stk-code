@@ -2,6 +2,8 @@
 
 (tuxkart-track
  (name "Around the Lighthouse")
- (herring "new"))
+ (description "Created by Ingo Ruhnke")
+ (herring "new")
+)
 
 ;; EOF ;;

@@ -381,8 +381,11 @@ int WidgetSet::space(int pd)
 void WidgetSet::drawText (const char *text, int sz, int x, int y, 
 			  int red, int green, int blue, 
 			  float scale_x, float scale_y ) {
-  float l,r,t,b;
-  sz = (int)(sz*(scale_x>scale_y ? scale_x:scale_y));
+  float l,r,t,b, fontScaling;
+  // Only scale for lower resolution
+  fontScaling = config->width<800 ? ((float)config->width/800.0f) : 1.0f;
+  fontScaling = (float)config->width/800.0f;
+  sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
   fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
   int w = (int)((r-l+0.99)*scale_x);
   int h = (int)((t-b+0.99)*scale_y);
@@ -394,9 +397,6 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
   }
  
   textOut->begin();
-    if(config->width<800){
-      sz = (int)((float)sz*(float)config->width/800.0f);
-    }
     textOut->setPointSize(sz);
     textOut->start2f((GLfloat)x, (GLfloat)y);
     glColor3ub(red, green, blue);

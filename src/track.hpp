@@ -40,6 +40,7 @@ class Track {
     std::string name;
     std::string music_filename;
     std::string herringStyle;
+    std::string description;
     sgVec4      sky_color;
     bool        use_fog;
     sgVec4      fog_color;
@@ -121,6 +122,7 @@ public:
   const float&  getFogStart           () const {return fog_start;     }
   const float&  getFogEnd             () const {return fog_end;       }
   const sgVec4& getSkyColor           () const {return sky_color;     }
+  const std::string getDescription    () const {return description;   }
   const std::vector<sgVec3Wrapper>& getDriveline () const {return driveline;}
   const std::vector<SGfloat>& getWidth() const {return path_width;    }
   const char*        getHerringStyle  () const {return herringStyle.c_str();}

@@ -1,7 +1,8 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2005 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006      Joerg Henrichs, Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,19 +25,19 @@
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
 
-CupData::CupData(const char* filename)
-{
+CupData::CupData(const std::string filename) {
   const lisp::Lisp* lisp = 0;
   try {
     lisp::Parser parser;
     lisp = parser.parse(loader->getPath(filename));
     
-    lisp = lisp->getLisp("tuxkart-cup");
+    lisp = lisp->getLisp("supertuxkart-cup");
     if(!lisp)
-        throw std::runtime_error("No tuxkart-cup node");
+        throw std::runtime_error("No supertuxkart-cup node");
     
-    lisp->get("name", name);
-    lisp->getVector("tracks", tracks);
+    lisp->get      ("name",        name       );
+    lisp->get      ("description", description);
+    lisp->getVector("tracks",      tracks     );
   } catch(std::exception& err) {
     std::cout << "Error while reading cup: " << err.what() << "\n";
   }

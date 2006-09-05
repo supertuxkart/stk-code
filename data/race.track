@@ -2,7 +2,9 @@
 
 (tuxkart-track
  (name "Race Track")
- (herring "new"))
+ (description "Created by Ingo Ruhnke")
+ (herring "new")
+)
 
 ;; EOF ;;
 

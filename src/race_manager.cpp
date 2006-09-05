@@ -188,8 +188,7 @@ TimeTrialMode::start()
 }
 
 
-RaceManager::RaceManager()
-{ 
+RaceManager::RaceManager() { 
   mode       = 0;
   numKarts   = 6;
   difficulty = RD_MEDIUM;
@@ -241,9 +240,7 @@ RaceManager::start()
   switch(race_mode)
     {
     case RaceSetup::RM_GRAND_PRIX:
-      mode = new GrandPrixMode(players, 
-			       CupData("data/herring.cup"),
-			       difficulty, numKarts);
+      mode = new GrandPrixMode(players, cup, difficulty, numKarts);
       break;
     case RaceSetup::RM_TIME_TRIAL:
       mode = new TimeTrialMode(track, players[0], numLaps);

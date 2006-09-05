@@ -26,6 +26,7 @@
 #include <GL/gl.h>
 #endif
 #include <plib/fnt.h>
+#include <string>
 
 /*---------------------------------------------------------------------------*/
 
@@ -172,6 +173,12 @@ public:
 	void drawText(const char *text, int sz, int x, int y, 
 		      int red, int green, int blue, 
 		      float scale_x=1.0, float scale_y=1.0);
+        void drawText(std::string text, int sz, int x, int y, 
+		      int red, int green, int blue, 
+	  	      float scale_x=1.0, float scale_y=1.0) {
+	              drawText(text.c_str(), sz, x, y, red, green, blue,
+			       scale_x, scale_y);
+	              }
 	/*---------------------------------------------------------------------------*/
 	
 	/* prints out debugging info */

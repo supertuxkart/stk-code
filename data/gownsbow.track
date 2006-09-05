@@ -2,8 +2,10 @@
 
 (tuxkart-track
  (name "Gowns Bow")
+ (description "Created by Ingo Ruhnke")
  (gravity 78.0)
- (music "mods/tk5a.mod"))
+ (music "mods/tk5a.mod")
+)
 
 ;; EOF ;;
 
