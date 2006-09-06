@@ -49,36 +49,28 @@ Thanks in advance!
 ********************************
 ********************************
 
-Urgent for release
-===================
-- Collect a list of 'new' items, which can be used for advertising
-  the new release. [hiker, in progress]
-- Create a native windows executable.
-- Valgrind for memory bugs.
-- Update the web page, make more screen shots, ...
+Known bugs
+==========
+This contains either hard, or not reproducible errors. 
 
-
-Most likely too difficult/time consuming to be fixed before the release
-=======================================================================
-This contains either hard, or not reproducible errors. They are most 
-likely to be ignored for now. The first problem appears to be very
-difficult (and most likely related to the X driver and plib interaction),
-while the second and third appear to be too unimportant to fix for now
-
-- Fix keyboard bug: see bug 6168
-  Might be difficult to fix! Worst case, document this, blame X/plib
-  :)) and leave it.
+- Fix keyboard bug: the first time turning left/right while
+  pressing the up key is ignored. See bug 6168
+  Might be difficult to fix, since it occurs (it appears) in the interface
+  between X and plib.
 - Fix 'fall through track' bug #8384
   This appears to be a very special bug, which only happens on a certain
   configuration (Suse 10.1, dual core 32-bit Intel, ATI graphics card),
   and the error does NOT happen when using the same source code with
-  wine under windows, or on a AMD 64 bit machine. Therefore rather low 
-  priority for now, unless we know that this happens more often. It might 
-  be a compiler bug! [hiker]
+  wine under windows, or on a AMD 64 bit machine. 
+  It might  be a compiler bug! [hiker]
 - Fix not-reproducible ref-count error (I haven't seen this bug for
   a while, perhaps it was fixed when fixing something else?? Any
   reports on this would be helpful, otherwise we assume that this
   is fixed).
+- With some resolution (esp. 1024x768 or higher) the race gui is
+  not scaled correctly, e.g. the displayed track display might be
+  where the kart is etc. Best resolution is probably 800x600 (or lower)
+  for now.
 
 Things that would be nice to fix, but are not urgent
 =====================================================
@@ -88,11 +80,8 @@ Things that would be nice to fix, but are not urgent
   - speed display is red if the kart is not on ground
   - lap display for other karts is red if kart is on last 
     track, green if finished.
-- Support for several grand prix (mainly: add menu for this,
-  STK should be able to handle different GPs anyway)  [hiker, 
-  in progress]
-- Add scrolling text window for credits, so that longer credits
-  can be displayed [hiker, in progress]
+- Display skid marks again (currently disabled due to problems of 
+  skid marks being 'in the air').
 - Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
 - Enable real fullscreen support
 - Improved sound
@@ -104,7 +93,6 @@ Things that would be nice to fix, but are not urgent
    - Esp. include information on how to create/edit
      tracks.
 - Top 10 lists for time trial, and grand prix.
-- Scale fonts dependent on resolution [hiker, in progress].
 - Add a screen dump of each track to be displayed, instead
   of the outline.
 - Add track sections which must be passed in order to finish
@@ -113,11 +101,11 @@ Things that would be nice to fix, but are not urgent
   not get any feedback if a wayline is skipped --> after 
   crossing the finishing line, the race might not end for a
   kart.
-- Create a widget displaying slowly scrolling text, which would
-  enable a much longer and complete credit lists (and perhaps
-  help texts as well).
+- Valgrind for memory bugs.
+- Update the web page, make more screen shots, ...
 - Tight/wide corner steering for AI. The AI is hitting the wall
   in very tight corners (e.g. subseatrack) [coz, in progress]
+
 
 long term
 =========
@@ -231,3 +219,11 @@ DONE
 - Give credit to the track designer (perhaps add a one line comment
   to each track, which is displayed when selecting a track?? Or just
   add then to the credits list?)
+- Collect a list of 'new' items, which can be used for advertising
+  the new release.
+- Create a widget displaying slowly scrolling text, which would
+  enable a much longer and complete credit lists (and perhaps
+  help texts as well).
+- Support for several grand prix (mainly: add menu for this,
+  STK should be able to handle different GPs anyway)
+- Scale fonts dependent on resolution.

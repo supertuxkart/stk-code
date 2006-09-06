@@ -1,3 +1,11 @@
+SuperTuxKart 0.2rc1 (06. Sep 2006)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Improved AI
+  * Support for different grand prix
+  * Too many bugfixes to list them all
+  * Improved physics (still work in progress)
+  * Keyboard handling allows gradual turning
+
 SuperTuxKart 0.1 (04. May 2006)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Significant speedup by using a new HOT and collision algorithm
@@ -5,7 +13,6 @@ SuperTuxKart 0.1 (04. May 2006)
   * Removed all SDL dependencies, only plib is needed
   * Single and multi-window menu can be used
   * Code structure changes
-  * Slightly better AI
   * Some bugfixes and small improvements
   * Added profile option to support automatic profiling
 
