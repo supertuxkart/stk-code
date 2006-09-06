@@ -10,7 +10,7 @@ AC_PREREQ(2.52)
 dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(supertuxkart, 0.0.0)
+AM_INIT_AUTOMAKE(supertuxkart, 0.1rc1)
 
 dnl Check for compilers.
 AC_PROG_CC

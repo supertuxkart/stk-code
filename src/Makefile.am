@@ -30,9 +30,9 @@ supertuxkart_SOURCES =             main.cpp  			\
 	hook_manager.cpp	   hook_manager.hpp	        \
 	skid_mark.cpp		   skid_mark.hpp	        \
 	shadow.cpp		   shadow.hpp	        	\
-	start_screen.cpp	   start_screen.h	        \
-	world_screen.cpp	   world_screen.h	        \
-	empty_screen.cpp	   empty_screen.h	        \
+	start_screen.cpp	   start_screen.hpp	        \
+	world_screen.cpp	   world_screen.hpp	        \
+	empty_screen.cpp	   empty_screen.hpp	        \
 	particle_system.cpp	   particle_system.hpp       	\
 	screen_manager.cpp	   screen_manager.hpp        	\
 	widget_set.cpp		   widget_set.hpp	        \
@@ -43,11 +43,12 @@ supertuxkart_SOURCES =             main.cpp  			\
 	auto_kart.cpp		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
 	projectile.cpp 		   projectile.hpp	        \
-	static_ssg.cpp 		   statig_ssg.hpp	        \
+	static_ssg.cpp 		   static_ssg.hpp	        \
 	history.cpp		   history.hpp	        	\
-	race_setup.h	   	   no_copy.hpp	        	\
-	kart_control.h		   constants.hpp            	\
+	race_setup.hpp	   	   no_copy.hpp	        	\
+	kart_control.hpp	   constants.hpp            	\
 	traffic.cpp 			  	        	\
+	player.hpp		   screen.hpp			\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\
@@ -66,7 +67,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/config_sound.cpp	   gui/config_sound.hpp    	\
 	gui/config_controls.cpp	   gui/config_controls.hpp   	\
 	gui/options.cpp		   gui/options.hpp	        \
-	gui/game_mode.cpp	   gui/gameMode.hpp	        \
+	gui/game_mode.cpp	   gui/game_mode.hpp	        \
 	gui/difficulty.cpp	   gui/difficulty.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
