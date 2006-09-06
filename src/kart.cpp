@@ -139,6 +139,12 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
 Kart::~Kart() {
   delete smokepuff;
 
+  sgMat4 wheel_steer;
+  sgMakeIdentMat4(wheel_steer);
+  if (wheel_front_l) wheel_front_l->setTransform(wheel_steer);
+  if (wheel_front_r) wheel_front_r->setTransform(wheel_steer);
+
+
   ssgDeRefDelete(wheel_front_l);
   ssgDeRefDelete(wheel_front_r);
   ssgDeRefDelete(wheel_rear_l);

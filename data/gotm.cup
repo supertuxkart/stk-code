@@ -3,7 +3,7 @@
 (supertuxkart-cup
  (name "Game-of-the-Month")
  (description "All new tracks done by the Game of the month team")
- (tracks "beach" "lighthouse" "startrack" "volcano" "littlevolcano" "gownsbow" "race" "subseatrack" )
+ (tracks "beach" "lighthouse" "startrack" "volcano" "littlevolcano" "race" "subseatrack" )
 )
 
 ;; EOF ;;
