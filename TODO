@@ -51,19 +51,6 @@ Thanks in advance!
 
 Urgent for release
 ===================
-- Fix gui bug: run grand prix, back to menu -> textures are wrong
-  in character selection menu
-  It is known that this can be fixed by removing
-  loader->shared_textures.removeAll
-  in gui/char_sel.cpp, but then the same problem happens when going
-  from the next menu back to the char-sel menu.
-  A similar problems occurs (sometimes??) when first running a 
-  quick race, then a grand prix: some textures on the track will be
-  missing (usually in tuxtrack there are no textures for the lower
-  barriers to the left and right of the road).
-- Give credit to the track designer (perhaps add a one line comment
-  to each track, which is displayed when selecting a track?? Or just
-  add then to the credits list?)
 - Collect a list of 'new' items, which can be used for advertising
   the new release. [hiker, in progress]
 - Create a native windows executable.
@@ -231,3 +218,16 @@ DONE
   - Generally, the AI should be able to finish all tracks.  [coz, in progress]
 - Decide which tracks should be included - some tracks appear to be
   somewhat unfinished.
+- Fix gui bug: run grand prix, back to menu -> textures are wrong
+  in character selection menu
+  It is known that this can be fixed by removing
+  loader->shared_textures.removeAll
+  in gui/char_sel.cpp, but then the same problem happens when going
+  from the next menu back to the char-sel menu.
+  A similar problems occurs (sometimes??) when first running a 
+  quick race, then a grand prix: some textures on the track will be
+  missing (usually in tuxtrack there are no textures for the lower
+  barriers to the left and right of the road).
+- Give credit to the track designer (perhaps add a one line comment
+  to each track, which is displayed when selecting a track?? Or just
+  add then to the credits list?)

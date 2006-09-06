@@ -30,11 +30,12 @@
 #include "config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"
+#include "material_manager.hpp"
+#include "material.hpp"
 
 CharSel::CharSel(int whichPlayer)
-  : kart(0), playerIndex(whichPlayer)
-{
-    // for some strange reasons plib calls makeCurrent() in ssgContext
+  : kart(0), playerIndex(whichPlayer) {
+    // for some strange reasons plib calls makeCurrent() in ssgContextf
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
 	context = new ssgContext;
@@ -57,29 +58,23 @@ CharSel::CharSel(int whichPlayer)
 	int va = widgetSet -> varray(ha);
 
 	int icon_size = 64;
-	/* plib keeps track of textures which are already loaded.
-	   Since the icons are deleted, the texture 'cache' needs
-	   to be cleared. This problem actually appears only if
-	   in the next menu (track) ESC is pressed and control
-	   returns to this menu: all icons are simply white then.
-	   Clearing the texture cache can either be done with:
-	   loader->shared_textures.removeAll(); or
-	   loader->endLoad(); which calls removeAll() */
-    loader->shared_textures.removeAll();   // remove cached textures
 
 	int row1 = widgetSet -> harray(va);
 	
-	for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++)
-	{
-      	const KartProperties* kp= kart_manager->getKartById(i);
-		int c = widgetSet->image(row1, kp->getIconFile(), icon_size, icon_size);
-		widgetSet->activate_widget(c, i, 0);
+	for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++) {
+	  const KartProperties* kp= kart_manager->getKartById(i);
+	  Material *m = material_manager->getMaterial(kp->getIconFile());
+	  ssgSimpleState *s=m->getState();
+	  int c = widgetSet->image(row1, m->getState()->getTextureHandle(), 
+				   icon_size, icon_size);
+	  widgetSet->activate_widget(c, i, 0);
 
-		if (NULL == kart_manager->getKartById(i + 1)) // last in the list
-			widgetSet -> set_active(c);
+	  if (NULL == kart_manager->getKartById(i + 1)) // last in the list
+	    widgetSet -> set_active(c);
 	}
 	widgetSet -> filler(ha);
-    kart_name_label = widgetSet -> label(menu_id, "No driver choosed", GUI_MED, GUI_ALL, 0, 0);
+	kart_name_label = widgetSet -> label(menu_id, "No driver choosed", 
+					     GUI_MED, GUI_ALL, 0, 0);
 	widgetSet -> layout(menu_id, 0, 1);
 
 	current_kart = -1;
@@ -90,12 +85,11 @@ CharSel::CharSel(int whichPlayer)
 
 }
 
-CharSel::~CharSel()
-{
-	widgetSet -> delete_widget(menu_id) ;
-    ssgDeRefDelete(kart);
-
-    delete context;
+CharSel::~CharSel() {
+  widgetSet -> delete_widget(menu_id) ;
+  ssgDeRefDelete(kart);
+  
+  delete context;
 }
 
 void CharSel::switch_to_character(int n)

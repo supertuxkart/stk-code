@@ -51,9 +51,6 @@ WidgetSet::~WidgetSet()
 
 	for (id = 1; id < MAXWIDGETS; id++)
 	{
-		if (glIsTexture(widgets[id].text_img))
-			glDeleteTextures(1, &widgets[id].text_img);
-
 		if (glIsList(widgets[id].rect_obj))
 			glDeleteLists(widgets[id].rect_obj, 1);
 
@@ -198,8 +195,6 @@ int WidgetSet::filler(int pd) { return add_widget(pd, GUI_FILLER); }
 
 void WidgetSet::set_label(int id, const char *text)
 {
-    if (glIsTexture(widgets[id].text_img))
-        glDeleteTextures(1, &widgets[id].text_img);
     float l,r,b,t;
     fnt->getBBox(text, widgets[id].size, 0, &l, &r, &b, &t);
     widgets[id].yOffset    = (int)b;
@@ -259,13 +254,13 @@ void WidgetSet::set_multi(int id, const char *text)
 
 /*---------------------------------------------------------------------------*/
 
-int WidgetSet::image(int pd, const char *file, int w, int h)
+int WidgetSet::image(int pd, int textureId, int w, int h)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_IMAGE)))
     {
-      widgets[id].text_img = loader->createTexture((char*)file)->getHandle();
+      widgets[id].text_img = textureId;
       widgets[id].w     = w;
       widgets[id].h     = h;
     }
@@ -837,9 +832,6 @@ int WidgetSet::delete_widget(int id) {
         delete_widget(widgets[id].car);
 
         /* Release any GL resources held by this widget. */
-
-        if (glIsTexture(widgets[id].text_img))
-            glDeleteTextures(1, &widgets[id].text_img);
 
         if (glIsList(widgets[id].rect_obj))
             glDeleteLists(widgets[id].rect_obj, 1);

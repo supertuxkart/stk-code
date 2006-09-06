@@ -85,6 +85,8 @@ GrandPrixEnd::~GrandPrixEnd()
 
     //The next line prevents textures like the background of the main menu from
     //going white after finishing the grandprix
+    // FIXME: I think this is not necessary anymore after the
+    //        texture bug fix (r733) - but I can't currently test this.
     loader->shared_textures.removeAll();
 }
 

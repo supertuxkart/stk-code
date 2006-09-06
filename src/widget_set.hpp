@@ -141,8 +141,9 @@ public:
 	//fills up space
 	int  filler(int);
 	
-	//a widget that consists of an image
-	int  image(int, const char *, int, int);
+	//a widget that consists of a texture (which must be completely
+        //handled by the application)
+	int  image(int, int, int, int);
 	
 	//a normal text menu entry, except that it is automatically immediately activated
 	int  start(int, const char *, int, int, int value=0);

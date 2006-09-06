@@ -73,12 +73,6 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   trackBranch = new ssgBranch ;
   scene -> addKid ( trackBranch ) ;
 
-  //Clear textures that might be stored from things like the character select
-  //screen, otherwise, the tracks could get textures where they aren't
-  //suppposed to be, and if there is no texture, it just looks white.
-  if(raceSetup.mode != RaceSetup::RM_GRAND_PRIX)
-      loader->shared_textures.removeAll();
-
   assert(raceSetup.karts.size() > 0);
 
   // Clear all hooks, which might still be stored there from a previous race.
