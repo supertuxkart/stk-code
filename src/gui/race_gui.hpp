@@ -34,6 +34,7 @@ class RaceGUI: public BaseGUI {
   // the kart which is using them
   PlayerKart* keysToKart[MAXKEYS];
   int         typeForKey[MAXKEYS];
+  int         xOffForText;
 public:
        RaceGUI();
        ~RaceGUI();

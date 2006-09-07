@@ -24,6 +24,8 @@
 #include "track.hpp"
 #include "menu_manager.hpp"
 #include "config.hpp"
+#include "material.hpp"
+#include "material_manager.hpp"
 
 enum WidgetTokens {
   WTOK_RETURN,
@@ -72,16 +74,45 @@ void TrackSel::update(float dt) {
   int clicked_token= widgetSet->token(widgetSet->click());
   const Track* track= track_manager->getTrack(clicked_token);
 
-  // preview's map color
-  glColor3f ( 1, 1, 1 ) ;
-
-  // glOrtho was feed with 0.0, getScreenWidth(), 0.0, getScreenHeight();
-  // NOTE: it's weird that these values do not fit at all with the glOrtho()
-  track->drawScaled2D(0.0, -0.7, 1.0, 0.3, true);  // (x, y, w, h, stretch)
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
   glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
+  const std::string& screenshot = track->getScreenshotFile();
+  const std::string& topview    = track->getTopviewFile();
+  if(screenshot.size()==0 && topview.size()==0) {
+    glColor3f ( 1, 1, 1 ) ;
+    track->drawScaled2D(0.0, 50, config->width, config->height/3);  // (x, y, w, h)
+  } else {                   // either topview or screenshot specified
+    int xLeft   = config->width/2;
+    int yBottom = 50;
+    int w       = config->width/2-20;
+    int h       = config->height/3-10;
+    if(topview.size()==0) {  // no topview, but there is a screenshot!
+      track->drawScaled2D(xLeft, yBottom, w, h);
+    } else {                 // topview is defined
+      Material *m=material_manager->getMaterial(topview);
+      m->apply();
+      glBegin(GL_QUADS) ;
+        glColor4f(1, 1, 1, 1 );
+        glTexCoord2f(0, 0); glVertex2i( xLeft,   yBottom   );
+        glTexCoord2f(1, 0); glVertex2i( xLeft+w, yBottom  );
+        glTexCoord2f(1, 1); glVertex2i( xLeft+w, yBottom+h);
+        glTexCoord2f(0, 1); glVertex2i( xLeft,   yBottom+h);
+      glEnd () ;
+      
+    }   // topview is defined
+    Material *m=material_manager->getMaterial(screenshot);
+    xLeft = 10;
+    m->apply();
+    glBegin(GL_QUADS) ;
+      glColor4f(1, 1, 1, 1 );
+      glTexCoord2f(0, 0); glVertex2i( xLeft,   yBottom   );
+      glTexCoord2f(1, 0); glVertex2i( xLeft+w, yBottom  );
+      glTexCoord2f(1, 1); glVertex2i( xLeft+w, yBottom+h);
+      glTexCoord2f(0, 1); glVertex2i( xLeft,   yBottom+h);
+    glEnd () ;
+  }   // either topview or screenshot specified
   glMatrixMode(GL_MODELVIEW);
   glEnable(GL_BLEND);
 

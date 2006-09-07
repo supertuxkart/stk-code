@@ -67,10 +67,6 @@ This contains either hard, or not reproducible errors.
   a while, perhaps it was fixed when fixing something else?? Any
   reports on this would be helpful, otherwise we assume that this
   is fixed).
-- With some resolution (esp. 1024x768 or higher) the race gui is
-  not scaled correctly, e.g. the displayed track display might be
-  where the kart is etc. Best resolution is probably 800x600 (or lower)
-  for now.
 
 Things that would be nice to fix, but are not urgent
 =====================================================
@@ -80,6 +76,8 @@ Things that would be nice to fix, but are not urgent
   - speed display is red if the kart is not on ground
   - lap display for other karts is red if kart is on last 
     track, green if finished.
+- Add screenshot and 'topview' picture for each track, which can
+  be displayed during track selection.
 - Display skid marks again (currently disabled due to problems of 
   skid marks being 'in the air').
 - Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
@@ -93,14 +91,15 @@ Things that would be nice to fix, but are not urgent
    - Esp. include information on how to create/edit
      tracks.
 - Top 10 lists for time trial, and grand prix.
-- Add a screen dump of each track to be displayed, instead
-  of the outline.
+- Support more colours to indicate which lap a kart
+  is on. Display the time difference to either the
+  kart in front of the kart, or to the first kart.
 - Add track sections which must be passed in order to finish
   a lap. This would avoid karts taking shortcuts.
   That's already in the code, but currently the user does 
-  not get any feedback if a wayline is skipped --> after 
+  not get any feedback if a driveline is skipped --> after 
   crossing the finishing line, the race might not end for a
-  kart.
+  kart. Well, there is the 'wrong direction' message (?)
 - Valgrind for memory bugs.
 - Update the web page, make more screen shots, ...
 - Tight/wide corner steering for AI. The AI is hitting the wall
@@ -135,95 +134,13 @@ long term
   Make it easy to replace sounds (which are currently hardcoded), e.g
   via a config file. Sound/music should be selectable for a track,
   but a grand prix should be able to overwrite this to create a consistent
-  ambience
+  ambience, ...
 - More tracks
 - More grand prixs
 - Support for translations(?)
 - Support for easy-to-plugin different AIs, and allow different karts
   to have different AIs
-
-
-DONE
-====
-- Fix 'not on triangle' bug
-    A crash happens if a kart should leave the track completely
-- Rename configuration directory/file from .tuxkart to .supertuxkart
-- Make steering wheel speed adjustable
-- Make game installable in a configurable directory
-- Add short 'help' screen
-- Add 'about' screen
-- Update readme
-- Update (c) information in sources
-- Update/add todo/known bugs list
-- Adding item boxes to levels which don't have them.
-- Remove obstacle/road-work on tuxtrack, since the AI doesn't
-  know about it and might very likely just drive into it ...
-  over and over again (work around, till the AI becomes better)
-- Giving material in tracks, from which the kart can't go back
-  to the race, a 'reset' property (e.g. hole in volcano, or under
-  bridge of sand track, where the karts can fall it but can't come
-  back from), so that karts falling into these paces will be rescued
-  automatically
-- Update doc directory: most of the information is tuxkart only,
-  and still the useful documentation should be merged into the
-  Implementation.txt file for now.
-- Work-around rescue problems 
-- Physics
-   - slow down when driving upwards, accelerate when driving
-     down 
-- Disable fullscreen (it doesn't work currently, and I expect it's
-  too much work to fix this on all platforms before the release).
-- Fix wheelies (make all wheelie parameters easily changeable without
-  recompile, and if possible dependent on physic parameters.
-- Restart race does not work (when in a (quick) race, press esc,
-  select Restart --> nothing happens) --> could not be reproduced.
-- Collectables are not returned when a race is restart.
-- If a herring is gone during a restart, it will not be
-  there at all in the restarted race.
-- The number of finished karts is not reset during a restart, resulting
-  in the restarted race to finish too early.
-- Wait for a limited amount of time after the last player kart
-  is finished, and then end the game. Helps if 2 (or more) AI
-  karts are stuck somewhere.
-- No new 3D model for gold coins, the old herring is still used.
-  Is there an easy way to make two coins, one silver, one gold?
-- No GUI (e.g. speed etc) is displayed if a kart has a spark
-  as a collectable.
-- Add a 3rd dimension to herring data, so that the subsea
-  and gownsbow can have herrings as well (currently, herring
-  data is 2d only, the height is taken from computing the height
-  of the track - which doesn't work correctly in case of lanes
-  running on top of each other (gown), or a track running inside
-  a tube (subsea).
-- Find acceptable physics parameters (e.g. kart engine and
-  air resistance will determine highest speed).
-  Perhaps make the maximum speed dependent on the skill level:
-  higher skill levels --> faster karts 
-- Improve AI
-  - I've seen it once or twice that the AI would drive into a
-    wall (towards the right of the track), and it would then
-    just keep on driving into the same wall.  [coz, in progress]
-  - Generally, the AI should be able to finish all tracks.  [coz, in progress]
-- Decide which tracks should be included - some tracks appear to be
-  somewhat unfinished.
-- Fix gui bug: run grand prix, back to menu -> textures are wrong
-  in character selection menu
-  It is known that this can be fixed by removing
-  loader->shared_textures.removeAll
-  in gui/char_sel.cpp, but then the same problem happens when going
-  from the next menu back to the char-sel menu.
-  A similar problems occurs (sometimes??) when first running a 
-  quick race, then a grand prix: some textures on the track will be
-  missing (usually in tuxtrack there are no textures for the lower
-  barriers to the left and right of the road).
-- Give credit to the track designer (perhaps add a one line comment
-  to each track, which is displayed when selecting a track?? Or just
-  add then to the credits list?)
-- Collect a list of 'new' items, which can be used for advertising
-  the new release.
-- Create a widget displaying slowly scrolling text, which would
-  enable a much longer and complete credit lists (and perhaps
-  help texts as well).
-- Support for several grand prix (mainly: add menu for this,
-  STK should be able to handle different GPs anyway)
-- Scale fonts dependent on resolution.
+- Code cleanup
+  - Consistent style (which needs to be defined)
+  - replace (as far as possible) all char* with std::string
+  - ...

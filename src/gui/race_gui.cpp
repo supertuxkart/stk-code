@@ -28,13 +28,12 @@
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
 
-#define TEXT_START_X  (config->width-220)
-
 RaceGUI::RaceGUI(): time_left(0.0) {
   if(!config->profile) {
     UpdateKeyboardMappings();
   }   // if !config->profile
 
+  xOffForText   = (int)(config->width-220*config->width/800.0f);
   pos_string[0] = "?!?";
   pos_string[1] = "1st";
   pos_string[2] = "2nd";
@@ -166,7 +165,7 @@ void RaceGUI::drawFPS () {
     fpsCounter = 0;
     fpsTimer.setMaxDelta(1000);
   }    
-  widgetSet->drawText (fpsString, 36, 0, config->height-36, 255, 255, 255 ) ;
+  widgetSet->drawText (fpsString, 36, 0, config->height-50, 255, 255, 255 ) ;
 }   // drawFPS
 
 // -----------------------------------------------------------------------------
@@ -223,7 +222,7 @@ void RaceGUI::drawTimer () {
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
   sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( str, 36, TEXT_START_X, config->height-80) ;
+  drawDropShadowText ( str, 36, xOffForText, config->height-80) ;
 }   // drawTimer
 
 // -----------------------------------------------------------------------------
@@ -250,7 +249,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
     green=0; blue=0;
   }
   drawDropShadowText ( str, (int)(36*ratio_y), 
-		       (int)(offset_x+TEXT_START_X        *ratio_x),
+		       (int)(offset_x+xOffForText         *ratio_x),
 		       (int)(offset_y+(config->height-200)*ratio_y),
 		       red, green, blue);
 
@@ -267,13 +266,13 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
   }
 
   drawDropShadowText ( str, (int)(38*ratio_y), 
-		       (int)(offset_x+TEXT_START_X        *ratio_x),
+		       (int)(offset_x+xOffForText         *ratio_x),
 		       (int)(offset_y+(config->height-250)*ratio_y) );
 
   /* Show player's position */
   sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
   drawDropShadowText ( str, (int)(38*ratio_y), 
-  		       (int)(offset_x+TEXT_START_X        *ratio_x), 
+  		       (int)(offset_x+xOffForText         *ratio_x), 
   		       (int)(offset_y+(config->height-300)*ratio_y) );
 }   // drawScore
 
@@ -284,9 +283,12 @@ void RaceGUI::drawMap () {
   glDisable ( GL_TEXTURE_2D ) ;
   glColor3f ( 0,0,1 ) ;
   assert(world != NULL);
-  world -> track -> draw2Dview ( 430+TRACKVIEW_SIZE  , TRACKVIEW_SIZE   ) ;
+  int xLeft = 10;
+  int yTop   =  10;
+
+  world -> track -> draw2Dview ( xLeft,   yTop   );
   glColor3f ( 1,1,0 ) ;
-  world -> track -> draw2Dview ( 430+TRACKVIEW_SIZE+1, TRACKVIEW_SIZE+1 ) ;
+  world -> track -> draw2Dview ( xLeft+1, yTop+1 );
 
   glBegin ( GL_QUADS ) ;
 
@@ -297,10 +299,10 @@ void RaceGUI::drawMap () {
     glColor3fv ( *kart->getColor());
     c          = kart->getCoord () ;
 
-    world -> track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+3 ) ;
-    world -> track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+3 ) ;
-    world -> track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+0, TRACKVIEW_SIZE+0 ) ;
-    world -> track->glVtx ( c->xyz, 430+TRACKVIEW_SIZE+3, TRACKVIEW_SIZE+0 ) ;
+    world -> track->glVtx ( c->xyz, xLeft+3, yTop+3);
+    world -> track->glVtx ( c->xyz, xLeft  , yTop+3);
+    world -> track->glVtx ( c->xyz, xLeft  , yTop  );
+    world -> track->glVtx ( c->xyz, xLeft+3, yTop  );
   }
 
   glEnd () ;
@@ -384,7 +386,7 @@ void RaceGUI::drawPlayerIcons () {
       if(position > 4)  // only draw the first four karts
         continue;
       
-      y = config->width/2-20 - ((position-1)*(55+5));
+      y = config->height*3/4-20 - ((position-1)*(55+5));
 
       // draw text
       int red=255, green=255, blue=255;
@@ -472,21 +474,21 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
 void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x, 
 				     int offset_y, float ratio_x, 
 				     float ratio_y                    ) {
-  int zz = FALSE ;
   // Originally the hardcoded sizes were 320-32 and 400
   int x1 = (int)((config->width/2-32) * ratio_x) + offset_x ;
   int y1 = (int)(config->height*5/6 * ratio_y)      + offset_y;
 
+  int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
   // If player doesn't have anything, just let the transparent black square
   Collectable* collectable=player_kart->getCollectable();
   if(collectable->getType() == COLLECT_NOTHING) {
     glDisable(GL_TEXTURE_2D);
     glBegin ( GL_QUADS ) ;
       glColor4f ( 0.0, 0.0, 0.0, 0.16 ) ;
-      glVertex2i ( x1                  , y1    ) ;
-      glVertex2i ( x1+(int)(64*ratio_x), y1    ) ;
-      glVertex2i ( x1+(int)(64*ratio_x), y1+(int)(64*ratio_y) ) ;
-      glVertex2i ( x1                  , y1+(int)(64*ratio_y) ) ;
+      glVertex2i ( x1             , y1    ) ;
+      glVertex2i ( x1+(int)(nSize), y1    ) ;
+      glVertex2i ( x1+(int)(nSize), y1+(int)(nSize) ) ;
+      glVertex2i ( x1             , y1+(int)(nSize) ) ;
     glEnd();
     return;
   }
@@ -497,32 +499,17 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
   if ( n > 5 ) n = 5 ;
   if ( n < 1 ) n = 1 ;
 
-  glEnable(GL_TEXTURE_2D);
-
-  glBegin ( GL_QUADS ) ;
-    glColor4f    ( 1, 1, 1, 1 ) ;
+  glBegin(GL_QUADS) ;
+    glColor4f(1, 1, 1, 1 );
 
     for ( int i = 0 ; i < n ; i++ ) {
-      if ( zz ) {
-	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1                  , y1    ) ;
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1    ) ;
-	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+(int)(64*ratio_x), y1+(int)(32*ratio_y) ) ;
-	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(32*ratio_y) ) ;
-
-	glTexCoord2f ( 0, 2 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(32*ratio_y) ) ;
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*40 + x1+(int)(64*ratio_x), y1+(int)(32*ratio_y) ) ;
-	glTexCoord2f ( 2, 0 ) ; glVertex2i ( i*40 + x1+(int)(32*ratio_x), y1+(int)(64*ratio_y) ) ;
-	glTexCoord2f ( 2, 2 ) ; glVertex2i ( i*40 + x1                  , y1+(int)(64*ratio_y) ) ;
-      } else {
-	glTexCoord2f ( 0, 0 ) ; glVertex2i ( i*30 + x1                  , y1    ) ;
-	glTexCoord2f ( 1, 0 ) ; glVertex2i ( i*30 + x1+(int)(64*ratio_x), y1    ) ;
-	glTexCoord2f ( 1, 1 ) ; glVertex2i ( i*30 + x1+(int)(64*ratio_x), y1+(int)(64*ratio_y) ) ;
-	glTexCoord2f ( 0, 1 ) ; glVertex2i ( i*30 + x1                  , y1+(int)(64*ratio_y) ) ;
-      }
+      glTexCoord2f(0, 0); glVertex2i( i*30 + x1      , y1      );
+      glTexCoord2f(1, 0); glVertex2i( i*30 + x1+nSize, y1      );
+      glTexCoord2f(1, 1); glVertex2i( i*30 + x1+nSize, y1+nSize);
+      glTexCoord2f(0, 1); glVertex2i( i*30 + x1      , y1+nSize);
     }   // for i
   glEnd () ;
 
-//  glDisable(GL_TEXTURE_2D);
 }   // drawCollectableIcons
 
 // -----------------------------------------------------------------------------
@@ -619,7 +606,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
     glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
     glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
     glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
-//    glEnable(GL_TEXTURE_2D);
+
     SteeringWheelIcon->getState()->force();
     glBegin ( GL_QUADS ) ;
       glColor4f    ( 1, 1, 1, 1 ) ;

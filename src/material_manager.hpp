@@ -21,6 +21,7 @@
 #define HEADER_MATERIALMANAGER_H
 
 #include <plib/ssg.h>
+#include <string>
 
 struct Material;
 
@@ -37,8 +38,9 @@ class MaterialManager {
   int       addEntity(Material *m);
   int       searchForEntity(Material *m) {return materials->searchForEntity(m);}
   int       getNumEntities() {return materials->getNumEntities();}
-  Material *getMaterial ( const char *texname ) ;
-  Material *getMaterial ( ssgLeaf *lf ) ;
+  Material *getMaterial (const char *texname);
+  Material *getMaterial (const std::string& t) {return getMaterial(t.c_str());}
+  Material *getMaterial (ssgLeaf *lf);
 };
 
 extern ssgState *fuzzy_gst, *herringbones_gst;

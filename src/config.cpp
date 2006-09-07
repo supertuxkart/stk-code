@@ -95,7 +95,7 @@ void Config::setDefaults() {
   displayFPS       = false;
   singleWindowMenu = false;
   oldStatusDisplay = false;
-  herringStyle     = "default";
+  herringStyle     = "new";
   disableMagnet    = true;
   profile          = 0;
   useKPH           = false;

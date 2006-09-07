@@ -64,7 +64,6 @@ CharSel::CharSel(int whichPlayer)
 	for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++) {
 	  const KartProperties* kp= kart_manager->getKartById(i);
 	  Material *m = material_manager->getMaterial(kp->getIconFile());
-	  ssgSimpleState *s=m->getState();
 	  int c = widgetSet->image(row1, m->getState()->getTextureHandle(), 
 				   icon_size, icon_size);
 	  widgetSet->activate_widget(c, i, 0);

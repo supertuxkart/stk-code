@@ -32,6 +32,9 @@ Track::Track (const char* filename, float w, float h, bool stretch) {
   track2DWidth  = w;
   track2DHeight = h;
   doStretch     = stretch;
+  description   = "";
+  screenshot    = "";
+  topview       = "";
   loadTrack(filename);
   loadDriveline();
 
@@ -176,34 +179,39 @@ void Track::trackToSpatial ( sgVec3 xyz, int hint ) const {
 // which uses the pre-computed attributes (see constructor/loadDriveline)
 // - which saves a bit of time at runtime as well.
 // drawScaled2D is called from gui/TrackSel, draw2Dview from RaceGUI.
-void Track::drawScaled2D(float x, float y, float w, 
-			 float h, bool stretch) const {
+void Track::drawScaled2D(float x, float y, float w, float h) const {
   sgVec2 sc ;
-  sgSubVec2 ( sc, driveline_max, driveline_center ) ;
-
-  float sx = w / sc[0] ;
+  sgSubVec2 ( sc, driveline_max, driveline_min ) ;
+  
+  float sx = (w-20.0f) / sc[0]; // leave 10 pix space left and right
+  x+=10.0;
   float sy = h / sc[1] ;
 
-  if(!stretch) sx = sy = std::min(sx, sy);
+  if(sx>sy) {
+    sx = sy;
+    x += w/2 - sc[0]*sx/2;
+  } else {
+    sy = sx;
+  }
 
   const unsigned int driveline_size = driveline.size();
   glBegin ( GL_LINE_LOOP ) ;
   for ( size_t i = 0 ; i < driveline_size ; ++i ) {
-      glVertex2f ( x + ( driveline[i][0] - driveline_center[0] ) * sx,
-                   y + ( driveline[i][1] - driveline_center[1] ) * sy ) ;
+      glVertex2f ( x + ( driveline[i][0] - driveline_min[0] ) * sx,
+                   y + ( driveline[i][1] - driveline_min[1] ) * sy ) ;
   }
   glEnd () ;
 
 }   // drawScaled2D
 
 // -----------------------------------------------------------------------------
-void Track::draw2Dview (float x, float y) const {
+void Track::draw2Dview (float xOff, float yOff) const {
 
   const unsigned int driveline_size = driveline.size();
   glBegin ( GL_LINE_LOOP ) ;
   for ( size_t i = 0 ; i < driveline_size ; ++i ) {
-      glVertex2f ( x + ( driveline[i][0] - driveline_center[0] ) * scaleX,
-                   y + ( driveline[i][1] - driveline_center[1] ) * scaleY ) ;
+    glVertex2f ( xOff + ( driveline[i][0] - driveline_min[0] ) * scaleX,
+		 yOff + ( driveline[i][1] - driveline_min[1] ) * scaleY ) ;
   }
   glEnd () ;
 }   // draw2Dview
@@ -244,6 +252,8 @@ void Track::loadTrack(const char* filename) {
   lisp->get("description",   description);
   lisp->get("music",         music_filename);
   lisp->get("herring",       herringStyle);
+  lisp->get("screenshot",    screenshot);
+  lisp->get("topview",       topview);
   lisp->get("sky-color",     sky_color);
 
   lisp->get("use-fog",       use_fog);
@@ -337,10 +347,9 @@ Track::loadDriveline()
   }
 
   total_distance = d;
-  sgAddScaledVec2(driveline_center, driveline_min, driveline_max, 0.5);
 
   sgVec2 sc ;
-  sgSubVec2 ( sc, driveline_max, driveline_center ) ;
+  sgSubVec2 ( sc, driveline_max, driveline_min ) ;
 
   scaleX = track2DWidth  / sc[0] ;
   scaleY = track2DHeight / sc[1] ;

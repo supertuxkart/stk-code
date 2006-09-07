@@ -37,8 +37,8 @@ public:
   /** Load the CupData from the given filename */
               CupData       (const std::string filename);
               CupData       ()       {}; // empty for initialising
-  std::string getName       () const { return name;        }
-  std::string getDescription() const { return description; }
+  const std::string& getName       () const { return name;        }
+  const std::string& getDescription() const { return description; }
 };
 
 #endif

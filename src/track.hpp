@@ -34,13 +34,15 @@ class Track {
  private:
     float       gravity;
     std::string ident;
+    std::string screenshot;
+    std::string topview;
+    std::string music_filename;
+    std::string herringStyle;
+    std::string description;
 
  public:
 
     std::string name;
-    std::string music_filename;
-    std::string herringStyle;
-    std::string description;
     sgVec4      sky_color;
     bool        use_fog;
     sgVec4      fog_color;
@@ -84,7 +86,6 @@ public:
 
     sgVec2 driveline_min;
     sgVec2 driveline_max;
-    sgVec2 driveline_center;
 
 
     float total_distance;
@@ -101,7 +102,7 @@ public:
                     ~Track            ();
   void               draw2Dview       (float x, float y            ) const ;
   void               drawScaled2D     (float x, float y, float w,
-				       float h, bool stretch       ) const ;
+				       float h                     ) const ;
   int                absSpatialToTrack(sgVec2 dst, sgVec3 xyz      ) const ;
   void               trackToSpatial   (sgVec3 xyz, int last_hint   ) const ;
   int                spatialToTrack   (sgVec2 last_pos, sgVec3 xyz,
@@ -122,14 +123,17 @@ public:
   const float&  getFogStart           () const {return fog_start;     }
   const float&  getFogEnd             () const {return fog_end;       }
   const sgVec4& getSkyColor           () const {return sky_color;     }
-  const std::string getDescription    () const {return description;   }
+  const std::string& getDescription   () const {return description;   }
+  const std::string& getTopviewFile   () const {return topview;       }
+  const std::string& getScreenshotFile() const {return screenshot;    }
   const std::vector<sgVec3Wrapper>& getDriveline () const {return driveline;}
   const std::vector<SGfloat>& getWidth() const {return path_width;    }
   const char*        getHerringStyle  () const {return herringStyle.c_str();}
-  void               glVtx            (sgVec2 v, float xoff, float yoff) const {
+  void               glVtx            (sgVec2 v, float xOff, float yOff) const {
+    //                                       yOff-=(driveline_max[1]-driveline_min[1])*scaleY;
                                        glVertex2f(
-                                       xoff+(v[0]-driveline_center[0])*scaleX,
-				       yoff+(v[1]-driveline_center[1])*scaleY);}
+                                       xOff+(v[0]-driveline_min[0])*scaleX,
+				       yOff+(v[1]-driveline_min[1])*scaleY);}
 
 private:
   void loadTrack                      (const char* filename);
