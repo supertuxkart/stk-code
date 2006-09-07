@@ -272,7 +272,7 @@ void AutoKart::update (float delta)
                             float angle = fabsf(world->track->angle[trackHint]-
                                                 curr_pos.hpr[0]);
                             if(time_since_last_shot > 10.0f && angle < 30.0f &&
-                               !crashes.road)
+                               !crashes.road && STEPS > 2)
                             {
                                 collectable.use();
                                 time_since_last_shot = 0.0f;

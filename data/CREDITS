@@ -6,7 +6,7 @@ of tuxkart.
 http://supertuxkart.berlios.de/
 
 Project Leaders:
-----------------
+-----------------
    Joerg Henrichs (hiker)
          - port from GotM supertuxkart into a 
            playable game
@@ -25,7 +25,7 @@ did most of the graphical improvements.
 
 
 Additional coding:
------------------
+--------------------
    Patrick Ammann
          - bug fixes, code cleanup
          - OpenAL support (in progress)
@@ -33,10 +33,10 @@ Additional coding:
 
     
 Previous releases
-====================
+=================
 
 Game of the Month group:
-------------------------
+----------------------------
 http://happypenguin.org/forums/viewforum.php?f=21
 
    Ingo Ruhnke
@@ -48,19 +48,18 @@ http://happypenguin.org/forums/viewforum.php?f=21
    Craig Keogh
    Pascal Giard
    Caleb Sawtell
-   Matt Thomas
    Ricardo Cruz
    Oliver Jeeves
    Jacob Persson
    Willian Padovani Germano
 
 Original Tuxkart Design:
-------------------------
+--------------------------
    Steve Baker
    http://www.sjbaker.org/
 
 Models and Track Design:
-------------------------
+----------------------------
    Original TuxKart models:
    Steve Baker, Oliver Baker
 
@@ -68,7 +67,7 @@ Models and Track Design:
    Ingo Ruhnke
 
 Music:
-----------------
+-------
    Matt Thomas
    
 
