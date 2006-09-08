@@ -2,7 +2,7 @@
 
 (tuxkart-track
  (name "Tux Tollway")
- (description "Created by Oliver&Steve Baker")
+ (description "Created by Oliver & Steve Baker")
  (music "mods/tk2.mod")
 )
 
