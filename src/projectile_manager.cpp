@@ -44,12 +44,14 @@ void ProjectileManager::loadData() {
 void ProjectileManager::cleanup() {
   for(Projectiles::iterator i = activeProjectiles.begin();
                             i != activeProjectiles.end(); ++i) {
+    ssgTransform *m = (*i)->getModel();
+    m->removeAllKids();
     delete *i;
   }
   activeProjectiles.clear();
   for(Explosions::iterator i  = activeExplosions.begin(); 
                            i != activeExplosions.end(); ++i) {
-    delete *i;
+    ssgDeRefDelete(*i);
   }
   activeExplosions.clear();
 }   // cleanup

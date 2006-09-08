@@ -507,6 +507,7 @@ void World::restartRace() {
     (*i)->reset();
   }
   herring_manager->reset();
+  projectile_manager->cleanup();
   race_manager->reset();
 }
 
