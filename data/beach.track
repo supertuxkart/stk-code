@@ -4,6 +4,7 @@
  (name "On the Beach")
  (description "Created by Ingo Ruhnke")
  (herring "new")
+ (music "mods/Boom_boom_boom.mod")
 )
 
 ;; EOF ;;

@@ -4,6 +4,7 @@
  (name "Race Track")
  (description "Created by Ingo Ruhnke")
  (herring "new")
+ (music "mods/tk7.mod")
 )
 
 ;; EOF ;;
