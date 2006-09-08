@@ -72,9 +72,11 @@ void ScrolledText::update(float dt){
   glViewport(xLeft, yBottom, xRight-xLeft, yTop-yBottom);
 
   glScalef(1.0f, config->width/(yTop-yBottom), 1.0f);
-  
+
   for(unsigned int i=0; i<sl.size(); i++) {
-    widgetSet->drawText(sl[i],24,
+
+    if((yPos-i*fontSize < yTop-yBottom) && yPos-i*fontSize > -fontSize)
+        widgetSet->drawText(sl[i],24,
 			xLeft,(int)yPos-i*fontSize,255,255,255);
   }
   glMatrixMode(GL_PROJECTION);

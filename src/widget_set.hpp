@@ -45,7 +45,7 @@
 #define GUI_BOT  (GUI_SW  | GUI_SE)
 #define GUI_ALL  (GUI_TOP | GUI_BOT)
 
-#define SCREEN_CENTERED_TEXT -1
+#define SCREEN_CENTERED_TEXT -10000
 
 
 /*---------------------------------------------------------------------------*/
