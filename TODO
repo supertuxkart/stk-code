@@ -73,7 +73,6 @@ Things that would be nice to fix, but are not urgent
 - Write some documentation (a scrolling widget will help 
   displaying the additional information). Things to include:
   - taking shortcuts might result in not finishing a lap
-  - speed display is red if the kart is not on ground
   - lap display for other karts is red if kart is on last 
     track, green if finished.
 - Add screenshot and 'topview' picture for each track, which can
@@ -82,8 +81,6 @@ Things that would be nice to fix, but are not urgent
   skid marks being 'in the air').
 - Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
 - Enable real fullscreen support
-- Improved sound
-   - More sounds, music, ... [coz, in progress]
 - Performance tuning
    - It's not too bad at the moment, but might be worth
      having a look again. [hiker]
@@ -103,7 +100,7 @@ Things that would be nice to fix, but are not urgent
 - Valgrind for memory bugs.
 - Update the web page, make more screen shots, ...
 - Tight/wide corner steering for AI. The AI is hitting the wall
-  in very tight corners (e.g. subseatrack) [coz, in progress]
+  in very tight corners (e.g. subseatrack) [coz]
 
 
 long term

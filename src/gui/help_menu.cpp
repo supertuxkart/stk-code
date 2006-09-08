@@ -27,13 +27,21 @@
 HelpMenu::HelpMenu(){
   menu_id = widgetSet->vstack(0);
   widgetSet->multi(menu_id, 
-"Drive around and collect blue powerups, avoid bananas\n\
-and collect coins to get more powerups. Finish the race\n\
-before all other players. Key bindings:",GUI_SML );
+"Finish the race before other drivers, by driving and using\n\
+powerups from the blue boxes! Bananas will slow you down,\n\
+coins will let you get more powerups, gold coins are better.\n\
+At high speeds you can use wheelies to go even faster, but\n\
+be careful because you won't be able to steer.\n\
+If you get stuck somewhere or fall too far from the road,\n\
+use the rescue button to get back on track.\n\
+Current keys bindings for the first player:",GUI_SML );
   int ha        = widgetSet->harray(menu_id);
   int change_id = widgetSet->varray(ha);
   int label_id  = widgetSet->varray(ha);
   for(int i=KC_LEFT; i<=KC_FIRE; i++) {
+    //FIXME: this is temporal, just while the jumping is disabled.
+    if(i==KC_JUMP) continue;
+
     // *sigh* widget set stores only pointer to strings, so
     // to make sure that all key-strings are permanent, they
     // are assigned to an array allKeys within this object.
