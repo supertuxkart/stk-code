@@ -63,10 +63,6 @@ This contains either hard, or not reproducible errors.
   and the error does NOT happen when using the same source code with
   wine under windows, or on a AMD 64 bit machine. 
   It might  be a compiler bug! [hiker]
-- Fix not-reproducible ref-count error (I haven't seen this bug for
-  a while, perhaps it was fixed when fixing something else?? Any
-  reports on this would be helpful, otherwise we assume that this
-  is fixed).
 
 Things that would be nice to fix, but are not urgent
 =====================================================
