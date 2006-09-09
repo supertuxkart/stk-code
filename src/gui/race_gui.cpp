@@ -534,6 +534,7 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
   if(wl < 1)
     wl = 1;
 
+  glDisable(GL_TEXTURE_2D);
   // Draw a Meter border
   // left side
   glBegin ( GL_QUADS ) ;
@@ -581,6 +582,7 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
     glVertex2i ( x+w, y + (int)(state * h));
     glVertex2i ( x,   y + (int)(state * h) ) ;
   glEnd () ;
+  glEnable(GL_TEXTURE_2D);
 }   // drawEnergyMeter
 
 
