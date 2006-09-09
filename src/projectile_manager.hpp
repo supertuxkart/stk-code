@@ -56,8 +56,8 @@ class ProjectileManager {
 public:
                    ProjectileManager() {};
                   ~ProjectileManager(){};
-  void             explode          (Projectile *p){somethingWasHit=true;}
-  void             FinishedExplosion(Explosion *p) {explosionEnded =true;}
+  void             explode          (){somethingWasHit=true;}
+  void             FinishedExplosion() {explosionEnded =true;}
   ssgSelector*     getExplosionModel()             {
                              return (ssgSelector*)explosionModel->clone();}
   int              getProjectileId  (const std::string ident);

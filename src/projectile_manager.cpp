@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "world.hpp"
 #include "loader.hpp"
 #include "projectile_manager.hpp"
 #include "projectile.hpp"
@@ -51,6 +52,7 @@ void ProjectileManager::cleanup() {
   activeProjectiles.clear();
   for(Explosions::iterator i  = activeExplosions.begin(); 
                            i != activeExplosions.end(); ++i) {
+    world->removeFromScene((ssgTransform*)*i);
     ssgDeRefDelete(*i);
   }
   activeExplosions.clear();

@@ -51,7 +51,7 @@ void Explosion::init(Projectile* p) {
 void Explosion::update (float dt) {
 
   if ( ++step >= seq->getNumKids() ) {
-    projectile_manager->FinishedExplosion(this);
+    projectile_manager->FinishedExplosion();
     world->removeFromScene((ssgTransform*)this);
     return ;
   }

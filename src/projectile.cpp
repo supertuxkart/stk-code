@@ -140,7 +140,7 @@ void Projectile::explode() {
   // The manager will create the appropriate explosion object, and
   // place this projectile into a list so that it can be reused later,
   // without the additional cost of creating the object again
-  projectile_manager->explode(this);
+  projectile_manager->explode();
   
   // Now remove this projectile from the graph:
   ssgTransform *m = getModel();
