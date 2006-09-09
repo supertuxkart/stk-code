@@ -526,11 +526,11 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 				float ratio_x, float ratio_y             ) {
   float state = (float)(player_kart->getNumHerring()) /
                         MAX_HERRING_EATEN;
-  int x = (int)(config->width-50 * ratio_x) + offset_x;
+  int x = (int)(config->width/2-50 * ratio_x) + offset_x;
   int y = (int)(config->height/4 * ratio_y) + offset_y;
   int w = (int)(24 * ratio_x);
   int h = (int)(config->height/2 * ratio_y);
-  int wl = (int)(1 * ratio_x);
+  int wl = (int)(ratio_x);
   if(wl < 1)
     wl = 1;
 
