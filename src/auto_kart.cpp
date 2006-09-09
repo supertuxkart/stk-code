@@ -450,18 +450,11 @@ void AutoKart::check_crashes(const int STEPS, sgVec3 pos)
                 kart_distance = sgDistanceVec2(step_coord,
                     world->getKart(j)->getCoord()->xyz);
 
-                if(i != 1)
                 {
-                    if(kart_distance < KART_LENGTH * 0.5f)
+                    if(kart_distance < KART_LENGTH + 0.125f * i)
                         if(velocity.xyz[1] > world->getKart(j)->
                            getVelocity()->xyz[1] * 0.75f) crashes.kart = j;
                 }
-                else
-                  if(kart_distance < KART_LENGTH)
-                  {
-                     if(velocity.xyz[1] > world->getKart(j)->
-                         getVelocity()->xyz[1] * 0.95f) crashes.kart = j;
-                  }
             }
 
         /*Find if we crash with the track*/
