@@ -115,6 +115,13 @@ Writer::write(const std::string& name, const std::string& value)
 }
 
 void
+Writer::write(const std::string& name, const char* value)
+{
+    indent();
+    *out << '(' << name << " \"" << value << "\")\n";
+}
+
+void
 Writer::write(const std::string& name, bool value)
 {
     indent();

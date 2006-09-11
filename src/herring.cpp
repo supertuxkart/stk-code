@@ -43,6 +43,12 @@ Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) {
 }   // Herring
 
 // -----------------------------------------------------------------------------
+Herring::~Herring() {
+  ssgDeRefDelete(rotate);
+  ssgDeRefDelete(root);
+}   // ~Herring
+
+// -----------------------------------------------------------------------------
 void Herring::reset() {
   bEaten         = false;
   time_to_return = 0.0f;

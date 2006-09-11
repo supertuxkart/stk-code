@@ -21,11 +21,14 @@
 #ifndef HEADER_CUPDATA_H
 #define HEADER_CUPDATA_H
 
+#include "herring_manager.hpp"
+
 /** Simple class that hold the data relevant to a 'cup', aka. a number
     of races that has to be completed one after the other */
 class CupData {
   std::string name;         // The name of the cup 
   std::string description;  // Description for this track 
+  std::string herringStyle; // herring style which overwrites the track default
 
 public:
 
@@ -35,10 +38,15 @@ public:
   std::vector<std::string> tracks;
 
   /** Load the CupData from the given filename */
-              CupData       (const std::string filename);
-              CupData       ()       {}; // empty for initialising
-  const std::string& getName       () const { return name;        }
-  const std::string& getDescription() const { return description; }
+                     CupData        (const std::string filename);
+                     CupData        ()       {}; // empty for initialising
+  const std::string& getName        ()  const { return name;        }
+  const std::string& getDescription ()  const { return description; }
+  const std::string& getHerringStyle()  const { return herringStyle;}
+  const void         loadHerrings() {
+    herring_manager->loadHerringStyle(herringStyle);
+  }
+
 };
 
 #endif

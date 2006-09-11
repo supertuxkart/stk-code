@@ -117,6 +117,7 @@ AC_CONFIG_FILES([      \
  src/Makefile         \
  wavs/Makefile        \
  wavs/radio/Makefile  \
- wavs/tintagel/Makefile
+ wavs/tintagel/Makefile \
+ models/herrings/Makefile
 ])
 AC_OUTPUT

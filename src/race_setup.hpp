@@ -27,16 +27,18 @@ enum RaceDifficulty { RD_EASY, RD_MEDIUM, RD_HARD };
 
 /** A class that manages all configurations that are needed for a
     single race */
-class RaceSetup
-{
+class RaceSetup {
+protected:
+  std::string herringStyle;
 public:
         enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
 
 	RaceSetup() { 
-		mode       = RM_QUICK_RACE;
-		difficulty = RD_EASY;
-		numLaps    = 3; 
-		track      = "race";
+		mode         = RM_QUICK_RACE;
+		difficulty   = RD_EASY;
+		numLaps      = 3; 
+		track        = "race";
+		herringStyle = "";
         }
 
 	RaceMode  mode;
@@ -58,8 +60,10 @@ public:
             will be used in the order in which they are given */
         Karts karts;
 
-        unsigned int getNumKarts()  const { return karts.size(); }
-        int getNumPlayers() const { return players.size(); }
+        unsigned int getNumKarts()  const { return (unsigned int) karts.size(); }
+        int getNumPlayers() const                 { return (int)players.size(); }
+        const std::string& getHerringStyle()          const {return herringStyle;}
+        const void         setHerringStyle(const std::string& s) {herringStyle=s;}
 };
 
 #endif

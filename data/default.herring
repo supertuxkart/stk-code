@@ -2,6 +2,10 @@
 
 ;; nothing specified --> chose the default models
 (herring
+  (gold   "OLD_GOLD")
+  (silver "OLD_SILVER")
+  (green  "OLD_GREEN")
+  (red    "OLD_RED")
 )
 
 ;; EOF ;;

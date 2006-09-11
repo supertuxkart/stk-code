@@ -128,7 +128,7 @@ public:
   const std::string& getScreenshotFile() const {return screenshot;    }
   const std::vector<sgVec3Wrapper>& getDriveline () const {return driveline;}
   const std::vector<SGfloat>& getWidth() const {return path_width;    }
-  const char*        getHerringStyle  () const {return herringStyle.c_str();}
+  const std::string& getHerringStyle  () const {return herringStyle;  }
   void               glVtx            (sgVec2 v, float xOff, float yOff) const {
     //                                       yOff-=(driveline_max[1]-driveline_min[1])*scaleY;
                                        glVertex2f(

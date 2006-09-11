@@ -1,18 +1,10 @@
 ;; -*- mode: lisp -*-
 
 (herring
-  (gold 
-   (name  "goldcoin")
-   (model "coin_gold.ac")   )
-  (silver 
-   (name  "silvercoin")
-   (model "coin_silver.ac")   )
-  (green
-   (name  "banana")
-   (model "banana.ac") )
-  (red
-   (name  "bonusblock")
-   (model "bonusblock.ac") )
+  (gold   "goldcoin"  )
+  (silver "silvercoin")
+  (green  "banana"    )
+  (red    "bonusblock")
 )
 
 ;; EOF ;;

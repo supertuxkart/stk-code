@@ -1,9 +1,9 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Tux Tollway")
+ (name        "Tux Tollway")
  (description "Created by Oliver & Steve Baker")
- (music "mods/tk2.mod")
+ (music       "mods/tk2.mod")
 )
 
 ;; EOF ;;

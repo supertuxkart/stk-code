@@ -81,14 +81,14 @@ void
 GrandPrixMode::start_race(int n)
 {
   RaceSetup raceSetup;
-
+  cup.loadHerrings();
   raceSetup.mode       = RaceSetup::RM_GRAND_PRIX;
   raceSetup.difficulty = difficulty;
   raceSetup.numLaps    = 1;
   raceSetup.track      = cup.tracks[n];
-
   raceSetup.karts.resize(karts.size());
   raceSetup.players.resize(players.size());
+  raceSetup.setHerringStyle(cup.getHerringStyle());
 
   
   for(int i = 0; i < int(karts.size()); ++i)

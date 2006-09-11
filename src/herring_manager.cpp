@@ -27,6 +27,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "kart.hpp"
+#include "string_utils.hpp"
 
 // Simple shadow class, only used here for default herrings
 class Shadow {
@@ -47,15 +48,15 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 ) {
   sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
   sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
  
-  sgSetVec3 ( v, x1, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y1, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x1, y2, 0.10 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y2, 0.10 ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y1, 0.10f ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y1, 0.10f ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y2, 0.10f ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y2, 0.10f ) ; va->add(v) ;
  
-  sgSetVec2 ( t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 0.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 1.0 ) ; ta->add(t) ;
+  sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
  
   sh = new ssgBranch ;
   sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
@@ -74,24 +75,76 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 ) {
 HerringManager* herring_manager;
 
 HerringManager::HerringManager() {
-  for(int i=HE_RED; i<=HE_SILVER; i++) {
-    allDefaultModels[i]=NULL;
-    allTrackModels  [i]=NULL;
-    allUserModels   [i]=NULL;
-  }
+    allModels.clear();
+  // The actual loading is done in loadDefaultHerrings
 }   // HerringManager
 
 // -----------------------------------------------------------------------------
+void HerringManager::loadDefaultHerrings() {
+  // Load all models. This can't be done in the constructor, since the loader 
+  // isn't ready at that stage.
+
+  // Load all models from the models/herrings directory
+  // --------------------------------------------------
+  std::set<std::string> files;
+  loader->listFiles(files, "models/herrings");
+  for(std::set<std::string>::iterator i  = files.begin(); 
+                                      i != files.end();  ++i) {
+    if(!StringUtils::has_suffix(*i, ".ac")) continue;
+    std::string fullName  = "herrings/"+(*i);
+    ssgEntity*  h         = ssgLoad(fullName.c_str(), loader);
+    std::string shortName = StringUtils::without_extension(*i);
+    h->ref();
+    h->setName(shortName.c_str());
+    preProcessObj(h);
+    allModels[shortName] = h;
+  }   // for i
+
+
+  // Load the old, internal only models
+  // ----------------------------------
+  sgVec3 yellow = { 1.0f, 1.0f, 0.4f }; CreateDefaultHerring(yellow, "OLD_GOLD"  );
+  sgVec3 cyan   = { 0.4f, 1.0f, 1.0f }; CreateDefaultHerring(cyan  , "OLD_SILVER");
+  sgVec3 red    = { 0.8f, 0.0f, 0.0f }; CreateDefaultHerring(red   , "OLD_RED"   );
+  sgVec3 green  = { 0.0f, 0.8f, 0.0f }; CreateDefaultHerring(green , "OLD_GREEN" );
+  
+  setDefaultHerringStyle();
+}   // loadDefaultHerrings
+
+// -----------------------------------------------------------------------------
+void HerringManager::setDefaultHerringStyle() {
+  std::string defaultNames[4] = {"bonusblock", "banana",
+				 "goldcoin",   "silvercoin"};
+
+  bool bError=0;
+  for(int i=HE_RED; i<=HE_SILVER; i++) {
+    herringModel[i] = allModels[defaultNames[i]];
+    if(!herringModel[i]) {
+      fprintf(stderr, "Herring model '%s' is missing!\n",defaultNames[i].c_str());
+      bError=1;
+    }   // if !herringModel
+  }   // for i
+  if(bError) {
+    fprintf(stderr, "The following models are available:\n");
+    typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
+    for(CI_type i=allModels.begin(); i!=allModels.end(); ++i) {
+      if(i->second) {
+	if(i->first.substr(0,3)=="OLD") {
+	  fprintf(stderr,"   %s internally only.\n",i->first.c_str());
+	} else {
+	  fprintf(stderr,"   %s in models/herrings/%s.ac.\n",i->first.c_str(),
+		  i->first.c_str());
+	}
+      }  // if i->second
+    }
+    exit(-1);
+  }   // if bError
+  
+}   // setDefaultHerringStyle
+
+// -----------------------------------------------------------------------------
 Herring* HerringManager::newHerring(herringType type, sgVec3* xyz) {
-  ssgEntity* m;
-  // This test determines the order in which models are used: user model
-  // overwrite track models, which in turn overwrite default models.
-  if(!allUserModels[type]) {
-    m = allTrackModels[type] ? allTrackModels[type] : allDefaultModels[type];
-  } else {
-    m = allUserModels[type];
-  }
-  Herring* h = new Herring(type, xyz, m);
+  Herring* h = new Herring(type, xyz, herringModel[type]);
   allHerrings.push_back(h);
   return h;
 }   // newHerring
@@ -118,9 +171,17 @@ void HerringManager::cleanup() {
   }
   allHerrings.clear();
   
-  for(int i=HE_RED; i<=HE_SILVER; i++) {
-    allTrackModels[i]=NULL;
-  }  // for i
+  setDefaultHerringStyle();
+
+  // Then load the default style from the config file
+  // ------------------------------------------------
+  // This way if a herring is not defined in the herringstyle-file, the
+  // default (i.e. old herring) is used.
+  loadHerringStyle(config->herringStyle);
+  if(userFilename.size()>0) {
+    loadHerringStyle(userFilename);
+  }
+
 }   // cleanup
 
 // -----------------------------------------------------------------------------
@@ -141,51 +202,36 @@ void HerringManager::update(float delta) {
 }   // delta
 
 // -----------------------------------------------------------------------------
-void HerringManager::loadAllHerrings() {
-  // First load the default old models.
-  sgVec3 yellow = { 1.0, 1.0, 0.4 }; CreateDefaultHerring(yellow, HE_GOLD  );
-  sgVec3 cyan   = { 0.4, 1.0, 1.0 }; CreateDefaultHerring(cyan  , HE_SILVER);
-  sgVec3 red    = { 0.8, 0.0, 0.0 }; CreateDefaultHerring(red   , HE_RED   );
-  sgVec3 green  = { 0.0, 0.8, 0.0 }; CreateDefaultHerring(green , HE_GREEN );
-
-  // The load the default style from the config file
-  // This way if a herring is not defined in the herringstyle-file, the
-  // default is used.
-  std::string filename=config->herringStyle;
-  loadHerringData(filename, ISUSERDATA);
-}   // loadAllHerrings
-
-// -----------------------------------------------------------------------------
-void HerringManager::CreateDefaultHerring(sgVec3 colour, herringType type) {
+void HerringManager::CreateDefaultHerring(sgVec3 colour, std::string name) {
   ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
   ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
   ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
   ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
   
-  sgSetVec3(v, -0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v, -0.5, 0.0, 0.5 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.5 ) ; va->add(v) ;
-  sgSetVec3(v, -0.5, 0.0, 0.0 ) ; va->add(v) ;
-  sgSetVec3(v,  0.5, 0.0, 0.0 ) ; va->add(v) ;
+  sgSetVec3(v, -0.5f, 0.0f, 0.0f ) ; va->add(v) ;
+  sgSetVec3(v,  0.5f, 0.0f, 0.0f ) ; va->add(v) ;
+  sgSetVec3(v, -0.5f, 0.0f, 0.5f ) ; va->add(v) ;
+  sgSetVec3(v,  0.5f, 0.0f, 0.5f ) ; va->add(v) ;
+  sgSetVec3(v, -0.5f, 0.0f, 0.0f ) ; va->add(v) ;
+  sgSetVec3(v,  0.5f, 0.0f, 0.0f ) ; va->add(v) ;
 
   sgSetVec3(n,  0.0f,  1.0f,  0.0f ) ; na->add(n) ;
 
   sgCopyVec3 ( c, colour ) ; c[ 3 ] = 1.0f ; ca->add(c) ;
  
-  sgSetVec2(t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 0.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2(t, 1.0, 0.0 ) ; ta->add(t) ;
+  sgSetVec2(t, 0.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2(t, 1.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2(t, 0.0f, 1.0f ) ; ta->add(t) ;
+  sgSetVec2(t, 1.0f, 1.0f ) ; ta->add(t) ;
+  sgSetVec2(t, 0.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2(t, 1.0f, 0.0f ) ; ta->add(t) ;
  
 
   ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
  
   gset->setState(material_manager->getMaterial("herring.rgb")->getState()) ;
  
-  Shadow* sh = new Shadow ( -0.5, 0.5, -0.25, 0.25 ) ;
+  Shadow* sh = new Shadow ( -0.5f, 0.5f, -0.25f, 0.25f ) ;
  
   ssgTransform* tr = new ssgTransform () ;
  
@@ -193,16 +239,16 @@ void HerringManager::CreateDefaultHerring(sgVec3 colour, herringType type) {
   tr -> addKid ( gset ) ;
   tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
   preProcessObj(tr);
-  allDefaultModels[type]=tr;
+  allModels[name] = tr;
 
 }   // CreateDefaultHerring
 // -----------------------------------------------------------------------------
-void HerringManager::loadHerringData(const std::string filename, int isUser) {
+void HerringManager::loadHerringStyle(const std::string filename) {
   if(filename.length()==0) return;
   const lisp::Lisp* root = 0;
   lisp::Parser parser;
   std::string tmp= "data/" + (std::string)filename + ".herring";
-  root = parser.parse(loader->getPath(tmp.c_str()));
+  root = parser.parse(loader->getPath(tmp));
 
   const lisp::Lisp* herring_node = root->getLisp("herring");
   if(!herring_node) {
@@ -211,29 +257,20 @@ void HerringManager::loadHerringData(const std::string filename, int isUser) {
     msg << "Couldn't load map '" << filename << "': no herring node.";
     throw std::runtime_error(msg.str());
   }
-  loadHerringModel(herring_node, "red",    HE_RED,    isUser);
-  loadHerringModel(herring_node, "green",  HE_GREEN,  isUser);
-  loadHerringModel(herring_node, "gold",   HE_GOLD,   isUser);
-  loadHerringModel(herring_node, "silver", HE_SILVER, isUser);
-}   // loadHerringData
-// -----------------------------------------------------------------------------
-void HerringManager::loadHerringModel(const lisp::Lisp* herring_node,
-				      char* colour, herringType type, 
-				      int isUser) {
 
-  const lisp::Lisp* data = herring_node->getLisp(colour);
-  if(data) {
-    std::string  name, model;
-    data->get("name",  name);
-    data->get("model", model);
-    ssgEntity* e = ssgLoad(model.c_str(), loader);
-    e->setName(name.c_str());
-    preProcessObj(e);
-    if(isUser==ISUSERDATA) {
-      allUserModels[type] = e;
-    } else {
-      allTrackModels[type] = e;
-    }
+  setHerring(herring_node, "red",   HE_RED   );
+  setHerring(herring_node, "green", HE_GREEN );
+  setHerring(herring_node, "gold"  ,HE_GOLD  );
+  setHerring(herring_node, "silver",HE_SILVER);
+}   // loadHerringStyle
+
+// -----------------------------------------------------------------------------
+void HerringManager::setHerring(const lisp::Lisp *herring_node, 
+				char *colour, herringType type) {
+  std::string name;
+  herring_node->get(colour, name);
+  if(name.size()>0) {
+    herringModel[type]=allModels[name];
   }
-}   // loadHerringModel
+}   // setHerring
 // -----------------------------------------------------------------------------

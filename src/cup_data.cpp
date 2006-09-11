@@ -35,9 +35,10 @@ CupData::CupData(const std::string filename) {
     if(!lisp)
         throw std::runtime_error("No supertuxkart-cup node");
     
-    lisp->get      ("name",        name       );
-    lisp->get      ("description", description);
-    lisp->getVector("tracks",      tracks     );
+    lisp->get      ("name",        name        );
+    lisp->get      ("description", description );
+    lisp->get      ("herring",     herringStyle);
+    lisp->getVector("tracks",      tracks      );
   } catch(std::exception& err) {
     std::cout << "Error while reading cup: " << err.what() << "\n";
   }

@@ -26,7 +26,7 @@ class Kart;
 class ssgTransform;
 class ssgEntity;
 
-// HE_SILVER must be the last entry, it is used in HerringManager
+// HE_RED ust be the first, HE_SILVER the last entry. See HerringManager
 enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
  
 // ----------------------------------------------------------------------------- 
@@ -43,12 +43,14 @@ private:
  
  public:
               Herring   (herringType type, sgVec3* xyz, ssgEntity* model);
+             ~Herring   ();
   void        update    (float delta);
   bool        wasEaten  ()            {return bEaten;}
   void        isEaten   ();
   herringType getType   ()            {return type;}
   int         hitKart   (Kart* kart );
   void        reset     ();
+  ssgTransform* getRoot () const {return root;}
 };   // class Herring
 
 #endif

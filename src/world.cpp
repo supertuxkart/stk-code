@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <sstream>
 #include <stdexcept>
+#include <algorithm>
 
 #include "world.hpp"
 #include "preprocessor.hpp"
@@ -118,7 +119,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
     // lap! Therefor -1.5 is subtracted from the y position - which
     // is a somewhat arbitrary value.
     init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
-    init_pos.xyz[1] = -pos * 1.5f -1.5;
+    init_pos.xyz[1] = -pos * 1.5f -1.5f;
     float hot = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
     init_pos.xyz[2] = hot;
     newkart -> setReset ( & init_pos ) ;
@@ -161,10 +162,10 @@ World::~World() {
 
   sgVec3 sun_pos;
   sgVec4 ambient_col, specular_col, diffuse_col;
-  sgSetVec3 ( sun_pos, 0.0, 0.0, 1.0 ) ;
-  sgSetVec4 ( ambient_col , 0.2, 0.2, 0.2, 1.0 ) ;
-  sgSetVec4 ( specular_col, 1.0, 1.0, 1.0, 1.0 ) ;
-  sgSetVec4 ( diffuse_col , 1.0, 1.0, 1.0, 1.0 ) ;
+  sgSetVec3 ( sun_pos, 0.0f, 0.0f, 1.0f );
+  sgSetVec4 ( ambient_col , 0.2f, 0.2f, 0.2f, 1.0f );
+  sgSetVec4 ( specular_col, 1.0f, 1.0f, 1.0f, 1.0f );
+  sgSetVec4 ( diffuse_col , 1.0f, 1.0f, 1.0f, 1.0f );
 
   ssgGetLight ( 0 ) -> setPosition ( sun_pos ) ;
   ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
@@ -193,7 +194,7 @@ void World::update(float delta) {
     menu_manager->pushMenu(MENUID_RACERESULT);
   }
 
-  float inc = 0.05;
+  float inc = 0.05f;
   float dt  = delta;
   while (dt>0.0) {
     if(dt>=inc) {
@@ -217,7 +218,7 @@ void World::update(float delta) {
   herring_manager->update(delta);
   
   for ( Karts::size_type i = 0 ; i < kart.size(); ++i) {
-    if(!kart[i]->raceIsFinished()) updateRacePosition(i);
+    if(!kart[i]->raceIsFinished()) updateRacePosition((int)i);
   }
 
   /* Routine stuff we do even when paused */
@@ -251,7 +252,7 @@ void World::checkRaceStatus() {
       {
           kart[i]->setFinishingState(clock);
 
-          race_manager->addKartScore(i, kart[i]->getPosition());
+          race_manager->addKartScore((int)i, kart[i]->getPosition());
 
           ++new_finished_karts;
 	  if(kart[i]->isPlayerKart()) {
@@ -334,7 +335,7 @@ void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight ) {
   if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
   // Even if 3d data are given, make sure that the herring is on the ground
-  (*xyz)[2] = getHeight ( trackBranch, *xyz ) + 0.06 ;
+  (*xyz)[2] = getHeight ( trackBranch, *xyz ) + 0.06f;
   herringType type=HE_GREEN;
   if ( htype=='Y' || htype=='y' ){ type = HE_GOLD   ;}
   if ( htype=='G' || htype=='g' ){ type = HE_GREEN  ;}
@@ -353,9 +354,13 @@ void World::loadTrack() {
   // remove old herrings (from previous race), and remove old
   // track specific herring models
   herring_manager->cleanup();
-  herring_manager->loadHerringData(track->getHerringStyle(),
-				   HerringManager::ISTRACKDATA);
-  FILE *fd = fopen (path.c_str(), "r" ) ;
+  if(raceSetup.mode==RaceSetup::RM_GRAND_PRIX) {
+    herring_manager->loadHerringStyle(raceSetup.getHerringStyle());
+  } else {
+    herring_manager->loadHerringStyle(track->getHerringStyle());
+  }
+
+  FILE *fd = fopen (path.c_str(), "r" );
   if ( fd == NULL ) {
     std::stringstream msg;
     msg << "Can't open track location file '" << path << "'.";
