@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdexcept>
+#include <algorithm>
 #include "loader.hpp"
 #include "string_utils.hpp"
 #include "kart_manager.hpp"
@@ -124,7 +125,7 @@ void KartManager::fillWithRandomKarts(std::vector<std::string>& vec)
             { // Found a new kart, so use it
               vec[i] = all_karts[new_kart];
             }
-          else if (!all_karts.size() >= vec.size())
+          else if (!(all_karts.size() >= vec.size()))
             { // We need to fill more karts than we have available, so don't care about dups
               vec[i] = all_karts[new_kart];
             }

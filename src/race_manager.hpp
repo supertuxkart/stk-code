@@ -149,7 +149,7 @@ public:
   void setRaceMode(RaceSetup::RaceMode mode) { race_mode = mode;             }
   void setNumKarts(int num)                  { numKarts = num;               }
   int  getNumKarts()              const { return numKarts;                   }
-  int  getNumPlayers()            const { return players.size();             }
+  int  getNumPlayers()            const { return (int)players.size();        }
   int  getNumLaps()               const { return numLaps;                    }
   CupData *getGrandPrix()               { return &cup;                       }
   unsigned int getFinishedKarts() const { return numFinishedKarts;           }

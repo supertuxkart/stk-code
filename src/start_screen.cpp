@@ -17,7 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <unistd.h>   // for usleep
+#if !defined(WIN32) && !defined(__CYGWIN__)
+#  include <unistd.h>   // for usleep
+#endif
 #include <plib/pw.h>
 
 #include "loader.hpp"
@@ -67,7 +69,9 @@ StartScreen::update()
   // a lot of implementation work ... or by sleeping for a little while,
   // which apparently reduces the load for the X server, so that no 
   // buffering is done --> all key events are handled in time.
+#if !defined(WIN32) && !defined(__CYGWIN__)
   usleep(2000);
+#endif
   //Draw the splash screen
   introMaterial -> force () ;
 

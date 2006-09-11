@@ -92,7 +92,7 @@ public:
   
   PlayerKart* getPlayerKart(int player);
   Kart* getKart(int kart); 
-  int getNumKarts() const { return kart.size(); }
+  int getNumKarts() const { return (int)kart.size(); }
   void addToScene(ssgEntity *kid) {scene->addKid(kid); }
   void removeFromScene(ssgEntity *kid) {scene->removeKid(kid);}
   

@@ -223,18 +223,18 @@ void Track::loadTrack(const char* filename) {
 
   // Default values
   use_fog = false;
-  sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;
+  sgSetVec4 ( fog_color  , 0.3f, 0.7f, 0.9f, 1.0f ) ;
   fog_density = 1.0f/100.0f;
   fog_start   = 0.0f;
   fog_end     = 1000.0f;
   gravity     = 9.80665f;
 
-  sgSetVec3 ( sun_position, 0.4, 0.4, 0.4 ) ;
-  sgSetVec4 ( sky_color  , 0.3, 0.7, 0.9, 1.0 ) ;
-  sgSetVec4 ( fog_color  , 0.3, 0.7, 0.9, 1.0 ) ;
-  sgSetVec4 ( ambientcol , 0.5, 0.5, 0.5, 1.0 ) ;
-  sgSetVec4 ( specularcol, 1.0, 1.0, 1.0, 1.0 ) ;
-  sgSetVec4 ( diffusecol , 1.0, 1.0, 1.0, 1.0 ) ;
+  sgSetVec3 ( sun_position, 0.4f, 0.4f, 0.4f );
+  sgSetVec4 ( sky_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
+  sgSetVec4 ( fog_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
+  sgSetVec4 ( ambientcol ,  0.5f, 0.5f, 0.5f, 1.0f );
+  sgSetVec4 ( specularcol,  1.0f, 1.0f, 1.0f, 1.0f );
+  sgSetVec4 ( diffusecol ,  1.0f, 1.0f, 1.0f, 1.0f );
 
   const lisp::Lisp* root = 0;
   lisp::Parser parser;

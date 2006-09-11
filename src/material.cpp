@@ -73,7 +73,7 @@ float Material::parseFloat ( char **p )
 
   while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
 
-  return strtod ( *p, p ) ;
+  return (float)strtod ( *p, p ) ;
 }
 
 
@@ -124,7 +124,7 @@ void Material::init ()
   index = material_manager -> addEntity ( this ) ;
   clamp_tex    = 0     ;
   transparency = false ;
-  alpha_ref    = 0.1   ;
+  alpha_ref    = 0.1f  ;
   lighting     = true  ;
   spheremap    = false ;
   friction     = 1.0   ;

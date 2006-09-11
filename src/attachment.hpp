@@ -66,7 +66,7 @@ class Attachment {
   float          AirResistanceAdjust () const {return type==ATTACH_PARACHUTE
                                    ?physicsParameters->parachuteFriction:0.0f;}
   float          SpeedAdjust    () const {return type==ATTACH_ANVIL
-                                    ?physicsParameters->anvilSpeedFactor:1.0; }
+                                    ?physicsParameters->anvilSpeedFactor:1.0f; }
   void           hitGreenHerring();
   void           update         (float dt, sgCoord *velocity);
   ~Attachment();

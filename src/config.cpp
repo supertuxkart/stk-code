@@ -24,6 +24,8 @@
 #if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
 #  include <sys/types.h>
+#else
+#  include <direct.h>
 #endif
 
 #include <plib/pw.h>
@@ -188,7 +190,7 @@ int Config::CheckAndCreateDir() {
   // The directory does not exist, try to create it
   int bError;
 #if defined(WIN32) && !defined(__CYGWIN__)
-  bError = mkdir(dirname.c_str()      ) != 0;
+  bError = _mkdir(dirname.c_str()      ) != 0;
 #else
   bError = mkdir(dirname.c_str(), 0755) != 0;
 #endif

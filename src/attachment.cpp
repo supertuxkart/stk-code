@@ -130,8 +130,8 @@ void Attachment::update(float dt, sgCoord *velocity) {
     case ATTACH_TINYTUX:   if(time_left<=0.0) kart->handleRescue();
                            sgZeroVec3 ( velocity->xyz ) ;
                            sgZeroVec3 ( velocity->hpr ) ;
-			   velocity->xyz[2] = 1.1 * GRAVITY * dt *10;
-			   break;
+                           velocity->xyz[2] = 1.1f * GRAVITY * dt *10.0f;
+                           break;
 #ifdef USE_MAGNET
     case ATTACH_MAGNET:    break;
     case ATTACH_MAGNET_BZZT: float cdist; int closest;

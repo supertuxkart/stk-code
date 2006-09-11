@@ -85,7 +85,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType ) {
   if(!lisp->get("speed",  allSpeeds[collectType])) {
     dummy=-1;
     lisp->get("speed",  dummy);
-    allSpeeds[collectType]=dummy;
+    allSpeeds[collectType]=(float)dummy;
   }
 
   // load material

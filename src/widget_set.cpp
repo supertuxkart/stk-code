@@ -19,8 +19,8 @@
 
 #include <plib/pw.h>
 
+#include "constants.hpp"
 #include "widget_set.hpp"
-
 #include "loader.hpp"
 #include "config.hpp"
 #include "sound.hpp"
@@ -196,7 +196,7 @@ int WidgetSet::filler(int pd) { return add_widget(pd, GUI_FILLER); }
 void WidgetSet::set_label(int id, const char *text)
 {
     float l,r,b,t;
-    fnt->getBBox(text, widgets[id].size, 0, &l, &r, &b, &t);
+    fnt->getBBox(text, widgets[id].size, 0.0f, &l, &r, &b, &t);
     widgets[id].yOffset    = (int)b;
     widgets[id].text_width = (int)(r-l+0.99);
     widgets[id]._text      = text;
@@ -972,8 +972,8 @@ void WidgetSet::paint_clock(int id)
   //int ht = ((widgets[id].value % 6000) % 100) / 10;
   //int ho = ((widgets[id].value % 6000) % 100) % 10;
 
-    GLfloat dx_large=1.0;// FIXME = (GLfloat) digit_w[i][0];
-    GLfloat dx_small=0.1;// = (GLfloat) digit_w[i][0] * 0.75f;
+    GLfloat dx_large=1.0f;// FIXME = (GLfloat) digit_w[i][0];
+    GLfloat dx_small=0.1f;// = (GLfloat) digit_w[i][0] * 0.75f;
 
     printf("paint_clock: FIXME\n");
     glPushMatrix();
@@ -1106,8 +1106,16 @@ void WidgetSet::paint(int id)
         if(widgets[id].color0) {
             glColor4fv(widgets[id].color0);
         } else {
-            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
+#ifdef WIN32
+			// This appears to be a visual c++ bug
+            GLfloat dummy5[4]={ 1.f, 1.f, 1.f, .5f };
+            glColor4fv(dummy5);
+            GLfloat dummy1[4]={ 1.f, 1.f, 1.f, 1.f };
+            glColor4fv(dummy1);
+#else
+			glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
             glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f });
+#endif
         }
         paint_text(id);
 

@@ -19,6 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "hook_manager.hpp"
+#include "constants.hpp"
 #include "world.hpp"
 
 HookManager* hook_manager=0;
@@ -130,14 +131,14 @@ void autodcsHook ( ssgBranch *br, void *param ) {
     can be modulo-360 degrees.                                                  
   */
  
-  now . hpr [ 0 ] = fmod ( now . hpr [ 0 ], 360.0 ) ;
-  now . hpr [ 1 ] = fmod ( now . hpr [ 1 ], 360.0 ) ;
-  now . hpr [ 2 ] = fmod ( now . hpr [ 2 ], 360.0 ) ;
+  now . hpr [ 0 ] = fmod ( now . hpr [ 0 ], 360.0f) ;
+  now . hpr [ 1 ] = fmod ( now . hpr [ 1 ], 360.0f ) ;
+  now . hpr [ 2 ] = fmod ( now . hpr [ 2 ], 360.0f) ;
  
   if ( br->isAKindOf(ssgTypeTexTrans()) ) {
-    now . xyz [ 0 ] = fmod ( now . xyz [ 0 ], 1.0 ) ;
-    now . xyz [ 1 ] = fmod ( now . xyz [ 1 ], 1.0 ) ;
-    now . xyz [ 2 ] = fmod ( now . xyz [ 2 ], 1.0 ) ;
+    now . xyz [ 0 ] = fmod ( now . xyz [ 0 ], 1.0f ) ;
+    now . xyz [ 1 ] = fmod ( now . xyz [ 1 ], 1.0f ) ;
+    now . xyz [ 2 ] = fmod ( now . xyz [ 2 ], 1.0f ) ;
   }
   ((ssgBaseTransform *) br) -> setTransform ( & now ) ;
 }   //autdcsHook
@@ -227,7 +228,7 @@ void *animInit ( ssgBranch **br, char *data ) {
 
   int   startlim = strtol ( data, &data, 0 ) ;
   int   endlim   = strtol ( data, &data, 0 ) ;
-  float timelim  = strtod ( data, &data ) ;
+  float timelim  = (float)strtod ( data, &data ) ;
 
   while ( *data <= ' ' && *data != '\0' )
     data++ ;

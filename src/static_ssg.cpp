@@ -18,10 +18,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
+#include <algorithm>
 #include "static_ssg.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
+#ifndef round
+# define round(x)  (floor(x+0.5f))
+#endif
 
 StaticSSG::StaticSSG(ssgEntity* start_, int nSize) {
   start  = start_;
@@ -67,7 +70,7 @@ void StaticSSG::Draw(ssgBranch* b) {
     for(int i=0; i<m; i++) {
       ssgVertexArray* a = new ssgVertexArray();
       sgVec3 v;
-      float h=0.2;
+      float h=0.2f;
       v[0]=xMin+1/invdx*i;    v[1]= yMin+1/invdy*j;    v[2]=h; a->add(v);
       v[0]=xMin+1/invdx*(i+1);v[1]= yMin+1/invdy*j;    v[2]=h; a->add(v);
       v[0]=xMin+1/invdx*(i+1);v[1]= yMin+1/invdy*(j+1);v[2]=h; a->add(v);

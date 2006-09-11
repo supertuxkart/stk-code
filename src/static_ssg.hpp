@@ -23,7 +23,7 @@
 #include <vector>
 #include <plib/ssg.h>
 
-#define NOINTERSECT -999999.9
+#define NOINTERSECT -999999.9f
 
 class InfoTriangle{
  public:

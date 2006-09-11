@@ -84,7 +84,7 @@ void AutoKart::update (float delta)
 
     const float KART_LENGTH = 1.5f;
 
-    crash_perc += collided ? 3.0f * delta : -0.25 * delta;
+    crash_perc += collided ? 3.0f * delta : -0.25f * delta;
     if(crash_perc < 0.0f) crash_perc = 0.0f;
 
     //Find if any player is ahead of this kart
@@ -445,10 +445,10 @@ void AutoKart::check_crashes(const int STEPS, sgVec3 pos)
         if(crashes.kart == -1) //Don't find a kart to dodge if we got one
             for (size_t j = 0; j < NUM_KARTS; ++j)
             {
-                if(world->getKart(j) == this) continue;
+                if(world->getKart((int)j) == this) continue;
 
                 kart_distance = sgDistanceVec2(step_coord,
-                    world->getKart(j)->getCoord()->xyz);
+                    world->getKart((int)j)->getCoord()->xyz);
 
                 {
                     if(kart_distance < KART_LENGTH + 0.125f * i)

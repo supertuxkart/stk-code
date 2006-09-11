@@ -77,17 +77,17 @@ void KartParticleSystem::particle_create(int, Particle *p) {
   
   sgCopyVec3 (p->pos, pos->xyz);
   
-  p->pos[0] += xDirection * 0.7;
-  p->pos[1] += yDirection * 0.7;
+  p->pos[0] += xDirection * 0.7f;
+  p->pos[1] += yDirection * 0.7f;
   
   float abs_vel = sqrt((vel->xyz[0] * vel->xyz[0]) + (vel->xyz[1] * vel->xyz[1]));
    
   p->vel[0] = xDirection * -abs_vel/2;
   p->vel[1] = yDirection * -abs_vel/2;
    
-  p->vel[0] += sgCos (rand()%180) * 1;
-  p->vel[1] += sgSin (rand()%180) * 1;
-  p->vel[2] += sgSin (rand()%100) * 1;
+  p->vel[0] += sgCos (rand()%180);
+  p->vel[1] += sgSin (rand()%180);
+  p->vel[2] += sgSin (rand()%100);
   
   getBSphere () -> setCenter ( pos->xyz[0], pos->xyz[1], pos->xyz[2] ) ;
 }   // particle_create
@@ -494,7 +494,7 @@ void Kart::updatePhysics (float dt) {
       if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;  // In case the AI sets
       if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;  // controls.lr >1 or <-1
     } else {
-      float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0;
+      float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0f;
       float TurnDistance   = velocity.hpr[0]*M_PI/180.0f * wheelBase/2.0f;
       float slipAngleFront = atan((velocity.xyz[0]+TurnDistance)
 				  /fabsf(velocity.xyz[1]))
@@ -502,9 +502,9 @@ void Kart::updatePhysics (float dt) {
       float slipAngleRear  = atan((velocity.xyz[0]-TurnDistance)
 				  /fabsf(velocity.xyz[1]));
       float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
-                           * ForceOnFrontTire - SysResistance[0]*0.5;
+                           * ForceOnFrontTire - SysResistance[0]*0.5f;
       float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
-                           * ForceOnRearTire  - SysResistance[0]*0.5;
+                           * ForceOnRearTire  - SysResistance[0]*0.5f;
       float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
       velocity.xyz[0]      = cornerForce/mass*dt;
       float torque         =                  ForceLatRear *wheelBase/2
@@ -711,7 +711,7 @@ void Kart::updatePhysics (float dt) {
 // PHORS recommends: f=B*alpha/(1+fabs(A*alpha)^p), where A, B, and p
 //                   are appropriately chosen constants.
 float Kart::NormalizedLateralForce(float alpha, float corner) const {
-  float const maxAlpha=3.14/4;
+  float const maxAlpha=3.14f/4.0f;
   if(fabsf(alpha)<maxAlpha) {
     return corner*alpha;
   } else {
@@ -953,7 +953,7 @@ void Kart::placeModel () {
   sgCoord c ;
   sgCopyCoord ( &c, &curr_pos ) ;
   c.hpr[1] += wheelie_angle ;
-  c.xyz[2] += 0.3*fabs(sin(wheelie_angle 
+  c.xyz[2] += 0.3f*fabs(sin(wheelie_angle 
                            *SG_DEGREES_TO_RADIANS));
   model -> setTransform ( & c ) ;
 
@@ -994,7 +994,7 @@ void Kart::handleMagnet(float cdist, int closest) {
   //          to something larger than 1???
   if (cdist > physicsParameters->magnetMinRangeSQ) {
     if ( velocity.xyz[1] < tgt_velocity )
-      velocity.xyz[1] = tgt_velocity * 1.4 ;
+      velocity.xyz[1] = tgt_velocity * 1.4f;
   } else
     velocity.xyz[1] = tgt_velocity ;
 }   // handleMagnet

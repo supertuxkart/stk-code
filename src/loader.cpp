@@ -17,12 +17,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <dirent.h>
+
 #include <stdexcept>
 #include <sstream>
 #if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
 #  include <sys/types.h>
+#  include <dirent.h>
+#endif
+#ifdef WIN32
+#  include <io.h>
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#  include <stdio.h>
+#  include <dirent.h>
+#  define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #endif
 #include "loader.hpp"
 

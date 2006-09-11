@@ -22,7 +22,7 @@
 
 #include <vector>
 
-struct KartProperties;
+class KartProperties;
 
 class KartManager {
  protected:

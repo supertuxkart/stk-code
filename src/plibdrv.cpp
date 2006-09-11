@@ -134,7 +134,7 @@ void InitPlib() {
   if( joystick -> notWorking () ) config->player[0].setUseJoystick(false);
     else
   {
-    joystick -> setDeadBand( 0, 0.1 );
-    joystick -> setDeadBand( 1, 0.1 );
+    joystick -> setDeadBand( 0, 0.1f );
+    joystick -> setDeadBand( 1, 0.1f );
   }
 }

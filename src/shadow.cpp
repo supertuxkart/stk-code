@@ -33,15 +33,15 @@ ssgTransform* createShadow( const std::string& name,
   sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
   sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
  
-  sgSetVec3 ( v, x1, y1, 0.05 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y1, 0.05 ) ; va->add(v) ;
-  sgSetVec3 ( v, x1, y2, 0.05 ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y2, 0.05 ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y1, 0.05f ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y1, 0.05f ) ; va->add(v) ;
+  sgSetVec3 ( v, x1, y2, 0.05f ) ; va->add(v) ;
+  sgSetVec3 ( v, x2, y2, 0.05f ) ; va->add(v) ;
  
-  sgSetVec2 ( t, 0.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 0.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 0.0, 1.0 ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0, 1.0 ) ; ta->add(t) ;
+  sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
+  sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
  
   ssgTransform* result = new ssgTransform ;
   result -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;

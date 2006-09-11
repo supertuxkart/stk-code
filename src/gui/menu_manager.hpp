@@ -77,7 +77,7 @@ public:
   void pushMenu(MenuManagerIDs id);
   void popMenu();
 
-  int getMenuStackSize() {return m_menuStack.size();}
+  int getMenuStackSize() {return (int)m_menuStack.size();}
 
   bool isCurrentMenu(MenuManagerIDs id) {return (m_menuStack.back() == id);}
   BaseGUI* getCurrentMenu() {return m_currentMenu;}

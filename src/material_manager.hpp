@@ -23,7 +23,7 @@
 #include <plib/ssg.h>
 #include <string>
 
-struct Material;
+class Material;
 
 class MaterialManager {
  private:
