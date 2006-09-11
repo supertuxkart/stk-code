@@ -257,7 +257,7 @@ int main ( int argc, char **argv ) {
   kart_manager       ->loadKartData   ();
   projectile_manager ->loadData       ();
   collectable_manager->loadCollectable();
-  herring_manager    ->loadAllHerrings();
+  herring_manager    ->loadDefaultHerrings();
   startScreen = new StartScreen();
   widgetSet   = new WidgetSet;
 
@@ -305,7 +305,7 @@ int main ( int argc, char **argv ) {
       race_manager->setNumKarts  (4);
       race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
       race_manager->setDifficulty(RD_MEDIUM);
-      race_manager->setNumLaps   (1);
+      race_manager->setNumLaps   (4);
       race_manager->setTrack     ("littlevolcano");
       //race_manager->setTrack     ("tuxtrack");
       //race_manager->setTrack     ("olivermath");
