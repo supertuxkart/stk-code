@@ -23,6 +23,7 @@
 #include "world.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
+#include "sound.hpp"
 
 Projectile::Projectile(Kart *kart, int collectable) : Moveable(false) {
   init(kart, collectable);  
@@ -34,6 +35,7 @@ void Projectile::init(Kart *kart, int collectable_) {
   owner              = kart;
   type               = collectable_;
   hasHitSomething    = false;
+  nLastRadarBeep     = -1;
   speed              = collectable_manager->getSpeed(type);
   ssgTransform *m    = getModel();
   m->addKid(collectable_manager->getModel(type));
@@ -77,13 +79,18 @@ void Projectile::doObjectInteractions () {
         ndist = d ;
         nearest = i ;
       }  // if !d<2.0f
-    }   // if type!=NOTHGIN &&kart!=owner
+    }   // if type!=NOTHING &&kart!=owner
   }  // for i<getNumKarts
   if ( type == COLLECT_HOMING_MISSILE && nearest != -1 &&
         ndist < MAX_HOME_DIST_SQD                          ) {
-    sgVec3 delta ;
-    sgVec3 hpr ;
-    sgCoord *k = world -> getKart(nearest)->getCoord() ;
+    sgVec3 delta;
+    sgVec3 hpr;
+    Kart *kart=world->getKart(nearest);
+    if(nLastRadarBeep!=nearest && kart->isPlayerKart()) {
+      sound->playSfx(SOUND_MISSILE_LOCK);
+      nLastRadarBeep=nearest;
+    }
+    sgCoord *k = kart->getCoord() ;
 
     sgSubVec3 ( delta, k->xyz, curr_pos.xyz ) ;
 

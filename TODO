@@ -93,6 +93,7 @@ Things that would be nice to fix, but are not urgent
   not get any feedback if a driveline is skipped --> after 
   crossing the finishing line, the race might not end for a
   kart. Well, there is the 'wrong direction' message (?)
+- Add a tutorial course
 - Valgrind for memory bugs.
 - Update the web page, make more screen shots, ...
 - Tight/wide corner steering for AI. The AI is hitting the wall
@@ -135,5 +136,8 @@ long term
   to have different AIs
 - Code cleanup
   - Consistent style (which needs to be defined)
-  - replace (as far as possible) all char* with std::string
-  - ...
+  - Replace (as far as possible) all char* with std::string
+  - Rather complicated way of passing information to world, a 
+    mixture of CupData, raceSetup, race_manager. This could
+    probably all be simplified by only using the race_manager,
+    removing the raceSetup class completely.

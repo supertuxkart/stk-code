@@ -80,7 +80,15 @@ void Moveable::update (float dt) {
       printf("tmp     =%f,%f,%f,%f,%f,%f\n",
 	     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
 	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
+
+#undef IGNORE_Z_IN_HISTORY
+#ifdef IGNORE_Z_IN_HISTORY
+      float dummy=velocity.xyz[2];
       sgCopyCoord(&velocity, &tmp);
+      velocity.xyz[2]=dummy;
+#else
+      sgCopyCoord(&velocity, &tmp);
+#endif
     } else {
       sgCopyCoord(&(historyVelocity[history->GetCurrentIndex()]), &velocity);
     }
@@ -108,10 +116,18 @@ void Moveable::update (float dt) {
       printf("curr_pos=%f,%f,%f,%f,%f,%f\n",
 	     curr_pos.xyz[0],curr_pos.xyz[1],curr_pos.xyz[2],
 	     curr_pos.hpr[0],curr_pos.hpr[1],curr_pos.hpr[2]);
-      printf("tmp     =%f,%f,%f,%f,%f,%f\n",
+      printf("tmp     =%f,%f,%f,%f,%f,%f --> %d\n",
 	     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
-	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
+	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2],
+	     history->GetCurrentIndex());
+
+#ifdef IGNORE_Z_IN_HISTORY
+      float dummy=curr_pos.xyz[2];
       sgCopyCoord(&curr_pos, &tmp);
+      curr_pos.xyz[2]=dummy;
+#else
+      sgCopyCoord(&curr_pos, &tmp);
+#endif
     } else {
       sgCopyCoord(&(historyPosition[history->GetCurrentIndex()]), &curr_pos);
     }

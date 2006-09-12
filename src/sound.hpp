@@ -24,24 +24,12 @@
 
 #include <plib/sl.h>
 
-#define SOUND_UGH		0
-#define SOUND_WINNER    1
-#define SOUND_CRASH		2
-#define SOUND_GRAB		3
-#define SOUND_SHOT		4
-#define SOUND_OW		5
-#define SOUND_WEE		6
-#define SOUND_EXPLOSION         7
-#define SOUND_BZZT              8
-#define SOUND_BEEP              9
-#define SOUND_BACK_MENU         10
-#define SOUND_SELECT_MENU       11
-#define SOUND_MOVE_MENU         12
-#define SOUND_FULL              13
-#define SOUND_PRESTART          14
-#define SOUND_START             15
-
-#define NUM_SOUNDS 16
+enum allSoundsType {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
+		    SOUND_SHOT, SOUND_OW,     SOUND_WEE,   SOUND_EXPLOSION,
+		    SOUND_BZZT, SOUND_BEEP,   SOUND_BACK_MENU, 
+		    SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL, 
+		    SOUND_PRESTART, SOUND_START, SOUND_MISSILE_LOCK,
+		    NUM_SOUNDS};
 
 
 using std::string;

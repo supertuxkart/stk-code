@@ -31,7 +31,7 @@ class Projectile : public Moveable {
   float       speed;    // Speed of the projectile
   int         type ;
   bool        hasHitSomething;
-
+  int         nLastRadarBeep;
 public:
 
   Projectile               (Kart* kart_, int type);
