@@ -3,7 +3,6 @@
 (tuxkart-track
  (name "Race Track")
  (description "Created by Ingo Ruhnke")
- (herring "new")
  (music "mods/tk5a.mod")
 )
 

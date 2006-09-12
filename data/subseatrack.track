@@ -3,7 +3,6 @@
 (tuxkart-track
  (name "Sub Sea")
  (description "Created by Ingo Ruhnke")
- (herring "new")
  (use-fog #t)
  (sky-color    0.0 0.0 0.2 0.0)
  (fog-color    0.0 0.0 0.2 0.0)

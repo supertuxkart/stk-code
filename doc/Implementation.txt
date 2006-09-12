@@ -20,13 +20,41 @@ collectable is used, Collectable::use is called from PlayerKart::update
 or AutoKart::update.
 
 The collectables can have different styles, for example, in some tracks
-the it can look like a fish and in others it can look like a box with a
-question mark. The styles are defined in data/*.herring. These files
-contain a model to use for each of the four types of herring, not just
-the red herring. If no model is defined for a certain herring, the
-original tuxkart style is used. Right now there are two styles defined:
-- default (basicly an empty file, so it uses the tuxkart herrings).
-- new (from the GOTM event).
+they can look like a fish and in others like a box with a question mark. 
+All herring models are stored in models/herrings and are loaded at the
+start of the program. The only exception are the original fish models,
+which are created within tuxkart. They can be specified by using the
+special model names; OLD_GOLD, OLD_GREEN, OLD_RED, and OLD_SILVER.
+The herrings to use are defined in herring style files in 
+data/*.herring - for example:
+
+(herring
+  (gold   "goldcoin")
+  (silver "silvercoin")
+  (green  "OLD_GREEN")
+)
+
+This would use the new coin models for the energy boosters, but the
+old green for bad collectables. Since no value is specified for
+red herrings, the system default will be used. 
+The program can load up to 4 different style. First of all it loads
+the (hardcoded) defaults (which are the newly defined models in
+models/herrings). Then it will a user specified model (using the
+--herring command line option). Then it will load a herring file 
+specified in the track, and if a grand prix is used, it will load
+the grand prix specifications last. This means, that a grand prix
+setting will overwrite a track setting, which in turn will overwrite
+a user setting, which will overwrite the defaults. This way a grand
+prix can specify a consistent style.
+
+To create a new herring model:
+1) create the model and put it in models/herrings
+2) create a herring style file in data/*.herring,
+   which specified for which to use the model.
+3) Then either specify the name of the new herring style file
+   on the command line option (which will then become your
+   new default, since it will be loaded), or add it to a track
+   or cup file in data (as  (herring "new-name-without-extension")
 
 2) Projectiles
 ==============
