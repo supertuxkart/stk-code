@@ -219,7 +219,13 @@ void Config::loadConfig(const std::string& filename) {
   try {
     lisp::Parser parser;
     root = parser.parse(filename);
-
+  } catch(std::exception& e) {
+    std::cout << "Config file '"<<filename<<"' does not exist, it will be created.\n";
+    delete root;
+    return;
+  }
+  
+  try {
     const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
     if(!lisp)
       throw std::runtime_error("No tuxkart-config node");
