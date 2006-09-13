@@ -27,7 +27,7 @@ ScrolledText::ScrolledText(){
   float r       = config->width/800.0f;
   xLeft         = (int)(30.0*r);  xRight = config->width -xLeft;
   r             = config->height/600.0f;
-  yBottom       = (int)(50.0*r);  yTop   = config->height-(int)(200.0f*r);
+  yBottom       = (int)(50.0*r);  yTop   = config->height-(int)(50.0f*r);
   ySpeed        = 50.0f;
   fontSize      = 24;
   yPos          = yBottom-fontSize;
@@ -75,7 +75,7 @@ void ScrolledText::update(float dt){
 
   for(unsigned int i=0; i<sl.size(); i++) {
 
-    if((yPos-i*fontSize < yTop-yBottom) && yPos-i*fontSize > -fontSize)
+    if((yPos-i*fontSize < yTop + yBottom ) && yPos-i*fontSize > -fontSize)
         widgetSet->drawText(sl[i],24,
 			xLeft,(int)yPos-i*fontSize,255,255,255);
   }
