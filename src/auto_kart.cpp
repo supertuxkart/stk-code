@@ -84,6 +84,7 @@ void AutoKart::update (float delta)
 
     const float KART_LENGTH = 1.5f;
 
+    //The crash_perc measures if a kart has been crashing for too long
     crash_perc += collided ? 3.0f * delta : -0.25f * delta;
     if(crash_perc < 0.0f) crash_perc = 0.0f;
 
@@ -242,6 +243,8 @@ void AutoKart::update (float delta)
     }
 
     /*Handle rescue*/
+    //If we have been crashing constantly for around 3 seconds, asume
+    //the kart is stuck and ask for a rescue.
     if(crash_perc > 3.0f)
     {
         rescue = true;
@@ -358,6 +361,7 @@ void AutoKart::handle_race_start()
     //5% in medium and less than 1% of the karts in hard.
     if(starting_delay <  0.0f)
     {
+        //FIXME: is this next line really needed?
         placeModel();
 
         srand((unsigned)time(0));
