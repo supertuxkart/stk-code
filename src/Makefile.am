@@ -1,6 +1,23 @@
 # src/
 
 bin_PROGRAMS = supertuxkart
+
+# This is a VERY ugly work-around for a compiler bug: if static_ssg s compiled with -O2
+# (more particularly: with -fregmove, which is part of -O2), it will causes the kart
+# to fall through the tracks very easily. Therefore, static_ssg needs special compiler
+# flags to work correctly.
+# Since it is not possible to set compiler flags for a single .o file (see
+# http://sources.redhat.com/ml/automake/2004-12/msg00063.html), I used the
+# workaround provided there.
+# Adding -fno-regmove works, even though it is put before the actual compiler flags,
+# i.e.: -fno-regmove -g -O2, still works by disabling -fregmove.
+# Unless a better work-around is found, I'll commit this patch, but obviously
+# the configure script should check if this flag should be used!
+
+noinst_LIBRARIES         =  libstatic_ssg.a
+libstatic_ssg_a_SOURCES  = static_ssg.cpp static_ssg.hpp
+libstatic_ssg_a_CXXFLAGS = -fno-regmove
+
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 supertuxkart_SOURCES =             main.cpp  			\
 	material.cpp		   material.hpp           	\
@@ -43,7 +60,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	auto_kart.cpp		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
 	projectile.cpp 		   projectile.hpp	        \
-	static_ssg.cpp 		   static_ssg.hpp	        \
 	history.cpp		   history.hpp	        	\
 	race_setup.hpp	   	   no_copy.hpp	        	\
 	kart_control.hpp	   constants.hpp            	\
@@ -77,7 +93,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/scrolled_text.cpp	   gui/scrolled_text.hpp	\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp
 
-
-supertuxkart_LDADD = \
+# Link in the specific gcc 4.1 bug work around
+supertuxkart_LDADD = -L . -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
 	-lplibpw -lplibul -lplibssgaux $(opengl_LIBS)
