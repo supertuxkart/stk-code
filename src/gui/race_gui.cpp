@@ -390,11 +390,11 @@ void RaceGUI::drawPlayerIcons () {
 
       // draw text
       int red=255, green=255, blue=255;
-      if(lap==world->raceSetup.numLaps) {  // kart is finished
+      int numLaps = world->raceSetup.numLaps;
+      if(lap>=numLaps) {  // kart is finished, display in green
 	red=0; blue=0;
-      } else if(lap==world->raceSetup.numLaps-1 &&
-		world->raceSetup.numLaps>1              ) {
-	blue=0; green=0;
+      } else if(lap>=0 && numLaps>1) {
+	green = blue  = 255-(int)((float)lap/((float)numLaps-1.0f)*255.0f);
       }
 
       glDisable(GL_CULL_FACE);
