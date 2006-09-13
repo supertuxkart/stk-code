@@ -133,7 +133,8 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   }  // for i
 
   loadPlayers ( ) ;
-
+  numberCollisions = new int[raceSetup.getNumKarts()];
+  for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) numberCollisions[i]=0;
   preProcessObj ( scene ) ;
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
@@ -155,7 +156,7 @@ World::~World() {
 
   kart.clear();
   projectile_manager->cleanup();
-
+  delete numberCollisions;
   delete scene ;
 
   sound -> stop_music();
@@ -189,6 +190,15 @@ void World::update(float delta) {
 
   checkRaceStatus();
 
+  // Count the number of collision in the next 'framesForTrafficJam' frames.
+  // If a kart has more than one hit, play 'traffic jam' noise.
+  static int nCount=0;
+  const int framesForTrafficJam=20;
+  nCount++;
+  if(nCount==framesForTrafficJam) {
+    for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) numberCollisions[i]=0;
+    nCount=0;
+  }
   if( getPhase() == FINISH_PHASE ) {
     widgetSet->tgl_paused();
     menu_manager->pushMenu(MENUID_RACERESULT);
@@ -223,6 +233,17 @@ void World::update(float delta) {
 
   /* Routine stuff we do even when paused */
   hook_manager->update();
+
+  // Check for traffic jam. The sound is played even if it's
+  // not a player kart - a traffic jam happens rarely anyway.
+  for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) {
+    if(numberCollisions[i]>1) {
+      sound->playSfx(SOUND_TRAFFIC_JAM);
+      nCount = framesForTrafficJam-1;  // sets all fields to zero in next frame
+      break;
+    }
+  }
+
 }
 
 void World::checkRaceStatus() {
@@ -516,10 +537,6 @@ void World::restartRace() {
   race_manager->reset();
 }
 
-Kart* World::getKart(int kartId) {
-  assert(kartId >= 0 && kartId < int(kart.size()));
-  return kart[kartId];
-}
 
 PlayerKart* World::getPlayerKart(int player) {
   return (PlayerKart*)kart[raceSetup.players[player]];

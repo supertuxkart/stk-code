@@ -78,6 +78,7 @@ SoundSystem::SoundSystem ()
   sfx[SOUND_PRESTART    ].fname = "wavs/tintagel/pre_start_race.wav";
   sfx[SOUND_START       ].fname = "wavs/tintagel/start_race.wav";
   sfx[SOUND_MISSILE_LOCK].fname = "wavs/radio/radarping.wav";
+  sfx[SOUND_TRAFFIC_JAM ].fname = "wavs/radio/trafficjam.wav";
 
   setSafetyMargin () ;
 

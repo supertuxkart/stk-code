@@ -46,6 +46,7 @@ private:
   Karts      kart;
   StaticSSG* staticSSG;
   float      finishDelayStartTime;
+  int*       numberCollisions;
 public:
   float      clock;
 
@@ -91,11 +92,14 @@ public:
   void restartRace();
   
   PlayerKart* getPlayerKart(int player);
-  Kart* getKart(int kart); 
-  int getNumKarts() const { return (int)kart.size(); }
-  void addToScene(ssgEntity *kid) {scene->addKid(kid); }
-  void removeFromScene(ssgEntity *kid) {scene->removeKid(kid);}
-  
+  Kart* getKart(int kartId)                 {assert(kartId >= 0 && 
+						    kartId < int(kart.size()));
+                                             return kart[kartId];              }
+  int  getNumKarts() const                  {return (int)kart.size();          }
+  void addToScene(ssgEntity *kid)           {scene->addKid(kid);               }
+  void removeFromScene(ssgEntity *kid)      {scene->removeKid(kid);            }
+  void addCollisions(int kartNumber, int n) {numberCollisions[kartNumber]+=n;  }
+
   /** Returns the phase of the game */
   Phase getPhase() const { return phase; }
   float getGravity() const { return track->getGravity();}

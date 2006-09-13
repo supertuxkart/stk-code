@@ -197,7 +197,8 @@ void Kart::doObjectInteractions () {
 
     if ( sgLengthSquaredVec2 ( xyz ) < 1.0f ) {
       sgNormalizeVec2 ( xyz ) ;
-
+      world->addCollisions(grid_position, 1);
+      world->addCollisions(i,             1);
       if ( velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] ) {
         forceCrash () ;
         sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
