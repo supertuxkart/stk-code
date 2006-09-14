@@ -39,6 +39,7 @@ class Track {
     std::string music_filename;
     std::string herringStyle;
     std::string description;
+    std::string filename;
 
  public:
 
@@ -97,7 +98,7 @@ public:
     bool doStretch;      // 2d track display might be stretched to fit better
 
 public:
-                     Track            (const char* filename,float w=100,
+                     Track            (std::string filename,float w=100,
 				       float h=100, bool stretch=1);
                     ~Track            ();
   void               draw2Dview       (float x, float y            ) const ;
@@ -112,7 +113,8 @@ public:
   float              getTrackLength   () const {return total_distance;}
   const char*        getIdent         () const {return ident.c_str(); }
   const char*        getName          () const {return name.c_str();  }
-  const char*        getMusic         () const {return music_filename.c_str();}
+  const std::string& getMusic         () const {return music_filename;}
+  const std::string& getFilename      () const {return filename; }
   const sgVec3& getSunPos             () const {return sun_position;  }
   const sgVec4& getAmbientCol         () const {return ambientcol;    }
   const sgVec4& getDiffuseCol         () const {return diffusecol;    }
@@ -136,7 +138,7 @@ public:
 				       yOff+(v[1]-driveline_min[1])*scaleY);}
 
 private:
-  void loadTrack                      (const char* filename);
+  void loadTrack                      (std::string filename);
   void loadDriveline                  ();
   void readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
 				       const std::string& file_ext      );

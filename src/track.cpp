@@ -27,7 +27,8 @@
 #include "lisp/parser.hpp"
 
 
-Track::Track (const char* filename, float w, float h, bool stretch) {
+Track::Track (std::string filename_, float w, float h, bool stretch) {
+  filename      = filename_;
   herringStyle  = "";
   track2DWidth  = w;
   track2DHeight = h;
@@ -217,7 +218,9 @@ void Track::draw2Dview (float xOff, float yOff) const {
 }   // draw2Dview
 
 // -----------------------------------------------------------------------------
-void Track::loadTrack(const char* filename) {
+void Track::loadTrack(std::string filename_) {
+  filename      = filename_;
+
   ident = StringUtils::basename(StringUtils::without_extension(filename));
   std::string path = StringUtils::without_extension(filename);
 

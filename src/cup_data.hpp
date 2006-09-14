@@ -27,6 +27,7 @@
     of races that has to be completed one after the other */
 class CupData {
   std::string name;         // The name of the cup 
+  std::string filename;     // Original filename, only for error handling needed
   std::string description;  // Description for this track 
   std::string herringStyle; // herring style which overwrites the track default
 
@@ -43,11 +44,8 @@ public:
   const std::string& getName        ()  const { return name;        }
   const std::string& getDescription ()  const { return description; }
   const std::string& getHerringStyle()  const { return herringStyle;}
-  const void         loadHerrings() {
-    herring_manager->loadHerringStyle(herringStyle);
-  }
-
-};
+  const std::string& getFilename    ()  const { return filename;    }
+};   // CupData
 
 #endif
 

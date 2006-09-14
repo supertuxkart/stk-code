@@ -113,6 +113,7 @@ void HerringManager::loadDefaultHerrings() {
 
 // -----------------------------------------------------------------------------
 void HerringManager::setDefaultHerringStyle() {
+  // This should go in an internal, system wide configuration file
   std::string defaultNames[4] = {"bonusblock", "banana",
 				 "goldcoin",   "silvercoin"};
 
@@ -177,9 +178,25 @@ void HerringManager::cleanup() {
   // ------------------------------------------------
   // This way if a herring is not defined in the herringstyle-file, the
   // default (i.e. old herring) is used.
-  loadHerringStyle(config->herringStyle);
-  if(userFilename.size()>0) {
+  try {
+    // FIXME: This should go in a system-wide configuration file,
+    //        and only one of this and the hard-coded settings in
+    //        setDefaultHerringStyle are necessary!!!
+    loadHerringStyle(config->herringStyle);
+  } catch(std::runtime_error) {
+    fprintf(stderr,"The herring style '%s' in your configuration file does not exist.\n",
+	    config->herringStyle.c_str());
+    fprintf(stderr,"Resetting it to empty.\n");
+    config->herringStyle="";
+  }
+
+  try {
     loadHerringStyle(userFilename);
+  } catch(std::runtime_error) {
+    fprintf(stderr,"The herring style '%s' specified on the command line does not exist.\n",
+	    userFilename.c_str());
+    fprintf(stderr,"It is ignored.\n");
+    userFilename="";  // reset to avoid further warnings.
   }
 
 }   // cleanup

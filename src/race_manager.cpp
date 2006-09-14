@@ -81,7 +81,6 @@ void
 GrandPrixMode::start_race(int n)
 {
   RaceSetup raceSetup;
-  cup.loadHerrings();
   raceSetup.mode       = RaceSetup::RM_GRAND_PRIX;
   raceSetup.difficulty = difficulty;
   raceSetup.numLaps    = 1;

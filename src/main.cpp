@@ -201,7 +201,7 @@ int handleCmdLine(int argc, char **argv) {
     } else if( !strcmp(argv[i], "--history") ) {
       config->replayHistory=true;
     } else if( !strcmp(argv[i], "--herring") && i+1<argc ) {
-      config->herringStyle=argv[i+1];
+      herring_manager->setUserFilename(argv[i+1]);
     } else {
       fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
       cmdLineHelp(argv[0]);

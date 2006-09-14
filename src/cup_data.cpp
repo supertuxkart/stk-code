@@ -25,7 +25,8 @@
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
 
-CupData::CupData(const std::string filename) {
+CupData::CupData(const std::string filename_) {
+  filename = filename_;
   const lisp::Lisp* lisp = 0;
   try {
     lisp::Parser parser;

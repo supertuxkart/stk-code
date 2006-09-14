@@ -143,8 +143,8 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
 
   menu_manager->switchToRace();
 
-  const char* music_name= track_manager->getTrack(raceSetup.track)->getMusic();
-  if (music_name != NULL) sound->play_track(music_name);
+  const std::string& music_name= track_manager->getTrack(raceSetup.track)->getMusic();
+  if (music_name.size()>0) sound->play_track(music_name);
 
   ready_set_go = 3;
   phase        = START_PHASE;
@@ -376,9 +376,24 @@ void World::loadTrack() {
   // track specific herring models
   herring_manager->cleanup();
   if(raceSetup.mode==RaceSetup::RM_GRAND_PRIX) {
+  try {
     herring_manager->loadHerringStyle(raceSetup.getHerringStyle());
+  } catch(std::runtime_error) {
+    fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
+	    race_manager->getGrandPrix()->getName().c_str(), 
+	    race_manager->getGrandPrix()->getHerringStyle().c_str());
+    fprintf(stderr, "Please fix the file '%s'.\n",
+	    race_manager->getGrandPrix()->getFilename().c_str()); 
+  }
   } else {
-    herring_manager->loadHerringStyle(track->getHerringStyle());
+    try {
+      herring_manager->loadHerringStyle(track->getHerringStyle());
+    } catch(std::runtime_error) {
+    fprintf(stderr, "The track '%s' contains an invalid herring style '%s'.\n",
+	    track->getName(), track->getHerringStyle().c_str());
+    fprintf(stderr, "Please fix the file '%s'.\n",
+	    track->getFilename().c_str()); 
+    }
   }
 
   FILE *fd = fopen (path.c_str(), "r" );

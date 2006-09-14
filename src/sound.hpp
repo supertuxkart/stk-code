@@ -60,11 +60,11 @@ public:
     sched -> setSafetyMargin ( t ) ;
   }
 
-  void play_track ( const char *fname );
-
-  void stop_music () { sched -> stopMusic(); }
-  void pause_music () { sched -> pauseMusic(); }
-  void resume_music () { sched -> resumeMusic(); }
+  void play_track  ( const char *fname );
+  void play_track  ( const std::string& fname ) {play_track(fname.c_str());}
+  void stop_music  ()                           {sched -> stopMusic();     }
+  void pause_music ()                           { sched -> pauseMusic();   }
+  void resume_music()                           { sched -> resumeMusic();  }
 } ;
 
 extern SoundSystem *sound ;

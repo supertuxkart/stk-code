@@ -81,7 +81,7 @@ void Moveable::update (float dt) {
 	     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
 	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
 
-#undef IGNORE_Z_IN_HISTORY
+#define IGNORE_Z_IN_HISTORY
 #ifdef IGNORE_Z_IN_HISTORY
       float dummy=velocity.xyz[2];
       sgCopyCoord(&velocity, &tmp);
