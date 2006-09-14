@@ -6,17 +6,22 @@ bin_PROGRAMS = supertuxkart
 # (more particularly: with -fregmove, which is part of -O2), it will causes the kart
 # to fall through the tracks very easily. Therefore, static_ssg needs special compiler
 # flags to work correctly.
+# It might (didn't check the details) be that this is the problem reported in 
+# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=28146
+# (which states that the problem does not happen with i686 and x86_64, which
+# is what I have seen as well, it only happened on i586, not on x86_64).
+#
 # Since it is not possible to set compiler flags for a single .o file (see
 # http://sources.redhat.com/ml/automake/2004-12/msg00063.html), I used the
 # workaround provided there.
 # Adding -fno-regmove works, even though it is put before the actual compiler flags,
 # i.e.: -fno-regmove -g -O2, still works by disabling -fregmove.
-# Unless a better work-around is found, I'll commit this patch, but obviously
-# the configure script should check if this flag should be used!
+# The configure script checks if the compiler accepts this flag, and if so, it
+# will be used here.
 
 noinst_LIBRARIES         =  libstatic_ssg.a
 libstatic_ssg_a_SOURCES  = static_ssg.cpp static_ssg.hpp
-libstatic_ssg_a_CXXFLAGS = -fno-regmove
+libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 supertuxkart_SOURCES =             main.cpp  			\

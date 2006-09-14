@@ -105,7 +105,17 @@ int main() {
   AC_MSG_ERROR([Install plib 1.8.4 or later first...])],
  AC_MSG_RESULT(yes)
 )
+AC_MSG_CHECKING([for gcc -fno-regmove option ])
 
+# Test if -fno-regmove is supported, since -fregmove (which is part of -O2 on
+# g++) triggers an optimisation problem with static_ssg:
+ORIGCXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -fno-regmove"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+	          AC_MSG_RESULT(yes); NOREGMOVE=-fno-regmove,
+                  AC_MSG_RESULT(no);  NOREGMOVE="")
+CXXFLAGS="$ORIGCXXFLAGS"
+AC_SUBST(NOREGMOVE)
 
 AC_CONFIG_FILES([      \
  Makefile             \
