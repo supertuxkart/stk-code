@@ -75,4 +75,18 @@
 "wheel.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "water.rgb"            N N     N      0.1     Y     N   1.0     N   N    Y    N
 
+"sshot-beach.rgb"      N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-bsodcastle.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-geekopeak.rgb"  N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-gownsbow.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-lighthouse.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-littlevolcano.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-race.rgb"       N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-sandtrack.rgb"  N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-startrack.rgb"  N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-subseatrack.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-tuxtrack.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-volcano.rgb"    N N     N      0.1     Y     N   1.0     N   N    N    Y
+"sshot-olivermath.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+
 # EOF #

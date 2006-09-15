@@ -4,6 +4,7 @@
  (name "Volcano")
  (description "Created by Ingo Ruhnke")
  (music "mods/Boom_boom_boom.mod")
+ (screenshot "images/sshot-volcano.rgb")
 )
 
 ;; EOF ;;

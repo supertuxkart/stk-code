@@ -5,6 +5,7 @@
  (sky-color    0.0 0.0 0.0 0.0)
  (description "Created by Ingo Ruhnke")
  (music "mods/tk5a.mod")
+ (screenshot "images/sshot-startrack.rgb")
 )
 
 ;; EOF ;;

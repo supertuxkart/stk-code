@@ -4,6 +4,7 @@
  (name "Shifting Sands")
  (description "Created by Oliver & Steve Baker")
  (music "mods/tk7.mod")
+ (screenshot "images/sshot-sandtrack.rgb")
 )
 
 ;; EOF ;;
