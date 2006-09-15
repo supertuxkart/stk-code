@@ -67,9 +67,9 @@ void cmdLineHelp (char* invocation) {
 	    "  --kart NAME             Use kart number NAME\n"
 	    "  --list-karts            Show available karts.\n"
 	    "  --laps n                Define number of laps to n\n"
-	    "  --players n             Define number of players to between 1 and 4.\n"
-	    "  --reverse               Enable reverse mode\n"
-	    "  --mirror                Enable mirror mode (when supported)\n"
+//FIXME	    "  --players n             Define number of players to between 1 and 4.\n"
+//FIXME	    "  --reverse               Enable reverse mode\n"
+//FIXME	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  --herring style         Herring style to use\n"
 #if FULLSCREEN_IS_CURRENTLY_DISABLED
 	    "  -f,  --fullscreen       Fullscreen display.\n"
@@ -83,7 +83,7 @@ void cmdLineHelp (char* invocation) {
 	    "  -v,  --version          Show version.\n"
 	    // should not be used by unaware users:
             // "  --profile            Enable automatic driven profile mode for 20 seconds\n"
-            // "  --profile n          Enable automatic driven profile mode for n seconds\n"
+            // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
 	    // "  --history            Replay history file 'history.dat'\n"
 	    "\n"
 	    "You can visit SuperTuxKart's homepage at "
@@ -104,7 +104,7 @@ int handleCmdLine(int argc, char **argv) {
     } else if( (!strcmp(argv[i], "--kart") && i+1<argc )) {
       race_manager->setPlayerKart(0, argv[i+1]);
     } else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
-	       && argc > 2                                             ) {
+	       && i+1<argc                                              ) {
       race_manager->setTrack(argv[i+1]);
       fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
     } else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
@@ -139,8 +139,8 @@ int handleCmdLine(int argc, char **argv) {
     } else if (    !strcmp(argv[i], "--no-start-screen")
 		|| !strcmp(argv[i], "-N")                ) {
       config->noStartScreen = true;
-    } else if ( !strcmp(argv[i], "--reverse") ) {
-      fprintf ( stdout, "Enabling reverse mode.\n" ) ;
+      //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
+      //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
       //FIXME:raceSetup.reverse = 1;
     } else if ( !strcmp(argv[i], "--mirror") ) {
   #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
@@ -195,7 +195,7 @@ int handleCmdLine(int argc, char **argv) {
       config->singleWindowMenu=true;
     } else if( !strcmp(argv[i], "--oldstatus") ) {
       config->oldStatusDisplay=true;
-    } else if( sscanf(argv[i], "--profile %d",  &n)==1) {
+    } else if( sscanf(argv[i], "--profile=%d",  &n)==1) {
       config->profile=n;
     } else if( !strcmp(argv[i], "--profile") ) {
       config->profile=20;
