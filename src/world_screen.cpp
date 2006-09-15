@@ -77,11 +77,13 @@ void WorldScreen::update() {
   menu_manager->update();
   sound->update() ;
   if(config->profile) {
-    if(frameCount++ == config->profile) {
-      frameClock.update();
-      exit(2);
+    frameCount++;
+    if (world->clock>config->profile) {
+      printf("Number of frames: %d Average FPS: %f\n",
+	     frameCount, (float)frameCount/world->clock);
+      exit(-2);
     }
-  }
+  }   // if profile
 
   pwSwapBuffers() ;
 }

@@ -46,8 +46,8 @@ class Config {
     bool   displayFPS;
     bool   singleWindowMenu;
     bool   oldStatusDisplay;
-    int    profile;         // Number of frames to profile, default 500
-                            // -1 if no profiling. Never saved in config file!
+    int    profile;         // Positive number: time in seconds, neg: # laps
+                            // 0 if no profiling. Never saved in config file!
     std::string herringStyle;
     bool   newKeyboardStyle;// use the new keyboard style
     bool   disableMagnet;   // true if a magnet can be dis- and enabled

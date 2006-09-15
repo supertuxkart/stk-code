@@ -91,8 +91,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ;
                                   i != raceSetup.karts.end() ; ++i ) {
     Kart* newkart;
-    if(config->profile)
-    {
+    if(config->profile) {
       // In profile mode, load only the old kart
       newkart = new AutoKart (kart_manager->getKart("tuxkart"), pos);
     } else {
@@ -105,7 +104,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
       } else {
 	newkart = new AutoKart   (kart_manager->getKart(*i), pos);
       }
-    }   // if config->profile else
+    }   // if !config->profile
     if(config->replayHistory) {
       history->LoadKartData(newkart, pos);
     }
@@ -146,8 +145,13 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   const std::string& music_name= track_manager->getTrack(raceSetup.track)->getMusic();
   if (music_name.size()>0) sound->play_track(music_name);
 
-  ready_set_go = 3;
-  phase        = START_PHASE;
+  if(config->profile) {
+    ready_set_go = -1;
+    phase        = RACE_PHASE;
+  } else {
+    phase        = START_PHASE;  // profile starts without countdown
+    ready_set_go = 3;
+  }
 }
 
 World::~World() {

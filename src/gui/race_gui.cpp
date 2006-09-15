@@ -125,7 +125,7 @@ void RaceGUI::keybd(int key) {
       menu_manager->pushMenu(MENUID_RACEMENU);
       // The player might have changed the keyboard 
       // configuration, so we need to redefine the mappings
-      UpdateKeyboardMappings();
+      if(!config->profile) UpdateKeyboardMappings();
       break;
     case PW_KEY_F10:
       history->Save();

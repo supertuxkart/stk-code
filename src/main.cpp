@@ -82,7 +82,8 @@ void cmdLineHelp (char* invocation) {
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
 	    // should not be used by unaware users:
-            // "  --profile            Enable automatic driven profile mode\n"
+            // "  --profile            Enable automatic driven profile mode for 20 seconds\n"
+            // "  --profile n          Enable automatic driven profile mode for n seconds\n"
 	    // "  --history            Replay history file 'history.dat'\n"
 	    "\n"
 	    "You can visit SuperTuxKart's homepage at "
@@ -194,10 +195,10 @@ int handleCmdLine(int argc, char **argv) {
       config->singleWindowMenu=true;
     } else if( !strcmp(argv[i], "--oldstatus") ) {
       config->oldStatusDisplay=true;
-    } else if( sscanf(argv[i], "--profile=%d",&n)==1) {
+    } else if( sscanf(argv[i], "--profile %d",  &n)==1) {
       config->profile=n;
     } else if( !strcmp(argv[i], "--profile") ) {
-      config->profile=500;
+      config->profile=20;
     } else if( !strcmp(argv[i], "--history") ) {
       config->replayHistory=true;
     } else if( !strcmp(argv[i], "--herring") && i+1<argc ) {
@@ -208,9 +209,8 @@ int handleCmdLine(int argc, char **argv) {
       return 0;
     }
   }   // for i <argc
-  if(config->profile) {
-    printf("Profiling: %d frames.\n",config->profile);
-  }
+  if(config->profile) printf("Profiling: %d seconds.\n",config->profile);
+  
   return 1;
 }   /* handleCmdLine */
 
@@ -302,14 +302,10 @@ int main ( int argc, char **argv ) {
   // =========
       race_manager->setNumPlayers(1);
       race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
-      race_manager->setNumKarts  (4);
       race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
       race_manager->setDifficulty(RD_MEDIUM);
-      race_manager->setNumLaps   (4);
-      race_manager->setTrack     ("littlevolcano");
-      //race_manager->setTrack     ("tuxtrack");
-      //race_manager->setTrack     ("olivermath");
-      startScreen->switchToGame();
+      race_manager->setNumLaps   (999999); // profile end depends on time
+      startScreen->switchToGame  ();
     }
     screen_manager->run();
   }
