@@ -86,8 +86,8 @@ void TrackSel::update(float dt) {
   } else {                   // either topview or screenshot specified
     int xLeft   = config->width/2;
     int yBottom = 50;
-    int w       = config->width/2-20;
-    int h       = config->height/3-10;
+    int w       = config->width/3;
+    int h       = config->height/3;
     if(topview.size()==0) {  // no topview, but there is a screenshot!
       track->drawScaled2D(xLeft, yBottom, w, h);
     } else {                 // topview is defined
@@ -103,7 +103,7 @@ void TrackSel::update(float dt) {
       
     }   // topview is defined
     Material *m=material_manager->getMaterial(screenshot);
-    xLeft = 10;
+    xLeft = xLeft - w - 10;
     m->apply();
     glBegin(GL_QUADS) ;
       glColor4f(1, 1, 1, 1 );
