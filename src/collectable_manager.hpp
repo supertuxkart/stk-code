@@ -27,8 +27,8 @@ class Material;
 class ssgEntity;
 
 enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE, 
-		      COLLECT_SPARK,   COLLECT_HOMING_MISSILE,
-		      COLLECT_ZIPPER,  
+		      COLLECT_SPARK, COLLECT_HOMING_MISSILE,
+		      COLLECT_ZIPPER, COLLECT_ANVIL, COLLECT_PARACHUTE,
 #ifdef USE_MAGNETS
                       COLLECT_MAGNET, 
 #endif

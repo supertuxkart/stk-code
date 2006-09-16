@@ -306,6 +306,8 @@ void AutoKart::update (float delta)
                         break;
                     /*TODO: teach AI to use the magnet*/
                     default:
+                        collectable.use() ;
+                        time_since_last_shot = 0.0f;
                         break;
                 }
                 break;
@@ -447,12 +449,12 @@ void AutoKart::check_crashes(const int STEPS, sgVec3 pos)
 
         /*Find if we crash with any kart*/
         if(crashes.kart == -1) //Don't find a kart to dodge if we got one
-            for (size_t j = 0; j < NUM_KARTS; ++j)
+            for (int j = 0; j < NUM_KARTS; ++j)
             {
-                if(world->getKart((int)j) == this) continue;
+                if(world->getKart(j) == this) continue;
 
                 kart_distance = sgDistanceVec2(step_coord,
-                    world->getKart((int)j)->getCoord()->xyz);
+                    world->getKart(j)->getCoord()->xyz);
 
                 {
                     if(kart_distance < KART_LENGTH + 0.125f * i)

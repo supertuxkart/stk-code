@@ -38,6 +38,8 @@ initCollectableType ict[]={
   {COLLECT_SPARK,          "spark.projectile"         },
   {COLLECT_MISSILE,        "missile.projectile"       },
   {COLLECT_HOMING_MISSILE, "homingmissile.projectile" },
+  {COLLECT_ANVIL,          "anvil.collectable"        },
+  {COLLECT_PARACHUTE,      "parachute.collectable"    },
   {COLLECT_MAX,            ""                         },
 };
 

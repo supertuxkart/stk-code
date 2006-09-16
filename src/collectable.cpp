@@ -22,6 +22,7 @@
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "sound.hpp"
+#include "world.cpp"
 
 // -----------------------------------------------------------------------------
 Collectable::Collectable(Kart* kart_) {
@@ -66,7 +67,7 @@ void Collectable::use() {
                            break ;
 #endif
     case COLLECT_ZIPPER:   owner->handleZipper();
-			   break ;
+			               break ;
     case COLLECT_HOMING_MISSILE:
     case COLLECT_SPARK:
     case COLLECT_MISSILE:
@@ -74,6 +75,42 @@ void Collectable::use() {
 				               sound->playSfx(SOUND_SHOT);
                            projectile_manager->newProjectile(owner, type);
                            break ;
+
+    case COLLECT_ANVIL:
+                           //Attach an anvil(twice as good as the one given
+                           //by the bananas) to the kart in the 1st position.
+                           for(int i = 0 ; i < world->getNumKarts(); ++i)
+                           {
+                               if(world->getKart(i) == owner) continue;
+                               if(world->getKart(i)->getPosition() == 1)
+                               {
+                                   world->getKart(i)->
+                                       attach(ATTACH_ANVIL, 4.0f);
+                                   world->getKart(i)->getVelocity()->xyz[1] *=
+                                       physicsParameters->anvilSpeedFactor *
+                                       0.5f;
+                                   break;
+                               }
+
+                           }
+
+                           break;
+
+    case COLLECT_PARACHUTE:
+                           //Attach a parachute to all the karts that are
+                           //in front of this one.
+                           for(int i = 0 ; i < world->getNumKarts(); ++i)
+                           {
+                               if(world->getKart(i) == owner) continue;
+                               if(owner->getPosition() > world->getKart(i)->
+                                  getPosition())
+                               {
+                                   world->getKart(i)->attach(ATTACH_PARACHUTE,
+                                       8.0f);
+                               }
+
+                           }
+                           break;
 
     case COLLECT_NOTHING:
     default :              break ;
