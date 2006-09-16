@@ -73,10 +73,11 @@ void Collectable::use() {
     case COLLECT_MISSILE:
 			               if(owner->isPlayerKart())
 				               sound->playSfx(SOUND_SHOT);
+
                            projectile_manager->newProjectile(owner, type);
                            break ;
 
-/*    case COLLECT_ANVIL:
+    case COLLECT_ANVIL:
                            //Attach an anvil(twice as good as the one given
                            //by the bananas) to the kart in the 1st position.
                            for(int i = 0 ; i < world->getNumKarts(); ++i)
@@ -86,32 +87,44 @@ void Collectable::use() {
                                {
                                    world->getKart(i)->
                                        attach(ATTACH_ANVIL, 4.0f);
+
                                    world->getKart(i)->getVelocity()->xyz[1] *=
                                        physicsParameters->anvilSpeedFactor *
                                        0.5f;
+
+				                   if(world->getKart(i)->isPlayerKart())
+                                      sound->playSfx(SOUND_USE_ANVIL);
                                    break;
                                }
-
                            }
 
-                           break;*/
+                           break;
 
-/*    case COLLECT_PARACHUTE:
-                           //Attach a parachunot supportte(that last as twice as the
-                           //one from the bananas) to all the karts that are
-                           //in front of this one.
-                           for(int i = 0 ; i < world->getNumKarts(); ++i)
+    case COLLECT_PARACHUTE:
                            {
-                               if(world->getKart(i) == owner) continue;
-                               if(owner->getPosition() > world->getKart(i)->
-                                  getPosition())
+                               bool player_affected = false;
+                               //Attach a parachutte(that last as twice as the
+                               //one from the bananas) to all the karts that
+                               //are in front of this one.
+                               for(int i = 0 ; i < world->getNumKarts(); ++i)
                                {
-                                   world->getKart(i)->attach(ATTACH_PARACHUTE,
-                                       8.0f);
+                                   if(world->getKart(i) == owner) continue;
+                                   if(owner->getPosition() > world->
+                                      getKart(i)->getPosition())
+                                   {
+                                       world->getKart(i)->attach(
+                                           ATTACH_PARACHUTE, 8.0f);
+
+                                       if(world->getKart(i)->isPlayerKart())
+                                           player_affected = true;
+                                   }
+
                                }
 
+                               if(player_affected)
+                                   sound->playSfx(SOUND_USE_PARACHUTE);
                            }
-                           break;*/
+                           break;
 
     case COLLECT_NOTHING:
     default :              break ;
@@ -124,16 +137,47 @@ void Collectable::use() {
 
 // -----------------------------------------------------------------------------
 void Collectable::hitRedHerring(int n) {
-  //rand() is moduled by COLLECT_MAX - 1 because it's the number of
-  //collectables, but since it might give a result of 0(and that position isn't
-  //a valid collectable) we have to add 1.
-  collectableType newC=(collectableType)(rand()%(COLLECT_MAX - 1) + 1);
+  //The probabilities of getting the anvil or the parachute increase
+  //depending on how bad the owner's position is. For the first
+  //driver the posibility is none, for the last player is 15 %.
+
+  if(owner->getPosition() != 1 && type == COLLECT_NOTHING)
+  {
+      int special_prob = (int)(15.0 / ((float)world->getNumKarts() /
+                             (float)owner->getPosition()));
+      int rand_num = rand()%100;
+      if(rand_num <= special_prob)
+      {
+          //If the driver in the first position has finished, give the driver
+          //the parachute.
+          for(int i; i < world->getNumKarts(); ++i)
+          {
+              if(world->getKart(i) == owner) continue;
+              if(world->getKart(i)->getPosition() == 1 && world->getKart(i)->
+                  raceIsFinished())
+              {
+                  type = COLLECT_PARACHUTE;
+                  number = 1;
+                  return;
+              }
+          }
+
+          type = rand()%(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
+          number = 1;
+          return;
+      }
+  }
+
+  //rand() is moduled by COLLECT_MAX - 1 - 2 because because we have to
+  //exclude the anvil and the parachute, but later we have to add 1 to prevent
+  //having a value of 0 since that isn't a valid collectable.
+  collectableType newC=(collectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
   if(type==COLLECT_NOTHING) {
     type=newC;
-    number=n;
+    number = n;
   } else if(newC==type) {
-    number+=n;
-    if(number > MAX_COLLECTABLES) number = MAX_COLLECTABLES;
+      number+=n;
+      if(number > MAX_COLLECTABLES) number = MAX_COLLECTABLES;
   }
   // Ignore new collectable if it is different from the current one
 }   // hitRedHerring

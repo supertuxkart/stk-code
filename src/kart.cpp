@@ -315,7 +315,7 @@ void Kart::update (float dt) {
   if ( rescue ) {
     if(attachment.getType() != ATTACH_TINYTUX)
     {
-        sound -> playSfx ( SOUND_BZZT ) ;
+        if(isPlayerKart()) sound -> playSfx ( SOUND_BZZT );
         attachment.set( ATTACH_TINYTUX, 2.0f ) ;
     }
   }
