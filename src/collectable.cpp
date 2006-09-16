@@ -22,7 +22,7 @@
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "sound.hpp"
-#include "world.cpp"
+#include "world.hpp"
 
 // -----------------------------------------------------------------------------
 Collectable::Collectable(Kart* kart_) {
@@ -76,7 +76,7 @@ void Collectable::use() {
                            projectile_manager->newProjectile(owner, type);
                            break ;
 
-    case COLLECT_ANVIL:
+/*    case COLLECT_ANVIL:
                            //Attach an anvil(twice as good as the one given
                            //by the bananas) to the kart in the 1st position.
                            for(int i = 0 ; i < world->getNumKarts(); ++i)
@@ -94,10 +94,11 @@ void Collectable::use() {
 
                            }
 
-                           break;
+                           break;*/
 
-    case COLLECT_PARACHUTE:
-                           //Attach a parachute to all the karts that are
+/*    case COLLECT_PARACHUTE:
+                           //Attach a parachunot supportte(that last as twice as the
+                           //one from the bananas) to all the karts that are
                            //in front of this one.
                            for(int i = 0 ; i < world->getNumKarts(); ++i)
                            {
@@ -110,7 +111,7 @@ void Collectable::use() {
                                }
 
                            }
-                           break;
+                           break;*/
 
     case COLLECT_NOTHING:
     default :              break ;
