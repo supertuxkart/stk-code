@@ -181,6 +181,16 @@ Good Things:
     * Portable Zippers - these are just like the zippers on the track
       itself - they give you a sudden accelleration and temporarily
       increase the top speed of your kart.
+    * Portable parachutes - this pops out the back of all the karts in
+      a better position than you and slows them down a for some seconds.
+      The worse your position is, the higher the probabilities of getting
+      this you have(but they are still small). You can only have one at
+      a time.
+    * Portable anvil - the driver in the first position gets dragged
+      by a heavy anvil, allowing other drivers to catch up with him...
+      like the portable parachutes, the worse your position is, the higher
+      probabilites of getting this you have. However, you can't get this
+      if the driver in the first position already finished the race.
 
 Bad Things:
 
