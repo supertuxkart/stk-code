@@ -4,7 +4,7 @@
  (name "missile")
  (model "missile.ac")
  (icon  "missile.rgb")
- (speed 55.5)
+ (speed 50.0)
 )
 
 ;; EOF ;;

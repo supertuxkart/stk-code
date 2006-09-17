@@ -47,7 +47,7 @@
 // Zipper related constants:
 // =========================
 #define ZIPPER_ANGLE          45.0    
-#define ZIPPER_TIME           1.5f   /* Seconds */
+#define ZIPPER_TIME           1.0f   /* Seconds */
 #define ZIPPER_VELOCITY      (100.0f * KILOMETERS_PER_HOUR )
 
 // Traffic (not used at this time)
@@ -59,7 +59,7 @@
 // Projectile related constants
 // ============================
 #define HOMING_MISSILE_TURN_RATE  (MAX_TURN_RATE*6.0f)
-#define HOMING_MISSILE_PITCH_RATE (MAX_TURN_RATE/2.0f)
+#define HOMING_MISSILE_PITCH_RATE (MAX_TURN_RATE*0.125f)
 
 #define MAX_HOME_DIST  50.0f
 #define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)

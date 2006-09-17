@@ -112,8 +112,8 @@ void Projectile::doObjectInteractions () {
       else if ( hpr[0] < -3.0f ) velocity.hpr[0] = -HOMING_MISSILE_TURN_RATE ;
       else                       velocity.hpr[0] =  0.0f ;
 
-      if      ( hpr[1] > 1.0f  ) velocity.hpr[1] =  HOMING_MISSILE_PITCH_RATE ;
-      else if ( hpr[1] < -1.0f ) velocity.hpr[1] = -HOMING_MISSILE_PITCH_RATE ;
+      if      ( hpr[2] > 1.0f  ) velocity.hpr[1] = -HOMING_MISSILE_PITCH_RATE ;
+      else if ( hpr[2] < -1.0f ) velocity.hpr[1] = HOMING_MISSILE_PITCH_RATE ;
       else                       velocity.hpr[1] = 0.0f ;
     }
   } else  // type!=HOMING||nearest==-1||ndist>MAX_HOME_DIST_SQD

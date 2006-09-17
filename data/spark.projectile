@@ -4,7 +4,7 @@
  (name  "spark")
  (model "spark.ac")
  (icon  "spark.rgb")
- (speed 11.1)
+ (speed 5.0)
 )
 
 ;; EOF ;;

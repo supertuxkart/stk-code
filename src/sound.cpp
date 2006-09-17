@@ -42,7 +42,8 @@ void SoundSystem::play_track ( const char *fname )
         strcpy ( current_track, PATH.c_str() ) ;
 
         sched -> stopMusic () ;
-        sched -> loopMusic ( current_track ) ;
+        if ( current_track [ 0 ] != '\0' )
+            sched -> loopMusic ( current_track ) ;
       }
   }
 }
@@ -90,7 +91,7 @@ SoundSystem::SoundSystem ()
       sfx[i].s  = new slSample ( path.c_str(), sched ) ;
   }
 
-  play_track ( "" ) ;
+//  play_track ( "" ) ;
 }
 
 

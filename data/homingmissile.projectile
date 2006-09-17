@@ -4,7 +4,7 @@
  (name  "homing")
  (model "homingmissile.ac")
  (icon  "homingmissile.rgb")
- (speed 29)
+ (speed 25.0)
 )
 
 ;; EOF ;;
