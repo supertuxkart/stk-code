@@ -171,7 +171,15 @@ void Collectable::hitRedHerring(int n) {
   //rand() is moduled by COLLECT_MAX - 1 - 2 because because we have to
   //exclude the anvil and the parachute, but later we have to add 1 to prevent
   //having a value of 0 since that isn't a valid collectable.
-  collectableType newC=(collectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
+  collectableType newC;
+  if(!config->profile) {
+    newC = (collectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
+  } else {
+    // No random effects when profiling!
+    static int simpleCounter=-1;
+    simpleCounter++;
+    newC = (collectableType)(simpleCounter%(COLLECT_MAX - 1 - 2) + 1);
+  }
   if(type==COLLECT_NOTHING) {
     type=newC;
     number = n;

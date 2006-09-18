@@ -28,6 +28,7 @@
 #include "track.hpp"
 #include "plibdrv.hpp"
 #include "gui/menu_manager.hpp"
+#include "history.hpp"
 
 WorldScreen* WorldScreen::current_ = 0;
 
@@ -79,8 +80,13 @@ void WorldScreen::update() {
   if(config->profile) {
     frameCount++;
     if (world->clock>config->profile) {
-      printf("Number of frames: %d Average FPS: %f\n",
-	     frameCount, (float)frameCount/world->clock);
+      // The actual timing for FPS has to be done with an external clock,
+      // since world->clock might be modified by replaying a history file.
+      frameClock.update();
+      printf("Number of frames: %d time %f, Average FPS: %f\n",
+	     frameCount, frameClock.getAbsTime(), 
+	     (float)frameCount/frameClock.getAbsTime());
+      if(!config->replayHistory) history->Save();
       exit(-2);
     }
   }   // if profile

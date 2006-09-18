@@ -21,7 +21,7 @@
 #define HEADER_CONSTANTS_H
 
 
-#define MAX_HISTORY           1000   /* number of history events */
+#define MAX_HISTORY            50000   /* number of history events */
 #define TIME_DELAY_TILL_FINISH  10.0f  /* time after all player karts finish */
 /*
   All final units are in meters (or meters/sec or meters/sec^2)

@@ -209,7 +209,11 @@ int handleCmdLine(int argc, char **argv) {
       return 0;
     }
   }   // for i <argc
-  if(config->profile) printf("Profiling: %d seconds.\n",config->profile);
+  if(config->profile) {
+    printf("Profiling: %d seconds.\n",config->profile);
+    config->sfx   = false;  // Disable sound effects and music when profiling
+    config->music = false;
+  }
   
   return 1;
 }   /* handleCmdLine */

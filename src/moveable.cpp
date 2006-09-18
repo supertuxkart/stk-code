@@ -74,14 +74,14 @@ void Moveable::update (float dt) {
     if(config->replayHistory) {
       sgCoord tmp;
       sgCopyCoord(&tmp, &(historyVelocity[history->GetCurrentIndex()]));
-      printf("velocity=%f,%f,%f,%f,%f,%f\n",
-	     velocity.xyz[0],velocity.xyz[1],velocity.xyz[2],
-	     velocity.hpr[0],velocity.hpr[1],velocity.hpr[2]);
-      printf("tmp     =%f,%f,%f,%f,%f,%f\n",
-	     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
-	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
+      //printf("velocity=%f,%f,%f,%f,%f,%f\n",
+      //     velocity.xyz[0],velocity.xyz[1],velocity.xyz[2],
+      //     velocity.hpr[0],velocity.hpr[1],velocity.hpr[2]);
+      //printf("tmp     =%f,%f,%f,%f,%f,%f\n",
+      //     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
+      //     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
 
-#define IGNORE_Z_IN_HISTORY
+#undef IGNORE_Z_IN_HISTORY
 #ifdef IGNORE_Z_IN_HISTORY
       float dummy=velocity.xyz[2];
       sgCopyCoord(&velocity, &tmp);
@@ -113,13 +113,13 @@ void Moveable::update (float dt) {
     if(config->replayHistory) {
       sgCoord tmp;
       sgCopyCoord(&tmp, &(historyPosition[history->GetCurrentIndex()]));
-      printf("curr_pos=%f,%f,%f,%f,%f,%f\n",
-	     curr_pos.xyz[0],curr_pos.xyz[1],curr_pos.xyz[2],
-	     curr_pos.hpr[0],curr_pos.hpr[1],curr_pos.hpr[2]);
-      printf("tmp     =%f,%f,%f,%f,%f,%f --> %d\n",
-	     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
-	     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2],
-	     history->GetCurrentIndex());
+      //printf("curr_pos=%f,%f,%f,%f,%f,%f\n",
+      //     curr_pos.xyz[0],curr_pos.xyz[1],curr_pos.xyz[2],
+      //     curr_pos.hpr[0],curr_pos.hpr[1],curr_pos.hpr[2]);
+      //printf("tmp     =%f,%f,%f,%f,%f,%f --> %d\n",
+      //     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
+      //     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2],
+      //     history->GetCurrentIndex());
 
 #ifdef IGNORE_Z_IN_HISTORY
       float dummy=curr_pos.xyz[2];
