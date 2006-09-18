@@ -213,6 +213,7 @@ public:
 #endif
 
 void print_model(ssgEntity* entity, int indent, int maxLevel);
+void optimise_model(ssgEntity* entity);
 
 #endif
 

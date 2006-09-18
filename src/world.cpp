@@ -73,7 +73,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   scene       = new ssgRoot   ;
   trackBranch = new ssgBranch ;
   scene -> addKid ( trackBranch ) ;
-
+  
   assert(raceSetup.karts.size() > 0);
 
   // Clear all hooks, which might still be stored there from a previous race.
@@ -496,6 +496,7 @@ void World::loadTrack() {
       }   // if need_hat
 
       ssgEntity        *obj   = ssgLoad ( fname, loader ) ;
+      optimise_model(obj);
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;
 

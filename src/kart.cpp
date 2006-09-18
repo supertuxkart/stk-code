@@ -909,6 +909,7 @@ void Kart::load_data() {
   // else needed to load the wheels as a separate object.
   ssgFlatten(obj);
 
+  optimise_model(obj);
   ssgRangeSelector *lod = new ssgRangeSelector ;
 
   lod -> addKid ( obj ) ;
@@ -1029,6 +1030,25 @@ static ssgTransform* add_transform(ssgBranch* branch) {
 }   // add_transform
 
 // =============================================================================
+// Make VtTables use display lists.
+void optimise_model(ssgEntity* entity) {
+  if (!entity) return;
+  
+  ssgVtxTable* table = dynamic_cast<ssgVtxTable*>(entity);
+  if(table) {
+    if(table->getNumTriangles()>1) table->makeDList();
+  }
+  ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
+      
+  if (branch) {
+    for(ssgEntity* i = branch->getKid(0); i != NULL; 
+	           i = branch->getNextKid()) {
+      optimise_model(i);
+    }   // for
+  }   // if branch
+}  // optimise_model
+
+// =============================================================================
 void print_model(ssgEntity* entity, int indent, int maxLevel) {
   if(maxLevel <0) return;
   if (entity) {
@@ -1036,11 +1056,11 @@ void print_model(ssgEntity* entity, int indent, int maxLevel) {
       std::cout << "  ";
       
     std::cout << entity->getTypeName() << " " << entity->getType() << " '" 
-              << entity->getPrintableName() 
-              << "' '" 
-              << (entity->getName() ? entity->getName() : "null")
-              << "' " << entity << std::endl;
-    
+	       << entity->getPrintableName() 
+	       << "' '" 
+	       << (entity->getName() ? entity->getName() : "null")
+	       << "' " << entity << std::endl;
+
     ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
       
     if (branch) {
