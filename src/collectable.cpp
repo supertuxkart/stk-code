@@ -150,7 +150,7 @@ void Collectable::hitRedHerring(int n) {
       {
           //If the driver in the first position has finished, give the driver
           //the parachute.
-          for(int i; i < world->getNumKarts(); ++i)
+          for(int i=0; i < world->getNumKarts(); ++i)
           {
               if(world->getKart(i) == owner) continue;
               if(world->getKart(i)->getPosition() == 1 && world->getKart(i)->
