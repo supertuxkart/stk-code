@@ -20,19 +20,15 @@
 
 #include <stdexcept>
 #include <sstream>
-#if !defined(WIN32) || defined(__CYGWIN__)
-#  include <sys/stat.h>
-#  include <sys/types.h>
-#  include <dirent.h>
-#endif
+#include <sys/stat.h>
 #ifdef WIN32
 #  include <io.h>
-#  include <sys/types.h>
-#  include <sys/stat.h>
 #  include <stdio.h>
-#  include <dirent.h>
-#  define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#  ifndef __CYGWIN__
+#    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#  endif
 #endif
+#include "plib/ul.h"
 #include "loader.hpp"
 
 Loader* loader = 0;
@@ -168,15 +164,15 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
     if(! S_ISDIR(mystat.st_mode))
       continue;
     
-    DIR* mydir = opendir(path.c_str());
-    if(!mydir)
-      continue;
 
-    struct dirent* mydirent;
-    while( (mydirent = readdir(mydir)) != 0) {
+    ulDir* mydir = ulOpenDir(path.c_str());
+    if(!mydir) continue;
+
+    ulDirEnt* mydirent;
+    while( (mydirent = ulReadDir(mydir)) != 0) {
       result.insert(mydirent->d_name);
     }
-    closedir(mydir);
+    ulCloseDir(mydir);
   }
 }
 
