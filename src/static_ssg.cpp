@@ -30,6 +30,7 @@ StaticSSG::StaticSSG(ssgEntity* start_, int nSize) {
   start  = start_;
   xMin   = yMin =  1E10;
   xMax   = yMax = -1E10;
+  testNumber = 0;
   Setup(nSize);
 }   // StaticSSG
 

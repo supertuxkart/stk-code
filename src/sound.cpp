@@ -57,8 +57,8 @@ void SoundSystem::playSfx ( int sfx_num )
 
 SoundSystem::SoundSystem ()
 {
-  sched = new slScheduler ;
-
+  sched            = new slScheduler ;
+  current_track[0] = 0;
   sfx[SOUND_UGH           ].fname = "wavs/ugh.wav";
   sfx[SOUND_WINNER        ].fname = "wavs/radio/grandprix_winner.wav";
   sfx[SOUND_CRASH         ].fname = "wavs/tintagel/crash.wav";

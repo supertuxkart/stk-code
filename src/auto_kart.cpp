@@ -51,6 +51,7 @@ AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
     next_straight_hint = -1;
     on_curve = false;
     handle_curve = false;
+    start_kart_crash_direction = 0;
 
     crash_perc = 0.0;
 }
