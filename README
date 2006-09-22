@@ -1,12 +1,12 @@
 SuperTuxKart
 ============
 
-SuperTuxKart is based on Tuxkart (http://tuxkart.sourceforge.net)
+SuperTuxKart is based on TuxKart (http://tuxkart.sourceforge.net)
 by Steve Baker. It was picked up by the Linux Game of the Month
 project and got a big overhaul during this time, but was left in
 an unfinished state. 
 A new set of maintainers, namely hiker & coz, took over in 2006, 
-and we are glad to annouce our first release here. You can find
+and we are glad to announce our first release here. You can find
 more details on:
 
   http://supertuxkart.berlios.de
@@ -16,7 +16,7 @@ SuperTuxKart needs hardware OpenGL support, and has currently only one
 software dependency: plib, see http://plib.sourceforge.net
 
 A big "thank you" to Steve Baker for designing and implementing
-the original tuxkart, to the GotM team for their invaluable work.
+the original TuxKart, to the GotM team for their invaluable work.
 See the AUTHORS file for individual credits.
 
 To contact the current maintainers, please send an email to the
@@ -25,7 +25,7 @@ SuperTuxKart development list at:
 supertuxkart-devel@list.berlios.de
 
 
-Hope you enjoy te game
+Hope you enjoy the game
    Hiker & Coz
 
 
@@ -65,7 +65,7 @@ you negatively: an anvil or parachute will slow you down for a
 while.
 If you are running rather fast, you can pop a wheelie, which gives
 you an additional speed boost, but you can't steer your kart 
-while doing a wheelie, so be carefuel.
+while doing a wheelie, so be careful.
 Hitting another kart does not do any damage to your kart or the
 other kart, one of the karts will just be forced to a stand still,
 loosing precious seconds.
@@ -82,16 +82,16 @@ Three different game modes are available:
 
 Split screen multi-player is supported, though you need a somewhat
 powerful computer and graphics card to get a high frame rate in this
-case. Network multiplayer is not yet supported.
+case. Network multi-player is not yet supported.
 
 
 CONTROLLING YOUR KART
 ---------------------
-Ideally, you need a 'gamepad' style joystick with at least six buttons:
+Ideally, you need a 'game-pad' style joystick with at least six buttons:
 
   Joystick Left/Right:  Steer.
 
-  A button - Accellerate.
+  A button - Accelerate.
   B button - Brake.
   C button - Use an item you've collected
   D button - Ask to be rescued by tinytux.
@@ -102,7 +102,7 @@ In addition, you can drive from the keyboard:
 
   LEFT/RIGHT ARROW: Steer.
 
-  UP-ARROW   - Same as 'A' button - Accellerate
+  UP-ARROW   - Same as 'A' button - Accelerate
   DOWN-ARROW - Same as 'B' button - Brake
 
   A key - Same as 'L' button - pop a Wheelie
@@ -129,8 +129,8 @@ There are also some debug functions left for developers:
 
   F10 key - Save the last 1000 frames into a file ./history.dat
             This can be used by the developers to reproduce
-            problems occuring during a race.
-  F11 key - Toggle wireframe view.
+            problems occurring during a race.
+  F11 key - Toggle wire-frame view.
   F12 key - Toggle frame-per-second display.
 
 The menu structure should be mostly self explanatory. Be aware that
@@ -138,7 +138,7 @@ pressing the escape key will return to the previous menu. Pressing
 escape during a race will pause the game
 
 
-POWERUPS:
+POWER UPS:
 ---------
 There are currently many 'good things' (triggered by driving over a blue
 cube) and a few 'bad things' (triggered by hitting a banana).
@@ -151,17 +151,17 @@ Bad things happen immediately - and last for a few seconds before 'going
 away' by themselves.
 
 Notice that (unlike some kart games), the computer controlled players
-also collect and use powerups.
+also collect and use power-ups.
 
 Silver and Gold coins gradually fill up the energy level - as you collect
 more coins, you'll find that a blue box will subsequently give you two, 
-three, four or five powerups at one time!
+three, four or five power-ups at one time!
 
 Good Things:
 
     * Missiles - unguided but fast. If they hit anything (including the
       track), they explode impressively. The effect on a Kart is to stop 
-      it dead - so you have to accellerate again.
+      it dead - so you have to accelerate again.
     * Homing missiles - slower than the regular kind - but they track
       the nearest kart and are quite hard to shake off.
     * Fuzzy blobs - even slower still - a kart can outrun them quite
@@ -176,7 +176,7 @@ Good Things:
       them again, allowing you to escape from the magnetic grip of
       another kart.
     * Portable Zippers - these are just like the zippers on the track
-      itself - they give you a sudden accelleration and temporarily
+      itself - they give you a sudden acceleration and temporarily
       increase the top speed of your kart.
     * Portable parachutes - this pops out the back of all the karts in
       a better position than you and slows them down a for some seconds.
@@ -186,7 +186,7 @@ Good Things:
     * Portable anvil - the driver in the first position gets dragged
       by a heavy anvil, allowing other drivers to catch up with him...
       like the portable parachutes, the worse your position is, the higher
-      probabilites of getting this you have. However, you can't get this
+      probabilities of getting this you have. However, you can't get this
       if the driver in the first position already finished the race.
 
 Bad Things:
@@ -234,11 +234,11 @@ mailing list at
 
 The archives of this mailing list can be found at:
 
-  http://<FIXME>
+  http://lists.berlios.de/pipermail/supertuxkart-devel/
 
 Or post a bug report on the SuperTuxKart webpage
 
-  <FIXME link here>
+  http://developer.berlios.de/bugs/?group_id=2765
 
 A wiki will be installed in the near future, too.
 
