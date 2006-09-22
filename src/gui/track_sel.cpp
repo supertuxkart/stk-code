@@ -81,15 +81,24 @@ void TrackSel::update(float dt) {
   const std::string& screenshot = track->getScreenshotFile();
   const std::string& topview    = track->getTopviewFile();
   if(screenshot.size()==0 && topview.size()==0) {
-    glColor3f ( 1, 1, 1 ) ;
-    track->drawScaled2D(0.0, 50, config->width, config->height/3);  // (x, y, w, h)
+    glDisable ( GL_TEXTURE_2D ) ;
+    glColor3f ( 0.0f, 0.0f, 0.0f ) ;
+    track->drawScaled2D(0.0, 50, config->width, config->height/3); // (x, y, w, h)
+    glColor3f ( 1.0f, 1.0f, 1.0f ) ;
+    track->drawScaled2D(1.0, 51, config->width, config->height/3);
+    glEnable ( GL_TEXTURE_2D ) ;
   } else {                   // either topview or screenshot specified
     int xLeft   = config->width/2;
     int yBottom = 50;
     int w       = config->width/3;
     int h       = config->height/3;
     if(topview.size()==0) {  // no topview, but there is a screenshot!
+      glDisable ( GL_TEXTURE_2D ) ;
+      glColor3f ( 0.0f, 0.0f, 0.0f ) ;
       track->drawScaled2D(xLeft, yBottom, w, h);
+      glColor3f ( 1.0f, 1.0f, 1.0f ) ;
+      track->drawScaled2D(xLeft + 1, yBottom + 1, w, h);
+      glEnable ( GL_TEXTURE_2D ) ;
     } else {                 // topview is defined
       Material *m=material_manager->getMaterial(topview);
       m->apply();
