@@ -1,33 +1,43 @@
-SuperTuxKart 0.2rc2 (16. Sep 2006)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  * Two new collectables
-  * Fixes 'karts fall through track' bug
-  * Track screenshots in the track select screen
+This is the first official release of SuperTuxKart.
+To see what was changed compared to the original TuxKart, you
+have to include all SuperTuxKart items 0.2, 0.1, 0.0.0, which
+were never released!
 
-SuperTuxKart 0.2rc1 (06. Sep 2006)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SuperTuxKart 0.2 (22. Sep 2006)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Significant performance improvement by using display lists
   * Improved AI
-  * Support for different grand prix
-  * Too many bugfixes to list them all
-  * Improved physics (still work in progress)
+  * Support for different grand prixs
+  * Too many bug fixes to list them all, but the important ones:
+    * Work around for 'karts fall through track' compiler bug
+    * Fixed rescue mode
+  * Two new collectables: parachute and anvil
+  * Track screen shots in the track select screen
   * Keyboard handling allows gradual turning
+  * Improved physics (still work in progress)
+    * All hard-coded properties like maximum velocity have
+      been replaced by dynamically computed data dependent
+      on kart parameters, allowing for karts having different
+      characteristics.
+  * Added help and about screens, added credits to track designer
+  * Items were added to all tracks
 
-SuperTuxKart 0.1 (04. May 2006)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SuperTuxKart 0.1 (04. May 2006)  (not officially released)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * Significant speedup by using a new HOT and collision algorithm
     --> all tracks are now playable
   * Removed all SDL dependencies, only plib is needed
   * Single and multi-window menu can be used
   * Code structure changes
-  * Some bugfixes and small improvements
+  * Some bug fixes and small improvements
   * Added profile option to support automatic profiling
 
-SuperTuxKart 0.0.0 (22. Dec 2004)
+SuperTuxKart 0.0.0 (22. Dec 2004) (not officially released)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * new tracks
   * new characters and karts
   * new user-interface
-  * some additional effects (skidmarks, smoke)
+  * some additional effects (skid-marks, smoke)
 
 TuxKart v0.4.0 (March 19th 2004)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

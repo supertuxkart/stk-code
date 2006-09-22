@@ -15,15 +15,14 @@ no particular order):
    - See todo list below - it's rather long at the moment :)
 
 4) Web master
-   - Add wiki
-   - Keep web page up to date
+   - Extend the current web page, keep it up to date
 
 5) Tester
    - For just about everything
    - Esp. different platforms
 
 6) Package creators
-   - Create packages For 
+   - Create packages for 
      - most common linux Distributors
      - Windows
      - MaxOS (?? currently not sure if STK works on Macs)
@@ -57,35 +56,19 @@ This contains either hard, or not reproducible errors.
   pressing the up key is ignored. See bug 6168
   Might be difficult to fix, since it occurs (it appears) in the interface
   between X and plib.
-- Fix 'fall through track' bug #8384
-  This appears to be a very special bug, which only happens on a certain
-  configuration (Suse 10.1, dual core 32-bit Intel, ATI graphics card),
-  and the error does NOT happen when using the same source code with
-  wine under windows, or on a AMD 64 bit machine. 
-  It might  be a compiler bug! [hiker]
 
 Things that would be nice to fix, but are not urgent
 =====================================================
-- Write some documentation (a scrolling widget will help 
-  displaying the additional information). Things to include:
+- Write some documentation. Things to include:
   - taking shortcuts might result in not finishing a lap
-  - lap display for other karts is red if kart is on last 
-    track, green if finished.
-- Add screenshot and 'topview' picture for each track, which can
-  be displayed during track selection.
+  - lap display colour for all karts changes colour whenever
+    a lap is finished
 - Display skid marks again (currently disabled due to problems of 
   skid marks being 'in the air').
 - Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
 - Enable real fullscreen support
-- Performance tuning
-   - It's not too bad at the moment, but might be worth
-     having a look again. [hiker]
-- Re-activate wiki or create new one
-   - Esp. include information on how to create/edit
-     tracks.
 - Top 10 lists for time trial, and grand prix.
-- Support more colours to indicate which lap a kart
-  is on. Display the time difference to either the
+- Display the time difference to either the
   kart in front of the kart, or to the first kart.
 - Add track sections which must be passed in order to finish
   a lap. This would avoid karts taking shortcuts.
@@ -118,7 +101,7 @@ long term
 - More flexibility for items. E.g. 
   - Tracks might hard code some items, change the distribution of some
     others (e.g. only a rocket at a certain location, but random choice
-    which one the kart gets. Instead of jsut specifying 
+    which one the kart gets. Instead of just specifying 
     GREENHERRING, one could write: ZIPPER:ANVIL and one of the listed
     things would be picked randomly)
   - Grand prixs might want to overwrite this, e.g.:

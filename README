@@ -5,7 +5,7 @@ SuperTuxKart is based on Tuxkart (http://tuxkart.sourceforge.net)
 by Steve Baker. It was picked up by the Linux Game of the Month
 project and got a big overhaul during this time, but was left in
 an unfinished state. 
-A new set of maintainers, namely hiker & coz took over in 2006, 
+A new set of maintainers, namely hiker & coz, took over in 2006, 
 and we are glad to annouce our first release here. You can find
 more details on:
 
@@ -38,9 +38,6 @@ Hardware:
     * You should have a CPU that's running at 266MHz or better.
     * A sound card would be nice - but it's not essential.
     * You'll need at least 32Mb RAM. 
-
-SuperTuxKart is not yet optimised for slower CPU's so performance will 
-be 'chunky' on machines under about 450MHz.
 
 Software:
 Right now, SuperTuxKart runs under Linux and under Windoze using the 
