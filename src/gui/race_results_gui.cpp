@@ -71,7 +71,7 @@ RaceResultsGUI::RaceResultsGUI()
 			 GUI_MED, GUI_LFT, 0, 0);
     }
 
-    delete order;
+    delete[] order;
     widgetSet -> space(menu_id);
 
     int va = widgetSet -> varray(menu_id);
@@ -83,7 +83,7 @@ RaceResultsGUI::RaceResultsGUI()
 RaceResultsGUI::~RaceResultsGUI()
 {
     widgetSet -> delete_widget(menu_id) ;
-    delete score;
+    delete[] score;
 }
 
 void RaceResultsGUI::select()
