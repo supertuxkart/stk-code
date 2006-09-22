@@ -37,7 +37,9 @@ See the --help output of configure for further options.
 But it didn't work!
 -------------------
 
-Well, the most common (by FAR) reason for problems is that your OpenGL/Mesa
+Right now there is no proper windows compilation. You can still compile for windows using cygwin, see README.cygwin for details.
+
+Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
 is incorrectly installed - so before you complain to any of the PLIB or
 Supertuxkart mailing lists, first try running one of the example programs
 that comes with your OpenGL implementation - or one of the Mesa or GLUT
@@ -47,6 +49,6 @@ If you those examples run OK - then go to the PLIB home page and download
 the PLIB examples.
 
 If THOSE run correctly - but Supertuxkart doesn't then please get in touch 
-with the SupertuxKkrt mailing list and we'll do our best to get you up and 
+with the SupertuxKart mailing list and we'll do our best to get you up and 
 racing.
 

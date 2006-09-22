@@ -1,7 +1,7 @@
 This is the first official release of SuperTuxKart.
 To see what was changed compared to the original TuxKart, you
-have to include all SuperTuxKart items 0.2, 0.1, 0.0.0, which
-were never released!
+have to include all SuperTuxKart items, including 0.1 which
+was never released!
 
 SuperTuxKart 0.2 (22. Sep 2006)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,7 +32,7 @@ SuperTuxKart 0.1 (04. May 2006)  (not officially released)
   * Some bug fixes and small improvements
   * Added profile option to support automatic profiling
 
-SuperTuxKart 0.0.0 (22. Dec 2004) (not officially released)
+SuperTuxKart 0.0.0 (22. Dec 2004)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   * new tracks
   * new characters and karts
