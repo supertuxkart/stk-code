@@ -96,7 +96,6 @@ Ideally, you need a 'game-pad' style joystick with at least six buttons:
   C button - Use an item you've collected
   D button - Ask to be rescued by tinytux.
   L button - Pop a wheelie (if you are going fast enough).
-  R button - Jump.
 
 In addition, you can drive from the keyboard:
 
@@ -106,7 +105,6 @@ In addition, you can drive from the keyboard:
   DOWN-ARROW - Same as 'B' button - Brake
 
   A key - Same as 'L' button - pop a Wheelie
-  S key - Same as 'R' button - Jump
   D key - Same as 'D' button - Rescue Me Please!
   F key - Same as 'C' button - Use an item.
 
