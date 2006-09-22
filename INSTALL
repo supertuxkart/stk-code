@@ -39,6 +39,8 @@ But it didn't work!
 
 Right now there is no proper windows compilation. You can still compile for windows using cygwin, see README.cygwin for details.
 
+If you checked out your copy directly from SVN, you have to run 'sh autogen.sh' to generate the configure script.
+
 Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
 is incorrectly installed - so before you complain to any of the PLIB or
 Supertuxkart mailing lists, first try running one of the example programs
