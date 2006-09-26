@@ -484,11 +484,11 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
   if(collectable->getType() == COLLECT_NOTHING) {
     glDisable(GL_TEXTURE_2D);
     glBegin ( GL_QUADS ) ;
-      glColor4f ( 0.0, 0.0, 0.0, 0.16 ) ;
-      glVertex2i ( x1             , y1    ) ;
-      glVertex2i ( x1+(int)(nSize), y1    ) ;
-      glVertex2i ( x1+(int)(nSize), y1+(int)(nSize) ) ;
-      glVertex2i ( x1             , y1+(int)(nSize) ) ;
+      glColor4f  ( 0.0f, 0.0f, 0.0f, 0.16f          );
+      glVertex2i ( x1             , y1              );
+      glVertex2i ( x1+(int)(nSize), y1              );
+      glVertex2i ( x1+(int)(nSize), y1+(int)(nSize) );
+      glVertex2i ( x1             , y1+(int)(nSize) );
     glEnd();
     return;
   }
@@ -634,13 +634,13 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
   glLoadIdentity () ;
 
   glPushAttrib   ( GL_ENABLE_BIT | GL_LIGHTING_BIT ) ;
-  glDisable      ( GL_DEPTH_TEST ) ;
-  glDisable      ( GL_LIGHTING   ) ;
-  glDisable      ( GL_FOG        ) ;
-  glDisable      ( GL_CULL_FACE  ) ;
-  glEnable       ( GL_ALPHA_TEST ) ;
-  glAlphaFunc    ( GL_GREATER, 0.1 ) ;
-  glEnable       ( GL_BLEND      ) ;
+  glDisable      ( GL_DEPTH_TEST   );
+  glDisable      ( GL_LIGHTING     );
+  glDisable      ( GL_FOG          );
+  glDisable      ( GL_CULL_FACE    );
+  glEnable       ( GL_ALPHA_TEST   );
+  glAlphaFunc    ( GL_GREATER, 0.1f);
+  glEnable       ( GL_BLEND        );
 
   glOrtho        ( 0, config->width, 0, config->height, 0, 100 ) ;
   switch (world->ready_set_go) {

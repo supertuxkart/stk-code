@@ -328,7 +328,7 @@ Track::loadDriveline()
   sgSetVec2 ( driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
 
 
-  distance_from_start.reserve(driveline_size);
+distance_from_start.reserve(driveline_size);
   float d = 0.0f ;
   for ( size_t i = 0 ; i < driveline_size ; ++i )
   {
@@ -341,7 +341,7 @@ Track::loadDriveline()
     if ( driveline[i][1] > driveline_max[1] )
       driveline_max[1] = driveline[i][1] ;
 
-    distance_from_start[i] = d;
+    distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
 
     if ( i == driveline_size - 1 )
       d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
@@ -364,12 +364,13 @@ Track::loadDriveline()
 void
 Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
 {
-  std::string path = "data/";
+  std::string path = "data";
+  path += DIR_SEPARATOR;
   path += ident;
   path += file_ext;
   path = loader->getPath(path.c_str());
 
-  FILE *fd = fopen ( path.c_str(), "ra" ) ;
+  FILE *fd = fopen ( path.c_str(), "r" ) ;
 
   if ( fd == NULL )
     {

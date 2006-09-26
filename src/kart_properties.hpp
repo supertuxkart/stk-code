@@ -73,8 +73,9 @@ class KartProperties : public NoCopy {
   
   virtual void  init_defaults    ();
   virtual void  getAllData       (const lisp::Lisp* lisp);
-  virtual void  load             (const char* filename, char* node="tuxkart-kart");
-
+  virtual void  load             (const std::string filename, 
+	                              const std::string node="tuxkart-kart");
+  
   Material*     getIconMaterial        () const { return icon_material;      }
   ssgEntity*    getModel               () const {return model;               }
   const char*   getName                () const {return name.c_str();        }

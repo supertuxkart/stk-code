@@ -40,14 +40,14 @@ Loader::Loader() {
     datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
   else
 #ifdef _MSC_VER
-    if ( _access ( "data/tuxtrack.track", 04 ) == 0 )
+    if ( _access ( "data\\tuxtrack.track", 04 ) == 0 )
 #else
     if ( access ( "data/tuxtrack.track", F_OK ) == 0 )
 #endif
       datadir = "." ;
     else
 #ifdef _MSC_VER
-      if ( _access ( "../data/tuxtrack.track", 04 ) == 0 )
+      if ( _access ( "..\\data\\tuxtrack.track", 04 ) == 0 )
 #else
       if ( access ( "../data/tuxtrack.track", F_OK ) == 0 )
 #endif
@@ -70,12 +70,13 @@ void Loader::make_path(char* path, const char* dir, const char* fname) const {
     
   for(std::vector<std::string>::const_iterator i = searchPath.begin();
       i != searchPath.end(); ++i) {
-    sprintf(path, "%s/%s/%s", i->c_str(), dir, fname);
-    // convert backslashes to slashes
+    sprintf(path, "%s%c%s%c%s", i->c_str(), DIR_SEPARATOR, dir, 
+		    DIR_SEPARATOR, fname);
+    // convert backslashes and slashes to the native form
     size_t len = strlen(path);
     for(size_t i = 0; i < len; ++i)
-      if(path[i] == '\\')
-        path[i] = '/';
+      if(path[i] == '\\' || path[i] == '/')
+        path[i] = DIR_SEPARATOR;
     
     if(stat(path, &mystat) < 0)
       continue;
@@ -124,12 +125,18 @@ void Loader::initConfigDir() {
 std::string Loader::getPath(const char* fname) const {
   struct stat mystat;
   std::string result;
-   
+
+  std::string native_fname=fname;
+  size_t len = strlen(fname);
+  for(size_t i = 0; i < len; ++i)
+      if(native_fname[i] == '\\' || native_fname[i] == '/')
+        native_fname[i] = DIR_SEPARATOR;
+
   for(std::vector<std::string>::const_iterator i = searchPath.begin();
       i != searchPath.end(); ++i) {
     result = *i;
-    result += '/';
-    result += fname;
+    result += DIR_SEPARATOR;
+    result += native_fname;
     
     if(stat(result.c_str(), &mystat) < 0)
       continue;
@@ -156,7 +163,7 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
   for(std::vector<std::string>::const_iterator i = searchPath.begin();
       i != searchPath.end(); ++i) {
     std::string path = *i;
-    path += '/';
+    path += DIR_SEPARATOR;
     path += dir;
     
     if(stat(path.c_str(), &mystat) < 0)

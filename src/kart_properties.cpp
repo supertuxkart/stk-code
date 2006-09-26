@@ -41,7 +41,7 @@ KartProperties::KartProperties() : icon_material(0), model(0) {
 }   // KartProperties
 
 // -----------------------------------------------------------------------------
-void KartProperties::load(const char* filename, char *node) {
+void KartProperties::load(const std::string filename, const std::string node) {
 
   init_defaults();
 

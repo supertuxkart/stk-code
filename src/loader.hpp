@@ -25,6 +25,12 @@
 #include <vector>
 #include <set>
 
+#ifdef _MSC_VER
+   const char DIR_SEPARATOR='\\';
+#else
+   const char DIR_SEPARATOR='/';
+#endif
+
 class Loader : public ssgLoaderOptions
 {
 public:

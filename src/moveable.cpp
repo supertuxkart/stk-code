@@ -266,14 +266,14 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end ) {
   */
 
   sphere.setRadius ( COLLISION_SPHERE_RADIUS ) ;
-  sphere.setCenter ( 0.0f, 0.0f, COLLISION_SPHERE_RADIUS + 0.3 ) ;
+  sphere.setCenter ( 0.0f, 0.0f, COLLISION_SPHERE_RADIUS + 0.3f) ;
 
   /* Do a bounding-sphere test for Player. */
   sgSetVec3 ( surface_avoidance_vector, 0.0f, 0.0f, 0.0f );
 
   // new collision  algorithm
   AllHits a;
-  sphere.setCenter ( end[0],end[1],end[2]+ COLLISION_SPHERE_RADIUS + 0.3 ) ;
+  sphere.setCenter ( end[0],end[1],end[2]+ COLLISION_SPHERE_RADIUS + 0.3f) ;
   num_hits = world->Collision(&sphere, &a);
   for(AllHits::iterator i=a.begin(); i!=a.end(); i++) {
     if ( (*i)->plane[2]>0.4 ) continue;

@@ -51,7 +51,7 @@ void MaterialManager::loadMaterial() {
 
   sprintf ( fname, "data/materials.dat" ) ;
   std::string path = loader->getPath(fname);
-  FILE *fd = fopen ( path.c_str(), "ra" ) ;
+  FILE *fd = fopen ( path.c_str(), "r" ) ;
 
   if ( fd == NULL )
   {

@@ -573,7 +573,7 @@ void Kart::updatePhysics (float dt) {
       curr_pos.hpr[0] += steerAngleDegrees*dt;
       if(ForceLong>maxGrip) {
 	skidRear=true;
-	ForceLong *= 0.4;
+	ForceLong *= 0.4f;
       }
       cos_s_a = cos(steerAngleDegrees*M_PI/180.0f);
       ForceLatRear  = 0.0f;
@@ -591,9 +591,9 @@ void Kart::updatePhysics (float dt) {
 
       cos_s_a       = cos(steer_angle);
       ForceLatFront = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
-                    * ForceOnFrontTire - SysResistance[0]*0.5;
+                    * ForceOnFrontTire - SysResistance[0]*0.5f;
       ForceLatRear  = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
-                    * ForceOnRearTire  - SysResistance[0]*0.5;
+                    * ForceOnRearTire  - SysResistance[0]*0.5f;
 #  ifdef PHYSICS_DEBUG    
       printf("steera % 5.3f saf % 5.3f sar % 5.3f v: % 7.3f , % 7.3f sqsum % 7.3f ", 
 	     steer_angle, slipAngleFront, slipAngleRear,

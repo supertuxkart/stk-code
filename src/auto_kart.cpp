@@ -450,7 +450,7 @@ void AutoKart::check_crashes(const int STEPS, sgVec3 pos)
 
         /*Find if we crash with any kart*/
         if(crashes.kart == -1) //Don't find a kart to dodge if we got one
-            for (int j = 0; j < NUM_KARTS; ++j)
+            for (unsigned int j = 0; j < NUM_KARTS; ++j)
             {
                 if(world->getKart(j) == this) continue;
 

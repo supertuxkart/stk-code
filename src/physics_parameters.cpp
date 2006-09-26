@@ -22,9 +22,9 @@
 PhysicsParameters* physicsParameters=0;
 
 // -----------------------------------------------------------------------------
-void PhysicsParameters::load(const char* filename, char *node) {
+void PhysicsParameters::load(const std::string filename) {
 
-  KartProperties::load(filename, node);
+  KartProperties::load(filename, "physics");
 
   // Check that all necessary values are indeed set physics.data file
 
@@ -70,8 +70,8 @@ void PhysicsParameters::init_defaults() {
     magnetRangeSQ    = jumpImpulse       = brake_factor      = anvilSpeedFactor=
     time_full_steer  = wheelieMaxPitch   = wheelieMaxSpeedRatio                =
     wheeliePitchRate = wheelieRestoreRate= wheelieSpeedBoost = airResReduce[2] =
-    airResReduce[1]  = -99.9; 
-  airResReduce[0]    = 1.0;
+    airResReduce[1]  = -99.9f;
+  airResReduce[0]    = 1.0f;
 }   // init_defaults
 
 // -----------------------------------------------------------------------------

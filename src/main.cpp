@@ -234,7 +234,8 @@ void InitTuxkart() {
   material_manager      = new MaterialManager   ();
   track_manager         = new TrackManager      ();
   physicsParameters     = new PhysicsParameters ();
-  physicsParameters->load("data/physics.data");
+  const std::string physicsDefault=std::string("data")+DIR_SEPARATOR+ "physics.data";
+  physicsParameters->load(physicsDefault);
   kart_manager          = new KartManager       ();
   projectile_manager    = new ProjectileManager ();
   collectable_manager   = new CollectableManager();

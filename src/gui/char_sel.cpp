@@ -135,7 +135,7 @@ void CharSel::update(float dt)
 
 		glEnable (GL_DEPTH_TEST);
 		sgCoord trans;
-		sgSetCoord(&trans, 0, 3, -.4, clock, 0, 0);
+		sgSetCoord(&trans, 0, 3, -.4f, clock, 0, 0);
 		kart->setTransform (&trans) ;
 		//glShadeModel(GL_SMOOTH);
 		ssgCullAndDraw ( kart ) ;

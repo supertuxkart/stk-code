@@ -79,7 +79,7 @@ void KartManager::loadKartData() {
                                       i != result.end(); ++i) {
     if (StringUtils::has_suffix(*i, ".tkkf")) {
       KartProperties* kp = new KartProperties();
-      std::string tmp= "data/" + (std::string)*i;
+	  std::string tmp= std::string("data")+DIR_SEPARATOR + *i;
       kp->load(tmp.c_str());
       karts.push_back(kp);
       if(kp->getMaxSteerAngle() > maxSteerAngle) {

@@ -19,6 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <algorithm>
+#include "loader.hpp"
 #include "string_utils.hpp"
 
 namespace StringUtils {
@@ -38,7 +39,7 @@ std::string basename(const std::string& filename)
 {
   for(int i = int(filename.size()) - 1; i >= 0; --i)
     {
-      if (filename[i] == '/') {
+      if (filename[i]=='/' || filename[i]=='\\') {
 	return filename.substr(i+1);
       }
     }

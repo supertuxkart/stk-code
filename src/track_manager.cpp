@@ -69,7 +69,7 @@ TrackManager::loadTrackList ()
     {
       if(StringUtils::has_suffix(*i, ".track"))
         {
-          std::string track_name= "data/" + *i;
+	  std::string track_name= std::string("data")+DIR_SEPARATOR + *i;
           tracks.push_back(new Track(track_name.c_str()));
         }
     }
