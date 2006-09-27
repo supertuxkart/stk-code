@@ -20,8 +20,8 @@
 "backpack.ac",-12,5,{},0,{},{}
 "ruler_bridge.ac",60,20,{},0,{},{}
 "ruler_jump.ac",-20,20,{},160,{},{}
-"mnm.ac",50,10,{},0,{},{}
-"mnm.ac",-30,70,{},0,{},{}
+"bananawrap.ac",50,10,{},0,{},{}
+"bananawrap.ac",-30,70,{},0,{},{}
 "paperairplane.ac",0,80,{},-40,{},{}
 "teachersdesk.ac",40,75,{},0,{},{}
 "teachersdesk.ac",63,95,{},90,{},{}
