@@ -12,7 +12,7 @@
 
  ;; Other kart relates values
  ;; -------------------------
- (jump-impulse               0.3 )  ;; percentage of gravity!
+ (jump-impulse             5400.0 ) ;; percentage of gravity!
 
  (reduce-air-resistance-racer  0.6) ;; reduce air-resistance for hard
  (reduce-air-resistance-driver 0.8) ;; and medium skill level

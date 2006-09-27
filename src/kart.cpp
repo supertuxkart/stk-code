@@ -455,7 +455,7 @@ void Kart::updatePhysics (float dt) {
       if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
     }
     if(controls.jump) { // ignore gravity down when jumping
-      ForceGravity = 18000.f*physicsParameters->jumpImpulse*gravity;
+      ForceGravity = physicsParameters->jumpImpulse*gravity;
     } else {   // kart is on groud and not jumping
       if(config->improvedPhysics) {
 	// FIXME:
