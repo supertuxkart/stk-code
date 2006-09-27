@@ -35,6 +35,9 @@ class RaceGUI: public BaseGUI {
   PlayerKart* keysToKart[MAXKEYS];
   int         typeForKey[MAXKEYS];
   int         xOffForText;
+  float       timeOfLeader;
+  int         lapLeader;
+
 public:
        RaceGUI();
        ~RaceGUI();

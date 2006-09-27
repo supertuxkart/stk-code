@@ -180,9 +180,10 @@ void Kart::handleZipper() {
 
 // -----------------------------------------------------------------------------
 void Kart::doLapCounting () {
-  if (      last_track_coords[1] > 100.0f && curr_track_coords[1] <  20.0f )
+  if (      last_track_coords[1] > 100.0f && curr_track_coords[1] <  20.0f ) {
+    setTimeAtLap(world->clock);
     raceLap++ ;
-  else if ( curr_track_coords[1] > 100.0f && last_track_coords[1] <  20.0f )
+  }   else if ( curr_track_coords[1] > 100.0f && last_track_coords[1] <  20.0f )
       raceLap-- ;
 }   // doLapCounting
 
@@ -454,7 +455,7 @@ void Kart::updatePhysics (float dt) {
       if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
     }
     if(controls.jump) { // ignore gravity down when jumping
-      ForceGravity = physicsParameters->jumpImpulse*gravity;
+      ForceGravity = 18000.f*physicsParameters->jumpImpulse*gravity;
     } else {   // kart is on groud and not jumping
       if(config->improvedPhysics) {
 	// FIXME:

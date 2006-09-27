@@ -33,6 +33,8 @@ RaceGUI::RaceGUI(): time_left(0.0) {
     UpdateKeyboardMappings();
   }   // if !config->profile
 
+  lapLeader     = -1;
+  timeOfLeader  = -1.0f;
   xOffForText   = (int)(config->width-220*config->width/800.0f);
   pos_string[0] = "?!?";
   pos_string[1] = "1st";
@@ -254,12 +256,13 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 		       red, green, blue);
 
   /* Show lap number */
-  if ( player_kart->getLap() < 0 ) {
+  int lap = player_kart->getLap();
+  if ( lap < 0 ) {
     sprintf ( str, "Lap:0/%d", raceSetup.numLaps ) ;
-  }  else if ( player_kart->getLap() < raceSetup.numLaps - 1 ) {
+  }  else if ( lap < raceSetup.numLaps - 1 ) {
     sprintf ( str, "Lap:%d/%d",
-	      player_kart->getLap() + 1, raceSetup.numLaps ) ;
-  } else if ( player_kart->getLap() == raceSetup.numLaps - 1 ) {
+	      lap + 1, raceSetup.numLaps ) ;
+  } else if ( lap == raceSetup.numLaps - 1 ) {
     sprintf ( str, "Last lap!" );
   } else {
     sprintf ( str, "Finished!" );
@@ -398,8 +401,29 @@ void RaceGUI::drawPlayerIcons () {
       }
 
       glDisable(GL_CULL_FACE);
-      drawDropShadowText(pos_string[position], 28, 55+x, y+10, 
-			 red, green, blue);
+      if(lap>lapLeader) {
+	lapLeader    = lap;
+	timeOfLeader = world->clock;
+      }
+      if(lapLeader<=0 ||    // Display position during first lap
+	 position==1  ||    // Display position for leader
+	 (world->clock - kart->getTimeAtLap()>5.0f && 
+	  lap==lapLeader)) {  // Display for 5 seconds
+	drawDropShadowText(pos_string[position], 28, 55+x, y+10, 
+			   red, green, blue);
+      } else {
+	float timeBehind;
+	timeBehind = (lap==lapLeader ? kart->getTimeAtLap() : world->clock)
+	           - timeOfLeader;
+	int min     = (int) floor ( timeBehind / 60.0 ) ;
+	int sec     = (int) floor ( timeBehind - (double) ( 60 * min ) ) ;
+	int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
+	char str[256];
+	sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
+	drawDropShadowText(str, 28, 55+x, y+10, 
+			   red, green, blue);
+      }
+
       glEnable(GL_CULL_FACE);
 
       bFirst = 0;
