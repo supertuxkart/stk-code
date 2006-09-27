@@ -41,6 +41,9 @@ AC_CHECK_HEADER(windows.h)
 
 dnl check for OpenGL related libraries
 case "${host}" in
+*darwin*|*macosx*)
+    LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
+    ;;
 *-*-cygwin* | *-*-mingw32*)
     dnl CygWin under Windoze.
 
