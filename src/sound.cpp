@@ -74,7 +74,7 @@ SoundSystem::SoundSystem ()
 
   //FIXME: The following 3 sounds are not used in the game yet.
   sfx[SOUND_BACK_MENU     ].fname = "wavs/tintagel/deselect_option.wav";
-  sfx[SOUND_SELECT_MENU   ].fname = "wavs/tintagel/select_option.wav";
+//  sfx[SOUND_SELECT_MENU   ].fname = "wavs/tintagel/select_option.wav";
   sfx[SOUND_MOVE_MENU     ].fname = "wavs/tintagel/move_option.wav";
 
   sfx[SOUND_FULL          ].fname = "wavs/tintagel/energy_bar_full.wav";
