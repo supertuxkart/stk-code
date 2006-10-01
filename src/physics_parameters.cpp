@@ -31,7 +31,7 @@ void PhysicsParameters::load(const std::string filename) {
 
 #define CHECK_NEG(  a,strA) if(a<-99) {                                    \
              fprintf(stderr,"Missing default value for '%s' in '%s'.\n",   \
-		     strA,filename);exit(-1);                       \
+		     strA,filename.c_str());exit(-1);			   \
              }
 
   CHECK_NEG(corn_r,   "corn_r"   );CHECK_NEG(wheel_base,     "wheel-base"     );
