@@ -336,41 +336,6 @@ void RaceGUI::drawGameOverText (const float dt) {
 }   // drawGameOverText
 
 // -----------------------------------------------------------------------------
-void RaceGUI::oldDrawPlayerIcons () {
-  assert(world != NULL);
-  
-  int   x =  0 ;
-  int   y = 10 ;
-  float w = 640.0f - 64.0f ;
-
-    Material *last_players_gst=0;
-    for(int i=0; i<world->getNumKarts(); i++) {
-      x = (int) ( w * world->getKart(i) -> getDistanceDownTrack () /
-		  world -> track -> getTrackLength () ) ;
-      Material* players_gst =
-	        world->getKart(i)->getKartProperties()->getIconMaterial();
-      // Hmm - if the same icon is displayed more than once in a row,
-      // plib does only do the first setTexture, therefore nothing is
-      // displayed for the remaining icons. So we have to call force() if
-      // the same icon is displayed more than once in a row.
-      if(last_players_gst==players_gst) {
-	players_gst->getState()->force();
-      }
-      players_gst -> apply ();
-      last_players_gst=players_gst;
-      glBegin ( GL_QUADS ) ;
-        glColor4f    ( 1, 1, 1, 1 ) ;
-	glTexCoord2f (  0, 0 ) ; glVertex2i ( x   , y    ) ;
-	glTexCoord2f (  1, 0 ) ; glVertex2i ( x+64, y    ) ;
-	glTexCoord2f (  1, 1 ) ; glVertex2i ( x+64, y+64 ) ;
-	glTexCoord2f (  0, 1 ) ; glVertex2i ( x   , y+64 ) ;
-      glEnd () ;
-
-    }   // for i
-
-}   // oldDrawPlayerIcons
-
-// -----------------------------------------------------------------------------
 
 // Draw players position on the race
 void RaceGUI::drawPlayerIcons () {
@@ -737,11 +702,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
     drawTimer ();
     drawMap   ();
     if ( config->displayFPS ) drawFPS ();
-    if(config->oldStatusDisplay) {
-      oldDrawPlayerIcons();
-    } else {
-      drawPlayerIcons() ;
-    }
+    drawPlayerIcons() ;
   }   // if RACE_PHASE
 
   glPopAttrib  () ;

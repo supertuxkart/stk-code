@@ -19,6 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdexcept>
+#include <sstream>
 
 // for mkdir:
 #if !defined(WIN32) || defined(__CYGWIN__)
@@ -95,14 +96,11 @@ void Config::setDefaults() {
   music            = true;
   smoke            = false;
   displayFPS       = false;
-  singleWindowMenu = false;
-  oldStatusDisplay = false;
   herringStyle     = "new";
   disableMagnet    = true;
   profile          = 0;
   useKPH           = false;
   improvedPhysics  = false;
-  newKeyboardStyle = true;
   replayHistory    = false;
   width            = 800;
   height           = 600;
@@ -229,6 +227,32 @@ void Config::loadConfig(const std::string& filename) {
     const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
     if(!lisp)
       throw std::runtime_error("No tuxkart-config node");
+    int configFileVersion = 0;
+    lisp->get("configFileVersion", configFileVersion);
+    if (configFileVersion < SUPPORTED_CONFIG_VERSION) {
+      // Give some feedback to the user about what was changed.
+      // Do NOT add a break after the case, so that all changes will be printed
+      std::cout << "\nConfig file version '"<<configFileVersion<<"' is too old.\n";
+      std::cout << "The following changes have been applied in the current SuperTuxKart version:\n";
+      int needToAbort=0;
+      switch(configFileVersion) {
+        case 0:  std::cout << "- Single window menu, old status display,new keyboard style settings were removed\n";
+                 needToAbort=0;
+	  //E.g.:case 1:  std::cout << "- Key bindings were changed, please check the settings. All existing values were discarded.\n";
+          //     needToAbort=1;  // if the old keybinds were read, they wouldn't make any sense
+        case 99: break;
+        default: std::cout << "Config file version " << configFileVersion 
+			 << " is too old. Discarding your configuration. Sorry. :(\n";
+	break;
+      }
+      if(needToAbort) {
+	delete root;
+	return;
+      }
+      std::cout << "This warning can be ignored.\n";
+      // Keep on reading the config files as far as possible
+    }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
+
 
     /*get toggles*/
     lisp->get("fullscreen",       fullscreen);
@@ -237,11 +261,8 @@ void Config::loadConfig(const std::string& filename) {
     lisp->get("music",            music);
     lisp->get("smoke",            smoke);
     lisp->get("displayFPS",       displayFPS);
-    lisp->get("singlewindowmenu", singleWindowMenu);
-    lisp->get("oldStatusDisplay", oldStatusDisplay);
     lisp->get("herringStyle",     herringStyle);
     lisp->get("disableMagnet",    disableMagnet);
-    lisp->get("newKeyboardStyle", newKeyboardStyle);
     lisp->get("useKPH",           useKPH);
     lisp->get("improvedPhysics",  improvedPhysics);
 
@@ -316,17 +337,15 @@ void Config::saveConfig(const std::string& filename) {
     lisp::Writer writer(filename);
 
     writer.beginList("tuxkart-config");
+    writer.writeComment("If the game's supported config file version is higher than this number the configuration is discarded.");
+    writer.write("configFileVersion\t",   CURRENT_CONFIG_VERSION);
+
     writer.writeComment("the following options can be set to #t or #f:");
-    writer.write("fullscreen\t", fullscreen);
     writer.write("sfx\t",   sfx);
     writer.write("music\t", music);
     writer.write("smoke\t", smoke);
     writer.writeComment("Display frame per seconds");
     writer.write("displayFPS\t", displayFPS);
-    writer.writeComment("Use the old, one-window style menu at startup");
-    writer.write("singleWindowMenu\t", singleWindowMenu);
-    writer.writeComment("Display kart icons in bottom row instead of at the left");
-    writer.write("oldStatusDisplay\t", oldStatusDisplay);
     writer.writeComment("Name of the .herring file to use.");
     writer.write("herringStyle\t", herringStyle);
     writer.writeComment("Allow players to disable a magnet");
@@ -336,17 +355,16 @@ void Config::saveConfig(const std::string& filename) {
     writer.writeComment("With improved physics the gravity on a non-horizontal");
     writer.writeComment("plane will add an accelerating force on the kart");
     writer.write("improvedPhysics\t", improvedPhysics);
-    writer.writeComment("#f: old 'digital' style, #t:new analog style, allows for better turning");
-    writer.write("newKeyboardStyle\t", newKeyboardStyle);
 
-    writer.writeComment("screen resolution");
+    writer.writeComment("screen resolution and windowing mode");
     writer.write("width\t", width);
     writer.write("height\t", height);
+    writer.write("fullscreen\t", fullscreen);
 
     writer.writeComment("number of karts. -1 means use all");
     writer.write("karts\t", karts);
 
-    /*write player configurations*/
+    /* write player configurations */
     for(i=0; i<PLAYERS; ++i) {
       temp = "player ";
       temp += i+'1';
@@ -367,6 +385,8 @@ void Config::saveConfig(const std::string& filename) {
       writer.write("jump\t",    player[i].getKey(KC_JUMP));
       writer.write("rescue\t",  player[i].getKey(KC_RESCUE));
       writer.write("fire\t",    player[i].getKey(KC_FIRE));
+      writer.writeComment("optional");
+      writer.write("lastKartId", player[i].getLastKartId());
 
       writer.writeComment("joystick layout");
       writer.write("joy-up",        player[i].getButton(KC_ACCEL));

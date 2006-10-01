@@ -29,6 +29,7 @@ enum WidgetTokens {
   WTOK_RETURN_RACE,
   WTOK_OPTIONS,
   WTOK_RESTART_RACE,
+  WTOK_SETUP_NEW_RACE,
   WTOK_EXIT_RACE,
 };
 
@@ -41,6 +42,11 @@ RaceMenu::RaceMenu()
   widgetSet -> start(va, "Return To Race",  GUI_MED, WTOK_RETURN_RACE, 0);
   widgetSet -> state(va, "Options",         GUI_MED, WTOK_OPTIONS, 0);
   widgetSet -> state(va, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
+
+  if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE) {
+    widgetSet->state(va, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE, 0);
+  }
+
   widgetSet -> state(va, "Exit Race",       GUI_MED, WTOK_EXIT_RACE, 0);
 	
   widgetSet -> layout(menu_id, 0, 0);
@@ -68,6 +74,11 @@ void RaceMenu::select()
 	{
 	case WTOK_RETURN_RACE:	
                 menu_manager->popMenu(); 
+                break;
+
+	case WTOK_SETUP_NEW_RACE:
+                race_manager->exit_race();
+                menu_manager->pushMenu(MENUID_DIFFICULTY);
                 break;
 
 	case WTOK_RESTART_RACE:

@@ -157,7 +157,7 @@ QuickRaceMode::start()
   int first_player = numKarts - players.size();
   for(int i = 0; i < int(players.size()); ++i)
     {
-      raceSetup.karts[first_player + i] = players[i]; // Players starts last in the first race
+      raceSetup.karts[first_player + i] = players[i]; // Players starts last in the race
       raceSetup.players.push_back(first_player + i);
     }
 

@@ -43,6 +43,7 @@ private:
     bool useJoy;    //player is using a joystick
     int keys[8]; //keyboard keymap and joystick button map
     int buttons[8];
+    int lastKartId;
 
 public:
     Player(){}
@@ -56,6 +57,8 @@ public:
 	int getKey(KartActions action){return keys[action];}
     int getButton(KartActions action){return buttons[action];}
     bool IsUsingJoystick() {return useJoy; }
+    int getLastKartId(){ return lastKartId; }
+    void setLastKartId(int newLastKartId){ lastKartId = newLastKartId; } 
 };
 
 #endif

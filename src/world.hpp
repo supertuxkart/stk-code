@@ -65,7 +65,9 @@ public:
     DELAY_FINISH_PHASE,
     // The player crossed the finishing line and his and the time of
     // the other players is displayed, controll is automatic
-    FINISH_PHASE 
+    FINISH_PHASE,
+    // The state after finish where no calculations are done.
+    LIMBO_PHASE, 
   };
 
   int ready_set_go;
@@ -90,6 +92,7 @@ public:
   void draw();
   void update(float delta);
   void restartRace();
+  void disableRace(); // Put race into limbo phase
   
   PlayerKart* getPlayerKart(int player);
   Kart* getKart(int kartId)                 {assert(kartId >= 0 && 

@@ -33,11 +33,12 @@ NumLaps::NumLaps() {
 
   widgetSet -> start(menu_id, "One",                    GUI_MED,  1);
   widgetSet -> state(menu_id, "Two",                    GUI_MED,  2);
-  widgetSet -> state(menu_id, "Three",                  GUI_MED,  3);
   widgetSet -> state(menu_id, "Four",                   GUI_MED,  4);
   widgetSet -> state(menu_id, "Five",                   GUI_MED,  5);
+  widgetSet -> state(menu_id, "Six",                    GUI_MED,  6);
+  widgetSet -> state(menu_id, "Eight",                  GUI_MED,  8);
   widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML,  6);
+  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, -1);
   widgetSet -> space(menu_id);
 
   widgetSet -> layout(menu_id, 0, 0);
@@ -51,7 +52,7 @@ NumLaps::~NumLaps() {
 // -----------------------------------------------------------------------------
 void NumLaps::select() {
   int n = widgetSet->token(widgetSet->click() );
-  if(n==6) {
+  if(n==-1) {
     menu_manager->popMenu();
   } else {
     race_manager->setNumLaps(n);

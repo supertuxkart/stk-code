@@ -23,6 +23,17 @@
 
 #define PLAYERS 4
 
+/* The following config versions are currently used:
+   0: the 0.2 release config file, without config-verison number
+      (so that defaults to 0)
+   1: Removed singleWindowMenu, newKeyboardStyle, oldStatusDisplay,
+      added config-version number
+   Version 1 can read version 0 without any problems, so 
+   SUPPORTED_CONFIG_VERSION is 0.
+*/
+#define CURRENT_CONFIG_VERSION   1
+#define SUPPORTED_CONFIG_VERSION 0
+
 #include <string>
 #include "player.hpp"
 
@@ -44,12 +55,9 @@ class Config {
     bool   music;
     bool   smoke;
     bool   displayFPS;
-    bool   singleWindowMenu;
-    bool   oldStatusDisplay;
     int    profile;         // Positive number: time in seconds, neg: # laps
                             // 0 if no profiling. Never saved in config file!
     std::string herringStyle;
-    bool   newKeyboardStyle;// use the new keyboard style
     bool   disableMagnet;   // true if a magnet can be dis- and enabled
     bool   replayHistory;
     bool   useKPH;

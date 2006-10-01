@@ -47,24 +47,19 @@ void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
 // are handled here, not 'one time action' keys like fire, ...
 void PlayerKart::handleKeyboard(float dt) {
 
-  if(!config->newKeyboardStyle) {
-    controls.lr = isKeyDown(player->getKey(KC_LEFT))  ?  1.0f 
-                : isKeyDown(player->getKey(KC_RIGHT)) ? -1.0f : 0.0f;
-  } else {
-    float steerChange = dt/getTimeFullSteer();  // amount the steering is changed
-    if       (isKeyDown(player->getKey(KC_LEFT)))  { controls.lr += steerChange;
-    } else if(isKeyDown(player->getKey(KC_RIGHT))) { controls.lr -= steerChange; 
-    } else {   // no key is pressed
-      if(controls.lr>0.0f) {
-	controls.lr -= steerChange;
-	if(controls.lr<0.0f) controls.lr=0.0f;
-      } else {   // controls.lr<=0.0f;
-	controls.lr += steerChange;
-	if(controls.lr>0.0f) controls.lr=0.0f;
-      }   // if controls.lr<=0.0f
-    }   // no key is pressed
-  }   // not old steering
-    // clamp control value to be within  [-1,1]
+  float steerChange = dt/getTimeFullSteer();  // amount the steering is changed
+  if       (isKeyDown(player->getKey(KC_LEFT)))  { controls.lr += steerChange;
+  } else if(isKeyDown(player->getKey(KC_RIGHT))) { controls.lr -= steerChange; 
+  } else {   // no key is pressed
+    if(controls.lr>0.0f) {
+      controls.lr -= steerChange;
+      if(controls.lr<0.0f) controls.lr=0.0f;
+    } else {   // controls.lr<=0.0f;
+      controls.lr += steerChange;
+      if(controls.lr>0.0f) controls.lr=0.0f;
+    }   // if controls.lr<=0.0f
+  }   // no key is pressed
+  // clamp control value to be within  [-1,1]
   controls.lr = std::min(1.0f, std::max(-1.0f, controls.lr));
 
   if(isKeyDown(player->getKey(KC_ACCEL)))   controls.accel   =  1.0f;

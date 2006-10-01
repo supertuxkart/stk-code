@@ -42,7 +42,6 @@
 #include "loader.hpp"
 #include "screen_manager.hpp"
 #include "start_screen.hpp"
-#include "gui/single_window_menu.hpp"
 #include "widget_set.hpp"
 #include "material_manager.hpp"
 #include "plibdrv.hpp"
@@ -75,9 +74,6 @@ void cmdLineHelp (char* invocation) {
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -w,  --windowed         Windowed display. (default)\n"
 #endif
-	    "  --mwm                   New multi-window menu\n"
-	    "  --swm                   Original single-window menu\n"
-	    "  --oldstatus             Original status display\n"
 	    "  -s,  --screensize WIDTHxHEIGHT\n"
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
@@ -189,13 +185,7 @@ int handleCmdLine(int argc, char **argv) {
       return 0;
     }
   #endif
-    else if( !strcmp(argv[i], "--mwm") ) {
-      config->singleWindowMenu=false;
-    } else if( !strcmp(argv[i], "--swm") ) {
-      config->singleWindowMenu=true;
-    } else if( !strcmp(argv[i], "--oldstatus") ) {
-      config->oldStatusDisplay=true;
-    } else if( sscanf(argv[i], "--profile=%d",  &n)==1) {
+    else if( sscanf(argv[i], "--profile=%d",  &n)==1) {
       config->profile=n;
     } else if( !strcmp(argv[i], "--profile") ) {
       config->profile=20;
@@ -275,13 +265,7 @@ int main ( int argc, char **argv ) {
     screen_manager->run();
   } else {
     if(!config->profile) {
-      if(config->singleWindowMenu) {
-
-  // Single Window Menu
-  // ==================
-	if(SingleWindowMenu()) exit(0);   // Quit selected
-	startScreen->switchToGame();
-      } else if (!config->noStartScreen ) {
+      if(!config->noStartScreen) {
 
   // Normal multi window start
   // =========================

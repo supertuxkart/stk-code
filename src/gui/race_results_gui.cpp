@@ -28,6 +28,8 @@
 
 enum WidgetTokens {
   WTOK_CONTINUE,
+  WTOK_RESTART_RACE,
+  WTOK_SETUP_NEW_RACE,
 };
 
 RaceResultsGUI::RaceResultsGUI()
@@ -76,6 +78,10 @@ RaceResultsGUI::RaceResultsGUI()
 
     int va = widgetSet -> varray(menu_id);
     widgetSet -> start(va, "Continue",  GUI_MED, WTOK_CONTINUE);
+    widgetSet -> start(va, "Restart Race",  GUI_MED, WTOK_RESTART_RACE);
+    if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE) {
+      widgetSet -> start(va, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
+    }
     
     widgetSet -> layout(menu_id, 0, 1);
 }
@@ -94,6 +100,19 @@ void RaceResultsGUI::select()
             widgetSet->tgl_paused();
             race_manager->next();
             break;
+        case WTOK_RESTART_RACE:
+            widgetSet->tgl_paused();
+            menu_manager->popMenu();
+            // TODO: Maybe let this go through the race_manager for
+            // more flexibility.
+            world->restartRace();
+            break;
+        case WTOK_SETUP_NEW_RACE:
+            widgetSet->tgl_paused();
+            race_manager->exit_race();
+            menu_manager->pushMenu(MENUID_DIFFICULTY);
+            break;
+
         default:
             break;
     }

@@ -68,8 +68,10 @@ CharSel::CharSel(int whichPlayer)
 				   icon_size, icon_size);
 	  widgetSet->activate_widget(c, i, 0);
 
-	  if (NULL == kart_manager->getKartById(i + 1)) // last in the list
-	    widgetSet -> set_active(c);
+          if (config->player[whichPlayer].getLastKartId() == i)
+            widgetSet->set_active(c);
+//          else if (NULL == kart_manager->getKartById(i + 1)) // last in the list
+//	    widgetSet->set_active(c);
 	}
 	widgetSet -> filler(ha);
 	kart_name_label = widgetSet -> label(menu_id, "No driver choosed", 
@@ -151,7 +153,10 @@ void CharSel::select()
 	int token = widgetSet -> token (widgetSet -> click());
 	const KartProperties* kp= kart_manager->getKartById(token);
 	if (kp != NULL)
-          race_manager->setPlayerKart(playerIndex, kp->getIdent());
+	{
+	  race_manager->setPlayerKart(playerIndex, kp->getIdent());
+	  config->player[playerIndex].setLastKartId(token);
+	}
 
 	if (race_manager->getNumPlayers() > 1)
 	{
