@@ -18,7 +18,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//FIXME: Not sure this is needed (Coz).
 #ifdef WIN32
 #  ifdef __CYGWIN__
 #    include <unistd.h>
@@ -48,7 +47,7 @@
 #include "hook_manager.hpp"
 #include "history.hpp"
 #include "herring_manager.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "physics_parameters.hpp"
 
 void cmdLineHelp (char* invocation) {
@@ -216,7 +215,7 @@ void InitTuxkart() {
   loader->setCreateStateCallback(getAppState);
   loader->setCreateBranchCallback(process_userdata);
   config = new Config();
-  sound  = new SoundSystem();
+  sound_manager  = new SoundManager();
 
   // The order here can be important, e.g. KartManager needs 
   // defaultKartProperties.

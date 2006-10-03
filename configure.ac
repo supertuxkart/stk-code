@@ -51,7 +51,7 @@ case "${host}" in
     AC_DEFINE([WIN32], 1, [Define for Win32 platforms])
     AC_DEFINE([NOMINMAX], 1, [Define for Win32 platforms])
 
-    LIBS="$LIBS -lglut32 -lglu32 -lopengl32 -luser32 -lgdi32 -lm -lwinmm"
+    opengl_LIBS="-lglut32 -lglu32 -lopengl32 -luser32 -lgdi32 -lm -lwinmm"
     joystick_LIBS="$joystick_LIBS -lwinmm"
 
     echo "Will link apps with $LIBS"
@@ -60,7 +60,10 @@ case "${host}" in
 *)
    dnl X-Windows based machines
 
+   save_LIBS=$LIBS
    AC_SEARCH_LIBS(glNewList, [ GL GLcore MesaGL ])
+   opengl_LIBS="$LIBS"
+   LIBS=$save_LIBS
    if test "x$ac_cv_search_glNewList" = "x-lGLcore"; then
        dnl if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
@@ -68,6 +71,40 @@ case "${host}" in
 
 esac
 
+dnl check for OpenAL libraries
+case "${host}" in
+*)
+   dnl default unix style machines
+ 
+   save_LIBS=$LIBS
+   AC_SEARCH_LIBS(alGenBuffers, openal)
+   dnl TODO: versions of alut previous to 1.0 came with openal, now the check must be independent
+   AC_SEARCH_LIBS(alutInit, [ alut openal ] )
+   openal_LIBS="$LIBS"
+   LIBS=$save_LIBS
+   if test "$ac_cv_search_alGenBuffers"; then
+      AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])    
+   fi
+
+esac
+
+dnl check for MikMod libraries
+case "${host}" in
+*)
+   dnl default unix style machines
+
+   AM_PATH_LIBMIKMOD(3.1.5, have_mikmod=yes, have_mikmod=no)
+   if test "x$have_mikmod" = xyes; then
+      AC_DEFINE([HAVE_MIKMOD], 1, [Defined when MikMod is available])
+      mikmod_LIBS="-lmikmod"
+   fi
+
+esac
+
+# subst bars in Makefile.am
+AC_SUBST(opengl_LIBS)
+AC_SUBST(openal_LIBS)
+AC_SUBST(mikmod_LIBS)
 
 # The following are C++ items that need to be tested for with the c++
 # compiler

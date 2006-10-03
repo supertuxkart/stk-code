@@ -21,7 +21,7 @@
 #include "world.hpp"
 #include "widget_set.hpp"
 #include "world_screen.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "camera.hpp"
 #include "config.hpp"
 #include "track_manager.hpp"
@@ -76,7 +76,7 @@ void WorldScreen::update() {
 
   pollEvents();
   menu_manager->update();
-  sound->update() ;
+  sound_manager->update() ;
   if(config->profile) {
     frameCount++;
     if (world->clock>config->profile) {

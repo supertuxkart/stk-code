@@ -21,7 +21,7 @@
 #include "config.hpp"
 #include "projectile_manager.hpp"
 #include "kart.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "world.hpp"
 
 // -----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void Collectable::use() {
     case COLLECT_SPARK:
     case COLLECT_MISSILE:
 			               if(owner->isPlayerKart())
-				               sound->playSfx(SOUND_SHOT);
+				               sound_manager->playSfx(SOUND_SHOT);
 
                            projectile_manager->newProjectile(owner, type);
                            break ;
@@ -93,7 +93,7 @@ void Collectable::use() {
                                        0.5f;
 
 				                   if(world->getKart(i)->isPlayerKart())
-                                      sound->playSfx(SOUND_USE_ANVIL);
+                                      sound_manager->playSfx(SOUND_USE_ANVIL);
                                    break;
                                }
                            }
@@ -122,7 +122,7 @@ void Collectable::use() {
                                }
 
                                if(player_affected)
-                                   sound->playSfx(SOUND_USE_PARACHUTE);
+                                   sound_manager->playSfx(SOUND_USE_PARACHUTE);
                            }
                            break;
 

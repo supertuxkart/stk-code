@@ -23,7 +23,7 @@
 #include "widget_set.hpp"
 #include "loader.hpp"
 #include "config.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 
 WidgetSet *widgetSet;
 
@@ -1437,13 +1437,13 @@ void WidgetSet::set_active(int id)
 
 void WidgetSet::set_paused()
 {
-    sound -> pause_music() ;
+    sound_manager -> pauseMusic() ;
     paused = true;
 }
 
 void WidgetSet::clr_paused()
 {
-	sound -> resume_music() ;
+	sound_manager -> resumeMusic() ;
     paused = false;
 }
 

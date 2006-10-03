@@ -19,7 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "constants.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
 #include "plibdrv.hpp"
@@ -103,14 +103,14 @@ void PlayerKart::update(float dt) {
   }
 
  if ( controls.fire ) {
-    if (collectable.getType()==COLLECT_NOTHING) sound->playSfx(SOUND_BEEP);
+    if (collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
     // use() needs to be called even if there currently is no collecteable
     // since use() tests for switching a magnet on/off.
     collectable.use() ;
     controls.fire = false;
   }
   if ( on_ground  &&  controls.rescue ) {
-    sound -> playSfx ( SOUND_BEEP ) ;
+    sound_manager -> playSfx ( SOUND_BEEP ) ;
     rescue = TRUE ;
     controls.rescue=false;
   }
@@ -125,18 +125,18 @@ void PlayerKart::update(float dt) {
 // -----------------------------------------------------------------------------
 void PlayerKart::forceCrash() {
   Kart::forceCrash();
-  sound->playSfx( SOUND_CRASH );
+  sound_manager->playSfx( SOUND_CRASH );
 }
 
 // -----------------------------------------------------------------------------
 void PlayerKart::handleZipper() {
   Kart::handleZipper();
-  sound->playSfx ( SOUND_WEE );
+  sound_manager->playSfx ( SOUND_WEE );
 }
 
 // -----------------------------------------------------------------------------
 void PlayerKart::collectedHerring(Herring* herring) {
     Kart::collectedHerring(herring);
-    sound->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
+    sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }
 /* EOF */

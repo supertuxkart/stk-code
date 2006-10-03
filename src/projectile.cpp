@@ -23,7 +23,7 @@
 #include "world.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 
 Projectile::Projectile(Kart *kart, int collectable) : Moveable(false) {
   init(kart, collectable);  
@@ -87,7 +87,7 @@ void Projectile::doObjectInteractions () {
     sgVec3 hpr;
     Kart *kart=world->getKart(nearest);
     if(nLastRadarBeep!=nearest && kart->isPlayerKart()) {
-      sound->playSfx(SOUND_MISSILE_LOCK);
+      sound_manager->playSfx(SOUND_MISSILE_LOCK);
       nLastRadarBeep=nearest;
     }
     sgCoord *k = kart->getCoord() ;

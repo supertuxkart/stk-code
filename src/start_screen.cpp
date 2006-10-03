@@ -27,6 +27,7 @@
 #include "start_screen.hpp"
 #include "gui/menu_manager.hpp"
 #include "plibdrv.hpp"
+#include "sound_manager.hpp"
 
 StartScreen* startScreen = NULL;
 
@@ -86,6 +87,7 @@ StartScreen::update()
   glFlush();
   pollEvents() ;
   menu_manager->update();
+  sound_manager->update();
 
   // Swapbuffers - and off we go again...
   pwSwapBuffers();

@@ -24,7 +24,7 @@
 #include "constants.hpp"
 #include "loader.hpp"
 #include "world.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 
 struct  initAttachmentType {attachmentType attachment; char*file;};
 
@@ -146,7 +146,7 @@ void Attachment::update(float dt, sgCoord *velocity) {
 			     // Otherwise: set type to active magnet.
 			     if(type==ATTACH_MAGNET) {
 			       if(kart->isPlayerKart() || closest==0) {
-				 sound->playSfx(SOUND_BZZT);
+				 sound_manager->playSfx(SOUND_BZZT);
 			       }
 			       set(ATTACH_MAGNET_BZZT,
 				   time_left<4.0?4.0:time_left);

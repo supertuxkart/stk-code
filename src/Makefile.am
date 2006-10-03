@@ -30,7 +30,10 @@ supertuxkart_SOURCES =             main.cpp  			\
 	attachment.cpp		   attachment.hpp	        \
 	collectable.cpp		   collectable.hpp	        \
 	collectable_manager.cpp	   collectable_manager.hpp   	\
-	sound.cpp		   sound.hpp                	\
+	sound_manager.cpp	   sound_manager.hpp                	\
+	sound_plib.cpp	   sound_plib.hpp                	\
+	music_mikmod.cpp	   music_mikmod.hpp                	\
+	sfx_openal.cpp	   sfx_openal.hpp                	\
 	utils.cpp		   utils.hpp                	\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
@@ -100,4 +103,4 @@ supertuxkart_SOURCES =             main.cpp  			\
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L . -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-	-lplibpw -lplibul -lplibssgaux $(opengl_LIBS)
+	-lplibpw -lplibul -lplibssgaux $(opengl_LIBS) $(openal_LIBS) $(mikmod_LIBS)

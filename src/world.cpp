@@ -46,7 +46,7 @@
 #include "hook_manager.hpp"
 #include "history.hpp"
 #include "constants.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "widget_set.hpp"
 
 World* world = 0;
@@ -143,7 +143,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   menu_manager->switchToRace();
 
   const std::string& music_name= track_manager->getTrack(raceSetup.track)->getMusic();
-  if (music_name.size()>0) sound->play_track(music_name);
+  if (music_name.size()>0) sound_manager->playMusic(music_name.c_str());
 
   if(config->profile) {
     ready_set_go = -1;
@@ -163,7 +163,7 @@ World::~World() {
   delete numberCollisions;
   delete scene ;
 
-  sound -> stop_music();
+  sound_manager -> stopMusic();
 
   sgVec3 sun_pos;
   sgVec4 ambient_col, specular_col, diffuse_col;
@@ -242,7 +242,7 @@ void World::update(float delta) {
   // not a player kart - a traffic jam happens rarely anyway.
   for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) {
     if(numberCollisions[i]>1) {
-      sound->playSfx(SOUND_TRAFFIC_JAM);
+      sound_manager->playSfx(SOUND_TRAFFIC_JAM);
       nCount = framesForTrafficJam-1;  // sets all fields to zero in next frame
       break;
     }
@@ -257,12 +257,12 @@ void World::checkRaceStatus() {
     ready_set_go = 0;
     phase = RACE_PHASE;
     clock = 0.0f;
-    sound->playSfx(SOUND_START);
+    sound_manager->playSfx(SOUND_START);
   } else if (clock > 1.0 && ready_set_go == 2) {
-    sound->playSfx(SOUND_PRESTART);
+    sound_manager->playSfx(SOUND_PRESTART);
     ready_set_go = 1;
   } else if (clock > 0.0 && ready_set_go == 3) {
-    sound->playSfx(SOUND_PRESTART);
+    sound_manager->playSfx(SOUND_PRESTART);
     ready_set_go = 2;
   }
 

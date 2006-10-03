@@ -23,7 +23,7 @@
 #include <plib/ssg.h>
 
 #include "herring_manager.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "loader.hpp"
 #include "skid_mark.hpp"
 #include "config.hpp"
@@ -232,7 +232,7 @@ void Kart::collectedHerring(Herring* herring) {
 
   if(old_herring_gobbled < num_herring_gobbled &&
      num_herring_gobbled == MAX_HERRING_EATEN)
-      sound->playSfx(SOUND_FULL);
+      sound_manager->playSfx(SOUND_FULL);
 }   // hitHerring
 // -----------------------------------------------------------------------------
 void Kart::doZipperProcessing (float delta) {
@@ -316,7 +316,7 @@ void Kart::update (float dt) {
   if ( rescue ) {
     if(attachment.getType() != ATTACH_TINYTUX)
     {
-        if(isPlayerKart()) sound -> playSfx ( SOUND_BZZT );
+        if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
         attachment.set( ATTACH_TINYTUX, 2.0f ) ;
     }
   }

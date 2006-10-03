@@ -21,7 +21,7 @@
 #include <string>
 
 #include "loader.hpp"
-#include "sound.hpp"
+#include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_manager.hpp"
 #include "preprocessor.hpp"
@@ -71,7 +71,7 @@ GrandPrixEnd::GrandPrixEnd()
     kart->addKid(kartentity);
     preProcessObj ( kart, 0 );
 
-    sound->playSfx(SOUND_WINNER);
+    sound_manager->playSfx(SOUND_WINNER);
 
 	clock = 0;
 }
