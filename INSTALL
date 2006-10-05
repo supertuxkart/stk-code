@@ -1,13 +1,16 @@
-SUPERTUXKART INSTALLATION INSTRUCTIONS.
-=======================================
+SUPERTUXKART INSTALLATION INSTRUCTIONS
+======================================
 
-INSTALLATION:
--------------
+General
+-------
 
 First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
   * PLIB version 1.8.4 or later
+  * OpenAL
+  * Alut
+  * MikMod
 
 Unpack the files from the tarball like this:
 
@@ -32,6 +35,28 @@ be written to /usr/local/share/games/supertuxkart, the executable
 will be copied to /usr/local/bin. To change the default installation
 location, use the "--prefix" option of configure, e.g. --prefix=/usr
 See the --help output of configure for further options.
+
+
+SVN STK on Ubuntu Edgy
+----------------------
+Here are the compilation instructions for the current svn(05 oct. 2006) of Super Tux Kart on Ubuntu Edgy, contributed by Damien:
+
+install following packages:
+# apt-get install libopenal-dev libalut-dev libmikmod2-dev plib1.8.4-dev
+libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
+
+do a:
+$ svn checkout svn://svn.berlios.de/supertuxkart/trunk
+
+then:
+$ cd trunk
+$ ./autogen.sh && ./configure && make
+and if all went well:
+$ src/supertuxkart
+
+tested with g++ 3.3 and 4.1 , both succeeded.
+
+If you want to install the game system-wide, do 'make install'.
 
 
 But it didn't work!
