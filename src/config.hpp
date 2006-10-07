@@ -31,11 +31,14 @@
    Version 1 can read version 0 without any problems, so 
    SUPPORTED_CONFIG_VERSION is 0.
 */
-#define CURRENT_CONFIG_VERSION   1
-#define SUPPORTED_CONFIG_VERSION 0
+#define CURRENT_CONFIG_VERSION   2
+#define SUPPORTED_CONFIG_VERSION 2
 
 #include <string>
 #include "player.hpp"
+#include "lisp/lisp.hpp"
+#include "lisp/parser.hpp"
+#include "lisp/writer.hpp"
 
 #define CONFIGDIR ".supertuxkart"
 
@@ -47,7 +50,16 @@ class Config {
     void        setFilename      ();
     int         CheckAndCreateDir();
     std::string getConfigDir     ();
-    
+
+    void readInput(const lisp::Lisp* &r,
+                   const char *node,
+                   KartActions action,
+                   Player& player);
+
+    void writeInput(lisp::Writer &writer,
+                    const char *node,
+                    KartActions action,
+                    Player& player);    
   public:
     bool   fullscreen;
     bool   noStartScreen;
@@ -75,7 +87,7 @@ class Config {
     void loadConfig(const std::string& filename);
     void saveConfig();
     void saveConfig(const std::string& filename);
-    std::string GetKeyAsString(int player_index, KartActions control);
+    std::string getInputAsString(int player_index, KartActions control);
 };
 
 

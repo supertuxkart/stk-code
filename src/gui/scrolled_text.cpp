@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 #include "scrolled_text.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
@@ -34,12 +34,10 @@ ScrolledText::ScrolledText(){
   rect          = 0;
   menu_id = widgetSet -> varray(0);
   widgetSet->layout(menu_id, 0, 0);
-  pwSetAutoRepeatKey(true);
 }   // ScrolledText
 
 // -----------------------------------------------------------------------------
 ScrolledText::~ScrolledText() {
-  pwSetAutoRepeatKey(false);
   glDeleteLists(rect, 1);
 }   // ~ScrolledText
 	
@@ -91,13 +89,13 @@ void ScrolledText::update(float dt){
 // -----------------------------------------------------------------------------
 void ScrolledText::keybd(int key) {
   switch(key) {
-    case '+'              :
-    case PW_KEY_UP        : ySpeed += 10.0f; break;
-    case PW_KEY_PAGE_UP   : ySpeed += 50.0f; break;
-    case PW_KEY_PAGE_DOWN : ySpeed -= 50.0f; break;
-    case '-'              :
-    case PW_KEY_DOWN      : ySpeed -= 10.0f; break;
-    default               : menu_manager->popMenu();
+    case SDLK_PLUS      :
+    case SDLK_UP        : ySpeed += 10.0f; break;
+    case SDLK_PAGEUP    : ySpeed += 50.0f; break;
+    case SDLK_PAGEDOWN  : ySpeed -= 50.0f; break;
+    case SDLK_MINUS     :
+    case SDLK_DOWN      : ySpeed -= 10.0f; break;
+    default             : menu_manager->popMenu();
   }   // switch
 }   // keybd
 // -----------------------------------------------------------------------------

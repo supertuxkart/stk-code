@@ -23,6 +23,7 @@
 #define HEADER_PLAYERKART_H
 
 #include "kart.hpp"
+#include "player.hpp"
 
 class Player;
 
@@ -30,26 +31,28 @@ class Player;
     them to the Kart */
 class PlayerKart : public Kart {
  private:
+  int steerVal, accelVal;
+
   Player *player;
   float  penaltyTime;
-  bool   joystickWasMoved;
 
-  void handleKeyboard(float dt);
+  void smoothSteer(float dt, bool left, bool right);
  public:
   PlayerKart(const KartProperties *kart_properties,
 	     int position, Player *_player) :
     Kart(kart_properties, position), player(_player), 
-    penaltyTime(0.0), joystickWasMoved(false)        {}
+    penaltyTime(0.0)         {    }
 
   int     earlyStartPenalty () {return penaltyTime>0; }
   Player* getPlayer         () {return player;        }
   void    update            (float);
-  void    incomingJoystick  (const KartControl &ctrl);
-  void    action            (int key);
+  void    action            (KartActions action, int value);
   void    forceCrash        ();
   void    handleZipper      ();
   void    collectedHerring  (Herring* herring);
   int     isPlayerKart      () const {return 1;}
+
+  void    reset();
 };
 
 #endif

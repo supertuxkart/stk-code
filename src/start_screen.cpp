@@ -20,34 +20,31 @@
 #if !defined(WIN32) && !defined(__CYGWIN__)
 #  include <unistd.h>   // for usleep
 #endif
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 
 #include "loader.hpp"
 #include "race_manager.hpp"
 #include "start_screen.hpp"
+#include "material.hpp"
+#include "material_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "plibdrv.hpp"
 #include "sound_manager.hpp"
 
 StartScreen* startScreen = NULL;
 
-StartScreen::StartScreen() 
-    : introMaterial(NULL)
-{
+StartScreen::StartScreen() : introMaterial(NULL) {
   menu_manager->switchToMainMenu();
   installMaterial();
-  pwSetCallbacks(keystroke, gui_mousefn, gui_motionfn, NULL, NULL);
 }
 
-StartScreen::~StartScreen()
-{
-  delete introMaterial;
+// -----------------------------------------------------------------------------
+StartScreen::~StartScreen() {
+  ssgDeRefDelete(introMaterial->getState());
   introMaterial= NULL;
-}
+}   // ~StartScreen
 
-void
-StartScreen::update()
-{
+// -----------------------------------------------------------------------------
+void StartScreen::update() {
   //Setup for boring 2D rendering
   glMatrixMode   ( GL_PROJECTION ) ;
   glLoadIdentity () ;
@@ -74,53 +71,56 @@ StartScreen::update()
   usleep(2000);
 #endif
   //Draw the splash screen
-  introMaterial -> force () ;
+  introMaterial->getState()->force();
 
   glBegin ( GL_QUADS ) ;
-  glColor3f    ( 1, 1, 1 ) ;
-  glTexCoord2f ( 0, 0 ) ; glVertex2i (   -1,   -1 ) ;
-  glTexCoord2f ( 1, 0 ) ; glVertex2i (   1,   -1 ) ;
-  glTexCoord2f ( 1, 1 ) ; glVertex2i (   1,   1 ) ;
-  glTexCoord2f ( 0, 1 ) ; glVertex2i (   -1,   1 ) ;
+    glColor3f   (1, 1, 1 ) ;
+    glTexCoord2f(0, 0); glVertex2i(-1, -1);
+    glTexCoord2f(1, 0); glVertex2i( 1, -1);
+    glTexCoord2f(1, 1); glVertex2i( 1,  1);
+    glTexCoord2f(0, 1); glVertex2i(-1,  1);
   glEnd () ;
 
   glFlush();
-  pollEvents() ;
   menu_manager->update();
   sound_manager->update();
 
   // Swapbuffers - and off we go again...
-  pwSwapBuffers();
-}
+  SDL_GL_SwapBuffers();
+}   // update
 
-void
-StartScreen::installMaterial()
-{
+// -----------------------------------------------------------------------------
+void StartScreen::reInit() {
+  installMaterial();
+}   // reInit
+
+// -----------------------------------------------------------------------------
+void StartScreen::installMaterial() {
   /* Make a simplestate for the title screen texture */
-  introMaterial = new ssgSimpleState;
-  introMaterial -> setTexture(loader->getPath("images/st_title_screen.rgb").c_str(), TRUE, TRUE);
-  introMaterial -> enable      ( GL_TEXTURE_2D ) ;
-  introMaterial -> disable     ( GL_LIGHTING  ) ;
-  introMaterial -> disable     ( GL_CULL_FACE ) ;
-  introMaterial -> setOpaque   () ;
-  introMaterial -> disable     ( GL_BLEND ) ;
-  introMaterial -> setShadeModel ( GL_SMOOTH ) ;
-  introMaterial -> disable     ( GL_COLOR_MATERIAL ) ;
-  introMaterial -> enable      ( GL_CULL_FACE      ) ;
-  introMaterial -> setMaterial ( GL_EMISSION, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-  introMaterial -> setMaterial ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-  introMaterial -> setShininess ( 0 ) ;
-}
+  introMaterial = material_manager->getMaterial("st_title_screen.rgb");
+  // This ref is necessary: if the window mode is changed (to/from fullscreen)
+  // the textures all need to be reloaded. But the current context 
+  // (_ssgCurrentContext) still has a pointer to the old ssgTexture object.
+  // If the texture for the new title screen is set (as part of force()),
+  // ssgSimpleState::setTexture() will ssgDeRefDelete the old texture. The
+  // old texture (even if most likely already deleted) will still have the 
+  // old texture handle for the title screen, which will then get deleted!
+  // Since the new title texture has the same texture handle, the new title
+  // screen gets deleted a well.
+  // One solution is:
+  //  _ssgCurrentContext->getState()->setTexture((ssgTexture*)NULL);
+  // before material_manager->reInit() in sdldrv (this way the old tile screen
+  // texture gets deleted, which will be deleted in reInit anyway), and when
+  // the new texture is set, the old teture is NULL, so nothing will be
+  // incorrectly deleted. Or we artifically increase the ref count, so that
+  // it does not get freed:
+  introMaterial->getState()->ref();
+}   // installMaterial
 
-void
-StartScreen::switchToGame()
-{
-  delete introMaterial;
-  introMaterial= NULL;
+// -----------------------------------------------------------------------------
+void StartScreen::switchToGame() {
 
   race_manager->start();
-}
+}   // switchToGame
 
 /* EOF */

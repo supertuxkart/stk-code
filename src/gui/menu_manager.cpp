@@ -46,31 +46,42 @@
 
 MenuManager* menu_manager= new MenuManager();
 
-MenuManager::MenuManager() {
+MenuManager::MenuManager() 
+{
   m_currentMenu= NULL;
   m_handeldSize= 0;
 }
 
-MenuManager::~MenuManager() {
+// -----------------------------------------------------------------------------
+MenuManager::~MenuManager() 
+{
   delete m_currentMenu;
 }
 
-void MenuManager::pushMenu(MenuManagerIDs id) {
+// -----------------------------------------------------------------------------
+void MenuManager::pushMenu(MenuManagerIDs id) 
+{
   m_menuStack.push_back(id);
 }
 
-void MenuManager::popMenu() {
+// -----------------------------------------------------------------------------
+void MenuManager::popMenu() 
+{
   m_menuStack.pop_back();
 }
 
-void MenuManager::update() {
+// -----------------------------------------------------------------------------
+void MenuManager::update() 
+{
 
-  if (m_handeldSize != m_menuStack.size()) {
+  if (m_handeldSize != m_menuStack.size()) 
+  {
     delete m_currentMenu;
     m_currentMenu= NULL;
 
     m_handeldSize= m_menuStack.size();
-    if (m_handeldSize > 0) {
+    if (m_handeldSize > 0) 
+    {
       MenuManagerIDs id= m_menuStack.back();
       switch (id) {
         case MENUID_MAINMENU:
@@ -155,23 +166,36 @@ void MenuManager::update() {
   static ulClock now  = ulClock();
   now.update();
 
-  if (m_currentMenu != NULL) {
+  if (m_currentMenu != NULL) 
+  {
     m_currentMenu->update(now.getDeltaTime());
   }
 }   // update
 
+// -----------------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()
 {
     m_menuStack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
 }
 
+// -----------------------------------------------------------------------------
 void MenuManager::switchToRace()
 {
   m_menuStack.clear();
   pushMenu(MENUID_RACE);
 }
 
+// -----------------------------------------------------------------------------
+// Returns true if the id is somewhere on the stack. This can be used to detect
+// if the config_display menu was called from the race_gui, or main_menu
+bool MenuManager::isSomewhereOnStack(MenuManagerIDs id)
+{
+  return std::find(m_menuStack.begin(), m_menuStack.end(), id) !=
+         m_menuStack.end();
+}   // isSomewhereOnStack
+
+// -----------------------------------------------------------------------------
 void MenuManager::switchToMainMenu()
 {
   if (m_currentMenu != NULL) {

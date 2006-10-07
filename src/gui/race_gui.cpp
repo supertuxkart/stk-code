@@ -18,8 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
-
+#include <SDL/SDL.h>
 #include "race_gui.hpp"
 #include "history.hpp"
 #include "widget_set.hpp"
@@ -27,6 +26,7 @@
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
+#include "sdldrv.hpp"
 
 RaceGUI::RaceGUI(): time_left(0.0) {
   if(!config->profile) {
@@ -67,32 +67,52 @@ RaceGUI::~RaceGUI() {
 
 // -----------------------------------------------------------------------------
 void RaceGUI::UpdateKeyboardMappings() {
+  // Clear all entries.
+  for(int type = 0;type< (int) IT_LAST+1;type++)
+    for(int id0=0;id0<MAX_ID0;id0++)
+      for(int id1=0;id1<MAX_ID1;id1++)
+        for(int id2=0;id2<MAX_ID2;id2++)
+          inputMap[type][id0][id1][id2].kart = NULL;
+
+
   // Defines the mappings for player keys to kart and action	
   // To avoid looping over all players to find out what
   // player control key was pressed, a special data structure 
   // is set up: keysToKArt contains for each (player assigned) 
   // key which kart it applies to (and therefore which player),
   // and typeForKey contains the assigned function of that key.
-  for(int i=0; i<MAXKEYS; i++) {
-    keysToKart[i]=0;
-    typeForKey[i]=0;
-  }
-  
-  for(int i=0; i<world->raceSetup.getNumPlayers(); i++) {
-    assert(world != NULL);
+  int num=world->raceSetup.getNumPlayers();
+  for(int i=0; i<num; i++)
+  {
     PlayerKart* kart = world->getPlayerKart(i);
-    Player* p        = kart->getPlayer();
-    
-    keysToKart[p->getKey(KC_WHEELIE)] = kart;
-    keysToKart[p->getKey(KC_JUMP)   ] = kart;
-    keysToKart[p->getKey(KC_RESCUE) ] = kart;
-    keysToKart[p->getKey(KC_FIRE)   ] = kart;
-    typeForKey[p->getKey(KC_WHEELIE)] = KC_WHEELIE;
-    typeForKey[p->getKey(KC_JUMP)   ] = KC_JUMP;
-    typeForKey[p->getKey(KC_RESCUE) ] = KC_RESCUE;
-    typeForKey[p->getKey(KC_FIRE)   ] = KC_FIRE;
+
+    for(int ka=(int) KC_LEFT;ka< (int) KC_FIRE+1;ka++)
+      putEntry(kart, (KartActions) ka);
   }
+
 }   // UpdateKeyControl
+
+void RaceGUI::putEntry(PlayerKart *kart, KartActions kc)
+{
+  Player *p = kart->getPlayer();
+  Input *i  = p->getInput(kc);
+
+  inputMap[i->type][i->id0][i->id1][i->id2].kart = kart;
+  inputMap[i->type][i->id0][i->id1][i->id2].action = kc;
+}
+
+bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
+{
+  PlayerKart *k = inputMap[type][id0][id1][id2].kart;
+
+  if (k)
+    {
+      k->action(inputMap[type][id0][id1][id2].action, value);
+      return true;
+    }
+  else
+   return false;
+}
 
 // -----------------------------------------------------------------------------
 void RaceGUI::update(float dt) {
@@ -100,17 +120,35 @@ void RaceGUI::update(float dt) {
   drawStatusText(world->raceSetup, dt);
 }   // update
 
+void RaceGUI::input(InputType type, int id0, int id1, int id2, int value)
+{
+  switch (type)
+  {
+    case IT_KEYBOARD:
+      if (!handleInput(type, id0, id1, id2, value))
+        inputKeyboard(id0, value);
+      break;
+    default:
+      handleInput(type, id0, id1, id2, value);
+      break;
+  }
+
+}
+
 // -----------------------------------------------------------------------------
-void RaceGUI::keybd(int key) {
+void RaceGUI::inputKeyboard(int key, int pressed) {
+  if (!pressed)
+    return;
+
   static int isWireframe = FALSE ;
   switch ( key ) {
-    case 0x12:
+    case 0x12: // TODO: Which key is that?
       if(world->raceSetup.getNumPlayers()==1) {   // ctrl-r
         Kart* kart = world->getPlayerKart(0);
         kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
       }
       break;
-    case PW_KEY_F12:
+    case SDLK_F12:
       config->displayFPS = !config->displayFPS;
 	  if(config->displayFPS) {
         fpsTimer.reset();
@@ -118,46 +156,30 @@ void RaceGUI::keybd(int key) {
         fpsCounter=0;
       }
       break;
-    case PW_KEY_F11:
+    case SDLK_F11:
       glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
       isWireframe = ! isWireframe;
       break;
-    case 27: // ESC
+      // For now disable F9 toggling fullscreen, since windows requires
+      // to reload all textures, display lists etc. Fullscreen can
+      // be toggled from the main menu (options->display).
+    case SDLK_F9:
+      drv_toggleFullscreen(0);   // 0: do not reset textures
+      // Fall through to put the game into pause mode.
+    case SDLK_ESCAPE: // ESC
       widgetSet->tgl_paused();
       menu_manager->pushMenu(MENUID_RACEMENU);
       // The player might have changed the keyboard 
       // configuration, so we need to redefine the mappings
       if(!config->profile) UpdateKeyboardMappings();
       break;
-    case PW_KEY_F10:
+    case SDLK_F10:
       history->Save();
       break;
     default:
-      // Check if it's a user assigned key
-      if (keysToKart[key] != 0) {
-        keysToKart[key]->action(typeForKey[key]);
-      }
       break;
     } // switch
 } // keybd
-
-// -----------------------------------------------------------------------------
-void RaceGUI::stick(const int &whichAxis, const float &value){
-  KartControl controls;
-  controls.data[whichAxis] = value;
-  assert(world != NULL);
-  world -> getPlayerKart(0) -> incomingJoystick ( controls );
-}   // stick
-
-// -----------------------------------------------------------------------------
-void RaceGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
-  KartControl controls;
-  controls.buttons = hold;
-  controls.presses = presses;
-  controls.releases = releases;
-  assert(world != NULL);
-  world -> getPlayerKart(whichJoy) -> incomingJoystick ( controls );
-}   // joybuttons
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawFPS () {

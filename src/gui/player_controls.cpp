@@ -17,7 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
 #include "player_controls.hpp"
 #include "widget_set.hpp"
 #include "config.hpp"
@@ -73,47 +72,19 @@ void PlayerControls::select() {
 }   // select
 
 // -----------------------------------------------------------------------------
-void PlayerControls::keybd(int key) {
-  if (grabInput) {
+void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
+{
+  if (grabInput && value)
+  {
     //    printf("Setting %d: %lx: from %d to %d\n",
     //	   player_index, config->player[player_index],config->player[player_index].keys[editAction],key);
-    config->player[player_index].setKey(editAction, key);
+    config->player[player_index].setInput(editAction, type, id0, id1, id2);
     grabInput = false;
     changeKeyLabel(grab_id, editAction);
-  } else
-    BaseGUI::keybd(key);
-}   // keybd
-
-// -----------------------------------------------------------------------------
-void PlayerControls::point(int x, int y) {
-    if (!grabInput)
-        widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
-}   // point
-
-// -----------------------------------------------------------------------------
-void PlayerControls::stick(const int &whichAxis, const float &value) {
-  if (!grabInput)
-    widgetSet -> pulse(widgetSet -> stick(menu_id, whichAxis, (int)value), 1.2f);
-}   // stick
-
-// -----------------------------------------------------------------------------
-void PlayerControls::joybuttons(int whichJoy, int hold, int presses,
-                                int releases) {
-  if(grabInput)
-  {
-      if (editAction != KC_LEFT && editAction != KC_RIGHT &&
-          editAction != KC_ACCEL && whichJoy == player_index && presses)
-      {
-          config->player[player_index].setButton(editAction, presses);
-          grabInput = false;
-          changeKeyLabel(grab_id, editAction);
-      }
   }
   else
-  {
-      BaseGUI::joybuttons(whichJoy, hold, presses, releases);
-  }
-}   // joybuttons
+    BaseGUI::input(type, id0, id1, id2, value);
+}
 
 // -----------------------------------------------------------------------------
 void PlayerControls::addKeyLabel(int change_id, KartActions control, bool start)
@@ -136,5 +107,5 @@ void PlayerControls::changeKeyLabel(int grab_id, KartActions control) {
 
 // -----------------------------------------------------------------------------
 void PlayerControls::setKeyInfoString(KartActions control) {
-  KeyNames[control] = config->GetKeyAsString(player_index, control);
+  KeyNames[control] = config->getInputAsString(player_index, control);
 }   // setKeyInfoString

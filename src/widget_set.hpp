@@ -118,7 +118,7 @@ class WidgetSet
 public:
 	WidgetSet();
 	~WidgetSet();
-	
+        void reInit();   // necessary in case of fullscreen/window mode change on windows
 	/*---------------------------------------------------------------------------*/
 	
 	/* change the value of variables stored by already-existing widgets*/	
@@ -221,7 +221,7 @@ public:
 	int  point(int, int x, int y);	
 	
 	/* joystick movement */
-	int  stick(int, int whichAxis, int value);
+	int  stick(int, int axis, int dir, int value);
 	
 	/* keyboard cursors */
 	int cursor(int id, int key);

@@ -62,7 +62,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	screen_manager.cpp	   screen_manager.hpp        	\
 	widget_set.cpp		   widget_set.hpp	        \
 	camera.cpp		   camera.hpp	        	\
-	plibdrv.cpp		   plibdrv.hpp	        	\
+	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
 	kart.cpp		   kart.hpp		        \
 	auto_kart.cpp		   auto_kart.hpp             	\
@@ -103,4 +103,4 @@ supertuxkart_SOURCES =             main.cpp  			\
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L . -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-	-lplibpw -lplibul -lplibssgaux $(opengl_LIBS) $(openal_LIBS) $(mikmod_LIBS)
+	-lplibul -lplibssgaux $(opengl_LIBS)  $(SDL_LIBS) $(openal_LIBS) $(mikmod_LIBS)

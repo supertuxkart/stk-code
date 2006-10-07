@@ -43,7 +43,7 @@
 #include "start_screen.hpp"
 #include "widget_set.hpp"
 #include "material_manager.hpp"
-#include "plibdrv.hpp"
+#include "sdldrv.hpp"
 #include "hook_manager.hpp"
 #include "history.hpp"
 #include "herring_manager.hpp"
@@ -69,10 +69,8 @@ void cmdLineHelp (char* invocation) {
 //FIXME	    "  --reverse               Enable reverse mode\n"
 //FIXME	    "  --mirror                Enable mirror mode (when supported)\n"
 	    "  --herring style         Herring style to use\n"
-#if FULLSCREEN_IS_CURRENTLY_DISABLED
 	    "  -f,  --fullscreen       Fullscreen display.\n"
 	    "  -w,  --windowed         Windowed display. (default)\n"
-#endif
 	    "  -s,  --screensize WIDTHxHEIGHT\n"
 	    "                          Set the screen size (e.g. 320x200)\n"
 	    "  -v,  --version          Show version.\n"
@@ -241,7 +239,7 @@ int main ( int argc, char **argv ) {
   //handleCmdLine() needs InitTuxkart() so it can't be called first
   if(!handleCmdLine(argc, argv)) exit(0);
 
-  InitPlib();
+  drv_init();
   // loadMaterials needs ssgLoadTextures (internally), which can
   // only be called after ssgInit (since this adds the actual loader)
   // so this next call can't be in InitTuxkart. And InitPlib needs
@@ -298,6 +296,8 @@ int main ( int argc, char **argv ) {
     screen_manager->run();
   }
   config->saveConfig();
+  
+  drv_deinit();
 return 0 ;
 }
 

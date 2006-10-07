@@ -36,9 +36,13 @@ Options::Options()
 	widgetSet -> space(menu_id);
 	widgetSet -> label(menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
 	widgetSet -> start(menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
-#if FULLSCREEN_IS_CURRENTLY_DISABLED
-	widgetSet -> state(menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
-#endif
+	// Don't display the fullscreen menu when called from within the race.
+	// The fullscreen mode will reload all textures, reload the models,
+	// ... basically creating a big mess!!  (and all of this only thanks
+	// to windows, who discards all textures, ...)
+	if(!menu_manager->isSomewhereOnStack(MENUID_RACE)) {
+	  widgetSet -> state(menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
+	}
 	widgetSet -> state(menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);
 	widgetSet -> space(menu_id);
 	widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);

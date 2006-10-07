@@ -28,7 +28,7 @@ MaterialManager *material_manager=0;
 MaterialManager::MaterialManager(){
   /* Create list - and default material zero */
 
-  materials = new ulList ( 100 ) ;
+  materials.reserve(100);
   // We can't call init here, since the global variable
   // material_manager has not yet been initialised, and
   // material_manager is used in the Material constructor.
@@ -38,10 +38,21 @@ MaterialManager::MaterialManager(){
 }
 
 int MaterialManager::addEntity(Material *m) {
-  materials->addEntity(m);
-  return materials->searchForEntity(m);
+  materials.push_back(m);
+  return materials.size()-1;
 }
 
+// -----------------------------------------------------------------------------
+void MaterialManager::reInit() {
+  for(std::vector<Material*>::const_iterator i=materials.begin();
+      i!=materials.end(); i++) {
+    delete *i;
+  }
+  materials.clear();
+  loadMaterial();
+}   // reInit
+
+// -----------------------------------------------------------------------------
 void MaterialManager::loadMaterial() {
   // Create the default/empty material. The Material 
   // constructor will add the material to (this) material_manager
@@ -131,14 +142,14 @@ int MaterialManager::parseMaterial ( FILE *fd )
 
 Material *MaterialManager::getMaterial ( ssgLeaf *l )
 {
-  return getEntity ( l -> getExternalPropertyIndex () ) ;
+  return materials[l -> getExternalPropertyIndex ()] ;
 }
 
 
 Material *MaterialManager::getMaterial ( const char* fname )
 {
   if ( fname == NULL || fname[0] == '\0' )
-    return getEntity ( 0 ) ;
+    return materials[0];
 
   //This copy is made so the original fname is not modified
   char *fname_copy = strdup(fname);
@@ -169,7 +180,7 @@ Material *MaterialManager::getMaterial ( const char* fname )
 
   for ( int i = 0 ; i < getNumEntities () ; i++ )
   {
-    char *fname2 = getEntity(i)-> getTexFname () ;
+    char *fname2 = materials[i]-> getTexFname () ;
 
     if ( fname2 != NULL && fname2[0] != '\0' )
     {
@@ -198,7 +209,7 @@ Material *MaterialManager::getMaterial ( const char* fname )
         *fn2 = '\0' ;
 
       if ( strcmp ( basename, basename2 ) == 0 )
-        return getEntity ( i ) ;
+        return materials[i] ;
     }
   }
 

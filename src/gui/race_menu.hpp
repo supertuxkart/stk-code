@@ -30,7 +30,7 @@ public:
 
 	void update(float dt);
 	void select();
-	void keybd(int key);
+	void inputKeyboard(int key, int pressed);
 };
 
 #endif

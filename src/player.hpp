@@ -22,6 +22,18 @@
 
 #include <string>
 
+enum AxisDirection { AD_NEGATIVE, AD_POSITIVE };
+
+enum InputType { IT_KEYBOARD, IT_STICKMOTION, IT_STICKBUTTON, IT_STICKHAT, IT_MOUSEMOTION, IT_MOUSEBUTTON };
+#define IT_LAST IT_MOUSEBUTTON
+
+typedef struct {
+  InputType type;
+  int id0;
+  int id1;
+  int id2;
+} Input;
+
 // Some part (e.g. gui/PlayerControls) depend on KC_LEFT being the first
 // entry, and KC_FIRE being the last - so any action added should be
 // added in between those two values.
@@ -40,24 +52,29 @@ class Player
 {
 private:
     std::string name;
-    bool useJoy;    //player is using a joystick
-    int keys[8]; //keyboard keymap and joystick button map
-    int buttons[8];
-    int lastKartId;
+    Input actionMap[KC_FIRE+1];
+    unsigned int lastKartId;
 
 public:
     Player(){}
     Player(const std::string &name_):name(name_){}
     void setName(const std::string &name_){name = name_;}
-    void setKey(KartActions action, int key){keys[action]=key;}
-    void setButton(KartActions action, int button){buttons[action]=button;}
-    void setUseJoystick(bool set){useJoy= set;}
-    
+
+    void setKey(KartActions action, int key) {}
+    void setButton(KartActions action, int button){ }
+
     const char* getName() {return name.c_str();}
-	int getKey(KartActions action){return keys[action];}
-    int getButton(KartActions action){return buttons[action];}
-    bool IsUsingJoystick() {return useJoy; }
-    int getLastKartId(){ return lastKartId; }
+
+    Input *getInput(KartActions action) { return &actionMap[action]; }
+    void setInput(KartActions action, InputType type, int id0, int id1, int id2){
+                                       Input *i = &actionMap[action];
+                                       i->type = type;
+                                       i->id0 = id0;
+                                       i->id1 = id1;
+                                       i->id2 = id2;
+	 }
+
+    unsigned int getLastKartId(){ return lastKartId; }
     void setLastKartId(int newLastKartId){ lastKartId = newLastKartId; } 
 };
 

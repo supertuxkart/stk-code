@@ -22,14 +22,14 @@
 
 #include "base_gui.hpp"
 
-class ConfigDisplay: public BaseGUI
-{
+class ConfigDisplay: public BaseGUI {
+  void CreateMenu();
 public:
-	ConfigDisplay();
-	~ConfigDisplay();
+  ConfigDisplay();
+  ~ConfigDisplay();
 	
-	void update(float dt);
-	void select();
+  void update(float dt);
+  void select();
 
 private:
   int fullscreen_menu_id;

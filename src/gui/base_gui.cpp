@@ -17,27 +17,65 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 
 #include "base_gui.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
 
-void BaseGUI::keybd(int key) {
+void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
+{
+  switch (type)
+  {
+    case IT_KEYBOARD:
+      inputKeyboard(id0, value);
+      break;
+    case IT_MOUSEMOTION:
+      if (id0 == 1 && value)
+        if (id1 == AD_NEGATIVE)
+          inputKeyboard(SDLK_UP, 1);
+        else
+          inputKeyboard(SDLK_DOWN, 1);
+      break;
+    case IT_STICKMOTION:
+      if(widgetSet)
+        widgetSet -> pulse(widgetSet -> stick(menu_id, id1, id2, value), 1.2f);
+      break;
+    case IT_STICKBUTTON:
+      if( value)
+        switch (id1) // Button no
+        {
+          case 0:
+            select();
+            break;
+          case 1:
+            menu_manager->popMenu();
+            break;
+        }
+       break;
+     default:
+       break;
+  }
+
+}
+
+void BaseGUI::inputKeyboard(int key, int pressed) {
+  if (!pressed)
+    return;
+
   switch ( key ) {
-    case PW_KEY_LEFT:
-    case PW_KEY_RIGHT:
-    case PW_KEY_UP:
-    case PW_KEY_DOWN:
+    case SDLK_LEFT:
+    case SDLK_RIGHT:
+    case SDLK_UP:
+    case SDLK_DOWN:
       widgetSet->pulse(widgetSet->cursor(menu_id, key), 1.2f);
       break;
-
-    case ' ' :
-    case '\r':
+    case SDLK_SPACE:
+    case SDLK_RETURN:
       select();
       break;
     
-    case 27:  // ESC
+    case SDLK_ESCAPE:
       menu_manager->popMenu();
       break;
 
@@ -46,32 +84,6 @@ void BaseGUI::keybd(int key) {
   }   // switch
 }   // keybd
 
-// -----------------------------------------------------------------------------
-void BaseGUI::point(int x, int y) {
-  if(widgetSet) {
-    widgetSet -> pulse(widgetSet -> point(menu_id, x, y), 1.2f);
-  }
-}   // point
-
-// -----------------------------------------------------------------------------
-void BaseGUI::stick(const int &whichAxis, const float &value) {
-  if(widgetSet) {
-    widgetSet -> pulse(widgetSet -> stick(menu_id, whichAxis, (int)value), 1.2f);
-  }
-}   // stick
-
-// -----------------------------------------------------------------------------
-void BaseGUI::joybuttons( int whichJoy, int hold, int presses, int releases ) {
-  (void)whichJoy; (void)hold; (void)releases;
-
-  if( presses & 2 ) {
-    select();
-  }
-
-  if (presses & 1) {
-    menu_manager->popMenu();
-  }
-}   // joybuttons
 // -----------------------------------------------------------------------------
 
 void BaseGUI::update(float dt) {

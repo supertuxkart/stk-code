@@ -1760,7 +1760,7 @@ OBJECT poly
 name "Curve"
 data 8
 Mesh.004
-texture "chrome.png"
+texture "chrome.rgb"
 texrep 1 1
 crease 30
 rot 1 0 0 0 1 0 0 0 1

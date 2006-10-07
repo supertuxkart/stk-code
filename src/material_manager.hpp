@@ -22,6 +22,7 @@
 
 #include <plib/ssg.h>
 #include <string>
+#include <vector>
 
 class Material;
 
@@ -30,17 +31,17 @@ class MaterialManager {
 
   char   *parseFileName(char **str);
   int     parseMaterial(FILE *fd);
-  ulList *materials ;
+  
+  std::vector<Material*>  materials;
  public:
-          MaterialManager();
-  void      loadMaterial();
-  Material *getEntity(int i) {return (Material*)materials->getEntity(i);}
-  int       addEntity(Material *m);
-  int       searchForEntity(Material *m) {return materials->searchForEntity(m);}
-  int       getNumEntities() {return materials->getNumEntities();}
-  Material *getMaterial (const char *texname);
-  Material *getMaterial (const std::string& t) {return getMaterial(t.c_str());}
-  Material *getMaterial (ssgLeaf *lf);
+            MaterialManager();
+  void      loadMaterial   ();
+  void      reInit         ();
+  int       addEntity      (Material *m);
+  Material *getMaterial    (ssgLeaf *lf);
+  Material *getMaterial    (const char *texname);
+  Material *getMaterial    (const std::string& t) {return getMaterial(t.c_str());}
+  int       getNumEntities ()                     {return materials.size();      }
 };
 
 extern ssgState *fuzzy_gst, *herringbones_gst;

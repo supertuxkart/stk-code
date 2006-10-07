@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <SDL/SDL.h>
+
 #include "main_menu.hpp"
 #include "widget_set.hpp"
 #include "race_manager.hpp"
@@ -85,16 +87,18 @@ void MainMenu::select()
 	}
 }
 
-void MainMenu::keybd(int key)
+void MainMenu::inputKeyboard(int key, int pressed)
 {
 	switch ( key )
 	{
-	case 27:   //ESC
+	case SDLK_ESCAPE:   //ESC
+	if(!pressed)
+	  break;
         menu_manager->pushMenu(MENUID_EXITGAME);
 		break;
 
 	default:
-        BaseGUI::keybd(key);
+        BaseGUI::inputKeyboard(key, pressed);
 		break;
 	}
 }

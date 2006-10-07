@@ -25,15 +25,25 @@
 #include "material.hpp"
 #include "config.hpp"
 #include "player_kart.hpp"
-#include "plibdrv.hpp"
+#include "player.hpp"
+
+// TODO: Fix this.
+#define MAX_ID0 512
+#define MAX_ID1 16
+#define MAX_ID2 2
+
+typedef struct {
+  PlayerKart *kart;
+  KartActions action;
+} Entry;
 
 class RaceSetup;
 
 class RaceGUI: public BaseGUI {
   // A mapping for the assigned keys (like fire, ...) to
   // the kart which is using them
-  PlayerKart* keysToKart[MAXKEYS];
-  int         typeForKey[MAXKEYS];
+  Entry inputMap[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
+
   int         xOffForText;
   float       timeOfLeader;
   int         lapLeader;
@@ -43,10 +53,8 @@ public:
        ~RaceGUI();
   void update(float dt);
   void select() {}
-  void keybd(int key);
-  void point(int x, int y) { (void)x; (void)y; }
-  void stick     (const int &whichAxis, const float &value) ;
-  void joybuttons(int whichJoy, int hold, int presses, int releases ) ;
+  void input(InputType type, int id0, int id1, int id2, int value);
+  void handleKartAction(KartActions ka, int value);
 
 private:
     ulClock   fpsTimer;
@@ -72,6 +80,9 @@ private:
 				int   offset_x, int   offset_y, 
 				float ratio_x,  float ratio_y  );
     void UpdateKeyboardMappings();
+    void putEntry(PlayerKart *kart, KartActions ka);
+    bool handleInput(InputType type, int id0, int id1, int id2, int value);
+    void inputKeyboard(int key, int pressed);
     void drawPlayerIcons       ();
     void oldDrawPlayerIcons    ();
     void drawGameOverText      (const float dt);

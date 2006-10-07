@@ -22,7 +22,6 @@
 
 #include "screen.hpp"
 
-class ssgSimpleState;
 
 class EmptyScreen : public Screen
 {

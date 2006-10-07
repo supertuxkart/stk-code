@@ -80,6 +80,7 @@ public:
   int getMenuStackSize() {return (int)m_menuStack.size();}
 
   bool isCurrentMenu(MenuManagerIDs id) {return (m_menuStack.back() == id);}
+  bool isSomewhereOnStack(MenuManagerIDs id);
   BaseGUI* getCurrentMenu() {return m_currentMenu;}
 
   void update();

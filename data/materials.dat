@@ -90,5 +90,6 @@
 "sshot-tuxtrack.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
 "sshot-volcano.rgb"    N N     N      0.1     Y     N   1.0     N   N    N    Y
 "sshot-olivermath.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"st_title_screen.rgb"  Y Y     N      1.0     N     N   1.0     N   N    N    Y
 
 # EOF #

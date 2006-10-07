@@ -17,7 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
+
 #include "world.hpp"
 #include "widget_set.hpp"
 #include "world_screen.hpp"
@@ -26,7 +27,6 @@
 #include "config.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
-#include "plibdrv.hpp"
 #include "gui/menu_manager.hpp"
 #include "history.hpp"
 
@@ -74,7 +74,6 @@ void WorldScreen::update() {
 
   draw();
 
-  pollEvents();
   menu_manager->update();
   sound_manager->update() ;
   if(config->profile) {
@@ -91,7 +90,7 @@ void WorldScreen::update() {
     }
   }   // if profile
 
-  pwSwapBuffers() ;
+  SDL_GL_SwapBuffers() ;
 }
 
 void

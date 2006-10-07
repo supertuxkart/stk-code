@@ -17,17 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 
 #include "empty_screen.hpp"
 #include "start_screen.hpp"
 #include "screen_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "plibdrv.hpp"
 
 EmptyScreen::EmptyScreen()
 {
-  pwSetCallbacks(keystroke, gui_mousefn, gui_motionfn, NULL, NULL);
 }
 
 EmptyScreen::~EmptyScreen()
@@ -37,10 +35,9 @@ EmptyScreen::~EmptyScreen()
 void
 EmptyScreen::update()
 {
-    pollEvents() ;
     menu_manager->update();
 
-    pwSwapBuffers();
+    SDL_GL_SwapBuffers();
 }
 
 /* EOF */

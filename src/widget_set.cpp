@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 
 #include "constants.hpp"
 #include "widget_set.hpp"
@@ -34,7 +34,8 @@ WidgetSet::WidgetSet()
 	int h   = config->height;
 	int s   = (h < w) ? h : w;
 	radius  = s/60;
-	fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
+				 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 	textOut = new fntRenderer();
 	textOut->setFont(fnt);
 
@@ -62,6 +63,16 @@ WidgetSet::~WidgetSet()
 	}
 
 }
+
+void WidgetSet::reInit() {
+  if(fnt    ) delete fnt;
+  if(textOut) delete textOut;
+  fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(), 
+			   GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+  textOut = new fntRenderer();
+  textOut->setFont(fnt);
+  
+}   // reInit
 
 int WidgetSet::hot(int id)
 {
@@ -1359,7 +1370,7 @@ int WidgetSet::stick_U(int id, int dd)
 }
 
 
-int WidgetSet::stick(int id, int whichAxis, int value)
+int WidgetSet::stick(int id, int axis, int dir, int value)
 {
     /* Flag the axes to prevent uncontrolled scrolling. */
 
@@ -1370,29 +1381,29 @@ int WidgetSet::stick(int id, int whichAxis, int value)
 
     /* Find a new active widget in the direction of joystick motion. */
 
-    if (whichAxis == 0)
+    if (axis == 0)
     {
-        if(value == 0) x_not_pressed = 1;
-        else if(value == -1 && x_not_pressed)
+        if(!value) x_not_pressed = 1;
+        else if(dir == 0 && x_not_pressed)
         {
             jd = stick_L(id, active);
             x_not_pressed = 0;
         }
-        else if (value == 1 && x_not_pressed)
+        else if (dir == 1 && x_not_pressed)
         {
             jd = stick_R(id, active);
             x_not_pressed = 0;
         }
     }
-    else if(whichAxis == 1)
+    else if(axis == 1)
     {
-        if(value == 0) y_not_pressed = 1;
-        else if(value == -1 && y_not_pressed)
+        if(!value) y_not_pressed = 1;
+        else if(dir == 0 && y_not_pressed)
         {
             jd = stick_U(id, active);
             y_not_pressed = 0;
         }
-        else if (value == 1 && y_not_pressed)
+        else if (dir == 1 && y_not_pressed)
         {
             jd = stick_D(id, active);
             y_not_pressed = 0;
@@ -1413,10 +1424,10 @@ int WidgetSet::cursor(int id, int key)
 
 	switch (key)
 	{
-	case PW_KEY_LEFT:  jd = stick_L(id, active); break;
-	case PW_KEY_RIGHT: jd = stick_R(id, active); break;
-	case PW_KEY_UP:    jd = stick_U(id, active); break;
-	case PW_KEY_DOWN:  jd = stick_D(id, active); break;
+	case SDLK_LEFT:  jd = stick_L(id, active); break;
+	case SDLK_RIGHT: jd = stick_R(id, active); break;
+	case SDLK_UP:    jd = stick_U(id, active); break;
+	case SDLK_DOWN:  jd = stick_D(id, active); break;
 	default: return 0;
 	}
 	
@@ -1443,7 +1454,7 @@ void WidgetSet::set_paused()
 
 void WidgetSet::clr_paused()
 {
-	sound_manager -> resumeMusic() ;
+    sound_manager -> resumeMusic() ;
     paused = false;
 }
 

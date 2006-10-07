@@ -117,7 +117,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
   finishTime           = 0.0f;
   prevAccel            = 0.0f;
   powersliding         = false;
-  smokepuff                = NULL;
+  smokepuff            = NULL;
   smoke_system         = NULL;
   exhaust_pipe         = NULL;
   skidmark_left        = NULL;
@@ -145,6 +145,7 @@ Kart::~Kart() {
   if (wheel_front_r) wheel_front_r->setTransform(wheel_steer);
 
 
+  ssgDeRefDelete(shadow);
   ssgDeRefDelete(wheel_front_l);
   ssgDeRefDelete(wheel_front_r);
   ssgDeRefDelete(wheel_rear_l);

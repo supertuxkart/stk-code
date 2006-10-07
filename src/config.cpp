@@ -18,6 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
+
 #include <stdexcept>
 #include <sstream>
 
@@ -29,7 +30,7 @@
 #  include <direct.h>
 #endif
 
-#include <plib/pw.h>
+#include <SDL/SDL.h>
 #include <plib/ul.h>
 
 #include "config.hpp"
@@ -111,58 +112,45 @@ void Config::setDefaults() {
   player[2].setName("Player 3");
   player[3].setName("Player 4");
 
-  player[0].setUseJoystick(true);
-  player[1].setUseJoystick(false);
-  player[2].setUseJoystick(false);
-  player[3].setUseJoystick(false);
-  
   /*player 1 default keyboard settings*/
-  player[0].setKey(KC_LEFT,    PW_KEY_LEFT);
-  player[0].setKey(KC_RIGHT,   PW_KEY_RIGHT);
-  player[0].setKey(KC_ACCEL,   PW_KEY_UP);
-  player[0].setKey(KC_BRAKE,   PW_KEY_DOWN);
-  player[0].setKey(KC_WHEELIE, 'a');
-  player[0].setKey(KC_JUMP,    's');
-  player[0].setKey(KC_RESCUE,  'd');
-  player[0].setKey(KC_FIRE,    'f');
-  /*player 1 default joystick settings*/
-  player[0].setButton(KC_BRAKE,     1);
-  player[0].setButton(KC_WHEELIE,   0x20);
-  player[0].setButton(KC_JUMP,      0x10);
-  player[0].setButton(KC_RESCUE,    0x04);
-  player[0].setButton(KC_FIRE,      0x08);
-  
-  /*player 2 default keyboard settings*/
-  player[1].setKey(KC_LEFT,      'j');
-  player[1].setKey(KC_RIGHT,     'l');
-  player[1].setKey(KC_ACCEL,     'i');
-  player[1].setKey(KC_BRAKE,     'k');
-  player[1].setKey(KC_WHEELIE,   'q');
-  player[1].setKey(KC_JUMP,      'w');
-  player[1].setKey(KC_RESCUE,    'e');
-  player[1].setKey(KC_FIRE,      'r');
-  /*player 2 default joystick settings*/
-  player[1].setButton(KC_ACCEL,     0);
-  player[1].setButton(KC_BRAKE,     1);
-  player[1].setButton(KC_WHEELIE,   2);
-  player[1].setButton(KC_JUMP,      3);
-  player[1].setButton(KC_RESCUE,    4);
-  player[1].setButton(KC_FIRE,      5);
+  player[0].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_LEFT,      0, 0);
+  player[0].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_RIGHT,     0, 0);
+  player[0].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_UP,        0, 0);
+  player[0].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_DOWN,      0, 0);
+  player[0].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_RSHIFT,    0, 0);
+  player[0].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_MINUS,     0, 0);
+  player[0].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_BACKSPACE, 0, 0);
+  player[0].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_RCTRL,     0, 0);
 
-  /*player 3 default joystick settings*/
-  player[2].setButton(KC_ACCEL,     0);
-  player[2].setButton(KC_BRAKE,     1);
-  player[2].setButton(KC_WHEELIE,   2);
-  player[2].setButton(KC_JUMP,      3);
-  player[2].setButton(KC_RESCUE,    4);
-  player[2].setButton(KC_FIRE,      5);
-  /*player 4 default joystick settings*/
-  player[3].setButton(KC_ACCEL,     0);
-  player[3].setButton(KC_BRAKE,     1);
-  player[3].setButton(KC_WHEELIE,   2);
-  player[3].setButton(KC_JUMP,      3);
-  player[3].setButton(KC_RESCUE,    4);
-  player[3].setButton(KC_FIRE,      5);
+  /*player 2 default keyboard settings*/
+  player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_a,         0, 0);
+  player[1].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_d,         0, 0);
+  player[1].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_w,         0, 0);
+  player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_s,         0, 0);
+  player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_LSHIFT,    0, 0);
+  player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_CAPSLOCK,  0, 0);
+  player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_LALT,      0, 0);
+  player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_LCTRL,     0, 0);
+
+  /*player 3 default keyboard settings*/
+  player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_f,         0, 0);
+  player[1].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_h,         0, 0);
+  player[1].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_t,         0, 0);
+  player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_g,         0, 0);
+  player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_c,         0, 0);
+  player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_v,         0, 0);
+  player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_b,         0, 0);
+  player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_n,         0, 0);
+
+  /*player 4 default keyboard settings*/
+  player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_j,         0, 0);
+  player[1].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_l,         0, 0);
+  player[1].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_i,         0, 0);
+  player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_k,         0, 0);
+  player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_m,         0, 0);
+  player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_COMMA,     0, 0);
+  player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_PERIOD,    0, 0);
+  player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_SLASH,     0, 0);
 }   // setDefaults
 
 
@@ -238,8 +226,8 @@ void Config::loadConfig(const std::string& filename) {
       switch(configFileVersion) {
         case 0:  std::cout << "- Single window menu, old status display,new keyboard style settings were removed\n";
                  needToAbort=0;
-	  //E.g.:case 1:  std::cout << "- Key bindings were changed, please check the settings. All existing values were discarded.\n";
-          //     needToAbort=1;  // if the old keybinds were read, they wouldn't make any sense
+	case 1:  std::cout << "- Key bindings were changed, please check the settings. All existing values were discarded.\n";
+                 needToAbort=1;  // if the old keybinds were read, they wouldn't make any sense
         case 99: break;
         default: std::cout << "Config file version " << configFileVersion 
 			 << " is too old. Discarding your configuration. Sorry. :(\n";
@@ -252,7 +240,6 @@ void Config::loadConfig(const std::string& filename) {
       std::cout << "This warning can be ignored.\n";
       // Keep on reading the config files as far as possible
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
-
 
     /*get toggles*/
     lisp->get("fullscreen",       fullscreen);
@@ -287,24 +274,20 @@ void Config::loadConfig(const std::string& filename) {
       reader->get("name", name);
       player[i].setName(name);
 
-      int tmp= 0;
-      /*get keyboard configuration*/
-      reader->get("left", tmp);    player[i].setKey(KC_LEFT, tmp);
-      reader->get("right", tmp);   player[i].setKey(KC_RIGHT, tmp);
-      reader->get("up", tmp);      player[i].setKey(KC_ACCEL, tmp);
-      reader->get("down", tmp);    player[i].setKey(KC_BRAKE, tmp);
-      reader->get("wheelie", tmp); player[i].setKey(KC_WHEELIE, tmp);
-      reader->get("jump", tmp);    player[i].setKey(KC_JUMP, tmp);
-      reader->get("rescue", tmp);  player[i].setKey(KC_RESCUE, tmp);
-      reader->get("fire", tmp);    player[i].setKey(KC_FIRE, tmp);
+      int lastKartId = 0;
+      reader->get("lastKartId", lastKartId);
+      player[i].setLastKartId(lastKartId);
 
-      /*get joystick configuration*/
-      reader->get("joy-up", tmp);      player[i].setButton(KC_ACCEL, tmp);
-      reader->get("joy-down", tmp);    player[i].setButton(KC_BRAKE, tmp);
-      reader->get("joy-wheelie", tmp); player[i].setButton(KC_WHEELIE, tmp);
-      reader->get("joy-jump", tmp);    player[i].setButton(KC_JUMP, tmp);
-      reader->get("joy-rescue", tmp);  player[i].setButton(KC_RESCUE, tmp);
-      reader->get("joy-fire", tmp);    player[i].setButton(KC_FIRE, tmp);
+      // Retrieves a player's input configuration
+      readInput(reader, "left", KC_LEFT, player[i]);
+      readInput(reader, "right", KC_RIGHT, player[i]);
+      readInput(reader, "accel", KC_ACCEL, player[i]);
+      readInput(reader, "brake", KC_BRAKE, player[i]);
+
+      readInput(reader, "wheelie", KC_WHEELIE, player[i]);
+      readInput(reader, "jump", KC_JUMP, player[i]);
+      readInput(reader, "rescue", KC_RESCUE, player[i]);
+      readInput(reader, "fire", KC_FIRE, player[i]);
     }
   } catch(std::exception& e) {
     std::cout << "Error while parsing config '" << filename << "': " << e.what() << "\n";
@@ -312,6 +295,63 @@ void Config::loadConfig(const std::string& filename) {
   delete root;
 }   // loadConfig
 
+void Config::readInput(const lisp::Lisp* &r,
+		       const char *node,
+                       KartActions action,
+                       Player& player)
+{
+  std::string inputTypeName;
+  const lisp::Lisp* subReader = r->getLisp(node);
+  InputType it=IT_KEYBOARD;
+  // Every unused id variable *must* be set to
+  // something different than -1. Otherwise
+  // the restored mapping will not be applied
+  // to the player.
+  int id0 = -1, id1 = -1, id2 = -1;
+
+  subReader->get("type", inputTypeName);
+  if (inputTypeName == "keyboard")
+    {
+      it = IT_KEYBOARD;
+      subReader->get("key", id0);
+      id1 = id2 = 0;
+    }
+  else if (inputTypeName == "stickaxis")
+    {
+      it = IT_STICKMOTION;
+      subReader->get("stick", id0);
+      subReader->get("axis", id1);
+      subReader->get("direction", id2);
+    }
+  else if (inputTypeName == "stickbutton")
+    {
+      it = IT_STICKBUTTON;
+      subReader->get("stick", id0);
+      subReader->get("button", id1);
+      id2 = 0;
+    }
+  else if (inputTypeName == "stickhat")
+    {
+      it = IT_STICKHAT;
+      // TODO: Implement me
+    }
+  else if (inputTypeName == "mouseaxis")
+    {
+      it = IT_MOUSEMOTION;
+      subReader->get("axis", id0);
+      subReader->get("direction", id1);
+      id2 = 0;
+    }
+  else if (inputTypeName == "mousebutton")
+    {
+      it = IT_MOUSEBUTTON;
+      subReader->get("button", id0);
+      id1 = id2 = 0;
+    }
+
+  if (id0 != -1 && id1 != -1 && id2 != -1)
+    player.setInput(action, it, id0, id1, id2);
+}
 
 // -----------------------------------------------------------------------------
 /*call saveConfig w/ the default filename for this platform*/
@@ -376,25 +416,19 @@ void Config::saveConfig(const std::string& filename) {
 
       writer.write("name\t", player[i].getName());
 
-      writer.writeComment("keyboard layout");
-      writer.write("left\t",    player[i].getKey(KC_LEFT));
-      writer.write("right\t",   player[i].getKey(KC_RIGHT));
-      writer.write("up\t\t",    player[i].getKey(KC_ACCEL));
-      writer.write("down\t",    player[i].getKey(KC_BRAKE));
-      writer.write("wheelie\t", player[i].getKey(KC_WHEELIE));
-      writer.write("jump\t",    player[i].getKey(KC_JUMP));
-      writer.write("rescue\t",  player[i].getKey(KC_RESCUE));
-      writer.write("fire\t",    player[i].getKey(KC_FIRE));
+      writer.writeComment("optional");
+      writer.write("lastKartId", player[i].getLastKartId());
       writer.writeComment("optional");
       writer.write("lastKartId", player[i].getLastKartId());
 
-      writer.writeComment("joystick layout");
-      writer.write("joy-up",        player[i].getButton(KC_ACCEL));
-      writer.write("joy-down",      player[i].getButton(KC_BRAKE));
-      writer.write("joy-wheelie\t", player[i].getButton(KC_WHEELIE));
-      writer.write("joy-jump\t",    player[i].getButton(KC_JUMP));
-      writer.write("joy-rescue\t",  player[i].getButton(KC_RESCUE));
-      writer.write("joy-fire\t",    player[i].getButton(KC_FIRE));
+      writeInput(writer, "left\t", KC_LEFT, player[i]);
+      writeInput(writer, "right\t", KC_RIGHT, player[i]);
+      writeInput(writer, "accel\t", KC_ACCEL, player[i]);
+      writeInput(writer, "brake\t", KC_BRAKE, player[i]);
+      writeInput(writer, "wheelie\t", KC_WHEELIE, player[i]);
+      writeInput(writer, "jump\t", KC_JUMP, player[i]);
+      writeInput(writer, "rescue\t", KC_RESCUE, player[i]);
+      writeInput(writer, "fire\t", KC_FIRE, player[i]);
 
       writer.endList(temp);
     }   // for i
@@ -404,59 +438,78 @@ void Config::saveConfig(const std::string& filename) {
     std::cout << "Couldn't write config: " << e.what() << "\n";
   }
 }   // saveConfig
-// -----------------------------------------------------------------------------
-std::string Config::GetKeyAsString(int player_index, KartActions control) {
-  int key         = player[player_index].getKey(control);
-  int useJoystick = player[player_index].IsUsingJoystick();
-  std::string ret;
-  switch (key) {
-    case PW_KEY_RIGHT     : ret="right"  ; break;
-    case PW_KEY_LEFT      : ret="left"   ; break;
-    case PW_KEY_UP        : ret="up"     ; break;
-    case PW_KEY_DOWN      : ret="down"   ; break;
-    case PW_KEY_F1        : ret="F1"     ; break;
-    case PW_KEY_F2        : ret="F2"     ; break;
-    case PW_KEY_F3        : ret="F3"     ; break;
-    case PW_KEY_F4        : ret="F4"     ; break;
-    case PW_KEY_F5        : ret="F5"     ; break;
-    case PW_KEY_F6        : ret="F6"     ; break;
-    case PW_KEY_F7        : ret="F7"     ; break;
-    case PW_KEY_F8        : ret="F8"     ; break;
-    case PW_KEY_F9        : ret="F9"     ; break;
-    case PW_KEY_F10       : ret="F10"    ; break;
-    case PW_KEY_F11       : ret="F11"    ; break;
-    case PW_KEY_F12       : ret="F12"    ; break;
-    case PW_KEY_PAGE_UP   : ret="pg up"  ; break;
-    case PW_KEY_PAGE_DOWN : ret="pg down"; break;
-    case PW_KEY_HOME      : ret="home"   ; break;
-    case PW_KEY_END       : ret="end"    ; break;
-    case PW_KEY_INSERT    : ret="insert" ; break;
-    case 13               : ret="enter"  ; break;
-    case 32               : ret="space"  ; break;
-    default:                ret=" ";
-                            ret[0]=key;
-  }
-  if (useJoystick) {
-    char joyInfo[60];
-    if      (control == KC_LEFT)  sprintf(joyInfo, " or stick left");
-    else if (control == KC_RIGHT) sprintf(joyInfo, " or stick right");
-    else if (control == KC_ACCEL) sprintf(joyInfo, " or stick up");
-    else
+
+void Config::writeInput(lisp::Writer &writer, const char *node, KartActions action, Player& player)
+{
+  Input *input = player.getInput(action);
+
+  writer.beginList(node);
+
+  switch (input->type)
     {
-        const int TARGET_BUTTON = config->player[player_index].getButton(control);
-        int button_number = 0;
-        while((1 << button_number != TARGET_BUTTON) && (button_number < 16))
-            ++button_number;
-
-        if(button_number < 16)
-            sprintf(joyInfo, " or joybutton %d", button_number + 1 );
-        else
-            sprintf(joyInfo, " or unassigned" );
-
+      case IT_KEYBOARD:
+        writer.write("type", "keyboard");
+        writer.write("key", input->id0);
+        break;
+      case IT_STICKMOTION:
+        writer.write("type", "stickaxis");
+        writer.write("stick", input->id0);
+        writer.write("axis", input->id1);
+        writer.writeComment("0 is negative/left/up, 1 is positive/right/down");
+        writer.write("direction", input->id2);
+        break;
+      case IT_STICKBUTTON:
+        writer.write("type", "stickbutton");
+        writer.write("stick", input->id0);
+        writer.write("button", input->id1);
+        break;
+      case IT_STICKHAT:
+        // TODO: Implement me
+        break;
+      case IT_MOUSEMOTION:
+        writer.write("type", "mouseaxis");
+        writer.write("axis", input->id0);
+        writer.writeComment("0 is negative/left/up, 1 is positive/right/down");
+        writer.write("direction", input->id1);
+        break;
+      case IT_MOUSEBUTTON:
+        writer.write("type", "mousebutton");
+        writer.write("button", input->id0);
+        break;
     }
-    ret += joyInfo;
+  
+  writer.endList(node);
+}
+
+// -----------------------------------------------------------------------------
+std::string Config::getInputAsString(int player_index, KartActions control) {
+  Input *input         = player[player_index].getInput(control);
+  std::ostringstream stm;
+
+  switch (input->type)
+  {
+    case IT_KEYBOARD:
+      stm << SDL_GetKeyName((SDLKey) input->id0);
+      break;
+    case IT_STICKMOTION:
+      stm << "joy " << input->id0 << " axis " << input->id1 << ((input->id2 == AD_NEGATIVE) ? " -" : " +");
+      break;
+    case IT_STICKBUTTON:
+      stm << "joy " << input->id0 << " btn " << input->id1;
+      break;
+    case IT_STICKHAT:
+      stm << "joy " << input->id0 << " hat " << input->id1;
+      break;
+    case IT_MOUSEBUTTON:
+      stm << "mouse btn " << input->id0;
+      break;
+    case IT_MOUSEMOTION:
+      stm << "mouse axis " << input->id0 << ((input->id1 == AD_NEGATIVE) ? " -" : " +");
+      break;
+    default:
+      stm << "invalid";
   }
-  return ret;
+  return stm.str();
 }   // GetKeyAsString
 
 /*EOF*/

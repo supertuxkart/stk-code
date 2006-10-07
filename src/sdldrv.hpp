@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: sdldrv.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
@@ -17,18 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PLIBDRV_H
-#define HEADER_PLIBDRV_H
+#ifndef HEADER_SDLDRV_H
+#define HEADER_SDLDRV_H
 
-#define MAXKEYS 512
+void drv_init();
+void drv_deinit();
 
-void InitPlib();
-void keyfn ( int key, int updown, int x, int );
-void gui_mousefn ( int button, int updown, int x, int y );
-void gui_motionfn ( int button, int updown );
-void keystroke ( int key, int updown, int x, int y ) ;
-int  isKeyDown ( unsigned int k ) ;
-int  getKeystroke () ;
-void pollEvents() ;
-void printkeys();
+void drv_toggleFullscreen(int resetTextures=1);
+
+void drv_loop();
+
 #endif

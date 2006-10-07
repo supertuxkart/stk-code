@@ -39,6 +39,7 @@ public:
     void beginList(const std::string& listname);
 
     void write(const std::string& name, int value);
+  void write(const std::string& name, unsigned int value) {write(name, (int)value);}
     void write(const std::string& name, float value);
     void write(const std::string& name, const std::string& value);
 	void write(const std::string& name, const char* value);

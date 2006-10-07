@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <assert.h>
+#include "sdldrv.hpp"
 #include "screen_manager.hpp"
 #include "screen.hpp"
 
@@ -43,13 +44,18 @@ void ScreenManager::setScreen(Screen* screen) {
 // -----------------------------------------------------------------------------
 void ScreenManager::run() {
   while(!do_abort) {
-    if (current_screen) current_screen->update();
+    // Run input processing and all that.
+    drv_loop();
 
+    // Now the screen may have changed and
+    // needs to be updated.
     if (next_screen) {
       delete current_screen;
       current_screen = next_screen;
       next_screen    = 0;
     }   // if next_screen
+
+    if (current_screen) current_screen->update();
   }  // while !do_abort
 }   // run
 

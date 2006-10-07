@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <SDL/SDL.h>
+
 #include "race_menu.hpp"
 #include "world.hpp"
 #include "widget_set.hpp"
@@ -99,17 +101,19 @@ void RaceMenu::select()
 	}
 }
 
-void RaceMenu::keybd(int key)
+void RaceMenu::inputKeyboard(int key, int pressed)
 {
 	switch ( key )
 	{
-	case 27: //ESC
+	case SDLK_ESCAPE: //ESC
+                if(!pressed)
+                  break;
 		widgetSet -> tgl_paused();
 		menu_manager->popMenu();
 		break;
 		
 	default:
-		BaseGUI::keybd(key);
+		BaseGUI::inputKeyboard(key, pressed);
 		break;
 	}
 }

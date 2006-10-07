@@ -67,11 +67,10 @@ void KartProperties::load(const std::string filename, const std::string node) {
   delete root;
 
   // Load material
-  icon_material = material_manager->getMaterial(icon_file.c_str());
+  icon_material = material_manager->getMaterial(icon_file);
 
   // Load model
   if(model_file.length()>0) {
-    //JH    model         = ssgLoadAC ( ("models/"+model_file).c_str(), loader ) ;
     model         = ssgLoadAC ( model_file.c_str(), loader ) ;
 
     ssgStripify(model);

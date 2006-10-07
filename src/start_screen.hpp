@@ -21,14 +21,12 @@
 #define HEADER_STARTSCREEN_H
 
 #include "screen.hpp"
+#include "material.hpp"
 
-class ssgSimpleState;
 
-
-class StartScreen : public Screen
-{
+class StartScreen : public Screen {
 private:
-  ssgSimpleState *introMaterial ;
+  Material *introMaterial ;
 
   void installMaterial();
 public:
@@ -37,6 +35,7 @@ public:
 
   void switchToGame();
   void update(); 
+  void reInit();
 };
 
 extern StartScreen* startScreen;

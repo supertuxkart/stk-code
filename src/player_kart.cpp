@@ -22,73 +22,72 @@
 #include "sound_manager.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
-#include "plibdrv.hpp"
+#include "sdldrv.hpp"
 #include "herring.hpp"
 #include "world.hpp"
 #include "config.hpp"
 
 // -----------------------------------------------------------------------------
-void PlayerKart::incomingJoystick  (const KartControl &ctrl) {
-  //Steering keys(hold)
-  controls.lr      = -ctrl.data[0];
-  joystickWasMoved = fabsf(controls.lr)>0.01;
-  controls.accel   = -ctrl.data[1];
-  controls.brake   = player->getButton(KC_BRAKE)   & ctrl.buttons;
-  controls.wheelie = player->getButton(KC_WHEELIE) & ctrl.buttons;
+void PlayerKart::action(KartActions action, int value)
+{
+  switch (action)
+  {
+    case KC_LEFT:
+      steerVal = -value;
+      break;
+    case KC_RIGHT:
+      steerVal = value;
+      break;
+    case KC_ACCEL:
+      accelVal = value;
+      break;
+    case KC_BRAKE:
+      if (value)
+        accelVal = 0;
+      controls.brake = value;
+      break;
+    case KC_WHEELIE:
+      controls.wheelie = value;
+      break;
+    case KC_RESCUE:
+      controls.rescue = value;
+      break;
+    case KC_FIRE:
+      controls.fire = value;
+      break;
+    case KC_JUMP:
+      controls.jump = value;
+      break;
+   }
+}
 
-  //One time press keys; these are cleared each frame so we don't have to
-  if (player->getButton(KC_RESCUE) & ctrl.presses) controls.rescue = true;
-  if (player->getButton(KC_FIRE)   & ctrl.presses) controls.fire   = true;
-  if (player->getButton(KC_JUMP)   & ctrl.presses) controls.jump   = true;
-}   // incomingJoystick
+void PlayerKart::smoothSteer(float dt, bool left, bool right)
+{
+    float steerChange = dt/getTimeFullSteer();  // amount the steering is changed
+    if       (left)  { controls.lr += steerChange;
+    } else if(right) { controls.lr -= steerChange; 
+    } else {   // no key is pressed
+      if(controls.lr>0.0f) {
+	controls.lr -= steerChange;
+	if(controls.lr<0.0f) controls.lr=0.0f;
+      } else {   // controls.lr<=0.0f;
+	controls.lr += steerChange;
+	if(controls.lr>0.0f) controls.lr=0.0f;
+      }   // if controls.lr<=0.0f
+    }   // no key is pressed
 
-// -----------------------------------------------------------------------------
-// Only keys which must keep on working when still being pressed
-// are handled here, not 'one time action' keys like fire, ...
-void PlayerKart::handleKeyboard(float dt) {
-
-  float steerChange = dt/getTimeFullSteer();  // amount the steering is changed
-  if       (isKeyDown(player->getKey(KC_LEFT)))  { controls.lr += steerChange;
-  } else if(isKeyDown(player->getKey(KC_RIGHT))) { controls.lr -= steerChange; 
-  } else {   // no key is pressed
-    if(controls.lr>0.0f) {
-      controls.lr -= steerChange;
-      if(controls.lr<0.0f) controls.lr=0.0f;
-    } else {   // controls.lr<=0.0f;
-      controls.lr += steerChange;
-      if(controls.lr>0.0f) controls.lr=0.0f;
-    }   // if controls.lr<=0.0f
-  }   // no key is pressed
-  // clamp control value to be within  [-1,1]
   controls.lr = std::min(1.0f, std::max(-1.0f, controls.lr));
 
-  if(isKeyDown(player->getKey(KC_ACCEL)))   controls.accel   =  1.0f;
-  if(isKeyDown(player->getKey(KC_BRAKE)))   controls.brake   =  true;
-  if(isKeyDown(player->getKey(KC_WHEELIE))) controls.wheelie =  true;
-
-}   // handleKeyboard
-
-// -----------------------------------------------------------------------------
-// Gets called by RaceGUI when one of the non-steering keys
-// was pressed. The entries in the CONTROLS data structure
-// are reset in update(dt) after handling the corresponding
-// action.
-void PlayerKart::action(int key) {
-  switch (key) {
-    case KC_FIRE:    controls.fire    = true; break;
-    case KC_JUMP:    controls.jump    = true; break;
-    case KC_RESCUE:  controls.rescue  = true; break;
-  }   // switch key
-}   // action
+}   // smoothSteer
 
 // -----------------------------------------------------------------------------
 void PlayerKart::update(float dt) {
-  // Joystick values takes precedence over keyboard, only
-  // do the keyboard handling if joystick wasn't moved.
-  if(!joystickWasMoved) handleKeyboard(dt);
+  smoothSteer(dt, steerVal == -1, steerVal == 1);
+
+  controls.accel = accelVal;
 
   if(world->getPhase()==World::START_PHASE) {
-    if(controls.lr!=0.0 || controls.accel!=0.0 || controls.brake!=false ||
+    if(controls.accel!=0.0 || controls.brake!=false ||
        controls.fire|controls.wheelie|controls.jump) {
       //JH Some sound here?
       penaltyTime=1.0;
@@ -116,10 +115,6 @@ void PlayerKart::update(float dt) {
   }
 
   Kart::update(dt);
-  controls.accel   = 0.0f;
-  controls.brake   = false;
-  controls.wheelie = false;
-  controls.jump    = 0.0f;
 }   // update
 
 // -----------------------------------------------------------------------------
@@ -139,4 +134,19 @@ void PlayerKart::collectedHerring(Herring* herring) {
     Kart::collectedHerring(herring);
     sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }
+
+void PlayerKart::reset()
+{
+    steerVal = 0;
+    accelVal = 0;
+    controls.accel = 0.0;
+    controls.brake =false;
+    controls.fire = false;
+    controls.wheelie = false;
+    controls.jump = false;
+    penaltyTime = 0;
+
+    Kart::reset();
+}
+
 /* EOF */

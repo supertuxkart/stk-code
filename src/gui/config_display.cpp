@@ -21,12 +21,18 @@
 #include "widget_set.hpp"
 #include "config.hpp"
 #include "menu_manager.hpp"
+#include "sdldrv.hpp"
 
 enum WidgetTokens {
   WTOK_FULLSCREEN, WTOK_BACK
 };
 
 ConfigDisplay::ConfigDisplay() {
+  CreateMenu();
+}
+
+// -----------------------------------------------------------------------------
+void ConfigDisplay::CreateMenu() {
   menu_id = widgetSet -> vstack(0);
   widgetSet -> label(menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
 
@@ -34,18 +40,19 @@ ConfigDisplay::ConfigDisplay() {
   fullscreen_menu_id = widgetSet -> start(va, "Fullscreen mode",  GUI_MED, 
 					  WTOK_FULLSCREEN);
   
-  
   if(config->fullscreen)
     widgetSet->set_label(fullscreen_menu_id, "Window mode");
   widgetSet -> space(menu_id);
   widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
   widgetSet -> layout(menu_id, 0, 0);
-}
+}   // CreateMenu
 
+// -----------------------------------------------------------------------------
 ConfigDisplay::~ConfigDisplay() {
-	widgetSet -> delete_widget(menu_id) ;
+  widgetSet -> delete_widget(menu_id) ;
 }
 
+// -----------------------------------------------------------------------------
 void ConfigDisplay::update(float dt) {
   widgetSet -> timer(menu_id, dt) ;
 #if 0
@@ -57,10 +64,17 @@ void ConfigDisplay::update(float dt) {
   widgetSet -> paint(menu_id) ;
 }
 
+// -----------------------------------------------------------------------------
 void ConfigDisplay::select() {
   switch ( widgetSet -> token (widgetSet -> click()) )  {
   case WTOK_FULLSCREEN:
-    //JHtoggle_fullscreen();
+    drv_toggleFullscreen();
+    widgetSet -> delete_widget(menu_id) ;
+    // Since changing the video mode in drv_toggleFullscreen deletes all
+    // display lists, textures etc., we have to load the menu again.
+    // drv_toggleFullscreen takes care of general material, general
+    // widgetSet, etc.
+    CreateMenu();
     if(config->fullscreen)
       widgetSet->set_label(fullscreen_menu_id, "Window mode");
     else

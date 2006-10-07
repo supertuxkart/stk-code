@@ -154,11 +154,9 @@ void Material::install ()
   
   state -> ref () ;
   state -> setExternalPropertyIndex ( index ) ;
-  if ( texname != NULL && texname [ 0 ] != '\0' )
-  {
-    char fn [ 1024 ] ;
-    sprintf ( fn, "images/%s", texname ) ;
-    state -> setTexture ( loader->getPath(fn).c_str(), !(clamp_tex & UCLAMP),
+  if ( texname != NULL && texname [ 0 ] != '\0' ) {
+    std::string fn=std::string("images")+DIR_SEPARATOR+texname;
+    state -> setTexture ( loader->getPath(fn.c_str()).c_str(), !(clamp_tex & UCLAMP),
 		                                       !(clamp_tex & VCLAMP) );
     state -> enable  ( GL_TEXTURE_2D ) ;
   }

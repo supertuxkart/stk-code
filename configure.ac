@@ -26,6 +26,9 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
+dnl Check for SDL
+AC_CHECK_HEADER([SDL/SDL.h])
+AC_CHECK_LIB([SDL], [SDL_Init])
 
 # specify the plib location
 AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])

@@ -20,6 +20,8 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
+#include "player.hpp"
+
 class BaseGUI
 {
 public:
@@ -28,10 +30,9 @@ public:
 
 	virtual void update(float dt);
 	virtual void select() = 0;
-	virtual void keybd(int key);
-	virtual void point(int x, int y);
-	virtual void stick(const int &whichAxis, const float &value);
-	virtual void joybuttons(int whichJoy, int hold, int presses, int releases);
+
+        virtual void input(InputType type, int id0, int id1, int id2, int value);
+	virtual void inputKeyboard(int key, int pressed);
 
 protected:
 	int menu_id;

@@ -45,7 +45,7 @@ Current keys bindings for the first player:",GUI_SML );
     // *sigh* widget set stores only pointer to strings, so
     // to make sure that all key-strings are permanent, they
     // are assigned to an array allKeys within this object.
-    allKeys[i]=config->GetKeyAsString(0, (KartActions)i);
+    allKeys[i]=config->getInputAsString(0, (KartActions)i);
     widgetSet->label(change_id, allKeys[i].c_str(),    GUI_SML);
     widgetSet->label(label_id,  sKartAction2String[i], GUI_SML);
   }
