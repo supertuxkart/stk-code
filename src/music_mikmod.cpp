@@ -36,11 +36,16 @@ MusicMikMod::MusicMikMod() {
   m_soundSource= 0;
   m_pausedMusic= true;
 
-  // register null driver
-  MikMod_RegisterAllDrivers();
+  static bool initialized = false;
+  if( !initialized )
+  {
+      initialized = true;
+      // register null driver
+      MikMod_RegisterAllDrivers();
 
-  // register loaders (it, s3m, xm y mod)
-  MikMod_RegisterAllLoaders();
+      // register loaders (it, s3m, xm y mod)
+      MikMod_RegisterAllLoaders();
+  }
 
   assert(!MikMod_Init(""));
 }

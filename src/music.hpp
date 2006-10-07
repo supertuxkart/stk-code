@@ -30,6 +30,8 @@ public:
   virtual bool resumeMusic()= 0;
 
   virtual void update()= 0;
+
+  virtual ~Music(){};
 };
 
 #endif // HEADER_MUSIC_H
