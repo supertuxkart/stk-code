@@ -26,9 +26,6 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
-dnl Check for SDL
-AC_CHECK_HEADER([SDL/SDL.h])
-AC_CHECK_LIB([SDL], [SDL_Init])
 
 # specify the plib location
 AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
@@ -45,8 +42,9 @@ AC_CHECK_HEADER(windows.h)
 dnl check for OpenGL related libraries
 case "${host}" in
 *darwin*|*macosx*)
-    LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
+    opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
     ;;
+
 *-*-cygwin* | *-*-mingw32*)
     dnl CygWin under Windoze.
 
@@ -71,24 +69,30 @@ case "${host}" in
        dnl if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
    fi
-
 esac
 
-dnl check for OpenAL libraries
+dnl check for OpenAL (al and alut) libraries
 case "${host}" in
 *)
    dnl default unix style machines
- 
+
+   dnl check for libraries
    save_LIBS=$LIBS
-   AC_SEARCH_LIBS(alGenBuffers, openal)
-   dnl TODO: versions of alut previous to 1.0 came with openal, now the check must be independent
-   AC_SEARCH_LIBS(alutInit, [ alut openal ] )
+   AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)
+   AC_SEARCH_LIBS(alutInit, alut, have_alut_lib=yes)
    openal_LIBS="$LIBS"
    LIBS=$save_LIBS
-   if test "$ac_cv_search_alGenBuffers"; then
-      AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])    
-   fi
 
+   if test x$have_al_lib = xyes -a x$have_alut_lib = xyes; then
+
+      dnl check for header files
+      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
+      AC_CHECK_HEADER(AL/alut.h, have_alut_hdr=yes)
+
+      if test x$have_al_hdr = xyes -a x$have_alut_hdr = xyes; then
+         AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
+      fi
+   fi
 esac
 
 dnl check for MikMod libraries
@@ -96,18 +100,38 @@ case "${host}" in
 *)
    dnl default unix style machines
 
-   AM_PATH_LIBMIKMOD(3.1.5, have_mikmod=yes, have_mikmod=no)
-   if test "x$have_mikmod" = xyes; then
-      AC_DEFINE([HAVE_MIKMOD], 1, [Defined when MikMod is available])
+   AC_CHECK_HEADER(mikmod.h, have_mikmod_hdr=yes)
+   AC_CHECK_LIB(mikmod, MikMod_RegisterDriver, have_mikmod_lib=yes)
+   if test x$have_mikmod_hdr = xyes -a x$have_mikmod_lib = xyes; then
+      AC_DEFINE(HAVE_MIKMOD, 1, [Defined when MikMod is available])
       mikmod_LIBS="-lmikmod"
    fi
+esac
 
+dnl check for SDL libraries
+case "${host}" in
+*)
+   dnl default unix style machines
+
+   dnl check for libraries
+   save_LIBS=$LIBS 
+   AC_SEARCH_LIBS(SDL_Init, SDL, have_SDL_lib=yes)
+   sdl_LIBS="$LIBS"
+   LIBS=$save_LIBS
+
+   dnl check for header files
+   AC_CHECK_HEADER(SDL/SDL.h, have_SDL_hdr=yes)
+   
+   if test x$have_SDL_hdr != xyes -o x$have_SDL_lib != xyes; then
+      AC_MSG_ERROR([Install SDL first...])
+   fi
 esac
 
 # subst bars in Makefile.am
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(mikmod_LIBS)
+AC_SUBST(sdl_LIBS)
 
 # The following are C++ items that need to be tested for with the c++
 # compiler
