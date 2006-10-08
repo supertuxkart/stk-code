@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <SDL/SDL.h>
+
 #include "player_controls.hpp"
 #include "widget_set.hpp"
 #include "config.hpp"
@@ -76,10 +78,12 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
 {
   if (grabInput && value)
   {
-    //    printf("Setting %d: %lx: from %d to %d\n",
-    //	   player_index, config->player[player_index],config->player[player_index].keys[editAction],key);
-    config->player[player_index].setInput(editAction, type, id0, id1, id2);
     grabInput = false;
+
+    // Do not accept pressing ESC as input.
+    if (type != IT_KEYBOARD && id0 != SDLK_ESCAPE)
+      config->player[player_index].setInput(editAction, type, id0, id1, id2);
+
     changeKeyLabel(grab_id, editAction);
   }
   else
