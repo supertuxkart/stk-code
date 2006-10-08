@@ -115,25 +115,28 @@ void SoundManager::playSfx(unsigned int id) {
   }
 }
 
-void SoundManager::playMusic(const char* filename) {   
-  printf("Music: %s\n", filename);
+void SoundManager::playMusic(const char* filename) {
+  if(config->music)
+  {
+      printf("Music: %s\n", filename);
 
-  if (m_currentMusic != NULL) {
-    delete m_currentMusic;
-  }
-  
-  if (filename == NULL || strlen(filename) == 0) {
-    // nothing to play
-    return;
-  }
+      if (m_currentMusic != NULL) {
+        delete m_currentMusic;
+      }
 
-#if USE_PLIB_SOUND
-  m_currentMusic= new MusicPlib();
-#else
-  m_currentMusic= new MusicMikMod();
-#endif
-  assert(m_currentMusic->load(filename));
-  m_currentMusic->playMusic();
+      if (filename == NULL || strlen(filename) == 0) {
+        // nothing to play
+        return;
+      }
+
+      #if USE_PLIB_SOUND
+        m_currentMusic= new MusicPlib();
+      #else
+        m_currentMusic= new MusicMikMod();
+      #endif
+        assert(m_currentMusic->load(filename));
+        m_currentMusic->playMusic();
+  }
 }
 
 void SoundManager::stopMusic() {
