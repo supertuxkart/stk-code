@@ -160,7 +160,7 @@ World::~World() {
 
   kart.clear();
   projectile_manager->cleanup();
-  delete numberCollisions;
+  delete [] numberCollisions;
   delete scene ;
 
   sound_manager -> stopMusic();

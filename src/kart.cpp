@@ -151,8 +151,8 @@ Kart::~Kart() {
   ssgDeRefDelete(wheel_rear_l);
   ssgDeRefDelete(wheel_rear_r);
 
-  delete skidmark_left;
-  delete skidmark_right;
+  if(skidmark_left ) delete skidmark_left ;
+  if(skidmark_right) delete skidmark_right;
 }   // ~Kart
 
 // -----------------------------------------------------------------------------

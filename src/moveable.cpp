@@ -46,8 +46,8 @@ Moveable::Moveable (bool bHasHistory) {
 // -----------------------------------------------------------------------------
 Moveable::~Moveable() {
   if(historyVelocity) {
-    delete historyVelocity;
-    delete historyPosition;
+    delete [] historyVelocity;
+    delete [] historyPosition;
   }
   // FIXME what about model?
 }   // ~Moveable
