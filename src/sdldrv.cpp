@@ -94,6 +94,7 @@ void drv_toggleFullscreen(int resetTextures)
   SDL_FreeSurface(mainSurface);
   mainSurface = SDL_SetVideoMode(config->width, config->height, 0, flags);
 
+#ifdef WIN32
   if(resetTextures) {
     // Clear plib internal texture cache
     loader->endLoad();
@@ -106,6 +107,7 @@ void drv_toggleFullscreen(int resetTextures)
     startScreen->reInit();
     widgetSet->reInit();
   }
+#endif
 }
 
 void drv_deinit()
