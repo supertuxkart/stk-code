@@ -160,12 +160,14 @@ void RaceGUI::inputKeyboard(int key, int pressed) {
       glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
       isWireframe = ! isWireframe;
       break;
+#ifndef WIN32
       // For now disable F9 toggling fullscreen, since windows requires
       // to reload all textures, display lists etc. Fullscreen can
       // be toggled from the main menu (options->display).
     case SDLK_F9:
       drv_toggleFullscreen(0);   // 0: do not reset textures
       // Fall through to put the game into pause mode.
+#endif
     case SDLK_ESCAPE: // ESC
       widgetSet->tgl_paused();
       menu_manager->pushMenu(MENUID_RACEMENU);

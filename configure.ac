@@ -3,8 +3,8 @@ dnl Process this file with autogen.sh to produce a configure script.
 AC_INIT
 AC_CONFIG_SRCDIR([src/main.cpp])
 
-dnl Require at least automake 2.52
-AC_PREREQ(2.52)
+dnl Require at least automake 2.59
+AC_PREREQ(2.59)
 
 
 dnl Initialize the automake stuff
@@ -26,6 +26,9 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
+dnl Check for SDL
+AC_CHECK_HEADER([SDL/SDL.h])
+AC_CHECK_LIB([SDL], [SDL_Init])
 
 # specify the plib location
 AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
