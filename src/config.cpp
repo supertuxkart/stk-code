@@ -418,8 +418,6 @@ void Config::saveConfig(const std::string& filename) {
 
       writer.writeComment("optional");
       writer.write("lastKartId", player[i].getLastKartId());
-      writer.writeComment("optional");
-      writer.write("lastKartId", player[i].getLastKartId());
 
       writeInput(writer, "left\t", KC_LEFT, player[i]);
       writeInput(writer, "right\t", KC_RIGHT, player[i]);
