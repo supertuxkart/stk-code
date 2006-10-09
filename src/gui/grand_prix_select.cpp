@@ -43,13 +43,15 @@ GrandPrixSelect::GrandPrixSelect() {
       std::string fullPath= "data/" + (std::string)*i;
       CupData *cup = new CupData(fullPath.c_str());
       allCups.push_back(cup);
-      int tmp=widgetSet -> state(menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
-      if(nId==0) widgetSet->set_active(tmp);
+      if(nId==0)
+        widgetSet -> start(menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
+      else
+        widgetSet -> state(menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
       nId++;
     }   // if
   }   // for i
   widgetSet -> space(menu_id);
-  widgetSet -> start(menu_id,"Press <ESC> to go back", GUI_SML, -1);
+  widgetSet -> state(menu_id,"Press <ESC> to go back", GUI_SML, -1);
   widgetSet -> layout(menu_id, 0, 0);
   rect = widgetSet->rect(10, 10, config->width-20, 34, GUI_ALL, 10);
 }   // GrandPrixSelect
