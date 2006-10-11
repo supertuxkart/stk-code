@@ -40,8 +40,8 @@ Difficulty::Difficulty() {
   widgetSet -> state(va, "Racer",  GUI_MED, WTOK_HARD, 0);
   widgetSet -> state(va, "Driver", GUI_MED, WTOK_MEDIUM, 0);
   widgetSet -> start(va, "Novice", GUI_MED, WTOK_EASY, 0);
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+  widgetSet -> space(va);
+  widgetSet -> state(va, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
 
   widgetSet -> layout(menu_id, 0, 0);
 }   // Difficulty

@@ -31,8 +31,8 @@ ConfigControls::ConfigControls() {
   widgetSet -> state(va, "Player 3",  GUI_MED, 3);
   widgetSet -> state(va, "Player 4",  GUI_MED, 4);
 
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, 5);
+  widgetSet -> space(va);
+  widgetSet -> state(va, "Press <ESC> to go back", GUI_SML, 5);
   
   widgetSet -> layout(menu_id, 0, 0);
 }

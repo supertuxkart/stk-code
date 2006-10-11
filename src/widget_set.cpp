@@ -1254,7 +1254,8 @@ int WidgetSet::vert_test(int id, int jd)
 {
 	/* Determine whether widget id is in vertical contact with widget jd. */
 
-	if (id && hot(id) && jd && hot(jd))
+  if (id && (widgets[id].type&(GUI_STATE|GUI_SPACE)) && 
+      jd && (widgets[jd].type&(GUI_STATE|GUI_SPACE))    )
 	{
 		int i0 = widgets[id].x;
 		int i1 = widgets[id].x + widgets[id].w;
@@ -1400,12 +1401,18 @@ int WidgetSet::stick(int id, int axis, int dir, int value)
         if(!value) y_not_pressed = 1;
         else if(dir == 0 && y_not_pressed)
         {
+	   {
             jd = stick_U(id, active);
+	    // Skip over GUI_SPACE
+	    while(!hot(jd)) jd = stick_U(id, jd);
             y_not_pressed = 0;
+	  } 
         }
         else if (dir == 1 && y_not_pressed)
         {
             jd = stick_D(id, active);
+	    // Skip over GUI_SPACE
+	    while(!hot(jd)) jd = stick_D(id, active);
             y_not_pressed = 0;
         }
     }
@@ -1426,8 +1433,14 @@ int WidgetSet::cursor(int id, int key)
 	{
 	case SDLK_LEFT:  jd = stick_L(id, active); break;
 	case SDLK_RIGHT: jd = stick_R(id, active); break;
-	case SDLK_UP:    jd = stick_U(id, active); break;
-	case SDLK_DOWN:  jd = stick_D(id, active); break;
+	case SDLK_UP:    jd = stick_U(id, active); 
+	                 // Skip over GUI_SPACE
+                         while( jd && !hot(jd)) jd = stick_U(id, jd);
+			 break;
+	case SDLK_DOWN:  jd = stick_D(id, active); 
+                         // Skip over GUI_SPACE
+                         while (jd && !hot(jd)) jd = stick_D(id, jd); 
+			 break;
 	default: return 0;
 	}
 	

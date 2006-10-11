@@ -41,8 +41,8 @@ ConfigSound::ConfigSound() {
 
   if(config->music) widgetSet->set_label(music_menu_id, "Turn off music");
   if(config->sfx) widgetSet->set_label(sfx_menu_id, "Turn off sound effects");
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
+  widgetSet -> space(va);
+  widgetSet -> state(va, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
   widgetSet -> layout(menu_id, 0, 0);
 }
 

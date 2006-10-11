@@ -42,9 +42,9 @@ GameMode::GameMode() {
   if (race_manager->getNumPlayers() == 1)
     widgetSet -> state(va, "Time Trial",  GUI_MED, WTOK_TIMETRIAL);
   
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
-  widgetSet -> space(menu_id);
+  widgetSet -> space(va);
+  widgetSet -> state(va,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
+  widgetSet -> space(va);
   widgetSet -> layout(menu_id, 0, 0);
 }
 
