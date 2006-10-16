@@ -81,7 +81,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
     grabInput = false;
 
     // Do not accept pressing ESC as input.
-    if (type != IT_KEYBOARD && id0 != SDLK_ESCAPE)
+    if (type != IT_KEYBOARD || id0 != SDLK_ESCAPE)
       config->player[player_index].setInput(editAction, type, id0, id1, id2);
 
     changeKeyLabel(grab_id, editAction);
