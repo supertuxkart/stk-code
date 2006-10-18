@@ -19,7 +19,6 @@
 "chrome2.rgb"          N N     N      0.0     N     Y   0.5     N   N    N    N
 "railing.rgb"          N Y     Y      0.5     Y     N   1.0     N   N    N    N
 "ruler.rgb"            N N     Y      0.2     Y     N   1.0     N   N    N    N
-"herringwall.rgb"      N N     Y      0.5     Y     N   1.0     N   N    N    N
 "adverts.rgb"          N N     N      0.0     Y     N   1.0     N   N    N    Y
 "wood.rgb"             N N     N      0.0     Y     N   1.0     N   N    N    N
 "concrete.rgb"         N N     N      0.0     Y     N   1.0     N   N    N    Y
@@ -73,7 +72,6 @@
 "anvil.rgb"            Y Y     Y      0.1     N     N   1.0     Y   N    N    N
 "parachute.rgb"        Y Y     Y      0.1     N     N   1.0     Y   N    N    N
 "herring.rgb"          Y Y     Y      0.9     N     N   1.0     Y   N    N    N
-"herringbones.rgb"     Y Y     Y      0.2     N     N   1.0     Y   N    N    N
 "wheel.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "water.rgb"            N N     N      0.1     Y     N   1.0     N   N    Y    N
 
