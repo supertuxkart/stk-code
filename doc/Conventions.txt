@@ -1,0 +1,42 @@
+Here are the guidelines to follow when coding Super Tux Kart:
+
+Filenames
+==========
+
+The filenames should be, with underscores between words. Use the .cpp extension for C++ implementation files and .hpp for C++ headers, .c for C files and .h for C headers.
+
+
+Coding style
+============
+
+* Identation should be 4 spaces, without tabs.
+
+* Braces should be placed on a line of their own, that means.
+
+* Functions 
+
+* Use const instead of #define when able.
+
+* The code should be 'const correct'.
+
+* Constants are named with all characters in caps separated by '_'.
+
+* Variable names are lower case separated by '_'.
+
+* Class member variables should also be prefixed with "m_".
+
+* Function names should be capitalized, except the first word.
+
+* Type(including classes/struct) names have all their words capitalized.
+
+* Use true/false instead of TRUE/FALSE.
+
+* Prefer std::string to char*; for C-style strings, use std::string.c_str().
+
+* Instead of using plib container classes, use stl containers like vector.
+
+* Use std::min() / std::max() instead of a #define.
+  For windows defining #NOMINMAX before including windows.h is required.
+
+* Never write the implementation of two different classes in the same file.
+

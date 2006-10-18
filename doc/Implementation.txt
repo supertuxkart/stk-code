@@ -1,4 +1,4 @@
-lmSome more or less unsorted implementation details. Some comments
+Some more or less unsorted implementation details. Some comments
 are included in [].
 
 
@@ -284,14 +284,7 @@ the kart might suddenly only rotate on the spot, or hardly
 turn at all. Testing and tweaking and tweaking and testing
 is necessary.
     
-6) Conventions
-==============
-The filenames should be lowercase, with underscores between 
-words. Use the .cpp extension for C++ implementation files, 
-and .hpp for C++ headers, .c for C files and .h for C 
-headers.
-
-7) Track design
+6) Track design
 ===============
 This was  written originally by Steve Baker for TuxKart. Most of the
 information contained here is still valid, though it might be good to
