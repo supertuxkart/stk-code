@@ -25,13 +25,15 @@
 #include "projectile_manager.hpp"
 #include "sound_manager.hpp"
 
-Projectile::Projectile(Kart *kart, int collectable) : Moveable(false) {
+Projectile::Projectile(Kart *kart, int collectable) : Moveable(false) 
+{
   init(kart, collectable);  
   getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 }   // Projectile
 
 // -----------------------------------------------------------------------------
-void Projectile::init(Kart *kart, int collectable_) {
+void Projectile::init(Kart *kart, int collectable_) 
+{
   owner              = kart;
   type               = collectable_;
   hasHitSomething    = false;
@@ -41,12 +43,16 @@ void Projectile::init(Kart *kart, int collectable_) {
   m->addKid(collectable_manager->getModel(type));
   setCoord(kart->getCoord());
   world->addToScene(m);
-}
+}   // init
+
 // -----------------------------------------------------------------------------
-Projectile::~Projectile() {
+Projectile::~Projectile() 
+{
 }   // ~Projectile
+
 // -----------------------------------------------------------------------------
-void Projectile::update (float dt) {
+void Projectile::update (float dt) 
+{
   // we don't even do any physics here - just set the
   // velocity, and ignore everything else for projectiles.
   velocity.xyz[1] = speed;
@@ -58,20 +64,24 @@ void Projectile::update (float dt) {
 // -----------------------------------------------------------------------------
 // Returns true if this missile has hit something,
 // otherwise false.
-void Projectile::doObjectInteractions () {
+void Projectile::doObjectInteractions () 
+{
   float ndist = SG_MAX ;
   int nearest = -1 ;
 
-  for ( int i = 0 ; i < world->getNumKarts() ; i++ ) {
+  for ( int i = 0 ; i < world->getNumKarts() ; i++ ) 
+  {
     sgCoord *pos ;
  
     Kart *kart = world -> getKart(i);
     pos        = kart  -> getCoord();
  
-    if ( type != COLLECT_NOTHING && kart != owner ) {
+    if ( type != COLLECT_NOTHING && kart != owner ) 
+    {
       float d = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
 
-      if ( d < 2.0f ) {
+      if ( d < 2.0f ) 
+      {
 	explode();
         kart -> forceCrash () ;
 	return;
@@ -82,11 +92,13 @@ void Projectile::doObjectInteractions () {
     }   // if type!=NOTHING &&kart!=owner
   }  // for i<getNumKarts
   if ( type == COLLECT_HOMING_MISSILE && nearest != -1 &&
-        ndist < MAX_HOME_DIST_SQD                          ) {
+        ndist < MAX_HOME_DIST_SQD                          ) 
+  {
     sgVec3 delta;
     sgVec3 hpr;
     Kart *kart=world->getKart(nearest);
-    if(nLastRadarBeep!=nearest && kart->isPlayerKart()) {
+    if(nLastRadarBeep!=nearest && kart->isPlayerKart()) 
+    {
       sound_manager->playSfx(SOUND_MISSILE_LOCK);
       nLastRadarBeep=nearest;
     }
@@ -107,7 +119,8 @@ void Projectile::doObjectInteractions () {
 
     if ( hpr[0] > 80.0f || hpr[0] < -80.0f )
       velocity.hpr[0] = 0.0f ;
-    else {
+    else 
+    {
       if      ( hpr[0] >  3.0f ) velocity.hpr[0] =  HOMING_MISSILE_TURN_RATE ;
       else if ( hpr[0] < -3.0f ) velocity.hpr[0] = -HOMING_MISSILE_TURN_RATE ;
       else                       velocity.hpr[0] =  0.0f ;
@@ -118,13 +131,15 @@ void Projectile::doObjectInteractions () {
     }
   } else  // type!=HOMING||nearest==-1||ndist>MAX_HOME_DIST_SQD
     velocity.hpr[0] = velocity.hpr[1] = 0.0f ;
-}
+}   // doObjectInteractions
 
 // -----------------------------------------------------------------------------
 void Projectile::doCollisionAnalysis  ( float dt, float hot )
 {
-  if ( collided || crashed ) {
-    if ( type == COLLECT_SPARK ) {
+  if ( collided || crashed ) 
+  {
+    if ( type == COLLECT_SPARK ) 
+    {
       sgVec3 bouncevec ;
       sgVec3 direction ;
 
@@ -133,14 +148,16 @@ void Projectile::doCollisionAnalysis  ( float dt, float hot )
       sgReflectInPlaneVec3 ( direction, bouncevec ) ;
 
       sgHPRfromVec3 ( curr_pos.hpr, direction ) ;
-    } else if ( type != COLLECT_NOTHING ) {
+    } else if ( type != COLLECT_NOTHING ) 
+    {
       explode();
     }
   }   // if collided||crashed
 }   // doCollisionAnalysis
 
 // -----------------------------------------------------------------------------
-void Projectile::explode() {
+void Projectile::explode() 
+{
   hasHitSomething=true;
   curr_pos.xyz[2] += 1.2f ;
   // Notify the projectile manager that this rocket has hit something.

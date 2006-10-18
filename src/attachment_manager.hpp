@@ -1,7 +1,7 @@
-//  $Id$
+//  $Id: attachment_manager.hpp 757 2006-09-11 22:27:39Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,29 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STARTSCREEN_H
-#define HEADER_STARTSCREEN_H
+#ifndef HEADER_ATTACHMENT_MANAGER_H
+#define HEADER_ATTACHMENT_MANAGER_H
 
-#include "screen.hpp"
-#include "material.hpp"
+#include <plib/ssg.h>
+#include "attachment.hpp"
 
-
-class StartScreen : public Screen 
+class AttachmentManager 
 {
-private:
-  Material *introMaterial ;
-
-public:
-       StartScreen    ();
-      ~StartScreen    ();
-  void switchToGame   ();
-  void update         (); 
-  void removeTextures ();
-  void installMaterial();
+ private:
+  ssgEntity *m_attachments[ATTACH_MAX];
+ public:
+             AttachmentManager() {};
+  ssgEntity *getModel         (attachmentType type) {return m_attachments[type];}
+  void       removeTextures   ();
+  void       loadModels       ();
 };
 
-extern StartScreen* startScreen;
-
+extern AttachmentManager *attachment_manager;
 #endif
-
-/* EOF */

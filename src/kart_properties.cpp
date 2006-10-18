@@ -70,11 +70,10 @@ void KartProperties::load(const std::string filename, const std::string node) {
   icon_material = material_manager->getMaterial(icon_file);
 
   // Load model
-  if(model_file.length()>0) {
-    model         = ssgLoadAC ( model_file.c_str(), loader ) ;
-
+  if(model_file.length()>0) 
+  {
+    model = loader->load(model_file, CB_KART);
     ssgStripify(model);
-
     preProcessObj(model, 0);
     model->ref();
   }

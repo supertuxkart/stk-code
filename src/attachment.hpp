@@ -35,19 +35,8 @@ enum attachmentType { ATTACH_PARACHUTE,
                       ATTACH_MAX, ATTACH_NOTHING};
 
 
-// The attachment manager is only used as a static member in
-// attachment.
-class AttachmentManager {
- private:
-  ssgEntity *attachments[ATTACH_MAX];
- public:
-  AttachmentManager();
-  ssgEntity *getModel(attachmentType type) {return attachments[type];}
-};
-
 class Attachment {
  private:
-  static AttachmentManager *attachment_manager;
   attachmentType  type;
   Kart           *kart;
   float           time_left;

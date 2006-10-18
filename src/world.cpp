@@ -43,7 +43,7 @@
 #include "track_manager.hpp"
 #include "race_manager.hpp"
 #include "config.hpp"
-#include "hook_manager.hpp"
+#include "callback_manager.hpp"
 #include "history.hpp"
 #include "constants.hpp"
 #include "sound_manager.hpp"
@@ -76,8 +76,8 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   
   assert(raceSetup.karts.size() > 0);
 
-  // Clear all hooks, which might still be stored there from a previous race.
-  hook_manager->clearAll();
+  // Clear all callbacks, which might still be stored there from a previous race.
+  callback_manager->clear(CB_TRACK);
 
   // Load the track models - this must be done before the karts so that the
   // karts can be positioned properly on (and not in) the tracks.
@@ -236,7 +236,7 @@ void World::update(float delta) {
   }
 
   /* Routine stuff we do even when paused */
-  hook_manager->update();
+  callback_manager->update(delta);
 
   // Check for traffic jam. The sound is played even if it's
   // not a player kart - a traffic jam happens rarely anyway.
@@ -495,7 +495,7 @@ void World::loadTrack() {
 	}
       }   // if need_hat
 
-      ssgEntity        *obj   = ssgLoad ( fname, loader ) ;
+      ssgEntity        *obj   = loader->load(fname, CB_TRACK);
       optimise_model(obj);
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;

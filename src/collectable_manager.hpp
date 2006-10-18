@@ -30,7 +30,7 @@ class ssgEntity;
 enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE, 
 		      COLLECT_SPARK, COLLECT_HOMING_MISSILE,
 		      COLLECT_ZIPPER,
-              COLLECT_ANVIL, COLLECT_PARACHUTE,
+		      COLLECT_ANVIL, COLLECT_PARACHUTE,
 #ifdef USE_MAGNETS
                       COLLECT_MAGNET, 
 #endif
@@ -43,12 +43,13 @@ class CollectableManager {
   ssgEntity*   allModels[COLLECT_MAX];
   void         LoadNode       (const lisp::Lisp* lisp, int collectType);
  public:
-  CollectableManager          (){}
-  void         loadCollectable();
-  void         Load           (int collectType, const char* filename);
-  Material*    getIcon        (int type) {return allIcons [type];}
-  float        getSpeed       (int type) {return allSpeeds[type];}
-  ssgEntity*   getModel       (int type) {return allModels[type];}
+  CollectableManager           ();
+  void         loadCollectables();
+  void         removeTextures  ();
+  void         Load            (int collectType, const char* filename);
+  Material*    getIcon         (int type) {return allIcons [type];}
+  float        getSpeed        (int type) {return allSpeeds[type];}
+  ssgEntity*   getModel        (int type) {return allModels[type];}
 };
 
 extern CollectableManager* collectable_manager;

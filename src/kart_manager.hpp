@@ -47,7 +47,7 @@ public:
 
   /** Fill the empty positions in the given vector with random karts */
   void fillWithRandomKarts (std::vector<std::string>& vec);
-  void reInit              ();
+  void removeTextures      ();
 };
 
 extern KartManager *kart_manager;

@@ -52,7 +52,8 @@ private:
 		  herringType type);
 
 public:
-  HerringManager();
+              HerringManager();
+             ~HerringManager();
   void        loadDefaultHerrings();
   void        loadHerringStyle(const std::string filename);
   Herring*    newHerring      (herringType type, sgVec3* xyz);
@@ -60,6 +61,7 @@ public:
   void        hitHerring      (Kart* kart);
   void        cleanup         ();
   void        reset           ();
+  void        removeTextures  ();
   void        setUserFilename (char *s) {userFilename=s;}
 };
 

@@ -30,7 +30,9 @@ Additional coding:
          - bug fixes, code cleanup
          - OpenAL support (in progress)
 
-
+   Robert Schuster 
+         - SDL port
+         - bug fixes
     
 Previous releases
 =================

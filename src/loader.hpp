@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include "callback_manager.hpp"
 
 #ifdef _MSC_VER
    const char DIR_SEPARATOR='\\';
@@ -45,13 +46,17 @@ public:
     void listFiles(std::set<std::string>& result, const std::string& dir)
         const;
 
-    void addSearchPath(const std::string& path);
-    void addSearchPath(const char* path);
-    void initConfigDir();
+    void       addSearchPath(const std::string& path);
+    void       addSearchPath(const char* path);
+    void       initConfigDir();
+    ssgEntity *load(const std::string& filename, CallbackType t);
+    void       setCallbackType(CallbackType t)   {currentCallbackType=t;}
 private:
-    void make_path(char* path, const char* dir, const char* fname) const;
-
     std::vector<std::string> searchPath;
+    CallbackType             currentCallbackType;
+    void         make_path(char* path, const char* dir, const char* fname) const;
+    ssgBranch   *createBranch(char *data) const;
+    ssgBranch   *animInit    (char *data) const;
 };
 
 extern Loader* loader;

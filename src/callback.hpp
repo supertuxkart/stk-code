@@ -1,7 +1,7 @@
-//  $Id$
+//  $Id: callback.hpp 796 2006-09-27 07:06:34Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,29 +17,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STARTSCREEN_H
-#define HEADER_STARTSCREEN_H
+#ifndef CALLBACK_H
+#define CALLBACK_H
 
-#include "screen.hpp"
-#include "material.hpp"
+#include <string>
+#include <plib/sg.h>
+#include <plib/ssg.h>
 
-
-class StartScreen : public Screen 
+class Callback  
 {
 private:
-  Material *introMaterial ;
+  // the ac model files assume MODE_FORWARD=1, so a MODE_NONE is added
+  enum allCallbackModesType { MODE_NONE, MODE_FORWARD, MODE_CYCLE, MODE_SHUTTLE, 
+			      MODE_SINESHUTTLE};
+
+  sgCoord    m_delta;
+  sgCoord    m_now;
+  float      m_phase;
+  float      m_cycle;
+  int        m_mode;
+  ssgBranch *m_branch;
+  
+  void       parseData(char *data);
 
 public:
-       StartScreen    ();
-      ~StartScreen    ();
-  void switchToGame   ();
-  void update         (); 
-  void removeTextures ();
-  void installMaterial();
-};
-
-extern StartScreen* startScreen;
+       Callback(char *data, ssgBranch *branch_);
+      ~Callback();
+  void update  (float dt);
+};   // CallbackManager
 
 #endif
-
-/* EOF */
+  

@@ -37,12 +37,13 @@ KartManager::~KartManager()
 }
 
 // -----------------------------------------------------------------------------
-void KartManager::reInit() {
+void KartManager::removeTextures() {
   for(KartPropertiesVector::iterator i = karts.begin(); i != karts.end(); ++i) {
     delete *i;
   }
   karts.clear();
-}   // reInit
+  callback_manager->clear(CB_KART);
+}   // removeTextures
 
 // -----------------------------------------------------------------------------
 void KartManager::loadKartData() {

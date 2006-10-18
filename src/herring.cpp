@@ -22,7 +22,8 @@
 #include "kart.hpp"
 
 // =============================================================================
-Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) {
+Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) 
+{
   sgSetVec3(coord.hpr, 0.0f, 0.0f, 0.0f);
 
   sgCopyVec3(coord.xyz, *xyz);
@@ -43,27 +44,32 @@ Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) {
 }   // Herring
 
 // -----------------------------------------------------------------------------
-Herring::~Herring() {
-  ssgDeRefDelete(rotate);
+Herring::~Herring() 
+{
   ssgDeRefDelete(root);
+  ssgDeRefDelete(rotate);
 }   // ~Herring
 
 // -----------------------------------------------------------------------------
-void Herring::reset() {
+void Herring::reset() 
+{
   bEaten         = false;
   time_to_return = 0.0f;
   root->setTransform(&coord);
 }   // reset
 // -----------------------------------------------------------------------------
-int Herring::hitKart(Kart* kart) {
+int Herring::hitKart(Kart* kart) 
+{
   return sgDistanceSquaredVec3 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
 }   // hitKart
 
 // -----------------------------------------------------------------------------
-void Herring::update(float delta) {
+void Herring::update(float delta) 
+{
   if(bEaten) {
     float t = time_to_return - world->clock;
-    if ( t > 0 ) {
+    if ( t > 0 ) 
+    {
       sgVec3 hell;
       sgCopyVec3(hell, coord.xyz);
 
@@ -75,7 +81,8 @@ void Herring::update(float delta) {
       root -> setTransform(&coord);
     }   // t>0
     
-  } else {   // not bEaten
+  } else 
+  {   // not bEaten
     sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
     c.hpr[0] = rotation;
     rotation += 180.0f*delta;
@@ -84,7 +91,6 @@ void Herring::update(float delta) {
 }   // update
 
 // -----------------------------------------------------------------------------
-
 void Herring::isEaten()
 {
     bEaten=TRUE;

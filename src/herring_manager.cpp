@@ -73,11 +73,38 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 ) {
 
 // =============================================================================
 HerringManager* herring_manager;
+typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
 
 HerringManager::HerringManager() {
     allModels.clear();
   // The actual loading is done in loadDefaultHerrings
 }   // HerringManager
+
+// -----------------------------------------------------------------------------
+void HerringManager::removeTextures() {
+  for(AllHerringType::iterator i =allHerrings.begin(); 
+                               i!=allHerrings.end();  i++) 
+  {
+    delete *i;
+  }
+  allHerrings.clear();
+
+  for(CI_type i=allModels.begin(); i!=allModels.end(); ++i) 
+  {
+    ssgDeRefDelete(i->second);
+  }
+  allModels.clear();
+  callback_manager->clear(CB_HERRING);
+}   // removeTextures
+
+// -----------------------------------------------------------------------------
+HerringManager::~HerringManager()
+{
+  for(CI_type i=allModels.begin(); i!=allModels.end(); ++i) 
+  {
+    ssgDeRefDelete(i->second);
+  }
+}   // ~HerringManager
 
 // -----------------------------------------------------------------------------
 void HerringManager::loadDefaultHerrings() {
@@ -92,7 +119,7 @@ void HerringManager::loadDefaultHerrings() {
                                       i != files.end();  ++i) {
     if(!StringUtils::has_suffix(*i, ".ac")) continue;
     std::string fullName  = "herrings/"+(*i);
-    ssgEntity*  h         = ssgLoad(fullName.c_str(), loader);
+    ssgEntity*  h         = loader->load(fullName, CB_HERRING);
     std::string shortName = StringUtils::without_extension(*i);
     h->ref();
     h->setName(shortName.c_str());
@@ -127,7 +154,6 @@ void HerringManager::setDefaultHerringStyle() {
   }   // for i
   if(bError) {
     fprintf(stderr, "The following models are available:\n");
-    typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
     for(CI_type i=allModels.begin(); i!=allModels.end(); ++i) {
       if(i->second) {
 	if(i->first.substr(0,3)=="OLD") {

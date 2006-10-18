@@ -32,19 +32,21 @@
 
 StartScreen* startScreen = NULL;
 
-StartScreen::StartScreen() : introMaterial(NULL) {
+StartScreen::StartScreen() : introMaterial(NULL) 
+{
   menu_manager->switchToMainMenu();
   installMaterial();
 }
 
 // -----------------------------------------------------------------------------
-StartScreen::~StartScreen() {
-  ssgDeRefDelete(introMaterial->getState());
+StartScreen::~StartScreen() 
+{
   introMaterial= NULL;
 }   // ~StartScreen
 
 // -----------------------------------------------------------------------------
-void StartScreen::update() {
+void StartScreen::update() 
+{
   //Setup for boring 2D rendering
   glMatrixMode   ( GL_PROJECTION ) ;
   glLoadIdentity () ;
@@ -90,36 +92,42 @@ void StartScreen::update() {
 }   // update
 
 // -----------------------------------------------------------------------------
-void StartScreen::reInit() {
-  installMaterial();
-}   // reInit
+void StartScreen::removeTextures()
+{
+  // The current context (within plib) has a pointer to the last applied
+  // texture, which means that the background image will not be deleted
+  // as part of material_manager->reInit. To fix this, we load a NULL
+  // texture into the current context, which decreases the ref counter
+  // of the background image, and allows it to be deleted.
+  // Doing it this way is not really nice, so any better way is appreciated :)
+  _ssgCurrentContext->getState()->setTexture((ssgTexture*)NULL);
+  
+}   // removeTextures
 
 // -----------------------------------------------------------------------------
-void StartScreen::installMaterial() {
+void StartScreen::installMaterial() 
+{
   /* Make a simplestate for the title screen texture */
   introMaterial = material_manager->getMaterial("st_title_screen.rgb");
-  // This ref is necessary: if the window mode is changed (to/from fullscreen)
-  // the textures all need to be reloaded. But the current context 
-  // (_ssgCurrentContext) still has a pointer to the old ssgTexture object.
-  // If the texture for the new title screen is set (as part of force()),
-  // ssgSimpleState::setTexture() will ssgDeRefDelete the old texture. The
-  // old texture (even if most likely already deleted) will still have the 
-  // old texture handle for the title screen, which will then get deleted!
-  // Since the new title texture has the same texture handle, the new title
-  // screen gets deleted a well.
-  // One solution is:
-  //  _ssgCurrentContext->getState()->setTexture((ssgTexture*)NULL);
-  // before material_manager->reInit() in sdldrv (this way the old tile screen
-  // texture gets deleted, which will be deleted in reInit anyway), and when
-  // the new texture is set, the old teture is NULL, so nothing will be
-  // incorrectly deleted. Or we artifically increase the ref count, so that
-  // it does not get freed:
-  introMaterial->getState()->ref();
 }   // installMaterial
 
 // -----------------------------------------------------------------------------
-void StartScreen::switchToGame() {
+void StartScreen::switchToGame() 
+{
+  // As soon as the game is started, display the background picture only
+  // so that the user gets feedback that his selection was done.
+  introMaterial->getState()->force();
 
+  glBegin ( GL_QUADS ) ;
+    glColor3f   (1, 1, 1 ) ;
+    glTexCoord2f(0, 0); glVertex2i(-1, -1);
+    glTexCoord2f(1, 0); glVertex2i( 1, -1);
+    glTexCoord2f(1, 1); glVertex2i( 1,  1);
+    glTexCoord2f(0, 1); glVertex2i(-1,  1);
+  glEnd () ;
+
+  glFlush();
+  SDL_GL_SwapBuffers();
   race_manager->start();
 }   // switchToGame
 

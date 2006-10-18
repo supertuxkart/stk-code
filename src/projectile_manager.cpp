@@ -32,14 +32,27 @@ ProjectileManager *projectile_manager=0;
 // -----------------------------------------------------------------------------
 void ProjectileManager::loadData() {
 
-  // Load the explosion model and find the actual selector branch in int
-  explosionModel = find_selector((ssgBranch*)ssgLoad("explode.ac", loader));
+  // Load the explosion model and find the actual selector branch in it.
+  // Only the explosion model is loaded here, see collectable_manager.
+  explosionModel = find_selector((ssgBranch*)loader->load("explode.ac", 
+							  CB_EXPLOSION) );
+  explosionModel->ref();
   if ( explosionModel == NULL ) {
     fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
     exit ( 1 ) ;
   }
   
 }   // loadData
+
+// -----------------------------------------------------------------------------
+void ProjectileManager::removeTextures()
+{
+  cleanup();
+  ssgDeRefDelete(explosionModel);
+  // Only the explosion is here, all other models are actualy managed
+  // by collectable_manager.
+  callback_manager->clear(CB_EXPLOSION);
+}   // removeTextures
 
 // -----------------------------------------------------------------------------
 void ProjectileManager::cleanup() {

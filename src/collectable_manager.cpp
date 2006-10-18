@@ -46,11 +46,33 @@ initCollectableType ict[]={
 CollectableManager* collectable_manager=0;
 
 // -----------------------------------------------------------------------------
-void CollectableManager::loadCollectable() {
+CollectableManager::CollectableManager() 
+{
+  for(int i=0; i<COLLECT_MAX; i++)
+  {  
+    allModels[i] = (ssgEntity*)NULL;
+    allIcons[i]  = (Material*)NULL;
+  }
+}   // CollectableManager
+
+// -----------------------------------------------------------------------------
+void CollectableManager::removeTextures()
+{
+  for(int i=0; i<COLLECT_MAX; i++)
+  {
+    if(allIcons [i]) ssgDeRefDelete(allIcons [i]->getState());
+    if(allModels[i]) ssgDeRefDelete(allModels[i]            );
+  }   // for
+  callback_manager->clear(CB_COLLECTABLE);
+
+}   // removeTextures
+
+// -----------------------------------------------------------------------------
+void CollectableManager::loadCollectables() {
   for(int i=0; ict[i].collectable != COLLECT_MAX; i++) {
     Load(ict[i].collectable, ict[i].dataFile);
   }
-}  // loadCollectable
+}  // loadCollectables
 
 // -----------------------------------------------------------------------------
 void CollectableManager::Load(int collectType, const char* filename) {
@@ -91,14 +113,15 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType ) {
   }
 
   // load material
-  allIcons [collectType] = material_manager->getMaterial(sIconFile.c_str());
+  allIcons [collectType] = material_manager->getMaterial(sIconFile);
+  allIcons[collectType]->getState()->ref();
 
   //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
   //this is just a quick fix.
   if(collectType == COLLECT_SPARK) allIcons[COLLECT_SPARK]->getState()->disable ( GL_CULL_FACE ) ;
-
+  
   if(sModel!="") {
-    ssgEntity* e = ssgLoadAC(sModel.c_str(), loader);
+    ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
     allModels[collectType] = e;
     preProcessObj(e, 0);
     e->ref();

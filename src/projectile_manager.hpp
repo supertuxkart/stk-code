@@ -55,8 +55,8 @@ class ProjectileManager {
 
 public:
                    ProjectileManager() {};
-                  ~ProjectileManager(){};
-  void             explode          (){somethingWasHit=true;}
+                  ~ProjectileManager() {};
+  void             explode          () {somethingWasHit=true;}
   void             FinishedExplosion() {explosionEnded =true;}
   ssgSelector*     getExplosionModel()             {
                              return (ssgSelector*)explosionModel->clone();}
@@ -67,6 +67,7 @@ public:
   Projectile*      newProjectile    (Kart *kart, int type);
   Explosion*       newExplosion     (Projectile *p);
   void             Deactivate       (Projectile *p) {}
+  void             removeTextures   ();
 };
 
 extern ProjectileManager *projectile_manager;

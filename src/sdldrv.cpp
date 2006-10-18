@@ -29,6 +29,10 @@
 #include "material_manager.hpp"
 #include "kart_manager.hpp"
 #include "start_screen.hpp"
+#include "herring_manager.hpp"
+#include "collectable_manager.hpp"
+#include "attachment_manager.hpp"
+#include "projectile_manager.hpp"
 #include "loader.hpp"
 
 #include "gui/menu_manager.hpp"
@@ -99,13 +103,29 @@ void drv_toggleFullscreen(int resetTextures)
     // Clear plib internal texture cache
     loader->endLoad();
     
-    // The order is somewhat important. When material_manager is called, all
-    // texture refcounts must have been reset (e.g. karts be deleted, ...)
-    kart_manager->reInit();
+    // Windows needs to reload all textures, display lists, ... which means 
+    // that all models have to be reloaded. So first, free all textures, 
+    // models, then reload the textures from materials.dat, then reload
+    // all models, textures etc.
+    
+    startScreen         -> removeTextures();
+    attachment_manager  -> removeTextures();
+    projectile_manager  -> removeTextures();
+    herring_manager     -> removeTextures();
+    kart_manager        -> removeTextures();
+    collectable_manager -> removeTextures();
+
     material_manager->reInit();
-    kart_manager->loadKartData();
-    startScreen->reInit();
-    widgetSet->reInit();
+
+
+    collectable_manager -> loadCollectables();
+    kart_manager        -> loadKartData();
+    herring_manager     -> loadDefaultHerrings();
+    projectile_manager  -> loadData();
+    attachment_manager  -> loadModels();
+
+    startScreen         -> installMaterial();
+    widgetSet           -> reInit();
   }
 #endif
 }

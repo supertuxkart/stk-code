@@ -33,8 +33,11 @@
 
 Loader* loader = 0;
 
-Loader::Loader() {
+// -----------------------------------------------------------------------------
+Loader::Loader() 
+{
   char *datadir;
+  currentCallbackType = CB_COLLECTABLE;
 
   if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
     datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
@@ -60,16 +63,21 @@ Loader::Loader() {
 #endif
   fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
   addSearchPath(datadir);
-}
+}  // Loader
 
-Loader::~Loader() {
-}
+// -----------------------------------------------------------------------------
+Loader::~Loader() 
+{
+}   // ~Loader
 
-void Loader::make_path(char* path, const char* dir, const char* fname) const {
+// -----------------------------------------------------------------------------
+void Loader::make_path(char* path, const char* dir, const char* fname) const 
+{
   struct stat mystat;
     
   for(std::vector<std::string>::const_iterator i = searchPath.begin();
-      i != searchPath.end(); ++i) {
+      i != searchPath.end(); ++i) 
+  {
     sprintf(path, "%s%c%s%c%s", i->c_str(), DIR_SEPARATOR, dir, 
 		    DIR_SEPARATOR, fname);
     // convert backslashes and slashes to the native form
@@ -87,26 +95,35 @@ void Loader::make_path(char* path, const char* dir, const char* fname) const {
   // error case...
   // hmm ideally we'd throw an exception here, but plib is not prepared for that
   sprintf(path, "NotFound: %s", fname);
-}
+}   // make_path
 
-void Loader::makeModelPath(char* path, const char* fname) const {
+// -----------------------------------------------------------------------------
+void Loader::makeModelPath(char* path, const char* fname) const 
+{
   make_path(path, getModelDir(), fname);
-}
+}   // makeModelPath
 
-void Loader::makeTexturePath(char* path, const char* fname) const {
+// -----------------------------------------------------------------------------
+void Loader::makeTexturePath(char* path, const char* fname) const 
+{
   make_path(path, getTextureDir(), fname);
-}
+}   // makeTexturePath
 
-void Loader::addSearchPath(const std::string& path) {
+// -----------------------------------------------------------------------------
+void Loader::addSearchPath(const std::string& path) 
+{
   searchPath.push_back(path);
-}
+}   // addSearchPath
 
+// -----------------------------------------------------------------------------
 void Loader::addSearchPath(const char* path)
 {
   searchPath.push_back(std::string(path));
-}
+}   // addSearchPath
 
-void Loader::initConfigDir() {
+// -----------------------------------------------------------------------------
+void Loader::initConfigDir() 
+{
 #ifdef WIN32
   /*nothing*/
 #else
@@ -120,9 +137,11 @@ void Loader::initConfigDir() {
     mkdir(pathname.c_str(), 0755);
   }
 #endif
-}
+}   // initConfigDir
 
-std::string Loader::getPath(const char* fname) const {
+// -----------------------------------------------------------------------------
+std::string Loader::getPath(const char* fname) const 
+{
   struct stat mystat;
   std::string result;
 
@@ -147,10 +166,12 @@ std::string Loader::getPath(const char* fname) const {
   std::stringstream msg;
   msg << "Couldn't find file '" << fname << "'.";
   throw std::runtime_error(msg.str());
-}
+}   // getPath
 
+// -----------------------------------------------------------------------------
 void Loader::listFiles(std::set<std::string>& result, const std::string& dir) 
-     const {
+     const 
+{
   struct stat mystat;
 
 #ifdef DEBUG
@@ -181,5 +202,89 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
     }
     ulCloseDir(mydir);
   }
-}
+}   // listFiles
+
+// -----------------------------------------------------------------------------
+ssgEntity *Loader::load(const std::string& filename, CallbackType t) 
+{
+  currentCallbackType=t;
+  return ssgLoad(filename.c_str(), this);
+}   // load
+
+// -----------------------------------------------------------------------------
+ssgBranch *Loader::animInit (char *data ) const
+{
+  while ( ! isdigit ( *data ) && *data != '\0' )
+    data++ ;
+
+  int   startlim =        strtol(data, &data, 0 );
+  int   endlim   =        strtol(data, &data, 0 );
+  float timelim  = (float)strtod(data, &data    );
+
+  while ( *data <= ' ' && *data != '\0' )
+    data++ ;
+
+  char mode = toupper ( *data ) ;
+
+  ssgTimedSelector *br = new ssgTimedSelector;
+
+  br->setLimits  (startlim+1, endlim+1 ) ;
+  br->setDuration(timelim ) ;
+  br->setMode    ((mode=='O') ?  SSG_ANIM_ONESHOT 
+		              :  (mode=='S') ?  SSG_ANIM_SWING 
+		                             : SSG_ANIM_SHUTTLE ) ;
+  br->control    (SSG_ANIM_START ) ;
+
+  return br;
+}   // animInit
+
+
+// -----------------------------------------------------------------------------
+// Handle userdata that is stored in the model files. Mostly the userdata
+// indicates that a special branch is to be created (e.g. a ssgCutout instead
+// of the standard branch). But some userdata indicate that callbacks need
+// to be created, which are then handled by the callback manager.
+
+ssgBranch *Loader::createBranch(char *data) const
+{
+
+  if ( data == NULL || data[0] != '@' ) return NULL;
+
+  data++ ;   /* Skip the '@' */
+
+  if ( strncmp("billboard", data, strlen("billboard") ) == 0 ) 
+    return  new ssgCutout();
+
+
+  if ( strncmp("invisible", data, strlen("invisible") ) == 0 )
+    return new ssgInvisible();
+
+  if ( strncmp ( "switch", data, strlen ( "switch" ) ) == 0 ) 
+  {
+    ssgSelector *sel = new ssgSelector();
+    sel->select(0);
+    return sel;
+  }
+      
+  if ( strncmp ( "animate", data, strlen ( "animate" ) ) == 0 )
+    return animInit(data);
+  
+
+  if ( strncmp ( "autodcs", data, strlen ( "autodcs" ) ) == 0 ) {
+    ssgTransform *br = new ssgTransform();
+    Callback     *c  = new Callback(data, br);
+    br->setUserData(new ssgBase());
+    callback_manager->addCallback(c, currentCallbackType);
+    return br;
+  }
+
+  if ( strncmp ( "autotex", data, strlen ( "autotex" ) ) == 0 ) {
+    ssgTexTrans *br = new ssgTexTrans();
+    Callback    *c  = new Callback(data, br);
+    callback_manager->addCallback(c, currentCallbackType);
+    return br;
+  }
+  
+  return NULL ;
+}   // createBranch
 

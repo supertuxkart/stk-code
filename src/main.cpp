@@ -44,9 +44,10 @@
 #include "widget_set.hpp"
 #include "material_manager.hpp"
 #include "sdldrv.hpp"
-#include "hook_manager.hpp"
+#include "callback_manager.hpp"
 #include "history.hpp"
 #include "herring_manager.hpp"
+#include "attachment_manager.hpp"
 #include "sound_manager.hpp"
 #include "physics_parameters.hpp"
 
@@ -211,7 +212,6 @@ void InitTuxkart() {
   loader->setModelDir("models");
   loader->setTextureDir("images");
   loader->setCreateStateCallback(getAppState);
-  loader->setCreateBranchCallback(process_userdata);
   config = new Config();
   sound_manager  = new SoundManager();
 
@@ -228,8 +228,9 @@ void InitTuxkart() {
   collectable_manager   = new CollectableManager();
   race_manager          = new RaceManager       ();
   screen_manager        = new ScreenManager     ();
-  hook_manager          = new HookManager       ();
+  callback_manager      = new CallbackManager   ();
   herring_manager       = new HerringManager    ();
+  attachment_manager    = new AttachmentManager ();
   track_manager   ->loadTrackList () ;
 }
 
@@ -245,11 +246,12 @@ int main ( int argc, char **argv ) {
   // so this next call can't be in InitTuxkart. And InitPlib needs
   // config, which gets defined in InitTuxkart, so swapping those two
   // calls is not possible either ... so loadMaterial has to be done here :(
-  material_manager   ->loadMaterial   ();
-  kart_manager       ->loadKartData   ();
-  projectile_manager ->loadData       ();
-  collectable_manager->loadCollectable();
+  material_manager   ->loadMaterial       ();
+  kart_manager       ->loadKartData       ();
+  projectile_manager ->loadData           ();
+  collectable_manager->loadCollectables   ();
   herring_manager    ->loadDefaultHerrings();
+  attachment_manager ->loadModels         ();
   startScreen = new StartScreen();
   widgetSet   = new WidgetSet;
 
