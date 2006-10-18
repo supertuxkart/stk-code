@@ -7,8 +7,8 @@
  (shadow-file "pennyshadow.rgb")
 
  (red   0.8)
- (green 0.8)
- (blue  0.8)
+ (green 0.2)
+ (blue  0.6)
        
 )
 ;; EOF ;;

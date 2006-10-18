@@ -6,9 +6,9 @@
  (icon-file   "eviltuxicon.rgb")
  (shadow-file "tuxkartshadow.rgb")
  
- (red         0.0)
- (green       0.0)
- (blue        0.8)
+ (red         0.3)
+ (green       0.1)
+ (blue        0.6)
 
 )
 ;; EOF ;;

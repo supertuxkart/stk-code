@@ -6,9 +6,9 @@
  (icon-file   "dinoicon.rgb")
  (shadow-file "dinoshadow.rgb")
 
- (red   0.0)
- (green 0.8)
- (blue  0.0)
+ (red   1.0)
+ (green 0.7)
+ (blue  0.1)
        
 )
 ;; EOF ;;

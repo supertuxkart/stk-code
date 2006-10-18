@@ -6,9 +6,9 @@
  (icon-file   "yetiicon.rgb")
  (shadow-file "yetishadow.rgb")
  
- (red         0.2)
- (green       0.0)
- (blue        0.2)
+ (red         0.5)
+ (green       0.8)
+ (blue        1.0)
        
 )
 ;; EOF ;;
