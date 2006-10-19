@@ -1404,7 +1404,7 @@ int WidgetSet::stick(int id, int axis, int dir, int value)
 	   {
             jd = stick_U(id, active);
 	    // Skip over GUI_SPACE
-	    while(!hot(jd)) jd = stick_U(id, jd);
+	    while(jd && !hot(jd)) jd = stick_U(id, jd);
             y_not_pressed = 0;
 	  } 
         }
@@ -1412,7 +1412,7 @@ int WidgetSet::stick(int id, int axis, int dir, int value)
         {
             jd = stick_D(id, active);
 	    // Skip over GUI_SPACE
-	    while(!hot(jd)) jd = stick_D(id, active);
+	    while(jd && !hot(jd)) jd = stick_D(id, jd);
             y_not_pressed = 0;
         }
     }
