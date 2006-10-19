@@ -35,7 +35,7 @@
 #include "attachment_manager.hpp"
 #include "projectile_manager.hpp"
 #include "loader.hpp"
-
+#include "screen_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "kart_control.hpp"
 #include "player.hpp"
@@ -167,8 +167,12 @@ void drv_loop()
   while(SDL_PollEvent(&ev))
   {
     switch(ev.type) {
-        case SDL_KEYDOWN:
-	case SDL_KEYUP:
+    case SDL_QUIT:
+            screen_manager->abort();
+        break;
+
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
             input(IT_KEYBOARD, ev.key.keysym.sym, 0, 0, ev.key.state);
 	    break;
         case SDL_MOUSEMOTION:
