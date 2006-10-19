@@ -19,6 +19,7 @@
 
 #ifndef HEADER_SCREENMANAGER_H
 #define HEADER_SCREENMANAGER_H
+#include <stdlib.h>
 
 class Screen;
 
@@ -40,6 +41,7 @@ public:
   /** Set the current active screen, the screen will get delete'ed
       automatically once it is no longer needed */
   void setScreen(Screen* screen);
+  bool  screenSwitchPending() const {return next_screen!=NULL;}
 };
 
 extern ScreenManager* screen_manager;

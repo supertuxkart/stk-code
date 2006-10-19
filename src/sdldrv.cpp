@@ -29,6 +29,7 @@
 #include "material_manager.hpp"
 #include "kart_manager.hpp"
 #include "start_screen.hpp"
+#include "screen_manager.hpp"
 #include "herring_manager.hpp"
 #include "collectable_manager.hpp"
 #include "attachment_manager.hpp"
@@ -45,6 +46,7 @@ SDL_Joystick **sticks;
 
 #define DEADZONE_MOUSE 1
 
+// -----------------------------------------------------------------------------
 void gui_mousefn ( int button, int updown, int x, int y ) {
   if (button==0 && updown==0) {
     BaseGUI* menu= menu_manager->getCurrentMenu();
@@ -57,10 +59,12 @@ void gui_mousefn ( int button, int updown, int x, int y ) {
   // puMouse(button, updown, x, y ) ;
 }
 
+// -----------------------------------------------------------------------------
 void updateMenus()
 {
 }
 
+// -----------------------------------------------------------------------------
 void drv_init() {
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
   
@@ -86,6 +90,7 @@ void drv_init() {
   fntInit();
 }
 
+// -----------------------------------------------------------------------------
 void drv_toggleFullscreen(int resetTextures)
 {
   config->fullscreen = !config->fullscreen;
@@ -130,6 +135,7 @@ void drv_toggleFullscreen(int resetTextures)
 #endif
 }
 
+// -----------------------------------------------------------------------------
 void drv_deinit()
 {
   SDL_ShowCursor(SDL_ENABLE);
@@ -145,6 +151,7 @@ void drv_deinit()
   SDL_Quit();
 }
 
+// -----------------------------------------------------------------------------
 void input(InputType type, int id0, int id1, int id2, int value)
 {
     BaseGUI* menu= menu_manager->getCurrentMenu();
@@ -152,6 +159,7 @@ void input(InputType type, int id0, int id1, int id2, int value)
       menu->input(type, id0, id1, id2, value);
 }
 
+// -----------------------------------------------------------------------------
 void drv_loop()
 {
   SDL_Event ev;
@@ -209,10 +217,18 @@ void drv_loop()
 	    break;
 	case SDL_JOYBUTTONDOWN:
 	case SDL_JOYBUTTONUP:
-	    input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, ev.jbutton.state);
+	    input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, 
+		  ev.jbutton.state);
 	    break;
-    }
-  }
+    }  // switch
+
+    // If the event caused a new screen to be displayed, abort the current event
+    // loop. This avoids e.g. the problem of selecting the number of laps twice
+    // in the num_laps menu (by rapidly pressing enter), causing the game-start
+    // procedure to be done twice (which causes an assertion error in the
+    // screen_manager, since the new world_screen is added twice).
+    if(screen_manager->screenSwitchPending()) break;
+  }   // while (SDL_PollEvent())
   
   updateMenus();
   
