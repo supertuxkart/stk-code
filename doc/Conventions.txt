@@ -3,7 +3,8 @@ Here are the guidelines to follow when coding Super Tux Kart:
 Filenames
 ==========
 
-The filenames should be, with underscores between words. Use the .cpp extension for C++ implementation files and .hpp for C++ headers, .c for C files and .h for C headers.
+The filenames should be, with underscores between words. Use the .cpp extension
+for C++ implementation files and .hpp for C++ headers, .c for C files and .h for C headers.
 
 
 Coding style
@@ -13,7 +14,10 @@ Coding style
 
 * Braces should be placed on a line of their own, that means.
 
-* Functions 
+* Functions should be separated by a line of "//" followed by 77 '-'.
+
+* If you add a doxygen-style function header, do so between the line that
+  separates functions and the function definition.
 
 * Use const instead of #define when able.
 
