@@ -326,10 +326,23 @@ void RaceGUI::drawMap () {
     glColor3fv ( *kart->getColor());
     c          = kart->getCoord () ;
 
-    world -> track->glVtx ( c->xyz, xLeft+3, yTop+3);
-    world -> track->glVtx ( c->xyz, xLeft  , yTop+3);
-    world -> track->glVtx ( c->xyz, xLeft  , yTop  );
-    world -> track->glVtx ( c->xyz, xLeft+3, yTop  );
+    /* If it's a player, draw a bigger sign */
+    if (kart -> isPlayerKart ()) {
+      world -> track->glVtx ( c->xyz, xLeft+3, yTop+3);
+      world -> track->glVtx ( c->xyz, xLeft-2, yTop+3);
+      world -> track->glVtx ( c->xyz, xLeft-2, yTop-2);
+      world -> track->glVtx ( c->xyz, xLeft+3, yTop-2);
+/*      world -> track->glVtx ( c->xyz, xLeft  , yTop-4);
+      world -> track->glVtx ( c->xyz, xLeft+4, yTop  );
+      world -> track->glVtx ( c->xyz, xLeft  , yTop+4);
+      world -> track->glVtx ( c->xyz, xLeft-4, yTop  ); */
+    }
+    else {
+      world -> track->glVtx ( c->xyz, xLeft+2, yTop+2);
+      world -> track->glVtx ( c->xyz, xLeft-1, yTop+2);
+      world -> track->glVtx ( c->xyz, xLeft-1, yTop-1);
+      world -> track->glVtx ( c->xyz, xLeft+2, yTop-1);
+    }
   }
 
   glEnd () ;
