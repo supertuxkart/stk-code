@@ -43,7 +43,7 @@
 "Penguin_orig.rgb"     N N     N      0.0     Y     N   1.0     N   N    N    N
 "grass.rgb"            N N     N      0.0     Y     N   0.1     N   N    N    N
 "track2.rgb"           N N     N      0.0     Y     N   1.0     N   N    N    N
-"zipper.rgb"           N N     N      0.0     N     N   1.0     N   Y    N    N
+"zipper_collect.rgb"           N N     N      0.0     N     N   1.0     N   Y    N    N
 "bananawrap.rgb"       Y Y     Y      0.5     N     N   1.0     N   Y    N    N
 "fuzzy.rgb"            Y Y     Y      0.2     N     N   0.5     Y   N    N    N
 "mriceblockshadow.rgb" Y Y     Y      0.0     N     N   1.0     Y   N    N    N

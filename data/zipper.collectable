@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "zipper")
  (model "zipper.ac")
- (icon  "zipper.rgb")
+ (icon  "zipper_collect.rgb")
 )
 
 ;; EOF ;;
