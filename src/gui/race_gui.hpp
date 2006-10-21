@@ -63,6 +63,7 @@ private:
     double    time_left ;
     char*     pos_string [11];
     Material* SteeringWheelIcon;
+    Material* PositionIcons[12];
 
     /* Display informat on screen */
     void drawStatusText        (const RaceSetup& raceSetup, const float dt);
@@ -98,6 +99,8 @@ private:
 				   int red=255, int green=255, int blue=255);
     void drawInverseDropShadowText(const char *str, int sz, int x, int y);
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
+				   float ratio_x, float ratio_y           );
+    void drawPosition             (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
 #if 0
     void drawTexture              (const GLuint texture, int w, int h, int red,

@@ -52,6 +52,13 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   SteeringWheelIcon = material_manager->getMaterial("wheel.rgb");
   SteeringWheelIcon->getState()->disable(GL_CULL_FACE);
 
+  for(int i = 1;i < 11;i++) {
+    char str [ 256 ];
+    sprintf(str,"pos%d.rgb",i);
+    PositionIcons[i] = material_manager->getMaterial(str);
+    PositionIcons[i]->getState()->disable(GL_CULL_FACE);
+  }
+
   fpsCounter = 0;
   fpsString[0]=0;
   fpsTimer.reset();
@@ -295,12 +302,6 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
   drawDropShadowText ( str, (int)(38*ratio_y), 
 		       (int)(offset_x+xOffForText         *ratio_x),
 		       (int)(offset_y+(config->height-250)*ratio_y) );
-
-  /* Show player's position */
-  sprintf ( str, "%s", pos_string [ player_kart->getPosition() ] ) ;
-  drawDropShadowText ( str, (int)(38*ratio_y), 
-  		       (int)(offset_x+xOffForText         *ratio_x), 
-  		       (int)(offset_y+(config->height-300)*ratio_y) );
 }   // drawScore
 
 // -----------------------------------------------------------------------------
@@ -648,6 +649,34 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 } // drawSteering
 
 // -----------------------------------------------------------------------------
+void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
+			   float ratio_x, float ratio_y           ) {
+
+  float minRatio = std::min(ratio_x, ratio_y);
+  offset_x += (int)((config->width-138)*ratio_x);
+  offset_y += (int)(10*ratio_y);
+#define POSWIDTH 128
+  int width  = (int)(POSWIDTH*minRatio);
+  int height = (int)(POSWIDTH*minRatio);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+    glLoadIdentity();
+    int tw = width/2; int th = height/2;
+    glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
+    glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
+
+    PositionIcons[kart->getPosition()]->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
+    glEnd () ;
+
+  glPopMatrix();
+} // drawPosition
+
+// -----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
   assert(world != NULL);
 
@@ -730,6 +759,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       drawEnergyMeter     (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawSteering        (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawPosition        (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawScore           (raceSetup, player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
