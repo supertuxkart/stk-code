@@ -52,12 +52,25 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   SteeringWheelIcon = material_manager->getMaterial("wheel.rgb");
   SteeringWheelIcon->getState()->disable(GL_CULL_FACE);
 
-  for(int i = 1;i < 11;i++) {
+  for(int i = 0;i < 11;i++) {
     char str [ 256 ];
-    sprintf(str,"pos%d.rgb",i);
-    PositionIcons[i] = material_manager->getMaterial(str);
-    PositionIcons[i]->getState()->disable(GL_CULL_FACE);
+    sprintf(str,"%d.rgb",i);
+    NumberIcons[i] = material_manager->getMaterial(str);
+    NumberIcons[i]->getState()->disable(GL_CULL_FACE);
   }
+
+  StIcon = material_manager->getMaterial("st.rgb");
+  StIcon->getState()->disable(GL_CULL_FACE);
+  NdIcon = material_manager->getMaterial("nd.rgb");
+  NdIcon->getState()->disable(GL_CULL_FACE);
+  RdIcon = material_manager->getMaterial("rd.rgb");
+  RdIcon->getState()->disable(GL_CULL_FACE);
+  ThIcon = material_manager->getMaterial("th.rgb");
+  ThIcon->getState()->disable(GL_CULL_FACE);
+  SlashIcon = material_manager->getMaterial("slash.rgb");
+  SlashIcon->getState()->disable(GL_CULL_FACE);
+  LapIcon = material_manager->getMaterial("lap.rgb");
+  LapIcon->getState()->disable(GL_CULL_FACE);
 
   fpsCounter = 0;
   fpsString[0]=0;
@@ -287,7 +300,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 		       red, green, blue);
 
   /* Show lap number */
-  int lap = player_kart->getLap();
+/*  int lap = player_kart->getLap();
   if ( lap < 0 ) {
     sprintf ( str, "Lap:0/%d", raceSetup.numLaps ) ;
   }  else if ( lap < raceSetup.numLaps - 1 ) {
@@ -302,7 +315,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
   drawDropShadowText ( str, (int)(38*ratio_y), 
 		       (int)(offset_x+xOffForText         *ratio_x),
 		       (int)(offset_y+(config->height-250)*ratio_y) );
-}   // drawScore
+*/}   // drawScore
 
 // -----------------------------------------------------------------------------
 #define TRACKVIEW_SIZE 100
@@ -459,12 +472,27 @@ void RaceGUI::drawPlayerIcons () {
       glEnd () ;
 
       // draw position (1st, 2nd...)
-      PositionIcons[kart->getPosition()]->getState()->force();
+      NumberIcons[kart->getPosition()]->getState()->force();
       glBegin ( GL_QUADS ) ;
         glTexCoord2f(0, 0);glVertex2i(x-3               , y+3               );
         glTexCoord2f(1, 0);glVertex2i(x-3+ICON_POS_WIDTH, y+3               );
         glTexCoord2f(1, 1);glVertex2i(x-3+ICON_POS_WIDTH, y+3+ICON_POS_WIDTH);
         glTexCoord2f(0, 1);glVertex2i(x-3               , y+3+ICON_POS_WIDTH);
+      glEnd () ;
+
+      if (kart->getPosition() == 1)
+        StIcon->getState()->force();
+      else if (kart->getPosition() == 2)
+        NdIcon->getState()->force();
+      else if (kart->getPosition() == 3)
+        RdIcon->getState()->force();
+      else
+        ThIcon->getState()->force();
+      glBegin ( GL_QUADS ) ;
+        glTexCoord2f(0, 0);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6)                 , y+(int)(ICON_POS_WIDTH*0.6)                 );
+        glTexCoord2f(1, 0);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2), y+(int)(ICON_POS_WIDTH*0.6)                 );
+        glTexCoord2f(1, 1);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2), y+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2));
+        glTexCoord2f(0, 1);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6)                 , y+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2));
       glEnd () ;
 
     }
@@ -670,19 +698,90 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
 
   float minRatio = std::min(ratio_x, ratio_y);
   offset_x += (int)((config->width-138)*ratio_x);
-  offset_y += (int)(10*ratio_y);
+  offset_y += 0;
 #define POSWIDTH 128
   int width  = (int)(POSWIDTH*minRatio);
   int height = (int)(POSWIDTH*minRatio);
   glMatrixMode(GL_MODELVIEW);
-    PositionIcons[kart->getPosition()]->getState()->force();
+    NumberIcons[kart->getPosition()]->getState()->force();
     glBegin ( GL_QUADS ) ;
       glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
       glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
       glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
       glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
     glEnd () ;
-} // drawPosition
+
+    if (kart->getPosition() == 1)
+      StIcon->getState()->force();
+    else if (kart->getPosition() == 2)
+      NdIcon->getState()->force();
+    else if (kart->getPosition() == 3)
+      RdIcon->getState()->force();
+    else
+      ThIcon->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x+(int)(width*0.6)        , offset_y+(int)(height*0.6)         );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+(int)(width*0.6+width/2), offset_y+(int)(height*0.6)         );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+(int)(width*0.6+width/2), offset_y+(int)(height*0.6+height/2));
+      glTexCoord2f(0, 1);glVertex2i(offset_x+(int)(width*0.6)        , offset_y+(int)(height*0.6+height/2));
+    glEnd () ;
+
+ } // drawPosition
+
+// -----------------------------------------------------------------------------
+void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
+			   float ratio_x, float ratio_y           ) {
+
+  float maxRatio = std::max(ratio_x, ratio_y);
+  offset_x += (int)(120*ratio_x);
+  offset_y += (int)(30*maxRatio);
+#define LAPWIDTH 48
+  int width  = (int)(LAPWIDTH*maxRatio);
+  int height = (int)(LAPWIDTH*maxRatio);
+  glMatrixMode(GL_MODELVIEW);
+
+    LapIcon->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x                 , offset_y                  );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+(int)(1.6*width), offset_y                  );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+(int)(1.6*width), offset_y+(int)(1.6*height));
+      glTexCoord2f(0, 1);glVertex2i(offset_x                 , offset_y+(int)(1.6*height));
+    glEnd () ;
+
+    offset_y -= (int)(LAPWIDTH*0.6*maxRatio);
+    offset_x -= (int)(14*maxRatio);
+    int lap = kart->getLap();
+    if ( lap < 0 )
+      NumberIcons[0]->getState()->force();
+    else if ( lap >= world->raceSetup.numLaps ) 
+      NumberIcons[world->raceSetup.numLaps]->getState()->force();
+    else
+      NumberIcons[lap+1]->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
+    glEnd () ;
+
+    offset_x += (int)(LAPWIDTH*0.6*maxRatio);
+    SlashIcon->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
+    glEnd () ;
+
+    offset_x += (int)(LAPWIDTH*0.6*maxRatio);
+    NumberIcons[world->raceSetup.numLaps]->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
+    glEnd () ;
+} // drawLap
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
@@ -769,6 +868,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       drawSteering        (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawPosition        (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawLap             (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawScore           (raceSetup, player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y ) ;

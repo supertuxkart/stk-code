@@ -63,7 +63,13 @@ private:
     double    time_left ;
     char*     pos_string [11];
     Material* SteeringWheelIcon;
-    Material* PositionIcons[12];
+    Material* NumberIcons[12];
+    Material* StIcon;
+    Material* NdIcon;
+    Material* RdIcon;
+    Material* ThIcon;
+    Material* SlashIcon;
+    Material* LapIcon;
 
     /* Display informat on screen */
     void drawStatusText        (const RaceSetup& raceSetup, const float dt);
@@ -101,6 +107,8 @@ private:
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
     void drawPosition             (Kart* kart, int offset_x, int offset_y,
+				   float ratio_x, float ratio_y           );
+    void drawLap                  (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
 #if 0
     void drawTexture              (const GLuint texture, int w, int h, int red,
