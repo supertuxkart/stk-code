@@ -26,7 +26,7 @@
 #include "start_screen.hpp"
 #include "world_screen.hpp"
 #include "empty_screen.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "race_manager.hpp"
 
 //Is this include needed?
@@ -66,7 +66,7 @@ GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
     kart_names[numKarts-1 - i] = players[numPlayers - 1 - i];
   }
 
-  kart_manager->fillWithRandomKarts(kart_names);
+  kart_properties_manager->fillWithRandomKarts(kart_names);
 
   const int numAIKarts = numKarts - numPlayers;
   //Add the AI karts
@@ -161,7 +161,7 @@ QuickRaceMode::start()
       raceSetup.players.push_back(first_player + i);
     }
 
-  kart_manager->fillWithRandomKarts(raceSetup.karts);
+  kart_properties_manager->fillWithRandomKarts(raceSetup.karts);
 
   screen_manager->setScreen(new WorldScreen(raceSetup));
 }

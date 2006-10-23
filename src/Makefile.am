@@ -43,7 +43,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	explosion.cpp		   explosion.hpp            	\
 	config.cpp 		   config.hpp               	\
 	cup_data.cpp   		   cup_data.hpp              	\
-	kart_manager.cpp	   kart_manager.hpp          	\
+	kart_properties_manager.cpp kart_properties_manager.hpp \
 	projectile_manager.cpp	   projectile_manager.hpp    	\
 	kart_properties.cpp	   kart_properties.hpp       	\
 	physics_parameters.cpp	   physics_parameters.hpp    	\

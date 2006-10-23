@@ -34,7 +34,7 @@
 #include "config.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
 #include "race_manager.hpp"
@@ -119,12 +119,12 @@ int handleCmdLine(int argc, char **argv) {
 
       return 0;
     } else if( !strcmp(argv[i], "--list-karts") ) {
-      kart_manager->loadKartData () ;
+      kart_properties_manager->loadKartData () ;
 
       fprintf ( stdout, "  Available karts:\n" );    
-      for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++)
+      for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
       {
-      	const KartProperties* kp= kart_manager->getKartById(i);
+      	const KartProperties* kp= kart_properties_manager->getKartById(i);
 		fprintf (stdout, "\t%10s: %s\n", kp->getIdent(), kp->getName());
       }
       fprintf ( stdout, "\n" );
@@ -215,22 +215,22 @@ void InitTuxkart() {
   config = new Config();
   sound_manager  = new SoundManager();
 
-  // The order here can be important, e.g. KartManager needs 
+  // The order here can be important, e.g. KartPropertiesManager needs 
   // defaultKartProperties.
-  history               = new History           ();
-  material_manager      = new MaterialManager   ();
-  track_manager         = new TrackManager      ();
-  physicsParameters     = new PhysicsParameters ();
+  history                 = new History              ();
+  material_manager        = new MaterialManager      ();
+  track_manager           = new TrackManager         ();
+  physicsParameters       = new PhysicsParameters    ();
   const std::string physicsDefault=std::string("data")+DIR_SEPARATOR+ "physics.data";
   physicsParameters->load(physicsDefault);
-  kart_manager          = new KartManager       ();
-  projectile_manager    = new ProjectileManager ();
-  collectable_manager   = new CollectableManager();
-  race_manager          = new RaceManager       ();
-  screen_manager        = new ScreenManager     ();
-  callback_manager      = new CallbackManager   ();
-  herring_manager       = new HerringManager    ();
-  attachment_manager    = new AttachmentManager ();
+  kart_properties_manager = new KartPropertiesManager();
+  projectile_manager      = new ProjectileManager    ();
+  collectable_manager     = new CollectableManager   ();
+  race_manager            = new RaceManager          ();
+  screen_manager          = new ScreenManager        ();
+  callback_manager        = new CallbackManager      ();
+  herring_manager         = new HerringManager       ();
+  attachment_manager      = new AttachmentManager    ();
   track_manager   ->loadTrackList () ;
 }
 
@@ -246,12 +246,12 @@ int main ( int argc, char **argv ) {
   // so this next call can't be in InitTuxkart. And InitPlib needs
   // config, which gets defined in InitTuxkart, so swapping those two
   // calls is not possible either ... so loadMaterial has to be done here :(
-  material_manager   ->loadMaterial       ();
-  kart_manager       ->loadKartData       ();
-  projectile_manager ->loadData           ();
-  collectable_manager->loadCollectables   ();
-  herring_manager    ->loadDefaultHerrings();
-  attachment_manager ->loadModels         ();
+  material_manager        -> loadMaterial       ();
+  kart_properties_manager -> loadKartData       ();
+  projectile_manager      -> loadData           ();
+  collectable_manager     -> loadCollectables   ();
+  herring_manager         -> loadDefaultHerrings();
+  attachment_manager      -> loadModels         ();
   startScreen = new StartScreen();
   widgetSet   = new WidgetSet;
 
@@ -277,7 +277,7 @@ int main ( int argc, char **argv ) {
 	race_manager->setNumKarts  (4);
 	race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
 	race_manager->setDifficulty(RD_MEDIUM);
-	race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
+	race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
 	race_manager->setNumLaps   (3);
 	//race_manager->setTrack     ("tuxtrack");
 	//race_manager->setTrack     ("sandtrack");
@@ -289,7 +289,7 @@ int main ( int argc, char **argv ) {
   // Profiling
   // =========
       race_manager->setNumPlayers(1);
-      race_manager->setPlayerKart(0, kart_manager->getKart("tuxkart")->getIdent());
+      race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
       race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
       race_manager->setDifficulty(RD_MEDIUM);
       race_manager->setNumLaps   (999999); // profile end depends on time

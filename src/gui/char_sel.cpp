@@ -22,7 +22,7 @@
 
 #include "loader.hpp"
 #include "char_sel.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "preprocessor.hpp"
 #include "widget_set.hpp"
 #include "race_manager.hpp"
@@ -61,8 +61,8 @@ CharSel::CharSel(int whichPlayer)
 
 	int row1 = widgetSet -> harray(va);
 	
-	for (unsigned int i = 0; NULL != kart_manager->getKartById(i); i++) {
-	  const KartProperties* kp= kart_manager->getKartById(i);
+	for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++) {
+	  const KartProperties* kp= kart_properties_manager->getKartById(i);
 	  Material *m = material_manager->getMaterial(kp->getIconFile());
 	  int c = widgetSet->image(row1, m->getState()->getTextureHandle(), 
 				   icon_size, icon_size);
@@ -70,7 +70,7 @@ CharSel::CharSel(int whichPlayer)
 
           if (config->player[whichPlayer].getLastKartId() == i)
             widgetSet->set_active(c);
-//          else if (NULL == kart_manager->getKartById(i + 1)) // last in the list
+//          else if (NULL == kart_properties_manager->getKartById(i + 1)) // last in the list
 //	    widgetSet->set_active(c);
 	}
 	widgetSet -> filler(ha);
@@ -95,7 +95,7 @@ CharSel::~CharSel() {
 
 void CharSel::switch_to_character(int n)
 {
-	const KartProperties* kp= kart_manager->getKartById(n);
+	const KartProperties* kp= kart_properties_manager->getKartById(n);
 	if (current_kart != n && kp != NULL)
 	{
         widgetSet -> set_label(kart_name_label, kp->getName());
@@ -151,7 +151,7 @@ void CharSel::update(float dt)
 void CharSel::select()
 {
 	int token = widgetSet -> token (widgetSet -> click());
-	const KartProperties* kp= kart_manager->getKartById(token);
+	const KartProperties* kp= kart_properties_manager->getKartById(token);
 	if (kp != NULL)
 	{
 	  race_manager->setPlayerKart(playerIndex, kp->getIdent());

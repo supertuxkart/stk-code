@@ -23,7 +23,7 @@
 #include "loader.hpp"
 #include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "preprocessor.hpp"
 #include "widget_set.hpp"
 #include "race_manager.hpp"
@@ -53,7 +53,7 @@ GrandPrixEnd::GrandPrixEnd()
             highest = i;
 
     const std::string kart_name = race_manager->getKartName(highest);
-    const KartProperties* winning_kart = kart_manager->getKart(kart_name);
+    const KartProperties* winning_kart = kart_properties_manager->getKart(kart_name);
     
     std::stringstream output;
     //FIXME: when a long string is used the output gets corrupted.

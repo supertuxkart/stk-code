@@ -39,7 +39,7 @@
 #include "auto_kart.hpp"
 #include "isect.hpp"
 #include "track.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "track_manager.hpp"
 #include "race_manager.hpp"
 #include "config.hpp"
@@ -93,16 +93,16 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
     Kart* newkart;
     if(config->profile) {
       // In profile mode, load only the old kart
-      newkart = new AutoKart (kart_manager->getKart("tuxkart"), pos);
+      newkart = new AutoKart (kart_properties_manager->getKart("tuxkart"), pos);
     } else {
       if (std::find(raceSetup.players.begin(),
 		    raceSetup.players.end(), pos) != raceSetup.players.end())
       {
 	// the given position belongs to a player
-	    newkart = new PlayerKart (kart_manager->getKart(*i), pos,
+	    newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
                       &(config->player[playerIndex++]));
       } else {
-	newkart = new AutoKart   (kart_manager->getKart(*i), pos);
+	newkart = new AutoKart   (kart_properties_manager->getKart(*i), pos);
       }
     }   // if !config->profile
     if(config->replayHistory) {

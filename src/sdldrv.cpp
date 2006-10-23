@@ -27,7 +27,7 @@
 #include "sdldrv.hpp"
 #include "widget_set.hpp"
 #include "material_manager.hpp"
-#include "kart_manager.hpp"
+#include "kart_properties_manager.hpp"
 #include "start_screen.hpp"
 #include "screen_manager.hpp"
 #include "herring_manager.hpp"
@@ -113,24 +113,24 @@ void drv_toggleFullscreen(int resetTextures)
     // models, then reload the textures from materials.dat, then reload
     // all models, textures etc.
     
-    startScreen         -> removeTextures();
-    attachment_manager  -> removeTextures();
-    projectile_manager  -> removeTextures();
-    herring_manager     -> removeTextures();
-    kart_manager        -> removeTextures();
-    collectable_manager -> removeTextures();
+    startScreen             -> removeTextures();
+    attachment_manager      -> removeTextures();
+    projectile_manager      -> removeTextures();
+    herring_manager         -> removeTextures();
+    kart_properties_manager -> removeTextures();
+    collectable_manager     -> removeTextures();
 
     material_manager->reInit();
 
 
-    collectable_manager -> loadCollectables();
-    kart_manager        -> loadKartData();
-    herring_manager     -> loadDefaultHerrings();
-    projectile_manager  -> loadData();
-    attachment_manager  -> loadModels();
+    collectable_manager     -> loadCollectables();
+    kart_properties_manager -> loadKartData();
+    herring_manager         -> loadDefaultHerrings();
+    projectile_manager      -> loadData();
+    attachment_manager      -> loadModels();
 
-    startScreen         -> installMaterial();
-    widgetSet           -> reInit();
+    startScreen             -> installMaterial();
+    widgetSet               -> reInit();
   }
 #endif
 }

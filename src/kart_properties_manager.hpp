@@ -17,24 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KARTMANAGER_H
-#define HEADER_KARTMANAGER_H
+#ifndef HEADER_KARTPROPERTIESMANAGER_H
+#define HEADER_KARTPROPERTIESMANAGER_H
 
 #include <vector>
-
+//#include "kart_properties.hpp"
 class KartProperties;
 
-class KartManager {
+class KartPropertiesManager 
+{
  protected:
   float maxSteerAngle;
 
   typedef std::vector<KartProperties*> KartPropertiesVector;
   /** All available kart configurations */
-  KartPropertiesVector karts;
+  KartPropertiesVector m_karts_properties;
 
 public:  
-  KartManager();
-  ~KartManager();
+  KartPropertiesManager();
+  ~KartPropertiesManager();
 
   const KartProperties*    getKartById            (int i);
   const KartProperties*    getKart                (const std::string ident);
@@ -50,7 +51,7 @@ public:
   void removeTextures      ();
 };
 
-extern KartManager *kart_manager;
+extern KartPropertiesManager *kart_properties_manager;
 
 #endif
 

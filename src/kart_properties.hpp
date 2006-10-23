@@ -27,80 +27,81 @@
 class Material;
 class ssgEntity;
 
-class KartProperties : public NoCopy {
- private:
+class KartProperties : public NoCopy 
+{
+private:
 
-  Material* icon_material;
-  ssgEntity* model;
+     Material* icon_material;
+     ssgEntity* model;
 
- protected:  
-  /* Display and gui */
-  /* --------------- */
-  std::string name;         // The human readable Name of the karts driver
-  std::string ident;        // The computer readable-name of the karts driver
-  std::string model_file;   // Filename of 3d model that is used for kart
-  std::string icon_file;    // Filename of icon that represents the kart in
-                            // the statusbar and the character select screen  
-  std::string shadow_file;  // Filename of the image file that contains the 
-			    // shadow for this kart
-  float color[3];           // Color the represents the kart in the status
-			                      // bar and on the track-view
+protected:  
+     /* Display and gui */
+     /* --------------- */
+     std::string name;         // The human readable Name of the karts driver
+     std::string ident;        // The computer readable-name of the karts driver
+     std::string model_file;   // Filename of 3d model that is used for kart
+     std::string icon_file;    // Filename of icon that represents the kart in
+                               // the statusbar and the character select screen  
+     std::string shadow_file;  // Filename of the image file that contains the 
+     // shadow for this kart
+     float color[3];           // Color the represents the kart in the status
+			                // bar and on the track-view
   
-  /* Physic properties */
-  /* ----------------- */
-  float mass;               // weight of kart
-  float air_resistance;     // air resistance
-  float roll_resistance;    // rolling resistance etc
-  float wheel_base;         // distance between front and read wheels
-  float heightCOG;          // height of center of gravity
-  float engine_power;       // maximum force from engine
-  float brake_factor;       // braking factor * engine_power = braking force
-  float tire_grip;          // grip of tires in longitudinal direction
-  float max_steer_angle;    // maximum steering angle
-  float time_full_steer;    // time for player karts to reach full steer angle
-  float corn_f;
-  float corn_r;
-  float inertia;
-  float wheelieMaxSpeedRatio;  // percentage of maximum speed for wheelies
-  float wheelieMaxPitch;       // maximum pitch for wheelies
-  float wheeliePitchRate;      // rate/sec with which kart goes up
-  float wheelieRestoreRate;    // rate/sec with which kart does down
-  float wheelieSpeedBoost;     // speed boost while doing a wheelie
+     /* Physic properties */
+     /* ----------------- */
+     float mass;               // weight of kart
+     float air_resistance;     // air resistance
+     float roll_resistance;    // rolling resistance etc
+     float wheel_base;         // distance between front and read wheels
+     float heightCOG;          // height of center of gravity
+     float engine_power;       // maximum force from engine
+     float brake_factor;       // braking factor * engine_power = braking force
+     float tire_grip;          // grip of tires in longitudinal direction
+     float max_steer_angle;    // maximum steering angle
+     float time_full_steer;    // time for player karts to reach full steer angle
+     float corn_f;
+     float corn_r;
+     float inertia;
+     float wheelieMaxSpeedRatio;  // percentage of maximum speed for wheelies
+     float wheelieMaxPitch;       // maximum pitch for wheelies
+     float wheeliePitchRate;      // rate/sec with which kart goes up
+     float wheelieRestoreRate;    // rate/sec with which kart does down
+     float wheelieSpeedBoost;     // speed boost while doing a wheelie
 
- public:
-                KartProperties   ();
-  virtual      ~KartProperties   ();
+public:
+                   KartProperties   ();
+     virtual      ~KartProperties   ();
   
-  virtual void  init_defaults    ();
-  virtual void  getAllData       (const lisp::Lisp* lisp);
-  virtual void  load             (const std::string filename, 
-	                              const std::string node="tuxkart-kart");
-  
-  Material*     getIconMaterial        () const { return icon_material;      }
-  ssgEntity*    getModel               () const {return model;               }
-  const char*   getName                () const {return name.c_str();        }
-  const char*   getIdent               () const {return ident.c_str();       }
-  const char*   getShadowFile          () const {return shadow_file.c_str(); }
-  const char*   getIconFile            () const {return icon_file.c_str();   }
-  const sgVec3* getColor               () const {return &color;              }
-  float         getMass                () const {return mass;                }
-  float         getAirResistance       () const {return air_resistance;      }
-  float         getRollResistance      () const {return roll_resistance;     }
-  float         getMaxPower            () const {return engine_power;        }
-  float         getTimeFullSteer       () const {return time_full_steer;     }
-  float         getBrakeFactor         () const {return brake_factor;        }
-  float         getWheelBase           () const {return wheel_base;          }
-  float         getHeightCOG           () const {return heightCOG;           }
-  float         getTireGrip            () const {return tire_grip;           }
-  float         getMaxSteerAngle       () const {return max_steer_angle;     }
-  float         getCornerStiffF        () const {return corn_f;              }
-  float         getCornerStiffR        () const {return corn_r;              }
-  float         getInertia             () const {return inertia;             }
-  float         getWheelieMaxSpeedRatio() const {return wheelieMaxSpeedRatio;}
-  float         getWheelieMaxPitch     () const {return wheelieMaxPitch;     }
-  float         getWheeliePitchRate    () const {return wheeliePitchRate;    }
-  float         getWheelieRestoreRate  () const {return wheelieRestoreRate;  }
-  float         getWheelieSpeedBoost   () const {return wheelieSpeedBoost;   }
+     virtual void  init_defaults    ();
+     virtual void  getAllData       (const lisp::Lisp* lisp);
+     virtual void  load             (const std::string filename, 
+                                     const std::string node="tuxkart-kart");
+     
+     Material*     getIconMaterial        () const { return icon_material;      }
+     ssgEntity*    getModel               () const {return model;               }
+     const char*   getName                () const {return name.c_str();        }
+     const char*   getIdent               () const {return ident.c_str();       }
+     const char*   getShadowFile          () const {return shadow_file.c_str(); }
+     const char*   getIconFile            () const {return icon_file.c_str();   }
+     const sgVec3* getColor               () const {return &color;              }
+     float         getMass                () const {return mass;                }
+     float         getAirResistance       () const {return air_resistance;      }
+     float         getRollResistance      () const {return roll_resistance;     }
+     float         getMaxPower            () const {return engine_power;        }
+     float         getTimeFullSteer       () const {return time_full_steer;     }
+     float         getBrakeFactor         () const {return brake_factor;        }
+     float         getWheelBase           () const {return wheel_base;          }
+     float         getHeightCOG           () const {return heightCOG;           }
+     float         getTireGrip            () const {return tire_grip;           }
+     float         getMaxSteerAngle       () const {return max_steer_angle;     }
+     float         getCornerStiffF        () const {return corn_f;              }
+     float         getCornerStiffR        () const {return corn_r;              }
+     float         getInertia             () const {return inertia;             }
+     float         getWheelieMaxSpeedRatio() const {return wheelieMaxSpeedRatio;}
+     float         getWheelieMaxPitch     () const {return wheelieMaxPitch;     }
+     float         getWheeliePitchRate    () const {return wheeliePitchRate;    }
+     float         getWheelieRestoreRate  () const {return wheelieRestoreRate;  }
+     float         getWheelieSpeedBoost   () const {return wheelieSpeedBoost;   }
 };
 
 #endif

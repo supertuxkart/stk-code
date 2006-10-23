@@ -911,7 +911,7 @@ void Kart::load_data() {
   // else needed to load the wheels as a separate object.
   ssgFlatten(obj);
 
-  optimise_model(obj);
+  optimise_model(obj);  // create all display lists
   ssgRangeSelector *lod = new ssgRangeSelector ;
 
   lod -> addKid ( obj ) ;
