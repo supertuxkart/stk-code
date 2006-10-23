@@ -378,9 +378,12 @@ void RaceGUI::drawGameOverText (const float dt) {
 // Draw players position on the race
 void RaceGUI::drawPlayerIcons () {
   assert(world != NULL);
-  
-  int x = 10;
+
+  int x = 5;
   int y;
+#define ICON_WIDTH 40
+#define ICON_PLAYER_WIDHT 50
+#define ICON_POS_WIDTH 28
 
   //glEnable(GL_TEXTURE_2D);
   Material *last_players_gst = 0;
@@ -389,42 +392,38 @@ void RaceGUI::drawPlayerIcons () {
       Kart* kart   = world->getKart(i);
       int position = kart->getPosition();
       int lap      = kart->getLap();
-      if(position > 4)  // only draw the first four karts
-        continue;
-      
-      y = config->height*3/4-20 - ((position-1)*(55+5));
+
+      y = config->height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
 
       // draw text
       int red=255, green=255, blue=255;
       int numLaps = world->raceSetup.numLaps;
       if(lap>=numLaps) {  // kart is finished, display in green
-	red=0; blue=0;
+        red=0; blue=0;
       } else if(lap>=0 && numLaps>1) {
-	green = blue  = 255-(int)((float)lap/((float)numLaps-1.0f)*255.0f);
+        green = blue  = 255-(int)((float)lap/((float)numLaps-1.0f)*255.0f);
       }
 
       glDisable(GL_CULL_FACE);
       if(lap>lapLeader) {
-	lapLeader    = lap;
-	timeOfLeader = world->clock;
+        lapLeader    = lap;
+        timeOfLeader = world->clock;
       }
-      if(lapLeader<=0 ||    // Display position during first lap
-	 position==1  ||    // Display position for leader
-	 (world->clock - kart->getTimeAtLap()>5.0f && 
-	  lap==lapLeader)) {  // Display for 5 seconds
-	drawDropShadowText(pos_string[position], 28, 55+x, y+10, 
-			   red, green, blue);
-      } else {
-	float timeBehind;
-	timeBehind = (lap==lapLeader ? kart->getTimeAtLap() : world->clock)
-	           - timeOfLeader;
-	int min     = (int) floor ( timeBehind / 60.0 ) ;
-	int sec     = (int) floor ( timeBehind - (double) ( 60 * min ) ) ;
-	int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
-	char str[256];
-	sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-	drawDropShadowText(str, 28, 55+x, y+10, 
-			   red, green, blue);
+
+      if(lapLeader>0 &&    // Display position during first lap
+         position!=1  &&    // Display position for leader
+         (world->clock - kart->getTimeAtLap()<5.0f ||
+         lap!=lapLeader)) {  // Display for 5 seconds
+        float timeBehind;
+        timeBehind = (lap==lapLeader ? kart->getTimeAtLap() : world->clock)
+                   - timeOfLeader;
+        int min     = (int) floor ( timeBehind / 60.0 ) ;
+        int sec     = (int) floor ( timeBehind - (double) ( 60 * min ) ) ;
+        int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
+        char str[256];
+        sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
+        drawDropShadowText(str, 20, ICON_PLAYER_WIDHT+x, y+5, 
+           red, green, blue);
       }
 
       glEnable(GL_CULL_FACE);
@@ -437,7 +436,7 @@ void RaceGUI::drawPlayerIcons () {
       // displayed for the remaining icons. So we have to call force() if
       // the same icon is displayed more than once in a row.
       if(last_players_gst==players_gst) {
-	players_gst->getState()->force();
+        players_gst->getState()->force();
       }
       //The material of the icons should not have a non-zero alpha_ref value,
       //because if so the next call can make the text look aliased.
@@ -445,12 +444,29 @@ void RaceGUI::drawPlayerIcons () {
       last_players_gst = players_gst;
       glBegin ( GL_QUADS ) ;
         glColor4f    ( 1, 1, 1, 1 ) ;
-
-        glTexCoord2f ( 0, 0 ) ; glVertex2i ( x   , y    ) ;
-        glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+55, y    ) ;
-        glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+55, y+55 ) ;
-        glTexCoord2f ( 0, 1 ) ; glVertex2i ( x   , y+55 ) ;
+        if (kart -> isPlayerKart ()) {
+          glTexCoord2f ( 0, 0 ) ; glVertex2i ( x                  , y                   ) ;
+          glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_PLAYER_WIDHT, y                   ) ;
+          glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_PLAYER_WIDHT, y+ICON_PLAYER_WIDHT ) ;
+          glTexCoord2f ( 0, 1 ) ; glVertex2i ( x                  , y+ICON_PLAYER_WIDHT ) ;
+        }
+        else {
+          glTexCoord2f ( 0, 0 ) ; glVertex2i ( x           , y            ) ;
+          glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_WIDTH, y            ) ;
+          glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_WIDTH, y+ICON_WIDTH ) ;
+          glTexCoord2f ( 0, 1 ) ; glVertex2i ( x           , y+ICON_WIDTH ) ;
+        }
       glEnd () ;
+
+      // draw position (1st, 2nd...)
+      PositionIcons[kart->getPosition()]->getState()->force();
+      glBegin ( GL_QUADS ) ;
+        glTexCoord2f(0, 0);glVertex2i(x-3               , y+3               );
+        glTexCoord2f(1, 0);glVertex2i(x-3+ICON_POS_WIDTH, y+3               );
+        glTexCoord2f(1, 1);glVertex2i(x-3+ICON_POS_WIDTH, y+3+ICON_POS_WIDTH);
+        glTexCoord2f(0, 1);glVertex2i(x-3               , y+3+ICON_POS_WIDTH);
+      glEnd () ;
+
     }
 }   // drawPlayerIcons
 
@@ -478,7 +494,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_y), 
+      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_x), 
 			    (int)(130*ratio_x)+offset_x,
 			    (int)(210*ratio_y)+offset_y, red, green, blue ) ;
       if ( ! i ) {
@@ -489,7 +505,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_y), 
+      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_x), 
 			    (int)((130+2)*ratio_x)+offset_x,
 			    (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
 
@@ -659,12 +675,6 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
   int width  = (int)(POSWIDTH*minRatio);
   int height = (int)(POSWIDTH*minRatio);
   glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-    glLoadIdentity();
-    int tw = width/2; int th = height/2;
-    glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
-    glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
-
     PositionIcons[kart->getPosition()]->getState()->force();
     glBegin ( GL_QUADS ) ;
       glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
@@ -672,8 +682,6 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
       glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
       glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
     glEnd () ;
-
-  glPopMatrix();
 } // drawPosition
 
 // -----------------------------------------------------------------------------
