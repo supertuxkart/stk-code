@@ -44,17 +44,17 @@ void createDisplayLists(ssgEntity* entity)
     ssgVtxTable* table = dynamic_cast<ssgVtxTable*>(entity);
     if(table)
     {
-         if(table->getNumTriangles()>1) table->makeDList();
+        if(table->getNumTriangles()>1) table->makeDList();
     }
     ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
       
     if (branch) 
     {
-         for(ssgEntity* i = branch->getKid(0); i != NULL; 
-             i = branch->getNextKid()) 
-         {
-              createDisplayLists(i);
-         }   // for
+        for(ssgEntity* i = branch->getKid(0); i != NULL; 
+            i = branch->getNextKid()) 
+        {
+            createDisplayLists(i);
+        }   // for
     }   // if branch
 
 }  // createDisplayLists
@@ -74,7 +74,7 @@ ssgTransform* add_transform(ssgBranch* branch)
     transform->ref();
     for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid()) 
     {
-         transform->addKid(i);
+        transform->addKid(i);
     }
    
     branch->removeAllKids();
@@ -95,26 +95,30 @@ ssgTransform* add_transform(ssgBranch* branch)
 /// \param entity The entity ro print
 /// \param indent Indentation to use
 /// \param maxLevel maximum number of levels to print
-void print_model(ssgEntity* entity, int indent, int maxLevel) {
+void print_model(ssgEntity* entity, int indent, int maxLevel) 
+{
     if(maxLevel <0) return;
-    if (entity) {
-         for(int i = 0; i < indent; ++i)
-              std::cout << "  ";
+    if (entity) 
+    {
+        for(int i = 0; i < indent; ++i)
+            std::cout << "  ";
       
-         std::cout << entity->getTypeName() << " " << entity->getType() << " '" 
-                   << entity->getPrintableName() 
-                   << "' '" 
-                   << (entity->getName() ? entity->getName() : "null")
-                   << "' " << entity << std::endl;
+        std::cout << entity->getTypeName() << " " << entity->getType() << " '" 
+                  << entity->getPrintableName() 
+                  << "' '" 
+                  << (entity->getName() ? entity->getName() : "null")
+                  << "' " << entity << std::endl;
 
-         ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
+        ssgBranch* branch = dynamic_cast<ssgBranch*>(entity);
       
-         if (branch) {
-              for(ssgEntity* i = branch->getKid(0); i != NULL; 
-                  i = branch->getNextKid()) {
-                   print_model(i, indent + 1, maxLevel-1);
-              }
-         }   // if branch
+        if (branch) 
+        {
+            for(ssgEntity* i = branch->getKid(0); i != NULL; 
+                i = branch->getNextKid()) 
+            {
+                print_model(i, indent + 1, maxLevel-1);
+            }
+        }   // if branch
     }   // if entity
 }   // print_model
 

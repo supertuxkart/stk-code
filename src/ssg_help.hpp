@@ -22,10 +22,11 @@
 #define HEADER_SSG_HELP_H
 
 #include <plib/ssg.h>
+
 /// Several useful functions which don't fit anywhere else
-void print_model(ssgEntity* entity, int indent, int maxLevel);
-void createDisplayLists(ssgEntity* entity);
-ssgTransform* add_transform(ssgBranch* branch);
+void          print_model       (ssgEntity* entity, int indent, int maxLevel);
+void          createDisplayLists(ssgEntity* entity);
+ssgTransform* add_transform     (ssgBranch* branch);
 
 
 #endif

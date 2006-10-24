@@ -38,8 +38,8 @@
 KartParticleSystem::KartParticleSystem(Kart* kart_,
                                        int num, float _create_rate, int _ttf,
                                        float sz, float bsphere_size)
-     : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
-       kart(kart_) 
+    : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
+      kart(kart_) 
 {
     getBSphere () -> setCenter ( 0, 0, 0 ) ;
     getBSphere () -> setRadius ( 1000.0f ) ;
@@ -113,7 +113,7 @@ void KartParticleSystem::particle_delete (int , Particle* )
 
 // =============================================================================
 Kart::Kart (const KartProperties* kartProperties_, int position_ ) 
-     : Moveable(true), attachment(this), collectable(this) 
+    : Moveable(true), attachment(this), collectable(this) 
 {
     kartProperties       = kartProperties_;
     grid_position        = position_ ;
@@ -192,10 +192,10 @@ void Kart::doLapCounting ()
 {
     if (      last_track_coords[1] > 100.0f && curr_track_coords[1] <  20.0f ) 
     {
-         setTimeAtLap(world->clock);
-         raceLap++ ;
+        setTimeAtLap(world->clock);
+        raceLap++ ;
     } else if ( curr_track_coords[1] > 100.0f && last_track_coords[1] <  20.0f )
-         raceLap-- ;
+        raceLap-- ;
 }   // doLapCounting
 
 // -----------------------------------------------------------------------------
@@ -204,27 +204,27 @@ void Kart::doObjectInteractions ()
     int i;
     for ( i = 0 ; i < grid_position ; i++ ) 
     {
-         sgVec3 xyz ;
-
-         sgSubVec3(xyz, getCoord()->xyz, world->getKart(i)->getCoord()->xyz );
-
-         if ( sgLengthSquaredVec2 ( xyz ) < 1.0f ) 
-         {
-              sgNormalizeVec2 ( xyz ) ;
-              world->addCollisions(grid_position, 1);
-              world->addCollisions(i,             1);
-              if ( velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] ) 
-              {
-                   forceCrash () ;
-                   sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
-              } else 
-              {
-                   world->getKart(i)->forceCrash () ;
-                   sgAddVec2 ( getCoord()->xyz, xyz ) ;
-              }
-         }   // if sgLengthSquaredVec2(xy)<1.0
+        sgVec3 xyz ;
+        
+        sgSubVec3(xyz, getCoord()->xyz, world->getKart(i)->getCoord()->xyz );
+        
+        if ( sgLengthSquaredVec2 ( xyz ) < 1.0f ) 
+        {
+            sgNormalizeVec2 ( xyz ) ;
+            world->addCollisions(grid_position, 1);
+            world->addCollisions(i,             1);
+            if ( velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] ) 
+            {
+                forceCrash () ;
+                sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
+            } else 
+            {
+                world->getKart(i)->forceCrash () ;
+                sgAddVec2 ( getCoord()->xyz, xyz ) ;
+            }
+        }   // if sgLengthSquaredVec2(xy)<1.0
     }   // for i
-
+    
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
 }   // doObjectInteractions
@@ -241,24 +241,24 @@ void Kart::collectedHerring(Herring* herring)
     case HE_SILVER : num_herring_gobbled++ ;       break;
     case HE_GOLD   : num_herring_gobbled += 3 ;    break;
     case HE_RED    : int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
-         collectable.hitRedHerring(n); break;
+        collectable.hitRedHerring(n); break;
     }   // switch type
 
     if ( num_herring_gobbled > MAX_HERRING_EATEN )
-         num_herring_gobbled = MAX_HERRING_EATEN;
+        num_herring_gobbled = MAX_HERRING_EATEN;
 
     if(old_herring_gobbled < num_herring_gobbled &&
        num_herring_gobbled == MAX_HERRING_EATEN)
-         sound_manager->playSfx(SOUND_FULL);
+        sound_manager->playSfx(SOUND_FULL);
 }   // hitHerring
 // -----------------------------------------------------------------------------
 void Kart::doZipperProcessing (float delta) 
 {
     if ( ZipperTimeLeft > delta ) 
     {
-         ZipperTimeLeft -= delta ;
-         if ( velocity.xyz[1] < ZIPPER_VELOCITY )
-              velocity.xyz[1] = ZIPPER_VELOCITY ;
+        ZipperTimeLeft -= delta ;
+        if ( velocity.xyz[1] < ZIPPER_VELOCITY )
+            velocity.xyz[1] = ZIPPER_VELOCITY ;
     } else ZipperTimeLeft = 0.0f ;
 }   // doZipperProcessing
 
@@ -269,7 +269,7 @@ void Kart::forceCrash ()
     wheelie_angle = CRASH_PITCH ;
 
     velocity.xyz[0] = velocity.xyz[1] = velocity.xyz[2] =
-         velocity.hpr[0] = velocity.hpr[1] = velocity.hpr[2] = 0.0f ;
+        velocity.hpr[0] = velocity.hpr[1] = velocity.hpr[2] = 0.0f ;
 }  // forceCrash
 
 // -----------------------------------------------------------------------------
@@ -277,28 +277,28 @@ void Kart::doCollisionAnalysis ( float delta, float hot )
 {
     if ( collided ) 
     {
-         if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY ) 
-         {
-              velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
-         } else if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY ) 
-         {
-              velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
-         }
+        if ( velocity.xyz[1] > MIN_COLLIDE_VELOCITY ) 
+        {
+            velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
+        } else if ( velocity.xyz[1] < -MIN_COLLIDE_VELOCITY ) 
+        {
+            velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
+        }
     }   // if collided
 
     if ( crashed && velocity.xyz[1] > MIN_CRASH_VELOCITY ) 
     {
-         forceCrash () ;
+        forceCrash () ;
     } else if ( wheelie_angle < 0.0f ) 
     {
-         wheelie_angle += getWheelieRestoreRate() * delta;
-         if ( wheelie_angle >= 0.0f ) wheelie_angle = 0.0f ;
+        wheelie_angle += getWheelieRestoreRate() * delta;
+        if ( wheelie_angle >= 0.0f ) wheelie_angle = 0.0f ;
     }
    
     /* Make sure that the car doesn't go through the floor */
     if ( isOnGround() ) 
     {
-         velocity.xyz[2] = 0.0f ;
+        velocity.xyz[2] = 0.0f ;
     }   // isOnGround
 }   // doCollisionAnalysis
 
@@ -311,19 +311,19 @@ void Kart::update (float dt)
 
     if ( rescue ) 
     {
-         if(attachment.getType() != ATTACH_TINYTUX)
-         {
-              if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
-              attachment.set( ATTACH_TINYTUX, 2.0f ) ;
-         }
+        if(attachment.getType() != ATTACH_TINYTUX)
+        {
+            if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
+            attachment.set( ATTACH_TINYTUX, 2.0f ) ;
+        }
     }
     attachment.update(dt, &velocity);
    
     /*smoke drawing control point*/
     if ( config->smoke ) 
     {
-         if (smoke_system != NULL)
-              smoke_system->update (dt);
+        if (smoke_system != NULL)
+            smoke_system->update (dt);
     }  // config->smoke
     doZipperProcessing (dt) ;
     updatePhysics(dt);
@@ -362,7 +362,7 @@ void Kart::updatePhysics (float dt)
 
     if(wheelie_angle>0.0f) 
     {
-         velocity.xyz[1]-=getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+        velocity.xyz[1]-=getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
     }
 
 
@@ -370,29 +370,29 @@ void Kart::updatePhysics (float dt)
     // ==========================
     if(on_ground) 
     {
-         if(controls.brake) 
-         {
-              throttle = velocity.xyz[1]<0.0 ? -1.0f : -getBrakeFactor();
-         } else {   // not breaking
-              throttle =  controls.accel;
-         }
-         // Handle wheelies
-         // ===============
-         if ( controls.wheelie && velocity.xyz[1] >= 
-              getMaxSpeed()*getWheelieMaxSpeedRatio()) 
-         {
-              velocity.hpr[0]=0.0;
-              if ( wheelie_angle < getWheelieMaxPitch() )
-                   wheelie_angle += getWheeliePitchRate() * dt;
-              else
-                   wheelie_angle = getWheelieMaxPitch();
-         } else if ( wheelie_angle > 0.0f ) 
-         {
-              wheelie_angle -= getWheelieRestoreRate() * dt;
-              if ( wheelie_angle <= 0.0f ) wheelie_angle = 0.0f ;
-         }
+        if(controls.brake) 
+        {
+            throttle = velocity.xyz[1]<0.0 ? -1.0f : -getBrakeFactor();
+        } else {   // not breaking
+            throttle =  controls.accel;
+        }
+        // Handle wheelies
+        // ===============
+        if ( controls.wheelie && velocity.xyz[1] >= 
+             getMaxSpeed()*getWheelieMaxSpeedRatio()) 
+        {
+            velocity.hpr[0]=0.0;
+            if ( wheelie_angle < getWheelieMaxPitch() )
+                wheelie_angle += getWheeliePitchRate() * dt;
+            else
+                wheelie_angle = getWheelieMaxPitch();
+        } else if ( wheelie_angle > 0.0f ) 
+        {
+            wheelie_angle -= getWheelieRestoreRate() * dt;
+            if ( wheelie_angle <= 0.0f ) wheelie_angle = 0.0f ;
+        }
     } else {   // not on ground
-         throttle = 0.0;
+        throttle = 0.0;
     }   // if !on_ground
 
     float ForceLong = throttle * getMaxPower();
@@ -420,108 +420,108 @@ void Kart::updatePhysics (float dt)
     float ForceGravity;
     if(on_ground) 
     {
-         if(normalHOT) 
-         {
-              // Adjust pitch and roll according to the current terrain. To compute
-              // the correspondant angles, we consider first a normalised line 
-              // pointing into the direction the kart is facing (pointing from (0,0,0) 
-              // to (x,y,0)). The angle between this line and the triangle the kart is 
-              // on determines the pitch. Similartly the roll is computed, using a 
-              // normalised line pointing to the right of the kart, for which we simply
-              // use (-y,x,0).
-              float kartAngle = curr_pos.hpr[0]*M_PI/180.0f;
-              float x = -sin(kartAngle);
-              float y =  cos(kartAngle);
-              // Compute the angle between the normal of the plane and the line to 
-              // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane, 
-              // simplifying the computation of the scalar product.
-              float pitch = ( (*normalHOT)[0]*x + (*normalHOT)[1]*y );  // use ( x,y,0)
-              float roll  = (-(*normalHOT)[0]*y + (*normalHOT)[1]*x );  // use (-y,x,0)
+        if(normalHOT) 
+        {
+            // Adjust pitch and roll according to the current terrain. To compute
+            // the correspondant angles, we consider first a normalised line 
+            // pointing into the direction the kart is facing (pointing from (0,0,0) 
+            // to (x,y,0)). The angle between this line and the triangle the kart is 
+            // on determines the pitch. Similartly the roll is computed, using a 
+            // normalised line pointing to the right of the kart, for which we simply
+            // use (-y,x,0).
+            float kartAngle = curr_pos.hpr[0]*M_PI/180.0f;
+            float x = -sin(kartAngle);
+            float y =  cos(kartAngle);
+            // Compute the angle between the normal of the plane and the line to 
+            // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane, 
+            // simplifying the computation of the scalar product.
+            float pitch = ( (*normalHOT)[0]*x + (*normalHOT)[1]*y );  // use ( x,y,0)
+            float roll  = (-(*normalHOT)[0]*y + (*normalHOT)[1]*x );  // use (-y,x,0)
 
-              // The actual angle computed above is between the normal and the (x,y,0) 
-              // line, so to compute the actual angles 90 degrees must be subtracted.
-              pitch = acosf(pitch)/M_PI*180.0f-90.0f;
-              roll  = acosf(roll )/M_PI*180.0f-90.0f;
-              // if dt is too big, the relaxation will overshoot, and the
-              // karts will either be hopping, or even turn upside down etc.
-              if(dt<=0.05) 
-              {
+            // The actual angle computed above is between the normal and the (x,y,0) 
+            // line, so to compute the actual angles 90 degrees must be subtracted.
+            pitch = acosf(pitch)/M_PI*180.0f-90.0f;
+            roll  = acosf(roll )/M_PI*180.0f-90.0f;
+            // if dt is too big, the relaxation will overshoot, and the
+            // karts will either be hopping, or even turn upside down etc.
+            if(dt<=0.05) 
+            {
 # define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*20.0f)
-                   curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
-                   curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
-              } else {
-                   curr_pos.hpr[1] = pitch;
-                   curr_pos.hpr[2] = roll ;
-              }
-              if(fabsf(curr_pos.hpr[1])>fabsf(pitch)) curr_pos.hpr[1]=pitch;
-              if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
-         }
-         if(controls.jump) 
-         { // ignore gravity down when jumping
-              ForceGravity = physicsParameters->jumpImpulse*gravity;
-         } else {   // kart is on groud and not jumping
-              if(config->improvedPhysics) 
-              {
-                   // FIXME:
-                   // While these physics computation is correct, it is very difficult
-                   // to drive, esp. the sandtrack: the grades (with the current
-                   // physics parameters) are too steep, so the kart needs a very high
-                   // initial velocity to be able to reach the top. Especially the
-                   // AI gets stuck very easily! Perhaps reduce the forces somewhat?
-                   float pitch_in_rad = curr_pos.hpr[1]*M_PI/180.0f;
-                   ForceGravity   = -gravity * mass * cos(pitch_in_rad);
-                   ForceLong     -=  gravity * mass * sin(pitch_in_rad);
-              } else {
-                   ForceGravity   = -gravity * mass;
-              }
-         }
+                curr_pos.hpr[1] = RELAX(curr_pos.hpr[1],pitch);
+                curr_pos.hpr[2] = RELAX(curr_pos.hpr[2],roll );
+            } else {
+                curr_pos.hpr[1] = pitch;
+                curr_pos.hpr[2] = roll ;
+            }
+            if(fabsf(curr_pos.hpr[1])>fabsf(pitch)) curr_pos.hpr[1]=pitch;
+            if(fabsf(curr_pos.hpr[2])>fabsf(roll )) curr_pos.hpr[2]=roll;
+        }
+        if(controls.jump) 
+        { // ignore gravity down when jumping
+            ForceGravity = physicsParameters->jumpImpulse*gravity;
+        } else {   // kart is on groud and not jumping
+            if(config->improvedPhysics) 
+            {
+                // FIXME:
+                // While these physics computation is correct, it is very difficult
+                // to drive, esp. the sandtrack: the grades (with the current
+                // physics parameters) are too steep, so the kart needs a very high
+                // initial velocity to be able to reach the top. Especially the
+                // AI gets stuck very easily! Perhaps reduce the forces somewhat?
+                float pitch_in_rad = curr_pos.hpr[1]*M_PI/180.0f;
+                ForceGravity   = -gravity * mass * cos(pitch_in_rad);
+                ForceLong     -=  gravity * mass * sin(pitch_in_rad);
+            } else {
+                ForceGravity   = -gravity * mass;
+            }
+        }
     } else 
     {  // kart is not on ground, gravity applies all to z axis.
-         ForceGravity = -gravity * mass;
+        ForceGravity = -gravity * mass;
     }
     velocity.xyz[2] += ForceGravity / mass * dt;
 
 
     if(wheelie_angle <= 0.0f && on_ground) 
     {
-         // At low speed, the advanced turning mode can result in 'flickering', i.e.
-         // very quick left/right movements. The reason might be:
-         // 1) integration timestep to big
-         // 2) the kart turning too much, thus 'oversteering', which then gets
-         //    corrected (which might be caused by wrongly tuned physics parameters,
-         //    or the too big timestep mentioned above
-         // Since at lower speed the simple turning algorithm is good enough, 
-         // the advanced sliding turn algorithm is only used at higher speeds.
+        // At low speed, the advanced turning mode can result in 'flickering', i.e.
+        // very quick left/right movements. The reason might be:
+        // 1) integration timestep to big
+        // 2) the kart turning too much, thus 'oversteering', which then gets
+        //    corrected (which might be caused by wrongly tuned physics parameters,
+        //    or the too big timestep mentioned above
+        // Since at lower speed the simple turning algorithm is good enough, 
+        // the advanced sliding turn algorithm is only used at higher speeds.
 
-         // FIXME: for now, only use the simple steering algorithm.
-         //        so the test for 'lower speed' is basically disabled for now,
-         //        since the velocity will always be lower than 1.5*100000.0f
-         if(fabsf(velocity.xyz[1])<150000.0f) 
-         {
-              float msa       = getMaxSteerAngle();
-              velocity.hpr[0] = controls.lr * ((velocity.xyz[1]>=0.0f) ? msa : -msa);
-              if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;  // In case the AI sets
-              if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;  // controls.lr >1 or <-1
-         } else {
-              float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0f;
-              float TurnDistance   = velocity.hpr[0]*M_PI/180.0f * wheelBase/2.0f;
-              float slipAngleFront = atan((velocity.xyz[0]+TurnDistance)
-                                          /fabsf(velocity.xyz[1]))
-                   - sgn(velocity.xyz[1])*steer_angle;
-              float slipAngleRear  = atan((velocity.xyz[0]-TurnDistance)
-                                          /fabsf(velocity.xyz[1]));
-              float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
-                   * ForceOnFrontTire - SysResistance[0]*0.5f;
-              float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
-                   * ForceOnRearTire  - SysResistance[0]*0.5f;
-              float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
-              velocity.xyz[0]      = cornerForce/mass*dt;
-              float torque         =                  ForceLatRear *wheelBase/2
-                   - cos(steer_angle)*ForceLatFront*wheelBase/2; 
-              float angAcc         = torque/getInertia();
+        // FIXME: for now, only use the simple steering algorithm.
+        //        so the test for 'lower speed' is basically disabled for now,
+        //        since the velocity will always be lower than 1.5*100000.0f
+        if(fabsf(velocity.xyz[1])<150000.0f) 
+        {
+            float msa       = getMaxSteerAngle();
+            velocity.hpr[0] = controls.lr * ((velocity.xyz[1]>=0.0f) ? msa : -msa);
+            if(velocity.hpr[0]> msa) velocity.hpr[0] =  msa;  // In case the AI sets
+            if(velocity.hpr[0]<-msa) velocity.hpr[0] = -msa;  // controls.lr >1 or <-1
+        } else {
+            float steer_angle    = controls.lr*getMaxSteerAngle()*M_PI/180.0f;
+            float TurnDistance   = velocity.hpr[0]*M_PI/180.0f * wheelBase/2.0f;
+            float slipAngleFront = atan((velocity.xyz[0]+TurnDistance)
+                                        /fabsf(velocity.xyz[1]))
+                - sgn(velocity.xyz[1])*steer_angle;
+            float slipAngleRear  = atan((velocity.xyz[0]-TurnDistance)
+                                        /fabsf(velocity.xyz[1]));
+            float ForceLatFront  = NormalizedLateralForce(slipAngleFront, getCornerStiffF())
+                * ForceOnFrontTire - SysResistance[0]*0.5f;
+            float ForceLatRear   = NormalizedLateralForce(slipAngleRear,  getCornerStiffR())
+                * ForceOnRearTire  - SysResistance[0]*0.5f;
+            float cornerForce    = ForceLatRear + cos(steer_angle)*ForceLatFront;
+            velocity.xyz[0]      = cornerForce/mass*dt;
+            float torque         =                  ForceLatRear *wheelBase/2
+                - cos(steer_angle)*ForceLatFront*wheelBase/2; 
+            float angAcc         = torque/getInertia();
 
-              velocity.hpr[0] += angAcc*dt*180.0f/M_PI;
-         }   // fabsf(velocity.xyz[1])<0.5
+            velocity.hpr[0] += angAcc*dt*180.0f/M_PI;
+        }   // fabsf(velocity.xyz[1])<0.5
     }   // wheelie_angle <=0.0f && on_ground
 
     // Longitudinal accelleration 
@@ -532,8 +532,8 @@ void Kart::updatePhysics (float dt)
     //     by an arbitrary value.
     if(fabs(effForce)>maxGrip) 
     {
-         //    effForce *= 0.4f;
-         //    skidRear  = true;
+        //    effForce *= 0.4f;
+        //    skidRear  = true;
     }   // while effForce>maxGrip
     float accel       = effForce / mass;
 
@@ -542,8 +542,8 @@ void Kart::updatePhysics (float dt)
 
     if(wheelie_angle>0.0f) 
     {
-         velocity.xyz[1]+=
-              getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+        velocity.xyz[1]+=
+            getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
     }
 }   // updatePhysics
 
@@ -555,9 +555,9 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const
     float const maxAlpha=3.14f/4.0f;
     if(fabsf(alpha)<maxAlpha) 
     {
-         return corner*alpha;
+        return corner*alpha;
     } else {
-         return alpha>0.0f ? corner*maxAlpha : -corner*maxAlpha;
+        return alpha>0.0f ? corner*maxAlpha : -corner*maxAlpha;
     }
 }   // NormalizedLateralForce
 // -----------------------------------------------------------------------------
@@ -574,7 +574,7 @@ float Kart::getAirResistance() const
 {
     return (kartProperties->getAirResistance() +
             attachment.AirResistanceAdjust()    )
-         * physicsParameters->airResReduce[world->raceSetup.difficulty];
+        * physicsParameters->airResReduce[world->raceSetup.difficulty];
 }
 
 // -----------------------------------------------------------------------------
@@ -586,99 +586,99 @@ void Kart::processSkidMarks()
   
     if(skidRear || skidFront) 
     {
-         if(on_ground) 
-         {
-              const float length = 0.57f;
-              if(skidmark_left) 
-              {
-                   const float angle  = -43.0f;
+        if(on_ground) 
+        {
+            const float length = 0.57f;
+            if(skidmark_left) 
+            {
+                const float angle  = -43.0f;
         
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
         
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
         
-                   if(skidmark_left->wasSkidMarking())
-                        skidmark_left->add(&wheelpos);
-                   else
-                        skidmark_left->addBreak(&wheelpos);
-              }   // if skidmark_left
+                if(skidmark_left->wasSkidMarking())
+                    skidmark_left->add(&wheelpos);
+                else
+                    skidmark_left->addBreak(&wheelpos);
+            }   // if skidmark_left
 
-              if(skidmark_right) 
-              {
-                   const float angle  = 43.0f;
+            if(skidmark_right) 
+            {
+                const float angle  = 43.0f;
         
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
         
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
 
-                   if(skidmark_right->wasSkidMarking())
-                        skidmark_right->add(&wheelpos);
-                   else
-                        skidmark_right->addBreak(&wheelpos);
-              }   // if skidmark_right
-         } else {   // not on ground
-              if(skidmark_left) 
-              {
-                   const float length = 0.57f;
-                   const float angle  = -43.0f;
+                if(skidmark_right->wasSkidMarking())
+                    skidmark_right->add(&wheelpos);
+                else
+                    skidmark_right->addBreak(&wheelpos);
+            }   // if skidmark_right
+        } else {   // not on ground
+            if(skidmark_left) 
+            {
+                const float length = 0.57f;
+                const float angle  = -43.0f;
         
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
         
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
         
-                   skidmark_left->addBreak(&wheelpos);
-              }   // if skidmark_left
+                skidmark_left->addBreak(&wheelpos);
+            }   // if skidmark_left
 
-              if(skidmark_right) 
-              {
-                   const float length = 0.57f;
-                   const float angle  = 43.0f;
+            if(skidmark_right) 
+            {
+                const float length = 0.57f;
+                const float angle  = 43.0f;
         
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
         
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
         
-                   skidmark_right->addBreak(&wheelpos);
-              }   // if skidmark_right
-         }   // on ground
+                skidmark_right->addBreak(&wheelpos);
+            }   // if skidmark_right
+        }   // on ground
     } else {   // !skidRear && !skidFront
-         if(skidmark_left)
-              if(skidmark_left->wasSkidMarking()) 
-              {
-                   const float angle  = -43.0f;
-                   const float length = 0.57f;
+        if(skidmark_left)
+            if(skidmark_left->wasSkidMarking()) 
+            {
+                const float angle  = -43.0f;
+                const float length = 0.57f;
         
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
         
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
         
-                   skidmark_left->addBreak(&wheelpos);
-              }   // skidmark_left->wasSkidMarking
+                skidmark_left->addBreak(&wheelpos);
+            }   // skidmark_left->wasSkidMarking
 
-         if(skidmark_right)
-              if(skidmark_right->wasSkidMarking()) 
-              {
-                   const float angle  = 43.0f;
-                   const float length = 0.57f;
+        if(skidmark_right)
+            if(skidmark_right->wasSkidMarking()) 
+            {
+                const float angle  = 43.0f;
+                const float length = 0.57f;
 
-                   sgCoord wheelpos;
-                   sgCopyCoord(&wheelpos, getCoord());
+                sgCoord wheelpos;
+                sgCopyCoord(&wheelpos, getCoord());
 
-                   wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
-                   wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[0] += length * sgSin(wheelpos.hpr[0] + angle);
+                wheelpos.xyz[1] += length * -sgCos(wheelpos.hpr[0] + angle);
         
-                   skidmark_right->addBreak(&wheelpos);
-              }   // skidmark_right->wasSkidMarking
+                skidmark_right->addBreak(&wheelpos);
+            }   // skidmark_right->wasSkidMarking
     }   // velocity < 20
 }   // processSkidMarks
 
@@ -689,24 +689,24 @@ void Kart::load_wheels(ssgBranch* branch)
 
     for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid()) 
     {
-         if (i->getName()) 
-         { // We found something that might be a wheel
-              if (strcmp(i->getName(), "WheelFront.L") == 0) 
-              {
-                   wheel_front_l = add_transform(dynamic_cast<ssgTransform*>(i));
-              } else if (strcmp(i->getName(), "WheelFront.R") == 0) {
-                   wheel_front_r = add_transform(dynamic_cast<ssgTransform*>(i));
-              } else if (strcmp(i->getName(), "WheelRear.L") == 0) {
-                   wheel_rear_l = add_transform(dynamic_cast<ssgTransform*>(i));
-              } else if (strcmp(i->getName(), "WheelRear.R") == 0) {
-                   wheel_rear_r = add_transform(dynamic_cast<ssgTransform*>(i));
-              } else {
-                   // Wasn't a wheel, continue searching
-                   load_wheels(dynamic_cast<ssgBranch*>(i));
-              }
-         } else { // Can't be a wheel,continue searching
-              load_wheels(dynamic_cast<ssgBranch*>(i));
-         }
+        if (i->getName()) 
+        { // We found something that might be a wheel
+            if (strcmp(i->getName(), "WheelFront.L") == 0) 
+            {
+                wheel_front_l = add_transform(dynamic_cast<ssgTransform*>(i));
+            } else if (strcmp(i->getName(), "WheelFront.R") == 0) {
+                wheel_front_r = add_transform(dynamic_cast<ssgTransform*>(i));
+            } else if (strcmp(i->getName(), "WheelRear.L") == 0) {
+                wheel_rear_l = add_transform(dynamic_cast<ssgTransform*>(i));
+            } else if (strcmp(i->getName(), "WheelRear.R") == 0) {
+                wheel_rear_r = add_transform(dynamic_cast<ssgTransform*>(i));
+            } else {
+                // Wasn't a wheel, continue searching
+                load_wheels(dynamic_cast<ssgBranch*>(i));
+            }
+        } else { // Can't be a wheel,continue searching
+            load_wheels(dynamic_cast<ssgBranch*>(i));
+        }
     }   // for i
 }   // load_wheels
 
@@ -799,17 +799,17 @@ void Kart::getClosestKart(float *cdist, int *closest)
       
     for ( int i = 0; i < world->getNumKarts() ; ++i ) 
     {
-         if ( world->getKart(i) == this ) continue ;
-         if ( world->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
-              continue ;
+        if ( world->getKart(i) == this ) continue ;
+        if ( world->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
+            continue ;
          
-         float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                           world->getKart(i)->getCoord()->xyz ) ;
-         if ( d < *cdist && d < physicsParameters->magnetRangeSQ) 
-         {
-              *cdist = d ;
-              *closest = i ;
-         }
+        float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
+                                          world->getKart(i)->getCoord()->xyz ) ;
+        if ( d < *cdist && d < physicsParameters->magnetRangeSQ) 
+        {
+            *cdist = d ;
+            *closest = i ;
+        }
     }   // for i
 }   // getClosestKart
 
@@ -830,10 +830,10 @@ void Kart::handleMagnet(float cdist, int closest)
     //          to something larger than 1???
     if (cdist > physicsParameters->magnetMinRangeSQ) 
     {
-         if ( velocity.xyz[1] < tgt_velocity )
-              velocity.xyz[1] = tgt_velocity * 1.4f;
+        if ( velocity.xyz[1] < tgt_velocity )
+            velocity.xyz[1] = tgt_velocity * 1.4f;
     } else
-         velocity.xyz[1] = tgt_velocity ;
+        velocity.xyz[1] = tgt_velocity ;
 }   // handleMagnet
 
 // -----------------------------------------------------------------------------

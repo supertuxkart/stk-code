@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PHYSFSLOADER_H
-#define HEADER_PHYSFSLOADER_H
+#ifndef HEADER_LOADER_H
+#define HEADER_LOADER_H
 
 #include <plib/ssg.h>
 #include <string>

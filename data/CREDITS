@@ -26,6 +26,11 @@ did most of the graphical improvements.
 
 Additional coding:
 --------------------
+   Canarix
+         - User interface
+         - 2D art
+         - Testing
+
    Patrick Ammann
          - bug fixes, code cleanup
          - OpenAL support (in progress)
