@@ -66,6 +66,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
+	ssg_help.cpp               ssg_help.hpp                 \
 	kart.cpp		   kart.hpp		        \
 	auto_kart.cpp		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \

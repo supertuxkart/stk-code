@@ -496,7 +496,7 @@ void World::loadTrack() {
       }   // if need_hat
 
       ssgEntity        *obj   = loader->load(fname, CB_TRACK);
-      optimise_model(obj);
+      createDisplayLists(obj);
       ssgRangeSelector *lod   = new ssgRangeSelector ;
       ssgTransform     *trans = new ssgTransform ( & loc ) ;
 

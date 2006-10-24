@@ -35,28 +35,28 @@
 class Loader : public ssgLoaderOptions
 {
 public:
-    Loader();
-    ~Loader();
+     Loader();
+     ~Loader();
 
-    virtual void makeModelPath(char* path, const char* fname) const;
-    virtual void makeTexturePath(char* path, const char* fname) const;
+     virtual void makeModelPath(char* path, const char* fname) const;
+     virtual void makeTexturePath(char* path, const char* fname) const;
 
-    std::string getPath(const char* name) const;
-    std::string getPath(const std::string name) const {return getPath(name.c_str());}
-    void listFiles(std::set<std::string>& result, const std::string& dir)
-        const;
+     std::string getPath(const char* name) const;
+     std::string getPath(const std::string name) const {return getPath(name.c_str());}
+     void listFiles(std::set<std::string>& result, const std::string& dir)
+          const;
 
-    void       addSearchPath(const std::string& path);
-    void       addSearchPath(const char* path);
-    void       initConfigDir();
-    ssgEntity *load(const std::string& filename, CallbackType t);
-    void       setCallbackType(CallbackType t)   {currentCallbackType=t;}
+     void       addSearchPath(const std::string& path);
+     void       addSearchPath(const char* path);
+     void       initConfigDir();
+     ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true);
+     void       setCallbackType(CallbackType t)   {currentCallbackType=t;}
 private:
-    std::vector<std::string> searchPath;
-    CallbackType             currentCallbackType;
-    void         make_path(char* path, const char* dir, const char* fname) const;
-    ssgBranch   *createBranch(char *data) const;
-    ssgBranch   *animInit    (char *data) const;
+     std::vector<std::string> searchPath;
+     CallbackType             currentCallbackType;
+     void         make_path(char* path, const char* dir, const char* fname) const;
+     ssgBranch   *createBranch(char *data) const;
+     ssgBranch   *animInit    (char *data) const;
 };
 
 extern Loader* loader;

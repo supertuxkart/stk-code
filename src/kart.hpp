@@ -34,7 +34,8 @@ class SkidMark;
 class Kart;
 class Herring;
 
-class KartParticleSystem : public ParticleSystem {
+class KartParticleSystem : public ParticleSystem 
+{
 private:
   Kart* kart;
 
@@ -47,7 +48,8 @@ public:
   virtual void particle_delete(int index, Particle* p                         );
 };
 
-class Kart : public Moveable {
+class Kart : public Moveable 
+{
 protected:
   Attachment   attachment;
   Collectable  collectable;
@@ -129,8 +131,6 @@ public:
   float          getFinishTime       () const  { return finishTime;         }
   bool           raceIsFinished      () const  { return finishedRace;       }
   void           handleRescue        ();
-  void           beginPowerslide     ();
-  void           endPowerslide       ();
   void           processSkidMarks    ();
   void           getClosestKart      (float *cdist, int *closest);
   void           handleMagnet        (float cdist, int closest);
@@ -181,9 +181,6 @@ public:
   virtual void   update           (float dt               );
   virtual void   doCollisionAnalysis(float dt, float hot    );
   virtual void   doObjectInteractions();
-#ifdef NEW_PHYSICS
-  virtual void   updatePosition   (float dt, sgMat4 result);
-#endif
   virtual void   OutsideTrack     (int isReset) {rescue=true;} 
 };
 
@@ -202,21 +199,8 @@ public:
   
 } ;
 
-#ifdef JH
-class NetworkKartDriver : public Kart {
-public:
-  NetworkKartDriver ( int _pos, ssgTransform *m ) : Kart ( _pos, m )
-  {
-  }
-
-  virtual void update () ;
-} ;
-
-
-#endif
-
 void print_model(ssgEntity* entity, int indent, int maxLevel);
-void optimise_model(ssgEntity* entity);
+void createDisplayLists(ssgEntity* entity);
 
 #endif
 

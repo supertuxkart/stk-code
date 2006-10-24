@@ -205,10 +205,24 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
 }   // listFiles
 
 // -----------------------------------------------------------------------------
-ssgEntity *Loader::load(const std::string& filename, CallbackType t) 
+/// Loads a kart model
+///
+/// Loads the kart model 'filename'. Callbacks contained in this file
+/// are stored in the callback class t. If optimise is set to false,
+/// the file will not be flattened, which is necessary for the kart
+/// models - flattening them will remove the wheel nodes, withouth
+/// which the wheels do not rotate.
+/// \param filename File to load
+/// \param t        Callback category for callbacks included in this
+///                 file (see callback_manager.hpp)
+/// \param optimise Default is true. If set to false, the model will not 
+///                 be flattened.
+ssgEntity *Loader::load(const std::string& filename, CallbackType t, 
+                        bool optimise) 
 {
-  currentCallbackType=t;
-  return ssgLoad(filename.c_str(), this);
+    currentCallbackType=t;
+    return optimise ? ssgLoad  (filename.c_str(), this)
+                    : ssgLoadAC(filename.c_str(), this);
 }   // load
 
 // -----------------------------------------------------------------------------
@@ -255,6 +269,13 @@ ssgBranch *Loader::createBranch(char *data) const
   if ( strncmp("billboard", data, strlen("billboard") ) == 0 ) 
     return  new ssgCutout();
 
+  if ( strncmp("DONT_DELETE", data, strlen("DONT_DELETE") ) == 0 ) 
+  {
+       printf("DONT\n");
+       ssgBranch *br = new ssgTransform();
+       br->setUserData(new ssgBase());
+       return br;
+  }
 
   if ( strncmp("invisible", data, strlen("invisible") ) == 0 )
     return new ssgInvisible();

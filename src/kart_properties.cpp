@@ -37,56 +37,61 @@
 // functions do NOT get called, only the virtual functions here would be
 // called. Therefore, a two step initialisation is necessary: the constructor
 // doing not much, but then in load the overwriting functions can be used.
-KartProperties::KartProperties() : icon_material(0), model(0) {
+KartProperties::KartProperties() : icon_material(0), model(0) 
+{
 }   // KartProperties
 
 // -----------------------------------------------------------------------------
-void KartProperties::load(const std::string filename, const std::string node) {
+void KartProperties::load(const std::string filename, const std::string node) 
+{
 
-  init_defaults();
-
-  const lisp::Lisp* root = 0;
-  ident = StringUtils::basename(StringUtils::without_extension(filename));
-
-  try {
-    lisp::Parser parser;
-    root = parser.parse(loader->getPath(filename));
+    init_defaults();
     
-    const lisp::Lisp* lisp = root->getLisp(node);
-    if(!lisp) {
-      std::string s="No '";
-      s+=node;
-      s+="' node found";
-      throw std::runtime_error(s);
+    const lisp::Lisp* root = 0;
+    ident = StringUtils::basename(StringUtils::without_extension(filename));
+
+    try 
+    {
+         lisp::Parser parser;
+         root = parser.parse(loader->getPath(filename));
+    
+         const lisp::Lisp* lisp = root->getLisp(node);
+         if(!lisp) {
+              std::string s="No '";
+              s+=node;
+              s+="' node found";
+              throw std::runtime_error(s);
+         }
+         getAllData(lisp);
+    } catch(std::exception& err) {
+         std::cout << "Error while parsing KartProperties '" << filename
+                   << ": " << err.what() << "\n";
     }
-    getAllData(lisp);
-  } catch(std::exception& err) {
-    std::cout << "Error while parsing KartProperties '" << filename
-              << ": " << err.what() << "\n";
-  }
-  delete root;
-
-  // Load material
-  icon_material = material_manager->getMaterial(icon_file);
-
-  // Load model
-  if(model_file.length()>0) 
-  {
-    model = loader->load(model_file, CB_KART);
-    ssgStripify(model);
-    preProcessObj(model, 0);
-    model->ref();
-  }
-
+    delete root;
+    
+    // Load material
+    icon_material = material_manager->getMaterial(icon_file);
+    
+    // Load model
+    if(model_file.length()>0) 
+    {
+         model = loader->load(model_file, CB_KART, false);
+         ssgStripify(model);
+         preProcessObj(model, 0);
+         model->ref();
+    }  // if
+    
 }   // load
 
 // -----------------------------------------------------------------------------
-KartProperties::~KartProperties() {
-  ssgDeRefDelete(model);
+KartProperties::~KartProperties() 
+{
+    ssgDeRefDelete(model);
 }   // ~KartProperties
 
 // -----------------------------------------------------------------------------
-void KartProperties::getAllData(const lisp::Lisp* lisp) {
+void KartProperties::getAllData(const lisp::Lisp* lisp) 
+{
     lisp->get("name",                    name);
     lisp->get("model-file",              model_file);
     lisp->get("icon-file",               icon_file);
@@ -115,34 +120,35 @@ void KartProperties::getAllData(const lisp::Lisp* lisp) {
     lisp->get("wheelie-speed-boost",     wheelieSpeedBoost   );
 }   // getAllData
 // -----------------------------------------------------------------------------
-void KartProperties::init_defaults() {
+void KartProperties::init_defaults() 
+{
 
-  name          = "Tux";
-  ident         = "tux";
-  model_file    = "tuxkart.ac";
-  icon_file     = "tuxicon.png";
-  shadow_file   = "tuxkartshadow.png";
+    name          = "Tux";
+    ident         = "tux";
+    model_file    = "tuxkart.ac";
+    icon_file     = "tuxicon.png";
+    shadow_file   = "tuxkartshadow.png";
 
-  color[0] = 1.0f; color[1] = 0.0f; color[2] = 0.0f;
+    color[0] = 1.0f; color[1] = 0.0f; color[2] = 0.0f;
 
-  wheel_base           = physicsParameters->wheel_base;
-  heightCOG            = physicsParameters->heightCOG;
-  engine_power         = physicsParameters->engine_power;
-  time_full_steer      = physicsParameters->time_full_steer;
-  brake_factor         = physicsParameters->brake_factor;
-  roll_resistance      = physicsParameters->roll_resistance;
-  mass                 = physicsParameters->mass;
-  air_resistance       = physicsParameters->air_resistance;
-  tire_grip            = physicsParameters->tire_grip;
-  max_steer_angle      = physicsParameters->max_steer_angle;
-  corn_f               = physicsParameters->corn_f;
-  corn_r               = physicsParameters->corn_r;
-  inertia              = physicsParameters->inertia;
-  wheelieMaxSpeedRatio = physicsParameters->wheelieMaxSpeedRatio;
-  wheelieMaxPitch      = physicsParameters->wheelieMaxPitch;
-  wheeliePitchRate     = physicsParameters->wheeliePitchRate;
-  wheelieRestoreRate   = physicsParameters->wheelieRestoreRate;
-  wheelieSpeedBoost    = physicsParameters->wheelieSpeedBoost;
+    wheel_base           = physicsParameters->wheel_base;
+    heightCOG            = physicsParameters->heightCOG;
+    engine_power         = physicsParameters->engine_power;
+    time_full_steer      = physicsParameters->time_full_steer;
+    brake_factor         = physicsParameters->brake_factor;
+    roll_resistance      = physicsParameters->roll_resistance;
+    mass                 = physicsParameters->mass;
+    air_resistance       = physicsParameters->air_resistance;
+    tire_grip            = physicsParameters->tire_grip;
+    max_steer_angle      = physicsParameters->max_steer_angle;
+    corn_f               = physicsParameters->corn_f;
+    corn_r               = physicsParameters->corn_r;
+    inertia              = physicsParameters->inertia;
+    wheelieMaxSpeedRatio = physicsParameters->wheelieMaxSpeedRatio;
+    wheelieMaxPitch      = physicsParameters->wheelieMaxPitch;
+    wheeliePitchRate     = physicsParameters->wheeliePitchRate;
+    wheelieRestoreRate   = physicsParameters->wheelieRestoreRate;
+    wheelieSpeedBoost    = physicsParameters->wheelieSpeedBoost;
 }   // init_defaults
 
 // -----------------------------------------------------------------------------
