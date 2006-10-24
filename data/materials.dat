@@ -90,6 +90,7 @@
 "rd.rgb"               Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "th.rgb"               Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "slash.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
+"minus.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "lap.rgb"              Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 
 "sshot-beach.rgb"      N N     N      0.1     Y     N   1.0     N   N    N    Y

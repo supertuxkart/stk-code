@@ -69,6 +69,7 @@ private:
     Material* RdIcon;
     Material* ThIcon;
     Material* SlashIcon;
+    Material* MinusIcon;
     Material* LapIcon;
 
     /* Display informat on screen */

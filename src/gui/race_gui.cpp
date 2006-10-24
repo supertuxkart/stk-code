@@ -69,6 +69,8 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   ThIcon->getState()->disable(GL_CULL_FACE);
   SlashIcon = material_manager->getMaterial("slash.rgb");
   SlashIcon->getState()->disable(GL_CULL_FACE);
+  MinusIcon = material_manager->getMaterial("minus.rgb");
+  MinusIcon->getState()->disable(GL_CULL_FACE);
   LapIcon = material_manager->getMaterial("lap.rgb");
   LapIcon->getState()->disable(GL_CULL_FACE);
 
@@ -754,7 +756,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
     if ( lap < 0 )
       NumberIcons[0]->getState()->force();
     else if ( lap >= world->raceSetup.numLaps ) 
-      NumberIcons[world->raceSetup.numLaps]->getState()->force();
+      MinusIcon->getState()->force();
     else
       NumberIcons[lap+1]->getState()->force();
     glBegin ( GL_QUADS ) ;
@@ -774,7 +776,10 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
     glEnd () ;
 
     offset_x += (int)(LAPWIDTH*0.6*maxRatio);
-    NumberIcons[world->raceSetup.numLaps]->getState()->force();
+    if ( lap >= world->raceSetup.numLaps ) 
+      MinusIcon->getState()->force();
+    else
+      NumberIcons[world->raceSetup.numLaps]->getState()->force();
     glBegin ( GL_QUADS ) ;
       glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
       glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
