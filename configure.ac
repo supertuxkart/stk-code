@@ -187,6 +187,20 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
 CXXFLAGS="$ORIGCXXFLAGS"
 AC_SUBST(NOREGMOVE)
 
+# Check for bullet physics. Currently, this is optional and needs
+# a '--enable-bullet' during configure to be used.
+AC_MSG_CHECKING(for bullet physics)
+AC_ARG_ENABLE(bullet,
+	AC_HELP_STRING([--enable-bullet], [enable bullet physics]),
+	[enable_bullet="$enableval"],
+	[enable_bullet="no"])
+if test "x${enable_bullet}" != "xno"; then
+	AC_DEFINE(BULLET)
+	AC_MSG_RESULT([enabled])
+else
+	AC_MSG_RESULT([disabled])
+fi
+
 AC_CONFIG_FILES([      \
  Makefile             \
  data/Makefile        \
