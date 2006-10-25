@@ -589,47 +589,50 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
 /* Energy meter that gets filled with coins */
 
 // Meter fluid color (0 - 255)
-#define METER_TOP_COLOR    230, 0, 0, 210
-#define METER_BOTTOM_COLOR 240, 110, 110, 210 
+#define METER_TOP_COLOR    240, 0, 0, 255
+#define METER_BOTTOM_COLOR    240, 200, 0, 160
 // Meter border color (0.0 - 1.0)
-#define METER_BORDER_COLOR 0.0, 0.0, 0.0
+#define METER_BORDER_BLACK 0.0, 0.0, 0.0
+#define METER_BORDER_WHITE 1.0, 1.0, 1.0
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y, 
 				float ratio_x, float ratio_y             ) {
   float state = (float)(player_kart->getNumHerring()) /
                         MAX_HERRING_EATEN;
-  int x = (int)((config->width-50) * ratio_x) + offset_x;
+  int x = (int)((config->width-40) * ratio_x) + offset_x;
   int y = (int)(config->height/4 * ratio_y) + offset_y;
   int w = (int)(24 * ratio_x);
-  int h = (int)(config->height/2 * ratio_y);
+  int h = (int)(config->height/3 * ratio_y);
   int wl = (int)(ratio_x);
   if(wl < 1)
     wl = 1;
 
   glDisable(GL_TEXTURE_2D);
   // Draw a Meter border
+  x-=1;
+  y-=1;
   // left side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( METER_BORDER_COLOR ) ;
+  glColor3f ( METER_BORDER_BLACK ) ;
     glVertex2i ( x-wl, y-wl ) ;
     glVertex2i ( x,    y-wl ) ;
-    glVertex2i ( x,    y + h) ;
-    glVertex2i ( x-wl, y + h ) ;
+    glVertex2i ( x,    y + h+1) ;
+    glVertex2i ( x-wl, y + h+1) ;
   glEnd () ;
 
   // right side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( METER_BORDER_COLOR ) ;
+  glColor3f ( METER_BORDER_BLACK ) ;
     glVertex2i ( x+w,    y-wl ) ;
     glVertex2i ( x+w+wl, y-wl ) ;
-    glVertex2i ( x+w+wl, y + h) ;
-    glVertex2i ( x+w,    y + h ) ;
+    glVertex2i ( x+w+wl, y + h+1) ;
+    glVertex2i ( x+w,    y + h+1) ;
   glEnd () ;
 
   // down side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( METER_BORDER_COLOR ) ;
+  glColor3f ( METER_BORDER_BLACK ) ;
     glVertex2i ( x,   y-wl ) ;
     glVertex2i ( x+w, y-wl ) ;
     glVertex2i ( x+w, y ) ;
@@ -638,7 +641,46 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 
   // up side
   glBegin ( GL_QUADS ) ;
-  glColor3f ( METER_BORDER_COLOR ) ;
+  glColor3f ( METER_BORDER_BLACK ) ;
+    glVertex2i ( x,   y+h ) ;
+    glVertex2i ( x+w, y+h ) ;
+    glVertex2i ( x+w, y+h+wl ) ;
+    glVertex2i ( x,   y+h+wl ) ;
+  glEnd () ;
+
+  x+=1;
+  y+=1;
+ 
+  // left side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( METER_BORDER_WHITE ) ;
+    glVertex2i ( x-wl, y-wl ) ;
+    glVertex2i ( x,    y-wl ) ;
+    glVertex2i ( x,    y + h+1) ;
+    glVertex2i ( x-wl, y + h+1) ;
+  glEnd () ;
+
+  // right side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( METER_BORDER_WHITE ) ;
+    glVertex2i ( x+w,    y-wl ) ;
+    glVertex2i ( x+w+wl, y-wl ) ;
+    glVertex2i ( x+w+wl, y + h+1) ;
+    glVertex2i ( x+w,    y + h+1) ;
+  glEnd () ;
+
+  // down side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( METER_BORDER_WHITE ) ;
+    glVertex2i ( x,   y-wl ) ;
+    glVertex2i ( x+w, y-wl ) ;
+    glVertex2i ( x+w, y ) ;
+    glVertex2i ( x,   y ) ;
+  glEnd () ;
+
+  // up side
+  glBegin ( GL_QUADS ) ;
+  glColor3f ( METER_BORDER_WHITE ) ;
     glVertex2i ( x,   y+h ) ;
     glVertex2i ( x+w, y+h ) ;
     glVertex2i ( x+w, y+h+wl ) ;
@@ -647,11 +689,11 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 
   // Draw the Meter fluid
   glBegin ( GL_QUADS ) ;
-  glColor4ub ( METER_TOP_COLOR ) ;
+  glColor4ub ( METER_BOTTOM_COLOR ) ;
     glVertex2i ( x,   y ) ;
     glVertex2i ( x+w, y ) ;
 
-  glColor4ub ( METER_BOTTOM_COLOR ) ;
+  glColor4ub ( METER_TOP_COLOR ) ;
     glVertex2i ( x+w, y + (int)(state * h));
     glVertex2i ( x,   y + (int)(state * h) ) ;
   glEnd () ;
@@ -699,9 +741,9 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
   float minRatio = std::min(ratio_x, ratio_y);
-  offset_x += (int)((config->width-138)*ratio_x);
+#define POSWIDTH 90
+  offset_x += (int)((config->width-POSWIDTH-20)*ratio_x);
   offset_y += 0;
-#define POSWIDTH 128
   int width  = (int)(POSWIDTH*minRatio);
   int height = (int)(POSWIDTH*minRatio);
   glMatrixMode(GL_MODELVIEW);
