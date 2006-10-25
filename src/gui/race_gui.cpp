@@ -707,6 +707,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 
   float minRatio = std::min(ratio_x, ratio_y);
   offset_x += (int)((config->width-220)*ratio_x);
+  offset_y += (int)(6*ratio_x);
 #define WHEELWIDTH 64
   int width  = (int)(WHEELWIDTH*minRatio);
   int height = (int)(WHEELWIDTH*minRatio);
