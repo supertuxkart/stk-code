@@ -1,4 +1,4 @@
-//  $Id: ssg_help.hpp 796 2006-09-27 07:06:34Z hiker $
+//  $Id: physics.hpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -18,25 +18,36 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SSG_HELP_H
-#define HEADER_SSG_HELP_H
+#ifndef HEADER_PHYSICS_H
+#define HEADER_PHYSICS_H
 
-#include <plib/ssg.h>
+#include "kart.hpp"
 
-//* Several useful functions which don't fit anywhere else
-void          createDisplayLists(ssgEntity *entity);
-ssgTransform* add_transform     (ssgBranch* branch);
-void          print_model       (ssgEntity *entity, const int indent, 
-                                 const int maxLevel);
-void          MinMax            (ssgEntity *p, 
-                                 float *x_min, float *x_max, 
-                                 float *y_min, float *y_max);
-void          MinMax            (ssgEntity *p, sgMat4 m, 
-                                 float *x_min, float *x_max, 
-                                 float *y_min, float *y_max);
+#ifdef BULLET
+#include <bullet/btBulletDynamicsCommon.h>
 
+class Physics 
+{
+protected:
+    btDynamicsWorld* m_dynamics_world;
+public:
+         Physics(float gravity);
+        ~Physics();
+    void addKart(Kart *k);
+};
+
+// For non-bullet version: empty object
+#else
+class Physics 
+{
+public:
+         Physics(float gravity) {};
+        ~Physics() {};
+    void addKart(Kart *k) {};
+};
 
 #endif
 
+#endif
 /* EOF */
   

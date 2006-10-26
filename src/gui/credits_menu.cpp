@@ -43,7 +43,6 @@ CreditsMenu::CreditsMenu(){
 // -----------------------------------------------------------------------------
 CreditsMenu::~CreditsMenu() {
   while(sl.size()>0) {
-    char*p=sl.back();
     sl.pop_back();
   }
 }   // ~CreditsMenu

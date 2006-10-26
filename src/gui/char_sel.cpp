@@ -98,7 +98,7 @@ void CharSel::switch_to_character(int n)
 	const KartProperties* kp= kart_properties_manager->getKartById(n);
 	if (current_kart != n && kp != NULL)
 	{
-        widgetSet -> set_label(kart_name_label, kp->getName());
+        widgetSet -> set_label(kart_name_label, kp->getName().c_str());
 
 		current_kart = n;
         ssgDeRefDelete(kart);

@@ -168,11 +168,12 @@ public:
   float          getSteerAngle    () const {return controls.lr*
                                                kartProperties->getMaxSteerAngle();}
   float          getAirResistance () const;
-  float          getSteerPercent  () const {return controls.lr;  }
-  float          getMaxSpeed      () const {return maxSpeed;     }
-  void           setTimeAtLap     (float t){timeAtLastLap=t;     }
-  float          getTimeAtLap     ()       {return timeAtLastLap;}
-  virtual int    isPlayerKart     () const {return 0;            }
+  float          getSteerPercent  () const {return controls.lr;              }
+  float          getMaxSpeed      () const {return maxSpeed;                 }
+  void           setTimeAtLap     (float t){timeAtLastLap=t;                 }
+  float          getTimeAtLap     () const {return timeAtLastLap;            }
+  const std::string& getName      () const {return kartProperties->getName();}
+  virtual int    isPlayerKart     () const {return 0;                        }
   virtual void   collectedHerring (Herring* herring);
   virtual void   reset            ();
   virtual void   handleZipper     ();

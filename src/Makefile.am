@@ -55,6 +55,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	preprocessor.cpp	   preprocessor.hpp	        \
 	callback.cpp               callback.hpp                 \
 	callback_manager.cpp       callback_manager.hpp         \
+        physics.cpp                physics.hpp                  \
 	skid_mark.cpp		   skid_mark.hpp	        \
 	shadow.cpp		   shadow.hpp	        	\
 	start_screen.cpp	   start_screen.hpp	        \

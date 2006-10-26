@@ -79,7 +79,7 @@ public:
      
      Material*     getIconMaterial        () const { return icon_material;      }
      ssgEntity*    getModel               () const {return model;               }
-     const char*   getName                () const {return name.c_str();        }
+     const std::string& getName           () const {return name;                }
      const char*   getIdent               () const {return ident.c_str();       }
      const char*   getShadowFile          () const {return shadow_file.c_str(); }
      const char*   getIconFile            () const {return icon_file.c_str();   }

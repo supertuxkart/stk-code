@@ -72,7 +72,6 @@ class StaticSSG {
   ssgEntity*      start;
 
   void Setup        (int n);
-  void MinMax       (ssgEntity* p, sgMat4 m);
   void Distribute   (ssgEntity* start, sgMat4 m);
   void StoreTriangle(ssgLeaf* l, int indx, sgVec3 vv1, sgVec3 vv2, sgVec3 vv3);
   int  GetHash  (float x, float y) { int m1; int n1;

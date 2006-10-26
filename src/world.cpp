@@ -74,6 +74,9 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
   trackBranch = new ssgBranch ;
   scene -> addKid ( trackBranch ) ;
   
+  // Create the physics
+  physics = new Physics(getGravity());
+  
   assert(raceSetup.karts.size() > 0);
 
   // Clear all callbacks, which might still be stored there from a previous race.
@@ -126,7 +129,7 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) {
     newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
     scene -> addKid ( newkart -> getModel() ) ;
-
+    physics->addKart(newkart);
     kart.push_back(newkart);
     pos++;
   }  // for i

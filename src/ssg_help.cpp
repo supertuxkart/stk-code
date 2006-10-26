@@ -19,24 +19,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#include <iostream>
 #include <plib/ssg.h>
+#include "ssg_help.hpp"
 
-#include "herring_manager.hpp"
-#include "sound_manager.hpp"
-#include "loader.hpp"
-#include "skid_mark.hpp"
-#include "config.hpp"
-#include "constants.hpp"
-#include "shadow.hpp"
-#include "track.hpp"
-#include "world.hpp"
-#include "kart.hpp"
 
 // -----------------------------------------------------------------------------
-/// Make VtTables use display lists.
-///
-/// Calls recursively 'makeDList' in all ssgVtxTable of the entity.
-/// \param entity Tree in which to create display lists.
+//* Make VtTables use display lists.
+//*
+//* Calls recursively 'makeDList' in all ssgVtxTable of the entity.
+//* \param entity Tree in which to create display lists.
 void createDisplayLists(ssgEntity* entity) 
 {
     if (!entity) return;
@@ -60,12 +52,12 @@ void createDisplayLists(ssgEntity* entity)
 }  // createDisplayLists
 
 // -----------------------------------------------------------------------------
-/// Adds a transform node to the branch. 
-///
-/// Creates a new ssgTransform node to which all children of the branch are
-/// added. The new ssgTransform is then set as the only child of the
-/// branch.
-/// \param branch The branch to which a transform node is added.
+//* Adds a transform node to the branch. 
+//*
+//* Creates a new ssgTransform node to which all children of the branch are
+//* added. The new ssgTransform is then set as the only child of the
+//* branch.
+//* \param branch The branch to which a transform node is added.
 ssgTransform* add_transform(ssgBranch* branch) 
 {
     if (!branch) return 0;
@@ -88,14 +80,15 @@ ssgTransform* add_transform(ssgBranch* branch)
 }   // add_transform
 
 // -----------------------------------------------------------------------------
-/// Recursively prints a model.
-///
-/// Recursively prints a model. That function can most likely be removed, the
-/// print method of the ssg objects do the same.
-/// \param entity The entity ro print
-/// \param indent Indentation to use
-/// \param maxLevel maximum number of levels to print
-void print_model(ssgEntity* entity, int indent, int maxLevel) 
+//* Recursively prints a model.
+//*
+//* Recursively prints a model. That function can most likely be removed, the
+//* print method of the ssg objects do the same.
+//* \param entity The entity ro print (can't be constant because of ssg functions
+//*               which are not const correct)
+//* \param indent Indentation to use
+//* \param maxLevel maximum number of levels to print
+void print_model(ssgEntity* entity, const int indent, const int maxLevel) 
 {
     if(maxLevel <0) return;
     if (entity) 
@@ -121,5 +114,78 @@ void print_model(ssgEntity* entity, int indent, int maxLevel)
         }   // if branch
     }   // if entity
 }   // print_model
+
+// -----------------------------------------------------------------------------
+//* Computes the minimum and maximum x/y coordinates for a ssgEntity.
+//*
+//* Recursively computes the minimum x and y coordinates of a ssgEntity.
+//* \param p ssgEntity for which t compute the extend (can't be constant because
+//* of plib not const correct)
+//* \param x_min minimum x value
+//* \param x_max maximum x value
+//* \param y_min minimum y value
+//* \param y_max maximum y value
+void MinMax(ssgEntity* p, float* x_min, float* x_max, 
+                          float* y_min, float* y_max)
+{
+    sgMat4 mat;
+    sgMakeIdentMat4(mat);
+    MinMax(p, mat, x_min, x_max, y_min, y_max);
+
+}   // MinMax
+
+// -----------------------------------------------------------------------------
+//* Internal function used by MinMax
+void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max, 
+                                    float* y_min, float* y_max)
+{
+    if(p->isAKindOf(ssgTypeLeaf())) 
+    {
+        ssgLeaf* l=(ssgLeaf*)p;
+        for(int i=0; i<l->getNumTriangles(); i++) 
+        {
+            short v1,v2,v3;
+            sgVec3 vv1, vv2, vv3;
+            
+            l->getTriangle(i, &v1, &v2, &v3);
+            
+            sgXformPnt3 ( vv1, l->getVertex(v1), m );
+            sgXformPnt3 ( vv2, l->getVertex(v2), m );
+            sgXformPnt3 ( vv3, l->getVertex(v3), m );
+            *x_min = std::min(*x_min, vv1[0]); *x_max = std::max(*x_max, vv1[0]);
+            *x_min = std::min(*x_min, vv2[0]); *x_max = std::max(*x_max, vv2[0]);
+            *x_min = std::min(*x_min, vv3[0]); *x_max = std::max(*x_max, vv3[0]);
+            *y_min = std::min(*y_min, vv1[1]); *y_max = std::max(*y_max, vv1[1]);
+            *y_min = std::min(*y_min, vv2[1]); *y_max = std::max(*y_max, vv2[1]);
+            *y_min = std::min(*y_min, vv3[1]); *y_max = std::max(*y_max, vv3[1]);
+        }   // for i<p->getNumTriangles
+    } else if (p->isAKindOf(ssgTypeTransform())) 
+    {
+        ssgBaseTransform* t=(ssgBaseTransform*)p;
+
+        sgMat4 tmpT, tmpM;
+        t->getTransform(tmpT);
+    sgCopyMat4(tmpM, m);
+    sgPreMultMat4(tmpM,tmpT);
+    
+    for(ssgEntity* e=t->getKid(0); e!=NULL; e=t->getNextKid()) 
+    {
+        MinMax(e, tmpM, x_min, x_max, y_min, y_max);
+    }   // for i<getNumKids
+    
+    } else if (p->isAKindOf(ssgTypeBranch())) 
+    {
+        ssgBranch* b =(ssgBranch*)p;
+        for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
+            MinMax(e, m, x_min, x_max, y_min, y_max);
+        }   // for i<getNumKids
+    } else 
+    {
+        printf("StaticSSG::MinMax: unkown type\n");
+        p->print(stdout, 0, 0);
+    }
+}   // MinMax
+
+// -----------------------------------------------------------------------------
 
 /* EOF */
