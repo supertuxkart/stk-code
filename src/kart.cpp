@@ -363,6 +363,7 @@ void Kart::updatePhysics (float dt)
     if(wheelie_angle>0.0f) 
     {
         velocity.xyz[1]-=getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+        if(velocity.xyz[1]<0) velocity.xyz[1]=0.0;
     }
 
 
@@ -544,6 +545,7 @@ void Kart::updatePhysics (float dt)
     {
         velocity.xyz[1]+=
             getWheelieSpeedBoost()*wheelie_angle/getWheelieMaxPitch();
+        if(velocity.xyz[1]<0) velocity.xyz[1]=0.0;
     }
 }   // updatePhysics
 
