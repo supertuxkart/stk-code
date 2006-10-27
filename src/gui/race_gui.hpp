@@ -71,6 +71,9 @@ private:
     Material* SlashIcon;
     Material* MinusIcon;
     Material* LapIcon;
+    Material* RevIcon;
+    Material* SpeedBackIcon;
+    Material* SpeedForeIcon;
 
     /* Display informat on screen */
     void drawStatusText        (const RaceSetup& raceSetup, const float dt);
@@ -108,6 +111,8 @@ private:
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
     void drawPosition             (Kart* kart, int offset_x, int offset_y,
+				   float ratio_x, float ratio_y           );
+    void drawSpeed                (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
     void drawLap                  (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );

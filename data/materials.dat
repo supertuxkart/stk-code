@@ -92,6 +92,9 @@
 "slash.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "minus.rgb"            Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 "lap.rgb"              Y Y     Y      0.0     N     N   1.0     Y   N    N    N
+"rev.rgb"              Y Y     Y      0.0     N     N   1.0     Y   N    N    N
+"speedback.rgb"        Y Y     Y      0.0     N     N   1.0     Y   N    N    N
+"speedfore.rgb"        Y Y     Y      0.0     N     N   1.0     Y   N    N    N
 
 "sshot-beach.rgb"      N N     N      0.1     Y     N   1.0     N   N    N    Y
 "sshot-bsodcastle.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y

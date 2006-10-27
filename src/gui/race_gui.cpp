@@ -73,6 +73,12 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   MinusIcon->getState()->disable(GL_CULL_FACE);
   LapIcon = material_manager->getMaterial("lap.rgb");
   LapIcon->getState()->disable(GL_CULL_FACE);
+  RevIcon = material_manager->getMaterial("rev.rgb");
+  RevIcon->getState()->disable(GL_CULL_FACE);
+  SpeedBackIcon = material_manager->getMaterial("speedback.rgb");
+  SpeedBackIcon->getState()->disable(GL_CULL_FACE);
+  SpeedForeIcon = material_manager->getMaterial("speedfore.rgb");
+  SpeedForeIcon->getState()->disable(GL_CULL_FACE);
 
   fpsCounter = 0;
   fpsString[0]=0;
@@ -277,10 +283,10 @@ void RaceGUI::drawTimer () {
 void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 			 int offset_x, int offset_y, float ratio_x, 
 			 float ratio_y                                 ) {
-  char str [ 256 ] ;
+//  char str [ 256 ] ;
 
   /* Show velocity */
-  if ( player_kart->getVelocity()->xyz[1] < 0 )
+/*  if ( player_kart->getVelocity()->xyz[1] < 0 )
     sprintf ( str, "Reverse" ) ;
   else {
     if(config->useKPH) {
@@ -300,7 +306,7 @@ void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
 		       (int)(offset_x+xOffForText         *ratio_x),
 		       (int)(offset_y+(config->height-200)*ratio_y),
 		       red, green, blue);
-
+*/
   /* Show lap number */
 /*  int lap = player_kart->getLap();
   if ( lap < 0 ) {
@@ -600,10 +606,10 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 				float ratio_x, float ratio_y             ) {
   float state = (float)(player_kart->getNumHerring()) /
                         MAX_HERRING_EATEN;
-  int x = (int)((config->width-40) * ratio_x) + offset_x;
-  int y = (int)(config->height/4 * ratio_y) + offset_y;
-  int w = (int)(24 * ratio_x);
-  int h = (int)(config->height/3 * ratio_y);
+  int x = (int)((config->width-24) * ratio_x) + offset_x;
+  int y = (int)(250 * ratio_y) + offset_y;
+  int w = (int)(16 * ratio_x);
+  int h = (int)(config->height/4 * ratio_y);
   int wl = (int)(ratio_x);
   if(wl < 1)
     wl = 1;
@@ -706,11 +712,12 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
   float minRatio = std::min(ratio_x, ratio_y);
-  offset_x += (int)((config->width-220)*ratio_x);
-  offset_y += (int)(6*ratio_x);
 #define WHEELWIDTH 64
   int width  = (int)(WHEELWIDTH*minRatio);
   int height = (int)(WHEELWIDTH*minRatio);
+  offset_x += (int)((config->width-150)*ratio_x) - width;
+  offset_y += (int)(6*ratio_y);
+
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
     glLoadIdentity();
@@ -743,10 +750,11 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
 
   float minRatio = std::min(ratio_x, ratio_y);
 #define POSWIDTH 90
-  offset_x += (int)((config->width-POSWIDTH-20)*ratio_x);
-  offset_y += 0;
   int width  = (int)(POSWIDTH*minRatio);
   int height = (int)(POSWIDTH*minRatio);
+  offset_x += (int)((config->width-10)*ratio_x) - width;
+  offset_y += (int)(130*ratio_y);
+
   glMatrixMode(GL_MODELVIEW);
     NumberIcons[kart->getPosition()]->getState()->force();
     glBegin ( GL_QUADS ) ;
@@ -772,6 +780,68 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
     glEnd () ;
 
  } // drawPosition
+
+// -----------------------------------------------------------------------------
+void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
+			   float ratio_x, float ratio_y           ) {
+
+  float minRatio = std::min(ratio_x, ratio_y);
+#define SPEEDWIDTH 128
+  int width  = (int)(SPEEDWIDTH*minRatio);
+  int height = (int)(SPEEDWIDTH*minRatio);
+  offset_x += (int)((config->width-10)*ratio_x) - width;
+  offset_y += (int)(10*ratio_y);
+
+  glMatrixMode(GL_MODELVIEW);
+    SpeedBackIcon->getState()->force();
+    glBegin ( GL_QUADS ) ;
+      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
+      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
+      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
+      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
+    glEnd () ;
+
+    /* Show velocity */
+    if ( kart->getVelocity()->xyz[1] < 0 )
+    {
+#define REVWIDTH 76
+      int w = (int)(REVWIDTH*minRatio);
+      int h = (int)(REVWIDTH*minRatio);
+      int x = (int)((config->width-10)*ratio_x) - w;
+      int y = offset_y;
+      RevIcon->getState()->force();
+      glBegin ( GL_QUADS ) ;
+        glTexCoord2f(0, 0);glVertex2i(x  , y  );
+        glTexCoord2f(1, 0);glVertex2i(x+w, y  );
+        glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
+        glTexCoord2f(0, 1);glVertex2i(x  , y+h);
+      glEnd () ;
+    }
+    else
+    {
+      float speedRatio = (kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR)/110;
+
+      if ( speedRatio > 1 )
+        speedRatio = 1;
+
+      SpeedForeIcon->getState()->force();
+      glBegin ( GL_POLYGON ) ;
+        glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y);
+        glTexCoord2f(0, 0);glVertex2i(offset_x, offset_y);
+        if (speedRatio < 0.5)
+        {
+          glTexCoord2f(0, speedRatio*2);glVertex2i(offset_x, (int)(offset_y+width*speedRatio*2));
+        }
+        else
+        {
+          glTexCoord2f(0, 1);glVertex2i(offset_x, offset_y+width);
+          glTexCoord2f((speedRatio-0.5)*2, 1);glVertex2i((int)(offset_x+height*(speedRatio-0.5)*2), offset_y+height);
+        }
+
+      glEnd () ;
+    }   // velocity<0
+
+ } // drawSpeed
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
@@ -916,6 +986,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
       drawSteering        (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawPosition        (player_kart, offset_x, offset_y,
+			   split_screen_ratio_x, split_screen_ratio_y );
+      drawSpeed           (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawLap             (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
