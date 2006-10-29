@@ -25,70 +25,84 @@
 namespace lisp
 {
 
-class EOFException
-{
-};
+    class EOFException
+        {}
+    ;
 
-Lexer::Lexer(std::istream& newstream)
-    : stream(newstream), isEof(false)
-{
-    try {
-        // trigger a refill of the buffer
-        c = 0;
-        bufend = c + 1;        
-        nextChar();
-    } catch(EOFException& e) {
+    Lexer::Lexer(std::istream& newstream)
+            : m_stream(newstream), m_is_eof(false)
+    {
+        try
+        {
+            // trigger a refill of the m_buffer
+            m_c = 0;
+            m_buffer_end = m_c + 1;
+            nextChar();
+        }
+        catch(EOFException& e)
+        {}
     }
-}
 
-Lexer::~Lexer()
-{
-}
+//-----------------------------------------------------------------------------
 
-void
-Lexer::nextChar()
-{
-    ++c;
-    if(c >= bufend) {
-        if(isEof)
-            throw EOFException();
-        stream.read(buffer, LEXER_BUFFER_SIZE);
-        std::streamsize n = stream.gcount();
+    Lexer::~Lexer()
+    {}
 
-        c = buffer;
-        bufend = buffer + n;
+//-----------------------------------------------------------------------------
 
-        // the following is a hack that appends an additional ' ' at the end of
-        // the file to avoid problems when parsing symbols/elements and a sudden
-        // EOF. This is faster than relying on unget and IMO also nicer.
-        if(n < LEXER_BUFFER_SIZE || n == 0) {
-            *bufend = ' ';
-            ++bufend;
-            isEof = true;
+    void
+    Lexer::nextChar()
+    {
+        ++m_c;
+        if(m_c >= m_buffer_end)
+        {
+            if(m_is_eof)
+                throw EOFException();
+            m_stream.read(m_buffer, LEXER_BUFFER_SIZE);
+            std::streamsize n = m_stream.gcount();
+
+            m_c = m_buffer;
+            m_buffer_end = m_buffer + n;
+
+            // the following is a hack that appends an additional ' ' at the end of
+            // the file to avoid problems when parsing symbols/elements and a sudden
+            // EOF. This is faster than relying on unget and IMO also nicer.
+            if(n < LEXER_BUFFER_SIZE || n == 0)
+            {
+                *m_buffer_end = ' ';
+                ++m_buffer_end;
+                m_is_eof = true;
+            }
         }
     }
-}
 
-Lexer::TokenType
-Lexer::getNextToken()
-{
-    static const char* delims = "\"();";
+//-----------------------------------------------------------------------------
 
-    try {
-        while(isspace(*c)) {
-            nextChar();
-            if(*c == '\n')
-                ++linenumber;
-        };
+    Lexer::TokenType
+    Lexer::getNextToken()
+    {
+        static const char* delims = "\"();";
 
-        token_length = 0;
-        
-        switch(*c) {
+        try
+        {
+            while(isspace(*m_c))
+            {
+                nextChar();
+                if(*m_c == '\n')
+                    ++m_line_number;
+            };
+
+            m_token_length = 0;
+
+            switch(*m_c)
+            {
             case ';': // comment
-                while(true) {
+                while(true)
+                {
                     nextChar();
-                    if(*c == '\n') {
-                        ++linenumber;
+                    if(*m_c == '\n')
+                    {
+                        ++m_line_number;
                         break;
                     }
                 }
@@ -99,58 +113,69 @@ Lexer::getNextToken()
             case ')':
                 nextChar();
                 return TOKEN_CLOSE_PAREN;
-            case '"': {  // string
-                int startline = linenumber;
-                try {
-                    while(1) {
-                        nextChar();
-                        if(*c == '"')
-                            break;
-                    
-                        if(*c == '\\') {
+            case '"': // string
+                {
+                    const int STARTLINE = m_line_number;
+                    try
+                    {
+                        while(1)
+                        {
                             nextChar();
-                            switch(*c) {
+                            if(*m_c == '"')
+                                break;
+
+                            if(*m_c == '\\')
+                            {
+                                nextChar();
+                                switch(*m_c)
+                                {
                                 case 'n':
-                                    *c = '\n';
+                                    *m_c = '\n';
                                     break;
                                 case 't':
-                                    *c = '\t';
+                                    *m_c = '\t';
                                     break;
+                                }
                             }
+                            if(m_token_length < MAX_TOKEN_LENGTH)
+                                m_token_string[m_token_length++] = *m_c;
                         }
-                        if(token_length < MAX_TOKEN_LENGTH)
-                            token_string[token_length++] = *c;
+                        m_token_string[m_token_length] = 0;
                     }
-                    token_string[token_length] = 0;
-                } catch(EOFException& ) {
-                    std::stringstream msg;
-                    msg << "Parse error in line " << startline << ": "
+                    catch(EOFException& )
+                    {
+                        std::stringstream msg;
+                        msg << "Parse error in line " << STARTLINE << ": "
                         << "EOF while parsing string.";
-                    throw std::runtime_error(msg.str());
+                        throw std::runtime_error(msg.str());
+                    }
+                    nextChar();
+                    return TOKEN_STRING;
                 }
-                nextChar();
-                return TOKEN_STRING;
-            }
             case '#': // constant
-                try {
+                try
+                {
                     nextChar();
 
-                    while(isalnum(*c) || *c == '_') {
-                        if(token_length < MAX_TOKEN_LENGTH)
-                            token_string[token_length++] = *c;
+                    while(isalnum(*m_c) || *m_c == '_')
+                    {
+                        if(m_token_length < MAX_TOKEN_LENGTH)
+                            m_token_string[m_token_length++] = *m_c;
                         nextChar();
                     }
-                    token_string[token_length] = 0;
-                } catch(EOFException& ) {
+                    m_token_string[m_token_length] = 0;
+                }
+                catch(EOFException& )
+                {
                     std::stringstream msg;
-                    msg << "Parse Error in line " << linenumber << ": "
-                        << "EOF while parsing constant.";
+                    msg << "Parse Error in line " << m_line_number << ": "
+                    << "EOF while parsing constant.";
                     throw std::runtime_error(msg.str());
                 }
 
-                if(strcmp(token_string, "t") == 0)
+                if(strcmp(m_token_string, "t") == 0)
                     return TOKEN_TRUE;
-                if(strcmp(token_string, "f") == 0)
+                if(strcmp(m_token_string, "f") == 0)
                     return TOKEN_FALSE;
 
                 // this would be the place to add more sophisticated handling of
@@ -158,32 +183,35 @@ Lexer::getNextToken()
 
                 {
                     std::stringstream msg;
-                    msg << "Parse Error in line " << linenumber << ": "
-                        << "Unknown constant '" << token_string << "'.";
+                    msg << "Parse Error in line " << m_line_number << ": "
+                    << "Unknown constant '" << m_token_string << "'.";
                     throw std::runtime_error(msg.str());
                 }
 
             default:
-                if(isdigit(*c) || *c == '-') {
+                if(isdigit(*m_c) || *m_c == '-')
+                {
                     bool have_nondigits = false;
                     bool have_digits = false;
                     int have_floating_point = 0;
 
-                    do {
-                        if(isdigit(*c))
+                    do
+                    {
+                        if(isdigit(*m_c))
                             have_digits = true;
-                        else if(*c == '.')
+                        else if(*m_c == '.')
                             ++have_floating_point;
-                        else if(isalnum(*c) || *c == '_')
-                            have_nondigits = true;  
+                        else if(isalnum(*m_c) || *m_c == '_')
+                            have_nondigits = true;
 
-                        if(token_length < MAX_TOKEN_LENGTH)
-                            token_string[token_length++] = *c;
+                        if(m_token_length < MAX_TOKEN_LENGTH)
+                            m_token_string[m_token_length++] = *m_c;
 
                         nextChar();
-                    } while(!isspace(*c) && !strchr(delims, *c));
+                    }
+                    while(!isspace(*m_c) && !strchr(delims, *m_c));
 
-                    token_string[token_length] = 0;
+                    m_token_string[m_token_length] = 0;
 
                     // no nextChar
 
@@ -193,23 +221,29 @@ Lexer::getNextToken()
                         return TOKEN_REAL;
                     else
                         return TOKEN_INTEGER;
-                } else {
-                    do {
-                        if(token_length < MAX_TOKEN_LENGTH)
-                            token_string[token_length++] = *c;
+                }
+                else
+                {
+                    do
+                    {
+                        if(m_token_length < MAX_TOKEN_LENGTH)
+                            m_token_string[m_token_length++] = *m_c;
                         nextChar();
-                    } while(!isspace(*c) && !strchr(delims, *c));
-                    token_string[token_length] = 0;
-                    
+                    }
+                    while(!isspace(*m_c) && !strchr(delims, *m_c));
+                    m_token_string[m_token_length] = 0;
+
                     // no nextChar
 
                     return TOKEN_SYMBOL;
-                }       
+                }
+            }
         }
-    } catch(EOFException& ) {
-        return TOKEN_EOF;
+        catch(EOFException& )
+        {
+            return TOKEN_EOF;
+        }
     }
-}
 
 } // end of namespace lisp
 

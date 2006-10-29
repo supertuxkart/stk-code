@@ -27,132 +27,162 @@
 namespace lisp
 {
 
-Writer::Writer(const std::string& filename)
-    : indent_depth(0)
-{
-    owner = true;
-    out = new std::ofstream(filename.c_str());
-    if(!out->good()) {
-        std::stringstream msg;
-        msg << "LispWriter Error: Couldn't open file '" << filename << "'.";
-        throw std::runtime_error(msg.str());
-    }
-}
-
-Writer::Writer(std::ostream& newout)
-  : indent_depth(0)
-{
-    owner = false;
-    out = &newout;
-}
-
-Writer::~Writer()
-{
-    if(lists.size() > 0) {
-        std::cerr << "Warning: Not all sections closed in lispwriter!\n";
+    Writer::Writer(const std::string& filename)
+            : m_indent_depth(0)
+    {
+        m_owner = true;
+        m_out = new std::ofstream(filename.c_str());
+        if(!m_out->good())
+        {
+            std::stringstream msg;
+            msg << "LispWriter Error: Couldn't open file '" << filename << "'.";
+            throw std::runtime_error(msg.str());
+        }
     }
 
-    if(owner)
-        delete out;
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::writeComment(const std::string& comment)
-{
-    indent();
-    *out << "; " << comment << "\n";
-}
+    Writer::Writer(std::ostream& newout)
+            : m_indent_depth(0)
+    {
+        m_owner = false;
+        m_out = &newout;
+    }
 
-void
-Writer::beginList(const std::string& listname)
-{
-    indent();
-    *out << '(' << listname << '\n';
-    indent_depth += 2;
-    
-    lists.push_back(listname);
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::endList(const std::string& listname)
-{
-    if(lists.size() == 0) {
-        std::cerr << "Trying to close list '" << listname 
+    Writer::~Writer()
+    {
+        if(m_lists.size() > 0)
+        {
+            std::cerr << "Warning: Not all sections closed in lispwriter!\n";
+        }
+
+        if(m_owner)
+            delete m_out;
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::writeComment(const std::string& comment)
+    {
+        indent();
+        *m_out << "; " << comment << "\n";
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::beginList(const std::string& listname)
+    {
+        indent();
+        *m_out << '(' << listname << '\n';
+        m_indent_depth += 2;
+
+        m_lists.push_back(listname);
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::endList(const std::string& listname)
+    {
+        if(m_lists.size() == 0)
+        {
+            std::cerr << "Trying to close list '" << listname
             << "', which is not open.\n";
-        return;
+            return;
+        }
+        if(m_lists.back() != listname)
+        {
+            std::cerr << "Warning: trying to close list '" << listname
+            << "' while list '" << m_lists.back() << "' is open.\n";
+            return;
+        }
+        m_lists.pop_back();
+
+        m_indent_depth -= 2;
+        indent();
+        *m_out << ")\n";
     }
-    if(lists.back() != listname) {
-        std::cerr << "Warning: trying to close list '" << listname 
-            << "' while list '" << lists.back() << "' is open.\n";
-        return;
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::write(const std::string& name, int value)
+    {
+        indent();
+        *m_out << '(' << name << ' ' << value << ")\n";
     }
-    lists.pop_back();
-    
-    indent_depth -= 2;
-    indent();
-    *out << ")\n";
-}
 
-void
-Writer::write(const std::string& name, int value)
-{
-    indent();
-    *out << '(' << name << ' ' << value << ")\n";
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::write(const std::string& name, float value)
-{
-    indent();
-    *out << '(' << name << ' ' << value << ")\n";
-}
+    void
+    Writer::write(const std::string& name, float value)
+    {
+        indent();
+        *m_out << '(' << name << ' ' << value << ")\n";
+    }
 
-void
-Writer::write(const std::string& name, const std::string& value)
-{
-    indent();
-    *out << '(' << name << " \"" << value << "\")\n";
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::write(const std::string& name, const char* value)
-{
-    indent();
-    *out << '(' << name << " \"" << value << "\")\n";
-}
+    void
+    Writer::write(const std::string& name, const std::string& value)
+    {
+        indent();
+        *m_out << '(' << name << " \"" << value << "\")\n";
+    }
 
-void
-Writer::write(const std::string& name, bool value)
-{
-    indent();
-    *out << '(' << name << ' ' << (value ? "#t" : "#f") << ")\n";
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::write(const std::string& name, const std::vector<int>& value)
-{
-    indent();
-    *out << '(' << name;
-    for(std::vector<int>::const_iterator i = value.begin(); i != value.end(); ++i)
-        *out << " " << *i;
-    *out << ")\n";
-}
+    void
+    Writer::write(const std::string& name, const char* value)
+    {
+        indent();
+        *m_out << '(' << name << " \"" << value << "\")\n";
+    }
 
-void
-Writer::write(const std::string& name, const std::vector<unsigned int>& value)
-{
-    indent();
-    *out << '(' << name;
-    for(std::vector<unsigned int>::const_iterator i = value.begin(); i != value.end(); ++i)
-        *out << " " << *i;
-    *out << ")\n";
-}
+//-----------------------------------------------------------------------------
 
-void
-Writer::indent()
-{
-    for(int i = 0; i<indent_depth; ++i)
-        *out << ' ';
-}
+    void
+    Writer::write(const std::string& name, bool value)
+    {
+        indent();
+        *m_out << '(' << name << ' ' << (value ? "#t" : "#f") << ")\n";
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::write(const std::string& name, const std::vector<int>& value)
+    {
+        indent();
+        *m_out << '(' << name;
+        for(std::vector<int>::const_iterator i = value.begin(); i != value.end(); ++i)
+            *m_out << " " << *i;
+        *m_out << ")\n";
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::write(const std::string& name, const std::vector<unsigned int>& value)
+    {
+        indent();
+        *m_out << '(' << name;
+        for(std::vector<unsigned int>::const_iterator i = value.begin(); i != value.end(); ++i)
+            *m_out << " " << *i;
+        *m_out << ")\n";
+    }
+
+//-----------------------------------------------------------------------------
+
+    void
+    Writer::indent()
+    {
+        for(int i = 0; i<m_indent_depth; ++i)
+            *m_out << ' ';
+    }
 
 } // end of namespace lisp

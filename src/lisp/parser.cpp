@@ -27,130 +27,147 @@
 namespace lisp
 {
 
-Parser::Parser()
-    : lexer(0)
-{
-}
+    Parser::Parser()
+            : m_lexer(0)
+    {}
 
-Parser::~Parser()
-{
-    delete lexer;
-}
+//-----------------------------------------------------------------------------
 
-Lisp*
-Parser::parse(const std::string& filename)
-{
-    std::ifstream in(filename.c_str());
-    if(!in.good()) {
-        std::stringstream msg;
-        msg << "Parser problem: Couldn't open file '" << filename << "'.";
-        throw std::runtime_error(msg.str());
+    Parser::~Parser()
+    {
+        delete m_lexer;
     }
-    return parse(in);
-}
 
-Lisp*
-Parser::parse(std::istream& stream)
-{
-    delete lexer;
-    lexer = new Lexer(stream);
+//-----------------------------------------------------------------------------
 
-    token = lexer->getNextToken();
-    Lisp* result = new Lisp(Lisp::TYPE_CONS);
-    result->v.cons.car = 0;
-    result->v.cons.cdr = readList();
-
-    delete lexer;
-    lexer = 0;
-
-    return result;    
-}
-
-Lisp*
-Parser::read()
-{
-    Lisp* result;
-    switch(token) {
-        case Lexer::TOKEN_EOF: {
+    Lisp*
+    Parser::parse(const std::string& filename)
+    {
+        std::ifstream in(filename.c_str());
+        if(!in.good())
+        {
             std::stringstream msg;
-            msg << "Parse Error at line " << lexer->getLineNumber() << ": "
+            msg << "Parser problem: Couldn't open file '" << filename << "'.";
+            throw std::runtime_error(msg.str());
+        }
+        return parse(in);
+    }
+
+//-----------------------------------------------------------------------------
+
+    Lisp*
+    Parser::parse(std::istream& m_stream)
+    {
+        delete m_lexer;
+        m_lexer = new Lexer(m_stream);
+
+        m_token = m_lexer->getNextToken();
+        Lisp* result = new Lisp(Lisp::TYPE_CONS);
+        result->m_v.m_cons.m_car = 0;
+        result->m_v.m_cons.m_cdr = readList();
+
+        delete m_lexer;
+        m_lexer = 0;
+
+        return result;
+    }
+
+//-----------------------------------------------------------------------------
+
+    Lisp*
+    Parser::read()
+    {
+        Lisp* result;
+        switch(m_token)
+        {
+        case Lexer::TOKEN_EOF:
+            {
+                std::stringstream msg;
+                msg << "Parse Error at line " << m_lexer->getLineNumber() << ": "
                 << "Unexpected EOF.";
-            throw std::runtime_error(msg.str());
-        }
-        case Lexer::TOKEN_CLOSE_PAREN: {
-            std::stringstream msg;
-            msg << "Parse Error at line " << lexer->getLineNumber() << ": "
+                throw std::runtime_error(msg.str());
+            }
+        case Lexer::TOKEN_CLOSE_PAREN:
+            {
+                std::stringstream msg;
+                msg << "Parse Error at line " << m_lexer->getLineNumber() << ": "
                 << "Unexpected ')'.";
-            throw std::runtime_error(msg.str());
-        }
+                throw std::runtime_error(msg.str());
+            }
         case Lexer::TOKEN_OPEN_PAREN:
             result = new Lisp(Lisp::TYPE_CONS);
 
-            token = lexer->getNextToken();
-            
-            result->v.cons.car = read();
-            result->v.cons.cdr = readList();
-            
-            if(token != Lexer::TOKEN_CLOSE_PAREN) {
+            m_token = m_lexer->getNextToken();
+
+            result->m_v.m_cons.m_car = read();
+            result->m_v.m_cons.m_cdr = readList();
+
+            if(m_token != Lexer::TOKEN_CLOSE_PAREN)
+            {
                 std::stringstream msg;
-                msg << "Parse Error at line " << lexer->getLineNumber() << ": "
-                    << "Expected ')'.";
+                msg << "Parse Error at line " << m_lexer->getLineNumber() << ": "
+                << "Expected ')'.";
                 throw std::runtime_error(msg.str());
             }
             break;
-        case Lexer::TOKEN_SYMBOL: {
-            result = new Lisp(Lisp::TYPE_SYMBOL);
-            size_t len = strlen(lexer->getString()) + 1;
-            result->v.string = new char[len];
-            memcpy(result->v.string, lexer->getString(), len);
-            break;
-        }
-        case Lexer::TOKEN_STRING: {
-            result = new Lisp(Lisp::TYPE_STRING);
-            size_t len = strlen(lexer->getString()) + 1;
-            result->v.string = new char[len];
-            memcpy(result->v.string, lexer->getString(), len);
-            break;
-        }
+        case Lexer::TOKEN_SYMBOL:
+            {
+                result = new Lisp(Lisp::TYPE_SYMBOL);
+                const size_t LEN = strlen(m_lexer->getString()) + 1;
+                result->m_v.m_string = new char[LEN];
+                memcpy(result->m_v.m_string, m_lexer->getString(), LEN);
+                break;
+            }
+        case Lexer::TOKEN_STRING:
+            {
+                result = new Lisp(Lisp::TYPE_STRING);
+                const size_t LEN = strlen(m_lexer->getString()) + 1;
+                result->m_v.m_string = new char[LEN];
+                memcpy(result->m_v.m_string, m_lexer->getString(), LEN);
+                break;
+            }
         case Lexer::TOKEN_INTEGER:
             result = new Lisp(Lisp::TYPE_INTEGER);
-            sscanf(lexer->getString(), "%d", &result->v.integer);
+            sscanf(m_lexer->getString(), "%d", &result->m_v.m_integer);
             break;
         case Lexer::TOKEN_REAL:
             result = new Lisp(Lisp::TYPE_REAL);
-            sscanf(lexer->getString(), "%f", &result->v.real);
+            sscanf(m_lexer->getString(), "%f", &result->m_v.m_real);
             break;
         case Lexer::TOKEN_TRUE:
             result = new Lisp(Lisp::TYPE_BOOLEAN);
-            result->v.boolean = true;
+            result->m_v.m_boolean = true;
             break;
         case Lexer::TOKEN_FALSE:
             result = new Lisp(Lisp::TYPE_BOOLEAN);
-            result->v.boolean = false;
+            result->m_v.m_boolean = false;
             break;
 
         default:
             // this should never happen
             assert(false);
+        }
+
+        m_token = m_lexer->getNextToken();
+        return result;
     }
 
-    token = lexer->getNextToken();
-    return result;
-}
+//-----------------------------------------------------------------------------
 
-Lisp*
-Parser::readList()
-{
-    Lisp* result = 0;
+    Lisp*
+    Parser::readList()
+    {
+        Lisp* result = 0;
 
-    while(token != Lexer::TOKEN_CLOSE_PAREN && token != Lexer::TOKEN_EOF) {
-        Lisp* newlisp = new Lisp(Lisp::TYPE_CONS);
-        newlisp->v.cons.car = read();
-        newlisp->v.cons.cdr = result;
-        result = newlisp;
+        while(m_token != Lexer::TOKEN_CLOSE_PAREN && m_token != Lexer::TOKEN_EOF)
+        {
+            Lisp* newlisp = new Lisp(Lisp::TYPE_CONS);
+            newlisp->m_v.m_cons.m_car = read();
+            newlisp->m_v.m_cons.m_cdr = result;
+            result = newlisp;
+        }
+
+        return result;
     }
-
-    return result;
-}
 
 } // end of namespace lisp

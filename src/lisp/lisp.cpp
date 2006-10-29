@@ -21,69 +21,84 @@
 
 namespace lisp
 {
-    
-Lisp::Lisp(LispType newtype)
-    : type(newtype)
-{
-}
 
-Lisp::~Lisp()
-{
-    if(type == TYPE_SYMBOL || type == TYPE_STRING)
-        delete[] v.string;
-    if(type == TYPE_CONS) {
-        delete v.cons.cdr;
-        delete v.cons.car;
-    }
-}
+    Lisp::Lisp(LispType newtype)
+            : m_type(newtype)
+    {}
 
-const Lisp*
-Lisp::getLisp(const char* name) const
-{
-    const Lisp* p;
+//-----------------------------------------------------------------------------
 
-    for(p = getCdr(); p != 0; p = p->getCdr()) {
-        const Lisp* child = p->getCar();
-        if(!child)
-            continue;
-        if(!child->getCar())
-            continue;
-        std::string childName;
-        if(!child->getCar()->get(childName))
-            continue;
-        if(childName == name)
-            return child;
-    }
-
-    return 0;
-}
-
-void
-Lisp::print(int ) const
-{
-    if(type == TYPE_CONS) {
-        printf("(");
-        if(v.cons.car)
-            v.cons.car->print();
-        if(v.cons.cdr) {
-            printf(",");
-            if(v.cons.cdr)
-                v.cons.cdr->print();
+    Lisp::~Lisp()
+    {
+        if(m_type == TYPE_SYMBOL || m_type == TYPE_STRING)
+            delete[] m_v.m_string;
+        if(m_type == TYPE_CONS)
+        {
+            delete m_v.m_cons.m_cdr;
+            delete m_v.m_cons.m_car;
         }
-        printf(")");
     }
-    if(type == TYPE_STRING) {
-        printf("'%s' ", v.string);
+
+//-----------------------------------------------------------------------------
+
+    const Lisp*
+    Lisp::getLisp(const char* name) const
+    {
+        const Lisp* P;
+
+        for(P = getCdr(); P != 0; P = P->getCdr())
+        {
+            const Lisp* CHILD = P->getCar();
+            if(!CHILD)
+                continue;
+            if(!CHILD->getCar())
+                continue;
+            std::string CHILDName;
+            if(!CHILD->getCar()->get(CHILDName))
+                continue;
+            if(CHILDName == name)
+                return CHILD;
+        }
+
+        return 0;
     }
-    if(type == TYPE_INTEGER) {
-        printf("%d", v.integer);
+
+//-----------------------------------------------------------------------------
+
+    //FIXME: is the boolean handled by this function? should the argument be
+    //removed?
+    void
+    Lisp::print(int ) const
+    {
+        if(m_type == TYPE_CONS)
+        {
+            printf("(");
+            if(m_v.m_cons.m_car)
+                m_v.m_cons.m_car->print();
+            if(m_v.m_cons.m_cdr)
+            {
+                printf(",");
+                if(m_v.m_cons.m_cdr)
+                    m_v.m_cons.m_cdr->print();
+            }
+            printf(")");
+        }
+        if(m_type == TYPE_STRING)
+        {
+            printf("'%s' ", m_v.m_string);
+        }
+        if(m_type == TYPE_INTEGER)
+        {
+            printf("%d", m_v.m_integer);
+        }
+        if(m_type == TYPE_REAL)
+        {
+            printf("%f", m_v.m_real);
+        }
+        if(m_type == TYPE_SYMBOL)
+        {
+            printf("%s ", m_v.m_string);
+        }
     }
-    if(type == TYPE_REAL) {
-        printf("%f", v.real);
-    }
-    if(type == TYPE_SYMBOL) {
-        printf("%s ", v.string);
-    }
-}
 
 } // end of namespace lisp

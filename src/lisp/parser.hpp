@@ -26,24 +26,24 @@
 namespace lisp
 {
 
-class Lisp;
+    class Lisp;
 
-class Parser
-{
-public:
-    Parser();
-    ~Parser();
+    class Parser
+    {
+    public:
+        Parser();
+        ~Parser();
 
-    Lisp* parse(const std::string& filename);
-    Lisp* parse(std::istream& stream);
+        Lisp* parse(const std::string& filename);
+        Lisp* parse(std::istream& stream);
 
-private:
-    Lisp* read();
-    Lisp* readList();
-    
-    Lexer* lexer;
-    Lexer::TokenType token;
-};
+    private:
+        Lisp* read();
+        Lisp* readList();
+
+        Lexer* m_lexer;
+        Lexer::TokenType m_token;
+    };
 
 } // end of namespace lisp
 

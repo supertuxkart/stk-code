@@ -23,47 +23,51 @@
 namespace lisp
 {
 
-class Lexer
-{
-public:
-    enum TokenType {
-        TOKEN_EOF,
-        TOKEN_OPEN_PAREN,
-        TOKEN_CLOSE_PAREN,
-        TOKEN_SYMBOL,
-        TOKEN_STRING,
-        TOKEN_INTEGER,
-        TOKEN_REAL,
-        TOKEN_TRUE,
-        TOKEN_FALSE
-    };
-    
-    Lexer(std::istream& stream);
-    ~Lexer();
+    class Lexer
+    {
+    public:
+        enum TokenType
+        {
+            TOKEN_EOF,
+            TOKEN_OPEN_PAREN,
+            TOKEN_CLOSE_PAREN,
+            TOKEN_SYMBOL,
+            TOKEN_STRING,
+            TOKEN_INTEGER,
+            TOKEN_REAL,
+            TOKEN_TRUE,
+            TOKEN_FALSE
+        };
 
-    TokenType getNextToken();
-    const char* getString() const
-    { return token_string; }
-    int getLineNumber() const
-    { return linenumber; }
-    
-private:
-    enum {
-        MAX_TOKEN_LENGTH = 4096,
-        LEXER_BUFFER_SIZE = 1024
+        Lexer(std::istream& stream);
+        ~Lexer();
+
+        TokenType getNextToken();
+
+        const char* getString() const
+            { return m_token_string; }
+
+        int getLineNumber() const
+            { return m_line_number; }
+
+    private:
+        enum
+        {
+            MAX_TOKEN_LENGTH = 4096,
+            LEXER_BUFFER_SIZE = 1024
+        };
+
+        inline void nextChar();
+
+        std::istream& m_stream;
+        bool m_is_eof;
+        int m_line_number;
+        char m_buffer[LEXER_BUFFER_SIZE+1];
+        char* m_buffer_end;
+        char* m_c;
+        char m_token_string[MAX_TOKEN_LENGTH + 1];
+        int m_token_length;
     };
-    
-    inline void nextChar();
-    
-    std::istream& stream;
-    bool isEof;
-    int linenumber;
-    char buffer[LEXER_BUFFER_SIZE+1];
-    char* bufend;
-    char* c;
-    char token_string[MAX_TOKEN_LENGTH + 1];
-    int token_length;
-};
 
 } // end of namespace lisp
 

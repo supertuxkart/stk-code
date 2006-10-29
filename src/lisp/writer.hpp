@@ -27,37 +27,37 @@
 namespace lisp
 {
 
-class Writer
-{
-public:
-    Writer(const std::string& filename);
-    Writer(std::ostream& out);
-    ~Writer();
+    class Writer
+    {
+    public:
+        Writer(const std::string& filename);
+        Writer(std::ostream& out);
+        ~Writer();
 
-    void writeComment(const std::string& comment);
+        void writeComment(const std::string& comment);
 
-    void beginList(const std::string& listname);
+        void beginList(const std::string& listname);
 
-    void write(const std::string& name, int value);
-  void write(const std::string& name, unsigned int value) {write(name, (int)value);}
-    void write(const std::string& name, float value);
-    void write(const std::string& name, const std::string& value);
-	void write(const std::string& name, const char* value);
-    void write(const std::string& name, bool value);
-    void write(const std::string& name, const std::vector<int>& value);
-    void write(const std::string& name, const std::vector<unsigned int>& value);
-    // add more write-functions when needed...
+        void write(const std::string& name, int value);
+        void write(const std::string& name, unsigned int value) {write(name, (int)value);}
+        void write(const std::string& name, float value);
+        void write(const std::string& name, const std::string& value);
+        void write(const std::string& name, const char* value);
+        void write(const std::string& name, bool value);
+        void write(const std::string& name, const std::vector<int>& value);
+        void write(const std::string& name, const std::vector<unsigned int>& value);
+        // add more write-functions when needed...
 
-    void endList(const std::string& listname);
+        void endList(const std::string& listname);
 
-private:
-    void indent();
+    private:
+        void indent();
 
-    bool owner;
-    std::ostream* out;
-    int indent_depth;
-    std::vector<std::string> lists;
-};
+        bool m_owner;
+        std::ostream* m_out;
+        int m_indent_depth;
+        std::vector<std::string> m_lists;
+    };
 
 } //namespace lisp
 
