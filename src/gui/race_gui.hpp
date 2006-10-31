@@ -70,8 +70,10 @@ private:
     Material* ThIcon;
     Material* SlashIcon;
     Material* MinusIcon;
+    Material* BangIcon;
     Material* LapIcon;
     Material* RevIcon;
+    Material* ArrowIcon;
     Material* SpeedBackIcon;
     Material* SpeedForeIcon;
 

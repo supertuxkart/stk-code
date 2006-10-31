@@ -71,10 +71,14 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   SlashIcon->getState()->disable(GL_CULL_FACE);
   MinusIcon = material_manager->getMaterial("minus.rgb");
   MinusIcon->getState()->disable(GL_CULL_FACE);
+  BangIcon = material_manager->getMaterial("bang.rgb");
+  BangIcon->getState()->disable(GL_CULL_FACE);
   LapIcon = material_manager->getMaterial("lap.rgb");
   LapIcon->getState()->disable(GL_CULL_FACE);
   RevIcon = material_manager->getMaterial("rev.rgb");
   RevIcon->getState()->disable(GL_CULL_FACE);
+  ArrowIcon = material_manager->getMaterial("arrow.rgb");
+  ArrowIcon->getState()->disable(GL_CULL_FACE);
   SpeedBackIcon = material_manager->getMaterial("speedback.rgb");
   SpeedBackIcon->getState()->disable(GL_CULL_FACE);
   SpeedForeIcon = material_manager->getMaterial("speedfore.rgb");
@@ -715,7 +719,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 #define WHEELWIDTH 64
   int width  = (int)(WHEELWIDTH*minRatio);
   int height = (int)(WHEELWIDTH*minRatio);
-  offset_x += (int)((config->width-150)*ratio_x) - width;
+  offset_x += (int)((config->width-160)*ratio_x) - width;
   offset_y += (int)(6*ratio_y);
 
   glMatrixMode(GL_MODELVIEW);
@@ -801,6 +805,22 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
       glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
     glEnd () ;
 
+    if ( !kart->isOnGround() )
+    {
+#define BANGWIDTH 48
+      int w = (int)(BANGWIDTH*minRatio);
+      int h = (int)(BANGWIDTH*minRatio);
+      int x = (int)((config->width-125)*ratio_x) - w;
+      int y = offset_y;
+      BangIcon->getState()->force();
+      glBegin ( GL_QUADS ) ;
+        glTexCoord2f(0, 0);glVertex2i(x  , y  );
+        glTexCoord2f(1, 0);glVertex2i(x+w, y  );
+        glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
+        glTexCoord2f(0, 1);glVertex2i(x  , y+h);
+      glEnd () ;
+     }
+
     /* Show velocity */
     if ( kart->getVelocity()->xyz[1] < 0 )
     {
@@ -819,7 +839,25 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     }
     else
     {
+      if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio())
+      {
+#define ARROWWIDTH 76
+        int w = (int)(REVWIDTH*minRatio);
+        int h = (int)(REVWIDTH*minRatio);
+        int x = (int)((config->width-10)*ratio_x) - w;
+        int y = offset_y;
+        ArrowIcon->getState()->force();
+        glBegin ( GL_QUADS ) ;
+          glTexCoord2f(0, 0);glVertex2i(x  , y  );
+          glTexCoord2f(1, 0);glVertex2i(x+w, y  );
+          glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
+          glTexCoord2f(0, 1);glVertex2i(x  , y+h);
+        glEnd () ;
+      }
+
       float speedRatio = (kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR)/110;
+      // The following does not work with wheelie or Zipper
+      //float speedRatio = kart->getVelocity()->xyz[1]/(kart->getMaxSpeed();
 
       if ( speedRatio > 1 )
         speedRatio = 1;
