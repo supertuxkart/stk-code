@@ -175,12 +175,39 @@ public:
 	//just a blank space
 	int  space(int);
 	void drawText(const char *text, int sz, int x, int y, 
-		      int red, int green, int blue, 
+		      int red=255, int green=255, int blue=255, 
 		      float scale_x=1.0, float scale_y=1.0);
         void drawText(std::string text, int sz, int x, int y, 
-		      int red, int green, int blue, 
+		      int red=255, int green=255, int blue=255, 
 	  	      float scale_x=1.0, float scale_y=1.0) {
 	              drawText(text.c_str(), sz, x, y, red, green, blue,
+			       scale_x, scale_y);
+	              }
+	void drawDropShadowText(const char *text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+		      float scale_x=1.0, float scale_y=1.0);
+        void drawDropShadowText(std::string text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+	  	      float scale_x=1.0, float scale_y=1.0) {
+	              drawDropShadowText(text.c_str(), sz, x, y, red, green, blue,
+			       scale_x, scale_y);
+	              }
+	void drawTextRace(const char *text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+		      float scale_x=1.0, float scale_y=1.0);
+        void drawTextRace(std::string text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+	  	      float scale_x=1.0, float scale_y=1.0) {
+	              drawTextRace(text.c_str(), sz, x, y, red, green, blue,
+			       scale_x, scale_y);
+	              }
+	void drawDropShadowTextRace(const char *text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+		      float scale_x=1.0, float scale_y=1.0);
+        void drawDropShadowTextRace(std::string text, int sz, int x, int y, 
+		      int red=255, int green=255, int blue=255, 
+	  	      float scale_x=1.0, float scale_y=1.0) {
+	              drawDropShadowTextRace(text.c_str(), sz, x, y, red, green, blue,
 			       scale_x, scale_y);
 	              }
 	/*---------------------------------------------------------------------------*/
@@ -314,6 +341,8 @@ private:
 	int           radius;
 	fntTexFont    *fnt;
 	fntRenderer   *textOut;
+	fntTexFont    *fntRace;
+	fntRenderer   *textOutRace;
 	
 	int pause_id;
 	bool paused;

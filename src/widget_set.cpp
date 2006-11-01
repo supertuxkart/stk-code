@@ -39,6 +39,11 @@ WidgetSet::WidgetSet()
 	textOut = new fntRenderer();
 	textOut->setFont(fnt);
 
+	fntRace = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(),
+				 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	textOutRace = new fntRenderer();
+	textOutRace->setFont(fntRace);
+
 	/* Initialize font rendering. */
 	memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
 
@@ -71,6 +76,11 @@ void WidgetSet::reInit() {
 			   GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
   textOut = new fntRenderer();
   textOut->setFont(fnt);
+  if(textOutRace) delete textOutRace;
+  fntRace = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(), 
+			   GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+  textOutRace = new fntRenderer();
+  textOutRace->setFont(fntRace);
   
 }   // reInit
 
@@ -410,6 +420,45 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
   textOut->end();
 }
 
+void WidgetSet::drawDropShadowText (const char *text, int sz, int x, int y, 
+			  int red, int green, int blue, 
+			  float scale_x, float scale_y ) {
+  drawText ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
+  drawText ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
+}
+
+void WidgetSet::drawTextRace (const char *text, int sz, int x, int y, 
+			  int red, int green, int blue, 
+			  float scale_x, float scale_y ) {
+  float l,r,t,b, fontScaling;
+  // Only scale for lower resolution
+  fontScaling = config->width<800 ? ((float)config->width/800.0f) : 1.0f;
+  fontScaling = (float)config->width/800.0f;
+  sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
+  fntRace->getBBox(text, sz, 0, &l, &r, &b, &t);
+  int w = (int)((r-l+0.99)*scale_x);
+  int h = (int)((t-b+0.99)*scale_y);
+  if(x == SCREEN_CENTERED_TEXT) {
+    x = (config->width - w) / 2;
+  }
+  if(y == SCREEN_CENTERED_TEXT) {
+    y = (config->height - h) / 2;
+  }
+ 
+  textOutRace->begin();
+    textOutRace->setPointSize(sz);
+    textOutRace->start2f((GLfloat)x, (GLfloat)y);
+    glColor3ub(red, green, blue);
+    textOutRace->puts(text);
+  textOutRace->end();
+}
+
+void WidgetSet::drawDropShadowTextRace (const char *text, int sz, int x, int y, 
+			  int red, int green, int blue, 
+			  float scale_x, float scale_y ) {
+  drawTextRace ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
+  drawTextRace ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
+}
 
 int WidgetSet::pause(int pd)
 {

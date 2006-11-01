@@ -51,34 +51,6 @@ RaceGUI::RaceGUI(): time_left(0.0) {
   // Temporary, we need a better icon here
   SteeringWheelIcon = material_manager->getMaterial("wheel.rgb");
   SteeringWheelIcon->getState()->disable(GL_CULL_FACE);
-
-  for(int i = 0;i < 11;i++) {
-    char str [ 256 ];
-    sprintf(str,"%d.rgb",i);
-    NumberIcons[i] = material_manager->getMaterial(str);
-    NumberIcons[i]->getState()->disable(GL_CULL_FACE);
-  }
-
-  StIcon = material_manager->getMaterial("st.rgb");
-  StIcon->getState()->disable(GL_CULL_FACE);
-  NdIcon = material_manager->getMaterial("nd.rgb");
-  NdIcon->getState()->disable(GL_CULL_FACE);
-  RdIcon = material_manager->getMaterial("rd.rgb");
-  RdIcon->getState()->disable(GL_CULL_FACE);
-  ThIcon = material_manager->getMaterial("th.rgb");
-  ThIcon->getState()->disable(GL_CULL_FACE);
-  SlashIcon = material_manager->getMaterial("slash.rgb");
-  SlashIcon->getState()->disable(GL_CULL_FACE);
-  MinusIcon = material_manager->getMaterial("minus.rgb");
-  MinusIcon->getState()->disable(GL_CULL_FACE);
-  BangIcon = material_manager->getMaterial("bang.rgb");
-  BangIcon->getState()->disable(GL_CULL_FACE);
-  LapIcon = material_manager->getMaterial("lap.rgb");
-  LapIcon->getState()->disable(GL_CULL_FACE);
-  RevIcon = material_manager->getMaterial("rev.rgb");
-  RevIcon->getState()->disable(GL_CULL_FACE);
-  ArrowIcon = material_manager->getMaterial("arrow.rgb");
-  ArrowIcon->getState()->disable(GL_CULL_FACE);
   SpeedBackIcon = material_manager->getMaterial("speedback.rgb");
   SpeedBackIcon->getState()->disable(GL_CULL_FACE);
   SpeedForeIcon = material_manager->getMaterial("speedfore.rgb");
@@ -223,22 +195,24 @@ void RaceGUI::drawFPS () {
     fpsCounter = 0;
     fpsTimer.setMaxDelta(1000);
   }    
-  widgetSet->drawText (fpsString, 36, 0, config->height-50, 255, 255, 255 ) ;
+  widgetSet->drawDropShadowTextRace (fpsString, 36, 0, config->height-50, 255, 255, 255 ) ;
 }   // drawFPS
 
+/*
 // -----------------------------------------------------------------------------
 void RaceGUI::drawInverseDropShadowText ( const char *str, int sz, 
 					  int x, int y              ) {
-  widgetSet->drawText ( str, sz, x, y, 255, 255, 255 ) ;
-  widgetSet->drawText ( str, sz, x+1, y+1, 0, 0, 0 ) ;
+  widgetSet->drawTextRace ( str, sz, x, y, 255, 255, 255 ) ;
+  widgetSet->drawTextRace ( str, sz, x+2, y+2, 0, 0, 0 ) ;
 }   // drawInverseDropShadowText
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawDropShadowText (const char *str, int sz, 
 				  int x, int y, int red, int green, int blue) {
-  widgetSet->drawText ( str, sz, x, y, 0, 0, 0 ) ;
-  widgetSet->drawText ( str, sz, x+1, y+1, red, green, blue ) ;
+  widgetSet->drawTextRace ( str, sz, x, y, 0, 0, 0 ) ;
+  widgetSet->drawTextRace ( str, sz, x+2, y+2, red, green, blue ) ;
 }  // drawDropShadowText
+*/
 
 // -----------------------------------------------------------------------------
 #if 0
@@ -280,7 +254,7 @@ void RaceGUI::drawTimer () {
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
   sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-  drawDropShadowText ( str, 36, xOffForText, config->height-80) ;
+  widgetSet->drawDropShadowTextRace ( str, 44, xOffForText, config->height-80, 255, 255, 255) ;
 }   // drawTimer
 
 // -----------------------------------------------------------------------------
@@ -391,10 +365,10 @@ void RaceGUI::drawGameOverText (const float dt) {
   if ( finishing_position > 1 ) {
     char s[255];
     sprintf(s,"YOU FINISHED %s",pos_string[finishing_position]);
-    widgetSet->drawText ( s  , 50, 130, 300, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( s  , 50, 130, 300, red, green, blue ) ;
   } else {
-    widgetSet->drawText ( "CONGRATULATIONS"  , 50, 130, 300, red, green, blue ) ;
-    widgetSet->drawText ( "YOU WON THE RACE!", 50, 130, 210, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( "CONGRATULATIONS"  , 50, 130, 300, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( "YOU WON THE RACE!", 50, 130, 210, red, green, blue ) ;
   }
 }   // drawGameOverText
 
@@ -408,7 +382,8 @@ void RaceGUI::drawPlayerIcons () {
   int y;
 #define ICON_WIDTH 40
 #define ICON_PLAYER_WIDHT 50
-#define ICON_POS_WIDTH 28
+/*#define ICON_POS_WIDTH 28
+*/
 
   //glEnable(GL_TEXTURE_2D);
   Material *last_players_gst = 0;
@@ -447,7 +422,7 @@ void RaceGUI::drawPlayerIcons () {
         int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
         char str[256];
         sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-        drawDropShadowText(str, 20, ICON_PLAYER_WIDHT+x, y+5, 
+        widgetSet->drawDropShadowTextRace(str, 20, ICON_PLAYER_WIDHT+x, y+5, 
            red, green, blue);
       }
 
@@ -484,29 +459,22 @@ void RaceGUI::drawPlayerIcons () {
       glEnd () ;
 
       // draw position (1st, 2nd...)
-      NumberIcons[kart->getPosition()]->getState()->force();
-      glBegin ( GL_QUADS ) ;
-        glTexCoord2f(0, 0);glVertex2i(x-3               , y+3               );
-        glTexCoord2f(1, 0);glVertex2i(x-3+ICON_POS_WIDTH, y+3               );
-        glTexCoord2f(1, 1);glVertex2i(x-3+ICON_POS_WIDTH, y+3+ICON_POS_WIDTH);
-        glTexCoord2f(0, 1);glVertex2i(x-3               , y+3+ICON_POS_WIDTH);
-      glEnd () ;
+      glDisable(GL_CULL_FACE);
+      char str[256];
+
+      sprintf(str, "%d", kart->getPosition());
+      widgetSet->drawDropShadowTextRace ( str, 33, x-7, y-4);
 
       if (kart->getPosition() == 1)
-        StIcon->getState()->force();
+        widgetSet->drawDropShadowTextRace ( "st", 13, x-7+17, y-4+17);
       else if (kart->getPosition() == 2)
-        NdIcon->getState()->force();
+        widgetSet->drawDropShadowTextRace ( "nd", 13, x-7+17, y-4+17);
       else if (kart->getPosition() == 3)
-        RdIcon->getState()->force();
+        widgetSet->drawDropShadowTextRace ( "rd", 13, x-7+17, y-4+17);
       else
-        ThIcon->getState()->force();
-      glBegin ( GL_QUADS ) ;
-        glTexCoord2f(0, 0);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6)                 , y+(int)(ICON_POS_WIDTH*0.6)                 );
-        glTexCoord2f(1, 0);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2), y+(int)(ICON_POS_WIDTH*0.6)                 );
-        glTexCoord2f(1, 1);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2), y+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2));
-        glTexCoord2f(0, 1);glVertex2i(x+(int)(ICON_POS_WIDTH*0.6)                 , y+(int)(ICON_POS_WIDTH*0.6+ICON_POS_WIDTH/2));
-      glEnd () ;
+        widgetSet->drawDropShadowTextRace ( "th", 13, x-7+17, y-4+17);
 
+      glEnable(GL_CULL_FACE);
     }
 }   // drawPlayerIcons
 
@@ -534,8 +502,8 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_x), 
-			    (int)(130*ratio_x)+offset_x,
+      widgetSet->drawDropShadowTextRace ( "WRONG WAY!", (int)(60*ratio_x), 
+			    (int)(200*ratio_x)+offset_x,
 			    (int)(210*ratio_y)+offset_y, red, green, blue ) ;
       if ( ! i ) {
         red = blue = 255;
@@ -545,8 +513,8 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
         green = 255;
       }
 
-      widgetSet->drawText ( "WRONG WAY!", (int)(50*ratio_x), 
-			    (int)((130+2)*ratio_x)+offset_x,
+      widgetSet->drawDropShadowTextRace ( "WRONG WAY!", (int)(60*ratio_x), 
+			    (int)((200+2)*ratio_x)+offset_x,
 			    (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
 
       i = ! i ;
@@ -752,38 +720,25 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
-  float minRatio = std::min(ratio_x, ratio_y);
-#define POSWIDTH 90
-  int width  = (int)(POSWIDTH*minRatio);
-  int height = (int)(POSWIDTH*minRatio);
-  offset_x += (int)((config->width-10)*ratio_x) - width;
-  offset_y += (int)(130*ratio_y);
+  char str[256];
+  offset_x += (int)((config->width-110)*ratio_x);
+  offset_y += (int)(140*ratio_y);
 
-  glMatrixMode(GL_MODELVIEW);
-    NumberIcons[kart->getPosition()]->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
+  sprintf(str, "%d", kart->getPosition());
+  widgetSet->drawDropShadowTextRace ( str, (int)(100*ratio_y), offset_x, offset_y);
 
-    if (kart->getPosition() == 1)
-      StIcon->getState()->force();
-    else if (kart->getPosition() == 2)
-      NdIcon->getState()->force();
-    else if (kart->getPosition() == 3)
-      RdIcon->getState()->force();
-    else
-      ThIcon->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x+(int)(width*0.6)        , offset_y+(int)(height*0.6)         );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+(int)(width*0.6+width/2), offset_y+(int)(height*0.6)         );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+(int)(width*0.6+width/2), offset_y+(int)(height*0.6+height/2));
-      glTexCoord2f(0, 1);glVertex2i(offset_x+(int)(width*0.6)        , offset_y+(int)(height*0.6+height/2));
-    glEnd () ;
+  offset_x += (int)(50*ratio_x);
+  offset_y += (int)(50*ratio_y);
 
- } // drawPosition
+  if (kart->getPosition() == 1)
+    widgetSet->drawDropShadowTextRace ( "st", (int)(40*ratio_y), offset_x, offset_y);
+  else if (kart->getPosition() == 2)
+    widgetSet->drawDropShadowTextRace ( "nd", (int)(40*ratio_y), offset_x, offset_y);
+  else if (kart->getPosition() == 3)
+    widgetSet->drawDropShadowTextRace ( "rd", (int)(40*ratio_y), offset_x, offset_y);
+  else
+    widgetSet->drawDropShadowTextRace ( "th", (int)(40*ratio_y), offset_x, offset_y);
+} // drawPosition
 
 // -----------------------------------------------------------------------------
 void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
@@ -806,53 +761,18 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     glEnd () ;
 
     if ( !kart->isOnGround() )
-    {
-#define BANGWIDTH 48
-      int w = (int)(BANGWIDTH*minRatio);
-      int h = (int)(BANGWIDTH*minRatio);
-      int x = (int)((config->width-125)*ratio_x) - w;
-      int y = offset_y;
-      BangIcon->getState()->force();
-      glBegin ( GL_QUADS ) ;
-        glTexCoord2f(0, 0);glVertex2i(x  , y  );
-        glTexCoord2f(1, 0);glVertex2i(x+w, y  );
-        glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
-        glTexCoord2f(0, 1);glVertex2i(x  , y+h);
-      glEnd () ;
-     }
+      widgetSet->drawDropShadowTextRace ( "!", (int)(60*minRatio), offset_x-(int)(30*minRatio), offset_y-(int)(10*minRatio));
 
     /* Show velocity */
     if ( kart->getVelocity()->xyz[1] < 0 )
-    {
-#define REVWIDTH 76
-      int w = (int)(REVWIDTH*minRatio);
-      int h = (int)(REVWIDTH*minRatio);
-      int x = (int)((config->width-10)*ratio_x) - w;
-      int y = offset_y;
-      RevIcon->getState()->force();
-      glBegin ( GL_QUADS ) ;
-        glTexCoord2f(0, 0);glVertex2i(x  , y  );
-        glTexCoord2f(1, 0);glVertex2i(x+w, y  );
-        glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
-        glTexCoord2f(0, 1);glVertex2i(x  , y+h);
-      glEnd () ;
-    }
+      widgetSet->drawDropShadowTextRace ( "REV", (int)(40*minRatio), offset_x+(int)(40*minRatio), offset_y+(int)(10*minRatio));
     else
     {
-      if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio())
+      //if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() && kart->wheelie_angle == 0 )
+      if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )
       {
-#define ARROWWIDTH 76
-        int w = (int)(REVWIDTH*minRatio);
-        int h = (int)(REVWIDTH*minRatio);
-        int x = (int)((config->width-10)*ratio_x) - w;
-        int y = offset_y;
-        ArrowIcon->getState()->force();
-        glBegin ( GL_QUADS ) ;
-          glTexCoord2f(0, 0);glVertex2i(x  , y  );
-          glTexCoord2f(1, 0);glVertex2i(x+w, y  );
-          glTexCoord2f(1, 1);glVertex2i(x+w, y+h);
-          glTexCoord2f(0, 1);glVertex2i(x  , y+h);
-        glEnd () ;
+        widgetSet->drawDropShadowTextRace ( "l", (int)(60*minRatio), offset_x+(int)(70*minRatio), offset_y);
+        widgetSet->drawDropShadowTextRace ( "^", (int)(60*minRatio), offset_x+(int)(65*minRatio), offset_y+(int)(7*minRatio));
       }
 
       float speedRatio = (kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR)/110;
@@ -886,57 +806,24 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
 			   float ratio_x, float ratio_y           ) {
 
   float maxRatio = std::max(ratio_x, ratio_y);
+  char str[256];
   offset_x += (int)(120*ratio_x);
-  offset_y += (int)(30*maxRatio);
-#define LAPWIDTH 48
-  int width  = (int)(LAPWIDTH*maxRatio);
-  int height = (int)(LAPWIDTH*maxRatio);
-  glMatrixMode(GL_MODELVIEW);
+  offset_y += (int)(50*maxRatio);
 
-    LapIcon->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x                 , offset_y                  );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+(int)(1.6*width), offset_y                  );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+(int)(1.6*width), offset_y+(int)(1.6*height));
-      glTexCoord2f(0, 1);glVertex2i(offset_x                 , offset_y+(int)(1.6*height));
-    glEnd () ;
+  if ( kart->getLap() >= world->raceSetup.numLaps )
+  {
+    sprintf(str, "Finished");
+    widgetSet->drawDropShadowTextRace ( str, (int)(48*maxRatio), offset_x, offset_y);
+  }
+  else
+  {
+    widgetSet->drawDropShadowTextRace ( "Lap", (int)(48*maxRatio), offset_x, offset_y);
 
-    offset_y -= (int)(LAPWIDTH*0.6*maxRatio);
-    offset_x -= (int)(14*maxRatio);
-    int lap = kart->getLap();
-    if ( lap < 0 )
-      NumberIcons[0]->getState()->force();
-    else if ( lap >= world->raceSetup.numLaps ) 
-      MinusIcon->getState()->force();
-    else
-      NumberIcons[lap+1]->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
+    offset_y -= (int)(50*ratio_y);
 
-    offset_x += (int)(LAPWIDTH*0.6*maxRatio);
-    SlashIcon->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
-
-    offset_x += (int)(LAPWIDTH*0.6*maxRatio);
-    if ( lap >= world->raceSetup.numLaps ) 
-      MinusIcon->getState()->force();
-    else
-      NumberIcons[world->raceSetup.numLaps]->getState()->force();
-    glBegin ( GL_QUADS ) ;
-      glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-      glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-      glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-      glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
+    sprintf(str, "%d/%d", kart->getLap()<0?0:kart->getLap()+1, world->raceSetup.numLaps);
+    widgetSet->drawDropShadowTextRace ( str, (int)(48*maxRatio), offset_x, offset_y);
+  }
 } // drawLap
 
 // -----------------------------------------------------------------------------
@@ -962,13 +849,13 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
 
   glOrtho        ( 0, config->width, 0, config->height, 0, 100 ) ;
   switch (world->ready_set_go) {
-    case 2: widgetSet->drawText ( "Ready!", 80, SCREEN_CENTERED_TEXT, 
+    case 2: widgetSet->drawTextRace ( "Ready!", 80, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 230, 170, 160 ) ;
             break;
-    case 1: widgetSet->drawText ( "Set!", 80, SCREEN_CENTERED_TEXT, 
+    case 1: widgetSet->drawTextRace ( "Set!", 80, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 230, 230, 160 ) ;
             break;
-    case 0: widgetSet->drawText ( "Go!", 80, SCREEN_CENTERED_TEXT, 
+    case 0: widgetSet->drawTextRace ( "Go!", 80, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 100, 210, 100 ) ;
             break;
   }   // switch
@@ -981,7 +868,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
   if(world->getPhase()==World::START_PHASE) {
     for(int i=0; i<raceSetup.getNumPlayers(); i++) {
       if(world->getPlayerKart(i)->earlyStartPenalty()) {
-	widgetSet->drawText("Penalty time!!",80, SCREEN_CENTERED_TEXT,
+	widgetSet->drawTextRace("Penalty time!!",80, SCREEN_CENTERED_TEXT,
 			    200, 200, 10, 10);
       }   // if penalty
     }  // for i < getNumPlayers
