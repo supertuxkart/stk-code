@@ -138,6 +138,9 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
     wheel_front_r = NULL;
     wheel_rear_l  = NULL;
     wheel_rear_r  = NULL;
+#ifdef BULLET
+    world->getPhysics()->addKart(this, &m_vehicle, &m_tuning);
+#endif
 }   // Kart
 
 // -----------------------------------------------------------------------------

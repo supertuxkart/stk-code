@@ -198,7 +198,7 @@ if test "x${enable_bullet}" != "xno"; then
 	AC_DEFINE(BULLET)
 	AC_MSG_RESULT([enabled])
 	CXXFLAGS="$CXXFLAGS -Ibullet"
-	LIBS="$LIBS -L bullet -lbulletdynamics -lbulletcollision -lbulletmath"
+	LIBS="$LIBS -L bullet -lbulletopenglsupport -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
 else
 	AC_MSG_RESULT([disabled])
 fi

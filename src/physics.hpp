@@ -24,16 +24,21 @@
 #include "kart.hpp"
 
 #ifdef BULLET
-#include <bullet/btBulletDynamicsCommon.h>
-
+#include "bullet/btBulletDynamicsCommon.h"
+#include "../bullet/Demos/OpenGL/GLDebugDrawer.h"
 class Physics 
 {
 protected:
-    btDynamicsWorld* m_dynamics_world;
+    btDynamicsWorld *m_dynamics_world;
+    Kart            *m_kart;
+    GLDebugDrawer   *m_debug_drawer;
 public:
-         Physics(float gravity);
-        ~Physics();
-    void addKart(Kart *k);
+         Physics  (float gravity);
+        ~Physics  ();
+    void addKart  (Kart *k, btRaycastVehicle **v, 
+                   btRaycastVehicle::btVehicleTuning **t);
+    void update   (float dt);
+    void set_track(ssgEntity *track);
 };
 
 // For non-bullet version: empty object
@@ -43,7 +48,8 @@ class Physics
 public:
          Physics(float gravity) {};
         ~Physics() {};
-    void addKart(Kart *k) {};
+    void update(float dt) {};
+    void set_track(ssgEntity *track) {};
 };
 
 #endif

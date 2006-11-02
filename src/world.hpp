@@ -102,8 +102,9 @@ public:
     void addCollisions(int kartNumber, int n) {numberCollisions[kartNumber]+=n;  }
 
     /** Returns the phase of the game */
-    Phase getPhase() const                    { return phase; }
-    float getGravity() const                  { return track->getGravity();}
+    Phase getPhase() const                    { return phase;                    }
+    float getGravity() const                  { return track->getGravity();      }
+    Physics *getPhysics() const               { return physics;                  }
 
 private:
     void updateRacePosition( int k );

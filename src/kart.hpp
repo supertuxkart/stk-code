@@ -28,7 +28,9 @@
 #include "kart_properties.hpp"
 #include "attachment.hpp"
 #include "collectable.hpp"
-
+#ifdef BULLET
+#include "bullet/btBulletDynamicsCommon.h"
+#endif
 
 class SkidMark;
 class Kart;
@@ -48,6 +50,7 @@ public:
   virtual void particle_delete(int index, Particle* p                         );
 };
 
+// =============================================================================
 class Kart : public Moveable 
 {
 protected:
@@ -68,6 +71,11 @@ protected:
   bool         skidRear;           // true if rear tires are skidding
   float        maxSpeed;           // maximum speed of the kart, computed from
                                    // physics parameters, storing it saves time
+#ifdef BULLET
+	btRaycastVehicle::btVehicleTuning  *m_tuning;
+	btVehicleRaycaster	               *m_vehicleRayCaster;
+	btRaycastVehicle                   *m_vehicle;
+#endif
 
 private:
   int                 num_herring_gobbled;
@@ -149,6 +157,8 @@ public:
   float          getTimeFullSteer () const {return kartProperties->getTimeFullSteer();}
   float          getBrakeFactor   () const {return kartProperties->getBrakeFactor();}
   float          getWheelBase     () const {return kartProperties->getWheelBase();}
+  float          getWheelRadius   () const {return 0.5f;}
+  float          getWheelWidth    () const {return 0.5f;}
   float          getHeightCOG     () const {return kartProperties->getHeightCOG();}
   float          getTireGrip      () const {return kartProperties->getTireGrip();}
   float          getMaxSteerAngle () const {return kartProperties->getMaxSteerAngle();}
@@ -172,6 +182,11 @@ public:
   float          getMaxSpeed      () const {return maxSpeed;                 }
   void           setTimeAtLap     (float t){timeAtLastLap=t;                 }
   float          getTimeAtLap     () const {return timeAtLastLap;            }
+#ifdef BULLET
+    void           setPhysics(btRaycastVehicle *v, 
+                              btRaycastVehicle::btVehicleTuning *t) {m_vehicle=v;m_tuning=t; }
+    btRaycastVehicle *getVehicle() const {return m_vehicle;}
+#endif
   const std::string& getName      () const {return kartProperties->getName();}
   virtual int    isPlayerKart     () const {return 0;                        }
   virtual void   collectedHerring (Herring* herring);
@@ -200,8 +215,6 @@ public:
   
 } ;
 
-void print_model(ssgEntity* entity, int indent, int maxLevel);
-void createDisplayLists(ssgEntity* entity);
 
 #endif
 

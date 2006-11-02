@@ -30,10 +30,12 @@ void          print_model       (ssgEntity *entity, const int indent,
                                  const int maxLevel);
 void          MinMax            (ssgEntity *p, 
                                  float *x_min, float *x_max, 
-                                 float *y_min, float *y_max);
+                                 float *y_min, float *y_max,
+                                 float *z_min=NULL, float *z_max=NULL);
 void          MinMax            (ssgEntity *p, sgMat4 m, 
                                  float *x_min, float *x_max, 
-                                 float *y_min, float *y_max);
+                                 float *y_min, float *y_max,
+                                 float *z_min=NULL, float *z_max=NULL);
 
 
 #endif

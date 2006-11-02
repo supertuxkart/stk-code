@@ -125,19 +125,23 @@ void print_model(ssgEntity* entity, const int indent, const int maxLevel)
 //* \param x_max maximum x value
 //* \param y_min minimum y value
 //* \param y_max maximum y value
-void MinMax(ssgEntity* p, float* x_min, float* x_max, 
-                          float* y_min, float* y_max)
+//*  \param z_min minimum z value, optional parameter!
+//*  \param z_max minimum z value, optional parameter!
+void MinMax(ssgEntity* p, float *x_min, float *x_max, 
+                          float *y_min, float *y_max,
+                          float *z_min, float *z_max)
 {
     sgMat4 mat;
     sgMakeIdentMat4(mat);
-    MinMax(p, mat, x_min, x_max, y_min, y_max);
+    MinMax(p, mat, x_min, x_max, y_min, y_max, z_min, z_max);
 
 }   // MinMax
 
 // -----------------------------------------------------------------------------
 //* Internal function used by MinMax
 void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max, 
-                                    float* y_min, float* y_max)
+                                    float* y_min, float* y_max,
+                                    float* z_min, float* z_max)
 {
     if(p->isAKindOf(ssgTypeLeaf())) 
     {
@@ -158,6 +162,19 @@ void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max,
             *y_min = std::min(*y_min, vv1[1]); *y_max = std::max(*y_max, vv1[1]);
             *y_min = std::min(*y_min, vv2[1]); *y_max = std::max(*y_max, vv2[1]);
             *y_min = std::min(*y_min, vv3[1]); *y_max = std::max(*y_max, vv3[1]);
+            if(z_min)
+            {
+                *z_min = std::min(*z_min, vv1[2]);
+                *z_min = std::min(*z_min, vv2[2]);
+                *z_min = std::min(*z_min, vv3[2]);
+            }
+            if(z_max)
+            {
+                *z_max = std::max(*z_max, vv1[2]);
+                *z_max = std::max(*z_max, vv2[2]);
+                *z_max = std::max(*z_max, vv3[2]);
+            }
+
         }   // for i<p->getNumTriangles
     } else if (p->isAKindOf(ssgTypeTransform())) 
     {
@@ -170,14 +187,14 @@ void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max,
     
     for(ssgEntity* e=t->getKid(0); e!=NULL; e=t->getNextKid()) 
     {
-        MinMax(e, tmpM, x_min, x_max, y_min, y_max);
+        MinMax(e, tmpM, x_min, x_max, y_min, y_max, z_min, z_max);
     }   // for i<getNumKids
     
     } else if (p->isAKindOf(ssgTypeBranch())) 
     {
         ssgBranch* b =(ssgBranch*)p;
         for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
-            MinMax(e, m, x_min, x_max, y_min, y_max);
+            MinMax(e, m, x_min, x_max, y_min, y_max, z_min, z_max);
         }   // for i<getNumKids
     } else 
     {
