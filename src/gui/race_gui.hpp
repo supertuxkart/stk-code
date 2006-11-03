@@ -44,7 +44,6 @@ class RaceGUI: public BaseGUI {
   // the kart which is using them
   Entry inputMap[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
 
-  int         xOffForText;
   float       timeOfLeader;
   int         lapLeader;
 
@@ -77,10 +76,6 @@ private:
     void drawEmergencyText     (Kart* player_kart, 
 				int   offset_x, int   offset_y, 
 				float ratio_x,  float ratio_y  );
-    void drawScore             (const RaceSetup& raceSetup,
-				Kart* player_kart, 
-				int   offset_x, int   offset_y, 
-				float ratio_x,  float ratio_y  );
     void UpdateKeyboardMappings();
     void putEntry(PlayerKart *kart, KartActions ka);
     bool handleInput(InputType type, int id0, int id1, int id2, int value);
@@ -96,9 +91,6 @@ private:
   /** Draw text to screen.
       scale_x and scale_y could be used to a simple resize (e.g. for multiplayer
       split screens, though, currently, we reduce fonts size to half).        */
-/*    void drawDropShadowText       (const char *str, int sz, int x, int y, 
-				   int red=255, int green=255, int blue=255);
-    void drawInverseDropShadowText(const char *str, int sz, int x, int y);*/
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
 				   float ratio_x, float ratio_y           );
     void drawPosition             (Kart* kart, int offset_x, int offset_y,

@@ -35,7 +35,6 @@ RaceGUI::RaceGUI(): time_left(0.0) {
 
   lapLeader     = -1;
   timeOfLeader  = -1.0f;
-  xOffForText   = (int)(config->width-220*config->width/800.0f);
   pos_string[0] = "?!?";
   pos_string[1] = "1st";
   pos_string[2] = "2nd";
@@ -195,24 +194,8 @@ void RaceGUI::drawFPS () {
     fpsCounter = 0;
     fpsTimer.setMaxDelta(1000);
   }    
-  widgetSet->drawDropShadowTextRace (fpsString, 36, 0, config->height-50, 255, 255, 255 ) ;
+  widgetSet->drawDropShadowTextRace (fpsString, 48, 0, config->height-50, 255, 255, 255 ) ;
 }   // drawFPS
-
-/*
-// -----------------------------------------------------------------------------
-void RaceGUI::drawInverseDropShadowText ( const char *str, int sz, 
-					  int x, int y              ) {
-  widgetSet->drawTextRace ( str, sz, x, y, 255, 255, 255 ) ;
-  widgetSet->drawTextRace ( str, sz, x+2, y+2, 0, 0, 0 ) ;
-}   // drawInverseDropShadowText
-
-// -----------------------------------------------------------------------------
-void RaceGUI::drawDropShadowText (const char *str, int sz, 
-				  int x, int y, int red, int green, int blue) {
-  widgetSet->drawTextRace ( str, sz, x, y, 0, 0, 0 ) ;
-  widgetSet->drawTextRace ( str, sz, x+2, y+2, red, green, blue ) ;
-}  // drawDropShadowText
-*/
 
 // -----------------------------------------------------------------------------
 #if 0
@@ -254,54 +237,8 @@ void RaceGUI::drawTimer () {
   int tenths  = (int) floor ( 10.0f * (time_left - (double)(sec + 60*min)));
 
   sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-  widgetSet->drawDropShadowTextRace ( str, 44, xOffForText, config->height-80, 255, 255, 255) ;
+  widgetSet->drawDropShadowTextRace ( str, 60, config->width-260, config->height-64, 255, 255, 255) ;
 }   // drawTimer
-
-// -----------------------------------------------------------------------------
-void RaceGUI::drawScore (const RaceSetup& raceSetup, Kart* player_kart,
-			 int offset_x, int offset_y, float ratio_x, 
-			 float ratio_y                                 ) {
-//  char str [ 256 ] ;
-
-  /* Show velocity */
-/*  if ( player_kart->getVelocity()->xyz[1] < 0 )
-    sprintf ( str, "Reverse" ) ;
-  else {
-    if(config->useKPH) {
-      sprintf(str,"%d km/h",
-	      (int)(player_kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR));
-    } else {
-      sprintf(str,"%d mph",
-	      (int)(player_kart->getVelocity()->xyz[1]/MILES_PER_HOUR));
-    }   // use KPH
-  }   // velocity<0
-
-  int red=255, green=255, blue=255;
-  if(!player_kart->isOnGround()) {
-    green=0; blue=0;
-  }
-  drawDropShadowText ( str, (int)(36*ratio_y), 
-		       (int)(offset_x+xOffForText         *ratio_x),
-		       (int)(offset_y+(config->height-200)*ratio_y),
-		       red, green, blue);
-*/
-  /* Show lap number */
-/*  int lap = player_kart->getLap();
-  if ( lap < 0 ) {
-    sprintf ( str, "Lap:0/%d", raceSetup.numLaps ) ;
-  }  else if ( lap < raceSetup.numLaps - 1 ) {
-    sprintf ( str, "Lap:%d/%d",
-	      lap + 1, raceSetup.numLaps ) ;
-  } else if ( lap == raceSetup.numLaps - 1 ) {
-    sprintf ( str, "Last lap!" );
-  } else {
-    sprintf ( str, "Finished!" );
-  }
-
-  drawDropShadowText ( str, (int)(38*ratio_y), 
-		       (int)(offset_x+xOffForText         *ratio_x),
-		       (int)(offset_y+(config->height-250)*ratio_y) );
-*/}   // drawScore
 
 // -----------------------------------------------------------------------------
 #define TRACKVIEW_SIZE 100
@@ -365,10 +302,10 @@ void RaceGUI::drawGameOverText (const float dt) {
   if ( finishing_position > 1 ) {
     char s[255];
     sprintf(s,"YOU FINISHED %s",pos_string[finishing_position]);
-    widgetSet->drawDropShadowTextRace ( s  , 50, 130, 300, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( s  , 64, 130, 300, red, green, blue ) ;
   } else {
-    widgetSet->drawDropShadowTextRace ( "CONGRATULATIONS"  , 50, 130, 300, red, green, blue ) ;
-    widgetSet->drawDropShadowTextRace ( "YOU WON THE RACE!", 50, 130, 210, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( "CONGRATULATIONS"  , 64, 130, 300, red, green, blue ) ;
+    widgetSet->drawDropShadowTextRace ( "YOU WON THE RACE!", 64, 130, 210, red, green, blue ) ;
   }
 }   // drawGameOverText
 
@@ -382,8 +319,6 @@ void RaceGUI::drawPlayerIcons () {
   int y;
 #define ICON_WIDTH 40
 #define ICON_PLAYER_WIDHT 50
-/*#define ICON_POS_WIDTH 28
-*/
 
   //glEnable(GL_TEXTURE_2D);
   Material *last_players_gst = 0;
@@ -422,7 +357,7 @@ void RaceGUI::drawPlayerIcons () {
         int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
         char str[256];
         sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-        widgetSet->drawDropShadowTextRace(str, 20, ICON_PLAYER_WIDHT+x, y+5, 
+        widgetSet->drawDropShadowTextRace(str, 30, ICON_PLAYER_WIDHT+x, y+5, 
            red, green, blue);
       }
 
@@ -849,13 +784,13 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
 
   glOrtho        ( 0, config->width, 0, config->height, 0, 100 ) ;
   switch (world->ready_set_go) {
-    case 2: widgetSet->drawTextRace ( "Ready!", 80, SCREEN_CENTERED_TEXT, 
+    case 2: widgetSet->drawTextRace ( "Ready!", 90, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 230, 170, 160 ) ;
             break;
-    case 1: widgetSet->drawTextRace ( "Set!", 80, SCREEN_CENTERED_TEXT, 
+    case 1: widgetSet->drawTextRace ( "Set!", 90, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 230, 230, 160 ) ;
             break;
-    case 0: widgetSet->drawTextRace ( "Go!", 80, SCREEN_CENTERED_TEXT, 
+    case 0: widgetSet->drawTextRace ( "Go!", 120, SCREEN_CENTERED_TEXT, 
 				  SCREEN_CENTERED_TEXT, 100, 210, 100 ) ;
             break;
   }   // switch
@@ -916,8 +851,6 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt) {
 			   split_screen_ratio_x, split_screen_ratio_y );
       drawLap             (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y );
-      drawScore           (raceSetup, player_kart, offset_x, offset_y,
-			   split_screen_ratio_x, split_screen_ratio_y ) ;
       drawEmergencyText   (player_kart, offset_x, offset_y,
 			   split_screen_ratio_x, split_screen_ratio_y ) ;
     }   // for pla
