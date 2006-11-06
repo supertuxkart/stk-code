@@ -22,15 +22,16 @@
 
 #include "base_gui.hpp"
 
-class TrackSel: public BaseGUI {
+class TrackSel: public BaseGUI
+{
 protected:
-  int   rect;
+    int   m_rect;
 public:
-	TrackSel();
-	~TrackSel();
+    TrackSel();
+    ~TrackSel();
 
-	void update(float dt);
-	void select();
+    void update(float dt);
+    void select();
 };
 
 #endif

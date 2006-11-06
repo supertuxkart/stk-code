@@ -25,10 +25,10 @@
 class Difficulty: public BaseGUI
 {
 public:
-	Difficulty();
-	~Difficulty();
-	
-	void select();
+    Difficulty();
+    ~Difficulty();
+
+    void select();
 };
 
 #endif

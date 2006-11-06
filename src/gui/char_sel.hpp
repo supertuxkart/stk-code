@@ -29,21 +29,21 @@ class ssgContext;
 class CharSel: public BaseGUI
 {
 private:
-    ssgContext* context;
-    ssgTransform* kart;
-    int current_kart;
-    int kart_name_label;
-    float clock;
+    ssgContext* m_context;
+    ssgTransform* m_kart;
+    int m_current_kart;
+    int m_kart_name_label;
+    float m_clock;
 
-	int playerIndex;
-	
+    int m_player_index;
+
 public:
-	CharSel(int whichPlayer);
-	~CharSel();
-	
-    void switch_to_character(int n);
-	void update(float dt);
-	void select();
+    CharSel(int which_player);
+    ~CharSel();
+
+    void switchCharacter(int n);
+    void update(float dt);
+    void select();
 };
 
 #endif

@@ -25,70 +25,70 @@
 
 enum MenuManagerIDs
 {
-  // menu
-  MENUID_MAINMENU,
-  MENUID_CHARSEL_P1,
-  MENUID_CHARSEL_P2,
-  MENUID_CHARSEL_P3,
-  MENUID_CHARSEL_P4,
-  MENUID_DIFFICULTY,
-  MENUID_GAMEMODE,
-  MENUID_RACERESULT,
-  MENUID_GRANDPRIXEND,
+    // menu
+    MENUID_MAINMENU,
+    MENUID_CHARSEL_P1,
+    MENUID_CHARSEL_P2,
+    MENUID_CHARSEL_P3,
+    MENUID_CHARSEL_P4,
+    MENUID_DIFFICULTY,
+    MENUID_GAMEMODE,
+    MENUID_RACERESULT,
+    MENUID_GRANDPRIXEND,
 #if 0 // no needed yet
-  MENUID_NEXTRACE,
+    MENUID_NEXTRACE,
 #endif
-  MENUID_RACEMENU,
-  MENUID_TRACKSEL,
-  MENUID_NUMLAPS,
-  MENUID_NUMPLAYERS,
-  MENUID_OPTIONS,
-  MENUID_EXITGAME,
-  MENUID_GRANDPRIXSELECT,
+    MENUID_RACEMENU,
+    MENUID_TRACKSEL,
+    MENUID_NUMLAPS,
+    MENUID_NUMPLAYERS,
+    MENUID_OPTIONS,
+    MENUID_EXITGAME,
+    MENUID_GRANDPRIXSELECT,
 
-  // menu configuration
-  MENUID_CONFIG_DISPLAY,
-  MENUID_CONFIG_SOUND,
-  MENUID_CONFIG_CONTROLS,
-  MENUID_CONFIG_P1,
-  MENUID_CONFIG_P2,
-  MENUID_CONFIG_P3,
-  MENUID_CONFIG_P4,
+    // menu configuration
+    MENUID_CONFIG_DISPLAY,
+    MENUID_CONFIG_SOUND,
+    MENUID_CONFIG_CONTROLS,
+    MENUID_CONFIG_P1,
+    MENUID_CONFIG_P2,
+    MENUID_CONFIG_P3,
+    MENUID_CONFIG_P4,
 
-  // help and credit menu
-  MENUID_HELP,
-  MENUID_CREDITS,
-  // race gui
-  MENUID_RACE,
+    // help and credit menu
+    MENUID_HELP,
+    MENUID_CREDITS,
+    // race gui
+    MENUID_RACE,
 };
 
 class MenuManager
 {
 public:
-  MenuManager();
-  virtual ~MenuManager();
+    MenuManager();
+    virtual ~MenuManager();
 
-  // general functions
-  void switchToGrandPrixEnding();
-  void switchToRace();
-  void switchToMainMenu();
+    // general functions
+    void switchToGrandPrixEnding();
+    void switchToRace();
+    void switchToMainMenu();
 
-  // use this function within menu classes
-  void pushMenu(MenuManagerIDs id);
-  void popMenu();
+    // use this function within menu classes
+    void pushMenu(MenuManagerIDs id);
+    void popMenu();
 
-  int getMenuStackSize() {return (int)m_menuStack.size();}
+    int getMenuStackSize() {return (int)m_menu_stack.size();}
 
-  bool isCurrentMenu(MenuManagerIDs id) {return (m_menuStack.back() == id);}
-  bool isSomewhereOnStack(MenuManagerIDs id);
-  BaseGUI* getCurrentMenu() {return m_currentMenu;}
+    bool isCurrentMenu(MenuManagerIDs id) {return (m_menu_stack.back() == id);}
+    bool isSomewhereOnStack(MenuManagerIDs id);
+    BaseGUI* getCurrentMenu() {return m_current_menu;}
 
-  void update();
+    void update();
 
 private:
-  std::vector<MenuManagerIDs> m_menuStack;
-  BaseGUI* m_currentMenu;
-  unsigned int m_handeldSize;
+    std::vector<MenuManagerIDs> m_menu_stack;
+    BaseGUI* m_current_menu;
+    unsigned int m_handled_size;
 };
 
 extern MenuManager* menu_manager;

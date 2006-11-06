@@ -28,94 +28,98 @@
 
 
 enum WidgetTokens {
-  WTOK_RETURN_RACE,
-  WTOK_OPTIONS,
-  WTOK_RESTART_RACE,
-  WTOK_SETUP_NEW_RACE,
-  WTOK_EXIT_RACE,
+    WTOK_RETURN_RACE,
+    WTOK_OPTIONS,
+    WTOK_RESTART_RACE,
+    WTOK_SETUP_NEW_RACE,
+    WTOK_EXIT_RACE,
 };
 
 RaceMenu::RaceMenu()
 {
-  menu_id = widgetSet -> vstack(0);
-  widgetSet -> label(menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
-	
-  int va = widgetSet -> varray(menu_id);
-  widgetSet -> start(va, "Return To Race",  GUI_MED, WTOK_RETURN_RACE, 0);
-  widgetSet -> state(va, "Options",         GUI_MED, WTOK_OPTIONS, 0);
-  widgetSet -> state(va, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
+    m_menu_id = widgetSet -> vstack(0);
+    widgetSet -> label(m_menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
 
-  if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE) {
-    widgetSet->state(va, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE, 0);
-  }
+    const int VA = widgetSet -> varray(m_menu_id);
+    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE, 0);
+    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS, 0);
+    widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
 
-  widgetSet -> state(va, "Exit Race",       GUI_MED, WTOK_EXIT_RACE, 0);
-	
-  widgetSet -> layout(menu_id, 0, 0);
+    if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE)
+    {
+        widgetSet->state(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE, 0);
+    }
+
+    widgetSet -> state(VA, "Exit Race",       GUI_MED, WTOK_EXIT_RACE, 0);
+
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
+//-----------------------------------------------------------------------------
 RaceMenu::~RaceMenu()
 {
-	widgetSet -> delete_widget(menu_id) ;
+    widgetSet -> delete_widget(m_menu_id) ;
 }
-	
+
 void RaceMenu::update(float dt)
 {
-	widgetSet -> timer(menu_id, dt) ;
-//	widgetSet -> blank();
-	widgetSet -> paint(menu_id) ;
+    widgetSet -> timer(m_menu_id, dt) ;
+    // widgetSet -> blank();
+    widgetSet -> paint(m_menu_id) ;
 }
 
+//-----------------------------------------------------------------------------
 void RaceMenu::select()
 {
-  int clicked_token = widgetSet->token(widgetSet->click());
-  if(clicked_token != WTOK_OPTIONS)
-	  widgetSet -> tgl_paused();
-	
-	switch (clicked_token)
-	{
-	case WTOK_RETURN_RACE:	
-                menu_manager->popMenu(); 
-                break;
+    int clicked_token = widgetSet->token(widgetSet->click());
+    if(clicked_token != WTOK_OPTIONS)
+        widgetSet -> tgl_paused();
 
-	case WTOK_SETUP_NEW_RACE:
-                race_manager->exit_race();
-                menu_manager->pushMenu(MENUID_DIFFICULTY);
-                break;
+    switch (clicked_token)
+    {
+    case WTOK_RETURN_RACE:
+        menu_manager->popMenu();
+        break;
 
-	case WTOK_RESTART_RACE:
-                menu_manager->popMenu(); 
-                world->restartRace();
-                break;
+    case WTOK_SETUP_NEW_RACE:
+        race_manager->exit_race();
+        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        break;
 
-	case WTOK_OPTIONS:
-                menu_manager->pushMenu(MENUID_OPTIONS);	
-                break;
+    case WTOK_RESTART_RACE:
+        menu_manager->popMenu();
+        world->restartRace();
+        break;
 
-	case WTOK_EXIT_RACE:	
-                race_manager->exit_race();
-                break;
-                
-	default:
-                break;
-	}
+    case WTOK_OPTIONS:
+        menu_manager->pushMenu(MENUID_OPTIONS);
+        break;
+
+    case WTOK_EXIT_RACE:
+        race_manager->exit_race();
+        break;
+
+    default:
+        break;
+    }
 }
 
+//-----------------------------------------------------------------------------
 void RaceMenu::inputKeyboard(int key, int pressed)
 {
-	switch ( key )
-	{
-	case SDLK_ESCAPE: //ESC
-                if(!pressed)
-                  break;
-		widgetSet -> tgl_paused();
-		menu_manager->popMenu();
-		break;
-		
-	default:
-		BaseGUI::inputKeyboard(key, pressed);
-		break;
-	}
+    switch ( key )
+    {
+    case SDLK_ESCAPE: //ESC
+        if(!pressed)
+            break;
+        widgetSet -> tgl_paused();
+        menu_manager->popMenu();
+        break;
+
+    default:
+        BaseGUI::inputKeyboard(key, pressed);
+        break;
+    }
 }
 
 

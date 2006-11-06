@@ -23,56 +23,60 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_GP,
-  WTOK_QUICKRACE,
-  WTOK_TIMETRIAL,
-  WTOK_BACK
+    WTOK_GP,
+    WTOK_QUICKRACE,
+    WTOK_TIMETRIAL,
+    WTOK_BACK
 };
 
-GameMode::GameMode() {
-  menu_id = widgetSet -> vstack(0);
-  
-  widgetSet -> label(menu_id, "Choose a Race Mode", GUI_LRG);
-  
-  int va = widgetSet -> varray(menu_id);
-  widgetSet -> space(menu_id);
-  widgetSet -> start(va, "Grand Prix",  GUI_MED, WTOK_GP);
-  widgetSet -> state(va, "Quick Race",  GUI_MED, WTOK_QUICKRACE);
-  
-  if (race_manager->getNumPlayers() == 1)
-    widgetSet -> state(va, "Time Trial",  GUI_MED, WTOK_TIMETRIAL);
-  
-  widgetSet -> space(va);
-  widgetSet -> state(va,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
-  widgetSet -> space(va);
-  widgetSet -> layout(menu_id, 0, 0);
+GameMode::GameMode()
+{
+    m_menu_id = widgetSet -> vstack(0);
+
+    widgetSet -> label(m_menu_id, "Choose a Race Mode", GUI_LRG);
+
+    const int VA = widgetSet -> varray(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> start(VA, "Grand Prix",  GUI_MED, WTOK_GP);
+    widgetSet -> state(VA, "Quick Race",  GUI_MED, WTOK_QUICKRACE);
+
+    if (race_manager->getNumPlayers() == 1)
+        widgetSet -> state(VA, "Time Trial",  GUI_MED, WTOK_TIMETRIAL);
+
+    widgetSet -> space(VA);
+    widgetSet -> state(VA,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> space(VA);
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
-GameMode::~GameMode() {
-	widgetSet -> delete_widget(menu_id) ;
+//-----------------------------------------------------------------------------
+GameMode::~GameMode()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
 }
-	
+
+//-----------------------------------------------------------------------------
 void GameMode::select()
 {
-	switch ( widgetSet -> token (widgetSet -> click()) )
-	{
-	case WTOK_GP:
-		 race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
-		 menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
-		 break;
-	case WTOK_QUICKRACE:
-		 race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
-		 menu_manager->pushMenu(MENUID_DIFFICULTY);
-		 break;
-	case WTOK_TIMETRIAL:
-		 race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);
-		 menu_manager->pushMenu(MENUID_CHARSEL_P1); //difficulty makes no sense here
-		 break;
-	case WTOK_BACK:
-                 menu_manager->popMenu();
-		 break;
-	default: break;
-	}
+    switch ( widgetSet -> token (widgetSet -> click()) )
+    {
+    case WTOK_GP:
+        race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
+        menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
+        break;
+    case WTOK_QUICKRACE:
+        race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
+        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        break;
+    case WTOK_TIMETRIAL:
+        race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1); //difficulty makes no sense here
+        break;
+    case WTOK_BACK:
+        menu_manager->popMenu();
+        break;
+    default: break;
+    }
 }
 
 

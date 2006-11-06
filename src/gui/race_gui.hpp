@@ -32,50 +32,53 @@
 #define MAX_ID1 16
 #define MAX_ID2 2
 
-typedef struct {
-  PlayerKart *kart;
-  KartActions action;
-} Entry;
+typedef struct
+{
+    PlayerKart *kart;
+    KartActions action;
+}
+Entry;
 
 class RaceSetup;
 
-class RaceGUI: public BaseGUI {
-  // A mapping for the assigned keys (like fire, ...) to
-  // the kart which is using them
-  Entry inputMap[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
+class RaceGUI: public BaseGUI
+{
+    // A mapping for the assigned keys (like fire, ...) to
+    // the kart which is using them
+    Entry m_input_map[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
 
-  float       timeOfLeader;
-  int         lapLeader;
+    float       m_time_of_leader;
+    int         m_lap_leader;
 
 public:
-       RaceGUI();
-       ~RaceGUI();
-  void update(float dt);
-  void select() {}
-  void input(InputType type, int id0, int id1, int id2, int value);
-  void handleKartAction(KartActions ka, int value);
+    RaceGUI();
+    ~RaceGUI();
+    void update(float dt);
+    void select() {}
+    void input(InputType type, int id0, int id1, int id2, int value);
+    void handleKartAction(KartActions ka, int value);
 
 private:
-    ulClock   fpsTimer;
-    int       fpsCounter;
-    char      fpsString[10];
-    double    time_left ;
-    char*     pos_string [11];
-    Material* SteeringWheelIcon;
-    Material* SpeedBackIcon;
-    Material* SpeedForeIcon;
+    ulClock   m_fps_timer;
+    int       m_fps_counter;
+    char      m_fps_string[10];
+    double    m_time_left ;
+    char*     m_pos_string [11];
+    Material* m_steering_wheel_icon;
+    Material* m_speed_back_icon;
+    Material* m_speed_fore_icon;
 
     /* Display informat on screen */
     void drawStatusText        (const RaceSetup& raceSetup, const float dt);
-    void drawEnergyMeter       (Kart *player_kart, 
-				int   offset_x, int   offset_y, 
-				float ratio_x,  float ratio_y  );
-    void drawCollectableIcons  (Kart* player_kart, 
-				int   offset_x, int   offset_y, 
-				float ratio_x,  float ratio_y  );
-    void drawEmergencyText     (Kart* player_kart, 
-				int   offset_x, int   offset_y, 
-				float ratio_x,  float ratio_y  );
+    void drawEnergyMeter       (Kart *player_kart,
+                                int   offset_x, int   offset_y,
+                                float ratio_x,  float ratio_y  );
+    void drawCollectableIcons  (Kart* player_kart,
+                                int   offset_x, int   offset_y,
+                                float ratio_x,  float ratio_y  );
+    void drawEmergencyText     (Kart* player_kart,
+                                int   offset_x, int   offset_y,
+                                float ratio_x,  float ratio_y  );
     void UpdateKeyboardMappings();
     void putEntry(PlayerKart *kart, KartActions ka);
     bool handleInput(InputType type, int id0, int id1, int id2, int value);
@@ -86,22 +89,22 @@ private:
     void drawMap               ();
     void drawTimer             ();
     void drawFPS               ();
-    
-  /* Text drawing */
-  /** Draw text to screen.
-      scale_x and scale_y could be used to a simple resize (e.g. for multiplayer
-      split screens, though, currently, we reduce fonts size to half).        */
+
+    /* Text drawing */
+    /** Draw text to screen.
+        scale_x and scale_y could be used to a simple resize (e.g. for multiplayer
+        split screens, though, currently, we reduce fonts size to half).        */
     void drawSteering             (Kart* kart, int offset_x, int offset_y,
-				   float ratio_x, float ratio_y           );
+                                   float ratio_x, float ratio_y           );
     void drawPosition             (Kart* kart, int offset_x, int offset_y,
-				   float ratio_x, float ratio_y           );
+                                   float ratio_x, float ratio_y           );
     void drawSpeed                (Kart* kart, int offset_x, int offset_y,
-				   float ratio_x, float ratio_y           );
+                                   float ratio_x, float ratio_y           );
     void drawLap                  (Kart* kart, int offset_x, int offset_y,
-				   float ratio_x, float ratio_y           );
+                                   float ratio_x, float ratio_y           );
 #if 0
     void drawTexture              (const GLuint texture, int w, int h, int red,
-				   int green, int blue, int x, int y);
+                                   int green, int blue, int x, int y);
 #endif
 };
 

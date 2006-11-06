@@ -24,16 +24,17 @@
 #include "base_gui.hpp"
 #include "cup_data.hpp"
 
-class GrandPrixSelect: public BaseGUI {
+class GrandPrixSelect: public BaseGUI
+{
 private:
-  std::vector<CupData*> allCups;
-  int rect;
+    std::vector<CupData*> m_all_cups;
+    int m_rect;
 public:
-  GrandPrixSelect();
-  ~GrandPrixSelect();
+    GrandPrixSelect();
+    ~GrandPrixSelect();
 
-  void update(float dt);
-  void select();
+    void update(float dt);
+    void select();
 };
 
 #endif

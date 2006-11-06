@@ -23,69 +23,83 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_MUSIC,
-  WTOK_SFX,
-  WTOK_BACK,
+    WTOK_MUSIC,
+    WTOK_SFX,
+    WTOK_BACK,
 };
 
-ConfigSound::ConfigSound() {
-  menu_id = widgetSet -> vstack(0);
-  widgetSet -> label(menu_id, "Sound Settings", GUI_LRG, GUI_ALL, 0, 0);
-  
-  int va = widgetSet -> varray(menu_id);
-  // The spaces are actually important, otherwise the set_label calls below
-  // will increase the width of the container, resulting in a warning being
-  // printed by widgetSet.
-  music_menu_id = widgetSet->start(va,"  Turn on music  ", GUI_MED, WTOK_MUSIC);
-  sfx_menu_id   = widgetSet->state(va,"  Turn on sound effects  ", GUI_MED, WTOK_SFX);
+ConfigSound::ConfigSound()
+{
+    m_menu_id = widgetSet -> vstack(0);
+    widgetSet -> label(m_menu_id, "Sound Settings", GUI_LRG, GUI_ALL, 0, 0);
 
-  if(config->music) widgetSet->set_label(music_menu_id, "Turn off music");
-  if(config->sfx) widgetSet->set_label(sfx_menu_id, "Turn off sound effects");
-  widgetSet -> space(va);
-  widgetSet -> state(va, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
-  widgetSet -> layout(menu_id, 0, 0);
+    const int VA = widgetSet -> varray(m_menu_id);
+    // The spaces are actually important, otherwise the set_label calls below
+    // will increase the width of the container, resulting in a warning being
+    // printed by widgetSet.
+    m_music_menu_id = widgetSet->start(VA,"  Turn on music  ", GUI_MED, WTOK_MUSIC);
+    m_sfx_menu_id   = widgetSet->state(VA,"  Turn on sound effects  ", GUI_MED, WTOK_SFX);
+
+    if(config->music) widgetSet->set_label(m_music_menu_id, "Turn off music");
+    if(config->sfx) widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
+    widgetSet -> space(VA);
+    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
-ConfigSound::~ConfigSound() {
-	widgetSet -> delete_widget(menu_id) ;
+//-----------------------------------------------------------------------------
+ConfigSound::~ConfigSound()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
 }
 
-void ConfigSound::update(float dt) {
-	widgetSet -> timer(menu_id, dt) ;
+//-----------------------------------------------------------------------------
+void ConfigSound::update(float dt)
+{
+    widgetSet -> timer(m_menu_id, dt) ;
 #if 0
-	// This menu can be triggered from the game, when it is paused
-	// so we have to check it and draw it as in pause
-	if(widgetSet -> get_paused()) widgetSet -> blank() ;
+    // This menu can be triggered from the game, when it is paused
+    // so we have to check it and draw it as in pause
+    if(widgetSet -> get_paused()) widgetSet -> blank() ;
 #endif
 
-	widgetSet -> paint(menu_id) ;
+    widgetSet -> paint(m_menu_id) ;
 }
 
-void ConfigSound::select() {
-  switch ( widgetSet -> token (widgetSet -> click()) ) {
-  case WTOK_MUSIC:
-    if(config->music) {
-      config->music = false;
-      widgetSet->set_label(music_menu_id, "Turn on music");
-    } else {
-      config->music = true;
-      widgetSet->set_label(music_menu_id, "Turn off music");
+//-----------------------------------------------------------------------------
+void ConfigSound::select()
+{
+    switch ( widgetSet -> token (widgetSet -> click()) )
+    {
+    case WTOK_MUSIC:
+        if(config->music)
+        {
+            config->music = false;
+            widgetSet->set_label(m_music_menu_id, "Turn on music");
+        }
+        else
+        {
+            config->music = true;
+            widgetSet->set_label(m_music_menu_id, "Turn off music");
+        }
+        break;
+    case WTOK_SFX:
+        if(config->sfx)
+        {
+            config->sfx = false;
+            widgetSet->set_label(m_sfx_menu_id, "Turn on sound effects");
+        }
+        else
+        {
+            config->sfx = true;
+            widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
+        }
+        break;
+    case WTOK_BACK:
+        menu_manager->popMenu();
+        break;
+    default: break;
     }
-    break;
-  case WTOK_SFX:
-    if(config->sfx) {
-      config->sfx = false;
-      widgetSet->set_label(sfx_menu_id, "Turn on sound effects");
-    } else {
-      config->sfx = true;
-      widgetSet->set_label(sfx_menu_id, "Turn off sound effects");
-    }
-    break;
-  case WTOK_BACK:
-    menu_manager->popMenu();
-    break;
-  default: break;
-	}
 }
 
 

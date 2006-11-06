@@ -27,95 +27,102 @@
 #include "race_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_CONTINUE,
-  WTOK_RESTART_RACE,
-  WTOK_SETUP_NEW_RACE,
+    WTOK_CONTINUE,
+    WTOK_RESTART_RACE,
+    WTOK_SETUP_NEW_RACE,
 };
 
 RaceResultsGUI::RaceResultsGUI()
 {
-    menu_id = widgetSet -> vstack(0);
+    m_menu_id = widgetSet -> vstack(0);
     const unsigned int MAX_STR_LEN = 60;
-    widgetSet -> label(menu_id, "Race results", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, "Race results", GUI_LRG, GUI_ALL, 0, 0);
 
-    unsigned int numKarts = world->getNumKarts();
-    int*  order;
-    score = new char[numKarts * MAX_STR_LEN];
-    order = new int [numKarts              ];
-    unsigned int maxNameLen = 1;
-    for(unsigned int i=0; i<numKarts; i++) {
-      Kart *k = world->getKart(i);
-      order[k->getPosition()-1] = i;
-      const std::string& s = k->getName();
-      unsigned int l = s.size();
-      if(l>maxNameLen) maxNameLen = l;
-    }   // for i
-    
-    for(unsigned int i = 0; i < numKarts; ++i)
+    const unsigned int NUM_KARTS = world->getNumKarts();
+    int*  order = new int [NUM_KARTS];
+    m_score = new char[NUM_KARTS * MAX_STR_LEN];
+    unsigned int max_name_len = 1;
+
+    for(unsigned int i=0; i < NUM_KARTS; i++)
     {
-      Kart *kart = world->getKart(order[i]);
-      const std::string& kartName = kart->getName();
-      char sTime[20];
-      if(i==numKarts-1) {
-	sprintf(sTime,"          ");
-      } else {
-	float t      = kart->getFinishTime();
-	int   mins   = (int) floor ( t / 60.0 ) ;
-	int   secs   = (int) floor ( t - (float) ( 60 * mins ) ) ;
-	int   tenths = (int) floor ( 10.0f * (t - (float)(secs + 60*mins)));
-	sprintf(sTime,"%3d:%02d.%01d", mins, secs, tenths);
-      }
-      //This shows position + driver name + time + points earned + total points
-      sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
-              kart->getPosition(), kartName.c_str(), sTime,
-              race_manager->getPositionScore(i+1),
-              race_manager->getKartScore(order[i]));
-      widgetSet -> label(menu_id, (char*)(score + MAX_STR_LEN * i), 
-			 GUI_MED, GUI_LFT, 0, 0);
+        Kart *k = world->getKart(i);
+        order[k->getPosition()-1] = i;
+        const std::string& s = k->getName();
+        unsigned int l = s.size();
+        if(l>max_name_len) max_name_len = l;
+    }   // for i
+
+    for(unsigned int i = 0; i < NUM_KARTS; ++i)
+    {
+        const Kart *KART = world->getKart(order[i]);
+        const std::string& KART_NAME = KART->getName();
+        char sTime[20];
+        if(i==NUM_KARTS-1)
+        {
+            sprintf(sTime,"          ");
+        }
+        else
+        {
+            const float T      = KART->getFinishTime();
+            const int   MINS   = (int) floor ( T / 60.0 ) ;
+            const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
+            const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
+            sprintf(sTime,"%3d:%02d.%01d", MINS, SECS, TENTHS);
+        }
+        //This shows position + driver name + time + points earned + total points
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
+                KART->getPosition(), KART_NAME.c_str(), sTime,
+                race_manager->getPositionScore(i+1),
+                race_manager->getKartScore(order[i]));
+        widgetSet -> label(m_menu_id, (char*)(m_score + MAX_STR_LEN * i),
+                           GUI_MED, GUI_LFT, 0, 0);
     }
 
     delete[] order;
-    widgetSet -> space(menu_id);
+    widgetSet -> space(m_menu_id);
 
-    int va = widgetSet -> varray(menu_id);
-    widgetSet -> start(va, "Continue",  GUI_MED, WTOK_CONTINUE);
-    widgetSet -> start(va, "Restart Race",  GUI_MED, WTOK_RESTART_RACE);
-    if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE) {
-      widgetSet -> start(va, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
+    const int VA = widgetSet -> varray(m_menu_id);
+    widgetSet -> start(VA, "Continue",  GUI_MED, WTOK_CONTINUE);
+    widgetSet -> start(VA, "Restart Race",  GUI_MED, WTOK_RESTART_RACE);
+    if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE)
+    {
+        widgetSet -> start(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
     }
-    
-    widgetSet -> layout(menu_id, 0, 1);
+
+    widgetSet -> layout(m_menu_id, 0, 1);
 }
 
+//-----------------------------------------------------------------------------
 RaceResultsGUI::~RaceResultsGUI()
 {
-    widgetSet -> delete_widget(menu_id) ;
-    delete[] score;
+    widgetSet -> delete_widget(m_menu_id) ;
+    delete[] m_score;
 }
 
+//-----------------------------------------------------------------------------
 void RaceResultsGUI::select()
 {
     switch( widgetSet->token( widgetSet->click() ) )
     {
-        case WTOK_CONTINUE:
-            widgetSet->tgl_paused();
-            race_manager->next();
-            break;
-        case WTOK_RESTART_RACE:
-            widgetSet->tgl_paused();
-            menu_manager->popMenu();
-            // TODO: Maybe let this go through the race_manager for
-            // more flexibility.
-            world->restartRace();
-            break;
-        case WTOK_SETUP_NEW_RACE:
-            widgetSet->tgl_paused();
-            race_manager->exit_race();
-            menu_manager->pushMenu(MENUID_DIFFICULTY);
-            break;
+    case WTOK_CONTINUE:
+        widgetSet->tgl_paused();
+        race_manager->next();
+        break;
+    case WTOK_RESTART_RACE:
+        widgetSet->tgl_paused();
+        menu_manager->popMenu();
+        // TODO: Maybe let this go through the race_manager for
+        // more flexibility.
+        world->restartRace();
+        break;
+    case WTOK_SETUP_NEW_RACE:
+        widgetSet->tgl_paused();
+        race_manager->exit_race();
+        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 /* EOF */

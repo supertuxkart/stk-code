@@ -22,66 +22,72 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_CONTROLS,
-  WTOK_DISPLAY,
-  WTOK_SOUND,
-  WTOK_BACK,
+    WTOK_CONTROLS,
+    WTOK_DISPLAY,
+    WTOK_SOUND,
+    WTOK_BACK,
 };
 
 Options::Options()
 {
-	menu_id = widgetSet -> varray(0);
+    m_menu_id = widgetSet -> varray(0);
 
-	widgetSet -> space(menu_id);
-	widgetSet -> space(menu_id);
-	widgetSet -> label(menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
-	widgetSet -> start(menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
-	// Don't display the fullscreen menu when called from within the race.
-	// The fullscreen mode will reload all textures, reload the models,
-	// ... basically creating a big mess!!  (and all of this only thanks
-	// to windows, who discards all textures, ...)
-	if(!menu_manager->isSomewhereOnStack(MENUID_RACE)) {
-	  widgetSet -> state(menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
-	}
-	widgetSet -> state(menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);
-	widgetSet -> space(menu_id);
-	widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
-	
-	widgetSet -> layout(menu_id, 0, 0);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> label(m_menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> start(m_menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
+    // Don't display the fullscreen menu when called from within the race.
+    // The fullscreen mode will reload all textures, reload the models,
+    // ... basically creating a big mess!!  (and all of this only thanks
+    // to windows, who discards all textures, ...)
+    if(!menu_manager->isSomewhereOnStack(MENUID_RACE))
+    {
+        widgetSet -> state(m_menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
+    }
+    widgetSet -> state(m_menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
+// -----------------------------------------------------------------------------
 Options::~Options()
 {
-	widgetSet -> delete_widget(menu_id) ;
-}
-	
-void Options::update(float dt)
-{
-	widgetSet -> timer(menu_id, dt) ;
-#if 0
-  // This menu can be triggered from the game, when it is paused
-  // so we have to check it and draw it as in pause
-  if(widgetSet -> get_paused())
-    widgetSet -> blank() ;
-#endif
-  widgetSet -> paint(menu_id) ;
+    widgetSet -> delete_widget(m_menu_id) ;
 }
 
-void Options::select() {
-  switch ( widgetSet -> token (widgetSet -> click()) ) 	{
+// -----------------------------------------------------------------------------
+void Options::update(float dt)
+{
+    widgetSet -> timer(m_menu_id, dt) ;
+#if 0
+    // This menu can be triggered from the game, when it is paused
+    // so we have to check it and draw it as in pause
+    if(widgetSet -> get_paused())
+        widgetSet -> blank() ;
+#endif
+    widgetSet -> paint(m_menu_id) ;
+}
+
+// -----------------------------------------------------------------------------
+void Options::select()
+{
+    switch ( widgetSet -> token (widgetSet -> click()) )
+    {
     case WTOK_CONTROLS:
-      menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);
-      break;
+        menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);
+        break;
     case WTOK_DISPLAY:
-      menu_manager->pushMenu(MENUID_CONFIG_DISPLAY);
-      break;
+        menu_manager->pushMenu(MENUID_CONFIG_DISPLAY);
+        break;
     case WTOK_SOUND:
-      menu_manager->pushMenu(MENUID_CONFIG_SOUND);
-      break;
+        menu_manager->pushMenu(MENUID_CONFIG_SOUND);
+        break;
     case WTOK_BACK:
-      menu_manager->popMenu();
-      break;
+        menu_manager->popMenu();
+        break;
     default:
-      break;
-  }  // switch
+        break;
+    }  // switch
 }

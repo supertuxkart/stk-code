@@ -36,7 +36,7 @@ class Collectable {
                   Collectable  (Kart* kart_);
   void            set          (collectableType _type, int n=1);
   void            clear        () {type=COLLECT_NOTHING; number=0;}
-  int             getNum       () {return number;}
+  int             getNum       () const {return number;}
   collectableType getType      () {return type;}
   void            hitRedHerring(int n);
   Material*       getIcon      ();

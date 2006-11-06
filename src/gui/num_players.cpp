@@ -23,47 +23,50 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_PLAYER_2= 2,
-  WTOK_PLAYER_3,
-  WTOK_PLAYER_4,
-  WTOK_BACK
+    WTOK_PLAYER_2 = 2,
+    WTOK_PLAYER_3,
+    WTOK_PLAYER_4,
+    WTOK_BACK
 };
 
 NumPlayers::NumPlayers()
 {
-  menu_id = widgetSet -> varray(0);
-  widgetSet -> space(menu_id);
-  widgetSet -> start(menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2);
-  widgetSet -> state(menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3);
-  widgetSet -> state(menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4);
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
-  widgetSet -> space(menu_id);
+    m_menu_id = widgetSet -> varray(0);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> start(m_menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2);
+    widgetSet -> state(m_menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3);
+    widgetSet -> state(m_menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> space(m_menu_id);
 
-  widgetSet -> layout(menu_id, 0, 0);
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
+// -----------------------------------------------------------------------------
 NumPlayers::~NumPlayers()
 {
-  widgetSet -> delete_widget(menu_id) ;
+    widgetSet -> delete_widget(m_menu_id) ;
 }
 
+// -----------------------------------------------------------------------------
 void NumPlayers::select()
 {
-  int clicked_id= widgetSet -> token (widgetSet -> click());
-  switch (clicked_id) {
+    const int CLICKED_ID = widgetSet -> token (widgetSet -> click());
+    switch (CLICKED_ID)
+    {
     case WTOK_PLAYER_2:
     case WTOK_PLAYER_3:
     case WTOK_PLAYER_4:
-      race_manager->setNumPlayers(clicked_id);
-      menu_manager->pushMenu(MENUID_GAMEMODE);
-      break;
+        race_manager->setNumPlayers(CLICKED_ID);
+        menu_manager->pushMenu(MENUID_GAMEMODE);
+        break;
     case WTOK_BACK:
-      menu_manager->popMenu();
-      break;
+        menu_manager->popMenu();
+        break;
     default:
-      break;
-  }
+        break;
+    }
 }
 
 

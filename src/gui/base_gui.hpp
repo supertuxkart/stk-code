@@ -25,17 +25,17 @@
 class BaseGUI
 {
 public:
-	BaseGUI() {}
-	virtual ~BaseGUI() {}
+    BaseGUI() {}
+    virtual ~BaseGUI() {}
 
-	virtual void update(float dt);
-	virtual void select() = 0;
+    virtual void update(float dt);
+    virtual void select() = 0;
 
-        virtual void input(InputType type, int id0, int id1, int id2, int value);
-	virtual void inputKeyboard(int key, int pressed);
+    virtual void input(InputType type, int id0, int id1, int id2, int value);
+    virtual void inputKeyboard(int key, int pressed);
 
 protected:
-	int menu_id;
+    int m_menu_id;
 };
 
 #endif // HEADER_BASEGUI_H

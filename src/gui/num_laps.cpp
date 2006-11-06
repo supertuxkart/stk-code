@@ -23,41 +23,47 @@
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
 
-NumLaps::NumLaps() {
-  menu_id = widgetSet -> varray(0);
+NumLaps::NumLaps()
+{
+    m_menu_id = widgetSet -> varray(0);
 
-  widgetSet -> space(menu_id);
-  widgetSet -> space(menu_id);
-  widgetSet -> space(menu_id);
-  widgetSet -> label(menu_id, "Choose number of laps",  GUI_LRG   );
+    widgetSet -> space(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> label(m_menu_id, "Choose number of laps",  GUI_LRG   );
 
-  widgetSet -> start(menu_id, "One",                    GUI_MED,  1);
-  widgetSet -> state(menu_id, "Two",                    GUI_MED,  2);
-  widgetSet -> state(menu_id, "Four",                   GUI_MED,  4);
-  widgetSet -> state(menu_id, "Five",                   GUI_MED,  5);
-  widgetSet -> state(menu_id, "Six",                    GUI_MED,  6);
-  widgetSet -> state(menu_id, "Eight",                  GUI_MED,  8);
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id, "Press <ESC> to go back", GUI_SML, -1);
-  widgetSet -> space(menu_id);
+    widgetSet -> start(m_menu_id, "One",                    GUI_MED,  1);
+    widgetSet -> state(m_menu_id, "Two",                    GUI_MED,  2);
+    widgetSet -> state(m_menu_id, "Four",                   GUI_MED,  4);
+    widgetSet -> state(m_menu_id, "Five",                   GUI_MED,  5);
+    widgetSet -> state(m_menu_id, "Six",                    GUI_MED,  6);
+    widgetSet -> state(m_menu_id, "Eight",                  GUI_MED,  8);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id, "Press <ESC> to go back", GUI_SML, -1);
+    widgetSet -> space(m_menu_id);
 
-  widgetSet -> layout(menu_id, 0, 0);
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
 // -----------------------------------------------------------------------------
-NumLaps::~NumLaps() {
-  widgetSet -> delete_widget(menu_id) ;
+NumLaps::~NumLaps()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
 }   // ~NumLaps
 
 // -----------------------------------------------------------------------------
-void NumLaps::select() {
-  int n = widgetSet->token(widgetSet->click() );
-  if(n==-1) {
-    menu_manager->popMenu();
-  } else {
-    race_manager->setNumLaps(n);
-    startScreen->switchToGame();
-  }
+void NumLaps::select()
+{
+    const int N = widgetSet->token(widgetSet->click() );
+    if(N==-1)
+    {
+        menu_manager->popMenu();
+    }
+    else
+    {
+        race_manager->setNumLaps(N);
+        startScreen->switchToGame();
+    }
 }   // select
 
 

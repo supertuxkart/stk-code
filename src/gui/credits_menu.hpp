@@ -27,16 +27,17 @@
 #include "player.hpp"
 
 
-class CreditsMenu: public ScrolledText {
+class CreditsMenu: public ScrolledText
+{
 protected:
-  int        xLeft, xRight, yBottom, yTop;
-  float      yPos, ySpeed;
-  int        numberOfLines;
-  int        fontSize;
-  StringList sl;
+    int        m_xLeft, m_xRight, m_yBottom, m_yTop;
+    float      m_yPos, m_ySpeed;
+    int        m_numberOfLines;
+    int        m_fontSize;
+    StringList m_string_list;
 public:
-       CreditsMenu();
-      ~CreditsMenu();
+    CreditsMenu();
+    ~CreditsMenu();
 };
 
 #endif

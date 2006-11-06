@@ -25,11 +25,11 @@
 class MainMenu: public BaseGUI
 {
 public:
-	MainMenu();
-	~MainMenu();
+    MainMenu();
+    ~MainMenu();
 
-	void select();
-	void inputKeyboard(int key, int pressed);
+    void select();
+    void inputKeyboard(int key, int pressed);
 };
 
 #endif

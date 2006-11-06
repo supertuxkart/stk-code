@@ -25,10 +25,10 @@
 class GameMode: public BaseGUI
 {
 public:
-	GameMode();
-	~GameMode();
-	
-	void select();
+    GameMode();
+    ~GameMode();
+
+    void select();
 };
 
 #endif

@@ -25,11 +25,11 @@
 class Options: public BaseGUI
 {
 public:
-	Options();
-	~Options();
-	
-	void update(float dt);
-	void select();
+    Options();
+    ~Options();
+
+    void update(float dt);
+    void select();
 };
 
 #endif

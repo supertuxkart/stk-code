@@ -25,15 +25,15 @@
 class ConfigSound: public BaseGUI
 {
 public:
-	ConfigSound();
-	~ConfigSound();
+    ConfigSound();
+    ~ConfigSound();
 
     void update(float dt);
-	void select();
+    void select();
 
 private:
-  int music_menu_id;
-  int sfx_menu_id;
+    int m_music_menu_id;
+    int m_sfx_menu_id;
 };
 
 #endif

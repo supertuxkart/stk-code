@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: help_menu.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -24,13 +24,14 @@
 #include "base_gui.hpp"
 #include "player.hpp"
 
-class HelpMenu: public BaseGUI {
+class HelpMenu: public BaseGUI
+{
 protected:
-  std::string allKeys[KC_FIRE+1];
+    std::string m_all_keys[KC_FIRE+1];
 public:
-       HelpMenu();
-      ~HelpMenu();
-  void select  ();
+    HelpMenu();
+    ~HelpMenu();
+    void select ();
 };
 
 #endif

@@ -25,10 +25,10 @@
 class NumPlayers: public BaseGUI
 {
 public:
-	NumPlayers();
-	~NumPlayers();
+    NumPlayers();
+    ~NumPlayers();
 
-	void select();
+    void select();
 };
 
 #endif

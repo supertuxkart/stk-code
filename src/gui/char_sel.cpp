@@ -34,156 +34,162 @@
 #include "material.hpp"
 
 CharSel::CharSel(int whichPlayer)
-  : kart(0), playerIndex(whichPlayer) {
+        : m_kart(0), m_player_index(whichPlayer)
+{
     // for some strange reasons plib calls makeCurrent() in ssgContextf
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
-	context = new ssgContext;
+    m_context = new ssgContext;
     oldContext->makeCurrent();
 
-    menu_id = widgetSet -> vstack(0);
+    m_menu_id = widgetSet -> vstack(0);
 
     std::ostringstream tmp;
     //FIXME: when a long string is used, like the previous one which was
     //"Player #, choose a character" the output gets corrupted.
-    tmp << "Player " << playerIndex + 1 << ", choose a driver";
+    tmp << "Player " << m_player_index + 1 << ", choose a driver";
     // Due to widgetSet constraints, this must be static!
-    static std::string heading;
-    heading = tmp.str();
-    widgetSet -> label(menu_id, heading.c_str(), GUI_LRG, GUI_ALL, 0, 0);
-	widgetSet -> space(menu_id);
+    static const std::string HEADING = tmp.str();
+    widgetSet -> label(m_menu_id, HEADING.c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> space(m_menu_id);
 
-	int ha = widgetSet -> harray(menu_id);
-	widgetSet -> filler(ha);
-	int va = widgetSet -> varray(ha);
+    const int HA = widgetSet -> harray(m_menu_id);
+    widgetSet -> filler(HA);
+    const int VA = widgetSet -> varray(HA);
 
-	int icon_size = 64;
+    const int ICON_SIZE = 64;
 
-	int row1 = widgetSet -> harray(va);
-	
-	for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++) {
-	  const KartProperties* kp= kart_properties_manager->getKartById(i);
-	  Material *m = material_manager->getMaterial(kp->getIconFile());
-	  int c = widgetSet->image(row1, m->getState()->getTextureHandle(), 
-				   icon_size, icon_size);
-	  widgetSet->activate_widget(c, i, 0);
+    const int ROWL = widgetSet -> harray(VA);
 
-          if (config->player[whichPlayer].getLastKartId() == i)
-            widgetSet->set_active(c);
-//          else if (NULL == kart_properties_manager->getKartById(i + 1)) // last in the list
-//	    widgetSet->set_active(c);
-	}
-	widgetSet -> filler(ha);
-	kart_name_label = widgetSet -> label(menu_id, "No driver choosed", 
-					     GUI_MED, GUI_ALL, 0, 0);
-	widgetSet -> layout(menu_id, 0, 1);
+    for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
+    {
+        const KartProperties* kp= kart_properties_manager->getKartById(i);
+        Material *m = material_manager->getMaterial(kp->getIconFile());
+        const int C = widgetSet->image(ROWL, m->getState()->getTextureHandle(),
+                                 ICON_SIZE, ICON_SIZE);
+        widgetSet->activate_widget(C, i, 0);
 
-	current_kart = -1;
-	switch_to_character(3);
+        if (config->player[whichPlayer].getLastKartId() == i)
+            widgetSet->set_active(C);
+        //          else if (NULL == kart_properties_manager->getKartById(i + 1)) // last in the list
+        //     widgetSet->set_active(C);
+    }
+    widgetSet -> filler(HA);
+    m_kart_name_label = widgetSet -> label(m_menu_id, "No driver choosed",
+                                         GUI_MED, GUI_ALL, 0, 0);
+    widgetSet -> layout(m_menu_id, 0, 1);
 
-	clock = 0;
-	//test
+    m_current_kart = -1;
+    switchCharacter(3);
+
+    m_clock = 0;
+    //test
 
 }
 
-CharSel::~CharSel() {
-  widgetSet -> delete_widget(menu_id) ;
-  ssgDeRefDelete(kart);
-  
-  delete context;
-}
-
-void CharSel::switch_to_character(int n)
+//-----------------------------------------------------------------------------
+CharSel::~CharSel()
 {
-	const KartProperties* kp= kart_properties_manager->getKartById(n);
-	if (current_kart != n && kp != NULL)
-	{
-        widgetSet -> set_label(kart_name_label, kp->getName().c_str());
+    widgetSet -> delete_widget(m_menu_id) ;
+    ssgDeRefDelete(m_kart);
 
-		current_kart = n;
-        ssgDeRefDelete(kart);
-		kart = new ssgTransform;
-		kart->ref();
-		ssgEntity* kartentity = kp->getModel();
-
-		kart->addKid(kartentity);
-
-		preProcessObj ( kart, 0 );
-	}
+    delete m_context;
 }
 
+//-----------------------------------------------------------------------------
+void CharSel::switchCharacter(int n)
+{
+    const KartProperties* kp= kart_properties_manager->getKartById(n);
+    if (m_current_kart != n && kp != NULL)
+    {
+        widgetSet -> set_label(m_kart_name_label, kp->getName().c_str());
+
+        m_current_kart = n;
+        ssgDeRefDelete(m_kart);
+        m_kart = new ssgTransform;
+        m_kart->ref();
+        ssgEntity* kartentity = kp->getModel();
+
+        m_kart->addKid(kartentity);
+
+        preProcessObj ( m_kart, 0 );
+    }
+}
+
+//-----------------------------------------------------------------------------
 void CharSel::update(float dt)
 {
-	clock += dt * 40.0f;
-	BaseGUI::update(dt);
+    m_clock += dt * 40.0f;
+    BaseGUI::update(dt);
 
-	switch_to_character(widgetSet->token(widgetSet->click()));
+    switchCharacter(widgetSet->token(widgetSet->click()));
 
-	if (kart != NULL)
-	{
+    if (m_kart != NULL)
+    {
         ssgContext* oldContext = ssgGetCurrentContext();
-        context -> makeCurrent();
+        m_context -> makeCurrent();
 
-		glClear(GL_DEPTH_BUFFER_BIT);
-		// FIXME: A bit hackish...
-		glViewport ( 0, 0, 800, 320);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        // FIXME: A bit hackish...
+        glViewport ( 0, 0, 800, 320);
 
-		context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
-		context -> setNearFar ( 0.05f, 1000.0f ) ;
+        m_context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
+        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
 
-		sgCoord cam_pos;
-		sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
-		context -> setCamera ( &cam_pos ) ;
+        sgCoord cam_pos;
+        sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+        m_context -> setCamera ( &cam_pos ) ;
 
-		glEnable (GL_DEPTH_TEST);
-		sgCoord trans;
-		sgSetCoord(&trans, 0, 3, -.4f, clock, 0, 0);
-		kart->setTransform (&trans) ;
-		//glShadeModel(GL_SMOOTH);
-		ssgCullAndDraw ( kart ) ;
-		glViewport ( 0, 0, config->width, config->height ) ;
+        glEnable (GL_DEPTH_TEST);
+        sgCoord trans;
+        sgSetCoord(&trans, 0, 3, -.4f, m_clock, 0, 0);
+        m_kart->setTransform (&trans) ;
+        //glShadeModel(GL_SMOOTH);
+        ssgCullAndDraw ( m_kart ) ;
+        glViewport ( 0, 0, config->width, config->height ) ;
 
-		glDisable (GL_DEPTH_TEST);
+        glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
-	}
+    }
 }
 
+//----------------------------------------------------------------------------
 void CharSel::select()
 {
-	int token = widgetSet -> token (widgetSet -> click());
-	const KartProperties* kp= kart_properties_manager->getKartById(token);
-	if (kp != NULL)
-	{
-	  race_manager->setPlayerKart(playerIndex, kp->getIdent());
-	  config->player[playerIndex].setLastKartId(token);
-	}
-
-	if (race_manager->getNumPlayers() > 1)
-	{
-		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
-		{
-			menu_manager->pushMenu(MENUID_CHARSEL_P2);
-			return;
-		}
+    const int TOKEN = widgetSet -> token (widgetSet -> click());
+    const KartProperties* KP = kart_properties_manager->getKartById(TOKEN);
+    if (KP != NULL)
+    {
+        race_manager->setPlayerKart(m_player_index, KP->getIdent());
+        config->player[m_player_index].setLastKartId(TOKEN);
     }
 
-	if (race_manager->getNumPlayers() > 2)
-	{
-		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
-		{
-			menu_manager->pushMenu(MENUID_CHARSEL_P3);
-			return;
-		}
+    if (race_manager->getNumPlayers() > 1)
+    {
+        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
+        {
+            menu_manager->pushMenu(MENUID_CHARSEL_P2);
+            return;
+        }
     }
 
-	if (race_manager->getNumPlayers() > 3)
-	{
-		if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
-		{
-			menu_manager->pushMenu(MENUID_CHARSEL_P4);
-			return;
-		}
-	}
+    if (race_manager->getNumPlayers() > 2)
+    {
+        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
+        {
+            menu_manager->pushMenu(MENUID_CHARSEL_P3);
+            return;
+        }
+    }
+
+    if (race_manager->getNumPlayers() > 3)
+    {
+        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
+        {
+            menu_manager->pushMenu(MENUID_CHARSEL_P4);
+            return;
+        }
+    }
 
     if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
         menu_manager->pushMenu(MENUID_TRACKSEL);

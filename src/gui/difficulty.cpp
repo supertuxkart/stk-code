@@ -23,54 +23,58 @@
 #include "menu_manager.hpp"
 
 enum WidgetTokens {
-  WTOK_HARD,
-  WTOK_MEDIUM,
-  WTOK_EASY,
-  WTOK_BACK
+    WTOK_HARD,
+    WTOK_MEDIUM,
+    WTOK_EASY,
+    WTOK_BACK
 };
 
-Difficulty::Difficulty() {
-  menu_id = widgetSet -> vstack(0);
+Difficulty::Difficulty()
+{
+    m_menu_id = widgetSet -> vstack(0);
 
-  widgetSet -> label(menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
-  
-  int va = widgetSet -> varray(menu_id);
-  widgetSet -> space(menu_id);
-  widgetSet -> space(menu_id);
-  widgetSet -> state(va, "Racer",  GUI_MED, WTOK_HARD, 0);
-  widgetSet -> state(va, "Driver", GUI_MED, WTOK_MEDIUM, 0);
-  widgetSet -> start(va, "Novice", GUI_MED, WTOK_EASY, 0);
-  widgetSet -> space(va);
-  widgetSet -> state(va, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+    widgetSet -> label(m_menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
 
-  widgetSet -> layout(menu_id, 0, 0);
+    const int VA = widgetSet -> varray(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> space(m_menu_id);
+    widgetSet -> state(VA, "Racer",  GUI_MED, WTOK_HARD, 0);
+    widgetSet -> state(VA, "Driver", GUI_MED, WTOK_MEDIUM, 0);
+    widgetSet -> start(VA, "Novice", GUI_MED, WTOK_EASY, 0);
+    widgetSet -> space(VA);
+    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+
+    widgetSet -> layout(m_menu_id, 0, 0);
 }   // Difficulty
 
-// -----------------------------------------------------------------------------
-Difficulty::~Difficulty() {
-	widgetSet -> delete_widget(menu_id) ;
+//-----------------------------------------------------------------------------
+Difficulty::~Difficulty()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
 }   // ~Difficulty
-	
-// -----------------------------------------------------------------------------
-void Difficulty::select() {
-  switch ( widgetSet -> token (widgetSet -> click()) ) {
+
+//-----------------------------------------------------------------------------
+void Difficulty::select()
+{
+    switch ( widgetSet -> token (widgetSet -> click()) )
+    {
     case WTOK_EASY:
-      race_manager->setDifficulty(RD_EASY);
-	  	menu_manager->pushMenu(MENUID_CHARSEL_P1);
-      break;
+        race_manager->setDifficulty(RD_EASY);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        break;
     case WTOK_MEDIUM:
-      race_manager->setDifficulty(RD_MEDIUM);
-      menu_manager->pushMenu(MENUID_CHARSEL_P1);
-      break;
+        race_manager->setDifficulty(RD_MEDIUM);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        break;
     case WTOK_HARD:
-      race_manager->setDifficulty(RD_HARD);
-      menu_manager->pushMenu(MENUID_CHARSEL_P1);
-      break;
+        race_manager->setDifficulty(RD_HARD);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        break;
     case WTOK_BACK:
-      menu_manager->popMenu();
-      break;
+        menu_manager->popMenu();
+        break;
     default: break;
-  }   // switch
+    }   // switch
 }   // select
 
 

@@ -46,164 +46,166 @@
 
 MenuManager* menu_manager= new MenuManager();
 
-MenuManager::MenuManager() 
+MenuManager::MenuManager()
 {
-  m_currentMenu= NULL;
-  m_handeldSize= 0;
+    m_current_menu= NULL;
+    m_handled_size= 0;
 }
 
-// -----------------------------------------------------------------------------
-MenuManager::~MenuManager() 
+//-----------------------------------------------------------------------------
+MenuManager::~MenuManager()
 {
-  delete m_currentMenu;
+    delete m_current_menu;
 }
 
-// -----------------------------------------------------------------------------
-void MenuManager::pushMenu(MenuManagerIDs id) 
+//-----------------------------------------------------------------------------
+void MenuManager::pushMenu(MenuManagerIDs id)
 {
-  m_menuStack.push_back(id);
+    m_menu_stack.push_back(id);
 }
 
-// -----------------------------------------------------------------------------
-void MenuManager::popMenu() 
+//-----------------------------------------------------------------------------
+void MenuManager::popMenu()
 {
-  m_menuStack.pop_back();
+    m_menu_stack.pop_back();
 }
 
-// -----------------------------------------------------------------------------
-void MenuManager::update() 
+//-----------------------------------------------------------------------------
+void MenuManager::update()
 {
 
-  if (m_handeldSize != m_menuStack.size()) 
-  {
-    delete m_currentMenu;
-    m_currentMenu= NULL;
-
-    m_handeldSize= m_menuStack.size();
-    if (m_handeldSize > 0) 
+    if (m_handled_size != m_menu_stack.size())
     {
-      MenuManagerIDs id= m_menuStack.back();
-      switch (id) {
-        case MENUID_MAINMENU:
-          m_currentMenu= new MainMenu();
-          break;
-        case MENUID_CHARSEL_P1:
-        case MENUID_CHARSEL_P2:
-        case MENUID_CHARSEL_P3:
-        case MENUID_CHARSEL_P4:
-          m_currentMenu= new CharSel(id - MENUID_CHARSEL_P1);
-          break;
-        case MENUID_DIFFICULTY:
-          m_currentMenu= new Difficulty();
-          break;
-        case MENUID_GAMEMODE:
-          m_currentMenu= new GameMode();
-          break;
-        case MENUID_OPTIONS:
-          m_currentMenu= new Options();
-          break;
-        case MENUID_TRACKSEL:
-          m_currentMenu= new TrackSel();
-          break;
-        case MENUID_NUMLAPS:
-          m_currentMenu= new NumLaps();
-          break;
-        case MENUID_NUMPLAYERS:
-          m_currentMenu= new NumPlayers();
-          break;
-        case MENUID_RACE:
-          m_currentMenu= new RaceGUI();
-          break;
-        case MENUID_RACERESULT:
-          m_currentMenu= new RaceResultsGUI();
-          break;
-        case MENUID_GRANDPRIXEND:
-          m_currentMenu= new GrandPrixEnd();
-          break;
-        case MENUID_GRANDPRIXSELECT:
-          m_currentMenu= new GrandPrixSelect();
-          break;
+        delete m_current_menu;
+        m_current_menu= NULL;
+
+        m_handled_size= m_menu_stack.size();
+        if (m_handled_size > 0)
+        {
+            MenuManagerIDs id= m_menu_stack.back();
+            switch (id)
+            {
+            case MENUID_MAINMENU:
+                m_current_menu= new MainMenu();
+                break;
+            case MENUID_CHARSEL_P1:
+            case MENUID_CHARSEL_P2:
+            case MENUID_CHARSEL_P3:
+            case MENUID_CHARSEL_P4:
+                m_current_menu= new CharSel(id - MENUID_CHARSEL_P1);
+                break;
+            case MENUID_DIFFICULTY:
+                m_current_menu= new Difficulty();
+                break;
+            case MENUID_GAMEMODE:
+                m_current_menu= new GameMode();
+                break;
+            case MENUID_OPTIONS:
+                m_current_menu= new Options();
+                break;
+            case MENUID_TRACKSEL:
+                m_current_menu= new TrackSel();
+                break;
+            case MENUID_NUMLAPS:
+                m_current_menu= new NumLaps();
+                break;
+            case MENUID_NUMPLAYERS:
+                m_current_menu= new NumPlayers();
+                break;
+            case MENUID_RACE:
+                m_current_menu= new RaceGUI();
+                break;
+            case MENUID_RACERESULT:
+                m_current_menu= new RaceResultsGUI();
+                break;
+            case MENUID_GRANDPRIXEND:
+                m_current_menu= new GrandPrixEnd();
+                break;
+            case MENUID_GRANDPRIXSELECT:
+                m_current_menu= new GrandPrixSelect();
+                break;
 #if 0
-        case MENUID_NEXTRACE:
-          race_manager->next();
-          break;
+            case MENUID_NEXTRACE:
+                race_manager->next();
+                break;
 #endif
-        case MENUID_RACEMENU:
-          m_currentMenu= new RaceMenu();
-          break;
-        case MENUID_EXITGAME:
-          m_menuStack.clear();
-          screen_manager->abort();
-          break;
+            case MENUID_RACEMENU:
+                m_current_menu= new RaceMenu();
+                break;
+            case MENUID_EXITGAME:
+                m_menu_stack.clear();
+                screen_manager->abort();
+                break;
 
-        case MENUID_CONFIG_CONTROLS:
-          m_currentMenu= new ConfigControls();
-          break;
-        case MENUID_CONFIG_P1:
-        case MENUID_CONFIG_P2:
-        case MENUID_CONFIG_P3:
-        case MENUID_CONFIG_P4:
-          m_currentMenu= new PlayerControls(id - MENUID_CONFIG_P1);
-          break;
-        case MENUID_CONFIG_DISPLAY:
-          m_currentMenu= new ConfigDisplay();
-          break;
-        case MENUID_CONFIG_SOUND:
-          m_currentMenu= new ConfigSound();
-          break;
-        case MENUID_HELP:
-          m_currentMenu = new HelpMenu();
-	  break;
-        case MENUID_CREDITS:
-          m_currentMenu = new CreditsMenu();
-	  break;
-        default:
-          break;
-      }   // switch
+            case MENUID_CONFIG_CONTROLS:
+                m_current_menu= new ConfigControls();
+                break;
+            case MENUID_CONFIG_P1:
+            case MENUID_CONFIG_P2:
+            case MENUID_CONFIG_P3:
+            case MENUID_CONFIG_P4:
+                m_current_menu= new PlayerControls(id - MENUID_CONFIG_P1);
+                break;
+            case MENUID_CONFIG_DISPLAY:
+                m_current_menu= new ConfigDisplay();
+                break;
+            case MENUID_CONFIG_SOUND:
+                m_current_menu= new ConfigSound();
+                break;
+            case MENUID_HELP:
+                m_current_menu = new HelpMenu();
+                break;
+            case MENUID_CREDITS:
+                m_current_menu = new CreditsMenu();
+                break;
+            default:
+                break;
+            }   // switch
+        }
     }
-  }
 
-  static ulClock now  = ulClock();
-  now.update();
+    static ulClock now  = ulClock();
+    now.update();
 
-  if (m_currentMenu != NULL) 
-  {
-    m_currentMenu->update(now.getDeltaTime());
-  }
+    if (m_current_menu != NULL)
+    {
+        m_current_menu->update(now.getDeltaTime());
+    }
 }   // update
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()
 {
-    m_menuStack.clear();
+    m_menu_stack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void MenuManager::switchToRace()
 {
-  m_menuStack.clear();
-  pushMenu(MENUID_RACE);
+    m_menu_stack.clear();
+    pushMenu(MENUID_RACE);
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Returns true if the id is somewhere on the stack. This can be used to detect
 // if the config_display menu was called from the race_gui, or main_menu
 bool MenuManager::isSomewhereOnStack(MenuManagerIDs id)
 {
-  return std::find(m_menuStack.begin(), m_menuStack.end(), id) !=
-         m_menuStack.end();
+    return std::find(m_menu_stack.begin(), m_menu_stack.end(), id) !=
+           m_menu_stack.end();
 }   // isSomewhereOnStack
 
 // -----------------------------------------------------------------------------
 void MenuManager::switchToMainMenu()
 {
-  if (m_currentMenu != NULL) {
-    delete m_currentMenu;
-    m_currentMenu= NULL;
-  }
-  m_handeldSize= 0;
-  
-  m_menuStack.clear();    
-  pushMenu(MENUID_MAINMENU);
+    if (m_current_menu != NULL)
+    {
+        delete m_current_menu;
+        m_current_menu= NULL;
+    }
+    m_handled_size= 0;
+
+    m_menu_stack.clear();
+    pushMenu(MENUID_MAINMENU);
 }

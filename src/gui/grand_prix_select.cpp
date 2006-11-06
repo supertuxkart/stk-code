@@ -26,81 +26,87 @@
 #include "race_manager.hpp"
 #include "config.hpp"
 
-GrandPrixSelect::GrandPrixSelect() {
-  menu_id = widgetSet -> varray(0);
+GrandPrixSelect::GrandPrixSelect()
+{
+    m_menu_id = widgetSet -> varray(0);
 
-  widgetSet -> label(menu_id, "Choose a Grand Prix", GUI_LRG, GUI_ALL, 0, 0);
-  widgetSet -> space(menu_id);
+    widgetSet -> label(m_menu_id, "Choose a Grand Prix", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> space(m_menu_id);
 
-  std::set<std::string> result;
-  loader->listFiles(result, "data");
+    std::set<std::string> result;
+    loader->listFiles(result, "data");
 
-  // Findout which grand prixs are available and load them
-  int nId = 0;
-  for(std::set<std::string>::iterator i  = result.begin(); 
-                                      i != result.end()  ; i++) {
-    if (StringUtils::has_suffix(*i, ".cup")) {
-      std::string fullPath= "data/" + (std::string)*i;
-      CupData *cup = new CupData(fullPath.c_str());
-      allCups.push_back(cup);
-      if(nId==0)
-        widgetSet -> start(menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
-      else
-        widgetSet -> state(menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
-      nId++;
-    }   // if
-  }   // for i
-  widgetSet -> space(menu_id);
-  widgetSet -> state(menu_id,"Press <ESC> to go back", GUI_SML, -1);
-  widgetSet -> layout(menu_id, 0, 0);
-  rect = widgetSet->rect(10, 10, config->width-20, 34, GUI_ALL, 10);
+    // Findout which grand prixs are available and load them
+    int nId = 0;
+    for(std::set<std::string>::iterator i  = result.begin();
+            i != result.end()  ; i++)
+        {
+            if (StringUtils::has_suffix(*i, ".cup"))
+            {
+                std::string fullPath= "data/" + (std::string)*i;
+                CupData *cup = new CupData(fullPath.c_str());
+                m_all_cups.push_back(cup);
+                if(nId==0)
+                    widgetSet -> start(m_menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
+                else
+                    widgetSet -> state(m_menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
+                nId++;
+            }   // if
+        }   // for i
+    widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id,"Press <ESC> to go back", GUI_SML, -1);
+    widgetSet -> layout(m_menu_id, 0, 0);
+    m_rect = widgetSet->rect(10, 10, config->width-20, 34, GUI_ALL, 10);
 }   // GrandPrixSelect
 
-// -----------------------------------------------------------------------------
-GrandPrixSelect::~GrandPrixSelect() {
-  widgetSet -> delete_widget(menu_id) ;
-  glDeleteLists(rect, 1);
+//-----------------------------------------------------------------------------
+GrandPrixSelect::~GrandPrixSelect()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
+    glDeleteLists(m_rect, 1);
 }   // GrandPrixSelect
 
-// -----------------------------------------------------------------------------
-	
-void GrandPrixSelect::update(float dt) {
-  BaseGUI::update(dt); 
-  int clicked_token= widgetSet->token(widgetSet->click());
-  if(clicked_token==-1) return;
+//-----------------------------------------------------------------------------
+void GrandPrixSelect::update(float dt)
+{
+    BaseGUI::update(dt);
+    const int CLICKED_TOKEN = widgetSet->token(widgetSet->click());
+    if(CLICKED_TOKEN == -1) return;
 
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
-  glMatrixMode(GL_MODELVIEW);
-  glEnable(GL_BLEND);
-  CupData *cup=allCups[clicked_token];
-  glPushMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_BLEND);
+    CupData *cup = m_all_cups[CLICKED_TOKEN];
+    glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
-    const GLfloat backgroundColour[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
-    glColor4fv(backgroundColour);
-    glCallList(rect);
-  glPopMatrix();
-  widgetSet->drawText(cup->getDescription(), GUI_MED, SCREEN_CENTERED_TEXT, 10,
-		      255,255,255);
-  glDisable(GL_BLEND);
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-		      
-  return;
+    const GLfloat BACKGROUND_COLOUR[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
+    glColor4fv(BACKGROUND_COLOUR);
+    glCallList(m_rect);
+    glPopMatrix();
+    widgetSet->drawText(cup->getDescription(), GUI_MED, SCREEN_CENTERED_TEXT, 10,
+                        255,255,255);
+    glDisable(GL_BLEND);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    return;
 }
 
-// -----------------------------------------------------------------------------
-void GrandPrixSelect::select() {
-  int clicked_token= widgetSet->token(widgetSet->click());
-  if(clicked_token==-1) {
-    menu_manager->popMenu();
-    return;
-  }
-  race_manager->setGrandPrix(allCups[clicked_token]);
-  menu_manager->pushMenu(MENUID_DIFFICULTY);
+//-----------------------------------------------------------------------------
+void GrandPrixSelect::select()
+{
+    const int CLICKED_TOKEN = widgetSet->token(widgetSet->click());
+    if(CLICKED_TOKEN == -1)
+    {
+        menu_manager->popMenu();
+        return;
+    }
+    race_manager->setGrandPrix(m_all_cups[CLICKED_TOKEN]);
+    menu_manager->pushMenu(MENUID_DIFFICULTY);
 }   // select
 
 /* EOF */

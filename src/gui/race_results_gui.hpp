@@ -25,13 +25,13 @@
 /** GUI that shows the RaceResults, times and such */
 class RaceResultsGUI : public BaseGUI
 {
- private:
-  char* score;
+private:
+    char* m_score;
 public:
-  RaceResultsGUI();
-  ~RaceResultsGUI();
+    RaceResultsGUI();
+    ~RaceResultsGUI();
 
-  void select();
+    void select();
 };
 
 #endif

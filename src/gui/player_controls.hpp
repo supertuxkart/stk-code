@@ -28,24 +28,24 @@
 class PlayerControls: public BaseGUI
 {
 public:
-	PlayerControls(int whichPlayer);
-	~PlayerControls();
+    PlayerControls(int whichPlayer);
+    ~PlayerControls();
 
-	void select();
-	void input(InputType type, int id0, int id1, int id2, int value);
-	void addKeyLabel(int change_id, KartActions control, bool start);
-	void changeKeyLabel(int grab_id, KartActions control);
-	void setKeyInfoString(KartActions control);
+    void select();
+    void input(InputType type, int id0, int id1, int id2, int value);
+    void addKeyLabel(int change_id, KartActions control, bool start);
+    void changeKeyLabel(int grab_id, KartActions control);
+    void setKeyInfoString(KartActions control);
 
 private:
-	int grab_id;
-	int player_index;
-	bool grabInput;
-	KartActions editAction;
-	// Stores the heading - making this an attribute here avoids
-	// memory leaks or complicated memory management
-	char Heading[60];
-	std::string KeyNames[KC_FIRE+1];
+    int m_grab_id;
+    int m_player_index;
+    bool m_grab_input;
+    KartActions m_edit_action;
+    // Stores the heading - making this an attribute here avoids
+    // memory leaks or complicated memory management
+    char m_heading[60];
+    std::string m_key_names[KC_FIRE+1];
 };
 
 #endif

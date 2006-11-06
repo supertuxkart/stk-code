@@ -22,12 +22,13 @@
 
 #include "base_gui.hpp"
 
-class NumLaps: public BaseGUI {
+class NumLaps: public BaseGUI
+{
 public:
-  NumLaps();
-  ~NumLaps();
-  
-  void select();
+    NumLaps();
+    ~NumLaps();
+
+    void select();
 };
 
 #endif

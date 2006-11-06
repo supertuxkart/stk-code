@@ -25,11 +25,11 @@
 class ConfigControls: public BaseGUI
 {
 public:
-	ConfigControls();
-	~ConfigControls();
+    ConfigControls();
+    ~ConfigControls();
 
-	void update(float dt);
-	void select();
+    void update(float dt);
+    void select();
 };
 
 #endif

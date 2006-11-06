@@ -131,10 +131,10 @@ public:
   void           setAttachmentType   (attachmentType t)
                                         { attachment.set(t);                }
   Collectable   *getCollectable      () { return &collectable;              }
-  int            getNumCollectables  () { return  collectable.getNum();     }
-  int            getNumHerring       () { return  num_herring_gobbled;      }
-  int            getLap              () { return  raceLap;                  }
-  int            getPosition         () { return  racePosition ;            }
+  int            getNumCollectables  () const { return  collectable.getNum();}
+  int            getNumHerring       () const { return  num_herring_gobbled;}
+  int            getLap              () const { return  raceLap;            }
+  int            getPosition         () const { return  racePosition ;      }
   void           setFinishingState(float time);
   float          getFinishTime       () const  { return finishTime;         }
   bool           raceIsFinished      () const  { return finishedRace;       }

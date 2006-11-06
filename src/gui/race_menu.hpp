@@ -25,12 +25,12 @@
 class RaceMenu: public BaseGUI
 {
 public:
-	RaceMenu();
-	~RaceMenu();
+    RaceMenu();
+    ~RaceMenu();
 
-	void update(float dt);
-	void select();
-	void inputKeyboard(int key, int pressed);
+    void update(float dt);
+    void select();
+    void inputKeyboard(int key, int pressed);
 };
 
 #endif
