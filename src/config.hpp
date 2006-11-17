@@ -43,8 +43,9 @@
 #define CONFIGDIR ".supertuxkart"
 
 /*class for managing general tuxkart configuration data*/
-class Config {
-  private:
+class Config
+{
+private:
     std::string filename;
 
     void        setFilename      ();
@@ -59,25 +60,25 @@ class Config {
     void writeInput(lisp::Writer &writer,
                     const char *node,
                     KartActions action,
-                    Player& player);    
-  public:
-    bool   fullscreen;
-    bool   noStartScreen;
-    bool   sfx;
-    bool   music;
-    bool   smoke;
-    bool   displayFPS;
-    int    profile;         // Positive number: time in seconds, neg: # laps
-                            // 0 if no profiling. Never saved in config file!
-    std::string herringStyle;
-    bool   disableMagnet;   // true if a magnet can be dis- and enabled
-    bool   replayHistory;
-    bool   useKPH;
-    bool   improvedPhysics;
-    int    width;
-    int    height;
-    int    karts;
-    Player player[PLAYERS];
+                    Player& player);
+public:
+    bool   m_fullscreen;
+    bool   m_no_start_screen;
+    bool   m_sfx;
+    bool   m_music;
+    bool   m_smoke;
+    bool   m_display_fps;
+    int    m_profile;         // Positive number: time in seconds, neg: # laps
+    // 0 if no profiling. Never saved in config file!
+    std::string m_herring_style;
+    bool   m_disable_magnet;   // true if a magnet can be dis- and enabled
+    bool   m_replay_history;
+    bool   m_use_kph;
+    bool   m_improved_physics;
+    int    m_width;
+    int    m_height;
+    int    m_karts;
+    Player m_player[PLAYERS];
 
     Config();
     Config(const std::string& filename);

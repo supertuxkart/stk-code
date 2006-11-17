@@ -22,22 +22,23 @@
 #define HEADER_KARTCONTROL_H
 #include <plib/js.h>
 
-struct KartControl {
-  float data [ _JS_MAX_AXES ];
-  int   buttons;
-  int   presses;
-  int   releases;
-  float lr;
-  float accel;
-  bool  brake;
-  bool  wheelie;
-  bool  jump;
-  bool  rescue;
-  bool  fire;
+struct KartControl
+{
+    float data [ _JS_MAX_AXES ];
+    int   buttons;
+    int   presses;
+    int   releases;
+    float lr;
+    float accel;
+    bool  brake;
+    bool  wheelie;
+    bool  jump;
+    bool  rescue;
+    bool  fire;
 
-  KartControl() : buttons(0), presses(0),
-          releases(0), lr(0.0f), accel(0.0f), brake(false),
-          wheelie(false), jump(false),  rescue(false), fire(false){}
-};
+    KartControl() : buttons(0), presses(0),
+            releases(0), lr(0.0f), accel(0.0f), brake(false),
+    wheelie(false), jump(false),  rescue(false), fire(false){}}
+;
 
 #endif

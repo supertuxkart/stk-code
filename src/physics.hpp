@@ -26,16 +26,16 @@
 #ifdef BULLET
 #include "bullet/btBulletDynamicsCommon.h"
 #include "../bullet/Demos/OpenGL/GLDebugDrawer.h"
-class Physics 
+class Physics
 {
 protected:
     btDynamicsWorld *m_dynamics_world;
     Kart            *m_kart;
     GLDebugDrawer   *m_debug_drawer;
 public:
-         Physics  (float gravity);
-        ~Physics  ();
-    void addKart  (Kart *k, btRaycastVehicle **v, 
+    Physics  (float gravity);
+    ~Physics  ();
+    void addKart  (Kart *k, btRaycastVehicle **v,
                    btRaycastVehicle::btVehicleTuning **t);
     void update   (float dt);
     void set_track(ssgEntity *track);
@@ -43,11 +43,11 @@ public:
 
 // For non-bullet version: empty object
 #else
-class Physics 
+class Physics
 {
 public:
-         Physics(float gravity) {};
-        ~Physics() {};
+    Physics(float gravity) {};
+    ~Physics() {};
     void update(float dt) {};
     void set_track(ssgEntity *track) {};
 };
@@ -56,4 +56,4 @@ public:
 
 #endif
 /* EOF */
-  
+

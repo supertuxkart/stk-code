@@ -29,40 +29,41 @@
 class Kart;
 class ssgEntity;
 
-class HerringManager{
+class HerringManager
+{
 
 private:
-  // The vector of all herrings of the current track
-  typedef std::vector<Herring*> AllHerringType;
-  AllHerringType allHerrings;
+    // The vector of all herrings of the current track
+    typedef std::vector<Herring*> AllHerringType;
+    AllHerringType m_all_herrings;
 
-  // This stores all herring models defined in the models/herring
-  // subdirectory.
-  ssgEntity *herringModel[HE_SILVER+1];
+    // This stores all herring models defined in the models/herring
+    // subdirectory.
+    ssgEntity *m_herring_model[HE_SILVER+1];
 
-  // This is the active model. It gets determined by first loading the
-  // default, then track models, user models, cup models. This means, that
-  // a herring style specified in a track overwrites a command line option.
-  std::map<std::string,ssgEntity*>allModels;
+    // This is the active model. It gets determined by first loading the
+    // default, then track models, user models, cup models. This means, that
+    // a herring style specified in a track overwrites a command line option.
+    std::map<std::string,ssgEntity*> m_all_models;
 
-  std::string userFilename;
-  void CreateDefaultHerring(sgVec3 colour, std::string name);
-  void setDefaultHerringStyle();
-  void setHerring(const lisp::Lisp *herring_node, char *colour, 
-		  herringType type);
+    std::string m_user_filename;
+    void CreateDefaultHerring(sgVec3 colour, std::string name);
+    void setDefaultHerringStyle();
+    void setHerring(const lisp::Lisp *herring_node, char *colour,
+                    herringType type);
 
 public:
-              HerringManager();
-             ~HerringManager();
-  void        loadDefaultHerrings();
-  void        loadHerringStyle(const std::string filename);
-  Herring*    newHerring      (herringType type, sgVec3* xyz);
-  void        update          (float delta);
-  void        hitHerring      (Kart* kart);
-  void        cleanup         ();
-  void        reset           ();
-  void        removeTextures  ();
-  void        setUserFilename (char *s) {userFilename=s;}
+    HerringManager();
+    ~HerringManager();
+    void        loadDefaultHerrings();
+    void        loadHerringStyle(const std::string filename);
+    Herring*    newHerring      (herringType type, sgVec3* xyz);
+    void        update          (float delta);
+    void        hitHerring      (Kart* kart);
+    void        cleanup         ();
+    void        reset           ();
+    void        removeTextures  ();
+    void        setUserFilename (char *s) {m_user_filename=s;}
 };
 
 extern HerringManager* herring_manager;

@@ -24,27 +24,28 @@
 #include <plib/sg.h>
 #include <plib/ssg.h>
 
-class Callback  
+class Callback
 {
 private:
-  // the ac model files assume MODE_FORWARD=1, so a MODE_NONE is added
-  enum allCallbackModesType { MODE_NONE, MODE_FORWARD, MODE_CYCLE, MODE_SHUTTLE, 
-			      MODE_SINESHUTTLE};
+    // the ac model files assume MODE_FORWARD=1, so a MODE_NONE is added
+    enum allCallbackModesType { MODE_NONE, MODE_FORWARD, MODE_CYCLE, MODE_SHUTTLE,
+                                MODE_SINESHUTTLE};
 
-  sgCoord    m_delta;
-  sgCoord    m_now;
-  float      m_phase;
-  float      m_cycle;
-  int        m_mode;
-  ssgBranch *m_branch;
-  
-  void       parseData(char *data);
+    sgCoord    m_delta;
+    sgCoord    m_now;
+    float      m_phase;
+    float      m_cycle;
+    int        m_mode;
+    ssgBranch *m_branch;
+
+    void       parseData(char *data);
 
 public:
-       Callback(char *data, ssgBranch *branch_);
-      ~Callback();
-  void update  (float dt);
-};   // CallbackManager
+    Callback(char *data, ssgBranch *branch_);
+    ~Callback();
+    void update  (float dt);
+}
+;   // CallbackManager
 
 #endif
-  
+

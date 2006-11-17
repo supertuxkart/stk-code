@@ -120,7 +120,7 @@ void GrandPrixEnd::update(float dt)
     m_kart->setTransform (&trans) ;
     //glShadeModel(GL_SMOOTH);
     ssgCullAndDraw ( m_kart ) ;
-    glViewport ( 0, 0, config->width, config->height ) ;
+    glViewport ( 0, 0, config->m_width, config->m_height ) ;
 
     glDisable (GL_DEPTH_TEST);
     oldContext->makeCurrent();

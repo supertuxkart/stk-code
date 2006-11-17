@@ -27,124 +27,144 @@
 #include "world.hpp"
 #include "config.hpp"
 
-// -----------------------------------------------------------------------------
 void PlayerKart::action(KartActions action, int value)
 {
-  switch (action)
-  {
+    switch (action)
+    {
     case KC_LEFT:
-      steerVal = -value;
-      break;
+        m_steer_val = -value;
+        break;
     case KC_RIGHT:
-      steerVal = value;
-      break;
+        m_steer_val = value;
+        break;
     case KC_ACCEL:
-      accelVal = value;
-      break;
+        m_accel_val = value;
+        break;
     case KC_BRAKE:
-      if (value)
-        accelVal = 0;
-      controls.brake = value;
-      break;
+        if (value)
+            m_accel_val = 0;
+        m_controls.brake = value;
+        break;
     case KC_WHEELIE:
-      controls.wheelie = value;
-      break;
+        m_controls.wheelie = value;
+        break;
     case KC_RESCUE:
-      controls.rescue = value;
-      break;
+        m_controls.rescue = value;
+        break;
     case KC_FIRE:
-      controls.fire = value;
-      break;
+        m_controls.fire = value;
+        break;
     case KC_JUMP:
-      controls.jump = value;
-      break;
-   }
+        m_controls.jump = value;
+        break;
+    }
 }
 
+//-----------------------------------------------------------------------------
 void PlayerKart::smoothSteer(float dt, bool left, bool right)
 {
-    float steerChange = dt/getTimeFullSteer();  // amount the steering is changed
-    if       (left)  { controls.lr += steerChange;
-    } else if(right) { controls.lr -= steerChange; 
-    } else {   // no key is pressed
-      if(controls.lr>0.0f) {
-	controls.lr -= steerChange;
-	if(controls.lr<0.0f) controls.lr=0.0f;
-      } else {   // controls.lr<=0.0f;
-	controls.lr += steerChange;
-	if(controls.lr>0.0f) controls.lr=0.0f;
-      }   // if controls.lr<=0.0f
+    const float STEER_CHANGE = dt/getTimeFullSteer();  // amount the steering is changed
+    if       (left)
+    {
+        m_controls.lr += STEER_CHANGE;
+    }
+    else if(right)
+    {
+        m_controls.lr -= STEER_CHANGE;
+    }
+    else
+    {   // no key is pressed
+        if(m_controls.lr>0.0f)
+        {
+            m_controls.lr -= STEER_CHANGE;
+            if(m_controls.lr<0.0f) m_controls.lr=0.0f;
+        }
+        else
+        {   // m_controls.lr<=0.0f;
+            m_controls.lr += STEER_CHANGE;
+            if(m_controls.lr>0.0f) m_controls.lr=0.0f;
+        }   // if m_controls.lr<=0.0f
     }   // no key is pressed
 
-  controls.lr = std::min(1.0f, std::max(-1.0f, controls.lr));
+    m_controls.lr = std::min(1.0f, std::max(-1.0f, m_controls.lr));
 
 }   // smoothSteer
 
-// -----------------------------------------------------------------------------
-void PlayerKart::update(float dt) {
-  smoothSteer(dt, steerVal == -1, steerVal == 1);
+//-----------------------------------------------------------------------------
+void PlayerKart::update(float dt)
+{
+    smoothSteer(dt, m_steer_val == -1, m_steer_val == 1);
 
-  controls.accel = accelVal;
+    m_controls.accel = m_accel_val;
 
-  if(world->getPhase()==World::START_PHASE) {
-    if(controls.accel!=0.0 || controls.brake!=false ||
-       controls.fire|controls.wheelie|controls.jump) {
-      //JH Some sound here?
-      penaltyTime=1.0;
-      // A warning gets displayed in RaceGUI
+    if(world->getPhase()==World::START_PHASE)
+    {
+        if(m_controls.accel!=0.0 || m_controls.brake!=false ||
+           m_controls.fire|m_controls.wheelie|m_controls.jump)
+        {
+            //JH Some sound here?
+            m_penalty_time=1.0;
+            // A warning gets displayed in RaceGUI
+        }
+        placeModel();
+        return;
     }
-    placeModel();
-    return;
-  }
-  if(penaltyTime>0.0) {
-    penaltyTime-=dt;
-    return;
-  }
+    if(m_penalty_time>0.0)
+    {
+        m_penalty_time-=dt;
+        return;
+    }
 
- if ( controls.fire ) {
-    if (collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
-    // use() needs to be called even if there currently is no collecteable
-    // since use() tests for switching a magnet on/off.
-    collectable.use() ;
-    controls.fire = false;
-  }
-  if ( on_ground  &&  controls.rescue ) {
-    sound_manager -> playSfx ( SOUND_BEEP ) ;
-    rescue = TRUE ;
-    controls.rescue=false;
-  }
+    if ( m_controls.fire )
+    {
+        if (m_collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
+        // use() needs to be called even if there currently is no collecteable
+        // since use() tests for switching a magnet on/off.
+        m_collectable.use() ;
+        m_controls.fire = false;
+    }
+    if ( m_on_ground  &&  m_controls.rescue )
+    {
+        sound_manager -> playSfx ( SOUND_BEEP ) ;
+        m_rescue = true ;
+        m_controls.rescue=false;
+    }
 
-  Kart::update(dt);
+    Kart::update(dt);
 }   // update
 
-// -----------------------------------------------------------------------------
-void PlayerKart::forceCrash() {
-  Kart::forceCrash();
-  sound_manager->playSfx( SOUND_CRASH );
+//-----------------------------------------------------------------------------
+void PlayerKart::forceCrash()
+{
+    Kart::forceCrash();
+    sound_manager->playSfx( SOUND_CRASH );
 }
 
-// -----------------------------------------------------------------------------
-void PlayerKart::handleZipper() {
-  Kart::handleZipper();
-  sound_manager->playSfx ( SOUND_WEE );
+//-----------------------------------------------------------------------------
+void PlayerKart::handleZipper()
+{
+    Kart::handleZipper();
+    sound_manager->playSfx ( SOUND_WEE );
 }
 
-// -----------------------------------------------------------------------------
-void PlayerKart::collectedHerring(Herring* herring) {
+//-----------------------------------------------------------------------------
+void PlayerKart::collectedHerring(Herring* herring)
+{
     Kart::collectedHerring(herring);
     sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }
 
+//-----------------------------------------------------------------------------
 void PlayerKart::reset()
 {
-    steerVal = 0;
-    accelVal = 0;
-    controls.accel = 0.0;
-    controls.brake =false;
-    controls.fire = false;
-    controls.wheelie = false;
-    controls.jump = false;
-    penaltyTime = 0;
+    m_steer_val = 0;
+    m_accel_val = 0;
+    m_controls.accel = 0.0;
+    m_controls.brake =false;
+    m_controls.fire = false;
+    m_controls.wheelie = false;
+    m_controls.jump = false;
+    m_penalty_time = 0;
 
     Kart::reset();
 }

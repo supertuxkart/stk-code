@@ -24,17 +24,18 @@ class ssgSelector;
 class Projectile;
 
 
-class Explosion : public ssgTransform {
- public:
-  int step ;
-  ssgSelector  *seq ;
+class Explosion : public ssgTransform
+{
+public:
+    int m_step ;
+    ssgSelector  *m_seq ;
 public:
 
-       Explosion(Projectile* p);
-  int  inUse    ()              {return (step >= 0); }
-  void init     (Projectile *p);
-  void update   (float delta_t);
-  bool hasEnded () {return step>=seq->getNumKids();}
+    Explosion(Projectile* p);
+    int  inUse    ()              {return (m_step >= 0); }
+    void init     (Projectile *p);
+    void update   (float delta_t);
+    bool hasEnded () {return m_step >= m_seq->getNumKids(); }
 
 } ;
 

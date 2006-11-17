@@ -29,143 +29,160 @@ static ssgSelector *find_selector ( ssgBranch *b );
 
 ProjectileManager *projectile_manager=0;
 
-// -----------------------------------------------------------------------------
-void ProjectileManager::loadData() {
+void ProjectileManager::loadData()
+{
 
-  // Load the explosion model and find the actual selector branch in it.
-  // Only the explosion model is loaded here, see collectable_manager.
-  explosionModel = find_selector((ssgBranch*)loader->load("explode.ac", 
-							  CB_EXPLOSION) );
-  explosionModel->ref();
-  if ( explosionModel == NULL ) {
-    fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
-    exit ( 1 ) ;
-  }
-  
+    // Load the explosion model and find the actual selector branch in it.
+    // Only the explosion model is loaded here, see collectable_manager.
+    m_explosion_model = find_selector((ssgBranch*)loader->load("explode.ac",
+                                   CB_EXPLOSION) );
+    m_explosion_model->ref();
+    if ( m_explosion_model == NULL )
+    {
+        fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
+        exit ( 1 ) ;
+    }
+
 }   // loadData
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void ProjectileManager::removeTextures()
 {
-  cleanup();
-  ssgDeRefDelete(explosionModel);
-  // Only the explosion is here, all other models are actualy managed
-  // by collectable_manager.
-  callback_manager->clear(CB_EXPLOSION);
+    cleanup();
+    ssgDeRefDelete(m_explosion_model);
+    // Only the explosion is here, all other models are actualy managed
+    // by collectable_manager.
+    callback_manager->clear(CB_EXPLOSION);
 }   // removeTextures
 
-// -----------------------------------------------------------------------------
-void ProjectileManager::cleanup() {
-  for(Projectiles::iterator i = activeProjectiles.begin();
-                            i != activeProjectiles.end(); ++i) {
-    ssgTransform *m = (*i)->getModel();
-    m->removeAllKids();
-    delete *i;
-  }
-  activeProjectiles.clear();
-  for(Explosions::iterator i  = activeExplosions.begin(); 
-                           i != activeExplosions.end(); ++i) {
-    world->removeFromScene((ssgTransform*)*i);
-    ssgDeRefDelete(*i);
-  }
-  activeExplosions.clear();
+//-----------------------------------------------------------------------------
+void ProjectileManager::cleanup()
+{
+    for(Projectiles::iterator i = m_active_projectiles.begin();
+        i != m_active_projectiles.end(); ++i)
+    {
+        ssgTransform *m = (*i)->getModel();
+        m->removeAllKids();
+        delete *i;
+    }
+    m_active_projectiles.clear();
+    for(Explosions::iterator i  = m_active_explosions.begin();
+        i != m_active_explosions.end(); ++i)
+    {
+        world->removeFromScene((ssgTransform*)*i);
+        ssgDeRefDelete(*i);
+    }
+    m_active_explosions.clear();
 }   // cleanup
 
-// -----------------------------------------------------------------------------
-// General update call
-void ProjectileManager::update(float dt) {
-  somethingWasHit=false;
-  // First update all projectiles on the track
-  for(Projectiles::iterator i  = activeProjectiles.begin(); 
-                            i != activeProjectiles.end(); ++i) {
-    (*i)->update(dt);
-  }
-  // Then check if any projectile hit something
-  if(somethingWasHit) {
-    Projectiles::iterator p;
-    p = activeProjectiles.begin();
-    while(p!=activeProjectiles.end()) {
-      if(! (*p)->hasHit()) { p++; continue; }
-      newExplosion(*p);
-      // Create a new explosion, move the projectile to the
-      // list of deleted projectiles (so that they can be 
-      // reused later), and remove it from the list of active
-      // projectiles.
-      deletedProjectiles.push_back(*p);
-      p=activeProjectiles.erase(p);  // returns the next element
-    }   // while p!=activeProjectiles.end()
-  }
-  
-  explosionEnded=false;
-  for(Explosions::iterator i  = activeExplosions.begin(); 
-                           i != activeExplosions.end(); ++i) {
-    (*i)->update(dt);
-  }
-  if(explosionEnded) {
-    Explosions::iterator e;
-    e = activeExplosions.begin();
-    while(e!=activeExplosions.end()) {
-      if(!(*e)->hasEnded()) { e++; continue;}
-      deletedExplosions.push_back(*e);
-      e=activeExplosions.erase(e);
-    }   // while e!=activeExplosions.end()
-  }   // if explosionEnded
-  
+/** General projectile update call. */
+void ProjectileManager::update(float dt)
+{
+    m_something_was_hit=false;
+    // First update all projectiles on the track
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+        i != m_active_projectiles.end(); ++i)
+    {
+        (*i)->update(dt);
+    }
+    // Then check if any projectile hit something
+    if(m_something_was_hit)
+    {
+        Projectiles::iterator p = m_active_projectiles.begin();
+        while(p!=m_active_projectiles.end())
+        {
+            if(! (*p)->hasHit()) { p++; continue; }
+            newExplosion(*p);
+            // Create a new explosion, move the projectile to the
+            // list of deleted projectiles (so that they can be
+            // reused later), and remove it from the list of active
+            // projectiles.
+            m_deleted_projectiles.push_back(*p);
+            p=m_active_projectiles.erase(p);  // returns the next element
+        }   // while p!=m_active_projectiles.end()
+    }
+
+    m_explosion_ended=false;
+    for(Explosions::iterator i  = m_active_explosions.begin();
+        i != m_active_explosions.end(); ++i)
+    {
+        (*i)->update(dt);
+    }
+    if(m_explosion_ended)
+    {
+        Explosions::iterator e;
+        e = m_active_explosions.begin();
+        while(e!=m_active_explosions.end())
+        {
+            if(!(*e)->hasEnded()) { e++; continue;}
+            m_deleted_explosions.push_back(*e);
+            e=m_active_explosions.erase(e);
+        }   // while e!=m_active_explosions.end()
+    }   // if m_explosion_ended
+
 }   // update
 
-// -----------------------------------------------------------------------------
-// See if there is an old, unused projectile object available. If so,
-// reuse this object, otherwise create a new one.
-Projectile *ProjectileManager::newProjectile(Kart *kart, int type) {
-  Projectile *p;
-  if(deletedProjectiles.size()>0) {
-    p = deletedProjectiles.back();
-    deletedProjectiles.pop_back();
-    p->init(kart, type);
-  } else {
-    p=new Projectile(kart, type);
-  }
-  activeProjectiles.push_back(p);
-  return p;
-	      
+/** See if there is an old, unused projectile object available. If so,
+ *  reuse this object, otherwise create a new one. */
+Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
+{
+    Projectile *p;
+    if(m_deleted_projectiles.size()>0)
+    {
+        p = m_deleted_projectiles.back();
+        m_deleted_projectiles.pop_back();
+        p->init(kart, type);
+    }
+    else
+    {
+        p=new Projectile(kart, type);
+    }
+    m_active_projectiles.push_back(p);
+    return p;
+
 }   // newProjectile
 
-// -----------------------------------------------------------------------------
-// See if there is an old, unused explosion object available. If so,
-// reuse this object, otherwise create a new one.
-Explosion* ProjectileManager::newExplosion(Projectile* p) {
-  Explosion *e;
-  if(deletedExplosions.size()>0) {
-    e = deletedExplosions.back();
-    deletedExplosions.pop_back();
-    e->init(p);
-  } else {
-    e=new Explosion(p);
-  }
-  activeExplosions.push_back(e);
-  return e;
+/** See if there is an old, unused explosion object available. If so,
+ *  reuse this object, otherwise create a new one. */
+Explosion* ProjectileManager::newExplosion(Projectile* p)
+{
+    Explosion *e;
+    if(m_deleted_explosions.size()>0)
+    {
+        e = m_deleted_explosions.back();
+        m_deleted_explosions.pop_back();
+        e->init(p);
+    }
+    else
+    {
+        e=new Explosion(p);
+    }
+    m_active_explosions.push_back(e);
+    return e;
 }   // newExplosion
 
 // =============================================================================
-// A general function which is only neede here, but
-// it's not really a method, so I'll leave it here.
-static ssgSelector *find_selector ( ssgBranch *b ) {
-  if ( b == NULL )
+/** A general function which is only needed here, but
+ *  it's not really a method, so I'll leave it here.
+ */
+static ssgSelector *find_selector ( ssgBranch *b )
+{
+    if ( b == NULL )
+        return NULL ;
+
+    if ( ! b -> isAKindOf ( ssgTypeBranch () ) )
+        return NULL ;
+
+    if ( b -> isAKindOf ( ssgTypeSelector () ) )
+        return (ssgSelector *) b ;
+
+    for ( int i = 0 ; i < b -> getNumKids() ; i++ )
+    {
+        ssgSelector *res = find_selector ( (ssgBranch *)(b ->getKid(i)) ) ;
+
+        if ( res != NULL )
+            return res ;
+    }
+
     return NULL ;
-
-  if ( ! b -> isAKindOf ( ssgTypeBranch () ) )
-    return NULL ;
-
-  if ( b -> isAKindOf ( ssgTypeSelector () ) )
-    return (ssgSelector *) b ;
-
-  for ( int i = 0 ; i < b -> getNumKids() ; i++ )
-  {
-    ssgSelector *res = find_selector ( (ssgBranch *)(b ->getKid(i)) ) ;
-
-    if ( res != NULL )
-      return res ;
-  }
-
-  return NULL ;
 }   // find_selector

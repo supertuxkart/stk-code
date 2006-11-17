@@ -25,26 +25,30 @@
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
 
-CupData::CupData(const std::string filename_) {
-  filename = filename_;
-  const lisp::Lisp* lisp = 0;
-  try {
-    lisp::Parser parser;
-    lisp = parser.parse(loader->getPath(filename));
-    
-    lisp = lisp->getLisp("supertuxkart-cup");
-    if(!lisp)
-        throw std::runtime_error("No supertuxkart-cup node");
-    
-    lisp->get      ("name",        name        );
-    lisp->get      ("description", description );
-    lisp->get      ("herring",     herringStyle);
-    lisp->getVector("tracks",      tracks      );
-  } catch(std::exception& err) {
-    std::cout << "Error while reading cup: " << err.what() << "\n";
-  }
+CupData::CupData(const std::string filename_)
+{
+    m_filename = filename_;
+    const lisp::Lisp* lisp = 0;
+    try
+    {
+        lisp::Parser parser;
+        lisp = parser.parse(loader->getPath(m_filename));
 
-  delete lisp;
+        lisp = lisp->getLisp("supertuxkart-cup");
+        if(!lisp)
+            throw std::runtime_error("No supertuxkart-cup node");
+
+        lisp->get      ("name",        m_name        );
+        lisp->get      ("description", m_description );
+        lisp->get      ("herring",     m_herring_style);
+        lisp->getVector("tracks",      m_tracks      );
+    }
+    catch(std::exception& err)
+    {
+        std::cout << "Error while reading cup: " << err.what() << "\n";
+    }
+
+    delete lisp;
 }
 
 /* EOF */

@@ -20,9 +20,12 @@
 #ifndef HEADER_SFX_H
 #define HEADER_SFX_H
 
-class SFX {
+class SFX
+{
 public:
-  virtual void play()= 0;
+    virtual void play()= 0;
+
+    virtual ~SFX() {}
 };
 
 #endif // HEADER_SFX_H

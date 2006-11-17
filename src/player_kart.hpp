@@ -29,30 +29,31 @@ class Player;
 
 /** PlayerKart manages control events from the player and moves
     them to the Kart */
-class PlayerKart : public Kart {
- private:
-  int steerVal, accelVal;
+class PlayerKart : public Kart
+{
+private:
+    int m_steer_val, m_accel_val;
 
-  Player *player;
-  float  penaltyTime;
+    Player *m_player;
+    float  m_penalty_time;
 
-  void smoothSteer(float dt, bool left, bool right);
- public:
-  PlayerKart(const KartProperties *kart_properties,
-	     int position, Player *_player) :
-    Kart(kart_properties, position), player(_player), 
-    penaltyTime(0.0)         {    }
+    void smoothSteer(float dt, bool left, bool right);
+public:
+    PlayerKart(const KartProperties *kart_properties,
+               int position, Player *_player) :
+            Kart(kart_properties, position), m_player(_player),
+    m_penalty_time(0.0)         {    }
 
-  int     earlyStartPenalty () {return penaltyTime>0; }
-  Player* getPlayer         () {return player;        }
-  void    update            (float);
-  void    action            (KartActions action, int value);
-  void    forceCrash        ();
-  void    handleZipper      ();
-  void    collectedHerring  (Herring* herring);
-  int     isPlayerKart      () const {return 1;}
+    int     earlyStartPenalty () {return m_penalty_time>0; }
+    Player* getPlayer         () {return m_player;        }
+    void    update            (float);
+    void    action            (KartActions action, int value);
+    void    forceCrash        ();
+    void    handleZipper      ();
+    void    collectedHerring  (Herring* herring);
+    int     isPlayerKart      () const {return 1;}
 
-  void    reset();
+    void    reset();
 };
 
 #endif

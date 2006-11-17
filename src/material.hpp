@@ -24,55 +24,55 @@
 
 class Material
 {
-  ssgSimpleState *state ;
-  ssgCallback predraw ;
-  ssgCallback postdraw ;
+    ssgSimpleState *m_state ;
+    ssgCallback m_predraw ;
+    ssgCallback m_postdraw ;
 
-  int   index ;
+    int   m_index ;
 
-  char *texname      ;
+    char *m_texname      ;
 
-  bool  collideable  ;
-  bool  zipper       ;
-  bool  resetter     ;
-  bool  ignore       ;
+    bool  m_collideable  ;
+    bool  m_zipper       ;
+    bool  m_resetter     ;
+    bool  m_ignore       ;
 
-  int   clamp_tex    ;
-  bool  lighting     ;
-  bool  spheremap    ;
-  bool  transparency ;
-  float alpha_ref    ;
-  float friction     ;
+    int   m_clamp_tex    ;
+    bool  m_lighting     ;
+    bool  m_sphere_map   ;
+    bool  m_transparency ;
+    float m_alpha_ref    ;
+    float m_friction     ;
 
-  bool  parseBool  ( char **p ) ;
-  int   parseInt   ( char **p ) ;
-  float parseFloat ( char **p ) ;
+    bool  parseBool  ( char **p ) ;
+    int   parseInt   ( char **p ) ;
+    float parseFloat ( char **p ) ;
 
-  void init    () ;
-  void install () ;
+    void init    () ;
+    void install () ;
 
 public:
 
-  Material () ;
-  Material ( char *fname, char *description ) ;
+    Material () ;
+    Material ( char *fname, char *description ) ;
 
-  ~Material ();
+    ~Material ();
 
-  int matches ( char *tx ) ;
+    int matches ( char *tx ) ;
 
-  bool isIgnore    () { return ignore      ; }
-  bool isZipper    () { return zipper      ; }
-  bool isSphereMap () { return spheremap   ; }
-  bool isCrashable () { return collideable ; }
-  bool isReset     () { return resetter    ; }
-  float getFriction() { return friction    ; }
+    bool isIgnore    () { return m_ignore      ; }
+    bool isZipper    () { return m_zipper      ; }
+    bool isSphereMap () { return m_sphere_map   ; }
+    bool isCrashable () { return m_collideable ; }
+    bool isReset     () { return m_resetter    ; }
+    float getFriction() { return m_friction    ; }
 
-  void applyToLeaf ( ssgLeaf *l ) ;
+    void applyToLeaf ( ssgLeaf *l ) ;
 
-  ssgSimpleState *getState () { return state ; }
-  void      apply    () { state -> apply ()  ; }
+    ssgSimpleState *getState () { return m_state ; }
+    void      apply    () { m_state -> apply ()  ; }
 
-  char *getTexFname  () { return texname     ; }
+    char *getTexFname  () { return m_texname     ; }
 
 } ;
 

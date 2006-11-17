@@ -37,7 +37,7 @@
 
 /*
   For convenience - here are some multipliers for other units.
-
+ 
   eg  30 * MILES_PER_HOUR  is 30mph expressed in m/sec
 */
 
@@ -46,7 +46,7 @@
 
 // Zipper related constants:
 // =========================
-#define ZIPPER_ANGLE          45.0    
+#define ZIPPER_ANGLE          45.0
 #define ZIPPER_TIME           1.0f   /* Seconds */
 #define ZIPPER_VELOCITY      (100.0f * KILOMETERS_PER_HOUR )
 

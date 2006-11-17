@@ -31,70 +31,81 @@
 
 
 
-SFXImpl::SFXImpl(const char* filename) {
-  m_soundBuffer= 0;
-  m_soundSource= 0;
-  assert(load(filename));
+SFXImpl::SFXImpl(const char* filename)
+{
+    m_soundBuffer= 0;
+    m_soundSource= 0;
+    assert(load(filename));
 }
 
-SFXImpl::~SFXImpl() {
-  alDeleteBuffers(1, &m_soundBuffer);
-  alDeleteSources(1, &m_soundSource);
+//-----------------------------------------------------------------------------
+SFXImpl::~SFXImpl()
+{
+    alDeleteBuffers(1, &m_soundBuffer);
+    alDeleteSources(1, &m_soundSource);
 }
 
-void SFXImpl::play() {
-  alSourcePlay(m_soundSource);
+//-----------------------------------------------------------------------------
+void SFXImpl::play()
+{
+    alSourcePlay(m_soundSource);
 }
 
-bool SFXImpl::load(const char* filename) {
-  std::string path=  loader->getPath(filename);
+//-----------------------------------------------------------------------------
+bool SFXImpl::load(const char* filename)
+{
+    std::string path=  loader->getPath(filename);
 
-  alGenBuffers(1, &m_soundBuffer);
-  if (alGetError() != AL_NO_ERROR) { printf(" failed\n"); return false; }
-  ALenum format= 0;
-  ALsizei size= 0, freq= 0;
-  ALvoid* data= NULL;
-  ALboolean loop= AL_FALSE;
+    alGenBuffers(1, &m_soundBuffer);
+    if (alGetError() != AL_NO_ERROR) { printf(" failed\n"); return false; }
+    ALenum format= 0;
+    ALsizei size= 0, freq= 0;
+    ALvoid* data= NULL;
+    ALboolean loop= AL_FALSE;
 
 #ifdef __APPLE__
-  alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq);
+    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq);
 #else
-  alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq, &loop);
+    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq, &loop);
 #endif
 
-  if (data == NULL) {
-    printf("Error 1 loading SFX: %s failed\n", path.c_str());
-    return false;
-  }
+    if (data == NULL)
+    {
+        printf("Error 1 loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
 
-  alBufferData(m_soundBuffer, format, data, size, freq);
-  if (alGetError() != AL_NO_ERROR) {
-    printf("Error 2 loading SFX: %s failed\n", path.c_str());
-    return false;
-  }
+    alBufferData(m_soundBuffer, format, data, size, freq);
+    if (alGetError() != AL_NO_ERROR)
+    {
+        printf("Error 2 loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
 
-  alutUnloadWAV(format, data, size, freq);
-  if (alGetError() != AL_NO_ERROR) {
-    printf("Error 3 loading SFX: %s failed\n", path.c_str());
-    return false;
-  }
+    alutUnloadWAV(format, data, size, freq);
+    if (alGetError() != AL_NO_ERROR)
+    {
+        printf("Error 3 loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
 
-  // Bind buffer with a source.
-  alGenSources(1, &m_soundSource);
-  if (alGetError() != AL_NO_ERROR) {
-    printf("Error 4 loading SFX: %s failed\n", path.c_str());
-    return false;
-  }
+    // Bind buffer with a source.
+    alGenSources(1, &m_soundSource);
+    if (alGetError() != AL_NO_ERROR)
+    {
+        printf("Error 4 loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
 
-  // not 3D yet
-  alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
-  alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
-  alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
-  alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
-  alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.0          );
-  alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
+    // not 3D yet
+    alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
+    alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
+    alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
+    alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.0          );
+    alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
 
-  return true;
+    return true;
 }
 
 #endif // HAVE_OPENAL && HAVE_MIKMOD

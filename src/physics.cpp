@@ -25,8 +25,7 @@
 #ifdef BULLET
 #include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
-// -----------------------------------------------------------------------------
-/// Initialise physics.
+/** Initialise physics. */
 Physics::Physics(float gravity)
 {
     m_dynamics_world = new btDiscreteDynamicsWorld();
@@ -37,21 +36,18 @@ Physics::Physics(float gravity)
 
 }   // Physics
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 Physics::~Physics()
 {
     delete m_dynamics_world;
 }   // ~Physics
 
-// -----------------------------------------------------------------------------
-//* Set track
+//-----------------------------------------------------------------------------
 void Physics::set_track(ssgEntity* track)
-{
-}   // set_track
+{}   // set_track
 
-// -----------------------------------------------------------------------------
-//* Adds a kart to the physics engine
-void Physics::addKart(Kart *kart, btRaycastVehicle **vehicle, 
+/** Adds a kart to the physics engine. */
+void Physics::addKart(Kart *kart, btRaycastVehicle **vehicle,
                       btRaycastVehicle::btVehicleTuning **tuning)
 {
 
@@ -61,29 +57,29 @@ void Physics::addKart(Kart *kart, btRaycastVehicle **vehicle,
     ssgEntity *model = kart->getModel();
     float x_min, x_max, y_min, y_max, z_min, z_max;
     MinMax(model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    float kart_width  = x_max-x_min;
-    float kart_length = y_max-y_min;
-    btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*kart_width,
-                                                              0.5*kart_length,
-                                                              0.5*(z_max-z_min)));
+    const float KART_WIDTH  = x_max-x_min;
+    const float KART_LENGTH = y_max-y_min;
+    btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*KART_WIDTH,
+                                     0.5*KART_LENGTH,
+                                     0.5*(z_max-z_min)));
     // Set mass and inertia
     // --------------------
-    float mass=kart->getMass();
+    const float MASS=kart->getMass();
     btVector3 inertia;
-    kart_chassis->calculateLocalInertia(mass, inertia);
+    kart_chassis->calculateLocalInertia(MASS, inertia);
 
     // Position the chassis
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    sgCoord *pos=kart->getCoord();
-    trans.setOrigin(btVector3(pos->xyz[0], pos->xyz[1], pos->xyz[2]+100.0f));
+    const sgCoord* const POS=kart->getCoord();
+    trans.setOrigin(btVector3(POS->xyz[0], POS->xyz[1], POS->xyz[2]+100.0f));
     btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
 
     // Then create a rigid body
     // ------------------------
-    btRigidBody* kart_body = new btRigidBody(mass, myMotionState, 
-                                             kart_chassis, inertia);
+    btRigidBody* kart_body = new btRigidBody(MASS, myMotionState,
+                             kart_chassis, inertia);
     kart_body->setCenterOfMassTransform(btTransform::getIdentity());
     m_dynamics_world->addRigidBody(kart_body);
 
@@ -102,59 +98,58 @@ void Physics::addKart(Kart *kart, btRaycastVehicle **vehicle,
     kart_body->SetActivationState(DISABLE_DEACTIVATION);
     m_dynamics_world->addVehicle(*vehicle);
     (*vehicle)->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
-    
+
     // Add wheels
     // ----------
-    float wheel_width  = kart->getWheelWidth();
-    float wheel_radius = kart->getWheelRadius();
-    float suspension_rest = 0.6f;
-    btVector3 wheel_coord(0.5f*kart_width-(0.3f*wheel_width), 
-                          0.5f*kart_length-wheel_radius,
+    const float WHEEL_WIDTH  = kart->getWheelWidth();
+    const float WHEEL_RADIUS = kart->getWheelRadius();
+    float SUSPENSION_REST = 0.6f;
+    btVector3 wheel_coord(0.5f*kart_width-(0.3f*WHEEL_WIDTH),
+                          0.5f*kart_length-WHEEL_RADIUS,
                           0.0f);
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
     // right front wheel
     (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         suspension_rest, wheel_radius, **tuning,
+                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
                          /* isFrontWheel: */ true);
 
     // left front wheel
-    wheel_coord = btVector3(- (0.5f*kart_width-(0.3f*wheel_width)), 
-                            0.5f*kart_length-wheel_radius,
+    wheel_coord = btVector3(- (0.5f*kart_width-(0.3f*WHEEL_WIDTH)),
+                            0.5f*kart_length-WHEEL_RADIUS,
                             0.0f);
     (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         suspension_rest, wheel_radius, **tuning,
+                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
                          /* isFrontWheel: */ true);
 
     // right rear wheel
-    wheel_coord = btVector3(0.5*kart_width-(0.3f*wheel_width), 
-                            -0.5*(kart_length-wheel_radius),
+    wheel_coord = btVector3(0.5*kart_width-(0.3f*WHEEL_WIDTH),
+                            -0.5*(kart_length-WHEEL_RADIUS),
                             0.0f);
     (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         suspension_rest, wheel_radius, **tuning,
+                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
                          /* isFrontWheel: */ false);
 
     // right rear wheel
-    wheel_coord = btVector3(-(0.5*kart_width-(0.3f*wheel_width)),
-                            -0.5*(kart_length-wheel_radius),
+    wheel_coord = btVector3(-(0.5*kart_width-(0.3f*WHEEL_WIDTH)),
+                            -0.5*(kart_length-WHEEL_RADIUS),
                             0.0f);
     (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         suspension_rest, wheel_radius, **tuning,
+                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
                          /* isFrontWheel: */ false);
 }   // addKart
 
-// -----------------------------------------------------------------------------
-//* 
+//-----------------------------------------------------------------------------
 void Physics::update(float dt)
 {
 
     for(int i=0; i<world->getNumKarts(); i++)
     {
-        Kart *k = world->getKart(i);
-        sgCoord *curr_pos = k->getCoord();
+        const Kart * const K = world->getKart(i);
+        sgCoord *curr_pos = K->getCoord();
 
-        btRaycastVehicle *vehicle=k->getVehicle();
+        btRaycastVehicle *vehicle=K->getVehicle();
         btRigidBody *b=vehicle->getRigidBody();
         btMotionState *m = b->getMotionState();
         btTransform trans;
@@ -165,9 +160,9 @@ void Physics::update(float dt)
         btVector3 p = trans.getOrigin();
         printf("%lx Pos %f %f %f\n",vehicle, p.x(), p.y(), p.z());
 
-        btCylinderShapeX wheelShape(btVector3(k->getWheelWidth(),
-                                              k->getWheelRadius(),
-                                              k->getWheelRadius()));
+        btCylinderShapeX wheelShape(btVector3(K->getWheelWidth(),
+                                              K->getWheelRadius(),
+                                              K->getWheelRadius()));
         btVector3 wheelColor(1,0,0);
         for(int j=0; j<vehicle->getNumWheels(); j++)
         {
@@ -179,33 +174,30 @@ void Physics::update(float dt)
     }
 
     int num_objects = m_dynamics_world->getNumCollisionObjects();
-    for(int i=0; i<num_objects; i++) 
+    for(int i=0; i<num_objects; i++)
     {
-        Kart *k=world->getKart(i);
+        const Kart * const K=world->getKart(i);
         btCollisionObject *obj = m_dynamics_world->getCollisionObjectArray()[i];
         btRigidBody* body = btRigidBody::upcast(obj);
         if(!body) continue;
-        const btVector3 &pos=body->getCenterOfMassPosition();
-        printf("body %d: %f %f %f dt %f\n",i, pos.x(), pos.y(), pos.z(),dt);
-        sgCoord *p = k->getCoord();
-        p->xyz[0]=pos.x();
-        p->xyz[1]=pos.y();
-        p->xyz[2]=pos.z();
+        const btVector3 &POS=body->getCenterOfMassPosition();
+        printf("body %d: %f %f %f dt %f\n",i, POS.x(), POS.y(), POS.z(),dt);
+        sgCoord *p = K->getCoord();
+        p->xyz[0]=POS.x();
+        p->xyz[1]=POS.y();
+        p->xyz[2]=POS.z();
         float m[16];
-		btVector3 wireColor(1,0,0);
+        btVector3 wireColor(1,0,0);
         btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
         myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
         GL_ShapeDrawer::drawOpenGL(m,obj->m_collisionShape,wireColor,
                                    btIDebugDraw::DBG_DrawWireframe);
-        
+
     }
-	// ???  m_dynamicsWorld->updateAabbs();
+    // ???  m_dynamicsWorld->updateAabbs();
 
 }   // update
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 #endif
 /* EOF */
-  
+

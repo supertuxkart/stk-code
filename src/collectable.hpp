@@ -26,21 +26,22 @@
 
 class Kart;
 
-class Collectable {
- protected:
-  Kart*                      owner;
-  collectableType            type;
-  int                        number;
+class Collectable
+{
+protected:
+    Kart*                      owner;
+    collectableType            type;
+    int                        number;
 
- public:
-                  Collectable  (Kart* kart_);
-  void            set          (collectableType _type, int n=1);
-  void            clear        () {type=COLLECT_NOTHING; number=0;}
-  int             getNum       () const {return number;}
-  collectableType getType      () {return type;}
-  void            hitRedHerring(int n);
-  Material*       getIcon      ();
-  void            use          ();
+public:
+    Collectable  (Kart* kart_);
+    void            set          (collectableType _type, int n=1);
+void            clear        () {type=COLLECT_NOTHING; number=0;}
+    int             getNum       () const {return number;}
+    collectableType getType      () {return type;}
+    void            hitRedHerring(int n);
+    Material*       getIcon      ();
+    void            use          ();
 };
 
 #endif

@@ -24,34 +24,34 @@
 
 void preProcessObj ( ssgEntity *n, bool mirror )
 {
-  if ( n == NULL ) return ;
+    if ( n == NULL ) return ;
 
-  n -> dirtyBSphere () ;
+    n -> dirtyBSphere () ;
 
-  if ( n -> isAKindOf ( ssgTypeLeaf() ) )
-  {
-    if ( mirror )
-      for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
-        ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
+    if ( n -> isAKindOf ( ssgTypeLeaf() ) )
+    {
+        if ( mirror )
+            for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
+                ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
 
-    material_manager->getMaterial ( (ssgLeaf *) n ) -> applyToLeaf ( (ssgLeaf *) n ) ;
-    return ;
-  }
+        material_manager->getMaterial ( (ssgLeaf *) n ) -> applyToLeaf ( (ssgLeaf *) n ) ;
+        return ;
+    }
 
-  if ( mirror && n -> isAKindOf ( ssgTypeTransform () ) )
-  {
-    sgMat4 xform ;
+    if ( mirror && n -> isAKindOf ( ssgTypeTransform () ) )
+    {
+        sgMat4 xform ;
 
-    ((ssgTransform *)n) -> getTransform ( xform ) ;
-    xform [ 0 ][ 0 ] *= -1.0f ;
-    xform [ 1 ][ 0 ] *= -1.0f ;
-    xform [ 2 ][ 0 ] *= -1.0f ;
-    xform [ 3 ][ 0 ] *= -1.0f ;
-    ((ssgTransform *)n) -> setTransform ( xform ) ;
-  }
+        ((ssgTransform *)n) -> getTransform ( xform ) ;
+        xform [ 0 ][ 0 ] *= -1.0f ;
+        xform [ 1 ][ 0 ] *= -1.0f ;
+        xform [ 2 ][ 0 ] *= -1.0f ;
+        xform [ 3 ][ 0 ] *= -1.0f ;
+        ((ssgTransform *)n) -> setTransform ( xform ) ;
+    }
 
-  ssgBranch *b = (ssgBranch *) n ;
+    ssgBranch *b = (ssgBranch *) n ;
 
-  for ( int i = 0 ; i < b -> getNumKids () ; i++ )
-    preProcessObj ( b -> getKid ( i ), mirror ) ;
+    for ( int i = 0 ; i < b -> getNumKids () ; i++ )
+        preProcessObj ( b -> getKid ( i ), mirror ) ;
 }

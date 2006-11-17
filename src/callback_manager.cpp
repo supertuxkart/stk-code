@@ -21,50 +21,48 @@
 
 CallbackManager *callback_manager=NULL;
 
-// -----------------------------------------------------------------------------
-CallbackManager::CallbackManager() 
+CallbackManager::CallbackManager()
 {
-  for(int i=0; i<CB_MAX; i++)
-  {
-    m_allCallbacks[i].clear();
-  }
+    for(int i=0; i<CB_MAX; i++)
+    {
+        m_allCallbacks[i].clear();
+    }
 }   // CallbackManager
 
-// -----------------------------------------------------------------------------
-CallbackManager::~CallbackManager() 
+//-----------------------------------------------------------------------------
+CallbackManager::~CallbackManager()
 {
-  for(int i=0; i<CB_MAX; i++)
-  {
-    for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
-	c != m_allCallbacks[i].end(); c++) 
-      delete *c;
-    m_allCallbacks[i].clear();
-  }
+    for(int i=0; i<CB_MAX; i++)
+    {
+        for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
+            c != m_allCallbacks[i].end(); c++)
+            delete *c;
+        m_allCallbacks[i].clear();
+    }
 }   // ~CallbackManager
 
-// -----------------------------------------------------------------------------
-void CallbackManager::clear(CallbackType cbType) {
-  for(std::vector<Callback*>::const_iterator c = m_allCallbacks[cbType].begin();
-      c != m_allCallbacks[cbType].end(); c++) 
-  {
-    delete *c;
-  }
-  
-  m_allCallbacks[cbType].clear();
+//-----------------------------------------------------------------------------
+void CallbackManager::clear(CallbackType cbType)
+{
+    for(std::vector<Callback*>::const_iterator c = m_allCallbacks[cbType].begin();
+        c != m_allCallbacks[cbType].end(); c++)
+    {
+        delete *c;
+    }
+
+    m_allCallbacks[cbType].clear();
 }  // clear
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void CallbackManager::update(float dt) const
 {
-  for(int i=0; i<CB_MAX; i++)
-  {
-    for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
-	c != m_allCallbacks[i].end(); c++) 
-      (*c)->update(dt);
-  }   // for i
+    for(int i=0; i<CB_MAX; i++)
+    {
+        for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
+            c != m_allCallbacks[i].end(); c++)
+            (*c)->update(dt);
+    }   // for i
 
 }   // update
 
-// -----------------------------------------------------------------------------
-/* EOF */
-  
+

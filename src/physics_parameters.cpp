@@ -21,74 +21,87 @@
 
 PhysicsParameters* physicsParameters=0;
 
-// -----------------------------------------------------------------------------
-void PhysicsParameters::load(const std::string filename) {
+//-----------------------------------------------------------------------------
+void PhysicsParameters::load(const std::string filename)
+{
 
-  KartProperties::load(filename, "physics");
+    KartProperties::load(filename, "physics");
 
-  // Check that all necessary values are indeed set physics.data file
+    // Check that all necessary values are indeed set physics.data file
 
 
-#define CHECK_NEG(  a,strA) if(a<-99) {                                    \
-             fprintf(stderr,"Missing default value for '%s' in '%s'.\n",   \
-		     strA,filename.c_str());exit(-1);			   \
-             }
+#define CHECK_NEG(  a,strA) if(a<-99) {                             \
+        fprintf(stderr,"Missing default value for '%s' in '%s'.\n", \
+                strA,filename.c_str());exit(-1);                    \
+    }
 
-  CHECK_NEG(corn_r,   "corn_r"   );CHECK_NEG(wheel_base,     "wheel-base"     );
-  CHECK_NEG(heightCOG,"heightCOG");CHECK_NEG(engine_power,   "engine-power"   );
-  CHECK_NEG(mass,     "mass"     );CHECK_NEG(air_resistance, "air-resistance" );
-  CHECK_NEG(tire_grip,"tire-grip");CHECK_NEG(max_steer_angle,"max-steer-angle");
-  CHECK_NEG(corn_f,   "corn_f"   );CHECK_NEG(roll_resistance,"roll-resistance");
-  CHECK_NEG(inertia,  "inertia"  );CHECK_NEG(magnetRangeSQ,  "magnet-range"   );
-  CHECK_NEG(brake_factor,        "brake-factor"           );
-  CHECK_NEG(jumpImpulse,         "jump-impulse"           );
-  CHECK_NEG(airResReduce[1],     "reduce-air-resistance-driver");
-  CHECK_NEG(airResReduce[2],     "reduce-air-resistance-racer" );
-  CHECK_NEG(wheelieMaxSpeedRatio,"wheelie-max-speed-ratio");
-  CHECK_NEG(wheelieMaxPitch,     "wheelie-max-pitch"      );
-  CHECK_NEG(wheeliePitchRate,    "wheelie-pitch-rate"     );
-  CHECK_NEG(wheelieRestoreRate,  "wheelie-restore-rate"   );
-  CHECK_NEG(wheelieSpeedBoost,   "wheelie-speed-boost"    );
-  CHECK_NEG(magnetMinRangeSQ,    "magnet-min-range"       );
-  CHECK_NEG(parachuteFriction,   "parachute-friction"     );
-  CHECK_NEG(time_full_steer,     "time-full-steer"        );
+    CHECK_NEG(m_corn_r,                  "m_corn_r"                     );
+    CHECK_NEG(m_corn_f,                  "m_corn_f"                     );
 
-  // Precompute some handy values to reduce work later
-  magnetRangeSQ    = magnetRangeSQ   *magnetRangeSQ;
-  magnetMinRangeSQ = magnetMinRangeSQ*magnetMinRangeSQ;
+    CHECK_NEG(m_mass,                    "mass"                         );
+    CHECK_NEG(m_inertia,                 "m_inertia"                    );
+    CHECK_NEG(m_tire_grip,               "tire-grip"                    );
+    CHECK_NEG(m_height_cog,              "heightCOG"                    );
+    CHECK_NEG(m_wheel_base,              "wheel-base"                   );
+    CHECK_NEG(m_engine_power,            "engine-power"                 );
+    CHECK_NEG(m_air_resistance,          "air-resistance"               );
+    CHECK_NEG(m_max_steer_angle,         "max-steer-angle"              );
+    CHECK_NEG(m_roll_resistance,         "roll-resistance"              );
+    CHECK_NEG(m_magnet_range_sq,         "magnet-range"                 );
+    CHECK_NEG(m_brake_factor,            "brake-factor"                 );
+    CHECK_NEG(m_jump_impulse,            "jump-impulse"                 );
+
+    CHECK_NEG(m_air_res_reduce[1],       "reduce-air-resistance-driver" );
+    CHECK_NEG(m_air_res_reduce[2],       "reduce-air-resistance-racer"  );
+
+    CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
+    CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
+    CHECK_NEG(m_wheelie_pitch_rate,      "wheelie-pitch-rate"           );
+    CHECK_NEG(m_wheelie_restore_rate,    "wheelie-restore-rate"         );
+    CHECK_NEG(m_wheelie_speed_boost,     "wheelie-speed-boost"          );
+
+    CHECK_NEG(m_magnet_min_range_sq,     "magnet-min-range"             );
+    CHECK_NEG(m_parachute_friction,      "parachute-friction"           );
+    CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
+
+    // Precompute some handy values to reduce work later
+    m_magnet_range_sq    = m_magnet_range_sq   * m_magnet_range_sq;
+    m_magnet_min_range_sq = m_magnet_min_range_sq * m_magnet_min_range_sq;
 }   // load
 
-// -----------------------------------------------------------------------------
-// Init all values with invalid defaults, which are tested later. This 
-// guarantees that all parameters will indeed be initialised, and helps
-// finding typos.
-void PhysicsParameters::init_defaults() {
-  wheel_base         = heightCOG         = magnetMinRangeSQ  = roll_resistance = 
-    mass             = corn_r            =
-    air_resistance   = tire_grip         = max_steer_angle   = corn_f          = 
-    inertia          = anvilWeight       = parachuteFriction = engine_power    =
-    magnetRangeSQ    = jumpImpulse       = brake_factor      = anvilSpeedFactor=
-    time_full_steer  = wheelieMaxPitch   = wheelieMaxSpeedRatio                =
-    wheeliePitchRate = wheelieRestoreRate= wheelieSpeedBoost = airResReduce[2] =
-    airResReduce[1]  = -99.9f;
-  airResReduce[0]    = 1.0f;
+/** Init all values with invalid defaults, which are tested later. This
+ * guarantees that all parameters will indeed be initialised, and helps
+ * finding typos.
+ */
+void PhysicsParameters::init_defaults()
+{
+    m_wheel_base  = m_height_cog      = m_magnet_min_range_sq = m_roll_resistance  = m_mass =
+    m_corn_r      = m_air_resistance = m_tire_grip        = m_max_steer_angle  =
+    m_corn_f      = m_inertia        = m_anvil_weight      = m_parachute_friction =
+    m_engine_power = m_magnet_range_sq = m_jump_impulse      = m_brake_factor     =
+    m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
+    m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
+    m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] = -99.9f;
+
+    m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
 
-// -----------------------------------------------------------------------------
-void PhysicsParameters::getAllData(const lisp::Lisp* lisp) {
+//-----------------------------------------------------------------------------
+void PhysicsParameters::getAllData(const lisp::Lisp* lisp)
+{
 
-  // Get the values which are not part of the default KartProperties
-  // ---------------------------------------------------------------
-  lisp->get("anvil-weight",                 anvilWeight         );
-  lisp->get("anvil-speed-factor",           anvilSpeedFactor    );
-  lisp->get("parachute-friction",           parachuteFriction   );
-  lisp->get("magnet-range",                 magnetRangeSQ       );
-  lisp->get("magnet-min-range",             magnetMinRangeSQ    );
-  lisp->get("jump-impulse",                 jumpImpulse         );
-  lisp->get("reduce-air-resistance-racer",  airResReduce[2]     );
-  lisp->get("reduce-air-resistance-driver", airResReduce[1]     );
+    // Get the values which are not part of the default KartProperties
+    // ---------------------------------------------------------------
+    lisp->get("anvil-weight",                 m_anvil_weight        );
+    lisp->get("anvil-speed-factor",           m_anvil_speed_factor  );
+    lisp->get("parachute-friction",           m_parachute_friction  );
+    lisp->get("magnet-range",                 m_magnet_range_sq     );
+    lisp->get("magnet-min-range",             m_magnet_min_range_sq );
+    lisp->get("jump-impulse",                 m_jump_impulse        );
+    lisp->get("reduce-air-resistance-racer",  m_air_res_reduce[2]   );
+    lisp->get("reduce-air-resistance-driver", m_air_res_reduce[1]   );
 
-  // Get the default KartProperties
-  // ------------------------------
-  KartProperties::getAllData(lisp->getLisp("kart-defaults"));
+    // Get the default KartProperties
+    // ------------------------------
+    KartProperties::getAllData(lisp->getLisp("kart-defaults"));
 }   // getAllData

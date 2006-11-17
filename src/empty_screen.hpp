@@ -26,10 +26,10 @@
 class EmptyScreen : public Screen
 {
 public:
-  EmptyScreen();
-  ~EmptyScreen();
+    EmptyScreen();
+    ~EmptyScreen();
 
-  void update();
+    void update();
 };
 
 #endif

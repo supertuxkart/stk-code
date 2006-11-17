@@ -30,125 +30,134 @@
 #include "gui/menu_manager.hpp"
 #include "history.hpp"
 
-WorldScreen* WorldScreen::current_ = 0;
+WorldScreen* WorldScreen::m_current_ = 0;
 
 WorldScreen::WorldScreen(const RaceSetup& raceSetup)
 {
-  // the constructor assigns this object to the global
-  // variable world. Admittedly a bit ugly, but simplifies
-  // handling of objects which get created in the constructor
-  // and need world to be defined.
-  new World(raceSetup);
+    // the constructor assigns this object to the global
+    // variable world. Admittedly a bit ugly, but simplifies
+    // handling of objects which get created in the constructor
+    // and need world to be defined.
+    new World(raceSetup);
 
-  current_ = this;
+    m_current_ = this;
 
-  for(int i = 0; i < raceSetup.getNumPlayers(); ++i)
-    cameras.push_back(new Camera(raceSetup.getNumPlayers(), i));
-  fclock.reset();
-  fclock.setMaxDelta(1.0);
-  frameClock.reset();
-  frameClock.setMaxDelta(100000.0);
-  frameCount = 0;
+    for(int i = 0; i < raceSetup.getNumPlayers(); ++i)
+        m_cameras.push_back(new Camera(raceSetup.getNumPlayers(), i));
+    m_fclock.reset();
+    m_fclock.setMaxDelta(1.0);
+    m_frame_clock.reset();
+    m_frame_clock.setMaxDelta(100000.0);
+    m_frame_count = 0;
 }
 
+//-----------------------------------------------------------------------------
 WorldScreen::~WorldScreen()
 {
-  for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
-    delete *i;
+    for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
+        delete *i;
 
-  if(current() == this) {
-  delete world;
-  world = 0;
-  }
-}
-
-void WorldScreen::update() {
-  fclock.update();
-
-  if ( ! widgetSet -> get_paused () ) {
-    world->update(fclock.getDeltaTime());
-  }
-
-  for (Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
-    (*i)->update();
-
-  draw();
-
-  menu_manager->update();
-  sound_manager->update() ;
-  if(config->profile) {
-    frameCount++;
-    if (world->clock>config->profile) {
-      // The actual timing for FPS has to be done with an external clock,
-      // since world->clock might be modified by replaying a history file.
-      frameClock.update();
-      printf("Number of frames: %d time %f, Average FPS: %f\n",
-	     frameCount, frameClock.getAbsTime(), 
-	     (float)frameCount/frameClock.getAbsTime());
-      if(!config->replayHistory) history->Save();
-      exit(-2);
+    if(current() == this)
+    {
+        delete world;
+        world = 0;
     }
-  }   // if profile
-
-  SDL_GL_SwapBuffers() ;
 }
 
+//-----------------------------------------------------------------------------
+void WorldScreen::update()
+{
+    m_fclock.update();
+
+    if ( ! widgetSet -> get_paused () )
+    {
+        world->update(m_fclock.getDeltaTime());
+    }
+
+    for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
+        (*i)->update();
+
+    draw();
+
+    menu_manager->update();
+    sound_manager->update() ;
+    if(config->m_profile)
+    {
+        m_frame_count++;
+        if (world->m_clock>config->m_profile)
+        {
+            // The actual timing for FPS has to be done with an external clock,
+            // since world->m_clock might be modified by replaying a history file.
+            m_frame_clock.update();
+            printf("Number of frames: %d time %f, Average FPS: %f\n",
+                   m_frame_count, m_frame_clock.getAbsTime(),
+                   (float)m_frame_count/m_frame_clock.getAbsTime());
+            if(!config->m_replay_history) history->Save();
+            exit(-2);
+        }
+    }   // if m_profile
+
+    SDL_GL_SwapBuffers() ;
+}
+
+//-----------------------------------------------------------------------------
 void
 WorldScreen::draw()
 {
-  const Track* track = world->track;
+    const Track* TRACK = world->m_track;
 
-  glEnable ( GL_DEPTH_TEST ) ;
+    glEnable ( GL_DEPTH_TEST ) ;
 
-  if (track->useFog())
+    if (TRACK->useFog())
     {
-      glEnable ( GL_FOG ) ;
+        glEnable ( GL_FOG ) ;
 
-      glFogf ( GL_FOG_DENSITY, track->getFogDensity() ) ;
-      glFogfv( GL_FOG_COLOR  , track->getFogColor() ) ;
-      glFogf ( GL_FOG_START  , track->getFogStart() ) ;
-      glFogf ( GL_FOG_END    , track->getFogEnd() ) ;
-      glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
-      glHint ( GL_FOG_HINT   , GL_NICEST ) ;
+        glFogf ( GL_FOG_DENSITY, TRACK->getFogDensity() ) ;
+        glFogfv( GL_FOG_COLOR  , TRACK->getFogColor() ) ;
+        glFogf ( GL_FOG_START  , TRACK->getFogStart() ) ;
+        glFogf ( GL_FOG_END    , TRACK->getFogEnd() ) ;
+        glFogi ( GL_FOG_MODE   , GL_EXP2   ) ;
+        glHint ( GL_FOG_HINT   , GL_NICEST ) ;
 
-      /* Clear the screen */
-      glClearColor (track->getFogColor()[0],
-                    track->getFogColor()[1],
-                    track->getFogColor()[2],
-                    track->getFogColor()[3]);
+        /* Clear the screen */
+        glClearColor (TRACK->getFogColor()[0],
+                      TRACK->getFogColor()[1],
+                      TRACK->getFogColor()[2],
+                      TRACK->getFogColor()[3]);
     }
-  else
+    else
     {
-      /* Clear the screen */
-      glClearColor (track->getSkyColor()[0],
-                    track->getSkyColor()[1],
-                    track->getSkyColor()[2],
-                    track->getSkyColor()[3]);
-    }
-
-  glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
-
-  for ( Cameras::iterator i = cameras.begin(); i != cameras.end(); ++i)
-    {
-      (*i) -> apply () ;
-      world->draw() ;
+        /* Clear the screen */
+        glClearColor (TRACK->getSkyColor()[0],
+                      TRACK->getSkyColor()[1],
+                      TRACK->getSkyColor()[2],
+                      TRACK->getSkyColor()[3]);
     }
 
-  if (track->useFog())
+    glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
+
+    for ( Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
     {
-      glDisable ( GL_FOG ) ;
+        (*i) -> apply () ;
+        world->draw() ;
     }
 
-  glViewport ( 0, 0, config->width, config->height ) ;
+    if (TRACK->useFog())
+    {
+        glDisable ( GL_FOG ) ;
+    }
+
+    glViewport ( 0, 0, config->m_width, config->m_height ) ;
 }
 
+//-----------------------------------------------------------------------------
 Camera*
 WorldScreen::getCamera(int i) const
 {
-  if (i >= 0 && i < int(cameras.size()))
-    return cameras[i];
-  else
-    return 0;
+    if (i >= 0 && i < int(m_cameras.size()))
+        return m_cameras[i];
+    else
+        return 0;
 }
 
 /* EOF */

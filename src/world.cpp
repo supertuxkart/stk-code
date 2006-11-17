@@ -52,36 +52,37 @@
 
 World* world = 0;
 
-// -----------------------------------------------------------------------------
-World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_) 
+World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 {
     delete world;
     world = this;
-    phase = START_PHASE;
+    m_phase = START_PHASE;
 
-    scene = NULL;
-    track = NULL;
+    m_scene = NULL;
+    m_track = NULL;
 
-    clock = 0.0f;
+    m_clock = 0.0f;
 
     // Grab the track file
-    try 
+    try
     {
-        track = track_manager->getTrack(raceSetup.track) ;
-    } catch(std::runtime_error) {
-        printf("Track '%s' not found.\n",raceSetup.track.c_str());
+        m_track = track_manager->getTrack(m_race_setup.m_track) ;
+    }
+    catch(std::runtime_error)
+    {
+        printf("Track '%s' not found.\n",m_race_setup.m_track.c_str());
         exit(1);
     }
 
     // Start building the scene graph
-    scene       = new ssgRoot   ;
-    trackBranch = new ssgBranch ;
-    scene -> addKid ( trackBranch ) ;
-  
+    m_scene       = new ssgRoot   ;
+    m_track_branch = new ssgBranch ;
+    m_scene -> addKid ( m_track_branch ) ;
+
     // Create the physics
-    physics = new Physics(getGravity());
-  
-    assert(raceSetup.karts.size() > 0);
+    m_physics = new Physics(getGravity());
+
+    assert(m_race_setup.m_karts.size() > 0);
 
     // Clear all callbacks, which might still be stored there from a previous race.
     callback_manager->clear(CB_TRACK);
@@ -90,33 +91,35 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_)
     // karts can be positioned properly on (and not in) the tracks.
     loadTrack   ( ) ;
 
-    staticSSG = new StaticSSG(trackBranch, 1000);
-    //  staticSSG->Draw(scene);
+    m_static_ssg = new StaticSSG(m_track_branch, 1000);
+    //  m_static_ssg->Draw(m_scene);
     //  exit(-1);
     int pos = 0;
     int playerIndex = 0;
-    for (RaceSetup::Karts::iterator i = raceSetup.karts.begin() ;
-         i != raceSetup.karts.end() ; ++i ) 
+    for (RaceSetup::Karts::iterator i = m_race_setup.m_karts.begin() ;
+         i != m_race_setup.m_karts.end() ; ++i )
     {
         Kart* newkart;
-        if(config->profile) 
+        if(config->m_profile)
         {
             // In profile mode, load only the old kart
             newkart = new AutoKart (kart_properties_manager->getKart("tuxkart"), pos);
-        } else 
+        }
+        else
         {
-            if (std::find(raceSetup.players.begin(),
-                          raceSetup.players.end(), pos) != raceSetup.players.end())
+            if (std::find(m_race_setup.m_players.begin(),
+                          m_race_setup.m_players.end(), pos) != m_race_setup.m_players.end())
             {
                 // the given position belongs to a player
                 newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
-                                          &(config->player[playerIndex++]));
-            } else 
+                                          &(config->m_player[playerIndex++]));
+            }
+            else
             {
                 newkart = new AutoKart   (kart_properties_manager->getKart(*i), pos);
             }
-        }   // if !config->profile
-        if(config->replayHistory) 
+        }   // if !config->m_profile
+        if(config->m_replay_history)
         {
             history->LoadKartData(newkart, pos);
         }
@@ -131,52 +134,53 @@ World::World(const RaceSetup& raceSetup_) : raceSetup(raceSetup_)
         // is a somewhat arbitrary value.
         init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
         init_pos.xyz[1] = -pos * 1.5f -1.5f;
-        float hot = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
-        init_pos.xyz[2] = hot;
+        const float HOT = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
+        init_pos.xyz[2] = HOT;
         newkart -> setReset ( & init_pos ) ;
         newkart -> reset    () ;
         newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-        scene -> addKid ( newkart -> getModel() ) ;
-        kart.push_back(newkart);
+        m_scene -> addKid ( newkart -> getModel() ) ;
+        m_kart.push_back(newkart);
         pos++;
     }  // for i
 
     loadPlayers ( ) ;
-    numberCollisions = new int[raceSetup.getNumKarts()];
-    for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) numberCollisions[i]=0;
-    preProcessObj ( scene ) ;
+    m_number_collisions = new int[m_race_setup.getNumKarts()];
+    for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
+    preProcessObj ( m_scene ) ;
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-    //ssgSetBackFaceCollisions ( raceSetup.mirror ) ;
+    //ssgSetBackFaceCollisions ( m_race_setup.mirror ) ;
 #endif
 
     menu_manager->switchToRace();
 
-    const std::string& music_name= track_manager->getTrack(raceSetup.track)->getMusic();
-    if (music_name.size()>0) sound_manager->playMusic(music_name.c_str());
+    const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();
+    if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME.c_str());
 
-    if(config->profile) 
+    if(config->m_profile)
     {
-        ready_set_go = -1;
-        phase        = RACE_PHASE;
-    } else 
+        m_ready_set_go = -1;
+        m_phase        = RACE_PHASE;
+    }
+    else
     {
-        phase        = START_PHASE;  // profile starts without countdown
-        ready_set_go = 3;
+        m_phase        = START_PHASE;  // profile starts without countdown
+        m_ready_set_go = 3;
     }
 }
 
-// -----------------------------------------------------------------------------
-World::~World() 
+//-----------------------------------------------------------------------------
+World::~World()
 {
-    for ( unsigned int i = 0 ; i < kart.size() ; i++ )
-        delete kart[i];
+    for ( unsigned int i = 0 ; i < m_kart.size() ; i++ )
+        delete m_kart[i];
 
-    kart.clear();
+    m_kart.clear();
     projectile_manager->cleanup();
-    delete [] numberCollisions;
-    delete scene ;
+    delete [] m_number_collisions;
+    delete m_scene ;
 
     sound_manager -> stopMusic();
 
@@ -193,37 +197,37 @@ World::~World()
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
 }
 
-// -----------------------------------------------------------------------------
-void World::draw() 
+//-----------------------------------------------------------------------------
+void World::draw()
 {
 
-    ssgGetLight ( 0 ) -> setPosition ( track->getSunPos() ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , track->getAmbientCol()  ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , track->getDiffuseCol() ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, track->getSpecularCol() ) ;
+    ssgGetLight ( 0 ) -> setPosition ( m_track->getSunPos() ) ;
+    ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , m_track->getAmbientCol()  ) ;
+    ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , m_track->getDiffuseCol() ) ;
+    ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, m_track->getSpecularCol() ) ;
 
-    ssgCullAndDraw ( world->scene ) ;
+    ssgCullAndDraw ( world->m_scene ) ;
 }
 
-// -----------------------------------------------------------------------------
-void World::update(float delta) 
+//-----------------------------------------------------------------------------
+void World::update(float delta)
 {
-    if(config->replayHistory) delta=history->GetNextDelta();
-    clock += delta;
+    if(config->m_replay_history) delta=history->GetNextDelta();
+    m_clock += delta;
 
     checkRaceStatus();
 
-    // Count the number of collision in the next 'framesForTrafficJam' frames.
+    // Count the number of collision in the next 'FRAMES_FOR_TRAFFIC_JAM' frames.
     // If a kart has more than one hit, play 'traffic jam' noise.
     static int nCount=0;
-    const int framesForTrafficJam=20;
+    const int FRAMES_FOR_TRAFFIC_JAM=20;
     nCount++;
-    if(nCount==framesForTrafficJam) 
+    if(nCount==FRAMES_FOR_TRAFFIC_JAM)
     {
-        for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) numberCollisions[i]=0;
+        for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
         nCount=0;
     }
-    if( getPhase() == FINISH_PHASE ) 
+    if( getPhase() == FINISH_PHASE )
     {
         widgetSet->tgl_paused();
         menu_manager->pushMenu(MENUID_RACERESULT);
@@ -231,13 +235,14 @@ void World::update(float delta)
 
     float inc = 0.05f;
     float dt  = delta;
-    while (dt>0.0) 
+    while (dt>0.0)
     {
-        if(dt>=inc) 
+        if(dt>=inc)
         {
             dt-=inc;
-            if(config->replayHistory) delta=history->GetNextDelta();
-        } else 
+            if(config->m_replay_history) delta=history->GetNextDelta();
+        }
+        else
         {
             inc=dt;
             dt=0.0;
@@ -246,20 +251,20 @@ void World::update(float delta)
         // the same index in History:allDeltas, and the history* arrays here,
         // and makes writing easier, since we had to write delta the first
         // time, and then inc from then on.
-        if(!config->replayHistory) history->StoreDelta(delta);
-        for ( Karts::size_type i = 0 ; i < kart.size(); ++i) 
+        if(!config->m_replay_history) history->StoreDelta(delta);
+        for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
         {
-            kart[i]->update(inc) ;
+            m_kart[i]->update(inc) ;
         }
-        physics->update(inc);
+        m_physics->update(inc);
     }   // while dt>0
 
     projectile_manager->update(delta);
     herring_manager->update(delta);
-  
-    for ( Karts::size_type i = 0 ; i < kart.size(); ++i) 
+
+    for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
-        if(!kart[i]->raceIsFinished()) updateRacePosition((int)i);
+        if(!m_kart[i]->raceIsFinished()) updateRacePosition((int)i);
     }
 
     /* Routine stuff we do even when paused */
@@ -267,38 +272,41 @@ void World::update(float delta)
 
     // Check for traffic jam. The sound is played even if it's
     // not a player kart - a traffic jam happens rarely anyway.
-    for(unsigned int i=0; i<raceSetup.getNumKarts(); i++) 
+    for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++)
     {
-        if(numberCollisions[i]>1) 
+        if(m_number_collisions[i]>1)
         {
             sound_manager->playSfx(SOUND_TRAFFIC_JAM);
-            nCount = framesForTrafficJam-1;  // sets all fields to zero in next frame
+            nCount = FRAMES_FOR_TRAFFIC_JAM-1;  // sets all fields to zero in next frame
             break;
         }
     }
 
 }
 
-// -----------------------------------------------------------------------------
-void World::checkRaceStatus() 
+//-----------------------------------------------------------------------------
+void World::checkRaceStatus()
 {
-    if (clock > 1.0 && ready_set_go == 0) 
+    if (m_clock > 1.0 && m_ready_set_go == 0)
     {
-        ready_set_go = -1;
-    } else if (clock > 2.0 && ready_set_go == 1) 
+        m_ready_set_go = -1;
+    }
+    else if (m_clock > 2.0 && m_ready_set_go == 1)
     {
-        ready_set_go = 0;
-        phase = RACE_PHASE;
-        clock = 0.0f;
+        m_ready_set_go = 0;
+        m_phase = RACE_PHASE;
+        m_clock = 0.0f;
         sound_manager->playSfx(SOUND_START);
-    } else if (clock > 1.0 && ready_set_go == 2) 
+    }
+    else if (m_clock > 1.0 && m_ready_set_go == 2)
     {
         sound_manager->playSfx(SOUND_PRESTART);
-        ready_set_go = 1;
-    } else if (clock > 0.0 && ready_set_go == 3) 
+        m_ready_set_go = 1;
+    }
+    else if (m_clock > 0.0 && m_ready_set_go == 3)
     {
         sound_manager->playSfx(SOUND_PRESTART);
-        ready_set_go = 2;
+        m_ready_set_go = 2;
     }
 
     /*if all players have finished, or if only one kart is not finished when
@@ -306,16 +314,16 @@ void World::checkRaceStatus()
       vector, so substracting the number of players finds the first player's
       position.*/
     int new_finished_karts   = 0;
-    for ( Karts::size_type i = 0; i < kart.size(); ++i)
+    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
     {
-        if ((kart[i]->getLap () >= raceSetup.numLaps) && !kart[i]->raceIsFinished())
+        if ((m_kart[i]->getLap () >= m_race_setup.m_num_laps) && !m_kart[i]->raceIsFinished())
         {
-            kart[i]->setFinishingState(clock);
+            m_kart[i]->setFinishingState(m_clock);
 
-            race_manager->addKartScore((int)i, kart[i]->getPosition());
+            race_manager->addKartScore((int)i, m_kart[i]->getPosition());
 
             ++new_finished_karts;
-            if(kart[i]->isPlayerKart()) 
+            if(m_kart[i]->isPlayerKart())
             {
                 race_manager->PlayerFinishes();
             }
@@ -330,87 +338,90 @@ void World::checkRaceStatus()
     // 2) If only one kart is playing, finish when one kart is finished.
     // 3) Otherwise, wait till all karts except one is finished - the last
     //    kart obviously becoming the last
-    if(race_manager->allPlayerFinished() && phase == RACE_PHASE) 
+    if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE)
     {
-        phase = DELAY_FINISH_PHASE;
-        finishDelayStartTime = clock;
-    } else if(phase==DELAY_FINISH_PHASE && 
-              clock-finishDelayStartTime>TIME_DELAY_TILL_FINISH) 
+        m_phase = DELAY_FINISH_PHASE;
+        m_finish_delay_start_time = m_clock;
+    }
+    else if(m_phase==DELAY_FINISH_PHASE &&
+            m_clock-m_finish_delay_start_time>TIME_DELAY_TILL_FINISH)
     {
-        phase = FINISH_PHASE;
-        for ( Karts::size_type i = 0; i < kart.size(); ++i) 
+        m_phase = FINISH_PHASE;
+        for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
         {
-            if(!kart[i]->raceIsFinished()) 
+            if(!m_kart[i]->raceIsFinished())
             {
                 // FIXME: Add some tenths to have different times - a better solution
                 //        would be to estimate the distance to go and use this to
                 //        determine better times.
-                kart[i]->setFinishingState(clock+kart[i]->getPosition()*0.3f);
+                m_kart[i]->setFinishingState(m_clock+m_kart[i]->getPosition()*0.3f);
             }   // if !raceIsFinished
         }   // for i
-    
-    } else if(raceSetup.getNumKarts() == 1) 
+
+    }
+    else if(m_race_setup.getNumKarts() == 1)
     {
-        if(race_manager->getFinishedKarts() == 1) phase = FINISH_PHASE;
-    } else if(race_manager->getFinishedKarts() >= raceSetup.getNumKarts() - 1) 
+        if(race_manager->getFinishedKarts() == 1) m_phase = FINISH_PHASE;
+    }
+    else if(race_manager->getFinishedKarts() >= m_race_setup.getNumKarts() - 1)
     {
-        phase = FINISH_PHASE;
-        for ( Karts::size_type i = 0; i < kart.size(); ++i) 
+        m_phase = FINISH_PHASE;
+        for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
         {
-            if(!kart[i]->raceIsFinished()) 
+            if(!m_kart[i]->raceIsFinished())
             {
-                kart[i]->setFinishingState(clock);
+                m_kart[i]->setFinishingState(m_clock);
             }   // if !raceIsFinished
         }   // for i
     }   // if getFinishedKarts()>=geNumKarts()
 
 }  // checkRaceStatus
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void World::updateRacePosition ( int k )
 {
     int p = 1 ;
 
     /* Find position of kart 'k' */
 
-    for ( Karts::size_type j = 0 ; j < kart.size() ; ++j )
+    for ( Karts::size_type j = 0 ; j < m_kart.size() ; ++j )
     {
         if ( int(j) == k ) continue ;
 
-        // Count karts ahead of the current kart, i.e. kart that are already 
+        // Count karts ahead of the current kart, i.e. kart that are already
         // finished (the current kart k has not yet finished!!), have done more
         // laps, or the same number of laps, but a greater distance.
-        if (kart[j]->raceIsFinished()                                          ||
-            kart[j]->getLap() >  kart[k]->getLap()                             ||
-            (kart[j]->getLap() == kart[k]->getLap() &&
-             kart[j]->getDistanceDownTrack() > kart[k]->getDistanceDownTrack()) )
+        if (m_kart[j]->raceIsFinished()                                          ||
+            m_kart[j]->getLap() >  m_kart[k]->getLap()                             ||
+            (m_kart[j]->getLap() == m_kart[k]->getLap() &&
+             m_kart[j]->getDistanceDownTrack() > m_kart[k]->getDistanceDownTrack()) )
             p++ ;
     }
 
-    kart [ k ] -> setPosition ( p ) ;
+    m_kart [ k ] -> setPosition ( p ) ;
 }   // updateRacePosition
 
-// -----------------------------------------------------------------------------
-void World::loadPlayers() 
+//-----------------------------------------------------------------------------
+void World::loadPlayers()
 {
-    for ( Karts::size_type i = 0 ; i < kart.size() ; ++i )
+    for ( Karts::size_type i = 0 ; i < m_kart.size() ; ++i )
     {
-        kart[i]->load_data();
+        m_kart[i]->load_data();
     }
 
 }
 
-// -----------------------------------------------------------------------------
-void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight ) 
+//-----------------------------------------------------------------------------
+void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
 {
 
     // if only 2d coordinates are given, let the herring fall from very heigh
     if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
     // Even if 3d data are given, make sure that the herring is on the ground
-    (*xyz)[2] = getHeight ( trackBranch, *xyz ) + 0.06f;
+    (*xyz)[2] = getHeight ( m_track_branch, *xyz ) + 0.06f;
     herringType type=HE_GREEN;
-    if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
+if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
     if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
     if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
     if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
@@ -418,46 +429,49 @@ void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
 }   // herring_command
 
 
-// -----------------------------------------------------------------------------
-void World::loadTrack() 
+//-----------------------------------------------------------------------------
+void World::loadTrack()
 {
     std::string path = "data/";
-    path += track->getIdent();
+    path += m_track->getIdent();
     path += ".loc";
     path = loader->getPath(path.c_str());
 
     // remove old herrings (from previous race), and remove old
     // track specific herring models
     herring_manager->cleanup();
-    if(raceSetup.mode==RaceSetup::RM_GRAND_PRIX) 
+    if(m_race_setup.m_mode == RaceSetup::RM_GRAND_PRIX)
     {
-        try 
+        try
         {
-            herring_manager->loadHerringStyle(raceSetup.getHerringStyle());
-        } catch(std::runtime_error) 
+            herring_manager->loadHerringStyle(m_race_setup.getHerringStyle());
+        }
+        catch(std::runtime_error)
         {
             fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
-                    race_manager->getGrandPrix()->getName().c_str(), 
+                    race_manager->getGrandPrix()->getName().c_str(),
                     race_manager->getGrandPrix()->getHerringStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
-                    race_manager->getGrandPrix()->getFilename().c_str()); 
+                    race_manager->getGrandPrix()->getFilename().c_str());
         }
-    } else 
+    }
+    else
     {
-        try 
+        try
         {
-            herring_manager->loadHerringStyle(track->getHerringStyle());
-        } catch(std::runtime_error) 
+            herring_manager->loadHerringStyle(m_track->getHerringStyle());
+        }
+        catch(std::runtime_error)
         {
             fprintf(stderr, "The track '%s' contains an invalid herring style '%s'.\n",
-                    track->getName(), track->getHerringStyle().c_str());
+                    m_track->getName(), m_track->getHerringStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
-                    track->getFilename().c_str()); 
+                    m_track->getFilename().c_str());
         }
     }
 
     FILE *fd = fopen (path.c_str(), "r" );
-    if ( fd == NULL ) 
+    if ( fd == NULL )
     {
         std::stringstream msg;
         msg << "Can't open track location file '" << path << "'.";
@@ -466,13 +480,13 @@ void World::loadTrack()
 
     char s [ 1024 ] ;
 
-    while ( fgets ( s, 1023, fd ) != NULL ) 
+    while ( fgets ( s, 1023, fd ) != NULL )
     {
         if ( *s == '#' || *s < ' ' )
             continue ;
 
-        int need_hat = FALSE ;
-        int fit_skin = FALSE ;
+        int need_hat = false ;
+        int fit_skin = false ;
         char fname [ 1024 ] ;
         sgCoord loc ;
         sgZeroVec3 ( loc.xyz ) ;
@@ -481,67 +495,78 @@ void World::loadTrack()
         char htype = '\0' ;
 
         if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
-                      &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 ) 
+                      &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
         {
             herring_command(&loc.xyz, htype, false) ;
-        } else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
-                             &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) 
+        }
+        else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
+                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
         {
             herring_command (&loc.xyz, htype, true) ;
-        } else if ( s[0] == '\"' ) 
+        }
+        else if ( s[0] == '\"' )
         {
             if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
                           fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                          &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 ) 
+                          &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 )
             {
                 /* All 6 DOF specified */
-                need_hat = FALSE;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                                 &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 )
+                need_hat = false;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 )
             {
                 /* All 6 DOF specified - but need height */
-                need_hat = TRUE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                                 &(loc.hpr[0]) ) == 5 ) 
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
+                               &(loc.hpr[0]) ) == 5 )
             {
                 /* No Roll/Pitch specified - assumed zero */
-                need_hat = FALSE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                                 &(loc.hpr[0]) ) == 3 ) 
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]) ) == 3 )
             {
                 /* All 6 DOF specified - but need height, roll, pitch */
-                need_hat = TRUE ;
-                fit_skin = TRUE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                                 &(loc.hpr[0]) ) == 4 ) 
+                need_hat = true ;
+                fit_skin = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]) ) == 4 )
             {
                 /* No Roll/Pitch specified - but need height */
-                need_hat = TRUE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                                 &(loc.xyz[2]) ) == 4 ) 
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.xyz[2]) ) == 4 )
             {
                 /* No Heading/Roll/Pitch specified - but need height */
-                need_hat = FALSE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) 
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
             {
                 /* No Roll/Pitch specified - but need height */
-                need_hat = TRUE ;
-            } else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
-                                 fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 ) 
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
             {
                 /* No Z/Heading/Roll/Pitch specified */
-                need_hat = FALSE ;
-            } else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 ) 
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 )
             {
                 /* Nothing specified */
-                need_hat = FALSE ;
-            } else 
+                need_hat = false ;
+            }
+            else
             {
                 fclose(fd);
                 std::stringstream msg;
@@ -549,22 +574,22 @@ void World::loadTrack()
                 throw std::runtime_error(msg.str());
             }
 
-            if ( need_hat ) 
+            if ( need_hat )
             {
                 sgVec3 nrm ;
 
                 loc.xyz[2] = 1000.0f ;
-                loc.xyz[2] = getHeightAndNormal ( trackBranch, loc.xyz, nrm ) ;
+                loc.xyz[2] = getHeightAndNormal ( m_track_branch, loc.xyz, nrm ) ;
 
-                if ( fit_skin ) 
+                if ( fit_skin )
                 {
                     float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
                     float cy = cos ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
 
                     loc.hpr[2] =  SG_RADIANS_TO_DEGREES * atan2 ( nrm[0] * cy -
-                                                                  nrm[1] * sy, nrm[2] ) ;
+                                  nrm[1] * sy, nrm[2] ) ;
                     loc.hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy +
-                                                                  nrm[0] * sy, nrm[2] ) ;
+                                 nrm[0] * sy, nrm[2] ) ;
                 }
             }   // if need_hat
 
@@ -577,35 +602,37 @@ void World::loadTrack()
 
             lod         -> addKid    ( obj   ) ;
             trans       -> addKid    ( lod   ) ;
-            trackBranch -> addKid    ( trans ) ;
+            m_track_branch -> addKid ( trans ) ;
             lod         -> setRanges ( r, 2  ) ;
-            physics->set_track(obj);
+            m_physics->set_track(obj);
 #ifdef DEBUG_SHOW_DRIVEPOINTS
             ssgaSphere *sphere;
             sgVec3 center;
             sgVec4 colour;
-            for(unsigned int i = 0; i < track->driveline.size(); ++i)
+            for(unsigned int i = 0; i < m_track->driveline.size(); ++i)
             {
                 sphere = new ssgaSphere;
-                sgCopyVec3(center, track->driveline[i]);
+                sgCopyVec3(center, m_track->driveline[i]);
                 sphere->setCenter(center);
-                sphere->setSize(track->getWidth()[i] / 4.0f);
+                sphere->setSize(m_track->getWidth()[i] / 4.0f);
 
                 if(i == 0)
                 {
                     colour[0] = colour[2] = colour[3] = 255;
                     colour[1] = 0;
-                } else
+                }
+                else
                 {
                     colour[0] = colour[1] = colour[3] = 255;
                     colour[2] = 0;
                 }
                 sphere->setColour(colour);
-                scene->addKid(sphere);
+                m_scene->addKid(sphere);
             }
 #endif
 
-        } else 
+        }
+        else
         {
             fclose(fd);
             std::stringstream msg;
@@ -617,14 +644,14 @@ void World::loadTrack()
     fclose ( fd ) ;
 }   // loadTrack
 
-// -----------------------------------------------------------------------------
-void World::restartRace() 
+//-----------------------------------------------------------------------------
+void World::restartRace()
 {
-    ready_set_go = 3;
-    clock        = 0.0f;
-    phase        = START_PHASE;
+    m_ready_set_go = 3;
+    m_clock        = 0.0f;
+    m_phase        = START_PHASE;
 
-    for ( Karts::iterator i = kart.begin(); i != kart.end() ; ++i ) 
+    for ( Karts::iterator i = m_kart.begin(); i != m_kart.end() ; ++i )
     {
         (*i)->reset();
     }
@@ -634,10 +661,10 @@ void World::restartRace()
 }
 
 
-// -----------------------------------------------------------------------------
-PlayerKart* World::getPlayerKart(int player) 
+//-----------------------------------------------------------------------------
+PlayerKart* World::getPlayerKart(int player)
 {
-    return (PlayerKart*)kart[raceSetup.players[player]];
+    return (PlayerKart*)m_kart[m_race_setup.m_players[player]];
 }
 
 /* EOF */

@@ -26,52 +26,56 @@
 TrackManager* track_manager = 0;
 
 TrackManager::TrackManager()
-{
-}
+{}
 
+//-----------------------------------------------------------------------------
 TrackManager::~TrackManager()
 {
-  for(Tracks::iterator i = tracks.begin(); i != tracks.end(); ++i)
-    delete *i;
+    for(Tracks::iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
+        delete *i;
 }
 
+//-----------------------------------------------------------------------------
 const Track*
 TrackManager::getTrack(const std::string& ident) const
 {
-  for(Tracks::const_iterator i = tracks.begin(); i != tracks.end(); ++i)
+    for(Tracks::const_iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
     {
-      if ((*i)->getIdent() == ident)
-        return *i;
+        if ((*i)->getIdent() == ident)
+            return *i;
     }
 
-  throw std::runtime_error("TrackManager: Couldn't find track: '" + ident + "'");
+    throw std::runtime_error("TrackManager: Couldn't find track: '" + ident + "'");
 }
 
+//-----------------------------------------------------------------------------
 const Track*
 TrackManager::getTrack(size_t id) const
 {
-  return tracks[id];
+    return m_tracks[id];
 }
 
+//-----------------------------------------------------------------------------
 size_t
 TrackManager::getTrackCount() const
 {
-  return tracks.size();
+    return m_tracks.size();
 }
 
+//-----------------------------------------------------------------------------
 void
 TrackManager::loadTrackList ()
 {
-  // Load up a list of tracks - and their names
-  std::set<std::string> files;
-  loader->listFiles(files, "data");
-  for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
-    {
-      if(StringUtils::has_suffix(*i, ".track"))
+    // Load up a list of tracks - and their names
+    std::set<std::string> files;
+    loader->listFiles(files, "data");
+    for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
         {
-	  std::string track_name= std::string("data")+DIR_SEPARATOR + *i;
-          tracks.push_back(new Track(track_name.c_str()));
+            if(StringUtils::has_suffix(*i, ".track"))
+            {
+                std::string track_name= std::string("data")+DIR_SEPARATOR + *i;
+                m_tracks.push_back(new Track(track_name.c_str()));
+            }
         }
-    }
 }
 

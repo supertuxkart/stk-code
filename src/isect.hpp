@@ -27,7 +27,7 @@ float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal);
 
 inline float getHeight(ssgBranch* branch, sgVec3 my_position)
 {
-  return getHeightAndNormal(branch, my_position, 0);
+    return getHeightAndNormal(branch, my_position, 0);
 }
 
 #endif

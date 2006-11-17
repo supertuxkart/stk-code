@@ -24,30 +24,30 @@
 class Camera
 {
 public:
-  enum Mode {
-    CM_NORMAL,
-    CM_CLOSEUP,
-    CM_NO_FAKE_DRIFT,
-    CM_SIMPLE_REPLAY
-  };
+    enum Mode {
+        CM_NORMAL,
+        CM_CLOSEUP,
+        CM_NO_FAKE_DRIFT,
+        CM_SIMPLE_REPLAY
+    };
 protected:
-  ssgContext *context  ;
+    ssgContext *m_context  ;
 
-  int    whichKart ;
-  Mode mode;
-  float last_steer_offset;
-  float x, y, w, h ;
+    int    m_which_kart ;
+    Mode m_mode;
+    float m_last_steer_offset;
+    float m_x, m_y, m_w, m_h ;
 
 public:
-  Camera ( int numPlayers, int id ) ;
+    Camera ( int numPlayers, int id ) ;
 
-  /** Set the camera to the given mode */
-  void setMode(Mode mode_);
+    /** Set the camera to the given mode */
+    void setMode(Mode mode_);
 
-  void setScreenPosition ( int numPlayers, int pos ) ;
+    void setScreenPosition ( int numPlayers, int pos ) ;
 
-  void update () ;
-  void apply  () ;
+    void update () ;
+    void apply  () ;
 } ;
 
 #endif

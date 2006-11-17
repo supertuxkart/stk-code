@@ -40,8 +40,8 @@ ConfigSound::ConfigSound()
     m_music_menu_id = widgetSet->start(VA,"  Turn on music  ", GUI_MED, WTOK_MUSIC);
     m_sfx_menu_id   = widgetSet->state(VA,"  Turn on sound effects  ", GUI_MED, WTOK_SFX);
 
-    if(config->music) widgetSet->set_label(m_music_menu_id, "Turn off music");
-    if(config->sfx) widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
+    if(config->m_music) widgetSet->set_label(m_music_menu_id, "Turn off music");
+    if(config->m_sfx) widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
     widgetSet -> space(VA);
     widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
     widgetSet -> layout(m_menu_id, 0, 0);
@@ -72,26 +72,26 @@ void ConfigSound::select()
     switch ( widgetSet -> token (widgetSet -> click()) )
     {
     case WTOK_MUSIC:
-        if(config->music)
+        if(config->m_music)
         {
-            config->music = false;
+            config->m_music = false;
             widgetSet->set_label(m_music_menu_id, "Turn on music");
         }
         else
         {
-            config->music = true;
+            config->m_music = true;
             widgetSet->set_label(m_music_menu_id, "Turn off music");
         }
         break;
     case WTOK_SFX:
-        if(config->sfx)
+        if(config->m_sfx)
         {
-            config->sfx = false;
+            config->m_sfx = false;
             widgetSet->set_label(m_sfx_menu_id, "Turn on sound effects");
         }
         else
         {
-            config->sfx = true;
+            config->m_sfx = true;
             widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
         }
         break;

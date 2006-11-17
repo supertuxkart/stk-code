@@ -28,80 +28,81 @@
 WidgetSet *widgetSet;
 
 WidgetSet::WidgetSet()
-	: active(0), pause_id(0), paused(0)
+        : m_active(0), m_pause_id(0), m_paused(0)
 {
-	int w   = config->width;
-	int h   = config->height;
-	int s   = (h < w) ? h : w;
-	radius  = s/60;
-	fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
-				 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	textOut = new fntRenderer();
-	textOut->setFont(fnt);
+    const int W   = config->m_width;
+    const int H   = config->m_height;
+    const int S   = (H < W) ? H : W;
+    m_radius  = S/60;
+    m_fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
+                             GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    m_text_out = new fntRenderer();
+    m_text_out->setFont(m_fnt);
 
-	fntRace = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(),
-				 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	textOutRace = new fntRenderer();
-	textOutRace->setFont(fntRace);
+    m_fnt_race = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(),
+                             GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    m_text_out_race = new fntRenderer();
+    m_text_out_race->setFont(m_fnt_race);
 
-	/* Initialize font rendering. */
-	memset(widgets, 0, sizeof (Widget) * MAXWIDGETS);
+    /* Initialize font rendering. */
+    memset(m_widgets, 0, sizeof (Widget) * MAXWIDGETS);
 
 }
 
+//-----------------------------------------------------------------------------
 WidgetSet::~WidgetSet()
 {
-	int id;
+    int id;
 
-	/* Release any remaining widget texture and display list indices. */
+    /* Release any remaining widget texture and display list indices. */
 
-	for (id = 1; id < MAXWIDGETS; id++)
-	{
-		if (glIsList(widgets[id].rect_obj))
-			glDeleteLists(widgets[id].rect_obj, 1);
+    for (id = 1; id < MAXWIDGETS; id++)
+    {
+        if (glIsList(m_widgets[id].rect_obj))
+            glDeleteLists(m_widgets[id].rect_obj, 1);
 
-		widgets[id].type     = GUI_FREE;
-		widgets[id].text_img = 0;
-		widgets[id].rect_obj = 0;
-		widgets[id].cdr      = 0;
-		widgets[id].car      = 0;
-	}
+        m_widgets[id].type     = GUI_FREE;
+        m_widgets[id].text_img = 0;
+        m_widgets[id].rect_obj = 0;
+        m_widgets[id].cdr      = 0;
+        m_widgets[id].car      = 0;
+    }
 
 }
 
-void WidgetSet::reInit() {
-  if(fnt    ) delete fnt;
-  if(textOut) delete textOut;
-  fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(), 
-			   GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-  textOut = new fntRenderer();
-  textOut->setFont(fnt);
-  if(textOutRace) delete textOutRace;
-  fntRace = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(), 
-			   GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-  textOutRace = new fntRenderer();
-  textOutRace->setFont(fntRace);
-  
+//-----------------------------------------------------------------------------
+void WidgetSet::reInit()
+{
+    if(m_fnt    ) delete m_fnt;
+    if(m_text_out) delete m_text_out;
+    m_fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
+                             GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    m_text_out = new fntRenderer();
+    m_text_out->setFont(m_fnt);
+    if(m_text_out_race) delete m_text_out_race;
+    m_fnt_race = new fntTexFont(loader->getPath("fonts/DomesticManners.txf").c_str(),
+                             GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    m_text_out_race = new fntRenderer();
+    m_text_out_race->setFont(m_fnt_race);
+
 }   // reInit
 
+//-----------------------------------------------------------------------------
 int WidgetSet::hot(int id)
 {
-	return (widgets[id].type & GUI_STATE);
+    return (m_widgets[id].type & GUI_STATE);
 }
 
 
-/*---------------------------------------------------------------------------*/
-/*
- * Initialize a display list containing a rounded-corner rectangle (x,
- * y, w, h).  Generate texture coordinates to properly apply a texture
- * map to the rectangle as though the corners were not rounded.
+/** Initialize a display list containing a rounded-corner rectangle (x,
+ *  y, w, h).  Generate texture coordinates to properly apply a texture
+ *  map to the rectangle as though the corners were not rounded.
  */
-
 GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
 {
     GLuint list = glGenLists(1);
 
-    int n = 8;
+    const int N = 8;
     int i;
 
     glNewList(list, GL_COMPILE);
@@ -110,9 +111,9 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
         {
             /* Left side... */
 
-            for (i = 0; i <= n; i++)
+            for (i = 0; i <= N; i++)
             {
-                float a = 0.5f * M_PI * (float) i / (float) n;
+                float a = 0.5f * M_PI * (float) i / (float) N;
                 float s = r * sin(a);
                 float c = r * cos(a);
 
@@ -128,9 +129,9 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
 
             /* ... Right side. */
 
-            for (i = 0; i <= n; i++)
+            for (i = 0; i <= N; i++)
             {
-                float a = 0.5f * M_PI * (float) i / (float) n;
+                float a = 0.5f * M_PI * (float) i / (float) N;
                 float s = r * sin(a);
                 float c = r * cos(a);
 
@@ -152,11 +153,7 @@ GLuint WidgetSet::rect(int x, int y, int w, int h, int f, int r)
     return list;
 }
 
-
-
-/*---------------------------------------------------------------------------*/
-
-
+//-----------------------------------------------------------------------------
 int WidgetSet::add_widget(int pd, int type)
 {
     int id;
@@ -164,90 +161,99 @@ int WidgetSet::add_widget(int pd, int type)
     /* Find an unused entry in the widget table. */
 
     for (id = 1; id < MAXWIDGETS; id++)
-      {
-        if (widgets[id].type == GUI_FREE)
+    {
+        if (m_widgets[id].type == GUI_FREE)
         {
             /* Set the type and default properties. */
 
-            widgets[id].type       = type;
-            widgets[id].token      = 0;
-            widgets[id].value      = 0;
-            widgets[id].size       = 0;
-            widgets[id].rect       = GUI_NW | GUI_SW | GUI_NE | GUI_SE;
-            widgets[id].w          = 0;
-            widgets[id].h          = 0;
-            widgets[id].text_img   = 0;
-            widgets[id].rect_obj   = 0;
-            widgets[id].color0     = gui_wht;
-            widgets[id].color1     = gui_wht;
-            widgets[id].scale      = 1.0f;
-            widgets[id].count_text = (char*)NULL;
+            m_widgets[id].type       = type;
+            m_widgets[id].token      = 0;
+            m_widgets[id].value      = 0;
+            m_widgets[id].size       = 0;
+            m_widgets[id].rect       = GUI_NW | GUI_SW | GUI_NE | GUI_SE;
+            m_widgets[id].w          = 0;
+            m_widgets[id].h          = 0;
+            m_widgets[id].text_img   = 0;
+            m_widgets[id].rect_obj   = 0;
+            m_widgets[id].color0     = gui_wht;
+            m_widgets[id].color1     = gui_wht;
+            m_widgets[id].scale      = 1.0f;
+            m_widgets[id].count_text = (char*)NULL;
 
             /* Insert the new widget into the parents's widget list. */
 
             if (pd)
             {
-                widgets[id].car = 0;
-                widgets[id].cdr = widgets[pd].car;
-                widgets[pd].car = id;
+                m_widgets[id].car = 0;
+                m_widgets[id].cdr = m_widgets[pd].car;
+                m_widgets[pd].car = id;
             }
             else
             {
-                widgets[id].car = 0;
-                widgets[id].cdr = 0;
+                m_widgets[id].car = 0;
+                m_widgets[id].cdr = 0;
             }
 
             return id;
-	}
-      }   // for i
+        }
+    }   // for i
 
     fprintf(stderr, "Out of widget IDs\n");
 
     return 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::harray(int pd) { return add_widget(pd, GUI_HARRAY); }
+//-----------------------------------------------------------------------------
 int WidgetSet::varray(int pd) { return add_widget(pd, GUI_VARRAY); }
+//-----------------------------------------------------------------------------
 int WidgetSet::hstack(int pd) { return add_widget(pd, GUI_HSTACK); }
+//-----------------------------------------------------------------------------
 int WidgetSet::vstack(int pd) { return add_widget(pd, GUI_VSTACK); }
+//-----------------------------------------------------------------------------
 int WidgetSet::filler(int pd) { return add_widget(pd, GUI_FILLER); }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::set_label(int id, const char *text)
 {
     float l,r,b,t;
-    fnt->getBBox(text, widgets[id].size, 0.0f, &l, &r, &b, &t);
-    widgets[id].yOffset    = (int)b;
-    widgets[id].text_width = (int)(r-l+0.99);
-    widgets[id]._text      = text;
+    m_fnt->getBBox(text, m_widgets[id].size, 0.0f, &l, &r, &b, &t);
+    m_widgets[id].yOffset    = (int)b;
+    m_widgets[id].text_width = (int)(r-l+0.99);
+    m_widgets[id]._text      = text;
     // There is a potential bug here: if the label being set is
     // larger than the current width, the container (parent) does
     // not get wider ... the layout will be broken. Unfortunately,
     // that's somewhat difficult to fix, since layout will in turn
     // add the radius to width of button (see button_up), ...
     // So for now we only print a warning:
-    if(widgets[id].text_width > widgets[id].w) {
-      fprintf(stderr,
-     "set_label increased width of parent container, layout will be invalid\n");
+    if(m_widgets[id].text_width > m_widgets[id].w)
+    {
+        fprintf(stderr,
+                "set_label increased width of parent container, layout will be invalid\n");
     }
 }
 
-void WidgetSet::set_count(int id, int value) {
-  widgets[id].value = value;
-  sprintf(widgets[id].count_text,"%d",value);
-  float l,r,b,t;
-  fnt->getBBox(widgets[id].count_text, widgets[id].size, 0, &l, &r, &b, &t);
-  widgets[id].yOffset    = (int)(b);
-  widgets[id].w          = (int)(r-l+0.99);
-  widgets[id].h          = (int)(t-b+0.99);
+//-----------------------------------------------------------------------------
+void WidgetSet::set_count(int id, int value)
+{
+    m_widgets[id].value = value;
+    sprintf(m_widgets[id].count_text,"%d",value);
+    float l,r,b,t;
+    m_fnt->getBBox(m_widgets[id].count_text, m_widgets[id].size, 0, &l, &r, &b, &t);
+    m_widgets[id].yOffset    = (int)(b);
+    m_widgets[id].w          = (int)(r-l+0.99);
+    m_widgets[id].h          = (int)(t-b+0.99);
 }   // set_count
 
+//-----------------------------------------------------------------------------
 void WidgetSet::set_clock(int id, int value)
 {
-    widgets[id].value = value;
+    m_widgets[id].value = value;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::set_multi(int id, const char *text)
 {
     const char *p;
@@ -269,218 +275,236 @@ void WidgetSet::set_multi(int id, const char *text)
 
     /* Set the label value for each line. */
 
-    for (i = j - 1, jd = widgets[id].car; i >= 0 && jd; i--, jd = widgets[jd].cdr)
+    for (i = j - 1, jd = m_widgets[id].car; i >= 0 && jd; i--, jd = m_widgets[jd].cdr)
         set_label(jd, s[i]);
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 int WidgetSet::image(int pd, int textureId, int w, int h)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_IMAGE)))
     {
-      widgets[id].text_img = textureId;
-      widgets[id].w     = w;
-      widgets[id].h     = h;
+        m_widgets[id].text_img = textureId;
+        m_widgets[id].w     = w;
+        m_widgets[id].h     = h;
     }
     return id;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::start(int pd, const char *text, int size, int token, int value)
 {
     int id;
 
     if ((id = state(pd, text, size, token, value)))
-        active = id;
+        m_active = id;
 
     return id;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::state(int pd, const char *text, int size, int token, int value)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_STATE)))
     {
-      widgets[id]._text = text;
-      float l,r,b,t;
-      fnt->getBBox(text, size, 0, &l, &r, &b, &t);
-      // Apparently the font system allows charater to be
-      // under the y=0 line (e.g the character g, p, y)
-      // Since the text will not be centered because of this,
-      // the distance to the baseline y=0 is saved and during
-      // output added to the y location.
-      widgets[id].w          = (int)(r-l+0.99);
-      widgets[id].text_width = widgets[id].w;
-      widgets[id].h          = (int)(t-b+0.99);
-      widgets[id].yOffset    = (int)b - widgets[id].h/4 ;
-      widgets[id].size       = size;
-      widgets[id].token      = token;
-      widgets[id].value      = value;
+        m_widgets[id]._text = text;
+        float l,r,b,t;
+        m_fnt->getBBox(text, size, 0, &l, &r, &b, &t);
+        // Apparently the font system allows charater to be
+        // under the y=0 line (e.g the character g, p, y)
+        // Since the text will not be centered because of this,
+        // the distance to the baseline y=0 is saved and during
+        // output added to the y location.
+        m_widgets[id].w          = (int)(r-l+0.99);
+        m_widgets[id].text_width = m_widgets[id].w;
+        m_widgets[id].h          = (int)(t-b+0.99);
+        m_widgets[id].yOffset    = (int)b - m_widgets[id].h/4 ;
+        m_widgets[id].size       = size;
+        m_widgets[id].token      = token;
+        m_widgets[id].value      = value;
     }
     return id;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::label(int pd, const char *text, int size, int rect, const float *c0,
-                                                            const float *c1)
+                     const float *c1)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_LABEL)))
     {
-      widgets[id]._text = text;
-      float l,r,b,t;
-      fnt->getBBox(text, size, 0, &l, &r, &b, &t);
-      widgets[id].yOffset    = (int)(b);
-      widgets[id].w          = (int)(r-l+0.99);
-      widgets[id].h          = (int)(t-b+0.99);
-      widgets[id].text_width = widgets[id].w;
-      widgets[id].size       = size;
-      widgets[id].color0     = c0 ? c0 : gui_yel;
-      widgets[id].color1     = c1 ? c1 : gui_red;
-      widgets[id].rect       = rect;
+        m_widgets[id]._text = text;
+        float l,r,b,t;
+        m_fnt->getBBox(text, size, 0, &l, &r, &b, &t);
+        m_widgets[id].yOffset    = (int)(b);
+        m_widgets[id].w          = (int)(r-l+0.99);
+        m_widgets[id].h          = (int)(t-b+0.99);
+        m_widgets[id].text_width = m_widgets[id].w;
+        m_widgets[id].size       = size;
+        m_widgets[id].color0     = c0 ? c0 : gui_yel;
+        m_widgets[id].color1     = c1 ? c1 : gui_red;
+        m_widgets[id].rect       = rect;
     }
     return id;
 }
-// -----------------------------------------------------------------------------
-int WidgetSet::count(int pd, int value, int size, int rect) {
+
+//-----------------------------------------------------------------------------
+int WidgetSet::count(int pd, int value, int size, int rect)
+{
     int  id;
 
-    if ((id = add_widget(pd, GUI_COUNT))) {
-      widgets[id].value  = value;
-      widgets[id].size   = size;
-      widgets[id].color0 = gui_yel;
-      widgets[id].color1 = gui_red;
-      widgets[id].rect   = rect;
-      widgets[id].count_text  = new char[20];
-      sprintf(widgets[id].count_text,"%d",value);
-      float l,r,b,t;
-      fnt->getBBox(widgets[id].count_text, size, 0, &l, &r, &b, &t);
-      widgets[id].yOffset    = (int)(b);
-      widgets[id].w          = (int)(r-l+0.99);
-      widgets[id].h          = (int)(t-b+0.99);
+    if ((id = add_widget(pd, GUI_COUNT)))
+    {
+        m_widgets[id].value  = value;
+        m_widgets[id].size   = size;
+        m_widgets[id].color0 = gui_yel;
+        m_widgets[id].color1 = gui_red;
+        m_widgets[id].rect   = rect;
+        m_widgets[id].count_text  = new char[20];
+        sprintf(m_widgets[id].count_text,"%d",value);
+        float l,r,b,t;
+        m_fnt->getBBox(m_widgets[id].count_text, size, 0, &l, &r, &b, &t);
+        m_widgets[id].yOffset    = (int)(b);
+        m_widgets[id].w          = (int)(r-l+0.99);
+        m_widgets[id].h          = (int)(t-b+0.99);
     }
     return id;
 }   // count
 
-// -----------------------------------------------------------------------------
-int WidgetSet::clock(int pd, int value, int size, int rect) {
+//-----------------------------------------------------------------------------
+int WidgetSet::clock(int pd, int value, int size, int rect)
+{
     int id;
 
     if ((id = add_widget(pd, GUI_CLOCK)))
     {
-      printf("clock: FIXME\n");
-      //widgets[id].w      = digit_w[size][0] * 6;
-      //widgets[id].h      = digit_h[size][0];
-        widgets[id].value  = value;
-        widgets[id].size   = size;
-        widgets[id].color0 = gui_yel;
-        widgets[id].color1 = gui_red;
-        widgets[id].rect   = rect;
+        printf("clock: FIXME\n");
+        //m_widgets[id].w      = digit_w[size][0] * 6;
+        //m_widgets[id].h      = digit_h[size][0];
+        m_widgets[id].value  = value;
+        m_widgets[id].size   = size;
+        m_widgets[id].color0 = gui_yel;
+        m_widgets[id].color1 = gui_red;
+        m_widgets[id].rect   = rect;
     }
     return id;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::space(int pd)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_SPACE)))
     {
-        widgets[id].w = 0;
-        widgets[id].h = 0;
+        m_widgets[id].w = 0;
+        m_widgets[id].h = 0;
     }
     return id;
 }
-void WidgetSet::drawText (const char *text, int sz, int x, int y, 
-			  int red, int green, int blue, 
-			  float scale_x, float scale_y ) {
-  float l,r,t,b, fontScaling;
-  // Only scale for lower resolution
-  fontScaling = config->width<800 ? ((float)config->width/800.0f) : 1.0f;
-  fontScaling = (float)config->width/800.0f;
-  sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
-  fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
-  int w = (int)((r-l+0.99)*scale_x);
-  int h = (int)((t-b+0.99)*scale_y);
-  if(x == SCREEN_CENTERED_TEXT) {
-    x = (config->width - w) / 2;
-  }
-  if(y == SCREEN_CENTERED_TEXT) {
-    y = (config->height - h) / 2;
-  }
- 
-  textOut->begin();
-    textOut->setPointSize(sz);
-    textOut->start2f((GLfloat)x, (GLfloat)y);
+
+//-----------------------------------------------------------------------------
+void WidgetSet::drawText (const char *text, int sz, int x, int y,
+                          int red, int green, int blue,
+                          float scale_x, float scale_y )
+{
+    float l,r,t,b, fontScaling;
+    // Only scale for lower resolution
+    fontScaling = config->m_width<800 ? ((float)config->m_width/800.0f) : 1.0f;
+    fontScaling = (float)config->m_width/800.0f;
+    sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
+    m_fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
+    const int W = (int)((r-l+0.99)*scale_x);
+    const int H = (int)((t-b+0.99)*scale_y);
+    if(x == SCREEN_CENTERED_TEXT)
+    {
+        x = (config->m_width - W) / 2;
+    }
+    if(y == SCREEN_CENTERED_TEXT)
+    {
+        y = (config->m_height - H) / 2;
+    }
+
+    m_text_out->begin();
+    m_text_out->setPointSize(sz);
+    m_text_out->start2f((GLfloat)x, (GLfloat)y);
     glColor3ub(red, green, blue);
-    textOut->puts(text);
-  textOut->end();
+    m_text_out->puts(text);
+    m_text_out->end();
 }
 
-void WidgetSet::drawDropShadowText (const char *text, int sz, int x, int y, 
-			  int red, int green, int blue, 
-			  float scale_x, float scale_y ) {
-  drawText ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
-  drawText ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
+//-----------------------------------------------------------------------------
+void WidgetSet::drawDropShadowText (const char *text, int sz, int x, int y,
+                                    int red, int green, int blue,
+                                    float scale_x, float scale_y )
+{
+    drawText ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
+    drawText ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
 }
 
-void WidgetSet::drawTextRace (const char *text, int sz, int x, int y, 
-			  int red, int green, int blue, 
-			  float scale_x, float scale_y ) {
-  float l,r,t,b, fontScaling;
-  // Only scale for lower resolution
-  fontScaling = config->width<800 ? ((float)config->width/800.0f) : 1.0f;
-  fontScaling = (float)config->width/800.0f;
-  sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
-  fntRace->getBBox(text, sz, 0, &l, &r, &b, &t);
-  int w = (int)((r-l+0.99)*scale_x);
-  int h = (int)((t-b+0.99)*scale_y);
-  if(x == SCREEN_CENTERED_TEXT) {
-    x = (config->width - w) / 2;
-  }
-  if(y == SCREEN_CENTERED_TEXT) {
-    y = (config->height - h) / 2;
-  }
- 
-  textOutRace->begin();
-    textOutRace->setPointSize(sz);
-    textOutRace->start2f((GLfloat)x, (GLfloat)y);
+//-----------------------------------------------------------------------------
+void WidgetSet::drawTextRace (const char *text, int sz, int x, int y,
+                              int red, int green, int blue,
+                              float scale_x, float scale_y )
+{
+    float l,r,t,b, fontScaling;
+    // Only scale for lower resolution
+    fontScaling = config->m_width<800 ? ((float)config->m_width/800.0f) : 1.0f;
+    fontScaling = (float)config->m_width/800.0f;
+    sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
+    m_fnt_race->getBBox(text, sz, 0, &l, &r, &b, &t);
+    const int W = (int)((r-l+0.99)*scale_x);
+    const int H = (int)((t-b+0.99)*scale_y);
+    if(x == SCREEN_CENTERED_TEXT)
+    {
+        x = (config->m_width - W) / 2;
+    }
+    if(y == SCREEN_CENTERED_TEXT)
+    {
+        y = (config->m_height - H) / 2;
+    }
+
+    m_text_out_race->begin();
+    m_text_out_race->setPointSize(sz);
+    m_text_out_race->start2f((GLfloat)x, (GLfloat)y);
     glColor3ub(red, green, blue);
-    textOutRace->puts(text);
-  textOutRace->end();
+    m_text_out_race->puts(text);
+    m_text_out_race->end();
 }
 
-void WidgetSet::drawDropShadowTextRace (const char *text, int sz, int x, int y, 
-			  int red, int green, int blue, 
-			  float scale_x, float scale_y ) {
-  drawTextRace ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
-  drawTextRace ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
+//-----------------------------------------------------------------------------
+void WidgetSet::drawDropShadowTextRace (const char *text, int sz, int x, int y,
+                                        int red, int green, int blue,
+                                        float scale_x, float scale_y )
+{
+    drawTextRace ( text, sz, x, y, 0, 0, 0, scale_x, scale_y ) ;
+    drawTextRace ( text, sz, x+2, y+2, red, green, blue, scale_x, scale_y ) ;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::pause(int pd)
 {
     int id;
 
     if ((id = add_widget(pd, GUI_PAUSE)))
     {
-        widgets[id].value  = 0;
-        widgets[id].rect   = GUI_ALL;
+        m_widgets[id].value  = 0;
+        m_widgets[id].rect   = GUI_ALL;
     }
     return id;
 }
 
-/*---------------------------------------------------------------------------*/
-/*
- * Create  a multi-line  text box  using a  vertical array  of labels.
- * Parse the  text for '\'  characters and treat them  as line-breaks.
- * Preserve the rect specifation across the entire array.
+/** Create  a multi-line  text box  using a  vertical array  of labels.
+ *  Parse the  text for '\'  characters and treat them  as line-breaks.
+ *  Preserve the rect specifation across the entire array.
  */
-
 int WidgetSet::multi(int pd, const char *text, int size, int rect, const float *c0,
-                                                            const float *c1)
+                     const float *c1)
 {
     int id = 0;
 
@@ -488,8 +512,8 @@ int WidgetSet::multi(int pd, const char *text, int size, int rect, const float *
     {
         const char *p;
 #define MAX_NUMBER_OF_LINES 20
-	// Important; this s must be static, otherwise the strings will be
-	// lost when returning --> garbage will be displayed.
+        // Important; this s must be static, otherwise the strings will be
+        // lost when returning --> garbage will be displayed.
         static char s[MAX_NUMBER_OF_LINES][MAXSTR];
         int  r[MAX_NUMBER_OF_LINES];
         int  i, j;
@@ -523,129 +547,132 @@ int WidgetSet::multi(int pd, const char *text, int size, int rect, const float *
     return id;
 }
 
-/*---------------------------------------------------------------------------*/
-/*
- * The bottom-up pass determines the area of all widgets.  The minimum
- * width  and height of  a leaf  widget is  given by  the size  of its
- * contents.   Array  and  stack   widths  and  heights  are  computed
- * recursively from these.
+/** The bottom-up pass determines the area of all widgets.  The minimum
+ *  width  and height of  a leaf  widget is  given by  the size  of its
+ *  contents.   Array  and  stack   widths  and  heights  are  computed
+ *  recursively from these.
  */
-
 void WidgetSet::harray_up(int id)
 {
     int jd, c = 0;
 
     /* Find the widest child width and the highest child height. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
         widget_up(jd);
 
-        if (widgets[id].h < widgets[jd].h)
-            widgets[id].h = widgets[jd].h;
-        if (widgets[id].w < widgets[jd].w)
-            widgets[id].w = widgets[jd].w;
+        if (m_widgets[id].h < m_widgets[jd].h)
+            m_widgets[id].h = m_widgets[jd].h;
+        if (m_widgets[id].w < m_widgets[jd].w)
+            m_widgets[id].w = m_widgets[jd].w;
         c++;
     }
 
     /* Total width is the widest child width times the child count. */
 
-    widgets[id].w *= c;
+    m_widgets[id].w *= c;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::varray_up(int id)
 {
     int jd, c = 0;
 
     /* Find the widest child width and the highest child height. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
         widget_up(jd);
 
-        if (widgets[id].h < widgets[jd].h)
-            widgets[id].h = widgets[jd].h;
-        if (widgets[id].w < widgets[jd].w)
-            widgets[id].w = widgets[jd].w;
+        if (m_widgets[id].h < m_widgets[jd].h)
+            m_widgets[id].h = m_widgets[jd].h;
+        if (m_widgets[id].w < m_widgets[jd].w)
+            m_widgets[id].w = m_widgets[jd].w;
 
         c++;
     }
 
     /* Total height is the highest child height times the child count. */
 
-    widgets[id].h *= c;
+    m_widgets[id].h *= c;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::hstack_up(int id)
 {
     int jd;
 
     /* Find the highest child height.  Sum the child widths. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
         widget_up(jd);
 
-        if (widgets[id].h < widgets[jd].h)
-            widgets[id].h = widgets[jd].h;
+        if (m_widgets[id].h < m_widgets[jd].h)
+            m_widgets[id].h = m_widgets[jd].h;
 
-        widgets[id].w += widgets[jd].w;
+        m_widgets[id].w += m_widgets[jd].w;
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::vstack_up(int id)
 {
     int jd;
 
     /* Find the widest child width.  Sum the child heights. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
         widget_up(jd);
 
-        if (widgets[id].w < widgets[jd].w)
-            widgets[id].w = widgets[jd].w;
+        if (m_widgets[id].w < m_widgets[jd].w)
+            m_widgets[id].w = m_widgets[jd].w;
 
-        widgets[id].h += widgets[jd].h;
+        m_widgets[id].h += m_widgets[jd].h;
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paused_up(int id)
 {
     /* Store width and height for later use in text rendering. */
 
-    widgets[id].x = widgets[id].w;
-    widgets[id].y = widgets[id].h;
+    m_widgets[id].x = m_widgets[id].w;
+    m_widgets[id].y = m_widgets[id].h;
 
     /* The pause widget fills the screen. */
 
-    widgets[id].w = config->width;
-    widgets[id].h = config->height;
+    m_widgets[id].w = config->m_width;
+    m_widgets[id].h = config->m_height;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::button_up(int id)
 {
     /* Store width and height for later use in text rendering. */
 
-    widgets[id].x = widgets[id].w;
-    widgets[id].y = widgets[id].h;
+    m_widgets[id].x = m_widgets[id].w;
+    m_widgets[id].y = m_widgets[id].h;
 
-    if (widgets[id].w < widgets[id].h && widgets[id].w > 0)
-        widgets[id].w = widgets[id].h;
+    if (m_widgets[id].w < m_widgets[id].h && m_widgets[id].w > 0)
+        m_widgets[id].w = m_widgets[id].h;
 
 
     /* Padded text elements look a little nicer. */
 
-    if (widgets[id].w < config->width)
-        widgets[id].w += radius;
-    if (widgets[id].h < config->height)
-        widgets[id].h += radius;
+    if (m_widgets[id].w < config->m_width)
+        m_widgets[id].w += m_radius;
+    if (m_widgets[id].h < config->m_height)
+        m_widgets[id].h += m_radius;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::widget_up(int id)
 {
     if (id)
-        switch (widgets[id].type & GUI_TYPE)
+        switch (m_widgets[id].type & GUI_TYPE)
         {
         case GUI_HARRAY: harray_up(id); break;
         case GUI_VARRAY: varray_up(id); break;
@@ -656,30 +683,27 @@ void WidgetSet::widget_up(int id)
         }
 }
 
-/*---------------------------------------------------------------------------*/
-/*
- * The  top-down layout  pass distributes  available area  as computed
- * during the bottom-up pass.  Widgets  use their area and position to
- * initialize rendering state.
+/** The  top-down layout  pass distributes  available area  as computed
+ *  during the bottom-up pass.  Widgets  use their area and position to
+ *  initialize rendering state.
  */
-
 void WidgetSet::harray_dn(int id, int x, int y, int w, int h)
 {
     int jd, i = 0, c = 0;
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
 
     /* Count children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
         c += 1;
 
     /* Distribute horizontal space evenly to all children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr, i++)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr, i++)
     {
         int x0 = x +  i      * w / c;
         int x1 = x + (i + 1) * w / c;
@@ -688,23 +712,24 @@ void WidgetSet::harray_dn(int id, int x, int y, int w, int h)
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::varray_dn(int id, int x, int y, int w, int h)
 {
     int jd, i = 0, c = 0;
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
 
     /* Count children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
         c += 1;
 
     /* Distribute vertical space evenly to all children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr, i++)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr, i++)
     {
         int y0 = y +  i      * h / c;
         int y1 = y + (i + 1) * h / c;
@@ -713,98 +738,103 @@ void WidgetSet::varray_dn(int id, int x, int y, int w, int h)
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::hstack_dn(int id, int x, int y, int w, int h)
 {
     int jd, jx = x, jw = 0, c = 0;
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
 
     /* Measure the total width requested by non-filler children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
-        if ((widgets[jd].type & GUI_TYPE) == GUI_FILLER)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
+        if ((m_widgets[jd].type & GUI_TYPE) == GUI_FILLER)
             c += 1;
         else
-            jw += widgets[jd].w;
+            jw += m_widgets[jd].w;
 
     /* Give non-filler children their requested space.   */
     /* Distribute the rest evenly among filler children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
-        if ((widgets[jd].type & GUI_TYPE) == GUI_FILLER)
+        if ((m_widgets[jd].type & GUI_TYPE) == GUI_FILLER)
             widget_dn(jd, jx, y, (w - jw) / c, h);
         else
-            widget_dn(jd, jx, y, widgets[jd].w, h);
+            widget_dn(jd, jx, y, m_widgets[jd].w, h);
 
-        jx += widgets[jd].w;
+        jx += m_widgets[jd].w;
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::vstack_dn(int id, int x, int y, int w, int h)
 {
     int jd, jy = y, jh = 0, c = 0;
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
 
     /* Measure the total height requested by non-filler children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
-        if ((widgets[jd].type & GUI_TYPE) == GUI_FILLER)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
+        if ((m_widgets[jd].type & GUI_TYPE) == GUI_FILLER)
             c += 1;
         else
-            jh += widgets[jd].h;
+            jh += m_widgets[jd].h;
 
     /* Give non-filler children their requested space.   */
     /* Distribute the rest evenly among filler children. */
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
     {
-        if ((widgets[jd].type & GUI_TYPE) == GUI_FILLER)
+        if ((m_widgets[jd].type & GUI_TYPE) == GUI_FILLER)
             widget_dn(jd, x, jy, w, (h - jh) / c);
         else
-            widget_dn(jd, x, jy, w, widgets[jd].h);
+            widget_dn(jd, x, jy, w, m_widgets[jd].h);
 
-        jy += widgets[jd].h;
+        jy += m_widgets[jd].h;
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::filler_dn(int id, int x, int y, int w, int h)
 {
     /* Filler expands to whatever size it is given. */
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::button_dn(int id, int x, int y, int w, int h)
 {
     /* Recall stored width and height for text rendering. */
 
-    int R = widgets[id].rect;
-    int r = ((widgets[id].type & GUI_TYPE) == GUI_PAUSE ? radius * 4 : radius);
+    int R = m_widgets[id].rect;
+    int r = ((m_widgets[id].type & GUI_TYPE) == GUI_PAUSE ? m_radius * 4 : m_radius);
 
-    widgets[id].x = x;
-    widgets[id].y = y;
-    widgets[id].w = w;
-    widgets[id].h = h;
+    m_widgets[id].x = x;
+    m_widgets[id].y = y;
+    m_widgets[id].w = w;
+    m_widgets[id].h = h;
     /* Create display lists for the text area and rounded rectangle. */
 
-    widgets[id].rect_obj = rect(-w / 2, -h / 2, w, h, R, r);
+    m_widgets[id].rect_obj = rect(-w / 2, -h / 2, w, h, R, r);
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::widget_dn(int id, int x, int y, int w, int h)
 {
     if (id)
-        switch (widgets[id].type & GUI_TYPE)
+        switch (m_widgets[id].type & GUI_TYPE)
         {
         case GUI_HARRAY: harray_dn(id, x, y, w, h); break;
         case GUI_VARRAY: varray_dn(id, x, y, w, h); break;
@@ -816,25 +846,24 @@ void WidgetSet::widget_dn(int id, int x, int y, int w, int h)
         }
 }
 
-/*---------------------------------------------------------------------------*/
-/*
- * During GUI layout, we make a bottom-up pass to determine total area
- * requirements for  the widget  tree.  We position  this area  to the
- * sides or center of the screen.  Finally, we make a top-down pass to
- * distribute this area to each widget.
+/** During GUI layout, we make a bottom-up pass to determine total area
+ *  requirements for  the widget  tree.  We position  this area  to the
+ *  sides or center of the screen.  Finally, we make a top-down pass to
+ *  distribute this area to each widget.
  */
-
 void WidgetSet::layout(int id, int xd, int yd)
 {
     int x, y;
 
-    int w, W = config->width;
-    int h, H = config->height;
+    const int W = config->m_width;
+    const int H = config->m_height;
+    int w = W;
+    int h = W;
 
     widget_up(id);
 
-    w = widgets[id].w;
-    h = widgets[id].h;
+    w = m_widgets[id].w;
+    h = m_widgets[id].h;
     if      (xd < 0) x = 0;
     else if (xd > 0) x = (W - w);
     else             x = (W - w) / 2;
@@ -850,92 +879,99 @@ void WidgetSet::layout(int id, int xd, int yd)
     point(id, -1, -1);
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::search(int id, int x, int y)
 {
     int jd, kd;
     assert(id < MAXWIDGETS);
-    
+
     /* Search the hierarchy for the widget containing the given point. */
 
-    if (id && (widgets[id].x <= x && x < widgets[id].x + widgets[id].w &&
-               widgets[id].y <= y && y < widgets[id].y + widgets[id].h))
+    if (id && (m_widgets[id].x <= x && x < m_widgets[id].x + m_widgets[id].w &&
+               m_widgets[id].y <= y && y < m_widgets[id].y + m_widgets[id].h))
     {
         if (hot(id))
             return id;
 
-        for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+        for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
             if ((kd = search(jd, x, y)))
                 return kd;
     }
     return 0;
 }
 
-/*
- * Activate a widget, allowing it  to behave as a normal state widget.
- * This may  be used  to create  image buttons, or  cause an  array of
- * widgets to behave as a single state widget.
+/** Activate a widget, allowing it  to behave as a normal state widget.
+ *  This may  be used  to create  image buttons, or  cause an  array of
+ *  widgets to behave as a single state widget.
  */
 int WidgetSet::activate_widget(int id, int token, int value)
 {
-    widgets[id].type |= GUI_STATE;
-    widgets[id].token = token;
-    widgets[id].value = value;
+    m_widgets[id].type |= GUI_STATE;
+    m_widgets[id].token = token;
+    m_widgets[id].value = value;
 
     return id;
 }
 
-int WidgetSet::delete_widget(int id) {
-    if (id) {
+//-----------------------------------------------------------------------------
+int WidgetSet::delete_widget(int id)
+{
+    if (id)
+    {
         /* Recursively delete all subwidgets. */
 
-        delete_widget(widgets[id].cdr);
-        delete_widget(widgets[id].car);
+        delete_widget(m_widgets[id].cdr);
+        delete_widget(m_widgets[id].car);
 
         /* Release any GL resources held by this widget. */
 
-        if (glIsList(widgets[id].rect_obj))
-            glDeleteLists(widgets[id].rect_obj, 1);
+        if (glIsList(m_widgets[id].rect_obj))
+            glDeleteLists(m_widgets[id].rect_obj, 1);
 
         /* Mark this widget unused. */
-	if(widgets[id].type==GUI_COUNT) {
-	  delete widgets[id].count_text;
-	}
-        widgets[id].type     = GUI_FREE;
-        widgets[id].text_img = 0;
-        widgets[id].rect_obj = 0;
-        widgets[id].cdr      = 0;
-        widgets[id].car      = 0;
+        if(m_widgets[id].type==GUI_COUNT)
+        {
+            delete m_widgets[id].count_text;
+        }
+        m_widgets[id].type     = GUI_FREE;
+        m_widgets[id].text_img = 0;
+        m_widgets[id].rect_obj = 0;
+        m_widgets[id].cdr      = 0;
+        m_widgets[id].car      = 0;
     }
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_rect(int id, int st)
 {
 #ifdef SNIP
-    static const GLfloat back[4][4] = {
-        { 0.1f, 0.1f, 0.1f, 0.5f },             /* off and inactive    */
-        { 0.3f, 0.3f, 0.3f, 0.5f },             /* off and   active    */
-        { 0.7f, 0.3f, 0.0f, 0.5f },             /* on  and inactive    */
-        { 1.0f, 0.7f, 0.3f, 0.5f },             /* on  and   active    */
-    };
+    static const GLfloat back[4][4] =
+        {
+            { 0.1f, 0.1f, 0.1f, 0.5f }
+            ,             /* off and inactive    */
+            { 0.3f, 0.3f, 0.3f, 0.5f },             /* off and   active    */
+            { 0.7f, 0.3f, 0.0f, 0.5f },             /* on  and inactive    */
+            { 1.0f, 0.7f, 0.3f, 0.5f },             /* on  and   active    */
+        };
 #endif
-    static const GLfloat back[4][4] = {
-        { 0.1f, 0.1f, 0.1f, 0.5f },             /* off and inactive    */
-        { 0.5f, 0.5f, 0.5f, 0.8f },             /* off and   active    */
-        { 1.0f, 0.7f, 0.3f, 0.5f },             /* on  and inactive    */
-        { 1.0f, 0.7f, 0.3f, 0.8f },             /* on  and   active    */
-    };
+    static const GLfloat back[4][4] =
+        {
+            { 0.1f, 0.1f, 0.1f, 0.5f }
+            ,             /* off and inactive    */
+            { 0.5f, 0.5f, 0.5f, 0.8f },             /* off and   active    */
+            { 1.0f, 0.7f, 0.3f, 0.5f },             /* on  and inactive    */
+            { 1.0f, 0.7f, 0.3f, 0.8f },             /* on  and   active    */
+        };
 
     int jd, i = 0;
 
     /* Use the widget status to determine the background color. */
 
     if (hot(id))
-        i = st | (((widgets[id].value) ? 2 : 0) |
-                  ((id == active)     ? 1 : 0));
-    switch (widgets[id].type & GUI_TYPE)
+        i = st | (((m_widgets[id].value) ? 2 : 0) |
+                  ((id == m_active)     ? 1 : 0));
+    switch (m_widgets[id].type & GUI_TYPE)
     {
     case GUI_IMAGE:
     case GUI_SPACE:
@@ -949,7 +985,7 @@ void WidgetSet::paint_rect(int id, int st)
 
         /* Recursively paint all subwidgets. */
 
-        for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+        for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
             paint_rect(jd, i);
 
         break;
@@ -959,11 +995,11 @@ void WidgetSet::paint_rect(int id, int st)
         /* Draw a leaf's background, colored by widget state. */
         glPushMatrix();
         {
-	  glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-		       (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
+            glTranslatef((GLfloat) (m_widgets[id].x + m_widgets[id].w / 2),
+                         (GLfloat) (m_widgets[id].y + m_widgets[id].h / 2), 0.f);
 
             glColor4fv(back[i]);
-            glCallList(widgets[id].rect_obj);
+            glCallList(m_widgets[id].rect_obj);
         }
         glPopMatrix();
 
@@ -971,17 +1007,16 @@ void WidgetSet::paint_rect(int id, int st)
     }
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_array(int id)
 {
     int jd;
 
     glPushMatrix();
     {
-        GLfloat cx = widgets[id].x + widgets[id].w / 2.0f;
-        GLfloat cy = widgets[id].y + widgets[id].h / 2.0f;
-        GLfloat ck = widgets[id].scale;
+        GLfloat cx = m_widgets[id].x + m_widgets[id].w / 2.0f;
+        GLfloat cy = m_widgets[id].y + m_widgets[id].h / 2.0f;
+        GLfloat ck = m_widgets[id].scale;
 
         glTranslatef(+cx, +cy, 0.0f);
         glScalef(ck, ck, ck);
@@ -989,48 +1024,52 @@ void WidgetSet::paint_array(int id)
 
         /* Recursively paint all subwidgets. */
 
-        for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+        for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
             paint_text(jd);
     }
     glPopMatrix();
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_image(int id)
 {
     /* Draw the widget rect, textured using the image. */
 
     glPushMatrix();
     {
-        glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-                     (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
-	/* For whatever reasons the icons are upside down, 
-	   so we mirror them back to the right orientation */
-        glScalef(widgets[id].scale,
-                 -widgets[id].scale,
-                 widgets[id].scale);
+        glTranslatef((GLfloat) (m_widgets[id].x + m_widgets[id].w / 2),
+                     (GLfloat) (m_widgets[id].y + m_widgets[id].h / 2), 0.f);
+        /* For whatever reasons the icons are upside down,
+           so we mirror them back to the right orientation */
+        glScalef(m_widgets[id].scale,
+                 -m_widgets[id].scale,
+                 m_widgets[id].scale);
 
-        glBindTexture(GL_TEXTURE_2D, widgets[id].text_img);
-	glColor4fv(gui_wht);
-        glCallList(widgets[id].rect_obj);
+        glBindTexture(GL_TEXTURE_2D, m_widgets[id].text_img);
+        glColor4fv(gui_wht);
+        glCallList(m_widgets[id].rect_obj);
     }
     glPopMatrix();
 }
 
-void WidgetSet::paint_count(int id) {
-  drawText(widgets[id].count_text, widgets[id].size, widgets[id].x,widgets[id].y,
-	   255,255,255,1.0, 1.0);
-  return;
+//-----------------------------------------------------------------------------
+void WidgetSet::paint_count(int id)
+{
+    drawText(m_widgets[id].count_text, m_widgets[id].size, m_widgets[id].x,m_widgets[id].y,
+             255,255,255,1.0, 1.0);
+    return;
 }   // paint_count
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_clock(int id)
 {
-  //int i  =   widgets[id].size;
-  int mt =  (widgets[id].value / 6000) / 10;
-  //int mo =  (widgets[id].value / 6000) % 10;
-  //int st = ((widgets[id].value % 6000) / 100) / 10;
-  //int so = ((widgets[id].value % 6000) / 100) % 10;
-  //int ht = ((widgets[id].value % 6000) % 100) / 10;
-  //int ho = ((widgets[id].value % 6000) % 100) % 10;
+    //int i  =   m_widgets[id].size;
+    const int MT =  (m_widgets[id].value / 6000) / 10;
+    //int mo =  (m_widgets[id].value / 6000) % 10;
+    //int st = ((m_widgets[id].value % 6000) / 100) / 10;
+    //int so = ((m_widgets[id].value % 6000) / 100) % 10;
+    //int ht = ((m_widgets[id].value % 6000) % 100) / 10;
+    //int ho = ((m_widgets[id].value % 6000) % 100) % 10;
 
     GLfloat dx_large=1.0f;// FIXME = (GLfloat) digit_w[i][0];
     GLfloat dx_small=0.1f;// = (GLfloat) digit_w[i][0] * 0.75f;
@@ -1042,27 +1081,27 @@ void WidgetSet::paint_clock(int id)
 
         /* Translate to the widget center, and apply the pulse scale. */
 
-        glTranslatef((GLfloat) (widgets[id].x + widgets[id].w / 2),
-                     (GLfloat) (widgets[id].y + widgets[id].h / 2), 0.f);
+        glTranslatef((GLfloat) (m_widgets[id].x + m_widgets[id].w / 2),
+                     (GLfloat) (m_widgets[id].y + m_widgets[id].h / 2), 0.f);
 
-        glScalef(widgets[id].scale,
-                 widgets[id].scale,
-                 widgets[id].scale);
+        glScalef(m_widgets[id].scale,
+                 m_widgets[id].scale,
+                 m_widgets[id].scale);
 
         /* Translate left by half the total width of the rendered value. */
 
-        if (mt > 0)
+        if (MT > 0)
             glTranslatef(-2.25f * dx_large, 0.0f, 0.0f);
         else
             glTranslatef(-1.75f * dx_large, 0.0f, 0.0f);
 
         /* Render the minutes counter. */
 
-        if (mt > 0)
+        if (MT > 0)
         {
-	  //glBindTexture(GL_TEXTURE_2D, digit_text[i][mt]);
-	  // glCallList(digit_list[i][mt]);
-	  // glTranslatef(dx_large, 0.0f, 0.0f);
+            //glBindTexture(GL_TEXTURE_2D, digit_text[i][MT]);
+            // glCallList(digit_list[i][MT]);
+            // glTranslatef(dx_large, 0.0f, 0.0f);
         }
 
         //glBindTexture(GL_TEXTURE_2D, digit_text[i][mo]);
@@ -1099,32 +1138,35 @@ void WidgetSet::paint_clock(int id)
     glPopMatrix();
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_label(int id)
 {
     /* Draw the widget text box, textured using the glyph. */
 
     glPushMatrix();
     {
-      // These offsets are rather horrible, but at least they
-      // seem to give the right visuals
-      glTranslatef((GLfloat) (widgets[id].x + widgets[id].w+
-			      (radius-widgets[id].text_width)/2),
-		   (GLfloat) (widgets[id].y + (widgets[id].h-radius)/2), 0.f);
+        // These offsets are rather horrible, but at least they
+        // seem to give the right visuals
+        glTranslatef((GLfloat) (m_widgets[id].x + m_widgets[id].w+
+                                (m_radius-m_widgets[id].text_width)/2),
+                     (GLfloat) (m_widgets[id].y + (m_widgets[id].h-m_radius)/2), 0.f);
 
-      glScalef(widgets[id].scale, widgets[id].scale, widgets[id].scale);
-      textOut->begin(); {
-	    textOut->setPointSize(widgets[id].size);
-        textOut->start2f((GLfloat)-widgets[id].w/2 , (GLfloat)widgets[id].yOffset);
-        textOut->puts(widgets[id]._text);
-      }
-      textOut->end();
+        glScalef(m_widgets[id].scale, m_widgets[id].scale, m_widgets[id].scale);
+        m_text_out->begin();
+        {
+            m_text_out->setPointSize(m_widgets[id].size);
+            m_text_out->start2f((GLfloat)-m_widgets[id].w/2 , (GLfloat)m_widgets[id].yOffset);
+            m_text_out->puts(m_widgets[id]._text);
+        }
+        m_text_out->end();
     }
     glPopMatrix();
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paint_text(int id)
 {
-    switch (widgets[id].type & GUI_TYPE)
+    switch (m_widgets[id].type & GUI_TYPE)
     {
     case GUI_SPACE:  break;
     case GUI_FILLER: break;
@@ -1139,6 +1181,7 @@ void WidgetSet::paint_text(int id)
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::paint(int id)
 {
     if (id)
@@ -1162,20 +1205,26 @@ void WidgetSet::paint(int id)
         }
         glPopAttrib();
 
-        // Makes the font white ... not sure how to get 
-        if(widgets[id].color0) {
-            glColor4fv(widgets[id].color0);
-        } else {
+        // Makes the font white ... not sure how to get
+        if(m_widgets[id].color0)
+        {
+            glColor4fv(m_widgets[id].color0);
+        }
+        else
+        {
 #ifdef WIN32
-			// This appears to be a visual c++ bug
+            // This appears to be a visual c++ bug
             GLfloat dummy5[4]={ 1.f, 1.f, 1.f, .5f };
             glColor4fv(dummy5);
             GLfloat dummy1[4]={ 1.f, 1.f, 1.f, 1.f };
             glColor4fv(dummy1);
 #else
-			glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f });
-            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f });
+            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, .5f }
+                      );
+            glColor4fv((GLfloat[4]){ 1.f, 1.f, 1.f, 1.f }
+                      );
 #endif
+
         }
         paint_text(id);
 
@@ -1185,14 +1234,14 @@ void WidgetSet::paint(int id)
 }
 
 #if 0
+//-----------------------------------------------------------------------------
 void WidgetSet::blank()
 {
-    paint(pause_id);
+    paint(m_pause_id);
 }
 #endif
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::dump(int id, int d)
 {
     int jd, i;
@@ -1201,7 +1250,7 @@ void WidgetSet::dump(int id, int d)
     {
         char *type = "?";
 
-        switch (widgets[id].type & GUI_TYPE)
+        switch (m_widgets[id].type & GUI_TYPE)
         {
         case GUI_HARRAY: type = "harray"; break;
         case GUI_VARRAY: type = "varray"; break;
@@ -1219,32 +1268,35 @@ void WidgetSet::dump(int id, int d)
 
         printf("%04d %s\n", id, type);
 
-        for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+        for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
             dump(jd, d + 1);
     }
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::pulse(int id, float k)
 {
-    if (id) widgets[id].scale = k;
+    if (id) m_widgets[id].scale = k;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::timer(int id, float dt)
 {
     int jd;
 
     if (id)
     {
-        for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+        for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
             timer(jd, dt);
 
-        if (widgets[id].scale - 1.0f < dt)
-            widgets[id].scale = 1.0f;
+        if (m_widgets[id].scale - 1.0f < dt)
+            m_widgets[id].scale = 1.0f;
         else
-            widgets[id].scale -= dt;
+            m_widgets[id].scale -= dt;
     }
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::point(int id, int x, int y)
 {
     static int x_cache = 0;
@@ -1262,7 +1314,7 @@ int WidgetSet::point(int id, int x, int y)
 
     /* Short-circuit check the current active widget. */
 
-    jd = search(active, x, y);
+    jd = search(m_active, x, y);
 
     /* If not still active, search the hierarchy for a new active widget. */
 
@@ -1271,89 +1323,92 @@ int WidgetSet::point(int id, int x, int y)
 
     /* If the active widget has changed, return the new active id. */
 
-    if (jd == 0 || jd == active)
+    if (jd == 0 || jd == m_active)
         return 0;
     else
-        return active = jd;
+        return m_active = jd;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::click(void)
 {
-    return active;
+    return m_active;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::token(int id) const
 {
-    return id ? widgets[id].token : 0;
+    return id ? m_widgets[id].token : 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::value(int id) const
 {
-    return id ? widgets[id].value : 0;
+    return id ? m_widgets[id].value : 0;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::toggle(int id)
 {
-    widgets[id].value = widgets[id].value ? 0 : 1;
+    m_widgets[id].value = m_widgets[id].value ? 0 : 1;
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 int WidgetSet::vert_test(int id, int jd)
 {
-	/* Determine whether widget id is in vertical contact with widget jd. */
+    /* Determine whether widget id is in vertical contact with widget jd. */
 
-  if (id && (widgets[id].type&(GUI_STATE|GUI_SPACE)) && 
-      jd && (widgets[jd].type&(GUI_STATE|GUI_SPACE))    )
-	{
-		int i0 = widgets[id].x;
-		int i1 = widgets[id].x + widgets[id].w;
-		int j0 = widgets[jd].x;
-		int j1 = widgets[jd].x + widgets[jd].w;
+    if (id && (m_widgets[id].type&(GUI_STATE|GUI_SPACE)) &&
+        jd && (m_widgets[jd].type&(GUI_STATE|GUI_SPACE))    )
+    {
+        const int I0 = m_widgets[id].x;
+        const int I1 = m_widgets[id].x + m_widgets[id].w;
+        const int J0 = m_widgets[jd].x;
+        const int J1 = m_widgets[jd].x + m_widgets[jd].w;
 
-		/* Is widget id's top edge is in contact with jd's bottom edge? */
+        /* Is widget id's top edge is in contact with jd's bottom edge? */
 
-		if (widgets[id].y + widgets[id].h == widgets[jd].y)
-		{
-			/* Do widgets id and jd overlap horizontally? */
+        if (m_widgets[id].y + m_widgets[id].h == m_widgets[jd].y)
+        {
+            /* Do widgets id and jd overlap horizontally? */
 
-			if (j0 <= i0 && i0 <  j1) return 1;
-			if (j0 <  i1 && i1 <= j1) return 1;
-			if (i0 <= j0 && j0 <  i1) return 1;
-			if (i0 <  j1 && j1 <= i1) return 1;
-		}
-	}
-	return 0;
+            if (J0 <= I0 && I0 <  J1) return 1;
+            if (J0 <  I1 && I1 <= J1) return 1;
+            if (I0 <= J0 && J0 <  I1) return 1;
+            if (I0 <  J1 && J1 <= I1) return 1;
+        }
+    }
+    return 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::horz_test(int id, int jd)
 {
     /* Determine whether widget id is in horizontal contact with widget jd. */
 
     if (id && hot(id) && jd && hot(jd))
     {
-        int i0 = widgets[id].y;
-        int i1 = widgets[id].y + widgets[id].h;
-        int j0 = widgets[jd].y;
-        int j1 = widgets[jd].y + widgets[jd].h;
+        const int I0 = m_widgets[id].y;
+        const int I1 = m_widgets[id].y + m_widgets[id].h;
+        const int J0 = m_widgets[jd].y;
+        const int J1 = m_widgets[jd].y + m_widgets[jd].h;
 
         /* Is widget id's right edge in contact with jd's left edge? */
 
-        if (widgets[id].x + widgets[id].w == widgets[jd].x)
+        if (m_widgets[id].x + m_widgets[id].w == m_widgets[jd].x)
         {
-            /* Do widgets id and jd overlap vertically? */
+            /* Do m_widgets id and jd overlap vertically? */
 
-            if (j0 <= i0 && i0 <  j1) return 1;
-            if (j0 <  i1 && i1 <= j1) return 1;
-            if (i0 <= j0 && j0 <  i1) return 1;
-            if (i0 <  j1 && j1 <= i1) return 1;
+            if (J0 <= I0 && I0 <  J1) return 1;
+            if (J0 <  I1 && I1 <= J1) return 1;
+            if (I0 <= J0 && J0 <  I1) return 1;
+            if (I0 <  J1 && J1 <= I1) return 1;
         }
     }
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 int WidgetSet::stick_L(int id, int dd)
 {
     int jd, kd;
@@ -1363,13 +1418,14 @@ int WidgetSet::stick_L(int id, int dd)
     if (horz_test(id, dd))
         return id;
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
         if ((kd = stick_L(jd, dd)))
             return kd;
 
     return 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::stick_R(int id, int dd)
 {
     int jd, kd;
@@ -1379,47 +1435,52 @@ int WidgetSet::stick_R(int id, int dd)
     if (horz_test(dd, id))
         return id;
 
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
         if ((kd = stick_R(jd, dd)))
             return kd;
 
     return 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::stick_D(int id, int dd)
 {
-	int jd, kd;
+    int jd, kd;
 
-	/* Find a widget below widget dd. */
+    /* Find a widget below widget dd. */
 
-	if (vert_test(id, dd))
-		return id;
+    if (vert_test(id, dd))
+        return id;
 
-	for (jd = widgets[id].car; jd; jd = widgets[jd].cdr)
-		if ((kd = stick_D(jd, dd)))
-			return kd;
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
+        if ((kd = stick_D(jd, dd)))
+            return kd;
 
-	return 0;
+    return 0;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::stick_U(int id, int dd)
 {
     int jd, kd;
 
     /* Find a widget above widget dd. */
 
-    if (vert_test(dd, id)) {
+    if (vert_test(dd, id))
+    {
         return id;
     }
-    for (jd = widgets[id].car; jd; jd = widgets[jd].cdr) {
-      if ((kd = stick_U(jd, dd))) {
+    for (jd = m_widgets[id].car; jd; jd = m_widgets[jd].cdr)
+    {
+        if ((kd = stick_U(jd, dd)))
+        {
             return kd;
-      }
+        }
     }
     return 0;
 }
 
-
+//-----------------------------------------------------------------------------
 int WidgetSet::stick(int id, int axis, int dir, int value)
 {
     /* Flag the axes to prevent uncontrolled scrolling. */
@@ -1436,12 +1497,12 @@ int WidgetSet::stick(int id, int axis, int dir, int value)
         if(!value) x_not_pressed = 1;
         else if(dir == 0 && x_not_pressed)
         {
-            jd = stick_L(id, active);
+            jd = stick_L(id, m_active);
             x_not_pressed = 0;
         }
         else if (dir == 1 && x_not_pressed)
         {
-            jd = stick_R(id, active);
+            jd = stick_R(id, m_active);
             x_not_pressed = 0;
         }
     }
@@ -1450,107 +1511,109 @@ int WidgetSet::stick(int id, int axis, int dir, int value)
         if(!value) y_not_pressed = 1;
         else if(dir == 0 && y_not_pressed)
         {
-	   {
-            jd = stick_U(id, active);
-	    // Skip over GUI_SPACE
-	    while(jd && !hot(jd)) jd = stick_U(id, jd);
-            y_not_pressed = 0;
-	  } 
+            {
+                jd = stick_U(id, m_active);
+                // Skip over GUI_SPACE
+                while(jd && !hot(jd)) jd = stick_U(id, jd);
+                y_not_pressed = 0;
+            }
         }
         else if (dir == 1 && y_not_pressed)
         {
-            jd = stick_D(id, active);
-	    // Skip over GUI_SPACE
-	    while(jd && !hot(jd)) jd = stick_D(id, jd);
+            jd = stick_D(id, m_active);
+            // Skip over GUI_SPACE
+            while(jd && !hot(jd)) jd = stick_D(id, jd);
             y_not_pressed = 0;
         }
     }
 
     /* If the active widget has changed, return the new active id. */
 
-    if (jd == 0 || jd == active)
+    if (jd == 0 || jd == m_active)
         return 0;
     else
-        return active = jd;
+        return m_active = jd;
 }
 
+//-----------------------------------------------------------------------------
 int WidgetSet::cursor(int id, int key)
 {
-	int jd = 0;
+    int jd = 0;
 
-	switch (key)
-	{
-	case SDLK_LEFT:  jd = stick_L(id, active); break;
-	case SDLK_RIGHT: jd = stick_R(id, active); break;
-	case SDLK_UP:    jd = stick_U(id, active); 
-	                 // Skip over GUI_SPACE
-                         while( jd && !hot(jd)) jd = stick_U(id, jd);
-			 break;
-	case SDLK_DOWN:  jd = stick_D(id, active); 
-                         // Skip over GUI_SPACE
-                         while (jd && !hot(jd)) jd = stick_D(id, jd); 
-			 break;
-	default: return 0;
-	}
-	
+    switch (key)
+    {
+    case SDLK_LEFT:  jd = stick_L(id, m_active); break;
+    case SDLK_RIGHT: jd = stick_R(id, m_active); break;
+    case SDLK_UP:    jd = stick_U(id, m_active);
+        // Skip over GUI_SPACE
+        while( jd && !hot(jd)) jd = stick_U(id, jd);
+        break;
+    case SDLK_DOWN:  jd = stick_D(id, m_active);
+        // Skip over GUI_SPACE
+        while (jd && !hot(jd)) jd = stick_D(id, jd);
+        break;
+    default: return 0;
+    }
+
     /* If the active widget has changed, return the new active id. */
 
-    if (jd == 0 || jd == active)
+    if (jd == 0 || jd == m_active)
         return 0;
     else
-        return active = jd;
+        return m_active = jd;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::set_active(int id)
 {
-	active = id;
+    m_active = id;
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::set_paused()
 {
     sound_manager -> pauseMusic() ;
-    paused = true;
+    m_paused = true;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::clr_paused()
 {
     sound_manager -> resumeMusic() ;
-    paused = false;
+    m_paused = false;
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::tgl_paused()
 {
-    if (paused)
+    if (m_paused)
         clr_paused();
     else
         set_paused();
 }
 
-/*---------------------------------------------------------------------------*/
-
+//-----------------------------------------------------------------------------
 void WidgetSet::config_push_persp(float fov, float n, float f)
 {
     GLdouble m[4][4];
 
-    GLdouble r = fov / 2 * M_PI / 180;
-    GLdouble s = sin(r);
-    GLdouble c = cos(r) / s;
+    const GLdouble R = fov / 2 * M_PI / 180;
+    const GLdouble S = sin(R);
+    const GLdouble C = cos(R) / S;
 
-    GLdouble a = (GLdouble)config->width/(GLdouble)config->height;
+    const GLdouble A = (GLdouble)config->m_width/(GLdouble)config->m_height;
 
     glMatrixMode(GL_PROJECTION);
     {
         glPushMatrix();
         glLoadIdentity();
 
-        m[0][0] =  c/a;
+        m[0][0] =  C/A;
         m[0][1] =  0.0;
         m[0][2] =  0.0;
         m[0][3] =  0.0;
         m[1][0] =  0.0;
-        m[1][1] =    c;
+        m[1][1] =    C;
         m[1][2] =  0.0;
         m[1][3] =  0.0;
         m[2][0] =  0.0;
@@ -1567,20 +1630,22 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
     glMatrixMode(GL_MODELVIEW);
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::config_push_ortho()
 {
-  GLdouble w = (GLdouble) config->width;
-  GLdouble h = (GLdouble) config->height;
+    const GLdouble W = (GLdouble) config->m_width;
+    const GLdouble H = (GLdouble) config->m_height;
 
     glMatrixMode(GL_PROJECTION);
     {
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0.0, w, 0.0, h, -1.0, +1.0);
+        glOrtho(0.0, W, 0.0, H, -1.0, +1.0);
     }
     glMatrixMode(GL_MODELVIEW);
 }
 
+//-----------------------------------------------------------------------------
 void WidgetSet::config_pop_matrix()
 {
     glMatrixMode(GL_PROJECTION);
@@ -1589,8 +1654,4 @@ void WidgetSet::config_pop_matrix()
     }
     glMatrixMode(GL_MODELVIEW);
 }
-
-/*---------------------------------------------------------------------------*/
-
-
 

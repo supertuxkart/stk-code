@@ -22,6 +22,8 @@
 #include "attachment_manager.hpp"
 #include "loader.hpp"
 
+AttachmentManager *attachment_manager = 0;
+
 struct  initAttachmentType {attachmentType attachment; char*file;};
 
 /* Some explanations to the attachments:
@@ -30,50 +32,46 @@ struct  initAttachmentType {attachmentType attachment; char*file;};
               friction only becomes important at higher speeds.
    Anvil:     It increases the weight of the kart.But this will NOT have any
               effect on karts already driving at highest speed: the accelerating
-	      force is independent of the mass, so it is 0 at highest speed 
-	      (engine force = air- plus system-force) and only this value gets
-	      divided by the mass later --> at highest speed there would be no 
-	      effect when the mass is changed, only at lower speeds the acting 
-	      acceleration will be lower.Reducing the power slows the kart down,
-	      but doesn't give the feeling of a sudden weight increase. 
-	      Therefore the anvil will reduce by a certain factor (see physics
-	      parameters) once when it is attached. Together with the mass 
-	      increase (lower acceleration) it's sufficient negative.
+       force is independent of the mass, so it is 0 at highest speed 
+       (engine force = air- plus system-force) and only this value gets
+       divided by the mass later --> at highest speed there would be no 
+       effect when the mass is changed, only at lower speeds the acting 
+       acceleration will be lower.Reducing the power slows the kart down,
+       but doesn't give the feeling of a sudden weight increase. 
+       Therefore the anvil will reduce by a certain factor (see physics
+       parameters) once when it is attached. Together with the mass 
+       increase (lower acceleration) it's sufficient negative.
 */
 
 initAttachmentType iat[]=
 {
-  {ATTACH_PARACHUTE,   "parachute.ac"},
+    {ATTACH_PARACHUTE,   "parachute.ac"},
 #ifdef USE_MAGNET
-  {ATTACH_MAGNET,      "magnet.ac"},
-  {ATTACH_MAGNET_BZZT, "magnetbzzt.ac"},
+    {ATTACH_MAGNET,      "magnet.ac"},
+    {ATTACH_MAGNET_BZZT, "magnetbzzt.ac"},
 #endif
-  {ATTACH_ANVIL,       "anvil.ac"},
-  {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
-  {ATTACH_MAX,         ""},
-
+    {ATTACH_ANVIL,       "anvil.ac"},
+    {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
+    {ATTACH_MAX,         ""},
 };
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void AttachmentManager::removeTextures()
 {
-  for(int i=0; iat[i].attachment!=ATTACH_MAX; i++) 
-  {
-    ssgDeRefDelete(m_attachments[iat[i].attachment]);
-  }   // for
-  callback_manager->clear(CB_ATTACHMENT);
+    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    {
+        ssgDeRefDelete(m_attachments[iat[i].attachment]);
+    }   // for
+    callback_manager->clear(CB_ATTACHMENT);
 }   // removeTextures
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void AttachmentManager::loadModels()
 {
-  for(int i=0; iat[i].attachment!=ATTACH_MAX; i++) 
-  {
-    m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
-    m_attachments[iat[i].attachment]->ref();
-  }   // for
+    for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
+    {
+        m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
+        m_attachments[iat[i].attachment]->ref();
+    }   // for
 }   // reInit
-
-// -----------------------------------------------------------------------------
-AttachmentManager *attachment_manager=0;
 

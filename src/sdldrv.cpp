@@ -46,194 +46,200 @@ SDL_Joystick **sticks;
 
 #define DEADZONE_MOUSE 1
 
-// -----------------------------------------------------------------------------
-void gui_mousefn ( int button, int updown, int x, int y ) {
-  if (button==0 && updown==0) {
-    BaseGUI* menu= menu_manager->getCurrentMenu();
-    if (menu != NULL) {
-      menu->select();
-    }
-  } else if (button==2 && updown==0 && menu_manager->getMenuStackSize() > 1) {
-    menu_manager->popMenu();
-  }
-  // puMouse(button, updown, x, y ) ;
-}
-
-// -----------------------------------------------------------------------------
-void updateMenus()
+void gui_mousefn ( int button, int updown, int x, int y )
 {
+    if (button==0 && updown==0)
+    {
+        BaseGUI* menu= menu_manager->getCurrentMenu();
+        if (menu != NULL)
+        {
+            menu->select();
+        }
+    }
+    else if (button==2 && updown==0 && menu_manager->getMenuStackSize() > 1)
+    {
+        menu_manager->popMenu();
+    }
+    // puMouse(button, updown, x, y ) ;
 }
 
-// -----------------------------------------------------------------------------
-void drv_init() {
-  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
-  
-  flags = SDL_OPENGL | SDL_HWSURFACE;
+//-----------------------------------------------------------------------------
+void updateMenus()
+{}
 
-  if(config->fullscreen)
-    flags |= SDL_FULLSCREEN;
-  
-  mainSurface = SDL_SetVideoMode(config->width, config->height, 0,
-			  flags);
+//-----------------------------------------------------------------------------
+void drv_init()
+{
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 
-  SDL_JoystickEventState(SDL_ENABLE);
-			  
-  int noSticks = SDL_NumJoysticks();
-  sticks = (SDL_Joystick **) malloc(sizeof(SDL_Joystick *) * noSticks);
-  for (int i=0;i<noSticks;i++)
-    sticks[i] = SDL_JoystickOpen(i);
-			  
-  SDL_WM_SetCaption("Super Tux Kart", NULL);
-  SDL_ShowCursor(SDL_DISABLE);
+    flags = SDL_OPENGL | SDL_HWSURFACE;
 
-  ssgInit () ;
-  fntInit();
+    if(config->m_fullscreen)
+        flags |= SDL_FULLSCREEN;
+
+    mainSurface = SDL_SetVideoMode(config->m_width, config->m_height, 0,
+                                   flags);
+
+    SDL_JoystickEventState(SDL_ENABLE);
+
+    const int NO_STICKS = SDL_NumJoysticks();
+    sticks = (SDL_Joystick **) malloc(sizeof(SDL_Joystick *) * NO_STICKS);
+    for (int i=0;i<NO_STICKS;i++)
+        sticks[i] = SDL_JoystickOpen(i);
+
+    SDL_WM_SetCaption("Super Tux Kart", NULL);
+    SDL_ShowCursor(SDL_DISABLE);
+
+    ssgInit () ;
+    fntInit();
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void drv_toggleFullscreen(int resetTextures)
 {
-  config->fullscreen = !config->fullscreen;
+    config->m_fullscreen = !config->m_fullscreen;
 
-  flags = SDL_OPENGL | SDL_HWSURFACE;
+    flags = SDL_OPENGL | SDL_HWSURFACE;
 
-  if(config->fullscreen)
-    flags |= SDL_FULLSCREEN;
+    if(config->m_fullscreen)
+        flags |= SDL_FULLSCREEN;
 
-  SDL_FreeSurface(mainSurface);
-  mainSurface = SDL_SetVideoMode(config->width, config->height, 0, flags);
+    SDL_FreeSurface(mainSurface);
+    mainSurface = SDL_SetVideoMode(config->m_width, config->m_height, 0, flags);
 
 #ifdef WIN32
-  if(resetTextures) {
-    // Clear plib internal texture cache
-    loader->endLoad();
-    
-    // Windows needs to reload all textures, display lists, ... which means 
-    // that all models have to be reloaded. So first, free all textures, 
-    // models, then reload the textures from materials.dat, then reload
-    // all models, textures etc.
-    
-    startScreen             -> removeTextures();
-    attachment_manager      -> removeTextures();
-    projectile_manager      -> removeTextures();
-    herring_manager         -> removeTextures();
-    kart_properties_manager -> removeTextures();
-    collectable_manager     -> removeTextures();
+    if(resetTextures)
+    {
+        // Clear plib internal texture cache
+        loader->endLoad();
 
-    material_manager->reInit();
+        // Windows needs to reload all textures, display lists, ... which means
+        // that all models have to be reloaded. So first, free all textures,
+        // models, then reload the textures from materials.dat, then reload
+        // all models, textures etc.
+
+        startScreen             -> removeTextures();
+        attachment_manager      -> removeTextures();
+        projectile_manager      -> removeTextures();
+        herring_manager         -> removeTextures();
+        kart_properties_manager -> removeTextures();
+        collectable_manager     -> removeTextures();
+
+        material_manager->reInit();
 
 
-    collectable_manager     -> loadCollectables();
-    kart_properties_manager -> loadKartData();
-    herring_manager         -> loadDefaultHerrings();
-    projectile_manager      -> loadData();
-    attachment_manager      -> loadModels();
+        collectable_manager     -> loadCollectables();
+        kart_properties_manager -> loadKartData();
+        herring_manager         -> loadDefaultHerrings();
+        projectile_manager      -> loadData();
+        attachment_manager      -> loadModels();
 
-    startScreen             -> installMaterial();
-    widgetSet               -> reInit();
-  }
+        startScreen             -> installMaterial();
+        widgetSet               -> reInit();
+    }
 #endif
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void drv_deinit()
 {
-  SDL_ShowCursor(SDL_ENABLE);
+    SDL_ShowCursor(SDL_ENABLE);
 
-  int noSticks = SDL_NumJoysticks();
-  for (int i=0;i<noSticks;i++)
-    SDL_JoystickClose(sticks[i]);
-  
-  free(sticks);
+    const int NO_STICKS = SDL_NumJoysticks();
+    for (int i=0;i<NO_STICKS;i++)
+        SDL_JoystickClose(sticks[i]);
 
-  SDL_FreeSurface(mainSurface);
-  
-  SDL_Quit();
+    free(sticks);
+
+    SDL_FreeSurface(mainSurface);
+
+    SDL_Quit();
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void input(InputType type, int id0, int id1, int id2, int value)
 {
     BaseGUI* menu= menu_manager->getCurrentMenu();
     if (menu != NULL)
-      menu->input(type, id0, id1, id2, value);
+        menu->input(type, id0, id1, id2, value);
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void drv_loop()
 {
-  SDL_Event ev;
+    SDL_Event ev;
 
-  while(SDL_PollEvent(&ev))
-  {
-    switch(ev.type) {
-    case SDL_QUIT:
+    while(SDL_PollEvent(&ev))
+    {
+        switch(ev.type)
+        {
+        case SDL_QUIT:
             screen_manager->abort();
-        break;
+            break;
 
-    case SDL_KEYDOWN:
-    case SDL_KEYUP:
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
             input(IT_KEYBOARD, ev.key.keysym.sym, 0, 0, ev.key.state);
-	    break;
+            break;
         case SDL_MOUSEMOTION:
             // This probably needs better handling
             if (ev.motion.xrel < -DEADZONE_MOUSE)
-              input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 1);
+                input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 1);
             else if(ev.motion.xrel > DEADZONE_MOUSE)
-              input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 1);
+                input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 1);
             else
-              {
+            {
                 input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 0);
                 input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 0);
-              }
+            }
 
             if (ev.motion.yrel < -DEADZONE_MOUSE)
-              input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 1);
+                input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 1);
             else if(ev.motion.yrel > DEADZONE_MOUSE)
-              input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 1);
+                input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 1);
             else
-              {
+            {
                 input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 0);
                 input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 0);
-              }
+            }
 
-	    break;
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP:
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
             input(IT_MOUSEBUTTON, ev.button.button, 0, 0, ev.button.state);
-	    break;
-	case SDL_JOYAXISMOTION:
+            break;
+        case SDL_JOYAXISMOTION:
             if(ev.jaxis.value <= -1000)
-              {
+            {
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 1);
-              }
+            }
             else if(ev.jaxis.value >= 1000)
-              {
+            {
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 0);
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 1);
-              }
+            }
             else
-              {
+            {
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 0);
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
-              }
-	    break;
-	case SDL_JOYBUTTONDOWN:
-	case SDL_JOYBUTTONUP:
-	    input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, 
-		  ev.jbutton.state);
-	    break;
-    }  // switch
+            }
+            break;
+        case SDL_JOYBUTTONDOWN:
+        case SDL_JOYBUTTONUP:
+            input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0,
+                  ev.jbutton.state);
+            break;
+        }  // switch
 
-    // If the event caused a new screen to be displayed, abort the current event
-    // loop. This avoids e.g. the problem of selecting the number of laps twice
-    // in the num_laps menu (by rapidly pressing enter), causing the game-start
-    // procedure to be done twice (which causes an assertion error in the
-    // screen_manager, since the new world_screen is added twice).
-    if(screen_manager->screenSwitchPending()) break;
-  }   // while (SDL_PollEvent())
-  
-  updateMenus();
-  
+        // If the event caused a new screen to be displayed, abort the current event
+        // loop. This avoids e.g. the problem of selecting the number of laps twice
+        // in the num_laps menu (by rapidly pressing enter), causing the game-start
+        // procedure to be done twice (which causes an assertion error in the
+        // screen_manager, since the new world_screen is added twice).
+        if(screen_manager->screenSwitchPending()) break;
+    }   // while (SDL_PollEvent())
+
+    updateMenus();
+
 }

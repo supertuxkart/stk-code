@@ -27,411 +27,430 @@
 #include "lisp/parser.hpp"
 
 
-Track::Track (std::string filename_, float w, float h, bool stretch) {
-  filename      = filename_;
-  herringStyle  = "";
-  track2DWidth  = w;
-  track2DHeight = h;
-  doStretch     = stretch;
-  description   = "";
-  screenshot    = "";
-  topview       = "";
-  loadTrack(filename);
-  loadDriveline();
+Track::Track (std::string filename_, float w, float h, bool stretch)
+{
+    m_filename        = filename_;
+    m_herring_style   = "";
+    m_track_2d_width  = w;
+    m_track_2d_height = h;
+    m_do_stretch      = stretch;
+    m_description     = "";
+    m_screenshot      = "";
+    m_top_view        = "";
+
+    loadTrack(m_filename);
+    loadDriveline();
 
 }
 
-// -----------------------------------------------------------------------------
-Track::~Track() {
-}
+//-----------------------------------------------------------------------------
+Track::~Track()
+{}
 
-// -----------------------------------------------------------------------------
-int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const {
-  size_t nearest = 0 ;
-  float d ;
-  float nearest_d = 99999 ;
+//-----------------------------------------------------------------------------
+int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const
+{
+    size_t nearest = 0 ;
+    float d ;
+    float nearest_d = 99999 ;
 
-  const unsigned int driveline_size = driveline.size();
-  int temp_i;
-  //Checks from the previous two hints to the next two which is the closest,
-  //checking from the previous to the next works on my machine but might not
-  //work on slower computers.
-  for(int i = hint - 2; i < hint + 3; ++i)
-  {
-      temp_i = i;
-      if(temp_i < 0) temp_i = driveline_size - temp_i;
-      if(temp_i >= (int)driveline_size) temp_i -= driveline_size;
+    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    int temp_i;
+    //Checks from the previous two hints to the next two which is the closest,
+    //checking from the previous to the next works on my machine but might not
+    //work on slower computers.
+    for(int i = hint - 2; i < hint + 3; ++i)
+    {
+        temp_i = i;
+        if(temp_i < 0) temp_i = DRIVELINE_SIZE - temp_i;
+        if(temp_i >= (int)DRIVELINE_SIZE) temp_i -= DRIVELINE_SIZE;
 
-      d = sgDistanceVec2 ( driveline[temp_i], xyz ) ;
-      if ( d < nearest_d ) {
-        nearest_d = d;
-        nearest = temp_i;
-      }
-  }
-
-  /*
-    OK - so we have the closest point
-  */
-
-  size_t prev,  next ;
-  float  dprev, dnext ;
-
-  prev = ( nearest   ==   0              ) ? driveline_size - 1 : (nearest - 1);
-  next = ( nearest+1 >= driveline_size ) ?      0             : (nearest + 1);
-
-  dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
-  dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
-
-  size_t p1, p2 ;
-  float  d1, d2 ;
-
-  if ( dnext < dprev ) {
-    p1 = nearest   ; p2 =  next ;
-    d1 = nearest_d ; d2 = dnext ;
-  } else {
-    p1 =  prev ; p2 = nearest   ;
-    d1 = dprev ; d2 = nearest_d ;
-  }
-
-  sgVec3 line_eqn ;
-  sgVec3 tmp ;
-
-  sgMake2DLine ( line_eqn, driveline[p1], driveline[p2] ) ;
-
-  res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
-
-  sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
-
-  // distance_from_start[p1] contains the sum of the distances between
-  // all driveline points up to point p1.
-  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + distance_from_start[p1];
-
-  return nearest ;
-}
-
-// -----------------------------------------------------------------------------
-int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz ) const {
-  size_t nearest = 0 ;
-  float d ;
-  float nearest_d = 99999 ;
-
-  /*
-    Search all the points on the track to find our nearest
-    centerline point
-  */
-
-  const unsigned int driveline_size = driveline.size();
-  for (size_t i = 0 ; i < driveline_size ; ++i ) {
-    d = sgDistanceVec2 ( driveline[i], xyz ) ;
-
-    if ( d < nearest_d ) {
-      nearest_d = d ;
-      nearest = i ;
+        d = sgDistanceVec2 ( m_driveline[temp_i], xyz ) ;
+        if ( d < nearest_d )
+        {
+            nearest_d = d;
+            nearest = temp_i;
+        }
     }
-  }   // for i
 
-  /*
-    OK - so we have the closest point
-  */
+    /*
+      OK - so we have the closest point
+    */
 
-  size_t prev,  next ;
-  float  dprev, dnext ;
+    const size_t PREV = ( nearest   ==   0              ) ? DRIVELINE_SIZE - 1 : (nearest - 1);
+    const size_t NEXT = ( nearest+1 >= DRIVELINE_SIZE ) ?      0             : (nearest + 1);
 
-  prev = ( nearest   ==   0              ) ? driveline_size-1 : (nearest - 1);
-  next = ( nearest+1 >= driveline_size ) ?      0             : (nearest + 1);
+    const float D_PREV = sgDistanceVec2 ( m_driveline[PREV], xyz ) ;
+    const float D_NEXT = sgDistanceVec2 ( m_driveline[NEXT], xyz ) ;
 
-  dprev = sgDistanceVec2 ( driveline[prev], xyz ) ;
-  dnext = sgDistanceVec2 ( driveline[next], xyz ) ;
+    size_t p1, p2 ;
+    float  d1, d2 ;
 
-  size_t p1, p2 ;
-  float  d1, d2 ;
+    if ( D_NEXT < D_PREV )
+    {
+        p1 = nearest   ; p2 =  NEXT ;
+        d1 = nearest_d ; d2 = D_NEXT ;
+    }
+    else
+    {
+        p1 =  PREV ; p2 = nearest   ;
+        d1 = D_PREV ; d2 = nearest_d ;
+    }
 
-  if ( dnext < dprev ) {
-    p1 = nearest   ; p2 =  next ;
-    d1 = nearest_d ; d2 = dnext ;
-  } else {
-    p1 =  prev ; p2 = nearest   ;
-    d1 = dprev ; d2 = nearest_d ;
-  }
+    sgVec3 line_eqn ;
+    sgVec3 tmp ;
 
-  sgVec3 line_eqn ;
-  sgVec3 tmp ;
+    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] ) ;
 
-  sgMake2DLine ( line_eqn, driveline[p1], driveline[p2] ) ;
+    res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
 
-  res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
+    sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
 
-  sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
+    // m_distance_from_start[p1] contains the sum of the distances between
+    // all driveline points up to point p1.
+    res [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
 
-  res [ 1 ] = sgDistanceVec2 ( tmp, driveline[p1] ) + distance_from_start[p1];
-
-  return nearest ;
+    return nearest ;
 }
 
-// -----------------------------------------------------------------------------
-void Track::trackToSpatial ( sgVec3 xyz, int hint ) const {
-  sgCopyVec3 ( xyz, driveline [ hint ] ) ;
+//-----------------------------------------------------------------------------
+int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz ) const
+{
+    size_t nearest = 0 ;
+    float d ;
+    float nearest_d = 99999 ;
+
+    /*
+      Search all the points on the track to find our nearest
+      centerline point
+    */
+
+    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    for (size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        d = sgDistanceVec2 ( m_driveline[i], xyz ) ;
+
+        if ( d < nearest_d )
+        {
+            nearest_d = d ;
+            nearest = i ;
+        }
+    }   // for i
+
+    /*
+      OK - so we have the closest point
+    */
+
+    const size_t PREV = ( nearest   ==   0              ) ? DRIVELINE_SIZE - 1 : (nearest - 1);
+    const size_t NEXT = ( nearest+1 >= DRIVELINE_SIZE ) ?      0             : (nearest + 1);
+
+    const float D_PREV = sgDistanceVec2 ( m_driveline[PREV], xyz ) ;
+    const float D_NEXT = sgDistanceVec2 ( m_driveline[NEXT], xyz ) ;
+
+    size_t p1, p2 ;
+    float  d1, d2 ;
+
+    if ( D_NEXT < D_PREV )
+    {
+        p1 = nearest   ; p2 =  NEXT ;
+        d1 = nearest_d ; d2 = D_NEXT ;
+    }
+    else
+    {
+        p1 =  PREV ; p2 = nearest   ;
+        d1 = D_PREV ; d2 = nearest_d ;
+    }
+
+    sgVec3 line_eqn ;
+    sgVec3 tmp ;
+
+    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] ) ;
+
+    res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
+
+    sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
+
+    res [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
+
+    return nearest ;
 }
-// -----------------------------------------------------------------------------
-// It's not the nices solution to have two very similar version of a function,
-// i.e. drawScaled2D and draw2Dview - but to keep both versions const, the
-// values scaleX/scaleY can not be changed, but they are needed in glVtx.
-// So two functions are provided: one which uses temporary variables, and one
-// which uses the pre-computed attributes (see constructor/loadDriveline)
-// - which saves a bit of time at runtime as well.
-// drawScaled2D is called from gui/TrackSel, draw2Dview from RaceGUI.
-void Track::drawScaled2D(float x, float y, float w, float h) const {
-  sgVec2 sc ;
-  sgSubVec2 ( sc, driveline_max, driveline_min ) ;
-  
-  float sx = (w-20.0f) / sc[0]; // leave 10 pix space left and right
-  x+=10.0;
-  float sy = h / sc[1] ;
 
-  if(sx>sy) {
-    sx = sy;
-    x += w/2 - sc[0]*sx/2;
-  } else {
-    sy = sx;
-  }
+//-----------------------------------------------------------------------------
+void Track::trackToSpatial ( sgVec3 xyz, int hint ) const
+{
+    sgCopyVec3 ( xyz, m_driveline [ hint ] ) ;
+}
 
-  const unsigned int driveline_size = driveline.size();
-  glBegin ( GL_LINE_LOOP ) ;
-  for ( size_t i = 0 ; i < driveline_size ; ++i ) {
-      glVertex2f ( x + ( driveline[i][0] - driveline_min[0] ) * sx,
-                   y + ( driveline[i][1] - driveline_min[1] ) * sy ) ;
-  }
-  glEnd () ;
+/** It's not the nices solution to have two very similar version of a function,
+ *  i.e. drawScaled2D and draw2Dview - but to keep both versions const, the
+ *  values m_scale_x/m_scale_y can not be changed, but they are needed in glVtx.
+ *  So two functions are provided: one which uses temporary variables, and one
+ *  which uses the pre-computed attributes (see constructor/loadDriveline)
+ *  - which saves a bit of time at runtime as well.
+ *  drawScaled2D is called from gui/TrackSel, draw2Dview from RaceGUI.
+ */
+void Track::drawScaled2D(float x, float y, float w, float h) const
+{
+    sgVec2 sc ;
+    sgSubVec2 ( sc, m_driveline_max, m_driveline_min ) ;
+
+    float sx = (w-20.0f) / sc[0]; // leave 10 pix space left and right
+    x+=10.0;
+    float sy = h / sc[1] ;
+
+    if(sx>sy)
+    {
+        sx = sy;
+        x += w/2 - sc[0]*sx/2;
+    }
+    else
+    {
+        sy = sx;
+    }
+
+    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    glBegin ( GL_LINE_LOOP ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        glVertex2f ( x + ( m_driveline[i][0] - m_driveline_min[0] ) * sx,
+                     y + ( m_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+    }
+    glEnd () ;
 
 }   // drawScaled2D
 
-// -----------------------------------------------------------------------------
-void Track::draw2Dview (float xOff, float yOff) const {
+//-----------------------------------------------------------------------------
+void Track::draw2Dview (float xOff, float yOff) const
+{
 
-  const unsigned int driveline_size = driveline.size();
-  glBegin ( GL_LINE_LOOP ) ;
-  for ( size_t i = 0 ; i < driveline_size ; ++i ) {
-    glVertex2f ( xOff + ( driveline[i][0] - driveline_min[0] ) * scaleX,
-		 yOff + ( driveline[i][1] - driveline_min[1] ) * scaleY ) ;
-  }
-  glEnd () ;
+    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    glBegin ( GL_LINE_LOOP ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        glVertex2f ( xOff + ( m_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+                     yOff + ( m_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    }
+    glEnd () ;
 }   // draw2Dview
 
-// -----------------------------------------------------------------------------
-void Track::loadTrack(std::string filename_) {
-  filename      = filename_;
+//-----------------------------------------------------------------------------
+void Track::loadTrack(std::string filename_)
+{
+    m_filename      = filename_;
 
-  ident = StringUtils::basename(StringUtils::without_extension(filename));
-  std::string path = StringUtils::without_extension(filename);
+    m_ident = StringUtils::basename(StringUtils::without_extension(m_filename));
+    std::string path = StringUtils::without_extension(m_filename);
 
-  // Default values
-  use_fog = false;
-  sgSetVec4 ( fog_color  , 0.3f, 0.7f, 0.9f, 1.0f ) ;
-  fog_density = 1.0f/100.0f;
-  fog_start   = 0.0f;
-  fog_end     = 1000.0f;
-  gravity     = 9.80665f;
+    // Default values
+    m_use_fog = false;
+    sgSetVec4 ( m_fog_color  , 0.3f, 0.7f, 0.9f, 1.0f ) ;
+    m_fog_density = 1.0f/100.0f;
+    m_fog_start   = 0.0f;
+    m_fog_end     = 1000.0f;
+    m_gravity     = 9.80665f;
 
-  sgSetVec3 ( sun_position, 0.4f, 0.4f, 0.4f );
-  sgSetVec4 ( sky_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
-  sgSetVec4 ( fog_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
-  sgSetVec4 ( ambientcol ,  0.5f, 0.5f, 0.5f, 1.0f );
-  sgSetVec4 ( specularcol,  1.0f, 1.0f, 1.0f, 1.0f );
-  sgSetVec4 ( diffusecol ,  1.0f, 1.0f, 1.0f, 1.0f );
+    sgSetVec3 ( m_sun_position, 0.4f, 0.4f, 0.4f );
+    sgSetVec4 ( m_sky_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
+    sgSetVec4 ( m_fog_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
+    sgSetVec4 ( m_ambient_col ,  0.5f, 0.5f, 0.5f, 1.0f );
+    sgSetVec4 ( m_specular_col,  1.0f, 1.0f, 1.0f, 1.0f );
+    sgSetVec4 ( m_diffuse_col ,  1.0f, 1.0f, 1.0f, 1.0f );
 
-  const lisp::Lisp* root = 0;
-  lisp::Parser parser;
-  root = parser.parse(loader->getPath(filename));
+    lisp::Parser parser;
+    const lisp::Lisp* const ROOT = parser.parse(loader->getPath(m_filename));
 
-  const lisp::Lisp* lisp = root->getLisp("tuxkart-track");
-  if(!lisp) {
-    delete root;
-    std::stringstream msg;
-    msg << "Couldn't load map '" << filename << "': no tuxkart-track node.";
-    throw std::runtime_error(msg.str());
-  }
+    const lisp::Lisp* const LISP = ROOT->getLisp("tuxkart-track");
+    if(!LISP)
+    {
+        delete ROOT;
+        std::stringstream msg;
+        msg << "Couldn't load map '" << m_filename << "': no tuxkart-track node.";
+        throw std::runtime_error(msg.str());
+    }
 
-  lisp->get("name",          name);
-  lisp->get("description",   description);
-  lisp->get("music",         music_filename);
-  lisp->get("herring",       herringStyle);
-  lisp->get("screenshot",    screenshot);
-  lisp->get("topview",       topview);
-  lisp->get("sky-color",     sky_color);
+    LISP->get("name",          m_name);
+    LISP->get("description",   m_description);
+    LISP->get("music",         m_music_filename);
+    LISP->get("herring",       m_herring_style);
+    LISP->get("screenshot",    m_screenshot);
+    LISP->get("topview",       m_top_view);
+    LISP->get("sky-color",     m_sky_color);
 
-  lisp->get("use-fog",       use_fog);
-  lisp->get("fog-color",     fog_color);
-  lisp->get("fog-density",   fog_density);
-  lisp->get("fog-start",     fog_start);
-  lisp->get("fog-end",       fog_end);
+    LISP->get("use-fog",       m_use_fog);
+    LISP->get("fog-color",     m_fog_color);
+    LISP->get("fog-density",   m_fog_density);
+    LISP->get("fog-start",     m_fog_start);
+    LISP->get("fog-end",       m_fog_end);
 
-  lisp->get("sun-position",  sun_position);
-  lisp->get("sun-ambient",   ambientcol);
-  lisp->get("sun-specular",  specularcol);
-  lisp->get("sun-diffuse",   diffusecol);
-  lisp->get("gravity",       gravity);
-  delete root;
+    LISP->get("sun-position",  m_sun_position);
+    LISP->get("sun-ambient",   m_ambient_col);
+    LISP->get("sun-specular",  m_specular_col);
+    LISP->get("sun-diffuse",   m_diffuse_col);
+    LISP->get("m_gravity",     m_gravity);
+    delete ROOT;
 }
 
+//-----------------------------------------------------------------------------
 void
 Track::loadDriveline()
 {
-  std::vector<sgVec3Wrapper> left_driveline;
-  std::vector<sgVec3Wrapper> right_driveline;
+    std::vector<sgVec3Wrapper> left_driveline;
+    std::vector<sgVec3Wrapper> right_driveline;
 
-  readDrivelineFromFile(left_driveline, ".drvl");
+    readDrivelineFromFile(left_driveline, ".drvl");
 
-  const unsigned int driveline_size = left_driveline.size();
-  right_driveline.reserve(driveline_size);
-  readDrivelineFromFile(right_driveline, ".drvr");
+    const unsigned int DRIVELINE_SIZE = left_driveline.size();
+    right_driveline.reserve(DRIVELINE_SIZE);
+    readDrivelineFromFile(right_driveline, ".drvr");
 
-  if(right_driveline.size() != left_driveline.size())
-      std::cout << "Error: driveline's sizes do not match, right " <<
-          "driveline is " << right_driveline.size() << " points long " <<
-          "and the left driveline is " << left_driveline.size()
-          << " points long. Track is " << name << " ." << std::endl;
+    if(right_driveline.size() != left_driveline.size())
+        std::cout << "Error: driveline's sizes do not match, right " <<
+        "driveline is " << right_driveline.size() << " points long " <<
+        "and the left driveline is " << left_driveline.size()
+        << " points long. Track is " << m_name << " ." << std::endl;
 
-  SGfloat width;
-  sgVec3 center_point, width_vector;
-  driveline.reserve(driveline_size);
-  path_width.reserve(driveline_size);
-  angle.reserve(driveline_size);
-  for(unsigned int i = 0; i < driveline_size; ++i)
-  {
-      sgAddVec3(center_point, left_driveline[i], right_driveline[i]);
-      sgScaleVec3(center_point, 0.5f);
-      driveline.push_back(center_point);
+    SGfloat width;
+    sgVec3 center_point, width_vector;
+    m_driveline.reserve(DRIVELINE_SIZE);
+    m_path_width.reserve(DRIVELINE_SIZE);
+    m_angle.reserve(DRIVELINE_SIZE);
+    for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
+    {
+        sgAddVec3(center_point, left_driveline[i], right_driveline[i]);
+        sgScaleVec3(center_point, 0.5f);
+        m_driveline.push_back(center_point);
 
-      sgSubVec3(width_vector, right_driveline[i], center_point);
-      width = sgLengthVec3(width_vector);
-      if(width > 0.0f) path_width.push_back(width);
-      else path_width.push_back(-width);
-  }
+        sgSubVec3(width_vector, right_driveline[i], center_point);
+        width = sgLengthVec3(width_vector);
+        if(width > 0.0f) m_path_width.push_back(width);
+        else m_path_width.push_back(-width);
+    }
 
-  size_t next;
-  float adjacent_line, opposite_line;
-  SGfloat theta;
+    size_t next;
+    float adjacent_line, opposite_line;
+    SGfloat theta;
 
-  for(unsigned int i = 0; i < driveline_size; ++i)
-  {
-      next = i + 1 >= driveline_size ? 0 : i + 1;
-      adjacent_line = driveline[next][0] - driveline[i][0];
-      opposite_line = driveline[next][1] - driveline[i][1];
+    for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
+    {
+        next = i + 1 >= DRIVELINE_SIZE ? 0 : i + 1;
+        adjacent_line = m_driveline[next][0] - m_driveline[i][0];
+        opposite_line = m_driveline[next][1] - m_driveline[i][1];
 
-      theta = sgATan(opposite_line/adjacent_line);
-      theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
+        theta = sgATan(opposite_line/adjacent_line);
+        theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
 
-      angle.push_back(theta);
-  }
+        m_angle.push_back(theta);
+    }
 
-  sgSetVec2 ( driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
-  sgSetVec2 ( driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
+    sgSetVec2 ( m_driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
+    sgSetVec2 ( m_driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
 
 
-distance_from_start.reserve(driveline_size);
-  float d = 0.0f ;
-  for ( size_t i = 0 ; i < driveline_size ; ++i )
-  {
-    if ( driveline[i][0] < driveline_min[0] )
-      driveline_min[0] = driveline[i][0] ;
-    if ( driveline[i][1] < driveline_min[1] )
-      driveline_min[1] = driveline[i][1] ;
-    if ( driveline[i][0] > driveline_max[0] )
-      driveline_max[0] = driveline[i][0] ;
-    if ( driveline[i][1] > driveline_max[1] )
-      driveline_max[1] = driveline[i][1] ;
+    m_distance_from_start.reserve(DRIVELINE_SIZE);
+    float d = 0.0f ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        if ( m_driveline[i][0] < m_driveline_min[0] )
+            m_driveline_min[0] = m_driveline[i][0] ;
+        if ( m_driveline[i][1] < m_driveline_min[1] )
+            m_driveline_min[1] = m_driveline[i][1] ;
+        if ( m_driveline[i][0] > m_driveline_max[0] )
+            m_driveline_max[0] = m_driveline[i][0] ;
+        if ( m_driveline[i][1] > m_driveline_max[1] )
+            m_driveline_max[1] = m_driveline[i][1] ;
 
-    distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
+        m_distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
 
-    if ( i == driveline_size - 1 )
-      d += sgDistanceVec2 ( driveline[i], driveline[0] ) ;
-    else
-      d += sgDistanceVec2 ( driveline[i], driveline[i+1] ) ;
-  }
+        if ( i == DRIVELINE_SIZE - 1 )
+            d += sgDistanceVec2 ( m_driveline[i], m_driveline[0] ) ;
+        else
+            d += sgDistanceVec2 ( m_driveline[i], m_driveline[i+1] ) ;
+    }
 
-  total_distance = d;
+    m_total_distance = d;
 
-  sgVec2 sc ;
-  sgSubVec2 ( sc, driveline_max, driveline_min ) ;
+    sgVec2 sc ;
+    sgSubVec2 ( sc, m_driveline_max, m_driveline_min ) ;
 
-  scaleX = track2DWidth  / sc[0] ;
-  scaleY = track2DHeight / sc[1] ;
+    m_scale_x = m_track_2d_width  / sc[0] ;
+    m_scale_y = m_track_2d_height / sc[1] ;
 
-  if(!doStretch) scaleX = scaleY = std::min(scaleX, scaleY);
+    if(!m_do_stretch) m_scale_x = m_scale_y = std::min(m_scale_x, m_scale_y);
 
 }   // loadDriveline
 
+//-----------------------------------------------------------------------------
 void
 Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
 {
-  std::string path = "data";
-  path += DIR_SEPARATOR;
-  path += ident;
-  path += file_ext;
-  path = loader->getPath(path.c_str());
+    std::string path = "data";
+    path += DIR_SEPARATOR;
+    path += m_ident;
+    path += file_ext;
+    path = loader->getPath(path.c_str());
 
-  FILE *fd = fopen ( path.c_str(), "r" ) ;
+    FILE *fd = fopen ( path.c_str(), "r" ) ;
 
-  if ( fd == NULL )
+    if ( fd == NULL )
     {
-      fprintf ( stderr, "Can't open '%s' for reading.\n", path.c_str() ) ;
-      exit ( 1 ) ;
+        fprintf ( stderr, "Can't open '%s' for reading.\n", path.c_str() ) ;
+        exit ( 1 ) ;
     }
 
-  int prev_hint = -1;
-  SGfloat prev_distance = 1.51f;
-  while(!feof(fd))
+    int prev_hint = -1;
+    SGfloat prev_distance = 1.51f;
+    while(!feof(fd))
     {
-      char s [ 1024 ] ;
+        char s [ 1024 ] ;
 
-      if ( fgets ( s, 1023, fd ) == NULL )
-        break ;
+        if ( fgets ( s, 1023, fd ) == NULL )
+            break ;
 
-      if ( *s == '#' || *s < ' ' )
-        continue ;
+        if ( *s == '#' || *s < ' ' )
+            continue ;
 
-      float x = 0.0f;
-      float y = 0.0f;
-      float z = 0.0f;
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
 
-      if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
+        if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
         {
-          fprintf ( stderr, "Syntax error in '%s'\n", path.c_str() ) ;
-          exit ( 1 ) ;
+            fprintf ( stderr, "Syntax error in '%s'\n", path.c_str() ) ;
+            exit ( 1 ) ;
         }
 
-      sgVec3 point;
-      point[0] = x;
-      point[1] = y;
-      point[2] = z;
+        sgVec3 point;
+        point[0] = x;
+        point[1] = y;
+        point[2] = z;
 
-      if(prev_hint != -1) prev_distance = sgDistanceVec2 ( point, line[prev_hint]);
+        if(prev_hint != -1) prev_distance = sgDistanceVec2 ( point, line[prev_hint]);
 
-      //1.5f was choosen because it's more or less the length of the tuxkart
-      if(prev_distance == 0)
-      {
-        std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
+        //1.5f was choosen because it's more or less the length of the tuxkart
+        if(prev_distance == 0)
+        {
+            std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
             "duplicated!.\n";
-      }
-      else if(prev_distance < 1.5f)
-      {
-        std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
+        }
+        else if(prev_distance < 1.5f)
+        {
+            std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
             "too close(<1.5) to previous point.\n";
-      }
+        }
 #if 0
-      if(prev_distance > 15.0f)
-      {
-        std::cerr << "In file " << path << " point " <<
+        if(prev_distance > 15.0f)
+        {
+            std::cerr << "In file " << path << " point " <<
             prev_hint << " is too far(>15.0) from next point at " <<
             prev_distance << " .\n";
-      }
+        }
 #endif
 
-          line.push_back(point);
-          ++prev_hint;
-          prev_distance -= 1.5f;
+        line.push_back(point);
+        ++prev_hint;
+        prev_distance -= 1.5f;
     }
 
-  fclose ( fd ) ;
+    fclose ( fd ) ;
 }
 

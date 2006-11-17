@@ -27,33 +27,35 @@
 #include "sfx.hpp"
 
 
-class SFXImpl : public SFX {
+class SFXImpl : public SFX
+{
 public:
-  SFXImpl(const char* filename);
-  virtual ~SFXImpl();
+    SFXImpl(const char* filename);
+    virtual ~SFXImpl();
 
-  virtual void play();
+    virtual void play();
 
 private:
-  slSample* m_sample;
+    slSample* m_sample;
 };
 
-class MusicPlib : public Music {
+class MusicPlib : public Music
+{
 public:
-  MusicPlib() {}
-  virtual ~MusicPlib() {}
+    MusicPlib() {}
+    virtual ~MusicPlib() {}
 
-  virtual void update();
+    virtual void update();
 
-  virtual bool load(const char* filename);
+    virtual bool load(const char* filename);
 
-  virtual bool playMusic();
-  virtual bool stopMusic();
-  virtual bool pauseMusic();
-  virtual bool resumeMusic();
+    virtual bool playMusic();
+    virtual bool stopMusic();
+    virtual bool pauseMusic();
+    virtual bool resumeMusic();
 
 private:
-  std::string m_filename;
+    std::string m_filename;
 };
 
 extern slScheduler* plib_scheduler;

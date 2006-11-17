@@ -30,10 +30,10 @@
 
 RaceGUI::RaceGUI(): m_time_left(0.0)
 {
-    if(!config->profile)
+    if(!config->m_profile)
     {
         UpdateKeyboardMappings();
-    }   // if !config->profile
+    }   // if !config->m_profile
 
     m_lap_leader     = -1;
     m_time_of_leader  = -1.0f;
@@ -88,7 +88,7 @@ void RaceGUI::UpdateKeyboardMappings()
     // is set up: keysToKArt contains for each (player assigned)
     // key which kart it applies to (and therefore which player),
     // and typeForKey contains the assigned function of that key.
-    const int NUM = world->raceSetup.getNumPlayers();
+    const int NUM = world->m_race_setup.getNumPlayers();
     for(int i=0; i < NUM; i++)
     {
         PlayerKart* kart = world->getPlayerKart(i);
@@ -125,7 +125,7 @@ bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
 void RaceGUI::update(float dt)
 {
     assert(world != NULL);
-    drawStatusText(world->raceSetup, dt);
+    drawStatusText(world->m_race_setup, dt);
 }   // update
 
 void RaceGUI::input(InputType type, int id0, int id1, int id2, int value)
@@ -153,15 +153,15 @@ void RaceGUI::inputKeyboard(int key, int pressed)
     switch ( key )
     {
     case 0x12: // TODO: Which key is that?
-        if(world->raceSetup.getNumPlayers()==1)
+        if(world->m_race_setup.getNumPlayers()==1)
         {   // ctrl-r
             Kart* kart = world->getPlayerKart(0);
             kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
         }
         break;
     case SDLK_F12:
-        config->displayFPS = !config->displayFPS;
-        if(config->displayFPS)
+        config->m_display_fps = !config->m_display_fps;
+        if(config->m_display_fps)
         {
             m_fps_timer.reset();
             m_fps_timer.setMaxDelta(1000);
@@ -185,7 +185,7 @@ void RaceGUI::inputKeyboard(int key, int pressed)
         menu_manager->pushMenu(MENUID_RACEMENU);
         // The player might have changed the keyboard
         // configuration, so we need to redefine the mappings
-        if(!config->profile) UpdateKeyboardMappings();
+        if(!config->m_profile) UpdateKeyboardMappings();
         break;
     case SDLK_F10:
         history->Save();
@@ -205,7 +205,7 @@ void RaceGUI::drawFPS ()
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-    widgetSet->drawDropShadowTextRace (m_fps_string, 48, 0, config->height-50, 255, 255, 255 ) ;
+    widgetSet->drawDropShadowTextRace (m_fps_string, 48, 0, config->m_height-50, 255, 255, 255 ) ;
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
@@ -243,14 +243,14 @@ void RaceGUI::drawTimer ()
     char str [ 256 ] ;
 
     assert(world != NULL);
-    m_time_left = world->clock;
+    m_time_left = world->m_clock;
 
     int min     = (int) floor ( m_time_left / 60.0 ) ;
     int sec     = (int) floor ( m_time_left - (double) ( 60 * min ) ) ;
     int tenths  = (int) floor ( 10.0f * (m_time_left - (double)(sec + 60*min)));
 
     sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
-    widgetSet->drawDropShadowTextRace ( str, 60, config->width-260, config->height-64, 255, 255, 255) ;
+    widgetSet->drawDropShadowTextRace ( str, 60, config->m_width-260, config->m_height-64, 255, 255, 255) ;
 }   // drawTimer
 
 //-----------------------------------------------------------------------------
@@ -264,9 +264,9 @@ void RaceGUI::drawMap ()
     int xLeft = 10;
     int yTop   =  10;
 
-    world -> track -> draw2Dview ( xLeft,   yTop   );
+    world -> m_track -> draw2Dview ( xLeft,   yTop   );
     glColor3f ( 1,1,0 ) ;
-    world -> track -> draw2Dview ( xLeft+1, yTop+1 );
+    world -> m_track -> draw2Dview ( xLeft+1, yTop+1 );
 
     glBegin ( GL_QUADS ) ;
 
@@ -281,21 +281,21 @@ void RaceGUI::drawMap ()
         /* If it's a player, draw a bigger sign */
         if (kart -> isPlayerKart ())
         {
-            world -> track->glVtx ( c->xyz, xLeft+3, yTop+3);
-            world -> track->glVtx ( c->xyz, xLeft-2, yTop+3);
-            world -> track->glVtx ( c->xyz, xLeft-2, yTop-2);
-            world -> track->glVtx ( c->xyz, xLeft+3, yTop-2);
-            /*      world -> track->glVtx ( c->xyz, xLeft  , yTop-4);
-                  world -> track->glVtx ( c->xyz, xLeft+4, yTop  );
-                  world -> track->glVtx ( c->xyz, xLeft  , yTop+4);
-                  world -> track->glVtx ( c->xyz, xLeft-4, yTop  ); */
+            world -> m_track->glVtx ( c->xyz, xLeft+3, yTop+3);
+            world -> m_track->glVtx ( c->xyz, xLeft-2, yTop+3);
+            world -> m_track->glVtx ( c->xyz, xLeft-2, yTop-2);
+            world -> m_track->glVtx ( c->xyz, xLeft+3, yTop-2);
+            /*      world -> m_track->glVtx ( c->xyz, xLeft  , yTop-4);
+                  world -> m_track->glVtx ( c->xyz, xLeft+4, yTop  );
+                  world -> m_track->glVtx ( c->xyz, xLeft  , yTop+4);
+                  world -> m_track->glVtx ( c->xyz, xLeft-4, yTop  ); */
         }
         else
         {
-            world -> track->glVtx ( c->xyz, xLeft+2, yTop+2);
-            world -> track->glVtx ( c->xyz, xLeft-1, yTop+2);
-            world -> track->glVtx ( c->xyz, xLeft-1, yTop-1);
-            world -> track->glVtx ( c->xyz, xLeft+2, yTop-1);
+            world -> m_track->glVtx ( c->xyz, xLeft+2, yTop+2);
+            world -> m_track->glVtx ( c->xyz, xLeft-1, yTop+2);
+            world -> m_track->glVtx ( c->xyz, xLeft-1, yTop-1);
+            world -> m_track->glVtx ( c->xyz, xLeft+2, yTop-1);
         }
     }
 
@@ -351,11 +351,11 @@ void RaceGUI::drawPlayerIcons ()
         int position = kart->getPosition();
         int lap      = kart->getLap();
 
-        y = config->height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
+        y = config->m_height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
 
         // draw text
         int red=255, green=255, blue=255;
-        int numLaps = world->raceSetup.numLaps;
+        int numLaps = world->m_race_setup.m_num_laps;
         if(lap>=numLaps)
         {  // kart is finished, display in green
             red=0; blue=0;
@@ -369,16 +369,16 @@ void RaceGUI::drawPlayerIcons ()
         if(lap>m_lap_leader)
         {
             m_lap_leader    = lap;
-            m_time_of_leader = world->clock;
+            m_time_of_leader = world->m_clock;
         }
 
         if(m_lap_leader>0 &&    // Display position during first lap
            position!=1  &&    // Display position for leader
-           (world->clock - kart->getTimeAtLap()<5.0f ||
+           (world->m_clock - kart->getTimeAtLap()<5.0f ||
             lap!=m_lap_leader))
         {  // Display for 5 seconds
             float timeBehind;
-            timeBehind = (lap==m_lap_leader ? kart->getTimeAtLap() : world->clock)
+            timeBehind = (lap==m_lap_leader ? kart->getTimeAtLap() : world->m_clock)
                          - m_time_of_leader;
             int min     = (int) floor ( timeBehind / 60.0 ) ;
             int sec     = (int) floor ( timeBehind - (double) ( 60 * min ) ) ;
@@ -449,7 +449,7 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
                                  int offset_y, float ratio_x, float ratio_y )
 {
 
-    float angle_diff = player_kart->getCoord()->hpr[0] - world->track->angle[player_kart->getHint()];
+    float angle_diff = player_kart->getCoord()->hpr[0] - world->m_track->m_angle[player_kart->getHint()];
     if(angle_diff > 180.0f) angle_diff -= 360.0f;
     else if (angle_diff < -180.0f) angle_diff += 360.0f;
 
@@ -501,8 +501,8 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
                                      float ratio_y                    )
 {
     // Originally the hardcoded sizes were 320-32 and 400
-    int x1 = (int)((config->width/2-32) * ratio_x) + offset_x ;
-    int y1 = (int)(config->height*5/6 * ratio_y)      + offset_y;
+    int x1 = (int)((config->m_width/2-32) * ratio_x) + offset_x ;
+    int y1 = (int)(config->m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
     // If player doesn't have anything, just let the transparent black square
@@ -556,10 +556,10 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 {
     float state = (float)(player_kart->getNumHerring()) /
                   MAX_HERRING_EATEN;
-    int x = (int)((config->width-24) * ratio_x) + offset_x;
+    int x = (int)((config->m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;
     int w = (int)(16 * ratio_x);
-    int h = (int)(config->height/4 * ratio_y);
+    int h = (int)(config->m_height/4 * ratio_y);
     int wl = (int)(ratio_x);
     if(wl < 1)
         wl = 1;
@@ -666,7 +666,7 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 #define WHEELWIDTH 64
     int width  = (int)(WHEELWIDTH*minRatio);
     int height = (int)(WHEELWIDTH*minRatio);
-    offset_x += (int)((config->width-160)*ratio_x) - width;
+    offset_x += (int)((config->m_width-160)*ratio_x) - width;
     offset_y += (int)(6*ratio_y);
 
     glMatrixMode(GL_MODELVIEW);
@@ -701,7 +701,7 @@ void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
 {
 
     char str[256];
-    offset_x += (int)((config->width-110)*ratio_x);
+    offset_x += (int)((config->m_width-110)*ratio_x);
     offset_y += (int)(140*ratio_y);
 
     sprintf(str, "%d", kart->getPosition());
@@ -729,7 +729,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 #define SPEEDWIDTH 128
     int width  = (int)(SPEEDWIDTH*minRatio);
     int height = (int)(SPEEDWIDTH*minRatio);
-    offset_x += (int)((config->width-10)*ratio_x) - width;
+    offset_x += (int)((config->m_width-10)*ratio_x) - width;
     offset_y += (int)(10*ratio_y);
 
     glMatrixMode(GL_MODELVIEW);
@@ -792,7 +792,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
     offset_x += (int)(120*ratio_x);
     offset_y += (int)(50*maxRatio);
 
-    if ( kart->getLap() >= world->raceSetup.numLaps )
+    if ( kart->getLap() >= world->m_race_setup.m_num_laps )
     {
         sprintf(str, "Finished");
         widgetSet->drawDropShadowTextRace ( str, (int)(48*maxRatio), offset_x, offset_y);
@@ -803,7 +803,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
 
         offset_y -= (int)(50*ratio_y);
 
-        sprintf(str, "%d/%d", kart->getLap()<0?0:kart->getLap()+1, world->raceSetup.numLaps);
+        sprintf(str, "%d/%d", kart->getLap()<0?0:kart->getLap()+1, world->m_race_setup.m_num_laps);
         widgetSet->drawDropShadowTextRace ( str, (int)(48*maxRatio), offset_x, offset_y);
     }
 } // drawLap
@@ -830,8 +830,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     glAlphaFunc    ( GL_GREATER, 0.1f);
     glEnable       ( GL_BLEND        );
 
-    glOrtho        ( 0, config->width, 0, config->height, 0, 100 ) ;
-    switch (world->ready_set_go)
+    glOrtho        ( 0, config->m_width, 0, config->m_height, 0, 100 ) ;
+    switch (world->m_ready_set_go)
     {
     case 2: widgetSet->drawTextRace ( "Ready!", 90, SCREEN_CENTERED_TEXT,
                                           SCREEN_CENTERED_TEXT, 230, 170, 160 ) ;
@@ -846,8 +846,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 
     for(int i = 0; i < 10; ++i)
     {
-        if(world->debugtext[i] != "")
-            widgetSet->drawText(world->debugtext[i].c_str(), 20, 20, 200 - i*20,
+        if(world->m_debug_text[i] != "")
+            widgetSet->drawText(world->m_debug_text[i].c_str(), 20, 20, 200 - i*20,
                                 100, 210, 100);
     }
     if(world->getPhase()==World::START_PHASE)
@@ -883,15 +883,15 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 
             if(raceSetup.getNumPlayers() == 2)
             {
-                if(pla == 0) offset_y = config->height/2;
+                if(pla == 0) offset_y = config->m_height/2;
             }
             else if(raceSetup.getNumPlayers() > 2)
             {
                 if((pla == 0 && raceSetup.getNumPlayers() > 1) || (pla == 1))
-                    offset_y = config->height/2;
+                    offset_y = config->m_height/2;
 
                 if((pla == 1) || pla == 3)
-                    offset_x = config->width/2;
+                    offset_x = config->m_width/2;
             }
 
             Kart* player_kart=world->getPlayerKart(pla);
@@ -912,7 +912,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
         }   // for pla
         drawTimer ();
         drawMap   ();
-        if ( config->displayFPS ) drawFPS ();
+        if ( config->m_display_fps ) drawFPS ();
         drawPlayerIcons() ;
     }   // if RACE_PHASE
 

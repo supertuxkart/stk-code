@@ -36,187 +36,196 @@ class SkidMark;
 class Kart;
 class Herring;
 
-class KartParticleSystem : public ParticleSystem 
+class KartParticleSystem : public ParticleSystem
 {
 private:
-  Kart* kart;
+    Kart* m_kart;
 
 public:
-  KartParticleSystem          (Kart* kart, int num, float _create_rate,
-			       int _turn_to_face, float sz, float bsphere_size);
-  virtual void update         (float t                                        );
-  virtual void particle_create(int index, Particle* p                         );
-  virtual void particle_update(float deltaTime, int index, Particle *p        );
-  virtual void particle_delete(int index, Particle* p                         );
+    KartParticleSystem          (Kart* kart, int num, float _create_rate,
+                                 int _turn_to_face, float sz, float bsphere_size);
+    virtual void update         (float t                                        );
+    virtual void particle_create(int index, Particle* p                         );
+    virtual void particle_update(float deltaTime, int index, Particle *p        );
+    virtual void particle_delete(int index, Particle* p                         );
 };
 
 // =============================================================================
-class Kart : public Moveable 
+class Kart : public Moveable
 {
 protected:
-  Attachment   attachment;
-  Collectable  collectable;
+    Attachment   m_attachment;
+    Collectable  m_collectable;
 
-  int          grid_position;
-  int          racePosition;
-  bool         powersliding;
-  KartControl  controls;           // The position of the karts controlls 
-  unsigned int trackHint;          // index in driveline                  
-  float        ZipperTimeLeft;
-  sgVec2       last_track_coords;
-  sgVec2       curr_track_coords;
-  sgVec3       velocity_wc;        // velocity in world coordinates
-  float        prevAccel;          // acceleration at previous time step
-  bool         skidFront;          // true if front tires are skidding
-  bool         skidRear;           // true if rear tires are skidding
-  float        maxSpeed;           // maximum speed of the kart, computed from
-                                   // physics parameters, storing it saves time
+    int          m_grid_position;
+    int          m_race_position;
+    bool         m_power_sliding;
+    KartControl  m_controls;           // The position of the karts controlls
+    unsigned int m_track_hint;          // index in driveline
+    float        m_zipper_time_left;
+    sgVec2       m_last_track_coords;
+    sgVec2       m_curr_track_coords;
+    sgVec3       m_velocity_wc;        // velocity in world coordinates
+    float        m_prev_accel;          // acceleration at previous time step
+    bool         m_skid_front;          // true if front tires are skidding
+    bool         m_skid_rear;           // true if rear tires are skidding
+    float        m_max_speed;           // maximum speed of the kart, computed from
+    // physics parameters, storing it saves time
 #ifdef BULLET
-	btRaycastVehicle::btVehicleTuning  *m_tuning;
-	btVehicleRaycaster	               *m_vehicleRayCaster;
-	btRaycastVehicle                   *m_vehicle;
+    btRaycastVehicle::btVehicleTuning  *m_tuning;
+    btVehicleRaycaster                *m_vehicleRayCaster;
+    btRaycastVehicle                   *m_vehicle;
 #endif
 
 private:
-  int                 num_herring_gobbled;
-  ssgSimpleState*     smokepuff;
-  // don't delete the following 2 vars (they're kids in the hirarchy)
-  KartParticleSystem* smoke_system;
-  ssgTransform*       exhaust_pipe;
+    int                 m_num_herrings_gobbled;
+    ssgSimpleState*     m_smokepuff;
+    // don't delete the following 2 vars (they're kids in the hirarchy)
+    KartParticleSystem* m_smoke_system;
+    ssgTransform*       m_exhaust_pipe;
 
-  float               wheel_position;
-  ssgTransform*       wheel_front_l;
-  ssgTransform*       wheel_front_r;
-  ssgTransform*       wheel_rear_l;
-  ssgTransform*       wheel_rear_r;
+    float               m_wheel_position;
+    ssgTransform*       m_wheel_front_l;
+    ssgTransform*       m_wheel_front_r;
+    ssgTransform*       m_wheel_rear_l;
+    ssgTransform*       m_wheel_rear_r;
 
-  SkidMark*           skidmark_left;
-  SkidMark*           skidmark_right;
+    SkidMark*           m_skidmark_left;
+    SkidMark*           m_skidmark_right;
 
-  int                 raceLap;             // number of finished(!) laps
-  float               timeAtLastLap;       // time at finishing last lap
-  float               finishTime;
-  bool                finishedRace;
- protected:
-  int                 rescue;
-  const KartProperties *kartProperties;  
-  
-  /** Search the given branch of objects that match the wheel names
-      and if so assign them to wheel_* variables */
-  void  load_wheels          (ssgBranch* obj);
-    
+    int                 m_race_lap;             // number of finished(!) laps
+    float               m_time_at_last_lap;       // time at finishing last lap
+    float               m_finish_time;
+    bool                m_finished_race;
+protected:
+    int                 m_rescue;
+    const KartProperties *m_kart_properties;
+
+    /** Search the given branch of objects that match the wheel names
+        and if so assign them to wheel_* variables */
+    void  load_wheels          (ssgBranch* obj);
+
 public:
-  Kart(const KartProperties* kartProperties_, int position_);
-  virtual ~Kart();
+    Kart(const KartProperties* kartProperties_, int position_);
+    virtual ~Kart();
 
-  void load_data();
+    void load_data();
 
-  virtual void placeModel ();
-  const KartProperties* getKartProperties() const 
-                                        { return kartProperties; }
-  void           setKartProperties   (const KartProperties *kp) 
-                                        { kartProperties=kp;}
-  void           attach              (attachmentType attachment_, float time)
-                                        { attachment.set(attachment_, time);}
-  void           gotZipper           (float angle, float time)
-                                        { wheelie_angle=angle; 
-					  ZipperTimeLeft=time;              }
-  void           setCollectable      (collectableType t, int n) 
-                                        { collectable.set(t, n);            }
-  void           setPosition         (int p)    {racePosition = p;          }
-  int            getHint             () { return trackHint;                 }
-  float          getDistanceDownTrack() { return curr_track_coords[1];      }
-  float          getDistanceToCenter () { return curr_track_coords[0];      }
-  attachmentType getAttachment       () { return  attachment.getType();     }
-  void           setAttachmentType   (attachmentType t)
-                                        { attachment.set(t);                }
-  Collectable   *getCollectable      () { return &collectable;              }
-  int            getNumCollectables  () const { return  collectable.getNum();}
-  int            getNumHerring       () const { return  num_herring_gobbled;}
-  int            getLap              () const { return  raceLap;            }
-  int            getPosition         () const { return  racePosition ;      }
-  void           setFinishingState(float time);
-  float          getFinishTime       () const  { return finishTime;         }
-  bool           raceIsFinished      () const  { return finishedRace;       }
-  void           handleRescue        ();
-  void           processSkidMarks    ();
-  void           getClosestKart      (float *cdist, int *closest);
-  void           handleMagnet        (float cdist, int closest);
-  void           doZipperProcessing  (float dt);
-  void           updatePhysics       (float dt);
-  float          NormalizedLateralForce(float alpha, float corner) const;
+    virtual void placeModel ();
+    const KartProperties* getKartProperties() const
+        { return m_kart_properties; }
+    void           setKartProperties   (const KartProperties *kp)
+    { m_kart_properties=kp;}
+    void           attach              (attachmentType attachment_, float time)
+    { m_attachment.set(attachment_, time);}
+    void           gotZipper           (float angle, float time)
+    {
+        m_wheelie_angle=angle;
+        m_zipper_time_left=time;
+    }
+    void           setCollectable      (collectableType t, int n)
+    { m_collectable.set(t, n);            }
+    void           setPosition         (int p)    {m_race_position = p;          }
+    int            getHint             () { return m_track_hint;                 }
+    float          getDistanceDownTrack() { return m_curr_track_coords[1];      }
+    float          getDistanceToCenter () { return m_curr_track_coords[0];      }
+    attachmentType getAttachment       () { return  m_attachment.getType();     }
+    void           setAttachmentType   (attachmentType t)
+    { m_attachment.set(t);                }
+    Collectable   *getCollectable      () { return &m_collectable;              }
+    int            getNumCollectables  () const { return  m_collectable.getNum();}
+    int            getNumHerring       () const { return  m_num_herrings_gobbled;}
+    int            getLap              () const { return  m_race_lap;            }
+    int            getPosition         () const { return  m_race_position ;      }
+    void           setFinishingState(float time);
+    float          getFinishTime       () const  { return m_finish_time;         }
+    bool           raceIsFinished      () const  { return m_finished_race;       }
+    void           handleRescue        ();
+    void           processSkidMarks    ();
+    void           getClosestKart      (float *cdist, int *closest);
+    void           handleMagnet        (float cdist, int closest);
+    void           doZipperProcessing  (float dt);
+    void           updatePhysics       (float dt);
+    float          NormalizedLateralForce(float alpha, float corner) const;
 
-  // Functions to access the current kart properties (which might get changed,
-  // e.g. mass increase or air_friction increase depending on attachment etc.)
-  // -------------------------------------------------------------------------
-  const sgVec3*  getColor         () const {return kartProperties->getColor();}
-  float          getMass          () const {return kartProperties->getMass()
-                                                 + attachment.WeightAdjust();}
-  float          getRollResistance() const {return kartProperties->getRollResistance();}
-  float          getMaxPower      () const {return kartProperties->getMaxPower();}
-  float          getTimeFullSteer () const {return kartProperties->getTimeFullSteer();}
-  float          getBrakeFactor   () const {return kartProperties->getBrakeFactor();}
-  float          getWheelBase     () const {return kartProperties->getWheelBase();}
-  float          getWheelRadius   () const {return 0.5f;}
-  float          getWheelWidth    () const {return 0.5f;}
-  float          getHeightCOG     () const {return kartProperties->getHeightCOG();}
-  float          getTireGrip      () const {return kartProperties->getTireGrip();}
-  float          getMaxSteerAngle () const {return kartProperties->getMaxSteerAngle();}
-  float          getCornerStiffF  () const {return kartProperties->getCornerStiffF();}
-  float          getCornerStiffR  () const {return kartProperties->getCornerStiffR();}
-  float          getInertia       () const {return kartProperties->getInertia();     }
-  float          getWheelieMaxSpeedRatio () const
-                                     {return kartProperties->getWheelieMaxSpeedRatio();}
-  float          getWheelieMaxPitch  () const
-                                     {return kartProperties->getWheelieMaxPitch();   }
-  float          getWheeliePitchRate () const
-                                     {return kartProperties->getWheeliePitchRate();  }
-  float          getWheelieRestoreRate() const
-                                     {return kartProperties->getWheelieRestoreRate();}
-  float          getWheelieSpeedBoost() const
-                                     {return kartProperties->getWheelieSpeedBoost(); }
-  float          getSteerAngle    () const {return controls.lr*
-                                               kartProperties->getMaxSteerAngle();}
-  float          getAirResistance () const;
-  float          getSteerPercent  () const {return controls.lr;              }
-  float          getMaxSpeed      () const {return maxSpeed;                 }
-  void           setTimeAtLap     (float t){timeAtLastLap=t;                 }
-  float          getTimeAtLap     () const {return timeAtLastLap;            }
+    // Functions to access the current kart properties (which might get changed,
+    // e.g. mass increase or air_friction increase depending on attachment etc.)
+    // -------------------------------------------------------------------------
+    const sgVec3*  getColor         () const {return m_kart_properties->getColor();}
+    float          getMass          () const
+    {
+        return m_kart_properties->getMass()
+               + m_attachment.WeightAdjust();
+    }
+    float          getRollResistance() const {return m_kart_properties->getRollResistance();}
+    float          getMaxPower      () const {return m_kart_properties->getMaxPower();}
+    float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
+    float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
+    float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
+    float          getWheelRadius   () const {return 0.5f;}
+    float          getWheelWidth    () const {return 0.5f;}
+    float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
+    float          getTireGrip      () const {return m_kart_properties->getTireGrip();}
+    float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
+    float          getCornerStiffF  () const {return m_kart_properties->getCornerStiffF();}
+    float          getCornerStiffR  () const {return m_kart_properties->getCornerStiffR();}
+    float          getInertia       () const {return m_kart_properties->getInertia();     }
+    float          getWheelieMaxSpeedRatio () const
+        {return m_kart_properties->getWheelieMaxSpeedRatio();}
+    float          getWheelieMaxPitch  () const
+        {return m_kart_properties->getWheelieMaxPitch();   }
+    float          getWheeliePitchRate () const
+        {return m_kart_properties->getWheeliePitchRate();  }
+    float          getWheelieRestoreRate() const
+        {return m_kart_properties->getWheelieRestoreRate();}
+    float          getWheelieSpeedBoost() const
+        {return m_kart_properties->getWheelieSpeedBoost(); }
+    float          getSteerAngle    () const
+    {
+        return m_controls.lr*
+               m_kart_properties->getMaxSteerAngle();
+    }
+    float          getAirResistance () const;
+    float          getSteerPercent  () const {return m_controls.lr;              }
+    float          getMaxSpeed      () const {return m_max_speed;                 }
+    void           setTimeAtLap     (float t){m_time_at_last_lap=t;                 }
+    float          getTimeAtLap     () const {return m_time_at_last_lap;            }
 #ifdef BULLET
-    void           setPhysics(btRaycastVehicle *v, 
+    void           setPhysics(btRaycastVehicle *v,
                               btRaycastVehicle::btVehicleTuning *t) {m_vehicle=v;m_tuning=t; }
     btRaycastVehicle *getVehicle() const {return m_vehicle;}
 #endif
-  const std::string& getName      () const {return kartProperties->getName();}
-  virtual int    isPlayerKart     () const {return 0;                        }
-  virtual void   collectedHerring (Herring* herring);
-  virtual void   reset            ();
-  virtual void   handleZipper     ();
-  virtual void   forceCrash       ();
-  virtual void   doLapCounting    ();
-  virtual void   update           (float dt               );
-  virtual void   doCollisionAnalysis(float dt, float hot    );
-  virtual void   doObjectInteractions();
-  virtual void   OutsideTrack     (int isReset) {rescue=true;} 
+    const std::string& getName      () const {return m_kart_properties->getName();}
+    virtual int    isPlayerKart     () const {return 0;                        }
+    virtual void   collectedHerring (Herring* herring);
+    virtual void   reset            ();
+    virtual void   handleZipper     ();
+    virtual void   forceCrash       ();
+    virtual void   doLapCounting    ();
+    virtual void   update           (float dt               );
+    virtual void   doCollisionAnalysis(float dt, float hot    );
+    virtual void   doObjectInteractions();
+    virtual void   OutsideTrack     (int isReset) {m_rescue=true;}
 };
 
-class TrafficDriver : public Kart {
+class TrafficDriver : public Kart
+{
 public:
-  TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos )
-    : Kart (kartProperties_, 0 )
-  {
-    sgCopyVec3 ( reset_pos.xyz, _pos ) ;
-    reset () ;
-  }
-  virtual void doObjectInteractions () ;
-  virtual void doLapCounting        () ;
-  virtual void doZipperProcessing   () ;
-  virtual void update (float delta) ;
-  
+    TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos )
+            : Kart (kartProperties_, 0 )
+    {
+        sgCopyVec3 ( m_reset_pos.xyz, _pos ) ;
+        reset () ;
+    }
+    virtual void doObjectInteractions () ;
+    virtual void doLapCounting        () ;
+    virtual void doZipperProcessing   () ;
+    virtual void update (float delta) ;
+
 } ;
 
 
 #endif
 
 /* EOF */
-  
+

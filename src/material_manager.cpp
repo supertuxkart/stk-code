@@ -25,202 +25,212 @@ ssgState *fuzzy_gst;
 
 MaterialManager *material_manager=0;
 
-MaterialManager::MaterialManager(){
-  /* Create list - and default material zero */
+MaterialManager::MaterialManager()
+{
+    /* Create list - and default material zero */
 
-  materials.reserve(100);
-  // We can't call init here, since the global variable
-  // material_manager has not yet been initialised, and
-  // material_manager is used in the Material constructor.
-  // Therefore, the code for loading the material had to
-  // be moved into a separate function.
-  //  Init();
+    m_materials.reserve(100);
+    // We can't call init here, since the global variable
+    // material_manager has not yet been initialised, and
+    // material_manager is used in the Material constructor.
+    // Therefore, the code for loading the material had to
+    // be moved into a separate function.
+    //  Init();
 }
 
-int MaterialManager::addEntity(Material *m) {
-  materials.push_back(m);
-  return materials.size()-1;
+//-----------------------------------------------------------------------------
+int MaterialManager::addEntity(Material *m)
+{
+    m_materials.push_back(m);
+    return m_materials.size()-1;
 }
 
-// -----------------------------------------------------------------------------
-void MaterialManager::reInit() {
-  for(std::vector<Material*>::const_iterator i=materials.begin();
-      i!=materials.end(); i++) {
-    delete *i;
-  }
-  materials.clear();
-  loadMaterial();
+//-----------------------------------------------------------------------------
+void MaterialManager::reInit()
+{
+    for(std::vector<Material*>::const_iterator i=m_materials.begin();
+        i!=m_materials.end(); i++)
+    {
+        delete *i;
+    }
+    m_materials.clear();
+    loadMaterial();
 }   // reInit
 
-// -----------------------------------------------------------------------------
-void MaterialManager::loadMaterial() {
-  // Create the default/empty material. The Material 
-  // constructor will add the material to (this) material_manager
-  new Material ();
+//-----------------------------------------------------------------------------
+void MaterialManager::loadMaterial()
+{
+    // Create the default/empty material. The Material
+    // constructor will add the material to (this) material_manager
+    new Material ();
 
-  char fname [ 1000 ] ;
+    char fname [ 1000 ] ;
 
-  sprintf ( fname, "data/materials.dat" ) ;
-  std::string path = loader->getPath(fname);
-  FILE *fd = fopen ( path.c_str(), "r" ) ;
+    sprintf ( fname, "data/materials.dat" ) ;
+    std::string path = loader->getPath(fname);
+    FILE *fd = fopen ( path.c_str(), "r" ) ;
 
-  if ( fd == NULL )
-  {
-    fprintf ( stderr, "FATAL: No Such File as '%s'\n", fname ) ;
-    exit ( 1 ) ;
-  }
+    if ( fd == NULL )
+    {
+        fprintf ( stderr, "FATAL: No Such File as '%s'\n", fname ) ;
+        exit ( 1 ) ;
+    }
 
-  while ( parseMaterial ( fd ) ) 
-    /* Read file */ ;
+    while ( parseMaterial ( fd ) )
+        /* Read file */ ;
 
-  fclose ( fd ) ;
+    fclose ( fd ) ;
 
-  ssgSetAppStateCallback ( getAppState ) ;
-  fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
+    ssgSetAppStateCallback ( getAppState ) ;
+    fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
 }   // MaterialManager
 
-char* MaterialManager::parseFileName(char **str) {
-  char *p = *str ;
+//-----------------------------------------------------------------------------
+char* MaterialManager::parseFileName(char **str)
+{
+    char *p = *str ;
 
-  /* Skip leading spaces */
-  while ( *p <= ' ' && *p != '\0' ) p++ ;
+    /* Skip leading spaces */
+    while ( *p <= ' ' && *p != '\0' ) p++ ;
 
-  /* Skip blank lines and comments */
-  if ( *p == '#' || *p == '\0' )
-    return NULL ;
+    /* Skip blank lines and comments */
+    if ( *p == '#' || *p == '\0' )
+        return NULL ;
 
-  if ( *p != '"' )
-  {
-    fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n");
-    fprintf ( stderr, "ERROR: Offending line is '%s'\n", *str ) ;
-    return NULL ;
-  }
+    if ( *p != '"' )
+    {
+        fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n");
+        fprintf ( stderr, "ERROR: Offending line is '%s'\n", *str ) ;
+        return NULL ;
+    }
 
-  /* Filename? */
-  char *f = ++p ;
-  while ( *p != '"' && *p != '\0' ) p++ ;
+    /* Filename? */
+    char *f = ++p ;
+    while ( *p != '"' && *p != '\0' ) p++ ;
 
-  if ( *p != '"' )
-  {
-    fprintf ( stderr,
-      "ERROR: Unterminated string constant '%s' in materials file.\n", *str ) ;
-    return NULL ;
-  }
+    if ( *p != '"' )
+    {
+        fprintf ( stderr,
+                  "ERROR: Unterminated string constant '%s' in materials file.\n", *str ) ;
+        return NULL ;
+    }
 
-  *p = '\0' ;
-  *str = ++p ;
+    *p = '\0' ;
+    *str = ++p ;
 
-  return f ;
+    return f ;
 }
 
-
+//-----------------------------------------------------------------------------
 int MaterialManager::parseMaterial ( FILE *fd )
 {
-  char str [ 1024 ] ;
+    char str [ 1024 ] ;
 
-  while ( ! feof ( fd ) )
-  {
-    char *s = str ;
-
-    if ( fgets ( s, 1024, fd ) == NULL )
-      return false ;
-
-    s [ strlen(s) - 1 ] = '\0' ;
-
-    char *f = parseFileName ( & s ) ;
-
-    if ( f != NULL )
+    while ( ! feof ( fd ) )
     {
-      new Material ( f, s ) ;
-      return true ;
+        char *s = str ;
+
+        if ( fgets ( s, 1024, fd ) == NULL )
+            return false ;
+
+        s [ strlen(s) - 1 ] = '\0' ;
+
+        char *f = parseFileName ( & s ) ;
+
+        if ( f != NULL )
+        {
+            new Material ( f, s ) ;
+            return true ;
+        }
     }
-  }
- 
-  return false ;
+
+    return false ;
 }
 
-
+//-----------------------------------------------------------------------------
 Material *MaterialManager::getMaterial ( ssgLeaf *l )
 {
-  return materials[l -> getExternalPropertyIndex ()] ;
+    return m_materials[l -> getExternalPropertyIndex ()] ;
 }
 
-
+//-----------------------------------------------------------------------------
 Material *MaterialManager::getMaterial ( const char* fname )
 {
-  if ( fname == NULL || fname[0] == '\0' )
-    return materials[0];
+    if ( fname == NULL || fname[0] == '\0' )
+        return m_materials[0];
 
-  //This copy is made so the original fname is not modified
-  char *fname_copy = strdup(fname);
-  const char *fn;
-  /* Remove all leading path information. */
+    //This copy is made so the original fname is not modified
+    char *fname_copy = strdup(fname);
+    const char *fn;
+    /* Remove all leading path information. */
 
-  for ( fn = & fname_copy [ strlen ( fname_copy ) - 1 ] ;
-        fn != fname_copy && *fn != '/' ; fn-- )
-    /* Search back for a '/' */ ;
-
-    if ( *fn == '/' )
-      fn++ ;
-
-  char basename [ 1024 ] ;
-
-  strcpy ( basename, fn ) ;
-  free(fname_copy);
-
-  /* Remove last trailing extension. */
-
-  char* fno;
-  for ( fno = & basename [ strlen ( basename ) - 1 ] ; fno != basename &&
-                                                     *fno != '.' ; fno-- )
-    /* Search back for a '.' */ ;
-
-  if ( *fno == '.' )
-    *fno = '\0' ;
-
-  for ( int i = 0 ; i < getNumEntities () ; i++ )
-  {
-    char *fname2 = materials[i]-> getTexFname () ;
-
-    if ( fname2 != NULL && fname2[0] != '\0' )
-    {
-      char *fn2 ;
-
-      /* Remove all leading path information. */
-
-      for ( fn2 = & fname2 [ strlen ( fname2 ) -1 ] ; fn2 != fname2 &&
-                                                     *fn2 != '/' ; fn2-- )
+    for ( fn = & fname_copy [ strlen ( fname_copy ) - 1 ] ;
+          fn != fname_copy && *fn != '/' ; fn-- )
         /* Search back for a '/' */ ;
 
-      if ( *fn2 == '/' )
-        fn2++ ;
+    if ( *fn == '/' )
+        fn++ ;
 
-      char basename2 [ 1024 ] ;
+    char basename [ 1024 ] ;
 
-      strcpy ( basename2, fn2 ) ;
+    strcpy ( basename, fn ) ;
+    free(fname_copy);
 
-      /* Remove last trailing extension. */
+    /* Remove last trailing extension. */
 
-      for ( fn2 = & basename2 [ strlen ( basename2 ) - 1 ] ; fn2 != basename2 &&
-                                                         *fn2 != '.' ; fn2-- )
+    char* fno;
+    for ( fno = & basename [ strlen ( basename ) - 1 ] ; fno != basename &&
+          *fno != '.' ; fno-- )
         /* Search back for a '.' */ ;
 
-      if ( *fn2 == '.' )
-        *fn2 = '\0' ;
+    if ( *fno == '.' )
+        *fno = '\0' ;
 
-      if ( strcmp ( basename, basename2 ) == 0 )
-        return materials[i] ;
+
+    char *fname2;
+
+    for ( int i = 0 ; i < getNumEntities () ; i++ )
+    {
+        fname2 = m_materials[i]-> getTexFname () ;
+
+        if ( fname2 != NULL && fname2[0] != '\0' )
+        {
+            char *fn2 ;
+
+            /* Remove all leading path information. */
+
+            for ( fn2 = & fname2 [ strlen ( fname2 ) -1 ] ; fn2 != fname2 &&
+                  *fn2 != '/' ; fn2-- )
+                /* Search back for a '/' */ ;
+
+            if ( *fn2 == '/' )
+                fn2++ ;
+
+            char basename2 [ 1024 ] ;
+
+            strcpy ( basename2, fn2 ) ;
+
+            /* Remove last trailing extension. */
+
+            for ( fn2 = & basename2 [ strlen ( basename2 ) - 1 ] ; fn2 != basename2 &&
+                  *fn2 != '.' ; fn2-- )
+                /* Search back for a '.' */ ;
+
+            if ( *fn2 == '.' )
+                *fn2 = '\0' ;
+
+            if ( strcmp ( basename, basename2 ) == 0 )
+                return m_materials[i] ;
+        }
     }
-  }
 
-  return NULL ;
+    return NULL ;
 }
 
-
+//=============================================================================
 ssgState *getAppState ( char *fname )
 {
-  Material *m = material_manager->getMaterial ( fname ) ;
-  return ( m == NULL ) ? NULL : m -> getState () ;
+    Material *m = material_manager->getMaterial ( fname ) ;
+    return ( m == NULL ) ? NULL : m -> getState () ;
 }
-
 

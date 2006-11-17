@@ -58,7 +58,7 @@ TrackSel::TrackSel()
     }
 
     widgetSet -> layout(m_menu_id, 0, 1);
-    m_rect = widgetSet->rect(10, 10, config->width-20, 34, GUI_ALL, 10);
+    m_rect = widgetSet->rect(10, 10, config->m_width-20, 34, GUI_ALL, 10);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,24 +82,24 @@ void TrackSel::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
+    glOrtho(0.0, config->m_width, 0.0, config->m_height, -1.0, +1.0);
     const std::string& screenshot = TRACK->getScreenshotFile();
     const std::string& topview    = TRACK->getTopviewFile();
     if(screenshot.size()==0 && topview.size()==0)
     {
         glDisable ( GL_TEXTURE_2D ) ;
         glColor3f ( 0.0f, 0.0f, 0.0f ) ;
-        TRACK->drawScaled2D(0.0, 50, config->width, config->height/3); // (x, y, w, h)
+        TRACK->drawScaled2D(0.0, 50, config->m_width, config->m_height/3); // (x, y, w, h)
         glColor3f ( 1.0f, 1.0f, 1.0f ) ;
-        TRACK->drawScaled2D(1.0, 51, config->width, config->height/3);
+        TRACK->drawScaled2D(1.0, 51, config->m_width, config->m_height/3);
         glEnable ( GL_TEXTURE_2D ) ;
     }
     else
     {                   // either topview or screenshot specified
-        int xLeft   = config->width/2;
+        int xLeft   = config->m_width/2;
         int yBottom = 50;
-        int w       = config->width/3;
-        int h       = config->height/3;
+        int w       = config->m_width/3;
+        int h       = config->m_height/3;
         if(topview.size()==0)
         {  // no topview, but there is a screenshot!
             glDisable ( GL_TEXTURE_2D ) ;

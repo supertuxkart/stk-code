@@ -22,41 +22,40 @@
 
 float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal)
 {
-  /* Look for the nearest polygon *beneath* my_position */
+    /* Look for the nearest polygon *beneath* my_position */
 
-  ssgHit *results ;
-  int num_hits ;
+    ssgHit *results ;
 
-  float hot ;        /* H.O.T == Height Of Terrain */
-  sgVec3 HOTvec ;
+    float hot ;        /* H.O.T == Height Of Terrain */
+    sgVec3 HOTvec ;
 
-  sgMat4 invmat ;
-  sgMakeIdentMat4 ( invmat ) ;
-  invmat[3][0] = - my_position [0] ;
-  invmat[3][1] = - my_position [1] ;
-  invmat[3][2] = 0.0 ;
+    sgMat4 invmat ;
+    sgMakeIdentMat4 ( invmat ) ;
+    invmat[3][0] = - my_position [0] ;
+    invmat[3][1] = - my_position [1] ;
+    invmat[3][2] = 0.0 ;
 
-  sgSetVec3 ( HOTvec, 0.0f, 0.0f, my_position [ 2 ] ) ;
+    sgSetVec3 ( HOTvec, 0.0f, 0.0f, my_position [ 2 ] ) ;
 
-  num_hits = ssgHOT (branch, HOTvec, invmat, &results ) ;
-  
-  hot = - FLT_MAX ;
+    const int NUM_HITS = ssgHOT (branch, HOTvec, invmat, &results ) ;
 
-  for ( int i = 0 ; i < num_hits ; i++ )
-  {
-    ssgHit *h = &results [ i ] ;
+    hot = - FLT_MAX ;
 
-    float hgt = - h->plane[3] / h->plane[2] ;
-
-    if ( hgt >= hot )
+    for ( int i = 0 ; i < NUM_HITS ; i++ )
     {
-      hot = hgt ;
+        ssgHit *h = &results [ i ] ;
 
-      if ( normal != NULL )
-        sgCopyVec3 ( normal, h->plane ) ;
+        float hgt = - h->plane[3] / h->plane[2] ;
+
+        if ( hgt >= hot )
+        {
+            hot = hgt ;
+
+            if ( normal != NULL )
+                sgCopyVec3 ( normal, h->plane ) ;
+        }
     }
-  }
 
-  return hot ;
+    return hot ;
 }
 

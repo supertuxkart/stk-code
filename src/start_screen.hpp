@@ -24,18 +24,18 @@
 #include "material.hpp"
 
 
-class StartScreen : public Screen 
+class StartScreen : public Screen
 {
 private:
-  Material *introMaterial ;
+    Material *m_intro_material ;
 
 public:
-       StartScreen    ();
-      ~StartScreen    ();
-  void switchToGame   ();
-  void update         (); 
-  void removeTextures ();
-  void installMaterial();
+    StartScreen    ();
+    ~StartScreen    ();
+    void switchToGame   ();
+    void update         ();
+    void removeTextures ();
+    void installMaterial();
 };
 
 extern StartScreen* startScreen;

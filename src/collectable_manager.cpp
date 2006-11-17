@@ -25,108 +25,123 @@
 #include "material.hpp"
 #include "preprocessor.hpp"
 
-typedef struct {
-  collectableType collectable;
-  const char*const dataFile;
-} initCollectableType;
+typedef struct
+{
+    collectableType collectable;
+    const char*const dataFile;
+}
+initCollectableType;
 
-initCollectableType ict[]={
-  {COLLECT_ZIPPER,         "zipper.collectable"       },
+initCollectableType ict[]=
+{
+    {COLLECT_ZIPPER,         "zipper.collectable"       },
 #ifdef USE_MAGNETS
-  {COLLECT_MAGNET,         "magnet.collectable"       },
+    {COLLECT_MAGNET,         "magnet.collectable"       },
 #endif
-  {COLLECT_SPARK,          "spark.projectile"         },
-  {COLLECT_MISSILE,        "missile.projectile"       },
-  {COLLECT_HOMING_MISSILE, "homingmissile.projectile" },
-  {COLLECT_ANVIL,          "anvil.collectable"        },
-  {COLLECT_PARACHUTE,      "parachute.collectable"    },
-  {COLLECT_MAX,            ""                         },
+    {COLLECT_SPARK,          "spark.projectile"         },
+    {COLLECT_MISSILE,        "missile.projectile"       },
+    {COLLECT_HOMING_MISSILE, "homingmissile.projectile" },
+    {COLLECT_ANVIL,          "anvil.collectable"        },
+    {COLLECT_PARACHUTE,      "parachute.collectable"    },
+    {COLLECT_MAX,            ""                         },
 };
 
 CollectableManager* collectable_manager=0;
 
-// -----------------------------------------------------------------------------
-CollectableManager::CollectableManager() 
+//-----------------------------------------------------------------------------
+CollectableManager::CollectableManager()
 {
-  for(int i=0; i<COLLECT_MAX; i++)
-  {  
-    allModels[i] = (ssgEntity*)NULL;
-    allIcons[i]  = (Material*)NULL;
-  }
+    for(int i=0; i<COLLECT_MAX; i++)
+    {
+        m_all_models[i] = (ssgEntity*)NULL;
+        m_all_icons[i]  = (Material*)NULL;
+    }
 }   // CollectableManager
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void CollectableManager::removeTextures()
 {
-  for(int i=0; i<COLLECT_MAX; i++)
-  {
-    if(allIcons [i]) ssgDeRefDelete(allIcons [i]->getState());
-    if(allModels[i]) ssgDeRefDelete(allModels[i]            );
-  }   // for
-  callback_manager->clear(CB_COLLECTABLE);
+    for(int i=0; i<COLLECT_MAX; i++)
+    {
+        if(m_all_icons [i]) ssgDeRefDelete(m_all_icons [i]->getState());
+        if(m_all_models[i]) ssgDeRefDelete(m_all_models[i]            );
+    }   // for
+    callback_manager->clear(CB_COLLECTABLE);
 
 }   // removeTextures
 
-// -----------------------------------------------------------------------------
-void CollectableManager::loadCollectables() {
-  for(int i=0; ict[i].collectable != COLLECT_MAX; i++) {
-    Load(ict[i].collectable, ict[i].dataFile);
-  }
+//-----------------------------------------------------------------------------
+void CollectableManager::loadCollectables()
+{
+    for(int i=0; ict[i].collectable != COLLECT_MAX; i++)
+    {
+        Load(ict[i].collectable, ict[i].dataFile);
+    }
 }  // loadCollectables
 
-// -----------------------------------------------------------------------------
-void CollectableManager::Load(int collectType, const char* filename) {
-  const lisp::Lisp* root = 0;
-  try {
-    lisp::Parser parser;
-    std::string tmp= "data/" + (std::string)filename;
-    root = parser.parse(loader->getPath(tmp.c_str()));
-    
-    const lisp::Lisp* lisp = root->getLisp("tuxkart-collectable");
-    if(!lisp) {
-      std::string s="No 'tuxkart-collectable node found";
-      throw std::runtime_error(s);
+//-----------------------------------------------------------------------------
+void CollectableManager::Load(int collectType, const char* filename)
+{
+    const lisp::Lisp* ROOT = 0;
+    try
+    {
+        lisp::Parser parser;
+        std::string tmp= "data/" + (std::string)filename;
+        ROOT = parser.parse(loader->getPath(tmp.c_str()));
+
+        const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
+        if(!lisp)
+        {
+            std::string s="No 'tuxkart-collectable node found";
+            throw std::runtime_error(s);
+        }
+        LoadNode(lisp, collectType);
     }
-    LoadNode(lisp, collectType);
-  } catch(std::exception& err) {
-    std::cout << "Error while parsing collectable '" << filename
-              << ": " << err.what() << "\n";
-  }
-  delete root;
+    catch(std::exception& err)
+    {
+        std::cout << "Error while parsing collectable '" << filename
+        << ": " << err.what() << "\n";
+    }
+    delete ROOT;
 
 }   // Load
 
-// -----------------------------------------------------------------------------
-void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType ) {
-  std::string sName, sModel, sIconFile;
-  int dummy;
-  lisp->get("name",   sName                 ); // the name is actually ignored
-  lisp->get("model",  sModel                );
-  lisp->get("icon",   sIconFile             );
-  // If the speed value is an integer (e.g. no "."), an uninitialised
-  // value will be returned. In this case try reading the speed as
-  // an integer value.
-  if(!lisp->get("speed",  allSpeeds[collectType])) {
-    dummy=-1;
-    lisp->get("speed",  dummy);
-    allSpeeds[collectType]=(float)dummy;
-  }
+//-----------------------------------------------------------------------------
+void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
+{
+    std::string sName, sModel, sIconFile;
+    int dummy;
+    lisp->get("name",   sName                 ); // the name is actually ignored
+    lisp->get("model",  sModel                );
+    lisp->get("icon",   sIconFile             );
+    // If the speed value is an integer (e.g. no "."), an uninitialised
+    // value will be returned. In this case try reading the speed as
+    // an integer value.
+    if(!lisp->get("speed",  m_all_speeds[collectType]))
+    {
+        dummy=-1;
+        lisp->get("speed",  dummy);
+        m_all_speeds[collectType]=(float)dummy;
+    }
 
-  // load material
-  allIcons [collectType] = material_manager->getMaterial(sIconFile);
-  allIcons[collectType]->getState()->ref();
+    // load material
+    m_all_icons [collectType] = material_manager->getMaterial(sIconFile);
+    m_all_icons[collectType]->getState()->ref();
 
-  //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
-  //this is just a quick fix.
-  if(collectType == COLLECT_SPARK) allIcons[COLLECT_SPARK]->getState()->disable ( GL_CULL_FACE ) ;
-  
-  if(sModel!="") {
-    ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
-    allModels[collectType] = e;
-    preProcessObj(e, 0);
-    e->ref();
-  } else {
-    allModels[collectType] = 0;
-  }
+    //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
+    //this is just a quick fix.
+    if(collectType == COLLECT_SPARK) m_all_icons[COLLECT_SPARK]->getState()->disable ( GL_CULL_FACE ) ;
+
+    if(sModel!="")
+    {
+        ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
+        m_all_models[collectType] = e;
+        preProcessObj(e, 0);
+        e->ref();
+    }
+    else
+    {
+        m_all_models[collectType] = 0;
+    }
 }   // LoadNode
 

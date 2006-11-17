@@ -28,29 +28,31 @@ class ssgEntity;
 
 // HE_RED ust be the first, HE_SILVER the last entry. See HerringManager
 enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
- 
-// ----------------------------------------------------------------------------- 
-class Herring {
+
+// -----------------------------------------------------------------------------
+class Herring
+{
 private:
-  herringType   type;         // Herring type
-  bool          bEaten;       // true if herring  was eaten & is not displayed
-  float         time_to_return;  // world->clock when an eaten herring reappears
-  sgCoord       coord;        // Original coordinates, used mainly when 
-                              // eaten herrings reappear.
-  ssgTransform* root;         // The actual root of the herring
-  ssgTransform* rotate;       // Just below root is a node only rotating
-  float         rotation;     // Amount of rotation
- 
- public:
-              Herring   (herringType type, sgVec3* xyz, ssgEntity* model);
-             ~Herring   ();
-  void        update    (float delta);
-  bool        wasEaten  ()            {return bEaten;}
-  void        isEaten   ();
-  herringType getType   ()            {return type;}
-  int         hitKart   (Kart* kart );
-  void        reset     ();
-  ssgTransform* getRoot () const {return root;}
-};   // class Herring
+    herringType   m_type;         // Herring type
+    bool          m_eaten;       // true if herring  was eaten & is not displayed
+    float         m_time_to_return;  // world->clock when an eaten herring reappears
+    sgCoord       m_coord;        // Original coordinates, used mainly when
+    // eaten herrings reappear.
+    ssgTransform* m_root;         // The actual root of the herring
+    ssgTransform* m_rotate;       // Just below root is a node only rotating
+    float         m_rotation;     // Amount of rotation
+
+public:
+    Herring   (herringType type, sgVec3* xyz, ssgEntity* model);
+    ~Herring   ();
+    void        update    (float delta);
+    bool        wasEaten  ()            {return m_eaten;}
+    void        isEaten   ();
+    herringType getType   ()            {return m_type;}
+    int         hitKart   (Kart* kart );
+    void        reset     ();
+    ssgTransform* getRoot () const {return m_root;}
+}
+;   // class Herring
 
 #endif

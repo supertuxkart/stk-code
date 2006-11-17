@@ -25,30 +25,33 @@ inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 
 void TrafficDriver::update (float dt)
 {
-  /* Steering algorithm */
+    /* Steering algorithm */
 
-  /* If moving left-to-right and on the left - or right to left
-     and on the right - do nothing. */
+    /* If moving left-to-right and on the left - or right to left
+       and on the right - do nothing. */
 
-  sgVec2 track_velocity ;
-  sgSubVec2 ( track_velocity, curr_track_coords, last_track_coords ) ;
+    sgVec2 track_velocity ;
+    sgSubVec2 ( track_velocity, m_curr_track_coords, m_last_track_coords ) ;
 
-  if ( ( track_velocity [ 0 ] < 0.0f && curr_track_coords [ 0 ] > 0.0f ) ||
-       ( track_velocity [ 0 ] > 0.0f && curr_track_coords [ 0 ] < 0.0f ) )
-    velocity.hpr[0] = sgnsq(curr_track_coords[0])*3.0f ;
-  else
-    velocity.hpr[0] = sgnsq(curr_track_coords[0])*12.0f ;
+    if ( ( track_velocity [ 0 ] < 0.0f && m_curr_track_coords [ 0 ] > 0.0f ) ||
+         ( track_velocity [ 0 ] > 0.0f && m_curr_track_coords [ 0 ] < 0.0f ) )
+        m_velocity.hpr[0] = sgnsq(m_curr_track_coords[0])*3.0f ;
+    else
+        m_velocity.hpr[0] = sgnsq(m_curr_track_coords[0])*12.0f ;
 
-  velocity.xyz[1]  = TRAFFIC_VELOCITY ;
-  velocity.xyz[2] -= GRAVITY * dt ;
+    m_velocity.xyz[1]  = TRAFFIC_VELOCITY ;
+    m_velocity.xyz[2] -= GRAVITY * dt ;
 
-  if ( wheelie_angle != 0.0f )
-    wheelie_angle = 0.0f ;
+    if ( m_wheelie_angle != 0.0f )
+        m_wheelie_angle = 0.0f ;
 
-  Kart::update (dt) ;
+    Kart::update (dt) ;
 }
 
+//-----------------------------------------------------------------------------
 void TrafficDriver::doObjectInteractions () {}
+//-----------------------------------------------------------------------------
 void TrafficDriver::doLapCounting        () {}
+//-----------------------------------------------------------------------------
 void TrafficDriver::doZipperProcessing   () {}
 

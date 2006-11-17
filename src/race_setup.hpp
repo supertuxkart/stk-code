@@ -27,43 +27,45 @@ enum RaceDifficulty { RD_EASY, RD_MEDIUM, RD_HARD };
 
 /** A class that manages all configurations that are needed for a
     single race */
-class RaceSetup {
+class RaceSetup
+{
 protected:
-  std::string herringStyle;
+    std::string m_herring_style;
 public:
-        enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
+    enum RaceMode { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX };
 
-	RaceSetup() { 
-		mode         = RM_QUICK_RACE;
-		difficulty   = RD_EASY;
-		numLaps      = 3; 
-		track        = "race";
-		herringStyle = "";
-        }
+    RaceSetup()
+    {
+        m_mode          = RM_QUICK_RACE;
+        m_difficulty    = RD_EASY;
+        m_num_laps      = 3;
+        m_track         = "race";
+        m_herring_style = "";
+    }
 
-	RaceMode  mode;
-	RaceDifficulty  difficulty;
-	int   numLaps;
+    RaceMode  m_mode;
+    RaceDifficulty  m_difficulty;
+    int   m_num_laps;
 
-        /** Ident of the track to use */
-        std::string track;
+    /** Ident of the track to use */
+    std::string m_track;
 
-        // FIXME: This could probally be a bit more robust/easier to understand
-  
-        typedef std::vector<int> Players;
-        /** Positions of the karts which should be controlled by
-            players */
-        Players players;
+    // FIXME: This could probally be a bit more robust/easier to understand
 
-	typedef std::vector<std::string> Karts;
-        /** kart idents that should be used in the race, the karts
-            will be used in the order in which they are given */
-        Karts karts;
+    typedef std::vector<int> Players;
+    /** Positions of the karts which should be controlled by
+        players */
+    Players m_players;
 
-        unsigned int getNumKarts()  const { return (unsigned int) karts.size(); }
-        int getNumPlayers() const                 { return (int)players.size(); }
-        const std::string& getHerringStyle()          const {return herringStyle;}
-        const void         setHerringStyle(const std::string& s) {herringStyle=s;}
+    typedef std::vector<std::string> Karts;
+    /** kart idents that should be used in the race, the karts
+        will be used in the order in which they are given */
+    Karts m_karts;
+
+    unsigned int getNumKarts()  const { return (unsigned int) m_karts.size(); }
+    int getNumPlayers() const                 { return (int)m_players.size(); }
+    const std::string& getHerringStyle()          const {return m_herring_style;}
+    const void         setHerringStyle(const std::string& s) {m_herring_style=s;}
 };
 
 #endif

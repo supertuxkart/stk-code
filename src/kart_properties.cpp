@@ -29,7 +29,7 @@
 #include "kart_properties.hpp"
 #include "physics_parameters.hpp"
 
-// This constructor would be a bit more useful, nicer, if we could call 
+// This constructor would be a bit more useful, nicer, if we could call
 // init_defaults() and load from here. Unfortunately, this object is used
 // as a base class for PhysicsParameters, which has to overwrite
 // init_defaults() and getAllData(). But during the call of this constructor,
@@ -37,119 +37,121 @@
 // functions do NOT get called, only the virtual functions here would be
 // called. Therefore, a two step initialisation is necessary: the constructor
 // doing not much, but then in load the overwriting functions can be used.
-KartProperties::KartProperties() : icon_material(0), model(0) 
-{
-}   // KartProperties
+KartProperties::KartProperties() : m_icon_material(0), m_model(0)
+{}   // KartProperties
 
-// -----------------------------------------------------------------------------
-void KartProperties::load(const std::string filename, const std::string node) 
+//-----------------------------------------------------------------------------
+void KartProperties::load(const std::string filename, const std::string node)
 {
 
     init_defaults();
-    
-    const lisp::Lisp* root = 0;
-    ident = StringUtils::basename(StringUtils::without_extension(filename));
 
-    try 
+    const lisp::Lisp* root = 0;
+    m_ident = StringUtils::basename(StringUtils::without_extension(filename));
+
+    try
     {
-         lisp::Parser parser;
-         root = parser.parse(loader->getPath(filename));
-    
-         const lisp::Lisp* lisp = root->getLisp(node);
-         if(!lisp) {
-              std::string s="No '";
-              s+=node;
-              s+="' node found";
-              throw std::runtime_error(s);
-         }
-         getAllData(lisp);
-    } catch(std::exception& err) {
-         std::cout << "Error while parsing KartProperties '" << filename
-                   << ": " << err.what() << "\n";
+        lisp::Parser parser;
+        root = parser.parse(loader->getPath(filename));
+
+        const lisp::Lisp* const LISP = root->getLisp(node);
+        if(!LISP)
+        {
+            std::string s="No '";
+            s+=node;
+            s+="' node found";
+            throw std::runtime_error(s);
+        }
+        getAllData(LISP);
+    }
+    catch(std::exception& err)
+    {
+        std::cout << "Error while parsing KartProperties '" << filename
+        << ": " << err.what() << "\n";
     }
     delete root;
-    
+
     // Load material
-    icon_material = material_manager->getMaterial(icon_file);
-    
+    m_icon_material = material_manager->getMaterial(m_icon_file);
+
     // Load model
-    if(model_file.length()>0) 
+    if(m_model_file.length()>0)
     {
-         model = loader->load(model_file, CB_KART, false);
-         ssgStripify(model);
-         preProcessObj(model, 0);
-         model->ref();
+        m_model = loader->load(m_model_file, CB_KART, false);
+        ssgStripify(m_model);
+        preProcessObj(m_model, 0);
+        m_model->ref();
     }  // if
-    
+
 }   // load
 
-// -----------------------------------------------------------------------------
-KartProperties::~KartProperties() 
+//-----------------------------------------------------------------------------
+KartProperties::~KartProperties()
 {
-    ssgDeRefDelete(model);
+    ssgDeRefDelete(m_model);
 }   // ~KartProperties
 
-// -----------------------------------------------------------------------------
-void KartProperties::getAllData(const lisp::Lisp* lisp) 
+//-----------------------------------------------------------------------------
+void KartProperties::getAllData(const lisp::Lisp* lisp)
 {
-    lisp->get("name",                    name);
-    lisp->get("model-file",              model_file);
-    lisp->get("icon-file",               icon_file);
-    lisp->get("shadow-file",             shadow_file);
-    lisp->get("red",                     color[0]);
-    lisp->get("green",                   color[1]);
-    lisp->get("blue",                    color[2]);
+    lisp->get("name",                    m_name);
+    lisp->get("model-file",              m_model_file);
+    lisp->get("icon-file",               m_icon_file);
+    lisp->get("shadow-file",             m_shadow_file);
+    lisp->get("red",                     m_color[0]);
+    lisp->get("green",                   m_color[1]);
+    lisp->get("blue",                    m_color[2]);
 
-    lisp->get("wheel-base",              wheel_base);
-    lisp->get("heightCOG",               heightCOG);
-    lisp->get("engine-power",            engine_power);
-    lisp->get("time-full-steer",         time_full_steer);
-    lisp->get("brake-factor",            brake_factor);
-    lisp->get("roll-resistance",         roll_resistance); 
-    lisp->get("mass",                    mass);
-    lisp->get("air-resistance",          air_resistance);
-    lisp->get("tire-grip",               tire_grip);
-    lisp->get("max-steer-angle",         max_steer_angle);
-    lisp->get("corn-f",                  corn_f);
-    lisp->get("corn-r",                  corn_r);
-    lisp->get("inertia",                 inertia);
-    lisp->get("wheelie-max-speed-ratio", wheelieMaxSpeedRatio);
-    lisp->get("wheelie-max-pitch",       wheelieMaxPitch     );
-    lisp->get("wheelie-pitch-rate",      wheeliePitchRate    );
-    lisp->get("wheelie-restore-rate",    wheelieRestoreRate  );
-    lisp->get("wheelie-speed-boost",     wheelieSpeedBoost   );
+    lisp->get("wheel-base",              m_wheel_base);
+    lisp->get("heightCOG",               m_height_cog);
+    lisp->get("engine-power",            m_engine_power);
+    lisp->get("time-full-steer",         m_time_full_steer);
+    lisp->get("brake-factor",            m_brake_factor);
+    lisp->get("roll-resistance",         m_roll_resistance);
+    lisp->get("mass",                    m_mass);
+    lisp->get("air-resistance",          m_air_resistance);
+    lisp->get("tire-grip",               m_tire_grip);
+    lisp->get("max-steer-angle",         m_max_steer_angle);
+    lisp->get("corn-f",                  m_corn_f);
+    lisp->get("corn-r",                  m_corn_r);
+    lisp->get("inertia",                 m_inertia);
+    lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio);
+    lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch     );
+    lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate    );
+    lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate  );
+    lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost   );
 }   // getAllData
-// -----------------------------------------------------------------------------
-void KartProperties::init_defaults() 
+
+//-----------------------------------------------------------------------------
+void KartProperties::init_defaults()
 {
 
-    name          = "Tux";
-    ident         = "tux";
-    model_file    = "tuxkart.ac";
-    icon_file     = "tuxicon.png";
-    shadow_file   = "tuxkartshadow.png";
+    m_name          = "Tux";
+    m_ident         = "tux";
+    m_model_file    = "tuxkart.ac";
+    m_icon_file     = "tuxicon.png";
+    m_shadow_file   = "tuxkartshadow.png";
 
-    color[0] = 1.0f; color[1] = 0.0f; color[2] = 0.0f;
+    m_color[0] = 1.0f; m_color[1] = 0.0f; m_color[2] = 0.0f;
 
-    wheel_base           = physicsParameters->wheel_base;
-    heightCOG            = physicsParameters->heightCOG;
-    engine_power         = physicsParameters->engine_power;
-    time_full_steer      = physicsParameters->time_full_steer;
-    brake_factor         = physicsParameters->brake_factor;
-    roll_resistance      = physicsParameters->roll_resistance;
-    mass                 = physicsParameters->mass;
-    air_resistance       = physicsParameters->air_resistance;
-    tire_grip            = physicsParameters->tire_grip;
-    max_steer_angle      = physicsParameters->max_steer_angle;
-    corn_f               = physicsParameters->corn_f;
-    corn_r               = physicsParameters->corn_r;
-    inertia              = physicsParameters->inertia;
-    wheelieMaxSpeedRatio = physicsParameters->wheelieMaxSpeedRatio;
-    wheelieMaxPitch      = physicsParameters->wheelieMaxPitch;
-    wheeliePitchRate     = physicsParameters->wheeliePitchRate;
-    wheelieRestoreRate   = physicsParameters->wheelieRestoreRate;
-    wheelieSpeedBoost    = physicsParameters->wheelieSpeedBoost;
+    m_wheel_base           = physicsParameters->m_wheel_base;
+    m_height_cog           = physicsParameters->m_height_cog;
+    m_engine_power         = physicsParameters->m_engine_power;
+    m_time_full_steer      = physicsParameters->m_time_full_steer;
+    m_brake_factor         = physicsParameters->m_brake_factor;
+    m_roll_resistance      = physicsParameters->m_roll_resistance;
+    m_mass                 = physicsParameters->m_mass;
+    m_air_resistance       = physicsParameters->m_air_resistance;
+    m_tire_grip            = physicsParameters->m_tire_grip;
+    m_max_steer_angle      = physicsParameters->m_max_steer_angle;
+    m_corn_f               = physicsParameters->m_corn_f;
+    m_corn_r               = physicsParameters->m_corn_r;
+    m_inertia              = physicsParameters->m_inertia;
+    m_wheelie_max_speed_ratio = physicsParameters->m_wheelie_max_speed_ratio;
+    m_wheelie_max_pitch       = physicsParameters->m_wheelie_max_pitch;
+    m_wheelie_pitch_rate      = physicsParameters->m_wheelie_pitch_rate;
+    m_wheelie_restore_rate    = physicsParameters->m_wheelie_restore_rate;
+    m_wheelie_speed_boost     = physicsParameters->m_wheelie_speed_boost;
 }   // init_defaults
 
-// -----------------------------------------------------------------------------
 /* EOF */

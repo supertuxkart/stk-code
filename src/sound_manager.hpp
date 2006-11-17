@@ -26,33 +26,34 @@
 #include "sfx.hpp"
 
 enum enumSFX {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
-		    SOUND_SHOT, SOUND_OW,     SOUND_WEE,   SOUND_EXPLOSION,
-		    SOUND_BZZT, SOUND_BEEP,
-            SOUND_BACK_MENU, SOUND_USE_ANVIL, SOUND_USE_PARACHUTE,
-		    /*SOUND_SELECT_MENU,*/ SOUND_MOVE_MENU, SOUND_FULL,
-		    SOUND_PRESTART, SOUND_START, SOUND_MISSILE_LOCK,
-		    SOUND_TRAFFIC_JAM, NUM_SOUNDS};
+              SOUND_SHOT, SOUND_OW,     SOUND_WEE,   SOUND_EXPLOSION,
+              SOUND_BZZT, SOUND_BEEP,
+              SOUND_BACK_MENU, SOUND_USE_ANVIL, SOUND_USE_PARACHUTE,
+              /*SOUND_SELECT_MENU,*/ SOUND_MOVE_MENU, SOUND_FULL,
+              SOUND_PRESTART, SOUND_START, SOUND_MISSILE_LOCK,
+              SOUND_TRAFFIC_JAM, NUM_SOUNDS};
 
-class SoundManager {
+class SoundManager
+{
 public:
-  SoundManager();
-  virtual ~SoundManager();
+    SoundManager();
+    virtual ~SoundManager();
 
-  void update();
+    void update();
 
-  void playSfx(unsigned int id);
+    void playSfx(unsigned int id);
 
-  void playMusic(const char* filename);
-  void stopMusic();
-  void pauseMusic();
-  void resumeMusic();
+    void playMusic(const char* filename);
+    void stopMusic();
+    void pauseMusic();
+    void resumeMusic();
 
 private:
-  void init();
+    void init();
 
-  typedef std::map<int, SFX*> SFXsType;
-  SFXsType m_SFXs;
-  Music* m_currentMusic;
+    typedef std::map<int, SFX*> SFXsType;
+    SFXsType m_SFXs;
+    Music* m_currentMusic;
 };
 
 extern SoundManager* sound_manager;

@@ -69,7 +69,7 @@ CharSel::CharSel(int whichPlayer)
                                  ICON_SIZE, ICON_SIZE);
         widgetSet->activate_widget(C, i, 0);
 
-        if (config->player[whichPlayer].getLastKartId() == i)
+        if (config->m_player[whichPlayer].getLastKartId() == i)
             widgetSet->set_active(C);
         //          else if (NULL == kart_properties_manager->getKartById(i + 1)) // last in the list
         //     widgetSet->set_active(C);
@@ -146,7 +146,7 @@ void CharSel::update(float dt)
         m_kart->setTransform (&trans) ;
         //glShadeModel(GL_SMOOTH);
         ssgCullAndDraw ( m_kart ) ;
-        glViewport ( 0, 0, config->width, config->height ) ;
+        glViewport ( 0, 0, config->m_width, config->m_height ) ;
 
         glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
@@ -161,7 +161,7 @@ void CharSel::select()
     if (KP != NULL)
     {
         race_manager->setPlayerKart(m_player_index, KP->getIdent());
-        config->player[m_player_index].setLastKartId(TOKEN);
+        config->m_player[m_player_index].setLastKartId(TOKEN);
     }
 
     if (race_manager->getNumPlayers() > 1)

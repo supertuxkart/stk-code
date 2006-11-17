@@ -26,7 +26,7 @@
 class ssgTransform;
 
 ssgTransform* createShadow(const std::string& name,
-    float x1, float x2, float y1, float y2 );
+                           float x1, float x2, float y1, float y2 );
 
 #endif
 

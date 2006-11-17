@@ -27,55 +27,58 @@ enum AxisDirection { AD_NEGATIVE, AD_POSITIVE };
 enum InputType { IT_KEYBOARD, IT_STICKMOTION, IT_STICKBUTTON, IT_STICKHAT, IT_MOUSEMOTION, IT_MOUSEBUTTON };
 #define IT_LAST IT_MOUSEBUTTON
 
-typedef struct {
-  InputType type;
-  int id0;
-  int id1;
-  int id2;
-} Input;
+typedef struct
+{
+    InputType type;
+    int id0;
+    int id1;
+    int id2;
+}
+Input;
 
 // Some part (e.g. gui/PlayerControls) depend on KC_LEFT being the first
 // entry, and KC_FIRE being the last - so any action added should be
 // added in between those two values.
 enum KartActions { KC_LEFT,
-		   KC_RIGHT,
-		   KC_ACCEL,
-		   KC_BRAKE,
-		   KC_WHEELIE,
-		   KC_JUMP,
-		   KC_RESCUE,
-		   KC_FIRE };
+                   KC_RIGHT,
+                   KC_ACCEL,
+                   KC_BRAKE,
+                   KC_WHEELIE,
+                   KC_JUMP,
+                   KC_RESCUE,
+                   KC_FIRE };
 
 extern char *sKartAction2String[KC_FIRE+1];
 /*class for managing player name and control configuration*/
 class Player
 {
 private:
-    std::string name;
-    Input actionMap[KC_FIRE+1];
-    unsigned int lastKartId;
+    std::string m_name;
+    Input m_action_map[KC_FIRE+1];
+    unsigned int m_last_kart_id;
 
 public:
     Player(){}
-    Player(const std::string &name_):name(name_){}
-    void setName(const std::string &name_){name = name_;}
+    Player(const std::string &name_):m_name(name_){}
+    void setName(const std::string &name_){m_name = name_;}
 
     void setKey(KartActions action, int key) {}
     void setButton(KartActions action, int button){ }
 
-    const char* getName() {return name.c_str();}
+    const char* getName() {return m_name.c_str();}
 
-    Input *getInput(KartActions action) { return &actionMap[action]; }
-    void setInput(KartActions action, InputType type, int id0, int id1, int id2){
-                                       Input *i = &actionMap[action];
-                                       i->type = type;
-                                       i->id0 = id0;
-                                       i->id1 = id1;
-                                       i->id2 = id2;
-	 }
+    Input *getInput(KartActions action) { return &m_action_map[action]; }
+    void setInput(KartActions action, InputType type, int id0, int id1, int id2)
+    {
+        Input *i = &m_action_map[action];
+        i->type = type;
+        i->id0 = id0;
+        i->id1 = id1;
+        i->id2 = id2;
+    }
 
-    unsigned int getLastKartId(){ return lastKartId; }
-    void setLastKartId(int newLastKartId){ lastKartId = newLastKartId; } 
+    unsigned int getLastKartId(){ return m_last_kart_id; }
+    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
 };
 
 #endif

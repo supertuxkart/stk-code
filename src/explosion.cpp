@@ -25,40 +25,42 @@
 #include "sound_manager.hpp"
 
 
-// -----------------------------------------------------------------------------
-Explosion::Explosion(Projectile* p) : ssgTransform() {
-  ssgCutout *cut = new ssgCutout();
-  addKid(cut);
-  // Make sure that the transform object does not get deleted when it is
-  // removed from the scene graphs. This can happen when the explosion is
-  // moved to the deletedExplosion list in the projecile_manager.
-  ref();
-  seq   = projectile_manager->getExplosionModel();
-  cut->addKid(seq);
-  init(p);
+Explosion::Explosion(Projectile* p) : ssgTransform()
+{
+    ssgCutout *cut = new ssgCutout();
+    addKid(cut);
+    // Make sure that the transform object does not get deleted when it is
+    // removed from the scene graphs. This can happen when the explosion is
+    // moved to the deletedExplosion list in the projecile_manager.
+    ref();
+    m_seq   = projectile_manager->getExplosionModel();
+    cut->addKid(m_seq);
+    init(p);
 }   // Explosion
 
-// -----------------------------------------------------------------------------
-void Explosion::init(Projectile* p) {
-  sound_manager->playSfx( SOUND_EXPLOSION );
+//-----------------------------------------------------------------------------
+void Explosion::init(Projectile* p)
+{
+    sound_manager->playSfx( SOUND_EXPLOSION );
 
-  setTransform(p->getCoord());
-  step = -1;
-  world->addToScene(this);
+    setTransform(p->getCoord());
+    m_step = -1;
+    world->addToScene(this);
 }
 
-// -----------------------------------------------------------------------------
-void Explosion::update (float dt) {
+//-----------------------------------------------------------------------------
+void Explosion::update (float dt)
+{
 
-  if ( ++step >= seq->getNumKids() ) {
-    projectile_manager->FinishedExplosion();
-    world->removeFromScene((ssgTransform*)this);
-    return ;
-  }
+    if ( ++m_step >= m_seq->getNumKids() )
+    {
+        projectile_manager->FinishedExplosion();
+        world->removeFromScene((ssgTransform*)this);
+        return ;
+    }
 
-  seq -> selectStep ( step ) ;
+    m_seq -> selectStep ( m_step ) ;
 
 }
-// -----------------------------------------------------------------------------
 
 

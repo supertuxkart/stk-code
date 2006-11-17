@@ -22,65 +22,73 @@
 #include "loader.hpp"
 #include "string_utils.hpp"
 
-namespace StringUtils {
-
-bool has_suffix(const std::string& lhs, const std::string rhs)
+namespace StringUtils
 {
-  if (lhs.length() < rhs.length())
-    return false;
-  else
-    // While this is basically correct, it fails with older 
-    // g++ versions (at least 2.95.3), which have a wrong template. To 
-    // avoid this issue, a more C-traditional way is used.
-    return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), rhs.c_str())==0;
-}
-
-std::string basename(const std::string& filename)
-{
-  for(int i = int(filename.size()) - 1; i >= 0; --i)
+    bool has_suffix(const std::string& lhs, const std::string rhs)
     {
-      if (filename[i]=='/' || filename[i]=='\\') {
-	return filename.substr(i+1);
-      }
+        if (lhs.length() < rhs.length())
+            return false;
+        else
+            // While this is basically correct, it fails with older
+            // g++ versions (at least 2.95.3), which have a wrong template. To
+            // avoid this issue, a more C-traditional way is used.
+            return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), rhs.c_str())==0;
     }
-  return filename;
-}
 
-std::string without_extension(const std::string& filename)
-{
-  for(int i = int(filename.size()) - 1; i >= 0; --i)
+//-----------------------------------------------------------------------------
+    std::string basename(const std::string& filename)
     {
-      if (filename[i] == '.') {
-	return filename.substr(0, i);
-      }
+        for(int i = int(filename.size()) - 1; i >= 0; --i)
+        {
+            if (filename[i]=='/' || filename[i]=='\\')
+            {
+                return filename.substr(i+1);
+            }
+        }
+        return filename;
     }
-  return filename;  
-}
 
-std::string extension(const std::string& filename)
-{
-  for(int i = int(filename.size()) - 1; i >= 0; --i)
+//-----------------------------------------------------------------------------
+    std::string without_extension(const std::string& filename)
     {
-      if (filename[i] == '.') {
-	return filename.substr(i+1);
-      }
+        for(int i = int(filename.size()) - 1; i >= 0; --i)
+        {
+            if (filename[i] == '.')
+            {
+                return filename.substr(0, i);
+            }
+        }
+        return filename;
     }
-  return filename;  
-}
 
-std::string upcase (const std::string& str)
-{
-  std::string name = str;
-  std::transform(name.begin(), name.end(), name.begin(), ::toupper);
-  return name;
-}
+//-----------------------------------------------------------------------------
+    std::string extension(const std::string& filename)
+    {
+        for(int i = int(filename.size()) - 1; i >= 0; --i)
+        {
+            if (filename[i] == '.')
+            {
+                return filename.substr(i+1);
+            }
+        }
+        return filename;
+    }
 
-std::string downcase (const std::string& str)
-{
-  std::string name = str;
-  std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-  return name;
-}
+//-----------------------------------------------------------------------------
+    std::string upcase (const std::string& str)
+    {
+        std::string name = str;
+        std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+        return name;
+    }
+
+//-----------------------------------------------------------------------------
+    std::string downcase (const std::string& str)
+    {
+        std::string name = str;
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        return name;
+    }
 
 } // namespace StringUtils
 

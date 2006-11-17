@@ -27,50 +27,66 @@
 
 slScheduler* plib_scheduler= NULL;
 
-SFXImpl::SFXImpl(const char* filename) {
-  std::string path = loader->getPath(filename);
-  m_sample= new slSample(path.c_str(), plib_scheduler);
+SFXImpl::SFXImpl(const char* filename)
+{
+    std::string path = loader->getPath(filename);
+    m_sample= new slSample(path.c_str(), plib_scheduler);
 }
 
-SFXImpl::~SFXImpl() {
-  delete m_sample;
+//-----------------------------------------------------------------------------
+SFXImpl::~SFXImpl()
+{
+    delete m_sample;
 }
 
-void SFXImpl::play() {
-  plib_scheduler->playSample(m_sample, 1, SL_SAMPLE_MUTE, 2, NULL);
+//-----------------------------------------------------------------------------
+void SFXImpl::play()
+{
+    plib_scheduler->playSample(m_sample, 1, SL_SAMPLE_MUTE, 2, NULL);
 }
 
-
-void MusicPlib::update() {
-  // Comment this next line out if the sound causes big glitches
-  // on your IRIX machine!
-  plib_scheduler->update();
+//=============================================================================
+void MusicPlib::update()
+{
+    // Comment this next line out if the sound causes big glitches
+    // on your IRIX machine!
+    plib_scheduler->update();
 }
 
-bool MusicPlib::load(const char* filename) {
-  m_filename= loader->getPath(filename);
-  return true;
+//-----------------------------------------------------------------------------
+bool MusicPlib::load(const char* filename)
+{
+    m_filename= loader->getPath(filename);
+    return true;
 }
 
-bool MusicPlib::playMusic() {
-  plib_scheduler->stopMusic();
-  plib_scheduler->loopMusic(m_filename.c_str());
-  return true;
+//-----------------------------------------------------------------------------
+bool MusicPlib::playMusic()
+{
+    plib_scheduler->stopMusic();
+    plib_scheduler->loopMusic(m_filename.c_str());
+    return true;
 }
 
-bool MusicPlib::stopMusic() {
-  plib_scheduler->stopMusic();
-  return true;
+//-----------------------------------------------------------------------------
+bool MusicPlib::stopMusic()
+{
+    plib_scheduler->stopMusic();
+    return true;
 }
 
-bool MusicPlib::pauseMusic() {
-  plib_scheduler->stopMusic();
-  return true;
+//-----------------------------------------------------------------------------
+bool MusicPlib::pauseMusic()
+{
+    plib_scheduler->stopMusic();
+    return true;
 }
 
-bool MusicPlib::resumeMusic() {
-  plib_scheduler->loopMusic(m_filename.c_str());
-  return true;
+//-----------------------------------------------------------------------------
+bool MusicPlib::resumeMusic()
+{
+    plib_scheduler->loopMusic(m_filename.c_str());
+    return true;
 }
 
 #endif // !(HAVE_OPENAL && HAVE_MIKMOD)

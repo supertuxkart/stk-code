@@ -45,7 +45,7 @@ RaceMenu::RaceMenu()
     widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS, 0);
     widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
 
-    if(world->raceSetup.mode==RaceSetup::RM_QUICK_RACE)
+    if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
         widgetSet->state(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE, 0);
     }

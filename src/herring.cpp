@@ -21,79 +21,83 @@
 #include "herring.hpp"
 #include "kart.hpp"
 
-// =============================================================================
-Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model) 
+Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model)
 {
-  sgSetVec3(coord.hpr, 0.0f, 0.0f, 0.0f);
+    sgSetVec3(m_coord.hpr, 0.0f, 0.0f, 0.0f);
 
-  sgCopyVec3(coord.xyz, *xyz);
-  root   = new ssgTransform();
-  root->ref();
-  root->setTransform(&coord);
+    sgCopyVec3(m_coord.xyz, *xyz);
+    m_root   = new ssgTransform();
+    m_root->ref();
+    m_root->setTransform(&m_coord);
 
-  rotate = new ssgTransform();
-  rotate->ref();
-  rotate->addKid(model);
-  root->addKid(rotate);
-  world->addToScene(root);
+    m_rotate = new ssgTransform();
+    m_rotate->ref();
+    m_rotate->addKid(model);
+    m_root->addKid(m_rotate);
+    world->addToScene(m_root);
 
-  type           = _type;
-  bEaten         = FALSE;
-  rotation       = 0.0f;
-  time_to_return = 0.0f;  // not strictly necessary, see isEaten()
+    m_type           = _type;
+    m_eaten         = false;
+    m_rotation       = 0.0f;
+    m_time_to_return = 0.0f;  // not strictly necessary, see isEaten()
 }   // Herring
 
-// -----------------------------------------------------------------------------
-Herring::~Herring() 
+//-----------------------------------------------------------------------------
+Herring::~Herring()
 {
-  ssgDeRefDelete(root);
-  ssgDeRefDelete(rotate);
+    ssgDeRefDelete(m_root);
+    ssgDeRefDelete(m_rotate);
 }   // ~Herring
 
-// -----------------------------------------------------------------------------
-void Herring::reset() 
+//-----------------------------------------------------------------------------
+void Herring::reset()
 {
-  bEaten         = false;
-  time_to_return = 0.0f;
-  root->setTransform(&coord);
+    m_eaten         = false;
+    m_time_to_return = 0.0f;
+    m_root->setTransform(&m_coord);
 }   // reset
-// -----------------------------------------------------------------------------
-int Herring::hitKart(Kart* kart) 
+
+//-----------------------------------------------------------------------------
+int Herring::hitKart(Kart* kart)
 {
-  return sgDistanceSquaredVec3 ( kart->getCoord()->xyz, coord.xyz ) < 0.8f;
+    return sgDistanceSquaredVec3 ( kart->getCoord()->xyz, m_coord.xyz ) < 0.8f;
 }   // hitKart
 
-// -----------------------------------------------------------------------------
-void Herring::update(float delta) 
+//-----------------------------------------------------------------------------
+void Herring::update(float delta)
 {
-  if(bEaten) {
-    float t = time_to_return - world->clock;
-    if ( t > 0 ) 
+    if(m_eaten)
     {
-      sgVec3 hell;
-      sgCopyVec3(hell, coord.xyz);
+        const float T = m_time_to_return - world->m_clock;
+        if ( T > 0 )
+        {
+            sgVec3 hell;
+            sgCopyVec3(hell, m_coord.xyz);
 
-      hell[2] = ( t > 1.0f ) ? -1000000.0f : coord.xyz[2] - t / 2.0f;
-      root -> setTransform(hell);
-    } else {
-      bEaten   = FALSE;
-      rotation = 0.0f;
-      root -> setTransform(&coord);
-    }   // t>0
-    
-  } else 
-  {   // not bEaten
-    sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
-    c.hpr[0] = rotation;
-    rotation += 180.0f*delta;
-    rotate -> setTransform ( &c ) ;
-  }
+            hell[2] = ( T > 1.0f ) ? -1000000.0f : m_coord.xyz[2] - T / 2.0f;
+            m_root -> setTransform(hell);
+        }
+        else
+        {
+            m_eaten   = false;
+            m_rotation = 0.0f;
+            m_root -> setTransform(&m_coord);
+        }   // T>0
+
+    }
+    else
+    {   // not m_eaten
+        sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
+        c.hpr[0] = m_rotation;
+        m_rotation += 180.0f*delta;
+        m_rotate -> setTransform ( &c ) ;
+    }
 }   // update
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void Herring::isEaten()
 {
-    bEaten=TRUE;
-    time_to_return=world->clock+2.0f;
+    m_eaten=true;
+    m_time_to_return=world->m_clock+2.0f;
 }
 

@@ -24,44 +24,51 @@
 
 ScreenManager* screen_manager = 0;
 
-ScreenManager::ScreenManager() : do_abort(false) {
-  current_screen = 0;
-  next_screen    = 0;
+ScreenManager::ScreenManager() : m_do_abort(false)
+{
+    m_current_screen = 0;
+    m_next_screen    = 0;
 }  // ScreenManager
 
-// -----------------------------------------------------------------------------
-ScreenManager::~ScreenManager() {
-  delete next_screen;
-  delete current_screen;
+//-----------------------------------------------------------------------------
+ScreenManager::~ScreenManager()
+{
+    delete m_next_screen;
+    delete m_current_screen;
 }   // ~ScreenManager
 
-// -----------------------------------------------------------------------------
-void ScreenManager::setScreen(Screen* screen) {
-  assert(next_screen == 0);
-  next_screen = screen;
+//-----------------------------------------------------------------------------
+void ScreenManager::setScreen(Screen* screen)
+{
+    assert(m_next_screen == 0);
+    m_next_screen = screen;
 }   // setScreen
 
-// -----------------------------------------------------------------------------
-void ScreenManager::run() {
-  while(!do_abort) {
-    // Run input processing and all that.
-    drv_loop();
+//-----------------------------------------------------------------------------
+void ScreenManager::run()
+{
+    while(!m_do_abort)
+    {
+        // Run input processing and all that.
+        drv_loop();
 
-    // Now the screen may have changed and
-    // needs to be updated.
-    if (next_screen) {
-      delete current_screen;
-      current_screen = next_screen;
-      next_screen    = 0;
-    }   // if next_screen
+        // Now the screen may have changed and
+        // needs to be updated.
+        if (m_next_screen)
+        {
+            delete m_current_screen;
+            m_current_screen = m_next_screen;
+            m_next_screen    = 0;
+        }   // if next_screen
 
-    if (current_screen) current_screen->update();
-  }  // while !do_abort
+        if (m_current_screen) m_current_screen->update();
+    }  // while !m_do_abort
 }   // run
 
-// -----------------------------------------------------------------------------
-void ScreenManager::abort() {
-  do_abort = true;
+//-----------------------------------------------------------------------------
+void ScreenManager::abort()
+{
+    m_do_abort = true;
 }
 
 /* EOF */

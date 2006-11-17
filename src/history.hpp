@@ -25,26 +25,27 @@
 
 class Kart;
 
-class History {
- protected:
-  // maximum number of history events to store
-  int   nSize;
-  int   current;
-  bool  wrapped;
-  FILE* fd;
+class History
+{
+protected:
+    // maximum number of history events to store
+    int   m_size;
+    int   m_current;
+    bool  m_wrapped;
+    FILE* m_fd;
 
-  float *     allDeltas;
- public:
-        History        ()             { SetSize(MAX_HISTORY);}
-  int   GetCount       ()             { return wrapped ? nSize : current+1; }
-  int   GetCurrentIndex()             { return current;}
-  int   GetSize        ()             { return nSize;  }
-  void  SetSize        (int n);
-  void  StoreDelta     (float delta);
-  void  Save           ();
-  void  Load           ();
-  void  LoadKartData   (Kart* k, int kartNumber);
-  float GetNextDelta   ();
+    float *     m_all_deltas;
+public:
+    History        ()             { SetSize(MAX_HISTORY);}
+    int   GetCount       ()             { return m_wrapped ? m_size : m_current+1; }
+    int   GetCurrentIndex()             { return m_current;}
+    int   GetSize        ()             { return m_size;  }
+    void  SetSize        (int n);
+    void  StoreDelta     (float delta);
+    void  Save           ();
+    void  Load           ();
+    void  LoadKartData   (Kart* k, int kartNumber);
+    float GetNextDelta   ();
 };
 
 extern History* history;

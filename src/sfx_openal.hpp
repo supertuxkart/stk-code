@@ -26,18 +26,19 @@
 #include "sfx.hpp"
 
 
-class SFXImpl : public SFX {
+class SFXImpl : public SFX
+{
 public:
-  SFXImpl(const char* filename);
-  virtual ~SFXImpl();
+    SFXImpl(const char* filename);
+    virtual ~SFXImpl();
 
-  virtual void play();
+    virtual void play();
 
 private:
-  bool load(const char* filename);
+    bool load(const char* filename);
 
-  ALuint m_soundBuffer;   // Buffers hold sound data.
-  ALuint m_soundSource;   // Sources are points emitting sound.
+    ALuint m_soundBuffer;   // Buffers hold sound data.
+    ALuint m_soundSource;   // Sources are points emitting sound.
 };
 
 #endif // HEADER_SFX_OPENAL_H

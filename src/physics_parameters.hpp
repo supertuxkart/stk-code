@@ -23,21 +23,23 @@
 #include "kart_properties.hpp"
 #include "lisp/lisp.hpp"
 
-class PhysicsParameters : public KartProperties {
- public:
-  float anvilWeight;           // Additional kart weight if anvil is attached
-  float anvilSpeedFactor;      // To decrease speed once when attached
-  float parachuteFriction;     // Increased air friction when parachute
-  float magnetRangeSQ;         // Squared range for magnets
-  float magnetMinRangeSQ;      // Squared minimum range for magnets
-  float jumpImpulse;           // percentage of gravity when jumping
-  float airResReduce[3];       // air resistance reduction for the three levels
+class PhysicsParameters : public KartProperties
+{
+public:
+    float m_anvil_weight;           // Additional kart weight if anvil is attached
+    float m_anvil_speed_factor;      // To decrease speed once when attached
+    float m_parachute_friction;     // Increased air friction when parachute
+    float m_magnet_range_sq;         // Squared range for magnets
+    float m_magnet_min_range_sq;      // Squared minimum range for magnets
+    float m_jump_impulse;           // percentage of gravity when jumping
+    float m_air_res_reduce[3];       // air resistance reduction for the three levels
 
-       PhysicsParameters() : KartProperties() {};
-  void init_defaults    ();
-  void getAllData       (const lisp::Lisp* lisp);
-  void load             (const std::string filename);
-};   // PhysicsParameters
+    PhysicsParameters() : KartProperties() {};
+    void init_defaults    ();
+    void getAllData       (const lisp::Lisp* lisp);
+    void load             (const std::string filename);
+}
+;   // PhysicsParameters
 
 extern PhysicsParameters* physicsParameters;
 #endif

@@ -26,136 +26,136 @@
 
 KartPropertiesManager *kart_properties_manager=0;
 
-KartPropertiesManager::KartPropertiesManager() 
-{
-}
+KartPropertiesManager::KartPropertiesManager()
+{}
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 KartPropertiesManager::~KartPropertiesManager()
 {
-    for(KartPropertiesVector::iterator i  = m_karts_properties.begin(); 
-                                        i != m_karts_properties.end(); ++i)
-          delete *i;
+    for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
+        i != m_karts_properties.end(); ++i)
+        delete *i;
 }   // ~KartPropertiesManager
 
-// -----------------------------------------------------------------------------
-void KartPropertiesManager::removeTextures() 
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::removeTextures()
 {
-    for(KartPropertiesVector::iterator i  = m_karts_properties.begin(); 
-                                       i != m_karts_properties.end(); ++i) 
+    for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
+        i != m_karts_properties.end(); ++i)
     {
-         delete *i;
+        delete *i;
     }
     m_karts_properties.clear();
     callback_manager->clear(CB_KART);
 }   // removeTextures
 
-// -----------------------------------------------------------------------------
-void KartPropertiesManager::loadKartData() 
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::loadKartData()
 {
-    maxSteerAngle = -1.0f;
+    m_max_steer_angle = -1.0f;
     std::set<std::string> result;
     loader->listFiles(result, "data");
-    
+
     // Findout which characters are available and load them
-    for(std::set<std::string>::iterator i = result.begin(); 
-                                       i != result.end(); ++i) 
-    {
-         if (StringUtils::has_suffix(*i, ".tkkf")) 
-         {
-              KartProperties* kp = new KartProperties();
-              std::string tmp= std::string("data")+DIR_SEPARATOR + *i;
-              kp->load(tmp.c_str());
-              m_karts_properties.push_back(kp);
-              if(kp->getMaxSteerAngle() > maxSteerAngle) {
-                   maxSteerAngle = kp->getMaxSteerAngle();
-              }
-         }   // if
-    }   // for i
+    for(std::set<std::string>::iterator i = result.begin();
+            i != result.end(); ++i)
+        {
+            if (StringUtils::has_suffix(*i, ".tkkf"))
+            {
+                KartProperties* kp = new KartProperties();
+                std::string tmp= std::string("data")+DIR_SEPARATOR + *i;
+                kp->load(tmp.c_str());
+                m_karts_properties.push_back(kp);
+                if(kp->getMaxSteerAngle() > m_max_steer_angle)
+                {
+                    m_max_steer_angle = kp->getMaxSteerAngle();
+                }
+            }   // if
+        }   // for i
 }   // loadKartData
 
-// -----------------------------------------------------------------------------
-const int KartPropertiesManager::getKartId(const std::string ident) 
+//-----------------------------------------------------------------------------
+const int KartPropertiesManager::getKartId(const std::string IDENT)
 {
     int j = 0;
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
-                                             i != m_karts_properties.end(); ++i)
+        i != m_karts_properties.end(); ++i)
     {
-         if ((*i)->getIdent() == ident)
-              return j;
-         ++j;
+        if ((*i)->getIdent() == IDENT)
+            return j;
+        ++j;
     }
 
-    throw std::runtime_error("KartPropertiesManager: Couldn't find kart: '" + ident + "'");
+    throw std::runtime_error("KartPropertiesManager: Couldn't find kart: '" + IDENT + "'");
 }   // getKartId
 
-// -----------------------------------------------------------------------------
-const KartProperties* KartPropertiesManager::getKart(const std::string ident) 
+//-----------------------------------------------------------------------------
+const KartProperties* KartPropertiesManager::getKart(const std::string IDENT)
 {
-    for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin(); 
-                                             i != m_karts_properties.end(); ++i)
+    for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
+        i != m_karts_properties.end(); ++i)
     {
-         if ((*i)->getIdent() == ident)
-              return *i;
+        if ((*i)->getIdent() == IDENT)
+            return *i;
     }
-    
+
     return NULL;
 }   // getKart
 
-// -----------------------------------------------------------------------------
-const KartProperties* KartPropertiesManager::getKartById(int i) 
+//-----------------------------------------------------------------------------
+const KartProperties* KartPropertiesManager::getKartById(int i)
 {
     if (i < 0 || i >= int(m_karts_properties.size()))
-         return NULL;
-    
+        return NULL;
+
     return m_karts_properties[i];
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 std::vector<std::string> KartPropertiesManager::getRandomKarts(int len)
 {
     std::vector<std::string> all_karts;
 
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
-                                             i != m_karts_properties.end(); ++i)
+        i != m_karts_properties.end(); ++i)
     {
-         all_karts.push_back((*i)->getIdent());
+        all_karts.push_back((*i)->getIdent());
     }
 
     std::random_shuffle(all_karts.begin(), all_karts.end());
-    
+
     all_karts.resize(len);
 
     return all_karts;
 }   // getRandomKart
 
-// -----------------------------------------------------------------------------
-void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec) 
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
 {
     std::vector<std::string> all_karts;
 
     for(KartPropertiesVector::const_iterator i = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
-         all_karts.push_back((*i)->getIdent());
-    
+        all_karts.push_back((*i)->getIdent());
+
     std::random_shuffle(all_karts.begin(), all_karts.end());
-    
+
     int new_kart = 0;
     for(int i = 0; i < int(vec.size()); ++i)
     {
-         while(vec[i].empty())
-         {
-              if (std::find(vec.begin(), vec.end(), all_karts[new_kart]) == vec.end())
-              { // Found a new kart, so use it
-                   vec[i] = all_karts[new_kart];
-              }
-              else if (!(all_karts.size() >= vec.size()))
-              { // We need to fill more karts than we have available, so don't care about dups
-                   vec[i] = all_karts[new_kart];
-              }
-              
-              new_kart += 1;
-         }   // while
+        while(vec[i].empty())
+        {
+            if (std::find(vec.begin(), vec.end(), all_karts[new_kart]) == vec.end())
+            { // Found a new kart, so use it
+                vec[i] = all_karts[new_kart];
+            }
+            else if (!(all_karts.size() >= vec.size()))
+            { // We need to fill more karts than we have available, so don't care about dups
+                vec[i] = all_karts[new_kart];
+            }
+
+            new_kart += 1;
+        }   // while
     }   // for i
 }
 

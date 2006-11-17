@@ -23,9 +23,9 @@
 class Screen
 {
 public:
-  virtual ~Screen()
-  {}
-  virtual void update() = 0;
+    virtual ~Screen()
+    {}
+    virtual void update() = 0;
 };
 
 #endif

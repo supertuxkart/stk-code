@@ -27,29 +27,30 @@ class Material;
 class ssgEntity;
 
 //The anvil and parachute must be at the end of the enum.
-enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE, 
-		      COLLECT_SPARK, COLLECT_HOMING_MISSILE,
-		      COLLECT_ZIPPER,
-		      COLLECT_ANVIL, COLLECT_PARACHUTE,
+enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE,
+                      COLLECT_SPARK, COLLECT_HOMING_MISSILE,
+                      COLLECT_ZIPPER,
+                      COLLECT_ANVIL, COLLECT_PARACHUTE,
 #ifdef USE_MAGNETS
-                      COLLECT_MAGNET, 
+                      COLLECT_MAGNET,
 #endif
-		      COLLECT_MAX};
+                      COLLECT_MAX};
 
-class CollectableManager {
- protected:
-  Material*    allIcons [COLLECT_MAX];
-  float        allSpeeds[COLLECT_MAX];
-  ssgEntity*   allModels[COLLECT_MAX];
-  void         LoadNode       (const lisp::Lisp* lisp, int collectType);
- public:
-  CollectableManager           ();
-  void         loadCollectables();
-  void         removeTextures  ();
-  void         Load            (int collectType, const char* filename);
-  Material*    getIcon         (int type) {return allIcons [type];}
-  float        getSpeed        (int type) {return allSpeeds[type];}
-  ssgEntity*   getModel        (int type) {return allModels[type];}
+class CollectableManager
+{
+protected:
+    Material*    m_all_icons [COLLECT_MAX];
+    float        m_all_speeds[COLLECT_MAX];
+    ssgEntity*   m_all_models[COLLECT_MAX];
+    void         LoadNode       (const lisp::Lisp* lisp, int collectType);
+public:
+    CollectableManager           ();
+    void         loadCollectables();
+    void         removeTextures  ();
+    void         Load            (int collectType, const char* filename);
+    Material*    getIcon         (int type) {return m_all_icons [type];}
+    float        getSpeed        (int type) {return m_all_speeds[type];}
+    ssgEntity*   getModel        (int type) {return m_all_models[type];}
 };
 
 extern CollectableManager* collectable_manager;

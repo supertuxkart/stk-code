@@ -26,22 +26,23 @@
 
 class Material;
 
-class MaterialManager {
- private:
+class MaterialManager
+{
+private:
 
-  char   *parseFileName(char **str);
-  int     parseMaterial(FILE *fd);
-  
-  std::vector<Material*>  materials;
- public:
-            MaterialManager();
-  void      loadMaterial   ();
-  void      reInit         ();
-  int       addEntity      (Material *m);
-  Material *getMaterial    (ssgLeaf *lf);
-  Material *getMaterial    (const char *texname);
-  Material *getMaterial    (const std::string& t) {return getMaterial(t.c_str());}
-  int       getNumEntities ()                     {return materials.size();      }
+    char   *parseFileName(char **str);
+    int     parseMaterial(FILE *fd);
+
+    std::vector<Material*> m_materials;
+public:
+    MaterialManager();
+    void      loadMaterial   ();
+    void      reInit         ();
+    int       addEntity      (Material *m);
+    Material *getMaterial    (ssgLeaf *lf);
+    Material *getMaterial    (const char *texname);
+    Material *getMaterial    (const std::string& t) {return getMaterial(t.c_str());}
+    int       getNumEntities ()                     {return m_materials.size();      }
 };
 
 extern ssgState *fuzzy_gst, *herringbones_gst;

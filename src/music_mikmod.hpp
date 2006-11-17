@@ -28,32 +28,33 @@
 #include "music.hpp"
 
 
-class MusicMikMod : public Music {
+class MusicMikMod : public Music
+{
 public:
-  MusicMikMod();
-  virtual ~MusicMikMod();
+    MusicMikMod();
+    virtual ~MusicMikMod();
 
-  virtual void update();
+    virtual void update();
 
-  virtual bool load(const char* filename);
+    virtual bool load(const char* filename);
 
-  virtual bool playMusic();
-  virtual bool stopMusic();
-  virtual bool pauseMusic();
-  virtual bool resumeMusic();
+    virtual bool playMusic();
+    virtual bool stopMusic();
+    virtual bool pauseMusic();
+    virtual bool resumeMusic();
 
 private:
-  bool release();
-  bool isPlaying();
-  bool streamIntoBuffer(ALuint buffer);
+    bool release();
+    bool isPlaying();
+    bool streamIntoBuffer(ALuint buffer);
 
-  std::string m_fileName;
-  MODULE* m_modStream;
+    std::string m_fileName;
+    MODULE* m_modStream;
 
-  ALuint m_soundBuffers[2];
-  ALuint m_soundSource;
+    ALuint m_soundBuffers[2];
+    ALuint m_soundSource;
 
-  bool m_pausedMusic;
+    bool m_pausedMusic;
 };
 
 #endif // HEADER_MUSICMIKMOD_H

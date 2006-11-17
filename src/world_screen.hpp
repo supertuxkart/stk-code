@@ -31,24 +31,24 @@ class WorldScreen : public Screen
 {
 private:
 
-  ulClock fclock ;
-  ulClock frameClock;
-  int     frameCount;
-  
-  typedef std::vector<Camera*> Cameras;
-  Cameras cameras;
+    ulClock m_fclock ;
+    ulClock m_frame_clock;
+    int     m_frame_count;
 
-  static WorldScreen* current_;
+    typedef std::vector<Camera*> Cameras;
+    Cameras m_cameras;
+
+    static WorldScreen* m_current_;
 public:
-  static WorldScreen* current() { return current_; }
+    static WorldScreen* current() { return m_current_; }
 
-  WorldScreen(const RaceSetup& racesetup);
-  virtual ~WorldScreen();
+    WorldScreen(const RaceSetup& racesetup);
+    virtual ~WorldScreen();
 
-  Camera* getCamera(int i) const;
+    Camera* getCamera(int i) const;
 
-  void draw();
-  void update();
+    void draw();
+    void update();
 };
 
 #endif

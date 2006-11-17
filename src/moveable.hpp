@@ -35,56 +35,58 @@
 #define MAX_HERRING_EATEN    20
 
 
-class Moveable {
+class Moveable
+{
 protected:
-  sgCoord       reset_pos;      /* Where to start in case of a reset           */
-  sgCoord       curr_pos;       /* current position                            */
-  sgCoord       velocity;       /* current velocity in local coordinates       */
-  sgVec3        abs_velocity;   /* world coordinates' velocity vector          */
-  sgVec4*       normalHOT;      /* plane on which HOT was computed             */
-  Material*     materialHOT;    /* Material at HOT                             */
-  ssgTransform* model;
-  ssgTransform* shadow;
-  int           collided;
-  int           crashed;
-  sgVec3        surface_avoidance_vector ;
-  int           firsttime ;
-  float         wheelie_angle ;
-  int           on_ground ; 
+    sgCoord       m_reset_pos;      /* Where to start in case of a reset           */
+    sgCoord       m_curr_pos;       /* current position                            */
+    sgCoord       m_velocity;       /* current velocity in local coordinates       */
+    sgVec3        m_abs_velocity;   /* world coordinates' velocity vector          */
+    sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
+    Material*     m_material_hot;    /* Material at HOT                             */
+    ssgTransform* m_model;
+    ssgTransform* m_shadow;
+    int           m_collided;
+    int           m_crashed;
+    sgVec3        m_surface_avoidance_vector ;
+    int           m_first_time ;
+    float         m_wheelie_angle ;
+    int           m_on_ground ;
 
-  float collectIsectData ( sgVec3 start, sgVec3 end ) ;
-  sgCoord*      historyVelocity;
-  sgCoord*      historyPosition;
+    float collectIsectData ( sgVec3 start, sgVec3 end ) ;
+    sgCoord*      m_history_velocity;
+    sgCoord*      m_history_position;
 
 public:
-  
-  /* start - New Physics */
-  
 
-  Moveable (bool bHasHistory=false);
-  virtual ~Moveable();
+    /* start - New Physics */
 
-  void          setReset     (sgCoord* pos)  {sgCopyCoord( &reset_pos, pos ); }
-  ssgTransform* getModel     ()              {return model ;                  }
-  int           isOnGround   ()              {return on_ground;               }
-  sgCoord*      getVelocity  ()              {return & velocity;              }
-  sgCoord*      getCoord     ()              {return &curr_pos;               }
-  void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &curr_pos,pos);   }
-  virtual void  placeModel   ()              {model->setTransform(&curr_pos); }
-  virtual void  handleZipper ()              {};
-  virtual void  reset        ();
-  virtual void  update       (float dt) ;
-  virtual void  updatePosition(float dt, sgMat4 result);
-  virtual void  doCollisionAnalysis(float dt, float hot);
 
-  // Gets called when no high of terrain can be determined (isReset=0), or 
-  // there is a 'reset' material under the moveable --> karts need to be 
-  // rescued, missiles should explode.
-  virtual void  OutsideTrack (int isReset) {}
+    Moveable (bool bHasHistory=false);
+    virtual ~Moveable();
 
-  float         getIsectData (sgVec3 start, sgVec3 end );
-  void          WriteHistory (char* s, int kartNumber, int indx);
-  void          ReadHistory  (char* s, int kartNumber, int indx);
-};   // class Moveable
+    void          setReset     (sgCoord* pos)  {sgCopyCoord( &m_reset_pos, pos ); }
+    ssgTransform* getModel     ()              {return m_model ;                  }
+    int           isOnGround   ()              {return m_on_ground;               }
+    sgCoord*      getVelocity  ()              {return & m_velocity;              }
+    sgCoord*      getCoord     ()              {return &m_curr_pos;               }
+    void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);   }
+    virtual void  placeModel   ()              {m_model->setTransform(&m_curr_pos); }
+    virtual void  handleZipper ()              {};
+    virtual void  reset        ();
+    virtual void  update       (float dt) ;
+    virtual void  updatePosition(float dt, sgMat4 result);
+    virtual void  doCollisionAnalysis(float dt, float hot);
+
+    // Gets called when no high of terrain can be determined (isReset=0), or
+    // there is a 'reset' material under the moveable --> karts need to be
+    // rescued, missiles should explode.
+    virtual void  OutsideTrack (int isReset) {}
+
+    float         getIsectData (sgVec3 start, sgVec3 end );
+    void          WriteHistory (char* s, int kartNumber, int indx);
+    void          ReadHistory  (char* s, int kartNumber, int indx);
+}
+;   // class Moveable
 
 #endif

@@ -27,47 +27,50 @@ class Kart;
 class Projectile;
 class Explosion;
 
-class ProjectileManager {
- private:
-  typedef std::vector<Projectile*> Projectiles;
-  typedef std::vector<Explosion* > Explosions;
+class ProjectileManager
+{
+private:
+    typedef std::vector<Projectile*> Projectiles;
+    typedef std::vector<Explosion* > Explosions;
 
-  // The list of all active projectiles, i.e. projectiles
-  // which are currently moving on the track
-  Projectiles      activeProjectiles;
+    // The list of all active projectiles, i.e. projectiles
+    // which are currently moving on the track
+    Projectiles      m_active_projectiles;
 
-  // The list of all deleted projectiles, i.e. projectils which
-  // hit something and have therefore been deleted. The objects
-  // in this list can be reused later, this removes the overhead
-  // of object creation
-  Projectiles      deletedProjectiles;
+    // The list of all deleted projectiles, i.e. projectils which
+    // hit something and have therefore been deleted. The objects
+    // in this list can be reused later, this removes the overhead
+    // of object creation
+    Projectiles      m_deleted_projectiles;
 
-  // All active explosions, i.e. explosions which are currently
-  // being shown
-  Explosions       activeExplosions;
+    // All active explosions, i.e. explosions which are currently
+    // being shown
+    Explosions       m_active_explosions;
 
-  // The list of deleted explosion, which will be reused.
-  Explosions       deletedExplosions;
+    // The list of deleted explosion, which will be reused.
+    Explosions       m_deleted_explosions;
 
-  ssgSelector*     explosionModel;
-  bool             somethingWasHit;
-  bool             explosionEnded;
+    ssgSelector*     m_explosion_model;
+    bool             m_something_was_hit;
+    bool             m_explosion_ended;
 
 public:
-                   ProjectileManager() {};
-                  ~ProjectileManager() {};
-  void             explode          () {somethingWasHit=true;}
-  void             FinishedExplosion() {explosionEnded =true;}
-  ssgSelector*     getExplosionModel()             {
-                             return (ssgSelector*)explosionModel->clone();}
-  int              getProjectileId  (const std::string ident);
-  void             loadData         ();
-  void             cleanup          ();
-  void             update           (float dt);
-  Projectile*      newProjectile    (Kart *kart, int type);
-  Explosion*       newExplosion     (Projectile *p);
-  void             Deactivate       (Projectile *p) {}
-  void             removeTextures   ();
+    ProjectileManager() {};
+    ~ProjectileManager() {};
+    void             explode          () {m_something_was_hit=true;}
+    void             FinishedExplosion() {m_explosion_ended =true;}
+    ssgSelector*     getExplosionModel()
+    {
+        return (ssgSelector*)m_explosion_model->clone();
+    }
+    int              getProjectileId  (const std::string ident);
+    void             loadData         ();
+    void             cleanup          ();
+    void             update           (float dt);
+    Projectile*      newProjectile    (Kart *kart, int type);
+    Explosion*       newExplosion     (Projectile *p);
+    void             Deactivate       (Projectile *p) {}
+    void             removeTextures   ();
 };
 
 extern ProjectileManager *projectile_manager;

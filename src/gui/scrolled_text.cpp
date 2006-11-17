@@ -25,10 +25,10 @@
 
 ScrolledText::ScrolledText()
 {
-    float r       = config->width/800.0f;
-    m_x_left         = (int)(30.0*r);  m_x_right = config->width -m_x_left;
-    r             = config->height/600.0f;
-    m_y_bottom       = (int)(50.0*r);  m_y_top   = config->height-(int)(50.0f*r);
+    float r       = config->m_width/800.0f;
+    m_x_left         = (int)(30.0*r);  m_x_right = config->m_width -m_x_left;
+    r             = config->m_height/600.0f;
+    m_y_bottom       = (int)(50.0*r);  m_y_top   = config->m_height-(int)(50.0f*r);
     m_y_speed        = 50.0f;
     m_font_size      = 24;
     m_y_pos          = m_y_bottom-m_font_size;
@@ -60,7 +60,7 @@ void ScrolledText::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0.0, config->width, 0.0, config->height, -1.0, +1.0);
+    glOrtho(0.0, config->m_width, 0.0, config->m_height, -1.0, +1.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
 
@@ -74,7 +74,7 @@ void ScrolledText::update(float dt)
                         SCREEN_CENTERED_TEXT, 20, 255, 255, 255);
     glViewport(m_x_left, m_y_bottom, m_x_right-m_x_left, m_y_top-m_y_bottom);
 
-    glScalef(1.0f, config->width/(m_y_top-m_y_bottom), 1.0f);
+    glScalef(1.0f, config->m_width/(m_y_top-m_y_bottom), 1.0f);
 
     for(unsigned int i=0; i<m_string_list.size(); i++)
     {
@@ -86,7 +86,7 @@ void ScrolledText::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-    glViewport(0,0,config->width, config->height);
+    glViewport(0,0,config->m_width, config->m_height);
     m_y_pos=m_y_pos+dt*m_y_speed;
     if(m_y_speed>0 && m_y_pos>m_string_list.size()*m_font_size+m_y_top-m_y_bottom) m_y_pos=-m_font_size;
     if(m_y_speed<0 && m_y_pos<0) m_y_pos=m_string_list.size()*m_font_size+m_y_top-m_y_bottom;

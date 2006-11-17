@@ -24,31 +24,31 @@
 //#include "kart_properties.hpp"
 class KartProperties;
 
-class KartPropertiesManager 
+class KartPropertiesManager
 {
- protected:
-  float maxSteerAngle;
+protected:
+    float m_max_steer_angle;
 
-  typedef std::vector<KartProperties*> KartPropertiesVector;
-  /** All available kart configurations */
-  KartPropertiesVector m_karts_properties;
+    typedef std::vector<KartProperties*> KartPropertiesVector;
+    /** All available kart configurations */
+    KartPropertiesVector m_karts_properties;
 
-public:  
-  KartPropertiesManager();
-  ~KartPropertiesManager();
+public:
+    KartPropertiesManager();
+    ~KartPropertiesManager();
 
-  const KartProperties*    getKartById            (int i);
-  const KartProperties*    getKart                (const std::string ident);
-  const int                getKartId              (const std::string ident);
-        void               loadKartData           ();
-  const float              getMaximumSteeringAngle() {return maxSteerAngle;}
-  
-  /** Return len random karts */
-  std::vector<std::string> getRandomKarts         (int len);
+    const KartProperties*    getKartById            (int i);
+    const KartProperties*    getKart                (const std::string IDENT);
+    const int                getKartId              (const std::string IDENT);
+    void               loadKartData           ();
+    const float              getMaximumSteeringAngle() {return m_max_steer_angle;}
 
-  /** Fill the empty positions in the given vector with random karts */
-  void fillWithRandomKarts (std::vector<std::string>& vec);
-  void removeTextures      ();
+    /** Return len random karts */
+    std::vector<std::string> getRandomKarts         (int len);
+
+    /** Fill the empty positions in the given vector with random karts */
+    void fillWithRandomKarts (std::vector<std::string>& vec);
+    void removeTextures      ();
 };
 
 extern KartPropertiesManager *kart_properties_manager;

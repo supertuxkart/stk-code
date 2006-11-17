@@ -23,68 +23,72 @@
 
 #include "kart.hpp"
 
-class AutoKart : public Kart {
+class AutoKart : public Kart
+{
 private:
 
-  //The crash percentage is how much of the time the AI has been crashing,
-  //if the AI has been crashing for some time, use the rescue.
-  float crash_perc;
+    //The crash percentage is how much of the time the AI has been crashing,
+    //if the AI has been crashing for some time, use the rescue.
+    float m_crash_perc;
 
-  float time_since_last_shot;
-  size_t future_hint;
+    float m_time_since_last_shot;
+    size_t m_future_hint;
 
-  float starting_delay;
+    float m_starting_delay;
 
-  int next_curve_hint;
-  int next_straight_hint;
-  bool on_curve;
-  bool handle_curve;
+    int m_next_curve_hint;
+    int m_next_straight_hint;
+    bool m_on_curve;
+    bool m_handle_curve;
 
-  struct CrashTypes
-  {
-      bool road; //true if we are going to 'crash' with the bounds of the road
-      int kart; //-1 if no crash, pos numbers are the kart it crashes with
-      CrashTypes() : road(false), kart(-1) {};
-      void clear() {road = false; kart = -1;}
-  } crashes;
+    class CrashTypes
+    {
+        public:
 
-  int start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
+        bool m_road; //true if we are going to 'crash' with the bounds of the road
+        int m_kart; //-1 if no crash, pos numbers are the kart it crashes with
+        CrashTypes() : m_road(false), m_kart(-1) {};
+        void clear() {m_road = false; m_kart = -1;}
+    }
+    crashes;
 
-  void handle_race_start();
+    int start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-  float steer_to_angle(const size_t HINT, const float ANGLE);
-  float steer_to_point(const sgVec2 POINT);
+    void handle_race_start();
 
-  bool do_wheelie(const int STEPS);
-  void check_crashes(const int STEPS, sgVec3 pos);
-  void find_non_crashing_point(sgVec2 result);
+    float steer_to_angle(const size_t HINT, const float ANGLE);
+    float steer_to_point(const sgVec2 POINT);
 
-  void remove_angle_excess (float &angle);
-  int calc_steps();
+    bool do_wheelie(const int STEPS);
+    void check_crashes(const int STEPS, sgVec3 pos);
+    void find_non_crashing_point(sgVec2 result);
 
-  float angle_to_control(float angle);
+    void remove_angle_excess (float &angle);
+    int calc_steps();
+
+    float angle_to_control(float angle);
 #if 0
-  //Functions currently not being used, but that might be useful in the future.
-  int find_check_hint();
-  float guess_accel (const float throttle);
-  bool handle_tight_curves();
-  bool hint_is_behind(const int HINT);
-  int find_curve();
-  void setup_curve_handling();
-  float steer_for_tight_curve();
+    //Functions currently not being used, but that might be useful in the future.
+    int find_check_hint();
+    float guess_accel (const float throttle);
+    bool handle_tight_curves();
+    bool hint_is_behind(const int HINT);
+    int find_curve();
+    void setup_curve_handling();
+    float steer_for_tight_curve();
 #endif
 
 #if 0
-  enum Direction {LEFT, RIGHT};
-  Direction curve_direction;
+    enum Direction {LEFT, RIGHT};
+    Direction curve_direction;
 #endif
 
 public:
-  AutoKart(const KartProperties *kart_properties, int position);
+    AutoKart(const KartProperties *kart_properties, int position);
 
-  void update      (float delta) ;
-  void reset       ();
-  int  isPlayerKart() const {return 0;}
+    void update      (float delta) ;
+    void reset       ();
+    int  isPlayerKart() const {return 0;}
 };
 
 #endif

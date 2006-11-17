@@ -33,279 +33,285 @@
 
 Loader* loader = 0;
 
-// -----------------------------------------------------------------------------
-Loader::Loader() 
+Loader::Loader()
 {
-  char *datadir;
-  currentCallbackType = CB_COLLECTABLE;
+    char *datadir;
+    m_current_callback_type = CB_COLLECTABLE;
 
-  if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-    datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
-  else
-#ifdef _MSC_VER
-    if ( _access ( "data\\tuxtrack.track", 04 ) == 0 )
-#else
-    if ( access ( "data/tuxtrack.track", F_OK ) == 0 )
-#endif
-      datadir = "." ;
+    if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
+        datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
     else
 #ifdef _MSC_VER
-      if ( _access ( "..\\data\\tuxtrack.track", 04 ) == 0 )
+        if ( _access ( "data\\tuxtrack.track", 04 ) == 0 )
 #else
-      if ( access ( "../data/tuxtrack.track", F_OK ) == 0 )
+        if ( access ( "data/tuxtrack.track", F_OK ) == 0 )
 #endif
-	datadir = ".." ;
-      else
+            datadir = "." ;
+        else
+#ifdef _MSC_VER
+            if ( _access ( "..\\data\\tuxtrack.track", 04 ) == 0 )
+#else
+            if ( access ( "../data/tuxtrack.track", F_OK ) == 0 )
+#endif
+                datadir = ".." ;
+            else
 #ifdef SUPERTUXKART_DATADIR
-	datadir = SUPERTUXKART_DATADIR ;
+                datadir = SUPERTUXKART_DATADIR ;
 #else
-      datadir = "/usr/local/share/games/supertuxkart" ;
+                datadir = "/usr/local/share/games/supertuxkart" ;
 #endif
-  fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
-  addSearchPath(datadir);
+    fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
+    addSearchPath(datadir);
 }  // Loader
 
-// -----------------------------------------------------------------------------
-Loader::~Loader() 
+//-----------------------------------------------------------------------------
+Loader::~Loader()
+{}   // ~Loader
+
+//-----------------------------------------------------------------------------
+void Loader::makePath(char* path, const char* dir, const char* fname) const
 {
-}   // ~Loader
+    struct stat mystat;
 
-// -----------------------------------------------------------------------------
-void Loader::make_path(char* path, const char* dir, const char* fname) const 
+    for(std::vector<std::string>::const_iterator i = m_search_path.begin();
+        i != m_search_path.end(); ++i)
+    {
+        sprintf(path, "%s%c%s%c%s", i->c_str(), DIR_SEPARATOR, dir,
+                DIR_SEPARATOR, fname);
+        // convert backslashes and slashes to the native form
+        const size_t LEN = strlen(path);
+        for(size_t i = 0; i < LEN; ++i)
+            if(path[i] == '\\' || path[i] == '/')
+                path[i] = DIR_SEPARATOR;
+
+        if(stat(path, &mystat) < 0)
+            continue;
+
+        return;
+    }
+
+    // error case...
+    // hmm ideally we'd throw an exception here, but plib is not prepared for that
+    sprintf(path, "NotFound: %s", fname);
+}   // makePath
+
+//-----------------------------------------------------------------------------
+void Loader::makeModelPath(char* path, const char* FNAME) const
 {
-  struct stat mystat;
-    
-  for(std::vector<std::string>::const_iterator i = searchPath.begin();
-      i != searchPath.end(); ++i) 
-  {
-    sprintf(path, "%s%c%s%c%s", i->c_str(), DIR_SEPARATOR, dir, 
-		    DIR_SEPARATOR, fname);
-    // convert backslashes and slashes to the native form
-    size_t len = strlen(path);
-    for(size_t i = 0; i < len; ++i)
-      if(path[i] == '\\' || path[i] == '/')
-        path[i] = DIR_SEPARATOR;
-    
-    if(stat(path, &mystat) < 0)
-      continue;
-
-    return;
-  }
-
-  // error case...
-  // hmm ideally we'd throw an exception here, but plib is not prepared for that
-  sprintf(path, "NotFound: %s", fname);
-}   // make_path
-
-// -----------------------------------------------------------------------------
-void Loader::makeModelPath(char* path, const char* fname) const 
-{
-  make_path(path, getModelDir(), fname);
+    makePath(path, getModelDir(), FNAME);
 }   // makeModelPath
 
-// -----------------------------------------------------------------------------
-void Loader::makeTexturePath(char* path, const char* fname) const 
+//-----------------------------------------------------------------------------
+void Loader::makeTexturePath(char* path, const char* FNAME) const
 {
-  make_path(path, getTextureDir(), fname);
+    makePath(path, getTextureDir(), FNAME);
 }   // makeTexturePath
 
-// -----------------------------------------------------------------------------
-void Loader::addSearchPath(const std::string& path) 
+//-----------------------------------------------------------------------------
+void Loader::addSearchPath(const std::string& PATH)
 {
-  searchPath.push_back(path);
+    m_search_path.push_back(PATH);
 }   // addSearchPath
 
-// -----------------------------------------------------------------------------
-void Loader::addSearchPath(const char* path)
+//-----------------------------------------------------------------------------
+void Loader::addSearchPath(const char* PATH)
 {
-  searchPath.push_back(std::string(path));
+    m_search_path.push_back(std::string(PATH));
 }   // addSearchPath
 
-// -----------------------------------------------------------------------------
-void Loader::initConfigDir() 
+//-----------------------------------------------------------------------------
+void Loader::initConfigDir()
 {
 #ifdef WIN32
-  /*nothing*/
+    /*nothing*/
 #else
-  /*if HOME environment variable exists
+    /*if HOME environment variable exists
     create directory $HOME/.supertuxkart*/
-  if(getenv("HOME")!=NULL) 
-  {
-    std::string pathname;
-    pathname = getenv("HOME");
-    pathname += "/.supertuxkart";
-    mkdir(pathname.c_str(), 0755);
-  }
+    if(getenv("HOME")!=NULL)
+    {
+        std::string pathname;
+        pathname = getenv("HOME");
+        pathname += "/.supertuxkart";
+        mkdir(pathname.c_str(), 0755);
+    }
 #endif
 }   // initConfigDir
 
-// -----------------------------------------------------------------------------
-std::string Loader::getPath(const char* fname) const 
+//-----------------------------------------------------------------------------
+std::string Loader::getPath(const char* FNAME) const
 {
-  struct stat mystat;
-  std::string result;
+    struct stat mystat;
+    std::string result;
 
-  std::string native_fname=fname;
-  size_t len = strlen(fname);
-  for(size_t i = 0; i < len; ++i)
-      if(native_fname[i] == '\\' || native_fname[i] == '/')
-        native_fname[i] = DIR_SEPARATOR;
+    std::string native_fname=FNAME;
+    const size_t LEN = strlen(FNAME);
+    for(size_t i = 0; i < LEN; ++i)
+        if(native_fname[i] == '\\' || native_fname[i] == '/')
+            native_fname[i] = DIR_SEPARATOR;
 
-  for(std::vector<std::string>::const_iterator i = searchPath.begin();
-      i != searchPath.end(); ++i) {
-    result = *i;
-    result += DIR_SEPARATOR;
-    result += native_fname;
-    
-    if(stat(result.c_str(), &mystat) < 0)
-      continue;
-    
-    return result;
-  }
+    for(std::vector<std::string>::const_iterator i = m_search_path.begin();
+        i != m_search_path.end(); ++i)
+    {
+        result = *i;
+        result += DIR_SEPARATOR;
+        result += native_fname;
 
-  std::stringstream msg;
-  msg << "Couldn't find file '" << fname << "'.";
-  throw std::runtime_error(msg.str());
+        if(stat(result.c_str(), &mystat) < 0)
+            continue;
+
+        return result;
+    }
+
+    std::stringstream msg;
+    msg << "Couldn't find file '" << FNAME << "'.";
+    throw std::runtime_error(msg.str());
 }   // getPath
 
-// -----------------------------------------------------------------------------
-void Loader::listFiles(std::set<std::string>& result, const std::string& dir) 
-     const 
-{
-  struct stat mystat;
+//-----------------------------------------------------------------------------
+void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
+    const
+    {
+        struct stat mystat;
 
 #ifdef DEBUG
-  // don't list directories with a slash on the end, it'll fail on win32
-  assert(dir[dir.size()-1] != '/');
+        // don't list directories with a slash on the end, it'll fail on win32
+        assert(dir[dir.size()-1] != '/');
 #endif
 
-  result.clear();
+        result.clear();
 
-  for(std::vector<std::string>::const_iterator i = searchPath.begin();
-      i != searchPath.end(); ++i) {
-    std::string path = *i;
-    path += DIR_SEPARATOR;
-    path += dir;
-    
-    if(stat(path.c_str(), &mystat) < 0)
-      continue;
-    if(! S_ISDIR(mystat.st_mode))
-      continue;
-    
+        for(std::vector<std::string>::const_iterator i = m_search_path.begin();
+            i != m_search_path.end(); ++i)
+        {
+            std::string path = *i;
+            path += DIR_SEPARATOR;
+            path += dir;
 
-    ulDir* mydir = ulOpenDir(path.c_str());
-    if(!mydir) continue;
+            if(stat(path.c_str(), &mystat) < 0)
+                continue;
+            if(! S_ISDIR(mystat.st_mode))
+                continue;
 
-    ulDirEnt* mydirent;
-    while( (mydirent = ulReadDir(mydir)) != 0) {
-      result.insert(mydirent->d_name);
-    }
-    ulCloseDir(mydir);
-  }
-}   // listFiles
 
-// -----------------------------------------------------------------------------
-/// Loads a kart model
-///
-/// Loads the kart model 'filename'. Callbacks contained in this file
-/// are stored in the callback class t. If optimise is set to false,
-/// the file will not be flattened, which is necessary for the kart
-/// models - flattening them will remove the wheel nodes, withouth
-/// which the wheels do not rotate.
-/// \param filename File to load
-/// \param t        Callback category for callbacks included in this
-///                 file (see callback_manager.hpp)
-/// \param optimise Default is true. If set to false, the model will not 
-///                 be flattened.
-ssgEntity *Loader::load(const std::string& filename, CallbackType t, 
-                        bool optimise) 
+            ulDir* mydir = ulOpenDir(path.c_str());
+            if(!mydir) continue;
+
+            ulDirEnt* mydirent;
+            while( (mydirent = ulReadDir(mydir)) != 0)
+            {
+                result.insert(mydirent->d_name);
+            }
+            ulCloseDir(mydir);
+        }
+    }   // listFiles
+
+/** Loads a kart model
+ *
+ *  Loads the kart model 'filename'. Callbacks contained in this file
+ *  are stored in the callback class t. If optimise is set to false,
+ *  the file will not be flattened, which is necessary for the kart
+ *  models - flattening them will remove the wheel nodes, withouth
+ *  which the wheels do not rotate.
+ *
+ *  \param filename File to load
+ *
+ *  \param t        Callback category for callbacks included in this
+ *                  file (see callback_manager.hpp)
+ *
+ *  \param optimise Default is true. If set to false, the model will not
+ *                  be flattened.
+ */
+ssgEntity *Loader::load(const std::string& filename, CallbackType t,
+                        bool optimise)
 {
-    currentCallbackType=t;
+    m_current_callback_type=t;
     return optimise ? ssgLoad  (filename.c_str(), this)
-                    : ssgLoadAC(filename.c_str(), this);
+           : ssgLoadAC(filename.c_str(), this);
 }   // load
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 ssgBranch *Loader::animInit (char *data ) const
 {
-  while ( ! isdigit ( *data ) && *data != '\0' )
-    data++ ;
+    while ( ! isdigit ( *data ) && *data != '\0' )
+        data++ ;
 
-  int   startlim =        strtol(data, &data, 0 );
-  int   endlim   =        strtol(data, &data, 0 );
-  float timelim  = (float)strtod(data, &data    );
+    const int   START_LIM =        strtol(data, &data, 0 );
+    const int   END_LIM   =        strtol(data, &data, 0 );
+    const float TIME_LIM  = (float)strtod(data, &data    );
 
-  while ( *data <= ' ' && *data != '\0' )
-    data++ ;
+    while ( *data <= ' ' && *data != '\0' )
+        data++ ;
 
-  char mode = toupper ( *data ) ;
+    char mode = toupper ( *data ) ;
 
-  ssgTimedSelector *br = new ssgTimedSelector;
+    ssgTimedSelector *br = new ssgTimedSelector;
 
-  br->setLimits  (startlim+1, endlim+1 ) ;
-  br->setDuration(timelim ) ;
-  br->setMode    ((mode=='O') ?  SSG_ANIM_ONESHOT 
-		              :  (mode=='S') ?  SSG_ANIM_SWING 
-		                             : SSG_ANIM_SHUTTLE ) ;
-  br->control    (SSG_ANIM_START ) ;
+    br->setLimits  (START_LIM+1, END_LIM+1 ) ;
+    br->setDuration(TIME_LIM ) ;
+    br->setMode    ((mode=='O') ?  SSG_ANIM_ONESHOT
+                    :  (mode=='S') ?  SSG_ANIM_SWING
+                    : SSG_ANIM_SHUTTLE ) ;
+    br->control    (SSG_ANIM_START ) ;
 
-  return br;
+    return br;
 }   // animInit
 
 
-// -----------------------------------------------------------------------------
-// Handle userdata that is stored in the model files. Mostly the userdata
-// indicates that a special branch is to be created (e.g. a ssgCutout instead
-// of the standard branch). But some userdata indicate that callbacks need
-// to be created, which are then handled by the callback manager.
+/** Handle userdata that is stored in the model files. Mostly the userdata
+ *  indicates that a special branch is to be created (e.g. a ssgCutout instead
+ * of the standard branch). But some userdata indicate that callbacks need
+ * to be created, which are then handled by the callback manager.
+ */
 
 ssgBranch *Loader::createBranch(char *data) const
 {
 
-  if ( data == NULL || data[0] != '@' ) return NULL;
+    if ( data == NULL || data[0] != '@' ) return NULL;
 
-  data++ ;   /* Skip the '@' */
+    data++ ;   /* Skip the '@' */
 
-  if ( strncmp("billboard", data, strlen("billboard") ) == 0 ) 
-    return  new ssgCutout();
+    if ( strncmp("billboard", data, strlen("billboard") ) == 0 )
+        return  new ssgCutout();
 
-  if ( strncmp("DONT_DELETE", data, strlen("DONT_DELETE") ) == 0 ) 
-  {
-       printf("DONT\n");
-       ssgBranch *br = new ssgTransform();
-       br->setUserData(new ssgBase());
-       return br;
-  }
+    if ( strncmp("DONT_DELETE", data, strlen("DONT_DELETE") ) == 0 )
+    {
+        printf("DONT\n");
+        ssgBranch *br = new ssgTransform();
+        br->setUserData(new ssgBase());
+        return br;
+    }
 
-  if ( strncmp("invisible", data, strlen("invisible") ) == 0 )
-    return new ssgInvisible();
+    if ( strncmp("invisible", data, strlen("invisible") ) == 0 )
+        return new ssgInvisible();
 
-  if ( strncmp ( "switch", data, strlen ( "switch" ) ) == 0 ) 
-  {
-    ssgSelector *sel = new ssgSelector();
-    sel->select(0);
-    return sel;
-  }
-      
-  if ( strncmp ( "animate", data, strlen ( "animate" ) ) == 0 )
-    return animInit(data);
-  
+    if ( strncmp ( "switch", data, strlen ( "switch" ) ) == 0 )
+    {
+        ssgSelector *sel = new ssgSelector();
+        sel->select(0);
+        return sel;
+    }
 
-  if ( strncmp ( "autodcs", data, strlen ( "autodcs" ) ) == 0 ) {
-    ssgTransform *br = new ssgTransform();
-    Callback     *c  = new Callback(data, br);
-    br->setUserData(new ssgBase());
-    callback_manager->addCallback(c, currentCallbackType);
-    return br;
-  }
+    if ( strncmp ( "animate", data, strlen ( "animate" ) ) == 0 )
+        return animInit(data);
 
-  if ( strncmp ( "autotex", data, strlen ( "autotex" ) ) == 0 ) {
-    ssgTexTrans *br = new ssgTexTrans();
-    Callback    *c  = new Callback(data, br);
-    callback_manager->addCallback(c, currentCallbackType);
-    return br;
-  }
-  
-  return NULL ;
+
+    if ( strncmp ( "autodcs", data, strlen ( "autodcs" ) ) == 0 )
+    {
+        ssgTransform *br = new ssgTransform();
+        Callback     *c  = new Callback(data, br);
+        br->setUserData(new ssgBase());
+        callback_manager->addCallback(c, m_current_callback_type);
+        return br;
+    }
+
+    if ( strncmp ( "autotex", data, strlen ( "autotex" ) ) == 0 )
+    {
+        ssgTexTrans *br = new ssgTexTrans();
+        Callback    *c  = new Callback(data, br);
+        callback_manager->addCallback(c, m_current_callback_type);
+        return br;
+    }
+
+    return NULL ;
 }   // createBranch
 

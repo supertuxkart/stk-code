@@ -25,151 +25,152 @@
 #include "projectile_manager.hpp"
 #include "sound_manager.hpp"
 
-Projectile::Projectile(Kart *kart, int collectable) : Moveable(false) 
+Projectile::Projectile(Kart *kart, int collectable) : Moveable(false)
 {
-  init(kart, collectable);  
-  getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+    init(kart, collectable);
+    getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 }   // Projectile
 
-// -----------------------------------------------------------------------------
-void Projectile::init(Kart *kart, int collectable_) 
+//-----------------------------------------------------------------------------
+void Projectile::init(Kart *kart, int collectable_)
 {
-  owner              = kart;
-  type               = collectable_;
-  hasHitSomething    = false;
-  nLastRadarBeep     = -1;
-  speed              = collectable_manager->getSpeed(type);
-  ssgTransform *m    = getModel();
-  m->addKid(collectable_manager->getModel(type));
-  setCoord(kart->getCoord());
-  world->addToScene(m);
+    m_owner              = kart;
+    m_type               = collectable_;
+    m_has_hit_something    = false;
+    m_last_radar_beep     = -1;
+    m_speed              = collectable_manager->getSpeed(m_type);
+    ssgTransform *m    = getModel();
+    m->addKid(collectable_manager->getModel(m_type));
+    setCoord(kart->getCoord());
+    world->addToScene(m);
 }   // init
 
-// -----------------------------------------------------------------------------
-Projectile::~Projectile() 
-{
-}   // ~Projectile
+//-----------------------------------------------------------------------------
+Projectile::~Projectile()
+{}   // ~Projectile
 
-// -----------------------------------------------------------------------------
-void Projectile::update (float dt) 
+//-----------------------------------------------------------------------------
+void Projectile::update (float dt)
 {
-  // we don't even do any physics here - just set the
-  // velocity, and ignore everything else for projectiles.
-  velocity.xyz[1] = speed;
-  sgCopyCoord ( &last_pos, &curr_pos);
-  Moveable::update(dt);
-  doObjectInteractions();
+    // we don't even do any physics here - just set the
+    // velocity, and ignore everything else for projectiles.
+    m_velocity.xyz[1] = m_speed;
+    sgCopyCoord ( &m_last_pos, &m_curr_pos);
+    Moveable::update(dt);
+    doObjectInteractions();
 }   // update
 
-// -----------------------------------------------------------------------------
-// Returns true if this missile has hit something,
-// otherwise false.
-void Projectile::doObjectInteractions () 
+/** Returns true if this missile has hit something, otherwise false. */
+void Projectile::doObjectInteractions ()
 {
-  float ndist = SG_MAX ;
-  int nearest = -1 ;
+    float ndist = SG_MAX ;
+    int nearest = -1 ;
 
-  for ( int i = 0 ; i < world->getNumKarts() ; i++ ) 
-  {
-    sgCoord *pos ;
- 
-    Kart *kart = world -> getKart(i);
-    pos        = kart  -> getCoord();
- 
-    if ( type != COLLECT_NOTHING && kart != owner ) 
+    for ( int i = 0 ; i < world->getNumKarts() ; i++ )
     {
-      float d = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
+        sgCoord *pos ;
 
-      if ( d < 2.0f ) 
-      {
-	explode();
-        kart -> forceCrash () ;
-	return;
-      } else if ( d < ndist ) {
-        ndist = d ;
-        nearest = i ;
-      }  // if !d<2.0f
-    }   // if type!=NOTHING &&kart!=owner
-  }  // for i<getNumKarts
-  if ( type == COLLECT_HOMING_MISSILE && nearest != -1 &&
-        ndist < MAX_HOME_DIST_SQD                          ) 
-  {
-    sgVec3 delta;
-    sgVec3 hpr;
-    Kart *kart=world->getKart(nearest);
-    if(nLastRadarBeep!=nearest && kart->isPlayerKart()) 
+        Kart *kart = world -> getKart(i);
+        pos        = kart  -> getCoord();
+
+        if ( m_type != COLLECT_NOTHING && kart != m_owner )
+        {
+            const float D = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
+
+            if ( D < 2.0f )
+            {
+                explode();
+                kart -> forceCrash () ;
+                return;
+            }
+            else if ( D < ndist )
+            {
+                ndist = D ;
+                nearest = i ;
+            }  // if !D<2.0f
+        }   // if m_type!=NOTHING &&kart!=m_owner
+    }  // for i<getNumKarts
+    if ( m_type == COLLECT_HOMING_MISSILE && nearest != -1 &&
+         ndist < MAX_HOME_DIST_SQD                          )
     {
-      sound_manager->playSfx(SOUND_MISSILE_LOCK);
-      nLastRadarBeep=nearest;
+        sgVec3 delta;
+        sgVec3 hpr;
+        Kart * kart=world->getKart(nearest);
+        if(m_last_radar_beep!=nearest && kart->isPlayerKart())
+        {
+            sound_manager->playSfx(SOUND_MISSILE_LOCK);
+            m_last_radar_beep=nearest;
+        }
+        sgCoord *k = kart->getCoord() ;
+
+        sgSubVec3 ( delta, k->xyz, m_curr_pos.xyz ) ;
+
+        delta[2] = 0.0f ;
+
+        sgHPRfromVec3 ( hpr, delta ) ;
+
+        sgSubVec3 ( hpr, m_curr_pos.hpr ) ;
+
+        if ( hpr[0] >  180.0f ) hpr[0] -= 360.0f ;
+        if ( hpr[0] < -180.0f ) hpr[0] += 360.0f ;
+        if ( hpr[1] >  180.0f ) hpr[1] -= 360.0f ;
+        if ( hpr[1] < -180.0f ) hpr[1] += 360.0f ;
+
+        if ( hpr[0] > 80.0f || hpr[0] < -80.0f )
+            m_velocity.hpr[0] = 0.0f ;
+        else
+        {
+            if      ( hpr[0] >  3.0f ) m_velocity.hpr[0] =  HOMING_MISSILE_TURN_RATE ;
+            else if ( hpr[0] < -3.0f ) m_velocity.hpr[0] = -HOMING_MISSILE_TURN_RATE ;
+            else                       m_velocity.hpr[0] =  0.0f ;
+
+            if      ( hpr[2] > 1.0f  ) m_velocity.hpr[1] = -HOMING_MISSILE_PITCH_RATE ;
+            else if ( hpr[2] < -1.0f ) m_velocity.hpr[1] = HOMING_MISSILE_PITCH_RATE ;
+            else                       m_velocity.hpr[1] = 0.0f ;
+        }
     }
-    sgCoord *k = kart->getCoord() ;
-
-    sgSubVec3 ( delta, k->xyz, curr_pos.xyz ) ;
-
-    delta[2] = 0.0f ;
-
-    sgHPRfromVec3 ( hpr, delta ) ;
-
-    sgSubVec3 ( hpr, curr_pos.hpr ) ;
-
-    if ( hpr[0] >  180.0f ) hpr[0] -= 360.0f ;
-    if ( hpr[0] < -180.0f ) hpr[0] += 360.0f ;
-    if ( hpr[1] >  180.0f ) hpr[1] -= 360.0f ;
-    if ( hpr[1] < -180.0f ) hpr[1] += 360.0f ;
-
-    if ( hpr[0] > 80.0f || hpr[0] < -80.0f )
-      velocity.hpr[0] = 0.0f ;
-    else 
-    {
-      if      ( hpr[0] >  3.0f ) velocity.hpr[0] =  HOMING_MISSILE_TURN_RATE ;
-      else if ( hpr[0] < -3.0f ) velocity.hpr[0] = -HOMING_MISSILE_TURN_RATE ;
-      else                       velocity.hpr[0] =  0.0f ;
-
-      if      ( hpr[2] > 1.0f  ) velocity.hpr[1] = -HOMING_MISSILE_PITCH_RATE ;
-      else if ( hpr[2] < -1.0f ) velocity.hpr[1] = HOMING_MISSILE_PITCH_RATE ;
-      else                       velocity.hpr[1] = 0.0f ;
-    }
-  } else  // type!=HOMING||nearest==-1||ndist>MAX_HOME_DIST_SQD
-    velocity.hpr[0] = velocity.hpr[1] = 0.0f ;
+    else  // m_type!=HOMING||nearest==-1||ndist>MAX_HOME_DIST_SQD
+        m_velocity.hpr[0] = m_velocity.hpr[1] = 0.0f ;
 }   // doObjectInteractions
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void Projectile::doCollisionAnalysis  ( float dt, float hot )
 {
-  if ( collided || crashed ) 
-  {
-    if ( type == COLLECT_SPARK ) 
+    if ( m_collided || m_crashed )
     {
-      sgVec3 bouncevec ;
-      sgVec3 direction ;
+        if ( m_type == COLLECT_SPARK )
+        {
+            sgVec3 bouncevec ;
+            sgVec3 direction ;
 
-      sgNormalizeVec3 ( bouncevec, surface_avoidance_vector ) ;
-      sgSubVec3 ( direction, curr_pos.xyz, last_pos.xyz ) ;
-      sgReflectInPlaneVec3 ( direction, bouncevec ) ;
+            sgNormalizeVec3 ( bouncevec, m_surface_avoidance_vector ) ;
+            sgSubVec3 ( direction, m_curr_pos.xyz, m_last_pos.xyz ) ;
+            sgReflectInPlaneVec3 ( direction, bouncevec ) ;
 
-      sgHPRfromVec3 ( curr_pos.hpr, direction ) ;
-    } else if ( type != COLLECT_NOTHING ) 
-    {
-      explode();
-    }
-  }   // if collided||crashed
+            sgHPRfromVec3 ( m_curr_pos.hpr, direction ) ;
+        }
+        else if ( m_type != COLLECT_NOTHING )
+        {
+            explode();
+        }
+    }   // if m_collided||m_crashed
 }   // doCollisionAnalysis
 
-// -----------------------------------------------------------------------------
-void Projectile::explode() 
+//-----------------------------------------------------------------------------
+void Projectile::explode()
 {
-  hasHitSomething=true;
-  curr_pos.xyz[2] += 1.2f ;
-  // Notify the projectile manager that this rocket has hit something.
-  // The manager will create the appropriate explosion object, and
-  // place this projectile into a list so that it can be reused later,
-  // without the additional cost of creating the object again
-  projectile_manager->explode();
-  
-  // Now remove this projectile from the graph:
-  ssgTransform *m = getModel();
-  m->removeAllKids();
-  world->removeFromScene(m);
+    m_has_hit_something=true;
+    m_curr_pos.xyz[2] += 1.2f ;
+    // Notify the projectile manager that this rocket has hit something.
+    // The manager will create the appropriate explosion object, and
+    // place this projectile into a list so that it can be reused later,
+    // without the additional cost of creating the object again
+    projectile_manager->explode();
+
+    // Now remove this projectile from the graph:
+    ssgTransform *m = getModel();
+    m->removeAllKids();
+    world->removeFromScene(m);
 }   // explode
 
 /* EOF */

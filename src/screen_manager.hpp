@@ -28,20 +28,20 @@ class Screen;
 class ScreenManager
 {
 private:
-  bool do_abort;
-  Screen* current_screen;
-  Screen* next_screen;
+    bool m_do_abort;
+    Screen* m_current_screen;
+    Screen* m_next_screen;
 
 public:
-  ScreenManager();
-  ~ScreenManager();
-  void run();
-  /** aborts the main loop */
-  void abort();
-  /** Set the current active screen, the screen will get delete'ed
-      automatically once it is no longer needed */
-  void setScreen(Screen* screen);
-  bool  screenSwitchPending() const {return next_screen!=NULL;}
+    ScreenManager();
+    ~ScreenManager();
+    void run();
+    /** aborts the main loop */
+    void abort();
+    /** Set the current active screen, the screen will get delete'ed
+        automatically once it is no longer needed */
+    void setScreen(Screen* screen);
+    bool  screenSwitchPending() const {return m_next_screen!=NULL;}
 };
 
 extern ScreenManager* screen_manager;

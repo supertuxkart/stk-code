@@ -28,24 +28,25 @@
 // gets loaded once, and deleted at the end (and when switching windows /
 // fullscreen). Sinace it's not much overhead, a separate class is provided
 // for every model that might contain a callback.
-enum CallbackType { CB_COLLECTABLE, CB_ATTACHMENT, CB_EXPLOSION, CB_HERRING, 
+enum CallbackType { CB_COLLECTABLE, CB_ATTACHMENT, CB_EXPLOSION, CB_HERRING,
                     CB_KART,        CB_TRACK,      CB_MAX                    };
 
-class CallbackManager  
+class CallbackManager
 {
-  std::vector<Callback*> m_allCallbacks[CB_MAX];
+    std::vector<Callback*> m_allCallbacks[CB_MAX];
 
 public:
-       CallbackManager();
-      ~CallbackManager();
+    CallbackManager();
+    ~CallbackManager();
 
-  void update     (float dt) const;
-  void clear      (CallbackType cbType);
-  void addCallback(Callback *c, CallbackType t) {m_allCallbacks[t].push_back(c);}
-};   // CallbackManager
+    void update     (float dt) const;
+    void clear      (CallbackType cbType);
+    void addCallback(Callback *c, CallbackType t) {m_allCallbacks[t].push_back(c);}
+}
+;   // CallbackManager
 
 extern CallbackManager *callback_manager;
 
 #endif
 /* EOF */
-  
+

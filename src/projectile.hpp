@@ -25,26 +25,30 @@
 
 class Kart;
 
-class Projectile : public Moveable {
-  sgCoord     last_pos;
-  const Kart* owner;
-  float       speed;    // Speed of the projectile
-  int         type ;
-  bool        hasHitSomething;
-  int         nLastRadarBeep;
+class Projectile : public Moveable
+{
+    sgCoord     m_last_pos;
+    const Kart* m_owner;
+    float       m_speed;    // Speed of the projectile
+    int         m_type ;
+    bool        m_has_hit_something;
+    int         m_last_radar_beep;
 public:
 
-  Projectile               (Kart* kart_, int type);
-  virtual ~Projectile();
-  void init                (Kart* kart_, int type);
-  void update              (float);
-  void doCollisionAnalysis (float dt, float hot);
-  void doObjectInteractions();
-  void explode             ();
-  bool hasHit              ()            {return hasHitSomething;            }
-  void reset               ()            {Moveable::reset();
-                                          sgCopyCoord(&last_pos,&reset_pos );}
-  void OutsideTrack        (int isReset) {explode();                         }
+    Projectile               (Kart* kart_, int type);
+    virtual ~Projectile();
+    void init                (Kart* kart_, int type);
+    void update              (float);
+    void doCollisionAnalysis (float dt, float hot);
+    void doObjectInteractions();
+    void explode             ();
+    bool hasHit              ()            {return m_has_hit_something;}
+    void reset               ()
+    {
+        Moveable::reset();
+        sgCopyCoord(&m_last_pos,&m_reset_pos );
+    }
+    void OutsideTrack        (int isReset) {explode();}
 
 } ;
 

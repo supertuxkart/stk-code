@@ -32,79 +32,82 @@
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
-class World 
+class World
 {
 public:
-    ssgRoot      *scene;
-    
+    ssgRoot      *m_scene;
+
     typedef std::vector<Kart*> Karts;
 private:
-    Karts      kart;
-    StaticSSG* staticSSG;
-    float      finishDelayStartTime;
-    int*       numberCollisions;
-    Physics*   physics;
+    Karts      m_kart;
+    StaticSSG* m_static_ssg;
+    float      m_finish_delay_start_time;
+    int*       m_number_collisions;
+    Physics*   m_physics;
 public:
-    float      clock;
+    float      m_clock;
 
     /** resources, this should be put in a separate class or replaced by a smart
      * resource manager
      */
-    RaceSetup raceSetup;
+    RaceSetup m_race_setup;
 
-    enum Phase { 
+    enum Phase {
         // The traffic light is shown and all players stay in position
         START_PHASE,
         // The traffic light turned green and all driver, drive around the track
         RACE_PHASE,
-        // All players have finished, now wait a certain amount of time for AI 
+        // All players have finished, now wait a certain amount of time for AI
         // karts to finish. If they do not finish in that time, finish the race
         DELAY_FINISH_PHASE,
         // The player crossed the finishing line and his and the time of
         // the other players is displayed, controll is automatic
         FINISH_PHASE,
         // The state after finish where no calculations are done.
-        LIMBO_PHASE, 
+        LIMBO_PHASE,
     };
 
-    int ready_set_go;
-    
-    const Track* track;
+    int m_ready_set_go;
+
+    const Track* m_track;
 private:
-    Phase phase;
+    Phase m_phase;
 
 public:
     /** debug text that will be overlaid to the screen */
-    std::string debugtext[10];
-    
+    std::string m_debug_text[10];
+
     /** Reference to the track inside the scene */
-    ssgBranch *trackBranch ;
+    ssgBranch *m_track_branch ;
 
     World(const RaceSetup& raceSetup);
     virtual ~World();
-    float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm) 
-                                 {return staticSSG->hot(start, end, leaf, nrm);}
-    int   Collision(sgSphere* s, AllHits *a) 
-                                      {return staticSSG->collision(s,a);       }
+    float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
+    {return m_static_ssg->hot(start, end, leaf, nrm);}
+    int   Collision(sgSphere* s, AllHits *a)
+    {return m_static_ssg->collision(s,a);       }
 
     void draw();
     void update(float delta);
     void restartRace();
     void disableRace(); // Put race into limbo phase
-    
+
     PlayerKart* getPlayerKart(int player);
-    Kart* getKart(int kartId)                 {assert(kartId >= 0 && 
-		                                       kartId < int(kart.size()));
-                                               return kart[kartId];              }
-    int  getNumKarts() const                  {return (int)kart.size();          }
-    void addToScene(ssgEntity *kid)           {scene->addKid(kid);               }
-    void removeFromScene(ssgEntity *kid)      {scene->removeKid(kid);            }
-    void addCollisions(int kartNumber, int n) {numberCollisions[kartNumber]+=n;  }
+    Kart* getKart(int kartId)
+    {
+        assert(kartId >= 0 &&
+               kartId < int(m_kart.size()));
+        return m_kart[kartId];
+    }
+    int  getNumKarts() const                  {return (int)m_kart.size();          }
+    void addToScene(ssgEntity *kid)           {m_scene->addKid(kid);               }
+    void removeFromScene(ssgEntity *kid)      {m_scene->removeKid(kid);            }
+    void addCollisions(int kartNumber, int n) {m_number_collisions[kartNumber]+=n;  }
 
     /** Returns the phase of the game */
-    Phase getPhase() const                    { return phase;                    }
-    float getGravity() const                  { return track->getGravity();      }
-    Physics *getPhysics() const               { return physics;                  }
+    Phase getPhase() const                    { return m_phase;                    }
+    float getGravity() const                  { return m_track->getGravity();      }
+    Physics *getPhysics() const               { return m_physics;                  }
 
 private:
     void updateRacePosition( int k );

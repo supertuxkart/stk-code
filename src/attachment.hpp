@@ -27,38 +27,56 @@ class ssgEntity;
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
 // and TINYTUX being the last one. So if new elemts are added, make sure
 // to add them in between those values.
-enum attachmentType { ATTACH_PARACHUTE, 
+enum attachmentType { ATTACH_PARACHUTE,
 #ifdef USE_MAGNET
-                      ATTACH_MAGNET, ATTACH_MAGNET_BZZT, 
+                      ATTACH_MAGNET, ATTACH_MAGNET_BZZT,
 #endif
-		      ATTACH_ANVIL, ATTACH_TINYTUX,
+                      ATTACH_ANVIL, ATTACH_TINYTUX,
                       ATTACH_MAX, ATTACH_NOTHING};
 
 
-class Attachment {
- private:
-  attachmentType  type;
-  Kart           *kart;
-  float           time_left;
-  ssgSelector    *holder;    // where the attachment is put on the kart
- public:
-  Attachment(Kart* _kart);
-  void           set            (attachmentType _type, float time);
-  void           set            (attachmentType _type)
-                                   {set(_type, time_left);                    }
-  void           clear          () {type=ATTACH_NOTHING; time_left=0.0;
-                                    holder->select(0);                        }
-  attachmentType getType        () {return type;                              }
-  float          getTimeLeft    () {return time_left;                         }
-  float          WeightAdjust   () const {return type==ATTACH_ANVIL    
-                                         ?physicsParameters->anvilWeight:0.0f;}
-  float          AirResistanceAdjust () const {return type==ATTACH_PARACHUTE
-                                   ?physicsParameters->parachuteFriction:0.0f;}
-  float          SpeedAdjust    () const {return type==ATTACH_ANVIL
-                                    ?physicsParameters->anvilSpeedFactor:1.0f; }
-  void           hitGreenHerring();
-  void           update         (float dt, sgCoord *velocity);
-  ~Attachment();
+class Attachment
+{
+private:
+    attachmentType  m_type;
+    Kart           *m_kart;
+    float           m_time_left;
+    ssgSelector    *m_holder;    // where the attachment is put on the kart
+public:
+    Attachment(Kart* _kart);
+    ~Attachment();
+
+    void set (attachmentType _type, float time);
+    void set (attachmentType _type) {set(_type, m_time_left); }
+
+    void clear ()
+    {
+        m_type=ATTACH_NOTHING; m_time_left=0.0;
+        m_holder->select(0);
+    }
+
+    attachmentType getType () {return m_type;      }
+    float getTimeLeft () {return m_time_left; }
+
+    float WeightAdjust () const
+    {
+        return m_type==ATTACH_ANVIL
+               ?physicsParameters->m_anvil_weight:0.0f;
+    }
+
+    float AirResistanceAdjust () const
+    {
+        return m_type==ATTACH_PARACHUTE
+               ?physicsParameters->m_parachute_friction:0.0f;
+    }
+
+    float SpeedAdjust () const
+    {
+        return m_type==ATTACH_ANVIL
+               ?physicsParameters->m_anvil_speed_factor:1.0f;
+    }
+    void  hitGreenHerring();
+    void  update (float dt, sgCoord *velocity);
 };
 
 #endif

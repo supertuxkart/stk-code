@@ -23,15 +23,15 @@
 #include <plib/ssg.h>
 #include "attachment.hpp"
 
-class AttachmentManager 
+class AttachmentManager
 {
- private:
-  ssgEntity *m_attachments[ATTACH_MAX];
- public:
-             AttachmentManager() {};
-  ssgEntity *getModel         (attachmentType type) {return m_attachments[type];}
-  void       removeTextures   ();
-  void       loadModels       ();
+private:
+    ssgEntity *m_attachments[ATTACH_MAX];
+public:
+    AttachmentManager() {};
+    ssgEntity *getModel         (attachmentType type) {return m_attachments[type];}
+    void       removeTextures   ();
+    void       loadModels       ();
 };
 
 extern AttachmentManager *attachment_manager;

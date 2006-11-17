@@ -23,39 +23,39 @@
 #include "shadow.hpp"
 
 ssgTransform* createShadow( const std::string& name,
-    float x1, float x2, float y1, float y2 )
+                            float x1, float x2, float y1, float y2 )
 {
-  ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-  ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-  ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-  ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
+    ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
+    ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
+    ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
+    ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
 
-  sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
-  sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
- 
-  sgSetVec3 ( v, x1, y1, 0.05f ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y1, 0.05f ) ; va->add(v) ;
-  sgSetVec3 ( v, x1, y2, 0.05f ) ; va->add(v) ;
-  sgSetVec3 ( v, x2, y2, 0.05f ) ; va->add(v) ;
- 
-  sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
-  sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
-  sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
- 
-  ssgTransform* result = new ssgTransform ;
-  result -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
- 
-  result -> setName ( "Shadow" ) ;
- 
-  ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
- 
-  gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-  gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
+    sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
+    sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
 
-  result -> addKid ( gs ) ;
+    sgSetVec3 ( v, x1, y1, 0.05f ) ; va->add(v) ;
+    sgSetVec3 ( v, x2, y1, 0.05f ) ; va->add(v) ;
+    sgSetVec3 ( v, x1, y2, 0.05f ) ; va->add(v) ;
+    sgSetVec3 ( v, x2, y2, 0.05f ) ; va->add(v) ;
 
-  return result;
+    sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
+    sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
+    sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
+    sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
+
+    ssgTransform* result = new ssgTransform ;
+    result -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
+
+    result -> setName ( "Shadow" ) ;
+
+    ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
+
+    gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
+    gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
+
+    result -> addKid ( gs ) ;
+
+    return result;
 }
 
 /* EOF */
