@@ -51,6 +51,10 @@
 #include "sound_manager.hpp"
 #include "physics_parameters.hpp"
 
+#ifdef BULLET
+#include <GL/glut.h>
+#endif
+
 void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
@@ -273,8 +277,12 @@ void InitTuxkart()
 }
 
 //=============================================================================
-int main ( int argc, char **argv )
+
+int main ( int argc, char **argv ) 
 {
+#ifdef BULLET
+    glutInit(&argc, argv);
+#endif
     InitTuxkart();
     //handleCmdLine() needs InitTuxkart() so it can't be called first
     if(!handleCmdLine(argc, argv)) exit(0);

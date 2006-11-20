@@ -50,6 +50,10 @@
 #include "widget_set.hpp"
 #include "ssg_help.hpp"
 
+#ifdef BULLET
+#include <GL/glut.h>
+#endif
+
 World* world = 0;
 
 World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
@@ -206,7 +210,54 @@ void World::draw()
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , m_track->getDiffuseCol() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, m_track->getSpecularCol() ) ;
 
+#ifndef BULLET
     ssgCullAndDraw ( world->m_scene ) ;
+#endif
+#ifdef BULLET
+    // Use bullets debug drawer
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    /*	light_position is NOT default value	*/
+    GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
+    GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
+  
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+  
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+ 
+
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glClearColor(0.8,0.8,0.8,0);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    float f=10.0f;
+    glFrustum(-f, f, -f, f, 1.0, 1000.0);
+    
+    gluLookAt(-2.0f, -15.0f, 10.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    //gluLookAt(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    glMatrixMode(GL_MODELVIEW);
+
+    for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i) 
+    {
+        m_kart[i]->draw();
+    }
+    m_physics->draw();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -604,7 +655,9 @@ void World::loadTrack()
             trans       -> addKid    ( lod   ) ;
             m_track_branch -> addKid ( trans ) ;
             lod         -> setRanges ( r, 2  ) ;
-            m_physics->set_track(obj);
+#ifdef BULLET
+            m_physics->setTrack(obj);
+#endif
 #ifdef DEBUG_SHOW_DRIVEPOINTS
             ssgaSphere *sphere;
             sgVec3 center;

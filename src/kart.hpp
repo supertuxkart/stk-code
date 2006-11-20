@@ -73,8 +73,9 @@ protected:
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
-    btVehicleRaycaster                *m_vehicleRayCaster;
+    btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
+    btRigidBody                        *m_kart_body;
 #endif
 
 private:
@@ -191,9 +192,11 @@ public:
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;                 }
     float          getTimeAtLap     () const {return m_time_at_last_lap;            }
 #ifdef BULLET
-    void           setPhysics(btRaycastVehicle *v,
-                              btRaycastVehicle::btVehicleTuning *t) {m_vehicle=v;m_tuning=t; }
-    btRaycastVehicle *getVehicle() const {return m_vehicle;}
+    void              createPhysics();
+    btRaycastVehicle *getVehicle  () const {return m_vehicle;                }
+    btRigidBody      *getKartBody () const {return m_kart_body;              }
+    void              updateBulletPhysics(float dt);
+    void              draw        ();
 #endif
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }

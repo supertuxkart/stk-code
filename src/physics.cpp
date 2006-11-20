@@ -1,8 +1,7 @@
-//  $Id: physics.hpp 839 2006-10-24 00:01:56Z hiker $
+//  $Id: physics.cpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,7 +32,6 @@ Physics::Physics(float gravity)
     m_debug_drawer=new GLDebugDrawer();
     m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
-
 }   // Physics
 
 //-----------------------------------------------------------------------------
@@ -42,161 +40,124 @@ Physics::~Physics()
     delete m_dynamics_world;
 }   // ~Physics
 
-//-----------------------------------------------------------------------------
-void Physics::set_track(ssgEntity* track)
-{}   // set_track
-
-/** Adds a kart to the physics engine. */
-void Physics::addKart(Kart *kart, btRaycastVehicle **vehicle,
-                      btRaycastVehicle::btVehicleTuning **tuning)
+// -----------------------------------------------------------------------------
+//* Convert the ssg track tree into its physics equivalents.
+void Physics::setTrack(ssgEntity* track)
 {
+    //return;               // debug only FIXME
+    if(!track) return;
+    sgMat4 mat;
+    sgMakeIdentMat4(mat);
+    convertTrack(track, mat);
+}   // setTrack
 
-    // First: Create the chassis of the kart
-    // -------------------------------------
-    // The size for bullet must be specified in half extends!
-    ssgEntity *model = kart->getModel();
-    float x_min, x_max, y_min, y_max, z_min, z_max;
-    MinMax(model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    const float KART_WIDTH  = x_max-x_min;
-    const float KART_LENGTH = y_max-y_min;
-    btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*KART_WIDTH,
-                                     0.5*KART_LENGTH,
-                                     0.5*(z_max-z_min)));
-    // Set mass and inertia
-    // --------------------
-    const float MASS=kart->getMass();
-    btVector3 inertia;
-    kart_chassis->calculateLocalInertia(MASS, inertia);
+// -----------------------------------------------------------------------------
+//* Convert the ssg track tree into its physics equivalents.
+void Physics::convertTrack(ssgEntity *track, sgMat4 m)
+{
+    if(!track) return;
+    if(track->isAKindOf(ssgTypeLeaf()))
+    {
+        ssgLeaf             *leaf       = (ssgLeaf*)(track);
+        // printf("triangles %d\n",leaf->getNumTriangles());
+        btTriangleMesh      *mesh       = new btTriangleMesh();
+        for(int i=0; i<leaf->getNumTriangles(); i++) 
+        {
+            short v1,v2,v3;
+            sgVec3 vv1, vv2, vv3;
+            
+            leaf->getTriangle(i, &v1, &v2, &v3);
+            sgXformPnt3 ( vv1, leaf->getVertex(v1), m );
+            sgXformPnt3 ( vv2, leaf->getVertex(v2), m );
+            sgXformPnt3 ( vv3, leaf->getVertex(v3), m );
+            btVector3 vb1(vv1[0],vv1[1],vv1[2]);
+            btVector3 vb2(vv2[0],vv2[1],vv2[2]);
+            btVector3 vb3(vv3[0],vv3[1],vv3[2]);
+            mesh->addTriangle(vb1, vb2, vb3);
+        }
 
-    // Position the chassis
-    // --------------------
-    btTransform trans;
-    trans.setIdentity();
-    const sgCoord* const POS=kart->getCoord();
-    trans.setOrigin(btVector3(POS->xyz[0], POS->xyz[1], POS->xyz[2]+100.0f));
-    btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
+        btCollisionShape *mesh_shape = new btBvhTriangleMeshShape(mesh);
+        btTransform startTransform;
+        startTransform.setIdentity();
+        btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
+        btRigidBody *body=new btRigidBody(0.0f, myMotionState, mesh_shape);
+        m_dynamics_world->addRigidBody(body);
+    }   // if(track isAKindOf leaf)
+    else if(track->isAKindOf(ssgTypeTransform()))
+    {
+        ssgBaseTransform *t = (ssgBaseTransform*)(track);
+        sgMat4 tmpT, tmpM;
+        t->getTransform(tmpT);
+        sgCopyMat4(tmpM, m);
+        sgPreMultMat4(tmpM,tmpT);
+        for(ssgEntity *e = t->getKid(0); e!=NULL; e=t->getNextKid())
+        {
+            convertTrack(e, tmpM);
+        }   // for i
+    }
+    else if (track->isAKindOf(ssgTypeBranch())) 
+    {
+        ssgBranch *b =(ssgBranch*)track;
+        for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
+            convertTrack(e, m);
+        }   // for i<getNumKids
+    }
+    else
+    {
+        assert(!"Unkown ssg type in convertTrack");
+    }
+}   // convertTrack
 
-    // Then create a rigid body
-    // ------------------------
-    btRigidBody* kart_body = new btRigidBody(MASS, myMotionState,
-                             kart_chassis, inertia);
-    kart_body->setCenterOfMassTransform(btTransform::getIdentity());
-    m_dynamics_world->addRigidBody(kart_body);
+// -----------------------------------------------------------------------------
+//* Adds a kart to the physics engine
+void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
+{
+    m_dynamics_world->addRigidBody(kart->getKartBody());
+    m_dynamics_world->addVehicle(vehicle);
 
-    // Reset velocities
-    // ----------------
-    kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
-
-    // Create the actual vehicle
-    // -------------------------
-    btVehicleRaycaster *vehicle_raycaster = new btDefaultVehicleRaycaster(m_dynamics_world);
-    *tuning = new btRaycastVehicle::btVehicleTuning();
-    *vehicle = new btRaycastVehicle(**tuning, kart_body, vehicle_raycaster);
-
-    // never deactivate the vehicle
-    kart_body->SetActivationState(DISABLE_DEACTIVATION);
-    m_dynamics_world->addVehicle(*vehicle);
-    (*vehicle)->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
-
-    // Add wheels
-    // ----------
-    const float WHEEL_WIDTH  = kart->getWheelWidth();
-    const float WHEEL_RADIUS = kart->getWheelRadius();
-    float SUSPENSION_REST = 0.6f;
-    btVector3 wheel_coord(0.5f*kart_width-(0.3f*WHEEL_WIDTH),
-                          0.5f*kart_length-WHEEL_RADIUS,
-                          0.0f);
-    btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
-    btVector3 wheel_axle(1.0f,0.0f,0.0f);
-
-    // right front wheel
-    (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
-                         /* isFrontWheel: */ true);
-
-    // left front wheel
-    wheel_coord = btVector3(- (0.5f*kart_width-(0.3f*WHEEL_WIDTH)),
-                            0.5f*kart_length-WHEEL_RADIUS,
-                            0.0f);
-    (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
-                         /* isFrontWheel: */ true);
-
-    // right rear wheel
-    wheel_coord = btVector3(0.5*kart_width-(0.3f*WHEEL_WIDTH),
-                            -0.5*(kart_length-WHEEL_RADIUS),
-                            0.0f);
-    (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
-                         /* isFrontWheel: */ false);
-
-    // right rear wheel
-    wheel_coord = btVector3(-(0.5*kart_width-(0.3f*WHEEL_WIDTH)),
-                            -0.5*(kart_length-WHEEL_RADIUS),
-                            0.0f);
-    (*vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                         SUSPENSION_REST, WHEEL_RADIUS, **tuning,
-                         /* isFrontWheel: */ false);
 }   // addKart
 
 //-----------------------------------------------------------------------------
 void Physics::update(float dt)
 {
+    m_dynamics_world->stepSimulation(dt);
+    // ???  m_dynamicsWorld->updateAabbs();
 
-    for(int i=0; i<world->getNumKarts(); i++)
-    {
-        const Kart * const K = world->getKart(i);
-        sgCoord *curr_pos = K->getCoord();
+}   // update
 
-        btRaycastVehicle *vehicle=K->getVehicle();
-        btRigidBody *b=vehicle->getRigidBody();
-        btMotionState *m = b->getMotionState();
-        btTransform trans;
-        trans.setIdentity();
-        trans.setOrigin(btVector3(curr_pos->xyz[0],curr_pos->xyz[1],curr_pos->xyz[2]));
-        m->setWorldTransform(trans);
-        //        m->getWorldTransform(trans);
-        btVector3 p = trans.getOrigin();
-        printf("%lx Pos %f %f %f\n",vehicle, p.x(), p.y(), p.z());
-
-        btCylinderShapeX wheelShape(btVector3(K->getWheelWidth(),
-                                              K->getWheelRadius(),
-                                              K->getWheelRadius()));
-        btVector3 wheelColor(1,0,0);
-        for(int j=0; j<vehicle->getNumWheels(); j++)
-        {
-            vehicle->updateWheelTransform(j);
-            float m[16];
-            vehicle->getWheelInfo(j).m_worldTransform.getOpenGLMatrix(m);
-            GL_ShapeDrawer::drawOpenGL(m, &wheelShape, wheelColor,btIDebugDraw::DBG_DrawWireframe);
-        }
-    }
-
+// -----------------------------------------------------------------------------
+//* 
+void Physics::draw()
+{
+    GL_ShapeDrawer::drawCoordSystem();
+                               
     int num_objects = m_dynamics_world->getNumCollisionObjects();
     for(int i=0; i<num_objects; i++)
     {
-        const Kart * const K=world->getKart(i);
         btCollisionObject *obj = m_dynamics_world->getCollisionObjectArray()[i];
         btRigidBody* body = btRigidBody::upcast(obj);
         if(!body) continue;
-        const btVector3 &POS=body->getCenterOfMassPosition();
-        printf("body %d: %f %f %f dt %f\n",i, POS.x(), POS.y(), POS.z(),dt);
-        sgCoord *p = K->getCoord();
-        p->xyz[0]=POS.x();
-        p->xyz[1]=POS.y();
-        p->xyz[2]=POS.z();
+        //const btVector3 &pos=body->getCenterOfMassPosition();
+        //printf("body %d: %f %f %f dt %f\n",i, pos.x(), pos.y(), pos.z(),dt);
         float m[16];
         btVector3 wireColor(1,0,0);
         btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
         myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
-        GL_ShapeDrawer::drawOpenGL(m,obj->m_collisionShape,wireColor,
-                                   btIDebugDraw::DBG_DrawWireframe);
+        debugDraw(m, obj->getCollisionShape(), wireColor);
 
     }
-    // ???  m_dynamicsWorld->updateAabbs();
+}   // draw
 
-}   // update
+// -----------------------------------------------------------------------------
+void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
+    
+{
+    GL_ShapeDrawer::drawOpenGL(m, s, color, 0);
+                               //                               btIDebugDraw::DBG_DrawWireframe);
+    //                               btIDebugDraw::DBG_DrawAabb);
+
+}   // debugDraw
+// -----------------------------------------------------------------------------
 
 #endif
 /* EOF */

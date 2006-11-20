@@ -1,8 +1,7 @@
 //  $Id: physics.hpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2006 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +21,7 @@
 #define HEADER_PHYSICS_H
 
 #include "kart.hpp"
+#include <plib/sg.h>
 
 #ifdef BULLET
 #include "bullet/btBulletDynamicsCommon.h"
@@ -32,13 +32,17 @@ protected:
     btDynamicsWorld *m_dynamics_world;
     Kart            *m_kart;
     GLDebugDrawer   *m_debug_drawer;
+
+    void convertTrack(ssgEntity *track, sgMat4 m);
 public:
-    Physics  (float gravity);
-    ~Physics  ();
-    void addKart  (Kart *k, btRaycastVehicle **v,
-                   btRaycastVehicle::btVehicleTuning **t);
+         Physics  (float gravity);
+        ~Physics  ();
+    void addKart  (const Kart *k, btRaycastVehicle *v);
     void update   (float dt);
-    void set_track(ssgEntity *track);
+    void draw     ();
+    void setTrack (ssgEntity *track);
+    btDynamicsWorld *getPhysicsWorld() const {return m_dynamics_world;}
+    void debugDraw(float m[16], btCollisionShape *s, const btVector3 color);
 };
 
 // For non-bullet version: empty object
@@ -49,7 +53,8 @@ public:
     Physics(float gravity) {};
     ~Physics() {};
     void update(float dt) {};
-    void set_track(ssgEntity *track) {};
+    void setTrack(ssgEntity *track) {};
+    void draw     () {};
 };
 
 #endif
