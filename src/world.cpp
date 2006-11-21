@@ -245,11 +245,12 @@ void World::draw()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    float f=10.0f;
+    float f=2.0f;
     glFrustum(-f, f, -f, f, 1.0, 1000.0);
     
-    gluLookAt(-2.0f, -15.0f, 10.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-    //gluLookAt(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    gluLookAt(-5, -5.0f,  5.0f, 
+              0.0f, 0.0f, 0.0f, 
+              0.0f, 0.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 
     for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i) 

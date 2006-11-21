@@ -76,6 +76,7 @@ protected:
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
     btRigidBody                        *m_kart_body;
+    float                               m_kart_height;
 #endif
 
 private:

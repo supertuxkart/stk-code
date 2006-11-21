@@ -157,9 +157,14 @@ void Kart::createPhysics()
     MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     float kart_width  = x_max-x_min;
     float kart_length = y_max-y_min;
+
+    // The kart height is needed later to reset the physics to the correct
+    // position.
+    m_kart_height     = z_max-z_min;
+    printf("w %f l %f h %f\n",kart_width, kart_length, m_kart_height);
     btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*kart_width,
                                                               0.5*kart_length,
-                                                              0.5*(z_max-z_min)));
+                                                              0.5*m_kart_height));
     // Set mass and inertia
     // --------------------
     float mass=getMass();
@@ -171,7 +176,7 @@ void Kart::createPhysics()
     btTransform trans;
     trans.setIdentity();
     sgCoord *pos=getCoord();
-    trans.setOrigin(btVector3(pos->xyz[0], pos->xyz[1], pos->xyz[2]+100.0f));
+    trans.setOrigin(btVector3(pos->xyz[0], pos->xyz[1], pos->xyz[2]));
     btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
 
     // Then create a rigid body
@@ -179,6 +184,7 @@ void Kart::createPhysics()
     m_kart_body = new btRigidBody(mass, myMotionState, 
                                   kart_chassis, inertia);
     m_kart_body->setCenterOfMassTransform(btTransform::getIdentity());
+    m_kart_body->setDamping(0.2, 0.2);
 
     // Reset velocities
     // ----------------
@@ -200,42 +206,42 @@ void Kart::createPhysics()
     // ----------
     float wheel_width  = getWheelWidth();
     float wheel_radius = getWheelRadius();
-    float suspension_rest = 0.6f;
-    btVector3 wheel_coord(0.5f*kart_width-(0.3f*wheel_width), 
-                          0.5f*kart_length-wheel_radius,
-                          0.0f);
-    btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
+    float suspension_rest = .6f;
+    float connection_height = 0.5*m_kart_height-wheel_radius;
+    btVector3 wheel_direction(0.0f, 0.0f, 1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
     // right front wheel
-    (m_vehicle)->addWheel(wheel_coord, wheel_direction, wheel_axle,
-                          suspension_rest, wheel_radius, *m_tuning,
-                          /* isFrontWheel: */ true);
+    btVector3 wheel_coord(0.5f*kart_width-(0.3f*wheel_width), 
+                          0.5f*kart_length,
+                          connection_height);
+    m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
+                        suspension_rest, wheel_radius, *m_tuning,
+                        /* isFrontWheel: */ true);
 
     // left front wheel
     wheel_coord = btVector3(- (0.5f*kart_width-(0.3f*wheel_width)), 
-                            0.5f*kart_length-wheel_radius,
-                            0.0f);
+                            0.5f*kart_length,
+                            connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ true);
 
     // right rear wheel
     wheel_coord = btVector3(0.5*kart_width-(0.3f*wheel_width), 
-                            -0.5*(kart_length-wheel_radius),
-                            0.0f);
+                            -0.5*kart_length,
+                            connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ false);
 
     // right rear wheel
     wheel_coord = btVector3(-(0.5*kart_width-(0.3f*wheel_width)),
-                            -0.5*(kart_length-wheel_radius),
-                            0.0f);
+                            -0.5*kart_length,
+                            connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ false);
-    world->getPhysics()->addKart(this, m_vehicle);
 
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
@@ -246,6 +252,7 @@ void Kart::createPhysics()
         wheel.m_frictionSlip             = 1e30f;
         wheel.m_rollInfluence            = 0.1f;
     }
+    world->getPhysics()->addKart(this, m_vehicle);
 }   // createPhysics
 #endif
 
@@ -289,7 +296,9 @@ void Kart::reset()
                 m_curr_pos.xyz);
 #ifdef BULLET
     btTransform trans;
-    trans.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]+100.0f));
+    trans.setOrigin(btVector3(m_curr_pos.xyz[0],
+                              m_curr_pos.xyz[1],
+                              m_curr_pos.xyz[2]+0.5*m_kart_height));
     m_kart_body->setCenterOfMassTransform(trans);
 #endif
 }   // reset
@@ -475,6 +484,11 @@ void Kart::draw()
     my_motion_state->m_graphicsWorldTrans.getOpenGLMatrix(m);
     printf("mw= ");
     for(int i=12; i<16; i++) printf(" %f",m[i]);
+    btTransform t;
+    my_motion_state->getWorldTransform(t);
+    btQuaternion q= t.getRotation();
+    printf(" q %f %f %f %f\n",
+           q.x(),q.y(), q.z(),q.getAngle());
     printf("\n");
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
@@ -486,7 +500,6 @@ void Kart::draw()
     btVector3 wheelColor(1,0,0);
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
-        m_vehicle->updateWheelTransform(j, true);
         float m[16];
         m_vehicle->getWheelInfo(j).m_worldTransform.getOpenGLMatrix(m);
         world->getPhysics()->debugDraw(m, wheelShape, wheelColor);
@@ -498,6 +511,10 @@ void Kart::updatePhysics (float dt)
 {
 
 #ifdef BULLET
+    for(int j=0; j<m_vehicle->getNumWheels(); j++)
+    {
+        m_vehicle->updateWheelTransform(j, true);
+    }
     if(m_controls.brake)
     {
         // no braking yet
@@ -512,7 +529,7 @@ void Kart::updatePhysics (float dt)
     { // ignore gravity down when jumping
         // no jumping yet
     }
-    const float steering = getMaxSteerAngle() * m_controls.lr*0.00444;
+    const float steering = -getMaxSteerAngle() * m_controls.lr*0.00444;
     printf("steering %f\n",steering);
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
@@ -996,7 +1013,11 @@ void Kart::placeModel ()
     const btVector3 pos=t.getOrigin();
     m_curr_pos.xyz[0]=pos.x();
     m_curr_pos.xyz[1]=pos.y();
-    m_curr_pos.xyz[2]=pos.z();
+    m_curr_pos.xyz[2]=pos.z()-0.5*m_kart_height;
+    btQuaternion q=t.getRotation();
+    sgQuat sgQ;
+    sgSetQuat(sgQ, q.x(), q.y(), q.z(), q.getW());
+    sgQuatToEuler(m_curr_pos.hpr, sgQ);
 #endif
 
     sgCoord c ;
