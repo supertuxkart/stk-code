@@ -93,7 +93,7 @@ void ScrolledText::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void ScrolledText::keybd(int key)
+void ScrolledText::inputKeyboard(int key, int pressed)
 {
     switch(key)
     {
@@ -103,9 +103,10 @@ void ScrolledText::keybd(int key)
     case SDLK_PAGEDOWN  : m_y_speed -= 50.0f; break;
     case SDLK_MINUS     :
     case SDLK_DOWN      : m_y_speed -= 10.0f; break;
-    default             : menu_manager->popMenu();
+    case SDLK_ESCAPE    : menu_manager->popMenu();
+    default             : break;
     }   // switch
-}   // keybd
+}   // inputKeyboard
 
 //-----------------------------------------------------------------------------
 void ScrolledText::select()

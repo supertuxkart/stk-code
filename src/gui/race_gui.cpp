@@ -193,7 +193,7 @@ void RaceGUI::inputKeyboard(int key, int pressed)
     default:
         break;
     } // switch
-} // keybd
+} // inputKeyboard
 
 //-----------------------------------------------------------------------------
 void RaceGUI::drawFPS ()

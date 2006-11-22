@@ -40,9 +40,10 @@ public:
     ScrolledText();
     ~ScrolledText();
     void setText      (StringList sl_);
-    virtual void select       ();
-    virtual void update       (float dt);
-    virtual void keybd        (int key);
+
+    void select        ();
+    void update        (float dt);
+    void inputKeyboard (int key, int pressed);
 };
 
 #endif
