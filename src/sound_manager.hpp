@@ -49,11 +49,16 @@ public:
     void resumeMusic();
 
 private:
-    void init();
 
     typedef std::map<int, SFX*> SFXsType;
-    SFXsType m_SFXs;
-    Music* m_currentMusic;
+
+    SFXsType m_sfxs;
+    Music* m_current_music;
+
+    bool m_initialized; //If the sound could not be initialized, for example,
+                        //if the player doesn't has a sound card, we want
+                        //to avoid anything sound related so we crash the game.
+
 };
 
 extern SoundManager* sound_manager;

@@ -37,53 +37,60 @@ SoundManager* sound_manager= NULL;
 
 SoundManager::SoundManager()
 {
-    m_currentMusic= NULL;
+    m_current_music = NULL;
 
-    init();
-}
 
-//-----------------------------------------------------------------------------
-void SoundManager::init()
-{
-    if(config->m_music || config->m_sfx)
-    {
 #if USE_PLIB_SOUND
-        plib_scheduler= new slScheduler;
-        plib_scheduler->setSafetyMargin(0.25);
-#else
-        alutInit(0, NULL);  // init openAL sound system
-        alGetError(); // Clear Error Code (so we can catch any new errors)
-#endif
+    plib_scheduler = new slScheduler;
 
+    if(plib_scheduler->working())
+        m_initialized = true;
+    else
+    {
+        fprintf(stderr, "WARNING: Could not initialize the PLIB based sound.\n");
+
+        plib_scheduler->setSafetyMargin(0.25);
+        m_initialized = false;
+    }
+#else
+    if(alutInit(0, NULL) == AL_TRUE)  // init openAL sound system
+        m_initialized = true;
+    else
+    {
+        fprintf(stderr, "WARNING: Could not initialize the ALUT based sound.");
+        m_initialized = false;
     }
 
-    if (config->m_sfx)
+    alGetError(); //Called here to clear any non-important errors found
+#endif
+
+    if (m_initialized)
     {
         // must be in sync with enumSoundSFX
         SFX* sfx= NULL;
-        sfx = new SFXImpl("wavs/ugh.wav");       m_SFXs[SOUND_UGH]= sfx;
-        sfx = new SFXImpl("wavs/radio/grandprix_winner.wav"); m_SFXs[SOUND_WINNER] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/grab_collectable.wav"); m_SFXs[SOUND_GRAB] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/crash.wav"); m_SFXs[SOUND_CRASH] = sfx;
-        sfx = new SFXImpl("wavs/radio/shot.wav"); m_SFXs[SOUND_SHOT] = sfx;
-        sfx = new SFXImpl("wavs/ow.wav"); m_SFXs[SOUND_OW] = sfx;
-        sfx = new SFXImpl("wavs/explosion.wav"); m_SFXs[SOUND_EXPLOSION] = sfx;
-        sfx = new SFXImpl("wavs/bzzt.wav"); m_SFXs[SOUND_BZZT] = sfx;
-        sfx = new SFXImpl("wavs/radio/horn.wav"); m_SFXs[SOUND_BEEP] = sfx;
-        sfx = new SFXImpl("wavs/radio/slap.wav"); m_SFXs[SOUND_USE_ANVIL] = sfx;
-        sfx = new SFXImpl("wavs/radio/squeaky.wav"); m_SFXs[SOUND_USE_PARACHUTE] = sfx;
-        sfx = new SFXImpl("wavs/wee.wav"); m_SFXs[SOUND_WEE] = sfx;
+        sfx = new SFXImpl("wavs/ugh.wav");       m_sfxs[SOUND_UGH]= sfx;
+        sfx = new SFXImpl("wavs/radio/grandprix_winner.wav"); m_sfxs[SOUND_WINNER] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/grab_collectable.wav"); m_sfxs[SOUND_GRAB] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/crash.wav"); m_sfxs[SOUND_CRASH] = sfx;
+        sfx = new SFXImpl("wavs/radio/shot.wav"); m_sfxs[SOUND_SHOT] = sfx;
+        sfx = new SFXImpl("wavs/ow.wav"); m_sfxs[SOUND_OW] = sfx;
+        sfx = new SFXImpl("wavs/explosion.wav"); m_sfxs[SOUND_EXPLOSION] = sfx;
+        sfx = new SFXImpl("wavs/bzzt.wav"); m_sfxs[SOUND_BZZT] = sfx;
+        sfx = new SFXImpl("wavs/radio/horn.wav"); m_sfxs[SOUND_BEEP] = sfx;
+        sfx = new SFXImpl("wavs/radio/slap.wav"); m_sfxs[SOUND_USE_ANVIL] = sfx;
+        sfx = new SFXImpl("wavs/radio/squeaky.wav"); m_sfxs[SOUND_USE_PARACHUTE] = sfx;
+        sfx = new SFXImpl("wavs/wee.wav"); m_sfxs[SOUND_WEE] = sfx;
 
         //FIXME: The following 3 sounds are not used in the game yet.
-        sfx = new SFXImpl("wavs/tintagel/deselect_option.wav"); m_SFXs[SOUND_BACK_MENU] = sfx;
-        //sfx = new SFXImpl("wavs/tintagel/select_option.wav"); m_SFXs[SOUND_SELECT_MENU] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/move_option.wav"); m_SFXs[SOUND_MOVE_MENU] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/deselect_option.wav"); m_sfxs[SOUND_BACK_MENU] = sfx;
+        //sfx = new SFXImpl("wavs/tintagel/select_option.wav"); m_sfxs[SOUND_SELECT_MENU] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/move_option.wav"); m_sfxs[SOUND_MOVE_MENU] = sfx;
 
-        sfx = new SFXImpl("wavs/tintagel/energy_bar_full.wav"); m_SFXs[SOUND_FULL] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/pre_start_race.wav"); m_SFXs[SOUND_PRESTART] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_SFXs[SOUND_START] = sfx;
-        sfx = new SFXImpl("wavs/radio/radarping.wav"); m_SFXs[SOUND_MISSILE_LOCK] = sfx;
-        sfx = new SFXImpl("wavs/radio/trafficjam.wav"); m_SFXs[SOUND_TRAFFIC_JAM] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/energy_bar_full.wav"); m_sfxs[SOUND_FULL] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/pre_start_race.wav"); m_sfxs[SOUND_PRESTART] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;
+        sfx = new SFXImpl("wavs/radio/radarping.wav"); m_sfxs[SOUND_MISSILE_LOCK] = sfx;
+        sfx = new SFXImpl("wavs/radio/trafficjam.wav"); m_sfxs[SOUND_TRAFFIC_JAM] = sfx;
     }
 }
 
@@ -91,20 +98,20 @@ void SoundManager::init()
 SoundManager::~SoundManager()
 {
     // SFX cleanup
-    for(SFXsType::iterator it= m_SFXs.begin(); it != m_SFXs.end(); it++)
+    for(SFXsType::iterator it= m_sfxs.begin(); it != m_sfxs.end(); it++)
     {
         SFX* sfx= it->second;
         delete sfx;
     }
-    m_SFXs.empty();
+    m_sfxs.empty();
 
-    if (m_currentMusic != NULL)
+    if (m_current_music != NULL)
     {
-        delete m_currentMusic;
-        m_currentMusic = NULL;
+        delete m_current_music;
+        m_current_music = NULL;
     }
 
-    if(config->m_music || config->m_sfx)
+    if(m_initialized)
     {
 #if USE_PLIB_SOUND
         delete plib_scheduler;
@@ -118,10 +125,10 @@ SoundManager::~SoundManager()
 //-----------------------------------------------------------------------------
 void SoundManager::playSfx(unsigned int id)
 {
-    if(config->m_sfx)
+    if(config->m_sfx && m_initialized)
     {
-        SFXsType::iterator it= m_SFXs.find(id);
-        if (it == m_SFXs.end())
+        SFXsType::iterator it= m_sfxs.find(id);
+        if (it == m_sfxs.end())
         {
             assert(false);
             return;
@@ -134,13 +141,11 @@ void SoundManager::playSfx(unsigned int id)
 //-----------------------------------------------------------------------------
 void SoundManager::playMusic(const char* filename)
 {
-    if(config->m_music)
+    if(config->m_music && m_initialized)
     {
-        printf("Music: %s\n", filename);
-
-        if (m_currentMusic != NULL)
+        if (m_current_music != NULL)
         {
-            delete m_currentMusic;
+            delete m_current_music;
         }
 
         if (filename == NULL || strlen(filename) == 0)
@@ -150,30 +155,30 @@ void SoundManager::playMusic(const char* filename)
         }
 
 #if USE_PLIB_SOUND
-        m_currentMusic= new MusicPlib();
+        m_current_music= new MusicPlib();
 #else
-        m_currentMusic= new MusicMikMod();
+        m_current_music= new MusicMikMod();
 #endif
-        assert(m_currentMusic->load(filename));
-        m_currentMusic->playMusic();
+        assert(m_current_music->load(filename));
+        m_current_music->playMusic();
     }
 }
 
 //-----------------------------------------------------------------------------
 void SoundManager::stopMusic()
 {
-    if (m_currentMusic != NULL)
+    if (m_current_music != NULL)
     {
-        m_currentMusic->stopMusic();
+        m_current_music->stopMusic();
     }
 }
 
 //-----------------------------------------------------------------------------
 void SoundManager::pauseMusic()
 {
-    if (m_currentMusic != NULL)
+    if (m_current_music != NULL)
     {
-        m_currentMusic->pauseMusic();
+        m_current_music->pauseMusic();
     }
 
 }
@@ -181,18 +186,18 @@ void SoundManager::pauseMusic()
 //-----------------------------------------------------------------------------
 void SoundManager::resumeMusic()
 {
-    if (m_currentMusic != NULL)
+    if (m_current_music != NULL)
     {
-        m_currentMusic->resumeMusic();
+        m_current_music->resumeMusic();
     }
 }
 
 //-----------------------------------------------------------------------------
 void SoundManager::update()
 {
-    if (m_currentMusic != NULL)
+    if (m_current_music != NULL)
     {
-        m_currentMusic->update();
+        m_current_music->update();
     }
 }
 
