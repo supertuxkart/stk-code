@@ -85,7 +85,7 @@ void BaseGUI::inputKeyboard(int key, int pressed)
     default:
         break;
     }   // switch
-}   // keybd
+}   // inputKeyboard
 
 //-----------------------------------------------------------------------------
 void BaseGUI::update(float dt)

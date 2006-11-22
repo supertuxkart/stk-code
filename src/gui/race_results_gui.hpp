@@ -32,6 +32,9 @@ public:
     ~RaceResultsGUI();
 
     void select();
+
+    void input(InputType type, int id0, int  id1, int id2, int value);
+    void inputKeyboard(int key, int pressed);
 };
 
 #endif
