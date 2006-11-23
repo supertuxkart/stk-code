@@ -43,17 +43,17 @@ SoundManager::SoundManager()
 #if USE_PLIB_SOUND
     plib_scheduler = new slScheduler;
 
-    if(plib_scheduler->working())
-        m_initialized = true;
-    else
+    if(plib_scheduler->notWorking())
     {
         fprintf(stderr, "WARNING: Could not initialize the PLIB based sound.\n");
 
         plib_scheduler->setSafetyMargin(0.25);
         m_initialized = false;
     }
+    else
+        m_initialized = true;
 #else
-    if(alutInit(0, NULL) == AL_TRUE)  // init openAL sound system
+    if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
         m_initialized = true;
     else
     {
