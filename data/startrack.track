@@ -6,6 +6,7 @@
  (description "Created by Ingo Ruhnke")
  (music "mods/tk5a.mod")
  (screenshot "images/sshot-startrack.rgb")
+ (topview "images/topview-startrack.rgb")
 )
 
 ;; EOF ;;

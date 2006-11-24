@@ -90,6 +90,19 @@
 "sshot-tuxtrack.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
 "sshot-volcano.rgb"    N N     N      0.1     Y     N   1.0     N   N    N    Y
 "sshot-olivermath.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-lighthouse.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-littlevolcano.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-volcano.rgb"  N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-tuxtrack.rgb"  N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-subseatrack.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-sandtrack.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-gownsbow.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-geekopeak.rgb" N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-beach.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-bsodcastle.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-race.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-startrack.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
+"topview-olivermath.rgb"   N N     N      0.1     Y     N   1.0     N   N    N    Y
 "st_title_screen.rgb"  Y Y     N      1.0     N     N   1.0     N   N    N    Y
 
 # EOF #

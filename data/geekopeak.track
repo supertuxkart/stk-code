@@ -5,6 +5,7 @@
  (description "Created by Oliver & Steve Baker")
  (music "mods/tk2.mod")
  (screenshot "images/sshot-geekopeak.rgb")
+ (topview "images/topview-geekopeak.rgb")
 )
 
 ;; EOF ;;

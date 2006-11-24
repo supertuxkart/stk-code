@@ -17,6 +17,7 @@
 
  (music "mods/tk5a.mod")
  (screenshot "images/sshot-littlevolcano.rgb")
+ (topview "images/topview-littlevolcano.rgb")
 )
 
 ;; EOF ;;

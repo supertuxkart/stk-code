@@ -5,6 +5,7 @@
  (description "Created by Oliver & Steve Baker")
  (music "mods/tuxr.mod")
  (screenshot "images/sshot-bsodcastle.rgb")
+ (topview "images/topview-bsodcastle.rgb")
 )
 
 ;; EOF ;;

@@ -16,6 +16,7 @@
 
  (music "mods/tuxr.mod")
  (screenshot "images/sshot-subseatrack.rgb")
+ (topview "images/topview-subseatrack.rgb")
 )
 
 ;; EOF ;;
