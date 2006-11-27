@@ -26,10 +26,6 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
-dnl Check for SDL
-AC_CHECK_HEADER([SDL/SDL.h])
-AC_CHECK_LIB([SDL], [SDL_Init])
-
 # specify the plib location
 AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
 if test "x$with_plib" != "x" ; then
@@ -93,8 +89,30 @@ case "${host}" in
       AC_CHECK_HEADER(AL/alut.h, have_alut_hdr=yes)
 
       if test x$have_al_hdr = xyes -a x$have_alut_hdr = xyes; then
-         AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
+	AC_MSG_CHECKING([for alut version 1.0.0 or later ])
+	LIBS="$LIBS $openal_LIBS"
+	dnl check for right version of alut, must be at least 1.0
+	AC_TRY_RUN([
+#include <AL/alut.h>
+#define MIN_ALUT_VERSION 1
+
+int main() {
+  if(alutGetMajorVersion()<MIN_ALUT_VERSION) {
+   return -1;
+ }
+
+ return 0;
+}
+
+                   ],
+                   [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available]) ],
+                    AC_MSG_RESULT(too old alut version - using plib instead),
+                   [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available]) ]
+       )
+
+         
       fi
+   LIBS=$save_LIBS
    fi
 esac
 
