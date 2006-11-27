@@ -149,7 +149,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         pos++;
     }  // for i
 
-    loadPlayers ( ) ;
+
     m_number_collisions = new int[m_race_setup.getNumKarts()];
     for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
     preProcessObj ( m_scene ) ;
@@ -452,16 +452,6 @@ void World::updateRacePosition ( int k )
 
     m_kart [ k ] -> setPosition ( p ) ;
 }   // updateRacePosition
-
-//-----------------------------------------------------------------------------
-void World::loadPlayers()
-{
-    for ( Karts::size_type i = 0 ; i < m_kart.size() ; ++i )
-    {
-        m_kart[i]->load_data();
-    }
-
-}
 
 //-----------------------------------------------------------------------------
 void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )

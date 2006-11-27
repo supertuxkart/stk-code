@@ -140,28 +140,27 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ )
     m_wheel_front_r = NULL;
     m_wheel_rear_l  = NULL;
     m_wheel_rear_r  = NULL;
-#ifdef BULLET
-    createPhysics();
-#endif
+    loadData();
 }   // Kart
 
 // -----------------------------------------------------------------------------v
 #ifdef BULLET
-void Kart::createPhysics()
+void Kart::createPhysics(ssgEntity *obj)
 {
     // First: Create the chassis of the kart
     // -------------------------------------
     // The size for bullet must be specified in half extends!
     //    ssgEntity *model = getModel();
     float x_min, x_max, y_min, y_max, z_min, z_max;
-    MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+    MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     float kart_width  = x_max-x_min;
     float kart_length = y_max-y_min;
 
     // The kart height is needed later to reset the physics to the correct
     // position.
     m_kart_height     = z_max-z_min;
-    printf("w %f l %f h %f\n",kart_width, kart_length, m_kart_height);
+    printf("%s: w %f l %f h %f\n",getName().c_str(),
+	   kart_width, kart_length, m_kart_height);
     btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*kart_width,
                                                               0.5*kart_length,
                                                               0.5*m_kart_height));
@@ -482,14 +481,14 @@ void Kart::draw()
     btDefaultMotionState *my_motion_state =
         (btDefaultMotionState*)m_kart_body->getMotionState();
     my_motion_state->m_graphicsWorldTrans.getOpenGLMatrix(m);
-    printf("mw= ");
-    for(int i=12; i<16; i++) printf(" %f",m[i]);
+    //    printf("mw= ");
+    //    for(int i=12; i<16; i++) printf(" %f",m[i]);
     btTransform t;
     my_motion_state->getWorldTransform(t);
     btQuaternion q= t.getRotation();
-    printf(" q %f %f %f %f\n",
-           q.x(),q.y(), q.z(),q.getAngle());
-    printf("\n");
+    //    printf(" q %f %f %f %f\n",
+    //           q.x(),q.y(), q.z(),q.getAngle());
+    //    printf("\n");
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
     world->getPhysics()->debugDraw(m, m_kart_body->getCollisionShape(), 
@@ -521,7 +520,7 @@ void Kart::updatePhysics (float dt)
     }
     else
     {   // not breaking
-        printf("Applying %f ",getMaxPower());
+      //        printf("Applying %f ",getMaxPower());
         m_vehicle->applyEngineForce(getMaxPower(), 2);
         m_vehicle->applyEngineForce(getMaxPower(), 3);
     }
@@ -530,7 +529,7 @@ void Kart::updatePhysics (float dt)
         // no jumping yet
     }
     const float steering = -getMaxSteerAngle() * m_controls.lr*0.00444;
-    printf("steering %f\n",steering);
+    //    printf("steering %f\n",steering);
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
     
@@ -933,7 +932,7 @@ void Kart::load_wheels(ssgBranch* branch)
 }   // load_wheels
 
 //-----------------------------------------------------------------------------
-void Kart::load_data()
+void Kart::loadData()
 {
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
@@ -952,6 +951,9 @@ void Kart::load_data()
     m_smokepuff -> setShininess      (  0 ) ;
 
     ssgEntity *obj = m_kart_properties->getModel();
+#ifdef BULLET
+    createPhysics(obj);
+#endif
 
     load_wheels(dynamic_cast<ssgBranch*>(obj));
 
@@ -984,7 +986,7 @@ void Kart::load_data()
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();
     m_model->addKid ( m_shadow );
-}   // load_data
+}   // loadData
 
 //-----------------------------------------------------------------------------
 void Kart::placeModel ()

@@ -111,7 +111,7 @@ public:
     Kart(const KartProperties* kartProperties_, int position_);
     virtual ~Kart();
 
-    void load_data();
+    void loadData();
 
     virtual void placeModel ();
     const KartProperties* getKartProperties() const
@@ -188,16 +188,16 @@ public:
                m_kart_properties->getMaxSteerAngle();
     }
     float          getAirResistance () const;
-    float          getSteerPercent  () const {return m_controls.lr;              }
-    float          getMaxSpeed      () const {return m_max_speed;                 }
-    void           setTimeAtLap     (float t){m_time_at_last_lap=t;                 }
-    float          getTimeAtLap     () const {return m_time_at_last_lap;            }
+    float          getSteerPercent  () const {return m_controls.lr;            }
+    float          getMaxSpeed      () const {return m_max_speed;              }
+    void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
+    float          getTimeAtLap     () const {return m_time_at_last_lap;       }
 #ifdef BULLET
-    void              createPhysics();
-    btRaycastVehicle *getVehicle  () const {return m_vehicle;                }
-    btRigidBody      *getKartBody () const {return m_kart_body;              }
+    void              createPhysics (ssgEntity *obj);
+    btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
+    btRigidBody      *getKartBody   () const {return m_kart_body;              }
     void              updateBulletPhysics(float dt);
-    void              draw        ();
+    void              draw          ();
 #endif
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }

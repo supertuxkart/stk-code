@@ -112,7 +112,6 @@ public:
 private:
     void updateRacePosition( int k );
     void loadTrack();
-    void loadPlayers();
     void herring_command(sgVec3* loc, char htype, int bNeedHeight);
     void checkRaceStatus();
 };
