@@ -37,7 +37,7 @@ fi
 # Check for MS Windows environment
 AC_CHECK_HEADER(windows.h)
 
-
+SUMMARY="\nSummary of optional components:\n==============================="
 dnl check for OpenGL related libraries
 case "${host}" in
 *darwin*|*macosx*)
@@ -70,63 +70,70 @@ case "${host}" in
    fi
 esac
 
-dnl check for OpenAL (al and alut) libraries
+dnl check for OpenAL (al and alut) libraries\
+dnl as well as mikmod, since mikmod is only used (but then
+dnl it's necessary) when openal is used.
 case "${host}" in
 *)
    dnl default unix style machines
 
    dnl check for libraries
    save_LIBS=$LIBS
-   AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)
-   AC_SEARCH_LIBS(alutInit, alut, have_alut_lib=yes)
-   openal_LIBS="$LIBS"
-   LIBS=$save_LIBS
-
-   if test x$have_al_lib = xyes -a x$have_alut_lib = xyes; then
-
-      dnl check for header files
-      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
-      AC_CHECK_HEADER(AL/alut.h, have_alut_hdr=yes)
-
-      if test x$have_al_hdr = xyes -a x$have_alut_hdr = xyes; then
-	AC_MSG_CHECKING([for alut version 1.0.0 or later ])
-	LIBS="$LIBS $openal_LIBS"
-	dnl check for right version of alut, must be at least 1.0
-	AC_TRY_RUN([
-#include <AL/alut.h>
-#define MIN_ALUT_VERSION 1
-
-int main() {
-  if(alutGetMajorVersion()<MIN_ALUT_VERSION) {
-   return -1;
- }
-
- return 0;
-}
-
-                   ],
-                   [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available]) ],
-                    AC_MSG_RESULT(too old alut version - using plib instead),
-                   [AC_MSG_RESULT(yes); AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available]) ]
-       )
-
-         
-      fi
-   LIBS=$save_LIBS
-   fi
-esac
-
-dnl check for MikMod libraries
-case "${host}" in
-*)
-   dnl default unix style machines
-
    AC_CHECK_HEADER(mikmod.h, have_mikmod_hdr=yes)
    AC_CHECK_LIB(mikmod, MikMod_RegisterDriver, have_mikmod_lib=yes)
-   if test x$have_mikmod_hdr = xyes -a x$have_mikmod_lib = xyes; then
-      AC_DEFINE(HAVE_MIKMOD, 1, [Defined when MikMod is available])
-      mikmod_LIBS="-lmikmod"
-   fi
+   if test x$have_mikmod_hdr = xyes -a  x$have_mikmod_lib = xyes; then
+      AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)
+      AC_SEARCH_LIBS(alutInit, alut, have_alut_lib=yes)
+      openal_LIBS="$LIBS -lmikmod"
+      LIBS=$save_LIBS
+
+      if test x$have_al_lib = xyes -a x$have_alut_lib = xyes; then
+
+         dnl check for header files
+         AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
+         AC_CHECK_HEADER(AL/alut.h, have_alut_hdr=yes)
+
+         if test x$have_al_hdr = xyes -a x$have_alut_hdr = xyes; then
+            AC_MSG_CHECKING([for alut version 1.0.0 or later ])
+	    LIBS="$LIBS $openal_LIBS"
+   	    dnl check for right version of alut, must be at least 1.0
+	    AC_TRY_RUN([
+#             include <AL/alut.h>
+#             define MIN_ALUT_VERSION 1
+              int main()  {
+                if(alutGetMajorVersion()<MIN_ALUT_VERSION) return -1;
+                return 0; }
+
+                       ],
+                       [ AC_MSG_RESULT(yes) 
+			 AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
+                         AC_DEFINE([HAVE_MIKMOD], 1, [Defined when MikMod is available]) 
+		         SUMMARY="$SUMMARY\nUsing OpenAL for sound."
+                       ],
+                       AC_MSG_RESULT(too old alut version - using plib instead),	
+                       [ AC_MSG_RESULT(yes) 
+	                 AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
+                         AC_DEFINE([HAVE_MIKMOD], 1, [Defined when MikMod is available]) 
+		         SUMMARY="$SUMMARY\nUsing OpenAL for sound."
+	               ]
+            )
+
+         else
+           SUMMARY="$SUMMARY\nNo OpenAL or freealut header found, using plib for sound."
+           SUMMARY="$SUMMARY\n   --> Install the corresponding development packages."
+         fi
+         dnl if have_al_hdr -a have_alut_hdr
+      else
+         SUMMARY="$SUMMARY\nNo OpenAL or freealut libraries found, using plib for sound."
+         SUMMARY="$SUMMARY\n   --> Please install the OpenAL and freealut development packages."
+      fi 
+      dnl if have_al_lib -a have_alut_lib
+      LIBS=$save_LIBS
+   else
+     SUMMARY="$SUMMARY\nNo mikmod found, which disables OpenAL as well. PLIb is used for sound."
+     SUMMARY="$SUMMARY\n   --> Please install mikmod if you want to use OpenAL."
+   fi 
+   dnl if have_mikmod_hdr -a have_mikmod_lib
 esac
 
 dnl check for SDL libraries
@@ -235,3 +242,4 @@ AC_CONFIG_FILES([      \
  models/herrings/Makefile
 ])
 AC_OUTPUT
+echo -e $SUMMARY
