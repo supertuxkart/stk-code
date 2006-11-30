@@ -209,13 +209,112 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
     }
 
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
+
+    glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT );
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable (GL_TEXTURE_2D);
+
+    glColor4f ( 1, 1, 1, 0.5) ;
+
+    glBegin ( GL_QUAD_STRIP ) ;
+
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+      glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
+          y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy) ;
+
+      glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
+          y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+    }
+    glVertex2f ( x + ( m_left_driveline[0][0] - m_driveline_min[0] ) * sx,
+        y + ( m_left_driveline[0][1] - m_driveline_min[1] ) * sy) ;
+    glVertex2f ( x + ( m_right_driveline[0][0] - m_driveline_min[0] ) * sx,
+        y + ( m_right_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+
+    glEnd () ;
+
+    glEnable( GL_LINE_SMOOTH );
+    glEnable( GL_POINT_SMOOTH );
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
+    glLineWidth(1);
+    glPointSize(1);
+
+    glColor4f ( 0, 0, 0, 1 ) ;
+
+    glBegin ( GL_LINES ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE - 1 ; ++i )
+    {
+        /*Draw left driveline of the map*/
+        glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
+            y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+
+        glVertex2f ( x + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * sx,
+            y + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * sy ) ;
+
+
+        /*Draw left driveline of the map*/
+        glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
+	        y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+
+        glVertex2f ( x + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * sx,
+	        y + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * sy ) ;
+    }
+
+    //Close the left driveline
+    glVertex2f ( x + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * sx,
+        y + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * sy ) ;
+
+    glVertex2f ( x + ( m_left_driveline[0][0] - m_driveline_min[0] ) * sx,
+        y + ( m_left_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+
+
+    //Close the right driveline
+    glVertex2f ( x + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * sx,
+        y + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * sy ) ;
+
+    glVertex2f ( x + ( m_right_driveline[0][0] - m_driveline_min[0] ) * sx,
+        y + ( m_right_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+    glEnd () ;
+
+#if 0
+  //FIXME: We are not sure if it's a videocard problem, but on Linux with a
+  //Nvidia Geforce4 mx 440, we get problems with GL_LINE_LOOP;
+  //If this issue is solved, using GL_LINE_LOOP is a better solution than
+  //GL_LINES
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x + ( m_driveline[i][0] - m_driveline_min[0] ) * sx,
-                     y + ( m_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
+            y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
     }
     glEnd () ;
+
+    glBegin ( GL_LINE_LOOP ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
+	        y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+    }
+    glEnd () ;
+#endif
+
+
+    glBegin ( GL_POINTS ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+      glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
+          y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+
+      glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
+          y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+    }
+    glEnd () ;
+
+    glPopAttrib();
 
 }   // drawScaled2D
 
@@ -224,13 +323,123 @@ void Track::draw2Dview (float xOff, float yOff) const
 {
 
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
+
+    glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT );
+
+    glEnable ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable (GL_TEXTURE_2D);
+
+    //TODO: maybe colors should be configurable, or at least the alpha value
+    glColor4f ( 1,1,1, 0.4) ;
+
+
+/*FIXME: Too much calculations here, we should be generating scaled driveline arrays
+ * in Track::loadDriveline so all we'd be doing is pumping out predefined
+ * vertexes in-game.
+ */
+    /*Draw white filling of the map*/
+    glBegin ( GL_QUAD_STRIP ) ;
+
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i ) {
+      glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+          yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y) ;
+      glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+          yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    }
+    glVertex2f ( xOff + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( xOff + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+    glEnd () ;
+
+
+    glEnable( GL_LINE_SMOOTH );
+    glEnable( GL_POINT_SMOOTH );
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
+    glLineWidth(2);
+    glPointSize(2);
+
+    glColor4f ( 0,0,0,1) ;
+
+
+    glBegin ( GL_LINES ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE - 1 ; ++i )
+    {
+        /*Draw left driveline of the map*/
+        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+        glVertex2f ( xOff + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
+            yOff + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+
+        /*Draw left driveline of the map*/
+        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	        yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+        glVertex2f ( xOff + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
+	        yOff + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    }
+
+    //Close the left driveline
+    glVertex2f ( xOff + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+    glVertex2f ( xOff + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+
+    //Close the right driveline
+    glVertex2f ( xOff + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+    glVertex2f ( xOff + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        yOff + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glEnd () ;
+
+#if 0
+  //FIXME: We are not sure if it's a videocard problem, but on Linux with a
+  //Nvidia Geforce4 mx 440, we get problems with GL_LINE_LOOP;
+  //If this issue is solved, using GL_LINE_LOOP is a better solution than
+  //GL_LINES
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( xOff + ( m_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-                     yOff + ( m_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
     glEnd () ;
+
+    glBegin ( GL_LINE_LOOP ) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	        yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    }
+    glEnd () ;
+#endif
+
+    /*Because of the way OpenGL draws lines of widths higher than 1,
+     *we have to draw the joints too, in order to fill small spaces
+     *between lines
+     */
+    glBegin ( GL_POINTS) ;
+    for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    {
+        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+
+        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	      yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    }
+    glEnd () ;
+
+    glPopAttrib();
+
 }   // draw2Dview
 
 //-----------------------------------------------------------------------------
@@ -294,19 +503,16 @@ void Track::loadTrack(std::string filename_)
 void
 Track::loadDriveline()
 {
-    std::vector<sgVec3Wrapper> left_driveline;
-    std::vector<sgVec3Wrapper> right_driveline;
+    readDrivelineFromFile(m_left_driveline, ".drvl");
 
-    readDrivelineFromFile(left_driveline, ".drvl");
+    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
+    m_right_driveline.reserve(DRIVELINE_SIZE);
+    readDrivelineFromFile(m_right_driveline, ".drvr");
 
-    const unsigned int DRIVELINE_SIZE = left_driveline.size();
-    right_driveline.reserve(DRIVELINE_SIZE);
-    readDrivelineFromFile(right_driveline, ".drvr");
-
-    if(right_driveline.size() != left_driveline.size())
+    if(m_right_driveline.size() != m_left_driveline.size())
         std::cout << "Error: driveline's sizes do not match, right " <<
-        "driveline is " << right_driveline.size() << " points long " <<
-        "and the left driveline is " << left_driveline.size()
+        "driveline is " << m_right_driveline.size() << " points long " <<
+        "and the left driveline is " << m_left_driveline.size()
         << " points long. Track is " << m_name << " ." << std::endl;
 
     SGfloat width;
@@ -316,11 +522,11 @@ Track::loadDriveline()
     m_angle.reserve(DRIVELINE_SIZE);
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
-        sgAddVec3(center_point, left_driveline[i], right_driveline[i]);
+        sgAddVec3(center_point, m_left_driveline[i], m_right_driveline[i]);
         sgScaleVec3(center_point, 0.5f);
         m_driveline.push_back(center_point);
 
-        sgSubVec3(width_vector, right_driveline[i], center_point);
+        sgSubVec3(width_vector, m_right_driveline[i], center_point);
         width = sgLengthVec3(width_vector);
         if(width > 0.0f) m_path_width.push_back(width);
         else m_path_width.push_back(-width);

@@ -88,10 +88,7 @@ void TrackSel::update(float dt)
     if(screenshot.size()==0 && topview.size()==0)
     {
         glDisable ( GL_TEXTURE_2D ) ;
-        glColor3f ( 0.0f, 0.0f, 0.0f ) ;
         TRACK->drawScaled2D(0.0, 50, config->m_width, config->m_height/3); // (x, y, w, h)
-        glColor3f ( 1.0f, 1.0f, 1.0f ) ;
-        TRACK->drawScaled2D(1.0, 51, config->m_width, config->m_height/3);
         glEnable ( GL_TEXTURE_2D ) ;
     }
     else
@@ -103,10 +100,7 @@ void TrackSel::update(float dt)
         if(topview.size()==0)
         {  // no topview, but there is a screenshot!
             glDisable ( GL_TEXTURE_2D ) ;
-            glColor3f ( 0.0f, 0.0f, 0.0f ) ;
             TRACK->drawScaled2D(xLeft, yBottom, w, h);
-            glColor3f ( 1.0f, 1.0f, 1.0f ) ;
-            TRACK->drawScaled2D(xLeft + 1, yBottom + 1, w, h);
             glEnable ( GL_TEXTURE_2D ) ;
         }
         else

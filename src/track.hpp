@@ -89,6 +89,11 @@ public:
     std::vector<SGfloat> m_path_width;
     std::vector<SGfloat> m_angle;
 
+	//Left and Right drivelines for overhead map rendering.
+	//(Should probably be private as they are only use internally right now)
+    std::vector<sgVec3Wrapper> m_left_driveline;
+    std::vector<sgVec3Wrapper> m_right_driveline;  
+
     sgVec2 m_driveline_min;
     sgVec2 m_driveline_max;
 

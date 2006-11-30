@@ -259,14 +259,11 @@ void RaceGUI::drawTimer ()
 void RaceGUI::drawMap ()
 {
     glDisable ( GL_TEXTURE_2D ) ;
-    glColor3f ( 0,0,1 ) ;
     assert(world != NULL);
     int xLeft = 10;
     int yTop   =  10;
 
     world -> m_track -> draw2Dview ( xLeft,   yTop   );
-    glColor3f ( 1,1,0 ) ;
-    world -> m_track -> draw2Dview ( xLeft+1, yTop+1 );
 
     glBegin ( GL_QUADS ) ;
 
