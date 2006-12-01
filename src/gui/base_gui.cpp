@@ -49,7 +49,13 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
                 select();
                 break;
             case 1:
-                menu_manager->popMenu();
+                if (menu_manager->getMenuStackSize() > 1)
+                {
+                    if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
+                        widgetSet->tgl_paused();
+
+                    menu_manager->popMenu();
+                }
                 break;
             }
         break;
