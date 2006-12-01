@@ -110,7 +110,8 @@ public:
     Track            (std::string filename,float w=100,
                       float h=100, bool stretch=1);
     ~Track            ();
-    void               draw2Dview       (float x, float y            ) const ;
+    void               draw2Dview       (float x_offset,
+                                         float y_offset              ) const ;
     void               drawScaled2D     (float x, float y, float w,
                                          float h                     ) const ;
     int                absSpatialToTrack(sgVec2 dst, sgVec3 xyz      ) const ;
@@ -140,12 +141,11 @@ public:
     const std::vector<sgVec3Wrapper>& getDriveline () const {return m_driveline;}
     const std::vector<SGfloat>& getWidth() const {return m_path_width;    }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
-    void               glVtx            (sgVec2 v, float xOff, float yOff) const
+    void               glVtx            (sgVec2 v, float x_offset, float y_offset) const
     {
-        //                                       yOff-=(driveline_max[1]-m_driveline_min[1])*scaleY;
         glVertex2f(
-            xOff+(v[0]-m_driveline_min[0])*m_scale_x,
-            yOff+(v[1]-m_driveline_min[1])*m_scale_y);
+            x_offset+(v[0]-m_driveline_min[0])*m_scale_x,
+            y_offset+(v[1]-m_driveline_min[1])*m_scale_y);
     }
 
 private:

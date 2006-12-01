@@ -319,7 +319,7 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
 }   // drawScaled2D
 
 //-----------------------------------------------------------------------------
-void Track::draw2Dview (float xOff, float yOff) const
+void Track::draw2Dview (float x_offset, float y_offset) const
 {
 
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
@@ -342,15 +342,15 @@ void Track::draw2Dview (float xOff, float yOff) const
     glBegin ( GL_QUAD_STRIP ) ;
 
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i ) {
-      glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-          yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y) ;
-      glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-          yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+      glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+          y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y) ;
+      glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+          y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
-    glVertex2f ( xOff + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
-    glVertex2f ( xOff + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
     glEnd () ;
 
@@ -370,35 +370,35 @@ void Track::draw2Dview (float xOff, float yOff) const
     for ( size_t i = 0 ; i < DRIVELINE_SIZE - 1 ; ++i )
     {
         /*Draw left driveline of the map*/
-        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
-        glVertex2f ( xOff + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
-            yOff + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
+            y_offset + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
 
         /*Draw left driveline of the map*/
-        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	        yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
-        glVertex2f ( xOff + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
-	        yOff + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
 
     //Close the left driveline
-    glVertex2f ( xOff + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
-    glVertex2f ( xOff + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
 
     //Close the right driveline
-    glVertex2f ( xOff + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
-    glVertex2f ( xOff + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        yOff + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
+        y_offset + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
     glEnd () ;
 
 #if 0
@@ -409,16 +409,16 @@ void Track::draw2Dview (float xOff, float yOff) const
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
     glEnd () ;
 
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	        yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
     glEnd () ;
 #endif
@@ -430,11 +430,11 @@ void Track::draw2Dview (float xOff, float yOff) const
     glBegin ( GL_POINTS) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( xOff + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            yOff + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
 
-        glVertex2f ( xOff + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	      yOff + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
+	      y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
     }
     glEnd () ;
 
