@@ -99,6 +99,7 @@ void RaceGUI::UpdateKeyboardMappings()
 
 }   // UpdateKeyControl
 
+//-----------------------------------------------------------------------------
 void RaceGUI::putEntry(PlayerKart *kart, KartActions kc)
 {
     Player *p = kart->getPlayer();
@@ -108,6 +109,7 @@ void RaceGUI::putEntry(PlayerKart *kart, KartActions kc)
     m_input_map[I->type][I->id0][I->id1][I->id2].action = kc;
 }
 
+//-----------------------------------------------------------------------------
 bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
 {
     PlayerKart *k = m_input_map[type][id0][id1][id2].kart;
@@ -128,6 +130,7 @@ void RaceGUI::update(float dt)
     drawStatusText(world->m_race_setup, dt);
 }   // update
 
+//-----------------------------------------------------------------------------
 void RaceGUI::input(InputType type, int id0, int id1, int id2, int value)
 {
     switch (type)
