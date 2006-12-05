@@ -1,0 +1,29 @@
+Preliminary support for the bullet physics engine has been
+added. To enable it (assume that 'STK' is the supertuxkart root
+directory):
+1) install a recent version of bullet in STK/bullet
+2) compile bullet (follow the instructions in STK/bullet/INSTALL)
+3) Run configure with:
+   ./configure --enable-bullet
+4) make
+
+For now mainly the race track works as expected, most tracks
+can be played (though the performance in some tracks is somewhat
+bad at the moment). Most important bugs:
+- rescue mode does not work
+- if a kart ends upside down, it will be rescued, but ... see
+  previous point :)
+- attachments don't work
+- collectable don't work
+  (well, you can fire a rocket, but hitting a kart won't do
+  much)
+- the speed display is wrong (displaying reverse when the
+  kart is actually going forward)
+- mathclass and tuxtrack can not be played
+  (appears to be a bug in converting the track to bullet -
+  ending up with a solid wall in front of the karts)
+- no proper friction handling, so no skidding
+  (though skidding potentially works - if the friction is
+  set correctly).
+- physics parameters are not tuned
+

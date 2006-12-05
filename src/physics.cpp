@@ -27,7 +27,13 @@
 /** Initialise physics. */
 Physics::Physics(float gravity)
 {
-    m_dynamics_world = new btDiscreteDynamicsWorld();
+    btCollisionDispatcher *dispatcher = new btCollisionDispatcher();
+    btVector3 worldMin(-1000, -1000, -1000);
+    btVector3 worldMax( 1000,  1000,  1000);
+    btOverlappingPairCache *pairCache = new btAxisSweep3(worldMin, worldMax);
+    btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
+    m_dynamics_world = new btDiscreteDynamicsWorld(dispatcher, pairCache, 
+                                                   constraintSolver);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
     m_debug_drawer=new GLDebugDrawer();
     m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
@@ -44,7 +50,7 @@ Physics::~Physics()
 //* Convert the ssg track tree into its physics equivalents.
 void Physics::setTrack(ssgEntity* track)
 {
-    //return;               // debug only FIXME
+  //return;               // debug only FIXME
     if(!track) return;
     sgMat4 mat;
     sgMakeIdentMat4(mat);
@@ -129,8 +135,6 @@ void Physics::update(float dt)
 //* 
 void Physics::draw()
 {
-    GL_ShapeDrawer::drawCoordSystem();
-                               
     int num_objects = m_dynamics_world->getNumCollisionObjects();
     for(int i=0; i<num_objects; i++)
     {
@@ -153,7 +157,7 @@ void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
     
 {
     GL_ShapeDrawer::drawOpenGL(m, s, color, 0);
-                               //                               btIDebugDraw::DBG_DrawWireframe);
+    //                               btIDebugDraw::DBG_DrawWireframe);
     //                               btIDebugDraw::DBG_DrawAabb);
 
 }   // debugDraw

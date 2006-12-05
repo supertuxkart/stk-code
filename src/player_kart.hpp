@@ -40,9 +40,10 @@ private:
     void smoothSteer(float dt, bool left, bool right);
 public:
     PlayerKart(const KartProperties *kart_properties,
-               int position, Player *_player) :
-            Kart(kart_properties, position), m_player(_player),
-    m_penalty_time(0.0)         {    }
+               int position, Player *_player,
+               sgCoord init_pos) :
+        Kart(kart_properties, position, init_pos), m_player(_player),
+        m_penalty_time(0.0)         {reset(); }
 
     int     earlyStartPenalty () {return m_penalty_time>0; }
     Player* getPlayer         () {return m_player;        }

@@ -161,6 +161,7 @@ void Moveable::update (float dt)
     m_first_time = false ;
 }   // update
 
+//-----------------------------------------------------------------------------
 /**
  * Computes the new position and hpr of the kart after a single time step.
  */

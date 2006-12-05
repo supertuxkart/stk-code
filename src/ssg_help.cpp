@@ -24,6 +24,7 @@
 #include "ssg_help.hpp"
 
 
+// -----------------------------------------------------------------------------
 /** Make VtTables use display lists.
  *
  *  Calls recursively 'makeDList' in all ssgVtxTable of the entity.
@@ -51,6 +52,7 @@ void createDisplayLists(ssgEntity* entity)
 
 }  // createDisplayLists
 
+// -----------------------------------------------------------------------------
 /** Adds a transform node to the branch.
  *
  *  Creates a new ssgTransform node to which all children of the branch are
@@ -79,6 +81,7 @@ ssgTransform* add_transform(ssgBranch* branch)
     return transform;
 }   // add_transform
 
+// -----------------------------------------------------------------------------
 /** Recursively prints a model.
  *
  * Recursively prints a model. That function can most likely be removed, the
@@ -115,6 +118,7 @@ void print_model(ssgEntity* entity, const int indent, const int maxLevel)
     }   // if entity
 }   // print_model
 
+// -----------------------------------------------------------------------------
 /** Computes the minimum and maximum x/y coordinates for a ssgEntity.
  *
  *  Recursively computes the minimum x and y coordinates of a ssgEntity.
@@ -133,6 +137,8 @@ void MinMax(ssgEntity* p, float *x_min, float *x_max,
 {
     sgMat4 mat;
     sgMakeIdentMat4(mat);
+    *x_min = *y_min =  10000.0f; if(z_min) *z_min =  10000.0f;
+    *x_max = *y_max = -10000.0f; if(z_max) *z_max = -10000.0f;
     MinMax(p, mat, x_min, x_max, y_min, y_max, z_min, z_max);
 
 }   // MinMax
@@ -205,5 +211,7 @@ void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max,
         p->print(stdout, 0, 0);
     }
 }   // MinMax
+
+// -----------------------------------------------------------------------------
 
 /* EOF */

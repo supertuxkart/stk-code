@@ -29,7 +29,7 @@
 #include "attachment.hpp"
 #include "collectable.hpp"
 #ifdef BULLET
-#include "bullet/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 #endif
 
 class SkidMark;
@@ -108,7 +108,7 @@ protected:
     void  load_wheels          (ssgBranch* obj);
 
 public:
-    Kart(const KartProperties* kartProperties_, int position_);
+    Kart(const KartProperties* kartProperties_, int position_, sgCoord init_pos);
     virtual ~Kart();
 
     void loadData();
@@ -164,8 +164,7 @@ public:
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
     float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
-    float          getWheelRadius   () const {return 0.5f;}
-    float          getWheelWidth    () const {return 0.5f;}
+    float          getWheelRadius   () const {return 0.25f;}
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
     float          getTireGrip      () const {return m_kart_properties->getTireGrip();}
     float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
@@ -215,8 +214,9 @@ public:
 class TrafficDriver : public Kart
 {
 public:
-    TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos )
-            : Kart (kartProperties_, 0 )
+    TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos,
+                   sgCoord init_pos)
+        : Kart (kartProperties_, 0, init_pos )
     {
         sgCopyVec3 ( m_reset_pos.xyz, _pos ) ;
         reset () ;

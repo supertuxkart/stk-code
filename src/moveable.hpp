@@ -65,7 +65,6 @@ public:
     Moveable (bool bHasHistory=false);
     virtual ~Moveable();
 
-    void          setReset     (sgCoord* pos)  {sgCopyCoord( &m_reset_pos, pos ); }
     ssgTransform* getModel     ()              {return m_model ;                  }
     int           isOnGround   ()              {return m_on_ground;               }
     sgCoord*      getVelocity  ()              {return & m_velocity;              }

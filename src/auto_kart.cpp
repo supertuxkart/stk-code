@@ -42,8 +42,9 @@
 #include "world.hpp"
 #include "auto_kart.hpp"
 
-AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
-        Kart(kart_properties, position)
+AutoKart::AutoKart(const KartProperties *kart_properties, int position,
+                   sgCoord init_pos) :
+    Kart(kart_properties, position, init_pos)
 {
     m_time_since_last_shot = 0.0f;
     m_future_hint = 0;
@@ -54,6 +55,7 @@ AutoKart::AutoKart(const KartProperties *kart_properties, int position) :
     start_kart_crash_direction = 0;
 
     m_crash_perc = 0.0;
+    reset();
 }
 
 //-----------------------------------------------------------------------------

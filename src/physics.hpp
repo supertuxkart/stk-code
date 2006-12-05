@@ -24,7 +24,7 @@
 #include <plib/sg.h>
 
 #ifdef BULLET
-#include "bullet/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 #include "../bullet/Demos/OpenGL/GLDebugDrawer.h"
 class Physics
 {

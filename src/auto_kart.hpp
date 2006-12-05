@@ -84,10 +84,11 @@ private:
 #endif
 
 public:
-    AutoKart(const KartProperties *kart_properties, int position);
+    AutoKart(const KartProperties *kart_properties, int position,
+             sgCoord init_pos);
 
     void update      (float delta) ;
-    void reset       ();
+    virtual void reset       ();
     int  isPlayerKart() const {return 0;}
 };
 

@@ -103,33 +103,8 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     for (RaceSetup::Karts::iterator i = m_race_setup.m_karts.begin() ;
          i != m_race_setup.m_karts.end() ; ++i )
     {
-        Kart* newkart;
-        if(config->m_profile)
-        {
-            // In profile mode, load only the old kart
-            newkart = new AutoKart (kart_properties_manager->getKart("tuxkart"), pos);
-        }
-        else
-        {
-            if (std::find(m_race_setup.m_players.begin(),
-                          m_race_setup.m_players.end(), pos) != m_race_setup.m_players.end())
-            {
-                // the given position belongs to a player
-                newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
-                                          &(config->m_player[playerIndex++]));
-            }
-            else
-            {
-                newkart = new AutoKart   (kart_properties_manager->getKart(*i), pos);
-            }
-        }   // if !config->m_profile
-        if(config->m_replay_history)
-        {
-            history->LoadKartData(newkart, pos);
-        }
+        // First determine the x/y/z position for the kart
         sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
-
-
         //float hot=0.0;
         // Bug fix/workaround: sometimes the first kart would be too close
         // to the first driveline point and not to the last one -->
@@ -138,10 +113,39 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         // is a somewhat arbitrary value.
         init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
         init_pos.xyz[1] = -pos * 1.5f -1.5f;
-        const float HOT = newkart->getIsectData ( init_pos.xyz, init_pos.xyz ) ;
-        init_pos.xyz[2] = HOT;
-        newkart -> setReset ( & init_pos ) ;
-        newkart -> reset    () ;
+        init_pos.xyz[2] = 100.0f;  // height must be and larger than the actual hight
+                                   // for which hot is computed.
+        ssgLeaf *leaf;
+        sgVec4* normal;
+        const float hot = GetHOT(init_pos.xyz, init_pos.xyz, &leaf, &normal);
+        init_pos.xyz[2] = hot;
+        Kart* newkart;
+        if(config->m_profile)
+        {
+            // In profile mode, load only the old kart
+            newkart = new AutoKart (kart_properties_manager->getKart("tuxkart"), pos,
+                                    init_pos);
+        }
+        else
+        {
+            if (std::find(m_race_setup.m_players.begin(),
+                          m_race_setup.m_players.end(), pos) != m_race_setup.m_players.end())
+            {
+                // the given position belongs to a player
+                newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
+                                          &(config->m_player[playerIndex++]),
+                                          init_pos);
+            }
+            else
+            {
+                newkart = new AutoKart   (kart_properties_manager->getKart(*i), pos,
+                                          init_pos);
+            }
+        }   // if !config->m_profile
+        if(config->m_replay_history)
+        {
+            history->LoadKartData(newkart, pos);
+        }
         newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
         m_scene -> addKid ( newkart -> getModel() ) ;
@@ -210,10 +214,11 @@ void World::draw()
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , m_track->getDiffuseCol() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, m_track->getSpecularCol() ) ;
 
-#ifndef BULLET
-    ssgCullAndDraw ( world->m_scene ) ;
-#endif
+    //#ifndef BULLET
+        ssgCullAndDraw ( world->m_scene ) ;
+    //#endif
 #ifdef BULLET
+        return;
     // Use bullets debug drawer
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -248,8 +253,10 @@ void World::draw()
     float f=2.0f;
     glFrustum(-f, f, -f, f, 1.0, 1000.0);
     
-    gluLookAt(-5, -5.0f,  5.0f, 
-              0.0f, 0.0f, 0.0f, 
+    btVector3 pos;
+    sgCoord *c = getKart(getNumKarts()-1)->getCoord();
+    gluLookAt(c->xyz[0], c->xyz[1]-5.f, c->xyz[2]+4,
+              c->xyz[0], c->xyz[1],     c->xyz[2],
               0.0f, 0.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 
@@ -304,11 +311,11 @@ void World::update(float delta)
         // and makes writing easier, since we had to write delta the first
         // time, and then inc from then on.
         if(!config->m_replay_history) history->StoreDelta(delta);
+        m_physics->update(inc);
         for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
         {
             m_kart[i]->update(inc) ;
         }
-        m_physics->update(inc);
     }   // while dt>0
 
     projectile_manager->update(delta);
