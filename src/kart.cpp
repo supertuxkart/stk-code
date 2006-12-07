@@ -175,23 +175,13 @@ void Kart::createPhysics(ssgEntity *obj)
     // Position the chassis
     // --------------------
     btTransform trans;
-    sgCoord pos;
-    sgCopyCoord(&pos, &m_reset_pos);
-    pos.xyz[2]+=0.5*m_kart_height;
     trans.setIdentity();
-    //trans.setOrigin(btVector3(pos.xyz[0], pos.xyz[1], pos.xyz[2]));
     btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
 
     // Then create a rigid body
     // ------------------------
     m_kart_body = new btRigidBody(mass, myMotionState, 
                                   kart_chassis, inertia);
-    trans.setIdentity();
-    //sgCoord pos;
-    sgCopyCoord(&pos, &m_reset_pos);
-    pos.xyz[2]+=0.5*m_kart_height;
-    trans.setOrigin(btVector3(pos.xyz[0], pos.xyz[1], pos.xyz[2]));
-    m_kart_body->setCenterOfMassTransform(trans);
     m_kart_body->setDamping(0.2, 0.2);
 
     // Reset velocities
@@ -286,6 +276,17 @@ Kart::~Kart()
     if(m_skidmark_right) delete m_skidmark_right;
 }   // ~Kart
 
+//-----------------------------------------------------------------------------
+/** Returns true if the kart is 'resting'
+ *
+ * Returns true if the kart is 'resting', i.e. (nearly) not moving.
+ */
+#ifdef BULLET
+bool Kart::isInRest()
+{
+    return fabs(m_kart_body->getLinearVelocity ().z())<0.2;
+}  // isInRest
+#endif
 //-----------------------------------------------------------------------------
 void Kart::reset()
 {

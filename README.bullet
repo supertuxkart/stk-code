@@ -19,9 +19,6 @@ bad at the moment). Most important bugs:
   much)
 - the speed display is wrong (displaying reverse when the
   kart is actually going forward)
-- mathclass and tuxtrack can not be played
-  (appears to be a bug in converting the track to bullet -
-  ending up with a solid wall in front of the karts)
 - no proper friction handling, so no skidding
   (though skidding potentially works - if the friction is
   set correctly).

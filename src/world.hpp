@@ -114,6 +114,7 @@ private:
     void loadTrack();
     void herring_command(sgVec3* loc, char htype, int bNeedHeight);
     void checkRaceStatus();
+    void resetAllKarts();
 };
 
 extern World* world;

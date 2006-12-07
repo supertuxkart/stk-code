@@ -197,6 +197,7 @@ public:
     btRigidBody      *getKartBody   () const {return m_kart_body;              }
     void              updateBulletPhysics(float dt);
     void              draw          ();
+    bool              isInRest      ();
 #endif
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }

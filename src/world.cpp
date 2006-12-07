@@ -113,12 +113,13 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         // is a somewhat arbitrary value.
         init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
         init_pos.xyz[1] = -pos * 1.5f -1.5f;
-        init_pos.xyz[2] = 100.0f;  // height must be and larger than the actual hight
-                                   // for which hot is computed.
+        init_pos.xyz[2] = 1.0f;    // height must be and larger than the actual
+                                   // hight for which hot is computed.
         ssgLeaf *leaf;
         sgVec4* normal;
         const float hot = GetHOT(init_pos.xyz, init_pos.xyz, &leaf, &normal);
         init_pos.xyz[2] = hot;
+
         Kart* newkart;
         if(config->m_profile)
         {
@@ -153,7 +154,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         pos++;
     }  // for i
 
-
+    resetAllKarts();
     m_number_collisions = new int[m_race_setup.getNumKarts()];
     for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
     preProcessObj ( m_scene ) ;
@@ -206,6 +207,33 @@ World::~World()
 }
 
 //-----------------------------------------------------------------------------
+/** Waits till each kart is resting on the ground
+ *
+ * Does simulation steps still all karts reach the ground, i.e. are not
+ * moving anymore
+ */
+void World::resetAllKarts()
+{
+#ifdef BULLET
+    bool all_finished=false;
+    for(int i=0; i<10; i++) m_physics->update(1./60.);
+    while(!all_finished)
+    {
+        m_physics->update(1./60.);
+        all_finished=true;
+        for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+        {
+            if(!(*i)->isInRest()) 
+            {
+                all_finished=false;
+                break;
+            }
+        }
+    }   // while
+#endif
+}   // resetAllKarts
+
+//-----------------------------------------------------------------------------
 void World::draw()
 {
 
@@ -215,10 +243,10 @@ void World::draw()
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, m_track->getSpecularCol() ) ;
 
     //#ifndef BULLET
-        ssgCullAndDraw ( world->m_scene ) ;
+    ssgCullAndDraw ( world->m_scene ) ;
     //#endif
 #ifdef BULLET
-        return;
+    return;
     // Use bullets debug drawer
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -653,9 +681,6 @@ void World::loadTrack()
             trans       -> addKid    ( lod   ) ;
             m_track_branch -> addKid ( trans ) ;
             lod         -> setRanges ( r, 2  ) ;
-#ifdef BULLET
-            m_physics->setTrack(obj);
-#endif
 #ifdef DEBUG_SHOW_DRIVEPOINTS
             ssgaSphere *sphere;
             sgVec3 center;
@@ -693,6 +718,9 @@ void World::loadTrack()
     }   // while fgets
 
     fclose ( fd ) ;
+#ifdef BULLET
+            m_physics->setTrack(m_track_branch);
+#endif
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
@@ -706,6 +734,7 @@ void World::restartRace()
     {
         (*i)->reset();
     }
+    resetAllKarts();
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
