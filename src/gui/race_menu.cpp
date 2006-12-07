@@ -30,6 +30,7 @@
 enum WidgetTokens {
     WTOK_RETURN_RACE,
     WTOK_OPTIONS,
+    WTOK_HELP,
     WTOK_RESTART_RACE,
     WTOK_SETUP_NEW_RACE,
     WTOK_EXIT_RACE,
@@ -41,8 +42,9 @@ RaceMenu::RaceMenu()
     widgetSet -> label(m_menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE, 0);
-    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS, 0);
+    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE,  0);
+    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS,      0);
+    widgetSet -> state(VA, "Help",            GUI_MED, WTOK_HELP,         0);
     widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
@@ -72,7 +74,7 @@ void RaceMenu::update(float dt)
 void RaceMenu::select()
 {
     int clicked_token = widgetSet->token(widgetSet->click());
-    if(clicked_token != WTOK_OPTIONS)
+    if(clicked_token != WTOK_OPTIONS && clicked_token != WTOK_HELP)
         widgetSet -> tgl_paused();
 
     switch (clicked_token)
@@ -93,6 +95,10 @@ void RaceMenu::select()
 
     case WTOK_OPTIONS:
         menu_manager->pushMenu(MENUID_OPTIONS);
+        break;
+
+    case WTOK_HELP:
+        menu_manager->pushMenu(MENUID_HELP);
         break;
 
     case WTOK_EXIT_RACE:
