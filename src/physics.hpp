@@ -35,14 +35,15 @@ protected:
 
     void convertTrack(ssgEntity *track, sgMat4 m);
 public:
-         Physics  (float gravity);
-        ~Physics  ();
-    void addKart  (const Kart *k, btRaycastVehicle *v);
-    void update   (float dt);
-    void draw     ();
-    void setTrack (ssgEntity *track);
+         Physics     (float gravity);
+        ~Physics     ();
+    void addKart     (const Kart *k, btRaycastVehicle *v);
+    void removeKart  (const Kart *k, btRaycastVehicle *v);
+    void update      (float dt);
+    void draw        ();
+    void setTrack    (ssgEntity *track);
     btDynamicsWorld *getPhysicsWorld() const {return m_dynamics_world;}
-    void debugDraw(float m[16], btCollisionShape *s, const btVector3 color);
+    void debugDraw   (float m[16], btCollisionShape *s, const btVector3 color);
 };
 
 // For non-bullet version: empty object

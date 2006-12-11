@@ -745,9 +745,11 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
         widgetSet->drawDropShadowTextRace ( "!", (int)(60*minRatio), offset_x-(int)(30*minRatio), offset_y-(int)(10*minRatio));
 
     /* Show velocity */
+#ifndef BULLET
     if ( kart->getVelocity()->xyz[1] < 0 )
         widgetSet->drawDropShadowTextRace ( "REV", (int)(40*minRatio), offset_x+(int)(40*minRatio), offset_y+(int)(10*minRatio));
     else
+#endif
     {
         //if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() && kart->wheelie_angle == 0 )
         if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )

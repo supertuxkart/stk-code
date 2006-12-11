@@ -242,11 +242,10 @@ void World::draw()
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , m_track->getDiffuseCol() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, m_track->getSpecularCol() ) ;
 
-    //#ifndef BULLET
+#ifndef BULLETDEBUG
     ssgCullAndDraw ( world->m_scene ) ;
-    //#endif
-#ifdef BULLET
-    return;
+#else
+
     // Use bullets debug drawer
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };

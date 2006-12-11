@@ -71,7 +71,7 @@ void Attachment::hitGreenHerring()
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         // Reduce speed once (see description above), all other changes are
         // handled in Kart::updatePhysics
-        m_kart->getVelocity()->xyz[1] *= physicsParameters->m_anvil_speed_factor;
+        m_kart->adjustSpeedWeight(physicsParameters->m_anvil_speed_factor);
         break ;
     }   // switch rand()%2
 }   // hitGreenHerring
@@ -88,11 +88,8 @@ void Attachment::update(float dt, sgCoord *velocity)
     case ATTACH_ANVIL:      // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:       break;
-    case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->handleRescue();
-        sgZeroVec3 ( velocity->xyz ) ;
-        sgZeroVec3 ( velocity->hpr ) ;
-        velocity->xyz[2] = 1.1f * GRAVITY * dt *10.0f;
-        break;
+    case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->endRescue();
+                           break;
 #ifdef USE_MAGNET
     case ATTACH_MAGNET:    break;
     case ATTACH_MAGNET_BZZT: float cdist; int closest;
@@ -123,6 +120,17 @@ void Attachment::update(float dt, sgCoord *velocity)
 
     if ( m_time_left <= 0.0f)
     {
-        clear();
+        if(m_type==ATTACH_ANVIL) 
+        {
+            // Resets the weight, and multiplies the velocity by 1.0, 
+            // i.e. no change of velocity. But we have to clear the 
+            // object first (to remove the increased weihgt)
+            clear();
+            m_kart->adjustSpeedWeight(1.0f);
+        }
+        else
+        {
+            clear();
+        }
     }   // if m_time_left<0
 }   // update

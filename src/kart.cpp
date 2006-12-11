@@ -124,7 +124,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_finished_race         = false;
     m_finish_time           = 0.0f;
     m_prev_accel            = 0.0f;
-    m_power_sliding         = false;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -161,16 +160,16 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // The kart height is needed later to reset the physics to the correct
     // position.
-    m_kart_height     = z_max-z_min;
+    m_kart_height  = z_max-z_min;
 
-    btCollisionShape *kart_chassis = new btBoxShape(btVector3(0.5*kart_width,
-                                                              0.5*kart_length,
-                                                              0.5*m_kart_height));
+    m_kart_chassis = new btBoxShape(btVector3(0.5*kart_width,
+                                              0.5*kart_length,
+                                              0.5*m_kart_height));
     // Set mass and inertia
     // --------------------
     float mass=getMass();
     btVector3 inertia;
-    kart_chassis->calculateLocalInertia(mass, inertia);
+    m_kart_chassis->calculateLocalInertia(mass, inertia);
 
     // Position the chassis
     // --------------------
@@ -181,7 +180,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // Then create a rigid body
     // ------------------------
     m_kart_body = new btRigidBody(mass, myMotionState, 
-                                  kart_chassis, inertia);
+                                  m_kart_chassis, inertia);
     m_kart_body->setDamping(0.2, 0.2);
 
     // Reset velocities
@@ -244,7 +243,7 @@ void Kart::createPhysics(ssgEntity *obj)
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
-        wheel.m_suspensionStiffness      = 20.0f;
+        wheel.m_suspensionStiffness      = 15.0f;
         wheel.m_wheelsDampingRelaxation  = 2.3f;
         wheel.m_wheelsDampingCompression = 4.4f;
         wheel.m_frictionSlip             = 1e30f;
@@ -274,6 +273,11 @@ Kart::~Kart()
 
     if(m_skidmark_left ) delete m_skidmark_left ;
     if(m_skidmark_right) delete m_skidmark_right;
+
+#ifdef BULLET
+    delete m_kart_chassis;
+    delete m_kart_body;
+#endif
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -287,6 +291,24 @@ bool Kart::isInRest()
     return fabs(m_kart_body->getLinearVelocity ().z())<0.2;
 }  // isInRest
 #endif
+//-----------------------------------------------------------------------------
+/** Modifies the physics parameter to simulate an attached anvil.
+ *  The velocity is multiplicated by f, and the mass of the kart is increased.
+ */
+void Kart::adjustSpeedWeight(float f)
+{
+#ifdef BULLET
+    m_kart_body->setLinearVelocity(m_kart_body->getLinearVelocity()*f);
+    // getMass returns the mass increased by the attachment
+    btVector3 inertia;
+    float m=getMass();
+    m_kart_chassis->calculateLocalInertia(m, inertia);
+    m_kart_body->setMassProps(m, inertia);
+#else
+    getVelocity()->xyz[1] *= f;
+#endif
+}   // adjustSpeedWeight
+
 //-----------------------------------------------------------------------------
 void Kart::reset()
 {
@@ -459,11 +481,35 @@ void Kart::update (float dt)
 
     if ( m_rescue )
     {
+        const float rescue_time=2.0f;
         if(m_attachment.getType() != ATTACH_TINYTUX)
         {
             if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
-            m_attachment.set( ATTACH_TINYTUX, 2.0f ) ;
+            m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
+#ifdef BULLET
+            m_rescue_pitch = m_curr_pos.hpr[1];
+            m_rescue_roll  = m_curr_pos.hpr[2];
+            world->getPhysics()->removeKart(this, m_vehicle);
+#endif
         }
+#ifdef BULLET
+        // Let the kart raise 2m in the 2 seconds of the rescue
+        const float rescue_height=2.0f;
+        m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
+
+        btTransform pos=m_kart_body->getCenterOfMassTransform();
+        pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
+        btQuaternion q_roll (btVector3(0., 1., 0.),
+                             -m_rescue_roll*dt/rescue_time*M_PI/180.0);
+        btQuaternion q_pitch(btVector3(1., 0., 0.),
+                             -m_rescue_pitch*dt/rescue_time*M_PI/180.0);
+        pos.setRotation(pos.getRotation()*q_roll*q_pitch);
+        m_kart_body->setCenterOfMassTransform(pos);
+#else
+        sgZeroVec3 ( m_velocity.xyz ) ;
+        sgZeroVec3 ( m_velocity.hpr ) ;
+        m_velocity.xyz[2] = 1.1f * GRAVITY * dt *10.0f;
+#endif        
     }
     m_attachment.update(dt, &m_velocity);
 
@@ -526,15 +572,18 @@ void Kart::updatePhysics (float dt)
 {
 
 #ifdef BULLET
+    float engine_power = getMaxPower();
+    if(getAttachment()==ATTACH_PARACHUTE) engine_power*=0.2;
+
     if(m_controls.brake)
     {
-        m_vehicle->applyEngineForce(-m_controls.brake*getMaxPower(), 2);
-        m_vehicle->applyEngineForce(-m_controls.brake*getMaxPower(), 3);
+        m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
+        m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
     }
     else if(m_controls.accel)
     {   // not braking
-        m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 2);
-        m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 3);
+        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
+        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
     }
     if(m_controls.jump)
     { // ignore gravity down when jumping
@@ -779,13 +828,31 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const
 }   // NormalizedLateralForce
 
 //-----------------------------------------------------------------------------
-void Kart::handleRescue()
+/** Drops a kart which was rescued back on the track.
+ */
+void Kart::endRescue()
 {
     if ( m_track_hint > 0 ) m_track_hint-- ;
     world ->m_track -> trackToSpatial ( m_curr_pos.xyz, m_track_hint ) ;
     m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_hint] ;
     m_rescue = false ;
-}   // handleRescue
+#ifdef BULLET
+    world->getPhysics()->addKart(this, m_vehicle);
+    m_kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
+    m_kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+    // FIXME: This code positions the kart correctly back on the track
+    // (nearest waypoint) - but if the kart is simply upside down,
+    // it feels better if the kart is left where it was. Perhaps
+    // this code should only be used if a rescue was not triggered
+    // by the kart being upside down??
+    btTransform pos=m_kart_body->getCenterOfMassTransform();
+    pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
+                            m_curr_pos.xyz[2]+0.5*m_kart_height));
+    m_kart_body->setCenterOfMassTransform(pos);
+                  
+#endif
+
+}   // endRescue
 
 //-----------------------------------------------------------------------------
 float Kart::getAirResistance() const
@@ -793,6 +860,7 @@ float Kart::getAirResistance() const
     return (m_kart_properties->getAirResistance() +
             m_attachment.AirResistanceAdjust()    )
            * physicsParameters->m_air_res_reduce[world->m_race_setup.m_difficulty];
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1019,11 +1087,9 @@ void Kart::placeModel ()
     // We don't have to call Moveable::placeModel, since it does only setTransform
 
 #ifdef BULLET
+    const btTransform &t1= m_kart_body->getCenterOfMassTransform();
     float m[4][4];
-    btTransform t1;
-    m_kart_body->getMotionState()->getWorldTransform(t1);
-    // expects an array of float, not float[4][4] 
-    t1.getOpenGLMatrix((float*)&m);
+    t1.getOpenGLMatrix((float*)&m);  // expects float*, not float[4][4]
 
     // Transfer the new position and hpr to m_curr_pos
     sgSetCoord(&m_curr_pos, m);

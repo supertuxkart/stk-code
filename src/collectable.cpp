@@ -97,10 +97,8 @@ void Collectable::use()
             {
                 world->getKart(i)->
                 attach(ATTACH_ANVIL, 4.0f);
-
-                world->getKart(i)->getVelocity()->xyz[1] *=
-                    physicsParameters->m_anvil_speed_factor *
-                    0.5f;
+                
+                world->getKart(i)->adjustSpeedWeight(physicsParameters->m_anvil_speed_factor*0.5f);
 
                 if(world->getKart(i)->isPlayerKart())
                     sound_manager->playSfx(SOUND_USE_ANVIL);

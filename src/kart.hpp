@@ -59,7 +59,6 @@ protected:
 
     int          m_grid_position;
     int          m_race_position;
-    bool         m_power_sliding;
     KartControl  m_controls;           // The position of the karts controlls
     unsigned int m_track_hint;          // index in driveline
     float        m_zipper_time_left;
@@ -75,6 +74,7 @@ protected:
     btRaycastVehicle::btVehicleTuning  *m_tuning;
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
+    btBoxShape                         *m_kart_chassis;
     btRigidBody                        *m_kart_body;
     float                               m_kart_height;
 #endif
@@ -101,6 +101,9 @@ private:
     bool                m_finished_race;
 protected:
     int                 m_rescue;
+#ifdef BULLET
+    float               m_rescue_pitch, m_rescue_roll;
+#endif
     const KartProperties *m_kart_properties;
 
     /** Search the given branch of objects that match the wheel names
@@ -142,7 +145,7 @@ public:
     void           setFinishingState(float time);
     float          getFinishTime       () const  { return m_finish_time;         }
     bool           raceIsFinished      () const  { return m_finished_race;       }
-    void           handleRescue        ();
+    void           endRescue           ();
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           handleMagnet        (float cdist, int closest);
@@ -199,6 +202,7 @@ public:
     void              draw          ();
     bool              isInRest      ();
 #endif
+    void           adjustSpeedWeight(float f);
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
     virtual void   collectedHerring (Herring* herring);

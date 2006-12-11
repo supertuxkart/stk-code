@@ -35,9 +35,11 @@ Physics::Physics(float gravity)
     m_dynamics_world = new btDiscreteDynamicsWorld(dispatcher, pairCache, 
                                                    constraintSolver);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
+#ifdef BULLETDEBUG
     m_debug_drawer=new GLDebugDrawer();
     m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
+#endif
 }   // Physics
 
 //-----------------------------------------------------------------------------
@@ -124,6 +126,16 @@ void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
 }   // addKart
 
 //-----------------------------------------------------------------------------
+/** Removes a kart from the physics engine.
+ *  Removes a kart from the physics engine. This is used when rescuing a kart
+ */
+void Physics::removeKart(const Kart *kart, btRaycastVehicle *vehicle)
+{
+    m_dynamics_world->removeRigidBody(kart->getKartBody());
+    m_dynamics_world->removeVehicle(vehicle);
+}   // removeKart
+
+//-----------------------------------------------------------------------------
 void Physics::update(float dt)
 {
     m_dynamics_world->stepSimulation(dt);
@@ -135,6 +147,7 @@ void Physics::update(float dt)
 //* 
 void Physics::draw()
 {
+#ifdef BULLETDEBUG
     int num_objects = m_dynamics_world->getNumCollisionObjects();
     for(int i=0; i<num_objects; i++)
     {
@@ -149,7 +162,8 @@ void Physics::draw()
         myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
         debugDraw(m, obj->getCollisionShape(), wireColor);
 
-    }
+    }  // for i
+#endif
 }   // draw
 
 // -----------------------------------------------------------------------------
