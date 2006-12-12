@@ -99,6 +99,11 @@ private:
     float               m_time_at_last_lap;       // time at finishing last lap
     float               m_finish_time;
     bool                m_finished_race;
+
+#ifdef BULLET
+    float               m_linear_velocity;
+#endif
+
 protected:
     int                 m_rescue;
 #ifdef BULLET
@@ -201,6 +206,8 @@ public:
     void              updateBulletPhysics(float dt);
     void              draw          ();
     bool              isInRest      ();
+    //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
+    float             getLinearVelocity() const {return m_linear_velocity;     }
 #endif
     void           adjustSpeedWeight(float f);
     const std::string& getName      () const {return m_kart_properties->getName();}

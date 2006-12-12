@@ -181,7 +181,8 @@ void Kart::createPhysics(ssgEntity *obj)
     // ------------------------
     m_kart_body = new btRigidBody(mass, myMotionState, 
                                   m_kart_chassis, inertia);
-    m_kart_body->setDamping(0.2, 0.2);
+    m_kart_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
+			    m_kart_properties->getChassisAngularDamping() );
 
     // Reset velocities
     // ----------------
@@ -201,8 +202,8 @@ void Kart::createPhysics(ssgEntity *obj)
     
     // Add wheels
     // ----------
-    float wheel_width  = 0.3*kart_width;
-    float wheel_radius = getWheelRadius();
+    float wheel_width  = m_kart_properties->getWheelWidth();
+    float wheel_radius = m_kart_properties->getWheelRadius();
     float suspension_rest = 0;
     float connection_height = -0.5*m_kart_height;
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
@@ -243,11 +244,11 @@ void Kart::createPhysics(ssgEntity *obj)
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
-        wheel.m_suspensionStiffness      = 15.0f;
-        wheel.m_wheelsDampingRelaxation  = 2.3f;
-        wheel.m_wheelsDampingCompression = 4.4f;
-        wheel.m_frictionSlip             = 1e30f;
-        wheel.m_rollInfluence            = 0.1f;
+        wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
+        wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
+        wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
+        wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
+        wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
     }
     world->getPhysics()->addKart(this, m_vehicle);
 
@@ -332,6 +333,8 @@ void Kart::reset()
     trans->setOrigin(btVector3(m_reset_pos.xyz[0],
                                m_reset_pos.xyz[1],
                                m_reset_pos.xyz[2]+0.5*m_kart_height));
+    m_vehicle->applyEngineForce (0.0f, 2);
+    m_vehicle->applyEngineForce (0.0f, 3);
     m_kart_body->setCenterOfMassTransform(*trans);
     m_kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
@@ -577,21 +580,67 @@ void Kart::updatePhysics (float dt)
 
     if(m_controls.brake)
     {
-        m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
-        m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
+        //only apply braking force when moving forward
+        if(m_linear_velocity > 0.f)
+        {
+            m_vehicle->applyEngineForce(-m_controls.brake*getBrakeFactor()*getMaxPower(), 2);
+            m_vehicle->applyEngineForce(-m_controls.brake*getBrakeFactor()*getMaxPower(), 3);
+        }
+        //should probably not allow the kart to reverse at same velocity as forward
+        else
+        {
+            m_vehicle->applyEngineForce(-m_controls.brake*getMaxPower(), 2);
+            m_vehicle->applyEngineForce(-m_controls.brake*getMaxPower(), 2);
+        }
+
     }
-    else if(m_controls.accel)
+    else // FIXME: was: else if(m_controls.accel)
     {   // not braking
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 2);
+	m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 3);
+
     }
     if(m_controls.jump)
     { // ignore gravity down when jumping
         // no jumping yet
     }
-    const float steering = getMaxSteerAngle() * m_controls.lr*0.00444;
+    const float steering = getMaxSteerAngle() * m_controls.lr * 0.00444;
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
+
+    //store current velocity
+    m_linear_velocity = getVehicle()->getRigidBody()->getLinearVelocity().length();
+
+    //cap at maximum velocity
+    if ( m_linear_velocity >  m_kart_properties->getMaximumVelocity() )
+    {
+        btVector3 velocity = getVehicle()->getRigidBody()->getLinearVelocity();
+        if ( fabsf(velocity.getY()) > m_kart_properties->getMaximumVelocity()
+              || fabsf(velocity.getX()) > m_kart_properties->getMaximumVelocity() )
+        {
+            m_linear_velocity = m_kart_properties->getMaximumVelocity();
+            if ( fabsf(velocity.getY()) > fabsf(velocity.getX()) )
+                velocity.setY( sgn(velocity.getY()) * m_kart_properties->getMaximumVelocity() );
+            else
+                velocity.setX( sgn(velocity.getX()) * m_kart_properties->getMaximumVelocity() );
+            getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+        }
+    }
+    //at low velocity, forces on kart push it back and forth so we ignore this
+    if(m_linear_velocity > 0.13f) {
+        const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
+
+        btVector3 forwardW (
+            chassisTrans.getBasis()[0][1],
+            chassisTrans.getBasis()[1][1],
+            chassisTrans.getBasis()[2][1]);
+
+        if ( forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < 0.f )
+            m_linear_velocity *= -1.f;
+     }
+     else
+         m_linear_velocity = 0;
+
     
 #else      // ! BULLET
     m_skid_front = m_skid_rear = false;

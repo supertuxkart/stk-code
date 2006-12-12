@@ -741,27 +741,31 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
     glEnd () ;
 
+#ifdef BULLET
+    //convention taken from btRaycastVehicle::updateVehicle
+    const float velocity =  3.6f * kart->getLinearVelocity();
+#else
+    const float velocity = (kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR);
+#endif
+
     if ( !kart->isOnGround() )
         widgetSet->drawDropShadowTextRace ( "!", (int)(60*minRatio), offset_x-(int)(30*minRatio), offset_y-(int)(10*minRatio));
 
     /* Show velocity */
 #ifndef BULLET
-    if ( kart->getVelocity()->xyz[1] < 0 )
+    if ( velocity < 0 )
         widgetSet->drawDropShadowTextRace ( "REV", (int)(40*minRatio), offset_x+(int)(40*minRatio), offset_y+(int)(10*minRatio));
     else
 #endif
     {
         //if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() && kart->wheelie_angle == 0 )
-        if ( kart->getVelocity()->xyz[1] >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )
+        if ( velocity >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )
         {
             widgetSet->drawDropShadowTextRace ( "l", (int)(60*minRatio), offset_x+(int)(70*minRatio), offset_y);
             widgetSet->drawDropShadowTextRace ( "^", (int)(60*minRatio), offset_x+(int)(65*minRatio), offset_y+(int)(7*minRatio));
         }
-#ifdef BULLET
-        float speedRatio = sgLengthVec3(kart->getVelocity()->xyz)/(KILOMETERS_PER_HOUR*110);
-#else
-        float speedRatio = (kart->getVelocity()->xyz[1]/KILOMETERS_PER_HOUR)/110;
-#endif
+
+        float speedRatio = velocity/110.0f;
         // The following does not work with wheelie or Zipper
         //float speedRatio = kart->getVelocity()->xyz[1]/(kart->getMaxSpeed();
 

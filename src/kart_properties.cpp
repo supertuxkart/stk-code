@@ -120,6 +120,19 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate    );
     lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate  );
     lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost   );
+
+    //bullet physics data
+    lisp->get("suspension-stiffness",      m_supension_stiffness      );
+    lisp->get("wheel-damping-relaxation",  m_wheel_damping_relaxation );
+    lisp->get("wheel-damping-compression", m_wheel_damping_compression);
+    lisp->get("friction-slip",             m_friction_slip            );
+    lisp->get("roll-influence",            m_roll_influence           );
+    lisp->get("wheel-radius",              m_wheel_radius             );
+    lisp->get("wheel-width",               m_wheel_width              );
+    lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
+    lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
+    lisp->get("maximum-velocity",          m_maximum_velocity         );
+
 }   // getAllData
 
 //-----------------------------------------------------------------------------
@@ -152,6 +165,20 @@ void KartProperties::init_defaults()
     m_wheelie_pitch_rate      = physicsParameters->m_wheelie_pitch_rate;
     m_wheelie_restore_rate    = physicsParameters->m_wheelie_restore_rate;
     m_wheelie_speed_boost     = physicsParameters->m_wheelie_speed_boost;
+
+    //bullet physics data
+    m_supension_stiffness       = physicsParameters->m_supension_stiffness;
+    m_wheel_damping_relaxation  = physicsParameters->m_wheel_damping_relaxation;
+    m_wheel_damping_compression = physicsParameters->m_wheel_damping_compression;
+    m_friction_slip             = physicsParameters->m_friction_slip;
+    m_roll_influence            = physicsParameters->m_roll_influence;
+    m_wheel_radius              = physicsParameters->m_wheel_radius;
+    m_wheel_width               = physicsParameters->m_wheel_width;
+    m_chassis_linear_damping    = physicsParameters->m_chassis_linear_damping;
+    m_chassis_angular_damping   = physicsParameters->m_chassis_angular_damping;
+    m_maximum_velocity          = physicsParameters->m_maximum_velocity;
+
+
 }   // init_defaults
 
 /* EOF */

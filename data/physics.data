@@ -23,12 +23,12 @@
    (wheel-base               1.2 )
    (heightCOG                0.2 )
    (engine-power           400   )
-   (brake-factor             5   )
+   (brake-factor             2.75   )
    (mass                   125   )
    (air-resistance           1.8 )
    (roll-resistance          1.05)
    (tire-grip                0.9 )
-   (max-steer-angle         90   )
+   (max-steer-angle         55   )
    (time-full-steer          0.3 )
    (corn-f                   4   )
    (corn-r                   4   )
@@ -41,6 +41,19 @@
    ;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating
    ;; around the center of gravity, where a and b are the width and length 
    (inertia                  5.0 )
+
+   ;; Bullet physics attributes
+   (suspension-stiffness      20.0)
+   (wheel-damping-relaxation  2.0 )
+   (wheel-damping-compression 3.0 )
+   (friction-slip             5.25 )
+   (roll-influence            0.0 )
+   (wheel-radius              0.1 )
+   (wheel-width               0.1 )
+   (chassis-linear-damping    0.02 )
+   (chassis-angular-damping   0.02 )
+   (maximum-velocity         22.22 ) ;; = 80 km/h
+
   )   ;; end kart-defaults
 )
 ;; EOF ;;
