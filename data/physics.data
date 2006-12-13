@@ -44,14 +44,14 @@
 
    ;; Bullet physics attributes
    (suspension-stiffness      20.0)
-   (wheel-damping-relaxation  2.0 )
-   (wheel-damping-compression 3.0 )
-   (friction-slip             5.25 )
-   (roll-influence            0.0 )
-   (wheel-radius              0.1 )
-   (wheel-width               0.1 )
-   (chassis-linear-damping    0.02 )
-   (chassis-angular-damping   0.02 )
+   (wheel-damping-relaxation  2.3 )
+   (wheel-damping-compression 4.4 )
+   (friction-slip             10000000 )
+   (roll-influence            0.1 )
+   (wheel-radius              0.25 )
+   (wheel-width               0.3 )
+   (chassis-linear-damping    0.2 )
+   (chassis-angular-damping   0.2 )
    (maximum-velocity         22.22 ) ;; = 80 km/h
 
   )   ;; end kart-defaults

@@ -101,7 +101,7 @@ private:
     bool                m_finished_race;
 
 #ifdef BULLET
-    float               m_linear_velocity;
+    float               m_speed;
 #endif
 
 protected:
@@ -172,7 +172,6 @@ public:
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
     float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
-    float          getWheelRadius   () const {return 0.25f;}
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
     float          getTireGrip      () const {return m_kart_properties->getTireGrip();}
     float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
@@ -207,7 +206,7 @@ public:
     void              draw          ();
     bool              isInRest      ();
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
-    float             getLinearVelocity() const {return m_linear_velocity;     }
+    float             getSpeed() const {return m_speed;     }
 #endif
     void           adjustSpeedWeight(float f);
     const std::string& getName      () const {return m_kart_properties->getName();}

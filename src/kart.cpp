@@ -118,12 +118,13 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
             sgCoord init_pos)
         : Moveable(true), m_attachment(this), m_collectable(this)
 {
-    m_kart_properties       = kartProperties_;
+    m_kart_properties      = kartProperties_;
     m_grid_position        = position_ ;
-    m_num_herrings_gobbled  = 0;
-    m_finished_race         = false;
-    m_finish_time           = 0.0f;
-    m_prev_accel            = 0.0f;
+    m_num_herrings_gobbled = 0;
+    m_finished_race        = false;
+    m_finish_time          = 0.0f;
+    m_prev_accel           = 0.0f;
+    m_speed                = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -133,7 +134,11 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
-    m_max_speed             = sqrt(getMaxPower()/getAirResistance());
+#ifdef BULLET
+    m_max_speed            = m_kart_properties->getMaximumVelocity();
+#else
+    m_max_speed            = sqrt(getMaxPower()/getAirResistance());
+#endif
 
     m_wheel_position = 0;
 
@@ -182,7 +187,7 @@ void Kart::createPhysics(ssgEntity *obj)
     m_kart_body = new btRigidBody(mass, myMotionState, 
                                   m_kart_chassis, inertia);
     m_kart_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
-			    m_kart_properties->getChassisAngularDamping() );
+                            m_kart_properties->getChassisAngularDamping() );
 
     // Reset velocities
     // ----------------
@@ -557,9 +562,10 @@ void Kart::draw()
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
     world->getPhysics()->debugDraw(m, m_kart_body->getCollisionShape(), 
                                    wire_color);
-    btCylinderShapeX *wheelShape = new btCylinderShapeX(btVector3(0.3,
-                                                                  getWheelRadius(), 
-                                                                  getWheelRadius()));
+    btCylinderShapeX *wheelShape = 
+        new btCylinderShapeX( btVector3(0.3,
+                                        m_kart_properties->getWheelRadius(),
+                                        m_kart_properties->getWheelRadius()) );
     btVector3 wheelColor(1,0,0);
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
@@ -581,7 +587,7 @@ void Kart::updatePhysics (float dt)
     if(m_controls.brake)
     {
         //only apply braking force when moving forward
-        if(m_linear_velocity > 0.f)
+        if(m_speed > 0.f)
         {
             m_vehicle->applyEngineForce(-m_controls.brake*getBrakeFactor()*getMaxPower(), 2);
             m_vehicle->applyEngineForce(-m_controls.brake*getBrakeFactor()*getMaxPower(), 3);
@@ -594,10 +600,10 @@ void Kart::updatePhysics (float dt)
         }
 
     }
-    else // FIXME: was: else if(m_controls.accel)
+    else
     {   // not braking
         m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 2);
-	m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 3);
+        m_vehicle->applyEngineForce(m_controls.accel*getMaxPower(), 3);
 
     }
     if(m_controls.jump)
@@ -609,16 +615,16 @@ void Kart::updatePhysics (float dt)
     m_vehicle->setSteeringValue(steering, 1);
 
     //store current velocity
-    m_linear_velocity = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
     //cap at maximum velocity
-    if ( m_linear_velocity >  m_kart_properties->getMaximumVelocity() )
+    if ( m_speed >  m_kart_properties->getMaximumVelocity() )
     {
         btVector3 velocity = getVehicle()->getRigidBody()->getLinearVelocity();
         if ( fabsf(velocity.getY()) > m_kart_properties->getMaximumVelocity()
               || fabsf(velocity.getX()) > m_kart_properties->getMaximumVelocity() )
         {
-            m_linear_velocity = m_kart_properties->getMaximumVelocity();
+            m_speed = m_kart_properties->getMaximumVelocity();
             if ( fabsf(velocity.getY()) > fabsf(velocity.getX()) )
                 velocity.setY( sgn(velocity.getY()) * m_kart_properties->getMaximumVelocity() );
             else
@@ -627,7 +633,7 @@ void Kart::updatePhysics (float dt)
         }
     }
     //at low velocity, forces on kart push it back and forth so we ignore this
-    if(m_linear_velocity > 0.13f) {
+    if(m_speed > 0.13f) {
         const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
 
         btVector3 forwardW (
@@ -636,10 +642,10 @@ void Kart::updatePhysics (float dt)
             chassisTrans.getBasis()[2][1]);
 
         if ( forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < 0.f )
-            m_linear_velocity *= -1.f;
+            m_speed *= -1.f;
      }
      else
-         m_linear_velocity = 0;
+         m_speed = 0;
 
     
 #else      // ! BULLET

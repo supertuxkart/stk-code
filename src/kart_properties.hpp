@@ -69,7 +69,7 @@ protected:
     float m_wheelie_speed_boost;      // speed boost while doing a wheelie
 
     //bullet physics data
-    float m_supension_stiffness;
+    float m_suspension_stiffness;
     float m_wheel_damping_relaxation;
     float m_wheel_damping_compression;
     float m_friction_slip;
@@ -116,7 +116,7 @@ public:
     float         getWheelieSpeedBoost   () const {return m_wheelie_speed_boost;    }
 
     //bullet physics get functions
-    float getSuspensionStiffness    () const {return m_supension_stiffness;      }
+    float getSuspensionStiffness    () const {return m_suspension_stiffness;     }
     float getWheelDampingRelaxation () const {return m_wheel_damping_relaxation; }
     float getWheelDampingCompression() const {return m_wheel_damping_compression;}
     float getFrictionSlip           () const {return m_friction_slip;            }

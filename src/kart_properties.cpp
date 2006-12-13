@@ -122,7 +122,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost   );
 
     //bullet physics data
-    lisp->get("suspension-stiffness",      m_supension_stiffness      );
+    lisp->get("suspension-stiffness",      m_suspension_stiffness     );
     lisp->get("wheel-damping-relaxation",  m_wheel_damping_relaxation );
     lisp->get("wheel-damping-compression", m_wheel_damping_compression);
     lisp->get("friction-slip",             m_friction_slip            );
@@ -167,7 +167,7 @@ void KartProperties::init_defaults()
     m_wheelie_speed_boost     = physicsParameters->m_wheelie_speed_boost;
 
     //bullet physics data
-    m_supension_stiffness       = physicsParameters->m_supension_stiffness;
+    m_suspension_stiffness      = physicsParameters->m_suspension_stiffness;
     m_wheel_damping_relaxation  = physicsParameters->m_wheel_damping_relaxation;
     m_wheel_damping_compression = physicsParameters->m_wheel_damping_compression;
     m_friction_slip             = physicsParameters->m_friction_slip;

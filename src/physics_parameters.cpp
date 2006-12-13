@@ -65,7 +65,7 @@ void PhysicsParameters::load(const std::string filename)
     CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
 
     //bullet physics data
-    CHECK_NEG(m_supension_stiffness,       "suspension-stiffness"       );
+    CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );
     CHECK_NEG(m_wheel_damping_relaxation,  "wheel-damping-relaxation"   );
     CHECK_NEG(m_wheel_damping_compression, "wheel-damping-compression"  );
     CHECK_NEG(m_friction_slip,             "friction-slip"              );
@@ -96,7 +96,7 @@ void PhysicsParameters::init_defaults()
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
     m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] =
     //bullet physics data
-    m_supension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
+    m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
     m_chassis_linear_damping = m_chassis_angular_damping = m_maximum_velocity = -99.9f;
 

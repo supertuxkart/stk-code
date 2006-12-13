@@ -223,21 +223,23 @@ if test "x${enable_bullet}" != "xno"; then
 	AC_DEFINE(BULLET)
 	AC_MSG_RESULT([enabled])
 	CXXFLAGS="$CXXFLAGS -I../bullet/src"
-	LIBS="$LIBS -L ../bullet/out/*/*/libs -lbulletopenglsupport -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
+	LIBS="$LIBS  -L ../bullet/Demos/OpenGL -l bulletopenglsupport -L ../bullet/src/ -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
 else
 	AC_MSG_RESULT([disabled])
 fi
 
-AC_CONFIG_FILES([      \
- Makefile             \
- data/Makefile        \
- fonts/Makefile       \
- images/Makefile      \
- models/Makefile      \
- mods/Makefile        \
- src/Makefile         \
- wavs/Makefile        \
- wavs/radio/Makefile  \
+AC_CONFIG_FILES([       \
+ Makefile               \
+ data/Makefile          \
+ fonts/Makefile         \
+ images/Makefile        \
+ models/Makefile        \
+ mods/Makefile          \
+ bullet/src/Makefile    \
+ bullet/Demos/OpenGL/Makefile    \
+ src/Makefile           \
+ wavs/Makefile          \
+ wavs/radio/Makefile    \
  wavs/tintagel/Makefile \
  models/herrings/Makefile
 ])
