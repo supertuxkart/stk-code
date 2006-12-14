@@ -124,7 +124,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_prev_accel           = 0.0f;
-    m_speed                = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -136,6 +135,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     // power equals the air resistance force, resulting in this formula:
 #ifdef BULLET
     m_max_speed            = m_kart_properties->getMaximumVelocity();
+    m_speed                = 0.0f;
 #else
     m_max_speed            = sqrt(getMaxPower()/getAirResistance());
 #endif
