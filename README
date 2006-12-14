@@ -1,232 +1,70 @@
 SuperTuxKart
-============
-
-SuperTuxKart is based on TuxKart (http://tuxkart.sourceforge.net)
-by Steve Baker. It was picked up by the Linux Game of the Month
-project and got a big overhaul during this time, but was left in
-an unfinished state. 
-A new set of maintainers, namely hiker & coz, took over in 2006, 
-and we are glad to announce our first release here. You can find
-more details on:
+==============
+SuperTuxKart is based on TuxKart (http://tuxkart.sourceforge.net) by Steve
+Baker. You can find more details at:
 
   http://supertuxkart.berlios.de
 
-
-SuperTuxKart needs hardware OpenGL support, and has currently only one
-software dependency: plib, see http://plib.sourceforge.net
-
-A big "thank you" to Steve Baker for designing and implementing
-the original TuxKart, to the GotM team for their invaluable work.
+A big "thank you" to Steve Baker for designing and implementing the
+original TuxKart, and to the GotM team for their invaluable work.
 See the AUTHORS file for individual credits.
 
-To contact the current maintainers, please send an email to the
-SuperTuxKart development list at:
+To contact the active maintainers, please send an email to:
 
-supertuxkart-devel@list.berlios.de
+  supertuxkart-devel@list.berlios.de
 
+Hope you enjoy the game.
+ - The SuperTuxKart development team.
 
-Hope you enjoy the game
-   Hiker & Coz
-
-
-REQUIREMENTS
-============
-Hardware:
-    * You need a 3D graphics card that can support OpenGL or Mesa.
-    * Ideally, you want a joystick - preferably one with at least 
-      6 buttons - you can also drive from the keyboard.
-    * You should have a CPU that's running at 266MHz or better.
-    * A sound card would be nice - but it's not essential.
-    * You'll need at least 32Mb RAM. 
-
-Software:
-Right now, SuperTuxKart runs under Linux and under Windoze using the 
-CygWin package. We anticipate MSVC/Windoze, MacOS, BSD, BeOS, 
-etc. ports to follow very soon.
-
-Make sure that you have the following packages installed:
-
-    * OpenGL (or Mesa 2.1 or later)
-    * PLIB version 1.8.0 or later . 
-
+HARDWARE REQUIREMENTS
+=====================
+* You need a 3D graphics card that supports OpenGL or Mesa.
+* You should have a CPU that's running at 450MHz or better.
+* You'll need at least 32Mb RAM. 
+* A sound card would be nice - but it's not essential.
+* Ideally, you want a joystick with at least 6 buttons.
 
 PLAYING THE GAME
 ================
-SuperTuxKart is a kart racing game. Basically, you run a certain
-number of laps and try to be faster than your opponents. Power 
-ups, like accelerator, rockets, can help you to achieve this
-goal. By collecting coins you build up your power, which enables
-you to get more power ups whenever you collect one. The arrow-
-shaped red and black 'zippers' on the track will give you a quick
-speedup. 
+SuperTuxKart is a kart racing game. Basically you run around the track,
+and give your best shot at reaching the goal before your opponents. The ?
+boxes can help you, and certain items can build up your power, so you can
+grab more than one collectable!
 
-At the same time, there are bananas out on the track, which effect
-you negatively: an anvil or parachute will slow you down for a 
-while.
-If you are running rather fast, you can pop a wheelie, which gives
-you an additional speed boost, but you can't steer your kart 
-while doing a wheelie, so be careful.
-Hitting another kart does not do any damage to your kart or the
-other kart, one of the karts will just be forced to a stand still,
-loosing precious seconds.
+Controls can be configured from the game, here are the defaults mappings:
 
-Three different game modes are available:
-1) Quick Race
-   A single race (with between 1 and 5 laps)
+Player 1:
+  Steer      : Left / Right arrow
+  Accelerate : Up arrow
+  Brake      : Down arrow
+  Fire       : Right control
+  Wheelie    : Right shift
+  Rescue     : Backspace
 
-2) Time Trial
-   A single race with a single lap only
+Player 2:
+  Steer      : J / L key
+  Accelerate : I key
+  Brake      : K key
+  Fire       : M key
+  Wheelie    : . key
+  Rescue     : / key
 
-3) Grand Prix
-   A set of several races, each with several laps
+Player 3 and 4 do not have default control configurations.
+The Escape key pauses the game and shows the race menu.
 
-Split screen multi-player is supported, though you need a somewhat
-powerful computer and graphics card to get a high frame rate in this
-case. Network multi-player is not yet supported.
+KNOWN BUGS
+==========
+  * Sometimes you can be pushed through a solid object if you are hit by
+    another player when in contact with the surface.
+  * The --track command-line option doesn't seems to work.
 
-
-CONTROLLING YOUR KART
----------------------
-Ideally, you need a 'game-pad' style joystick with at least six buttons:
-
-  Joystick Left/Right:  Steer.
-
-  A button - Accelerate.
-  B button - Brake.
-  C button - Use an item you've collected
-  D button - Ask to be rescued by tinytux.
-  L button - Pop a wheelie (if you are going fast enough).
-
-In addition, you can drive from the keyboard:
-
-  LEFT/RIGHT ARROW: Steer.
-
-  UP-ARROW   - Same as 'A' button - Accelerate
-  DOWN-ARROW - Same as 'B' button - Brake
-
-  A key - Same as 'L' button - pop a Wheelie
-  D key - Same as 'D' button - Rescue Me Please!
-  F key - Same as 'C' button - Use an item.
-
-  ESCAPE- Pauses the game, popping up a menu with
-          additional options (including returning
-          or restarting the race).
-
-This is the default binding. In the options->control
-menu you can assign your preferred keys to the kart
-handling functions. 
-
-Usually, rescuing occurs automatically when your kart leaves
-a track (e.g. drives into the sea, or into a volcano), but if
-you find yourself in a situation with no way out, you can 
-always request a TinyTux to be sent out - which will lift your
-kart up and drop you back on the track, approximately where you 
-left the track.
-
-There are also some debug functions left for developers:
-
-  F10 key - Save the last 1000 frames into a file ./history.dat
-            This can be used by the developers to reproduce
-            problems occurring during a race.
-  F11 key - Toggle wire-frame view.
-  F12 key - Toggle frame-per-second display.
-
-The menu structure should be mostly self explanatory. Be aware that
-pressing the escape key will return to the previous menu. Pressing
-escape during a race will pause the game
-
-
-POWER UPS:
----------
-There are currently many 'good things' (triggered by driving over a blue
-cube) and a few 'bad things' (triggered by hitting a banana).
-
-Good things are collectables - you pick them up by driving through the
-blue cube and activate them by "using" an item (see above for default
-key bindings)
-
-Bad things happen immediately - and last for a few seconds before 'going
-away' by themselves.
-
-Notice that (unlike some kart games), the computer controlled players
-also collect and use power-ups.
-
-Silver and Gold coins gradually fill up the energy level - as you collect
-more coins, you'll find that a blue box will subsequently give you two, 
-three, four or five power-ups at one time!
-
-Good Things:
-
-    * Missiles - unguided but fast. If they hit anything (including the
-      track), they explode impressively. The effect on a Kart is to stop 
-      it dead - so you have to accelerate again.
-    * Homing missiles - slower than the regular kind - but they track
-      the nearest kart and are quite hard to shake off.
-    * Fuzzy blobs - even slower still - a kart can outrun them quite
-      easily. They ricochet off the sides of the track and only explode
-      when they hit a Kart. Since they are not moving fast, they'll
-      tend to stay close to where you dropped them.
-    * Magnets - if you activate a magnet then it hangs around for 
-      about 15 seconds. If anyone comes within about 20 meters, 
-      you'll be pulled towards them and end up glued to their tail 
-      until the magnet 'expires'. Great for catching up with someone 
-      - hopeless for passing them. Magnets can be disabled by using 
-      them again, allowing you to escape from the magnetic grip of
-      another kart.
-    * Portable Zippers - these are just like the zippers on the track
-      itself - they give you a sudden acceleration and temporarily
-      increase the top speed of your kart.
-    * Portable parachutes - this pops out the back of all the karts in
-      a better position than you and slows them down a for some seconds.
-      The worse your position is, the higher the probabilities of getting
-      this you have(but they are still small). You can only have one at
-      a time.
-    * Portable anvil - the driver in the first position gets dragged
-      by a heavy anvil, allowing other drivers to catch up with him...
-      like the portable parachutes, the worse your position is, the higher
-      probabilities of getting this you have. However, you can't get this
-      if the driver in the first position already finished the race.
-
-Bad Things:
-
-    * Parachute - this pops out the back of your kart and slows you down
-      a little for a few seconds only. Enough to drop you back one place
-      if it's a close race though.
-    * Anvil - gets dragged behind your kart on a rope for an even shorter
-      amount of time than the parachute...but the drag effect is much
-      stronger - your kart hardly moves at all. 
-
-KNOWN BUGS:
-
-    * No drive-with-the-mouse support.
-    * Slow performance on CPU's less than ~450MHz.
-    * Sometimes you can be pushed through a solid object if you are hit by
-      another player when in contact with the surface. 
-
-There might of course be more.
-
-COMMAND LINE OPTIONS:
-=====================
-Useful command line options:
-
--N, --no-start-screen   Quick start without any menus
--t, --track NAME        Load track NAME
--l, --list-tracks       List all tracks
--k, --numkarts NUM      Overall number of karts
-    --kart NAME         Use kart NAME
-    --list-karts        Lists all available karts
-    --laps NUM          Number of laps to play
--s, --screensize WxH    Set screensize, e.g. -s 800x600
--v, --version           Show version
-
-SUPPORT:
-========
+SUPPORT
+=======
 The main webpage is at:
 
   http://supertuxkart.berlios.de
 
-If you have any problems, please contact the SuperTuxKart
-mailing list at
+If you have any problems, please contact the SuperTuxKart mailing list at:
 
   supertuxkart-devel@list.berlios.de
 
@@ -238,36 +76,7 @@ Or post a bug report on the SuperTuxKart webpage
 
   http://developer.berlios.de/bugs/?group_id=2765
 
-A wiki will be installed in the near future, too.
-
-
-LICENSE:
-========
-This software is released under the provisions of
-the GNU General Public License (GPL) which can be
-found in the file 'LICENSE' in the current directory.
-
-
-DIRECTORY STRUCTURE:
-====================
-src     -- Where the source code lives.
-
-data    -- This contains all kinds of miscellaneous data
-           files. It includes information about tracks,
-           karts, constants for the physics, grand prix
-           data, collectables.
-
-doc     -- Implementation documentation.
-
-images  -- Texture maps and other images needed by the
-           game. These are currently all in 'SGI' image
-           format.
-
-wavs    -- Sound files - sound effects in 'wav' format.
-
-mods    -- Music files - in 'mod' format.
-
-models  -- 3D models - in '.ac' format.
-
-contrib -- Unsorted contributed files.
-
+LICENSE
+=======
+This software is released under the GNU General Public License (GPL) which
+can be found in the file 'LICENSE' in the same directory as this file.

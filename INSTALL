@@ -8,9 +8,10 @@ First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
   * PLIB version 1.8.4 or later
-  * OpenAL
-  * Alut
-  * MikMod
+  * SDL 1.2 or later
+  * OpenAL (optional)
+  * freealut (optional)
+  * MikMod (optional)
 
 Unpack the files from the tarball like this:
 
@@ -39,7 +40,8 @@ See the --help output of configure for further options.
 
 SVN STK on Ubuntu Edgy
 ----------------------
-Here are the compilation instructions for the current svn(05 oct. 2006) of Super Tux Kart on Ubuntu Edgy, contributed by Damien:
+Here are the compilation instructions for the current svn(05 oct. 2006) of
+Super Tux Kart on Ubuntu Edgy, contributed by Damien:
 
 install following packages:
 # apt-get install libopenal-dev libalut-dev libmikmod2-dev plib1.8.4-dev
@@ -62,9 +64,16 @@ If you want to install the game system-wide, do 'make install'.
 But it didn't work!
 -------------------
 
-Right now there is no proper windows compilation. You can still compile for windows using cygwin, see README.cygwin for details.
+Right now there is no proper windows compilation. You can still compile
+for windows using cygwin, see README.cygwin for details.
 
-If you checked out your copy directly from SVN, you have to run 'sh autogen.sh' to generate the configure script.
+If you checked out your copy directly from SVN, you have to run
+'sh autogen.sh' to generate the configure script.
+
+You should check the SuperTuxKart wiki at:
+
+  http://supertuxkart.berlios.de/wiki
+
 
 Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
 is incorrectly installed - so before you complain to any of the PLIB or
