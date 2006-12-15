@@ -299,14 +299,17 @@ COMMAND LINE OPTIONS
 Useful command line options:
 
 -N, --no-start-screen   Quick start without any menus
--t, --track NAME        Load track NAME
 -l, --list-tracks       List all tracks
--k, --numkarts NUM      Overall number of karts
+-k, --numkarts NUM      Number of karts to race
     --kart NAME         Use kart NAME
     --list-karts        Lists all available karts
     --laps NUM          Number of laps to play
+    --herring STYLE     Use STYLE as your herring style
+-f, --fullscreen        Fullscreen display
+-w, --windowed          Windowed display
 -s, --screensize WxH    Set screensize, e.g. -s 800x600
 -v, --version           Show version
+-h, --help              Show command-line options
 
 SUPPORT
 -------
