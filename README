@@ -37,7 +37,7 @@ Player 1:
   Steer      : Left / Right arrow
   Accelerate : Up arrow
   Brake      : Down arrow
-  Fire       : Right control
+  Use item   : Right control
   Wheelie    : Right shift
   Rescue     : Backspace
 
@@ -45,7 +45,7 @@ Player 2:
   Steer      : J / L key
   Accelerate : I key
   Brake      : K key
-  Fire       : M key
+  Use item   : M key
   Wheelie    : . key
   Rescue     : / key
 

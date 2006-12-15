@@ -1,6 +1,6 @@
-===================
-SuperTuxKart manual
-===================
+============================
+SuperTuxKart player's manual
+============================
 
 INTRODUCTION
 ------------
@@ -35,14 +35,26 @@ ports to follow.
 
 You need the following programs installed:
 
-OpenGL (or Mesa 3.0 or later)              http://www.opengl.org
-                                           http://www.mesa3d.org
-PLIB 1.8.4                                 http://plib.sourceforge.net
-SDL 1.2                                    http://www.libsdl.org
-OpenAL (optional, requires ALUT,   MikMod) http://www.openal.org
-ALUT   (optional, requires OpenAL, MikMod) http://www.openal.org
-MikMod (optional, requires OpenAL, ALUT)   http://mikmod.raphnet.net
-Bullet (optional)                          http://continuous.physics.com/Bullet/
+OpenGL (or Mesa 3.0 or later)
+    http://www.opengl.org ,  http://www.mesa3d.org
+
+PLIB 1.8.4 
+    http://plib.sourceforge.net
+
+SDL 1.2
+    http://www.libsdl.org
+
+OpenAL (optional, requires ALUT,   MikMod)
+    http://www.openal.org
+
+ALUT   (optional, requires OpenAL, MikMod)
+    http://www.openal.org
+
+MikMod (optional, requires OpenAL, ALUT)
+    http://mikmod.raphnet.net
+
+Bullet (optional)
+    http://continuous.physics.com/Bullet/
 
 If you wish to use bullet, you should see the README.bullet file
 that should be in the main SuperTuxKart directory.
@@ -58,7 +70,7 @@ Player 1:
   Steer      : Left / Right arrow
   Accelerate : Up arrow
   Brake      : Down arrow
-  Fire       : Right control
+  Use item   : Right control
   Wheelie    : Right shift
   Rescue     : Backspace
 
@@ -66,15 +78,15 @@ Player 2:
   Steer      : J / L key
   Accelerate : I key
   Brake      : K key
-  Fire       : M key
+  Use item   : M key
   Wheelie    : . key
   Rescue     : / key
 
 Player 3 and 4 do not have default control configurations.
 
-The rescue button is meant to be used if your kart is stuck;
-it will send you to the track with your approximate progress,
-but it will take a few seconds.
+The rescue button is meant to be used if your kart is stuck; it
+will send you to the track with your approximate progress, but
+it will take a few seconds.
 
 The Escape key pauses the game and shows the race menu. Also,
 pressing Escape in a menu will exit from it, and in the main
@@ -86,9 +98,8 @@ There are also some special functions:
             Windows.
 
   F10 key - Save the last 1000 frames into a file ./history.dat
-            This can be used by the developers to reproduce
-            problems occurring during a race. This is mainly
-            useful for developers.
+            This can be used to reproduce problems occurring
+            during a race. This is mainly useful for developers.
 
   F11 key - Toggle wire-frame view.
 
@@ -139,14 +150,14 @@ GAME MODES
 ----------
 
 Three different game modes are available:
-1) Quick Race
+1) Grand Prix
+   A set of several races, each with several laps
+
+2) Quick Race
    A single race (with between 1 and 5 laps)
 
-2) Time Trial
+3) Time Trial
    A single race with a single lap only
-
-3) Grand Prix
-   A set of several races, each with several laps
 
 
 MULTIPLAYER
@@ -161,67 +172,71 @@ cuadrants. You *need* to set up the 3rd and 4th player controls,
 but you probably will want to set different controls for the 1st
 and 2nd player too.
 
+Also, after you finish the race, you might want to go back to
+give your friends some trouble!
 
-POWER UPS:
----------
 
-There are currently many 'good things' (triggered by driving over a blue
-cube) and a few 'bad things' (triggered by hitting a banana).
+COLLECTABLES
+------------
 
-Good things are collectables - you pick them up by driving through the
-blue cube and activate them by "using" an item (see above for default
-key bindings)
+There are currently many 'good things' you can get (triggered by
+touching an item box) and a few 'bad things'.
 
-Bad things happen immediately - and last for a few seconds before 'going
-away' by themselves.
+When you pick up one of the good things, you will see it on your
+item box, and activate it by using an item (see above for
+default key bindings)
 
-Notice that (unlike some kart games), the computer controlled players
-also collect and use power-ups.
+Bad things happen immediately - and last for a few seconds
+before 'going away' by themselves.
 
-Silver and Gold coins gradually fill up the energy level - as you collect
-more coins, you'll find that a blue box will subsequently give you two, 
-three, four or five power-ups at one time!
+Notice that (unlike some kart games), the computer controlled
+players also collect and use power-ups in the same way you do.
+
+Energizers gradually fill up the energy level - as you collect
+more, you'll find that an item cube will subsequently give you
+two, three, four or five power-ups at one time!
 
 Good Things:
 
-    * Missiles - unguided but fast. If they hit anything (including the
-      track), they explode impressively. The effect on a Kart is to stop 
-      it dead - so you have to accelerate again.
-    * Homing missiles - slower than the regular kind - but they track
-      the nearest kart and are quite hard to shake off.
-    * Fuzzy blobs - even slower still - a kart can outrun them quite
-      easily. They ricochet off the sides of the track and only explode
-      when they hit a Kart. Since they are not moving fast, they'll
-      tend to stay close to where you dropped them.
-    * Magnets - if you activate a magnet then it hangs around for 
-      about 15 seconds. If anyone comes within about 20 meters, 
-      you'll be pulled towards them and end up glued to their tail 
-      until the magnet 'expires'. Great for catching up with someone 
-      - hopeless for passing them. Magnets can be disabled by using 
-      them again, allowing you to escape from the magnetic grip of
-      another kart.
-    * Portable Zippers - these are just like the zippers on the track
-      itself - they give you a sudden acceleration and temporarily
-      increase the top speed of your kart.
-    * Portable parachutes - this pops out the back of all the karts in
-      a better position than you and slows them down a for some seconds.
-      The worse your position is, the higher the probabilities of getting
-      this you have(but they are still small). You can only have one at
-      a time.
-    * Portable anvil - the driver in the first position gets dragged
-      by a heavy anvil, allowing other drivers to catch up with him...
-      like the portable parachutes, the worse your position is, the higher
-      probabilities of getting this you have. However, you can't get this
-      if the driver in the first position already finished the race.
+ Missiles: unguided but fast. If they hit anything (including
+ the track), they explode impressively. The effect on a Kart is
+ to stop it dead - so you have to accelerate again from zero.
+
+ Homing missiles: slower than the regular kind - but they track
+ the nearest kart and are quite hard to shake off.
+
+ Fuzzy blobs: even slower still, a kart can outrun them quite
+ easily. They ricochet off the sides of the track and only
+ explode when they hit a Kart. Since they are not moving fast,
+ they'll tend to stay close to where you dropped them, thought
+ you won't know exactly where.
+
+ Portable Zippers: these are just like the zippers on the track
+ itself - they give you a sudden acceleration and temporarily
+ increase the top speed of your kart.
+
+ Portable parachutes: this pops out the back of all the karts
+ in a better position than you and slows them down a for some
+ seconds. The worse your position is, the higher the
+ probabilities of getting this you have (but they are still
+ small). You can only have one at a time.
+
+ Portable anvil: the driver in the first position gets dragged
+ by a heavy anvil, allowing other drivers to catch up with
+ him... like the portable parachutes, the worse your position
+ is, the higher probabilities of getting this you have. However,
+ you can't get this if the driver in the first position already
+ finished the race.
 
 Bad Things:
 
-    * Parachute - this pops out the back of your kart and slows you down
-      a little for a few seconds only. Enough to drop you back one place
-      if it's a close race though.
-    * Anvil - gets dragged behind your kart on a rope for an even shorter
-      amount of time than the parachute...but the drag effect is much
-      stronger - your kart hardly moves at all. 
+ Parachute: this pops out the back of your kart and slows you down
+ a little for a few seconds only. Enough to drop you back one place
+ if it's a close race though.
+ 
+ Anvil: gets dragged behind your kart on a rope for an even shorter
+ amount of time than the parachute... but the drag effect is much
+ stronger; your kart hardly moves at all. 
 
 
 GAME MECHANICS AND TIPS
@@ -231,13 +246,13 @@ You are a racer in SuperTuxKart, and your goal is to reach the
 finish line before your opponents, but as a bonus you might want
 to show your awesome driving skills.
 
-The item boxes contain helpful objects; which item you get is
+The item cubes contain helpful objects; which item you get is
 matter of luck. If you have an item already, you will only get
 another item the random selection chooses the same item type as
 the one you already have.
 
 The energizers will increase the number of items you grab from a
-single item box. You may only have up to 5 items, except the
+single item cube. You may only have up to 5 items, except the
 anvil and the parachute, since anvils are so heavy and you have
 so many parachutes, there is not much room and you can only
 carry one!
