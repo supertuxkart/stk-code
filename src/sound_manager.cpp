@@ -73,7 +73,6 @@ SoundManager::SoundManager()
         sfx = new SFXImpl("wavs/tintagel/grab_collectable.wav"); m_sfxs[SOUND_GRAB] = sfx;
         sfx = new SFXImpl("wavs/tintagel/crash.wav"); m_sfxs[SOUND_CRASH] = sfx;
         sfx = new SFXImpl("wavs/radio/shot.wav"); m_sfxs[SOUND_SHOT] = sfx;
-        sfx = new SFXImpl("wavs/ow.wav"); m_sfxs[SOUND_OW] = sfx;
         sfx = new SFXImpl("wavs/explosion.wav"); m_sfxs[SOUND_EXPLOSION] = sfx;
         sfx = new SFXImpl("wavs/bzzt.wav"); m_sfxs[SOUND_BZZT] = sfx;
         sfx = new SFXImpl("wavs/radio/horn.wav"); m_sfxs[SOUND_BEEP] = sfx;
