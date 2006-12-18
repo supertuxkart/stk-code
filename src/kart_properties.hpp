@@ -67,6 +67,10 @@ protected:
     float m_wheelie_pitch_rate;       // rate/sec with which kart goes up
     float m_wheelie_restore_rate;     // rate/sec with which kart does down
     float m_wheelie_speed_boost;      // speed boost while doing a wheelie
+    float m_wheelie_lean_recovery;
+    float m_wheelie_balance_recovery;
+    float m_wheelie_step;
+    float m_wheelie_power_boost;      // increase in engine power
 
     //bullet physics data
     float m_suspension_stiffness;
@@ -114,6 +118,10 @@ public:
     float         getWheeliePitchRate    () const {return m_wheelie_pitch_rate;     }
     float         getWheelieRestoreRate  () const {return m_wheelie_restore_rate;   }
     float         getWheelieSpeedBoost   () const {return m_wheelie_speed_boost;    }
+    float         getWheelieLeanRecovery () const {return m_wheelie_lean_recovery;  }
+    float         getWheelieBalanceRecovery()const{return m_wheelie_balance_recovery;}
+    float         getWheelieStep         () const {return m_wheelie_step;           }
+    float         getWheeliePowerBoost   () const {return m_wheelie_power_boost;    }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }

@@ -50,7 +50,6 @@ protected:
     int           m_crashed;
     sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
-    float         m_wheelie_angle ;
     int           m_on_ground ;
 
     float collectIsectData ( sgVec3 start, sgVec3 end ) ;

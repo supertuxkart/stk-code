@@ -37,6 +37,10 @@
    (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
    (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
    (wheelie-speed-boost     10.0 ) ;; speed boost while doing a wheelie
+   (wheelie-lean-recovery    1 )
+   (wheelie-balance-recovery 2 )
+   (wheelie-step             1 )
+   (wheelie-power-boost      1 )   ;; increase in engine power, i.e. 1=plus 100%
 
    ;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating
    ;; around the center of gravity, where a and b are the width and length 

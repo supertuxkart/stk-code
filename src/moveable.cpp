@@ -65,9 +65,8 @@ void Moveable::reset ()
     m_on_ground        = true;
     m_collided         = false;
     m_crashed          = false;
-    m_wheelie_angle    = 0.0f;
-    m_material_hot      = NULL;
-    m_normal_hot        = NULL;
+    m_material_hot     = NULL;
+    m_normal_hot       = NULL;
 
     sgZeroVec3 ( m_velocity.xyz ) ;
     sgZeroVec3 ( m_velocity.hpr ) ;

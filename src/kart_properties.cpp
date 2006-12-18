@@ -115,11 +115,15 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("corn-f",                  m_corn_f);
     lisp->get("corn-r",                  m_corn_r);
     lisp->get("inertia",                 m_inertia);
-    lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio);
-    lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch     );
-    lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate    );
-    lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate  );
-    lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost   );
+    lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio );
+    lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch       );
+    lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate      );
+    lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate    );
+    lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost     );
+    lisp->get("wheelie-lean-recovery",   m_wheelie_lean_recovery   );
+    lisp->get("wheelie-step",            m_wheelie_step            );
+    lisp->get("wheelie-balance-recovery",m_wheelie_balance_recovery);
+    lisp->get("wheelie-power-boost",     m_wheelie_power_boost     );
 
     //bullet physics data
     lisp->get("suspension-stiffness",      m_suspension_stiffness     );
@@ -165,6 +169,10 @@ void KartProperties::init_defaults()
     m_wheelie_pitch_rate      = physicsParameters->m_wheelie_pitch_rate;
     m_wheelie_restore_rate    = physicsParameters->m_wheelie_restore_rate;
     m_wheelie_speed_boost     = physicsParameters->m_wheelie_speed_boost;
+    m_wheelie_lean_recovery   = physicsParameters->m_wheelie_lean_recovery;
+    m_wheelie_balance_recovery= physicsParameters->m_wheelie_balance_recovery;
+    m_wheelie_step            = physicsParameters->m_wheelie_step;
+    m_wheelie_power_boost     = physicsParameters->m_wheelie_power_boost;
 
     //bullet physics data
     m_suspension_stiffness      = physicsParameters->m_suspension_stiffness;

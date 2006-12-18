@@ -69,6 +69,8 @@ protected:
     bool         m_skid_front;          // true if front tires are skidding
     bool         m_skid_rear;           // true if rear tires are skidding
     float        m_max_speed;           // maximum speed of the kart, computed from
+    float        m_wheelie_angle ;
+    
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
@@ -76,6 +78,7 @@ protected:
     btRaycastVehicle                   *m_vehicle;
     btBoxShape                         *m_kart_chassis;
     btRigidBody                        *m_kart_body;
+    btDefaultMotionState               *m_motion_state;
     float                               m_kart_height;
 #endif
 
@@ -207,6 +210,7 @@ public:
     bool              isInRest      ();
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
     float             getSpeed() const {return m_speed;     }
+    float             handleWheelie(float dt);
 #endif
     void           adjustSpeedWeight(float f);
     const std::string& getName      () const {return m_kart_properties->getName();}
