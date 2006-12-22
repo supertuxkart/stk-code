@@ -1122,9 +1122,11 @@ refs 4
 6 0.399011999369 1.42787802219
 kids 0
 OBJECT poly
-name "sandstorm"
 data 14
 @autotex X=0.5
+kids 1
+OBJECT poly
+name "sandstorm"
 texture "../images/fuzzy_sand.rgb"
 texrep 1 1
 numvert 40

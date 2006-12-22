@@ -30,6 +30,12 @@
 #endif
 #include "plib/ul.h"
 #include "loader.hpp"
+#include "world.hpp"
+#ifdef BULLET
+#include "btBulletDynamicsCommon.h"
+#include "moving_physics.hpp"
+#endif
+#include "moving_texture.hpp"
 
 Loader* loader = 0;
 
@@ -205,6 +211,7 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
         }
     }   // listFiles
 
+//-----------------------------------------------------------------------------
 /** Loads a kart model
  *
  *  Loads the kart model 'filename'. Callbacks contained in this file
@@ -257,6 +264,7 @@ ssgBranch *Loader::animInit (char *data ) const
 }   // animInit
 
 
+//-----------------------------------------------------------------------------
 /** Handle userdata that is stored in the model files. Mostly the userdata
  *  indicates that a special branch is to be created (e.g. a ssgCutout instead
  * of the standard branch). But some userdata indicate that callbacks need
@@ -298,7 +306,7 @@ ssgBranch *Loader::createBranch(char *data) const
     if ( strncmp ( "autodcs", data, strlen ( "autodcs" ) ) == 0 )
     {
         ssgTransform *br = new ssgTransform();
-        Callback     *c  = new Callback(data, br);
+        Callback     *c  = new MovingTexture(data, br);
         br->setUserData(new ssgBase());
         callback_manager->addCallback(c, m_current_callback_type);
         return br;
@@ -307,11 +315,23 @@ ssgBranch *Loader::createBranch(char *data) const
     if ( strncmp ( "autotex", data, strlen ( "autotex" ) ) == 0 )
     {
         ssgTexTrans *br = new ssgTexTrans();
-        Callback    *c  = new Callback(data, br);
+        Callback    *c  = new MovingTexture(data, br);
+        br->setUserData(new ssgBase());
+        br->setName("MovingTexture");
         callback_manager->addCallback(c, m_current_callback_type);
         return br;
     }
-
+    if(strncmp("physics", data, strlen("physics")) == 0)
+    {
+#ifdef BULLET
+        MovingPhysics *mp = new MovingPhysics(data, MovingPhysics::BODY_CONE);
+        callback_manager->addCallback(mp, m_current_callback_type);
+        return mp;
+#else
+        return NULL;
+#endif
+    }
+    fprintf(stderr, "Warning: Ignoring userdata '%s'\n",data);
     return NULL ;
 }   // createBranch
 

@@ -78,7 +78,7 @@ void PhysicsParameters::load(const std::string filename)
     CHECK_NEG(m_wheel_width,               "wheel-width"                );
     CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
-    CHECK_NEG(m_maximum_velocity,          "maximum_velocity"           );
+    CHECK_NEG(m_maximum_speed,             "maximum_speed"           );
 
 
     // Precompute some handy values to reduce work later
@@ -104,7 +104,7 @@ void PhysicsParameters::init_defaults()
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost =
-    m_chassis_linear_damping = m_chassis_angular_damping = m_maximum_velocity = -99.9f;
+    m_chassis_linear_damping = m_chassis_angular_damping = m_maximum_speed = -99.9f;
 
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults

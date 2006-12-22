@@ -6156,9 +6156,12 @@ refs 4
 5 19.0 1.0
 kids 0
 OBJECT poly
-name "rect.010"
+name "wrapper"
 data 14
 @autotex y=0.1
+kids 1
+OBJECT poly
+name "rect.010"
 texture "lava.rgb"
 texrep 1 1
 crease 30

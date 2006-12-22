@@ -660,9 +660,12 @@ refs 4
 108 0.0 5.0
 kids 0
 OBJECT poly
+name "wrapper"
+data 15
+@autotex Y=0.05
+kids 1
+OBJECT poly
 name "box.008"
-data 14
-@autotex Y=0.5
 texture "lava.rgb"
 texrep 1 1
 crease 30
@@ -1682,9 +1685,12 @@ refs 4
 12 0.0 0.934674024582
 kids 0
 OBJECT poly
+name "wrapper"
+data 17
+@autotex Y=-0.004
+kids 1
+OBJECT poly
 name "rect.002"
-data 16
-@autotex Y=-0.04
 texture "lava.rgb"
 texrep 1 1
 crease 30
@@ -1787,9 +1793,12 @@ refs 4
 12 0.498885005713 0.294928014278
 kids 0
 OBJECT poly
+name "wrapper"
+data 16
+@autotex Y=0.001
+kids 1
+OBJECT poly
 name "rect.001"
-data 15
-@autotex Y=0.01
 texture "lava.rgb"
 texrep 1 1
 crease 30

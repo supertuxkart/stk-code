@@ -1,4 +1,4 @@
-//  $Id: callback.hpp 796 2006-09-27 07:06:34Z hiker $
+//  $Id: moving_physics.hpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -17,21 +17,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef CALLBACK_H
-#define CALLBACK_H
-
-#include <string>
-#include <plib/sg.h>
+#ifdef BULLET
+#ifndef HEADER_MOVING_PHYSICS_H
+#define HEADER_MOVING_PHYSICS_H
 #include <plib/ssg.h>
+#include "btBulletDynamicsCommon.h"
+#include "callback.hpp"
 
-class Callback
+class MovingPhysics : public ssgTransform, public Callback
 {
 public:
-    virtual      ~Callback()        {};
-    virtual void update  (float dt) = 0;
-    virtual void init    ()         = 0;
-}
-;   // Callback
+    enum bodyTypes {BODY_CONE, BODY_BOX};
+protected:
+    btRigidBody          *m_body;
+    bodyTypes             m_type;
+    btCollisionShape     *m_shape;
+    btDefaultMotionState *m_motion_state;
+public:
+    MovingPhysics           (char *data, bodyTypes type);
+    ~MovingPhysics          (); 
+    virtual void update     (float dt);
+    void         init       ()          {};
+    const char  *getTypeName()          {return "moving physics";}
+};  // MovingPhysics
 
 #endif
+#endif
+/* EOF */
 

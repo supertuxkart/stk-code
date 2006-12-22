@@ -135,7 +135,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("wheel-width",               m_wheel_width              );
     lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
     lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
-    lisp->get("maximum-velocity",          m_maximum_velocity         );
+    lisp->get("maximum-speed",             m_maximum_speed            );
 
 }   // getAllData
 
@@ -184,7 +184,7 @@ void KartProperties::init_defaults()
     m_wheel_width               = physicsParameters->m_wheel_width;
     m_chassis_linear_damping    = physicsParameters->m_chassis_linear_damping;
     m_chassis_angular_damping   = physicsParameters->m_chassis_angular_damping;
-    m_maximum_velocity          = physicsParameters->m_maximum_velocity;
+    m_maximum_speed             = physicsParameters->m_maximum_speed;
 
 
 }   // init_defaults

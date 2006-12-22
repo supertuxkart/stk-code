@@ -135,7 +135,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
 #ifdef BULLET
-    m_max_speed            = m_kart_properties->getMaximumVelocity();
+    m_max_speed            = m_kart_properties->getMaximumSpeed();
     m_speed                = 0.0f;
 #else
     m_max_speed            = sqrt(getMaxPower()/getAirResistance());
@@ -197,10 +197,10 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // Create the actual vehicle
     // -------------------------
-    btVehicleRaycaster *vehicle_raycaster = 
+    m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
     m_tuning = new btRaycastVehicle::btVehicleTuning();
-    m_vehicle = new btRaycastVehicle(*m_tuning, m_kart_body, vehicle_raycaster);
+    m_vehicle = new btRaycastVehicle(*m_tuning, m_kart_body, m_vehicle_raycaster);
     // never deactivate the vehicle
     m_kart_body->setActivationState(DISABLE_DEACTIVATION);
     m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
@@ -670,19 +670,18 @@ void Kart::updatePhysics (float dt)
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
     //cap at maximum velocity
-    if ( m_speed >  m_kart_properties->getMaximumVelocity() )
+    const float max_speed = m_kart_properties->getMaximumSpeed();
+    if ( m_speed >  max_speed )
     {
-        btVector3 velocity = getVehicle()->getRigidBody()->getLinearVelocity();
-        if ( fabsf(velocity.getY()) > m_kart_properties->getMaximumVelocity()
-              || fabsf(velocity.getX()) > m_kart_properties->getMaximumVelocity() )
-        {
-            m_speed = m_kart_properties->getMaximumVelocity();
-            if ( fabsf(velocity.getY()) > fabsf(velocity.getX()) )
-                velocity.setY( sgn(velocity.getY()) * m_kart_properties->getMaximumVelocity() );
-            else
-                velocity.setX( sgn(velocity.getX()) * m_kart_properties->getMaximumVelocity() );
-            getVehicle()->getRigidBody()->setLinearVelocity( velocity );
-        }
+        const float velocity_ratio = max_speed/m_speed;
+        m_speed                    = max_speed;
+        btVector3 velocity         = m_kart_body->getLinearVelocity();
+
+        velocity.setY( velocity.getY() * velocity_ratio );
+        velocity.setX( velocity.getX() * velocity_ratio );
+
+        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+
     }
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(m_speed > 0.13f) {

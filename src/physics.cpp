@@ -23,6 +23,7 @@
 
 #ifdef BULLET
 #include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+#include "moving_physics.hpp"
 
 /** Initialise physics. */
 Physics::Physics(float gravity)
@@ -64,7 +65,16 @@ void Physics::setTrack(ssgEntity* track)
 void Physics::convertTrack(ssgEntity *track, sgMat4 m)
 {
     if(!track) return;
-    if(track->isAKindOf(ssgTypeLeaf()))
+    MovingPhysics *mp = dynamic_cast<MovingPhysics*>(track);
+    if(mp)
+    {
+        // If the track contains obect of type MovingPhysics,
+        // these objects will be real rigid body and are already
+        // part of the world. So these objects must not be converted
+        // to triangle meshes.
+        printf("Ignoring moving physics: %s\n", track->getName());
+    } 
+    else if(track->isAKindOf(ssgTypeLeaf()))
     {
         ssgLeaf             *leaf       = (ssgLeaf*)(track);
         // printf("triangles %d\n",leaf->getNumTriangles());
@@ -159,8 +169,11 @@ void Physics::draw()
         float m[16];
         btVector3 wireColor(1,0,0);
         btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
-        myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
-        debugDraw(m, obj->getCollisionShape(), wireColor);
+        if(myMotion) 
+        {
+            myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
+            debugDraw(m, obj->getCollisionShape(), wireColor);
+        }
 
     }  // for i
 #endif

@@ -1,4 +1,4 @@
-//  $Id: callback.hpp 796 2006-09-27 07:06:34Z hiker $
+//  $Id: moving_texture.hpp 796 2006-09-27 07:06:34Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -17,21 +17,37 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef CALLBACK_H
-#define CALLBACK_H
+#ifndef MOVING_TEXTURE_H
+#define MOVING_TEXTURE_H
 
 #include <string>
 #include <plib/sg.h>
 #include <plib/ssg.h>
+#include "callback.hpp"
 
-class Callback
+class MovingTexture : public Callback
 {
+private:
+    // the ac model files assume MODE_FORWARD=1, so a MODE_NONE is added
+    enum allCallbackModesType { MODE_NONE, MODE_FORWARD, MODE_CYCLE, MODE_SHUTTLE,
+                                MODE_SINESHUTTLE};
+
+    sgCoord    m_delta;
+    sgCoord    m_now;
+    float      m_phase;
+    float      m_cycle;
+    int        m_mode;
+    ssgBranch *m_branch;
+
+    void       parseData(char *data);
+
 public:
-    virtual      ~Callback()        {};
-    virtual void update  (float dt) = 0;
-    virtual void init    ()         = 0;
+    MovingTexture(char *data, ssgBranch *branch_);
+     ~MovingTexture();
+    void update  (float dt);
+    void init(){};
 }
-;   // Callback
+;   // MovingTexture
 
 #endif
 

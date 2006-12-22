@@ -13,9 +13,6 @@ bad at the moment). Most important bugs:
 - collectable don't work
   (well, you can fire a rocket, but hitting a kart won't do
   much, zipper, don't do anything, ...)
-- wheelies don't work
-- the speed display is wrong (displaying reverse when the
-  kart is actually going forward)
 - no proper friction handling, so no skidding
   (though skidding potentially works - if the friction is
   set correctly).
@@ -23,4 +20,9 @@ bad at the moment). Most important bugs:
 - rescuing an upside-down kart will return the kart to the middle
   of the track (waypoints) - the kart should be returned to where 
   it ended, just with a proper orientation.
+- if a kart is upside down, it will actually hang under the
+  track.
+- tuxtrack has some support for moveable objects, but the
+  display and physics are not synched properly - so the 
+  position of the cones is not shown correctly.
 

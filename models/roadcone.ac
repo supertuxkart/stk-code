@@ -1,6 +1,8 @@
 AC3Db
 MATERIAL "" rgb 1 0 0  amb 1 0 0  emis 0 0 0  spec 1 1 1  shi 51  trans 0
 OBJECT world
+data 13
+@physics cone
 kids 1
 OBJECT poly
 name "cylinder"

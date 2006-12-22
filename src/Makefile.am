@@ -53,7 +53,9 @@ supertuxkart_SOURCES =             main.cpp  			\
 	track_manager.cpp	   track_manager.hpp         	\
 	world.cpp		   world.hpp                	\
 	preprocessor.cpp	   preprocessor.hpp	        \
-	callback.cpp               callback.hpp                 \
+        callback.hpp						\
+	moving_physics.hpp	   moving_physics.cpp		\
+	movint_texture.hpp	   moving_texture.cpp		\
 	callback_manager.cpp       callback_manager.hpp         \
         physics.cpp                physics.hpp                  \
 	skid_mark.cpp		   skid_mark.hpp	        \

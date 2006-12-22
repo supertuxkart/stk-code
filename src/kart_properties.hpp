@@ -82,7 +82,7 @@ protected:
     float m_wheel_width;
     float m_chassis_linear_damping;
     float m_chassis_angular_damping;
-    float m_maximum_velocity;
+    float m_maximum_speed;
 
 public:
     KartProperties   ();
@@ -133,7 +133,7 @@ public:
     float getWheelWidth             () const {return m_wheel_width;              }
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
-    float getMaximumVelocity        () const {return m_maximum_velocity;         }
+    float getMaximumSpeed           () const {return m_maximum_speed;            }
 
 };
 

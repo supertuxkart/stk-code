@@ -56,7 +56,7 @@
    (wheel-width               0.3 )
    (chassis-linear-damping    0.2 )
    (chassis-angular-damping   0.2 )
-   (maximum-velocity         22.22 ) ;; = 80 km/h
+   (maximum-speed           22.22 ) ;; = 80 km/h
 
   )   ;; end kart-defaults
 )
