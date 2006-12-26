@@ -58,18 +58,18 @@
 #define GUI_TYPE 0xFFFE
 
 #define GUI_FREE   0
-#define GUI_STATE  1
-#define GUI_HARRAY 2
-#define GUI_VARRAY 4
-#define GUI_HSTACK 6
-#define GUI_VSTACK 8
-#define GUI_FILLER 10
-#define GUI_IMAGE  12
-#define GUI_LABEL  14
-#define GUI_COUNT  16
-#define GUI_CLOCK  18
-#define GUI_SPACE  20
-#define GUI_PAUSE  22
+#define GUI_STATE  (1<<0)
+#define GUI_HARRAY (1<<1)
+#define GUI_VARRAY (1<<2)
+#define GUI_HSTACK (1<<3)
+#define GUI_VSTACK (1<<4)
+#define GUI_FILLER (1<<5)
+#define GUI_IMAGE  (1<<6)
+#define GUI_LABEL  (1<<7)
+#define GUI_COUNT  (1<<8)
+#define GUI_CLOCK  (1<<9)
+#define GUI_SPACE  (1<<10)
+#define GUI_PAUSE  (1<<11)
 
 /*---------------------------------------------------------------------------*/
 
