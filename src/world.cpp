@@ -684,10 +684,10 @@ void World::loadTrack()
             ssgaSphere *sphere;
             sgVec3 center;
             sgVec4 colour;
-            for(unsigned int i = 0; i < m_track->driveline.size(); ++i)
+            for(unsigned int i = 0; i < m_track->m_driveline.size(); ++i)
             {
                 sphere = new ssgaSphere;
-                sgCopyVec3(center, m_track->driveline[i]);
+                sgCopyVec3(center, m_track->m_driveline[i]);
                 sphere->setCenter(center);
                 sphere->setSize(m_track->getWidth()[i] / 4.0f);
 
