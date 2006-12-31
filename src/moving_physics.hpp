@@ -27,17 +27,20 @@
 class MovingPhysics : public ssgTransform, public Callback
 {
 public:
-    enum bodyTypes {BODY_CONE, BODY_BOX};
+    enum bodyTypes {BODY_NONE, BODY_CONE, BODY_BOX};
+
 protected:
-    btRigidBody          *m_body;
-    bodyTypes             m_type;
+    bodyTypes             m_body_type;
     btCollisionShape     *m_shape;
+    btRigidBody          *m_body;
     btDefaultMotionState *m_motion_state;
+    float                 m_half_height;
+    float                 m_mass;
 public:
-    MovingPhysics           (char *data, bodyTypes type);
+    MovingPhysics           (const std::string data);
     ~MovingPhysics          (); 
-    virtual void update     (float dt);
-    void         init       ()          {};
+    void update             (float dt);
+    void         init       ();
     const char  *getTypeName()          {return "moving physics";}
 };  // MovingPhysics
 

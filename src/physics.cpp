@@ -72,7 +72,6 @@ void Physics::convertTrack(ssgEntity *track, sgMat4 m)
         // these objects will be real rigid body and are already
         // part of the world. So these objects must not be converted
         // to triangle meshes.
-        printf("Ignoring moving physics: %s\n", track->getName());
     } 
     else if(track->isAKindOf(ssgTypeLeaf()))
     {

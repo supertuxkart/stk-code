@@ -3,6 +3,8 @@ MATERIAL "ac3dmat0" rgb 0 0 0  amb 0 0 0  emis 0 0 0  spec 0 0 0  shi 0  trans 1
 MATERIAL "ac3dmat1" rgb 1 1 1  amb 0.2 0.2 0.2  emis 0 0 0  spec 0.5 0.5 0.5  shi 10  trans 0
 MATERIAL "" rgb 1 0 0  amb 1 0 0  emis 0 0 0  spec 1 1 1  shi 51  trans 0
 OBJECT world
+data 20
+@physics box mass=10
 kids 3
 OBJECT poly
 name "poly"

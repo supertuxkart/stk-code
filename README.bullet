@@ -22,7 +22,9 @@ bad at the moment). Most important bugs:
   it ended, just with a proper orientation.
 - if a kart is upside down, it will actually hang under the
   track.
-- tuxtrack has some support for moveable objects, but the
-  display and physics are not synched properly - so the 
-  position of the cones is not shown correctly.
+- tuxtrack is using real rigid bodies for the roadcone and roadblock,
+  so they are pushed around when hit by a kart. Currently, the
+  start orientation is not used, so the heading of the objects
+  is currently wrong.
+  Furthermore, the cones currently don't stop rolling around.
 

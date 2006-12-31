@@ -64,5 +64,16 @@ void CallbackManager::update(float dt) const
     }   // for i
 
 }   // update
+//-----------------------------------------------------------------------------
+void CallbackManager::initAll() const
+{
+    for(int i=0; i<CB_MAX; i++)
+    {
+        for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
+            c != m_allCallbacks[i].end(); c++)
+            (*c)->init();
+    }   // for i
+
+}   // update
 
 

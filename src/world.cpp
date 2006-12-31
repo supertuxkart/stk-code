@@ -163,6 +163,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     //ssgSetBackFaceCollisions ( m_race_setup.mirror ) ;
 #endif
 
+    callback_manager->initAll();
     menu_manager->switchToRace();
 
     const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();

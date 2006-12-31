@@ -283,8 +283,59 @@ minor changes will result in big changes in playability, i.e.
 the kart might suddenly only rotate on the spot, or hardly
 turn at all. Testing and tweaking and tweaking and testing
 is necessary.
-    
-6) Track design
+ 
+6) Moving textures
+==================
+A texture can be marked as 'moving', creating an animation effect - for
+example the lava in geekopeak. To do this, a new node must be added
+into the models. I don't know how to do this in blender, the manual
+way is:
+Find the texture to be moved, and look up for the first previous
+'OBJECT' statement (which is the begin of a node), e.g.:
+
+OBJECT poly
+name "rect.010"
+texture "lava.rgb"
+...
+
+Before that insert a new node like, having a @autotex line:
+
+OBJECT poly
+name "wrapper"
+data 14
+@autotex y=0.1
+kids 1
+OBJECT poly
+name "rect.010"
+texture "lava.rgb"
+...
+
+The data line indicates the number of characters in the next line
+(@autotex...) - including the '@'. The 'name' line is only inserted
+to help finding the node in a dump of the track for debugging
+purposes.
+
+The possible parameters can be found in the file moving_textures.cpp
+(function parseData).
+
+7) Physical objects
+===================
+Similar to moving textures (above), part of the track can be declared
+to represent a rigid body when bullet is used, i.e. this part of the
+track will be following the physics rules, and can move around etc.
+To do this, similar to moving textures, insert a node like:
+OBJECT world
+data 20
+@physics cone mass=1
+kids 1
+at the beginning of a file (see roadcone, roadblock), or begin
+with an "OBJECT poly" statement (instead of world).
+
+Currently, only 'cone' and 'box' are supported. Additional parameters
+can follow on the same line, but currently only 'mass=...'
+is supported (which defaults to 1).
+
+8) Track design
 ===============
 This was  written originally by Steve Baker for TuxKart. Most of the
 information contained here is still valid, though it might be good to

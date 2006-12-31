@@ -22,6 +22,7 @@
 #define HEADER_STRING_UTILS_H
 
 #include <string>
+#include <vector>
 #include <sstream>
 
 namespace StringUtils
@@ -67,6 +68,7 @@ namespace StringUtils
 
     std::string upcase (const std::string&);
     std::string downcase (const std::string&);
+    std::vector<std::string> split(const std::string& s, char c);
 
 } // namespace StringUtils
 

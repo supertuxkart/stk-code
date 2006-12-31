@@ -89,6 +89,31 @@ namespace StringUtils
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         return name;
     }
+//-----------------------------------------------------------------------------
+// Splits a string into substrings separated by a certain character, and 
+// returns a std::vector of all those substring. E.g.:
+//  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
+    std::vector<std::string> split(const std::string& s, char c)
+    {
+        std::vector<std::string> result;
+    
+        unsigned int start=0;
+        while(start!=std::string::npos)
+        {
+            unsigned int i=s.find(c, start);
+            if(i!=std::string::npos)
+            {
+                result.push_back(std::string(s,start, i-start));
+                start=i+1;
+            } 
+            else
+            {
+                result.push_back(std::string(s,start));
+                start = i;
+            }
+        }
+        return result;
+    }
 
 } // namespace StringUtils
 

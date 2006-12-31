@@ -495,7 +495,9 @@ void Kart::update (float dt)
     {
         // Let the kart raise 2m in the 2 seconds of the rescue
         const float rescue_time   = 2.0f;
+#ifdef BULLET
         const float rescue_height = 2.0f;
+#endif
         if(m_attachment.getType() != ATTACH_TINYTUX)
         {
             if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );

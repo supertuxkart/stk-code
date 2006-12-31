@@ -324,7 +324,7 @@ ssgBranch *Loader::createBranch(char *data) const
     if(strncmp("physics", data, strlen("physics")) == 0)
     {
 #ifdef BULLET
-        MovingPhysics *mp = new MovingPhysics(data, MovingPhysics::BODY_CONE);
+        MovingPhysics *mp = new MovingPhysics(std::string(data));
         callback_manager->addCallback(mp, m_current_callback_type);
         return mp;
 #else

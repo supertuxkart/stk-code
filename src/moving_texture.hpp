@@ -45,7 +45,7 @@ public:
     MovingTexture(char *data, ssgBranch *branch_);
      ~MovingTexture();
     void update  (float dt);
-    void init(){};
+    void init    ()         {};
 }
 ;   // MovingTexture
 
