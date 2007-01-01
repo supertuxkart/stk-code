@@ -288,8 +288,8 @@ BUGS IN THIS VERSION
 
 * Slow performance on CPU's less than ~450MHz.
 
-* Sometimes you can be pushed through a solid object if you are hit by
-another player when in contact with the surface. 
+* Sometimes you can be pushed through a solid object if you are
+hit by another player when in contact with the surface. 
 
 There might of course be more.
 
@@ -327,11 +327,14 @@ The archives of this mailing list can be found at:
 
   http://lists.berlios.de/pipermail/supertuxkart-devel/
 
-Or post a bug report on the SuperTuxKart webpage
+Or post a bug report on the SuperTuxKart bug forum (no 
+registration is required):
 
-  http://developer.berlios.de/bugs/?group_id=2765
+  http://developer.berlios.de/forum/forum.php?forum_id=23737
 
-A wiki will be installed in the near future, too.
+There is also a wiki at:
+
+  http://supertuxkart.berlios.de/wiki
 
 
 LICENSE
