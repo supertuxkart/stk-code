@@ -20,7 +20,6 @@
 #include <SDL/SDL.h>
 
 #include <plib/ssg.h>
-#include <plib/js.h>
 #include <plib/fnt.h>
 
 #include "config.hpp"

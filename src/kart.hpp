@@ -22,8 +22,9 @@
 #define HEADER_KART_H
 
 #include <plib/sg.h>
+#include <plib/js.h>
+
 #include "moveable.hpp"
-#include "kart_control.hpp"
 #include "particle_system.hpp"
 #include "kart_properties.hpp"
 #include "attachment.hpp"
@@ -31,6 +32,26 @@
 #ifdef BULLET
 #include "btBulletDynamicsCommon.h"
 #endif
+
+
+struct KartControl
+{
+    float data [ _JS_MAX_AXES ];
+    int   buttons;
+    int   presses;
+    int   releases;
+    float lr;
+    float accel;
+    bool  brake;
+    bool  wheelie;
+    bool  jump;
+    bool  rescue;
+    bool  fire;
+
+    KartControl() : buttons(0), presses(0),
+            releases(0), lr(0.0f), accel(0.0f), brake(false),
+    wheelie(false), jump(false),  rescue(false), fire(false){}
+};
 
 class SkidMark;
 class Kart;
@@ -70,7 +91,7 @@ protected:
     bool         m_skid_rear;           // true if rear tires are skidding
     float        m_max_speed;           // maximum speed of the kart, computed from
     float        m_wheelie_angle ;
-    
+
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;

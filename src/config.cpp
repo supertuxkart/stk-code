@@ -143,24 +143,24 @@ void Config::setDefaults()
     m_player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_LCTRL,     0, 0);
 
     /*player 3 default keyboard settings*/
-    m_player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_f,         0, 0);
-    m_player[1].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_h,         0, 0);
-    m_player[1].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_t,         0, 0);
-    m_player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_g,         0, 0);
-    m_player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_c,         0, 0);
-    m_player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_v,         0, 0);
-    m_player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_b,         0, 0);
-    m_player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_n,         0, 0);
+    m_player[2].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_f,         0, 0);
+    m_player[2].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_h,         0, 0);
+    m_player[2].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_t,         0, 0);
+    m_player[2].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_g,         0, 0);
+    m_player[2].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_c,         0, 0);
+    m_player[2].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_v,         0, 0);
+    m_player[2].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_b,         0, 0);
+    m_player[2].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_n,         0, 0);
 
     /*player 4 default keyboard settings*/
-    m_player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_j,         0, 0);
-    m_player[1].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_l,         0, 0);
-    m_player[1].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_i,         0, 0);
-    m_player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_k,         0, 0);
-    m_player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_m,         0, 0);
-    m_player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_COMMA,     0, 0);
-    m_player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_PERIOD,    0, 0);
-    m_player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_SLASH,     0, 0);
+    m_player[3].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_j,         0, 0);
+    m_player[3].setInput(KC_RIGHT,  IT_KEYBOARD, SDLK_l,         0, 0);
+    m_player[3].setInput(KC_ACCEL,  IT_KEYBOARD, SDLK_i,         0, 0);
+    m_player[3].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_k,         0, 0);
+    m_player[3].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_m,         0, 0);
+    m_player[3].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_COMMA,     0, 0);
+    m_player[3].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_PERIOD,    0, 0);
+    m_player[3].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_SLASH,     0, 0);
 }   // setDefaults
 
 

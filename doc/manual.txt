@@ -75,14 +75,28 @@ Player 1:
   Rescue     : Backspace
 
 Player 2:
+  Steer      : A / D key
+  Accelerate : W key
+  Brake      : S key
+  Use item   : Left control
+  Wheelie    : Left shift
+  Rescue     : Left alt
+
+Player 3:
+  Steer      : F / H key
+  Accelerate : T key
+  Brake      : G key
+  Use item   : N key
+  Wheelie    : C key
+  Rescue     : B key
+
+Player 4:
   Steer      : J / L key
   Accelerate : I key
   Brake      : K key
   Use item   : M key
   Wheelie    : . key
   Rescue     : / key
-
-Player 3 and 4 do not have default control configurations.
 
 The rescue button is meant to be used if your kart is stuck; it
 will send you to the track with your approximate progress, but
@@ -168,9 +182,9 @@ somewhat powerful computer and graphics card to get a high frame
 rate in this case. Network multi-player is not yet supported.
 
 When playing with your friends, the screen will be divided in
-cuadrants. You *need* to set up the 3rd and 4th player controls,
-but you probably will want to set different controls for the 1st
-and 2nd player too.
+cuadrants. Even thought there are default controls for all
+players, you should change them if you feel uncomfortable, or
+if you have a joystick.
 
 Also, after you finish the race, you might want to go back to
 give your friends some trouble!

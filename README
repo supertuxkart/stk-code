@@ -42,6 +42,22 @@ Player 1:
   Rescue     : Backspace
 
 Player 2:
+  Steer      : A / D key
+  Accelerate : W key
+  Brake      : S key
+  Use item   : Left control
+  Wheelie    : Left shift
+  Rescue     : Left alt
+
+Player 3:
+  Steer      : F / H key
+  Accelerate : T key
+  Brake      : G key
+  Use item   : N key
+  Wheelie    : C key
+  Rescue     : B key
+
+Player 4:
   Steer      : J / L key
   Accelerate : I key
   Brake      : K key
@@ -49,7 +65,6 @@ Player 2:
   Wheelie    : . key
   Rescue     : / key
 
-Player 3 and 4 do not have default control configurations.
 The Escape key pauses the game and shows the race menu.
 
 KNOWN BUGS
