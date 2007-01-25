@@ -98,14 +98,18 @@ void ScrolledText::inputKeyboard(int key, int pressed)
     switch(key)
     {
     case SDLK_PLUS      :
-    case SDLK_UP        : m_y_speed += 10.0f; break;
-    case SDLK_PAGEUP    : m_y_speed += 50.0f; break;
-    case SDLK_PAGEDOWN  : m_y_speed -= 50.0f; break;
+    case SDLK_UP        : m_y_speed -= 10.0f; break;
+    case SDLK_PAGEUP    : m_y_speed -= 50.0f; break;
+    case SDLK_PAGEDOWN  : m_y_speed += 50.0f; break;
     case SDLK_MINUS     :
-    case SDLK_DOWN      : m_y_speed -= 10.0f; break;
+    case SDLK_DOWN      : m_y_speed += 10.0f; break;
     case SDLK_ESCAPE    : menu_manager->popMenu();
     default             : break;
     }   // switch
+
+    if (m_y_speed > 500.0f) m_y_speed = 500.0f;
+    if (m_y_speed < -500.0f) m_y_speed = -500.0f;
+
 }   // inputKeyboard
 
 //-----------------------------------------------------------------------------

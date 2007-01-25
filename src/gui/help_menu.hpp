@@ -32,6 +32,8 @@ public:
     HelpMenu();
     ~HelpMenu();
     void select ();
+    void switch_to_first_screen();
+    void switch_to_second_screen();
 };
 
 #endif
