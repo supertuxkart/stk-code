@@ -79,6 +79,7 @@
 
 /*---------------------------------------------------------------------------*/
 
+//TODO:fix widget set colors, it seems only white works.
 const GLfloat gui_wht[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat gui_yel[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
 const GLfloat gui_red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };

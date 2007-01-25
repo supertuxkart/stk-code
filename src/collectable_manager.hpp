@@ -27,10 +27,10 @@ class Material;
 class ssgEntity;
 
 //The anvil and parachute must be at the end of the enum.
-enum collectableType {COLLECT_NOTHING, COLLECT_MISSILE,
-                      COLLECT_SPARK, COLLECT_HOMING_MISSILE,
-                      COLLECT_ZIPPER,
-                      COLLECT_ANVIL, COLLECT_PARACHUTE,
+enum collectableType {COLLECT_NOTHING,
+                      COLLECT_MISSILE, COLLECT_HOMING_MISSILE,
+                      COLLECT_SPARK, COLLECT_ZIPPER,
+                      COLLECT_PARACHUTE, COLLECT_ANVIL,
 #ifdef USE_MAGNETS
                       COLLECT_MAGNET,
 #endif

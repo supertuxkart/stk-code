@@ -37,7 +37,6 @@
 #include "loader.hpp"
 #include "screen_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "kart_control.hpp"
 #include "player.hpp"
 
 SDL_Surface *mainSurface;
