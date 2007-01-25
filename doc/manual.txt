@@ -205,7 +205,7 @@ Good Things:
  Homing missiles: slower than the regular kind - but they track
  the nearest kart and are quite hard to shake off.
 
- Fuzzy blobs: even slower still, a kart can outrun them quite
+ Fuzzy blobs/Spark: even slower still, a kart can outrun them quite
  easily. They ricochet off the sides of the track and only
  explode when they hit a Kart. Since they are not moving fast,
  they'll tend to stay close to where you dropped them, thought
@@ -281,6 +281,10 @@ the track), so be careful.
 Hitting another kart does not do any damage to your kart or the
 other kart, one of the karts will just be forced to a stand still,
 loosing precious seconds.
+
+When all human controlled karts finish the race, the game will wait
+some seconds for the AI to finish the race. If the AI doesn't, it
+will use the AI's current position as their final position.
 
 
 BUGS IN THIS VERSION
