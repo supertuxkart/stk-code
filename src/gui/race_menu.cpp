@@ -42,17 +42,17 @@ RaceMenu::RaceMenu()
     widgetSet -> label(m_menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE,  0);
-    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS,      0);
-    widgetSet -> state(VA, "Help",            GUI_MED, WTOK_HELP,         0);
-    widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE, 0);
+    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE);
+    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS);
+    widgetSet -> state(VA, "Help",            GUI_MED, WTOK_HELP);
+    widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE);
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet->state(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE, 0);
+        widgetSet->state(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
     }
 
-    widgetSet -> state(VA, "Exit Race",       GUI_MED, WTOK_EXIT_RACE, 0);
+    widgetSet -> state(VA, "Exit Race",       GUI_MED, WTOK_EXIT_RACE);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 }

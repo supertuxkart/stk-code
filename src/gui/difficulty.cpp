@@ -38,11 +38,11 @@ Difficulty::Difficulty()
     const int VA = widgetSet -> varray(m_menu_id);
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(VA, "Racer",  GUI_MED, WTOK_HARD, 0);
-    widgetSet -> state(VA, "Driver", GUI_MED, WTOK_MEDIUM, 0);
-    widgetSet -> start(VA, "Novice", GUI_MED, WTOK_EASY, 0);
+    widgetSet -> state(VA, "Racer",  GUI_MED, WTOK_HARD);
+    widgetSet -> state(VA, "Driver", GUI_MED, WTOK_MEDIUM);
+    widgetSet -> start(VA, "Novice", GUI_MED, WTOK_EASY);
     widgetSet -> space(VA);
-    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 }   // Difficulty

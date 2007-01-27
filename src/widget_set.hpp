@@ -78,7 +78,7 @@ enum GuiType
 
     GUI_FILLER = 32, //Empty space, cannot be traveled through
 
-    GUI_IMAGE  = 64, //Image widget
+    GUI_IMAGE  = 64, //Image widget using an OpenGL texture
 
     GUI_LABEL  = 128, //Single line text
 
@@ -166,13 +166,13 @@ public:
 
     //a widget that consists of a texture (which must be completely
     //handled by the application)
-    int  image(int, int, int, int);
+    int  image(int, int, int, int, int rect=GUI_ALL);
 
     //a normal text menu entry, except that it is automatically immediately activated
-    int  start(int, const char *, int, int, int value=0);
+    int  start(int, const char *, int, int, int value=GUI_OFF);
 
     //a normal text menu entry
-    int  state(int, const char *, int, int, int value=0);
+    int  state(int, const char *, int, int, int value=GUI_OFF);
 
     //a text label (cannot be selected). c0 and c1 are two colours that the text is shaded with
     int  label(int pd, const char *text, int size=GUI_MED, int rect=GUI_ALL,

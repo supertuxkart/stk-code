@@ -76,7 +76,7 @@ RaceResultsGUI::RaceResultsGUI()
                 race_manager->getPositionScore(i+1),
                 race_manager->getKartScore(order[i]));
         widgetSet -> label(m_menu_id, (char*)(m_score + MAX_STR_LEN * i),
-                           GUI_MED, GUI_LFT, 0, 0);
+                           GUI_MED, GUI_ALL);
     }
 
     delete[] order;

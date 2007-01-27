@@ -43,6 +43,8 @@ CharSel::CharSel(int whichPlayer)
     oldContext->makeCurrent();
 
     m_menu_id = widgetSet -> vstack(0);
+    const int HS1 = widgetSet -> hstack (m_menu_id);
+    widgetSet -> filler(HS1);
 
     std::ostringstream tmp;
     //FIXME: when a long string is used, like the previous one which was
@@ -50,37 +52,34 @@ CharSel::CharSel(int whichPlayer)
     tmp << "Player " << m_player_index + 1 << ", choose a driver";
     // Due to widgetSet constraints, this must be static!
     static const std::string HEADING = tmp.str();
-    widgetSet -> label(m_menu_id, HEADING.c_str(), GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> space(m_menu_id);
+    widgetSet -> label(HS1, HEADING.c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> filler(HS1);
+
+    widgetSet -> filler(m_menu_id);
 
     const int HA = widgetSet -> harray(m_menu_id);
-    widgetSet -> filler(HA);
-    const int VA = widgetSet -> varray(HA);
-
     const int ICON_SIZE = 64;
 
-    const int ROWL = widgetSet -> harray(VA);
-
-    for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
+    for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
         Material *m = material_manager->getMaterial(kp->getIconFile());
-        const int C = widgetSet->image(ROWL, m->getState()->getTextureHandle(),
+        const int C = widgetSet->image(HA, m->getState()->getTextureHandle(),
                                  ICON_SIZE, ICON_SIZE);
         widgetSet->activate_widget(C, i, 0);
 
-        if (config->m_player[whichPlayer].getLastKartId() == i)
+        if (i == kart_properties_manager->getNumberOfKarts() - 1)
             widgetSet->set_active(C);
-        //          else if (NULL == kart_properties_manager->getKartById(i + 1)) // last in the list
-        //     widgetSet->set_active(C);
     }
-    widgetSet -> filler(HA);
-    m_kart_name_label = widgetSet -> label(m_menu_id, "No driver choosed",
-                                         GUI_MED, GUI_ALL, 0, 0);
+    const int HS2 = widgetSet -> hstack(m_menu_id);
+    widgetSet -> filler (HS2);
+    m_kart_name_label = widgetSet -> label(HS2, "No driver choosed",
+                                         GUI_MED, GUI_ALL);
+    widgetSet -> filler (HS2);
     widgetSet -> layout(m_menu_id, 0, 1);
 
     m_current_kart = -1;
-    switchCharacter(3);
+    switchCharacter(1);
 
     m_clock = 0;
     //test

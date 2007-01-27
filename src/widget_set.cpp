@@ -278,7 +278,7 @@ void WidgetSet::set_multi(int id, const char *text)
 }
 
 //-----------------------------------------------------------------------------
-int WidgetSet::image(int pd, int textureId, int w, int h)
+int WidgetSet::image(int pd, int textureId, int w, int h, int rect)
 {
     int id;
 
@@ -287,6 +287,8 @@ int WidgetSet::image(int pd, int textureId, int w, int h)
         m_widgets[id].text_img = textureId;
         m_widgets[id].w     = w;
         m_widgets[id].h     = h;
+        m_widgets[id].rect  = rect;
+
     }
     return id;
 }
