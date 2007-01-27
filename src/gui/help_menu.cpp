@@ -66,8 +66,8 @@ Current keys bindings for the first player:",GUI_SML);
         // to make sure that all key-strings are permanent, they
         // are assigned to an array m_all_keys within this object.
         m_all_keys[i]=config->getInputAsString(0, (KartActions)i);
-        widgetSet->label(CHANGE_ID, m_all_keys[i].c_str(),    GUI_SML);
-        widgetSet->label(LABEL_ID,  sKartAction2String[i], GUI_SML);
+        widgetSet->label(LABEL_ID,  sKartAction2String[i], GUI_SML, GUI_LFT);
+        widgetSet->label(CHANGE_ID, m_all_keys[i].c_str(), GUI_SML, GUI_RGT);
     }
     widgetSet->start(m_menu_id,"Next screen", GUI_SML, WTOK_SECOND_PAGE);
     widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
@@ -83,12 +83,11 @@ void HelpMenu::switch_to_second_screen()
         "To help you win, there are certain collectables you can grab:",
         GUI_SML);
 
-
-    const int HA        = widgetSet->harray(m_menu_id);
+    const int HA        = widgetSet->hstack(m_menu_id);
     const int LABEL_ID  = widgetSet->varray(HA);
-    const int IMAGE_ID = widgetSet->varray(HA);
+    const int IMAGE_ID = widgetSet->vstack(HA);
 
-    const int ICON_SIZE = 32;
+    const int ICON_SIZE = 64;
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE);

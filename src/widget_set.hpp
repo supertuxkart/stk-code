@@ -33,49 +33,67 @@
 
 /*---------------------------------------------------------------------------*/
 
-#define GUI_SML  18
-#define GUI_MED  24
-#define GUI_LRG  30
+enum WidgetFontSize { GUI_SML = 18, GUI_MED = 24, GUI_LRG = 30};
 
-#define GUI_NW   1
-#define GUI_SW   2
-#define GUI_NE   4
-#define GUI_SE   8
+enum WidgetArea //One of the uses of this, is to say which corners are rounded
+{
+    GUI_NONE = 0,
+    GUI_NW = 1, GUI_SW = 2, GUI_NE = 4, GUI_SE = 8,
+    GUI_LFT = (GUI_NW  | GUI_SW),
+    GUI_RGT = (GUI_NE  | GUI_SE),
+    GUI_TOP = (GUI_NW  | GUI_NE),
+    GUI_BOT = (GUI_SW  | GUI_SE),
+    GUI_ALL = (GUI_TOP | GUI_BOT)
+};
 
-#define GUI_LFT  (GUI_NW  | GUI_SW)
-#define GUI_RGT  (GUI_NE  | GUI_SE)
-#define GUI_TOP  (GUI_NW  | GUI_NE)
-#define GUI_BOT  (GUI_SW  | GUI_SE)
-#define GUI_ALL  (GUI_TOP | GUI_BOT)
+enum WidgetValue { GUI_OFF = 0, GUI_ON = 1 }; //For the widget values, for
+                                              // on / off switch.
 
 #define SCREEN_CENTERED_TEXT -10000
 
 
 /*---------------------------------------------------------------------------*/
 
-#define MAXWIDGETS 256
+#define MAX_WIDGETS 256
 
 #define GUI_TYPE 0xFFFE
 
-#define GUI_FREE   0
-#define GUI_STATE  (1<<0)
-#define GUI_HARRAY (1<<1)
-#define GUI_VARRAY (1<<2)
-#define GUI_HSTACK (1<<3)
-#define GUI_VSTACK (1<<4)
-#define GUI_FILLER (1<<5)
-#define GUI_IMAGE  (1<<6)
-#define GUI_LABEL  (1<<7)
-#define GUI_COUNT  (1<<8)
-#define GUI_CLOCK  (1<<9)
-#define GUI_SPACE  (1<<10)
-#define GUI_PAUSE  (1<<11)
+enum GuiType
+{
+    GUI_FREE   = 0, //Unused widget
+
+    GUI_STATE  = 1, //Button that has a state assigned.
+
+    GUI_HARRAY = 2, //Horizantal container for groups of other types, all with
+                    //the same size.
+
+    GUI_VARRAY = 4, //Vertical container for groups of other types, all with
+                    //the same.
+
+    GUI_HSTACK = 8, //Horizontal container for groups of other types, each one
+                    //on top of the other, with individual sizes.
+
+    GUI_VSTACK = 16, //Vertical container for groups of other types, each one
+                     //on top the other, with individual sizes.
+
+    GUI_FILLER = 32, //Empty space, cannot be traveled through
+
+    GUI_IMAGE  = 64, //Image widget
+
+    GUI_LABEL  = 128, //Single line text
+
+    GUI_COUNT  = 256,
+
+    GUI_CLOCK  = 512,
+    GUI_SPACE  = 1024,//Empty space, can be traveled through
+    GUI_PAUSE  = 2048
+};
 
 /*---------------------------------------------------------------------------*/
 
 //previously in config.h:
 
-#define MAXSTR 256
+#define MAX_STR 256
 
 /*---------------------------------------------------------------------------*/
 
@@ -92,9 +110,10 @@ struct Widget
 {
     int     type;
     int     token;
-    int     value;
+    int     value;//On/Off switch using the WidgetValue.
     int     size;
-    int     rect;
+    int     rect; //This uses the WidgetAreas, and determines which corners
+                  //are rounded, GUI_ALL rounds all corners.
 
     int     x, y;
     int     w, h;
@@ -336,12 +355,7 @@ private:
 
     /*---------------------------------------------------------------------------*/
 
-    void set_paused();
-    void clr_paused();
-
-    /*---------------------------------------------------------------------------*/
-
-    Widget m_widgets[MAXWIDGETS];
+    Widget m_widgets[MAX_WIDGETS];
     int           m_active;
     int           m_radius;
     fntTexFont    *m_fnt;

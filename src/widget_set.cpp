@@ -30,9 +30,9 @@ WidgetSet *widgetSet;
 WidgetSet::WidgetSet()
         : m_active(0), m_pause_id(0), m_paused(0)
 {
-    const int W   = config->m_width;
-    const int H   = config->m_height;
-    const int S   = (H < W) ? H : W;
+    const int width   = config->m_width;
+    const int height   = config->m_height;
+    const int S   = (height < width) ? height : width ;
     m_radius  = S/60;
     m_fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
                              GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
@@ -45,18 +45,16 @@ WidgetSet::WidgetSet()
     m_text_out_race->setFont(m_fnt_race);
 
     /* Initialize font rendering. */
-    memset(m_widgets, 0, sizeof (Widget) * MAXWIDGETS);
+    memset(m_widgets, 0, sizeof (Widget) * MAX_WIDGETS);
 
 }
 
 //-----------------------------------------------------------------------------
 WidgetSet::~WidgetSet()
 {
-    int id;
-
     /* Release any remaining widget texture and display list indices. */
 
-    for (id = 1; id < MAXWIDGETS; id++)
+    for (int id = 1; id < MAX_WIDGETS; id++)
     {
         if (glIsList(m_widgets[id].rect_obj))
             glDeleteLists(m_widgets[id].rect_obj, 1);
@@ -160,7 +158,7 @@ int WidgetSet::add_widget(int pd, int type)
 
     /* Find an unused entry in the widget table. */
 
-    for (id = 1; id < MAXWIDGETS; id++)
+    for (id = 1; id < MAX_WIDGETS; id++)
     {
         if (m_widgets[id].type == GUI_FREE)
         {
@@ -258,7 +256,7 @@ void WidgetSet::set_multi(int id, const char *text)
 {
     const char *p;
 
-    char s[8][MAXSTR];
+    char s[8][MAX_STR];
     int  i, j, jd;
 
     size_t n = 0;
@@ -514,7 +512,7 @@ int WidgetSet::multi(int pd, const char *text, int size, int rect, const float *
 #define MAX_NUMBER_OF_LINES 20
         // Important; this s must be static, otherwise the strings will be
         // lost when returning --> garbage will be displayed.
-        static char s[MAX_NUMBER_OF_LINES][MAXSTR];
+        static char s[MAX_NUMBER_OF_LINES][MAX_STR];
         int  r[MAX_NUMBER_OF_LINES];
         int  i, j;
 
@@ -883,7 +881,7 @@ void WidgetSet::layout(int id, int xd, int yd)
 int WidgetSet::search(int id, int x, int y)
 {
     int jd, kd;
-    assert(id < MAXWIDGETS);
+    assert(id < MAX_WIDGETS);
 
     /* Search the hierarchy for the widget containing the given point. */
 
@@ -1570,26 +1568,18 @@ void WidgetSet::set_active(int id)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetSet::set_paused()
-{
-    sound_manager -> pauseMusic() ;
-    m_paused = true;
-}
-
-//-----------------------------------------------------------------------------
-void WidgetSet::clr_paused()
-{
-    sound_manager -> resumeMusic() ;
-    m_paused = false;
-}
-
-//-----------------------------------------------------------------------------
 void WidgetSet::tgl_paused()
 {
     if (m_paused)
-        clr_paused();
+    {
+        sound_manager -> resumeMusic() ;
+        m_paused = false;
+    }
     else
-        set_paused();
+    {
+        sound_manager -> pauseMusic() ;
+        m_paused = true;
+    }
 }
 
 //-----------------------------------------------------------------------------

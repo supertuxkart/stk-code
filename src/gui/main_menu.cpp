@@ -39,13 +39,13 @@ MainMenu::MainMenu()
     m_menu_id = widgetSet -> varray(0);
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, "Single Player", GUI_MED, WTOK_SINGLE,  0);
-    widgetSet -> state(m_menu_id, "Multiplayer",   GUI_MED, WTOK_MULTI,   0);
-    widgetSet -> state(m_menu_id, "Options",       GUI_MED, WTOK_OPTIONS, 0);
-    widgetSet -> state(m_menu_id, "Quit",          GUI_MED, WTOK_QUIT,    0);
+    widgetSet -> start(m_menu_id, "Single Player", GUI_MED, WTOK_SINGLE);
+    widgetSet -> state(m_menu_id, "Multiplayer",   GUI_MED, WTOK_MULTI);
+    widgetSet -> state(m_menu_id, "Options",       GUI_MED, WTOK_OPTIONS);
+    widgetSet -> state(m_menu_id, "Quit",          GUI_MED, WTOK_QUIT);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, "Help",          GUI_SML, WTOK_HELP,    0);
-    widgetSet -> state(m_menu_id, "Credits",       GUI_SML, WTOK_CREDITS, 0);
+    widgetSet -> state(m_menu_id, "Help",          GUI_SML, WTOK_HELP);
+    widgetSet -> state(m_menu_id, "Credits",       GUI_SML, WTOK_CREDITS);
     widgetSet -> space(m_menu_id);
 
     widgetSet -> layout(m_menu_id, 0, 0);
@@ -71,6 +71,7 @@ void MainMenu::select()
         break;
 
     case WTOK_REPLAY:
+        //TODO
         break;
 
     case WTOK_OPTIONS:

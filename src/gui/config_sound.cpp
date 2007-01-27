@@ -34,14 +34,21 @@ ConfigSound::ConfigSound()
     widgetSet -> label(m_menu_id, "Sound Settings", GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    // The spaces are actually important, otherwise the set_label calls below
-    // will increase the width of the container, resulting in a warning being
+    // The spaces are important, otherwise the set_label calls below will
+    // increase the width of the container, resulting in a warning being
     // printed by widgetSet.
-    m_music_menu_id = widgetSet->start(VA,"  Turn on music  ", GUI_MED, WTOK_MUSIC);
-    m_sfx_menu_id   = widgetSet->state(VA,"  Turn on sound effects  ", GUI_MED, WTOK_SFX);
+    if( config->m_music )
+        m_music_menu_id = widgetSet->start(VA,"  Turn off music  ", GUI_MED, WTOK_MUSIC, GUI_ON);
+    else
+        m_music_menu_id = widgetSet->start(VA,"  Turn on music  ", GUI_MED, WTOK_MUSIC, GUI_OFF);
 
-    if(config->m_music) widgetSet->set_label(m_music_menu_id, "Turn off music");
-    if(config->m_sfx) widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
+    if( config->m_sfx )
+        m_sfx_menu_id   = widgetSet->state(VA,"  Turn off sound effects  ",
+            GUI_MED, WTOK_SFX, GUI_ON);
+    else
+        m_sfx_menu_id   = widgetSet->state(VA,"  Turn on sound effects  ",
+            GUI_MED, WTOK_SFX, GUI_OFF);
+
     widgetSet -> space(VA);
     widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
     widgetSet -> layout(m_menu_id, 0, 0);
@@ -82,6 +89,7 @@ void ConfigSound::select()
             config->m_music = true;
             widgetSet->set_label(m_music_menu_id, "Turn off music");
         }
+        widgetSet->toggle(m_music_menu_id);
         break;
     case WTOK_SFX:
         if(config->m_sfx)
@@ -94,6 +102,7 @@ void ConfigSound::select()
             config->m_sfx = true;
             widgetSet->set_label(m_sfx_menu_id, "Turn off sound effects");
         }
+        widgetSet->toggle(m_sfx_menu_id);
         break;
     case WTOK_BACK:
         menu_manager->popMenu();

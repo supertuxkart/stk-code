@@ -25,7 +25,7 @@ enum WidgetTokens {
     WTOK_CONTROLS,
     WTOK_DISPLAY,
     WTOK_SOUND,
-    WTOK_BACK,
+    WTOK_BACK
 };
 
 Options::Options()
@@ -35,18 +35,18 @@ Options::Options()
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
     widgetSet -> label(m_menu_id, "Options",   GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> start(m_menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, 0);
+    widgetSet -> start(m_menu_id, "Controls",  GUI_MED, WTOK_CONTROLS, GUI_OFF);
     // Don't display the fullscreen menu when called from within the race.
     // The fullscreen mode will reload all textures, reload the models,
     // ... basically creating a big mess!!  (and all of this only thanks
     // to windows, who discards all textures, ...)
     if(!menu_manager->isSomewhereOnStack(MENUID_RACE))
     {
-        widgetSet -> state(m_menu_id, "Display",   GUI_MED, WTOK_DISPLAY, 0);
+        widgetSet -> state(m_menu_id, "Display",   GUI_MED, WTOK_DISPLAY);
     }
-    widgetSet -> state(m_menu_id, "Sound",     GUI_MED, WTOK_SOUND, 0);
+    widgetSet -> state(m_menu_id, "Sound",     GUI_MED, WTOK_SOUND);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK, 0);
+    widgetSet -> state(m_menu_id, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 }
