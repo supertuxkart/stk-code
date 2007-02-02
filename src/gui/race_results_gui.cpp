@@ -83,7 +83,7 @@ RaceResultsGUI::RaceResultsGUI()
     widgetSet -> space(m_menu_id);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Continue",  GUI_MED, WTOK_CONTINUE);
+    widgetSet -> start(VA, "Back to the main menu",  GUI_MED, WTOK_CONTINUE);
     widgetSet -> start(VA, "Race in this track again",  GUI_MED, WTOK_RESTART_RACE);
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {

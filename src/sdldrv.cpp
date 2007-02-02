@@ -197,12 +197,16 @@ void drv_loop()
         case SDL_JOYAXISMOTION:
             if(ev.jaxis.value <= -1000)
             {
+#ifdef ALT_JOY_HANDLING
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
+#endif
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 1);
             }
             else if(ev.jaxis.value >= 1000)
             {
+#ifdef ALT_JOY_HANDLING
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 0);
+#endif
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 1);
             }
             else
