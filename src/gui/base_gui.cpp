@@ -30,17 +30,41 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
     case IT_KEYBOARD:
         inputKeyboard(id0, value);
         break;
+
     case IT_MOUSEMOTION:
+        widgetSet->pulse(widgetSet->point(m_menu_id, id0, id1), 1.2f);
+
+#ifdef  ALT_MOUSE_HANDLING
         if (id0 == 1 && value)
             if (id1 == AD_NEGATIVE)
                 inputKeyboard(SDLK_UP, 1);
             else
                 inputKeyboard(SDLK_DOWN, 1);
+#endif
         break;
+
+    case IT_MOUSEBUTTON:
+        switch (id0)
+        {
+            case SDL_BUTTON_LEFT:
+                select();
+                break;
+            case SDL_BUTTON_RIGHT:
+                if (menu_manager->getMenuStackSize() > 1)
+                {
+                    if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
+                        widgetSet->tgl_paused();
+
+                    menu_manager->popMenu();
+                }
+            break;
+        }
+        break;
+
     case IT_STICKMOTION:
-        if(widgetSet)
-            widgetSet -> pulse(widgetSet -> stick(m_menu_id, id1, id2, value), 1.2f);
+        widgetSet -> pulse(widgetSet -> stick(m_menu_id, id1, id2, value), 1.2f);
         break;
+
     case IT_STICKBUTTON:
         if( value)
             switch (id1) // Button no
@@ -79,6 +103,7 @@ void BaseGUI::inputKeyboard(int key, int pressed)
     case SDLK_DOWN:
         widgetSet->pulse(widgetSet->cursor(m_menu_id, key), 1.2f);
         break;
+
     case SDLK_SPACE:
     case SDLK_RETURN:
         select();

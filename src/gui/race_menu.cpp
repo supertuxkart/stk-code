@@ -20,6 +20,7 @@
 #include <SDL/SDL.h>
 
 #include "race_menu.hpp"
+#include "config.hpp"
 #include "world.hpp"
 #include "widget_set.hpp"
 
@@ -55,14 +56,19 @@ RaceMenu::RaceMenu()
     widgetSet -> state(VA, "Exit Race",       GUI_MED, WTOK_EXIT_RACE);
 
     widgetSet -> layout(m_menu_id, 0, 0);
+
+    if(config->m_fullscreen) SDL_ShowCursor(SDL_ENABLE);
 }
 
 //-----------------------------------------------------------------------------
 RaceMenu::~RaceMenu()
 {
     widgetSet -> delete_widget(m_menu_id) ;
+
+    if(config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
 }
 
+//-----------------------------------------------------------------------------
 void RaceMenu::update(float dt)
 {
     widgetSet -> timer(m_menu_id, dt) ;

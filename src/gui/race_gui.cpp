@@ -30,6 +30,11 @@
 
 RaceGUI::RaceGUI(): m_time_left(0.0)
 {
+    if(config->m_fullscreen)
+    {
+        SDL_ShowCursor(SDL_DISABLE);
+    }
+
     if(!config->m_profile)
     {
         UpdateKeyboardMappings();
@@ -68,6 +73,10 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+    if(config->m_fullscreen)
+    {
+        SDL_ShowCursor(SDL_ENABLE);
+    }
     //FIXME: does all that material stuff need freeing somehow?
 }   // ~Racegui
 

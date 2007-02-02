@@ -44,27 +44,6 @@ SDL_Joystick **sticks;
 
 #define DEADZONE_MOUSE 1
 
-void gui_mousefn ( int button, int updown, int x, int y )
-{
-    if (button==0 && updown==0)
-    {
-        BaseGUI* menu= menu_manager->getCurrentMenu();
-        if (menu != NULL)
-        {
-            menu->select();
-        }
-    }
-    else if (button==2 && updown==0 && menu_manager->getMenuStackSize() > 1)
-    {
-        menu_manager->popMenu();
-    }
-    // puMouse(button, updown, x, y ) ;
-}
-
-//-----------------------------------------------------------------------------
-void updateMenus()
-{}
-
 //-----------------------------------------------------------------------------
 void drv_init()
 {
@@ -80,13 +59,12 @@ void drv_init()
 
     SDL_JoystickEventState(SDL_ENABLE);
 
-    const int NO_STICKS = SDL_NumJoysticks();
-    sticks = (SDL_Joystick **) malloc(sizeof(SDL_Joystick *) * NO_STICKS);
-    for (int i=0;i<NO_STICKS;i++)
+    const int NUM_STICKS = SDL_NumJoysticks();
+    sticks = (SDL_Joystick **) malloc(sizeof(SDL_Joystick *) * NUM_STICKS);
+    for (int i=0;i<NUM_STICKS;i++)
         sticks[i] = SDL_JoystickOpen(i);
 
     SDL_WM_SetCaption("Super Tux Kart", NULL);
-    SDL_ShowCursor(SDL_DISABLE);
 
     ssgInit () ;
     fntInit();
@@ -100,7 +78,14 @@ void drv_toggleFullscreen(int resetTextures)
     flags = SDL_OPENGL | SDL_HWSURFACE;
 
     if(config->m_fullscreen)
+    {
         flags |= SDL_FULLSCREEN;
+
+        if(menu_manager->isSomewhereOnStack(MENUID_RACE))
+            SDL_ShowCursor(SDL_DISABLE);
+    }
+    else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
+            SDL_ShowCursor(SDL_ENABLE);
 
     SDL_FreeSurface(mainSurface);
     mainSurface = SDL_SetVideoMode(config->m_width, config->m_height, 0, flags);
@@ -141,10 +126,8 @@ void drv_toggleFullscreen(int resetTextures)
 //-----------------------------------------------------------------------------
 void drv_deinit()
 {
-    SDL_ShowCursor(SDL_ENABLE);
-
-    const int NO_STICKS = SDL_NumJoysticks();
-    for (int i=0;i<NO_STICKS;i++)
+    const int NUM_STICKS = SDL_NumJoysticks();
+    for (int i=0;i<NUM_STICKS;i++)
         SDL_JoystickClose(sticks[i]);
 
     free(sticks);
@@ -179,7 +162,11 @@ void drv_loop()
         case SDL_KEYUP:
             input(IT_KEYBOARD, ev.key.keysym.sym, 0, 0, ev.key.state);
             break;
+
         case SDL_MOUSEMOTION:
+            input(IT_MOUSEMOTION, ev.motion.x, mainSurface->h - ev.motion.y, 0, 0);
+
+#ifdef ALT_MOUSE_HANDLING
             // This probably needs better handling
             if (ev.motion.xrel < -DEADZONE_MOUSE)
                 input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 1);
@@ -200,12 +187,13 @@ void drv_loop()
                 input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 0);
                 input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 0);
             }
-
+#endif
             break;
+
         case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP:
             input(IT_MOUSEBUTTON, ev.button.button, 0, 0, ev.button.state);
             break;
+
         case SDL_JOYAXISMOTION:
             if(ev.jaxis.value <= -1000)
             {
@@ -223,6 +211,7 @@ void drv_loop()
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
             }
             break;
+
         case SDL_JOYBUTTONDOWN:
         case SDL_JOYBUTTONUP:
             input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0,
@@ -237,7 +226,4 @@ void drv_loop()
         // screen_manager, since the new world_screen is added twice).
         if(screen_manager->screenSwitchPending()) break;
     }   // while (SDL_PollEvent())
-
-    updateMenus();
-
 }
