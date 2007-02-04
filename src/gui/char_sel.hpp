@@ -22,7 +22,6 @@
 
 #include "base_gui.hpp"
 
-class ssgBranch;
 class ssgTransform;
 class ssgContext;
 
