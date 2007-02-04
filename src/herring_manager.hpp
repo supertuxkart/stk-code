@@ -64,6 +64,8 @@ public:
     void        reset           ();
     void        removeTextures  ();
     void        setUserFilename (char *s) {m_user_filename=s;}
+    ssgEntity*  getHerringModel (herringType type)
+                                {return m_herring_model[type];}
 };
 
 extern HerringManager* herring_manager;

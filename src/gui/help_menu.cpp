@@ -17,6 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "kart_properties_manager.hpp"
+#include "kart_properties.hpp"
+
 #include "help_menu.hpp"
 #include "widget_set.hpp"
 #include "race_manager.hpp"
@@ -34,28 +37,130 @@ enum WidgetTokens {
 
 HelpMenu::HelpMenu()
 {
+    //The ssgContext constructor calls makeCurrent(), it has to be restored
+    ssgContext* oldContext = ssgGetCurrentContext();
+    m_context = new ssgContext;
+    oldContext->makeCurrent();
+
+    m_box = 0;
+    m_silver_coin = 0;
+    m_gold_coin = 0;
+    m_banana = 0;
+
     switch_to_first_screen();
 }   // HelpMenu
+
+//-----------------------------------------------------------------------------
+HelpMenu::~HelpMenu()
+{
+    widgetSet -> delete_widget(m_menu_id) ;
+
+    {
+    ssgDeRefDelete(m_box);
+    ssgDeRefDelete(m_silver_coin);
+    ssgDeRefDelete(m_gold_coin);
+    ssgDeRefDelete(m_banana);
+
+    delete m_context;
+    }
+
+}   // ~HelpMenu
+
+//-----------------------------------------------------------------------------
+void HelpMenu::update(float dt)
+{
+    m_clock += dt * 40.0f;
+    BaseGUI::update(dt);
+
+    if (m_box != NULL && m_banana != NULL)
+    {
+        ssgContext* oldContext = ssgGetCurrentContext();
+        m_context -> makeCurrent();
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+#if 0
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+
+        glViewport ( 0, 0, viewport[2], viewport[3]);
+        m_context -> setFOV ( 45.0f, 45.0f * viewport[2]/viewport[3] ) ;
+        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
+#endif
+
+        sgCoord cam_pos;
+        sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+        m_context -> setCamera ( &cam_pos ) ;
+
+        glEnable (GL_DEPTH_TEST);
+        sgCoord trans;
+        sgSetCoord(&trans, -4, 10, 1.85f, m_clock, 0, 0);
+        m_box->setTransform (&trans);
+
+        sgSetCoord(&trans, -2, 8, 1.5f, m_clock, 0, 0);
+        m_silver_coin->setTransform (&trans);
+
+        sgSetCoord(&trans, -1, 8, 1.5f, m_clock, 0, 0);
+        m_gold_coin->setTransform (&trans);
+
+        sgSetCoord(&trans, 5, 15, 3, m_clock, 0, 0);
+        m_banana->setTransform (&trans);
+
+        //glShadeModel(GL_SMOOTH);
+        ssgCullAndDraw ( m_box ) ;
+        ssgCullAndDraw ( m_silver_coin ) ;
+        ssgCullAndDraw ( m_gold_coin ) ;
+        ssgCullAndDraw ( m_banana ) ;
+        glViewport ( 0, 0, config->m_width, config->m_height ) ;
+
+        glDisable (GL_DEPTH_TEST);
+        oldContext->makeCurrent();
+    }
+}
 
 //-----------------------------------------------------------------------------
 void HelpMenu::switch_to_first_screen()
 {
     m_menu_id = widgetSet->vstack(0);
 
-    widgetSet->multi(m_menu_id,
-//The next line starts at column 0 so no spaces appear in the game's help.
-"Finish the race before other drivers, by driving and using\n\
-powerups from the blue boxes! Bananas will slow you down,\n\
-coins will let you get more powerups, gold coins are better.\n\
-At high speeds you can use wheelies to go even faster, but\n\
-be careful because you won't be able to steer.\n\
-If you get stuck somewhere or fall too far from the road,\n\
-use the rescue button to get back on track.\n\
-Current keys bindings for the first player:",GUI_SML);
+    //FIXME: if an hstack has no items, it segfaults
+    const int HS1 = widgetSet->hstack(m_menu_id);
+    widgetSet -> filler(HS1);
+    widgetSet -> label(HS1, "Force your rivals bite *your* dust!", GUI_SML);
+    widgetSet -> filler(HS1);
 
-    const int HA        = widgetSet->harray(m_menu_id);
-    const int CHANGE_ID = widgetSet->varray(HA);
-    const int LABEL_ID  = widgetSet->varray(HA);
+    const int HS2 = widgetSet->harray(m_menu_id);
+    widgetSet->label(HS2, "Avoid bananas", GUI_SML);
+    widgetSet->label(HS2, "Grab blue boxes and coins", GUI_SML);
+
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+    widgetSet -> filler(m_menu_id);
+
+    widgetSet->multi(m_menu_id,
+//Next line starts at column 0 to avoid spaces in the GUI
+"At high speeds wheelies drive you faster, but you can't steer. If you\n\
+get stuck or fall too far, use the rescue button to get back on track.",
+        GUI_SML);
+
+    widgetSet -> filler(m_menu_id);
+
+    widgetSet->label(m_menu_id,
+        "Check the current keys bindings for the first player:", GUI_SML);
+
+    const int HS3       = widgetSet->hstack(m_menu_id);
+    widgetSet -> filler(HS3);
+    const int CHANGE_ID = widgetSet->varray(HS3);
+    const int LABEL_ID  = widgetSet->varray(HS3);
+    widgetSet -> filler(HS3);
 
     for(int i = KC_LEFT; i <= KC_FIRE; i++)
     {
@@ -72,6 +177,31 @@ Current keys bindings for the first player:",GUI_SML);
     widgetSet->start(m_menu_id,"Next screen", GUI_SML, WTOK_SECOND_PAGE);
     widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
     widgetSet->layout(m_menu_id, 0, 0);
+
+
+    ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
+    ssgDeRefDelete(m_box);
+    m_box = new ssgTransform;
+    m_box->ref();
+    m_box->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_SILVER);
+    ssgDeRefDelete(m_silver_coin);
+    m_silver_coin = new ssgTransform;
+    m_silver_coin->ref();
+    m_silver_coin->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_GOLD);
+    ssgDeRefDelete(m_gold_coin);
+    m_gold_coin = new ssgTransform;
+    m_gold_coin->ref();
+    m_gold_coin->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_GREEN);
+    ssgDeRefDelete(m_banana);
+    m_banana = new ssgTransform;
+    m_banana->ref();
+    m_banana->addKid(hm);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,12 +253,6 @@ void HelpMenu::switch_to_second_screen()
     widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
     widgetSet->layout(m_menu_id, 0, 0);
 }
-
-//-----------------------------------------------------------------------------
-HelpMenu::~HelpMenu()
-{
-    widgetSet -> delete_widget(m_menu_id) ;
-}   // ~HelpMenu
 
 //-----------------------------------------------------------------------------
 void HelpMenu::select()

@@ -24,16 +24,29 @@
 #include "base_gui.hpp"
 #include "player.hpp"
 
+class ssgTransform;
+class ssgContext;
+
 class HelpMenu: public BaseGUI
 {
-protected:
+private:
     std::string m_all_keys[KC_FIRE+1];
+
+    ssgContext* m_context;
+    ssgTransform* m_box;
+    ssgTransform* m_banana;
+    ssgTransform* m_silver_coin;
+    ssgTransform* m_gold_coin;
+    float m_clock;
+
 public:
     HelpMenu();
     ~HelpMenu();
     void select ();
     void switch_to_first_screen();
     void switch_to_second_screen();
+
+    void update(float dt);
 };
 
 #endif
