@@ -52,14 +52,12 @@ HelpMenu::~HelpMenu()
 {
     widgetSet -> delete_widget(m_menu_id) ;
 
-    {
     ssgDeRefDelete(m_box);
     ssgDeRefDelete(m_silver_coin);
     ssgDeRefDelete(m_gold_coin);
     ssgDeRefDelete(m_banana);
 
     delete m_context;
-    }
 
 }   // ~HelpMenu
 
@@ -69,7 +67,8 @@ void HelpMenu::update(float dt)
     m_clock += dt * 40.0f;
     BaseGUI::update(dt);
 
-    if (m_box != NULL && m_banana != NULL)
+    if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
+        && m_banana != NULL )
     {
         ssgContext* oldContext = ssgGetCurrentContext();
         m_context -> makeCurrent();
@@ -204,6 +203,12 @@ get stuck or fall too far, use the rescue button to get back on track.",
 //-----------------------------------------------------------------------------
 void HelpMenu::switch_to_second_screen()
 {
+
+    ssgDeRefDelete(m_box); m_box = 0;
+    ssgDeRefDelete(m_silver_coin); m_box = 0;
+    ssgDeRefDelete(m_gold_coin); m_box = 0;
+    ssgDeRefDelete(m_banana); m_box = 0;
+
     m_menu_id = widgetSet->vstack(0);
 
     widgetSet->label(m_menu_id,
