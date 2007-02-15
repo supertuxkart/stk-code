@@ -44,6 +44,8 @@ HelpMenu::HelpMenu()
     m_gold_coin = 0;
     m_banana = 0;
 
+	m_clock = 0;
+
     switch_to_first_screen();
 }   // HelpMenu
 
@@ -52,10 +54,14 @@ HelpMenu::~HelpMenu()
 {
     widgetSet -> delete_widget(m_menu_id) ;
 
-    ssgDeRefDelete(m_box);
-    ssgDeRefDelete(m_silver_coin);
-    ssgDeRefDelete(m_gold_coin);
-    ssgDeRefDelete(m_banana);
+	if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
+        && m_banana != NULL )
+	{
+		ssgDeRefDelete(m_box);
+		ssgDeRefDelete(m_silver_coin);
+		ssgDeRefDelete(m_gold_coin);
+		ssgDeRefDelete(m_banana);
+	}
 
     delete m_context;
 
@@ -129,6 +135,30 @@ void HelpMenu::switch_to_first_screen()
     widgetSet->label(HS2, "Avoid bananas", GUI_SML);
     widgetSet->label(HS2, "Grab blue boxes and coins", GUI_SML);
 
+	ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
+    ssgDeRefDelete(m_box);
+    m_box = new ssgTransform;
+    m_box->ref();
+    m_box->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_SILVER);
+    ssgDeRefDelete(m_silver_coin);
+    m_silver_coin = new ssgTransform;
+    m_silver_coin->ref();
+    m_silver_coin->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_GOLD);
+    ssgDeRefDelete(m_gold_coin);
+    m_gold_coin = new ssgTransform;
+    m_gold_coin->ref();
+    m_gold_coin->addKid(hm);
+
+    hm = herring_manager->getHerringModel(HE_GREEN);
+    ssgDeRefDelete(m_banana);
+    m_banana = new ssgTransform;
+    m_banana->ref();
+    m_banana->addKid(hm);
+
     widgetSet -> filler(m_menu_id);
     widgetSet -> filler(m_menu_id);
     widgetSet -> filler(m_menu_id);
@@ -174,30 +204,6 @@ get stuck or fall too far, use the rescue button to get back on track.",
     widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
     widgetSet->layout(m_menu_id, 0, 0);
 
-
-    ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
-    ssgDeRefDelete(m_box);
-    m_box = new ssgTransform;
-    m_box->ref();
-    m_box->addKid(hm);
-
-    hm = herring_manager->getHerringModel(HE_SILVER);
-    ssgDeRefDelete(m_silver_coin);
-    m_silver_coin = new ssgTransform;
-    m_silver_coin->ref();
-    m_silver_coin->addKid(hm);
-
-    hm = herring_manager->getHerringModel(HE_GOLD);
-    ssgDeRefDelete(m_gold_coin);
-    m_gold_coin = new ssgTransform;
-    m_gold_coin->ref();
-    m_gold_coin->addKid(hm);
-
-    hm = herring_manager->getHerringModel(HE_GREEN);
-    ssgDeRefDelete(m_banana);
-    m_banana = new ssgTransform;
-    m_banana->ref();
-    m_banana->addKid(hm);
 }
 
 //-----------------------------------------------------------------------------
@@ -205,9 +211,9 @@ void HelpMenu::switch_to_second_screen()
 {
 
     ssgDeRefDelete(m_box); m_box = 0;
-    ssgDeRefDelete(m_silver_coin); m_box = 0;
-    ssgDeRefDelete(m_gold_coin); m_box = 0;
-    ssgDeRefDelete(m_banana); m_box = 0;
+    ssgDeRefDelete(m_silver_coin); m_silver_coin = 0;
+    ssgDeRefDelete(m_gold_coin); m_gold_coin = 0;
+    ssgDeRefDelete(m_banana); m_banana = 0;
 
     m_menu_id = widgetSet->vstack(0);
 
@@ -217,7 +223,7 @@ void HelpMenu::switch_to_second_screen()
 
     const int HA        = widgetSet->hstack(m_menu_id);
     const int LABEL_ID  = widgetSet->varray(HA);
-    const int IMAGE_ID = widgetSet->vstack(HA);
+    const int IMAGE_ID  = widgetSet->vstack(HA);
 
     const int ICON_SIZE = 64;
 
