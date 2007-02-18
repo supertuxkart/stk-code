@@ -38,13 +38,6 @@ public:
     ssgRoot      *m_scene;
 
     typedef std::vector<Kart*> Karts;
-private:
-    Karts      m_kart;
-    StaticSSG* m_static_ssg;
-    float      m_finish_delay_start_time;
-    int*       m_number_collisions;
-    Physics*   m_physics;
-public:
     float      m_clock;
 
     /** resources, this should be put in a separate class or replaced by a smart
@@ -70,11 +63,8 @@ public:
     int m_ready_set_go;
 
     const Track* m_track;
-private:
-    Phase m_phase;
-
-public:
-    /** debug text that will be overlaid to the screen */
+    
+        /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];
 
     /** Reference to the track inside the scene */
@@ -92,7 +82,12 @@ public:
     void restartRace();
     void disableRace(); // Put race into limbo phase
 
-    PlayerKart* getPlayerKart(int player);
+    PlayerKart* getPlayerKart(int player)
+    {
+        return (PlayerKart*)m_kart[m_race_setup.m_players[player]];
+    }
+    
+    
     Kart* getKart(int kartId)
     {
         assert(kartId >= 0 &&
@@ -102,7 +97,7 @@ public:
     int  getNumKarts() const                  {return (int)m_kart.size();          }
     void addToScene(ssgEntity *kid)           {m_scene->addKid(kid);               }
     void removeFromScene(ssgEntity *kid)      {m_scene->removeKid(kid);            }
-    void addCollisions(int kartNumber, int n) {m_number_collisions[kartNumber]+=n;  }
+    void addCollisions(int kartNumber, int n) {m_number_collisions[kartNumber]+=n; }
 
     /** Returns the phase of the game */
     Phase getPhase() const                    { return m_phase;                    }
@@ -110,11 +105,21 @@ public:
     Physics *getPhysics() const               { return m_physics;                  }
 
 private:
+    Karts      m_kart;
+    StaticSSG* m_static_ssg;
+    float      m_finish_delay_start_time;
+    int*       m_number_collisions;
+    Physics*   m_physics;
+
+    Phase m_phase;
+
     void updateRacePosition( int k );
     void loadTrack();
     void herring_command(sgVec3* loc, char htype, int bNeedHeight);
     void checkRaceStatus();
     void resetAllKarts();
+    Kart* loadRobot(const KartProperties *kart_properties, int position,
+                 sgCoord init_pos);
 };
 
 extern World* world;

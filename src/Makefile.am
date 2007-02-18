@@ -104,7 +104,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/help_menu.cpp 	   gui/help_menu.hpp 	        \
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/scrolled_text.cpp	   gui/scrolled_text.hpp	\
-	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp
+	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp \
+	robots/default_robot.cpp   robots/default_robot.hpp 
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L . -lstatic_ssg \

@@ -50,6 +50,8 @@
 #include "widget_set.hpp"
 #include "ssg_help.hpp"
 
+#include "robots/default_robot.hpp"
+
 #ifdef BULLET
 #include <GL/glut.h>
 #endif
@@ -124,7 +126,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         if(config->m_profile)
         {
             // In profile mode, load only the old kart
-            newkart = new AutoKart (kart_properties_manager->getKart("tuxkart"), pos,
+            newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
                                     init_pos);
         }
         else
@@ -139,8 +141,8 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             }
             else
             {
-                newkart = new AutoKart   (kart_properties_manager->getKart(*i), pos,
-                                          init_pos);
+                newkart = loadRobot(kart_properties_manager->getKart(*i), pos,
+                    init_pos);
             }
         }   // if !config->m_profile
         if(config->m_replay_history)
@@ -740,11 +742,29 @@ void World::restartRace()
     race_manager->reset();
 }
 
-
 //-----------------------------------------------------------------------------
-PlayerKart* World::getPlayerKart(int player)
+Kart* World::loadRobot(const KartProperties *kart_properties, int position,
+                 sgCoord init_pos)
 {
-    return (PlayerKart*)m_kart[m_race_setup.m_players[player]];
+    Kart* currentRobot;
+    
+    const int NUM_ROBOTS = 1;
+    srand((unsigned)time(0));
+
+    switch(rand() % NUM_ROBOTS)
+    {
+        case 0:
+            currentRobot = new DefaultRobot(kart_properties, position,
+                init_pos);
+            break;
+        default:
+            std::cerr << "Warning: Unknown robot, using default." << std::endl;
+            currentRobot = new DefaultRobot(kart_properties, position,
+                init_pos);
+            break;
+    }
+    
+    return currentRobot;
 }
 
 /* EOF */
