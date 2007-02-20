@@ -25,12 +25,13 @@
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "config.hpp"
+#include "translation.hpp"
 
 GrandPrixSelect::GrandPrixSelect()
 {
     m_menu_id = widgetSet -> varray(0);
 
-    widgetSet -> label(m_menu_id, "Choose a Grand Prix", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Choose a Grand Prix"), GUI_LRG, GUI_ALL, 0, 0);
     widgetSet -> space(m_menu_id);
 
     std::set<std::string> result;
@@ -54,7 +55,7 @@ GrandPrixSelect::GrandPrixSelect()
             }   // if
         }   // for i
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id,"Press <ESC> to go back", GUI_SML, -1);
+    widgetSet -> state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> layout(m_menu_id, 0, 0);
     m_rect = widgetSet->rect(10, 10, config->m_width-20, 34, GUI_ALL, 10);
 }   // GrandPrixSelect

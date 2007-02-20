@@ -26,6 +26,7 @@
 #include "world.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_CONTINUE,
@@ -37,7 +38,7 @@ RaceResultsGUI::RaceResultsGUI()
 {
     m_menu_id = widgetSet -> vstack(0);
     const unsigned int MAX_STR_LEN = 60;
-    widgetSet -> label(m_menu_id, "Race results", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Race results"), GUI_LRG, GUI_ALL, 0, 0);
 
     const unsigned int NUM_KARTS = world->getNumKarts();
     int*  order = new int [NUM_KARTS];
@@ -83,11 +84,11 @@ RaceResultsGUI::RaceResultsGUI()
     widgetSet -> space(m_menu_id);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Back to the main menu",  GUI_MED, WTOK_CONTINUE);
-    widgetSet -> start(VA, "Race in this track again",  GUI_MED, WTOK_RESTART_RACE);
+    widgetSet -> start(VA, _("Back to the main menu"),  GUI_MED, WTOK_CONTINUE);
+    widgetSet -> start(VA, _("Race in this track again"),  GUI_MED, WTOK_RESTART_RACE);
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet -> start(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
+        widgetSet -> start(VA, _("Setup New Race"),  GUI_MED, WTOK_SETUP_NEW_RACE);
     }
 
     widgetSet -> layout(m_menu_id, 0, 1);

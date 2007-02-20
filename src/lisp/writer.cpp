@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "writer.hpp"
+#include "translation.hpp"
 
 namespace lisp
 {
@@ -34,9 +35,11 @@ namespace lisp
         m_out = new std::ofstream(filename.c_str());
         if(!m_out->good())
         {
-            std::stringstream msg;
-            msg << "LispWriter Error: Couldn't open file '" << filename << "'.";
-            throw std::runtime_error(msg.str());
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf(msg, sizeof(msg), 
+                     _("LispWriter Error: Couldn't open file '%s'."),
+                     filename.c_str());
+            throw std::runtime_error(msg);
         }
     }
 
@@ -55,7 +58,7 @@ namespace lisp
     {
         if(m_lists.size() > 0)
         {
-            std::cerr << "Warning: Not all sections closed in lispwriter!\n";
+            std::cerr << _("Warning: Not all sections closed in lispwriter!\n");
         }
 
         if(m_owner)
@@ -90,14 +93,15 @@ namespace lisp
     {
         if(m_lists.size() == 0)
         {
-            std::cerr << "Trying to close list '" << listname
-            << "', which is not open.\n";
+            fprintf(stderr, _("Trying to close list '%s, which is not open.\n"),
+                    listname.c_str());
             return;
         }
         if(m_lists.back() != listname)
         {
-            std::cerr << "Warning: trying to close list '" << listname
-            << "' while list '" << m_lists.back() << "' is open.\n";
+            fprintf(stderr, 
+                    _("Warning: trying to close list '%s' while list '%s' is open.\n"),
+                    listname.c_str(),  m_lists.back().c_str());
             return;
         }
         m_lists.pop_back();

@@ -220,7 +220,7 @@ AC_ARG_ENABLE(bullet,
 	[enable_bullet="$enableval"],
 	[enable_bullet="no"])
 if test "x${enable_bullet}" != "xno"; then
-	AC_DEFINE(BULLET)
+	AC_DEFINE([BULLET], [], [Use the bullet physics engine])
 	AC_MSG_RESULT([enabled])
 	CXXFLAGS="$CXXFLAGS -I../bullet/src"
 	LIBS="$LIBS -L ../bullet/out/*/*/libs -lbulletopenglsupport -lbulletdynamics -lbulletcollision -lbulletmath -lglut"

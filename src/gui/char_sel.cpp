@@ -32,6 +32,7 @@
 #include "kart_properties.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
+#include "translation.hpp"
 
 CharSel::CharSel(int whichPlayer)
         : m_kart(0), m_player_index(whichPlayer)
@@ -46,13 +47,12 @@ CharSel::CharSel(int whichPlayer)
     const int HS1 = widgetSet -> hstack (m_menu_id);
     widgetSet -> filler(HS1);
 
-    std::ostringstream tmp;
-    //FIXME: when a long string is used, like the previous one which was
-    //"Player #, choose a character" the output gets corrupted.
-    tmp << "Player " << m_player_index + 1 << ", choose a driver";
     // Due to widgetSet constraints, this must be static!
-    static const std::string HEADING = tmp.str();
-    widgetSet -> label(HS1, HEADING.c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    static char HEADING[MAX_MESSAGE_LENGTH];
+    snprintf(HEADING, sizeof(HEADING), _("Player %d, choose a driver"),
+             m_player_index + 1);
+
+    widgetSet -> label(HS1, HEADING, GUI_LRG, GUI_ALL, 0, 0);
     widgetSet -> filler(HS1);
 
     widgetSet -> filler(m_menu_id);
@@ -73,8 +73,8 @@ CharSel::CharSel(int whichPlayer)
     }
     const int HS2 = widgetSet -> hstack(m_menu_id);
     widgetSet -> filler (HS2);
-    m_kart_name_label = widgetSet -> label(HS2, "No driver choosed",
-                                         GUI_MED, GUI_ALL);
+    m_kart_name_label = widgetSet -> label(HS2, _("No driver choosed"),
+                                           GUI_MED, GUI_ALL);
     widgetSet -> filler (HS2);
     widgetSet -> layout(m_menu_id, 0, 1);
 

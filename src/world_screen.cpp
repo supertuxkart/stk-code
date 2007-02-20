@@ -29,6 +29,7 @@
 #include "track.hpp"
 #include "gui/menu_manager.hpp"
 #include "history.hpp"
+#include "translation.hpp"
 
 WorldScreen* WorldScreen::m_current_ = 0;
 
@@ -89,7 +90,7 @@ void WorldScreen::update()
             // The actual timing for FPS has to be done with an external clock,
             // since world->m_clock might be modified by replaying a history file.
             m_frame_clock.update();
-            printf("Number of frames: %d time %f, Average FPS: %f\n",
+            printf(_("Number of frames: %d time %f, Average FPS: %f\n"),
                    m_frame_count, m_frame_clock.getAbsTime(),
                    (float)m_frame_count/m_frame_clock.getAbsTime());
             if(!config->m_replay_history) history->Save();

@@ -17,9 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <stdexcept>
+
 #include "credits_menu.hpp"
 #include "loader.hpp"
-#include <stdexcept>
+#include "translation.hpp"
+
 CreditsMenu::CreditsMenu()
 {
 
@@ -38,9 +41,9 @@ CreditsMenu::CreditsMenu()
     }
     catch(std::runtime_error& e)
     {
-        printf("Couldn't load '%s'\n",filename.c_str());
-        m_string_list.push_back("CREDIT file was not installed properly!!");
-        m_string_list.push_back("Please check 'data/CREDIT'!!");
+        printf(_("Couldn't load '%s'\n"),filename.c_str());
+        m_string_list.push_back(_("CREDIT file was not installed properly!!"));
+        m_string_list.push_back(_("Please check 'data/CREDIT'!!"));
     }
 
     setText(m_string_list);

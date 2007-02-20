@@ -1,0 +1,926 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-02-21 10:12+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: callback.cpp:77 moving_texture.cpp:77
+#, c-format
+msgid "Unrecognised @autodcs string: '%s'\n"
+msgstr ""
+
+#: collectable_manager.cpp:97
+#, c-format
+msgid "No 'tuxkart-collectable' node found while parsing '%s'."
+msgstr ""
+
+#: config.cpp:125 gui/config_controls.cpp:36
+#, c-format
+msgid "Player %d"
+msgstr ""
+
+#: config.cpp:205
+#, c-format
+msgid "Couldn't create '%s', config files will not be saved.\n"
+msgstr ""
+
+#: config.cpp:211
+#, c-format
+msgid "Config directory '%s' successfully created.\n"
+msgstr ""
+
+#: config.cpp:235
+#, c-format
+msgid "Config file '%s' does not exist, it will be created.\n"
+msgstr ""
+
+#: config.cpp:247
+#, c-format
+msgid "No tuxkart-config node"
+msgstr ""
+
+#: config.cpp:256
+#, c-format
+msgid ""
+"\n"
+"Config file version '%d' is too old.\n"
+"The following changes have been applied in the current SuperTuxKart "
+"version:\n"
+msgstr ""
+
+#: config.cpp:262
+#, c-format
+msgid ""
+"- Single window menu, old status display,new keyboard style settings were "
+"removed\n"
+msgstr ""
+
+#: config.cpp:264
+#, c-format
+msgid ""
+"- Key bindings were changed, please check the settings. All existing values "
+"were discarded.\n"
+msgstr ""
+
+#: config.cpp:267
+#, c-format
+msgid ""
+"Config file version '%d' is too old. Discarding your configuration. Sorry. :"
+"(\n"
+msgstr ""
+
+#: config.cpp:275
+#, c-format
+msgid "This warning can be ignored.\n"
+msgstr ""
+
+#: config.cpp:308
+#, c-format
+msgid "No '%s' node"
+msgstr ""
+
+#: config.cpp:333
+#, c-format
+msgid "Error while parsing config '%s':\n"
+msgstr ""
+
+#: config.cpp:483
+#, c-format
+msgid "Couldn't write config: "
+msgstr ""
+
+#: config.cpp:542
+#, c-format
+msgid "%s"
+msgstr ""
+
+#: config.cpp:545
+#, c-format
+msgid "joy %d axis %d  %c"
+msgstr ""
+
+#: config.cpp:549
+#, c-format
+msgid "joy %d btn %d"
+msgstr ""
+
+#: config.cpp:552
+#, c-format
+msgid "joy %d hat %d"
+msgstr ""
+
+#: config.cpp:555
+#, c-format
+msgid "mouse btn %d"
+msgstr ""
+
+#: config.cpp:558
+#, c-format
+msgid "mouse axis %d %c"
+msgstr ""
+
+#: config.cpp:562
+#, c-format
+msgid "Invalid"
+msgstr ""
+
+#: cup_data.cpp:41
+msgid "No supertuxkart-cup node"
+msgstr ""
+
+#: cup_data.cpp:51
+#, c-format
+msgid "Error while reading cup file '%s'\n"
+msgstr ""
+
+#: herring_manager.cpp:162
+#, c-format
+msgid "Herring model '%s' is missing!\n"
+msgstr ""
+
+#: herring_manager.cpp:169
+#, c-format
+msgid "The following models are available:\n"
+msgstr ""
+
+#: herring_manager.cpp:176
+#, c-format
+msgid "   %s internally only.\n"
+msgstr ""
+
+#: herring_manager.cpp:180
+#, c-format
+msgid "   %s in models/herrings/%s.ac.\n"
+msgstr ""
+
+#: herring_manager.cpp:241
+#, c-format
+msgid ""
+"The herring style '%s' in your configuration file does not exist.\n"
+"It is ignored.\n"
+msgstr ""
+
+#: herring_manager.cpp:252
+#, c-format
+msgid ""
+"The herring style '%s' specified on the command line does not exist.\n"
+"It is ignored.\n"
+msgstr ""
+
+#: herring_manager.cpp:338
+#, c-format
+msgid "Couldn't load map '%s': no herring node."
+msgstr ""
+
+#: kart_properties.cpp:69
+#, c-format
+msgid "Error while parsing KartProperties '%s':\n"
+msgstr ""
+
+#: kart_properties_manager.cpp:92
+#, c-format
+msgid "KartPropertiesManager: Couldn't find kart: '%s'"
+msgstr ""
+
+#: loader.cpp:70
+#, c-format
+msgid "Data files will be fetched from: '%s'\n"
+msgstr ""
+
+#: loader.cpp:178
+#, c-format
+msgid "Couldn't find file '%s'."
+msgstr ""
+
+#: loader.cpp:340
+#, c-format
+msgid "Warning: Ignoring userdata '%s'\n"
+msgstr ""
+
+#: main.cpp:63
+#, c-format
+msgid ""
+"Usage: %s [OPTIONS]\n"
+"\n"
+"Run SuperTuxKart, a racing game with go-kart that features the Tux and "
+"friends.\n"
+"\n"
+"Options:\n"
+"  -N,  --no-start-screen  Quick race\n"
+"  -l,  --list-tracks      Show available tracks\n"
+"  -k,  --numkarts NUM     Number of karts on the racetrack\n"
+"       --kart NAME        Use kart number NAME\n"
+"       --list-karts       Show available karts\n"
+"       --laps N           Define number of laps to N\n"
+"       --herring STYLE    Use STYLE as your herring style\n"
+"  -f,  --fullscreen       Fullscreen display\n"
+"  -w,  --windowed         Windowed display (default)\n"
+"  -s,  --screensize WxH   Set the screen size (e.g. 320x200)\n"
+"  -v,  --version          Show version\n"
+"  -h,  --help             Show this help\n"
+"\n"
+"You can visit SuperTuxKart's homepage at http://supertuxkart.berlios.de\n"
+"\n"
+msgstr ""
+
+#: main.cpp:105
+msgid "--help"
+msgstr ""
+
+#: main.cpp:106
+msgid "-help"
+msgstr ""
+
+#: main.cpp:120
+#, c-format
+msgid "You choose to start in track: %s.\n"
+msgstr ""
+
+#: main.cpp:126
+#, c-format
+msgid "You choose to have %s karts.\n"
+msgstr ""
+
+#: main.cpp:131
+#, c-format
+msgid "  Available tracks:\n"
+msgstr ""
+
+#: main.cpp:137
+#, c-format
+msgid ""
+"Use --track N to choose track.\n"
+"\n"
+msgstr ""
+
+#: main.cpp:147
+#, c-format
+msgid "  Available karts:\n"
+msgstr ""
+
+#: main.cpp:168
+#, c-format
+msgid "Enabling mirror mode.\n"
+msgstr ""
+
+#: main.cpp:177
+#, c-format
+msgid "You choose to have %d laps.\n"
+msgstr ""
+
+#: main.cpp:207
+#, c-format
+msgid "You choose to be in %dx%d.\n"
+msgstr ""
+
+#: main.cpp:240
+#, c-format
+msgid ""
+"Invalid parameter: %s.\n"
+"\n"
+msgstr ""
+
+#: main.cpp:372
+#, c-format
+msgid ""
+"\n"
+"Aborting SuperTuxKart\n"
+msgstr ""
+
+#: material_manager.cpp:76
+#, c-format
+msgid "FATAL: No Such File as '%s'\n"
+msgstr ""
+
+#: material_manager.cpp:103
+#, c-format
+msgid ""
+"ERROR: Material file entries must start with '\"'\n"
+"ERROR: Offending line is '%s'\n"
+msgstr ""
+
+#: material_manager.cpp:115
+#, c-format
+msgid "ERROR: Unterminated string constant '%s' in materials file.\n"
+msgstr ""
+
+#: moveable.cpp:256
+#, c-format
+msgid ""
+"WARNING: Speed too high for collision detection!\n"
+"WARNING: Nsteps=%d, Speed=%f!\n"
+"moveable %p, vel=%f,%f,%f\n"
+msgstr ""
+
+#: moving_physics.cpp:44
+#, c-format
+msgid "Invalid physics specification: '%s'\n"
+msgstr ""
+
+#: moving_physics.cpp:61 moving_physics.cpp:72
+#, c-format
+msgid "Invalid physics parameter string: '%s'\n"
+msgstr ""
+
+#: moving_physics.cpp:109
+#, c-format
+msgid "WARNING: physical object with more than one parent!!\n"
+msgstr ""
+
+#: moving_physics.cpp:132
+#, c-format
+msgid "MovingPhysics: init: %d parents found, ignored.\n"
+msgstr ""
+
+#: moving_physics.cpp:177
+#, c-format
+msgid "WARNING: Uninitialised moving shape\n"
+msgstr ""
+
+#: music_mikmod.cpp:72 music_mikmod.cpp:81 music_mikmod.cpp:90
+#: music_mikmod.cpp:97
+#, c-format
+msgid "Loading Music: %s failed\n"
+msgstr ""
+
+#: physics.cpp:125
+msgid "Unkown ssg type in convertTrack"
+msgstr ""
+
+#: physics_parameters.cpp:35
+#, c-format
+msgid "Missing default value for '%s' in '%s'.\n"
+msgstr ""
+
+#: race_manager.cpp:232
+#, c-format
+msgid "Warning: player '%d' does not exists.\n"
+msgstr ""
+
+#: race_manager.cpp:271
+msgid "Unknown game mode"
+msgstr ""
+
+#: sfx_openal.cpp:62
+#, c-format
+msgid "Loading '%s' failed\n"
+msgstr ""
+
+#: sfx_openal.cpp:78
+#, c-format
+msgid "Error 1 loading SFX: %s failed\n"
+msgstr ""
+
+#: sfx_openal.cpp:85
+#, c-format
+msgid "Error 2 loading SFX: %s failed\n"
+msgstr ""
+
+#: sfx_openal.cpp:92
+#, c-format
+msgid "Error 3 loading SFX: %s failed\n"
+msgstr ""
+
+#: sfx_openal.cpp:100
+#, c-format
+msgid "Error 4 loading SFX: %s failed\n"
+msgstr ""
+
+#: sound_manager.cpp:50
+#, c-format
+msgid "WARNING: Could not initialize the PLIB based sound.\n"
+msgstr ""
+
+#: sound_manager.cpp:62
+#, c-format
+msgid "WARNING: Could not initialize the ALUT based sound.\n"
+msgstr ""
+
+#: ssg_help.cpp:210
+#, c-format
+msgid "StaticSSG::MinMax: unkown type\n"
+msgstr ""
+
+#: static_ssg.cpp:146
+#, c-format
+msgid "StaticSSG::Distribute: unkown type\n"
+msgstr ""
+
+#: track.cpp:477
+#, c-format
+msgid "Couldn't load map '%s': no tuxkart-track node."
+msgstr ""
+
+#: track.cpp:605
+#, c-format
+msgid "Can't open '%s' for reading.\n"
+msgstr ""
+
+#: track.cpp:628
+#, c-format
+msgid "Syntax error in '%s'\n"
+msgstr ""
+
+#: track.cpp:642
+#, c-format
+msgid "File %s point %d is duplicated!.\n"
+msgstr ""
+
+#: track.cpp:647
+#, c-format
+msgid "File %s point %d is too close(<1.5) to previous point.\n"
+msgstr ""
+
+#: track.cpp:653
+#, c-format
+msgid "In file %s point %d is too far(>15.0) from next point at %d.\n"
+msgstr ""
+
+#: track_manager.cpp:50
+#, c-format
+msgid "TrackManager: Couldn't find track: '%s'"
+msgstr ""
+
+#: world.cpp:82
+#, c-format
+msgid "Track '%s' not found.\n"
+msgstr ""
+
+#: world.cpp:533
+#, c-format
+msgid "The cup '%s' contains an invalid herring style '%s'.\n"
+msgstr ""
+
+#: world.cpp:536 world.cpp:550
+#, c-format
+msgid "Please fix the file '%s'.\n"
+msgstr ""
+
+#: world.cpp:548
+#, c-format
+msgid "The track '%s' contains an invalid herring style '%s'.\n"
+msgstr ""
+
+#: world.cpp:559
+#, c-format
+msgid "Can't open track location file '%s'.\n"
+msgstr ""
+
+#: world.cpp:656 world.cpp:722
+#, c-format
+msgid "Syntax error in '%s': %s"
+msgstr ""
+
+#: world_screen.cpp:93
+#, c-format
+msgid "Number of frames: %d time %f, Average FPS: %f\n"
+msgstr ""
+
+#: gui/char_sel.cpp:52
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr ""
+
+#: gui/char_sel.cpp:76
+msgid "No driver choosed"
+msgstr ""
+
+#: gui/config_controls.cpp:28
+msgid "Edit controls for which player?"
+msgstr ""
+
+#: gui/config_controls.cpp:41 gui/config_display.cpp:49
+#: gui/config_sound.cpp:56 gui/difficulty.cpp:46 gui/game_mode.cpp:48
+#: gui/grand_prix_select.cpp:58 gui/num_laps.cpp:43 gui/num_players.cpp:41
+#: gui/options.cpp:50 gui/player_controls.cpp:54 gui/scrolled_text.cpp:74
+msgid "Press <ESC> to go back"
+msgstr ""
+
+#: gui/config_display.cpp:40
+msgid "Display Settings"
+msgstr ""
+
+#: gui/config_display.cpp:43 gui/config_display.cpp:88
+msgid "Fullscreen mode"
+msgstr ""
+
+#: gui/config_display.cpp:47 gui/config_display.cpp:86
+msgid "Window mode"
+msgstr ""
+
+#: gui/config_sound.cpp:35
+msgid "Sound Settings"
+msgstr ""
+
+#: gui/config_sound.cpp:42
+msgid "  Turn off music  "
+msgstr ""
+
+#: gui/config_sound.cpp:45
+msgid "  Turn on music  "
+msgstr ""
+
+#: gui/config_sound.cpp:49
+msgid "  Turn off sound effects  "
+msgstr ""
+
+#: gui/config_sound.cpp:52
+msgid "  Turn on sound effects  "
+msgstr ""
+
+#: gui/config_sound.cpp:88
+msgid "Turn on music"
+msgstr ""
+
+#: gui/config_sound.cpp:93
+msgid "Turn off music"
+msgstr ""
+
+#: gui/config_sound.cpp:101
+msgid "Turn on sound effects"
+msgstr ""
+
+#: gui/config_sound.cpp:106
+msgid "Turn off sound effects"
+msgstr ""
+
+#: gui/credits_menu.cpp:44
+#, c-format
+msgid "Couldn't load '%s'\n"
+msgstr ""
+
+#: gui/credits_menu.cpp:45
+msgid "CREDIT file was not installed properly!!"
+msgstr ""
+
+#: gui/credits_menu.cpp:46
+msgid "Please check 'data/CREDIT'!!"
+msgstr ""
+
+#: gui/difficulty.cpp:37
+msgid "Choose your skill level"
+msgstr ""
+
+#: gui/difficulty.cpp:42
+msgid "Racer"
+msgstr ""
+
+#: gui/difficulty.cpp:43
+msgid "Driver"
+msgstr ""
+
+#: gui/difficulty.cpp:44
+msgid "Novice"
+msgstr ""
+
+#: gui/game_mode.cpp:37
+msgid "Choose a Race Mode"
+msgstr ""
+
+#: gui/game_mode.cpp:41
+msgid "Grand Prix"
+msgstr ""
+
+#: gui/game_mode.cpp:42
+msgid "Quick Race"
+msgstr ""
+
+#: gui/game_mode.cpp:45
+msgid "Time Trial"
+msgstr ""
+
+#: gui/grand_prix_ending.cpp:61
+#, c-format
+msgid "The winner is %s!"
+msgstr ""
+
+#: gui/grand_prix_ending.cpp:65 gui/race_results_gui.cpp:87
+msgid "Back to the main menu"
+msgstr ""
+
+#: gui/grand_prix_select.cpp:34
+msgid "Choose a Grand Prix"
+msgstr ""
+
+#: gui/help_menu.cpp:132
+msgid "Force your rivals bite *your* dust!"
+msgstr ""
+
+#: gui/help_menu.cpp:136
+msgid "Avoid bananas"
+msgstr ""
+
+#: gui/help_menu.cpp:137
+msgid "Grab blue boxes and coins"
+msgstr ""
+
+#: gui/help_menu.cpp:177
+msgid ""
+"At high speeds wheelies drive you faster, but you can't steer. If you\n"
+"get stuck or fall too far, use the rescue button to get back on track."
+msgstr ""
+
+#: gui/help_menu.cpp:184
+msgid "Check the current keys bindings for the first player:"
+msgstr ""
+
+#: gui/help_menu.cpp:205
+msgid "Next screen"
+msgstr ""
+
+#: gui/help_menu.cpp:206 gui/help_menu.cpp:263
+msgid "Go back to the main menu"
+msgstr ""
+
+#: gui/help_menu.cpp:223
+msgid "To help you win, there are certain collectables you can grab:"
+msgstr ""
+
+#: gui/help_menu.cpp:234 gui/help_menu.cpp:259
+msgid "Missile - fast stopper in a straight line"
+msgstr ""
+
+#: gui/help_menu.cpp:238
+msgid "Homing missile - follows rivals, but is slower than the missile"
+msgstr ""
+
+#: gui/help_menu.cpp:242
+msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
+msgstr ""
+
+#: gui/help_menu.cpp:246
+msgid "Zipper - speed boost"
+msgstr ""
+
+#: gui/help_menu.cpp:250
+msgid "Parachute - slows down all karts in a better position!"
+msgstr ""
+
+#: gui/help_menu.cpp:254
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr ""
+
+#: gui/help_menu.cpp:262
+msgid "Previous screen"
+msgstr ""
+
+#: gui/main_menu.cpp:43
+msgid "Single Player"
+msgstr ""
+
+#: gui/main_menu.cpp:44
+msgid "Multiplayer"
+msgstr ""
+
+#: gui/main_menu.cpp:45 gui/options.cpp:38 gui/race_menu.cpp:47
+msgid "Options"
+msgstr ""
+
+#: gui/main_menu.cpp:46
+msgid "Quit"
+msgstr ""
+
+#: gui/main_menu.cpp:48 gui/race_menu.cpp:48
+msgid "Help"
+msgstr ""
+
+#: gui/main_menu.cpp:49
+msgid "Credits"
+msgstr ""
+
+#: gui/num_laps.cpp:34
+msgid "Choose number of laps"
+msgstr ""
+
+#: gui/num_laps.cpp:36
+msgid "One"
+msgstr ""
+
+#: gui/num_laps.cpp:37
+msgid "Two"
+msgstr ""
+
+#: gui/num_laps.cpp:38
+msgid "Four"
+msgstr ""
+
+#: gui/num_laps.cpp:39
+msgid "Five"
+msgstr ""
+
+#: gui/num_laps.cpp:40
+msgid "Six"
+msgstr ""
+
+#: gui/num_laps.cpp:41
+msgid "Eight"
+msgstr ""
+
+#: gui/num_players.cpp:37
+msgid "Two Players"
+msgstr ""
+
+#: gui/num_players.cpp:38
+msgid "Three Players"
+msgstr ""
+
+#: gui/num_players.cpp:39
+msgid "Four Players"
+msgstr ""
+
+#: gui/options.cpp:39
+msgid "Controls"
+msgstr ""
+
+#: gui/options.cpp:46
+msgid "Display"
+msgstr ""
+
+#: gui/options.cpp:48
+msgid "Sound"
+msgstr ""
+
+#: gui/player_controls.cpp:30
+msgid "Left"
+msgstr ""
+
+#: gui/player_controls.cpp:30
+msgid "Right"
+msgstr ""
+
+#: gui/player_controls.cpp:30
+msgid "Accelerate"
+msgstr ""
+
+#: gui/player_controls.cpp:31
+msgid "Brake"
+msgstr ""
+
+#: gui/player_controls.cpp:31
+msgid "Wheelie"
+msgstr ""
+
+#: gui/player_controls.cpp:31
+msgid "Jump"
+msgstr ""
+
+#: gui/player_controls.cpp:32
+msgid "Rescue"
+msgstr ""
+
+#: gui/player_controls.cpp:32
+msgid "Fire"
+msgstr ""
+
+#: gui/player_controls.cpp:39
+#, c-format
+msgid "Choose your controls, %s"
+msgstr ""
+
+#: gui/player_controls.cpp:79
+msgid "Press key"
+msgstr ""
+
+#: gui/race_gui.cpp:334
+#, c-format
+msgid "YOU FINISHED %s"
+msgstr ""
+
+#: gui/race_gui.cpp:339
+msgid "CONGRATULATIONS"
+msgstr ""
+
+#: gui/race_gui.cpp:340
+msgid "YOU WON THE RACE!"
+msgstr ""
+
+#: gui/race_gui.cpp:488 gui/race_gui.cpp:502
+msgid "WRONG WAY!"
+msgstr ""
+
+#: gui/race_gui.cpp:769
+msgid "REV"
+msgstr ""
+
+#: gui/race_gui.cpp:816
+#, c-format
+msgid "Finished"
+msgstr ""
+
+#: gui/race_gui.cpp:821
+msgid "Lap"
+msgstr ""
+
+#: gui/race_gui.cpp:855
+msgid "Ready!"
+msgstr ""
+
+#: gui/race_gui.cpp:858
+msgid "Set!"
+msgstr ""
+
+#: gui/race_gui.cpp:861
+msgid "Go!"
+msgstr ""
+
+#: gui/race_gui.cpp:878
+msgid "Penalty time!!"
+msgstr ""
+
+#: gui/race_menu.cpp:43
+msgid "Paused"
+msgstr ""
+
+#: gui/race_menu.cpp:46
+msgid "Return To Race"
+msgstr ""
+
+#: gui/race_menu.cpp:49
+msgid "Restart Race"
+msgstr ""
+
+#: gui/race_menu.cpp:53 gui/race_results_gui.cpp:91
+msgid "Setup New Race"
+msgstr ""
+
+#: gui/race_menu.cpp:56
+msgid "Exit Race"
+msgstr ""
+
+#: gui/race_results_gui.cpp:41
+msgid "Race results"
+msgstr ""
+
+#: gui/race_results_gui.cpp:88
+msgid "Race in this track again"
+msgstr ""
+
+#: gui/track_sel.cpp:42
+msgid "Choose a Track"
+msgstr ""
+
+#: lisp/lexer.cpp:150
+#, c-format
+msgid "Parse error in line %d: EOF while parsing string."
+msgstr ""
+
+#: lisp/lexer.cpp:174
+#, c-format
+msgid "Parse Error in line %d: EOF while parsing constant."
+msgstr ""
+
+#: lisp/lexer.cpp:190
+#, c-format
+msgid "Parse Error in line %d: Unknown constant '%s'."
+msgstr ""
+
+#: lisp/parser.cpp:52
+#, c-format
+msgid "Parser problem: Couldn't open file '%s'."
+msgstr ""
+
+#: lisp/parser.cpp:90
+#, c-format
+msgid "Parse Error at line %d: Unexpected EOF."
+msgstr ""
+
+#: lisp/parser.cpp:98
+#, c-format
+msgid "Parse Error at line %d: Unexpected ')'."
+msgstr ""
+
+#: lisp/parser.cpp:114
+#, c-format
+msgid "Parse Error at line %d: Expected ')'."
+msgstr ""
+
+#: lisp/writer.cpp:40
+#, c-format
+msgid "LispWriter Error: Couldn't open file '%s'."
+msgstr ""
+
+#: lisp/writer.cpp:61
+msgid "Warning: Not all sections closed in lispwriter!\n"
+msgstr ""
+
+#: lisp/writer.cpp:96
+#, c-format
+msgid "Trying to close list '%s, which is not open.\n"
+msgstr ""
+
+#: lisp/writer.cpp:103
+#, c-format
+msgid "Warning: trying to close list '%s' while list '%s' is open.\n"
+msgstr ""

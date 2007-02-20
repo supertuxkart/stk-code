@@ -28,6 +28,7 @@
 #include "material.hpp"
 #include "kart.hpp"
 #include "string_utils.hpp"
+#include "translation.hpp"
 
 /** Simple shadow class, only used here for default herrings. */
 class Shadow
@@ -153,33 +154,39 @@ void HerringManager::setDefaultHerringStyle()
                                    "goldcoin",   "silvercoin"};
 
     bool bError=0;
+    char msg[MAX_ERROR_MESSAGE_LENGTH];
     for(int i=HE_RED; i<=HE_SILVER; i++)
     {
         m_herring_model[i] = m_all_models[DEFAULT_NAMES[i]];
         if(!m_herring_model[i])
         {
-            fprintf(stderr, "Herring model '%s' is missing!\n",DEFAULT_NAMES[i].c_str());
+            snprintf(msg, sizeof(msg), 
+                     _("Herring model '%s' is missing (see herring_manager)!\n"),
+                     DEFAULT_NAMES[i].c_str());
             bError=1;
+            break;
         }   // if !m_herring_model
     }   // for i
     if(bError)
     {
-        fprintf(stderr, "The following models are available:\n");
+        fprintf(stderr, _("The following models are available:\n"));
         for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
         {
             if(i->second)
             {
                 if(i->first.substr(0,3)=="OLD")
                 {
-                    fprintf(stderr,"   %s internally only.\n",i->first.c_str());
+                    fprintf(stderr,_("   %s internally only.\n"),i->first.c_str());
                 }
                 else
                 {
-                    fprintf(stderr,"   %s in models/herrings/%s.ac.\n",i->first.c_str(),
+                    fprintf(stderr,_("   %s in models/herrings/%s.ac.\n"),
+                            i->first.c_str(),
                             i->first.c_str());
                 }
             }  // if i->second
         }
+        throw std::runtime_error(msg);
         exit(-1);
     }   // if bError
 
@@ -235,9 +242,8 @@ void HerringManager::cleanup()
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,"The herring style '%s' in your configuration file does not exist.\n",
+        fprintf(stderr,_("The herring style '%s' in your configuration file does not exist.\nIt is ignored.\n"),
                 config->m_herring_style.c_str());
-        fprintf(stderr,"Resetting it to empty.\n");
         config->m_herring_style="";
     }
 
@@ -247,9 +253,8 @@ void HerringManager::cleanup()
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,"The herring style '%s' specified on the command line does not exist.\n",
+        fprintf(stderr,_("The herring style '%s' specified on the command line does not exist.\nIt is ignored.\n"),
                 m_user_filename.c_str());
-        fprintf(stderr,"It is ignored.\n");
         m_user_filename="";  // reset to avoid further warnings.
     }
 
@@ -333,9 +338,10 @@ void HerringManager::loadHerringStyle(const std::string filename)
     if(!herring_node)
     {
         delete root;
-        std::stringstream msg;
-        msg << "Couldn't load map '" << filename << "': no herring node.";
-        throw std::runtime_error(msg.str());
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), _("Couldn't load map '%s': no herring node."),
+                 filename.c_str());
+        throw std::runtime_error(msg);
     }
 
     setHerring(herring_node, "red",   HE_RED   );

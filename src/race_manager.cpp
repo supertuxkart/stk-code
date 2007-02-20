@@ -28,9 +28,8 @@
 #include "empty_screen.hpp"
 #include "kart_properties_manager.hpp"
 #include "race_manager.hpp"
-
-//Is this include needed?
 #include "gui/menu_manager.hpp"
+#include "translation.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -229,7 +228,9 @@ RaceManager::setPlayerKart(int player, const std::string& kart)
         m_players[player] = kart;
     }
     else
-        std::cout << "Warning: player " << player << " doesn't exists" << std::endl;
+    {
+        fprintf(stderr, _("Warning: player '%d' does not exists.\n"), player);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -267,7 +268,7 @@ RaceManager::start()
         m_mode = new QuickRaceMode(m_track, m_players, m_difficulty, m_num_karts, m_num_laps);
         break;
     default:
-        assert(!"Unknown game mode");
+        assert(!_("Unknown game mode"));
     }
 
     m_mode->start();

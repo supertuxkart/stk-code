@@ -26,7 +26,7 @@
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
-
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_RETURN_RACE,
@@ -40,20 +40,20 @@ enum WidgetTokens {
 RaceMenu::RaceMenu()
 {
     m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, "Paused", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Paused"), GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Return To Race",  GUI_MED, WTOK_RETURN_RACE);
-    widgetSet -> state(VA, "Options",         GUI_MED, WTOK_OPTIONS);
-    widgetSet -> state(VA, "Help",            GUI_MED, WTOK_HELP);
-    widgetSet -> state(VA, "Restart Race",    GUI_MED, WTOK_RESTART_RACE);
+    widgetSet -> start(VA, _("Return To Race"),  GUI_MED, WTOK_RETURN_RACE);
+    widgetSet -> state(VA, _("Options"),         GUI_MED, WTOK_OPTIONS);
+    widgetSet -> state(VA, _("Help"),            GUI_MED, WTOK_HELP);
+    widgetSet -> state(VA, _("Restart Race"),    GUI_MED, WTOK_RESTART_RACE);
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet->state(VA, "Setup New Race",  GUI_MED, WTOK_SETUP_NEW_RACE);
+        widgetSet->state(VA, _("Setup New Race"),GUI_MED, WTOK_SETUP_NEW_RACE);
     }
 
-    widgetSet -> state(VA, "Exit Race",       GUI_MED, WTOK_EXIT_RACE);
+    widgetSet -> state(VA, _("Exit Race"),       GUI_MED, WTOK_EXIT_RACE);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 

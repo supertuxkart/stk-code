@@ -26,6 +26,7 @@
 #include "config.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_RETURN,
@@ -38,7 +39,7 @@ TrackSel::TrackSel()
 {
     m_menu_id = widgetSet -> vstack(0);
 
-    widgetSet -> label(m_menu_id, "Choose a Track", GUI_LRG, GUI_TOP, 0, 0);
+    widgetSet -> label(m_menu_id, _("Choose a Track"), GUI_LRG, GUI_TOP, 0, 0);
     widgetSet -> space(m_menu_id);
 
     const int HA = widgetSet -> harray(m_menu_id);

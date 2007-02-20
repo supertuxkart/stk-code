@@ -23,6 +23,7 @@
 #include "widget_set.hpp"
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_SINGLE,
@@ -39,13 +40,13 @@ MainMenu::MainMenu()
     m_menu_id = widgetSet -> varray(0);
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, "Single Player", GUI_MED, WTOK_SINGLE);
-    widgetSet -> state(m_menu_id, "Multiplayer",   GUI_MED, WTOK_MULTI);
-    widgetSet -> state(m_menu_id, "Options",       GUI_MED, WTOK_OPTIONS);
-    widgetSet -> state(m_menu_id, "Quit",          GUI_MED, WTOK_QUIT);
+    widgetSet -> start(m_menu_id, _("Single Player"), GUI_MED, WTOK_SINGLE);
+    widgetSet -> state(m_menu_id, _("Multiplayer"),   GUI_MED, WTOK_MULTI);
+    widgetSet -> state(m_menu_id, _("Options"),       GUI_MED, WTOK_OPTIONS);
+    widgetSet -> state(m_menu_id, _("Quit"),          GUI_MED, WTOK_QUIT);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, "Help",          GUI_SML, WTOK_HELP);
-    widgetSet -> state(m_menu_id, "Credits",       GUI_SML, WTOK_CREDITS);
+    widgetSet -> state(m_menu_id, _("Help"),          GUI_SML, WTOK_HELP);
+    widgetSet -> state(m_menu_id, _("Credits"),       GUI_SML, WTOK_CREDITS);
     widgetSet -> space(m_menu_id);
 
     widgetSet -> layout(m_menu_id, 0, 0);

@@ -25,7 +25,7 @@
 #include "string_utils.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
-
+#include "translation.hpp"
 
 Track::Track (std::string filename_, float w, float h, bool stretch)
 {
@@ -472,9 +472,11 @@ void Track::loadTrack(std::string filename_)
     if(!LISP)
     {
         delete ROOT;
-        std::stringstream msg;
-        msg << "Couldn't load map '" << m_filename << "': no tuxkart-track node.";
-        throw std::runtime_error(msg.str());
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), 
+                 _("Couldn't load map '%s': no tuxkart-track node."),
+                 m_filename.c_str());
+        throw std::runtime_error(msg);
     }
 
     LISP->get("name",          m_name);
@@ -599,8 +601,9 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
 
     if ( fd == NULL )
     {
-        fprintf ( stderr, "Can't open '%s' for reading.\n", path.c_str() ) ;
-        exit ( 1 ) ;
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf (msg, sizeof(msg), _("Can't open '%s' for reading.\n"), path.c_str() ) ;
+        throw std::runtime_error(msg);
     }
 
     int prev_hint = -1;
@@ -621,8 +624,9 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
 
         if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
         {
-            fprintf ( stderr, "Syntax error in '%s'\n", path.c_str() ) ;
-            exit ( 1 ) ;
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf (msg, sizeof(msg), _("Syntax error in '%s'\n"), path.c_str() ) ;
+            throw std::runtime_error(msg);
         }
 
         sgVec3 point;
@@ -635,20 +639,19 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         //1.5f was choosen because it's more or less the length of the tuxkart
         if(prev_distance == 0)
         {
-            std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
-            "duplicated!.\n";
+            fprintf(stderr, _("File %s point %d is duplicated!.\n"),
+                    path.c_str(), prev_hint+1);
         }
         else if(prev_distance < 1.5f)
         {
-            std::cerr << "File " << path << " point " << prev_hint + 1 << " is " <<
-            "too close(<1.5) to previous point.\n";
+            fprintf(stderr,_("File %s point %d is too close(<1.5) to previous point.\n"),
+                    path.c_str(), prev_hint + 1);
         }
 #if 0
         if(prev_distance > 15.0f)
         {
-            std::cerr << "In file " << path << " point " <<
-            prev_hint << " is too far(>15.0) from next point at " <<
-            prev_distance << " .\n";
+            fprintf(stderr,_("In file %s point %d is too far(>15.0) from next point at %d.\n"),
+                    path, prev_hint, prev_distance);
         }
 #endif
 

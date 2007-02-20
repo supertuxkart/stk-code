@@ -64,7 +64,7 @@ void drv_init()
     for (int i=0;i<NUM_STICKS;i++)
         sticks[i] = SDL_JoystickOpen(i);
 
-    SDL_WM_SetCaption("Super Tux Kart", NULL);
+    SDL_WM_SetCaption("SuperTuxKart", NULL);
 
     ssgInit () ;
     fntInit();

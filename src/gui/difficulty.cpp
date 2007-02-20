@@ -21,6 +21,7 @@
 #include "race_manager.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_HARD,
@@ -33,16 +34,16 @@ Difficulty::Difficulty()
 {
     m_menu_id = widgetSet -> vstack(0);
 
-    widgetSet -> label(m_menu_id, "Choose your skill level", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Choose your skill level"), GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(VA, "Racer",  GUI_MED, WTOK_HARD);
-    widgetSet -> state(VA, "Driver", GUI_MED, WTOK_MEDIUM);
-    widgetSet -> start(VA, "Novice", GUI_MED, WTOK_EASY);
+    widgetSet -> state(VA, _("Racer"),  GUI_MED, WTOK_HARD);
+    widgetSet -> state(VA, _("Driver"), GUI_MED, WTOK_MEDIUM);
+    widgetSet -> start(VA, _("Novice"), GUI_MED, WTOK_EASY);
     widgetSet -> space(VA);
-    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 }   // Difficulty

@@ -24,6 +24,7 @@
 #include "material.hpp"
 #include "config.hpp"
 #include "history.hpp"
+#include "translation.hpp"
 
 Moveable::Moveable (bool bHasHistory)
 {
@@ -252,9 +253,10 @@ float Moveable::collectIsectData ( sgVec3 start, sgVec3 end )
 
     if ( nsteps > 100 )
     {
-        fprintf ( stderr, "WARNING: Speed too high for collision detect!\n" ) ;
-        fprintf ( stderr, "WARNING: Nsteps=%d, Speed=%f!\n", nsteps,SPEED ) ;
-        fprintf(stderr, "moveable %p, vel=%f,%f,%f\n",this, vel[0],vel[1],vel[2]);
+        fprintf(stderr, _("WARNING: Speed too high for collision detection!\n"
+                          "WARNING: Nsteps=%d, Speed=%f!\n"
+                          "moveable %p, vel=%f,%f,%f\n"),
+                nsteps, SPEED, this, vel[0], vel[1], vel[2]);
         nsteps = 100 ;
     }
 

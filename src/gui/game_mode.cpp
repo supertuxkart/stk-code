@@ -21,6 +21,7 @@
 #include "widget_set.hpp"
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_GP,
@@ -33,18 +34,18 @@ GameMode::GameMode()
 {
     m_menu_id = widgetSet -> vstack(0);
 
-    widgetSet -> label(m_menu_id, "Choose a Race Mode", GUI_LRG);
+    widgetSet -> label(m_menu_id, _("Choose a Race Mode"), GUI_LRG);
 
     const int VA = widgetSet -> varray(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> start(VA, "Grand Prix",  GUI_MED, WTOK_GP);
-    widgetSet -> state(VA, "Quick Race",  GUI_MED, WTOK_QUICKRACE);
+    widgetSet -> start(VA, _("Grand Prix"),  GUI_MED, WTOK_GP);
+    widgetSet -> state(VA, _("Quick Race"),  GUI_MED, WTOK_QUICKRACE);
 
     if (race_manager->getNumPlayers() == 1)
-        widgetSet -> state(VA, "Time Trial",  GUI_MED, WTOK_TIMETRIAL);
+        widgetSet -> state(VA, _("Time Trial"),  GUI_MED, WTOK_TIMETRIAL);
 
     widgetSet -> space(VA);
-    widgetSet -> state(VA,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> state(VA,_("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
     widgetSet -> space(VA);
     widgetSet -> layout(m_menu_id, 0, 0);
 }

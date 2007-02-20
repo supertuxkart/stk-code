@@ -25,6 +25,7 @@
 #include "player.hpp"
 #include "collectable_manager.hpp"
 #include "material.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_FIRST_PAGE,
@@ -128,12 +129,12 @@ void HelpMenu::switch_to_first_screen()
     //FIXME: if an hstack has no items, it segfaults
     const int HS1 = widgetSet->hstack(m_menu_id);
     widgetSet -> filler(HS1);
-    widgetSet -> label(HS1, "Force your rivals bite *your* dust!", GUI_SML);
+    widgetSet -> label(HS1, _("Force your rivals bite *your* dust!"), GUI_SML);
     widgetSet -> filler(HS1);
 
     const int HS2 = widgetSet->harray(m_menu_id);
-    widgetSet->label(HS2, "Avoid bananas", GUI_SML);
-    widgetSet->label(HS2, "Grab blue boxes and coins", GUI_SML);
+    widgetSet->label(HS2, _("Avoid bananas"), GUI_SML);
+    widgetSet->label(HS2, _("Grab blue boxes and coins"), GUI_SML);
 
 	ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
     ssgDeRefDelete(m_box);
@@ -173,14 +174,15 @@ void HelpMenu::switch_to_first_screen()
 
     widgetSet->multi(m_menu_id,
 //Next line starts at column 0 to avoid spaces in the GUI
-"At high speeds wheelies drive you faster, but you can't steer. If you\n\
-get stuck or fall too far, use the rescue button to get back on track.",
+_("At high speeds wheelies drive you faster, but you can't steer. If you\n\
+get stuck or fall too far, use the rescue button to get back on track."),
         GUI_SML);
 
     widgetSet -> filler(m_menu_id);
 
     widgetSet->label(m_menu_id,
-        "Check the current keys bindings for the first player:", GUI_SML);
+                     _("Check the current keys bindings for the first player:"),
+                     GUI_SML);
 
     const int HS3       = widgetSet->hstack(m_menu_id);
     widgetSet -> filler(HS3);
@@ -200,8 +202,8 @@ get stuck or fall too far, use the rescue button to get back on track.",
         widgetSet->label(LABEL_ID,  sKartAction2String[i], GUI_SML, GUI_LFT);
         widgetSet->label(CHANGE_ID, m_all_keys[i].c_str(), GUI_SML, GUI_RGT);
     }
-    widgetSet->start(m_menu_id,"Next screen", GUI_SML, WTOK_SECOND_PAGE);
-    widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
+    widgetSet->start(m_menu_id,_("Next screen"), GUI_SML, WTOK_SECOND_PAGE);
+    widgetSet->state(m_menu_id,_("Go back to the main menu"), GUI_SML, WTOK_QUIT);
     widgetSet->layout(m_menu_id, 0, 0);
 
 }
@@ -218,7 +220,7 @@ void HelpMenu::switch_to_second_screen()
     m_menu_id = widgetSet->vstack(0);
 
     widgetSet->label(m_menu_id,
-        "To help you win, there are certain collectables you can grab:",
+                     _("To help you win, there are certain collectables you can grab:"),
         GUI_SML);
 
     const int HA        = widgetSet->hstack(m_menu_id);
@@ -229,36 +231,36 @@ void HelpMenu::switch_to_second_screen()
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Missile - fast stopper in a straight line", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Missile - fast stopper in a straight line"), GUI_SML);
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_HOMING_MISSILE)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Homing missile - follows rivals, but is slower than the missile", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Homing missile - follows rivals, but is slower than the missile"), GUI_SML);
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Fuzzy blob/Spark - very slow, but bounces from walls", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Fuzzy blob/Spark - very slow, but bounces from walls"), GUI_SML);
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Zipper - speed boost", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Zipper - speed boost"), GUI_SML);
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Parachute - slows down all karts in a better position!", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Parachute - slows down all karts in a better position!"), GUI_SML);
 
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Anvil - slows down greatly the kart in the first position", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Anvil - slows down greatly the kart in the first position"), GUI_SML);
 
 #ifdef USE_MAGNETS
     widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle(),
         ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, "Missile - fast stopper in a straight line", GUI_SML);
+    widgetSet->label(LABEL_ID, _("Missile - fast stopper in a straight line"), GUI_SML);
 #endif
 
-    widgetSet->start(m_menu_id,"Previous screen", GUI_SML, WTOK_FIRST_PAGE);
-    widgetSet->state(m_menu_id,"Go back to the main menu", GUI_SML, WTOK_QUIT);
+    widgetSet->start(m_menu_id,_("Previous screen"), GUI_SML, WTOK_FIRST_PAGE);
+    widgetSet->state(m_menu_id,_("Go back to the main menu"), GUI_SML, WTOK_QUIT);
     widgetSet->layout(m_menu_id, 0, 0);
 }
 

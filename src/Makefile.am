@@ -77,6 +77,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	history.cpp		   history.hpp	        	\
 	race_setup.hpp	   	   no_copy.hpp	        	\
 	kart_control.hpp	   constants.hpp            	\
+	translation.hpp 					\
 	traffic.cpp 			  	        	\
 	player.hpp		   screen.hpp			\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
@@ -111,3 +112,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 supertuxkart_LDADD = -L . -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
 	-lplibul -lplibssgaux $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS) $(mikmod_LIBS)
+
+.PHONY: pot
+pot:
+	xgettext -o supertuxkart.pot -k_ --c++ *.?pp */*.?pp

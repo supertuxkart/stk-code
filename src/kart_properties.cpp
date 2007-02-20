@@ -28,6 +28,7 @@
 #include "string_utils.hpp"
 #include "kart_properties.hpp"
 #include "physics_parameters.hpp"
+#include "translation.hpp"
 
 // This constructor would be a bit more useful, nicer, if we could call
 // init_defaults() and load from here. Unfortunately, this object is used
@@ -57,17 +58,18 @@ void KartProperties::load(const std::string filename, const std::string node)
         const lisp::Lisp* const LISP = root->getLisp(node);
         if(!LISP)
         {
-            std::string s="No '";
-            s+=node;
-            s+="' node found";
-            throw std::runtime_error(s);
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf(msg, sizeof(msg), "No '%s' node found.", node.c_str());
+            throw std::runtime_error(msg);
         }
         getAllData(LISP);
     }
     catch(std::exception& err)
     {
-        std::cout << "Error while parsing KartProperties '" << filename
-        << ": " << err.what() << "\n";
+        fprintf(stderr, _("Error while parsing KartProperties '%s':\n"), 
+                filename.c_str());
+        fprintf(stderr, err.what());
+        fprintf(stderr, "\n");
     }
     delete root;
 

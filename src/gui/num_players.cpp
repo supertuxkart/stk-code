@@ -21,6 +21,7 @@
 #include "race_manager.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_PLAYER_2 = 2,
@@ -33,11 +34,11 @@ NumPlayers::NumPlayers()
 {
     m_menu_id = widgetSet -> varray(0);
     widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, "Two Players",   GUI_MED, WTOK_PLAYER_2);
-    widgetSet -> state(m_menu_id, "Three Players", GUI_MED, WTOK_PLAYER_3);
-    widgetSet -> state(m_menu_id, "Four Players",  GUI_MED, WTOK_PLAYER_4);
+    widgetSet -> start(m_menu_id, _("Two Players"),   GUI_MED, WTOK_PLAYER_2);
+    widgetSet -> state(m_menu_id, _("Three Players"), GUI_MED, WTOK_PLAYER_3);
+    widgetSet -> state(m_menu_id, _("Four Players"),  GUI_MED, WTOK_PLAYER_4);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id,"Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
     widgetSet -> space(m_menu_id);
 
     widgetSet -> layout(m_menu_id, 0, 0);

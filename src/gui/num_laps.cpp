@@ -22,6 +22,7 @@
 #include "start_screen.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 NumLaps::NumLaps()
 {
@@ -30,16 +31,16 @@ NumLaps::NumLaps()
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
-    widgetSet -> label(m_menu_id, "Choose number of laps",  GUI_LRG   );
+    widgetSet -> label(m_menu_id, _("Choose number of laps"),  GUI_LRG   );
 
-    widgetSet -> start(m_menu_id, "One",                    GUI_MED,  1);
-    widgetSet -> state(m_menu_id, "Two",                    GUI_MED,  2);
-    widgetSet -> state(m_menu_id, "Four",                   GUI_MED,  4);
-    widgetSet -> state(m_menu_id, "Five",                   GUI_MED,  5);
-    widgetSet -> state(m_menu_id, "Six",                    GUI_MED,  6);
-    widgetSet -> state(m_menu_id, "Eight",                  GUI_MED,  8);
+    widgetSet -> start(m_menu_id, _("One"),                    GUI_MED,  1);
+    widgetSet -> state(m_menu_id, _("Two"),                    GUI_MED,  2);
+    widgetSet -> state(m_menu_id, _("Four"),                   GUI_MED,  4);
+    widgetSet -> state(m_menu_id, _("Five"),                   GUI_MED,  5);
+    widgetSet -> state(m_menu_id, _("Six"),                    GUI_MED,  6);
+    widgetSet -> state(m_menu_id, _("Eight"),                  GUI_MED,  8);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, "Press <ESC> to go back", GUI_SML, -1);
+    widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> space(m_menu_id);
 
     widgetSet -> layout(m_menu_id, 0, 0);

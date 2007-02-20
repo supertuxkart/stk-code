@@ -24,6 +24,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "preprocessor.hpp"
+#include "translation.hpp"
 
 typedef struct
 {
@@ -83,25 +84,22 @@ void CollectableManager::loadCollectables()
 void CollectableManager::Load(int collectType, const char* filename)
 {
     const lisp::Lisp* ROOT = 0;
-    try
-    {
-        lisp::Parser parser;
-        std::string tmp= "data/" + (std::string)filename;
-        ROOT = parser.parse(loader->getPath(tmp.c_str()));
 
-        const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
-        if(!lisp)
-        {
-            std::string s="No 'tuxkart-collectable node found";
-            throw std::runtime_error(s);
-        }
-        LoadNode(lisp, collectType);
-    }
-    catch(std::exception& err)
+    lisp::Parser parser;
+    std::string tmp= "data/" + (std::string)filename;
+    ROOT = parser.parse(loader->getPath(tmp.c_str()));
+        
+    const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
+    if(!lisp)
     {
-        std::cout << "Error while parsing collectable '" << filename
-        << ": " << err.what() << "\n";
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), 
+                 _("No 'tuxkart-collectable' node found while parsing '%s'."),
+                 filename);
+        throw std::runtime_error(msg);
     }
+    LoadNode(lisp, collectType);
+
     delete ROOT;
 
 }   // Load

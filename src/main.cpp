@@ -30,6 +30,7 @@
 #else
 #  include <unistd.h>
 #endif
+#include <stdexcept>
 
 #include "config.hpp"
 #include "track_manager.hpp"
@@ -50,6 +51,7 @@
 #include "attachment_manager.hpp"
 #include "sound_manager.hpp"
 #include "physics_parameters.hpp"
+#include "translation.hpp"
 
 #ifdef BULLET
 #include <GL/glut.h>
@@ -58,7 +60,7 @@
 void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
-    "Usage: %s [OPTIONS]\n\n"
+  _("Usage: %s [OPTIONS]\n\n"
 
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
@@ -87,7 +89,7 @@ void cmdLineHelp (char* invocation)
     "  -h,  --help             Show this help\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.berlios.de\n\n", invocation
+    "http://supertuxkart.berlios.de\n\n"), invocation
     );
 }   // cmdLineHelp
 
@@ -98,9 +100,11 @@ int handleCmdLine(int argc, char **argv)
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
-        if ( !strcmp(argv[i], "--help") ||
-             !strcmp(argv[i], "-help" ) ||
-             !strcmp(argv[i], "-h")      )
+        if ( !strcmp(argv[i], "--help"    ) ||
+             !strcmp(argv[i], "-help"     ) ||
+             !strcmp(argv[i], _("--help") ) ||
+             !strcmp(argv[i], _("-help" ) ) ||
+             !strcmp(argv[i], "-h")       )
         {
             cmdLineHelp(argv[0]);
             return 0;
@@ -113,24 +117,24 @@ int handleCmdLine(int argc, char **argv)
                  && i+1<argc                                              )
         {
             race_manager->setTrack(argv[i+1]);
-            fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+            fprintf ( stdout, _("You choose to start in track: %s.\n"), argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
             race_manager->setNumKarts(config->m_karts = atoi(argv[i+1]));
-            fprintf ( stdout, "You choose to have %s karts.\n", argv[i+1] ) ;
+            fprintf ( stdout, _("You choose to have %s karts.\n"), argv[i+1] ) ;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {
 
-            fprintf ( stdout, "  Available tracks:\n" );
+            fprintf ( stdout, _("  Available tracks:\n") );
             for (size_t i = 0; i != track_manager->getTrackCount(); i++)
                 fprintf ( stdout, "\t%10s: %s\n",
                           track_manager->getTrack(i)->getIdent(),
                           track_manager->getTrack(i)->getName());
 
-            fprintf ( stdout, "Use --track N to choose track.\n\n" );
+            fprintf ( stdout, _("Use --track N to choose track.\n\n"));
             delete track_manager;
             track_manager = 0;
 
@@ -140,7 +144,7 @@ int handleCmdLine(int argc, char **argv)
         {
             kart_properties_manager->loadKartData () ;
 
-            fprintf ( stdout, "  Available karts:\n" );
+            fprintf ( stdout, _("  Available karts:\n") );
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
                 const KartProperties* KP= kart_properties_manager->getKartById(i);
@@ -161,7 +165,7 @@ int handleCmdLine(int argc, char **argv)
         else if ( !strcmp(argv[i], "--mirror") )
         {
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-            fprintf ( stdout, "Enabling mirror mode.\n" ) ;
+            fprintf ( stdout, _("Enabling mirror mode.\n") ) ;
             //raceSetup.mirror = 1;
 #else
             //raceSetup.mirror = 0 ;
@@ -170,7 +174,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
+            fprintf ( stdout, _("You choose to have %d laps.\n"), atoi(argv[i+1]) ) ;
             race_manager->setNumLaps(atoi(argv[i+1]));
         }
         /* FIXME:
@@ -184,7 +188,7 @@ int handleCmdLine(int argc, char **argv)
         cmdLineHelp(argv[0]);
         return 0;
           }
-          fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
+          fprintf ( stdout, _("You choose to have %d players.\n"), atoi(argv[i+1]) ) ;
         }
         */
 #if !defined(WIN32) && !defined(__CYGWIN)
@@ -200,18 +204,18 @@ int handleCmdLine(int argc, char **argv)
         else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
         {
             if (sscanf(argv[i+1], "%dx%d", &config->m_width, &config->m_height) == 2)
-                fprintf ( stdout, "You choose to be in %dx%d.\n", config->m_width,
+                fprintf ( stdout, _("You choose to be in %dx%d.\n"), config->m_width,
                           config->m_height );
             else
             {
-                fprintf ( stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
+                fprintf(stderr, ("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));
                 exit(EXIT_FAILURE);
             }
         }
 #ifdef VERSION
         else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
         {
-            fprintf ( stdout, "SuperTuxkart %s\n", VERSION ) ;
+            fprintf ( stdout, "SuperTuxKart %s\n", VERSION ) ;
             return 0;
         }
 #endif
@@ -233,7 +237,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else
         {
-            fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
+            fprintf ( stderr, _("Invalid parameter: %s.\n\n"), argv[i] );
             cmdLineHelp(argv[0]);
             return 0;
         }
@@ -281,44 +285,51 @@ void InitTuxkart()
 
 int main ( int argc, char **argv ) 
 {
+    try {
+        initTranslations();
 #ifdef BULLET
-    glutInit(&argc, argv);
+        glutInit(&argc, argv);
 #endif
-    InitTuxkart();
-    //handleCmdLine() needs InitTuxkart() so it can't be called first
-    if(!handleCmdLine(argc, argv)) exit(0);
+        InitTuxkart();
+        //handleCmdLine() needs InitTuxkart() so it can't be called first
+        if(!handleCmdLine(argc, argv)) exit(0);
 
-    drv_init();
-    // loadMaterials needs ssgLoadTextures (internally), which can
-    // only be called after ssgInit (since this adds the actual loader)
-    // so this next call can't be in InitTuxkart. And InitPlib needs
-    // config, which gets defined in InitTuxkart, so swapping those two
-    // calls is not possible either ... so loadMaterial has to be done here :(
-    material_manager        -> loadMaterial       ();
-    kart_properties_manager -> loadKartData       ();
-    projectile_manager      -> loadData           ();
-    collectable_manager     -> loadCollectables   ();
-    herring_manager         -> loadDefaultHerrings();
-    attachment_manager      -> loadModels         ();
-    startScreen = new StartScreen();
-    widgetSet   = new WidgetSet;
+        drv_init();
+        // loadMaterials needs ssgLoadTextures (internally), which can
+        // only be called after ssgInit (since this adds the actual loader)
+        // so this next call can't be in InitTuxkart. And InitPlib needs
+        // config, which gets defined in InitTuxkart, so swapping those two
+        // calls is not possible either ... so loadMaterial has to be done here :(
+        material_manager        -> loadMaterial       ();
+        kart_properties_manager -> loadKartData       ();
+        projectile_manager      -> loadData           ();
+        collectable_manager     -> loadCollectables   ();
+        herring_manager         -> loadDefaultHerrings();
+        attachment_manager      -> loadModels         ();
+        startScreen = new StartScreen();
+        widgetSet   = new WidgetSet;
 
-    // Replay a race
-    // =============
-    if(config->m_replay_history)
-    {
-        // This will setup the race manager etc.
-        history->Load();
-        startScreen->switchToGame();
-        screen_manager->run();
-    }
-    else
-    {
+        // Replay a race
+        // =============
+        if(config->m_replay_history)
+        {
+            // This will setup the race manager etc.
+            history->Load();
+            startScreen->switchToGame();
+            screen_manager->run();
+            // well, actually run() will never return, since
+            // it exits after replaying history (see history::GetNextDT()).
+            // So the next line is just to make this obvious here!
+            exit(-3);
+        }
+        
+        // Not replaying
+        // =============
         if(!config->m_profile)
         {
             if(!config->m_no_start_screen)
             {
-
+                
                 // Normal multi window start
                 // =========================
                 screen_manager->setScreen(startScreen);
@@ -340,7 +351,7 @@ int main ( int argc, char **argv )
                 startScreen->switchToGame();
             }
         }
-        else
+        else  // profilie
         {
 
             // Profiling
@@ -353,7 +364,14 @@ int main ( int argc, char **argv )
             startScreen->switchToGame  ();
         }
         screen_manager->run();
+
+    }  // try
+    catch (std::exception &e)
+    {
+        fprintf(stderr,e.what());
+        fprintf(stderr,_("\nAborting SuperTuxKart\n"));
     }
+
     config->saveConfig();
 
     drv_deinit();

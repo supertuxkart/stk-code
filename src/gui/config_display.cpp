@@ -22,6 +22,7 @@
 #include "config.hpp"
 #include "menu_manager.hpp"
 #include "sdldrv.hpp"
+#include "translation.hpp"
 
 enum WidgetTokens {
     WTOK_FULLSCREEN, WTOK_BACK
@@ -36,16 +37,16 @@ ConfigDisplay::ConfigDisplay()
 void ConfigDisplay::CreateMenu()
 {
     m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, "Display Settings", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Display Settings"), GUI_LRG, GUI_ALL, 0, 0);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    m_fullscreen_menu_id = widgetSet -> start(VA, "Fullscreen mode",  GUI_MED,
+    m_fullscreen_menu_id = widgetSet -> start(VA, _("Fullscreen mode"),  GUI_MED,
                                             WTOK_FULLSCREEN);
 
     if(config->m_fullscreen)
-        widgetSet->set_label(m_fullscreen_menu_id, "Window mode");
+        widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
     widgetSet -> space(VA);
-    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, WTOK_BACK);
+    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
     widgetSet -> layout(m_menu_id, 0, 0);
 }   // CreateMenu
 
@@ -82,9 +83,9 @@ void ConfigDisplay::select()
         // widgetSet, etc.
         CreateMenu();
         if(config->m_fullscreen)
-            widgetSet->set_label(m_fullscreen_menu_id, "Window mode");
+            widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
         else
-            widgetSet->set_label(m_fullscreen_menu_id, "Fullscreen mode");
+            widgetSet->set_label(m_fullscreen_menu_id, _("Fullscreen mode"));
         break;
     case WTOK_BACK:
         menu_manager->popMenu();

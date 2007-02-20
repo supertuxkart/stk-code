@@ -20,6 +20,7 @@
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
+#include "translation.hpp"
 
 ssgState *fuzzy_gst;
 
@@ -72,7 +73,7 @@ void MaterialManager::loadMaterial()
 
     if ( fd == NULL )
     {
-        fprintf ( stderr, "FATAL: No Such File as '%s'\n", fname ) ;
+        fprintf(stderr, _("FATAL: No Such File as '%s'\n"), fname ) ;
         exit ( 1 ) ;
     }
 
@@ -99,8 +100,8 @@ char* MaterialManager::parseFileName(char **str)
 
     if ( *p != '"' )
     {
-        fprintf ( stderr, "ERROR: Material file entries must start with '\"'\n");
-        fprintf ( stderr, "ERROR: Offending line is '%s'\n", *str ) ;
+        fprintf(stderr, _("ERROR: Material file entries must start with '\"'\n"
+                          "ERROR: Offending line is '%s'\n"), *str );
         return NULL ;
     }
 
@@ -110,8 +111,8 @@ char* MaterialManager::parseFileName(char **str)
 
     if ( *p != '"' )
     {
-        fprintf ( stderr,
-                  "ERROR: Unterminated string constant '%s' in materials file.\n", *str ) ;
+        fprintf(stderr,
+                _("ERROR: Unterminated string constant '%s' in materials file.\n"), *str ) ;
         return NULL ;
     }
 

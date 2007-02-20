@@ -37,6 +37,7 @@
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
+#include "translation.hpp"
 
 Config *config;
 
@@ -117,10 +118,14 @@ void Config::setDefaults()
     m_height           = 600;
     m_karts            = 4;
 
-    m_player[0].setName("Player 1");
-    m_player[1].setName("Player 2");
-    m_player[2].setName("Player 3");
-    m_player[3].setName("Player 4");
+    
+    for(int i=0; i<4; i++) 
+    {
+        char pl[255];
+        snprintf(pl, sizeof(pl), _("Player %d"), i+1);
+        m_player[i].setName(pl);
+    }
+
 
     /*player 1 default keyboard settings*/
     m_player[0].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_LEFT,      0, 0);
@@ -197,13 +202,13 @@ int Config::CheckAndCreateDir()
 #endif
     if(bError)
     {
-        fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
+        fprintf(stderr, _("Couldn't create '%s', config files will not be saved.\n"),
                 DIRNAME.c_str());
         return 0;
     }
     else
     {
-        printf("Config directory '%s' successfully created.\n",DIRNAME.c_str());
+        printf(_("Config directory '%s' successfully created.\n"),DIRNAME.c_str());
         return 2;
     }
 
@@ -227,7 +232,8 @@ void Config::loadConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
-        std::cout << "Config file '"<<filename<<"' does not exist, it will be created.\n";
+        printf(_("Config file '%s' does not exist, it will be created.\n"), 
+               filename.c_str());
         delete root;
         return;
     }
@@ -235,34 +241,38 @@ void Config::loadConfig(const std::string& filename)
     try
     {
         const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
-        if(!lisp)
-            throw std::runtime_error("No tuxkart-config node");
+        if(!lisp) 
+        {
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf(msg, sizeof(msg), _("No tuxkart-config node"));
+            throw std::runtime_error(msg);
+        }
         int configFileVersion = 0;
         lisp->get("configFileVersion", configFileVersion);
         if (configFileVersion < SUPPORTED_CONFIG_VERSION)
         {
             // Give some feedback to the user about what was changed.
             // Do NOT add a break after the case, so that all changes will be printed
-            std::cout << "\nConfig file version '"<<configFileVersion<<"' is too old.\n";
-            std::cout << "The following changes have been applied in the current SuperTuxKart version:\n";
+            printf(_("\nConfig file version '%d' is too old.\n"
+                     "The following changes have been applied in the current SuperTuxKart version:\n"),
+                   configFileVersion);
             int needToAbort=0;
             switch(configFileVersion)
             {
-            case 0:  std::cout << "- Single window menu, old status display,new keyboard style settings were removed\n";
+            case 0:  printf(_("- Single window menu, old status display,new keyboard style settings were removed\n"));
                 needToAbort=0;
-            case 1:  std::cout << "- Key bindings were changed, please check the settings. All existing values were discarded.\n";
+            case 1:  printf(_("- Key bindings were changed, please check the settings. All existing values were discarded.\n"));
                 needToAbort=1;  // if the old keybinds were read, they wouldn't make any sense
             case 99: break;
-            default: std::cout << "Config file version " << configFileVersion
-                << " is too old. Discarding your configuration. Sorry. :(\n";
-                break;
+            default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
+                     break;
             }
             if(needToAbort)
             {
                 delete root;
                 return;
             }
-            std::cout << "This warning can be ignored.\n";
+            printf(_("This warning can be ignored.\n"));
             // Keep on reading the config files as far as possible
         }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
 
@@ -294,8 +304,9 @@ void Config::loadConfig(const std::string& filename)
             const lisp::Lisp* reader = lisp->getLisp(temp);
             if(!reader)
             {
-                temp = "No " + temp + " node";
-                throw std::runtime_error(temp);
+                char msg[MAX_ERROR_MESSAGE_LENGTH];
+                snprintf(msg, sizeof(msg), _("No '%s' node"), temp.c_str());
+                throw std::runtime_error(msg);
             }
             std::string name;
             reader->get("name", name);
@@ -319,7 +330,9 @@ void Config::loadConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
-        std::cout << "Error while parsing config '" << filename << "': " << e.what() << "\n";
+        fprintf(stderr, _("Error while parsing config '%s':\n"), filename.c_str());
+        fprintf(stderr,  e.what());
+        fprintf(stderr, "\n");
     }
     delete root;
 }   // loadConfig
@@ -467,7 +480,9 @@ void Config::saveConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
-        std::cout << "Couldn't write config: " << e.what() << "\n";
+        fprintf(stderr, _("Couldn't write config: "));
+        fprintf(stderr, e.what());
+        fprintf(stderr, "\n");
     }
 }   // saveConfig
 
@@ -518,30 +533,33 @@ void Config::writeInput(lisp::Writer &writer, const char *node, KartActions acti
 std::string Config::getInputAsString(int player_index, KartActions control)
 {
     const Input *INPUT         = m_player[player_index].getInput(control);
+    char msg[MAX_MESSAGE_LENGTH];
     std::ostringstream stm;
-
+    
     switch (INPUT->type)
     {
     case IT_KEYBOARD:
-        stm << SDL_GetKeyName((SDLKey) INPUT->id0);
+        snprintf(msg, sizeof(msg), _("%s"), SDL_GetKeyName((SDLKey) INPUT->id0));
         break;
     case IT_STICKMOTION:
-        stm << "joy " << INPUT->id0 << " axis " << INPUT->id1 << ((INPUT->id2 == AD_NEGATIVE) ? " -" : " +");
+        snprintf(msg, sizeof(msg), _("joy %d axis %d  %c"),
+                 INPUT->id0, INPUT->id1, (INPUT->id2 == AD_NEGATIVE) ? '-' : '+');
         break;
     case IT_STICKBUTTON:
-        stm << "joy " << INPUT->id0 << " btn " << INPUT->id1;
+        snprintf(msg, sizeof(msg), _("joy %d btn %d"), INPUT->id0, INPUT->id1);
         break;
     case IT_STICKHAT:
-        stm << "joy " << INPUT->id0 << " hat " << INPUT->id1;
+        snprintf(msg, sizeof(msg), _("joy %d hat %d"), INPUT->id0, INPUT->id1);
         break;
     case IT_MOUSEBUTTON:
-        stm << "mouse btn " << INPUT->id0;
+        snprintf(msg, sizeof(msg), _("mouse btn %d"), INPUT->id0);
         break;
     case IT_MOUSEMOTION:
-        stm << "mouse axis " << INPUT->id0 << ((INPUT->id1 == AD_NEGATIVE) ? " -" : " +");
+        snprintf(msg, sizeof(msg), _("mouse axis %d %c"),
+                 INPUT->id0, ((INPUT->id1 == AD_NEGATIVE) ? '-' : '+'));
         break;
     default:
-        stm << "invalid";
+        snprintf(msg, sizeof(msg), _("Invalid"));
     }
     return stm.str();
 }   // GetKeyAsString

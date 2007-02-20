@@ -49,6 +49,7 @@
 #include "sound_manager.hpp"
 #include "widget_set.hpp"
 #include "ssg_help.hpp"
+#include "translation.hpp"
 
 #include "robots/default_robot.hpp"
 
@@ -76,8 +77,10 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     }
     catch(std::runtime_error)
     {
-        printf("Track '%s' not found.\n",m_race_setup.m_track.c_str());
-        exit(1);
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), 
+                 _("Track '%s' not found.\n"),m_race_setup.m_track.c_str());
+        throw std::runtime_error(msg);
     }
 
     // Start building the scene graph
@@ -527,10 +530,10 @@ void World::loadTrack()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
+            fprintf(stderr, _("The cup '%s' contains an invalid herring style '%s'.\n"),
                     race_manager->getGrandPrix()->getName().c_str(),
                     race_manager->getGrandPrix()->getHerringStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
+            fprintf(stderr, _("Please fix the file '%s'.\n"),
                     race_manager->getGrandPrix()->getFilename().c_str());
         }
     }
@@ -542,9 +545,9 @@ void World::loadTrack()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The track '%s' contains an invalid herring style '%s'.\n",
+            fprintf(stderr, _("The track '%s' contains an invalid herring style '%s'.\n"),
                     m_track->getName(), m_track->getHerringStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
+            fprintf(stderr, _("Please fix the file '%s'.\n"),
                     m_track->getFilename().c_str());
         }
     }
@@ -552,9 +555,10 @@ void World::loadTrack()
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
     {
-        std::stringstream msg;
-        msg << "Can't open track location file '" << path << "'.";
-        throw std::runtime_error(msg.str());
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg),_("Can't open track location file '%s'.\n"), 
+                 path.c_str());
+        throw std::runtime_error(msg);
     }
 
     char s [ 1024 ] ;
@@ -648,9 +652,10 @@ void World::loadTrack()
             else
             {
                 fclose(fd);
-                std::stringstream msg;
-                msg << "Syntax error in '" << path << "': " << s;
-                throw std::runtime_error(msg.str());
+                char msg[MAX_ERROR_MESSAGE_LENGTH];
+                snprintf(msg, sizeof(msg), _("Syntax error in '%s': %s"),
+                         path.c_str(), s);
+                throw std::runtime_error(msg);
             }
 
             if ( need_hat )
@@ -713,9 +718,10 @@ void World::loadTrack()
         else
         {
             fclose(fd);
-            std::stringstream msg;
-            msg << "Syntax error in '" << path << "': " << s;
-            throw std::runtime_error(msg.str());
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf(msg, sizeof(msg), _("Syntax error in '%s': %s"),
+                     path.c_str(), s);
+            throw std::runtime_error(msg);
         }
     }   // while fgets
 

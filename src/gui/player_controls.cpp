@@ -23,19 +23,20 @@
 #include "widget_set.hpp"
 #include "config.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 #include <string>
 
-char *sKartAction2String[KC_FIRE+1] = {"Left", "Right", "Accelerate",
-                                       "Brake","Wheelie", "Jump",
-                                       "Rescue", "Fire"};
+char *sKartAction2String[KC_FIRE+1] = {_("Left"), _("Right"), _("Accelerate"),
+                                       _("Brake"),  _("Wheelie"), _("Jump"),
+                                       _("Rescue"), _("Fire")                 };
 
 
 PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
         m_grab_input(false)
 {
     m_menu_id = widgetSet -> vstack(0);
-    sprintf(m_heading, "Choose your controls, %s", config->m_player[m_player_index].getName());
+    sprintf(m_heading, _("Choose your controls, %s"), config->m_player[m_player_index].getName());
     widgetSet -> label(m_menu_id, m_heading, GUI_LRG, GUI_ALL, 0, 0);
 
     const int HA        = widgetSet->harray(m_menu_id);
@@ -50,7 +51,7 @@ PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
         widgetSet->label(LABEL_ID, sKartAction2String[i]);
     }
 
-    widgetSet->state(m_menu_id,"Press <ESC> to go back", GUI_SML, -1);
+    widgetSet->state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> layout(m_menu_id, 0, 0);
 }   // PlayerControls
 
@@ -75,7 +76,7 @@ void PlayerControls::select()
 
     m_edit_action   = static_cast<KartActions>(MENU_CHOICE);
     m_grab_input = true;
-    widgetSet->set_label(m_grab_id,"Press key");
+    widgetSet->set_label(m_grab_id, _("Press key"));
 }   // select
 
 //-----------------------------------------------------------------------------

@@ -36,6 +36,7 @@
 #include "moving_physics.hpp"
 #endif
 #include "moving_texture.hpp"
+#include "translation.hpp"
 
 Loader* loader = 0;
 
@@ -66,7 +67,8 @@ Loader::Loader()
 #else
                 datadir = "/usr/local/share/games/supertuxkart" ;
 #endif
-    fprintf ( stderr, "Data files will be fetched from: '%s'\n", datadir ) ;
+    fprintf(stderr, _("Data files will be fetched from: '%s'\n"), 
+            datadir ) ;
     addSearchPath(datadir);
 }  // Loader
 
@@ -77,6 +79,7 @@ Loader::~Loader()
 //-----------------------------------------------------------------------------
 void Loader::makePath(char* path, const char* dir, const char* fname) const
 {
+
     struct stat mystat;
 
     for(std::vector<std::string>::const_iterator i = m_search_path.begin();
@@ -97,8 +100,11 @@ void Loader::makePath(char* path, const char* dir, const char* fname) const
     }
 
     // error case...
-    // hmm ideally we'd throw an exception here, but plib is not prepared for that
-    sprintf(path, "NotFound: %s", fname);
+    char msg[MAX_ERROR_MESSAGE_LENGTH];
+    snprintf(msg, sizeof(msg), "Could not find path for '%s'.", fname);
+
+    throw std::runtime_error(msg);
+
 }   // makePath
 
 //-----------------------------------------------------------------------------
@@ -168,9 +174,9 @@ std::string Loader::getPath(const char* FNAME) const
         return result;
     }
 
-    std::stringstream msg;
-    msg << "Couldn't find file '" << FNAME << "'.";
-    throw std::runtime_error(msg.str());
+    char msg[MAX_ERROR_MESSAGE_LENGTH];
+    snprintf(msg, sizeof(msg), _("Couldn't find file '%s'."), FNAME);
+    throw std::runtime_error(msg);
 }   // getPath
 
 //-----------------------------------------------------------------------------
@@ -331,7 +337,7 @@ ssgBranch *Loader::createBranch(char *data) const
         return NULL;
 #endif
     }
-    fprintf(stderr, "Warning: Ignoring userdata '%s'\n",data);
+    fprintf(stderr, _("Warning: Ignoring userdata '%s'\n"), data);
     return NULL ;
 }   // createBranch
 

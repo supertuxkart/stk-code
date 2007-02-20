@@ -32,6 +32,7 @@
 #include "config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"
+#include "translation.hpp"
 
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
@@ -55,13 +56,13 @@ GrandPrixEnd::GrandPrixEnd()
     const std::string KART_NAME = race_manager->getKartName(highest);
     const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);
 
-    std::stringstream output;
-    //FIXME: when a long string is used the output gets corrupted.
-    output << "The winner is " << WINNING_KART->getName() << "!";
-    widgetSet -> label(m_menu_id, output.str().c_str(), GUI_LRG, GUI_ALL, 0, 0);
+    char output[MAX_MESSAGE_LENGTH];
+    snprintf(output, sizeof(output),
+             _("The winner is %s!"),WINNING_KART->getName().c_str());
+    widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
     widgetSet -> space(m_menu_id);
 
-    widgetSet -> label(m_menu_id, "Back to the main menu", GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> label(m_menu_id, _("Back to the main menu"), GUI_LRG, GUI_ALL, 0, 0);
 
     widgetSet -> layout(m_menu_id, 0, 1);
 

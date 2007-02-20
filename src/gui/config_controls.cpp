@@ -20,20 +20,25 @@
 #include "config_controls.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
+#include "translation.hpp"
 
 ConfigControls::ConfigControls()
 {
     m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, "Edit controls for which player?", GUI_LRG);
+    widgetSet -> label(m_menu_id, _("Edit controls for which player?"), GUI_LRG);
 
     const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, "Player 1",  GUI_MED, 1);
-    widgetSet -> state(VA, "Player 2",  GUI_MED, 2);
-    widgetSet -> state(VA, "Player 3",  GUI_MED, 3);
-    widgetSet -> state(VA, "Player 4",  GUI_MED, 4);
+    
+    static char playerN[4][MAX_MESSAGE_LENGTH];
+    for(int i=1; i<=4; i++)
+    {
+        snprintf(playerN[i-1], MAX_MESSAGE_LENGTH,
+                 _("Player %d"), i);
+        widgetSet -> start(VA, playerN[i-1],  GUI_MED, i);
+    }
 
     widgetSet -> space(VA);
-    widgetSet -> state(VA, "Press <ESC> to go back", GUI_SML, 5);
+    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, 5);
 
     widgetSet -> layout(m_menu_id, 0, 0);
 }

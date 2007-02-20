@@ -22,6 +22,7 @@
 #include "string_utils.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
+#include "translation.hpp"
 
 TrackManager* track_manager = 0;
 
@@ -45,7 +46,9 @@ TrackManager::getTrack(const std::string& ident) const
             return *i;
     }
 
-    throw std::runtime_error("TrackManager: Couldn't find track: '" + ident + "'");
+    char msg[MAX_ERROR_MESSAGE_LENGTH];
+    fprintf(stderr, _("TrackManager: Couldn't find track: '%s'"), ident.c_str() );
+    throw std::runtime_error(msg);
 }
 
 //-----------------------------------------------------------------------------

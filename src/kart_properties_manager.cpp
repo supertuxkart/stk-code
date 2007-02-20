@@ -23,6 +23,8 @@
 #include "string_utils.hpp"
 #include "kart_properties_manager.hpp"
 #include "kart_properties.hpp"
+#include "translation.hpp"
+
 
 KartPropertiesManager *kart_properties_manager=0;
 
@@ -86,7 +88,10 @@ const int KartPropertiesManager::getKartId(const std::string IDENT)
         ++j;
     }
 
-    throw std::runtime_error("KartPropertiesManager: Couldn't find kart: '" + IDENT + "'");
+    char msg[MAX_ERROR_MESSAGE_LENGTH];
+    snprintf(msg, sizeof(msg), _("KartPropertiesManager: Couldn't find kart: '%s'"),
+             IDENT.c_str());
+    throw std::runtime_error(msg);
 }   // getKartId
 
 //-----------------------------------------------------------------------------

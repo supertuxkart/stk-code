@@ -33,6 +33,8 @@
 #include "sfx_openal.hpp"
 #endif
 
+#include "translation.hpp"
+
 SoundManager* sound_manager= NULL;
 
 SoundManager::SoundManager()
@@ -45,7 +47,7 @@ SoundManager::SoundManager()
 
     if(plib_scheduler->notWorking())
     {
-        fprintf(stderr, "WARNING: Could not initialize the PLIB based sound.\n");
+        fprintf(stderr, _("WARNING: Could not initialize the PLIB based sound.\n"));
 
         plib_scheduler->setSafetyMargin(0.25);
         m_initialized = false;
@@ -57,7 +59,7 @@ SoundManager::SoundManager()
         m_initialized = true;
     else
     {
-        fprintf(stderr, "WARNING: Could not initialize the ALUT based sound.");
+        fprintf(stderr, _("WARNING: Could not initialize the ALUT based sound.\n"));
         m_initialized = false;
     }
 

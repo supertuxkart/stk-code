@@ -22,6 +22,7 @@
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
 #include "config.hpp"
+#include "translation.hpp"
 
 ScrolledText::ScrolledText()
 {
@@ -70,7 +71,7 @@ void ScrolledText::update(float dt)
     glColor4fv(backgroundColour);
     glCallList(m_rect);
     glPopMatrix();
-    widgetSet->drawText("Press <ESC> to go back", 24,
+    widgetSet->drawText(_("Press <ESC> to go back"), 24,
                         SCREEN_CENTERED_TEXT, 20, 255, 255, 255);
     glViewport(m_x_left, m_y_bottom, m_x_right-m_x_left, m_y_top-m_y_bottom);
 
