@@ -20,7 +20,7 @@
 #ifndef TRANSLATION_H
 #define TRANLSATION_H
 
-#undef HAS_GETTEXT
+#define HAS_GETTEXT
 
 #ifdef HAS_GETTEXT
 #  include <libintl.h>
@@ -46,10 +46,13 @@ public:
 #ifdef HAS_GETTEXT
     initTranslations() 
     { 
-        //        setlocale (LC_ALL, "");
         //        bindtextdomain (PACKAGE, LOCALEDIR);
         //        textdomain (PACKAGE);
-        setlocale (LC_ALL, "");
+        // LC_ALL does not work, sscanf will then not always be able
+        // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
+        // used in driveline files.
+        setlocale (LC_CTYPE,    "");
+        setlocale (LC_MESSAGES, "");
         bindtextdomain (PACKAGE, "/home/joh/local/tuxkart/po");
         textdomain (PACKAGE);
     }
