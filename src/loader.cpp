@@ -337,7 +337,7 @@ ssgBranch *Loader::createBranch(char *data) const
         return NULL;
 #endif
     }
-    fprintf(stderr, _("Warning: Ignoring userdata '%s'\n"), data);
+    fprintf(stderr, "Warning: Ignoring userdata '%s'\n", data);
     return NULL ;
 }   // createBranch
 

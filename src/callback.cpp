@@ -20,7 +20,6 @@
 #include "callback.hpp"
 #include "string_utils.hpp"
 #include "world.hpp"
-#include "translation.hpp"
 
 Callback::Callback(char *data, ssgBranch *branch)
 {
@@ -74,7 +73,7 @@ void Callback::parseData(char *data)
         if ( sscanf ( s,  "C=%f", & f ) == 1 ) m_cycle        = f ; else
         if ( sscanf ( s,  "M=%f", & f ) == 1 ) m_mode         = (int) f ; else
         if ( sscanf ( s,  "O=%f", & f ) == 1 ) m_phase        = f ; else
-            fprintf ( stderr, _("Unrecognised @autodcs string: '%s'\n"), data );
+            fprintf ( stderr, "Unrecognised @autodcs string: '%s'\n", data );
     }   // while s!=NULL&&s!='\0'
 }   // parseData
 

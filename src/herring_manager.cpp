@@ -21,7 +21,7 @@
 #include <string>
 #include <sstream>
 #include "preprocessor.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "herring_manager.hpp"
 #include "loader.hpp"
 #include "material_manager.hpp"
@@ -161,7 +161,7 @@ void HerringManager::setDefaultHerringStyle()
         if(!m_herring_model[i])
         {
             snprintf(msg, sizeof(msg), 
-                     _("Herring model '%s' is missing (see herring_manager)!\n"),
+                     "Herring model '%s' is missing (see herring_manager)!\n",
                      DEFAULT_NAMES[i].c_str());
             bError=1;
             break;
@@ -169,18 +169,18 @@ void HerringManager::setDefaultHerringStyle()
     }   // for i
     if(bError)
     {
-        fprintf(stderr, _("The following models are available:\n"));
+        fprintf(stderr, "The following models are available:\n");
         for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
         {
             if(i->second)
             {
                 if(i->first.substr(0,3)=="OLD")
                 {
-                    fprintf(stderr,_("   %s internally only.\n"),i->first.c_str());
+                    fprintf(stderr,"   %s internally only.\n",i->first.c_str());
                 }
                 else
                 {
-                    fprintf(stderr,_("   %s in models/herrings/%s.ac.\n"),
+                    fprintf(stderr, "   %s in models/herrings/%s.ac.\n",
                             i->first.c_str(),
                             i->first.c_str());
                 }
@@ -229,8 +229,8 @@ void HerringManager::cleanup()
 
     setDefaultHerringStyle();
 
-    // Then load the default style from the config file
-    // ------------------------------------------------
+    // Then load the default style from the user_config file
+    // -----------------------------------------------------
     // This way if a herring is not defined in the herringstyle-file, the
     // default (i.e. old herring) is used.
     try
@@ -238,13 +238,13 @@ void HerringManager::cleanup()
         // FIXME: This should go in a system-wide configuration file,
         //        and only one of this and the hard-coded settings in
         //        setDefaultHerringStyle are necessary!!!
-        loadHerringStyle(config->m_herring_style);
+        loadHerringStyle(user_config->m_herring_style);
     }
     catch(std::runtime_error)
     {
         fprintf(stderr,_("The herring style '%s' in your configuration file does not exist.\nIt is ignored.\n"),
-                config->m_herring_style.c_str());
-        config->m_herring_style="";
+                user_config->m_herring_style.c_str());
+        user_config->m_herring_style="";
     }
 
     try

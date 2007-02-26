@@ -49,7 +49,7 @@ namespace lisp
         {
             char msg[MAX_ERROR_MESSAGE_LENGTH];
             snprintf(msg, sizeof(msg), 
-                     _("Parser problem: Couldn't open file '%s'."),
+                     _("Couldn't open file '%s'."),
                      filename.c_str());
             throw std::runtime_error(msg);
         }
@@ -87,7 +87,7 @@ namespace lisp
             {
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
                 snprintf(msg, sizeof(msg), 
-                         _("Parse Error at line %d: Unexpected EOF."),
+                         "Parse Error at line %d: Unexpected EOF.",
                          m_lexer->getLineNumber());
                 throw std::runtime_error(msg);
             }
@@ -95,7 +95,7 @@ namespace lisp
             {
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
                 snprintf(msg, sizeof(msg), 
-                         _("Parse Error at line %d: Unexpected ')'."),
+                         "Parse Error at line %d: Unexpected ')'.",
                          m_lexer->getLineNumber());
                 throw std::runtime_error(msg);
             }
@@ -111,7 +111,7 @@ namespace lisp
             {
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
                 snprintf(msg, sizeof(msg), 
-                         _("Parse Error at line %d: Expected ')'."),
+                         "Parse Error at line %d: Expected ')'.",
                          m_lexer->getLineNumber());
                 throw std::runtime_error(msg);
             }

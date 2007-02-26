@@ -24,7 +24,6 @@
 #include "string_utils.hpp"
 #include "world.hpp"
 #include "ssg_help.hpp"
-#include "translation.hpp"
 
 #ifdef BULLET
 // -----------------------------------------------------------------------------
@@ -41,7 +40,7 @@ MovingPhysics::MovingPhysics(const std::string data)
     std::vector<std::string> parameters = StringUtils::split(data, ' ');
     if(parameters.size()<2)
     {
-        fprintf(stderr, _("Invalid physics specification: '%s'\n"),data.c_str());
+        fprintf(stderr, "Invalid physics specification: '%s'\n",data.c_str());
     }
     parameters.erase(parameters.begin());
     std::string &shape=parameters[0];
@@ -58,7 +57,7 @@ MovingPhysics::MovingPhysics(const std::string data)
         std::vector<std::string> p=StringUtils::split(parameters[0],'=');
         if(p.size()!=2) 
         {
-            fprintf(stderr, _("Invalid physics parameter string: '%s'\n"),data.c_str());
+            fprintf(stderr, "Invalid physics parameter string: '%s'\n",data.c_str());
             break;
         } 
         else
@@ -69,7 +68,7 @@ MovingPhysics::MovingPhysics(const std::string data)
             }
             else
             {
-                fprintf(stderr, _("Invalid physics parameter string: '%s'\n"),
+                fprintf(stderr, "Invalid physics parameter string: '%s'\n",
                         data.c_str());
                 break;
             }
@@ -106,7 +105,7 @@ void MovingPhysics::init()
     // -------------------------------------------------------------
     if(getNumParents()>1) 
     {
-        fprintf(stderr, _("WARNING: physical object with more than one parent!!\n"));
+        fprintf(stderr, "WARNING: physical object with more than one parent!!\n");
         return;
     }
     ssgBranch *parent = getParent(0);
@@ -129,7 +128,7 @@ void MovingPhysics::init()
             //        scene), we have to follow all possible ways up to the
             //        root, and for each way add one instance to the root.
             //        For now this is unsupported, and we abort here.
-            fprintf(stderr, _("MovingPhysics: init: %d parents found, ignored.\n"),
+            fprintf(stderr, "MovingPhysics: init: %d parents found, ignored.\n",
                     p->getNumParents());
             return;
         }   // if numparents!=1
@@ -174,7 +173,7 @@ void MovingPhysics::init()
                                                        0.5*(z_max-z_min) ) );
                     setName("box");
                     break;
-    case BODY_NONE: fprintf(stderr, _("WARNING: Uninitialised moving shape\n"));
+    case BODY_NONE: fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         break;
     }
 

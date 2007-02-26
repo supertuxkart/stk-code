@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-21 10:12+1100\n"
+"POT-Creation-Date: 2007-02-27 10:30+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,177 +16,23 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: callback.cpp:77 moving_texture.cpp:77
-#, c-format
-msgid "Unrecognised @autodcs string: '%s'\n"
-msgstr ""
-
-#: collectable_manager.cpp:97
-#, c-format
-msgid "No 'tuxkart-collectable' node found while parsing '%s'."
-msgstr ""
-
-#: config.cpp:125 gui/config_controls.cpp:36
-#, c-format
-msgid "Player %d"
-msgstr ""
-
-#: config.cpp:205
-#, c-format
-msgid "Couldn't create '%s', config files will not be saved.\n"
-msgstr ""
-
-#: config.cpp:211
-#, c-format
-msgid "Config directory '%s' successfully created.\n"
-msgstr ""
-
-#: config.cpp:235
-#, c-format
-msgid "Config file '%s' does not exist, it will be created.\n"
-msgstr ""
-
-#: config.cpp:247
-#, c-format
-msgid "No tuxkart-config node"
-msgstr ""
-
-#: config.cpp:256
-#, c-format
-msgid ""
-"\n"
-"Config file version '%d' is too old.\n"
-"The following changes have been applied in the current SuperTuxKart "
-"version:\n"
-msgstr ""
-
-#: config.cpp:262
-#, c-format
-msgid ""
-"- Single window menu, old status display,new keyboard style settings were "
-"removed\n"
-msgstr ""
-
-#: config.cpp:264
-#, c-format
-msgid ""
-"- Key bindings were changed, please check the settings. All existing values "
-"were discarded.\n"
-msgstr ""
-
-#: config.cpp:267
-#, c-format
-msgid ""
-"Config file version '%d' is too old. Discarding your configuration. Sorry. :"
-"(\n"
-msgstr ""
-
-#: config.cpp:275
-#, c-format
-msgid "This warning can be ignored.\n"
-msgstr ""
-
-#: config.cpp:308
-#, c-format
-msgid "No '%s' node"
-msgstr ""
-
-#: config.cpp:333
-#, c-format
-msgid "Error while parsing config '%s':\n"
-msgstr ""
-
-#: config.cpp:483
-#, c-format
-msgid "Couldn't write config: "
-msgstr ""
-
-#: config.cpp:542
-#, c-format
-msgid "%s"
-msgstr ""
-
-#: config.cpp:545
-#, c-format
-msgid "joy %d axis %d  %c"
-msgstr ""
-
-#: config.cpp:549
-#, c-format
-msgid "joy %d btn %d"
-msgstr ""
-
-#: config.cpp:552
-#, c-format
-msgid "joy %d hat %d"
-msgstr ""
-
-#: config.cpp:555
-#, c-format
-msgid "mouse btn %d"
-msgstr ""
-
-#: config.cpp:558
-#, c-format
-msgid "mouse axis %d %c"
-msgstr ""
-
-#: config.cpp:562
-#, c-format
-msgid "Invalid"
-msgstr ""
-
-#: cup_data.cpp:41
-msgid "No supertuxkart-cup node"
-msgstr ""
-
-#: cup_data.cpp:51
-#, c-format
-msgid "Error while reading cup file '%s'\n"
-msgstr ""
-
-#: herring_manager.cpp:162
-#, c-format
-msgid "Herring model '%s' is missing!\n"
-msgstr ""
-
-#: herring_manager.cpp:169
-#, c-format
-msgid "The following models are available:\n"
-msgstr ""
-
-#: herring_manager.cpp:176
-#, c-format
-msgid "   %s internally only.\n"
-msgstr ""
-
-#: herring_manager.cpp:180
-#, c-format
-msgid "   %s in models/herrings/%s.ac.\n"
-msgstr ""
-
-#: herring_manager.cpp:241
+#: herring_manager.cpp:245
 #, c-format
 msgid ""
 "The herring style '%s' in your configuration file does not exist.\n"
 "It is ignored.\n"
 msgstr ""
 
-#: herring_manager.cpp:252
+#: herring_manager.cpp:256
 #, c-format
 msgid ""
 "The herring style '%s' specified on the command line does not exist.\n"
 "It is ignored.\n"
 msgstr ""
 
-#: herring_manager.cpp:338
+#: herring_manager.cpp:342
 #, c-format
 msgid "Couldn't load map '%s': no herring node."
-msgstr ""
-
-#: kart_properties.cpp:69
-#, c-format
-msgid "Error while parsing KartProperties '%s':\n"
 msgstr ""
 
 #: kart_properties_manager.cpp:92
@@ -202,11 +48,6 @@ msgstr ""
 #: loader.cpp:178
 #, c-format
 msgid "Couldn't find file '%s'."
-msgstr ""
-
-#: loader.cpp:340
-#, c-format
-msgid "Warning: Ignoring userdata '%s'\n"
 msgstr ""
 
 #: main.cpp:63
@@ -285,6 +126,11 @@ msgstr ""
 msgid "You choose to be in %dx%d.\n"
 msgstr ""
 
+#: main.cpp:211
+#, c-format
+msgid "Error: --screensize argument must be given as WIDTHxHEIGHT\n"
+msgstr ""
+
 #: main.cpp:240
 #, c-format
 msgid ""
@@ -299,103 +145,9 @@ msgid ""
 "Aborting SuperTuxKart\n"
 msgstr ""
 
-#: material_manager.cpp:76
+#: moving_texture.cpp:77
 #, c-format
-msgid "FATAL: No Such File as '%s'\n"
-msgstr ""
-
-#: material_manager.cpp:103
-#, c-format
-msgid ""
-"ERROR: Material file entries must start with '\"'\n"
-"ERROR: Offending line is '%s'\n"
-msgstr ""
-
-#: material_manager.cpp:115
-#, c-format
-msgid "ERROR: Unterminated string constant '%s' in materials file.\n"
-msgstr ""
-
-#: moveable.cpp:256
-#, c-format
-msgid ""
-"WARNING: Speed too high for collision detection!\n"
-"WARNING: Nsteps=%d, Speed=%f!\n"
-"moveable %p, vel=%f,%f,%f\n"
-msgstr ""
-
-#: moving_physics.cpp:44
-#, c-format
-msgid "Invalid physics specification: '%s'\n"
-msgstr ""
-
-#: moving_physics.cpp:61 moving_physics.cpp:72
-#, c-format
-msgid "Invalid physics parameter string: '%s'\n"
-msgstr ""
-
-#: moving_physics.cpp:109
-#, c-format
-msgid "WARNING: physical object with more than one parent!!\n"
-msgstr ""
-
-#: moving_physics.cpp:132
-#, c-format
-msgid "MovingPhysics: init: %d parents found, ignored.\n"
-msgstr ""
-
-#: moving_physics.cpp:177
-#, c-format
-msgid "WARNING: Uninitialised moving shape\n"
-msgstr ""
-
-#: music_mikmod.cpp:72 music_mikmod.cpp:81 music_mikmod.cpp:90
-#: music_mikmod.cpp:97
-#, c-format
-msgid "Loading Music: %s failed\n"
-msgstr ""
-
-#: physics.cpp:125
-msgid "Unkown ssg type in convertTrack"
-msgstr ""
-
-#: physics_parameters.cpp:35
-#, c-format
-msgid "Missing default value for '%s' in '%s'.\n"
-msgstr ""
-
-#: race_manager.cpp:232
-#, c-format
-msgid "Warning: player '%d' does not exists.\n"
-msgstr ""
-
-#: race_manager.cpp:271
-msgid "Unknown game mode"
-msgstr ""
-
-#: sfx_openal.cpp:62
-#, c-format
-msgid "Loading '%s' failed\n"
-msgstr ""
-
-#: sfx_openal.cpp:78
-#, c-format
-msgid "Error 1 loading SFX: %s failed\n"
-msgstr ""
-
-#: sfx_openal.cpp:85
-#, c-format
-msgid "Error 2 loading SFX: %s failed\n"
-msgstr ""
-
-#: sfx_openal.cpp:92
-#, c-format
-msgid "Error 3 loading SFX: %s failed\n"
-msgstr ""
-
-#: sfx_openal.cpp:100
-#, c-format
-msgid "Error 4 loading SFX: %s failed\n"
+msgid "Unrecognised @autodcs string: '%s'\n"
 msgstr ""
 
 #: sound_manager.cpp:50
@@ -408,84 +160,114 @@ msgstr ""
 msgid "WARNING: Could not initialize the ALUT based sound.\n"
 msgstr ""
 
-#: ssg_help.cpp:210
+#: user_config.cpp:127 gui/config_controls.cpp:36
 #, c-format
-msgid "StaticSSG::MinMax: unkown type\n"
+msgid "Player %d"
 msgstr ""
 
-#: static_ssg.cpp:146
+#: user_config.cpp:209
 #, c-format
-msgid "StaticSSG::Distribute: unkown type\n"
+msgid "Couldn't create '%s', config files will not be saved.\n"
 msgstr ""
 
-#: track.cpp:477
+#: user_config.cpp:215
 #, c-format
-msgid "Couldn't load map '%s': no tuxkart-track node."
+msgid "Config directory '%s' successfully created.\n"
 msgstr ""
 
-#: track.cpp:605
+#: user_config.cpp:240
 #, c-format
-msgid "Can't open '%s' for reading.\n"
+msgid "Config file '%s' does not exist, it will be created.\n"
 msgstr ""
 
-#: track.cpp:628
+#: user_config.cpp:252
 #, c-format
-msgid "Syntax error in '%s'\n"
+msgid "No tuxkart-config node"
 msgstr ""
 
-#: track.cpp:642
+#: user_config.cpp:261
 #, c-format
-msgid "File %s point %d is duplicated!.\n"
+msgid ""
+"\n"
+"Config file version '%d' is too old.\n"
+"The following changes have been applied in the current SuperTuxKart "
+"version:\n"
 msgstr ""
 
-#: track.cpp:647
+#: user_config.cpp:267
 #, c-format
-msgid "File %s point %d is too close(<1.5) to previous point.\n"
+msgid ""
+"- Single window menu, old status display,new keyboard style settings were "
+"removed\n"
 msgstr ""
 
-#: track.cpp:653
+#: user_config.cpp:269
 #, c-format
-msgid "In file %s point %d is too far(>15.0) from next point at %d.\n"
+msgid ""
+"- Key bindings were changed, please check the settings. All existing values "
+"were discarded.\n"
 msgstr ""
 
-#: track_manager.cpp:50
+#: user_config.cpp:272
 #, c-format
-msgid "TrackManager: Couldn't find track: '%s'"
+msgid ""
+"Config file version '%d' is too old. Discarding your configuration. Sorry. :"
+"(\n"
 msgstr ""
 
-#: world.cpp:82
+#: user_config.cpp:280
 #, c-format
-msgid "Track '%s' not found.\n"
+msgid "This warning can be ignored.\n"
 msgstr ""
 
-#: world.cpp:533
+#: user_config.cpp:313
 #, c-format
-msgid "The cup '%s' contains an invalid herring style '%s'.\n"
+msgid "No '%s' node"
 msgstr ""
 
-#: world.cpp:536 world.cpp:550
+#: user_config.cpp:338
 #, c-format
-msgid "Please fix the file '%s'.\n"
+msgid "Error while parsing config '%s':\n"
 msgstr ""
 
-#: world.cpp:548
+#: user_config.cpp:490
 #, c-format
-msgid "The track '%s' contains an invalid herring style '%s'.\n"
+msgid "Couldn't write config: "
 msgstr ""
 
-#: world.cpp:559
+#: user_config.cpp:549
 #, c-format
-msgid "Can't open track location file '%s'.\n"
+msgid "%s"
 msgstr ""
 
-#: world.cpp:656 world.cpp:722
+#: user_config.cpp:552
 #, c-format
-msgid "Syntax error in '%s': %s"
+msgid "joy %d axis %d  %c"
 msgstr ""
 
-#: world_screen.cpp:93
+#: user_config.cpp:556
 #, c-format
-msgid "Number of frames: %d time %f, Average FPS: %f\n"
+msgid "joy %d btn %d"
+msgstr ""
+
+#: user_config.cpp:559
+#, c-format
+msgid "joy %d hat %d"
+msgstr ""
+
+#: user_config.cpp:562
+#, c-format
+msgid "mouse btn %d"
+msgstr ""
+
+#: user_config.cpp:565
+#, c-format
+msgid "mouse axis %d %c"
+msgstr ""
+
+#: user_config.cpp:569
+#, c-format
+msgid "Invalid"
 msgstr ""
 
 #: gui/char_sel.cpp:52
@@ -793,49 +575,49 @@ msgstr ""
 msgid "Press key"
 msgstr ""
 
-#: gui/race_gui.cpp:334
+#: gui/race_gui.cpp:335
 #, c-format
 msgid "YOU FINISHED %s"
 msgstr ""
 
-#: gui/race_gui.cpp:339
+#: gui/race_gui.cpp:340
 msgid "CONGRATULATIONS"
 msgstr ""
 
-#: gui/race_gui.cpp:340
+#: gui/race_gui.cpp:341
 msgid "YOU WON THE RACE!"
 msgstr ""
 
-#: gui/race_gui.cpp:488 gui/race_gui.cpp:502
+#: gui/race_gui.cpp:489 gui/race_gui.cpp:503
 msgid "WRONG WAY!"
 msgstr ""
 
-#: gui/race_gui.cpp:769
+#: gui/race_gui.cpp:770
 msgid "REV"
 msgstr ""
 
-#: gui/race_gui.cpp:816
+#: gui/race_gui.cpp:817
 #, c-format
 msgid "Finished"
 msgstr ""
 
-#: gui/race_gui.cpp:821
+#: gui/race_gui.cpp:822
 msgid "Lap"
 msgstr ""
 
-#: gui/race_gui.cpp:855
+#: gui/race_gui.cpp:856
 msgid "Ready!"
 msgstr ""
 
-#: gui/race_gui.cpp:858
+#: gui/race_gui.cpp:859
 msgid "Set!"
 msgstr ""
 
-#: gui/race_gui.cpp:861
+#: gui/race_gui.cpp:862
 msgid "Go!"
 msgstr ""
 
-#: gui/race_gui.cpp:878
+#: gui/race_gui.cpp:879
 msgid "Penalty time!!"
 msgstr ""
 
@@ -871,56 +653,12 @@ msgstr ""
 msgid "Choose a Track"
 msgstr ""
 
-#: lisp/lexer.cpp:150
-#, c-format
-msgid "Parse error in line %d: EOF while parsing string."
-msgstr ""
-
-#: lisp/lexer.cpp:174
-#, c-format
-msgid "Parse Error in line %d: EOF while parsing constant."
-msgstr ""
-
-#: lisp/lexer.cpp:190
-#, c-format
-msgid "Parse Error in line %d: Unknown constant '%s'."
-msgstr ""
-
 #: lisp/parser.cpp:52
 #, c-format
-msgid "Parser problem: Couldn't open file '%s'."
-msgstr ""
-
-#: lisp/parser.cpp:90
-#, c-format
-msgid "Parse Error at line %d: Unexpected EOF."
-msgstr ""
-
-#: lisp/parser.cpp:98
-#, c-format
-msgid "Parse Error at line %d: Unexpected ')'."
-msgstr ""
-
-#: lisp/parser.cpp:114
-#, c-format
-msgid "Parse Error at line %d: Expected ')'."
+msgid "Couldn't open file '%s'."
 msgstr ""
 
 #: lisp/writer.cpp:40
 #, c-format
 msgid "LispWriter Error: Couldn't open file '%s'."
-msgstr ""
-
-#: lisp/writer.cpp:61
-msgid "Warning: Not all sections closed in lispwriter!\n"
-msgstr ""
-
-#: lisp/writer.cpp:96
-#, c-format
-msgid "Trying to close list '%s, which is not open.\n"
-msgstr ""
-
-#: lisp/writer.cpp:103
-#, c-format
-msgid "Warning: trying to close list '%s' while list '%s' is open.\n"
 msgstr ""

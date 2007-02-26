@@ -20,7 +20,6 @@
 #include "physics.hpp"
 #include "ssg_help.hpp"
 #include "world.hpp"
-#include "translation.hpp"
 
 #ifdef BULLET
 #include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
@@ -122,7 +121,7 @@ void Physics::convertTrack(ssgEntity *track, sgMat4 m)
     }
     else
     {
-        assert(!_("Unkown ssg type in convertTrack"));
+        assert(!"Unkown ssg type in convertTrack");
     }
 }   // convertTrack
 

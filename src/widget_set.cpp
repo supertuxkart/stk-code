@@ -22,7 +22,7 @@
 #include "constants.hpp"
 #include "widget_set.hpp"
 #include "loader.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "sound_manager.hpp"
 
 WidgetSet *widgetSet;
@@ -30,8 +30,8 @@ WidgetSet *widgetSet;
 WidgetSet::WidgetSet()
         : m_active(0), m_pause_id(0), m_paused(0)
 {
-    const int width   = config->m_width;
-    const int height   = config->m_height;
+    const int width   = user_config->m_width;
+    const int height   = user_config->m_height;
     const int S   = (height < width) ? height : width ;
     m_radius  = S/60;
     m_fnt     = new fntTexFont(loader->getPath("fonts/AvantGarde-Demi.txf").c_str(),
@@ -415,19 +415,19 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
 {
     float l,r,t,b, fontScaling;
     // Only scale for lower resolution
-    fontScaling = config->m_width<800 ? ((float)config->m_width/800.0f) : 1.0f;
-    fontScaling = (float)config->m_width/800.0f;
+    fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) : 1.0f;
+    fontScaling = (float)user_config->m_width/800.0f;
     sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
     m_fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99)*scale_x);
     const int H = (int)((t-b+0.99)*scale_y);
     if(x == SCREEN_CENTERED_TEXT)
     {
-        x = (config->m_width - W) / 2;
+        x = (user_config->m_width - W) / 2;
     }
     if(y == SCREEN_CENTERED_TEXT)
     {
-        y = (config->m_height - H) / 2;
+        y = (user_config->m_height - H) / 2;
     }
 
     m_text_out->begin();
@@ -454,19 +454,19 @@ void WidgetSet::drawTextRace (const char *text, int sz, int x, int y,
 {
     float l,r,t,b, fontScaling;
     // Only scale for lower resolution
-    fontScaling = config->m_width<800 ? ((float)config->m_width/800.0f) : 1.0f;
-    fontScaling = (float)config->m_width/800.0f;
+    fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) : 1.0f;
+    fontScaling = (float)user_config->m_width/800.0f;
     sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
     m_fnt_race->getBBox(text, sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99)*scale_x);
     const int H = (int)((t-b+0.99)*scale_y);
     if(x == SCREEN_CENTERED_TEXT)
     {
-        x = (config->m_width - W) / 2;
+        x = (user_config->m_width - W) / 2;
     }
     if(y == SCREEN_CENTERED_TEXT)
     {
-        y = (config->m_height - H) / 2;
+        y = (user_config->m_height - H) / 2;
     }
 
     m_text_out_race->begin();
@@ -644,8 +644,8 @@ void WidgetSet::paused_up(int id)
 
     /* The pause widget fills the screen. */
 
-    m_widgets[id].w = config->m_width;
-    m_widgets[id].h = config->m_height;
+    m_widgets[id].w = user_config->m_width;
+    m_widgets[id].h = user_config->m_height;
 }
 
 //-----------------------------------------------------------------------------
@@ -662,9 +662,9 @@ void WidgetSet::button_up(int id)
 
     /* Padded text elements look a little nicer. */
 
-    if (m_widgets[id].w < config->m_width)
+    if (m_widgets[id].w < user_config->m_width)
         m_widgets[id].w += m_radius;
-    if (m_widgets[id].h < config->m_height)
+    if (m_widgets[id].h < user_config->m_height)
         m_widgets[id].h += m_radius;
 }
 
@@ -855,8 +855,8 @@ void WidgetSet::layout(int id, int xd, int yd)
 {
     int x, y;
 
-    const int W = config->m_width;
-    const int H = config->m_height;
+    const int W = user_config->m_width;
+    const int H = user_config->m_height;
     int w = W;
     int h = W;
 
@@ -1593,7 +1593,7 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
     const GLdouble S = sin(R);
     const GLdouble C = cos(R) / S;
 
-    const GLdouble A = (GLdouble)config->m_width/(GLdouble)config->m_height;
+    const GLdouble A = (GLdouble)user_config->m_width/(GLdouble)user_config->m_height;
 
     glMatrixMode(GL_PROJECTION);
     {
@@ -1625,8 +1625,8 @@ void WidgetSet::config_push_persp(float fov, float n, float f)
 //-----------------------------------------------------------------------------
 void WidgetSet::config_push_ortho()
 {
-    const GLdouble W = (GLdouble) config->m_width;
-    const GLdouble H = (GLdouble) config->m_height;
+    const GLdouble W = (GLdouble) user_config->m_width;
+    const GLdouble H = (GLdouble) user_config->m_height;
 
     glMatrixMode(GL_PROJECTION);
     {

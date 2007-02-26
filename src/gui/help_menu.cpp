@@ -21,7 +21,7 @@
 #include "widget_set.hpp"
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "player.hpp"
 #include "collectable_manager.hpp"
 #include "material.hpp"
@@ -114,7 +114,7 @@ void HelpMenu::update(float dt)
         ssgCullAndDraw ( m_silver_coin ) ;
         ssgCullAndDraw ( m_gold_coin ) ;
         ssgCullAndDraw ( m_banana ) ;
-        glViewport ( 0, 0, config->m_width, config->m_height ) ;
+        glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 
         glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
@@ -198,7 +198,7 @@ get stuck or fall too far, use the rescue button to get back on track."),
         // *sigh* widget set stores only pointer to strings, so
         // to make sure that all key-strings are permanent, they
         // are assigned to an array m_all_keys within this object.
-        m_all_keys[i]=config->getInputAsString(0, (KartActions)i);
+        m_all_keys[i]=user_config->getInputAsString(0, (KartActions)i);
         widgetSet->label(LABEL_ID,  sKartAction2String[i], GUI_SML, GUI_LFT);
         widgetSet->label(CHANGE_ID, m_all_keys[i].c_str(), GUI_SML, GUI_RGT);
     }

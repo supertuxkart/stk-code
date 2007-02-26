@@ -21,7 +21,7 @@
 
 #include "player_controls.hpp"
 #include "widget_set.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
@@ -36,7 +36,7 @@ PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
         m_grab_input(false)
 {
     m_menu_id = widgetSet -> vstack(0);
-    sprintf(m_heading, _("Choose your controls, %s"), config->m_player[m_player_index].getName());
+    sprintf(m_heading, _("Choose your controls, %s"), user_config->m_player[m_player_index].getName());
     widgetSet -> label(m_menu_id, m_heading, GUI_LRG, GUI_ALL, 0, 0);
 
     const int HA        = widgetSet->harray(m_menu_id);
@@ -88,7 +88,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
 
         // Do not accept pressing ESC as input.
         if (type != IT_KEYBOARD || id0 != SDLK_ESCAPE)
-            config->m_player[m_player_index].setInput(m_edit_action, type, id0, id1, id2);
+            user_config->m_player[m_player_index].setInput(m_edit_action, type, id0, id1, id2);
 
         changeKeyLabel(m_grab_id, m_edit_action);
     }
@@ -119,5 +119,5 @@ void PlayerControls::changeKeyLabel(int m_grab_id, KartActions control)
 //-----------------------------------------------------------------------------
 void PlayerControls::setKeyInfoString(KartActions control)
 {
-    m_key_names[control] = config->getInputAsString(m_player_index, control);
+    m_key_names[control] = user_config->getInputAsString(m_player_index, control);
 }   // setKeyInfoString

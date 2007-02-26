@@ -24,7 +24,7 @@
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "camera.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 
 void
 Camera::setScreenPosition ( int numPlayers, int pos )
@@ -153,8 +153,8 @@ void Camera::update ()
 //-----------------------------------------------------------------------------
 void Camera::apply ()
 {
-    int width  = config->m_width ;
-    int height = config->m_height;
+    int width  = user_config->m_width ;
+    int height = user_config->m_height;
 
     assert ( world->m_scene != NULL ) ;
 

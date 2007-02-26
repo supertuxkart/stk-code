@@ -58,7 +58,7 @@ namespace lisp
     {
         if(m_lists.size() > 0)
         {
-            std::cerr << _("Warning: Not all sections closed in lispwriter!\n");
+            std::cerr << "Warning: Not all sections closed in lispwriter!\n";
         }
 
         if(m_owner)
@@ -93,14 +93,14 @@ namespace lisp
     {
         if(m_lists.size() == 0)
         {
-            fprintf(stderr, _("Trying to close list '%s, which is not open.\n"),
+            fprintf(stderr, "Trying to close list '%s, which is not open.\n",
                     listname.c_str());
             return;
         }
         if(m_lists.back() != listname)
         {
             fprintf(stderr, 
-                    _("Warning: trying to close list '%s' while list '%s' is open.\n"),
+                    "Warning: trying to close list '%s' while list '%s' is open.\n",
                     listname.c_str(),  m_lists.back().c_str());
             return;
         }

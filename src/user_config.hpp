@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_CONFIG_H
-#define TUXKART_CONFIG_H
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 #define PLAYERS 4
 
@@ -43,7 +43,7 @@
 #define CONFIGDIR ".supertuxkart"
 
 /*class for managing general tuxkart configuration data*/
-class Config
+class UserConfig
 {
 private:
     std::string filename;
@@ -80,9 +80,9 @@ public:
     int    m_karts;
     Player m_player[PLAYERS];
 
-    Config();
-    Config(const std::string& filename);
-    ~Config();
+    UserConfig();
+    UserConfig(const std::string& filename);
+    ~UserConfig();
     void setDefaults();
     void loadConfig();
     void loadConfig(const std::string& filename);
@@ -92,7 +92,7 @@ public:
 };
 
 
-extern Config *config;
+extern UserConfig *user_config;
 
 #endif
 

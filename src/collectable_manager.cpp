@@ -94,7 +94,7 @@ void CollectableManager::Load(int collectType, const char* filename)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), 
-                 _("No 'tuxkart-collectable' node found while parsing '%s'."),
+                 "No 'tuxkart-collectable' node found while parsing '%s'.",
                  filename);
         throw std::runtime_error(msg);
     }

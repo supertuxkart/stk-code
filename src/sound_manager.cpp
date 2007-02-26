@@ -20,7 +20,7 @@
 #include <assert.h>
 
 #include "sound_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 
 #define USE_PLIB_SOUND !(HAVE_OPENAL && HAVE_MIKMOD)
 #if USE_PLIB_SOUND
@@ -126,7 +126,7 @@ SoundManager::~SoundManager()
 //-----------------------------------------------------------------------------
 void SoundManager::playSfx(unsigned int id)
 {
-    if(config->m_sfx && m_initialized)
+    if(user_config->m_sfx && m_initialized)
     {
         SFXsType::iterator it= m_sfxs.find(id);
         if (it == m_sfxs.end())
@@ -142,7 +142,7 @@ void SoundManager::playSfx(unsigned int id)
 //-----------------------------------------------------------------------------
 void SoundManager::playMusic(const char* filename)
 {
-    if(config->m_music && m_initialized)
+    if(user_config->m_music && m_initialized)
     {
         if (m_current_music != NULL)
         {

@@ -22,9 +22,8 @@
 #include "player_kart.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "history.hpp"
-#include "translation.hpp"
 
 Moveable::Moveable (bool bHasHistory)
 {
@@ -81,7 +80,7 @@ void Moveable::update (float dt)
 {
     if(m_history_velocity)
     {
-        if(config->m_replay_history)
+        if(user_config->m_replay_history)
         {
             sgCoord tmp;
             sgCopyCoord(&tmp, &(m_history_velocity[history->GetCurrentIndex()]));
@@ -124,7 +123,7 @@ void Moveable::update (float dt)
 
     if(m_history_position)
     {
-        if(config->m_replay_history)
+        if(user_config->m_replay_history)
         {
             sgCoord tmp;
             sgCopyCoord(&tmp, &(m_history_position[history->GetCurrentIndex()]));
@@ -253,9 +252,9 @@ float Moveable::collectIsectData ( sgVec3 start, sgVec3 end )
 
     if ( nsteps > 100 )
     {
-        fprintf(stderr, _("WARNING: Speed too high for collision detection!\n"
-                          "WARNING: Nsteps=%d, Speed=%f!\n"
-                          "moveable %p, vel=%f,%f,%f\n"),
+        fprintf(stderr, "WARNING: Speed too high for collision detection!\n"
+                        "WARNING: Nsteps=%d, Speed=%f!\n"
+                        "moveable %p, vel=%f,%f,%f\n",
                 nsteps, SPEED, this, vel[0], vel[1], vel[2]);
         nsteps = 100 ;
     }

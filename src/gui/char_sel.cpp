@@ -27,7 +27,7 @@
 #include "widget_set.hpp"
 #include "race_manager.hpp"
 #include "start_screen.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"
 #include "material_manager.hpp"
@@ -145,7 +145,7 @@ void CharSel::update(float dt)
         m_kart->setTransform (&trans) ;
         //glShadeModel(GL_SMOOTH);
         ssgCullAndDraw ( m_kart ) ;
-        glViewport ( 0, 0, config->m_width, config->m_height ) ;
+        glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 
         glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
@@ -160,7 +160,7 @@ void CharSel::select()
     if (KP != NULL)
     {
         race_manager->setPlayerKart(m_player_index, KP->getIdent());
-        config->m_player[m_player_index].setLastKartId(TOKEN);
+        user_config->m_player[m_player_index].setLastKartId(TOKEN);
     }
 
     if (race_manager->getNumPlayers() > 1)

@@ -33,34 +33,34 @@
 #include <SDL/SDL.h>
 #include <plib/ul.h>
 
-#include "config.hpp"
+#include "user_config.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "translation.hpp"
 
-Config *config;
+UserConfig *user_config;
 
-Config::Config()
+UserConfig::UserConfig()
 {
     setDefaults();
     loadConfig();
-}   // Config
+}   // UserConfig
 
-//-----------------------------------------------------------------------------
-Config::Config(const std::string& filename)
+// -----------------------------------------------------------------------------
+UserConfig::UserConfig(const std::string& filename)
 {
     setDefaults();
     loadConfig(filename);
-}   // Config
+}   // UserConfig
 
 
-//-----------------------------------------------------------------------------
-Config::~Config()
+// -----------------------------------------------------------------------------
+UserConfig::~UserConfig()
 {}
 
-//-----------------------------------------------------------------------------
-std::string Config::getConfigDir()
+// -----------------------------------------------------------------------------
+std::string UserConfig::getConfigDir()
 {
     std::string DIRNAME;
 #ifdef WIN32
@@ -82,10 +82,11 @@ std::string Config::getConfigDir()
     return DIRNAME;
 }  // getConfigDir
 
+// -----------------------------------------------------------------------------
 /**
  * Set the config filename for each platform
  */
-void Config::setFilename()
+void UserConfig::setFilename()
 {
     filename = getConfigDir();
     filename += "/";
@@ -96,10 +97,11 @@ void Config::setFilename()
 #endif
 }   // setFilename
 
+// -----------------------------------------------------------------------------
 /**
  * Load default values for options
  */
-void Config::setDefaults()
+void UserConfig::setDefaults()
 {
     setFilename();
     m_fullscreen       = false;
@@ -169,14 +171,16 @@ void Config::setDefaults()
 }   // setDefaults
 
 
+// -----------------------------------------------------------------------------
 /**
  * load default configuration file for this platform
  */
-void Config::loadConfig()
+void UserConfig::loadConfig()
 {
     loadConfig(filename);
 }   // loadConfig
 
+// -----------------------------------------------------------------------------
 /**
  * Checks for existance of the tuxkart configuration directory. If the
  * directory does not exist, it will be created. Return values:
@@ -184,7 +188,7 @@ void Config::loadConfig()
  * 2: does not exist, but was created
  * 0: does not exist, and could not be created.
  */
-int Config::CheckAndCreateDir()
+int UserConfig::CheckAndCreateDir()
 {
     const std::string DIRNAME = getConfigDir();
     ulDir*      u       = ulOpenDir(DIRNAME.c_str());
@@ -214,8 +218,9 @@ int Config::CheckAndCreateDir()
 
 }   // CheckAndCreateDir
 
+// -----------------------------------------------------------------------------
 /** Load configuration values from file. */
-void Config::loadConfig(const std::string& filename)
+void UserConfig::loadConfig(const std::string& filename)
 {
     std::string temp;
     const lisp::Lisp* root = 0;
@@ -337,8 +342,8 @@ void Config::loadConfig(const std::string& filename)
     delete root;
 }   // loadConfig
 
-//-----------------------------------------------------------------------------
-void Config::readInput(const lisp::Lisp* &r,
+// -----------------------------------------------------------------------------
+void UserConfig::readInput(const lisp::Lisp* &r,
                        const char *node,
                        KartActions action,
                        Player& player)
@@ -396,14 +401,16 @@ void Config::readInput(const lisp::Lisp* &r,
         player.setInput(action, it, id0, id1, id2);
 }
 
+// -----------------------------------------------------------------------------
 /** Call saveConfig with the default filename for this platform. */
-void Config::saveConfig()
+void UserConfig::saveConfig()
 {
     saveConfig(filename);
 }   // saveConfig
 
+// -----------------------------------------------------------------------------
 /** Write settings to config file. */
-void Config::saveConfig(const std::string& filename)
+void UserConfig::saveConfig(const std::string& filename)
 {
     std::string temp;
     int i;
@@ -487,7 +494,7 @@ void Config::saveConfig(const std::string& filename)
 }   // saveConfig
 
 // -----------------------------------------------------------------------------
-void Config::writeInput(lisp::Writer &writer, const char *node, KartActions action, Player& player)
+void UserConfig::writeInput(lisp::Writer &writer, const char *node, KartActions action, Player& player)
 {
     const Input *INPUT = player.getInput(action);
 
@@ -529,8 +536,8 @@ void Config::writeInput(lisp::Writer &writer, const char *node, KartActions acti
     writer.endList(node);
 }
 
-//-----------------------------------------------------------------------------
-std::string Config::getInputAsString(int player_index, KartActions control)
+// -----------------------------------------------------------------------------
+std::string UserConfig::getInputAsString(int player_index, KartActions control)
 {
     const Input *INPUT         = m_player[player_index].getInput(control);
     char msg[MAX_MESSAGE_LENGTH];
@@ -563,5 +570,7 @@ std::string Config::getInputAsString(int player_index, KartActions control)
     }
     return stm.str();
 }   // GetKeyAsString
+
+// -----------------------------------------------------------------------------
 
 /*EOF*/

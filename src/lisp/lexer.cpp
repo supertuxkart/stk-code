@@ -147,7 +147,7 @@ namespace lisp
                     {
                         char msg[MAX_ERROR_MESSAGE_LENGTH];
                         snprintf(msg, sizeof(msg),
-                                 _("Parse error in line %d: EOF while parsing string."),
+                                 "Parse error in line %d: EOF while parsing string.",
                                  STARTLINE);
                         throw std::runtime_error(msg);
                     }
@@ -171,7 +171,7 @@ namespace lisp
                 {
                     char msg[MAX_ERROR_MESSAGE_LENGTH];
                     snprintf(msg, sizeof(msg), 
-                             _("Parse Error in line %d: EOF while parsing constant."),
+                             "Parse Error in line %d: EOF while parsing constant.",
                              m_line_number);
                     throw std::runtime_error(msg);
                 }
@@ -187,7 +187,7 @@ namespace lisp
                 {
                     char msg[MAX_ERROR_MESSAGE_LENGTH];
                     snprintf(msg, sizeof(msg), 
-                             _("Parse Error in line %d: Unknown constant '%s'."),
+                             "Parse Error in line %d: Unknown constant '%s'.",
                              m_line_number, m_token_string);
                     throw std::runtime_error(msg);
                 }

@@ -66,7 +66,7 @@ void KartProperties::load(const std::string filename, const std::string node)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, _("Error while parsing KartProperties '%s':\n"), 
+        fprintf(stderr, "Error while parsing KartProperties '%s':\n", 
                 filename.c_str());
         fprintf(stderr, err.what());
         fprintf(stderr, "\n");

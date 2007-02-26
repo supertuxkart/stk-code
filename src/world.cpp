@@ -42,7 +42,7 @@
 #include "kart_properties_manager.hpp"
 #include "track_manager.hpp"
 #include "race_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
 #include "constants.hpp"
@@ -79,7 +79,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), 
-                 _("Track '%s' not found.\n"),m_race_setup.m_track.c_str());
+                 "Track '%s' not found.\n",m_race_setup.m_track.c_str());
         throw std::runtime_error(msg);
     }
 
@@ -126,7 +126,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         init_pos.xyz[2] = hot;
 
         Kart* newkart;
-        if(config->m_profile)
+        if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
@@ -139,7 +139,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             {
                 // the given position belongs to a player
                 newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
-                                          &(config->m_player[playerIndex++]),
+                                          &(user_config->m_player[playerIndex++]),
                                           init_pos);
             }
             else
@@ -147,8 +147,8 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
                 newkart = loadRobot(kart_properties_manager->getKart(*i), pos,
                     init_pos);
             }
-        }   // if !config->m_profile
-        if(config->m_replay_history)
+        }   // if !user_config->m_profile
+        if(user_config->m_replay_history)
         {
             history->LoadKartData(newkart, pos);
         }
@@ -174,7 +174,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();
     if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME.c_str());
 
-    if(config->m_profile)
+    if(user_config->m_profile)
     {
         m_ready_set_go = -1;
         m_phase        = RACE_PHASE;
@@ -304,7 +304,7 @@ void World::draw()
 //-----------------------------------------------------------------------------
 void World::update(float delta)
 {
-    if(config->m_replay_history) delta=history->GetNextDelta();
+    if(user_config->m_replay_history) delta=history->GetNextDelta();
     m_clock += delta;
 
     checkRaceStatus();
@@ -332,7 +332,7 @@ void World::update(float delta)
         if(dt>=inc)
         {
             dt-=inc;
-            if(config->m_replay_history) delta=history->GetNextDelta();
+            if(user_config->m_replay_history) delta=history->GetNextDelta();
         }
         else
         {
@@ -343,7 +343,7 @@ void World::update(float delta)
         // the same index in History:allDeltas, and the history* arrays here,
         // and makes writing easier, since we had to write delta the first
         // time, and then inc from then on.
-        if(!config->m_replay_history) history->StoreDelta(delta);
+        if(!user_config->m_replay_history) history->StoreDelta(delta);
         m_physics->update(inc);
         for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
         {
@@ -530,10 +530,10 @@ void World::loadTrack()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, _("The cup '%s' contains an invalid herring style '%s'.\n"),
+            fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
                     race_manager->getGrandPrix()->getName().c_str(),
                     race_manager->getGrandPrix()->getHerringStyle().c_str());
-            fprintf(stderr, _("Please fix the file '%s'.\n"),
+            fprintf(stderr, "Please fix the file '%s'.\n",
                     race_manager->getGrandPrix()->getFilename().c_str());
         }
     }
@@ -545,9 +545,9 @@ void World::loadTrack()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, _("The track '%s' contains an invalid herring style '%s'.\n"),
+            fprintf(stderr, "The track '%s' contains an invalid herring style '%s'.\n",
                     m_track->getName(), m_track->getHerringStyle().c_str());
-            fprintf(stderr, _("Please fix the file '%s'.\n"),
+            fprintf(stderr, "Please fix the file '%s'.\n",
                     m_track->getFilename().c_str());
         }
     }
@@ -556,7 +556,7 @@ void World::loadTrack()
     if ( fd == NULL )
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg),_("Can't open track location file '%s'.\n"), 
+        snprintf(msg, sizeof(msg),"Can't open track location file '%s'.\n",
                  path.c_str());
         throw std::runtime_error(msg);
     }
@@ -653,7 +653,7 @@ void World::loadTrack()
             {
                 fclose(fd);
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), _("Syntax error in '%s': %s"),
+                snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
                          path.c_str(), s);
                 throw std::runtime_error(msg);
             }
@@ -719,7 +719,7 @@ void World::loadTrack()
         {
             fclose(fd);
             char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), _("Syntax error in '%s': %s"),
+            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
                      path.c_str(), s);
             throw std::runtime_error(msg);
         }

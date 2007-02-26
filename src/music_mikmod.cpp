@@ -26,7 +26,6 @@
 
 #include "music_mikmod.hpp"
 #include "loader.hpp"
-#inlcude "translation.hpp"
 
 #define BUFFER_SIZE (1024 * 32)
 
@@ -69,7 +68,7 @@ bool MusicMikMod::load(const char* filename)
     FILE* modFile = fopen(m_fileName.c_str(), "rb");
     if (modFile == NULL)
     {
-        fprintf(stderr, _("Loading Music: %s failed\n"), m_fileName.c_str());
+        fprintf(stderr, "Loading Music: %s failed\n", m_fileName.c_str());
         return false;
     }
 
@@ -78,7 +77,7 @@ bool MusicMikMod::load(const char* filename)
     fclose(modFile);
     if (m_modStream == NULL)
     {
-        fprintf(stderr, _("Loading Music: %s failed\n"), m_fileName.c_str());
+        fprintf(stderr, "Loading Music: %s failed\n", m_fileName.c_str());
         return false;
     }
 
@@ -87,14 +86,14 @@ bool MusicMikMod::load(const char* filename)
     alGenBuffers(2, m_soundBuffers);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, _("Loading Music: %s failed\n"), m_fileName.c_str());
+        fprintf(stderr, "Loading Music: %s failed\n", m_fileName.c_str());
         return false;
     }
 
     alGenSources(1, &m_soundSource);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, _("Loading Music: %s failed\n"), m_fileName.c_str());
+        fprintf(stderr, "Loading Music: %s failed\n", m_fileName.c_str());
         return false;
     }
 

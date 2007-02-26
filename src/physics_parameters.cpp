@@ -18,7 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "physics_parameters.hpp"
-#include "translation.hpp"
 
 PhysicsParameters* physicsParameters=0;
 
@@ -32,7 +31,7 @@ void PhysicsParameters::load(const std::string filename)
 
 
 #define CHECK_NEG(  a,strA) if(a<-99) {                                \
-        fprintf(stderr,_("Missing default value for '%s' in '%s'.\n"), \
+        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
 

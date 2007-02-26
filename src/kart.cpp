@@ -26,7 +26,7 @@
 #include "sound_manager.hpp"
 #include "loader.hpp"
 #include "skid_mark.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "constants.hpp"
 #include "shadow.hpp"
 #include "track.hpp"
@@ -404,21 +404,11 @@ void Kart::doObjectInteractions ()
                m_attachment.getPreviousOwner()!=other_kart) 
             {
                 m_attachment.moveBombFromTo(this, other_kart);
-                //other_kart->setAttachmentType(ATTACH_BOMB,
-                //                                             m_attachment.getTimeLeft()+
-                //                                              BOMB_TRANSFER_TIME_INCREASE,
-                //                                              this);
-                //                m_attachment.clear();
             }
             if(other_kart->m_attachment.getType()==ATTACH_BOMB &&
                other_kart->m_attachment.getPreviousOwner()!=this)
             {
                 m_attachment.moveBombFromTo(other_kart, this);
-                //                setAttachmentType(ATTACH_BOMB,
-                //                                  m_attachment.getTimeLeft()+
-                //                                  BOMB_TRANSFER_TIME_INCREASE,
-                //                                  other_kart);
-                //                other_kart->m_attachment.clear();
             }
         }   // if sgLengthSquaredVec2(xy)<1.0
     }   // for i
@@ -550,11 +540,11 @@ void Kart::update (float dt)
     m_attachment.update(dt, &m_velocity);
 
     /*smoke drawing control point*/
-    if ( config->m_smoke )
+    if ( user_config->m_smoke )
     {
         if (m_smoke_system != NULL)
             m_smoke_system->update (dt);
-    }  // config->smoke
+    }  // user_config->smoke
     doZipperProcessing (dt) ;
     updatePhysics(dt);
 
@@ -845,7 +835,7 @@ void Kart::updatePhysics (float dt)
         }
         else
         {   // kart is on groud and not jumping
-            if(config->m_improved_physics)
+            if(user_config->m_improved_physics)
             {
                 // FIXME:
                 // While these physics computation is correct, it is very difficult

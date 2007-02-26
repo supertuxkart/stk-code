@@ -25,7 +25,6 @@
 #include "sdldrv.hpp"
 #include "herring.hpp"
 #include "world.hpp"
-#include "config.hpp"
 
 void PlayerKart::action(KartActions action, int value)
 {

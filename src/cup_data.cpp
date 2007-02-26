@@ -24,7 +24,6 @@
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
-#include "translation.hpp"
 
 CupData::CupData(const std::string filename_)
 {
@@ -38,7 +37,7 @@ CupData::CupData(const std::string filename_)
         lisp = lisp->getLisp("supertuxkart-cup");
         if(!lisp)
         {
-            throw std::runtime_error(_("No supertuxkart-cup node"));
+            throw std::runtime_error("No supertuxkart-cup node");
         }
 
         lisp->get      ("name",        m_name        );
@@ -48,7 +47,7 @@ CupData::CupData(const std::string filename_)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, _("Error while reading cup file '%s'\n"), filename_.c_str());
+        fprintf(stderr, "Error while reading cup file '%s'\n", filename_.c_str());
         fprintf(stderr, err.what());
         fprintf(stderr, "\n");
     }

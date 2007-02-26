@@ -19,7 +19,7 @@
 
 #include "config_display.hpp"
 #include "widget_set.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "sdldrv.hpp"
 #include "translation.hpp"
@@ -43,7 +43,7 @@ void ConfigDisplay::CreateMenu()
     m_fullscreen_menu_id = widgetSet -> start(VA, _("Fullscreen mode"),  GUI_MED,
                                             WTOK_FULLSCREEN);
 
-    if(config->m_fullscreen)
+    if(user_config->m_fullscreen)
         widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
     widgetSet -> space(VA);
     widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
@@ -82,7 +82,7 @@ void ConfigDisplay::select()
         // drv_toggleFullscreen takes care of general material, general
         // widgetSet, etc.
         CreateMenu();
-        if(config->m_fullscreen)
+        if(user_config->m_fullscreen)
             widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
         else
             widgetSet->set_label(m_fullscreen_menu_id, _("Fullscreen mode"));

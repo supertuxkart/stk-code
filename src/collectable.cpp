@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "collectable.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "sound_manager.hpp"
@@ -56,7 +56,7 @@ Material *Collectable::getIcon()
 void Collectable::use()
 {
 #ifdef USE_MAGNET
-    if(config->disableMagnet)
+    if(user_config->disableMagnet)
     {
         attachmentType at=owner->getAttachment();
         if(at==ATTACH_MAGNET)
@@ -67,7 +67,7 @@ void Collectable::use()
         {
             owner->setAttachmentType(ATTACH_MAGNET     );
         }   // if MAGNET_BZZT
-    }  // config->disableMagnet
+    }  // user_config->disableMagnet
 #endif
     number--;
     switch (type)
@@ -182,7 +182,7 @@ void Collectable::hitRedHerring(int n)
     //exclude the anvil and the parachute, but later we have to add 1 to prevent
     //having a value of 0 since that isn't a valid collectable.
     collectableType newC;
-    if(!config->m_profile)
+    if(!user_config->m_profile)
     {
         newC = (collectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
     }

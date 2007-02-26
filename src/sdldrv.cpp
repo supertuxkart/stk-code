@@ -22,7 +22,7 @@
 #include <plib/ssg.h>
 #include <plib/fnt.h>
 
-#include "config.hpp"
+#include "user_config.hpp"
 #include "sdldrv.hpp"
 #include "widget_set.hpp"
 #include "material_manager.hpp"
@@ -51,10 +51,10 @@ void drv_init()
 
     flags = SDL_OPENGL | SDL_HWSURFACE;
 
-    if(config->m_fullscreen)
+    if(user_config->m_fullscreen)
         flags |= SDL_FULLSCREEN;
 
-    mainSurface = SDL_SetVideoMode(config->m_width, config->m_height, 0,
+    mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0,
                                    flags);
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -73,11 +73,11 @@ void drv_init()
 //-----------------------------------------------------------------------------
 void drv_toggleFullscreen(int resetTextures)
 {
-    config->m_fullscreen = !config->m_fullscreen;
+    user_config->m_fullscreen = !user_config->m_fullscreen;
 
     flags = SDL_OPENGL | SDL_HWSURFACE;
 
-    if(config->m_fullscreen)
+    if(user_config->m_fullscreen)
     {
         flags |= SDL_FULLSCREEN;
 
@@ -88,7 +88,7 @@ void drv_toggleFullscreen(int resetTextures)
             SDL_ShowCursor(SDL_ENABLE);
 
     SDL_FreeSurface(mainSurface);
-    mainSurface = SDL_SetVideoMode(config->m_width, config->m_height, 0, flags);
+    mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
 
 #ifdef WIN32
     if(resetTextures)

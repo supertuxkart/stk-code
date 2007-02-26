@@ -24,7 +24,7 @@
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "translation.hpp"
 
 GrandPrixSelect::GrandPrixSelect()
@@ -57,7 +57,7 @@ GrandPrixSelect::GrandPrixSelect()
     widgetSet -> space(m_menu_id);
     widgetSet -> state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> layout(m_menu_id, 0, 0);
-    m_rect = widgetSet->rect(10, 10, config->m_width-20, 34, GUI_ALL, 10);
+    m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);
 }   // GrandPrixSelect
 
 //-----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ void GrandPrixSelect::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0.0, config->m_width, 0.0, config->m_height, -1.0, +1.0);
+    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
     CupData *cup = m_all_cups[CLICKED_TOKEN];

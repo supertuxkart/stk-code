@@ -29,7 +29,7 @@
 #include "race_manager.hpp"
 #include "start_screen.hpp"
 #include "screen_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"
 #include "translation.hpp"
@@ -121,7 +121,7 @@ void GrandPrixEnd::update(float dt)
     m_kart->setTransform (&trans) ;
     //glShadeModel(GL_SMOOTH);
     ssgCullAndDraw ( m_kart ) ;
-    glViewport ( 0, 0, config->m_width, config->m_height ) ;
+    glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 
     glDisable (GL_DEPTH_TEST);
     oldContext->makeCurrent();

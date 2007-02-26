@@ -24,12 +24,11 @@
 #include "world_screen.hpp"
 #include "sound_manager.hpp"
 #include "camera.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "gui/menu_manager.hpp"
 #include "history.hpp"
-#include "translation.hpp"
 
 WorldScreen* WorldScreen::m_current_ = 0;
 
@@ -82,18 +81,18 @@ void WorldScreen::update()
 
     menu_manager->update();
     sound_manager->update() ;
-    if(config->m_profile)
+    if(user_config->m_profile)
     {
         m_frame_count++;
-        if (world->m_clock>config->m_profile)
+        if (world->m_clock>user_config->m_profile)
         {
             // The actual timing for FPS has to be done with an external clock,
             // since world->m_clock might be modified by replaying a history file.
             m_frame_clock.update();
-            printf(_("Number of frames: %d time %f, Average FPS: %f\n"),
+            printf("Number of frames: %d time %f, Average FPS: %f\n",
                    m_frame_count, m_frame_clock.getAbsTime(),
                    (float)m_frame_count/m_frame_clock.getAbsTime());
-            if(!config->m_replay_history) history->Save();
+            if(!user_config->m_replay_history) history->Save();
             exit(-2);
         }
     }   // if m_profile
@@ -148,7 +147,7 @@ WorldScreen::draw()
         glDisable ( GL_FOG ) ;
     }
 
-    glViewport ( 0, 0, config->m_width, config->m_height ) ;
+    glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 }
 
 //-----------------------------------------------------------------------------

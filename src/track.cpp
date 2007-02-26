@@ -474,7 +474,7 @@ void Track::loadTrack(std::string filename_)
         delete ROOT;
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), 
-                 _("Couldn't load map '%s': no tuxkart-track node."),
+                 "Couldn't load map '%s': no tuxkart-track node.",
                  m_filename.c_str());
         throw std::runtime_error(msg);
     }
@@ -602,7 +602,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
     if ( fd == NULL )
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf (msg, sizeof(msg), _("Can't open '%s' for reading.\n"), path.c_str() ) ;
+        snprintf (msg, sizeof(msg), "Can't open '%s' for reading.\n", path.c_str() ) ;
         throw std::runtime_error(msg);
     }
 
@@ -625,7 +625,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
         {
             char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf (msg, sizeof(msg), _("Syntax error in '%s'\n"), path.c_str() ) ;
+            snprintf (msg, sizeof(msg), "Syntax error in '%s'\n", path.c_str() ) ;
             throw std::runtime_error(msg);
         }
 
@@ -639,18 +639,18 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         //1.5f was choosen because it's more or less the length of the tuxkart
         if(prev_distance == 0)
         {
-            fprintf(stderr, _("File %s point %d is duplicated!.\n"),
+            fprintf(stderr, "File %s point %d is duplicated!.\n",
                     path.c_str(), prev_hint+1);
         }
         else if(prev_distance < 1.5f)
         {
-            fprintf(stderr,_("File %s point %d is too close(<1.5) to previous point.\n"),
+            fprintf(stderr,"File %s point %d is too close(<1.5) to previous point.\n",
                     path.c_str(), prev_hint + 1);
         }
 #if 0
         if(prev_distance > 15.0f)
         {
-            fprintf(stderr,_("In file %s point %d is too far(>15.0) from next point at %d.\n"),
+            fprintf(stderr,"In file %s point %d is too far(>15.0) from next point at %d.\n",
                     path, prev_hint, prev_distance);
         }
 #endif

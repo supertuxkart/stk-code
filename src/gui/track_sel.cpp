@@ -23,7 +23,7 @@
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "menu_manager.hpp"
-#include "config.hpp"
+#include "user_config.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
 #include "translation.hpp"
@@ -59,7 +59,7 @@ TrackSel::TrackSel()
     }
 
     widgetSet -> layout(m_menu_id, 0, 1);
-    m_rect = widgetSet->rect(10, 10, config->m_width-20, 34, GUI_ALL, 10);
+    m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,21 +83,21 @@ void TrackSel::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0.0, config->m_width, 0.0, config->m_height, -1.0, +1.0);
+    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
     const std::string& screenshot = TRACK->getScreenshotFile();
     const std::string& topview    = TRACK->getTopviewFile();
     if(screenshot.size()==0 && topview.size()==0)
     {
         glDisable ( GL_TEXTURE_2D ) ;
-        TRACK->drawScaled2D(0.0, 50, config->m_width, config->m_height/3); // (x, y, w, h)
+        TRACK->drawScaled2D(0.0, 50, user_config->m_width, user_config->m_height/3); // (x, y, w, h)
         glEnable ( GL_TEXTURE_2D ) ;
     }
     else
     {                   // either topview or screenshot specified
-        int xLeft   = config->m_width/2;
+        int xLeft   = user_config->m_width/2;
         int yBottom = 50;
-        int w       = config->m_width/3;
-        int h       = config->m_height/3;
+        int w       = user_config->m_width/3;
+        int h       = user_config->m_height/3;
         if(topview.size()==0)
         {  // no topview, but there is a screenshot!
             glDisable ( GL_TEXTURE_2D ) ;

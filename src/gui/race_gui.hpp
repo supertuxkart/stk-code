@@ -23,7 +23,6 @@
 
 #include "base_gui.hpp"
 #include "material.hpp"
-#include "config.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
 

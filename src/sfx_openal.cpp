@@ -59,7 +59,7 @@ bool SFXImpl::load(const char* filename)
     alGenBuffers(1, &m_soundBuffer);
     if (alGetError() != AL_NO_ERROR) 
     {
-        fprintf(stderr, _("Loading '%s' failed\n"),filename); 
+        fprintf(stderr, "Loading '%s' failed\n",filename); 
         return false; 
     }
     ALenum format= 0;
@@ -75,21 +75,21 @@ bool SFXImpl::load(const char* filename)
 
     if (data == NULL)
     {
-        fprintf(stderr, _("Error 1 loading SFX: %s failed\n"), path.c_str());
+        fprintf(stderr, "Error 1 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
     alBufferData(m_soundBuffer, format, data, size, freq);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, _("Error 2 loading SFX: %s failed\n"), path.c_str());
+        fprintf(stderr, "Error 2 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
     alutUnloadWAV(format, data, size, freq);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, _("Error 3 loading SFX: %s failed\n"), path.c_str());
+        fprintf(stderr, "Error 3 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
@@ -97,7 +97,7 @@ bool SFXImpl::load(const char* filename)
     alGenSources(1, &m_soundSource);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, _("Error 4 loading SFX: %s failed\n"), path.c_str());
+        fprintf(stderr, "Error 4 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 

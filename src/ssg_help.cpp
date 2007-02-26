@@ -22,7 +22,6 @@
 #include <iostream>
 #include <plib/ssg.h>
 #include "ssg_help.hpp"
-#include "translation.hpp"
 
 // -----------------------------------------------------------------------------
 /** Make VtTables use display lists.
@@ -207,7 +206,7 @@ void MinMax(ssgEntity* p, sgMat4 m, float* x_min, float* x_max,
     }
     else
     {
-        printf(_("StaticSSG::MinMax: unkown type\n"));
+        printf("StaticSSG::MinMax: unkown type\n");
         p->print(stdout, 0, 0);
     }
 }   // MinMax

@@ -23,7 +23,6 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "ssg_help.hpp"
-#include "translation.hpp"
 
 #ifndef round
 # define round(x)  (floor(x+0.5f))
@@ -143,7 +142,7 @@ void StaticSSG::Distribute(ssgEntity* p, sgMat4 m)
     }
     else
     {
-        printf(_("StaticSSG::Distribute: unkown type\n"));
+        printf("StaticSSG::Distribute: unkown type\n");
         p->print(stdout, 0, 0);
     }
 }   // Distribute

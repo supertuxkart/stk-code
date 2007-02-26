@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <stdexcept>
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
@@ -73,8 +74,9 @@ void MaterialManager::loadMaterial()
 
     if ( fd == NULL )
     {
-        fprintf(stderr, _("FATAL: No Such File as '%s'\n"), fname ) ;
-        exit ( 1 ) ;
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", fname);
+        throw std::runtime_error(msg);
     }
 
     while ( parseMaterial ( fd ) )
@@ -100,8 +102,8 @@ char* MaterialManager::parseFileName(char **str)
 
     if ( *p != '"' )
     {
-        fprintf(stderr, _("ERROR: Material file entries must start with '\"'\n"
-                          "ERROR: Offending line is '%s'\n"), *str );
+        fprintf(stderr, "ERROR: Material file entries must start with '\"'\n"
+                "ERROR: Offending line is '%s'\n", *str);
         return NULL ;
     }
 
@@ -112,7 +114,7 @@ char* MaterialManager::parseFileName(char **str)
     if ( *p != '"' )
     {
         fprintf(stderr,
-                _("ERROR: Unterminated string constant '%s' in materials file.\n"), *str ) ;
+                "ERROR: Unterminated string constant '%s' in materials file.\n", *str ) ;
         return NULL ;
     }
 

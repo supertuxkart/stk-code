@@ -32,7 +32,7 @@
 #endif
 #include <stdexcept>
 
-#include "config.hpp"
+#include "user_config.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "kart_properties_manager.hpp"
@@ -122,7 +122,7 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
-            race_manager->setNumKarts(config->m_karts = atoi(argv[i+1]));
+            race_manager->setNumKarts(user_config->m_karts = atoi(argv[i+1]));
             fprintf ( stdout, _("You choose to have %s karts.\n"), argv[i+1] ) ;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
@@ -157,7 +157,7 @@ int handleCmdLine(int argc, char **argv)
         else if (    !strcmp(argv[i], "--no-start-screen")
                      || !strcmp(argv[i], "-N")                )
         {
-            config->m_no_start_screen = true;
+            user_config->m_no_start_screen = true;
             //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
             //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
             //FIXME:raceSetup.reverse = 1;
@@ -194,21 +194,21 @@ int handleCmdLine(int argc, char **argv)
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
         {
-            config->m_fullscreen = true;
+            user_config->m_fullscreen = true;
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
-            config->m_fullscreen = false;
+            user_config->m_fullscreen = false;
         }
 #endif
         else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
         {
-            if (sscanf(argv[i+1], "%dx%d", &config->m_width, &config->m_height) == 2)
-                fprintf ( stdout, _("You choose to be in %dx%d.\n"), config->m_width,
-                          config->m_height );
+            if (sscanf(argv[i+1], "%dx%d", &user_config->m_width, &user_config->m_height) == 2)
+                fprintf ( stdout, _("You choose to be in %dx%d.\n"), user_config->m_width,
+                          user_config->m_height );
             else
             {
-                fprintf(stderr, ("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));
+                fprintf(stderr, _("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));
                 exit(EXIT_FAILURE);
             }
         }
@@ -221,15 +221,15 @@ int handleCmdLine(int argc, char **argv)
 #endif
         else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
-            config->m_profile=n;
+            user_config->m_profile=n;
         }
         else if( !strcmp(argv[i], "--profile") )
         {
-            config->m_profile=20;
+            user_config->m_profile=20;
         }
         else if( !strcmp(argv[i], "--history") )
         {
-            config->m_replay_history=true;
+            user_config->m_replay_history=true;
         }
         else if( !strcmp(argv[i], "--herring") && i+1<argc )
         {
@@ -242,11 +242,11 @@ int handleCmdLine(int argc, char **argv)
             return 0;
         }
     }   // for i <argc
-    if(config->m_profile)
+    if(user_config->m_profile)
     {
-        printf("Profiling: %d seconds.\n",config->m_profile);
-        config->m_sfx   = false;  // Disable sound effects and music when profiling
-        config->m_music = false;
+        printf("Profiling: %d seconds.\n",user_config->m_profile);
+        user_config->m_sfx   = false;  // Disable sound effects and music when profiling
+        user_config->m_music = false;
     }
 
     return 1;
@@ -259,7 +259,7 @@ void InitTuxkart()
     loader->setModelDir("models");
     loader->setTextureDir("images");
     loader->setCreateStateCallback(getAppState);
-    config = new Config();
+    user_config = new UserConfig();
     sound_manager  = new SoundManager();
 
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -311,7 +311,7 @@ int main ( int argc, char **argv )
 
         // Replay a race
         // =============
-        if(config->m_replay_history)
+        if(user_config->m_replay_history)
         {
             // This will setup the race manager etc.
             history->Load();
@@ -325,9 +325,9 @@ int main ( int argc, char **argv )
         
         // Not replaying
         // =============
-        if(!config->m_profile)
+        if(!user_config->m_profile)
         {
-            if(!config->m_no_start_screen)
+            if(!user_config->m_no_start_screen)
             {
                 
                 // Normal multi window start
@@ -372,7 +372,7 @@ int main ( int argc, char **argv )
         fprintf(stderr,_("\nAborting SuperTuxKart\n"));
     }
 
-    config->saveConfig();
+    user_config->saveConfig();
 
     drv_deinit();
     return 0 ;
