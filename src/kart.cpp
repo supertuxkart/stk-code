@@ -382,23 +382,43 @@ void Kart::doObjectInteractions ()
     for ( i = 0 ; i < m_grid_position ; i++ )
     {
         sgVec3 xyz ;
-
-        sgSubVec3(xyz, getCoord()->xyz, world->getKart(i)->getCoord()->xyz );
+        Kart *other_kart = world->getKart(i);
+        sgSubVec3(xyz, getCoord()->xyz, other_kart->getCoord()->xyz );
 
         if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
         {
             sgNormalizeVec2 ( xyz ) ;
             world->addCollisions(m_grid_position, 1);
             world->addCollisions(i,             1);
-            if ( m_velocity.xyz[1] > world->getKart(i)->getVelocity()->xyz[1] )
+            if ( m_velocity.xyz[1] > other_kart->getVelocity()->xyz[1] )
             {
                 forceCrash () ;
-                sgSubVec2 ( world->getKart(i)->getCoord()->xyz, xyz ) ;
+                sgSubVec2 ( other_kart->getCoord()->xyz, xyz ) ;
             }
             else
             {
-                world->getKart(i)->forceCrash () ;
+                other_kart->forceCrash () ;
                 sgAddVec2 ( getCoord()->xyz, xyz ) ;
+            }
+            if(m_attachment.getType()==ATTACH_BOMB &&
+               m_attachment.getPreviousOwner()!=other_kart) 
+            {
+                m_attachment.moveBombFromTo(this, other_kart);
+                //other_kart->setAttachmentType(ATTACH_BOMB,
+                //                                             m_attachment.getTimeLeft()+
+                //                                              BOMB_TRANSFER_TIME_INCREASE,
+                //                                              this);
+                //                m_attachment.clear();
+            }
+            if(other_kart->m_attachment.getType()==ATTACH_BOMB &&
+               other_kart->m_attachment.getPreviousOwner()!=this)
+            {
+                m_attachment.moveBombFromTo(other_kart, this);
+                //                setAttachmentType(ATTACH_BOMB,
+                //                                  m_attachment.getTimeLeft()+
+                //                                  BOMB_TRANSFER_TIME_INCREASE,
+                //                                  other_kart);
+                //                other_kart->m_attachment.clear();
             }
         }   // if sgLengthSquaredVec2(xy)<1.0
     }   // for i
@@ -636,7 +656,7 @@ void Kart::updatePhysics (float dt)
 
 #ifdef BULLET
     float engine_power = getMaxPower() + handleWheelie(dt);
-    if(getAttachment()==ATTACH_PARACHUTE) engine_power*=0.2;
+    if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2;
 
     if(m_controls.brake)
     {

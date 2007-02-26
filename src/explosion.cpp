@@ -21,11 +21,10 @@
 #include "explosion.hpp"
 #include "world.hpp"
 #include "projectile_manager.hpp"
-#include "projectile.hpp"
 #include "sound_manager.hpp"
 
 
-Explosion::Explosion(Projectile* p) : ssgTransform()
+Explosion::Explosion(sgCoord* coord) : ssgTransform()
 {
     ssgCutout *cut = new ssgCutout();
     addKid(cut);
@@ -35,15 +34,15 @@ Explosion::Explosion(Projectile* p) : ssgTransform()
     ref();
     m_seq   = projectile_manager->getExplosionModel();
     cut->addKid(m_seq);
-    init(p);
+    init(coord);
 }   // Explosion
 
 //-----------------------------------------------------------------------------
-void Explosion::init(Projectile* p)
+void Explosion::init(sgCoord* coord)
 {
     sound_manager->playSfx( SOUND_EXPLOSION );
 
-    setTransform(p->getCoord());
+    setTransform(coord);
     m_step = -1;
     world->addToScene(this);
 }

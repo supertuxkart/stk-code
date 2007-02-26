@@ -161,12 +161,13 @@ public:
     { m_collectable.set(t, n);            }
     void           setPosition         (int p)    {m_race_position = p;          }
     int            getHint             () { return m_track_hint;                 }
-    float          getDistanceDownTrack() { return m_curr_track_coords[1];      }
-    float          getDistanceToCenter () { return m_curr_track_coords[0];      }
-    attachmentType getAttachment       () { return  m_attachment.getType();     }
-    void           setAttachmentType   (attachmentType t)
-    { m_attachment.set(t);                }
-    Collectable   *getCollectable      () { return &m_collectable;              }
+    float          getDistanceDownTrack() { return m_curr_track_coords[1];       }
+    float          getDistanceToCenter () { return m_curr_track_coords[0];       }
+    Attachment    *getAttachment       () { return &m_attachment;                }
+    void           setAttachmentType   (attachmentType t, float time_left=0.0f,
+                                        Kart*k=NULL)
+                                          { m_attachment.set(t, time_left, k);   }
+    Collectable   *getCollectable      () { return &m_collectable;               }
     int            getNumCollectables  () const { return  m_collectable.getNum();}
     int            getNumHerring       () const { return  m_num_herrings_gobbled;}
     int            getLap              () const { return  m_race_lap;            }
@@ -230,10 +231,11 @@ public:
     void              draw          ();
     bool              isInRest      ();
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
-    float             getSpeed() const {return m_speed;     }
+    float             getSpeed      () const {return m_speed;                 }
     float             handleWheelie(float dt);
 #endif
     void           adjustSpeedWeight(float f);
+    void           forceRescue      ()       {m_rescue=true;                   }
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
     virtual void   collectedHerring (Herring* herring);

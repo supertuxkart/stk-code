@@ -92,7 +92,7 @@ void ProjectileManager::update(float dt)
         while(p!=m_active_projectiles.end())
         {
             if(! (*p)->hasHit()) { p++; continue; }
-            newExplosion(*p);
+            newExplosion((*p)->getCoord());
             // Create a new explosion, move the projectile to the
             // list of deleted projectiles (so that they can be
             // reused later), and remove it from the list of active
@@ -144,18 +144,18 @@ Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
 
 /** See if there is an old, unused explosion object available. If so,
  *  reuse this object, otherwise create a new one. */
-Explosion* ProjectileManager::newExplosion(Projectile* p)
+Explosion* ProjectileManager::newExplosion(sgCoord* coord)
 {
     Explosion *e;
     if(m_deleted_explosions.size()>0)
     {
         e = m_deleted_explosions.back();
         m_deleted_explosions.pop_back();
-        e->init(p);
+        e->init(coord);
     }
     else
     {
-        e=new Explosion(p);
+        e=new Explosion(coord);
     }
     m_active_explosions.push_back(e);
     return e;

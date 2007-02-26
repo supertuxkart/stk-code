@@ -31,6 +31,7 @@ enum attachmentType { ATTACH_PARACHUTE,
 #ifdef USE_MAGNET
                       ATTACH_MAGNET, ATTACH_MAGNET_BZZT,
 #endif
+                      ATTACH_BOMB,
                       ATTACH_ANVIL, ATTACH_TINYTUX,
                       ATTACH_MAX, ATTACH_NOTHING};
 
@@ -42,13 +43,13 @@ private:
     Kart           *m_kart;
     float           m_time_left;
     ssgSelector    *m_holder;    // where the attachment is put on the kart
+    Kart           *m_previous_owner;
 public:
     Attachment(Kart* _kart);
     ~Attachment();
 
-    void set (attachmentType _type, float time);
-    void set (attachmentType _type) {set(_type, m_time_left); }
-
+    void set (attachmentType _type, float time, Kart *previous_kart=NULL);
+    void set (attachmentType _type)  {set(_type, m_time_left); }
     void clear ()
     {
         m_type=ATTACH_NOTHING; m_time_left=0.0;
@@ -57,6 +58,7 @@ public:
 
     attachmentType getType () {return m_type;      }
     float getTimeLeft () {return m_time_left; }
+    Kart* getPreviousOwner() {return m_previous_owner;}
 
     float WeightAdjust () const
     {
@@ -77,6 +79,7 @@ public:
     }
     void  hitGreenHerring();
     void  update (float dt, sgCoord *velocity);
+    void  moveBombFromTo(Kart *from, Kart *to);
 };
 
 #endif

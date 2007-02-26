@@ -50,6 +50,7 @@ initAttachmentType iat[]=
     {ATTACH_MAGNET,      "magnet.ac"},
     {ATTACH_MAGNET_BZZT, "magnetbzzt.ac"},
 #endif
+    {ATTACH_BOMB,        "bomb.ac"},
     {ATTACH_ANVIL,       "anvil.ac"},
     {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
     {ATTACH_MAX,         ""},

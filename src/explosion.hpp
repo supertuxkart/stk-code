@@ -20,9 +20,7 @@
 #ifndef HEADER_EXPLOSION_H
 #define HEADER_EXPLOSION_H
 
-class ssgSelector;
-class Projectile;
-
+#include <plib/sg.h>
 
 class Explosion : public ssgTransform
 {
@@ -31,9 +29,9 @@ public:
     ssgSelector  *m_seq ;
 public:
 
-    Explosion(Projectile* p);
+    Explosion(sgCoord* coord);
     int  inUse    ()              {return (m_step >= 0); }
-    void init     (Projectile *p);
+    void init     (sgCoord *coord);
     void update   (float delta_t);
     bool hasEnded () {return m_step >= m_seq->getNumKids(); }
 

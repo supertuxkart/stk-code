@@ -68,7 +68,7 @@ public:
     void             cleanup          ();
     void             update           (float dt);
     Projectile*      newProjectile    (Kart *kart, int type);
-    Explosion*       newExplosion     (Projectile *p);
+    Explosion*       newExplosion     (sgCoord *coord);
     void             Deactivate       (Projectile *p) {}
     void             removeTextures   ();
 };

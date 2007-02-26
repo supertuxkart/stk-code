@@ -21,6 +21,7 @@
 
 #include "attachment.hpp"
 #include "attachment_manager.hpp"
+#include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "constants.hpp"
 #include "loader.hpp"
@@ -29,10 +30,11 @@
 
 Attachment::Attachment(Kart* _kart)
 {
-    m_type      = ATTACH_NOTHING;
-    m_time_left = 0.0;
-    m_kart      = _kart;
-    m_holder    = new ssgSelector();
+    m_type           = ATTACH_NOTHING;
+    m_time_left      = 0.0;
+    m_kart           = _kart;
+    m_holder         = new ssgSelector();
+    m_previous_owner = NULL;
     m_kart->getModel()->addKid(m_holder);
 
     for(int i=ATTACH_PARACHUTE; i<=ATTACH_TINYTUX; i++)
@@ -41,7 +43,7 @@ Attachment::Attachment(Kart* _kart)
         m_holder->addKid(p);
     }
     m_holder->select(0);
-}   // Attachmetn
+}   // Attachment
 
 //-----------------------------------------------------------------------------
 Attachment::~Attachment()
@@ -50,23 +52,28 @@ Attachment::~Attachment()
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
-void Attachment::set(attachmentType _type, float time)
+void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 {
     m_holder->selectStep(_type);
-    m_type      = _type;
-    m_time_left = time;
+    m_type           = _type;
+    m_time_left      = time;
+    m_previous_owner = current_kart;
 }   // set
 
 // -----------------------------------------------------------------------------
 void Attachment::hitGreenHerring()
 {
-    switch (rand()%2)
+    switch (rand()%3)
     {
     case 0: set( ATTACH_PARACHUTE, 4.0f ) ;
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 1: set( ATTACH_ANVIL, 2.0f ) ;
+    case 1: set( ATTACH_BOMB, 40.0f ) ;
+        // if ( m_kart == m_kart[0] )
+        //   sound -> playSfx ( SOUND_SHOOMF ) ;
+        break ;
+    case 2: set( ATTACH_ANVIL, 2.0f ) ;
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         // Reduce speed once (see description above), all other changes are
@@ -75,6 +82,18 @@ void Attachment::hitGreenHerring()
         break ;
     }   // switch rand()%2
 }   // hitGreenHerring
+
+//-----------------------------------------------------------------------------
+//** Moves a bomb from kart FROM to kart TO.
+void Attachment::moveBombFromTo(Kart *from, Kart *to)
+{
+    const float BOMB_TRANSFER_TIME_INCREASE=10.0f;
+    to->setAttachmentType(ATTACH_BOMB,
+                          from->getAttachment()->getTimeLeft()+
+                          BOMB_TRANSFER_TIME_INCREASE,
+                          from);
+    from->getAttachment()->clear();
+}   // moveBombFromTo
 
 //-----------------------------------------------------------------------------
 void Attachment::update(float dt, sgCoord *velocity)
@@ -88,6 +107,12 @@ void Attachment::update(float dt, sgCoord *velocity)
     case ATTACH_ANVIL:      // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:       break;
+    case ATTACH_BOMB:      if(m_time_left<=0.0) 
+                           {
+                               projectile_manager->newExplosion(m_kart->getCoord());
+                               m_kart->forceRescue();
+                           }
+                           break;
     case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->endRescue();
                            break;
 #ifdef USE_MAGNET
@@ -118,19 +143,16 @@ void Attachment::update(float dt, sgCoord *velocity)
 
     }   // switch
 
+    // Detach attachment if its time is up.
     if ( m_time_left <= 0.0f)
     {
+        clear();
         if(m_type==ATTACH_ANVIL) 
         {
             // Resets the weight, and multiplies the velocity by 1.0, 
-            // i.e. no change of velocity. But we have to clear the 
-            // object first (to remove the increased weihgt)
-            clear();
+            // i.e. no change of velocity.
             m_kart->adjustSpeedWeight(1.0f);
-        }
-        else
-        {
-            clear();
         }
     }   // if m_time_left<0
 }   // update
+//-----------------------------------------------------------------------------
