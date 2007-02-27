@@ -11,5 +11,5 @@ To create a robot, here is what you should do:
   #include "robots/<header file name>", then add your robot inside
   function World::loadRobot to the switch statement as the next case
   available, and increase the constant NUM_ROBOTS by one.
-- To test it, run 'make'. It should reconfigure your build and then compile
-  STK.
+- To test it, run 'sh reconf.sh'. It should reconfigure your build and then
+  compile STK.
