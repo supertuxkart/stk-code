@@ -20,7 +20,7 @@
 #ifndef TRANSLATION_H
 #define TRANLSATION_H
 
-#define HAS_GETTEXT
+#undef HAS_GETTEXT
 
 #ifdef HAS_GETTEXT
 #  include <libintl.h>
