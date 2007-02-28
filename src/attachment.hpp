@@ -20,7 +20,7 @@
 #ifndef HEADER_ATTACHMENT_H
 #define HEADER_ATTACHMENT_H
 
-#include "physics_parameters.hpp"
+#include "stk_config.hpp"
 class Kart;
 class ssgEntity;
 
@@ -39,44 +39,40 @@ enum attachmentType { ATTACH_PARACHUTE,
 class Attachment
 {
 private:
-    attachmentType  m_type;
-    Kart           *m_kart;
-    float           m_time_left;
-    ssgSelector    *m_holder;    // where the attachment is put on the kart
-    Kart           *m_previous_owner;
+    attachmentType  m_type;            // attachment type
+    Kart           *m_kart;            // kart the attachment is attached to
+    float           m_time_left;       // time left till attachment expires
+    ssgSelector    *m_holder;          // where the attachment is put on the kart
+    Kart           *m_previous_owner;  // used by bombs so that it's not passed
+                                       // back to previous owner
 public:
     Attachment(Kart* _kart);
     ~Attachment();
 
     void set (attachmentType _type, float time, Kart *previous_kart=NULL);
-    void set (attachmentType _type)  {set(_type, m_time_left); }
-    void clear ()
-    {
-        m_type=ATTACH_NOTHING; m_time_left=0.0;
-        m_holder->select(0);
-    }
+    void set (attachmentType _type) { set(_type, m_time_left); }
+    void clear ()                   {
+                                      m_type=ATTACH_NOTHING; 
+                                      m_time_left=0.0;
+                                      m_holder->select(0);
+                                    }
+    attachmentType getType () const { return m_type;           }
+    float getTimeLeft      () const { return m_time_left;      }
+    Kart* getPreviousOwner () const { return m_previous_owner; }
+    float WeightAdjust     () const {
+                                      return m_type==ATTACH_ANVIL
+                                          ?stk_config->m_anvil_weight:0.0f;
+                                    }
 
-    attachmentType getType () {return m_type;      }
-    float getTimeLeft () {return m_time_left; }
-    Kart* getPreviousOwner() {return m_previous_owner;}
+    float AirResistanceAdjust () const {
+                                      return m_type==ATTACH_PARACHUTE
+                                          ?stk_config->m_parachute_friction:0.0f;
+                                    }
 
-    float WeightAdjust () const
-    {
-        return m_type==ATTACH_ANVIL
-               ?physicsParameters->m_anvil_weight:0.0f;
-    }
-
-    float AirResistanceAdjust () const
-    {
-        return m_type==ATTACH_PARACHUTE
-               ?physicsParameters->m_parachute_friction:0.0f;
-    }
-
-    float SpeedAdjust () const
-    {
-        return m_type==ATTACH_ANVIL
-               ?physicsParameters->m_anvil_speed_factor:1.0f;
-    }
+    float SpeedAdjust () const      {
+                                      return m_type==ATTACH_ANVIL
+                                          ?stk_config->m_anvil_speed_factor:1.0f;
+                                    }
     void  hitGreenHerring();
     void  update (float dt, sgCoord *velocity);
     void  moveBombFromTo(Kart *from, Kart *to);

@@ -46,7 +46,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	kart_properties_manager.cpp kart_properties_manager.hpp \
 	projectile_manager.cpp	   projectile_manager.hpp    	\
 	kart_properties.cpp	   kart_properties.hpp       	\
-	physics_parameters.cpp	   physics_parameters.hpp    	\
+	stk_config.cpp		   stk_config.hpp    		\
 	loader.cpp          	   loader.hpp               	\
 	race_manager.cpp	   race_manager.hpp          	\
 	string_utils.cpp	   string_utils.hpp          	\

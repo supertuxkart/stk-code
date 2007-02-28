@@ -50,7 +50,7 @@
 #include "herring_manager.hpp"
 #include "attachment_manager.hpp"
 #include "sound_manager.hpp"
-#include "physics_parameters.hpp"
+#include "stk_config.hpp"
 #include "translation.hpp"
 
 #ifdef BULLET
@@ -259,17 +259,17 @@ void InitTuxkart()
     loader->setModelDir("models");
     loader->setTextureDir("images");
     loader->setCreateStateCallback(getAppState);
-    user_config = new UserConfig();
-    sound_manager  = new SoundManager();
+    user_config             = new UserConfig();
+    sound_manager           = new SoundManager();
 
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties.
     history                 = new History              ();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
-    physicsParameters       = new PhysicsParameters    ();
-    const std::string PHYSICS_DEFAULT = std::string("data")+DIR_SEPARATOR+ "physics.data";
-    physicsParameters->load(PHYSICS_DEFAULT);
+    stk_config              = new STKConfig            ();
+    const std::string STK_CONFIG = std::string("data")+DIR_SEPARATOR+ "stk_config.data";
+    stk_config->load(STK_CONFIG);
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     collectable_manager     = new CollectableManager   ();

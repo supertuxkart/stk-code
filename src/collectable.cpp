@@ -23,6 +23,7 @@
 #include "kart.hpp"
 #include "sound_manager.hpp"
 #include "world.hpp"
+#include "stk_config.hpp"
 
 //-----------------------------------------------------------------------------
 Collectable::Collectable(Kart* kart_)
@@ -73,7 +74,7 @@ void Collectable::use()
     switch (type)
     {
 #ifdef USE_MAGNET
-    case COLLECT_MAGNET:   owner->attach(ATTACH_MAGNET_BZZT, 10.0f);
+    case COLLECT_MAGNET:   owner->attach(ATTACH_MAGNET_BZZT, stk_config->m_magnet_time);
         break ;
 #endif
     case COLLECT_ZIPPER:   owner->handleZipper();
@@ -96,9 +97,9 @@ void Collectable::use()
             if(world->getKart(i)->getPosition() == 1)
             {
                 world->getKart(i)->
-                attach(ATTACH_ANVIL, 4.0f);
+                attach(ATTACH_ANVIL, stk_config->m_anvil_time);
                 
-                world->getKart(i)->adjustSpeedWeight(physicsParameters->m_anvil_speed_factor*0.5f);
+                world->getKart(i)->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
 
                 if(world->getKart(i)->isPlayerKart())
                     sound_manager->playSfx(SOUND_USE_ANVIL);
@@ -121,7 +122,7 @@ void Collectable::use()
                    getKart(i)->getPosition())
                 {
                     world->getKart(i)->attach(
-                        ATTACH_PARACHUTE, 8.0f);
+                        ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
 
                     if(world->getKart(i)->isPlayerKart())
                         player_affected = true;

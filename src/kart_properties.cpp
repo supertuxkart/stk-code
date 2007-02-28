@@ -27,14 +27,14 @@
 #include "preprocessor.hpp"
 #include "string_utils.hpp"
 #include "kart_properties.hpp"
-#include "physics_parameters.hpp"
+#include "stk_config.hpp"
 #include "translation.hpp"
 
 // This constructor would be a bit more useful, nicer, if we could call
 // init_defaults() and load from here. Unfortunately, this object is used
-// as a base class for PhysicsParameters, which has to overwrite
+// as a base class for STKConfig, which has to overwrite
 // init_defaults() and getAllData(). But during the call of this constructor,
-// the PhysicsParameters object does not (yet) exist, so the overwriting
+// the STKConfig object does not (yet) exist, so the overwriting
 // functions do NOT get called, only the virtual functions here would be
 // called. Therefore, a two step initialisation is necessary: the constructor
 // doing not much, but then in load the overwriting functions can be used.
@@ -153,40 +153,40 @@ void KartProperties::init_defaults()
 
     m_color[0] = 1.0f; m_color[1] = 0.0f; m_color[2] = 0.0f;
 
-    m_wheel_base           = physicsParameters->m_wheel_base;
-    m_height_cog           = physicsParameters->m_height_cog;
-    m_engine_power         = physicsParameters->m_engine_power;
-    m_time_full_steer      = physicsParameters->m_time_full_steer;
-    m_brake_factor         = physicsParameters->m_brake_factor;
-    m_roll_resistance      = physicsParameters->m_roll_resistance;
-    m_mass                 = physicsParameters->m_mass;
-    m_air_resistance       = physicsParameters->m_air_resistance;
-    m_tire_grip            = physicsParameters->m_tire_grip;
-    m_max_steer_angle      = physicsParameters->m_max_steer_angle;
-    m_corn_f               = physicsParameters->m_corn_f;
-    m_corn_r               = physicsParameters->m_corn_r;
-    m_inertia              = physicsParameters->m_inertia;
-    m_wheelie_max_speed_ratio = physicsParameters->m_wheelie_max_speed_ratio;
-    m_wheelie_max_pitch       = physicsParameters->m_wheelie_max_pitch;
-    m_wheelie_pitch_rate      = physicsParameters->m_wheelie_pitch_rate;
-    m_wheelie_restore_rate    = physicsParameters->m_wheelie_restore_rate;
-    m_wheelie_speed_boost     = physicsParameters->m_wheelie_speed_boost;
-    m_wheelie_lean_recovery   = physicsParameters->m_wheelie_lean_recovery;
-    m_wheelie_balance_recovery= physicsParameters->m_wheelie_balance_recovery;
-    m_wheelie_step            = physicsParameters->m_wheelie_step;
-    m_wheelie_power_boost     = physicsParameters->m_wheelie_power_boost;
+    m_wheel_base                = stk_config->m_wheel_base;
+    m_height_cog                = stk_config->m_height_cog;
+    m_engine_power              = stk_config->m_engine_power;
+    m_time_full_steer           = stk_config->m_time_full_steer;
+    m_brake_factor              = stk_config->m_brake_factor;
+    m_roll_resistance           = stk_config->m_roll_resistance;
+    m_mass                      = stk_config->m_mass;
+    m_air_resistance            = stk_config->m_air_resistance;
+    m_tire_grip                 = stk_config->m_tire_grip;
+    m_max_steer_angle           = stk_config->m_max_steer_angle;
+    m_corn_f                    = stk_config->m_corn_f;
+    m_corn_r                    = stk_config->m_corn_r;
+    m_inertia                   = stk_config->m_inertia;
+    m_wheelie_max_speed_ratio   = stk_config->m_wheelie_max_speed_ratio;
+    m_wheelie_max_pitch         = stk_config->m_wheelie_max_pitch;
+    m_wheelie_pitch_rate        = stk_config->m_wheelie_pitch_rate;
+    m_wheelie_restore_rate      = stk_config->m_wheelie_restore_rate;
+    m_wheelie_speed_boost       = stk_config->m_wheelie_speed_boost;
+    m_wheelie_lean_recovery     = stk_config->m_wheelie_lean_recovery;
+    m_wheelie_balance_recovery  = stk_config->m_wheelie_balance_recovery;
+    m_wheelie_step              = stk_config->m_wheelie_step;
+    m_wheelie_power_boost       = stk_config->m_wheelie_power_boost;
 
     //bullet physics data
-    m_suspension_stiffness      = physicsParameters->m_suspension_stiffness;
-    m_wheel_damping_relaxation  = physicsParameters->m_wheel_damping_relaxation;
-    m_wheel_damping_compression = physicsParameters->m_wheel_damping_compression;
-    m_friction_slip             = physicsParameters->m_friction_slip;
-    m_roll_influence            = physicsParameters->m_roll_influence;
-    m_wheel_radius              = physicsParameters->m_wheel_radius;
-    m_wheel_width               = physicsParameters->m_wheel_width;
-    m_chassis_linear_damping    = physicsParameters->m_chassis_linear_damping;
-    m_chassis_angular_damping   = physicsParameters->m_chassis_angular_damping;
-    m_maximum_speed             = physicsParameters->m_maximum_speed;
+    m_suspension_stiffness      = stk_config->m_suspension_stiffness;
+    m_wheel_damping_relaxation  = stk_config->m_wheel_damping_relaxation;
+    m_wheel_damping_compression = stk_config->m_wheel_damping_compression;
+    m_friction_slip             = stk_config->m_friction_slip;
+    m_roll_influence            = stk_config->m_roll_influence;
+    m_wheel_radius              = stk_config->m_wheel_radius;
+    m_wheel_width               = stk_config->m_wheel_width;
+    m_chassis_linear_damping    = stk_config->m_chassis_linear_damping;
+    m_chassis_angular_damping   = stk_config->m_chassis_angular_damping;
+    m_maximum_speed             = stk_config->m_maximum_speed;
 
 
 }   // init_defaults

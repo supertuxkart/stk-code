@@ -831,7 +831,7 @@ void Kart::updatePhysics (float dt)
         }
         if(m_controls.jump)
         { // ignore gravity down when jumping
-            ForceGravity = physicsParameters->m_jump_impulse*WORLD_GRAVITY;
+            ForceGravity = stk_config->m_jump_impulse*WORLD_GRAVITY;
         }
         else
         {   // kart is on groud and not jumping
@@ -978,7 +978,7 @@ float Kart::getAirResistance() const
 {
     return (m_kart_properties->getAirResistance() +
             m_attachment.AirResistanceAdjust()    )
-           * physicsParameters->m_air_res_reduce[world->m_race_setup.m_difficulty];
+           * stk_config->m_air_res_reduce[world->m_race_setup.m_difficulty];
 
 }
 
@@ -1262,7 +1262,7 @@ void Kart::getClosestKart(float *cdist, int *closest)
 
         float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
                                           world->getKart(i)->getCoord()->xyz ) ;
-        if ( d < *cdist && d < physicsParameters->m_magnet_range_sq)
+        if ( d < *cdist && d < stk_config->m_magnet_range_sq)
         {
             *cdist = d ;
             *closest = i ;
@@ -1285,7 +1285,7 @@ void Kart::handleMagnet(float cdist, int closest)
 
     //JH FIXME: that should probably be changes, e.g. by increasing the throttle
     //          to something larger than 1???
-    if (cdist > physicsParameters->m_magnet_min_range_sq)
+    if (cdist > stk_config->m_magnet_min_range_sq)
     {
         if ( m_velocity.xyz[1] < tgt_velocity )
             m_velocity.xyz[1] = tgt_velocity * 1.4f;

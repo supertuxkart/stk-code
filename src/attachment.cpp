@@ -27,6 +27,7 @@
 #include "loader.hpp"
 #include "world.hpp"
 #include "sound_manager.hpp"
+#include "stk_config.hpp"
 
 Attachment::Attachment(Kart* _kart)
 {
@@ -65,33 +66,31 @@ void Attachment::hitGreenHerring()
 {
     switch (rand()%3)
     {
-    case 0: set( ATTACH_PARACHUTE, 4.0f ) ;
+    case 0: set( ATTACH_PARACHUTE, stk_config->m_parachute_time ) ;
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 1: set( ATTACH_BOMB, 40.0f ) ;
+    case 1: set( ATTACH_BOMB, stk_config->m_bomb_time ) ;
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 2: set( ATTACH_ANVIL, 2.0f ) ;
+    case 2: set( ATTACH_ANVIL, stk_config->m_anvil_time ) ;
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         // Reduce speed once (see description above), all other changes are
         // handled in Kart::updatePhysics
-        m_kart->adjustSpeedWeight(physicsParameters->m_anvil_speed_factor);
+        m_kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor);
         break ;
-    }   // switch rand()%2
+    }   // switch rand()%3
 }   // hitGreenHerring
 
 //-----------------------------------------------------------------------------
 //** Moves a bomb from kart FROM to kart TO.
 void Attachment::moveBombFromTo(Kart *from, Kart *to)
 {
-    const float BOMB_TRANSFER_TIME_INCREASE=10.0f;
     to->setAttachmentType(ATTACH_BOMB,
                           from->getAttachment()->getTimeLeft()+
-                          BOMB_TRANSFER_TIME_INCREASE,
-                          from);
+                          stk_config->m_bomb_time_increase, from);
     from->getAttachment()->clear();
 }   // moveBombFromTo
 
