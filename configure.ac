@@ -154,7 +154,7 @@ case "${host}" in
            SUMMARY="$SUMMARY\nUsing OpenAL for sound."
            
            if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
-               AC_DEFINE([HAVE_VORBIS], 1, [Defined when Ogg Vorbis is available])
+               AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
                SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
            fi
        fi
