@@ -22,7 +22,7 @@
 #include "sound_manager.hpp"
 #include "user_config.hpp"
 
-#define USE_PLIB_SOUND !((HAVE_OPENAL && (HAVE_MIKMOD && HAVE_OGGVORBIS)))
+#define USE_PLIB_SOUND !((HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS)))
 #if USE_PLIB_SOUND
 #include "sound_plib.hpp"
 #else    //We use OpenAL
