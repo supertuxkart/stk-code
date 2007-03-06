@@ -1,0 +1,72 @@
+//  $Id$
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2007 Damien Morel <divdams@free.fr>
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 2
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#ifndef HEADER_MUSICOGG_H
+#define HEADER_MUSICOGG_H
+
+#include <string>
+#include <iostream>
+using namespace std;
+
+#include <ogg/ogg.h>
+#include <vorbis/vorbisfile.h>
+#include <AL/al.h>
+
+#include "music.hpp"
+
+
+class MusicOggStream : public Music
+{
+public:
+    MusicOggStream();
+    virtual ~MusicOggStream();
+
+    virtual void update();
+
+    virtual bool load(const char* filename);
+
+    virtual bool playMusic();
+    virtual bool stopMusic();
+    virtual bool pauseMusic();
+    virtual bool resumeMusic();
+
+
+protected:
+    bool empty();
+    bool check();
+    string errorString(int code);
+
+private:
+    bool release();
+    bool isPlaying();
+    bool streamIntoBuffer(ALuint buffer);
+
+    string          m_fileName;
+    FILE*           oggFile;
+    OggVorbis_File  m_oggStream;
+    vorbis_info*    vorbisInfo;
+
+    ALuint m_soundBuffers[2];
+    ALuint m_soundSource;
+    ALenum nb_channels;
+
+    bool m_pausedMusic;
+};
+
+#endif // HEADER_MUSICOGG_H

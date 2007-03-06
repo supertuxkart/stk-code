@@ -32,8 +32,9 @@ supertuxkart_SOURCES =             main.cpp  			\
 	collectable.cpp		   collectable.hpp	        \
 	collectable_manager.cpp	   collectable_manager.hpp   	\
 	sound_manager.cpp	   sound_manager.hpp           	\
-        sound_plib.cpp             sound_plib.hpp              	\
+    sound_plib.cpp             sound_plib.hpp              	\
 	music_mikmod.cpp	   music_mikmod.hpp            	\
+	music_ogg.cpp	   music_ogg.hpp            	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
 	utils.cpp		   utils.hpp                	\
 	isect.cpp		   isect.hpp                	\
@@ -53,11 +54,11 @@ supertuxkart_SOURCES =             main.cpp  			\
 	track_manager.cpp	   track_manager.hpp         	\
 	world.cpp		   world.hpp                	\
 	preprocessor.cpp	   preprocessor.hpp	        \
-        callback.hpp						\
+    callback.hpp						\
 	moving_physics.hpp	   moving_physics.cpp		\
 	movint_texture.hpp	   moving_texture.cpp		\
 	callback_manager.cpp       callback_manager.hpp         \
-        physics.cpp                physics.hpp                  \
+    physics.cpp                physics.hpp                  \
 	skid_mark.cpp		   skid_mark.hpp	        \
 	shadow.cpp		   shadow.hpp	        	\
 	start_screen.cpp	   start_screen.hpp	        \

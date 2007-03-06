@@ -22,16 +22,21 @@
 #include "sound_manager.hpp"
 #include "user_config.hpp"
 
-#define USE_PLIB_SOUND !(HAVE_OPENAL && HAVE_MIKMOD)
+#define USE_PLIB_SOUND !((HAVE_OPENAL && (HAVE_MIKMOD && HAVE_OGGVORBIS)))
 #if USE_PLIB_SOUND
 #include "sound_plib.hpp"
-#else
+#else    //We use OpenAL
 #include <AL/al.h>
 #include <AL/alut.h>
 
-#include "music_mikmod.hpp"
-#include "sfx_openal.hpp"
+#if HAVE_OGGVORBIS
+#include "music_ogg.hpp"
 #endif
+#if HAVE_MIKMOD
+#include "music_mikmod.hpp"
+#endif
+#include "sfx_openal.hpp"
+#endif // USE_PLIB_SOUND
 
 #include "translation.hpp"
 
@@ -156,12 +161,30 @@ void SoundManager::playMusic(const char* filename)
         }
 
 #if USE_PLIB_SOUND
+	if (!strcasecmp(".mod", filename+strlen(filename)-4))
         m_current_music= new MusicPlib();
-#else
-        m_current_music= new MusicMikMod();
 #endif
-        assert(m_current_music->load(filename));
-        m_current_music->playMusic();
+#if HAVE_OGGVORBIS
+	if (!strcasecmp(".ogg", filename+strlen(filename)-4))
+        m_current_music= new MusicOggStream();
+#endif
+#if HAVE_MIKMOD
+	if (!strcasecmp(".mod", filename+strlen(filename)-4))
+        m_current_music= new MusicMikMod();
+
+#endif
+        if(m_current_music == NULL)	// no support for file
+            return;
+
+            if((m_current_music->load(filename)) == false)
+        {
+            delete m_current_music;
+            fprintf(stderr, "WARNING: Unabled to load music %s, not supported\n", filename);
+        }
+        else
+        {
+            m_current_music->playMusic();
+        }
     }
 }
 
