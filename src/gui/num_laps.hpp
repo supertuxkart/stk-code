@@ -21,6 +21,7 @@
 #define HEADER_NUMLAPS_H
 
 #include "base_gui.hpp"
+#include "translation.hpp"
 
 class NumLaps: public BaseGUI
 {
@@ -29,6 +30,11 @@ public:
     ~NumLaps();
 
     void select();
+    
+private:
+    int lap_label_id;
+    int laps;
+    char lap_label[MAX_MESSAGE_LENGTH];
 };
 
 #endif

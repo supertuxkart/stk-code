@@ -22,24 +22,20 @@
 #include "start_screen.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
-#include "translation.hpp"
 
-NumLaps::NumLaps()
+NumLaps::NumLaps() : laps(3)
 {
     m_menu_id = widgetSet -> varray(0);
-
+    widgetSet -> label(m_menu_id, _("Choose number of laps"),  GUI_LRG, GUI_ALL, 0, 0 );
+    
     widgetSet -> space(m_menu_id);
+    
+    lap_label_id = widgetSet -> label(m_menu_id, _("Laps: 3"));
     widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id, _("Less"), GUI_MED, 10);
+    widgetSet -> start(m_menu_id, _("More"), GUI_MED, 20);
     widgetSet -> space(m_menu_id);
-    widgetSet -> label(m_menu_id, _("Choose number of laps"),  GUI_LRG   );
-
-    widgetSet -> start(m_menu_id, _("One"),                    GUI_MED,  1);
-    widgetSet -> state(m_menu_id, _("Two"),                    GUI_MED,  2);
-    widgetSet -> state(m_menu_id, _("Four"),                   GUI_MED,  4);
-    widgetSet -> state(m_menu_id, _("Five"),                   GUI_MED,  5);
-    widgetSet -> state(m_menu_id, _("Six"),                    GUI_MED,  6);
-    widgetSet -> state(m_menu_id, _("Eight"),                  GUI_MED,  8);
-    widgetSet -> space(m_menu_id);
+    widgetSet -> state(m_menu_id, _("Next"), GUI_SML, 30);
     widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> space(m_menu_id);
 
@@ -55,15 +51,27 @@ NumLaps::~NumLaps()
 // -----------------------------------------------------------------------------
 void NumLaps::select()
 {
-    const int N = widgetSet->token(widgetSet->click() );
-    if(N==-1)
+    const int id = widgetSet->click();
+    const int n = widgetSet->token(id);
+    switch (n)
     {
-        menu_manager->popMenu();
-    }
-    else
-    {
-        race_manager->setNumLaps(N);
+      case 10:
+        laps = std::max(1, laps-1);
+	snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
+	widgetSet->set_label(lap_label_id, lap_label);
+	break;
+      case 20:
+        laps = std::min(10, laps+1);
+	snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
+	widgetSet->set_label(lap_label_id, lap_label);
+	break;
+      case 30:
+        race_manager->setNumLaps(laps);
         startScreen->switchToGame();
+        break;
+      case -1:
+        menu_manager->popMenu();
+	break;
     }
 }   // select
 
