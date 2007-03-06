@@ -568,6 +568,9 @@ std::string UserConfig::getInputAsString(int player_index, KartActions control)
     default:
         snprintf(msg, sizeof(msg), _("Invalid"));
     }
+    
+    stm << msg;
+    
     return stm.str();
 }   // GetKeyAsString
 
