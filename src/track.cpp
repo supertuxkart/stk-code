@@ -217,7 +217,7 @@ int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
     sgLineSegment3 line_seg;
     for (size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        if( side != RS_RIGHT)
+        if( SIDE != RS_RIGHT)
         {
             sgCopyVec3( line_seg.a, m_left_driveline[i] );
             sgCopyVec3( line_seg.b, m_left_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
@@ -231,7 +231,7 @@ int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
             }
         }
 
-        if( side != RS_LEFT )
+        if( SIDE != RS_LEFT )
         {
             sgCopyVec3( line_seg.a, m_right_driveline[i] );
             sgCopyVec3( line_seg.b, m_right_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
@@ -297,7 +297,7 @@ void Track::spatialToTrack
     }
     else
     {
-        p1 = PREV; p2 = sector;
+        p1 = PREV; p2 = SECTOR;
     }
 
     sgVec2 line_eqn;
@@ -307,7 +307,7 @@ void Track::spatialToTrack
 
     dst [ 0 ] = sgDistToLineVec2 ( line_eqn, POS );
 
-    sgAddScaledVec2 ( tmp, pos, line_eqn, -dst [0] );
+    sgAddScaledVec2 ( tmp, POS, line_eqn, -dst [0] );
 
     dst [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
 }
