@@ -24,9 +24,6 @@
 
 class EmptyRobot : public AutoKart
 {
-private:
-    void handle_race_start();
-
 public:
     EmptyRobot(const KartProperties *kart_properties, int position,
              sgCoord init_pos);

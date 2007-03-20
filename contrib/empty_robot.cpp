@@ -44,21 +44,8 @@ EmptyRobot::EmptyRobot(const KartProperties *kart_properties, int position,
 //-----------------------------------------------------------------------------
 void EmptyRobot::update (float delta)
 {
-    if( world->getPhase() == World::START_PHASE )
-    {
-        handle_race_start();
-        return;
-    }
-
     /*General kart stuff*/
-    Kart::update(delta);
-}
-
-//-----------------------------------------------------------------------------
-void EmptyRobot::handle_race_start()
-{
-        //FIXME: is this next line really needed?
-        placeModel();
+    AutoKart::update(delta);
 }
 
 //-----------------------------------------------------------------------------
@@ -67,5 +54,5 @@ void EmptyRobot::reset()
     //This function is called at the beginning of *each race*
 
     /*General kart stuff*/
-    Kart::reset();
+    AutoKart::reset();
 }
