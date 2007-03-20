@@ -462,7 +462,8 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
                                  int offset_y, float ratio_x, float ratio_y )
 {
 
-    float angle_diff = player_kart->getCoord()->hpr[0] - world->m_track->m_angle[player_kart->getHint()];
+    float angle_diff = player_kart->getCoord()->hpr[0] -
+        world->m_track->m_angle[player_kart->getHint()];
     if(angle_diff > 180.0f) angle_diff -= 360.0f;
     else if (angle_diff < -180.0f) angle_diff += 360.0f;
 

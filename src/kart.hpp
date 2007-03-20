@@ -33,7 +33,8 @@
 #include "btBulletDynamicsCommon.h"
 #endif
 
-
+//TODO: move the data, buttons, presses and releases variables out of the
+//KartControl struct because they are joystick specific.
 struct KartControl
 {
     float data [ _JS_MAX_AXES ];
@@ -145,7 +146,7 @@ public:
 
     void loadData();
 
-    virtual void placeModel ();
+    void placeModel ();
     const KartProperties* getKartProperties() const
         { return m_kart_properties; }
     void           setKartProperties   (const KartProperties *kp)
