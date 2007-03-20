@@ -334,8 +334,12 @@ void Kart::reset()
     m_collectable.clear();
     m_num_herrings_gobbled = 0;
     m_wheel_position       = 0;
-    m_track_hint = world -> m_track -> absSpatialToTrack(m_curr_track_coords,
-                                                         m_curr_pos.xyz);
+
+    m_track_hint = world->m_track->findSector(m_curr_pos.xyz,
+        Track::RS_DONT_KNOW);
+    world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
+        m_track_hint );
+        
 #ifdef BULLET
     btTransform *trans=new btTransform();
     trans->setIdentity();
@@ -552,8 +556,10 @@ void Kart::update (float dt)
     Moveable::update (dt) ;
     doObjectInteractions();
 
-    m_track_hint = world->m_track->spatialToTrack(
-                    m_curr_track_coords, m_curr_pos.xyz, m_track_hint );
+    m_track_hint = world->m_track->findSector(m_curr_pos.xyz,
+        m_curr_track_coords[0] > 0.0 ? Track::RS_RIGHT : Track::RS_LEFT);
+    world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
+        m_track_hint );
 
     doLapCounting () ;
     processSkidMarks();

@@ -27,7 +27,9 @@
 #include "lisp/parser.hpp"
 #include "translation.hpp"
 
-Track::Track (std::string filename_, float w, float h, bool stretch)
+Track::Track( std::string filename_, float w, float h, bool stretch ) :
+    QUAD_TRI_NONE(-1), QUAD_TRI_FIRST(1), QUAD_TRI_SECOND(2),
+    UNKNOWN_SECTOR(-1)
 {
     m_filename        = filename_;
     m_herring_style   = "";
@@ -47,141 +49,276 @@ Track::Track (std::string filename_, float w, float h, bool stretch)
 Track::~Track()
 {}
 
-//-----------------------------------------------------------------------------
-int Track::spatialToTrack ( sgVec3 res, sgVec3 xyz, int hint ) const
+/** Finds on which side of the line segment a given point is.
+ */
+inline float Track::pointSideToLine( const sgVec2 L1, const sgVec2 L2,
+    const sgVec2 P ) const
 {
-    size_t nearest = 0 ;
-    float d ;
-    float nearest_d = 99999 ;
+    return ( L2[0]-L1[0] )*( P[1]-L1[1] )-( L2[1]-L1[1] )*( P[0]-L1[0] );
+}
 
-    const unsigned int DRIVELINE_SIZE = m_driveline.size();
-    int temp_i;
-    //Checks from the previous two hints to the next two which is the closest,
-    //checking from the previous to the next works on my machine but might not
-    //work on slower computers.
-    for(int i = hint - 2; i < hint + 3; ++i)
+/** pointInQuad() works by checking if the given point is 'to the right'
+ *  in clock-wise direction (which would be to look towards the inside of
+ *  the quad) of each line segment that forms the quad. If it is to the
+ *  left of all the segments, then the point is inside. This idea
+ *  works for convex polygons, so we have to test it for the two
+ *  triangles that compose the quad, in case that the quad is concave,
+ *  not for the quad itself.
+ */
+int Track::pointInQuad
+(
+    const sgVec2 A,
+    const sgVec2 B,
+    const sgVec2 C,
+    const sgVec2 D,
+    const sgVec2 POINT
+) const
+{
+    //Test the first triangle
+    if( pointSideToLine( A, B, POINT ) > 0.0 &&
+        pointSideToLine( B, C, POINT ) > 0.0 &&
+        pointSideToLine( C, A, POINT ) > 0.0 )
+        return QUAD_TRI_FIRST;
+    
+    //Test the second triangle
+    if( pointSideToLine( C, D, POINT ) > 0.0 &&
+        pointSideToLine( D, A, POINT ) > 0.0 &&
+        pointSideToLine( A, C, POINT ) > 0.0 )
+        return QUAD_TRI_SECOND;
+
+    return QUAD_TRI_NONE;
+}
+
+/** findRoadSector returns in which sector on the road the position
+ *  xyz is. If xyz is not on top of the road, it returns
+ *  UNKNOWN_SECTOR.
+ */
+int Track::findRoadSector( const sgVec3 XYZ )const
+{
+    /* To find in which 'sector' of the track the kart is, we use a
+       'point in triangle' algorithm for each triangle in the quad
+       that forms each track segment.
+     */
+    std::vector <SegmentTriangle> possible_segment_tris;
+    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
+    int triangle;
+    int next;
+    for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
-        temp_i = i;
-        if(temp_i < 0) temp_i = DRIVELINE_SIZE - temp_i;
-        if(temp_i >= (int)DRIVELINE_SIZE) temp_i -= DRIVELINE_SIZE;
-
-        d = sgDistanceVec2 ( m_driveline[temp_i], xyz ) ;
-        if ( d < nearest_d )
+        next = i + 1 <  DRIVELINE_SIZE ? i + 1 : 0;
+        triangle = pointInQuad( m_left_driveline[i], m_right_driveline[i],
+            m_right_driveline[next], m_left_driveline[next], XYZ );
+    
+        if (triangle != QUAD_TRI_NONE)
         {
-            nearest_d = d;
-            nearest = temp_i;
+            possible_segment_tris.push_back(SegmentTriangle(i, triangle));
         }
     }
 
-    /*
-      OK - so we have the closest point
-    */
-
-    const size_t PREV = ( nearest   ==   0              ) ? DRIVELINE_SIZE - 1 : (nearest - 1);
-    const size_t NEXT = ( nearest+1 >= DRIVELINE_SIZE ) ?      0             : (nearest + 1);
-
-    const float D_PREV = sgDistanceVec2 ( m_driveline[PREV], xyz ) ;
-    const float D_NEXT = sgDistanceVec2 ( m_driveline[NEXT], xyz ) ;
-
-    size_t p1, p2 ;
-    float  d1, d2 ;
-
-    if ( D_NEXT < D_PREV )
+    /* Since xyz can be on more than one 2D track segment, we have to
+       find on top of which one of the possible track segments it is.
+     */
+    const int POS_SEG_SIZE = possible_segment_tris.size();
+    if( POS_SEG_SIZE == 1 )
     {
-        p1 = nearest   ; p2 =  NEXT ;
-        d1 = nearest_d ; d2 = D_NEXT ;
+        //Only one possibility, so return it.
+        return possible_segment_tris[0].segment;
     }
-    else
+    else if( POS_SEG_SIZE == 0 )
     {
-        p1 =  PREV ; p2 = nearest   ;
-        d1 = D_PREV ; d2 = nearest_d ;
+        //xyz is not on the road
+        return UNKNOWN_SECTOR;
     }
+    else //POS_SEG_SIZE > 1
+    {
+        /* To find on top of which track segment the variable xyz is,
+           we get which of the possible triangles that are under xyz
+           has the lower distance on the height(Y or Z) axis.
+         */
+        float dist;
+        float near_dist = 99999;
+        int nearest = 0;
+        size_t segment;
+        sgVec4 plane;
 
-    sgVec3 line_eqn ;
-    sgVec3 tmp ;
+        for( int i = 0; i < POS_SEG_SIZE; ++i )
+        {
+             segment = possible_segment_tris[i].segment;
+             next = segment + 1 < DRIVELINE_SIZE ? segment + 1 : 0;
 
-    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] ) ;
+             if( possible_segment_tris[i].triangle == QUAD_TRI_FIRST )
+             {
+                 sgMakePlane( plane, m_left_driveline[segment],
+                     m_right_driveline[segment], m_right_driveline[next] );
+             }
+             else //possible_segment_tris[i].triangle == QUAD_TRI_SECOND
+             {
+                  sgMakePlane( plane, m_right_driveline[next],
+                      m_left_driveline[next], m_left_driveline[segment] );
+             }
 
-    res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
+             dist = sgHeightAbovePlaneVec3( plane, XYZ );
 
-    sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
+             /* sgHeightAbovePlaneVec3 gives a negative dist if the plane
+                is on top, so we have to rule it out.
+                
+                However, for some reason there are cases where we get
+                negative values for the track segment we should be on,
+                so we just use the absolute values, since the track
+                segment you are on will have a smaller absolute value
+                of dist anyways.
+              */
+             if( dist < 0.0) dist = -dist;
+             if( dist < near_dist)
+             {
+                 near_dist = dist;
+                 nearest = i;
+             }
+        }
 
-    // m_distance_from_start[p1] contains the sum of the distances between
-    // all driveline points up to point p1.
-    res [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
-
-    return nearest ;
+        return possible_segment_tris[nearest].segment;
+    }
 }
 
-//-----------------------------------------------------------------------------
-int Track::absSpatialToTrack ( sgVec3 res, sgVec3 xyz ) const
+/** findOutOfRoadSector finds the sector where XYZ is, but as it name
+    implies, it is more accurate for the outside of the track than the
+    inside, and for STK's needs the accuracy on top of the track is
+    unacceptable; but if this was a 2D function, the accuracy for out
+    of road sectors would be perfect.
+
+    To find the sector we look for the closest line segment from the
+    right and left drivelines, and the number of that segment will be
+    the sector.
+
+    The SIDE argument is used to speed up the function only; if we know
+    that XYZ is on the left or right side of the track, we know that
+    the closest driveline must be the one that matches that condition.
+    In reality, the side used in STK is the one from the previous frame,
+    but in order to move from one side to another a point would go
+    through the middle, that is handled by findRoadSector() which doesn't
+    has speed ups based on the side.
+
+    NOTE: This method of finding the sector outside of the road is *not*
+    perfect: if two line segments have a similar altitude (but enough to
+    let a kart get through) and they are very close on a 2D system,
+    if a kart is on the air it could be closer to the top line segment
+    even if it is supposed to be on the sector of the lower line segment.
+    Probably the best solution would be to construct a quad that reaches
+    until the next higher overlapping line segment, and find the closest
+    one to XYZ.
+ */
+int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
 {
-    size_t nearest = 0 ;
-    float d ;
-    float nearest_d = 99999 ;
+    int sector = -1;
+    float dist;
+    float nearest_dist = 99999;
+    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
 
-    /*
-      Search all the points on the track to find our nearest
-      centerline point
-    */
-
-    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    sgLineSegment3 line_seg;
     for (size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        d = sgDistanceVec2 ( m_driveline[i], xyz ) ;
-
-        if ( d < nearest_d )
+        if( side != RS_RIGHT)
         {
-            nearest_d = d ;
-            nearest = i ;
+            sgCopyVec3( line_seg.a, m_left_driveline[i] );
+            sgCopyVec3( line_seg.b, m_left_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
+
+            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
+
+            if ( dist < nearest_dist )
+            {
+                nearest_dist = dist;
+                sector = i ;
+            }
+        }
+
+        if( side != RS_LEFT )
+        {
+            sgCopyVec3( line_seg.a, m_right_driveline[i] );
+            sgCopyVec3( line_seg.b, m_right_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
+
+            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
+
+            if ( dist < nearest_dist )
+            {
+                nearest_dist = dist;
+                sector = i ;
+            }
         }
     }   // for i
 
-    /*
-      OK - so we have the closest point
-    */
+    return sector;
+}
 
-    const size_t PREV = ( nearest   ==   0              ) ? DRIVELINE_SIZE - 1 : (nearest - 1);
-    const size_t NEXT = ( nearest+1 >= DRIVELINE_SIZE ) ?      0             : (nearest + 1);
+/** This function returns in which 'sector' the position XYZ is, which could
+ *  be defined as the number of the closest track segment. 
+ *
+ *  The argument SIDE is used to speed up the search, if it is not known
+ *  then the speedup is not used.
+ */
+int Track::findSector( const sgVec3 XYZ, const RoadSide SIDE ) const
+{
+    int sector = findRoadSector( XYZ );
 
-    const float D_PREV = sgDistanceVec2 ( m_driveline[PREV], xyz ) ;
-    const float D_NEXT = sgDistanceVec2 ( m_driveline[NEXT], xyz ) ;
-
-    size_t p1, p2 ;
-    float  d1, d2 ;
-
-    if ( D_NEXT < D_PREV )
+    /* If sector == UNKNOWN_SECTOR, then xyz is not on top of the road, so
+       we need a method to find the sector outside of the road.
+     */
+    if( sector == UNKNOWN_SECTOR)
     {
-        p1 = nearest   ; p2 =  NEXT ;
-        d1 = nearest_d ; d2 = D_NEXT ;
+        sector = findOutOfRoadSector( XYZ, SIDE);
+    }
+
+    return sector;
+}
+
+/** spatialToTrack() takes absolute coordinates (coordinates in OpenGL
+ *  space) and transforms them into coordinates based on the track. It is
+ *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
+ *  of the returned vector is how much of the track the point has gone
+ *  through, and the x-axis is on which side of the road it is.
+ */
+void Track::spatialToTrack
+(
+    sgVec2 dst,
+    const sgVec2 POS,
+    const int SECTOR
+) const
+{   
+    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
+    const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
+
+    const float DIST_PREV = sgDistanceVec2 ( m_driveline[PREV], POS );
+    const float DIST_NEXT = sgDistanceVec2 ( m_driveline[NEXT], POS );
+
+    size_t p1, p2;
+    if ( DIST_NEXT < DIST_PREV )
+    {
+        p1 = SECTOR; p2 = NEXT;
     }
     else
     {
-        p1 =  PREV ; p2 = nearest   ;
-        d1 = D_PREV ; d2 = nearest_d ;
+        p1 = PREV; p2 = sector;
     }
 
-    sgVec3 line_eqn ;
-    sgVec3 tmp ;
+    sgVec2 line_eqn;
+    sgVec2 tmp;
 
-    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] ) ;
+    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] );
 
-    res [ 0 ] = sgDistToLineVec2 ( line_eqn, xyz ) ;
+    dst [ 0 ] = sgDistToLineVec2 ( line_eqn, POS );
 
-    sgAddScaledVec2 ( tmp, xyz, line_eqn, -res [0] ) ;
+    sgAddScaledVec2 ( tmp, pos, line_eqn, -dst [0] );
 
-    res [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
-
-    return nearest ;
+    dst [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
 }
 
 //-----------------------------------------------------------------------------
-void Track::trackToSpatial ( sgVec3 xyz, int hint ) const
+void Track::trackToSpatial ( sgVec3 xyz, const int HINT ) const
 {
-    sgCopyVec3 ( xyz, m_driveline [ hint ] ) ;
+    sgCopyVec3 ( xyz, m_driveline [ HINT ] ) ;
 }
 
-/** It's not the nices solution to have two very similar version of a function,
+/** It's not the nicest solution to have two very similar version of a function,
  *  i.e. drawScaled2D and draw2Dview - but to keep both versions const, the
  *  values m_scale_x/m_scale_y can not be changed, but they are needed in glVtx.
  *  So two functions are provided: one which uses temporary variables, and one
@@ -513,9 +650,9 @@ Track::loadDriveline()
 
     if(m_right_driveline.size() != m_left_driveline.size())
         std::cout << "Error: driveline's sizes do not match, right " <<
-        "driveline is " << m_right_driveline.size() << " points long " <<
+        "driveline is " << m_right_driveline.size() << " vertex long " <<
         "and the left driveline is " << m_left_driveline.size()
-        << " points long. Track is " << m_name << " ." << std::endl;
+        << " vertex long. Track is " << m_name << " ." << std::endl;
 
     SGfloat width;
     sgVec3 center_point, width_vector;

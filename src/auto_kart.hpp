@@ -27,7 +27,8 @@ class AutoKart : public Kart
 {
     public:
         AutoKart(const KartProperties *kart_properties, int position,
-                 sgCoord init_pos);
+                 sgCoord init_pos) :
+        Kart(kart_properties, position, init_pos) { Kart::reset(); }
 
         int  isPlayerKart() const {return 0;}
 };

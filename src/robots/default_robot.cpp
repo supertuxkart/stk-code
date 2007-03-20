@@ -52,7 +52,7 @@ DefaultRobot::DefaultRobot(const KartProperties *kart_properties, int position,
     m_handle_curve = false;
     start_kart_crash_direction = 0;
 
-    m_crash_perc = 0.0;
+    m_crash_time = 0.0;
     reset();
 }
 
@@ -67,7 +67,7 @@ void DefaultRobot::update (float delta)
         handle_race_start();
         return;
     }
-
+    
 
     /*Get information about the track*/
     //Detect if we are going to crash with the track and/or karts
@@ -85,9 +85,9 @@ void DefaultRobot::update (float delta)
 
     const float KART_LENGTH = 1.5f;
 
-    //The m_crash_perc measures if a kart has been crashing for too long
-    m_crash_perc += m_collided ? 3.0f * delta : -0.25f * delta;
-    if(m_crash_perc < 0.0f) m_crash_perc = 0.0f;
+    //The m_crash_time measures if a kart has been crashing for too long
+    m_crash_time += m_collided ? 3.0f * delta : -0.25f * delta;
+    if(m_crash_time < 0.0f) m_crash_time = 0.0f;
 
     //Find if any player is ahead of this kart
     bool player_winning = false;
@@ -111,14 +111,6 @@ void DefaultRobot::update (float delta)
             break;
         }
 
-#if 0
-    //This is used for tight curves, but since right now the steering
-    //is so wide, there is no need for this.
-    //Find the hint at which the next curve starts
-    m_next_curve_hint = find_curve();
-#endif
-
-
     /*Steer based on the information we just gathered*/
     float steer_angle = 0.0f;
 
@@ -130,7 +122,6 @@ void DefaultRobot::update (float delta)
 #ifdef AI_DEBUG
         std::cout << "Action: Steer towards center." << std::endl;
 #endif
-
     }
 
 #if 0
@@ -141,7 +132,7 @@ void DefaultRobot::update (float delta)
     {
         steer_angle = steer_for_tight_curve();
 #ifdef AI_DEBUG
-        std::cout << "Action 2: Handle tight curves." << std::endl;
+        std::cout << "Action: Handle tight curves." << std::endl;
 #endif
 
     }
@@ -175,12 +166,12 @@ void DefaultRobot::update (float delta)
             if(m_curr_track_coords[0] > world->getKart(crashes.m_kart)->
                getDistanceToCenter())
             {
-                steer_to_angle(NEXT_HINT, -90.0f);
+                steer_angle = steer_to_angle(NEXT_HINT, -90.0f);
                 start_kart_crash_direction = 1;
             }
             else
             {
-                steer_to_angle(NEXT_HINT, 90.0f);
+                steer_angle = steer_to_angle(NEXT_HINT, 90.0f);
                 start_kart_crash_direction = -1;
             }
         }
@@ -223,8 +214,6 @@ void DefaultRobot::update (float delta)
 
     }
 
-    m_controls.lr = angle_to_control(steer_angle) * difficulty_multiplier;
-
     /*Handle braking*/
     m_controls.brake = false;
     //At the moment this makes the AI brake too much
@@ -248,12 +237,11 @@ void DefaultRobot::update (float delta)
     }
 
     /*Handle rescue*/
-    //If we have been crashing constantly for around 3 seconds, asume
+    //If we have been crashing constantly, asume
     //the kart is stuck and ask for a rescue.
-    if(m_crash_perc > 3.0f)
+    if(m_crash_time > 5.0f)
     {
         m_rescue = true;
-        m_crash_perc = 0.0f;
     }
 
     /*Handle wheelies*/
@@ -320,6 +308,10 @@ void DefaultRobot::update (float delta)
             break;
         }
     }   // if COLLECT_NOTHING
+    
+    
+    m_controls.lr = angle_to_control(steer_angle) * difficulty_multiplier;
+
 
     /*And obviously general kart stuff*/
     Kart::update(delta);
@@ -345,11 +337,17 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     const float CHECK_DIST = world->m_race_setup.m_difficulty == RD_HARD ? 1.35f :
                              1.5f;
 
+    /* The following method of finding if a position is outside of the track
+       is less accurate than calling findRoadSector(), but a lot faster.
+     */
     const int WHEELIE_STEPS = int((m_velocity.xyz[1] * CHECK_DIST)/ KART_LENGTH);
     for(int i = WHEELIE_STEPS; i > STEPS - 1; --i)
     {
         sgAddScaledVec2(step_coord, m_curr_pos.xyz, vel_normal, KART_LENGTH * i);
-        world->m_track->spatialToTrack(step_track_coord, step_coord, m_future_hint);
+
+        world->m_track->spatialToTrack( step_track_coord, step_coord,
+            m_future_hint );
+
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];
 
@@ -368,9 +366,6 @@ void DefaultRobot::handle_race_start()
     //5% in medium and less than 1% of the karts in hard.
     if(m_starting_delay <  0.0f)
     {
-        //FIXME: is this next line really needed?
-        placeModel();
-
         srand((unsigned)time(0));
 
         //Each kart starts at a different, random time, and the time is
@@ -387,6 +382,12 @@ void DefaultRobot::handle_race_start()
             m_starting_delay = (float)rand()/RAND_MAX * 0.15f;
             break;
         }
+
+        //This is used instead of AutoKart::update() because the AI doesn't
+        //needs more. Without this, karts behave a look a little erratic before
+        //the race starts.
+        placeModel();
+
     }
 }
 
@@ -437,8 +438,8 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
     //these values for now, it won't work optimally on big or small karts.
     const float KART_LENGTH = 1.5f;
 
-    sgVec2 vel_normal, step_coord, step_track_coord;
-    SGfloat distance, check_width, kart_distance;
+    sgVec2 vel_normal, step_coord;
+    SGfloat kart_distance;
 
     crashes.clear();
 
@@ -465,17 +466,10 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
                 }
             }
 
-        /*Find if we crash with the track*/
-        m_future_hint = world->m_track->spatialToTrack (step_track_coord,
-                      step_coord, m_future_hint);
-
-        distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
-                   : -step_track_coord[0];
-
-        check_width = world->m_track->getWidth()[m_future_hint] >
-                      world->m_track->getWidth()[m_track_hint]
-                      ? world->m_track->getWidth()[m_track_hint]
-                      : world->m_track->getWidth()[m_future_hint];
+        /*Find if we crash with the drivelines*/
+        int hint = world->m_track->findRoadSector(step_coord);
+        
+        const int UNKNOWN_SECTOR = -1;
 
 #ifdef SHOW_FUTURE_PATH
 
@@ -495,7 +489,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         center[2] = pos[2];
         sphere->setCenter(center);
         sphere->setSize(KART_LENGTH);
-        if(distance + KART_LENGTH * 0.5f > check_width)
+        if(hint != UNKNOWN_SECTOR)
         {
             sgVec4 colour;
             colour[0] = colour[3] = 255;
@@ -511,9 +505,9 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         }
         world->m_scene->addKid(sphere);
 #endif
-
-        if (distance + KART_LENGTH * 0.5f > check_width)
+        if (hint != UNKNOWN_SECTOR)
         {
+            m_future_hint = hint;
             crashes.m_road = true;
             break;
         }
@@ -536,7 +530,8 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
     unsigned int hint = m_track_hint + 1 < DRIVELINE_SIZE ? m_track_hint + 1 : 0;
     int target_hint;
 
-    sgVec2 direction;
+    sgVec2 direction, step_track_coord;
+    SGfloat distance;
     int steps;
 
     //We exit from the function when we have found a solution
@@ -555,8 +550,7 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
         steps = int(sgLengthVec2(direction) / KART_LENGTH);
         if(steps < 1) steps = 1;
 
-        sgVec2 step_coord, step_track_coord;
-        SGfloat distance;
+        sgVec2 step_coord;
 
         sgNormalizeVec2(direction);
 
@@ -565,7 +559,9 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
         {
 
             sgAddScaledVec2(step_coord, m_curr_pos.xyz, direction, KART_LENGTH * i);
-            world->m_track->spatialToTrack (step_track_coord, step_coord, hint);
+
+            world->m_track->spatialToTrack( step_track_coord, step_coord,
+                hint );
 
             distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
                        : -step_track_coord[0];
@@ -573,34 +569,6 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
             //If we are outside, the previous hint is what we are looking for
             if (distance + KART_LENGTH * 0.5f > world->m_track->getWidth()[hint])
             {
-#if 0
-                sgVec2 edge, perpendicular, tangent_point;
-
-                //This would find a closer point to the next curve, but it
-                //gives problems in some tracks so it's disabled for now.
-
-                hint = target_hint;
-                target_hint = target_hint - 1 < 0 ? DRIVELINE_SIZE - 1 :
-                              target_hint - 1;
-                sgSubVec2(edge, world->m_track->m_driveline[hint],
-                          world->m_track->m_driveline[target_hint]);
-
-                perpendicular[0] = edge[1];
-                perpendicular[1] = -edge[0];
-
-                sgNormalizeVec2(perpendicular);
-                sgScaleVec2(perpendicular,
-                            world->m_track->getWidth()[target_hint] - KART_LENGTH);
-
-                if(step_track_coord[0] > 0.0f)
-                    sgAddVec2(tangent_point, world->m_track->m_driveline[
-                                  target_hint], perpendicular);
-                else
-                    sgSubVec2(tangent_point, world->m_track->m_driveline[
-                                  target_hint], perpendicular);
-
-                sgCopyVec2(result, tangent_point);
-#endif
                 sgCopyVec2(result, world->m_track->m_driveline[hint]);
 
 #ifdef SHOW_NON_CRASHING_HINT
@@ -635,33 +603,6 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 }
 
 //-----------------------------------------------------------------------------
-#if 0
-//Not used for now, basicly copy pasting from the kart physics code.
-float DefaultRobot::guess_accel(const float throttle)
-{
-    const float SysResistance   = getRollResistance() * m_velocity.xyz[1];
-    const float AirResistance   = getAirFriction() * m_velocity.xyz[1] * fabs(m_velocity.xyz[1]);
-    const float force           = throttle * getMaxPower();
-
-    const float  mass        = getMass();
-    float effForce     = (force-AirResistance-SysResistance);
-
-    const float gravity     = world->getGravity();
-    const float ForceOnRearTire   = 0.5f*mass*gravity + prevAccel*mass*getHeightCOG()/getWheelBase();
-    const float ForceOnFrontTire  =      mass*gravity - ForceOnRearTire;
-    const float maxGrip           = (ForceOnRearTire > ForceOnFrontTire ?
-                                     ForceOnRearTire : ForceOnFrontTire) * getTireGrip();
-
-    // Slipping: more force than what can be supported by the back wheels
-    // --> reduce the effective force acting on the kart - currently
-    //     by an arbitrary value.
-    while(fabs(effForce)>maxGrip) effForce *= 0.4f;
-
-    return effForce / mass;
-}
-#endif
-
-//-----------------------------------------------------------------------------
 void DefaultRobot::reset()
 {
     m_future_hint = 0;
@@ -671,7 +612,7 @@ void DefaultRobot::reset()
     m_on_curve = false;
     m_handle_curve = false;
 
-    m_crash_perc = 0.0f;
+    m_crash_time = 0.0f;
 
     Kart::reset();
 }
@@ -711,183 +652,8 @@ int DefaultRobot::calc_steps()
     int steps = int(m_velocity.xyz[1] / KART_LENGTH);
     if(steps < min_steps) steps = min_steps;
 
-#if 0
-    //This used to prevent karts from going crazy on tight tracks(like the volcano)
-    //but now it seems it's not necesary.
-    const int MAX_STEPS = int(world->m_track->getWidth()[m_track_hint] * 2.0f) + min_steps;
-    else if(steps > MAX_STEPS) steps = MAX_STEPS;
-#endif
-
     return steps;
 }
-
-//-----------------------------------------------------------------------------
-#if 0
-bool DefaultRobot::handle_tight_curves()
-{
-    if(hint_is_behind(m_next_straight_hint))
-    {
-        m_handle_curve = false;
-        m_on_curve = false;
-    }
-
-    if(!m_handle_curve)
-    {
-        if(m_next_curve_hint != -1) setup_curve_handling();
-    }
-    else
-    {
-        if(hint_is_behind(m_next_curve_hint)) m_handle_curve = false;//m_on_curve = true;
-        return true;
-    }
-
-    return false;
-}
-#endif
-//-----------------------------------------------------------------------------
-#if 0
-bool DefaultRobot::hint_is_behind(const int HINT)
-{
-    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
-    int pos = DRIVELINE_SIZE - int(m_track_hint) + HINT;
-    if(pos > DRIVELINE_SIZE) pos -= DRIVELINE_SIZE;
-    if(pos > DRIVELINE_SIZE * 0.5f) return true;
-
-    return false;
-}
-#endif
-//-----------------------------------------------------------------------------
-#if 0
-int DefaultRobot::find_curve()
-{
-    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
-    float total_dist = 0.0f;
-    int next_hint;
-
-    for(int i = m_track_hint; total_dist < m_velocity.xyz[1]; i = next_hint)
-    {
-        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        total_dist += sgDistanceVec2(world->m_track->m_driveline[i], world->m_track->m_driveline[next_hint]);
-    }
-
-    float ang_diff = world->m_track->m_angle[next_hint] - world->m_track->m_angle[m_track_hint];
-
-    if(fabsf(ang_diff / total_dist) > getMaxSteerAngle() * M_PI / 180.0f)
-    {
-#ifdef AI_DEBUG
-        if(ang_diff > 0.0f)
-            std::cout << "Next curve is LEFT";
-        else
-            std::cout << "Next curve is RIGHT";
-
-
-        std::cout << " with " << ang_diff/*direction*/ << " degrees." << std::endl;
-#endif
-
-        return next_hint;
-    }
-    return -1;
-}
-#endif
-//-----------------------------------------------------------------------------
-#if 0
-int DefaultRobot::find_check_hint()
-{
-    //Find where to start checking for curves
-    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
-    float total_dist = 0.0f;
-    size_t next_hint = m_track_hint;
-
-    for(int i = m_track_hint; total_dist < m_velocity.xyz[1]; i = next_hint)
-    {
-        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        total_dist += sgDistanceVec2(world->m_track->m_driveline[i],world->m_track->m_driveline[next_hint]);
-    }
-
-    return next_hint;
-    //    return m_track_hint;
-}
-#endif
-
-//-----------------------------------------------------------------------------
-#if 0
-void DefaultRobot::setup_curve_handling()
-{
-    size_t next_hint;
-    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
-
-    float total_ang_diff = 0.0f, total_dist = 0.0f;
-    float dist, ang_diff, pos_ang_diff;
-
-    //Find the angle of the curve
-    int i;
-    for(i = m_next_curve_hint; total_dist < m_velocity.xyz[1]; i = next_hint)
-    {
-        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-
-        dist = sgDistanceVec2(world->m_track->m_driveline[i],
-                              world->m_track->m_driveline[next_hint]);
-        total_dist += dist;
-
-        ang_diff = world->m_track->m_angle[next_hint] - world->m_track->m_angle[i];
-        remove_angle_excess(ang_diff);
-
-        pos_ang_diff = ang_diff > 0.0f ? ang_diff : -ang_diff;
-        m_next_straight_hint = i;
-        if(pos_ang_diff < getMaxSteerAngle()) break;
-        total_ang_diff += ang_diff;
-    }
-    m_next_straight_hint = i;
-
-    curve_direction = total_ang_diff > 0.0f ? LEFT : RIGHT;
-
-    if(total_ang_diff < 0.0f) total_ang_diff = -total_ang_diff;
-    //If the curve is has more than 90.0f degrees
-    if(total_ang_diff > 90.0f)
-    {
-        total_ang_diff = total_ang_diff / total_dist;
-
-        //FIXME: getSteerAngle should be replaced by how much the kart can steer
-        if(total_ang_diff < getMaxSteerAngle()) m_handle_curve = false;
-        else m_handle_curve = true;
-    }
-    else m_handle_curve = false;
-
-}
-#endif
-//-----------------------------------------------------------------------------
-#if 0
-float DefaultRobot::steer_for_tight_curve()
-{
-    const float PERCENTAGE = m_curr_track_coords[0] /
-                             world->m_track->getWidth()[m_track_hint];
-    const size_t NEXT_HINT = m_track_hint + 1 <
-                             world->m_track->m_driveline.size() ? m_track_hint + 1 : 0;
-
-    if(!m_on_curve)
-    {
-        if(curve_direction == LEFT)
-        {
-            if(PERCENTAGE < 0.5f)
-                return steer_to_angle(NEXT_HINT, -22.5f);
-        }
-        else if(PERCENTAGE > -0.5f)
-            return steer_to_angle(NEXT_HINT, 22.5f);
-    }
-    else
-    {
-        if(curve_direction == RIGHT)
-        {
-            if(PERCENTAGE < 0.333f)
-                return steer_to_angle(NEXT_HINT, -90.0f);
-        }
-        else if(PERCENTAGE > -0.333f)
-            return steer_to_angle(NEXT_HINT, 90.0f);
-    }
-
-    return steer_to_angle(NEXT_HINT, 0.0f);
-}
-#endif
 
 /** Translates coordinates from an angle(in degrees) to values within the range
  *  of -1.0 to 1.0 to use the same format as the KartControl::lr variable.
@@ -901,4 +667,3 @@ float DefaultRobot::angle_to_control(float angle)
 
     return angle;
 }
-

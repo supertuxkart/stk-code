@@ -27,7 +27,7 @@ private:
 
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
-    float m_crash_perc;
+    float m_crash_time;
 
     float m_time_since_last_shot;
     size_t m_future_hint;
@@ -65,21 +65,6 @@ private:
     int calc_steps();
 
     float angle_to_control(float angle);
-#if 0
-    //Functions currently not being used, but that might be useful in the future.
-    int find_check_hint();
-    float guess_accel (const float throttle);
-    bool handle_tight_curves();
-    bool hint_is_behind(const int HINT);
-    int find_curve();
-    void setup_curve_handling();
-    float steer_for_tight_curve();
-#endif
-
-#if 0
-    enum Direction {LEFT, RIGHT};
-    Direction curve_direction;
-#endif
 
 public:
     DefaultRobot(const KartProperties *kart_properties, int position,

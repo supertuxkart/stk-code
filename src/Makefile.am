@@ -72,7 +72,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	moveable.cpp 		   moveable.hpp             	\
 	ssg_help.cpp               ssg_help.hpp                 \
 	kart.cpp		   kart.hpp		        \
-	auto_kart.cpp		   auto_kart.hpp             	\
+	            		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
 	projectile.cpp 		   projectile.hpp	        \
 	history.cpp		   history.hpp	        	\

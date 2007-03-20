@@ -43,6 +43,23 @@ private:
     std::string m_filename;
 
 public:
+    enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
+    const int QUAD_TRI_NONE;
+    const int QUAD_TRI_FIRST;
+    const int QUAD_TRI_SECOND;
+    const int UNKNOWN_SECTOR;
+
+    struct SegmentTriangle
+    {
+        int segment;
+        int triangle;
+    
+        SegmentTriangle
+        (
+            int _segment,
+            int _triangle
+        ) : segment(_segment), triangle(_triangle) {};
+    };
 
     std::string m_name;
     sgVec4      m_sky_color;
@@ -56,7 +73,6 @@ public:
     sgVec4      m_specular_col;
     sgVec4      m_diffuse_col;
 
-public:
     /** sgVec3 is a float[3] array, so unfortunately we can't put it in a
     * std::vector because it lacks a copy-constructor, this hack should help...
     */
@@ -106,18 +122,24 @@ public:
           m_scale_y;        // track2dWidth/Heightheigth
     bool m_do_stretch;      // 2d track display might be stretched to fit better
 
-public:
     Track            (std::string filename,float w=100,
                       float h=100, bool stretch=1);
     ~Track            ();
+
     void               draw2Dview       (float x_offset,
-                                         float y_offset              ) const ;
+                                         float y_offset              ) const;
     void               drawScaled2D     (float x, float y, float w,
-                                         float h                     ) const ;
-    int                absSpatialToTrack(sgVec2 dst, sgVec3 xyz      ) const ;
-    void               trackToSpatial   (sgVec3 xyz, int last_hint   ) const ;
-    int                spatialToTrack   (sgVec2 last_pos, sgVec3 xyz,
-                                         int hint                    ) const ;
+                                         float h                     ) const;
+
+    int                findSector       (const sgVec3 XYZ,
+                                         const RoadSide SIDE         ) const;
+    int                findRoadSector   (const sgVec3 XYZ            ) const;
+    int                findOutOfRoadSector(const sgVec3 XYZ,
+                                          const RoadSide SIDE        ) const;
+    void               spatialToTrack   (sgVec2 dst,
+                                         const sgVec2 POS,
+                                         const int SECTOR            ) const;
+    void               trackToSpatial   (sgVec3 xyz, const int HINT  ) const;
 
     float              getGravity       () const {return m_gravity;       }
     float              getTrackLength   () const {return m_total_distance;}
@@ -153,6 +175,11 @@ private:
     void loadDriveline                  ();
     void readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
                                          const std::string& file_ext      );
+
+    float pointSideToLine( const sgVec2 L1, const sgVec2 L2,
+        const sgVec2 P ) const;
+    int pointInQuad( const sgVec2 A, const sgVec2 B,
+        const sgVec2 C, const sgVec2 D, const sgVec2 POINT ) const;
 }
 ;   // class Track
 
