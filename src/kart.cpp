@@ -335,10 +335,10 @@ void Kart::reset()
     m_num_herrings_gobbled = 0;
     m_wheel_position       = 0;
 
-    m_track_hint = world->m_track->findSector(m_curr_pos.xyz,
+    m_track_sector = world->m_track->findSector(m_curr_pos.xyz,
         Track::RS_DONT_KNOW);
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
-        m_track_hint );
+        m_track_sector );
         
 #ifdef BULLET
     btTransform *trans=new btTransform();
@@ -556,10 +556,10 @@ void Kart::update (float dt)
     Moveable::update (dt) ;
     doObjectInteractions();
 
-    m_track_hint = world->m_track->findSector(m_curr_pos.xyz,
+    m_track_sector = world->m_track->findSector(m_curr_pos.xyz,
         m_curr_track_coords[0] > 0.0 ? Track::RS_RIGHT : Track::RS_LEFT);
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
-        m_track_hint );
+        m_track_sector );
 
     doLapCounting () ;
     processSkidMarks();
@@ -956,9 +956,9 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const
  */
 void Kart::endRescue()
 {
-    if ( m_track_hint > 0 ) m_track_hint-- ;
-    world ->m_track -> trackToSpatial ( m_curr_pos.xyz, m_track_hint ) ;
-    m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_hint] ;
+    if ( m_track_sector > 0 ) m_track_sector-- ;
+    world ->m_track -> trackToSpatial ( m_curr_pos.xyz, m_track_sector ) ;
+    m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_sector] ;
     m_rescue = false ;
 #ifdef BULLET
     world->getPhysics()->addKart(this, m_vehicle);

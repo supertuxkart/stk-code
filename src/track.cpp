@@ -313,9 +313,9 @@ void Track::spatialToTrack
 }
 
 //-----------------------------------------------------------------------------
-void Track::trackToSpatial ( sgVec3 xyz, const int HINT ) const
+void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
 {
-    sgCopyVec3 ( xyz, m_driveline [ HINT ] ) ;
+    sgCopyVec3 ( xyz, m_driveline [ SECTOR ] ) ;
 }
 
 /** It's not the nicest solution to have two very similar version of a function,
@@ -743,7 +743,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         throw std::runtime_error(msg);
     }
 
-    int prev_hint = -1;
+    int prev_sector = -1;
     SGfloat prev_distance = 1.51f;
     while(!feof(fd))
     {
@@ -771,29 +771,29 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         point[1] = y;
         point[2] = z;
 
-        if(prev_hint != -1) prev_distance = sgDistanceVec2 ( point, line[prev_hint]);
+        if(prev_sector != -1) prev_distance = sgDistanceVec2 ( point, line[prev_sector]);
 
         //1.5f was choosen because it's more or less the length of the tuxkart
         if(prev_distance == 0)
         {
             fprintf(stderr, "File %s point %d is duplicated!.\n",
-                    path.c_str(), prev_hint+1);
+                    path.c_str(), prev_sector+1);
         }
         else if(prev_distance < 1.5f)
         {
             fprintf(stderr,"File %s point %d is too close(<1.5) to previous point.\n",
-                    path.c_str(), prev_hint + 1);
+                    path.c_str(), prev_sector + 1);
         }
 #if 0
         if(prev_distance > 15.0f)
         {
             fprintf(stderr,"In file %s point %d is too far(>15.0) from next point at %d.\n",
-                    path, prev_hint, prev_distance);
+                    path, prev_sector, prev_distance);
         }
 #endif
 
         line.push_back(point);
-        ++prev_hint;
+        ++prev_sector;
         prev_distance -= 1.5f;
     }
 

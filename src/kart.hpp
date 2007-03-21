@@ -82,7 +82,7 @@ protected:
     int          m_grid_position;
     int          m_race_position;
     KartControl  m_controls;           // The position of the karts controlls
-    unsigned int m_track_hint;          // index in driveline
+    unsigned int m_track_sector;          // index in driveline
     float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
     sgVec2       m_curr_track_coords;
@@ -161,7 +161,7 @@ public:
     void           setCollectable      (collectableType t, int n)
     { m_collectable.set(t, n);            }
     void           setPosition         (int p)    {m_race_position = p;          }
-    int            getHint             () { return m_track_hint;                 }
+    int            getSector             () { return m_track_sector;                 }
     float          getDistanceDownTrack() { return m_curr_track_coords[1];       }
     float          getDistanceToCenter () { return m_curr_track_coords[0];       }
     Attachment    *getAttachment       () { return &m_attachment;                }

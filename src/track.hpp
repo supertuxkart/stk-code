@@ -139,7 +139,7 @@ public:
     void               spatialToTrack   (sgVec2 dst,
                                          const sgVec2 POS,
                                          const int SECTOR            ) const;
-    void               trackToSpatial   (sgVec3 xyz, const int HINT  ) const;
+    void               trackToSpatial   (sgVec3 xyz, const int SECTOR) const;
 
     float              getGravity       () const {return m_gravity;       }
     float              getTrackLength   () const {return m_total_distance;}

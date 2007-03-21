@@ -30,12 +30,12 @@ private:
     float m_crash_time;
 
     float m_time_since_last_shot;
-    size_t m_future_hint;
+    size_t m_future_sector;
 
     float m_starting_delay;
 
-    int m_next_curve_hint;
-    int m_next_straight_hint;
+    int m_next_curve_sector;
+    int m_next_straight_sector;
     bool m_on_curve;
     bool m_handle_curve;
 
@@ -54,7 +54,7 @@ private:
 
     void handle_race_start();
 
-    float steer_to_angle(const size_t HINT, const float ANGLE);
+    float steer_to_angle(const size_t SECTOR, const float ANGLE);
     float steer_to_point(const sgVec2 POINT);
 
     bool do_wheelie(const int STEPS);

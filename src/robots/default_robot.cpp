@@ -26,8 +26,8 @@
 //checks for crashes with the outside of the track.
 #define ERASE_PATH   //If not defined, the spheres drawn in the future path
 //won't be erased the next time the function is called.
-#define SHOW_NON_CRASHING_HINT //If defined, draws a green sphere where the
-//nfarthest non-crashing hint is.
+#define SHOW_NON_CRASHING_SECTOR //If defined, draws a green sphere where the
+//nfarthest non-crashing sector is.
 #include <plib/ssgAux.h>
 #endif
 
@@ -45,9 +45,9 @@ DefaultRobot::DefaultRobot(const KartProperties *kart_properties, int position,
     AutoKart(kart_properties, position, init_pos)
 {
     m_time_since_last_shot = 0.0f;
-    m_future_hint = 0;
-    m_next_curve_hint = -1;
-    m_next_straight_hint = -1;
+    m_future_sector = 0;
+    m_next_curve_sector = -1;
+    m_next_straight_sector = -1;
     m_on_curve = false;
     m_handle_curve = false;
     start_kart_crash_direction = 0;
@@ -81,7 +81,7 @@ void DefaultRobot::update (float delta)
     //Store the number of points the driveline has
     const size_t DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
-    const size_t NEXT_HINT = m_track_hint + 1 < DRIVELINE_SIZE ? m_track_hint + 1 : 0;
+    const size_t NEXT_SECTOR = m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
 
     const float KART_LENGTH = 1.5f;
 
@@ -115,9 +115,9 @@ void DefaultRobot::update (float delta)
     float steer_angle = 0.0f;
 
     //If the kart is outside of the track steer back to it
-    if(DIST_TO_CENTER + KART_LENGTH * 0.5f > world->m_track->getWidth()[m_track_hint])
+    if(DIST_TO_CENTER + KART_LENGTH * 0.5f > world->m_track->getWidth()[m_track_sector])
     {
-        steer_angle = steer_to_point(world->m_track->m_driveline[NEXT_HINT]);
+        steer_angle = steer_to_point(world->m_track->m_driveline[NEXT_SECTOR]);
 
 #ifdef AI_DEBUG
         std::cout << "Action: Steer towards center." << std::endl;
@@ -142,7 +142,7 @@ void DefaultRobot::update (float delta)
     //in the same direction of the track
     else if(crashes.m_road)// && world->m_race_setup.m_difficulty != RD_HARD)
     {
-        steer_angle = steer_to_angle(m_track_hint, 0.0f);
+        steer_angle = steer_to_angle(m_track_sector, 0.0f);
 
 #ifdef AI_DEBUG
         std::cout << "Action: Avoid crashing with the track." << std::endl;
@@ -153,12 +153,12 @@ void DefaultRobot::update (float delta)
     {
         if(start_kart_crash_direction == 1) //-1 = left, 1 = right, 0 = no crash.
         {
-            steer_angle = steer_to_angle(NEXT_HINT, -90.0f);
+            steer_angle = steer_to_angle(NEXT_SECTOR, -90.0f);
             start_kart_crash_direction = 0;
         }
         else if(start_kart_crash_direction == -1)
         {
-            steer_angle = steer_to_angle(NEXT_HINT, 90.0f);
+            steer_angle = steer_to_angle(NEXT_SECTOR, 90.0f);
             start_kart_crash_direction = 0;
         }
         else
@@ -166,12 +166,12 @@ void DefaultRobot::update (float delta)
             if(m_curr_track_coords[0] > world->getKart(crashes.m_kart)->
                getDistanceToCenter())
             {
-                steer_angle = steer_to_angle(NEXT_HINT, -90.0f);
+                steer_angle = steer_to_angle(NEXT_SECTOR, -90.0f);
                 start_kart_crash_direction = 1;
             }
             else
             {
-                steer_angle = steer_to_angle(NEXT_HINT, 90.0f);
+                steer_angle = steer_to_angle(NEXT_SECTOR, 90.0f);
                 start_kart_crash_direction = -1;
             }
         }
@@ -199,7 +199,7 @@ void DefaultRobot::update (float delta)
 
             //Remain parallel to the track
         case RD_MEDIUM:
-            steer_angle = steer_to_angle(NEXT_HINT, 0.0f);
+            steer_angle = steer_to_angle(NEXT_SECTOR, 0.0f);
             break;
 
             //Just drive in a straight line
@@ -267,7 +267,7 @@ void DefaultRobot::update (float delta)
             {
             case COLLECT_ZIPPER:
                 {
-                    float angle = fabsf(world->m_track->m_angle[m_track_hint]-
+                    float angle = fabsf(world->m_track->m_angle[m_track_sector]-
                                         m_curr_pos.hpr[0]);
                     if(m_time_since_last_shot > 10.0f && angle < 30.0f &&
                        !crashes.m_road && STEPS > 2)
@@ -346,12 +346,12 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
         sgAddScaledVec2(step_coord, m_curr_pos.xyz, vel_normal, KART_LENGTH * i);
 
         world->m_track->spatialToTrack( step_track_coord, step_coord,
-            m_future_hint );
+            m_future_sector );
 
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];
 
-        if (distance > world->m_track->getWidth()[m_track_hint]) return false;
+        if (distance > world->m_track->getWidth()[m_track_sector]) return false;
     }
 
     return true;
@@ -392,12 +392,12 @@ void DefaultRobot::handle_race_start()
 }
 
 //-----------------------------------------------------------------------------
-float DefaultRobot::steer_to_angle (const size_t HINT, const float ANGLE)
+float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
 {
-    float dist1 = sgDistanceVec2(world->m_track->m_driveline[HINT], m_curr_pos.xyz);
-    float dist2 = sgDistanceVec2(world->m_track->m_driveline[m_track_hint], m_curr_pos.xyz);
-    float angle = (world->m_track->m_angle[HINT] * dist1 +
-                   world->m_track->m_angle[m_track_hint] * dist2) / (dist1 + dist2);
+    float dist1 = sgDistanceVec2(world->m_track->m_driveline[SECTOR], m_curr_pos.xyz);
+    float dist2 = sgDistanceVec2(world->m_track->m_driveline[m_track_sector], m_curr_pos.xyz);
+    float angle = (world->m_track->m_angle[SECTOR] * dist1 +
+                   world->m_track->m_angle[m_track_sector] * dist2) / (dist1 + dist2);
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_curr_pos.hpr[0];
@@ -467,7 +467,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
             }
 
         /*Find if we crash with the drivelines*/
-        int hint = world->m_track->findRoadSector(step_coord);
+        int sector = world->m_track->findRoadSector(step_coord);
         
         const int UNKNOWN_SECTOR = -1;
 
@@ -489,7 +489,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         center[2] = pos[2];
         sphere->setCenter(center);
         sphere->setSize(KART_LENGTH);
-        if(hint != UNKNOWN_SECTOR)
+        if(sector != UNKNOWN_SECTOR)
         {
             sgVec4 colour;
             colour[0] = colour[3] = 255;
@@ -505,9 +505,9 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         }
         world->m_scene->addKid(sphere);
 #endif
-        if (hint != UNKNOWN_SECTOR)
+        if (sector != UNKNOWN_SECTOR)
         {
-            m_future_hint = hint;
+            m_future_sector = sector;
             crashes.m_road = true;
             break;
         }
@@ -515,7 +515,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
 }
 
 //-----------------------------------------------------------------------------
-//Find the hint that at the longest distance from the kart, that can be
+//Find the sector that at the longest distance from the kart, that can be
 //driven to without crashing with the track, then find towards which of
 //the two edges of the track is closest to the next curve after wards,
 //and return the position of that edge.
@@ -527,8 +527,8 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 
     const unsigned int DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
-    unsigned int hint = m_track_hint + 1 < DRIVELINE_SIZE ? m_track_hint + 1 : 0;
-    int target_hint;
+    unsigned int sector = m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
+    int target_sector;
 
     sgVec2 direction, step_track_coord;
     SGfloat distance;
@@ -537,15 +537,15 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
     //We exit from the function when we have found a solution
     while(1)
     {
-        //target_hint is the hint at the longest distance that we can drive
+        //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_hint = hint + 1 < DRIVELINE_SIZE ? hint + 1 : 0;
+        target_sector = sector + 1 < DRIVELINE_SIZE ? sector + 1 : 0;
         /*
-                target_hint = next_hint + count < DRIVELINE_SIZE ?
-                    next_hint + count : next_hint + count - DRIVELINE_SIZE;*/
+                target_sector = next_sector + count < DRIVELINE_SIZE ?
+                    next_sector + count : next_sector + count - DRIVELINE_SIZE;*/
 
-        //direction is a vector from our kart to the hints we are testing
-        sgSubVec2(direction, world->m_track->m_driveline[target_hint], m_curr_pos.xyz);
+        //direction is a vector from our kart to the sectors we are testing
+        sgSubVec2(direction, world->m_track->m_driveline[target_sector], m_curr_pos.xyz);
 
         steps = int(sgLengthVec2(direction) / KART_LENGTH);
         if(steps < 1) steps = 1;
@@ -554,24 +554,24 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 
         sgNormalizeVec2(direction);
 
-        //Test if we crash if we drive towards the target hint
+        //Test if we crash if we drive towards the target sector
         for(int i = 2; i < steps; ++i)
         {
 
             sgAddScaledVec2(step_coord, m_curr_pos.xyz, direction, KART_LENGTH * i);
 
             world->m_track->spatialToTrack( step_track_coord, step_coord,
-                hint );
+                sector );
 
             distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
                        : -step_track_coord[0];
 
-            //If we are outside, the previous hint is what we are looking for
-            if (distance + KART_LENGTH * 0.5f > world->m_track->getWidth()[hint])
+            //If we are outside, the previous sector is what we are looking for
+            if (distance + KART_LENGTH * 0.5f > world->m_track->getWidth()[sector])
             {
-                sgCopyVec2(result, world->m_track->m_driveline[hint]);
+                sgCopyVec2(result, world->m_track->m_driveline[sector]);
 
-#ifdef SHOW_NON_CRASHING_HINT
+#ifdef SHOW_NON_CRASHING_SECTOR
                 ssgaSphere *sphere = new ssgaSphere;
 
                 static ssgaSphere *last_sphere = 0;
@@ -598,17 +598,17 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
                 return;
             }
         }
-        hint = target_hint;
+        sector = target_sector;
     }
 }
 
 //-----------------------------------------------------------------------------
 void DefaultRobot::reset()
 {
-    m_future_hint = 0;
+    m_future_sector = 0;
     m_starting_delay = -1.0f;
-    m_next_curve_hint = -1;
-    m_next_straight_hint = -1;
+    m_next_curve_sector = -1;
+    m_next_straight_sector = -1;
     m_on_curve = false;
     m_handle_curve = false;
 
