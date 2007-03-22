@@ -42,8 +42,7 @@ struct KartControl
     bool  rescue;
     bool  fire;
 
-    KartControl() : buttons(0), presses(0),
-            releases(0), lr(0.0f), accel(0.0f), brake(false),
+    KartControl() : lr(0.0f), accel(0.0f), brake(false),
     wheelie(false), jump(false),  rescue(false), fire(false){}
 };
 
