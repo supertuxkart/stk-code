@@ -95,10 +95,6 @@ void DefaultRobot::update (float delta)
     const int STEPS = calc_steps();
     check_crashes(STEPS, m_curr_pos.xyz);
 
-    //Store the absolute distance to the center of the track
-    const float DIST_TO_CENTER = m_curr_track_coords[0] > 0.0f ?
-                                 m_curr_track_coords[0] : -m_curr_track_coords[0];
-
     //Store the number of points the driveline has
     const size_t DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
@@ -116,11 +112,12 @@ void DefaultRobot::update (float delta)
         if(m_race_position > world->getPlayerKart(i)->getPosition())
             player_winning = true;
 
+
     /*Steer based on the information we just gathered*/
     float steer_angle = 0.0f;
 
     //If the kart is outside of the track steer back to it
-    if(DIST_TO_CENTER + KART_LENGTH * 0.5f > world->m_track->getWidth()[m_track_sector])
+    if( m_on_road )
     {
         steer_angle = steer_to_point(world->m_track->m_driveline[NEXT_SECTOR]);
 
@@ -459,8 +456,6 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         /*Find if we crash with the drivelines*/
         int sector = world->m_track->findRoadSector(step_coord);
 
-        const int UNKNOWN_SECTOR = -1;
-
 #ifdef SHOW_FUTURE_PATH
 
         ssgaSphere *sphere = new ssgaSphere;
@@ -479,7 +474,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         center[2] = pos[2];
         sphere->setCenter(center);
         sphere->setSize(KART_LENGTH);
-        if(sector == UNKNOWN_SECTOR)
+        if(sector == Track::UNKNOWN_SECTOR)
         {
             sgVec4 colour;
             colour[0] = colour[3] = 255;
@@ -495,7 +490,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         }
         world->m_scene->addKid(sphere);
 #endif
-        if (sector == UNKNOWN_SECTOR)
+        if (sector == Track::UNKNOWN_SECTOR)
         {
             m_future_sector = sector;
             crashes.m_road = true;

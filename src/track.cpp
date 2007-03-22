@@ -27,9 +27,7 @@
 #include "lisp/parser.hpp"
 #include "translation.hpp"
 
-Track::Track( std::string filename_, float w, float h, bool stretch ) :
-    QUAD_TRI_NONE(-1), QUAD_TRI_FIRST(1), QUAD_TRI_SECOND(2),
-    UNKNOWN_SECTOR(-1)
+Track::Track( std::string filename_, float w, float h, bool stretch )
 {
     m_filename        = filename_;
     m_herring_style   = "";
@@ -79,7 +77,7 @@ int Track::pointInQuad
         pointSideToLine( B, C, POINT ) > 0.0 &&
         pointSideToLine( C, A, POINT ) > 0.0 )
         return QUAD_TRI_FIRST;
-    
+
     //Test the second triangle
     if( pointSideToLine( C, D, POINT ) > 0.0 &&
         pointSideToLine( D, A, POINT ) > 0.0 &&
@@ -92,6 +90,9 @@ int Track::pointInQuad
 /** findRoadSector returns in which sector on the road the position
  *  xyz is. If xyz is not on top of the road, it returns
  *  UNKNOWN_SECTOR.
+ *
+ *  The 'sector' could be defined as the number of the closest track
+ *  segment to XYZ.
  */
 int Track::findRoadSector( const sgVec3 XYZ )const
 {
@@ -108,7 +109,7 @@ int Track::findRoadSector( const sgVec3 XYZ )const
         next = i + 1 <  DRIVELINE_SIZE ? i + 1 : 0;
         triangle = pointInQuad( m_left_driveline[i], m_right_driveline[i],
             m_right_driveline[next], m_left_driveline[next], XYZ );
-    
+
         if (triangle != QUAD_TRI_NONE)
         {
             possible_segment_tris.push_back(SegmentTriangle(i, triangle));
@@ -161,7 +162,7 @@ int Track::findRoadSector( const sgVec3 XYZ )const
 
              /* sgHeightAbovePlaneVec3 gives a negative dist if the plane
                 is on top, so we have to rule it out.
-                
+
                 However, for some reason there are cases where we get
                 negative values for the track segment we should be on,
                 so we just use the absolute values, since the track
@@ -209,7 +210,7 @@ int Track::findRoadSector( const sgVec3 XYZ )const
  */
 int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
 {
-    int sector = -1;
+    int sector = UNKNOWN_SECTOR;
     float dist;
     float nearest_dist = 99999;
     const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
@@ -249,27 +250,6 @@ int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
     return sector;
 }
 
-/** This function returns in which 'sector' the position XYZ is, which could
- *  be defined as the number of the closest track segment. 
- *
- *  The argument SIDE is used to speed up the search, if it is not known
- *  then the speedup is not used.
- */
-int Track::findSector( const sgVec3 XYZ, const RoadSide SIDE ) const
-{
-    int sector = findRoadSector( XYZ );
-
-    /* If sector == UNKNOWN_SECTOR, then xyz is not on top of the road, so
-       we need a method to find the sector outside of the road.
-     */
-    if( sector == UNKNOWN_SECTOR)
-    {
-        sector = findOutOfRoadSector( XYZ, SIDE);
-    }
-
-    return sector;
-}
-
 /** spatialToTrack() takes absolute coordinates (coordinates in OpenGL
  *  space) and transforms them into coordinates based on the track. It is
  *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
@@ -282,7 +262,7 @@ void Track::spatialToTrack
     const sgVec2 POS,
     const int SECTOR
 ) const
-{   
+{
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
     const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
     const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
@@ -743,7 +723,7 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         throw std::runtime_error(msg);
     }
 
-    int prev_sector = -1;
+    int prev_sector = UNKNOWN_SECTOR;
     SGfloat prev_distance = 1.51f;
     while(!feof(fd))
     {
@@ -771,7 +751,8 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
         point[1] = y;
         point[2] = z;
 
-        if(prev_sector != -1) prev_distance = sgDistanceVec2 ( point, line[prev_sector]);
+        if(prev_sector != UNKNOWN_SECTOR) prev_distance = sgDistanceVec2(
+            point, line[prev_sector] );
 
         //1.5f was choosen because it's more or less the length of the tuxkart
         if(prev_distance == 0)

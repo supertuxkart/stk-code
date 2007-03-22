@@ -44,16 +44,20 @@ private:
 
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
-    const int QUAD_TRI_NONE;
-    const int QUAD_TRI_FIRST;
-    const int QUAD_TRI_SECOND;
-    const int UNKNOWN_SECTOR;
+
+    //An enum is not used for the QUAD_TRI_* constants because of limitations
+    //of the conversion between enums and ints.
+    static const int QUAD_TRI_NONE = -1;
+    static const int QUAD_TRI_FIRST = 1;
+    static const int QUAD_TRI_SECOND = 2;
+
+    static const int UNKNOWN_SECTOR = -1;
 
     struct SegmentTriangle
     {
         int segment;
         int triangle;
-    
+
         SegmentTriangle
         (
             int _segment,
@@ -108,7 +112,7 @@ public:
 	//Left and Right drivelines for overhead map rendering.
 	//(Should probably be private as they are only use internally right now)
     std::vector<sgVec3Wrapper> m_left_driveline;
-    std::vector<sgVec3Wrapper> m_right_driveline;  
+    std::vector<sgVec3Wrapper> m_right_driveline;
 
     sgVec2 m_driveline_min;
     sgVec2 m_driveline_max;
@@ -131,8 +135,6 @@ public:
     void               drawScaled2D     (float x, float y, float w,
                                          float h                     ) const;
 
-    int                findSector       (const sgVec3 XYZ,
-                                         const RoadSide SIDE         ) const;
     int                findRoadSector   (const sgVec3 XYZ            ) const;
     int                findOutOfRoadSector(const sgVec3 XYZ,
                                           const RoadSide SIDE        ) const;

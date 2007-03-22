@@ -68,6 +68,9 @@ public:
 class Kart : public Moveable
 {
 protected:
+    bool         m_on_road;            //true if the kart is on top of the
+                                       //road path drawn by the drivelines
+
     Attachment   m_attachment;
     Collectable  m_collectable;
 

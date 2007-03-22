@@ -335,11 +335,24 @@ void Kart::reset()
     m_num_herrings_gobbled = 0;
     m_wheel_position       = 0;
 
-    m_track_sector = world->m_track->findSector(m_curr_pos.xyz,
-        Track::RS_DONT_KNOW);
+    m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
+
+    //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
+    //the road, so we have to use another function to find the sector.
+    if (m_track_sector == Track::UNKNOWN_SECTOR )
+    {
+        m_on_road = false;
+        m_track_sector = world->m_track->findOutOfRoadSector(
+            m_curr_pos.xyz, Track::RS_DONT_KNOW );
+    }
+    else
+    {
+        m_on_road = true;
+    }
+
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
         m_track_sector );
-        
+
 #ifdef BULLET
     btTransform *trans=new btTransform();
     trans->setIdentity();
@@ -556,8 +569,24 @@ void Kart::update (float dt)
     Moveable::update (dt) ;
     doObjectInteractions();
 
-    m_track_sector = world->m_track->findSector(m_curr_pos.xyz,
-        m_curr_track_coords[0] > 0.0 ? Track::RS_RIGHT : Track::RS_LEFT);
+
+    m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
+
+    if (m_track_sector == Track::UNKNOWN_SECTOR )
+    {
+        m_on_road = false;
+        if( m_curr_track_coords[0] > 0.0 )
+            m_track_sector = world->m_track->findOutOfRoadSector(
+               m_curr_pos.xyz, Track::RS_RIGHT );
+        else
+            m_track_sector = world->m_track->findOutOfRoadSector(
+               m_curr_pos.xyz, Track::RS_LEFT );
+    }
+    else
+    {
+        m_on_road = true;
+    }
+
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
         m_track_sector );
 
