@@ -39,8 +39,9 @@ EmptyRobot::EmptyRobot(const KartProperties *kart_properties, int position,
     AutoKart(kart_properties, position, init_pos)
 {
     //This is called just once per *competition*
-}
 
+    reset();
+}
 //-----------------------------------------------------------------------------
 void EmptyRobot::update (float delta)
 {
@@ -53,6 +54,14 @@ void EmptyRobot::reset()
 {
     //This function is called at the beginning of *each race*
 
+    m_controls.lr      = 0.0;
+    m_controls.accel   = false;
+    m_controls.brake   = false;
+    m_controls.brake   = false;
+    m_controls.wheelie = false;
+    m_controls.jump    = false;
+    m_controls.rescue  = false;
+    m_controls.fire    = false;
     /*General kart stuff*/
     AutoKart::reset();
 }
