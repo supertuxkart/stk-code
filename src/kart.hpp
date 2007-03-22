@@ -22,7 +22,6 @@
 #define HEADER_KART_H
 
 #include <plib/sg.h>
-#include <plib/js.h>
 
 #include "moveable.hpp"
 #include "particle_system.hpp"
@@ -33,14 +32,8 @@
 #include "btBulletDynamicsCommon.h"
 #endif
 
-//TODO: move the data, buttons, presses and releases variables out of the
-//KartControl struct because they are joystick specific.
 struct KartControl
 {
-    float data [ _JS_MAX_AXES ];
-    int   buttons;
-    int   presses;
-    int   releases;
     float lr;
     float accel;
     bool  brake;
@@ -81,7 +74,7 @@ protected:
 
     int          m_grid_position;
     int          m_race_position;
-    KartControl  m_controls;           // The position of the karts controlls
+    KartControl  m_controls;           // The position of the karts controls
     unsigned int m_track_sector;          // index in driveline
     float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
