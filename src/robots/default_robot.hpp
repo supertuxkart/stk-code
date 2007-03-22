@@ -24,7 +24,38 @@
 class DefaultRobot : public AutoKart
 {
 private:
+    enum StraightTactic
+    {
+        ST_DONT_STEER,  //In straight roads, don't steer at all
+        ST_PARALLEL,    //Stay parallel to the road
+        ST_FAREST_POINT //Drive towards the farest non-crashing point
+    };
 
+    enum ItemTactic
+    {
+        IT_TEN_SECONDS, //Fire after 10 seconds have passed, since the item
+                        //was grabbed.
+        IT_CALCULATE //Aim carefully, check for enough space for boosters,
+                     //and that other conditions are meet before firing.
+    };
+
+    /*Difficulty handling variables*/
+    float m_max_speed; //The allowed maximum speed, in percentage,
+                       //from 0.0 to 1.0
+    StraightTactic m_straights_tactic; //How to steer on straight roads
+    bool m_use_wheelies; //Is the AI allowed to use wheelies?
+    float m_wheelie_check_dist; //How far to check for the space needed for
+                                //wheelies, in percentage
+    ItemTactic m_item_tactic; //How are items going to be used?
+    float m_max_start_delay; //Delay before accelerating at the start of each
+                             //race
+    int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
+                     //even has check around the kart, if 1, it checks around
+                     //the kart always, and more than that will check the
+                     //remaining number of steps in front of the kart, always
+
+
+    /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
@@ -61,7 +92,7 @@ private:
     void check_crashes(const int STEPS, sgVec3 pos);
     void find_non_crashing_point(sgVec2 result);
 
-    void remove_angle_excess (float &angle);
+    float normalize_angle (float angle);
     int calc_steps();
 
     float angle_to_control(float angle);

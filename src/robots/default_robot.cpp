@@ -40,26 +40,48 @@
 
 #include "default_robot.hpp"
 
-DefaultRobot::DefaultRobot(const KartProperties *kart_properties, int position,
-                   sgCoord init_pos) :
+DefaultRobot::DefaultRobot(const KartProperties *kart_properties,
+                           int position, sgCoord init_pos) :
     AutoKart(kart_properties, position, init_pos)
 {
     m_time_since_last_shot = 0.0f;
-    m_future_sector = 0;
-    m_next_curve_sector = -1;
-    m_next_straight_sector = -1;
-    m_on_curve = false;
-    m_handle_curve = false;
     start_kart_crash_direction = 0;
-
-    m_crash_time = 0.0;
     reset();
+
+    switch( world->m_race_setup.m_difficulty )
+    {
+    case RD_EASY:
+        m_max_speed = 0.9f;
+        m_straights_tactic = ST_DONT_STEER;
+        m_use_wheelies = false;
+        m_wheelie_check_dist = 0.0;
+        m_item_tactic = IT_TEN_SECONDS;
+        m_max_start_delay = 0.5;
+        m_min_steps = 0;
+        break;
+    case RD_MEDIUM:
+        m_max_speed = 0.95f;
+        m_straights_tactic = ST_PARALLEL;
+        m_use_wheelies = true;
+        m_wheelie_check_dist = 0.8;
+        m_item_tactic = IT_CALCULATE;
+        m_max_start_delay = 0.4;
+        m_min_steps = 1;
+        break;
+    case RD_HARD:
+        m_max_speed = 1.0f;
+        m_straights_tactic = ST_FAREST_POINT;
+        m_use_wheelies = true;
+        m_wheelie_check_dist = 1.0;
+        m_item_tactic = IT_CALCULATE;
+        m_max_start_delay = 0.1;
+        m_min_steps = 2;
+        break;
+    }
 }
 
 //-----------------------------------------------------------------------------
-
 //TODO: if the AI is crashing constantly, make it move backwards in a straight line, then move forward while turning.
-//TODO: rotation should be dependant on how much each kart can rotate, so we don't have crazy cars.
 void DefaultRobot::update (float delta)
 {
     if( world->getPhase() == World::START_PHASE )
@@ -67,10 +89,9 @@ void DefaultRobot::update (float delta)
         handle_race_start();
         return;
     }
-    
 
     /*Get information about the track*/
-    //Detect if we are going to crash with the track and/or karts
+    //Detect if we are going to crash with the track and/or kart
     const int STEPS = calc_steps();
     check_crashes(STEPS, m_curr_pos.xyz);
 
@@ -94,22 +115,6 @@ void DefaultRobot::update (float delta)
     for(int i = 0; i < world->m_race_setup.getNumPlayers(); ++i)
         if(m_race_position > world->getPlayerKart(i)->getPosition())
             player_winning = true;
-
-    float difficulty_multiplier = 1.0f;
-    if(!player_winning)
-        switch(world->m_race_setup.m_difficulty)
-        {
-        case RD_EASY:
-            difficulty_multiplier = 0.9f;
-            break;
-
-        case RD_MEDIUM:
-            difficulty_multiplier = 0.95f;
-            break;
-
-        default:
-            break;
-        }
 
     /*Steer based on the information we just gathered*/
     float steer_angle = 0.0f;
@@ -183,11 +188,11 @@ void DefaultRobot::update (float delta)
     }
     else
     {
-        switch(world->m_race_setup.m_difficulty)
+        switch(m_straights_tactic)
         {
             //Steer to the farest point that the kart can drive to in a
             //straight line without crashing with the track.
-        case RD_HARD:
+        case ST_FAREST_POINT:
             {
                 //Find a suitable point to drive to in a straight line
                 sgVec2 straight_point;
@@ -198,12 +203,12 @@ void DefaultRobot::update (float delta)
             break;
 
             //Remain parallel to the track
-        case RD_MEDIUM:
+        case ST_PARALLEL:
             steer_angle = steer_to_angle(NEXT_SECTOR, 0.0f);
             break;
 
             //Just drive in a straight line
-        case RD_EASY:
+        case ST_DONT_STEER:
             steer_angle = 0.0f;
             break;
         }
@@ -228,7 +233,7 @@ void DefaultRobot::update (float delta)
     /*Handle acceleration*/
     if(m_starting_delay < 0.0f)
     {
-        m_controls.accel = 1.0f * difficulty_multiplier;
+        m_controls.accel = 1.0f * m_max_speed;
     }
     else
     {
@@ -245,24 +250,22 @@ void DefaultRobot::update (float delta)
     }
 
     /*Handle wheelies*/
-    if(world->m_race_setup.m_difficulty != RD_EASY)
-        m_controls.wheelie = do_wheelie(STEPS);
+    if(m_use_wheelies) m_controls.wheelie = do_wheelie(STEPS);
 
     /*Handle specials*/
     m_time_since_last_shot += delta;
     if ( m_collectable.getType() != COLLECT_NOTHING )
     {
-        switch(world->m_race_setup.m_difficulty)
+        switch(m_item_tactic)
         {
-        case RD_EASY:
+        case IT_TEN_SECONDS:
             if (m_time_since_last_shot > 10.0f)
             {
                 m_collectable.use() ;
                 m_time_since_last_shot = 0.0f;
             }
             break;
-        case RD_MEDIUM:
-        case RD_HARD:
+        case IT_CALCULATE:
             switch(m_collectable.getType())
             {
             case COLLECT_ZIPPER:
@@ -308,9 +311,9 @@ void DefaultRobot::update (float delta)
             break;
         }
     }   // if COLLECT_NOTHING
-    
-    
-    m_controls.lr = angle_to_control(steer_angle) * difficulty_multiplier;
+
+
+    m_controls.lr = angle_to_control(steer_angle);
 
 
     /*And obviously general kart stuff*/
@@ -334,8 +337,7 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
 
     //FIXME: instead of using 1.35 and 1.5, it should find out how much time it
     //will pass to stop doing the wheelie completely from the current state.
-    const float CHECK_DIST = world->m_race_setup.m_difficulty == RD_HARD ? 1.35f :
-                             1.5f;
+    const float CHECK_DIST = 1.5f * m_wheelie_check_dist;
 
     /* The following method of finding if a position is outside of the track
        is less accurate than calling findRoadSector(), but a lot faster.
@@ -370,18 +372,7 @@ void DefaultRobot::handle_race_start()
 
         //Each kart starts at a different, random time, and the time is
         //smaller depending on the difficulty.
-        switch(world->m_race_setup.m_difficulty)
-        {
-        case RD_EASY:
-            m_starting_delay = (float)rand()/RAND_MAX * 0.5f;
-            break;
-        case RD_MEDIUM:
-            m_starting_delay = (float)rand()/RAND_MAX * 0.3f;
-            break;
-        case RD_HARD:
-            m_starting_delay = (float)rand()/RAND_MAX * 0.15f;
-            break;
-        }
+        m_starting_delay = (float)rand()/RAND_MAX * m_max_start_delay;
 
         //This is used instead of AutoKart::update() because the AI doesn't
         //needs more. Without this, karts behave a look a little erratic before
@@ -401,10 +392,9 @@ float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_curr_pos.hpr[0];
-    remove_angle_excess(steer_angle);
 
     steer_angle += ANGLE;
-    remove_angle_excess(steer_angle);
+    steer_angle = normalize_angle(steer_angle);
 
     return steer_angle;
 }
@@ -420,7 +410,7 @@ float DefaultRobot::steer_to_point(const sgVec2 POINT)
     theta += ADJACENT_LINE < 0.0f ? 90.0f : -90.0f;
 
     float steer_angle = theta - getCoord()->hpr[0];
-    remove_angle_excess(steer_angle);
+    steer_angle = normalize_angle(steer_angle);
 
     return steer_angle;
 }
@@ -468,7 +458,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
 
         /*Find if we crash with the drivelines*/
         int sector = world->m_track->findRoadSector(step_coord);
-        
+
         const int UNKNOWN_SECTOR = -1;
 
 #ifdef SHOW_FUTURE_PATH
@@ -489,7 +479,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         center[2] = pos[2];
         sphere->setCenter(center);
         sphere->setSize(KART_LENGTH);
-        if(sector != UNKNOWN_SECTOR)
+        if(sector == UNKNOWN_SECTOR)
         {
             sgVec4 colour;
             colour[0] = colour[3] = 255;
@@ -505,7 +495,7 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         }
         world->m_scene->addKid(sphere);
 #endif
-        if (sector != UNKNOWN_SECTOR)
+        if (sector == UNKNOWN_SECTOR)
         {
             m_future_sector = sector;
             crashes.m_road = true;
@@ -618,39 +608,28 @@ void DefaultRobot::reset()
 }
 
 //-----------------------------------------------------------------------------
-inline void DefaultRobot::remove_angle_excess(float &angle)
+inline float DefaultRobot::normalize_angle(float angle)
 {
-    if (angle > 180.0f) angle -= 360.0f;
-    else if (angle < -180.0f ) angle += 360.0f;
+    while( angle > 360.0 ) angle -= 360;
+    while( angle < -360.0 ) angle += 360;
+
+    if( angle > 180.0 ) angle -= 360.0;
+    else if( angle < -180.0 ) angle += 360.0;
+
+    return angle;
 }
 
-//-----------------------------------------------------------------------------
+/** calc_steps() divides the velocity vector by the lenght of the kart,
+ *  and gets the number of steps to use for the sight line of the kart..
+ */
 int DefaultRobot::calc_steps()
 {
-    //calc_steps divides the velocity vector by the lenght of the kart and get the number
-    //of steps to use for the sight line of the kart based on that
-
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
     //these values for now, it won't work correctly on big or small karts.
     const float KART_LENGTH = 1.5f;
 
-    int min_steps = 2;
-
-    switch(world->m_race_setup.m_difficulty)
-    {
-    case RD_EASY:
-        min_steps = 0;
-        break;
-    case RD_MEDIUM:
-        min_steps = 1;
-        break;
-    case RD_HARD:
-        min_steps = 2;
-        break;
-    }
-
     int steps = int(m_velocity.xyz[1] / KART_LENGTH);
-    if(steps < min_steps) steps = min_steps;
+    if(steps < m_min_steps) steps = m_min_steps;
 
     return steps;
 }
