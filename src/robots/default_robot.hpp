@@ -24,11 +24,11 @@
 class DefaultRobot : public AutoKart
 {
 private:
-    enum StraightTactic
+    enum FallbackTactic
     {
-        ST_DONT_STEER,  //In straight roads, don't steer at all
-        ST_PARALLEL,    //Stay parallel to the road
-        ST_FAREST_POINT //Drive towards the farest non-crashing point
+        FT_DONT_STEER,  //Don't steer at all
+        FT_PARALLEL,    //Stay parallel to the road
+        FT_FAREST_POINT //Drive towards the farest non-crashing point
     };
 
     enum ItemTactic
@@ -40,9 +40,12 @@ private:
     };
 
     /*Difficulty handling variables*/
-    float m_max_speed; //The allowed maximum speed, in percentage,
+    float m_max_accel; //The allowed maximum speed, in percentage,
                        //from 0.0 to 1.0
-    StraightTactic m_straights_tactic; //How to steer on straight roads
+    FallbackTactic m_fallback_tactic; //General steering procedure. Used
+                                      //mostly on straight lines and on curves
+                                      //that re too small to need special
+                                      //handling.
     bool m_use_wheelies; //Is the AI allowed to use wheelies?
     float m_wheelie_check_dist; //How far to check for the space needed for
                                 //wheelies, in percentage
@@ -54,14 +57,14 @@ private:
                      //the kart always, and more than that will check the
                      //remaining number of steps in front of the kart, always
 
-
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
 
     float m_time_since_last_shot;
-    size_t m_future_sector;
+    int   m_future_sector;
+    sgVec2 m_future_location;
 
     float m_starting_delay;
 
@@ -89,13 +92,28 @@ private:
     float steer_to_point(const sgVec2 POINT);
 
     bool do_wheelie(const int STEPS);
-    void check_crashes(const int STEPS, sgVec3 pos);
+    void check_crashes(const int STEPS, sgVec3 const pos);
     void find_non_crashing_point(sgVec2 result);
 
     float normalize_angle (float angle);
     int calc_steps();
 
-    float angle_to_control(float angle);
+    float angle_to_control(float angle) const;
+
+    float get_approx_radius(const int START, const int END) const;
+    float find_braking_dist
+    (
+        const float CURR_SPEED,
+        const float TARGET_SPEED
+    ) const;
+
+    void  closestPointToLine
+    (
+        sgVec2 target,
+        const sgVec2 P,
+        const sgVec2 L0,
+        const sgVec2 L1
+    ) const;
 
 public:
     DefaultRobot(const KartProperties *kart_properties, int position,

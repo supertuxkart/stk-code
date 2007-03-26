@@ -19,15 +19,15 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-//#define AI_DEBUG
+#define AI_DEBUG
 
 #ifdef AI_DEBUG
 #define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
 //checks for crashes with the outside of the track.
 #define ERASE_PATH   //If not defined, the spheres drawn in the future path
 //won't be erased the next time the function is called.
-#define SHOW_NON_CRASHING_SECTOR //If defined, draws a green sphere where the
-//nfarthest non-crashing sector is.
+#define SHOW_NON_CRASHING_POINT //If defined, draws a green sphere where the
+//n farthest non-crashing point is.
 #include <plib/ssgAux.h>
 #endif
 
@@ -51,8 +51,8 @@ DefaultRobot::DefaultRobot(const KartProperties *kart_properties,
     switch( world->m_race_setup.m_difficulty )
     {
     case RD_EASY:
-        m_max_speed = 0.9f;
-        m_straights_tactic = ST_DONT_STEER;
+        m_max_accel = 0.9f;
+        m_fallback_tactic = FT_DONT_STEER;
         m_use_wheelies = false;
         m_wheelie_check_dist = 0.0;
         m_item_tactic = IT_TEN_SECONDS;
@@ -60,8 +60,8 @@ DefaultRobot::DefaultRobot(const KartProperties *kart_properties,
         m_min_steps = 0;
         break;
     case RD_MEDIUM:
-        m_max_speed = 0.95f;
-        m_straights_tactic = ST_PARALLEL;
+        m_max_accel = 0.95f;
+        m_fallback_tactic = FT_PARALLEL;
         m_use_wheelies = true;
         m_wheelie_check_dist = 0.8;
         m_item_tactic = IT_CALCULATE;
@@ -69,8 +69,8 @@ DefaultRobot::DefaultRobot(const KartProperties *kart_properties,
         m_min_steps = 1;
         break;
     case RD_HARD:
-        m_max_speed = 1.0f;
-        m_straights_tactic = ST_FAREST_POINT;
+        m_max_accel = 1.0f;
+        m_fallback_tactic = FT_FAREST_POINT;
         m_use_wheelies = true;
         m_wheelie_check_dist = 1.0;
         m_item_tactic = IT_CALCULATE;
@@ -98,10 +98,12 @@ void DefaultRobot::update (float delta)
     //Store the number of points the driveline has
     const size_t DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
-    const size_t NEXT_SECTOR = m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
+    const size_t NEXT_SECTOR = (uint)m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
 
     const float KART_LENGTH = 1.5f;
 
+    //TODO: know against what we collided, and act depending on if it's a
+    //dynamic object (ej.:kart) or against the track static object.
     //The m_crash_time measures if a kart has been crashing for too long
     m_crash_time += m_collided ? 3.0f * delta : -0.25f * delta;
     if(m_crash_time < 0.0f) m_crash_time = 0.0f;
@@ -110,14 +112,67 @@ void DefaultRobot::update (float delta)
     bool player_winning = false;
     for(int i = 0; i < world->m_race_setup.getNumPlayers(); ++i)
         if(m_race_position > world->getPlayerKart(i)->getPosition())
+        {
             player_winning = true;
+            break;
+        }
 
 
-    /*Steer based on the information we just gathered*/
+    /*Start of experimental braking*/
+    {
+        float speed = 99999.0;
+
+        //TODO: handle if future_sector is smaller than track sector
+        //find length of curr sector to future sector
+        float total_dist;
+        int next_hint;
+        for(int i = m_track_sector; i != m_future_sector; i = next_hint)
+        {
+            next_hint = (uint)i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
+            total_dist += sgDistanceVec2(world->m_track->m_driveline[i], world->m_track->m_driveline[next_hint]);
+        }
+
+        if( m_track_sector != m_future_sector )
+        {
+        //TODO: Add the distance from the inside of the curve to the kart.
+        const float RADIUS = get_approx_radius(m_track_sector, m_future_sector);
+        const float G = world->getGravity();
+
+//    if(m_on_ground && m_material_hot) grip = getTireGrip() * m_material_hot->getFriction();
+
+        const float METTERS_TO_FEET = 3.2808399f;
+        //Max speed we should reach before slipping
+        speed = sgSqrt(RADIUS * (G * METTERS_TO_FEET) * getTireGrip());
+        }
+        if ( m_velocity.xyz[1] > speed )
+            m_controls.brake = true;
+        else
+            m_controls.brake = false;
+#if 0
+        const float FEET_TO_METTERS =  0.3048 ;
+        std::cout << "angle: " <<  (world->m_track->m_angle[m_future_sector] - world->m_track->m_angle[m_track_sector]) / total_dist<< std::endl;
+        std::cout << "radius: "   << RADIUS                                               << std::endl;
+        std::cout << "G: "        << G                                                    << std::endl;
+        std::cout << "Friction: " << getTireGrip()                                        << std::endl;
+        std::cout << "Speed: "    <<  speed                                               << std::endl;
+        std::cout << "Speed2: "   << m_velocity.xyz[1]                                    << std::endl;
+        std::cout << "Braking: "  << find_braking_dist(m_velocity.xyz[1], speed) *
+                                     METTERS_TO_FEET                                      << std::endl;
+#endif
+    }
+    /*End of experimental braking*/
+
+
+    /*The AI responds based on the information we just gathered, using a
+     *finite state machine.
+     */
     float steer_angle = 0.0f;
 
-    //If the kart is outside of the track steer back to it
-    if( m_on_road )
+    if(m_crash_time > 5.0f)//Reaction to being stuck
+    {
+        m_rescue = true;
+    }
+    else if( !m_on_road )//Reaction to being outside of the road
     {
         steer_angle = steer_to_point(world->m_track->m_driveline[NEXT_SECTOR]);
 
@@ -141,7 +196,7 @@ void DefaultRobot::update (float delta)
 #endif
 
     //If it seems like the kart will crash with a curve, try to remain
-    //in the same direction of the track
+    //in the same direction of the track (parallel)
     else if(crashes.m_road)// && world->m_race_setup.m_difficulty != RD_HARD)
     {
         steer_angle = steer_to_angle(m_track_sector, 0.0f);
@@ -185,27 +240,57 @@ void DefaultRobot::update (float delta)
     }
     else
     {
-        switch(m_straights_tactic)
+        switch(m_fallback_tactic)
         {
             //Steer to the farest point that the kart can drive to in a
             //straight line without crashing with the track.
-        case ST_FAREST_POINT:
+        case FT_FAREST_POINT:
             {
-                //Find a suitable point to drive to in a straight line
                 sgVec2 straight_point;
+                //Find a suitable point to drive to in a straight line
                 find_non_crashing_point(straight_point);
-
                 steer_angle = steer_to_point(straight_point);
+
+#ifdef FUTURE_FOLLOWS_CENTER
+                /*Experimental steering, which causes the kart's future
+                 * position to follow the center of the track, if it works
+                 * properly, it will follow the center of the lane instead.
+                 */
+
+                //1. Find closest point to future vel location
+                //2. find angle and make it the steer angle
+                sgVec2 closest_point;
+                const size_t NEXT_FUTURE_SECTOR = m_future_sector + 1 < DRIVELINE_SIZE ? m_future_sector + 1 : 0;
+                closestPointToLine(closest_point, m_future_location, world->m_track->m_driveline[m_future_sector],
+                                    world->m_track->m_driveline[NEXT_FUTURE_SECTOR]);
+
+                float len1 = sgDistanceVec2 ( m_future_location, closest_point );
+                float len2 = sgDistanceVec2 ( closest_point    , m_curr_pos.xyz );
+                float len3 = sgDistanceVec2 ( m_curr_pos.xyz, m_future_location );
+
+
+                std::cout << len1 << " , " << len2 << ", " << len3 << std::endl;
+                float angle;
+                sgTriangleSolver_SSStoAAA ( len1, len2, len3, &angle, NULL , NULL) ;
+
+                sgVec3 future_track_pos;
+                world->m_track->spatialToTrack( future_track_pos, m_future_location, m_future_sector);
+                if ( future_track_pos[0] < 0.0 ) angle = -angle;
+                //If m_future_location is to the right of the closest point, angle should be pos; otherwise, neg
+
+                steer_angle = angle;
+                std::cout << angle << std::endl;
+#endif
             }
             break;
 
             //Remain parallel to the track
-        case ST_PARALLEL:
+        case FT_PARALLEL:
             steer_angle = steer_to_angle(NEXT_SECTOR, 0.0f);
             break;
 
             //Just drive in a straight line
-        case ST_DONT_STEER:
+        case FT_DONT_STEER:
             steer_angle = 0.0f;
             break;
         }
@@ -216,10 +301,10 @@ void DefaultRobot::update (float delta)
 
     }
 
-    /*Handle braking*/
+    /*Handle brakingm disabled for now*/
+#if 0
     m_controls.brake = false;
     //At the moment this makes the AI brake too much
-#if 0
     float time = (m_velocity.xyz[1]/ -guess_accel(-1.0f));
 
     //Braking distance is in openGL units.
@@ -230,20 +315,12 @@ void DefaultRobot::update (float delta)
     /*Handle acceleration*/
     if(m_starting_delay < 0.0f)
     {
-        m_controls.accel = 1.0f * m_max_speed;
+        m_controls.accel = 1.0f * m_max_accel;
     }
     else
     {
         m_controls.accel = 0.0f;
         m_starting_delay -= delta;
-    }
-
-    /*Handle rescue*/
-    //If we have been crashing constantly, asume
-    //the kart is stuck and ask for a rescue.
-    if(m_crash_time > 5.0f)
-    {
-        m_rescue = true;
     }
 
     /*Handle wheelies*/
@@ -314,7 +391,7 @@ void DefaultRobot::update (float delta)
 
 
     /*And obviously general kart stuff*/
-    Kart::update(delta);
+    AutoKart::update(delta);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -330,6 +407,9 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     sgVec2 vel_normal, step_coord, step_track_coord;
     float distance;
 
+    //We have to be careful with normalizing, because if the source argument
+    //has both the X and Y axis set to 0, it returns nan to the destiny.
+    if( m_abs_velocity[0] == 0.0 && m_abs_velocity[1] == 0.0 ) return false;
     sgNormalizeVec2(vel_normal, m_abs_velocity);
 
     //FIXME: instead of using 1.35 and 1.5, it should find out how much time it
@@ -413,7 +493,7 @@ float DefaultRobot::steer_to_point(const sgVec2 POINT)
 }
 
 //-----------------------------------------------------------------------------
-void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
+void DefaultRobot::check_crashes(const int STEPS, sgVec3 const pos)
 {
     //Right now there are 2 kind of 'crashes': with other karts and another
     //with the track. The sight line is used to find if the karts crash with
@@ -431,7 +511,13 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
     crashes.clear();
 
     const size_t NUM_KARTS = world->getNumKarts();
-    sgNormalizeVec2(vel_normal, m_abs_velocity);
+
+    //Protection against having vel_normal with nan values
+    if( m_abs_velocity[0] == 0.0 && m_abs_velocity[1] == 0.0 )
+    {
+        vel_normal[0] = vel_normal[1] = 0.0;
+    }
+    else sgNormalizeVec2(vel_normal, m_abs_velocity);
 
     for(int i = 1; STEPS > i; ++i)
     {
@@ -490,20 +576,29 @@ void DefaultRobot::check_crashes(const int STEPS, sgVec3 pos)
         }
         world->m_scene->addKid(sphere);
 #endif
+
+        m_future_location[0] = step_coord[0]; m_future_location[1] = step_coord[1];
+
         if (sector == Track::UNKNOWN_SECTOR)
         {
-            m_future_sector = sector;
+            m_future_sector = world->m_track->findOutOfRoadSector(step_coord, Track::RS_DONT_KNOW);
             crashes.m_road = true;
             break;
         }
+        else
+        {
+            m_future_sector = sector;
+        }
+
+
     }
 }
 
-//-----------------------------------------------------------------------------
-//Find the sector that at the longest distance from the kart, that can be
-//driven to without crashing with the track, then find towards which of
-//the two edges of the track is closest to the next curve after wards,
-//and return the position of that edge.
+/** Find the sector that at the longest distance from the kart, that can be
+ *  driven to without crashing with the track, then find towards which of
+ *  the two edges of the track is closest to the next curve after wards,
+ *  and return the position of that edge.
+ */
 void DefaultRobot::find_non_crashing_point(sgVec2 result)
 {
     //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
@@ -512,7 +607,7 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 
     const unsigned int DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
-    unsigned int sector = m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
+    unsigned int sector = (uint)m_track_sector + 1 < DRIVELINE_SIZE ? m_track_sector + 1 : 0;
     int target_sector;
 
     sgVec2 direction, step_track_coord;
@@ -537,7 +632,11 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 
         sgVec2 step_coord;
 
-        sgNormalizeVec2(direction);
+        //Protection against having vel_normal with nan values
+        if( direction[0] != 0.0 && direction[1] != 0.0 )
+        {
+            sgNormalizeVec2(direction);
+        }
 
         //Test if we crash if we drive towards the target sector
         for(int i = 2; i < steps; ++i)
@@ -556,7 +655,7 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
             {
                 sgCopyVec2(result, world->m_track->m_driveline[sector]);
 
-#ifdef SHOW_NON_CRASHING_SECTOR
+#ifdef SHOW_NON_CRASHING_POINT
                 ssgaSphere *sphere = new ssgaSphere;
 
                 static ssgaSphere *last_sphere = 0;
@@ -590,6 +689,9 @@ void DefaultRobot::find_non_crashing_point(sgVec2 result)
 //-----------------------------------------------------------------------------
 void DefaultRobot::reset()
 {
+    m_future_location[0] = 0.0;
+    m_future_location[1] = 0.0;
+
     m_future_sector = 0;
     m_starting_delay = -1.0f;
     m_next_curve_sector = -1;
@@ -599,7 +701,7 @@ void DefaultRobot::reset()
 
     m_crash_time = 0.0f;
 
-    Kart::reset();
+    AutoKart::reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -625,6 +727,7 @@ int DefaultRobot::calc_steps()
 
     int steps = int(m_velocity.xyz[1] / KART_LENGTH);
     if(steps < m_min_steps) steps = m_min_steps;
+    //steps += m_min_steps;
 
     return steps;
 }
@@ -632,7 +735,7 @@ int DefaultRobot::calc_steps()
 /** Translates coordinates from an angle(in degrees) to values within the range
  *  of -1.0 to 1.0 to use the same format as the KartControl::lr variable.
  */
-float DefaultRobot::angle_to_control(float angle)
+float DefaultRobot::angle_to_control(float angle) const
 {
     angle *= 180.0f / (getMaxSteerAngle() * M_PI) ;
 
@@ -641,3 +744,124 @@ float DefaultRobot::angle_to_control(float angle)
 
     return angle;
 }
+
+
+/** Finds the radius of a curve. It needs two arguments, the number of the
+ *  drivepoint that marks the beginning of the curve, and the number of the
+ *  drivepoint that marks the ending of the curve.
+ *
+ *  This really weird way of getting the radius, needs 2 pair of points, that
+ *  define two line segments, which are the start and the end of the curve.
+ *  The point where they intersect would be the center of the curve, and
+ *  the average between the distance to the two lines segments is returned as
+ *  the radius.
+ *
+ *  However, this will only work accuratelly if the start and the end of the
+ *  curve lines form an angle of 90 degrees when they intersect.
+ */
+float DefaultRobot::get_approx_radius(const int START, const int END) const
+{
+    /*Create lines*/
+    const float& X1 = world->m_track->m_left_driveline[START][0];
+    const float& Y1 = world->m_track->m_left_driveline[START][1];
+    const float& X2 = world->m_track->m_right_driveline[START][0];
+    const float& Y2 = world->m_track->m_right_driveline[START][1];
+    const float  M1 = (Y1 - Y2) / (X1 - X2);
+    const float  B1 =  -(M1 * X2) + Y2;
+
+    const float& X3 = world->m_track->m_left_driveline[END][0];
+    const float& Y3 = world->m_track->m_left_driveline[END][1];
+    const float& X4 = world->m_track->m_right_driveline[END][0];
+    const float& Y4 = world->m_track->m_right_driveline[END][1];
+    const float  M2 = (Y3 - Y4) / (X3 - X4);
+    const float  B2 =  -(M2 * X4) + Y4;
+
+
+    /*Find intersection point*/
+    sgVec3 center;
+
+    //Parallel lines have to be handled separatedly because it could cause a
+    //division by zero in some cases, even with the rounding errors.
+    if( M1 == M2 )
+    {
+        //Find the center of the curve by average of two of the points of
+        //the same driveline
+        center[0] = X2 + X4 / 2.0;
+        center[1] = Y2 + Y4 / 2.0;
+        center[2] = 0.0;
+    }
+    else
+    {
+        center[0] = (B1 - B2) / (M2 - M1);
+        center[1] = M1 * center[0] + B1;
+        center[2] = 0.0;
+    }
+
+
+    /*Find distance from intersection of the two lines*/
+    sgLineSegment3 line;
+
+    line.a[0] = X1; line.a[1] = Y1; line.a[2] = 0.0;
+    line.b[0] = X2; line.b[1] = Y2; line.b[2] = 0.0;
+    const float DIST1 = sgDistToLineSegmentVec3( line, center );
+
+    line.a[0] = X3; line.a[1] = Y3; line.a[2] = 0.0;
+    line.b[0] = X4; line.b[1] = Y4; line.b[2] = 0.0;
+    const float DIST2 = sgDistToLineSegmentVec3( line, center );
+
+    /*Return average*/
+    return ( DIST1 + DIST2 ) / 2.0;
+}
+
+/** This function finds the distance necessary to change from CURR_SPEED to
+ *  TARGET_SPEED if braking. It's based on RARS documentation in the part 2
+ *  of the tutorial.
+ *
+ *  NOTE: It doesn't takes into account the friction with the material under
+ *  the kart.
+ */
+float DefaultRobot::find_braking_dist
+(
+    const float CURR_SPEED,
+    const float TARGET_SPEED
+) const
+{
+    const float METTERS_TO_FEET = 3.2808399f;
+    const float SPEED_DIFF = TARGET_SPEED - CURR_SPEED;
+    const float DISTANCE = ( CURR_SPEED + 0.5 * SPEED_DIFF ) * SPEED_DIFF / -getBrakeFactor() * METTERS_TO_FEET;
+
+    return DISTANCE;
+}
+
+/** Returns the intersection point of the line specified by the points L0
+ *  and L1 and it's perpendicular line through point P, since the closest
+ *  distance from a line to a point it's the length of another line
+ *  perpendicular to the line.
+ *
+ *  In other words, the closest point(target) to a line(L0,L1) to a point(P)
+ */
+void DefaultRobot::closestPointToLine
+(
+    sgVec2 target,
+    const sgVec2 P,
+    const sgVec2 L0,
+    const sgVec2 L1
+) const
+{
+        const float DIST_X = L1[0] - L0[0];
+        const float DIST_Y = L1[1] - L0[1];
+
+        //Handle if L0 == L1 to avoid a division by zero
+        if ((DIST_X == 0) && (DIST_Y == 0))
+        {
+            target[0] = L1[0];
+            target[1] = L1[1];
+            return;
+        }
+        float U = ((P[0] - L0[0]) * DIST_X + (P[1] - L0[1]) * DIST_Y) /
+            (DIST_X * DIST_X + DIST_Y * DIST_Y);
+
+        target[0] = L0[0] + U * DIST_X;
+        target[1] = L0[1] + U * DIST_Y;
+}
+
