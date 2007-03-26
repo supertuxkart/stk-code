@@ -324,16 +324,18 @@ void Kart::reset()
 {
     Moveable::reset();
 
+    m_attachment.clear();
+    m_collectable.clear();
+
     m_race_lap             = -1;
     m_race_position        = 9;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
-    m_zipper_time_left     = 0.0f ;
+    m_zipper_time_left     = 0.0f;
     m_rescue               = false;
-    m_attachment.clear();
-    m_collectable.clear();
     m_num_herrings_gobbled = 0;
     m_wheel_position       = 0;
+    m_wheelie_angle        = 0.0f;
 
     m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
 
