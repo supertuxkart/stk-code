@@ -77,15 +77,15 @@ protected:
     int          m_grid_position;
     int          m_race_position;
     KartControl  m_controls;           // The position of the karts controls
-    unsigned int m_track_sector;          // index in driveline
+    int          m_track_sector;       // index in driveline
     float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
     sgVec2       m_curr_track_coords;
     sgVec3       m_velocity_wc;        // velocity in world coordinates
-    float        m_prev_accel;          // acceleration at previous time step
-    bool         m_skid_front;          // true if front tires are skidding
-    bool         m_skid_rear;           // true if rear tires are skidding
-    float        m_max_speed;           // maximum speed of the kart, computed from
+    float        m_prev_accel;         // acceleration at previous time step
+    bool         m_skid_front;         // true if front tires are skidding
+    bool         m_skid_rear;          // true if rear tires are skidding
+    float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_wheelie_angle ;
 
     // physics parameters, storing it saves time
