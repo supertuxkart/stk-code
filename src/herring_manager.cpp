@@ -335,9 +335,9 @@ void HerringManager::loadHerringStyle(const std::string filename)
     root = parser.parse(loader->getPath(TMP));
 
     const lisp::Lisp* herring_node = root->getLisp("herring");
+    delete root;
     if(!herring_node)
     {
-        delete root;
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), _("Couldn't load map '%s': no herring node."),
                  filename.c_str());
