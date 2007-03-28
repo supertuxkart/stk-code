@@ -12,8 +12,8 @@
  (magnet-time               10.0 )  ;; time a magnet is active
  (parachute-time             4.0 )  ;; time an attached parachute is active
  (parachute-time-other       8.0 )  ;; time a parachute attached from other kart is active
- (bomb-time                 40.0 )  ;; time till a bomb explodes
- (bomb-time-increase        10.0 )  ;; time added to timer when bomb is passed on
+ (bomb-time                 30.0 )  ;; time till a bomb explodes
+ (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
  (anvil-time                 2.0 )  ;; time an anvil is active
 
  ;; Other kart relates values
