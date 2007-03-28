@@ -131,7 +131,7 @@ void HighscoreManager::Save()
         lisp::Writer writer(filename);
         writer.beginList("highscores");
           writer.writeComment("Number of highscores in this file");
-          writer.write("number-entries\t",m_allScores.size());
+          writer.write("number-entries\t",(unsigned int)m_allScores.size());
           int record_number=0;
           for(type_all_scores::iterator i  = m_allScores.begin(); 
               i != m_allScores.end();  i++)
