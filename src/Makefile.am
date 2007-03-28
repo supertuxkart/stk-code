@@ -23,7 +23,9 @@ noinst_LIBRARIES         =  libstatic_ssg.a
 libstatic_ssg_a_SOURCES  = static_ssg.cpp static_ssg.hpp
 libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 
-AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
+AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\"" \
+	    -DSUPERTUXKART_HIGHSCOREDIR="\"@sharedstatedir@/@PACKAGE@\"" 
+
 supertuxkart_SOURCES =             main.cpp  			\
 	material.cpp		   material.hpp           	\
 	material_manager.cpp	   material_manager.hpp    	\
@@ -48,6 +50,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	projectile_manager.cpp	   projectile_manager.hpp    	\
 	kart_properties.cpp	   kart_properties.hpp       	\
 	stk_config.cpp		   stk_config.hpp    		\
+	highscores.cpp		   highscores.hpp		\
+	highscore_manager.cpp	   highscore_manager.hpp	\
 	loader.cpp          	   loader.hpp               	\
 	race_manager.cpp	   race_manager.hpp          	\
 	string_utils.cpp	   string_utils.hpp          	\

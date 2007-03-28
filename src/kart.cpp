@@ -143,10 +143,11 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
 
     m_wheel_position = 0;
 
-    m_wheel_front_l = NULL;
-    m_wheel_front_r = NULL;
-    m_wheel_rear_l  = NULL;
-    m_wheel_rear_r  = NULL;
+    m_wheel_front_l  = NULL;
+    m_wheel_front_r  = NULL;
+    m_wheel_rear_l   = NULL;
+    m_wheel_rear_r   = NULL;
+    m_lap_start_time = -1.0f;
     loadData();
 }   // Kart
 
@@ -385,13 +386,34 @@ void Kart::handleZipper()
 //-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
-    if (      m_last_track_coords[1] > 100.0f && m_curr_track_coords[1] <  20.0f )
+    if ( m_last_track_coords[1] > 100.0f && m_curr_track_coords[1] <  20.0f )
     {
         setTimeAtLap(world->m_clock);
         m_race_lap++ ;
+        // Only do timings if original time was set properly. Driving backwards
+        // over the start line will cause the lap start time to be set to 0.
+        if(m_lap_start_time>=0.0)
+        {
+            float time_per_lap=world->m_clock-m_lap_start_time;
+            if(time_per_lap<world->getFastestLapTime() )
+            {
+                world->setFastestLap(this, time_per_lap);
+            }
+            if(isPlayerKart())
+            {
+                // Put in in the highscore list???
+                //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
+            }
+        }
+        m_lap_start_time = world->m_clock;
     }
     else if ( m_curr_track_coords[1] > 100.0f && m_last_track_coords[1] <  20.0f )
+    {
         m_race_lap-- ;
+        // Prevent cheating by setting time to a negative number, indicating
+        // that the line wasn't crossed properly.
+        m_lap_start_time = -1.0f;
+    }
 }   // doLapCounting
 
 //-----------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 #include "player_kart.hpp"
 #include "physics.hpp"
 #include "kart.hpp"
+#include "highscores.hpp"
 
 
 /** This class keeps all the state of a race, scenegraph, time,
@@ -103,15 +104,20 @@ public:
     Phase getPhase() const                    { return m_phase;                    }
     float getGravity() const                  { return m_track->getGravity();      }
     Physics *getPhysics() const               { return m_physics;                  }
-
+    Kart* getFastestKart() const              { return m_fastest_kart;             }
+    float getFastestLapTime() const           { return m_fastest_lap;              }
+    void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time;}
+    const Highscores* getHighscores() const   { return m_highscores;               }
 private:
-    Karts      m_kart;
-    StaticSSG* m_static_ssg;
-    float      m_finish_delay_start_time;
-    int*       m_number_collisions;
-    Physics*   m_physics;
-
-    Phase m_phase;
+    Karts       m_kart;
+    StaticSSG*  m_static_ssg;
+    float       m_finish_delay_start_time;
+    int*        m_number_collisions;
+    Physics*    m_physics;
+    float       m_fastest_lap;
+    Kart*       m_fastest_kart;
+    Highscores* m_highscores;
+    Phase       m_phase;
 
     void updateRacePosition( int k );
     void loadTrack();

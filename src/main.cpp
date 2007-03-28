@@ -52,6 +52,7 @@
 #include "sound_manager.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
+#include "highscore_manager.hpp"
 
 #ifdef BULLET
 #include <GL/glut.h>
@@ -278,6 +279,7 @@ void InitTuxkart()
     callback_manager        = new CallbackManager      ();
     herring_manager         = new HerringManager       ();
     attachment_manager      = new AttachmentManager    ();
+    highscore_manager       = new HighscoreManager     ();
     track_manager   ->loadTrackList () ;
 }
 
@@ -375,6 +377,8 @@ int main ( int argc, char **argv )
     user_config->saveConfig();
 
     drv_deinit();
+
+    delete highscore_manager;
     return 0 ;
 }
 

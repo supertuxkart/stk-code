@@ -77,7 +77,7 @@ protected:
     int          m_grid_position;
     int          m_race_position;
     KartControl  m_controls;           // The position of the karts controls
-    int          m_track_sector;       // index in driveline
+    unsigned int m_track_sector;       // index in driveline
     float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
     sgVec2       m_curr_track_coords;
@@ -87,6 +87,7 @@ protected:
     bool         m_skid_rear;          // true if rear tires are skidding
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_wheelie_angle ;
+    float        m_lap_start_time;     // Time at start of a new lap
 
     // physics parameters, storing it saves time
 #ifdef BULLET

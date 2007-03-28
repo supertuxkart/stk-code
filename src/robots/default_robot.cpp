@@ -19,7 +19,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#define AI_DEBUG
+#undef AI_DEBUG
 
 #ifdef AI_DEBUG
 #define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it

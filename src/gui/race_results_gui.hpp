@@ -27,6 +27,8 @@ class RaceResultsGUI : public BaseGUI
 {
 private:
     char* m_score;
+    char* m_highscores;
+
 public:
     RaceResultsGUI();
     ~RaceResultsGUI();

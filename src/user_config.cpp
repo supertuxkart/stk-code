@@ -119,7 +119,13 @@ void UserConfig::setDefaults()
     m_width            = 800;
     m_height           = 600;
     m_karts            = 4;
-
+    if(getenv("USERNAME")!=NULL) 
+        m_username=getenv("USERNAME");
+    else if(getenv("USER")!=NULL)
+        m_username=getenv("USER");
+    else if(getenv("LOGNAME")!=NULL)
+        m_username=getenv("LOGNAME");
+    else m_username="nouser";
     
     for(int i=0; i<4; i++) 
     {
@@ -265,9 +271,11 @@ void UserConfig::loadConfig(const std::string& filename)
             switch(configFileVersion)
             {
             case 0:  printf(_("- Single window menu, old status display,new keyboard style settings were removed\n"));
-                needToAbort=0;
+                     needToAbort=0;
             case 1:  printf(_("- Key bindings were changed, please check the settings. All existing values were discarded.\n"));
-                needToAbort=1;  // if the old keybinds were read, they wouldn't make any sense
+                     needToAbort=1;  // old keybinds wouldn't make any sense
+            case 2:  printf(_("Added username, using: '%s'.\n"), m_username.c_str());
+                     needToAbort=0;
             case 99: break;
             default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
                      break;
@@ -277,7 +285,7 @@ void UserConfig::loadConfig(const std::string& filename)
                 delete root;
                 return;
             }
-            printf(_("This warning can be ignored.\n"));
+            printf(_("This warning can be ignored, the config file will be automatically updated.\n"));
             // Keep on reading the config files as far as possible
         }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
 

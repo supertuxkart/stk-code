@@ -28,11 +28,13 @@
       (so that defaults to 0)
    1: Removed singleWindowMenu, newKeyboardStyle, oldStatusDisplay,
       added config-version number
-   Version 1 can read version 0 without any problems, so 
-   SUPPORTED_CONFIG_VERSION is 0.
+      Version 1 can read version 0 without any problems, so 
+      SUPPORTED_CONFIG_VERSION is 0.
+   2: Changed to SDL keyboard bindings
+   3: Added username
 */
-#define CURRENT_CONFIG_VERSION   2
-#define SUPPORTED_CONFIG_VERSION 2
+#define CURRENT_CONFIG_VERSION   3
+#define SUPPORTED_CONFIG_VERSION 3
 
 #include <string>
 #include "player.hpp"
@@ -62,23 +64,24 @@ private:
                     KartActions action,
                     Player& player);
 public:
-    bool   m_fullscreen;
-    bool   m_no_start_screen;
-    bool   m_sfx;
-    bool   m_music;
-    bool   m_smoke;
-    bool   m_display_fps;
-    int    m_profile;         // Positive number: time in seconds, neg: # laps
-    // 0 if no profiling. Never saved in config file!
+    bool        m_fullscreen;
+    bool        m_no_start_screen;
+    bool        m_sfx;
+    bool        m_music;
+    bool        m_smoke;
+    bool        m_display_fps;
+    int         m_profile;         // Positive number: time in seconds, neg: # laps
+                                   // 0 if no profiling. Never saved in config file!
     std::string m_herring_style;
-    bool   m_disable_magnet;   // true if a magnet can be dis- and enabled
-    bool   m_replay_history;
-    bool   m_use_kph;
-    bool   m_improved_physics;
-    int    m_width;
-    int    m_height;
-    int    m_karts;
-    Player m_player[PLAYERS];
+    std::string m_username;
+    bool        m_disable_magnet;   // true if a magnet can be dis- and enabled
+    bool        m_replay_history;
+    bool        m_use_kph;
+    bool        m_improved_physics;
+    int         m_width;
+    int         m_height;
+    int         m_karts;
+    Player      m_player[PLAYERS];
 
     UserConfig();
     UserConfig(const std::string& filename);

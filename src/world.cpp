@@ -50,6 +50,7 @@
 #include "widget_set.hpp"
 #include "ssg_help.hpp"
 #include "translation.hpp"
+#include "highscore_manager.hpp"
 
 #include "robots/default_robot.hpp"
 
@@ -62,14 +63,16 @@ World* world = 0;
 World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 {
     delete world;
-    world = this;
-    m_phase = START_PHASE;
+    world          = this;
+    m_phase        = START_PHASE;
 
-    m_scene = NULL;
-    m_track = NULL;
+    m_scene        = NULL;
+    m_track        = NULL;
 
-    m_clock = 0.0f;
-
+    m_clock        = 0.0f;
+    m_fastest_lap  = 9999999.9f;
+    m_fastest_kart = 0;
+    m_highscores   = NULL;
     // Grab the track file
     try
     {
@@ -321,6 +324,37 @@ void World::update(float delta)
     }
     if( getPhase() == FINISH_PHASE )
     {
+        // Add times to highscore list. First compute the order of karts,
+        // so that the timing of the fastest kart is added first (otherwise
+        // someone might get into the highscore list, only to be kicked out
+        // again by a faster kart in the same race).
+        int *order = new int[m_kart.size()];
+        for (unsigned int i=0; i<m_kart.size(); i++ )
+        {
+            order[m_kart[i]->getPosition()-1] = i;
+        }
+        for(unsigned int i=0; i<m_kart.size(); i++)
+        {
+            Kart *k = m_kart[order[i]];
+            if(!k->isPlayerKart()) continue;
+            Highscores::HighscoreType hst;
+            if (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+            { 
+                hst = Highscores::HST_TIMETRIAL_OVERALL_TIME;
+            }
+            else
+            {
+                hst = Highscores::HST_RACE_OVERALL_TIME;
+            }
+            
+            m_highscores = highscore_manager->addResult(hst, m_kart.size(),
+                                                        m_race_setup.m_difficulty, 
+                                                        m_track->getName(),
+                                                        k->getName(),
+                                                        user_config->m_username, 
+                                                        k->getFinishTime());
+        }
+        
         widgetSet->tgl_paused();
         menu_manager->pushMenu(MENUID_RACERESULT);
     }

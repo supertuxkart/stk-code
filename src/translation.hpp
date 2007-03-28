@@ -57,7 +57,7 @@ public:
         textdomain (PACKAGE);
     }
 #else
-    initTranslations() { printf("InitTranslations\n");}
+    initTranslations() {}
 #endif
 };
 

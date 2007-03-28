@@ -37,9 +37,15 @@ enum WidgetTokens {
 RaceResultsGUI::RaceResultsGUI()
 {
     m_menu_id = widgetSet -> vstack(0);
+    widgetSet -> label(m_menu_id, _("Result"), GUI_LRG, GUI_ALL, 0, 0);
     const unsigned int MAX_STR_LEN = 60;
-    widgetSet -> label(m_menu_id, _("Race results"), GUI_LRG, GUI_ALL, 0, 0);
+    widgetSet -> space(m_menu_id);
 
+    const int HA = widgetSet->harray(m_menu_id);
+    const int HIGHSCORE_TABLE = widgetSet->varray(HA);
+    const int RESULT_TABLE    = widgetSet->varray(HA);
+    widgetSet -> label(RESULT_TABLE,    _("Race results"),GUI_LRG,GUI_ALL,0,0);
+    widgetSet -> label(HIGHSCORE_TABLE, _("Highscores"),  GUI_LRG,GUI_ALL,0,0);
     const unsigned int NUM_KARTS = world->getNumKarts();
     int*  order = new int [NUM_KARTS];
     m_score = new char[NUM_KARTS * MAX_STR_LEN];
@@ -76,22 +82,40 @@ RaceResultsGUI::RaceResultsGUI()
                 KART->getPosition(), KART_NAME.c_str(), sTime,
                 race_manager->getPositionScore(i+1),
                 race_manager->getKartScore(order[i]));
-        widgetSet -> label(m_menu_id, (char*)(m_score + MAX_STR_LEN * i),
+        widgetSet -> label(RESULT_TABLE, (char*)(m_score + MAX_STR_LEN * i),
                            GUI_MED, GUI_ALL);
     }
 
     delete[] order;
+
+    const Highscores *hs = world->getHighscores();
+    int num_scores = hs->getNumberEntries();
+    m_highscores = new char[num_scores * MAX_STR_LEN];
+    for(int i=0; i<num_scores; i++)
+    {
+        std::string kart_name, name;
+        float T;
+        hs->getEntry(i, kart_name, name, &T);
+        const int   MINS   = (int) floor ( T / 60.0 ) ;
+        const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
+        const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
+        sprintf((char*)(m_highscores + MAX_STR_LEN * i), 
+                "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
+        widgetSet->label(HIGHSCORE_TABLE, (char*)(m_highscores+MAX_STR_LEN*i),
+                         GUI_MED, GUI_ALL);
+        
+    }
     widgetSet -> space(m_menu_id);
 
-    const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, _("Back to the main menu"),  GUI_MED, WTOK_CONTINUE);
-    widgetSet -> start(VA, _("Race in this track again"),  GUI_MED, WTOK_RESTART_RACE);
+    //    const int VA = widgetSet -> varray(m_menu_id);
+    widgetSet -> start(m_menu_id, _("Back to the main menu"),  GUI_MED, WTOK_CONTINUE);
+    widgetSet -> start(m_menu_id, _("Race in this track again"),  GUI_MED, WTOK_RESTART_RACE);
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet -> start(VA, _("Setup New Race"),  GUI_MED, WTOK_SETUP_NEW_RACE);
+        widgetSet -> start(m_menu_id, _("Setup New Race"),  GUI_MED, WTOK_SETUP_NEW_RACE);
     }
 
-    widgetSet -> layout(m_menu_id, 0, 1);
+    widgetSet -> layout(m_menu_id, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +123,7 @@ RaceResultsGUI::~RaceResultsGUI()
 {
     widgetSet -> delete_widget(m_menu_id) ;
     delete[] m_score;
+    delete[] m_highscores;
 }
 
 //-----------------------------------------------------------------------------
