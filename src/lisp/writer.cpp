@@ -37,7 +37,7 @@ namespace lisp
         {
             char msg[MAX_ERROR_MESSAGE_LENGTH];
             snprintf(msg, sizeof(msg), 
-                     _("LispWriter Error: Couldn't open file '%s'."),
+                     _("LispWriter Error: Couldn't open file '%s' for writing."),
                      filename.c_str());
             throw std::runtime_error(msg);
         }

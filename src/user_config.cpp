@@ -119,11 +119,11 @@ void UserConfig::setDefaults()
     m_width            = 800;
     m_height           = 600;
     m_karts            = 4;
-    if(getenv("USERNAME")!=NULL) 
+    if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");
-    else if(getenv("USER")!=NULL)
+    else if(getenv("USER")!=NULL)       // Linux, Macs
         m_username=getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)
+    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         m_username=getenv("LOGNAME");
     else m_username="nouser";
     

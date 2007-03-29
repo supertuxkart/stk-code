@@ -24,7 +24,7 @@ libstatic_ssg_a_SOURCES  = static_ssg.cpp static_ssg.hpp
 libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\"" \
-	    -DSUPERTUXKART_HIGHSCOREDIR="\"@sharedstatedir@/@PACKAGE@\"" 
+	    -DSUPERTUXKART_HIGHSCOREDIR="\"@sharedstatedir@/games/@PACKAGE@\"" 
 
 supertuxkart_SOURCES =             main.cpp  			\
 	material.cpp		   material.hpp           	\

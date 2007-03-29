@@ -36,8 +36,9 @@ private:
     typedef std::vector<Highscores*> type_all_scores;
     type_all_scores m_allScores;
     
-    std::string filename;
-private:
+    std::string m_filename;
+    bool        m_can_write;
+
     void Load();
     void Save();
     void SetFilename();

@@ -30,6 +30,7 @@ HighscoreManager* highscore_manager=0;
 
 HighscoreManager::HighscoreManager()
 {
+    m_can_write=true;
     SetFilename();
     Load();
 }   // HighscoreManager
@@ -50,28 +51,28 @@ void HighscoreManager::SetFilename()
 {
     if ( getenv("SUPERTUXKART_HIGHSCOREDIR") != NULL )
     {
-        filename = getenv("SUPERTUXKART_HIGHSCOREDIR")
-                 + std::string("/highscores.data");
+        m_filename = getenv("SUPERTUXKART_HIGHSCOREDIR")
+                 + std::string("/highscores/highscores.data");
     } else {
         // Check if we are running from a relativ location
-        std::string defaultPath = loader->getPath(filename);
+        std::string defaultPath = loader->getPath(m_filename);
         if(defaultPath[0]=='/')  // no relative location, get configuration dir
         { 
 #ifdef SUPERTUXKART_HIGHSCOREDIR
-            filename = SUPERTUXKART_HIGHSCOREDIR
-                     + std::string("/highscores.data");
+            m_filename = SUPERTUXKART_HIGHSCOREDIR
+                     + std::string("/highscores/highscores.data");
 #else
-            filename="/usr/local/share/games/supertuxkart/highscores.data";
+            m_filename="/usr/local/share/games/supertuxkart/highscores.data";
 #endif
         }
         else  // running in relative dir --> put highscore file in datadir!
         {
-            filename=loader->getPath("highscores.data");
+            m_filename=loader->getPath("highscores/highscores.data");
         }
     }
     // Set the correct directory separator
-    filename[filename.length()-16]=DIR_SEPARATOR;
-    fprintf(stderr, _("Highscores will be saved in '%s'.\n"),filename.c_str());
+    m_filename[m_filename.length()-strlen("/highscores.data")           ]=DIR_SEPARATOR;
+    m_filename[m_filename.length()-strlen("/highscores/highscores.data")]=DIR_SEPARATOR;
     return;
 
 }   // SetFilename
@@ -85,8 +86,21 @@ void HighscoreManager::Load()
     try
     {
         lisp::Parser parser;
-        root = parser.parse(filename);
-
+        root = parser.parse(m_filename);
+    }
+    catch(std::exception& err)
+    {
+        Save();
+        if(m_can_write)
+        {
+            fprintf(stderr, "New highscore file '%s' created.\n", 
+                    m_filename.c_str());
+        }
+        delete root;
+        return;
+    }
+    try
+    {
         const lisp::Lisp* const node = root->getLisp("highscores");
         if(!node)
         {
@@ -107,18 +121,26 @@ void HighscoreManager::Load()
             char record_name[255];
             snprintf(record_name, sizeof(record_name), "record-%d", i);
             const lisp::Lisp* const node_record=node->getLisp(record_name);
+            if(!node_record) 
+            {
+                char msg[MAX_ERROR_MESSAGE_LENGTH];
+                snprintf(msg, sizeof(msg),"Can't find record '%d' in '%s'",
+                         i,m_filename.c_str());
+                throw std::runtime_error(msg);
+            }
             Highscores *highscores = new Highscores();
             m_allScores.push_back(highscores);
             highscores->Read(node_record);
         }
+    fprintf(stderr, _("Highscores will be saved in '%s'.\n"),m_filename.c_str());
     }
     catch(std::exception& err)
     {
         fprintf(stderr, "Error while parsing highscore file '%s':\n", 
-                filename.c_str());
-        fprintf(stderr, "No highscores will be available.\n");
+                m_filename.c_str());
         fprintf(stderr, err.what());
         fprintf(stderr, "\n");
+        fprintf(stderr, "No old highscores will be available.\n");
     }
     delete root;
 }   // Load
@@ -126,9 +148,11 @@ void HighscoreManager::Load()
 // -----------------------------------------------------------------------------
 void HighscoreManager::Save()
 {
+    // Print error message only once
+    if(!m_can_write) return;
     try
     {
-        lisp::Writer writer(filename);
+        lisp::Writer writer(m_filename);
         writer.beginList("highscores");
           writer.writeComment("Number of highscores in this file");
           writer.write("number-entries\t",(unsigned int)m_allScores.size());
@@ -144,14 +168,18 @@ void HighscoreManager::Save()
               writer.endList(record_name);
           }   // for i
         writer.endList("highscores");
-        
+        m_can_write=true;
     }   // try
     catch(std::exception &e)
     {
-        printf("Problems saving highscores\n");
+        printf("Problems saving highscores in '%s'\n",
+               m_filename.c_str());
         printf(e.what());
+        printf("\n");
+        m_can_write=false;
     }
-}   // Write
+}   // Save
+
 // -----------------------------------------------------------------------------
 // Checks if the specified times needs to be put into the highscore list.
 // If it's one of the fastest HIGHSCORE_LEN results, it is put into the

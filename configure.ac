@@ -42,6 +42,11 @@ dnl check for OpenGL related libraries
 case "${host}" in
 *darwin*|*macosx*)
     opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
+    dnl This should be defined in apple compilers, otherwise add this line:
+    dnl AC_DEFINE([__APPLE__],1,[Define for Macs])
+    if test x$have_al_lib = xyes; then
+       AC_CHECK_HEADER(OpenAL/al.h, have_al_hdr=yes)
+    fi
     ;;
 
 *-*-cygwin* | *-*-mingw32*)
@@ -55,6 +60,9 @@ case "${host}" in
     joystick_LIBS="$joystick_LIBS -lwinmm"
 
     echo "Will link apps with $LIBS"
+   if test x$have_al_lib = xyes; then
+      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
+   fi
     ;;
 
 *)
@@ -67,6 +75,9 @@ case "${host}" in
    if test "x$ac_cv_search_glNewList" = "x-lGLcore"; then
        dnl if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
+   fi
+   if test x$have_al_lib = xyes; then
+      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
    fi
 esac
 
@@ -83,9 +94,7 @@ case "${host}" in
 
    dnl we have 4 sound libraries to check, first we check for OpenAL   
    AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)   
-   if test x$have_al_lib = xyes; then
-      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
-   fi
+   dnl AL/al.h is checked before, since Macs need a different path
 
    dnl check for freealut
    AC_SEARCH_LIBS(alutInit, alut, have_alut_lib=yes)
@@ -257,7 +266,7 @@ else
 	AC_MSG_RESULT([disabled])
 fi
 
-AC_CONFIG_FILES([      \
+AC_CONFIG_FILES([     \
  Makefile             \
  data/Makefile        \
  fonts/Makefile       \
@@ -268,6 +277,7 @@ AC_CONFIG_FILES([      \
  wavs/Makefile        \
  wavs/radio/Makefile  \
  wavs/tintagel/Makefile \
+ highscores/Makefile  \
  models/herrings/Makefile
 ])
 AC_OUTPUT

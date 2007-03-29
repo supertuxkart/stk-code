@@ -26,7 +26,11 @@ using namespace std;
 
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
-#include <AL/al.h>
+#ifdef __APPLE__
+#  include <OpenAL/al.h>
+#else
+#  include <AL/al.h>
+#endif
 
 #include "music.hpp"
 

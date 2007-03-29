@@ -24,18 +24,22 @@
 
 #define USE_PLIB_SOUND !((HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS)))
 #if USE_PLIB_SOUND
-#include "sound_plib.hpp"
+#  include "sound_plib.hpp"
 #else    //We use OpenAL
-#include <AL/al.h>
-#include <AL/alut.h>
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#  else
+#    include <AL/al.h>
+#  endif
+#  include <AL/alut.h>
 
-#if HAVE_OGGVORBIS
-#include "music_ogg.hpp"
-#endif
-#if HAVE_MIKMOD
-#include "music_mikmod.hpp"
-#endif
-#include "sfx_openal.hpp"
+#  if HAVE_OGGVORBIS
+#    include "music_ogg.hpp"
+#  endif
+#  if HAVE_MIKMOD
+#    include "music_mikmod.hpp"
+#  endif
+#  include "sfx_openal.hpp"
 #endif // USE_PLIB_SOUND
 
 #include "translation.hpp"

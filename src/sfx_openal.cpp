@@ -23,7 +23,11 @@
 #include <stdio.h>
 #include <string>
 
-#include <AL/al.h>
+#ifdef __APPLE__
+#  include <OpenAL/al.h>
+#else
+#  include <AL/al.h>
+#endif
 #include <AL/alut.h>
 
 #include "sfx_openal.hpp"

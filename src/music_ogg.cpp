@@ -19,7 +19,11 @@
 
 #if HAVE_OPENAL && HAVE_OGGVORBIS
 
-#include <AL/al.h>
+#ifdef __APPLE__
+#  include <OpenAL/al.h>
+#else
+#  include <AL/al.h>
+#endif
 #include <AL/alut.h>
 
 #include "music_ogg.hpp"
