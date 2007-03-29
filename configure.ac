@@ -38,6 +38,11 @@ fi
 AC_CHECK_HEADER(windows.h)
 
 SUMMARY="\nSummary of optional components:\n==============================="
+dnl we have 4 sound libraries to check, first we check for OpenAL   
+AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)   
+dnl The check for OpenAL headers depends on the OS, since Apple has the
+dnl headers in OpenAL/al.h instead of AL/al.h
+
 dnl check for OpenGL related libraries
 case "${host}" in
 *darwin*|*macosx*)
@@ -76,6 +81,7 @@ case "${host}" in
        dnl if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
    fi
+   echo "Setting to $have_al_lib"
    if test x$have_al_lib = xyes; then
       AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
    fi
@@ -92,8 +98,6 @@ case "${host}" in
    dnl check for libraries
    save_LIBS=$LIBS
 
-   dnl we have 4 sound libraries to check, first we check for OpenAL   
-   AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)   
    dnl AL/al.h is checked before, since Macs need a different path
 
    dnl check for freealut
