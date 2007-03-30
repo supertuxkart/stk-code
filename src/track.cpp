@@ -755,17 +755,17 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
             point, line[prev_sector] );
 
         //1.5f was choosen because it's more or less the length of the tuxkart
-        if(prev_distance == 0)
+        if(prev_distance < 0.0000001)
         {
             fprintf(stderr, "File %s point %d is duplicated!.\n",
                     path.c_str(), prev_sector+1);
         }
+#if 0
         else if(prev_distance < 1.5f)
         {
             fprintf(stderr,"File %s point %d is too close(<1.5) to previous point.\n",
                     path.c_str(), prev_sector + 1);
         }
-#if 0
         if(prev_distance > 15.0f)
         {
             fprintf(stderr,"In file %s point %d is too far(>15.0) from next point at %d.\n",
