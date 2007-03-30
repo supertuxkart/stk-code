@@ -26,9 +26,12 @@ class DefaultRobot : public AutoKart
 private:
     enum FallbackTactic
     {
-        FT_DONT_STEER,  //Don't steer at all
+        FT_AVOID_TRACK_CRASH, //Only steer to avoid getting out of the road,
+                              //otherwise, don't steer at all
         FT_PARALLEL,    //Stay parallel to the road
-        FT_FAREST_POINT //Drive towards the farest non-crashing point
+        FT_FAREST_POINT //Drive towards the farest non-crashing point that
+                        //the kart can drive to in a straight line without
+                        //crashing with the track.
     };
 
     enum ItemTactic
@@ -39,23 +42,38 @@ private:
                      //and that other conditions are meet before firing.
     };
 
+    class CrashTypes
+    {
+        public:
+
+        bool m_road; //true if we are going to 'crash' with the bounds of the road
+        int m_kart; //-1 if no crash, pos numbers are the kart it crashes with
+        CrashTypes() : m_road(false), m_kart(-1) {};
+        void clear() {m_road = false; m_kart = -1;}
+    } m_crashes;
+
     /*Difficulty handling variables*/
-    float m_max_accel; //The allowed maximum speed, in percentage,
-                       //from 0.0 to 1.0
-    FallbackTactic m_fallback_tactic; //General steering procedure. Used
-                                      //mostly on straight lines and on curves
-                                      //that re too small to need special
-                                      //handling.
-    bool m_use_wheelies; //Is the AI allowed to use wheelies?
-    float m_wheelie_check_dist; //How far to check for the space needed for
-                                //wheelies, in percentage
-    ItemTactic m_item_tactic; //How are items going to be used?
     float m_max_start_delay; //Delay before accelerating at the start of each
                              //race
     int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
                      //even has check around the kart, if 1, it checks around
                      //the kart always, and more than that will check the
                      //remaining number of steps in front of the kart, always
+    bool  m_wait_for_players; //If true, the acceleration is decreased when
+                              //the AI is in a better position than all the
+                              //human players.
+    float m_max_handicap_accel; //The allowed maximum speed, in percentage,
+                                //from 0.0 to 1.0. Used only when
+                                //m_wait_for_players == true.
+    FallbackTactic m_fallback_tactic; //General steering procedure. Used
+                                      //mostly on straight lines and on curves
+                                      //that re too small to need special
+                                      //handling.
+    bool m_use_wheelies; //Is the AI allowed to use wheelies?
+    float m_wheelie_check_dist; //How far to check for the space needed for
+                                //wheelies, in percentage. Used only when
+                                //m_use_wheelies == true.
+    ItemTactic m_item_tactic; //How are items going to be used?
 
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
@@ -66,28 +84,29 @@ private:
     int   m_future_sector;
     sgVec2 m_future_location;
 
-    float m_starting_delay;
+    float m_time_till_start; //Used to simulate a delay at the start of the
+                             //race, since human players don't accelerate
+                             //at the same time and rarely repeat the a
+                             //previous timing.
 
-    int m_next_curve_sector;
-    int m_next_straight_sector;
-    bool m_on_curve;
-    bool m_handle_curve;
+    int m_inner_curve;
 
-    class CrashTypes
-    {
-        public:
+    int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-        bool m_road; //true if we are going to 'crash' with the bounds of the road
-        int m_kart; //-1 if no crash, pos numbers are the kart it crashes with
-        CrashTypes() : m_road(false), m_kart(-1) {};
-        void clear() {m_road = false; m_kart = -1;}
-    }
-    crashes;
-
-    int start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
-
+    /*Functions called directly from update(). They all represent an action
+     *that can be done, and end up setting their respective m_controls
+     *variable, except handle_race_start() that isn't associated with any
+     *specific action (more like, associated with inaction).
+     */
     void handle_race_start();
+    void handle_acceleration(const float DELTA);
+    void handle_steering();
+    void handle_items(const float DELTA, const int STEPS);
+    void handle_rescue(const float DELTA);
+    void handle_braking(const int STEPS);
+    void handle_wheelie(const int STEPS);
 
+    /*Lower level functions not called directly from update()*/
     float steer_to_angle(const size_t SECTOR, const float ANGLE);
     float steer_to_point(const sgVec2 POINT);
 
@@ -99,21 +118,6 @@ private:
     int calc_steps();
 
     float angle_to_control(float angle) const;
-
-    float get_approx_radius(const int START, const int END) const;
-    float find_braking_dist
-    (
-        const float CURR_SPEED,
-        const float TARGET_SPEED
-    ) const;
-
-    void  closestPointToLine
-    (
-        sgVec2 target,
-        const sgVec2 P,
-        const sgVec2 L0,
-        const sgVec2 L1
-    ) const;
 
 public:
     DefaultRobot(const KartProperties *kart_properties, int position,
