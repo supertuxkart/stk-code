@@ -6,49 +6,68 @@ AC_CONFIG_SRCDIR([src/main.cpp])
 dnl Require at least automake 2.59
 AC_PREREQ(2.59)
 
-
+dnl ================================================
 dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
+dnl ================================================
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(supertuxkart, 0.2)
 
-dnl Check for compilers.
+dnl ===================
+dnl Check for compilers
+dnl ===================
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
 
+dnl ==================
 dnl Set compiler flags
+dnl ==================
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
 CXXFLAGS="$CXXFLAGS -Wall"
 
+dnl ===================
 dnl Checks for programs.
+dnl ===================
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
-# specify the plib location
-AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
-if test "x$with_plib" != "x" ; then
-   echo "plib prefix is $with_plib"
-   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
-fi
 
-
-# Check for MS Windows environment
+dnl ===============================
+dnl Check for MS Windows environment
+dnl ================================
 AC_CHECK_HEADER(windows.h)
 
-SUMMARY="\nSummary of optional components:\n==============================="
-dnl we have 4 sound libraries to check, first we check for OpenAL   
-AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)   
-dnl The check for OpenAL headers depends on the OS, since Apple has the
-dnl headers in OpenAL/al.h instead of AL/al.h
+dnl ================================================
+dnl Add special compiler flags for certain platforms
+dnl ================================================
+case "${host}" in
+*darwin*|*macosx*)
+  # SDL might not be in the default path, and needs a special SDL_main library
+  # to be linked in, so we have to check for sdl-config, which will tell us.
+  LDFLAGGS="$LDFLAGS -framework OpenAL"
+  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
+  if test x$have_sdl_config != xno; then
+    LDFLAGS="$LDFLAGS `sdl-config --libs`"
+    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
+  fi
+  # Same thing for freealut, which gets queried using pkg-config
+  AC_CHECK_PROGS(have_pkg_config,[pkg-config],"no")
+  if test x$have_pkg_config != xno; then
+    LDFLAGS="$LDFLAGS `pkg-config --libs freealut`"
+  fi
+esac
+
 
 dnl check for OpenGL related libraries
+dnl ==================================
+dnl We check for openal headers here, too - since otherwise
+dnl the test further down be
+
 case "${host}" in
 *darwin*|*macosx*)
     opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
-    dnl This should be defined in apple compilers, otherwise add this line:
-    dnl AC_DEFINE([__APPLE__],1,[Define for Macs])
     if test x$have_al_lib = xyes; then
        AC_CHECK_HEADER(OpenAL/al.h, have_al_hdr=yes)
     fi
@@ -65,9 +84,9 @@ case "${host}" in
     joystick_LIBS="$joystick_LIBS -lwinmm"
 
     echo "Will link apps with $LIBS"
-   if test x$have_al_lib = xyes; then
-      AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
-   fi
+    if test x$have_al_lib = xyes; then
+       AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
+    fi
     ;;
 
 *)
@@ -81,16 +100,38 @@ case "${host}" in
        dnl if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
    fi
-   echo "Setting to $have_al_lib"
    if test x$have_al_lib = xyes; then
       AC_CHECK_HEADER(AL/al.h, have_al_hdr=yes)
    fi
+   ;;
 esac
 
-dnl check for OpenAL (al and alut) libraries\
+dnl ========================================
+dnl check for OpenAL (al and alut) libraries
+dnl ========================================
+dnl FIXME: this all appears too complicated, doing unnecesary
+dnl        tests etc --> needs cleanup
+
+dnl The check for OpenAL headers depends on the OS, since 
+dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
+AC_SEARCH_LIBS(alGenBuffers, openal, have_al_lib=yes)   
+
 dnl as well as mikmod, since mikmod is only used (but then
 dnl it's necessary) when openal is used. We also check for
 dnl ogg vorbis support now.
+dnl we have 4 sound libraries to check, first we check for OpenAL   
+if test x$have_al_lib = xyes; then
+  case "${host}" in
+    *darwin*|*macosx*)
+       AC_CHECK_HEADER(OpenAL/al.h, have_al_hdr=yes)
+       ;;
+    *)
+       AC_CHECK_HEADER(AL/al.h,     have_al_hdr=yes)
+       ;;
+  esac
+fi
+
+SUMMARY="\nSummary of optional components:\n==============================="
 case "${host}" in
 *)
    dnl default unix style machines
@@ -178,7 +219,58 @@ case "${host}" in
    LIBS=$save_LIBS
 esac
 
+# The following are C++ items that need to be tested for with the c++
+# compiler
+AC_LANG_PUSH(C++)
+
+
+# ==============================================
+# Check for "plib" without which we cannot go on
+# ==============================================
+# specify the plib location
+AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
+if test "x$with_plib" != "x" ; then
+   echo "plib prefix is $with_plib"
+   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
+fi
+
+AC_CHECK_HEADER(plib/ul.h)
+if test "x$ac_cv_header_plib_ul_h" != "xyes"; then
+   echo
+   echo "You *must* have the plib library installed on your system to build!"
+   echo
+   echo "Please see README for more details."
+   echo
+   echo "configure aborted."
+   exit
+fi
+
+AC_MSG_CHECKING([for plib 1.8.4 or newer])
+AC_TRY_RUN([
+#  include <plib/ul.h>
+ 
+#  define MIN_PLIB_VERSION 184
+   int main() {
+   int major, minor, micro;
+   if ( PLIB_VERSION < MIN_PLIB_VERSION ) {
+      return -1;
+    }
+   return 0;
+   }
+ ],
+  AC_MSG_RESULT(yes),
+  [ AC_MSG_RESULT(wrong version);
+    AC_MSG_ERROR([Install plib 1.8.4 or later first...])],
+  AC_MSG_RESULT(yes)
+)
+
+
+
+dnl =======================
 dnl check for SDL libraries
+dnl =======================
+dnl Potentially sdl-config could be used, but apparently that might not
+dnl exist on all platforms, so doing the 'classical' test is safer :(
 case "${host}" in
 *)
    dnl default unix style machines
@@ -197,55 +289,21 @@ case "${host}" in
    fi
 esac
 
+# =========================
 # subst bars in Makefile.am
+# =========================
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(mikmod_LIBS)
 AC_SUBST(sdl_LIBS)
 
-# The following are C++ items that need to be tested for with the c++
-# compiler
-
-AC_LANG_PUSH(C++)
-
-# Check for "plib" without which we cannot go on
-AC_CHECK_HEADER(plib/ul.h)
-if test "x$ac_cv_header_plib_ul_h" != "xyes"; then
-   echo
-   echo "You *must* have the plib library installed on your system to build!"
-   echo
-   echo "Please see README for more details."
-   echo
-   echo "configure aborted."
-   exit
-fi
-
-AC_MSG_CHECKING([for plib 1.8.4 or newer])
-AC_TRY_RUN([
-#include <plib/ul.h>
-
-#define MIN_PLIB_VERSION 184
-
-int main() {
- int major, minor, micro;
-
- if ( PLIB_VERSION < MIN_PLIB_VERSION ) {
-   return -1;
- }
-
- return 0;
-}
-
-],
- AC_MSG_RESULT(yes),
- [AC_MSG_RESULT(wrong version);
-  AC_MSG_ERROR([Install plib 1.8.4 or later first...])],
- AC_MSG_RESULT(yes)
-)
 AC_MSG_CHECKING([for gcc -fno-regmove option ])
 
-# Test if -fno-regmove is supported, since -fregmove (which is part of -O2 on
-# g++) triggers an optimisation problem with static_ssg:
+dnl =========================
+dnl test regmove compiler bug
+dnl =========================
+dnl Test if -fno-regmove is supported, since -fregmove (which is part of -O2 on
+dnl g++) triggers an optimisation problem with static_ssg:
 ORIGCXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS -fno-regmove"
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
@@ -254,8 +312,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
 CXXFLAGS="$ORIGCXXFLAGS"
 AC_SUBST(NOREGMOVE)
 
-# Check for bullet physics. Currently, this is optional and needs
-# a '--enable-bullet' during configure to be used.
+dnl =======================================
+dnl Bullet physics - currently experimental
+dnl =======================================
+dnl Check for bullet physics. Currently, this is optional and needs
+dnl a '--enable-bullet' during configure to be used.
 AC_MSG_CHECKING(for bullet physics)
 AC_ARG_ENABLE(bullet,
 	AC_HELP_STRING([--enable-bullet], [enable bullet physics]),
@@ -270,6 +331,9 @@ else
 	AC_MSG_RESULT([disabled])
 fi
 
+dnl ================
+dnl Create makefiles
+dnl ================
 AC_CONFIG_FILES([     \
  Makefile             \
  data/Makefile        \
