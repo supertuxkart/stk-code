@@ -338,6 +338,13 @@ void Kart::reset()
     m_wheel_position       = 0;
     m_wheelie_angle        = 0.0f;
 
+    m_controls.lr      = 0.0f;
+    m_controls.accel   = 0.0f;
+    m_controls.brake   = false;
+    m_controls.wheelie = false;
+    m_controls.jump    = false;
+    m_controls.fire    = false;
+
     m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
 
     //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
