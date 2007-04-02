@@ -415,6 +415,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
     {
         m_rescue = true;
     }
+    else m_rescue = false;
 }
 
 //-----------------------------------------------------------------------------
