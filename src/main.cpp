@@ -220,13 +220,16 @@ int handleCmdLine(int argc, char **argv)
                 exit(EXIT_FAILURE);
             }
         }
-#ifdef VERSION
         else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
         {
-            fprintf ( stdout, "SuperTuxKart %s\n", VERSION ) ;
+#ifdef VERSION
+            fprintf ( stdout, "SuperTuxKart, %s\n", VERSION ) ;
+#endif
+#ifdef SVNVERSION
+            fprintf ( stdout, "SuperTuxKart, SVN revision number%s\n", SVNVERSION ) ;
+#endif
             return 0;
         }
-#endif
         else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
             user_config->m_profile=n;

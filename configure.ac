@@ -11,7 +11,7 @@ dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 dnl ================================================
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(supertuxkart, 0.2)
+AM_INIT_AUTOMAKE(supertuxkart, 0.3alpha)
 
 dnl ===================
 dnl Check for compilers
@@ -39,20 +39,12 @@ dnl Check for MS Windows environment
 dnl ================================
 AC_CHECK_HEADER(windows.h)
 
+
 dnl ================================================
 dnl Add special compiler flags for certain platforms
 dnl ================================================
 case "${host}" in
 *darwin*|*macosx*)
-  # SDL might not be in the default path, and needs a special SDL_main library
-  # to be linked in, so we have to check for sdl-config, which will tell us.
-  LDFLAGGS="$LDFLAGS -framework OpenAL"
-  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
-  if test x$have_sdl_config != xno; then
-    LDFLAGS="$LDFLAGS `sdl-config --libs`"
-    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
-  fi
-  # Same thing for freealut, which gets queried using pkg-config
   AC_CHECK_PROGS(have_pkg_config,[pkg-config],"no")
   if test x$have_pkg_config != xno; then
     LDFLAGS="$LDFLAGS `pkg-config --libs freealut`"
@@ -60,11 +52,13 @@ case "${host}" in
 esac
 
 
+dnl ==================================
 dnl check for OpenGL related libraries
 dnl ==================================
 dnl We check for openal headers here, too - since otherwise
-dnl the test further down be
-
+dnl the test further down is even more complicated. This test
+dnl depends on the platform, since Macs are using OpenAL/al.h
+dnl instead of AL/al.h.
 case "${host}" in
 *darwin*|*macosx*)
     opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
@@ -251,7 +245,6 @@ AC_TRY_RUN([
  
 #  define MIN_PLIB_VERSION 184
    int main() {
-   int major, minor, micro;
    if ( PLIB_VERSION < MIN_PLIB_VERSION ) {
       return -1;
     }
@@ -288,6 +281,39 @@ case "${host}" in
       AC_MSG_ERROR([Install SDL first...])
    fi
 esac
+
+dnl =======================================================
+dnl Add special compiler flags for SDL on certain platforms
+dnl =======================================================
+case "${host}" in
+*darwin*|*macosx*)
+  dnl SDL on Macs needs to link in SDLmain, since it includes the
+  dnl actual main program (on Macs #include "SDL/SDL.h" renames
+  dnl main into SDL_main, which then gets called from the new
+  dnl main program included in SDLmain. This is necessary to 
+  dnl install a proper framework for SDL).
+  dnl This can't be done earlier, since all SDL tests program
+  dnl from configure do NOT include SDL/SDL.h, therefore the 
+  dnl main program gets not replaced, and then getting an linking
+  dnl error about main defined twice :((
+  LDFLAGGS="$LDFLAGS -framework OpenAL"
+  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
+  if test x$have_sdl_config != xno; then
+    LDFLAGS="$LDFLAGS `sdl-config --libs`"
+    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
+  fi
+esac
+
+dnl ======================================================
+dnl Try to supply the SVN revision number for the compiler
+dnl ======================================================
+AC_CHECK_PROGS(have_svnversion,[svnversion],"no")
+echo "XXXX $have_svnversion"
+if test x$have_svnversion != xno; then
+  SVNVERSION="`svnversion`"
+  AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
+fi
+
 
 # =========================
 # subst bars in Makefile.am
