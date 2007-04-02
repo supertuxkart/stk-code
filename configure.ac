@@ -308,9 +308,8 @@ dnl ======================================================
 dnl Try to supply the SVN revision number for the compiler
 dnl ======================================================
 AC_CHECK_PROGS(have_svnversion,[svnversion],"no")
-echo "XXXX $have_svnversion"
 if test x$have_svnversion != xno; then
-  SVNVERSION="`svnversion`"
+  SVNVERSION="`svnversion .`"
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 

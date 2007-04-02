@@ -223,10 +223,10 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
         {
 #ifdef VERSION
-            fprintf ( stdout, "SuperTuxKart, %s\n", VERSION ) ;
+            fprintf ( stdout, "SuperTuxKart, %s.\n", VERSION ) ;
 #endif
 #ifdef SVNVERSION
-            fprintf ( stdout, "SuperTuxKart, SVN revision number%s\n", SVNVERSION ) ;
+            fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
 #endif
             return 0;
         }
