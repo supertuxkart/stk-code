@@ -113,12 +113,13 @@ void History::Load()
         fprintf(stderr, "WARNING: no Version information found in history file.\n");
         exit(-2);
     }
+#ifdef VERSION
     if(strcmp(s1,VERSION))
     {
         fprintf(stderr, "WARNING: history is version '%s'\n",s1);
         fprintf(stderr, "         tuxracer version is '%s'\n",VERSION);
     }
-
+#endif
     fgets(s, 1023, m_fd);
     if(sscanf(s, "numkarts: %d",&numKarts)!=1)
     {
