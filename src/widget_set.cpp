@@ -416,7 +416,7 @@ void WidgetSet::drawText (const char *text, int sz, int x, int y,
     float l,r,t,b, fontScaling;
     // Only scale for lower resolution
     fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) : 1.0f;
-    fontScaling = (float)user_config->m_width/800.0f;
+    //    fontScaling = (float)user_config->m_width/800.0f;
     sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
     m_fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99)*scale_x);
@@ -455,7 +455,7 @@ void WidgetSet::drawTextRace (const char *text, int sz, int x, int y,
     float l,r,t,b, fontScaling;
     // Only scale for lower resolution
     fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) : 1.0f;
-    fontScaling = (float)user_config->m_width/800.0f;
+    //    fontScaling = (float)user_config->m_width/800.0f;
     sz = (int)(sz*std::max(scale_x,scale_y)*fontScaling);
     m_fnt_race->getBBox(text, sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99)*scale_x);
