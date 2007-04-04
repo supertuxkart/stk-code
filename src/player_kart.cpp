@@ -114,7 +114,7 @@ void PlayerKart::update(float dt)
         return;
     }
 
-    if ( m_controls.fire )
+    if ( m_controls.fire && !m_rescue)
     {
         if (m_collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
         // use() needs to be called even if there currently is no collecteable

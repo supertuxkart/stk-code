@@ -235,6 +235,12 @@ void DefaultRobot::handle_steering()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_items( const float DELTA, const int STEPS )
 {
+    if( m_rescue )
+    {
+        m_controls.fire = false;
+        return;
+    }
+
     //FIXME: find real kart length
     const float KART_LENGTH = 1.5f;
 
@@ -246,10 +252,10 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
         case IT_TEN_SECONDS:
             if( m_time_since_last_shot > 10.0f )
             {
-                m_collectable.use() ;
+                m_controls.fire = true;
                 m_time_since_last_shot = 0.0f;
             }
-            break;
+            return;
         case IT_CALCULATE:
             switch( m_collectable.getType() )
             {
@@ -260,11 +266,11 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
                         15.0f && !m_crashes.m_road && STEPS > 8 )
                     {
-                        m_collectable.use();
+                        m_controls.fire = true;
                         m_time_since_last_shot = 0.0f;
                     }
                 }
-                break;
+                return;
 
             case COLLECT_MISSILE:
             case COLLECT_HOMING_MISSILE:
@@ -274,28 +280,31 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                         world->getKart(m_crashes.m_kart)->getCoord()->xyz ) >
                         KART_LENGTH * 2.5f )
                     {
-                        m_collectable.use() ;
+                        m_controls.fire = true;
                         m_time_since_last_shot = 0.0f;
                     }
                 }
-                break;
+                return;
 
             case COLLECT_SPARK:
                 if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
                 {
-                    m_collectable.use() ;
+                    m_controls.fire = true;
                     m_time_since_last_shot = 0.0f;
                 }
-                break;
+                return;
                 /*TODO: teach AI to use the magnet*/
             default:
-                m_collectable.use() ;
+                m_controls.fire = true;
                 m_time_since_last_shot = 0.0f;
-                break;
+                return;
             }
             break;
         }
     }
+
+
+    m_controls.fire = false;
 }
 
 //-----------------------------------------------------------------------------
