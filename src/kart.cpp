@@ -400,30 +400,29 @@ void Kart::doLapCounting ()
 {
     //FIXME: the flags are just a temporal way of preventing cheating,
     //because the lap counting is pretty bad anyways :p
-    if( m_track_sector >= 0 && m_track_sector <
+    if( m_track_sector >= 0 && (uint)m_track_sector <
         world->m_track->m_driveline.size() / 4 )
     {
         flag1 = true;
     }
-    else if( m_track_sector > world->m_track->m_driveline.size() / 4 &&
-             m_track_sector < world->m_track->m_driveline.size() / 2)
+    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 4 &&
+             (uint)m_track_sector < world->m_track->m_driveline.size() / 2)
     {
         flag2 = true;
     }
-    else if( m_track_sector > world->m_track->m_driveline.size() / 2 &&
-             m_track_sector < world->m_track->m_driveline.size() / 2 +
+    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 2 &&
+             (uint)m_track_sector < world->m_track->m_driveline.size() / 2 +
              world->m_track->m_driveline.size() / 4)
     {
         flag3 = true;
     }
-    else if( m_track_sector > world->m_track->m_driveline.size() / 2 +
+    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 2 +
              world->m_track->m_driveline.size() / 4 )
     {
         flag4 = true;
     }
 
-
-    if( flag1 && flag2 && flag3 && flag4 )
+    if( flag1 && flag2 && flag3 && flag4 || m_race_lap < 0)
     {
         if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f )
         {
@@ -446,7 +445,7 @@ void Kart::doLapCounting ()
             }
             m_lap_start_time = world->m_clock;
         }
-        else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f )
+        else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
         {
             m_race_lap-- ;
             // Prevent cheating by setting time to a negative number, indicating
