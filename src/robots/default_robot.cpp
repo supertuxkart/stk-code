@@ -421,18 +421,14 @@ void DefaultRobot::handle_rescue(const float DELTA)
 //-----------------------------------------------------------------------------
 float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
 {
-    float dist1 = sgDistanceVec2( world->m_track->m_driveline[SECTOR],
-        m_curr_pos.xyz );
-    float dist2 = sgDistanceVec2( world->m_track->m_driveline[m_track_sector],
-        m_curr_pos.xyz );
-    float angle = ( world->m_track->m_angle[SECTOR] * dist1 +
-        world->m_track->m_angle[m_track_sector] * dist2 ) / ( dist1 + dist2 );
+    float angle = world->m_track->m_angle[SECTOR];
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_curr_pos.hpr[0];
 
     steer_angle += ANGLE;
     steer_angle = normalize_angle( steer_angle );
+
 
     return steer_angle;
 }
