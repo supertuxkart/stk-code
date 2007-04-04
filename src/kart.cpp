@@ -328,6 +328,11 @@ void Kart::reset()
     m_attachment.clear();
     m_collectable.clear();
 
+    flag1 = false;
+    flag2 = false;
+    flag3 = false;
+    flag4 = false;
+
     m_race_lap             = -1;
     m_race_position        = 9;
     m_finished_race        = false;
@@ -393,33 +398,61 @@ void Kart::handleZipper()
 //-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
-    if ( m_last_track_coords[1] > 100.0f && m_curr_track_coords[1] <  20.0f )
+    //FIXME: the flags are just a temporal way of preventing cheating,
+    //because the lap counting is pretty bad anyways :p
+    if( m_track_sector >= 0 && m_track_sector <
+        world->m_track->m_driveline.size() / 4 )
     {
-        setTimeAtLap(world->m_clock);
-        m_race_lap++ ;
-        // Only do timings if original time was set properly. Driving backwards
-        // over the start line will cause the lap start time to be set to 0.
-        if(m_lap_start_time>=0.0)
-        {
-            float time_per_lap=world->m_clock-m_lap_start_time;
-            if(time_per_lap<world->getFastestLapTime() )
-            {
-                world->setFastestLap(this, time_per_lap);
-            }
-            if(isPlayerKart())
-            {
-                // Put in in the highscore list???
-                //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
-            }
-        }
-        m_lap_start_time = world->m_clock;
+        flag1 = true;
     }
-    else if ( m_curr_track_coords[1] > 100.0f && m_last_track_coords[1] <  20.0f )
+    else if( m_track_sector > world->m_track->m_driveline.size() / 4 &&
+             m_track_sector < world->m_track->m_driveline.size() / 2)
     {
-        m_race_lap-- ;
-        // Prevent cheating by setting time to a negative number, indicating
-        // that the line wasn't crossed properly.
-        m_lap_start_time = -1.0f;
+        flag2 = true;
+    }
+    else if( m_track_sector > world->m_track->m_driveline.size() / 2 &&
+             m_track_sector < world->m_track->m_driveline.size() / 2 +
+             world->m_track->m_driveline.size() / 4)
+    {
+        flag3 = true;
+    }
+    else if( m_track_sector > world->m_track->m_driveline.size() / 2 +
+             world->m_track->m_driveline.size() / 4 )
+    {
+        flag4 = true;
+    }
+
+
+    if( flag1 && flag2 && flag3 && flag4 )
+    {
+        if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f )
+        {
+            setTimeAtLap(world->m_clock);
+            m_race_lap++ ;
+            // Only do timings if original time was set properly. Driving backwards
+            // over the start line will cause the lap start time to be set to 0.
+            if(m_lap_start_time>=0.0)
+            {
+                float time_per_lap=world->m_clock-m_lap_start_time;
+                if(time_per_lap<world->getFastestLapTime() )
+                {
+                    world->setFastestLap(this, time_per_lap);
+                }
+                if(isPlayerKart())
+                {
+                    // Put in in the highscore list???
+                    //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
+                }
+            }
+            m_lap_start_time = world->m_clock;
+        }
+        else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f )
+        {
+            m_race_lap-- ;
+            // Prevent cheating by setting time to a negative number, indicating
+            // that the line wasn't crossed properly.
+            m_lap_start_time = -1.0f;
+        }
     }
 }   // doLapCounting
 

@@ -122,6 +122,13 @@ private:
     float               m_finish_time;
     bool                m_finished_race;
 
+    //FIXME: These are to prevent cheating by requiring a kart to go through
+    //the 4 quarters of a track before being able to advance a lap.
+    bool                flag1;
+    bool                flag2;
+    bool                flag3;
+    bool                flag4;
+
 #ifdef BULLET
     float               m_speed;
 #endif
