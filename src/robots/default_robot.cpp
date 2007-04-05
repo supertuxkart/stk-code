@@ -422,9 +422,9 @@ void DefaultRobot::handle_rescue(const float DELTA)
     //Reaction to being stuck
     if( m_crash_time > 5.0f )
     {
-        m_rescue = true;
+        m_controls.rescue = true;
     }
-    else m_rescue = false;
+    else m_controls.rescue = false;
 }
 
 //-----------------------------------------------------------------------------

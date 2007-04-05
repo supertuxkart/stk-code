@@ -263,6 +263,12 @@ void Track::spatialToTrack
     const int SECTOR
 ) const
 {
+    if( SECTOR == UNKNOWN_SECTOR )
+    {
+        std::cerr << "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n";
+        return;
+    }
+
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
     const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
     const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
