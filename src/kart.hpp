@@ -88,6 +88,7 @@ protected:
     bool         m_skid_rear;          // true if rear tires are skidding
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_wheelie_angle ;
+    float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
 
     // physics parameters, storing it saves time

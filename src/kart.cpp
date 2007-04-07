@@ -125,6 +125,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_finish_time          = 0.0f;
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
+    m_current_friction     = 1.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -629,7 +630,17 @@ void Kart::update (float dt)
     updatePhysics(dt);
 
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
-    Moveable::update (dt) ;
+    if(m_material_hot)
+    {
+        float r=m_material_hot->getFriction();
+        if(r<m_current_friction) 
+        {
+            m_velocity.xyz[1]-= (m_current_friction*m_current_friction-r*r)
+                                *m_velocity.xyz[1];
+        }   // r<m_current_friction
+        m_current_friction = r;
+    }   // if m_material_hot
+    Moveable::update (dt);
     doObjectInteractions();
 
 
@@ -819,8 +830,6 @@ void Kart::updatePhysics (float dt)
     const float  AIR_FRICTION = getAirResistance(); // includes attachmetn.AirFrictAdjust
     const float  ROLL_RESIST  = getRollResistance();
 
-    //  if(materialHOT) ROLL_RESIST +=materialHOT->getFriction();
-
     if(m_wheelie_angle>0.0f)
     {
         m_velocity.xyz[1]-=getWheelieSpeedBoost()*m_wheelie_angle/getWheelieMaxPitch();
@@ -840,7 +849,7 @@ void Kart::updatePhysics (float dt)
         }
         else
         {   // not braking
-            throttle =  m_controls.accel;
+            throttle =  m_controls.accel*m_current_friction*m_current_friction;
         }
         // Handle wheelies
         // ===============
