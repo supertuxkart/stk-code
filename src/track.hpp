@@ -137,7 +137,9 @@ public:
 
     int                findRoadSector   (const sgVec3 XYZ            ) const;
     int                findOutOfRoadSector(const sgVec3 XYZ,
-                                          const RoadSide SIDE        ) const;
+                                           const RoadSide SIDE,
+                                           const int CURR_SECTOR
+                                           ) const;
     void               spatialToTrack   (sgVec2 dst,
                                          const sgVec2 POS,
                                          const int SECTOR            ) const;

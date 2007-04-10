@@ -208,20 +208,47 @@ int Track::findRoadSector( const sgVec3 XYZ )const
     until the next higher overlapping line segment, and find the closest
     one to XYZ.
  */
-int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
+int Track::findOutOfRoadSector
+(
+    const sgVec3 XYZ,
+    const RoadSide SIDE,
+    const int CURR_SECTOR
+) const
 {
     int sector = UNKNOWN_SECTOR;
     float dist;
     float nearest_dist = 99999;
     const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
 
-    sgLineSegment3 line_seg;
-    for (size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
+    int begin_sector = 0;
+    int end_sector = DRIVELINE_SIZE - 1;
+
+    if(CURR_SECTOR != UNKNOWN_SECTOR )
     {
+        const int LIMIT = 3; //The limit prevents shortcuts
+        if( CURR_SECTOR - LIMIT < 0 )
+        {
+            begin_sector = DRIVELINE_SIZE - 1 + CURR_SECTOR - LIMIT;
+        }
+        else begin_sector = CURR_SECTOR - LIMIT;
+
+        if( CURR_SECTOR + LIMIT > (int)DRIVELINE_SIZE - 1 )
+        {
+            end_sector = CURR_SECTOR + LIMIT - DRIVELINE_SIZE;
+        }
+        else end_sector = CURR_SECTOR + LIMIT;
+    }
+
+    sgLineSegment3 line_seg;
+    int next_sector;
+    for (int i = begin_sector ; i != end_sector ; i = next_sector )
+    {
+        next_sector = i + 1 == (int)DRIVELINE_SIZE ? 0 : i + 1;
+
         if( SIDE != RS_RIGHT)
         {
             sgCopyVec3( line_seg.a, m_left_driveline[i] );
-            sgCopyVec3( line_seg.b, m_left_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
+            sgCopyVec3( line_seg.b, m_left_driveline[next_sector] );
 
             dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
 
@@ -235,7 +262,7 @@ int Track::findOutOfRoadSector( const sgVec3 XYZ, const RoadSide SIDE ) const
         if( SIDE != RS_LEFT )
         {
             sgCopyVec3( line_seg.a, m_right_driveline[i] );
-            sgCopyVec3( line_seg.b, m_right_driveline[i+1 == DRIVELINE_SIZE ? 0 : i + 1] );
+            sgCopyVec3( line_seg.b, m_right_driveline[next_sector] );
 
             dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
 

@@ -551,7 +551,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
         if( sector == Track::UNKNOWN_SECTOR )
         {
             m_future_sector = world->m_track->findOutOfRoadSector( step_coord,
-                Track::RS_DONT_KNOW );
+                Track::RS_DONT_KNOW, m_future_sector );
             m_crashes.m_road = true;
             break;
         }

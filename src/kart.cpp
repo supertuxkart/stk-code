@@ -359,7 +359,7 @@ void Kart::reset()
     {
         m_on_road = false;
         m_track_sector = world->m_track->findOutOfRoadSector(
-            m_curr_pos.xyz, Track::RS_DONT_KNOW );
+            m_curr_pos.xyz, Track::RS_DONT_KNOW, Track::UNKNOWN_SECTOR );
     }
     else
     {
@@ -644,6 +644,7 @@ void Kart::update (float dt)
     doObjectInteractions();
 
 
+    int prev_sector = m_track_sector;
     m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
 
     if (m_track_sector == Track::UNKNOWN_SECTOR )
@@ -651,10 +652,10 @@ void Kart::update (float dt)
         m_on_road = false;
         if( m_curr_track_coords[0] > 0.0 )
             m_track_sector = world->m_track->findOutOfRoadSector(
-               m_curr_pos.xyz, Track::RS_RIGHT );
+               m_curr_pos.xyz, Track::RS_RIGHT, prev_sector );
         else
             m_track_sector = world->m_track->findOutOfRoadSector(
-               m_curr_pos.xyz, Track::RS_LEFT );
+               m_curr_pos.xyz, Track::RS_LEFT, prev_sector );
     }
     else
     {
