@@ -225,7 +225,7 @@ int Track::findOutOfRoadSector
 
     if(CURR_SECTOR != UNKNOWN_SECTOR )
     {
-        const int LIMIT = 3; //The limit prevents shortcuts
+        const int LIMIT = 2; //The limit prevents shortcuts
         if( CURR_SECTOR - LIMIT < 0 )
         {
             begin_sector = DRIVELINE_SIZE - 1 + CURR_SECTOR - LIMIT;
