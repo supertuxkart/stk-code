@@ -90,7 +90,7 @@ void drv_toggleFullscreen(int resetTextures)
     SDL_FreeSurface(mainSurface);
     mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
     {
         // Clear plib internal texture cache
@@ -160,7 +160,7 @@ void drv_loop()
 
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            input(IT_KEYBOARD, ev.key.keysym.sym, 0, 0, ev.key.state);
+            input(IT_KEYBOARD, ev.key.keysym.sym, ev.key.keysym.unicode, 0, ev.key.state);
             break;
 
         case SDL_MOUSEMOTION:
