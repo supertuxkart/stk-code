@@ -65,7 +65,7 @@ public:
     void setKey(KartActions action, int key) {}
     void setButton(KartActions action, int button){ }
 
-    const char* getName() {return m_name.c_str();}
+    std::string getName() {return m_name;}
 
     Input *getInput(KartActions action) { return &m_action_map[action]; }
     void setInput(KartActions action, InputType type, int id0, int id1, int id2)

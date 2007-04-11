@@ -144,6 +144,7 @@ public:
     /* change the value of variables stored by already-existing widgets*/
 
     void set_label(int, const char *);
+    const char* get_label(int id) { return m_widgets[id]._text; }
     void set_multi(int, const char *);
     void set_count(int, int);
     void set_clock(int, int);

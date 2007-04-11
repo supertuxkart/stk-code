@@ -1,4 +1,4 @@
-//  $Id: highscores.hpp 921 2007-02-28 05:43:34Z hiker $
+ //  $Id: highscores.hpp 921 2007-02-28 05:43:34Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -26,6 +26,7 @@ Highscores::Highscores()
     m_highscore_type  = HST_UNDEFINED;
     m_number_of_karts =-1;
     m_difficulty      = -1;
+    m_number_of_laps  = -1;
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
         m_name[i]      = "";
@@ -37,10 +38,11 @@ Highscores::Highscores()
 // -----------------------------------------------------------------------------
 void Highscores::Read(const lisp::Lisp* const node)
 {
-    node->get("track-name",   m_track               );
-    node->get("number-karts", m_number_of_karts     );
-    node->get("race-mode",    (int&)m_highscore_type);
-    node->get("difficulty",   m_difficulty          );
+    node->get("track-name",     m_track               );
+    node->get("number-karts",   m_number_of_karts     );
+    node->get("race-mode",      (int&)m_highscore_type);
+    node->get("difficulty",     m_difficulty          );
+    node->get("number-of-laps", m_number_of_laps      );
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
@@ -57,19 +59,20 @@ void Highscores::Read(const lisp::Lisp* const node)
 // -----------------------------------------------------------------------------
 void Highscores::Write(lisp::Writer *writer)
 {
-    writer->write("track-name\t",   m_track              );
-    writer->write("number-karts\t", m_number_of_karts    );
-    writer->write("difficulty\t",   m_difficulty         );
-    writer->write("race-mode\t",    m_highscore_type     );
+    writer->write("track-name\t",     m_track            );
+    writer->write("number-karts\t",   m_number_of_karts  );
+    writer->write("difficulty\t\t",   m_difficulty       );
+    writer->write("race-mode\t\t",    m_highscore_type   );
+    writer->write("number-of-laps\t", m_number_of_laps   );
     for(int j=0; j<HIGHSCORE_LEN; j++) 
     {
         char s[128];
-        snprintf(s, sizeof(s), "time-%d\t",     j);
-        writer->write(s, m_time[j]               );
-        snprintf(s, sizeof(s), "name-%d\t",     j);
-        writer->write(s, m_name[j]               );
-        snprintf(s, sizeof(s), "kartname-%d\t", j);
-        writer->write(s, m_kart_name[j]          );
+        snprintf(s, sizeof(s), "time-%d\t\t",     j);
+        writer->write(s, m_time[j]                 );
+        snprintf(s, sizeof(s), "name-%d\t\t",     j);
+        writer->write(s, m_name[j]                 );
+        snprintf(s, sizeof(s), "kartname-%d\t\t", j);
+        writer->write(s, m_kart_name[j]            );
     }   // for j
     
 }   // Write
@@ -77,11 +80,12 @@ void Highscores::Write(lisp::Writer *writer)
 // -----------------------------------------------------------------------------
 int Highscores::matches(HighscoreType highscore_type,
                         int num_karts, RaceDifficulty difficulty,
-                        const std::string &track)
+                        const std::string &track, const int number_of_laps)
 {
-    return (m_highscore_type  == highscore_type &&
-            m_track           == track          &&
-            m_difficulty      == difficulty     &&
+    return (m_highscore_type  == highscore_type   &&
+            m_track           == track            &&
+            m_difficulty      == difficulty       &&
+            m_number_of_laps  == number_of_laps   &&
             m_number_of_karts == num_karts          );
 }   // matches
 // -----------------------------------------------------------------------------
@@ -93,10 +97,9 @@ int Highscores::matches(HighscoreType highscore_type,
 int Highscores::addData(const HighscoreType highscore_type, const int num_karts,
                         const RaceDifficulty difficulty,    const std::string track,
                         const std::string kart_name,        const std::string name, 
-                        const float time)
+                        const float time,                   const int number_of_laps)
 {
     int position=-1;
-    
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
         // Check for unused entry. If so, just insert the new record
@@ -126,6 +129,7 @@ int Highscores::addData(const HighscoreType highscore_type, const int num_karts,
         m_highscore_type      = highscore_type;
         m_number_of_karts     = num_karts;
         m_difficulty          = difficulty;
+        m_number_of_laps      = number_of_laps;
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;

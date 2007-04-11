@@ -36,7 +36,7 @@ Options::Options()
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
     widgetSet -> label(m_menu_id, _("Options"),   GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> start(m_menu_id, _("Controls"),  GUI_MED, WTOK_CONTROLS);
+    widgetSet -> start(m_menu_id, _("Player Config"),  GUI_MED, WTOK_CONTROLS);
     // Don't display the fullscreen menu when called from within the race.
     // The fullscreen mode will reload all textures, reload the models,
     // ... basically creating a big mess!!  (and all of this only thanks

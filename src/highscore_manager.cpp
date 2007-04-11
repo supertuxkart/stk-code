@@ -181,6 +181,32 @@ void HighscoreManager::Save()
 }   // Save
 
 // -----------------------------------------------------------------------------
+Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type, 
+                                            const int             num_karts,
+                                            const RaceDifficulty  difficulty,
+                                            const std::string     track, 
+                                            const int             number_of_laps)
+{
+    Highscores *highscores = 0;
+
+    // See if we already have a record for this type
+
+    for(type_all_scores::iterator i  = m_allScores.begin(); 
+                                  i != m_allScores.end();  i++)
+    {
+      if((*i)->matches(highscore_type, num_karts, difficulty, track,
+                       number_of_laps))
+        {
+            return (*i);
+        }
+    }   // for i in m_allScores
+
+    highscores = new Highscores();
+    m_allScores.push_back(highscores);
+    return highscores;
+}   // getHighscores
+
+// -----------------------------------------------------------------------------
 // Checks if the specified times needs to be put into the highscore list.
 // If it's one of the fastest HIGHSCORE_LEN results, it is put into the
 // list and the new position (1 ... HIGHSCORE_LEN) is returned, otherwise 0.
@@ -190,30 +216,14 @@ Highscores * HighscoreManager::addResult(const Highscores::HighscoreType highsco
                                          const std::string track, 
                                          const std::string kart_name,
                                          const std::string name, 
-                                         const float time)
+                                         const float time,
+                                         const int number_of_laps)
 {
-    Highscores *highscores = 0;
-
-    // See if we already have a record for this type
-
-    for(type_all_scores::iterator i  = m_allScores.begin(); 
-                                  i != m_allScores.end();  i++)
-    {
-        if((*i)->matches(highscore_type, num_karts, difficulty, track))
-        {
-            highscores = (*i);
-            break;
-        }
-    }   // for i in m_allScores
-
-    if(!highscores)
-    {
-        highscores = new Highscores();
-        m_allScores.push_back(highscores);
-    }
+    Highscores *highscores = getHighscores(highscore_type, num_karts,
+                                           difficulty, track, number_of_laps);
 
     if(highscores->addData(highscore_type, num_karts, difficulty,
-                           track, kart_name, name, time) >0)
+                           track, kart_name, name, time, number_of_laps) >0)
     {
         Save();
     }

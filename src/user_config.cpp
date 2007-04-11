@@ -119,6 +119,7 @@ void UserConfig::setDefaults()
     m_width            = 800;
     m_height           = 600;
     m_karts            = 4;
+
     if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");
     else if(getenv("USER")!=NULL)       // Linux, Macs
@@ -126,12 +127,11 @@ void UserConfig::setDefaults()
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         m_username=getenv("LOGNAME");
     else m_username="nouser";
-    
+
+    // Set the name as the default name for all players.
     for(int i=0; i<4; i++) 
     {
-        char pl[255];
-        snprintf(pl, sizeof(pl), _("Player %d"), i+1);
-        m_player[i].setName(pl);
+        m_player[i].setName(m_username);
     }
 
 
@@ -274,7 +274,10 @@ void UserConfig::loadConfig(const std::string& filename)
                      needToAbort=0;
             case 1:  printf(_("- Key bindings were changed, please check the settings. All existing values were discarded.\n"));
                      needToAbort=1;  // old keybinds wouldn't make any sense
+
             case 2:  printf(_("Added username, using: '%s'.\n"), m_username.c_str());
+                     needToAbort=0;
+            case 3:  printf(_("Added username for all players.\n"));
                      needToAbort=0;
             case 99: break;
             default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
@@ -323,6 +326,17 @@ void UserConfig::loadConfig(const std::string& filename)
             }
             std::string name;
             reader->get("name", name);
+            if(configFileVersion <=3) 
+            {
+                // For older config files, replace the default player 
+                // names "Player %d" with the user name
+                char sDefaultName[10];
+                snprintf(sDefaultName, sizeof(sDefaultName),
+                         "Player %d",i+1);
+                // If the config file does not contain a name or the old
+                // default name, set the default username as player name.
+                if(name.size()==0 || name==sDefaultName) name=m_username;
+            }
             m_player[i].setName(name);
 
             int lastKartId = 0;

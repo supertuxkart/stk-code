@@ -72,7 +72,8 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     m_clock        = 0.0f;
     m_fastest_lap  = 9999999.9f;
     m_fastest_kart = 0;
-    m_highscores   = NULL;
+
+
     // Grab the track file
     try
     {
@@ -170,6 +171,15 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
     //ssgSetBackFaceCollisions ( m_race_setup.mirror ) ;
 #endif
+
+    Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+                                  ? Highscores::HST_TIMETRIAL_OVERALL_TIME
+                                  : Highscores::HST_RACE_OVERALL_TIME;
+
+    m_highscores   = highscore_manager->getHighscores(hst, m_kart.size(),
+                                                      m_race_setup.m_difficulty, 
+                                                      m_track->getName(),
+                                                      m_race_setup.m_num_laps);
 
     callback_manager->initAll();
     menu_manager->switchToRace();
@@ -327,32 +337,33 @@ void World::update(float delta)
         // Add times to highscore list. First compute the order of karts,
         // so that the timing of the fastest kart is added first (otherwise
         // someone might get into the highscore list, only to be kicked out
-        // again by a faster kart in the same race).
-        int *order = new int[m_kart.size()];
+        // again by a faster kart in the same race), which might be confusing
+        // if we ever decide to display a message (e.g. during a race)
+        unsigned int *index = new unsigned int[m_kart.size()];
         for (unsigned int i=0; i<m_kart.size(); i++ )
         {
-            order[m_kart[i]->getPosition()-1] = i;
+            index[m_kart[i]->getPosition()-1] = i;
         }
-        for(unsigned int i=0; i<m_kart.size(); i++)
+
+        // Don't record the time for the last kart, since it didn't
+        // finish the race.
+        for(unsigned int pos=0; pos<m_kart.size()-1; pos++)
         {
-            Kart *k = m_kart[order[i]];
-            if(!k->isPlayerKart()) continue;
-            Highscores::HighscoreType hst;
-            if (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
-            { 
-                hst = Highscores::HST_TIMETRIAL_OVERALL_TIME;
-            }
-            else
-            {
-                hst = Highscores::HST_RACE_OVERALL_TIME;
-            }
+            // Only record times for player karts
+            if(!m_kart[index[pos]]->isPlayerKart()) continue;
+
+            PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
             
-            m_highscores = highscore_manager->addResult(hst, m_kart.size(),
-                                                        m_race_setup.m_difficulty, 
-                                                        m_track->getName(),
-                                                        k->getName(),
-                                                        user_config->m_username, 
-                                                        k->getFinishTime());
+            Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+                                  ? Highscores::HST_TIMETRIAL_OVERALL_TIME
+                                  : Highscores::HST_RACE_OVERALL_TIME;
+            m_highscores->addData(hst, m_kart.size(),
+                                  m_race_setup.m_difficulty, 
+                                  m_track->getName(),
+                                  k->getName(),
+                                  k->getPlayer()->getName(),
+                                  k->getFinishTime(),
+                                  m_race_setup.m_num_laps);
         }
         
         widgetSet->tgl_paused();

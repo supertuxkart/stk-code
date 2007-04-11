@@ -46,10 +46,14 @@ private:
 public:
     HighscoreManager();
     ~HighscoreManager();
-    Highscores *addResult(const Highscores::HighscoreType highscore_type, 
-                          const int num_karts, const RaceDifficulty difficulty, 
-                          const std::string track, const std::string kart_name, 
-                          const std::string name, const float time);
+    Highscores *getHighscores(const Highscores::HighscoreType highscore_type, 
+                              const int num_karts, const RaceDifficulty difficulty, 
+                              const std::string track, const int number_of_laps);
+    Highscores *addResult    (const Highscores::HighscoreType highscore_type, 
+                              const int num_karts, const RaceDifficulty difficulty, 
+                              const std::string track, const std::string kart_name, 
+                              const std::string name, const float time,
+                              const int number_of_laps);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

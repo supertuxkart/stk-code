@@ -40,11 +40,13 @@ public:
 private:
     int m_grab_id;
     int m_player_index;
+    int m_name_id;
     bool m_grab_input;
     KartActions m_edit_action;
     // Stores the heading - making this an attribute here avoids
     // memory leaks or complicated memory management
     char m_heading[60];
+    std::string m_name;
     std::string m_key_names[KC_FIRE+1];
 };
 

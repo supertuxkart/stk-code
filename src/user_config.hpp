@@ -33,7 +33,7 @@
    2: Changed to SDL keyboard bindings
    3: Added username
 */
-#define CURRENT_CONFIG_VERSION   3
+#define CURRENT_CONFIG_VERSION   4
 #define SUPPORTED_CONFIG_VERSION 3
 
 #include <string>
