@@ -630,7 +630,7 @@ void Kart::update (float dt)
     updatePhysics(dt);
 
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
-    if(m_material_hot)
+    if(m_material_hot && m_on_ground)
     {
         float r=m_material_hot->getFriction();
         if(r<m_current_friction) 
