@@ -120,12 +120,7 @@ int Track::findRoadSector( const sgVec3 XYZ )const
        find on top of which one of the possible track segments it is.
      */
     const int POS_SEG_SIZE = possible_segment_tris.size();
-    if( POS_SEG_SIZE == 1 )
-    {
-        //Only one possibility, so return it.
-        return possible_segment_tris[0].segment;
-    }
-    else if( POS_SEG_SIZE == 0 )
+    if( POS_SEG_SIZE == 0 )
     {
         //xyz is not on the road
         return UNKNOWN_SECTOR;
@@ -138,7 +133,7 @@ int Track::findRoadSector( const sgVec3 XYZ )const
          */
         float dist;
         float near_dist = 99999;
-        int nearest = 0;
+        int nearest = QUAD_TRI_NONE;
         size_t segment;
         sgVec4 plane;
 
@@ -169,15 +164,19 @@ int Track::findRoadSector( const sgVec3 XYZ )const
                 segment you are on will have a smaller absolute value
                 of dist anyways.
               */
-             if( dist < 0.0) dist = -dist;
-             if( dist < near_dist)
+             if( dist > -3.5 && dist < near_dist)
              {
                  near_dist = dist;
                  nearest = i;
              }
         }
 
-        return possible_segment_tris[nearest].segment;
+        if( nearest != QUAD_TRI_NONE )
+        {
+            return possible_segment_tris[nearest].segment;
+        }
+        else return UNKNOWN_SECTOR; //This only happens if the position is
+                                    //under all the possible sectors
     }
 }
 
@@ -225,7 +224,7 @@ int Track::findOutOfRoadSector
 
     if(CURR_SECTOR != UNKNOWN_SECTOR )
     {
-        const int LIMIT = 2; //The limit prevents shortcuts
+        const int LIMIT = 10; //The limit prevents shortcuts
         if( CURR_SECTOR - LIMIT < 0 )
         {
             begin_sector = DRIVELINE_SIZE - 1 + CURR_SECTOR - LIMIT;
