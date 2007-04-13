@@ -45,8 +45,29 @@ MusicMikMod::MusicMikMod()
     if( !initialized )
     {
         initialized = true;
-        // register null driver
-        MikMod_RegisterAllDrivers();
+
+        //Register network drivers
+        MikMod_RegisterDriver(&drv_AF);
+        MikMod_RegisterDriver(&drv_esd);
+
+        //Register hardware drivers, but disk writer drivers cause problems
+        //on computers without proper hardware or network drivers.
+        MikMod_RegisterDriver(&drv_aix);
+        MikMod_RegisterDriver(&drv_alsa);
+        MikMod_RegisterDriver(&drv_hp);
+        MikMod_RegisterDriver(&drv_sam9407);
+        MikMod_RegisterDriver(&drv_sgi);
+        MikMod_RegisterDriver(&drv_sun);
+        MikMod_RegisterDriver(&drv_ultra);
+
+        //These two won't link, at least under Gentoo linux.
+        //MikMod_RegisterDriver(&drv_dart);
+        //MikMod_RegisterDriver(&drv_os2);
+
+        //Register the null driver in case sound is not available.
+        //Also, for some reason, the assert at line 76 of this file
+        //crashes the program without it.
+        MikMod_RegisterDriver(&drv_nos);
 
         // register loaders (it, s3m, xm y mod)
         MikMod_RegisterAllLoaders();
