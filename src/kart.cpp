@@ -429,6 +429,8 @@ void Kart::doLapCounting ()
         {
             setTimeAtLap(world->m_clock);
             m_race_lap++ ;
+
+            flag1 = flag2 = flag3 = flag4 = false;
             // Only do timings if original time was set properly. Driving backwards
             // over the start line will cause the lap start time to be set to 0.
             if(m_lap_start_time>=0.0)
