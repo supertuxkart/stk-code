@@ -467,10 +467,12 @@ void Kart::doObjectInteractions ()
         sgVec3 xyz ;
         Kart *other_kart = world->getKart(i);
         sgSubVec3(xyz, getCoord()->xyz, other_kart->getCoord()->xyz );
-
-        if ( sgLengthSquaredVec2 ( xyz ) < 1.0f )
+        float dist = sgLengthSquaredVec2(xyz);
+        if ( dist < 1.0f )
         {
-            sgNormalizeVec2 ( xyz ) ;
+            // Avoid division by zero
+            if(dist>0.00001) sgNormalizeVec2(xyz) ;
+
             world->addCollisions(m_grid_position, 1);
             world->addCollisions(i,             1);
             if ( m_velocity.xyz[1] > other_kart->getVelocity()->xyz[1] )
@@ -941,7 +943,9 @@ void Kart::updatePhysics (float dt)
         }
         if(m_controls.jump)
         { // ignore gravity down when jumping
+#ifdef ENABLE_JUMPING
             ForceGravity = stk_config->m_jump_impulse*WORLD_GRAVITY;
+#endif
         }
         else
         {   // kart is on groud and not jumping

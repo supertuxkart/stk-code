@@ -54,7 +54,9 @@ void PlayerKart::action(KartActions action, int value)
         m_controls.fire = value;
         break;
     case KC_JUMP:
+#ifdef ENABLE_JUMPING
         m_controls.jump = value;
+#endif
         break;
     }
 }
