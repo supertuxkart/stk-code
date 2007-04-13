@@ -150,7 +150,9 @@ void DefaultRobot::handle_steering()
     /*The AI responds based on the information we just gathered, using a
      *finite state machine.
      */
-    if( !m_on_road )//Reaction to being outside of the road
+    //Reaction to being outside of the road
+    if( fabsf(m_curr_track_coords[0]) + 0.5 >
+        world->m_track->getWidth()[m_track_sector] )
     {
         steer_angle = steer_to_point( world->m_track->
             m_driveline[NEXT_SECTOR] );
@@ -447,7 +449,14 @@ float DefaultRobot::steer_to_point( const sgVec2 POINT )
 {
     const SGfloat ADJACENT_LINE = POINT[0] - m_curr_pos.xyz[0];
     const SGfloat OPPOSITE_LINE = POINT[1] - m_curr_pos.xyz[1];
-    SGfloat theta = sgATan( OPPOSITE_LINE / ADJACENT_LINE );
+    SGfloat theta;
+
+    //Protection from division by zero
+    if( ADJACENT_LINE > 0.0000001 || ADJACENT_LINE < -0.0000001 )
+    {
+        theta = sgATan( OPPOSITE_LINE / ADJACENT_LINE );
+    }
+    else theta = 0;
 
     //The real value depends on the side of the track that the kart is
     theta += ADJACENT_LINE < 0.0f ? 90.0f : -90.0f;
