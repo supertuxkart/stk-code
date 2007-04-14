@@ -108,7 +108,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
             // Handle backspace
             if(id0==SDLK_BACKSPACE)
             {
-                m_name.erase(m_name.size()-1,1);
+	      if(m_name.size()>=1) m_name.erase(m_name.size()-1,1);
             }
             // All other control characters are ignored and will end 
             // entering the name
