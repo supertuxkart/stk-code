@@ -14,6 +14,12 @@ SuperTuxKart SVN
 * Removed unused files
 * Better control configuration
 * Better in-game help
+* Added new track: the island
+* Highscores support
+* Added .desktop file for menus and icon
+* MacOSX support
+* Added new penalty: bomb
+* Optional ogg-vorbis support (not yet used)
 * Bugfixes:
   -Fixed bug in ssg_help::MinMax, which could cause a significant performance loss.
   -Fixed bug that allowed the joystick to erase the main menu

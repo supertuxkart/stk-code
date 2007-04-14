@@ -26,6 +26,9 @@ Additional coding:
    Robert Schuster 
          - SDL port
          - bug fixes
+
+   Damien
+         - Ogg vorbis support
    
    Johannes Sjolund
          - Island track making
