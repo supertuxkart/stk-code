@@ -422,11 +422,11 @@ void DefaultRobot::handle_rescue(const float DELTA)
     if( m_crash_time < 0.0f ) m_crash_time = 0.0f;
 
     //Reaction to being stuck
-    if( m_crash_time > 3.0f )
+    if( m_crash_time > 3.0f && m_on_ground )
     {
-        m_controls.rescue = true;
+        m_rescue = true;
+        m_crash_time = 0.0f;
     }
-    else m_controls.rescue = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -707,8 +707,8 @@ int DefaultRobot::calc_steps()
     //mostly for curves.
     if( fabsf(m_controls.lr) > 0.95 )
     {
-        const int WIDTH_STEPS = world->m_track->getWidth()[m_future_sector] /
-            ( KART_LENGTH * 2.0 );
+        const int WIDTH_STEPS = (int)( world->m_track->getWidth(
+            )[m_future_sector] / ( KART_LENGTH * 2.0 ));
 
         steps += WIDTH_STEPS;
     }
