@@ -357,13 +357,16 @@ void World::update(float delta)
             Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
-            m_highscores->addData(hst, m_kart.size(),
-                                  m_race_setup.m_difficulty, 
-                                  m_track->getName(),
-                                  k->getName(),
-                                  k->getPlayer()->getName(),
-                                  k->getFinishTime(),
-                                  m_race_setup.m_num_laps);
+            if(m_highscores->addData(hst, m_kart.size(),
+				     m_race_setup.m_difficulty, 
+				     m_track->getName(),
+				     k->getName(),
+				     k->getPlayer()->getName(),
+				     k->getFinishTime(),
+				     m_race_setup.m_num_laps)>0)
+	    {
+	        highscore_manager->Save();
+	    }
         }
         
         widgetSet->tgl_paused();

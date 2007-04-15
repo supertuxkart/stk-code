@@ -40,12 +40,12 @@ private:
     bool        m_can_write;
 
     void Load();
-    void Save();
     void SetFilename();
 
 public:
     HighscoreManager();
     ~HighscoreManager();
+    void Save();
     Highscores *getHighscores(const Highscores::HighscoreType highscore_type, 
                               const int num_karts, const RaceDifficulty difficulty, 
                               const std::string track, const int number_of_laps);
