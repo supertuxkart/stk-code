@@ -215,6 +215,7 @@ void  HerringManager::hitHerring(Kart* kart)
     }   // for m_all_herrings
 }   // hitHerring
 
+//-----------------------------------------------------------------------------
 /** Remove all herring instances, and the track specific models. This is used
  *  just before a new track is loaded and a race is started.
  */
@@ -260,6 +261,7 @@ void HerringManager::cleanup()
 
 }   // cleanup
 
+//-----------------------------------------------------------------------------
 /** Remove all herring instances, and the track specific models. This is used
  * just before a new track is loaded and a race is started
  */
