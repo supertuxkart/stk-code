@@ -945,6 +945,8 @@ void Kart::updatePhysics (float dt)
         { // ignore gravity down when jumping
 #ifdef ENABLE_JUMPING
             ForceGravity = stk_config->m_jump_impulse*WORLD_GRAVITY;
+#else
+	    ForceGravity = -WORLD_GRAVITY * MASS;
 #endif
         }
         else
