@@ -3870,6 +3870,11 @@ refs 4
 3 4.0 0.0
 kids 0
 OBJECT poly
+name "wrapper"
+data 14
+@autotex y=0.3
+kids 1
+OBJECT poly
 name "sandstorm"
 data 4
 Mesh
