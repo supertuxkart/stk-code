@@ -100,33 +100,41 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
     {
         // Handle input of user name
         // -------------------------
-        if(m_grab_id == m_name_id && type==IT_KEYBOARD)
+        if(m_grab_id == m_name_id)
         {
-            // Ignore shift, otherwise shift will disable input
-            // (making it impossible to enter upper case characters)
-            if(id0==SDLK_RSHIFT || id0==SDLK_LSHIFT) return;
-            // Handle backspace
-            if(id0==SDLK_BACKSPACE)
+            if(type==IT_KEYBOARD)
             {
-	      if(m_name.size()>=1) m_name.erase(m_name.size()-1,1);
-            }
-            // All other control characters are ignored and will end 
-            // entering the name
-            else if(id0<32 || id0>255)
+                // Ignore shift, otherwise shift will disable input
+                // (making it impossible to enter upper case characters)
+                if(id0==SDLK_RSHIFT || id0==SDLK_LSHIFT) return;
+                // Handle backspace
+                if(id0==SDLK_BACKSPACE)
+                {
+                    if(m_name.size()>=1) m_name.erase(m_name.size()-1,1);
+                }
+                // All other control characters are ignored and will end 
+                // entering the name
+                else if(id0<32 || id0>255)
+                {
+                    m_grab_input = false;
+                    user_config->m_player[m_player_index].setName(m_name);
+                    BaseGUI::input(type, id0, id1, id2, value);
+                    return;
+                }
+                else  // Add the character to the name
+                {
+                    // For this menu only unicode translation is enabled.
+                    // So we use the unicode character here, since this will
+                    // take care of upper/lower case etc.
+                    m_name = m_name + (char)id1;
+                }
+                widgetSet->set_label(m_name_id, m_name.c_str());
+            } 
+            else
             {
-                m_grab_input = false;
-                user_config->m_player[m_player_index].setName(m_name);
-                BaseGUI::input(type, id0, id1, id2, value);
-                return;
+                // Ignore all other events, e.g. when pressing the mouse
+                // button twice on the input field etc.
             }
-            else  // Add the character to the name
-            {
-                // For this menu only unicode translation is enabled.
-                // So we use the unicode character here, since this will
-                // take care of upper/lower case etc.
-                m_name = m_name + (char)id1;
-            }
-            widgetSet->set_label(m_name_id, m_name.c_str());
         }
         // Handle the definition of a key
         // ------------------------------
