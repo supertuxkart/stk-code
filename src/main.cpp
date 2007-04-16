@@ -62,7 +62,11 @@
 #include "highscore_manager.hpp"
 
 #ifdef BULLET
-#include <GL/glut.h>
+#  ifdef __APPLE__
+#    include <GLUT/glut.h>
+#  else
+#    include <GL/glut.h>
+#  endif
 #endif
 
 void cmdLineHelp (char* invocation)
