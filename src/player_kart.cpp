@@ -26,15 +26,36 @@
 #include "herring.hpp"
 #include "world.hpp"
 
-void PlayerKart::action(KartActions action, int value)
+void PlayerKart::action(KartActions action, int value, bool isKeyboard)
 {
+    if(isKeyboard) m_action_keys_values[action]=value;
     switch (action)
     {
     case KC_LEFT:
-        m_steer_val = -value;
+        // Special case: when releasing a key on the keyboard, take the
+        // current value of the opposite steering direction. If the opposite
+        // key is not pressed, this value is zero, otherwise it will 
+        // pick up the previous direction (e.g. consider: press right,
+        // press left, release left --> will steer right;  or:
+        // press left, press right, release left --> will steer right)
+        if(isKeyboard && value==0)
+        {
+            m_steer_val = m_action_keys_values[KC_RIGHT];
+        }
+        else
+        {
+            m_steer_val = -value;
+        }
         break;
     case KC_RIGHT:
-        m_steer_val = value;
+        if(isKeyboard && value==0)
+        {
+            m_steer_val = -m_action_keys_values[KC_LEFT];
+        }
+        else
+        {
+            m_steer_val = value;
+        }
         break;
     case KC_ACCEL:
         m_accel_val = value;
@@ -166,7 +187,10 @@ void PlayerKart::reset()
     m_controls.wheelie = false;
     m_controls.jump = false;
     m_penalty_time = 0;
-
+    for(int i=KC_LEFT; i<=KC_FIRE; i++)
+    {
+        m_action_keys_values[i]=false;
+    }
     Kart::reset();
 }
 

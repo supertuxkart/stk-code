@@ -121,6 +121,10 @@ int handleCmdLine(int argc, char **argv)
             cmdLineHelp(argv[0]);
             return 0;
         }
+        else if(!strcmp(argv[i], "--keyboard-debug"))
+        {
+            user_config->m_keyboard_debug=true;
+        }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
             race_manager->setPlayerKart(0, argv[i+1]);

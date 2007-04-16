@@ -160,6 +160,10 @@ void drv_loop()
 
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            if(user_config->m_keyboard_debug)
+            {
+                printf("keyboard: %d %d\n",ev.key.keysym.sym,ev.key.state);
+            }
             input(IT_KEYBOARD, ev.key.keysym.sym, ev.key.keysym.unicode, 0, ev.key.state);
             break;
 

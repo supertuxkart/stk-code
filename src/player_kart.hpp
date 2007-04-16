@@ -35,7 +35,11 @@ private:
     int m_steer_val, m_accel_val;
 
     Player *m_player;
-    float  m_penalty_time;
+    float   m_penalty_time;
+    // This field saves all currently pressed keys for each action. This is used
+    // to solve problems like: press left, press right, release right --> 
+    // the kart should in this case steer left.
+    int     m_action_keys_values[KC_FIRE+1];
 
     void smoothSteer(float dt, bool left, bool right);
 public:
@@ -48,7 +52,7 @@ public:
     int     earlyStartPenalty () {return m_penalty_time>0; }
     Player* getPlayer         () {return m_player;        }
     void    update            (float);
-    void    action            (KartActions action, int value);
+    void    action            (KartActions action, int value, bool isKeyboard);
     void    forceCrash        ();
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);
