@@ -1,7 +1,10 @@
 Preliminary support for the bullet physics engine has been
 added. To enable it (assume that 'STK' is the supertuxkart root
 directory):
-1) Decompress a recent version of bullet in STK/trunk/bullet
+1) Decompress version r528 of bullet in STK/trunk/bullet
+   (the API of bullet is changing, and STK hasn't been updated
+   to use a recent bullet version yet. So new bullet versions
+   will most likely not compile and/or not work).
 2) Compile bullet (follow the instructions in STK/trunk/bullet/INSTALL)
 3) Run configure with:
    ./configure --enable-bullet
