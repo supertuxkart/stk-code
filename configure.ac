@@ -370,7 +370,6 @@ AC_CONFIG_FILES([     \
  wavs/Makefile        \
  wavs/radio/Makefile  \
  wavs/tintagel/Makefile \
- highscores/Makefile  \
  models/herrings/Makefile
 ])
 AC_OUTPUT
