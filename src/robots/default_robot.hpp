@@ -89,7 +89,9 @@ private:
                              //at the same time and rarely repeat the a
                              //previous timing.
 
-    int m_inner_curve;
+    int m_inner_curve;//-1 left, 1 = right, 0 = center
+    float m_curve_target_speed;
+    float m_curve_angle;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
@@ -103,7 +105,7 @@ private:
     void handle_steering();
     void handle_items(const float DELTA, const int STEPS);
     void handle_rescue(const float DELTA);
-    void handle_braking(const int STEPS);
+    void handle_braking();
     void handle_wheelie(const int STEPS);
 
     /*Lower level functions not called directly from update()*/
@@ -118,6 +120,8 @@ private:
     int calc_steps();
 
     float angle_to_control(float angle) const;
+    float get_approx_radius(const int START, const int END) const;
+    void find_curve();
 
 public:
     DefaultRobot(const KartProperties *kart_properties, int position,

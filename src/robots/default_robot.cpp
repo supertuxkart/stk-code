@@ -99,6 +99,7 @@ void DefaultRobot::update( float delta )
     //Detect if we are going to crash with the track and/or kart
     const int STEPS = calc_steps();
     check_crashes( STEPS, m_curr_pos.xyz );
+    find_curve();
 
     /*Response handling functions*/
     handle_acceleration( delta );
@@ -106,7 +107,7 @@ void DefaultRobot::update( float delta )
     handle_items( delta, STEPS );
     handle_rescue( delta );
     handle_wheelie( STEPS );
-    handle_braking( STEPS );
+    handle_braking();
     //TODO:handle jumping
 
     /*And obviously general kart stuff*/
@@ -123,20 +124,62 @@ void DefaultRobot::handle_wheelie( const int STEPS )
 }
 
 //-----------------------------------------------------------------------------
-void DefaultRobot::handle_braking( const int STEPS )
+void DefaultRobot::handle_braking()
 {
-    //We brake if we are about to get out of the road, but only if the
-    //kart is on top of the road and if it doesn't slows the kart too
-    //much
-    if ( m_crashes.m_road && m_on_road && STEPS > 5 )
+    //We may brake if we are about to get out of the road, but only if the
+    //kart is on top of the road.
+    if ( m_crashes.m_road && m_on_road)
     {
-        m_controls.brake = true;
+        float kart_ang_diff = world->m_track->m_angle[m_track_sector] -
+            m_curr_pos.hpr[0];
+        kart_ang_diff = normalize_angle(kart_ang_diff);
+        kart_ang_diff = fabsf(kart_ang_diff);
+
+        const float MIN_TRACK_ANGLE = 20.0f;
+        const float CURVE_INSIDE_PERC = 0.25f;
+
+        //Brake only if the road does not goes somewhat straight.
+        if(m_curve_angle > MIN_TRACK_ANGLE) //Next curve is left
+        {
+            //Avoid braking if the kart is in the inside of the curve, but
+            //if the curve angle is bigger than what the kart can steer, brake
+            //even if we are in the inside, because the kart would be 'thrown'
+            //out of the curve.
+            if(!(m_curr_track_coords[0] > world->m_track->
+                getWidth()[m_track_sector] * -CURVE_INSIDE_PERC ||
+                m_curve_angle > getMaxSteerAngle()))
+            {
+                m_controls.brake = false;
+                return;
+            }
+        }
+        else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
+        {
+            if(!(m_curr_track_coords[0] < world->m_track->
+                getWidth()[m_track_sector] * CURVE_INSIDE_PERC ||
+                m_curve_angle < -getMaxSteerAngle()))
+            {
+                m_controls.brake = false;
+                return;
+            }
+        }
+
+        //Brake if the kart's speed is bigger than the speed we need
+        //to go through the curve at the widest angle, or if the kart
+        //is not going straight in relation to the road.
+        if(m_velocity.xyz[1] > m_curve_target_speed ||
+           kart_ang_diff > MIN_TRACK_ANGLE )
+        {
 #ifdef AI_DEBUG
         std::cout << "BRAKING" << std::endl;
 #endif
+            m_controls.brake = true;
+            return;
+        }
+
     }
-    else
-        m_controls.brake = false;
+
+    m_controls.brake = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,8 +306,10 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             {
             case COLLECT_ZIPPER:
                 {
-                    const float ANGLE_DIFF = fabsf( world->m_track->
-                        m_angle[m_track_sector]- m_curr_pos.hpr[0] );
+                    const float ANGLE_DIFF = fabsf( normalize_angle(
+                        world->m_track->m_angle[m_track_sector]-
+                        m_curr_pos.hpr[0] ) );
+
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
                         15.0f && !m_crashes.m_road && STEPS > 8 )
                     {
@@ -669,6 +714,9 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
 void DefaultRobot::reset()
 {
     m_inner_curve = 0;
+    m_curve_target_speed = getMaxSpeed();
+    m_curve_angle = 0.0;
+
     m_future_location[0] = 0.0;
     m_future_location[1] = 0.0;
 
@@ -729,3 +777,102 @@ float DefaultRobot::angle_to_control( float angle ) const
     return angle;
 }
 
+/** Finds the approximate radius of a track's curve. It needs two arguments,
+ *  the number of the drivepoint that marks the beginning of the curve, and
+ *  the number of the drivepoint that marks the ending of the curve.
+ *
+ *  Based on that you can construct any circle out of 3 points in it, we use
+ *  the two arguments to use the drivelines as the first and last point; the
+ *  middle sector is averaged.
+ */
+float DefaultRobot::get_approx_radius(const int START, const int END) const
+{
+    const int MIDDLE = (START + END) / 2;
+
+    //If the START and END sectors are very close, their average will be one
+    //of them, and using twice the same point just generates a huge radius
+    //(too big to be of any use) but it also can generate a division by zero,
+    //so here is some special handling for that case.
+    if (MIDDLE == START || MIDDLE == END ) return 99999.0f;
+
+    float X1, Y1, X2, Y2, X3, Y3;
+
+    //The next line is just to avoid compiler warnings.
+    X1 = X2 = X3 = Y1 = Y2 = Y3 = 0.0;
+
+
+    if(m_inner_curve == -1)
+    {
+
+    X1 = world->m_track->m_left_driveline[START][0];
+    Y1 = world->m_track->m_left_driveline[START][1];
+
+    X2 = world->m_track->m_left_driveline[MIDDLE][0];
+    Y2 = world->m_track->m_left_driveline[MIDDLE][1];
+
+    X3 = world->m_track->m_left_driveline[END][0];
+    Y3 = world->m_track->m_left_driveline[END][1];
+    }else if (m_inner_curve == 0)
+    {
+    X1 = world->m_track->m_driveline[START][0];
+    Y1 = world->m_track->m_driveline[START][1];
+
+    X2 = world->m_track->m_driveline[MIDDLE][0];
+    Y2 = world->m_track->m_driveline[MIDDLE][1];
+
+    X3 = world->m_track->m_driveline[END][0];
+    Y3 = world->m_track->m_driveline[END][1];
+    }else if (m_inner_curve == 1)
+    {
+    X1 = world->m_track->m_right_driveline[START][0];
+    Y1 = world->m_track->m_right_driveline[START][1];
+
+    X2 = world->m_track->m_right_driveline[MIDDLE][0];
+    Y2 = world->m_track->m_right_driveline[MIDDLE][1];
+
+    X3 = world->m_track->m_right_driveline[END][0];
+    Y3 = world->m_track->m_right_driveline[END][1];
+    }
+
+    const float A = X2 - X1;
+    const float B = Y2 - Y1;
+    const float C = X3 - X1;
+    const float D = Y3 - Y1;
+
+    const float E = A * ( X1 + X2) + B * (Y1 + Y2);
+    const float F = C * ( X1 + X3) + D * (Y1 + Y3);
+
+    const float G = 2.0 * ( A*( Y3-Y2 ) - B*( X3 - X2 ) );
+
+    const float pX = ( D*E - B*F) / G;
+    const float pY = ( A*F - C*E) / G;
+
+    const float radius = sqrt( ( X1 - pX) * ( X1 - pX) + (Y1 - pY) * (Y1 - pY) );
+
+    return radius;
+}
+
+/**Find_curve() gathers info about the closest sectors ahead: the curve
+ * angle, the direction of the next turn, and the optimal speed at which the
+ * curve can be travelled at it's widest angle.
+ *
+ * The number of sectors that form the curve is dependant on the kart's speed.
+ */
+void DefaultRobot::find_curve()
+{
+    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
+    float total_dist = 0.0f;
+    int next_hint = m_track_sector;
+    int i;
+
+    for(i = m_track_sector; total_dist < m_velocity.xyz[1]; i = next_hint)
+    {
+        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
+        total_dist += sgDistanceVec2(world->m_track->m_driveline[i], world->m_track->m_driveline[next_hint]);
+    }
+
+
+    m_curve_angle = normalize_angle(world->m_track->m_angle[i] - world->m_track->m_angle[m_track_sector]);
+    m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
+    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->getGravity() * getTireGrip());
+}
