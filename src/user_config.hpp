@@ -52,7 +52,6 @@ private:
 
     void        setFilename      ();
     int         CheckAndCreateDir();
-    std::string getConfigDir     ();
 
     void readInput(const lisp::Lisp* &r,
                    const char *node,
@@ -87,6 +86,7 @@ public:
     UserConfig();
     UserConfig(const std::string& filename);
     ~UserConfig();
+    std::string getConfigDir     ();
     void setDefaults();
     void loadConfig();
     void loadConfig(const std::string& filename);

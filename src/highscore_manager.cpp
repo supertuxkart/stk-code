@@ -25,6 +25,7 @@
 #include "string_utils.hpp"
 #include "loader.hpp"
 #include "race_setup.hpp"
+#include "user_config.hpp"
 
 HighscoreManager* highscore_manager=0;
 
@@ -53,26 +54,19 @@ void HighscoreManager::SetFilename()
     {
         m_filename = getenv("SUPERTUXKART_HIGHSCOREDIR")
                  + std::string("/highscores/highscores.data");
-    } else {
-        // Check if we are running from a relativ location
-        std::string defaultPath = loader->getPath(m_filename);
-        if(defaultPath[0]=='/')  // no relative location, get configuration dir
-        { 
-#ifdef SUPERTUXKART_HIGHSCOREDIR
-            m_filename = SUPERTUXKART_HIGHSCOREDIR
-                     + std::string("/highscores/highscores.data");
-#else
-            m_filename="/usr/local/share/games/supertuxkart/highscores.data";
-#endif
-        }
-        else  // running in relative dir --> put highscore file in datadir!
-        {
-            m_filename=loader->getPath("highscores/highscores.data");
-        }
     }
+    else 
+    {
+        m_filename=user_config->getConfigDir();
+    }
+    m_filename += "/highscore.data";
+
     // Set the correct directory separator
-    m_filename[m_filename.length()-strlen("/highscores.data")           ]=DIR_SEPARATOR;
-    m_filename[m_filename.length()-strlen("/highscores/highscores.data")]=DIR_SEPARATOR;
+    for(unsigned int i=0; i<m_filename.size(); i++)
+    {
+        if(m_filename[i]=='\\' || m_filename[i]=='/')
+            m_filename[i]=DIR_SEPARATOR;
+    }
     return;
 
 }   // SetFilename
