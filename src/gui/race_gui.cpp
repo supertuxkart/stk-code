@@ -257,17 +257,15 @@ void RaceGUI::drawTimer ()
 {
     if(world->getPhase()!=World::RACE_PHASE         &&
        world->getPhase()!=World::DELAY_FINISH_PHASE   ) return;
-    char str [ 256 ] ;
+    char str[256];
 
     assert(world != NULL);
     m_time_left = world->m_clock;
 
-    int min     = (int) floor ( m_time_left / 60.0 ) ;
-    int sec     = (int) floor ( m_time_left - (double) ( 60 * min ) ) ;
-    int tenths  = (int) floor ( 10.0f * (m_time_left - (double)(sec + 60*min)));
-
-    sprintf ( str, "%d:%02d:%d", min,  sec,  tenths ) ;
-    widgetSet->drawDropShadowTextRace ( str, 60, user_config->m_width-260, user_config->m_height-64, 255, 255, 255) ;
+    TimeToString(m_time_left, str);
+    widgetSet->drawDropShadowTextRace(str, 60, user_config->m_width-260, 
+                                      user_config->m_height-64, 
+                                      255, 255, 255);
 }   // drawTimer
 
 //-----------------------------------------------------------------------------
@@ -387,18 +385,23 @@ void RaceGUI::drawPlayerIcons ()
         }
 
         if(m_lap_leader>0 &&    // Display position during first lap
-           position!=1  &&    // Display position for leader
            (world->m_clock - kart->getTimeAtLap()<5.0f ||
             lap!=m_lap_leader))
         {  // Display for 5 seconds
-            float timeBehind;
-            timeBehind = (lap==m_lap_leader ? kart->getTimeAtLap() : world->m_clock)
-                         - m_time_of_leader;
-            int min     = (int) floor ( timeBehind / 60.0 ) ;
-            int sec     = (int) floor ( timeBehind - (double) ( 60 * min ) ) ;
-            int tenths  = (int) floor ( 10.0f * (timeBehind - (double)(sec + 60*min)));
             char str[256];
-            sprintf ( str, "%d:%02d\"%d", min,  sec,  tenths ) ;
+            if(position==1)
+            {
+                str[0]=' '; str[1]=0;
+                TimeToString(kart->getTimeAtLap(), str+1);
+            }
+            else
+            {
+                float timeBehind;
+                timeBehind = (lap==m_lap_leader ? kart->getTimeAtLap() : world->m_clock)
+                    - m_time_of_leader;
+                str[0]='+'; str[1]=0;
+                TimeToString(timeBehind, str+1);
+            }
             widgetSet->drawDropShadowTextRace(str, 30, ICON_PLAYER_WIDHT+x, y+5,
                                               red, green, blue);
         }

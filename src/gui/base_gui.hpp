@@ -33,7 +33,7 @@ public:
 
     virtual void input(InputType type, int id0, int id1, int id2, int value);
     virtual void inputKeyboard(int key, int pressed);
-
+    void  TimeToString(const float time, char *s);
 protected:
     int m_menu_id;
 };

@@ -72,10 +72,7 @@ RaceResultsGUI::RaceResultsGUI()
         else
         {
             const float T      = KART->getFinishTime();
-            const int   MINS   = (int) floor ( T / 60.0 ) ;
-            const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
-            const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-            sprintf(sTime,"%3d:%02d.%01d", MINS, SECS, TENTHS);
+            TimeToString(T, sTime);
         }
         //This shows position + driver name + time + points earned + total points
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",

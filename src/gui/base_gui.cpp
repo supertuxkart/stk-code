@@ -125,4 +125,14 @@ void BaseGUI::update(float dt)
     widgetSet -> paint(m_menu_id) ;
 }   // update
 
+//-----------------------------------------------------------------------------
+void BaseGUI::TimeToString(const float TIME, char *s)
+{
+    int min     = (int) floor ( TIME / 60.0 ) ;
+    int sec     = (int) floor ( TIME - (double) ( 60 * min ) ) ;
+    int tenths  = (int) floor ( 10.0f * (TIME - (double)(sec + 60* min)));
+    sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
+}   // TimeToString
+
+//-----------------------------------------------------------------------------
 /* EOF */
