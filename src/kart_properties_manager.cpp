@@ -116,6 +116,8 @@ const KartProperties* KartPropertiesManager::getKartById(int i)
     return m_karts_properties[i];
 }
 
+/*FIXME: the next function is unused, if it is not useful, it should be
+  deleted.*/
 //-----------------------------------------------------------------------------
 std::vector<std::string> KartPropertiesManager::getRandomKarts(int len)
 {
@@ -143,6 +145,7 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
         i != m_karts_properties.end(); ++i)
         all_karts.push_back((*i)->getIdent());
 
+    std::srand(std::time(0));
     std::random_shuffle(all_karts.begin(), all_karts.end());
 
     int new_kart = 0;
