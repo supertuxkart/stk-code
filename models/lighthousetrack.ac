@@ -12090,6 +12090,11 @@ refs 4
 27 0.487927496433 0.334459215403
 kids 0
 OBJECT poly
+name "wrapper"
+data 15
+@autotex x=0.02
+kids 1
+OBJECT poly
 name "Plane"
 data 4
 Mesh
