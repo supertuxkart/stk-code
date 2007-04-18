@@ -126,9 +126,12 @@ void DefaultRobot::handle_wheelie( const int STEPS )
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_braking()
 {
+    const float MIN_SPEED = world->m_track->getWidth()[m_track_sector];
+
     //We may brake if we are about to get out of the road, but only if the
-    //kart is on top of the road.
-    if ( m_crashes.m_road && m_on_road)
+    //kart is on top of the road, and if we won't slow down below a certain
+    //limit.
+    if ( m_crashes.m_road && m_on_road && m_velocity.xyz[1] > MIN_SPEED)
     {
         float kart_ang_diff = world->m_track->m_angle[m_track_sector] -
             m_curr_pos.hpr[0];
