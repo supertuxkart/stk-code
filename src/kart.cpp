@@ -467,8 +467,8 @@ void Kart::doObjectInteractions ()
         sgVec3 xyz ;
         Kart *other_kart = world->getKart(i);
         sgSubVec3(xyz, getCoord()->xyz, other_kart->getCoord()->xyz );
-        float dist = sgLengthSquaredVec2(xyz);
-        if ( dist < 1.0f )
+        float dist = sgLengthSquaredVec3(xyz);
+        if ( dist < 1.1f )
         {
             // Avoid division by zero
             if(dist>0.00001) sgNormalizeVec2(xyz) ;
