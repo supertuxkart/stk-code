@@ -4,7 +4,7 @@
  (name        "TuxKart Cup")
  (description "The original 6 tracks included in TuxKart")
  (herring     "old")
- (tracks      "olivermath" "sandtrack" "gownsbow" "bsodcastle" "geekopeak" "olivermath" "tuxtrack")
+ (tracks      "olivermath" "sandtrack" "gownsbow" "bsodcastle" "geekopeak" "tuxtrack")
 )
 
 ;; EOF ;;
