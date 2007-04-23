@@ -59,7 +59,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	preprocessor.cpp	   preprocessor.hpp	        \
     callback.hpp						\
 	moving_physics.hpp	   moving_physics.cpp		\
-	movint_texture.hpp	   moving_texture.cpp		\
+	moving_texture.hpp	   moving_texture.cpp		\
 	callback_manager.cpp       callback_manager.hpp         \
     physics.cpp                physics.hpp                  \
 	skid_mark.cpp		   skid_mark.hpp	        \
@@ -80,7 +80,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	projectile.cpp 		   projectile.hpp	        \
 	history.cpp		   history.hpp	        	\
 	race_setup.hpp	   	   no_copy.hpp	        	\
-	kart_control.hpp	   constants.hpp            	\
+	constants.hpp            	\
 	translation.hpp 					\
 	traffic.cpp 			  	        	\
 	player.hpp		   screen.hpp			\
