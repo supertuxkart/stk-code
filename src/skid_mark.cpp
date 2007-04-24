@@ -43,6 +43,7 @@ SkidMark::~SkidMark()
             ssgDeRefDelete(m_skid_marks[i]);
         }   // for
     }   // if !empty
+    ssgDeRefDelete(m_skid_state);
 }   // ~SkidMark
 
 //-----------------------------------------------------------------------------

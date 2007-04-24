@@ -212,7 +212,8 @@ World::~World()
     m_kart.clear();
     projectile_manager->cleanup();
     delete [] m_number_collisions;
-    delete m_scene ;
+    delete m_scene;
+    delete m_physics;
 
     sound_manager -> stopMusic();
 
@@ -372,7 +373,7 @@ void World::update(float delta)
 	        highscore_manager->Save();
 	    }
         }
-        
+        delete []index;
         widgetSet->tgl_paused();
         menu_manager->pushMenu(MENUID_RACERESULT);
     }
