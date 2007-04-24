@@ -25,6 +25,7 @@ float SkidMark::m_global_track_offset = 0.005f;
 SkidMark::SkidMark()
 {
     m_skid_state = new ssgSimpleState ();
+    m_skid_state->ref();
     m_skid_state -> enable (GL_BLEND);
     //This is just for the skidmarks, so the ones drawn when the kart is in
     //reverse get drawn
