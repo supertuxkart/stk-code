@@ -337,12 +337,12 @@ void HerringManager::loadHerringStyle(const std::string filename)
     root = parser.parse(loader->getPath(TMP));
 
     const lisp::Lisp* herring_node = root->getLisp("herring");
-    delete root;
     if(!herring_node)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), _("Couldn't load map '%s': no herring node."),
                  filename.c_str());
+	delete root;
         throw std::runtime_error(msg);
     }
 
@@ -350,6 +350,7 @@ void HerringManager::loadHerringStyle(const std::string filename)
     setHerring(herring_node, "green", HE_GREEN );
     setHerring(herring_node, "gold"  ,HE_GOLD  );
     setHerring(herring_node, "silver",HE_SILVER);
+    delete root;
 }   // loadHerringStyle
 
 //-----------------------------------------------------------------------------
