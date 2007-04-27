@@ -121,7 +121,7 @@ RaceResultsGUI::RaceResultsGUI()
     }
 
     widgetSet -> layout(m_menu_id, 0, 0);
-}
+}  // RaceResultsGUI
 
 //-----------------------------------------------------------------------------
 RaceResultsGUI::~RaceResultsGUI()
@@ -129,7 +129,7 @@ RaceResultsGUI::~RaceResultsGUI()
     widgetSet -> delete_widget(m_menu_id) ;
     delete[] m_score;
     delete[] m_highscores;
-}
+}   // ~RaceResultsGUI
 
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::select()
@@ -156,47 +156,26 @@ void RaceResultsGUI::select()
     default:
         break;
     }
-}
+}   // select
 
 
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::input(InputType type, int id0, int  id1, int id2, int value)
 {
-    switch (type)
+    if( (type==IT_STICKBUTTON && value && id1==1               ) ||
+        (type==IT_MOUSEBUTTON && value && id0==SDL_BUTTON_RIGHT)    )
+    {    // Usually here would be code to close this gui. Not only
+         // that doesn't has any real function in this gui,
+         // but also closing this gui causes bug #9157.
+        widgetSet->tgl_paused();
+        race_manager->next();
+    }
+    else
     {
-    case IT_KEYBOARD:
-        inputKeyboard(id0, value);
-        break;
-    case IT_MOUSEMOTION:
-        if (id0 == 1 && value)
-            if (id1 == AD_NEGATIVE)
-                inputKeyboard(SDLK_UP, 1);
-            else
-                inputKeyboard(SDLK_DOWN, 1);
-        break;
-    case IT_STICKMOTION:
-        if(widgetSet)
-            widgetSet -> pulse(widgetSet -> stick(m_menu_id, id1, id2, value), 1.2f);
-        break;
-    case IT_STICKBUTTON:
-        if( value)
-            switch (id1) // Button no
-            {
-            case 0:
-                select();
-                break;
-
-            case 1:   //Usually here would be code to close this gui. Not only
-                      //that doesn't has any real function in this gui,
-                      //but also closing this gui causes bug #9157.
-                break;
-            }
-        break;
-    default:
-        break;
+        BaseGUI::input(type, id0, id1, id2, value);
     }
 
-}
+}   // input
 
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::inputKeyboard(int key, int pressed)
@@ -204,27 +183,17 @@ void RaceResultsGUI::inputKeyboard(int key, int pressed)
     if (!pressed)
         return;
 
-    switch ( key )
+    if(key!=SDLK_ESCAPE)
     {
-    case SDLK_LEFT:
-    case SDLK_RIGHT:
-    case SDLK_UP:
-    case SDLK_DOWN:
-        widgetSet->pulse(widgetSet->cursor(m_menu_id, key), 1.2f);
-        break;
-    case SDLK_SPACE:
-    case SDLK_RETURN:
-        select();
-        break;
-
-    case SDLK_ESCAPE: //Usually here would be code to close this gui. Not only
-                      //that doesn't has any real function in this gui,
-                      //but also causes bug #9157.
-        break;
-
-    default:
-        break;
-    }   // switch
+        BaseGUI::inputKeyboard(key, pressed);
+    }
+    else
+    {   // Usually here would be code to close this gui. Not only
+        // that doesn't has any real function in this gui,
+        // but also causes bug #9157.
+        widgetSet->tgl_paused();
+        race_manager->next();
+    }   // sif SDLK_ESCAPE
 }   // inputKeyboard
 
 /* EOF */
