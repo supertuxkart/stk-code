@@ -369,13 +369,15 @@ void World::update(float delta)
 				     k->getPlayer()->getName(),
 				     k->getFinishTime(),
 				     m_race_setup.m_num_laps)>0)
-	    {
-	        highscore_manager->Save();
-	    }
+            {
+                highscore_manager->Save();
+            }
         }
         delete []index;
         widgetSet->tgl_paused();
         menu_manager->pushMenu(MENUID_RACERESULT);
+
+        m_phase = LIMBO_PHASE;
     }
 
     float inc = 0.05f;

@@ -139,6 +139,7 @@ private:
 
 public:
     RaceManager();
+    ~RaceManager();
 
     RaceSetup::RaceMode getRaceMode() const { return m_race_mode; }
 

@@ -33,6 +33,7 @@ private:
     ssgTransform* m_kart;
     int m_current_kart;
     int m_kart_name_label;
+    char* m_score;
     float m_clock;
 
 public:

@@ -28,11 +28,15 @@
 #include "widget_set.hpp"
 #include "race_manager.hpp"
 #include "start_screen.hpp"
+#include "empty_screen.hpp"
 #include "screen_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"
 #include "translation.hpp"
+#include "kart.hpp"
+#include "world.hpp"
+#include "screen_manager.hpp"
 
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
@@ -60,8 +64,27 @@ GrandPrixEnd::GrandPrixEnd()
     snprintf(output, sizeof(output),
              _("The winner is %s!"),WINNING_KART->getName().c_str());
     widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> space(m_menu_id);
 
+/*    {
+    const unsigned int MAX_STR_LEN = 60;
+    const unsigned int NUM_KARTS = world->getNumKarts();
+
+    const int VA = widgetSet->varray(m_menu_id);
+
+    for(unsigned int i=0; i < NUM_KARTS; i++)
+    {
+        const Kart *KART = world->getKart(i);
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s +%d %d",
+                KART->getPosition(), KART->getName().c_str(), //sTime,
+                race_manager->getPositionScore(i+1),
+                race_manager->getKartScore(i));
+        widgetSet -> label(VA, (char*)(m_score + MAX_STR_LEN * i),
+                           GUI_MED, GUI_ALL);
+    }
+
+    }*/
+
+    widgetSet -> space(m_menu_id);
     widgetSet -> label(m_menu_id, _("Back to the main menu"), GUI_LRG, GUI_ALL, 0, 0);
 
     widgetSet -> layout(m_menu_id, 0, 1);
@@ -75,6 +98,8 @@ GrandPrixEnd::GrandPrixEnd()
     sound_manager->playSfx(SOUND_WINNER);
 
     m_clock = 0;
+
+    screen_manager->setScreen(new EmptyScreen());
 }
 
 //-----------------------------------------------------------------------------
@@ -84,6 +109,7 @@ GrandPrixEnd::~GrandPrixEnd()
     ssgDeRefDelete(m_kart);
 
     delete m_context;
+    delete[] m_score;
 
     //The next line prevents textures like the background of the main menu from
     //going white after finishing the grandprix

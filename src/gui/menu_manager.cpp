@@ -176,6 +176,13 @@ void MenuManager::update()
 //-----------------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()
 {
+    if (m_current_menu != NULL)
+    {
+        delete m_current_menu;
+        m_current_menu= NULL;
+    }
+    m_handled_size= 0;
+
     m_menu_stack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
 }

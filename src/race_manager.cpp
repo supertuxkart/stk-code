@@ -136,7 +136,6 @@ GrandPrixMode::exit_race()
     }
     else
     {
-        screen_manager->setScreen(new EmptyScreen());
         menu_manager->switchToGrandPrixEnding();
     }
 }
@@ -206,6 +205,12 @@ RaceManager::RaceManager()
     m_track      = "race";
 
     m_players.push_back("tuxkart");
+}
+
+//-----------------------------------------------------------------------------
+RaceManager::~RaceManager()
+{
+    delete m_mode;
 }
 
 //-----------------------------------------------------------------------------
