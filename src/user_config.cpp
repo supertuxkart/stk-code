@@ -38,6 +38,9 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 UserConfig *user_config;
 

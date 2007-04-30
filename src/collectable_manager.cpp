@@ -25,6 +25,9 @@
 #include "material.hpp"
 #include "preprocessor.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 typedef struct
 {

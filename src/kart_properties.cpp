@@ -29,6 +29,9 @@
 #include "kart_properties.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 // This constructor would be a bit more useful, nicer, if we could call
 // init_defaults() and load from here. Unfortunately, this object is used

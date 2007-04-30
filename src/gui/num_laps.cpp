@@ -22,6 +22,9 @@
 #include "start_screen.hpp"
 #include "widget_set.hpp"
 #include "menu_manager.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 NumLaps::NumLaps() : laps(3)
 {

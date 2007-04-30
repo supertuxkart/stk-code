@@ -22,7 +22,9 @@
 
 #include "lexer.hpp"
 #include "translation.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 namespace lisp
 {
 

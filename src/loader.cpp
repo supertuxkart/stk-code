@@ -26,6 +26,7 @@
 #  include <stdio.h>
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#    define snprintf       _snprintf
 #  endif
 #endif
 #include "plib/ul.h"

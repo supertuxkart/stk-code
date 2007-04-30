@@ -26,7 +26,9 @@
 #include "loader.hpp"
 #include "race_setup.hpp"
 #include "user_config.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 HighscoreManager* highscore_manager=0;
 
 HighscoreManager::HighscoreManager()
@@ -76,6 +78,7 @@ void HighscoreManager::Load()
 {
 
     const lisp::Lisp* root = 0;
+	std::exception err;
 
     try
     {

@@ -90,9 +90,9 @@ void KartParticleSystem::particle_create(int, Particle *p)
     p->m_vel[0] = X_DIRECTION * -ABS_VEL/2;
     p->m_vel[1] = Y_DIRECTION * -ABS_VEL/2;
 
-    p->m_vel[0] += sgCos (rand()%180);
-    p->m_vel[1] += sgSin (rand()%180);
-    p->m_vel[2] += sgSin (rand()%100);
+    p->m_vel[0] += sgCos ((float)(rand()%180));
+    p->m_vel[1] += sgSin ((float)(rand()%180));
+    p->m_vel[2] += sgSin ((float)(rand()%100));
 
     getBSphere () -> setCenter ( POS->xyz[0], POS->xyz[1], POS->xyz[2] ) ;
 }   // particle_create
@@ -401,23 +401,23 @@ void Kart::doLapCounting ()
 {
     //FIXME: the flags are just a temporal way of preventing cheating,
     //because the lap counting is pretty bad anyways :p
-    if( m_track_sector >= 0 && (uint)m_track_sector <
+    if( m_track_sector >= 0 && (unsigned int)m_track_sector <
         world->m_track->m_driveline.size() / 4 )
     {
         flag1 = true;
     }
-    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 4 &&
-             (uint)m_track_sector < world->m_track->m_driveline.size() / 2)
+    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 4 &&
+             (unsigned int)m_track_sector < world->m_track->m_driveline.size() / 2)
     {
         flag2 = true;
     }
-    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 2 &&
-             (uint)m_track_sector < world->m_track->m_driveline.size() / 2 +
+    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 2 &&
+             (unsigned int)m_track_sector < world->m_track->m_driveline.size() / 2 +
              world->m_track->m_driveline.size() / 4)
     {
         flag3 = true;
     }
-    else if( (uint)m_track_sector > world->m_track->m_driveline.size() / 2 +
+    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 2 +
              world->m_track->m_driveline.size() / 4 )
     {
         flag4 = true;
@@ -676,8 +676,6 @@ void Kart::update (float dt)
 
 //-----------------------------------------------------------------------------
 #define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
-#define max(m,n) ((m)>(n) ? (m) : (n))
-#define min(m,n) ((m)<(n) ? (m) : (n))
 
 // -----------------------------------------------------------------------------
 #ifdef BULLET
@@ -892,7 +890,7 @@ void Kart::updatePhysics (float dt)
     // ----------------------------------------------
     const float FORCE_ON_REAR_TIRE = 0.5f*MASS*WORLD_GRAVITY + m_prev_accel*MASS*getHeightCOG()/WHEEL_BASE;
     const float FORCE_ON_FRONT_TIRE = MASS*WORLD_GRAVITY - FORCE_ON_REAR_TIRE;
-    float maxGrip = max(FORCE_ON_REAR_TIRE,FORCE_ON_FRONT_TIRE)*getTireGrip();
+	float maxGrip = std::max(FORCE_ON_REAR_TIRE,FORCE_ON_FRONT_TIRE)*getTireGrip();
 
     // If the kart is on ground, modify the grip by the friction
     // modifier for the texture/terrain.

@@ -37,7 +37,9 @@
 #include "kart.hpp"
 #include "world.hpp"
 #include "screen_manager.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
 {

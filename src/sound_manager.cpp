@@ -43,7 +43,9 @@
 #endif // USE_PLIB_SOUND
 
 #include "translation.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define strcasecmp _strcmpi
+#endif
 SoundManager* sound_manager= NULL;
 
 SoundManager::SoundManager()

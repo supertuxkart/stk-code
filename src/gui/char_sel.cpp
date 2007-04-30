@@ -33,6 +33,9 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 CharSel::CharSel(int whichPlayer)
         : m_kart(0), m_player_index(whichPlayer)

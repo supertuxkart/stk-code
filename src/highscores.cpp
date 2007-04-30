@@ -19,7 +19,9 @@
 
 #include <stdexcept>
 #include "highscores.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 Highscores::Highscores()
 {
     m_track           = ""; 
@@ -31,7 +33,7 @@ Highscores::Highscores()
     {
         m_name[i]      = "";
         m_kart_name[i] = "";
-        m_time[i]      = -9.9;
+        m_time[i]      = -9.9f;
     }
 }   // Highscores
 

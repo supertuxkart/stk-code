@@ -26,6 +26,9 @@
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
@@ -480,7 +483,7 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     glDisable (GL_TEXTURE_2D);
 
     //TODO: maybe colors should be configurable, or at least the alpha value
-    glColor4f ( 1,1,1, 0.4) ;
+    glColor4f ( 1.0f,1.0f,1, 0.4f) ;
 
 
 /*FIXME: Too much calculations here, we should be generating scaled driveline arrays

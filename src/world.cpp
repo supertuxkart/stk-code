@@ -53,7 +53,9 @@
 #include "highscore_manager.hpp"
 
 #include "robots/default_robot.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf  _snprintf
+#endif
 #ifdef BULLET
 #  ifdef __APPLE__
 #    include <GLUT/glut.h>
@@ -810,7 +812,9 @@ Kart* World::loadRobot(const KartProperties *kart_properties, int position,
     Kart* currentRobot;
     
     const int NUM_ROBOTS = 1;
+#if !defined(WIN32) || defined(__CYGWIN__)
     srand((unsigned)time(0));
+#endif
 
     switch(rand() % NUM_ROBOTS)
     {

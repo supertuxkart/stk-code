@@ -22,6 +22,9 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 ssgState *fuzzy_gst;
 

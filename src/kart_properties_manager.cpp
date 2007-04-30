@@ -24,7 +24,9 @@
 #include "kart_properties_manager.hpp"
 #include "kart_properties.hpp"
 #include "translation.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 KartPropertiesManager *kart_properties_manager=0;
 
@@ -145,7 +147,9 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
         i != m_karts_properties.end(); ++i)
         all_karts.push_back((*i)->getIdent());
 
+#if !defined(WIN32) || defined(__CYGWIN__)
     std::srand(std::time(0));
+#endif
     std::random_shuffle(all_karts.begin(), all_karts.end());
 
     int new_kart = 0;

@@ -29,7 +29,9 @@
 #include "kart.hpp"
 #include "string_utils.hpp"
 #include "translation.hpp"
-
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 /** Simple shadow class, only used here for default herrings. */
 class Shadow
 {

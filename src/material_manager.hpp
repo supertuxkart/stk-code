@@ -42,7 +42,7 @@ public:
     Material *getMaterial    (ssgLeaf *lf);
     Material *getMaterial    (const char *texname);
     Material *getMaterial    (const std::string& t) {return getMaterial(t.c_str());}
-    int       getNumEntities ()                     {return m_materials.size();      }
+    int       getNumEntities ()                     {return (int)m_materials.size();      }
 };
 
 extern ssgState *fuzzy_gst, *herringbones_gst;
