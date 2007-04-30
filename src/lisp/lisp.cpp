@@ -49,7 +49,9 @@ namespace lisp
         for(P = getCdr(); P != 0; P = P->getCdr())
         {
             const Lisp* CHILD = P->getCar();
-            if(!CHILD)
+            // Also ignore if the child is not a CONS type, i.e.
+            // a TYPE_INTEGER is found, for which car is not defined!
+            if(!CHILD || CHILD->m_type!=TYPE_CONS) 
                 continue;
             if(!CHILD->getCar())
                 continue;
