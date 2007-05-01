@@ -28,6 +28,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <ctime>
 
 #include "world.hpp"
 #include "preprocessor.hpp"
@@ -812,9 +813,8 @@ Kart* World::loadRobot(const KartProperties *kart_properties, int position,
     Kart* currentRobot;
     
     const int NUM_ROBOTS = 1;
-#if !defined(WIN32) || defined(__CYGWIN__)
-    srand((unsigned)time(0));
-#endif
+
+	srand((unsigned)std::time(0));
 
     switch(rand() % NUM_ROBOTS)
     {

@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <ctime>
 #include "loader.hpp"
 #include "string_utils.hpp"
 #include "kart_properties_manager.hpp"
@@ -147,9 +148,8 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
         i != m_karts_properties.end(); ++i)
         all_karts.push_back((*i)->getIdent());
 
-#if !defined(WIN32) || defined(__CYGWIN__)
     std::srand(std::time(0));
-#endif
+
     std::random_shuffle(all_karts.begin(), all_karts.end());
 
     int new_kart = 0;
