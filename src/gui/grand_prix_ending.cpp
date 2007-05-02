@@ -62,29 +62,62 @@ GrandPrixEnd::GrandPrixEnd()
     const std::string KART_NAME = race_manager->getKartName(highest);
     const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);
 
-    char output[MAX_MESSAGE_LENGTH];
+    static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
              _("The winner is %s!"),WINNING_KART->getName().c_str());
     widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
 
-/*    {
+
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
 
     const int VA = widgetSet->varray(m_menu_id);
 
-    for(unsigned int i=0; i < NUM_KARTS; i++)
+    Kart *kart;
+    int scores [2][NUM_KARTS];
+    for( unsigned int i = 0; i < NUM_KARTS; ++i )
     {
-        const Kart *KART = world->getKart(i);
-        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s +%d %d",
-                KART->getPosition(), KART->getName().c_str(), //sTime,
-                race_manager->getPositionScore(i+1),
-                race_manager->getKartScore(i));
-        widgetSet -> label(VA, (char*)(m_score + MAX_STR_LEN * i),
-                           GUI_MED, GUI_ALL);
+        kart = world->getKart(i);
+        scores[0][i] = i;
+        scores[1][i] = race_manager->getKartScore(i);
     }
 
-    }*/
+    //Bubblesort
+    bool sorted;
+    do
+    {
+        sorted = true;
+        for( unsigned int i = 0; i < NUM_KARTS - 1; ++i )
+        {
+            if( scores[1][i] < scores[1][i+1] )
+            {
+                int tmp_score[2];
+
+                tmp_score[0] = scores[0][i];
+                tmp_score[1] = scores[1][i];
+
+                scores[0][i] = scores[0][i+1];
+                scores[1][i] = scores[1][i+1];
+
+                scores[0][i+1] = tmp_score[0];
+                scores[1][i+1] = tmp_score[1];
+
+                sorted = false;
+            }
+        }
+    } while(!sorted);
+
+    m_score = new char[MAX_STR_LEN*NUM_KARTS];
+
+    for(unsigned int i=0; i < NUM_KARTS; ++i)
+    {
+        kart = world->getKart(scores[0][i]);
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
+                i + 1, kart->getName().c_str(), scores[1][i]);
+        widgetSet -> label(VA, (char*)(m_score + MAX_STR_LEN * i), GUI_MED,
+            GUI_ALL);
+    }
+
 
     widgetSet -> space(m_menu_id);
     widgetSet -> label(m_menu_id, _("Back to the main menu"), GUI_LRG, GUI_ALL, 0, 0);
@@ -128,7 +161,6 @@ void GrandPrixEnd::update(float dt)
 
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    BaseGUI::update(dt);
 
     ssgContext* oldContext = ssgGetCurrentContext();
     m_context -> makeCurrent();
@@ -153,6 +185,8 @@ void GrandPrixEnd::update(float dt)
 
     glDisable (GL_DEPTH_TEST);
     oldContext->makeCurrent();
+
+    BaseGUI::update(dt);
 }
 
 //-----------------------------------------------------------------------------
