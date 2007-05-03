@@ -188,6 +188,7 @@ TimeTrialMode::start()
     raceSetup.m_mode       = RaceSetup::RM_TIME_TRIAL;
     raceSetup.m_track      = m_track;
     raceSetup.m_num_laps   = m_num_laps;
+    raceSetup.m_difficulty = RD_HARD;
 
     raceSetup.m_karts.push_back(m_kart);
     raceSetup.m_players.push_back(0);
