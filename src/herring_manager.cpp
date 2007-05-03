@@ -346,8 +346,8 @@ void HerringManager::loadHerringStyle(const std::string filename)
                  filename.c_str());
 	delete root;
         throw std::runtime_error(msg);
+        delete root;
     }
-
     setHerring(herring_node, "red",   HE_RED   );
     setHerring(herring_node, "green", HE_GREEN );
     setHerring(herring_node, "gold"  ,HE_GOLD  );

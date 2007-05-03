@@ -218,11 +218,13 @@ void RaceGUI::drawFPS ()
     if (++m_fps_counter>=50)
     {
         m_fps_timer.update();
-        sprintf(m_fps_string, "%d",(int)(m_fps_counter/m_fps_timer.getDeltaTime()));
+        sprintf(m_fps_string, "%d",
+                (int)(m_fps_counter/m_fps_timer.getDeltaTime()));
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-    widgetSet->drawDropShadowTextRace (m_fps_string, 48, 0, user_config->m_height-50, 255, 255, 255 ) ;
+    widgetSet->drawDropShadowTextRace (m_fps_string, 48, 0, 
+                                       user_config->m_height-50, 255, 255, 255);
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
@@ -316,6 +318,8 @@ void RaceGUI::drawMap ()
 }   // drawMap
 
 //-----------------------------------------------------------------------------
+
+// FIXME: is this still used? Afaik a special end page is displayed instead
 void RaceGUI::drawGameOverText (const float dt)
 {
     static float timer = 0 ;
@@ -337,8 +341,10 @@ void RaceGUI::drawGameOverText (const float dt)
     }
     else
     {
-        widgetSet->drawDropShadowTextRace ( _("CONGRATULATIONS")  , 64, 130, 300, red, green, blue ) ;
-        widgetSet->drawDropShadowTextRace ( _("YOU WON THE RACE!"), 64, 130, 210, red, green, blue ) ;
+        widgetSet->drawDropShadowTextRace ( _("CONGRATULATIONS")  , 
+                                            64, 130, 300, red, green, blue ) ;
+        widgetSet->drawDropShadowTextRace ( _("YOU WON THE RACE!"), 
+                                            64, 130, 210, red, green, blue ) ;
     }
 }   // drawGameOverText
 
@@ -467,51 +473,71 @@ void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
                                  int offset_y, float ratio_x, float ratio_y )
 {
 
-    float angle_diff = player_kart->getCoord()->hpr[0] -
-        world->m_track->m_angle[player_kart->getSector()];
-    if(angle_diff > 180.0f) angle_diff -= 360.0f;
-    else if (angle_diff < -180.0f) angle_diff += 360.0f;
+    static int flash = false ;
+    static float shortcut_time_started=-1;
 
-    // Display a warning message if the kart is going back way (unless
-    // the kart has already finished the race).
-    if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-        player_kart->getVelocity () -> xyz [ 1 ] > 0.0  &&
-        !player_kart->raceIsFinished()                       )
+    int red, green, blue;
+    red = blue = (flash) ? 255 : 0;
+    green      = (flash) ? 0   : 255;
+    flash      = !flash;
+
+    // First message: on easy level, display a warning when going 
+    // in the wrong direction.
+    // -----------------------------------------------------------
+    if(world->m_race_setup.m_difficulty==RD_EASY)
     {
-        static int i = false ;
-
-        int red, green, blue;
-        if ( i )
+        float angle_diff = player_kart->getCoord()->hpr[0] -
+            world->m_track->m_angle[player_kart->getSector()];
+        if(angle_diff > 180.0f) angle_diff -= 360.0f;
+        else if (angle_diff < -180.0f) angle_diff += 360.0f;
+        // Display a warning message if the kart is going back way (unless
+        // the kart has already finished the race).
+        if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
+            player_kart->getVelocity () -> xyz [ 1 ] > 0.0  &&
+            !player_kart->raceIsFinished()                       )
         {
-            red = blue = 255;
-            green = 0;
-        }
-        else
+            widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
+                                                (int)(200*ratio_x)+offset_x,
+                                                (int)(210*ratio_y)+offset_y, 
+                                                red, green, blue ) ;
+            widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
+                                                (int)((200+2)*ratio_x)+offset_x,
+                                                (int)((210+2)*ratio_y)+offset_y, 
+                                                255-red, 255-green, 255-blue ) ;
+        }  // if angle is too big
+    }  // if difficulty easy
+    
+    // Second message: inform user when using shortcuts
+    // (shortcuts are not detected in easy races)> The
+    // message will be displayed for (at least) one second,
+    // even if the shortcut was very short.
+    // ------------------------------------------------
+    if(world->m_race_setup.m_difficulty!=RD_EASY)
+    {
+        // If the race is restarted, the shortcut_time_started might still
+        // be set to a previous value. If so, reset this flag so that
+        // no message is being displayed at the start of the next race
+        if(shortcut_time_started>world->m_clock)
+            shortcut_time_started=-1;
+        // Display the message if either the kart is currenlty doing a shortcut,
+        // or was doing a shortcut less than one second ago.
+        if(player_kart->isTakingShortcut()                                       ||
+           (shortcut_time_started>0 && world->m_clock-shortcut_time_started<1.0f)  )
         {
-            red = blue = 0;
-            green = 255;
+            if(shortcut_time_started<0) shortcut_time_started=world->m_clock;
+            widgetSet->drawDropShadowTextRace ( _("Invalid short-cut!"), 
+                                                (int)(50*ratio_x),
+                                                (int)(100*ratio_x)+offset_x,
+                                                (int)(210*ratio_y)+offset_y, 
+                                                red, green, blue ) ;
+            widgetSet->drawDropShadowTextRace ( _("Invalid short-cut!"), 
+                                                (int)(50*ratio_x),
+                                                (int)((100+2)*ratio_x)+offset_x,
+                                                (int)((210+2)*ratio_y)+offset_y, 
+                                                255-red, 255-green, 255-blue ) ;
         }
+    }   // if difficulty is not EASY
 
-        widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
-                                            (int)(200*ratio_x)+offset_x,
-                                            (int)(210*ratio_y)+offset_y, red, green, blue ) ;
-        if ( ! i )
-        {
-            red = blue = 255;
-            green = 0;
-        }
-        else
-        {
-            red = blue = 0;
-            green = 255;
-        }
-
-        widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
-                                            (int)((200+2)*ratio_x)+offset_x,
-                                            (int)((210+2)*ratio_y)+offset_y, red, green, blue ) ;
-
-        i = ! i ;
-    }
 }   //drawEmergencyText
 
 //-----------------------------------------------------------------------------
@@ -897,6 +923,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 
     if ( world->getPhase() == World::FINISH_PHASE )
     {
+        // FIXME: is this still used? It should be replaced by a special
+        //        end page.
         drawGameOverText(dt) ;
     }   // if FINISH_PHASE
     if ( world->getPhase() == World::RACE_PHASE         ||

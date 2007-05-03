@@ -140,11 +140,11 @@ public:
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR
                                            ) const;
-    void               spatialToTrack   (sgVec2 dst,
+    int                spatialToTrack   (sgVec3 dst,
                                          const sgVec2 POS,
                                          const int SECTOR            ) const;
     void               trackToSpatial   (sgVec3 xyz, const int SECTOR) const;
-
+    bool               isShortcut       (const int OLDSEC, const int NEWSEC) const;
     float              getGravity       () const {return m_gravity;       }
     float              getTrackLength   () const {return m_total_distance;}
     const char*        getIdent         () const {return m_ident.c_str(); }

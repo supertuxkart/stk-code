@@ -39,6 +39,7 @@ public:
     float m_bomb_time;               // time before a bomb explodes
     float m_bomb_time_increase;      // time added to bomb timer when it's passed on
     float m_anvil_time;              // time an anvil is active
+    float m_max_road_distance;       // max distance from road to be still ON road
 
     STKConfig() : KartProperties() {};
     void init_defaults    ();

@@ -81,7 +81,7 @@ protected:
                                        // e.g. UNKNOWN_SECTOR can be negative!
     float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
-    sgVec2       m_curr_track_coords;
+    sgVec3       m_curr_track_coords;
     sgVec3       m_velocity_wc;        // velocity in world coordinates
     float        m_prev_accel;         // acceleration at previous time step
     bool         m_skid_front;         // true if front tires are skidding
@@ -90,6 +90,13 @@ protected:
     float        m_wheelie_angle ;
     float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
+    float        m_kart_width;         // width of the kart
+    int          m_shortcut_count;     // counts number of times a shortcut is used
+    int          m_shortcut_sector;    // segment on which the shortcut was started
+    enum        {SC_NONE,              // no shortcut
+                 SC_SKIPPED_SECTOR,    // skipped too many sectors
+                 SC_OUTSIDE_TRACK}     // too far away from tracj
+                 m_shortcut_type  ;    // what kind of shortcut was detected
 
     // physics parameters, storing it saves time
 #ifdef BULLET
@@ -166,7 +173,7 @@ public:
     void           setCollectable      (collectableType t, int n)
     { m_collectable.set(t, n);            }
     void           setPosition         (int p)    {m_race_position = p;          }
-    int            getSector             () { return m_track_sector;                 }
+    int            getSector           () { return m_track_sector;               }
     float          getDistanceDownTrack() { return m_curr_track_coords[1];       }
     float          getDistanceToCenter () { return m_curr_track_coords[0];       }
     Attachment    *getAttachment       () { return &m_attachment;                }
@@ -180,6 +187,7 @@ public:
     int            getPosition         () const { return  m_race_position ;      }
     void           setFinishingState(float time);
     float          getFinishTime       () const  { return m_finish_time;         }
+    bool           isTakingShortcut    () const  { return m_shortcut_type!=SC_NONE;}
     bool           raceIsFinished      () const  { return m_finished_race;       }
     void           endRescue           ();
     void           processSkidMarks    ();
@@ -229,8 +237,8 @@ public:
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }
+    void           createPhysics    (ssgEntity *obj);
 #ifdef BULLET
-    void              createPhysics (ssgEntity *obj);
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     btRigidBody      *getKartBody   () const {return m_kart_body;              }
     void              updateBulletPhysics(float dt);
@@ -241,7 +249,7 @@ public:
     float             handleWheelie(float dt);
 #endif
     void           adjustSpeedWeight(float f);
-    void           forceRescue      ()       {m_rescue=true;                   }
+    void           forceRescue      ();
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
     virtual void   collectedHerring (Herring* herring);

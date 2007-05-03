@@ -275,20 +275,21 @@ void UserConfig::loadConfig(const std::string& filename)
             switch(configFileVersion)
             {
             case 0:  printf(_("- Single window menu, old status display,new keyboard style settings were removed\n"));
-                     needToAbort=0;
+                     needToAbort=std::max(needToAbort,0);
             case 1:  printf(_("- Key bindings were changed, please check the settings. All existing values were discarded.\n"));
-                     needToAbort=1;  // old keybinds wouldn't make any sense
-
+                     needToAbort=std::max(needToAbort,1);// old keybinds wouldn't make any sense
             case 2:  printf(_("Added username, using: '%s'.\n"), m_username.c_str());
-                     needToAbort=0;
+                     needToAbort=std::max(needToAbort,0);
             case 3:  printf(_("Added username for all players.\n"));
-                     needToAbort=0;
+                     needToAbort=std::max(needToAbort,0);
             case 99: break;
             default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
+                     needToAbort=1;
                      break;
             }
             if(needToAbort)
             {
+                printf(_("The old config file is deleted, a new one will be created.\n"));
                 delete root;
                 return;
             }

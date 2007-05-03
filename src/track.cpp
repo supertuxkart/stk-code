@@ -44,20 +44,23 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     loadTrack(m_filename);
     loadDriveline();
 
-}
+}   // Track
 
 //-----------------------------------------------------------------------------
 Track::~Track()
-{}
+{
+}   // ~Track
 
+//-----------------------------------------------------------------------------
 /** Finds on which side of the line segment a given point is.
  */
 inline float Track::pointSideToLine( const sgVec2 L1, const sgVec2 L2,
     const sgVec2 P ) const
 {
     return ( L2[0]-L1[0] )*( P[1]-L1[1] )-( L2[1]-L1[1] )*( P[0]-L1[0] );
-}
+}   // pointSideToLine
 
+//-----------------------------------------------------------------------------
 /** pointInQuad() works by checking if the given point is 'to the right'
  *  in clock-wise direction (which would be to look towards the inside of
  *  the quad) of each line segment that forms the quad. If it is to the
@@ -75,21 +78,24 @@ int Track::pointInQuad
     const sgVec2 POINT
 ) const
 {
-    //Test the first triangle
-    if( pointSideToLine( A, B, POINT ) > 0.0 &&
-        pointSideToLine( B, C, POINT ) > 0.0 &&
-        pointSideToLine( C, A, POINT ) > 0.0 )
-        return QUAD_TRI_FIRST;
+    if(pointSideToLine( C, A, POINT ) >= 0.0 )
+    {
+        //Test the first triangle
+        if( pointSideToLine( A, B, POINT ) >  0.0 &&
+            pointSideToLine( B, C, POINT ) >= 0.0    )
+            return QUAD_TRI_FIRST;
+        return QUAD_TRI_NONE;
+    }
 
     //Test the second triangle
     if( pointSideToLine( C, D, POINT ) > 0.0 &&
-        pointSideToLine( D, A, POINT ) > 0.0 &&
-        pointSideToLine( A, C, POINT ) > 0.0 )
+        pointSideToLine( D, A, POINT ) > 0.0     )
         return QUAD_TRI_SECOND;
 
     return QUAD_TRI_NONE;
-}
+}   // pointInQuad
 
+//-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position
  *  xyz is. If xyz is not on top of the road, it returns
  *  UNKNOWN_SECTOR.
@@ -110,8 +116,9 @@ int Track::findRoadSector( const sgVec3 XYZ )const
     for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
         next = i + 1 <  DRIVELINE_SIZE ? i + 1 : 0;
-        triangle = pointInQuad( m_left_driveline[i], m_right_driveline[i],
-            m_right_driveline[next], m_left_driveline[next], XYZ );
+        triangle = pointInQuad( m_left_driveline[i],     m_right_driveline[i],
+                                m_right_driveline[next], m_left_driveline[next], 
+                                XYZ );
 
         if (triangle != QUAD_TRI_NONE)
         {
@@ -181,8 +188,9 @@ int Track::findRoadSector( const sgVec3 XYZ )const
         else return UNKNOWN_SECTOR; //This only happens if the position is
                                     //under all the possible sectors
     }
-}
+}   // findRoadSector
 
+//-----------------------------------------------------------------------------
 /** findOutOfRoadSector finds the sector where XYZ is, but as it name
     implies, it is more accurate for the outside of the track than the
     inside, and for STK's needs the accuracy on top of the track is
@@ -277,17 +285,21 @@ int Track::findOutOfRoadSector
     }   // for i
 
     return sector;
-}
+}   // findOutOfRoadSector
 
+//-----------------------------------------------------------------------------
 /** spatialToTrack() takes absolute coordinates (coordinates in OpenGL
  *  space) and transforms them into coordinates based on the track. It is
  *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
  *  of the returned vector is how much of the track the point has gone
- *  through, and the x-axis is on which side of the road it is.
+ *  through, the x-axis is on which side of the road it is, and the z-axis
+ *  contains half the width of the track at this point. The return value
+ *  is p1, i.e. the first of the two driveline points between which the
+ *  kart is currently located.
  */
-void Track::spatialToTrack
+int Track::spatialToTrack
 (
-    sgVec2 dst,
+    sgVec3 dst,
     const sgVec2 POS,
     const int SECTOR
 ) const
@@ -295,7 +307,7 @@ void Track::spatialToTrack
     if( SECTOR == UNKNOWN_SECTOR )
     {
         std::cerr << "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n";
-        return;
+        return -1;
     }
 
     const unsigned int DRIVELINE_SIZE = m_driveline.size();
@@ -320,19 +332,48 @@ void Track::spatialToTrack
 
     sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] );
 
-    dst [ 0 ] = sgDistToLineVec2 ( line_eqn, POS );
+    dst[0] = sgDistToLineVec2 ( line_eqn, POS );
 
     sgAddScaledVec2 ( tmp, POS, line_eqn, -dst [0] );
 
-    dst [ 1 ] = sgDistanceVec2 ( tmp, m_driveline[p1] ) + m_distance_from_start[p1];
-}
+    float dist_from_driveline_p1 = sgDistanceVec2 ( tmp, m_driveline[p1] );
+    dst[1] = dist_from_driveline_p1 + m_distance_from_start[p1];
+    // Set z-axis to half the width (linear interpolation between the
+    // width at p1 and p2) - m_path_width is actually already half the width
+    // of the track. This is used to determine if a kart is too far
+    // away from the road and is therefore considered taking a shortcut.
+
+    float fraction = dist_from_driveline_p1
+                   / (m_distance_from_start[p2]-m_distance_from_start[p1]);
+    dst[2] = m_path_width[p1]*(1-fraction)+fraction*m_path_width[p2];
+
+    return p1;
+}   // spatialToTrack
 
 //-----------------------------------------------------------------------------
 void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
 {
     sgCopyVec3 ( xyz, m_driveline [ SECTOR ] ) ;
-}
+}   // trackToSpatial
 
+//-----------------------------------------------------------------------------
+/** Determines if a kart moving from sector OLDSEC to sector NEWSEC
+ *  would be taking a shortcut, i.e. if the distance is larger
+ *  than a certain detla
+ */
+bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
+{
+    // If the kart was off the road, don't do any shortcuts
+    if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
+    unsigned int distance_sectors = abs(OLDSEC-NEWSEC);
+    // Handle 'wrap around': if the distance is more than half the 
+    // number of driveline poins, assume it's a 'wrap around'
+    if(2*distance_sectors > m_driveline.size())
+        distance_sectors = m_driveline.size() - distance_sectors;
+    return (distance_sectors>5);
+}   // isShortcut
+
+//-----------------------------------------------------------------------------
 /** It's not the nicest solution to have two very similar version of a function,
  *  i.e. drawScaled2D and draw2Dview - but to keep both versions const, the
  *  values m_scale_x/m_scale_y can not be changed, but they are needed in glVtx.
@@ -341,6 +382,7 @@ void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
  *  - which saves a bit of time at runtime as well.
  *  drawScaled2D is called from gui/TrackSel, draw2Dview from RaceGUI.
  */
+
 void Track::drawScaled2D(float x, float y, float w, float h) const
 {
     sgVec2 sc ;
@@ -736,7 +778,7 @@ Track::loadDriveline()
     m_scale_y = m_track_2d_height / sc[1] ;
 
     if(!m_do_stretch) m_scale_x = m_scale_y = std::min(m_scale_x, m_scale_y);
-
+    
 }   // loadDriveline
 
 //-----------------------------------------------------------------------------

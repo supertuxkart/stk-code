@@ -153,7 +153,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
 }   // Kart
 
 // -----------------------------------------------------------------------------v
-#ifdef BULLET
 void Kart::createPhysics(ssgEntity *obj)
 {
     // First: Create the chassis of the kart
@@ -162,7 +161,8 @@ void Kart::createPhysics(ssgEntity *obj)
     //    ssgEntity *model = getModel();
     float x_min, x_max, y_min, y_max, z_min, z_max;
     MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    float kart_width  = x_max-x_min;
+    m_kart_width  = x_max-x_min;
+#ifdef BULLET
     float kart_length = y_max-y_min;
     if(kart_length<1.2) kart_length=1.5f;
 
@@ -259,8 +259,8 @@ void Kart::createPhysics(ssgEntity *obj)
     }
     world->getPhysics()->addKart(this, m_vehicle);
 
-}   // createPhysics
 #endif
+}   // createPhysics
 
 // -----------------------------------------------------------------------------
 Kart::~Kart() 
@@ -335,6 +335,9 @@ void Kart::reset()
     flag4 = false;
 
     m_race_lap             = -1;
+    m_shortcut_count       = 0;
+    m_shortcut_sector      = Track::UNKNOWN_SECTOR;
+    m_shortcut_type        = SC_NONE;
     m_race_position        = 9;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -425,11 +428,14 @@ void Kart::doLapCounting ()
 
     if( flag1 && flag2 && flag3 && flag4 || m_race_lap < 0)
     {
-        if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f )
+        if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f    &&
+             (world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
+              world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
         {
             setTimeAtLap(world->m_clock);
             m_race_lap++ ;
 
+            m_shortcut_count = 0;
             flag1 = flag2 = flag3 = flag4 = false;
             // Only do timings if original time was set properly. Driving backwards
             // over the start line will cause the lap start time to be set to 0.
@@ -447,6 +453,11 @@ void Kart::doLapCounting ()
                 }
             }
             m_lap_start_time = world->m_clock;
+        }
+        else if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f)
+        {
+            // Lap does not count due to shortcuts.
+            // Issue message here!!
         }
         else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
         {
@@ -650,6 +661,24 @@ void Kart::update (float dt)
 
     int prev_sector = m_track_sector;
     m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
+    
+    // Check if the kart is taking a shortcut (if it's not already doing one):
+    if(m_shortcut_type==SC_NONE)
+    {
+        if(world->m_track->isShortcut(prev_sector, m_track_sector))
+        {
+            m_shortcut_type = SC_SKIPPED_SECTOR;
+            m_shortcut_sector = prev_sector;
+            // Skipped sectors are more severe then getting outside the 
+            // road, so count this as two.
+            m_shortcut_count+=2;
+        }
+    } else {  // !m_shortcut_type==SC_NONE
+        if(m_shortcut_type==SC_SKIPPED_SECTOR)
+        {
+            m_shortcut_type=SC_NONE;
+        }
+    }
 
     if (m_track_sector == Track::UNKNOWN_SECTOR )
     {
@@ -666,8 +695,27 @@ void Kart::update (float dt)
         m_on_road = true;
     }
 
-    world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
-        m_track_sector );
+    int sector = world->m_track->spatialToTrack( m_curr_track_coords, 
+                                                 m_curr_pos.xyz,
+                                                 m_track_sector      );
+    // If the kart is more than twice its width away from the border of
+    // the track, the kart is considered taking a shortcut.
+
+    if(world->m_race_setup.m_difficulty             != RD_EASY               &&
+       m_shortcut_type                              != SC_SKIPPED_SECTOR     &&
+         fabsf(m_curr_track_coords[0])-stk_config->m_max_road_distance 
+         >  m_curr_track_coords[2] ) {
+        m_shortcut_type   = SC_OUTSIDE_TRACK;
+        m_shortcut_sector = sector;
+        m_shortcut_count++;
+    } else {
+        // Kart was taking a shortcut before, but it finished. So increase the
+        // overall shortcut count.
+        if(m_shortcut_type == SC_OUTSIDE_TRACK) 
+        {
+            m_shortcut_type = SC_NONE;
+        }
+    }
 
     doLapCounting () ;
     processSkidMarks();
@@ -1060,6 +1108,19 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const
 }   // NormalizedLateralForce
 
 //-----------------------------------------------------------------------------
+void Kart::forceRescue()
+{
+    m_rescue=true;
+    // If rescue is triggered while doing a shortcut, reset the kart to the
+    // segment where the shortcut started!! And then reset the shortcut
+    // flag, so that this shortcut is not counted!
+    if(m_shortcut_type!=SC_NONE)
+    {
+        m_track_sector  = m_shortcut_sector;
+        m_shortcut_type = SC_NONE;
+    } 
+}   // forceRescue
+//-----------------------------------------------------------------------------
 /** Drops a kart which was rescued back on the track.
  */
 void Kart::endRescue()
@@ -1263,9 +1324,7 @@ void Kart::loadData()
     m_smokepuff -> setShininess      (  0 ) ;
 
     ssgEntity *obj = m_kart_properties->getModel();
-#ifdef BULLET
     createPhysics(obj);
-#endif
 
     load_wheels(dynamic_cast<ssgBranch*>(obj));
 
