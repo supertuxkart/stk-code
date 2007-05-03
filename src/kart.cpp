@@ -429,7 +429,8 @@ void Kart::doLapCounting ()
     if( flag1 && flag2 && flag3 && flag4 || m_race_lap < 0)
     {
         if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f    &&
-             (world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
+             (world->m_race_setup.m_difficulty==RD_EASY                         ||
+	      world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
               world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
         {
             setTimeAtLap(world->m_clock);
