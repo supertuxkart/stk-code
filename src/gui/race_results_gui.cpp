@@ -100,12 +100,21 @@ RaceResultsGUI::RaceResultsGUI()
                 "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
         widgetSet->label(HIGHSCORE_TABLE, (char*)(m_highscores+MAX_STR_LEN*i),
                          GUI_MED, GUI_ALL);
-        
+
     }
     widgetSet -> space(m_menu_id);
 
     //    const int VA = widgetSet -> varray(m_menu_id);
-    
+
+    static int dev_msg_counter = 0;
+    if(dev_msg_counter == 2)
+    {
+        widgetSet -> label(m_menu_id, _("We need more developers! \
+if you want to help contact us!"), GUI_SML, GUI_ALL, 0, 0);
+        dev_msg_counter = 0;
+    }
+    ++dev_msg_counter;
+
     if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
     {
       widgetSet -> start(m_menu_id, _("Continue Grand Prix"),  GUI_MED, WTOK_CONTINUE);
