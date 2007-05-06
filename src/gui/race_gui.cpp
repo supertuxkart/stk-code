@@ -200,9 +200,6 @@ void RaceGUI::inputKeyboard(int key, int pressed)
     case SDLK_ESCAPE: // ESC
         widgetSet->tgl_paused();
         menu_manager->pushMenu(MENUID_RACEMENU);
-        // The player might have changed the keyboard
-        // configuration, so we need to redefine the mappings
-        if(!user_config->m_profile) UpdateKeyboardMappings();
         break;
     case SDLK_F10:
         history->Save();

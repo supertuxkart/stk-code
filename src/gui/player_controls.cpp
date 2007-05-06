@@ -144,8 +144,16 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
 
             // Do not accept pressing ESC as input.
             if (type != IT_KEYBOARD || id0 != SDLK_ESCAPE)
+            {
+ 	        // Since unicode translation is enabled, the value of id1 will
+                // be the unicode value. Since unicode is usually not enabled
+	        // in the race we have to set this value to zero (unicode 
+                // translation is only enabled here to help entering the name),
+	        // otherwise the keys will not be recognised in the race!!
+  	        if(type==IT_KEYBOARD) id1=0;
                 user_config->m_player[m_player_index].setInput(m_edit_action, type, 
                                                                id0, id1, id2);
+	    }
             
             changeKeyLabel(m_grab_id, m_edit_action);
         }
