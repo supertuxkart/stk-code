@@ -52,6 +52,8 @@
 #include "ssg_help.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
 
 #include "robots/default_robot.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -415,6 +417,7 @@ void World::update(float delta)
     for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
         if(!m_kart[i]->raceIsFinished()) updateRacePosition((int)i);
+        m_kart[i]->addMessages();
     }
 
     /* Routine stuff we do even when paused */
@@ -476,6 +479,15 @@ void World::checkRaceStatus()
             if(m_kart[i]->isPlayerKart())
             {
                 race_manager->PlayerFinishes();
+                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+                if(m)
+                {
+                    m->addMessage(m_kart[i]->getPosition()==1
+                                  ? _("You won") 
+                                  : _("You finished") ,
+                                  m_kart[i], 2.0f, 60);
+                    m->addMessage( _("the race!"), m_kart[i], 2.0f, 60);
+                }
             }
         }
     }

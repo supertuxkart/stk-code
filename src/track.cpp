@@ -25,6 +25,7 @@
 #include "string_utils.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
+#include "stk_config.hpp"
 #include "translation.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -370,7 +371,7 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
     // number of driveline poins, assume it's a 'wrap around'
     if(2*distance_sectors > m_driveline.size())
         distance_sectors = m_driveline.size() - distance_sectors;
-    return (distance_sectors>5);
+    return (distance_sectors>stk_config->m_shortcut_segments);
 }   // isShortcut
 
 //-----------------------------------------------------------------------------

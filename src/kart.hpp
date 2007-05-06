@@ -90,6 +90,7 @@ protected:
     float        m_wheelie_angle ;
     float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
+    char         m_fastest_lap_message[255];
     float        m_kart_width;         // width of the kart
     int          m_shortcut_count;     // counts number of times a shortcut is used
     int          m_shortcut_sector;    // segment on which the shortcut was started
@@ -97,7 +98,6 @@ protected:
                  SC_SKIPPED_SECTOR,    // skipped too many sectors
                  SC_OUTSIDE_TRACK}     // too far away from tracj
                  m_shortcut_type  ;    // what kind of shortcut was detected
-
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
@@ -129,13 +129,6 @@ private:
     float               m_time_at_last_lap;       // time at finishing last lap
     float               m_finish_time;
     bool                m_finished_race;
-
-    //FIXME: These are to prevent cheating by requiring a kart to go through
-    //the 4 quarters of a track before being able to advance a lap.
-    bool                flag1;
-    bool                flag2;
-    bool                flag3;
-    bool                flag4;
 
 #ifdef BULLET
     float               m_speed;
@@ -252,6 +245,8 @@ public:
     void           forceRescue      ();
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
+    // addMessages gets called by world to add messages to the gui
+    virtual void   addMessages      () {};
     virtual void   collectedHerring (Herring* herring);
     virtual void   reset            ();
     virtual void   handleZipper     ();
@@ -277,7 +272,6 @@ public:
     virtual void doLapCounting        () ;
     virtual void doZipperProcessing   () ;
     virtual void update (float delta) ;
-
 } ;
 
 

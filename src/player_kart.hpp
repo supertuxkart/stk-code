@@ -52,6 +52,7 @@ public:
     int     earlyStartPenalty () {return m_penalty_time>0; }
     Player* getPlayer         () {return m_player;        }
     void    update            (float);
+    void    addMessages       ();
     void    action            (KartActions action, int value, bool isKeyboard);
     void    forceCrash        ();
     void    handleZipper      ();

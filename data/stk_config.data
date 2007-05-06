@@ -15,8 +15,10 @@
  (bomb-time                 30.0 )  ;; time till a bomb explodes
  (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
  (anvil-time                 2.0 )  ;; time an anvil is active
- (shortcut-road-distance     4.0 )  ;; max. distance from side of road to be still 
+ (shortcut-road-distance     6.0 )  ;; max. distance from side of road to be still 
                                     ;; considered on the road (otherwise shortcut)
+ (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
+                                    ;; is considered to be a shortcut
  ;; Other kart relates values
  ;; -------------------------
  (jump-impulse             5400.0 ) ;; percentage of gravity!

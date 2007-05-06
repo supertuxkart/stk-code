@@ -34,6 +34,9 @@
 #include "kart.hpp"
 #include "ssg_help.hpp"
 #include "physics.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
+#include "translation.hpp"
 #ifdef BULLET
 #include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #endif
@@ -329,11 +332,6 @@ void Kart::reset()
     m_attachment.clear();
     m_collectable.clear();
 
-    flag1 = false;
-    flag2 = false;
-    flag3 = false;
-    flag4 = false;
-
     m_race_lap             = -1;
     m_shortcut_count       = 0;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
@@ -402,71 +400,62 @@ void Kart::handleZipper()
 //-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
-    //FIXME: the flags are just a temporal way of preventing cheating,
-    //because the lap counting is pretty bad anyways :p
-    if( m_track_sector >= 0 && (unsigned int)m_track_sector <
-        world->m_track->m_driveline.size() / 4 )
+    bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f;
+    if (  newLap   &&
+         (world->m_race_setup.m_difficulty==RD_EASY                         ||
+          world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
+          world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
     {
-        flag1 = true;
-    }
-    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 4 &&
-             (unsigned int)m_track_sector < world->m_track->m_driveline.size() / 2)
-    {
-        flag2 = true;
-    }
-    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 2 &&
-             (unsigned int)m_track_sector < world->m_track->m_driveline.size() / 2 +
-             world->m_track->m_driveline.size() / 4)
-    {
-        flag3 = true;
-    }
-    else if( (unsigned int)m_track_sector > world->m_track->m_driveline.size() / 2 +
-             world->m_track->m_driveline.size() / 4 )
-    {
-        flag4 = true;
-    }
+        setTimeAtLap(world->m_clock);
+        m_race_lap++ ;
 
-    if( flag1 && flag2 && flag3 && flag4 || m_race_lap < 0)
-    {
-        if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f    &&
-             (world->m_race_setup.m_difficulty==RD_EASY                         ||
-	      world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
-              world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
+        m_shortcut_count = 0;
+        // Only do timings if original time was set properly. Driving backwards
+        // over the start line will cause the lap start time to be set to 0.
+        if(m_lap_start_time>=0.0)
         {
-            setTimeAtLap(world->m_clock);
-            m_race_lap++ ;
-
-            m_shortcut_count = 0;
-            flag1 = flag2 = flag3 = flag4 = false;
-            // Only do timings if original time was set properly. Driving backwards
-            // over the start line will cause the lap start time to be set to 0.
-            if(m_lap_start_time>=0.0)
+            float time_per_lap=world->m_clock-m_lap_start_time;
+            if(time_per_lap < world->getFastestLapTime() )
             {
-                float time_per_lap=world->m_clock-m_lap_start_time;
-                if(time_per_lap<world->getFastestLapTime() )
+                world->setFastestLap(this, time_per_lap);
+                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+                if(m)
                 {
-                    world->setFastestLap(this, time_per_lap);
-                }
-                if(isPlayerKart())
-                {
-                    // Put in in the highscore list???
-                    //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
-                }
+                    m->addMessage(_("New fastest lap"), NULL, 
+                                  2.0f, 40, 100, 210, 100);
+                    char s[20];
+                    m->TimeToString(time_per_lap, s);
+                    snprintf(m_fastest_lap_message, sizeof(m_fastest_lap_message),
+                             "%s: %s",s, getName().c_str());
+                    m->addMessage(m_fastest_lap_message, NULL, 
+                                  2.0f, 40, 100, 210, 100);
+                }   // if m
+            }   // if time_per_lap < world->getFasterstLapTime()
+            if(isPlayerKart())
+            {
+                // Put in in the highscore list???
+                //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
             }
-            m_lap_start_time = world->m_clock;
         }
-        else if ( m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f)
+        m_lap_start_time = world->m_clock;
+    }
+    else if ( newLap )
+    {
+        // Might happen if the option menu is called
+        RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+        if(m)
         {
-            // Lap does not count due to shortcuts.
-            // Issue message here!!
+            m->addMessage(_("Lap not counted"),  this, 2.0f, 60);
+            m->addMessage(_("(shortcut taken)"), this, 2.0f, 60);
         }
-        else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
-        {
-            m_race_lap-- ;
-            // Prevent cheating by setting time to a negative number, indicating
-            // that the line wasn't crossed properly.
-            m_lap_start_time = -1.0f;
-        }
+        m_shortcut_count = 0;
+    }
+    else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
+    {
+        m_race_lap-- ;
+        // Prevent cheating by setting time to a negative number, indicating
+        // that the line wasn't crossed properly.
+        m_lap_start_time = -1.0f;
     }
 }   // doLapCounting
 
@@ -664,21 +653,31 @@ void Kart::update (float dt)
     m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
     
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(m_shortcut_type==SC_NONE)
+    if(m_shortcut_type!=SC_SKIPPED_SECTOR)
     {
         if(world->m_track->isShortcut(prev_sector, m_track_sector))
         {
-            m_shortcut_type = SC_SKIPPED_SECTOR;
             m_shortcut_sector = prev_sector;
             // Skipped sectors are more severe then getting outside the 
-            // road, so count this as two.
-            m_shortcut_count+=2;
+            // road, so count this as two. But if the kart is already
+            // outside the track, only one is added (since the outside
+            // track shortcut already added 1).
+            m_shortcut_count+= m_shortcut_type==SC_NONE ? 2 : 1;
+            m_shortcut_type  = SC_SKIPPED_SECTOR;
+            if(isPlayerKart())
+            {
+                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+                // Can happen if the option menu is called
+                if(m)
+                    m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);
+            }
         }
-    } else {  // !m_shortcut_type==SC_NONE
-        if(m_shortcut_type==SC_SKIPPED_SECTOR)
-        {
-            m_shortcut_type=SC_NONE;
-        }
+    } 
+    else
+    {   // The kart is already doing a skipped sector --> reset
+        // the flag, since from now on (it's on a new sector) it's
+        // not a shortcut anymore.
+        m_shortcut_type=SC_NONE;
     }
 
     if (m_track_sector == Track::UNKNOWN_SECTOR )
@@ -699,28 +698,31 @@ void Kart::update (float dt)
     int sector = world->m_track->spatialToTrack( m_curr_track_coords, 
                                                  m_curr_pos.xyz,
                                                  m_track_sector      );
-    // If the kart is more than twice its width away from the border of
-    // the track, the kart is considered taking a shortcut.
+    // If the kart is more thanm_max_road_distance away from the border of
+    // the track, the kart is considered taking a shortcut (but not on level
+    // easy, and not while being rescued)
 
     if(world->m_race_setup.m_difficulty             != RD_EASY               &&
+       !m_rescue                                                             &&
        m_shortcut_type                              != SC_SKIPPED_SECTOR     &&
          fabsf(m_curr_track_coords[0])-stk_config->m_max_road_distance 
          >  m_curr_track_coords[2] ) {
-        m_shortcut_type   = SC_OUTSIDE_TRACK;
+               
         m_shortcut_sector = sector;
-        m_shortcut_count++;
-    } else {
+        // Increase the error count the first time this happens
+        if(m_shortcut_type==SC_NONE)
+            m_shortcut_count++;
+        m_shortcut_type   = SC_OUTSIDE_TRACK;
+    }
+    else 
+    {
         // Kart was taking a shortcut before, but it finished. So increase the
         // overall shortcut count.
         if(m_shortcut_type == SC_OUTSIDE_TRACK) 
-        {
             m_shortcut_type = SC_NONE;
-        }
     }
-
     doLapCounting () ;
     processSkidMarks();
-
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -1117,8 +1119,9 @@ void Kart::forceRescue()
     // flag, so that this shortcut is not counted!
     if(m_shortcut_type!=SC_NONE)
     {
-        m_track_sector  = m_shortcut_sector;
-        m_shortcut_type = SC_NONE;
+        m_track_sector   = m_shortcut_sector;
+        m_shortcut_count-= m_shortcut_type==SC_OUTSIDE_TRACK ? 1 : 2;
+        m_shortcut_type  = SC_NONE;
     } 
 }   // forceRescue
 //-----------------------------------------------------------------------------

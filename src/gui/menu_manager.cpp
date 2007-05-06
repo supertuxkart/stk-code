@@ -49,8 +49,9 @@ MenuManager* menu_manager= new MenuManager();
 
 MenuManager::MenuManager()
 {
-    m_current_menu= NULL;
-    m_handled_size= 0;
+    m_current_menu = NULL;
+    m_RaceGUI      = NULL;
+    m_handled_size = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ void MenuManager::update()
 
     if (m_handled_size != m_menu_stack.size())
     {
+        if(m_current_menu==m_RaceGUI) m_RaceGUI=0;
+
         delete m_current_menu;
         m_current_menu= NULL;
 
@@ -114,7 +117,8 @@ void MenuManager::update()
                 m_current_menu= new NumPlayers();
                 break;
             case MENUID_RACE:
-                m_current_menu= new RaceGUI();
+                m_current_menu = new RaceGUI();
+                m_RaceGUI      = m_current_menu;
                 break;
             case MENUID_RACERESULT:
                 m_current_menu= new RaceResultsGUI();
@@ -179,6 +183,7 @@ void MenuManager::switchToGrandPrixEnding()
 {
     if (m_current_menu != NULL)
     {
+        if(m_current_menu==m_RaceGUI) m_RaceGUI=0;
         delete m_current_menu;
         m_current_menu= NULL;
     }
@@ -209,6 +214,7 @@ void MenuManager::switchToMainMenu()
 {
     if (m_current_menu != NULL)
     {
+        if(m_current_menu==m_RaceGUI) m_RaceGUI=0;
         delete m_current_menu;
         m_current_menu= NULL;
     }

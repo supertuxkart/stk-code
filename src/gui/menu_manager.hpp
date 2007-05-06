@@ -21,6 +21,7 @@
 #define HEADER_MENUMANAGER_H
 
 #include <vector>
+#include "gui/race_gui.hpp"
 #include "gui/base_gui.hpp"
 
 enum MenuManagerIDs
@@ -81,13 +82,15 @@ public:
 
     bool isCurrentMenu(MenuManagerIDs id) {return (m_menu_stack.back() == id);}
     bool isSomewhereOnStack(MenuManagerIDs id);
-    BaseGUI* getCurrentMenu() {return m_current_menu;}
+    BaseGUI* getCurrentMenu() const {return m_current_menu;}
+    RaceGUI* getRaceMenu   () const {return (RaceGUI*)m_RaceGUI;}
 
     void update();
 
 private:
     std::vector<MenuManagerIDs> m_menu_stack;
     BaseGUI* m_current_menu;
+    BaseGUI* m_RaceGUI;
     unsigned int m_handled_size;
 };
 

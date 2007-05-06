@@ -22,9 +22,11 @@
 #define HEADER_RACEGUI_H
 
 #include "base_gui.hpp"
+#include "kart.hpp"
 #include "material.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
+#include "world.hpp"
 
 // TODO: Fix this.
 #define MAX_ID0 512
@@ -49,6 +51,26 @@ class RaceGUI: public BaseGUI
     float       m_time_of_leader;
     int         m_lap_leader;
 
+    class TimedMessage
+    {
+     public:
+        const char  *m_message;      // message to display
+        float  m_end_time;           // end time for the message (-1 if once only)
+        int    m_red,m_blue,m_green; // colour
+        int    m_font_size;          // size
+        Kart  *m_kart;
+        TimedMessage(const char *message, 
+                     Kart *kart, float time, int size, 
+                     int red, int green, int blue)
+        {
+            m_message    = message; 
+            m_font_size  = size;
+            m_kart       = kart;
+            m_end_time   = time>=0.0f ? world->m_clock+time : -1.0f;
+            m_red=red; m_blue=blue; m_green=green; 
+        }
+        bool done() {return m_end_time<0 || world->m_clock>m_end_time;}
+    };
 public:
     RaceGUI();
     ~RaceGUI();
@@ -56,6 +78,8 @@ public:
     void select() {}
     void input(InputType type, int id0, int id1, int id2, int value);
     void handleKartAction(KartActions ka, int value);
+    void addMessage(const char *message, Kart *kart, float time, int fonst_size,
+                    int red=255, int green=0, int blue=255);
 
 private:
     ulClock   m_fps_timer;
@@ -66,6 +90,8 @@ private:
     Material* m_steering_wheel_icon;
     Material* m_speed_back_icon;
     Material* m_speed_fore_icon;
+    typedef   std::vector<TimedMessage*> AllMessageType;
+    AllMessageType m_messages;
 
     /* Display informat on screen */
     void drawStatusText        (const RaceSetup& raceSetup, const float dt);
@@ -75,7 +101,7 @@ private:
     void drawCollectableIcons  (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
-    void drawEmergencyText     (Kart* player_kart,
+    void drawAllMessages       (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
     void UpdateKeyboardMappings();
@@ -89,6 +115,7 @@ private:
     void drawMap               ();
     void drawTimer             ();
     void drawFPS               ();
+    void cleanupMessages       ();
 
     /* Text drawing */
     /** Draw text to screen.

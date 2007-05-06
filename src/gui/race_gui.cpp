@@ -23,7 +23,6 @@
 #include "race_gui.hpp"
 #include "history.hpp"
 #include "widget_set.hpp"
-#include "world.hpp"
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
@@ -141,6 +140,7 @@ void RaceGUI::update(float dt)
 {
     assert(world != NULL);
     drawStatusText(world->m_race_setup, dt);
+    cleanupMessages();
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -469,78 +469,6 @@ void RaceGUI::drawPlayerIcons ()
 }   // drawPlayerIcons
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawEmergencyText (Kart* player_kart, int offset_x,
-                                 int offset_y, float ratio_x, float ratio_y )
-{
-
-    static int flash = false ;
-    static float shortcut_time_started=-1;
-
-    int red, green, blue;
-    red = blue = (flash) ? 255 : 0;
-    green      = (flash) ? 0   : 255;
-    flash      = !flash;
-
-    // First message: on easy level, display a warning when going 
-    // in the wrong direction.
-    // -----------------------------------------------------------
-    if(world->m_race_setup.m_difficulty==RD_EASY)
-    {
-        float angle_diff = player_kart->getCoord()->hpr[0] -
-            world->m_track->m_angle[player_kart->getSector()];
-        if(angle_diff > 180.0f) angle_diff -= 360.0f;
-        else if (angle_diff < -180.0f) angle_diff += 360.0f;
-        // Display a warning message if the kart is going back way (unless
-        // the kart has already finished the race).
-        if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-            player_kart->getVelocity () -> xyz [ 1 ] > 0.0  &&
-            !player_kart->raceIsFinished()                       )
-        {
-            widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
-                                                (int)(200*ratio_x)+offset_x,
-                                                (int)(210*ratio_y)+offset_y, 
-                                                red, green, blue ) ;
-            widgetSet->drawDropShadowTextRace ( _("WRONG WAY!"), (int)(60*ratio_x),
-                                                (int)((200+2)*ratio_x)+offset_x,
-                                                (int)((210+2)*ratio_y)+offset_y, 
-                                                255-red, 255-green, 255-blue ) ;
-        }  // if angle is too big
-    }  // if difficulty easy
-    
-    // Second message: inform user when using shortcuts
-    // (shortcuts are not detected in easy races)> The
-    // message will be displayed for (at least) one second,
-    // even if the shortcut was very short.
-    // ------------------------------------------------
-    if(world->m_race_setup.m_difficulty!=RD_EASY)
-    {
-        // If the race is restarted, the shortcut_time_started might still
-        // be set to a previous value. If so, reset this flag so that
-        // no message is being displayed at the start of the next race
-        if(shortcut_time_started>world->m_clock)
-            shortcut_time_started=-1;
-        // Display the message if either the kart is currenlty doing a shortcut,
-        // or was doing a shortcut less than one second ago.
-        if(player_kart->isTakingShortcut()                                       ||
-           (shortcut_time_started>0 && world->m_clock-shortcut_time_started<1.0f)  )
-        {
-            if(shortcut_time_started<0) shortcut_time_started=world->m_clock;
-            widgetSet->drawDropShadowTextRace ( _("Invalid short-cut!"), 
-                                                (int)(50*ratio_x),
-                                                (int)(100*ratio_x)+offset_x,
-                                                (int)(210*ratio_y)+offset_y, 
-                                                red, green, blue ) ;
-            widgetSet->drawDropShadowTextRace ( _("Invalid short-cut!"), 
-                                                (int)(50*ratio_x),
-                                                (int)((100+2)*ratio_x)+offset_x,
-                                                (int)((210+2)*ratio_y)+offset_y, 
-                                                255-red, 255-green, 255-blue ) ;
-        }
-    }   // if difficulty is not EASY
-
-}   //drawEmergencyText
-
-//-----------------------------------------------------------------------------
 void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
                                      int offset_y, float ratio_x,
                                      float ratio_y                    )
@@ -861,6 +789,74 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
 } // drawLap
 
 //-----------------------------------------------------------------------------
+/** Removes messages which have been displayed long enough. This function
+ *  must be called after drawAllMessages, otherwise messages which are onlu
+ *  displayed once will not be drawn!
+ **/
+
+void RaceGUI::cleanupMessages()
+{
+    AllMessageType::iterator p =m_messages.begin(); 
+    while(p!=m_messages.end())
+    {
+        if((*p)->done())
+            m_messages.erase(p);
+        else
+            p++;
+    }
+}   // cleanupMessages
+
+//-----------------------------------------------------------------------------
+/** Displays all messages in the message queue
+ **/
+void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
+                              float ratio_x,  float ratio_y  )
+{
+    int x, y;
+    x = SCREEN_CENTERED_TEXT;
+    // First line of text somewhat under the top of the screen. For now
+    // start just under the timer display
+    y = user_config->m_height -164;
+    // The message are displayed in reverse order, so that a multi-line
+    // message (addMessage("1", ...); addMessage("2",...) is displayed
+    // in the right order: "1" on top of "2"
+    for(std::vector<TimedMessage*>::iterator i=m_messages.begin();
+                                             i!=m_messages.end(); i++)
+    {
+        // Display only messages for all karts, or messages for this kart
+        if( (*i)->m_kart && (*i)->m_kart!=player_kart) continue;
+
+        // drawDropShadowTextRace can't handle 'SCREEN_CENTERED_TEXT',
+        // so it can't be used here (unless we do the computation for
+        // centering here).
+        widgetSet->drawTextRace ( (*i)->m_message, 
+                                  (int)((*i)->m_font_size*ratio_x),
+                                  (int)(x*ratio_x)+offset_x,
+                                  (int)(y*ratio_y)+offset_y, 
+                                  (*i)->m_red, 
+                                  (*i)->m_green, 
+                                  (*i)->m_blue );
+        // Add 20% of font size as space between the lines
+        y-=(*i)->m_font_size*12/10;
+        
+        
+    }   // for i in all messages
+}   // drawAllMessages
+
+//-----------------------------------------------------------------------------
+/** Adds a message to the message queue. The message is displayed for a
+ *  certain amount of time (unless time<0, then the message is displayed
+ *  once).
+ **/
+void RaceGUI::addMessage(const char *msg, Kart *kart, float time, 
+                         int font_size, int red, int green, int blue)
+{
+    TimedMessage *m=new TimedMessage(msg, kart, time, font_size, 
+                                     red, green, blue);
+    m_messages.push_back(m);
+}   // addMessage
+
+//-----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 {
     assert(world != NULL);
@@ -961,8 +957,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawLap             (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
-            drawEmergencyText   (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y ) ;
+            drawAllMessages     (player_kart, offset_x, offset_y,
+                                 split_screen_ratio_x, split_screen_ratio_y );
         }   // for pla
         drawTimer ();
         drawMap   ();

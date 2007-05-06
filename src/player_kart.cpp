@@ -25,6 +25,9 @@
 #include "sdldrv.hpp"
 #include "herring.hpp"
 #include "world.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
+#include "translation.hpp"
 
 void PlayerKart::action(KartActions action, int value, bool isKeyboard)
 {
@@ -193,5 +196,43 @@ void PlayerKart::reset()
     }
     Kart::reset();
 }
+//-----------------------------------------------------------------------------
+/** This function is called by world to add any messages to the race gui. This
+ *  can't be done (in some cases) in the update() function, since update can be
+ *  called several times per frame, resulting in messages being displayed more 
+ *  than once.
+ **/
+void PlayerKart::addMessages()
+{
+    RaceGUI* m=menu_manager->getRaceMenu();
+    // This can happen if the option menu is called, since the
+    // racegui gets deleted
+    if(!m) return;
 
+    // 1) check if the player is going in the wrong direction
+    // ------------------------------------------------------
+    if(world->m_race_setup.m_difficulty==RD_EASY)
+    {
+        float angle_diff = getCoord()->hpr[0] - world->m_track->m_angle[getSector()];
+        if(angle_diff > 180.0f) angle_diff -= 360.0f;
+        else if (angle_diff < -180.0f) angle_diff += 360.0f;
+        // Display a warning message if the kart is going back way (unless
+        // the kart has already finished the race).
+        if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
+            getVelocity () -> xyz [ 1 ] > 0.0  && !raceIsFinished() )
+        {
+            m->addMessage(_("WRONG WAY!"), this, -1.0f, 60);
+        }  // if angle is too big
+    }  // if difficulty easy
+
+    // 2) Check if a shortcut is currently be taken
+    // --------------------------------------------
+
+    if(world->m_race_setup.m_difficulty != RD_EASY      && 
+       m_shortcut_type                  == SC_OUTSIDE_TRACK)
+    {
+        m->addMessage(_("Invalid short-cut!"), this, -1.0f, 60);
+    }
+
+}   // addMessages
 /* EOF */
