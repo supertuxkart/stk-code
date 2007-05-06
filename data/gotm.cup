@@ -2,7 +2,7 @@
 
 (supertuxkart-cup
  (name "Game-of-the-Month")
- (description "All new tracks done by the Game of the month team")
+ (description "All seven tracks done by the Game of the month team")
  (herring "new")
  (tracks "beach" "lighthouse" "startrack" "volcano" "littlevolcano" "race" "subseatrack" )
 )

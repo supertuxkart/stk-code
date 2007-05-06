@@ -2,7 +2,7 @@
 
 (supertuxkart-cup
  (name        "TuxKart Cup")
- (description "The original 6 tracks included in TuxKart")
+ (description "The original five tracks included in TuxKart")
  (herring     "old")
  (tracks      "olivermath" "gownsbow" "bsodcastle" "geekopeak" "tuxtrack")
 )
