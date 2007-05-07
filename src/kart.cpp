@@ -407,8 +407,14 @@ void Kart::doLapCounting ()
           world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
           world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
     {
-        setTimeAtLap(world->m_clock);
-        m_race_lap++ ;
+        // Only increase the lap counter and set the new time if the
+        // kart hasn't already finished the race (otherwise the race_gui
+        // will begin another countdown).
+        if(m_race_lap+1<=world->m_race_setup.m_num_laps)
+        {
+            setTimeAtLap(world->m_clock);
+            m_race_lap++ ;
+        }
 
         m_shortcut_count = 0;
         // Only do timings if original time was set properly. Driving backwards
