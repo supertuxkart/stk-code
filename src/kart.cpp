@@ -333,6 +333,7 @@ void Kart::reset()
     m_collectable.clear();
 
     m_race_lap             = -1;
+    m_lap_start_time       = -1.0f;
     m_shortcut_count       = 0;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
     m_shortcut_type        = SC_NONE;
