@@ -41,8 +41,6 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
         UpdateKeyboardMappings();
     }   // if !user_config->m_profile
 
-    m_lap_leader     = -1;
-    m_time_of_leader  = -1.0f;
     // FIXME: translation problem
     m_pos_string[0] = "?!?";
     m_pos_string[1] = "1st";
@@ -359,7 +357,30 @@ void RaceGUI::drawPlayerIcons ()
 
     //glEnable(GL_TEXTURE_2D);
     Material *last_players_gst = 0;
-    int bFirst =1;
+    int   laps_of_leader           = -1;
+    float time_of_leader       = -1;
+    // Find the best time for the lap. We can't simply use
+    // the time of the kart at position 1, since the kart
+    // might have been overtaken by now
+    for(int i = 0; i < world->getNumKarts() ; i++)
+    {
+        Kart* kart     = world->getKart(i);
+        float lap_time = kart->getTimeAtLap();
+        int laps       = kart->getLap();
+
+        if(laps > laps_of_leader)
+        {
+            // more laps than current leader --> new leader and new time computation
+            laps_of_leader = laps;
+            time_of_leader = lap_time;
+        } else if(laps == laps_of_leader)
+        {
+            // Same number of laps as leader: use fastest time
+            time_of_leader=std::min(time_of_leader,lap_time);
+        }
+    }   // for i<getNumKarts
+
+    int bFirst                 = 1;
     for(int i = 0; i < world->getNumKarts() ; i++)
     {
         Kart* kart   = world->getKart(i);
@@ -381,15 +402,10 @@ void RaceGUI::drawPlayerIcons ()
         }
 
         glDisable(GL_CULL_FACE);
-        if(lap>m_lap_leader)
-        {
-            m_lap_leader    = lap;
-            m_time_of_leader = world->m_clock;
-        }
 
-        if(m_lap_leader>0 &&    // Display position during first lap
+        if(laps_of_leader>0 &&    // Display position during first lap
            (world->m_clock - kart->getTimeAtLap()<5.0f ||
-            lap!=m_lap_leader))
+            lap!=laps_of_leader))
         {  // Display for 5 seconds
             char str[256];
             if(position==1)
@@ -400,8 +416,8 @@ void RaceGUI::drawPlayerIcons ()
             else
             {
                 float timeBehind;
-                timeBehind = (lap==m_lap_leader ? kart->getTimeAtLap() : world->m_clock)
-                    - m_time_of_leader;
+                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : world->m_clock)
+                    - time_of_leader;
                 str[0]='+'; str[1]=0;
                 TimeToString(timeBehind, str+1);
             }

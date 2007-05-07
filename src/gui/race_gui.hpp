@@ -48,9 +48,6 @@ class RaceGUI: public BaseGUI
     // the kart which is using them
     Entry m_input_map[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
 
-    float       m_time_of_leader;
-    int         m_lap_leader;
-
     class TimedMessage
     {
      public:
