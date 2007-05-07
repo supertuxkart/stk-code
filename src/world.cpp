@@ -517,6 +517,8 @@ void World::checkRaceStatus()
                 //        would be to estimate the distance to go and use this to
                 //        determine better times.
                 m_kart[i]->setFinishingState(m_clock+m_kart[i]->getPosition()*0.3f);
+                race_manager->addKartScore((int)i, m_kart[i]->getPosition());
+
             }   // if !raceIsFinished
         }   // for i
 
