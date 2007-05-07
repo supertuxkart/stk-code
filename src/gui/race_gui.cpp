@@ -842,9 +842,16 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
         // drawDropShadowTextRace can't handle 'SCREEN_CENTERED_TEXT',
         // so it can't be used here (unless we do the computation for
         // centering here).
+
+        // FIXME: x=SCREEN_CENTERED_TEXT is a problem in multi-player
+        // mode, since it will be centered on the whole screen, and not
+        // on the window of the kart. Best solution is probably to
+        // add optional parameters to widget set specifying the window
+        // parameters (left, top, right, bottom) on which to center the
+        // text. For now we leave it the way it is.
         widgetSet->drawTextRace ( (*i)->m_message, 
                                   (int)((*i)->m_font_size*ratio_x),
-                                  (int)(x*ratio_x)+offset_x,
+                                  x,
                                   (int)(y*ratio_y)+offset_y, 
                                   (*i)->m_red, 
                                   (*i)->m_green, 
