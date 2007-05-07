@@ -19,8 +19,6 @@
 
 #if HAVE_OPENAL && HAVE_MIKMOD
 
-#include <assert.h>
-
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #else
@@ -73,21 +71,34 @@ MusicMikMod::MusicMikMod()
         MikMod_RegisterAllLoaders();
     }
 
-    assert(!MikMod_Init(""));
+    if(MikMod_Init(""))
+    {
+        user_config->m_music=false;
+        fprintf(stderr,"Problems initialising mikmod. Disabling music.\n");
+    }
 }
 
 //-----------------------------------------------------------------------------
 MusicMikMod::~MusicMikMod()
 {
     stopMusic();
-    assert(release());
+    if(!release())
+    {
+        fprintf(stderr,"Problems with mikmod:release.\n");
+    }
     MikMod_Exit();
 }
 
 //-----------------------------------------------------------------------------
 bool MusicMikMod::load(const char* filename)
 {
-    assert(release());
+    if(!release())
+    {
+        user_config->m_music=false;
+        fprintf(stderr,"Problems mikmod:release. Disabling music.\n");
+        return;
+    }
+
 
     m_fileName =  loader->getPath(filename);
     FILE* modFile = fopen(m_fileName.c_str(), "rb");
@@ -258,7 +269,8 @@ void MusicMikMod::update()
         alSourceUnqueueBuffers(m_soundSource, 1, &buffer);
         if (alGetError() != AL_NO_ERROR)
         {
-            assert(false);
+            user_config->m_music=false;
+            fprintf(stderr,"Problems with mikmod:sourceUnqueueBuffers. Disabling music.\n");
             return;
         }
 
@@ -266,7 +278,8 @@ void MusicMikMod::update()
         alSourceQueueBuffers(m_soundSource, 1, &buffer);
         if (alGetError() != AL_NO_ERROR)
         {
-            assert(false);
+            user_config->m_music=false;
+            fprintf(stderr,"Problems with mikmod:sourceQueueBuffers. Disabling music.\n");
             return;
         }
     }
