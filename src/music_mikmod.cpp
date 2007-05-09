@@ -28,6 +28,7 @@
 
 #include "music_mikmod.hpp"
 #include "loader.hpp"
+#include "user_config.hpp"
 
 #define BUFFER_SIZE (1024 * 32)
 
@@ -96,7 +97,7 @@ bool MusicMikMod::load(const char* filename)
     {
         user_config->m_music=false;
         fprintf(stderr,"Problems mikmod:release. Disabling music.\n");
-        return;
+        return false;
     }
 
 
