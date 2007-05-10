@@ -1,33 +1,32 @@
-SuperTuxKart SVN
-~~~~~~~~~~~~~~~~~~~~
-* Improved user interface:
-  -New racing interface
-  -Better track map
-  -Player kart dots in the track map are bigger than AI dots
-  -Track selection screen has topview pictures
-  -Added "Setup new race" option when a track is finished
-  -Added "Restart race" option when a track is finished
-  -The keyboard can skip vertical spaces between buttons
-  -And many others
+SuperTuxKart 0.3 (May 2007)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Highscore lists	
+* Shortcut detection 	
+* Improved AI
 * Fullscreen support
-* OpenAL support
-* Removed unused files
-* Better control configuration
-* Better in-game help
-* Added new track: the island
-* Highscores support
-* Added .desktop file for menus and icon
+* New track: the island
+* New penalty: bomb
 * MacOSX support
-* Added new penalty: bomb
-* Optional ogg-vorbis support (not yet used)
+* OpenAL and ogg-vorbis support
+* Improved user interface:
+  - New racing interface
+  - Better track map
+  - Player kart dots in the track map are bigger than AI dots
+  - Track selection screen has topview pictures
+  - Added "Setup new race" option when a track is finished
+  - Added "Restart race" option when a track is finished
+  - The keyboard can skip vertical spaces between buttons
+  - Better control configuration
+  - Better in-game help
+  - Added .desktop file for menus and icon
 * Bugfixes:
-  -Fixed bug in ssg_help::MinMax, which could cause a significant performance loss.
-  -Fixed bug that allowed the joystick to erase the main menu
-  -Fixed bug that allowed the joystick to "play the game while paused"
-  -Fixed screen_manager assert failure bug
-  -Fixed sound_manager assert failure bug
-  -Fixed keyboard keys unable to work on the first key press bug
-  -And others
+  - Fixed bug in ssg_help::MinMax, which could cause a significant performance loss.
+  - Fixed bug that allowed the joystick to erase the main menu
+  - Fixed bug that allowed the joystick to "play the game while paused"
+  - Fixed screen_manager assert failure bug
+  - Fixed sound_manager assert failure bug
+  - Fixed keyboard keys unable to work on the first key press bug
+  - And others
 
 SuperTuxKart 0.2 (22. Sep 2006)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
