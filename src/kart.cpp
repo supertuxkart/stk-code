@@ -40,6 +40,9 @@
 #ifdef BULLET
 #include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #endif
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf  _snprintf
+#endif
 
 KartParticleSystem::KartParticleSystem(Kart* kart_,
                                        int num, float _create_rate, int _ttf,
