@@ -74,12 +74,13 @@ GrandPrixEnd::GrandPrixEnd()
     const int VA = widgetSet->varray(m_menu_id);
 
     Kart *kart;
-    int scores [2][NUM_KARTS];
+    int *scores   = new int[NUM_KARTS];
+    int *position = new int[NUM_KARTS];
     for( unsigned int i = 0; i < NUM_KARTS; ++i )
     {
         kart = world->getKart(i);
-        scores[0][i] = i;
-        scores[1][i] = race_manager->getKartScore(i);
+        position[i] = i;
+        scores[i]   = race_manager->getKartScore(i);
     }
 
     //Bubblesort
@@ -89,18 +90,18 @@ GrandPrixEnd::GrandPrixEnd()
         sorted = true;
         for( unsigned int i = 0; i < NUM_KARTS - 1; ++i )
         {
-            if( scores[1][i] < scores[1][i+1] )
+            if( scores[i] < scores[i+1] )
             {
                 int tmp_score[2];
 
-                tmp_score[0] = scores[0][i];
-                tmp_score[1] = scores[1][i];
+                tmp_score[0] = position[i];
+                tmp_score[1] = scores[i];
 
-                scores[0][i] = scores[0][i+1];
-                scores[1][i] = scores[1][i+1];
+                position[i] = position[i+1];
+                scores[i] = scores[i+1];
 
-                scores[0][i+1] = tmp_score[0];
-                scores[1][i+1] = tmp_score[1];
+                position[i+1] = tmp_score[0];
+                scores[i+1] = tmp_score[1];
 
                 sorted = false;
             }
@@ -111,13 +112,14 @@ GrandPrixEnd::GrandPrixEnd()
 
     for(unsigned int i=0; i < NUM_KARTS; ++i)
     {
-        kart = world->getKart(scores[0][i]);
+        kart = world->getKart(position[i]);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
-                i + 1, kart->getName().c_str(), scores[1][i]);
+                i + 1, kart->getName().c_str(), scores[i]);
         widgetSet -> label(VA, (char*)(m_score + MAX_STR_LEN * i), GUI_MED,
             GUI_ALL);
     }
-
+    delete []scores;
+    delete []position;
 
     widgetSet -> space(m_menu_id);
     widgetSet -> label(m_menu_id, _("Back to the main menu"), GUI_LRG, GUI_ALL, 0, 0);
