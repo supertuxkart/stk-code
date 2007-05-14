@@ -35,12 +35,11 @@ MaterialManager::MaterialManager()
     /* Create list - and default material zero */
 
     m_materials.reserve(100);
-    // We can't call init here, since the global variable
+    // We can't call init/loadMaterial here, since the global variable
     // material_manager has not yet been initialised, and
     // material_manager is used in the Material constructor.
     // Therefore, the code for loading the material had to
     // be moved into a separate function.
-    //  Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +162,15 @@ Material *MaterialManager::getMaterial ( ssgLeaf *l )
 Material *MaterialManager::getMaterial ( const char* fname )
 {
     if ( fname == NULL || fname[0] == '\0' )
-        return m_materials[0];
+    {
+        // This happens while reading the stk_config file, which contains
+        // kart_properties information (but no icon file): since at this 
+        // stage loadMaterial() hasn't been called, an exception can be
+        // triggered here (as it happened with visual c++), when
+        // m_materials[0] is accessed.
+        if(m_materials.size()>=1) return m_materials[0];
+        return NULL;
+    }
 
     //This copy is made so the original fname is not modified
     char *fname_copy = strdup(fname);
