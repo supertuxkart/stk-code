@@ -102,7 +102,15 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     m_scene -> addKid ( m_track_branch ) ;
 
     // Create the physics
+    // ------------------
+#if defined(WIN32) && !defined(__CYGWIN__)
+    // FIXME-WINDOWS: Some strange VisualC++ bug causes the call to
+    // getGravity() to get an invalid 'this' pointer. The following
+    // call prevents this problem.
+    m_physics = new Physics(m_track->getGravity());
+#else
     m_physics = new Physics(getGravity());
+#endif
 
     assert(m_race_setup.m_karts.size() > 0);
 
