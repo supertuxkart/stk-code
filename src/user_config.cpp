@@ -110,8 +110,8 @@ void UserConfig::setDefaults()
     m_keyboard_debug   = false;
     m_fullscreen       = false;
     m_no_start_screen  = false;
-    m_sfx              = true;
-    m_music            = true;
+    m_sfx              = UC_ENABLE;
+    m_music            = UC_ENABLE;
     m_smoke            = false;
     m_display_fps      = false;
     m_herring_style    = "new";
@@ -299,9 +299,13 @@ void UserConfig::loadConfig(const std::string& filename)
 
         /*get toggles*/
         lisp->get("fullscreen",       m_fullscreen);
-        lisp->get("sfx" ,             m_sfx);
+        bool doSFX=false;                                // avoid warning
+        lisp->get("sfx" ,             doSFX);
+        m_sfx = doSFX ? UC_ENABLE : UC_DISABLE;
         lisp->get("nostartscreen",    m_no_start_screen);
-        lisp->get("music",            m_music);
+        bool doMusic=false;                              // avoid warning
+        lisp->get("music",            doMusic);
+        m_music = doMusic ? UC_ENABLE : UC_DISABLE;
         lisp->get("smoke",            m_smoke);
         lisp->get("displayFPS",       m_display_fps);
         lisp->get("herringStyle",     m_herring_style);
@@ -459,8 +463,8 @@ void UserConfig::saveConfig(const std::string& filename)
         writer.write("configFileVersion\t",   CURRENT_CONFIG_VERSION);
 
         writer.writeComment("the following options can be set to #t or #f:");
-        writer.write("sfx\t",   m_sfx);
-        writer.write("music\t", m_music);
+        writer.write("sfx\t",   !(m_sfx==UC_DISABLE));
+        writer.write("music\t", !(m_music==UC_DISABLE));
         writer.write("smoke\t", m_smoke);
         writer.writeComment("Display frame per seconds");
         writer.write("displayFPS\t", m_display_fps);

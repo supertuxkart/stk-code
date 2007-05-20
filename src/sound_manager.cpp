@@ -137,7 +137,7 @@ SoundManager::~SoundManager()
 //-----------------------------------------------------------------------------
 void SoundManager::playSfx(unsigned int id)
 {
-    if(user_config->m_sfx && m_initialized)
+    if(user_config->doSFX() && m_initialized)
     {
         SFXsType::iterator it= m_sfxs.find(id);
         if (it == m_sfxs.end())
@@ -153,7 +153,7 @@ void SoundManager::playSfx(unsigned int id)
 //-----------------------------------------------------------------------------
 void SoundManager::playMusic(const char* filename)
 {
-    if(user_config->m_music && m_initialized)
+    if(user_config->doMusic() && m_initialized)
     {
         if (m_current_music != NULL)
         {

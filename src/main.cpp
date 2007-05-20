@@ -264,8 +264,8 @@ int handleCmdLine(int argc, char **argv)
     if(user_config->m_profile)
     {
         printf("Profiling: %d seconds.\n",user_config->m_profile);
-        user_config->m_sfx   = false;  // Disable sound effects and music when profiling
-        user_config->m_music = false;
+        user_config->setSFX(UserConfig::UC_DISABLE);  // Disable sound effects 
+        user_config->setMusic(UserConfig::UC_DISABLE);// and music when profiling
     }
 
     return 1;

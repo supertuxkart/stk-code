@@ -74,7 +74,7 @@ MusicMikMod::MusicMikMod()
 
     if(MikMod_Init(""))
     {
-        user_config->m_music=false;
+        user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
         fprintf(stderr,"Problems initialising mikmod. Disabling music.\n");
     }
 }
@@ -95,7 +95,7 @@ bool MusicMikMod::load(const char* filename)
 {
     if(!release())
     {
-        user_config->m_music=false;
+        user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
         fprintf(stderr,"Problems mikmod:release. Disabling music.\n");
         return false;
     }
@@ -270,7 +270,7 @@ void MusicMikMod::update()
         alSourceUnqueueBuffers(m_soundSource, 1, &buffer);
         if (alGetError() != AL_NO_ERROR)
         {
-            user_config->m_music=false;
+            user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
             fprintf(stderr,"Problems with mikmod:sourceUnqueueBuffers. Disabling music.\n");
             return;
         }
@@ -279,10 +279,11 @@ void MusicMikMod::update()
         alSourceQueueBuffers(m_soundSource, 1, &buffer);
         if (alGetError() != AL_NO_ERROR)
         {
-            user_config->m_music=false;
+            user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
             fprintf(stderr,"Problems with mikmod:sourceQueueBuffers. Disabling music.\n");
             return;
         }
+	user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
     }
 
     // check for underrun

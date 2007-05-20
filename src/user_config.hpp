@@ -44,6 +44,7 @@
 
 #define CONFIGDIR ".supertuxkart"
 
+
 /*class for managing general tuxkart configuration data*/
 class UserConfig
 {
@@ -52,6 +53,10 @@ private:
 
     void        setFilename      ();
     int         CheckAndCreateDir();
+
+    // Attributes which have setter/getter
+    int         m_sfx;
+    int         m_music;
 
     void readInput(const lisp::Lisp* &r,
                    const char *node,
@@ -63,11 +68,12 @@ private:
                     KartActions action,
                     Player& player);
 public:
+    enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
+
+    // Attributes that are accessed directly. 
     bool        m_keyboard_debug;
     bool        m_fullscreen;
     bool        m_no_start_screen;
-    bool        m_sfx;
-    bool        m_music;
     bool        m_smoke;
     bool        m_display_fps;
     int         m_profile;         // Positive number: time in seconds, neg: # laps
@@ -88,6 +94,10 @@ public:
     ~UserConfig();
     std::string getConfigDir     ();
     void setDefaults();
+    void setMusic(int m)     { m_music        =  m;        }
+    void setSFX  (int m)     { m_sfx          =  m;        }
+    bool doMusic() const     { return m_music == UC_ENABLE;}
+    bool doSFX()   const     { return m_sfx   == UC_ENABLE;}
     void loadConfig();
     void loadConfig(const std::string& filename);
     void saveConfig();

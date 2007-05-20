@@ -38,14 +38,14 @@ ConfigSound::ConfigSound()
     // The spaces are important, otherwise the set_label calls below will
     // increase the width of the container, resulting in a warning being
     // printed by widgetSet.
-    if( user_config->m_music )
+    if( user_config->doMusic() )
         m_music_menu_id = widgetSet->start(VA,_("  Turn off music  "), 
                                            GUI_MED, WTOK_MUSIC, GUI_ON);
     else
         m_music_menu_id = widgetSet->start(VA,_("  Turn on music  "), 
                                            GUI_MED, WTOK_MUSIC, GUI_OFF);
 
-    if( user_config->m_sfx )
+    if( user_config->doSFX() )
         m_sfx_menu_id   = widgetSet->state(VA,_("  Turn off sound effects  "),
                                            GUI_MED, WTOK_SFX, GUI_ON);
     else
@@ -82,27 +82,27 @@ void ConfigSound::select()
     switch ( widgetSet -> token (widgetSet -> click()) )
     {
     case WTOK_MUSIC:
-        if(user_config->m_music)
+        if(user_config->doMusic())
         {
-            user_config->m_music = false;
+            user_config->setMusic(UserConfig::UC_DISABLE);
             widgetSet->set_label(m_music_menu_id, _("Turn on music"));
         }
         else
         {
-            user_config->m_music = true;
+            user_config->setMusic(UserConfig::UC_ENABLE);
             widgetSet->set_label(m_music_menu_id, _("Turn off music"));
         }
         widgetSet->toggle(m_music_menu_id);
         break;
     case WTOK_SFX:
-        if(user_config->m_sfx)
+        if(user_config->doSFX())
         {
-            user_config->m_sfx = false;
+            user_config->setSFX(UserConfig::UC_DISABLE);
             widgetSet->set_label(m_sfx_menu_id, _("Turn on sound effects"));
         }
         else
         {
-            user_config->m_sfx = true;
+            user_config->setSFX(UserConfig::UC_ENABLE);
             widgetSet->set_label(m_sfx_menu_id, _("Turn off sound effects"));
         }
         widgetSet->toggle(m_sfx_menu_id);
