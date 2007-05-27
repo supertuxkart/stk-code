@@ -1,0 +1,10 @@
+;; -*- mode: lisp -*-
+
+(herring
+  (gold   "goldcoin"  )
+  (silver "silvercoin")
+  (green  "banana"    )
+  (red    "bonusblock")
+)
+
+;; EOF ;;

@@ -1,0 +1,14 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-kart
+ (name        "Skirpy")
+ (model-file  "skirpy-high.ac")
+ (icon-file   "skirpyicon.rgb")
+ (shadow-file "tuxkartshadow.rgb")
+ 
+ (red   0.1)
+ (green 0.5)
+ (blue  0.1)
+       
+)
+;; EOF ;;

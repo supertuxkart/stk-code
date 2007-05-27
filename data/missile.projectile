@@ -1,0 +1,10 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-collectable
+ (name "missile")
+ (model "missile.ac")
+ (icon  "missile.rgb")
+ (speed 50.0)
+)
+
+;; EOF ;;

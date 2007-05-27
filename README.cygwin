@@ -1,0 +1,28 @@
+Some short instruction on how to compile supertuxkart with cygwin:
+
+1) You have to use supertuxkart revision 593 or later (which you are 
+   probably doing since you are reading this readme :)  ).
+
+2) Install freeglut
+   This is part of the cygwin packages, so just select this in
+   the cygwin setup program.
+
+3) Compile and install plib
+   This should work straight out of the box.
+
+4) Unpack supteruxkart and run ./configure  and  make.
+
+That should be all.
+
+
+Comments: 
+1) A -DNOMINMAX is added for cygwin compilations, since otherwise
+   min and max are #defined, causing problems with all std::min and
+   std::max constructs.
+2) The order in which plib/pu.h and plib/pw.h are included appears
+   to be important - pw should be included first.
+
+If you have any problems, please post on the mailing list - I am 
+not a regular windows user, so am probably not able to help you.
+
+   hiker

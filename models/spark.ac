@@ -1,0 +1,58 @@
+AC3Db
+MATERIAL "ac3dmat1" rgb 1 1 1  amb 1 1 1  emis 1 1 1  spec 0 0 0  shi 0  trans 0
+OBJECT world
+kids 3
+OBJECT poly
+name "box"
+loc 0 -0.3 0
+texture "../images/spark.rgb"
+numvert 4
+0.00353554 0.28162 0.454694
+-0.555078 0.602028 -0.00289614
+-0.00353554 0.91838 -0.454694
+0.555078 0.597972 0.00289614
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+0 1 0
+1 1 1
+2 0 1
+3 0 0
+kids 0
+OBJECT poly
+name "box"
+loc 0 -0.3 0
+texture "../images/spark.rgb"
+numvert 4
+-0.279308 1.08786 0.000635528
+0.279308 0.767456 0.458226
+0.279308 0.112136 -0.000635528
+-0.279308 0.432544 -0.458226
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+0 0 1
+1 0 0
+2 1 0
+3 1 1
+kids 0
+OBJECT poly
+name "box"
+loc 0 -0.3 0
+texture "../images/spark.rgb"
+numvert 4
+-0.275772 0.114164 -0.00353168
+-0.275772 0.769484 0.45533
+0.275772 1.08584 0.00353168
+0.275772 0.430516 -0.45533
+numsurf 1
+SURF 0x20
+mat 0
+refs 4
+0 0 0
+1 1 0
+2 1 1
+3 0 1
+kids 0

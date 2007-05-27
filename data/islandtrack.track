@@ -1,0 +1,12 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "The Island")
+ (description "Created by Johannes Sjolund")
+ (music "mods/Boom_boom_boom.mod")
+ (screenshot "images/sshot-islandtrack.rgb")
+ (topview "images/topview-islandtrack.rgb")
+)
+
+;; EOF ;;
+

@@ -1,0 +1,622 @@
+Some more or less unsorted implementation details. Some comments
+are included in [].
+
+
+1) Collectables
+===============
+A collectable is an object used once in each kart. It stores:
+- a type (e.g. zipper)
+- an icon (displayed in the gui)
+- a number (how many of this items have been collected)
+- can have a model (for missiles etc). 
+The information about collectables is stored in several data files
+(data/*.collectables, and data/*.projectiles). The mapping from
+collectableType to data file is currently hard-coded in 
+CollectableManager (look for initCollectableType and ict).
+
+When a red herring is hit, Collectable::hitRedHerring for
+the collectable being used in the current kart is called. When a
+collectable is used, Collectable::use is called from PlayerKart::update
+or AutoKart::update.
+
+The collectables can have different styles, for example, in some tracks
+they can look like a fish and in others like a box with a question mark. 
+All herring models are stored in models/herrings and are loaded at the
+start of the program. The only exception are the original fish models,
+which are created within tuxkart. They can be specified by using the
+special model names; OLD_GOLD, OLD_GREEN, OLD_RED, and OLD_SILVER.
+The herrings to use are defined in herring style files in 
+data/*.herring - for example:
+
+(herring
+  (gold   "goldcoin")
+  (silver "silvercoin")
+  (green  "OLD_GREEN")
+)
+
+This would use the new coin models for the energy boosters, but the
+old green for bad collectables. Since no value is specified for
+red herrings, the system default will be used. 
+The program can load up to 4 different style. First of all it loads
+the (hardcoded) defaults (which are the newly defined models in
+models/herrings). Then it will a user specified model (using the
+--herring command line option). Then it will load a herring file 
+specified in the track, and if a grand prix is used, it will load
+the grand prix specifications last. This means, that a grand prix
+setting will overwrite a track setting, which in turn will overwrite
+a user setting, which will overwrite the defaults. This way a grand
+prix can specify a consistent style.
+
+To create a new herring model:
+1) create the model and put it in models/herrings
+2) create a herring style file in data/*.herring,
+   which specified for which to use the model.
+3) Then either specify the name of the new herring style file
+   on the command line option (which will then become your
+   new default, since it will be loaded), or add it to a track
+   or cup file in data (as  (herring "new-name-without-extension")
+
+2) Projectiles
+==============
+Projectiles inherit from Moveables. The projectile_manager
+maintains a dynamical list of unused projectiles (deletedProjectiles).
+If a new projectile is needed (because of the use of a collectable):
+- one projectile from this list will be used (and removed from
+  this list) if one is available,
+- otherwise a new one will created.
+The new projectile is added to the list activeProjectiles, see 
+ProjectileManager::newProjectile. When the projectile hits
+something, the 'somethingWasHit' flag gets set. This flag
+get tested after updating (i.e. moving) all projectiles from
+ProjectileManager::update. In case of a hit, a new explosion
+object is used (similarly from either a list of unused explosions
+or created newly, see ProjectileManager::newExplosion), the
+projectile is removed from the scene, and put in the dynamical
+list of available projectils for later reuse (deletedProjectiles).
+The speed and model of the projectile are taken from the
+collectable_manager (who takes this information from the files
+data/*.projectile).
+[Note: this design is a little bit awkward, since not all 
+collectables have/need speed. A more complicated implementation 
+might make the ProjectileManager inherit from the CollectableManager,
+... - but on the other hands, that makes (imho) all further handling
+more complicated: e.g. depending on whether the collectable is
+a missile or not, different managers have to be called ...]
+
+
+3) Default parameters 
+=====================
+All default parameters (mostly physics related, including default
+kart properties) are stored in data/physics.data, and managed by
+PhysicsParameters, which has KartProperties as a base class, so it
+can automatically store all kart data as well.
+This class checks if all necessary parameters are defined, so 
+missing data in data/physics.data will be detected.
+To add another parameter:
+1) add the parameter to data/physics.data
+2) add a variable to PhysicsParameter.h
+3) add a call to list->get to PhysicsParameter::getAllData
+4) add an initialisation to PhysicsParameter::init_defaults
+   (this value if possible should be <-99, since this is used
+   to detect missing values. If this value should be a valid
+   value for the new parameter, find something else and adjust
+   the test in PhysicsParameters::load accordingly).
+5) add a test to PhysicsParameters::load to see if this value
+   was defined.
+
+4) Menu handling
+================
+The ScreenManager contains the main event/redraw loop in its 
+ScreenManager::run function. The next screen can be defined, which
+means that the ScreenManager will delete the current screen, and
+replace it with the next screen. The main loop for the 
+ScreenManager can be aborted by calling ScreenManager::abort().
+
+There are currently two screens:
+- StartScreen
+  --> background rendered image of tuxkart
+- WorldScreen
+  --> Handles the display of the actual race, but is also
+      used when the race menu pops up
+The screens are then mainly responsible for:
+- drawing the actual screen (background image for StartScreen,
+  race track, karts etc for WorldScreen)
+- calling plibdrv.pollEvents (which manages all input)
+- calling updateGUI to handle keyboard etc.
+- swapping the display buffers
+
+StartScreen
+-----------
+A gui-stack (gui/BaseGUI) is responsible for handling the
+menus. StartScreen pushes GUI_MAINMENU on the guistack, which
+is the first menu. When a choice is made, the next menu
+(see BaseGUI the function updateGUI) is pushed on the stack.
+The updateGUI function then updates the current gui.
+
+When the main menu is finished, StartScreen::switchToGame
+gets called, either from:
+- start_tuxkart (profiling, quick start)
+- gui/CharSel   (GrandPrix)
+- gui/NumLaps   (all other racing modes)
+switchToGame clears the guiStack and calls RaceManager::start(). 
+There, a RaceMode object is created and start() gets called, 
+where (after some setup) a new WorldScreen is created and set 
+in the screen_manager.
+
+If a race is over (or aborted), a new StartStreen is created
+(see ::next() of all racing modes in RaceManager), and the
+menu handling starts again.
+
+WorldScreen
+-----------
+Similarly to StartScreen, WorldScreen::update gets called
+regularly by the ScreenManager.
+
+
+5) Physics
+==========
+The new physics (esp. new turning code) enables (well, soon)
+karts to start sliding when driving too fast in too tight
+curves. There are quite a few parameters which can and must
+be tuned to get the right feeling. All these parameters
+are stored in data/physics.data and can be changed with
+any editor - no recompilation is necessary, but tuxkart
+has to be started again for the new parameters to be used.
+Here a short explanation on how the parameters interact 
+with each other:
+- Driving in straight lines
+  The engine force is defined by 'engine-power', which
+  results in a force pushing the kart forward. There are
+  two forces countering this: rolling resistance (see
+  roll-resistance), and air-resistance. Rolling resistance
+  increases linearly with the velocity of the kart
+  (speed * roll_resistance); while air resistance increases
+  with the squared speed of the kart 
+  (speed*speed*air_resistance). Rolling resistance is more
+  important at lower speed, while air-resistance is most
+  effective at higher speed (and it's ultimate responsible
+  for the top speed of the kart).Therefore:
+  - engine_power and roll_resistance determine how fast
+    a kart can accelerate
+  - engine_power and air_resistance determine the maximum
+    speed of the kart.
+  E.g., to make the kart accelerate faster, without changing
+  the maximum speed: either decrease roll-resistance (the
+  effect to the maximum speed can be neglected); or increase
+  engine power and air resistance.
+  Additional effects are the tire grip and the surface the
+  kart is driving on: tire-force*tire_grip*surface_grip 
+  is the maximum grip (tire-force = force on the tire, caused
+  by the weight of the kart), and if the forward force is
+  greater than the maximum grip, slipping occurs: the 
+  effective force is reduced to 40% (arbitrary value), and
+  skid marks are drawn.
+- Turning
+  Turning is implemented by computing two lateral forces 
+  acting on the tires. These forces are caused by the 
+  difference of the direction the kart is driving (velocity,
+  which is a vector), and the direction the tires are 
+  facing. This is called the slip angle. For example, 
+  consider a kart driving in a straight line, when suddenly
+  the steering wheel is turned left. At this time, the front
+  tire will face in a different direction than the direction
+  the kart is travelling, but the rear tire will still face
+  in the same direction as the velocity. Therefore, a force
+  will act on the front tires pushing them to the left, 
+  while no such force acts on the rear tires. As a result of
+  this, two changes take place in the kart:
+  1) The force pushes the kart a bit to the left
+     --> this is responsible for the centre of gravity
+         to describe a circle
+  2) this force causes a turning moment to the kart,
+     causing the kart to rotate to the left.
+  Notice that these two effects are to a certain degree
+  independent: if the turning moment is too small (close
+  to zero), the kart will be sliding to the left, but not
+  actually face in the direction. If the turning moment
+  is too big, the kart will rotate too much - not facing
+  the direction of travel either.
+  Later in the turn the behaviour is quite similar, except
+  that the rear tires will (usually) face in a different
+  direction than the velocity, causing a force there as 
+  well. So the correct description is:
+  1) The sum of the forces on the front and rear tire
+     cause the centre of gravity of the kart to move
+     sideways
+  2) The difference of the two forces causes a turning
+     moment on the kart.
+  Well, that's somewhat simplified, since there are a
+  few cos(alpha), sin(delta), ... happening, but that
+  is enough to understand the parameters in the
+  data/physics.data file. For more details see:
+  http://home.planet.nl/~monstrous/tutcar.html
+  This page is currently down :((
+  Another recommended read is Ted Zuvich's "Vehicle
+  Dynamics for Racing Games" (available on
+  gamasutra, just google to find it). More information
+  can be found online, search for slip angle, car
+  physics, ...
+
+  The slip angles for front and rear tires depend on:
+  - steering angle (obviously only for front tires)
+  - distance between tires and centre of gravity
+    (and rotational velocity of the kart).
+    The CoG is assumed to be in the middle of the kart, so
+    this distance is wheel-base/2. The longer the wheel
+    base, the longer the way the tires will move as
+    a result of the kart rotation, the more lateral force
+    will be produced.
+  The force acting on the tires is then linearly dependent
+  on the slip_angle:  slip_angle * corner_force
+  (well, it's only linear for small angles, and the function
+  Kart::NormalizedLateralForce will cap the values if the
+  angle is too big). The acting force for the front tire
+  is modified by cos(steer_angle) to compute the lateral 
+  force on the centre of gravity from the lateral force
+  on the tire.
+  The sum of these two lateral forces causes the sideway
+  movement of the kart, and the difference between these
+  two forces multiplied by wheel_base/2 causes the turning
+  moment or torque, which gets divided by the inertia of the
+  kart to computer the rotational acceleration.
+
+  To tweak these values, consider:
+  - increasing the cornering forces for the tires will 
+    result in larger forces to work on the tires
+    --> the radius of the turn will be smaller, since the 
+        force pulling the kart to the middle is bigger,
+    --> the kart will rotate more, since the difference of 
+        the two forces will be bigger as well.
+  - increasing max_steer_angle will increase the force, but 
+    at the same time decrease the later component for the 
+    front tire (see cos(steer_angle) above)
+    --> tighter curve, but less rotation of the kart
+  - increasing the wheel base will increase the turning 
+    velocity, causing more force
+  - increasing the inertia will reduce the effect of the
+    turning moment on the kart, resulting in less rotation,
+    but the same pulling force causing the kart to go in
+    a circle, so the kart will not 'oversteer'2
+
+All those parameters are tightly coupled, and sometimes even
+minor changes will result in big changes in playability, i.e.
+the kart might suddenly only rotate on the spot, or hardly
+turn at all. Testing and tweaking and tweaking and testing
+is necessary.
+ 
+6) Moving textures
+==================
+A texture can be marked as 'moving', creating an animation effect - for
+example the lava in geekopeak. To do this, a new node must be added
+into the models. I don't know how to do this in blender, the manual
+way is:
+Find the texture to be moved, and look up for the first previous
+'OBJECT' statement (which is the begin of a node), e.g.:
+
+OBJECT poly
+name "rect.010"
+texture "lava.rgb"
+...
+
+Before that insert a new node like, having a @autotex line:
+
+OBJECT poly
+name "wrapper"
+data 14
+@autotex y=0.1
+kids 1
+OBJECT poly
+name "rect.010"
+texture "lava.rgb"
+...
+
+The data line indicates the number of characters in the next line
+(@autotex...) - including the '@'. The 'name' line is only inserted
+to help finding the node in a dump of the track for debugging
+purposes.
+
+The possible parameters can be found in the file moving_textures.cpp
+(function parseData).
+
+7) Physical objects
+===================
+Similar to moving textures (above), part of the track can be declared
+to represent a rigid body when bullet is used, i.e. this part of the
+track will be following the physics rules, and can move around etc.
+To do this, similar to moving textures, insert a node like:
+OBJECT world
+data 20
+@physics cone mass=1
+kids 1
+at the beginning of a file (see roadcone, roadblock), or begin
+with an "OBJECT poly" statement (instead of world).
+
+Currently, only 'cone' and 'box' are supported. Additional parameters
+can follow on the same line, but currently only 'mass=...'
+is supported (which defaults to 1).
+
+8) Track design
+===============
+This was  written originally by Steve Baker for TuxKart. Most of the
+information contained here is still valid, though it might be good to
+contact an experienced track designer on the supertuxkart-email list.
+
+A TuxKart 'level' (a race track) is just a bunch of static 
+models - perhaps just one if it's simple enough.
+
+The model files can be in any format that PLIB's "SSG" library can
+load - there are quite a few loaders now for a range of common
+formats. I havn't tested many of them though and I suspect that some
+of them are 'patchy' in implementation.
+
+I've been using AC3D to model stuff for TuxKart - and the AC3D file
+format is pretty well supported. 
+
+RACETRACK MODELS.
+-----------------
+The race always starts at the origin of the model - with the players
+facing due north. The karts start out spaced a couple of meters apart
+- so make sure the track is wide enough! 
+
+Karts are dropped onto the track - it's very important that the road
+surface at X==0, Y==0 is slightly below Z==0. That may seem a nasty
+restriction that I should fix - but think about what would happen if
+you wanted to start the race inside a tunnel or something where there
+were multiple layers of polygons above the origin...the program would
+have no way to know which layer you wanted to start at. 
+
+I've had to 'extend' the AC3D format a little by using the "Object
+Data" field to contain the additional parameters. The TuxKart engine
+knows how to do simple repetitive motion on either whole objects or
+texture maps based on that data...eg, I have moving water and lava
+streams by setting up a moving texture in the AC3D Object Data
+field. There are various other similar extensions for 'model switched'
+animations and such like. 
+
+It would be easy to add other kinds of effects into the model in that
+way.
+
+Since most model formats allow for some kind of text field to be
+attached to nodes in the database, this same technique should work for
+other model formats - although we may need to get the authors of those
+loaders to support the callback function that the AC3D loader uses to
+tell the application program that this happened. 
+
+IMAGE AND TEXTURE FILES:
+------------------------
+All 2D icons and texture maps have to be in either BMP or SGI 'RGB'
+format. I greatly prefer the latter because BMP changes often and my
+loader can't keep up. 
+
+All images and textures have to obey the rules for OpenGL texture maps
+- they must be even powers of two in size (ie the X and Y dimensions
+must be 2,4,8,16,32,64,128,256,etc). You can have rectangular maps (eg
+128x64). 
+
+Whilst there is no limit to the size of a texture map or image - you
+need to be aware that 3Dfx cards (which are VERY commonly used) cannot
+cope with maps larger than 256x256. The map loader will downsize your
+maps as necessary to make them fit - but beware that this will make
+them fuzzy. 
+
+3Dfx cards also have a limitation that maps must not have an aspect
+ratio of more than 8:1 or less than 1:8. That's rarely a practical
+limitation. 
+
+Textures are ALWAYS MIPmapped and displayed using the highest quality
+settings. 
+
+Ideally, all the maps for one track should fit into texture memory -
+and on early Voodoo-1 cards, that could be as little as 2Mb...of
+course with a GeForce-2 you get something like 64Mb of compressed
+texture memory - perhaps 100Mb. How much can you use? That's your
+problem! 
+
+COORDINATE SYSTEMS:
+-------------------
+I have chosen one 'unit' in the database to be one meter in the real
+world - but since we don't really know how big Tux and his friends
+are, this is pretty arbitary. Another way to think of this is that Tux
+is one meter tall (that's just how big I think of him as being) - so
+one 'unit' is one 'tux' high - which is one meter. Real world penguins
+do get as big as a meter tall - but Tux is a 'Jackass Penguin' and
+they only grow to about 30cm...however, if he was that small, it would
+be hard to make levels because he ends up being too short to reach
+furniture, door knobs, etc convincingly. 
+
+I come from a flight-simulation background where we use the convention
+that Z-is-up - so all my software works like that. However, the PLIB
+loaders know that some modellers use Y-is-up and do the axis swap as
+needed. Hence, in AC3D, Y-is-up - but in the game, your models will be
+converted to Z-is-up. If you find this confusing, forget I mentioned
+it - everything comes out OK automagically. 
+
+RACETRACK MATERIALS:
+--------------------
+Another kind of effect comes from which texture map you use. I find
+that model file formats don't tell me all I need to know about a
+polygon.
+
+For example - do you crash if you hit it? Yes - if it's a brick wall,
+No - if it's a cloud of smoke. What is the coefficient of friction?
+Different for Ice than for Concrete.
+
+These things are listed in a 'Material Reference File' called
+'data/materials.dat'. Since the default settings are generally what
+you want, most textures needn't be listed in the material file. It's
+really there for special materials such as those that make up the
+'zippers'.
+
+Hence, if you need an icy surface, you apply the texture "ice.rgb" and
+when the model loads, I check that filename against my list of
+materials in 'data/materials.dat' and note that "ice.rgb" is a
+slippery material. This means that you can't re-use the ice texture
+map for anything that isn't supposed to be slippery - but what the
+heck...that's a really easy solution. It also allows me to add new
+material properties without going back into every single model adding
+that property into every single polygon. 
+
+The format of 'data/materials.dat' is described in the file itself in
+comments. Each material is on a line of it's own. Start with the
+texturemap name in double-quotes, then follow a number of boolean or
+numeric fields separated by spaces. 
+
+An example of a line in this file is:
+
+# TextureName        UVClamp Trans AlphaRef Light Friction Ign Zip Reset Collide
+"lava.rgb"             N N     N      0.0     N     1.0     N   N    Y    Y
+
+
+The fields (in order) are:
+
+    * TextureName -- the name of the texture map - stripped of it's
+      pathname. (All textures should be in the 'images' directory). 
+    * UVCLAMP -- two booleans - the first indicates whether the
+      texture coordinates should be clamped in the U direction - the
+      second for the V direction. 
+          o N N - repeats endlessly.
+          o Y N - repeats in the V (ie Y) direction only.
+          o N Y - or only in the U (ie X) direction.
+          o Y Y - makes the texture not repeat at all. 
+      If the polygon is larger than the map and the map is clamped
+      then the edge texels of the map will be repeated endlessly. 
+    * Trans -- True if the polygon or texture is likely to be
+      transparent and therefore rendered with GL_BLEND enabled. 
+    * AlphaRef -- the 'alpha clamp' value - pixels with an alpha less
+      than this are not rendered. 
+    * Light -- is 'lighting' enabled for this polygon? If not, the
+      polygon will be drawn at it's full brightness and it'll glow in
+      the dark. 
+    * Friction -- the frictional coefficient. 1.0 is 'normal', larger
+      numbers represent rougher surfaces, smaller are more slippery. 
+    * Ign/Zip/Reset/Collide -- four booleans that describe the effect
+      on the Kart of touching polygons made of this material:
+          o Ign -- Ignore this polygon for the purposes of collision
+            testing. 
+          o Zip -- means that this is a 'zipper'. If a kart touches
+            it, the kart will accellerate to high speed. 
+          o Reset -- This material is "fatal" to karts - if you touch
+            it then the rescue squad will come and hoist you away from
+            it and up onto the track. 
+          o Collide -- if no set for a horizontal surface, it means
+            that a kart can drive on it - for a vertical surface,
+            karts that hit it will only slow down a little and can
+            'slide' along the polygons. If set, it means that any kart
+            that hits this polygon will crash and drop to zero speed.  
+
+THE 'LOCATION' FILE.
+There is a 'data/xxx.loc' file (where 'xxx' is the name of your level)
+that contains the location of each model file in (x,y,z) and (h,p,r) -
+Heading, Pitch and Roll. 
+
+It's convenient to have some objects automatically 'conform' to sit on
+the terrain. If you wish to do that, then you can replace the Z
+coordinate with a pair of curly braces '{}'...you can also leave out
+either Pitch or Roll (using '{}') - and they will be computed so as to
+position the object onto the underlying surface. 
+
+Since objects are added to the scene in order, the track models needs
+to appear earlier in the file than things you wish to conform to it. 
+
+There are some models that are 'built-in' to the game engine - notably
+the the various colours of herring. 
+
+Comments can be placed into the '.loc' file by placing a '#' at the
+start of the line. 
+
+The easiest way to understand the '.loc' file format is to look at
+some of those from existing levels - the format is easy enough. Here
+is an example: 
+
+#
+# The track itself.
+#
+"bsodcastle.ac",0,0,0,0,0,0
+#
+# Two Zippers (clamped to the track)
+#
+"zipper.ac",-70,0,{},90,{},{}
+"zipper.ac",-75,0,{},180,{},{}
+#
+# An advert for SuSE Linux
+#
+"susesign.ac",130,-40,5,-90,0,0
+#
+# A Gold (Yellow) herring
+#
+YHERRING,-45,-140
+#
+# Two Red herring
+# 
+RHERRING,29,-139
+RHERRING,29,-141
+#
+# Two Silver herring 
+#
+SHERRING,20,80
+SHERRING,120,-65
+#
+# Two Green herring
+# 
+GHERRING,25,70
+GHERRING,30,70
+
+
+
+THE 'DRIVE LINE' FILE:
+----------------------
+The second file you need is 'data/xxx.drv' - which is an ordered list
+of 2D points that lie along the approximate centerline of the track -
+starting at the start line, going all the way around the track and
+ending again at the start line. 
+
+The DRIVE LINE file is used for several things:
+
+    * To tell the computer players where to steer.
+    * To let me figure out how far around the 'lap' each player is. 
+    * I also use it to generate a 'plan view' of the track with
+      coloured dots for the players.  
+
+Here is an example of a typical 'drv' file.
+
+1.6556,-2.09912
+-0.6416,15.1328
+-7.5344,35.8112
+-22.469,54.192
+-40.8496,59.936
+-59.2304,51.8944
+-75.3136,33.5136
+-83.3552,22.0256
+-100.587,1.34728
+-122.414,-8.99188
+
+
+The simplest way to generate such a file is to load your track into a
+suitable 3D modeller and digitize a 'polyline' (or 'line loop' or
+whatever) around the track. Then delete all the other things in the
+model and SaveAs to a separate file. Presuming your modeller can
+export an ASCII format of some kind, you can easily hand edit the
+points to delete the vertical coordinate and all the non-vertex data
+from the file. 
+
+You can test whether you got it right by loading the model and drv
+file into TuxKart and driving Tux around the track. Observing the
+planview as you go around will make it easy to tell whether you got it
+right. 
+
+The computer-controlled players have a hard time making it around
+tight corners, so please try to have the drv file take a 'racing line'
+through the turn to give them a better chance. 
+
+KART MODELS:
+------------
+Right now, the Karts in TuxKart are pretty simple - just a plain rigid
+model. That's going to have to change so the characters do stuff like
+leaning into the corners, turning their heads, waving their fists (oh
+- wait, none of them *have* fists :-) ...however, remarkably little of
+that happens in MarioKart - and my first goal is just to be AS GOOD AS
+MK64 - being better than it can come later! 
+
+The Karts also need 2D icons for use in various parts of the game.
+
+Have a look at the data/*.tkkf files for details.

@@ -1,0 +1,213 @@
+#
+# In this files materials with special properties are listed, along with
+# the values for these properties. Only materials that are in some way
+# special need to be listed here, the others will use the default values.
+#
+# Here is an explanation of what each property do and their default values,
+# the actual properties are at the bottom of the file:
+#
+# UVClamp
+# -----
+# Clamp texture border instead of repeating the texture. This has
+# two values, one for the X-axis and another for the Y-axis, which can be
+# Y or N (yes or no).
+#
+# To understand what clamping is, hre is an example with my poor ASCII art:
+#
+#                                                          ox
+# Suppose you have a 2x2 texture which represented here by xo , where o is a
+# black square and x is a white square. If you place the texture in a 4x4
+# grid, you would think you get this:
+# 
+# ....
+# ....
+# ox..
+# xo..
+#
+# Where the . are empty spaces.
+# 
+# However, what really happens is that by default the texture repeats itself:
+#
+# oxox
+# xoxo
+# oxox
+# xoxo
+#
+# But if you clamp the texture on both the X and the Y axis you get this:
+#
+# oxoo
+# oxoo
+# oxxx
+# xooo
+#
+# So only the borders repeat in the X and Y direction, not the whole texture.
+#
+#
+# Translucency
+# ------------
+# Use the alpha value of the texture to produce translucent areas. Can be
+# Y or N, default is N.
+#
+#
+# Alpha reference
+# ---------------
+# This value is used for the alpha test, which is to compare all the
+# alpha values of the pixels of the texture against the alpha refence, and
+# if the test succeeds, the pixel is not drawn. Values go from 0.0 to 1.0.
+# 1.0 that no pixels are drawn, 0.0 means that only pixels completely
+# translucent are not drawn. Default is 0.1.
+#
+#
+# Lighting
+# --------
+# Let lights affect how dark or light a texture is. Can be Y or N, default is
+# Y.
+#
+# 
+# Sphere map
+# ----------
+# Place the texture as if it is on top of a reflective sphere. This is useful
+# on shiny metal objects, for example the coins. Can be Y or N, default is
+# N.
+#
+#
+# Friction
+# --------
+# How much friction there is between an object with this texture and the
+# wheels of the kart. Obviously, is only useful if a kart will ever be
+# standing on top of an object with this texture. The smaller this value is,
+# the more slippery a surface is. Values should go from 1.0 to 0.1, where
+# 1.0 is the friction of the road. Default is 1.0 .
+#
+# At the moment, friction only limits the speed and acceleration of the karts.
+#
+#
+#
+# Ignore
+# ------
+# Don't crash with a surface that has this texture applied. Values can be Y or
+# N. Default is N.
+#
+#
+# Zipper
+# ------
+# Karts get a speed boost when they touch a surface with this texture. Values
+# can be Y or N. Default is N.
+#
+#
+# Resetter
+# --------
+# When a kart touches this surface, it is rescued, useful for lava and others.
+# Values can be Y or N. Default value is N.
+#
+#
+# Collide
+# -------
+# When you crash against a surface with this texture, the kart will not
+# continue moving, instead it will stop the kart dead. Values can be Y or N,
+# default value is Y.
+
+# TextureName              Clamp Trans Alpha Light SphMp Frict Ign Zip Rst Col
+"chrome.rgb"                N N    N    0.0    N     Y    0.5   N   N   N   N
+"chrome2.rgb"               N N    N    0.0    N     Y    0.5   N   N   N   N
+"railing.rgb"               N Y    Y    0.5    Y     N    1.0   N   N   N   N
+"ruler.rgb"                 N N    Y    0.2    Y     N    1.0   N   N   N   N
+"adverts.rgb"               N N    N    0.0    Y     N    1.0   N   N   N   Y
+"wood.rgb"                  N N    N    0.0    Y     N    1.0   N   N   N   N
+"concrete.rgb"              N N    N    0.0    Y     N    1.0   N   N   N   Y
+"brick.rgb"                 N N    N    0.0    Y     N    1.0   N   N   N   Y
+"stonewall.rgb"             N N    N    0.0    Y     N    1.0   N   N   N   N
+"stones.rgb"                N N    N    0.0    Y     N    0.2   N   N   N   N
+"pebbles.rgb"               N N    N    0.0    Y     N    1.0   N   N   N   N
+"floor.rgb"                 N N    N    0.0    Y     N    1.0   N   N   N   N
+"sand.rgb"                  N N    N    0.0    Y     N    0.5   N   N   N   N
+"sandgrass.rgb"             N N    N    0.0    Y     N    0.5   N   N   N   N
+"egypt.rgb"                 N N    N    0.0    Y     N    1.0   N   N   N   Y
+"pyramidwall.rgb"           N N    N    0.0    Y     N    1.0   N   N   N   N
+"lava.rgb"                  N N    N    0.0    N     N    1.0   N   N   Y   Y
+"lava2.rgb"                 N N    N    0.0    N     N    1.0   N   N   Y   Y
+"Tuxclouds.rgb"             N N    N    0.1    Y     N    1.0   N   N   Y   Y
+"metalgrid.rgb"             N N    Y    0.3    Y     N    1.0   N   N   N   N
+"fuzzy_sand.rgb"            N N    Y    0.0    N     N    1.0   Y   N   N   N
+"roadway.rgb"               Y N    Y    0.0    Y     N    1.0   N   N   N   N
+"track.rgb"                 Y N    Y    0.0    Y     N    1.0   N   N   N   N
+"rainbow.rgb"               N N    Y    0.0    N     N    1.0   N   N   N   N
+"tinytux.rgb"               Y Y    Y    0.8    N     N    1.0   Y   N   N   N
+"butterfly.rgb"             Y Y    Y    0.8    N     N    1.0   Y   N   N   N
+"Penguin_orig.rgb"          N N    N    0.0    Y     N    1.0   N   N   N   N
+"grass.rgb"                 N N    N    0.0    Y     N    0.7   N   N   N   N
+"island/grass2.rgb"         N N    N    0.0    Y     N    0.7   N   N   N   N
+"island/rock1.rgb"          N N    N    0.0    Y     N    0.5   N   N   N   N
+"island/rock4.rgb"          N N    N    0.0    Y     N    0.5   N   N   N   N
+"island/water2.rgb"         N N    N    0.0    Y     N    1.0   N   N   Y   N
+"island/sand2.rgb"          N N    N    0.0    Y     N    0.7   N   N   N   N
+"track2.rgb"                N N    N    0.0    Y     N    1.0   N   N   N   N
+"zipper_collect.rgb"        N N    N    0.0    N     N    1.0   N   Y   N   N
+"zipper.rgb"                N N    N    0.0    N     N    1.0   N   Y   N   N
+"bananawrap.rgb"            Y Y    Y    0.5    N     N    1.0   N   Y   N   N
+"fuzzy.rgb"                 Y Y    Y    0.2    N     N    0.5   Y   N   N   N
+"mriceblockshadow.rgb"      Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"mriceblockicon.rgb"        Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"tuxkartshadow.rgb"         Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"eviltuxicon.rgb"           Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"sushishadow.rgb"           Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"sushiicon.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"yetishadow.rgb"            Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"yetiicon.rgb"              Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"dinoshadow.rgb"            Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"dinoicon.rgb"              Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"nolokicon.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"pennyshadow.rgb"           Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"spark.rgb"                 Y Y    N    0.2    N     N    1.0   Y   N   N   N
+"smoke.rgb"                 Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"explode.rgb"               Y Y    Y    0.2    N     N    1.0   Y   N   N   N
+"tuxicon.rgb"               Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"skirpyicon.rgb"            Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"pennyicon.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"missile.rgb"               Y Y    Y    0.1    N     N    1.0   Y   N   N   N
+"flames.rgb"                N N    N    0.9    N     N    1.0   Y   N   N   N
+"magnet.rgb"                Y Y    Y    0.1    N     N    1.0   Y   N   N   N
+"bzzt.rgb"                  N N    Y    0.1    N     N    1.0   Y   N   N   N
+"homingmissile.rgb"         Y Y    Y    0.1    N     N    1.0   Y   N   N   N
+"anvil.rgb"                 Y Y    Y    0.1    N     N    1.0   Y   N   N   N
+"parachute.rgb"             Y Y    Y    0.1    N     N    1.0   Y   N   N   N
+"herring.rgb"               Y Y    Y    0.9    N     N    1.0   Y   N   N   N
+"wheel.rgb"                 Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"water.rgb"                 N N    N    0.1    Y     N    1.0   N   N   Y   N
+"speedback.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"speedfore.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"st_title_screen.rgb"       Y Y    N    1.0    N     N    1.0   N   N   N   Y
+ 
+#Screenshots
+"sshot-beach.rgb"           N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-bsodcastle.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-geekopeak.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-gownsbow.rgb"        N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-lighthouse.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-littlevolcano.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-race.rgb"            N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-sandtrack.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-startrack.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-subseatrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-tuxtrack.rgb"        N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-volcano.rgb"         N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-olivermath.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
+"sshot-islandtrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
+ 
+#Top view images
+"topview-lighthouse.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-littlevolcano.rgb" N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-volcano.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-tuxtrack.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-subseatrack.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-sandtrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-gownsbow.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-geekopeak.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-beach.rgb"         N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-bsodcastle.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-race.rgb"          N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-startrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-olivermath.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
+"topview-islandtrack.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
+ 
+# EOF #

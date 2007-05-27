@@ -1,0 +1,9 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-collectable
+ (name  "magnet")
+ (model "magnet.ac")
+ (icon  "magnet.rgb")
+)
+
+;; EOF ;;

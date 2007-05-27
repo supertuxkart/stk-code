@@ -1,0 +1,77 @@
+;; -*- mode: lisp -*-
+
+(config
+
+ ;; Attachment related parameters
+ ;; -----------------------------
+ (anvil-weight             150.0 )  ;; additional weight an anvil adds to a kart
+ (anvil-speed-factor         0.2 )  ;; additional slowdown caused by anvil
+ (parachute-friction         2.0 )  ;; friction increase when a parachute is sttached
+ (magnet-range              30.0 )  ;; maximum range a magnet can work
+ (magnet-min-range           4.0 )  ;; unless this distance is reached, kart will accel.
+ (magnet-time               10.0 )  ;; time a magnet is active
+ (parachute-time             4.0 )  ;; time an attached parachute is active
+ (parachute-time-other       8.0 )  ;; time a parachute attached from other kart is active
+ (bomb-time                 30.0 )  ;; time till a bomb explodes
+ (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
+ (anvil-time                 2.0 )  ;; time an anvil is active
+ (shortcut-road-distance    23.0 )  ;; max. distance from side of road to be still 
+                                    ;; considered on the road (otherwise shortcut)
+                                    ;; usually 5 is a good value, but for the math class
+                                    ;; we have to use at least 21(!!)
+ (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
+                                    ;; is considered to be a shortcut
+ ;; Other kart relates values
+ ;; -------------------------
+ (jump-impulse             5400.0 ) ;; percentage of gravity!
+
+ (reduce-air-resistance-racer  0.6) ;; reduce air-resistance for hard
+ (reduce-air-resistance-driver 0.8) ;; and medium skill level
+
+ ;; The following files are the defaults for karts
+ ;; ----------------------------------------------
+ (kart-defaults
+   (wheel-base               1.2 )
+   (heightCOG                0.2 )
+   (engine-power           400   )
+   (brake-factor             2.75   )
+   (brake-force              2.5 )
+   (mass                   125   )
+   (air-resistance           1.8 )
+   (roll-resistance          1.05)
+   (tire-grip                0.9 )
+   (max-steer-angle         55   )
+   (time-full-steer          0.3 )
+   (corn-f                   4   )
+   (corn-r                   4   )
+   (wheelie-max-speed-ratio  0.9 ) ;; percentage of max speed for wheelies to work
+   (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
+   (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
+   (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
+   (wheelie-speed-boost     10.0 ) ;; speed boost while doing a wheelie
+   (wheelie-lean-recovery    1 )
+   (wheelie-balance-recovery 2 )
+   (wheelie-step             1 )
+   (wheelie-power-boost      1 )   ;; increase in engine power, i.e. 1=plus 100%
+
+   ;; Inertia for a rectanguar plane is: M*(a^2+b^2)/12 when rotating
+   ;; around the center of gravity, where a and b are the width and length 
+   (inertia                  5.0 )
+
+   ;; Bullet physics attributes
+   (suspension-stiffness      20.0 )
+   (wheel-damping-relaxation  2.3  )
+   (wheel-damping-compression 4.4  )
+   (friction-slip      10000000    )
+   (roll-influence            0.1  )
+   (wheel-radius              0.25 )
+   (wheel-width               0.3  )
+   (chassis-linear-damping    0.2  )
+   (chassis-angular-damping   0.2  )
+   (maximum-speed            22.22 ) ;; = 80 km/h
+   (gravity-center-shift      0.5 ) ;; Shift center of gravity down by that many
+                                    ;; units of kart_height (usually between 0 and 0.5)
+
+  )   ;; end kart-defaults
+)
+;; EOF ;;

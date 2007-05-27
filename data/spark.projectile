@@ -1,0 +1,10 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-collectable
+ (name  "spark")
+ (model "spark.ac")
+ (icon  "spark.rgb")
+ (speed 5.0)
+)
+
+;; EOF ;;

@@ -1,0 +1,14 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-kart
+ (name        "Dino")
+ (model-file  "dinokart-high.ac")
+ (icon-file   "dinoicon.rgb")
+ (shadow-file "dinoshadow.rgb")
+
+ (red   1.0)
+ (green 0.7)
+ (blue  0.1)
+       
+)
+;; EOF ;;

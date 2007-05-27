@@ -1,0 +1,14 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-kart
+ (name        "Yeti")
+ (model-file  "yetikart.ac")
+ (icon-file   "yetiicon.rgb")
+ (shadow-file "yetishadow.rgb")
+ 
+ (red         0.5)
+ (green       0.8)
+ (blue        1.0)
+       
+)
+;; EOF ;;

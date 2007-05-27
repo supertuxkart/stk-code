@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Super Tux Kart player's manual</title>
+</head>
+<body>
+<big><big style="font-weight: bold;"><big><span style="color: rgb(0, 0, 153);">S<span style="color: rgb(51, 51, 255);">u<span style="color: rgb(51, 102, 255);">p<span style="color: rgb(51, 204, 255);">e<span style="color: rgb(102, 255, 255);">r</span></span></span></span></span> <span style="color: rgb(0, 153, 0);">T</span><span style="color: rgb(51, 204, 0);">u</span><span style="color: rgb(153, 153, 0);">x</span> <span style="color: rgb(204, 153, 51);">K</span><span style="color: rgb(204, 102, 0);">a</span><span style="color: rgb(153, 0, 0);">r</span><span style="color: rgb(204, 0, 0);">t</span> player's manual</big></big></big><br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Introduction</span></big><br>
+<br>
+SuperTuxKart (abbreviated STK) is a kart racing game, based on<br>
+Steve Baker's TuxKart (<a href="http://tuxkart.sourceforge.net">http://tuxkart.sourceforge.net</a>). It was<br>
+picked up by the Linux Game Tome (<a href="http://www.happypenguin.org">http://www.happypenguin.org</a>)<br>
+Game of the Month project and got a big overhaul during this time,<br>
+but was left in an unfinished state.<br>
+<br>
+A new set of maintainers, namely hiker &amp; coz, took over in 2006.<br>
+You can find more details on&nbsp;<a href="http://supertuxkart.berlios.de">http://supertuxkart.berlios.de</a><br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Requirements</span></big><br>
+<br>
+<span style="font-weight: bold;">Hardware</span><br>
+* You need a 3D graphics card that can support OpenGL or Mesa.<br>
+* You should have a CPU that's running at 450MHz or better.<br>
+* You'll need at least 32Mb RAM.<br>
+* A sound card would be nice - but it's not essential.<br>
+* Ideally, you want a joystick - preferably one with at least 6<br>
+&nbsp; buttons - you can also drive from the keyboard or the mouse,<br>
+&nbsp; thought currently it is hard to drive with the mouse.<br>
+<br>
+<span style="font-weight: bold;">Software</span><br>
+Right now, SuperTuxKart runs under Linux and under Windoze using<br>
+the CygWin package. We hope MSVC/Windoze, MacOS, BSD, BeOS, etc.<br>
+ports to follow.<br>
+<br>
+You need the following programs installed:<br>
+<br>
+OpenGL (or Mesa 3.0 or later)<br>
+&nbsp;&nbsp;&nbsp; <a href="http://www.opengl.org">http://www.opengl.org</a>,&nbsp; <a href="http://www.mesa3d.org">http://www.mesa3d.org</a><br>
+<br>
+PLIB 1.8.4 <br>
+&nbsp;&nbsp;&nbsp; <a href="http://plib.sourceforge.net">http://plib.sourceforge.net</a><br>
+<br>
+SDL 1.2<br>
+&nbsp;&nbsp;&nbsp; <a href="http://www.libsdl.org">http://www.libsdl.org</a><br>
+<br>
+OpenAL (optional, requires ALUT,&nbsp;&nbsp; MikMod)<br>
+&nbsp;&nbsp;&nbsp; <a href="http://www.openal.org">http://www.openal.org</a><br>
+<br>
+ALUT&nbsp;&nbsp; (optional, requires OpenAL, MikMod)<br>
+&nbsp;&nbsp;&nbsp; <a href="http://www.openal.org">http://www.openal.org</a><br>
+<br>
+MikMod (optional, requires OpenAL, ALUT)<br>
+&nbsp;&nbsp;&nbsp; <a href="http://mikmod.raphnet.net">http://mikmod.raphnet.net</a><br>
+<br>
+Bullet (optional)<br>
+&nbsp;&nbsp;&nbsp; <a href="http://continuous.physics.com/Bullet/">http://continuous.physics.com/Bullet/</a><br>
+<br>
+<span style="font-style: italic;">If you wish to use bullet, you should see the README.bullet file</span><br style="font-style: italic;">
+<span style="font-style: italic;">that should be in the main SuperTuxKart directory.</span><br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Controlling your kart</span></big><br>
+<br>
+To win&nbsp;races you will need to master your controls. Here are the<br>
+predefined controls:<br>
+<br>
+Player 1:<br>
+&nbsp; Steer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : Left / Right arrow<br>
+&nbsp; Accelerate : Up arrow<br>
+&nbsp; Brake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : Down arrow<br>
+&nbsp; Use item&nbsp;&nbsp; : Right control<br>
+&nbsp; Wheelie&nbsp;&nbsp;&nbsp; : Right shift<br>
+&nbsp; Rescue&nbsp;&nbsp;&nbsp;&nbsp; : Backspace<br>
+<br>
+Player 2:<br>
+&nbsp; Steer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : A / D key<br>
+&nbsp; Accelerate : W key<br>
+&nbsp; Brake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : S key<br>
+&nbsp; Use item&nbsp;&nbsp; : Left control<br>
+&nbsp; Wheelie&nbsp;&nbsp;&nbsp; : Left shift<br>
+&nbsp; Rescue&nbsp;&nbsp;&nbsp;&nbsp; : Left alt<br>
+<br>
+Player 3:<br>
+&nbsp; Steer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : F / H key<br>
+&nbsp; Accelerate : T key<br>
+&nbsp; Brake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : G key<br>
+&nbsp; Use item&nbsp;&nbsp; : N key<br>
+&nbsp; Wheelie&nbsp;&nbsp;&nbsp; : C key<br>
+&nbsp; Rescue&nbsp;&nbsp;&nbsp;&nbsp; : B key<br>
+<br>
+Player 4:<br>
+&nbsp; Steer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : J / L key<br>
+&nbsp; Accelerate : I key<br>
+&nbsp; Brake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : K key<br>
+&nbsp; Use item&nbsp;&nbsp; : M key<br>
+&nbsp; Wheelie&nbsp;&nbsp;&nbsp; : . key<br>
+&nbsp; Rescue&nbsp;&nbsp;&nbsp;&nbsp; : / key<br>
+<br>
+The rescue button is meant to be used if your kart is stuck; it<br>
+will send you to the track with your approximate progress, but<br>
+it will take a few seconds.<br>
+<br>
+The Escape key pauses the game and shows the race menu. Also,<br>
+pressing Escape in a menu will exit from it, and in the main<br>
+menu it closes the game.<br>
+<br>
+There are also some special functions:<br>
+<br>
+&nbsp; F9 key&nbsp; - Toggle fullscreen during the race. Doesn't works on<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Windows.<br>
+<br>
+&nbsp; F10 key - Save the last 1000 frames into a file ./history.dat<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This can be used to reproduce problems occurring<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; during a race. This is mainly useful for developers.<br>
+<br>
+&nbsp; F11 key - Toggle wire-frame view.<br>
+<br>
+&nbsp; F12 key - Toggle frame-per-second display.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">The race screen</span></big><br>
+<br>
+This screen has several components:<br>
+<br>
+&nbsp; Position display (left) : here you will see the places of<br>
+&nbsp; everyone participating in the race; after the leader goes<br>
+&nbsp; though the goal, a counter will appear next to their images<br>
+&nbsp; showing how much time behind they are. The places are<br>
+&nbsp; initially colored in white, which will become a bit more red<br>
+&nbsp; with every lap finished; after the race is finished the<br>
+&nbsp; place appear in green.<br>
+<br>
+&nbsp; Track map (bottom left corner) : this will show the position<br>
+&nbsp; of everyone, in relation to the track; humans are drawn with<br>
+&nbsp; bigger dots.<br>
+<br>
+&nbsp; Lap (right of the track map) : the left number shows how many<br>
+&nbsp; laps you have completed, the right number shows how many laps<br>
+&nbsp; you have to complete to finish the race.<br>
+<br>
+&nbsp; Item (top) : the number of items and what is that you are<br>
+&nbsp; holding is displayed here.<br>
+<br>
+&nbsp; Power bar (right) : it displays how much power you have by<br>
+&nbsp; grabbing energizers.<br>
+<br>
+&nbsp; Speed bar (bottom right) : shows how fast you are moving.<br>
+<br>
+&nbsp; Steering wheel: when you steer, the front wheels do not rotate<br>
+&nbsp; to their limit instantly; instead, they take less than a<br>
+&nbsp; second to achieve full rotation. The current rotation is<br>
+&nbsp; displayed here.<br>
+&nbsp; <br>
+&nbsp; Current place: here it is shown how much you have advanced in<br>
+&nbsp; comparation with your competitors.<br>
+<br>
+&nbsp; Time: how much time it takes for you to reach the goal.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Game modes</span></big><br>
+<br>
+Three different game modes are available:<br>
+1) Grand Prix<br>
+&nbsp;&nbsp; A set of several races, each with several laps<br>
+<br>
+2) Quick Race<br>
+&nbsp;&nbsp; A single race (with between 1 and 5 laps)<br>
+<br>
+3) Time Trial<br>
+&nbsp;&nbsp; A single race with a single lap only<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Multiplayer</span></big><br>
+<br>
+Split screen multi-player is supported, though you need a<br>
+somewhat powerful computer and graphics card to get a high frame<br>
+rate in this case. Network multi-player is not yet supported.<br>
+<br>
+When playing with your friends, the screen will be divided in<br>
+cuadrants. Even thought there are default controls for all<br>
+players, you should change them if you feel uncomfortable, or<br>
+if you have a joystick.<br>
+<br>
+Also, after you finish the race, you might want to go back to<br>
+give your friends some trouble!<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Collectables</span></big><br>
+<br>
+There are currently many 'good things' you can get (triggered by<br>
+touching an item box) and a few 'bad things'.<br>
+<br>
+When you pick up one of the good things, you will see it on your<br>
+item box, and activate it by using an item (see above for<br>
+default key bindings).<br>
+<br>
+Bad things happen immediately - and last for a few seconds<br>
+before 'going away' by themselves.<br>
+<br>
+Notice that (unlike some kart games), the computer controlled<br>
+players also collect and use power-ups in the same way you do.<br>
+<br>
+Energizers gradually fill up the energy level - as you collect<br>
+more, you'll find that an item cube will subsequently give you<br>
+two, three, four or five power-ups at one time!<br>
+<br>
+<span style="font-weight: bold;">Good Things</span><br>
+<br>
+<table style="text-align: left; width: 398px; height: 430px;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Missile" src="missile.png"></td>
+      <td>Missiles: unguided but fast. If they hit&nbsp;anything &nbsp;(including &nbsp;the
+track), they explode impressively. The effect on a Kart is &nbsp;to stop it
+dead - so you have to accelerate again from zero.</td>
+    </tr>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Homing missile" src="homing_missile.png"></td>
+      <td>Homing missiles: slower than the regular kind - but they track the nearest kart and are quite hard to shake off.</td>
+    </tr>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Fuzzy blob / Spark" src="spark.png"></td>
+      <td>&nbsp;Fuzzy blob / Spark: even slower still, a kart can
+outrun them quite easily. They ricochet off the sides of the track and
+only explode when they hit a Kart. Since they are not moving fast,
+they'll tend to stay close to where you dropped them, thoughtyou won't know exactly where. </td>
+    </tr>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Zipper" src="zipper.png"></td>
+      <td>Portable Zippers: these are just like the zippers on the
+track &nbsp;itself - they give you a sudden acceleration and
+temporarily&nbsp;increase the top speed of your kart. </td>
+    </tr>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Parachute" src="parachute.png"></td>
+      <td>Portable parachutes: this pops out the back of all the karts
+in a better position than you and slows them down a for some seconds.
+The worse your position is, the higher the probabilities of getting
+this you have (but they are stillsmall). You can only have one at a time. </td>
+    </tr>
+    <tr>
+      <td><img style="width: 64px; height: 64px;" alt="Anvil" src="anvil.png"></td>
+      <td>&nbsp;Portable anvil: the driver in the first position gets
+dragged by a heavy anvil, allowing other drivers to catch up with
+him... like the portable parachutes, the worse your position is, the
+higher probabilities of getting this you have. However, you can't get
+this if the driver in the first position alreadyfinished the race, and you can't have more than one at a time. </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<span style="font-weight: bold;">Bad Things</span><br>
+<br>
+&nbsp;Parachute: this pops out the back of your kart and slows you down<br>
+&nbsp;a little for a few seconds only. Enough to drop you back one place<br>
+&nbsp;if it's a close race though.<br>
+&nbsp;<br>
+&nbsp;Anvil: gets dragged behind your kart on a rope for an even shorter<br>
+&nbsp;amount of time than the parachute... but the drag effect is much<br>
+&nbsp;stronger; your kart hardly moves at all. <br>
+&nbsp;<br>
+&nbsp;Bomb: after 30 seconds the bomb will explode, but if another kart<br>
+&nbsp;touches you, the bomb will be transfered to it and the remaining<br>
+&nbsp;time will be reduced by 5 seconds. Also, the bomb can't be<br>
+&nbsp;transfered to the inmediate previous bomb holder.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Game mechanics and tips</span></big><br>
+<br>
+As a racer in SuperTuxKart,&nbsp;your goal is to reach the<br>
+finish line before your opponents, but as a bonus you might want<br>
+to show your awesome driving skills.<br>
+<br>
+The item cubes contain helpful objects; which item you get is<br>
+matter of luck. If you have an item already, you will only get<br>
+another item the random selection chooses the same item type as<br>
+the one you already have.<br>
+<br>
+The energizers will increase the number of items you grab from a<br>
+single item cube. You may only have up to 5 items, except the<br>
+anvil and the parachute, since anvils are so heavy and you have<br>
+so many parachutes, there is not much room and you can only<br>
+carry one!<br>
+<br>
+On the track there could be zippers, which will give you a boost<br>
+when you go over them. Avoid water and lava, since you can't<br>
+drive inside them and you will have to be rescued just before<br>
+you touch them!<br>
+<br>
+There are also nasty things left on the track which will put an<br>
+anvil or a parachute on your kart.<br>
+<br>
+It is best to drive in straight lines as much as posible without<br>
+going out of the track.<br>
+<br>
+If you don't have items that you wish to use, try not to be in<br>
+a collision course towards other karts, since they might have<br>
+items of their own to throw at you! also, if they crash you<br>
+could go down with them.<br>
+<br>
+If you are running rather fast, you can pop a wheelie, which gives<br>
+you an additional speed boost, but you can't steer your kart <br>
+while doing a wheelie (since your front wheels are not touching<br>
+the track), so be careful.<br>
+<br>
+Hitting another kart does not do any damage to your kart or the<br>
+other kart, one of the karts will just be forced to a stand still,<br>
+loosing precious seconds.<br>
+<br>
+When all human controlled karts finish the race, the game will wait<br>
+some seconds for the AI to finish the race. If the AI doesn't, it<br>
+will use the AI's current position as their final position.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Bugs in this version</span></big><br>
+<br>
+* Sometimes you can be pushed through a solid object if you are<br>
+hit by another player when in contact with the surface. <br>
+<br>
+There might of course be more.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Comand line options</span></big><br>
+<br>
+Useful command line options:<br>
+<br>
+-N, --no-start-screen&nbsp;&nbsp; Quick start without any menus<br>
+-l, --list-tracks&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; List all tracks<br>
+-k, --numkarts NUM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Number of karts to race<br>
+&nbsp;&nbsp;&nbsp; --kart NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Use kart NAME<br>
+&nbsp;&nbsp;&nbsp; --list-karts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lists all available karts<br>
+&nbsp;&nbsp;&nbsp; --laps NUM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Number of laps to play<br>
+&nbsp;&nbsp;&nbsp; --herring STYLE&nbsp;&nbsp;&nbsp;&nbsp; Use STYLE as your herring style<br>
+-f, --fullscreen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fullscreen display<br>
+-w, --windowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Windowed display<br>
+-s, --screensize WxH&nbsp;&nbsp;&nbsp; Set screensize, e.g. -s 800x600<br>
+-v, --version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Show version<br>
+-h, --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Show command-line options<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<big><span style="font-weight: bold;">Support</span></big><br>
+<br>
+If you have any problems, please send an e-mail to the<br>
+Super Tux Kart mailing list at&nbsp;<a href="mailto:supertuxkart-devel@list.berlios.de">supertuxkart-devel@list.berlios.de</a>&nbsp;.<br>
+<br>
+The archives of this mailing list can be found at <br>
+<a href="http://lists.berlios.de/pipermail/supertuxkart-devel/">http://lists.berlios.de/pipermail/supertuxkart-devel/</a>&nbsp;.<br>
+<br>
+Or post a bug report on the SuperTuxKart bug forum (no <br>
+registration is required):<br>
+<a href="http://developer.berlios.de/forum/forum.php?forum_id=23737">http://developer.berlios.de/forum/forum.php?forum_id=23737</a><br>
+<br>
+There is also a wiki at&nbsp;<a href="http://supertuxkart.berlios.de/wiki">http://supertuxkart.berlios.de/wiki</a>&nbsp;.<br>
+<br>
+<img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><img style="width: 32px; height: 33px;" alt="" src="chess.png"><br>
+<br>
+<span style="font-weight: bold;">License</span><br>
+<br>
+SuperTuxKart is released under the provisions of<br>
+the GNU General Public License (GPL).<br>
+<br>
+</body>
+</html>

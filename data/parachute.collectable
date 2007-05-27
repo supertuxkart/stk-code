@@ -1,0 +1,9 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-collectable
+ (name  "parachute")
+ (model "parachute.ac")
+ (icon  "parachute.rgb")
+)
+
+;; EOF ;;

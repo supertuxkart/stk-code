@@ -1,0 +1,13 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Gowns Bow")
+ (description "Created by Oliver & Steve Baker")
+ (gravity 78.0)
+ (music "mods/tk5a.mod")
+ (screenshot "images/sshot-gownsbow.rgb")
+ (topview "images/topview-gownsbow.rgb")
+)
+
+;; EOF ;;
+

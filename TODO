@@ -1,0 +1,126 @@
+SuperTuxKart is looking for additional man power to make this
+one of the best free linux games out there :) We need (in 
+no particular order):
+
+1) Musicians/sound engineers
+   - Create additional background soundtrack
+   - Create sound effects
+
+2) Artists and track designer
+   - Create additional tracks
+   - Create additional art work for tracks,
+     background images
+
+3) Developers
+   - See todo list below - it's rather long at the moment :)
+
+4) Web master
+   - Extend the current web page, keep it up to date
+
+5) Tester
+   - For just about everything
+   - Esp. different platforms
+
+6) Package creators
+   - Create packages for 
+     - most common linux Distributors
+     - Windows
+     - MaxOS (?? currently not sure if STK works on Macs)
+
+7) Writers
+   - Write documentation, ranging from man page, to
+     a description for the web, to a design document, ...
+
+If you want to help the SuperTuxKart - Project, please
+contact us on the email list:
+
+  supertuxkart-devel@list.berlios.de
+
+Thanks in advance!
+   The SuperTuxKart-Team
+
+
+********************************
+********************************
+**                            **
+**  Incomplete(!!) TODO List  **
+**                            **
+********************************
+********************************
+
+Known bugs
+==========
+This contains either hard, or not reproducible errors. 
+
+- Fix keyboard bug: the first time turning left/right while
+  pressing the up key is ignored. See bug 6168
+  Might be difficult to fix, since it occurs (it appears) in the interface
+  between X and plib.
+
+Things that would be nice to fix, but are not urgent
+=====================================================
+- Write some documentation. Things to include:
+  - taking shortcuts might result in not finishing a lap
+  - lap display colour for all karts changes colour whenever
+    a lap is finished
+- Display skid marks again (currently disabled due to problems of 
+  skid marks being 'in the air').
+- Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
+- Enable real fullscreen support
+- Top 10 lists for time trial, and grand prix.
+- Display the time difference to either the
+  kart in front of the kart, or to the first kart.
+- Add track sections which must be passed in order to finish
+  a lap. This would avoid karts taking shortcuts.
+  That's already in the code, but currently the user does 
+  not get any feedback if a driveline is skipped --> after 
+  crossing the finishing line, the race might not end for a
+  kart. Well, there is the 'wrong direction' message (?)
+- Add a tutorial course
+- Valgrind for memory bugs.
+- Update the web page, make more screen shots, ...
+- Tight/wide corner steering for AI. The AI is hitting the wall
+  in very tight corners (e.g. subseatrack) [coz]
+
+
+long term
+=========
+- OpenAL support (optional)  [patrick]
+- Improved physics to support skidding
+- Improved collision handling
+- Add network multiplayer
+- Make full use of OpenAL
+- Performance tuning
+  - Support for multi-core CPUs
+    (while this is not strictly necessary, it might be a nice headline
+    for news entries. The physics/collision detection would be
+    easy to parallelise)
+- More gadgets
+  - Positive: - squirt oil on track to make karts slip, ...
+  - Negative: - 'dirt on windscreen' - partial blackout of screen
+- More flexibility for items. E.g. 
+  - Tracks might hard code some items, change the distribution of some
+    others (e.g. only a rocket at a certain location, but random choice
+    which one the kart gets. Instead of just specifying 
+    GREENHERRING, one could write: ZIPPER:ANVIL and one of the listed
+    things would be picked randomly)
+  - Grand prixs might want to overwrite this, e.g.:
+    "war" grand prix: only rockets for all gadgets
+  - Perhaps make good and bad things indistinguishable?
+- sound/music manager needed
+  Make it easy to replace sounds (which are currently hardcoded), e.g
+  via a config file. Sound/music should be selectable for a track,
+  but a grand prix should be able to overwrite this to create a consistent
+  ambience, ...
+- More tracks
+- More grand prixs
+- Support for translations(?)
+- Support for easy-to-plugin different AIs, and allow different karts
+  to have different AIs
+- Code cleanup
+  - Consistent style (which needs to be defined)
+  - Replace (as far as possible) all char* with std::string
+  - Rather complicated way of passing information to world, a 
+    mixture of CupData, raceSetup, race_manager. This could
+    probably all be simplified by only using the race_manager,
+    removing the raceSetup class completely.

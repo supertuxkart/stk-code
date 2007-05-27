@@ -1,0 +1,14 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-kart
+ (name        "Tux")
+ (model-file  "tuxkart.ac")
+ (icon-file   "tuxicon.rgb")
+ (shadow-file "tuxkartshadow.rgb")
+ 
+ (red         0.7)
+ (green       0.0)
+ (blue        0.0)
+       
+)
+;; EOF ;;

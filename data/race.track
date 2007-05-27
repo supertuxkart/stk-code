@@ -1,0 +1,12 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Race Track")
+ (description "Created by Ingo Ruhnke")
+ (music "mods/tk5a.mod")
+ (screenshot "images/sshot-race.rgb")
+ (topview "images/topview-race.rgb")
+)
+
+;; EOF ;;
+

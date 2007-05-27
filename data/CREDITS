@@ -1,0 +1,93 @@
+Super TuxKart - 0.3
+==========================
+Super TuxKart is a new and improved version
+of tuxkart.
+
+http://supertuxkart.berlios.de/
+
+Project Leaders:
+-----------------
+   Joerg Henrichs (hiker)
+
+   Eduardo Hernandez Munoz (coz)
+
+
+Additional coding:
+--------------------
+   Canarix
+         - User interface
+         - 2D art
+         - Testing
+
+   Patrick Ammann
+         - bug fixes, code cleanup
+         - OpenAL support
+
+   Robert Schuster 
+         - SDL port
+         - bug fixes
+
+   Damien
+         - Ogg vorbis support
+   
+   Johannes Sjolund
+         - Island track making
+
+
+Support for OS-X
+----------------
+   Port and package creation:
+         - Florian, -Nuke-, TinGamer and Xeno74
+
+   Additional artwork/documentation:
+         - Cherryprice, -Nuke-, and Xeno74
+
+Support for Mac-Linux-PPC
+-------------------------
+   Port and package creation:
+         - Xeno74
+
+Playtester
+----------
+   Too many friendly people at the 
+   Games4Mac Forum to list them all
+   (http://community.games4mac.de)
+
+Previous releases
+=================
+
+Game of the Month group:
+----------------------------
+http://happypenguin.org/forums/viewforum.php?f=21
+
+   Ingo Ruhnke
+   Matthias Braun
+   James Gregory
+   Jacob Persson
+   Paul Carley
+   Craig Keogh
+   Pascal Giard
+   Caleb Sawtell
+   Ricardo Cruz
+   Oliver Jeeves
+   Jacob Persson
+   Willian Padovani Germano
+
+Original Tuxkart Design:
+--------------------------
+   Steve Baker
+   http://www.sjbaker.org/
+
+Models and Track Design:
+----------------------------
+   Original TuxKart models:
+   Steve Baker, Oliver Baker
+
+   New SuperTuxKart models:
+   Ingo Ruhnke
+
+Music:
+-------
+   Matt Thomas
+   
+

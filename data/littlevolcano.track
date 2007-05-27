@@ -1,0 +1,24 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-track
+ (name "Little Volcano")
+ (description "Created by Ingo Ruhnke")
+ 
+ (use-fog      #t)
+ (sky-color    0.45 0.0 0.0 0.0)
+ (fog-color    0.45 0.0 0.0 0.0)
+ (fog-start    0.0)
+ (fog-end      200.0)
+ (fog-density  0.03)
+ 
+ (sun-ambient  0.8 0.6 0.6 0.0)
+ (sun-diffuse  0.8 0.6 0.6 0.0)
+ (sun-specular 1.0 0.8 0.8 0.0)
+
+ (music "mods/tk5a.mod")
+ (screenshot "images/sshot-littlevolcano.rgb")
+ (topview "images/topview-littlevolcano.rgb")
+)
+
+;; EOF ;;
+

@@ -1,0 +1,10 @@
+;; -*- mode: lisp -*-
+
+(supertuxkart-cup
+ (name        "TuxKart Cup")
+ (description "The original five tracks included in TuxKart")
+ (herring     "old")
+ (tracks      "olivermath" "gownsbow" "bsodcastle" "geekopeak" "tuxtrack")
+)
+
+;; EOF ;;

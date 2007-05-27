@@ -1,0 +1,3 @@
+There might be posible linking issues when Mac OS version is less than 10.4 and you have QuickTime 7 or higher.
+
+Please see https://lists.berlios.de/pipermail/supertuxkart-devel/2006-September/000188.html for the thread in the mailing list about this issue.

@@ -1,0 +1,97 @@
+SuperTuxKart
+==============
+SuperTuxKart is based on TuxKart (http://tuxkart.sourceforge.net) by Steve
+Baker. You can find more details at:
+
+  http://supertuxkart.berlios.de
+
+A big "thank you" to Steve Baker for designing and implementing the
+original TuxKart, and to the GotM team for their invaluable work.
+See the AUTHORS file for individual credits.
+
+To contact the active maintainers, please send an email to:
+
+  supertuxkart-devel@list.berlios.de
+
+Hope you enjoy the game.
+ - The SuperTuxKart development team.
+
+HARDWARE REQUIREMENTS
+=====================
+* You need a 3D graphics card that supports OpenGL or Mesa.
+* You should have a CPU that's running at 450MHz or better.
+* You'll need at least 32Mb RAM. 
+* A sound card would be nice - but it's not essential.
+* Ideally, you want a joystick with at least 6 buttons.
+
+PLAYING THE GAME
+================
+SuperTuxKart is a kart racing game. Basically you run around the track,
+and give your best shot at reaching the goal before your opponents. The ?
+boxes can help you, and certain items can build up your power, so you can
+grab more than one collectable!
+
+Controls can be configured from the game, here are the defaults mappings:
+
+Player 1:
+  Steer      : Left / Right arrow
+  Accelerate : Up arrow
+  Brake      : Down arrow
+  Use item   : Right control
+  Wheelie    : Right shift
+  Rescue     : Backspace
+
+Player 2:
+  Steer      : A / D key
+  Accelerate : W key
+  Brake      : S key
+  Use item   : Left control
+  Wheelie    : Left shift
+  Rescue     : Left alt
+
+Player 3:
+  Steer      : F / H key
+  Accelerate : T key
+  Brake      : G key
+  Use item   : N key
+  Wheelie    : C key
+  Rescue     : B key
+
+Player 4:
+  Steer      : J / L key
+  Accelerate : I key
+  Brake      : K key
+  Use item   : M key
+  Wheelie    : . key
+  Rescue     : / key
+
+The Escape key pauses the game and shows the race menu.
+
+KNOWN BUGS
+==========
+  * Sometimes you can be pushed through a solid object if you are hit by
+    another player when in contact with the surface.
+  * The --track command-line option doesn't seems to work.
+
+SUPPORT
+=======
+The main webpage is at:
+
+  http://supertuxkart.berlios.de
+
+If you have any problems, please contact the SuperTuxKart mailing list at:
+
+  supertuxkart-devel@list.berlios.de
+
+The archives of this mailing list can be found at:
+
+  http://lists.berlios.de/pipermail/supertuxkart-devel/
+
+Or post a message (no registration required) in the bug forum:
+
+  http://developer.berlios.de/forum/forum.php?forum_id=23737
+
+LICENSE
+=======
+This software is released under the GNU General Public License (GPL) which
+can be found in the file 'LICENSE' in the same directory as this file.
