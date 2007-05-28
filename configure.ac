@@ -108,7 +108,7 @@ dnl        tests etc --> needs cleanup
 
 dnl The check for OpenAL headers depends on the OS, since 
 dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
-AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)   
+AC_SEARCH_LIBS(alGenBuffers, [openal alut OpenAL32], have_al_lib=yes)   
 
 dnl as well as mikmod, since mikmod is only used (but then
 dnl it's necessary) when openal is used. We also check for
