@@ -363,9 +363,11 @@ void World::update(float delta)
             index[m_kart[i]->getPosition()-1] = i;
         }
 
-        // Don't record the time for the last kart, since it didn't
-        // finish the race.
-        for(unsigned int pos=0; pos<m_kart.size()-1; pos++)
+        // Don't record the time for the last kart, since it didn't finish
+        // the race - unless it's timetrial (then there is only one kart)
+	unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+                                    ? m_kart.size() : m_kart.size()-1;
+        for(unsigned int pos=0; pos<karts_to_enter; pos++)
         {
             // Only record times for player karts
             if(!m_kart[index[pos]]->isPlayerKart()) continue;

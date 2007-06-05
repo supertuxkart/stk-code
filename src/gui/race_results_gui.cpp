@@ -65,7 +65,7 @@ RaceResultsGUI::RaceResultsGUI()
         const Kart *KART = world->getKart(order[i]);
         const std::string& KART_NAME = KART->getName();
         char sTime[20];
-        if(i==NUM_KARTS-1)
+        if(i==NUM_KARTS-1 && world->m_race_setup.m_mode!=RaceSetup::RM_TIME_TRIAL)
         {
             sprintf(sTime,"          ");
         }
@@ -75,12 +75,20 @@ RaceResultsGUI::RaceResultsGUI()
             TimeToString(T, sTime);
         }
         //This shows position + driver name + time + points earned + total points
-        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
-                KART->getPosition(), KART_NAME.c_str(), sTime,
-                race_manager->getPositionScore(i+1),
-                race_manager->getKartScore(order[i]));
-        widgetSet -> label(RESULT_TABLE, (char*)(m_score + MAX_STR_LEN * i),
-                           GUI_MED, GUI_ALL);
+	if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
+	{
+	    sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
+		    KART->getPosition(), KART_NAME.c_str(), sTime,
+		    race_manager->getPositionScore(i+1),
+		    race_manager->getKartScore(order[i]));
+	} 
+	else 
+        {
+	    sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s",
+		    KART->getPosition(), KART_NAME.c_str(), sTime);
+	}
+	    widgetSet -> label(RESULT_TABLE, (char*)(m_score + MAX_STR_LEN * i),
+			       GUI_MED, GUI_ALL);
     }
 
     delete[] order;
