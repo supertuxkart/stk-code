@@ -486,25 +486,15 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
                                      int offset_y, float ratio_x,
                                      float ratio_y                    )
 {
+    // If player doesn't have anything, do nothing
+    Collectable* collectable=player_kart->getCollectable();
+    if(collectable->getType() == COLLECT_NOTHING) return;
+
     // Originally the hardcoded sizes were 320-32 and 400
     int x1 = (int)((user_config->m_width/2-32) * ratio_x) + offset_x ;
     int y1 = (int)(user_config->m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
-    // If player doesn't have anything, just let the transparent black square
-    Collectable* collectable=player_kart->getCollectable();
-    if(collectable->getType() == COLLECT_NOTHING)
-    {
-        glDisable(GL_TEXTURE_2D);
-        glBegin ( GL_QUADS ) ;
-        glColor4f  ( 0.0f, 0.0f, 0.0f, 0.16f          );
-        glVertex2i ( x1             , y1              );
-        glVertex2i ( x1+(int)(nSize), y1              );
-        glVertex2i ( x1+(int)(nSize), y1+(int)(nSize) );
-        glVertex2i ( x1             , y1+(int)(nSize) );
-        glEnd();
-        return;
-    }
     collectable->getIcon()->apply();
 
     int n  = player_kart->getNumCollectables() ;
