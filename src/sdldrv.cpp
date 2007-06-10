@@ -33,7 +33,7 @@
 #include "loader.hpp"
 #include "gui/menu_manager.hpp"
 #include "player.hpp"
-#include "widget_set.hpp"
+#include "gui/font.hpp"
 
 SDL_Surface *mainSurface;
 long flags;
@@ -114,7 +114,11 @@ void drv_toggleFullscreen(int resetTextures)
         attachment_manager      -> loadModels();
 
 	//        startScreen             -> installMaterial();
-        widgetSet               -> reInit();
+
+        //FIXME: the font reinit funcs should be inside the font class
+        //Reinit fonts
+        delete_fonts();
+        init_fonts();
     }
 #endif
 }

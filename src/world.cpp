@@ -47,7 +47,6 @@
 #include "history.hpp"
 #include "constants.hpp"
 #include "sound_manager.hpp"
-#include "widget_set.hpp"
 #include "ssg_help.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"

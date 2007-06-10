@@ -33,7 +33,6 @@
 #include "material_manager.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
-#include "widget_set.hpp"
 #include "user_config.hpp"
 #include "scene.hpp"
 #include "history.hpp"
