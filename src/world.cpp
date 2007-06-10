@@ -310,10 +310,8 @@ void World::update(float delta)
             }
         }
         delete []index;
-        widgetSet->tgl_paused();
+        pause();
         menu_manager->pushMenu(MENUID_RACERESULT);
-
-        m_phase = LIMBO_PHASE;
     }
 
     float inc = 0.05f;
@@ -752,6 +750,20 @@ Kart* World::loadRobot(const KartProperties *kart_properties, int position,
     }
     
     return currentRobot;
+}
+
+//-----------------------------------------------------------------------------
+void  World::pause()
+{
+    sound_manager -> pauseMusic() ;
+    m_phase = LIMBO_PHASE;
+}
+
+//-----------------------------------------------------------------------------
+void  World::unpause()
+{
+    sound_manager -> resumeMusic() ;
+    m_phase = RACE_PHASE;
 }
 
 /* EOF */

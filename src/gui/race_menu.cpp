@@ -26,6 +26,7 @@
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
+#include "sound_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
@@ -72,7 +73,6 @@ RaceMenu::~RaceMenu()
 void RaceMenu::update(float dt)
 {
     widgetSet -> timer(m_menu_id, dt) ;
-    // widgetSet -> blank();
     widgetSet -> paint(m_menu_id) ;
 }
 
@@ -80,21 +80,22 @@ void RaceMenu::update(float dt)
 void RaceMenu::select()
 {
     int clicked_token = widgetSet->get_token(widgetSet->click());
-    if(clicked_token != WTOK_OPTIONS && clicked_token != WTOK_HELP)
-        widgetSet -> tgl_paused();
 
     switch (clicked_token)
     {
     case WTOK_RETURN_RACE:
+        world->unpause();
         menu_manager->popMenu();
         break;
 
     case WTOK_SETUP_NEW_RACE:
+        world->unpause();
         race_manager->exit_race();
         menu_manager->pushMenu(MENUID_DIFFICULTY);
         break;
 
     case WTOK_RESTART_RACE:
+        world->unpause();
         menu_manager->popMenu();
         world->restartRace();
         break;
@@ -108,6 +109,7 @@ void RaceMenu::select()
         break;
 
     case WTOK_EXIT_RACE:
+        world->unpause();
         race_manager->exit_race();
         break;
 
@@ -124,7 +126,7 @@ void RaceMenu::inputKeyboard(int key, int pressed)
     case SDLK_ESCAPE: //ESC
         if(!pressed)
             break;
-        widgetSet -> tgl_paused();
+        world->unpause();
         menu_manager->popMenu();
         break;
 

@@ -21,6 +21,7 @@
 
 #include "base_gui.hpp"
 #include "widget_set.hpp"
+#include "world.hpp"
 #include "menu_manager.hpp"
 
 void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
@@ -53,7 +54,9 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
                 if (menu_manager->getMenuStackSize() > 1)
                 {
                     if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
-                        widgetSet->tgl_paused();
+                    {
+                        world->unpause();
+                    }
 
                     menu_manager->popMenu();
                 }
@@ -76,7 +79,9 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
                 if (menu_manager->getMenuStackSize() > 1)
                 {
                     if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
-                        widgetSet->tgl_paused();
+                    {
+                        world->unpause();
+                    }
 
                     menu_manager->popMenu();
                 }

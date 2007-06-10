@@ -202,7 +202,7 @@ void RaceGUI::inputKeyboard(int key, int pressed)
         // Fall through to put the game into pause mode.
 #endif
     case SDLK_ESCAPE: // ESC
-        widgetSet->tgl_paused();
+        world->pause();
         menu_manager->pushMenu(MENUID_RACEMENU);
         break;
     case SDLK_F10:

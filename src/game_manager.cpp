@@ -78,7 +78,7 @@ void GameManager::run()
         if (race_manager->raceIsActive())
         {
             scene->draw();
-            if ( ! widgetSet -> get_paused ())
+            if ( world->getPhase() != World::LIMBO_PHASE)
             {
                 world->update((m_curr_time - m_prev_time ) * 0.001);
 

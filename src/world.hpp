@@ -104,6 +104,9 @@ public:
     float getFastestLapTime() const           { return m_fastest_lap;              }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time;}
     const Highscores* getHighscores() const   { return m_highscores;               }
+
+    void  pause();
+    void  unpause();
 private:
     Karts       m_kart;
     StaticSSG*  m_static_ssg;

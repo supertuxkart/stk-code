@@ -154,18 +154,18 @@ void RaceResultsGUI::select()
     switch( widgetSet->get_token( widgetSet->click() ) )
     {
     case WTOK_CONTINUE:
-        widgetSet->tgl_paused();
+        world->unpause();
         race_manager->next();
         break;
     case WTOK_RESTART_RACE:
-        widgetSet->tgl_paused();
+        world->unpause();
         menu_manager->popMenu();
         // TODO: Maybe let this go through the race_manager for
         // more flexibility.
         world->restartRace();
         break;
     case WTOK_SETUP_NEW_RACE:
-        widgetSet->tgl_paused();
+        world->unpause();
         race_manager->exit_race();
         menu_manager->pushMenu(MENUID_DIFFICULTY);
         break;
@@ -184,7 +184,7 @@ void RaceResultsGUI::input(InputType type, int id0, int  id1, int id2, int value
     {    // Usually here would be code to close this gui. Not only
          // that doesn't has any real function in this gui,
          // but also closing this gui causes bug #9157.
-        widgetSet->tgl_paused();
+        world->unpause();
         race_manager->next();
     }
     else
@@ -208,7 +208,7 @@ void RaceResultsGUI::inputKeyboard(int key, int pressed)
     {   // Usually here would be code to close this gui. Not only
         // that doesn't has any real function in this gui,
         // but also causes bug #9157.
-        widgetSet->tgl_paused();
+        world->unpause();
         race_manager->next();
     }   // sif SDLK_ESCAPE
 }   // inputKeyboard
