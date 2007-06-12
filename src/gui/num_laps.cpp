@@ -37,7 +37,7 @@ NumLaps::NumLaps() : laps(3)
     widgetSet -> state(m_menu_id, _("Less"), GUI_MED, 10);
     widgetSet -> start(m_menu_id, _("More"), GUI_MED, 20);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, _("Next"), GUI_SML, 30);
+    widgetSet -> state(m_menu_id, _("Start Race"), GUI_SML, 30);
     widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> space(m_menu_id);
 
