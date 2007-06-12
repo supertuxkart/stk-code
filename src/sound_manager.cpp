@@ -185,7 +185,8 @@ void SoundManager::playMusic(const char* filename)
             if((m_current_music->load(filename)) == false)
         {
             delete m_current_music;
-            fprintf(stderr, "WARNING: Unabled to load music %s, not supported\n", filename);
+	    m_current_music=0;
+            fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
         }
         else
         {

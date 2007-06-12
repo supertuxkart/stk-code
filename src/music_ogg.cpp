@@ -19,6 +19,7 @@
 
 #if HAVE_OPENAL && HAVE_OGGVORBIS
 
+#include <stdexcept>
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #else
@@ -52,7 +53,14 @@ bool MusicOggStream::load(const char* filename)
 {
     //assert(release());
 
-    m_fileName =  loader->getPath(filename);
+    try
+    {
+      m_fileName =  loader->getPath(filename);
+    }
+    catch(std::runtime_error)
+    {
+	return false;
+    }
     oggFile = fopen(m_fileName.c_str(), "rb");
 
     if (ov_open(oggFile, &m_oggStream, NULL, 0) < 0)
