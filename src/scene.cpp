@@ -83,7 +83,7 @@ void Scene::remove(ssgEntity *kid)
 }
 
 //-----------------------------------------------------------------------------
-void Scene::draw()
+void Scene::draw(float dt)
 {
     glEnable ( GL_DEPTH_TEST ) ;
 
@@ -124,7 +124,7 @@ void Scene::draw()
 
     for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
     {
-        (*i)->update();
+        (*i)->update(dt);
         (*i) -> apply () ;
 
 #ifdef BULLET

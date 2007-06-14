@@ -40,6 +40,7 @@ protected:
     Mode m_mode;
     float m_last_steer_offset;
     float m_x, m_y, m_w, m_h ;
+    float m_LastPitch;
 
 public:
     Camera ( int numPlayers, int id ) ;
@@ -49,7 +50,7 @@ public:
 
     void setScreenPosition ( int numPlayers, int pos ) ;
 
-    void update () ;
+    void update (float dt) ;
     void apply  () ;
 } ;
 

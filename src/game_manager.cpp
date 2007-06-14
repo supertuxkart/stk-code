@@ -76,7 +76,7 @@ void GameManager::run()
 
         if (race_manager->raceIsActive())
         {
-            scene->draw();
+            scene->draw((m_curr_time - m_prev_time ) * 0.001);
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
                 world->update((m_curr_time - m_prev_time ) * 0.001);
