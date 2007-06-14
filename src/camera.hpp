@@ -21,12 +21,15 @@
 #ifndef HEADER_CAMERA_H
 #define HEADER_CAMERA_H
 
+class ssgContext;
+
 class Camera
 {
 public:
     enum Mode {
         CM_NORMAL,
         CM_CLOSEUP,
+        //FIXME: NO_FAKE_DRIFT is broken
         CM_NO_FAKE_DRIFT,
         CM_SIMPLE_REPLAY
     };
@@ -37,6 +40,7 @@ protected:
     Mode m_mode;
     float m_last_steer_offset;
     float m_x, m_y, m_w, m_h ;
+    float m_LastPitch;
 
 public:
     Camera ( int numPlayers, int id ) ;
@@ -46,7 +50,7 @@ public:
 
     void setScreenPosition ( int numPlayers, int pos ) ;
 
-    void update () ;
+    void update (float dt) ;
     void apply  () ;
 } ;
 

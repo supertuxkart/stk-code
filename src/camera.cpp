@@ -62,6 +62,7 @@ Camera::setScreenPosition ( int numPlayers, int pos )
             break;
         }
     }
+    m_LastPitch = 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,7 +91,7 @@ Camera::setMode(Mode mode_)
 }
 
 //-----------------------------------------------------------------------------
-void Camera::update ()
+void Camera::update (float dt)
 {
     // Update the camera
     if ( m_which_kart >= int(world->getNumKarts()) || m_which_kart < 0 ) m_which_kart = 0 ;
@@ -99,7 +100,18 @@ void Camera::update ()
     sgCopyCoord(&kartcoord, world->getPlayerKart(m_which_kart)->getCoord());
 
     kartcoord.hpr[2] = 0;
-    kartcoord.hpr[1] = 0;
+
+    // If the car angle is 'significantly' different from the camera angle,
+    // start adjusting the camera. This helps with steep declines, where
+    // otherwise the track is not visible anymore.
+    if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
+        kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
+    }
+    else
+    {
+        kartcoord.hpr[1]=m_LastPitch;
+    }
+    m_LastPitch = kartcoord.hpr[1];
 
     if (m_mode == CM_SIMPLE_REPLAY)
         kartcoord.hpr[0] = 0;
@@ -155,8 +167,6 @@ void Camera::apply ()
 {
     int width  = user_config->m_width ;
     int height = user_config->m_height;
-
-    assert ( world->m_scene != NULL ) ;
 
     glViewport ( (int)((float)width  * m_x),
                  (int)((float)height * m_y),

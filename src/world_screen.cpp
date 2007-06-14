@@ -75,7 +75,7 @@ void WorldScreen::update()
     }
 
     for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
-        (*i)->update();
+        (*i)->update(m_fclock.getDeltaTime());
 
     draw();
 
