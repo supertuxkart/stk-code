@@ -674,23 +674,33 @@ void Kart::update (float dt)
     doObjectInteractions();
 
 
+    // Save the last valid sector for forced rescue on shortcuts
+    if(m_track_sector  != Track::UNKNOWN_SECTOR && 
+       !m_rescue                                    ) 
+    {
+        m_shortcut_sector = m_track_sector;
+    }
+
     int prev_sector = m_track_sector;
-    world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
-    
+    if(!m_rescue)
+        world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
+
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(m_shortcut_type!=SC_SKIPPED_SECTOR)
+    if(m_shortcut_type!=SC_SKIPPED_SECTOR && !m_rescue)
     {
         if(world->m_track->isShortcut(prev_sector, m_track_sector))
         {
-            m_shortcut_sector = prev_sector;
             // Skipped sectors are more severe then getting outside the 
             // road, so count this as two. But if the kart is already
             // outside the track, only one is added (since the outside
             // track shortcut already added 1).
+            
+            // This gets subtracted again when doing the rescue
             m_shortcut_count+= m_shortcut_type==SC_NONE ? 2 : 1;
             m_shortcut_type  = SC_SKIPPED_SECTOR;
             if(isPlayerKart())
             {
+                forceRescue();  // bring karts back to where they left the track.
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
                 // Can happen if the option menu is called
                 if(m)
@@ -705,7 +715,7 @@ void Kart::update (float dt)
         m_shortcut_type=SC_NONE;
     }
 
-    if (m_track_sector == Track::UNKNOWN_SECTOR )
+    if (m_track_sector == Track::UNKNOWN_SECTOR && !m_rescue)
     {
         m_on_road = false;
         if( m_curr_track_coords[0] > 0.0 )
