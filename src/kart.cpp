@@ -864,8 +864,16 @@ void Kart::updatePhysics (float dt)
     }
     else
     {   // not braking
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        if(m_speed < 0.0f)   // if going backwards, accelerating is braking
+        {
+            m_vehicle->setBrake(getBrakeForce(), 2);
+            m_vehicle->setBrake(getBrakeForce(), 3);
+        }
+        else
+        {
+            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
+            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        }
 
     }
     if(m_controls.jump)
@@ -934,11 +942,12 @@ void Kart::updatePhysics (float dt)
     {
         if(m_controls.brake)
         {
-            throttle = m_velocity.xyz[1]<0.0 ? -1.0f : -getBrakeFactor();
+            throttle = m_velocity.xyz[1]<0.0f ? -1.0f : -getBrakeFactor();
         }
         else
         {   // not braking
-            throttle =  m_controls.accel*m_current_friction*m_current_friction;
+            throttle =  m_velocity.xyz[1]<0.0f ? getBrakeFactor() 
+                     : m_controls.accel*m_current_friction*m_current_friction;
         }
         // Handle wheelies
         // ===============
