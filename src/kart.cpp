@@ -850,8 +850,16 @@ void Kart::updatePhysics (float dt)
     }
     else
     {   // not braking
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
-        m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        if(m_speed < 0.0f)   // if going backwards, accelerating is braking
+        {
+            m_vehicle->setBrake(getBrakeForce(), 2);
+            m_vehicle->setBrake(getBrakeForce(), 3);
+        }
+        else
+        {
+            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
+            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        }
 
     }
     if(m_controls.jump)
