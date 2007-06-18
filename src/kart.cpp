@@ -137,6 +137,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_exhaust_pipe         = NULL;
     m_skidmark_left        = NULL;
     m_skidmark_right       = NULL;
+    m_track_sector         = Track::UNKNOWN_SECTOR;
     sgCopyCoord(&m_reset_pos, &init_pos);
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
@@ -659,23 +660,33 @@ void Kart::update (float dt)
     doObjectInteractions();
 
 
+    // Save the last valid sector for forced rescue on shortcuts
+    if(m_track_sector  != Track::UNKNOWN_SECTOR && 
+       !m_rescue                                    ) 
+    {
+        m_shortcut_sector = m_track_sector;
+    }
+
     int prev_sector = m_track_sector;
-    m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
+    if(!m_rescue)
+        m_track_sector = world->m_track->findRoadSector(m_curr_pos.xyz);
     
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(m_shortcut_type!=SC_SKIPPED_SECTOR)
+    if(m_shortcut_type!=SC_SKIPPED_SECTOR && !m_rescue)
     {
         if(world->m_track->isShortcut(prev_sector, m_track_sector))
         {
-            m_shortcut_sector = prev_sector;
             // Skipped sectors are more severe then getting outside the 
             // road, so count this as two. But if the kart is already
             // outside the track, only one is added (since the outside
             // track shortcut already added 1).
+            
+            // This gets subtracted again when doing the rescue
             m_shortcut_count+= m_shortcut_type==SC_NONE ? 2 : 1;
             m_shortcut_type  = SC_SKIPPED_SECTOR;
             if(isPlayerKart())
             {
+                forceRescue();  // bring karts back to where they left the track.
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
                 // Can happen if the option menu is called
                 if(m)
@@ -690,7 +701,7 @@ void Kart::update (float dt)
         m_shortcut_type=SC_NONE;
     }
 
-    if (m_track_sector == Track::UNKNOWN_SECTOR )
+    if (m_track_sector == Track::UNKNOWN_SECTOR && !m_rescue)
     {
         m_on_road = false;
         if( m_curr_track_coords[0] > 0.0 )
@@ -716,8 +727,8 @@ void Kart::update (float dt)
        !m_rescue                                                             &&
        m_shortcut_type                              != SC_SKIPPED_SECTOR     &&
          fabsf(m_curr_track_coords[0])-stk_config->m_max_road_distance 
-         >  m_curr_track_coords[2] ) {
-               
+         >  m_curr_track_coords[2] ) 
+    {
         m_shortcut_sector = sector;
         // Increase the error count the first time this happens
         if(m_shortcut_type==SC_NONE)
@@ -909,11 +920,12 @@ void Kart::updatePhysics (float dt)
     {
         if(m_controls.brake)
         {
-            throttle = m_velocity.xyz[1]<0.0 ? -1.0f : -getBrakeFactor();
+            throttle = m_velocity.xyz[1]<0.0f ? -1.0f : -getBrakeFactor();
         }
         else
         {   // not braking
-            throttle =  m_controls.accel*m_current_friction*m_current_friction;
+            throttle =  m_velocity.xyz[1]<0.0f ? getBrakeFactor() 
+                     : m_controls.accel*m_current_friction*m_current_friction;
         }
         // Handle wheelies
         // ===============
