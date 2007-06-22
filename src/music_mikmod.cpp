@@ -283,7 +283,6 @@ void MusicMikMod::update()
             fprintf(stderr,"Problems with mikmod:sourceQueueBuffers. Disabling music.\n");
             return;
         }
-	user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
     }
 
     // check for underrun
