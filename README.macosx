@@ -48,19 +48,13 @@ if [ "${BASH-no}" != "no" ]; then [ -r /etc/bashrc ] && . /etc/bashrc fi
 
 11.01 SDL
 
-11.02 SDL-image
+11.02 audiofile
 
-11.03 SDL-ttf
+11.03 esound
 
-11.04 SDL-mixer
+11.04 svn
 
-11.05 audiofile
-
-11.06 esound
-
-11.07 svn
-
-11.08 svn-client
+11.05 svn-client
 
 
 12. Download the SDL framework from http://www.libsdl.org/download-1.2.php and copy it to /Library/Frameworks.
@@ -86,7 +80,7 @@ if [ "${BASH-no}" != "no" ]; then [ -r /etc/bashrc ] && . /etc/bashrc fi
 14.03 Change in the folder PLIB.
 
 
-14.04 Download "pwMacOSX.cxx"-patch from http://community.games4mac.de/index.php?act=Attach&type=post&id=2217
+14.04 Download "pwMacOSX.cxx"-patch from ftp://ftp.berlios.de/pub/supertuxkart/plib_patch_for_osx.zip
 
 
 14.05 Installing pwMacOSX.cxx-patch.
