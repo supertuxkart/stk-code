@@ -1,4 +1,4 @@
-There are two ways to compile an executable for windows: using
+There are two documented ways to compile an executable for windows: using
 cygwin, and using visual c++ (tested with the free Express version).
 
 If you have any problems, please post on the mailing list - I am 
@@ -16,7 +16,7 @@ Cygwin
 2) Compile and install plib
    This should work straight out of the box.
 
-3) Unpack supteruxkart and run ./configure  and  make.
+3) Unpack supertuxkart and run ./configure  and  make.
 
 That should be all.
 
