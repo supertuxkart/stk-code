@@ -5,18 +5,17 @@ of tuxkart.
 
 http://supertuxkart.berlios.de/
 
-Project Leaders:
+Project Leaders
 -----------------
    Joerg Henrichs (hiker)
 
    Eduardo Hernandez Munoz (coz)
 
 
-Additional coding:
+Additional coding
 --------------------
    Canarix
          - User interface
-         - 2D art
          - Testing
 
    Patrick Ammann
@@ -30,9 +29,16 @@ Additional coding:
    Damien
          - Ogg vorbis support
    
-   Johannes Sjolund
-         - Island track making
+Artists
+---------------
+   Island track creation
+         - Johannes Sjolund
 
+   2D art
+         - Canarix
+
+   Hexley the platypus creation
+         - Frederico de Oliveira Linhares
 
 Support for OS-X
 ----------------
