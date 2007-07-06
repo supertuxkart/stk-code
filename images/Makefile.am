@@ -37,6 +37,10 @@ grass.rgb \
 herringbones.rgb \
 herring.rgb \
 herringwall.rgb \
+hexley_eye.rgb \
+hexleyicon.rgb \
+hexley_kart_textura.rgb \
+hexleyshadow.rgb \
 homework.rgb \
 homingmissile.rgb \
 icecreamtruck.rgb \
