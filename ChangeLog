@@ -1,10 +1,11 @@
-SuperTuxKart 0.3 (May 2007)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SuperTuxKart 0.3 (10. July 2007)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Highscore lists	
 * Shortcut detection 	
 * Improved AI
 * Fullscreen support
 * New track: the island
+* New kart: hexley
 * New penalty: bomb
 * MacOSX support
 * OpenAL and ogg-vorbis support

@@ -11,7 +11,7 @@ dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 dnl ================================================
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(supertuxkart, 0.3rc1)
+AM_INIT_AUTOMAKE(supertuxkart, 0.3)
 
 dnl ===================
 dnl Check for compilers
