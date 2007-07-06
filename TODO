@@ -25,7 +25,6 @@ no particular order):
    - Create packages for 
      - most common linux Distributors
      - Windows
-     - MaxOS (?? currently not sure if STK works on Macs)
 
 7) Writers
    - Write documentation, ranging from man page, to
