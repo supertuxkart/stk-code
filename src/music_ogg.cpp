@@ -252,14 +252,18 @@ void MusicOggStream::update()
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
     char pcm[BUFFER_SIZE];
-    int  bigendianp = 0;
+#ifdef WORDS_BIGENDIAN
+    int  isBigEndian = 1;
+#else
+    int  isBigEndian = 0;
+#endif
     int  size = 0;
     int  portion;
     int  result;
 
     while(size < BUFFER_SIZE)
     {
-        result = ov_read(&m_oggStream, pcm + size, BUFFER_SIZE - size, bigendianp, 2, 1, &portion);
+        result = ov_read(&m_oggStream, pcm + size, BUFFER_SIZE - size, isBigEndian, 2, 1, &portion);
 
         if(result > 0)
             size += result;

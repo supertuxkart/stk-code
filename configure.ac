@@ -33,7 +33,6 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
-
 dnl ===============================
 dnl Check for MS Windows environment
 dnl ================================
@@ -195,6 +194,9 @@ case "${host}" in
            if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
                AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
                SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
+               # ov_read for ogg music needs endianness flag. This macro defines
+	       # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
+	       AC_C_BIGENDIAN
            fi
        fi
    else
