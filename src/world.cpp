@@ -433,6 +433,8 @@ void World::update(float delta)
     /* Routine stuff we do even when paused */
     callback_manager->update(delta);
 
+#ifdef THIS_CAUSES_A_CRASH_ON_PPC
+    // FIXME: not sure why, but this loop crashes on the ppc.
     // Check for traffic jam. The sound is played even if it's
     // not a player kart - a traffic jam happens rarely anyway.
     for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++)
@@ -444,7 +446,7 @@ void World::update(float delta)
             break;
         }
     }
-
+#endif
 }
 
 //-----------------------------------------------------------------------------
