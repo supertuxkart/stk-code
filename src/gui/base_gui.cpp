@@ -110,7 +110,12 @@ void BaseGUI::inputKeyboard(int key, int pressed)
         break;
 
     case SDLK_ESCAPE:
-        menu_manager->popMenu();
+        if (menu_manager->getMenuStackSize() > 1)
+        {
+            //We don't need to handle the race menu because it has it's own
+            //keyboard handler.
+            menu_manager->popMenu();
+        }
         break;
 
     default:
