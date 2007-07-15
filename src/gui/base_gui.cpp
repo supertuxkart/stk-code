@@ -115,7 +115,14 @@ void BaseGUI::inputKeyboard(int key, int pressed)
         break;
 
     case SDLK_ESCAPE:
-        menu_manager->popMenu();
+        if (menu_manager->getMenuStackSize() > 1)
+        {
+            //We don't need to handle the race gui pause with the keyboard
+            //(but we have to with the joystick & mouse) because it has it's
+            //own keyboard handling function.
+
+            menu_manager->popMenu();
+        }
         break;
 
     default:
