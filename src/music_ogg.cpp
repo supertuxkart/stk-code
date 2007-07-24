@@ -29,6 +29,7 @@
 
 #include "music_ogg.hpp"
 #include "loader.hpp"
+#include "user_config.hpp"
 
 #define BUFFER_SIZE (4096 * 8)
 
@@ -51,7 +52,12 @@ MusicOggStream::~MusicOggStream()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::load(const char* filename)
 {
-    //assert(release());
+    if(!release())
+    {
+        user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
+        fprintf(stderr,"Problems oggStream:release. Disabling music.\n");
+        return false;
+    }
 
     try
     {

@@ -158,6 +158,7 @@ void SoundManager::playMusic(const char* filename)
         if (m_current_music != NULL)
         {
             delete m_current_music;
+            m_current_music = NULL;
         }
 
         if (filename == NULL || strlen(filename) == 0)
