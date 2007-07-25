@@ -38,7 +38,7 @@ private:
     std::string m_ident;
     std::string m_screenshot;
     std::string m_top_view;
-    std::string m_music_filename;
+    std::vector<std::string> m_music_filenames;
     std::string m_herring_style;
     std::string m_description;
     std::string m_filename;
@@ -151,7 +151,7 @@ public:
     float              getTrackLength   () const {return m_total_distance;}
     const char*        getIdent         () const {return m_ident.c_str(); }
     const char*        getName          () const {return m_name.c_str();  }
-    const std::string& getMusic         () const {return m_music_filename;}
+    const std::string& getMusic         () const;
     const std::string& getFilename      () const {return m_filename; }
     const sgVec3& getSunPos             () const {return m_sun_position;  }
     const sgVec4& getAmbientCol         () const {return m_ambient_col;    }

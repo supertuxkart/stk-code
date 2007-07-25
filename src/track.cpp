@@ -748,7 +748,7 @@ void Track::loadTrack(std::string filename_)
 
     LISP->get("name",          m_name);
     LISP->get("description",   m_description);
-    LISP->get("music",         m_music_filename);
+    LISP->getVector("music",   m_music_filenames);
     LISP->get("herring",       m_herring_style);
     LISP->get("screenshot",    m_screenshot);
     LISP->get("topview",       m_top_view);
@@ -767,6 +767,11 @@ void Track::loadTrack(std::string filename_)
     LISP->get("m_gravity",     m_gravity);
     delete ROOT;
 }
+
+//-----------------------------------------------------------------------------
+const std::string& Track::getMusic() const {
+    return m_music_filenames[rand()% m_music_filenames.size()];
+}   // getMusic
 
 //-----------------------------------------------------------------------------
 void
