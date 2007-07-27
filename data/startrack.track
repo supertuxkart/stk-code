@@ -4,7 +4,7 @@
  (name "Star Track")
  (sky-color    0.0 0.0 0.0 0.0)
  (description "Created by Ingo Ruhnke")
- (music "mods/tk5a.mod")
+ (music "oggs/Ethereal\ Spectrum\ \(ver\ loop\).ogg")
  (screenshot "images/sshot-startrack.rgb")
  (topview "images/topview-startrack.rgb")
 )
