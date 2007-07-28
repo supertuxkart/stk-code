@@ -64,8 +64,6 @@ RaceMenu::RaceMenu()
 RaceMenu::~RaceMenu()
 {
     widgetSet -> delete_widget(m_menu_id) ;
-
-    if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +85,7 @@ void RaceMenu::select()
     {
     case WTOK_RETURN_RACE:
         menu_manager->popMenu();
+        if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
         break;
 
     case WTOK_SETUP_NEW_RACE:
@@ -97,6 +96,7 @@ void RaceMenu::select()
     case WTOK_RESTART_RACE:
         menu_manager->popMenu();
         world->restartRace();
+        if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
         break;
 
     case WTOK_OPTIONS:
