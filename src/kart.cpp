@@ -1430,8 +1430,8 @@ void Kart::placeModel ()
     btTransform t;
     if(m_rescue)
     {
-             t=m_kart_body->getCenterOfMassTransform();
-             //             m_motion_state->getWorldTransform(t);
+        t=m_kart_body->getCenterOfMassTransform();
+        //             m_motion_state->getWorldTransform(t);
     } 
     else
     {
@@ -1450,7 +1450,8 @@ void Kart::placeModel ()
     sgCopyCoord ( &c, &m_curr_pos ) ;
     //    c.hpr[1] += m_wheelie_angle ;
     //    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS));
-    c.xyz[2] -= 0.5*m_kart_height;   // adjust for center of gravity
+    const float CENTER_SHIFT = getGravityCenterShift();
+    c.xyz[2] -= (0.5-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
     m_model->setTransform(&c);
     
     // Check if a kart needs to be rescued.

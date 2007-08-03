@@ -33,14 +33,14 @@
  (kart-defaults
    (wheel-base               1.2 )
    (heightCOG                0.2 )
-   (engine-power           400   )
-   (brake-factor             2.75   )
+   (engine-power          2200   )
+   (brake-factor             2.75)
    (brake-force              2.5 )
-   (mass                   125   )
+   (mass                   225   )
    (air-resistance           1.8 )
    (roll-resistance          1.05)
    (tire-grip                0.9 )
-   (max-steer-angle         55   )
+   (max-steer-angle         25   )
    (time-full-steer          0.3 )
    (corn-f                   4   )
    (corn-r                   4   )
@@ -59,7 +59,7 @@
    (inertia                  5.0 )
 
    ;; Bullet physics attributes
-   (suspension-stiffness      20.0 )
+   (suspension-stiffness      8.0  )
    (wheel-damping-relaxation  2.3  )
    (wheel-damping-compression 4.4  )
    (friction-slip      10000000    )
@@ -69,8 +69,8 @@
    (chassis-linear-damping    0.2  )
    (chassis-angular-damping   0.2  )
    (maximum-speed            22.22 ) ;; = 80 km/h
-   (gravity-center-shift      0.2 ) ;; Shift center of gravity down by that many
-                                    ;; units of kart_height (usually between 0 and 0.5)
+   (gravity-center-shift      0.4  ) ;; Shift center of gravity down by that many
+                                     ;; units of kart_height (usually between 0 and 0.5)
 
   )   ;; end kart-defaults
 )
