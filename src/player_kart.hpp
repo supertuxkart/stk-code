@@ -32,16 +32,12 @@ class Player;
 class PlayerKart : public Kart
 {
 private:
-    int m_steer_val, m_accel_val;
+    int m_steer_val, m_steer_val_l, m_steer_val_r, m_accel_val;
 
     Player *m_player;
     float   m_penalty_time;
-    // This field saves all currently pressed keys for each action. This is used
-    // to solve problems like: press left, press right, release right --> 
-    // the kart should in this case steer left.
-    int     m_action_keys_values[KC_FIRE+1];
 
-    void smoothSteer(float dt, bool left, bool right);
+    void steer(float, int);
 public:
     PlayerKart(const KartProperties *kart_properties,
                int position, Player *_player,
@@ -53,7 +49,7 @@ public:
     Player* getPlayer         () {return m_player;        }
     void    update            (float);
     void    addMessages       ();
-    void    action            (KartActions action, int value, bool isKeyboard);
+    void    action            (KartActions action, int value);
     void    forceCrash        ();
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);

@@ -120,14 +120,13 @@ void RaceGUI::putEntry(PlayerKart *kart, KartActions kc)
 }
 
 //-----------------------------------------------------------------------------
-bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value,
-                          bool isKeyboard)
+bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
 {
     PlayerKart *k = m_input_map[type][id0][id1][id2].kart;
 
     if (k)
     {
-        k->action(m_input_map[type][id0][id1][id2].action, value, isKeyboard);
+        k->action(m_input_map[type][id0][id1][id2].action, value);
         return true;
     }
     else
@@ -148,12 +147,13 @@ void RaceGUI::input(InputType type, int id0, int id1, int id2, int value)
     switch (type)
     {
     case IT_KEYBOARD:
-        // Set flag that this event is a keyboard event.
-        if (!handleInput(type, id0, id1, id2, value, true))
+        // Stuff that handleInput() does not care about are
+        // internal keyboard actions.
+        if (!handleInput(type, id0, id1, id2, value))
             inputKeyboard(id0, value);
         break;
     default:  // no keyboard event
-        handleInput(type, id0, id1, id2, value, false);
+        handleInput(type, id0, id1, id2, value);
         break;
     }
 

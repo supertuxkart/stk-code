@@ -40,6 +40,7 @@ long flags;
 SDL_Joystick **sticks;
 
 #define DEADZONE_MOUSE 1
+#define DEADZONE_JOYSTICK 1000
 
 //-----------------------------------------------------------------------------
 void drv_init()
@@ -158,13 +159,12 @@ void drv_loop()
             game_manager->abort();
             break;
 
-        case SDL_KEYDOWN:
         case SDL_KEYUP:
-            if(user_config->m_keyboard_debug)
-            {
-                printf("keyboard: %d %d\n",ev.key.keysym.sym,ev.key.state);
-            }
-            input(IT_KEYBOARD, ev.key.keysym.sym, ev.key.keysym.unicode, 0, ev.key.state);
+            input(IT_KEYBOARD, ev.key.keysym.sym, ev.key.keysym.unicode, 0, 0);
+            break;
+
+        case SDL_KEYDOWN:
+            input(IT_KEYBOARD, ev.key.keysym.sym, ev.key.keysym.unicode, 0, 32768);
             break;
 
         case SDL_MOUSEMOTION:
@@ -194,36 +194,33 @@ void drv_loop()
 #endif
             break;
 
+        case SDL_MOUSEBUTTONUP:
+            input(IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
+            break;
+
         case SDL_MOUSEBUTTONDOWN:
-            input(IT_MOUSEBUTTON, ev.button.button, 0, 0, ev.button.state);
+            input(IT_MOUSEBUTTON, ev.button.button, 0, 0, 32768);
             break;
 
         case SDL_JOYAXISMOTION:
-            if(ev.jaxis.value <= -1000)
-            {
-#ifdef ALT_JOY_HANDLING
-                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
-#endif
-                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 1);
-            }
-            else if(ev.jaxis.value >= 1000)
-            {
-#ifdef ALT_JOY_HANDLING
+            if(ev.jaxis.value <= -DEADZONE_JOYSTICK)
+                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, -ev.jaxis.value);
+            else if(ev.jaxis.value <= 0)
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 0);
-#endif
-                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 1);
-            }
-            else
-            {
-                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_NEGATIVE, 0);
+            
+            if(ev.jaxis.value >= DEADZONE_JOYSTICK)
+                input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, ev.jaxis.value);
+            else if(ev.jaxis.value >= 0)
                 input(IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, AD_POSITIVE, 0);
-            }
-            break;
 
-        case SDL_JOYBUTTONDOWN:
+            break;
         case SDL_JOYBUTTONUP:
             input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0,
-                  ev.jbutton.state);
+                  0);
+            break;
+        case SDL_JOYBUTTONDOWN:
+            input(IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0,
+                  32768);
             break;
         }  // switch
     }   // while (SDL_PollEvent())

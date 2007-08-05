@@ -45,6 +45,7 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
         break;
 
     case IT_MOUSEBUTTON:
+      if (!value) // Act on button release only.
         switch (id0)
         {
             case SDL_BUTTON_LEFT:
@@ -69,7 +70,7 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
         break;
 
     case IT_STICKBUTTON:
-        if( value)
+        if( !value) // act on button release only
             switch (id1) // Button no
             {
             case 0:
@@ -97,7 +98,8 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
 //-----------------------------------------------------------------------------
 void BaseGUI::inputKeyboard(int key, int pressed)
 {
-    if (!pressed)
+    // Skip on keypress, act on keyrelease only.
+    if (pressed)
         return;
 
     switch ( key )

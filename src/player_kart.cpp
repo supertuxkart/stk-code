@@ -29,36 +29,25 @@
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
 
-void PlayerKart::action(KartActions action, int value, bool isKeyboard)
+void PlayerKart::action(KartActions action, int value)
 {
-    if(isKeyboard) m_action_keys_values[action]=value;
     switch (action)
     {
     case KC_LEFT:
-        // Special case: when releasing a key on the keyboard, take the
-        // current value of the opposite steering direction. If the opposite
-        // key is not pressed, this value is zero, otherwise it will 
-        // pick up the previous direction (e.g. consider: press right,
-        // press left, release left --> will steer right;  or:
-        // press left, press right, release left --> will steer right)
-        if(isKeyboard && value==0)
-        {
-            m_steer_val = m_action_keys_values[KC_RIGHT];
-        }
+        m_steer_val_l = -value;
+        if (value)
+          m_steer_val = -value;
         else
-        {
-            m_steer_val = -value;
-        }
+          m_steer_val = m_steer_val_r;
+
         break;
     case KC_RIGHT:
-        if(isKeyboard && value==0)
-        {
-            m_steer_val = -m_action_keys_values[KC_LEFT];
-        }
+        m_steer_val_r = value;
+        if (value)
+          m_steer_val = value;
         else
-        {
-            m_steer_val = value;
-        }
+          m_steer_val = m_steer_val_l;
+
         break;
     case KC_ACCEL:
         m_accel_val = value;
@@ -86,15 +75,23 @@ void PlayerKart::action(KartActions action, int value, bool isKeyboard)
 }
 
 //-----------------------------------------------------------------------------
-void PlayerKart::smoothSteer(float dt, bool left, bool right)
+void PlayerKart::steer(float dt, int steer_val)
 {
     const float STEER_CHANGE = dt/getTimeFullSteer();  // amount the steering is changed
-    if       (left)
+    if (steer_val < 0)
     {
+      // If we got analog values do not cumulate.
+      if (steer_val > -32767)
+        m_controls.lr = -steer_val/32767.0f;
+      else
         m_controls.lr += STEER_CHANGE;
     }
-    else if(right)
+    else if(steer_val > 0)
     {
+      // If we got analog values do not cumulate.
+      if (steer_val < 32767)
+        m_controls.lr = -steer_val/32767.0f;
+      else
         m_controls.lr -= STEER_CHANGE;
     }
     else
@@ -113,14 +110,14 @@ void PlayerKart::smoothSteer(float dt, bool left, bool right)
 
     m_controls.lr = std::min(1.0f, std::max(-1.0f, m_controls.lr));
 
-}   // smoothSteer
+}   // steer
 
 //-----------------------------------------------------------------------------
 void PlayerKart::update(float dt)
 {
-    smoothSteer(dt, m_steer_val == -1, m_steer_val == 1);
+    steer(dt, m_steer_val);
 
-    m_controls.accel = m_accel_val;
+    m_controls.accel = m_accel_val / 32768.0f;
 
     if(world->getPhase()==World::START_PHASE)
     {
@@ -182,6 +179,8 @@ void PlayerKart::collectedHerring(Herring* herring)
 //-----------------------------------------------------------------------------
 void PlayerKart::reset()
 {
+    m_steer_val_l = 0;
+    m_steer_val_r = 0;
     m_steer_val = 0;
     m_accel_val = 0;
     m_controls.accel = 0.0;
@@ -190,10 +189,6 @@ void PlayerKart::reset()
     m_controls.wheelie = false;
     m_controls.jump = false;
     m_penalty_time = 0;
-    for(int i=KC_LEFT; i<=KC_FIRE; i++)
-    {
-        m_action_keys_values[i]=false;
-    }
     Kart::reset();
 }
 //-----------------------------------------------------------------------------

@@ -103,8 +103,7 @@ private:
                                 float ratio_x,  float ratio_y  );
     void UpdateKeyboardMappings();
     void putEntry(PlayerKart *kart, KartActions ka);
-    bool handleInput(InputType type, int id0, int id1, int id2, int value,
-                     bool isKeyboard=false);
+    bool handleInput(InputType type, int id0, int id1, int id2, int value);
     void inputKeyboard(int key, int pressed);
     void drawPlayerIcons       ();
     void oldDrawPlayerIcons    ();
