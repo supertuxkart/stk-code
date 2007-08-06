@@ -858,7 +858,7 @@ void Kart::updatePhysics (float dt)
         else
         {
             m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
-            m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
+            m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
         }
 
     }
