@@ -85,7 +85,7 @@ protected:
     float m_chassis_angular_damping;
     float m_maximum_speed;
     float m_gravity_center_shift;
-
+    float m_suspension_rest;
 public:
     KartProperties   ();
     virtual      ~KartProperties   ();
@@ -138,7 +138,7 @@ public:
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }
     float getGravityCenterShift     () const {return m_gravity_center_shift;     }
-
+    float getSuspensionRest         () const {return m_suspension_rest;          }
 };
 
 #endif

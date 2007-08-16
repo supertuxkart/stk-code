@@ -228,7 +228,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // ----------
     float wheel_width  = m_kart_properties->getWheelWidth();
     float wheel_radius = m_kart_properties->getWheelRadius();
-    float suspension_rest = 0;
+    float suspension_rest = m_kart_properties->getSuspensionRest();
     float connection_height = -(0.5-CENTER_SHIFT)*m_kart_height;
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);

@@ -89,6 +89,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
     CHECK_NEG(m_max_road_distance,         "shortcut-road-distance"     );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
+    CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
 
 
     // Precompute some handy values to reduce work later
@@ -116,7 +117,8 @@ void STKConfig::init_defaults()
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
-    m_maximum_speed = m_brake_force = m_gravity_center_shift = -99.9f;
+    m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
+       -99.9f;
 
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
