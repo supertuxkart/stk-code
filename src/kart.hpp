@@ -87,6 +87,7 @@ protected:
     bool         m_skid_front;         // true if front tires are skidding
     bool         m_skid_rear;          // true if rear tires are skidding
     float        m_max_speed;          // maximum speed of the kart, computed from
+    float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle ;
     float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
@@ -255,6 +256,7 @@ public:
     virtual void   doCollisionAnalysis(float dt, float hot    );
     virtual void   doObjectInteractions();
     virtual void   OutsideTrack     (int isReset) {m_rescue=true;}
+    virtual void   getsProjectile   ();
 };
 
 class TrafficDriver : public Kart

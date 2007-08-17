@@ -143,10 +143,11 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
 #ifdef BULLET
-    m_max_speed            = m_kart_properties->getMaximumSpeed();
-    m_speed                = 0.0f;
+    m_max_speed               = m_kart_properties->getMaximumSpeed();
+    m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
+    m_speed                   = 0.0f;
 #else
-    m_max_speed            = sqrt(getMaxPower()/getAirResistance());
+    m_max_speed               = sqrt(getMaxPower()/getAirResistance());
 #endif
 
     m_wheel_position = 0;
@@ -493,6 +494,9 @@ void Kart::doObjectInteractions ()
         sgVec3 xyz ;
         Kart *other_kart = world->getKart(i);
         sgSubVec3(xyz, getCoord()->xyz, other_kart->getCoord()->xyz );
+        //FIXME
+        // the dist calculation is very very basic, and 1.1f is far too low
+        // must be from 2.4f to 3.0f
         float dist = sgLengthSquaredVec3(xyz);
         if ( dist < 1.1f )
         {
@@ -564,13 +568,36 @@ void Kart::doZipperProcessing (float delta)
 }   // doZipperProcessing
 
 //-----------------------------------------------------------------------------
+void Kart::getsProjectile ()
+{
+#ifdef BULLET
+    btVector3 velocity         = m_kart_body->getLinearVelocity();
+
+    velocity.setX( 0.0f );
+    velocity.setY( 0.0f );
+    velocity.setZ( 3.5f );
+
+    getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+#else
+    forceCrash();
+#endif
+}
+
+//-----------------------------------------------------------------------------
 void Kart::forceCrash ()
 {
-
     m_wheelie_angle = CRASH_PITCH ;
+#ifdef BULLET
+    btVector3 velocity         = m_kart_body->getLinearVelocity();
 
+    velocity.setY( 0.0f );
+    velocity.setX( 0.0f );
+
+    getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+#else
     m_velocity.xyz[0] = m_velocity.xyz[1] = m_velocity.xyz[2] =
     m_velocity.hpr[0] = m_velocity.hpr[1] = m_velocity.hpr[2] = 0.0f ;
+#endif
 }  // forceCrash
 
 //-----------------------------------------------------------------------------
@@ -846,35 +873,39 @@ void Kart::updatePhysics (float dt)
     float engine_power = getMaxPower() + handleWheelie(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2;
 
-    if(m_controls.brake)
-    {
-        //only apply braking force when moving forward
-        if(m_speed > 0.f)
-        {
-            m_vehicle->setBrake(getBrakeForce(), 2);
-            m_vehicle->setBrake(getBrakeForce(), 3);
-        }
-        //should probably not allow the kart to reverse at same velocity as forward
-        else
-        {
-            m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
-            m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
-        }
-
+    if(m_controls.accel)
+    {   // accelerating
+        m_vehicle->applyEngineForce(engine_power, 2);
+        m_vehicle->applyEngineForce(engine_power, 3);
     }
     else
-    {   // not braking
-        if(m_speed < 0.0f)   // if going backwards, accelerating is braking
-        {
-            m_vehicle->setBrake(getBrakeForce(), 2);
-            m_vehicle->setBrake(getBrakeForce(), 3);
+    {   // not accelerating
+        if(m_controls.brake)
+        {   // braking or moving backwards
+            if(m_speed > 0.f)
+            {   // going forward, apply brake force
+                m_vehicle->applyEngineForce(-1.0f*getBrakeFactor()*engine_power, 2);
+                m_vehicle->applyEngineForce(-1.0f*getBrakeFactor()*engine_power, 3);
+            }
+            else
+            {   // going backward, apply reverse gear ratio
+                if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
+                {
+                    m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
+                    m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
+                }
+                else
+                {
+                    m_vehicle->applyEngineForce(0.f, 2);
+                    m_vehicle->applyEngineForce(0.f, 3);
+                }
+            }
         }
         else
-        {
-            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 2);
-            m_vehicle->applyEngineForce(m_controls.accel*engine_power, 3);
+        {   // lift the foot from throttle, brakes with 10% engine_power
+            m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
+            m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
         }
-
     }
     if(m_controls.jump)
     { // ignore gravity down when jumping
@@ -886,6 +917,16 @@ void Kart::updatePhysics (float dt)
 
     //store current velocity
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+
+    // calculate direction of m_speed
+    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
+    btVector3 forwardW (
+               chassisTrans.getBasis()[0][1],
+               chassisTrans.getBasis()[1][1],
+               chassisTrans.getBasis()[2][1]);
+
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
+        m_speed *= -1.f;
 
     //cap at maximum velocity
     const float max_speed = m_kart_properties->getMaximumSpeed();
@@ -902,20 +943,8 @@ void Kart::updatePhysics (float dt)
 
     }
     //at low velocity, forces on kart push it back and forth so we ignore this
-    if(m_speed > 0.13f) {
-        const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
-
-        btVector3 forwardW (
-            chassisTrans.getBasis()[0][1],
-            chassisTrans.getBasis()[1][1],
-            chassisTrans.getBasis()[2][1]);
-
-        if ( forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < 0.f )
-            m_speed *= -1.f;
-     }
-     else
+    if(fabsf(m_speed) < 0.13f)
          m_speed = 0;
-
     
 #else      // ! BULLET
     m_skid_front = m_skid_rear = false;

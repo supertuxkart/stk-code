@@ -84,6 +84,7 @@ protected:
     float m_chassis_linear_damping;
     float m_chassis_angular_damping;
     float m_maximum_speed;
+    float m_max_speed_reverse_ratio;
     float m_gravity_center_shift;
     float m_suspension_rest;
 public:
@@ -116,6 +117,7 @@ public:
     float         getCornerStiffF        () const {return m_corn_f;                 }
     float         getCornerStiffR        () const {return m_corn_r;                 }
     float         getInertia             () const {return m_inertia;                }
+    float         getMaxSpeedReverseRatio() const {return m_max_speed_reverse_ratio;}
     float         getWheelieMaxSpeedRatio() const {return m_wheelie_max_speed_ratio;}
     float         getWheelieMaxPitch     () const {return m_wheelie_max_pitch;      }
     float         getWheeliePitchRate    () const {return m_wheelie_pitch_rate;     }
