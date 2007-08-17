@@ -74,20 +74,19 @@ void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
   _("Usage: %s [OPTIONS]\n\n"
-
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
-
     "Options:\n"
     "  -N,  --no-start-screen  Quick race\n"
-    //FIXME
-    //"  -t,  --track NAME       Start at track NAME (see --list-tracks)\n"
+    "  -t,  --track NAME       Start at track NAME (see --list-tracks)\n"
+    "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.data\n"
     "  -l,  --list-tracks      Show available tracks\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
-    "       --kart NAME        Use kart number NAME\n"
+    "       --kart NAME        Use kart number NAME (see --list-karts)\n"
     "       --list-karts       Show available karts\n"
     "       --laps N           Define number of laps to N\n"
-    //FIXME     "  --players n             Define number of players to between 1 and 4.\n"
+    "       --mode N           N=1 novice, N=2 driver, N=3 racer\n"
+    "  --players n             Define number of players to between 1 and 4.\n"
     //FIXME     "  --reverse               Enable reverse mode\n"
     //FIXME     "  --mirror                Enable mirror mode (when supported)\n"
     "       --herring STYLE    Use STYLE as your herring style\n"
@@ -142,11 +141,31 @@ int handleCmdLine(int argc, char **argv)
         {
             race_manager->setPlayerKart(0, argv[i+1]);
         }
+        else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
+        {
+            switch (atoi(argv[i+1]))
+            {
+            case 1:
+                race_manager->setDifficulty(RD_EASY);
+                break;
+            case 2:
+                race_manager->setDifficulty(RD_MEDIUM);
+                break;
+            case 3:
+                race_manager->setDifficulty(RD_HARD);
+                break;
+            }
+        }
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
         {
             race_manager->setTrack(argv[i+1]);
             fprintf ( stdout, _("You choose to start in track: %s.\n"), argv[i+1] ) ;
+        }
+        else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
+        {
+            stk_config->load(std::string("data")+DIR_SEPARATOR+argv[i+1]);
+            fprintf ( stdout, _("STK config will be read from %s.\n"), argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
@@ -171,6 +190,8 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--list-karts") )
         {
+            // --list-karts seems to need a drv_init() ???
+            drv_init();
             kart_properties_manager->loadKartData () ;
 
             fprintf ( stdout, _("  Available karts:\n") );
@@ -300,8 +321,6 @@ void InitTuxkart()
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
     stk_config              = new STKConfig            ();
-    const std::string STK_CONFIG = std::string("data")+DIR_SEPARATOR+ "stk_config.data";
-    stk_config->load(STK_CONFIG);
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     collectable_manager     = new CollectableManager   ();
@@ -311,6 +330,14 @@ void InitTuxkart()
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     track_manager   ->loadTrackList () ;
+
+    // default settings for Quickstart
+    race_manager->setNumPlayers(1);
+    race_manager->setNumKarts  (4);
+    race_manager->setNumLaps   (3);
+    race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
+    race_manager->setDifficulty(RD_MEDIUM);
+    stk_config->load(std::string("data")+DIR_SEPARATOR+ "stk_config.data");
 }
 
 //=============================================================================
@@ -367,15 +394,16 @@ int main(int argc, char *argv[] )
             {
                 // Quickstart (-N)
                 // ===============
-                race_manager->setNumPlayers(1);
-                race_manager->setNumKarts  (4);
-                race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-                race_manager->setDifficulty(RD_MEDIUM);
-                race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
-                race_manager->setNumLaps   (3);
+                // all defaults are set in InitTuxkart()
+                //race_manager->setNumPlayers(1);
+                //race_manager->setNumKarts  (4);
+                //race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
+                //race_manager->setDifficulty(RD_MEDIUM);
+                //race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
+                //race_manager->setNumLaps   (3);
                 //race_manager->setTrack     ("tuxtrack");
                 //race_manager->setTrack     ("sandtrack");
-                race_manager->setTrack     ("race");
+                //race_manager->setTrack     ("race");
                 race_manager->start();
             }
         }
