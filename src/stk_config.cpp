@@ -81,6 +81,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
     CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
+    CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
     CHECK_NEG(m_gravity_center_shift,      "gravity-center-shift"       );
     CHECK_NEG(m_parachute_time,            "parachute-time"             );
     CHECK_NEG(m_parachute_time_other,      "parachute-time-other"       );
@@ -118,7 +119,7 @@ void STKConfig::init_defaults()
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
-       -99.9f;
+    m_max_speed_reverse_ratio = -99.9f;
 
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
