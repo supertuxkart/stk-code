@@ -72,6 +72,7 @@
    (chassis-linear-damping    0.2  )
    (chassis-angular-damping   0.2  )
    (maximum-speed            22.22 ) ;; = 80 km/h
+   (max-speed-reverse-ratio   0.2  ) ;; percentage of max speed for reverse gear
    (gravity-center-shift      0.4  ) ;; Shift center of gravity down by that many
                                      ;; units of kart_height (usually between 0 and 0.5)
    (suspension-rest           0.1  )
