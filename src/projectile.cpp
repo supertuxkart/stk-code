@@ -81,7 +81,11 @@ void Projectile::doObjectInteractions ()
             if ( D < 2.0f )
             {
                 explode();
+#ifdef BULLET
+                kart -> getsProjectile () ;
+#else
                 kart -> forceCrash () ;
+#endif
                 return;
             }
             else if ( D < ndist )
@@ -105,7 +109,26 @@ void Projectile::doObjectInteractions ()
         sgCoord *k = kart->getCoord() ;
 
         sgSubVec3 ( delta, k->xyz, m_curr_pos.xyz ) ;
+#ifdef BULLET
 
+        sgHPRfromVec3 ( hpr, delta ) ;
+
+        m_curr_pos.hpr[1] = -hpr[1];
+
+        sgSubVec3 ( hpr, m_curr_pos.hpr ) ;
+
+        if ( hpr[0] >  180.0f ) hpr[0] -= 360.0f ;
+        if ( hpr[0] < -180.0f ) hpr[0] += 360.0f ;
+
+        if ( hpr[0] > 80.0f || hpr[0] < -80.0f )
+            m_velocity.hpr[0] = 0.0f ;
+        else
+        {
+            if      ( hpr[0] >  3.0f ) m_velocity.hpr[0] =  HOMING_MISSILE_TURN_RATE ;
+            else if ( hpr[0] < -3.0f ) m_velocity.hpr[0] = -HOMING_MISSILE_TURN_RATE ;
+            else                       m_velocity.hpr[0] =  0.0f ;
+        }
+#else
         delta[2] = 0.0f ;
 
         sgHPRfromVec3 ( hpr, delta ) ;
@@ -129,6 +152,7 @@ void Projectile::doObjectInteractions ()
             else if ( hpr[2] < -1.0f ) m_velocity.hpr[1] = HOMING_MISSILE_PITCH_RATE ;
             else                       m_velocity.hpr[1] = 0.0f ;
         }
+#endif
     }
     else  // m_type!=HOMING||nearest==-1||ndist>MAX_HOME_DIST_SQD
         m_velocity.hpr[0] = m_velocity.hpr[1] = 0.0f ;
