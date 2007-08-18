@@ -567,6 +567,30 @@ void Kart::doZipperProcessing (float delta)
     else m_zipper_time_left = 0.0f ;
 }   // doZipperProcessing
 
+#ifdef BULLET
+//-----------------------------------------------------------------------------
+float Kart::getActualWheelForce()
+{
+    if ( m_speed <= m_max_speed*0.25f )
+    {
+        return( getMaxPower() * 2.5f ); // gear 1
+    }
+    else if ( m_speed > m_max_speed*0.25f && m_speed <= m_max_speed*0.5f )
+    {
+        return( getMaxPower() * 1.8f ); // gear 2
+    }
+    else if ( m_speed > m_max_speed*0.5f && m_speed <= m_max_speed*0.75f )
+    {
+        return( getMaxPower() * 1.4f ); // gear 3
+    }
+    else if ( m_speed > m_max_speed*0.75f  )
+    {
+        return( getMaxPower() ); // gear 4
+    }
+    return(0.0f);
+}
+#endif
+
 //-----------------------------------------------------------------------------
 void Kart::getsProjectile ()
 {
@@ -870,7 +894,7 @@ void Kart::updatePhysics (float dt)
 {
 
 #ifdef BULLET
-    float engine_power = getMaxPower() + handleWheelie(dt);
+    float engine_power = getActualWheelForce() + handleWheelie(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2;
 
     if(m_controls.accel)
@@ -943,7 +967,7 @@ void Kart::updatePhysics (float dt)
 
     }
     //at low velocity, forces on kart push it back and forth so we ignore this
-    if(fabsf(m_speed) < 0.13f)
+    if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
     
 #else      // ! BULLET

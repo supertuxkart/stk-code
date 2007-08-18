@@ -240,6 +240,7 @@ public:
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
     float             getSpeed      () const {return m_speed;                 }
     float             handleWheelie(float dt);
+    float             getActualWheelForce();
 #endif
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
