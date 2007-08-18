@@ -145,13 +145,14 @@ void Attachment::update(float dt, sgCoord *velocity)
     // Detach attachment if its time is up.
     if ( m_time_left <= 0.0f)
     {
-        clear();
         if(m_type==ATTACH_ANVIL) 
         {
             // Resets the weight, and multiplies the velocity by 1.0, 
             // i.e. no change of velocity.
+            m_kart->getAttachment()->clear();
             m_kart->adjustSpeedWeight(1.0f);
         }
+        clear();
     }   // if m_time_left<0
 }   // update
 //-----------------------------------------------------------------------------
