@@ -277,6 +277,9 @@ void DefaultRobot::handle_steering()
 #endif
 
     }
+    // avoid steer vibrations
+    if (fabsf(steer_angle) < 2.0f)
+        steer_angle = 0.f;
 
     m_controls.lr = angle_to_control( steer_angle );
 }
