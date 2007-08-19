@@ -28,6 +28,7 @@
 #include "kart_properties.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
+#include "ssg_help.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -83,6 +84,10 @@ void KartProperties::load(const std::string filename, const std::string node)
     {
         m_model = loader->load(m_model_file, CB_KART, false);
         ssgStripify(m_model);
+        float x_min, x_max, y_min, y_max, z_min, z_max;
+        MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+        m_kart_width = x_max-x_min;
+        m_kart_length = y_max-y_min;
         m_model->ref();
     }  // if
 
@@ -170,6 +175,8 @@ void KartProperties::init_defaults()
 
     m_color[0] = 1.0f; m_color[1] = 0.0f; m_color[2] = 0.0f;
 
+    m_kart_width                = 1.0f;
+    m_kart_length               = 1.5f;
     m_wheel_base                = stk_config->m_wheel_base;
     m_height_cog                = stk_config->m_height_cog;
     m_engine_power              = stk_config->m_engine_power;

@@ -45,6 +45,7 @@ DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
                            int position, sgCoord init_pos ) :
     AutoKart( kart_properties, position, init_pos )
 {
+    m_kart_properties      = kart_properties;
     m_time_since_last_shot = 0.0f;
     m_start_kart_crash_direction = 0;
     reset();
@@ -293,9 +294,6 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
         return;
     }
 
-    //FIXME: find real kart length
-    const float KART_LENGTH = 1.5f;
-
     m_time_since_last_shot += DELTA;
     if( m_collectable.getType() != COLLECT_NOTHING )
     {
@@ -332,7 +330,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 {
                     if( sgDistanceVec2( m_curr_pos.xyz,
                         world->getKart(m_crashes.m_kart)->getCoord()->xyz ) >
-                        KART_LENGTH * 2.5f )
+                        m_kart_properties->getKartLength() * 2.5f )
                     {
                         m_controls.fire = true;
                         m_time_since_last_shot = 0.0f;
@@ -405,10 +403,6 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     if( m_crashes.m_road ) return false;
     if( m_crashes.m_kart != -1 ) return false;
 
-    //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
-    //these values for now, it won't work optimally on big or small karts.
-    const float KART_LENGTH = 1.5f;
-
     sgVec2 vel_normal, step_coord, step_track_coord;
     float distance;
 
@@ -425,12 +419,12 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
        is less accurate than calling findRoadSector(), but a lot faster.
      */
     const int WHEELIE_STEPS = int(( m_velocity.xyz[1] * CHECK_DIST )/
-        KART_LENGTH );
+        m_kart_properties->getKartLength() );
 
     for( int i = WHEELIE_STEPS; i > STEPS - 1; --i )
     {
         sgAddScaledVec2( step_coord, m_curr_pos.xyz, vel_normal,
-            KART_LENGTH * i );
+            m_kart_properties->getKartLength() * i );
 
         world->m_track->spatialToTrack( step_track_coord, step_coord,
             m_future_sector );
@@ -528,10 +522,6 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
 
-    //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
-    //these values for now, it won't work optimally on big or small karts.
-    const float KART_LENGTH = 1.5f;
-
     sgVec2 vel_normal, step_coord;
     SGfloat kart_distance;
 
@@ -548,7 +538,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
     for(int i = 1; STEPS > i; ++i)
     {
-        sgAddScaledVec2( step_coord, pos, vel_normal, KART_LENGTH * i );
+        sgAddScaledVec2( step_coord, pos, vel_normal, m_kart_properties->getKartLength() * i );
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet
@@ -562,7 +552,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
                 kart_distance = sgDistanceVec2( step_coord,
                     world->getKart(j)->getCoord()->xyz );
 
-                if( kart_distance < KART_LENGTH + 0.125f * i )
+                if( kart_distance < m_kart_properties->getKartLength() + 0.125f * i )
                     if( m_velocity.xyz[1] > world->getKart(j)->
                        getVelocity()->xyz[1] * 0.75f ) m_crashes.m_kart = j;
             }
@@ -588,7 +578,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
         center[1] = step_coord[1];
         center[2] = pos[2];
         sphere->setCenter( center );
-        sphere->setSize( KART_LENGTH );
+        sphere->setSize( m_kart_properties->getKartLength() );
         if( m_sector == Track::UNKNOWN_SECTOR )
         {
             sgVec4 colour;
@@ -632,10 +622,6 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
  */
 void DefaultRobot::find_non_crashing_point( sgVec2 result )
 {
-    //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
-    //these values for now, it won't work correctly on big or small karts.
-    const float KART_LENGTH = 1.5f;
-
     const unsigned int DRIVELINE_SIZE = world->m_track->m_driveline.size();
 
     unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
@@ -657,7 +643,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         sgSubVec2( direction, world->m_track->m_driveline[target_sector],
             m_curr_pos.xyz );
 
-        steps = int( sgLengthVec2( direction ) / KART_LENGTH );
+        steps = int( sgLengthVec2( direction ) / m_kart_properties->getKartLength() );
         if( steps < 1 ) steps = 1;
 
         sgVec2 step_coord;
@@ -672,7 +658,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         for( int i = 2; i < steps; ++i )
         {
             sgAddScaledVec2( step_coord, m_curr_pos.xyz, direction,
-                KART_LENGTH * i );
+                m_kart_properties->getKartLength() * i );
 
             world->m_track->spatialToTrack( step_track_coord, step_coord,
                 sector );
@@ -681,7 +667,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
                        : -step_track_coord[0];
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + KART_LENGTH * 0.5f > world->
+            if ( distance + m_kart_properties->getKartLength() * 0.5f > world->
                 m_track->getWidth()[sector] )
             {
                 sgCopyVec2( result, world->m_track->m_driveline[sector] );
@@ -753,10 +739,7 @@ inline float DefaultRobot::normalize_angle( float angle )
  */
 int DefaultRobot::calc_steps()
 {
-    //FIXME:The tuxkart is about 1.5f long and 1.0f wide, so I'm using
-    //these values for now, it won't work correctly on big or small karts.
-    const float KART_LENGTH = 1.5f;
-    int steps = int( m_velocity.xyz[1] / KART_LENGTH );
+    int steps = int( m_velocity.xyz[1] / m_kart_properties->getKartLength() );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -764,7 +747,7 @@ int DefaultRobot::calc_steps()
     if( fabsf(m_controls.lr) > 0.95 )
     {
         const int WIDTH_STEPS = (int)( world->m_track->getWidth(
-            )[m_future_sector] / ( KART_LENGTH * 2.0 ));
+            )[m_future_sector] / ( m_kart_properties->getKartLength() * 2.0 ));
 
         steps += WIDTH_STEPS;
     }

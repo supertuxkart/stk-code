@@ -22,6 +22,7 @@
 #define HEADER_AUTOKART_H
 
 #include "kart.hpp"
+#include "kart_properties.hpp"
 
 class AutoKart : public Kart
 {

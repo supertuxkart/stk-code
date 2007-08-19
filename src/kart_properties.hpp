@@ -49,6 +49,8 @@ protected:
 
     /* Physic properties */
     /* ----------------- */
+    float m_kart_width;               // width of kart
+    float m_kart_length;              // length of kart
     float m_mass;                     // weight of kart
     float m_air_resistance;           // air resistance
     float m_roll_resistance;          // rolling resistance etc
@@ -127,6 +129,8 @@ public:
     float         getWheelieBalanceRecovery()const{return m_wheelie_balance_recovery;}
     float         getWheelieStep         () const {return m_wheelie_step;           }
     float         getWheeliePowerBoost   () const {return m_wheelie_power_boost;    }
+    float         getKartLength          () const {return m_kart_length;            }
+    float         getKartWidth           () const {return m_kart_width;             }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }
