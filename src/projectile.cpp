@@ -42,7 +42,28 @@ void Projectile::init(Kart *kart, int collectable_)
     m_speed              = collectable_manager->getSpeed(m_type);
     ssgTransform *m    = getModel();
     m->addKid(collectable_manager->getModel(m_type));
-    setCoord(kart->getCoord());
+
+    sgCoord c;
+    sgCopyCoord(&c, kart->getCoord());
+    const float angle_terrain = c.hpr[0]*M_PI/180.0f;
+    // The projectile should have the pitch of the terrain on which the kart
+    // is - while this is not really realistic, it plays much better this way
+    const sgVec4* normal      = kart->getNormalHOT();
+    if(normal) 
+    {
+        const float X = -sin(angle_terrain);
+        const float Y =  cos(angle_terrain);
+        // Compute the angle between the normal of the plane and the line to
+        // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
+        // simplifying the computation of the scalar product.
+        float pitch = ( (*normal)[0]*X + (*normal)[1]*Y );  // use ( x,y,0)
+        
+        // The actual angle computed above is between the normal and the (x,y,0)
+        // line, so to compute the actual angles 90 degrees must be subtracted.
+        c.hpr[1] = acosf(pitch)/M_PI*180.0f-90.0f;
+    }
+
+    setCoord(&c);
     scene->add(m);
 }   // init
 
@@ -80,12 +101,7 @@ void Projectile::doObjectInteractions ()
 
             if ( D < 2.0f )
             {
-                explode();
-#ifdef BULLET
-                kart -> getsProjectile () ;
-#else
-                kart -> forceCrash () ;
-#endif
+                explode(kart);
                 return;
             }
             else if ( D < ndist )
@@ -176,13 +192,13 @@ void Projectile::doCollisionAnalysis  ( float dt, float hot )
         }
         else if ( m_type != COLLECT_NOTHING )
         {
-            explode();
+            explode(NULL);  // no kart was hit directly
         }
     }   // if m_collided||m_crashed
 }   // doCollisionAnalysis
 
 //-----------------------------------------------------------------------------
-void Projectile::explode()
+void Projectile::explode(Kart *kart_hit)
 {
     m_has_hit_something=true;
     m_curr_pos.xyz[2] += 1.2f ;
@@ -196,6 +212,14 @@ void Projectile::explode()
     ssgTransform *m = getModel();
     m->removeAllKids();
     scene->remove(m);
+
+    for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
+    {
+        Kart *kart = world -> getKart(i);
+        // handle the actual explosion. Set a flag it if was a direct hit.
+        kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
+    }
+
 }   // explode
 
 /* EOF */

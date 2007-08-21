@@ -168,7 +168,7 @@ void RaceGUI::inputKeyboard(int key, int pressed)
     static int isWireframe = false ;
     switch ( key )
     {
-    case 0x12: // TODO: Which key is that?
+    case SDLK_F7:
         if(world->m_race_setup.getNumPlayers()==1)
         {   // ctrl-r
             Kart* kart = world->getPlayerKart(0);

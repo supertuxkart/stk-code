@@ -42,6 +42,7 @@ public:
     float m_max_road_distance;       // max distance from road to be still ON road
     float m_shortcut_segments;       // skipping more than this number of segments is
                                      // considered to be a shortcut
+    float m_explosion_impulse;       // impulse affecting each non-hit kart
 
     STKConfig() : KartProperties() {};
     void init_defaults    ();

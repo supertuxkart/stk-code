@@ -21,6 +21,7 @@
 #define HEADER_KARTPROPERTIES_H
 
 #include <string>
+#include <vector>
 #include "lisp/lisp.hpp"
 #include "no_copy.hpp"
 
@@ -89,6 +90,15 @@ protected:
     float m_max_speed_reverse_ratio;
     float m_gravity_center_shift;
     float m_suspension_rest;
+    // The following two vectors define at what ratio of the maximum speed what
+    // gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
+    //                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
+    // The next vector contains the increase in max power (to simulate different
+    // gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
+    std::vector<float> m_gear_switch_ratio;
+    std::vector<float> m_gear_power_increase;
+
+
 public:
     KartProperties   ();
     virtual      ~KartProperties   ();
@@ -145,6 +155,10 @@ public:
     float getMaximumSpeed           () const {return m_maximum_speed;            }
     float getGravityCenterShift     () const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
+    const std::vector<float>& 
+          getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
+    const std::vector<float>& 
+          getGearPowerIncrease      () const {return m_gear_power_increase;      }
 };
 
 #endif

@@ -244,6 +244,7 @@ public:
 #endif
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
+    void           handleExplosion  (const sgVec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
     // addMessages gets called by world to add messages to the gui
@@ -257,7 +258,6 @@ public:
     virtual void   doCollisionAnalysis(float dt, float hot    );
     virtual void   doObjectInteractions();
     virtual void   OutsideTrack     (int isReset) {m_rescue=true;}
-    virtual void   getsProjectile   ();
 };
 
 class TrafficDriver : public Kart

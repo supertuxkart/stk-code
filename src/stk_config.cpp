@@ -34,7 +34,25 @@ void STKConfig::load(const std::string filename)
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
-
+#ifdef BULLET
+    if(m_gear_switch_ratio.size()==0)
+    {
+        fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
+                filename.c_str());
+        exit(-1);
+    }
+    if(m_gear_power_increase.size()==0)
+    {
+        fprintf(stderr,"Missing default value for 'gear-power-increase' in '%s'.\n",
+                filename.c_str());
+        exit(-1);
+    }
+    if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
+        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase");
+        fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
+        exit(-1);
+    }
+#endif
     CHECK_NEG(m_corn_r,                  "m_corn_r"                     );
     CHECK_NEG(m_corn_f,                  "m_corn_f"                     );
 
@@ -91,7 +109,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_max_road_distance,         "shortcut-road-distance"     );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
-
+    CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
 
     // Precompute some handy values to reduce work later
     m_magnet_range_sq    = m_magnet_range_sq   * m_magnet_range_sq;
@@ -119,7 +137,7 @@ void STKConfig::init_defaults()
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
-    m_max_speed_reverse_ratio = -99.9f;
+    m_max_speed_reverse_ratio = m_explosion_impulse = -99.9f;
 
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
@@ -146,6 +164,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("bomb-time",                    m_bomb_time           );
     lisp->get("bomb-time-increase",           m_bomb_time_increase  );
     lisp->get("anvil-time",                   m_anvil_time          );
+    lisp->get("explosion-impulse",            m_explosion_impulse   );
 
     // Get the default KartProperties
     // ------------------------------

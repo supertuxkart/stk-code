@@ -41,14 +41,14 @@ public:
     void update              (float);
     void doCollisionAnalysis (float dt, float hot);
     void doObjectInteractions();
-    void explode             ();
+    void explode             (Kart* kart);
     bool hasHit              ()            {return m_has_hit_something;}
     void reset               ()
     {
         Moveable::reset();
         sgCopyCoord(&m_last_pos,&m_reset_pos );
     }
-    void OutsideTrack        (int isReset) {explode();}
+    void OutsideTrack        (int isReset) {explode(NULL);}
 
 } ;
 

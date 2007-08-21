@@ -571,41 +571,53 @@ void Kart::doZipperProcessing (float delta)
 //-----------------------------------------------------------------------------
 float Kart::getActualWheelForce()
 {
-    if ( m_speed <= m_max_speed*0.25f )
+    const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
+    for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
-        return( getMaxPower() * 2.5f ); // gear 1
+        if(m_speed <= m_max_speed*gear_ratio[i]) 
+            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i];
     }
-    else if ( m_speed > m_max_speed*0.25f && m_speed <= m_max_speed*0.5f )
-    {
-        return( getMaxPower() * 1.8f ); // gear 2
-    }
-    else if ( m_speed > m_max_speed*0.5f && m_speed <= m_max_speed*0.75f )
-    {
-        return( getMaxPower() * 1.4f ); // gear 3
-    }
-    else if ( m_speed > m_max_speed*0.75f  )
-    {
-        return( getMaxPower() ); // gear 4
-    }
-    return(0.0f);
-}
+    return getMaxPower();
+
+}   // getActualWheelForce
 #endif
 
 //-----------------------------------------------------------------------------
-void Kart::getsProjectile ()
+void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 {
 #ifdef BULLET
-    btVector3 velocity         = m_kart_body->getLinearVelocity();
+    if(direct_hit) {
+        btVector3 velocity = m_kart_body->getLinearVelocity();
 
-    velocity.setX( 0.0f );
-    velocity.setY( 0.0f );
-    velocity.setZ( 3.5f );
+        velocity.setX( 0.0f );
+        velocity.setY( 0.0f );
+        velocity.setZ( 3.5f );
 
-    getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+    }
+    else   // only affected by a distant explosion
+    {
+        sgVec3 diff;
+        sgSubVec3(diff, getCoord()->xyz, pos);
+        float len2=sgLengthSquaredVec3(diff);
+
+        // The correct forumale would be to first normalise diff,
+        // then apply the impulse (which decreases 1/r^2 depending
+        // on the distance r), so:
+        // diff/len(diff) * impulseSize/len(diff)^2
+        // = diff*impulseSize/len(diff)^3
+        // We use diff*impulseSize/len(diff)^2 here, this makes the impulse
+        // somewhat larger, which is actually more fun :)
+        sgScaleVec3(diff,stk_config->m_explosion_impulse/len2);
+        btVector3 impulse(diff[0],diff[1], diff[2]);
+        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
+    }
+
 #else
-    forceCrash();
+    // only the kart hit directly is affected.
+    if(direct_hit) forceCrash();
 #endif
-}
+}   // handleExplosion
 
 //-----------------------------------------------------------------------------
 void Kart::forceCrash ()

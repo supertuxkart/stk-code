@@ -21,6 +21,8 @@
                                     ;; we have to use at least 21(!!)
  (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
                                     ;; is considered to be a shortcut
+ (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
+
  ;; Other kart relates values
  ;; -------------------------
  (jump-impulse             5400.0 ) ;; percentage of gravity!
@@ -76,6 +78,13 @@
    (gravity-center-shift      0.4  ) ;; Shift center of gravity down by that many
                                      ;; units of kart_height (usually between 0 and 0.5)
    (suspension-rest           0.1  )
+   ;; The following two vectors define at what ratio of the maximum speed what
+   ;; gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
+   ;;                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
+   ;; The next vector contains the increase in max power (to simulate different
+   ;; gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
+   (gear-switch-ratio         0.25  0.5  0.75)
+   (gear-power-increase       2.5   1.8  1.4 )
 
   )   ;; end kart-defaults
 )

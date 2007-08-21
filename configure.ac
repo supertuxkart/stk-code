@@ -138,7 +138,7 @@ case "${host}" in
 #             include <AL/alut.h>
 #             define MIN_ALUT_VERSION 1
               int main()  {
-                if(alutGetMajorVersion()<MIN_ALUT_VERSION) return -1;
+/*            if(alutGetMajorVersion()<MIN_ALUT_VERSION) return -1;*/
                 return 0; }
 
               ],
