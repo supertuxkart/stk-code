@@ -125,6 +125,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
     const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
     int triangle;
     int next;
+
     for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
         next = i + 1 <  DRIVELINE_SIZE ? i + 1 : 0;
@@ -132,7 +133,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
                                 m_right_driveline[next], m_left_driveline[next], 
                                 XYZ );
 
-        if (triangle != QUAD_TRI_NONE)
+        if (triangle != QUAD_TRI_NONE && ((XYZ[2]-m_left_driveline[i][2]) < 1.0f))
         {
             possible_segment_tris.push_back(SegmentTriangle(i, triangle));
         }
