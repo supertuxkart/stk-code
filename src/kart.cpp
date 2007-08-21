@@ -1243,7 +1243,7 @@ void Kart::endRescue()
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
                             m_curr_pos.xyz[2]+0.5*m_kart_height));
     m_kart_body->setCenterOfMassTransform(pos);
-    //m_motion_state->setWorldTransform(pos);
+    m_motion_state->setWorldTransform(pos);
                   
 #endif
 
