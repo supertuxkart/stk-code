@@ -288,9 +288,10 @@ void DefaultRobot::handle_steering()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_items( const float DELTA, const int STEPS )
 {
+    m_controls.fire = false;
+
     if( m_rescue )
     {
-        m_controls.fire = false;
         return;
     }
 
@@ -305,7 +306,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 m_controls.fire = true;
                 m_time_since_last_shot = 0.0f;
             }
-            return;
+            break;
         case IT_CALCULATE:
             switch( m_collectable.getType() )
             {
@@ -322,7 +323,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                         m_time_since_last_shot = 0.0f;
                     }
                 }
-                return;
+                break;
 
             case COLLECT_MISSILE:
             case COLLECT_HOMING_MISSILE:
@@ -336,7 +337,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                         m_time_since_last_shot = 0.0f;
                     }
                 }
-                return;
+                break;
 
             case COLLECT_SPARK:
                 if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
@@ -344,7 +345,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                     m_controls.fire = true;
                     m_time_since_last_shot = 0.0f;
                 }
-                return;
+                break;
                 /*TODO: teach AI to use the magnet*/
             default:
                 m_controls.fire = true;
@@ -355,8 +356,11 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
         }
     }
 
-
-    m_controls.fire = false;
+    if( m_controls.fire )
+    {
+        m_collectable.use() ;
+    }
+    return;
 }
 
 //-----------------------------------------------------------------------------
