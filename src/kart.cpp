@@ -132,6 +132,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
     m_current_friction     = 1.0f;
+    m_time_since_stuck     = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -671,6 +672,19 @@ void Kart::doCollisionAnalysis ( float delta, float hot )
 //-----------------------------------------------------------------------------
 void Kart::update (float dt)
 {
+#ifdef BULLET
+    // check if kart is stuck
+    if(!isPlayerKart() && getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f
+            && !m_rescue && world->getPhase() != World::START_PHASE)
+    {
+        m_time_since_stuck += dt;
+    }
+    else
+    {
+        m_time_since_stuck = 0.0f;
+    }
+#endif
+
     //m_wheel_position gives the rotation around the X-axis, and since velocity's
     //timeframe is the delta time, we don't have to multiply it with dt.
     m_wheel_position += m_velocity.xyz[1];
@@ -1520,8 +1534,12 @@ void Kart::placeModel ()
     m_model->setTransform(&c);
     
     // Check if a kart needs to be rescued.
-    if(fabs(m_curr_pos.hpr[2])>60 &&
-       sgLengthVec3(m_velocity.xyz)<3.0f) m_rescue=true;
+    if((fabs(m_curr_pos.hpr[2])>60 &&
+       sgLengthVec3(m_velocity.xyz)<3.0f) || m_time_since_stuck > 2.0f)
+    {
+        m_rescue=true;
+        m_time_since_stuck=0.0f;
+    }
 #else
     sgCoord c ;
     sgCopyCoord ( &c, &m_curr_pos ) ;

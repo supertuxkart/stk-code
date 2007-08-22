@@ -107,6 +107,7 @@ protected:
     btRigidBody                        *m_kart_body;
     btDefaultMotionState               *m_motion_state;
     float                               m_kart_height;
+    float                               m_time_since_stuck;
 #endif
 
 private:
