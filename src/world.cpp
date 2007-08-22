@@ -694,11 +694,12 @@ void World::loadTrack()
         }
         else
         {
-            fclose(fd);
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
+//            fclose(fd);
+//            char msg[MAX_ERROR_MESSAGE_LENGTH];
+//            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
+            fprintf(stderr, "Warning: Syntax error in '%s': %s",
                      path.c_str(), s);
-            throw std::runtime_error(msg);
+//            throw std::runtime_error(msg);
         }
     }   // while fgets
 
