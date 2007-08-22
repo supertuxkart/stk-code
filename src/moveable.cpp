@@ -151,7 +151,11 @@ void Moveable::update (float dt)
     }   // if m_history_position
     const float HAT = m_curr_pos.xyz[2]-HOT;
 
+#ifdef BULLET
+    m_on_ground = ( HAT <= 1.5 );
+#else
     m_on_ground = ( HAT <= 0.01 );
+#endif
 
     doCollisionAnalysis(dt, HOT);
 
