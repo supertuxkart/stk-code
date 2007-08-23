@@ -341,7 +341,7 @@ int Track::spatialToTrack
         p1 = PREV; p2 = SECTOR;
     }
 
-    sgVec2 line_eqn;
+    sgVec3 line_eqn;
     sgVec2 tmp;
 
     sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] );
