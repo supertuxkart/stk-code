@@ -132,7 +132,9 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
     m_current_friction     = 1.0f;
+#ifdef BULLET
     m_time_since_stuck     = 0.0f;
+#endif
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
