@@ -46,7 +46,7 @@ ScrolledText::~ScrolledText()
 }   // ~ScrolledText
 
 //-----------------------------------------------------------------------------
-void ScrolledText::setText(StringList sl_)
+void ScrolledText::setText(StringList const &sl_)
 {
     m_string_list=sl_;
     if(m_rect) glDeleteLists(m_rect, 1);
@@ -82,7 +82,7 @@ void ScrolledText::update(float dt)
     {
 
         if((m_y_pos-i*m_font_size < m_y_top + m_y_bottom ) && m_y_pos-i*m_font_size > -m_font_size)
-            font_gui->Print(m_string_list[i], 24,
+            font_gui->Print(m_string_list[i].c_str(), 24,
                             m_x_left,(int)m_y_pos-i*m_font_size);
     }
     glMatrixMode(GL_PROJECTION);

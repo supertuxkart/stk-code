@@ -25,20 +25,23 @@
 #include "base_gui.hpp"
 #include "player.hpp"
 
-typedef std::vector<char*> StringList;
 
 class ScrolledText: public BaseGUI
 {
 protected:
+	typedef std::vector<std::string> StringList;
+
+private:
     int         m_x_left, m_x_right, m_y_bottom, m_y_top;
     float       m_y_pos, m_y_speed;
     int         m_font_size;
     StringList  m_string_list;
     int         m_rect;
+
 public:
     ScrolledText();
     ~ScrolledText();
-    void setText      (StringList sl_);
+    void setText      (StringList const &sl_);
 
     void select        ();
     void update        (float dt);

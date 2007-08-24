@@ -30,35 +30,34 @@ CreditsMenu::CreditsMenu()
 {
 
     std::string filename;
+	StringList credits_text_list;
     try
     {
         filename = loader->getPath("data/CREDITS");
-        FILE *fd = fopen(filename.c_str(), "ra");
+		//FIXME: we should change to c++ - filestreams
+        FILE *fd = fopen(filename.c_str(), "r");
         char s[1024];
         char *p;
         while(fgets(s, 1023, fd))
         {
-            p = strdup(s);
-            m_string_list.push_back(p);
+			credits_text_list.push_back(std::string(s));
         }   // while
+		fclose(fd);
+		fd = NULL;
     }
     catch(std::runtime_error& e)
     {
         printf(_("Couldn't load '%s'\n"),filename.c_str());
-        m_string_list.push_back(_("CREDIT file was not installed properly!!"));
-        m_string_list.push_back(_("Please check 'data/CREDIT'!!"));
+        credits_text_list.push_back(_("CREDIT file was not installed properly!!"));
+        credits_text_list.push_back(_("Please check 'data/CREDIT'!!"));
     }
 
-    setText(m_string_list);
+    setText(credits_text_list);
 }   // CreditsMenu
 
 //-----------------------------------------------------------------------------
 CreditsMenu::~CreditsMenu()
 {
-    while(m_string_list.size()>0)
-    {
-        m_string_list.pop_back();
-    }
 }   // ~CreditsMenu
 
 /* EOF */
