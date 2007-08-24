@@ -407,7 +407,8 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     if( m_crashes.m_road ) return false;
     if( m_crashes.m_kart != -1 ) return false;
 
-    sgVec2 vel_normal, step_coord, step_track_coord;
+    sgVec2 vel_normal, step_coord;
+    sgVec3 step_track_coord;
     float distance;
 
     //We have to be careful with normalizing, because if the source argument
@@ -632,7 +633,8 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         m_track_sector + 1 : 0;
     int target_sector;
 
-    sgVec2 direction, step_track_coord;
+    sgVec2 direction;
+    sgVec3 step_track_coord;
     SGfloat distance;
     int steps;
 

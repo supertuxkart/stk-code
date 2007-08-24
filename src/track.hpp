@@ -23,6 +23,10 @@
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #else
+#  ifdef WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
+#  endif
 #  include <GL/gl.h>
 #endif
 #include <plib/sg.h>
