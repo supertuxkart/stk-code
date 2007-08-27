@@ -180,36 +180,4 @@
 "speedfore.rgb"             Y Y    Y    0.0    N     N    1.0   Y   N   N   N
 "st_title_screen.rgb"       Y Y    N    1.0    N     N    1.0   N   N   N   Y
  
-#Screenshots
-"sshot-beach.rgb"           N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-bsodcastle.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-geekopeak.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-gownsbow.rgb"        N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-lighthouse.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-littlevolcano.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-race.rgb"            N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-sandtrack.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-startrack.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-subseatrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-tuxtrack.rgb"        N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-volcano.rgb"         N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-olivermath.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
-"sshot-islandtrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
- 
-#Top view images
-"topview-lighthouse.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-littlevolcano.rgb" N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-volcano.rgb"       N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-tuxtrack.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-subseatrack.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-sandtrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-gownsbow.rgb"      N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-geekopeak.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-beach.rgb"         N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-bsodcastle.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-race.rgb"          N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-startrack.rgb"     N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-olivermath.rgb"    N N    N    0.1    Y     N    1.0   N   N   N   Y
-"topview-islandtrack.rgb"   N N    N    0.1    Y     N    1.0   N   N   N   Y
- 
 # EOF #
