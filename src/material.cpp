@@ -87,7 +87,7 @@ Material::Material ()
 }
 
 //-----------------------------------------------------------------------------
-Material::Material ( char *fname, char *description )
+Material::Material (const char *fname, char *description )
 {
     m_texname = new char [ strlen ( fname ) + 1 ] ;
     strcpy ( m_texname, fname ) ;
@@ -95,19 +95,21 @@ Material::Material ( char *fname, char *description )
 
     init () ;
 
-    m_clamp_tex    = parseBool  ( & description ) ? UCLAMP : 0 ;
-    m_clamp_tex   += parseBool  ( & description ) ? VCLAMP : 0 ;
-
-    m_transparency = parseBool  ( & description ) ;
-    m_alpha_ref    = parseFloat ( & description ) ;
-    m_lighting     = parseBool  ( & description ) ;
-    m_sphere_map   = parseBool  ( & description ) ;
-    m_friction     = parseFloat ( & description ) ;
-    m_ignore       = parseBool  ( & description ) ;
-    m_zipper       = parseBool  ( & description ) ;
-    m_resetter     = parseBool  ( & description ) ;
-    m_collideable  = parseBool  ( & description ) ;
-
+    if(strlen(description)>0)
+    {
+        m_clamp_tex    = parseBool  ( & description ) ? UCLAMP : 0 ;
+        m_clamp_tex   += parseBool  ( & description ) ? VCLAMP : 0 ;
+        
+        m_transparency = parseBool  ( & description ) ;
+        m_alpha_ref    = parseFloat ( & description ) ;
+        m_lighting     = parseBool  ( & description ) ;
+        m_sphere_map   = parseBool  ( & description ) ;
+        m_friction     = parseFloat ( & description ) ;
+        m_ignore       = parseBool  ( & description ) ;
+        m_zipper       = parseBool  ( & description ) ;
+        m_resetter     = parseBool  ( & description ) ;
+        m_collideable  = parseBool  ( & description ) ;
+    }
     install () ;
 }
 
@@ -157,7 +159,7 @@ void Material::install ()
     if ( m_texname != NULL && m_texname [ 0 ] != '\0' )
     {
         std::string fn=std::string("images")+DIR_SEPARATOR+m_texname;
-        m_state -> setTexture ( loader->getPath(fn.c_str()).c_str(), !(m_clamp_tex & UCLAMP),
+        m_state -> setTexture ( loader->getPath(fn).c_str(), !(m_clamp_tex & UCLAMP),
                               !(m_clamp_tex & VCLAMP) );
         m_state -> enable  ( GL_TEXTURE_2D ) ;
     }

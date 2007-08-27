@@ -54,7 +54,7 @@ class Material
 public:
 
     Material () ;
-    Material ( char *fname, char *description ) ;
+    Material (const char *fname, char *description ) ;
 
     ~Material ();
 

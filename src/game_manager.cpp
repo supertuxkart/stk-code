@@ -60,6 +60,8 @@ GameManager::~GameManager()
 //-----------------------------------------------------------------------------
 void GameManager::run()
 {
+    const GLuint TITLE_SCREEN_TEXTURE = 
+        material_manager->getMaterial("st_title_screen.rgb")->getIndex();
     while(!m_abort)
     {
         // Run input processing.
@@ -129,7 +131,7 @@ void GameManager::run()
 //                usleep(2000);
         #endif
             //Draw the splash screen
-            glBindTexture(GL_TEXTURE_2D,material_manager->getMaterial("st_title_screen.rgb")->getIndex());
+            glBindTexture(GL_TEXTURE_2D,TITLE_SCREEN_TEXTURE);
 
             glBegin ( GL_QUADS ) ;
             glColor3f   (1, 1, 1 ) ;

@@ -187,7 +187,6 @@ Material *MaterialManager::getMaterial ( const char* fname )
     char basename [ 1024 ] ;
 
     strcpy ( basename, fn ) ;
-    free(fname_copy);
 
     /* Remove last trailing extension. */
 
@@ -231,13 +230,22 @@ Material *MaterialManager::getMaterial ( const char* fname )
 
             if ( *fn2 == '.' )
                 *fn2 = '\0' ;
-
+            fflush(stdout);
             if ( strcmp ( basename, basename2 ) == 0 )
+            {
+                free(fname_copy);
                 return m_materials[i] ;
+            }
         }
     }
 
-    return NULL ;
+    // Add the material: the material constructor adds the material
+    // to (this) material_manager.
+    Material* m=new Material(fn,"");
+    // Since fn is a pointer into fname_copy, fname_copy must be freed
+    // here, not earlier.
+    free(fname_copy);
+    return m ;
 }
 
 //=============================================================================
