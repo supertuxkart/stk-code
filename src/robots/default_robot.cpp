@@ -527,8 +527,14 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
 
-    sgVec2 vel_normal, step_coord;
+    sgVec2 vel_normal;
+	//in this func we use it as a 2d-vector, but later on it is passed
+	//to world->m_track->findRoadSector, there it is used as a 3d-vector
+	//to find distance to plane, so z must be initialized to zero
+	sgVec3 step_coord;
     SGfloat kart_distance;
+
+	step_coord[2] = 0.0;
 
     m_crashes.clear();
 
@@ -752,6 +758,7 @@ int DefaultRobot::calc_steps()
     //mostly for curves.
     if( fabsf(m_controls.lr) > 0.95 )
     {
+        assert( m_future_sector > -1 );
         const int WIDTH_STEPS = (int)( world->m_track->getWidth(
             )[m_future_sector] / ( m_kart_properties->getKartLength() * 2.0 ));
 
