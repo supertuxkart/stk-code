@@ -1508,25 +1508,29 @@ void Kart::placeModel ()
     // We don't have to call Moveable::placeModel, since it does only setTransform
 
 #ifdef BULLET
-    btTransform t;
-    if(m_rescue)
+    // Only transfer the bullet data to the plib tree if no history is being
+    // replayed.
+    if(!user_config->m_replay_history)
     {
-        t=m_kart_body->getCenterOfMassTransform();
-        //             m_motion_state->getWorldTransform(t);
-    } 
-    else
-    {
-        m_motion_state->getWorldTransform(t);
+        btTransform t;
+        if(m_rescue)
+        {
+            t=m_kart_body->getCenterOfMassTransform();
+            //             m_motion_state->getWorldTransform(t);
+        } 
+        else
+        {
+            m_motion_state->getWorldTransform(t);
+        }
+        float m[4][4];
+        t.getOpenGLMatrix((float*)&m);
+        
+        //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
+        // Transfer the new position and hpr to m_curr_pos
+        sgSetCoord(&m_curr_pos, m);
+        const btVector3 &v=m_kart_body->getLinearVelocity();
+        sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
     }
-    float m[4][4];
-    t.getOpenGLMatrix((float*)&m);
-
-    //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
-    // Transfer the new position and hpr to m_curr_pos
-    sgSetCoord(&m_curr_pos, m);
-    const btVector3 &v=m_kart_body->getLinearVelocity();
-    sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
-
     sgCoord c ;
     sgCopyCoord ( &c, &m_curr_pos ) ;
     //    c.hpr[1] += m_wheelie_angle ;
