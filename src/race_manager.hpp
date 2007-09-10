@@ -148,7 +148,7 @@ public:
     void setPlayerKart(int player, const std::string& kart);
     void setNumPlayers(int num);
     void reset();
-    void setGrandPrix(CupData *cup_)           { m_cup = *cup_;                  }
+    void setGrandPrix(const CupData &cup_)     { m_cup = cup_;                  }
     void setDifficulty(RaceDifficulty diff_)   { m_difficulty = diff_;           }
     void setNumLaps(int num)                   { m_num_laps = num;                }
     void setTrack(const std::string& track_)   { m_track = track_;               }

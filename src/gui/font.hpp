@@ -36,12 +36,12 @@ public:
     const static int CENTER_OF_SCREEN=-1;
     enum FontSize      {SMALL=18,   MEDIUM=24,   LARGE=30    };
     Font(char* fontname);
-    Font(std::string fontname) { Font(fontname.c_str()); }
+    Font(const std::string &fontname) { Font(fontname.c_str()); }
     ~Font();
-    void getBBox(const char *text, int size, bool italic,
+    void getBBox(const std::string &text, int size, bool italic,
                  float *left, float *right, float *bot, float *top)
     {
-        m_fnt->getBBox(text, size, italic, left, right, bot, top);
+        m_fnt->getBBox(text.c_str(), size, italic, left, right, bot, top);
     }
 
     // The actual main function which does everything
@@ -53,7 +53,7 @@ public:
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1,
                      bool doShadow=false);
-    void Print(      std::string text, int size, 
+    void Print(      std::string const &text, int size, 
                      FontAlignType fontalign_x, int x,
                      FontAlignType fontalign_y, int y,
                      int red=255, int green=255, int blue=255,
@@ -68,7 +68,7 @@ public:
 
     // Convenience functions to reduce the number of parameters
     // --------------------------------------------------------
-    void Print(      const char *text, int size, int x, int y,
+    void Print(      const std::string &text, int size, int x, int y,
                      int red=255, int green=255, int blue=255,
                      int left=-1, int right=-1, int top=-1, int bottom=-1)
     {

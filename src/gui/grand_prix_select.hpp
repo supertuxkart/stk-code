@@ -27,7 +27,7 @@
 class GrandPrixSelect: public BaseGUI
 {
 private:
-    std::vector<CupData*> m_all_cups;
+    std::vector<CupData> m_all_cups;
     int m_rect;
 public:
     GrandPrixSelect();

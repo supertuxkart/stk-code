@@ -46,12 +46,16 @@ GrandPrixSelect::GrandPrixSelect()
             if (StringUtils::has_suffix(*i, ".cup"))
             {
                 std::string fullPath= "data/" + (std::string)*i;
-                CupData *cup = new CupData(fullPath.c_str());
+                CupData cup(fullPath.c_str());
                 m_all_cups.push_back(cup);
                 if(nId==0)
-                    widgetSet -> start(m_menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
+                {
+                    widgetSet -> start(m_menu_id, cup.getName(), GUI_SML, nId, 0);
+                }
                 else
-                    widgetSet -> state(m_menu_id, cup->getName().c_str(), GUI_SML, nId, 0);
+                {
+                    widgetSet -> state(m_menu_id, cup.getName(), GUI_SML, nId, 0);
+                }
                 nId++;
             }   // if
         }   // for i
@@ -81,14 +85,14 @@ void GrandPrixSelect::update(float dt)
     glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
-    CupData *cup = m_all_cups[CLICKED_TOKEN];
+    const CupData &cup = m_all_cups[CLICKED_TOKEN];
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
     const GLfloat BACKGROUND_COLOUR[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
     glColor4fv(BACKGROUND_COLOUR);
     glCallList(m_rect);
     glPopMatrix();
-    font_gui->Print(cup->getDescription(), GUI_MED, 
+    font_gui->Print(cup.getDescription(), GUI_MED, 
                     Font::ALIGN_CENTER, -1, Font::ALIGN_BOTTOM, 10);
     glDisable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);

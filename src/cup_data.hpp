@@ -21,6 +21,10 @@
 #ifndef HEADER_CUPDATA_H
 #define HEADER_CUPDATA_H
 
+#include <string>
+#include <vector>
+#include <cassert>
+
 #include "herring_manager.hpp"
 
 /** Simple class that hold the data relevant to a 'cup', aka. a number
@@ -31,13 +35,12 @@ class CupData
     std::string m_filename;     // Original filename, only for error handling needed
     std::string m_description;  // Description for this track
     std::string m_herring_style; // herring style which overwrites the track default
-
-public:
-
     /** The ident of the tracks in this cup in their right order, ident
         means the filename of the .track file without .track extension
         (ie. 'volcano') */
     std::vector<std::string> m_tracks;
+
+public:
 
     /** Load the CupData from the given filename */
     CupData        (const std::string filename);
@@ -46,6 +49,8 @@ public:
     const std::string& getDescription ()  const { return m_description; }
     const std::string& getHerringStyle()  const { return m_herring_style;}
     const std::string& getFilename    ()  const { return m_filename;    }
+    const std::string& getTrack(size_t track_index) const { assert(track_index < m_tracks.size()); return m_tracks[track_index]; }
+    size_t             getTrackCount() const    { return m_tracks.size(); }
 }
 ;   // CupData
 

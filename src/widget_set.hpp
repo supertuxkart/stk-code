@@ -121,8 +121,8 @@ struct Widget
     int     car;
     int     cdr;
 
-    const char    *_text;
-    char    *count_text;
+    std::string _text;
+    std::string count_text;
     int     text_width;
     GLuint  text_img;
     GLuint  rect_obj;
@@ -146,12 +146,12 @@ public:
     /*
      * Get/set functions
      */
-    void set_label(int id, const char *);
+    void set_label(int id, const std::string&);
     void set_multi(int id, const char *);
     void set_count(int id, int);
     void set_clock(int id, int);
 
-    const char* get_label(int id) { return m_widgets[id]._text; }
+    const std::string& get_label(int id) { return m_widgets[id]._text; }
     int  get_token(int id) const;
     int  get_value(int id) const;
 
@@ -174,13 +174,13 @@ public:
     int  image(int parent, int, int, int, int rect=GUI_ALL);
 
     //a normal text menu entry, except that it is automatically immediately activated
-    int  start(int parent, const char *, int, int, int value=GUI_OFF);
+    int  start(int parent, const std::string&, int, int, int value=GUI_OFF);
 
     //a normal text menu entry
-    int  state(int parent, const char *, int, int, int value=GUI_OFF);
+    int  state(int parent, const std::string&, int, int, int value=GUI_OFF);
 
     //a text label (cannot be selected). c0 and c1 are two colours that the text is shaded with
-    int  label(int parent, const char *text, int size=GUI_MED, int rect=GUI_ALL,
+    int  label(int parent, const std::string &text, int size=GUI_MED, int rect=GUI_ALL,
                const float *c0=0, const float *c1=0);
 
     //Create  a multi-line  text box  using a  vertical array  of labels.

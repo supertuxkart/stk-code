@@ -91,7 +91,7 @@ GrandPrixMode::start_race(int n)
     raceSetup.m_mode       = RaceSetup::RM_GRAND_PRIX;
     raceSetup.m_difficulty = m_difficulty;
     raceSetup.m_num_laps    = 2;
-    raceSetup.m_track      = m_cup.m_tracks[n];
+    raceSetup.m_track      = m_cup.getTrack(n);
     raceSetup.m_karts.resize(m_karts.size());
     raceSetup.m_players.resize(m_players.size());
     raceSetup.setHerringStyle(m_cup.getHerringStyle());
@@ -126,7 +126,7 @@ void
 GrandPrixMode::next()
 {
     m_track += 1;
-    if (m_track < int(m_cup.m_tracks.size()))
+    if (m_track < int(m_cup.getTrackCount()))
     {
         scene->clear();
         start_race(m_track);
@@ -142,7 +142,7 @@ GrandPrixMode::next()
 void
 GrandPrixMode::exit_race()
 {
-    if (m_track < int(m_cup.m_tracks.size()))
+    if (m_track < int(m_cup.getTrackCount()))
     {
         RaceMode::exit_race();
     }

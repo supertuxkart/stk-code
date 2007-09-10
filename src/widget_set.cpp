@@ -19,6 +19,8 @@
 
 #include <SDL/SDL.h>
 
+#include <sstream>
+
 #include "constants.hpp"
 #include "widget_set.hpp"
 #include "loader.hpp"
@@ -277,7 +279,7 @@ int WidgetSet::add_widget(int parent, int type)
             m_widgets[id].color0     = gui_wht;
             m_widgets[id].color1     = gui_wht;
             m_widgets[id].scale      = 1.0f;
-            m_widgets[id].count_text = (char*)NULL;
+            m_widgets[id].count_text = "";
 
             /* Insert the new widget into the parents's widget list. */
 
@@ -314,7 +316,7 @@ int WidgetSet::vstack(int parent) { return add_widget(parent, GUI_VSTACK); }
 int WidgetSet::filler(int parent) { return add_widget(parent, GUI_FILLER); }
 
 //-----------------------------------------------------------------------------
-void WidgetSet::set_label(int id, const char *text)
+void WidgetSet::set_label(int id, const std::string &text)
 {
     float l,r,b,t;
     font_gui->getBBox(text, m_widgets[id].size, 0.0f, &l, &r, &b, &t);
@@ -338,7 +340,9 @@ void WidgetSet::set_label(int id, const char *text)
 void WidgetSet::set_count(int id, int value)
 {
     m_widgets[id].value = value;
-    sprintf(m_widgets[id].count_text,"%d",value);
+    std::stringstream ss;
+    ss << value;
+    m_widgets[id].count_text = ss.str();
     float l,r,b,t;
     font_gui->getBBox(m_widgets[id].count_text, m_widgets[id].size, 0, &l, &r, &b, &t);
     m_widgets[id].yOffset    = (int)(b);
@@ -395,7 +399,7 @@ int WidgetSet::image(int parent, int textureId, int w, int h, int rect)
 }
 
 //-----------------------------------------------------------------------------
-int WidgetSet::start(int parent, const char *text, int size, int token, int value)
+int WidgetSet::start(int parent, const std::string &text, int size, int token, int value)
 {
     int id;
 
@@ -406,7 +410,7 @@ int WidgetSet::start(int parent, const char *text, int size, int token, int valu
 }
 
 //-----------------------------------------------------------------------------
-int WidgetSet::state(int parent, const char *text, int size, int token, int value)
+int WidgetSet::state(int parent, const std::string &text, int size, int token, int value)
 {
     int id;
 
@@ -432,7 +436,7 @@ int WidgetSet::state(int parent, const char *text, int size, int token, int valu
 }
 
 //-----------------------------------------------------------------------------
-int WidgetSet::label(int parent, const char *text, int size, int rect, const float *c0,
+int WidgetSet::label(int parent, const std::string &text, int size, int rect, const float *c0,
                      const float *c1)
 {
     int id;
@@ -466,8 +470,9 @@ int WidgetSet::count(int parent, int value, int size, int rect)
         m_widgets[id].color0 = gui_yel;
         m_widgets[id].color1 = gui_red;
         m_widgets[id].rect   = rect;
-        m_widgets[id].count_text  = new char[20];
-        sprintf(m_widgets[id].count_text,"%d",value);
+        std::stringstream ss;
+        ss << value;
+        m_widgets[id].count_text = ss.str();
         float l,r,b,t;
         font_gui->getBBox(m_widgets[id].count_text, size, 0, &l, &r, &b, &t);
         m_widgets[id].yOffset    = (int)(b);
@@ -952,10 +957,6 @@ int WidgetSet::delete_widget(int id)
             glDeleteLists(m_widgets[id].rect_obj, 1);
 
         /* Mark this widget unused. */
-        if(m_widgets[id].type==GUI_COUNT)
-        {
-            delete m_widgets[id].count_text;
-        }
         m_widgets[id].type     = GUI_FREE;
         m_widgets[id].text_img = 0;
         m_widgets[id].rect_obj = 0;
