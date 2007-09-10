@@ -39,9 +39,6 @@ WidgetSet::WidgetSet()
     m_radius  = S/60;
 
     init_fonts();
-
-    memset(m_widgets, 0, sizeof (Widget) * MAX_WIDGETS);
-
 }
 
 //-----------------------------------------------------------------------------

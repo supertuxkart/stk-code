@@ -107,6 +107,11 @@ const GLfloat gui_gry[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
 
 struct Widget
 {
+    Widget() :
+        type(0), token(0), value(0), size(0), rect(0), x(0), y(0), w(0), h(0),
+        yOffset(0), car(0), cdr(0), _text(""), count_text(""), text_width(0),
+        text_img(0), rect_obj(0), color0(NULL), color1(NULL), scale(0.0f) {}
+
     int     type;
     int     token;//The token is a number supplied by the programmer to name
                   //recognize a widget. You could also store the id, but
