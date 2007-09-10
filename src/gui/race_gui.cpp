@@ -813,10 +813,14 @@ void RaceGUI::cleanupMessages()
     AllMessageType::iterator p =m_messages.begin(); 
     while(p!=m_messages.end())
     {
-        if((*p)->done())
-            m_messages.erase(p);
+        if((*p).done())
+        {
+            p = m_messages.erase(p);
+        }
         else
-            p++;
+        {
+            ++p;
+        }
     }
 }   // cleanupMessages
 
@@ -834,20 +838,21 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
-    for(std::vector<TimedMessage*>::iterator i=m_messages.begin();
-                                             i!=m_messages.end(); i++)
+    for(AllMessageType::const_iterator i=m_messages.begin();i!=m_messages.end(); ++i)
     {
-        // Display only messages for all karts, or messages for this kart
-        if( (*i)->m_kart && (*i)->m_kart!=player_kart) continue;
+        TimedMessage const &msg = *i;
 
-        font_race->Print( (*i)->m_message, (*i)->m_font_size, 
+        // Display only messages for all karts, or messages for this kart
+        if( msg.m_kart && msg.m_kart!=player_kart) continue;
+
+        font_race->Print( msg.m_message.c_str(), msg.m_font_size, 
                           Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
                           Font::ALIGN_BOTTOM, y,
-                          (*i)->m_red, (*i)->m_green, (*i)->m_blue,
+                          msg.m_red, msg.m_green, msg.m_blue,
                           ratio_x, ratio_y,
                           offset_x, offset_x+(int)(user_config->m_width*ratio_x));
         // Add 20% of font size as space between the lines
-        y-=(*i)->m_font_size*12/10;
+        y-=msg.m_font_size*12/10;
         
         
     }   // for i in all messages
@@ -861,9 +866,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
 void RaceGUI::addMessage(const char *msg, Kart *kart, float time, 
                          int font_size, int red, int green, int blue)
 {
-    TimedMessage *m=new TimedMessage(msg, kart, time, font_size, 
-                                     red, green, blue);
-    m_messages.push_back(m);
+    m_messages.push_back(TimedMessage(msg, kart, time, font_size, red, green, blue));
 }   // addMessage
 
 //-----------------------------------------------------------------------------

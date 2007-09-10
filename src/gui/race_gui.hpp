@@ -21,6 +21,9 @@
 #ifndef HEADER_RACEGUI_H
 #define HEADER_RACEGUI_H
 
+#include <string>
+#include <vector>
+
 #include "base_gui.hpp"
 #include "kart.hpp"
 #include "material.hpp"
@@ -51,11 +54,14 @@ class RaceGUI: public BaseGUI
     class TimedMessage
     {
      public:
-        const char  *m_message;      // message to display
-        float  m_end_time;           // end time for the message (-1 if once only)
-        int    m_red,m_blue,m_green; // colour
-        int    m_font_size;          // size
-        Kart  *m_kart;
+        std::string m_message;            // message to display
+        float       m_end_time;           // end time for the message (-1 if once only)
+        int         m_red,m_blue,m_green; // colour
+        int         m_font_size;          // size
+        Kart        *m_kart;
+        // std::vector needs standard copy-ctor and std-assignment op.
+        // let compiler create defaults .. they'll do the job, no
+        // deep copies here ..
         TimedMessage(const char *message, 
                      Kart *kart, float time, int size, 
                      int red, int green, int blue)
@@ -66,9 +72,10 @@ class RaceGUI: public BaseGUI
             m_end_time   = time>=0.0f ? world->m_clock+time : -1.0f;
             m_red=red; m_blue=blue; m_green=green; 
         }
-        bool done() {return m_end_time<0 || world->m_clock>m_end_time;}
+        bool done() const {return m_end_time<0 || world->m_clock>m_end_time;}
     };
 public:
+
     RaceGUI();
     ~RaceGUI();
     void update(float dt);
@@ -87,7 +94,7 @@ private:
     Material* m_steering_wheel_icon;
     Material* m_speed_back_icon;
     Material* m_speed_fore_icon;
-    typedef   std::vector<TimedMessage*> AllMessageType;
+    typedef   std::vector<TimedMessage> AllMessageType;
     AllMessageType m_messages;
 
     /* Display informat on screen */
