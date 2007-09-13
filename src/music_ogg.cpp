@@ -69,7 +69,11 @@ bool MusicOggStream::load(const char* filename)
     }
     oggFile = fopen(m_fileName.c_str(), "rb");
 
+#if defined( WIN32 ) || defined( WIN64 )
+    if( ov_open_callbacks((void *)oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT) < 0)
+#else
     if (ov_open(oggFile, &m_oggStream, NULL, 0) < 0)
+#endif
     {
 	fclose(oggFile);
         printf("Loading Music: %s failed\n", m_fileName.c_str());
