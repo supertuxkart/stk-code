@@ -93,11 +93,9 @@ SoundManager::SoundManager()
         sfx = new SFXImpl("wavs/radio/squeaky.wav"); m_sfxs[SOUND_USE_PARACHUTE] = sfx;
         sfx = new SFXImpl("wavs/wee.wav"); m_sfxs[SOUND_WEE] = sfx;
 
-        //FIXME: The following 3 sounds are not used in the game yet.
         sfx = new SFXImpl("wavs/tintagel/deselect_option.wav"); m_sfxs[SOUND_BACK_MENU] = sfx;
-        //sfx = new SFXImpl("wavs/tintagel/select_option.wav"); m_sfxs[SOUND_SELECT_MENU] = sfx;
+        sfx = new SFXImpl("wavs/tintagel/select_option.wav"); m_sfxs[SOUND_SELECT_MENU] = sfx;
         sfx = new SFXImpl("wavs/tintagel/move_option.wav"); m_sfxs[SOUND_MOVE_MENU] = sfx;
-
         sfx = new SFXImpl("wavs/tintagel/energy_bar_full.wav"); m_sfxs[SOUND_FULL] = sfx;
         sfx = new SFXImpl("wavs/tintagel/pre_start_race.wav"); m_sfxs[SOUND_PRESTART] = sfx;
         sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;

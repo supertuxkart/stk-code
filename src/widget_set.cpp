@@ -1277,7 +1277,11 @@ void WidgetSet::dump(int id, int d)
 //-----------------------------------------------------------------------------
 void WidgetSet::pulse(int id, float k)
 {
-    if (id) m_widgets[id].scale = k;
+    if (id) 
+    {
+        m_widgets[id].scale = k;
+        sound_manager->playSfx(SOUND_MOVE_MENU);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -45,6 +45,7 @@
 #include "help_menu.hpp"
 #include "credits_menu.hpp"
 #include "grand_prix_select.hpp"
+#include "sound_manager.hpp"
 
 MenuManager* menu_manager= new MenuManager();
 
@@ -64,12 +65,25 @@ MenuManager::~MenuManager()
 //-----------------------------------------------------------------------------
 void MenuManager::pushMenu(MenuManagerIDs id)
 {
+    // used to suppress select-sound on startup
+    static bool is_startup = true;
+
+    if( MENUID_EXITGAME == id )
+    {
+        sound_manager->playSfx(SOUND_BACK_MENU);
+    }
+    else
+    {
+        if( !is_startup ) sound_manager->playSfx(SOUND_SELECT_MENU);
+        else is_startup = false;
+    }
     m_menu_stack.push_back(id);
 }
 
 //-----------------------------------------------------------------------------
 void MenuManager::popMenu()
 {
+    sound_manager->playSfx(SOUND_BACK_MENU);
     m_menu_stack.pop_back();
 }
 
