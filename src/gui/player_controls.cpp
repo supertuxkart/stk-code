@@ -27,9 +27,9 @@
 
 #include <string>
 
-char *sKartAction2String[KC_FIRE+1] = {_("Left"), _("Right"), _("Accelerate"),
+char *sKartAction2String[KC_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
                                        _("Brake"),  _("Wheelie"), _("Jump"),
-                                       _("Rescue"), _("Fire")                 };
+                                       _("Rescue"), _("Fire"), _("Look back") };
 
 
 PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
@@ -50,7 +50,7 @@ PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
     widgetSet->label(LABEL_ID, _("Player name"));
     m_name = user_config->m_player[m_player_index].getName();
     m_name_id = widgetSet->state(CHANGE_ID, m_name.c_str(), GUI_MED, -2);
-    for(int i=KC_LEFT; i<=KC_FIRE; i++)
+    for(int i=0; i<=KC_LAST; i++)
     {
         //FIXME: this is temporal, just while the jumping is disabled.
         if(i==KC_JUMP) continue;

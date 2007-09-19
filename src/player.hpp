@@ -24,8 +24,8 @@
 
 enum AxisDirection { AD_NEGATIVE, AD_POSITIVE };
 
-enum InputType { IT_KEYBOARD, IT_STICKMOTION, IT_STICKBUTTON, IT_STICKHAT, IT_MOUSEMOTION, IT_MOUSEBUTTON };
-#define IT_LAST IT_MOUSEBUTTON
+enum InputType { IT_NONE, IT_KEYBOARD, IT_STICKMOTION, IT_STICKBUTTON, IT_STICKHAT, IT_MOUSEMOTION, IT_MOUSEBUTTON };
+#define IT_LAST (IT_MOUSEBUTTON)
 
 typedef struct
 {
@@ -46,15 +46,17 @@ enum KartActions { KC_LEFT,
                    KC_WHEELIE,
                    KC_JUMP,
                    KC_RESCUE,
-                   KC_FIRE };
+                   KC_FIRE,
+                   KC_LOOK_BACK };
+#define KC_LAST (KC_LOOK_BACK)
 
-extern char *sKartAction2String[KC_FIRE+1];
+extern char *sKartAction2String[KC_LAST+1];
 /*class for managing player name and control configuration*/
 class Player
 {
 private:
     std::string m_name;
-    Input m_action_map[KC_FIRE+1];
+    Input m_action_map[KC_LAST+1];
     unsigned int m_last_kart_id;
 
 public:

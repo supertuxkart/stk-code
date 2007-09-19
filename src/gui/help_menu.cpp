@@ -190,7 +190,7 @@ get stuck or fall too far, use the rescue button to get back on track."),
     const int LABEL_ID  = widgetSet->varray(HS3);
     widgetSet -> filler(HS3);
 
-    for(int i = KC_LEFT; i <= KC_FIRE; i++)
+    for(int i = KC_LEFT; i <= KC_LAST; i++)
     {
         //FIXME: this is temporal, just while the jumping is disabled.
         if(i == KC_JUMP) continue;

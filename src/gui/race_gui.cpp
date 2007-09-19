@@ -95,7 +95,7 @@ void RaceGUI::UpdateKeyboardMappings()
     // Defines the mappings for player keys to kart and action
     // To avoid looping over all players to find out what
     // player control key was pressed, a special data structure
-    // is set up: keysToKArt contains for each (player assigned)
+    // is set up: keysToKart contains for each (player assigned)
     // key which kart it applies to (and therefore which player),
     // and typeForKey contains the assigned function of that key.
     const int NUM = world->m_race_setup.getNumPlayers();
@@ -103,7 +103,7 @@ void RaceGUI::UpdateKeyboardMappings()
     {
         PlayerKart* kart = world->getPlayerKart(i);
 
-        for(int ka=(int) KC_LEFT;ka< (int) KC_FIRE+1;ka++)
+        for(int ka=(int) KC_LEFT;ka< (int) KC_LAST+1;ka++)
             putEntry(kart, (KartActions) ka);
     }
 

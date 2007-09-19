@@ -118,7 +118,6 @@ GrandPrixMode::start_race(int n)
     // handling of objects which get created in the constructor
     // and need world to be defined.
     new World(raceSetup);
-    scene->set_race_cameras(raceSetup.getNumPlayers());
 }
 
 //-----------------------------------------------------------------------------
@@ -198,7 +197,6 @@ QuickRaceMode::start()
     // handling of objects which get created in the constructor
     // and need world to be defined.
     new World(raceSetup);
-    scene->set_race_cameras(raceSetup.getNumPlayers());
 }
 
 //=============================================================================
@@ -226,7 +224,6 @@ TimeTrialMode::start()
     // handling of objects which get created in the constructor
     // and need world to be defined.
     new World(raceSetup);
-    scene->set_race_cameras(raceSetup.getNumPlayers());
 }
 
 //=============================================================================

@@ -151,6 +151,7 @@ void UserConfig::setDefaults()
     m_player[0].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_MINUS,     0, 0);
     m_player[0].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_BACKSPACE, 0, 0);
     m_player[0].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_RCTRL,     0, 0);
+    m_player[0].setInput(KC_LOOK_BACK,   IT_KEYBOARD, SDLK_RALT,     0, 0);
 
     /*player 2 default keyboard settings*/
     m_player[1].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_a,         0, 0);
@@ -159,8 +160,9 @@ void UserConfig::setDefaults()
     m_player[1].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_s,         0, 0);
     m_player[1].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_LSHIFT,    0, 0);
     m_player[1].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_CAPSLOCK,  0, 0);
-    m_player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_LALT,      0, 0);
+    m_player[1].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_q,      0, 0);
     m_player[1].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_LCTRL,     0, 0);
+    m_player[1].setInput(KC_LOOK_BACK,   IT_KEYBOARD, SDLK_LALT,     0, 0);
 
     /*player 3 default keyboard settings*/
     m_player[2].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_f,         0, 0);
@@ -169,8 +171,9 @@ void UserConfig::setDefaults()
     m_player[2].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_g,         0, 0);
     m_player[2].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_c,         0, 0);
     m_player[2].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_v,         0, 0);
-    m_player[2].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_b,         0, 0);
-    m_player[2].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_n,         0, 0);
+    m_player[2].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_r,         0, 0);
+    m_player[2].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_b,         0, 0);
+    m_player[2].setInput(KC_LOOK_BACK,   IT_KEYBOARD, SDLK_n,         0, 0);
 
     /*player 4 default keyboard settings*/
     m_player[3].setInput(KC_LEFT,   IT_KEYBOARD, SDLK_j,         0, 0);
@@ -179,8 +182,9 @@ void UserConfig::setDefaults()
     m_player[3].setInput(KC_BRAKE,  IT_KEYBOARD, SDLK_k,         0, 0);
     m_player[3].setInput(KC_WHEELIE,IT_KEYBOARD, SDLK_m,         0, 0);
     m_player[3].setInput(KC_JUMP,   IT_KEYBOARD, SDLK_COMMA,     0, 0);
-    m_player[3].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_PERIOD,    0, 0);
-    m_player[3].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_SLASH,     0, 0);
+    m_player[3].setInput(KC_RESCUE, IT_KEYBOARD, SDLK_u,    0, 0);
+    m_player[3].setInput(KC_FIRE,   IT_KEYBOARD, SDLK_PERIOD,     0, 0);
+    m_player[3].setInput(KC_LOOK_BACK,   IT_KEYBOARD, SDLK_SLASH,     0, 0);
 }   // setDefaults
 
 
@@ -366,6 +370,7 @@ void UserConfig::loadConfig(const std::string& filename)
             readInput(reader, "jump", KC_JUMP, m_player[i]);
             readInput(reader, "rescue", KC_RESCUE, m_player[i]);
             readInput(reader, "fire", KC_FIRE, m_player[i]);
+            readInput(reader, "lookBack", KC_LOOK_BACK, m_player[i]);
         }
     }
     catch(std::exception& e)
@@ -392,6 +397,14 @@ void UserConfig::readInput(const lisp::Lisp* &r,
     // to the player.
     int id0 = -1, id1 = -1, id2 = -1;
 
+    // If config file contains no such entry should
+    // create an empty input mapping.
+    if (!subReader)
+    {
+      player.setInput(action, IT_NONE, 0, 0, 0);
+      return;
+    }
+      
     subReader->get("type", inputTypeName);
     if (inputTypeName == "keyboard")
     {
@@ -516,6 +529,7 @@ void UserConfig::saveConfig(const std::string& filename)
             writeInput(writer, "jump\t", KC_JUMP, m_player[i]);
             writeInput(writer, "rescue\t", KC_RESCUE, m_player[i]);
             writeInput(writer, "fire\t", KC_FIRE, m_player[i]);
+            writeInput(writer, "lookBack\t", KC_LOOK_BACK, m_player[i]);
 
             writer.endList(temp);
         }   // for i
@@ -534,6 +548,10 @@ void UserConfig::saveConfig(const std::string& filename)
 void UserConfig::writeInput(lisp::Writer &writer, const char *node, KartActions action, Player& player)
 {
     const Input *INPUT = player.getInput(action);
+
+    // Write no entry if the input has no mapping.
+    if (INPUT->type == IT_NONE)
+      return;
 
     writer.beginList(node);
 
@@ -568,6 +586,8 @@ void UserConfig::writeInput(lisp::Writer &writer, const char *node, KartActions 
         writer.write("type", "mousebutton");
         writer.write("button", INPUT->id0);
         break;
+    default:
+        break;
     }
 
     writer.endList(node);
@@ -582,6 +602,9 @@ std::string UserConfig::getInputAsString(int player_index, KartActions control)
     
     switch (INPUT->type)
     {
+    case IT_NONE:
+        snprintf(msg, sizeof(msg), _("not set"));
+        break;
     case IT_KEYBOARD:
         snprintf(msg, sizeof(msg), _("%s"), SDL_GetKeyName((SDLKey) INPUT->id0));
         break;

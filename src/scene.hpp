@@ -42,9 +42,9 @@ public:
     void add(ssgEntity *kid);
     void remove(ssgEntity *kid);
     void draw(float dt);
-    void set_race_cameras(int num_players);
 
-    //TODO: add camera
+    Camera *createCamera(int numPlayers, int playerId);
+
 };
 
 extern Scene *scene;

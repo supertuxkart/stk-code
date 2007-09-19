@@ -28,6 +28,7 @@
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
+#include "camera.hpp"
 
 void PlayerKart::action(KartActions action, int value)
 {
@@ -65,6 +66,9 @@ void PlayerKart::action(KartActions action, int value)
         break;
     case KC_FIRE:
         m_controls.fire = value;
+        break;
+    case KC_LOOK_BACK:
+        m_camera->setReverseHeading(value);
         break;
     case KC_JUMP:
 #ifdef ENABLE_JUMPING
@@ -189,6 +193,7 @@ void PlayerKart::reset()
     m_controls.wheelie = false;
     m_controls.jump = false;
     m_penalty_time = 0;
+    m_camera->setReverseHeading(false);
     Kart::reset();
 }
 //-----------------------------------------------------------------------------

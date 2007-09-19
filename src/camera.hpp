@@ -42,16 +42,22 @@ protected:
     float m_x, m_y, m_w, m_h ;
     float m_LastPitch;
 
+    bool m_reverse;
+
 public:
     Camera ( int numPlayers, int id ) ;
 
     /** Set the camera to the given mode */
     void setMode(Mode mode_);
 
+    void setReverseHeading(bool);
+
     void setScreenPosition ( int numPlayers, int pos ) ;
 
     void update (float dt) ;
     void apply  () ;
+
+    int getKartId() const { return m_which_kart; }
 } ;
 
 #endif

@@ -26,6 +26,7 @@
 #include "player.hpp"
 
 class Player;
+class Camera;
 
 /** PlayerKart manages control events from the player and moves
     them to the Kart */
@@ -36,14 +37,15 @@ private:
 
     Player *m_player;
     float   m_penalty_time;
+    Camera *m_camera;
 
     void steer(float, int);
 public:
     PlayerKart(const KartProperties *kart_properties,
                int position, Player *_player,
-               sgCoord init_pos) :
+               sgCoord init_pos, Camera *cam) :
         Kart(kart_properties, position, init_pos), m_player(_player),
-        m_penalty_time(0.0)         {reset(); }
+        m_penalty_time(0.0), m_camera(cam)       {reset(); }
 
     int     earlyStartPenalty () {return m_penalty_time>0; }
     Player* getPlayer         () {return m_player;        }

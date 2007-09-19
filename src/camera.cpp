@@ -67,6 +67,7 @@ Camera::setScreenPosition ( int numPlayers, int pos )
 
 //-----------------------------------------------------------------------------
 Camera::Camera ( int numPlayers, int which_ )
+  : m_reverse(false)
 {
     m_which_kart = which_ ;   // Just for now
     m_mode = CM_NORMAL;
@@ -88,6 +89,13 @@ void
 Camera::setMode(Mode mode_)
 {
     m_mode = mode_;
+}
+
+//-----------------------------------------------------------------------------
+void
+Camera::setReverseHeading(bool b)
+{
+  m_reverse = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +140,17 @@ void Camera::update (float dt)
     else
         sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
 
-    if (m_mode == CM_NO_FAKE_DRIFT)
+    if (m_reverse)
+    {
+      // If player is looking back all other camera options are ignored.
+      sgMat4 cam_lb;
+      sgMakeTransMat4(cam_pos, 0.f, -2.5f, 0.75f);
+
+      // Applies 'look back' rotation.
+      sgMakeRotMat4(cam_lb, 180, 0, 0);
+      sgMultMat4(relative, cam_pos, cam_lb);
+    }
+    else if (m_mode == CM_NO_FAKE_DRIFT)
     {
         const float STEER_OFFSET = world->getPlayerKart(m_which_kart)->getSteerAngle()*-10.0f;
 
@@ -145,12 +163,14 @@ void Camera::update (float dt)
     }
     else
     {
-        sgMat4 cam_rot;
-        if (m_mode == CM_CLOSEUP)
-            sgMakeRotMat4(cam_rot, 0, -15, 0);
-        else
-            sgMakeRotMat4(cam_rot, 0, -5, 0);
-        sgMultMat4(relative, cam_pos, cam_rot);
+      sgMat4 cam_rot;
+
+      if (m_mode == CM_CLOSEUP)
+        sgMakeRotMat4(cam_rot, 0, -15, 0);
+      else
+        sgMakeRotMat4(cam_rot, 0, -5, 0);
+
+      sgMultMat4(relative, cam_pos, cam_rot);
     }
 
     sgMat4 result;

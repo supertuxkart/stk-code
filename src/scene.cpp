@@ -64,10 +64,15 @@ void Scene::clear ()
 }
 
 //-----------------------------------------------------------------------------
-void Scene::set_race_cameras(int num_players)
+
+Camera *
+Scene::createCamera(int numPlayers, int playerId)
 {
-    for(int i = 0; i < num_players; ++i)
-        m_cameras.push_back(new Camera(num_players, i));
+  Camera *cam = new Camera(numPlayers, playerId);
+
+  m_cameras.push_back(cam);
+
+  return cam;
 }
 
 //-----------------------------------------------------------------------------

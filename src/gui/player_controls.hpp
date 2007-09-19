@@ -47,7 +47,7 @@ private:
     // memory leaks or complicated memory management
     char m_heading[60];
     std::string m_name;
-    std::string m_key_names[KC_FIRE+1];
+    std::string m_key_names[KC_LAST+1];
 };
 
 #endif

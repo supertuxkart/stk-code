@@ -51,6 +51,8 @@
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "scene.hpp"
+#include "camera.hpp"
+
 #include "robots/default_robot.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
@@ -145,10 +147,13 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             if (std::find(m_race_setup.m_players.begin(),
                           m_race_setup.m_players.end(), pos) != m_race_setup.m_players.end())
             {
+                
+                Camera *cam = scene->createCamera(m_race_setup.getNumPlayers(), playerIndex);
                 // the given position belongs to a player
                 newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
-                                          &(user_config->m_player[playerIndex++]),
-                                          init_pos);
+                                          &(user_config->m_player[playerIndex]),
+                                          init_pos, cam);
+                playerIndex++;
             }
             else
             {
