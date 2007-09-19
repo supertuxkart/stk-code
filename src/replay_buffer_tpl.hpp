@@ -50,10 +50,9 @@ class Buffer
     friend class BufferArray<T>;
 
 public:
-    template<typename T> class BufferArray;
-
     Buffer()  : m_pp_blocks(NULL),m_number_blocks(0),m_block_size(0),m_number_objects_used(0),m_healthy(true) {}
     ~Buffer() { destroy(); }
+
 private:
     Buffer( Buffer<T> const &c );
     Buffer<T> const &operator=( Buffer<T> const &c );
