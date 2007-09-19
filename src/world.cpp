@@ -208,7 +208,12 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
-    if( !loadReplayHumanReadable( "test1" ) ) delete m_p_replay_player;
+	m_p_replay_player = new ReplayPlayer;
+    if( !loadReplayHumanReadable( "test1" ) ) 
+	{
+		delete m_p_replay_player;
+		m_p_replay_player = NULL;
+	}
 #endif
 }
 
@@ -243,8 +248,12 @@ World::~World()
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.destroy();
-    m_p_replay_player->destroy();
-    delete m_p_replay_player;
+	if( m_p_replay_player )
+	{
+		m_p_replay_player->destroy();
+		delete m_p_replay_player;
+		m_p_replay_player = NULL;
+	}
 #endif
 }
 
@@ -469,8 +478,8 @@ bool World::saveReplayHumanReadable( std::string const &filename ) const
 //-----------------------------------------------------------------------------
 bool World::loadReplayHumanReadable( std::string const &filename )
 {
-    delete m_p_replay_player;
-    m_p_replay_player = new ReplayPlayer();
+    assert( m_p_replay_player );
+    m_p_replay_player->destroy();
 
     std::string path = ReplayBase::REPLAY_FOLDER + DIR_SEPARATOR;
     path += filename + ".";

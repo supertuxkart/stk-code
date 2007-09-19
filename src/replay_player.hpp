@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Damien Morel <divdams@free.fr>
@@ -25,14 +25,16 @@
 #include "replay_base.hpp"
 
 
-#include "replay_base.hpp"
-
-
 // class managing:
 //      - the loading of replay-file
 //      - the rendering of the replay (interpolation if needed)
 class ReplayPlayer : public ReplayBase
 {
+public:
+	ReplayPlayer() : ReplayBase() {}
+	virtual ~ReplayPlayer() { destroy(); }
+
+	void            destroy() { ReplayBase::destroy(); }
 };
 
 
