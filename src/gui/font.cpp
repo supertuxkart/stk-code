@@ -49,7 +49,7 @@ int delete_fonts()
 }   // delete_fonts
 
 // =============================================================================
-Font::Font(char *fontname)
+Font::Font(const char *fontname)
 {
     m_fnt      = new fntTexFont(loader->getPath(fontname).c_str(),
                                 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);

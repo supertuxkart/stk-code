@@ -1249,7 +1249,7 @@ void WidgetSet::dump(int id, int d)
 
     if (id)
     {
-        char *type = "?";
+        const char *type = "?";
 
         switch (m_widgets[id].type & GUI_TYPE)
         {

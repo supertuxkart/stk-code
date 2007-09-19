@@ -44,7 +44,7 @@ Loader* loader = 0;
 
 Loader::Loader()
 {
-    char *datadir;
+    const char *datadir;
     m_current_callback_type = CB_COLLECTABLE;
 
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )

@@ -50,7 +50,7 @@ enum KartActions { KC_LEFT,
                    KC_LOOK_BACK };
 #define KC_LAST (KC_LOOK_BACK)
 
-extern char *sKartAction2String[KC_LAST+1];
+extern const char *sKartAction2String[KC_LAST+1];
 /*class for managing player name and control configuration*/
 class Player
 {

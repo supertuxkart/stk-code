@@ -35,7 +35,7 @@ public:
     enum FontAlignType {ALIGN_LEFT, ALIGN_CENTER, ALIGN_BOTTOM};
     const static int CENTER_OF_SCREEN=-1;
     enum FontSize      {SMALL=18,   MEDIUM=24,   LARGE=30    };
-    Font(char* fontname);
+    Font(const char* fontname);
     Font(const std::string &fontname) { Font(fontname.c_str()); }
     ~Font();
     void getBBox(const std::string &text, int size, bool italic,

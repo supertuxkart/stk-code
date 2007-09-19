@@ -49,7 +49,7 @@ private:
     std::string m_user_filename;
     void CreateDefaultHerring(sgVec3 colour, std::string name);
     void setDefaultHerringStyle();
-    void setHerring(const lisp::Lisp *herring_node, char *colour,
+    void setHerring(const lisp::Lisp *herring_node, const char *colour,
                     herringType type);
 
 public:

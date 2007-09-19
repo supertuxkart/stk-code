@@ -354,7 +354,7 @@ void HerringManager::loadHerringStyle(const std::string filename)
 
 //-----------------------------------------------------------------------------
 void HerringManager::setHerring(const lisp::Lisp *herring_node,
-                                char *colour, herringType type)
+                                const char *colour, herringType type)
 {
     std::string name;
     herring_node->get(colour, name);

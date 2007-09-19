@@ -27,9 +27,9 @@
 
 #include <string>
 
-char *sKartAction2String[KC_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
-                                       _("Brake"),  _("Wheelie"), _("Jump"),
-                                       _("Rescue"), _("Fire"), _("Look back") };
+const char *sKartAction2String[KC_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
+                                             _("Brake"),  _("Wheelie"), _("Jump"),
+                                             _("Rescue"), _("Fire"), _("Look back") };
 
 
 PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
