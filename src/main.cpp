@@ -333,7 +333,6 @@ void InitTuxkart()
 
     // default settings for Quickstart
     race_manager->setNumPlayers(1);
-    race_manager->setNumKarts  (4);
     race_manager->setNumLaps   (3);
     race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
     race_manager->setDifficulty(RD_MEDIUM);

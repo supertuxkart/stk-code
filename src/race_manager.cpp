@@ -28,6 +28,7 @@
 #include "gui/menu_manager.hpp"
 #include "world.hpp"
 #include "scene.hpp"
+#include "user_config.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -61,11 +62,17 @@ GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
 : m_difficulty(difficulty_), m_num_karts(numKarts_), m_players(players_),
     m_cup(cup_), m_track(0)
 {
+    const int NUM_PLAYERS = m_players.size();
 
     std::vector<std::string> kart_names;
+    
+    // make sure we have a valid number of karts
+    if ((m_num_karts < 0) || (m_num_karts > NUM_PLAYERS + int(kart_properties_manager->getNumberOfKarts()))) {
+    	m_num_karts = NUM_PLAYERS + kart_properties_manager->getNumberOfKarts();
+    }
+
     kart_names.resize(m_num_karts);
 
-    const int NUM_PLAYERS = m_players.size();
     for(int i = 0; i < NUM_PLAYERS; ++i)
     {
         /*Players position is behind the AI in the first race*/
@@ -159,7 +166,11 @@ QuickRaceMode::QuickRaceMode(const std::string& track_,
                              int numKarts_, int numLaps_)
         : m_track(track_), m_players(players_), m_difficulty(difficulty_),
         m_num_karts(numKarts_), m_num_laps(numLaps_)
-{}
+{
+	if ((m_num_karts<0) || (m_num_karts > int(kart_properties_manager->getNumberOfKarts() + m_players.size()))) {
+		m_num_karts = kart_properties_manager->getNumberOfKarts() + m_players.size();
+	}
+}
 
 //-----------------------------------------------------------------------------
 void
@@ -222,7 +233,7 @@ TimeTrialMode::start()
 RaceManager::RaceManager()
 {
     m_mode       = 0;
-    m_num_karts  = 6;
+    m_num_karts  = user_config->m_karts;
     m_difficulty = RD_MEDIUM;
     m_race_mode  = RaceSetup::RM_QUICK_RACE;
     m_track      = "race";
