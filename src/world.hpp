@@ -29,7 +29,10 @@
 #include "physics.hpp"
 #include "kart.hpp"
 #include "highscores.hpp"
-
+#ifdef HAVE_GHOST_REPLAY
+#  include "replay_recorder.hpp"
+   class ReplayPlayer;
+#endif
 
 /** This class keeps all the state of a race, scenegraph, time,
     etc. */
@@ -125,6 +128,15 @@ private:
     void resetAllKarts();
     Kart* loadRobot(const KartProperties *kart_properties, int position,
                  sgCoord init_pos);
+
+#ifdef HAVE_GHOST_REPLAY
+    void        pushReplayFrameData();
+    bool        saveReplayHumanReadable( std::string const &filename ) const;
+    bool        loadReplayHumanReadable( std::string const &filename );
+
+    ReplayRecorder  m_replay_recorder;
+    ReplayPlayer    *m_p_replay_player;
+#endif
 };
 
 extern World* world;

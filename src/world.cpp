@@ -51,8 +51,13 @@
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "scene.hpp"
-
 #include "robots/default_robot.hpp"
+#ifdef HAVE_GHOST_REPLAY
+#  include "replay_player.hpp"
+   class ReplayPlayer;
+#endif
+
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
 #endif
@@ -60,6 +65,9 @@
 World* world = 0;
 
 World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
+#ifdef HAVE_GHOST_REPLAY
+, m_p_replay_player(NULL)
+#endif
 {
     delete world;
     world          = this;
@@ -192,11 +200,20 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         m_phase        = START_PHASE;  // profile starts without countdown
         m_ready_set_go = 3;
     }
+
+#ifdef HAVE_GHOST_REPLAY
+    m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
+    if( !loadReplayHumanReadable( "test1" ) ) delete m_p_replay_player;
+#endif
 }
 
 //-----------------------------------------------------------------------------
 World::~World()
 {
+#ifdef HAVE_GHOST_REPLAY
+    saveReplayHumanReadable( "test" );
+#endif
+
     for ( unsigned int i = 0 ; i < m_kart.size() ; i++ )
         delete m_kart[i];
 
@@ -218,6 +235,12 @@ World::~World()
     ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffuse_col ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
+
+#ifdef HAVE_GHOST_REPLAY
+    m_replay_recorder.destroy();
+    m_p_replay_player->destroy();
+    delete m_p_replay_player;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -363,7 +386,135 @@ void World::update(float delta)
         }
     }
 
+#ifdef HAVE_GHOST_REPLAY
+    pushReplayFrameData();
+#endif
 }
+
+#ifdef HAVE_GHOST_REPLAY
+//-----------------------------------------------------------------------------
+void World::pushReplayFrameData()
+{
+    ReplayFrame *pFrame = m_replay_recorder.getNewFrame();
+    if( !pFrame ) return;
+
+    pFrame->time = m_clock;
+
+    Karts::const_iterator itKarts;
+    int kart_index = 0;
+    for( itKarts = m_kart.begin(); itKarts != m_kart.end(); ++itKarts, ++kart_index )
+    {
+        sgCopyCoord( &( pFrame->p_kart_states[ kart_index ].position ), 
+                     (*itKarts)->getCoord() );
+    }
+
+}  // pushFrameData
+#endif  // HAVE_GHOST_REPLAY
+
+#ifdef HAVE_GHOST_REPLAY
+//-----------------------------------------------------------------------------
+bool World::saveReplayHumanReadable( std::string const &filename ) const
+{
+    std::string path;
+    try
+    {
+        path = loader->getPath( ReplayBase::REPLAY_FOLDER );
+    }
+    catch(std::runtime_error& e)
+    {
+        fprintf( stderr, _("Couldn't find replay-path: '%s'\n"), ReplayBase::REPLAY_FOLDER.c_str() );
+        return false;
+    }
+    path += DIR_SEPARATOR + filename + ".";
+    path += ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE;
+
+    FILE *fd = fopen( path.c_str(), "w" );
+    if( !fd ) 
+    {
+        fprintf(stderr, _("Error while opening replay file for writing '%s'\n"), path.c_str());
+        return false;
+    }
+    int  nKarts = world->getNumKarts();
+    const char *version = "unknown";
+#ifdef VERSION
+    version = VERSION;
+#endif
+    fprintf(fd, "Version:  %s\n",   version);
+    fprintf(fd, "numkarts: %d\n",   m_kart.size());
+    fprintf(fd, "numplayers: %d\n", m_race_setup.getNumPlayers());
+    fprintf(fd, "difficulty: %d\n", m_race_setup.m_difficulty);
+    fprintf(fd, "track: %s\n",      m_track->getIdent());
+    for( size_t k = 0; k < m_kart.size(); ++k )
+    {
+        fprintf(fd, "model %d: %s\n",k, m_kart[k]->getName().c_str());
+    }
+    if( !m_replay_recorder.saveReplayHumanReadable( fd ) )
+    {
+        fclose( fd ); fd = NULL;
+        return false;
+    }
+
+    fclose( fd ); fd = NULL;
+
+    return true;
+}  // saveReplayHumanReadable
+#endif  // HAVE_GHOST_REPLAY
+
+#ifdef HAVE_GHOST_REPLAY
+//-----------------------------------------------------------------------------
+bool World::loadReplayHumanReadable( std::string const &filename )
+{
+    delete m_p_replay_player;
+    m_p_replay_player = new ReplayPlayer();
+
+    std::string path = ReplayBase::REPLAY_FOLDER + DIR_SEPARATOR;
+    path += filename + ".";
+    path += ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE;
+
+    try
+    {
+        path = loader->getPath(path.c_str());
+    }
+    catch(std::runtime_error& e)
+    {
+        fprintf( stderr, _("Couldn't find replay-file: '%s'\n"), path.c_str() );
+        return false;
+    }
+
+    FILE *fd = fopen( path.c_str(), "r" );
+    if( !fd ) 
+    {
+        fprintf(stderr, _("Error while opening replay file for loading '%s'\n"), path.c_str());
+        return false;
+    }
+
+    bool blnRet = false;
+    int intTemp;
+    char buff[1000];
+    size_t number_karts;
+    size_t frames;
+    if( fscanf( fd, "Version: %s\n", buff ) != 1 ) goto close;
+    if( fscanf( fd, "numkarts: %u\n",   &number_karts ) != 1 ) goto close;
+    if( fscanf( fd, "numplayers: %s\n", buff ) != 1 ) goto close;
+    if( fscanf( fd, "difficulty: %s\n", buff ) != 1 ) goto close;
+    if( fscanf( fd, "track: %s\n", buff ) != 1 ) goto close;
+    for( size_t k = 0; k < m_kart.size(); ++k )
+    {
+        if( fscanf( fd, "model %d: %s\n", &intTemp, buff ) != 2 ) goto close;
+    }
+
+    if( !m_p_replay_player->loadReplayHumanReadable( fd, number_karts ) ) goto close;
+
+    blnRet = true;
+
+close:
+    fclose( fd ); fd = NULL;
+
+    return blnRet;
+}  // loadReplayHumanReadable
+#endif  // HAVE_GHOST_REPLAY
+
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void World::checkRaceStatus()
