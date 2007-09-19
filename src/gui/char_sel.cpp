@@ -61,6 +61,9 @@ CharSel::CharSel(int whichPlayer)
     const int HA = widgetSet -> harray(m_menu_id);
     const int ICON_SIZE = 64;
 
+    unsigned int lastKartId = user_config->m_player[m_player_index].getLastKartId();
+    bool skipActivatingLast = false;
+
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
@@ -69,7 +72,14 @@ CharSel::CharSel(int whichPlayer)
                                  ICON_SIZE, ICON_SIZE);
         widgetSet->activate_widget(C, i, 0);
 
-        if (i == kart_properties_manager->getNumberOfKarts() - 1)
+        if (i == lastKartId)
+        {
+          widgetSet->set_active(C);
+          skipActivatingLast = true;
+        }
+
+        if (!skipActivatingLast &&
+            i == kart_properties_manager->getNumberOfKarts() - 1)
             widgetSet->set_active(C);
     }
     const int HS2 = widgetSet -> hstack(m_menu_id);
@@ -128,10 +138,14 @@ void CharSel::update(float dt)
         m_context -> makeCurrent();
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        // FIXME: A bit hackish...
-        glViewport ( 0, 0, 800, 320);
 
-        m_context -> setFOV ( 45.0f, 45.0f * 320.0f/800.0f ) ;
+        // Puts the character in the center. Scaling is done by
+        // applying a big camera FOV.
+        int w = user_config->m_width;
+        int h = user_config->m_height;
+        glViewport ( 0, 0, w, h);
+
+        m_context -> setFOV ( 65.0f, 65.0f * h/w ) ;
         m_context -> setNearFar ( 0.05f, 1000.0f ) ;
 
         sgCoord cam_pos;
