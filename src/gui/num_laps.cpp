@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006, 2007 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,9 +35,9 @@ NumLaps::NumLaps() : laps(3)
     lap_label_id = widgetSet -> label(m_menu_id, _("Laps: 3"));
     widgetSet -> space(m_menu_id);
     widgetSet -> state(m_menu_id, _("Less"), GUI_MED, 10);
-    widgetSet -> start(m_menu_id, _("More"), GUI_MED, 20);
+    widgetSet -> state(m_menu_id, _("More"), GUI_MED, 20);
     widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, _("Start Race"), GUI_SML, 30);
+    widgetSet -> start(m_menu_id, _("Start Race"), GUI_SML, 30);
     widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> space(m_menu_id);
 

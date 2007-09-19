@@ -36,7 +36,10 @@ ConfigControls::ConfigControls()
     {
         snprintf(playerN[i-1], MAX_MESSAGE_LENGTH,
                  _("Player %d"), i);
-        widgetSet -> start(VA, playerN[i-1],  GUI_MED, i);
+        if (i == 1)
+          widgetSet -> start(VA, playerN[i-1],  GUI_MED, i);
+        else
+          widgetSet -> state(VA, playerN[i-1],  GUI_MED, i);
     }
 
     widgetSet -> space(VA);
