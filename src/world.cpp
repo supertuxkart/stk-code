@@ -56,7 +56,6 @@
 #include "robots/default_robot.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
-   class ReplayPlayer;
 #endif
 
 

@@ -109,7 +109,13 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/scrolled_text.cpp	   gui/scrolled_text.hpp	\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/font.hpp		   gui/font.cpp                 \
-	robots/default_robot.cpp   robots/default_robot.hpp 
+	robots/default_robot.cpp   robots/default_robot.hpp  \
+	replay_buffer_tpl.hpp \
+	replay_buffers.hpp		   replay_buffers.cpp       \
+	replay_base.hpp			   replay_base.cpp       \
+	replay_player.hpp          replay_player.cpp       \
+	replay_recorder.hpp		   replay_recorder.cpp       
+
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L. -lstatic_ssg \
