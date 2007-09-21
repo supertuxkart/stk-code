@@ -230,7 +230,6 @@ Material *MaterialManager::getMaterial ( const char* fname )
 
             if ( *fn2 == '.' )
                 *fn2 = '\0' ;
-            fflush(stdout);
             if ( strcmp ( basename, basename2 ) == 0 )
             {
                 free(fname_copy);
