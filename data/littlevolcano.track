@@ -16,8 +16,8 @@
  (sun-specular 1.0 0.8 0.8 0.0)
 
  (music "mods/tk5a.mod")
- (screenshot "images/sshot-littlevolcano.rgb")
- (topview "images/topview-littlevolcano.rgb")
+ (screenshot "sshot-littlevolcano.rgb")
+ (topview "topview-littlevolcano.rgb")
 )
 
 ;; EOF ;;

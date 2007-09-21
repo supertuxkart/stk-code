@@ -240,7 +240,7 @@ Material *MaterialManager::getMaterial ( const char* fname )
 
     // Add the material: the material constructor adds the material
     // to (this) material_manager.
-    Material* m=new Material(fn,"");
+    Material* m=new Material(fname,"");
     // Since fn is a pointer into fname_copy, fname_copy must be freed
     // here, not earlier.
     free(fname_copy);

@@ -15,8 +15,8 @@
  (sun-specular 0.8 0.8 1.0 0.0)
 
  (music "mods/tuxr.mod")
- (screenshot "images/sshot-subseatrack.rgb")
- (topview "images/topview-subseatrack.rgb")
+ (screenshot "sshot-subseatrack.rgb")
+ (topview "topview-subseatrack.rgb")
 )
 
 ;; EOF ;;

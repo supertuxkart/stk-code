@@ -4,8 +4,8 @@
  (name "BSODs Battlements")
  (description "Created by Oliver & Steve Baker")
  (music "oggs/Lava\ Lagoon_2.ogg")
- (screenshot "images/sshot-bsodcastle.rgb")
- (topview "images/topview-bsodcastle.rgb")
+ (screenshot "sshot-bsodcastle.rgb")
+ (topview "topview-bsodcastle.rgb")
 )
 
 ;; EOF ;;

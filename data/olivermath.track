@@ -4,8 +4,8 @@
  (name "Oliver's Math Class")
  (description "Created by Oliver & Steve Baker")
  (music "mods/Boom_boom_boom.mod")
- (screenshot "images/sshot-olivermath.rgb")
- (topview "images/topview-olivermath.rgb")
+ (screenshot "sshot-olivermath.rgb")
+ (topview "topview-olivermath.rgb")
 )
 
 ;; EOF ;;

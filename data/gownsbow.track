@@ -5,8 +5,8 @@
  (description "Created by Oliver & Steve Baker")
  (gravity 78.0)
  (music "mods/tk5a.mod")
- (screenshot "images/sshot-gownsbow.rgb")
- (topview "images/topview-gownsbow.rgb")
+ (screenshot "sshot-gownsbow.rgb")
+ (topview "topview-gownsbow.rgb")
 )
 
 ;; EOF ;;
