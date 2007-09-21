@@ -24,7 +24,7 @@
 
 AttachmentManager *attachment_manager = 0;
 
-struct  initAttachmentType {attachmentType attachment; char*file;};
+struct  initAttachmentType {attachmentType attachment; const char *file;};
 
 /* Some explanations to the attachments:
    Parachute: This will increase the air friction, reducing the maximum speed.
