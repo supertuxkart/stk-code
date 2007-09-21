@@ -70,10 +70,10 @@ public:
 
     bool            loadReplayHumanReadable( FILE *fd );
 
+    // calc state of replay-objects at given time
     void            showReplayAt( float abs_time );
 
-private:
-    void            updateObjects();
+    void            reset()                         { m_current_frame_index = 0; }
 
 private:
     typedef std::vector<ReplayKart>    ReplayKarts;

@@ -95,13 +95,13 @@ bool ReplayPlayer::loadReplayHumanReadable( FILE *fd )
     if( !m_ReplayBuffers.loadReplayHumanReadable( fd, number_karts ) ) return false;
 
     m_current_frame_index = 0;
-    updateObjects();
 
     return true;
 }
 
 void ReplayPlayer::showReplayAt( float abs_time )
 {
+    assert( m_ReplayBuffers.getNumberFrames() );
     assert( m_current_frame_index > -1 );
     assert( (size_t)m_current_frame_index < m_ReplayBuffers.getNumberFrames() );
 
@@ -120,17 +120,49 @@ void ReplayPlayer::showReplayAt( float abs_time )
         ++m_current_frame_index;
     }
 
-    updateObjects();
-}
+    frame = m_ReplayBuffers.getFrameAt( m_current_frame_index );
 
-void ReplayPlayer::updateObjects()
-{
-    ReplayFrame const* frame = m_ReplayBuffers.getFrameAt( m_current_frame_index );
-
-    for( size_t k = 0; k < m_Karts.size(); ++k )
+    // interpolate, if we are not at the end
+    if( (m_current_frame_index + 1) < (int)m_ReplayBuffers.getNumberFrames() )
     {
-        m_Karts[ k ].setPosition( frame->p_kart_states[ k ].position );
+        ReplayFrame const* frame_next = m_ReplayBuffers.getFrameAt( m_current_frame_index+1 );
+
+        sgVec3 tmp_v3;
+        float scale;
+        sgCoord pos;
+
+        // calc interpolations for all objects
+        for( size_t k = 0; k < m_Karts.size(); ++k )
+        {
+            // calc distance between next and current frame-position
+            sgCopyVec3( pos.xyz, frame->p_kart_states[k].position.xyz ) ;
+            sgCopyVec3( tmp_v3, frame_next->p_kart_states[k].position.xyz ) ;
+            sgSubVec3( tmp_v3, pos.xyz );
+
+            // calc scale factor based on time between frames
+            assert( frame_next->time > frame->time );
+            assert( frame_next->time != frame->time );
+            scale = (abs_time - frame->time) / (frame_next->time - frame->time);
+            sgScaleVec3( tmp_v3, scale );
+
+            // add interpolated vector
+            sgAddVec3( pos.xyz, tmp_v3 );
+
+            // no orientation-interpolation for starters
+            sgCopyVec3( pos.hpr, frame->p_kart_states[k].position.hpr );
+
+            m_Karts[ k ].setPosition( pos );
+        }
     }
+    else
+    {
+        // replay finished, leave them at last known position
+        for( size_t k = 0; k < m_Karts.size(); ++k )
+        {
+            m_Karts[ k ].setPosition( frame->p_kart_states[ k ].position );
+        }
+    }
+
 }
 
 

@@ -213,7 +213,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 		delete m_p_replay_player;
 		m_p_replay_player = NULL;
 	}
-	if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
+	if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
 #endif
 }
 
@@ -419,7 +419,7 @@ void World::update(float delta)
 //-----------------------------------------------------------------------------
 void World::pushReplayFrameData()
 {
-	// we dpnt record the startphase ..
+	// we dont record the startphase ..
 	assert( m_phase != START_PHASE );
 
     ReplayFrame *pFrame = m_replay_recorder.getNewFrame();
@@ -890,6 +890,17 @@ void World::restartRace()
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
+
+#ifdef HAVE_GHOST_REPLAY
+    m_replay_recorder.destroy();
+    m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
+
+	if( m_p_replay_player ) 
+    {
+        m_p_replay_player->reset();
+        m_p_replay_player->showReplayAt( 0.0 );
+    }
+#endif
 }
 
 //-----------------------------------------------------------------------------

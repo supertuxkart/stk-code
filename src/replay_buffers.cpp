@@ -43,7 +43,7 @@ ReplayBuffers::getNewFrame()
     // make sure initialization was called properly
     assert( m_BufferFrame.getNumberObjectsUsed() == m_BufferKartState.getNumberArraysUsed() );
 
-    if( !isHealthy() ) return false;
+    if( !isHealthy() ) return NULL;
 
     ReplayFrame* frame = m_BufferFrame.getNewObject();
     if( !frame ) return NULL;
