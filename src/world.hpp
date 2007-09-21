@@ -130,13 +130,15 @@ private:
                  sgCoord init_pos);
 
 #ifdef HAVE_GHOST_REPLAY
-    void        pushReplayFrameData();
-    bool        saveReplayHumanReadable( std::string const &filename ) const;
-    bool        loadReplayHumanReadable( std::string const &filename );
+private:
+    void    pushReplayFrameData();
+    bool    saveReplayHumanReadable( std::string const &filename ) const;
+    bool    loadReplayHumanReadable( std::string const &filename );
 
     ReplayRecorder  m_replay_recorder;
     ReplayPlayer    *m_p_replay_player;
 #endif
+
 };
 
 extern World* world;

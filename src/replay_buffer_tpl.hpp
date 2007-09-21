@@ -60,16 +60,16 @@ private:
 public:
     bool            init( size_t number_preallocated_objects );
     void            destroy();
+    // this is false, if a reallocation failed
     bool            isHealthy() const                   { return m_healthy; }
     // returns a new *free* object, allocated memory if necessary
     T*              getNewObject();
-    // returns a new *free* array of objects
-    //T*              getNewObjects( size_t number_objects );
     // returs object at given position, like usual array access,
-    // does not allocate memory
+    // does not allocate memory, index must be < getNumberObjectsUsed()
     T const*        getObjectAt( size_t index ) const;
     T*              getObjectAt( size_t index );
     size_t          getNumberObjectsUsed() const        { return m_number_objects_used; }
+    size_t          getNumberBlocks() const             { return m_number_blocks; }
 
 private:
     // adds a new block of objects to m_pp_blocks with a size of m_block_size
@@ -121,6 +121,7 @@ public:
     T const*        getArrayAt( size_t index ) const    { assert( m_array_size ); return m_Buffer.getObjectAt( m_array_size * index ); }
     T*              getArrayAt( size_t index )          { assert( m_array_size ); return m_Buffer.getObjectAt( m_array_size * index ); }
     size_t          getNumberArraysUsed() const         { return m_Buffer.getNumberObjectsUsed() / m_array_size; }
+    size_t          getNumberBlocks() const             { return m_Buffer.getNumberBlocks(); }
     bool            isHealthy() const                   { return m_Buffer.isHealthy(); }
 
 private:

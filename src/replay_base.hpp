@@ -23,7 +23,6 @@
 #ifdef HAVE_GHOST_REPLAY
 
 
-#include <new>
 #include <string>
 #include <plib/sg.h>
 
@@ -60,7 +59,6 @@ public:
 
     virtual void    destroy();
 
-    bool            loadReplayHumanReadable( FILE *fd, size_t number_cars ) { return m_ReplayBuffers.loadReplayHumanReadable( fd, number_cars ); }
     bool            saveReplayHumanReadable( FILE *fd ) const { return m_ReplayBuffers.saveReplayHumanReadable( fd ); }
 
 private:

@@ -22,8 +22,40 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
+#include <vector>
+#include <plib/ssg.h>
+
 #include "replay_base.hpp"
 
+
+class KartProperties;
+class ReplayKart
+{
+public:
+    ReplayKart();
+    ~ReplayKart();
+
+    ReplayKart( ReplayKart const &kart ) { *this = kart; }
+    ReplayKart& operator=( ReplayKart const &kart ) 
+    {
+        assert( this != &kart );
+        m_kart_properties = kart.m_kart_properties;
+        m_model = kart.m_model;
+        sgCopyCoord ( &m_position, &kart.m_position );
+        return *this;
+    }
+    bool                init( const std::string &strKartIdent );
+    void                destroy();
+
+    ssgTransform*       getModel() { return m_model; }
+
+    void                setPosition( const sgCoord &pos ) { sgCopyCoord ( &m_position, &pos ); m_model->setTransform(&m_position); }
+
+private:
+    const KartProperties    *m_kart_properties;
+    sgCoord                 m_position;
+    ssgTransform            *m_model;
+};
 
 // class managing:
 //      - the loading of replay-file
@@ -31,12 +63,24 @@
 class ReplayPlayer : public ReplayBase
 {
 public:
-	ReplayPlayer() : ReplayBase() {}
-	virtual ~ReplayPlayer() { destroy(); }
+    ReplayPlayer();
+    virtual ~ReplayPlayer();
 
-	void            destroy() { ReplayBase::destroy(); }
+    void            destroy();
+
+    bool            loadReplayHumanReadable( FILE *fd );
+
+    void            showReplayAt( float abs_time );
+
+private:
+    void            updateObjects();
+
+private:
+    typedef std::vector<ReplayKart>    ReplayKarts;
+
+    int                    m_current_frame_index;
+    ReplayKarts            m_Karts;
 };
-
 
 
 #endif // HAVE_GHOST_REPLAY

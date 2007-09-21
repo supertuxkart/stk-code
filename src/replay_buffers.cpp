@@ -57,24 +57,18 @@ ReplayBuffers::getNewFrame()
     return frame;
 }
 
-ReplayFrame const* 
-ReplayBuffers::getFrame( size_t frame_index ) const
-{
-    return m_BufferFrame.getObjectAt( frame_index );
-}
-
 bool ReplayBuffers::saveReplayHumanReadable( FILE *fd ) const
 {
     if( !isHealthy() ) return false;
 
-    if( fprintf( fd, "frames: %u\n", getNumberFramesUsed() ) < 1 ) return false;
+    if( fprintf( fd, "frames: %u\n", getNumberFrames() ) < 1 ) return false;
     
     unsigned int frame_idx, kart_idx;
     ReplayFrame const *frame;
     ReplayKartState const *kart;
-    for( frame_idx = 0; frame_idx < getNumberFramesUsed(); ++frame_idx )
+    for( frame_idx = 0; frame_idx < getNumberFrames(); ++frame_idx )
     {
-        frame = getFrame( frame_idx );
+        frame = getFrameAt( frame_idx );
         if( fprintf( fd, "frame %u  time %f\n", frame_idx, frame->time ) < 1 ) return false;
 
         for( kart_idx = 0; kart_idx < m_number_cars; ++kart_idx )
@@ -100,14 +94,13 @@ bool ReplayBuffers::loadReplayHumanReadable( FILE *fd, size_t number_cars )
     unsigned int frame_idx, kart_idx, tmp;
     ReplayFrame *frame;
     ReplayKartState *kart;
-    for( frame_idx = 0; frame_idx < getNumberFramesUsed(); ++frame_idx )
+    for( frame_idx = 0; frame_idx < frames; ++frame_idx )
     {
-        frame = m_BufferFrame.getObjectAt( frame_idx );
+        // if we are here, it cant fail, since enough objects have to be allocated above
+        frame = getNewFrame();
         assert( frame );
-        if( fscanf( fd, "frame %u  time %f\n", &tmp, &frame->time ) != 2 ) return false;
 
-        frame->p_kart_states = m_BufferKartState.getArrayAt( frame_idx );
-        assert( frame->p_kart_states );
+        if( fscanf( fd, "frame %u  time %f\n", &tmp, &frame->time ) != 2 ) return false;
 
         for( kart_idx = 0; kart_idx < number_cars; ++kart_idx )
         {
@@ -118,6 +111,14 @@ bool ReplayBuffers::loadReplayHumanReadable( FILE *fd, size_t number_cars )
                      &kart->position.hpr[0], &kart->position.hpr[1], &kart->position.hpr[2] ) != 7 ) return false;   
         }
     }
+
+    assert( frames == getNumberFrames() );
+    assert( m_BufferFrame.getNumberObjectsUsed() == getNumberFrames() );
+    assert( m_BufferKartState.getNumberArraysUsed() == getNumberFrames() );
+
+    // there should be no reallocation ..
+    assert( m_BufferFrame.getNumberBlocks() == 1 );
+    assert( m_BufferKartState.getNumberBlocks() == 1 );
 
     return true;
 }

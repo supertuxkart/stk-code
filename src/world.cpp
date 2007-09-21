@@ -52,7 +52,6 @@
 #include "highscore_manager.hpp"
 #include "scene.hpp"
 #include "camera.hpp"
-
 #include "robots/default_robot.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
@@ -207,12 +206,14 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
+
 	m_p_replay_player = new ReplayPlayer;
     if( !loadReplayHumanReadable( "test1" ) ) 
 	{
 		delete m_p_replay_player;
 		m_p_replay_player = NULL;
 	}
+	if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
 #endif
 }
 
@@ -292,9 +293,13 @@ void World::draw()
 void World::update(float delta)
 {
     if(user_config->m_replay_history) delta=history->GetNextDelta();
-    m_clock += delta;
 
     checkRaceStatus();
+	// this line was before checkRaceStatus. but m_clock is set to 0.0 in
+	// checkRaceStatus on start, so m_clock would not be synchron and the
+	// first delta would not be added .. that would cause a gap in 
+	// replay-recording
+	m_clock += delta;
 
     // Count the number of collision in the next 'FRAMES_FOR_TRAFFIC_JAM' frames.
     // If a kart has more than one hit, play 'traffic jam' noise.
@@ -400,7 +405,13 @@ void World::update(float delta)
     }
 
 #ifdef HAVE_GHOST_REPLAY
-    pushReplayFrameData();
+	// we start recording after START_PHASE, since during start-phase m_clock is incremented
+	// normally, but after switching to RACE_PHASE m_clock is set back to 0.0
+	if( m_phase != START_PHASE ) 
+	{
+		pushReplayFrameData();
+		if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
+	}
 #endif
 }
 
@@ -408,6 +419,9 @@ void World::update(float delta)
 //-----------------------------------------------------------------------------
 void World::pushReplayFrameData()
 {
+	// we dpnt record the startphase ..
+	assert( m_phase != START_PHASE );
+
     ReplayFrame *pFrame = m_replay_recorder.getNewFrame();
     if( !pFrame ) return;
 
@@ -457,9 +471,11 @@ bool World::saveReplayHumanReadable( std::string const &filename ) const
     fprintf(fd, "numplayers: %d\n", m_race_setup.getNumPlayers());
     fprintf(fd, "difficulty: %d\n", m_race_setup.m_difficulty);
     fprintf(fd, "track: %s\n",      m_track->getIdent());
-    for( size_t k = 0; k < m_kart.size(); ++k )
+
+    for (RaceSetup::Karts::const_iterator i = m_race_setup.m_karts.begin() ;
+         i != m_race_setup.m_karts.end() ; ++i )
     {
-        fprintf(fd, "model %d: %s\n",k, m_kart[k]->getName().c_str());
+        fprintf(fd, "model %d: %s\n", i-m_race_setup.m_karts.begin(), (*i).c_str());
     }
     if( !m_replay_recorder.saveReplayHumanReadable( fd ) )
     {
@@ -501,26 +517,8 @@ bool World::loadReplayHumanReadable( std::string const &filename )
         return false;
     }
 
-    bool blnRet = false;
-    int intTemp;
-    char buff[1000];
-    size_t number_karts;
-    size_t frames;
-    if( fscanf( fd, "Version: %s\n", buff ) != 1 ) goto close;
-    if( fscanf( fd, "numkarts: %u\n",   &number_karts ) != 1 ) goto close;
-    if( fscanf( fd, "numplayers: %s\n", buff ) != 1 ) goto close;
-    if( fscanf( fd, "difficulty: %s\n", buff ) != 1 ) goto close;
-    if( fscanf( fd, "track: %s\n", buff ) != 1 ) goto close;
-    for( size_t k = 0; k < m_kart.size(); ++k )
-    {
-        if( fscanf( fd, "model %d: %s\n", &intTemp, buff ) != 2 ) goto close;
-    }
+    bool blnRet = m_p_replay_player->loadReplayHumanReadable( fd );
 
-    if( !m_p_replay_player->loadReplayHumanReadable( fd, number_karts ) ) goto close;
-
-    blnRet = true;
-
-close:
     fclose( fd ); fd = NULL;
 
     return blnRet;
@@ -542,6 +540,10 @@ void World::checkRaceStatus()
         m_phase = RACE_PHASE;
         m_clock = 0.0f;
         sound_manager->playSfx(SOUND_START);
+#ifdef HAVE_GHOST_REPLAY
+		// push positions at time 0.0 to replay-data
+		pushReplayFrameData();
+#endif
     }
     else if (m_clock > 1.0 && m_ready_set_go == 2)
     {

@@ -24,7 +24,6 @@
 
 
 #include <cstdio>
-#include <new>
 
 #include "replay_buffer_tpl.hpp"
 
@@ -51,14 +50,16 @@ public:
 
     // returs frame at given position from replay data
     // used to *show* the replay
-    ReplayFrame const*  getFrame( size_t frame_index ) const;
+    // if frame_index >= num_frames -> returns NULL
+    ReplayFrame const*  getFrameAt( size_t frame_index ) const  { return m_BufferFrame.getObjectAt( frame_index ); }
+
+    size_t              getNumberFrames() const                 { return m_BufferFrame.getNumberObjectsUsed(); }
 
     bool                saveReplayHumanReadable( FILE *fd ) const;
     bool                loadReplayHumanReadable( FILE *fd, size_t number_cars );
 
 private:
-    bool                isHealthy() const { return m_BufferFrame.isHealthy() && m_BufferKartState.isHealthy(); }
-    size_t              getNumberFramesUsed() const { return m_BufferFrame.getNumberObjectsUsed(); }
+    bool                isHealthy() const                       { return m_BufferFrame.isHealthy() && m_BufferKartState.isHealthy(); }
 
 private:
     typedef Buffer<ReplayFrame>           BufferFrame;
