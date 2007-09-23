@@ -52,8 +52,6 @@ PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
     m_name_id = widgetSet->state(CHANGE_ID, m_name.c_str(), GUI_MED, -2);
     for(int i=0; i<=KC_LAST; i++)
     {
-        //FIXME: this is temporal, just while the jumping is disabled.
-        if(i==KC_JUMP) continue;
         addKeyLabel(CHANGE_ID, (KartActions)i,    i==0 );
         widgetSet->label(LABEL_ID, sKartAction2String[i]);
     }
