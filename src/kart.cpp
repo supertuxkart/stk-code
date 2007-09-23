@@ -959,9 +959,16 @@ void Kart::updatePhysics (float dt)
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
         }
     }
+
     if(m_controls.jump)
-    { // ignore gravity down when jumping
-        // no jumping yet
+    { 
+      //Vector3 impulse(0.0f, 0.0f, 10.0f);
+      //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
+        btVector3 velocity         = m_kart_body->getLinearVelocity();
+        velocity.setZ( 3.0f );
+
+        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+
     }
     const float steering = getMaxSteerAngle() * m_controls.lr * 0.00444;
     m_vehicle->setSteeringValue(steering, 0);
@@ -1117,11 +1124,7 @@ void Kart::updatePhysics (float dt)
         }
         if(m_controls.jump)
         { // ignore gravity down when jumping
-#ifdef ENABLE_JUMPING
             ForceGravity = stk_config->m_jump_impulse*WORLD_GRAVITY;
-#else
-	    ForceGravity = -WORLD_GRAVITY * MASS;
-#endif
         }
         else
         {   // kart is on groud and not jumping
