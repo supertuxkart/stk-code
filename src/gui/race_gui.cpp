@@ -946,22 +946,38 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     if ( world->getPhase() == World::RACE_PHASE         ||
          world->getPhase() == World::DELAY_FINISH_PHASE   )
     {
-        for(int pla = 0; pla < raceSetup.getNumPlayers(); pla++)
+        const int numPlayers = raceSetup.getNumPlayers();
+
+        for(int pla = 0; pla < numPlayers; pla++)
         {
             int offset_x, offset_y;
             offset_x = offset_y = 0;
 
-            if(raceSetup.getNumPlayers() == 2)
+            if(numPlayers == 2)
             {
-                if(pla == 0) offset_y = user_config->m_height/2;
+              if(pla == 0) offset_y = user_config->m_height/2;
             }
-            else if(raceSetup.getNumPlayers() > 2)
+            else if (numPlayers == 3)
             {
-                if((pla == 0 && raceSetup.getNumPlayers() > 1) || (pla == 1))
-                    offset_y = user_config->m_height/2;
+              if (pla == 0  || pla == 1)
+                offset_y = user_config->m_height/2;
+              else
+              {
+                // Fixes width for player 3
+                split_screen_ratio_x = 1.0;
+              }
 
-                if((pla == 1) || pla == 3)
-                    offset_x = user_config->m_width/2;
+              if (pla == 1)
+                offset_x = user_config->m_width/2;
+
+            }
+            else if(numPlayers == 4)
+            {
+              if(pla == 0  || pla == 1)
+                offset_y = user_config->m_height/2;
+
+              if((pla == 1) || pla == 3)
+                offset_x = user_config->m_width/2;
             }
 
             Kart* player_kart=world->getPlayerKart(pla);

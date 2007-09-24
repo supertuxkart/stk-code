@@ -47,7 +47,21 @@ Camera::setScreenPosition ( int numPlayers, int pos )
             break;
         }
     }
-    else if (numPlayers == 3 || numPlayers == 4)
+    else if (numPlayers == 3)
+    {
+        m_context -> setFOV ( 50.0f, 0.0f );
+        switch ( pos )
+        {
+        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
+            break;
+        case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
+            break;
+        case 2 : m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 0.5f;
+            m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
+            break;
+        }
+    }
+    else if (numPlayers == 4)
     {
         m_context -> setFOV ( 50.0f, 0.0f );
         switch ( pos )
