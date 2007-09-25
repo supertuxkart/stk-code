@@ -192,9 +192,6 @@ get stuck or fall too far, use the rescue button to get back on track."),
 
     for(int i = KC_LEFT; i <= KC_LAST; i++)
     {
-        //FIXME: this is temporal, just while the jumping is disabled.
-        if(i == KC_JUMP) continue;
-
         // *sigh* widget set stores only pointer to strings, so
         // to make sure that all key-strings are permanent, they
         // are assigned to an array m_all_keys within this object.
