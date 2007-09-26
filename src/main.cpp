@@ -170,8 +170,14 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
-            race_manager->setNumKarts(user_config->m_karts = atoi(argv[i+1]));
-            fprintf ( stdout, _("You choose to have %s karts.\n"), argv[i+1] ) ;
+            user_config->m_karts = atoi(argv[i+1]);
+            if(user_config->m_karts>stk_config->m_max_karts) {
+                fprintf(stdout, _("Number of karts reset to maximum number %d\n"),
+                                  stk_config->m_max_karts);
+                user_config->m_karts = stk_config->m_max_karts;
+            }
+            race_manager->setNumKarts(user_config->m_karts );
+            fprintf ( stdout, _("%d karts will be used.\n"), user_config->m_karts);
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {

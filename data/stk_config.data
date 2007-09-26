@@ -2,6 +2,10 @@
 
 (config
 
+ ;; STK parameters
+ ;; --------------
+ (max-karts                 10   )  ;; maximum number of karts
+
  ;; Attachment related parameters
  ;; -----------------------------
  (anvil-weight             150.0 )  ;; additional weight an anvil adds to a kart

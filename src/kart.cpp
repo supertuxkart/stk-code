@@ -396,6 +396,10 @@ void Kart::reset()
 #ifdef BULLET
     btTransform *trans=new btTransform();
     trans->setIdentity();
+    // Set heading:
+    trans->setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
+				    m_reset_pos.hpr[0]*3.1415926f/180.0f));
+    // Set position
     trans->setOrigin(btVector3(m_reset_pos.xyz[0],
                                m_reset_pos.xyz[1],
                                m_reset_pos.xyz[2]+0.5*m_kart_height));

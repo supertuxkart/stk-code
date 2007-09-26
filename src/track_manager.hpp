@@ -38,8 +38,8 @@ public:
 
     /** get TrackData by the track ident (aka filename without
         .track) */
-    const Track* getTrack(const std::string& ident) const;
-    const Track* getTrack(size_t id) const;
+    Track* getTrack(const std::string& ident) const;
+    Track* getTrack(size_t id) const;
 
     size_t getTrackCount() const;
 

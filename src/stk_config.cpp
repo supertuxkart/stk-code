@@ -53,6 +53,8 @@ void STKConfig::load(const std::string filename)
         exit(-1);
     }
 #endif
+    CHECK_NEG(m_max_karts,               "max-karts"                    );
+
     CHECK_NEG(m_corn_r,                  "m_corn_r"                     );
     CHECK_NEG(m_corn_f,                  "m_corn_f"                     );
 
@@ -139,6 +141,7 @@ void STKConfig::init_defaults()
     m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
     m_max_speed_reverse_ratio = m_explosion_impulse = -99.9f;
 
+    m_max_karts            = -100;
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
 
@@ -165,6 +168,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("bomb-time-increase",           m_bomb_time_increase  );
     lisp->get("anvil-time",                   m_anvil_time          );
     lisp->get("explosion-impulse",            m_explosion_impulse   );
+    lisp->get("max-karts",                    m_max_karts           );
 
     // Get the default KartProperties
     // ------------------------------

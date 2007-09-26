@@ -371,6 +371,37 @@ void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
 }   // trackToSpatial
 
 //-----------------------------------------------------------------------------
+void Track::createHash(ssgEntity* track_branch, unsigned int n) {
+    m_static_ssg = new StaticSSG(track_branch, n);
+}   // createHash
+
+//-----------------------------------------------------------------------------
+/** Returns the start coordinates for a kart on a given position pos
+    (with 0<=pos).
+ */
+void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
+  // Bug fix/workaround: sometimes the first kart would be too close
+  // to the first driveline point and not to the last one -->
+  // This kart would not get any lap counting done in the first
+  // lap! Therefor -1.5 is subtracted from the y position - which
+  // is a somewhat arbitrary value.
+  coords->xyz[0] = pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5:-1.5f);
+  coords->xyz[1] = pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f;
+   // height must be larger than the actual hight for which hot is computed.
+  coords->xyz[2] = pos<m_start_z.size() ? m_start_z[pos] : 1.0f;
+
+  coords->hpr[0] = pos<m_start_heading.size() ? m_start_heading[pos] : 0.0f;
+  coords->hpr[1] = 0.0f;
+  coords->hpr[2] = 0.0f;
+
+  ssgLeaf *leaf;
+  sgVec4* normal;
+  const float hot = m_static_ssg->hot(coords->xyz, coords->xyz, &leaf, &normal);
+  coords->xyz[2] = hot;
+
+}   // getStartCoords
+
+//-----------------------------------------------------------------------------
 /** Determines if a kart moving from sector OLDSEC to sector NEWSEC
  *  would be taking a shortcut, i.e. if the distance is larger
  *  than a certain detla
@@ -747,25 +778,29 @@ void Track::loadTrack(std::string filename_)
         throw std::runtime_error(msg);
     }
 
-    LISP->get("name",          m_name);
-    LISP->get("description",   m_description);
-    LISP->getVector("music",   m_music_filenames);
-    LISP->get("herring",       m_herring_style);
-    LISP->get("screenshot",    m_screenshot);
-    LISP->get("topview",       m_top_view);
-    LISP->get("sky-color",     m_sky_color);
+    LISP->get      ("name",          m_name);
+    LISP->get      ("description",   m_description);
+    LISP->getVector("music",         m_music_filenames);
+    LISP->get      ("herring",       m_herring_style);
+    LISP->get      ("screenshot",    m_screenshot);
+    LISP->get      ("topview",       m_top_view);
+    LISP->get      ("sky-color",     m_sky_color);
+    LISP->getVector("start-x",       m_start_x);
+    LISP->getVector("start-y",       m_start_y);
+    LISP->getVector("start-z",       m_start_z);
+    LISP->getVector("start-heading", m_start_heading);
 
-    LISP->get("use-fog",       m_use_fog);
-    LISP->get("fog-color",     m_fog_color);
-    LISP->get("fog-density",   m_fog_density);
-    LISP->get("fog-start",     m_fog_start);
-    LISP->get("fog-end",       m_fog_end);
+    LISP->get      ("use-fog",       m_use_fog);
+    LISP->get      ("fog-color",     m_fog_color);
+    LISP->get      ("fog-density",   m_fog_density);
+    LISP->get      ("fog-start",     m_fog_start);
+    LISP->get      ("fog-end",       m_fog_end);
 
-    LISP->get("sun-position",  m_sun_position);
-    LISP->get("sun-ambient",   m_ambient_col);
-    LISP->get("sun-specular",  m_specular_col);
-    LISP->get("sun-diffuse",   m_diffuse_col);
-    LISP->get("m_gravity",     m_gravity);
+    LISP->get      ("sun-position",  m_sun_position);
+    LISP->get      ("sun-ambient",   m_ambient_col);
+    LISP->get      ("sun-specular",  m_specular_col);
+    LISP->get      ("sun-diffuse",   m_diffuse_col);
+    LISP->get      ("m_gravity",     m_gravity);
     delete ROOT;
 }
 

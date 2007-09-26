@@ -33,7 +33,7 @@
 #include <plib/ssg.h>
 #include <string>
 #include <vector>
-
+#include "static_ssg.hpp"
 
 class Track
 {
@@ -43,9 +43,11 @@ private:
     std::string m_screenshot;
     std::string m_top_view;
     std::vector<std::string> m_music_filenames;
+    std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
     std::string m_herring_style;
     std::string m_description;
     std::string m_filename;
+    StaticSSG*  m_static_ssg;
 
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
@@ -168,11 +170,18 @@ public:
     const float&  getFogEnd             () const {return m_fog_end;       }
     const sgVec4& getSkyColor           () const {return m_sky_color;     }
     const std::string& getDescription   () const {return m_description;   }
-    const std::string& getTopviewFile   () const {return m_top_view;       }
+    const std::string& getTopviewFile   () const {return m_top_view;      }
     const std::string& getScreenshotFile() const {return m_screenshot;    }
     const std::vector<sgVec3Wrapper>& getDriveline () const {return m_driveline;}
     const std::vector<SGfloat>& getWidth() const {return m_path_width;    }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
+    void               createHash       (ssgEntity* track_branch, unsigned int n);
+    void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
+    int                Collision(sgSphere* s, AllHits *a) const
+                                        {return m_static_ssg->collision(s,a); }
+    float              GetHOT(sgVec3 start, sgVec3 end, 
+			      ssgLeaf** l, sgVec4** nrm) const
+                       {return m_static_ssg->hot(start, end, l, nrm);}
     void               glVtx            (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(

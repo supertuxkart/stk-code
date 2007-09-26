@@ -148,26 +148,26 @@ public:
     void setPlayerKart(int player, const std::string& kart);
     void setNumPlayers(int num);
     void reset();
-    void setGrandPrix(const CupData &cup_)     { m_cup = cup_;                  }
+    void setGrandPrix(const CupData &cup_)     { m_cup = cup_;                   }
     void setDifficulty(RaceDifficulty diff_)   { m_difficulty = diff_;           }
-    void setNumLaps(int num)                   { m_num_laps = num;                }
+    void setNumLaps(int num)                   { m_num_laps = num;               }
     void setTrack(const std::string& track_)   { m_track = track_;               }
     void setRaceMode(RaceSetup::RaceMode mode) { m_race_mode = mode;             }
-    void setNumKarts(int num)                  { m_num_karts = num;            }
-    int  getNumKarts()              const { return m_num_karts;                }
+    void setNumKarts(int num)                  { m_num_karts = num;              }
+    int  getNumKarts()              const { return m_num_karts;                  }
     int  getNumPlayers()            const { return (int)m_players.size();        }
-    int  getNumLaps()               const { return m_num_laps;                    }
+    int  getNumLaps()               const { return m_num_laps;                   }
     CupData *getGrandPrix()               { return &m_cup;                       }
-    unsigned int getFinishedKarts() const { return m_num_finished_karts;           }
-    unsigned int getFinishedPlayers() const { return m_num_finished_players;   }
+    unsigned int getFinishedKarts() const { return m_num_finished_karts;         }
+    unsigned int getFinishedPlayers() const { return m_num_finished_players;     }
     int  getKartScore(int kart   )  const { return m_mode->getKartScore(kart);   }
     int  getPositionScore(int pos)  const { return m_mode->getPositionScore(pos);}
     std::string getKartName(int kart) const { return m_mode->getKartName(kart);  }
     void addKartScore(int kart, int pos)  { m_mode->addKartScore(kart, pos);     }
-    void addFinishedKarts(int num)        { m_num_finished_karts += num;           }
-    void PlayerFinishes()                 { m_num_finished_players++;          }
-    int  allPlayerFinished()        {return m_num_finished_players==m_players.size();}
-    int  raceIsActive()                   {return m_active_race;}
+    void addFinishedKarts(int num)        { m_num_finished_karts += num;         }
+    void PlayerFinishes()                 { m_num_finished_players++;            }
+    int  allPlayerFinished()    {return m_num_finished_players==m_players.size();}
+    int  raceIsActive()                   {return m_active_race;                 }
 
     void setMirror() {/*FIXME*/}
     void setReverse(){/*FIXME*/}

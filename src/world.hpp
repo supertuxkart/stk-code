@@ -23,7 +23,6 @@
 #include <vector>
 #include <plib/ssg.h>
 #include "race_setup.hpp"
-#include "static_ssg.hpp"
 #include "track.hpp"
 #include "player_kart.hpp"
 #include "physics.hpp"
@@ -64,7 +63,7 @@ public:
 
     int m_ready_set_go;
 
-    const Track* m_track;
+    Track* m_track;
     
         /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];
@@ -72,13 +71,12 @@ public:
     /** Reference to the track inside the scene */
     ssgBranch *m_track_branch ;
 
+
     World(const RaceSetup& raceSetup);
     virtual ~World();
     float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
-    {return m_static_ssg->hot(start, end, leaf, nrm);}
-    int   Collision(sgSphere* s, AllHits *a)
-    {return m_static_ssg->collision(s,a);       }
-
+          {return m_track->GetHOT(start, end, leaf, nrm);}
+    int   Collision(sgSphere* s, AllHits *a) const {return m_track->Collision(s,a); }
     void draw();
     void update(float delta);
     void restartRace();
@@ -112,7 +110,6 @@ public:
     void  unpause();
 private:
     Karts       m_kart;
-    StaticSSG*  m_static_ssg;
     float       m_finish_delay_start_time;
     int*        m_number_collisions;
     Physics*    m_physics;

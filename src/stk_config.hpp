@@ -43,6 +43,7 @@ public:
     float m_shortcut_segments;       // skipping more than this number of segments is
                                      // considered to be a shortcut
     float m_explosion_impulse;       // impulse affecting each non-hit kart
+    int   m_max_karts;               // maximum number of karts
 
     STKConfig() : KartProperties() {};
     void init_defaults    ();

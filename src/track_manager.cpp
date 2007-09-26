@@ -37,7 +37,7 @@ TrackManager::~TrackManager()
 }
 
 //-----------------------------------------------------------------------------
-const Track*
+Track*
 TrackManager::getTrack(const std::string& ident) const
 {
     for(Tracks::const_iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
@@ -52,7 +52,7 @@ TrackManager::getTrack(const std::string& ident) const
 }
 
 //-----------------------------------------------------------------------------
-const Track*
+Track*
 TrackManager::getTrack(size_t id) const
 {
     return m_tracks[id];

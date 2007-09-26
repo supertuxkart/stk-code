@@ -109,36 +109,22 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     // karts can be positioned properly on (and not in) the tracks.
     loadTrack   ( ) ;
 
-    m_static_ssg = new StaticSSG(m_track_branch, 1000);
+    m_track->createHash(m_track_branch, 1000);
 
     int pos = 0;
     int playerIndex = 0;
     for (RaceSetup::Karts::iterator i = m_race_setup.m_karts.begin() ;
          i != m_race_setup.m_karts.end() ; ++i )
     {
-        // First determine the x/y/z position for the kart
-        sgCoord init_pos = { { 0, 0, 0 }, { 0, 0, 0 } } ;
-        //float hot=0.0;
-        // Bug fix/workaround: sometimes the first kart would be too close
-        // to the first driveline point and not to the last one -->
-        // This kart would not get any lap counting done in the first
-        // lap! Therefor -1.5 is subtracted from the y position - which
-        // is a somewhat arbitrary value.
-        init_pos.xyz[0] = (pos % 2 == 0) ? 1.5f : -1.5f ;
-        init_pos.xyz[1] = -pos * 1.5f -1.5f;
-        init_pos.xyz[2] = 1.0f;    // height must be and larger than the actual
-                                   // hight for which hot is computed.
-        ssgLeaf *leaf;
-        sgVec4* normal;
-        const float hot = GetHOT(init_pos.xyz, init_pos.xyz, &leaf, &normal);
-        init_pos.xyz[2] = hot;
+        sgCoord init_pos;
+        m_track->getStartCoords(pos, &init_pos);
 
         Kart* newkart;
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
-                                    init_pos);
+					init_pos);
         }
         else
         {
@@ -156,7 +142,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             else
             {
                 newkart = loadRobot(kart_properties_manager->getKart(*i), pos,
-                    init_pos);
+				    init_pos);
             }
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)
@@ -669,7 +655,7 @@ void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
     // Even if 3d data are given, make sure that the herring is on the ground
     (*xyz)[2] = getHeight ( m_track_branch, *xyz ) + 0.06f;
     herringType type=HE_GREEN;
-if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
+    if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
     if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
     if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
     if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
