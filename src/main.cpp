@@ -178,6 +178,7 @@ int handleCmdLine(int argc, char **argv)
             }
             race_manager->setNumKarts(user_config->m_karts );
             fprintf ( stdout, _("%d karts will be used.\n"), user_config->m_karts);
+	    i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {

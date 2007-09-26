@@ -66,8 +66,8 @@ GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
 
     std::vector<std::string> kart_names;
     
-    if(m_num_karts < 0               ) m_num_karts = stk_config->m_max_karts;
-    if(m_num_karts < m_players.size()) m_num_karts = m_players.size();
+    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
+    if((unsigned int)m_num_karts < m_players.size()) m_num_karts = m_players.size();
 
     kart_names.resize(m_num_karts);
 
@@ -164,8 +164,8 @@ QuickRaceMode::QuickRaceMode(const std::string& track_,
         : m_track(track_), m_players(players_), m_difficulty(difficulty_),
         m_num_karts(numKarts_), m_num_laps(numLaps_)
 {
-    if(m_num_karts < 0               ) m_num_karts = stk_config->m_max_karts;
-    if(m_num_karts < m_players.size()) m_num_karts = m_players.size();
+    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
+    if((unsigned int)m_num_karts < m_players.size()) m_num_karts = m_players.size();
 }
 
 //-----------------------------------------------------------------------------
