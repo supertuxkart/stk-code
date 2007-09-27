@@ -40,7 +40,7 @@ struct ReplayFrame
     // absolute time of frame
     float           time;
     // for each kart in frame, points to continious block 
-    // in Buffers::m_pp_blocks_kart_states with m_number_cars items
+    // in Buffers::m_pp_blocks_kart_states with m_number_karts items
     ReplayKartState *p_kart_states;
 };
 

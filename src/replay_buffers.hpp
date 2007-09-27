@@ -40,7 +40,7 @@ public:
     ReplayBuffers();
     ~ReplayBuffers();
 
-    bool                init( unsigned int number_cars, 
+    bool                init( unsigned int number_karts, 
                               size_t number_preallocated_frames );
     void                destroy();
 
@@ -54,9 +54,10 @@ public:
     ReplayFrame const*  getFrameAt( size_t frame_index ) const  { return m_BufferFrame.getObjectAt( frame_index ); }
 
     size_t              getNumberFrames() const                 { return m_BufferFrame.getNumberObjectsUsed(); }
+    unsigned int        getNumberKarts() const                  { return m_number_karts; }
 
     bool                saveReplayHumanReadable( FILE *fd ) const;
-    bool                loadReplayHumanReadable( FILE *fd, size_t number_cars );
+    bool                loadReplayHumanReadable( FILE *fd, unsigned int number_karts );
 
 private:
     bool                isHealthy() const                       { return m_BufferFrame.isHealthy() && m_BufferKartState.isHealthy(); }
@@ -65,7 +66,7 @@ private:
     typedef Buffer<ReplayFrame>           BufferFrame;
     typedef BufferArray<ReplayKartState>  BufferKartState;
 
-    unsigned int        m_number_cars;
+    unsigned int        m_number_karts;
     BufferFrame         m_BufferFrame;
     BufferKartState     m_BufferKartState;
 };

@@ -6,9 +6,10 @@
 #include "replay_base.hpp"
 #include "replay_buffers.hpp"
 
+#define REPLAY_SAVE_STATISTIC
 
 ReplayBuffers::ReplayBuffers()
-: m_number_cars(0),
+: m_number_karts(0),
   m_BufferFrame(),
   m_BufferKartState()
 {
@@ -23,16 +24,16 @@ void ReplayBuffers::destroy()
 {
     m_BufferFrame.destroy();
     m_BufferKartState.destroy();
-    m_number_cars = 0;
+    m_number_karts = 0;
 }
 
-bool ReplayBuffers::init( unsigned int number_cars, 
+bool ReplayBuffers::init( unsigned int number_karts, 
                           size_t number_preallocated_frames )
 {
-    m_number_cars = number_cars;
+    m_number_karts = number_karts;
 
     if( !m_BufferFrame.init( number_preallocated_frames ) ) return false;
-    if( !m_BufferKartState.init( number_preallocated_frames, number_cars ) ) return false;
+    if( !m_BufferKartState.init( number_preallocated_frames, number_karts ) ) return false;
 
     return true;
 }
@@ -63,6 +64,10 @@ bool ReplayBuffers::saveReplayHumanReadable( FILE *fd ) const
 
     if( fprintf( fd, "frames: %u\n", getNumberFrames() ) < 1 ) return false;
     
+#ifdef REPLAY_SAVE_STATISTIC
+    float time_step_min = 9999999.0f, time_step_max = 0.0f, time_last;
+#endif
+
     unsigned int frame_idx, kart_idx;
     ReplayFrame const *frame;
     ReplayKartState const *kart;
@@ -71,7 +76,7 @@ bool ReplayBuffers::saveReplayHumanReadable( FILE *fd ) const
         frame = getFrameAt( frame_idx );
         if( fprintf( fd, "frame %u  time %f\n", frame_idx, frame->time ) < 1 ) return false;
 
-        for( kart_idx = 0; kart_idx < m_number_cars; ++kart_idx )
+        for( kart_idx = 0; kart_idx < m_number_karts; ++kart_idx )
         {
             kart = frame->p_kart_states + kart_idx;
 
@@ -79,18 +84,42 @@ bool ReplayBuffers::saveReplayHumanReadable( FILE *fd ) const
                      kart->position.xyz[0], kart->position.xyz[1], kart->position.xyz[2],
                      kart->position.hpr[0], kart->position.hpr[1], kart->position.hpr[2] ) < 1 ) return false;   
         }
+
+#ifdef REPLAY_SAVE_STATISTIC
+        if( frame_idx )
+        {
+            float diff = frame->time - time_last;
+            if( diff < time_step_min ) time_step_min = diff;
+            if( diff > time_step_max ) time_step_max = diff;
+        }
+        time_last = frame->time;
+#endif
     }
+
+#ifdef REPLAY_SAVE_STATISTIC
+    float time_step_avg;
+    if( getNumberFrames() > 1 )
+    {
+        time_step_avg = time_last / ( getNumberFrames() - 1 );
+    }
+    else
+    {
+        time_step_avg = -1.0f;
+    }
+    fprintf( fd, "\n# statistic time-steps:\n# \tmin: %f\n# \tmax: %f\n# \tavg: %f\n", time_step_min, time_step_max, time_step_avg );
+#endif
 
     return true;
 }
 
-bool ReplayBuffers::loadReplayHumanReadable( FILE *fd, size_t number_cars )
+bool ReplayBuffers::loadReplayHumanReadable( FILE *fd, unsigned int number_karts )
 {
     size_t frames;
     if( fscanf( fd, "frames: %u\n", &frames ) != 1 ) return false;
 
-    if( !init( number_cars, frames ) ) return false;
+    if( !init( number_karts, frames ) ) return false;
 
+    assert( m_number_karts );
     unsigned int frame_idx, kart_idx, tmp;
     ReplayFrame *frame;
     ReplayKartState *kart;
@@ -102,7 +131,7 @@ bool ReplayBuffers::loadReplayHumanReadable( FILE *fd, size_t number_cars )
 
         if( fscanf( fd, "frame %u  time %f\n", &tmp, &frame->time ) != 2 ) return false;
 
-        for( kart_idx = 0; kart_idx < number_cars; ++kart_idx )
+        for( kart_idx = 0; kart_idx < m_number_karts; ++kart_idx )
         {
             kart = frame->p_kart_states + kart_idx;
 

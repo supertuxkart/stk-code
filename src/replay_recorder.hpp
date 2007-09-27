@@ -33,19 +33,26 @@ class ReplayRecorder : public ReplayBase
 private:
     // assuming 10 minutes with 50 frames per second
     enum { BUFFER_PREALLOCATE_FRAMES = 10 * 50 * 60, };
+    enum { REPLAY_FREQUENCY_MAX = 30 };
+    // calculated from REPLAY_FREQUENCY_MAX
+    static const float  REPLAY_TIME_STEP_MIN;
 
 public:
     ReplayRecorder();
     virtual ~ReplayRecorder();
 
     void            destroy();
-    bool            initRecorder( unsigned int number_cars, 
+    bool            initRecorder( unsigned int number_karts, 
                                   size_t number_preallocated_frames = BUFFER_PREALLOCATE_FRAMES );
 
+    // something might go wrong, since a new buffer may be allocated, so false means
+    // no memory available
+    bool            pushFrame();
+
+private:
     // returns a new *free* frame to be used to store the current frame-data into it
     // used to *record* the replay
     ReplayFrame*    getNewFrame() { return m_ReplayBuffers.getNewFrame(); }
-
 };
 
 

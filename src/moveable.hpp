@@ -68,6 +68,7 @@ public:
     int           isOnGround   ()              {return m_on_ground;               }
     sgCoord*      getVelocity  ()              {return & m_velocity;              }
     sgCoord*      getCoord     ()              {return &m_curr_pos;               }
+    const sgCoord* getCoord    ()  const       {return &m_curr_pos;               }
     const sgVec4* getNormalHOT ()  const       {return m_normal_hot;              }
     void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);   }
     virtual void  placeModel   ()              {m_model->setTransform(&m_curr_pos); }

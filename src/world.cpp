@@ -395,34 +395,11 @@ void World::update(float delta)
 	// normally, but after switching to RACE_PHASE m_clock is set back to 0.0
 	if( m_phase != START_PHASE ) 
 	{
-		pushReplayFrameData();
+		m_replay_recorder.pushFrame();
 		if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
 	}
 #endif
 }
-
-#ifdef HAVE_GHOST_REPLAY
-//-----------------------------------------------------------------------------
-void World::pushReplayFrameData()
-{
-	// we dont record the startphase ..
-	assert( m_phase != START_PHASE );
-
-    ReplayFrame *pFrame = m_replay_recorder.getNewFrame();
-    if( !pFrame ) return;
-
-    pFrame->time = m_clock;
-
-    Karts::const_iterator itKarts;
-    int kart_index = 0;
-    for( itKarts = m_kart.begin(); itKarts != m_kart.end(); ++itKarts, ++kart_index )
-    {
-        sgCopyCoord( &( pFrame->p_kart_states[ kart_index ].position ), 
-                     (*itKarts)->getCoord() );
-    }
-
-}  // pushFrameData
-#endif  // HAVE_GHOST_REPLAY
 
 #ifdef HAVE_GHOST_REPLAY
 //-----------------------------------------------------------------------------
@@ -528,7 +505,7 @@ void World::checkRaceStatus()
         sound_manager->playSfx(SOUND_START);
 #ifdef HAVE_GHOST_REPLAY
 		// push positions at time 0.0 to replay-data
-		pushReplayFrameData();
+		m_replay_recorder.pushFrame();
 #endif
     }
     else if (m_clock > 1.0 && m_ready_set_go == 2)

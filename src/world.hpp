@@ -127,8 +127,9 @@ private:
                  sgCoord init_pos);
 
 #ifdef HAVE_GHOST_REPLAY
+public:
+    float   getClock() const            { return m_clock; }
 private:
-    void    pushReplayFrameData();
     bool    saveReplayHumanReadable( std::string const &filename ) const;
     bool    loadReplayHumanReadable( std::string const &filename );
 
