@@ -127,8 +127,12 @@ void ReplayPlayer::showReplayAt( float abs_time )
     {
         ReplayFrame const* frame_next = m_ReplayBuffers.getFrameAt( m_current_frame_index+1 );
 
+        // calc scale factor based on time between frames
+        assert( frame_next->time > frame->time );
+        assert( frame_next->time != frame->time );
+        float scale = (abs_time - frame->time) / (frame_next->time - frame->time);
+
         sgVec3 tmp_v3;
-        float scale;
         sgCoord pos;
 
         // calc interpolations for all objects
@@ -139,10 +143,7 @@ void ReplayPlayer::showReplayAt( float abs_time )
             sgCopyVec3( tmp_v3, frame_next->p_kart_states[k].position.xyz ) ;
             sgSubVec3( tmp_v3, pos.xyz );
 
-            // calc scale factor based on time between frames
-            assert( frame_next->time > frame->time );
-            assert( frame_next->time != frame->time );
-            scale = (abs_time - frame->time) / (frame_next->time - frame->time);
+            // scale it based on time between frames
             sgScaleVec3( tmp_v3, scale );
 
             // add interpolated vector
