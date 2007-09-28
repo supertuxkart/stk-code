@@ -1,0 +1,42 @@
+basically 4 setups are included in the vc8-project:
+---------------------------------------------------
+
+Debug/Release: 
+  main setup with openAL & vorbis: HAVE_OPENAL + HAVE_OGGVORBIS
+
+PlibSoundDebug/PlibSoundRelease:
+  no ogg-sound, no openAL, no vorbis, it is gonna be obsolete, when we move to OpenAL/ogg-vorbis completely
+  
+BulletDebug/BulletRelease:
+  main setup (Debug/Relase) + BULLET
+  
+ReplayDebug/ReplayRelease:
+  main setup (Debug/Relase) + HAVE_GHOST_REPLAY
+  
+  
+
+create these environment-vars pointing to the folders of your installations:
+----------------------------------------------------------------------------
+
+@set PLIB_PATH=C:\libs
+@set SDL_PATH=C:\libs\SDL-1.2.12
+@set ALUT_PATH=C:\libs\freealut-1.1.0-bin
+@set OGG_PATH=C:\libs\libogg-1.1.3
+@set VORBIS_PATH=C:\libs\libvorbis-1.2.0
+@set OPENAL_PATH=C:\libs\OpenAL_1_1_SDK
+
+PLIB_PATH must be set to the parent-folder, i.e. my folder is "C:\libs\plib", but in the sources it is included
+as <plib/...h>, so we can use "$(PLIB_PATH)" for includes and "$(PLIB_PATH)/plib" for addiational-lib-directory
+
+
+add the folders of the runtime-dlls to the PATH-variable, this is what i had to put:
+
+C:\libs\SDL-1.2.12\lib;C:\libs\freealut-1.1.0-bin\lib;C:\libs\libogg-1.1.3\win32\VS2003\libogg\Release;C:\libs\libvorbis-1.2.0\win32\VS2005\libvorbis\Release;C:\libs\libvorbis-1.2.0\win32\VS2005\libvorbisfile\Release;C:\libs\plib;
+
+
+
+remarks for OpenAL-installation:
+--------------------------------
+
+my version of OpenAL 1.1-SDK didn't put its includes in OpenAL/include/AL but in OpenAL/include. 
+if yours did the same, create the folder OpenAL/include/AL and copy all the includes there.
