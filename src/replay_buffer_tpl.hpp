@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Damien Morel <divdams@free.fr>
+//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,20 +42,20 @@
 #endif
 
 
-template<typename T> class BufferArray;
+template<typename T> class ReplayBufferArray;
 
 template<typename T>
-class Buffer
+class ReplayBuffer
 {
-    friend class BufferArray<T>;
+    friend class ReplayBufferArray<T>;
 
 public:
-    Buffer()  : m_pp_blocks(NULL),m_number_blocks(0),m_block_size(0),m_number_objects_used(0),m_healthy(true) {}
-    ~Buffer() { destroy(); }
+    ReplayBuffer() : m_pp_blocks(NULL),m_number_blocks(0),m_block_size(0),m_number_objects_used(0),m_healthy(true) {}
+    ~ReplayBuffer() { destroy(); }
 
 private:
-    Buffer( Buffer<T> const &c );
-    Buffer<T> const &operator=( Buffer<T> const &c );
+    ReplayBuffer( ReplayBuffer<T> const &c );
+    ReplayBuffer<T> const &operator=( ReplayBuffer<T> const &c );
 
 public:
     bool            init( size_t number_preallocated_objects );
@@ -103,14 +103,14 @@ private:
 };
 
 
-// does the same as Buffer<T>, but it returns an array of objects, rather than just one 
+// does the same as ReplayBuffer<T>, but it returns an array of objects, rather than just one 
 // object .. 
 template<typename T>
-class BufferArray
+class ReplayBufferArray
 {
 public:
-    BufferArray() : m_Buffer(), m_array_size(0) {}
-    ~BufferArray() { destroy(); }
+    ReplayBufferArray() : m_Buffer(), m_array_size(0) {}
+    ~ReplayBufferArray() { destroy(); }
 
     void            destroy();
     bool            init( size_t number_preallocated_arrays, size_t array_size );
@@ -125,15 +125,15 @@ public:
     bool            isHealthy() const                   { return m_Buffer.isHealthy(); }
 
 private:
-    Buffer<T>   m_Buffer;
-    size_t      m_array_size;
+    ReplayBuffer<T> m_Buffer;
+    size_t          m_array_size;
 };
 
 
 
 
 template<typename T>
-bool Buffer<T>::init( size_t number_preallocated_objects )
+bool ReplayBuffer<T>::init( size_t number_preallocated_objects )
 {
     // make sure *clean* usage
     assert( !m_pp_blocks );
@@ -146,7 +146,7 @@ bool Buffer<T>::init( size_t number_preallocated_objects )
 }
 
 template<typename T>
-void Buffer<T>::destroy()
+void ReplayBuffer<T>::destroy()
 {
     size_t tmp;
     if( m_pp_blocks )
@@ -163,7 +163,7 @@ void Buffer<T>::destroy()
 // returns a new *free* frame to be used to store the current frame-data into it
 // used to *record* the replay
 template<typename T>
-T* Buffer<T>::getNewObject()
+T* ReplayBuffer<T>::getNewObject()
 {
     // make sure initialization was called properly
     assert( m_pp_blocks );
@@ -191,7 +191,7 @@ T* Buffer<T>::getNewObject()
 // returs frame at given position from replay data
 // used to *show* the replay
 template<typename T>
-T const* Buffer<T>::getObjectAt( size_t index ) const
+T const* ReplayBuffer<T>::getObjectAt( size_t index ) const
 {
     // make sure initialization was called properly
     assert( m_pp_blocks );
@@ -204,7 +204,7 @@ T const* Buffer<T>::getObjectAt( size_t index ) const
 }
 
 template<typename T>
-T* Buffer<T>::getObjectAt( size_t index )
+T* ReplayBuffer<T>::getObjectAt( size_t index )
 {
     // make sure initialization was called properly
     assert( m_pp_blocks );
@@ -218,7 +218,7 @@ T* Buffer<T>::getObjectAt( size_t index )
 
 // adds a new block of objects to m_pp_blocks with a size of m_block_size
 template<typename T>
-bool Buffer<T>::addNewBlock()
+bool ReplayBuffer<T>::addNewBlock()
 {
     assert( m_block_size );
 
@@ -261,14 +261,14 @@ bool Buffer<T>::addNewBlock()
 
 
 template<typename T>
-void BufferArray<T>::destroy()
+void ReplayBufferArray<T>::destroy()
 {
     m_Buffer.destroy();
     m_array_size = 0;
 }
 
 template<typename T>
-bool BufferArray<T>::init( size_t number_preallocated_arrays, size_t array_size )
+bool ReplayBufferArray<T>::init( size_t number_preallocated_arrays, size_t array_size )
 {
     assert( number_preallocated_arrays );
     assert( array_size );
@@ -278,7 +278,7 @@ bool BufferArray<T>::init( size_t number_preallocated_arrays, size_t array_size 
 
 // returns a new *free* array of objects
 template<typename T>
-T* BufferArray<T>::getNewArray()
+T* ReplayBufferArray<T>::getNewArray()
 {
     if( !isHealthy() ) return NULL;
 

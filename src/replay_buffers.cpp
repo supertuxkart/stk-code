@@ -1,7 +1,7 @@
-//  $Id: replay_buffers.cpp ikework $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

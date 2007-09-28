@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Damien Morel <divdams@free.fr>
+//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -63,8 +63,8 @@ private:
     bool                isHealthy() const                       { return m_BufferFrame.isHealthy() && m_BufferKartState.isHealthy(); }
 
 private:
-    typedef Buffer<ReplayFrame>           BufferFrame;
-    typedef BufferArray<ReplayKartState>  BufferKartState;
+    typedef ReplayBuffer<ReplayFrame>           BufferFrame;
+    typedef ReplayBufferArray<ReplayKartState>  BufferKartState;
 
     unsigned int        m_number_karts;
     BufferFrame         m_BufferFrame;
