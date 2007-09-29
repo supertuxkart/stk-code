@@ -190,7 +190,7 @@ get stuck or fall too far, use the rescue button to get back on track."),
     const int LABEL_ID  = widgetSet->varray(HS3);
     widgetSet -> filler(HS3);
 
-    for(int i = KC_LEFT; i <= KC_LAST; i++)
+    for(int i = KC_FIRST; i <= KC_LAST; i++)
     {
         // *sigh* widget set stores only pointer to strings, so
         // to make sure that all key-strings are permanent, they

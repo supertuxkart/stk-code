@@ -103,7 +103,7 @@ void RaceGUI::UpdateKeyboardMappings()
     {
         PlayerKart* kart = world->getPlayerKart(i);
 
-        for(int ka=(int) KC_LEFT;ka< (int) KC_LAST+1;ka++)
+        for(int ka=(int)KC_FIRST; ka < (int)KC_LAST+1; ka++)
             putEntry(kart, (KartActions) ka);
     }
 

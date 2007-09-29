@@ -30,7 +30,7 @@ class ssgContext;
 class HelpMenu: public BaseGUI
 {
 private:
-    std::string m_all_keys[KC_FIRE+1];
+    std::string m_all_keys[KC_LAST+1];
 
     ssgContext* m_context;
     ssgTransform* m_box;

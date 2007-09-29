@@ -36,9 +36,8 @@ typedef struct
 }
 Input;
 
-// Some part (e.g. gui/PlayerControls) depend on KC_LEFT being the first
-// entry, and KC_FIRE being the last - so any action added should be
-// added in between those two values.
+//When adding any action at the beginning or at the end, remember to update
+//the KC_FIRST and/or KC_LAST constants.
 enum KartActions { KC_LEFT,
                    KC_RIGHT,
                    KC_ACCEL,
@@ -48,7 +47,8 @@ enum KartActions { KC_LEFT,
                    KC_RESCUE,
                    KC_FIRE,
                    KC_LOOK_BACK };
-#define KC_LAST (KC_LOOK_BACK)
+const int KC_FIRST = KC_LEFT;
+const int KC_LAST = KC_LOOK_BACK;
 
 extern const char *sKartAction2String[KC_LAST+1];
 /*class for managing player name and control configuration*/
