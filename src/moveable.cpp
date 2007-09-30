@@ -27,11 +27,15 @@
 
 Moveable::Moveable (bool bHasHistory)
 {
-    m_shadow                = 0;
-    m_first_time             = true ;
-    m_model                 = new ssgTransform();
+#ifdef BULLET
+    m_body         = 0;
+    m_motion_state = 0;
+#endif
+    m_shadow       = 0;
+    m_first_time   = true ;
+    m_model        = new ssgTransform();
 
-    m_model     ->ref();
+    m_model->ref();
 
     sgZeroVec3 ( m_reset_pos.xyz ) ; sgZeroVec3 ( m_reset_pos.hpr ) ;
 
@@ -51,6 +55,10 @@ Moveable::Moveable (bool bHasHistory)
 //-----------------------------------------------------------------------------
 Moveable::~Moveable()
 {
+#ifdef BULLET
+    if(m_body        ) delete m_body;
+    if(m_motion_state) delete m_motion_state;
+#endif
     if(m_history_velocity)
     {
         delete [] m_history_velocity;
@@ -75,6 +83,19 @@ void Moveable::reset ()
 
 }   // reset
 
+//-----------------------------------------------------------------------------
+#ifdef BULLET
+void Moveable::createBody(float mass, btTransform& position, 
+                          btCollisionShape *shape, btVector3 inertia) {
+    
+    m_motion_state = new btDefaultMotionState(position);
+
+    // Then create a rigid body
+    // ------------------------
+    m_body = new btRigidBody(mass, m_motion_state, 
+                             shape, inertia);
+}   // createBody
+#endif
 //-----------------------------------------------------------------------------
 void Moveable::update (float dt)
 {

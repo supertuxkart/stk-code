@@ -101,11 +101,9 @@ protected:
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
+    btCompoundShape                    *m_kart_chassis;
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
-    btCompoundShape                    *m_kart_chassis;
-    btRigidBody                        *m_kart_body;
-    btDefaultMotionState               *m_motion_state;
     float                               m_kart_height;
     float                               m_time_since_stuck;
 #endif
@@ -234,7 +232,6 @@ public:
     void           createPhysics    (ssgEntity *obj);
 #ifdef BULLET
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
-    btRigidBody      *getKartBody   () const {return m_kart_body;              }
     void              updateBulletPhysics(float dt);
     void              draw          ();
     bool              isInRest      ();

@@ -34,8 +34,16 @@ Physics::Physics(float gravity)
     btCollisionDispatcher *dispatcher = new btCollisionDispatcher();
     btVector3 worldMin(-1000, -1000, -1000);
     btVector3 worldMax( 1000,  1000,  1000);
+
+    // The bullet interface has changed recently, define NEWBULLET
+    // for the new interface, default is the old interface
+#ifdef NEWBULLET
+    btBroadphaseInterface *pairCache = new btAxisSweep3(worldMin, worldMax);
+    btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
+#else
     btOverlappingPairCache *pairCache = new btAxisSweep3(worldMin, worldMax);
     btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
+#endif
     m_dynamics_world = new btDiscreteDynamicsWorld(dispatcher, pairCache, 
                                                    constraintSolver);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
@@ -133,7 +141,7 @@ void Physics::convertTrack(ssgEntity *track, sgMat4 m)
 //* Adds a kart to the physics engine
 void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
 {
-    m_dynamics_world->addRigidBody(kart->getKartBody());
+    m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(vehicle);
 
 }   // addKart
@@ -144,7 +152,7 @@ void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
  */
 void Physics::removeKart(const Kart *kart, btRaycastVehicle *vehicle)
 {
-    m_dynamics_world->removeRigidBody(kart->getKartBody());
+    m_dynamics_world->removeRigidBody(kart->getBody());
     m_dynamics_world->removeVehicle(vehicle);
 }   // removeKart
 

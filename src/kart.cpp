@@ -184,7 +184,6 @@ void Kart::createPhysics(ssgEntity *obj)
     btBoxShape *shape = new btBoxShape(btVector3(0.5*kart_width,
                                               0.5*kart_length,
                                               0.5*m_kart_height));
-    m_kart_chassis = new btCompoundShape();
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart 
@@ -192,6 +191,9 @@ void Kart::createPhysics(ssgEntity *obj)
     // (it's in units of kart_height)
     const float CENTER_SHIFT = getGravityCenterShift();
     shiftCenterOfGravity.setOrigin(btVector3(0.0f,0.0f,CENTER_SHIFT*m_kart_height));
+
+    // kart chassis is actually managed in moveable as shape
+    m_kart_chassis = new btCompoundShape();
     m_kart_chassis->addChildShape(shiftCenterOfGravity, shape);
 
     // Set mass and inertia
@@ -204,28 +206,24 @@ void Kart::createPhysics(ssgEntity *obj)
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    m_motion_state = new btDefaultMotionState(trans);
+    createBody(mass, trans, m_kart_chassis, inertia);
 
-    // Then create a rigid body
-    // ------------------------
-    m_kart_body = new btRigidBody(mass, m_motion_state, 
-                                  m_kart_chassis, inertia);
-    m_kart_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
-                            m_kart_properties->getChassisAngularDamping() );
+    m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
+                       m_kart_properties->getChassisAngularDamping() );
 
     // Reset velocities
     // ----------------
-    m_kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    m_kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+    m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
+    m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
 
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
     m_tuning = new btRaycastVehicle::btVehicleTuning();
-    m_vehicle = new btRaycastVehicle(*m_tuning, m_kart_body, m_vehicle_raycaster);
+    m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
     // never deactivate the vehicle
-    m_kart_body->setActivationState(DISABLE_DEACTIVATION);
+    m_body->setActivationState(DISABLE_DEACTIVATION);
     m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
     
     // Add wheels
@@ -311,9 +309,7 @@ Kart::~Kart()
     {
         delete m_kart_chassis->getChildShape(i);
     }
-    delete m_kart_chassis;
-    delete m_kart_body;
-    delete m_motion_state;
+    // the actual shape gets deleted in ~moveable
 #endif
 }   // ~Kart
 
@@ -325,7 +321,7 @@ Kart::~Kart()
 #ifdef BULLET
 bool Kart::isInRest()
 {
-    return fabs(m_kart_body->getLinearVelocity ().z())<0.2;
+    return fabs(m_body->getLinearVelocity ().z())<0.2;
 }  // isInRest
 #endif
 //-----------------------------------------------------------------------------
@@ -335,12 +331,12 @@ bool Kart::isInRest()
 void Kart::adjustSpeedWeight(float f)
 {
 #ifdef BULLET
-    m_kart_body->setLinearVelocity(m_kart_body->getLinearVelocity()*f);
+    m_body->setLinearVelocity(m_body->getLinearVelocity()*f);
     // getMass returns the mass increased by the attachment
     btVector3 inertia;
     float m=getMass();
     m_kart_chassis->calculateLocalInertia(m, inertia);
-    m_kart_body->setMassProps(m, inertia);
+    m_body->setMassProps(m, inertia);
 #else
     getVelocity()->xyz[1] *= f;
 #endif
@@ -405,9 +401,9 @@ void Kart::reset()
                                m_reset_pos.xyz[2]+0.5*m_kart_height));
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
-    m_kart_body->setCenterOfMassTransform(*trans);
-    m_kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    m_kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+    m_body->setCenterOfMassTransform(*trans);
+    m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
+    m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
@@ -594,7 +590,7 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 {
 #ifdef BULLET
     if(direct_hit) {
-        btVector3 velocity = m_kart_body->getLinearVelocity();
+        btVector3 velocity = m_body->getLinearVelocity();
 
         velocity.setX( 0.0f );
         velocity.setY( 0.0f );
@@ -631,7 +627,7 @@ void Kart::forceCrash ()
 {
     m_wheelie_angle = CRASH_PITCH ;
 #ifdef BULLET
-    btVector3 velocity         = m_kart_body->getLinearVelocity();
+    btVector3 velocity = m_body->getLinearVelocity();
 
     velocity.setY( 0.0f );
     velocity.setX( 0.0f );
@@ -715,14 +711,14 @@ void Kart::update (float dt)
 #ifdef BULLET
         m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
 
-        btTransform pos=m_kart_body->getCenterOfMassTransform();
+        btTransform pos=m_body->getCenterOfMassTransform();
         pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
         btQuaternion q_roll (btVector3(0., 1., 0.),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0);
         btQuaternion q_pitch(btVector3(1., 0., 0.),
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0);
         pos.setRotation(pos.getRotation()*q_roll*q_pitch);
-        m_kart_body->setCenterOfMassTransform(pos);
+        m_body->setCenterOfMassTransform(pos);
         m_motion_state->setWorldTransform(pos);
         //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());
 #else
@@ -856,7 +852,7 @@ void Kart::draw()
     t.getOpenGLMatrix(m);
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
-    world->getPhysics()->debugDraw(m, m_kart_body->getCollisionShape(), 
+    world->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
                                    wire_color);
     btCylinderShapeX *wheelShape = 
         new btCylinderShapeX( btVector3(0.3,
@@ -895,7 +891,7 @@ float Kart::handleWheelie(float dt)
     }
     if(m_wheelie_angle <=0.0f) return 0.0f;
 
-    const btTransform& chassisTrans = m_kart_body->getCenterOfMassTransform();
+    const btTransform& chassisTrans = m_body->getCenterOfMassTransform();
     btVector3 targetUp(0.0f, 0.0f, 1.0f);
     btVector3 forwardW (chassisTrans.getBasis()[0][1],
                         chassisTrans.getBasis()[1][1],
@@ -908,14 +904,14 @@ float Kart::handleWheelie(float dt)
     const float balance_recovery= m_kart_properties->getWheelieBalanceRecovery();
     float alpha                 = (targetUp.dot(forwardW));
     float deltaalpha            = m_wheelie_angle*M_PI/180.0f - alpha;
-    btVector3 angvel            = m_kart_body->getAngularVelocity();
+    btVector3 angvel            = m_body->getAngularVelocity();
     float projvel               = angvel.dot(crossProd);
     float deltavel              = -projvel    * gLeanRecovery    / step
                                   -deltaalpha * balance_recovery / step;
     btVector3 deltaangvel       = deltavel * crossProd;
     
     angvel                     += deltaangvel;
-    m_kart_body->setAngularVelocity(angvel);
+    m_body->setAngularVelocity(angvel);
     return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
           * m_wheelie_angle/getWheelieMaxPitch();
 }   // handleWheelie
@@ -968,7 +964,7 @@ void Kart::updatePhysics (float dt)
     { 
       //Vector3 impulse(0.0f, 0.0f, 10.0f);
       //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
-        btVector3 velocity         = m_kart_body->getLinearVelocity();
+        btVector3 velocity         = m_body->getLinearVelocity();
         velocity.setZ( 3.0f );
 
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
@@ -997,7 +993,7 @@ void Kart::updatePhysics (float dt)
     {
         const float velocity_ratio = max_speed/m_speed;
         m_speed                    = max_speed;
-        btVector3 velocity         = m_kart_body->getLinearVelocity();
+        btVector3 velocity         = m_body->getLinearVelocity();
 
         velocity.setY( velocity.getY() * velocity_ratio );
         velocity.setX( velocity.getX() * velocity_ratio );
@@ -1267,17 +1263,17 @@ void Kart::endRescue()
     m_rescue = false ;
 #ifdef BULLET
     world->getPhysics()->addKart(this, m_vehicle);
-    m_kart_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    m_kart_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+    m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
+    m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
     // FIXME: This code positions the kart correctly back on the track
     // (nearest waypoint) - but if the kart is simply upside down,
     // it feels better if the kart is left where it was. Perhaps
     // this code should only be used if a rescue was not triggered
     // by the kart being upside down??
-    btTransform pos=m_kart_body->getCenterOfMassTransform();
+    btTransform pos=m_body->getCenterOfMassTransform();
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
                             m_curr_pos.xyz[2]+0.5*m_kart_height));
-    m_kart_body->setCenterOfMassTransform(pos);
+    m_body->setCenterOfMassTransform(pos);
     m_motion_state->setWorldTransform(pos);
                   
 #endif
@@ -1522,7 +1518,7 @@ void Kart::placeModel ()
         btTransform t;
         if(m_rescue)
         {
-            t=m_kart_body->getCenterOfMassTransform();
+            t=m_body->getCenterOfMassTransform();
             //             m_motion_state->getWorldTransform(t);
         } 
         else
@@ -1535,7 +1531,7 @@ void Kart::placeModel ()
         //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
         // Transfer the new position and hpr to m_curr_pos
         sgSetCoord(&m_curr_pos, m);
-        const btVector3 &v=m_kart_body->getLinearVelocity();
+        const btVector3 &v=m_body->getLinearVelocity();
         sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
     }
     sgCoord c ;

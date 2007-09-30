@@ -23,6 +23,9 @@
 
 #include <plib/ssg.h>
 #include "material.hpp"
+#ifdef BULLET
+#include "btBulletDynamicsCommon.h"
+#endif
 
 /* Limits of Kart performance */
 #define CRASH_PITCH          -45.0f
@@ -55,6 +58,10 @@ protected:
     float collectIsectData ( sgVec3 start, sgVec3 end ) ;
     sgCoord*      m_history_velocity;
     sgCoord*      m_history_position;
+#ifdef BULLET
+    btRigidBody*          m_body;
+    btDefaultMotionState* m_motion_state;
+#endif
 
 public:
 
@@ -86,6 +93,11 @@ public:
     float         getIsectData (sgVec3 start, sgVec3 end );
     void          WriteHistory (char* s, int kartNumber, int indx);
     void          ReadHistory  (char* s, int kartNumber, int indx);
+#ifdef BULLET
+    btRigidBody*  getBody   () const {return m_body; }
+    void          createBody(float mass, btTransform& position, 
+                             btCollisionShape *shape, btVector3 inertia);
+#endif
 }
 ;   // class Moveable
 

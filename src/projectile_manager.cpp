@@ -75,6 +75,7 @@ void ProjectileManager::cleanup()
     m_active_explosions.clear();
 }   // cleanup
 
+// -----------------------------------------------------------------------------
 /** General projectile update call. */
 void ProjectileManager::update(float dt)
 {
@@ -122,6 +123,7 @@ void ProjectileManager::update(float dt)
 
 }   // update
 
+// -----------------------------------------------------------------------------
 /** See if there is an old, unused projectile object available. If so,
  *  reuse this object, otherwise create a new one. */
 Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
@@ -142,6 +144,7 @@ Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
 
 }   // newProjectile
 
+// -----------------------------------------------------------------------------
 /** See if there is an old, unused explosion object available. If so,
  *  reuse this object, otherwise create a new one. */
 Explosion* ProjectileManager::newExplosion(sgCoord* coord)
