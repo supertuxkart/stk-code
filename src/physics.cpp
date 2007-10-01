@@ -31,21 +31,31 @@
 /** Initialise physics. */
 Physics::Physics(float gravity)
 {
+
+    // The bullet interface has changed recently, define NEWBULLET
+    // for the new interface, default is the old interface. This version
+    // works with SVN revision 813 of bullet.
+
+#ifdef NEWBULLET
+    btDefaultCollisionConfiguration* collisionConf = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher *dispatcher = new btCollisionDispatcher(collisionConf);
+#else
     btCollisionDispatcher *dispatcher = new btCollisionDispatcher();
+#endif
     btVector3 worldMin(-1000, -1000, -1000);
     btVector3 worldMax( 1000,  1000,  1000);
 
-    // The bullet interface has changed recently, define NEWBULLET
-    // for the new interface, default is the old interface
 #ifdef NEWBULLET
-    btBroadphaseInterface *pairCache = new btAxisSweep3(worldMin, worldMax);
+    btBroadphaseInterface *axis_sweep    = new btAxisSweep3(worldMin, worldMax);
     btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
+    m_dynamics_world = new btDiscreteDynamicsWorld(dispatcher, axis_sweep, 
+                                                   constraintSolver);
 #else
-    btOverlappingPairCache *pairCache = new btAxisSweep3(worldMin, worldMax);
+    btOverlappingPairCache *pairCache    = new btAxisSweep3(worldMin, worldMax);
     btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
-#endif
     m_dynamics_world = new btDiscreteDynamicsWorld(dispatcher, pairCache, 
                                                    constraintSolver);
+#endif
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
     if(user_config->m_bullet_debug)
     {
