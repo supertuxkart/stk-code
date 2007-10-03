@@ -721,6 +721,10 @@
 				>
 			</File>
 			<File
+				RelativePath="../../../src\inputmap.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\isect.cpp"
 				>
 			</File>
@@ -1080,6 +1084,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.hpp"
+				>
+			</File>
+			<File
+				RelativePath="../../../src\inputmap.hpp"
 				>
 			</File>
 			<File
