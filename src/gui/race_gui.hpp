@@ -31,25 +31,11 @@
 #include "player.hpp"
 #include "world.hpp"
 
-// TODO: Fix this.
-#define MAX_ID0 512
-#define MAX_ID1 16
-#define MAX_ID2 2
-
-typedef struct
-{
-    PlayerKart *kart;
-    KartActions action;
-}
-Entry;
-
+class InputMap;
 class RaceSetup;
 
 class RaceGUI: public BaseGUI
 {
-    // A mapping for the assigned keys (like fire, ...) to
-    // the kart which is using them
-    Entry m_input_map[IT_LAST+1][MAX_ID0][MAX_ID1][MAX_ID2];
 
     class TimedMessage
     {
@@ -86,6 +72,7 @@ public:
                     int red=255, int green=0, int blue=255);
 
 private:
+    InputMap *m_input_map;
     ulClock     m_fps_timer;
     int         m_fps_counter;
     char        m_fps_string[10];
@@ -108,8 +95,7 @@ private:
     void drawAllMessages       (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
-    void UpdateKeyboardMappings();
-    void putEntry(PlayerKart *kart, KartActions ka);
+    void updateInputMappings();
     bool handleInput(InputType type, int id0, int id1, int id2, int value);
     void inputKeyboard(int key, int pressed);
     void drawPlayerIcons       ();

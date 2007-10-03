@@ -24,6 +24,7 @@
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "sdldrv.hpp"
 
 #include <string>
 
@@ -88,6 +89,8 @@ void PlayerControls::select()
     }
     m_edit_action   = static_cast<KartActions>(MENU_CHOICE);
     m_grab_input = true;
+    drv_hidePointer();
+
     widgetSet->set_label(m_grab_id, _("Press key"));
 }   // select
 
@@ -138,6 +141,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
         // ------------------------------
         else
         {
+            drv_showPointer();
             m_grab_input = false;
 
             // Do not accept pressing ESC as input.

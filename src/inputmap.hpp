@@ -1,7 +1,7 @@
-//  $Id: sdldrv.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: inputmap.hpp 1259 2007-09-24 12:28:19Z thebohemian $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2007 Robert Schuster
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,19 +17,36 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SDLDRV_H
-#define HEADER_SDLDRV_H
+#ifndef HEADER_INPUTMAP_H
+#define HEADER_INPUTMAP_H
 
-enum MouseState { INITIAL, MOVED, RESET_NEEDED }; 
+#include <map>
+#include "player.hpp"
 
-void drv_init();
-void drv_deinit();
+class Playerkart;
 
-void drv_showPointer();
-void drv_hidePointer();
+class InputMap
+{
+  typedef std::pair<int, int> Key;
 
-void drv_toggleFullscreen(int resetTextures=1);
+  public:
+    typedef struct
+    {
+      PlayerKart *kart;
+      KartActions action;
+    } Entry;
 
-void drv_loop();
+    void clear();
+
+    void putEntry(PlayerKart *, KartActions);
+
+    Entry *getEntry(InputType, int, int, int);
+
+  private:
+    Key key(InputType, int, int, int);
+
+    std::map<Key, Entry *> inputMap;
+
+};
 
 #endif

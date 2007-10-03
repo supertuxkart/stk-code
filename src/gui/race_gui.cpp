@@ -29,8 +29,9 @@
 #include "sdldrv.hpp"
 #include "translation.hpp"
 #include "font.hpp"
+#include "inputmap.hpp"
 
-RaceGUI::RaceGUI(): m_time_left(0.0)
+RaceGUI::RaceGUI(): m_input_map (new InputMap()), m_time_left(0.0)
 {
     if(user_config->m_fullscreen)
     {
@@ -39,7 +40,7 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
 
     if(!user_config->m_profile)
     {
-        UpdateKeyboardMappings();
+        updateInputMappings();
     }   // if !user_config->m_profile
 
     // FIXME: translation problem
@@ -74,6 +75,8 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+  delete m_input_map;
+
     if(user_config->m_fullscreen)
     {
         SDL_ShowCursor(SDL_ENABLE);
@@ -82,15 +85,9 @@ RaceGUI::~RaceGUI()
 }   // ~Racegui
 
 //-----------------------------------------------------------------------------
-void RaceGUI::UpdateKeyboardMappings()
+void RaceGUI::updateInputMappings()
 {
-    // Clear all entries.
-    for(int type = 0;type< (int) IT_LAST+1;type++)
-        for(int id0=0;id0<MAX_ID0;id0++)
-            for(int id1=0;id1<MAX_ID1;id1++)
-                for(int id2=0;id2<MAX_ID2;id2++)
-                    m_input_map[type][id0][id1][id2].kart = NULL;
-
+  m_input_map->clear();
 
     // Defines the mappings for player keys to kart and action
     // To avoid looping over all players to find out what
@@ -104,29 +101,19 @@ void RaceGUI::UpdateKeyboardMappings()
         PlayerKart* kart = world->getPlayerKart(i);
 
         for(int ka=(int)KC_FIRST; ka < (int)KC_LAST+1; ka++)
-            putEntry(kart, (KartActions) ka);
+            m_input_map->putEntry(kart, (KartActions) ka);
     }
 
 }   // UpdateKeyControl
 
 //-----------------------------------------------------------------------------
-void RaceGUI::putEntry(PlayerKart *kart, KartActions kc)
-{
-    Player *p = kart->getPlayer();
-    const Input *I  = p->getInput(kc);
-
-    m_input_map[I->type][I->id0][I->id1][I->id2].kart = kart;
-    m_input_map[I->type][I->id0][I->id1][I->id2].action = kc;
-}
-
-//-----------------------------------------------------------------------------
 bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
 {
-    PlayerKart *k = m_input_map[type][id0][id1][id2].kart;
+    InputMap::Entry *e = m_input_map->getEntry(type, id0, id1, id2);
 
-    if (k)
+    if (e)
     {
-        k->action(m_input_map[type][id0][id1][id2].action, value);
+        e->kart->action(e->action, value);
         return true;
     }
     else

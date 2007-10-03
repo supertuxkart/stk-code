@@ -39,8 +39,14 @@ SDL_Surface *mainSurface;
 long flags;
 SDL_Joystick **sticks;
 
+bool pointerVisible = true;
+
 #define DEADZONE_MOUSE 1
 #define DEADZONE_JOYSTICK 1000
+
+#define MULTIPLIER_MOUSE 750
+int mouseValX = 0;
+int mouseValY = 0;
 
 //-----------------------------------------------------------------------------
 void drv_init()
@@ -68,6 +74,20 @@ void drv_init()
 }
 
 //-----------------------------------------------------------------------------
+void
+drv_showPointer()
+{
+  pointerVisible = true;
+  SDL_ShowCursor(SDL_ENABLE);
+}
+//-----------------------------------------------------------------------------
+void
+drv_hidePointer()
+{
+  pointerVisible = false;
+  SDL_ShowCursor(SDL_DISABLE);
+}
+//-----------------------------------------------------------------------------
 void drv_toggleFullscreen(int resetTextures)
 {
     user_config->m_fullscreen = !user_config->m_fullscreen;
@@ -79,10 +99,10 @@ void drv_toggleFullscreen(int resetTextures)
         flags |= SDL_FULLSCREEN;
 
         if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-            SDL_ShowCursor(SDL_DISABLE);
+          drv_showPointer();
     }
     else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-            SDL_ShowCursor(SDL_ENABLE);
+        drv_hidePointer();
 
     SDL_FreeSurface(mainSurface);
     mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
@@ -168,32 +188,28 @@ void drv_loop()
             break;
 
         case SDL_MOUSEMOTION:
-            input(IT_MOUSEMOTION, ev.motion.x, mainSurface->h - ev.motion.y, 0, 0);
+          if (pointerVisible)
+          {
+            BaseGUI* menu= menu_manager->getCurrentMenu();
+            if (menu != NULL)
+              menu->inputPointer(ev.motion.x, mainSurface->h - ev.motion.y);
 
-#ifdef ALT_MOUSE_HANDLING
-            // This probably needs better handling
-            if (ev.motion.xrel < -DEADZONE_MOUSE)
-                input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 1);
-            else if(ev.motion.xrel > DEADZONE_MOUSE)
-                input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 1);
-            else
-            {
-                input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 0);
-                input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 0);
-            }
-
-            if (ev.motion.yrel < -DEADZONE_MOUSE)
-                input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 1);
-            else if(ev.motion.yrel > DEADZONE_MOUSE)
-                input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 1);
-            else
-            {
-                input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 0);
-                input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 0);
-            }
-#endif
-            break;
-
+            // Reset parameters for relative mouse handling to make sure we are
+            // in a valid state when returning to relative mouse mode
+            mouseValX = mouseValY = 0;
+          }
+          else
+          {
+            mouseValX = std::max(-32768,
+                                 std::min(32768, mouseValX
+                                                 + ev.motion.xrel
+                                                 * MULTIPLIER_MOUSE));
+            mouseValY = std::max(-32768,
+                                 std::min(32768, mouseValY
+                                                 + ev.motion.yrel
+                                                 * MULTIPLIER_MOUSE));
+          }
+          break;
         case SDL_MOUSEBUTTONUP:
             input(IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
             break;
@@ -224,4 +240,16 @@ void drv_loop()
             break;
         }  // switch
     }   // while (SDL_PollEvent())
+
+    // Makes mouse behave like an analog axis.
+    if (mouseValX <= DEADZONE_MOUSE)
+      input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, -mouseValX);
+    else if (mouseValX >= DEADZONE_MOUSE)
+      input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, mouseValX);
+
+    if (mouseValY <= DEADZONE_MOUSE)
+      input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, -mouseValY);
+    else if (mouseValY >= DEADZONE_MOUSE)
+      input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, mouseValY);
+
 }

@@ -31,19 +31,6 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
     case IT_KEYBOARD:
         inputKeyboard(id0, value);
         break;
-
-    case IT_MOUSEMOTION:
-        widgetSet->pulse(widgetSet->point(m_menu_id, id0, id1), 1.2f);
-
-#ifdef  ALT_MOUSE_HANDLING
-        if (id0 == 1 && value)
-            if (id1 == AD_NEGATIVE)
-                inputKeyboard(SDLK_UP, 1);
-            else
-                inputKeyboard(SDLK_DOWN, 1);
-#endif
-        break;
-
     case IT_MOUSEBUTTON:
       if (!value) // Act on button release only.
         switch (id0)
@@ -131,6 +118,12 @@ void BaseGUI::inputKeyboard(int key, int pressed)
         break;
     }   // switch
 }   // inputKeyboard
+//-----------------------------------------------------------------------------
+void
+BaseGUI::inputPointer(int x, int y)
+{
+  widgetSet->pulse(widgetSet->point(m_menu_id, x, y), 1.2f);
+}
 
 //-----------------------------------------------------------------------------
 void BaseGUI::update(float dt)

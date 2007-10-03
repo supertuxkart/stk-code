@@ -38,6 +38,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	music_ogg.cpp	   	   music_ogg.hpp            	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
 	utils.cpp		   utils.hpp                	\
+	inputmap.cpp		   inputmap.hpp			\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
 	herring.cpp 		   herring.hpp              	\

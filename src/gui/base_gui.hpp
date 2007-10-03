@@ -33,6 +33,9 @@ public:
 
     virtual void input(InputType type, int id0, int id1, int id2, int value);
     virtual void inputKeyboard(int key, int pressed);
+
+    void inputPointer(int x, int y);
+
     void  TimeToString(const float time, char *s);
 protected:
 
