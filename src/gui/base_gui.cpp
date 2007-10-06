@@ -39,21 +39,22 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
                 select();
                 break;
             case SDL_BUTTON_RIGHT:
-                if (menu_manager->getMenuStackSize() > 1)
-                {
-                    if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
-                    {
-                        world->unpause();
-                    }
-
-                    menu_manager->popMenu();
-                }
+                inputKeyboard(SDLK_ESCAPE, 0);
             break;
         }
         break;
 
     case IT_STICKMOTION:
-        widgetSet -> pulse(widgetSet -> stick(m_menu_id, id1, id2, value), 1.2f);
+        if (id1 == 0)
+        {
+          // X-Axis
+          inputKeyboard((id2 == AD_NEGATIVE) ? SDLK_LEFT : SDLK_RIGHT, !value);
+        }
+        else if (id1 == 1)
+        {
+          // Y-Axis
+          inputKeyboard((id2 == AD_NEGATIVE) ? SDLK_UP : SDLK_DOWN, !value);
+        }
         break;
 
     case IT_STICKBUTTON:
@@ -61,18 +62,10 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
             switch (id1) // Button no
             {
             case 0:
-                select();
+                inputKeyboard(SDLK_RETURN, 0);
                 break;
             case 1:
-                if (menu_manager->getMenuStackSize() > 1)
-                {
-                    if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
-                    {
-                        world->unpause();
-                    }
-
-                    menu_manager->popMenu();
-                }
+                inputKeyboard(SDLK_ESCAPE, 0);
                 break;
             }
         break;
@@ -83,6 +76,23 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
 }
 
 //-----------------------------------------------------------------------------
+/**
+ * Important note: One day the STK engine code will have no notion of SDL
+ * key, button, axes and so on. It will only know actions like menu up, menu
+ * down, enter menu, leave menu, ...
+ *
+ * However this requires some major reworking. Until this is done SDL's keys
+ * take the role of the actions. That is why joystick axes & buttons and mouse
+ * buttons are converted to key input (see BaseGUI::input).
+ *
+ * When the game actions are implemented not dealing with the input mechanisms
+ * gives more flexibility:
+ *  - issue no game actions when input sensing is active
+ *  - what issues a certain game action can be conveniently selected
+ *    (at compile or runtime, depending on the need)
+ *
+ * Please keep this goal in mind when you work on the input stuff.
+ */
 void BaseGUI::inputKeyboard(int key, int pressed)
 {
     // Skip on keypress, act on keyrelease only.
@@ -106,11 +116,10 @@ void BaseGUI::inputKeyboard(int key, int pressed)
     case SDLK_ESCAPE:
         if (menu_manager->getMenuStackSize() > 1)
         {
-            //We don't need to handle the race gui pause with the keyboard
-            //(but we have to with the joystick & mouse) because it has it's
-            //own keyboard handling function.
-
-            menu_manager->popMenu();
+           if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
+             world->unpause();
+    
+           menu_manager->popMenu();
         }
         break;
 

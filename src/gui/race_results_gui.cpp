@@ -174,43 +174,16 @@ void RaceResultsGUI::select()
         break;
     }
 }   // select
-
-
 //-----------------------------------------------------------------------------
-void RaceResultsGUI::input(InputType type, int id0, int  id1, int id2, int value)
+void
+RaceResultsGUI::inputKeyboard(int key, int pressed)
 {
-    if( (type==IT_STICKBUTTON && value && id1==1               ) ||
-        (type==IT_MOUSEBUTTON && value && id0==SDL_BUTTON_RIGHT)    )
-    {    // Usually here would be code to close this gui. Not only
-         // that doesn't has any real function in this gui,
-         // but also closing this gui causes bug #9157.
-        world->unpause();
-        race_manager->next();
-    }
-    else
-    {
-        BaseGUI::input(type, id0, id1, id2, value);
-    }
-
-}   // input
-
-//-----------------------------------------------------------------------------
-void RaceResultsGUI::inputKeyboard(int key, int pressed)
-{
-    if (!pressed)
-        return;
-
-    if(key!=SDLK_ESCAPE)
-    {
-        BaseGUI::inputKeyboard(key, pressed);
-    }
-    else
-    {   // Usually here would be code to close this gui. Not only
-        // that doesn't has any real function in this gui,
-        // but also causes bug #9157.
-        world->unpause();
-        race_manager->next();
-    }   // sif SDLK_ESCAPE
-}   // inputKeyboard
+  // Attempts to close the menu are silently discarded
+  // since they do not make sense at this point.
+  if (key == SDLK_ESCAPE)
+   return;
+  else
+    BaseGUI::inputKeyboard(key, pressed);
+}
 
 /* EOF */
