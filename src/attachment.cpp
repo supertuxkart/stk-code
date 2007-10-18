@@ -64,17 +64,44 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 // -----------------------------------------------------------------------------
 void Attachment::hitGreenHerring()
 {
-    switch (rand()%3)
+    int random_attachment;
+    float leftover_time   = 0.0f;
+    switch(getType())   // If there already is an attachment, make it worse :)
     {
-    case 0: set( ATTACH_PARACHUTE, stk_config->m_parachute_time ) ;
+    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getCoord());
+                       // Best solution would probably be to trigger the
+                       // explosion, and then to attach a new, random
+                       // attachment. Unfortunately, handleExplosion() is not
+                       // really severe enough, and forceRescue() attaches
+                       // tinytux, so that the new attachment is immediately lost.
+                       //m_kart->handleExplosion(m_kart->getCoord()->xyz, true);
+                       m_kart->forceRescue();
+                       clear();
+                       random_attachment = rand()%3;
+                       break;
+    case ATTACH_ANVIL :// if the kart already has an anvil, attach a new anvil, 
+                       // and increase the overall time 
+                       random_attachment = 2;
+                       leftover_time     = m_time_left;
+                       break;
+    case ATTACH_PARACHUTE:
+                       random_attachment = 2;  // anvil
+                       leftover_time     = m_time_left;
+                       break;
+    default:           random_attachment = rand()%3;
+    }   // switch
+    
+    switch (random_attachment)
+    {
+    case 0: set( ATTACH_PARACHUTE, stk_config->m_parachute_time+leftover_time);
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 1: set( ATTACH_BOMB, stk_config->m_bomb_time ) ;
+    case 1: set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 2: set( ATTACH_ANVIL, stk_config->m_anvil_time ) ;
+    case 2: set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         // Reduce speed once (see description above), all other changes are
