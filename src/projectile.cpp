@@ -1,3 +1,4 @@
+
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
@@ -25,11 +26,11 @@
 #include "projectile_manager.hpp"
 #include "sound_manager.hpp"
 #include "scene.hpp"
+#include "ssg_help.hpp"
 
 Projectile::Projectile(Kart *kart, int collectable) : Moveable(false)
 {
     init(kart, collectable);
-    getModel()->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 }   // Projectile
 
 //-----------------------------------------------------------------------------
@@ -37,17 +38,86 @@ void Projectile::init(Kart *kart, int collectable_)
 {
     m_owner              = kart;
     m_type               = collectable_;
-    m_has_hit_something    = false;
-    m_last_radar_beep     = -1;
+    m_has_hit_something  = false;
+    m_last_radar_beep    = -1;
     m_speed              = collectable_manager->getSpeed(m_type);
-    ssgTransform *m    = getModel();
+    ssgTransform *m      = getModel();
     m->addKid(collectable_manager->getModel(m_type));
+    scene->add(m);
 
+#ifdef BULLET
+	m_exploded = false;
+	float x_min, x_max, y_min, y_max, z_min, z_max;
+	// getModel returns the transform node, so get the actual model node
+	MinMax(getModel()->getKid(0), &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+	float half_length = 0.5f*(y_max-y_min);
+    
+    btCylinderShape* shape = new btCylinderShapeX(btVector3(half_length,
+														    0.5f*(z_max-z_min),
+															0.5f*(x_max-x_min)));
+
+    // The rocket has to start ahead of the kart (not in), so it has to 
+	// be moved forward by (at least) half a kart lengt .. we use one length here
+	btTransform trans;
+    kart->getTrans(&trans);
+
+	// We should get heading from the kart, and pitch/roll from the terrain here
+    btVector3 normal;
+	if(world->getPhysics()->getTerrainNormal(trans.getOrigin(), &normal))
+	{
+		float m[4][4];
+		trans.getOpenGLMatrix((float*)&m);
+		sgCoord pos;
+        sgSetCoord(&pos, m);
+		btQuaternion q=trans.getRotation();
+	    const float angle_terrain = DEGREE_TO_RAD(pos.hpr[0]);
+	    // The projectile should have the pitch of the terrain on which the kart
+        // is - while this is not really realistic, it plays much better this way
+        const float X = -sin(angle_terrain);
+        const float Y =  cos(angle_terrain);
+        // Compute the angle between the normal of the plane and the line to
+        // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
+        // simplifying the computation of the scalar product.
+        float pitch = ( normal.getX()*X + normal.getY()*Y );  // use ( x,y,0)
+        
+        // The actual angle computed above is between the normal and the (x,y,0)
+        // line, so to compute the actual angles 90 degrees must be subtracted.
+        pos.hpr[1] = acosf(pitch)/M_PI*180.0f-90.0f;
+		btQuaternion r=trans.getRotation();
+		r.setEuler(DEGREE_TO_RAD(pos.hpr[1]),DEGREE_TO_RAD(pos.hpr[2]),DEGREE_TO_RAD(pos.hpr[0]));
+		trans.setRotation(r);
+	}   // if a normal exist
+
+    m_initial_velocity = trans.getBasis()*btVector3(0.0f, m_speed, 0.0f);
+	btTransform offset;
+	offset.setOrigin(btVector3(0.0f, 2.0f*kart->getKartLength()+2.0f*half_length, 
+							   kart->getKartHeight()));
+
+	// The cylinder needs to be rotated by 90 degrees to face in the right direction:
+	btQuaternion r90(0.0f, 0.0f, -NINETY_DEGREE_RAD);
+	offset.setRotation(r90);
+    
+	// Apply rotation and offste
+	trans *= offset;
+	float mass=1.0f;
+
+    createBody(mass, trans, shape, Moveable::MOV_PROJECTILE);
+	// Simplified rockets: no gravity
+	world->getPhysics()->addBody(getBody());
+    m_body->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	m_body->setLinearVelocity(m_initial_velocity);
+	// FIXME: for now it is necessary to synch the graphical position with the 
+	//        physical position, since 'hot' computation is done using the 
+	//        graphical position (and hot can trigger an explosion when no
+	//        terrain is under the rocket). Once hot is done with bullet as
+	//        well, this shouldn't be necessary anymore.
+    placeModel();
+
+#else
     sgCoord c;
     sgCopyCoord(&c, kart->getCoord());
     const float angle_terrain = c.hpr[0]*M_PI/180.0f;
     // The projectile should have the pitch of the terrain on which the kart
-    // is - while this is not really realistic, it plays much better this way
     const sgVec4* normal      = kart->getNormalHOT();
     if(normal) 
     {
@@ -64,7 +134,7 @@ void Projectile::init(Kart *kart, int collectable_)
     }
 
     setCoord(&c);
-    scene->add(m);
+#endif
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -74,14 +144,39 @@ Projectile::~Projectile()
 //-----------------------------------------------------------------------------
 void Projectile::update (float dt)
 {
+#ifdef BULLET
+	if(m_exploded) return;
+    m_body->setLinearVelocity(m_initial_velocity);	
+#else
     // we don't even do any physics here - just set the
     // velocity, and ignore everything else for projectiles.
     m_velocity.xyz[1] = m_speed;
     sgCopyCoord ( &m_last_pos, &m_curr_pos);
+#endif
     Moveable::update(dt);
     doObjectInteractions();
 }   // update
 
+// -----------------------------------------------------------------------------
+#ifdef BULLET
+void Projectile::placeModel()
+{
+	btTransform t;
+	getTrans(&t);
+	// FIXME: this 90 degrees rotation can be removed 
+	//        if the 3d model is rotated instead
+	btQuaternion r90(0.0f, 0.0f, NINETY_DEGREE_RAD);
+	t.setRotation(t.getRotation()*r90);
+    float m[4][4];
+    t.getOpenGLMatrix((float*)&m);
+    sgSetCoord(&m_curr_pos, m);
+    const btVector3 &v=m_body->getLinearVelocity();
+    sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
+    m_model->setTransform(&m_curr_pos);
+    
+}  // placeModel
+#endif
+// -----------------------------------------------------------------------------
 /** Returns true if this missile has hit something, otherwise false. */
 void Projectile::doObjectInteractions ()
 {
@@ -98,13 +193,15 @@ void Projectile::doObjectInteractions ()
         if ( m_type != COLLECT_NOTHING && kart != m_owner )
         {
             const float D = sgDistanceSquaredVec3 ( pos->xyz, getCoord()->xyz ) ;
-
+#ifndef BULLET
             if ( D < 2.0f )
             {
                 explode(kart);
                 return;
             }
-            else if ( D < ndist )
+            else 
+#endif
+            if ( D < ndist )
             {
                 ndist = D ;
                 nearest = i ;
@@ -175,6 +272,7 @@ void Projectile::doObjectInteractions ()
 }   // doObjectInteractions
 
 //-----------------------------------------------------------------------------
+#ifndef BULLET
 void Projectile::doCollisionAnalysis  ( float dt, float hot )
 {
     if ( m_collided || m_crashed )
@@ -196,11 +294,15 @@ void Projectile::doCollisionAnalysis  ( float dt, float hot )
         }
     }   // if m_collided||m_crashed
 }   // doCollisionAnalysis
-
+#endif
 //-----------------------------------------------------------------------------
 void Projectile::explode(Kart *kart_hit)
 {
-    m_has_hit_something=true;
+#ifdef BULLET
+	if(m_exploded) return;
+
+#endif
+	m_has_hit_something=true;
     m_curr_pos.xyz[2] += 1.2f ;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object, and
@@ -213,6 +315,10 @@ void Projectile::explode(Kart *kart_hit)
     m->removeAllKids();
     scene->remove(m);
 
+#ifdef BULLET
+    world->getPhysics()->removeBody(getBody());
+	m_exploded=true;
+#endif
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         Kart *kart = world -> getKart(i);

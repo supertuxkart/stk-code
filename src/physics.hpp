@@ -25,27 +25,34 @@
 
 #ifdef BULLET
 #include "btBulletDynamicsCommon.h"
-#include "../bullet/Demos/OpenGL/GLDebugDrawer.h"
+#include "bullet/Demos/OpenGL/GLDebugDrawer.h"
 class Physics
 {
 protected:
-    btDynamicsWorld *m_dynamics_world;
-    Kart            *m_kart;
-    GLDebugDrawer   *m_debug_drawer;
+    btDynamicsWorld       *m_dynamics_world;
+    Kart                  *m_kart;
+    GLDebugDrawer         *m_debug_drawer;
+    btCollisionDispatcher *m_dispatcher;
 
-    void convertTrack(ssgEntity *track, sgMat4 m);
+    void convertTrack(ssgEntity *track, sgMat4 m,  btTriangleMesh* track_mesh);
 public:
-         Physics     (float gravity);
-        ~Physics     ();
-    void addKart     (const Kart *k, btRaycastVehicle *v);
-    void removeKart  (const Kart *k, btRaycastVehicle *v);
-    void update      (float dt);
-    void draw        ();
-    void setTrack    (ssgEntity *track);
-    btDynamicsWorld *getPhysicsWorld() const {return m_dynamics_world;}
-    void debugDraw   (float m[16], btCollisionShape *s, const btVector3 color);
+          Physics         (float gravity);
+         ~Physics         ();
+    void  addKart         (const Kart *k, btRaycastVehicle *v);
+    void  addBody         (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
+    void  removeKart      (const Kart *k);
+    void  removeBody      (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
+    void  update          (float dt);
+    void  handleCollisions();
+    void  draw            ();
+    void  setTrack        (ssgEntity *track);
+    btDynamicsWorld*
+          getPhysicsWorld () const {return m_dynamics_world;}
+    void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
+    static float NOHIT;
+    float getHOT          (btVector3 pos);
+    bool  getTerrainNormal(btVector3 pos, btVector3* normal);
 };
-
 // For non-bullet version: empty object
 #else
 class Physics

@@ -79,7 +79,6 @@ void ProjectileManager::cleanup()
 /** General projectile update call. */
 void ProjectileManager::update(float dt)
 {
-    m_something_was_hit=false;
     // First update all projectiles on the track
     for(Projectiles::iterator i  = m_active_projectiles.begin();
         i != m_active_projectiles.end(); ++i)
@@ -120,7 +119,7 @@ void ProjectileManager::update(float dt)
             e=m_active_explosions.erase(e);
         }   // while e!=m_active_explosions.end()
     }   // if m_explosion_ended
-
+    m_something_was_hit=false;
 }   // update
 
 // -----------------------------------------------------------------------------

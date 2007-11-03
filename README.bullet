@@ -1,25 +1,29 @@
 Preliminary support for the bullet physics engine has been
 added. To enable it (assume that 'STK' is the supertuxkart root
 directory):
-1) Decompress version r528 of bullet in STK/trunk/bullet
-   (the API of bullet is changing, and STK hasn't been updated
-   to use a recent bullet version yet. So new bullet versions
-   will most likely not compile and/or not work).
-2) Compile bullet (follow the instructions in STK/trunk/bullet/INSTALL)
-3) Run configure with:
+1) Uncompress a recent version of bullet (tested with 2.63)
+   in STK/src/bullet
+   2.63 is the latest version, earlier versions will not
+   work due to changes in the bullet API.
+   NOTE: The location of bullet was changed, before it was in
+   STK/bullet, now it's in STK/src/bullet.
+2) Compile bullet (follow the instructions in STK/src/bullet/INSTALL)
+3) Run STK configure with:
    ./configure --enable-bullet
 4) make
 
 For now mainly the race track works as expected, all tracks
 can be played (though the performance in some tracks is somewhat
 bad at the moment). Most important bugs:
-- collectable don't work
-  (well, you can fire a rocket, but hitting a kart won't do
-  much, zipper, don't do anything, ...)
+- not all collectable work
+  (zippers don't work, homing missiles don't go to the target,
+  sparks won't fly as expected either), but collision with
+  karts work.
 - no proper friction handling, so no skidding
   (though skidding potentially works - if the friction is
   set correctly).
-- physics parameters are not tuned
+- physics parameters have been improved, but might need 
+  additional tuning
 - rescuing an upside-down kart will return the kart to the middle
   of the track (waypoints) - the kart should be returned to where 
   it ended, just with a proper orientation.

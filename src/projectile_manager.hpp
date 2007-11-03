@@ -55,7 +55,7 @@ private:
     bool             m_explosion_ended;
 
 public:
-    ProjectileManager() {};
+    ProjectileManager() {m_something_was_hit=false;};
     ~ProjectileManager() {};
     void             explode          () {m_something_was_hit=true;}
     void             FinishedExplosion() {m_explosion_ended =true;}

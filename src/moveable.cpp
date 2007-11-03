@@ -85,15 +85,19 @@ void Moveable::reset ()
 
 //-----------------------------------------------------------------------------
 #ifdef BULLET
-void Moveable::createBody(float mass, btTransform& position, 
-                          btCollisionShape *shape, btVector3 inertia) {
+void Moveable::createBody(float mass, btTransform& trans, 
+                          btCollisionShape *shape, MoveableType m) {
     
-    m_motion_state = new btDefaultMotionState(position);
+    btVector3 inertia;
+    shape->calculateLocalInertia(mass, inertia);
+    m_motion_state = new btDefaultMotionState(trans);
 
     // Then create a rigid body
     // ------------------------
     m_body = new btRigidBody(mass, m_motion_state, 
                              shape, inertia);
+    m_body->setUserPointer(this);
+    setMoveableType(m);
 }   // createBody
 #endif
 //-----------------------------------------------------------------------------
@@ -174,11 +178,17 @@ void Moveable::update (float dt)
 
 #ifdef BULLET
     m_on_ground = ( HAT <= 1.5 );
+    // FIXME: we need a correct test here, HOT/HAT are currently not defined
+    //        for bullet (and would require a separate raycast, which can be
+    //        expensive. Perhaps add a function to bullet to indicate if
+    //        all/some/?? wheels toucht the ground.
+    //        m_on_ground is currently only used (in the bullet version) for
+    //        the gui display anyway
+    
 #else
     m_on_ground = ( HAT <= 0.01 );
-#endif
-
     doCollisionAnalysis(dt, HOT);
+#endif
 
     placeModel () ;
 
@@ -246,7 +256,9 @@ void Moveable::ReadHistory(char* s, int kartNumber, int indx)
 }   // ReadHistory
 
 //-----------------------------------------------------------------------------
+#ifndef BULLET
 void Moveable::doCollisionAnalysis  ( float,float ) { /* Empty by Default. */ }
+#endif
 
 #define ISECT_STEP_SIZE         0.4f
 #define COLLISION_SPHERE_RADIUS 0.6f

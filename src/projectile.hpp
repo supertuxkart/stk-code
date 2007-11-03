@@ -33,13 +33,22 @@ class Projectile : public Moveable
     int         m_type ;
     bool        m_has_hit_something;
     int         m_last_radar_beep;
+#ifdef BULLET
+    bool        m_exploded;
+    btVector3   m_initial_velocity; 
+#endif
 public:
 
     Projectile               (Kart* kart_, int type);
     virtual ~Projectile();
     void init                (Kart* kart_, int type);
     void update              (float);
+#ifdef BULLET
+    void placeModel          ();
+#endif
+#ifndef BULLET
     void doCollisionAnalysis (float dt, float hot);
+#endif
     void doObjectInteractions();
     void explode             (Kart* kart);
     bool hasHit              ()            {return m_has_hit_something;}

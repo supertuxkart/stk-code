@@ -124,7 +124,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
-					init_pos);
+                    init_pos);
         }
         else
         {
@@ -142,7 +142,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             else
             {
                 newkart = loadRobot(kart_properties_manager->getKart(*i), pos,
-				    init_pos);
+                    init_pos);
             }
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)
@@ -193,13 +193,13 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
 
-	m_p_replay_player = new ReplayPlayer;
+    m_p_replay_player = new ReplayPlayer;
     if( !loadReplayHumanReadable( "test1" ) ) 
-	{
-		delete m_p_replay_player;
-		m_p_replay_player = NULL;
-	}
-	if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
+    {
+        delete m_p_replay_player;
+        m_p_replay_player = NULL;
+    }
+    if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
 #endif
 }
 
@@ -234,14 +234,14 @@ World::~World()
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.destroy();
-	if( m_p_replay_player )
-	{
-		m_p_replay_player->destroy();
-		delete m_p_replay_player;
-		m_p_replay_player = NULL;
-	}
+    if( m_p_replay_player )
+    {
+        m_p_replay_player->destroy();
+        delete m_p_replay_player;
+        m_p_replay_player = NULL;
+    }
 #endif
-}
+}   // ~World
 
 //-----------------------------------------------------------------------------
 /** Waits till each kart is resting on the ground
@@ -281,11 +281,11 @@ void World::update(float delta)
     if(user_config->m_replay_history) delta=history->GetNextDelta();
 
     checkRaceStatus();
-	// this line was before checkRaceStatus. but m_clock is set to 0.0 in
-	// checkRaceStatus on start, so m_clock would not be synchron and the
-	// first delta would not be added .. that would cause a gap in 
-	// replay-recording
-	m_clock += delta;
+    // this line was before checkRaceStatus. but m_clock is set to 0.0 in
+    // checkRaceStatus on start, so m_clock would not be synchron and the
+    // first delta would not be added .. that would cause a gap in 
+    // replay-recording
+    m_clock += delta;
 
     // Count the number of collision in the next 'FRAMES_FOR_TRAFFIC_JAM' frames.
     // If a kart has more than one hit, play 'traffic jam' noise.
@@ -312,7 +312,7 @@ void World::update(float delta)
 
         // Don't record the time for the last kart, since it didn't finish
         // the race - unless it's timetrial (then there is only one kart)
-	unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+    unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
                                     ? m_kart.size() : m_kart.size()-1;
         for(unsigned int pos=0; pos<karts_to_enter; pos++)
         {
@@ -325,12 +325,12 @@ void World::update(float delta)
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
             if(m_highscores->addData(hst, m_kart.size(),
-				     m_race_setup.m_difficulty, 
-				     m_track->getName(),
-				     k->getName(),
-				     k->getPlayer()->getName(),
-				     k->getFinishTime(),
-				     m_race_setup.m_num_laps)>0)
+                     m_race_setup.m_difficulty, 
+                     m_track->getName(),
+                     k->getName(),
+                     k->getPlayer()->getName(),
+                     k->getFinishTime(),
+                     m_race_setup.m_num_laps)>0)
             {
                 highscore_manager->Save();
             }
@@ -391,13 +391,13 @@ void World::update(float delta)
     }
 
 #ifdef HAVE_GHOST_REPLAY
-	// we start recording after START_PHASE, since during start-phase m_clock is incremented
-	// normally, but after switching to RACE_PHASE m_clock is set back to 0.0
-	if( m_phase != START_PHASE ) 
-	{
-		m_replay_recorder.pushFrame();
-		if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
-	}
+    // we start recording after START_PHASE, since during start-phase m_clock is incremented
+    // normally, but after switching to RACE_PHASE m_clock is set back to 0.0
+    if( m_phase != START_PHASE ) 
+    {
+        m_replay_recorder.pushFrame();
+        if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
+    }
 #endif
 }
 
@@ -504,8 +504,8 @@ void World::checkRaceStatus()
         m_clock = 0.0f;
         sound_manager->playSfx(SOUND_START);
 #ifdef HAVE_GHOST_REPLAY
-		// push positions at time 0.0 to replay-data
-		m_replay_recorder.pushFrame();
+        // push positions at time 0.0 to replay-data
+        m_replay_recorder.pushFrame();
 #endif
     }
     else if (m_clock > 1.0 && m_ready_set_go == 2)
@@ -858,7 +858,7 @@ void World::restartRace()
     m_replay_recorder.destroy();
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
 
-	if( m_p_replay_player ) 
+    if( m_p_replay_player ) 
     {
         m_p_replay_player->reset();
         m_p_replay_player->showReplayAt( 0.0 );
@@ -874,7 +874,7 @@ Kart* World::loadRobot(const KartProperties *kart_properties, int position,
     
     const int NUM_ROBOTS = 1;
 
-	srand((unsigned)std::time(0));
+    srand((unsigned)std::time(0));
 
     switch(rand() % NUM_ROBOTS)
     {

@@ -38,7 +38,7 @@
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
 #ifdef BULLET
-#include "../bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #endif
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
@@ -174,16 +174,16 @@ void Kart::createPhysics(ssgEntity *obj)
     float x_min, x_max, y_min, y_max, z_min, z_max;
     MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     float kart_width  = x_max-x_min;
-    float kart_length = y_max-y_min;
-    if(kart_length<1.2) kart_length=1.5f;
+    m_kart_length = y_max-y_min;
+    if(m_kart_length<1.2) m_kart_length=1.5f;
 
     // The kart height is needed later to reset the physics to the correct
     // position.
     m_kart_height  = z_max-z_min;
 
-    btBoxShape *shape = new btBoxShape(btVector3(0.5*kart_width,
-                                              0.5*kart_length,
-                                              0.5*m_kart_height));
+    btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
+                                              0.5f*m_kart_length,
+                                              0.5f*m_kart_height));
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart 
@@ -199,14 +199,12 @@ void Kart::createPhysics(ssgEntity *obj)
     // Set mass and inertia
     // --------------------
     float mass=getMass();
-    btVector3 inertia;
-    m_kart_chassis->calculateLocalInertia(mass, inertia);
 
     // Position the chassis
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    createBody(mass, trans, m_kart_chassis, inertia);
+    createBody(mass, trans, m_kart_chassis, Moveable::MOV_KART);
 
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
                        m_kart_properties->getChassisAngularDamping() );
@@ -222,6 +220,7 @@ void Kart::createPhysics(ssgEntity *obj)
         new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
     m_tuning = new btRaycastVehicle::btVehicleTuning();
     m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
+
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
     m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
@@ -231,13 +230,13 @@ void Kart::createPhysics(ssgEntity *obj)
     float wheel_width  = m_kart_properties->getWheelWidth();
     float wheel_radius = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
-    float connection_height = -(0.5-CENTER_SHIFT)*m_kart_height;
+    float connection_height = -(0.5f-CENTER_SHIFT)*m_kart_height;
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
     // right front wheel
     btVector3 wheel_coord(0.5f*kart_width-0.3f*wheel_width,
-                          0.5f*kart_length-wheel_radius,
+                          0.5f*m_kart_length-wheel_radius,
                           connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -245,23 +244,23 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // left front wheel
     wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
-                            0.5f*kart_length-wheel_radius,
+                            0.5f*m_kart_length-wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ true);
 
     // right rear wheel
-    wheel_coord = btVector3(0.5*kart_width-0.3f*wheel_width, 
-                            -0.5*kart_length+wheel_radius,
+    wheel_coord = btVector3(0.5f*kart_width-0.3f*wheel_width, 
+                            -0.5f*m_kart_length+wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ false);
 
     // right rear wheel
-    wheel_coord = btVector3(-0.5*kart_width+0.3f*wheel_width,
-                            -0.5*kart_length+wheel_radius,
+    wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
+                            -0.5f*m_kart_length+wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -304,6 +303,7 @@ Kart::~Kart()
 #ifdef BULLET
     delete m_tuning;
     delete m_vehicle_raycaster;
+    world->getPhysics()->removeKart(this);
     delete m_vehicle;
     for(int i=0; i<m_kart_chassis->getNumChildShapes(); i++)
     {
@@ -394,11 +394,11 @@ void Kart::reset()
     trans->setIdentity();
     // Set heading:
     trans->setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-				    m_reset_pos.hpr[0]*3.1415926f/180.0f));
+                                    DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
     // Set position
     trans->setOrigin(btVector3(m_reset_pos.xyz[0],
                                m_reset_pos.xyz[1],
-                               m_reset_pos.xyz[2]+0.5*m_kart_height));
+                               m_reset_pos.xyz[2]+0.5f*m_kart_height));
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
     m_body->setCenterOfMassTransform(*trans);
@@ -640,6 +640,7 @@ void Kart::forceCrash ()
 }  // forceCrash
 
 //-----------------------------------------------------------------------------
+#ifndef BULLET
 void Kart::doCollisionAnalysis ( float delta, float hot )
 {
     if ( m_collided )
@@ -670,7 +671,7 @@ void Kart::doCollisionAnalysis ( float delta, float hot )
         m_velocity.xyz[2] = 0.0f ;
     }   // isOnGround
 }   // doCollisionAnalysis
-
+#endif
 //-----------------------------------------------------------------------------
 void Kart::update (float dt)
 {
@@ -705,7 +706,7 @@ void Kart::update (float dt)
 #ifdef BULLET
             m_rescue_pitch = m_curr_pos.hpr[1];
             m_rescue_roll  = m_curr_pos.hpr[2];
-            world->getPhysics()->removeKart(this, m_vehicle);
+            world->getPhysics()->removeKart(this);
 #endif
         }
 #ifdef BULLET
@@ -713,13 +714,13 @@ void Kart::update (float dt)
 
         btTransform pos=m_body->getCenterOfMassTransform();
         pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
-        btQuaternion q_roll (btVector3(0., 1., 0.),
-                             -m_rescue_roll*dt/rescue_time*M_PI/180.0);
-        btQuaternion q_pitch(btVector3(1., 0., 0.),
-                             -m_rescue_pitch*dt/rescue_time*M_PI/180.0);
+        btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
+                             -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
+        btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
+                             -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
         pos.setRotation(pos.getRotation()*q_roll*q_pitch);
         m_body->setCenterOfMassTransform(pos);
-        m_motion_state->setWorldTransform(pos);
+    setTrans(pos);
         //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());
 #else
         sgZeroVec3 ( m_velocity.xyz ) ;
@@ -848,14 +849,14 @@ void Kart::draw()
 {
     float m[16];
     btTransform t;
-    m_motion_state->getWorldTransform(t);
+    getTrans(&t);
     t.getOpenGLMatrix(m);
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
     world->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
                                    wire_color);
     btCylinderShapeX *wheelShape = 
-        new btCylinderShapeX( btVector3(0.3,
+        new btCylinderShapeX( btVector3(0.3f,
                                         m_kart_properties->getWheelRadius(),
                                         m_kart_properties->getWheelRadius()) );
     btVector3 wheelColor(1,0,0);
@@ -923,7 +924,7 @@ void Kart::updatePhysics (float dt)
 
 #ifdef BULLET
     float engine_power = getActualWheelForce() + handleWheelie(dt);
-    if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2;
+    if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
     if(m_controls.accel)
     {   // accelerating
@@ -967,10 +968,10 @@ void Kart::updatePhysics (float dt)
         btVector3 velocity         = m_body->getLinearVelocity();
         velocity.setZ( 3.0f );
 
-        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+        getBody()->setLinearVelocity( velocity );
 
     }
-    const float steering = getMaxSteerAngle() * m_controls.lr * 0.00444;
+    const float steering = getMaxSteerAngle() * m_controls.lr * 0.00444f;
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
 
@@ -1073,7 +1074,7 @@ void Kart::updatePhysics (float dt)
     // ----------------------------------------------
     const float FORCE_ON_REAR_TIRE = 0.5f*MASS*WORLD_GRAVITY + m_prev_accel*MASS*getHeightCOG()/WHEEL_BASE;
     const float FORCE_ON_FRONT_TIRE = MASS*WORLD_GRAVITY - FORCE_ON_REAR_TIRE;
-	float maxGrip = std::max(FORCE_ON_REAR_TIRE,FORCE_ON_FRONT_TIRE)*getTireGrip();
+    float maxGrip = std::max(FORCE_ON_REAR_TIRE,FORCE_ON_FRONT_TIRE)*getTireGrip();
 
     // If the kart is on ground, modify the grip by the friction
     // modifier for the texture/terrain.
@@ -1272,9 +1273,9 @@ void Kart::endRescue()
     // by the kart being upside down??
     btTransform pos=m_body->getCenterOfMassTransform();
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
-                            m_curr_pos.xyz[2]+0.5*m_kart_height));
+                            m_curr_pos.xyz[2]+0.5f*m_kart_height));
     m_body->setCenterOfMassTransform(pos);
-    m_motion_state->setWorldTransform(pos);
+    setTrans(pos);
                   
 #endif
 
@@ -1518,12 +1519,13 @@ void Kart::placeModel ()
         btTransform t;
         if(m_rescue)
         {
+      // FIXME: can we use motion_state/getTrans as below here?
+      // FIXME: e.g. by setting motion_state appropriately during rescue?
             t=m_body->getCenterOfMassTransform();
-            //             m_motion_state->getWorldTransform(t);
         } 
         else
         {
-            m_motion_state->getWorldTransform(t);
+            getTrans(&t);
         }
         float m[4][4];
         t.getOpenGLMatrix((float*)&m);
@@ -1539,7 +1541,7 @@ void Kart::placeModel ()
     //    c.hpr[1] += m_wheelie_angle ;
     //    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS));
     const float CENTER_SHIFT = getGravityCenterShift();
-    c.xyz[2] -= (0.5-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
+    c.xyz[2] -= (0.5f-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
     m_model->setTransform(&c);
     
     // Check if a kart needs to be rescued.
@@ -1597,7 +1599,7 @@ void Kart::handleMagnet(float cdist, int closest)
 
     float tgt_velocity = world->getKart(closest)->getVelocity()->xyz[1] ;
 
-    //JH FIXME: that should probably be changes, e.g. by increasing the throttle
+    //JH FIXME: that should probably be changed, e.g. by increasing the throttle
     //          to something larger than 1???
     if (cdist > stk_config->m_magnet_min_range_sq)
     {

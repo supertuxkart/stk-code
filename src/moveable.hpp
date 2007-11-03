@@ -40,7 +40,10 @@
 
 class Moveable
 {
+public:
+    enum   MoveableType {MOV_KART, MOV_PROJECTILE} ;
 protected:
+    MoveableType  m_moveable_type;  /* used when upcasting bullet user pointers    */
     sgCoord       m_reset_pos;      /* Where to start in case of a reset           */
     sgCoord       m_curr_pos;       /* current position                            */
     sgCoord       m_velocity;       /* current velocity in local coordinates       */
@@ -73,6 +76,8 @@ public:
 
     ssgTransform* getModel     ()              {return m_model ;                  }
     int           isOnGround   ()              {return m_on_ground;               }
+    MoveableType  getMoveableType()  const     {return m_moveable_type;           }
+    void          setMoveableType(MoveableType m){m_moveable_type=m;              }
     sgCoord*      getVelocity  ()              {return & m_velocity;              }
     sgCoord*      getCoord     ()              {return &m_curr_pos;               }
     const sgCoord* getCoord    ()  const       {return &m_curr_pos;               }
@@ -83,7 +88,9 @@ public:
     virtual void  reset        ();
     virtual void  update       (float dt) ;
     virtual void  updatePosition(float dt, sgMat4 result);
+#ifndef BULLET
     virtual void  doCollisionAnalysis(float dt, float hot);
+#endif
 
     // Gets called when no high of terrain can be determined (isReset=0), or
     // there is a 'reset' material under the moveable --> karts need to be
@@ -95,8 +102,11 @@ public:
     void          ReadHistory  (char* s, int kartNumber, int indx);
 #ifdef BULLET
     btRigidBody*  getBody   () const {return m_body; }
-    void          createBody(float mass, btTransform& position, 
-                             btCollisionShape *shape, btVector3 inertia);
+    void          createBody(float mass, btTransform& trans, 
+                             btCollisionShape *shape, MoveableType m);
+    void          getTrans  (btTransform* t) const 
+                                            {m_motion_state->getWorldTransform(*t);}
+    void          setTrans  (btTransform& t){m_motion_state->setWorldTransform(t);}
 #endif
 }
 ;   // class Moveable

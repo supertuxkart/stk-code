@@ -91,6 +91,7 @@ protected:
     float        m_wheelie_angle ;
     float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
+    float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
     int          m_shortcut_count;     // counts number of times a shortcut is used
     int          m_shortcut_sector;    // segment on which the shortcut was started
@@ -229,8 +230,10 @@ public:
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }
+    float          getKartLength    () const {return m_kart_length;            }
     void           createPhysics    (ssgEntity *obj);
 #ifdef BULLET
+    float             getKartHeight () const {return m_kart_height;            }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     void              updateBulletPhysics(float dt);
     void              draw          ();
@@ -253,7 +256,9 @@ public:
     virtual void   forceCrash       ();
     virtual void   doLapCounting    ();
     virtual void   update           (float dt               );
+#ifndef BULLET
     virtual void   doCollisionAnalysis(float dt, float hot    );
+#endif
     virtual void   doObjectInteractions();
     virtual void   OutsideTrack     (int isReset) {m_rescue=true;}
 };

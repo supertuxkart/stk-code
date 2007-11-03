@@ -72,5 +72,7 @@
 #  define M_PI 3.14159265358979323846f  /* As in Linux's math.h */
 #endif
 
+#define NINETY_DEGREE_RAD  (M_PI/2.0f)
+#define DEGREE_TO_RAD(x)          ((x)*M_PI/180.0f)
 #endif
 

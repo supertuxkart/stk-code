@@ -162,16 +162,16 @@ void MovingPhysics::init()
     // -------------------------------
     float x_min, x_max, y_min, y_max, z_min, z_max, radius;
     MinMax(this, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    m_half_height = 0.5*(z_max-z_min);
+    m_half_height = 0.5f*(z_max-z_min);
     switch (m_body_type)
     {
-    case BODY_CONE: radius = 0.5*std::max(x_max-x_min, y_max-y_min);
+    case BODY_CONE: radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
                     m_shape = new btConeShape(radius, z_max-z_min);
                     setName("cone");
                     break;
-    case BODY_BOX:  m_shape = new btBoxShape(btVector3(0.5*(x_max-x_min),
-                                                       0.5*(y_max-y_min),
-                                                       0.5*(z_max-z_min) ) );
+    case BODY_BOX:  m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
+                                                       0.5f*(y_max-y_min),
+                                                       0.5f*(z_max-z_min) ) );
                     setName("box");
                     break;
     case BODY_NONE: fprintf(stderr, "WARNING: Uninitialised moving shape\n");
@@ -189,8 +189,7 @@ void MovingPhysics::init()
     btVector3 inertia;
     m_shape->calculateLocalInertia(mass, inertia);
     m_body = new btRigidBody(mass, m_motion_state, m_shape, inertia);
-    world->getPhysics()->getPhysicsWorld()->addRigidBody(m_body);
-
+    world->getPhysics()->addBody(m_body);
 }   // init
 
 // -----------------------------------------------------------------------------

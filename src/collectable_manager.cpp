@@ -137,6 +137,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
         ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();
+        e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
     }
     else
     {

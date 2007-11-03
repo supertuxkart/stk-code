@@ -82,10 +82,10 @@ void GameManager::run()
 
         if (race_manager->raceIsActive())
         {
-            scene->draw((m_curr_time - m_prev_time ) * 0.001);
+            scene->draw((m_curr_time - m_prev_time ) * 0.001f);
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
-                world->update((m_curr_time - m_prev_time ) * 0.001);
+                world->update((m_curr_time - m_prev_time ) * 0.001f);
 
                 if(user_config->m_profile)
                 {
