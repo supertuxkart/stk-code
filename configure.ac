@@ -326,6 +326,7 @@ fi
 # =========================
 # subst bars in Makefile.am
 # =========================
+AC_SUBST(bullet_LIBS)
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(mikmod_LIBS)
@@ -360,25 +361,36 @@ if test "x${enable_bullet}" != "xno"; then
 	AC_DEFINE([BULLET], [], [Use the bullet physics engine])
 	AC_MSG_RESULT([enabled])
 	CXXFLAGS="$CXXFLAGS -Ibullet/src"
-	LIBS="$LIBS -L bullet/out/*/*/libs -lbulletopenglsupport -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
+	AC_CONFIG_FILES([         \
+		 src/bullet/Makefile      \
+		 src/bullet/src/Makefile  \
+		 src/bullet/Demos/OpenGL/Makefile
+	])
+	SUMMARY="$SUMMARY\nUsing bullet physics."
+	BULLETTREE="src/bullet"
+	bullet_LIBS="-L bullet/Demos/OpenGL -lbulletopenglsupport -L bullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
 else
 	AC_MSG_RESULT([disabled])
+	BULLETTREE=""
+	bullet_LIBS=""
+
 fi
+AC_SUBST(BULLETTREE)
 
 dnl ================
 dnl Create makefiles
 dnl ================
-AC_CONFIG_FILES([     \
- Makefile             \
- data/Makefile        \
- fonts/Makefile       \
- images/Makefile      \
- models/Makefile      \
- mods/Makefile        \
- src/Makefile         \
- wavs/Makefile        \
- wavs/radio/Makefile  \
- wavs/tintagel/Makefile \
+AC_CONFIG_FILES([         \
+ Makefile                 \
+ data/Makefile            \
+ fonts/Makefile           \
+ images/Makefile          \
+ models/Makefile          \
+ mods/Makefile            \
+ src/Makefile             \
+ wavs/Makefile            \
+ wavs/radio/Makefile      \
+ wavs/tintagel/Makefile   \
  models/herrings/Makefile
 ])
 AC_OUTPUT

@@ -1,0 +1,31 @@
+BMF_BitmapFont.o BMF_BitmapFont.o: BMF_BitmapFont.cpp \
+  /usr/include/string.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-64.h \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h \
+  /usr/include/xlocale.h /usr/include/GL/gl.h /usr/include/GL/glext.h \
+  BMF_BitmapFont.h BMF_FontData.h
+
+/usr/include/string.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/GL/gl.h:
+
+/usr/include/GL/glext.h:
+
+BMF_BitmapFont.h:
+
+BMF_FontData.h:

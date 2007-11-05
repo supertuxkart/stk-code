@@ -1,16 +1,8 @@
 Preliminary support for the bullet physics engine has been
-added. To enable it (assume that 'STK' is the supertuxkart root
-directory):
-1) Uncompress a recent version of bullet (tested with 2.63)
-   in STK/src/bullet
-   2.63 is the latest version, earlier versions will not
-   work due to changes in the bullet API.
-   NOTE: The location of bullet was changed, before it was in
-   STK/bullet, now it's in STK/src/bullet.
-2) Compile bullet (follow the instructions in STK/src/bullet/INSTALL)
-3) Run STK configure with:
-   ./configure --enable-bullet
-4) make
+added, and bullet itself is part of the STK sources by noq.
+To enable it, use the '--enable-bullet' option in configure,
+that should be all (though up to now only linux and cygwin 
+have been tested with the new, integrated bullet version).
 
 For now mainly the race track works as expected, all tracks
 can be played (though the performance in some tracks is somewhat

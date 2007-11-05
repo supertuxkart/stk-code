@@ -1,0 +1,174 @@
+btGeneric6DofConstraint.o btGeneric6DofConstraint.o:  \
+ BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.cpp \
+  BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h \
+  LinearMath/btVector3.h LinearMath/btQuadWord.h LinearMath/btScalar.h \
+  /usr/include/math.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-64.h /usr/include/bits/huge_val.h \
+  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
+  /usr/include/bits/inf.h /usr/include/bits/nan.h \
+  /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
+  /usr/include/bits/mathinline.h /usr/include/c++/4.1.0/cstdlib \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/c++config.h \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/os_defines.h \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/cpu_defines.h \
+  /usr/include/c++/4.1.0/cstddef \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h \
+  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/xlocale.h \
+  /usr/include/sys/types.h /usr/include/bits/types.h \
+  /usr/include/bits/typesizes.h /usr/include/time.h \
+  /usr/include/sys/select.h /usr/include/bits/select.h \
+  /usr/include/bits/sigset.h /usr/include/bits/time.h \
+  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+  /usr/include/alloca.h /usr/include/c++/4.1.0/cfloat \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/float.h \
+  /usr/include/assert.h LinearMath/btMinMax.h \
+  BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+  BulletDynamics/Dynamics/btRigidBody.h LinearMath/btAlignedObjectArray.h \
+  LinearMath/btAlignedAllocator.h /usr/include/c++/4.1.0/new \
+  /usr/include/c++/4.1.0/exception LinearMath/btPoint3.h \
+  LinearMath/btVector3.h LinearMath/btTransform.h \
+  LinearMath/btMatrix3x3.h LinearMath/btQuaternion.h \
+  BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+  LinearMath/btScalar.h LinearMath/btAlignedAllocator.h \
+  BulletCollision/CollisionDispatch/btCollisionObject.h \
+  LinearMath/btTransform.h LinearMath/btMotionState.h \
+  LinearMath/btTransform.h LinearMath/btAlignedAllocator.h \
+  BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+  LinearMath/btScalar.h LinearMath/btTransformUtil.h
+
+BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h:
+
+LinearMath/btVector3.h:
+
+LinearMath/btQuadWord.h:
+
+LinearMath/btScalar.h:
+
+/usr/include/math.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+/usr/include/c++/4.1.0/cstdlib:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/c++config.h:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/os_defines.h:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/cpu_defines.h:
+
+/usr/include/c++/4.1.0/cstddef:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/c++/4.1.0/cfloat:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/float.h:
+
+/usr/include/assert.h:
+
+LinearMath/btMinMax.h:
+
+BulletDynamics/ConstraintSolver/btJacobianEntry.h:
+
+BulletDynamics/Dynamics/btRigidBody.h:
+
+LinearMath/btAlignedObjectArray.h:
+
+LinearMath/btAlignedAllocator.h:
+
+/usr/include/c++/4.1.0/new:
+
+/usr/include/c++/4.1.0/exception:
+
+LinearMath/btPoint3.h:
+
+LinearMath/btVector3.h:
+
+LinearMath/btTransform.h:
+
+LinearMath/btMatrix3x3.h:
+
+LinearMath/btQuaternion.h:
+
+BulletCollision/BroadphaseCollision/btBroadphaseProxy.h:
+
+LinearMath/btScalar.h:
+
+LinearMath/btAlignedAllocator.h:
+
+BulletCollision/CollisionDispatch/btCollisionObject.h:
+
+LinearMath/btTransform.h:
+
+LinearMath/btMotionState.h:
+
+LinearMath/btTransform.h:
+
+LinearMath/btAlignedAllocator.h:
+
+BulletDynamics/ConstraintSolver/btTypedConstraint.h:
+
+LinearMath/btScalar.h:
+
+LinearMath/btTransformUtil.h:

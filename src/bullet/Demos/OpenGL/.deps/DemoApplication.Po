@@ -1,0 +1,359 @@
+DemoApplication.o DemoApplication.o: DemoApplication.cpp \
+  DemoApplication.h /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
+  /usr/include/GL/gl.h /usr/include/GL/glext.h \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h \
+  /usr/include/GL/glu.h /usr/include/stdlib.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+  /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+  /usr/include/endian.h /usr/include/bits/endian.h /usr/include/xlocale.h \
+  /usr/include/sys/types.h /usr/include/bits/types.h \
+  /usr/include/bits/typesizes.h /usr/include/time.h \
+  /usr/include/sys/select.h /usr/include/bits/select.h \
+  /usr/include/bits/sigset.h /usr/include/bits/time.h \
+  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+  /usr/include/alloca.h /usr/include/stdio.h /usr/include/libio.h \
+  /usr/include/_G_config.h /usr/include/wchar.h /usr/include/bits/wchar.h \
+  /usr/include/gconv.h \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stdarg.h \
+  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/math.h \
+  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+  /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+  /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+  /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
+  ../../src/LinearMath/btVector3.h ../../src/LinearMath/btQuadWord.h \
+  ../../src/LinearMath/btScalar.h /usr/include/c++/4.1.0/cstdlib \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/c++config.h \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/os_defines.h \
+  /usr/include/c++/4.1.0/x86_64-suse-linux/bits/cpu_defines.h \
+  /usr/include/c++/4.1.0/cstddef /usr/include/c++/4.1.0/cfloat \
+  /usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/float.h \
+  /usr/include/assert.h ../../src/LinearMath/btMinMax.h \
+  ../../src/LinearMath/btMatrix3x3.h ../../src/LinearMath/btVector3.h \
+  ../../src/LinearMath/btQuaternion.h ../../src/LinearMath/btTransform.h \
+  ../../src/LinearMath/btMatrix3x3.h ../../src/LinearMath/btQuickprof.h \
+  /usr/include/sys/time.h ../../src/LinearMath/btIDebugDraw.h \
+  ../../src/BulletDynamics/Dynamics/btDynamicsWorld.h \
+  ../../src/BulletCollision/CollisionDispatch/btCollisionWorld.h \
+  ../../src/LinearMath/btVector3.h ../../src/LinearMath/btTransform.h \
+  ../../src/BulletCollision/CollisionDispatch/btCollisionObject.h \
+  ../../src/LinearMath/btMotionState.h ../../src/LinearMath/btTransform.h \
+  ../../src/LinearMath/btAlignedAllocator.h \
+  ../../src/BulletCollision/CollisionDispatch/btCollisionDispatcher.h \
+  ../../src/BulletCollision/BroadphaseCollision/btDispatcher.h \
+  ../../src/LinearMath/btScalar.h \
+  ../../src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h \
+  ../../src/LinearMath/btVector3.h ../../src/LinearMath/btTransform.h \
+  ../../src/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h \
+  ../../src/LinearMath/btTransformUtil.h \
+  ../../src/LinearMath/btAlignedAllocator.h \
+  ../../src/BulletCollision/CollisionDispatch/btManifoldResult.h \
+  ../../src/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h \
+  ../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+  ../../src/LinearMath/btAlignedAllocator.h \
+  ../../src/LinearMath/btAlignedObjectArray.h \
+  ../../src/LinearMath/btAlignedAllocator.h /usr/include/c++/4.1.0/new \
+  /usr/include/c++/4.1.0/exception \
+  ../../src/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h \
+  ../../src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h \
+  ../../src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h \
+  ../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+  ../../src/LinearMath/btVector3.h ../../src/LinearMath/btPoint3.h \
+  ../../src/LinearMath/btAlignedObjectArray.h \
+  ../../src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h \
+  ../../src/LinearMath/btVector3.h \
+  ../../src/BulletDynamics/ConstraintSolver/btJacobianEntry.h \
+  ../../src/BulletDynamics/Dynamics/btRigidBody.h \
+  ../../src/LinearMath/btAlignedObjectArray.h \
+  ../../src/LinearMath/btPoint3.h ../../src/LinearMath/btTransform.h \
+  ../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+  ../../src/BulletCollision/CollisionDispatch/btCollisionObject.h \
+  ../../src/BulletDynamics/ConstraintSolver/btTypedConstraint.h \
+  ../../src/LinearMath/btScalar.h \
+  ../../src/BulletCollision/CollisionShapes/btCollisionShape.h \
+  ../../src/LinearMath/btTransform.h ../../src/LinearMath/btVector3.h \
+  ../../src/LinearMath/btMatrix3x3.h ../../src/LinearMath/btPoint3.h \
+  ../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h \
+  ../../src/BulletCollision/CollisionShapes/btBoxShape.h \
+  ../../src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h \
+  ../../src/BulletCollision/CollisionShapes/btConvexInternalShape.h \
+  ../../src/BulletCollision/CollisionShapes/btConvexShape.h \
+  ../../src/BulletCollision/CollisionShapes/btCollisionShape.h \
+  ../../src/BulletCollision/CollisionShapes/btCollisionMargin.h \
+  ../../src/LinearMath/btAlignedAllocator.h \
+  ../../src/LinearMath/btMinMax.h \
+  ../../src/BulletCollision/CollisionShapes/btSphereShape.h \
+  ../../src/BulletCollision/CollisionShapes/btCompoundShape.h \
+  ../../src/LinearMath/btAlignedObjectArray.h \
+  ../../src/BulletCollision/CollisionShapes/btUniformScalingShape.h \
+  GL_ShapeDrawer.h ../../src/LinearMath/btDefaultMotionState.h BMF_Api.h \
+  BMF_Fonts.h BMF_Settings.h
+
+DemoApplication.h:
+
+/usr/include/GL/glut.h:
+
+/usr/include/GL/freeglut_std.h:
+
+/usr/include/GL/gl.h:
+
+/usr/include/GL/glext.h:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stddef.h:
+
+/usr/include/GL/glu.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/gconv.h:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btQuadWord.h:
+
+../../src/LinearMath/btScalar.h:
+
+/usr/include/c++/4.1.0/cstdlib:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/c++config.h:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/os_defines.h:
+
+/usr/include/c++/4.1.0/x86_64-suse-linux/bits/cpu_defines.h:
+
+/usr/include/c++/4.1.0/cstddef:
+
+/usr/include/c++/4.1.0/cfloat:
+
+/usr/lib64/gcc/x86_64-suse-linux/4.1.0/include/float.h:
+
+/usr/include/assert.h:
+
+../../src/LinearMath/btMinMax.h:
+
+../../src/LinearMath/btMatrix3x3.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btQuaternion.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/LinearMath/btMatrix3x3.h:
+
+../../src/LinearMath/btQuickprof.h:
+
+/usr/include/sys/time.h:
+
+../../src/LinearMath/btIDebugDraw.h:
+
+../../src/BulletDynamics/Dynamics/btDynamicsWorld.h:
+
+../../src/BulletCollision/CollisionDispatch/btCollisionWorld.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/BulletCollision/CollisionDispatch/btCollisionObject.h:
+
+../../src/LinearMath/btMotionState.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/LinearMath/btAlignedAllocator.h:
+
+../../src/BulletCollision/CollisionDispatch/btCollisionDispatcher.h:
+
+../../src/BulletCollision/BroadphaseCollision/btDispatcher.h:
+
+../../src/LinearMath/btScalar.h:
+
+../../src/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h:
+
+../../src/LinearMath/btTransformUtil.h:
+
+../../src/LinearMath/btAlignedAllocator.h:
+
+../../src/BulletCollision/CollisionDispatch/btManifoldResult.h:
+
+../../src/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h:
+
+../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h:
+
+../../src/LinearMath/btAlignedAllocator.h:
+
+../../src/LinearMath/btAlignedObjectArray.h:
+
+../../src/LinearMath/btAlignedAllocator.h:
+
+/usr/include/c++/4.1.0/new:
+
+/usr/include/c++/4.1.0/exception:
+
+../../src/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h:
+
+../../src/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h:
+
+../../src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h:
+
+../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btPoint3.h:
+
+../../src/LinearMath/btAlignedObjectArray.h:
+
+../../src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/BulletDynamics/ConstraintSolver/btJacobianEntry.h:
+
+../../src/BulletDynamics/Dynamics/btRigidBody.h:
+
+../../src/LinearMath/btAlignedObjectArray.h:
+
+../../src/LinearMath/btPoint3.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h:
+
+../../src/BulletCollision/CollisionDispatch/btCollisionObject.h:
+
+../../src/BulletDynamics/ConstraintSolver/btTypedConstraint.h:
+
+../../src/LinearMath/btScalar.h:
+
+../../src/BulletCollision/CollisionShapes/btCollisionShape.h:
+
+../../src/LinearMath/btTransform.h:
+
+../../src/LinearMath/btVector3.h:
+
+../../src/LinearMath/btMatrix3x3.h:
+
+../../src/LinearMath/btPoint3.h:
+
+../../src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h:
+
+../../src/BulletCollision/CollisionShapes/btBoxShape.h:
+
+../../src/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h:
+
+../../src/BulletCollision/CollisionShapes/btConvexInternalShape.h:
+
+../../src/BulletCollision/CollisionShapes/btConvexShape.h:
+
+../../src/BulletCollision/CollisionShapes/btCollisionShape.h:
+
+../../src/BulletCollision/CollisionShapes/btCollisionMargin.h:
+
+../../src/LinearMath/btAlignedAllocator.h:
+
+../../src/LinearMath/btMinMax.h:
+
+../../src/BulletCollision/CollisionShapes/btSphereShape.h:
+
+../../src/BulletCollision/CollisionShapes/btCompoundShape.h:
+
+../../src/LinearMath/btAlignedObjectArray.h:
+
+../../src/BulletCollision/CollisionShapes/btUniformScalingShape.h:
+
+GL_ShapeDrawer.h:
+
+../../src/LinearMath/btDefaultMotionState.h:
+
+BMF_Api.h:
+
+BMF_Fonts.h:
+
+BMF_Settings.h:

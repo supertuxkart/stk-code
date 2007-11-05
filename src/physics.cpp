@@ -48,7 +48,7 @@ Physics::Physics(float gravity)
 
     btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
     m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher, axis_sweep, 
-                                                   constraintSolver);
+                                                   constraintSolver, collisionConf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
     if(user_config->m_bullet_debug)
     {
