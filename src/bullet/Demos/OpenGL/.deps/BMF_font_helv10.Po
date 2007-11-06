@@ -1,6 +1,0 @@
-BMF_font_helv10.o BMF_font_helv10.o: BMF_font_helv10.cpp BMF_FontData.h \
-  BMF_Settings.h
-
-BMF_FontData.h:
-
-BMF_Settings.h:
