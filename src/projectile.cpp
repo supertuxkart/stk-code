@@ -112,6 +112,7 @@ void Projectile::init(Kart *kart, int collectable_)
 	//        terrain is under the rocket). Once hot is done with bullet as
 	//        well, this shouldn't be necessary anymore.
     placeModel();
+    m_current_HAT = world->getHAT(offset.getOrigin());
 
 #else
     sgCoord c;
@@ -146,7 +147,13 @@ void Projectile::update (float dt)
 {
 #ifdef BULLET
 	if(m_exploded) return;
-    m_body->setLinearVelocity(m_initial_velocity);	
+    m_body->setLinearVelocity(m_initial_velocity);
+    m_HAT_counter++;
+    if(m_HAT_counter==10)
+    {
+        m_current_HAT = world->getHAT(getBody()->getCenterOfMassPosition());
+        m_HAT_counter = 0;
+    }
 #else
     // we don't even do any physics here - just set the
     // velocity, and ignore everything else for projectiles.

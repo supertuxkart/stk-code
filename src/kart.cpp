@@ -586,6 +586,16 @@ float Kart::getActualWheelForce()
 #endif
 
 //-----------------------------------------------------------------------------
+#ifdef BULLET
+bool Kart::isOnGround()
+{
+    return m_vehicle->getWheelInfo(0).m_raycastInfo.m_isInContact &&
+           m_vehicle->getWheelInfo(1).m_raycastInfo.m_isInContact &&
+           m_vehicle->getWheelInfo(2).m_raycastInfo.m_isInContact &&
+           m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
+}   // isOnGround
+#endif
+//-----------------------------------------------------------------------------
 void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 {
 #ifdef BULLET
@@ -740,7 +750,7 @@ void Kart::update (float dt)
     updatePhysics(dt);
 
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
-    if(m_material_hot && m_on_ground)
+    if(m_material_hot && isOnGround())
     {
         float r=m_material_hot->getFriction();
         if(r<m_current_friction) 
@@ -944,8 +954,8 @@ void Kart::updatePhysics (float dt)
             {   // going backward, apply reverse gear ratio
                 if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
-                    m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 2);
-                    m_vehicle->applyEngineForce(-m_controls.brake*engine_power, 3);
+                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
+                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
                 }
                 else
                 {
@@ -961,7 +971,7 @@ void Kart::updatePhysics (float dt)
         }
     }
 
-    if(m_controls.jump)
+    if(isOnGround() && m_controls.jump)
     { 
       //Vector3 impulse(0.0f, 0.0f, 10.0f);
       //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
@@ -1299,7 +1309,7 @@ void Kart::processSkidMarks()
 
     if(m_skid_rear || m_skid_front)
     {
-        if(m_on_ground)
+        if(isOnGround())
         {
             const float LENGTH = 0.57f;
             if(m_skidmark_left)

@@ -29,10 +29,13 @@
 class Physics
 {
 protected:
-    btDynamicsWorld       *m_dynamics_world;
-    Kart                  *m_kart;
-    GLDebugDrawer         *m_debug_drawer;
-    btCollisionDispatcher *m_dispatcher;
+    btDynamicsWorld                 *m_dynamics_world;
+    Kart                            *m_kart;
+    GLDebugDrawer                   *m_debug_drawer;
+    btCollisionDispatcher           *m_dispatcher;
+    btBroadphaseInterface           *m_axis_sweep;
+    btDefaultCollisionConfiguration *m_collision_conf;
+    btConstraintSolver              *m_constraint_solver;
 
     void convertTrack(ssgEntity *track, sgMat4 m,  btTriangleMesh* track_mesh);
 public:
@@ -50,7 +53,7 @@ public:
           getPhysicsWorld () const {return m_dynamics_world;}
     void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
     static float NOHIT;
-    float getHOT          (btVector3 pos);
+    float getHAT          (btVector3 pos);
     bool  getTerrainNormal(btVector3 pos, btVector3* normal);
 };
 // For non-bullet version: empty object

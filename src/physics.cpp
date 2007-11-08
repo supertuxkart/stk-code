@@ -30,6 +30,7 @@
 #include "moving_physics.hpp"
 #include "user_config.hpp"
 #include "sound_manager.hpp"
+#include "material_manager.hpp"
 
 /** Initialise physics. */
 
@@ -38,17 +39,18 @@ float Physics::NOHIT=-99999.9f;
 Physics::Physics(float gravity)
 {
 
-    btDefaultCollisionConfiguration* collisionConf 
-                                         = new btDefaultCollisionConfiguration();
-    m_dispatcher                         = new btCollisionDispatcher(collisionConf);
+    m_collision_conf    = new btDefaultCollisionConfiguration();
+    m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
     
     btVector3 worldMin(-1000, -1000, -1000);
     btVector3 worldMax( 1000,  1000,  1000);
-    btBroadphaseInterface *axis_sweep    = new btAxisSweep3(worldMin, worldMax);
+    m_axis_sweep        = new btAxisSweep3(worldMin, worldMax);
 
-    btConstraintSolver *constraintSolver = new btSequentialImpulseConstraintSolver();
-    m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher, axis_sweep, 
-                                                   constraintSolver, collisionConf);
+    m_constraint_solver = new btSequentialImpulseConstraintSolver();
+    m_dynamics_world    = new btDiscreteDynamicsWorld(m_dispatcher, 
+                                                      m_axis_sweep, 
+                                                      m_constraint_solver,
+                                                      m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
     if(user_config->m_bullet_debug)
     {
@@ -63,6 +65,11 @@ Physics::~Physics()
 {
     delete m_dispatcher;
     delete m_dynamics_world;
+    delete m_axis_sweep;
+    delete m_collision_conf;
+    delete m_constraint_solver;
+    if(user_config->m_bullet_debug) delete m_debug_drawer;
+    
 }   // ~Physics
 
 // -----------------------------------------------------------------------------
@@ -103,7 +110,11 @@ void Physics::convertTrack(ssgEntity *track, sgMat4 m, btTriangleMesh* track_mes
     } 
     else if(track->isAKindOf(ssgTypeLeaf()))
     {
-        ssgLeaf             *leaf       = (ssgLeaf*)(track);
+        ssgLeaf  *leaf  = (ssgLeaf*)(track);
+        Material *mat   = material_manager->getMaterial(leaf);
+        // Don't convert triangles with material that is ignored (e.g. fuzzy_sand)
+        if(!mat || mat->isIgnore()) return;
+
         for(int i=0; i<leaf->getNumTriangles(); i++) 
         {
             short v1,v2,v3;
@@ -280,7 +291,7 @@ void Physics::handleCollisions() {
 }   // handleCollisions
 
 // -----------------------------------------------------------------------------
-float Physics::getHOT(btVector3 pos)
+float Physics::getHAT(btVector3 pos)
 {
     btVector3 to_pos(pos);
     to_pos.setZ(-100000.f);
@@ -289,7 +300,7 @@ float Physics::getHOT(btVector3 pos)
 
     m_dynamics_world->rayTest(pos, to_pos, rayCallback);
     if(!rayCallback.HasHit()) return NOHIT;
-    return 1.0f;
+    return rayCallback.m_hitPointWorld.getZ() - pos.getZ();
 }   // getHOT
 // -----------------------------------------------------------------------------
 bool Physics::getTerrainNormal(btVector3 pos, btVector3* normal)

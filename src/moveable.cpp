@@ -70,7 +70,9 @@ Moveable::~Moveable()
 //-----------------------------------------------------------------------------
 void Moveable::reset ()
 {
+#ifndef BULLET
     m_on_ground        = true;
+#endif
     m_collided         = false;
     m_crashed          = false;
     m_material_hot     = NULL;
@@ -176,16 +178,7 @@ void Moveable::update (float dt)
     }   // if m_history_position
     const float HAT = m_curr_pos.xyz[2]-HOT;
 
-#ifdef BULLET
-    m_on_ground = ( HAT <= 1.5 );
-    // FIXME: we need a correct test here, HOT/HAT are currently not defined
-    //        for bullet (and would require a separate raycast, which can be
-    //        expensive. Perhaps add a function to bullet to indicate if
-    //        all/some/?? wheels toucht the ground.
-    //        m_on_ground is currently only used (in the bullet version) for
-    //        the gui display anyway
-    
-#else
+#ifndef BULLET
     m_on_ground = ( HAT <= 0.01 );
     doCollisionAnalysis(dt, HOT);
 #endif

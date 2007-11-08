@@ -35,7 +35,10 @@ class Projectile : public Moveable
     int         m_last_radar_beep;
 #ifdef BULLET
     bool        m_exploded;
-    btVector3   m_initial_velocity; 
+    btVector3   m_initial_velocity;
+    float       m_current_HAT;        // height  above terrain
+    int         m_HAT_counter;        // compute HAT only every N timesteps
+
 #endif
 public:
 

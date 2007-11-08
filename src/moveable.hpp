@@ -56,7 +56,9 @@ protected:
     int           m_crashed;
     sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
+#ifndef BULLET
     int           m_on_ground ;
+#endif
 
     float collectIsectData ( sgVec3 start, sgVec3 end ) ;
     sgCoord*      m_history_velocity;
@@ -75,7 +77,9 @@ public:
     virtual ~Moveable();
 
     ssgTransform* getModel     ()              {return m_model ;                  }
+#ifndef BULLET
     int           isOnGround   ()              {return m_on_ground;               }
+#endif
     MoveableType  getMoveableType()  const     {return m_moveable_type;           }
     void          setMoveableType(MoveableType m){m_moveable_type=m;              }
     sgCoord*      getVelocity  ()              {return & m_velocity;              }

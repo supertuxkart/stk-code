@@ -242,6 +242,7 @@ public:
     float             getSpeed      () const {return m_speed;                 }
     float             handleWheelie(float dt);
     float             getActualWheelForce();
+    bool              isOnGround   ();
 #endif
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
