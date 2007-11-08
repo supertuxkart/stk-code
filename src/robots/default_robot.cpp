@@ -468,7 +468,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
     //TODO: check if we collided against a dynamic object (ej.:kart) or
     //against the track's static object.
     //The m_crash_time measures if a kart has been crashing for too long
-    m_crash_time += (m_collided && m_on_ground) ? 3.0f * DELTA : -0.25f * DELTA;
+    m_crash_time += (m_collided && isOnGround()) ? 3.0f * DELTA : -0.25f * DELTA;
 
     if( m_crash_time < 0.0f ) m_crash_time = 0.0f;
 
