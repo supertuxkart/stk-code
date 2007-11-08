@@ -142,7 +142,9 @@ void Projectile::init(Kart *kart, int collectable_)
 //-----------------------------------------------------------------------------
 Projectile::~Projectile()
 {
-	world->getPhysics()->removeBody(getBody());
+#ifdef BULLET
+    world->getPhysics()->removeBody(getBody());
+#endif
 }   // ~Projectile
 
 //-----------------------------------------------------------------------------
