@@ -56,7 +56,8 @@ Moveable::Moveable (bool bHasHistory)
 Moveable::~Moveable()
 {
 #ifdef BULLET
-    if(m_body        ) delete m_body;
+    // The body is being removed from the world in kart/projectile
+    if(m_body) delete m_body;
     if(m_motion_state) delete m_motion_state;
 #endif
     if(m_history_velocity)

@@ -102,7 +102,7 @@ protected:
     // physics parameters, storing it saves time
 #ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
-    btCompoundShape                    *m_kart_chassis;
+    btCompoundShape                    m_kart_chassis;
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
     float                               m_kart_height;

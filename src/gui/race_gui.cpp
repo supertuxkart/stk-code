@@ -348,7 +348,7 @@ void RaceGUI::drawPlayerIcons ()
 
     //glEnable(GL_TEXTURE_2D);
     Material *last_players_gst = 0;
-    int   laps_of_leader           = -1;
+    int   laps_of_leader       = -1;
     float time_of_leader       = -1;
     // Find the best time for the lap. We can't simply use
     // the time of the kart at position 1, since the kart

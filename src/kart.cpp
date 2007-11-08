@@ -182,8 +182,8 @@ void Kart::createPhysics(ssgEntity *obj)
     m_kart_height  = z_max-z_min;
 
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                              0.5f*m_kart_length,
-                                              0.5f*m_kart_height));
+                                                 0.5f*m_kart_length,
+                                                 0.5f*m_kart_height));
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart 
@@ -192,9 +192,7 @@ void Kart::createPhysics(ssgEntity *obj)
     const float CENTER_SHIFT = getGravityCenterShift();
     shiftCenterOfGravity.setOrigin(btVector3(0.0f,0.0f,CENTER_SHIFT*m_kart_height));
 
-    // kart chassis is actually managed in moveable as shape
-    m_kart_chassis = new btCompoundShape();
-    m_kart_chassis->addChildShape(shiftCenterOfGravity, shape);
+    m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
 
     // Set mass and inertia
     // --------------------
@@ -204,7 +202,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    createBody(mass, trans, m_kart_chassis, Moveable::MOV_KART);
+    createBody(mass, trans, &m_kart_chassis, Moveable::MOV_KART);
 
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
                        m_kart_properties->getChassisAngularDamping() );
@@ -218,7 +216,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // -------------------------
     m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
-    m_tuning = new btRaycastVehicle::btVehicleTuning();
+    m_tuning  = new btRaycastVehicle::btVehicleTuning();
     m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
 
     // never deactivate the vehicle
@@ -268,7 +266,7 @@ void Kart::createPhysics(ssgEntity *obj)
 
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
-        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+        btWheelInfo& wheel               = m_vehicle->getWheelInfo(i);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
         wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
@@ -283,7 +281,7 @@ void Kart::createPhysics(ssgEntity *obj)
 // -----------------------------------------------------------------------------
 Kart::~Kart() 
 {
-    delete m_smokepuff;
+    if(m_smokepuff) delete m_smokepuff;
 
     sgMat4 wheel_steer;
     sgMakeIdentMat4(wheel_steer);
@@ -301,15 +299,14 @@ Kart::~Kart()
     if(m_skidmark_right) delete m_skidmark_right;
 
 #ifdef BULLET
+    delete m_vehicle;
     delete m_tuning;
     delete m_vehicle_raycaster;
     world->getPhysics()->removeKart(this);
-    delete m_vehicle;
-    for(int i=0; i<m_kart_chassis->getNumChildShapes(); i++)
+    for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
     {
-        delete m_kart_chassis->getChildShape(i);
+        delete m_kart_chassis.getChildShape(i);
     }
-    // the actual shape gets deleted in ~moveable
 #endif
 }   // ~Kart
 
@@ -335,7 +332,7 @@ void Kart::adjustSpeedWeight(float f)
     // getMass returns the mass increased by the attachment
     btVector3 inertia;
     float m=getMass();
-    m_kart_chassis->calculateLocalInertia(m, inertia);
+    m_kart_chassis.calculateLocalInertia(m, inertia);
     m_body->setMassProps(m, inertia);
 #else
     getVelocity()->xyz[1] *= f;
@@ -390,18 +387,18 @@ void Kart::reset()
         m_track_sector );
 
 #ifdef BULLET
-    btTransform *trans=new btTransform();
-    trans->setIdentity();
+    btTransform trans;
+    trans.setIdentity();
     // Set heading:
-    trans->setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-                                    DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
+    trans.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
+                                   DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
     // Set position
-    trans->setOrigin(btVector3(m_reset_pos.xyz[0],
-                               m_reset_pos.xyz[1],
-                               m_reset_pos.xyz[2]+0.5f*m_kart_height));
+    trans.setOrigin(btVector3(m_reset_pos.xyz[0],
+                              m_reset_pos.xyz[1],
+                              m_reset_pos.xyz[2]+0.5f*m_kart_height));
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
-    m_body->setCenterOfMassTransform(*trans);
+    m_body->setCenterOfMassTransform(trans);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
@@ -865,17 +862,16 @@ void Kart::draw()
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
     world->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
                                    wire_color);
-    btCylinderShapeX *wheelShape = 
-        new btCylinderShapeX( btVector3(0.3f,
+    btCylinderShapeX wheelShape( btVector3(0.3f,
                                         m_kart_properties->getWheelRadius(),
-                                        m_kart_properties->getWheelRadius()) );
+                                        m_kart_properties->getWheelRadius()));
     btVector3 wheelColor(1,0,0);
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         m_vehicle->updateWheelTransform(i, true);
         float m[16];
         m_vehicle->getWheelInfo(i).m_worldTransform.getOpenGLMatrix(m);
-        world->getPhysics()->debugDraw(m, wheelShape, wheelColor);
+        world->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
     }
 }   // draw
 #endif

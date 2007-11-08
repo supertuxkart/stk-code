@@ -113,6 +113,7 @@ void Projectile::init(Kart *kart, int collectable_)
 	//        well, this shouldn't be necessary anymore.
     placeModel();
     m_current_HAT = world->getHAT(offset.getOrigin());
+    m_HAT_counter = 0;
 
 #else
     sgCoord c;
@@ -140,7 +141,9 @@ void Projectile::init(Kart *kart, int collectable_)
 
 //-----------------------------------------------------------------------------
 Projectile::~Projectile()
-{}   // ~Projectile
+{
+	world->getPhysics()->removeBody(getBody());
+}   // ~Projectile
 
 //-----------------------------------------------------------------------------
 void Projectile::update (float dt)
