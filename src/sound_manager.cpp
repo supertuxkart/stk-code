@@ -179,6 +179,7 @@ void SoundManager::playMusic(const char* filename)
 
 #endif
         if(m_current_music == NULL)	// no support for file
+            fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename);
             return;
 
             if((m_current_music->load(filename)) == false)
