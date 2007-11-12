@@ -40,7 +40,7 @@ public:
     const KartProperties*    getKartById            (int i);
     const KartProperties*    getKart                (const std::string IDENT);
     const int                getKartId              (const std::string IDENT);
-    void                     loadKartData           ();
+    void                     loadKartData           (bool dont_load_models=false);
     const float              getMaximumSteeringAngle() {return m_max_steer_angle;}
     const unsigned int       getNumberOfKarts       () {return m_karts_properties.size();}
 

@@ -55,13 +55,13 @@ void KartPropertiesManager::removeTextures()
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::loadKartData()
+void KartPropertiesManager::loadKartData(bool dont_load_models)
 {
     m_max_steer_angle = -1.0f;
     std::set<std::string> result;
     loader->listFiles(result, "data");
 
-    // Findout which characters are available and load them
+    // Find out which characters are available and load them
     for(std::set<std::string>::iterator i = result.begin();
             i != result.end(); ++i)
         {
@@ -69,7 +69,7 @@ void KartPropertiesManager::loadKartData()
             {
                 KartProperties* kp = new KartProperties();
                 std::string tmp= std::string("data")+DIR_SEPARATOR + *i;
-                kp->load(tmp.c_str());
+                kp->load(tmp.c_str(), "tuxkart-kart", dont_load_models);
                 m_karts_properties.push_back(kp);
                 if(kp->getMaxSteerAngle() > m_max_steer_angle)
                 {

@@ -45,7 +45,8 @@ KartProperties::KartProperties() : m_icon_material(0), m_model(0)
 {}   // KartProperties
 
 //-----------------------------------------------------------------------------
-void KartProperties::load(const std::string filename, const std::string node)
+void KartProperties::load(const std::string filename, const std::string node,
+                          bool dont_load_models)
 {
 
     init_defaults();
@@ -79,8 +80,8 @@ void KartProperties::load(const std::string filename, const std::string node)
     // Load material
     m_icon_material = material_manager->getMaterial(m_icon_file);
 
-    // Load model
-    if(m_model_file.length()>0)
+    // Load model, except when called as part of --list-karts
+    if(m_model_file.length()>0 && !dont_load_models)
     {
         m_model = loader->load(m_model_file, CB_KART, false);
         ssgStripify(m_model);

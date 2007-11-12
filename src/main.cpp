@@ -197,9 +197,8 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--list-karts") )
         {
-            // --list-karts seems to need a drv_init() ???
-            drv_init();
-            kart_properties_manager->loadKartData () ;
+            bool dont_load_models=true;
+            kart_properties_manager->loadKartData(dont_load_models) ;
 
             fprintf ( stdout, _("  Available karts:\n") );
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
