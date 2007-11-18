@@ -972,7 +972,7 @@ void Kart::updatePhysics (float dt)
       //Vector3 impulse(0.0f, 0.0f, 10.0f);
       //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
         btVector3 velocity         = m_body->getLinearVelocity();
-        velocity.setZ( 3.0f );
+        velocity.setZ( m_kart_properties->getJumpVelocity() );
 
         getBody()->setLinearVelocity( velocity );
 

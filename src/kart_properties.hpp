@@ -90,6 +90,7 @@ protected:
     float m_max_speed_reverse_ratio;
     float m_gravity_center_shift;
     float m_suspension_rest;
+    float m_jump_velocity;            // z velocity set when jumping
     // The following two vectors define at what ratio of the maximum speed what
     // gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
     //                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
@@ -156,6 +157,7 @@ public:
     float getMaximumSpeed           () const {return m_maximum_speed;            }
     float getGravityCenterShift     () const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
+    float getJumpVelocity           () const {return m_jump_velocity;            }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 

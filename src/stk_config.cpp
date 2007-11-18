@@ -111,6 +111,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_max_road_distance,         "shortcut-road-distance"     );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
+    CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
 
     // Precompute some handy values to reduce work later
@@ -139,7 +140,7 @@ void STKConfig::init_defaults()
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
-    m_max_speed_reverse_ratio = m_explosion_impulse = -99.9f;
+    m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = -99.9f;
 
     m_max_karts            = -100;
     m_air_res_reduce[0]    = 1.0f;

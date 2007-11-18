@@ -161,6 +161,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("maximum-speed",             m_maximum_speed            );
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
+    lisp->get("jump-velocity",             m_jump_velocity            );
 #ifdef BULLET
     // getVector appends to existing vectors, so a new one must be used to load
     std::vector<float> temp;
@@ -225,6 +226,7 @@ void KartProperties::init_defaults()
     m_max_speed_reverse_ratio   = stk_config->m_max_speed_reverse_ratio;
     m_gravity_center_shift      = stk_config->m_gravity_center_shift;
     m_suspension_rest           = stk_config->m_suspension_rest;
+    m_jump_velocity             = stk_config->m_jump_velocity;
     m_gear_switch_ratio         = stk_config->m_gear_switch_ratio;
     m_gear_power_increase       = stk_config->m_gear_power_increase;
 

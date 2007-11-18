@@ -82,6 +82,13 @@
    (gravity-center-shift      0.4  ) ;; Shift center of gravity down by that many
                                      ;; units of kart_height (usually between 0 and 0.5)
    (suspension-rest           0.1  )
+
+   ;; The z-axis velocity set when a jump is initiated. This will cause the
+   ;; kart to start rising, till it is pulled back by gravity. A higher value
+   ;; means higher Z velocity, meaning the kart will rise faster and higher,
+   ;; and will be in the air longer
+   (jump-velocity             3.0  )
+
    ;; The following two vectors define at what ratio of the maximum speed what
    ;; gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
    ;;                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
