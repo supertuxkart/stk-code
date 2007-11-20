@@ -134,7 +134,7 @@ void GrandPrixSelect::update(float dt)
     glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
-    const CupData &cup = m_all_cups[CLICKED_TOKEN];
+    const CupData &cup = m_all_cups[CLICKED_TOKEN-WTOK_FIRSTPRIX];
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
     const GLfloat BACKGROUND_COLOUR[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
@@ -160,7 +160,7 @@ void GrandPrixSelect::select()
         menu_manager->popMenu();
         return;
     }
-    race_manager->setGrandPrix(m_all_cups[CLICKED_TOKEN]);
+    race_manager->setGrandPrix(m_all_cups[CLICKED_TOKEN-WTOK_FIRSTPRIX]);
     menu_manager->pushMenu(MENUID_DIFFICULTY);
 }   // select
 
