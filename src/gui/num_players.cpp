@@ -19,7 +19,7 @@
 
 #include "num_players.hpp"
 #include "race_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
@@ -32,34 +32,58 @@ enum WidgetTokens {
 
 NumPlayers::NumPlayers()
 {
-    m_menu_id = widgetSet -> varray(0);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, _("Two Players"),   GUI_MED, WTOK_PLAYER_2);
-    widgetSet -> state(m_menu_id, _("Three Players"), GUI_MED, WTOK_PLAYER_3);
-    widgetSet -> state(m_menu_id, _("Four Players"),  GUI_MED, WTOK_PLAYER_4);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
-    widgetSet -> space(m_menu_id);
+    widget_manager->add_wgt(WTOK_PLAYER_2, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_PLAYER_2 );
+    widget_manager->set_wgt_text( WTOK_PLAYER_2, _("Two Players") );
+    widget_manager->set_wgt_text_size( WTOK_PLAYER_2, WGT_FNT_MED );
+    widget_manager->show_wgt_text( WTOK_PLAYER_2 );
+    widget_manager->activate_wgt( WTOK_PLAYER_2 );
+    widget_manager->break_line();
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt(WTOK_PLAYER_3, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_PLAYER_3 );
+    widget_manager->set_wgt_text( WTOK_PLAYER_3, _("Three Players") );
+    widget_manager->set_wgt_text_size( WTOK_PLAYER_3, WGT_FNT_MED );
+    widget_manager->show_wgt_text( WTOK_PLAYER_3 );
+    widget_manager->activate_wgt( WTOK_PLAYER_3);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_PLAYER_4, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_PLAYER_4 );
+    widget_manager->set_wgt_text( WTOK_PLAYER_4, _("Four Players") );
+    widget_manager->set_wgt_text_size( WTOK_PLAYER_4, WGT_FNT_MED );
+    widget_manager->show_wgt_text( WTOK_PLAYER_4 );
+    widget_manager->activate_wgt( WTOK_PLAYER_4 );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WidgetManager::WGT_NONE, 35, 7);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_BACK, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_BACK );
+    widget_manager->set_wgt_text( WTOK_BACK, _("Press <ESC> to go back") );
+    widget_manager->set_wgt_text_size( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->show_wgt_text( WTOK_BACK );
+    widget_manager->activate_wgt( WTOK_BACK );
+
+    widget_manager->layout(WGT_AREA_ALL);
 }
 
 // -----------------------------------------------------------------------------
 NumPlayers::~NumPlayers()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts() ;
 }
 
 // -----------------------------------------------------------------------------
 void NumPlayers::select()
 {
-    const int CLICKED_ID = widgetSet -> get_token (widgetSet -> click());
-    switch (CLICKED_ID)
+    switch ( widget_manager->get_selected_wgt() )
     {
     case WTOK_PLAYER_2:
     case WTOK_PLAYER_3:
     case WTOK_PLAYER_4:
-        race_manager->setNumPlayers(CLICKED_ID);
+        race_manager->setNumPlayers(widget_manager->get_selected_wgt());
         menu_manager->pushMenu(MENUID_GAMEMODE);
         break;
     case WTOK_BACK:

@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "track_sel.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
@@ -30,44 +30,78 @@
 #include "translation.hpp"
 
 enum WidgetTokens {
-    WTOK_RETURN,
-    WTOK_OPTIONS,
-    WTOK_RESTART,
-    WTOK_EXIT,
+    WTOK_TITLE,
+
+    WTOK_TRACK0,
+    WTOK_TRACK1,
+    WTOK_TRACK2,
+    WTOK_TRACK3,
+    WTOK_TRACK4,
+    WTOK_TRACK5,
+    WTOK_TRACK6,
+    WTOK_TRACK7,
+    WTOK_TRACK8,
+    WTOK_TRACK9,
+    WTOK_TRACK10,
+    WTOK_TRACK11,
+    WTOK_TRACK12,
+    WTOK_TRACK13,
+
+    WTOK_IMG0,
+    WTOK_IMG1,
+
+    WTOK_AUTHOR
 };
 
 TrackSel::TrackSel()
 {
-    m_menu_id = widgetSet -> vstack(0);
+    widget_manager->add_wgt( WTOK_TITLE, 40, 7);
+    widget_manager->show_wgt_rect( WTOK_TITLE );
+    widget_manager->set_wgt_text( WTOK_TITLE, _("Choose a track"));
+    widget_manager->show_wgt_text( WTOK_TITLE );
+    widget_manager->break_line();
 
-    widgetSet -> label(m_menu_id, _("Choose a Track"), GUI_LRG, GUI_TOP, 0, 0);
-    widgetSet -> space(m_menu_id);
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->break_line();
 
-    const int HA = widgetSet -> harray(m_menu_id);
-
-    const int COL1 = widgetSet -> varray(HA);
-    const int COL2 = widgetSet -> varray(HA);
-
-    for (size_t i = 0; i != track_manager->getTrackCount()/2; ++i)
-        widgetSet -> state(COL1, track_manager->getTrack(i)->getName(), GUI_SML, i, 0);
-
-    for (size_t i = track_manager->getTrackCount()/2;
-         i != track_manager->getTrackCount(); ++i)
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_SML, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    for (size_t i = 0; i != track_manager->getTrackCount(); i += 2)
     {
-        int tmp = widgetSet -> state(COL2, track_manager->getTrack(i)->getName(), GUI_SML, i, 0);
-        if (i == track_manager->getTrackCount()/2)
-            widgetSet -> set_active(tmp);
+        widget_manager->add_wgt( WTOK_TRACK0 + i, 40, 7);
+        widget_manager->set_wgt_text( WTOK_TRACK0 + i, track_manager->getTrack(i)->getName());
+        widget_manager->add_wgt( WTOK_TRACK0 + i + 1, 40, 7);
+        widget_manager->set_wgt_text( WTOK_TRACK0 + i + 1, track_manager->getTrack(i+1)->getName());
+        widget_manager->break_line();
     }
 
-    widgetSet -> layout(m_menu_id, 0, 1);
-    m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);
+//FIXME: Right now, the image and the author's name is not controlled by the widget manager.
+#if 0
+    widget_manager->set_initial_rect_state(false, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(false, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_activation_state(false);
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->break_line();
+
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_WHITE);
+    widget_manager->add_wgt( WTOK_IMG0, 40, 30);
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 5, 30);
+    widget_manager->add_wgt( WTOK_IMG0, 40, 30);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WTOK_AUTHOR, 100, 10);
+    widget_manager->show_wgt_text( WTOK_AUTHOR );
+#endif
+    widget_manager->layout(WGT_AREA_TOP);
 }
 
 //-----------------------------------------------------------------------------
 TrackSel::~TrackSel()
 {
-    widgetSet -> delete_widget(m_menu_id);
-    glDeleteLists(m_rect, 1);
+    widget_manager->delete_wgts();
 }
 
 //-----------------------------------------------------------------------------
@@ -78,8 +112,9 @@ void TrackSel::update(float dt)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // draw a track preview of the currently highlighted track menu entry
-    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
-    const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN);
+//    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
+    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -136,9 +171,9 @@ void TrackSel::update(float dt)
     glBindTexture(GL_TEXTURE_2D, 0);
     const GLfloat backgroundColour[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
     glColor4fv(backgroundColour);
-    glCallList(m_rect);
+//    glCallList(m_rect);
     glPopMatrix();
-    font_gui->Print(TRACK->getDescription(), GUI_MED, 
+    font_gui->Print(TRACK->getDescription(), WGT_FNT_MED,
                     Font::ALIGN_CENTER, -1,
                     Font::ALIGN_BOTTOM, 10);
     glDisable(GL_BLEND);
@@ -151,8 +186,9 @@ void TrackSel::update(float dt)
 //-----------------------------------------------------------------------------
 void TrackSel::select()
 {
-    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
-    const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN);
+    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    //const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
+    const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
     race_manager->setTrack(TRACK->getIdent());
 
     menu_manager->pushMenu(MENUID_NUMLAPS);

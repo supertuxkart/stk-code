@@ -19,45 +19,63 @@
 
 #include "difficulty.hpp"
 #include "race_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
+    WTOK_TITLE,
+
     WTOK_HARD,
     WTOK_MEDIUM,
     WTOK_EASY,
-    WTOK_BACK
+
+    WTOK_QUIT
 };
 
 Difficulty::Difficulty()
 {
-    m_menu_id = widgetSet -> vstack(0);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    widgetSet -> label(m_menu_id, _("Choose your skill level"), GUI_LRG, GUI_ALL, 0, 0);
+    widget_manager->add_wgt(WTOK_TITLE, 60, 7);
+    widget_manager->show_wgt_rect(WTOK_TITLE);
+    widget_manager->show_wgt_text(WTOK_TITLE);
+    widget_manager->set_wgt_text(WTOK_TITLE,
+        _("Choose your skill level"));
+    widget_manager->break_line();
 
-    const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(VA, _("Racer"),  GUI_MED, WTOK_HARD);
-    widgetSet -> state(VA, _("Driver"), GUI_MED, WTOK_MEDIUM);
-    widgetSet -> start(VA, _("Novice"), GUI_MED, WTOK_EASY);
-    widgetSet -> space(VA);
-    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->add_wgt(WTOK_HARD, 60, 7);
+    widget_manager->set_wgt_text(WTOK_HARD, _("Racer"));
+    widget_manager->break_line();
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt(WTOK_MEDIUM, 60, 7);
+    widget_manager->set_wgt_text(WTOK_MEDIUM, _("Driver"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_EASY, 60, 7);
+    widget_manager->set_wgt_text(WTOK_EASY, _("Novice"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 60, 7);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
+
+    widget_manager->layout(WGT_AREA_ALL);
 }   // Difficulty
 
 //-----------------------------------------------------------------------------
 Difficulty::~Difficulty()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
 }   // ~Difficulty
 
 //-----------------------------------------------------------------------------
 void Difficulty::select()
 {
-    switch ( widgetSet -> get_token (widgetSet -> click()) )
+    switch ( widget_manager->get_selected_wgt())
     {
     case WTOK_EASY:
         race_manager->setDifficulty(RD_EASY);
@@ -71,7 +89,7 @@ void Difficulty::select()
         race_manager->setDifficulty(RD_HARD);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
         menu_manager->popMenu();
         break;
     default: break;

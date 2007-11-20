@@ -33,14 +33,10 @@ public:
 
     void select();
     void input(InputType type, int id0, int id1, int id2, int value);
-    void addKeyLabel(int change_id, KartActions control, bool start);
-    void changeKeyLabel(int grab_id, KartActions control);
-    void setKeyInfoString(KartActions control);
 
 private:
     int m_grab_id;
     int m_player_index;
-    int m_name_id;
     bool m_grab_input;
     KartActions m_edit_action;
     // Stores the heading - making this an attribute here avoids

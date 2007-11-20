@@ -31,7 +31,6 @@ private:
     ssgContext* m_context;
     ssgTransform* m_kart;
     int m_current_kart;
-    int m_kart_name_label;
     float m_clock;
 
     int m_player_index;

@@ -21,7 +21,7 @@
 #include <SDL/SDL.h>
 
 #include "race_results_gui.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "kart_properties.hpp"
 #include "world.hpp"
 #include "menu_manager.hpp"
@@ -29,24 +29,41 @@
 #include "translation.hpp"
 
 enum WidgetTokens {
+    WTOK_TITLE,
+    WTOK_EMPTY,
+    WTOK_HIGHSCORES,
+    WTOK_RESULTS,
     WTOK_CONTINUE,
     WTOK_RESTART_RACE,
     WTOK_SETUP_NEW_RACE,
+    WTOK_FIRST_RESULT
 };
 
 RaceResultsGUI::RaceResultsGUI()
 {
-    m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, _("Result"), GUI_LRG, GUI_ALL, 0, 0);
-    const unsigned int MAX_STR_LEN = 60;
-    widgetSet -> space(m_menu_id);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->add_wgt(WTOK_TITLE, 60, 7);
+    widget_manager->set_wgt_text(WTOK_TITLE, _("Result"));
+    widget_manager->break_line();
 
-    const int HA = widgetSet->harray(m_menu_id);
-    const int HIGHSCORE_TABLE = widgetSet->varray(HA);
-    const int RESULT_TABLE    = widgetSet->varray(HA);
-    widgetSet -> label(RESULT_TABLE,    _("Race results"),GUI_LRG,GUI_ALL,0,0);
-    widgetSet -> label(HIGHSCORE_TABLE, _("Highscores"),  GUI_LRG,GUI_ALL,0,0);
+    widget_manager->add_wgt(WTOK_EMPTY, 60, 5);
+    widget_manager->hide_wgt_rect(WTOK_EMPTY);
+    widget_manager->hide_wgt_text(WTOK_EMPTY);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_RESULTS, 40, 7);
+    widget_manager->set_wgt_text(WTOK_RESULTS, _("Race results"));
+    widget_manager->add_wgt(WTOK_HIGHSCORES, 40, 7);
+    widget_manager->set_wgt_text(WTOK_HIGHSCORES, _("Highscores"));
+    widget_manager->break_line();
+
+
+    const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
+
     int*  order = new int [NUM_KARTS];
     m_score = new char[NUM_KARTS * MAX_STR_LEN];
     unsigned int max_name_len = 1;
@@ -75,20 +92,22 @@ RaceResultsGUI::RaceResultsGUI()
             TimeToString(T, sTime);
         }
         //This shows position + driver name + time + points earned + total points
-	if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
-	{
-	    sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
-		    KART->getPosition(), KART_NAME.c_str(), sTime,
-		    race_manager->getPositionScore(i+1),
-		    race_manager->getKartScore(order[i]));
-	} 
-	else 
+        if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
         {
-	    sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s",
-		    KART->getPosition(), KART_NAME.c_str(), sTime);
-	}
-	    widgetSet -> label(RESULT_TABLE, (char*)(m_score + MAX_STR_LEN * i),
-			       GUI_MED, GUI_ALL);
+            sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
+                KART->getPosition(), KART_NAME.c_str(), sTime,
+                race_manager->getPositionScore(i+1),
+                race_manager->getKartScore(order[i]));
+        }
+        else
+            {
+            sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s",
+                KART->getPosition(), KART_NAME.c_str(), sTime);
+        }
+
+        widget_manager->add_wgt(WTOK_FIRST_RESULT + i, 80, 7);
+        widget_manager->set_wgt_text(WTOK_FIRST_RESULT + i,
+            (char*)(m_score + MAX_STR_LEN * i));
     }
 
     delete[] order;
@@ -106,14 +125,15 @@ RaceResultsGUI::RaceResultsGUI()
         const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
         sprintf((char*)(m_highscores + MAX_STR_LEN * i), 
                 "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
-        widgetSet->label(HIGHSCORE_TABLE, (char*)(m_highscores+MAX_STR_LEN*i),
-                         GUI_MED, GUI_ALL);
+/*        widgetSet->label(HIGHSCORE_TABLE, (char*)(m_highscores+MAX_STR_LEN*i),
+                         GUI_MED, GUI_ALL);*/
 
     }
-    widgetSet -> space(m_menu_id);
+//    widgetSet -> space(m_menu_id);
 
     //    const int VA = widgetSet -> varray(m_menu_id);
 
+#if 0
     static int dev_msg_counter = 0;
     if(dev_msg_counter == 2)
     {
@@ -122,28 +142,31 @@ if you want to help contact us!"), GUI_SML, GUI_ALL, 0, 0);
         dev_msg_counter = 0;
     }
     ++dev_msg_counter;
+#endif
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
     {
-      widgetSet -> start(m_menu_id, _("Continue Grand Prix"),  GUI_MED, WTOK_CONTINUE);
+//      widgetSet -> start(m_menu_id, _("Continue Grand Prix"),  GUI_MED, WTOK_CONTINUE);
     }
     else
     {
-      widgetSet -> start(m_menu_id, _("Back to the main menu"),  GUI_MED, WTOK_CONTINUE);
+//      widgetSet -> start(m_menu_id, _("Back to the main menu"),  GUI_MED, WTOK_CONTINUE);
     }
-    widgetSet -> start(m_menu_id, _("Race in this track again"),  GUI_MED, WTOK_RESTART_RACE);
+//    widgetSet -> start(m_menu_id, _("Race in this track again"),  GUI_MED, WTOK_RESTART_RACE);
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet -> start(m_menu_id, _("Setup New Race"),  GUI_MED, WTOK_SETUP_NEW_RACE);
+//        widgetSet -> start(m_menu_id, _("Setup New Race"),  GUI_MED, WTOK_SETUP_NEW_RACE);
     }
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+//    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->layout(WGT_AREA_ALL);
 }  // RaceResultsGUI
 
 //-----------------------------------------------------------------------------
 RaceResultsGUI::~RaceResultsGUI()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
+    //widgetSet -> delete_widget(m_menu_id) ;
     delete[] m_score;
     delete[] m_highscores;
 }   // ~RaceResultsGUI
@@ -151,7 +174,7 @@ RaceResultsGUI::~RaceResultsGUI()
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::select()
 {
-    switch( widgetSet->get_token( widgetSet->click() ) )
+    switch( widget_manager->get_selected_wgt() )
     {
     case WTOK_CONTINUE:
         world->unpause();

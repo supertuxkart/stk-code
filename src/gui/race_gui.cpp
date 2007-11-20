@@ -22,7 +22,6 @@
 #include "user_config.hpp"
 #include "race_gui.hpp"
 #include "history.hpp"
-#include "widget_set.hpp"
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
@@ -817,8 +816,7 @@ void RaceGUI::cleanupMessages()
 void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
                               float ratio_x,  float ratio_y  )
 {
-    int x, y;
-    x = SCREEN_CENTERED_TEXT;
+    int y;
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
     y = (int)(ratio_y*(user_config->m_height -164)+offset_y);

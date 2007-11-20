@@ -19,19 +19,79 @@
 
 #include "num_laps.hpp"
 #include "race_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
 
+enum WidgetTokens {
+    WTOK_TITLE,
+
+    WTOK_NUMLAPS,
+
+    WTOK_LESS,
+    WTOK_MORE,
+
+    WTOK_START,
+    WTOK_QUIT
+};
+
 NumLaps::NumLaps() : laps(3)
 {
-    m_menu_id = widgetSet -> varray(0);
+    widget_manager->add_wgt(WTOK_TITLE, 50, 7);
+    widget_manager->show_wgt_rect(WTOK_TITLE);
+    widget_manager->show_wgt_text(WTOK_TITLE);
+    widget_manager->set_wgt_text(WTOK_TITLE, _("Choose number of laps"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_NUMLAPS, 20, 7);
+    widget_manager->show_wgt_rect(WTOK_NUMLAPS);
+    widget_manager->show_wgt_text(WTOK_NUMLAPS);
+    widget_manager->set_wgt_text(WTOK_NUMLAPS, _("Laps: 3"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_LESS, 20, 7);
+    widget_manager->show_wgt_rect(WTOK_LESS);
+    widget_manager->show_wgt_text(WTOK_LESS);
+    widget_manager->set_wgt_text(WTOK_LESS, _("Less"));
+    widget_manager->activate_wgt(WTOK_LESS);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_MORE, 20, 7);
+    widget_manager->show_wgt_rect(WTOK_MORE);
+    widget_manager->show_wgt_text(WTOK_MORE);
+    widget_manager->set_wgt_text(WTOK_MORE, _("More"));
+    widget_manager->activate_wgt(WTOK_MORE);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_START, 30, 7);
+    widget_manager->show_wgt_rect(WTOK_START);
+    widget_manager->show_wgt_text(WTOK_START);
+    widget_manager->set_wgt_text(WTOK_START, _("Start race"));
+    widget_manager->activate_wgt(WTOK_START);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 50, 7);
+    widget_manager->show_wgt_rect(WTOK_QUIT);
+    widget_manager->show_wgt_text(WTOK_QUIT);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->activate_wgt(WTOK_QUIT);
+
+/*    m_menu_id = widgetSet -> varray(0);
     widgetSet -> label(m_menu_id, _("Choose number of laps"),  GUI_LRG, GUI_ALL, 0, 0 );
-    
+
     widgetSet -> space(m_menu_id);
-    
+
     lap_label_id = widgetSet -> label(m_menu_id, _("Laps: 3"));
     widgetSet -> space(m_menu_id);
     widgetSet -> state(m_menu_id, _("Less"), GUI_MED, 10);
@@ -41,37 +101,40 @@ NumLaps::NumLaps() : laps(3)
     widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
     widgetSet -> space(m_menu_id);
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widgetSet -> layout(m_menu_id, 0, 0);*/
+    widget_manager->layout(WGT_AREA_ALL);
 }
 
 // -----------------------------------------------------------------------------
 NumLaps::~NumLaps()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
 }   // ~NumLaps
 
 // -----------------------------------------------------------------------------
 void NumLaps::select()
 {
-    const int id = widgetSet->click();
-    const int n = widgetSet->get_token(id);
-    switch (n)
+    const int WGT = widget_manager->get_selected_wgt();
+/*    const int id = widgetSet->click();
+    const int n = widgetSet->get_token(id);*/
+    //TEMP
+    switch (WGT)
     {
-      case 10:
+      case WTOK_LESS:
         laps = std::max(1, laps-1);
-	snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-	widgetSet->set_label(lap_label_id, lap_label);
-	break;
-      case 20:
+        snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
+	    widget_manager->set_wgt_text(WTOK_NUMLAPS, lap_label);
+        break;
+      case WTOK_MORE:
         laps = std::min(10, laps+1);
-	snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-	widgetSet->set_label(lap_label_id, lap_label);
-	break;
-      case 30:
+        snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
+        widget_manager->set_wgt_text(WTOK_NUMLAPS, lap_label);
+        break;
+      case WTOK_START:
         race_manager->setNumLaps(laps);
         race_manager->start();
         break;
-      case -1:
+      case WTOK_QUIT:
         menu_manager->popMenu();
 	break;
     }

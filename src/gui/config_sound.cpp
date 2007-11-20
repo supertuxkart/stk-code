@@ -18,90 +18,109 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config_sound.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
+    WTOK_TITLE,
+
     WTOK_MUSIC,
     WTOK_SFX,
-    WTOK_BACK,
+
+    WTOK_EMPTY,
+
+    WTOK_QUIT,
 };
 
 ConfigSound::ConfigSound()
 {
-    m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, _("Sound Settings"), GUI_LRG, GUI_ALL, 0, 0);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    const int VA = widgetSet -> varray(m_menu_id);
-    // The spaces are important, otherwise the set_label calls below will
-    // increase the width of the container, resulting in a warning being
-    // printed by widgetSet.
+    widget_manager->add_wgt(WTOK_TITLE, 40, 7);
+    widget_manager->set_wgt_text( WTOK_TITLE, _("Sound Settings"));
+    widget_manager->break_line();
+
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->add_wgt(WTOK_MUSIC, 40, 7);
     if( user_config->doMusic() )
-        m_music_menu_id = widgetSet->start(VA,_("  Turn off music  "), 
-                                           GUI_MED, WTOK_MUSIC, GUI_ON);
+    {
+        widget_manager->set_wgt_text( WTOK_MUSIC, _("Turn off music"));
+    }
     else
-        m_music_menu_id = widgetSet->start(VA,_("  Turn on music  "), 
-                                           GUI_MED, WTOK_MUSIC, GUI_OFF);
+    {
+        widget_manager->set_wgt_text( WTOK_MUSIC, _("Turn on music"));
+    }
+    widget_manager->break_line();
 
+    widget_manager->add_wgt(WTOK_SFX, 40, 7);
     if( user_config->doSFX() )
-        m_sfx_menu_id   = widgetSet->state(VA,_("  Turn off sound effects  "),
-                                           GUI_MED, WTOK_SFX, GUI_ON);
+    {
+        widget_manager->set_wgt_text( WTOK_SFX, _("Turn off sound effects"));
+    }
     else
-        m_sfx_menu_id   = widgetSet->state(VA,_("  Turn on sound effects  "),
-                                           GUI_MED, WTOK_SFX, GUI_OFF);
+    {
+        widget_manager->set_wgt_text( WTOK_SFX, _("Turn on sound effects"));
+    }
+    widget_manager->break_line();
 
-    widgetSet -> space(VA);
-    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt(WTOK_EMPTY, 40, 5);
+    widget_manager->deactivate_wgt(WTOK_EMPTY);
+    widget_manager->hide_wgt_rect(WTOK_EMPTY);
+    widget_manager->hide_wgt_text(WTOK_EMPTY);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
+    widget_manager->set_wgt_text( WTOK_QUIT,  _("Press <ESC> to go back"));
+    widget_manager->set_wgt_text_size(WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->break_line();
+
+    widget_manager->layout(WGT_AREA_ALL);
 }
 
 //-----------------------------------------------------------------------------
 ConfigSound::~ConfigSound()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
-}
-
-//-----------------------------------------------------------------------------
-void ConfigSound::update(float dt)
-{
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
+    widget_manager->delete_wgts();
 }
 
 //-----------------------------------------------------------------------------
 void ConfigSound::select()
 {
-    switch ( widgetSet -> get_token (widgetSet -> click()) )
+    switch ( widget_manager->get_selected_wgt())
     {
     case WTOK_MUSIC:
         if(user_config->doMusic())
         {
             user_config->setMusic(UserConfig::UC_DISABLE);
-            widgetSet->set_label(m_music_menu_id, _("Turn on music"));
+            widget_manager->set_wgt_text(WTOK_MUSIC, _("Turn on music"));
         }
         else
         {
             user_config->setMusic(UserConfig::UC_ENABLE);
-            widgetSet->set_label(m_music_menu_id, _("Turn off music"));
+            widget_manager->set_wgt_text(WTOK_MUSIC, _("Turn off music"));
         }
-        widgetSet->toggle(m_music_menu_id);
+//FIXME:'Toggling' can be achieved with a simple color change, if desired.
+//        widgetSet->toggle(m_music_menu_id);
         break;
     case WTOK_SFX:
         if(user_config->doSFX())
         {
             user_config->setSFX(UserConfig::UC_DISABLE);
-            widgetSet->set_label(m_sfx_menu_id, _("Turn on sound effects"));
+            widget_manager->set_wgt_text(WTOK_SFX, _("Turn on sound effects"));
         }
         else
         {
             user_config->setSFX(UserConfig::UC_ENABLE);
-            widgetSet->set_label(m_sfx_menu_id, _("Turn off sound effects"));
+            widget_manager->set_wgt_text(WTOK_SFX, _("Turn off sound effects"));
         }
-        widgetSet->toggle(m_sfx_menu_id);
+//        widgetSet->toggle(m_sfx_menu_id);
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
         menu_manager->popMenu();
         break;
     default: break;

@@ -26,7 +26,7 @@
 #include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_properties_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "game_manager.hpp"
 #include "user_config.hpp"
@@ -39,6 +39,16 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
+
+enum WidgetTokens
+{
+    WTOK_TITLE,
+    WTOK_QUIT,
+
+    WTOK_FIRSTKART
+};
+
+
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
 {
@@ -48,7 +58,7 @@ GrandPrixEnd::GrandPrixEnd()
     m_context = new ssgContext;
     oldContext->makeCurrent();
 
-    m_menu_id = widgetSet -> vstack(0);
+//    m_menu_id = widgetSet -> vstack(0);
 
     int highest = 0;
     //FIXME: We go from the back to the front because the players are in the
@@ -64,13 +74,19 @@ GrandPrixEnd::GrandPrixEnd()
     static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
              _("The winner is %s!"),WINNING_KART->getName().c_str());
-    widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
+    widget_manager->add_wgt( WTOK_TITLE, 60, 10);
+    widget_manager->show_wgt_rect(WTOK_TITLE);
+    widget_manager->show_wgt_text(WTOK_TITLE);
+    widget_manager->set_wgt_text(WTOK_TITLE, output);
+    widget_manager->set_wgt_text_size(WTOK_TITLE, WGT_FNT_LRG);
+    widget_manager->break_line();
+//    widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
 
 
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
 
-    const int VA = widgetSet->varray(m_menu_id);
+//    const int VA = widgetSet->varray(m_menu_id);
 
     Kart *kart;
 	int *scores   = new int[NUM_KARTS];
@@ -114,16 +130,25 @@ GrandPrixEnd::GrandPrixEnd()
         kart = world->getKart(position[i]);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
                 i + 1, kart->getName().c_str(), scores[i]);
-        widgetSet -> label(VA, (char*)(m_score + MAX_STR_LEN * i), GUI_MED,
-            GUI_ALL);
+
+        widget_manager->add_wgt(WTOK_FIRSTKART + i, 40, 5);
+        widget_manager->show_wgt_rect(WTOK_FIRSTKART + i);
+        widget_manager->show_wgt_text(WTOK_FIRSTKART + i);
+        widget_manager->set_wgt_text(WTOK_FIRSTKART + i,
+            (char*)(m_score + MAX_STR_LEN * i));
+        widget_manager->set_wgt_text_size(WTOK_FIRSTKART + i, WGT_FNT_SML);
+    widget_manager->break_line();
     }
     delete []scores;
     delete []position;
 
-    widgetSet -> space(m_menu_id);
-    widgetSet -> label(m_menu_id, _("Back to the main menu"), GUI_LRG, GUI_ALL, 0, 0);
+    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
+    widget_manager->activate_wgt(WTOK_QUIT);
+    widget_manager->show_wgt_rect(WTOK_QUIT);
+    widget_manager->show_wgt_text(WTOK_QUIT);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Back to the main menu"));
 
-    widgetSet -> layout(m_menu_id, 0, 1);
+    widget_manager->layout(WGT_AREA_ALL);
 
     m_kart = new ssgTransform;
     m_kart->ref();
@@ -146,7 +171,8 @@ GrandPrixEnd::GrandPrixEnd()
 //-----------------------------------------------------------------------------
 GrandPrixEnd::~GrandPrixEnd()
 {
-    widgetSet -> delete_widget(m_menu_id);
+    widget_manager->delete_wgts();
+    //widgetSet -> delete_widget(m_menu_id);
     ssgDeRefDelete(m_kart);
 
     delete m_context;

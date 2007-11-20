@@ -23,7 +23,7 @@
 #include "loader.hpp"
 #include "char_sel.hpp"
 #include "kart_properties_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
@@ -35,62 +35,78 @@
 #  define snprintf _snprintf
 #endif
 
+enum WidgetTokens
+{
+    WTOK_RACER0,
+    WTOK_RACER1,
+    WTOK_RACER2,
+    WTOK_RACER3,
+    WTOK_RACER4,
+    WTOK_RACER5,
+    WTOK_RACER6,
+    WTOK_RACER7,
+    WTOK_RACER8,
+    WTOK_RACER9,
+
+    WTOK_TITLE,
+    WTOK_NAME,
+
+    WTOK_QUIT
+};
+
 CharSel::CharSel(int whichPlayer)
         : m_kart(0), m_player_index(whichPlayer)
 {
-    // for some strange reasons plib calls makeCurrent() in ssgContextf
+    // For some strange reasons plib calls makeCurrent() in ssgContext
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
     m_context = new ssgContext;
     oldContext->makeCurrent();
 
-    m_menu_id = widgetSet -> vstack(0);
-    const int HS1 = widgetSet -> hstack (m_menu_id);
-    widgetSet -> filler(HS1);
-
-    // Due to widgetSet constraints, this must be static!
-    static char HEADING[MAX_MESSAGE_LENGTH];
+    widget_manager->set_initial_activation_state(false);
+    widget_manager->add_wgt( WTOK_TITLE, 60, 10);
+    widget_manager->show_wgt_rect( WTOK_TITLE );
+    char HEADING[MAX_MESSAGE_LENGTH];
     snprintf(HEADING, sizeof(HEADING), _("Player %d, choose a driver"),
              m_player_index + 1);
+    widget_manager->set_wgt_text( WTOK_TITLE, HEADING);
+    widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG);
+    widget_manager->show_wgt_text( WTOK_TITLE );
+    widget_manager->break_line();
 
-    widgetSet -> label(HS1, HEADING, GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> filler(HS1);
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->break_line();
 
-    widgetSet -> filler(m_menu_id);
-
-    const int HA = widgetSet -> harray(m_menu_id);
-    const int ICON_SIZE = 64;
-
-    unsigned int lastKartId = user_config->m_player[m_player_index].getLastKartId();
-    bool skipActivatingLast = false;
+    //FIXME: this supports only a static number of karts
+//    unsigned int lastKartId = user_config->m_player[m_player_index].getLastKartId();
+//    bool skipActivatingLast = false;
 
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
         Material *m = material_manager->getMaterial(kp->getIconFile());
-        const int C = widgetSet->image(HA, m->getState()->getTextureHandle(),
-                                 ICON_SIZE, ICON_SIZE);
-        widgetSet->activate_widget(C, i, 0);
-
-        if (i == lastKartId)
-        {
-          widgetSet->set_active(C);
-          skipActivatingLast = true;
-        }
-
-        if (!skipActivatingLast &&
-            i == kart_properties_manager->getNumberOfKarts() - 1)
-            widgetSet->set_active(C);
+        widget_manager->add_wgt( WTOK_RACER0 + i, 10, 13);
+        widget_manager->show_wgt_rect( WTOK_RACER0 + i);
+        widget_manager->set_wgt_color( WTOK_RACER0 + i, WGT_GRAY);
+        widget_manager->set_wgt_texture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
+        widget_manager->show_wgt_texture( WTOK_RACER0 + i );
+        widget_manager->activate_wgt( WTOK_RACER0 + i );
     }
-    const int HS2 = widgetSet -> hstack(m_menu_id);
-    widgetSet -> filler (HS2);
-    m_kart_name_label = widgetSet -> label(HS2, _("No driver choosed"),
-                                           GUI_MED, GUI_ALL);
-    widgetSet -> filler (HS2);
-    widgetSet -> layout(m_menu_id, 0, 1);
+
+    widget_manager->break_line();
+    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->break_line();
+
+    //FIXME: the widget should check if the dimensions > 100
+    widget_manager->add_wgt( WTOK_NAME, 20, 7);
+    widget_manager->show_wgt_rect( WTOK_NAME );
+    widget_manager->show_wgt_text( WTOK_NAME );
+
+    //FIXME: widget_manager says that token -1 is already in use
+    widget_manager->layout(WGT_AREA_TOP);
 
     m_current_kart = -1;
-    switchCharacter(1);
+    switchCharacter(0);
 
     m_clock = 0;
     //test
@@ -100,7 +116,7 @@ CharSel::CharSel(int whichPlayer)
 //-----------------------------------------------------------------------------
 CharSel::~CharSel()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
     ssgDeRefDelete(m_kart);
 
     delete m_context;
@@ -112,7 +128,8 @@ void CharSel::switchCharacter(int n)
     const KartProperties* kp= kart_properties_manager->getKartById(n);
     if (m_current_kart != n && kp != NULL)
     {
-        widgetSet -> set_label(m_kart_name_label, kp->getName().c_str());
+        //widgetSet -> set_label(m_kart_name_label, kp->getName().c_str());
+        widget_manager->set_wgt_text( WTOK_NAME, kp->getName().c_str());
 
         m_current_kart = n;
         ssgDeRefDelete(m_kart);
@@ -130,7 +147,7 @@ void CharSel::update(float dt)
     m_clock += dt * 40.0f;
     BaseGUI::update(dt);
 
-    switchCharacter(widgetSet->get_token(widgetSet->click()));
+    switchCharacter(widget_manager->get_selected_wgt() - WTOK_RACER0);
 
     if (m_kart != NULL)
     {
@@ -168,7 +185,7 @@ void CharSel::update(float dt)
 //----------------------------------------------------------------------------
 void CharSel::select()
 {
-    const int TOKEN = widgetSet -> get_token (widgetSet -> click());
+    const int TOKEN = 0;
     const KartProperties* KP = kart_properties_manager->getKartById(TOKEN);
     if (KP != NULL)
     {

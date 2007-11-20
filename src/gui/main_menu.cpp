@@ -20,7 +20,7 @@
 #include <SDL/SDL.h>
 
 #include "main_menu.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
@@ -29,38 +29,65 @@ enum WidgetTokens {
     WTOK_SINGLE,
     WTOK_MULTI,
     WTOK_OPTIONS,
-    WTOK_REPLAY,
     WTOK_QUIT,
+    WTOK_EMPTY,
     WTOK_HELP,
-    WTOK_CREDITS,
+    WTOK_CREDITS
 };
 
 MainMenu::MainMenu()
 {
-    m_menu_id = widgetSet -> varray(0);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, _("Single Player"), GUI_MED, WTOK_SINGLE);
-    widgetSet -> state(m_menu_id, _("Multiplayer"),   GUI_MED, WTOK_MULTI);
-    widgetSet -> state(m_menu_id, _("Options"),       GUI_MED, WTOK_OPTIONS);
-    widgetSet -> state(m_menu_id, _("Quit"),          GUI_MED, WTOK_QUIT);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, _("Help"),          GUI_SML, WTOK_HELP);
-    widgetSet -> state(m_menu_id, _("Credits"),       GUI_SML, WTOK_CREDITS);
-    widgetSet -> space(m_menu_id);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt(WTOK_SINGLE, 25, 7);
+    widget_manager->set_wgt_text( WTOK_SINGLE, _("Single Player") );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_MULTI, 25, 7);
+    widget_manager->set_wgt_text( WTOK_MULTI, _("Multiplayer") );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_OPTIONS, 25, 7);
+    widget_manager->set_wgt_text( WTOK_OPTIONS, _("Options") );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 25, 7);
+    widget_manager->set_wgt_text( WTOK_QUIT, _("Quit") );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_EMPTY, 25, 7);
+    widget_manager->hide_wgt_text( WTOK_EMPTY );
+    widget_manager->hide_wgt_rect( WTOK_EMPTY );
+    widget_manager->deactivate_wgt( WTOK_EMPTY );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_HELP, 25, 7);
+    widget_manager->set_wgt_text( WTOK_HELP, _("Help") );
+    //FIXME: if text size is not set, we get a crash when resizing the rect to the text
+    widget_manager->set_wgt_text_size( WTOK_HELP, WGT_FNT_SML );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_CREDITS, 25, 7);
+    widget_manager->set_wgt_text( WTOK_CREDITS, _("Credits") );
+    widget_manager->set_wgt_text_size( WTOK_CREDITS, WGT_FNT_SML );
+
+    widget_manager->layout(WGT_AREA_ALL);
 }
 
 //-----------------------------------------------------------------------------
 MainMenu::~MainMenu()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts() ;
 }
 
 //-----------------------------------------------------------------------------
 void MainMenu::select()
 {
+    #if 0
     switch ( widgetSet -> get_token (widgetSet -> click()) )
     {
     case WTOK_SINGLE:
@@ -73,6 +100,31 @@ void MainMenu::select()
 
     case WTOK_REPLAY:
         //TODO
+        break;
+
+    case WTOK_OPTIONS:
+        menu_manager->pushMenu(MENUID_OPTIONS);
+        break;
+
+    case WTOK_QUIT:
+        menu_manager->pushMenu(MENUID_EXITGAME);
+        break;
+    case WTOK_HELP:
+        menu_manager->pushMenu(MENUID_HELP);
+        break;
+    case WTOK_CREDITS:
+        menu_manager->pushMenu(MENUID_CREDITS);
+        break;
+    }
+    #endif
+    switch ( widget_manager->get_selected_wgt() )
+    {
+    case WTOK_SINGLE:
+        race_manager->setNumPlayers(1);
+        menu_manager->pushMenu(MENUID_GAMEMODE);
+        break;
+    case WTOK_MULTI:
+        menu_manager->pushMenu(MENUID_NUMPLAYERS);
         break;
 
     case WTOK_OPTIONS:

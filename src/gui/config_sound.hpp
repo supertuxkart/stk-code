@@ -28,7 +28,6 @@ public:
     ConfigSound();
     ~ConfigSound();
 
-    void update(float dt);
     void select();
 
 private:

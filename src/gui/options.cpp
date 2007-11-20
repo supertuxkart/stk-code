@@ -18,11 +18,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "options.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
+    WTOK_TITLE,
     WTOK_CONTROLS,
     WTOK_DISPLAY,
     WTOK_SOUND,
@@ -31,7 +32,7 @@ enum WidgetTokens {
 
 Options::Options()
 {
-    m_menu_id = widgetSet -> varray(0);
+/*    m_menu_id = widgetSet -> varray(0);
 
     widgetSet -> space(m_menu_id);
     widgetSet -> space(m_menu_id);
@@ -51,26 +52,69 @@ Options::Options()
     widgetSet -> space(m_menu_id);
     widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widgetSet -> layout(m_menu_id, 0, 0);*/
+    widget_manager->add_wgt(WTOK_TITLE, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_TITLE );
+    widget_manager->set_wgt_text( WTOK_TITLE, _("Options") );
+    widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG );
+    widget_manager->show_wgt_text( WTOK_TITLE );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_CONTROLS, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_CONTROLS );
+    widget_manager->set_wgt_text( WTOK_CONTROLS, _("Player Config") );
+    widget_manager->set_wgt_text_size( WTOK_CONTROLS, WGT_FNT_MED );
+    widget_manager->show_wgt_text( WTOK_CONTROLS );
+    widget_manager->activate_wgt( WTOK_CONTROLS);
+    widget_manager->break_line();
+
+    // Don't display the fullscreen menu when called from within the race.
+    // The fullscreen mode will reload all textures, reload the models,
+    // ... basically creating a big mess!!  (and all of this only thanks
+    // to windows, who discards all textures, ...)
+    if(!menu_manager->isSomewhereOnStack(MENUID_RACE))
+    {
+        widget_manager->add_wgt(WTOK_DISPLAY, 35, 7);
+        widget_manager->show_wgt_rect( WTOK_DISPLAY );
+        widget_manager->set_wgt_text( WTOK_DISPLAY, _("Display") );
+        widget_manager->set_wgt_text_size( WTOK_DISPLAY, WGT_FNT_MED );
+        widget_manager->show_wgt_text( WTOK_DISPLAY );
+        widget_manager->activate_wgt( WTOK_DISPLAY );
+        widget_manager->break_line();
+    }
+
+    widget_manager->add_wgt(WTOK_SOUND, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_SOUND );
+    widget_manager->set_wgt_text( WTOK_SOUND, _("Sound") );
+    widget_manager->set_wgt_text_size( WTOK_SOUND, WGT_FNT_MED );
+    widget_manager->show_wgt_text( WTOK_SOUND );
+    widget_manager->activate_wgt( WTOK_SOUND );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WidgetManager::WGT_NONE, 35, 7);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_BACK, 35, 7);
+    widget_manager->show_wgt_rect( WTOK_BACK );
+    widget_manager->set_wgt_text( WTOK_BACK, _("Press <ESC> to go back") );
+    widget_manager->set_wgt_text_size( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->show_wgt_text( WTOK_BACK );
+    widget_manager->activate_wgt( WTOK_BACK );
+
+    widget_manager->layout(WGT_AREA_ALL);
 }
 
 // -----------------------------------------------------------------------------
 Options::~Options()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
-}
-
-// -----------------------------------------------------------------------------
-void Options::update(float dt)
-{
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
+    widget_manager->delete_wgts() ;
 }
 
 // -----------------------------------------------------------------------------
 void Options::select()
 {
-    switch ( widgetSet -> get_token (widgetSet -> click()) )
+    switch ( widget_manager->get_selected_wgt() )
+//    switch ( widgetSet -> get_token (widgetSet -> click()) )
     {
     case WTOK_CONTROLS:
         menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);

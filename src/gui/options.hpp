@@ -28,7 +28,6 @@ public:
     Options();
     ~Options();
 
-    void update(float dt);
     void select();
 };
 

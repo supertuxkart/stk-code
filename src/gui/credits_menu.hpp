@@ -20,23 +20,17 @@
 #ifndef HEADER_CREDITSMENU_H
 #define HEADER_CREDITSMENU_H
 
-#include <string>
-#include <plib/fnt.h>
-#include "scrolled_text.hpp"
 #include "base_gui.hpp"
-#include "player.hpp"
+//#include "player.hpp"
 
 
-class CreditsMenu: public ScrolledText
+class CreditsMenu: public BaseGUI
 {
-private:
-    int        m_xLeft, m_xRight, m_yBottom, m_yTop;
-    float      m_yPos, m_ySpeed;
-    int        m_numberOfLines;
-    int        m_fontSize;
 public:
     CreditsMenu();
     ~CreditsMenu();
+
+    void select ();
 };
 
 #endif

@@ -20,7 +20,7 @@
 #include <SDL/SDL.h>
 
 #include "base_gui.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "world.hpp"
 #include "menu_manager.hpp"
 
@@ -31,6 +31,34 @@ void BaseGUI::input(InputType type, int id0, int  id1, int id2, int value)
     case IT_KEYBOARD:
         inputKeyboard(id0, value);
         break;
+
+    case IT_MOUSEMOTION:
+    {
+        const int PREV_SELECTED_WGT = widget_manager->get_selected_wgt();
+        const int SELECTED_WGT = widget_manager->handle_mouse( id0, id1 );
+
+        //FIXME: I should take WGT_NONE out of the class.
+        if( SELECTED_WGT != WidgetManager::WGT_NONE )
+        {
+            if( PREV_SELECTED_WGT != WidgetManager::WGT_NONE )
+            {
+                widget_manager->darken_wgt_color( PREV_SELECTED_WGT );
+            }
+
+            widget_manager->lighten_wgt_color( SELECTED_WGT );
+            widget_manager->pulse_wgt( SELECTED_WGT );
+        }
+
+#ifdef  ALT_MOUSE_HANDLING
+        if (id0 == 1 && value)
+            if (id1 == AD_NEGATIVE)
+                inputKeyboard(SDLK_UP, 1);
+            else
+                inputKeyboard(SDLK_DOWN, 1);
+#endif
+        break;
+    }
+
     case IT_MOUSEBUTTON:
       if (!value) // Act on button release only.
         switch (id0)
@@ -105,7 +133,28 @@ void BaseGUI::inputKeyboard(int key, int pressed)
     case SDLK_RIGHT:
     case SDLK_UP:
     case SDLK_DOWN:
-        widgetSet->pulse(widgetSet->cursor(m_menu_id, key), 1.2f);
+    {
+        const int PREV_SELECTED_WGT = widget_manager->get_selected_wgt();
+        const int SELECTED_WGT = widget_manager->handle_keyboard( key );
+
+        if( SELECTED_WGT != WidgetManager::WGT_NONE )
+        {
+            if( PREV_SELECTED_WGT != WidgetManager::WGT_NONE )
+            {
+                widget_manager->darken_wgt_color( PREV_SELECTED_WGT );
+            }
+
+            widget_manager->lighten_wgt_color( SELECTED_WGT );
+            widget_manager->pulse_wgt( SELECTED_WGT );
+        }
+        break;
+    }
+
+    case SDLK_PLUS:
+    case SDLK_MINUS:
+    case SDLK_PAGEUP:
+    case SDLK_PAGEDOWN:
+        widget_manager->handle_keyboard( key );
         break;
 
     case SDLK_SPACE:
@@ -118,7 +167,7 @@ void BaseGUI::inputKeyboard(int key, int pressed)
         {
            if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
              world->unpause();
-    
+
            menu_manager->popMenu();
         }
         break;
@@ -131,14 +180,29 @@ void BaseGUI::inputKeyboard(int key, int pressed)
 void
 BaseGUI::inputPointer(int x, int y)
 {
-  widgetSet->pulse(widgetSet->point(m_menu_id, x, y), 1.2f);
+    const int PREV_SELECTED_WGT = widget_manager->get_selected_wgt();
+    const int SELECTED_WGT = widget_manager->handle_mouse( x, y );
+
+    if( SELECTED_WGT != WidgetManager::WGT_NONE )
+    {
+        if( PREV_SELECTED_WGT != WidgetManager::WGT_NONE )
+        {
+            widget_manager->darken_wgt_color( PREV_SELECTED_WGT );
+        }
+
+        widget_manager->lighten_wgt_color( SELECTED_WGT );
+        widget_manager->pulse_wgt( SELECTED_WGT );
+    }
 }
 
 //-----------------------------------------------------------------------------
 void BaseGUI::update(float dt)
 {
+    widget_manager->update(dt);
+#if 0
     widgetSet -> timer(m_menu_id, dt) ;
     widgetSet -> paint(m_menu_id) ;
+#endif
 }   // update
 
 //-----------------------------------------------------------------------------

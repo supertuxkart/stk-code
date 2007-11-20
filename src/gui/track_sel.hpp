@@ -24,8 +24,8 @@
 
 class TrackSel: public BaseGUI
 {
-protected:
-    int   m_rect;
+/*protected:
+    int   m_rect;*/
 public:
     TrackSel();
     ~TrackSel();

@@ -21,23 +21,42 @@
 #include "loader.hpp"
 #include "string_utils.hpp"
 #include "grand_prix_select.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "font.hpp"
 #include "translation.hpp"
 
+enum WidgetTokens
+{
+    WTOK_TITLE,
+
+    //FIXME: finish the tokens
+
+    WTOK_EMPTY0,
+    WTOK_DESCRIPTION,
+    WTOK_EMPTY1,
+    WTOK_QUIT,
+
+    WTOK_FIRSTPRIX
+};
+
 GrandPrixSelect::GrandPrixSelect()
 {
-    m_menu_id = widgetSet -> varray(0);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    widgetSet -> label(m_menu_id, _("Choose a Grand Prix"), GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> space(m_menu_id);
+    widget_manager->add_wgt(WTOK_TITLE, 40, 7);
+    widget_manager->set_wgt_text(WTOK_TITLE,  _("Choose a Grand Prix"));
+    widget_manager->break_line();
 
     std::set<std::string> result;
     loader->listFiles(result, "data");
 
+    widget_manager->set_initial_activation_state(true);
     // Findout which grand prixs are available and load them
     int nId = 0;
     for(std::set<std::string>::iterator i  = result.begin();
@@ -48,37 +67,67 @@ GrandPrixSelect::GrandPrixSelect()
                 std::string fullPath= "data/" + (std::string)*i;
                 CupData cup(fullPath.c_str());
                 m_all_cups.push_back(cup);
-                if(nId==0)
+                widget_manager->add_wgt(WTOK_FIRSTPRIX + nId, 40, 7);
+                widget_manager->set_wgt_text(WTOK_FIRSTPRIX + nId, cup.getName());
+/*                if(nId==0)
                 {
                     widgetSet -> start(m_menu_id, cup.getName(), GUI_SML, nId, 0);
                 }
                 else
                 {
                     widgetSet -> state(m_menu_id, cup.getName(), GUI_SML, nId, 0);
-                }
+                }*/
+                widget_manager->break_line();
                 nId++;
             }   // if
         }   // for i
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, -1);
-    widgetSet -> layout(m_menu_id, 0, 0);
-    m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);
+
+    widget_manager->set_initial_activation_state(false);
+    widget_manager->add_wgt(WTOK_EMPTY0, 60, 7);
+    widget_manager->hide_wgt_rect(WTOK_EMPTY0);
+    widget_manager->hide_wgt_text(WTOK_EMPTY0);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_DESCRIPTION, 80, 7);
+    widget_manager->hide_wgt_rect(WTOK_DESCRIPTION);
+    widget_manager->set_wgt_text(WTOK_DESCRIPTION, _("No Grand Prix selected"));
+    widget_manager->set_wgt_text_size(WTOK_DESCRIPTION, WGT_FNT_SML);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_EMPTY1, 60, 7);
+    widget_manager->hide_wgt_rect(WTOK_EMPTY1);
+    widget_manager->hide_wgt_text(WTOK_EMPTY1);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 60, 7);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->set_wgt_text_size(WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->activate_wgt(WTOK_QUIT);
+
+    widget_manager->layout(WGT_AREA_ALL);
+    //m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);*/
 }   // GrandPrixSelect
 
 //-----------------------------------------------------------------------------
 GrandPrixSelect::~GrandPrixSelect()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
-    glDeleteLists(m_rect, 1);
+    widget_manager->delete_wgts();
+//    widgetSet -> delete_widget(m_menu_id) ;
+//    glDeleteLists(m_rect, 1);
 }   // GrandPrixSelect
 
 //-----------------------------------------------------------------------------
 void GrandPrixSelect::update(float dt)
 {
     BaseGUI::update(dt);
-    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
-    if(CLICKED_TOKEN == -1) return;
+    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    if(CLICKED_TOKEN < WTOK_FIRSTPRIX) return;
 
+    const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
+    widget_manager->set_wgt_text(WTOK_DESCRIPTION, cup.getDescription());
+
+//FIXME: The following triggers a crash; it is left to be investigated later.
+#if 0
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -90,14 +139,14 @@ void GrandPrixSelect::update(float dt)
     glBindTexture(GL_TEXTURE_2D, 0);
     const GLfloat BACKGROUND_COLOUR[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
     glColor4fv(BACKGROUND_COLOUR);
-    glCallList(m_rect);
     glPopMatrix();
-    font_gui->Print(cup.getDescription(), GUI_MED, 
+    font_gui->Print(cup.getDescription(), WGT_FNT_MED,
                     Font::ALIGN_CENTER, -1, Font::ALIGN_BOTTOM, 10);
     glDisable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+#endif
 
     return;
 }
@@ -105,8 +154,8 @@ void GrandPrixSelect::update(float dt)
 //-----------------------------------------------------------------------------
 void GrandPrixSelect::select()
 {
-    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
-    if(CLICKED_TOKEN == -1)
+    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    if(CLICKED_TOKEN == WTOK_QUIT)
     {
         menu_manager->popMenu();
         return;

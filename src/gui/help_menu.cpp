@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "help_menu.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
 #include "user_config.hpp"
@@ -27,7 +27,46 @@
 #include "material.hpp"
 #include "translation.hpp"
 
-enum WidgetTokens {
+enum WidgetTokens
+{
+/* For the first screen */
+    WTOK_MSG1,
+    WTOK_MSG2,
+    WTOK_MSG3,
+    WTOK_MSG4,
+    WTOK_MSG5,
+
+    WTOK_EMPTY,
+
+    //Change this so it's not a static amount of keys that is supported
+    WTOK_LEFT,
+    WTOK_RIGHT,
+    WTOK_ACCEL,
+    WTOK_BRAKE,
+    WTOK_WHEELIE,
+    WTOK_RESCUE,
+    WTOK_FIRE,
+    WTOK_JUMP,
+
+    WTOK_LEFTKEY,
+    WTOK_RIGHTKEY,
+    WTOK_ACCELKEY,
+    WTOK_BRAKEKEY,
+    WTOK_WHEELIEKEY,
+    WTOK_RESCUEKEY,
+    WTOK_FIREKEY,
+    WTOK_JUMPKEY,
+
+/* For the second screen */
+    WTOK_MSG6,
+
+    WTOK_ITEMIMG1, WTOK_ITEMTXT1,
+    WTOK_ITEMIMG2, WTOK_ITEMTXT2,
+    WTOK_ITEMIMG3, WTOK_ITEMTXT3,
+    WTOK_ITEMIMG4, WTOK_ITEMTXT4,
+    WTOK_ITEMIMG5, WTOK_ITEMTXT5,
+    WTOK_ITEMIMG6, WTOK_ITEMTXT6,
+
     WTOK_FIRST_PAGE,
     WTOK_SECOND_PAGE,
     WTOK_QUIT
@@ -53,7 +92,7 @@ HelpMenu::HelpMenu()
 //-----------------------------------------------------------------------------
 HelpMenu::~HelpMenu()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts() ;
 
 	if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
         && m_banana != NULL )
@@ -124,18 +163,26 @@ void HelpMenu::update(float dt)
 //-----------------------------------------------------------------------------
 void HelpMenu::switch_to_first_screen()
 {
-    m_menu_id = widgetSet->vstack(0);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
 
-    //FIXME: if an hstack has no items, it segfaults
-    const int HS1 = widgetSet->hstack(m_menu_id);
-    widgetSet -> filler(HS1);
-    widgetSet -> label(HS1, _("Force your rivals bite *your* dust!"), GUI_SML);
-    widgetSet -> filler(HS1);
+    widget_manager->set_initial_rect_state( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
+    widget_manager->set_initial_text_state( SHOW_TEXT, "", TEXT_SIZE, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    const int HS2 = widgetSet->harray(m_menu_id);
-    widgetSet->label(HS2, _("Avoid bananas"), GUI_SML);
-    widgetSet->label(HS2, _("Grab blue boxes and coins"), GUI_SML);
+    /*Help header*/
+    widget_manager->add_wgt(WTOK_MSG1, 50, 7);
+    widget_manager->set_wgt_text( WTOK_MSG1, _("Force your rivals bite *your* dust!") );
+    widget_manager->break_line();
 
+    widget_manager->add_wgt(WTOK_MSG2, 60, 7);
+    widget_manager->set_wgt_text( WTOK_MSG2, _("Grab blue boxes and coins") );
+
+    widget_manager->add_wgt(WTOK_MSG3, 30, 7);
+    widget_manager->set_wgt_text( WTOK_MSG3, _("Avoid bananas") );
+    widget_manager->break_line();
+
+    /*Rotating 3D models*/
 	ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
     ssgDeRefDelete(m_box);
     m_box = new ssgTransform;
@@ -160,119 +207,241 @@ void HelpMenu::switch_to_first_screen()
     m_banana->ref();
     m_banana->addKid(hm);
 
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
+    /*Empty widget to cover the space for the 3D models*/
+    widget_manager->add_wgt(WTOK_EMPTY, 100, 15);
+    widget_manager->hide_wgt_rect(WTOK_EMPTY);
+    widget_manager->hide_wgt_text(WTOK_EMPTY);
+    widget_manager->break_line();
 
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-    widgetSet -> filler(m_menu_id);
-
-    widgetSet->multi(m_menu_id,
+    widget_manager->add_wgt(WTOK_MSG4, 100, 10);
+    widget_manager->set_wgt_text( WTOK_MSG4,
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
-get stuck or fall too far, use the rescue button to get back on track."),
-        GUI_SML);
+get stuck or fall too far, use the rescue button to get back on track."));
+    widget_manager->break_line();
 
-    widgetSet -> filler(m_menu_id);
+    /*Current key bindings*/
+    widget_manager->add_wgt(WTOK_MSG5, 70, 7);
+    widget_manager->set_wgt_text( WTOK_MSG5,
+        _("Check the current key bindings for the first player"));
+    widget_manager->break_line();
 
-    widgetSet->label(m_menu_id,
-                     _("Check the current keys bindings for the first player:"),
-                     GUI_SML);
+    widget_manager->add_wgt(WTOK_LEFT, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_LEFT, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_LEFT, sKartAction2String[KC_LEFT]);
+    widget_manager->add_wgt(WTOK_LEFTKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_LEFTKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_LEFTKEY,
+        user_config->getInputAsString(0, (KartActions)KC_LEFT).c_str());
+    widget_manager->break_line();
 
-    const int HS3       = widgetSet->hstack(m_menu_id);
-    widgetSet -> filler(HS3);
-    const int CHANGE_ID = widgetSet->varray(HS3);
-    const int LABEL_ID  = widgetSet->varray(HS3);
-    widgetSet -> filler(HS3);
+    widget_manager->add_wgt(WTOK_RIGHT, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_RIGHT, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_RIGHT, sKartAction2String[KC_RIGHT]);
+    widget_manager->add_wgt(WTOK_RIGHTKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_RIGHTKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_RIGHTKEY,
+        user_config->getInputAsString(0, (KartActions)KC_RIGHT).c_str());
+    widget_manager->break_line();
 
-    for(int i = KC_FIRST; i <= KC_LAST; i++)
-    {
-        // *sigh* widget set stores only pointer to strings, so
-        // to make sure that all key-strings are permanent, they
-        // are assigned to an array m_all_keys within this object.
-        m_all_keys[i]=user_config->getInputAsString(0, (KartActions)i);
-        widgetSet->label(LABEL_ID,  sKartAction2String[i], GUI_SML, GUI_LFT);
-        widgetSet->label(CHANGE_ID, m_all_keys[i].c_str(), GUI_SML, GUI_RGT);
-    }
-    widgetSet->start(m_menu_id,_("Next screen"), GUI_SML, WTOK_SECOND_PAGE);
-    widgetSet->state(m_menu_id,_("Go back to the main menu"), GUI_SML, WTOK_QUIT);
-    widgetSet->layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt(WTOK_ACCEL, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_ACCEL, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_ACCEL, sKartAction2String[KC_ACCEL]);
+    widget_manager->add_wgt(WTOK_ACCELKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_ACCELKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_ACCELKEY,
+        user_config->getInputAsString(0, (KartActions)KC_ACCEL).c_str());
+    widget_manager->break_line();
 
+    widget_manager->add_wgt(WTOK_BRAKE, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_BRAKE, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_BRAKE, sKartAction2String[KC_BRAKE]);
+    widget_manager->add_wgt(WTOK_BRAKEKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_BRAKEKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_BRAKEKEY,
+        user_config->getInputAsString(0, (KartActions)KC_BRAKE).c_str());
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_WHEELIE, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_WHEELIE, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_WHEELIE, sKartAction2String[KC_WHEELIE]);
+    widget_manager->add_wgt(WTOK_WHEELIEKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_WHEELIEKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_WHEELIEKEY,
+        user_config->getInputAsString(0, (KartActions)KC_WHEELIE).c_str());
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_RESCUE, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_RESCUE, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_RESCUE, sKartAction2String[KC_RESCUE]);
+    widget_manager->add_wgt(WTOK_RESCUEKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_RESCUEKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_RESCUEKEY,
+        user_config->getInputAsString(0, (KartActions)KC_RESCUE).c_str());
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_FIRE, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_FIRE, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_FIRE, sKartAction2String[KC_FIRE]);
+    widget_manager->add_wgt(WTOK_FIREKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_FIREKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_FIREKEY,
+        user_config->getInputAsString(0, (KartActions)KC_FIRE).c_str());
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_JUMP, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_JUMP, WGT_AREA_LFT );
+    widget_manager->set_wgt_text(WTOK_JUMP, sKartAction2String[KC_JUMP]);
+    widget_manager->add_wgt(WTOK_JUMPKEY, 20, 5);
+    widget_manager->set_wgt_round_corners(WTOK_JUMPKEY, WGT_AREA_RGT );
+    widget_manager->set_wgt_text(WTOK_JUMPKEY,
+        user_config->getInputAsString(0, (KartActions)KC_JUMP).c_str());
+    widget_manager->break_line();
+
+    /*Buttons at the bottom*/
+    widget_manager->add_wgt(WTOK_SECOND_PAGE, 20, 7);
+    widget_manager->set_wgt_text(WTOK_SECOND_PAGE, _("Next screen"));
+    widget_manager->activate_wgt(WTOK_SECOND_PAGE);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Go back to the main menu"));
+    widget_manager->activate_wgt(WTOK_QUIT);
+
+    widget_manager->layout( WGT_AREA_TOP );
 }
 
 //-----------------------------------------------------------------------------
 void HelpMenu::switch_to_second_screen()
 {
-
+    /* Delete 3D models from the first screen */
     ssgDeRefDelete(m_box); m_box = 0;
     ssgDeRefDelete(m_silver_coin); m_silver_coin = 0;
     ssgDeRefDelete(m_gold_coin); m_gold_coin = 0;
     ssgDeRefDelete(m_banana); m_banana = 0;
 
-    m_menu_id = widgetSet->vstack(0);
+    /* Add the widgets */
+    const bool SHOW_RECT = true;
+    const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
+    widget_manager->set_initial_rect_state( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
+    widget_manager->set_initial_text_state( false, "", TEXT_SIZE, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    widgetSet->label(m_menu_id,
-                     _("To help you win, there are certain collectables you can grab:"),
-        GUI_SML);
+    widget_manager->add_wgt(WTOK_MSG6, 100, 8);
+    widget_manager->set_wgt_text(WTOK_MSG6,
+        _("To help you win, there are certain collectables you can grab:"));
+    widget_manager->show_wgt_text( WTOK_MSG6 );
+    widget_manager->break_line();
 
-    const int HA        = widgetSet->hstack(m_menu_id);
-    const int LABEL_ID  = widgetSet->varray(HA);
-    const int IMAGE_ID  = widgetSet->vstack(HA);
+    /* Collectable images and descriptions */
+    widget_manager->add_wgt(WTOK_ITEMIMG1, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG1,
+        collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG1, WGT_WHITE);
+    widget_manager->show_wgt_texture(WTOK_ITEMIMG1);
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG1, WGT_AREA_NONE);
 
-    const int ICON_SIZE = 64;
+    widget_manager->add_wgt(WTOK_ITEMTXT1, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT1,
+        _("Missile - fast stopper in a straight line"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT1 );
+    widget_manager->break_line();
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Missile - fast stopper in a straight line"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMIMG2, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG2,
+        collectable_manager->getIcon(COLLECT_HOMING_MISSILE)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG2, WGT_WHITE);
+    widget_manager->show_wgt_texture( WTOK_ITEMIMG2 );
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG2, WGT_AREA_NONE);
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_HOMING_MISSILE)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Homing missile - follows rivals, but is slower than the missile"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMTXT2, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT2,
+        _("Homing missile - follows rivals, but is slower than the missile"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT2 );
+    widget_manager->break_line();
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Fuzzy blob/Spark - very slow, but bounces from walls"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMIMG3, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG3,
+        collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG3, WGT_WHITE);
+    widget_manager->show_wgt_texture( WTOK_ITEMIMG3 );
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG3, WGT_AREA_NONE);
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Zipper - speed boost"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMTXT3, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT3,
+        _("Fuzzy blob/Spark - very slow, but bounces from walls"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT3 );
+    widget_manager->break_line();
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Parachute - slows down all karts in a better position!"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMIMG4, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG4,
+        collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG4, WGT_WHITE);
+    widget_manager->show_wgt_texture( WTOK_ITEMIMG4 );
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG4, WGT_AREA_NONE);
 
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Anvil - slows down greatly the kart in the first position"), GUI_SML);
+    widget_manager->add_wgt(WTOK_ITEMTXT4, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT4,
+        _("Zipper - speed boost"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT4 );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_ITEMIMG5, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG5,
+        collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG5, WGT_WHITE);
+    widget_manager->show_wgt_texture( WTOK_ITEMIMG5 );
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG5, WGT_AREA_NONE);
+
+    widget_manager->add_wgt(WTOK_ITEMTXT5, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT5,
+        _("Parachute - slows down all karts in a better position!"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT5 );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_ITEMIMG6, 10, 13);
+    widget_manager->set_wgt_texture(WTOK_ITEMIMG6,
+        collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle());
+    widget_manager->set_wgt_color(WTOK_ITEMIMG6, WGT_WHITE);
+    widget_manager->show_wgt_texture( WTOK_ITEMIMG6 );
+    widget_manager->set_wgt_round_corners(WTOK_ITEMIMG6, WGT_AREA_NONE);
+
+    widget_manager->add_wgt(WTOK_ITEMTXT6, 90, 13);
+    widget_manager->set_wgt_text( WTOK_ITEMTXT6,
+        _("Anvil - slows down greatly the kart in the first position"));
+    widget_manager->show_wgt_text( WTOK_ITEMTXT6 );
+    widget_manager->break_line();
 
 #ifdef USE_MAGNETS
-    widgetSet->image(IMAGE_ID, collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle(),
-        ICON_SIZE, ICON_SIZE, GUI_NONE);
-    widgetSet->label(LABEL_ID, _("Missile - fast stopper in a straight line"), GUI_SML);
+    //Magnets are currently disabled.
 #endif
 
-    widgetSet->start(m_menu_id,_("Previous screen"), GUI_SML, WTOK_FIRST_PAGE);
-    widgetSet->state(m_menu_id,_("Go back to the main menu"), GUI_SML, WTOK_QUIT);
-    widgetSet->layout(m_menu_id, 0, 0);
+    /*Buttons at the bottom*/
+    widget_manager->add_wgt(WTOK_FIRST_PAGE, 25, 7);
+    widget_manager->set_wgt_text(WTOK_FIRST_PAGE, _("Previous screen"));
+    widget_manager->show_wgt_text( WTOK_FIRST_PAGE );
+    widget_manager->activate_wgt(WTOK_FIRST_PAGE);
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Go back to the main menu"));
+    widget_manager->show_wgt_text( WTOK_QUIT );
+    widget_manager->activate_wgt(WTOK_QUIT);
+
+    widget_manager->layout( WGT_AREA_TOP );
 }
 
 //-----------------------------------------------------------------------------
 void HelpMenu::select()
 {
-    switch( widgetSet->get_token (widgetSet->click()))
+    switch ( widget_manager->get_selected_wgt() )
     {
         case WTOK_FIRST_PAGE:
-            widgetSet -> delete_widget(m_menu_id) ;
+            widget_manager->delete_wgts();
             switch_to_first_screen();
             break;
 
         case WTOK_SECOND_PAGE:
-            widgetSet -> delete_widget(m_menu_id) ;
+            widget_manager->delete_wgts();
             switch_to_second_screen();
             break;
 

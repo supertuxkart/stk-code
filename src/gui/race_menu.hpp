@@ -28,7 +28,6 @@ public:
     RaceMenu();
     ~RaceMenu();
 
-    void update(float dt);
     void select();
     void inputKeyboard(int key, int pressed);
 };

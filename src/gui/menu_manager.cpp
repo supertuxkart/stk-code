@@ -47,6 +47,7 @@
 #include "grand_prix_select.hpp"
 #include "sound_manager.hpp"
 #include "sdldrv.hpp"
+#include "widget_manager.hpp"
 
 MenuManager* menu_manager= new MenuManager();
 
@@ -187,6 +188,11 @@ void MenuManager::update()
             default:
                 break;
             }   // switch
+
+            if( widget_manager->get_selected_wgt() != WidgetManager::WGT_NONE )
+            {
+                widget_manager->lighten_wgt_color(widget_manager->get_selected_wgt());
+            }
         }
     }
 

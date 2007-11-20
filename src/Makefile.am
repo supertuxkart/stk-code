@@ -67,7 +67,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	shadow.cpp		   shadow.hpp	        	\
 	particle_system.cpp	   particle_system.hpp       	\
 	game_manager.cpp	   game_manager.hpp        	\
-	widget_set.cpp		   widget_set.hpp	        \
+	widget_manager.cpp		   widget_manager.hpp	        \
+	widget.cpp		   widget.hpp	        \
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
@@ -107,7 +108,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
 	gui/help_menu.cpp 	   gui/help_menu.hpp 	        \
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
-	gui/scrolled_text.cpp	   gui/scrolled_text.hpp	\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/font.hpp		   gui/font.cpp                 \
 	robots/default_robot.cpp   robots/default_robot.hpp  \

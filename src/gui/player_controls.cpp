@@ -20,7 +20,7 @@
 #include <SDL/SDL.h>
 
 #include "player_controls.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
@@ -28,43 +28,94 @@
 
 #include <string>
 
+enum WidgetTokens
+{
+    WTOK_TITLE,
+    WTOK_PLYR_NAME0,
+    WTOK_PLYR_NAME1,
+
+    WTOK_LEFT,
+    WTOK_RIGHT,
+    WTOK_ACCEL,
+    WTOK_BRAKE,
+    WTOK_WHEELIE,
+    WTOK_JUMP,
+    WTOK_RESCUE,
+    WTOK_FIRE,
+    WTOK_LOOK_BACK,
+
+    WTOK_KEY0,
+    WTOK_KEY1,
+    WTOK_KEY2,
+    WTOK_KEY3,
+    WTOK_KEY4,
+    WTOK_KEY5,
+    WTOK_KEY6,
+    WTOK_KEY7,
+    WTOK_KEY8,
+
+    WTOK_QUIT
+};
+
 const char *sKartAction2String[KC_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
                                              _("Brake"),  _("Wheelie"), _("Jump"),
                                              _("Rescue"), _("Fire"), _("Look back") };
 
 
-PlayerControls::PlayerControls(int whichPlayer): m_player_index(whichPlayer),
-        m_grab_input(false)
+PlayerControls::PlayerControls(int whichPlayer):
+    m_grab_id(WidgetManager::WGT_NONE), m_player_index(whichPlayer),
+    m_grab_input(false)
 {
     // We need the unicode character here, so enable the translation
     SDL_EnableUNICODE(1);
-    m_menu_id = widgetSet -> vstack(0);
-    
-    sprintf(m_heading, _("Choose your controls, %s"), 
+
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+
+    widget_manager->add_wgt( WTOK_TITLE, 60, 7);
+    sprintf(m_heading, _("Choose your controls, %s"),
             user_config->m_player[m_player_index].getName().c_str());
-    widgetSet -> label(m_menu_id, m_heading, GUI_LRG, GUI_ALL, 0, 0);
+    widget_manager->set_wgt_text( WTOK_TITLE, m_heading);
+    widget_manager->break_line();
 
-    const int HA        = widgetSet->harray(m_menu_id);
-    const int CHANGE_ID = widgetSet->varray(HA);
-    const int LABEL_ID  = widgetSet->varray(HA);
+    widget_manager->add_wgt( WTOK_PLYR_NAME0, 30, 7);
+    widget_manager->set_wgt_text( WTOK_PLYR_NAME0, _("Player name"));
 
-    widgetSet->label(LABEL_ID, _("Player name"));
+    widget_manager->add_wgt( WTOK_PLYR_NAME1, 30, 7);
     m_name = user_config->m_player[m_player_index].getName();
-    m_name_id = widgetSet->state(CHANGE_ID, m_name.c_str(), GUI_MED, -2);
+    widget_manager->set_wgt_text( WTOK_PLYR_NAME1, m_name);
+    widget_manager->activate_wgt( WTOK_PLYR_NAME1);
+    widget_manager->break_line();
+
+    KartActions control;
     for(int i=0; i<=KC_LAST; i++)
     {
-        addKeyLabel(CHANGE_ID, (KartActions)i,    i==0 );
-        widgetSet->label(LABEL_ID, sKartAction2String[i]);
+        widget_manager->add_wgt( WTOK_KEY0 + i, 30, 7);
+        widget_manager->set_wgt_text( WTOK_KEY0 + i, sKartAction2String[i]);
+
+        control = (KartActions)i;
+        m_key_names[control] = user_config->getInputAsString(m_player_index, control);
+        widget_manager->add_wgt( WTOK_LEFT + i, 30, 7);
+        widget_manager->set_wgt_text( WTOK_LEFT + i, m_key_names[control].c_str());
+        widget_manager->activate_wgt( WTOK_LEFT + i);
+
+        widget_manager->break_line();
     }
 
-    widgetSet->state(m_menu_id,_("Press <ESC> to go back"), GUI_SML, -1);
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->add_wgt( WTOK_QUIT, 60, 7);
+    widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->activate_wgt( WTOK_QUIT);
+
+    widget_manager->layout(WGT_AREA_ALL);
 }   // PlayerControls
 
 //-----------------------------------------------------------------------------
 PlayerControls::~PlayerControls()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
     // The unicode translation is not generally needed, so disable it again.
     SDL_EnableUNICODE(0);
 }   // ~PlayerControls
@@ -74,15 +125,16 @@ void PlayerControls::select()
 {
     if (m_grab_input) return;
 
-    m_grab_id = widgetSet -> click();
-    if(m_grab_id == m_name_id) 
+    m_grab_id = widget_manager->get_selected_wgt();
+    if(m_grab_id == WTOK_PLYR_NAME1)
     {
         m_grab_input = true;
         return;
     }
-    const int MENU_CHOICE = widgetSet -> get_token (m_grab_id);
 
-    if(MENU_CHOICE == -1)
+    const int MENU_CHOICE = widget_manager->get_selected_wgt() - WTOK_LEFT;
+
+    if(MENU_CHOICE == WTOK_QUIT)
     {
         menu_manager->popMenu();
         return;
@@ -91,7 +143,7 @@ void PlayerControls::select()
     m_grab_input = true;
     drv_hidePointer();
 
-    widgetSet->set_label(m_grab_id, _("Press key"));
+    widget_manager->set_wgt_text(m_grab_id, _("Press key"));
 }   // select
 
 //-----------------------------------------------------------------------------
@@ -101,7 +153,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
     {
         // Handle input of user name
         // -------------------------
-        if(m_grab_id == m_name_id)
+        if(m_grab_id == WTOK_PLYR_NAME1)
         {
             if(type==IT_KEYBOARD)
             {
@@ -113,13 +165,14 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
                 {
                     if(m_name.size()>=1) m_name.erase(m_name.size()-1,1);
                 }
-                // All other control characters are ignored and will end 
+                // All other control characters are ignored and will end
                 // entering the name
                 else if(id0<32 || id0>255)
                 {
                     m_grab_input = false;
+                    m_grab_id = WidgetManager::WGT_NONE;
                     user_config->m_player[m_player_index].setName(m_name);
-                    BaseGUI::input(type, id0, id1, id2, value);
+//                    BaseGUI::input(type, id0, id1, id2, value);
                     return;
                 }
                 else  // Add the character to the name
@@ -129,8 +182,8 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
                     // take care of upper/lower case etc.
                     m_name = m_name + (char)id1;
                 }
-                widgetSet->set_label(m_name_id, m_name.c_str());
-            } 
+                widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
+            }
             else
             {
                 // Ignore all other events, e.g. when pressing the mouse
@@ -147,17 +200,17 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
             // Do not accept pressing ESC as input.
             if (type != IT_KEYBOARD || id0 != SDLK_ESCAPE)
             {
- 	        // Since unicode translation is enabled, the value of id1 will
+	        // Since unicode translation is enabled, the value of id1 will
                 // be the unicode value. Since unicode is usually not enabled
-	        // in the race we have to set this value to zero (unicode 
+	        // in the race we have to set this value to zero (unicode
                 // translation is only enabled here to help entering the name),
 	        // otherwise the keys will not be recognised in the race!!
-  	        if(type==IT_KEYBOARD) id1=0;
-                user_config->m_player[m_player_index].setInput(m_edit_action, type, 
+	        if(type==IT_KEYBOARD) id1=0;
+                user_config->m_player[m_player_index].setInput(m_edit_action, type,
                                                                id0, id1, id2);
 	    }
-            
-            changeKeyLabel(m_grab_id, m_edit_action);
+
+            widget_manager->set_wgt_text(m_grab_id, m_key_names[m_edit_action].c_str());
         }
     }
     else
@@ -165,7 +218,7 @@ void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
 }
 
 //-----------------------------------------------------------------------------
-void PlayerControls::addKeyLabel(int CHANGE_ID, KartActions control, bool start)
+/*void PlayerControls::addKeyLabel(int CHANGE_ID, KartActions control, bool start)
 {
 
     setKeyInfoString(control);
@@ -187,5 +240,5 @@ void PlayerControls::changeKeyLabel(int m_grab_id, KartActions control)
 //-----------------------------------------------------------------------------
 void PlayerControls::setKeyInfoString(KartActions control)
 {
-    m_key_names[control] = user_config->getInputAsString(m_player_index, control);
 }   // setKeyInfoString
+*/

@@ -18,70 +18,91 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config_display.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "sdldrv.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
-    WTOK_FULLSCREEN, WTOK_BACK
+    WTOK_TITLE,
+
+    WTOK_FULLSCREEN,
+
+    WTOK_EMPTY,
+
+    WTOK_QUIT
 };
 
 ConfigDisplay::ConfigDisplay()
 {
-    CreateMenu();
-}
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-//-----------------------------------------------------------------------------
-void ConfigDisplay::CreateMenu()
-{
-    m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, _("Display Settings"), GUI_LRG, GUI_ALL, 0, 0);
+    widget_manager->add_wgt( WTOK_TITLE, 40, 7);
+    widget_manager->set_wgt_text( WTOK_TITLE, _("Display Settings"));
+    widget_manager->break_line();
 
-    const int VA = widgetSet -> varray(m_menu_id);
-    m_fullscreen_menu_id = widgetSet -> start(VA, _("Fullscreen mode"),  GUI_MED,
-                                            WTOK_FULLSCREEN);
-
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->add_wgt( WTOK_FULLSCREEN, 40, 7);
     if(user_config->m_fullscreen)
-        widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
-    widgetSet -> space(VA);
-    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
-    widgetSet -> layout(m_menu_id, 0, 0);
-}   // CreateMenu
+    {
+        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
+    }
+    else
+    {
+        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
+    }
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WTOK_EMPTY, 40, 2);
+    widget_manager->deactivate_wgt( WTOK_EMPTY );
+    widget_manager->hide_wgt_rect( WTOK_EMPTY );
+    widget_manager->hide_wgt_text( WTOK_EMPTY );
+    widget_manager->break_line();
+
+    widget_manager->add_wgt( WTOK_QUIT, 40, 7);
+    widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML );
+
+    widget_manager->layout( WGT_AREA_ALL );
+}
 
 //-----------------------------------------------------------------------------
 ConfigDisplay::~ConfigDisplay()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+//    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
 }
 
 //-----------------------------------------------------------------------------
-void ConfigDisplay::update(float dt)
+/*void ConfigDisplay::update(float dt)
 {
     widgetSet -> timer(m_menu_id, dt) ;
     widgetSet -> paint(m_menu_id) ;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 void ConfigDisplay::select()
 {
-    switch ( widgetSet -> get_token (widgetSet -> click()) )
+    switch ( widget_manager->get_selected_wgt())
     {
     case WTOK_FULLSCREEN:
         drv_toggleFullscreen();
-        widgetSet -> delete_widget(m_menu_id) ;
+//        widgetSet -> delete_widget(m_menu_id) ;
         // Since changing the video mode in drv_toggleFullscreen deletes all
         // display lists, textures etc., we have to load the menu again.
         // drv_toggleFullscreen takes care of general material, general
         // widgetSet, etc.
-        CreateMenu();
+//        CreateMenu();
         if(user_config->m_fullscreen)
-            widgetSet->set_label(m_fullscreen_menu_id, _("Window mode"));
+            widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Window mode"));
         else
-            widgetSet->set_label(m_fullscreen_menu_id, _("Fullscreen mode"));
+            widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
         menu_manager->popMenu();
         break;
     default: break;

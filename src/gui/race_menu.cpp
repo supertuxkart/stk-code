@@ -22,7 +22,7 @@
 #include "race_menu.hpp"
 #include "user_config.hpp"
 #include "world.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
@@ -30,33 +30,54 @@
 #include "translation.hpp"
 
 enum WidgetTokens {
+    WTOK_PAUSE,
     WTOK_RETURN_RACE,
     WTOK_OPTIONS,
     WTOK_HELP,
     WTOK_RESTART_RACE,
     WTOK_SETUP_NEW_RACE,
-    WTOK_EXIT_RACE,
+    WTOK_QUIT,
 };
 
 RaceMenu::RaceMenu()
 {
-    m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, _("Paused"), GUI_LRG, GUI_ALL, 0, 0);
+    const bool SHOW_RECT = true;
+    const bool SHOW_TEXT = true;
+    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
-    const int VA = widgetSet -> varray(m_menu_id);
-    widgetSet -> start(VA, _("Return To Race"),  GUI_MED, WTOK_RETURN_RACE);
-    widgetSet -> state(VA, _("Options"),         GUI_MED, WTOK_OPTIONS);
-    widgetSet -> state(VA, _("Help"),            GUI_MED, WTOK_HELP);
-    widgetSet -> state(VA, _("Restart Race"),    GUI_MED, WTOK_RESTART_RACE);
+    widget_manager->add_wgt(WTOK_PAUSE, 30, 7);
+    widget_manager->set_wgt_text(WTOK_PAUSE, _("Paused"));
+    widget_manager->break_line();
+
+    widget_manager->set_initial_activation_state(true);
+    widget_manager->add_wgt(WTOK_RETURN_RACE, 30, 7);
+    widget_manager->set_wgt_text(WTOK_RETURN_RACE, _("Return To Race"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_OPTIONS, 30, 7);
+    widget_manager->set_wgt_text(WTOK_OPTIONS, _("Options"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_HELP, 30, 7);
+    widget_manager->set_wgt_text(WTOK_HELP, _("Help"));
+    widget_manager->break_line();
+
+    widget_manager->add_wgt(WTOK_RESTART_RACE, 30, 7);
+    widget_manager->set_wgt_text(WTOK_RESTART_RACE, _("Restart Race"));
+    widget_manager->break_line();
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widgetSet->state(VA, _("Setup New Race"),GUI_MED, WTOK_SETUP_NEW_RACE);
+        widget_manager->add_wgt(WTOK_SETUP_NEW_RACE, 30, 7);
+        widget_manager->set_wgt_text(WTOK_SETUP_NEW_RACE, _("Setup New Race"));
+        widget_manager->break_line();
     }
 
-    widgetSet -> state(VA, _("Exit Race"),       GUI_MED, WTOK_EXIT_RACE);
+    widget_manager->add_wgt(WTOK_QUIT, 30, 7);
+    widget_manager->set_wgt_text(WTOK_QUIT, _("Exit Race"));
 
-    widgetSet -> layout(m_menu_id, 0, 0);
+    widget_manager->layout(WGT_AREA_ALL);
 
     if(user_config->m_fullscreen) SDL_ShowCursor(SDL_ENABLE);
 }
@@ -64,20 +85,14 @@ RaceMenu::RaceMenu()
 //-----------------------------------------------------------------------------
 RaceMenu::~RaceMenu()
 {
-    widgetSet -> delete_widget(m_menu_id) ;
+    widget_manager->delete_wgts();
 }
 
-//-----------------------------------------------------------------------------
-void RaceMenu::update(float dt)
-{
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
-}
 
 //-----------------------------------------------------------------------------
 void RaceMenu::select()
 {
-    int clicked_token = widgetSet->get_token(widgetSet->click());
+    int clicked_token = widget_manager->get_selected_wgt();
 
     switch (clicked_token)
     {
@@ -108,7 +123,7 @@ void RaceMenu::select()
         menu_manager->pushMenu(MENUID_HELP);
         break;
 
-    case WTOK_EXIT_RACE:
+    case WTOK_QUIT:
         world->unpause();
         race_manager->exit_race();
         break;

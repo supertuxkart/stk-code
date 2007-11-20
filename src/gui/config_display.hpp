@@ -24,12 +24,11 @@
 
 class ConfigDisplay: public BaseGUI
 {
-    void CreateMenu();
 public:
     ConfigDisplay();
     ~ConfigDisplay();
 
-    void update(float dt);
+//    void update(float dt);
     void select();
 
 private:

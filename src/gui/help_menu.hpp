@@ -22,7 +22,7 @@
 
 #include <string>
 #include "base_gui.hpp"
-#include "player.hpp"
+//#include "player.hpp"
 
 class ssgTransform;
 class ssgContext;
@@ -30,8 +30,6 @@ class ssgContext;
 class HelpMenu: public BaseGUI
 {
 private:
-    std::string m_all_keys[KC_LAST+1];
-
     ssgContext* m_context;
     ssgTransform* m_box;
     ssgTransform* m_banana;

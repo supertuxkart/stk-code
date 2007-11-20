@@ -48,7 +48,7 @@
 #include "race_manager.hpp"
 #include "loader.hpp"
 #include "game_manager.hpp"
-#include "widget_set.hpp"
+#include "widget_manager.hpp"
 #include "material_manager.hpp"
 #include "sdldrv.hpp"
 #include "callback_manager.hpp"
@@ -374,7 +374,7 @@ int main(int argc, char *argv[] )
         herring_manager         -> loadDefaultHerrings();
         attachment_manager      -> loadModels         ();
         scene = new Scene();
-        widgetSet   = new WidgetSet;
+        widget_manager   = new WidgetManager;
         menu_manager->switchToMainMenu();
 
         // Replay a race
