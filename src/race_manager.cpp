@@ -29,6 +29,7 @@
 #include "world.hpp"
 #include "scene.hpp"
 #include "user_config.hpp"
+#include "stk_config.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -95,22 +96,43 @@ GrandPrixMode::start_race(int n)
     RaceSetup raceSetup;
     raceSetup.m_mode       = RaceSetup::RM_GRAND_PRIX;
     raceSetup.m_difficulty = m_difficulty;
-    raceSetup.m_num_laps    = 2;
+    raceSetup.m_num_laps   = 1;
     raceSetup.m_track      = m_cup.getTrack(n);
     raceSetup.m_karts.resize(m_karts.size());
     raceSetup.m_players.resize(m_players.size());
     raceSetup.setHerringStyle(m_cup.getHerringStyle());
 
-
-    for(int i = 0; i < int(m_karts.size()); ++i)
-    {
-        raceSetup.m_karts[m_karts[i].prev_finish_pos] = m_karts[i].ident;
-        if (m_karts[i].player < int(m_players.size()))
+    if (n == 0) //The first race, Players start at the back
+    { 
+        for(int i = 0; i < int(m_karts.size()); ++i)
         {
-            raceSetup.m_players[m_karts[i].player] = i;
+            raceSetup.m_karts[m_karts[i].prev_finish_pos] = m_karts[i].ident;
+            if (m_karts[i].player < int(m_players.size()))
+            {
+                raceSetup.m_players[m_karts[i].player] = m_karts[i].prev_finish_pos;
+            }
         }
     }
-
+    else //subsequent races where order of grid is determined by score
+    {
+        std::sort(m_karts.begin(), m_karts.end());//sort karts by increasing score
+        
+        //reverse kart order if flagged in stk_config
+        if (stk_config->m_grid_order)
+        {
+        std::reverse(m_karts.begin(), m_karts.end());
+        } 
+        
+        for(int i = 0;i < int(m_karts.size()); ++i)
+        {
+            raceSetup.m_karts[i] = m_karts[i].ident;
+            if (m_karts[i].player < int(m_players.size()))
+            {
+                raceSetup.m_players[m_karts[i].player] = i;
+            }
+        }
+    }
+    
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor

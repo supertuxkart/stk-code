@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "race_setup.hpp"
 #include "cup_data.hpp"
@@ -47,7 +48,7 @@ private:
 
     RaceDifficulty m_difficulty;
     int m_num_karts;
-
+    
     struct KartStatus
     {
         std::string ident;//The .tkkf filename without the .tkkf
@@ -59,15 +60,16 @@ private:
         KartStatus(const std::string& ident_, const int& score_,
                    const int& prev_finish_pos_, const int& player_) :
                 ident(ident_), score(score_), prev_finish_pos(prev_finish_pos_),
-        player(player_) {}}
-    ;
-
+        player(player_) {}
+        
+     };
+    
 public:
     std::vector<std::string> m_players;
     CupData m_cup;
     std::vector<KartStatus> m_karts;
     int m_track;
-
+    
     GrandPrixMode(const std::vector<std::string>& players_,
                   const CupData& cup_,
                   RaceDifficulty difficulty_,
@@ -77,7 +79,7 @@ public:
     void start();
     void next();
     void exit_race();
-
+       
     int  getKartScore    (int kart) const    { return m_karts[kart].score;}
     int  getPositionScore(int pos)  const    { return pos>4 ? 0 : 4-pos;}
     std::string getKartName(int kart) const  { return m_karts[kart].ident;}
@@ -86,8 +88,14 @@ public:
         m_karts[kart].score +=
             getPositionScore(pos);
     }
+    friend bool operator< (const KartStatus& left, const KartStatus& right)
+        {
+            if (left.score < right.score) return true; 
+            return false;
+        }
+       
 };
-
+    
 class QuickRaceMode : public RaceMode
 {
 public:

@@ -44,6 +44,7 @@ public:
                                      // considered to be a shortcut
     float m_explosion_impulse;       // impulse affecting each non-hit kart
     int   m_max_karts;               // maximum number of karts
+    int   m_grid_order;              // whether grand prix grid is in point order or reverse point order
 
     STKConfig() : KartProperties() {};
     void init_defaults    ();

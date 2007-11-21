@@ -54,6 +54,7 @@ void STKConfig::load(const std::string filename)
     }
 #endif
     CHECK_NEG(m_max_karts,               "max-karts"                    );
+    CHECK_NEG(m_grid_order,              "grid-order"                   );
 
     CHECK_NEG(m_corn_r,                  "m_corn_r"                     );
     CHECK_NEG(m_corn_f,                  "m_corn_f"                     );
@@ -143,6 +144,7 @@ void STKConfig::init_defaults()
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = -99.9f;
 
     m_max_karts            = -100;
+    m_grid_order           = -100;
     m_air_res_reduce[0]    = 1.0f;
 }   // init_defaults
 
@@ -170,6 +172,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("anvil-time",                   m_anvil_time          );
     lisp->get("explosion-impulse",            m_explosion_impulse   );
     lisp->get("max-karts",                    m_max_karts           );
+    lisp->get("grid-order",                   m_grid_order          );
 
     // Get the default KartProperties
     // ------------------------------

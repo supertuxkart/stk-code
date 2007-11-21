@@ -5,6 +5,9 @@
  ;; STK parameters
  ;; --------------
  (max-karts                 10   )  ;; maximum number of karts
+ (grid-order	   	     1   )  ;; order for grand prix, 1 is most 
+				    ;; points 1st, 0 is least points
+				    ;; 1st
 
  ;; Attachment related parameters
  ;; -----------------------------
