@@ -96,7 +96,7 @@ GrandPrixMode::start_race(int n)
     RaceSetup raceSetup;
     raceSetup.m_mode       = RaceSetup::RM_GRAND_PRIX;
     raceSetup.m_difficulty = m_difficulty;
-    raceSetup.m_num_laps   = 1;
+    raceSetup.m_num_laps   = 2;
     raceSetup.m_track      = m_cup.getTrack(n);
     raceSetup.m_karts.resize(m_karts.size());
     raceSetup.m_players.resize(m_players.size());
