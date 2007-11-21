@@ -159,7 +159,7 @@ void Highscores::getEntry(int number, std::string &kart_name,
         fprintf(stderr, "Error, accessing undefined highscore entry:\n");
         fprintf(stderr,"number %d, but %d entries are defined\n",number,
                 getNumberEntries());
-        fprintf(stderr, "This error can be ignored, but no highsocres are available\n");
+        fprintf(stderr, "This error can be ignored, but no highscores are available\n");
     }
     kart_name = m_kart_name[number];
     name      = m_name[number];
