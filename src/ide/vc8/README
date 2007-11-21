@@ -9,6 +9,8 @@ PlibSoundDebug/PlibSoundRelease:
   
 BulletDebug/BulletRelease:
   main setup (Debug/Relase) + BULLET
+  The debug version links in the optimised bullet (and sdl and plib) versions, since i is assumed that
+  mostly STK is being debugged, not everything. Using debug for everything creates a really slow executable.
   
 ReplayDebug/ReplayRelease:
   main setup (Debug/Relase) + HAVE_GHOST_REPLAY
@@ -24,6 +26,7 @@ create these environment-vars pointing to the folders of your installations:
 @set OGG_PATH=C:\libs\libogg-1.1.3
 @set VORBIS_PATH=C:\libs\libvorbis-1.2.0
 @set OPENAL_PATH=C:\libs\OpenAL_1_1_SDK
+@set GLUT_PATH=C:\libs\glut
 
 PLIB_PATH must be set to the parent-folder, i.e. my folder is "C:\libs\plib", but in the sources it is included
 as <plib/...h>, so we can use "$(PLIB_PATH)" for includes and "$(PLIB_PATH)/plib" for addiational-lib-directory

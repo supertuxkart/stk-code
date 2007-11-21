@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="supertuxkart"
 	ProjectGUID="{B1BC2764-1A43-4800-A654-788B0D05EDA2}"
 	RootNamespace="supertuxkart"
@@ -520,7 +520,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./../../../src;;$(PLIB_PATH);$(SDL_PATH)\include;$(ALUT_PATH)\include;$(OGG_PATH)\include;$(VORBIS_PATH)\include;$(OPENAL_PATH)\include;$(OPENAL_PATH)\include\AL;"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;"
 				PreprocessorDefinitions="BULLET;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -541,13 +542,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg_d.lib ssg_d.lib ul_d.lib ssgAux_d.lib fnt_d.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib"
 				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SDL_PATH)\lib;$(PLIB_PATH)\plib;$(OPENAL_PATH)\libs\Win32;$(ALUT_PATH)\lib;$(OGG_PATH)\win32\VS2003\libogg\Release;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release;"
-				IgnoreDefaultLibraryNames="libcmtd.lib"
+				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				LinkTimeCodeGeneration="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -600,7 +603,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./../../../src;;$(PLIB_PATH);$(SDL_PATH)\include;$(ALUT_PATH)\include;$(OGG_PATH)\include;$(VORBIS_PATH)\include;$(OPENAL_PATH)\include;$(OPENAL_PATH)\include\AL;"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;"
 				PreprocessorDefinitions="BULLET;HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -622,7 +626,7 @@
 				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib"
 				OutputFile="./../../../$(ProjectName)_bullet.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SDL_PATH)\lib;$(PLIB_PATH)\plib;$(OPENAL_PATH)\libs\Win32;$(ALUT_PATH)\lib;$(OGG_PATH)\win32\VS2003\libogg\Release;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release;"
+				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -881,7 +885,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\widget_set.cpp"
+				RelativePath="..\..\widget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\widget_manager.cpp"
 				>
 			</File>
 			<File
@@ -973,10 +981,6 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\race_results_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\scrolled_text.cpp"
 					>
 				</File>
 				<File
@@ -1267,7 +1271,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\widget_set.hpp"
+				RelativePath="..\..\widget.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\widget_manager.hpp"
 				>
 			</File>
 			<File
@@ -1359,10 +1367,6 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\race_results_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\scrolled_text.hpp"
 					>
 				</File>
 				<File
