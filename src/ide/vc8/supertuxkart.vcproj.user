@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioUserFile
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	ShowAllFiles="false"
 	>
 	<Configurations>
@@ -10,7 +10,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -22,7 +22,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -38,7 +38,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -50,7 +50,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -66,7 +66,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -78,7 +78,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -94,7 +94,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -106,7 +106,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -122,7 +122,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -134,7 +134,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -150,7 +150,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -162,7 +162,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -178,7 +178,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -190,7 +190,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -206,7 +206,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="./../../../../supertuxkart"
+				WorkingDirectory="./../../.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
@@ -218,7 +218,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
