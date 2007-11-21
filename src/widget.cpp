@@ -24,8 +24,12 @@
 //FIXME: this should be removed when the scrolling is cleaned
 #include "user_config.hpp"
 
+#include "constants.hpp"
 #include <cmath>
 #include <iostream>
+
+const float Widget::MAX_TEXT_SCALE = 1.2f;
+const float Widget::MIN_TEXT_SCALE = 1.0f;
 
 const GLfloat WGT_WHITE  [4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat WGT_GRAY   [4] = { 0.5f, 0.5f, 0.5f, 1.0f };

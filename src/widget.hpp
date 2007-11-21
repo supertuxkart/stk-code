@@ -27,6 +27,10 @@
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #else
+#  ifdef WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
+#  endif
 #  include <GL/gl.h>
 #endif
 
@@ -115,8 +119,8 @@ class Widget
 
     /* Delta time dependant features, these deactivate after a certain time,
      * and are dependant on the delta time. They have animations. */
-    static const float MAX_TEXT_SCALE = 1.2f;
-    static const float MIN_TEXT_SCALE = 1.0f;
+    static const float MAX_TEXT_SCALE;
+    static const float MIN_TEXT_SCALE;
     float m_text_scale; //Used for the pulse effect
 
 /*public:*/
