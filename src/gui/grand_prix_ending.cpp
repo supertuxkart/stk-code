@@ -58,8 +58,6 @@ GrandPrixEnd::GrandPrixEnd()
     m_context = new ssgContext;
     oldContext->makeCurrent();
 
-//    m_menu_id = widgetSet -> vstack(0);
-
     int highest = 0;
     //FIXME: We go from the back to the front because the players are in the
     //back and in case of a tie they will win against the AI, *but* if it's
@@ -80,13 +78,10 @@ GrandPrixEnd::GrandPrixEnd()
     widget_manager->set_wgt_text(WTOK_TITLE, output);
     widget_manager->set_wgt_text_size(WTOK_TITLE, WGT_FNT_LRG);
     widget_manager->break_line();
-//    widgetSet -> label(m_menu_id, output, GUI_LRG, GUI_ALL, 0, 0);
 
 
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
-
-//    const int VA = widgetSet->varray(m_menu_id);
 
     Kart *kart;
 	int *scores   = new int[NUM_KARTS];
@@ -142,13 +137,13 @@ GrandPrixEnd::GrandPrixEnd()
     delete []scores;
     delete []position;
 
-    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
+    widget_manager->add_wgt(WTOK_QUIT, 50, 7);
     widget_manager->activate_wgt(WTOK_QUIT);
     widget_manager->show_wgt_rect(WTOK_QUIT);
     widget_manager->show_wgt_text(WTOK_QUIT);
     widget_manager->set_wgt_text(WTOK_QUIT, _("Back to the main menu"));
 
-    widget_manager->layout(WGT_AREA_ALL);
+    widget_manager->layout(WGT_AREA_TOP);
 
     m_kart = new ssgTransform;
     m_kart->ref();
@@ -172,7 +167,6 @@ GrandPrixEnd::GrandPrixEnd()
 GrandPrixEnd::~GrandPrixEnd()
 {
     widget_manager->delete_wgts();
-    //widgetSet -> delete_widget(m_menu_id);
     ssgDeRefDelete(m_kart);
 
     delete m_context;

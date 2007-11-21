@@ -126,28 +126,6 @@ void GrandPrixSelect::update(float dt)
     const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
     widget_manager->set_wgt_text(WTOK_DESCRIPTION, cup.getDescription());
 
-//FIXME: The following triggers a crash; it is left to be investigated later.
-#if 0
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
-    glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_BLEND);
-    const CupData &cup = m_all_cups[CLICKED_TOKEN-WTOK_FIRSTPRIX];
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    const GLfloat BACKGROUND_COLOUR[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
-    glColor4fv(BACKGROUND_COLOUR);
-    glPopMatrix();
-    font_gui->Print(cup.getDescription(), WGT_FNT_MED,
-                    Font::ALIGN_CENTER, -1, Font::ALIGN_BOTTOM, 10);
-    glDisable(GL_BLEND);
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-#endif
-
     return;
 }
 
