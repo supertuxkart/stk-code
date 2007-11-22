@@ -256,7 +256,7 @@ void World::resetAllKarts()
     for(int i=0; i<10; i++) m_physics->update(1./60.);
     while(!all_finished)
     {
-        m_physics->update(1./60.);
+        m_physics->update(1.f/60.f);
         all_finished=true;
         for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
         {

@@ -67,7 +67,7 @@ void HighscoreManager::SetFilename()
     for(unsigned int i=0; i<m_filename.size(); i++)
     {
         if(m_filename[i]=='\\' || m_filename[i]=='/')
-            m_filename[i]=DIR_SEPARATOR;
+            m_filename[i]=Loader::DIR_SEPARATOR;
     }
     return;
 

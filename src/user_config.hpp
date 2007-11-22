@@ -91,6 +91,7 @@ public:
     int         m_height;
     int         m_karts;
     Player      m_player[PLAYERS];
+    bool        m_log_errors;
 
     UserConfig();
     UserConfig(const std::string& filename);

@@ -457,15 +457,15 @@ void Track::addDebugToScene(int type) const
             // The segment display must be slightly higher than the
             // track, otherwise it's not clearly visible.
             sgVec3 v;
-            sgCopyVec3(v,m_left_driveline [i  ]); v[2]+=0.1; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[i  ]); v[2]+=0.1; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[ip1]); v[2]+=0.1; v_array->add(v);
-            sgCopyVec3(v,m_left_driveline [ip1]); v[2]+=0.1; v_array->add(v);
+            sgCopyVec3(v,m_left_driveline [i  ]); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_right_driveline[i  ]); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_right_driveline[ip1]); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_left_driveline [ip1]); v[2]+=0.1f; v_array->add(v);
             sgVec4 vc;
             vc[0] = i%2==0 ? 1.0f : 0.0f;
             vc[1] = 1.0f-v[0];
-            vc[2] = 0;
-            vc[3] = 0.1;
+            vc[2] = 0.0f;
+            vc[3] = 0.1f;
             c_array->add(vc);c_array->add(vc);c_array->add(vc);c_array->add(vc);
         }   // for i
         // if GL_QUAD_STRIP is used, the colours are smoothed, so the changes
@@ -900,7 +900,7 @@ void
 Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
 {
     std::string path = "data";
-    path += DIR_SEPARATOR;
+    path += Loader::DIR_SEPARATOR;
     path += m_ident;
     path += file_ext;
     path = loader->getPath(path.c_str());

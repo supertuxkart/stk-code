@@ -38,6 +38,8 @@
 #  include <unistd.h>
 #endif
 #include <stdexcept>
+#include <cstdio>
+#include <string>
 
 #include "user_config.hpp"
 #include "track_manager.hpp"
@@ -98,6 +100,8 @@ void cmdLineHelp (char* invocation)
     // "  --profile            Enable automatic driven profile mode for 20 seconds\n"
     // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
     // "  --history            Replay history file 'history.dat'\n"
+    "  --log=terminal          Write messages to screen\n"
+    "  --log=file              Write messages/warning to log files stdout.log/stderr.log\n"
     "  -h,  --help             Show this help\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
@@ -164,7 +168,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
-            stk_config->load(std::string("data")+DIR_SEPARATOR+argv[i+1]);
+            stk_config->load(std::string("data")+Loader::DIR_SEPARATOR+argv[i+1]);
             fprintf ( stdout, _("STK config will be read from %s.\n"), argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
@@ -178,7 +182,7 @@ int handleCmdLine(int argc, char **argv)
             }
             race_manager->setNumKarts(user_config->m_karts );
             fprintf ( stdout, _("%d karts will be used.\n"), user_config->m_karts);
-	    i++;
+            i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {
@@ -278,7 +282,14 @@ int handleCmdLine(int argc, char **argv)
 #endif
             return 0;
         }
-        else if( sscanf(argv[i], "--profile=%d",  &n)==1)
+        else if( !strcmp(argv[i], "--log=terminal"))
+        {
+            user_config->m_log_errors=false;
+        }
+        else if( !strcmp(argv[i], "--log=file"))
+        {
+            user_config->m_log_errors=true;
+        }else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
             user_config->m_profile=n;
         }
@@ -342,7 +353,7 @@ void InitTuxkart()
     race_manager->setNumLaps   (3);
     race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
     race_manager->setDifficulty(RD_MEDIUM);
-    stk_config->load(std::string("data")+DIR_SEPARATOR+ "stk_config.data");
+    stk_config->load(std::string("data")+Loader::DIR_SEPARATOR+ "stk_config.data");
 }
 
 //=============================================================================
@@ -358,7 +369,26 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
-
+        
+        if (user_config->m_log_errors) //Enable logging of stdout and stderr to logfile
+        {
+            std::string logoutfile = user_config->getConfigDir();
+            logoutfile += Loader::DIR_SEPARATOR;
+            std::string logerrfile = logoutfile;
+            logoutfile += "stdout.log";
+            logerrfile += "stderr.log";
+            if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
+            {
+                fprintf(stderr, "Can not open log file '%s'. Writing to stdout instead.\n",
+                        logoutfile.c_str());
+            }
+            if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
+            {
+                fprintf(stderr, "Can not open log file '%s'. Writing to stderr instead.\n",
+                        logerrfile.c_str());
+            }
+        }
+        
         //FIXME: this needs a better organization
         drv_init();
         game_manager = new GameManager ();
@@ -436,6 +466,12 @@ int main(int argc, char *argv[] )
     user_config->saveConfig();
 
     drv_deinit();
+    
+    if (user_config->m_log_errors) //close logfiles
+    {
+        fclose(stderr);
+        fclose(stdout);
+    }
 
     delete highscore_manager;
     return 0 ;

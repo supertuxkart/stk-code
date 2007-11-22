@@ -68,7 +68,7 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
             if (StringUtils::has_suffix(*i, ".tkkf"))
             {
                 KartProperties* kp = new KartProperties();
-                std::string tmp= std::string("data")+DIR_SEPARATOR + *i;
+                std::string tmp= std::string("data")+Loader::DIR_SEPARATOR + *i;
                 kp->load(tmp.c_str(), "tuxkart-kart", dont_load_models);
                 m_karts_properties.push_back(kp);
                 if(kp->getMaxSteerAngle() > m_max_steer_angle)
