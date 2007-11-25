@@ -656,7 +656,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
             m_curr_pos.xyz );
 
         steps = int( sgLengthVec2( direction ) / m_kart_properties->getKartLength() );
-        if( steps < 1 ) steps = 1;
+        if( steps < 3 ) steps = 3;
 
         sgVec2 step_coord;
 
