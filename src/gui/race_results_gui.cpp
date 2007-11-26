@@ -204,14 +204,14 @@ void RaceResultsGUI::select()
 }   // select
 //-----------------------------------------------------------------------------
 void
-RaceResultsGUI::inputKeyboard(int key, int pressed)
+RaceResultsGUI::handle(GameAction ga, int value)
 {
   // Attempts to close the menu are silently discarded
   // since they do not make sense at this point.
-  if (key == SDLK_ESCAPE)
+  if (ga == GA_LEAVE)
    return;
   else
-    BaseGUI::inputKeyboard(key, pressed);
+    BaseGUI::handle(ga, value);
 }
 
 /* EOF */

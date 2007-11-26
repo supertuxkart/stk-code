@@ -29,7 +29,7 @@ public:
     ~RaceMenu();
 
     void select();
-    void inputKeyboard(int key, int pressed);
+    void handle(GameAction ga, int value);
 };
 
 #endif

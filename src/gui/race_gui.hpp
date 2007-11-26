@@ -66,13 +66,12 @@ public:
     ~RaceGUI();
     void update(float dt);
     void select() {}
-    void input(InputType type, int id0, int id1, int id2, int value);
-    void handleKartAction(KartActions ka, int value);
+    void handle(GameAction, int);
+    void handleKartAction(KartAction ka, int value);
     void addMessage(const char *message, Kart *kart, float time, int fonst_size,
                     int red=255, int green=0, int blue=255);
 
 private:
-    InputMap *m_input_map;
     ulClock     m_fps_timer;
     int         m_fps_counter;
     char        m_fps_string[10];
@@ -95,9 +94,6 @@ private:
     void drawAllMessages       (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
-    void updateInputMappings();
-    bool handleInput(InputType type, int id0, int id1, int id2, int value);
-    void inputKeyboard(int key, int pressed);
     void drawPlayerIcons       ();
     void oldDrawPlayerIcons    ();
     void drawGameOverText      (const float dt);

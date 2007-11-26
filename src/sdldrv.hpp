@@ -20,16 +20,41 @@
 #ifndef HEADER_SDLDRV_H
 #define HEADER_SDLDRV_H
 
+#include <SDL/SDL.h>
+
+#include "input.hpp"
+
+class ActionMap;
+
 enum MouseState { INITIAL, MOVED, RESET_NEEDED }; 
+
+enum InputDriverMode {
+	MENU = 0,
+	INGAME,
+	INPUT_SENSE,
+	LOWLEVEL,
+	BOOTSTRAP
+};
+
+struct StickInfo {
+	SDL_Joystick *sdlJoystick;
+	AxisDirection *prevAxisDirections;
+	
+	StickInfo(int);
+	~StickInfo();
+};
 
 void drv_init();
 void drv_deinit();
 
-void drv_showPointer();
-void drv_hidePointer();
-
 void drv_toggleFullscreen(int resetTextures=1);
 
 void drv_loop();
+
+void drv_setMode(InputDriverMode);
+bool drv_isInMode(InputDriverMode);
+
+Input &drv_getSensedInput();
+
 
 #endif

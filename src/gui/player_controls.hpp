@@ -24,6 +24,7 @@
 #include "player.hpp"
 
 #include <string>
+#include <SDL/SDL.h>
 
 class PlayerControls: public BaseGUI
 {
@@ -32,18 +33,30 @@ public:
     ~PlayerControls();
 
     void select();
-    void input(InputType type, int id0, int id1, int id2, int value);
+    void clearMapping();
+	
+	void handle(GameAction, int);
+	void inputKeyboard(SDLKey, int);
+	void addKeyLabel(int change_id, KartAction control, bool start);
+	void setKeyInfoString(KartAction control);
 
 private:
-    int m_grab_id;
+	void updateAllKeyLabels();
+	
     int m_player_index;
     bool m_grab_input;
-    KartActions m_edit_action;
-    // Stores the heading - making this an attribute here avoids
-    // memory leaks or complicated memory management
-    char m_heading[60];
+	
+	/** Stores the KartAction for which the input is being sensed. */
+    KartAction m_edit_action;
+	
+	// Stores the heading - making this an attribute here avoids
+	// memory leaks or complicated memory management
+	char m_heading[60];
+	
     std::string m_name;
-    std::string m_key_names[KC_LAST+1];
+    std::string m_key_names[KC_COUNT];
+	
+	static const size_t PLAYER_NAME_MAX;
 };
 
 #endif

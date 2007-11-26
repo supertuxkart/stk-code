@@ -47,6 +47,7 @@
 #include "grand_prix_select.hpp"
 #include "sound_manager.hpp"
 #include "sdldrv.hpp"
+#include "user_config.hpp"
 #include "widget_manager.hpp"
 
 MenuManager* menu_manager= new MenuManager();
@@ -95,11 +96,12 @@ void MenuManager::update()
 
     if (m_handled_size != m_menu_stack.size())
     {
-        if(m_current_menu==m_RaceGUI)
+        if (m_RaceGUI
+			&& m_current_menu == m_RaceGUI)
         {
           m_RaceGUI = 0;
-          drv_showPointer();
-        }
+		  drv_setMode(MENU);
+		}
 
         delete m_current_menu;
         m_current_menu= NULL;
@@ -138,7 +140,7 @@ void MenuManager::update()
                 m_current_menu= new NumPlayers();
                 break;
             case MENUID_RACE:
-                drv_hidePointer();
+                drv_setMode(INGAME);
                 m_current_menu = new RaceGUI();
                 m_RaceGUI      = m_current_menu;
                 break;

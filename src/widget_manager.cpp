@@ -20,9 +20,6 @@
 
 #include "user_config.hpp"
 
-//TODO: this include should not be necesary?
-#include <SDL/SDL.h>
-
 #include "gui/font.hpp"
 
 //TEMP
@@ -887,11 +884,11 @@ void WidgetManager::darken_wgt_color(const int TOKEN)
     else std::cerr << "Tried to darken an unexistant widget with token " << TOKEN << '\n';
 }
 
-/** The handle_mouse() function returns the current widget under the mouse
+/** The handle_pointer() function returns the current widget under the
  *  pointer, if it's different from the selected widget. If the widget under
- *  the mouse is the selected widget, it returns WGT_NONE.
+ *  the pointer is the selected widget, it returns WGT_NONE.
  */
-int WidgetManager::handle_mouse(const int X, const int Y )
+int WidgetManager::handle_pointer(const int X, const int Y )
 {
     //Search if the given x and y positions are on top of any widget. Please
     //note that the bounding box for each widget is used instead of the
@@ -932,131 +929,74 @@ int WidgetManager::handle_mouse(const int X, const int Y )
     return WGT_NONE;
 }
 
-/** The handle_keyboard() function stores the current widget under the cursor
+/** The handle_*() function stores the current widget under the cursor
  *  after receiving input from a key.
  */
-int WidgetManager::handle_keyboard(const int KEY)
+int
+WidgetManager::handle_left()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
-
-    int next_wgt = find_id(m_selected_wgt_token);
-    //FIXME: eventually, the keys should not be hard coded
-    switch (KEY)
-    {
-    case SDLK_LEFT:
-        next_wgt = find_left_widget(find_id(m_selected_wgt_token));
-        break;
-
-    case SDLK_RIGHT:
-        next_wgt = find_right_widget(find_id(m_selected_wgt_token));
-        break;
-
-    case SDLK_UP:
-        next_wgt = find_top_widget(find_id(m_selected_wgt_token));
-        break;
-
-    case SDLK_DOWN:
-        next_wgt = find_bottom_widget(find_id(m_selected_wgt_token));
-        break;
-
-    //FIXME: apparently, there are different codes for the + and -
-    //near the numlock.
-    case SDLK_PLUS:
-    {
-        const int ID = find_id(m_selected_wgt_token);
-        if( m_widgets[ID].widget->m_enable_scroll )
-        {
-            //FIXME: these increases shouldn't be in pixels, but in percentages.
-            //This should increase it by 1%, and the page buttons by 5%.
-            m_widgets[ID].widget->m_scroll_speed_y -= 1;
-        }
-        break;
-    }
-
-    case SDLK_MINUS:
-    {
-        const int ID = find_id(m_selected_wgt_token);
-        if( m_widgets[ID].widget->m_enable_scroll )
-        {
-            m_widgets[ID].widget->m_scroll_speed_y += 1;
-        }
-        break;
-    }
-
-    case SDLK_PAGEUP:
-    {
-        const int ID = find_id(m_selected_wgt_token);
-        if( m_widgets[ID].widget->m_enable_scroll )
-        {
-            m_widgets[ID].widget->m_scroll_speed_y -= 5;
-        }
-        break;
-    }
-
-    case SDLK_PAGEDOWN:
-    {
-        const int ID = find_id(m_selected_wgt_token);
-        if( m_widgets[ID].widget->m_enable_scroll )
-        {
-            m_widgets[ID].widget->m_scroll_speed_y += 5;
-        }
-        return WGT_NONE;
-    }
-
-    default: return WGT_NONE;
-    }
-
-    if( next_wgt == WGT_NONE) return WGT_NONE;
-
-    m_selected_wgt_token = m_widgets[next_wgt].token;
-    return m_selected_wgt_token;
+	
+	return handle_finish(find_left_widget(find_id(m_selected_wgt_token)));
 }
 
-/** The handle_joystick() function stores the current widget under the cursor
- *  after receiving input from the joystick.
- */
-//FIXME: shouldn't direction and value be merged?
-int WidgetManager::handle_joystick
-(
-    const int axis,
-    const int direction,
-    int value
-)
+int
+WidgetManager::handle_right()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
+	
+	return handle_finish(find_right_widget(find_id(m_selected_wgt_token)));
+}
 
-    int next_wgt = WGT_NONE; //This asignment is to prevent a compiler warning
-    switch (axis)
-    {
-    case 0:
-        if( direction == 0 )
-        {
-            next_wgt = find_left_widget(find_id(m_selected_wgt_token));
-        }
-        else if( direction == 1 )
-        {
-            next_wgt = find_right_widget(find_id(m_selected_wgt_token));
-        }
-        break;
+int
+WidgetManager::handle_up()
+{
+    if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
+	
+	return handle_finish(find_top_widget(find_id(m_selected_wgt_token)));
+}
 
-    case 1:
-        if( direction == 0 )
-        {
-            next_wgt = find_top_widget(find_id(m_selected_wgt_token));
-        }
-        else if( direction == 1 )
-        {
-            next_wgt = find_bottom_widget(find_id(m_selected_wgt_token));
-        }
-        break;
+int
+WidgetManager::handle_down()
+{
+    if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
+	
+	return handle_finish(find_bottom_widget(find_id(m_selected_wgt_token)));
+}
 
-    default: return WGT_NONE;
-    }
+int
+WidgetManager::handle_finish(const int next_wgt)
+{
+    if( next_wgt == WGT_NONE)
+		return WGT_NONE;
+	
+	m_selected_wgt_token = m_widgets[next_wgt].token;
+	
+	return m_selected_wgt_token;
+}
 
-    if( next_wgt == find_id(m_selected_wgt_token) ) return WGT_NONE;
+void
+WidgetManager::increase_scroll_speed(const bool fast)
+{
+	const int ID = find_id(m_selected_wgt_token);
+	if( m_widgets[ID].widget->m_enable_scroll )
+	{
+		//FIXME: these increases shouldn't be in pixels, but in percentages.
+		//This should increase it by 1%, and the page buttons by 5%.
+		m_widgets[ID].widget->m_scroll_speed_y -= (fast) ? 5 : 1;
+	}
+}
 
-    m_selected_wgt_token = m_widgets[next_wgt].token;
-    return m_selected_wgt_token;
+void
+WidgetManager::decrease_scroll_speed(const bool fast)
+{
+	const int ID = find_id(m_selected_wgt_token);
+	if( m_widgets[ID].widget->m_enable_scroll )
+	{
+		//FIXME: these increases shouldn't be in pixels, but in percentages.
+		//This should increase it by 1%, and the page buttons by 5%.
+		m_widgets[ID].widget->m_scroll_speed_y += (fast) ? 5 : 1;
+	}
 }
 
 //FIXME: find_left_widget() doesn't works properly yet

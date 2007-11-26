@@ -134,19 +134,20 @@ void RaceMenu::select()
 }
 
 //-----------------------------------------------------------------------------
-void RaceMenu::inputKeyboard(int key, int pressed)
+void RaceMenu::handle(GameAction ga, int value)
 {
-    switch ( key )
+    switch ( ga )
     {
-    case SDLK_ESCAPE: //ESC
-        if(!pressed)
+    case GA_LEAVE:
+        if (value)
             break;
+		
         world->unpause();
         menu_manager->popMenu();
         break;
 
     default:
-        BaseGUI::inputKeyboard(key, pressed);
+        BaseGUI::handle(ga, value);
         break;
     }
 }

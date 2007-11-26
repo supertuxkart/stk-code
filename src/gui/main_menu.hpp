@@ -29,7 +29,8 @@ public:
     ~MainMenu();
 
     void select();
-    void inputKeyboard(int key, int pressed);
+    void handle(GameAction, int);
+				
 };
 
 #endif

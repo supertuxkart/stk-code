@@ -57,18 +57,18 @@ enum WidgetTokens
     WTOK_QUIT
 };
 
-const char *sKartAction2String[KC_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
+/** Limits the maximum length of the player name. */
+const size_t PlayerControls::PLAYER_NAME_MAX = 10;
+
+const char *sKartAction2String[KA_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
                                              _("Brake"),  _("Wheelie"), _("Jump"),
                                              _("Rescue"), _("Fire"), _("Look back") };
 
 
 PlayerControls::PlayerControls(int whichPlayer):
-    m_grab_id(WidgetManager::WGT_NONE), m_player_index(whichPlayer),
+    m_player_index(whichPlayer),
     m_grab_input(false)
 {
-    // We need the unicode character here, so enable the translation
-    SDL_EnableUNICODE(1);
-
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
@@ -89,14 +89,14 @@ PlayerControls::PlayerControls(int whichPlayer):
     widget_manager->activate_wgt( WTOK_PLYR_NAME1);
     widget_manager->break_line();
 
-    KartActions control;
-    for(int i=0; i<=KC_LAST; i++)
+    KartAction control;
+    for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
         widget_manager->add_wgt( WTOK_KEY0 + i, 30, 7);
         widget_manager->set_wgt_text( WTOK_KEY0 + i, sKartAction2String[i]);
 
-        control = (KartActions)i;
-        m_key_names[control] = user_config->getInputAsString(m_player_index, control);
+        control = (KartAction)i;
+        m_key_names[control] = user_config->getMappingAsString(m_player_index, control);
         widget_manager->add_wgt( WTOK_LEFT + i, 30, 7);
         widget_manager->set_wgt_text( WTOK_LEFT + i, m_key_names[control].c_str());
         widget_manager->activate_wgt( WTOK_LEFT + i);
@@ -117,128 +117,169 @@ PlayerControls::~PlayerControls()
 {
     widget_manager->delete_wgts();
     // The unicode translation is not generally needed, so disable it again.
-    SDL_EnableUNICODE(0);
 }   // ~PlayerControls
 
 //-----------------------------------------------------------------------------
-void PlayerControls::select()
+void
+PlayerControls::select()
 {
-    if (m_grab_input) return;
+    const int selected = widget_manager->get_selected_wgt();
+	switch (selected)
+	{
+		case WTOK_PLYR_NAME1:
+			// Switch to typing in the player's name.
+			widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+		
+			drv_setMode(LOWLEVEL);
+		
+        	break;
+		case WTOK_QUIT:
+			// Leave menu.
+	        menu_manager->popMenu();
+		
+			break;
+		default:
+			// Switch to input sensing.
 
-    m_grab_id = widget_manager->get_selected_wgt();
-    if(m_grab_id == WTOK_PLYR_NAME1)
-    {
-        m_grab_input = true;
-        return;
-    }
-
-    const int MENU_CHOICE = widget_manager->get_selected_wgt() - WTOK_LEFT;
-
-    if(MENU_CHOICE == WTOK_QUIT)
-    {
-        menu_manager->popMenu();
-        return;
-    }
-    m_edit_action   = static_cast<KartActions>(MENU_CHOICE);
-    m_grab_input = true;
-    drv_hidePointer();
-
-    widget_manager->set_wgt_text(m_grab_id, _("Press key"));
+			// If the only remaining and not yet handled widgets are the ones
+			// that deal with the kart controls and the values are still in the
+			// correct order the assertion should hold. If not did something
+			// bad.
+			assert (selected >= WTOK_LEFT
+					&& selected <= WTOK_LOOK_BACK);
+		
+			
+		    m_edit_action = static_cast<KartAction>(selected - WTOK_LEFT);
+		    widget_manager->set_wgt_text(selected, _("Press key"));
+			
+			drv_setMode(INPUT_SENSE);
+			
+			break;
+	}
 }   // select
-
 //-----------------------------------------------------------------------------
-void PlayerControls::input(InputType type, int id0, int id1, int id2, int value)
+void
+PlayerControls::inputKeyboard(SDLKey key, int unicode)
 {
-    if (m_grab_input && value)
-    {
-        // Handle input of user name
-        // -------------------------
-        if(m_grab_id == WTOK_PLYR_NAME1)
-        {
-            if(type==IT_KEYBOARD)
-            {
-                // Ignore shift, otherwise shift will disable input
-                // (making it impossible to enter upper case characters)
-                if(id0==SDLK_RSHIFT || id0==SDLK_LSHIFT) return;
-                // Handle backspace
-                if(id0==SDLK_BACKSPACE)
-                {
-                    if(m_name.size()>=1) m_name.erase(m_name.size()-1,1);
-                }
-                // All other control characters are ignored and will end
-                // entering the name
-                else if(id0<32 || id0>255)
-                {
-                    m_grab_input = false;
-                    m_grab_id = WidgetManager::WGT_NONE;
-                    user_config->m_player[m_player_index].setName(m_name);
-//                    BaseGUI::input(type, id0, id1, id2, value);
-                    return;
-                }
-                else  // Add the character to the name
-                {
-                    // For this menu only unicode translation is enabled.
-                    // So we use the unicode character here, since this will
-                    // take care of upper/lower case etc.
-                    m_name = m_name + (char)id1;
-                }
-                widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
-            }
-            else
-            {
-                // Ignore all other events, e.g. when pressing the mouse
-                // button twice on the input field etc.
-            }
-        }
-        // Handle the definition of a key
-        // ------------------------------
-        else
-        {
-            drv_showPointer();
-            m_grab_input = false;
+	switch (key)
+	{
+	case SDLK_RSHIFT:
+	case SDLK_LSHIFT:
+		// Ignore shift, otherwise shift will disable input
+		// (making it impossible to enter upper case characters)
+	case SDLK_SPACE:
+		// Ignore space to prevent invisible names.
+			
+		// Note: This will never happen as long as SPACE has a mapping which
+		// causes GA_ENTER and therefore finishes the typing. Please leave this
+		// because I am not sure whether this is good behavior (that SPACE
+		// cannot reach inputKeyboard()) and with some changes to the input
+		// driver this code has suddenly a useful effect.
+	case SDLK_KP_ENTER:
+	case SDLK_RETURN:
+	case SDLK_ESCAPE:
+		// Ignore some control keys. What they could provide is implemented
+		// in the handle() method.
+		return;
+	case SDLK_BACKSPACE:
+		// Handle backspace.
+		if (m_name.size() >=1)
+			m_name.erase(m_name.size()-1, 1);
+		
+		widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+		break;
+		break;
+	default:
+		// Adds the character to the name.
+		// For this menu only unicode translation is enabled.
+		// So we use the unicode character here, since this will
+		// take care of upper/lower case etc.
+		if (unicode && m_name.size() <= PLAYER_NAME_MAX)
+			m_name += (char) unicode;
+		widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+		break;
+	}
 
-            // Do not accept pressing ESC as input.
-            if (type != IT_KEYBOARD || id0 != SDLK_ESCAPE)
-            {
-	        // Since unicode translation is enabled, the value of id1 will
-                // be the unicode value. Since unicode is usually not enabled
-	        // in the race we have to set this value to zero (unicode
-                // translation is only enabled here to help entering the name),
-	        // otherwise the keys will not be recognised in the race!!
-	        if(type==IT_KEYBOARD) id1=0;
-                user_config->m_player[m_player_index].setInput(m_edit_action, type,
-                                                               id0, id1, id2);
-	    }
+}
+//-----------------------------------------------------------------------------
+void
+PlayerControls::clearMapping()
+{
+	const int selected = widget_manager->get_selected_wgt();
+	if (selected >= WTOK_LEFT && selected <= WTOK_LOOK_BACK)
+	{
+		user_config->clearInput(m_player_index,
+							  (KartAction) (selected - WTOK_LEFT));
+		updateAllKeyLabels();
+	}
+}
+//-----------------------------------------------------------------------------
+void PlayerControls::handle(GameAction ga, int value)
+{
+	if (value)
+		return;
+	
+	switch (ga)
+	{
+		case GA_CLEAR_MAPPING:
+            clearMapping();
 
-            widget_manager->set_wgt_text(m_grab_id, m_key_names[m_edit_action].c_str());
-        }
-    }
-    else
-        BaseGUI::input(type, id0, id1, id2, value);
+			break;
+		case GA_SENSE_COMPLETE:
+			// Updates the configuration with the newly sensed input.
+            user_config->setInput(m_player_index,
+								  m_edit_action,
+								  drv_getSensedInput());
+			// Fall through to recover the widget labels.
+		case GA_SENSE_CANCEL:
+			drv_setMode(MENU);
+		
+			// Refresh all key labels since they mave changed because of
+			// conflicting bindings.
+			updateAllKeyLabels();
+			break;
+		case GA_ENTER:
+			// If the user is typing her name this will be finished at this
+			// point.
+			if (drv_isInMode(LOWLEVEL))
+			{
+				// Prevents zero-length names.
+				if (m_name.length() == 0)
+					m_name = _("Player ") + m_player_index;
+				user_config->m_player[m_player_index].setName(m_name);
+				widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
+
+				drv_setMode(MENU);
+			}
+			else
+				select();
+			break;
+		case GA_LEAVE:
+			// If the user is typing her name this will be cancelled at this
+			// point.
+			if (drv_isInMode(LOWLEVEL))
+			{
+				m_name = user_config->m_player[m_player_index].getName();
+				widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
+
+				drv_setMode(MENU);
+				break;
+			}
+			// Fall through to reach the usual GA_LEAVE code (leave menu).
+		default:
+			BaseGUI::handle(ga, value);
+	}
+	
 }
 
 //-----------------------------------------------------------------------------
-/*void PlayerControls::addKeyLabel(int CHANGE_ID, KartActions control, bool start)
+void
+PlayerControls::updateAllKeyLabels()
 {
-
-    setKeyInfoString(control);
-
-    if (start)
-        widgetSet -> start(CHANGE_ID, m_key_names[control].c_str(), GUI_MED, control);
-    else
-        widgetSet -> state(CHANGE_ID, m_key_names[control].c_str(), GUI_MED, control);
-}   // addKeyLabel
-
-//-----------------------------------------------------------------------------
-void PlayerControls::changeKeyLabel(int m_grab_id, KartActions control)
-{
-    setKeyInfoString(control);
-    widgetSet -> set_label(m_grab_id, m_key_names[control].c_str());
-    //  widgetSet -> layout(m_menu_id, 0, 0);
-}   // changeKeyLabel
-
-//-----------------------------------------------------------------------------
-void PlayerControls::setKeyInfoString(KartActions control)
-{
-}   // setKeyInfoString
-*/
+	for (int i = KA_FIRST; i <= KA_LAST; i++)
+  {
+    m_key_names[i] = user_config->getMappingAsString(m_player_index,
+													 (KartAction) i);
+    widget_manager->set_wgt_text(WTOK_LEFT + i, m_key_names[i].c_str());
+  }
+}

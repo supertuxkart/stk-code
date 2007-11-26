@@ -30,11 +30,11 @@
 #include "translation.hpp"
 #include "camera.hpp"
 
-void PlayerKart::action(KartActions action, int value)
+void PlayerKart::action(KartAction action, int value)
 {
     switch (action)
     {
-    case KC_LEFT:
+    case KA_LEFT:
         m_steer_val_l = -value;
         if (value)
           m_steer_val = -value;
@@ -42,7 +42,7 @@ void PlayerKart::action(KartActions action, int value)
           m_steer_val = m_steer_val_r;
 
         break;
-    case KC_RIGHT:
+    case KA_RIGHT:
         m_steer_val_r = value;
         if (value)
           m_steer_val = value;
@@ -50,27 +50,27 @@ void PlayerKart::action(KartActions action, int value)
           m_steer_val = m_steer_val_l;
 
         break;
-    case KC_ACCEL:
+    case KA_ACCEL:
         m_accel_val = value;
         break;
-    case KC_BRAKE:
+    case KA_BRAKE:
         if (value)
             m_accel_val = 0;
         m_controls.brake = value;
         break;
-    case KC_WHEELIE:
+    case KA_WHEELIE:
         m_controls.wheelie = value;
         break;
-    case KC_RESCUE:
+    case KA_RESCUE:
         m_controls.rescue = value;
         break;
-    case KC_FIRE:
+    case KA_FIRE:
         m_controls.fire = value;
         break;
-    case KC_LOOK_BACK:
+    case KA_LOOK_BACK:
         m_camera->setReverseHeading(value);
         break;
-    case KC_JUMP:
+    case KA_JUMP:
         m_controls.jump = value;
         break;
     }

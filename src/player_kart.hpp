@@ -51,7 +51,7 @@ public:
     Player* getPlayer         () {return m_player;        }
     void    update            (float);
     void    addMessages       ();
-    void    action            (KartActions action, int value);
+    void    action            (KartAction action, int value);
     void    forceCrash        ();
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);

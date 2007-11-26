@@ -37,6 +37,7 @@
 #define SUPPORTED_CONFIG_VERSION 3
 
 #include <string>
+#include "input.hpp"
 #include "player.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
@@ -44,12 +45,28 @@
 
 #define CONFIGDIR ".supertuxkart"
 
+class ActionMap;
 
 /*class for managing general tuxkart configuration data*/
 class UserConfig
 {
 private:
+	typedef struct 
+	{
+		int count;
+		Input *inputs;
+	} InputMapEntry;
+		
     std::string filename;
+	
+	/** Stores the GameAction->Input mappings in a way that is suitable for
+	  * quick modification of the mappings. Internally this allows multiple
+	  * Input instances per GameAction but the public methods allow only one
+	  * mapping.
+	  * 
+	  * It is named after what is put in as values.
+	  */
+	InputMapEntry inputMap[GA_COUNT];
 
     void        setFilename      ();
     int         CheckAndCreateDir();
@@ -58,15 +75,57 @@ private:
     int         m_sfx;
     int         m_music;
 
-    void readInput(const lisp::Lisp* &r,
-                   const char *node,
-                   KartActions action,
-                   Player& player);
+	void readPlayerInput(const lisp::Lisp *,
+						 const char *,
+						 KartAction ka,
+						 int);
 
-    void writeInput(lisp::Writer &writer,
-                    const char *node,
-                    KartActions action,
-                    Player& player);
+    void readInput(const lisp::Lisp *,
+                   const char *,
+				   GameAction);
+
+    void writeInput(lisp::Writer *,
+                    const char *,
+					GameAction);
+	
+	void writePlayerInput(lisp::Writer *,
+						  const char *,
+						  KartAction,
+						  int);
+	
+	/** Iterates through the input mapping and unsets all
+	 * where the given input occurs.
+	 * 
+	 * This makes sure an input is not bound multiple times.
+	 */
+	void unsetDuplicates(GameAction, Input &);
+	
+	/** Creates an GameAction->Input mapping with one Input */
+	void set(GameAction, Input);
+	
+	/** Creates an GameAction->Input mapping with two Inputs */
+	void set(GameAction, Input, Input);
+	
+	/** Creates an GameAction->Input mapping with three Inputs */
+	void set(GameAction, Input, Input, Input);
+	
+	/** Creates an GameAction->Input mapping with four Inputs */
+	void set(GameAction, Input, Input, Input, Input);
+
+	std::string getInputAsString(Input &);
+
+	/** Creates an ActionMap for the GameAction values of the specified
+	  * range.
+	  */
+	ActionMap *newActionMap(const int, const int);
+	
+	/** Sets the Input for the given GameAction. Includes a check for
+	  * duplicates and automatic removing of the other candidate(s).
+	  *
+	  * For use when reading from file.
+	  */
+	void setInput(GameAction, Input &);
+
 public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
 
@@ -106,7 +165,31 @@ public:
     void loadConfig(const std::string& filename);
     void saveConfig();
     void saveConfig(const std::string& filename);
-    std::string getInputAsString(int player_index, KartActions control);
+	
+	/** Retrieves a human readable string of the mapping for a GameAction */
+    std::string getMappingAsString(GameAction);
+	/** Retrieves a human readable string of the mapping for the given
+	  * player and KartAction.
+	  */
+	std::string getMappingAsString(int, KartAction);
+	
+	/** Sets the Input for the given Player and KartAction. Includes a check
+	  * for duplicates and automatic removing of the other candidate(s).
+	  *
+	  * For use when sensing input.
+	  */
+	void setInput(int, KartAction, Input &);
+	
+	/** Clears the mapping for a given Player and KartAction. */
+	void clearInput(int, KartAction);
+	
+	bool isFixedInput(InputType, int, int, int);
+	
+	/** Creates ActionMap for use in menu mode. */
+	ActionMap *newMenuActionMap();
+	
+	/** Creates ActionMap for use in ingame mode. */
+	ActionMap *newIngameActionMap();
 };
 
 

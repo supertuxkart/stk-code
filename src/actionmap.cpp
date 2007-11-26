@@ -1,4 +1,4 @@
-//  $Id: inputmap.cpp 1259 2007-09-24 12:28:19Z thebohemian $
+//  $Id: actionmap.cpp 1259 2007-09-24 12:28:19Z thebohemian $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Robert Schuster
@@ -19,45 +19,43 @@
 
 #include <map>
 
-#include "player.hpp"
-#include "player_kart.hpp"
-#include "inputmap.hpp"
+#include "input.hpp"
+#include "actionmap.hpp"
 
 using namespace std;
 
 void
-InputMap::putEntry(PlayerKart *kart, KartActions kc)
+ActionMap::putEntry(Input input, GameAction ga)
 {
-    Player *p = kart->getPlayer();
-    const Input *i  = p->getInput(kc);
-
-    Entry *e = new Entry();
-    e->kart = kart;
-    e->action = kc;
-
-    inputMap[key(i->type, i->id0, i->id1, i->id2)] = e;
+	inputMap[key(input)] = ga;
 }
 
-InputMap::Entry *
-InputMap::getEntry(InputType it, int id0, int id1, int id2)
+GameAction
+ActionMap::getEntry(Input input)
 {
-  return inputMap[key(it, id0, id1, id2)];
+	return inputMap[key(input)];
+}
+
+GameAction
+ActionMap::getEntry(InputType type, int id0, int id1, int id2)
+{
+	return inputMap[key(type, id0, id1, id2)];
 }
 
 void
-InputMap::clear()
+ActionMap::clear()
 {
-    for (map<Key, Entry *>::iterator i = inputMap.begin();
-         i != inputMap.end(); i++)
-    {
-      delete i->second;
-    }
-
     inputMap.clear();
 }
 
-InputMap::Key
-InputMap::key(InputType it, int id0, int id1, int id2)
+ActionMap::Key
+ActionMap::key(Input input)
+{
+	return key(input.type, input.id0, input.id1, input.id2);
+}
+
+ActionMap::Key
+ActionMap::key(InputType it, int id0, int id1, int id2)
 {
     /*
      * A short reminder on the bit distribution and their usage:

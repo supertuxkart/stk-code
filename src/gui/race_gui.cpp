@@ -18,30 +18,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <SDL/SDL.h>
-#include "user_config.hpp"
 #include "race_gui.hpp"
+
+#include "input.hpp"
+#include "sdldrv.hpp"
+
+#include "user_config.hpp"
 #include "history.hpp"
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
-#include "sdldrv.hpp"
 #include "translation.hpp"
 #include "font.hpp"
-#include "inputmap.hpp"
 
-RaceGUI::RaceGUI(): m_input_map (new InputMap()), m_time_left(0.0)
+RaceGUI::RaceGUI(): m_time_left(0.0)
 {
-    if(user_config->m_fullscreen)
-    {
-        SDL_ShowCursor(SDL_DISABLE);
-    }
-
-    if(!user_config->m_profile)
-    {
-        updateInputMappings();
-    }   // if !user_config->m_profile
-
     // FIXME: translation problem
     m_pos_string[0] = "?!?";
     m_pos_string[1] = "1st";
@@ -74,49 +65,85 @@ RaceGUI::RaceGUI(): m_input_map (new InputMap()), m_time_left(0.0)
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
-  delete m_input_map;
-
-    if(user_config->m_fullscreen)
-    {
-        SDL_ShowCursor(SDL_ENABLE);
-    }
     //FIXME: does all that material stuff need freeing somehow?
 }   // ~Racegui
 
 //-----------------------------------------------------------------------------
-void RaceGUI::updateInputMappings()
+void
+RaceGUI::handle(GameAction ga, int value)
 {
-  m_input_map->clear();
+	static int isWireframe = false;
+	
+	// The next lines find out the player and kartaction that belongs
+	// to a certain gameaction value (GameAction -> Player number, Kartaction).
+	// Since the numbers are fixed this can be done through computation
+	// (instead of using e.g. a separate data structure).
+	// Note that the kartaction enum value and their representatives in
+	// gameaction enum have the same order (Otherwise the stuff below would
+	// not work ...)!
+	if (ga >= GA_FIRST_KARTACTION && ga <= GA_LAST_KARTACTION)
+	{
+		// 'Pulls down' the gameaction value to make them multiples of the
+		// kartaction values.
+		int ka = ga - GA_FIRST_KARTACTION;
+		
+		int playerNo = ka / KC_COUNT;
+		ka = ka % KC_COUNT;
+		
+		world->getPlayerKart(playerNo)->action((KartAction) ka, value);
+		
+		return;
+	}
+	
+	if (value)
+		return;
+	
+	switch (ga)
+	{
+		case GA_DEBUG_ADD_MISSILE:
+			if (world->m_race_setup.getNumPlayers() ==1 )
+			{
+				Kart* kart = world->getPlayerKart(0);
+				kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
+			}
+			break;
+		case GA_DEBUG_TOGGLE_FPS:
+			user_config->m_display_fps = !user_config->m_display_fps;
+			if(user_config->m_display_fps)
+			{
+				m_fps_timer.reset();
+				m_fps_timer.setMaxDelta(1000);
+				m_fps_counter=0;
+			}
+			break;
+#ifdef BULLET
+		case GA_DEBUG_BULLET:
+			user_config->m_bullet_debug = !user_config->m_bullet_debug;
+			break;
+#endif
+		case GA_DEBUG_TOGGLE_WIREFRAME:
+			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
+			isWireframe = ! isWireframe;
+			break;
+#ifndef WIN32
+		// For now disable F9 toggling fullscreen, since windows requires
+		// to reload all textures, display lists etc. Fullscreen can
+		// be toggled from the main menu (options->display).
+		case GA_TOGGLE_FULLSCREEN:
+			drv_toggleFullscreen(0);   // 0: do not reset textures
+			// Fall through to put the game into pause mode.
+#endif
+		case GA_LEAVE_RACE:
+			world->pause();
+			menu_manager->pushMenu(MENUID_RACEMENU);
+		break;
+		case GA_DEBUG_HISTORY:
+			history->Save();
+			break;
+		default:
+			break;
+	} // switch
 
-    // Defines the mappings for player keys to kart and action
-    // To avoid looping over all players to find out what
-    // player control key was pressed, a special data structure
-    // is set up: keysToKart contains for each (player assigned)
-    // key which kart it applies to (and therefore which player),
-    // and typeForKey contains the assigned function of that key.
-    const int NUM = world->m_race_setup.getNumPlayers();
-    for(int i=0; i < NUM; i++)
-    {
-        PlayerKart* kart = world->getPlayerKart(i);
-
-        for(int ka=(int)KC_FIRST; ka < (int)KC_LAST+1; ka++)
-            m_input_map->putEntry(kart, (KartActions) ka);
-    }
-
-}   // UpdateKeyControl
-
-//-----------------------------------------------------------------------------
-bool RaceGUI::handleInput(InputType type, int id0, int id1, int id2, int value)
-{
-    InputMap::Entry *e = m_input_map->getEntry(type, id0, id1, id2);
-
-    if (e)
-    {
-        e->kart->action(e->action, value);
-        return true;
-    }
-    else
-        return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,78 +153,6 @@ void RaceGUI::update(float dt)
     drawStatusText(world->m_race_setup, dt);
     cleanupMessages();
 }   // update
-
-//-----------------------------------------------------------------------------
-void RaceGUI::input(InputType type, int id0, int id1, int id2, int value)
-{
-    switch (type)
-    {
-    case IT_KEYBOARD:
-        // Stuff that handleInput() does not care about are
-        // internal keyboard actions.
-        if (!handleInput(type, id0, id1, id2, value))
-            inputKeyboard(id0, value);
-        break;
-    default:  // no keyboard event
-        handleInput(type, id0, id1, id2, value);
-        break;
-    }
-
-}
-
-//-----------------------------------------------------------------------------
-void RaceGUI::inputKeyboard(int key, int pressed)
-{
-    if (!pressed)
-        return;
-
-    static int isWireframe = false ;
-    switch ( key )
-    {
-    case SDLK_F7:
-        if(world->m_race_setup.getNumPlayers()==1)
-        {   // ctrl-r
-            Kart* kart = world->getPlayerKart(0);
-            kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
-        }
-        break;
-    case SDLK_F12:
-        user_config->m_display_fps = !user_config->m_display_fps;
-        if(user_config->m_display_fps)
-        {
-            m_fps_timer.reset();
-            m_fps_timer.setMaxDelta(1000);
-            m_fps_counter=0;
-        }
-        break;
-#ifdef BULLET
-    case SDLK_F2:
-        user_config->m_bullet_debug = !user_config->m_bullet_debug;
-        break;
-#endif
-    case SDLK_F11:
-        glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
-        isWireframe = ! isWireframe;
-        break;
-#ifndef WIN32
-        // For now disable F9 toggling fullscreen, since windows requires
-        // to reload all textures, display lists etc. Fullscreen can
-        // be toggled from the main menu (options->display).
-    case SDLK_F9:
-        drv_toggleFullscreen(0);   // 0: do not reset textures
-        // Fall through to put the game into pause mode.
-#endif
-    case SDLK_ESCAPE: // ESC
-        world->pause();
-        menu_manager->pushMenu(MENUID_RACEMENU);
-        break;
-    case SDLK_F10:
-        history->Save();
-        break;
-    default:
-        break;
-    } // switch
-} // inputKeyboard
 
 //-----------------------------------------------------------------------------
 void RaceGUI::drawFPS ()

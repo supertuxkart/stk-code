@@ -33,7 +33,7 @@ public:
     RaceResultsGUI();
     ~RaceResultsGUI();
 
-    void inputKeyboard(int, int);
+    void handle(GameAction, int);
 
     void select();
 };

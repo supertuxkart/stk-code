@@ -20,19 +20,24 @@
 #ifndef HEADER_BASEGUI_H
 #define HEADER_BASEGUI_H
 
+#include <SDL/SDL.h>
+
 #include "player.hpp"
 
 class BaseGUI
 {
+	void animateWidget(const int, const int);
+		
 public:
     BaseGUI() {}
     virtual ~BaseGUI() {}
 
     virtual void update(float dt);
     virtual void select() = 0;
-
-    virtual void input(InputType type, int id0, int id1, int id2, int value);
-    virtual void inputKeyboard(int key, int pressed);
+	
+	virtual void handle(GameAction, int);
+	
+	virtual void inputKeyboard(SDLKey, int);
 
     void inputPointer(int x, int y);
 

@@ -228,74 +228,74 @@ get stuck or fall too far, use the rescue button to get back on track."));
 
     widget_manager->add_wgt(WTOK_LEFT, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_LEFT, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_LEFT, sKartAction2String[KC_LEFT]);
+    widget_manager->set_wgt_text(WTOK_LEFT, sKartAction2String[KA_LEFT]);
     widget_manager->add_wgt(WTOK_LEFTKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_LEFTKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_LEFTKEY,
-        user_config->getInputAsString(0, (KartActions)KC_LEFT).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_LEFT).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_RIGHT, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_RIGHT, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_RIGHT, sKartAction2String[KC_RIGHT]);
+    widget_manager->set_wgt_text(WTOK_RIGHT, sKartAction2String[KA_RIGHT]);
     widget_manager->add_wgt(WTOK_RIGHTKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_RIGHTKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_RIGHTKEY,
-        user_config->getInputAsString(0, (KartActions)KC_RIGHT).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_RIGHT).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_ACCEL, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_ACCEL, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_ACCEL, sKartAction2String[KC_ACCEL]);
+    widget_manager->set_wgt_text(WTOK_ACCEL, sKartAction2String[KA_ACCEL]);
     widget_manager->add_wgt(WTOK_ACCELKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_ACCELKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_ACCELKEY,
-        user_config->getInputAsString(0, (KartActions)KC_ACCEL).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_ACCEL).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_BRAKE, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_BRAKE, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_BRAKE, sKartAction2String[KC_BRAKE]);
+    widget_manager->set_wgt_text(WTOK_BRAKE, sKartAction2String[KA_BRAKE]);
     widget_manager->add_wgt(WTOK_BRAKEKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_BRAKEKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_BRAKEKEY,
-        user_config->getInputAsString(0, (KartActions)KC_BRAKE).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_BRAKE).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_WHEELIE, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_WHEELIE, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_WHEELIE, sKartAction2String[KC_WHEELIE]);
+    widget_manager->set_wgt_text(WTOK_WHEELIE, sKartAction2String[KA_WHEELIE]);
     widget_manager->add_wgt(WTOK_WHEELIEKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_WHEELIEKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_WHEELIEKEY,
-        user_config->getInputAsString(0, (KartActions)KC_WHEELIE).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_WHEELIE).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_RESCUE, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_RESCUE, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_RESCUE, sKartAction2String[KC_RESCUE]);
+    widget_manager->set_wgt_text(WTOK_RESCUE, sKartAction2String[KA_RESCUE]);
     widget_manager->add_wgt(WTOK_RESCUEKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_RESCUEKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_RESCUEKEY,
-        user_config->getInputAsString(0, (KartActions)KC_RESCUE).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_RESCUE).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_FIRE, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_FIRE, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_FIRE, sKartAction2String[KC_FIRE]);
+    widget_manager->set_wgt_text(WTOK_FIRE, sKartAction2String[KA_FIRE]);
     widget_manager->add_wgt(WTOK_FIREKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_FIREKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_FIREKEY,
-        user_config->getInputAsString(0, (KartActions)KC_FIRE).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_FIRE).c_str());
     widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_JUMP, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_JUMP, WGT_AREA_LFT );
-    widget_manager->set_wgt_text(WTOK_JUMP, sKartAction2String[KC_JUMP]);
+    widget_manager->set_wgt_text(WTOK_JUMP, sKartAction2String[KA_JUMP]);
     widget_manager->add_wgt(WTOK_JUMPKEY, 20, 5);
     widget_manager->set_wgt_round_corners(WTOK_JUMPKEY, WGT_AREA_RGT );
     widget_manager->set_wgt_text(WTOK_JUMPKEY,
-        user_config->getInputAsString(0, (KartActions)KC_JUMP).c_str());
+        user_config->getMappingAsString(0, (KartAction)KA_JUMP).c_str());
     widget_manager->break_line();
 
     /*Buttons at the bottom*/

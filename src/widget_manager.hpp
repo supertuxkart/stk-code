@@ -100,6 +100,8 @@ class WidgetManager
     int find_top_widget(const int START_WGT) const;
     int find_bottom_widget(const int START_WGT) const;
 
+	int handle_finish(const int);
+
 public:
     //FIXME: maybe I should get this out of this class?
     static const int WGT_NONE;
@@ -190,9 +192,15 @@ public:
     void darken_wgt_color(const int TOKEN);
 
     /* Input device handling. */
-    int handle_mouse( const int X, const int Y );
-    int handle_keyboard( const int KEY );
-    int handle_joystick( int axis, int dir, int value );
+    int handle_pointer( const int X, const int Y );
+    int handle_left();
+    int handle_right();
+    int handle_up();
+    int handle_down();
+	
+	/* Scrolling modification. */
+	void increase_scroll_speed(bool = false);
+	void decrease_scroll_speed(bool = false);
 };
 
 extern WidgetManager *widget_manager;

@@ -1,4 +1,4 @@
-//  $Id: inputmap.hpp 1259 2007-09-24 12:28:19Z thebohemian $
+//  $Id: actionmap.hpp 1259 2007-09-24 12:28:19Z thebohemian $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Robert Schuster
@@ -17,35 +17,33 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_INPUTMAP_H
-#define HEADER_INPUTMAP_H
+#ifndef HEADER_ACTIONMAP_H
+#define HEADER_ACTIONMAP_H
 
 #include <map>
-#include "player.hpp"
+#include "input.hpp"
 
-class Playerkart;
-
-class InputMap
+/**
+  * This thing is named after what is put in as values.
+  */
+class ActionMap
 {
   typedef std::pair<int, int> Key;
 
   public:
-    typedef struct
-    {
-      PlayerKart *kart;
-      KartActions action;
-    } Entry;
 
     void clear();
 
-    void putEntry(PlayerKart *, KartActions);
+    void putEntry(Input, GameAction);
 
-    Entry *getEntry(InputType, int, int, int);
+    GameAction getEntry(Input);
+    GameAction getEntry(InputType, int, int, int);
 
   private:
+    inline Key key(Input);
     Key key(InputType, int, int, int);
 
-    std::map<Key, Entry *> inputMap;
+    std::map<Key, GameAction> inputMap;
 
 };
 

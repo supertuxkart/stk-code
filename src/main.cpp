@@ -391,6 +391,7 @@ int main(int argc, char *argv[] )
         
         //FIXME: this needs a better organization
         drv_init();
+		
         game_manager = new GameManager ();
         // loadMaterials needs ssgLoadTextures (internally), which can
         // only be called after ssgInit (since this adds the actual loader)
