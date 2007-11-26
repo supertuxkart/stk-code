@@ -929,8 +929,8 @@ int WidgetManager::handle_pointer(const int X, const int Y )
     return WGT_NONE;
 }
 
-/** The handle_*() function stores the current widget under the cursor
- *  after receiving input from a key.
+/** The handle_<direction>() function stores the current widget under
+ *  the cursor after receiving input from a key.
  */
 int
 WidgetManager::handle_left()
