@@ -98,6 +98,54 @@ bool WidgetManager::add_wgt
 }
 
 //-----------------------------------------------------------------------------
+bool WidgetManager::insert_column()
+{
+    const int NUM_WGTS = m_widgets.size();
+    const int LAST_BREAK = m_breaks.size() - 1;
+
+    //Check if we are at the beginning of a line
+    if( NUM_WGTS > 0)
+    {
+        if( LAST_BREAK < 0 || m_breaks[LAST_BREAK] != NUM_WGTS - 1)
+        {
+            std::cerr << "Warning: tried to add a column that is not at " <<
+                "the beginning of a line, after widget with token " <<
+                m_widgets[NUM_WGTS - 1].token << ".\n";
+            return false;
+        }
+    }
+
+
+    const int NUM_COLUMNS = m_columns.size();
+
+    if( NUM_COLUMNS > 0 )
+    {
+        if( !column_starts(NUM_WGTS) ) m_columns.push_back(NUM_WGTS);
+        else
+        {
+            if( NUM_WGTS > 0 )
+            {
+                std::cerr << "Warning: tried to add a column twice at " <<
+                    "widget with token" << m_widgets[NUM_WGTS - 1].token <<
+                    ".\n";
+            }
+            else
+            {
+                std::cerr << "Warning: tried to add a column twice before" <<
+                    "the first widget.\n";
+            }
+            return false;
+        }
+    }
+    else
+    {
+            m_columns.push_back(NUM_WGTS);
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool WidgetManager::break_line()
 {
     const int LAST_WGT = m_widgets.size() - 1;
@@ -141,6 +189,22 @@ void WidgetManager::delete_wgts()
     }
 
     m_widgets.clear();
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::column_starts( const int WGT ) const
+{
+    const int NUM_COLUMNS = m_columns.size();
+
+    if( NUM_COLUMNS > 0)
+    {
+        for(int i = 0; i < NUM_COLUMNS; ++i )
+        {
+            if( m_columns[i] == WGT ) return true;
+        }
+    }
+
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -232,9 +296,21 @@ int WidgetManager::calc_width() const
             curr_width = 0;
         }
 
+        if( column_starts(i) )
+        {
+            curr_width = calc_column_width(i);
+
+            //Jump to the next line break
+            for(; i < NUM_WIDGETS; ++i)
+            {
+                if( line_breaks(i) ) break;
+            }
+        }
     }
+
     if( curr_width > total_width ) total_width = curr_width;
 
+    std::cerr << total_width << " W" <<std::endl; //200
     return total_width;
 }
 
@@ -256,6 +332,7 @@ int WidgetManager::calc_height() const
         }
     }
 
+    std::cerr << total_height << " H" <<std::endl; //294
     return total_height;
 }
 
@@ -366,7 +443,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     //biggest one, it might look bad for the smaller one, but it doesn't
     //happens the other way around, and it's divided by 60, maybe because
     //it results in small enough values to be of use, or maybe because it's
-    //divided by 60 minutes?
+    //divided by 60 minutes? The formula was taken from the old Widget Set.
     const int RADIUS = ( SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH ) / 60;
 
     //The widgets positions given are for the lower left corner.
@@ -431,6 +508,7 @@ int WidgetManager::calc_line_width( const int START_WGT ) const
 int WidgetManager::calc_line_height( const int START_WGT ) const
 {
     int line_height = 0;
+    int column_height;
     const int NUM_WIDGETS = m_widgets.size();
 
     for( int i = START_WGT; i < NUM_WIDGETS; ++i )
@@ -439,10 +517,53 @@ int WidgetManager::calc_line_height( const int START_WGT ) const
         {
             line_height = m_widgets[i].widget->m_height;
         }
+
+        if( column_starts(i) )
+        {
+            column_height = calc_column_height(i);
+            if( line_height < column_height )
+            {
+                line_height = column_height;
+            }
+        }
+
         if( line_breaks(i) ) break;
     }
 
     return line_height;
+}
+
+//-----------------------------------------------------------------------------
+int WidgetManager::calc_column_width(const int START_WGT) const
+{
+    int column_width = 0;
+    const int NUM_WIDGETS = m_widgets.size();
+
+    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    {
+        if( column_width < m_widgets[i].widget->m_width )
+        {
+            column_width = m_widgets[i].widget->m_width;
+        }
+        if( line_breaks(i) ) break;
+    }
+
+    return column_width;
+}
+
+//-----------------------------------------------------------------------------
+int WidgetManager::calc_column_height(const int START_WGT) const
+{
+    int total_height = 0;
+    const int NUM_WIDGETS = m_widgets.size();
+
+    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    {
+        total_height += m_widgets[i].widget->m_height;
+        if( line_breaks(i) ) break;
+    }
+
+    return total_height;
 }
 
 //-----------------------------------------------------------------------------
@@ -938,6 +1059,7 @@ int WidgetManager::handle_joystick
     return m_selected_wgt_token;
 }
 
+//FIXME: find_left_widget() doesn't works properly yet
 /** find_left_widget() returns the closest widget to the left of START_WGT.
  */
 int WidgetManager::find_left_widget(const int START_WGT) const
@@ -1002,6 +1124,7 @@ int WidgetManager::find_left_widget(const int START_WGT) const
     return closest_wgt;
 }
 
+//FIXME: find_right_widget() doesn't works properly yet
 /** find_right_widget() returns the closest widget to the right of START_WGT
  */
 int WidgetManager::find_right_widget(const int START_WGT) const

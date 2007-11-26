@@ -57,6 +57,7 @@ class WidgetManager
 
     std::vector<WidgetID> m_widgets;
     std::vector<int> m_breaks;
+    std::vector<int> m_columns;
 
     int m_x;
     int m_y;
@@ -82,13 +83,17 @@ class WidgetManager
 /*    int m_default_scroll_x_speed;*/
     int m_default_scroll_y_speed;
 
+    bool column_starts( const int WGT ) const;
     bool line_breaks( const int WGT ) const;
+    int get_next_line_break(const int START_WGT) const;
 
     int find_id(const int TOKEN) const;
     int calc_width() const;
     int calc_height() const;
     int calc_line_width(const int START_WGT) const;
     int calc_line_height(const int START_WGT) const;
+    int calc_column_width(const int START_WGT) const;
+    int calc_column_height(const int START_WGT) const;
 
     int find_left_widget(const int START_WGT) const;
     int find_right_widget(const int START_WGT) const;
@@ -105,12 +110,18 @@ public:
     bool add_wgt
     (
         const int TOKEN, //A number that names the widget.
-        const int MIN_WIDTH, //These values are percentages not pixels. If
-                             //the widget is inside a container, 100%
-                             //represents container space, otherwise 100% is
-                             //the screen space.
+        const int MIN_WIDTH, //These values are percentages not pixels. 100%
+                             //is the whole screen.
         const int MIN_HEIGHT
     );
+    bool insert_column(); //This function changes the orientation from left to
+                          //right and top to bottom of the widgets at line
+                          //breaks, and switches it, making it from top to
+                          //bottom, and left to right at a line break,
+                          //until the next line break or the next layout()
+                          //call. It can only be used right at the beginning
+                          //of a line (that is, before any widgets have been
+                          //created, or just after a line break).
     bool break_line();
 
     void delete_wgts();
