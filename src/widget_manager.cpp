@@ -475,8 +475,11 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     //Always select the first active widget by default
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
-        if( m_widgets[i].active) m_selected_wgt_token = m_widgets[i].token;
-
+        if( m_widgets[i].active)
+        {
+            m_selected_wgt_token = m_widgets[i].token;
+            break;
+        }
     }
 
     //Cleanups
