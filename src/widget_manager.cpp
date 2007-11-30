@@ -307,7 +307,6 @@ int WidgetManager::calc_width() const
 
     if( curr_width > total_width ) total_width = curr_width;
 
-    std::cerr << total_width << " W" <<std::endl; //200
     return total_width;
 }
 
@@ -329,7 +328,6 @@ int WidgetManager::calc_height() const
         }
     }
 
-    std::cerr << total_height << " H" <<std::endl; //294
     return total_height;
 }
 
