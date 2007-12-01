@@ -131,7 +131,7 @@ void UserConfig::setDefaults()
     m_width            = 800;
     m_height           = 600;
     m_karts            = 4;
-    m_log_errors       = true;
+    m_log_errors       = false;
 
     if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");

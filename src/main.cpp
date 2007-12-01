@@ -374,6 +374,8 @@ int main(int argc, char *argv[] )
         {
             std::string logoutfile = user_config->getConfigDir();
             logoutfile += Loader::DIR_SEPARATOR;
+            std::cout << "Error messages and other text output will be logged to " ;
+            std::cout << logoutfile << "stderr.log and stdout.log" << std::endl; 
             std::string logerrfile = logoutfile;
             logoutfile += "stdout.log";
             logerrfile += "stderr.log";
@@ -391,7 +393,7 @@ int main(int argc, char *argv[] )
         
         //FIXME: this needs a better organization
         drv_init();
-		
+        
         game_manager = new GameManager ();
         // loadMaterials needs ssgLoadTextures (internally), which can
         // only be called after ssgInit (since this adds the actual loader)

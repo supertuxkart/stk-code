@@ -5,9 +5,9 @@ Icon=supertuxkart_64.xpm
 Comment=A kart racing game
 Comment[fr_FR]=Un jeu de karting
 Comment[ro_RO]=Un joc de curse cu carturi
-Exec=supertuxkart
+Exec=supertuxkart --log=file
 Terminal=false
 StartupNotify=false
 Type=Application
-TryExec=supertuxkart
+TryExec=supertuxkart --log=file
 Categories=3DGraphics;Game;ActionGame;Simulation;SportsGame;
