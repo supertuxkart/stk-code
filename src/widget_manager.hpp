@@ -36,7 +36,7 @@
  *
  * You can use set_initial_*state() to avoid setting the state of the same
  * switch features with same values over and over; the default states are
- * reset when you call layout() or you can use reset_default_states().
+ * reset when you call reset() or you can use reset_default_states().
  */
 
 
@@ -120,13 +120,13 @@ public:
                           //right and top to bottom of the widgets at line
                           //breaks, and switches it, making it from top to
                           //bottom, and left to right at a line break,
-                          //until the next line break or the next layout()
-                          //call. It can only be used right at the beginning
+                          //until the next line break or reset() call. It can
+                          //only be used right at the beginning
                           //of a line (that is, before any widgets have been
                           //created, or just after a line break).
     bool break_line();
 
-    void delete_wgts();
+    void reset();
 
     void update(const float DELTA);
 
@@ -197,7 +197,7 @@ public:
     int handle_right();
     int handle_up();
     int handle_down();
-	
+
 	/* Scrolling modification. */
 	void increase_scroll_speed(bool = false);
 	void decrease_scroll_speed(bool = false);

@@ -111,7 +111,7 @@ GrandPrixSelect::GrandPrixSelect()
 //-----------------------------------------------------------------------------
 GrandPrixSelect::~GrandPrixSelect()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
 //    widgetSet -> delete_widget(m_menu_id) ;
 //    glDeleteLists(m_rect, 1);
 }   // GrandPrixSelect

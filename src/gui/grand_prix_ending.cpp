@@ -166,7 +166,7 @@ GrandPrixEnd::GrandPrixEnd()
 //-----------------------------------------------------------------------------
 GrandPrixEnd::~GrandPrixEnd()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
     ssgDeRefDelete(m_kart);
 
     delete m_context;

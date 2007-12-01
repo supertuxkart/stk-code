@@ -104,7 +104,7 @@ ConfigControls::ConfigControls()
 //-----------------------------------------------------------------------------
 ConfigControls::~ConfigControls()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
 //    widgetSet -> delete_widget(m_menu_id) ;
 }
 

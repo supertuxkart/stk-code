@@ -74,7 +74,7 @@ ConfigDisplay::ConfigDisplay()
 ConfigDisplay::~ConfigDisplay()
 {
 //    widgetSet -> delete_widget(m_menu_id) ;
-    widget_manager->delete_wgts();
+    widget_manager->reset();
 }
 
 //-----------------------------------------------------------------------------

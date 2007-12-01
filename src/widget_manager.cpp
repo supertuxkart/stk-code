@@ -35,14 +35,13 @@ const int WidgetManager::WGT_NONE = -1;
 WidgetManager::WidgetManager() :
 m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
 {
-    restore_default_states();
     init_fonts();
 }
 
 //-----------------------------------------------------------------------------
 WidgetManager::~WidgetManager()
 {
-    delete_wgts();
+    reset();
     delete_fonts();
 }
 
@@ -122,6 +121,7 @@ bool WidgetManager::insert_column()
         {
             if( NUM_WGTS > 0 )
             {
+                //FIXME: check if a column is inside a column instead
                 std::cerr << "Warning: tried to add a column twice at " <<
                     "widget with token" << m_widgets[NUM_WGTS - 1].token <<
                     ".\n";
@@ -154,6 +154,18 @@ bool WidgetManager::break_line()
         return false;
     }
 
+    const int LAST_COLUMN = m_columns.size() - 1;
+    if( LAST_COLUMN > -1 && m_columns[LAST_COLUMN] == LAST_WGT )
+    {
+        std::cerr << "Warning: tried to add a column with just one widget" <<
+            ".\n";
+
+        //The last column is removed, because it would screw up the layout.
+        m_columns.pop_back();
+
+        return false;
+    }
+
     const int NUM_BREAKS = m_breaks.size();
 
     if( NUM_BREAKS > 0 )
@@ -176,7 +188,7 @@ bool WidgetManager::break_line()
 
 
 //-----------------------------------------------------------------------------
-void WidgetManager::delete_wgts()
+void WidgetManager::reset()
 {
     const int NUM_WIDGETS = m_widgets.size();
 
@@ -186,6 +198,10 @@ void WidgetManager::delete_wgts()
     }
 
     m_widgets.clear();
+
+    restore_default_states();
+    m_breaks.clear();
+    m_columns.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -425,11 +441,8 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         break;
     }
 
-    int line_height = calc_line_height(0);
-
     //m_y should be the bottom value of the widgets, because that's the way
     //OpenGL handles the y-axis.
-    m_y -= line_height;
 
 //TODO: fix if m_x or m_y is bigger than the screen.
 
@@ -443,30 +456,98 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 
     //The widgets positions given are for the lower left corner.
     int widget_x = m_x + ( WGTS_WIDTH - calc_line_width( 0 )) / 2;
-    int widget_y = m_y;
+    int widget_y = m_y - m_widgets[0].widget->m_height;
+
+    bool column_begins = false;
+    int column_first_wgt = WGT_NONE;
+
+    //The important part of the function: give each widget it's true position
+    //on the screen and create their rect.
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
+        //Assign the widget's position
         m_widgets[i].widget->m_x = widget_x;
-        m_widgets[i].widget->m_y = widget_y + (line_height - m_widgets[i].widget->m_height);
+        m_widgets[i].widget->m_y = widget_y;
 
+        //Create widget's rect
         if( !(m_widgets[i].widget->create_rect(RADIUS)) )
         {
             return false;
         }
 
+
+        //Calculate the position of the next widget; this is not done if
+        //there are no more widgets left.
         if( i + 1 < NUM_WIDGETS )
         {
+            //Check if the i widget is the start of a column
+            column_begins = column_starts(i);
+            if( column_begins ) column_first_wgt = i;
+
+            //Column handling
+            if( column_first_wgt != WGT_NONE )
+            {
+                //Line breaks inside columns mark the end of them, so they
+                //behave differently if they are inside or outside of a
+                //column
+                if( line_breaks(i) )
+                {
+                    widget_x += calc_column_width(column_first_wgt);
+
+                    //Move the y pos back to the same height of the first wgt
+                    //of the column.
+                    widget_y += calc_column_height(column_first_wgt) -
+                        m_widgets[i].widget->m_height;
+
+                    if(!column_begins) column_first_wgt = WGT_NONE;
+                }
+                else
+                {
+                    widget_y -= m_widgets[i].widget->m_height;
+                }
+            }
+            else //What to do if we are not into a column
+            {
+                if( line_breaks(i) )
+                {
+                    const int CENTERED_POS = (WGTS_WIDTH -
+                        calc_line_width( i+1 )) / 2;
+                    widget_x = m_x + CENTERED_POS;
+                    widget_y -= m_widgets[i+1].widget->m_height;
+                }
+                else
+                {
+                    widget_x += m_widgets[i].widget->m_width;
+                }
+            }
+            //----
+            #if 0
             if( line_breaks(i) )
             {
-                line_height = calc_line_height(i+1);
-
-                widget_y -= line_height;
                 widget_x = m_x + ( WGTS_WIDTH - calc_line_width( i+1 )) / 2;
+
+                if( inside_column )
+                {
+                    widget_y += column_height;
+                    inside_column = false;
+                }
+
+                widget_y -= m_widgets[i].widget->m_height;
             }
-            else
+            else if( inside_column )
             {
-                widget_x += m_widgets[i].widget->m_width;
+                widget_y -= m_widgets[i].widget->m_height;
             }
+            else widget_x += m_widgets[i].widget->m_width;
+
+            if( column_starts(i) )
+            {
+                widget_y -= m_widgets[i].widget->m_height;
+                widget_x -= m_widgets[i].widget->m_width;
+                column_height = calc_column_height(i);
+                inside_column = true;
+            }
+            #endif
         }
     }
 
@@ -480,10 +561,6 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         }
     }
 
-    //Cleanups
-    m_breaks.clear();
-    restore_default_states();
-
     return true;
 }
 
@@ -495,8 +572,17 @@ int WidgetManager::calc_line_width( const int START_WGT ) const
 
     for( int i = START_WGT; i < NUM_WIDGETS; ++i )
     {
-        total_width += m_widgets[i].widget->m_width;
-        if( line_breaks(i) ) break;
+        if( column_starts(i) )
+        {
+            total_width += calc_column_width(i);
+
+            while( !line_breaks(i) && i < NUM_WIDGETS ) ++i;
+        }
+        else
+        {
+            total_width += m_widgets[i].widget->m_width;
+            if( line_breaks(i) ) break;
+        }
     }
 
     return total_width;
@@ -572,7 +658,8 @@ void WidgetManager::set_selected_wgt(const int TOKEN)
     {
         m_selected_wgt_token = TOKEN;
     }
-    else std::cerr << "Tried to select unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Warning: tried to select unnamed widget with " <<
+        token << TOKEN << '\n';
 }
 
 
@@ -666,7 +753,11 @@ void WidgetManager::activate_wgt(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].active = true;
-    else std::cerr << "Tried to activate unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to activate unnamed widget with token "
+            << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -674,7 +765,11 @@ void WidgetManager::deactivate_wgt(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].active = false;
-    else std::cerr << "Tried to deactivate unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to deactivate unnamed widget with " <<
+            << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -682,7 +777,11 @@ void WidgetManager::set_wgt_color(const int TOKEN, const GLfloat *COLOR)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_rect_color = COLOR;
-    else std::cerr << "Tried to change the rect color of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to change the rect color of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -690,14 +789,22 @@ void WidgetManager::set_wgt_round_corners(const int TOKEN, const WidgetArea CORN
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_round_corners = CORNERS;
-    else std::cerr << "Tried to change the round corners of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to change the round corners of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
 }
 //-----------------------------------------------------------------------------
 void WidgetManager::show_wgt_rect(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = true;
-    else std::cerr << "Tried to show the rect of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to show the rect of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -705,7 +812,11 @@ void WidgetManager::hide_wgt_rect(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = false;
-    else std::cerr << "Tried to hide the rect of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to hide the rect of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -713,7 +824,7 @@ void WidgetManager::hide_wgt_rect(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_rect();
-    else std::cerr << "Tried to toggle the rect of an unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Tried to toggle the rect of an unnamed widget with token " << TOKEN << '\n';
 }*/
 
 //-----------------------------------------------------------------------------
@@ -721,7 +832,11 @@ void WidgetManager::set_wgt_texture(const int TOKEN, const int TEXTURE)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_texture = TEXTURE;
-    else std::cerr << "Tried to set the texture of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the texture of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -729,7 +844,11 @@ void WidgetManager::show_wgt_texture(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = true;
-    else std::cerr << "Tried to show the texture of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to show the texture of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -737,7 +856,11 @@ void WidgetManager::hide_wgt_texture(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = false;
-    else std::cerr << "Tried to hide the texture of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to hide the texture of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -745,7 +868,7 @@ void WidgetManager::hide_wgt_texture(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_texture();
-    else std::cerr << "Tried to toggle the texture of an unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Tried to toggle the texture of an unnamed widget with token " << TOKEN << '\n';
 }
 */
 //-----------------------------------------------------------------------------
@@ -753,7 +876,11 @@ void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
-    else std::cerr << "Tried to set text to an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set text to an unnamed widget " <<
+            "with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -761,7 +888,11 @@ void WidgetManager::set_wgt_text( const int TOKEN, const std::string TEXT )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
-    else std::cerr << "Tried to set the text of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the text of an unnamed widget with " <<
+            "token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -769,7 +900,11 @@ void WidgetManager::set_wgt_text_size( const int TOKEN, const WidgetFontSize SIZ
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_size = SIZE;
-    else std::cerr << "Tried to set the text size of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the text size of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -777,7 +912,11 @@ void WidgetManager::show_wgt_text( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = true;
-    else std::cerr << "Tried to show the text of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to show the text of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -785,7 +924,11 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = false;
-    else std::cerr << "Tried to hide the text of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to hide the text of an unnamed widget " <<
+            "with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -793,7 +936,7 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_text();
-    else std::cerr << "Tried to toggle the text of an unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Warning: tried to toggle the text of an unnamed widget with token " << TOKEN << '\n';
 }*/
 
 //-----------------------------------------------------------------------------
@@ -801,7 +944,11 @@ void WidgetManager::set_wgt_text_x_alignment( const int TOKEN, const Font::FontA
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_x_alignment = ALIGN;
-    else std::cerr << "Tried to set the X alignment of text of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the X alignment of text of " <<
+            "an unnamed widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -809,7 +956,11 @@ void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontA
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_y_alignment = ALIGN;
-    else std::cerr << "Tried to set the Y alignment of text of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the Y alignment of text of " <<
+            "an unnamed widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -817,7 +968,11 @@ void WidgetManager::enable_wgt_scroll( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = true;
-    else std::cerr << "Tried to enable scrolling of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to enable scrolling of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -825,7 +980,11 @@ void WidgetManager::disable_wgt_scroll( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = false;
-    else std::cerr << "Tried to disable scrolling of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to disable scrolling of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -833,7 +992,7 @@ void WidgetManager::disable_wgt_scroll( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_x = POS;
-    else std::cerr << "Tried to set the X scroll position of an unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Tried to set the X scroll position of an unnamed widget with token " << TOKEN << '\n';
 }*/
 
 //-----------------------------------------------------------------------------
@@ -841,7 +1000,11 @@ void WidgetManager::set_wgt_y_scroll_pos( const int TOKEN, const int POS )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_y = POS;
-    else std::cerr << "Tried to set the Y scroll position of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the Y scroll position of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -849,7 +1012,7 @@ void WidgetManager::set_wgt_y_scroll_pos( const int TOKEN, const int POS )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
-    else std::cerr << "Tried to set the X scroll speed of an unexistant widget with token " << TOKEN << '\n';
+    else std::cerr << "Tried to set the X scroll speed of an unnamed widget with token " << TOKEN << '\n';
 }*/
 
 //-----------------------------------------------------------------------------
@@ -857,7 +1020,11 @@ void WidgetManager::set_wgt_y_scroll_speed( const int TOKEN, const int SPEED )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
-    else std::cerr << "Tried to set the Y scroll speed of an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to set the Y scroll speed of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
 }
 
 /** pulse_widget() passes the pulse order to the right widget.
@@ -866,7 +1033,11 @@ void WidgetManager::pulse_wgt(const int TOKEN) const
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->pulse();
-    else std::cerr << "Tried to pulse unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to pulse unnamed widget with token " <<
+            TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -874,7 +1045,11 @@ void WidgetManager::lighten_wgt_color(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->lighten_color();
-    else std::cerr << "Tried to lighten an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to lighten an unnamed widget with " <<
+            "token " << TOKEN << '\n';
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -882,7 +1057,11 @@ void WidgetManager::darken_wgt_color(const int TOKEN)
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->darken_color();
-    else std::cerr << "Tried to darken an unexistant widget with token " << TOKEN << '\n';
+    else
+    {
+        std::cerr << "Warning: tried to darken an unnamed widget with " <<
+            "token " << TOKEN << '\n';
+    }
 }
 
 /** The handle_pointer() function returns the current widget under the

@@ -92,7 +92,7 @@ HelpMenu::HelpMenu()
 //-----------------------------------------------------------------------------
 HelpMenu::~HelpMenu()
 {
-    widget_manager->delete_wgts() ;
+    widget_manager->reset() ;
 
 	if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
         && m_banana != NULL )
@@ -436,12 +436,12 @@ void HelpMenu::select()
     switch ( widget_manager->get_selected_wgt() )
     {
         case WTOK_FIRST_PAGE:
-            widget_manager->delete_wgts();
+            widget_manager->reset();
             switch_to_first_screen();
             break;
 
         case WTOK_SECOND_PAGE:
-            widget_manager->delete_wgts();
+            widget_manager->reset();
             switch_to_second_screen();
             break;
 

@@ -115,7 +115,7 @@ PlayerControls::PlayerControls(int whichPlayer):
 //-----------------------------------------------------------------------------
 PlayerControls::~PlayerControls()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
     // The unicode translation is not generally needed, so disable it again.
 }   // ~PlayerControls
 

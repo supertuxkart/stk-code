@@ -85,7 +85,7 @@ RaceMenu::RaceMenu()
 //-----------------------------------------------------------------------------
 RaceMenu::~RaceMenu()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
 }
 
 

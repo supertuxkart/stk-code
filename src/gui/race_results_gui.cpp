@@ -170,7 +170,7 @@ RaceResultsGUI::RaceResultsGUI()
 //-----------------------------------------------------------------------------
 RaceResultsGUI::~RaceResultsGUI()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
     //widgetSet -> delete_widget(m_menu_id) ;
     delete[] m_score;
     delete[] m_highscores;

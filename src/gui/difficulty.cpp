@@ -69,7 +69,7 @@ Difficulty::Difficulty()
 //-----------------------------------------------------------------------------
 Difficulty::~Difficulty()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
 }   // ~Difficulty
 
 //-----------------------------------------------------------------------------

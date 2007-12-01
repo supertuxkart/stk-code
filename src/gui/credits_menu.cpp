@@ -87,7 +87,7 @@ CreditsMenu::CreditsMenu()
 //-----------------------------------------------------------------------------
 CreditsMenu::~CreditsMenu()
 {
-    widget_manager->delete_wgts() ;
+    widget_manager->reset() ;
 }   // ~CreditsMenu
 
 //-----------------------------------------------------------------------------

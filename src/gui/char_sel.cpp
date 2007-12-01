@@ -116,7 +116,7 @@ CharSel::CharSel(int whichPlayer)
 //-----------------------------------------------------------------------------
 CharSel::~CharSel()
 {
-    widget_manager->delete_wgts();
+    widget_manager->reset();
     ssgDeRefDelete(m_kart);
 
     delete m_context;
