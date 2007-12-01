@@ -659,7 +659,7 @@ void WidgetManager::set_selected_wgt(const int TOKEN)
         m_selected_wgt_token = TOKEN;
     }
     else std::cerr << "Warning: tried to select unnamed widget with " <<
-        token << TOKEN << '\n';
+        "token " << TOKEN << '\n';
 }
 
 
@@ -768,7 +768,7 @@ void WidgetManager::deactivate_wgt(const int TOKEN)
     else
     {
         std::cerr << "Warning: tried to deactivate unnamed widget with " <<
-            << TOKEN << '\n';
+            TOKEN << '\n';
     }
 }
 
