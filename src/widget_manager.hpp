@@ -80,6 +80,8 @@ class WidgetManager
     std::vector<WidgetElement> m_elems;
     std::vector<WidgetID> m_widgets;
 
+    WidgetArea prev_layout_pos;
+
     int m_x;
     int m_y;
 
@@ -149,8 +151,10 @@ public:
 
     void update(const float DELTA);
 
-    //TODO: WGT_AREA_NONE and WGT_AREA_ALL should have some difference.
-    //Both WGT_AREA_NONE and WGT_AREA_ALL will produce centered widgets.
+    bool layout(); //This calls the other layout() function with the
+                   //POSITION given to the previous call to any of the two
+                   //layout functions. Fails if no previous call to the
+                   //layout(POSITION) function has been done.
     bool layout( const WidgetArea POSITION );
 
     //TODO: make all get functions const

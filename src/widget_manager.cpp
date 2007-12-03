@@ -33,7 +33,7 @@ WidgetManager *widget_manager;
 const int WidgetManager::WGT_NONE = -1;
 
 WidgetManager::WidgetManager() :
-m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
+prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
 {
     init_fonts();
     restore_default_states();
@@ -327,8 +327,28 @@ int WidgetManager::calc_height() const
 }
 
 //-----------------------------------------------------------------------------
+bool WidgetManager::layout()
+{
+    if( prev_layout_pos == WGT_AREA_NONE )
+    {
+        std::cerr << "WARNING: tried to call layout() with the previous " <<
+            "layout position, but layout(WidgetArea POSITION) has never " <<
+            "been called.\n";
+        return false;
+    }
+
+    return layout(prev_layout_pos);
+}
+
+//-----------------------------------------------------------------------------
 bool WidgetManager::layout(const WidgetArea POSITION)
 {
+    if( POSITION == WGT_AREA_NONE )
+    {
+        std::cerr << "WARNING: called layout with WGT_AREA_NONE.\n";
+        return false;
+    }
+
     const int NUM_WIDGETS = m_widgets.size();
     if( NUM_WIDGETS < 0 ) return true;
 
@@ -358,7 +378,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     {
         std::cerr << "WARNING: total width of the widgets is bigger than " <<
             "the screen, because the total minimum width given is bigger " <<
-            "than 100%,\n";
+            "than 100%.\n";
     }
     if( WGTS_HEIGHT > SCREEN_HEIGHT )
     {
@@ -412,11 +432,13 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         m_y = 0;
         break;
 
-    //A layout of WGT_AREA_NONE should probably just do nothing.
-    case WGT_AREA_NONE:
     case WGT_AREA_ALL:
         m_x = (int)(SCREEN_WIDTH * 0.5f - WGTS_WIDTH * 0.5f );
         m_y = (int)(SCREEN_HEIGHT * 0.5 + WGTS_HEIGHT * 0.5f );
+        break;
+
+    //This is just here to avoid a warning
+    case WGT_AREA_NONE:
         break;
     }
 
