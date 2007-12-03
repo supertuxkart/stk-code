@@ -40,38 +40,32 @@ enum WidgetTokens {
 
 ConfigControls::ConfigControls()
 {
-
-
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+
+    widget_manager->insert_column();
     widget_manager->add_wgt( WTOK_TITLE, 60, 7 );
     widget_manager->set_wgt_text( WTOK_TITLE, _("Edit controls for which player?"));
-    widget_manager->break_line();
 
     widget_manager->set_initial_activation_state(true);
     widget_manager->add_wgt( WTOK_PLYR1 , 60, 7 );
     widget_manager->set_wgt_text( WTOK_PLYR1, _("Player 1"));
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_PLYR2 , 60, 7 );
     widget_manager->set_wgt_text( WTOK_PLYR2, _("Player 2"));
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_PLYR3 , 60, 7 );
     widget_manager->set_wgt_text( WTOK_PLYR3, _("Player 3"));
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_PLYR4 , 60, 7 );
     widget_manager->set_wgt_text( WTOK_PLYR4, _("Player 4"));
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_SPACE, 60, 5);
     widget_manager->deactivate_wgt( WTOK_SPACE );
     widget_manager->hide_wgt_rect( WTOK_SPACE );
     widget_manager->hide_wgt_text( WTOK_SPACE );
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_QUIT , 60, 7 );
     widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));

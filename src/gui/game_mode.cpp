@@ -33,12 +33,13 @@ enum WidgetTokens {
 
 GameMode::GameMode()
 {
+    widget_manager->insert_column();
+
     widget_manager->add_wgt(WTOK_TITLE, 50, 7);
     widget_manager->show_wgt_rect( WTOK_TITLE );
     widget_manager->set_wgt_text( WTOK_TITLE, _("Choose a Race Mode"));
     widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG );
     widget_manager->show_wgt_text( WTOK_TITLE );
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_GP, 50, 7);
     widget_manager->show_wgt_rect( WTOK_GP );
@@ -46,7 +47,6 @@ GameMode::GameMode()
     widget_manager->set_wgt_text_size( WTOK_GP, WGT_FNT_MED );
     widget_manager->show_wgt_text( WTOK_GP );
     widget_manager->activate_wgt( WTOK_GP );
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_QUICKRACE, 50, 7);
     widget_manager->show_wgt_rect( WTOK_QUICKRACE );
@@ -54,7 +54,6 @@ GameMode::GameMode()
     widget_manager->set_wgt_text_size( WTOK_QUICKRACE, WGT_FNT_MED );
     widget_manager->show_wgt_text( WTOK_QUICKRACE );
     widget_manager->activate_wgt( WTOK_QUICKRACE );
-    widget_manager->break_line();
 
     if( race_manager->getNumPlayers() == 1 )
     {
@@ -64,11 +63,9 @@ GameMode::GameMode()
         widget_manager->set_wgt_text_size( WTOK_TIMETRIAL, WGT_FNT_MED );
         widget_manager->show_wgt_text( WTOK_TIMETRIAL );
         widget_manager->activate_wgt( WTOK_TIMETRIAL );
-        widget_manager->break_line();
     }
 
     widget_manager->add_wgt(WidgetManager::WGT_NONE, 50, 7);
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_BACK, 50, 7);
     widget_manager->show_wgt_rect( WTOK_BACK );

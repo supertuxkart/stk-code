@@ -41,9 +41,9 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
+    widget_manager->insert_column();
     widget_manager->add_wgt( WTOK_TITLE, 40, 7);
     widget_manager->set_wgt_text( WTOK_TITLE, _("Display Settings"));
-    widget_manager->break_line();
 
     widget_manager->set_initial_activation_state(true);
     widget_manager->add_wgt( WTOK_FULLSCREEN, 40, 7);
@@ -55,13 +55,11 @@ ConfigDisplay::ConfigDisplay()
     {
         widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
     }
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_EMPTY, 40, 2);
     widget_manager->deactivate_wgt( WTOK_EMPTY );
     widget_manager->hide_wgt_rect( WTOK_EMPTY );
     widget_manager->hide_wgt_text( WTOK_EMPTY );
-    widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_QUIT, 40, 7);
     widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));

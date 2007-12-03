@@ -36,6 +36,7 @@ WidgetManager::WidgetManager() :
 m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
 {
     init_fonts();
+    restore_default_states();
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +89,7 @@ bool WidgetManager::add_wgt
 /*    new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;*/
     new_id.widget->m_scroll_speed_y = m_default_scroll_y_speed;
 
+    m_elems.push_back(WidgetElement(ET_WGT, m_widgets.size()));
     m_widgets.push_back(new_id);
 
     return true;
@@ -96,50 +98,52 @@ bool WidgetManager::add_wgt
 //-----------------------------------------------------------------------------
 bool WidgetManager::insert_column()
 {
-    const int NUM_WGTS = m_widgets.size();
-    const int LAST_BREAK = m_breaks.size() - 1;
+    const int LAST_ELEM = m_elems.size() - 1;
+    const int LAST_WGT = m_widgets.size() - 1;
 
-    //Check if we are at the beginning of a line
-    if( NUM_WGTS > 0)
+    if( LAST_ELEM > -1)
     {
-        if( LAST_BREAK < 0 || m_breaks[LAST_BREAK] != NUM_WGTS - 1)
+        if( m_elems[LAST_ELEM].type == ET_WGT )
         {
-            std::cerr << "Warning: tried to add a column that is not at " <<
-                "the beginning of a line, after widget with token " <<
-                m_widgets[NUM_WGTS - 1].token << ".\n";
+            std::cerr << "WARNING: tried to add a column after widget " <<
+                "with token " << m_widgets[LAST_WGT].token << ".\n";
             return false;
         }
-    }
-
-
-    const int NUM_COLUMNS = m_columns.size();
-
-    if( NUM_COLUMNS > 0 )
-    {
-        if( !column_starts(NUM_WGTS) ) m_columns.push_back(NUM_WGTS);
-        else
+        else if ( m_elems[LAST_ELEM].type == ET_WGT )
         {
-            if( NUM_WGTS > 0 )
+            if( LAST_WGT > -1 )
             {
-                //FIXME: check if a column is inside a column instead
-                std::cerr << "Warning: tried to add a column twice at " <<
-                    "widget with token" << m_widgets[NUM_WGTS - 1].token <<
+                std::cerr << "WARNING: tried to add a column twice after " <<
+                    "widget with token " << m_widgets[LAST_WGT].token <<
                     ".\n";
             }
             else
             {
-                std::cerr << "Warning: tried to add a column twice before" <<
-                    "the first widget.\n";
+                std::cerr << "WARNING: tried to add a column twice before" <<
+                    " the first widget.\n";
             }
             return false;
         }
     }
-    else
-    {
-            m_columns.push_back(NUM_WGTS);
-    }
+
+    m_elems.push_back( WidgetElement( ET_COLUMN, 0));
 
     return true;
+}
+
+/** is_column_break() checks if the line break at the given position marks
+ *  the end of a column, assuming that at the position given there is a line
+ *  break. If there is no column returns false.
+ */
+bool WidgetManager::is_column_break( const int BREAK_POS) const
+{
+    for(int i = BREAK_POS - 1; i > -1; --i)
+    {
+        if (m_elems[i].type == ET_BREAK ) return false;
+        else if( m_elems[i].type == ET_COLUMN ) return true;
+    }
+
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,43 +153,51 @@ bool WidgetManager::break_line()
 
     if( LAST_WGT < 0 )
     {
-        std::cerr << "Warning: tried to add a break before adding any " <<
+        std::cerr << "WARNING: tried to add a break before adding any " <<
             "widgets.\n";
         return false;
     }
 
-    const int LAST_COLUMN = m_columns.size() - 1;
-    if( LAST_COLUMN > -1 && m_columns[LAST_COLUMN] == LAST_WGT )
+    const int LAST_ELEM = m_elems.size() - 1;
+    if( m_elems[LAST_ELEM].type == ET_COLUMN )
     {
-        std::cerr << "Warning: tried to add a column with just one widget" <<
-            ".\n";
+        std::cerr << "WARNING: tried to add a break to end a column " <<
+            "with no widgets inside the column, after widget with " <<
+            "token " << m_widgets[LAST_WGT].token << ".\n";
 
-        //The last column is removed, because it would screw up the layout.
-        m_columns.pop_back();
-
+        m_elems.pop_back();
         return false;
     }
 
-    const int NUM_BREAKS = m_breaks.size();
-
-    if( NUM_BREAKS > 0 )
+    if( LAST_ELEM > 0 )//If there are at least two elements
     {
-        if( !line_breaks(LAST_WGT) ) m_breaks.push_back(LAST_WGT);
-        else
+        if( m_elems[LAST_ELEM].type == ET_WGT &&
+            m_elems[LAST_ELEM - 1].type == ET_COLUMN )
         {
-            std::cerr << "Warning: tried to add a break twice after " <<
-                "widget with token" << m_widgets[LAST_WGT].token << ".\n";
+            std::cerr << "WARNING: tried to add a break to end a column " <<
+                "with 1 widget inside the column, after widget with " <<
+                "token " << m_widgets[LAST_WGT].token << ".\n";
+
+            //Remember that vector::end() returns an iterator _past_ the end,
+            //which is why we substract 2, not 1, to remove the column.
+            m_elems.erase(m_elems.end() - 2);
+            return false;
+        }
+
+        if( m_elems[LAST_ELEM].type == ET_BREAK &&
+            !is_column_break( LAST_ELEM ))
+        {
+            std::cerr << "WARNING: tried to add an non-column line break "
+                "twice after widget with token " <<
+                m_widgets[LAST_WGT].token << ".\n";
             return false;
         }
     }
-    else
-    {
-            m_breaks.push_back(LAST_WGT);
-    }
+
+    m_elems.push_back(WidgetElement(ET_BREAK,0));
 
     return true;
 }
-
 
 //-----------------------------------------------------------------------------
 void WidgetManager::reset()
@@ -198,42 +210,9 @@ void WidgetManager::reset()
     }
 
     m_widgets.clear();
+    m_elems.clear();
 
     restore_default_states();
-    m_breaks.clear();
-    m_columns.clear();
-}
-
-//-----------------------------------------------------------------------------
-bool WidgetManager::column_starts( const int WGT ) const
-{
-    const int NUM_COLUMNS = m_columns.size();
-
-    if( NUM_COLUMNS > 0)
-    {
-        for(int i = 0; i < NUM_COLUMNS; ++i )
-        {
-            if( m_columns[i] == WGT ) return true;
-        }
-    }
-
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-bool WidgetManager::line_breaks( const int WGT ) const
-{
-    const int NUM_BREAKS = m_breaks.size();
-
-    if( NUM_BREAKS > 0)
-    {
-        for(int i = 0; i < NUM_BREAKS; ++i )
-        {
-            if( m_breaks[i] == WGT ) return true;
-        }
-    }
-
-    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -292,32 +271,32 @@ void WidgetManager::update(const float DELTA)
  */
 int WidgetManager::calc_width() const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_ELEMS = m_elems.size();
+    int curr_width = 0, total_width = 0;
 
-    int wgt_width;
-    int curr_width = 0;
-    int total_width = 0;
-
-    for( int i = 0; i < NUM_WIDGETS; ++i )
+    for( int i = 0; i < NUM_ELEMS; ++i )
     {
-        wgt_width = m_widgets[i].widget->m_width;
-        curr_width += wgt_width;
-
-        if( line_breaks(i) )
+        switch( m_elems[i].type)
         {
+        case ET_WGT:
+            curr_width += m_widgets[ m_elems[i].pos ].widget->m_width;
+            break;
+
+        case ET_BREAK:
             if( curr_width > total_width ) total_width = curr_width;
             curr_width = 0;
-        }
+            break;
 
-        if( column_starts(i) )
-        {
+        case ET_COLUMN:
             curr_width = calc_column_width(i);
 
             //Jump to the next line break
-            for(; i < NUM_WIDGETS; ++i)
+            while( i < NUM_ELEMS )
             {
-                if( line_breaks(i) ) break;
+                ++i;
+                if( m_elems[i].type == ET_BREAK) break;
             }
+            break;
         }
     }
 
@@ -331,14 +310,14 @@ int WidgetManager::calc_width() const
  */
 int WidgetManager::calc_height() const
 {
-    const int NUM_WIDGETS = m_widgets.size();
-    if( NUM_WIDGETS < 0 ) return 0;
+    const int NUM_ELEMS = m_elems.size();
+    if( NUM_ELEMS < 0 ) return 0;
 
     int total_height = calc_line_height(0);
-
-    for( int i = 1; i < NUM_WIDGETS; ++i )
+    for( int i = 1; i < NUM_ELEMS; ++i )
     {
-        if( line_breaks(i-1) )
+        if( m_elems[i-1].type == ET_BREAK &&
+            !is_column_break( i-1 ))
         {
             total_height += calc_line_height(i);
         }
@@ -441,11 +420,6 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         break;
     }
 
-    //m_y should be the bottom value of the widgets, because that's the way
-    //OpenGL handles the y-axis.
-
-//TODO: fix if m_x or m_y is bigger than the screen.
-
     //This formula seems not to have much theory behind it, we pick the
     //smallest from the screen height and width because if we pick the
     //biggest one, it might look bad for the smaller one, but it doesn't
@@ -454,100 +428,102 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     //divided by 60 minutes? The formula was taken from the old Widget Set.
     const int RADIUS = ( SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH ) / 60;
 
-    //The widgets positions given are for the lower left corner.
+    /* In this loop we give each widget it's true position on the screen and
+     * create their rect; we start at the position where the first widget
+     * will be, and move right first and down on breaks if the widget is
+     * outside of a column, and inside columns we move down first and right
+     * at breaks. The position used is the top left corner of the widget or
+     * column, and is moved to the bottom left corner just to create the
+     * rect, then we move to the top left corner of the next widget. Widgets
+     * are centered in the X-axis around their line(if outside a column), or
+     * around their column(if inside one), but always are stuck to the top
+     * of their line/column.
+     */
+
+    //Position the first widget, these coordinates are for the top left
+    //corner of the first widget.
     int widget_x = m_x + ( WGTS_WIDTH - calc_line_width( 0 )) / 2;
-    int widget_y = m_y - m_widgets[0].widget->m_height;
+    int widget_y = m_y;
 
-    bool column_begins = false;
-    int column_first_wgt = WGT_NONE;
+    const int NUM_ELEMS = m_elems.size();
+    int line_pos = 0;
+    int column_pos = -1;
+    int curr_wgt = 0;
 
-    //The important part of the function: give each widget it's true position
-    //on the screen and create their rect.
-    for( int i = 0; i < NUM_WIDGETS; ++i )
+    for( int i = 0; i < NUM_ELEMS; ++i )
     {
-        //Assign the widget's position
-        m_widgets[i].widget->m_x = widget_x;
-        m_widgets[i].widget->m_y = widget_y;
-
-        //Create widget's rect
-        if( !(m_widgets[i].widget->create_rect(RADIUS)) )
+        switch( m_elems[i].type )
         {
-            return false;
-        }
+        case ET_WGT:
+            curr_wgt = m_elems[i].pos;
 
-
-        //Calculate the position of the next widget; this is not done if
-        //there are no more widgets left.
-        if( i + 1 < NUM_WIDGETS )
-        {
-            //Check if the i widget is the start of a column
-            column_begins = column_starts(i);
-            if( column_begins ) column_first_wgt = i;
-
-            //Column handling
-            if( column_first_wgt != WGT_NONE )
+            if( column_pos != -1 )
             {
-                //Line breaks inside columns mark the end of them, so they
-                //behave differently if they are inside or outside of a
-                //column
-                if( line_breaks(i) )
-                {
-                    widget_x += calc_column_width(column_first_wgt);
-
-                    //Move the y pos back to the same height of the first wgt
-                    //of the column.
-                    widget_y += calc_column_height(column_first_wgt) -
-                        m_widgets[i].widget->m_height;
-
-                    if(!column_begins) column_first_wgt = WGT_NONE;
-                }
-                else
-                {
-                    widget_y -= m_widgets[i].widget->m_height;
-                }
+                //If we are inside a column, we need to recalculate the X
+                //position so the widget is centered around the column
+                const int CENTERED_POS = ( calc_column_width( column_pos ) -
+                    m_widgets[curr_wgt].widget->m_width) / 2;
+                widget_x += CENTERED_POS;
             }
-            else //What to do if we are not into a column
+
+            //Move the position to the widget's bottom left corner, since
+            //that's what the create_rect() function expects.
+            widget_y -= m_widgets[curr_wgt].widget->m_height;
+
+            //Assign the widget's position
+            m_widgets[curr_wgt].widget->m_x = widget_x;
+            m_widgets[curr_wgt].widget->m_y = widget_y;
+
+            //Create widget's rect
+            if( !(m_widgets[curr_wgt].widget->create_rect(RADIUS)) )
             {
-                if( line_breaks(i) )
-                {
-                    const int CENTERED_POS = (WGTS_WIDTH -
-                        calc_line_width( i+1 )) / 2;
-                    widget_x = m_x + CENTERED_POS;
-                    widget_y -= m_widgets[i+1].widget->m_height;
-                }
-                else
-                {
-                    widget_x += m_widgets[i].widget->m_width;
-                }
+                return false;
             }
-            //----
-            #if 0
-            if( line_breaks(i) )
-            {
-                widget_x = m_x + ( WGTS_WIDTH - calc_line_width( i+1 )) / 2;
 
-                if( inside_column )
-                {
-                    widget_y += column_height;
-                    inside_column = false;
-                }
-
-                widget_y -= m_widgets[i].widget->m_height;
-            }
-            else if( inside_column )
+            if( column_pos == -1 )
             {
-                widget_y -= m_widgets[i].widget->m_height;
+                //If we are not inside a column, move the position to the
+                //top left corner of the next widget.
+                widget_x += m_widgets[curr_wgt].widget->m_width;
+                widget_y += m_widgets[curr_wgt].widget->m_height;
             }
-            else widget_x += m_widgets[i].widget->m_width;
-
-            if( column_starts(i) )
+            else
             {
-                widget_y -= m_widgets[i].widget->m_height;
-                widget_x -= m_widgets[i].widget->m_width;
-                column_height = calc_column_height(i);
-                inside_column = true;
+                //If we are inside a column, we need to move back to the
+                //columns' X position
+                const int CENTERED_POS = ( calc_column_width( column_pos ) -
+                    m_widgets[curr_wgt].widget->m_width) / 2;
+                widget_x -= CENTERED_POS;
             }
-            #endif
+
+            break;
+
+        case ET_BREAK:
+            if( column_pos == -1 )
+            {
+                //If we are not inside a column, move to the next line
+                const int CENTERED_POS = (WGTS_WIDTH -
+                    calc_line_width( i+1 )) / 2;
+                widget_x = m_x + CENTERED_POS;
+
+                widget_y -= calc_line_height(line_pos);
+
+                line_pos = i + 1;
+            }
+            else
+            {
+                //If we are inside a column, move to the next widget in the
+                //same line
+                widget_x += calc_column_width(column_pos);
+                widget_y += calc_column_height(column_pos);
+
+                column_pos = -1;
+            }
+            break;
+
+        case ET_COLUMN:
+            column_pos = i;
+            break;
         }
     }
 
@@ -565,23 +541,33 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_line_width( const int START_WGT ) const
+int WidgetManager::calc_line_width( const int START_ELEM ) const
 {
+    int curr_wgt;
     int total_width = 0;
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_ELEMS = m_elems.size();
 
-    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
-        if( column_starts(i) )
+        switch( m_elems[i].type )
         {
+        case ET_WGT:
+            curr_wgt = m_elems[i].pos;
+            total_width += m_widgets[curr_wgt].widget->m_width;
+            break;
+
+        case ET_BREAK:
+            return total_width;
+
+        case ET_COLUMN:
             total_width += calc_column_width(i);
 
-            while( !line_breaks(i) && i < NUM_WIDGETS ) ++i;
-        }
-        else
-        {
-            total_width += m_widgets[i].widget->m_width;
-            if( line_breaks(i) ) break;
+            while( i < NUM_ELEMS )
+            {
+                ++i;
+                if( m_elems[i].type == ET_BREAK ) break;
+            }
+            break;
         }
     }
 
@@ -589,62 +575,85 @@ int WidgetManager::calc_line_width( const int START_WGT ) const
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_line_height( const int START_WGT ) const
+int WidgetManager::calc_line_height( const int START_ELEM ) const
 {
+    int curr_wgt;
     int line_height = 0;
     int column_height;
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_ELEMS = m_elems.size();
 
-    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
-        if( line_height < m_widgets[i].widget->m_height )
+        switch( m_elems[i].type )
         {
-            line_height = m_widgets[i].widget->m_height;
-        }
+        case ET_WGT:
+            curr_wgt = m_elems[i].pos;
+            if( line_height < m_widgets[curr_wgt].widget->m_height )
+            {
+                line_height = m_widgets[curr_wgt].widget->m_height;
+            }
+            break;
 
-        if( column_starts(i) )
-        {
+        case ET_BREAK:
+            return line_height;
+
+        case ET_COLUMN:
             column_height = calc_column_height(i);
+
             if( line_height < column_height )
             {
                 line_height = column_height;
             }
-        }
 
-        if( line_breaks(i) ) break;
+            while( i < NUM_ELEMS )
+            {
+                ++i;
+                if( m_elems[i].type == ET_BREAK ) break;
+            }
+        }
     }
 
     return line_height;
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_column_width(const int START_WGT) const
+int WidgetManager::calc_column_width(const int START_ELEM) const
 {
+    int curr_wgt;
     int column_width = 0;
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_ELEMS = m_elems.size();
 
-    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
-        if( column_width < m_widgets[i].widget->m_width )
+        if( m_elems[i].type == ET_WGT )
         {
-            column_width = m_widgets[i].widget->m_width;
+            curr_wgt = m_elems[i].pos;
+            if( column_width < m_widgets[curr_wgt].widget->m_width )
+            {
+                column_width = m_widgets[curr_wgt].widget->m_width;
+            }
         }
-        if( line_breaks(i) ) break;
+        else if (m_elems[i].type == ET_BREAK ) return column_width;
     }
 
     return column_width;
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_column_height(const int START_WGT) const
+int WidgetManager::calc_column_height(const int START_ELEM) const
 {
+    int curr_wgt;
     int total_height = 0;
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_ELEMS = m_elems.size();
 
-    for( int i = START_WGT; i < NUM_WIDGETS; ++i )
+    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
-        total_height += m_widgets[i].widget->m_height;
-        if( line_breaks(i) ) break;
+        if( m_elems[i].type == ET_WGT )
+        {
+            curr_wgt = m_elems[i].pos;
+            total_height += m_widgets[curr_wgt].widget->m_height;
+        }
+        else if (m_elems[i].type == ET_BREAK ) return total_height;
     }
 
     return total_height;
@@ -658,7 +667,7 @@ void WidgetManager::set_selected_wgt(const int TOKEN)
     {
         m_selected_wgt_token = TOKEN;
     }
-    else std::cerr << "Warning: tried to select unnamed widget with " <<
+    else std::cerr << "WARNING: tried to select unnamed widget with " <<
         "token " << TOKEN << '\n';
 }
 
@@ -755,7 +764,7 @@ void WidgetManager::activate_wgt(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].active = true;
     else
     {
-        std::cerr << "Warning: tried to activate unnamed widget with token "
+        std::cerr << "WARNING: tried to activate unnamed widget with token "
             << TOKEN << '\n';
     }
 }
@@ -767,7 +776,7 @@ void WidgetManager::deactivate_wgt(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].active = false;
     else
     {
-        std::cerr << "Warning: tried to deactivate unnamed widget with " <<
+        std::cerr << "WARNING: tried to deactivate unnamed widget with " <<
             TOKEN << '\n';
     }
 }
@@ -779,7 +788,7 @@ void WidgetManager::set_wgt_color(const int TOKEN, const GLfloat *COLOR)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_rect_color = COLOR;
     else
     {
-        std::cerr << "Warning: tried to change the rect color of an " <<
+        std::cerr << "WARNING: tried to change the rect color of an " <<
             "unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -791,7 +800,7 @@ void WidgetManager::set_wgt_round_corners(const int TOKEN, const WidgetArea CORN
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_round_corners = CORNERS;
     else
     {
-        std::cerr << "Warning: tried to change the round corners of an " <<
+        std::cerr << "WARNING: tried to change the round corners of an " <<
             "unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -802,7 +811,7 @@ void WidgetManager::show_wgt_rect(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = true;
     else
     {
-        std::cerr << "Warning: tried to show the rect of an unnamed widget "
+        std::cerr << "WARNING: tried to show the rect of an unnamed widget "
             << "with token " << TOKEN << '\n';
     }
 }
@@ -814,7 +823,7 @@ void WidgetManager::hide_wgt_rect(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = false;
     else
     {
-        std::cerr << "Warning: tried to hide the rect of an unnamed widget "
+        std::cerr << "WARNING: tried to hide the rect of an unnamed widget "
             << "with token " << TOKEN << '\n';
     }
 }
@@ -834,7 +843,7 @@ void WidgetManager::set_wgt_texture(const int TOKEN, const int TEXTURE)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_texture = TEXTURE;
     else
     {
-        std::cerr << "Warning: tried to set the texture of an unnamed " <<
+        std::cerr << "WARNING: tried to set the texture of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -846,7 +855,7 @@ void WidgetManager::show_wgt_texture(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = true;
     else
     {
-        std::cerr << "Warning: tried to show the texture of an unnamed " <<
+        std::cerr << "WARNING: tried to show the texture of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -858,7 +867,7 @@ void WidgetManager::hide_wgt_texture(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = false;
     else
     {
-        std::cerr << "Warning: tried to hide the texture of an unnamed " <<
+        std::cerr << "WARNING: tried to hide the texture of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -878,7 +887,7 @@ void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
     else
     {
-        std::cerr << "Warning: tried to set text to an unnamed widget " <<
+        std::cerr << "WARNING: tried to set text to an unnamed widget " <<
             "with token " << TOKEN << '\n';
     }
 }
@@ -890,7 +899,7 @@ void WidgetManager::set_wgt_text( const int TOKEN, const std::string TEXT )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
     else
     {
-        std::cerr << "Warning: tried to set the text of an unnamed widget with " <<
+        std::cerr << "WARNING: tried to set the text of an unnamed widget with " <<
             "token " << TOKEN << '\n';
     }
 }
@@ -902,7 +911,7 @@ void WidgetManager::set_wgt_text_size( const int TOKEN, const WidgetFontSize SIZ
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_size = SIZE;
     else
     {
-        std::cerr << "Warning: tried to set the text size of an unnamed " <<
+        std::cerr << "WARNING: tried to set the text size of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -914,7 +923,7 @@ void WidgetManager::show_wgt_text( const int TOKEN )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = true;
     else
     {
-        std::cerr << "Warning: tried to show the text of an unnamed " <<
+        std::cerr << "WARNING: tried to show the text of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -926,7 +935,7 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = false;
     else
     {
-        std::cerr << "Warning: tried to hide the text of an unnamed widget " <<
+        std::cerr << "WARNING: tried to hide the text of an unnamed widget " <<
             "with token " << TOKEN << '\n';
     }
 }
@@ -936,7 +945,7 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_text();
-    else std::cerr << "Warning: tried to toggle the text of an unnamed widget with token " << TOKEN << '\n';
+    else std::cerr << "WARNING: tried to toggle the text of an unnamed widget with token " << TOKEN << '\n';
 }*/
 
 //-----------------------------------------------------------------------------
@@ -946,7 +955,7 @@ void WidgetManager::set_wgt_text_x_alignment( const int TOKEN, const Font::FontA
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_x_alignment = ALIGN;
     else
     {
-        std::cerr << "Warning: tried to set the X alignment of text of " <<
+        std::cerr << "WARNING: tried to set the X alignment of text of " <<
             "an unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -958,7 +967,7 @@ void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontA
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_y_alignment = ALIGN;
     else
     {
-        std::cerr << "Warning: tried to set the Y alignment of text of " <<
+        std::cerr << "WARNING: tried to set the Y alignment of text of " <<
             "an unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -970,7 +979,7 @@ void WidgetManager::enable_wgt_scroll( const int TOKEN )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = true;
     else
     {
-        std::cerr << "Warning: tried to enable scrolling of an unnamed " <<
+        std::cerr << "WARNING: tried to enable scrolling of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -982,7 +991,7 @@ void WidgetManager::disable_wgt_scroll( const int TOKEN )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = false;
     else
     {
-        std::cerr << "Warning: tried to disable scrolling of an unnamed " <<
+        std::cerr << "WARNING: tried to disable scrolling of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }
@@ -1002,7 +1011,7 @@ void WidgetManager::set_wgt_y_scroll_pos( const int TOKEN, const int POS )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_y = POS;
     else
     {
-        std::cerr << "Warning: tried to set the Y scroll position of an " <<
+        std::cerr << "WARNING: tried to set the Y scroll position of an " <<
             "unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -1022,7 +1031,7 @@ void WidgetManager::set_wgt_y_scroll_speed( const int TOKEN, const int SPEED )
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
     else
     {
-        std::cerr << "Warning: tried to set the Y scroll speed of an " <<
+        std::cerr << "WARNING: tried to set the Y scroll speed of an " <<
             "unnamed widget with token " << TOKEN << '\n';
     }
 }
@@ -1035,7 +1044,7 @@ void WidgetManager::pulse_wgt(const int TOKEN) const
     if( ID != WGT_NONE ) m_widgets[ID].widget->pulse();
     else
     {
-        std::cerr << "Warning: tried to pulse unnamed widget with token " <<
+        std::cerr << "WARNING: tried to pulse unnamed widget with token " <<
             TOKEN << '\n';
     }
 }
@@ -1047,7 +1056,7 @@ void WidgetManager::lighten_wgt_color(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->lighten_color();
     else
     {
-        std::cerr << "Warning: tried to lighten an unnamed widget with " <<
+        std::cerr << "WARNING: tried to lighten an unnamed widget with " <<
             "token " << TOKEN << '\n';
     }
 }
@@ -1059,7 +1068,7 @@ void WidgetManager::darken_wgt_color(const int TOKEN)
     if( ID != WGT_NONE ) m_widgets[ID].widget->darken_color();
     else
     {
-        std::cerr << "Warning: tried to darken an unnamed widget with " <<
+        std::cerr << "WARNING: tried to darken an unnamed widget with " <<
             "token " << TOKEN << '\n';
     }
 }

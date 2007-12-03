@@ -41,9 +41,9 @@ ConfigSound::ConfigSound()
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
+    widget_manager->insert_column();
     widget_manager->add_wgt(WTOK_TITLE, 40, 7);
     widget_manager->set_wgt_text( WTOK_TITLE, _("Sound Settings"));
-    widget_manager->break_line();
 
     widget_manager->set_initial_activation_state(true);
     widget_manager->add_wgt(WTOK_MUSIC, 40, 7);
@@ -55,7 +55,6 @@ ConfigSound::ConfigSound()
     {
         widget_manager->set_wgt_text( WTOK_MUSIC, _("Turn on music"));
     }
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_SFX, 40, 7);
     if( user_config->doSFX() )
@@ -66,18 +65,15 @@ ConfigSound::ConfigSound()
     {
         widget_manager->set_wgt_text( WTOK_SFX, _("Turn on sound effects"));
     }
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_EMPTY, 40, 5);
     widget_manager->deactivate_wgt(WTOK_EMPTY);
     widget_manager->hide_wgt_rect(WTOK_EMPTY);
     widget_manager->hide_wgt_text(WTOK_EMPTY);
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_QUIT, 40, 7);
     widget_manager->set_wgt_text( WTOK_QUIT,  _("Press <ESC> to go back"));
     widget_manager->set_wgt_text_size(WTOK_QUIT, WGT_FNT_SML);
-    widget_manager->break_line();
 
     widget_manager->layout(WGT_AREA_ALL);
 }

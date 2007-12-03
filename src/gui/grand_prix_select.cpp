@@ -49,9 +49,9 @@ GrandPrixSelect::GrandPrixSelect()
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
 
+    widget_manager->insert_column();
     widget_manager->add_wgt(WTOK_TITLE, 40, 7);
     widget_manager->set_wgt_text(WTOK_TITLE,  _("Choose a Grand Prix"));
-    widget_manager->break_line();
 
     std::set<std::string> result;
     loader->listFiles(result, "data");
@@ -77,7 +77,6 @@ GrandPrixSelect::GrandPrixSelect()
                 {
                     widgetSet -> state(m_menu_id, cup.getName(), GUI_SML, nId, 0);
                 }*/
-                widget_manager->break_line();
                 nId++;
             }   // if
         }   // for i
@@ -86,18 +85,15 @@ GrandPrixSelect::GrandPrixSelect()
     widget_manager->add_wgt(WTOK_EMPTY0, 60, 7);
     widget_manager->hide_wgt_rect(WTOK_EMPTY0);
     widget_manager->hide_wgt_text(WTOK_EMPTY0);
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_DESCRIPTION, 80, 7);
     widget_manager->hide_wgt_rect(WTOK_DESCRIPTION);
     widget_manager->set_wgt_text(WTOK_DESCRIPTION, _("No Grand Prix selected"));
     widget_manager->set_wgt_text_size(WTOK_DESCRIPTION, WGT_FNT_SML);
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_EMPTY1, 60, 7);
     widget_manager->hide_wgt_rect(WTOK_EMPTY1);
     widget_manager->hide_wgt_text(WTOK_EMPTY1);
-    widget_manager->break_line();
 
     widget_manager->add_wgt(WTOK_QUIT, 60, 7);
     widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));

@@ -55,9 +55,30 @@ class WidgetManager
         Widget *widget;
     };
 
+    //The point of adding 'elements' is to use a vector to keep the order
+    enum ElementTypes
+    {
+        ET_WGT,
+        ET_BREAK,
+        ET_COLUMN
+    };
+
+    /* I decided to waste one integer per break/column with the wgt_pos
+     * variable inside the WidgetElement struct, since otherwise we
+     * would need 2 vectors for breaks and columns, which would use more
+     * memory, be slower and be more complex than this. -Coz
+     */
+    struct WidgetElement
+    {
+        ElementTypes type;
+        int pos; //If the element is a widget, the position fo the widget
+                 //in it's vector
+
+        WidgetElement(ElementTypes _type, int _pos):type(_type), pos(_pos){};
+    };
+
+    std::vector<WidgetElement> m_elems;
     std::vector<WidgetID> m_widgets;
-    std::vector<int> m_breaks;
-    std::vector<int> m_columns;
 
     int m_x;
     int m_y;
@@ -83,17 +104,15 @@ class WidgetManager
 /*    int m_default_scroll_x_speed;*/
     int m_default_scroll_y_speed;
 
-    bool column_starts( const int WGT ) const;
-    bool line_breaks( const int WGT ) const;
-    int get_next_line_break(const int START_WGT) const;
+    bool is_column_break( const int BREAK_POST ) const;
 
     int find_id(const int TOKEN) const;
     int calc_width() const;
     int calc_height() const;
-    int calc_line_width(const int START_WGT) const;
-    int calc_line_height(const int START_WGT) const;
-    int calc_column_width(const int START_WGT) const;
-    int calc_column_height(const int START_WGT) const;
+    int calc_line_width(const int START_ELEM) const;
+    int calc_line_height(const int START_ELEM) const;
+    int calc_column_width(const int START_ELEM) const;
+    int calc_column_height(const int START_ELEM) const;
 
     int find_left_widget(const int START_WGT) const;
     int find_right_widget(const int START_WGT) const;
