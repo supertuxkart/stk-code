@@ -293,8 +293,8 @@ int WidgetManager::calc_width() const
             //Jump to the next line break
             while( i < NUM_ELEMS )
             {
-                ++i;
                 if( m_elems[i].type == ET_BREAK) break;
+                ++i;
             }
             break;
         }
@@ -586,8 +586,8 @@ int WidgetManager::calc_line_width( const int START_ELEM ) const
 
             while( i < NUM_ELEMS )
             {
-                ++i;
                 if( m_elems[i].type == ET_BREAK ) break;
+                ++i;
             }
             break;
         }
