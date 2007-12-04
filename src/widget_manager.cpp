@@ -348,6 +348,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         std::cerr << "WARNING: called layout with WGT_AREA_NONE.\n";
         return false;
     }
+    prev_layout_pos = POSITION;
 
     const int NUM_WIDGETS = m_widgets.size();
     if( NUM_WIDGETS < 0 ) return true;
