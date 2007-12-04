@@ -49,7 +49,7 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->add_wgt( WTOK_FULLSCREEN, 40, 7);
     if(user_config->m_fullscreen)
     {
-        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
+        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Window mode"));
     }
     else
     {
