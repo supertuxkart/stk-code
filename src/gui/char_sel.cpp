@@ -185,7 +185,7 @@ void CharSel::update(float dt)
 //----------------------------------------------------------------------------
 void CharSel::select()
 {
-    const int TOKEN = 0;
+    const int TOKEN = widget_manager->get_selected_wgt() - WTOK_RACER0;
     const KartProperties* KP = kart_properties_manager->getKartById(TOKEN);
     if (KP != NULL)
     {
