@@ -630,8 +630,8 @@ int WidgetManager::calc_line_height( const int START_ELEM ) const
 
             while( i < NUM_ELEMS )
             {
-                ++i;
                 if( m_elems[i].type == ET_BREAK ) break;
+                ++i;
             }
         }
     }
