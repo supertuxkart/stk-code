@@ -669,6 +669,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\actionmap.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\attachment.cpp"
 				>
 			</File>
@@ -722,10 +726,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\inputmap.cpp"
 				>
 			</File>
 			<File
@@ -1023,6 +1023,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\actionmap.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\attachment.hpp"
 				>
 			</File>
@@ -1088,10 +1092,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\inputmap.hpp"
 				>
 			</File>
 			<File
