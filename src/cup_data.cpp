@@ -44,6 +44,7 @@ CupData::CupData(const std::string filename_)
         lisp->get      ("description", m_description );
         lisp->get      ("herring",     m_herring_style);
         lisp->getVector("tracks",      m_tracks      );
+        lisp->getVector("laps",        m_laps        );
     }
     catch(std::exception& err)
     {

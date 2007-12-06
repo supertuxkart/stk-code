@@ -39,6 +39,9 @@ class CupData
         means the filename of the .track file without .track extension
         (ie. 'volcano') */
     std::vector<std::string> m_tracks;
+    /** The number of laps that each track should be raced, in the right
+     * order*/
+    std::vector<int> m_laps;
 
 public:
 
@@ -51,6 +54,7 @@ public:
     const std::string& getFilename    ()  const { return m_filename;    }
     const std::string& getTrack(size_t track_index) const { assert(track_index < m_tracks.size()); return m_tracks[track_index]; }
     size_t             getTrackCount() const    { return m_tracks.size(); }
+    const int&         getLaps(size_t lap_index) const { assert(lap_index < m_tracks.size()); return m_laps[lap_index]; }
 }
 ;   // CupData
 

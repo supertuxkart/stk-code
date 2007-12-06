@@ -3,6 +3,8 @@
 (supertuxkart-cup
  (name "All Island Tracks")
  (description "All three tracks on Islands")
- (tracks "beach" "lighthouse" "islandtrack" ))
+ (tracks "beach" "lighthouse" "islandtrack" )
+ (laps      2         4             2)
+)
 
 ;; EOF ;;

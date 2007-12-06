@@ -3,6 +3,8 @@
 (supertuxkart-cup
  (name "All tracks")
  (description "All 13 tracks included in SuperTuxKart")
- (tracks "beach" "startrack" "lighthouse" "volcano" "gownsbow" "islandtrack" "bsodcastle" "geekopeak" "littlevolcano" "olivermath" "race" "subseatrack" "tuxtrack"))
+ (tracks "beach" "startrack" "lighthouse" "volcano" "gownsbow" "islandtrack" "bsodcastle" "geekopeak" "littlevolcano" "olivermath" "race" "subseatrack" "tuxtrack")
+ (laps      2         3            4          3          2          2             3            3            3               4         5         3            2)
+)
 
 ;; EOF ;;
