@@ -20,7 +20,10 @@
 #ifndef HEADER_CONFIGDISPLAY_H
 #define HEADER_CONFIGDISPLAY_H
 
+#include <vector>
+
 #include "base_gui.hpp"
+#include "translation.hpp"
 
 class ConfigDisplay: public BaseGUI
 {
@@ -33,6 +36,14 @@ public:
 
 private:
     int m_fullscreen_menu_id;
+    
+    std::vector<std::pair<int,int> > m_sizes;
+    int m_sizes_index;
+    int m_sizes_size;
+    char m_resolution[MAX_MESSAGE_LENGTH];
+    
+    void changeResolution(int width, int height);
+    void getScreenModes();
 };
 
 #endif

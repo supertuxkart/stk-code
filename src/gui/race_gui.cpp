@@ -130,7 +130,7 @@ RaceGUI::handle(GameAction ga, int value)
 		// to reload all textures, display lists etc. Fullscreen can
 		// be toggled from the main menu (options->display).
 		case GA_TOGGLE_FULLSCREEN:
-			drv_toggleFullscreen(0);   // 0: do not reset textures
+			drv_toggleFullscreen(false);   // 0: do not reset textures
 			// Fall through to put the game into pause mode.
 #endif
 		case GA_LEAVE_RACE:

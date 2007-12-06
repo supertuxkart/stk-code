@@ -103,7 +103,7 @@ hidePointer()
   SDL_ShowCursor(SDL_DISABLE);
 }
 //-----------------------------------------------------------------------------
-void drv_toggleFullscreen(int resetTextures)
+void drv_toggleFullscreen(bool resetTextures)
 {
     user_config->m_fullscreen = !user_config->m_fullscreen;
 
@@ -118,7 +118,14 @@ void drv_toggleFullscreen(int resetTextures)
     }
     else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
         hidePointer();
+        
+    setVideoMode(resetTextures);
+}
 
+//-----------------------------------------------------------------------------
+void setVideoMode(bool resetTextures)
+{
+    //Is SDL_FreeSurface necessary? SDL wiki says not??
     SDL_FreeSurface(mainSurface);
     mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
 

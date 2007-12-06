@@ -97,11 +97,11 @@ void MenuManager::update()
     if (m_handled_size != m_menu_stack.size())
     {
         if (m_RaceGUI
-			&& m_current_menu == m_RaceGUI)
+            && m_current_menu == m_RaceGUI)
         {
           m_RaceGUI = 0;
-		  drv_setMode(MENU);
-		}
+          drv_setMode(MENU);
+        }
 
         delete m_current_menu;
         m_current_menu= NULL;
@@ -206,6 +206,16 @@ void MenuManager::update()
         m_current_menu->update(now.getDeltaTime());
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+//Used to create a new instance of the present menu, which updates the widgets
+//text and/or location, if they have been changed by selecting an entry in the menu. 
+//eg: after a change of screen resolution
+
+void MenuManager::refreshMenu()
+{
+        widget_manager->layout();
+}
 
 //-----------------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()

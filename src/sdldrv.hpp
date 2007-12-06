@@ -47,7 +47,8 @@ struct StickInfo {
 void drv_init();
 void drv_deinit();
 
-void drv_toggleFullscreen(int resetTextures=1);
+void drv_toggleFullscreen(bool resetTextures=1);
+void setVideoMode(bool resetTextures=1);
 
 void drv_loop();
 

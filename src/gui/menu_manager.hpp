@@ -73,6 +73,7 @@ public:
     void switchToGrandPrixEnding();
     void switchToRace();
     void switchToMainMenu();
+    void refreshMenu();
 
     // use this function within menu classes
     void pushMenu(MenuManagerIDs id);
