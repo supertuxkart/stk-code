@@ -76,12 +76,12 @@ public:
     void refreshMenu();
 
     // use this function within menu classes
-    void pushMenu(MenuManagerIDs id);
+    void pushMenu(MenuManagerIDs);
     void popMenu();
 
     int getMenuStackSize() {return (int)m_menu_stack.size();}
 
-    bool isCurrentMenu(MenuManagerIDs id) {return (m_menu_stack.back() == id);}
+    bool isCurrentMenu(MenuManagerIDs id) {return (m_menu_stack.back().first == id);}
     bool isSomewhereOnStack(MenuManagerIDs id);
     BaseGUI* getCurrentMenu() const {return m_current_menu;}
     RaceGUI* getRaceMenu   () const {return (RaceGUI*)m_RaceGUI;}
@@ -89,7 +89,7 @@ public:
     void update();
 
 private:
-    std::vector<MenuManagerIDs> m_menu_stack;
+    std::vector< std::pair<MenuManagerIDs, int> > m_menu_stack;
     BaseGUI* m_current_menu;
     BaseGUI* m_RaceGUI;
     unsigned int m_handled_size;

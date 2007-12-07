@@ -50,6 +50,8 @@
 #include "user_config.hpp"
 #include "widget_manager.hpp"
 
+using namespace std;
+
 MenuManager* menu_manager= new MenuManager();
 
 MenuManager::MenuManager()
@@ -66,9 +68,18 @@ MenuManager::~MenuManager()
 }
 
 //-----------------------------------------------------------------------------
+/** Puts the given menu into the menu stack and saves the widgetToken of
+  * the last selected widget for later reactivation.
+ */
 void MenuManager::pushMenu(MenuManagerIDs id)
 {
-    // used to suppress select-sound on startup
+	// If there is already an element then this is the one for the menu
+	// which is still visible. We store its currently selected widget
+	// therein.
+	if (m_menu_stack.size())
+		m_menu_stack.back().second = widget_manager->get_selected_wgt();
+
+	// used to suppress select-sound on startup
     static bool is_startup = true;
 
     if( MENUID_EXITGAME == id )
@@ -80,14 +91,21 @@ void MenuManager::pushMenu(MenuManagerIDs id)
         if( !is_startup ) sound_manager->playSfx(SOUND_SELECT_MENU);
         else is_startup = false;
     }
-    m_menu_stack.push_back(id);
+
+	// Creates a new entry for the to be displayed menu.
+	pair <MenuManagerIDs, int> element;
+	element.first = id;
+	element.second = WidgetManager::WGT_NONE;
+	
+    m_menu_stack.push_back(element);
 }
 
 //-----------------------------------------------------------------------------
 void MenuManager::popMenu()
 {
     sound_manager->playSfx(SOUND_BACK_MENU);
-    m_menu_stack.pop_back();
+	
+	m_menu_stack.pop_back();
 }
 
 //-----------------------------------------------------------------------------
@@ -109,7 +127,10 @@ void MenuManager::update()
         m_handled_size= m_menu_stack.size();
         if (m_handled_size > 0)
         {
-            MenuManagerIDs id= m_menu_stack.back();
+			pair<MenuManagerIDs, int> saved = m_menu_stack.back();
+            MenuManagerIDs id = saved.first;
+			int saved_widget = saved.second;
+			
             switch (id)
             {
             case MENUID_MAINMENU:
@@ -191,7 +212,13 @@ void MenuManager::update()
                 break;
             }   // switch
 
-            if( widget_manager->get_selected_wgt() != WidgetManager::WGT_NONE )
+			// Restores the previously selected widget if there was one.
+			if (saved_widget != WidgetManager::WGT_NONE)
+			{
+				widget_manager->lighten_wgt_color( saved_widget );
+				widget_manager->pulse_wgt( saved_widget );
+				widget_manager->set_selected_wgt(saved_widget);
+			} else if( widget_manager->get_selected_wgt() != WidgetManager::WGT_NONE )
             {
                 widget_manager->lighten_wgt_color(widget_manager->get_selected_wgt());
             }
@@ -244,8 +271,13 @@ void MenuManager::switchToRace()
 // if the config_display menu was called from the race_gui, or main_menu
 bool MenuManager::isSomewhereOnStack(MenuManagerIDs id)
 {
-    return std::find(m_menu_stack.begin(), m_menu_stack.end(), id) !=
-           m_menu_stack.end();
+	for(vector<pair<MenuManagerIDs,int> >::iterator i = m_menu_stack.begin(); i != m_menu_stack.end(); i++)
+	{
+		if ((*i).first == id)
+			return true;
+	}
+	
+	return false;
 }   // isSomewhereOnStack
 
 // -----------------------------------------------------------------------------
