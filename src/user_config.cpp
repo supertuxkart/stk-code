@@ -40,6 +40,7 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "translation.hpp"
+#include "race_manager.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -903,8 +904,40 @@ UserConfig::newMenuActionMap()
 ActionMap *
 UserConfig::newIngameActionMap()
 {
-	ActionMap *am = newActionMap(GA_FIRST_INGAME, GA_LAST_INGAME);
+	// This is rather unfriendly hack but work quite effective:
+	// In order to prevent the input driver from handling input mappings
+	// for human players which are not in the current game we select a subset
+	// of the game actions by looking at the amount of players. The
+	// race_manager instance is assumed to be available at this time because
+	// this method is called immediately before the RaceGUI instance is created
+	// (in MenuManager) and RaceGUI needs race_manager, too.
+
+  // TODO: Reorder ingame GameAction values so that they start with
+  // the fixed ones. This would allow simpler looking code here. 
+
+	GameAction gaEnd;
 	
+	switch (race_manager->getNumPlayers())
+	{
+		case 1:
+			gaEnd = GA_P1_LOOK_BACK; break;
+		case 2:
+			gaEnd = GA_P2_LOOK_BACK; break;
+		case 3:
+			gaEnd = GA_P3_LOOK_BACK; break;
+		case 4:
+			gaEnd = GA_P4_LOOK_BACK; break;
+	}
+	
+	ActionMap *am = newActionMap(GA_FIRST_INGAME, gaEnd);
+
+	for (int i = GA_FIRST_INGAME_FIXED; i <= GA_LAST_INGAME_FIXED; i++)
+	{
+		const int count = inputMap[i].count;
+		for (int j = 0;j < count; j++)
+			am->putEntry(inputMap[i].inputs[j], (GameAction) i);
+	}
+
 	return am;
 }
 // -----------------------------------------------------------------------------
