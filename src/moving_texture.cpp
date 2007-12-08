@@ -26,6 +26,9 @@
 MovingTexture::MovingTexture(char *data, ssgBranch *branch)
 {
     m_branch = branch;
+    branch->setUserData(new ssgBase());
+    branch->setName("MovingTexture");
+
     m_branch->ref();
     m_phase  = 0.0f;
     m_mode   = MODE_FORWARD;

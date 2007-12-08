@@ -58,6 +58,7 @@ public:
                                     }
     attachmentType getType () const { return m_type;           }
     float getTimeLeft      () const { return m_time_left;      }
+    void setTimeLeft       (float t){ m_time_left = t;         }
     Kart* getPreviousOwner () const { return m_previous_owner; }
     float WeightAdjust     () const {
                                       return m_type==ATTACH_ANVIL

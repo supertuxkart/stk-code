@@ -22,14 +22,18 @@
 
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
+#ifdef BULLET
+#include "btBulletDynamicsCommon.h"
+#endif
+
 
 class Material;
 class ssgEntity;
 
 // The anvil and parachute must be at the end of the enum, and the
 // zipper just before them (see collectable::hitRedHerring).
-enum collectableType {COLLECT_NOTHING,
-                      COLLECT_MISSILE, COLLECT_HOMING_MISSILE,
+enum CollectableType {COLLECT_NOTHING,
+                      COLLECT_MISSILE, COLLECT_HOMING,
                       COLLECT_SPARK, COLLECT_ZIPPER,
                       COLLECT_PARACHUTE, COLLECT_ANVIL,
 #ifdef USE_MAGNETS
@@ -41,17 +45,26 @@ class CollectableManager
 {
 protected:
     Material*    m_all_icons [COLLECT_MAX];
-    float        m_all_speeds[COLLECT_MAX];
+    float        m_all_max_distance[COLLECT_MAX];    // if a target is closer than this
+    float        m_all_force_to_target[COLLECT_MAX]; // apply this force to move towards
+                                                     // the target
+    float        m_all_max_turn_angle[COLLECT_MAX];  // maximum turn angle for homing
     ssgEntity*   m_all_models[COLLECT_MAX];
+    btVector3    m_all_extends[COLLECT_MAX];
     void         LoadNode       (const lisp::Lisp* lisp, int collectType);
 public:
     CollectableManager           ();
     void         loadCollectables();
     void         removeTextures  ();
     void         Load            (int collectType, const char* filename);
-    Material*    getIcon         (int type) {return m_all_icons [type];}
-    float        getSpeed        (int type) {return m_all_speeds[type];}
-    ssgEntity*   getModel        (int type) {return m_all_models[type];}
+    Material*    getIcon         (int type) const {return m_all_icons [type];      }
+    ssgEntity*   getModel        (int type) const {return m_all_models[type];      }
+    float        getForceToTarget(int type) const {return m_all_force_to_target[type]; }
+    float        getMaxDistance  (int type) const {return m_all_max_distance[type];}
+    float        getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
+#ifdef BULLET
+    const btVector3& getExtend   (int type) const {return m_all_extends[type];     }
+#endif
 };
 
 extern CollectableManager* collectable_manager;

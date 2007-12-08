@@ -102,9 +102,9 @@ public:
     float getGravity() const                  { return m_track->getGravity();      }
     Physics *getPhysics() const               { return m_physics;                  }
     Track *getTrack() const                   { return m_track;                    }
-#ifdef BULLET
     float getHAT(btVector3 pos) const         { return m_physics->getHAT(pos);     }
-#endif
+    bool getTerrainNormal(btVector3 pos, btVector3 *nrm) 
+                                        const { return m_physics->getTerrainNormal(pos,nrm);}
     Kart* getFastestKart() const              { return m_fastest_kart;             }
     float getFastestLapTime() const           { return m_fastest_lap;              }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time;}

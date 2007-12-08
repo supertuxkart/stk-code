@@ -36,7 +36,7 @@ Attachment::Attachment(Kart* _kart)
     m_kart           = _kart;
     m_holder         = new ssgSelector();
     m_previous_owner = NULL;
-    m_kart->getModel()->addKid(m_holder);
+    m_kart->getModelTransform()->addKid(m_holder);
 
     for(int i=ATTACH_PARACHUTE; i<=ATTACH_TINYTUX; i++)
     {

@@ -24,29 +24,32 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
+#include "spark.hpp"
+#include "missile.hpp"
+#include "homing.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
 
 typedef struct
 {
-    collectableType collectable;
+    CollectableType collectable;
     const char*const dataFile;
 }
 initCollectableType;
 
 initCollectableType ict[]=
 {
-    {COLLECT_ZIPPER,         "zipper.collectable"       },
+    {COLLECT_ZIPPER,    "zipper.collectable"       },
 #ifdef USE_MAGNETS
-    {COLLECT_MAGNET,         "magnet.collectable"       },
+    {COLLECT_MAGNET,    "magnet.collectable"       },
 #endif
-    {COLLECT_SPARK,          "spark.projectile"         },
-    {COLLECT_MISSILE,        "missile.projectile"       },
-    {COLLECT_HOMING_MISSILE, "homingmissile.projectile" },
-    {COLLECT_ANVIL,          "anvil.collectable"        },
-    {COLLECT_PARACHUTE,      "parachute.collectable"    },
-    {COLLECT_MAX,            ""                         },
+    {COLLECT_SPARK,     "spark.projectile"         },
+    {COLLECT_MISSILE,   "missile.projectile"       },
+    {COLLECT_HOMING,    "homingmissile.projectile" },
+    {COLLECT_ANVIL,     "anvil.collectable"        },
+    {COLLECT_PARACHUTE, "parachute.collectable"    },
+    {COLLECT_MAX,       ""                         },
 };
 
 CollectableManager* collectable_manager=0;
@@ -109,23 +112,13 @@ void CollectableManager::Load(int collectType, const char* filename)
 //-----------------------------------------------------------------------------
 void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 {
-    std::string sName, sModel, sIconFile;
-    int dummy;
-    lisp->get("name",   sName                 ); // the name is actually ignored
-    lisp->get("model",  sModel                );
-    lisp->get("icon",   sIconFile             );
-    // If the speed value is an integer (e.g. no "."), an uninitialised
-    // value will be returned. In this case try reading the speed as
-    // an integer value.
-    if(!lisp->get("speed",  m_all_speeds[collectType]))
-    {
-        dummy=-1;
-        lisp->get("speed",  dummy);
-        m_all_speeds[collectType]=(float)dummy;
-    }
-
+    std::string sName, sModel, sIconFile; 
+    lisp->get("name",            sName                              );
+    lisp->get("model",           sModel                             );
+    lisp->get("icon",            sIconFile                          );
+ 
     // load material
-    m_all_icons [collectType] = material_manager->getMaterial(sIconFile);
+    m_all_icons[collectType] = material_manager->getMaterial(sIconFile);
     m_all_icons[collectType]->getState()->ref();
 
     //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
@@ -142,6 +135,21 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     else
     {
         m_all_models[collectType] = 0;
+#ifdef BULLET
+        m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
+#endif
     }
+
+    // Load special attributes for certain collectables
+    switch (collectType) {
+        case COLLECT_SPARK:          
+             Spark::init  (lisp, m_all_models[collectType]); break;
+        case COLLECT_MISSILE:        
+             Missile::init(lisp, m_all_models[collectType]); break;
+        case COLLECT_HOMING: 
+             Homing::init (lisp, m_all_models[collectType]); break;
+        default:;
+    }   // switch
+
 }   // LoadNode
 

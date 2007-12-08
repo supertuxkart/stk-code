@@ -705,6 +705,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\flyable.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\game_manager.cpp"
 				>
 			</File>
@@ -726,6 +730,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\homing.cpp"
 				>
 			</File>
 			<File
@@ -761,6 +769,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\missile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\moveable.cpp"
 				>
 			</File>
@@ -790,10 +802,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\player_kart.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\projectile.cpp"
 				>
 			</File>
 			<File
@@ -849,6 +857,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\spark.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\ssg_help.cpp"
 				>
 			</File>
@@ -878,10 +890,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\user_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\utils.cpp"
 				>
 			</File>
 			<File
@@ -1071,6 +1079,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\flyable.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\game_manager.hpp"
 				>
 			</File>
@@ -1092,6 +1104,14 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\homing.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\input.hpp"
 				>
 			</File>
 			<File
@@ -1120,6 +1140,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\material_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\missile.hpp"
 				>
 			</File>
 			<File
@@ -1164,10 +1188,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\player_kart.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\projectile.hpp"
 				>
 			</File>
 			<File
@@ -1235,6 +1255,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\spark.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\ssg_help.hpp"
 				>
 			</File>
@@ -1264,10 +1288,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\user_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\utils.hpp"
 				>
 			</File>
 			<File

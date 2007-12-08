@@ -24,20 +24,21 @@
 #include "btBulletDynamicsCommon.h"
 #include "callback.hpp"
 
-class MovingPhysics : public ssgTransform, public Callback
+class MovingPhysics : public Callback
 {
 public:
     enum bodyTypes {BODY_NONE, BODY_CONE, BODY_BOX};
 
 protected:
     bodyTypes             m_body_type;
+    ssgTransform         *m_trans;
     btCollisionShape     *m_shape;
     btRigidBody          *m_body;
     btDefaultMotionState *m_motion_state;
     float                 m_half_height;
     float                 m_mass;
 public:
-    MovingPhysics           (const std::string data);
+    MovingPhysics           (const std::string data, ssgTransform *trans);
     ~MovingPhysics          (); 
     void update             (float dt);
     void         init       ();

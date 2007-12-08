@@ -326,7 +326,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 break;
 
             case COLLECT_MISSILE:
-            case COLLECT_HOMING_MISSILE:
+            case COLLECT_HOMING:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
                     if( sgDistanceVec2( m_curr_pos.xyz,

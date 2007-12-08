@@ -102,9 +102,6 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
     assert(m_race_setup.m_karts.size() > 0);
 
-    // Clear all callbacks, which might still be stored there from a previous race.
-    callback_manager->clear(CB_TRACK);
-
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
     loadTrack   ( ) ;
@@ -118,7 +115,6 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     {
         sgCoord init_pos;
         m_track->getStartCoords(pos, &init_pos);
-
         Kart* newkart;
         if(user_config->m_profile)
         {
@@ -149,9 +145,9 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         {
             history->LoadKartData(newkart, pos);
         }
-        newkart -> getModel () -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+        newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-        scene->add ( newkart -> getModel() ) ;
+        scene->add ( newkart -> getModelTransform() ) ;
         m_kart.push_back(newkart);
         pos++;
     }  // for i
@@ -201,7 +197,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     }
     if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
 #endif
-}
+}   // World
 
 //-----------------------------------------------------------------------------
 World::~World()
@@ -209,6 +205,9 @@ World::~World()
 #ifdef HAVE_GHOST_REPLAY
     saveReplayHumanReadable( "test" );
 #endif
+
+    // Clear all callbacks
+    callback_manager->clear(CB_TRACK);
 
     for ( unsigned int i = 0 ; i < m_kart.size() ; i++ )
         delete m_kart[i];
@@ -253,7 +252,7 @@ void World::resetAllKarts()
 {
 #ifdef BULLET
     bool all_finished=false;
-    for(int i=0; i<10; i++) m_physics->update(1./60.);
+    for(int i=0; i<10; i++) m_physics->update(1.f/60.f);
     while(!all_finished)
     {
         m_physics->update(1.f/60.f);

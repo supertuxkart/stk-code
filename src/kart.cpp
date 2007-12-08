@@ -349,6 +349,7 @@ void Kart::reset()
 
     m_race_lap             = -1;
     m_lap_start_time       = -1.0f;
+    m_time_at_last_lap     = 99999.9f;
     m_shortcut_count       = 0;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
     m_shortcut_type        = SC_NONE;
@@ -927,8 +928,6 @@ float Kart::handleWheelie(float dt)
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
 {
-
-#ifdef BULLET
     float engine_power = getActualWheelForce() + handleWheelie(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
@@ -1011,222 +1010,6 @@ void Kart::updatePhysics (float dt)
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
-    
-#else      // ! BULLET
-    m_skid_front = m_skid_rear = false;
-    sgVec3 AirResistance, SysResistance;
-    // Get some values once, to avoid calling them more than once.
-    const float  WORLD_GRAVITY     = world->getGravity();
-    const float  WHEEL_BASE   = getWheelBase();
-    const float  MASS        = getMass();         // includes m_attachment.WeightAdjust
-    const float  AIR_FRICTION = getAirResistance(); // includes attachmetn.AirFrictAdjust
-    const float  ROLL_RESIST  = getRollResistance();
-
-    if(m_wheelie_angle>0.0f)
-    {
-        m_velocity.xyz[1]-=getWheelieSpeedBoost()*m_wheelie_angle/getWheelieMaxPitch();
-        if(m_velocity.xyz[1]<0) m_velocity.xyz[1]=0.0;
-    }
-
-
-    // Handle throttle and brakes
-    // ==========================
-    float throttle;
-
-    if(m_on_ground)
-    {
-        if(m_controls.brake)
-        {
-            throttle = m_velocity.xyz[1]<0.0f ? -1.0f : -getBrakeFactor();
-        }
-        else
-        {   // not braking
-            throttle =  m_velocity.xyz[1]<0.0f ? getBrakeFactor() 
-                     : m_controls.accel*m_current_friction*m_current_friction;
-        }
-        // Handle wheelies
-        // ===============
-        if ( m_controls.wheelie && m_velocity.xyz[1] >=
-             getMaxSpeed()*getWheelieMaxSpeedRatio())
-        {
-            m_velocity.hpr[0]=0.0;
-            if ( m_wheelie_angle < getWheelieMaxPitch() )
-                m_wheelie_angle += getWheeliePitchRate() * dt;
-            else
-                m_wheelie_angle = getWheelieMaxPitch();
-        }
-        else if ( m_wheelie_angle > 0.0f )
-        {
-            m_wheelie_angle -= getWheelieRestoreRate() * dt;
-            if ( m_wheelie_angle <= 0.0f ) m_wheelie_angle = 0.0f ;
-        }
-    }
-    else
-    {   // not on ground
-        throttle = 0.0;
-    }   // if !m_on_ground
-
-    float ForceLong = throttle * getMaxPower();
-    // apply air friction and system friction
-    AirResistance[0] = 0.0f;
-    AirResistance[1] = AIR_FRICTION*m_velocity.xyz[1]*fabs(m_velocity.xyz[1]);
-    AirResistance[2] = 0.0f;
-    SysResistance[0] = ROLL_RESIST*m_velocity.xyz[0];;
-    SysResistance[1] = ROLL_RESIST*m_velocity.xyz[1];
-    SysResistance[2] = 0.0f;
-
-    //
-    // Compute longitudinal acceleration for slipping
-    // ----------------------------------------------
-    const float FORCE_ON_REAR_TIRE = 0.5f*MASS*WORLD_GRAVITY + m_prev_accel*MASS*getHeightCOG()/WHEEL_BASE;
-    const float FORCE_ON_FRONT_TIRE = MASS*WORLD_GRAVITY - FORCE_ON_REAR_TIRE;
-    float maxGrip = std::max(FORCE_ON_REAR_TIRE,FORCE_ON_FRONT_TIRE)*getTireGrip();
-
-    // If the kart is on ground, modify the grip by the friction
-    // modifier for the texture/terrain.
-    if(m_on_ground && m_material_hot) maxGrip *= m_material_hot->getFriction();
-
-    // Gravity handling
-    // ================
-    float ForceGravity;
-    if(m_on_ground)
-    {
-        if(m_normal_hot)
-        {
-            // Adjust pitch and roll according to the current terrain. To compute
-            // the correspondant angles, we consider first a normalised line
-            // pointing into the direction the kart is facing (pointing from (0,0,0)
-            // to (x,y,0)). The angle between this line and the triangle the kart is
-            // on determines the pitch. Similartly the roll is computed, using a
-            // normalised line pointing to the right of the kart, for which we simply
-            // use (-y,x,0).
-            const float kartAngle = m_curr_pos.hpr[0]*M_PI/180.0f;
-            const float X = -sin(kartAngle);
-            const float Y =  cos(kartAngle);
-            // Compute the angle between the normal of the plane and the line to
-            // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
-            // simplifying the computation of the scalar product.
-            float pitch = ( (*m_normal_hot)[0]*X + (*m_normal_hot)[1]*Y );  // use ( x,y,0)
-            float roll  = (-(*m_normal_hot)[0]*Y + (*m_normal_hot)[1]*X );  // use (-y,x,0)
-
-            // The actual angle computed above is between the normal and the (x,y,0)
-            // line, so to compute the actual angles 90 degrees must be subtracted.
-            pitch = acosf(pitch)/M_PI*180.0f-90.0f;
-            roll  = acosf(roll )/M_PI*180.0f-90.0f;
-            // if dt is too big, the relaxation will overshoot, and the
-            // karts will either be hopping, or even turn upside down etc.
-            if(dt<=0.05)
-            {
-# define RELAX(oldVal, newVal) (oldVal + (newVal-oldVal)*dt*20.0f)
-                m_curr_pos.hpr[1] = RELAX(m_curr_pos.hpr[1],pitch);
-                m_curr_pos.hpr[2] = RELAX(m_curr_pos.hpr[2],roll );
-            }
-            else
-            {
-                m_curr_pos.hpr[1] = pitch;
-                m_curr_pos.hpr[2] = roll ;
-            }
-            if(fabsf(m_curr_pos.hpr[1])>fabsf(pitch)) m_curr_pos.hpr[1]=pitch;
-            if(fabsf(m_curr_pos.hpr[2])>fabsf(roll )) m_curr_pos.hpr[2]=roll;
-        }
-        if(m_controls.jump)
-        { // ignore gravity down when jumping
-            ForceGravity = stk_config->m_jump_impulse*WORLD_GRAVITY;
-        }
-        else
-        {   // kart is on groud and not jumping
-            if(user_config->m_improved_physics)
-            {
-                // FIXME:
-                // While these physics computation is correct, it is very difficult
-                // to drive, esp. the sandtrack: the grades (with the current
-                // physics parameters) are too steep, so the kart needs a very high
-                // initial velocity to be able to reach the top. Especially the
-                // AI gets stuck very easily! Perhaps reduce the forces somewhat?
-                const float PITCH_IN_RAD = m_curr_pos.hpr[1]*M_PI/180.0f;
-                ForceGravity   = -WORLD_GRAVITY * MASS * cos(PITCH_IN_RAD);
-                ForceLong     -=  WORLD_GRAVITY * MASS * sin(PITCH_IN_RAD);
-            }
-            else
-            {
-                ForceGravity   = -WORLD_GRAVITY * MASS;
-            }
-        }
-    }
-    else
-    {  // kart is not on ground, gravity applies all to z axis.
-        ForceGravity = -WORLD_GRAVITY * MASS;
-    }
-    m_velocity.xyz[2] += ForceGravity / MASS * dt;
-
-
-    if(m_wheelie_angle <= 0.0f && m_on_ground)
-    {
-        // At low speed, the advanced turning mode can result in 'flickering', i.e.
-        // very quick left/right movements. The reason might be:
-        // 1) integration timestep to big
-        // 2) the kart turning too much, thus 'oversteering', which then gets
-        //    corrected (which might be caused by wrongly tuned physics parameters,
-        //    or the too big timestep mentioned above
-        // Since at lower speed the simple turning algorithm is good enough,
-        // the advanced sliding turn algorithm is only used at higher speeds.
-
-        // FIXME: for now, only use the simple steering algorithm.
-        //        so the test for 'lower speed' is basically disabled for now,
-        //        since the velocity will always be lower than 1.5*100000.0f
-        if(fabsf(m_velocity.xyz[1])<150000.0f)
-        {
-            const float MSA       = getMaxSteerAngle();
-            m_velocity.hpr[0] = m_controls.lr * ((m_velocity.xyz[1]>=0.0f) ? MSA : -MSA);
-            if(m_velocity.hpr[0]> MSA) m_velocity.hpr[0] =  MSA;  // In case the AI sets
-            if(m_velocity.hpr[0]<-MSA) m_velocity.hpr[0] = -MSA;  // m_controls.lr >1 or <-1
-        }
-        else
-        {
-            const float STEER_ANGLE    = m_controls.lr*getMaxSteerAngle()*M_PI/180.0f;
-            const float TURN_DISTANCE   = m_velocity.hpr[0]*M_PI/180.0f * WHEEL_BASE/2.0f;
-            const float SLIP_ANGLE_FRONT = atan((m_velocity.xyz[0]+TURN_DISTANCE)
-                                        /fabsf(m_velocity.xyz[1]))
-                                   - sgn(m_velocity.xyz[1])*STEER_ANGLE;
-            const float SLIP_ANGLE_REAR  = atan((m_velocity.xyz[0]-TURN_DISTANCE)
-                                        /fabsf(m_velocity.xyz[1]));
-            const float FORCE_LAT_FRONT  = NormalizedLateralForce(SLIP_ANGLE_FRONT, getCornerStiffF())
-                                   * FORCE_ON_FRONT_TIRE - SysResistance[0]*0.5f;
-            const float FORCE_LAT_REAR   = NormalizedLateralForce(SLIP_ANGLE_REAR,  getCornerStiffR())
-                                   * FORCE_ON_REAR_TIRE  - SysResistance[0]*0.5f;
-            const float CORNER_FORCE    = FORCE_LAT_REAR + cos(STEER_ANGLE)*FORCE_LAT_FRONT;
-            m_velocity.xyz[0]      = CORNER_FORCE/MASS*dt;
-            const float TORQUE         =                  FORCE_LAT_REAR *WHEEL_BASE/2
-                                                    - cos(STEER_ANGLE)*FORCE_LAT_FRONT*WHEEL_BASE/2;
-            const float ANGLE_ACCELERATION         = TORQUE/getInertia();
-
-            m_velocity.hpr[0] += ANGLE_ACCELERATION*dt*180.0f/M_PI;
-        }   // fabsf(m_velocity.xyz[1])<0.5
-    }   // m_wheelie_angle <=0.0f && m_on_ground
-
-    // Longitudinal accelleration
-    // ==========================
-    const float EFECTIVE_FORCE  = (ForceLong-AirResistance[1]-SysResistance[1]);
-    // Slipping: more force than what can be supported by the back wheels
-    // --> reduce the effective force acting on the kart - currently
-    //     by an arbitrary value.
-    if(fabs(EFECTIVE_FORCE)>maxGrip)
-    {
-        //    EFECTIVE_FORCE *= 0.4f;
-        //    m_skid_rear  = true;
-    }   // while EFECTIVE_FORCE>maxGrip
-    float ACCELERATION       = EFECTIVE_FORCE / MASS;
-
-    m_velocity.xyz[1] += ACCELERATION           * dt;
-    m_prev_accel        = ACCELERATION;
-
-    if(m_wheelie_angle>0.0f)
-    {
-        m_velocity.xyz[1]+=
-            getWheelieSpeedBoost()*m_wheelie_angle/getWheelieMaxPitch();
-        if(m_velocity.xyz[1]<0) m_velocity.xyz[1]=0.0;
-    }
-#endif
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
@@ -1478,7 +1261,7 @@ void Kart::loadData()
     lod -> addKid ( obj ) ;
     lod -> setRanges ( r, 2 ) ;
 
-    this-> getModel() -> addKid ( lod ) ;
+    this-> getModelTransform() -> addKid ( lod ) ;
 
     // Attach Particle System
     //JH  sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
@@ -1495,7 +1278,7 @@ void Kart::loadData()
 
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();
-    m_model->addKid ( m_shadow );
+    m_model_transform->addKid ( m_shadow );
 }   // loadData
 
 //-----------------------------------------------------------------------------
@@ -1548,7 +1331,7 @@ void Kart::placeModel ()
     //    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS));
     const float CENTER_SHIFT = getGravityCenterShift();
     c.xyz[2] -= (0.5f-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
-    m_model->setTransform(&c);
+    m_model_transform->setTransform(&c);
     
     // Check if a kart needs to be rescued.
     if((fabs(m_curr_pos.hpr[2])>60 &&

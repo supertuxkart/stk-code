@@ -26,7 +26,7 @@ libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 
 supertuxkart_SOURCES =             main.cpp  			\
-	actionmap.cpp		   actionmap.hpp			\
+	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	material_manager.cpp	   material_manager.hpp    	\
 	attachment.cpp		   attachment.hpp	        \
@@ -38,8 +38,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	music_mikmod.cpp	   music_mikmod.hpp            	\
 	music_ogg.cpp	   	   music_ogg.hpp            	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
-	utils.cpp		   utils.hpp                	\
-	input.hpp \
+	input.hpp 						\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
 	herring.cpp 		   herring.hpp              	\
@@ -68,8 +67,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	shadow.cpp		   shadow.hpp	        	\
 	particle_system.cpp	   particle_system.hpp       	\
 	game_manager.cpp	   game_manager.hpp        	\
-	widget_manager.cpp		   widget_manager.hpp	        \
-	widget.cpp		   widget.hpp	        \
+	widget_manager.cpp	   widget_manager.hpp	        \
+	widget.cpp		   widget.hpp	        	\
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
@@ -77,14 +76,17 @@ supertuxkart_SOURCES =             main.cpp  			\
 	kart.cpp		   kart.hpp		        \
 	            		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
-	projectile.cpp 		   projectile.hpp	        \
+	flyable.cpp		   flyable.hpp			\
+	missile.cpp		   missile.hpp			\
+	homing.cpp		   homing.hpp			\
+	spark.cpp		   spark.hpp			\
 	history.cpp		   history.hpp	        	\
 	scene.hpp		   scene.cpp			\
 	race_setup.hpp	   	   no_copy.hpp	        	\
-	constants.hpp            	\
+	constants.hpp            				\
 	translation.hpp 					\
 	traffic.cpp 			  	        	\
-	player.hpp		   \
+	player.hpp		   				\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\
@@ -111,12 +113,12 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/font.hpp		   gui/font.cpp                 \
-	robots/default_robot.cpp   robots/default_robot.hpp  \
-	replay_buffer_tpl.hpp \
-	replay_buffers.hpp		   replay_buffers.cpp       \
-	replay_base.hpp			   replay_base.cpp       \
-	replay_player.hpp          replay_player.cpp       \
-	replay_recorder.hpp		   replay_recorder.cpp       
+	robots/default_robot.cpp   robots/default_robot.hpp	\
+	replay_buffer_tpl.hpp 					\
+	replay_buffers.hpp	   replay_buffers.cpp		\
+	replay_base.hpp		   replay_base.cpp		\
+	replay_player.hpp          replay_player.cpp		\
+	replay_recorder.hpp	   replay_recorder.cpp       
 
 
 # Link in the specific gcc 4.1 bug work around

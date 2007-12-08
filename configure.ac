@@ -347,34 +347,20 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
 CXXFLAGS="$ORIGCXXFLAGS"
 AC_SUBST(NOREGMOVE)
 
-dnl =======================================
-dnl Bullet physics - currently experimental
-dnl =======================================
-dnl Check for bullet physics. Currently, this is optional and needs
-dnl a '--enable-bullet' during configure to be used.
-AC_MSG_CHECKING(for bullet physics)
-AC_ARG_ENABLE(bullet,
-	AC_HELP_STRING([--enable-bullet], [enable bullet physics]),
-	[enable_bullet="$enableval"],
-	[enable_bullet="no"])
-if test "x${enable_bullet}" != "xno"; then
-	AC_DEFINE([BULLET], [], [Use the bullet physics engine])
-	AC_MSG_RESULT([enabled])
-	CXXFLAGS="$CXXFLAGS -Ibullet/src"
-	AC_CONFIG_FILES([         \
+dnl ==============
+dnl Bullet physics
+dnl ==============
+AC_DEFINE([BULLET], [], [Use the bullet physics engine])
+CXXFLAGS="$CXXFLAGS -Ibullet/src"
+AC_CONFIG_FILES([         \
 		 src/bullet/Makefile      \
 		 src/bullet/src/Makefile  \
 		 src/bullet/Demos/OpenGL/Makefile
-	])
-	SUMMARY="$SUMMARY\nUsing bullet physics."
-	BULLETTREE="src/bullet"
-	bullet_LIBS="-L bullet/Demos/OpenGL -lbulletopenglsupport -L bullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
-else
-	AC_MSG_RESULT([disabled])
-	BULLETTREE=""
-	bullet_LIBS=""
+])
+SUMMARY="$SUMMARY\nUsing bullet physics."
+BULLETTREE="src/bullet"
+bullet_LIBS="-L bullet/Demos/OpenGL -lbulletopenglsupport -L bullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
 
-fi
 AC_SUBST(BULLETTREE)
 
 dnl ================

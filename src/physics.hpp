@@ -21,24 +21,71 @@
 #define HEADER_PHYSICS_H
 
 #include "kart.hpp"
+#include "flyable.hpp"
 #include <plib/sg.h>
+#include <set>
 
-#ifdef BULLET
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"
-class Physics
+class Physics : public btSequentialImpulseConstraintSolver
 {
-protected:
+private:
     btDynamicsWorld                 *m_dynamics_world;
     Kart                            *m_kart;
     GLDebugDrawer                   *m_debug_drawer;
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;
-    btConstraintSolver              *m_constraint_solver;
 
-    void convertTrack(ssgEntity *track, sgMat4 m,  btTriangleMesh* track_mesh);
+    // Bullet can report the same collision more than once (up to 4 
+    // contact points per collision. Additionally, more than one internal
+    // substep might be taken, resulting in potentially even more 
+    // duplicates. To handle this, all collisions (i.e. pair of objects)
+    // are stored in a vector, but only one entry per collision pair
+    // of objects.
+    // While this is a natural application of std::set, the set has some
+    // overhead (since it will likely use a tree to sort the entries).
+    // Considering that the number of collisions is usually rather small
+    // a simple list and linear search is being used here.
+
+    class CollisionPair {
+    public:
+        void                  *a, *b;
+        Moveable::MoveableType type_a, type_b;
+        // The entries in Collision Pairs are sorted: if a projectile
+        // is included, it's always 'a'. If only two karts are reported
+        // the first kart pointer is the smaller one
+        CollisionPair(void *a1, Moveable::MoveableType atype,
+                      void *b1, Moveable::MoveableType btype) {
+            if(atype==Moveable::MOV_KART && btype==Moveable::MOV_KART && a1>b1) {
+	        a=b1;b=a1; type_a=btype; type_b=atype;
+	    } else {
+	        a=a1; b=b1; type_a=atype; type_b=btype;
+	    }
+        };  //    CollisionPair
+        bool operator==(const CollisionPair p) {
+            return (p.a==a && p.b==b);
+        }
+    };
+
+    // This class is the list of collision objects, where each collision
+    // pair is stored as most once.
+    class CollisionList : public std::vector<CollisionPair> {
+    public:
+         void push_back(CollisionPair p) {
+            // only add a pair if it's not already in there
+            for(iterator i=begin(); i!=end(); i++) {
+                if((*i)==p) return;
+            }
+            std::vector<CollisionPair>::push_back(p);
+        };   // push_back
+    };
+
+    CollisionList m_all_collisions;
+    void  KartKartCollision(Kart *ka, Kart *kb);
+
 public:
+    void  convertTrack    (ssgEntity *track, sgMat4 m,  btTriangleMesh* track_mesh);
           Physics         (float gravity);
          ~Physics         ();
     void  addKart         (const Kart *k, btRaycastVehicle *v);
@@ -46,30 +93,21 @@ public:
     void  removeKart      (const Kart *k);
     void  removeBody      (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
     void  update          (float dt);
-    void  handleCollisions();
     void  draw            ();
     void  setTrack        (ssgEntity *track);
     btDynamicsWorld*
           getPhysicsWorld () const {return m_dynamics_world;}
     void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
-    static float NOHIT;
+    static const float NOHIT;
     float getHAT          (btVector3 pos);
     bool  getTerrainNormal(btVector3 pos, btVector3* normal);
+    virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
+                                btPersistentManifold** manifold,int numManifolds,
+                                btTypedConstraint** constraints,int numConstraints,
+                                const btContactSolverInfo& info, 
+                                btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,
+                                btDispatcher* dispatcher);
 };
-// For non-bullet version: empty object
-#else
-class Physics
-{
-public:
-    Physics(float gravity) {};
-    ~Physics() {};
-    void update(float dt) {};
-    void setTrack(ssgEntity *track) {};
-    void draw     () {};
-};
-
-#endif
-
 #endif
 /* EOF */
 

@@ -105,7 +105,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				WholeProgramOptimization="true"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(GLUT_PATH)\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				MinimalRebuild="true"

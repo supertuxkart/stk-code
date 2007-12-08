@@ -19,7 +19,9 @@
 
 #include "loader.hpp"
 #include "projectile_manager.hpp"
-#include "projectile.hpp"
+#include "spark.hpp"
+#include "missile.hpp"
+#include "homing.hpp"
 #include "explosion.hpp"
 #include "collectable_manager.hpp"
 #include "collectable.hpp"
@@ -50,7 +52,7 @@ void ProjectileManager::removeTextures()
 {
     cleanup();
     ssgDeRefDelete(m_explosion_model);
-    // Only the explosion is here, all other models are actualy managed
+    // Only the explosion is here, all other models are actually managed
     // by collectable_manager.
     callback_manager->clear(CB_EXPLOSION);
 }   // removeTextures
@@ -61,7 +63,7 @@ void ProjectileManager::cleanup()
     for(Projectiles::iterator i = m_active_projectiles.begin();
         i != m_active_projectiles.end(); ++i)
     {
-        ssgTransform *m = (*i)->getModel();
+        ssgTransform *m = (*i)->getModelTransform();
         m->removeAllKids();
         delete *i;
     }
@@ -93,12 +95,10 @@ void ProjectileManager::update(float dt)
         {
             if(! (*p)->hasHit()) { p++; continue; }
             newExplosion((*p)->getCoord());
-            // Create a new explosion, move the projectile to the
-            // list of deleted projectiles (so that they can be
-            // reused later), and remove it from the list of active
-            // projectiles.
-            m_deleted_projectiles.push_back(*p);
-            p=m_active_projectiles.erase(p);  // returns the next element
+            Flyable *f=*p;
+            Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
+            delete f;
+            p=pNext;
         }   // while p!=m_active_projectiles.end()
     }
 
@@ -115,32 +115,27 @@ void ProjectileManager::update(float dt)
         while(e!=m_active_explosions.end())
         {
             if(!(*e)->hasEnded()) { e++; continue;}
-            m_deleted_explosions.push_back(*e);
-            e=m_active_explosions.erase(e);
+            Explosion *exp=*e;
+            Explosions::iterator eNext=m_active_explosions.erase(e);
+            ssgDeRefDelete(exp);  // reduce refcount and free object
+            e=eNext;
         }   // while e!=m_active_explosions.end()
     }   // if m_explosion_ended
     m_something_was_hit=false;
 }   // update
 
 // -----------------------------------------------------------------------------
-/** See if there is an old, unused projectile object available. If so,
- *  reuse this object, otherwise create a new one. */
-Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
+Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
 {
-    Projectile *p;
-    if(m_deleted_projectiles.size()>0)
-    {
-        p = m_deleted_projectiles.back();
-        m_deleted_projectiles.pop_back();
-        p->init(kart, type);
+    Flyable *f;
+    switch(type) {
+    case COLLECT_SPARK:   f = new Spark(kart);   break;
+    case COLLECT_HOMING:  f = new Homing(kart);  break;
+    case COLLECT_MISSILE: f = new Missile(kart); break;
+    default:              return NULL;
     }
-    else
-    {
-        p=new Projectile(kart, type);
-    }
-    m_active_projectiles.push_back(p);
-    return p;
-
+    m_active_projectiles.push_back(f);
+    return f;
 }   // newProjectile
 
 // -----------------------------------------------------------------------------
@@ -148,17 +143,7 @@ Projectile *ProjectileManager::newProjectile(Kart *kart, int type)
  *  reuse this object, otherwise create a new one. */
 Explosion* ProjectileManager::newExplosion(sgCoord* coord)
 {
-    Explosion *e;
-    if(m_deleted_explosions.size()>0)
-    {
-        e = m_deleted_explosions.back();
-        m_deleted_explosions.pop_back();
-        e->init(coord);
-    }
-    else
-    {
-        e=new Explosion(coord);
-    }
+    Explosion *e = new Explosion(coord);
     m_active_explosions.push_back(e);
     return e;
 }   // newExplosion

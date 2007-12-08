@@ -286,7 +286,7 @@ void HelpMenu::switch_to_second_screen()
 
     widget_manager->add_wgt(WTOK_ITEMIMG2, 10, 13);
     widget_manager->set_wgt_texture(WTOK_ITEMIMG2,
-        collectable_manager->getIcon(COLLECT_HOMING_MISSILE)->getState()->getTextureHandle());
+        collectable_manager->getIcon(COLLECT_HOMING)->getState()->getTextureHandle());
     widget_manager->set_wgt_color(WTOK_ITEMIMG2, WGT_WHITE);
     widget_manager->show_wgt_texture( WTOK_ITEMIMG2 );
     widget_manager->set_wgt_round_corners(WTOK_ITEMIMG2, WGT_AREA_NONE);

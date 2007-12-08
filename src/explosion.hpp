@@ -29,10 +29,10 @@ public:
     ssgSelector  *m_seq ;
 public:
 
-    Explosion(sgCoord* coord);
-    int  inUse    ()              {return (m_step >= 0); }
+         Explosion(sgCoord* coord);
     void init     (sgCoord *coord);
     void update   (float delta_t);
+    int  inUse    () {return (m_step >= 0);                 }
     bool hasEnded () {return m_step >= m_seq->getNumKids(); }
 
 } ;

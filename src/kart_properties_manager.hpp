@@ -42,7 +42,7 @@ public:
     const int                getKartId              (const std::string IDENT);
     void                     loadKartData           (bool dont_load_models=false);
     const float              getMaximumSteeringAngle() {return m_max_steer_angle;}
-    const unsigned int       getNumberOfKarts       () {return m_karts_properties.size();}
+    const unsigned int       getNumberOfKarts       () {return (unsigned int)m_karts_properties.size();}
 
     /** Return len random karts */
     std::vector<std::string> getRandomKarts         (int len);

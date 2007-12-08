@@ -100,11 +100,25 @@ RaceGUI::handle(GameAction ga, int value)
 	
 	switch (ga)
 	{
+		case GA_DEBUG_ADD_SPARK:
+			if (world->m_race_setup.getNumPlayers() ==1 )
+			{
+				Kart* kart = world->getPlayerKart(0);
+				kart->setCollectable(COLLECT_SPARK, 10000);
+			}
+			break;
 		case GA_DEBUG_ADD_MISSILE:
 			if (world->m_race_setup.getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
-				kart->setCollectable((rand()%2)?COLLECT_MISSILE :COLLECT_HOMING_MISSILE, 10000);
+				kart->setCollectable(COLLECT_MISSILE, 10000);
+			}
+			break;
+		case GA_DEBUG_ADD_HOMING:
+			if (world->m_race_setup.getNumPlayers() ==1 )
+			{
+				Kart* kart = world->getPlayerKart(0);
+				kart->setCollectable(COLLECT_HOMING, 10000);
 			}
 			break;
 		case GA_DEBUG_TOGGLE_FPS:
@@ -708,7 +722,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
         else
         {
             glTexCoord2f(0, 1);glVertex2i(offset_x, offset_y+width);
-            glTexCoord2f((speedRatio-0.5)*2, 1);glVertex2i((int)(offset_x+height*(speedRatio-0.5)*2), offset_y+height);
+            glTexCoord2f((speedRatio-0.5f)*2, 1);glVertex2i((int)(offset_x+height*(speedRatio-0.5f)*2), offset_y+height);
         }
 
         glEnd () ;

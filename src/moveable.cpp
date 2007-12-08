@@ -27,15 +27,13 @@
 
 Moveable::Moveable (bool bHasHistory)
 {
-#ifdef BULLET
-    m_body         = 0;
-    m_motion_state = 0;
-#endif
-    m_shadow       = 0;
-    m_first_time   = true ;
-    m_model        = new ssgTransform();
+    m_body            = 0;
+    m_motion_state    = 0;
+    m_shadow          = 0;
+    m_first_time      = true ;
+    m_model_transform = new ssgTransform();
 
-    m_model->ref();
+    m_model_transform->ref();
 
     sgZeroVec3 ( m_reset_pos.xyz ) ; sgZeroVec3 ( m_reset_pos.hpr ) ;
 
@@ -55,11 +53,9 @@ Moveable::Moveable (bool bHasHistory)
 //-----------------------------------------------------------------------------
 Moveable::~Moveable()
 {
-#ifdef BULLET
     // The body is being removed from the world in kart/projectile
-    if(m_body) delete m_body;
+    if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
-#endif
     if(m_history_velocity)
     {
         delete [] m_history_velocity;
@@ -71,9 +67,6 @@ Moveable::~Moveable()
 //-----------------------------------------------------------------------------
 void Moveable::reset ()
 {
-#ifndef BULLET
-    m_on_ground        = true;
-#endif
     m_collided         = false;
     m_crashed          = false;
     m_material_hot     = NULL;
@@ -87,7 +80,6 @@ void Moveable::reset ()
 }   // reset
 
 //-----------------------------------------------------------------------------
-#ifdef BULLET
 void Moveable::createBody(float mass, btTransform& trans, 
                           btCollisionShape *shape, MoveableType m) {
     
@@ -102,7 +94,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     m_body->setUserPointer(this);
     setMoveableType(m);
 }   // createBody
-#endif
+
 //-----------------------------------------------------------------------------
 void Moveable::update (float dt)
 {
@@ -140,7 +132,6 @@ void Moveable::update (float dt)
     sgVec3 start ; sgCopyVec3      (start, m_curr_pos.xyz      );
     sgVec3 end   ; sgCopyVec3      (end  , result[3]         );
 
-    const float  HOT   = collectIsectData(start, end               );
 
     sgCopyVec3 (result[3], end) ;
 
@@ -177,13 +168,7 @@ void Moveable::update (float dt)
             sgCopyCoord(&(m_history_position[history->GetCurrentIndex()]), &m_curr_pos);
         }
     }   // if m_history_position
-    const float HAT = m_curr_pos.xyz[2]-HOT;
-
-#ifndef BULLET
-    m_on_ground = ( HAT <= 0.01 );
-    doCollisionAnalysis(dt, HOT);
-#endif
-
+    
     placeModel () ;
 
     m_first_time = false ;
@@ -250,10 +235,6 @@ void Moveable::ReadHistory(char* s, int kartNumber, int indx)
 }   // ReadHistory
 
 //-----------------------------------------------------------------------------
-#ifndef BULLET
-void Moveable::doCollisionAnalysis  ( float,float ) { /* Empty by Default. */ }
-#endif
-
 #define ISECT_STEP_SIZE         0.4f
 #define COLLISION_SPHERE_RADIUS 0.6f
 
@@ -371,8 +352,7 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end )
         m_material_hot = material_manager->getMaterial(m_leaf);
         // Only rescue the kart if it (nearly) touches the reset-material,
         // not only when it is above it. The condition for touching
-        // a material is coarser then for the m_on_ground condition
-        // (which tests for <0.01) - since the kart might have been falling
+        // a material is somewha coars, since the kart might have been falling
         // for quite some time, it might be really fast, so I guess a somewhat
         // coarser test is better for that case.
         if(m_material_hot->isReset() &&

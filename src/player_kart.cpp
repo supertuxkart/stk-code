@@ -147,7 +147,7 @@ void PlayerKart::update(float dt)
         m_collectable.use() ;
         m_controls.fire = false;
     }
-    if ( isOnGround()  &&  m_controls.rescue )
+    if ( m_controls.rescue )
     {
         sound_manager -> playSfx ( SOUND_BEEP ) ;
         forceRescue();

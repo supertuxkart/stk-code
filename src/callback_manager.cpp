@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "callback_manager.hpp"
+#include "moving_physics.hpp"
 
 CallbackManager *callback_manager=NULL;
 

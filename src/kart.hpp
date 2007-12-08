@@ -163,8 +163,8 @@ public:
         m_wheelie_angle=angle;
         m_zipper_time_left=time;
     }
-    void           setCollectable      (collectableType t, int n)
-    { m_collectable.set(t, n);            }
+    void           setCollectable      (CollectableType t, int n)
+                                           { m_collectable.set(t, n);            }
     void           setPosition         (int p)    {m_race_position = p;          }
     int            getSector           () { return m_track_sector;               }
     float          getDistanceDownTrack() { return m_curr_track_coords[1];       }

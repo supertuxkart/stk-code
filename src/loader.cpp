@@ -32,10 +32,8 @@
 #include "plib/ul.h"
 #include "loader.hpp"
 #include "world.hpp"
-#ifdef BULLET
 #include "btBulletDynamicsCommon.h"
 #include "moving_physics.hpp"
-#endif
 #include "moving_texture.hpp"
 #include "translation.hpp"
 #include "material_manager.hpp"
@@ -361,20 +359,16 @@ ssgBranch *Loader::createBranch(char *data) const
     {
         ssgTexTrans *br = new ssgTexTrans();
         Callback    *c  = new MovingTexture(data, br);
-        br->setUserData(new ssgBase());
-        br->setName("MovingTexture");
         callback_manager->addCallback(c, m_current_callback_type);
         return br;
     }
     if(strncmp("physics", data, strlen("physics")) == 0)
     {
-#ifdef BULLET
-        MovingPhysics *mp = new MovingPhysics(std::string(data));
+        ssgTransform *tr = new ssgTransform();
+        MovingPhysics *mp = new MovingPhysics(std::string(data), tr);
         callback_manager->addCallback(mp, m_current_callback_type);
-        return mp;
-#else
-        return NULL;
-#endif
+
+        return tr;
     }
     fprintf(stderr, "Warning: Ignoring userdata '%s'\n", data);
     return NULL ;

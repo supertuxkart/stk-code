@@ -22,33 +22,25 @@
 
 #include <vector>
 #include <plib/ssg.h>
+#include "flyable.hpp"
+#include "collectable_manager.hpp"
 
 class Kart;
-class Projectile;
 class Explosion;
 
 class ProjectileManager
 {
 private:
-    typedef std::vector<Projectile*> Projectiles;
+    typedef std::vector<Flyable*> Projectiles;
     typedef std::vector<Explosion* > Explosions;
 
     // The list of all active projectiles, i.e. projectiles
     // which are currently moving on the track
     Projectiles      m_active_projectiles;
 
-    // The list of all deleted projectiles, i.e. projectils which
-    // hit something and have therefore been deleted. The objects
-    // in this list can be reused later, this removes the overhead
-    // of object creation
-    Projectiles      m_deleted_projectiles;
-
     // All active explosions, i.e. explosions which are currently
     // being shown
     Explosions       m_active_explosions;
-
-    // The list of deleted explosion, which will be reused.
-    Explosions       m_deleted_explosions;
 
     ssgSelector*     m_explosion_model;
     bool             m_something_was_hit;
@@ -67,9 +59,9 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Projectile*      newProjectile    (Kart *kart, int type);
+    Flyable*         newProjectile    (Kart *kart, CollectableType type);
     Explosion*       newExplosion     (sgCoord *coord);
-    void             Deactivate       (Projectile *p) {}
+    void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
 };
 

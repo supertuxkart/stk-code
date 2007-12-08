@@ -65,6 +65,7 @@ SoundManager::SoundManager()
     }
     else
         m_initialized = true;
+    getcwd
 #else
     if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
         m_initialized = true;

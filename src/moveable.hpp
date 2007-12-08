@@ -41,7 +41,7 @@
 class Moveable
 {
 public:
-    enum   MoveableType {MOV_KART, MOV_PROJECTILE} ;
+    enum   MoveableType {MOV_KART, MOV_PROJECTILE, MOV_TRACK} ;
 protected:
     MoveableType  m_moveable_type;  /* used when upcasting bullet user pointers    */
     sgCoord       m_reset_pos;      /* Where to start in case of a reset           */
@@ -50,15 +50,12 @@ protected:
     sgVec3        m_abs_velocity;   /* world coordinates' velocity vector          */
     sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
     Material*     m_material_hot;    /* Material at HOT                             */
-    ssgTransform* m_model;
+    ssgTransform* m_model_transform; // The transform where the model is under
     ssgTransform* m_shadow;
     int           m_collided;
     int           m_crashed;
     sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
-#ifndef BULLET
-    int           m_on_ground ;
-#endif
 
     float collectIsectData ( sgVec3 start, sgVec3 end ) ;
     sgCoord*      m_history_velocity;
@@ -76,10 +73,7 @@ public:
     Moveable (bool bHasHistory=false);
     virtual ~Moveable();
 
-    ssgTransform* getModel     ()              {return m_model ;                  }
-#ifndef BULLET
-    int           isOnGround   ()              {return m_on_ground;               }
-#endif
+    ssgTransform* getModelTransform()          {return m_model_transform;         }
     MoveableType  getMoveableType()  const     {return m_moveable_type;           }
     void          setMoveableType(MoveableType m){m_moveable_type=m;              }
     sgCoord*      getVelocity  ()              {return & m_velocity;              }
@@ -87,7 +81,7 @@ public:
     const sgCoord* getCoord    ()  const       {return &m_curr_pos;               }
     const sgVec4* getNormalHOT ()  const       {return m_normal_hot;              }
     void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);   }
-    virtual void  placeModel   ()              {m_model->setTransform(&m_curr_pos); }
+    virtual void  placeModel   ()              {m_model_transform->setTransform(&m_curr_pos); }
     virtual void  handleZipper ()              {};
     virtual void  reset        ();
     virtual void  update       (float dt) ;
@@ -104,14 +98,12 @@ public:
     float         getIsectData (sgVec3 start, sgVec3 end );
     void          WriteHistory (char* s, int kartNumber, int indx);
     void          ReadHistory  (char* s, int kartNumber, int indx);
-#ifdef BULLET
     btRigidBody*  getBody   () const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape, MoveableType m);
     void          getTrans  (btTransform* t) const 
                                             {m_motion_state->getWorldTransform(*t);}
     void          setTrans  (btTransform& t){m_motion_state->setWorldTransform(t);}
-#endif
 }
 ;   // class Moveable
 

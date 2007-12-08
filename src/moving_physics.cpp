@@ -26,17 +26,16 @@
 #include "ssg_help.hpp"
 #include "scene.hpp"
 
-#ifdef BULLET
 // -----------------------------------------------------------------------------
-MovingPhysics::MovingPhysics(const std::string data)
-             : ssgTransform(), Callback()
+MovingPhysics::MovingPhysics(const std::string data, ssgTransform* trans)
+             : Callback()
 {
+    m_trans        = trans;
     m_shape        = NULL;
     m_body         = NULL;
     m_motion_state = NULL;
     m_mass         = 1;
-    setUserData(new ssgBase());
-    ref();
+    m_trans->setUserData(new ssgBase());   // prevent tree optimisations to remove this node
 
     std::vector<std::string> parameters = StringUtils::split(data, ' ');
     if(parameters.size()<2)
@@ -81,8 +80,8 @@ MovingPhysics::MovingPhysics(const std::string data)
 // -----------------------------------------------------------------------------
 MovingPhysics::~MovingPhysics()
 {
-    world->getPhysics()->getPhysicsWorld()->removeRigidBody(m_body);
-    deRef();
+    scene->remove(m_trans);
+    world->getPhysics()->removeBody(m_body);
     delete m_shape;
     delete m_motion_state;
     delete m_body;
@@ -104,15 +103,15 @@ void MovingPhysics::init()
 
     // 1. Remove the object from the graph and attach it to the root
     // -------------------------------------------------------------
-    if(getNumParents()>1) 
+    if(m_trans->getNumParents()>1) 
     {
         fprintf(stderr, "WARNING: physical object with more than one parent!!\n");
         return;
     }
-    ssgBranch *parent = getParent(0);
+    ssgBranch *parent = m_trans->getParent(0);
 
-    parent->removeKid(this);
-    scene->add(this);
+    scene->add(m_trans);
+    parent->removeKid(m_trans);
 
     // 2. Determine the original position of the object
     // ------------------------------------------------
@@ -161,18 +160,18 @@ void MovingPhysics::init()
     // 3. Determine size of the object
     // -------------------------------
     float x_min, x_max, y_min, y_max, z_min, z_max, radius;
-    MinMax(this, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+    MinMax(m_trans, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     m_half_height = 0.5f*(z_max-z_min);
     switch (m_body_type)
     {
     case BODY_CONE: radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
                     m_shape = new btConeShape(radius, z_max-z_min);
-                    setName("cone");
+                    m_trans->setName("cone");
                     break;
     case BODY_BOX:  m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
                                                        0.5f*(y_max-y_min),
                                                        0.5f*(z_max-z_min) ) );
-                    setName("box");
+                    m_trans->setName("box");
                     break;
     case BODY_NONE: fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         break;
@@ -204,10 +203,9 @@ void MovingPhysics::update(float dt)
     // Transfer the new position and hpr to m_curr_pos
     sgCoord m_curr_pos;
     sgSetCoord(&m_curr_pos, m);
-    setTransform(&m_curr_pos);
+    m_trans->setTransform(&m_curr_pos);
 }   // update
 // -----------------------------------------------------------------------------
-#endif
 
 /* EOF */
 

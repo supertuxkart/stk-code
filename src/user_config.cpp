@@ -197,8 +197,12 @@ void UserConfig::setDefaults()
 	set(GA_LEAVE_RACE,
 		Input(IT_KEYBOARD, SDLK_ESCAPE));
 
+	set(GA_DEBUG_ADD_SPARK,
+		Input(IT_KEYBOARD, SDLK_F1));
 	set(GA_DEBUG_ADD_MISSILE,
-		Input(IT_KEYBOARD, SDLK_F7));
+		Input(IT_KEYBOARD, SDLK_F2));
+	set(GA_DEBUG_ADD_HOMING,
+		Input(IT_KEYBOARD, SDLK_F3));
 	set(GA_DEBUG_TOGGLE_FPS,
 		Input(IT_KEYBOARD, SDLK_F12));
 	set(GA_DEBUG_TOGGLE_WIREFRAME,
@@ -206,7 +210,7 @@ void UserConfig::setDefaults()
 	set(GA_DEBUG_HISTORY,
 		Input(IT_KEYBOARD, SDLK_F10));
 	set(GA_DEBUG_BULLET,
-		Input(IT_KEYBOARD, SDLK_F2));
+		Input(IT_KEYBOARD, SDLK_F4));
 		
 	// TODO: The following should become a static
 	// array. This allows:

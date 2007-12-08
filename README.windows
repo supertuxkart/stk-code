@@ -32,11 +32,12 @@ Comments:
 
 Visual C++ Express
 ==================
-
+There are now project files included for building SuperTuxKart with
+Visual C++ - have a look at the src/ide/vc8 folder.
 Since version r793 SuperTuxKart compiles with Visual C++ Express,
 version 8.0, since rev 1267 Visual C++ project files are included.
 The main project file is .../src/ide/vc8/supertuxkart.vcproj,
-and it include a sub project for the bullet library. More details
+and it includes a sub project for the bullet library. More details
 can be found in .../src/ide/vc8/README.
 
 You still have to install all dependencies, and:

@@ -5,6 +5,9 @@
  (model "missile.ac")
  (icon  "missile.rgb")
  (speed 50.0)
+ (min-height 0.2)
+ (max-height 1.0)
+ (force-updown 15.0)
 )
 
 ;; EOF ;;

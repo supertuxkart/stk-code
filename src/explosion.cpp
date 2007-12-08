@@ -26,12 +26,9 @@
 
 Explosion::Explosion(sgCoord* coord) : ssgTransform()
 {
+    this->ref();
     ssgCutout *cut = new ssgCutout();
-    addKid(cut);
-    // Make sure that the transform object does not get deleted when it is
-    // removed from the scene graphs. This can happen when the explosion is
-    // moved to the deletedExplosion list in the projecile_manager.
-    ref();
+    addKid(cut);  // derefing the explosion will free the cutout
     m_seq   = projectile_manager->getExplosionModel();
     cut->addKid(m_seq);
     init(coord);
@@ -45,6 +42,7 @@ void Explosion::init(sgCoord* coord)
     setTransform(coord);
     m_step = -1;
     scene->add(this);
+    printf("explosion\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -53,8 +51,8 @@ void Explosion::update (float dt)
 
     if ( ++m_step >= m_seq->getNumKids() )
     {
-        projectile_manager->FinishedExplosion();
         scene->remove((ssgTransform*)this);
+        projectile_manager->FinishedExplosion();
         return ;
     }
 

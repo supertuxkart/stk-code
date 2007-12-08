@@ -4,7 +4,12 @@
  (name  "homing")
  (model "homingmissile.ac")
  (icon  "homingmissile.rgb")
- (speed 25.0)
+ (speed          35.0)
+ (min-height      0.2)
+ (max-height      1.0)
+ (max-distance   20.0)  ;; maximum distance at which a kart is still followed
+ (max-turn-angle  5.0)  ;; maximum turn angle when following a kart
+ (force-updown   25.0)  ;; force raising/lowering the homing missile if it's too low/high
 )
 
 ;; EOF ;;

@@ -29,16 +29,16 @@ class Kart;
 class Collectable
 {
 protected:
-    Kart*                      owner;
-    collectableType            type;
-    int                        number;
+    Kart*                      m_owner;
+    CollectableType            m_type;
+    int                        m_number;
 
 public:
-    Collectable  (Kart* kart_);
-    void            set          (collectableType _type, int n=1);
-void            clear        () {type=COLLECT_NOTHING; number=0;}
-    int             getNum       () const {return number;}
-    collectableType getType      () {return type;}
+                    Collectable  (Kart* kart_);
+    void            set          (CollectableType _type, int n=1);
+    void            clear        () {m_type=COLLECT_NOTHING; m_number=0;}
+    int             getNum       () const {return m_number;}
+    CollectableType getType      () {return m_type;}
     void            hitRedHerring(int n);
     Material*       getIcon      ();
     void            use          ();
