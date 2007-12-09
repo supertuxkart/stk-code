@@ -98,7 +98,7 @@ CharSel::CharSel(int whichPlayer)
     widget_manager->break_line();
 
     //FIXME: the widget should check if the dimensions > 100
-    widget_manager->add_wgt( WTOK_NAME, 20, 7);
+    widget_manager->add_wgt( WTOK_NAME, 30, 7);
     widget_manager->show_wgt_rect( WTOK_NAME );
     widget_manager->show_wgt_text( WTOK_NAME );
 
@@ -128,8 +128,9 @@ void CharSel::switchCharacter(int n)
     const KartProperties* kp= kart_properties_manager->getKartById(n);
     if (m_current_kart != n && kp != NULL)
     {
-        //widgetSet -> set_label(m_kart_name_label, kp->getName().c_str());
         widget_manager->set_wgt_text( WTOK_NAME, kp->getName().c_str());
+        //FIXME: maybe I should rename WGT_SCROLL_* to WGT_POS_*
+        widget_manager->set_wgt_x_scroll_pos( WTOK_NAME, WGT_SCROLL_CENTER );
 
         m_current_kart = n;
         ssgDeRefDelete(m_kart);
