@@ -105,8 +105,20 @@ CharSel::CharSel(int whichPlayer)
     //FIXME: widget_manager says that token -1 is already in use
     widget_manager->layout(WGT_AREA_TOP);
 
+
     m_current_kart = -1;
-    switchCharacter(0);
+
+    const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
+    if( LAST_KART != -1 )
+    {
+        widget_manager->set_selected_wgt(WTOK_RACER0 + LAST_KART);
+        switchCharacter(LAST_KART);
+    }
+    else
+    {
+        switchCharacter(0);
+    }
+
 
     m_clock = 0;
     //test

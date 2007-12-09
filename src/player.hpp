@@ -31,16 +31,16 @@ class Player
 private:
     std::string m_name;
     Input m_action_map[KA_LAST+1];
-    unsigned int m_last_kart_id;
+    int m_last_kart_id;
 
 public:
     Player(){}
-    Player(const std::string &name_):m_name(name_){}
+    Player(const std::string &name_):m_name(name_),m_last_kart_id(-1){}
     void setName(const std::string &name_){m_name = name_;}
 
     std::string getName() {return m_name;}
 
-    unsigned int getLastKartId(){ return m_last_kart_id; }
+    int getLastKartId(){ return m_last_kart_id; }
     void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
 };
 
