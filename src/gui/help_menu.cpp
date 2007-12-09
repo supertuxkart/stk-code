@@ -155,7 +155,7 @@ void HelpMenu::switch_to_first_screen()
     const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
 
     widget_manager->set_initial_rect_state( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
-    widget_manager->set_initial_text_state( SHOW_TEXT, "", TEXT_SIZE, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_text_state( SHOW_TEXT, "", TEXT_SIZE );
 
     /*Help header*/
     widget_manager->add_wgt(WTOK_MSG1, 50, 7);
@@ -262,7 +262,7 @@ void HelpMenu::switch_to_second_screen()
     const bool SHOW_RECT = true;
     const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
     widget_manager->set_initial_rect_state( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
-    widget_manager->set_initial_text_state( false, "", TEXT_SIZE, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_text_state( false, "", TEXT_SIZE );
 
     widget_manager->add_wgt(WTOK_MSG6, 100, 8);
     widget_manager->set_wgt_text(WTOK_MSG6,

@@ -80,13 +80,11 @@ bool WidgetManager::add_wgt
     new_id.widget->m_enable_text = m_default_show_text;
     new_id.widget->m_text.assign(m_default_text);
     new_id.widget->m_text_size = m_default_text_size;
-    new_id.widget->m_text_x_alignment =  m_default_text_x_alignment;
-    new_id.widget->m_text_y_alignment =  m_default_text_y_alignment;
 
     new_id.widget->m_enable_scroll = m_default_enable_scroll;
-/*    new_id.widget->m_scroll_pos_x = m_default_scroll_x_pos;*/
+    new_id.widget->m_scroll_pos_x = m_default_scroll_x_pos;
     new_id.widget->m_scroll_pos_y = m_default_scroll_y_pos;
-/*    new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;*/
+    new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;
     new_id.widget->m_scroll_speed_y = m_default_scroll_y_speed;
 
     m_elems.push_back(WidgetElement(ET_WGT, m_widgets.size()));
@@ -730,32 +728,28 @@ void WidgetManager::set_initial_text_state
 (
     const bool SHOW,
     const std::string TEXT,
-    const WidgetFontSize SIZE,
-    const Font::FontAlignType X_ALIGN,
-    const Font::FontAlignType Y_ALIGN
+    const WidgetFontSize SIZE
 )
 {
     m_default_show_text = SHOW;
     m_default_text = TEXT;
     m_default_text_size = SIZE;
-    m_default_text_x_alignment = X_ALIGN;
-    m_default_text_y_alignment = Y_ALIGN;
 }
 
 //-----------------------------------------------------------------------------
 void WidgetManager::set_initial_scroll_state
 (
     const bool ENABLE,
-/*    const int X_POS,*/
+    const int X_POS,
     const int Y_POS,
-/*    const int X_SPEED,*/
+    const int X_SPEED,
     const int Y_SPEED
 )
 {
     m_default_enable_scroll = ENABLE;
-/*    m_default_scroll_x_pos = X_POS;*/
+    m_default_scroll_x_pos = X_POS;
     m_default_scroll_y_pos = Y_POS;
-/*    m_default_scroll_x_speed = X_SPEED;*/
+    m_default_scroll_x_speed = X_SPEED;
     m_default_scroll_y_speed = Y_SPEED;
 }
 
@@ -771,12 +765,10 @@ void WidgetManager::restore_default_states()
     m_default_show_text = false;
     m_default_text = "";
     m_default_text_size = WGT_FNT_MED;
-    m_default_text_x_alignment = Font::ALIGN_CENTER;
-    m_default_text_y_alignment = Font::ALIGN_CENTER;
     m_default_enable_scroll = false;
-/*    m_default_scroll_x_pos = 0;*/
-    m_default_scroll_y_pos = 0;
-/*    m_default_scroll_x_speed = 0;*/
+    m_default_scroll_x_pos = WGT_SCROLL_CENTER;
+    m_default_scroll_y_pos = WGT_SCROLL_CENTER;
+    m_default_scroll_x_speed = 0;
     m_default_scroll_y_speed = 0;
 }
 
@@ -972,6 +964,7 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 }*/
 
 //-----------------------------------------------------------------------------
+/*
 void WidgetManager::set_wgt_text_x_alignment( const int TOKEN, const Font::FontAlignType ALIGN )
 {
     const int ID = find_id(TOKEN);
@@ -982,9 +975,9 @@ void WidgetManager::set_wgt_text_x_alignment( const int TOKEN, const Font::FontA
             "an unnamed widget with token " << TOKEN << '\n';
     }
 }
-
+*/
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontAlignType ALIGN )
+/*void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontAlignType ALIGN )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_y_alignment = ALIGN;
@@ -993,7 +986,7 @@ void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontA
         std::cerr << "WARNING: tried to set the Y alignment of text of " <<
             "an unnamed widget with token " << TOKEN << '\n';
     }
-}
+}*/
 
 //-----------------------------------------------------------------------------
 void WidgetManager::enable_wgt_scroll( const int TOKEN )
@@ -1020,16 +1013,46 @@ void WidgetManager::disable_wgt_scroll( const int TOKEN )
 }
 
 //-----------------------------------------------------------------------------
-/*void WidgetManager::set_wgt_x_scroll_pos( const int TOKEN, const int POS )
+void WidgetManager::set_wgt_x_scroll_pos
+(
+    const int TOKEN,
+    const WidgetScrollPos POS
+)
 {
+    if( POS == WGT_SCROLL_START_TOP || POS == WGT_SCROLL_START_BOTTOM ||
+        POS == WGT_SCROLL_END_TOP || POS == WGT_SCROLL_END_BOTTOM )
+    {
+        std::cerr << "WARNING: tried to set the X scroll position to a " <<
+            "position for the Y axis, on widget with token " << TOKEN <<
+            '\n';
+        return;
+    }
+
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_x = POS;
-    else std::cerr << "Tried to set the X scroll position of an unnamed widget with token " << TOKEN << '\n';
-}*/
+    else
+    {
+        std::cerr << "WARNING: tried to set the X scroll position of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_y_scroll_pos( const int TOKEN, const int POS )
+void WidgetManager::set_wgt_y_scroll_pos
+(
+    const int TOKEN,
+    const WidgetScrollPos POS
+)
 {
+    if( POS == WGT_SCROLL_START_LEFT || POS == WGT_SCROLL_START_RIGHT ||
+        POS == WGT_SCROLL_END_LEFT || POS == WGT_SCROLL_END_RIGHT )
+    {
+        std::cerr << "WARNING: tried to set the Y scroll position to a " <<
+            "position for the X axis, on widget with token " << TOKEN <<
+            '\n';
+        return;
+    }
+
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_y = POS;
     else
@@ -1040,15 +1063,19 @@ void WidgetManager::set_wgt_y_scroll_pos( const int TOKEN, const int POS )
 }
 
 //-----------------------------------------------------------------------------
-/*void WidgetManager::set_wgt_x_scroll_speed( const int TOKEN, const int SPEED )
+void WidgetManager::set_wgt_x_scroll_speed( const int TOKEN, const float SPEED )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
-    else std::cerr << "Tried to set the X scroll speed of an unnamed widget with token " << TOKEN << '\n';
-}*/
+    else
+    {
+        std::cerr << "WARNING: tried to set the X scroll speed of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_y_scroll_speed( const int TOKEN, const int SPEED )
+void WidgetManager::set_wgt_y_scroll_speed( const int TOKEN, const float SPEED )
 {
     const int ID = find_id(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;

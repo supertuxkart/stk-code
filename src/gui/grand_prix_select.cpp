@@ -47,7 +47,7 @@ GrandPrixSelect::GrandPrixSelect()
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
 
     widget_manager->insert_column();
     widget_manager->add_wgt(WTOK_TITLE, 40, 7);

@@ -50,6 +50,24 @@ enum WidgetArea //One of the uses of this, is for rounded corners
     WGT_AREA_ALL = (WGT_AREA_TOP | WGT_AREA_BOT)
 };
 
+//The lowest scroll values here must be bigger or lower than
+//Widget::MAX_SCROLL
+enum WidgetScrollPos
+{
+    //For the X axis
+    WGT_SCROLL_START_LEFT = 2000001,
+    WGT_SCROLL_START_RIGHT = 2000002,
+    WGT_SCROLL_END_LEFT = -2000001,
+    WGT_SCROLL_END_RIGHT = -2000002,
+    //For the Y axis
+    WGT_SCROLL_START_TOP = 1000001,
+    WGT_SCROLL_START_BOTTOM = 1000002,
+    WGT_SCROLL_END_TOP = -1000001,
+    WGT_SCROLL_END_BOTTOM = -1000002,
+    //Works for both axis
+    WGT_SCROLL_CENTER = 3000000
+};
+
 //I suggest that you do not use the white or light colors for the rects in
 //most cases, because they don't have lighter versions that can be used to
 //highlight those rects and then revert them, for example, when you select a
@@ -86,6 +104,9 @@ extern const GLfloat WGT_LIGHT_TRANS_BLUE   [4];
 
 class Widget
 {
+    //The only class that can access the Widget class is WidgetManager;
+    //they are meant to always be used together, and the widgets should only
+    //be used through the WidgetManager class.
     friend class WidgetManager;
 
     /* Basic widget properties that will always be used. */
@@ -107,15 +128,14 @@ class Widget
     bool m_enable_text;
     std::string m_text;
     WidgetFontSize m_text_size;
-    Font::FontAlignType m_text_x_alignment;
-    Font::FontAlignType m_text_y_alignment;
 
 
+    static const int MAX_SCROLL;
     bool m_enable_scroll;
-/*    int m_scroll_pos_x;*/
-    int m_scroll_pos_y;
-/*    int m_scroll_speed_x;*/
-    int m_scroll_speed_y;
+    float m_scroll_pos_x;
+    float m_scroll_pos_y;
+    float m_scroll_speed_x;
+    float m_scroll_speed_y;
 
     /* Delta time dependant features, these deactivate after a certain time,
      * and are dependant on the delta time. They have animations. */

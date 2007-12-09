@@ -31,8 +31,6 @@ private:
     fntRenderer *m_text_out;
 
 public:
-    // Align right and top are not supported yet
-    enum FontAlignType {ALIGN_LEFT, ALIGN_CENTER, ALIGN_BOTTOM};
     const static int CENTER_OF_SCREEN=-1;
     enum FontSize      {SMALL=18,   MEDIUM=24,   LARGE=30    };
     Font(const char* fontname);
@@ -46,56 +44,57 @@ public:
 
     // The actual main function which does everything
     // ----------------------------------------------
-    void Print(      const char *text, int size, 
-                     FontAlignType fontalign_x, int x,
-                     FontAlignType fontalign_y, int y,
+    void Print(      const char *text, int size,
+                     int x, int y,
                      int red=255, int green=255, int blue=255,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1,
                      bool doShadow=false);
-    void Print(      std::string const &text, int size, 
-                     FontAlignType fontalign_x, int x,
-                     FontAlignType fontalign_y, int y,
+    void Print(      std::string const &text, int size,
+                     int x, int y,
                      int red=255, int green=255, int blue=255,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1,
                      bool doShadow=false)
     {
-        Print(text.c_str(), size, fontalign_x, x, fontalign_y, y,
+        Print(text.c_str(), size, x, y,
               red, green, blue, scale_x, scale_y, left, right, top, bottom,
               doShadow);
     }
 
+#if 0
     // Convenience functions to reduce the number of parameters
     // --------------------------------------------------------
     void Print(      const std::string &text, int size, int x, int y,
                      int red=255, int green=255, int blue=255,
                      int left=-1, int right=-1, int top=-1, int bottom=-1)
     {
-                     Print(text,  size, ALIGN_LEFT, x, ALIGN_BOTTOM, y,
+                     Print(text,  size, x, y,
                            red, green, blue, 1.0f, 1.0f,
                            left, right, top, bottom);
     }
+#endif
 
     void PrintShadow(const char *text, int size,
-                     FontAlignType fontalign_x, int x,
-                     FontAlignType fontalign_y, int y,
+                     int x, int y,
                      int red=255, int green=255, int blue=255,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1)
     {
-                     Print(text,  size, fontalign_x, x, fontalign_y, y,
+                     Print(text, size, x, y,
                            red, green, blue, scale_x, scale_y,
                            left, right, top, bottom, true);
     }
+#if 0
     void PrintShadow(const char *text, int size, int x, int y,
                      int red=255, int green=255, int blue=255,
                      int left=-1, int right=-1, int top=-1, int bottom=-1)
     {
-                     Print(text, size, ALIGN_LEFT, x, ALIGN_BOTTOM, y,
+                     Print(text, size, x, y,
                            red, green, blue, 1.0f, 1.0f, 
                            left, right, top, bottom, true);
     }
+#endif
 };
 
 int init_fonts();

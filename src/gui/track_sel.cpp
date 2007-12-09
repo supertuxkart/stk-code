@@ -68,7 +68,7 @@ TrackSel::TrackSel()
     const bool SHOW_TEXT = true;
     widget_manager->set_initial_activation_state(true);
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_SML, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_SML );
     for (size_t i = 0; i != track_manager->getTrackCount(); i += 2)
     {
         widget_manager->add_wgt( WTOK_TRACK0 + i, 40, 7);
@@ -81,7 +81,7 @@ TrackSel::TrackSel()
 //FIXME: Right now, the image and the author's name is not controlled by the widget manager.
 #if 0
     widget_manager->set_initial_rect_state(false, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(false, "", WGT_FNT_MED, Font::ALIGN_CENTER, Font::ALIGN_CENTER );
+    widget_manager->set_initial_text_state(false, "", WGT_FNT_MED );
     widget_manager->set_initial_activation_state(false);
     widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
     widget_manager->break_line();
@@ -174,8 +174,7 @@ void TrackSel::update(float dt)
 //    glCallList(m_rect);
     glPopMatrix();
     font_gui->Print(TRACK->getDescription(), WGT_FNT_MED,
-                    Font::ALIGN_CENTER, -1,
-                    Font::ALIGN_BOTTOM, 10);
+                    Font::CENTER_OF_SCREEN, 10);
     glDisable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();

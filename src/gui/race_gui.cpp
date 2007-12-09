@@ -800,8 +800,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
         if( msg.m_kart && msg.m_kart!=player_kart) continue;
 
         font_race->Print( msg.m_message.c_str(), msg.m_font_size, 
-                          Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
-                          Font::ALIGN_BOTTOM, y,
+                          Font::CENTER_OF_SCREEN, y,
                           msg.m_red, msg.m_green, msg.m_blue,
                           ratio_x, ratio_y,
                           offset_x, offset_x+(int)(user_config->m_width*ratio_x));
@@ -849,18 +848,18 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     switch (world->m_ready_set_go)
     {
     case 2: font_race->PrintShadow(_("Ready!"), 90, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
                                    230, 170, 160);
         break;
     case 1: font_race->PrintShadow(_("Set!"), 90, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
                                    230, 230, 160);
         break;
     case 0: font_race->PrintShadow(_("Go!"), 90, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
-                                   Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
                                    100, 210, 100);
         break;
     }   // switch
@@ -878,8 +877,8 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
             if(world->getPlayerKart(i)->earlyStartPenalty())
             {
                 font_race->PrintShadow(_("Penalty time!!"), 80,
-                                       Font::ALIGN_CENTER, Font::CENTER_OF_SCREEN, 
-                                       Font::ALIGN_BOTTOM, 200, 200, 10, 10);
+                                       Font::CENTER_OF_SCREEN, 200,
+                                       200, 10, 10);
             }   // if penalty
         }  // for i < getNumPlayers
     }  // if not RACE_PHASE

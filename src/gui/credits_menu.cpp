@@ -69,13 +69,14 @@ CreditsMenu::CreditsMenu()
 
     widget_manager->set_initial_activation_state( true );
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", TEXT_SIZE, Font::ALIGN_CENTER, Font::ALIGN_CENTER);
+    widget_manager->set_initial_text_state(SHOW_TEXT, "", TEXT_SIZE );
 
     widget_manager->add_wgt( WTOK_CREDITS, 100, 93);
     widget_manager->set_wgt_text( WTOK_CREDITS, credits_text );
-    widget_manager->set_wgt_text_x_alignment( WTOK_CREDITS, Font::ALIGN_LEFT );
     //FIXME: maybe I should make scroll names more consistent
     widget_manager->enable_wgt_scroll( WTOK_CREDITS );
+    widget_manager->set_wgt_y_scroll_pos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
+    widget_manager->set_wgt_y_scroll_speed( WTOK_CREDITS, -0.25f );
     widget_manager->break_line();
 
     widget_manager->add_wgt( WTOK_QUIT, 40, 7);

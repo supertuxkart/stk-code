@@ -28,6 +28,8 @@
 #include <cmath>
 #include <iostream>
 
+const int Widget::MAX_SCROLL = 1000000;
+
 const float Widget::MAX_TEXT_SCALE = 1.2f;
 const float Widget::MIN_TEXT_SCALE = 1.0f;
 
@@ -73,8 +75,8 @@ Widget::Widget
     m_width(WIDTH_), m_height(HEIGHT_),
     m_rect_list(0),
     m_round_corners(WGT_AREA_ALL),
-    /*m_scroll_pos_x(0),*/ m_scroll_pos_y(0),
-    /*m_scroll_speed_x(0),*/ m_scroll_speed_y(0),
+    m_scroll_pos_x(0), m_scroll_pos_y(0),
+    m_scroll_speed_x(0), m_scroll_speed_y(0.0f),
     m_text_scale(1.0f)
 {
 }
@@ -101,8 +103,7 @@ void Widget::update(const float DELTA)
         if(m_text_scale < MIN_TEXT_SCALE) m_text_scale = MIN_TEXT_SCALE;
     }
 
-    /*Handle on/off features*/
-    //Draw widget
+    /*Start handling of on/off features*/
     if(m_enable_texture)
     {
         glEnable(GL_TEXTURE_2D);
@@ -142,7 +143,8 @@ void Widget::update(const float DELTA)
     //text when there are multiple lines. Hopefully this work around will
     //be removed when we move away from plib; the scrolling and the other
     //text handling should be cleaned. Also, for some reason, different
-    //positions are needed if the text is centered. Sorry for the mess.
+    //positions are needed if the text is centered, and on top of that,
+    //it's not 100% exact. Sorry for the mess.
     size_t line_end = 0;
     int lines = 0;
 
@@ -152,66 +154,114 @@ void Widget::update(const float DELTA)
         ++lines;
     } while( line_end != std::string::npos );
 
+    /* Handle preset scrolling positions */
+    // In the Y-axis, a scroll position of 0 leaves the text centered, and
+    // positive values lowers the text, and negatives (obviously) raise the
+    // text, in the X-axis, a position of 0 leaves the text aligned to the
+    // left; positive values move to the right and negative
+    // values to the left.
+
+    float left, right, bottom, top;
+    font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
+    int text_width = (int)(right - left + 0.99);
+
+    const int Y_LIMIT = lines * m_text_size + m_height;
+
+    //A work around for yet another bug with multilines: we get the wrong
+    //width when using multilines.
+    if( text_width > m_width )
+    {
+        text_width = m_width;
+    }
+
+    //Y-axis preset positions
+    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
+    {
+        m_scroll_pos_y = Y_LIMIT / 2 - m_height;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
+    {
+        m_scroll_pos_y = Y_LIMIT / 2;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
+    {
+        m_scroll_pos_y = 0;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
+    {
+        m_scroll_pos_y = -Y_LIMIT / 2;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
+    {
+        m_scroll_pos_y = -Y_LIMIT / 2 + m_height;
+    }
+    else if( m_scroll_pos_y > MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too high to scroll!.\n";
+    }
+    else if( m_scroll_pos_y < -MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too low to scroll!.\n";
+    }
+
+    //X-axis preset positions
+    if( m_scroll_pos_x == WGT_SCROLL_START_LEFT )
+    {
+        m_scroll_pos_x = 0;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_START_RIGHT )
+    {
+        m_scroll_pos_x = m_width;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_CENTER )
+    {
+        m_scroll_pos_x = (m_width - text_width) / 2;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_END_LEFT )
+    {
+        m_scroll_pos_x = -text_width;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
+    {
+        m_scroll_pos_x = -text_width + m_width;
+    }
+    else if( m_scroll_pos_x > MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position is too much to the right to " <<
+            "scroll!.\n";
+    }
+    else if( m_scroll_pos_x < -MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position is too much to the left to " <<
+            "to scroll!.\n";
+    }
+
     if(m_enable_scroll)
     {
         //TODO: constrain speed to sane values
-        /*m_scroll_pos_x += m_scroll_speed_x;*/
+        m_scroll_pos_x += m_scroll_speed_x;
         m_scroll_pos_y += m_scroll_speed_y;
 
-        if( m_text_y_alignment == Font::ALIGN_CENTER )
+        //Y-axis wrapping
+        if(m_scroll_pos_y * 2 > Y_LIMIT)
         {
-            const int LIMIT = lines * m_text_size + m_height;
-            if(m_scroll_pos_y * 2 > LIMIT)
-            {
-                m_scroll_pos_y = -LIMIT / 2;
-            }
-            else if(-m_scroll_pos_y * 2 > LIMIT)
-            {
-                m_scroll_pos_y = LIMIT / 2;
-            }
+            m_scroll_pos_y = WGT_SCROLL_END_TOP;
         }
-        else if( m_text_y_alignment == Font::ALIGN_BOTTOM )
+        else if(-m_scroll_pos_y * 2 > Y_LIMIT)
         {
-            const int TEXT_HEIGHT = lines * m_text_size;
-            if(m_scroll_pos_y > TEXT_HEIGHT / 2)
-            {
-                m_scroll_pos_y = -m_height - (TEXT_HEIGHT) / 2;
-            }
-            else if(m_scroll_pos_y < - m_height - TEXT_HEIGHT / 2)
-            {
-                m_scroll_pos_y = TEXT_HEIGHT / 2 + m_text_size;
-            }
+            m_scroll_pos_y = WGT_SCROLL_START_BOTTOM;
         }
 
-/*
-        float left, right;
-        font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
-        const int TEXT_WIDTH = (int)(right - left) / m_text_size;
+        //X-axis wrapping
+        if(m_scroll_pos_x > m_width )
+        {
+            m_scroll_pos_x = WGT_SCROLL_END_LEFT;
+        }
+        else if(m_scroll_pos_x < -text_width )
+        {
+            m_scroll_pos_x = WGT_SCROLL_START_RIGHT;
+        }
 
-        if( m_text_x_alignment == Font::ALIGN_CENTER )
-        {
-            const int LIMIT = TEXT_WIDTH + m_width;
-            if(m_scroll_pos_x * 2 > LIMIT)
-            {
-                m_scroll_pos_x = -LIMIT / 2;
-            }
-            else if(-m_scroll_pos_x * 2 > LIMIT)
-            {
-                m_scroll_pos_x = LIMIT / 2;
-            }
-        }
-        else if( m_text_x_alignment == Font::ALIGN_LEFT )
-        {
-            if(m_scroll_pos_x > TEXT_WIDTH / 2)
-            {
-                m_scroll_pos_x = -m_width - (TEXT_WIDTH) / 2;
-            }
-            else if(m_scroll_pos_x < - m_width - TEXT_WIDTH / 2)
-            {
-                m_scroll_pos_x = TEXT_WIDTH / 2 + m_text_size;
-            }
-        }
-*/
     }
 
     if(m_enable_text)
@@ -222,14 +272,10 @@ void Widget::update(const float DELTA)
             std::cerr << "(Did you set the text?)\n";
         }
 
-        int x_pos = m_x;// + m_scroll_pos_x;
-        int y_pos = m_y - m_scroll_pos_y + ((lines - 1 )* m_text_size) / 2;
+        int x_pos = m_x + (int)m_scroll_pos_x;
+        int y_pos = m_y - (int)m_scroll_pos_y + ((lines - 1 )* m_text_size) / 2;
 
-        if( m_text_x_alignment == Font::ALIGN_CENTER ) x_pos += m_width / 2;
-        if( m_text_y_alignment == Font::ALIGN_CENTER )
-        {
-            y_pos += m_height / 2;
-        }
+        y_pos += m_height / 2;
 
         size_t line_start = 0;
         bool draw;
@@ -262,7 +308,7 @@ void Widget::update(const float DELTA)
             if( draw )
             {
                 font_gui->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
-                    m_text_x_alignment, x_pos, m_text_y_alignment, y_pos,
+                    x_pos, y_pos,
                     255, 255, 255, m_text_scale, m_text_scale);
             }
 
@@ -425,7 +471,7 @@ void Widget::resize_to_text()
         font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
 
         const int TEXT_WIDTH = (int)(right - left);
-        const int TEXT_HEIGHT = (int)(bottom - top);
+        const int TEXT_HEIGHT = (int)(top - bottom);
 
         if( TEXT_WIDTH > m_width ) m_width = TEXT_WIDTH;
         if( TEXT_HEIGHT > m_height ) m_height = TEXT_HEIGHT;

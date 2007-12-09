@@ -97,13 +97,11 @@ class WidgetManager
     bool m_default_show_text;
     std::string m_default_text;
     WidgetFontSize m_default_text_size;
-    Font::FontAlignType m_default_text_x_alignment;
-    Font::FontAlignType m_default_text_y_alignment;
 
     bool m_default_enable_scroll;
-/*    int m_default_scroll_x_pos;*/
+    int m_default_scroll_x_pos;
     int m_default_scroll_y_pos;
-/*    int m_default_scroll_x_speed;*/
+    int m_default_scroll_x_speed;
     int m_default_scroll_y_speed;
 
     bool is_column_break( const int BREAK_POST ) const;
@@ -169,11 +167,16 @@ public:
     (
         const bool SHOW,
         const std::string TEXT,
-        const WidgetFontSize SIZE,
-        const Font::FontAlignType X_ALIGN,
-        const Font::FontAlignType Y_ALIGN
+        const WidgetFontSize SIZE
     );
-    void set_initial_scroll_state(const bool ENABLE, /*const int X_POS,*/ const int Y_POS, /*const int X_SPEED, */const int Y_SPEED );
+    void set_initial_scroll_state
+    (
+        const bool ENABLE,
+        const int X_POS,
+        const int Y_POS,
+        const int X_SPEED,
+        const int Y_SPEED
+    );
     void restore_default_states();
 
     void activate_wgt(const int TOKEN);
@@ -197,15 +200,17 @@ public:
     void show_wgt_text( const int TOKEN );
     void hide_wgt_text( const int TOKEN );
 //    void toggle_wgt_text( const int TOKEN );
-    void set_wgt_text_x_alignment( const int TOKEN, const Font::FontAlignType ALIGN );
-    void set_wgt_text_y_alignment( const int TOKEN, const Font::FontAlignType ALIGN );
 
+    //FIXME: change to enable_wgt_scrolling, since it enables or disables
+    //FIXME: maybe all that enabling the scrolling should do, is to allow
+    //players to lower/raise it?
+    //only the scrolling movement, not setting the scrolling position.
     void enable_wgt_scroll( const int TOKEN );
     void disable_wgt_scroll( const int TOKEN );
-/*    void set_wgt_x_scroll_pos( const int TOKEN, const int POS );*/
-    void set_wgt_y_scroll_pos( const int TOKEN, const int POS );
-/*    void set_wgt_x_scroll_speed( const int TOKEN, const int SPEED );*/
-    void set_wgt_y_scroll_speed( const int TOKEN, const int SPEED );
+    void set_wgt_x_scroll_pos( const int TOKEN, const WidgetScrollPos POS );
+    void set_wgt_y_scroll_pos( const int TOKEN, const WidgetScrollPos POS );
+    void set_wgt_x_scroll_speed( const int TOKEN, const float SPEED );
+    void set_wgt_y_scroll_speed( const int TOKEN, const float SPEED );
 
     /* Activated widget features. */
     void pulse_wgt( const int TOKEN ) const;
