@@ -191,15 +191,12 @@ void Flyable::update (float dt)
         btTransform trans=getBody()->getWorldTransform();
         m_current_HAT = world->getHAT(trans.getOrigin());
         m_HAT_counter = 0;
-        printf("pos: %f %f %f height %f min %f max %f\n",
-            trans.getOrigin().getX(),trans.getOrigin().getY(),trans.getOrigin().getZ(),
-            m_current_HAT, m_min_height, m_max_height);
         if(m_current_HAT!=Physics::NOHIT) 
         {
     	    if(m_current_HAT<m_min_height)   
-            {printf("up \n");too_low(dt);}
+                too_low(dt);
     	    else if(m_current_HAT>m_max_height) 
-            {printf("down \n");too_high(dt);}
+                too_high(dt);
             else                                
                 right_height(dt);
         } 

@@ -42,7 +42,6 @@ void Explosion::init(sgCoord* coord)
     setTransform(coord);
     m_step = -1;
     scene->add(this);
-    printf("explosion\n");
 }
 
 //-----------------------------------------------------------------------------
