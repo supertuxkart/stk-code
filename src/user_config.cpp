@@ -919,7 +919,7 @@ UserConfig::newIngameActionMap()
   // TODO: Reorder ingame GameAction values so that they start with
   // the fixed ones. This would allow simpler looking code here. 
 
-	GameAction gaEnd;
+	GameAction gaEnd = GA_NULL;
 	
 	switch (race_manager->getNumPlayers())
 	{
