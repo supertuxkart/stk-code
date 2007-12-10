@@ -212,15 +212,21 @@ void MenuManager::update()
                 break;
             }   // switch
 
-			// Restores the previously selected widget if there was one.
-			if (saved_widget != WidgetManager::WGT_NONE)
-			{
-				widget_manager->lighten_wgt_color( saved_widget );
-				widget_manager->pulse_wgt( saved_widget );
-				widget_manager->set_selected_wgt(saved_widget);
-			} else if( widget_manager->get_selected_wgt() != WidgetManager::WGT_NONE )
+
+            if( id != MENUID_EXITGAME )
             {
-                widget_manager->lighten_wgt_color(widget_manager->get_selected_wgt());
+                // Restores the previously selected widget if there was one.
+                if (saved_widget != WidgetManager::WGT_NONE)
+                {
+                    widget_manager->lighten_wgt_color( saved_widget );
+                    widget_manager->pulse_wgt( saved_widget );
+                    widget_manager->set_selected_wgt(saved_widget);
+                } else if( widget_manager->get_selected_wgt() !=
+                    WidgetManager::WGT_NONE )
+                {
+                    widget_manager->lighten_wgt_color (
+                        widget_manager->get_selected_wgt() );
+                }
             }
         }
     }
