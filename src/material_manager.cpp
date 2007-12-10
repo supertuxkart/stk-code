@@ -46,7 +46,7 @@ MaterialManager::MaterialManager()
 int MaterialManager::addEntity(Material *m)
 {
     m_materials.push_back(m);
-    return m_materials.size()-1;
+    return (int)m_materials.size()-1;
 }
 
 //-----------------------------------------------------------------------------

@@ -225,7 +225,7 @@ void ConfigDisplay::getScreenModes()
             
             //Prevent use of very small resolutions
             const int minRes = 640;
-            m_sizes_size = m_sizes.size();
+            m_sizes_size = (int)m_sizes.size();
             
             for (int i = m_sizes_size-1; i >= 0; --i)
             {
@@ -240,7 +240,7 @@ void ConfigDisplay::getScreenModes()
     
     // search m_sizes for the current resolution
     m_sizes_index = -1;
-    m_sizes_size = m_sizes.size();
+    m_sizes_size = (int)m_sizes.size();
     for (int i = 0; i < m_sizes_size; i++)
     {
         if (m_sizes[i].first == user_config->m_width 

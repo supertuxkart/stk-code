@@ -148,7 +148,7 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
         i != m_karts_properties.end(); ++i)
         all_karts.push_back((*i)->getIdent());
 
-    std::srand(std::time(0));
+    std::srand((unsigned int)std::time(0));
 
     std::random_shuffle(all_karts.begin(), all_karts.end());
 

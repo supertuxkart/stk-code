@@ -147,7 +147,13 @@ void PlayerKart::update(float dt)
         m_collectable.use() ;
         m_controls.fire = false;
     }
+#ifdef DEBUG
+    // Allow rescuing while still falling ... it's convenient for debugging, but
+    // not for a release
     if ( m_controls.rescue )
+#else
+    if ( isOnGround()  &&  m_controls.rescue )
+#endif
     {
         sound_manager -> playSfx ( SOUND_BEEP ) ;
         forceRescue();

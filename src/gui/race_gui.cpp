@@ -130,11 +130,6 @@ RaceGUI::handle(GameAction ga, int value)
 				m_fps_counter=0;
 			}
 			break;
-#ifdef BULLET
-		case GA_DEBUG_BULLET:
-			user_config->m_bullet_debug = !user_config->m_bullet_debug;
-			break;
-#endif
 		case GA_DEBUG_TOGGLE_WIREFRAME:
 			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
 			isWireframe = ! isWireframe;
@@ -677,12 +672,8 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
     glEnd () ;
 
-#ifdef BULLET
     //convention taken from btRaycastVehicle::updateVehicle
     const float speed =  kart->getSpeed();
-#else
-    const float speed = kart->getVelocity()->xyz[1];
-#endif
 
     if ( !kart->isOnGround() )
         font_race->PrintShadow("!", (int)(60*minRatio), 

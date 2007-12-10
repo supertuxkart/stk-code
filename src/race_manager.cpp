@@ -63,12 +63,12 @@ GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
 : m_difficulty(difficulty_), m_num_karts(numKarts_), m_players(players_),
     m_cup(cup_), m_track(0)
 {
-    const int NUM_PLAYERS = m_players.size();
+    const int NUM_PLAYERS = (int)m_players.size();
 
     std::vector<std::string> kart_names;
     
     if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
-    if((unsigned int)m_num_karts < m_players.size()) m_num_karts = m_players.size();
+    if((size_t)m_num_karts < m_players.size()) m_num_karts = (int)m_players.size();
 
     kart_names.resize(m_num_karts);
 
@@ -187,7 +187,7 @@ QuickRaceMode::QuickRaceMode(const std::string& track_,
         m_num_karts(numKarts_), m_num_laps(numLaps_)
 {
     if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
-    if((unsigned int)m_num_karts < m_players.size()) m_num_karts = m_players.size();
+    if((size_t)m_num_karts < m_players.size()) m_num_karts = (int)m_players.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ QuickRaceMode::start()
     raceSetup.m_num_laps   = m_num_laps;
     raceSetup.m_karts.resize(m_num_karts);
 
-    const int FIRST_PLAYER = m_num_karts - m_players.size();
+    const int FIRST_PLAYER = m_num_karts - (int)m_players.size();
     for(int i = 0; i < int(m_players.size()); ++i)
     {
         raceSetup.m_karts[FIRST_PLAYER + i] = m_players[i]; // Players starts last in the race

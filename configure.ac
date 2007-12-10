@@ -363,6 +363,13 @@ bullet_LIBS="-L bullet/Demos/OpenGL -lbulletopenglsupport -L bullet/src -lbullet
 
 AC_SUBST(BULLETTREE)
 
+dnl =============================================
+dnl Define debug which enables some cheats
+dnl This should be DISABLED when doing a release!
+dnl =============================================
+AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
+SUMMARY="$SUMMARY\nEnabled cheats for debugging, please disable for a release!!"
+
 dnl ================
 dnl Create makefiles
 dnl ================

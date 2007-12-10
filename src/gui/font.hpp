@@ -39,7 +39,7 @@ public:
     void getBBox(const std::string &text, int size, bool italic,
                  float *left, float *right, float *bot, float *top)
     {
-        m_fnt->getBBox(text.c_str(), size, italic, left, right, bot, top);
+        m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
     }
 
     // The actual main function which does everything

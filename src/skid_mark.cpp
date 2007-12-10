@@ -38,7 +38,7 @@ SkidMark::~SkidMark()
 {
     if(!m_skid_marks.empty())
     {
-        const unsigned int SIZE = m_skid_marks.size() -1;
+        const unsigned int SIZE = (unsigned int)m_skid_marks.size() -1;
         for(unsigned int i = 0; i < SIZE; ++i)
         {
             ssgDeRefDelete(m_skid_marks[i]);
@@ -52,14 +52,14 @@ void SkidMark::add(sgCoord* coord)
 {
     assert(m_skid_marking);
 
-    const int CURRENT = m_skid_marks.size() - 1;
+    const int CURRENT = (int)m_skid_marks.size() - 1;
     m_skid_marks[CURRENT]->add(coord);
 }   // add
 
 //-----------------------------------------------------------------------------
 void SkidMark::addBreak(sgCoord* coord)
 {
-    const unsigned int CURRENT = m_skid_marks.size() - 1;
+    const unsigned int CURRENT = (unsigned int)m_skid_marks.size() - 1;
     if(m_skid_marking)
         m_skid_marks[CURRENT]->addEnd(coord);
     else

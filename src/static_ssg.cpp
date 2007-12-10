@@ -177,7 +177,7 @@ float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
 
     float hot      = NOINTERSECT;
     int N_HASH_START = GetHash(start[0], start[1]);
-    int nTriangles = (*m_buckets)[N_HASH_START].size();
+    int nTriangles = (int)(*m_buckets)[N_HASH_START].size();
     *leaf          = NULL;
     for(int i=0; i<nTriangles; i++)
     {
@@ -194,7 +194,7 @@ float StaticSSG::hot(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
     if(start[0]==end[0] && start[1]==end[1]) return hot;
 
     const int HASH_END = GetHash(end[0], end[1]);
-    nTriangles   = (*m_buckets)[HASH_END].size();
+    nTriangles   = (int)(*m_buckets)[HASH_END].size();
     for(int i=0; i<nTriangles; i++)
     {
         InfoTriangle *t = (*m_buckets)[HASH_END][i];
@@ -245,7 +245,7 @@ int StaticSSG::collision(sgSphere *s, AllHits *allHits)
             {   // that should be a car off track
                 continue;                   // rescue should take care of this
             }
-            int nCount = (*m_buckets)[N_HASH].size();
+            int nCount = (int)(*m_buckets)[N_HASH].size();
             for(int k=0; k<nCount; k++)
             {
                 InfoTriangle *t = (*m_buckets)[N_HASH][k];

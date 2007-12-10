@@ -183,7 +183,7 @@ void Scene::draw(float dt)
             
             for (World::Karts::size_type i = 0 ; i < world->getNumKarts(); ++i)
             {
-                world->getKart(i)->draw();
+                world->getKart((int)i)->draw();
             }
             world->getPhysics()->draw();
         }   //  bullet_debug

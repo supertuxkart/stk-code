@@ -81,13 +81,13 @@ bool WidgetManager::add_wgt
     new_id.widget->m_text.assign(m_default_text);
     new_id.widget->m_text_size = m_default_text_size;
 
-    new_id.widget->m_enable_scroll = m_default_enable_scroll;
-    new_id.widget->m_scroll_pos_x = m_default_scroll_x_pos;
-    new_id.widget->m_scroll_pos_y = m_default_scroll_y_pos;
-    new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;
-    new_id.widget->m_scroll_speed_y = m_default_scroll_y_speed;
+    new_id.widget->m_enable_scroll  = m_default_enable_scroll;
+    new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_x_pos;
+    new_id.widget->m_scroll_pos_y   = (float)m_default_scroll_y_pos;
+    new_id.widget->m_scroll_speed_x = (float)m_default_scroll_x_speed;
+    new_id.widget->m_scroll_speed_y = (float)m_default_scroll_y_speed;
 
-    m_elems.push_back(WidgetElement(ET_WGT, m_widgets.size()));
+    m_elems.push_back(WidgetElement(ET_WGT, (int)m_widgets.size()));
     m_widgets.push_back(new_id);
 
     return true;
@@ -96,8 +96,8 @@ bool WidgetManager::add_wgt
 //-----------------------------------------------------------------------------
 bool WidgetManager::insert_column()
 {
-    const int LAST_ELEM = m_elems.size() - 1;
-    const int LAST_WGT = m_widgets.size() - 1;
+    const int LAST_ELEM = (int)m_elems.size() - 1;
+    const int LAST_WGT = (int)m_widgets.size() - 1;
 
     if( LAST_ELEM > -1)
     {
@@ -147,7 +147,7 @@ bool WidgetManager::is_column_break( const int BREAK_POS) const
 //-----------------------------------------------------------------------------
 bool WidgetManager::break_line()
 {
-    const int LAST_WGT = m_widgets.size() - 1;
+    const int LAST_WGT = (int)m_widgets.size() - 1;
 
     if( LAST_WGT < 0 )
     {
@@ -156,7 +156,7 @@ bool WidgetManager::break_line()
         return false;
     }
 
-    const int LAST_ELEM = m_elems.size() - 1;
+    const int LAST_ELEM = (int)m_elems.size() - 1;
     if( m_elems[LAST_ELEM].type == ET_COLUMN )
     {
         std::cerr << "WARNING: tried to add a break to end a column " <<
@@ -200,7 +200,7 @@ bool WidgetManager::break_line()
 //-----------------------------------------------------------------------------
 void WidgetManager::reset()
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
 
     for(int i = 0; i < NUM_WIDGETS; ++i)
     {
@@ -216,7 +216,7 @@ void WidgetManager::reset()
 //-----------------------------------------------------------------------------
 int WidgetManager::find_id(const int TOKEN) const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
 
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
@@ -250,7 +250,7 @@ void WidgetManager::update(const float DELTA)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE  ) ;
 
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     for( int i = 0; i < NUM_WIDGETS; ++i)
     {
         m_widgets[i].widget->update(DELTA);
@@ -269,7 +269,7 @@ void WidgetManager::update(const float DELTA)
  */
 int WidgetManager::calc_width() const
 {
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
     int curr_width = 0, total_width = 0;
 
     for( int i = 0; i < NUM_ELEMS; ++i )
@@ -308,7 +308,7 @@ int WidgetManager::calc_width() const
  */
 int WidgetManager::calc_height() const
 {
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
     if( NUM_ELEMS < 0 ) return 0;
 
     int total_height = calc_line_height(0);
@@ -348,7 +348,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     }
     prev_layout_pos = POSITION;
 
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     if( NUM_WIDGETS < 0 ) return true;
 
     int SCREEN_WIDTH = user_config->m_width;
@@ -466,7 +466,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     int widget_x = m_x + ( WGTS_WIDTH - calc_line_width( 0 )) / 2;
     int widget_y = m_y;
 
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
     int line_pos = 0;
     int column_pos = -1;
     int curr_wgt = 0;
@@ -566,7 +566,7 @@ int WidgetManager::calc_line_width( const int START_ELEM ) const
 {
     int curr_wgt;
     int total_width = 0;
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
 
     for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
@@ -601,7 +601,7 @@ int WidgetManager::calc_line_height( const int START_ELEM ) const
     int curr_wgt;
     int line_height = 0;
     int column_height;
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
 
     for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
@@ -642,7 +642,7 @@ int WidgetManager::calc_column_width(const int START_ELEM) const
 {
     int curr_wgt;
     int column_width = 0;
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
 
     for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {
@@ -665,7 +665,7 @@ int WidgetManager::calc_column_height(const int START_ELEM) const
 {
     int curr_wgt;
     int total_height = 0;
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
 
     for( int i = START_ELEM; i < NUM_ELEMS; ++i )
     {

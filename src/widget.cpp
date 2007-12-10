@@ -177,11 +177,11 @@ void Widget::update(const float DELTA)
     //Y-axis preset positions
     if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
     {
-        m_scroll_pos_y = Y_LIMIT / 2 - m_height;
+        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
     }
     else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
     {
-        m_scroll_pos_y = Y_LIMIT / 2;
+        m_scroll_pos_y = (float)(Y_LIMIT / 2);
     }
     else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
     {
@@ -189,11 +189,11 @@ void Widget::update(const float DELTA)
     }
     else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
     {
-        m_scroll_pos_y = -Y_LIMIT / 2;
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
     }
     else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
     {
-        m_scroll_pos_y = -Y_LIMIT / 2 + m_height;
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
     }
     else if( m_scroll_pos_y > MAX_SCROLL )
     {
@@ -211,19 +211,19 @@ void Widget::update(const float DELTA)
     }
     else if( m_scroll_pos_x == WGT_SCROLL_START_RIGHT )
     {
-        m_scroll_pos_x = m_width;
+        m_scroll_pos_x = (float)m_width;
     }
     else if( m_scroll_pos_x == WGT_SCROLL_CENTER )
     {
-        m_scroll_pos_x = (m_width - text_width) / 2;
+        m_scroll_pos_x = (float)( (m_width - text_width) / 2 );
     }
     else if( m_scroll_pos_x == WGT_SCROLL_END_LEFT )
     {
-        m_scroll_pos_x = -text_width;
+        m_scroll_pos_x = (float)(-text_width);
     }
     else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
     {
-        m_scroll_pos_x = -text_width + m_width;
+        m_scroll_pos_x = (float)(-text_width + m_width);
     }
     else if( m_scroll_pos_x > MAX_SCROLL )
     {
