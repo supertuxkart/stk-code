@@ -26,6 +26,7 @@
 #include "world.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
+#include "highscore_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
@@ -37,7 +38,9 @@ enum WidgetTokens {
     WTOK_CONTINUE,
     WTOK_RESTART_RACE,
     WTOK_SETUP_NEW_RACE,
-    WTOK_FIRST_RESULT
+    WTOK_FIRST_HIGHSCORE,
+    //Add 3 because the maximum number of highscores is 3
+    WTOK_FIRST_RESULT = WTOK_FIRST_HIGHSCORE + 3
 };
 
 RaceResultsGUI::RaceResultsGUI()
@@ -57,11 +60,13 @@ RaceResultsGUI::RaceResultsGUI()
 
     widget_manager->add_wgt(WTOK_RESULTS, 50, 7);
     widget_manager->set_wgt_text(WTOK_RESULTS, _("Race results"));
-#if 0
+
     widget_manager->add_wgt(WTOK_HIGHSCORES, 50, 7);
     widget_manager->set_wgt_text(WTOK_HIGHSCORES, _("Highscores"));
-#endif
+
     widget_manager->break_line();
+
+    widget_manager->insert_column();
 
 
     const unsigned int MAX_STR_LEN = 60;
@@ -70,10 +75,6 @@ RaceResultsGUI::RaceResultsGUI()
     int*  order = new int [NUM_KARTS];
     m_score = new char[NUM_KARTS * MAX_STR_LEN];
     unsigned int max_name_len = 1;
-
-    const Highscores *hs = world->getHighscores();
-    int num_scores = hs->getNumberEntries();
-    m_highscores = new char[num_scores * MAX_STR_LEN];
 
     for(unsigned int i=0; i < NUM_KARTS; i++)
     {
@@ -115,16 +116,21 @@ RaceResultsGUI::RaceResultsGUI()
         widget_manager->add_wgt(WTOK_FIRST_RESULT + i, 50, 7);
         widget_manager->set_wgt_text(WTOK_FIRST_RESULT + i,
             (char*)(m_score + MAX_STR_LEN * i));
-        widget_manager->break_line();
     }
 
     delete[] order;
 
+    widget_manager->break_line();
+    widget_manager->insert_column();
+
+    const Highscores *hs = world->getHighscores();
+    int num_scores = hs->getNumberEntries();
+    m_highscores = new char[num_scores * MAX_STR_LEN];
+
     for(int i=0; i<num_scores; i++)
     {
 
-        //FIXME:Add highscore table
-/*        std::string kart_name, name;
+        std::string kart_name, name;
         float T;
         hs->getEntry(i, kart_name, name, &T);
         const int   MINS   = (int) floor ( T / 60.0 ) ;
@@ -132,11 +138,13 @@ RaceResultsGUI::RaceResultsGUI()
         const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
         sprintf((char*)(m_highscores + MAX_STR_LEN * i), 
                 "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
-        widget_manager->add_wgt(WTOK_FIRST_HIGHSCORE + i, 40, 7);
+        widget_manager->add_wgt(WTOK_FIRST_HIGHSCORE + i, 50, 7);
         widget_manager->set_wgt_text(WTOK_FIRST_HIGHSCORE + i,
-            (char*)(m_highscores+MAX_STR_LEN*i));*/
-
+            (char*)(m_highscores+MAX_STR_LEN*i));
     }
+    widget_manager->break_line();
+    widget_manager->break_line();
+
     widget_manager->add_wgt(WTOK_EMPTY1, 60, 5);
     widget_manager->hide_wgt_rect(WTOK_EMPTY1);
     widget_manager->hide_wgt_text(WTOK_EMPTY1);
