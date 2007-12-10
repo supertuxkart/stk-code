@@ -169,19 +169,6 @@ bool WidgetManager::break_line()
 
     if( LAST_ELEM > 0 )//If there are at least two elements
     {
-        if( m_elems[LAST_ELEM].type == ET_WGT &&
-            m_elems[LAST_ELEM - 1].type == ET_COLUMN )
-        {
-            std::cerr << "WARNING: tried to add a break to end a column " <<
-                "with 1 widget inside the column, after widget with " <<
-                "token " << m_widgets[LAST_WGT].token << ".\n";
-
-            //Remember that vector::end() returns an iterator _past_ the end,
-            //which is why we substract 2, not 1, to remove the column.
-            m_elems.erase(m_elems.end() - 2);
-            return false;
-        }
-
         if( m_elems[LAST_ELEM].type == ET_BREAK &&
             !is_column_break( LAST_ELEM ))
         {
