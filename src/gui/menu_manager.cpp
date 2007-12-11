@@ -124,7 +124,7 @@ void MenuManager::update()
         delete m_current_menu;
         m_current_menu= NULL;
 
-        m_handled_size= m_menu_stack.size();
+        m_handled_size= (unsigned int)m_menu_stack.size();
         if (m_handled_size > 0)
         {
 			pair<MenuManagerIDs, int> saved = m_menu_stack.back();
@@ -213,7 +213,7 @@ void MenuManager::update()
             }   // switch
 
 
-            if( !widget_manager->is_empty() )
+            if( id != MENUID_EXITGAME )
             {
                 // Restores the previously selected widget if there was one.
                 if (saved_widget != WidgetManager::WGT_NONE)
@@ -236,7 +236,7 @@ void MenuManager::update()
 
     if (m_current_menu != NULL)
     {
-        m_current_menu->update(now.getDeltaTime());
+        m_current_menu->update((float)now.getDeltaTime());
     }
 }   // update
 

@@ -73,7 +73,7 @@ public:
     int getIndex             () { return m_index ; }
     void      apply    () { m_state -> apply ()  ; }
 
-    char *getTexFname  () { return m_texname     ; }
+    char *getTexFname  () const { return m_texname     ; }
 
 } ;
 

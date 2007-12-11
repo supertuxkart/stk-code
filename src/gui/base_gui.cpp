@@ -129,7 +129,7 @@ BaseGUI::update(float dt)
 
 //-----------------------------------------------------------------------------
 void
-BaseGUI::TimeToString(const float TIME, char *s)
+BaseGUI::TimeToString(const double TIME, char *s)
 {
     int min     = (int) floor ( TIME / 60.0 ) ;
     int sec     = (int) floor ( TIME - (double) ( 60 * min ) ) ;

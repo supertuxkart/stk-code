@@ -190,7 +190,7 @@ void DefaultRobot::handle_braking()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_steering()
 {
-    const unsigned int DRIVELINE_SIZE = world->m_track->m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
     const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
         m_track_sector + 1 : 0;
     float steer_angle = 0.0f;
@@ -633,7 +633,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
  */
 void DefaultRobot::find_non_crashing_point( sgVec2 result )
 {
-    const unsigned int DRIVELINE_SIZE = world->m_track->m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
 
     unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
         m_track_sector + 1 : 0;
@@ -864,7 +864,7 @@ float DefaultRobot::get_approx_radius(const int START, const int END) const
  */
 void DefaultRobot::find_curve()
 {
-    const int DRIVELINE_SIZE = world->m_track->m_driveline.size();
+    const int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
     float total_dist = 0.0f;
     int next_hint = m_track_sector;
     int i;

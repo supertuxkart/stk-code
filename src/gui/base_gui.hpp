@@ -41,7 +41,7 @@ public:
 
     void inputPointer(int x, int y);
 
-    void  TimeToString(const float time, char *s);
+    void  TimeToString(const double time, char *s);
 protected:
 
     int m_menu_id;
