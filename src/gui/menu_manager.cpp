@@ -213,7 +213,7 @@ void MenuManager::update()
             }   // switch
 
 
-            if( id != MENUID_EXITGAME )
+            if( !widget_manager->is_empty() )
             {
                 // Restores the previously selected widget if there was one.
                 if (saved_widget != WidgetManager::WGT_NONE)

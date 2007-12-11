@@ -128,6 +128,8 @@ public:
     WidgetManager();
     ~WidgetManager();
 
+    bool is_empty() { return m_widgets.empty(); }
+
     bool add_wgt
     (
         const int TOKEN, //A number that names the widget.
