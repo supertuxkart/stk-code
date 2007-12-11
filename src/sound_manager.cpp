@@ -65,7 +65,6 @@ SoundManager::SoundManager()
     }
     else
         m_initialized = true;
-    getcwd
 #else
     if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
         m_initialized = true;
@@ -180,13 +179,15 @@ void SoundManager::playMusic(const char* filename)
 
 #endif
         if(m_current_music == NULL)	// no support for file
+        {
             fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename);
             return;
+        }
 
-            if((m_current_music->load(filename)) == false)
+        if((m_current_music->load(filename)) == false)
         {
             delete m_current_music;
-	    m_current_music=0;
+	        m_current_music=0;
             fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
         }
         else
