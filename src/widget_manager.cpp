@@ -1225,66 +1225,60 @@ WidgetManager::decrease_scroll_speed(const bool fast)
 	}
 }
 
-//FIXME: find_left_widget() doesn't works properly yet
 /** find_left_widget() returns the closest widget to the left of START_WGT.
+ *  We use the center of the widgets as the reference points; then, we
+ *  filter any widget that is not to the left, and favor the ones that are
+ *  closest in the Y-axis. If there is only one widget that is closest in the
+ *  Y-axis, we pick that one as the closest, but if there is more than one
+ *  widget with the same vertical distance, we have to break the tie by
+ *  choosing the one closest in the X-axis.
  */
 int WidgetManager::find_left_widget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
-    int closest_dist = user_config->m_width;
+    int closest_x_dist = user_config->m_width;
+    int closest_y_dist = user_config->m_height;
+
+    const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
+        m_widgets[START_WGT].widget->m_height / 2;
+    const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
+        m_widgets[START_WGT].widget->m_width / 2;
+
+    int curr_wgt_x_center, curr_wgt_y_center;
+    int x_dist, y_dist;
+
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
 
-        if( m_widgets[i].widget->m_x + m_widgets[i].widget->m_width < m_widgets[START_WGT].widget->m_x + m_widgets[START_WGT].widget->m_width)
+        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
+        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+
+        x_dist = START_WGT_X_CENTER - curr_wgt_x_center;
+        y_dist = abs( curr_wgt_y_center - START_WGT_Y_CENTER );
+
+        //Filter out all widgets that are not to the left and choose the
+        //widget that is closest in the Y-axis
+        if( x_dist > 0 && y_dist <= closest_y_dist )
         {
-            const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y + m_widgets[START_WGT].widget->m_height / 2;
-            const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x + m_widgets[START_WGT].widget->m_width / 2;
-            const int CURR_WGT_Y_CENTER = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-            const int CURR_WGT_X_CENTER = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+            closest_y_dist = y_dist;
 
-            const int X_DIST = START_WGT_X_CENTER - CURR_WGT_X_CENTER;
-            if( X_DIST > abs(CURR_WGT_Y_CENTER - START_WGT_Y_CENTER ))
+            //If this is the first widget with this vertical distance, pick
+            //it as the current closest widget
+            if( y_dist != closest_y_dist )
             {
-                if( closest_dist > X_DIST )
-                {
-                    closest_dist = X_DIST;
-                    closest_wgt = i;
-                }
-
+                closest_x_dist = user_config->m_width; //Reset the distance
+                closest_wgt = i;
+            }
+            //If there is more than one widget with the same vertical
+            //distance, choose the one that is closest in the X-axis
+            else if( x_dist <= closest_x_dist )
+            {
+                closest_x_dist = x_dist;
+                closest_wgt = i;
             }
         }
-#if 0
-        //Check if the widget with the id i is to the left of the start widget.
-        //To do so, simply checking if the X position of the i widget is smaller
-        //than the start widget(divides the screen in a left and right blocks),
-        //and that the distance between the two widgets in the X axis is bigger
-        //than the distance in the Y axis(so that widgets on top and the
-        //bottom are ignored).
-        if( m_widgets[i].widget->m_x <= m_widgets[START_WGT].widget->m_x &&
-            m_widgets[START_WGT].widget->m_x - m_widgets[i].widget->m_x >=
-            abs(m_widgets[START_WGT].widget->m_y - m_widgets[i].widget->m_y ))
-            {
-                //FIXME: instead of using plib's routines, we should use functions
-                //that works on integers that don't depend on external libraries.
-                sgVec2 a;
-                a[0] = m_widgets[START_WGT].widget->m_x;
-                a[1] = m_widgets[START_WGT].widget->m_y;
-
-                sgVec2 b;
-                b[0] = m_widgets[i].widget->m_x;
-                b[1] = m_widgets[i].widget->m_y;
-                //Now that we know that the i widget is to the left, we have
-                //to find if it's the closest one.
-                if( closest_dist * closest_dist > sgDistanceSquaredVec2( a,b ) )
-                {
-                    closest_dist = (int)sgDistanceSquaredVec2( a,b );
-                    closest_wgt = i;
-                }
-
-            }
-#endif
     }
 
     return closest_wgt;
@@ -1297,63 +1291,44 @@ int WidgetManager::find_right_widget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
-    int closest_dist = user_config->m_width;
+    int closest_x_dist = user_config->m_width;
+    int closest_y_dist = user_config->m_height;
+
+    const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
+        m_widgets[START_WGT].widget->m_height / 2;
+    const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
+        m_widgets[START_WGT].widget->m_width / 2;
+
+    int curr_wgt_x_center, curr_wgt_y_center;
+    int x_dist, y_dist;
+
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
 
-        //Check if the widget with the id i is on top of the start widget.
-        //First it is checked if the y value of the i widget is higher than
-        //the start widget(remember that for the widget manager a higher
-        //value means that it is more on top). Then we add more precision:
-        //if the vertical distance of the center of the two widgets is
-        //smaller than the horizontal distance between the center of the two
-        //widgets, then the i widget is definitely on top of the START_WGT
-        //widget.
-        if( m_widgets[i].widget->m_x > m_widgets[START_WGT].widget->m_x )
+        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
+        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+
+        //Notice that the order of this substraction is the *only* difference
+        //from the find_left_widget() function
+        x_dist = curr_wgt_x_center - START_WGT_X_CENTER;
+        y_dist = abs( curr_wgt_y_center - START_WGT_Y_CENTER );
+
+        if( x_dist > 0 && y_dist <= closest_y_dist )
         {
-            const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y + m_widgets[START_WGT].widget->m_height / 2;
-            const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x + m_widgets[START_WGT].widget->m_width / 2;
-            const int CURR_WGT_Y_CENTER = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-            const int CURR_WGT_X_CENTER = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+            closest_y_dist = y_dist;
 
-            const int X_DIST = CURR_WGT_X_CENTER - START_WGT_X_CENTER;
-            if( X_DIST > abs(CURR_WGT_Y_CENTER - START_WGT_Y_CENTER ))
+            if( y_dist != closest_y_dist )
             {
-                if( closest_dist > X_DIST )
-                {
-                    closest_dist = X_DIST;
-                    closest_wgt = i;
-                }
-
+                closest_x_dist = user_config->m_width;
+                closest_wgt = i;
+            }
+            else if( x_dist <= closest_x_dist )
+            {
+                closest_x_dist = x_dist;
+                closest_wgt = i;
             }
         }
-#if 0
-        //Check if the widget with the id i is to the right of the start widget.
-        if( m_widgets[i].widget->m_x >= m_widgets[START_WGT].widget->m_x &&
-            m_widgets[i].widget->m_x - m_widgets[START_WGT].widget->m_x >=
-            abs(m_widgets[START_WGT].widget->m_y - m_widgets[i].widget->m_y ))
-            {
-                //FIXME: instead of using plib's routines, we should use functions
-                //that works on integers that don't depend on external libraries.
-                sgVec2 a;
-                a[0] = m_widgets[START_WGT].widget->m_x;
-                a[1] = m_widgets[START_WGT].widget->m_y;
-
-                sgVec2 b;
-                b[0] = m_widgets[i].widget->m_x;
-                b[1] = m_widgets[i].widget->m_y;
-
-                //Check if the widget found is closer than the closest
-                //widget we have found
-                if( closest_dist * closest_dist > sgDistanceSquaredVec2( a,b ) )
-                {
-                    closest_dist = (int)sgDistanceSquaredVec2( a,b );
-                    closest_wgt = i;
-                }
-
-            }
-#endif
     }
 
     return closest_wgt;
@@ -1367,35 +1342,46 @@ int WidgetManager::find_top_widget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
-    int closest_dist = user_config->m_height;
-    for(int i = 0; i < NUM_WIDGETS; ++i)
+    int closest_x_dist = user_config->m_width;
+    int closest_y_dist = user_config->m_height;
+
+    const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
+        m_widgets[START_WGT].widget->m_height / 2;
+    const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
+        m_widgets[START_WGT].widget->m_width / 2;
+
+    int curr_wgt_x_center, curr_wgt_y_center;
+    int x_dist, y_dist;
+
+    for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
 
-        //Check if the widget with the ID i is on top of the start widget.
-        //First it is checked if the y value of the i widget is higher than
-        //the start widget(remember that for the widget manager a higher
-        //value means that it closer to the top of the screen). Then we add
-        //more precision: if the vertical distance of the center of the two
-        //widgets is smaller than the horizontal distance between the center
-        //of the two widgets, then the i widget is definitely on top of the
-        //START_WGT widget.
-        if( m_widgets[i].widget->m_y > m_widgets[START_WGT].widget->m_y )
+        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
+        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+
+        y_dist = curr_wgt_y_center - START_WGT_Y_CENTER;
+        x_dist = abs( curr_wgt_x_center - START_WGT_X_CENTER );
+
+        //Filter out all widgets that are not on top and choose the
+        //widget that is closest in the X-axis
+        if( y_dist > 0 && x_dist <= closest_x_dist )
         {
-            const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y + m_widgets[START_WGT].widget->m_height / 2;
-            const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x + m_widgets[START_WGT].widget->m_width / 2;
-            const int CURR_WGT_Y_CENTER = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-            const int CURR_WGT_X_CENTER = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+            closest_x_dist = x_dist;
 
-            const int Y_DIST = CURR_WGT_Y_CENTER - START_WGT_Y_CENTER;
-            if( Y_DIST > abs(CURR_WGT_X_CENTER - START_WGT_X_CENTER ))
+            //If this is the first widget with this vertical distance, pick
+            //it as the current closest widget
+            if( x_dist != closest_x_dist )
             {
-                if( closest_dist > Y_DIST )
-                {
-                    closest_dist = Y_DIST;
-                    closest_wgt = i;
-                }
-
+                closest_y_dist = user_config->m_height;
+                closest_wgt = i;
+            }
+            //If there is more than one widget with the same horizontal
+            //distance, choose the one that is closest in the Y-axis
+            else if( y_dist <= closest_y_dist )
+            {
+                closest_y_dist = y_dist;
+                closest_wgt = i;
             }
         }
     }
@@ -1411,27 +1397,42 @@ int WidgetManager::find_bottom_widget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
-    int closest_dist = user_config->m_height;
-    for(int i = 0; i < NUM_WIDGETS; ++i)
+    int closest_x_dist = user_config->m_width;
+    int closest_y_dist = user_config->m_height;
+
+    const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
+        m_widgets[START_WGT].widget->m_height / 2;
+    const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
+        m_widgets[START_WGT].widget->m_width / 2;
+
+    int curr_wgt_x_center, curr_wgt_y_center;
+    int x_dist, y_dist;
+
+    for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
 
-        if( m_widgets[i].widget->m_y + m_widgets[i].widget->m_height < m_widgets[START_WGT].widget->m_y + m_widgets[START_WGT].widget->m_height)
+        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
+        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+
+        //Notice that the order of this substraction is the *only* difference
+        //from the find_top_widget() function
+        y_dist = START_WGT_Y_CENTER - curr_wgt_y_center;
+        x_dist = abs( curr_wgt_x_center - START_WGT_X_CENTER );
+
+        if( y_dist > 0 && x_dist <= closest_x_dist )
         {
-            const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y + m_widgets[START_WGT].widget->m_height / 2;
-            const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x + m_widgets[START_WGT].widget->m_width / 2;
-            const int CURR_WGT_Y_CENTER = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-            const int CURR_WGT_X_CENTER = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+            closest_x_dist = x_dist;
 
-            const int Y_DIST = START_WGT_Y_CENTER - CURR_WGT_Y_CENTER;
-            if( Y_DIST > abs(CURR_WGT_X_CENTER - START_WGT_X_CENTER ))
+            if( x_dist != closest_x_dist )
             {
-                if( closest_dist > Y_DIST )
-                {
-                    closest_dist = Y_DIST;
-                    closest_wgt = i;
-                }
-
+                closest_y_dist = user_config->m_height;
+                closest_wgt = i;
+            }
+            else if( y_dist <= closest_y_dist )
+            {
+                closest_y_dist = y_dist;
+                closest_wgt = i;
             }
         }
     }
