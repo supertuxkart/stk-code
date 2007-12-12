@@ -63,9 +63,11 @@ bool WidgetManager::add_wgt
 
     WidgetID new_id;
     new_id.token = TOKEN;
+
     //There is no reason to make a token-less widget active, so if the token
     //WGT_NONE, the widget is forced to be inactive, preventing bugs.
     new_id.active = TOKEN != WGT_NONE ? m_default_active : false;
+
     new_id.min_width = MIN_WIDTH;
     new_id.min_height = MIN_HEIGHT;
 
@@ -198,6 +200,8 @@ void WidgetManager::reset()
     m_elems.clear();
 
     restore_default_states();
+
+    m_selected_wgt_token = WGT_NONE;
 }
 
 //-----------------------------------------------------------------------------
@@ -535,10 +539,11 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         }
     }
 
-    //Always select the first active widget by default
+    //Select the first active widget by default
+    m_selected_wgt_token = WGT_NONE;
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
-        if( m_widgets[i].active)
+        if( m_widgets[i].active )
         {
             m_selected_wgt_token = m_widgets[i].token;
             break;
@@ -951,31 +956,6 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 }*/
 
 //-----------------------------------------------------------------------------
-/*
-void WidgetManager::set_wgt_text_x_alignment( const int TOKEN, const Font::FontAlignType ALIGN )
-{
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_x_alignment = ALIGN;
-    else
-    {
-        std::cerr << "WARNING: tried to set the X alignment of text of " <<
-            "an unnamed widget with token " << TOKEN << '\n';
-    }
-}
-*/
-//-----------------------------------------------------------------------------
-/*void WidgetManager::set_wgt_text_y_alignment( const int TOKEN, const Font::FontAlignType ALIGN )
-{
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_y_alignment = ALIGN;
-    else
-    {
-        std::cerr << "WARNING: tried to set the Y alignment of text of " <<
-            "an unnamed widget with token " << TOKEN << '\n';
-    }
-}*/
-
-//-----------------------------------------------------------------------------
 void WidgetManager::enable_wgt_scroll( const int TOKEN )
 {
     const int ID = find_id(TOKEN);
@@ -1284,7 +1264,6 @@ int WidgetManager::find_left_widget(const int START_WGT) const
     return closest_wgt;
 }
 
-//FIXME: find_right_widget() doesn't works properly yet
 /** find_right_widget() returns the closest widget to the right of START_WGT
  */
 int WidgetManager::find_right_widget(const int START_WGT) const
@@ -1333,7 +1312,6 @@ int WidgetManager::find_right_widget(const int START_WGT) const
 
     return closest_wgt;
 }
-//FIXME: fix find_left_widget and find_right_widget.
 /** find_top_widget() returns the closest widget on top of START_WGT.
  *  Remember that for the widget manager, the value 0 in the y-axis is in
  *  the bottom of the screen.

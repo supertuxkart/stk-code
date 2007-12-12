@@ -79,7 +79,7 @@ HelpMenu::HelpMenu()
 //-----------------------------------------------------------------------------
 HelpMenu::~HelpMenu()
 {
-    widget_manager->reset() ;
+    widget_manager->reset();
 
 	if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
         && m_banana != NULL )

@@ -161,8 +161,8 @@ void Widget::update(const float DELTA)
     // left; positive values move to the right and negative
     // values to the left.
 
-    float left, right, bottom, top;
-    font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
+    float left, right;
+    font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
     int text_width = (int)(right - left + 0.99);
 
     const int Y_LIMIT = lines * m_text_size + m_height;
