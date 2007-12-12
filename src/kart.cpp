@@ -446,7 +446,16 @@ void Kart::doLapCounting ()
         // over the start line will cause the lap start time to be set to 0.
         if(m_lap_start_time>=0.0)
         {
-            float time_per_lap=world->m_clock-m_lap_start_time;
+            float time_per_lap;
+            if (m_race_lap == 1) // just completed first lap
+            {
+            	time_per_lap=world->m_clock;
+            }
+            else //completing subsequent laps
+            {
+            	time_per_lap=world->m_clock-m_lap_start_time;
+            }
+                        
             if(time_per_lap < world->getFastestLapTime() )
             {
                 world->setFastestLap(this, time_per_lap);
