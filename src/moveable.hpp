@@ -56,14 +56,13 @@ protected:
     int           m_crashed;
     sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
-
+#ifndef BULLET
     float collectIsectData ( sgVec3 start, sgVec3 end ) ;
+#endif
     sgCoord*      m_history_velocity;
     sgCoord*      m_history_position;
-#ifdef BULLET
     btRigidBody*          m_body;
     btDefaultMotionState* m_motion_state;
-#endif
 
 public:
 
@@ -94,8 +93,9 @@ public:
     // there is a 'reset' material under the moveable --> karts need to be
     // rescued, missiles should explode.
     virtual void  OutsideTrack (int isReset) {}
-
+#ifndef BULLET
     float         getIsectData (sgVec3 start, sgVec3 end );
+#endif
     void          WriteHistory (char* s, int kartNumber, int indx);
     void          ReadHistory  (char* s, int kartNumber, int indx);
     btRigidBody*  getBody   () const {return m_body; }

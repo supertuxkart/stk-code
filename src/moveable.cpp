@@ -240,6 +240,7 @@ void Moveable::ReadHistory(char* s, int kartNumber, int indx)
 
 #define max(m,n) ((m)>(n) ? (m) : (n)) /* return highest number */
 
+#ifndef BULLET
 //-----------------------------------------------------------------------------
 float Moveable::collectIsectData ( sgVec3 start, sgVec3 end )
 {
@@ -371,3 +372,4 @@ float Moveable::getIsectData ( sgVec3 start, sgVec3 end )
     return HOT ;
 }   // getIsectData
 
+#endif

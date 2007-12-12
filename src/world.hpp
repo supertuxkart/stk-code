@@ -68,15 +68,13 @@ public:
         /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];
 
-    /** Reference to the track inside the scene */
-    ssgBranch *m_track_branch ;
-
-
     World(const RaceSetup& raceSetup);
     virtual ~World();
+#ifndef BULLET
     float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
           {return m_track->GetHOT(start, end, leaf, nrm);}
     int   Collision(sgSphere* s, AllHits *a) const {return m_track->Collision(s,a); }
+#endif
     void draw();
     void update(float delta);
     void restartRace();
@@ -124,7 +122,6 @@ private:
 
     void updateRacePosition( int k );
     void loadTrack();
-    void herring_command(sgVec3* loc, char htype, int bNeedHeight);
     void checkRaceStatus();
     void resetAllKarts();
     Kart* loadRobot(const KartProperties *kart_properties, int position,

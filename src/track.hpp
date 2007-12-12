@@ -33,21 +33,24 @@
 #include <plib/ssg.h>
 #include <string>
 #include <vector>
-#include "static_ssg.hpp"
+#include "btBulletDynamicsCommon.h"
+#include "material.hpp"
 
 class Track
 {
 private:
-    float       m_gravity;
-    std::string m_ident;
-    std::string m_screenshot;
-    std::string m_top_view;
+    float                    m_gravity;
+    std::string              m_ident;
+    std::string              m_screenshot;
+    std::string              m_top_view;
     std::vector<std::string> m_music_filenames;
     std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
-    std::string m_herring_style;
-    std::string m_description;
-    std::string m_filename;
-    StaticSSG*  m_static_ssg;
+    std::string              m_herring_style;
+    std::string              m_description;
+    std::string              m_filename;
+    ssgBranch*               m_model;
+    btRigidBody*             m_body;
+    static std::vector<const Material*>   m_triangleIndex2Material;
 
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
@@ -136,7 +139,7 @@ public:
     Track            (std::string filename,float w=100,
                       float h=100, bool stretch=1);
     ~Track            ();
-
+    void               cleanup          ();
     void               addDebugToScene  (int type                    ) const;
     void               draw2Dview       (float x_offset,
                                          float y_offset              ) const;
@@ -152,36 +155,34 @@ public:
                                          const sgVec2 POS,
                                          const int SECTOR            ) const;
     void               trackToSpatial   (sgVec3 xyz, const int SECTOR) const;
+    ssgBranch*         getModel         () const {return m_model;}
+    void               loadTrackModel   ();
     bool               isShortcut       (const int OLDSEC, const int NEWSEC) const;
-    float              getGravity       () const {return m_gravity;       }
-    float              getTrackLength   () const {return m_total_distance;}
-    const char*        getIdent         () const {return m_ident.c_str(); }
-    const char*        getName          () const {return m_name.c_str();  }
+    float              getGravity       () const {return m_gravity;        }
+    float              getTrackLength   () const {return m_total_distance; }
+    const char*        getIdent         () const {return m_ident.c_str();  }
+    const char*        getName          () const {return m_name.c_str();   }
     const std::string& getMusic         () const;
     const std::string& getFilename      () const {return m_filename; }
-    const sgVec3& getSunPos             () const {return m_sun_position;  }
+    const sgVec3& getSunPos             () const {return m_sun_position;   }
     const sgVec4& getAmbientCol         () const {return m_ambient_col;    }
     const sgVec4& getDiffuseCol         () const {return m_diffuse_col;    }
     const sgVec4& getSpecularCol        () const {return m_specular_col;   }
-    const bool&   useFog                () const {return m_use_fog;       }
-    const sgVec4& getFogColor           () const {return m_fog_color;     }
-    const float&  getFogDensity         () const {return m_fog_density;   }
-    const float&  getFogStart           () const {return m_fog_start;     }
-    const float&  getFogEnd             () const {return m_fog_end;       }
-    const sgVec4& getSkyColor           () const {return m_sky_color;     }
-    const std::string& getDescription   () const {return m_description;   }
-    const std::string& getTopviewFile   () const {return m_top_view;      }
-    const std::string& getScreenshotFile() const {return m_screenshot;    }
+    const bool&   useFog                () const {return m_use_fog;        }
+    const sgVec4& getFogColor           () const {return m_fog_color;      }
+    const float&  getFogDensity         () const {return m_fog_density;    }
+    const float&  getFogStart           () const {return m_fog_start;      }
+    const float&  getFogEnd             () const {return m_fog_end;        }
+    const sgVec4& getSkyColor           () const {return m_sky_color;      }
+    const std::string& getDescription   () const {return m_description;    }
+    const std::string& getTopviewFile   () const {return m_top_view;       }
+    const std::string& getScreenshotFile() const {return m_screenshot;     }
     const std::vector<sgVec3Wrapper>& getDriveline () const {return m_driveline;}
-    const std::vector<SGfloat>& getWidth() const {return m_path_width;    }
+    const std::vector<SGfloat>& getWidth() const {return m_path_width;     }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
-    void               createHash       (ssgEntity* track_branch, unsigned int n);
     void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
-    int                Collision(sgSphere* s, AllHits *a) const
-                                        {return m_static_ssg->collision(s,a); }
-    float              GetHOT(sgVec3 start, sgVec3 end, 
-			      ssgLeaf** l, sgVec4** nrm) const
-                       {return m_static_ssg->hot(start, end, l, nrm);}
+    static const Material* getMaterial  (unsigned int n) {return m_triangleIndex2Material[n];}
+    void createPhysicsModel             ();
     void               glVtx            (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(
@@ -191,9 +192,12 @@ public:
 
 private:
     void loadTrack                      (std::string filename);
+    void herring_command                (sgVec3 *xyz, char htype, int bNeedHeight);
     void loadDriveline                  ();
     void readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
                                          const std::string& file_ext      );
+    void convertTrackToBullet           (ssgEntity *track, sgMat4 m, 
+                                         btTriangleMesh* track_mesh);
 
     float pointSideToLine( const sgVec2 L1, const sgVec2 L2,
         const sgVec2 P ) const;

@@ -56,22 +56,22 @@ void PlayerKart::action(KartAction action, int value)
     case KA_BRAKE:
         if (value)
             m_accel_val = 0;
-        m_controls.brake = value;
+        m_controls.brake = (value!=0);  // This syntax avoid visual c++ warning (when brake=value)
         break;
     case KA_WHEELIE:
-        m_controls.wheelie = value;
+        m_controls.wheelie = (value!=0);
         break;
     case KA_RESCUE:
-        m_controls.rescue = value;
+        m_controls.rescue = (value!=0);
         break;
     case KA_FIRE:
-        m_controls.fire = value;
+        m_controls.fire = (value!=0);
         break;
     case KA_LOOK_BACK:
-        m_camera->setReverseHeading(value);
+        m_camera->setReverseHeading(value!=0);
         break;
     case KA_JUMP:
-        m_controls.jump = value;
+        m_controls.jump = (value!=0);
         break;
     }
 }

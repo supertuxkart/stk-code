@@ -29,10 +29,21 @@
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "scene.hpp"
+#include "moving_physics.hpp"
+#include "world.hpp"
+#include "material_manager.hpp"
+#include "isect.hpp"
+#include "ssg_help.hpp"
+#include "user_config.hpp"
+#include "herring.hpp"
+#include "herring_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
+std::vector<const Material*>Track::m_triangleIndex2Material;
 
+// ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
     m_filename        = filename_;
@@ -52,6 +63,15 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
 //-----------------------------------------------------------------------------
 Track::~Track()
 {
+}   // ~Track
+//-----------------------------------------------------------------------------
+/** Removes the physical body from the world.
+ *  Called at the end of a race.
+ */
+void Track::cleanup()
+{
+    world->getPhysics()->removeBody(m_body);
+    delete m_body;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -122,27 +142,27 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
        that forms each track segment.
      */
     std::vector <SegmentTriangle> possible_segment_tris;
-    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
     int triangle;
     int next;
 
     for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
-        next = i + 1 <  DRIVELINE_SIZE ? i + 1 : 0;
+        next = (unsigned int)i + 1 <  DRIVELINE_SIZE ? (int)i + 1 : 0;
         triangle = pointInQuad( m_left_driveline[i],     m_right_driveline[i],
                                 m_right_driveline[next], m_left_driveline[next], 
                                 XYZ );
 
         if (triangle != QUAD_TRI_NONE && ((XYZ[2]-m_left_driveline[i][2]) < 1.0f))
         {
-            possible_segment_tris.push_back(SegmentTriangle(i, triangle));
+            possible_segment_tris.push_back(SegmentTriangle((int)i, triangle));
         }
     }
 
     /* Since xyz can be on more than one 2D track segment, we have to
        find on top of which one of the possible track segments it is.
      */
-    const int POS_SEG_SIZE = possible_segment_tris.size();
+    const int POS_SEG_SIZE = (int)possible_segment_tris.size();
     if( POS_SEG_SIZE == 0 )
     {
         //xyz is not on the road
@@ -164,7 +184,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
     for( int i = 0; i < POS_SEG_SIZE; ++i )
     {
         segment = possible_segment_tris[i].segment;
-        next = segment + 1 < DRIVELINE_SIZE ? segment + 1 : 0;
+        next = segment + 1 < DRIVELINE_SIZE ? (int)segment + 1 : 0;
         
         if( possible_segment_tris[i].triangle == QUAD_TRI_FIRST )
         {
@@ -242,7 +262,7 @@ int Track::findOutOfRoadSector
     int sector = UNKNOWN_SECTOR;
     float dist;
     float nearest_dist = 99999;
-    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
 
     int begin_sector = 0;
     int end_sector = DRIVELINE_SIZE - 1;
@@ -324,7 +344,7 @@ int Track::spatialToTrack
         return -1;
     }
 
-    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_driveline.size();
     const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
     const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
 
@@ -361,7 +381,7 @@ int Track::spatialToTrack
                    / (m_distance_from_start[p2]-m_distance_from_start[p1]);
     dst[2] = m_path_width[p1]*(1-fraction)+fraction*m_path_width[p2];
 
-    return p1;
+    return (int)p1;
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
@@ -369,11 +389,6 @@ void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
 {
     sgCopyVec3 ( xyz, m_driveline [ SECTOR ] ) ;
 }   // trackToSpatial
-
-//-----------------------------------------------------------------------------
-void Track::createHash(ssgEntity* track_branch, unsigned int n) {
-    m_static_ssg = new StaticSSG(track_branch, n);
-}   // createHash
 
 //-----------------------------------------------------------------------------
 /** Returns the start coordinates for a kart on a given position pos
@@ -385,7 +400,7 @@ void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
   // This kart would not get any lap counting done in the first
   // lap! Therefor -1.5 is subtracted from the y position - which
   // is a somewhat arbitrary value.
-  coords->xyz[0] = pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5:-1.5f);
+  coords->xyz[0] = pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f);
   coords->xyz[1] = pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f;
    // height must be larger than the actual hight for which hot is computed.
   coords->xyz[2] = pos<m_start_z.size() ? m_start_z[pos] : 1.0f;
@@ -394,10 +409,8 @@ void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
   coords->hpr[1] = 0.0f;
   coords->hpr[2] = 0.0f;
 
-  ssgLeaf *leaf;
-  sgVec4* normal;
-  const float hot = m_static_ssg->hot(coords->xyz, coords->xyz, &leaf, &normal);
-  coords->xyz[2] = hot;
+  btVector3 tmp_pos(coords->xyz[0],coords->xyz[1],coords->xyz[2]);
+  coords->xyz[2] = world->getPhysics()->getHOT(tmp_pos);
 
 }   // getStartCoords
 
@@ -413,8 +426,8 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
     unsigned int distance_sectors = abs(OLDSEC-NEWSEC);
     // Handle 'wrap around': if the distance is more than half the 
     // number of driveline poins, assume it's a 'wrap around'
-    if(2*distance_sectors > m_driveline.size())
-        distance_sectors = m_driveline.size() - distance_sectors;
+    if(2*distance_sectors > (unsigned int)m_driveline.size())
+        distance_sectors = (unsigned int)m_driveline.size() - distance_sectors;
     return (distance_sectors>stk_config->m_shortcut_segments);
 }   // isShortcut
 
@@ -507,7 +520,7 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
         sy = sx;
     }
 
-    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_driveline.size();
 
     glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT );
 
@@ -621,7 +634,7 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
 void Track::draw2Dview (float x_offset, float y_offset) const
 {
 
-    const unsigned int DRIVELINE_SIZE = m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_driveline.size();
 
     glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT );
 
@@ -757,12 +770,12 @@ void Track::loadTrack(std::string filename_)
     m_fog_end     = 1000.0f;
     m_gravity     = 9.80665f;
 
-    sgSetVec3 ( m_sun_position, 0.4f, 0.4f, 0.4f );
-    sgSetVec4 ( m_sky_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
-    sgSetVec4 ( m_fog_color  ,  0.3f, 0.7f, 0.9f, 1.0f );
-    sgSetVec4 ( m_ambient_col ,  0.5f, 0.5f, 0.5f, 1.0f );
+    sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
+    sgSetVec4 ( m_sky_color,     0.3f, 0.7f, 0.9f, 1.0f );
+    sgSetVec4 ( m_fog_color,     0.3f, 0.7f, 0.9f, 1.0f );
+    sgSetVec4 ( m_ambient_col,   0.5f, 0.5f, 0.5f, 1.0f );
     sgSetVec4 ( m_specular_col,  1.0f, 1.0f, 1.0f, 1.0f );
-    sgSetVec4 ( m_diffuse_col ,  1.0f, 1.0f, 1.0f, 1.0f );
+    sgSetVec4 ( m_diffuse_col,   1.0f, 1.0f, 1.0f, 1.0f );
 
     lisp::Parser parser;
     const lisp::Lisp* const ROOT = parser.parse(loader->getPath(m_filename));
@@ -815,7 +828,7 @@ Track::loadDriveline()
 {
     readDrivelineFromFile(m_left_driveline, ".drvl");
 
-    const unsigned int DRIVELINE_SIZE = m_left_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
     m_right_driveline.reserve(DRIVELINE_SIZE);
     readDrivelineFromFile(m_right_driveline, ".drvr");
 
@@ -970,5 +983,276 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
     }
 
     fclose ( fd ) ;
-}
+}   // readDrivelineFromFile
 
+// -----------------------------------------------------------------------------
+//* Convert the ssg track tree into its physics equivalents.
+void Track::createPhysicsModel()
+{
+    if(!m_model) return;
+    sgMat4 mat;
+    sgMakeIdentMat4(mat);
+    btTriangleMesh *track_mesh = new btTriangleMesh();
+    m_triangleIndex2Material.clear();
+    // Collect all triangles in the track_mesh
+    convertTrackToBullet(m_model, mat, track_mesh);
+    
+    // Now convert the triangle mesh into a static rigid body
+    btCollisionShape *mesh_shape = new btBvhTriangleMeshShape(track_mesh, true);
+    btTransform startTransform;
+    startTransform.setIdentity();
+    btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
+    m_body=new btRigidBody(0.0f, myMotionState, mesh_shape);
+    // FIXME: can the mesh_shape and or track_mesh be deleted now?
+    world->getPhysics()->addBody(m_body);
+    m_body->setUserPointer(0);
+    m_body->setCollisionFlags(m_body->getCollisionFlags()  | 
+                              btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+}   // createPhysicsModel
+
+// -----------------------------------------------------------------------------
+//* Convert the ssg track tree into its physics equivalents.
+void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m, btTriangleMesh* track_mesh)
+{
+    if(!track) return;
+    MovingPhysics *mp = dynamic_cast<MovingPhysics*>(track);
+    if(mp)
+    {
+        // If the track contains obect of type MovingPhysics,
+        // these objects will be real rigid body and are already
+        // part of the world. So these objects must not be converted
+        // to triangle meshes.
+    } 
+    else if(track->isAKindOf(ssgTypeLeaf()))
+    {
+        ssgLeaf  *leaf  = (ssgLeaf*)(track);
+        Material *mat   = material_manager->getMaterial(leaf);
+        // Don't convert triangles with material that is ignored (e.g. fuzzy_sand)
+        if(!mat || mat->isIgnore()) return;
+
+        for(int i=0; i<leaf->getNumTriangles(); i++) 
+        {
+            short v1,v2,v3;
+            sgVec3 vv1, vv2, vv3;
+            
+            leaf->getTriangle(i, &v1, &v2, &v3);
+            sgXformPnt3 ( vv1, leaf->getVertex(v1), m );
+            sgXformPnt3 ( vv2, leaf->getVertex(v2), m );
+            sgXformPnt3 ( vv3, leaf->getVertex(v3), m );
+            btVector3 vb1(vv1[0],vv1[1],vv1[2]);
+            btVector3 vb2(vv2[0],vv2[1],vv2[2]);
+            btVector3 vb3(vv3[0],vv3[1],vv3[2]);
+            track_mesh->addTriangle(vb1, vb2, vb3);
+            m_triangleIndex2Material.push_back(mat);
+        }
+        
+    }   // if(track isAKindOf leaf)
+    else if(track->isAKindOf(ssgTypeTransform()))
+    {
+        ssgBaseTransform *t = (ssgBaseTransform*)(track);
+        sgMat4 tmpT, tmpM;
+        t->getTransform(tmpT);
+        sgCopyMat4(tmpM, m);
+        sgPreMultMat4(tmpM,tmpT);
+        for(ssgEntity *e = t->getKid(0); e!=NULL; e=t->getNextKid())
+        {
+            convertTrackToBullet(e, tmpM, track_mesh);
+        }   // for i
+    }
+    else if (track->isAKindOf(ssgTypeBranch())) 
+    {
+        ssgBranch *b =(ssgBranch*)track;
+        for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
+            convertTrackToBullet(e, m, track_mesh);
+        }   // for i<getNumKids
+    }
+    else
+    {
+        assert(!"Unkown ssg type in convertTrackToBullet");
+    }
+}   // convertTrackToBullet
+
+// ----------------------------------------------------------------------------
+void Track::loadTrackModel()
+{
+    std::string path = "data/";
+    path += getIdent();
+    path += ".loc";
+    path = loader->getPath(path.c_str());
+
+    FILE *fd = fopen (path.c_str(), "r" );
+    if ( fd == NULL )
+    {
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg),"Can't open track location file '%s'.\n",
+                 path.c_str());
+        throw std::runtime_error(msg);
+    }
+
+    // Start building the scene graph
+    m_model = new ssgBranch ;
+    scene->add(m_model);
+
+    char s [ 1024 ] ;
+
+    while ( fgets ( s, 1023, fd ) != NULL )
+    {
+        if ( *s == '#' || *s < ' ' )
+            continue ;
+
+        int need_hat = false ;
+        int fit_skin = false ;
+        char fname [ 1024 ] ;
+        sgCoord loc ;
+        sgZeroVec3 ( loc.xyz ) ;
+        sgZeroVec3 ( loc.hpr ) ;
+
+        char htype = '\0' ;
+
+        if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
+                      &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
+        {
+            herring_command(&loc.xyz, htype, false) ;
+        }
+        else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
+                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
+        {
+            herring_command (&loc.xyz, htype, true) ;
+        }
+        else if ( s[0] == '\"' )
+        {
+            if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
+                          fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
+                          &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 )
+            {
+                /* All 6 DOF specified */
+                need_hat = false;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 )
+            {
+                /* All 6 DOF specified - but need height */
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
+                               &(loc.hpr[0]) ) == 5 )
+            {
+                /* No Roll/Pitch specified - assumed zero */
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]) ) == 3 )
+            {
+                /* All 6 DOF specified - but need height, roll, pitch */
+                need_hat = true ;
+                fit_skin = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.hpr[0]) ) == 4 )
+            {
+                /* No Roll/Pitch specified - but need height */
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
+                               &(loc.xyz[2]) ) == 4 )
+            {
+                /* No Heading/Roll/Pitch specified - but need height */
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
+            {
+                /* No Roll/Pitch specified - but need height */
+                need_hat = true ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
+                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
+            {
+                /* No Z/Heading/Roll/Pitch specified */
+                need_hat = false ;
+            }
+            else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 )
+            {
+                /* Nothing specified */
+                need_hat = false ;
+            }
+            else
+            {
+                fclose(fd);
+                char msg[MAX_ERROR_MESSAGE_LENGTH];
+                snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
+                         path.c_str(), s);
+                throw std::runtime_error(msg);
+            }
+
+            if ( need_hat )
+            {
+                sgVec3 nrm ;
+
+                loc.xyz[2] = 1000.0f ;
+                loc.xyz[2] = getHeightAndNormal ( m_model, loc.xyz, nrm ) ;
+
+                if ( fit_skin )
+                {
+                    float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
+                    float cy = cos ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
+
+                    loc.hpr[2] =  SG_RADIANS_TO_DEGREES * atan2 ( nrm[0] * cy -
+                                  nrm[1] * sy, nrm[2] ) ;
+                    loc.hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy +
+                                 nrm[0] * sy, nrm[2] ) ;
+                }
+            }   // if need_hat
+
+            ssgEntity        *obj   = loader->load(fname, CB_TRACK);
+            createDisplayLists(obj);
+            ssgRangeSelector *lod   = new ssgRangeSelector ;
+            ssgTransform     *trans = new ssgTransform ( & loc ) ;
+
+            float r [ 2 ] = { -10.0f, 2000.0f } ;
+
+            lod    -> addKid(obj   );
+            trans  -> addKid(lod   );
+            m_model-> addKid(trans );
+            lod    -> setRanges(r, 2);
+            if(user_config->m_track_debug)
+                addDebugToScene(user_config->m_track_debug);
+
+        }
+        else
+        {
+//            fclose(fd);
+//            char msg[MAX_ERROR_MESSAGE_LENGTH];
+//            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
+            fprintf(stderr, "Warning: Syntax error in '%s': %s",
+                     path.c_str(), s);
+//            throw std::runtime_error(msg);
+        }
+    }   // while fgets
+
+    fclose ( fd ) ;
+
+    createPhysicsModel();
+}   // loadTrack
+
+//-----------------------------------------------------------------------------
+void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
+{
+
+    // if only 2d coordinates are given, let the herring fall from very heigh
+    if(bNeedHeight) (*xyz)[2] = 1000000.0f;
+
+    // Even if 3d data are given, make sure that the herring is on the ground
+    (*xyz)[2] = getHeight ( m_model, *xyz ) + 0.06f;
+    herringType type=HE_GREEN;
+    if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
+    if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
+    if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
+    if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
+    herring_manager->newHerring(type, xyz);
+}   // herring_command

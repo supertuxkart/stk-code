@@ -18,8 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifdef BULLET
-
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
 #include "physics.hpp"
@@ -34,10 +32,22 @@
 
 /** Initialise physics. */
 
+// ----------------------------------------------------------------------------
+// Handling of triangle specific friction and special attributes (e.g. reset,
+// zipper).
+extern ContactAddedCallback             gContactAddedCallback;
+bool HandleTerrainFriction(btManifoldPoint& cp, 
+                           const btCollisionObject* colObj0,int partId0,int index0,
+                           const btCollisionObject* colObj1,int partId1,int index1);
+
+// ----------------------------------------------------------------------------
 float const Physics::NOHIT=-99999.9f;
 
 Physics::Physics(float gravity) : btSequentialImpulseConstraintSolver()
 {
+    // Set the contact handler for friction computation (and reset triggering)
+    gContactAddedCallback = HandleTerrainFriction;
+
     m_collision_conf    = new btDefaultCollisionConfiguration();
     m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
     
@@ -67,90 +77,6 @@ Physics::~Physics()
     delete m_collision_conf;
     
 }   // ~Physics
-
-// -----------------------------------------------------------------------------
-//* Convert the ssg track tree into its physics equivalents.
-void Physics::setTrack(ssgEntity* track)
-{
-    if(!track) return;
-    sgMat4 mat;
-    sgMakeIdentMat4(mat);
-    btTriangleMesh *track_mesh = new btTriangleMesh();
-
-    // Collect all triangles in the track_mesh
-    convertTrack(track, mat, track_mesh);
-    
-    // Now convert the triangle mesh into a static rigid body
-    btCollisionShape *mesh_shape = new btBvhTriangleMeshShape(track_mesh, true);
-    btTransform startTransform;
-    startTransform.setIdentity();
-    btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
-    btRigidBody *body=new btRigidBody(0.0f, myMotionState, mesh_shape);
-    // FIXME: can the mesh_shape and or track_mesh be deleted now?
-    m_dynamics_world->addRigidBody(body);
-    body->setUserPointer(0);
-}   // setTrack
-
-// -----------------------------------------------------------------------------
-//* Convert the ssg track tree into its physics equivalents.
-void Physics::convertTrack(ssgEntity *track, sgMat4 m, btTriangleMesh* track_mesh)
-{
-    if(!track) return;
-    MovingPhysics *mp = dynamic_cast<MovingPhysics*>(track);
-    if(mp)
-    {
-        // If the track contains obect of type MovingPhysics,
-        // these objects will be real rigid body and are already
-        // part of the world. So these objects must not be converted
-        // to triangle meshes.
-    } 
-    else if(track->isAKindOf(ssgTypeLeaf()))
-    {
-        ssgLeaf  *leaf  = (ssgLeaf*)(track);
-        Material *mat   = material_manager->getMaterial(leaf);
-        // Don't convert triangles with material that is ignored (e.g. fuzzy_sand)
-        if(!mat || mat->isIgnore()) return;
-
-        for(int i=0; i<leaf->getNumTriangles(); i++) 
-        {
-            short v1,v2,v3;
-            sgVec3 vv1, vv2, vv3;
-            
-            leaf->getTriangle(i, &v1, &v2, &v3);
-            sgXformPnt3 ( vv1, leaf->getVertex(v1), m );
-            sgXformPnt3 ( vv2, leaf->getVertex(v2), m );
-            sgXformPnt3 ( vv3, leaf->getVertex(v3), m );
-            btVector3 vb1(vv1[0],vv1[1],vv1[2]);
-            btVector3 vb2(vv2[0],vv2[1],vv2[2]);
-            btVector3 vb3(vv3[0],vv3[1],vv3[2]);
-            track_mesh->addTriangle(vb1, vb2, vb3);
-        }
-        
-    }   // if(track isAKindOf leaf)
-    else if(track->isAKindOf(ssgTypeTransform()))
-    {
-        ssgBaseTransform *t = (ssgBaseTransform*)(track);
-        sgMat4 tmpT, tmpM;
-        t->getTransform(tmpT);
-        sgCopyMat4(tmpM, m);
-        sgPreMultMat4(tmpM,tmpT);
-        for(ssgEntity *e = t->getKid(0); e!=NULL; e=t->getNextKid())
-        {
-            convertTrack(e, tmpM, track_mesh);
-        }   // for i
-    }
-    else if (track->isAKindOf(ssgTypeBranch())) 
-    {
-        ssgBranch *b =(ssgBranch*)track;
-        for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
-            convertTrack(e, m, track_mesh);
-        }   // for i<getNumKids
-    }
-    else
-    {
-        assert(!"Unkown ssg type in convertTrack");
-    }
-}   // convertTrack
 
 // -----------------------------------------------------------------------------
 //* Adds a kart to the physics engine
@@ -357,14 +283,25 @@ float Physics::getHAT(btVector3 pos)
 {
     btVector3 to_pos(pos);
     to_pos.setZ(-100000.f);
-    btCollisionWorld::ClosestRayResultCallback 
-        rayCallback(pos, to_pos);
-
+    btCollisionWorld::ClosestRayResultCallback rayCallback(pos, to_pos);
     m_dynamics_world->rayTest(pos, to_pos, rayCallback);
     if(!rayCallback.HasHit()) return NOHIT;
 
     return pos.getZ()-rayCallback.m_hitPointWorld.getZ();
 }   // getHAT
+// -----------------------------------------------------------------------------
+float Physics::getHOT(btVector3 pos)
+{
+    btVector3 to_pos(pos);
+    to_pos.setZ(-100000.f);
+
+    btCollisionWorld::ClosestRayResultCallback rayCallback(pos, to_pos);
+
+    m_dynamics_world->rayTest(pos, to_pos, rayCallback);
+    if(!rayCallback.HasHit()) return NOHIT;
+
+    return rayCallback.m_hitPointWorld.getZ();
+}   // getHOT
 // -----------------------------------------------------------------------------
 bool Physics::getTerrainNormal(btVector3 pos, btVector3* normal)
 {
@@ -379,6 +316,36 @@ bool Physics::getTerrainNormal(btVector3 pos, btVector3* normal)
     normal->normalize();
     return true;
 }   // getTerrainNormal
+
+// -----------------------------------------------------------------------------
+bool HandleTerrainFriction(btManifoldPoint& cp, 
+                           const btCollisionObject* colObj0,int partId0,int index0,
+                           const btCollisionObject* colObj1,int partId1,int index1)
+{
+    const btCollisionObject* obj0 = static_cast<const btCollisionObject*>(colObj0);
+    const btCollisionObject* obj1 = static_cast<const btCollisionObject*>(colObj1);
+    Moveable *mov0          = static_cast<Moveable*>(obj0->getUserPointer());
+    Moveable *mov1          = static_cast<Moveable*>(obj1->getUserPointer());
+    // make sure that indeed one of the two objects is the track, i.e. has no user pointer
+    assert(mov0==0 || mov1==0);
+    Moveable *other;
+    other    = (mov0==0) ? mov1   : mov0;   // get the non-track object.
+
+    // This can happen when moving_physics objects exist
+    if(!other) return false;
+
+    int indx = (mov0==0) ? index0 : index1; // get the track index
+    // Don't do anything if a projectile (or any other non-kart object) hit sthe track
+    if(other->getMoveableType()!=Moveable::MOV_KART) return false;
+
+    const Material *mat= Track::getMaterial(indx);
+    if(mat->isReset())
+    {
+        ((Kart*)other)->forceRescue();
+    }
+    cp.m_combinedFriction = mat->getFriction();
+    return true;
+}   // CustomTriangleHandler
 
 // -----------------------------------------------------------------------------
 //* 
@@ -415,6 +382,5 @@ void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
 }   // debugDraw
 // -----------------------------------------------------------------------------
 
-#endif
 /* EOF */
 

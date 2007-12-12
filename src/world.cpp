@@ -37,7 +37,6 @@
 #include "loader.hpp"
 #include "player_kart.hpp"
 #include "auto_kart.hpp"
-#include "isect.hpp"
 #include "track.hpp"
 #include "kart_properties_manager.hpp"
 #include "track_manager.hpp"
@@ -47,7 +46,6 @@
 #include "history.hpp"
 #include "constants.hpp"
 #include "sound_manager.hpp"
-#include "ssg_help.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "scene.hpp"
@@ -93,10 +91,6 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
         throw std::runtime_error(msg);
     }
 
-    // Start building the scene graph
-    m_track_branch = new ssgBranch ;
-    scene->add ( m_track_branch ) ;
-
     // Create the physics
     m_physics = new Physics(getGravity());
 
@@ -104,9 +98,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    loadTrack   ( ) ;
-
-    m_track->createHash(m_track_branch, 1000);
+    loadTrack() ;
 
     int pos = 0;
     int playerIndex = 0;
@@ -164,7 +156,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
 
-    m_highscores   = highscore_manager->getHighscores(hst, m_kart.size(),
+    m_highscores   = highscore_manager->getHighscores(hst, (int)m_kart.size(),
                                                       m_race_setup.m_difficulty, 
                                                       m_track->getName(),
                                                       m_race_setup.m_num_laps);
@@ -205,7 +197,7 @@ World::~World()
 #ifdef HAVE_GHOST_REPLAY
     saveReplayHumanReadable( "test" );
 #endif
-
+    m_track->cleanup();
     // Clear all callbacks
     callback_manager->clear(CB_TRACK);
 
@@ -275,16 +267,16 @@ void World::draw()
 }
 
 //-----------------------------------------------------------------------------
-void World::update(float delta)
+void World::update(float dt)
 {
-    if(user_config->m_replay_history) delta=history->GetNextDelta();
+    if(user_config->m_replay_history) dt=history->GetNextDelta();
 
     checkRaceStatus();
     // this line was before checkRaceStatus. but m_clock is set to 0.0 in
     // checkRaceStatus on start, so m_clock would not be synchron and the
     // first delta would not be added .. that would cause a gap in 
     // replay-recording
-    m_clock += delta;
+    m_clock += dt;
 
     // Count the number of collision in the next 'FRAMES_FOR_TRAFFIC_JAM' frames.
     // If a kart has more than one hit, play 'traffic jam' noise.
@@ -311,8 +303,8 @@ void World::update(float delta)
 
         // Don't record the time for the last kart, since it didn't finish
         // the race - unless it's timetrial (then there is only one kart)
-    unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
-                                    ? m_kart.size() : m_kart.size()-1;
+        unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+                                    ? (unsigned int)m_kart.size() : (unsigned int)m_kart.size()-1;
         for(unsigned int pos=0; pos<karts_to_enter; pos++)
         {
             // Only record times for player karts
@@ -323,7 +315,7 @@ void World::update(float delta)
             Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
-            if(m_highscores->addData(hst, m_kart.size(),
+            if(m_highscores->addData(hst, (int)m_kart.size(),
                      m_race_setup.m_difficulty, 
                      m_track->getName(),
                      k->getName(),
@@ -338,35 +330,15 @@ void World::update(float delta)
         pause();
         menu_manager->pushMenu(MENUID_RACERESULT);
     }
-
-    float inc = 0.05f;
-    float dt  = delta;
-    while (dt>0.0)
+    if(!user_config->m_replay_history) history->StoreDelta(dt);
+    m_physics->update(dt);
+    for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
-        if(dt>=inc)
-        {
-            dt-=inc;
-            if(user_config->m_replay_history) delta=history->GetNextDelta();
-        }
-        else
-        {
-            inc=dt;
-            dt=0.0;
-        }
-        // The same delta is stored over and over again! This helps to use
-        // the same index in History:allDeltas, and the history* arrays here,
-        // and makes writing easier, since we had to write delta the first
-        // time, and then inc from then on.
-        if(!user_config->m_replay_history) history->StoreDelta(delta);
-        m_physics->update(inc);
-        for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
-        {
-            m_kart[i]->update(inc) ;
-        }
-    }   // while dt>0
+        m_kart[i]->update(dt) ;
+    }
 
-    projectile_manager->update(delta);
-    herring_manager->update(delta);
+    projectile_manager->update(dt);
+    herring_manager->update(dt);
 
     for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
@@ -375,7 +347,7 @@ void World::update(float delta)
     }
 
     /* Routine stuff we do even when paused */
-    callback_manager->update(delta);
+    callback_manager->update(dt);
 
     // Check for traffic jam. The sound is played even if it's
     // not a player kart - a traffic jam happens rarely anyway.
@@ -621,23 +593,6 @@ void World::updateRacePosition ( int k )
     m_kart [ k ] -> setPosition ( p ) ;
 }   // updateRacePosition
 
-//-----------------------------------------------------------------------------
-void World::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
-{
-
-    // if only 2d coordinates are given, let the herring fall from very heigh
-    if(bNeedHeight) (*xyz)[2] = 1000000.0f;
-
-    // Even if 3d data are given, make sure that the herring is on the ground
-    (*xyz)[2] = getHeight ( m_track_branch, *xyz ) + 0.06f;
-    herringType type=HE_GREEN;
-    if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
-    if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
-    if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
-    if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
-    herring_manager->newHerring(type, xyz);
-}   // herring_command
-
 
 //-----------------------------------------------------------------------------
 void World::loadTrack()
@@ -680,161 +635,7 @@ void World::loadTrack()
         }
     }
 
-    FILE *fd = fopen (path.c_str(), "r" );
-    if ( fd == NULL )
-    {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg),"Can't open track location file '%s'.\n",
-                 path.c_str());
-        throw std::runtime_error(msg);
-    }
-
-    char s [ 1024 ] ;
-
-    while ( fgets ( s, 1023, fd ) != NULL )
-    {
-        if ( *s == '#' || *s < ' ' )
-            continue ;
-
-        int need_hat = false ;
-        int fit_skin = false ;
-        char fname [ 1024 ] ;
-        sgCoord loc ;
-        sgZeroVec3 ( loc.xyz ) ;
-        sgZeroVec3 ( loc.hpr ) ;
-
-        char htype = '\0' ;
-
-        if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
-                      &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
-        {
-            herring_command(&loc.xyz, htype, false) ;
-        }
-        else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-        {
-            herring_command (&loc.xyz, htype, true) ;
-        }
-        else if ( s[0] == '\"' )
-        {
-            if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
-                          fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                          &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 )
-            {
-                /* All 6 DOF specified */
-                need_hat = false;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 )
-            {
-                /* All 6 DOF specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                               &(loc.hpr[0]) ) == 5 )
-            {
-                /* No Roll/Pitch specified - assumed zero */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]) ) == 3 )
-            {
-                /* All 6 DOF specified - but need height, roll, pitch */
-                need_hat = true ;
-                fit_skin = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]) ) == 4 )
-            {
-                /* No Roll/Pitch specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.xyz[2]) ) == 4 )
-            {
-                /* No Heading/Roll/Pitch specified - but need height */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-            {
-                /* No Roll/Pitch specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-            {
-                /* No Z/Heading/Roll/Pitch specified */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 )
-            {
-                /* Nothing specified */
-                need_hat = false ;
-            }
-            else
-            {
-                fclose(fd);
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
-                         path.c_str(), s);
-                throw std::runtime_error(msg);
-            }
-
-            if ( need_hat )
-            {
-                sgVec3 nrm ;
-
-                loc.xyz[2] = 1000.0f ;
-                loc.xyz[2] = getHeightAndNormal ( m_track_branch, loc.xyz, nrm ) ;
-
-                if ( fit_skin )
-                {
-                    float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
-                    float cy = cos ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
-
-                    loc.hpr[2] =  SG_RADIANS_TO_DEGREES * atan2 ( nrm[0] * cy -
-                                  nrm[1] * sy, nrm[2] ) ;
-                    loc.hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy +
-                                 nrm[0] * sy, nrm[2] ) ;
-                }
-            }   // if need_hat
-
-            ssgEntity        *obj   = loader->load(fname, CB_TRACK);
-            createDisplayLists(obj);
-            ssgRangeSelector *lod   = new ssgRangeSelector ;
-            ssgTransform     *trans = new ssgTransform ( & loc ) ;
-
-            float r [ 2 ] = { -10.0f, 2000.0f } ;
-
-            lod         -> addKid    ( obj   ) ;
-            trans       -> addKid    ( lod   ) ;
-            m_track_branch -> addKid ( trans ) ;
-            lod         -> setRanges ( r, 2  ) ;
-            if(user_config->m_track_debug)
-                m_track->addDebugToScene(user_config->m_track_debug);
-
-        }
-        else
-        {
-//            fclose(fd);
-//            char msg[MAX_ERROR_MESSAGE_LENGTH];
-//            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
-            fprintf(stderr, "Warning: Syntax error in '%s': %s",
-                     path.c_str(), s);
-//            throw std::runtime_error(msg);
-        }
-    }   // while fgets
-
-    fclose ( fd ) ;
-#ifdef BULLET
-    m_physics->setTrack(m_track_branch);
-#endif
+    m_track->loadTrackModel();
 }   // loadTrack
 
 //-----------------------------------------------------------------------------

@@ -85,7 +85,6 @@ private:
     void  KartKartCollision(Kart *ka, Kart *kb);
 
 public:
-    void  convertTrack    (ssgEntity *track, sgMat4 m,  btTriangleMesh* track_mesh);
           Physics         (float gravity);
          ~Physics         ();
     void  addKart         (const Kart *k, btRaycastVehicle *v);
@@ -94,12 +93,12 @@ public:
     void  removeBody      (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
     void  update          (float dt);
     void  draw            ();
-    void  setTrack        (ssgEntity *track);
     btDynamicsWorld*
           getPhysicsWorld () const {return m_dynamics_world;}
     void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
     static const float NOHIT;
     float getHAT          (btVector3 pos);
+    float getHOT          (btVector3 pos);
     bool  getTerrainNormal(btVector3 pos, btVector3* normal);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,

@@ -394,7 +394,6 @@ void Kart::reset()
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
         m_track_sector );
 
-#ifdef BULLET
     btTransform trans;
     trans.setIdentity();
     // Set heading:
@@ -414,7 +413,6 @@ void Kart::reset()
         m_vehicle->updateWheelTransform(j, true);
     }
 
-#endif
     placeModel();
 }   // reset
 
@@ -711,20 +709,15 @@ void Kart::update (float dt)
     {
         // Let the kart raise 2m in the 2 seconds of the rescue
         const float rescue_time   = 2.0f;
-#ifdef BULLET
         const float rescue_height = 2.0f;
-#endif
         if(m_attachment.getType() != ATTACH_TINYTUX)
         {
             if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
             m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
-#ifdef BULLET
             m_rescue_pitch = m_curr_pos.hpr[1];
             m_rescue_roll  = m_curr_pos.hpr[2];
             world->getPhysics()->removeKart(this);
-#endif
         }
-#ifdef BULLET
         m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
 
         btTransform pos=m_body->getCenterOfMassTransform();
@@ -735,13 +728,8 @@ void Kart::update (float dt)
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
         pos.setRotation(pos.getRotation()*q_roll*q_pitch);
         m_body->setCenterOfMassTransform(pos);
-    setTrans(pos);
-        //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());
-#else
-        sgZeroVec3 ( m_velocity.xyz ) ;
-        sgZeroVec3 ( m_velocity.hpr ) ;
-        m_velocity.xyz[2] = 1.1f * GRAVITY * dt *10.0f;
-#endif        
+        setTrans(pos);
+        //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());     
     }   // if m_rescue
     m_attachment.update(dt, &m_velocity);
 
@@ -1058,7 +1046,7 @@ void Kart::endRescue()
     world ->m_track -> trackToSpatial ( m_curr_pos.xyz, m_track_sector ) ;
     m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_sector] ;
     m_rescue = false ;
-#ifdef BULLET
+
     world->getPhysics()->addKart(this, m_vehicle);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
@@ -1070,10 +1058,10 @@ void Kart::endRescue()
     btTransform pos=m_body->getCenterOfMassTransform();
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
                             m_curr_pos.xyz[2]+0.5f*m_kart_height));
+    pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
+                                 DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
     setTrans(pos);
-                  
-#endif
 
 }   // endRescue
 

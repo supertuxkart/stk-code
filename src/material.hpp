@@ -60,20 +60,20 @@ public:
 
     int matches ( char *tx ) ;
 
-    bool isIgnore    () { return m_ignore      ; }
-    bool isZipper    () { return m_zipper      ; }
-    bool isSphereMap () { return m_sphere_map   ; }
-    bool isCrashable () { return m_collideable ; }
-    bool isReset     () { return m_resetter    ; }
-    float getFriction() { return m_friction    ; }
+    ssgSimpleState 
+         *getState    () const { return m_state ;      }
+    bool  isIgnore    () const { return m_ignore;      }
+    bool  isZipper    () const { return m_zipper;      }
+    bool  isSphereMap () const { return m_sphere_map;  }
+    bool  isCrashable () const { return m_collideable; }
+    bool  isReset     () const { return m_resetter;    }
+    float getFriction () const { return m_friction;    }
+    char *getTexFname () const { return m_texname;     }
+    int   getIndex    () const { return m_index;       }
+    void  apply       ()       { m_state -> apply ();  }
 
     void applyToLeaf ( ssgLeaf *l ) ;
 
-    ssgSimpleState *getState () { return m_state ; }
-    int getIndex             () { return m_index ; }
-    void      apply    () { m_state -> apply ()  ; }
-
-    char *getTexFname  () const { return m_texname     ; }
 
 } ;
 
