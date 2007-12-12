@@ -69,14 +69,6 @@ GrandPrixSelect::GrandPrixSelect()
                 m_all_cups.push_back(cup);
                 widget_manager->add_wgt(WTOK_FIRSTPRIX + nId, 40, 7);
                 widget_manager->set_wgt_text(WTOK_FIRSTPRIX + nId, cup.getName());
-/*                if(nId==0)
-                {
-                    widgetSet -> start(m_menu_id, cup.getName(), GUI_SML, nId, 0);
-                }
-                else
-                {
-                    widgetSet -> state(m_menu_id, cup.getName(), GUI_SML, nId, 0);
-                }*/
                 nId++;
             }   // if
         }   // for i
@@ -101,15 +93,12 @@ GrandPrixSelect::GrandPrixSelect()
     widget_manager->activate_wgt(WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
-    //m_rect = widgetSet->rect(10, 10, user_config->m_width-20, 34, GUI_ALL, 10);*/
 }   // GrandPrixSelect
 
 //-----------------------------------------------------------------------------
 GrandPrixSelect::~GrandPrixSelect()
 {
     widget_manager->reset();
-//    widgetSet -> delete_widget(m_menu_id) ;
-//    glDeleteLists(m_rect, 1);
 }   // GrandPrixSelect
 
 //-----------------------------------------------------------------------------
@@ -121,6 +110,7 @@ void GrandPrixSelect::update(float dt)
 
     const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
     widget_manager->set_wgt_text(WTOK_DESCRIPTION, cup.getDescription());
+    widget_manager->set_wgt_x_scroll_pos( WTOK_DESCRIPTION, WGT_SCROLL_CENTER );
 
     return;
 }
