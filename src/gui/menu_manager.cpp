@@ -42,7 +42,8 @@
 #include "race_manager.hpp"
 #include "game_manager.hpp"
 #include "race_menu.hpp"
-#include "help_menu.hpp"
+#include "help_page_one.hpp"
+#include "help_page_two.hpp"
 #include "credits_menu.hpp"
 #include "grand_prix_select.hpp"
 #include "sound_manager.hpp"
@@ -202,8 +203,11 @@ void MenuManager::update()
             case MENUID_CONFIG_SOUND:
                 m_current_menu= new ConfigSound();
                 break;
-            case MENUID_HELP:
-                m_current_menu = new HelpMenu();
+            case MENUID_HELP1:
+                m_current_menu = new HelpPageOne();
+                break;
+            case MENUID_HELP2:
+                m_current_menu = new HelpPageTwo();
                 break;
             case MENUID_CREDITS:
                 m_current_menu = new CreditsMenu();

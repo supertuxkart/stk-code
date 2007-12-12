@@ -28,7 +28,6 @@ public:
     ConfigControls();
     ~ConfigControls();
 
-//    void update(float dt);
     void select();
 };
 

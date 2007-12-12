@@ -114,7 +114,6 @@ void ConfigSound::select()
             user_config->setSFX(UserConfig::UC_ENABLE);
             widget_manager->set_wgt_text(WTOK_SFX, _("Turn off sound effects"));
         }
-//        widgetSet->toggle(m_sfx_menu_id);
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();

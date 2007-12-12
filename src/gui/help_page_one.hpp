@@ -17,17 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HELPMENU_H
-#define HEADER_HELPMENU_H
+#ifndef HEADER_HELPPAGEONE_H
+#define HEADER_HELPPAGEONE_H
 
 #include <string>
 #include "base_gui.hpp"
-//#include "player.hpp"
 
 class ssgTransform;
 class ssgContext;
 
-class HelpMenu: public BaseGUI
+class HelpPageOne: public BaseGUI
 {
 private:
     ssgContext* m_context;
@@ -38,11 +37,9 @@ private:
     float m_clock;
 
 public:
-    HelpMenu();
-    ~HelpMenu();
+    HelpPageOne();
+    ~HelpPageOne();
     void select ();
-    void switch_to_first_screen();
-    void switch_to_second_screen();
 
     void update(float dt);
 };

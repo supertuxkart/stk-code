@@ -31,7 +31,6 @@ public:
     ConfigDisplay();
     ~ConfigDisplay();
 
-//    void update(float dt);
     void select();
 
 private:

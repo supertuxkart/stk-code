@@ -87,21 +87,6 @@ NumLaps::NumLaps() : laps(3)
     widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
     widget_manager->activate_wgt(WTOK_QUIT);
 
-/*    m_menu_id = widgetSet -> varray(0);
-    widgetSet -> label(m_menu_id, _("Choose number of laps"),  GUI_LRG, GUI_ALL, 0, 0 );
-
-    widgetSet -> space(m_menu_id);
-
-    lap_label_id = widgetSet -> label(m_menu_id, _("Laps: 3"));
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, _("Less"), GUI_MED, 10);
-    widgetSet -> state(m_menu_id, _("More"), GUI_MED, 20);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> start(m_menu_id, _("Start Race"), GUI_SML, 30);
-    widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, -1);
-    widgetSet -> space(m_menu_id);
-
-    widgetSet -> layout(m_menu_id, 0, 0);*/
     widget_manager->layout(WGT_AREA_ALL);
 }
 
@@ -115,9 +100,6 @@ NumLaps::~NumLaps()
 void NumLaps::select()
 {
     const int WGT = widget_manager->get_selected_wgt();
-/*    const int id = widgetSet->click();
-    const int n = widgetSet->get_token(id);*/
-    //TEMP
     switch (WGT)
     {
       case WTOK_LESS:

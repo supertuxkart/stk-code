@@ -82,36 +82,6 @@ MainMenu::~MainMenu()
 //-----------------------------------------------------------------------------
 void MainMenu::select()
 {
-    #if 0
-    switch ( widgetSet -> get_token (widgetSet -> click()) )
-    {
-    case WTOK_SINGLE:
-        race_manager->setNumPlayers(1);
-        menu_manager->pushMenu(MENUID_GAMEMODE);
-        break;
-    case WTOK_MULTI:
-        menu_manager->pushMenu(MENUID_NUMPLAYERS);
-        break;
-
-    case WTOK_REPLAY:
-        //TODO
-        break;
-
-    case WTOK_OPTIONS:
-        menu_manager->pushMenu(MENUID_OPTIONS);
-        break;
-
-    case WTOK_QUIT:
-        menu_manager->pushMenu(MENUID_EXITGAME);
-        break;
-    case WTOK_HELP:
-        menu_manager->pushMenu(MENUID_HELP);
-        break;
-    case WTOK_CREDITS:
-        menu_manager->pushMenu(MENUID_CREDITS);
-        break;
-    }
-    #endif
     switch ( widget_manager->get_selected_wgt() )
     {
     case WTOK_SINGLE:
@@ -130,7 +100,7 @@ void MainMenu::select()
         menu_manager->pushMenu(MENUID_EXITGAME);
         break;
     case WTOK_HELP:
-        menu_manager->pushMenu(MENUID_HELP);
+        menu_manager->pushMenu(MENUID_HELP1);
         break;
     case WTOK_CREDITS:
         menu_manager->pushMenu(MENUID_CREDITS);
@@ -144,9 +114,7 @@ void MainMenu::handle(GameAction ga, int value)
     switch ( ga )
     {
     case GA_LEAVE:
-        if(!value)
-            break;
-		
+        if(!value) break;
         menu_manager->pushMenu(MENUID_EXITGAME);
         break;
 

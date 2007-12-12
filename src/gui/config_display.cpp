@@ -124,16 +124,8 @@ ConfigDisplay::ConfigDisplay()
 //-----------------------------------------------------------------------------
 ConfigDisplay::~ConfigDisplay()
 {
-//    widgetSet -> delete_widget(m_menu_id) ;
     widget_manager->reset();
 }
-
-//-----------------------------------------------------------------------------
-/*void ConfigDisplay::update(float dt)
-{
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
-}*/
 
 //-----------------------------------------------------------------------------
 void ConfigDisplay::select()
@@ -142,12 +134,6 @@ void ConfigDisplay::select()
     {
     case WTOK_FULLSCREEN:
         drv_toggleFullscreen();
-//        widgetSet -> delete_widget(m_menu_id) ;
-        // Since changing the video mode in drv_toggleFullscreen deletes all
-        // display lists, textures etc., we have to load the menu again.
-        // drv_toggleFullscreen takes care of general material, general
-        // widgetSet, etc.
-//        CreateMenu();
         if(user_config->m_fullscreen)
         {
             widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Window mode"));

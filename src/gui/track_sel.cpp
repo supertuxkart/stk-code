@@ -79,22 +79,6 @@ TrackSel::TrackSel()
     }
 
 //FIXME: Right now, the image and the author's name is not controlled by the widget manager.
-#if 0
-    widget_manager->set_initial_rect_state(false, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(false, "", WGT_FNT_MED );
-    widget_manager->set_initial_activation_state(false);
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
-    widget_manager->break_line();
-
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_WHITE);
-    widget_manager->add_wgt( WTOK_IMG0, 40, 30);
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 5, 30);
-    widget_manager->add_wgt( WTOK_IMG0, 40, 30);
-    widget_manager->break_line();
-
-    widget_manager->add_wgt( WTOK_AUTHOR, 100, 10);
-    widget_manager->show_wgt_text( WTOK_AUTHOR );
-#endif
     widget_manager->layout(WGT_AREA_TOP);
 }
 
@@ -112,7 +96,6 @@ void TrackSel::update(float dt)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // draw a track preview of the currently highlighted track menu entry
-//    const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
     const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
 
@@ -186,7 +169,6 @@ void TrackSel::update(float dt)
 void TrackSel::select()
 {
     const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
-    //const int CLICKED_TOKEN = widgetSet->get_token(widgetSet->click());
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
     race_manager->setTrack(TRACK->getIdent());
 

@@ -109,7 +109,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/difficulty.cpp	   gui/difficulty.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
-	gui/help_menu.cpp 	   gui/help_menu.hpp 	        \
+	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
+	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/font.hpp		   gui/font.cpp                 \

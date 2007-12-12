@@ -121,10 +121,6 @@ void
 BaseGUI::update(float dt)
 {
     widget_manager->update(dt);
-#if 0
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
-#endif
 }   // update
 
 //-----------------------------------------------------------------------------

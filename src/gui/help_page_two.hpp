@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: help_menu.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -17,17 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CREDITSMENU_H
-#define HEADER_CREDITSMENU_H
+#ifndef HEADER_HELPPAGETWO_H
+#define HEADER_HELPPAGETWO_H
 
+#include <string>
 #include "base_gui.hpp"
 
-class CreditsMenu: public BaseGUI
+class HelpPageTwo: public BaseGUI
 {
 public:
-    CreditsMenu();
-    ~CreditsMenu();
-
+    HelpPageTwo();
+    ~HelpPageTwo();
     void select ();
 };
 

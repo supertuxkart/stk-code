@@ -178,33 +178,6 @@ void RaceGUI::drawFPS ()
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
-#if 0
-//This is not being used..
-void RaceGUI::drawTexture(const GLuint texture, int w, int h,
-                          int red, int green, int blue, int x, int y)
-{
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glColor3ub ( red, green, blue ) ;
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);
-    glVertex2f(x, (float)h+y);
-
-    glTexCoord2f(1, 0);
-    glVertex2f((float)w+x, (float)h+y);
-
-    glTexCoord2f(1, 1);
-    glVertex2f((float)w+x, y);
-
-    glTexCoord2f(0, 1);
-    glVertex2f(x, y);
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-}   // drawTexture
-#endif
-//-----------------------------------------------------------------------------
 void RaceGUI::drawTimer ()
 {
     if(world->getPhase()!=World::RACE_PHASE         &&
@@ -248,10 +221,6 @@ void RaceGUI::drawMap ()
             world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop+3);
             world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop-2);
             world -> m_track->glVtx ( c->xyz, (float)xLeft+3, (float)yTop-2);
-            /*      world -> m_track->glVtx ( c->xyz, xLeft  , yTop-4);
-                  world -> m_track->glVtx ( c->xyz, xLeft+4, yTop  );
-                  world -> m_track->glVtx ( c->xyz, xLeft  , yTop+4);
-                  world -> m_track->glVtx ( c->xyz, xLeft-4, yTop  ); */
         }
         else
         {

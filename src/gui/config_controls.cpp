@@ -72,43 +72,14 @@ ConfigControls::ConfigControls()
     widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
-/*
- * m_menu_id = widgetSet -> vstack(0);
-    widgetSet -> label(m_menu_id, _("Edit controls for which player?"), GUI_LRG);
-
-    const int VA = widgetSet -> varray(m_menu_id);
-
-    static char playerN[4][MAX_MESSAGE_LENGTH];
-    for(int i=1; i<=4; i++)
-    {
-        snprintf(playerN[i-1], MAX_MESSAGE_LENGTH,
-                 _("Player %d"), i);
-        if (i == 1)
-          widgetSet -> start(VA, playerN[i-1],  GUI_MED, i);
-        else
-          widgetSet -> state(VA, playerN[i-1],  GUI_MED, i);
-    }
-
-    widgetSet -> space(VA);
-    widgetSet -> state(VA, _("Press <ESC> to go back"), GUI_SML, 5);
-
-    widgetSet -> layout(m_menu_id, 0, 0);*/
 }
 
 //-----------------------------------------------------------------------------
 ConfigControls::~ConfigControls()
 {
     widget_manager->reset();
-//    widgetSet -> delete_widget(m_menu_id) ;
 }
 
-//-----------------------------------------------------------------------------
-/*void ConfigControls::update(float dt)
-{
-    widgetSet -> timer(m_menu_id, dt) ;
-    widgetSet -> paint(m_menu_id) ;
-}
-*/
 //-----------------------------------------------------------------------------
 void ConfigControls::select()
 {

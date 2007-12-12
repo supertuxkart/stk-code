@@ -78,9 +78,6 @@ CharSel::CharSel(int whichPlayer)
     widget_manager->break_line();
 
     //FIXME: this supports only a static number of karts
-//    unsigned int lastKartId = user_config->m_player[m_player_index].getLastKartId();
-//    bool skipActivatingLast = false;
-
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
@@ -141,7 +138,7 @@ void CharSel::switchCharacter(int n)
     if (m_current_kart != n && kp != NULL)
     {
         widget_manager->set_wgt_text( WTOK_NAME, kp->getName().c_str());
-        //FIXME: maybe I should rename WGT_SCROLL_* to WGT_POS_*
+        //FIXME: maybe this should be renamed from WGT_SCROLL_* to WGT_POS_*
         widget_manager->set_wgt_x_scroll_pos( WTOK_NAME, WGT_SCROLL_CENTER );
 
         m_current_kart = n;

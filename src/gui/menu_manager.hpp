@@ -36,9 +36,6 @@ enum MenuManagerIDs
     MENUID_GAMEMODE,
     MENUID_RACERESULT,
     MENUID_GRANDPRIXEND,
-#if 0 // no needed yet
-    MENUID_NEXTRACE,
-#endif
     MENUID_RACEMENU,
     MENUID_TRACKSEL,
     MENUID_NUMLAPS,
@@ -57,7 +54,8 @@ enum MenuManagerIDs
     MENUID_CONFIG_P4,
 
     // help and credit menu
-    MENUID_HELP,
+    MENUID_HELP1,
+    MENUID_HELP2,
     MENUID_CREDITS,
     // race gui
     MENUID_RACE,

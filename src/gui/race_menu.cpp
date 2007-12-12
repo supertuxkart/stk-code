@@ -120,7 +120,7 @@ void RaceMenu::select()
         break;
 
     case WTOK_HELP:
-        menu_manager->pushMenu(MENUID_HELP);
+        menu_manager->pushMenu(MENUID_HELP1);
         break;
 
     case WTOK_QUIT:

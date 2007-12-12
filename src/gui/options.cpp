@@ -32,27 +32,6 @@ enum WidgetTokens {
 
 Options::Options()
 {
-/*    m_menu_id = widgetSet -> varray(0);
-
-    widgetSet -> space(m_menu_id);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> label(m_menu_id, _("Options"),   GUI_LRG, GUI_ALL, 0, 0);
-    widgetSet -> start(m_menu_id, _("Player Config"),  GUI_MED, WTOK_CONTROLS);
-
-#ifndef WIN32
-    // Don't display the fullscreen menu when called from within the race.
-    // (Windows only)
-    // The fullscreen mode will reload all textures, reload the models,
-    // ... basically creating a big mess!!  (and all of this only thanks
-    // to windows, who discards all textures, ...)
-    widgetSet -> state(m_menu_id, _("Display"),   GUI_MED, WTOK_DISPLAY);
-#endif
-
-    widgetSet -> state(m_menu_id, _("Sound"),     GUI_MED, WTOK_SOUND);
-    widgetSet -> space(m_menu_id);
-    widgetSet -> state(m_menu_id, _("Press <ESC> to go back"), GUI_SML, WTOK_BACK);
-
-    widgetSet -> layout(m_menu_id, 0, 0);*/
     widget_manager->add_wgt(WTOK_TITLE, 35, 7);
     widget_manager->show_wgt_rect( WTOK_TITLE );
     widget_manager->set_wgt_text( WTOK_TITLE, _("Options") );

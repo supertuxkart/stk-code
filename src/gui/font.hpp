@@ -62,19 +62,6 @@ public:
               doShadow);
     }
 
-#if 0
-    // Convenience functions to reduce the number of parameters
-    // --------------------------------------------------------
-    void Print(      const std::string &text, int size, int x, int y,
-                     int red=255, int green=255, int blue=255,
-                     int left=-1, int right=-1, int top=-1, int bottom=-1)
-    {
-                     Print(text,  size, x, y,
-                           red, green, blue, 1.0f, 1.0f,
-                           left, right, top, bottom);
-    }
-#endif
-
     void PrintShadow(const char *text, int size,
                      int x, int y,
                      int red=255, int green=255, int blue=255,
@@ -85,16 +72,6 @@ public:
                            red, green, blue, scale_x, scale_y,
                            left, right, top, bottom, true);
     }
-#if 0
-    void PrintShadow(const char *text, int size, int x, int y,
-                     int red=255, int green=255, int blue=255,
-                     int left=-1, int right=-1, int top=-1, int bottom=-1)
-    {
-                     Print(text, size, x, y,
-                           red, green, blue, 1.0f, 1.0f, 
-                           left, right, top, bottom, true);
-    }
-#endif
 };
 
 int init_fonts();
