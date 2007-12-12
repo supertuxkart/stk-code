@@ -229,7 +229,7 @@ void RaceGUI::drawMap ()
     int xLeft = 10;
     int yTop   =  10;
 
-    world -> m_track -> draw2Dview ( xLeft,   yTop   );
+    world -> m_track -> draw2Dview ( (float)xLeft,   (float)yTop   );
 
     glBegin ( GL_QUADS ) ;
 
@@ -244,10 +244,10 @@ void RaceGUI::drawMap ()
         /* If it's a player, draw a bigger sign */
         if (kart -> isPlayerKart ())
         {
-            world -> m_track->glVtx ( c->xyz, xLeft+3, yTop+3);
-            world -> m_track->glVtx ( c->xyz, xLeft-2, yTop+3);
-            world -> m_track->glVtx ( c->xyz, xLeft-2, yTop-2);
-            world -> m_track->glVtx ( c->xyz, xLeft+3, yTop-2);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft+3, (float)yTop+3);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop+3);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop-2);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft+3, (float)yTop-2);
             /*      world -> m_track->glVtx ( c->xyz, xLeft  , yTop-4);
                   world -> m_track->glVtx ( c->xyz, xLeft+4, yTop  );
                   world -> m_track->glVtx ( c->xyz, xLeft  , yTop+4);
@@ -255,10 +255,10 @@ void RaceGUI::drawMap ()
         }
         else
         {
-            world -> m_track->glVtx ( c->xyz, xLeft+2, yTop+2);
-            world -> m_track->glVtx ( c->xyz, xLeft-1, yTop+2);
-            world -> m_track->glVtx ( c->xyz, xLeft-1, yTop-1);
-            world -> m_track->glVtx ( c->xyz, xLeft+2, yTop-1);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft+2, (float)yTop+2);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft-1, (float)yTop+2);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft-1, (float)yTop-1);
+            world -> m_track->glVtx ( c->xyz, (float)xLeft+2, (float)yTop-1);
         }
     }
 
@@ -609,9 +609,9 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
     float displayedAngle = 45.0f * kart->getSteerPercent();
 
     int tw = width/2; int th = height/2;
-    glTranslatef( offset_x+tw,  offset_y+th, 0.0f);
+    glTranslatef( (float)(offset_x+tw), (float)(offset_y+th), 0.0f);
     glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
-    glTranslatef(-offset_x-tw, -offset_y-th, 0.0f);
+    glTranslatef((float)(-offset_x-tw), (float)(-offset_y-th), 0.0f);
 
     m_steering_wheel_icon->getState()->force();
     glBegin ( GL_QUADS ) ;
@@ -729,7 +729,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
     float maxRatio = std::max(ratio_x, ratio_y);
     char str[256];
     offset_x += (int)(120*ratio_x);
-    offset_y += (int)(50*maxRatio);
+    offset_y += (int)(70*maxRatio);
 
     if ( kart->getLap() >= world->m_race_setup.m_num_laps )
     {
