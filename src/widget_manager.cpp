@@ -71,6 +71,9 @@ bool WidgetManager::add_wgt
     new_id.min_width = MIN_WIDTH;
     new_id.min_height = MIN_HEIGHT;
 
+    new_id.last_preset_scroll_x = m_default_scroll_preset_x;
+    new_id.last_preset_scroll_y = m_default_scroll_preset_y;
+
     new_id.widget = new Widget(0, 0, 0, 0);
 
     new_id.widget->m_enable_rect = m_default_show_rect;
@@ -84,8 +87,8 @@ bool WidgetManager::add_wgt
     new_id.widget->m_text_size = m_default_text_size;
 
     new_id.widget->m_enable_scroll  = m_default_enable_scroll;
-    new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_x_pos;
-    new_id.widget->m_scroll_pos_y   = (float)m_default_scroll_y_pos;
+    new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_preset_x;
+    new_id.widget->m_scroll_pos_y   = (float)m_default_scroll_preset_y;
     new_id.widget->m_scroll_speed_x = (float)m_default_scroll_x_speed;
     new_id.widget->m_scroll_speed_y = (float)m_default_scroll_y_speed;
 
@@ -732,15 +735,15 @@ void WidgetManager::set_initial_text_state
 void WidgetManager::set_initial_scroll_state
 (
     const bool ENABLE,
-    const int X_POS,
-    const int Y_POS,
+    const WidgetScrollPos X_POS,
+    const WidgetScrollPos Y_POS,
     const int X_SPEED,
     const int Y_SPEED
 )
 {
     m_default_enable_scroll = ENABLE;
-    m_default_scroll_x_pos = X_POS;
-    m_default_scroll_y_pos = Y_POS;
+    m_default_scroll_preset_x = X_POS;
+    m_default_scroll_preset_y = Y_POS;
     m_default_scroll_x_speed = X_SPEED;
     m_default_scroll_y_speed = Y_SPEED;
 }
@@ -758,8 +761,8 @@ void WidgetManager::restore_default_states()
     m_default_text = "";
     m_default_text_size = WGT_FNT_MED;
     m_default_enable_scroll = false;
-    m_default_scroll_x_pos = WGT_SCROLL_CENTER;
-    m_default_scroll_y_pos = WGT_SCROLL_CENTER;
+    m_default_scroll_preset_x = WGT_SCROLL_CENTER;
+    m_default_scroll_preset_y = WGT_SCROLL_CENTER;
     m_default_scroll_x_speed = 0;
     m_default_scroll_y_speed = 0;
 }
@@ -891,7 +894,15 @@ void WidgetManager::hide_wgt_texture(const int TOKEN)
 void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
 {
     const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
+    if( ID != WGT_NONE )
+    {
+        m_widgets[ID].widget->m_text = TEXT;
+
+        //Reset the scroll position, because it will be the wrong value if
+        //new text has a different size
+        m_widgets[ID].widget->m_scroll_pos_x = m_widgets[ID].last_preset_scroll_x;
+        m_widgets[ID].widget->m_scroll_pos_y = m_widgets[ID].last_preset_scroll_y;
+    }
     else
     {
         std::cerr << "WARNING: tried to set text to an unnamed widget " <<
@@ -902,13 +913,24 @@ void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
 //-----------------------------------------------------------------------------
 void WidgetManager::set_wgt_text( const int TOKEN, const std::string TEXT )
 {
+    set_wgt_text( TOKEN, TEXT.c_str());
+#if 0
     const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_text = TEXT;
+    if( ID != WGT_NONE )
+    {
+        m_widgets[ID].widget->m_text = TEXT;
+
+        //Reset the scroll position, because it will be the wrong value if
+        //new text has a different size
+        m_widgets[ID].widget->m_scroll_pos_x = m_widgets[ID].last_preset_scroll_x;
+        m_widgets[ID].widget->m_scroll_pos_y = m_widgets[ID].last_preset_scroll_y;
+    }
     else
     {
         std::cerr << "WARNING: tried to set the text of an unnamed widget with " <<
             "token " << TOKEN << '\n';
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -996,7 +1018,11 @@ void WidgetManager::set_wgt_x_scroll_pos
     }
 
     const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_x = POS;
+    if( ID != WGT_NONE )
+    {
+        m_widgets[ID].widget->m_scroll_pos_x = POS;
+        m_widgets[ID].last_preset_scroll_x = POS;
+    }
     else
     {
         std::cerr << "WARNING: tried to set the X scroll position of an " <<
@@ -1021,7 +1047,11 @@ void WidgetManager::set_wgt_y_scroll_pos
     }
 
     const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_pos_y = POS;
+    if( ID != WGT_NONE )
+    {
+        m_widgets[ID].widget->m_scroll_pos_y = POS;
+        m_widgets[ID].last_preset_scroll_y = POS;
+    }
     else
     {
         std::cerr << "WARNING: tried to set the Y scroll position of an " <<

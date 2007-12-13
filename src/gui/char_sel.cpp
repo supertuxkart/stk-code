@@ -138,8 +138,6 @@ void CharSel::switchCharacter(int n)
     if (m_current_kart != n && kp != NULL)
     {
         widget_manager->set_wgt_text( WTOK_NAME, kp->getName().c_str());
-        //FIXME: maybe this should be renamed from WGT_SCROLL_* to WGT_POS_*
-        widget_manager->set_wgt_x_scroll_pos( WTOK_NAME, WGT_SCROLL_CENTER );
 
         m_current_kart = n;
         ssgDeRefDelete(m_kart);

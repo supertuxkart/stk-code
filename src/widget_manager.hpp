@@ -52,6 +52,11 @@ class WidgetManager
         int min_width;
         int min_height;
 
+        //The last given preset scroll position is stored, to restore it in
+        //case that the text is changed it needs to be restored.
+        WidgetScrollPos last_preset_scroll_x;
+        WidgetScrollPos last_preset_scroll_y;
+
         Widget *widget;
     };
 
@@ -87,7 +92,6 @@ class WidgetManager
 
     int m_selected_wgt_token;
 
-    //TODO: change 'default' to 'initial'
     bool m_default_active;
     bool m_default_show_rect;
     bool m_default_rect_round_corners;
@@ -99,8 +103,8 @@ class WidgetManager
     WidgetFontSize m_default_text_size;
 
     bool m_default_enable_scroll;
-    int m_default_scroll_x_pos;
-    int m_default_scroll_y_pos;
+    WidgetScrollPos m_default_scroll_preset_x;
+    WidgetScrollPos m_default_scroll_preset_y;
     int m_default_scroll_x_speed;
     int m_default_scroll_y_speed;
 
@@ -174,8 +178,8 @@ public:
     void set_initial_scroll_state
     (
         const bool ENABLE,
-        const int X_POS,
-        const int Y_POS,
+        const WidgetScrollPos X_POS,
+        const WidgetScrollPos Y_POS,
         const int X_SPEED,
         const int Y_SPEED
     );

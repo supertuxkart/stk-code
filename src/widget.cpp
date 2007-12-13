@@ -76,7 +76,6 @@ Widget::Widget
     m_rect_list(0),
     m_round_corners(WGT_AREA_ALL),
     m_scroll_pos_x(0), m_scroll_pos_y(0),
-    m_scroll_speed_x(0), m_scroll_speed_y(0.0f),
     m_text_scale(1.0f)
 {
 }
@@ -174,36 +173,11 @@ void Widget::update(const float DELTA)
         text_width = m_width;
     }
 
-    //Y-axis preset positions
-    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
-    {
-        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
-    {
-        m_scroll_pos_y = 0;
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
-    }
-    else if( m_scroll_pos_y > MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too high to scroll!.\n";
-    }
-    else if( m_scroll_pos_y < -MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too low to scroll!.\n";
-    }
-
+    //With the preset positions, we do comparations with the equal sign on
+    //floating point variables; however, no operations are done of the
+    //variables between the assignment of these integer values and the
+    //comparation and the values are small enough to fit in a few bytes,
+    //so no inaccuracies because of floating point rounding should happen.
     //X-axis preset positions
     if( m_scroll_pos_x == WGT_SCROLL_START_LEFT )
     {
@@ -234,6 +208,36 @@ void Widget::update(const float DELTA)
     {
         std::cerr << "WARNING: text position is too much to the left to " <<
             "to scroll!.\n";
+    }
+
+    //Y-axis preset positions
+    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
+    {
+        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
+    {
+        m_scroll_pos_y = (float)(Y_LIMIT / 2);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
+    {
+        m_scroll_pos_y = 0;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
+    {
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
+    {
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
+    }
+    else if( m_scroll_pos_y > MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too high to scroll!.\n";
+    }
+    else if( m_scroll_pos_y < -MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too low to scroll!.\n";
     }
 
     if(m_enable_scroll)

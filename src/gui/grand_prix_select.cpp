@@ -110,7 +110,6 @@ void GrandPrixSelect::update(float dt)
 
     const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
     widget_manager->set_wgt_text(WTOK_DESCRIPTION, cup.getDescription());
-    widget_manager->set_wgt_x_scroll_pos( WTOK_DESCRIPTION, WGT_SCROLL_CENTER );
 
     return;
 }
