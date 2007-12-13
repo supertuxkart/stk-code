@@ -171,7 +171,7 @@ void HelpPageTwo::select()
             break;
 
         case WTOK_QUIT:
-            menu_manager->popMenu();
+            menu_manager->switchToMainMenu();
             break;
     }
 }   // select
