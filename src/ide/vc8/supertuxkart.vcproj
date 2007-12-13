@@ -952,7 +952,11 @@
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\help_menu.cpp"
+					RelativePath="..\..\gui\help_page_one.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\help_page_two.cpp"
 					>
 				</File>
 				<File
@@ -1350,7 +1354,11 @@
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\help_menu.hpp"
+					RelativePath="..\..\gui\help_page_one.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\help_page_two.hpp"
 					>
 				</File>
 				<File

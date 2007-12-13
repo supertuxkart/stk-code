@@ -69,7 +69,7 @@ TrackSel::TrackSel()
     widget_manager->set_initial_activation_state(true);
     widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_SML );
-    for (size_t i = 0; i != track_manager->getTrackCount(); i += 2)
+    for (int i = 0; i != track_manager->getTrackCount(); i += 2)
     {
         widget_manager->add_wgt( WTOK_TRACK0 + i, 40, 7);
         widget_manager->set_wgt_text( WTOK_TRACK0 + i, track_manager->getTrack(i)->getName());
@@ -108,7 +108,8 @@ void TrackSel::update(float dt)
     if(screenshot.size()==0 && topview.size()==0)
     {
         glDisable ( GL_TEXTURE_2D ) ;
-        TRACK->drawScaled2D(0.0, 50, user_config->m_width, user_config->m_height/3); // (x, y, w, h)
+        TRACK->drawScaled2D(0.0f, 50.0f, (float)user_config->m_width, 
+                            (float)(user_config->m_height/3)); // (x, y, w, h)
         glEnable ( GL_TEXTURE_2D ) ;
     }
     else
@@ -120,7 +121,7 @@ void TrackSel::update(float dt)
         if(topview.size()==0)
         {  // no topview, but there is a screenshot!
             glDisable ( GL_TEXTURE_2D ) ;
-            TRACK->drawScaled2D(xLeft, yBottom, w, h);
+            TRACK->drawScaled2D((float)xLeft, (float)yBottom, (float)w, (float)h);
             glEnable ( GL_TEXTURE_2D ) ;
         }
         else
