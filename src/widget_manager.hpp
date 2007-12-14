@@ -85,7 +85,7 @@ class WidgetManager
     std::vector<WidgetElement> m_elems;
     std::vector<WidgetID> m_widgets;
 
-    WidgetArea prev_layout_pos;
+    WidgetArea m_prev_layout_pos;
 
     int m_x;
     int m_y;
@@ -157,8 +157,9 @@ public:
 
     bool layout(); //This calls the other layout() function with the
                    //POSITION given to the previous call to any of the two
-                   //layout functions. Fails if no previous call to the
-                   //layout(POSITION) function has been done.
+                   //layout functions. Besides the conditions under the other
+                   //layour() function fails, itm ay also fail if no previous
+                   //call to the layout(POSITION) function has been done.
     bool layout( const WidgetArea POSITION );
 
     //TODO: make all get functions const

@@ -33,7 +33,7 @@ WidgetManager *widget_manager;
 const int WidgetManager::WGT_NONE = -1;
 
 WidgetManager::WidgetManager() :
-prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
+m_prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
 {
     init_fonts();
     restore_default_states();
@@ -318,10 +318,17 @@ int WidgetManager::calc_height() const
     return total_height;
 }
 
-//-----------------------------------------------------------------------------
+/** This argument-less layout() function serves as a recall to the other
+ *  layout function in case you want to change the way widgets are put on
+ *  the screen. It calls layout(POSITION) with the last given position,
+ *  forces the recalculation of the scrolling position (since after the
+ *  change the text might not fit properly the widget), and the selected
+ *  widget, since layout(POSITION) function changes the selected widget to
+ *  the first active widget by default.
+ */
 bool WidgetManager::layout()
 {
-    if( prev_layout_pos == WGT_AREA_NONE )
+    if( m_prev_layout_pos == WGT_AREA_NONE )
     {
         std::cerr << "WARNING: tried to call layout() with the previous " <<
             "layout position, but layout(WidgetArea POSITION) has never " <<
@@ -339,7 +346,17 @@ bool WidgetManager::layout()
             m_widgets[i].last_preset_scroll_y;
     }
 
-    return layout(prev_layout_pos);
+    const int PREV_SELECTED_WGT_TOKEN = WGT_NONE;
+
+    const int RESULT = layout(m_prev_layout_pos);
+    if( RESULT == false ) return false;
+
+    if( find_id( PREV_SELECTED_WGT_TOKEN ) != WGT_NONE )
+    {
+        m_selected_wgt_token = PREV_SELECTED_WGT_TOKEN;
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -351,7 +368,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         return false;
     }
 
-    prev_layout_pos = POSITION;
+    m_prev_layout_pos = POSITION;
 
     const int NUM_WIDGETS = (int)m_widgets.size();
     if( NUM_WIDGETS < 1 ) return true;
