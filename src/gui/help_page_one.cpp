@@ -237,6 +237,11 @@ void HelpPageOne::select()
     switch ( widget_manager->get_selected_wgt() )
     {
         case WTOK_SECOND_PAGE:
+            //This switches thee first page with the second page, so they
+            //are not stacked by the menu manager, and the menu that called
+            //this help is the one that gets called back when the next page
+            //is popped.
+            menu_manager->popMenu();
             menu_manager->pushMenu(MENUID_HELP2);
             break;
 

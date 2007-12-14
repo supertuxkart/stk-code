@@ -57,6 +57,7 @@ enum MenuManagerIDs
     MENUID_HELP1,
     MENUID_HELP2,
     MENUID_CREDITS,
+
     // race gui
     MENUID_RACE,
 };
@@ -89,7 +90,7 @@ private:
     std::vector< std::pair<MenuManagerIDs, int> > m_menu_stack;
     BaseGUI* m_current_menu;
     BaseGUI* m_RaceGUI;
-    unsigned int m_handled_size;
+    bool m_change_menu;
 };
 
 extern MenuManager* menu_manager;

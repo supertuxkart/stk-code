@@ -59,7 +59,7 @@ MenuManager::MenuManager()
 {
     m_current_menu = NULL;
     m_RaceGUI      = NULL;
-    m_handled_size = 0;
+    m_change_menu = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +99,8 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 	element.second = WidgetManager::WGT_NONE;
 	
     m_menu_stack.push_back(element);
+
+    m_change_menu = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,26 +109,28 @@ void MenuManager::popMenu()
     sound_manager->playSfx(SOUND_BACK_MENU);
 	
 	m_menu_stack.pop_back();
+    m_change_menu = true;
 }
 
 //-----------------------------------------------------------------------------
 void MenuManager::update()
 {
 
-    if (m_handled_size != m_menu_stack.size())
+    if ( m_change_menu )
     {
+        m_change_menu = false;
+
         if (m_RaceGUI
             && m_current_menu == m_RaceGUI)
         {
-          m_RaceGUI = 0;
-          drv_setMode(MENU);
+            m_RaceGUI = 0;
+            drv_setMode(MENU);
         }
 
         delete m_current_menu;
         m_current_menu= NULL;
 
-        m_handled_size = (unsigned int)m_menu_stack.size();
-        if (m_handled_size > 0)
+        if (!m_menu_stack.empty())
         {
 			pair<MenuManagerIDs, int> saved = m_menu_stack.back();
             MenuManagerIDs id = saved.first;
@@ -175,11 +179,6 @@ void MenuManager::update()
             case MENUID_GRANDPRIXSELECT:
                 m_current_menu= new GrandPrixSelect();
                 break;
-#if 0
-            case MENUID_NEXTRACE:
-                race_manager->next();
-                break;
-#endif
             case MENUID_RACEMENU:
                 m_current_menu= new RaceMenu();
                 break;
@@ -253,7 +252,7 @@ void MenuManager::switchToGrandPrixEnding()
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_handled_size = 0;
+    m_change_menu = true;
 
     m_menu_stack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
@@ -285,11 +284,11 @@ void MenuManager::switchToMainMenu()
 {
     if (m_current_menu != NULL)
     {
-        if(m_current_menu==m_RaceGUI) m_RaceGUI=0;
+        if(m_current_menu == m_RaceGUI) m_RaceGUI = 0;
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_handled_size = 0;
+    m_change_menu = true;
 
     m_menu_stack.clear();
     pushMenu(MENUID_MAINMENU);

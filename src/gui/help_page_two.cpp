@@ -167,11 +167,12 @@ void HelpPageTwo::select()
     switch ( widget_manager->get_selected_wgt() )
     {
         case WTOK_FIRST_PAGE:
+            menu_manager->popMenu();
             menu_manager->pushMenu(MENUID_HELP1);
             break;
 
         case WTOK_QUIT:
-            menu_manager->switchToMainMenu();
+            menu_manager->popMenu();
             break;
     }
 }   // select
