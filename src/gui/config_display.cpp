@@ -142,7 +142,7 @@ void ConfigDisplay::select()
         {
             widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
         }
-        menu_manager->refreshMenu();
+        widget_manager->layout();
         break;
     case WTOK_INCR_RES:
         m_sizes_index = std::min(m_sizes_size-1,m_sizes_index+1);
@@ -176,7 +176,7 @@ void ConfigDisplay::changeResolution(int width, int height)
                  
     setVideoMode();
         
-    menu_manager->refreshMenu();
+    widget_manager->layout();
         
     glViewport(0,0,user_config->m_width, user_config->m_height);
     glScissor(0,0,user_config->m_width, user_config->m_height);

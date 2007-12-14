@@ -125,7 +125,7 @@ void MenuManager::update()
         delete m_current_menu;
         m_current_menu= NULL;
 
-        m_handled_size= (unsigned int)m_menu_stack.size();
+        m_handled_size = (unsigned int)m_menu_stack.size();
         if (m_handled_size > 0)
         {
 			pair<MenuManagerIDs, int> saved = m_menu_stack.back();
@@ -245,16 +245,6 @@ void MenuManager::update()
 }   // update
 
 //-----------------------------------------------------------------------------
-//Used to create a new instance of the present menu, which updates the widgets
-//text and/or location, if they have been changed by selecting an entry in the menu. 
-//eg: after a change of screen resolution
-
-void MenuManager::refreshMenu()
-{
-        widget_manager->layout();
-}
-
-//-----------------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()
 {
     if (m_current_menu != NULL)
@@ -263,7 +253,7 @@ void MenuManager::switchToGrandPrixEnding()
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_handled_size= 0;
+    m_handled_size = 0;
 
     m_menu_stack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
@@ -299,7 +289,7 @@ void MenuManager::switchToMainMenu()
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_handled_size= 0;
+    m_handled_size = 0;
 
     m_menu_stack.clear();
     pushMenu(MENUID_MAINMENU);
