@@ -329,6 +329,16 @@ bool WidgetManager::layout()
         return false;
     }
 
+    const int NUM_WIDGETS = (int)m_widgets.size();
+    for( int i = 0; i < NUM_WIDGETS; ++i )
+    {
+        m_widgets[i].widget->m_scroll_pos_x =
+            m_widgets[i].last_preset_scroll_x;
+
+        m_widgets[i].widget->m_scroll_pos_y =
+            m_widgets[i].last_preset_scroll_y;
+    }
+
     return layout(prev_layout_pos);
 }
 
@@ -340,10 +350,11 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         std::cerr << "WARNING: called layout with WGT_AREA_NONE.\n";
         return false;
     }
+
     prev_layout_pos = POSITION;
 
     const int NUM_WIDGETS = (int)m_widgets.size();
-    if( NUM_WIDGETS < 0 ) return true;
+    if( NUM_WIDGETS < 1 ) return true;
 
     int SCREEN_WIDTH = user_config->m_width;
     int SCREEN_HEIGHT = user_config->m_height;
