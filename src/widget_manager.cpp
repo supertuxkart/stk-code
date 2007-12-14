@@ -346,7 +346,7 @@ bool WidgetManager::layout()
             m_widgets[i].last_preset_scroll_y;
     }
 
-    const int PREV_SELECTED_WGT_TOKEN = WGT_NONE;
+    const int PREV_SELECTED_WGT_TOKEN = m_selected_wgt_token;
 
     const int RESULT = layout(m_prev_layout_pos);
     if( RESULT == false ) return false;
