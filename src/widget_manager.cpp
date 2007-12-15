@@ -36,7 +36,7 @@ WidgetManager::WidgetManager() :
 m_prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
 {
     init_fonts();
-    restore_default_states();
+    restoreDefaultStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -47,14 +47,14 @@ WidgetManager::~WidgetManager()
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::add_wgt
+bool WidgetManager::addWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
     const int MIN_HEIGHT
 )
 {
-    if( TOKEN != WGT_NONE && find_id( TOKEN ) != WGT_NONE )
+    if( TOKEN != WGT_NONE && findId( TOKEN ) != WGT_NONE )
     {
         std::cerr << "WARNING: tried to create widget with token " <<
             TOKEN << " but it is already in use.\n";
@@ -99,7 +99,7 @@ bool WidgetManager::add_wgt
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::insert_column()
+bool WidgetManager::insertColumn()
 {
     const int LAST_ELEM = (int)m_elems.size() - 1;
     const int LAST_WGT = (int)m_widgets.size() - 1;
@@ -134,11 +134,11 @@ bool WidgetManager::insert_column()
     return true;
 }
 
-/** is_column_break() checks if the line break at the given position marks
+/** isColumnBreak() checks if the line break at the given position marks
  *  the end of a column, assuming that at the position given there is a line
  *  break. If there is no column returns false.
  */
-bool WidgetManager::is_column_break( const int BREAK_POS) const
+bool WidgetManager::isColumnBreak( const int BREAK_POS) const
 {
     for(int i = BREAK_POS - 1; i > -1; --i)
     {
@@ -150,7 +150,7 @@ bool WidgetManager::is_column_break( const int BREAK_POS) const
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::break_line()
+bool WidgetManager::breakLine()
 {
     const int LAST_WGT = (int)m_widgets.size() - 1;
 
@@ -175,7 +175,7 @@ bool WidgetManager::break_line()
     if( LAST_ELEM > 0 )//If there are at least two elements
     {
         if( m_elems[LAST_ELEM].type == ET_BREAK &&
-            !is_column_break( LAST_ELEM ))
+            !isColumnBreak( LAST_ELEM ))
         {
             std::cerr << "WARNING: tried to add an non-column line break "
                 "twice after widget with token " <<
@@ -202,13 +202,13 @@ void WidgetManager::reset()
     m_widgets.clear();
     m_elems.clear();
 
-    restore_default_states();
+    restoreDefaultStates();
 
     m_selected_wgt_token = WGT_NONE;
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::find_id(const int TOKEN) const
+int WidgetManager::findId(const int TOKEN) const
 {
     const int NUM_WIDGETS = (int)m_widgets.size();
 
@@ -258,10 +258,10 @@ void WidgetManager::update(const float DELTA)
 
 }
 
-/** The calc_width() function retrieves the width of the smallest rectangle
+/** The calcWidth() function retrieves the width of the smallest rectangle
  *  that contains all the widgets being handled by the widget manager.
  */
-int WidgetManager::calc_width() const
+int WidgetManager::calcWidth() const
 {
     const int NUM_ELEMS = (int)m_elems.size();
     int curr_width = 0, total_width = 0;
@@ -280,7 +280,7 @@ int WidgetManager::calc_width() const
             break;
 
         case ET_COLUMN:
-            curr_width = calc_column_width(i);
+            curr_width = calcColumnWidth(i);
 
             //Jump to the next line break
             while( i < NUM_ELEMS )
@@ -297,21 +297,21 @@ int WidgetManager::calc_width() const
     return total_width;
 }
 
-/** The calc_height() function retrieves the height of the smallest rectangle
+/** The calcHeight() function retrieves the height of the smallest rectangle
  *  that contains all the widgets being handled by the widget manager.
  */
-int WidgetManager::calc_height() const
+int WidgetManager::calcHeight() const
 {
     const int NUM_ELEMS = (int)m_elems.size();
     if( NUM_ELEMS < 0 ) return 0;
 
-    int total_height = calc_line_height(0);
+    int total_height = calcLineHeight(0);
     for( int i = 1; i < NUM_ELEMS; ++i )
     {
         if( m_elems[i-1].type == ET_BREAK &&
-            !is_column_break( i-1 ))
+            !isColumnBreak( i-1 ))
         {
-            total_height += calc_line_height(i);
+            total_height += calcLineHeight(i);
         }
     }
 
@@ -351,7 +351,7 @@ bool WidgetManager::layout()
     const int RESULT = layout(m_prev_layout_pos);
     if( RESULT == false ) return false;
 
-    if( find_id( PREV_SELECTED_WGT_TOKEN ) != WGT_NONE )
+    if( findId( PREV_SELECTED_WGT_TOKEN ) != WGT_NONE )
     {
         m_selected_wgt_token = PREV_SELECTED_WGT_TOKEN;
     }
@@ -392,8 +392,8 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 */
     }
 
-    const int WGTS_WIDTH = calc_width();
-    const int WGTS_HEIGHT = calc_height();
+    const int WGTS_WIDTH = calcWidth();
+    const int WGTS_HEIGHT = calcHeight();
 
     if( WGTS_WIDTH > SCREEN_WIDTH )
     {
@@ -485,7 +485,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 
     //Position the first widget, these coordinates are for the top left
     //corner of the first widget.
-    int widget_x = m_x + ( WGTS_WIDTH - calc_line_width( 0 )) / 2;
+    int widget_x = m_x + ( WGTS_WIDTH - calcLineWidth( 0 )) / 2;
     int widget_y = m_y;
 
     const int NUM_ELEMS = (int)m_elems.size();
@@ -504,13 +504,13 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             {
                 //If we are inside a column, we need to recalculate the X
                 //position so the widget is centered around the column
-                const int CENTERED_POS = ( calc_column_width( column_pos ) -
+                const int CENTERED_POS = ( calcColumnWidth( column_pos ) -
                     m_widgets[curr_wgt].widget->m_width) / 2;
                 widget_x += CENTERED_POS;
             }
 
             //Move the position to the widget's bottom left corner, since
-            //that's what the create_rect() function expects.
+            //that's what the createRect() function expects.
             widget_y -= m_widgets[curr_wgt].widget->m_height;
 
             //Assign the widget's position
@@ -518,7 +518,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             m_widgets[curr_wgt].widget->m_y = widget_y;
 
             //Create widget's rect
-            if( !(m_widgets[curr_wgt].widget->create_rect(RADIUS)) )
+            if( !(m_widgets[curr_wgt].widget->createRect(RADIUS)) )
             {
                 return false;
             }
@@ -534,7 +534,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             {
                 //If we are inside a column, we need to move back to the
                 //columns' X position
-                const int CENTERED_POS = ( calc_column_width( column_pos ) -
+                const int CENTERED_POS = ( calcColumnWidth( column_pos ) -
                     m_widgets[curr_wgt].widget->m_width) / 2;
                 widget_x -= CENTERED_POS;
             }
@@ -546,10 +546,10 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             {
                 //If we are not inside a column, move to the next line
                 const int CENTERED_POS = (WGTS_WIDTH -
-                    calc_line_width( i+1 )) / 2;
+                    calcLineWidth( i+1 )) / 2;
                 widget_x = m_x + CENTERED_POS;
 
-                widget_y -= calc_line_height(line_pos);
+                widget_y -= calcLineHeight(line_pos);
 
                 line_pos = i + 1;
             }
@@ -557,8 +557,8 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             {
                 //If we are inside a column, move to the next widget in the
                 //same line
-                widget_x += calc_column_width(column_pos);
-                widget_y += calc_column_height(column_pos);
+                widget_x += calcColumnWidth(column_pos);
+                widget_y += calcColumnHeight(column_pos);
 
                 column_pos = -1;
             }
@@ -585,7 +585,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_line_width( const int START_ELEM ) const
+int WidgetManager::calcLineWidth( const int START_ELEM ) const
 {
     int curr_wgt;
     int total_width = 0;
@@ -604,7 +604,7 @@ int WidgetManager::calc_line_width( const int START_ELEM ) const
             return total_width;
 
         case ET_COLUMN:
-            total_width += calc_column_width(i);
+            total_width += calcColumnWidth(i);
 
             while( i < NUM_ELEMS )
             {
@@ -619,7 +619,7 @@ int WidgetManager::calc_line_width( const int START_ELEM ) const
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_line_height( const int START_ELEM ) const
+int WidgetManager::calcLineHeight( const int START_ELEM ) const
 {
     int curr_wgt;
     int line_height = 0;
@@ -642,7 +642,7 @@ int WidgetManager::calc_line_height( const int START_ELEM ) const
             return line_height;
 
         case ET_COLUMN:
-            column_height = calc_column_height(i);
+            column_height = calcColumnHeight(i);
 
             if( line_height < column_height )
             {
@@ -661,7 +661,7 @@ int WidgetManager::calc_line_height( const int START_ELEM ) const
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_column_width(const int START_ELEM) const
+int WidgetManager::calcColumnWidth(const int START_ELEM) const
 {
     int curr_wgt;
     int column_width = 0;
@@ -684,7 +684,7 @@ int WidgetManager::calc_column_width(const int START_ELEM) const
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calc_column_height(const int START_ELEM) const
+int WidgetManager::calcColumnHeight(const int START_ELEM) const
 {
     int curr_wgt;
     int total_height = 0;
@@ -704,9 +704,9 @@ int WidgetManager::calc_column_height(const int START_ELEM) const
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_selected_wgt(const int TOKEN)
+void WidgetManager::setSelectedWgt(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
         m_selected_wgt_token = TOKEN;
@@ -715,15 +715,14 @@ void WidgetManager::set_selected_wgt(const int TOKEN)
         "token " << TOKEN << '\n';
 }
 
-
 //-----------------------------------------------------------------------------
-void WidgetManager::set_initial_activation_state( const bool ACTIVE)
+void WidgetManager::setInitialActivationState( const bool ACTIVE)
 {
     m_default_active = ACTIVE;
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_initial_rect_state
+void WidgetManager::setInitialRectState
 (
     const bool SHOW,
     const WidgetArea ROUND_CORNERS,
@@ -736,7 +735,7 @@ void WidgetManager::set_initial_rect_state
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_initial_texture_state
+void WidgetManager::setInitialTextureState
 (
     const bool SHOW,
     const int TEXTURE
@@ -747,7 +746,7 @@ void WidgetManager::set_initial_texture_state
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_initial_text_state
+void WidgetManager::setInitialTextState
 (
     const bool SHOW,
     const std::string TEXT,
@@ -760,7 +759,7 @@ void WidgetManager::set_initial_text_state
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_initial_scroll_state
+void WidgetManager::setInitialScrollState
 (
     const bool ENABLE,
     const WidgetScrollPos X_POS,
@@ -777,7 +776,7 @@ void WidgetManager::set_initial_scroll_state
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::restore_default_states()
+void WidgetManager::restoreDefaultStates()
 {
     m_default_active = false;
     m_default_show_rect = false;
@@ -796,9 +795,9 @@ void WidgetManager::restore_default_states()
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::activate_wgt(const int TOKEN)
+void WidgetManager::activateWgt(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].active = true;
     else
     {
@@ -808,9 +807,9 @@ void WidgetManager::activate_wgt(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::deactivate_wgt(const int TOKEN)
+void WidgetManager::deactivateWgt(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].active = false;
     else
     {
@@ -820,9 +819,9 @@ void WidgetManager::deactivate_wgt(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_color(const int TOKEN, const GLfloat *COLOR)
+void WidgetManager::setWgtColor(const int TOKEN, const GLfloat *COLOR)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_rect_color = COLOR;
     else
     {
@@ -832,9 +831,9 @@ void WidgetManager::set_wgt_color(const int TOKEN, const GLfloat *COLOR)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_round_corners(const int TOKEN, const WidgetArea CORNERS)
+void WidgetManager::setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_round_corners = CORNERS;
     else
     {
@@ -843,9 +842,9 @@ void WidgetManager::set_wgt_round_corners(const int TOKEN, const WidgetArea CORN
     }
 }
 //-----------------------------------------------------------------------------
-void WidgetManager::show_wgt_rect(const int TOKEN)
+void WidgetManager::showWgtRect(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = true;
     else
     {
@@ -855,9 +854,9 @@ void WidgetManager::show_wgt_rect(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::hide_wgt_rect(const int TOKEN)
+void WidgetManager::hideWgtRect(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rect = false;
     else
     {
@@ -867,17 +866,9 @@ void WidgetManager::hide_wgt_rect(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-/*void WidgetManager::toggle_wgt_rect(const int TOKEN)
+void WidgetManager::setWgtTexture(const int TOKEN, const int TEXTURE)
 {
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_rect();
-    else std::cerr << "Tried to toggle the rect of an unnamed widget with token " << TOKEN << '\n';
-}*/
-
-//-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_texture(const int TOKEN, const int TEXTURE)
-{
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_texture = TEXTURE;
     else
     {
@@ -887,9 +878,9 @@ void WidgetManager::set_wgt_texture(const int TOKEN, const int TEXTURE)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::show_wgt_texture(const int TOKEN)
+void WidgetManager::showWgtTexture(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = true;
     else
     {
@@ -899,9 +890,9 @@ void WidgetManager::show_wgt_texture(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::hide_wgt_texture(const int TOKEN)
+void WidgetManager::hideWgtTexture(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_texture = false;
     else
     {
@@ -911,17 +902,9 @@ void WidgetManager::hide_wgt_texture(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-/*void WidgetManager::toggle_wgt_texture(const int TOKEN)
+void WidgetManager::setWgtText( const int TOKEN, const char* TEXT )
 {
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_texture();
-    else std::cerr << "Tried to toggle the texture of an unnamed widget with token " << TOKEN << '\n';
-}
-*/
-//-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
-{
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
         m_widgets[ID].widget->m_text = TEXT;
@@ -939,32 +922,15 @@ void WidgetManager::set_wgt_text( const int TOKEN, const char* TEXT )
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_text( const int TOKEN, const std::string TEXT )
+void WidgetManager::setWgtText( const int TOKEN, const std::string TEXT )
 {
-    set_wgt_text( TOKEN, TEXT.c_str());
-#if 0
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE )
-    {
-        m_widgets[ID].widget->m_text = TEXT;
-
-        //Reset the scroll position, because it will be the wrong value if
-        //new text has a different size
-        m_widgets[ID].widget->m_scroll_pos_x = m_widgets[ID].last_preset_scroll_x;
-        m_widgets[ID].widget->m_scroll_pos_y = m_widgets[ID].last_preset_scroll_y;
-    }
-    else
-    {
-        std::cerr << "WARNING: tried to set the text of an unnamed widget with " <<
-            "token " << TOKEN << '\n';
-    }
-#endif
+    setWgtText( TOKEN, TEXT.c_str());
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_text_size( const int TOKEN, const WidgetFontSize SIZE)
+void WidgetManager::setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE)
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_size = SIZE;
     else
     {
@@ -974,9 +940,9 @@ void WidgetManager::set_wgt_text_size( const int TOKEN, const WidgetFontSize SIZ
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::show_wgt_text( const int TOKEN )
+void WidgetManager::showWgtText( const int TOKEN )
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = true;
     else
     {
@@ -986,9 +952,9 @@ void WidgetManager::show_wgt_text( const int TOKEN )
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::hide_wgt_text( const int TOKEN )
+void WidgetManager::hideWgtText( const int TOKEN )
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_text = false;
     else
     {
@@ -998,17 +964,9 @@ void WidgetManager::hide_wgt_text( const int TOKEN )
 }
 
 //-----------------------------------------------------------------------------
-/*void WidgetManager::toggle_wgt_text( const int TOKEN )
+void WidgetManager::enableWgtScroll( const int TOKEN )
 {
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->toggle_text();
-    else std::cerr << "WARNING: tried to toggle the text of an unnamed widget with token " << TOKEN << '\n';
-}*/
-
-//-----------------------------------------------------------------------------
-void WidgetManager::enable_wgt_scroll( const int TOKEN )
-{
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = true;
     else
     {
@@ -1018,9 +976,9 @@ void WidgetManager::enable_wgt_scroll( const int TOKEN )
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::disable_wgt_scroll( const int TOKEN )
+void WidgetManager::disableWgtScroll( const int TOKEN )
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_scroll = false;
     else
     {
@@ -1030,7 +988,7 @@ void WidgetManager::disable_wgt_scroll( const int TOKEN )
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_x_scroll_pos
+void WidgetManager::setWgtXScrollPos
 (
     const int TOKEN,
     const WidgetScrollPos POS
@@ -1045,7 +1003,7 @@ void WidgetManager::set_wgt_x_scroll_pos
         return;
     }
 
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
         m_widgets[ID].widget->m_scroll_pos_x = POS;
@@ -1059,7 +1017,7 @@ void WidgetManager::set_wgt_x_scroll_pos
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_y_scroll_pos
+void WidgetManager::setWgtYScrollPos
 (
     const int TOKEN,
     const WidgetScrollPos POS
@@ -1074,7 +1032,7 @@ void WidgetManager::set_wgt_y_scroll_pos
         return;
     }
 
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
         m_widgets[ID].widget->m_scroll_pos_y = POS;
@@ -1088,34 +1046,34 @@ void WidgetManager::set_wgt_y_scroll_pos
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_x_scroll_speed( const int TOKEN, const float SPEED )
-{
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
-    else
-    {
-        std::cerr << "WARNING: tried to set the X scroll speed of an " <<
-            "unnamed widget with token " << TOKEN << '\n';
-    }
-}
+        void WidgetManager::setWgtXScrollSpeed( const int TOKEN, const float SPEED )
+        {
+            const int ID = findId(TOKEN);
+            if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
+            else
+            {
+                std::cerr << "WARNING: tried to set the X scroll speed of an " <<
+                    "unnamed widget with token " << TOKEN << '\n';
+            }
+        }
 
-//-----------------------------------------------------------------------------
-void WidgetManager::set_wgt_y_scroll_speed( const int TOKEN, const float SPEED )
-{
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
-    else
+        //-----------------------------------------------------------------------------
+    void WidgetManager::setWgtYScrollSpeed( const int TOKEN, const float SPEED )
     {
-        std::cerr << "WARNING: tried to set the Y scroll speed of an " <<
-            "unnamed widget with token " << TOKEN << '\n';
+        const int ID = findId(TOKEN);
+        if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
+        else
+        {
+            std::cerr << "WARNING: tried to set the Y scroll speed of an " <<
+                "unnamed widget with token " << TOKEN << '\n';
+        }
     }
-}
 
-/** pulse_widget() passes the pulse order to the right widget.
- */
-void WidgetManager::pulse_wgt(const int TOKEN) const
+    /** pulse_widget() passes the pulse order to the right widget.
+     */
+void WidgetManager::pulseWgt(const int TOKEN) const
 {
-    const int ID = find_id(TOKEN);
+    const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->pulse();
     else
     {
@@ -1125,10 +1083,10 @@ void WidgetManager::pulse_wgt(const int TOKEN) const
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::lighten_wgt_color(const int TOKEN)
+void WidgetManager::lightenWgtColor(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->lighten_color();
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->lightenColor();
     else
     {
         std::cerr << "WARNING: tried to lighten an unnamed widget with " <<
@@ -1137,10 +1095,10 @@ void WidgetManager::lighten_wgt_color(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::darken_wgt_color(const int TOKEN)
+void WidgetManager::darkenWgtColor(const int TOKEN)
 {
-    const int ID = find_id(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->darken_color();
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->darkenColor();
     else
     {
         std::cerr << "WARNING: tried to darken an unnamed widget with " <<
@@ -1148,11 +1106,11 @@ void WidgetManager::darken_wgt_color(const int TOKEN)
     }
 }
 
-/** The handle_pointer() function returns the current widget under the
+/** The handlePointer() function returns the current widget under the
  *  pointer, if it's different from the selected widget. If the widget under
  *  the pointer is the selected widget, it returns WGT_NONE.
  */
-int WidgetManager::handle_pointer(const int X, const int Y )
+int WidgetManager::handlePointer(const int X, const int Y )
 {
     //Search if the given x and y positions are on top of any widget. Please
     //note that the bounding box for each widget is used instead of the
@@ -1164,7 +1122,7 @@ int WidgetManager::handle_pointer(const int X, const int Y )
 
     if( m_selected_wgt_token != WGT_NONE )
     {
-        const int SELECTED_WGT_ID = find_id(m_selected_wgt_token);
+        const int SELECTED_WGT_ID = findId(m_selected_wgt_token);
 
         if(( X > m_widgets[SELECTED_WGT_ID].widget->m_x ) &&
            ( X < m_widgets[SELECTED_WGT_ID].widget->m_x + m_widgets[SELECTED_WGT_ID].widget->m_width ) &&
@@ -1197,39 +1155,39 @@ int WidgetManager::handle_pointer(const int X, const int Y )
  *  the cursor after receiving input from a key.
  */
 int
-WidgetManager::handle_left()
+WidgetManager::handleLeft()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
 	
-	return handle_finish(find_left_widget(find_id(m_selected_wgt_token)));
+	return handleFinish(findLeftWidget(findId(m_selected_wgt_token)));
 }
 
-int
-WidgetManager::handle_right()
+    int
+WidgetManager::handleRight()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
 	
-	return handle_finish(find_right_widget(find_id(m_selected_wgt_token)));
+	return handleFinish(findRightWidget(findId(m_selected_wgt_token)));
 }
 
 int
-WidgetManager::handle_up()
+WidgetManager::handleUp()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
 	
-	return handle_finish(find_top_widget(find_id(m_selected_wgt_token)));
+	return handleFinish(findTopWidget(findId(m_selected_wgt_token)));
 }
 
 int
-WidgetManager::handle_down()
+WidgetManager::handleDown()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
 	
-	return handle_finish(find_bottom_widget(find_id(m_selected_wgt_token)));
+	return handleFinish(findBottomWidget(findId(m_selected_wgt_token)));
 }
 
 int
-WidgetManager::handle_finish(const int next_wgt)
+WidgetManager::handleFinish(const int next_wgt)
 {
     if( next_wgt == WGT_NONE)
 		return WGT_NONE;
@@ -1240,9 +1198,9 @@ WidgetManager::handle_finish(const int next_wgt)
 }
 
 void
-WidgetManager::increase_scroll_speed(const bool fast)
+WidgetManager::increaseScrollSpeed(const bool fast)
 {
-	const int ID = find_id(m_selected_wgt_token);
+	const int ID = findId(m_selected_wgt_token);
 	if( m_widgets[ID].widget->m_enable_scroll )
 	{
 		//FIXME: these increases shouldn't be in pixels, but in percentages.
@@ -1252,9 +1210,9 @@ WidgetManager::increase_scroll_speed(const bool fast)
 }
 
 void
-WidgetManager::decrease_scroll_speed(const bool fast)
+WidgetManager::decreaseScrollSpeed(const bool fast)
 {
-	const int ID = find_id(m_selected_wgt_token);
+	const int ID = findId(m_selected_wgt_token);
 	if( m_widgets[ID].widget->m_enable_scroll )
 	{
 		//FIXME: these increases shouldn't be in pixels, but in percentages.
@@ -1263,7 +1221,7 @@ WidgetManager::decrease_scroll_speed(const bool fast)
 	}
 }
 
-/** find_left_widget() returns the closest widget to the left of START_WGT.
+/** findLeftWidget() returns the closest widget to the left of START_WGT.
  *  We use the center of the widgets as the reference points; then, we
  *  filter any widget that is not to the left, and favor the ones that are
  *  closest in the Y-axis. If there is only one widget that is closest in the
@@ -1271,7 +1229,7 @@ WidgetManager::decrease_scroll_speed(const bool fast)
  *  widget with the same vertical distance, we have to break the tie by
  *  choosing the one closest in the X-axis.
  */
-int WidgetManager::find_left_widget(const int START_WGT) const
+int WidgetManager::findLeftWidget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
@@ -1322,9 +1280,9 @@ int WidgetManager::find_left_widget(const int START_WGT) const
     return closest_wgt;
 }
 
-/** find_right_widget() returns the closest widget to the right of START_WGT
+/** findRightWidget() returns the closest widget to the right of START_WGT
  */
-int WidgetManager::find_right_widget(const int START_WGT) const
+int WidgetManager::findRightWidget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
@@ -1370,11 +1328,11 @@ int WidgetManager::find_right_widget(const int START_WGT) const
 
     return closest_wgt;
 }
-/** find_top_widget() returns the closest widget on top of START_WGT.
+/** findTopWidget() returns the closest widget on top of START_WGT.
  *  Remember that for the widget manager, the value 0 in the y-axis is in
  *  the bottom of the screen.
  */
-int WidgetManager::find_top_widget(const int START_WGT) const
+int WidgetManager::findTopWidget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
@@ -1425,11 +1383,11 @@ int WidgetManager::find_top_widget(const int START_WGT) const
     return closest_wgt;
 }
 
-/** find_bottom_widget() returns the closest widget under START_WGT.
+/** findBottomWidget() returns the closest widget under START_WGT.
  *  Remember that for the widget manager, the value 0 in the y-axis is in
  *  the bottom of the screen.
  */
-int WidgetManager::find_bottom_widget(const int START_WGT) const
+int WidgetManager::findBottomWidget(const int START_WGT) const
 {
     const int NUM_WIDGETS = m_widgets.size();
     int closest_wgt = WGT_NONE;
@@ -1452,7 +1410,7 @@ int WidgetManager::find_bottom_widget(const int START_WGT) const
         curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
 
         //Notice that the order of this substraction is the *only* difference
-        //from the find_top_widget() function
+        //from the findTopWidget() function
         y_dist = START_WGT_Y_CENTER - curr_wgt_y_center;
         x_dist = abs( curr_wgt_x_center - START_WGT_X_CENTER );
 

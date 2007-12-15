@@ -36,35 +36,35 @@ GameMode::GameMode()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt(WTOK_TITLE, 50, 7);
-    widget_manager->set_wgt_text( WTOK_TITLE, _("Choose a Race Mode"));
-    widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG );
+    widget_manager->insertColumn();
+    widget_manager->addWgt(WTOK_TITLE, 50, 7);
+    widget_manager->setWgtText( WTOK_TITLE, _("Choose a Race Mode"));
+    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG );
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt(WTOK_GP, 50, 7);
-    widget_manager->set_wgt_text( WTOK_GP, _("Grand Prix"));
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt(WTOK_GP, 50, 7);
+    widget_manager->setWgtText( WTOK_GP, _("Grand Prix"));
 
-    widget_manager->add_wgt(WTOK_QUICKRACE, 50, 7);
-    widget_manager->set_wgt_text( WTOK_QUICKRACE, _("Quick Race"));
+    widget_manager->addWgt(WTOK_QUICKRACE, 50, 7);
+    widget_manager->setWgtText( WTOK_QUICKRACE, _("Quick Race"));
 
     if( race_manager->getNumPlayers() == 1 )
     {
-        widget_manager->add_wgt(WTOK_TIMETRIAL, 50, 7);
-        widget_manager->set_wgt_text( WTOK_TIMETRIAL, _("Time Trial"));
+        widget_manager->addWgt(WTOK_TIMETRIAL, 50, 7);
+        widget_manager->setWgtText( WTOK_TIMETRIAL, _("Time Trial"));
     }
 
-    widget_manager->add_wgt(WTOK_EMPTY, 50, 7);
-    widget_manager->hide_wgt_rect( WTOK_EMPTY );
-    widget_manager->hide_wgt_text( WTOK_EMPTY );
-    widget_manager->deactivate_wgt( WTOK_EMPTY );
+    widget_manager->addWgt(WTOK_EMPTY, 50, 7);
+    widget_manager->hideWgtRect( WTOK_EMPTY );
+    widget_manager->hideWgtText( WTOK_EMPTY );
+    widget_manager->deactivateWgt( WTOK_EMPTY );
 
-    widget_manager->add_wgt(WTOK_BACK, 50, 7);
-    widget_manager->set_wgt_text( WTOK_BACK, _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->addWgt(WTOK_BACK, 50, 7);
+    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -78,7 +78,7 @@ GameMode::~GameMode()
 //-----------------------------------------------------------------------------
 void GameMode::select()
 {
-    switch ( widget_manager->get_selected_wgt() )
+    switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_GP:
         race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);

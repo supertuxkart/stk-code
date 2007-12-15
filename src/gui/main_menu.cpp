@@ -39,36 +39,36 @@ MainMenu::MainMenu()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialActivationState(true);
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt(WTOK_SINGLE, 25, 7);
-    widget_manager->set_wgt_text( WTOK_SINGLE, _("Single Player") );
+    widget_manager->insertColumn();
+    widget_manager->addWgt(WTOK_SINGLE, 25, 7);
+    widget_manager->setWgtText( WTOK_SINGLE, _("Single Player") );
 
-    widget_manager->add_wgt(WTOK_MULTI, 25, 7);
-    widget_manager->set_wgt_text( WTOK_MULTI, _("Multiplayer") );
+    widget_manager->addWgt(WTOK_MULTI, 25, 7);
+    widget_manager->setWgtText( WTOK_MULTI, _("Multiplayer") );
 
-    widget_manager->add_wgt(WTOK_OPTIONS, 25, 7);
-    widget_manager->set_wgt_text( WTOK_OPTIONS, _("Options") );
+    widget_manager->addWgt(WTOK_OPTIONS, 25, 7);
+    widget_manager->setWgtText( WTOK_OPTIONS, _("Options") );
 
-    widget_manager->add_wgt(WTOK_QUIT, 25, 7);
-    widget_manager->set_wgt_text( WTOK_QUIT, _("Quit") );
+    widget_manager->addWgt(WTOK_QUIT, 25, 7);
+    widget_manager->setWgtText( WTOK_QUIT, _("Quit") );
 
-    widget_manager->add_wgt(WTOK_EMPTY, 25, 7);
-    widget_manager->hide_wgt_text( WTOK_EMPTY );
-    widget_manager->hide_wgt_rect( WTOK_EMPTY );
-    widget_manager->deactivate_wgt( WTOK_EMPTY );
+    widget_manager->addWgt(WTOK_EMPTY, 25, 7);
+    widget_manager->hideWgtText( WTOK_EMPTY );
+    widget_manager->hideWgtRect( WTOK_EMPTY );
+    widget_manager->deactivateWgt( WTOK_EMPTY );
 
-    widget_manager->add_wgt(WTOK_HELP, 25, 7);
-    widget_manager->set_wgt_text( WTOK_HELP, _("Help") );
+    widget_manager->addWgt(WTOK_HELP, 25, 7);
+    widget_manager->setWgtText( WTOK_HELP, _("Help") );
     //FIXME: if text size is not set, we get a crash when resizing the rect to the text
-    widget_manager->set_wgt_text_size( WTOK_HELP, WGT_FNT_SML );
+    widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
 
-    widget_manager->add_wgt(WTOK_CREDITS, 25, 7);
-    widget_manager->set_wgt_text( WTOK_CREDITS, _("Credits") );
-    widget_manager->set_wgt_text_size( WTOK_CREDITS, WGT_FNT_SML );
+    widget_manager->addWgt(WTOK_CREDITS, 25, 7);
+    widget_manager->setWgtText( WTOK_CREDITS, _("Credits") );
+    widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -82,7 +82,7 @@ MainMenu::~MainMenu()
 //-----------------------------------------------------------------------------
 void MainMenu::select()
 {
-    switch ( widget_manager->get_selected_wgt() )
+    switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_SINGLE:
         race_manager->setNumPlayers(1);

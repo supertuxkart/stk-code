@@ -31,11 +31,11 @@ BaseGUI::animateWidget(const int PREV_SELECTED_WGT, const int SELECTED_WGT)
 	{
 		if( PREV_SELECTED_WGT != WidgetManager::WGT_NONE )
 		{
-			widget_manager->darken_wgt_color( PREV_SELECTED_WGT );
+			widget_manager->darkenWgtColor( PREV_SELECTED_WGT );
 		}
 
-		widget_manager->lighten_wgt_color( SELECTED_WGT );
-		widget_manager->pulse_wgt( SELECTED_WGT );
+		widget_manager->lightenWgtColor( SELECTED_WGT );
+		widget_manager->pulseWgt( SELECTED_WGT );
 	}
 }
 
@@ -47,38 +47,38 @@ BaseGUI::handle(GameAction action, int value)
     if (value)
         return;
 	
-	int previous = widget_manager->get_selected_wgt();
+	int previous = widget_manager->getSelectedWgt();
 
     switch ( action )
     {
     case GA_CURSOR_LEFT:
 		animateWidget(previous,
-					  widget_manager->handle_left());
+					  widget_manager->handleLeft());
 		
 		break;
     case GA_CURSOR_RIGHT:
 		animateWidget(previous,
-					  widget_manager->handle_right());
+					  widget_manager->handleRight());
 		break;
     case GA_CURSOR_UP:
 		animateWidget(previous,
-					  widget_manager->handle_up());
+					  widget_manager->handleUp());
 		break;
     case GA_CURSOR_DOWN:
 		animateWidget(previous,
-					  widget_manager->handle_down());
+					  widget_manager->handleDown());
 		break;
 	case GA_INC_SCROLL_SPEED:
-		widget_manager->increase_scroll_speed();
+		widget_manager->increaseScrollSpeed();
 		break;
 	case GA_INC_SCROLL_SPEED_FAST:
-		widget_manager->increase_scroll_speed(true);
+		widget_manager->increaseScrollSpeed(true);
 		break;
 	case GA_DEC_SCROLL_SPEED:
-		widget_manager->decrease_scroll_speed();
+		widget_manager->decreaseScrollSpeed();
 		break;
 	case GA_DEC_SCROLL_SPEED_FAST:
-		widget_manager->decrease_scroll_speed(true);
+		widget_manager->decreaseScrollSpeed(true);
 		break;
     case GA_ENTER:
         select();
@@ -101,18 +101,18 @@ BaseGUI::handle(GameAction action, int value)
 void
 BaseGUI::inputPointer(int x, int y)
 {
-    const int PREV_SELECTED_WGT = widget_manager->get_selected_wgt();
-    const int SELECTED_WGT = widget_manager->handle_pointer( x, y );
+    const int PREV_SELECTED_WGT = widget_manager->getSelectedWgt();
+    const int SELECTED_WGT = widget_manager->handlePointer( x, y );
 
     if( SELECTED_WGT != WidgetManager::WGT_NONE )
     {
         if( PREV_SELECTED_WGT != WidgetManager::WGT_NONE )
         {
-            widget_manager->darken_wgt_color( PREV_SELECTED_WGT );
+            widget_manager->darkenWgtColor( PREV_SELECTED_WGT );
         }
 
-        widget_manager->lighten_wgt_color( SELECTED_WGT );
-        widget_manager->pulse_wgt( SELECTED_WGT );
+        widget_manager->lightenWgtColor( SELECTED_WGT );
+        widget_manager->pulseWgt( SELECTED_WGT );
     }
 }
 

@@ -25,7 +25,7 @@
 
 /* Here are some big-picture instructions about how to use this widget
  * manager: the extern widget_manager is a global interface to the class. Call
- * add_wgt() to specify the widgets you want, and for each widget specify the
+ * addWgt() to specify the widgets you want, and for each widget specify the
  * details of it with the 'switch features', that can be changed between
  * show/hide, the initial setting for all of them is to be hidden. You will
  * usually have to call it's set_*() function, then the show_*() functions.
@@ -108,22 +108,22 @@ class WidgetManager
     int m_default_scroll_x_speed;
     int m_default_scroll_y_speed;
 
-    bool is_column_break( const int BREAK_POST ) const;
+    bool isColumnBreak( const int BREAK_POST ) const;
 
-    int find_id(const int TOKEN) const;
-    int calc_width() const;
-    int calc_height() const;
-    int calc_line_width(const int START_ELEM) const;
-    int calc_line_height(const int START_ELEM) const;
-    int calc_column_width(const int START_ELEM) const;
-    int calc_column_height(const int START_ELEM) const;
+    int findId(const int TOKEN) const;
+    int calcWidth() const;
+    int calcHeight() const;
+    int calcLineWidth(const int START_ELEM) const;
+    int calcLineHeight(const int START_ELEM) const;
+    int calcColumnWidth(const int START_ELEM) const;
+    int calcColumnHeight(const int START_ELEM) const;
 
-    int find_left_widget(const int START_WGT) const;
-    int find_right_widget(const int START_WGT) const;
-    int find_top_widget(const int START_WGT) const;
-    int find_bottom_widget(const int START_WGT) const;
+    int findLeftWidget(const int START_WGT) const;
+    int findRightWidget(const int START_WGT) const;
+    int findTopWidget(const int START_WGT) const;
+    int findBottomWidget(const int START_WGT) const;
 
-	int handle_finish(const int);
+	int handleFinish(const int);
 
 public:
     //FIXME: maybe I should get this out of this class?
@@ -132,16 +132,16 @@ public:
     WidgetManager();
     ~WidgetManager();
 
-    bool is_empty() { return m_widgets.empty(); }
+    bool isEmpty() { return m_widgets.empty(); }
 
-    bool add_wgt
+    bool addWgt
     (
         const int TOKEN, //A number that names the widget.
         const int MIN_WIDTH, //These values are percentages not pixels. 100%
                              //is the whole screen.
         const int MIN_HEIGHT
     );
-    bool insert_column(); //This function changes the orientation from left to
+    bool insertColumn(); //This function changes the orientation from left to
                           //right and top to bottom of the widgets at line
                           //breaks, and switches it, making it from top to
                           //bottom, and left to right at a line break,
@@ -149,7 +149,7 @@ public:
                           //only be used right at the beginning
                           //of a line (that is, before any widgets have been
                           //created, or just after a line break).
-    bool break_line();
+    bool breakLine();
 
     void reset();
 
@@ -163,20 +163,20 @@ public:
     bool layout( const WidgetArea POSITION );
 
     //TODO: make all get functions const
-    int get_selected_wgt() const { return m_selected_wgt_token;}
-    void set_selected_wgt(const int TOKEN);
+    int getSelectedWgt() const { return m_selected_wgt_token;}
+    void setSelectedWgt(const int TOKEN);
 
     /* On/off widget switch features. They are all disabled/hidden initially. */
-    void set_initial_activation_state( const bool ACTIVE);
-    void set_initial_rect_state(const bool SHOW, const WidgetArea ROUND_CORNERS, const GLfloat* const COLOR );
-    void set_initial_texture_state(const bool SHOW, const int TEXTURE );
-    void set_initial_text_state
+    void setInitialActivationState( const bool ACTIVE);
+    void setInitialRectState(const bool SHOW, const WidgetArea ROUND_CORNERS, const GLfloat* const COLOR );
+    void setInitialTextureState(const bool SHOW, const int TEXTURE );
+    void setInitialTextState
     (
         const bool SHOW,
         const std::string TEXT,
         const WidgetFontSize SIZE
     );
-    void set_initial_scroll_state
+    void setInitialScrollState
     (
         const bool ENABLE,
         const WidgetScrollPos X_POS,
@@ -184,58 +184,55 @@ public:
         const int X_SPEED,
         const int Y_SPEED
     );
-    void restore_default_states();
+    void restoreDefaultStates();
 
-    void activate_wgt(const int TOKEN);
-    void deactivate_wgt(const int TOKEN);
+    void activateWgt(const int TOKEN);
+    void deactivateWgt(const int TOKEN);
 
     //FIXME: maybe this should be set_wgt_rect_color ? and put after the other rect funcs?
-    void set_wgt_color(const int TOKEN, const GLfloat* const COLOR);
-    void set_wgt_round_corners(const int TOKEN, const WidgetArea CORNERS);
-    void show_wgt_rect(const int TOKEN);
-    void hide_wgt_rect(const int TOKEN);
-//    void toggle_wgt_rect(const int TOKEN);
+    void setWgtColor(const int TOKEN, const GLfloat* const COLOR);
+    void setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS);
+    void showWgtRect(const int TOKEN);
+    void hideWgtRect(const int TOKEN);
 
-    void set_wgt_texture(const int TOKEN, const int TEXTURE);
-    void show_wgt_texture(const int TOKEN);
-    void hide_wgt_texture(const int TOKEN);
-//    void toggle_wgt_texture(const int TOKEN);
+    void setWgtTexture(const int TOKEN, const int TEXTURE);
+    void showWgtTexture(const int TOKEN);
+    void hideWgtTexture(const int TOKEN);
 
-    void set_wgt_text( const int TOKEN, const char* TEXT );
-    void set_wgt_text( const int TOKEN, const std::string TEXT );
-    void set_wgt_text_size( const int TOKEN, const WidgetFontSize SIZE);
-    void show_wgt_text( const int TOKEN );
-    void hide_wgt_text( const int TOKEN );
-//    void toggle_wgt_text( const int TOKEN );
+    void setWgtText( const int TOKEN, const char* TEXT );
+    void setWgtText( const int TOKEN, const std::string TEXT );
+    void setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE);
+    void showWgtText( const int TOKEN );
+    void hideWgtText( const int TOKEN );
 
-    //FIXME: change to enable_wgt_scrolling, since it enables or disables
+    //FIXME: change to enableWgtScrolling, since it enables or disables
     //FIXME: maybe all that enabling the scrolling should do, is to allow
     //players to lower/raise it?
     //only the scrolling movement, not setting the scrolling position.
-    void enable_wgt_scroll( const int TOKEN );
-    void disable_wgt_scroll( const int TOKEN );
-    void set_wgt_x_scroll_pos( const int TOKEN, const WidgetScrollPos POS );
-    void set_wgt_y_scroll_pos( const int TOKEN, const WidgetScrollPos POS );
-    void set_wgt_x_scroll_speed( const int TOKEN, const float SPEED );
-    void set_wgt_y_scroll_speed( const int TOKEN, const float SPEED );
+    void enableWgtScroll( const int TOKEN );
+    void disableWgtScroll( const int TOKEN );
+    void setWgtXScrollPos( const int TOKEN, const WidgetScrollPos POS );
+    void setWgtYScrollPos( const int TOKEN, const WidgetScrollPos POS );
+    void setWgtXScrollSpeed( const int TOKEN, const float SPEED );
+    void setWgtYScrollSpeed( const int TOKEN, const float SPEED );
 
     /* Activated widget features. */
-    void pulse_wgt( const int TOKEN ) const;
+    void pulseWgt( const int TOKEN ) const;
 
     /* Convenience widget functions. */
-    void lighten_wgt_color(const int TOKEN);
-    void darken_wgt_color(const int TOKEN);
+    void lightenWgtColor(const int TOKEN);
+    void darkenWgtColor(const int TOKEN);
 
     /* Input device handling. */
-    int handle_pointer( const int X, const int Y );
-    int handle_left();
-    int handle_right();
-    int handle_up();
-    int handle_down();
+    int handlePointer( const int X, const int Y );
+    int handleLeft();
+    int handleRight();
+    int handleUp();
+    int handleDown();
 
 	/* Scrolling modification. */
-	void increase_scroll_speed(bool = false);
-	void decrease_scroll_speed(bool = false);
+	void increaseScrollSpeed(bool = false);
+	void decreaseScrollSpeed(bool = false);
 };
 
 extern WidgetManager *widget_manager;

@@ -56,54 +56,54 @@ ConfigDisplay::ConfigDisplay()
 {  
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt( WTOK_TITLE, 40, 7);
-    widget_manager->set_wgt_text( WTOK_TITLE, _("Display Settings"));
+    widget_manager->insertColumn();
+    widget_manager->addWgt( WTOK_TITLE, 40, 7);
+    widget_manager->setWgtText( WTOK_TITLE, _("Display Settings"));
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt( WTOK_FULLSCREEN, 40, 7);
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt( WTOK_FULLSCREEN, 40, 7);
     if(user_config->m_fullscreen)
     {
-        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Window mode"));
+        widget_manager->setWgtText( WTOK_FULLSCREEN, _("Window mode"));
     }
     else
     {
-        widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
+        widget_manager->setWgtText( WTOK_FULLSCREEN, _("Fullscreen mode"));
     }
     
-    widget_manager->add_wgt( WTOK_EMPTY, 40, 2);
-    widget_manager->deactivate_wgt( WTOK_EMPTY );
-    widget_manager->hide_wgt_rect( WTOK_EMPTY );
-    widget_manager->hide_wgt_text( WTOK_EMPTY );
+    widget_manager->addWgt( WTOK_EMPTY, 40, 2);
+    widget_manager->deactivateWgt( WTOK_EMPTY );
+    widget_manager->hideWgtRect( WTOK_EMPTY );
+    widget_manager->hideWgtText( WTOK_EMPTY );
     
-    widget_manager->add_wgt( WTOK_CURRENT_RES, 40, 7);
-    widget_manager->set_wgt_text( WTOK_CURRENT_RES, _("Current: ****x****"));
+    widget_manager->addWgt( WTOK_CURRENT_RES, 40, 7);
+    widget_manager->setWgtText( WTOK_CURRENT_RES, _("Current: ****x****"));
     
-    widget_manager->add_wgt( WTOK_INCR_RES, 40, 7);
-    widget_manager->set_wgt_text( WTOK_INCR_RES, _("Increase Resolution"));
+    widget_manager->addWgt( WTOK_INCR_RES, 40, 7);
+    widget_manager->setWgtText( WTOK_INCR_RES, _("Increase Resolution"));
         
-    widget_manager->add_wgt( WTOK_DECR_RES, 40, 7);
-    widget_manager->set_wgt_text( WTOK_DECR_RES, ("Decrease Resolution"));
+    widget_manager->addWgt( WTOK_DECR_RES, 40, 7);
+    widget_manager->setWgtText( WTOK_DECR_RES, ("Decrease Resolution"));
        
-       widget_manager->add_wgt( WTOK_EMPTY2, 40, 2);
-    widget_manager->deactivate_wgt( WTOK_EMPTY2 );
-    widget_manager->hide_wgt_rect( WTOK_EMPTY2 );
-    widget_manager->hide_wgt_text( WTOK_EMPTY2 );
+       widget_manager->addWgt( WTOK_EMPTY2, 40, 2);
+    widget_manager->deactivateWgt( WTOK_EMPTY2 );
+    widget_manager->hideWgtRect( WTOK_EMPTY2 );
+    widget_manager->hideWgtText( WTOK_EMPTY2 );
     
-    widget_manager->add_wgt( WTOK_APPLY_RES, 40, 7);
-    widget_manager->set_wgt_text( WTOK_APPLY_RES, ("Apply "));
+    widget_manager->addWgt( WTOK_APPLY_RES, 40, 7);
+    widget_manager->setWgtText( WTOK_APPLY_RES, ("Apply "));
         
-    widget_manager->add_wgt( WTOK_EMPTY1, 40, 7);
-    widget_manager->deactivate_wgt( WTOK_EMPTY1 );
-    widget_manager->hide_wgt_rect( WTOK_EMPTY1 );
-    widget_manager->hide_wgt_text( WTOK_EMPTY1 );
+    widget_manager->addWgt( WTOK_EMPTY1, 40, 7);
+    widget_manager->deactivateWgt( WTOK_EMPTY1 );
+    widget_manager->hideWgtRect( WTOK_EMPTY1 );
+    widget_manager->hideWgtText( WTOK_EMPTY1 );
     
-    widget_manager->add_wgt( WTOK_QUIT, 40, 7);
-    widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML );
+    widget_manager->addWgt( WTOK_QUIT, 40, 7);
+    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
     
@@ -112,12 +112,12 @@ ConfigDisplay::ConfigDisplay()
     if (m_sizes_index == -1)
     { 
         snprintf (m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d", user_config->m_width, user_config->m_height);
-        widget_manager->set_wgt_text(WTOK_CURRENT_RES, m_resolution);
+        widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
     }
     else
     {
         snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
-        widget_manager->set_wgt_text(WTOK_CURRENT_RES, m_resolution);
+        widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
     }
 }
 
@@ -130,34 +130,34 @@ ConfigDisplay::~ConfigDisplay()
 //-----------------------------------------------------------------------------
 void ConfigDisplay::select()
 {
-    switch ( widget_manager->get_selected_wgt())
+    switch ( widget_manager->getSelectedWgt())
     {
     case WTOK_FULLSCREEN:
         drv_toggleFullscreen();
         if(user_config->m_fullscreen)
         {
-            widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Window mode"));
+            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Window mode"));
            }
         else
         {
-            widget_manager->set_wgt_text( WTOK_FULLSCREEN, _("Fullscreen mode"));
+            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Fullscreen mode"));
         }
         widget_manager->layout();
         break;
     case WTOK_INCR_RES:
         m_sizes_index = std::min(m_sizes_size-1,m_sizes_index+1);
         snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Apply %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
-        widget_manager->set_wgt_text(WTOK_APPLY_RES, m_resolution);
+        widget_manager->setWgtText(WTOK_APPLY_RES, m_resolution);
         break;
       case WTOK_DECR_RES:
         m_sizes_index = std::max(0,m_sizes_index-1);
         snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Apply %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
-        widget_manager->set_wgt_text(WTOK_APPLY_RES, m_resolution);
+        widget_manager->setWgtText(WTOK_APPLY_RES, m_resolution);
         break;
       case WTOK_APPLY_RES:
         changeResolution(m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
         snprintf (m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d", user_config->m_width, user_config->m_height);
-        widget_manager->set_wgt_text(WTOK_CURRENT_RES, m_resolution);
+        widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
         
         break;
    

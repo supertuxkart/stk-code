@@ -63,41 +63,41 @@ CharSel::CharSel(int whichPlayer)
     m_context = new ssgContext;
     oldContext->makeCurrent();
 
-    widget_manager->set_initial_activation_state(false);
-    widget_manager->add_wgt( WTOK_TITLE, 60, 10);
-    widget_manager->show_wgt_rect( WTOK_TITLE );
+    widget_manager->setInitialActivationState(false);
+    widget_manager->addWgt( WTOK_TITLE, 60, 10);
+    widget_manager->showWgtRect( WTOK_TITLE );
     char HEADING[MAX_MESSAGE_LENGTH];
     snprintf(HEADING, sizeof(HEADING), _("Player %d, choose a driver"),
              m_player_index + 1);
-    widget_manager->set_wgt_text( WTOK_TITLE, HEADING);
-    widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->show_wgt_text( WTOK_TITLE );
-    widget_manager->break_line();
+    widget_manager->setWgtText( WTOK_TITLE, HEADING);
+    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG);
+    widget_manager->showWgtText( WTOK_TITLE );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 2);
-    widget_manager->break_line();
+    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->breakLine();
 
     //FIXME: this supports only a static number of karts
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
         Material *m = material_manager->getMaterial(kp->getIconFile());
-        widget_manager->add_wgt( WTOK_RACER0 + i, 10, 13);
-        widget_manager->show_wgt_rect( WTOK_RACER0 + i);
-        widget_manager->set_wgt_color( WTOK_RACER0 + i, WGT_GRAY);
-        widget_manager->set_wgt_texture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
-        widget_manager->show_wgt_texture( WTOK_RACER0 + i );
-        widget_manager->activate_wgt( WTOK_RACER0 + i );
+        widget_manager->addWgt( WTOK_RACER0 + i, 10, 13);
+        widget_manager->showWgtRect( WTOK_RACER0 + i);
+        widget_manager->setWgtColor( WTOK_RACER0 + i, WGT_GRAY);
+        widget_manager->setWgtTexture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
+        widget_manager->showWgtTexture( WTOK_RACER0 + i );
+        widget_manager->activateWgt( WTOK_RACER0 + i );
     }
 
-    widget_manager->break_line();
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 2);
-    widget_manager->break_line();
+    widget_manager->breakLine();
+    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->breakLine();
 
     //FIXME: the widget should check if the dimensions > 100
-    widget_manager->add_wgt( WTOK_NAME, 30, 7);
-    widget_manager->show_wgt_rect( WTOK_NAME );
-    widget_manager->show_wgt_text( WTOK_NAME );
+    widget_manager->addWgt( WTOK_NAME, 30, 7);
+    widget_manager->showWgtRect( WTOK_NAME );
+    widget_manager->showWgtText( WTOK_NAME );
 
     //FIXME: widget_manager says that token -1 is already in use
     widget_manager->layout(WGT_AREA_TOP);
@@ -108,7 +108,7 @@ CharSel::CharSel(int whichPlayer)
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
     if( LAST_KART != -1 )
     {
-        widget_manager->set_selected_wgt(WTOK_RACER0 + LAST_KART);
+        widget_manager->setSelectedWgt(WTOK_RACER0 + LAST_KART);
         switchCharacter(LAST_KART);
     }
     else
@@ -137,7 +137,7 @@ void CharSel::switchCharacter(int n)
     const KartProperties* kp= kart_properties_manager->getKartById(n);
     if (m_current_kart != n && kp != NULL)
     {
-        widget_manager->set_wgt_text( WTOK_NAME, kp->getName().c_str());
+        widget_manager->setWgtText( WTOK_NAME, kp->getName().c_str());
 
         m_current_kart = n;
         ssgDeRefDelete(m_kart);
@@ -155,7 +155,7 @@ void CharSel::update(float dt)
     m_clock += dt * 40.0f;
     BaseGUI::update(dt);
 
-    switchCharacter(widget_manager->get_selected_wgt() - WTOK_RACER0);
+    switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
 
     if (m_kart != NULL)
     {
@@ -193,7 +193,7 @@ void CharSel::update(float dt)
 //----------------------------------------------------------------------------
 void CharSel::select()
 {
-    const int TOKEN = widget_manager->get_selected_wgt() - WTOK_RACER0;
+    const int TOKEN = widget_manager->getSelectedWgt() - WTOK_RACER0;
     const KartProperties* KP = kart_properties_manager->getKartById(TOKEN);
     if (KP != NULL)
     {

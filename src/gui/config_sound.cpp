@@ -38,42 +38,42 @@ ConfigSound::ConfigSound()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt(WTOK_TITLE, 40, 7);
-    widget_manager->set_wgt_text( WTOK_TITLE, _("Sound Settings"));
+    widget_manager->insertColumn();
+    widget_manager->addWgt(WTOK_TITLE, 40, 7);
+    widget_manager->setWgtText( WTOK_TITLE, _("Sound Settings"));
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt(WTOK_MUSIC, 40, 7);
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt(WTOK_MUSIC, 40, 7);
     if( user_config->doMusic() )
     {
-        widget_manager->set_wgt_text( WTOK_MUSIC, _("Turn off music"));
+        widget_manager->setWgtText( WTOK_MUSIC, _("Turn off music"));
     }
     else
     {
-        widget_manager->set_wgt_text( WTOK_MUSIC, _("Turn on music"));
+        widget_manager->setWgtText( WTOK_MUSIC, _("Turn on music"));
     }
 
-    widget_manager->add_wgt(WTOK_SFX, 40, 7);
+    widget_manager->addWgt(WTOK_SFX, 40, 7);
     if( user_config->doSFX() )
     {
-        widget_manager->set_wgt_text( WTOK_SFX, _("Turn off sound effects"));
+        widget_manager->setWgtText( WTOK_SFX, _("Turn off sound effects"));
     }
     else
     {
-        widget_manager->set_wgt_text( WTOK_SFX, _("Turn on sound effects"));
+        widget_manager->setWgtText( WTOK_SFX, _("Turn on sound effects"));
     }
 
-    widget_manager->add_wgt(WTOK_EMPTY, 40, 5);
-    widget_manager->deactivate_wgt(WTOK_EMPTY);
-    widget_manager->hide_wgt_rect(WTOK_EMPTY);
-    widget_manager->hide_wgt_text(WTOK_EMPTY);
+    widget_manager->addWgt(WTOK_EMPTY, 40, 5);
+    widget_manager->deactivateWgt(WTOK_EMPTY);
+    widget_manager->hideWgtRect(WTOK_EMPTY);
+    widget_manager->hideWgtText(WTOK_EMPTY);
 
-    widget_manager->add_wgt(WTOK_QUIT, 40, 7);
-    widget_manager->set_wgt_text( WTOK_QUIT,  _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size(WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->addWgt(WTOK_QUIT, 40, 7);
+    widget_manager->setWgtText( WTOK_QUIT,  _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize(WTOK_QUIT, WGT_FNT_SML);
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -87,32 +87,30 @@ ConfigSound::~ConfigSound()
 //-----------------------------------------------------------------------------
 void ConfigSound::select()
 {
-    switch ( widget_manager->get_selected_wgt())
+    switch ( widget_manager->getSelectedWgt())
     {
     case WTOK_MUSIC:
         if(user_config->doMusic())
         {
             user_config->setMusic(UserConfig::UC_DISABLE);
-            widget_manager->set_wgt_text(WTOK_MUSIC, _("Turn on music"));
+            widget_manager->setWgtText(WTOK_MUSIC, _("Turn on music"));
         }
         else
         {
             user_config->setMusic(UserConfig::UC_ENABLE);
-            widget_manager->set_wgt_text(WTOK_MUSIC, _("Turn off music"));
+            widget_manager->setWgtText(WTOK_MUSIC, _("Turn off music"));
         }
-//FIXME:'Toggling' can be achieved with a simple color change, if desired.
-//        widgetSet->toggle(m_music_menu_id);
         break;
     case WTOK_SFX:
         if(user_config->doSFX())
         {
             user_config->setSFX(UserConfig::UC_DISABLE);
-            widget_manager->set_wgt_text(WTOK_SFX, _("Turn on sound effects"));
+            widget_manager->setWgtText(WTOK_SFX, _("Turn on sound effects"));
         }
         else
         {
             user_config->setSFX(UserConfig::UC_ENABLE);
-            widget_manager->set_wgt_text(WTOK_SFX, _("Turn off sound effects"));
+            widget_manager->setWgtText(WTOK_SFX, _("Turn off sound effects"));
         }
         break;
     case WTOK_QUIT:

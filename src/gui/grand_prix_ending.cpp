@@ -72,12 +72,12 @@ GrandPrixEnd::GrandPrixEnd()
     static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
              _("The winner is %s!"),WINNING_KART->getName().c_str());
-    widget_manager->add_wgt( WTOK_TITLE, 60, 10);
-    widget_manager->show_wgt_rect(WTOK_TITLE);
-    widget_manager->show_wgt_text(WTOK_TITLE);
-    widget_manager->set_wgt_text(WTOK_TITLE, output);
-    widget_manager->set_wgt_text_size(WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->break_line();
+    widget_manager->addWgt( WTOK_TITLE, 60, 10);
+    widget_manager->showWgtRect(WTOK_TITLE);
+    widget_manager->showWgtText(WTOK_TITLE);
+    widget_manager->setWgtText(WTOK_TITLE, output);
+    widget_manager->setWgtTextSize(WTOK_TITLE, WGT_FNT_LRG);
+    widget_manager->breakLine();
 
 
     const unsigned int MAX_STR_LEN = 60;
@@ -126,22 +126,22 @@ GrandPrixEnd::GrandPrixEnd()
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
                 i + 1, kart->getName().c_str(), scores[i]);
 
-        widget_manager->add_wgt(WTOK_FIRSTKART + i, 40, 5);
-        widget_manager->show_wgt_rect(WTOK_FIRSTKART + i);
-        widget_manager->show_wgt_text(WTOK_FIRSTKART + i);
-        widget_manager->set_wgt_text(WTOK_FIRSTKART + i,
+        widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
+        widget_manager->showWgtRect(WTOK_FIRSTKART + i);
+        widget_manager->showWgtText(WTOK_FIRSTKART + i);
+        widget_manager->setWgtText(WTOK_FIRSTKART + i,
             (char*)(m_score + MAX_STR_LEN * i));
-        widget_manager->set_wgt_text_size(WTOK_FIRSTKART + i, WGT_FNT_SML);
-    widget_manager->break_line();
+        widget_manager->setWgtTextSize(WTOK_FIRSTKART + i, WGT_FNT_SML);
+    widget_manager->breakLine();
     }
     delete []scores;
     delete []position;
 
-    widget_manager->add_wgt(WTOK_QUIT, 50, 7);
-    widget_manager->activate_wgt(WTOK_QUIT);
-    widget_manager->show_wgt_rect(WTOK_QUIT);
-    widget_manager->show_wgt_text(WTOK_QUIT);
-    widget_manager->set_wgt_text(WTOK_QUIT, _("Back to the main menu"));
+    widget_manager->addWgt(WTOK_QUIT, 50, 7);
+    widget_manager->activateWgt(WTOK_QUIT);
+    widget_manager->showWgtRect(WTOK_QUIT);
+    widget_manager->showWgtText(WTOK_QUIT);
+    widget_manager->setWgtText(WTOK_QUIT, _("Back to the main menu"));
 
     widget_manager->layout(WGT_AREA_TOP);
 

@@ -71,43 +71,43 @@ PlayerControls::PlayerControls(int whichPlayer):
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->add_wgt( WTOK_TITLE, 60, 7);
+    widget_manager->addWgt( WTOK_TITLE, 60, 7);
     sprintf(m_heading, _("Choose your controls, %s"),
             user_config->m_player[m_player_index].getName().c_str());
-    widget_manager->set_wgt_text( WTOK_TITLE, m_heading);
-    widget_manager->break_line();
+    widget_manager->setWgtText( WTOK_TITLE, m_heading);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WTOK_PLYR_NAME0, 30, 7);
-    widget_manager->set_wgt_text( WTOK_PLYR_NAME0, _("Player name"));
+    widget_manager->addWgt( WTOK_PLYR_NAME0, 30, 7);
+    widget_manager->setWgtText( WTOK_PLYR_NAME0, _("Player name"));
 
-    widget_manager->add_wgt( WTOK_PLYR_NAME1, 30, 7);
+    widget_manager->addWgt( WTOK_PLYR_NAME1, 30, 7);
     m_name = user_config->m_player[m_player_index].getName();
-    widget_manager->set_wgt_text( WTOK_PLYR_NAME1, m_name);
-    widget_manager->activate_wgt( WTOK_PLYR_NAME1);
-    widget_manager->break_line();
+    widget_manager->setWgtText( WTOK_PLYR_NAME1, m_name);
+    widget_manager->activateWgt( WTOK_PLYR_NAME1);
+    widget_manager->breakLine();
 
     KartAction control;
     for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
-        widget_manager->add_wgt( WTOK_KEY0 + i, 30, 7);
-        widget_manager->set_wgt_text( WTOK_KEY0 + i, sKartAction2String[i]);
+        widget_manager->addWgt( WTOK_KEY0 + i, 30, 7);
+        widget_manager->setWgtText( WTOK_KEY0 + i, sKartAction2String[i]);
 
         control = (KartAction)i;
         m_key_names[control] = user_config->getMappingAsString(m_player_index, control);
-        widget_manager->add_wgt( WTOK_LEFT + i, 30, 7);
-        widget_manager->set_wgt_text( WTOK_LEFT + i, m_key_names[control].c_str());
-        widget_manager->activate_wgt( WTOK_LEFT + i);
+        widget_manager->addWgt( WTOK_LEFT + i, 30, 7);
+        widget_manager->setWgtText( WTOK_LEFT + i, m_key_names[control].c_str());
+        widget_manager->activateWgt( WTOK_LEFT + i);
 
-        widget_manager->break_line();
+        widget_manager->breakLine();
     }
 
-    widget_manager->add_wgt( WTOK_QUIT, 60, 7);
-    widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML);
-    widget_manager->activate_wgt( WTOK_QUIT);
+    widget_manager->addWgt( WTOK_QUIT, 60, 7);
+    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->activateWgt( WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // PlayerControls
@@ -123,12 +123,12 @@ PlayerControls::~PlayerControls()
 void
 PlayerControls::select()
 {
-    const int selected = widget_manager->get_selected_wgt();
+    const int selected = widget_manager->getSelectedWgt();
 	switch (selected)
 	{
 		case WTOK_PLYR_NAME1:
 			// Switch to typing in the player's name.
-			widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+			widget_manager->setWgtText(WTOK_PLYR_NAME1, (m_name + "<").c_str());
 		
 			drv_setMode(LOWLEVEL);
 		
@@ -150,7 +150,7 @@ PlayerControls::select()
 		
 			
 		    m_edit_action = static_cast<KartAction>(selected - WTOK_LEFT);
-		    widget_manager->set_wgt_text(selected, _("Press key"));
+		    widget_manager->setWgtText(selected, _("Press key"));
 			
 			drv_setMode(INPUT_SENSE);
 			
@@ -186,7 +186,7 @@ PlayerControls::inputKeyboard(SDLKey key, int unicode)
 		if (m_name.size() >=1)
 			m_name.erase(m_name.size()-1, 1);
 		
-		widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+		widget_manager->setWgtText(WTOK_PLYR_NAME1, (m_name + "<").c_str());
 		break;
 		break;
 	default:
@@ -196,7 +196,7 @@ PlayerControls::inputKeyboard(SDLKey key, int unicode)
 		// take care of upper/lower case etc.
 		if (unicode && m_name.size() <= PLAYER_NAME_MAX)
 			m_name += (char) unicode;
-		widget_manager->set_wgt_text(WTOK_PLYR_NAME1, (m_name + "<").c_str());
+		widget_manager->setWgtText(WTOK_PLYR_NAME1, (m_name + "<").c_str());
 		break;
 	}
 
@@ -205,7 +205,7 @@ PlayerControls::inputKeyboard(SDLKey key, int unicode)
 void
 PlayerControls::clearMapping()
 {
-	const int selected = widget_manager->get_selected_wgt();
+	const int selected = widget_manager->getSelectedWgt();
 	if (selected >= WTOK_LEFT && selected <= WTOK_LOOK_BACK)
 	{
 		user_config->clearInput(m_player_index,
@@ -247,7 +247,7 @@ void PlayerControls::handle(GameAction ga, int value)
 				if (m_name.length() == 0)
 					m_name = _("Player ") + m_player_index;
 				user_config->m_player[m_player_index].setName(m_name);
-				widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
+				widget_manager->setWgtText(WTOK_PLYR_NAME1, m_name.c_str());
 
 				drv_setMode(MENU);
 			}
@@ -260,7 +260,7 @@ void PlayerControls::handle(GameAction ga, int value)
 			if (drv_isInMode(LOWLEVEL))
 			{
 				m_name = user_config->m_player[m_player_index].getName();
-				widget_manager->set_wgt_text(WTOK_PLYR_NAME1, m_name.c_str());
+				widget_manager->setWgtText(WTOK_PLYR_NAME1, m_name.c_str());
 
 				drv_setMode(MENU);
 				break;
@@ -280,6 +280,6 @@ PlayerControls::updateAllKeyLabels()
   {
     m_key_names[i] = user_config->getMappingAsString(m_player_index,
 													 (KartAction) i);
-    widget_manager->set_wgt_text(WTOK_LEFT + i, m_key_names[i].c_str());
+    widget_manager->setWgtText(WTOK_LEFT + i, m_key_names[i].c_str());
   }
 }

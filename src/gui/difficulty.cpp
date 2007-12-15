@@ -37,28 +37,28 @@ Difficulty::Difficulty()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt(WTOK_TITLE, 60, 7);
-    widget_manager->show_wgt_rect(WTOK_TITLE);
-    widget_manager->show_wgt_text(WTOK_TITLE);
-    widget_manager->set_wgt_text(WTOK_TITLE,
+    widget_manager->insertColumn();
+    widget_manager->addWgt(WTOK_TITLE, 60, 7);
+    widget_manager->showWgtRect(WTOK_TITLE);
+    widget_manager->showWgtText(WTOK_TITLE);
+    widget_manager->setWgtText(WTOK_TITLE,
         _("Choose your skill level"));
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt(WTOK_HARD, 60, 7);
-    widget_manager->set_wgt_text(WTOK_HARD, _("Racer"));
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt(WTOK_HARD, 60, 7);
+    widget_manager->setWgtText(WTOK_HARD, _("Racer"));
 
-    widget_manager->add_wgt(WTOK_MEDIUM, 60, 7);
-    widget_manager->set_wgt_text(WTOK_MEDIUM, _("Driver"));
+    widget_manager->addWgt(WTOK_MEDIUM, 60, 7);
+    widget_manager->setWgtText(WTOK_MEDIUM, _("Driver"));
 
-    widget_manager->add_wgt(WTOK_EASY, 60, 7);
-    widget_manager->set_wgt_text(WTOK_EASY, _("Novice"));
+    widget_manager->addWgt(WTOK_EASY, 60, 7);
+    widget_manager->setWgtText(WTOK_EASY, _("Novice"));
 
-    widget_manager->add_wgt(WTOK_QUIT, 60, 7);
-    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->addWgt(WTOK_QUIT, 60, 7);
+    widget_manager->setWgtText(WTOK_QUIT, _("Press <ESC> to go back"));
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // Difficulty
@@ -72,7 +72,7 @@ Difficulty::~Difficulty()
 //-----------------------------------------------------------------------------
 void Difficulty::select()
 {
-    switch ( widget_manager->get_selected_wgt())
+    switch ( widget_manager->getSelectedWgt())
     {
     case WTOK_EASY:
         race_manager->setDifficulty(RD_EASY);

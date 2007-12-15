@@ -67,20 +67,20 @@ CreditsMenu::CreditsMenu()
     const bool SHOW_TEXT = true;
     const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
 
-    widget_manager->set_initial_activation_state( true );
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", TEXT_SIZE );
+    widget_manager->setInitialActivationState( true );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", TEXT_SIZE );
 
-    widget_manager->add_wgt( WTOK_CREDITS, 100, 93);
-    widget_manager->set_wgt_text( WTOK_CREDITS, credits_text );
+    widget_manager->addWgt( WTOK_CREDITS, 100, 93);
+    widget_manager->setWgtText( WTOK_CREDITS, credits_text );
     //FIXME: maybe I should make scroll names more consistent
-    widget_manager->enable_wgt_scroll( WTOK_CREDITS );
-    widget_manager->set_wgt_y_scroll_pos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
-    widget_manager->set_wgt_y_scroll_speed( WTOK_CREDITS, -0.25f );
-    widget_manager->break_line();
+    widget_manager->enableWgtScroll( WTOK_CREDITS );
+    widget_manager->setWgtYScrollPos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
+    widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -0.25f );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WTOK_QUIT, 40, 7);
-    widget_manager->set_wgt_text( WTOK_QUIT, _("Go back to the main menu"));
+    widget_manager->addWgt( WTOK_QUIT, 40, 7);
+    widget_manager->setWgtText( WTOK_QUIT, _("Go back to the main menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // CreditsMenu
@@ -94,7 +94,7 @@ CreditsMenu::~CreditsMenu()
 //-----------------------------------------------------------------------------
 void CreditsMenu::select()
 {
-    switch( widget_manager->get_selected_wgt() )
+    switch( widget_manager->getSelectedWgt() )
     {
         case WTOK_QUIT:
             menu_manager->popMenu();

@@ -47,26 +47,26 @@ RaceResultsGUI::RaceResultsGUI()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
-    widget_manager->add_wgt(WTOK_TITLE, 60, 7);
-    widget_manager->set_wgt_text(WTOK_TITLE, _("Result"));
-    widget_manager->break_line();
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->addWgt(WTOK_TITLE, 60, 7);
+    widget_manager->setWgtText(WTOK_TITLE, _("Result"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_EMPTY0, 60, 5);
-    widget_manager->hide_wgt_rect(WTOK_EMPTY0);
-    widget_manager->hide_wgt_text(WTOK_EMPTY0);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_EMPTY0, 60, 5);
+    widget_manager->hideWgtRect(WTOK_EMPTY0);
+    widget_manager->hideWgtText(WTOK_EMPTY0);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_RESULTS, 50, 7);
-    widget_manager->set_wgt_text(WTOK_RESULTS, _("Race results"));
+    widget_manager->addWgt(WTOK_RESULTS, 50, 7);
+    widget_manager->setWgtText(WTOK_RESULTS, _("Race results"));
 
-    widget_manager->add_wgt(WTOK_HIGHSCORES, 50, 7);
-    widget_manager->set_wgt_text(WTOK_HIGHSCORES, _("Highscores"));
+    widget_manager->addWgt(WTOK_HIGHSCORES, 50, 7);
+    widget_manager->setWgtText(WTOK_HIGHSCORES, _("Highscores"));
 
-    widget_manager->break_line();
+    widget_manager->breakLine();
 
-    widget_manager->insert_column();
+    widget_manager->insertColumn();
 
 
     const unsigned int MAX_STR_LEN = 60;
@@ -113,15 +113,15 @@ RaceResultsGUI::RaceResultsGUI()
                 KART->getPosition(), KART_NAME.c_str(), sTime);
         }
 
-        widget_manager->add_wgt(WTOK_FIRST_RESULT + i, 50, 7);
-        widget_manager->set_wgt_text(WTOK_FIRST_RESULT + i,
+        widget_manager->addWgt(WTOK_FIRST_RESULT + i, 50, 7);
+        widget_manager->setWgtText(WTOK_FIRST_RESULT + i,
             (char*)(m_score + MAX_STR_LEN * i));
     }
 
     delete[] order;
 
-    widget_manager->break_line();
-    widget_manager->insert_column();
+    widget_manager->breakLine();
+    widget_manager->insertColumn();
 
     const Highscores *hs = world->getHighscores();
     int num_scores = hs->getNumberEntries();
@@ -138,38 +138,38 @@ RaceResultsGUI::RaceResultsGUI()
         const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
         sprintf((char*)(m_highscores + MAX_STR_LEN * i), 
                 "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
-        widget_manager->add_wgt(WTOK_FIRST_HIGHSCORE + i, 50, 7);
-        widget_manager->set_wgt_text(WTOK_FIRST_HIGHSCORE + i,
+        widget_manager->addWgt(WTOK_FIRST_HIGHSCORE + i, 50, 7);
+        widget_manager->setWgtText(WTOK_FIRST_HIGHSCORE + i,
             (char*)(m_highscores+MAX_STR_LEN*i));
     }
-    widget_manager->break_line();
-    widget_manager->break_line();
+    widget_manager->breakLine();
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_EMPTY1, 60, 5);
-    widget_manager->hide_wgt_rect(WTOK_EMPTY1);
-    widget_manager->hide_wgt_text(WTOK_EMPTY1);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_EMPTY1, 60, 5);
+    widget_manager->hideWgtRect(WTOK_EMPTY1);
+    widget_manager->hideWgtText(WTOK_EMPTY1);
+    widget_manager->breakLine();
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt( WTOK_CONTINUE, 60, 7);
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt( WTOK_CONTINUE, 60, 7);
     if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
     {
-        widget_manager->set_wgt_text( WTOK_CONTINUE, _("Continue Grand Prix"));
+        widget_manager->setWgtText( WTOK_CONTINUE, _("Continue Grand Prix"));
     }
     else
     {
-        widget_manager->set_wgt_text( WTOK_CONTINUE, _("Back to the main menu"));
+        widget_manager->setWgtText( WTOK_CONTINUE, _("Back to the main menu"));
     }
-    widget_manager->break_line();
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WTOK_RESTART_RACE, 60, 7);
-    widget_manager->set_wgt_text( WTOK_RESTART_RACE, _("Race in this track again"));
-    widget_manager->break_line();
+    widget_manager->addWgt( WTOK_RESTART_RACE, 60, 7);
+    widget_manager->setWgtText( WTOK_RESTART_RACE, _("Race in this track again"));
+    widget_manager->breakLine();
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widget_manager->add_wgt( WTOK_SETUP_NEW_RACE, 60, 7);
-        widget_manager->set_wgt_text( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
+        widget_manager->addWgt( WTOK_SETUP_NEW_RACE, 60, 7);
+        widget_manager->setWgtText( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
     }
 
     widget_manager->layout(WGT_AREA_ALL);
@@ -186,7 +186,7 @@ RaceResultsGUI::~RaceResultsGUI()
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::select()
 {
-    switch( widget_manager->get_selected_wgt() )
+    switch( widget_manager->getSelectedWgt() )
     {
     case WTOK_CONTINUE:
         world->unpause();

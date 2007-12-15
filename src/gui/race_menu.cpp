@@ -43,39 +43,39 @@ RaceMenu::RaceMenu()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->add_wgt(WTOK_PAUSE, 30, 7);
-    widget_manager->set_wgt_text(WTOK_PAUSE, _("Paused"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_PAUSE, 30, 7);
+    widget_manager->setWgtText(WTOK_PAUSE, _("Paused"));
+    widget_manager->breakLine();
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt(WTOK_RETURN_RACE, 30, 7);
-    widget_manager->set_wgt_text(WTOK_RETURN_RACE, _("Return To Race"));
-    widget_manager->break_line();
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt(WTOK_RETURN_RACE, 30, 7);
+    widget_manager->setWgtText(WTOK_RETURN_RACE, _("Return To Race"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_OPTIONS, 30, 7);
-    widget_manager->set_wgt_text(WTOK_OPTIONS, _("Options"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_OPTIONS, 30, 7);
+    widget_manager->setWgtText(WTOK_OPTIONS, _("Options"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_HELP, 30, 7);
-    widget_manager->set_wgt_text(WTOK_HELP, _("Help"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_HELP, 30, 7);
+    widget_manager->setWgtText(WTOK_HELP, _("Help"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_RESTART_RACE, 30, 7);
-    widget_manager->set_wgt_text(WTOK_RESTART_RACE, _("Restart Race"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_RESTART_RACE, 30, 7);
+    widget_manager->setWgtText(WTOK_RESTART_RACE, _("Restart Race"));
+    widget_manager->breakLine();
 
     if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
     {
-        widget_manager->add_wgt(WTOK_SETUP_NEW_RACE, 30, 7);
-        widget_manager->set_wgt_text(WTOK_SETUP_NEW_RACE, _("Setup New Race"));
-        widget_manager->break_line();
+        widget_manager->addWgt(WTOK_SETUP_NEW_RACE, 30, 7);
+        widget_manager->setWgtText(WTOK_SETUP_NEW_RACE, _("Setup New Race"));
+        widget_manager->breakLine();
     }
 
-    widget_manager->add_wgt(WTOK_QUIT, 30, 7);
-    widget_manager->set_wgt_text(WTOK_QUIT, _("Exit Race"));
+    widget_manager->addWgt(WTOK_QUIT, 30, 7);
+    widget_manager->setWgtText(WTOK_QUIT, _("Exit Race"));
 
     widget_manager->layout(WGT_AREA_ALL);
 
@@ -92,7 +92,7 @@ RaceMenu::~RaceMenu()
 //-----------------------------------------------------------------------------
 void RaceMenu::select()
 {
-    int clicked_token = widget_manager->get_selected_wgt();
+    int clicked_token = widget_manager->getSelectedWgt();
 
     switch (clicked_token)
     {

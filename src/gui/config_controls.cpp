@@ -42,34 +42,34 @@ ConfigControls::ConfigControls()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt( WTOK_TITLE, 60, 7 );
-    widget_manager->set_wgt_text( WTOK_TITLE, _("Edit controls for which player?"));
+    widget_manager->insertColumn();
+    widget_manager->addWgt( WTOK_TITLE, 60, 7 );
+    widget_manager->setWgtText( WTOK_TITLE, _("Edit controls for which player?"));
 
-    widget_manager->set_initial_activation_state(true);
-    widget_manager->add_wgt( WTOK_PLYR1 , 60, 7 );
-    widget_manager->set_wgt_text( WTOK_PLYR1, _("Player 1"));
+    widget_manager->setInitialActivationState(true);
+    widget_manager->addWgt( WTOK_PLYR1 , 60, 7 );
+    widget_manager->setWgtText( WTOK_PLYR1, _("Player 1"));
 
-    widget_manager->add_wgt( WTOK_PLYR2 , 60, 7 );
-    widget_manager->set_wgt_text( WTOK_PLYR2, _("Player 2"));
+    widget_manager->addWgt( WTOK_PLYR2 , 60, 7 );
+    widget_manager->setWgtText( WTOK_PLYR2, _("Player 2"));
 
-    widget_manager->add_wgt( WTOK_PLYR3 , 60, 7 );
-    widget_manager->set_wgt_text( WTOK_PLYR3, _("Player 3"));
+    widget_manager->addWgt( WTOK_PLYR3 , 60, 7 );
+    widget_manager->setWgtText( WTOK_PLYR3, _("Player 3"));
 
-    widget_manager->add_wgt( WTOK_PLYR4 , 60, 7 );
-    widget_manager->set_wgt_text( WTOK_PLYR4, _("Player 4"));
+    widget_manager->addWgt( WTOK_PLYR4 , 60, 7 );
+    widget_manager->setWgtText( WTOK_PLYR4, _("Player 4"));
 
-    widget_manager->add_wgt( WTOK_SPACE, 60, 5);
-    widget_manager->deactivate_wgt( WTOK_SPACE );
-    widget_manager->hide_wgt_rect( WTOK_SPACE );
-    widget_manager->hide_wgt_text( WTOK_SPACE );
+    widget_manager->addWgt( WTOK_SPACE, 60, 5);
+    widget_manager->deactivateWgt( WTOK_SPACE );
+    widget_manager->hideWgtRect( WTOK_SPACE );
+    widget_manager->hideWgtText( WTOK_SPACE );
 
-    widget_manager->add_wgt( WTOK_QUIT , 60, 7 );
-    widget_manager->set_wgt_text( WTOK_QUIT, _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size( WTOK_QUIT, WGT_FNT_SML );
+    widget_manager->addWgt( WTOK_QUIT , 60, 7 );
+    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
 }
@@ -83,7 +83,7 @@ ConfigControls::~ConfigControls()
 //-----------------------------------------------------------------------------
 void ConfigControls::select()
 {
-    switch ( widget_manager->get_selected_wgt() )
+    switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_PLYR1: menu_manager->pushMenu(MENUID_CONFIG_P1); break;
     case WTOK_PLYR2: menu_manager->pushMenu(MENUID_CONFIG_P2); break;

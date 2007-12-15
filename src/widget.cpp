@@ -197,7 +197,7 @@ void Widget::update(const float DELTA)
     }
     else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
     {
-        m_scroll_pos_x = (float)(-text_width + m_width);
+        m_scroll_pos_x = (float)(m_width - text_width);
     }
     else if( m_scroll_pos_x > MAX_SCROLL )
     {
@@ -335,7 +335,7 @@ void Widget::update(const float DELTA)
  *  map to the rectangle as though the corners were not rounded . Returns
  *  false if the call to glGenLists failed, otherwise it returns true.
  */
-bool Widget::create_rect(int radius)
+bool Widget::createRect(int radius)
 {
     //TODO: show warning if text > rect
     if(radius > m_width * 0.5)
@@ -467,7 +467,7 @@ bool Widget::create_rect(int radius)
 }
 
 //-----------------------------------------------------------------------------
-void Widget::resize_to_text()
+void Widget::resizeToText()
 {
     if( !m_text.empty() )
     {
@@ -484,7 +484,7 @@ void Widget::resize_to_text()
 
 //-----------------------------------------------------------------------------
 /* Please note that this function only lightens 'non-light' colors */
-void Widget::lighten_color()
+void Widget::lightenColor()
 {
     if(m_rect_color == WGT_GRAY)
     {
@@ -538,7 +538,7 @@ void Widget::lighten_color()
 
 //-----------------------------------------------------------------------------
 /* Please note that this function only darkens 'light' colors. */
-void Widget::darken_color()
+void Widget::darkenColor()
 {
     if(m_rect_color == WGT_LIGHT_GRAY)
     {

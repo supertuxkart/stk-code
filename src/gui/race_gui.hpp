@@ -114,10 +114,6 @@ private:
                                    float ratio_x, float ratio_y           );
     void drawLap                  (Kart* kart, int offset_x, int offset_y,
                                    float ratio_x, float ratio_y           );
-#if 0
-    void drawTexture              (const GLuint texture, int w, int h, int red,
-                                   int green, int blue, int x, int y);
-#endif
 };
 
 #endif

@@ -32,20 +32,20 @@ enum WidgetTokens {
 
 Options::Options()
 {
-    widget_manager->add_wgt(WTOK_TITLE, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_TITLE );
-    widget_manager->set_wgt_text( WTOK_TITLE, _("Options") );
-    widget_manager->set_wgt_text_size( WTOK_TITLE, WGT_FNT_LRG );
-    widget_manager->show_wgt_text( WTOK_TITLE );
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_TITLE, 35, 7);
+    widget_manager->showWgtRect( WTOK_TITLE );
+    widget_manager->setWgtText( WTOK_TITLE, _("Options") );
+    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG );
+    widget_manager->showWgtText( WTOK_TITLE );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_CONTROLS, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_CONTROLS );
-    widget_manager->set_wgt_text( WTOK_CONTROLS, _("Player Config") );
-    widget_manager->set_wgt_text_size( WTOK_CONTROLS, WGT_FNT_MED );
-    widget_manager->show_wgt_text( WTOK_CONTROLS );
-    widget_manager->activate_wgt( WTOK_CONTROLS);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_CONTROLS, 35, 7);
+    widget_manager->showWgtRect( WTOK_CONTROLS );
+    widget_manager->setWgtText( WTOK_CONTROLS, _("Player Config") );
+    widget_manager->setWgtTextSize( WTOK_CONTROLS, WGT_FNT_MED );
+    widget_manager->showWgtText( WTOK_CONTROLS );
+    widget_manager->activateWgt( WTOK_CONTROLS);
+    widget_manager->breakLine();
 
     // Don't display the fullscreen menu when called from within the race.
     // The fullscreen mode will reload all textures, reload the models,
@@ -53,32 +53,32 @@ Options::Options()
     // to windows, who discards all textures, ...)
     if(!menu_manager->isSomewhereOnStack(MENUID_RACE))
     {
-        widget_manager->add_wgt(WTOK_DISPLAY, 35, 7);
-        widget_manager->show_wgt_rect( WTOK_DISPLAY );
-        widget_manager->set_wgt_text( WTOK_DISPLAY, _("Display") );
-        widget_manager->set_wgt_text_size( WTOK_DISPLAY, WGT_FNT_MED );
-        widget_manager->show_wgt_text( WTOK_DISPLAY );
-        widget_manager->activate_wgt( WTOK_DISPLAY );
-        widget_manager->break_line();
+        widget_manager->addWgt(WTOK_DISPLAY, 35, 7);
+        widget_manager->showWgtRect( WTOK_DISPLAY );
+        widget_manager->setWgtText( WTOK_DISPLAY, _("Display") );
+        widget_manager->setWgtTextSize( WTOK_DISPLAY, WGT_FNT_MED );
+        widget_manager->showWgtText( WTOK_DISPLAY );
+        widget_manager->activateWgt( WTOK_DISPLAY );
+        widget_manager->breakLine();
     }
 
-    widget_manager->add_wgt(WTOK_SOUND, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_SOUND );
-    widget_manager->set_wgt_text( WTOK_SOUND, _("Sound") );
-    widget_manager->set_wgt_text_size( WTOK_SOUND, WGT_FNT_MED );
-    widget_manager->show_wgt_text( WTOK_SOUND );
-    widget_manager->activate_wgt( WTOK_SOUND );
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_SOUND, 35, 7);
+    widget_manager->showWgtRect( WTOK_SOUND );
+    widget_manager->setWgtText( WTOK_SOUND, _("Sound") );
+    widget_manager->setWgtTextSize( WTOK_SOUND, WGT_FNT_MED );
+    widget_manager->showWgtText( WTOK_SOUND );
+    widget_manager->activateWgt( WTOK_SOUND );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WidgetManager::WGT_NONE, 35, 7);
-    widget_manager->break_line();
+    widget_manager->addWgt(WidgetManager::WGT_NONE, 35, 7);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_BACK, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_BACK );
-    widget_manager->set_wgt_text( WTOK_BACK, _("Press <ESC> to go back") );
-    widget_manager->set_wgt_text_size( WTOK_BACK, WGT_FNT_SML );
-    widget_manager->show_wgt_text( WTOK_BACK );
-    widget_manager->activate_wgt( WTOK_BACK );
+    widget_manager->addWgt(WTOK_BACK, 35, 7);
+    widget_manager->showWgtRect( WTOK_BACK );
+    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back") );
+    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->showWgtText( WTOK_BACK );
+    widget_manager->activateWgt( WTOK_BACK );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -92,7 +92,7 @@ Options::~Options()
 // -----------------------------------------------------------------------------
 void Options::select()
 {
-    switch ( widget_manager->get_selected_wgt() )
+    switch ( widget_manager->getSelectedWgt() )
 //    switch ( widgetSet -> get_token (widgetSet -> click()) )
     {
     case WTOK_CONTROLS:

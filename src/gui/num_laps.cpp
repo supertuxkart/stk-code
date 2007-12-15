@@ -39,53 +39,53 @@ enum WidgetTokens {
 
 NumLaps::NumLaps() : laps(3)
 {
-    widget_manager->add_wgt(WTOK_TITLE, 50, 7);
-    widget_manager->show_wgt_rect(WTOK_TITLE);
-    widget_manager->show_wgt_text(WTOK_TITLE);
-    widget_manager->set_wgt_text(WTOK_TITLE, _("Choose number of laps"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_TITLE, 50, 7);
+    widget_manager->showWgtRect(WTOK_TITLE);
+    widget_manager->showWgtText(WTOK_TITLE);
+    widget_manager->setWgtText(WTOK_TITLE, _("Choose number of laps"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
-    widget_manager->break_line();
+    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_NUMLAPS, 20, 7);
-    widget_manager->show_wgt_rect(WTOK_NUMLAPS);
-    widget_manager->show_wgt_text(WTOK_NUMLAPS);
-    widget_manager->set_wgt_text(WTOK_NUMLAPS, _("Laps: 3"));
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_NUMLAPS, 20, 7);
+    widget_manager->showWgtRect(WTOK_NUMLAPS);
+    widget_manager->showWgtText(WTOK_NUMLAPS);
+    widget_manager->setWgtText(WTOK_NUMLAPS, _("Laps: 3"));
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
-    widget_manager->break_line();
+    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_LESS, 20, 7);
-    widget_manager->show_wgt_rect(WTOK_LESS);
-    widget_manager->show_wgt_text(WTOK_LESS);
-    widget_manager->set_wgt_text(WTOK_LESS, _("Less"));
-    widget_manager->activate_wgt(WTOK_LESS);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_LESS, 20, 7);
+    widget_manager->showWgtRect(WTOK_LESS);
+    widget_manager->showWgtText(WTOK_LESS);
+    widget_manager->setWgtText(WTOK_LESS, _("Less"));
+    widget_manager->activateWgt(WTOK_LESS);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_MORE, 20, 7);
-    widget_manager->show_wgt_rect(WTOK_MORE);
-    widget_manager->show_wgt_text(WTOK_MORE);
-    widget_manager->set_wgt_text(WTOK_MORE, _("More"));
-    widget_manager->activate_wgt(WTOK_MORE);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_MORE, 20, 7);
+    widget_manager->showWgtRect(WTOK_MORE);
+    widget_manager->showWgtText(WTOK_MORE);
+    widget_manager->setWgtText(WTOK_MORE, _("More"));
+    widget_manager->activateWgt(WTOK_MORE);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt( WidgetManager::WGT_NONE, 100, 5);
-    widget_manager->break_line();
+    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_START, 30, 7);
-    widget_manager->show_wgt_rect(WTOK_START);
-    widget_manager->show_wgt_text(WTOK_START);
-    widget_manager->set_wgt_text(WTOK_START, _("Start race"));
-    widget_manager->activate_wgt(WTOK_START);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_START, 30, 7);
+    widget_manager->showWgtRect(WTOK_START);
+    widget_manager->showWgtText(WTOK_START);
+    widget_manager->setWgtText(WTOK_START, _("Start race"));
+    widget_manager->activateWgt(WTOK_START);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_QUIT, 50, 7);
-    widget_manager->show_wgt_rect(WTOK_QUIT);
-    widget_manager->show_wgt_text(WTOK_QUIT);
-    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
-    widget_manager->activate_wgt(WTOK_QUIT);
+    widget_manager->addWgt(WTOK_QUIT, 50, 7);
+    widget_manager->showWgtRect(WTOK_QUIT);
+    widget_manager->showWgtText(WTOK_QUIT);
+    widget_manager->setWgtText(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->activateWgt(WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -99,18 +99,18 @@ NumLaps::~NumLaps()
 // -----------------------------------------------------------------------------
 void NumLaps::select()
 {
-    const int WGT = widget_manager->get_selected_wgt();
+    const int WGT = widget_manager->getSelectedWgt();
     switch (WGT)
     {
       case WTOK_LESS:
         laps = std::max(1, laps-1);
         snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-	    widget_manager->set_wgt_text(WTOK_NUMLAPS, lap_label);
+	    widget_manager->setWgtText(WTOK_NUMLAPS, lap_label);
         break;
       case WTOK_MORE:
         laps = std::min(10, laps+1);
         snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-        widget_manager->set_wgt_text(WTOK_NUMLAPS, lap_label);
+        widget_manager->setWgtText(WTOK_NUMLAPS, lap_label);
         break;
       case WTOK_START:
         race_manager->setNumLaps(laps);

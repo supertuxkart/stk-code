@@ -46,17 +46,17 @@ GrandPrixSelect::GrandPrixSelect()
 {
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
-    widget_manager->set_initial_rect_state(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->set_initial_text_state(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
 
-    widget_manager->insert_column();
-    widget_manager->add_wgt(WTOK_TITLE, 40, 7);
-    widget_manager->set_wgt_text(WTOK_TITLE,  _("Choose a Grand Prix"));
+    widget_manager->insertColumn();
+    widget_manager->addWgt(WTOK_TITLE, 40, 7);
+    widget_manager->setWgtText(WTOK_TITLE,  _("Choose a Grand Prix"));
 
     std::set<std::string> result;
     loader->listFiles(result, "data");
 
-    widget_manager->set_initial_activation_state(true);
+    widget_manager->setInitialActivationState(true);
     // Findout which grand prixs are available and load them
     int nId = 0;
     for(std::set<std::string>::iterator i  = result.begin();
@@ -67,30 +67,30 @@ GrandPrixSelect::GrandPrixSelect()
                 std::string fullPath= "data/" + (std::string)*i;
                 CupData cup(fullPath.c_str());
                 m_all_cups.push_back(cup);
-                widget_manager->add_wgt(WTOK_FIRSTPRIX + nId, 40, 7);
-                widget_manager->set_wgt_text(WTOK_FIRSTPRIX + nId, cup.getName());
+                widget_manager->addWgt(WTOK_FIRSTPRIX + nId, 40, 7);
+                widget_manager->setWgtText(WTOK_FIRSTPRIX + nId, cup.getName());
                 nId++;
             }   // if
         }   // for i
 
-    widget_manager->set_initial_activation_state(false);
-    widget_manager->add_wgt(WTOK_EMPTY0, 60, 7);
-    widget_manager->hide_wgt_rect(WTOK_EMPTY0);
-    widget_manager->hide_wgt_text(WTOK_EMPTY0);
+    widget_manager->setInitialActivationState(false);
+    widget_manager->addWgt(WTOK_EMPTY0, 60, 7);
+    widget_manager->hideWgtRect(WTOK_EMPTY0);
+    widget_manager->hideWgtText(WTOK_EMPTY0);
 
-    widget_manager->add_wgt(WTOK_DESCRIPTION, 80, 7);
-    widget_manager->hide_wgt_rect(WTOK_DESCRIPTION);
-    widget_manager->set_wgt_text(WTOK_DESCRIPTION, _("No Grand Prix selected"));
-    widget_manager->set_wgt_text_size(WTOK_DESCRIPTION, WGT_FNT_SML);
+    widget_manager->addWgt(WTOK_DESCRIPTION, 80, 7);
+    widget_manager->hideWgtRect(WTOK_DESCRIPTION);
+    widget_manager->setWgtText(WTOK_DESCRIPTION, _("No Grand Prix selected"));
+    widget_manager->setWgtTextSize(WTOK_DESCRIPTION, WGT_FNT_SML);
 
-    widget_manager->add_wgt(WTOK_EMPTY1, 60, 7);
-    widget_manager->hide_wgt_rect(WTOK_EMPTY1);
-    widget_manager->hide_wgt_text(WTOK_EMPTY1);
+    widget_manager->addWgt(WTOK_EMPTY1, 60, 7);
+    widget_manager->hideWgtRect(WTOK_EMPTY1);
+    widget_manager->hideWgtText(WTOK_EMPTY1);
 
-    widget_manager->add_wgt(WTOK_QUIT, 60, 7);
-    widget_manager->set_wgt_text(WTOK_QUIT, _("Press <ESC> to go back"));
-    widget_manager->set_wgt_text_size(WTOK_QUIT, WGT_FNT_SML);
-    widget_manager->activate_wgt(WTOK_QUIT);
+    widget_manager->addWgt(WTOK_QUIT, 60, 7);
+    widget_manager->setWgtText(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize(WTOK_QUIT, WGT_FNT_SML);
+    widget_manager->activateWgt(WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // GrandPrixSelect
@@ -105,11 +105,11 @@ GrandPrixSelect::~GrandPrixSelect()
 void GrandPrixSelect::update(float dt)
 {
     BaseGUI::update(dt);
-    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
     if(CLICKED_TOKEN < WTOK_FIRSTPRIX) return;
 
     const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
-    widget_manager->set_wgt_text(WTOK_DESCRIPTION, cup.getDescription());
+    widget_manager->setWgtText(WTOK_DESCRIPTION, cup.getDescription());
 
     return;
 }
@@ -117,7 +117,7 @@ void GrandPrixSelect::update(float dt)
 //-----------------------------------------------------------------------------
 void GrandPrixSelect::select()
 {
-    const int CLICKED_TOKEN = widget_manager->get_selected_wgt();
+    const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
     if(CLICKED_TOKEN == WTOK_QUIT)
     {
         menu_manager->popMenu();

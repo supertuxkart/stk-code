@@ -155,47 +155,16 @@ class Widget
 
     void update(const float DELTA);
 
-/*    int get_x_pos() const { return m_x; }
-    int get_y_pos() const { return m_y; }
-    int get_width() const { return m_width; }
-    int get_height() const { return m_height; }
-
-    void set_x_pos( const int X ) { m_x = X; }
-    void set_y_pos( const int Y ) { m_y = Y; }
-    void set_width( const int WIDTH ) { m_width = WIDTH; }
-    void set_height( const int HEIGHT ) { m_height = HEIGHT; }*/
-    void resize_to_text(); //This checks if the widget is smaller than the
+    void resizeToText(); //This checks if the widget is smaller than the
                            //text, and if so, changes the width and height.
-    bool create_rect(int radius);
-
-    /* Switch features functions. */
-/*    void enable_rect() {m_enable_rect = true;}
-    void disable_rect() {m_enable_rect = false;}*/
-//    void toggle_rect() {m_enable_rect = m_enable_rect ? false : true;}
-/*    void set_rect_color(const GLfloat *COLOR) {m_rect_color = COLOR;}
-    const GLfloat* get_rect_color() const {return m_rect_color;}*/
-
-/*    void enable_texture() {m_enable_texture = true;}
-    void disable_texture() {m_enable_texture = false;}*/
-//    void toggle_texture() {m_enable_texture = m_enable_texture ? false : true;}
-/*    void set_texture(const int TEXTURE) {m_texture = TEXTURE;}
-    int get_texture () const {return m_texture;}*/
-
-/*    void enable_text() {m_enable_text = true;}
-    void disable_text() {m_enable_text = false;}
-    void toggle_text() {m_enable_text = m_enable_text ? false : true;}
-    void set_text(const char* TEXT) {m_text.assign(TEXT);}
-    void set_text(const std::string TEXT) {m_text.assign(TEXT);}
-    std::string get_text() const {return m_text;}
-    void set_text_size( const WidgetFontSize SIZE ) { m_text_size = SIZE; }
-    WidgetFontSize get_text_size() { return m_text_size; }*/
+    bool createRect(int radius);
 
     /* Time limited features' functions. */
     void pulse() {m_text_scale = MAX_TEXT_SCALE;}
 
     /* Convenience functions. */
-    void lighten_color();
-    void darken_color();
+    void lightenColor();
+    void darkenColor();
 
 };
 

@@ -32,39 +32,39 @@ enum WidgetTokens {
 
 NumPlayers::NumPlayers()
 {
-    widget_manager->add_wgt(WTOK_PLAYER_2, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_PLAYER_2 );
-    widget_manager->set_wgt_text( WTOK_PLAYER_2, _("Two Players") );
-    widget_manager->set_wgt_text_size( WTOK_PLAYER_2, WGT_FNT_MED );
-    widget_manager->show_wgt_text( WTOK_PLAYER_2 );
-    widget_manager->activate_wgt( WTOK_PLAYER_2 );
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_PLAYER_2, 35, 7);
+    widget_manager->showWgtRect( WTOK_PLAYER_2 );
+    widget_manager->setWgtText( WTOK_PLAYER_2, _("Two Players") );
+    widget_manager->setWgtTextSize( WTOK_PLAYER_2, WGT_FNT_MED );
+    widget_manager->showWgtText( WTOK_PLAYER_2 );
+    widget_manager->activateWgt( WTOK_PLAYER_2 );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_PLAYER_3, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_PLAYER_3 );
-    widget_manager->set_wgt_text( WTOK_PLAYER_3, _("Three Players") );
-    widget_manager->set_wgt_text_size( WTOK_PLAYER_3, WGT_FNT_MED );
-    widget_manager->show_wgt_text( WTOK_PLAYER_3 );
-    widget_manager->activate_wgt( WTOK_PLAYER_3);
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_PLAYER_3, 35, 7);
+    widget_manager->showWgtRect( WTOK_PLAYER_3 );
+    widget_manager->setWgtText( WTOK_PLAYER_3, _("Three Players") );
+    widget_manager->setWgtTextSize( WTOK_PLAYER_3, WGT_FNT_MED );
+    widget_manager->showWgtText( WTOK_PLAYER_3 );
+    widget_manager->activateWgt( WTOK_PLAYER_3);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_PLAYER_4, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_PLAYER_4 );
-    widget_manager->set_wgt_text( WTOK_PLAYER_4, _("Four Players") );
-    widget_manager->set_wgt_text_size( WTOK_PLAYER_4, WGT_FNT_MED );
-    widget_manager->show_wgt_text( WTOK_PLAYER_4 );
-    widget_manager->activate_wgt( WTOK_PLAYER_4 );
-    widget_manager->break_line();
+    widget_manager->addWgt(WTOK_PLAYER_4, 35, 7);
+    widget_manager->showWgtRect( WTOK_PLAYER_4 );
+    widget_manager->setWgtText( WTOK_PLAYER_4, _("Four Players") );
+    widget_manager->setWgtTextSize( WTOK_PLAYER_4, WGT_FNT_MED );
+    widget_manager->showWgtText( WTOK_PLAYER_4 );
+    widget_manager->activateWgt( WTOK_PLAYER_4 );
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WidgetManager::WGT_NONE, 35, 7);
-    widget_manager->break_line();
+    widget_manager->addWgt(WidgetManager::WGT_NONE, 35, 7);
+    widget_manager->breakLine();
 
-    widget_manager->add_wgt(WTOK_BACK, 35, 7);
-    widget_manager->show_wgt_rect( WTOK_BACK );
-    widget_manager->set_wgt_text( WTOK_BACK, _("Press <ESC> to go back") );
-    widget_manager->set_wgt_text_size( WTOK_BACK, WGT_FNT_SML );
-    widget_manager->show_wgt_text( WTOK_BACK );
-    widget_manager->activate_wgt( WTOK_BACK );
+    widget_manager->addWgt(WTOK_BACK, 35, 7);
+    widget_manager->showWgtRect( WTOK_BACK );
+    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back") );
+    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->showWgtText( WTOK_BACK );
+    widget_manager->activateWgt( WTOK_BACK );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -78,12 +78,12 @@ NumPlayers::~NumPlayers()
 // -----------------------------------------------------------------------------
 void NumPlayers::select()
 {
-    switch ( widget_manager->get_selected_wgt() )
+    switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_PLAYER_2:
     case WTOK_PLAYER_3:
     case WTOK_PLAYER_4:
-        race_manager->setNumPlayers(widget_manager->get_selected_wgt());
+        race_manager->setNumPlayers(widget_manager->getSelectedWgt());
         menu_manager->pushMenu(MENUID_GAMEMODE);
         break;
     case WTOK_BACK:
