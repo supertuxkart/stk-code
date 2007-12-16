@@ -50,7 +50,7 @@ void drv_deinit();
 void drv_toggleFullscreen(bool resetTextures=1);
 void setVideoMode(bool resetTextures=1);
 
-void drv_loop();
+void sdl_input();
 
 void drv_setMode(InputDriverMode);
 bool drv_isInMode(InputDriverMode);

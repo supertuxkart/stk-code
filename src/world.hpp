@@ -75,7 +75,6 @@ public:
           {return m_track->GetHOT(start, end, leaf, nrm);}
     int   Collision(sgSphere* s, AllHits *a) const {return m_track->Collision(s,a); }
 #endif
-    void draw();
     void update(float delta);
     void restartRace();
     void disableRace(); // Put race into limbo phase

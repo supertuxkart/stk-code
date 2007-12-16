@@ -262,18 +262,13 @@ void World::resetAllKarts()
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------
-void World::draw()
-{
-}
-
-//-----------------------------------------------------------------------------
 void World::update(float dt)
 {
     if(user_config->m_replay_history) dt=history->GetNextDelta();
 
     checkRaceStatus();
     // this line was before checkRaceStatus. but m_clock is set to 0.0 in
-    // checkRaceStatus on start, so m_clock would not be synchron and the
+    // checkRaceStatus on start, so m_clock would not be synchronized and the
     // first delta would not be added .. that would cause a gap in 
     // replay-recording
     m_clock += dt;

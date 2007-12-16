@@ -248,7 +248,7 @@ void input(InputType type, int id0, int id1, int id2, int value)
   * flexibility (= treat 4 directions as four buttons).
   *
   */
-void drv_loop()
+void sdl_input()
 {
     SDL_Event ev;
 

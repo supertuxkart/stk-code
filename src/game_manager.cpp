@@ -64,13 +64,10 @@ void GameManager::run()
         material_manager->getMaterial("st_title_screen.rgb")->getIndex();
     while(!m_abort)
     {
-        // Run input processing.
-        // FIXME: rename this to sdl_input or something.
-        drv_loop();
+        sdl_input();
 
         // Now the screen may have changed and
         // needs to be updated.
-
         if(m_started) m_prev_time = m_curr_time;
         else
         {
