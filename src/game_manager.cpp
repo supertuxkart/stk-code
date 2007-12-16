@@ -69,7 +69,7 @@ void GameManager::run()
         // Now the screen may have changed and
         // needs to be updated.
         if(m_started) m_prev_time = m_curr_time;
-        else
+        else if( race_manager->raceIsActive() )
         {
             m_prev_time = SDL_GetTicks();
             m_started = true;
