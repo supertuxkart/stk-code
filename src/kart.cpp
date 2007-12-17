@@ -137,7 +137,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_finish_time          = 0.0f;
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
-    m_current_friction     = 1.0f;
     m_time_since_stuck     = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
@@ -720,16 +719,7 @@ void Kart::update (float dt)
     updatePhysics(dt);
 
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
-    if(m_material_hot && isOnGround())
-    {
-        float r=m_material_hot->getFriction();
-        if(r<m_current_friction) 
-        {
-            m_velocity.xyz[1]-= (m_current_friction*m_current_friction-r*r)
-                                *m_velocity.xyz[1];
-        }   // r<m_current_friction
-        m_current_friction = r;
-    }   // if m_material_hot
+    
     Moveable::update(dt);
     btTransform trans;
     getTrans(&trans);
@@ -741,15 +731,13 @@ void Kart::update (float dt)
     }
     else
     {
-#ifdef TERRAIN_SPECIFIC_FRICTION
         for(int i=0; i<m_vehicle->getNumWheels(); i++)
         {
             // terrain dependent friction
-            m_vehicle->getWheelInfo(i).m_frictionSlip = 
-                                   m_kart_properties->getFrictionSlip() * 
-                                   getMaterial()->getFriction();
+            m_vehicle->getWheelInfo(i).m_frictionSlip = getFrictionSlip() * 
+                                                        getMaterial()->getFriction();
         }   // for i<getNumWheels
-#endif
+
     }   // if there is terrain and it's not a reset material
     doObjectInteractions();
 

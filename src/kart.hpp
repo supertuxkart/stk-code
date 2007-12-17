@@ -88,7 +88,6 @@ protected:
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle ;
-    float        m_current_friction;   // current friction
     float        m_lap_start_time;     // Time at start of a new lap
     float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
@@ -201,6 +200,7 @@ public:
     float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
     float          getTireGrip      () const {return m_kart_properties->getTireGrip();}
+    float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
     float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
     float          getCornerStiffF  () const {return m_kart_properties->getCornerStiffF();}
     float          getCornerStiffR  () const {return m_kart_properties->getCornerStiffR();}
