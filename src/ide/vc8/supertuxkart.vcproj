@@ -877,6 +877,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\terrain_info.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\track.cpp"
 				>
 			</File>
@@ -1091,6 +1095,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gui\help_page_one.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gui\help_page_two.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\herring.hpp"
 				>
 			</File>
@@ -1276,6 +1288,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\string_utils.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\terrain_info.hpp"
 				>
 			</File>
 			<File

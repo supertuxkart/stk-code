@@ -96,10 +96,6 @@ public:
     btDynamicsWorld*
           getPhysicsWorld () const {return m_dynamics_world;}
     void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
-    static const float NOHIT;
-    float getHAT          (btVector3 pos);
-    float getHOT          (btVector3 pos);
-    bool  getTerrainNormal(btVector3 pos, btVector3* normal);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

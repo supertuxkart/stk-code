@@ -62,8 +62,8 @@ void Projectile::init(Kart *kart, int collectable_)
     kart->getTrans(&trans);
 
 	// We should get heading from the kart, and pitch/roll from the terrain here
-    btVector3 normal;
-	if(world->getPhysics()->getTerrainNormal(trans.getOrigin(), &normal))
+    btVector3 normal=getNormal();
+    if(getHoT()!=Track::NOHIT)
 	{
 		float m[4][4];
 		trans.getOpenGLMatrix((float*)&m);

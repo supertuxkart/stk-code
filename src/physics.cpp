@@ -31,23 +31,10 @@
 #include "material_manager.hpp"
 
 /** Initialise physics. */
-
 // ----------------------------------------------------------------------------
-// Handling of triangle specific friction and special attributes (e.g. reset,
-// zipper).
-extern ContactAddedCallback             gContactAddedCallback;
-bool HandleTerrainFriction(btManifoldPoint& cp, 
-                           const btCollisionObject* colObj0,int partId0,int index0,
-                           const btCollisionObject* colObj1,int partId1,int index1);
-
-// ----------------------------------------------------------------------------
-float const Physics::NOHIT=-99999.9f;
 
 Physics::Physics(float gravity) : btSequentialImpulseConstraintSolver()
 {
-    // Set the contact handler for friction computation (and reset triggering)
-    gContactAddedCallback = HandleTerrainFriction;
-
     m_collision_conf    = new btDefaultCollisionConfiguration();
     m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
     
@@ -279,76 +266,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 }   // solveGroup
 
 // -----------------------------------------------------------------------------
-float Physics::getHAT(btVector3 pos)
-{
-    btVector3 to_pos(pos);
-    to_pos.setZ(-100000.f);
-    btCollisionWorld::ClosestRayResultCallback rayCallback(pos, to_pos);
-    m_dynamics_world->rayTest(pos, to_pos, rayCallback);
-    if(!rayCallback.HasHit()) return NOHIT;
-
-    return pos.getZ()-rayCallback.m_hitPointWorld.getZ();
-}   // getHAT
-// -----------------------------------------------------------------------------
-float Physics::getHOT(btVector3 pos)
-{
-    btVector3 to_pos(pos);
-    to_pos.setZ(-100000.f);
-
-    btCollisionWorld::ClosestRayResultCallback rayCallback(pos, to_pos);
-
-    m_dynamics_world->rayTest(pos, to_pos, rayCallback);
-    if(!rayCallback.HasHit()) return NOHIT;
-
-    return rayCallback.m_hitPointWorld.getZ();
-}   // getHOT
-// -----------------------------------------------------------------------------
-bool Physics::getTerrainNormal(btVector3 pos, btVector3* normal)
-{
-    btVector3 to_pos(pos);
-    to_pos.setZ(-100000.f);
-    btCollisionWorld::ClosestRayResultCallback 
-        rayCallback(pos, to_pos);
-
-    m_dynamics_world->rayTest(pos, to_pos, rayCallback);
-    if(!rayCallback.HasHit()) return false;
-    *normal = rayCallback.m_hitNormalWorld;
-    normal->normalize();
-    return true;
-}   // getTerrainNormal
-
-// -----------------------------------------------------------------------------
-bool HandleTerrainFriction(btManifoldPoint& cp, 
-                           const btCollisionObject* colObj0,int partId0,int index0,
-                           const btCollisionObject* colObj1,int partId1,int index1)
-{
-    const btCollisionObject* obj0 = static_cast<const btCollisionObject*>(colObj0);
-    const btCollisionObject* obj1 = static_cast<const btCollisionObject*>(colObj1);
-    Moveable *mov0          = static_cast<Moveable*>(obj0->getUserPointer());
-    Moveable *mov1          = static_cast<Moveable*>(obj1->getUserPointer());
-    // make sure that indeed one of the two objects is the track, i.e. has no user pointer
-    assert(mov0==0 || mov1==0);
-    Moveable *other;
-    other    = (mov0==0) ? mov1   : mov0;   // get the non-track object.
-
-    // This can happen when moving_physics objects exist
-    if(!other) return false;
-
-    int indx = (mov0==0) ? index0 : index1; // get the track index
-    // Don't do anything if a projectile (or any other non-kart object) hit sthe track
-    if(other->getMoveableType()!=Moveable::MOV_KART) return false;
-
-    const Material *mat= Track::getMaterial(indx);
-    if(mat->isReset())
-    {
-        ((Kart*)other)->forceRescue();
-    }
-    cp.m_combinedFriction = mat->getFriction();
-    return true;
-}   // CustomTriangleHandler
-
-// -----------------------------------------------------------------------------
-//* 
 void Physics::draw()
 {
     if(user_config->m_bullet_debug)

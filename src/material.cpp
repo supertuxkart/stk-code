@@ -129,7 +129,7 @@ void Material::init ()
     m_alpha_ref    = 0.1f  ;
     m_lighting     = true  ;
     m_sphere_map   = false ;
-    m_friction     = 1.0   ;
+    m_friction     = 1.0f  ;
     m_ignore       = false ;
     m_zipper       = false ;
     m_resetter     = false ;

@@ -129,6 +129,7 @@ public:
 
 
     float m_total_distance;
+    static const float NOHIT;
 
     float m_track_2d_width,  // Width and heigth of the 2d display of the track
           m_track_2d_height;
@@ -182,6 +183,8 @@ public:
     const std::string& getHerringStyle  () const {return m_herring_style;  }
     void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
     static const Material* getMaterial  (unsigned int n) {return m_triangleIndex2Material[n];}
+    void  getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
+                         const Material **material) const;
     void createPhysicsModel             ();
     void               glVtx            (sgVec2 v, float x_offset, float y_offset) const
     {

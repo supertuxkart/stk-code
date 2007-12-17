@@ -37,9 +37,7 @@
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
-#ifdef BULLET
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
-#endif
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
 #endif
@@ -121,12 +119,13 @@ void KartParticleSystem::particle_delete (int , Particle* )
 
 //=============================================================================
 Kart::Kart (const KartProperties* kartProperties_, int position_ ,
-            sgCoord init_pos)
+            sgCoord init_pos) 
+    : TerrainInfo(1),
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
 #endif
-        : Moveable(true), m_attachment(this), m_collectable(this)
+       Moveable(true), m_attachment(this), m_collectable(this)
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
 #endif
@@ -139,9 +138,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
     m_current_friction     = 1.0f;
-#ifdef BULLET
     m_time_since_stuck     = 0.0f;
-#endif
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -152,13 +149,9 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
-#ifdef BULLET
     m_max_speed               = m_kart_properties->getMaximumSpeed();
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
-#else
-    m_max_speed               = sqrt(getMaxPower()/getAirResistance());
-#endif
 
     m_wheel_position = 0;
 
@@ -177,7 +170,6 @@ void Kart::createPhysics(ssgEntity *obj)
     // -------------------------------------
     // The size for bullet must be specified in half extends!
     //    ssgEntity *model = getModel();
-#ifdef BULLET
     float x_min, x_max, y_min, y_max, z_min, z_max;
     MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     float kart_width  = x_max-x_min;
@@ -282,7 +274,6 @@ void Kart::createPhysics(ssgEntity *obj)
     }
     world->getPhysics()->addKart(this, m_vehicle);
 
-#endif
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
@@ -305,7 +296,6 @@ Kart::~Kart()
     if(m_skidmark_left ) delete m_skidmark_left ;
     if(m_skidmark_right) delete m_skidmark_right;
 
-#ifdef BULLET
     delete m_vehicle;
     delete m_tuning;
     delete m_vehicle_raycaster;
@@ -314,7 +304,6 @@ Kart::~Kart()
     {
         delete m_kart_chassis.getChildShape(i);
     }
-#endif
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -322,28 +311,23 @@ Kart::~Kart()
  *
  * Returns true if the kart is 'resting', i.e. (nearly) not moving.
  */
-#ifdef BULLET
 bool Kart::isInRest()
 {
     return fabs(m_body->getLinearVelocity ().z())<0.2;
 }  // isInRest
-#endif
+
 //-----------------------------------------------------------------------------
 /** Modifies the physics parameter to simulate an attached anvil.
  *  The velocity is multiplicated by f, and the mass of the kart is increased.
  */
 void Kart::adjustSpeedWeight(float f)
 {
-#ifdef BULLET
     m_body->setLinearVelocity(m_body->getLinearVelocity()*f);
     // getMass returns the mass increased by the attachment
     btVector3 inertia;
     float m=getMass();
     m_kart_chassis.calculateLocalInertia(m, inertia);
     m_body->setMassProps(m, inertia);
-#else
-    getVelocity()->xyz[1] *= f;
-#endif
 }   // adjustSpeedWeight
 
 //-----------------------------------------------------------------------------
@@ -582,7 +566,6 @@ void Kart::doZipperProcessing (float delta)
     else m_zipper_time_left = 0.0f ;
 }   // doZipperProcessing
 
-#ifdef BULLET
 //-----------------------------------------------------------------------------
 float Kart::getActualWheelForce()
 {
@@ -595,10 +578,9 @@ float Kart::getActualWheelForce()
     return getMaxPower();
 
 }   // getActualWheelForce
-#endif
 
 //-----------------------------------------------------------------------------
-#ifdef BULLET
+
 bool Kart::isOnGround()
 {
     return m_vehicle->getWheelInfo(0).m_raycastInfo.m_isInContact &&
@@ -606,11 +588,9 @@ bool Kart::isOnGround()
            m_vehicle->getWheelInfo(2).m_raycastInfo.m_isInContact &&
            m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
 }   // isOnGround
-#endif
 //-----------------------------------------------------------------------------
 void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 {
-#ifdef BULLET
     if(direct_hit) {
         btVector3 velocity = m_body->getLinearVelocity();
 
@@ -620,13 +600,13 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
     }
-    else   // only affected by a distant explosion
+    else  // only affected by a distant explosion
     {
         sgVec3 diff;
         sgSubVec3(diff, getCoord()->xyz, pos);
         float len2=sgLengthSquaredVec3(diff);
 
-        // The correct forumale would be to first normalise diff,
+        // The correct formhale would be to first normalise diff,
         // then apply the impulse (which decreases 1/r^2 depending
         // on the distance r), so:
         // diff/len(diff) * impulseSize/len(diff)^2
@@ -637,28 +617,18 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
         btVector3 impulse(diff[0],diff[1], diff[2]);
         getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
     }
-
-#else
-    // only the kart hit directly is affected.
-    if(direct_hit) forceCrash();
-#endif
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
 void Kart::forceCrash ()
 {
     m_wheelie_angle = CRASH_PITCH ;
-#ifdef BULLET
     btVector3 velocity = m_body->getLinearVelocity();
 
     velocity.setY( 0.0f );
     velocity.setX( 0.0f );
 
     getVehicle()->getRigidBody()->setLinearVelocity( velocity );
-#else
-    m_velocity.xyz[0] = m_velocity.xyz[1] = m_velocity.xyz[2] =
-    m_velocity.hpr[0] = m_velocity.hpr[1] = m_velocity.hpr[2] = 0.0f ;
-#endif
 }  // forceCrash
 
 //-----------------------------------------------------------------------------
@@ -697,7 +667,6 @@ void Kart::doCollisionAnalysis ( float delta, float hot )
 //-----------------------------------------------------------------------------
 void Kart::update (float dt)
 {
-#ifdef BULLET
     // check if kart is stuck
     if(!isPlayerKart() && getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f
             && !m_rescue && world->getPhase() != World::START_PHASE)
@@ -708,7 +677,6 @@ void Kart::update (float dt)
     {
         m_time_since_stuck = 0.0f;
     }
-#endif
 
     //m_wheel_position gives the rotation around the X-axis, and since velocity's
     //timeframe is the delta time, we don't have to multiply it with dt.
@@ -762,9 +730,28 @@ void Kart::update (float dt)
         }   // r<m_current_friction
         m_current_friction = r;
     }   // if m_material_hot
-    Moveable::update (dt);
+    Moveable::update(dt);
+    btTransform trans;
+    getTrans(&trans);
+    TerrainInfo::update(trans.getOrigin());
+    if (getHoT()==Track::NOHIT                   || 
+       (getMaterial()->isReset() && isOnGround())   )
+    {
+        forceRescue();
+    }
+    else
+    {
+#ifdef TERRAIN_SPECIFIC_FRICTION
+        for(int i=0; i<m_vehicle->getNumWheels(); i++)
+        {
+            // terrain dependent friction
+            m_vehicle->getWheelInfo(i).m_frictionSlip = 
+                                   m_kart_properties->getFrictionSlip() * 
+                                   getMaterial()->getFriction();
+        }   // for i<getNumWheels
+#endif
+    }   // if there is terrain and it's not a reset material
     doObjectInteractions();
-
 
     // Save the last valid sector for forced rescue on shortcuts
     if(m_track_sector  != Track::UNKNOWN_SECTOR && 
@@ -856,7 +843,6 @@ void Kart::update (float dt)
 #define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
 
 // -----------------------------------------------------------------------------
-#ifdef BULLET
 void Kart::draw()
 {
     float m[16];
@@ -879,11 +865,11 @@ void Kart::draw()
         world->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
     }
 }   // draw
-#endif
+
 // -----------------------------------------------------------------------------
 /** Returned an additional engine power boost when doing a wheele.
 ***/
-#ifdef BULLET
+
 float Kart::handleWheelie(float dt)
 {
     // Handle wheelies
@@ -927,7 +913,6 @@ float Kart::handleWheelie(float dt)
     return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
           * m_wheelie_angle/getWheelieMaxPitch();
 }   // handleWheelie
-#endif
 
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
@@ -1304,7 +1289,6 @@ void Kart::placeModel ()
     if (m_wheel_rear_r) m_wheel_rear_r->setTransform(wheel_rot);
     // We don't have to call Moveable::placeModel, since it does only setTransform
 
-#ifdef BULLET
     // Only transfer the bullet data to the plib tree if no history is being
     // replayed.
     if(!user_config->m_replay_history)
@@ -1344,7 +1328,7 @@ void Kart::placeModel ()
         m_rescue=true;
         m_time_since_stuck=0.0f;
     }
-#else
+#ifndef BULLET
     sgCoord c ;
     sgCopyCoord ( &c, &m_curr_pos ) ;
     c.hpr[1] += m_wheelie_angle ;

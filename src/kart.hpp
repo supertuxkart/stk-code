@@ -22,15 +22,14 @@
 #define HEADER_KART_H
 
 #include <plib/sg.h>
+#include "btBulletDynamicsCommon.h"
 
 #include "moveable.hpp"
 #include "particle_system.hpp"
 #include "kart_properties.hpp"
 #include "attachment.hpp"
 #include "collectable.hpp"
-#ifdef BULLET
-#include "btBulletDynamicsCommon.h"
-#endif
+#include "terrain_info.hpp"
 
 struct KartControl
 {
@@ -65,7 +64,7 @@ public:
 };
 
 // =============================================================================
-class Kart : public Moveable
+class Kart : public TerrainInfo, public Moveable
 {
 protected:
     bool         m_on_road;            //true if the kart is on top of the
@@ -99,15 +98,14 @@ protected:
                  SC_SKIPPED_SECTOR,    // skipped too many sectors
                  SC_OUTSIDE_TRACK}     // too far away from tracj
                  m_shortcut_type  ;    // what kind of shortcut was detected
+
     // physics parameters, storing it saves time
-#ifdef BULLET
     btRaycastVehicle::btVehicleTuning  *m_tuning;
     btCompoundShape                    m_kart_chassis;
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
     float                               m_kart_height;
     float                               m_time_since_stuck;
-#endif
 
 private:
     int                 m_num_herrings_gobbled;
@@ -130,15 +128,11 @@ private:
     float               m_finish_time;
     bool                m_finished_race;
 
-#ifdef BULLET
     float               m_speed;
-#endif
 
 protected:
     int                 m_rescue;
-#ifdef BULLET
     float               m_rescue_pitch, m_rescue_roll;
-#endif
     const KartProperties *m_kart_properties;
 
     /** Search the given branch of objects that match the wheel names
@@ -232,18 +226,16 @@ public:
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }
     float          getKartLength    () const {return m_kart_length;            }
     void           createPhysics    (ssgEntity *obj);
-#ifdef BULLET
-    float             getKartHeight () const {return m_kart_height;            }
+    float          getKartHeight () const {return m_kart_height;            }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
-    void              updateBulletPhysics(float dt);
-    void              draw          ();
-    bool              isInRest      ();
+    void           updateBulletPhysics(float dt);
+    void           draw          ();
+    bool           isInRest      ();
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
-    float             getSpeed      () const {return m_speed;                 }
-    float             handleWheelie(float dt);
-    float             getActualWheelForce();
-    bool              isOnGround   ();
-#endif
+    float          getSpeed      () const {return m_speed;                 }
+    float          handleWheelie(float dt);
+    float          getActualWheelForce();
+    bool           isOnGround   ();
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
     void           handleExplosion  (const sgVec3& pos, bool direct_hit);

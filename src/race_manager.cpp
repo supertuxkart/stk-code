@@ -248,11 +248,11 @@ TimeTrialMode::start()
 //=============================================================================
 RaceManager::RaceManager()
 {
-    m_mode       = 0;
-    m_num_karts  = user_config->m_karts;
-    m_difficulty = RD_MEDIUM;
-    m_race_mode  = RaceSetup::RM_QUICK_RACE;
-    m_track      = "race";
+    m_mode        = 0;
+    m_num_karts   = user_config->m_karts;
+    m_difficulty  = RD_MEDIUM;
+    m_race_mode   = RaceSetup::RM_QUICK_RACE;
+    m_track       = "race";
     m_active_race = false;
 
     m_players.push_back("tuxkart");

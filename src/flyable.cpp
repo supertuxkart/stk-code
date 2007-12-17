@@ -74,16 +74,19 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
     btVector3 direction=trans.getBasis()*forwards;
     float heading=atan2(-direction.getX(), direction.getY());
 
-    btVector3 normal;
     float pitch=0.0f;
-    if(world->getTerrainNormal(trans.getOrigin(),&normal))
+
+    TerrainInfo::update(trans.getOrigin());
+
+    if(getHoT()!=Track::NOHIT)
     {
+        const btVector3 normal=getNormal();
         const float X =-sin(heading);
         const float Y = cos(heading);
         // Compute the angle between the normal of the plane and the line to
         // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
         // simplifying the computation of the scalar product.
-        pitch = ( normal.getX()*X + normal.getY()*Y );  // use ( x,y,0)
+        pitch = ( normal.getX()*X + normal.getY()*Y )/normal.length();  // use ( x,y,0)
         
         // The actual angle computed above is between the normal and the (x,y,0)
         // line, so to compute the actual angles 90 degrees must be subtracted.
@@ -123,8 +126,6 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
     //        terrain is under the rocket). Once hot is done with bullet as
     //        well, this shouldn't be necessary anymore.
     placeModel();
-    //FIXME m_current_HAT = world->getHAT(offset.getOrigin());
-    m_HAT_counter = 0;
 
 }   // createPhysics
 
@@ -183,25 +184,23 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDist, btVector3 *mi
 //-----------------------------------------------------------------------------
 void Flyable::update (float dt)
 {
-	if(m_exploded) return;
-
-    m_HAT_counter++;
-    if(m_HAT_counter==1)
+    if(m_exploded) return;
+	
+    btTransform trans=getBody()->getWorldTransform();
+    TerrainInfo::update(trans.getOrigin());
+    if(getHoT()==Track::NOHIT) 
     {
-        btTransform trans=getBody()->getWorldTransform();
-        m_current_HAT = world->getHAT(trans.getOrigin());
-        m_HAT_counter = 0;
-        if(m_current_HAT!=Physics::NOHIT) 
-        {
-    	    if(m_current_HAT<m_min_height)   
-                too_low(dt);
-    	    else if(m_current_HAT>m_max_height) 
-                too_high(dt);
-            else                                
-                right_height(dt);
-        } 
-        else explode(NULL);
+        explode(NULL);    // flyable out of track boundary
+        return;
     }
+
+    float hat = trans.getOrigin().getZ()-getHoT();
+    if(hat<m_min_height)   
+        too_low(dt);
+    else if(hat>m_max_height) 
+        too_high(dt);
+    else                                
+        right_height(dt);
     Moveable::update(dt);
 }   // update
 

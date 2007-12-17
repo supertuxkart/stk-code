@@ -43,6 +43,8 @@
 #endif
 std::vector<const Material*>Track::m_triangleIndex2Material;
 
+float const Track::NOHIT=-99999.9f;
+
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
@@ -410,7 +412,10 @@ void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
   coords->hpr[2] = 0.0f;
 
   btVector3 tmp_pos(coords->xyz[0],coords->xyz[1],coords->xyz[2]);
-  coords->xyz[2] = world->getPhysics()->getHOT(tmp_pos);
+
+  btVector3 normal;
+  const Material *material=NULL;
+  getTerrainInfo(tmp_pos, &(coords->xyz[2]), &normal, &material);
 
 }   // getStartCoords
 
@@ -1256,3 +1261,42 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
     if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
     herring_manager->newHerring(type, xyz);
 }   // herring_command
+
+// ----------------------------------------------------------------------------
+void  Track::getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
+                            const Material **material) const
+{
+    btVector3 to_pos(pos);
+    to_pos.setZ(-100000.f);
+
+    class MaterialCollision : public btCollisionWorld::ClosestRayResultCallback
+    {
+    public:
+        const Material* m_material;
+        MaterialCollision(btVector3 p1, btVector3 p2) : 
+            btCollisionWorld::ClosestRayResultCallback(p1,p2) {m_material=NULL;}
+        virtual btScalar AddSingleResult(btCollisionWorld::LocalRayResult& rayResult,
+                                         bool normalInWorldSpace) {
+             if(rayResult.m_localShapeInfo && rayResult.m_localShapeInfo->m_shapePart>=0 )
+             {
+                 m_material=m_triangleIndex2Material[rayResult.m_localShapeInfo->m_triangleIndex];
+             }
+             return btCollisionWorld::ClosestRayResultCallback::AddSingleResult(rayResult, 
+                                                                                normalInWorldSpace);
+        }   // AddSingleResult
+    };   // myCollision
+    MaterialCollision rayCallback(pos, to_pos);
+    world->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
+
+    if(!rayCallback.HasHit()) 
+    {
+        *hot      = NOHIT;
+        *material = NULL;
+        return;
+    }
+
+    *hot      = rayCallback.m_hitPointWorld.getZ();
+    *normal   = rayCallback.m_hitNormalWorld;
+    *material = rayCallback.m_material;
+    // FIXME: material must be set!
+}   // getTerrainInfo

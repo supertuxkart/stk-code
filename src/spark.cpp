@@ -82,7 +82,10 @@ void Spark::update(float dt)
         // speed, which causes the speed to increase, which in turn causes
         // the spark to fly higher and higher.
         btVector3 v=m_body->getLinearVelocity();
-        if (m_current_HAT<= m_max_height)
+        btTransform trans;
+        getTrans(&trans);
+        float hat = trans.getOrigin().getZ();
+        if (hat<= m_max_height)
         {
             float vlen = v.length2();
             if(vlen<0.8*m_speed*m_speed)
@@ -96,7 +99,7 @@ void Spark::update(float dt)
                     m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
                 }
             }   // vlen < 0.8*m_speed*m_speed
-        }   // m_current_HAT < m_max_height  
+        }   // hat< m_max_height  
     }   // spar lose energy
 }   // update
 // -----------------------------------------------------------------------------

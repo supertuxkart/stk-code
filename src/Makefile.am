@@ -76,6 +76,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	kart.cpp		   kart.hpp		        \
 	            		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
+	terrain_info.cpp	   terrain_info.hpp		\
 	flyable.cpp		   flyable.hpp			\
 	missile.cpp		   missile.hpp			\
 	homing.cpp		   homing.hpp			\

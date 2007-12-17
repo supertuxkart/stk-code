@@ -22,14 +22,14 @@
 
 #include "moveable.hpp"
 #include "kart.hpp"
+#include "terrain_info.hpp"
 
-class Flyable : public Moveable
+class Flyable : public Moveable, public TerrainInfo
 {
     sgCoord           m_last_pos;
     bool              m_has_hit_something;
     int               m_last_radar_beep;
     bool              m_exploded;
-    int               m_HAT_counter;        // compute HAT only every N timesteps
 
 protected:
     const Kart*       m_owner;              // the kart which released this flyable
@@ -51,7 +51,6 @@ protected:
     static float      m_st_force_updown[COLLECT_MAX];  // force pushing up/down 
     static btVector3  m_st_extend[COLLECT_MAX];        // size of the model
 
-    float             m_current_HAT;        // height  above terrain
     void              getClosestKart(const Kart **minKart, float *minDist, 
                                      btVector3 *minDelta) const;
     virtual btCollisionShape *createShape()=0;
