@@ -72,8 +72,7 @@ void drv_init()
     if(user_config->m_fullscreen)
         flags |= SDL_FULLSCREEN;
 
-    mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0,
-                                   flags);
+    setVideoMode(false);
 
     SDL_JoystickEventState(SDL_ENABLE);
 
