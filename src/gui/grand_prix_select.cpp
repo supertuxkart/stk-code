@@ -25,7 +25,6 @@
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
-#include "font.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens
@@ -79,7 +78,6 @@ GrandPrixSelect::GrandPrixSelect()
     widget_manager->hideWgtText(WTOK_EMPTY0);
 
     widget_manager->addWgt(WTOK_DESCRIPTION, 80, 7);
-    widget_manager->hideWgtRect(WTOK_DESCRIPTION);
     widget_manager->setWgtText(WTOK_DESCRIPTION, _("No Grand Prix selected"));
     widget_manager->setWgtTextSize(WTOK_DESCRIPTION, WGT_FNT_SML);
 

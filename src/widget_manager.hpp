@@ -28,15 +28,15 @@
  * addWgt() to specify the widgets you want, and for each widget specify the
  * details of it with the 'switch features', that can be changed between
  * show/hide, the initial setting for all of them is to be hidden. You will
- * usually have to call it's set_*() function, then the show_*() functions.
+ * usually have to call it's set*() function, then the show_*() functions.
  * After you have defined all the widgets in the screen, call layout(), that
  * will do the actual work at creating the widgets. Call the activated
  * functions during the time the widgets are alive, and make sure that
  * update() is called each frame.
  *
- * You can use set_initial_*state() to avoid setting the state of the same
+ * You can use setInitial*State() to avoid setting the state of the same
  * switch features with same values over and over; the default states are
- * reset when you call reset() or you can use reset_default_states().
+ * reset when you call reset() or you can use resetDefaultStates().
  */
 
 
@@ -189,7 +189,7 @@ public:
     void activateWgt(const int TOKEN);
     void deactivateWgt(const int TOKEN);
 
-    //FIXME: maybe this should be set_wgt_rect_color ? and put after the other rect funcs?
+    //FIXME: maybe this should be setWgtRectColor ? and put after the other rect funcs?
     void setWgtColor(const int TOKEN, const GLfloat* const COLOR);
     void setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS);
     void showWgtRect(const int TOKEN);

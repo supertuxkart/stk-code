@@ -26,7 +26,6 @@
 #include "user_config.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
-#include "font.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens {
@@ -48,6 +47,7 @@ enum WidgetTokens {
     WTOK_TRACK13,
 
     WTOK_IMG0,
+    WTOK_EMPTY,
     WTOK_IMG1,
 
     WTOK_AUTHOR
@@ -77,6 +77,29 @@ TrackSel::TrackSel()
         widget_manager->setWgtText( WTOK_TRACK0 + i + 1, track_manager->getTrack(i+1)->getName());
         widget_manager->breakLine();
     }
+//FIXME: till the widget can display the track map in some way, the image
+//widgets will stay commented out.
+    widget_manager->setInitialActivationState( false );
+#if 0
+    widget_manager->addWgt(WTOK_IMG0, 35, 35);
+    widget_manager->hideWgtText(WTOK_IMG0);
+    widget_manager->showWgtTexture(WTOK_IMG0);
+#endif
+
+    widget_manager->addWgt( WTOK_EMPTY, 5, 35 );
+    widget_manager->hideWgtRect( WTOK_EMPTY );
+    widget_manager->hideWgtText( WTOK_EMPTY );
+
+#if 0
+    widget_manager->addWgt(WTOK_IMG1, 35, 35);
+    widget_manager->hideWgtText(WTOK_IMG1);
+    widget_manager->showWgtTexture(WTOK_IMG1);
+#endif
+    widget_manager->breakLine();
+
+    widget_manager->addWgt( WTOK_AUTHOR, 80, 7 );
+    widget_manager->setWgtText( WTOK_AUTHOR, "No track selected" );
+    widget_manager->setWgtTextSize( WTOK_AUTHOR, WGT_FNT_MED );
 
 //FIXME: Right now, the image and the author's name is not controlled by the widget manager.
     widget_manager->layout(WGT_AREA_TOP);
@@ -93,11 +116,14 @@ void TrackSel::update(float dt)
 {
     BaseGUI::update(dt);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    // draw a track preview of the currently highlighted track menu entry
     const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
+
+    widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
+
+
+    // draw a track preview of the currently highlighted track menu entry
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -156,8 +182,6 @@ void TrackSel::update(float dt)
     const GLfloat backgroundColour[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
     glColor4fv(backgroundColour);
     glPopMatrix();
-    font_gui->Print(TRACK->getDescription(), WGT_FNT_MED,
-                    Font::CENTER_OF_SCREEN, 10);
     glDisable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
