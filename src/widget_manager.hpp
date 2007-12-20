@@ -20,8 +20,8 @@
 #define HEADER_WIDGET_MANAGER_H
 
 #include "widget.hpp"
-
 #include <vector>
+
 
 /* Here are some big-picture instructions about how to use this widget
  * manager: the extern widget_manager is a global interface to the class. Call

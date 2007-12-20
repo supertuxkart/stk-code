@@ -84,6 +84,7 @@ void Moveable::createBody(float mass, btTransform& trans,
                           btCollisionShape *shape, MoveableType m) {
     
     btVector3 inertia;
+    m_transform = trans;
     shape->calculateLocalInertia(mass, inertia);
     m_motion_state = new btDefaultMotionState(trans);
 
@@ -169,10 +170,16 @@ void Moveable::update (float dt)
         }
     }   // if m_history_position
     
-    placeModel () ;
-
+    placeModel();
     m_first_time = false ;
 }   // update
+
+//-----------------------------------------------------------------------------
+void Moveable::placeModel()
+{
+    m_motion_state->getWorldTransform(m_transform);
+    m_model_transform->setTransform(&m_curr_pos);
+}   // placeModel
 
 //-----------------------------------------------------------------------------
 /**
@@ -233,143 +240,3 @@ void Moveable::ReadHistory(char* s, int kartNumber, int indx)
         exit(-2);
     }
 }   // ReadHistory
-
-//-----------------------------------------------------------------------------
-#define ISECT_STEP_SIZE         0.4f
-#define COLLISION_SPHERE_RADIUS 0.6f
-
-#define max(m,n) ((m)>(n) ? (m) : (n)) /* return highest number */
-
-#ifndef BULLET
-//-----------------------------------------------------------------------------
-float Moveable::collectIsectData ( sgVec3 start, sgVec3 end )
-{
-    sgVec3 vel ;
-
-    m_collided = m_crashed = false ;  /* Initial assumption */
-
-    sgSubVec3 ( vel, end, start ) ;
-
-    const float SPEED = sgLengthVec3 ( vel ) ;
-
-    /*
-      At higher speeds, we must test frequently so we can't
-      pass through something thin by mistake.
-
-      At very high speeds, this is getting costly...so beware!
-    */
-
-    int nsteps = (int) ceil ( SPEED / ISECT_STEP_SIZE ) ;
-
-    if ( nsteps == 0 ) nsteps = 1 ;
-
-    if ( nsteps > 100 )
-    {
-        fprintf(stderr, "WARNING: Speed too high for collision detection!\n"
-                        "WARNING: Nsteps=%d, Speed=%f!\n"
-                        "moveable %p, vel=%f,%f,%f\n",
-                nsteps, SPEED, this, vel[0], vel[1], vel[2]);
-        nsteps = 100 ;
-    }
-
-    sgScaleVec3 ( vel, vel, 1.0f / (float) nsteps ) ;
-
-    sgVec3 pos1, pos2 ;
-
-    sgCopyVec3 ( pos1, start ) ;
-
-    float hot = -9999.0 ;
-
-    for ( int i = 0 ; i < nsteps ; i++ )
-    {
-        sgAddVec3 ( pos2, pos1, vel ) ;
-        float hot1 = getIsectData ( pos1, pos2 ) ;
-        hot = max(hot, hot1);
-        sgCopyVec3 ( pos1, pos2 ) ;
-        if(m_collided) break;
-    }
-
-    sgCopyVec3 ( end, pos2 ) ;
-    return hot ;
-}   // collectIsectData
-
-//-----------------------------------------------------------------------------
-
-float Moveable::getIsectData ( sgVec3 start, sgVec3 end )
-{
-    int num_hits;
-
-    sgSphere sphere;
-
-    /*
-      It's necessary to lift the center of the bounding sphere
-      somewhat so that Player can stand on a slope.
-    */
-
-    sphere.setRadius ( COLLISION_SPHERE_RADIUS ) ;
-    sphere.setCenter ( 0.0f, 0.0f, COLLISION_SPHERE_RADIUS + 0.3f) ;
-
-    /* Do a bounding-sphere test for Player. */
-    sgSetVec3 ( m_surface_avoidance_vector, 0.0f, 0.0f, 0.0f );
-
-    // new collision  algorithm
-    AllHits a;
-    sphere.setCenter ( end[0],end[1],end[2]+ COLLISION_SPHERE_RADIUS + 0.3f) ;
-    num_hits = world->Collision(&sphere, &a);
-    for(AllHits::iterator i=a.begin(); i!=a.end(); i++)
-    {
-        if ( (*i)->m_plane[2]>0.4 ) continue;
-        const float DIST = sphere.getRadius()-(*i)->m_dist;
-        sgVec3 nrm ;
-        sgCopyVec3  ( nrm, (*i)->m_plane ) ;
-        sgScaleVec3 ( nrm, nrm, DIST ) ;
-
-        sgAddVec3 ( m_surface_avoidance_vector, nrm ) ;
-
-        sgVec3 tmp ;
-        sgCopyVec3 ( tmp, sphere.getCenter() ) ;
-        sgAddVec3 ( tmp, nrm ) ;
-        sphere.setCenter ( tmp ) ;
-
-        m_collided = true ;
-        Material* m = material_manager->getMaterial( (*i)->m_leaf);
-        if (m->isZipper   () ) m_collided = false ;
-        if (m->isCrashable() ) m_crashed  = true  ;
-        if (m->isReset    () ) OutsideTrack(1);
-    }   // for i in a
-
-    sgAddVec3(end, m_surface_avoidance_vector);
-
-    // H.O.T == Height Of Terrain
-    // ==========================
-    const float TOP = COLLISION_SPHERE_RADIUS + max(start[2],end[2]);
-    sgVec3 dstart; sgCopyVec3(dstart, end);
-    sgVec3 dummy; sgCopyVec3(dummy, end);
-    dummy[2]=TOP;
-    ssgLeaf* m_leaf;
-    const float HOT = world->GetHOT(dummy, dummy, &m_leaf, &m_normal_hot);
-    if(m_leaf)
-    {
-        m_material_hot = material_manager->getMaterial(m_leaf);
-        // Only rescue the kart if it (nearly) touches the reset-material,
-        // not only when it is above it. The condition for touching
-        // a material is somewha coars, since the kart might have been falling
-        // for quite some time, it might be really fast, so I guess a somewhat
-        // coarser test is better for that case.
-        if(m_material_hot->isReset() &&
-           fabs(TOP-COLLISION_SPHERE_RADIUS - HOT)<0.2) OutsideTrack(1);
-        if(m_material_hot->isZipper()) handleZipper();
-    }
-    else
-    {
-        OutsideTrack(0);
-    }
-
-    if (end[2] < HOT )
-    {
-        end[2] = HOT ;
-    }   // end[2]<HOT
-    return HOT ;
-}   // getIsectData
-
-#endif

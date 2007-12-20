@@ -19,14 +19,12 @@
 
 #include <SDL/SDL.h>
 
-#include "player_controls.hpp"
 #include "widget_manager.hpp"
+#include "player_controls.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "sdldrv.hpp"
-
-#include <string>
 
 enum WidgetTokens
 {

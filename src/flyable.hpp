@@ -80,7 +80,6 @@ public:
     bool         hasHit      ()               { return m_has_hit_something; }
     void         reset       () { Moveable::reset();
                                   sgCopyCoord(&m_last_pos,&m_reset_pos );   }
-    void OutsideTrack        (int isReset)    { explode(NULL);              }
 };   // Flyable
 
 #endif

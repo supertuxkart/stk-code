@@ -64,13 +64,10 @@ void Homing::update(float dt)
     float minDistance;
 
     getClosestKart(&kart, &minDistance, &direction);
-    btTransform my_trans;
-    getTrans(&my_trans);
+    btTransform my_trans=getTrans();
     if(minDistance<m_st_max_distance)   // move homing towards kart
     {
-        btTransform target;
-        kart->getTrans(&target);
-        getTrans(&my_trans);
+        btTransform target=kart->getTrans();
         
         float steer=steerTowards(my_trans, target.getOrigin());
         if(fabsf(steer)>90.0f) steer=0.0f;

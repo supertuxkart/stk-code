@@ -25,9 +25,9 @@
 #include "track.hpp"
 #include "camera.hpp"
 #include "user_config.hpp"
+#include "constants.hpp"
 
-void
-Camera::setScreenPosition ( int numPlayers, int pos )
+void Camera::setScreenPosition ( int numPlayers, int pos )
 {
     assert(pos >= 0 && pos <= 3);
 
@@ -77,7 +77,7 @@ Camera::setScreenPosition ( int numPlayers, int pos )
         }
     }
     m_LastPitch = 0.0f;
-}
+}  // setScreenPosition
 
 //-----------------------------------------------------------------------------
 Camera::Camera ( int numPlayers, int which_ )
@@ -96,21 +96,19 @@ Camera::Camera ( int numPlayers, int which_ )
 
     setScreenPosition ( numPlayers, m_which_kart ) ;
     m_last_steer_offset = 0;
-}
+}   // Camera
 
 //-----------------------------------------------------------------------------
-void
-Camera::setMode(Mode mode_)
+void Camera::setMode(Mode mode_)
 {
     m_mode = mode_;
-}
+}   // setMode
 
 //-----------------------------------------------------------------------------
-void
-Camera::setReverseHeading(bool b)
+void Camera::setReverseHeading(bool b)
 {
   m_reverse = b;
-}
+}   // setReverseHeading
 
 //-----------------------------------------------------------------------------
 void Camera::update (float dt)
@@ -119,11 +117,13 @@ void Camera::update (float dt)
     if ( m_which_kart >= int(world->getNumKarts()) || m_which_kart < 0 ) m_which_kart = 0 ;
 
     sgCoord kartcoord;
+    const Kart *kart=world->getPlayerKart(m_which_kart);
     sgCopyCoord(&kartcoord, world->getPlayerKart(m_which_kart)->getCoord());
 
+    // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
+    kartcoord.hpr[1]=RAD_TO_DEGREE( kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
     kartcoord.hpr[2] = 0;
-
-    // If the car angle is 'significantly' different from the camera angle,
+    // If the terrain pitch is 'significantly' different from the camera angle,
     // start adjusting the camera. This helps with steep declines, where
     // otherwise the track is not visible anymore.
     if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
@@ -194,7 +194,7 @@ void Camera::update (float dt)
     sgSetCoord(&cam, result);
 
     m_context -> setCamera (&cam) ;
-}
+}   // update
 
 //-----------------------------------------------------------------------------
 void Camera::apply ()
@@ -208,5 +208,5 @@ void Camera::apply ()
                  (int)((float)height * m_h) ) ;
 
     m_context -> makeCurrent () ;
-}
+}   // apply
 

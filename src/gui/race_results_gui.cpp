@@ -81,7 +81,7 @@ RaceResultsGUI::RaceResultsGUI()
         Kart *k = world->getKart(i);
         order[k->getPosition()-1] = i;
         const std::string& s = k->getName();
-        unsigned int l = s.size();
+        unsigned int l = (unsigned int)s.size();
         if(l>max_name_len) max_name_len = l;
     }   // for i
 

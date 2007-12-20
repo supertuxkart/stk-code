@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include "flyable.hpp"
-#include "constants.hpp"
 #include "world.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
@@ -66,32 +65,17 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
     // 2) Compute the pitch of the terrain. This avoids the problem of the
     //    rocket hitting the floor (e.g. if the kart is braking and therefore
     //    pointing downwards).
-    btTransform trans;
-    m_owner->getTrans(&trans);
+    btTransform trans = m_owner->getTrans();
 
-    // Compute heading so that straight forward (direction=(0,1,0)) is 0:
-    btVector3 forwards(0.0f, 1.0f, 0.0f);
-    btVector3 direction=trans.getBasis()*forwards;
+    // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
+    btVector3 direction(trans.getBasis()[0][1],
+                        trans.getBasis()[1][1],
+                        trans.getBasis()[2][1]);
     float heading=atan2(-direction.getX(), direction.getY());
 
-    float pitch=0.0f;
-
     TerrainInfo::update(trans.getOrigin());
+    float pitch = getTerrainPitch(heading);
 
-    if(getHoT()!=Track::NOHIT)
-    {
-        const btVector3 normal=getNormal();
-        const float X =-sin(heading);
-        const float Y = cos(heading);
-        // Compute the angle between the normal of the plane and the line to
-        // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
-        // simplifying the computation of the scalar product.
-        pitch = ( normal.getX()*X + normal.getY()*Y )/normal.length();  // use ( x,y,0)
-        
-        // The actual angle computed above is between the normal and the (x,y,0)
-        // line, so to compute the actual angles 90 degrees must be subtracted.
-        pitch = acosf(pitch) - NINETY_DEGREE_RAD;
-    }
     btMatrix3x3 m;
     m.setEulerZYX(pitch, 0.0f, heading);
     trans.setBasis(m);
@@ -159,15 +143,13 @@ Flyable::~Flyable()
 //-----------------------------------------------------------------------------
 void Flyable::getClosestKart(const Kart **minKart, float *minDist, btVector3 *minDelta) const
 {
-    btTransform tProjectile;
-    getTrans(&tProjectile);
+    btTransform tProjectile=getTrans();
     *minDist = 99999.9f;
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
         Kart *kart = world -> getKart(i);
         if(kart == m_owner) continue;
-        btTransform t;
-	    kart->getTrans(&t);
+        btTransform t=kart->getTrans();
        
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
         float distance2 = delta.length2();
@@ -207,15 +189,13 @@ void Flyable::update (float dt)
 // -----------------------------------------------------------------------------
 void Flyable::placeModel()
 {
-	btTransform t;
-	getTrans(&t);
+	btTransform t=getTrans();
     float m[4][4];
     t.getOpenGLMatrix((float*)&m);
     sgSetCoord(&m_curr_pos, m);
     const btVector3 &v=m_body->getLinearVelocity();
     sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
-    m_model_transform->setTransform(&m_curr_pos);
-    
+    Moveable::placeModel();
 }  // placeModel
 
 // -----------------------------------------------------------------------------

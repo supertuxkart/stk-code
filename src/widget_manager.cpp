@@ -340,10 +340,10 @@ bool WidgetManager::layout()
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         m_widgets[i].widget->m_scroll_pos_x =
-            m_widgets[i].last_preset_scroll_x;
+            (float)m_widgets[i].last_preset_scroll_x;
 
         m_widgets[i].widget->m_scroll_pos_y =
-            m_widgets[i].last_preset_scroll_y;
+            (float)m_widgets[i].last_preset_scroll_y;
     }
 
     const int PREV_SELECTED_WGT_TOKEN = m_selected_wgt_token;
@@ -730,7 +730,7 @@ void WidgetManager::setInitialRectState
 )
 {
     m_default_show_rect = SHOW;
-    m_default_rect_round_corners = ROUND_CORNERS;
+    m_default_rect_round_corners = (ROUND_CORNERS!= WGT_AREA_NONE);
     m_default_rect_color = COLOR;
 }
 
@@ -911,8 +911,8 @@ void WidgetManager::setWgtText( const int TOKEN, const char* TEXT )
 
         //Reset the scroll position, because it will be the wrong value if
         //new text has a different size
-        m_widgets[ID].widget->m_scroll_pos_x = m_widgets[ID].last_preset_scroll_x;
-        m_widgets[ID].widget->m_scroll_pos_y = m_widgets[ID].last_preset_scroll_y;
+        m_widgets[ID].widget->m_scroll_pos_x = (float)m_widgets[ID].last_preset_scroll_x;
+        m_widgets[ID].widget->m_scroll_pos_y = (float)m_widgets[ID].last_preset_scroll_y;
     }
     else
     {
@@ -1006,7 +1006,7 @@ void WidgetManager::setWgtXScrollPos
     const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
-        m_widgets[ID].widget->m_scroll_pos_x = POS;
+        m_widgets[ID].widget->m_scroll_pos_x = (float)POS;
         m_widgets[ID].last_preset_scroll_x = POS;
     }
     else
@@ -1035,7 +1035,7 @@ void WidgetManager::setWgtYScrollPos
     const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
-        m_widgets[ID].widget->m_scroll_pos_y = POS;
+        m_widgets[ID].widget->m_scroll_pos_y = (float)POS;
         m_widgets[ID].last_preset_scroll_y = POS;
     }
     else
@@ -1118,7 +1118,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
 
     //The search starts with the current selected widget(since it's most
     //probable that the mouse is on top of it )
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
 
     if( m_selected_wgt_token != WGT_NONE )
     {
@@ -1231,7 +1231,7 @@ WidgetManager::decreaseScrollSpeed(const bool fast)
  */
 int WidgetManager::findLeftWidget(const int START_WGT) const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     int closest_wgt = WGT_NONE;
     int closest_x_dist = user_config->m_width;
     int closest_y_dist = user_config->m_height;
@@ -1284,7 +1284,7 @@ int WidgetManager::findLeftWidget(const int START_WGT) const
  */
 int WidgetManager::findRightWidget(const int START_WGT) const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     int closest_wgt = WGT_NONE;
     int closest_x_dist = user_config->m_width;
     int closest_y_dist = user_config->m_height;
@@ -1334,7 +1334,7 @@ int WidgetManager::findRightWidget(const int START_WGT) const
  */
 int WidgetManager::findTopWidget(const int START_WGT) const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     int closest_wgt = WGT_NONE;
     int closest_x_dist = user_config->m_width;
     int closest_y_dist = user_config->m_height;
@@ -1389,7 +1389,7 @@ int WidgetManager::findTopWidget(const int START_WGT) const
  */
 int WidgetManager::findBottomWidget(const int START_WGT) const
 {
-    const int NUM_WIDGETS = m_widgets.size();
+    const int NUM_WIDGETS = (int)m_widgets.size();
     int closest_wgt = WGT_NONE;
     int closest_x_dist = user_config->m_width;
     int closest_y_dist = user_config->m_height;

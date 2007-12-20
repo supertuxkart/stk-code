@@ -23,7 +23,6 @@
 #include "widget_manager.hpp"
 #include "world.hpp"
 #include "menu_manager.hpp"
-
 void
 BaseGUI::animateWidget(const int PREV_SELECTED_WGT, const int SELECTED_WGT)
 {

@@ -82,8 +82,7 @@ void Spark::update(float dt)
         // speed, which causes the speed to increase, which in turn causes
         // the spark to fly higher and higher.
         btVector3 v=m_body->getLinearVelocity();
-        btTransform trans;
-        getTrans(&trans);
+        btTransform trans=getTrans();
         float hat = trans.getOrigin().getZ();
         if (hat<= m_max_height)
         {

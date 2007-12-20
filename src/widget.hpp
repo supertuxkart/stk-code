@@ -24,6 +24,19 @@
 #ifndef HEADER_WIDGET_H
 #define HEADER_WIDGET_H
 
+// This include strings causes very many warning in the gui subdir:
+// xlocnum(590) : warning C4312: 'type cast' : conversion from 'uintptr_t' to 'void *' of greater size
+// These can apparently be removed by removing 64 bit compatibility warnings, or 
+// just disable the warning during the include:
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  pragma warning(disable:4312)
+#endif
+#include <string>
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  pragma warning(default:4312)
+#endif
+#include "gui/font.hpp"
+
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #else
@@ -34,8 +47,6 @@
 #  include <GL/gl.h>
 #endif
 
-#include <string>
-#include "gui/font.hpp"
 
 enum WidgetFontSize { WGT_FNT_SML = 18, WGT_FNT_MED = 24, WGT_FNT_LRG = 30};
 

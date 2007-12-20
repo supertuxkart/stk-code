@@ -21,8 +21,7 @@
 #define HEADER_BASEGUI_H
 
 #include <SDL/SDL.h>
-
-#include "player.hpp"
+#include "input.hpp"
 
 class BaseGUI
 {

@@ -134,6 +134,8 @@ void Physics::update(float dt)
  */
 void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 {
+    kartA->crashed();
+    kartB->crashed();
     Attachment *attachmentA=kartA->getAttachment();
     Attachment *attachmentB=kartB->getAttachment();
 
@@ -200,8 +202,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         Moveable *movA          = static_cast<Moveable*>(objA->getUserPointer());
         Moveable *movB          = static_cast<Moveable*>(objB->getUserPointer());
 
-        if(!numContacts) continue;   // no real collision
-
         // 1) object A is a track
         // =======================
         if(!movA) 
@@ -210,14 +210,22 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             {   // 1.1 projectile hits track
                 // -------------------------
                 m_all_collisions.push_back(CollisionPair(movB, Moveable::MOV_PROJECTILE,
-							 NULL, Moveable::MOV_TRACK  ));  
+						                                 NULL, Moveable::MOV_TRACK  ));  
+            }
+            else if(movB && movB->getMoveableType()==Moveable::MOV_KART)
+            {
+                ((Kart*)movB)->crashed();
             }
         } 
         // 2) object a is a kart
         // =====================
         else if(movA->getMoveableType()==Moveable::MOV_KART)
         {
-            if(movB && movB->getMoveableType()==Moveable::MOV_PROJECTILE)
+            if(!movB)
+            {
+                ((Kart*)movA)->crashed();
+            }
+            else if(movB && movB->getMoveableType()==Moveable::MOV_PROJECTILE)
             {   // 2.1 projectile hits kart
                 // -------------------------
                 m_all_collisions.push_back(CollisionPair(movB, Moveable::MOV_PROJECTILE,
@@ -239,19 +247,19 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             {   // 3.1) projectile hits track
                 // --------------------------
                 m_all_collisions.push_back(CollisionPair(movA, Moveable::MOV_PROJECTILE,
-							 NULL, Moveable::MOV_TRACK     ));
+                                                         NULL, Moveable::MOV_TRACK     ));
             }
             else if(movB->getMoveableType()==Moveable::MOV_PROJECTILE)
             {   // 3.2 projectile hits projectile
                 // ------------------------------
                 m_all_collisions.push_back(CollisionPair(movA, Moveable::MOV_PROJECTILE,
-							 movB, Moveable::MOV_PROJECTILE));  
+                                                         movB, Moveable::MOV_PROJECTILE));  
             }
             else if(movB->getMoveableType()==Moveable::MOV_KART)
             {   // 3.3 projectile hits kart
                 // ------------------------
                 m_all_collisions.push_back(CollisionPair(movA, Moveable::MOV_PROJECTILE,
-							 movB, Moveable::MOV_KART      ));  
+                                                         movB, Moveable::MOV_KART      ));  
             }
         }
         // 4) Nothing else should happen

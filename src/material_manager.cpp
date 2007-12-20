@@ -24,6 +24,7 @@
 #include "translation.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
+#  define strdup _strdup
 #endif
 
 ssgState *fuzzy_gst;

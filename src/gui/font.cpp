@@ -79,7 +79,7 @@ void Font::Print(const char *text, int size,
     int   sz          = (int)(size*std::max(scale_x,scale_y)*fontScaling);
 
     float l,r,t,b;
-    m_fnt->getBBox(text, sz, 0, &l, &r, &b, &t);
+    m_fnt->getBBox(text, (float)sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99));
     const int H = (int)((t-b+0.99));
 
@@ -104,7 +104,7 @@ void Font::Print(const char *text, int size,
     }
 
     m_text_out->begin();
-    m_text_out->setPointSize(sz);
+    m_text_out->setPointSize((float)sz);
     if(doShadow)
     {
         m_text_out->start2f((GLfloat)x-2, (GLfloat)y-2);

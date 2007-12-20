@@ -52,7 +52,7 @@ public:
     void    update            (float);
     void    addMessages       ();
     void    action            (KartAction action, int value);
-    void    forceCrash        ();
+    void    crashed           ();
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);
     int     isPlayerKart      () const {return 1;}

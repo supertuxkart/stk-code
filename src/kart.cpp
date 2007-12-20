@@ -377,18 +377,16 @@ void Kart::reset()
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
         m_track_sector );
 
-    btTransform trans;
-    trans.setIdentity();
     // Set heading:
-    trans.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-                                   DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
+    m_transform.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
+                                         DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
     // Set position
-    trans.setOrigin(btVector3(m_reset_pos.xyz[0],
-                              m_reset_pos.xyz[1],
-                              m_reset_pos.xyz[2]+0.5f*m_kart_height));
+    m_transform.setOrigin(btVector3(m_reset_pos.xyz[0],
+                                    m_reset_pos.xyz[1],
+                                    m_reset_pos.xyz[2]+0.5f*m_kart_height));
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
-    m_body->setCenterOfMassTransform(trans);
+    m_body->setCenterOfMassTransform(m_transform);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
@@ -487,6 +485,7 @@ void Kart::doLapCounting ()
 void Kart::doObjectInteractions ()
 {
     int i;
+    // FIXME: a lot of work for the 'traffic jam' sound - perhaps just remove it?
     for ( i = 0 ; i < m_grid_position ; i++ )
     {
         sgVec3 xyz ;
@@ -503,31 +502,9 @@ void Kart::doObjectInteractions ()
 
             world->addCollisions(m_grid_position, 1);
             world->addCollisions(i,             1);
-            if ( m_velocity.xyz[1] > other_kart->getVelocity()->xyz[1] )
-            {
-                forceCrash () ;
-                sgSubVec2 ( other_kart->getCoord()->xyz, xyz ) ;
-            }
-            else
-            {
-                other_kart->forceCrash () ;
-                sgAddVec2 ( getCoord()->xyz, xyz ) ;
-            }
-            if(m_attachment.getType()==ATTACH_BOMB &&
-               m_attachment.getPreviousOwner()!=other_kart) 
-            {
-                m_attachment.moveBombFromTo(this, other_kart);
-            }
-            if(other_kart->m_attachment.getType()==ATTACH_BOMB &&
-               other_kart->m_attachment.getPreviousOwner()!=this)
-            {
-                m_attachment.moveBombFromTo(other_kart, this);
-            }
         }   // if sgLengthSquaredVec2(xy)<1.0
     }   // for i
 
-    // Check if any herring was hit.
-    herring_manager->hitHerring(this);
 }   // doObjectInteractions
 
 //-----------------------------------------------------------------------------
@@ -554,11 +531,11 @@ void Kart::collectedHerring(Herring* herring)
 }   // hitHerring
 
 //-----------------------------------------------------------------------------
-void Kart::doZipperProcessing (float delta)
+void Kart::doZipperProcessing (float dt)
 {
-    if ( m_zipper_time_left > delta )
+    if ( m_zipper_time_left > dt )
     {
-        m_zipper_time_left -= delta ;
+        m_zipper_time_left -= dt ;
         if ( m_velocity.xyz[1] < ZIPPER_VELOCITY )
             m_velocity.xyz[1] = ZIPPER_VELOCITY ;
     }
@@ -566,6 +543,7 @@ void Kart::doZipperProcessing (float delta)
 }   // doZipperProcessing
 
 //-----------------------------------------------------------------------------
+// Simulates gears
 float Kart::getActualWheelForce()
 {
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
@@ -619,51 +597,6 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
-void Kart::forceCrash ()
-{
-    m_wheelie_angle = CRASH_PITCH ;
-    btVector3 velocity = m_body->getLinearVelocity();
-
-    velocity.setY( 0.0f );
-    velocity.setX( 0.0f );
-
-    getVehicle()->getRigidBody()->setLinearVelocity( velocity );
-}  // forceCrash
-
-//-----------------------------------------------------------------------------
-#ifndef BULLET
-void Kart::doCollisionAnalysis ( float delta, float hot )
-{
-    if ( m_collided )
-    {
-        if ( m_velocity.xyz[1] > MIN_COLLIDE_VELOCITY )
-        {
-            m_velocity.xyz[1] -= COLLIDE_BRAKING_RATE * delta ;
-        }
-        else if ( m_velocity.xyz[1] < -MIN_COLLIDE_VELOCITY )
-        {
-            m_velocity.xyz[1] += COLLIDE_BRAKING_RATE * delta ;
-        }
-    }   // if collided
-
-    if ( m_crashed && m_velocity.xyz[1] > MIN_CRASH_VELOCITY )
-    {
-        forceCrash () ;
-    }
-    else if ( m_wheelie_angle < 0.0f )
-    {
-        m_wheelie_angle += getWheelieRestoreRate() * delta;
-        if ( m_wheelie_angle >= 0.0f ) m_wheelie_angle = 0.0f ;
-    }
-
-    /* Make sure that the car doesn't go through the floor */
-    if ( isOnGround() )
-    {
-        m_velocity.xyz[2] = 0.0f ;
-    }   // isOnGround
-}   // doCollisionAnalysis
-#endif
-//-----------------------------------------------------------------------------
 void Kart::update (float dt)
 {
     // check if kart is stuck
@@ -696,15 +629,14 @@ void Kart::update (float dt)
         }
         m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
 
-        btTransform pos=m_body->getCenterOfMassTransform();
-        pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
+        m_transform.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
-        pos.setRotation(pos.getRotation()*q_roll*q_pitch);
-        m_body->setCenterOfMassTransform(pos);
-        setTrans(pos);
+        m_transform.setRotation(m_transform.getRotation()*q_roll*q_pitch);
+        m_body->setCenterOfMassTransform(m_transform);
+
         //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());     
     }   // if m_rescue
     m_attachment.update(dt, &m_velocity);
@@ -740,6 +672,9 @@ void Kart::update (float dt)
 
     }   // if there is terrain and it's not a reset material
     doObjectInteractions();
+
+    // Check if any herring was hit.
+    herring_manager->hitHerring(this);
 
     // Save the last valid sector for forced rescue on shortcuts
     if(m_track_sector  != Track::UNKNOWN_SECTOR && 
@@ -877,7 +812,7 @@ float Kart::handleWheelie(float dt)
     }
     if(m_wheelie_angle <=0.0f) return 0.0f;
 
-    const btTransform& chassisTrans = m_body->getCenterOfMassTransform();
+    const btTransform& chassisTrans = getTrans();
     btVector3 targetUp(0.0f, 0.0f, 1.0f);
     btVector3 forwardW (chassisTrans.getBasis()[0][1],
                         chassisTrans.getBasis()[1][1],
@@ -898,6 +833,7 @@ float Kart::handleWheelie(float dt)
     
     angvel                     += deltaangvel;
     m_body->setAngularVelocity(angvel);
+    
     return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
           * m_wheelie_angle/getWheelieMaxPitch();
 }   // handleWheelie
@@ -919,8 +855,8 @@ void Kart::updatePhysics (float dt)
         {   // braking or moving backwards
             if(m_speed > 0.f)
             {   // going forward, apply brake force
-                m_vehicle->applyEngineForce(-1.0f*getBrakeFactor()*engine_power, 2);
-                m_vehicle->applyEngineForce(-1.0f*getBrakeFactor()*engine_power, 3);
+                m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 2);
+                m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 3);
             }
             else
             {   // going backward, apply reverse gear ratio
@@ -1281,19 +1217,8 @@ void Kart::placeModel ()
     // replayed.
     if(!user_config->m_replay_history)
     {
-        btTransform t;
-        if(m_rescue)
-        {
-      // FIXME: can we use motion_state/getTrans as below here?
-      // FIXME: e.g. by setting motion_state appropriately during rescue?
-            t=m_body->getCenterOfMassTransform();
-        } 
-        else
-        {
-            getTrans(&t);
-        }
         float m[4][4];
-        t.getOpenGLMatrix((float*)&m);
+        getTrans().getOpenGLMatrix((float*)&m);
         
         //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
         // Transfer the new position and hpr to m_curr_pos
@@ -1308,6 +1233,7 @@ void Kart::placeModel ()
     const float CENTER_SHIFT = getGravityCenterShift();
     c.xyz[2] -= (0.5f-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
     m_model_transform->setTransform(&c);
+    Moveable::placeModel();
     
     // Check if a kart needs to be rescued.
     if((fabs(m_curr_pos.hpr[2])>60 &&
@@ -1316,16 +1242,6 @@ void Kart::placeModel ()
         m_rescue=true;
         m_time_since_stuck=0.0f;
     }
-#ifndef BULLET
-    sgCoord c ;
-    sgCopyCoord ( &c, &m_curr_pos ) ;
-    c.hpr[1] += m_wheelie_angle ;
-    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle
-                              *SG_DEGREES_TO_RADIANS));
-    m_model -> setTransform ( & c ) ;
-
-#endif
-
 
 }   // placeModel
 

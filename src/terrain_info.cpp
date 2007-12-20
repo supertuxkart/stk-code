@@ -21,7 +21,7 @@
 
 #include "terrain_info.hpp"
 #include "world.hpp"
-
+#include "constants.hpp"
 
 TerrainInfo::TerrainInfo(btVector3 &pos, int frequency)
 {
@@ -38,9 +38,30 @@ void TerrainInfo::update( btVector3& pos)
     {
         world->getTrack()->getTerrainInfo(pos, &m_HoT, 
                                           &m_normal, &m_material);
+        m_normal.normalize();
         m_HoT_counter = 0;
     }
 }   // update
 
 // -----------------------------------------------------------------------------
+/** Returns the pitch of the terrain depending on the heading
+*/
+float TerrainInfo::getTerrainPitch(float heading) const {
+    if(m_HoT==Track::NOHIT) return 0.0f;
+
+    const float X =-sin(heading);
+    const float Y = cos(heading);
+    // Compute the angle between the normal of the plane and the line to
+    // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
+    // simplifying the computation of the scalar product.
+    float pitch = ( m_normal.getX()*X + m_normal.getY()*Y );  // use ( x,y,0)
+        
+    // The actual angle computed above is between the normal and the (x,y,0)
+    // line, so to compute the actual angles 90 degrees must be subtracted.
+    pitch = acosf(pitch) - NINETY_DEGREE_RAD;
+    return pitch;
+}   // getTerrainPitch
+
+// -----------------------------------------------------------------------------
+
 /* EOF */

@@ -19,10 +19,10 @@
 
 #include <SDL/SDL.h>
 
-#include "race_menu.hpp"
-#include "user_config.hpp"
-#include "world.hpp"
 #include "widget_manager.hpp"
+#include "user_config.hpp"
+#include "race_menu.hpp"
+#include "world.hpp"
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"

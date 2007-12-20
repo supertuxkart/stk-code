@@ -29,9 +29,6 @@
 */
 
 /* Handy constants */
-
-#define GRAVITY              (4.0f * 9.80665f)
-#define MILE                 1609.344f
 #define KILOMETER            1000.000f
 #define HOUR                 (60.0f * 60.0f)
 
@@ -41,7 +38,6 @@
   eg  30 * MILES_PER_HOUR  is 30mph expressed in m/sec
 */
 
-#define MILES_PER_HOUR       (MILE/HOUR)
 #define KILOMETERS_PER_HOUR  (KILOMETER/HOUR)
 
 // Zipper related constants:
@@ -53,18 +49,6 @@
 // Traffic (not used at this time)
 // ===============================
 #define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
-
-#define MAX_TURN_RATE             22.5f  /* Degrees per second. */
-
-// Projectile related constants
-// ============================
-#define HOMING_MISSILE_TURN_RATE  (MAX_TURN_RATE*6.0f)
-#define HOMING_MISSILE_PITCH_RATE (MAX_TURN_RATE*0.125f)
-
-#define MAX_HOME_DIST  50.0f
-#define MAX_HOME_DIST_SQD  (MAX_HOME_DIST * MAX_HOME_DIST)
-
-#define DEFAULT_NUM_LAPS_IN_RACE 5
 
 /* M$ compilers don't define M_PI... */
 

@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "num_players.hpp"
 #include "race_manager.hpp"
+#include "num_players.hpp"
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"

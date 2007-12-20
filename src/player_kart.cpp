@@ -164,9 +164,9 @@ void PlayerKart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void PlayerKart::forceCrash()
+void PlayerKart::crashed()
 {
-    Kart::forceCrash();
+    Kart::crashed();
     sound_manager->playSfx( SOUND_CRASH );
 }
 

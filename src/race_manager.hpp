@@ -21,9 +21,9 @@
 #define HEADER_RACEMANAGER_H
 
 #include <vector>
-#include <string>
 #include <algorithm>
 
+#include <string>
 #include "race_setup.hpp"
 #include "cup_data.hpp"
 

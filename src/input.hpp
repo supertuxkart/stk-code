@@ -1,8 +1,6 @@
 #ifndef TUXKART_INPUT_H
 #define TUXKART_INPUT_H
 
-#include <string>
-
 enum AxisDirection {
 	AD_NEGATIVE,
 	AD_POSITIVE,

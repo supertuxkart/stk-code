@@ -226,7 +226,8 @@ public:
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }
     float          getKartLength    () const {return m_kart_length;            }
     void           createPhysics    (ssgEntity *obj);
-    float          getKartHeight () const {return m_kart_height;            }
+    float          getKartHeight    () const {return m_kart_height;            }
+    float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     void           updateBulletPhysics(float dt);
     void           draw          ();
@@ -246,14 +247,10 @@ public:
     virtual void   collectedHerring (Herring* herring);
     virtual void   reset            ();
     virtual void   handleZipper     ();
-    virtual void   forceCrash       ();
+    virtual void   crashed          () {};
     virtual void   doLapCounting    ();
     virtual void   update           (float dt               );
-#ifndef BULLET
-    virtual void   doCollisionAnalysis(float dt, float hot    );
-#endif
     virtual void   doObjectInteractions();
-    virtual void   OutsideTrack     (int isReset) {m_rescue=true;}
 };
 
 class TrafficDriver : public Kart

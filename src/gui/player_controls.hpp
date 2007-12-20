@@ -20,11 +20,10 @@
 #ifndef HEADER_PLAYERCONTROLS_H
 #define HEADER_PLAYERCONTROLS_H
 
-#include "base_gui.hpp"
-#include "player.hpp"
-
 #include <string>
 #include <SDL/SDL.h>
+#include "base_gui.hpp"
+#include "player.hpp"
 
 class PlayerControls: public BaseGUI
 {
