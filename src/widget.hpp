@@ -154,7 +154,6 @@ class Widget
     static const float MIN_TEXT_SCALE;
     float m_text_scale; //Used for the pulse effect
 
-/*public:*/
     Widget
     (
         const int X_,

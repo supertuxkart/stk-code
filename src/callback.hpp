@@ -20,10 +20,6 @@
 #ifndef CALLBACK_H
 #define CALLBACK_H
 
-#include <string>
-#include <plib/sg.h>
-#include <plib/ssg.h>
-
 class Callback
 {
 public:
