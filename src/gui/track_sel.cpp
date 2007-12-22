@@ -77,31 +77,25 @@ TrackSel::TrackSel()
         widget_manager->setWgtText( WTOK_TRACK0 + i + 1, track_manager->getTrack(i+1)->getName());
         widget_manager->breakLine();
     }
-//FIXME: till the widget can display the track map in some way, the image
-//widgets will stay commented out.
+
     widget_manager->setInitialActivationState( false );
-#if 0
     widget_manager->addWgt(WTOK_IMG0, 35, 35);
+    widget_manager->hideWgtRect( WTOK_IMG0 );
     widget_manager->hideWgtText(WTOK_IMG0);
-    widget_manager->showWgtTexture(WTOK_IMG0);
-#endif
 
     widget_manager->addWgt( WTOK_EMPTY, 5, 35 );
     widget_manager->hideWgtRect( WTOK_EMPTY );
     widget_manager->hideWgtText( WTOK_EMPTY );
 
-#if 0
     widget_manager->addWgt(WTOK_IMG1, 35, 35);
+    widget_manager->hideWgtRect( WTOK_IMG1 );
     widget_manager->hideWgtText(WTOK_IMG1);
-    widget_manager->showWgtTexture(WTOK_IMG1);
-#endif
     widget_manager->breakLine();
 
     widget_manager->addWgt( WTOK_AUTHOR, 80, 7 );
     widget_manager->setWgtText( WTOK_AUTHOR, "No track selected" );
     widget_manager->setWgtTextSize( WTOK_AUTHOR, WGT_FNT_MED );
 
-//FIXME: Right now, the image and the author's name is not controlled by the widget manager.
     widget_manager->layout(WGT_AREA_TOP);
 }
 
@@ -114,14 +108,71 @@ TrackSel::~TrackSel()
 //-----------------------------------------------------------------------------
 void TrackSel::update(float dt)
 {
-    BaseGUI::update(dt);
-
-    const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
-    const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
+    const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
+    const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
 
     widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
 
+    const std::string& screenshot = TRACK->getScreenshotFile();
+    const std::string& topview    = TRACK->getTopviewFile();
 
+    if( !screenshot.empty() && !topview.empty() )
+    {
+        Material *m = material_manager->getMaterial( screenshot );
+        widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+        widget_manager->showWgtRect( WTOK_IMG0 );
+        widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_IMG0 );
+        widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+        m = material_manager->getMaterial( topview );
+        widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+        widget_manager->showWgtRect( WTOK_IMG1 );
+        widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_IMG1 );
+        widget_manager->hideWgtTrack( WTOK_IMG1 );
+    }
+    else if( topview.empty() )
+    {
+        Material *m = material_manager->getMaterial( screenshot );
+        widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+        widget_manager->showWgtRect( WTOK_IMG0 );
+        widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_IMG0 );
+        widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+        widget_manager->hideWgtRect( WTOK_IMG1 );
+        widget_manager->hideWgtTexture( WTOK_IMG1 );
+        widget_manager->setWgtTrackNum( WTOK_IMG1, SELECTED_TRACK );
+        widget_manager->showWgtTrack( WTOK_IMG1 );
+    }
+    else if( screenshot.empty() )
+    {
+        widget_manager->hideWgtRect( WTOK_IMG0 );
+        widget_manager->hideWgtTexture( WTOK_IMG0 );
+        widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
+        widget_manager->showWgtTrack( WTOK_IMG0 );
+
+        Material *m = material_manager->getMaterial( topview );
+        widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+        widget_manager->showWgtRect( WTOK_IMG1 );
+        widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_IMG1 );
+        widget_manager->hideWgtTrack( WTOK_IMG1 );
+    }
+    else //if( screenshot.empty() && topview.empty() )
+    {
+        widget_manager->hideWgtRect( WTOK_IMG0 );
+        widget_manager->hideWgtTexture( WTOK_IMG0 );
+        widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
+        widget_manager->showWgtTrack( WTOK_IMG0 );
+
+        widget_manager->hideWgtRect( WTOK_IMG1 );
+        widget_manager->hideWgtTexture( WTOK_IMG1 );
+        widget_manager->hideWgtTrack( WTOK_IMG1 );
+    }
+
+#if 0
     // draw a track preview of the currently highlighted track menu entry
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -129,8 +180,6 @@ void TrackSel::update(float dt)
     glPushMatrix();
     glLoadIdentity();
     glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
-    const std::string& screenshot = TRACK->getScreenshotFile();
-    const std::string& topview    = TRACK->getTopviewFile();
     if(screenshot.size()==0 && topview.size()==0)
     {
         glDisable ( GL_TEXTURE_2D ) ;
@@ -186,7 +235,12 @@ void TrackSel::update(float dt)
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+#endif
 
+//Keep the BaseGUI::update() call at the bottom of the function, otherwise
+//the screen will be drawn once without being fully prepared, and this is
+//noticeable sometimes.
+    BaseGUI::update(dt);
 }
 
 //-----------------------------------------------------------------------------

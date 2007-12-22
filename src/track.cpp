@@ -508,14 +508,13 @@ void Track::addDebugToScene(int type) const
 
 void Track::drawScaled2D(float x, float y, float w, float h) const
 {
-    sgVec2 sc ;
-    sgSubVec2 ( sc, m_driveline_max, m_driveline_min ) ;
+    sgVec2 sc;
+    sgSubVec2 ( sc, m_driveline_max, m_driveline_min );
 
-    float sx = (w-20.0f) / sc[0]; // leave 10 pix space left and right
-    x+=10.0;
-    float sy = h / sc[1] ;
+    float sx = w / sc[0];
+    float sy = h / sc[1];
 
-    if(sx>sy)
+    if( sx > sy )
     {
         sx = sy;
         x += w/2 - sc[0]*sx/2;
@@ -884,14 +883,27 @@ Track::loadDriveline()
     float d = 0.0f ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        if ( m_driveline[i][0] < m_driveline_min[0] )
-            m_driveline_min[0] = m_driveline[i][0] ;
-        if ( m_driveline[i][1] < m_driveline_min[1] )
-            m_driveline_min[1] = m_driveline[i][1] ;
-        if ( m_driveline[i][0] > m_driveline_max[0] )
-            m_driveline_max[0] = m_driveline[i][0] ;
-        if ( m_driveline[i][1] > m_driveline_max[1] )
-            m_driveline_max[1] = m_driveline[i][1] ;
+        //Both drivelines must be checked to get the true size of
+        //the drivelines, and using the center driveline is not
+        //good enough.
+        if ( m_right_driveline[i][0] < m_driveline_min[0] )
+            m_driveline_min[0] = m_right_driveline[i][0] ;
+        if ( m_right_driveline[i][1] < m_driveline_min[1] )
+            m_driveline_min[1] = m_right_driveline[i][1] ;
+        if ( m_right_driveline[i][0] > m_driveline_max[0] )
+            m_driveline_max[0] = m_right_driveline[i][0] ;
+        if ( m_right_driveline[i][1] > m_driveline_max[1] )
+            m_driveline_max[1] = m_right_driveline[i][1] ;
+
+        if ( m_left_driveline[i][0] < m_driveline_min[0] )
+            m_driveline_min[0] = m_left_driveline[i][0] ;
+        if ( m_left_driveline[i][1] < m_driveline_min[1] )
+            m_driveline_min[1] = m_left_driveline[i][1] ;
+        if ( m_left_driveline[i][0] > m_driveline_max[0] )
+            m_driveline_max[0] = m_left_driveline[i][0] ;
+        if ( m_left_driveline[i][1] > m_driveline_max[1] )
+            m_driveline_max[1] = m_left_driveline[i][1] ;
+
 
         m_distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
 

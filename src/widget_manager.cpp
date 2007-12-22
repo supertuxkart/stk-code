@@ -92,6 +92,9 @@ bool WidgetManager::addWgt
     new_id.widget->m_scroll_speed_x = (float)m_default_scroll_x_speed;
     new_id.widget->m_scroll_speed_y = (float)m_default_scroll_y_speed;
 
+    new_id.widget->m_enable_track = m_default_show_track;
+    new_id.widget->m_track_num = m_default_track_num;
+
     m_elems.push_back(WidgetElement(ET_WGT, (int)m_widgets.size()));
     m_widgets.push_back(new_id);
 
@@ -776,8 +779,20 @@ void WidgetManager::setInitialScrollState
 }
 
 //-----------------------------------------------------------------------------
+void WidgetManager::setInitialTrackState
+(
+    const bool SHOW,
+    const int TRACK
+)
+{
+    m_default_show_track = SHOW;
+    m_default_track_num = TRACK;
+}
+
+//-----------------------------------------------------------------------------
 void WidgetManager::restoreDefaultStates()
 {
+    //FIXME: maybe instead of 'default' these variables should be 'initial'
     m_default_active = false;
     m_default_show_rect = false;
     m_default_rect_round_corners = WGT_AREA_NONE;
@@ -792,6 +807,8 @@ void WidgetManager::restoreDefaultStates()
     m_default_scroll_preset_y = WGT_SCROLL_CENTER;
     m_default_scroll_x_speed = 0;
     m_default_scroll_y_speed = 0;
+    m_default_show_track = false;
+    m_default_track_num = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -1083,6 +1100,42 @@ void WidgetManager::pulseWgt(const int TOKEN) const
 }
 
 //-----------------------------------------------------------------------------
+void WidgetManager::showWgtTrack( const int TOKEN )
+{
+    const int ID = findId( TOKEN );
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_track = true;
+    else
+    {
+        std::cerr << "WARNING: tried to show the track of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::hideWgtTrack( const int TOKEN )
+{
+    const int ID = findId( TOKEN );
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_track = false;
+    else
+    {
+        std::cerr << "WARNING: tried to hide the track of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtTrackNum( const int TOKEN, const int TRACK )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_track_num = TRACK;
+    else
+    {
+        std::cerr << "WARNING: tried to set the track number of an unnamed "
+            << "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
 void WidgetManager::lightenWgtColor(const int TOKEN)
 {
     const int ID = findId(TOKEN);
@@ -1305,7 +1358,7 @@ int WidgetManager::findRightWidget(const int START_WGT) const
         curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
 
         //Notice that the order of this substraction is the *only* difference
-        //from the find_left_widget() function
+        //from the findLeftWidget() function
         x_dist = curr_wgt_x_center - START_WGT_X_CENTER;
         y_dist = abs( curr_wgt_y_center - START_WGT_Y_CENTER );
 

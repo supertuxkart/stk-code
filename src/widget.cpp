@@ -25,6 +25,8 @@
 #include "user_config.hpp"
 
 #include "constants.hpp"
+#include "track_manager.hpp"
+#include "track.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -59,8 +61,10 @@ const GLfloat WGT_LIGHT_TRANS_GRAY   [4] = {1.0f, 1.0f, 1.0f, 0.8f};
 const GLfloat WGT_LIGHT_TRANS_BLACK  [4] = {0.5f, 0.5f, 0.5f, 0.8f};
 const GLfloat WGT_LIGHT_TRANS_YELLOW [4] = {1.0f, 1.0f, 0.5f, 0.8f};
 const GLfloat WGT_LIGHT_TRANS_RED    [4] = {1.0f, 0.5f, 0.5f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_GREEN  [4] = {0.5f, 1.0f, 0.5f, 0.5f};
+const GLfloat WGT_LIGHT_TRANS_GREEN  [4] = {0.5f, 1.0f, 0.5f, 0.8f};
 const GLfloat WGT_LIGHT_TRANS_BLUE   [4] = {0.5f, 0.5f, 1.0f, 0.8f};
+
+const GLfloat WGT_TRANSPARENT [4] = {1.0f, 1.0f, 1.0f, 0.0f};
 
 Widget::Widget
 (
@@ -133,6 +137,25 @@ void Widget::update(const float DELTA)
         {
             std::cerr << "Warning: widget tried to draw null rect list.\n";
             std::cerr << "(Did you created the rect?)\n";
+        }
+    }
+
+    if( m_enable_track )
+    {
+        if( m_track_num > track_manager->getTrackCount() - 1)
+        {
+            std::cerr << "Warning: widget tried to draw a track with a " <<
+                "number bigger than the amount of tracks available.\n";
+        }
+
+        if( m_track_num != -1 )
+        {
+            track_manager->getTrack( m_track_num )->drawScaled2D( m_x, m_y,
+                m_width, m_height);
+        }
+        else
+        {
+            std::cerr << "Warning: widget tried to draw an unset track.\n";
         }
     }
 

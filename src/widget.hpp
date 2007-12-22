@@ -112,6 +112,8 @@ extern const GLfloat WGT_LIGHT_TRANS_RED    [4];
 extern const GLfloat WGT_LIGHT_TRANS_GREEN  [4];
 extern const GLfloat WGT_LIGHT_TRANS_BLUE   [4];
 
+extern const GLfloat WGT_TRANSPARENT   [4];
+
 
 class Widget
 {
@@ -140,13 +142,17 @@ class Widget
     std::string m_text;
     WidgetFontSize m_text_size;
 
-
     static const int MAX_SCROLL;
     bool m_enable_scroll;
     float m_scroll_pos_x;
     float m_scroll_pos_y;
     float m_scroll_speed_x;
     float m_scroll_speed_y;
+
+    //The widget calls the Track::drawScaled2D() function to draw a given
+    //track, and m_track_num tells which track to draw.
+    int m_enable_track;
+    int m_track_num;
 
     /* Delta time dependant features, these deactivate after a certain time,
      * and are dependant on the delta time. They have animations. */

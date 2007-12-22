@@ -108,6 +108,10 @@ class WidgetManager
     int m_default_scroll_x_speed;
     int m_default_scroll_y_speed;
 
+    int m_default_show_track;
+    int m_default_track_num;
+
+
     bool isColumnBreak( const int BREAK_POST ) const;
 
     int findId(const int TOKEN) const;
@@ -170,12 +174,14 @@ public:
     void setInitialActivationState( const bool ACTIVE);
     void setInitialRectState(const bool SHOW, const WidgetArea ROUND_CORNERS, const GLfloat* const COLOR );
     void setInitialTextureState(const bool SHOW, const int TEXTURE );
+
     void setInitialTextState
     (
         const bool SHOW,
         const std::string TEXT,
         const WidgetFontSize SIZE
     );
+
     void setInitialScrollState
     (
         const bool ENABLE,
@@ -184,6 +190,13 @@ public:
         const int X_SPEED,
         const int Y_SPEED
     );
+
+    void setInitialTrackState
+    (
+        const bool SHOW,
+        const int TRACK
+    );
+
     void restoreDefaultStates();
 
     void activateWgt(const int TOKEN);
@@ -215,6 +228,10 @@ public:
     void setWgtYScrollPos( const int TOKEN, const WidgetScrollPos POS );
     void setWgtXScrollSpeed( const int TOKEN, const float SPEED );
     void setWgtYScrollSpeed( const int TOKEN, const float SPEED );
+
+    void showWgtTrack( const int TOKEN );
+    void hideWgtTrack( const int TOKEN );
+    void setWgtTrackNum( const int TOKEN, const int TRACK );
 
     /* Activated widget features. */
     void pulseWgt( const int TOKEN ) const;
