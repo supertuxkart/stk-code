@@ -22,7 +22,6 @@
 
 #include "stk_config.hpp"
 class Kart;
-class ssgEntity;
 
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
 // and TINYTUX being the last one. So if new elemts are added, make sure
