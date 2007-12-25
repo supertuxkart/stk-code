@@ -393,6 +393,7 @@ int main(int argc, char *argv[] )
         
         //FIXME: this needs a better organization
         drv_init();
+        ssgInit () ;
         
         game_manager = new GameManager ();
         // loadMaterials needs ssgLoadTextures (internally), which can
@@ -407,6 +408,12 @@ int main(int argc, char *argv[] )
         herring_manager         -> loadDefaultHerrings();
         attachment_manager      -> loadModels         ();
         scene = new Scene();
+
+        //For some reason, calling this before the material loading screws
+        //the background picture.
+        fntInit();
+        init_fonts();
+
         widget_manager   = new WidgetManager;
         menu_manager->switchToMainMenu();
 
@@ -466,6 +473,7 @@ int main(int argc, char *argv[] )
         fprintf(stderr,_("\nAborting SuperTuxKart\n"));
     }
 
+    /* Program closing...*/
     user_config->saveConfig();
 
     drv_deinit();
@@ -477,6 +485,8 @@ int main(int argc, char *argv[] )
     }
 
     delete highscore_manager;
+    delete_fonts();
+
     return 0 ;
 }
 

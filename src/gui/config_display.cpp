@@ -30,7 +30,8 @@
 #  define snprintf _snprintf
 #endif
 
-enum WidgetTokens {
+enum WidgetTokens
+{
     WTOK_TITLE,
 
     WTOK_FULLSCREEN,
@@ -57,7 +58,8 @@ ConfigDisplay::ConfigDisplay()
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
+        WGT_FONT_GUI );
 
     widget_manager->insertColumn();
     widget_manager->addWgt( WTOK_TITLE, 40, 7);

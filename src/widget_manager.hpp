@@ -39,7 +39,6 @@
  * reset when you call reset() or you can use resetDefaultStates().
  */
 
-
 class WidgetManager
 {
     struct WidgetID
@@ -60,7 +59,6 @@ class WidgetManager
         Widget *widget;
     };
 
-    //The point of adding 'elements' is to use a vector to keep the order
     enum ElementTypes
     {
         ET_WGT,
@@ -71,7 +69,7 @@ class WidgetManager
     /* I decided to waste one integer per break/column with the wgt_pos
      * variable inside the WidgetElement struct, since otherwise we
      * would need 2 vectors for breaks and columns, which would use more
-     * memory, be slower and be more complex than this. -Coz
+     * memory, be slower and more complex than this. -Coz
      */
     struct WidgetElement
     {
@@ -93,14 +91,18 @@ class WidgetManager
     int m_selected_wgt_token;
 
     bool m_default_active;
+
     bool m_default_show_rect;
     bool m_default_rect_round_corners;
     const GLfloat *m_default_rect_color;
+
     bool m_default_show_texture;
     int m_default_texture;
+
     bool m_default_show_text;
     std::string m_default_text;
     WidgetFontSize m_default_text_size;
+    WidgetFont m_default_font;
 
     bool m_default_enable_scroll;
     WidgetScrollPos m_default_scroll_preset_x;
@@ -130,7 +132,6 @@ class WidgetManager
 	int handleFinish(const int);
 
 public:
-    //FIXME: maybe I should get this out of this class?
     static const int WGT_NONE;
 
     WidgetManager();
@@ -179,7 +180,8 @@ public:
     (
         const bool SHOW,
         const std::string TEXT,
-        const WidgetFontSize SIZE
+        const WidgetFontSize SIZE,
+        const WidgetFont FONT
     );
 
     void setInitialScrollState
@@ -215,6 +217,7 @@ public:
     void setWgtText( const int TOKEN, const char* TEXT );
     void setWgtText( const int TOKEN, const std::string TEXT );
     void setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE);
+    void setWgtFont( const int TOKEN, const WidgetFont FONT);
     void showWgtText( const int TOKEN );
     void hideWgtText( const int TOKEN );
 

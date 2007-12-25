@@ -26,18 +26,9 @@ Font* font_race;
 
 int init_fonts()
 {
-    static int plib_font_was_init=0;
-    // Make sure that fntInit is only called once, since
-    // init_fonts might be called more than once
-    // (when switching to/from fullscreen mode, see sdldrv).
-    if(!plib_font_was_init)
-    {
-        fntInit();
-        plib_font_was_init=1;
-    }
-    font_gui  = new Font("fonts/AvantGarde-Demi.txf");
+    font_gui = new Font("fonts/AvantGarde-Demi.txf");
     font_race = new Font("fonts/DomesticManners.txf");
-    return (font_gui && font_race);
+    return ( font_gui && font_race );
 }   // init_fonts
 
 // =============================================================================

@@ -22,7 +22,8 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
-enum WidgetTokens {
+enum WidgetTokens
+{
     WTOK_TITLE,
     WTOK_CONTROLS,
     WTOK_DISPLAY,

@@ -28,7 +28,8 @@
 #include "material_manager.hpp"
 #include "translation.hpp"
 
-enum WidgetTokens {
+enum WidgetTokens
+{
     WTOK_TITLE,
 
     WTOK_TRACK0,
@@ -68,7 +69,9 @@ TrackSel::TrackSel()
     const bool SHOW_TEXT = true;
     widget_manager->setInitialActivationState(true);
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_SML );
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_SML,
+        WGT_FONT_GUI );
+
     for (unsigned int i = 0; i != track_manager->getTrackCount(); i += 2)
     {
         widget_manager->addWgt( WTOK_TRACK0 + i, 40, 7);

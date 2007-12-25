@@ -35,6 +35,7 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(default:4312)
 #endif
+
 #include "gui/font.hpp"
 
 #ifdef __APPLE__
@@ -61,8 +62,14 @@ enum WidgetArea //One of the uses of this, is for rounded corners
     WGT_AREA_ALL = (WGT_AREA_TOP | WGT_AREA_BOT)
 };
 
-//The lowest scroll values here must be bigger or lower than
-//Widget::MAX_SCROLL
+enum WidgetFont
+{
+    WGT_FONT_GUI,
+    WGT_FONT_RACE
+};
+
+//The lowest scroll values here must be bigger than
+//Widget::MAX_SCROLL or lower than -Widget::MAX_SCROLL
 enum WidgetScrollPos
 {
     //For the X axis
@@ -138,6 +145,7 @@ class Widget
     bool m_enable_texture;
     GLuint m_texture;
 
+    Font *m_font;
     bool m_enable_text;
     std::string m_text;
     WidgetFontSize m_text_size;
@@ -181,6 +189,8 @@ class Widget
     /* Convenience functions. */
     void lightenColor();
     void darkenColor();
+
+    void setFont( const WidgetFont FONT);
 
 };
 

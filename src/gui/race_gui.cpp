@@ -28,8 +28,50 @@
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
+#include "widget_manager.hpp"
 #include "translation.hpp"
 #include "font.hpp"
+
+//MAX_TOP_POS is the maximum number of racers to be shown in the bar to the
+//left where the positions are drawn.
+static const int MAX_TOP_POS = 10;
+
+static const int MAX_HUMANS = 4;
+
+enum WidgetTokens
+{
+    WTOK_FPS,
+    WTOK_EMPTY1,
+    WTOK_CLOCK,
+
+    WTOK_EMPTY2,
+
+    WTOK_FIRST_TOP_IMG,
+    WTOK_LAST_TOP_IMG = WTOK_FIRST_TOP_IMG + MAX_TOP_POS,
+
+    WTOK_FIRST_TOP_TEXT,
+    WTOK_LAST_TOP_TEXT = WTOK_FIRST_TOP_TEXT + MAX_TOP_POS,
+
+    WTOK_FIRST_MESSAGE,
+    WTOK_LAST_MESSAGE = WTOK_FIRST_MESSAGE + MAX_HUMANS,
+
+    WTOK_FIRST_POWERBAR,
+    WTOK_LAST_POWERBAR = WTOK_FIRST_POWERBAR + MAX_HUMANS,
+
+    WTOK_FIRST_POSITION,
+    WTOK_LAST_POSITION = WTOK_FIRST_POSITION + MAX_HUMANS,
+
+    WTOK_MAP,
+
+    WTOK_FIRST_LAP,
+    WTOK_LAST_LAP = WTOK_FIRST_LAP + MAX_HUMANS,
+
+    WTOK_FIRST_WHEEL,
+    WTOK_LAST_WHEEL = WTOK_FIRST_WHEEL + MAX_HUMANS,
+
+    WTOK_FIRST_SPEED,
+    WTOK_LAST_SPEED = WTOK_FIRST_SPEED + MAX_HUMANS
+};
 
 RaceGUI::RaceGUI(): m_time_left(0.0)
 {
@@ -60,11 +102,23 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
     m_fps_timer.update();
     m_fps_timer.setMaxDelta(1000);
 
+    const bool HIDE_TEXT = false;
+    widget_manager->setInitialTextState(HIDE_TEXT, "", WGT_FNT_LRG,
+        WGT_FONT_RACE );
+
+    widget_manager->addWgt( WTOK_FPS, 30, 10 );
+    widget_manager->addWgt( WTOK_EMPTY1, 40, 10 );
+    widget_manager->addWgt( WTOK_CLOCK, 30, 10 );
+    widget_manager->breakLine();
+
+    widget_manager->layout( WGT_AREA_TOP );
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+    widget_manager->reset();
+
     //FIXME: does all that material stuff need freeing somehow?
 }   // ~Racegui
 
@@ -128,7 +182,13 @@ RaceGUI::handle(GameAction ga, int value)
 				m_fps_timer.reset();
 				m_fps_timer.setMaxDelta(1000);
 				m_fps_counter=0;
+
+                widget_manager->showWgtText( WTOK_FPS );
 			}
+            else
+            {
+                widget_manager->hideWgtText( WTOK_FPS );
+            }
 			break;
 		case GA_DEBUG_TOGGLE_WIREFRAME:
 			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
@@ -161,6 +221,8 @@ void RaceGUI::update(float dt)
     assert(world != NULL);
     drawStatusText(world->m_race_setup, dt);
     cleanupMessages();
+
+    BaseGUI::update( dt );
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -174,7 +236,8 @@ void RaceGUI::drawFPS ()
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-    font_race->PrintShadow(m_fps_string,48, 0, user_config->m_height-50);
+
+    widget_manager->setWgtText( WTOK_FPS, m_fps_string );
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
@@ -188,8 +251,9 @@ void RaceGUI::drawTimer ()
     m_time_left = world->m_clock;
 
     TimeToString(m_time_left, str);
-    font_race->PrintShadow(str, 60, user_config->m_width-260, 
-                           user_config->m_height-64);
+
+    widget_manager->showWgtText( WTOK_CLOCK );
+    widget_manager->setWgtText( WTOK_CLOCK, str );
 }   // drawTimer
 
 //-----------------------------------------------------------------------------

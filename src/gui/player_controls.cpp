@@ -70,7 +70,8 @@ PlayerControls::PlayerControls(int whichPlayer):
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED );
+    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
+        WGT_FONT_GUI );
 
     widget_manager->addWgt( WTOK_TITLE, 60, 7);
     sprintf(m_heading, _("Choose your controls, %s"),

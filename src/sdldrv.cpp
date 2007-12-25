@@ -21,8 +21,6 @@
 
 #include <SDL/SDL.h>
 
-#include <plib/ssg.h>
-
 #include "input.hpp"
 #include "actionmap.hpp"
 #include "user_config.hpp"
@@ -82,8 +80,6 @@ void drv_init()
         stickInfos[i] = new StickInfo(i);
 	
     SDL_WM_SetCaption("SuperTuxKart", NULL);
-
-    ssgInit () ;
 
 	// Get into menu mode initially.
 	drv_setMode(MENU);

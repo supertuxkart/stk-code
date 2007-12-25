@@ -23,7 +23,8 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 
-enum WidgetTokens {
+enum WidgetTokens
+{
     WTOK_PLAYER_2 = 2,
     WTOK_PLAYER_3,
     WTOK_PLAYER_4,

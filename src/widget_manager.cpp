@@ -20,9 +20,6 @@
 
 #include "user_config.hpp"
 
-#include "gui/font.hpp"
-
-//TEMP
 #include <iostream>
 #include <cstdlib>
 #include <iterator>
@@ -33,9 +30,10 @@ WidgetManager *widget_manager;
 const int WidgetManager::WGT_NONE = -1;
 
 WidgetManager::WidgetManager() :
-m_prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WGT_NONE )
+m_prev_layout_pos(WGT_AREA_NONE),
+m_x( -1 ), m_y( -1 ),
+m_selected_wgt_token( WGT_NONE )
 {
-    init_fonts();
     restoreDefaultStates();
 }
 
@@ -43,7 +41,6 @@ m_prev_layout_pos(WGT_AREA_NONE), m_x( -1 ), m_y( -1 ), m_selected_wgt_token( WG
 WidgetManager::~WidgetManager()
 {
     reset();
-    delete_fonts();
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +82,7 @@ bool WidgetManager::addWgt
     new_id.widget->m_enable_text = m_default_show_text;
     new_id.widget->m_text.assign(m_default_text);
     new_id.widget->m_text_size = m_default_text_size;
+    new_id.widget->setFont( m_default_font );
 
     new_id.widget->m_enable_scroll  = m_default_enable_scroll;
     new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_preset_x;
@@ -753,12 +751,14 @@ void WidgetManager::setInitialTextState
 (
     const bool SHOW,
     const std::string TEXT,
-    const WidgetFontSize SIZE
+    const WidgetFontSize SIZE,
+    const WidgetFont FONT
 )
 {
     m_default_show_text = SHOW;
     m_default_text = TEXT;
     m_default_text_size = SIZE;
+    m_default_font = FONT;
 }
 
 //-----------------------------------------------------------------------------
@@ -800,6 +800,7 @@ void WidgetManager::restoreDefaultStates()
     m_default_show_texture = false;
     m_default_texture = 0;
     m_default_show_text = false;
+    m_default_font = WGT_FONT_GUI;
     m_default_text = "";
     m_default_text_size = WGT_FNT_MED;
     m_default_enable_scroll = false;
@@ -952,6 +953,18 @@ void WidgetManager::setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE)
     else
     {
         std::cerr << "WARNING: tried to set the text size of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtFont( const int TOKEN, const WidgetFont FONT )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->setFont( FONT );
+    else
+    {
+        std::cerr << "WARNING: tried to set the font of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }

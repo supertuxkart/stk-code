@@ -224,8 +224,7 @@ void MenuManager::update()
                     widget_manager->lightenWgtColor( saved_widget );
                     widget_manager->pulseWgt( saved_widget );
                     widget_manager->setSelectedWgt(saved_widget);
-                } else if( widget_manager->getSelectedWgt() !=
-                    WidgetManager::WGT_NONE )
+                } else if( widget_manager->getSelectedWgt() != WidgetManager::WGT_NONE )
                 {
                     widget_manager->lightenWgtColor (
                         widget_manager->getSelectedWgt() );

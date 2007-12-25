@@ -19,8 +19,6 @@
 
 #include "widget.hpp"
 
-#include "gui/font.hpp"
-
 //FIXME: this should be removed when the scrolling is cleaned
 #include "user_config.hpp"
 
@@ -142,7 +140,7 @@ void Widget::update(const float DELTA)
 
     if( m_enable_track )
     {
-        if( m_track_num > track_manager->getTrackCount() - 1)
+        if( m_track_num > (int)(track_manager->getTrackCount()) - 1)
         {
             std::cerr << "Warning: widget tried to draw a track with a " <<
                 "number bigger than the amount of tracks available.\n";
@@ -184,7 +182,7 @@ void Widget::update(const float DELTA)
     // values to the left.
 
     float left, right;
-    font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
+    m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
     int text_width = (int)(right - left + 0.99);
 
     const int Y_LIMIT = lines * m_text_size + m_height;
@@ -334,7 +332,7 @@ void Widget::update(const float DELTA)
             line_end = m_text.find_first_of('\n', line_start);
             if( draw )
             {
-                font_gui->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
+                m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
                     x_pos, y_pos,
                     255, 255, 255, m_text_scale, m_text_scale);
             }
@@ -495,7 +493,7 @@ void Widget::resizeToText()
     if( !m_text.empty() )
     {
         float left, right, bottom, top;
-        font_gui->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
+        m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
 
         const int TEXT_WIDTH = (int)(right - left);
         const int TEXT_HEIGHT = (int)(top - bottom);
@@ -611,4 +609,19 @@ void Widget::darkenColor()
     {
         m_rect_color = WGT_TRANS_BLUE;
     }
+}
+
+//-----------------------------------------------------------------------------
+void Widget::setFont( const WidgetFont FONT )
+{
+    switch( FONT )
+    {
+        case WGT_FONT_GUI:
+            m_font = font_gui;
+            break;
+
+        case WGT_FONT_RACE:
+            m_font = font_race;
+            break;
+    };
 }

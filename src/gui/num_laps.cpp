@@ -25,7 +25,8 @@
 #  define snprintf _snprintf
 #endif
 
-enum WidgetTokens {
+enum WidgetTokens
+{
     WTOK_TITLE,
 
     WTOK_NUMLAPS,
