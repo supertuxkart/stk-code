@@ -52,6 +52,7 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     m_shape             = NULL;
     m_mass              = 1.0f;
 
+    setUserPointerType(UP_PROJECTILE);
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
@@ -88,7 +89,7 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
     trans  *= offset_transform;
 
     m_shape = createShape();   // get shape
-    createBody(m_mass, trans, m_shape, Moveable::MOV_PROJECTILE);
+    createBody(m_mass, trans, m_shape, UserPointer::UP_PROJECTILE);
     world->getPhysics()->addBody(getBody());
 
     // Simplified rockets: no gravity
@@ -193,8 +194,6 @@ void Flyable::placeModel()
     float m[4][4];
     t.getOpenGLMatrix((float*)&m);
     sgSetCoord(&m_curr_pos, m);
-    const btVector3 &v=m_body->getLinearVelocity();
-    sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
     Moveable::placeModel();
 }  // placeModel
 

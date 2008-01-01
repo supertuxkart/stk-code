@@ -51,13 +51,13 @@ private:
     class CollisionPair {
     public:
         void                  *a, *b;
-        Moveable::MoveableType type_a, type_b;
+        UserPointer::UserPointerType type_a, type_b;
         // The entries in Collision Pairs are sorted: if a projectile
         // is included, it's always 'a'. If only two karts are reported
         // the first kart pointer is the smaller one
-        CollisionPair(void *a1, Moveable::MoveableType atype,
-                      void *b1, Moveable::MoveableType btype) {
-            if(atype==Moveable::MOV_KART && btype==Moveable::MOV_KART && a1>b1) {
+        CollisionPair(void *a1, UserPointer::UserPointerType atype,
+                      void *b1, UserPointer::UserPointerType btype) {
+            if(atype==Moveable::UP_KART && btype==Moveable::UP_KART && a1>b1) {
 	        a=b1;b=a1; type_a=btype; type_b=atype;
 	    } else {
 	        a=a1; b=b1; type_a=atype; type_b=btype;

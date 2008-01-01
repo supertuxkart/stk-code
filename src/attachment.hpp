@@ -74,7 +74,7 @@ public:
                                           ?stk_config->m_anvil_speed_factor:1.0f;
                                     }
     void  hitGreenHerring();
-    void  update (float dt, sgCoord *velocity);
+    void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
 };
 

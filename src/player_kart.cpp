@@ -223,7 +223,7 @@ void PlayerKart::addMessages()
         // Display a warning message if the kart is going back way (unless
         // the kart has already finished the race).
         if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-            getVelocity () -> xyz [ 1 ] > 0.0  && !raceIsFinished() )
+            getVelocity().getY() > 0.0f  && !raceIsFinished() )
         {
             m->addMessage(_("WRONG WAY!"), this, -1.0f, 60);
         }  // if angle is too big

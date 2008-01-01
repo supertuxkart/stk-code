@@ -894,6 +894,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\triangle_mesh.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\user_config.cpp"
 				>
 			</File>
@@ -1308,7 +1312,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\triangle_mesh.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\user_config.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\user_pointer.hpp"
 				>
 			</File>
 			<File

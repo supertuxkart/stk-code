@@ -78,7 +78,6 @@ protected:
     KartControl  m_controls;           // The position of the karts controls
     int          m_track_sector;       // index in driveline, special values
                                        // e.g. UNKNOWN_SECTOR can be negative!
-    float        m_zipper_time_left;
     sgVec2       m_last_track_coords;
     sgVec3       m_curr_track_coords;
     sgVec3       m_velocity_wc;        // velocity in world coordinates
@@ -87,7 +86,8 @@ protected:
     bool         m_skid_rear;          // true if rear tires are skidding
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
-    float        m_wheelie_angle ;
+    float        m_wheelie_angle;
+    float        m_zipper_time_left;   // zipper time left
     float        m_lap_start_time;     // Time at start of a new lap
     float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
@@ -139,34 +139,29 @@ protected:
     void  load_wheels          (ssgBranch* obj);
 
 public:
-    Kart(const KartProperties* kartProperties_, int position_, sgCoord init_pos);
-    virtual ~Kart();
-
-    void loadData();
-
-    void placeModel ();
-    const KartProperties* getKartProperties() const
-        { return m_kart_properties; }
+                   Kart(const KartProperties* kartProperties_, int position_, 
+                        sgCoord init_pos);
+    virtual       ~Kart();
+    void           loadData();
+    void           placeModel ();
+    const KartProperties* 
+                   getKartProperties   () const      { return m_kart_properties; }
     void           setKartProperties   (const KartProperties *kp)
-    { m_kart_properties=kp;}
+                                          { m_kart_properties=kp;                }
     void           attach              (attachmentType attachment_, float time)
-    { m_attachment.set(attachment_, time);}
-    void           gotZipper           (float angle, float time)
-    {
-        m_wheelie_angle=angle;
-        m_zipper_time_left=time;
-    }
+                                          { m_attachment.set(attachment_, time); }
     void           setCollectable      (CollectableType t, int n)
-                                           { m_collectable.set(t, n);            }
-    void           setPosition         (int p)    {m_race_position = p;          }
-    int            getSector           () { return m_track_sector;               }
-    float          getDistanceDownTrack() { return m_curr_track_coords[1];       }
-    float          getDistanceToCenter () { return m_curr_track_coords[0];       }
-    Attachment    *getAttachment       () { return &m_attachment;                }
+                                          { m_collectable.set(t, n);             }
+    void           setPosition         (int p)    
+                                          { m_race_position = p;                 }
+    int            getSector           () const { return m_track_sector;         }
+    float          getDistanceDownTrack() const { return m_curr_track_coords[1]; }
+    float          getDistanceToCenter () const { return m_curr_track_coords[0]; }
+    Attachment    *getAttachment       ()       { return &m_attachment;          }
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
                                         Kart*k=NULL)
                                           { m_attachment.set(t, time_left, k);   }
-    Collectable   *getCollectable      () { return &m_collectable;               }
+    Collectable   *getCollectable      ()       { return &m_collectable;         }
     int            getNumCollectables  () const { return  m_collectable.getNum();}
     int            getNumHerring       () const { return  m_num_herrings_gobbled;}
     int            getLap              () const { return  m_race_lap;            }
@@ -179,7 +174,6 @@ public:
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           handleMagnet        (float cdist, int closest);
-    void           doZipperProcessing  (float dt);
     void           updatePhysics       (float dt);
     float          NormalizedLateralForce(float alpha, float corner) const;
 

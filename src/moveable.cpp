@@ -71,17 +71,15 @@ void Moveable::reset ()
     m_crashed          = false;
     m_material_hot     = NULL;
     m_normal_hot       = NULL;
-
-    sgZeroVec3 ( m_velocity.xyz ) ;
-    sgZeroVec3 ( m_velocity.hpr ) ;
+    if(m_body) m_body->setLinearVelocity(btVector3(0.0, 0.0, 0.0));
     sgCopyCoord ( &m_curr_pos, &m_reset_pos ) ;
-    sgZeroVec3 ( m_abs_velocity ) ;
 
 }   // reset
 
 //-----------------------------------------------------------------------------
 void Moveable::createBody(float mass, btTransform& trans, 
-                          btCollisionShape *shape, MoveableType m) {
+                          btCollisionShape *shape, 
+                          UserPointer::UserPointerType t) {
     
     btVector3 inertia;
     m_transform = trans;
@@ -93,7 +91,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     m_body = new btRigidBody(mass, m_motion_state, 
                              shape, inertia);
     m_body->setUserPointer(this);
-    setMoveableType(m);
+    setUserPointerType(t);
 }   // createBody
 
 //-----------------------------------------------------------------------------
@@ -118,28 +116,16 @@ void Moveable::update (float dt)
             sgCopyCoord(&m_velocity, &tmp);
             m_velocity.xyz[2]=DUMMY;
 #else
-            sgCopyCoord(&m_velocity, &tmp);
+            m_velocityLC.setValue(tmp.xyz[0],tmp.xyz[1],tmp.xyz[2]);
 #endif
         }
         else
         {
-            sgCopyCoord(&(m_history_velocity[history->GetCurrentIndex()]), &m_velocity);
+            m_history_velocity[history->GetCurrentIndex()].xyz[0]=m_velocityLC.getX();
+            m_history_velocity[history->GetCurrentIndex()].xyz[1]=m_velocityLC.getY();
+            m_history_velocity[history->GetCurrentIndex()].xyz[2]=m_velocityLC.getZ();
         }
     }   // if m_history_velocity
-
-    sgMat4 result;
-    updatePosition(dt,result);
-
-    sgVec3 start ; sgCopyVec3      (start, m_curr_pos.xyz      );
-    sgVec3 end   ; sgCopyVec3      (end  , result[3]         );
-
-
-    sgCopyVec3 (result[3], end) ;
-
-    sgVec3 prev_pos;
-    sgCopyVec3(prev_pos, m_curr_pos.xyz);
-    sgSetCoord (&m_curr_pos, result);
-    sgSubVec3  (m_abs_velocity, m_curr_pos.xyz, prev_pos);
 
     if(m_history_position)
     {
@@ -170,6 +156,7 @@ void Moveable::update (float dt)
         }
     }   // if m_history_position
     
+    m_velocityLC = getVelocity()*getTrans().getBasis();
     placeModel();
     m_first_time = false ;
 }   // update
@@ -180,22 +167,6 @@ void Moveable::placeModel()
     m_motion_state->getWorldTransform(m_transform);
     m_model_transform->setTransform(&m_curr_pos);
 }   // placeModel
-
-//-----------------------------------------------------------------------------
-/**
- * Computes the new position and hpr of the kart after a single time step.
- */
-void Moveable::updatePosition(float dt, sgMat4 result)
-{
-    sgCoord scaled_velocity ;
-    sgMat4  delta, mat;
-    /* Scale velocities to current time step. */
-    sgScaleVec3    (scaled_velocity.xyz, m_velocity.xyz, dt);
-    sgScaleVec3    (scaled_velocity.hpr, m_velocity.hpr, dt);
-    sgMakeCoordMat4(delta, & scaled_velocity             );
-    sgMakeCoordMat4(mat  , & m_curr_pos                    );
-    sgMultMat4     (result, mat, delta                   );
-}   // updatePosition
 
 //-----------------------------------------------------------------------------
 void Moveable::WriteHistory(char* s, int kartNumber, int indx)

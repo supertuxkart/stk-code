@@ -34,7 +34,6 @@ void STKConfig::load(const std::string filename)
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
-#ifdef BULLET
     if(m_gear_switch_ratio.size()==0)
     {
         fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
@@ -52,7 +51,7 @@ void STKConfig::load(const std::string filename)
         fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
         exit(-1);
     }
-#endif
+
     CHECK_NEG(m_max_karts,               "max-karts"                    );
     CHECK_NEG(m_grid_order,              "grid-order"                   );
 
@@ -109,6 +108,8 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
     CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
+    CHECK_NEG(m_zipper_time,               "zipper-time"                );
+    CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_max_road_distance,         "shortcut-road-distance"     );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
@@ -134,6 +135,7 @@ void STKConfig::init_defaults()
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
     m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] =
     m_parachute_time = m_bomb_time = m_bomb_time_increase= m_anvil_time = 
+    m_zipper_time = m_zipper_force = 
     m_parachute_time_other = m_magnet_time = m_max_road_distance = m_shortcut_segments =
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
@@ -170,6 +172,8 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("bomb-time",                    m_bomb_time           );
     lisp->get("bomb-time-increase",           m_bomb_time_increase  );
     lisp->get("anvil-time",                   m_anvil_time          );
+    lisp->get("zipper-time",                  m_zipper_time         );
+    lisp->get("zipper-force",                 m_zipper_force        );
     lisp->get("explosion-impulse",            m_explosion_impulse   );
     lisp->get("max-karts",                    m_max_karts           );
     lisp->get("grid-order",                   m_grid_order          );

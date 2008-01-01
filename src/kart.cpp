@@ -79,7 +79,7 @@ void KartParticleSystem::particle_create(int, Particle *p)
     p -> m_time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
 
     const sgCoord* POS = m_kart->getCoord();
-    const sgCoord* VEL = m_kart->getVelocity();
+    const btVector3 VEL = m_kart->getVelocity();
 
     const float X_DIRECTION = sgCos (POS->hpr[0] - 90.0f); // Point at the rear
     const float Y_DIRECTION = sgSin (POS->hpr[0] - 90.0f); // Point at the rear
@@ -89,7 +89,7 @@ void KartParticleSystem::particle_create(int, Particle *p)
     p->m_pos[0] += X_DIRECTION * 0.7f;
     p->m_pos[1] += Y_DIRECTION * 0.7f;
 
-    const float ABS_VEL = sqrt((VEL->xyz[0] * VEL->xyz[0]) + (VEL->xyz[1] * VEL->xyz[1]));
+    const float ABS_VEL = sqrt((VEL.getX() * VEL.getX()) + (VEL.getY() * VEL.getY()));
 
     p->m_vel[0] = X_DIRECTION * -ABS_VEL/2;
     p->m_vel[1] = Y_DIRECTION * -ABS_VEL/2;
@@ -200,7 +200,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    createBody(mass, trans, &m_kart_chassis, Moveable::MOV_KART);
+    createBody(mass, trans, &m_kart_chassis, UserPointer::UP_KART);
 
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
                        m_kart_properties->getChassisAngularDamping() );
@@ -398,13 +398,6 @@ void Kart::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-void Kart::handleZipper()
-{
-    m_wheelie_angle  = ZIPPER_ANGLE;
-    m_zipper_time_left = ZIPPER_TIME;
-}   // handleZipper
-
-//-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
     bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f;
@@ -531,28 +524,17 @@ void Kart::collectedHerring(Herring* herring)
 }   // hitHerring
 
 //-----------------------------------------------------------------------------
-void Kart::doZipperProcessing (float dt)
-{
-    if ( m_zipper_time_left > dt )
-    {
-        m_zipper_time_left -= dt ;
-        if ( m_velocity.xyz[1] < ZIPPER_VELOCITY )
-            m_velocity.xyz[1] = ZIPPER_VELOCITY ;
-    }
-    else m_zipper_time_left = 0.0f ;
-}   // doZipperProcessing
-
-//-----------------------------------------------------------------------------
 // Simulates gears
 float Kart::getActualWheelForce()
 {
+    float zipperF=(m_zipper_time_left>0.0f) ? stk_config->m_zipper_force : 0.0f;
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_max_speed*gear_ratio[i]) 
-            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i];
+            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]+zipperF;
     }
-    return getMaxPower();
+    return getMaxPower()+zipperF;
 
 }   // getActualWheelForce
 
@@ -610,9 +592,11 @@ void Kart::update (float dt)
         m_time_since_stuck = 0.0f;
     }
 
+    m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
+
     //m_wheel_position gives the rotation around the X-axis, and since velocity's
     //timeframe is the delta time, we don't have to multiply it with dt.
-    m_wheel_position += m_velocity.xyz[1];
+    m_wheel_position += getVelocity().getY();
 
     if ( m_rescue )
     {
@@ -639,7 +623,7 @@ void Kart::update (float dt)
 
         //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());     
     }   // if m_rescue
-    m_attachment.update(dt, &m_velocity);
+    m_attachment.update(dt);
 
     /*smoke drawing control point*/
     if ( user_config->m_smoke )
@@ -647,19 +631,21 @@ void Kart::update (float dt)
         if (m_smoke_system != NULL)
             m_smoke_system->update (dt);
     }  // user_config->smoke
-    doZipperProcessing (dt) ;
     updatePhysics(dt);
 
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
     
     Moveable::update(dt);
-    btTransform trans;
-    getTrans(&trans);
+    btTransform trans=getTrans();
     TerrainInfo::update(trans.getOrigin());
     if (getHoT()==Track::NOHIT                   || 
        (getMaterial()->isReset() && isOnGround())   )
     {
         forceRescue();
+    }
+    else if(getMaterial()->isZipper())
+    {
+        handleZipper();
     }
     else
     {
@@ -763,14 +749,18 @@ void Kart::update (float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+void Kart::handleZipper()
+{
+    m_zipper_time_left = stk_config->m_zipper_time;
+}   // handleZipper
+//-----------------------------------------------------------------------------
 #define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
 
 // -----------------------------------------------------------------------------
 void Kart::draw()
 {
     float m[16];
-    btTransform t;
-    getTrans(&t);
+    btTransform t=getTrans();
     t.getOpenGLMatrix(m);
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
@@ -1223,8 +1213,6 @@ void Kart::placeModel ()
         //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
         // Transfer the new position and hpr to m_curr_pos
         sgSetCoord(&m_curr_pos, m);
-        const btVector3 &v=m_body->getLinearVelocity();
-        sgSetVec3(m_velocity.xyz, v.x(), v.y(), v.z());
     }
     sgCoord c ;
     sgCopyCoord ( &c, &m_curr_pos ) ;
@@ -1236,8 +1224,8 @@ void Kart::placeModel ()
     Moveable::placeModel();
     
     // Check if a kart needs to be rescued.
-    if((fabs(m_curr_pos.hpr[2])>60 &&
-       sgLengthVec3(m_velocity.xyz)<3.0f) || m_time_since_stuck > 2.0f)
+    if((fabs(m_curr_pos.hpr[2])>60 && getSpeed()<3.0f) || 
+        m_time_since_stuck > 2.0f)
     {
         m_rescue=true;
         m_time_since_stuck=0.0f;
@@ -1278,17 +1266,17 @@ void Kart::handleMagnet(float cdist, int closest)
 
     sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
 
-    float tgt_velocity = world->getKart(closest)->getVelocity()->xyz[1] ;
+    float tgt_velocity = world->getKart(closest)->getVelocity().getY();
 
     //JH FIXME: that should probably be changed, e.g. by increasing the throttle
     //          to something larger than 1???
     if (cdist > stk_config->m_magnet_min_range_sq)
     {
-        if ( m_velocity.xyz[1] < tgt_velocity )
-            m_velocity.xyz[1] = tgt_velocity * 1.4f;
+        if ( getSpeed ()< tgt_velocity )
+;//FIXME            m_velocity.xyz[1] = tgt_velocity * 1.4f;
     }
     else
-        m_velocity.xyz[1] = tgt_velocity ;
+;//FIXME        m_velocity.xyz[1] = tgt_velocity ;
 }   // handleMagnet
 
 //-----------------------------------------------------------------------------

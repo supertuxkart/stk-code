@@ -41,7 +41,6 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-std::vector<const Material*>Track::m_triangleIndex2Material;
 
 float const Track::NOHIT=-99999.9f;
 
@@ -72,8 +71,8 @@ Track::~Track()
  */
 void Track::cleanup()
 {
-    world->getPhysics()->removeBody(m_body);
-    delete m_body;
+    delete m_non_collision_mesh;
+    delete m_track_mesh;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -1007,29 +1006,22 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
 void Track::createPhysicsModel()
 {
     if(!m_model) return;
+
+    m_track_mesh         = new TriangleMesh();
+    m_non_collision_mesh = new TriangleMesh();
+    
+    // Collect all triangles in the track_mesh
     sgMat4 mat;
     sgMakeIdentMat4(mat);
-    btTriangleMesh *track_mesh = new btTriangleMesh();
-    m_triangleIndex2Material.clear();
-    // Collect all triangles in the track_mesh
-    convertTrackToBullet(m_model, mat, track_mesh);
+    convertTrackToBullet(m_model, mat);
+    m_track_mesh->createBody();
+    m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
-    // Now convert the triangle mesh into a static rigid body
-    btCollisionShape *mesh_shape = new btBvhTriangleMeshShape(track_mesh, true);
-    btTransform startTransform;
-    startTransform.setIdentity();
-    btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
-    m_body=new btRigidBody(0.0f, myMotionState, mesh_shape);
-    // FIXME: can the mesh_shape and or track_mesh be deleted now?
-    world->getPhysics()->addBody(m_body);
-    m_body->setUserPointer(0);
-    m_body->setCollisionFlags(m_body->getCollisionFlags()  | 
-                              btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
 //* Convert the ssg track tree into its physics equivalents.
-void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m, btTriangleMesh* track_mesh)
+void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 {
     if(!track) return;
     MovingPhysics *mp = dynamic_cast<MovingPhysics*>(track);
@@ -1042,10 +1034,10 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m, btTriangleMesh* tra
     } 
     else if(track->isAKindOf(ssgTypeLeaf()))
     {
-        ssgLeaf  *leaf  = (ssgLeaf*)(track);
-        Material *mat   = material_manager->getMaterial(leaf);
+        ssgLeaf  *leaf     = (ssgLeaf*)(track);
+        Material *material = material_manager->getMaterial(leaf);
         // Don't convert triangles with material that is ignored (e.g. fuzzy_sand)
-        if(!mat || mat->isIgnore()) return;
+        if(!material || material->isIgnore()) return;
 
         for(int i=0; i<leaf->getNumTriangles(); i++) 
         {
@@ -1059,8 +1051,14 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m, btTriangleMesh* tra
             btVector3 vb1(vv1[0],vv1[1],vv1[2]);
             btVector3 vb2(vv2[0],vv2[1],vv2[2]);
             btVector3 vb3(vv3[0],vv3[1],vv3[2]);
-            track_mesh->addTriangle(vb1, vb2, vb3);
-            m_triangleIndex2Material.push_back(mat);
+            if(material->isZipper()) 
+            {
+                m_non_collision_mesh->addTriangle(vb1, vb2, vb3, material);
+            }
+            else
+            {
+                m_track_mesh->addTriangle(vb1, vb2, vb3, material);
+            }
         }
         
     }   // if(track isAKindOf leaf)
@@ -1073,14 +1071,14 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m, btTriangleMesh* tra
         sgPreMultMat4(tmpM,tmpT);
         for(ssgEntity *e = t->getKid(0); e!=NULL; e=t->getNextKid())
         {
-            convertTrackToBullet(e, tmpM, track_mesh);
+            convertTrackToBullet(e, tmpM);
         }   // for i
     }
     else if (track->isAKindOf(ssgTypeBranch())) 
     {
         ssgBranch *b =(ssgBranch*)track;
         for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
-            convertTrackToBullet(e, m, track_mesh);
+            convertTrackToBullet(e, m);
         }   // for i<getNumKids
     }
     else
@@ -1161,7 +1159,7 @@ void Track::loadTrackModel()
             }
             else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
                                fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]) ) == 3 )
+                               &(loc.hpr[0]) ) == 4 )
             {
                 /* All 6 DOF specified - but need height, roll, pitch */
                 need_hat = true ;
@@ -1291,7 +1289,7 @@ void  Track::getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal,
                                          bool normalInWorldSpace) {
              if(rayResult.m_localShapeInfo && rayResult.m_localShapeInfo->m_shapePart>=0 )
              {
-                 m_material=m_triangleIndex2Material[rayResult.m_localShapeInfo->m_triangleIndex];
+                 m_material = ((TriangleMesh*)rayResult.m_collisionObject->getUserPointer())->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
              }
              return btCollisionWorld::ClosestRayResultCallback::AddSingleResult(rayResult, 
                                                                                 normalInWorldSpace);

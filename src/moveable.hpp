@@ -23,9 +23,8 @@
 
 #include <plib/ssg.h>
 #include "material.hpp"
-#ifdef BULLET
 #include "btBulletDynamicsCommon.h"
-#endif
+#include "user_pointer.hpp"
 
 /* Limits of Kart performance */
 #define CRASH_PITCH          -45.0f
@@ -33,16 +32,13 @@
 #define MAX_HERRING_EATEN    20
 
 
-class Moveable
+class Moveable : public UserPointer
 {
-public:
-    enum   MoveableType {MOV_KART, MOV_PROJECTILE, MOV_TRACK} ;
+private:
+    btVector3     m_velocityLC;      /* velocity in kart coordinates                */
 protected:
-    MoveableType  m_moveable_type;  /* used when upcasting bullet user pointers    */
-    sgCoord       m_reset_pos;      /* Where to start in case of a reset           */
-    sgCoord       m_curr_pos;       /* current position                            */
-    sgCoord       m_velocity;       /* current velocity in local coordinates       */
-    sgVec3        m_abs_velocity;   /* world coordinates' velocity vector          */
+    sgCoord       m_reset_pos;       /* Where to start in case of a reset           */
+    sgCoord       m_curr_pos;        /* current position                            */
     sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
     Material*     m_material_hot;    /* Material at HOT                             */
     ssgTransform* m_model_transform;            // The transform where the model is under
@@ -68,25 +64,23 @@ public:
     Moveable (bool bHasHistory=false);
     virtual ~Moveable();
 
-    ssgTransform* getModelTransform()          {return m_model_transform;         }
-    MoveableType  getMoveableType()  const     {return m_moveable_type;           }
-    void          setMoveableType(MoveableType m){m_moveable_type=m;              }
-    sgCoord*      getVelocity  ()              {return & m_velocity;              }
-    sgCoord*      getCoord     ()              {return &m_curr_pos;               }
-    const sgCoord* getCoord    ()  const       {return &m_curr_pos;               }
-    const sgVec4* getNormalHOT ()  const       {return m_normal_hot;              }
-    void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);   }
+    ssgTransform* getModelTransform()          {return m_model_transform;          }
+    const btVector3 &getVelocity()   const     {return m_body->getLinearVelocity();}
+    const btVector3 &getVelocityLC() const     {return m_velocityLC;               }
+    sgCoord*      getCoord     ()              {return &m_curr_pos;                }
+    const sgCoord* getCoord    ()  const       {return &m_curr_pos;                }
+    const sgVec4* getNormalHOT ()  const       {return m_normal_hot;               }
+    void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);    }
     virtual void  placeModel   ();
     virtual void  handleZipper ()              {};
     virtual void  reset        ();
     virtual void  update       (float dt) ;
-    virtual void  updatePosition(float dt, sgMat4 result);
     void          WriteHistory (char* s, int kartNumber, int indx);
     void          ReadHistory  (char* s, int kartNumber, int indx);
     btRigidBody*  getBody   () const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
-                             btCollisionShape *shape, MoveableType m);
-    void          getTrans  (btTransform* t) const {*t=m_transform;}
+                             btCollisionShape *shape, 
+                             UserPointer::UserPointerType t);
     const btTransform&  getTrans  () const        {return m_transform;}
     void          setTrans  (btTransform& t){m_motion_state->setWorldTransform(t);}
 }

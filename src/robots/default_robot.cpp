@@ -133,7 +133,7 @@ void DefaultRobot::handle_braking()
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if ( m_crashes.m_road && m_on_road && m_velocity.xyz[1] > MIN_SPEED)
+    if ( m_crashes.m_road && m_on_road && getVelocityLC().getY() > MIN_SPEED)
     {
         float kart_ang_diff = world->m_track->m_angle[m_track_sector] -
             m_curr_pos.hpr[0];
@@ -172,7 +172,7 @@ void DefaultRobot::handle_braking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        if(m_velocity.xyz[1] > m_curve_target_speed ||
+        if(getVelocityLC().getY() > m_curve_target_speed ||
            kart_ang_diff > MIN_TRACK_ANGLE )
         {
 #ifdef AI_DEBUG
@@ -407,14 +407,16 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     if( m_crashes.m_road ) return false;
     if( m_crashes.m_kart != -1 ) return false;
 
-    sgVec2 vel_normal, step_coord;
+    sgVec2 step_coord;
     sgVec3 step_track_coord;
     float distance;
 
     //We have to be careful with normalizing, because if the source argument
     //has both the X and Y axis set to 0, it returns nan to the destiny.
-    if( m_abs_velocity[0] == 0.0 && m_abs_velocity[1] == 0.0 ) return false;
-    sgNormalizeVec2( vel_normal, m_abs_velocity );
+    const btVector3 &VEL=getVelocity();
+    if( VEL.getX() == 0.0 && VEL.getY() == 0.0 ) return false;
+    btVector3 vel_normal(VEL.getX(), VEL.getY(), 0.0);
+    vel_normal.normalize();
 
     //FIXME: instead of using 1.5, it should find out how much time it
     //will pass to stop doing the wheelie completely from the current state.
@@ -423,7 +425,7 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     /* The following method of finding if a position is outside of the track
        is less accurate than calling findRoadSector(), but a lot faster.
      */
-    const int WHEELIE_STEPS = int(( m_velocity.xyz[1] * CHECK_DIST )/
+    const int WHEELIE_STEPS = int(( getVelocityLC().getY() * CHECK_DIST )/
         m_kart_properties->getKartLength() );
 
     for( int i = WHEELIE_STEPS; i > STEPS - 1; --i )
@@ -527,7 +529,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
 
-    sgVec2 vel_normal;
+    btVector3 vel_normal;
 	//in this func we use it as a 2d-vector, but later on it is passed
 	//to world->m_track->findRoadSector, there it is used as a 3d-vector
 	//to find distance to plane, so z must be initialized to zero
@@ -541,11 +543,16 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     const size_t NUM_KARTS = world->getNumKarts();
 
     //Protection against having vel_normal with nan values
-    if( m_abs_velocity[0] == 0.0 && m_abs_velocity[1] == 0.0 )
+    const btVector3 &VEL = getVelocity();
+    if( VEL.getX() == 0.0 && VEL.getY() == 0.0 )
     {
-        vel_normal[0] = vel_normal[1] = 0.0;
+        vel_normal.setValue(0.0, 0.0, 0.0);
     }
-    else sgNormalizeVec2( vel_normal, m_abs_velocity );
+    else 
+    {
+        vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
+        vel_normal.normalize();
+    }
 
     for(int i = 1; STEPS > i; ++i)
     {
@@ -564,8 +571,8 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
                     world->getKart(j)->getCoord()->xyz );
 
                 if( kart_distance < m_kart_properties->getKartLength() + 0.125f * i )
-                    if( m_velocity.xyz[1] > world->getKart(j)->
-                       getVelocity()->xyz[1] * 0.75f ) m_crashes.m_kart = j;
+                    if( getVelocityLC().getY() > world->getKart(j)->
+                       getVelocityLC().getY() * 0.75f ) m_crashes.m_kart = j;
             }
         }
 
@@ -751,7 +758,7 @@ inline float DefaultRobot::normalize_angle( float angle )
  */
 int DefaultRobot::calc_steps()
 {
-    int steps = int( m_velocity.xyz[1] / m_kart_properties->getKartLength() );
+    int steps = int( getVelocityLC().getY() / m_kart_properties->getKartLength() );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -869,7 +876,7 @@ void DefaultRobot::find_curve()
     int next_hint = m_track_sector;
     int i;
 
-    for(i = m_track_sector; total_dist < m_velocity.xyz[1]; i = next_hint)
+    for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
     {
         next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
         total_dist += sgDistanceVec2(world->m_track->m_driveline[i], world->m_track->m_driveline[next_hint]);

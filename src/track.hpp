@@ -35,6 +35,7 @@
 #include <vector>
 #include "btBulletDynamicsCommon.h"
 #include "material.hpp"
+#include "triangle_mesh.hpp"
 
 class Track
 {
@@ -49,8 +50,8 @@ private:
     std::string              m_description;
     std::string              m_filename;
     ssgBranch*               m_model;
-    btRigidBody*             m_body;
-    static std::vector<const Material*>   m_triangleIndex2Material;
+    TriangleMesh*            m_track_mesh;
+    TriangleMesh*            m_non_collision_mesh;
 
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
@@ -182,7 +183,7 @@ public:
     const std::vector<SGfloat>& getWidth() const {return m_path_width;     }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
     void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
-    static const Material* getMaterial  (unsigned int n) {return m_triangleIndex2Material[n];}
+    //    static const Material* getMaterial  (unsigned int n) {return m_triangleIndex2Material[n];}
     void  getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
                          const Material **material) const;
     void createPhysicsModel             ();
@@ -194,18 +195,17 @@ public:
     }
 
 private:
-    void loadTrack                      (std::string filename);
-    void herring_command                (sgVec3 *xyz, char htype, int bNeedHeight);
-    void loadDriveline                  ();
-    void readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
+    void  loadTrack                      (std::string filename);
+    void  herring_command                (sgVec3 *xyz, char htype, int bNeedHeight);
+    void  loadDriveline                  ();
+    void  readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
                                          const std::string& file_ext      );
-    void convertTrackToBullet           (ssgEntity *track, sgMat4 m, 
-                                         btTriangleMesh* track_mesh);
+    void  convertTrackToBullet           (ssgEntity *track, sgMat4 m);
 
-    float pointSideToLine( const sgVec2 L1, const sgVec2 L2,
-        const sgVec2 P ) const;
-    int pointInQuad( const sgVec2 A, const sgVec2 B,
-        const sgVec2 C, const sgVec2 D, const sgVec2 POINT ) const;
+    float pointSideToLine(const sgVec2 L1, const sgVec2 L2,
+                          const sgVec2 P ) const;
+    int   pointInQuad(const sgVec2 A, const sgVec2 B,
+                      const sgVec2 C, const sgVec2 D, const sgVec2 POINT ) const;
 }
 ;   // class Track
 

@@ -122,7 +122,7 @@ void Attachment::moveBombFromTo(Kart *from, Kart *to)
 }   // moveBombFromTo
 
 //-----------------------------------------------------------------------------
-void Attachment::update(float dt, sgCoord *velocity)
+void Attachment::update(float dt)
 {
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
