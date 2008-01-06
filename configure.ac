@@ -359,7 +359,15 @@ AC_CONFIG_FILES([         \
 ])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
-bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
+
+case "${host}" in
+*darwin*|*macosx*)
+    bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath -framework GLUT"
+    ;;
+*)
+    bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
+    ;;
+esac
 
 AC_SUBST(BULLETTREE)
 
