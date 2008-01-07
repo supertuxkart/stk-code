@@ -50,8 +50,6 @@ void TrafficDriver::update (float dt)
 }
 
 //-----------------------------------------------------------------------------
-void TrafficDriver::doObjectInteractions () {}
-//-----------------------------------------------------------------------------
 void TrafficDriver::doLapCounting        () {}
 //-----------------------------------------------------------------------------
 void TrafficDriver::doZipperProcessing   () {}

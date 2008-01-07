@@ -244,7 +244,6 @@ public:
     virtual void   crashed          () {};
     virtual void   doLapCounting    ();
     virtual void   update           (float dt               );
-    virtual void   doObjectInteractions();
 };
 
 class TrafficDriver : public Kart
@@ -257,7 +256,6 @@ public:
         sgCopyVec3 ( m_reset_pos.xyz, _pos ) ;
         reset () ;
     }
-    virtual void doObjectInteractions () ;
     virtual void doLapCounting        () ;
     virtual void doZipperProcessing   () ;
     virtual void update (float delta) ;

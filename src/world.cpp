@@ -145,8 +145,6 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     }  // for i
 
     resetAllKarts();
-    m_number_collisions = new int[m_race_setup.getNumKarts()];
-    for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
     //ssgSetBackFaceCollisions ( m_race_setup.mirror ) ;
@@ -206,7 +204,6 @@ World::~World()
 
     m_kart.clear();
     projectile_manager->cleanup();
-    delete [] m_number_collisions;
     delete m_physics;
 
     sound_manager -> stopMusic();
@@ -273,16 +270,6 @@ void World::update(float dt)
     // replay-recording
     m_clock += dt;
 
-    // Count the number of collision in the next 'FRAMES_FOR_TRAFFIC_JAM' frames.
-    // If a kart has more than one hit, play 'traffic jam' noise.
-    static int nCount=0;
-    const int FRAMES_FOR_TRAFFIC_JAM=20;
-    nCount++;
-    if(nCount==FRAMES_FOR_TRAFFIC_JAM)
-    {
-        for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++) m_number_collisions[i]=0;
-        nCount=0;
-    }
     if( getPhase() == FINISH_PHASE )
     {
         // Add times to highscore list. First compute the order of karts,
@@ -343,18 +330,6 @@ void World::update(float dt)
 
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
-
-    // Check for traffic jam. The sound is played even if it's
-    // not a player kart - a traffic jam happens rarely anyway.
-    for(unsigned int i=0; i<m_race_setup.getNumKarts(); i++)
-    {
-        if(m_number_collisions[i]>1)
-        {
-            sound_manager->playSfx(SOUND_TRAFFIC_JAM);
-            nCount = FRAMES_FOR_TRAFFIC_JAM-1;  // sets all fields to zero in next frame
-            break;
-        }
-    }
 
 #ifdef HAVE_GHOST_REPLAY
     // we start recording after START_PHASE, since during start-phase m_clock is incremented

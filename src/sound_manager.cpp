@@ -101,7 +101,6 @@ SoundManager::SoundManager()
         sfx = new SFXImpl("wavs/tintagel/pre_start_race.wav"); m_sfxs[SOUND_PRESTART] = sfx;
         sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;
         sfx = new SFXImpl("wavs/radio/radarping.wav"); m_sfxs[SOUND_MISSILE_LOCK] = sfx;
-        sfx = new SFXImpl("wavs/radio/trafficjam.wav"); m_sfxs[SOUND_TRAFFIC_JAM] = sfx;
     }
 }
 

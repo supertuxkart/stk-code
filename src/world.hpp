@@ -92,7 +92,6 @@ public:
         return m_kart[kartId];
     }
     unsigned int  getNumKarts() const         {return (int)m_kart.size();          }
-    void addCollisions(int kartNumber, int n) {m_number_collisions[kartNumber]+=n; }
 
     /** Returns the phase of the game */
     Phase getPhase() const                    { return m_phase;                    }
@@ -109,7 +108,6 @@ public:
 private:
     Karts       m_kart;
     float       m_finish_delay_start_time;
-    int*        m_number_collisions;
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;

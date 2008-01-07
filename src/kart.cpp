@@ -475,32 +475,6 @@ void Kart::doLapCounting ()
 }   // doLapCounting
 
 //-----------------------------------------------------------------------------
-void Kart::doObjectInteractions ()
-{
-    int i;
-    // FIXME: a lot of work for the 'traffic jam' sound - perhaps just remove it?
-    for ( i = 0 ; i < m_grid_position ; i++ )
-    {
-        sgVec3 xyz ;
-        Kart *other_kart = world->getKart(i);
-        sgSubVec3(xyz, getCoord()->xyz, other_kart->getCoord()->xyz );
-        //FIXME
-        // the dist calculation is very very basic, and 1.1f is far too low
-        // must be from 2.4f to 3.0f
-        float dist = sgLengthSquaredVec3(xyz);
-        if ( dist < 1.1f )
-        {
-            // Avoid division by zero
-            if(dist>0.00001) sgNormalizeVec2(xyz) ;
-
-            world->addCollisions(m_grid_position, 1);
-            world->addCollisions(i,             1);
-        }   // if sgLengthSquaredVec2(xy)<1.0
-    }   // for i
-
-}   // doObjectInteractions
-
-//-----------------------------------------------------------------------------
 void Kart::collectedHerring(Herring* herring)
 {
     const herringType TYPE = herring->getType();
@@ -657,7 +631,6 @@ void Kart::update (float dt)
         }   // for i<getNumWheels
 
     }   // if there is terrain and it's not a reset material
-    doObjectInteractions();
 
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
