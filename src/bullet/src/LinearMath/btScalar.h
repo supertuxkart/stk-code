@@ -23,11 +23,17 @@ subject to the following restrictions:
 #include <cfloat>
 #include <float.h>
 
+#define BT_BULLET_VERSION 266
 
 inline int	btGetVersion()
 {
-	return 264;
+	return BT_BULLET_VERSION;
 }
+
+#if defined(DEBUG) || defined (_DEBUG)
+#define BT_DEBUG
+#endif
+
 
 #ifdef WIN32
 
@@ -110,6 +116,8 @@ inline int	btGetVersion()
 		#define btAssert assert
 		//btFullAssert is optional, slows down a lot
 		#define btFullAssert(x)
+		#define btLikely(_c)  _c
+		#define btUnlikely(_c) _c
 
 
 #endif // LIBSPE2

@@ -42,7 +42,6 @@ protected:
 
 	btAlignedObjectArray<btTypedConstraint*> m_constraints;
 
-	btIDebugDraw*	m_debugDrawer;
 
 	btVector3	m_gravity;
 
@@ -60,7 +59,7 @@ protected:
 
 	int	m_profileTimings;
 
-	void	predictUnconstraintMotion(btScalar timeStep);
+	virtual void	predictUnconstraintMotion(btScalar timeStep);
 	
 	void	integrateTransforms(btScalar timeStep);
 		
@@ -93,7 +92,6 @@ public:
 	///if maxSubSteps > 0, it will interpolate motion between fixedTimeStep's
 	virtual int	stepSimulation( btScalar timeStep,int maxSubSteps=1, btScalar fixedTimeStep=btScalar(1.)/btScalar(60.));
 
-	virtual void	updateAabbs();
 
 	void	addConstraint(btTypedConstraint* constraint, bool disableCollisionsBetweenLinkedBodies=false);
 
@@ -118,15 +116,6 @@ public:
 		return this;
 	}
 
-	virtual void	setDebugDrawer(btIDebugDraw*	debugDrawer)
-	{
-			m_debugDrawer = debugDrawer;
-	}
-
-	virtual btIDebugDraw*	getDebugDrawer()
-	{
-		return m_debugDrawer;
-	}
 
 	virtual void	setGravity(const btVector3& gravity);
 
@@ -137,6 +126,8 @@ public:
 	virtual void	removeRigidBody(btRigidBody* body);
 
 	void	debugDrawObject(const btTransform& worldTransform, const btCollisionShape* shape, const btVector3& color);
+
+	virtual void	debugDrawWorld();
 
 	virtual void	setConstraintSolver(btConstraintSolver* solver);
 
@@ -157,6 +148,12 @@ public:
 	{
 		return BT_DISCRETE_DYNAMICS_WORLD;
 	}
+	
+	///the forces on each rigidbody is accumulating together with gravity. clear this after each timestep.
+	virtual void	clearForces();
+
+	///apply gravity, call this once per timestep
+	virtual void	applyGravity();
 
 
 };

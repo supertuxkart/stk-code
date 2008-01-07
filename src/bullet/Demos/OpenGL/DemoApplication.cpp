@@ -29,6 +29,7 @@ subject to the following restrictions:
 #include "LinearMath/btQuickprof.h"
 #include "LinearMath/btDefaultMotionState.h"
 
+
 #include "BMF_Api.h"
 
 extern bool gDisableDeactivation;
@@ -71,12 +72,15 @@ m_shootBoxShape(0),
 	m_singleStep(false),
 	m_idle(false)
 {
+	m_profileIterator = CProfileManager::Get_Iterator();
 }
 
 
 
 DemoApplication::~DemoApplication()
 {
+
+	CProfileManager::Release_Iterator(m_profileIterator);
 	if (m_shootBoxShape)
 		delete m_shootBoxShape;
 
@@ -231,8 +235,6 @@ void DemoApplication::reshape(int w, int h)
 }
 
 
-
-
 void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 {
 	(void)x;
@@ -240,9 +242,27 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
 		m_lastKey = 0;
 
+        if (key >= 0x31 && key < 0x37)
+        {
+                int child = key-0x31;
+                m_profileIterator->Enter_Child(child);
+        }
+        if (key==0x30)
+        {
+                m_profileIterator->Enter_Parent();
+        }
+
+
     switch (key) 
     {
-    case 'q' : exit(0); break;
+    case 'q' : 
+#ifdef BT_USE_FREEGLUT
+		//return from glutMainLoop(), detect memory leaks etc.
+		glutLeaveMainLoop();
+#else
+		exit(0);
+#endif
+		break;
 
     case 'l' : stepLeft(); break;
     case 'r' : stepRight(); break;
@@ -469,7 +489,7 @@ void	DemoApplication::shootBox(const btVector3& destination)
 
 	if (m_dynamicsWorld)
 	{
-		float mass = 100.f;
+		float mass = 10.f;
 		btTransform startTransform;
 		startTransform.setIdentity();
 		btVector3 camPos = getCameraPosition();
@@ -482,7 +502,7 @@ void	DemoApplication::shootBox(const btVector3& destination)
 		btConvexShape* childShape = new btBoxShape(btVector3(1.f,1.f,1.f));
 		m_shootBoxShape = new btUniformScalingShape(childShape,0.5f);
 #else
-		m_shootBoxShape = new btBoxShape(btVector3(0.5f,0.5f,0.5f));
+		m_shootBoxShape = new btBoxShape(btVector3(1.f,1.f,1.f));
 #endif//
 		}
 
@@ -716,7 +736,7 @@ btRigidBody*	DemoApplication::localCreateRigidBody(float mass, const btTransform
 #define USE_MOTIONSTATE 1
 #ifdef USE_MOTIONSTATE
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-	btRigidBody* body = new btRigidBody(mass,myMotionState,shape,localInertia);
+	btRigidBody* body = new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(mass,myMotionState,shape,localInertia));
 
 #else
 	btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);	
@@ -753,6 +773,88 @@ void DemoApplication::resetPerspectiveProjection()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+}
+
+
+
+
+extern CProfileIterator * m_profileIterator;
+
+void DemoApplication::displayProfileString(int xOffset,int yStart,char* message)
+{
+	glRasterPos3f(xOffset,yStart,0);
+	BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),message);
+}
+
+
+void DemoApplication::showProfileInfo(float& xOffset,float& yStart, float yIncr)
+{
+
+	static double time_since_reset = 0.f;
+	if (!m_idle)
+	{
+			time_since_reset = CProfileManager::Get_Time_Since_Reset();
+	}
+
+
+	{
+		//recompute profiling data, and store profile strings
+
+		char blockTime[128];
+
+		double totalTime = 0;
+		
+		int frames_since_reset = CProfileManager::Get_Frame_Count_Since_Reset();
+
+		m_profileIterator->First();
+
+		double parent_time = m_profileIterator->Is_Root() ? time_since_reset : m_profileIterator->Get_Current_Parent_Total_Time();
+
+		{
+			sprintf(blockTime,"--- Profiling: %s (total running time: %.3f ms) ---",	m_profileIterator->Get_Current_Parent_Name(), parent_time );
+			displayProfileString(xOffset,yStart,blockTime);
+			yStart += yIncr;
+			sprintf(blockTime,"press number (1,2...) to display child timings, or 0 to go up to parent" );
+			displayProfileString(xOffset,yStart,blockTime);
+			yStart += yIncr;
+
+		}
+
+
+		double accumulated_time = 0.f;
+
+		for (int i = 0; !m_profileIterator->Is_Done(); m_profileIterator->Next())
+		{
+			double current_total_time = m_profileIterator->Get_Current_Total_Time();
+			accumulated_time += current_total_time;
+			double fraction = parent_time > SIMD_EPSILON ? (current_total_time / parent_time) * 100 : 0.f;
+
+			sprintf(blockTime,"%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)",
+				++i, m_profileIterator->Get_Current_Name(), fraction,
+				(current_total_time / (double)frames_since_reset),m_profileIterator->Get_Current_Total_Calls());
+			displayProfileString(xOffset,yStart,blockTime);
+			yStart += yIncr;
+			totalTime += current_total_time;
+		}
+
+		sprintf(blockTime,"%s (%.3f %%) :: %.3f ms", "Unaccounted",
+			// (min(0, time_since_reset - totalTime) / time_since_reset) * 100);
+			parent_time > SIMD_EPSILON ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
+
+		displayProfileString(xOffset,yStart,blockTime);
+		yStart += yIncr;
+
+
+
+		sprintf(blockTime,"-------------------------------------------------");
+		displayProfileString(xOffset,yStart,blockTime);
+		yStart += yIncr;
+
+	}
+
+
+
+
 }
 
 
@@ -822,6 +924,8 @@ void DemoApplication::renderme()
 			if ((m_debugMode & btIDebugDraw::DBG_NoHelpText)==0)
 				{
 				setOrthographicProjection();
+
+				showProfileInfo(xOffset,yStart,yIncr);
 
 	#ifdef USE_QUICKPROF
 

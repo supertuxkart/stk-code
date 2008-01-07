@@ -19,6 +19,7 @@ subject to the following restrictions:
 #include "btTriangleMeshShape.h"
 #include "btOptimizedBvh.h"
 #include "LinearMath/btAlignedAllocator.h"
+#include "BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 
 ///Bvh Concave triangle mesh is a static-triangle mesh shape with Bounding Volume Hierarchy optimization.
 ///Uses an interface to access the triangles to allow for sharing graphics/physics triangles.
@@ -27,7 +28,7 @@ ATTRIBUTE_ALIGNED16(class) btBvhTriangleMeshShape : public btTriangleMeshShape
 
 	btOptimizedBvh*	m_bvh;
 	bool m_useQuantizedAabbCompression;
-	bool	m_ownsBvh;
+	bool m_ownsBvh;
 	bool m_pad[11];////need padding due to alignment
 
 public:
@@ -42,15 +43,13 @@ public:
 	
 	virtual ~btBvhTriangleMeshShape();
 
-	
-	/*
 	virtual int	getShapeType() const
 	{
 		return TRIANGLE_MESH_SHAPE_PROXYTYPE;
 	}
-	*/
-
-
+	
+	void performRaycast (btTriangleRaycastCallback* callback, const btVector3& raySource, const btVector3& rayTarget);
+	void performConvexcast (btTriangleConvexcastCallback* callback, const btVector3& boxSource, const btVector3& boxTarget, const btVector3& boxMin, const btVector3& boxMax);
 
 	virtual void	processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
 

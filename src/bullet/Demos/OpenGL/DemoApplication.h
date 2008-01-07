@@ -17,18 +17,7 @@ subject to the following restrictions:
 #define DEMO_APPLICATION_H
 
 
-#ifdef WIN32//for glut.h
-#include <windows.h>
-#endif
-
-//think different
-#if defined(__APPLE__) && !defined (VMDMESA)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
+#include "GlutStuff.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,15 +28,21 @@ subject to the following restrictions:
 #include "LinearMath/btMatrix3x3.h"
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btQuickprof.h"
+#include "LinearMath/btAlignedObjectArray.h"
 
 class	btCollisionShape;
 class	btDynamicsWorld;
 class	btRigidBody;
 class	btTypedConstraint;
 
+
+
+
 class DemoApplication
 {
-	
+	void	displayProfileString(int xOffset,int yStart,char* message);
+	class CProfileIterator* m_profileIterator;
+
 	protected:
 
 	btClock m_clock;
@@ -82,7 +77,10 @@ class DemoApplication
 	bool m_singleStep;
 	bool m_idle;
 	int m_lastKey;
-	
+
+	void showProfileInfo(float& xOffset,float& yStart, float yIncr);
+
+
 public:
 		
 	DemoApplication();

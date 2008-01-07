@@ -35,6 +35,7 @@ int gNumManifold = 0;
 btCollisionDispatcher::btCollisionDispatcher (btCollisionConfiguration* collisionConfiguration): 
 	m_count(0),
 	m_useIslands(true),
+	m_staticWarningReported(false),
 	m_collisionConfiguration(collisionConfiguration)
 {
 	int i;
@@ -117,7 +118,7 @@ void btCollisionDispatcher::releaseManifold(btPersistentManifold* manifold)
 	manifold->~btPersistentManifold();
 	if (m_persistentManifoldPoolAllocator->validPtr(manifold))
 	{
-		m_persistentManifoldPoolAllocator->free(manifold);
+		m_persistentManifoldPoolAllocator->freeMemory(manifold);
 	} else
 	{
 		btAlignedFree(manifold);
@@ -161,13 +162,19 @@ bool	btCollisionDispatcher::needsCollision(btCollisionObject* body0,btCollisionO
 
 	bool needsCollision = true;
 
-	//broadphase filtering already deals with this
-	if ((body0->isStaticObject() || body0->isKinematicObject()) &&
-		(body1->isStaticObject() || body1->isKinematicObject()))
+#ifdef BT_DEBUG
+	if (!m_staticWarningReported)
 	{
-		printf("warning btCollisionDispatcher::needsCollision: static-static collision!\n");
+		//broadphase filtering already deals with this
+		if ((body0->isStaticObject() || body0->isKinematicObject()) &&
+			(body1->isStaticObject() || body1->isKinematicObject()))
+		{
+			m_staticWarningReported = true;
+			printf("warning btCollisionDispatcher::needsCollision: static-static collision!\n");
+		}
 	}
-		
+#endif //BT_DEBUG
+
 	if ((!body0->isActive()) && (!body1->isActive()))
 		needsCollision = false;
 	else if (!body0->checkCollideWith(body1))
@@ -279,7 +286,7 @@ void btCollisionDispatcher::freeCollisionAlgorithm(void* ptr)
 {
 	if (m_collisionAlgorithmPoolAllocator->validPtr(ptr))
 	{
-		m_collisionAlgorithmPoolAllocator->free(ptr);
+		m_collisionAlgorithmPoolAllocator->freeMemory(ptr);
 	} else
 	{
 		btAlignedFree(ptr);

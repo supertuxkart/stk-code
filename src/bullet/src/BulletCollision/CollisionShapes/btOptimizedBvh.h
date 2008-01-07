@@ -31,6 +31,9 @@ class btStridingMeshInterface;
 //Note: currently we have 16 bytes per quantized node
 #define MAX_SUBTREE_SIZE_IN_BYTES  2048
 
+// 10 gives the potential for 1024 parts, with at most 2^21 (2097152) (minus one
+// actually) triangles each (since the sign bit is reserved
+#define MAX_NUM_PARTS_IN_BITS 10
 
 ///btQuantizedBvhNode is a compressed aabb node, 16 bytes.
 ///Node can be used for leafnode or internal node. Leafnodes can point to 32-bit triangle index (non-negative range).
@@ -57,7 +60,14 @@ ATTRIBUTE_ALIGNED16	(struct) btQuantizedBvhNode
 	int	getTriangleIndex() const
 	{
 		btAssert(isLeafNode());
-		return m_escapeIndexOrTriangleIndex;
+		// Get only the lower bits where the triangle index is stored
+		return (m_escapeIndexOrTriangleIndex&~((~0)<<(31-MAX_NUM_PARTS_IN_BITS)));
+	}
+	int	getPartId() const
+	{
+		btAssert(isLeafNode());
+		// Get only the highest bits where the part index is stored
+		return (m_escapeIndexOrTriangleIndex>>(31-MAX_NUM_PARTS_IN_BITS));
 	}
 }
 ;
@@ -276,6 +286,7 @@ protected:
 	
 	void	walkStacklessTree(btNodeOverlapCallback* nodeCallback,const btVector3& aabbMin,const btVector3& aabbMax) const;
 
+	void	walkStacklessQuantizedTreeAgainstRay(btNodeOverlapCallback* nodeCallback, const btVector3& raySource, const btVector3& rayTarget, const btVector3& aabbMin, const btVector3& aabbMax, int startNodeIndex,int endNodeIndex) const;
 	void	walkStacklessQuantizedTree(btNodeOverlapCallback* nodeCallback,unsigned short int* quantizedQueryAabbMin,unsigned short int* quantizedQueryAabbMax,int startNodeIndex,int endNodeIndex) const;
 
 	///tree traversal designed for small-memory processors like PS3 SPU
@@ -319,8 +330,8 @@ public:
 	void	build(btStridingMeshInterface* triangles,bool useQuantizedAabbCompression, const btVector3& bvhAabbMin, const btVector3& bvhAabbMax);
 
 	void	reportAabbOverlappingNodex(btNodeOverlapCallback* nodeCallback,const btVector3& aabbMin,const btVector3& aabbMax) const;
-
-	void	reportSphereOverlappingNodex(btNodeOverlapCallback* nodeCallback,const btVector3& aabbMin,const btVector3& aabbMax) const;
+	void	reportRayOverlappingNodex (btNodeOverlapCallback* nodeCallback, const btVector3& raySource, const btVector3& rayTarget) const;
+	void	reportBoxCastOverlappingNodex(btNodeOverlapCallback* nodeCallback, const btVector3& raySource, const btVector3& rayTarget, const btVector3& aabbMin,const btVector3& aabbMax) const;
 	
 	SIMD_FORCE_INLINE void quantizeWithClamp(unsigned short* out, const btVector3& point) const
 	{
@@ -370,7 +381,7 @@ public:
 	bool serialize(void *o_alignedDataBuffer, unsigned i_dataBufferSize, bool i_swapEndian);
 
 	///deSerializeInPlace loads and initializes a BVH from a buffer in memory 'in place'
-	static btOptimizedBvh *deSerializeInPlace(void *i_alignedDataBuffer, unsigned i_dataBufferSize, bool i_swapEndian);
+	static btOptimizedBvh *deSerializeInPlace(void *i_alignedDataBuffer, unsigned int i_dataBufferSize, bool i_swapEndian);
 
 	static unsigned int getAlignmentSerializationPadding();
 
@@ -390,4 +401,5 @@ private:
 
 
 #endif //OPTIMIZED_BVH_H
+
 

@@ -41,6 +41,8 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/CollisionDispatch/btCollisionWorld.h			 \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h	 \
+	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp	 \
+	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm..h	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp		 \
