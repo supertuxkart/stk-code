@@ -77,7 +77,7 @@ CreditsMenu::CreditsMenu()
     //FIXME: maybe I should make scroll names more consistent
     widget_manager->enableWgtScroll( WTOK_CREDITS );
     widget_manager->setWgtYScrollPos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
-    widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -0.25f );
+    widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -100 );
     widget_manager->breakLine();
 
     widget_manager->addWgt( WTOK_QUIT, 40, 7);

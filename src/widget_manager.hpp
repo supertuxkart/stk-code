@@ -229,8 +229,8 @@ public:
     void disableWgtScroll( const int TOKEN );
     void setWgtXScrollPos( const int TOKEN, const WidgetScrollPos POS );
     void setWgtYScrollPos( const int TOKEN, const WidgetScrollPos POS );
-    void setWgtXScrollSpeed( const int TOKEN, const float SPEED );
-    void setWgtYScrollSpeed( const int TOKEN, const float SPEED );
+    void setWgtXScrollSpeed( const int TOKEN, const int SPEED );
+    void setWgtYScrollSpeed( const int TOKEN, const int SPEED );
 
     void showWgtTrack( const int TOKEN );
     void hideWgtTrack( const int TOKEN );

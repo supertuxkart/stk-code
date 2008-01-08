@@ -87,8 +87,8 @@ bool WidgetManager::addWgt
     new_id.widget->m_enable_scroll  = m_default_enable_scroll;
     new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_preset_x;
     new_id.widget->m_scroll_pos_y   = (float)m_default_scroll_preset_y;
-    new_id.widget->m_scroll_speed_x = (float)m_default_scroll_x_speed;
-    new_id.widget->m_scroll_speed_y = (float)m_default_scroll_y_speed;
+    new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;
+    new_id.widget->m_scroll_speed_y = m_default_scroll_y_speed;
 
     new_id.widget->m_enable_track = m_default_show_track;
     new_id.widget->m_track_num = m_default_track_num;
@@ -1076,7 +1076,7 @@ void WidgetManager::setWgtYScrollPos
 }
 
 //-----------------------------------------------------------------------------
-        void WidgetManager::setWgtXScrollSpeed( const int TOKEN, const float SPEED )
+        void WidgetManager::setWgtXScrollSpeed( const int TOKEN, const int SPEED )
         {
             const int ID = findId(TOKEN);
             if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
@@ -1088,7 +1088,7 @@ void WidgetManager::setWgtYScrollPos
         }
 
         //-----------------------------------------------------------------------------
-    void WidgetManager::setWgtYScrollSpeed( const int TOKEN, const float SPEED )
+    void WidgetManager::setWgtYScrollSpeed( const int TOKEN, const int SPEED )
     {
         const int ID = findId(TOKEN);
         if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;

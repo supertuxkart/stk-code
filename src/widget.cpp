@@ -264,8 +264,8 @@ void Widget::update(const float DELTA)
     if(m_enable_scroll)
     {
         //TODO: constrain speed to sane values
-        m_scroll_pos_x += m_scroll_speed_x;
-        m_scroll_pos_y += m_scroll_speed_y;
+        m_scroll_pos_x += m_scroll_speed_x * DELTA;
+        m_scroll_pos_y += m_scroll_speed_y * DELTA;
 
         //Y-axis wrapping
         if(m_scroll_pos_y * 2 > Y_LIMIT)

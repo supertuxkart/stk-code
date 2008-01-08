@@ -154,8 +154,8 @@ class Widget
     bool m_enable_scroll;
     float m_scroll_pos_x;
     float m_scroll_pos_y;
-    float m_scroll_speed_x;
-    float m_scroll_speed_y;
+    int m_scroll_speed_x;
+    int m_scroll_speed_y;
 
     //The widget calls the Track::drawScaled2D() function to draw a given
     //track, and m_track_num tells which track to draw.
