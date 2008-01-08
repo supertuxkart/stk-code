@@ -23,6 +23,7 @@
 #include <plib/ssg.h>
 #include "btBulletDynamicsCommon.h"
 #include "callback.hpp"
+#include <string>
 
 class MovingPhysics : public Callback
 {
