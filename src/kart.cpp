@@ -137,7 +137,6 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_finish_time          = 0.0f;
     m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
-    m_time_since_stuck     = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
     m_exhaust_pipe         = NULL;
@@ -555,17 +554,6 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update (float dt)
 {
-    // check if kart is stuck
-    if(!isPlayerKart() && getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f
-            && !m_rescue && world->getPhase() != World::START_PHASE)
-    {
-        m_time_since_stuck += dt;
-    }
-    else
-    {
-        m_time_since_stuck = 0.0f;
-    }
-
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_position gives the rotation around the X-axis, and since velocity's
@@ -1196,14 +1184,6 @@ void Kart::placeModel ()
     m_model_transform->setTransform(&c);
     Moveable::placeModel();
     
-    // Check if a kart needs to be rescued.
-    if((fabs(m_curr_pos.hpr[2])>60 && getSpeed()<3.0f) || 
-        m_time_since_stuck > 2.0f)
-    {
-        m_rescue=true;
-        m_time_since_stuck=0.0f;
-    }
-
 }   // placeModel
 
 //-----------------------------------------------------------------------------

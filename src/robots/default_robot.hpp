@@ -93,6 +93,10 @@ private:
     float m_curve_target_speed;
     float m_curve_angle;
 
+#if 0
+    float m_time_since_stuck;
+#endif
+
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
     /*Functions called directly from update(). They all represent an action

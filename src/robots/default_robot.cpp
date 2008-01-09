@@ -46,8 +46,6 @@ DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
     AutoKart( kart_properties, position, init_pos )
 {
     m_kart_properties      = kart_properties;
-    m_time_since_last_shot = 0.0f;
-    m_start_kart_crash_direction = 0;
     reset();
 
     switch( world->m_race_setup.m_difficulty )
@@ -480,6 +478,30 @@ void DefaultRobot::handle_rescue(const float DELTA)
         m_rescue = true;
         m_crash_time = 0.0f;
     }
+
+#if 0
+    //FIXME: this is from the kart.cpp; since we already have a way to rescue,
+    //I don't know if this is needed.
+
+    // check if kart is stuck
+    if(!isPlayerKart() && getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f
+            && !m_rescue && world->getPhase() != World::START_PHASE)
+    {
+        m_time_since_stuck += dt;
+    }
+    else
+    {
+        m_time_since_stuck = 0.0f;
+    }
+
+    // Check if a kart needs to be rescued.
+    if((fabs(m_curr_pos.hpr[2])>60 &&
+       sgLengthVec3(m_velocity.xyz)<3.0f) || m_time_since_stuck > 2.0f)
+    {
+        m_rescue=true;
+        m_time_since_stuck=0.0f;
+    }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -725,6 +747,9 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
 //-----------------------------------------------------------------------------
 void DefaultRobot::reset()
 {
+    m_time_since_last_shot = 0.0f;
+    m_start_kart_crash_direction = 0;
+
     m_sector      = Track::UNKNOWN_SECTOR;
     m_inner_curve = 0;
     m_curve_target_speed = getMaxSpeed();
@@ -737,6 +762,10 @@ void DefaultRobot::reset()
     m_time_till_start = -1.0f;
 
     m_crash_time = 0.0f;
+
+#if 0
+    m_time_since_stuck     = 0.0f;
+#endif
 
     AutoKart::reset();
 }

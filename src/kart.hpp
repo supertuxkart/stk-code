@@ -104,7 +104,6 @@ protected:
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
     float                               m_kart_height;
-    float                               m_time_since_stuck;
 
 private:
     int                 m_num_herrings_gobbled;
