@@ -66,14 +66,13 @@ SoundManager::SoundManager()
     else
         m_initialized = true;
 #else
-    //    if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
-        alutInit(0, NULL);
-        //        m_initialized = true;
-        //    else
-        //    {
-        //        fprintf(stderr, _("WARNING: Could not initialize the ALUT based sound.\n"));
-        //        m_initialized = false;
-        //    }
+    if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
+        m_initialized = true;
+    else
+    {
+        fprintf(stderr, _("WARNING: Could not initialize the ALUT based sound.\n"));
+        m_initialized = false;
+    }
 
     alGetError(); //Called here to clear any non-important errors found
 #endif
@@ -187,7 +186,7 @@ void SoundManager::playMusic(const char* filename)
         if((m_current_music->load(filename)) == false)
         {
             delete m_current_music;
-            m_current_music=0;
+	    m_current_music=0;
             fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
         }
         else
