@@ -143,7 +143,7 @@ void PlayerKart::update(float dt)
     {
         if (m_collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
         // use() needs to be called even if there currently is no collecteable
-        // since use() tests for switching a magnet on/off.
+        // since use() can test if something needs to be switched on/off.
         m_collectable.use() ;
         m_controls.fire = false;
     }

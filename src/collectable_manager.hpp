@@ -36,9 +36,6 @@ enum CollectableType {COLLECT_NOTHING,
                       COLLECT_MISSILE, COLLECT_HOMING,
                       COLLECT_SPARK, COLLECT_ZIPPER,
                       COLLECT_PARACHUTE, COLLECT_ANVIL,
-#ifdef USE_MAGNETS
-                      COLLECT_MAGNET,
-#endif
                       COLLECT_MAX};
 
 class CollectableManager

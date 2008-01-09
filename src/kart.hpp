@@ -172,7 +172,6 @@ public:
     void           endRescue           ();
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
-    void           handleMagnet        (float cdist, int closest);
     void           updatePhysics       (float dt);
     float          NormalizedLateralForce(float alpha, float corner) const;
 

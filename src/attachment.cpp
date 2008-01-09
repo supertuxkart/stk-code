@@ -141,32 +141,6 @@ void Attachment::update(float dt)
                            break;
     case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->endRescue();
                            break;
-#ifdef USE_MAGNET
-    case ATTACH_MAGNET:    break;
-    case ATTACH_MAGNET_BZZT: float cdist; int closest;
-        m_kart->getClosestKart(&cdist, &closest);
-        // if no closest kart, set type to
-        // non-active magnet
-        if(closest==-1)
-        {
-            if ( m_type == ATTACH_MAGNET_BZZT )
-                set( ATTACH_MAGNET, m_time_left ) ;
-            return;
-        }
-        // Otherwise: set type to active magnet.
-        if(m_type==ATTACH_MAGNET)
-        {
-            if(m_kart->isPlayerKart() || closest==0)
-            {
-                sound_manager->playSfx(SOUND_BZZT);
-            }
-            set(ATTACH_MAGNET_BZZT,
-                    m_time_left<4.0?4.0:m_time_left);
-        }
-        m_kart->handleMagnet(cdist, closest);
-        break;
-#endif
-
     }   // switch
 
     // Detach attachment if its time is up.

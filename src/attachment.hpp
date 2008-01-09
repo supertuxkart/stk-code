@@ -27,9 +27,6 @@ class Kart;
 // and TINYTUX being the last one. So if new elemts are added, make sure
 // to add them in between those values.
 enum attachmentType { ATTACH_PARACHUTE,
-#ifdef USE_MAGNET
-                      ATTACH_MAGNET, ATTACH_MAGNET_BZZT,
-#endif
                       ATTACH_BOMB,
                       ATTACH_ANVIL, ATTACH_TINYTUX,
                       ATTACH_MAX, ATTACH_NOTHING};

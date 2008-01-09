@@ -56,27 +56,9 @@ Material *Collectable::getIcon()
 //-----------------------------------------------------------------------------
 void Collectable::use()
 {
-#ifdef USE_MAGNET
-    if(user_config->disableMagnet)
-    {
-        attachmentType at=owner->getAttachment();
-        if(at==ATTACH_MAGNET)
-        {
-            owner->setAttachmentType(ATTACH_MAGNET_BZZT);
-        }
-        else if(at==ATTACH_MAGNET_BZZT)
-        {
-            owner->setAttachmentType(ATTACH_MAGNET     );
-        }   // if MAGNET_BZZT
-    }  // user_config->disableMagnet
-#endif
     m_number--;
     switch (m_type)
     {
-#ifdef USE_MAGNET
-    case COLLECT_MAGNET:   m_owner->attach(ATTACH_MAGNET_BZZT, stk_config->m_magnet_time);
-        break ;
-#endif
     case COLLECT_ZIPPER:   m_owner->handleZipper();
         break ;
     case COLLECT_HOMING:

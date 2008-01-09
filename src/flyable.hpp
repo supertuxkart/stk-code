@@ -53,7 +53,6 @@ protected:
 
     void              getClosestKart(const Kart **minKart, float *minDist, 
                                      btVector3 *minDelta) const;
-    virtual btCollisionShape *createShape()=0;
     virtual void      too_low  (float dt)    
                         {m_body->applyCentralForce(
                                  btVector3(0.0f, 0.0f, m_force_updown)); }
@@ -65,7 +64,8 @@ protected:
                          v.setZ(0.0f);
                          m_body->setLinearVelocity(v);  }
     void              createPhysics(const btVector3& offset, 
-                                    const btVector3 velocity);
+                                    const btVector3 velocity,
+                                    btCollisionShape *shape);
 public:
 
                  Flyable     (Kart* kart, CollectableType type);

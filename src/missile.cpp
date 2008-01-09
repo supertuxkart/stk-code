@@ -26,7 +26,8 @@ Missile::Missile(Kart *kart) : Flyable(kart, COLLECT_MISSILE)
     btVector3 offset(0.0f, 
                      kart->getKartLength()+2.0f*m_extend.getY(), 
                      0.3f );
-    createPhysics(offset, btVector3(0.0f, m_speed, 0.0f));
+    createPhysics(offset, btVector3(0.0f, m_speed, 0.0f),
+                  new btCylinderShape(0.5f*m_extend));
 }   // Missile
 
 // -----------------------------------------------------------------------------
@@ -34,12 +35,6 @@ void Missile::init(const lisp::Lisp* lisp, ssgEntity *missile)
 {
     Flyable::init(lisp, missile, COLLECT_MISSILE);
 }   // init
-
-// -----------------------------------------------------------------------------
-btCollisionShape *Missile::createShape()
-{
-    return new btCylinderShape(0.5f*m_extend);
-}  // createShape
 
 // -----------------------------------------------------------------------------
 void Missile::update(float dt)

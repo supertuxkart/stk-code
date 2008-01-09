@@ -31,7 +31,6 @@ private:
     float        steerTowards(btTransform& trans, btVector3& target);
 
 protected:
-    virtual btCollisionShape *createShape();
     virtual void too_low  (float dt)    {m_initial_velocity.setZ(m_force_updown*dt);}
     virtual void too_high(float dt)     {m_initial_velocity.setZ(-m_force_updown*dt);}
     virtual void right_height(float dt) {m_initial_velocity.setZ(0.0f);  }

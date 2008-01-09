@@ -142,7 +142,6 @@ public:
     std::string m_herring_style;
     std::string m_username;
     std::string m_background_music;
-    bool        m_disable_magnet;   // true if a magnet can be dis- and enabled
     bool        m_replay_history;
     bool        m_use_kph;
     bool        m_improved_physics;

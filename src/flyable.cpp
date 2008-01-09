@@ -59,7 +59,8 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     scene->add(m);
 }   // Flyable
 // ----------------------------------------------------------------------------
-void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
+void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity,
+                            btCollisionShape *shape)
 {
     // The actual transform is determined as follows:
     // 1) Compute the heading of the kart
@@ -88,7 +89,7 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity)
         
     trans  *= offset_transform;
 
-    m_shape = createShape();   // get shape
+    m_shape = shape;
     createBody(m_mass, trans, m_shape, UserPointer::UP_PROJECTILE);
     world->getPhysics()->addBody(getBody());
 

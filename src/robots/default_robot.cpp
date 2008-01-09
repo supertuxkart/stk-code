@@ -344,7 +344,6 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                     m_time_since_last_shot = 0.0f;
                 }
                 break;
-                /*TODO: teach AI to use the magnet*/
             default:
                 m_controls.fire = true;
                 m_time_since_last_shot = 0.0f;

@@ -24,8 +24,6 @@
 
 class Missile : public Flyable
 {
-protected:
-        virtual btCollisionShape *createShape();
 public:
     Missile(Kart *kart);
     static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);

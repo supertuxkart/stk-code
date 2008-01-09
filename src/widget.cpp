@@ -148,8 +148,8 @@ void Widget::update(const float DELTA)
 
         if( m_track_num != -1 )
         {
-            track_manager->getTrack( m_track_num )->drawScaled2D( m_x, m_y,
-                m_width, m_height);
+            track_manager->getTrack( m_track_num )->drawScaled2D( (float)m_x, 
+                (float)m_y, (float)m_width, (float)m_height);
         }
         else
         {

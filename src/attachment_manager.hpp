@@ -1,4 +1,3 @@
-//  $Id: attachment_manager.hpp 757 2006-09-11 22:27:39Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs

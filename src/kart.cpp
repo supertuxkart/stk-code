@@ -1185,53 +1185,6 @@ void Kart::placeModel ()
     Moveable::placeModel();
     
 }   // placeModel
-
-//-----------------------------------------------------------------------------
-void Kart::getClosestKart(float *cdist, int *closest)
-{
-    *cdist   = SG_MAX ;
-    *closest = -1 ;
-
-    for ( unsigned int i = 0; i < world->getNumKarts() ; ++i )
-    {
-        if ( world->getKart(i) == this ) continue ;
-        if ( world->getKart(i)->getDistanceDownTrack() < getDistanceDownTrack() )
-            continue ;
-
-        float d = sgDistanceSquaredVec2 ( getCoord()->xyz,
-                                          world->getKart(i)->getCoord()->xyz ) ;
-        if ( d < *cdist && d < stk_config->m_magnet_range_sq)
-        {
-            *cdist = d ;
-            *closest = i ;
-        }
-    }   // for i
-}   // getClosestKart
-
-//-----------------------------------------------------------------------------
-void Kart::handleMagnet(float cdist, int closest)
-{
-
-    sgVec3 vec ;
-    sgSubVec2 ( vec, world->getKart(closest)->getCoord()->xyz, getCoord()->xyz );
-    vec [ 2 ] = 0.0f ;
-    sgNormalizeVec3 ( vec ) ;
-
-    sgHPRfromVec3 ( getCoord()->hpr, vec ) ;
-
-    float tgt_velocity = world->getKart(closest)->getVelocity().getY();
-
-    //JH FIXME: that should probably be changed, e.g. by increasing the throttle
-    //          to something larger than 1???
-    if (cdist > stk_config->m_magnet_min_range_sq)
-    {
-        if ( getSpeed ()< tgt_velocity )
-;//FIXME            m_velocity.xyz[1] = tgt_velocity * 1.4f;
-    }
-    else
-;//FIXME        m_velocity.xyz[1] = tgt_velocity ;
-}   // handleMagnet
-
 //-----------------------------------------------------------------------------
 void Kart::setFinishingState(float time)
 {

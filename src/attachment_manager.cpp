@@ -44,10 +44,6 @@ struct  initAttachmentType {attachmentType attachment; const char *file;};
 initAttachmentType iat[]=
 {
     {ATTACH_PARACHUTE,   "parachute.ac"},
-#ifdef USE_MAGNET
-    {ATTACH_MAGNET,      "magnet.ac"},
-    {ATTACH_MAGNET_BZZT, "magnetbzzt.ac"},
-#endif
     {ATTACH_BOMB,        "bomb.ac"},
     {ATTACH_ANVIL,       "anvil.ac"},
     {ATTACH_TINYTUX,     "tinytux_magnet.ac"},

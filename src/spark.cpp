@@ -35,7 +35,8 @@ Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_SPARK)
         speed   = m_speed;
     }
 
-    createPhysics(offset, btVector3(0.0f, speed, 0.0f));
+    createPhysics(offset, btVector3(0.0f, speed, 0.0f),
+                  new btSphereShape(0.5f*m_extend.getY()));
 
     // unset no_contact_response flags, so that the spark 
     // will bounce off the track
@@ -54,13 +55,6 @@ void Spark::init(const lisp::Lisp* lisp, ssgEntity *spark)
     lisp->get("max-distance",    m_st_max_distance   );
     lisp->get("force-to-target", m_st_force_to_target);
 }   // init
-
-// -----------------------------------------------------------------------------
-btCollisionShape *Spark::createShape()
-{
-    return new btSphereShape(0.5f*m_extend.getY());
-    
-}   // createShape
 
 // -----------------------------------------------------------------------------
 void Spark::update(float dt)

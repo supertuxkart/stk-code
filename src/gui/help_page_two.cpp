@@ -137,10 +137,6 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->showWgtText( WTOK_ITEMTXT6 );
     widget_manager->breakLine();
 
-#ifdef USE_MAGNETS
-    //Magnets are currently disabled.
-#endif
-
     /*Buttons at the bottom*/
     widget_manager->addWgt(WTOK_FIRST_PAGE, 25, 7);
     widget_manager->setWgtText(WTOK_FIRST_PAGE, _("Previous screen"));

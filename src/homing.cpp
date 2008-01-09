@@ -33,7 +33,7 @@ Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
                      0.3f );
     // The cylinder needs to be rotated by 90 degrees to face in the right direction:
     m_initial_velocity = btVector3(0.0f, m_speed, 0.0f);
-    createPhysics(offset, m_initial_velocity);
+    createPhysics(offset, m_initial_velocity, new btCylinderShape(0.5f*m_extend));
     m_body->setCollisionFlags(m_body->getCollisionFlags()           |
                               btCollisionObject::CF_KINEMATIC_OBJECT );
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -48,11 +48,6 @@ void Homing::init(const lisp::Lisp* lisp, ssgEntity *homing)
     lisp->get("max-distance",    m_st_max_distance  );
     lisp->get("max-turn-angle",  m_st_max_turn_angle);
 }   // init
-// -----------------------------------------------------------------------------
-btCollisionShape *Homing::createShape()
-{
-    return new btCylinderShape(0.5f*m_extend);
-}  // createShape
 
 // -----------------------------------------------------------------------------
 void Homing::update(float dt)

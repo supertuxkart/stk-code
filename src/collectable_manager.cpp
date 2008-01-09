@@ -41,9 +41,6 @@ initCollectableType;
 initCollectableType ict[]=
 {
     {COLLECT_ZIPPER,    "zipper.collectable"       },
-#ifdef USE_MAGNETS
-    {COLLECT_MAGNET,    "magnet.collectable"       },
-#endif
     {COLLECT_SPARK,     "spark.projectile"         },
     {COLLECT_MISSILE,   "missile.projectile"       },
     {COLLECT_HOMING,    "homingmissile.projectile" },

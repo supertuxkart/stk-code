@@ -29,9 +29,6 @@ public:
     float m_anvil_weight;            // Additional kart weight if anvil is attached
     float m_anvil_speed_factor;      // To decrease speed once when attached
     float m_parachute_friction;      // Increased air friction when parachute
-    float m_magnet_range_sq;         // Squared range for magnets
-    float m_magnet_min_range_sq;     // Squared minimum range for magnets
-    float m_magnet_time;             // time a magnet is active
     float m_jump_impulse;            // percentage of gravity when jumping
     float m_air_res_reduce[3];       // air resistance reduction for the three levels
     float m_parachute_time;          // time a parachute is active

@@ -124,7 +124,6 @@ void UserConfig::setDefaults()
     m_display_fps      = false;
     m_herring_style    = "new";
     m_background_music = "";
-    m_disable_magnet   = true;
     m_profile          = 0;
     m_use_kph          = false;
     m_improved_physics = false;
@@ -428,7 +427,6 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("displayFPS",       m_display_fps);
         lisp->get("herringStyle",     m_herring_style);
         lisp->get("background-music", m_background_music);
-        lisp->get("disableMagnet",    m_disable_magnet);
         lisp->get("useKPH",           m_use_kph);
         lisp->get("improvedPhysics",  m_improved_physics);
 
@@ -605,8 +603,6 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("herringStyle\t", m_herring_style);
         writer->writeComment("Background music file to use,");
         writer->write("background-music\t", m_background_music);
-        writer->writeComment("Allow players to disable a magnet");
-        writer->write("disableMagnet\t", m_disable_magnet);
         writer->writeComment("Use of kilometers per hours (km/h) instead of mph");
         writer->write("useKPH\t", m_use_kph);
         writer->writeComment("With improved physics the gravity on a non-horizontal");

@@ -67,8 +67,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_air_resistance,          "air-resistance"               );
     CHECK_NEG(m_max_steer_angle,         "max-steer-angle"              );
     CHECK_NEG(m_roll_resistance,         "roll-resistance"              );
-    CHECK_NEG(m_magnet_range_sq,         "magnet-range"                 );
-    CHECK_NEG(m_magnet_time,             "magnet-time"                  );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
     CHECK_NEG(m_brake_force,             "brake-force"                  );
     CHECK_NEG(m_jump_impulse,            "jump-impulse"                 );
@@ -86,7 +84,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_wheelie_step,            "wheelie-step"                 );
     CHECK_NEG(m_wheelie_power_boost,     "wheelie-power-boost"          );
 
-    CHECK_NEG(m_magnet_min_range_sq,     "magnet-min-range"             );
     CHECK_NEG(m_parachute_friction,      "parachute-friction"           );
     CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
 
@@ -116,9 +113,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
 
-    // Precompute some handy values to reduce work later
-    m_magnet_range_sq    = m_magnet_range_sq   * m_magnet_range_sq;
-    m_magnet_min_range_sq = m_magnet_min_range_sq * m_magnet_min_range_sq;
 }   // load
 
 /** Init all values with invalid defaults, which are tested later. This
@@ -127,16 +121,16 @@ void STKConfig::load(const std::string filename)
  */
 void STKConfig::init_defaults()
 {
-    m_wheel_base  = m_height_cog      = m_magnet_min_range_sq = m_roll_resistance  = m_mass =
+    m_wheel_base  = m_height_cog      = m_roll_resistance  = m_mass =
     m_corn_r      = m_air_resistance = m_tire_grip        = m_max_steer_angle  =
     m_corn_f      = m_inertia        = m_anvil_weight      = m_parachute_friction =
-    m_engine_power = m_magnet_range_sq = m_jump_impulse      = m_brake_factor     =
+    m_engine_power = m_jump_impulse      = m_brake_factor     =
     m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
     m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] =
     m_parachute_time = m_bomb_time = m_bomb_time_increase= m_anvil_time = 
     m_zipper_time = m_zipper_force = 
-    m_parachute_time_other = m_magnet_time = m_max_road_distance = m_shortcut_segments =
+    m_parachute_time_other = m_max_road_distance = m_shortcut_segments =
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
@@ -161,9 +155,6 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("shortcut-skipped-segments",    m_shortcut_segments   );
     lisp->get("anvil-speed-factor",           m_anvil_speed_factor  );
     lisp->get("parachute-friction",           m_parachute_friction  );
-    lisp->get("magnet-range",                 m_magnet_range_sq     );
-    lisp->get("magnet-min-range",             m_magnet_min_range_sq );
-    lisp->get("magnet-time",                  m_magnet_time         );
     lisp->get("jump-impulse",                 m_jump_impulse        );
     lisp->get("reduce-air-resistance-racer",  m_air_res_reduce[2]   );
     lisp->get("reduce-air-resistance-driver", m_air_res_reduce[1]   );

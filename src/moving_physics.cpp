@@ -27,15 +27,14 @@
 #include "scene.hpp"
 
 // -----------------------------------------------------------------------------
-MovingPhysics::MovingPhysics(const std::string data, ssgTransform* trans)
-             : Callback()
+MovingPhysics::MovingPhysics(const std::string data)
+             : Callback(), ssgTransform()
 {
-    m_trans        = trans;
     m_shape        = NULL;
     m_body         = NULL;
     m_motion_state = NULL;
     m_mass         = 1;
-    m_trans->setUserData(new ssgBase());   // prevent tree optimisations to remove this node
+    setUserData(new ssgBase());   // prevent tree optimisations to remove this node
 
     std::vector<std::string> parameters = StringUtils::split(data, ' ');
     if(parameters.size()<2)
@@ -60,19 +59,17 @@ MovingPhysics::MovingPhysics(const std::string data, ssgTransform* trans)
             fprintf(stderr, "Invalid physics parameter string: '%s'\n",data.c_str());
             break;
         } 
+        if(p[0]=="mass") 
+        {
+            StringUtils::from_string<float>(p[1], m_mass);
+        }
         else
         {
-            if(p[0]=="mass") 
-            {
-                StringUtils::from_string<float>(p[1], m_mass);
-            }
-            else
-            {
-                fprintf(stderr, "Invalid physics parameter string: '%s'\n",
-                        data.c_str());
-                break;
-            }
+            fprintf(stderr, "Invalid physics parameter string: '%s'\n",
+                    data.c_str());
+            break;
         }
+
         parameters.erase(parameters.begin());
     }
 }   // MovingPhysics
@@ -80,11 +77,11 @@ MovingPhysics::MovingPhysics(const std::string data, ssgTransform* trans)
 // -----------------------------------------------------------------------------
 MovingPhysics::~MovingPhysics()
 {
-    scene->remove(m_trans);
     world->getPhysics()->removeBody(m_body);
-    delete m_shape;
-    delete m_motion_state;
     delete m_body;
+    delete m_motion_state;
+    delete m_shape;
+    scene->remove(this);
 }  // ~MovingPhysics
 
 // -----------------------------------------------------------------------------
@@ -103,15 +100,15 @@ void MovingPhysics::init()
 
     // 1. Remove the object from the graph and attach it to the root
     // -------------------------------------------------------------
-    if(m_trans->getNumParents()>1) 
+    if(getNumParents()>1) 
     {
         fprintf(stderr, "WARNING: physical object with more than one parent!!\n");
         return;
     }
-    ssgBranch *parent = m_trans->getParent(0);
+    ssgBranch *parent = getParent(0);
 
-    scene->add(m_trans);
-    parent->removeKid(m_trans);
+    scene->add(this);
+    parent->removeKid(this);
 
     // 2. Determine the original position of the object
     // ------------------------------------------------
@@ -160,18 +157,18 @@ void MovingPhysics::init()
     // 3. Determine size of the object
     // -------------------------------
     float x_min, x_max, y_min, y_max, z_min, z_max, radius;
-    MinMax(m_trans, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+    MinMax(this, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
     m_half_height = 0.5f*(z_max-z_min);
     switch (m_body_type)
     {
     case BODY_CONE: radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
-                    m_shape = new btConeShape(radius, z_max-z_min);
-                    m_trans->setName("cone");
+                    m_shape = new btConeShapeZ(radius, z_max-z_min);
+                    setName("cone");
                     break;
     case BODY_BOX:  m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
                                                        0.5f*(y_max-y_min),
                                                        0.5f*(z_max-z_min) ) );
-                    m_trans->setName("box");
+                    setName("box");
                     break;
     case BODY_NONE: fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         break;
@@ -181,13 +178,12 @@ void MovingPhysics::init()
     // --------------------------
     btTransform trans;
     trans.setIdentity();
-    //    trans.setOrigin(btVector3(0, 8, 5+rand()%10));
     trans.setOrigin(btVector3(pos[3][0],pos[3][1],pos[3][2]+m_half_height));
     m_motion_state = new btDefaultMotionState(trans);
-    float mass     = 10;
     btVector3 inertia;
-    m_shape->calculateLocalInertia(mass, inertia);
-    m_body = new btRigidBody(mass, m_motion_state, m_shape, inertia);
+    m_shape->calculateLocalInertia(m_mass, inertia);
+    m_body = new btRigidBody(m_mass, m_motion_state, m_shape, inertia);
+    //m_body->setDamping(2.0f, 2.0f);
     world->getPhysics()->addBody(m_body);
 }   // init
 
@@ -198,12 +194,12 @@ void MovingPhysics::update(float dt)
     m_motion_state->getWorldTransform(t);
     float m[4][4];
     t.getOpenGLMatrix((float*)&m);
-
+    
     //    printf("%lx is %f %f %f\n",this, t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
     // Transfer the new position and hpr to m_curr_pos
     sgCoord m_curr_pos;
     sgSetCoord(&m_curr_pos, m);
-    m_trans->setTransform(&m_curr_pos);
+    setTransform(&m_curr_pos);
 }   // update
 // -----------------------------------------------------------------------------
 

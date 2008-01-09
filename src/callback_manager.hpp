@@ -42,7 +42,7 @@ public:
     void update     (float dt) const;
     void initAll    () const;
     void clear      (CallbackType cbType);
-    void addCallback(Callback *c, CallbackType t) {m_allCallbacks[t].push_back(c);}
+    void addCallback(Callback *c, CallbackType t);
 }
 ;   // CallbackManager
 

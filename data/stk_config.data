@@ -14,9 +14,6 @@
  (anvil-weight             150.0 )  ;; additional weight an anvil adds to a kart
  (anvil-speed-factor         0.2 )  ;; additional slowdown caused by anvil
  (parachute-friction         2.0 )  ;; friction increase when a parachute is sttached
- (magnet-range              30.0 )  ;; maximum range a magnet can work
- (magnet-min-range           4.0 )  ;; unless this distance is reached, kart will accel.
- (magnet-time               10.0 )  ;; time a magnet is active
  (parachute-time             4.0 )  ;; time an attached parachute is active
  (parachute-time-other       8.0 )  ;; time a parachute attached from other kart is active
  (bomb-time                 30.0 )  ;; time till a bomb explodes

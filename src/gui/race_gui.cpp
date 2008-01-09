@@ -243,6 +243,7 @@ void RaceGUI::drawFPS ()
 //-----------------------------------------------------------------------------
 void RaceGUI::drawTimer ()
 {
+    return;
     if(world->getPhase()!=World::RACE_PHASE         &&
        world->getPhase()!=World::DELAY_FINISH_PHASE   ) return;
     char str[256];

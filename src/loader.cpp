@@ -364,11 +364,9 @@ ssgBranch *Loader::createBranch(char *data) const
     }
     if(strncmp("physics", data, strlen("physics")) == 0)
     {
-        ssgTransform *tr = new ssgTransform();
-        MovingPhysics *mp = new MovingPhysics(std::string(data), tr);
+        MovingPhysics *mp = new MovingPhysics(std::string(data));
         callback_manager->addCallback(mp, m_current_callback_type);
-
-        return tr;
+        return mp;
     }
     fprintf(stderr, "Warning: Ignoring userdata '%s'\n", data);
     return NULL ;

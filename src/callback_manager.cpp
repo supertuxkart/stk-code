@@ -37,18 +37,49 @@ CallbackManager::~CallbackManager()
     {
         for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
             c != m_allCallbacks[i].end(); c++)
-            delete *c;
-        m_allCallbacks[i].clear();
-    }
+        {
+            MovingPhysics *mp = dynamic_cast<MovingPhysics*>(*c);
+            if(mp)
+            {
+                ssgDeRefDelete(mp);
+            }
+            else
+            {
+                delete *c;
+            }
+            m_allCallbacks[i].clear();
+        }   // for c in m_allCallbacks[i]
+    }   // for i <CB_MAX
 }   // ~CallbackManager
 
 //-----------------------------------------------------------------------------
+void CallbackManager::addCallback(Callback *c, CallbackType t) 
+{
+    m_allCallbacks[t].push_back(c);
+        MovingPhysics *mp = dynamic_cast<MovingPhysics*>(c);
+        if(mp)
+        {
+            mp->ref();
+        }
+}   // addCallback
+
+//-----------------------------------------------------------------------------
+
+
 void CallbackManager::clear(CallbackType cbType)
 {
     for(std::vector<Callback*>::const_iterator c = m_allCallbacks[cbType].begin();
         c != m_allCallbacks[cbType].end(); c++)
     {
-        delete *c;
+        MovingPhysics *mp = dynamic_cast<MovingPhysics*>(*c);
+        if(mp)
+        {
+            ssgDeRefDelete(mp);
+        }
+        else
+        {
+            delete *c;
+        }
     }
 
     m_allCallbacks[cbType].clear();

@@ -27,8 +27,6 @@ class Spark : public Flyable
 private:
     static float m_st_max_distance;   // maximum distance for a spark to be attracted
     static float m_st_force_to_target;
-protected:
-    virtual btCollisionShape *createShape();
 
 public:
     Spark(Kart* kart);

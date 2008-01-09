@@ -46,10 +46,10 @@ RaceMode::exit_race()
 {
     menu_manager->switchToMainMenu();
 
+    scene->clear();
+
     delete world;
     world = 0;
-
-    scene->clear();
 
     race_manager->m_active_race = false;
 
