@@ -52,7 +52,7 @@
    (time-full-steer          0.3 )
    (corn-f                   4   )
    (corn-r                   4   )
-   (wheelie-max-speed-ratio  0.9 ) ;; percentage of max speed for wheelies to work
+   (wheelie-max-speed-ratio  0.7 ) ;; percentage of max speed for wheelies to work
    (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
    (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
    (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
