@@ -7,9 +7,9 @@
  (speed 5.0)
  (min-height 0.2)      ; height above terrain below which a spark is 
                        ; started to be pulled up 
- (max-height 3.0)      ; height above terrain at which a spark is 
+ (max-height 1.0)      ; height above terrain at which a spark is 
                        ; started to be pulled back to ground
- (force-updown 20.0)   ; force pushing the spark down 
+ (force-updown 2.0)    ; force pushing the spark down 
                        ; when it's too high above ground
  (force-to-target 20)  ; force with which a spark flies towards
                        ; the nearest kart

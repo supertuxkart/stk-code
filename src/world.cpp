@@ -17,13 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//#define DEBUG_SHOW_DRIVEPOINTS //This would place a small sphere in every point
-//of the driveline, the one at the first point
-//is purple, the others are yellow.
-#ifdef DEBUG_SHOW_DRIVEPOINTS
-#include <plib/ssgAux.h>
-#endif
-
 #include <assert.h>
 #include <sstream>
 #include <stdexcept>

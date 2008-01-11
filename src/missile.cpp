@@ -23,10 +23,8 @@
 // -----------------------------------------------------------------------------
 Missile::Missile(Kart *kart) : Flyable(kart, COLLECT_MISSILE)
 {
-    btVector3 offset(0.0f, 
-                     kart->getKartLength()+2.0f*m_extend.getY(), 
-                     0.3f );
-    createPhysics(offset, btVector3(0.0f, m_speed, 0.0f),
+    float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
+    createPhysics(y_offset, btVector3(0.0f, m_speed, 0.0f),
                   new btCylinderShape(0.5f*m_extend));
 }   // Missile
 

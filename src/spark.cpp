@@ -24,18 +24,16 @@ float Spark::m_st_force_to_target;
 // -----------------------------------------------------------------------------
 Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_SPARK)
 {
-    btVector3 offset(0.0f, 
-                     -0.5f*kart->getKartLength()-2.0f*m_extend.getY(), 
-                     0.5f*kart->getKartHeight());
-    float     speed=-m_speed;
+    float y_offset = -0.5f*kart->getKartLength()-2.0f*m_extend.getY();
+    float speed    = -m_speed;
     // if the kart is driving backwards, release from the front
     if(m_owner->getSpeed()<0) 
     {
-        offset.setY(0.5f*kart->getKartLength()+2.0f*m_extend.getY());
-        speed   = m_speed;
+        y_offset = -y_offset;
+        speed    = -speed;
     }
 
-    createPhysics(offset, btVector3(0.0f, speed, 0.0f),
+    createPhysics(y_offset, btVector3(0.0f, speed, 0.0f),
                   new btSphereShape(0.5f*m_extend.getY()));
 
     // unset no_contact_response flags, so that the spark 

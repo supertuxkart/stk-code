@@ -24,16 +24,20 @@ float Homing::m_st_max_distance;
 float Homing::m_st_max_turn_angle;
 
 // -----------------------------------------------------------------------------
+/** A homing missile is handled as a kinematic object, since this simplifies
+ *  computation of turning (otherwise rotational forces would have to be 
+ *  applied). As a result, the mass must be zero, and linear velocity of the
+ *  body can not be set (asserts in bullet). So this object implements its
+ *  own setting/getting of velocity, to be able to use flyables functions.
+ */
 Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
 {
     m_mass = 0.0f;    // a kinematik object must have mass=0, otherwise warnings
                       // will be printed during bullet collision handling.
-    btVector3 offset(0.0f, 
-                     kart->getKartLength()+2.0f*m_extend.getY(), 
-                     0.3f );
-    // The cylinder needs to be rotated by 90 degrees to face in the right direction:
+    float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
+    
     m_initial_velocity = btVector3(0.0f, m_speed, 0.0f);
-    createPhysics(offset, m_initial_velocity, new btCylinderShape(0.5f*m_extend));
+    createPhysics(y_offset, m_initial_velocity, new btCylinderShape(0.5f*m_extend));
     m_body->setCollisionFlags(m_body->getCollisionFlags()           |
                               btCollisionObject::CF_KINEMATIC_OBJECT );
     m_body->setActivationState(DISABLE_DEACTIVATION);

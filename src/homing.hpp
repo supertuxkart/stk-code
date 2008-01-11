@@ -30,16 +30,15 @@ private:
     btVector3    m_initial_velocity;
     float        steerTowards(btTransform& trans, btVector3& target);
 
-protected:
-    virtual void too_low  (float dt)    {m_initial_velocity.setZ(m_force_updown*dt);}
-    virtual void too_high(float dt)     {m_initial_velocity.setZ(-m_force_updown*dt);}
-    virtual void right_height(float dt) {m_initial_velocity.setZ(0.0f);  }
-
 public:
     Homing (Kart *kart);
     static  void init     (const lisp::Lisp* lisp, ssgEntity* homing);
     virtual void update   (float dt);
-    virtual void hitTrack ()             { explode(NULL); }
+    virtual void hitTrack ()                      { explode(NULL);           }
+    // Kinematic objects are not allowed to have a velocity (assertion in 
+    // bullet), so we have to do our own velocity handling here
+    virtual const btVector3 &getVelocity() const  {return m_initial_velocity;}
+    virtual void  setVelocity(const btVector3& v) {m_initial_velocity=v;     }
 
 };   // Homing
 

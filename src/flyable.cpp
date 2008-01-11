@@ -43,6 +43,7 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     m_extend            = m_st_extend[type];
     m_max_height        = m_st_max_height[type];
     m_min_height        = m_st_min_height[type];
+    m_average_height    = (m_min_height+m_max_height)/2.0f;
     m_force_updown      = m_st_force_updown[type];
 
     m_owner             = kart;
@@ -59,7 +60,7 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     scene->add(m);
 }   // Flyable
 // ----------------------------------------------------------------------------
-void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity,
+void Flyable::createPhysics(float y_offset, const btVector3 velocity,
                             btCollisionShape *shape)
 {
     // The actual transform is determined as follows:
@@ -85,6 +86,7 @@ void Flyable::createPhysics(const btVector3& offset, const btVector3 velocity,
     // Apply rotation and offset
     btTransform offset_transform;
     offset_transform.setIdentity();
+    btVector3 offset=btVector3(0,y_offset,m_average_height);
     offset_transform.setOrigin(offset);
         
     trans  *= offset_transform;
@@ -179,15 +181,18 @@ void Flyable::update (float dt)
     }
 
     float hat = trans.getOrigin().getZ()-getHoT();
-    if(hat<m_min_height)   
-        too_low(dt);
-    else if(hat>m_max_height) 
-        too_high(dt);
-    else                                
-        right_height(dt);
+
+    // Use the Height Above Terrain to set the Z velocity.
+    // HAT is clamped by min/max height. This might be somewhat
+    // unphysical, but feels right in the game.
+    hat = std::max(std::min(hat, m_max_height) , m_min_height);
+    float delta = m_average_height - hat;
+    btVector3 v=getVelocity();
+    v.setZ(m_force_updown*delta);
+    setVelocity(v);
+
     Moveable::update(dt);
 }   // update
-
 // -----------------------------------------------------------------------------
 void Flyable::placeModel()
 {

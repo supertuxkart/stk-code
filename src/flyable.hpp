@@ -36,6 +36,7 @@ protected:
     btCollisionShape *m_shape;
     float             m_max_height;
     float             m_min_height;
+    float             m_average_height;     // average of m_{min,ax}_height
     float             m_force_updown;
     float             m_speed;
     float             m_mass;
@@ -53,17 +54,7 @@ protected:
 
     void              getClosestKart(const Kart **minKart, float *minDist, 
                                      btVector3 *minDelta) const;
-    virtual void      too_low  (float dt)    
-                        {m_body->applyCentralForce(
-                                 btVector3(0.0f, 0.0f, m_force_updown)); }
-    virtual void      too_high(float dt)
-                        {m_body->applyCentralForce(
-                                 btVector3(0.0f, 0.0f, -m_force_updown)); }
-    virtual void      right_height(float dt)
-                        {btVector3 v=m_body->getLinearVelocity();
-                         v.setZ(0.0f);
-                         m_body->setLinearVelocity(v);  }
-    void              createPhysics(const btVector3& offset, 
+    void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
                                     btCollisionShape *shape);
 public:
