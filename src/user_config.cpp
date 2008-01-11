@@ -148,7 +148,7 @@ void UserConfig::setDefaults()
     }
 	
 	// Clear every entry.
-	memset(inputMap, sizeof(inputMap), 0);
+	memset(inputMap, 0, sizeof(inputMap));
 	
 	/* general game input settings */
 	set(GA_ENTER,
