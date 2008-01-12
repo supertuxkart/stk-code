@@ -13,6 +13,15 @@ dnl ================================================
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(supertuxkart, SVN)
 
+
+dnl =====================================================
+dnl Set the default CFLAGS/CXXFLAGS
+dnl If these were not set, the AC_PROG_CC and AC_PROG_CXX
+dnl scripts set them to "-g -O2".
+dnl =====================================================
+CFLAGS="$CFLAGS -O2 -Wall -Wstrict-prototypes -Wmissing-prototypes"
+CXXFLAGS="$CXXFLAGS -O2 -Wall"
+
 dnl ===================
 dnl Check for compilers
 dnl ===================
@@ -20,11 +29,18 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
 
-dnl ==================
-dnl Set compiler flags
-dnl ==================
-CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
-CXXFLAGS="$CXXFLAGS -Wall"
+dnl =============================================
+dnl Define debug which enables some cheats
+dnl This should be DISABLED when doing a release!
+dnl =============================================
+SUMMARY="\nSummary of optional components:\n==============================="
+AC_ARG_ENABLE(debug, [  --enable-debug    Enable debugging info],
+[AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
+CFLAGS="$CFLAGS -g -pg"
+CXXFLAGS="$CXXFLAGS -g -pg"
+SUMMARY="$SUMMARY\nEnabled debugging, please disable for a release!!"
+]
+)
 
 dnl ===================
 dnl Checks for programs.
@@ -115,7 +131,6 @@ if test x$have_al_lib = xyes; then
   esac
 fi
 
-SUMMARY="\nSummary of optional components:\n==============================="
 case "${host}" in
 *)
    dnl default unix style machines
@@ -370,13 +385,6 @@ case "${host}" in
 esac
 
 AC_SUBST(BULLETTREE)
-
-dnl =============================================
-dnl Define debug which enables some cheats
-dnl This should be DISABLED when doing a release!
-dnl =============================================
-AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
-SUMMARY="$SUMMARY\nEnabled cheats for debugging, please disable for a release!!"
 
 dnl ================
 dnl Create makefiles
