@@ -264,8 +264,12 @@ int handleCmdLine(int argc, char **argv)
         else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
         {
             if (sscanf(argv[i+1], "%dx%d", &user_config->m_width, &user_config->m_height) == 2)
-                fprintf ( stdout, _("You choose to be in %dx%d.\n"), user_config->m_width,
+                {
+                	fprintf ( stdout, _("You choose to be in %dx%d.\n"), user_config->m_width,
                           user_config->m_height );
+               		user_config->m_prev_width = user_config->m_width;
+               		user_config->m_prev_height = user_config->m_height;
+                }
             else
             {
                 fprintf(stderr, _("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));

@@ -141,4 +141,7 @@ BaseGUI::inputKeyboard(SDLKey, int)
 }
 
 //-----------------------------------------------------------------------------
+void BaseGUI::countdown()
+{
+}
 /* EOF */

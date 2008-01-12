@@ -24,6 +24,7 @@
 
 #include "base_gui.hpp"
 #include "translation.hpp"
+#include "display_res_confirm.hpp"
 
 class ConfigDisplay: public BaseGUI
 {
@@ -34,14 +35,15 @@ public:
     void select();
 
 private:
-    int m_fullscreen_menu_id;
-    
     std::vector<std::pair<int,int> > m_sizes;
     int m_sizes_index;
     int m_sizes_size;
     char m_resolution[MAX_MESSAGE_LENGTH];
-    
-    void changeResolution(int width, int height);
+    int m_curr_width;
+    int m_curr_height;
+        
+    // changeResolution reverse param is set true when changing to a previous resolution  
+    void changeResolution(int width, int height, bool reverse=false);
     void getScreenModes();
 };
 

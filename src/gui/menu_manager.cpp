@@ -34,6 +34,7 @@
 #include "num_players.hpp"
 #include "config_controls.hpp"
 #include "config_display.hpp"
+#include "display_res_confirm.hpp"
 #include "config_sound.hpp"
 #include "player_controls.hpp"
 #include "race_gui.hpp"
@@ -199,6 +200,9 @@ void MenuManager::update()
             case MENUID_CONFIG_DISPLAY:
                 m_current_menu= new ConfigDisplay();
                 break;
+            case MENUID_DISPLAY_RES_CONFIRM:
+            	m_current_menu= new DisplayResConfirm();
+            	break;
             case MENUID_CONFIG_SOUND:
                 m_current_menu= new ConfigSound();
                 break;

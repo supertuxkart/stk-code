@@ -1,7 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2008 Paul Elms
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,35 +17,29 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BASEGUI_H
-#define HEADER_BASEGUI_H
+#ifndef HEADER_DISPLAY_RES_CONFIRM_H
+#define HEADER_DISPLAY_RES_CONFIRM_H
+
+#include "base_gui.hpp"
+//#include "translation.hpp"
 
 #include <SDL/SDL.h>
-#include "input.hpp"
 
-class BaseGUI
+class DisplayResConfirm: public BaseGUI
 {
-	void animateWidget(const int, const int);
-		
 public:
-    BaseGUI() {}
-    virtual ~BaseGUI() {}
+    DisplayResConfirm();
+    ~DisplayResConfirm();
 
-    virtual void update(float dt);
-    virtual void select() = 0;
-	
-	virtual void handle(GameAction, int);
-	
-	virtual void inputKeyboard(SDLKey, int);
-	
-	virtual void countdown();
+    void select();
+    void countdown();
 
-    void inputPointer(int x, int y);
-
-    void  TimeToString(const double time, char *s);
-protected:
-
-    int m_menu_id;
+private:
+    SDL_TimerID m_timer;
+    char m_count[60];
+    int m_counter;
 };
 
-#endif // HEADER_BASEGUI_H
+Uint32 timeout(Uint32 interval, void *param);
+
+#endif

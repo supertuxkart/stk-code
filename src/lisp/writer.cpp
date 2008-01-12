@@ -192,7 +192,19 @@ namespace lisp
     }
 
 //-----------------------------------------------------------------------------
+	
+	void
+    Writer::write(const std::string& name, const std::vector<std::string>& value)
+    {
+        indent();
+        *m_out << '(' << name;
+        for(std::vector<std::string>::const_iterator i = value.begin(); i != value.end(); ++i)
+            *m_out << " " << "\"" << *i << "\"";
+        *m_out << ")\n";
+    }
 
+//-----------------------------------------------------------------------------
+    
     void
     Writer::indent()
     {

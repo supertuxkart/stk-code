@@ -37,6 +37,7 @@
 #define SUPPORTED_CONFIG_VERSION 3
 
 #include <string>
+#include <vector>
 #include "input.hpp"
 #include "player.hpp"
 #include "lisp/lisp.hpp"
@@ -147,6 +148,10 @@ public:
     bool        m_improved_physics;
     int         m_width;
     int         m_height;
+    int			m_prev_width;
+    int			m_prev_height;
+    bool		m_crashed;
+    std::vector<std::string> m_blacklist_res;
     int         m_karts;
     Player      m_player[PLAYERS];
     bool        m_log_errors;

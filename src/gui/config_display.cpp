@@ -49,8 +49,12 @@ enum WidgetTokens
     WTOK_EMPTY1,
     
     WTOK_EMPTY2,
+    
+    WTOK_EMPTY3,
 
-    WTOK_QUIT
+    WTOK_QUIT,
+    
+    WTOK_CLEAR_BLACKLIST
 };
 
 ConfigDisplay::ConfigDisplay()
@@ -88,15 +92,26 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->setWgtText( WTOK_INCR_RES, _("Increase Resolution"));
         
     widget_manager->addWgt( WTOK_DECR_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_DECR_RES, ("Decrease Resolution"));
+    widget_manager->setWgtText( WTOK_DECR_RES, _("Decrease Resolution"));
        
-       widget_manager->addWgt( WTOK_EMPTY2, 40, 2);
+    widget_manager->addWgt( WTOK_EMPTY2, 40, 2);
     widget_manager->deactivateWgt( WTOK_EMPTY2 );
     widget_manager->hideWgtRect( WTOK_EMPTY2 );
     widget_manager->hideWgtText( WTOK_EMPTY2 );
     
     widget_manager->addWgt( WTOK_APPLY_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_APPLY_RES, ("Apply "));
+    widget_manager->setWgtText( WTOK_APPLY_RES, _("Apply "));
+    
+    if (!user_config->m_blacklist_res.empty())
+    {
+    	widget_manager->addWgt( WTOK_EMPTY3, 40, 2);
+    	widget_manager->deactivateWgt( WTOK_EMPTY3 );
+    	widget_manager->hideWgtRect( WTOK_EMPTY3 );
+    	widget_manager->hideWgtText( WTOK_EMPTY3 );
+    
+    	widget_manager->addWgt( WTOK_CLEAR_BLACKLIST, 55, 7);
+    	widget_manager->setWgtText( WTOK_CLEAR_BLACKLIST, _("Clear Resolution Blacklist"));
+    }
         
     widget_manager->addWgt( WTOK_EMPTY1, 40, 7);
     widget_manager->deactivateWgt( WTOK_EMPTY1 );
@@ -107,18 +122,28 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
+	//if prev resolution different to current res then a resolution change has been rejected
+	if (user_config->m_width != user_config->m_prev_width 
+	    && user_config->m_height != user_config->m_prev_height)
+	  	{
+	  		changeResolution(user_config->m_prev_width,
+	  		user_config->m_prev_height,true);
+	  	}
+    
     widget_manager->layout( WGT_AREA_ALL );
     
     //get current resolution and set wgt txt
-    getScreenModes();
-    if (m_sizes_index == -1)
+    getScreenModes();  //Populate a list with possible resolutions
+    if (m_sizes_index == -1) //A custom res has been set previously that is not in list
     { 
-        snprintf (m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d", user_config->m_width, user_config->m_height);
+        snprintf (m_resolution, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), user_config->m_width, user_config->m_height);
         widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
     }
-    else
+    else // Find the current res from those in the list
     {
-        snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
+        m_curr_width = m_sizes[m_sizes_index].first;
+        m_curr_height = m_sizes[m_sizes_index].second;
+        snprintf(m_resolution, MAX_MESSAGE_LENGTH, _("Current: %dx%d"),m_curr_width,m_curr_height);
         widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
     }
 }
@@ -148,21 +173,28 @@ void ConfigDisplay::select()
         break;
     case WTOK_INCR_RES:
         m_sizes_index = std::min(m_sizes_size-1,m_sizes_index+1);
-        snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Apply %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
+        snprintf(m_resolution, MAX_MESSAGE_LENGTH, _("Apply %dx%d"),m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
         widget_manager->setWgtText(WTOK_APPLY_RES, m_resolution);
         break;
-      case WTOK_DECR_RES:
+    case WTOK_DECR_RES:
         m_sizes_index = std::max(0,m_sizes_index-1);
-        snprintf(m_resolution, MAX_MESSAGE_LENGTH, "Apply %dx%d",m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
+        snprintf(m_resolution, MAX_MESSAGE_LENGTH, _("Apply %dx%d"),m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
         widget_manager->setWgtText(WTOK_APPLY_RES, m_resolution);
         break;
-      case WTOK_APPLY_RES:
-        changeResolution(m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
-        snprintf (m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d", user_config->m_width, user_config->m_height);
-        widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
-        
+    case WTOK_APPLY_RES:
+    	if (m_curr_width != m_sizes[m_sizes_index].first 
+    		|| m_curr_height != m_sizes[m_sizes_index].second)  //Only allow Apply if a new res has been selected
+    	{
+        	changeResolution(m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
+        	menu_manager->pushMenu(MENUID_DISPLAY_RES_CONFIRM);
+        }
         break;
-   
+    case WTOK_CLEAR_BLACKLIST:
+    	user_config->m_blacklist_res.clear();
+    	widget_manager->hideWgtRect( WTOK_CLEAR_BLACKLIST );
+    	widget_manager->hideWgtText( WTOK_CLEAR_BLACKLIST );
+    	widget_manager->layout();
+    	break;
     case WTOK_QUIT:
         menu_manager->popMenu();
         break;
@@ -171,17 +203,33 @@ void ConfigDisplay::select()
 }
 
 //-----------------------------------------------------------------------------
-void ConfigDisplay::changeResolution(int width, int height)
+void ConfigDisplay::changeResolution(int width, int height, bool reverse)
 {
+    if (!reverse) //  don't store previous res if returning to it
+    {
+    	//store previous width and height
+    	user_config->m_prev_width = user_config->m_width;
+    	user_config->m_prev_height = user_config->m_height;
+    }
+    
+    //change to new height and width
     user_config->m_width = width;
     user_config->m_height = height;
+    
+    if (!reverse)
+    {
+    // Store settings in user config file in case new video mode
+    // causes a crash
+    	user_config->m_crashed = true; //set flag. 
+    	user_config->saveConfig();
+    }
                  
     setVideoMode();
-        
-    widget_manager->layout();
-        
+    
     glViewport(0,0,user_config->m_width, user_config->m_height);
     glScissor(0,0,user_config->m_width, user_config->m_height);
+    
+    user_config->m_crashed = false;  //if got here,then res change didn't crash STK
 }
 
 //-----------------------------------------------------------------------------
@@ -194,11 +242,11 @@ void ConfigDisplay::getScreenModes()
         SDL_Rect **modes = SDL_ListModes(NULL, SDL_OPENGL | SDL_FULLSCREEN | SDL_HWSURFACE );
         
         //Check if any modes are available
-            if (!modes)
+        if (!modes)
         {
             std::cerr << "No Screen Modes available" <<std::endl;
         }
-           else if (modes == (SDL_Rect **)-1) 
+        else if (modes == (SDL_Rect **)-1) 
         {
             //This means all modes are available..Shouldn't happen.
             std::cerr << "All modes available" << std::endl;
@@ -223,9 +271,33 @@ void ConfigDisplay::getScreenModes()
                     break;
                 }
             }
-        }
+        }    
     }// m_sizes.empty()
-    
+        
+    //reassess m_sizes_size
+    m_sizes_size = (int)m_sizes.size();
+            
+    //Remove blacklisted resolutions from the list
+    if (!user_config->m_blacklist_res.empty())
+    {
+        int blacklist_res_size = (int)user_config->m_blacklist_res.size();
+        int black_width, black_height = 0;
+        for (int i = 0; i < blacklist_res_size; i++)
+        {
+	        sscanf(user_config->m_blacklist_res[i].c_str(),
+			"%dx%d",& black_width, & black_height);
+			
+			for (int i = m_sizes_size-1; i >=0; i--)
+			{
+				if (m_sizes[i].first == black_width 
+					&& m_sizes[i].second == black_height)
+					{
+						m_sizes.erase(m_sizes.begin()+i);
+					}
+			}
+		}
+	}
+        
     // search m_sizes for the current resolution
     m_sizes_index = -1;
     m_sizes_size = (int)m_sizes.size();

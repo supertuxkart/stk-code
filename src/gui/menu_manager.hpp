@@ -46,6 +46,7 @@ enum MenuManagerIDs
 
     // menu configuration
     MENUID_CONFIG_DISPLAY,
+    MENUID_DISPLAY_RES_CONFIRM,
     MENUID_CONFIG_SOUND,
     MENUID_CONFIG_CONTROLS,
     MENUID_CONFIG_P1,

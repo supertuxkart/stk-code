@@ -105,6 +105,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/track_sel.cpp	   gui/track_sel.hpp	        \
 	gui/player_controls.cpp	   gui/player_controls.hpp   	\
 	gui/config_display.cpp	   gui/config_display.hpp    	\
+	gui/display_res_confirm.cpp	gui/display_res_confirm.hpp	\
 	gui/config_sound.cpp	   gui/config_sound.hpp    	\
 	gui/config_controls.cpp	   gui/config_controls.hpp   	\
 	gui/options.cpp		   gui/options.hpp	        \

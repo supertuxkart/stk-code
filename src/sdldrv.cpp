@@ -20,6 +20,9 @@
 #include <map>
 
 #include <SDL/SDL.h>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 #include "input.hpp"
 #include "actionmap.hpp"
@@ -66,10 +69,35 @@ void drv_init()
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER);
 
     flags = SDL_OPENGL | SDL_HWSURFACE;
-
-    if(user_config->m_fullscreen)
+        
+    //detect if previous resolution crashed STK
+    if (user_config->m_crashed)
+    {
+    	//STK crashed last time
+    	user_config->m_crashed = false;  //reset flag
+    	// set window mode as a precaution
+    	user_config->m_fullscreen = false;
+    	// blacklist the res
+    	std::ostringstream o;
+    	o << user_config->m_width << "x" << user_config->m_height;
+    	user_config->m_blacklist_res.push_back (o.str());
+    	//use prev screen res settings if available
+    	if (user_config->m_width != user_config->m_prev_width
+    		|| user_config->m_height != user_config->m_prev_height)
+    	{
+    		user_config->m_width = user_config->m_prev_width;
+    		user_config->m_height = user_config->m_prev_height;
+    	}
+    	else //set 'safe' resolution to return to
+    	{
+    		user_config->m_width = user_config->m_prev_width = 800;
+    		user_config->m_height = user_config->m_prev_height = 600;
+    	}
+    }
+    
+	if(user_config->m_fullscreen)
         flags |= SDL_FULLSCREEN;
-
+        
     setVideoMode(false);
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -110,11 +138,18 @@ void drv_toggleFullscreen(bool resetTextures)
 
         if(menu_manager->isSomewhereOnStack(MENUID_RACE))
           showPointer();
+          
+    	// Store settings in user config file in case new video mode
+    	// causes a crash
+    	user_config->m_crashed = true; //set flag. 
+    	user_config->saveConfig();
     }
     else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
         hidePointer();
-        
+            
     setVideoMode(resetTextures);
+    
+    user_config->m_crashed = false;  //if got here,then fullscreen change didn't crash STK
 }
 
 //-----------------------------------------------------------------------------
@@ -371,6 +406,10 @@ void sdl_input()
             input(IT_STICKBUTTON, !mode ? 0 : ev.jbutton.which, ev.jbutton.button, 0,
                   32768);
             break;
+        case SDL_USEREVENT:
+        // used in display_res_confirm for the countdown timer
+        (menu_manager->getCurrentMenu())->countdown();
+        
         }  // switch
     }   // while (SDL_PollEvent())
 
