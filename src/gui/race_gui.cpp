@@ -28,10 +28,16 @@
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
+
+#undef USE_WIDGET_MANAGER
+#ifdef USE_WIDGET_MANAGER
 #include "widget_manager.hpp"
+#endif
+
 #include "translation.hpp"
 #include "font.hpp"
 
+#ifdef USE_WIDGET_MANAGER
 //MAX_TOP_POS is the maximum number of racers to be shown in the bar to the
 //left where the positions are drawn.
 static const int MAX_TOP_POS = 10;
@@ -72,6 +78,7 @@ enum WidgetTokens
     WTOK_FIRST_SPEED,
     WTOK_LAST_SPEED = WTOK_FIRST_SPEED + MAX_HUMANS
 };
+#endif
 
 RaceGUI::RaceGUI(): m_time_left(0.0)
 {
@@ -102,6 +109,7 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
     m_fps_timer.update();
     m_fps_timer.setMaxDelta(1000);
 
+#ifdef USE_WIDGET_MANAGER
     const bool HIDE_TEXT = false;
     widget_manager->setInitialTextState(HIDE_TEXT, "", WGT_FNT_LRG,
         WGT_FONT_RACE );
@@ -112,12 +120,15 @@ RaceGUI::RaceGUI(): m_time_left(0.0)
     widget_manager->breakLine();
 
     widget_manager->layout( WGT_AREA_TOP );
+#endif
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+#ifdef USE_WIDGET_MANAGER
     widget_manager->reset();
+#endif
 
     //FIXME: does all that material stuff need freeing somehow?
 }   // ~Racegui
@@ -182,12 +193,13 @@ RaceGUI::handle(GameAction ga, int value)
 				m_fps_timer.reset();
 				m_fps_timer.setMaxDelta(1000);
 				m_fps_counter=0;
-
+#ifdef USE_WIDGET_MANAGER
                 widget_manager->showWgtText( WTOK_FPS );
 			}
             else
             {
                 widget_manager->hideWgtText( WTOK_FPS );
+#endif
             }
 			break;
 		case GA_DEBUG_TOGGLE_WIREFRAME:
@@ -236,8 +248,11 @@ void RaceGUI::drawFPS ()
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-
+#ifdef USE_WIDGET_MANAGER
     widget_manager->setWgtText( WTOK_FPS, m_fps_string );
+#else
+    font_race->PrintShadow(m_fps_string,48, 0, user_config->m_height-50);
+#endif
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
@@ -251,9 +266,13 @@ void RaceGUI::drawTimer ()
     m_time_left = world->m_clock;
 
     TimeToString(m_time_left, str);
-
+#ifdef USE_WIDGET_MANAGER
     widget_manager->showWgtText( WTOK_CLOCK );
     widget_manager->setWgtText( WTOK_CLOCK, str );
+#else
+    font_race->PrintShadow(str, 60, user_config->m_width-260,
+        user_config->m_height-64);
+#endif
 }   // drawTimer
 
 //-----------------------------------------------------------------------------
