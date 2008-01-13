@@ -185,6 +185,7 @@ void Widget::update(const float DELTA)
     m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
     int text_width = (int)(right - left + 0.99);
 
+
     const int Y_LIMIT = lines * m_text_size + m_height;
 
     //A work around for yet another bug with multilines: we get the wrong
@@ -305,6 +306,8 @@ void Widget::update(const float DELTA)
         size_t line_start = 0;
         bool draw;
         bool out_of_rect = false;
+        float top, bottom;
+        int text_height;
 
         glEnable( GL_SCISSOR_TEST );
         do
@@ -330,6 +333,12 @@ void Widget::update(const float DELTA)
             }
 
             line_end = m_text.find_first_of('\n', line_start);
+
+            m_font->getBBox(m_text.substr(line_start, line_end - line_start).
+                c_str(), m_text_size, false, NULL, NULL, &top, &bottom);
+            text_height = (int)(bottom - top + 0.99);
+            y_pos -= text_height / 2;
+
             if( draw )
             {
                 m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,

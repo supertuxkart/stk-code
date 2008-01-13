@@ -89,10 +89,6 @@ void Font::Print(const char *text, int size,
         int height = top-bottom+1;
         y = (height - H)/2 + bottom;
     }
-    else
-    {
-        y -= H/2;
-    }
 
     m_text_out->begin();
     m_text_out->setPointSize((float)sz);
