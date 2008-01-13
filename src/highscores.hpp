@@ -36,7 +36,7 @@ public:
                         HST_RACE_FASTEST_LAP,
                         HST_RACE_OVERALL_TIME};
 private:
-    static const int HIGHSCORE_LEN = 3;       // It's a top 3 list
+    enum {HIGHSCORE_LEN = 3};       // It's a top 3 list
     std::string         m_track;
     HighscoreType       m_highscore_type;
     int                 m_number_of_karts;

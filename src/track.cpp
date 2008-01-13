@@ -42,7 +42,11 @@
 #  define snprintf _snprintf
 #endif
 
-float const Track::NOHIT=-99999.9f;
+const float Track::NOHIT           = -99999.9f;
+const int   Track::QUAD_TRI_NONE   = -1;
+const int   Track::QUAD_TRI_FIRST  =  1;
+const int   Track::QUAD_TRI_SECOND =  2;
+const int   Track::UNKNOWN_SECTOR  = -1;
 
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )

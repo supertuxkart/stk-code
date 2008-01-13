@@ -58,11 +58,11 @@ public:
 
     //An enum is not used for the QUAD_TRI_* constants because of limitations
     //of the conversion between enums and ints.
-    static const int QUAD_TRI_NONE = -1;
-    static const int QUAD_TRI_FIRST = 1;
-    static const int QUAD_TRI_SECOND = 2;
+    static const int QUAD_TRI_NONE;
+    static const int QUAD_TRI_FIRST;
+    static const int QUAD_TRI_SECOND;
 
-    static const int UNKNOWN_SECTOR = -1;
+    static const int UNKNOWN_SECTOR;
 
     struct SegmentTriangle
     {

@@ -28,7 +28,7 @@
 
 // -----------------------------------------------------------------------------
 MovingPhysics::MovingPhysics(const std::string data)
-             : Callback(), ssgTransform()
+             : ssgTransform(), Callback()
 {
     m_shape        = NULL;
     m_body         = NULL;
