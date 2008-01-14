@@ -28,6 +28,7 @@ dnl ===================
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+AC_LANG(C++)
 
 # Do a quick check to ensure the c++ compiler works
 AC_RUN_IFELSE([
@@ -37,7 +38,7 @@ int main()  { return 0; }
    echo
    echo "Compiling a simple program failed, so something is broken with"
    echo "the building process. Please check that your system is setup"
-   echo "so it can compile C code."
+   echo "so it can compile C++ code."
    echo
    echo "Configure aborted."
    exit
