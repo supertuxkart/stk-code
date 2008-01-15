@@ -83,7 +83,6 @@ void Spark::update(float dt)
             {   // spark lost energy (less than 80%), i.e. it's too slow - speed it up:
                 if(vlen==0.0f) {
                     v    = btVector3(.5f, .5f, .5f);  // avoid 0 div.
-                    vlen = 0.75;
                 }
                 else
                 {

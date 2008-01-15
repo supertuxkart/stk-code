@@ -37,21 +37,11 @@
 
 enum WidgetTokens
 {
-    WTOK_RACER0,
-    WTOK_RACER1,
-    WTOK_RACER2,
-    WTOK_RACER3,
-    WTOK_RACER4,
-    WTOK_RACER5,
-    WTOK_RACER6,
-    WTOK_RACER7,
-    WTOK_RACER8,
-    WTOK_RACER9,
-
     WTOK_TITLE,
     WTOK_NAME,
 
-    WTOK_QUIT
+    WTOK_QUIT,
+    WTOK_RACER0
 };
 
 CharSel::CharSel(int whichPlayer)

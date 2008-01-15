@@ -376,6 +376,8 @@ void Kart::reset()
     world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
         m_track_sector );
 
+    m_vehicle->applyEngineForce (0.0f, 2);
+    m_vehicle->applyEngineForce (0.0f, 3);
     // Set heading:
     m_transform.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
                                          DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
@@ -383,8 +385,6 @@ void Kart::reset()
     m_transform.setOrigin(btVector3(m_reset_pos.xyz[0],
                                     m_reset_pos.xyz[1],
                                     m_reset_pos.xyz[2]+0.5f*m_kart_height));
-    m_vehicle->applyEngineForce (0.0f, 2);
-    m_vehicle->applyEngineForce (0.0f, 3);
     m_body->setCenterOfMassTransform(m_transform);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
@@ -575,7 +575,8 @@ void Kart::update (float dt)
         }
         m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
 
-        m_transform.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]));
+        m_transform.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
+                                        m_curr_pos.xyz[2]));
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
@@ -916,7 +917,6 @@ void Kart::endRescue()
     m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_sector] ;
     m_rescue = false ;
 
-    world->getPhysics()->addKart(this, m_vehicle);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
     // FIXME: This code positions the kart correctly back on the track
@@ -924,14 +924,18 @@ void Kart::endRescue()
     // it feels better if the kart is left where it was. Perhaps
     // this code should only be used if a rescue was not triggered
     // by the kart being upside down??
-    btTransform pos=m_body->getCenterOfMassTransform();
+    btTransform pos;
+    // A certain epsilon is added here to the Z coordinate (0.1), in case
+    // that the drivelines are somewhat under the track. Otherwise, the
+    // kart will be placed a little bit under the track, triggering
+    // a rescue, ...
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
-                            m_curr_pos.xyz[2]+0.5f*m_kart_height));
+                            m_curr_pos.xyz[2]+0.5f*m_kart_height+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
                                  DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
+    world->getPhysics()->addKart(this, m_vehicle);
     setTrans(pos);
-
 }   // endRescue
 
 //-----------------------------------------------------------------------------

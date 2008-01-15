@@ -82,8 +82,9 @@ public:
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape, 
                              UserPointer::UserPointerType t);
-    const btTransform&  getTrans  () const        {return m_transform;}
-    void          setTrans  (btTransform& t){m_motion_state->setWorldTransform(t);}
+    //void          getTrans  (btTransform& t) const        {m_motion_state->getWorldTransform(t);}
+    const btTransform&  getTrans() const {return m_transform;}
+    void          setTrans  (btTransform& t){m_transform=t;m_motion_state->setWorldTransform(t);}
 }
 ;   // class Moveable
 

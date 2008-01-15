@@ -82,7 +82,6 @@ void Moveable::createBody(float mass, btTransform& trans,
                           UserPointer::UserPointerType t) {
     
     btVector3 inertia;
-    m_transform = trans;
     shape->calculateLocalInertia(mass, inertia);
     m_motion_state = new btDefaultMotionState(trans);
 
@@ -155,7 +154,7 @@ void Moveable::update (float dt)
             sgCopyCoord(&(m_history_position[history->GetCurrentIndex()]), &m_curr_pos);
         }
     }   // if m_history_position
-    
+
     m_velocityLC = getVelocity()*getTrans().getBasis();
     placeModel();
     m_first_time = false ;

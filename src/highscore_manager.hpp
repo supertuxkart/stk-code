@@ -31,8 +31,6 @@ class HighscoreManager
 {
 public:
 private:
-    static const int HIGHSCORE_LEN = 3;       // It's a top 3 list
-
     typedef std::vector<Highscores*> type_all_scores;
     type_all_scores m_allScores;
     
