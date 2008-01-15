@@ -945,6 +945,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\display_res_confirm.cpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\font.cpp"
 					>
 				</File>
@@ -1364,6 +1368,10 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\difficulty.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\display_res_confirm.hpp"
 					>
 				</File>
 				<File
