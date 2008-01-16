@@ -67,7 +67,6 @@ CharSel::CharSel(int whichPlayer)
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 2);
     widget_manager->breakLine();
 
-    //FIXME: this supports only a static number of karts
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
         const KartProperties* kp= kart_properties_manager->getKartById(i);
