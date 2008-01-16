@@ -1266,12 +1266,24 @@ WidgetManager::handleFinish(const int next_wgt)
 void
 WidgetManager::increaseScrollSpeed(const bool fast)
 {
+    //FIXME: to increase the scroll speed we substract, and to decrease
+    //we add; this goes against logic, making code harder to read.
 	const int ID = findId(m_selected_wgt_token);
 	if( m_widgets[ID].widget->m_enable_scroll )
 	{
+        int &speed = m_widgets[ID].widget->m_scroll_speed_y;
 		//FIXME: these increases shouldn't be in pixels, but in percentages.
 		//This should increase it by 1%, and the page buttons by 5%.
-		m_widgets[ID].widget->m_scroll_speed_y -= (fast) ? 5 : 1;
+        if( fast )
+        {
+            if( speed > 0 && speed < 50 ) speed = 0;
+            else speed -= 50;
+        }
+        else
+        {
+            if( speed > 0 && speed < 10 ) speed = 0;
+            else speed -= 10;
+        }
 	}
 }
 
@@ -1281,9 +1293,19 @@ WidgetManager::decreaseScrollSpeed(const bool fast)
 	const int ID = findId(m_selected_wgt_token);
 	if( m_widgets[ID].widget->m_enable_scroll )
 	{
+        int &speed = m_widgets[ID].widget->m_scroll_speed_y;
 		//FIXME: these increases shouldn't be in pixels, but in percentages.
 		//This should increase it by 1%, and the page buttons by 5%.
-		m_widgets[ID].widget->m_scroll_speed_y += (fast) ? 5 : 1;
+        if( fast )
+        {
+            if( speed < 0 && speed > -50 ) speed = 0;
+            else speed += 50;
+        }
+        else
+        {
+            if( speed < 0 && speed > -10 ) speed = 0;
+            else speed += 10;
+        }
 	}
 }
 
