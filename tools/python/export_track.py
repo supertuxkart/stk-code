@@ -53,7 +53,7 @@ HELPTEXT = HELPTEXT_INTRO = [
 HELPTEXT_DRV = [
 'To export the drive path file you need to create two mesh objects,',
 'which are the left and right borders of the track. They must be only',
-'linked 2D line segments (aka a curve). The left border mesh object must',
+'linked 2D line segments. The left border mesh object must',
 'be called "DRV_LEFT" and the right border mesh object is to be',
 'called "DRV_RIGHT".',
 '',
