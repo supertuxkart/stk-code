@@ -94,8 +94,9 @@ Widget::~Widget()
 //-----------------------------------------------------------------------------
 void Widget::update(const float DELTA)
 {
-    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
+
+    glTranslatef ( m_x , m_y , 0);
 
     /*Handle delta time dependant features*/
     if(m_text_scale > MIN_TEXT_SCALE)
@@ -148,8 +149,8 @@ void Widget::update(const float DELTA)
 
         if( m_track_num != -1 )
         {
-            track_manager->getTrack( m_track_num )->drawScaled2D( (float)m_x, 
-                (float)m_y, (float)m_width, (float)m_height);
+            track_manager->getTrack( m_track_num )->drawScaled2D( 0.0f, 
+                0.0f, (float)m_width, (float)m_height);
         }
         else
         {
@@ -298,10 +299,8 @@ void Widget::update(const float DELTA)
             std::cerr << "(Did you set the text?)\n";
         }
 
-        int x_pos = m_x + (int)m_scroll_pos_x;
-        int y_pos = m_y - (int)m_scroll_pos_y + ((lines - 1 )* m_text_size) / 2;
-
-        y_pos += m_height / 2;
+        int x_pos = (int)m_scroll_pos_x;
+        int y_pos = - (int)m_scroll_pos_y + m_height / 2 + (lines - 1 )* m_text_size / 2;
 
         size_t line_start = 0;
         bool draw;
@@ -313,18 +312,18 @@ void Widget::update(const float DELTA)
         do
         {
             draw = true;
-            if(y_pos + m_text_size / 2 > m_y + m_height )
+            if(y_pos + m_text_size / 2 > m_height )
             {
-                if(y_pos - m_text_size / 2 > m_y + m_height) draw = false;
+                if(y_pos - m_text_size / 2 >  m_height) draw = false;
                 else
                 {
                     out_of_rect = true;
                     glScissor(m_x, m_y, m_width, m_height);
                 }
             }
-            else if(y_pos - m_text_size / 2 < m_y)
+            else if(y_pos - m_text_size / 2 < 0)
             {
-                if(y_pos + m_text_size / 2 < m_y) draw = false;
+                if(y_pos + m_text_size / 2 < 0) draw = false;
                 else
                 {
                     out_of_rect = true;
@@ -334,15 +333,10 @@ void Widget::update(const float DELTA)
 
             line_end = m_text.find_first_of('\n', line_start);
 
-            m_font->getBBox(m_text.substr(line_start, line_end - line_start).
-                c_str(), m_text_size, false, NULL, NULL, &top, &bottom);
-            text_height = (int)(bottom - top + 0.99);
-            y_pos -= text_height / 2;
-
             if( draw )
             {
                 m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
-                    x_pos, y_pos,
+                    x_pos, y_pos - m_text_size / 2,
                     255, 255, 255, m_text_scale, m_text_scale);
             }
 
@@ -448,18 +442,18 @@ bool Widget::createRect(int radius)
                 //position for the circle is dependant on rect; if a corner
                 //wasn't given, then the y position is computed as if it was
                 //for a rectangle without rounder corners.
-                const float VERTEX_X  = m_x + radius - CIRCLE_X;
-                const float VERTEX_YA = m_y + m_height +
+                const float VERTEX_X  = radius - CIRCLE_X;
+                const float VERTEX_YA = m_height +
                     ((m_round_corners & WGT_AREA_NW) ? (CIRCLE_Y - radius) : 0);
-                const float VERTEX_YB = m_y + ((m_round_corners & WGT_AREA_SW) ?
-                    (radius - CIRCLE_Y) : 0);
+                const float VERTEX_YB = m_round_corners & WGT_AREA_SW ?
+                    radius - CIRCLE_Y : 0;
 
-                glTexCoord2f((VERTEX_X - m_x) / m_width,
-                    (VERTEX_YA - m_y) / m_height);
+                glTexCoord2f(VERTEX_X / m_width,
+                    VERTEX_YA / m_height);
                 glVertex2f(VERTEX_X, VERTEX_YA);
 
-                glTexCoord2f((VERTEX_X - m_x) / m_width,
-                    (VERTEX_YB - m_y) / m_height);
+                glTexCoord2f(VERTEX_X / m_width,
+                    VERTEX_YB / m_height);
                 glVertex2f(VERTEX_X, VERTEX_YB);
             }
 
@@ -473,18 +467,18 @@ bool Widget::createRect(int radius)
                 const float CIRCLE_X = radius * sin(ANGLE);
                 const float CIRCLE_Y = radius * cos(ANGLE);
 
-                float VERTEX_X  = m_x + m_width - radius + CIRCLE_X;
-                float VERTEX_YA = m_y + m_height + ((m_round_corners &
+                float VERTEX_X  = m_width - radius + CIRCLE_X;
+                float VERTEX_YA = m_height + ((m_round_corners &
                     WGT_AREA_NE) ? (CIRCLE_Y - radius) : 0);
-                float VERTEX_YB = m_y + ((m_round_corners & WGT_AREA_SE) ?
-                    (radius - CIRCLE_Y) : 0);
+                float VERTEX_YB = m_round_corners & WGT_AREA_SE ?
+                    radius - CIRCLE_Y : 0;
 
-                glTexCoord2f((VERTEX_X - m_x) / m_width,
-                    (VERTEX_YA - m_y) / m_height);
+                glTexCoord2f(VERTEX_X / m_width,
+                    VERTEX_YA / m_height);
                 glVertex2f(VERTEX_X, VERTEX_YA);
 
-                glTexCoord2f((VERTEX_X - m_x) / m_width,
-                    (VERTEX_YB - m_y) / m_height);
+                glTexCoord2f((VERTEX_X) / m_width,
+                    (VERTEX_YB) / m_height);
                 glVertex2f(VERTEX_X, VERTEX_YB);
             }
 
