@@ -31,7 +31,8 @@ private:
     fntRenderer *m_text_out;
 
 public:
-    const static int CENTER_OF_SCREEN=-1;
+    //CENTER_OF_SCREEN has to be bigger or smaller than Widget::MAX_SCROLL
+    const static int CENTER_OF_SCREEN=-1000001;
     enum FontSize      {SMALL=18,   MEDIUM=24,   LARGE=30    };
     Font(const char* fontname);
     Font(const std::string &fontname) { Font(fontname.c_str()); }
