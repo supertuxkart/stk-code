@@ -149,7 +149,6 @@ void drv_toggleFullscreen(bool resetTextures)
             
     setVideoMode(resetTextures);
     
-    user_config->m_crashed = false;  //if got here,then fullscreen change didn't crash STK
 }
 
 //-----------------------------------------------------------------------------

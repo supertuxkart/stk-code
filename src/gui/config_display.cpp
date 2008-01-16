@@ -146,6 +146,10 @@ ConfigDisplay::ConfigDisplay()
         snprintf(m_resolution, MAX_MESSAGE_LENGTH, _("Current: %dx%d"),m_curr_width,m_curr_height);
         widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
     }
+    
+    // Set crashed flag to false (needed after confirming change to fullscreen)
+    user_config->m_crashed = false;  //if got here,then fullscreen change didn't crash STK 
+    user_config->saveConfig();
 }
 
 //-----------------------------------------------------------------------------
@@ -161,15 +165,8 @@ void ConfigDisplay::select()
     {
     case WTOK_FULLSCREEN:
         drv_toggleFullscreen();
-        if(user_config->m_fullscreen)
-        {
-            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Window mode"));
-           }
-        else
-        {
-            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Fullscreen mode"));
-        }
-        widget_manager->layout();
+        if (user_config->m_fullscreen)
+        	menu_manager->pushMenu(MENUID_DISPLAY_RES_CONFIRM);
         break;
     case WTOK_INCR_RES:
         m_sizes_index = std::min(m_sizes_size-1,m_sizes_index+1);
@@ -186,7 +183,20 @@ void ConfigDisplay::select()
     		|| m_curr_height != m_sizes[m_sizes_index].second)  //Only allow Apply if a new res has been selected
     	{
         	changeResolution(m_sizes[m_sizes_index].first,m_sizes[m_sizes_index].second);
-        	menu_manager->pushMenu(MENUID_DISPLAY_RES_CONFIRM);
+        	
+        	if (user_config->m_fullscreen)
+        		menu_manager->pushMenu(MENUID_DISPLAY_RES_CONFIRM);
+        	else
+        	{
+        		snprintf (m_resolution, MAX_MESSAGE_LENGTH, "Current: %dx%d",
+        		user_config->m_width, user_config->m_height);
+        		widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
+        		widget_manager->layout();
+        		// set prev_width and height values to current
+        		user_config->m_prev_width = m_curr_width = user_config->m_width;
+				user_config->m_prev_height = m_curr_height = user_config->m_height;
+				  
+        	}
         }
         break;
     case WTOK_CLEAR_BLACKLIST:
@@ -205,7 +215,8 @@ void ConfigDisplay::select()
 //-----------------------------------------------------------------------------
 void ConfigDisplay::changeResolution(int width, int height, bool reverse)
 {
-    if (!reverse) //  don't store previous res if returning to it
+    if (!reverse && user_config->m_fullscreen) //  don't store previous res if returning to it
+    											// or if not in fullscreen mode
     {
     	//store previous width and height
     	user_config->m_prev_width = user_config->m_width;
@@ -216,7 +227,7 @@ void ConfigDisplay::changeResolution(int width, int height, bool reverse)
     user_config->m_width = width;
     user_config->m_height = height;
     
-    if (!reverse)
+    if (!reverse && user_config->m_fullscreen)
     {
     // Store settings in user config file in case new video mode
     // causes a crash
@@ -225,11 +236,10 @@ void ConfigDisplay::changeResolution(int width, int height, bool reverse)
     }
                  
     setVideoMode();
-    
+        
     glViewport(0,0,user_config->m_width, user_config->m_height);
     glScissor(0,0,user_config->m_width, user_config->m_height);
     
-    user_config->m_crashed = false;  //if got here,then res change didn't crash STK
 }
 
 //-----------------------------------------------------------------------------
@@ -255,7 +265,7 @@ void ConfigDisplay::getScreenModes()
         {
             for (int i = 0; modes[i]; ++i)
             m_sizes.push_back (std::pair <int, int> (modes[i]->w, modes[i]->h));
-        
+                    
             //Sort the entries
             sort (m_sizes.begin(), m_sizes.end());
             

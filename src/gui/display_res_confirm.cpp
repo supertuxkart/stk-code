@@ -46,7 +46,7 @@ enum WidgetTokens
 
 DisplayResConfirm::DisplayResConfirm()
 {   
-	m_counter = 10; 
+	m_counter = 5; // Number of seconds in which to confirm
     
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
@@ -56,7 +56,7 @@ DisplayResConfirm::DisplayResConfirm()
 
     widget_manager->insertColumn();
     widget_manager->addWgt( WTOK_TITLE, 70, 7);
-    widget_manager->setWgtText( WTOK_TITLE, _("Confirm Resolution Within 10 Seconds"));
+    widget_manager->setWgtText( WTOK_TITLE, _("Confirm Resolution Within 5 Seconds"));
 
     widget_manager->setInitialActivationState(true);
         
@@ -80,7 +80,6 @@ DisplayResConfirm::DisplayResConfirm()
     widget_manager->layout( WGT_AREA_ALL );
     
     m_timer = SDL_AddTimer(1000,timeout,NULL);
-    
     
 }
     
