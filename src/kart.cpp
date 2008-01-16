@@ -309,7 +309,7 @@ Kart::~Kart()
  *
  * Returns true if the kart is 'resting', i.e. (nearly) not moving.
  */
-bool Kart::isInRest()
+bool Kart::isInRest() const
 {
     return fabs(m_body->getLinearVelocity ().z())<0.2;
 }  // isInRest
@@ -599,6 +599,13 @@ void Kart::update (float dt)
     sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
     
     Moveable::update(dt);
+
+    // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
+    if((fabs(m_curr_pos.hpr[2])>60 && getSpeed()<3.0f) )
+    {
+        forceRescue();
+    }
+
     btTransform trans=getTrans();
     TerrainInfo::update(trans.getOrigin());
     if (getHoT()==Track::NOHIT                   || 

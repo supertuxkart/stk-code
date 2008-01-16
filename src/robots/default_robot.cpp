@@ -288,7 +288,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
 {
     m_controls.fire = false;
 
-    if( m_rescue )
+    if(isRescue() )
     {
         return;
     }
@@ -474,33 +474,26 @@ void DefaultRobot::handle_rescue(const float DELTA)
     //Reaction to being stuck
     if( m_crash_time > 3.0f )
     {
-        m_rescue = true;
+        forceRescue();
         m_crash_time = 0.0f;
     }
 
-#if 0
-    //FIXME: this is from the kart.cpp; since we already have a way to rescue,
-    //I don't know if this is needed.
 
     // check if kart is stuck
-    if(!isPlayerKart() && getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f
-            && !m_rescue && world->getPhase() != World::START_PHASE)
+    if(getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f &&
+       !isRescue() && world->getPhase() != World::START_PHASE               )
     {
-        m_time_since_stuck += dt;
+        m_time_since_stuck += DELTA;
+        if(m_time_since_stuck > 2.0f)
+        {
+            forceRescue();
+            m_time_since_stuck=0.0f;
+        }   // m_time_since_stuck > 2.0f
     }
     else
     {
         m_time_since_stuck = 0.0f;
     }
-
-    // Check if a kart needs to be rescued.
-    if((fabs(m_curr_pos.hpr[2])>60 &&
-       sgLengthVec3(m_velocity.xyz)<3.0f) || m_time_since_stuck > 2.0f)
-    {
-        m_rescue=true;
-        m_time_since_stuck=0.0f;
-    }
-#endif
 }
 
 //-----------------------------------------------------------------------------

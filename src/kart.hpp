@@ -127,9 +127,9 @@ private:
     bool                m_finished_race;
 
     float               m_speed;
+    bool                m_rescue;
 
 protected:
-    int                 m_rescue;
     float               m_rescue_pitch, m_rescue_roll;
     const KartProperties *m_kart_properties;
 
@@ -222,13 +222,14 @@ public:
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     void           updateBulletPhysics(float dt);
-    void           draw          ();
-    bool           isInRest      ();
+    void           draw             ();
+    bool           isInRest         () const;
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
-    float          getSpeed      () const {return m_speed;                 }
-    float          handleWheelie(float dt);
+    float          getSpeed         () const {return m_speed;                 }
+    float          handleWheelie    (float dt);
     float          getActualWheelForce();
-    bool           isOnGround   ();
+    bool           isOnGround       ();
+    bool           isRescue         () const {return m_rescue;}
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
     void           handleExplosion  (const sgVec3& pos, bool direct_hit);
