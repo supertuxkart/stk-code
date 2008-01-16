@@ -96,7 +96,7 @@ void Widget::update(const float DELTA)
 {
     glPushMatrix();
 
-    glTranslatef ( m_x , m_y , 0);
+    glTranslatef ( (GLfloat)m_x , (GLfloat)m_y , 0);
 
     /*Handle delta time dependant features*/
     if(m_text_scale > MIN_TEXT_SCALE)
