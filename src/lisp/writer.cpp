@@ -39,7 +39,6 @@ namespace lisp
 	// With mingw, the files are written dos style (crlf), but
 	// these files can't be read with the lexer here. So we have
 	// to force the file to be written as binary for windows.
-	printf("Setting binary");
         m_out = new std::ofstream(filename.c_str(),::std::ios_base::binary);
 #else
         m_out = new std::ofstream(filename.c_str());
