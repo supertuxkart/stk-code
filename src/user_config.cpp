@@ -113,6 +113,7 @@ void UserConfig::setFilename()
 void UserConfig::setDefaults()
 {
     setFilename();
+    m_warning          = "";
     m_keyboard_debug   = false;
     m_track_debug      = 0;
     m_bullet_debug     = false;
@@ -153,7 +154,7 @@ void UserConfig::setDefaults()
 	
 	// Clear every entry.
 	memset(inputMap, 0, sizeof(inputMap));
-	
+
 	/* general game input settings */
 	set(GA_ENTER,
 		Input(IT_KEYBOARD, SDLK_RETURN),
@@ -385,7 +386,7 @@ void UserConfig::loadConfig(const std::string& filename)
         }
         int configFileVersion = 0;
         lisp->get("configFileVersion", configFileVersion);
-        if (configFileVersion < SUPPORTED_CONFIG_VERSION)
+        if (configFileVersion < CURRENT_CONFIG_VERSION)
         {
             // Give some feedback to the user about what was changed.
             // Do NOT add a break after the case, so that all changes will be printed
@@ -402,6 +403,8 @@ void UserConfig::loadConfig(const std::string& filename)
             case 2:  printf(_("Added username, using: '%s'.\n"), m_username.c_str());
                      needToAbort=std::max(needToAbort,0);
             case 3:  printf(_("Added username for all players.\n"));
+                     needToAbort=std::max(needToAbort,0);
+            case 4:  printf(_("Added jumping, which invalidates all key bindings.\n"));
                      needToAbort=std::max(needToAbort,0);
             case 99: break;
             default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
@@ -442,10 +445,10 @@ void UserConfig::loadConfig(const std::string& filename)
         //detect if resolution change previously crashed STK
         lisp->get("crash_detected",	  m_crashed);
         // blacklisted resolutions
-        lisp->getVector("blacklisted_resolutions", m_blacklist_res);
-		
+        lisp->getVector("blacklisted_resolutions", 
+                                      m_blacklist_res);
         /*get number of karts*/
-        lisp->get("karts", m_karts);
+        lisp->get("karts",            m_karts);
 
         //get whether to log errors to file
         lisp->get("log-errors",       m_log_errors);
@@ -482,18 +485,28 @@ void UserConfig::loadConfig(const std::string& filename)
             reader->get("lastKartId", lastKartId);
             m_player[i].setLastKartId(lastKartId);
 
-            // Retrieves a player's INPUT configuration
-            readPlayerInput(reader, "left", KA_LEFT, i);
-            readPlayerInput(reader, "right", KA_RIGHT, i);
-            readPlayerInput(reader, "accel", KA_ACCEL, i);
-            readPlayerInput(reader, "brake", KA_BRAKE, i);
-
-            readPlayerInput(reader, "wheelie", KA_WHEELIE, i);
-            readPlayerInput(reader, "jump", KA_JUMP, i);
-            readPlayerInput(reader, "rescue", KA_RESCUE, i);
-            readPlayerInput(reader, "fire", KA_FIRE, i);
-            readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
-        }
+            // Don't read the key bindings from a config file earlier than 
+            // version 5. These config files contain (unused) keybindings for 
+            // jumping, so it is possible that the same key is used for 
+            // jumping for player 1 and something else for another player.
+            // In this case jumping for player one would be disabled (see
+            // unsetDuplicates). To be on the safe side, old key bindings 
+            // are just discarded.
+            if (configFileVersion <= 4) 
+            {
+                m_warning=_("Old config file found, check your key bindings!");
+                // Retrieves a player's INPUT configuration
+                readPlayerInput(reader, "left",     KA_LEFT,      i);
+                readPlayerInput(reader, "right",    KA_RIGHT,     i);
+                readPlayerInput(reader, "accel",    KA_ACCEL,     i);
+                readPlayerInput(reader, "brake",    KA_BRAKE,     i);
+                readPlayerInput(reader, "wheelie",  KA_WHEELIE,   i);
+                readPlayerInput(reader, "jump",     KA_JUMP,      i);
+                readPlayerInput(reader, "rescue",   KA_RESCUE,    i);
+                readPlayerInput(reader, "fire",     KA_FIRE,      i);
+                readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
+            }  // configFileVersion <= 4
+        }   // for i < PLAYERS
     }
     catch(std::exception& e)
     {

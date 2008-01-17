@@ -24,6 +24,7 @@
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "user_config.hpp"
 
 enum WidgetTokens
 {
@@ -33,7 +34,8 @@ enum WidgetTokens
     WTOK_QUIT,
     WTOK_EMPTY,
     WTOK_HELP,
-    WTOK_CREDITS
+    WTOK_CREDITS,
+    WTOK_WARNING
 };
 
 MainMenu::MainMenu()
@@ -72,6 +74,14 @@ MainMenu::MainMenu()
     widget_manager->setWgtText( WTOK_CREDITS, _("Credits") );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
 
+    if(user_config->getWarning()!="")
+    {
+        widget_manager->addWgt( WTOK_WARNING, 80, 8 );
+        widget_manager->setWgtText( WTOK_WARNING, user_config->getWarning().c_str() );
+        widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
+        widget_manager->hideWgtRect(WTOK_WARNING);
+    }
+
     widget_manager->layout(WGT_AREA_ALL);
 }
 
@@ -79,6 +89,7 @@ MainMenu::MainMenu()
 MainMenu::~MainMenu()
 {
     widget_manager->reset();
+    user_config->resetWarning();
 }
 
 //-----------------------------------------------------------------------------

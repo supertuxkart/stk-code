@@ -31,10 +31,15 @@
       Version 1 can read version 0 without any problems, so 
       SUPPORTED_CONFIG_VERSION is 0.
    2: Changed to SDL keyboard bindings
-   3: Added username
+   3: Added username (userid was used for ALL players)
+   4: Added username per player
+   5: Enabled jumping, which might cause a problem with old
+      config files (which have an unused entry for jump defined
+      --> if a kart control for (say) player 2 uses the same key as
+      jump for player 1, this problem is not noticed in 0.3, but will
+      cause an undefined game action now
 */
-#define CURRENT_CONFIG_VERSION   4
-#define SUPPORTED_CONFIG_VERSION 3
+#define CURRENT_CONFIG_VERSION   5
 
 #include <string>
 #include <vector>
@@ -75,6 +80,7 @@ private:
     // Attributes which have setter/getter
     int         m_sfx;
     int         m_music;
+    std::string m_warning;
 
 	void readPlayerInput(const lisp::Lisp *,
 						 const char *,
@@ -188,6 +194,8 @@ public:
 	void clearInput(int, KartAction);
 	
 	bool isFixedInput(InputType, int, int, int);
+    const std::string& getWarning() {return m_warning;}
+    void  resetWarning() {m_warning="";}
 	
 	/** Creates ActionMap for use in menu mode. */
 	ActionMap *newMenuActionMap();
