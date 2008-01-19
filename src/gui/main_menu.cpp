@@ -79,6 +79,7 @@ MainMenu::MainMenu()
         widget_manager->addWgt( WTOK_WARNING, 80, 8 );
         widget_manager->setWgtText( WTOK_WARNING, user_config->getWarning().c_str() );
         widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
+        widget_manager->deactivateWgt(WTOK_WARNING);
         widget_manager->hideWgtRect(WTOK_WARNING);
     }
 
