@@ -19,8 +19,8 @@ dnl Set the default CFLAGS/CXXFLAGS
 dnl If these were not set, the AC_PROG_CC and AC_PROG_CXX
 dnl scripts set them to "-g -O2".
 dnl =====================================================
-CFLAGS="$CFLAGS -O2 -Wall -Wstrict-prototypes -Wmissing-prototypes"
-CXXFLAGS="$CXXFLAGS -O2 -Wall"
+CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
+CXXFLAGS="$CXXFLAGS -Wall"
 
 dnl ===================
 dnl Check for compilers
@@ -49,13 +49,28 @@ dnl Define debug which enables some cheats
 dnl This should be DISABLED when doing a release!
 dnl =============================================
 SUMMARY="\nSummary of optional components:\n==============================="
-AC_ARG_ENABLE(debug, [  --enable-debug    Enable debugging info],
-[AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
-CFLAGS="$CFLAGS -g -pg"
-CXXFLAGS="$CXXFLAGS -g -pg"
-SUMMARY="$SUMMARY\nEnabled debugging, please disable for a release!!"
-]
-)
+
+if test "x$with_plib" != "x" ; then
+   echo "plib prefix is $with_plib"
+   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
+fi
+
+AC_ARG_ENABLE(debug, [  --enable-debug    Enable debugging info])
+if test x$enable_debug = xyes; then
+    AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
+    CFLAGS="$CFLAGS -g -pg"
+    CXXFLAGS="$CXXFLAGS -g -pg"
+    SUMMARY="$SUMMARY\nEnabled debugging, please disable for a release!!"
+fi
+
+AC_ARG_ENABLE(optimization, [  --disable-optimization    Disable compiler optimizations],,
+    enable_optimization=yes)
+if test x$enable_optimization = xyes; then
+    CFLAGS="$CFLAGS -O2"
+    CXXFLAGS="$CXXFLAGS -O2"
+else
+    SUMMARY="$SUMMARY\nDisabled compiler optimizations."
+fi
 
 dnl ===================
 dnl Checks for programs.
