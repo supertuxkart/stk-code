@@ -21,7 +21,6 @@
 #define HEADER_DISPLAY_RES_CONFIRM_H
 
 #include "base_gui.hpp"
-//#include "translation.hpp"
 
 #include <SDL/SDL.h>
 
@@ -35,9 +34,10 @@ public:
     void countdown();
 
 private:
-    SDL_TimerID m_timer;
     char m_count[60];
     int m_counter;
+    
+    SDL_TimerID m_timer;
 };
 
 Uint32 timeout(Uint32 interval, void *param);

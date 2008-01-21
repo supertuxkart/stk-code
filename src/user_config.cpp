@@ -133,6 +133,7 @@ void UserConfig::setDefaults()
     m_height           = 600;
     m_prev_width	   = m_width;
     m_prev_height	   = m_height;
+    m_prev_windowed	   = false;
     m_crashed		   = false;
     m_blacklist_res.clear();
     m_karts            = 4;
@@ -442,6 +443,7 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("height",           m_height);
         lisp->get("prev_width",		  m_prev_width);
         lisp->get("prev_height",	  m_prev_height);
+        lisp->get("prev_windowed",	  m_prev_windowed);
         //detect if resolution change previously crashed STK
         lisp->get("crash_detected",	  m_crashed);
         // blacklisted resolutions
@@ -638,6 +640,7 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("height\t", m_height);
         writer->write("prev_width\t", m_prev_width);
         writer->write("prev_height\t", m_prev_height);
+        writer->write("prev_windowed\t", m_prev_windowed);
         writer->write("crash_detected\t", m_crashed);
         writer->write("blacklisted_resolutions\t", m_blacklist_res);
         writer->write("fullscreen\t", m_fullscreen);

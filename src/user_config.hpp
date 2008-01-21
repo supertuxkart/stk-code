@@ -156,6 +156,7 @@ public:
     int         m_height;
     int			m_prev_width;
     int			m_prev_height;
+    bool		m_prev_windowed;
     bool		m_crashed;
     std::vector<std::string> m_blacklist_res;
     int         m_karts;

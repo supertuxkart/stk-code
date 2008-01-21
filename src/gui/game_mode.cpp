@@ -22,6 +22,7 @@
 #include "race_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "user_config.hpp"
 
 enum WidgetTokens
 {
@@ -69,6 +70,11 @@ GameMode::GameMode()
     widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
+    
+    // Set crashed flag to false, as if made it here after chaging res
+    // then can't have crashed or been killed
+    user_config->m_crashed = false;
+    user_config->saveConfig();
 }
 
 //-----------------------------------------------------------------------------

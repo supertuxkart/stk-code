@@ -41,10 +41,17 @@ private:
     char m_resolution[MAX_MESSAGE_LENGTH];
     int m_curr_width;
     int m_curr_height;
+    int m_blacklist_res_size;
         
     // changeResolution reverse param is set true when changing to a previous resolution  
     void changeResolution(int width, int height, bool reverse=false);
     void getScreenModes();
+    void changeApplyButton();
+    // onBlacklist returns the index of the resolution in the blacklist 
+    // or -1 if not in the blacklist
+    int onBlacklist(); 
+    int onBlacklist(int width, int height);  
+    void showBlacklistButtons();
 };
 
 #endif

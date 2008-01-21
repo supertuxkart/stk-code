@@ -80,6 +80,8 @@ DisplayResConfirm::DisplayResConfirm()
     widget_manager->layout( WGT_AREA_ALL );
     
     m_timer = SDL_AddTimer(1000,timeout,NULL);
+    if (m_timer == NULL)
+    	std::cerr << "Warning: Timer could not be initialised!" << std::endl;
     
 }
     
@@ -98,6 +100,12 @@ void DisplayResConfirm::select()
 		//set prev resolution to current values to confirm change
 		user_config->m_prev_width = user_config->m_width;
 		user_config->m_prev_height = user_config->m_height;
+		
+		// if changing to fullscreen then it has now been confirmed
+		// so we need to change m_prev_windowed to confirm the change
+		if (user_config->m_fullscreen && user_config->m_prev_windowed)
+			user_config->m_prev_windowed = false;
+		
 		SDL_RemoveTimer(m_timer);
         menu_manager->popMenu();
         break;
@@ -131,7 +139,6 @@ void DisplayResConfirm::countdown()
 	}
 }
 
-
 //=============================================================================
 Uint32 timeout(Uint32 interval, void *param)
 {
@@ -150,3 +157,4 @@ Uint32 timeout(Uint32 interval, void *param)
         
 		return (interval); 
 }
+
