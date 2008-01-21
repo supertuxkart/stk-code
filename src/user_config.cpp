@@ -495,17 +495,18 @@ void UserConfig::loadConfig(const std::string& filename)
             if (configFileVersion <= 4) 
             {
                 m_warning=_("Old config file found, check your key bindings!");
-                // Retrieves a player's INPUT configuration
-                readPlayerInput(reader, "left",     KA_LEFT,      i);
-                readPlayerInput(reader, "right",    KA_RIGHT,     i);
-                readPlayerInput(reader, "accel",    KA_ACCEL,     i);
-                readPlayerInput(reader, "brake",    KA_BRAKE,     i);
-                readPlayerInput(reader, "wheelie",  KA_WHEELIE,   i);
-                readPlayerInput(reader, "jump",     KA_JUMP,      i);
-                readPlayerInput(reader, "rescue",   KA_RESCUE,    i);
-                readPlayerInput(reader, "fire",     KA_FIRE,      i);
-                readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
             }  // configFileVersion <= 4
+
+            // Retrieves a player's INPUT configuration
+            readPlayerInput(reader, "left",     KA_LEFT,      i);
+            readPlayerInput(reader, "right",    KA_RIGHT,     i);
+            readPlayerInput(reader, "accel",    KA_ACCEL,     i);
+            readPlayerInput(reader, "brake",    KA_BRAKE,     i);
+            readPlayerInput(reader, "wheelie",  KA_WHEELIE,   i);
+            readPlayerInput(reader, "jump",     KA_JUMP,      i);
+            readPlayerInput(reader, "rescue",   KA_RESCUE,    i);
+            readPlayerInput(reader, "fire",     KA_FIRE,      i);
+            readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
         }   // for i < PLAYERS
     }
     catch(std::exception& e)
