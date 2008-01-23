@@ -34,6 +34,8 @@ private:
     float m_clock;
 
     int m_player_index;
+    
+    bool kartAvailable(int kart);
 
 public:
     CharSel(int which_player);

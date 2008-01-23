@@ -36,7 +36,12 @@ protected:
 public:
     KartPropertiesManager();
     ~KartPropertiesManager();
-
+	
+	// vector containing kart numbers that have been selected in multiplayer
+	// games.  This it used to ensure the same kart can not be selected more
+	// than once.
+    std::vector<int>		 m_selected_karts;  
+    
     const KartProperties*    getKartById            (int i);
     const KartProperties*    getKart                (const std::string IDENT);
     const int                getKartId              (const std::string IDENT);
