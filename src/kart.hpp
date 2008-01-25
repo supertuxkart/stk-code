@@ -112,7 +112,7 @@ private:
     KartParticleSystem* m_smoke_system;
     ssgTransform*       m_exhaust_pipe;
 
-    float               m_wheel_position;
+    float               m_wheel_rotation;
     ssgTransform*       m_wheel_front_l;
     ssgTransform*       m_wheel_front_r;
     ssgTransform*       m_wheel_rear_l;

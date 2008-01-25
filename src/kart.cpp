@@ -17,8 +17,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-
+#include <math.h>
 #include <iostream>
 #include <plib/ssg.h>
 
@@ -151,7 +150,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
 
-    m_wheel_position = 0;
+    m_wheel_rotation = 0;
 
     m_wheel_front_l  = NULL;
     m_wheel_front_r  = NULL;
@@ -348,7 +347,7 @@ void Kart::reset()
     m_zipper_time_left     = 0.0f;
     m_rescue               = false;
     m_num_herrings_gobbled = 0;
-    m_wheel_position       = 0;
+    m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
 
     m_controls.lr      = 0.0f;
@@ -556,9 +555,10 @@ void Kart::update (float dt)
 {
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
-    //m_wheel_position gives the rotation around the X-axis, and since velocity's
+    //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
     //timeframe is the delta time, we don't have to multiply it with dt.
-    m_wheel_position += getVelocity().getY();
+    m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
+    m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
 
     if ( m_rescue )
     {
@@ -1163,7 +1163,7 @@ void Kart::placeModel ()
     sgMat4 wheel_steer;
     sgMat4 wheel_rot;
 
-    sgMakeRotMat4( wheel_rot, 0, -m_wheel_position, 0);
+    sgMakeRotMat4( wheel_rot, 0, RAD_TO_DEGREE(-m_wheel_rotation), 0);
     sgMakeRotMat4( wheel_steer, getSteerAngle()/getMaxSteerAngle() * 30.0f , 0, 0);
 
     sgMultMat4(wheel_front, wheel_steer, wheel_rot);
