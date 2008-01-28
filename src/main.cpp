@@ -40,6 +40,8 @@
 #include <stdexcept>
 #include <cstdio>
 #include <string>
+#include <sstream>
+#include <algorithm>
 
 #include "user_config.hpp"
 #include "track_manager.hpp"
@@ -254,7 +256,15 @@ int handleCmdLine(int argc, char **argv)
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
         {
-            user_config->m_fullscreen = true;
+            // Check that current res is not blacklisted
+            std::ostringstream o;
+    		o << user_config->m_width << "x" << user_config->m_height;
+    		std::string res = o.str();
+            if (std::find(user_config->m_blacklist_res.begin(), 
+              user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())         
+            	user_config->m_fullscreen = true;
+          	else 
+          		fprintf ( stdout, _("Resolution %s has been blacklisted, so it is not available!\n"), res.c_str());
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
@@ -263,13 +273,24 @@ int handleCmdLine(int argc, char **argv)
 #endif
         else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
         {
-            if (sscanf(argv[i+1], "%dx%d", &user_config->m_width, &user_config->m_height) == 2)
+            //Check if fullscreen and new res is blacklisted
+            int width, height;
+            if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
+            {
+            	std::ostringstream o;
+    			o << width << "x" << height;
+    			std::string res = o.str();
+                if (!user_config->m_fullscreen || std::find(user_config->m_blacklist_res.begin(), 
+              	  user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())
                 {
+                	user_config->m_prev_width = user_config->m_width = width;
+               		user_config->m_prev_height = user_config->m_height = height;
                 	fprintf ( stdout, _("You choose to be in %dx%d.\n"), user_config->m_width,
-                          user_config->m_height );
-               		user_config->m_prev_width = user_config->m_width;
-               		user_config->m_prev_height = user_config->m_height;
-                }
+                    	 user_config->m_height );
+               	}
+               	else
+               		fprintf ( stdout, _("Resolution %s has been blacklisted, so it is not available!\n"), res.c_str());
+            }
             else
             {
                 fprintf(stderr, _("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));
