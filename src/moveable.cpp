@@ -78,8 +78,7 @@ void Moveable::reset ()
 
 //-----------------------------------------------------------------------------
 void Moveable::createBody(float mass, btTransform& trans, 
-                          btCollisionShape *shape, 
-                          UserPointer::UserPointerType t) {
+                          btCollisionShape *shape) {
     
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
@@ -89,8 +88,11 @@ void Moveable::createBody(float mass, btTransform& trans,
     // ------------------------
     m_body = new btRigidBody(mass, m_motion_state, 
                              shape, inertia);
-    m_body->setUserPointer(this);
-    setUserPointerType(t);
+    // This MUST actually be set from the actual class, otherwise this
+    // is only a pointer to moveable, not to (say) kart, and virtual 
+    // functions are not called correctly. 
+    m_user_pointer.set(UserPointer::UP_UNDEF, 0);
+    m_body->setUserPointer(&m_user_pointer);
 }   // createBody
 
 //-----------------------------------------------------------------------------

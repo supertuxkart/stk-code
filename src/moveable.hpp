@@ -32,11 +32,12 @@
 #define MAX_HERRING_EATEN    20
 
 
-class Moveable : public UserPointer
+class Moveable 
 {
 private:
     btVector3     m_velocityLC;      /* velocity in kart coordinates                */
 protected:
+    UserPointer   m_user_pointer;
     sgCoord       m_reset_pos;       /* Where to start in case of a reset           */
     sgCoord       m_curr_pos;        /* current position                            */
     sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
@@ -47,9 +48,6 @@ protected:
     int           m_crashed;
     sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
-#ifndef BULLET
-    float collectIsectData ( sgVec3 start, sgVec3 end ) ;
-#endif
     sgCoord*      m_history_velocity;
     sgCoord*      m_history_position;
     btRigidBody*          m_body;
@@ -57,9 +55,6 @@ protected:
     btTransform   m_transform;
 
 public:
-
-    /* start - New Physics */
-
 
     Moveable (bool bHasHistory=false);
     virtual ~Moveable();
@@ -80,9 +75,7 @@ public:
     void          ReadHistory  (char* s, int kartNumber, int indx);
     btRigidBody*  getBody   () const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
-                             btCollisionShape *shape, 
-                             UserPointer::UserPointerType t);
-    //void          getTrans  (btTransform& t) const        {m_motion_state->getWorldTransform(t);}
+                             btCollisionShape *shape);
     const btTransform&  getTrans() const {return m_transform;}
     void          setTrans  (btTransform& t){m_transform=t;m_motion_state->setWorldTransform(t);}
 }

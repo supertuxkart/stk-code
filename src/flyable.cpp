@@ -53,7 +53,6 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     m_shape             = NULL;
     m_mass              = 1.0f;
 
-    setUserPointerType(UP_PROJECTILE);
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
@@ -92,7 +91,8 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     trans  *= offset_transform;
 
     m_shape = shape;
-    createBody(m_mass, trans, m_shape, UserPointer::UP_PROJECTILE);
+    createBody(m_mass, trans, m_shape);
+    m_user_pointer.set(UserPointer::UP_PROJECTILE, this);
     world->getPhysics()->addBody(getBody());
 
     // Simplified rockets: no gravity
@@ -106,7 +106,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
         m_body->setLinearVelocity(v);
         m_body->setAngularFactor(0.0f);   // prevent rotations
     }
-    m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+//    m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
     // FIXME: for now it is necessary to synch the graphical position with the 
     //        physical position, since 'hot' computation is done using the 

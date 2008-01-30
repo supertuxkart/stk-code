@@ -28,15 +28,17 @@
 /** A special class to store a triangle mesh with a separate material
  *  per triangle.
  */
-class TriangleMesh : public UserPointer
+class TriangleMesh
 {
+private:
+    UserPointer                  m_user_pointer;
     std::vector<const Material*> m_triangleIndex2Material;
     btRigidBody                 *m_body;
     btTriangleMesh               m_mesh;
     btDefaultMotionState        *m_motion_state;
     btCollisionShape            *m_collision_shape;
 public:
-    TriangleMesh(): UserPointer(UserPointer::UP_TRACK), m_mesh() {};
+    TriangleMesh() : m_mesh() {};
         ~TriangleMesh();
     void addTriangle(btVector3 t1, btVector3 t2, btVector3 t3,
                      const Material* m);

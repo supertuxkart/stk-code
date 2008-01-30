@@ -23,18 +23,29 @@
 /** Some bullet objects store 'user pointers'. This is a base class
  *  that allows to easily determine the type of the user pointer.
  */
+class TriangleMesh;
+class Moveable;
+class Flyable;
+class Kart;
+
 class UserPointer
 {
 public:
-    enum   UserPointerType {UP_UNDEF, UP_KART, UP_PROJECTILE, UP_TRACK} ;
-protected:
+    enum   UserPointerType {UP_UNDEF, UP_KART, UP_PROJECTILE, UP_TRACK};
+private:
+    void*  m_pointer;
     UserPointerType m_user_pointer_type;
 public:
-    UserPointerType getUserPointerType() const {return m_user_pointer_type;}
-    void            setUserPointerType(UserPointerType t) 
-                                                { m_user_pointer_type=t;   }
-    UserPointer(): m_user_pointer_type(UP_UNDEF) {};
-    UserPointer(UserPointerType t): m_user_pointer_type(t) {};
+    bool            is(UserPointerType t)    const {return m_user_pointer_type==t;  }
+    TriangleMesh*   getPointerTriangleMesh() const {return (TriangleMesh*)m_pointer;}
+    Moveable*       getPointerMoveable()     const {return (Moveable*)m_pointer;    }
+    Flyable*        getPointerFlyable()      const {return (Flyable*)m_pointer;     }
+    Kart*           getPointerKart()         const {return (Kart*)m_pointer;        }
+    void            set(UserPointerType t, void* p) 
+                                                { m_user_pointer_type=t;
+                                                  m_pointer          =p; }
+    UserPointer(): m_user_pointer_type(UP_UNDEF),m_pointer(NULL) {};
+    UserPointer(UserPointerType t, void* p) {set(t,p);}
 };
 #endif
 /* EOF */

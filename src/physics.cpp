@@ -103,26 +103,23 @@ void Physics::update(float dt)
     std::vector<CollisionPair>::iterator p;
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
-        if(p->type_a==UserPointer::UP_KART) {          // kart-kart collision
-            Kart *kartA = (Kart*)(p->a);
-            Kart *kartB = (Kart*)(p->b);
-            KartKartCollision(kartA, kartB);
+        if(p->a->is(UserPointer::UP_KART)) {          // kart-kart collision
+            KartKartCollision(p->a->getPointerKart(), p->b->getPointerKart());
         }  // if kart-kart collision
         else  // now the first object must be a projectile
         {
-            if(p->type_b==UserPointer::UP_TRACK)       // must be projectile hit track
+            if(p->b->is(UserPointer::UP_TRACK))       // must be projectile hit track
             {
-                ((Flyable*)(p->a))->hitTrack();
+                p->a->getPointerFlyable()->hitTrack();
             }
-            else if(p->type_b==UserPointer::UP_KART)   // projectile hit kart
+            else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
-                Flyable *f=(Flyable*)(p->a);
-                f->explode((Kart*)(p->b));
+                p->a->getPointerFlyable()->explode((Kart*)(p->b));
             }
             else                                     // projectile hits projectile
             {
-                ((Flyable*)(p->a))->explode(NULL);
-                ((Flyable*)(p->b))->explode(NULL);
+                p->a->getPointerFlyable()->explode(NULL);
+                p->b->getPointerFlyable()->explode(NULL);
             }
         }
     }  // for all p in m_all_collisions
@@ -199,76 +196,41 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         int numContacts = contactManifold->getNumContacts();
         if(!numContacts) continue;   // no real collision
 
-        Moveable *movA          = static_cast<Moveable*>(objA->getUserPointer());
-        Moveable *movB          = static_cast<Moveable*>(objB->getUserPointer());
+        UserPointer *upA        = (UserPointer*)(objA->getUserPointer());
+        UserPointer *upB        = (UserPointer*)(objB->getUserPointer());
 
         // 1) object A is a track
         // =======================
-        if(!movA) 
+        if(upA->is(UserPointer::UP_TRACK)) 
         { 
-            if(movB && movB->getUserPointerType()==UserPointer::UP_PROJECTILE)
-            {   // 1.1 projectile hits track
-                // -------------------------
-                m_all_collisions.push_back(CollisionPair(movB, UserPointer::UP_PROJECTILE,
-						                                 NULL, UserPointer::UP_TRACK  ));  
-            }
-            else if(movB && movB->getUserPointerType()==UserPointer::UP_KART)
-            {
-                ((Kart*)movB)->crashed();
-            }
-        } 
+            if(upB->is(UserPointer::UP_PROJECTILE))   // 1.1 projectile hits track
+                m_all_collisions.push_back(upB, upA);
+            else if(upB->is(UserPointer::UP_KART))
+                upB->getPointerKart()->crashed();
+        }
         // 2) object a is a kart
         // =====================
-        else if(movA->getUserPointerType()==UserPointer::UP_KART)
+        else if(upA->is(UserPointer::UP_KART))
         {
-            if(!movB)
-            {   // The casts here are important, otherwise re-casting the 
-                // pointers later in kart-kart does not work as expected.
-                ((Kart*)movA)->crashed();
-            }
-            else if(movB && movB->getUserPointerType()==UserPointer::UP_PROJECTILE)
-            {   // 2.1 projectile hits kart
-                // -------------------------
-                m_all_collisions.push_back(CollisionPair(movB,        UserPointer::UP_PROJECTILE,
-                            							 (Kart*)movA, UserPointer::UP_KART      ));  
-            }
-            else if(movB && movB->getUserPointerType()==UserPointer::UP_KART)
-            {   // 2.2 kart hits kart
-                // ------------------
-                m_all_collisions.push_back(CollisionPair((Kart*)movA, UserPointer::UP_KART,
-							                             (Kart*)movB, UserPointer::UP_KART      ));  
-                
-            }
+            if(upB->is(UserPointer::UP_TRACK))
+                upA->getPointerKart()->crashed(); // Kart hit track
+            else if(upB->is(UserPointer::UP_PROJECTILE))
+                m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart
+            else if(upB->is(UserPointer::UP_KART))
+                m_all_collisions.push_back(upA, upB);   // 2.2 kart hits kart
         }
         // 3) object is a projectile
         // ========================
-        else if(movA->getUserPointerType()==UserPointer::UP_PROJECTILE)
+        else if(upA->is(UserPointer::UP_PROJECTILE))
         {
-            if(!movB)
-            {   // 3.1) projectile hits track
-                // --------------------------
-                m_all_collisions.push_back(CollisionPair(movA, UserPointer::UP_PROJECTILE,
-                                                         NULL, UserPointer::UP_TRACK     ));
-            }
-            else if(movB->getUserPointerType()==UserPointer::UP_PROJECTILE)
-            {   // 3.2 projectile hits projectile
-                // ------------------------------
-                m_all_collisions.push_back(CollisionPair(movA, UserPointer::UP_PROJECTILE,
-                                                         movB, UserPointer::UP_PROJECTILE));  
-            }
-            else if(movB->getUserPointerType()==UserPointer::UP_KART)
-            {   // 3.3 projectile hits kart
-                // ------------------------
-                m_all_collisions.push_back(CollisionPair(movA,        UserPointer::UP_PROJECTILE,
-                                                         (Kart*)movB, UserPointer::UP_KART      ));  
+            if(upB->is(UserPointer::UP_TRACK     ) ||   // 3.1) projectile hits track
+               upB->is(UserPointer::UP_PROJECTILE) ||   // 3.2) projectile hits projectile
+               upB->is(UserPointer::UP_KART      )   )  // 3.3) projectile hits kart
+            {
+                m_all_collisions.push_back(upA, upB);
             }
         }
-        // 4) Nothing else should happen
-        // =============================
-        else
-        {
-            assert("Unknown user pointer");
-        }
+        else assert("Unknown user pointer");            // 4) Should never happen
     }   // for i<numManifolds
 
     return returnValue;

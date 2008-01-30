@@ -46,21 +46,21 @@ private:
     // While this is a natural application of std::set, the set has some
     // overhead (since it will likely use a tree to sort the entries).
     // Considering that the number of collisions is usually rather small
-    // a simple list and linear search is being used here.
+    // a simple list and linear search is faster is is being used here.
 
     class CollisionPair {
     public:
-        void                  *a, *b;
-        UserPointer::UserPointerType type_a, type_b;
+        const UserPointer*    a, *b;
+       
         // The entries in Collision Pairs are sorted: if a projectile
         // is included, it's always 'a'. If only two karts are reported
         // the first kart pointer is the smaller one
-        CollisionPair(void *a1, UserPointer::UserPointerType atype,
-                      void *b1, UserPointer::UserPointerType btype) {
-            if(atype==Moveable::UP_KART && btype==Moveable::UP_KART && a1>b1) {
-	        a=b1;b=a1; type_a=btype; type_b=atype;
+        CollisionPair(const UserPointer *a1, const UserPointer *b1) {
+            if(a1->is(UserPointer::UP_KART) && 
+               b1->is(UserPointer::UP_KART) && a1>b1) {
+	        a=b1;b=a1;
 	    } else {
-	        a=a1; b=b1; type_a=atype; type_b=btype;
+	        a=a1; b=b1; 
 	    }
         };  //    CollisionPair
         bool operator==(const CollisionPair p) {
@@ -71,14 +71,18 @@ private:
     // This class is the list of collision objects, where each collision
     // pair is stored as most once.
     class CollisionList : public std::vector<CollisionPair> {
-    public:
-         void push_back(CollisionPair p) {
+    private:
+        void push_back(CollisionPair p) {
             // only add a pair if it's not already in there
             for(iterator i=begin(); i!=end(); i++) {
                 if((*i)==p) return;
             }
             std::vector<CollisionPair>::push_back(p);
         };   // push_back
+    public:
+        void push_back(const UserPointer* a, const UserPointer*b) {
+            push_back(CollisionPair(a, b));
+        }
     };
 
     CollisionList m_all_collisions;
