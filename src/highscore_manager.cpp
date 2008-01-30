@@ -87,6 +87,7 @@ void HighscoreManager::Load()
     }
     catch(std::exception& err)
     {
+        (void)err;   // remove warning about unused variable
         Save();
         if(m_can_write)
         {

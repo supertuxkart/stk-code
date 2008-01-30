@@ -17,7 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef BULLET
 #ifndef HEADER_MOVING_PHYSICS_H
 #define HEADER_MOVING_PHYSICS_H
 #include <plib/ssg.h>
@@ -45,7 +44,6 @@ public:
     const char  *getTypeName()          {return "moving physics";}
 };  // MovingPhysics
 
-#endif
 #endif
 /* EOF */
 

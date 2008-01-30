@@ -68,16 +68,11 @@ public:
         /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];
 
-    World(const RaceSetup& raceSetup);
-    virtual ~World();
-#ifndef BULLET
-    float GetHOT(sgVec3 start, sgVec3 end, ssgLeaf** leaf, sgVec4** nrm)
-          {return m_track->GetHOT(start, end, leaf, nrm);}
-    int   Collision(sgSphere* s, AllHits *a) const {return m_track->Collision(s,a); }
-#endif
-    void update(float delta);
-    void restartRace();
-    void disableRace(); // Put race into limbo phase
+                World(const RaceSetup& raceSetup);
+    virtual    ~World();
+    void        update(float delta);
+    void        restartRace();
+    void        disableRace(); // Put race into limbo phase
 
     PlayerKart* getPlayerKart(int player)
     {

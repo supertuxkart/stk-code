@@ -24,14 +24,11 @@
 #include "world.hpp"
 #include "user_config.hpp"
 
-
-#ifdef BULLET
-#  include "btBulletDynamicsCommon.h"
-#  ifdef __APPLE__
-#    include <GLUT/glut.h>
-#  else
-#    include <GL/glut.h>
-#  endif
+#include "btBulletDynamicsCommon.h"
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
 #endif
 
 #include "scene.hpp"
@@ -132,12 +129,9 @@ void Scene::draw(float dt)
         (*i)->update(dt);
         (*i) -> apply () ;
 
-#ifdef BULLET
         if(!user_config->m_bullet_debug)
         {
-#endif
             ssgCullAndDraw ( m_scenegraph );
-#ifdef BULLET
         }
         else
         {
@@ -187,7 +181,6 @@ void Scene::draw(float dt)
             }
             world->getPhysics()->draw();
         }   //  bullet_debug
-#endif
     }   // for cameras
 
     if (TRACK->useFog())
