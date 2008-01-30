@@ -113,27 +113,15 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
 
     lisp->get("wheel-base",              m_wheel_base);
     lisp->get("heightCOG",               m_height_cog);
-#ifdef BULLET
     lisp->get("bullet-engine-power",     m_engine_power);
-#else
-    lisp->get("engine-power",            m_engine_power);
-#endif
     lisp->get("time-full-steer",         m_time_full_steer);
     lisp->get("brake-factor",            m_brake_factor);
     lisp->get("brake-force",             m_brake_force);
     lisp->get("roll-resistance",         m_roll_resistance);
-#ifdef BULLET
     lisp->get("bullet-mass",             m_mass);
-#else
-    lisp->get("mass",                    m_mass);
-#endif
     lisp->get("air-resistance",          m_air_resistance);
     lisp->get("tire-grip",               m_tire_grip);
-#ifdef BULLET
     lisp->get("bullet-max-steer-angle",  m_max_steer_angle);
-#else
-    lisp->get("max-steer-angle",         m_max_steer_angle);
-#endif
     lisp->get("corn-f",                  m_corn_f);
     lisp->get("corn-r",                  m_corn_r);
     lisp->get("inertia",                 m_inertia);
@@ -162,7 +150,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("jump-velocity",             m_jump_velocity            );
-#ifdef BULLET
     // getVector appends to existing vectors, so a new one must be used to load
     std::vector<float> temp;
     lisp->getVector("gear-switch-ratio",   temp);
@@ -170,7 +157,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     temp.clear();
     lisp->getVector("gear-power-increase", temp);
     if(temp.size()>0) m_gear_power_increase = temp;
-#endif
 
 }   // getAllData
 

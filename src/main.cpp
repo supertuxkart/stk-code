@@ -66,12 +66,11 @@
 #include "gui/menu_manager.hpp"
 #include "scene.hpp"
 
-#ifdef BULLET
-#  ifdef __APPLE__
-#    include <GLUT/glut.h>
-#  else
-#    include <GL/glut.h>
-#  endif
+// Only needed for bullet debug!
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
 #endif
 
 void cmdLineHelp (char* invocation)
@@ -387,9 +386,7 @@ int main(int argc, char *argv[] )
 {
     try {
         initTranslations();
-#ifdef BULLET
         glutInit(&argc, argv);
-#endif
         InitTuxkart();
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first

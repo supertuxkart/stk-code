@@ -232,7 +232,6 @@ World::~World()
  */
 void World::resetAllKarts()
 {
-#ifdef BULLET
     bool all_finished=false;
     for(int i=0; i<10; i++) m_physics->update(1.f/60.f);
     while(!all_finished)
@@ -248,7 +247,7 @@ void World::resetAllKarts()
             }
         }
     }   // while
-#endif
+
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------

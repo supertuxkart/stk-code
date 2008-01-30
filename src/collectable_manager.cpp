@@ -132,9 +132,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     else
     {
         m_all_models[collectType] = 0;
-#ifdef BULLET
         m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
-#endif
     }
 
     // Load special attributes for certain collectables

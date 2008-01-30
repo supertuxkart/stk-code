@@ -22,10 +22,7 @@
 
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
-#ifdef BULLET
 #include "btBulletDynamicsCommon.h"
-#endif
-
 
 class Material;
 class ssgEntity;
@@ -59,9 +56,7 @@ public:
     float        getForceToTarget(int type) const {return m_all_force_to_target[type]; }
     float        getMaxDistance  (int type) const {return m_all_max_distance[type];}
     float        getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
-#ifdef BULLET
     const btVector3& getExtend   (int type) const {return m_all_extends[type];     }
-#endif
 };
 
 extern CollectableManager* collectable_manager;
