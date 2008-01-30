@@ -151,7 +151,6 @@ public:
     std::string m_background_music;
     bool        m_replay_history;
     bool        m_use_kph;
-    bool        m_improved_physics;
     int         m_width;
     int         m_height;
     int			m_prev_width;

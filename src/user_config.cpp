@@ -127,7 +127,6 @@ void UserConfig::setDefaults()
     m_background_music = "";
     m_profile          = 0;
     m_use_kph          = false;
-    m_improved_physics = false;
     m_replay_history   = false;
     m_width            = 800;
     m_height           = 600;
@@ -437,7 +436,6 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("herringStyle",     m_herring_style);
         lisp->get("background-music", m_background_music);
         lisp->get("useKPH",           m_use_kph);
-        lisp->get("improvedPhysics",  m_improved_physics);
 
         /*get resolution width/height*/
         lisp->get("width",            m_width);
@@ -632,9 +630,6 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("background-music\t", m_background_music);
         writer->writeComment("Use of kilometers per hours (km/h) instead of mph");
         writer->write("useKPH\t", m_use_kph);
-        writer->writeComment("With improved physics the gravity on a non-horizontal");
-        writer->writeComment("plane will add an accelerating force on the kart");
-        writer->write("improvedPhysics\t", m_improved_physics);
 
         writer->writeComment("screen resolution and windowing mode");
         writer->write("width\t", m_width);
