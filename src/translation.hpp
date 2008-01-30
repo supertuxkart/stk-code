@@ -20,8 +20,6 @@
 #ifndef TRANSLATION_H
 #define TRANSLATION_H
 
-#undef HAS_GETTEXT
-
 #ifdef HAS_GETTEXT
 #  include <libintl.h>
 #  define _(String) gettext(String)
@@ -43,24 +41,8 @@
 class initTranslations
 {
 public:
-#ifdef HAS_GETTEXT
-    initTranslations() 
-    { 
-        //        textdomain (PACKAGE);
-        // LC_ALL does not work, sscanf will then not always be able
-        // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
-        // used in driveline files.
-        setlocale (LC_CTYPE,    "");
-        setlocale (LC_MESSAGES, "");
-        bindtextdomain (PACKAGE, "/home/joh/local/tuxkart/po");
-        //bindtextdomain (PACKAGE, LOCALEDIR);
-        textdomain (PACKAGE);
-    }
-#else
-    initTranslations() {}
-#endif
+    initTranslations();
 };
 
 #endif
 /* EOF */
-

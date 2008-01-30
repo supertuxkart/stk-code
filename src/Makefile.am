@@ -87,7 +87,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	scene.hpp		   scene.cpp			\
 	race_setup.hpp	   	   no_copy.hpp	        	\
 	constants.hpp            				\
-	translation.hpp 					\
+	translation.cpp		   translation.hpp 		\
 	traffic.cpp 			  	        	\
 	player.hpp		   				\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
