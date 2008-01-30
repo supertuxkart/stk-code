@@ -212,8 +212,6 @@ void GrandPrixEnd::update(float dt)
     glDisable (GL_DEPTH_TEST);
     oldContext->makeCurrent();
     BaseGUI::update(dt);
-
-    SDL_GL_SwapBuffers();
 }
 
 //-----------------------------------------------------------------------------
