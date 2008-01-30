@@ -44,7 +44,8 @@ namespace lisp
             nextChar();
         }
         catch(EOFException& e)
-        {}
+        {(void)e;  // avoid 'unreferenced local variable' warning
+        }
     }
 
 //-----------------------------------------------------------------------------

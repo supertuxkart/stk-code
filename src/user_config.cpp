@@ -370,6 +370,7 @@ void UserConfig::loadConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
+        (void)e;  // avoid warning about unreferenced local variable
         printf(_("Config file '%s' does not exist, it will be created.\n"), 
                filename.c_str());
         delete root;

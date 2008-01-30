@@ -305,8 +305,6 @@ void Widget::update(const float DELTA)
         size_t line_start = 0;
         bool draw;
         bool out_of_rect = false;
-        float top, bottom;
-        int text_height;
 
         glEnable( GL_SCISSOR_TEST );
         do
