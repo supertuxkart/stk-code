@@ -32,26 +32,14 @@ enum WidgetTokens
 {
     WTOK_TITLE,
 
-    WTOK_TRACK0,
-    WTOK_TRACK1,
-    WTOK_TRACK2,
-    WTOK_TRACK3,
-    WTOK_TRACK4,
-    WTOK_TRACK5,
-    WTOK_TRACK6,
-    WTOK_TRACK7,
-    WTOK_TRACK8,
-    WTOK_TRACK9,
-    WTOK_TRACK10,
-    WTOK_TRACK11,
-    WTOK_TRACK12,
-    WTOK_TRACK13,
-
     WTOK_IMG0,
-    WTOK_EMPTY,
+    WTOK_EMPTY0,
+    WTOK_EMPTY1,
     WTOK_IMG1,
 
-    WTOK_AUTHOR
+    WTOK_AUTHOR,
+
+    WTOK_TRACK0
 };
 
 TrackSel::TrackSel()
@@ -72,13 +60,19 @@ TrackSel::TrackSel()
     widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_SML,
         WGT_FONT_GUI );
 
-    for (unsigned int i = 0; i != track_manager->getTrackCount(); i += 2)
+    for (unsigned int i = 0; i != track_manager->getTrackCount(); ++i)
     {
-        widget_manager->addWgt( WTOK_TRACK0 + i, 40, 7);
+        widget_manager->addWgt( WTOK_TRACK0 + i, 40, 6);
         widget_manager->setWgtText( WTOK_TRACK0 + i, track_manager->getTrack(i)->getName());
-        widget_manager->addWgt( WTOK_TRACK0 + i + 1, 40, 7);
-        widget_manager->setWgtText( WTOK_TRACK0 + i + 1, track_manager->getTrack(i+1)->getName());
-        widget_manager->breakLine();
+        if( i%2 != 0 ) widget_manager->breakLine();
+        else if (i + 1 == track_manager->getTrackCount() )
+        {
+            widget_manager->addWgt( WTOK_EMPTY0, 40, 6 );
+            widget_manager->deactivateWgt( WTOK_EMPTY0 );
+            widget_manager->hideWgtRect( WTOK_EMPTY0 );
+            widget_manager->hideWgtText( WTOK_EMPTY0 );
+            widget_manager->breakLine();
+        }
     }
 
     widget_manager->setInitialActivationState( false );
@@ -86,9 +80,9 @@ TrackSel::TrackSel()
     widget_manager->hideWgtRect( WTOK_IMG0 );
     widget_manager->hideWgtText(WTOK_IMG0);
 
-    widget_manager->addWgt( WTOK_EMPTY, 5, 35 );
-    widget_manager->hideWgtRect( WTOK_EMPTY );
-    widget_manager->hideWgtText( WTOK_EMPTY );
+    widget_manager->addWgt( WTOK_EMPTY1, 5, 35 );
+    widget_manager->hideWgtRect( WTOK_EMPTY1 );
+    widget_manager->hideWgtText( WTOK_EMPTY1 );
 
     widget_manager->addWgt(WTOK_IMG1, 35, 35);
     widget_manager->hideWgtRect( WTOK_IMG1 );
