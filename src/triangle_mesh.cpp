@@ -55,7 +55,8 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);
-    m_body=new btRigidBody(0.0f, m_motion_state, m_collision_shape);
+    btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state, m_collision_shape);
+    m_body=new btRigidBody(info);
 
     world->getPhysics()->addBody(m_body);
     m_user_pointer.set(UserPointer::UP_TRACK, this);

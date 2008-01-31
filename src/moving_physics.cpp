@@ -182,8 +182,9 @@ void MovingPhysics::init()
     m_motion_state = new btDefaultMotionState(trans);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
-    m_body = new btRigidBody(m_mass, m_motion_state, m_shape, inertia);
-    //m_body->setDamping(2.0f, 2.0f);
+    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state, m_shape, inertia);
+
+    m_body = new btRigidBody(info);
     world->getPhysics()->addBody(m_body);
 }   // init
 

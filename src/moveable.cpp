@@ -84,10 +84,11 @@ void Moveable::createBody(float mass, btTransform& trans,
     shape->calculateLocalInertia(mass, inertia);
     m_motion_state = new btDefaultMotionState(trans);
 
+    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
+
     // Then create a rigid body
     // ------------------------
-    m_body = new btRigidBody(mass, m_motion_state, 
-                             shape, inertia);
+    m_body = new btRigidBody(info);
     // This MUST actually be set from the actual class, otherwise this
     // is only a pointer to moveable, not to (say) kart, and virtual 
     // functions are not called correctly. 
