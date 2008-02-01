@@ -395,7 +395,7 @@ AC_SUBST(NOREGMOVE)
 dnl ==============
 dnl Bullet physics
 dnl ==============
-AC_DEFINE([BULLET], [], [Use the bullet physics engine])
+AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 CXXFLAGS="$CXXFLAGS -Ibullet/src"
 AC_CONFIG_FILES([         \
 		 src/bullet/Makefile      \
