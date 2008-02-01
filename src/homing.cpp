@@ -77,6 +77,12 @@ void Homing::update(float dt)
         if(fabsf(steer)>90.0f) steer=0.0f;
         if(steer<-m_st_max_turn_angle)  steer = -m_st_max_turn_angle;
         if(steer> m_st_max_turn_angle)  steer =  m_st_max_turn_angle;
+        // The steering must be interpreted as grad/s (otherwise this would
+        // depend on the frame rate). But this would usually miss the karts,
+        // since the angle isn't adjusted quickly enough when coming closer
+        // So we allow for (much) larger steering angles the closer the
+        // kart is by multiplying the rotation/sec with max_distance/minDistance
+        steer *=(dt*m_st_max_distance/minDistance);
         btMatrix3x3 steerMatrix(btQuaternion(0.0f,0.0f,DEGREE_TO_RAD(steer)));
         my_trans.setBasis(my_trans.getBasis()*steerMatrix);
     }   // minDistance<m_st_max_distance
