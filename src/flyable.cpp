@@ -106,7 +106,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
         m_body->setLinearVelocity(v);
         m_body->setAngularFactor(0.0f);   // prevent rotations
     }
-//    m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
     // FIXME: for now it is necessary to synch the graphical position with the 
     //        physical position, since 'hot' computation is done using the 

@@ -32,12 +32,17 @@ float Homing::m_st_max_turn_angle;
  */
 Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
 {
-    m_mass = 0.0f;    // a kinematik object must have mass=0, otherwise warnings
-                      // will be printed during bullet collision handling.
+    // A bit of a hack: the mass of this kinematic object is still 1.0 
+    // (see flyable), which enables collisions. I tried setting 
+    // collisionFilterGroup/mask, but still couldn't get this object to 
+    // collide with the track. By setting the mass to 1, collisions happen.
+    // (if bullet is compiled with _DEBUG, a warning will be printed the first
+    // time a homing-track collision happens).
     float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
     
     m_initial_velocity = btVector3(0.0f, m_speed, 0.0f);
-    createPhysics(y_offset, m_initial_velocity, new btCylinderShape(0.5f*m_extend));
+    createPhysics(y_offset, m_initial_velocity, 
+                  new btCylinderShape(0.5f*m_extend));
     m_body->setCollisionFlags(m_body->getCollisionFlags()           |
                               btCollisionObject::CF_KINEMATIC_OBJECT );
     m_body->setActivationState(DISABLE_DEACTIVATION);
