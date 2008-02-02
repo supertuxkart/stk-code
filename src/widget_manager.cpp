@@ -90,6 +90,10 @@ bool WidgetManager::addWgt
     new_id.widget->m_scroll_speed_x = m_default_scroll_x_speed;
     new_id.widget->m_scroll_speed_y = m_default_scroll_y_speed;
 
+    new_id.widget->m_enable_rotation = m_default_enable_rotation;
+    new_id.widget->m_rotation_angle = m_default_rotation_angle;
+    new_id.widget->m_rotation_speed = m_default_rotation_speed;
+
     new_id.widget->m_enable_track = m_default_show_track;
     new_id.widget->m_track_num = m_default_track_num;
 
@@ -779,6 +783,19 @@ void WidgetManager::setInitialScrollState
 }
 
 //-----------------------------------------------------------------------------
+void WidgetManager::setInitialRotationState
+(
+        const bool ENABLE,
+        const float ANGLE,
+        const int SPEED
+)
+{
+    m_default_enable_rotation = ENABLE;
+    m_default_rotation_angle = ANGLE;
+    m_default_rotation_speed = SPEED;
+}
+
+//-----------------------------------------------------------------------------
 void WidgetManager::setInitialTrackState
 (
     const bool SHOW,
@@ -808,6 +825,9 @@ void WidgetManager::restoreDefaultStates()
     m_default_scroll_preset_y = WGT_SCROLL_CENTER;
     m_default_scroll_x_speed = 0;
     m_default_scroll_y_speed = 0;
+    m_default_enable_rotation = false;
+    m_default_rotation_angle = 0.0f;
+    m_default_rotation_speed = 0;
     m_default_show_track = false;
     m_default_track_num = -1;
 }
@@ -1076,39 +1096,74 @@ void WidgetManager::setWgtYScrollPos
 }
 
 //-----------------------------------------------------------------------------
-        void WidgetManager::setWgtXScrollSpeed( const int TOKEN, const int SPEED )
-        {
-            const int ID = findId(TOKEN);
-            if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
-            else
-            {
-                std::cerr << "WARNING: tried to set the X scroll speed of an " <<
-                    "unnamed widget with token " << TOKEN << '\n';
-            }
-        }
-
-        //-----------------------------------------------------------------------------
-    void WidgetManager::setWgtYScrollSpeed( const int TOKEN, const int SPEED )
-    {
-        const int ID = findId(TOKEN);
-        if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
-        else
-        {
-            std::cerr << "WARNING: tried to set the Y scroll speed of an " <<
-                "unnamed widget with token " << TOKEN << '\n';
-        }
-    }
-
-    /** pulse_widget() passes the pulse order to the right widget.
-     */
-void WidgetManager::pulseWgt(const int TOKEN) const
+void WidgetManager::setWgtXScrollSpeed( const int TOKEN, const int SPEED )
 {
     const int ID = findId(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->pulse();
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_x = SPEED;
     else
     {
-        std::cerr << "WARNING: tried to pulse unnamed widget with token " <<
-            TOKEN << '\n';
+        std::cerr << "WARNING: tried to set the X scroll speed of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtYScrollSpeed( const int TOKEN, const int SPEED )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_scroll_speed_y = SPEED;
+    else
+    {
+        std::cerr << "WARNING: tried to set the Y scroll speed of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::enableWgtRotation( const int TOKEN )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rotation = true;
+    else
+    {
+        std::cerr << "WARNING: tried to enable rotation of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::disableWgtRotation( const int TOKEN )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_rotation = false;
+    else
+    {
+        std::cerr << "WARNING: tried to disable rotation of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtRotationAngle( const int TOKEN, const float ANGLE )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_rotation_angle = ANGLE;
+    else
+    {
+        std::cerr << "WARNING: tried to set the rotation angle of an "
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtRotationSpeed( const int TOKEN, const int SPEED )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_rotation_speed = SPEED;
+    else
+    {
+        std::cerr << "WARNING: tried to set the rotation speed of an "
+            "unnamed widget with token " << TOKEN << '\n';
     }
 }
 
@@ -1145,6 +1200,19 @@ void WidgetManager::setWgtTrackNum( const int TOKEN, const int TRACK )
     {
         std::cerr << "WARNING: tried to set the track number of an unnamed "
             << "widget with token " << TOKEN << '\n';
+    }
+}
+
+/** pulse_widget() passes the pulse order to the right widget.
+*/
+void WidgetManager::pulseWgt(const int TOKEN) const
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->pulse();
+    else
+    {
+        std::cerr << "WARNING: tried to pulse unnamed widget with token " <<
+            TOKEN << '\n';
     }
 }
 

@@ -110,6 +110,10 @@ class WidgetManager
     int m_default_scroll_x_speed;
     int m_default_scroll_y_speed;
 
+    bool m_default_enable_rotation;
+    float m_default_rotation_angle;
+    int m_default_rotation_speed;
+
     int m_default_show_track;
     int m_default_track_num;
 
@@ -193,6 +197,14 @@ public:
         const int Y_SPEED
     );
 
+    void setInitialRotationState
+    (
+        const bool ENABLE,
+        const float ANGLE,
+        const int SPEED
+    );
+
+
     void setInitialTrackState
     (
         const bool SHOW,
@@ -231,6 +243,11 @@ public:
     void setWgtYScrollPos( const int TOKEN, const WidgetScrollPos POS );
     void setWgtXScrollSpeed( const int TOKEN, const int SPEED );
     void setWgtYScrollSpeed( const int TOKEN, const int SPEED );
+
+    void enableWgtRotation( const int TOKEN );
+    void disableWgtRotation( const int TOKEN );
+    void setWgtRotationAngle( const int TOKEN, const float ANGLE );
+    void setWgtRotationSpeed( const int TOKEN, const int SPEED );
 
     void showWgtTrack( const int TOKEN );
     void hideWgtTrack( const int TOKEN );

@@ -133,8 +133,7 @@ class Widget
     int  m_x, m_y;
     int  m_width, m_height;
 
-    /* On/off features, these are not dependant on the delta time and are not
-     * animated. They are off by default. */
+    /* Low level features. They are off by default. */
     bool m_enable_rect;
     GLuint  m_rect_list; //A display list number that draws the rectangle with
                       //possibly rounded corners.
@@ -157,13 +156,18 @@ class Widget
     int m_scroll_speed_x;
     int m_scroll_speed_y;
 
+    bool m_enable_rotation;
+    float m_rotation_angle;
+    int m_rotation_speed;
+
+
     //The widget calls the Track::drawScaled2D() function to draw a given
     //track, and m_track_num tells which track to draw.
     int m_enable_track;
     int m_track_num;
 
-    /* Delta time dependant features, these deactivate after a certain time,
-     * and are dependant on the delta time. They have animations. */
+    /* High level, pattern following features; they deactivate themselves
+     * after they follow their pattern, and might use low level features.*/
     static const float MAX_TEXT_SCALE;
     static const float MIN_TEXT_SCALE;
     float m_text_scale; //Used for the pulse effect

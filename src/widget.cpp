@@ -96,7 +96,21 @@ void Widget::update(const float DELTA)
 {
     glPushMatrix();
 
-    glTranslatef ( (GLfloat)m_x , (GLfloat)m_y , 0);
+    /* OpenGL transformations are affected by the order of the calls; but the
+     * operations must be called in the inverse order that you want them to
+     * be applied, since the calls are stacked, and the one at the top is
+     * done first, till the one at the bottom.
+     */
+
+    glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
+
+    m_rotation_angle += m_rotation_speed * DELTA;
+    if( m_enable_rotation )
+    {
+        glRotatef( (GLfloat)m_rotation_angle, 0.0f, 0.0f, (GLfloat)1.0f );
+    }
+
+
 
     /*Handle delta time dependant features*/
     if(m_text_scale > MIN_TEXT_SCALE)
@@ -299,8 +313,8 @@ void Widget::update(const float DELTA)
             std::cerr << "(Did you set the text?)\n";
         }
 
-        int x_pos = (int)m_scroll_pos_x;
-        int y_pos = - (int)m_scroll_pos_y + m_height / 2 + (lines - 1 )* m_text_size / 2;
+        int x_pos = (int)m_scroll_pos_x - m_width * 0.5f;
+        int y_pos = - (int)m_scroll_pos_y + (lines - 1 )* m_text_size / 2;
 
         size_t line_start = 0;
         bool draw;
@@ -413,6 +427,15 @@ bool Widget::createRect(int radius)
         //quad.
         glBegin(GL_QUAD_STRIP);
         {
+            //These are used to center the widget; without centering, the
+            //widget's 0,0 coordinates are at the lower left corner.
+            float half_width = m_width * 0.5f;
+            float half_height = m_height * 0.5f;
+
+            float angle;
+            float circle_x, circle_y;
+            float vertex_x, vertex_ya, vertex_yb;
+
             //Draw the left side of a rectangle.
             for (i = 0; i <= NUM_QUADS; ++i)
             {
@@ -430,9 +453,9 @@ bool Widget::createRect(int radius)
                 //on that, we just split the radians in a corner in NUM_QUADS
                 //+ 1 parts, and use the angles at those parts to find the
                 //X and Y position of the points.
-                const float ANGLE = 0.5f * M_PI * (float)i / (float)NUM_QUADS;
-                const float CIRCLE_X = radius * cos(ANGLE);
-                const float CIRCLE_Y = radius * sin(ANGLE);
+                angle = 0.5f * M_PI * (float)i / (float)NUM_QUADS;
+                circle_x = radius * cos(angle);
+                circle_y = radius * sin(angle);
 
                 //After we generate the positions in circle for the angles,
                 //we have to position each rounded corner properly depending
@@ -440,44 +463,69 @@ bool Widget::createRect(int radius)
                 //position for the circle is dependant on rect; if a corner
                 //wasn't given, then the y position is computed as if it was
                 //for a rectangle without rounder corners.
-                const float VERTEX_X  = radius - CIRCLE_X;
-                const float VERTEX_YA = m_height +
-                    ((m_round_corners & WGT_AREA_NW) ? (CIRCLE_Y - radius) : 0);
-                const float VERTEX_YB = m_round_corners & WGT_AREA_SW ?
-                    radius - CIRCLE_Y : 0;
+                vertex_x  = radius - circle_x;
 
-                glTexCoord2f(VERTEX_X / m_width,
-                    VERTEX_YA / m_height);
-                glVertex2f(VERTEX_X, VERTEX_YA);
+                if( m_round_corners & WGT_AREA_NW )
+                {
+                    vertex_ya = m_height + circle_y - radius;
+                }
+                else
+                {
+                    vertex_ya = m_height;
+                }
 
-                glTexCoord2f(VERTEX_X / m_width,
-                    VERTEX_YB / m_height);
-                glVertex2f(VERTEX_X, VERTEX_YB);
+                if( m_round_corners & WGT_AREA_SW )
+                {
+                    vertex_yb = radius - circle_y;
+                }
+                else
+                {
+                    vertex_yb = 0;
+                }
+
+                glTexCoord2f(vertex_x / m_width, vertex_ya / m_height);
+                glVertex2f(vertex_x - half_width, vertex_ya - half_height);
+
+                glTexCoord2f(vertex_x / m_width, vertex_yb / m_height);
+                glVertex2f(vertex_x - half_width, vertex_yb - half_height);
             }
 
             //Draw the right side of a rectangle
             for (i = 0; i <= NUM_QUADS; ++i)
             {
-                const float ANGLE = 0.5f * M_PI * (float) i / (float) NUM_QUADS;
+                angle = 0.5f * M_PI * (float) i / (float) NUM_QUADS;
 
                 //By inverting the use of sin and cos we get corners that are
                 //drawn from left to right instead of right to left
-                const float CIRCLE_X = radius * sin(ANGLE);
-                const float CIRCLE_Y = radius * cos(ANGLE);
+                circle_x = radius * sin(angle);
+                circle_y = radius * cos(angle);
 
-                float VERTEX_X  = m_width - radius + CIRCLE_X;
-                float VERTEX_YA = m_height + ((m_round_corners &
-                    WGT_AREA_NE) ? (CIRCLE_Y - radius) : 0);
-                float VERTEX_YB = m_round_corners & WGT_AREA_SE ?
-                    radius - CIRCLE_Y : 0;
+                vertex_x  = m_width - radius + circle_x;
 
-                glTexCoord2f(VERTEX_X / m_width,
-                    VERTEX_YA / m_height);
-                glVertex2f(VERTEX_X, VERTEX_YA);
+                if( m_round_corners & WGT_AREA_NE )
+                {
+                    vertex_ya = m_height + circle_y - radius;
+                }
+                else
+                {
+                    vertex_ya = m_height;
+                }
 
-                glTexCoord2f((VERTEX_X) / m_width,
-                    (VERTEX_YB) / m_height);
-                glVertex2f(VERTEX_X, VERTEX_YB);
+                if( m_round_corners & WGT_AREA_SE )
+                {
+                    vertex_yb = radius - circle_y;
+                }
+                else
+                {
+                    vertex_yb = 0;
+                }
+
+
+                glTexCoord2f(vertex_x / m_width, vertex_ya / m_height);
+                glVertex2f(vertex_x - half_width, vertex_ya - half_height);
+
+                glTexCoord2f(vertex_x / m_width, vertex_yb / m_height);
+                glVertex2f(vertex_x - half_width, vertex_yb - half_height);
             }
 
         }
