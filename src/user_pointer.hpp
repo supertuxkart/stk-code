@@ -44,7 +44,7 @@ public:
     void            set(UserPointerType t, void* p) 
                                                 { m_user_pointer_type=t;
                                                   m_pointer          =p; }
-    UserPointer(): m_user_pointer_type(UP_UNDEF),m_pointer(NULL) {};
+    UserPointer(): m_pointer(NULL),m_user_pointer_type(UP_UNDEF) {};
     UserPointer(UserPointerType t, void* p) {set(t,p);}
 };
 #endif
