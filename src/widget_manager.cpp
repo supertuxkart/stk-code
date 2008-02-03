@@ -237,17 +237,18 @@ void WidgetManager::update(const float DELTA)
     glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
 
-
     glPushAttrib(GL_LIGHTING_BIT |
         GL_COLOR_BUFFER_BIT |
-        GL_DEPTH_BUFFER_BIT);
+        GL_DEPTH_BUFFER_BIT |
+        GL_STENCIL_BUFFER_BIT);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE  ) ;
+    glDisable(GL_CULL_FACE);
+    glEnable (GL_STENCIL_TEST);
 
     const int NUM_WIDGETS = (int)m_widgets.size();
     for( int i = 0; i < NUM_WIDGETS; ++i)

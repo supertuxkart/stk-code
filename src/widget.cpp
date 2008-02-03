@@ -102,6 +102,7 @@ void Widget::update(const float DELTA)
      * done first, till the one at the bottom.
      */
 
+    glClear( GL_STENCIL_BUFFER_BIT );
     glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
 
     m_rotation_angle += m_rotation_speed * DELTA;
@@ -139,18 +140,35 @@ void Widget::update(const float DELTA)
         glDisable(GL_TEXTURE_2D);
     }
 
-    if(m_enable_rect)
+    if(glIsList(m_rect_list))
     {
-        if(glIsList(m_rect_list))
+        //FIXME: maybe there is some sort of stacking method to disable/enable
+        //color masking
+        if(!m_enable_rect)
         {
-            glColor4fv(m_rect_color);
-            glCallList(m_rect_list);
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         }
         else
         {
-            std::cerr << "Warning: widget tried to draw null rect list.\n";
-            std::cerr << "(Did you created the rect?)\n";
+            glColor4fv(m_rect_color);
         }
+
+        //FIXME: I should probably revert the values to the defaults within the widget manager
+        //(if glPushAttrib() doesn't), but right now this is the only thing using the
+        //stencil test anyways.
+        glStencilFunc(GL_ALWAYS, 0x1, 0x1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glCallList(m_rect_list);
+
+        if(!m_enable_rect)
+        {
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+    }
+    else
+    {
+        std::cerr << "Warning: widget tried to draw null rect list.\n";
+        std::cerr << "(Did you created the rect?)\n";
     }
 
     if( m_enable_track )
@@ -318,29 +336,19 @@ void Widget::update(const float DELTA)
 
         size_t line_start = 0;
         bool draw;
-        bool out_of_rect = false;
 
-        glEnable( GL_SCISSOR_TEST );
+        glStencilFunc(GL_EQUAL,0x1,0x1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         do
         {
             draw = true;
             if(y_pos + m_text_size / 2 > m_height / 2 )
             {
                 if(y_pos - m_text_size / 2 >  m_height / 2) draw = false;
-                else
-                {
-                    out_of_rect = true;
-                    glScissor(m_x, m_y, m_width, m_height);
-                }
             }
             else if(y_pos + (m_height - m_text_size) / 2 < 0)
             {
                 if(y_pos + (m_height + m_text_size) / 2 < 0) draw = false;
-                else
-                {
-                    out_of_rect = true;
-                    glScissor(m_x, m_y, m_width, m_height);
-                }
             }
 
             line_end = m_text.find_first_of('\n', line_start);
@@ -355,13 +363,7 @@ void Widget::update(const float DELTA)
             y_pos -= m_text_size;
             line_start = line_end + 1;
 
-            if( out_of_rect )
-            {
-                out_of_rect = false;
-                glScissor(0, 0, user_config->m_width, user_config->m_height);
-            }
         } while( line_end != std::string::npos );
-        glDisable( GL_SCISSOR_TEST );
     }
     glPopMatrix();
 }
