@@ -199,6 +199,10 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         UserPointer *upA        = (UserPointer*)(objA->getUserPointer());
         UserPointer *upB        = (UserPointer*)(objB->getUserPointer());
 
+	// FIXME: Must be a moving physics object
+	// FIXME: A rocket should explode here!
+
+	if(!upA || !upB) continue;
         // 1) object A is a track
         // =======================
         if(upA->is(UserPointer::UP_TRACK)) 
