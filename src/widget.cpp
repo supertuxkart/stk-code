@@ -313,7 +313,7 @@ void Widget::update(const float DELTA)
             std::cerr << "(Did you set the text?)\n";
         }
 
-        int x_pos = (int)m_scroll_pos_x - m_width * 0.5f;
+        int x_pos = (int)(m_scroll_pos_x - m_width * 0.5f);
         int y_pos = - (int)m_scroll_pos_y + (lines - 1 )* m_text_size / 2;
 
         size_t line_start = 0;
@@ -324,18 +324,18 @@ void Widget::update(const float DELTA)
         do
         {
             draw = true;
-            if(y_pos + m_text_size / 2 > m_height )
+            if(y_pos + m_text_size / 2 > m_height / 2 )
             {
-                if(y_pos - m_text_size / 2 >  m_height) draw = false;
+                if(y_pos - m_text_size / 2 >  m_height / 2) draw = false;
                 else
                 {
                     out_of_rect = true;
                     glScissor(m_x, m_y, m_width, m_height);
                 }
             }
-            else if(y_pos - m_text_size / 2 < 0)
+            else if(y_pos + (m_height - m_text_size) / 2 < 0)
             {
-                if(y_pos + m_text_size / 2 < 0) draw = false;
+                if(y_pos + (m_height + m_text_size) / 2 < 0) draw = false;
                 else
                 {
                     out_of_rect = true;
