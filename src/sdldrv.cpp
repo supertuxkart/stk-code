@@ -23,6 +23,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include "input.hpp"
 #include "actionmap.hpp"
@@ -85,10 +86,15 @@ void drv_init()
     	user_config->m_crashed = false;  //reset flag
     	// set window mode as a precaution
     	user_config->m_fullscreen = false;
-    	// blacklist the res
+    	// blacklist the res if not already done
     	std::ostringstream o;
     	o << user_config->m_width << "x" << user_config->m_height;
-    	user_config->m_blacklist_res.push_back (o.str());
+    	std::string res = o.str();
+    	if (std::find(user_config->m_blacklist_res.begin(),
+    	  user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())
+    	{
+    		user_config->m_blacklist_res.push_back (o.str());
+    	}
     	//use prev screen res settings if available
     	if (user_config->m_width != user_config->m_prev_width
     		|| user_config->m_height != user_config->m_prev_height)

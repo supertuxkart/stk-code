@@ -496,9 +496,7 @@ int main(int argc, char *argv[] )
     }
 
     /* Program closing...*/
-    // Set crashed flag to false 
-    user_config->m_crashed = false;
-    
+       
     user_config->saveConfig();
 
     drv_deinit();

@@ -71,12 +71,20 @@ ConfigDisplay::ConfigDisplay()
 	  		changeResolution(user_config->m_prev_width,
 	  		user_config->m_prev_height,true);
 	  	}
+	  	
     // if m_prev_windowed is true and m_fullscreen is true then a change to 
     // fullscreen has been rejected
-    if (user_config->m_prev_windowed && user_config->m_fullscreen)
+    else if (user_config->m_prev_windowed && user_config->m_fullscreen)
     {
     	drv_toggleFullscreen();
-    	user_config->m_prev_windowed = false;  //reset flag
+    	user_config->m_prev_windowed = false;  //reset flags
+    	user_config->m_crashed = false;
+    	user_config->saveConfig();
+    }
+    else
+    {
+    	user_config->m_crashed = false;  //if we are here we didn't crash
+    	user_config->saveConfig();
     }
     
     const bool SHOW_RECT = true;
@@ -299,6 +307,13 @@ void ConfigDisplay::changeResolution(int width, int height, bool reverse)
     //change to new height and width
     user_config->m_width = width;
     user_config->m_height = height;
+    
+    // if returning to prev res, change m_crashed to false as we didn't crash and save config
+    if (reverse && user_config->m_fullscreen)
+    {
+    	user_config->m_crashed = false;
+    	user_config->saveConfig();
+    }
     
     if (!reverse && user_config->m_fullscreen)
     {
