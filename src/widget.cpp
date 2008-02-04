@@ -475,7 +475,7 @@ bool Widget::createRect(int radius)
                 }
                 else
                 {
-                    vertex_ya = m_height;
+                    vertex_ya = (float)m_height;
                 }
 
                 if( m_round_corners & WGT_AREA_SW )
@@ -512,7 +512,7 @@ bool Widget::createRect(int radius)
                 }
                 else
                 {
-                    vertex_ya = m_height;
+                    vertex_ya = (float)m_height;
                 }
 
                 if( m_round_corners & WGT_AREA_SE )
