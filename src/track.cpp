@@ -266,7 +266,15 @@ int Track::findOutOfRoadSector
 {
     int sector = UNKNOWN_SECTOR;
     float dist;
-    float nearest_dist = 99999;
+    //FIXME: it can happen that dist is bigger than nearest_dist for all the
+    //the points we check (currently a limit of +/- 10), and if so, the
+    //function will return UNKNOWN_SECTOR, and if the AI get this, it will
+    //trigger an assertion. I increased the nearest_dist default value from
+    //99999 to 9999999, which is a lot more than the situation that caused
+    //the discovery of this problem, but the best way to solve this, is to
+    //find a better way of handling the shortcuts, and maybe a better way of
+    //calculating the distance.
+    float nearest_dist = 9999999;
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
 
     int begin_sector = 0;
