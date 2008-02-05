@@ -28,6 +28,8 @@
  (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
                                     ;; is considered to be a shortcut
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
+ (explosion-impulse-objects 500.0  )  ;; explosion impulse for physics objects (smaller
+                                    ;; else a cone e.g. will be pushed way too far)
 
  ;; Other kart relates values
  ;; -------------------------

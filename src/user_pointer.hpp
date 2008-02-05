@@ -27,25 +27,34 @@ class TriangleMesh;
 class Moveable;
 class Flyable;
 class Kart;
+class MovingPhysics;
 
 class UserPointer
 {
 public:
-    enum   UserPointerType {UP_UNDEF, UP_KART, UP_PROJECTILE, UP_TRACK};
+    enum   UserPointerType {UP_UNDEF, UP_KART, UP_FLYABLE, UP_TRACK,
+                            UP_MOVING_PHYSICS};
 private:
     void*  m_pointer;
     UserPointerType m_user_pointer_type;
 public:
-    bool            is(UserPointerType t)    const {return m_user_pointer_type==t;  }
-    TriangleMesh*   getPointerTriangleMesh() const {return (TriangleMesh*)m_pointer;}
-    Moveable*       getPointerMoveable()     const {return (Moveable*)m_pointer;    }
-    Flyable*        getPointerFlyable()      const {return (Flyable*)m_pointer;     }
-    Kart*           getPointerKart()         const {return (Kart*)m_pointer;        }
-    void            set(UserPointerType t, void* p) 
-                                                { m_user_pointer_type=t;
-                                                  m_pointer          =p; }
-    UserPointer(): m_pointer(NULL),m_user_pointer_type(UP_UNDEF) {};
-    UserPointer(UserPointerType t, void* p) {set(t,p);}
+    bool            is(UserPointerType t)     const {return m_user_pointer_type==t;    }
+    TriangleMesh*   getPointerTriangleMesh()  const {return (TriangleMesh*)m_pointer;  }
+    Moveable*       getPointerMoveable()      const {return (Moveable*)m_pointer;      }
+    Flyable*        getPointerFlyable()       const {return (Flyable*)m_pointer;       }
+    Kart*           getPointerKart()          const {return (Kart*)m_pointer;          }
+    MovingPhysics*  getPointerMovingPhysics() const {return (MovingPhysics*)m_pointer; }
+    void            set(MovingPhysics* p) { m_user_pointer_type=UP_MOVING_PHYSICS;
+                                            m_pointer          =p;           }
+    void            set(Kart* p)          { m_user_pointer_type=UP_KART;
+                                            m_pointer          =p;           }
+    void            set(Flyable* p)       { m_user_pointer_type=UP_FLYABLE;
+                                            m_pointer          =p;           }
+    void            set(TriangleMesh* p)  { m_user_pointer_type=UP_TRACK;
+                                            m_pointer          =p;           }
+                    UserPointer()         { zero();                          }
+    void            zero()                { m_user_pointer_type=UP_UNDEF;
+                                            m_pointer          = NULL;       }
 };
 #endif
 /* EOF */

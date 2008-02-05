@@ -615,6 +615,7 @@ void World::restartRace()
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
+    callback_manager->reset();
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.destroy();

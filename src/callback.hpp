@@ -20,12 +20,16 @@
 #ifndef CALLBACK_H
 #define CALLBACK_H
 
+#include "btBulletDynamicsCommon.h"
+
 class Callback
 {
 public:
-    virtual      ~Callback()        {};
-    virtual void update  (float dt) = 0;
-    virtual void init    ()         = 0;
+    virtual     ~Callback()     {};
+    virtual void update         (float dt) = 0;
+    virtual void init           ()         = 0;
+    virtual void reset          ()           {};
+    virtual void handleExplosion(const btVector3& pos, bool directHit) {};
 }
 ;   // Callback
 

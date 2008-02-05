@@ -106,6 +106,31 @@ void CallbackManager::initAll() const
             (*c)->init();
     }   // for i
 
-}   // update
+}   // initAll
 
+//-----------------------------------------------------------------------------
+// Called when restarting a race
+void CallbackManager::reset() const
+{
+    for(int i=0; i<CB_MAX; i++)
+    {
+        for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
+            c != m_allCallbacks[i].end(); c++)
+            (*c)->reset();
+    }   // for i
+
+}   // initAll
+
+//-----------------------------------------------------------------------------
+void CallbackManager::handleExplosion(const btVector3& pos, 
+                                      const MovingPhysics* mp) const
+{
+    for(int i=0; i<CB_MAX; i++)
+    {
+        for(std::vector<Callback*>::const_iterator c = m_allCallbacks[i].begin();
+            c != m_allCallbacks[i].end(); c++)
+            (*c)->handleExplosion(pos, mp==(*c));
+    }   // for i
+
+}   // handleExplosion
 

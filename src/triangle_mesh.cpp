@@ -59,7 +59,7 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
     m_body=new btRigidBody(info);
 
     world->getPhysics()->addBody(m_body);
-    m_user_pointer.set(UserPointer::UP_TRACK, this);
+    m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
     m_body->setCollisionFlags(m_body->getCollisionFlags()  | 
                               flags                        |

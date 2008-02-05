@@ -112,6 +112,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
+    CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
 
 }   // load
 
@@ -137,7 +138,8 @@ void STKConfig::init_defaults()
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
-    m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = -99.9f;
+    m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
+    m_explosion_impulse_objects = -99.9f;
 
     m_max_karts            = -100;
     m_grid_order           = -100;
@@ -166,6 +168,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("zipper-time",                  m_zipper_time         );
     lisp->get("zipper-force",                 m_zipper_force        );
     lisp->get("explosion-impulse",            m_explosion_impulse   );
+    lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts           );
     lisp->get("grid-order",                   m_grid_order          );
 

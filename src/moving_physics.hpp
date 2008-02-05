@@ -19,10 +19,11 @@
 
 #ifndef HEADER_MOVING_PHYSICS_H
 #define HEADER_MOVING_PHYSICS_H
+#include <string>
 #include <plib/ssg.h>
 #include "btBulletDynamicsCommon.h"
 #include "callback.hpp"
-#include <string>
+#include "user_pointer.hpp"
 
 class MovingPhysics : public ssgTransform, public Callback
 {
@@ -36,12 +37,16 @@ protected:
     btDefaultMotionState *m_motion_state;
     float                 m_half_height;
     float                 m_mass;
+    UserPointer           m_user_pointer;
+    btTransform           m_init_pos;
 public:
     MovingPhysics           (const std::string data);
     ~MovingPhysics          (); 
     void update             (float dt);
     void         init       ();
+    virtual void reset      ();
     const char  *getTypeName()          {return "moving physics";}
+    virtual void handleExplosion(const btVector3& pos, bool directHit);
 };  // MovingPhysics
 
 #endif

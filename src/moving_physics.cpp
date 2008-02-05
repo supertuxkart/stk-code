@@ -148,12 +148,6 @@ void MovingPhysics::init()
         }
     }   // while
 
-    //    printf("matrix: ");
-    //    for(int i=0; i<4; i++) 
-    //        for(int j=0; j<4; j++)
-    //            printf("%f ",pos[i][j]);
-    //    printf("\n");
-
     // 3. Determine size of the object
     // -------------------------------
     float x_min, x_max, y_min, y_max, z_min, z_max, radius;
@@ -176,15 +170,19 @@ void MovingPhysics::init()
 
     // 4. Create the rigid object
     // --------------------------
-    btTransform trans;
-    trans.setIdentity();
-    trans.setOrigin(btVector3(pos[3][0],pos[3][1],pos[3][2]+m_half_height));
-    m_motion_state = new btDefaultMotionState(trans);
+    
+    m_init_pos.setIdentity();
+    m_init_pos.setOrigin(btVector3(pos[3][0],pos[3][1],pos[3][2]+m_half_height));
+    m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state, m_shape, inertia);
-
+    
+    // Make sure that the cones stop rolling by defining angular friction != 0.
+    info.m_angularDamping = 0.5f;
     m_body = new btRigidBody(info);
+    m_user_pointer.set(this);
+    m_body->setUserPointer(&m_user_pointer);
     world->getPhysics()->addBody(m_body);
 }   // init
 
@@ -196,13 +194,45 @@ void MovingPhysics::update(float dt)
     float m[4][4];
     t.getOpenGLMatrix((float*)&m);
     
-    //    printf("%lx is %f %f %f\n",this, t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
     // Transfer the new position and hpr to m_curr_pos
     sgCoord m_curr_pos;
     sgSetCoord(&m_curr_pos, m);
     setTransform(&m_curr_pos);
 }   // update
 // -----------------------------------------------------------------------------
+void MovingPhysics::reset()
+{
+    m_body->setCenterOfMassTransform(m_init_pos);
+}   // reset 
 
+// -----------------------------------------------------------------------------
+void MovingPhysics::handleExplosion(const btVector3& pos, bool direct_hit) {
+    if(direct_hit) {
+        btVector3 impulse(0.0f, 0.0f, stk_config->m_explosion_impulse_objects);
+        m_body->applyCentralImpulse(impulse);
+    }
+    else  // only affected by a distant explosion
+    {
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+        btVector3 diff=t.getOrigin()-pos;
+
+        float len2=diff.length2();
+
+        // The correct formhale would be to first normalise diff,
+        // then apply the impulse (which decreases 1/r^2 depending
+        // on the distance r), so:
+        // diff/len(diff) * impulseSize/len(diff)^2
+        // = diff*impulseSize/len(diff)^3
+        // We use diff*impulseSize/len(diff)^2 here, this makes the impulse
+        // somewhat larger, which is actually more fun :)
+        btVector3 impulse=diff*stk_config->m_explosion_impulse_objects/len2;
+        m_body->applyCentralImpulse(impulse);
+    }
+    m_body->activate();
+
+}   // handleExplosion
+
+// -----------------------------------------------------------------------------
 /* EOF */
 

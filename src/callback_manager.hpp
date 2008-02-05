@@ -21,7 +21,9 @@
 #define CALLBACK_MANAGER_H
 
 #include <vector>
+#include "btBulletDynamicsCommon.h"
 #include "callback.hpp"
+#include "moving_physics.hpp"
 
 // It might actually be enough to have only two different values: track (which
 // get deleted and loaded more than one), and everything else, which only
@@ -36,13 +38,14 @@ class CallbackManager
     std::vector<Callback*> m_allCallbacks[CB_MAX];
 
 public:
-    CallbackManager();
-    ~CallbackManager();
-
-    void update     (float dt) const;
-    void initAll    () const;
-    void clear      (CallbackType cbType);
-    void addCallback(Callback *c, CallbackType t);
+         CallbackManager();
+        ~CallbackManager();
+    void update         (float dt) const;
+    void initAll        () const;
+    void reset          () const;
+    void clear          (CallbackType cbType);
+    void addCallback    (Callback *c, CallbackType t);
+    void handleExplosion(const btVector3& pos, const MovingPhysics* mo) const;
 }
 ;   // CallbackManager
 

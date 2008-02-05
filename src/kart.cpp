@@ -199,7 +199,7 @@ void Kart::createPhysics(ssgEntity *obj)
     btTransform trans;
     trans.setIdentity();
     createBody(mass, trans, &m_kart_chassis);
-    m_user_pointer.set(UserPointer::UP_KART, this);
+    m_user_pointer.set(this);
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
                        m_kart_properties->getChassisAngularDamping() );
 

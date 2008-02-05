@@ -85,14 +85,15 @@ void Moveable::createBody(float mass, btTransform& trans,
     m_motion_state = new btDefaultMotionState(trans);
 
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
+    info.m_restitution=0.5f;
 
     // Then create a rigid body
     // ------------------------
     m_body = new btRigidBody(info);
-    // This MUST actually be set from the actual class, otherwise this
+    // The value of user_pointer must be set from the actual class, otherwise this
     // is only a pointer to moveable, not to (say) kart, and virtual 
-    // functions are not called correctly. 
-    m_user_pointer.set(UserPointer::UP_UNDEF, 0);
+    // functions are not called correctly. So only init the pointer to zero.
+    m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);
 }   // createBody
 

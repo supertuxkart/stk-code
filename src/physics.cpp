@@ -112,6 +112,11 @@ void Physics::update(float dt)
             {
                 p->a->getPointerFlyable()->hitTrack();
             }
+            else if(p->b->is(UserPointer::UP_MOVING_PHYSICS))
+            {
+                p->a->getPointerFlyable()->explode(NULL, p->b->getPointerMovingPhysics());
+
+            }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
                 p->a->getPointerFlyable()->explode((Kart*)(p->b));
@@ -207,7 +212,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         // =======================
         if(upA->is(UserPointer::UP_TRACK)) 
         { 
-            if(upB->is(UserPointer::UP_PROJECTILE))   // 1.1 projectile hits track
+            if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
                 upB->getPointerKart()->crashed();
@@ -218,20 +223,28 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_TRACK))
                 upA->getPointerKart()->crashed(); // Kart hit track
-            else if(upB->is(UserPointer::UP_PROJECTILE))
+            else if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart
             else if(upB->is(UserPointer::UP_KART))
                 m_all_collisions.push_back(upA, upB);   // 2.2 kart hits kart
         }
         // 3) object is a projectile
         // ========================
-        else if(upA->is(UserPointer::UP_PROJECTILE))
+        else if(upA->is(UserPointer::UP_FLYABLE))
         {
-            if(upB->is(UserPointer::UP_TRACK     ) ||   // 3.1) projectile hits track
-               upB->is(UserPointer::UP_PROJECTILE) ||   // 3.2) projectile hits projectile
-               upB->is(UserPointer::UP_KART      )   )  // 3.3) projectile hits kart
+            if(upB->is(UserPointer::UP_TRACK         ) ||   // 3.1) projectile hits track
+               upB->is(UserPointer::UP_FLYABLE       ) ||   // 3.2) projectile hits projectile
+               upB->is(UserPointer::UP_MOVING_PHYSICS) ||   // 3.3) projectile hits projectile
+               upB->is(UserPointer::UP_KART          )   )  // 3.4) projectile hits kart
             {
                 m_all_collisions.push_back(upA, upB);
+            }
+        } 
+        else if(upA->is(UserPointer::UP_MOVING_PHYSICS))
+        {
+            if(upB->is(UserPointer::UP_FLYABLE)) 
+            {
+                m_all_collisions.push_back(upB, upA);
             }
         }
         else assert("Unknown user pointer");            // 4) Should never happen

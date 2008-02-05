@@ -23,6 +23,7 @@
 #include "world.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
+#include "callback_manager.hpp"
 #include "sound_manager.hpp"
 #include "scene.hpp"
 #include "ssg_help.hpp"
@@ -92,7 +93,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
 
     m_shape = shape;
     createBody(m_mass, trans, m_shape);
-    m_user_pointer.set(UserPointer::UP_PROJECTILE, this);
+    m_user_pointer.set(this);
     world->getPhysics()->addBody(getBody());
 
     // Simplified rockets: no gravity
@@ -204,7 +205,7 @@ void Flyable::placeModel()
 }  // placeModel
 
 // -----------------------------------------------------------------------------
-void Flyable::explode(Kart *kart_hit)
+void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
 {
 	if(m_exploded) return;
 
@@ -219,6 +220,7 @@ void Flyable::explode(Kart *kart_hit)
     m->removeAllKids();
     scene->remove(m);
 
+    btVector3 pos(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]);
     world->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
@@ -228,7 +230,7 @@ void Flyable::explode(Kart *kart_hit)
         // handle the actual explosion. Set a flag it if was a direct hit.
         kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
     }
-
+    callback_manager->handleExplosion(pos, moving_physics);
 }   // explode
 
 /* EOF */

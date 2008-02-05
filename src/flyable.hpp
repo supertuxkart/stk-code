@@ -21,6 +21,7 @@
 #define HEADER_FLYABLE_H
 
 #include "moveable.hpp"
+#include "moving_physics.hpp"
 #include "kart.hpp"
 #include "terrain_info.hpp"
 
@@ -67,7 +68,7 @@ public:
 
     void placeModel          ();
     virtual void hitTrack    () {};
-    void         explode     (Kart* kart);
+    void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
     bool         hasHit      ()               { return m_has_hit_something; }
     void         reset       () { Moveable::reset();
                                   sgCopyCoord(&m_last_pos,&m_reset_pos );   }

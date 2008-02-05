@@ -38,7 +38,7 @@ MovingTexture::MovingTexture(char *data, ssgBranch *branch)
     parseData(data);
 
 
-}   // Callback
+}   // MovingTexture
 
 //-----------------------------------------------------------------------------
 MovingTexture::~MovingTexture()
