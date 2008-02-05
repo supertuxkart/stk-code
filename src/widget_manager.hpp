@@ -41,7 +41,6 @@
 
 class WidgetManager
 {
-    //FIXME: maybe WidgetID isn't the right name for this struct...
     struct WidgetID
     {
         int token;

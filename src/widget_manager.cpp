@@ -62,8 +62,8 @@ bool WidgetManager::addWgt
     new_id.token = TOKEN;
 
     //There is no reason to make a token-less widget active, so if the token
-    //is WGT_NONE, the widget is forced to be inactive, preventing bugs.
-    new_id.active = (TOKEN != WGT_NONE ? m_default_active : false);
+    //WGT_NONE, the widget is forced to be inactive, preventing bugs.
+    new_id.active = TOKEN != WGT_NONE ? m_default_active : false;
 
     new_id.min_width = MIN_WIDTH;
     new_id.min_height = MIN_HEIGHT;
@@ -247,20 +247,17 @@ void WidgetManager::update(const float DELTA)
     glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
-    glEnable (GL_STENCIL_TEST);
-
-    //For some reason, the text is culled only when we are in race mode!
-    //To avoid this, we disable culling.
     glDisable(GL_CULL_FACE);
+    glEnable (GL_STENCIL_TEST);
 
     const int NUM_WIDGETS = (int)m_widgets.size();
     for( int i = 0; i < NUM_WIDGETS; ++i)
     {
         m_widgets[i].widget->update(DELTA);
     }
-    glFlush();
 
     glPopAttrib();
+
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
@@ -1250,82 +1247,6 @@ void WidgetManager::darkenWgtColor(const int TOKEN)
  */
 int WidgetManager::handlePointer(const int X, const int Y )
 {
-    /*
-    const int NUM_WGTS = m_widgets.size();
-    if( NUM_WGTS < 1 ) return WGT_NONE;
-
-    //OpenGL provides a mechanism to selects objects; simply 'draw' named
-    //objects into a selection buffer while limiting it to a viewing volume
-    //(in our case the X,Y position of the pointer). Each time something is
-    //drawn, it stores the number of objects in the viewing volume so far,
-    //two hard-to-explain values that are of no interest for us, and a list
-    //of all the names that have been written so far, so this list is written
-    //over and over, and increases with each object drawn.
-
-    //To find the maximum possible buffer size needed we use 'arithmetic
-    //series'. In most cases, this is be smaller than a hard coded value
-    //(I was going to use 256, which is more than what it's needed for 16
-    //widgets, all being in the same point under the mouse at the same
-    //time!), thought it's *extremely* unlikely someone in the planet will
-    //ever need the maximum possible size, but I'm not going to risk for
-    //almost no gain.
-    const int MIN_BUFFER_SIZE = 4; //1 GLuint for the number of objects,
-                                   //2 values, and 1 name
-    const int NON_NAME_HIT_INFO = 3; //1 number of objects and 2 values
-    const unsigned int BUFFER_SIZE = NUM_WGTS * ( MIN_BUFFER_SIZE +
-        NON_NAME_HIT_DESC + NUM_WGTS ) / 2;
-
-    GLuint select_buffer[BUFFER_SIZE];
-    glSelectBuffer(NUM_WGTS, select_buffer);
-
-    glRenderMode(GL_SELECT);
-    glInitNames();
-    glPushName(WGT_NONE);
-
-    glPushMatrix();
-
-    for( int i = 0; i < NUM_WGTS; ++i )
-    {
-        if(!(m_widgets[i].active)) continue;
-
-        glLoadName( m_widgets[i].token );
-
-        //In case this ever becomes a performance bottleneck:
-        //the m_rect_list includes texture coordinates, which are not
-        //needed for selection.
-        glCallList( m_widgets[i].widget->m_rect_list );
-    }
-    glFlush();
-    glPopMatrix();
-
-    GLuint num_names;
-    GLuint* position = select_buffer;
-    const GLint NUM_HITS = glRenderMode(GL_RENDER);
-    for( int i = 0; i < NUM_HITS; ++i )
-    {
-        num_names = position;
-        select_buffer;
-    }
-
-   unsigned int i, j;
-   GLuint names, *ptr;
-
-   printf ("hits = %d\n", hits);
-   ptr = (GLuint *) buffer;
-   for (i = 0; i < hits; i++) {
-      names = *ptr;
-      printf (" number of names for hit = %d\n", names); ptr++;
-      printf("  z1 is %g;", (float) *ptr/0x7fffffff); ptr++;
-      printf(" z2 is %g\n", (float) *ptr/0x7fffffff); ptr++;
-      printf ("   the name is ");
-      for (j = 0; j < names; j++) { 
-         printf ("%d ", *ptr); ptr++;
-      }
-      printf ("\n");
-   }
-*/
-
-#if 0
     //Search if the given x and y positions are on top of any widget. Please
     //note that the bounding box for each widget is used instead of the
     //real widget shape.
@@ -1361,12 +1282,11 @@ int WidgetManager::handlePointer(const int X, const int Y )
             return m_selected_wgt_token;
         }
     }
-#endif
 
     return WGT_NONE;
 }
 
-/** The handle<direction>() function stores the current widget under
+/** The handle_<direction>() function stores the current widget under
  *  the cursor after receiving input from a key.
  */
 int
@@ -1377,8 +1297,7 @@ WidgetManager::handleLeft()
 	return handleFinish(findLeftWidget(findId(m_selected_wgt_token)));
 }
 
-//-----------------------------------------------------------------------------
-int
+    int
 WidgetManager::handleRight()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
@@ -1386,7 +1305,6 @@ WidgetManager::handleRight()
 	return handleFinish(findRightWidget(findId(m_selected_wgt_token)));
 }
 
-//-----------------------------------------------------------------------------
 int
 WidgetManager::handleUp()
 {
@@ -1395,7 +1313,6 @@ WidgetManager::handleUp()
 	return handleFinish(findTopWidget(findId(m_selected_wgt_token)));
 }
 
-//-----------------------------------------------------------------------------
 int
 WidgetManager::handleDown()
 {
@@ -1404,7 +1321,6 @@ WidgetManager::handleDown()
 	return handleFinish(findBottomWidget(findId(m_selected_wgt_token)));
 }
 
-//-----------------------------------------------------------------------------
 int
 WidgetManager::handleFinish(const int next_wgt)
 {
@@ -1416,7 +1332,6 @@ WidgetManager::handleFinish(const int next_wgt)
 	return m_selected_wgt_token;
 }
 
-//-----------------------------------------------------------------------------
 void
 WidgetManager::increaseScrollSpeed(const bool fast)
 {
@@ -1441,7 +1356,6 @@ WidgetManager::increaseScrollSpeed(const bool fast)
 	}
 }
 
-//-----------------------------------------------------------------------------
 void
 WidgetManager::decreaseScrollSpeed(const bool fast)
 {
