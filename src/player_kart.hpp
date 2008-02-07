@@ -37,6 +37,7 @@ private:
 
     Player *m_player;
     float   m_penalty_time;
+    float   m_time_last_crash_sound;
     Camera *m_camera;
 
     void steer(float, int);

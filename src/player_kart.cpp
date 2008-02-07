@@ -74,7 +74,7 @@ void PlayerKart::action(KartAction action, int value)
         m_controls.jump = (value!=0);
         break;
     }
-}
+}   // action
 
 //-----------------------------------------------------------------------------
 void PlayerKart::steer(float dt, int steer_val)
@@ -167,22 +167,31 @@ void PlayerKart::update(float dt)
 void PlayerKart::crashed()
 {
     Kart::crashed();
-    sound_manager->playSfx( SOUND_CRASH );
-}
+    // A collision is usually reported several times, even when hitting
+    // something only once. This results in a kind of 'machine gun'
+    // noise by playing the crash sound over and over again. To prevent
+    // this, the crash sound is only played if there was at least 0.5
+    // seconds since the last time it was played (for this kart)
+    if(world->m_clock - m_time_last_crash_sound > 0.5f) 
+    {
+        sound_manager->playSfx( SOUND_CRASH );
+        m_time_last_crash_sound = world->m_clock;
+    }
+}   // crashed
 
 //-----------------------------------------------------------------------------
 void PlayerKart::handleZipper()
 {
     Kart::handleZipper();
     sound_manager->playSfx ( SOUND_WEE );
-}
+}   // handleZipper
 
 //-----------------------------------------------------------------------------
 void PlayerKart::collectedHerring(Herring* herring)
 {
     Kart::collectedHerring(herring);
     sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
-}
+}   // collectedHerring
 
 //-----------------------------------------------------------------------------
 void PlayerKart::reset()
@@ -197,9 +206,11 @@ void PlayerKart::reset()
     m_controls.wheelie = false;
     m_controls.jump = false;
     m_penalty_time = 0;
+    m_time_last_crash_sound = -10.0f;
     m_camera->setReverseHeading(false);
     Kart::reset();
-}
+}   // reset
+
 //-----------------------------------------------------------------------------
 /** This function is called by world to add any messages to the race gui. This
  *  can't be done (in some cases) in the update() function, since update can be
