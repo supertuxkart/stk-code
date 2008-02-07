@@ -1,11 +1,11 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Shifting Sands")
+ (name        "Shifting Sands")
  (description "Created by Oliver & Steve Baker")
- (music "mods/tk7.mod")
- (screenshot "sshot-sandtrack.rgb")
- (topview "topview-sandtrack.rgb")
+ (music       "oggs/tk7.ogg")
+ (screenshot  "sshot-sandtrack.rgb")
+ (topview     "topview-sandtrack.rgb")
 )
 
 ;; EOF ;;

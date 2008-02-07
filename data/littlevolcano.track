@@ -15,9 +15,9 @@
  (sun-diffuse  0.8 0.6 0.6 0.0)
  (sun-specular 1.0 0.8 0.8 0.0)
 
- (music "mods/tk5a.mod")
+ (music      "oggs/tk5a.ogg")
  (screenshot "sshot-littlevolcano.rgb")
- (topview "topview-littlevolcano.rgb")
+ (topview    "topview-littlevolcano.rgb")
 )
 
 ;; EOF ;;

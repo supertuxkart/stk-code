@@ -1,11 +1,11 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "BSODs Battlements")
+ (name        "BSODs Battlements")
  (description "Created by Oliver & Steve Baker")
- (music "oggs/Lava\ Lagoon_2.ogg")
- (screenshot "sshot-bsodcastle.rgb")
- (topview "topview-bsodcastle.rgb")
+ (music       "oggs/Lava\ Lagoon_2.ogg")
+ (screenshot  "sshot-bsodcastle.rgb")
+ (topview     "topview-bsodcastle.rgb")
 )
 
 ;; EOF ;;

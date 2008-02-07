@@ -1,11 +1,11 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "On the Beach")
+ (name        "On the Beach")
  (description "Created by Ingo Ruhnke")
- (music "mods/Boom_boom_boom.mod")
- (screenshot "sshot-beach.rgb")
- (topview "topview-beach.rgb")
+ (music       "oggs/Boom_boom_boom.ogg")
+ (screenshot  "sshot-beach.rgb")
+ (topview     "topview-beach.rgb")
 )
 
 ;; EOF ;;

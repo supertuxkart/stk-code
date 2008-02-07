@@ -146,9 +146,7 @@ dnl The check for OpenAL headers depends on the OS, since
 dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
 AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)   
 
-dnl as well as mikmod, since mikmod is only used (but then
-dnl it's necessary) when openal is used. We also check for
-dnl ogg vorbis support now.
+dnl We also check for ogg vorbis support now.
 dnl we have 4 sound libraries to check, first we check for OpenAL   
 if test x$have_al_lib = xyes; then
   case "${host}" in
@@ -195,13 +193,6 @@ case "${host}" in
       fi
    fi
 
-   dnl search for mikmod libraries, needed to play mod files with OpenAL
-   AC_SEARCH_LIBS(MikMod_RegisterDriver, mikmod, have_mikmod_lib=yes)
-   
-   if test x$have_mikmod_lib = xyes; then
-      AC_CHECK_HEADER(mikmod.h, have_mikmod_hdr=yes)
-   fi
- 
    dnl search for the libraries needed to use ogg vorbis
    AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
 
@@ -225,27 +216,20 @@ case "${host}" in
        SUMMARY="$SUMMARY You DO NOT have freealut."
    fi
    
-   if test x$have_mikmod_hdr != xyes; then
-       SUMMARY="$SUMMARY You DO NOT have mikmod."
-   fi
-   
    if test x$have_al_hdr = xyes -a x$alut_version_ok = xyes; then
-       if test x$have_mikmod_hdr = xyes; then
-           openal_LIBS="$LIBS"
-           AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
-           AC_DEFINE([HAVE_MIKMOD], 1, [Defined when mikmod is available])
-           SUMMARY="$SUMMARY\nUsing OpenAL for sound."
-           
-           if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
-               AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
-               SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
-               # ov_read for ogg music needs endianness flag. This macro defines
-	       # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
-	       AC_C_BIGENDIAN
-           fi
+       openal_LIBS="$LIBS"
+       AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
+       SUMMARY="$SUMMARY\nUsing OpenAL for sound."
+
+       if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
+           AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
+           SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
+           # ov_read for ogg music needs endianness flag. This macro defines
+           # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
+	   AC_C_BIGENDIAN
        fi
    else
-       SUMMARY="$SUMMARY\nInstall OpenAL, freealut and mikmod for better sound!"
+       SUMMARY="$SUMMARY\nInstall OpenAL and freealut for better sound!"
    fi
 
    LIBS=$save_LIBS
@@ -374,7 +358,6 @@ fi
 AC_SUBST(bullet_LIBS)
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
-AC_SUBST(mikmod_LIBS)
 AC_SUBST(sdl_LIBS)
 
 AC_MSG_CHECKING([for gcc -fno-regmove option ])
@@ -425,7 +408,6 @@ AC_CONFIG_FILES([         \
  fonts/Makefile           \
  images/Makefile          \
  models/Makefile          \
- mods/Makefile            \
  src/Makefile             \
  wavs/Makefile            \
  wavs/radio/Makefile      \

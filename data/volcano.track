@@ -1,11 +1,11 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name "Volcano")
+ (name        "Volcano")
  (description "Created by Ingo Ruhnke")
- (music "mods/Boom_boom_boom.mod")
- (screenshot "sshot-volcano.rgb")
- (topview "topview-volcano.rgb")
+ (music       "oggs/Boom_boom_boom.ogg")
+ (screenshot  "sshot-volcano.rgb")
+ (topview     "topview-volcano.rgb")
 )
 
 ;; EOF ;;
