@@ -69,7 +69,7 @@ void Herring::update(float delta)
 {
     if(m_eaten)
     {
-        const float T = m_time_to_return - world->m_clock;
+        const float T = m_time_to_return - world->getTime();
         if ( T > 0 )
         {
             sgVec3 hell;
@@ -99,6 +99,6 @@ void Herring::update(float delta)
 void Herring::isEaten()
 {
     m_eaten=true;
-    m_time_to_return=world->m_clock+2.0f;
+    m_time_to_return=world->getTime()+2.0f;
 }
 

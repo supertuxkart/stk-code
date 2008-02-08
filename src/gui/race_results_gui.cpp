@@ -93,15 +93,9 @@ RaceResultsGUI::RaceResultsGUI()
         const Kart *KART = world->getKart(order[i]);
         const std::string& KART_NAME = KART->getName();
         char sTime[20];
-        if(i==NUM_KARTS-1 && world->m_race_setup.m_mode!=RaceSetup::RM_TIME_TRIAL)
-        {
-            sprintf(sTime,"          ");
-        }
-        else
-        {
-            const float T      = KART->getFinishTime();
-            TimeToString(T, sTime);
-        }
+        const float T      = KART->getFinishTime();
+        TimeToString(T, sTime);
+
         //This shows position + driver name + time + points earned + total points
         if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
         {

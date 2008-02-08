@@ -55,10 +55,10 @@ class RaceGUI: public BaseGUI
             m_message    = message; 
             m_font_size  = size;
             m_kart       = kart;
-            m_end_time   = time>=0.0f ? world->m_clock+time : -1.0f;
+            m_end_time   = time>=0.0f ? world->getTime()+time : -1.0f;
             m_red=red; m_blue=blue; m_green=green; 
         }
-        bool done() const {return m_end_time<0 || world->m_clock>m_end_time;}
+        bool done() const {return m_end_time<0 || world->getTime()>m_end_time;}
     };
 public:
 

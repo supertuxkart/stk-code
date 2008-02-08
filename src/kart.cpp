@@ -409,23 +409,23 @@ void Kart::doLapCounting ()
         // will begin another countdown).
         if(m_race_lap+1<=world->m_race_setup.m_num_laps)
         {
-            setTimeAtLap(world->m_clock);
+            setTimeAtLap(world->getTime());
             m_race_lap++ ;
         }
 
         m_shortcut_count = 0;
         // Only do timings if original time was set properly. Driving backwards
-        // over the start line will cause the lap start time to be set to 0.
+        // over the start line will cause the lap start time to be set to -1.
         if(m_lap_start_time>=0.0)
         {
             float time_per_lap;
             if (m_race_lap == 1) // just completed first lap
             {
-            	time_per_lap=world->m_clock;
+            	time_per_lap=world->getTime();
             }
             else //completing subsequent laps
             {
-            	time_per_lap=world->m_clock-m_lap_start_time;
+            	time_per_lap=world->getTime()-m_lap_start_time;
             }
                         
             if(time_per_lap < world->getFastestLapTime() )
@@ -450,7 +450,7 @@ void Kart::doLapCounting ()
                 //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
             }
         }
-        m_lap_start_time = world->m_clock;
+        m_lap_start_time = world->getTime();
     }
     else if ( newLap )
     {
@@ -1201,6 +1201,29 @@ void Kart::setFinishingState(float time)
 {
     m_finished_race = true;
     m_finish_time   = time;
-}
+}   // setFinishingState
 
+//-----------------------------------------------------------------------------
+float Kart::estimateFinishTime  ()
+{
+    // Estimate the arrival time of any karts that haven't arrived
+    // yet by using their average speed up to now and the distance
+    // still to race. This approach guarantees that the order of 
+    // the karts won't change anymore (karts ahead will have a 
+    // higher average speed and therefore finish the race earlier 
+    // than karts further behind), so the position doesn't have to
+    // be updated to get the correct scoring.
+    float distance_covered  = getLap()*world->m_track->getTrackLength()
+                            + getDistanceDownTrack();
+    // In case that a kart is rescued behind start line, or ...
+    if(distance_covered<0) distance_covered =1.0f;
+
+    float average_speed     = distance_covered/world->getTime();
+
+    // Finish time is the time needed for the whole race with 
+    // the average speed computed above.
+    return world->m_race_setup.m_num_laps*world->m_track->getTrackLength() 
+          / average_speed;
+
+}   // estimateFinishTime
 /* EOF */

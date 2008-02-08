@@ -87,7 +87,7 @@ void GameManager::run()
                 if(user_config->m_profile)
                 {
                     m_frame_count++;
-                    if (world->m_clock>user_config->m_profile)
+                    if (world->getTime()>user_config->m_profile)
                     {
                         //FIXME: SDL_GetTicks() includes the loading time,
                         //so the FPS will be skewed for now.

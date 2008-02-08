@@ -170,6 +170,7 @@ public:
     bool           isTakingShortcut    () const  { return m_shortcut_type!=SC_NONE;}
     bool           raceIsFinished      () const  { return m_finished_race;       }
     void           endRescue           ();
+    float          estimateFinishTime  ();
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);

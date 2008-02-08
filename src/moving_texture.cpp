@@ -88,7 +88,7 @@ void MovingTexture::update(float dt)
     sgCoord add;
 
 
-    float timer = world->m_clock + m_phase ;
+    float timer = world->getTime() + m_phase ;
 
     if ( m_cycle != 0.0 && m_mode != MODE_FORWARD )
     {

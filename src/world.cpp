@@ -423,7 +423,6 @@ bool World::loadReplayHumanReadable( std::string const &filename )
 
 //-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
 void World::checkRaceStatus()
 {
     if (m_clock > 1.0 && m_ready_set_go == 0)
@@ -459,6 +458,7 @@ void World::checkRaceStatus()
     int new_finished_karts   = 0;
     for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
     {
+        // FIXME: this part should be done as part of Kart::update
         if ((m_kart[i]->getLap () >= m_race_setup.m_num_laps) && !m_kart[i]->raceIsFinished())
         {
             m_kart[i]->setFinishingState(m_clock);
@@ -482,19 +482,25 @@ void World::checkRaceStatus()
         }
     }
     race_manager->addFinishedKarts(new_finished_karts);
-    // Different ending conditions:
-    // 1) all players are finished -->
-    //    wait TIME_DELAY_TILL_FINISH seconds - if no other end condition
-    //    applies, end the game (and make up some artificial times for the
-    //    outstanding karts).
-    // 2) If only one kart is playing, finish when one kart is finished.
-    // 3) Otherwise, wait till all karts except one is finished - the last
-    //    kart obviously becoming the last
-    if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE)
+
+    // 1) All karts are finished --> end the race
+    // ==========================================
+    if(race_manager->getFinishedKarts() >= m_race_setup.getNumKarts() )
+    {
+        m_phase = FINISH_PHASE;
+    }
+
+    // 2) All player karts are finished --> wait some
+    //    time for AI karts to arrive before finishing
+    // ===============================================
+    else if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE)
     {
         m_phase = DELAY_FINISH_PHASE;
         m_finish_delay_start_time = m_clock;
     }
+
+    // 3) If the 'wait for AI' time is over, estimate arrival times & finish
+    // =====================================================================
     else if(m_phase==DELAY_FINISH_PHASE &&
             m_clock-m_finish_delay_start_time>TIME_DELAY_TILL_FINISH)
     {
@@ -503,32 +509,11 @@ void World::checkRaceStatus()
         {
             if(!m_kart[i]->raceIsFinished())
             {
-                // FIXME: Add some tenths to have different times - a better solution
-                //        would be to estimate the distance to go and use this to
-                //        determine better times.
-                m_kart[i]->setFinishingState(m_clock+m_kart[i]->getPosition()*0.3f);
+                m_kart[i]->setFinishingState(m_kart[i]->estimateFinishTime());
                 race_manager->addKartScore((int)i, m_kart[i]->getPosition());
-
             }   // if !raceIsFinished
         }   // for i
-
     }
-    else if(m_race_setup.getNumKarts() == 1)
-    {
-        if(race_manager->getFinishedKarts() == 1) m_phase = FINISH_PHASE;
-    }
-    else if(race_manager->getFinishedKarts() >= m_race_setup.getNumKarts() - 1)
-    {
-        m_phase = FINISH_PHASE;
-        for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-        {
-            if(!m_kart[i]->raceIsFinished())
-            {
-                m_kart[i]->setFinishingState(m_clock);
-            }   // if !raceIsFinished
-        }   // for i
-    }   // if getFinishedKarts()>=geNumKarts()
-
 }  // checkRaceStatus
 
 //-----------------------------------------------------------------------------

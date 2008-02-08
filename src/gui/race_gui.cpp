@@ -263,7 +263,7 @@ void RaceGUI::drawTimer ()
     char str[256];
 
     assert(world != NULL);
-    m_time_left = world->m_clock;
+    m_time_left = world->getTime();
 
     TimeToString(m_time_left, str);
 #ifdef USE_WIDGET_MANAGER
@@ -410,7 +410,7 @@ void RaceGUI::drawPlayerIcons ()
         glDisable(GL_CULL_FACE);
 
         if(laps_of_leader>0 &&    // Display position during first lap
-           (world->m_clock - kart->getTimeAtLap()<5.0f ||
+           (world->getTime() - kart->getTimeAtLap()<5.0f ||
             lap!=laps_of_leader))
         {  // Display for 5 seconds
             char str[256];
@@ -422,7 +422,7 @@ void RaceGUI::drawPlayerIcons ()
             else
             {
                 float timeBehind;
-                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : world->m_clock)
+                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : world->getTime())
                     - time_of_leader;
                 str[0]='+'; str[1]=0;
                 TimeToString(timeBehind, str+1);

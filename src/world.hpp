@@ -39,7 +39,6 @@ class World
 {
 public:
     typedef std::vector<Kart*> Karts;
-    float      m_clock;
 
     /** resources, this should be put in a separate class or replaced by a smart
      * resource manager
@@ -97,6 +96,7 @@ public:
     float getFastestLapTime() const           { return m_fastest_lap;              }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time;}
     const Highscores* getHighscores() const   { return m_highscores;               }
+    float getTime() const                     { return m_clock;                    }
 
     void  pause();
     void  unpause();
@@ -108,6 +108,7 @@ private:
     Kart*       m_fastest_kart;
     Highscores* m_highscores;
     Phase       m_phase;
+    float       m_clock;
 
     void updateRacePosition( int k );
     void loadTrack();
@@ -117,8 +118,6 @@ private:
                  sgCoord init_pos);
 
 #ifdef HAVE_GHOST_REPLAY
-public:
-    float   getClock() const            { return m_clock; }
 private:
     bool    saveReplayHumanReadable( std::string const &filename ) const;
     bool    loadReplayHumanReadable( std::string const &filename );

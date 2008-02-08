@@ -62,7 +62,7 @@ bool ReplayRecorder::pushFrame()
     if( m_ReplayBuffers.getNumberFrames() )
     {
         ReplayFrame const *last_Frame = m_ReplayBuffers.getFrameAt( m_ReplayBuffers.getNumberFrames() - 1 );
-        if( (world->getClock() - last_Frame->time) < REPLAY_TIME_STEP_MIN ) return true;
+        if( (world->getTime() - last_Frame->time) < REPLAY_TIME_STEP_MIN ) return true;
     }
 
     ReplayFrame *pFrame = getNewFrame();
