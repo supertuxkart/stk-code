@@ -35,7 +35,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	collectable_manager.cpp	   collectable_manager.hpp   	\
 	sound_manager.cpp	   sound_manager.hpp           	\
 	sound_plib.cpp             sound_plib.hpp              	\
-	music_mikmod.cpp	   music_mikmod.hpp            	\
 	music_ogg.cpp	   	   music_ogg.hpp            	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
 	input.hpp 						\
@@ -129,7 +128,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L. -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-	-lplibul -lplibssgaux $(bullet_LIBS) $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS) $(mikmod_LIBS)
+	-lplibul -lplibssgaux $(bullet_LIBS) $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS)
 
 .PHONY: pot
 pot:
