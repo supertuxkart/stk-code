@@ -83,10 +83,10 @@ GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
     const int NUM_AI_KARTS = m_num_karts - NUM_PLAYERS;
     //Add the AI karts
     for(int i = 0; i < NUM_AI_KARTS; ++i)
-        m_karts.push_back(KartStatus(kart_names[i], 0, i, NUM_PLAYERS));
+        m_karts.push_back(KartStatus(kart_names[i], 0, 0.0f, i, NUM_PLAYERS));
     //Add the player karts
     for(int i = 0; i < NUM_PLAYERS; ++i)
-        m_karts.push_back(KartStatus(kart_names[i+NUM_AI_KARTS], 0, i+NUM_AI_KARTS, i));
+        m_karts.push_back(KartStatus(kart_names[i+NUM_AI_KARTS], 0, 0.0f, i+NUM_AI_KARTS, i));
 }
 
 //-----------------------------------------------------------------------------
@@ -177,6 +177,7 @@ GrandPrixMode::exit_race()
         menu_manager->switchToGrandPrixEnding();
     }
 }
+
 
 //=============================================================================
 QuickRaceMode::QuickRaceMode(const std::string& track_,

@@ -39,6 +39,8 @@ public:
     virtual int  getKartScore    (int kart) const {return 0;}
     virtual std::string getKartName(int kart) const { return "";}
     virtual int  getPositionScore(int pos ) const {return 0;}
+    virtual void addKartOverallTime (int kart, float race_time) {}
+    virtual float getKartOverallTime (int kart) const {return 0.0f;}
 };
 
 class GrandPrixMode : public RaceMode
@@ -53,14 +55,16 @@ private:
     {
         std::string ident;//The .tkkf filename without the .tkkf
         int score;
+        float overall_time;
         int prev_finish_pos;
         int player;//Which player controls the kart, for the AI this is
         //the number of players.
 
         KartStatus(const std::string& ident_, const int& score_,
-                   const int& prev_finish_pos_, const int& player_) :
-                ident(ident_), score(score_), prev_finish_pos(prev_finish_pos_),
-        player(player_) {}
+                   const float& overall_time_, const int& prev_finish_pos_, 
+                   const int& player_) :
+                ident(ident_), score(score_), overall_time(overall_time_),
+                 prev_finish_pos(prev_finish_pos_), player(player_){}
         
      };
     
@@ -88,6 +92,11 @@ public:
         m_karts[kart].score +=
             getPositionScore(pos);
     }
+    float getKartOverallTime (int kart) const {return m_karts[kart].overall_time;}
+    void addKartOverallTime  (int kart, float race_time)
+    {
+		m_karts[kart].overall_time += race_time;
+	}
     friend bool operator< (const KartStatus& left, const KartStatus& right)
         {
             if (left.score < right.score) return true; 
@@ -172,6 +181,8 @@ public:
     int  getPositionScore(int pos)  const { return m_mode->getPositionScore(pos);}
     std::string getKartName(int kart) const { return m_mode->getKartName(kart);  }
     void addKartScore(int kart, int pos)  { m_mode->addKartScore(kart, pos);     }
+    void addKartOverallTime(int kart, float race_time) {m_mode->addKartOverallTime(kart, race_time); }
+    float getKartOverallTime(int kart) {return m_mode->getKartOverallTime(kart); }
     void addFinishedKarts(int num)        { m_num_finished_karts += num;         }
     void PlayerFinishes()                 { m_num_finished_players++;            }
     int  allPlayerFinished()    {return m_num_finished_players==m_players.size();}

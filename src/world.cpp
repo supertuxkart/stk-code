@@ -464,6 +464,7 @@ void World::checkRaceStatus()
             m_kart[i]->setFinishingState(m_clock);
 
             race_manager->addKartScore((int)i, m_kart[i]->getPosition());
+            race_manager->addKartOverallTime((int) i, m_clock);
 
             ++new_finished_karts;
             if(m_kart[i]->isPlayerKart())
@@ -509,8 +510,10 @@ void World::checkRaceStatus()
         {
             if(!m_kart[i]->raceIsFinished())
             {
-                m_kart[i]->setFinishingState(m_kart[i]->estimateFinishTime());
+                const float est_finish_time = m_kart[i]->estimateFinishTime();
+                m_kart[i]->setFinishingState(est_finish_time);
                 race_manager->addKartScore((int)i, m_kart[i]->getPosition());
+                race_manager->addKartOverallTime((int) i, est_finish_time);
             }   // if !raceIsFinished
         }   // for i
     }

@@ -58,39 +58,19 @@ GrandPrixEnd::GrandPrixEnd()
     m_context = new ssgContext;
     oldContext->makeCurrent();
 
-    int highest = 0;
-    //FIXME: We go from the back to the front because the players are in the
-    //back and in case of a tie they will win against the AI, *but* if it's
-    //player vs. player, the player who goes first would win.
-    for(int i = race_manager->getNumKarts() - 1; i > 0; --i)
-        if(race_manager->getKartScore(i) > race_manager->getKartScore(highest))
-            highest = i;
-
-    const std::string KART_NAME = race_manager->getKartName(highest);
-    const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);
-
-    static char output[MAX_MESSAGE_LENGTH];
-    snprintf(output, sizeof(output),
-             _("The winner is %s!"),WINNING_KART->getName().c_str());
-    widget_manager->addWgt( WTOK_TITLE, 60, 10);
-    widget_manager->showWgtRect(WTOK_TITLE);
-    widget_manager->showWgtText(WTOK_TITLE);
-    widget_manager->setWgtText(WTOK_TITLE, output);
-    widget_manager->setWgtTextSize(WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->breakLine();
-
-
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
 
     Kart *kart;
 	int *scores   = new int[NUM_KARTS];
     int *position = new int[NUM_KARTS];
+    float *race_time = new float[NUM_KARTS];
     for( unsigned int i = 0; i < NUM_KARTS; ++i )
     {
         kart = world->getKart(i);
         position[i] = i;
         scores[i]   = race_manager->getKartScore(i);
+        race_time[i] = race_manager->getKartOverallTime(i);
     }
 
     //Bubblesort
@@ -100,23 +80,40 @@ GrandPrixEnd::GrandPrixEnd()
         sorted = true;
         for( unsigned int i = 0; i < NUM_KARTS - 1; ++i )
         {
-            if( scores[i] < scores[i+1] )
+            if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
+              && race_time[i] > race_time[i+1]))
             {
                 int tmp_score[2];
+                float tmp_time;
 
                 tmp_score[0] = position[i];
                 tmp_score[1] = scores[i];
+                tmp_time = race_time[i];
 
                 position[i] = position[i+1];
                 scores[i] = scores[i+1];
+                race_time[i] = race_time[i+1];
 
                 position[i+1] = tmp_score[0];
                 scores[i+1] = tmp_score[1];
+                race_time[i+1] = tmp_time;
 
                 sorted = false;
             }
         }
     } while(!sorted);
+    
+    kart = world->getKart(position[0]);
+    
+    static char output[MAX_MESSAGE_LENGTH];
+    snprintf(output, sizeof(output),
+             _("The winner is %s!"),kart->getName().c_str());
+    widget_manager->addWgt( WTOK_TITLE, 60, 10);
+    widget_manager->showWgtRect(WTOK_TITLE);
+    widget_manager->showWgtText(WTOK_TITLE);
+    widget_manager->setWgtText(WTOK_TITLE, output);
+    widget_manager->setWgtTextSize(WTOK_TITLE, WGT_FNT_LRG);
+    widget_manager->breakLine();
 
     m_score = new char[MAX_STR_LEN*NUM_KARTS];
 
@@ -134,8 +131,11 @@ GrandPrixEnd::GrandPrixEnd()
         widget_manager->setWgtTextSize(WTOK_FIRSTKART + i, WGT_FNT_SML);
     widget_manager->breakLine();
     }
+    const std::string KART_NAME = race_manager->getKartName(position[0]);
+    const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);
     delete []scores;
     delete []position;
+    delete []race_time;
 
     widget_manager->addWgt(WTOK_QUIT, 50, 7);
     widget_manager->activateWgt(WTOK_QUIT);
