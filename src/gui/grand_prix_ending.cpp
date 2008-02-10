@@ -61,13 +61,11 @@ GrandPrixEnd::GrandPrixEnd()
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = world->getNumKarts();
 
-    Kart *kart;
-	int *scores   = new int[NUM_KARTS];
+    int *scores   = new int[NUM_KARTS];
     int *position = new int[NUM_KARTS];
-    float *race_time = new float[NUM_KARTS];
+    double *race_time = new double[NUM_KARTS];
     for( unsigned int i = 0; i < NUM_KARTS; ++i )
     {
-        kart = world->getKart(i);
         position[i] = i;
         scores[i]   = race_manager->getKartScore(i);
         race_time[i] = race_manager->getKartOverallTime(i);
@@ -84,7 +82,7 @@ GrandPrixEnd::GrandPrixEnd()
               && race_time[i] > race_time[i+1]))
             {
                 int tmp_score[2];
-                float tmp_time;
+                double tmp_time;
 
                 tmp_score[0] = position[i];
                 tmp_score[1] = scores[i];
@@ -103,6 +101,7 @@ GrandPrixEnd::GrandPrixEnd()
         }
     } while(!sorted);
     
+    Kart *kart;
     kart = world->getKart(position[0]);
     
     static char output[MAX_MESSAGE_LENGTH];
@@ -119,9 +118,11 @@ GrandPrixEnd::GrandPrixEnd()
 
     for(unsigned int i=0; i < NUM_KARTS; ++i)
     {
+        char sTime[20];
+        TimeToString(race_time[i], sTime);
         kart = world->getKart(position[i]);
-        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
-                i + 1, kart->getName().c_str(), scores[i]);
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
+                i + 1, kart->getName().c_str(), scores[i], sTime );
 
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);
