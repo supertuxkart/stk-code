@@ -75,7 +75,6 @@ private:
     ulClock     m_fps_timer;
     int         m_fps_counter;
     char        m_fps_string[10];
-    double      m_time_left ;
     const char* m_pos_string [11];
     Material*   m_steering_wheel_icon;
     Material*   m_speed_back_icon;
@@ -100,6 +99,7 @@ private:
     void drawMap               ();
     void drawTimer             ();
     void drawFPS               ();
+    void drawMusicDescription  ();
     void cleanupMessages       ();
 
     /* Text drawing */

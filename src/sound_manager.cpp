@@ -18,11 +18,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <assert.h>
+#include <fstream>
 
 #include "sound_manager.hpp"
 #include "user_config.hpp"
+#include "string_utils.hpp"
+#include "gui/font.hpp"
 
-#define USE_PLIB_SOUND !((HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS)))
+#define USE_PLIB_SOUND !(HAVE_OPENAL && HAVE_OGGVORBIS)
 #if USE_PLIB_SOUND
 #  include "sound_plib.hpp"
 #else    //We use OpenAL
@@ -35,9 +38,6 @@
 
 #  if HAVE_OGGVORBIS
 #    include "music_ogg.hpp"
-#  endif
-#  if HAVE_MIKMOD
-#    include "music_mikmod.hpp"
 #  endif
 #  include "sfx_openal.hpp"
 #endif // USE_PLIB_SOUND
@@ -101,7 +101,7 @@ SoundManager::SoundManager()
         sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;
         sfx = new SFXImpl("wavs/radio/radarping.wav"); m_sfxs[SOUND_MISSILE_LOCK] = sfx;
     }
-}
+}  // SoundManager
 
 //-----------------------------------------------------------------------------
 SoundManager::~SoundManager()
@@ -129,7 +129,7 @@ SoundManager::~SoundManager()
 #endif
 
     }
-}
+}   // ~SoundManager
 
 //-----------------------------------------------------------------------------
 void SoundManager::playSfx(unsigned int id)
@@ -145,24 +145,25 @@ void SoundManager::playSfx(unsigned int id)
         SFX* sfx= it->second;
         sfx->play();
     }
-}
+}   // playSfx
 
 //-----------------------------------------------------------------------------
 void SoundManager::playMusic(const char* filename)
 {
-    if(user_config->doMusic() && m_initialized)
-    {
-        if (m_current_music != NULL)
-        {
-            delete m_current_music;
-            m_current_music = NULL;
-        }
+    m_description.clear();
+    if(!user_config->doMusic() || !m_initialized) return;
 
-        if (filename == NULL || strlen(filename) == 0)
-        {
-            // nothing to play
-            return;
-        }
+    if (m_current_music != NULL)
+    {
+        delete m_current_music;
+        m_current_music = NULL;
+    }
+
+    if (filename == NULL || strlen(filename) == 0)
+    {
+        // nothing to play
+        return;
+    }
 
 #if USE_PLIB_SOUND
 	if (!strcasecmp(".mod", filename+strlen(filename)-4))
@@ -172,29 +173,33 @@ void SoundManager::playMusic(const char* filename)
 	if (!strcasecmp(".ogg", filename+strlen(filename)-4))
         m_current_music= new MusicOggStream();
 #endif
-#if HAVE_MIKMOD
-	if (!strcasecmp(".mod", filename+strlen(filename)-4))
-        m_current_music= new MusicMikMod();
-
-#endif
-        if(m_current_music == NULL)	// no support for file
-        {
-            fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename);
-            return;
-        }
-
-        if((m_current_music->load(filename)) == false)
-        {
-            delete m_current_music;
-	    m_current_music=0;
-            fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
-        }
-        else
-        {
-            m_current_music->playMusic();
-        }
+    if(m_current_music == NULL)	// no support for file
+    {
+        fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename);
+        return;
     }
-}
+
+    if((m_current_music->load(filename)) == false)
+    {
+        delete m_current_music;
+	    m_current_music=0;
+        fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
+        return;
+    }
+
+    // Read up to two lines from the corresponding .readme file: first one 
+    // the title, second the composer. This is then displayed by the race gui
+    std::string name_readme = StringUtils::without_extension(filename)+".readme";    
+    std::ifstream f(name_readme.c_str());
+    if(f)
+    { 
+        std::string s;
+        std::getline(f,s); if(!f.eof()) m_description.push_back(s);
+        std::getline(f,s); if(!f.eof()) m_description.push_back(s);
+        f.close();
+    }
+    m_current_music->playMusic();
+}   // playMusic
 
 //-----------------------------------------------------------------------------
 void SoundManager::stopMusic()
@@ -203,7 +208,8 @@ void SoundManager::stopMusic()
     {
         m_current_music->stopMusic();
     }
-}
+    m_description.clear();
+}   // stopMusic
 
 //-----------------------------------------------------------------------------
 void SoundManager::pauseMusic()
@@ -213,7 +219,7 @@ void SoundManager::pauseMusic()
         m_current_music->pauseMusic();
     }
 
-}
+}   // pauseMusic
 
 //-----------------------------------------------------------------------------
 void SoundManager::resumeMusic()
@@ -222,7 +228,7 @@ void SoundManager::resumeMusic()
     {
         m_current_music->resumeMusic();
     }
-}
+}   // resumeMusic
 
 //-----------------------------------------------------------------------------
 void SoundManager::update()
@@ -231,5 +237,5 @@ void SoundManager::update()
     {
         m_current_music->update();
     }
-}
+}   // update
 

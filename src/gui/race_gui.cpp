@@ -28,6 +28,7 @@
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
+#include "sound_manager.hpp"
 
 #undef USE_WIDGET_MANAGER
 #ifdef USE_WIDGET_MANAGER
@@ -80,7 +81,7 @@ enum WidgetTokens
 };
 #endif
 
-RaceGUI::RaceGUI(): m_time_left(0.0)
+RaceGUI::RaceGUI()
 {
     // FIXME: translation problem
     m_pos_string[0] = "?!?";
@@ -263,9 +264,8 @@ void RaceGUI::drawTimer ()
     char str[256];
 
     assert(world != NULL);
-    m_time_left = world->getTime();
 
-    TimeToString(m_time_left, str);
+    TimeToString(world->getTime(), str);
 #ifdef USE_WIDGET_MANAGER
     widget_manager->showWgtText( WTOK_CLOCK );
     widget_manager->setWgtText( WTOK_CLOCK, str );
@@ -866,6 +866,23 @@ void RaceGUI::addMessage(const char *msg, Kart *kart, float time,
 }   // addMessage
 
 //-----------------------------------------------------------------------------
+// Displays the description given for the music currently being played -
+// usually the title and composer.
+void RaceGUI::drawMusicDescription()
+{
+    const std::vector<std::string>& description = sound_manager->getDescription();
+    int y=0;
+    for(int i=(int)description.size()-1; i>=0; i--)
+    {
+        font_race->Print( description[i].c_str(), 25, 
+                          Font::CENTER_OF_SCREEN, y,
+                          255, 255, 255);
+        y+=20;
+    }  // for i<m_description.size()
+
+}   // drawMusicDescription
+
+//-----------------------------------------------------------------------------
 void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 {
     assert(world != NULL);
@@ -992,10 +1009,11 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
             drawAllMessages     (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
         }   // for pla
-        drawTimer ();
-        drawMap   ();
+        drawTimer           ();
+        if(world->getTime()<TIME_MUSIC_DESCRIPTION) drawMusicDescription();
+        drawMap             ();
         if ( user_config->m_display_fps ) drawFPS ();
-        drawPlayerIcons() ;
+        drawPlayerIcons     ();
     }   // if RACE_PHASE
 
     glPopAttrib  () ;
