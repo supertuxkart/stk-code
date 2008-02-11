@@ -435,6 +435,12 @@ void World::checkRaceStatus()
         m_phase = RACE_PHASE;
         m_clock = 0.0f;
         sound_manager->playSfx(SOUND_START);
+        // Reset the brakes now that the prestart phase is over
+        // (braking prevents the karts from sliding downhill)
+        for(unsigned int i=0; i<m_kart.size(); i++) 
+        {
+            m_kart[i]->resetBrakes();
+        }
 #ifdef HAVE_GHOST_REPLAY
         // push positions at time 0.0 to replay-data
         m_replay_recorder.pushFrame();

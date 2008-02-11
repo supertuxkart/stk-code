@@ -357,6 +357,9 @@ void Kart::reset()
     m_controls.jump    = false;
     m_controls.fire    = false;
 
+    // Set the brakes so that karts don't slide downhill
+    for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
+
     world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
 
     //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
@@ -511,8 +514,9 @@ float Kart::getActualWheelForce()
 }   // getActualWheelForce
 
 //-----------------------------------------------------------------------------
-
-bool Kart::isOnGround()
+/** The kart is on ground if all 4 wheels touch the ground
+*/
+bool Kart::isOnGround() const
 {
     return m_vehicle->getWheelInfo(0).m_raycastInfo.m_isInContact &&
            m_vehicle->getWheelInfo(1).m_raycastInfo.m_isInContact &&
@@ -797,6 +801,16 @@ float Kart::handleWheelie(float dt)
           * m_wheelie_angle/getWheelieMaxPitch();
 }   // handleWheelie
 
+// -----------------------------------------------------------------------------
+/** This function is called when the race starts. Up to then all brakes are
+    braking (to avoid the kart from rolling downhill), but they need to be set
+    to zero (otherwise the brakes will be braking whenever no engine force
+    is set, i.e. the kart is not accelerating).
+    */
+void Kart::resetBrakes()
+{
+    for(int i=0; i<4; i++) m_vehicle->setBrake(0.0f, i);
+}   // resetBrakes
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
 {

@@ -229,8 +229,9 @@ public:
     float          getSpeed         () const {return m_speed;                 }
     float          handleWheelie    (float dt);
     float          getActualWheelForce();
-    bool           isOnGround       ();
+    bool           isOnGround       () const;
     bool           isRescue         () const {return m_rescue;}
+    void           resetBrakes      ();
     void           adjustSpeedWeight(float f);
     void           forceRescue      ();
     void           handleExplosion  (const sgVec3& pos, bool direct_hit);
