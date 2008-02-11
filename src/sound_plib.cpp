@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //The next #if *needs* double parenthesis
-#if !((HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS)))
+#if !(HAVE_OPENAL && HAVE_OGGVORBIS)
 
 #include <string>
 
@@ -90,5 +90,5 @@ bool MusicPlib::resumeMusic()
     return true;
 }
 
-#endif //!(HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS))
+#endif //!(HAVE_OPENAL && HAVE_OGGVORBIS)
 

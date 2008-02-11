@@ -227,6 +227,9 @@ case "${host}" in
            # ov_read for ogg music needs endianness flag. This macro defines
            # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
 	   AC_C_BIGENDIAN
+       else
+           SUMMARY="$SUMMARY\nNo Ogg Vorbis support - the game will play with sound effects, but without music."
+           SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
        fi
    else
        SUMMARY="$SUMMARY\nInstall OpenAL and freealut for better sound!"

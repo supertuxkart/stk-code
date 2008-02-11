@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if (HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS))
+#if (HAVE_OPENAL && HAVE_OGGVORBIS)
 
 #include <assert.h>
 #include <stdio.h>
@@ -116,5 +116,5 @@ bool SFXImpl::load(const char* filename)
     return true;
 }
 
-#endif //if (HAVE_OPENAL && (HAVE_MIKMOD || HAVE_OGGVORBIS))
+#endif //if (HAVE_OPENAL && HAVE_OGGVORBIS)
 
