@@ -81,12 +81,13 @@ void GameManager::run()
 		
 		if (!music_on && !race_manager->raceIsActive())
 		{
-                    sound_manager->playMusic(stk_config->m_title_music);
+        	sound_manager->playMusic(stk_config->m_title_music);
 		    music_on = true;
 		}
 
         if (race_manager->raceIsActive())
         {
+            music_on = false; 
             scene->draw((m_curr_time - m_prev_time ) * 0.001f);
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
