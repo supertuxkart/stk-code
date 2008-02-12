@@ -54,6 +54,7 @@ public:
 
     void setScreenPosition ( int numPlayers, int pos ) ;
 
+    void reset();
     void update (float dt) ;
     void apply  () ;
 

@@ -38,6 +38,7 @@ public:
 
     Scene  ();
     ~Scene ();
+    void reset();
 
     void add(ssgEntity *kid);
     void remove(ssgEntity *kid);

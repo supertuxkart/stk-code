@@ -85,6 +85,14 @@ void Scene::remove(ssgEntity *kid)
 }
 
 //-----------------------------------------------------------------------------
+void Scene::reset()
+{
+    for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
+    {
+        (*i)->reset();
+    }
+}   // reset
+//-----------------------------------------------------------------------------
 void Scene::draw(float dt)
 {
     glEnable ( GL_DEPTH_TEST ) ;

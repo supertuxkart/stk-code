@@ -111,6 +111,15 @@ void Camera::setReverseHeading(bool b)
 }   // setReverseHeading
 
 //-----------------------------------------------------------------------------
+/** Reset is called when a new race starts. Make sure that the camera
+    is aligned neutral, and not like in the previous race
+*/
+void Camera::reset()
+{
+    m_LastPitch = 0.0f;
+}   // reset
+
+//-----------------------------------------------------------------------------
 void Camera::update (float dt)
 {
     // Update the camera

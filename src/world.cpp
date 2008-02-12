@@ -611,6 +611,8 @@ void World::restartRace()
     race_manager->reset();
     callback_manager->reset();
 
+    // Resets the cameras in case that they are pointing too steep up or down
+    scene->reset();
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.destroy();
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
@@ -621,7 +623,7 @@ void World::restartRace()
         m_p_replay_player->showReplayAt( 0.0 );
     }
 #endif
-}
+}   // restartRace
 
 //-----------------------------------------------------------------------------
 Kart* World::loadRobot(const KartProperties *kart_properties, int position,

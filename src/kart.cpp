@@ -390,12 +390,14 @@ void Kart::reset()
     m_body->setCenterOfMassTransform(m_transform);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+    m_motion_state->setWorldTransform(m_transform);
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
     }
 
     placeModel();
+    TerrainInfo::update(m_transform.getOrigin());
 }   // reset
 
 //-----------------------------------------------------------------------------
