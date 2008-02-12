@@ -787,10 +787,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\music_mikmod.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\music_ogg.cpp"
 				>
 			</File>
@@ -1190,10 +1186,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\music.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\music_mikmod.hpp"
 				>
 			</File>
 			<File
