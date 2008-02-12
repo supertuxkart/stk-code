@@ -150,13 +150,19 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
 
-    m_wheel_rotation = 0;
+    // Setting rescue to false is important! If rescue is set when reset() is
+    // called, it is assumed that this was triggered by a restart, and that
+    // the vehicle must be added back to the physics world. Since reset() is
+    // also called at the very start, it must be guaranteed that rescue is
+    // not set.
+    m_rescue                  = false;
+    m_wheel_rotation          = 0;
 
-    m_wheel_front_l  = NULL;
-    m_wheel_front_r  = NULL;
-    m_wheel_rear_l   = NULL;
-    m_wheel_rear_r   = NULL;
-    m_lap_start_time = -1.0f;
+    m_wheel_front_l           = NULL;
+    m_wheel_front_r           = NULL;
+    m_wheel_rear_l            = NULL;
+    m_wheel_rear_r            = NULL;
+    m_lap_start_time          = -1.0f;
     loadData();
 }   // Kart
 
@@ -345,7 +351,6 @@ void Kart::reset()
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
-    m_rescue               = false;
     m_num_herrings_gobbled = 0;
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
@@ -395,6 +400,14 @@ void Kart::reset()
     {
         m_vehicle->updateWheelTransform(j, true);
     }
+
+    // if the kart was being rescued when a restart is called,
+    // add the vehicle back into the physical world!
+    if(m_rescue)
+    {
+        world->getPhysics()->addKart(this, m_vehicle);
+    }
+    m_rescue               = false;
 
     placeModel();
     TerrainInfo::update(m_transform.getOrigin());
