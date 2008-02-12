@@ -3,7 +3,7 @@
 (tuxkart-track
  (name        "Tux Tollway")
  (description "Created by Oliver & Steve Baker")
- (music       "oggs/tk2.ogg")
+ (music       "oggs/g4m-fan-track.ogg")
  (screenshot  "sshot-tuxtrack.rgb")
  (topview     "topview-tuxtrack.rgb")
  (start-heading -25.0 -25.0 -25.0 -25.0 -25.0 -25.0 -25.0 -25.0 -25.0  -25.0 )
