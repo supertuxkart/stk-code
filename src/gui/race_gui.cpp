@@ -874,7 +874,10 @@ void RaceGUI::drawMusicDescription()
     int y=0;
     for(int i=(int)description.size()-1; i>=0; i--)
     {
-        font_race->Print( description[i].c_str(), 25, 
+        std::string s=description[i];
+        if(i==0) s="\""+s+"\"";
+        if(i==1) s="by "+s;
+        font_race->Print( s.c_str(), 25, 
                           Font::CENTER_OF_SCREEN, y,
                           255, 255, 255);
         y+=20;
