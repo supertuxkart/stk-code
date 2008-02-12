@@ -411,6 +411,7 @@ AC_CONFIG_FILES([         \
  fonts/Makefile           \
  images/Makefile          \
  models/Makefile          \
+ oggs/Makefile		  \
  src/Makefile             \
  wavs/Makefile            \
  wavs/radio/Makefile      \
