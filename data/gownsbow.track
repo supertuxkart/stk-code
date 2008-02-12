@@ -4,7 +4,7 @@
  (name        "Gowns Bow")
  (description "Created by Oliver & Steve Baker")
  (gravity     78.0)
- (music       "oggs/tk5a.ogg")
+ (music       "oggs/another_caribbean_beat.ogg")
  (screenshot  "sshot-gownsbow.rgb")
  (topview     "topview-gownsbow.rgb")
 )
