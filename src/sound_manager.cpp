@@ -148,7 +148,7 @@ void SoundManager::playSfx(unsigned int id)
 }   // playSfx
 
 //-----------------------------------------------------------------------------
-void SoundManager::playMusic(const char* filename)
+void SoundManager::playMusic(const std::string& filename)
 {
     m_description.clear();
     if(!user_config->doMusic() || !m_initialized) return;
@@ -159,31 +159,32 @@ void SoundManager::playMusic(const char* filename)
         m_current_music = NULL;
     }
 
-    if (filename == NULL || strlen(filename) == 0)
+    if (filename == "" || strlen(filename.c_str()) == 0)
     {
         // nothing to play
         return;
     }
 
 #if USE_PLIB_SOUND
-	if (!strcasecmp(".mod", filename+strlen(filename)-4))
+    if (!strcasecmp(".mod", filename.c_str()+filename.size()-4))
         m_current_music= new MusicPlib();
 #endif
 #if HAVE_OGGVORBIS
-	if (!strcasecmp(".ogg", filename+strlen(filename)-4))
+    if (!strcasecmp(".ogg", filename.c_str()+filename.size()-4))
         m_current_music= new MusicOggStream();
 #endif
     if(m_current_music == NULL)	// no support for file
     {
-        fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename);
+      fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename.c_str());
         return;
     }
 
     if((m_current_music->load(filename)) == false)
     {
         delete m_current_music;
-	    m_current_music=0;
-        fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", filename);
+        m_current_music=0;
+	fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
+                filename.c_str());
         return;
     }
 

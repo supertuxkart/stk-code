@@ -43,7 +43,7 @@ public:
 
     virtual void update();
 
-    virtual bool load(const char* filename);
+    virtual bool load(const std::string& filename);
 
     virtual bool playMusic();
     virtual bool stopMusic();

@@ -45,7 +45,7 @@ public:
 
     void playSfx(unsigned int id);
 
-    void playMusic(const char* filename);
+    void playMusic(const std::string& filename);
     void stopMusic();
     void pauseMusic();
     void resumeMusic();

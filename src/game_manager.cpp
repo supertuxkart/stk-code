@@ -62,6 +62,8 @@ void GameManager::run()
 {
     const GLuint TITLE_SCREEN_TEXTURE = 
         material_manager->getMaterial("st_title_screen.rgb")->getIndex();
+       
+    bool music_on = false;
     while(!m_abort)
     {
         sdl_input();
@@ -76,6 +78,12 @@ void GameManager::run()
         }
 
         m_curr_time = SDL_GetTicks();
+		
+		if (!music_on && !race_manager->raceIsActive())
+		{
+                    sound_manager->playMusic(stk_config->m_title_music);
+		    music_on = true;
+		}
 
         if (race_manager->raceIsActive())
         {

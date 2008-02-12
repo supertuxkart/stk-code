@@ -20,10 +20,12 @@
 #ifndef HEADER_MUSIC_H
 #define HEADER_MUSIC_H
 
+#include <string>
+
 class Music
 {
 public:
-    virtual bool load(const char* filename)= 0;
+  virtual bool load(const std::string& filename)= 0;
 
     virtual bool playMusic()= 0;
     virtual bool stopMusic()= 0;

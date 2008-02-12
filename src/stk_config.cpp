@@ -116,6 +116,7 @@ void STKConfig::load(const std::string filename)
 
 }   // load
 
+// -----------------------------------------------------------------------------
 /** Init all values with invalid defaults, which are tested later. This
  * guarantees that all parameters will indeed be initialised, and helps
  * finding typos.
@@ -144,6 +145,7 @@ void STKConfig::init_defaults()
     m_max_karts            = -100;
     m_grid_order           = -100;
     m_air_res_reduce[0]    = 1.0f;
+    m_title_music          = "";
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -171,6 +173,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts           );
     lisp->get("grid-order",                   m_grid_order          );
+    lisp->get("title-music",                  m_title_music         );
 
     // Get the default KartProperties
     // ------------------------------

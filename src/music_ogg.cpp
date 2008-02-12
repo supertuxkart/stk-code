@@ -50,7 +50,7 @@ MusicOggStream::~MusicOggStream()
 }
 
 //-----------------------------------------------------------------------------
-bool MusicOggStream::load(const char* filename)
+bool MusicOggStream::load(const std::string& filename)
 {
     if(!release())
     {

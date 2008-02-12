@@ -156,7 +156,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     menu_manager->switchToRace();
 
     const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();
-    if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME.c_str());
+    if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME);
 
     if(user_config->m_profile)
     {
