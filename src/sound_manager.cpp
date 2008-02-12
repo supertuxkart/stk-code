@@ -151,6 +151,7 @@ void SoundManager::playSfx(unsigned int id)
 void SoundManager::playMusic(const std::string& filename)
 {
     m_description.clear();
+    m_current_music_file = filename;
     if(!user_config->doMusic() || !m_initialized) return;
 
     if (m_current_music != NULL)
@@ -235,8 +236,8 @@ void SoundManager::resumeMusic()
 void SoundManager::update()
 {
     if (m_current_music != NULL)
-    {
-        m_current_music->update();
+    {	
+    	m_current_music->update();
     }
 }   // update
 

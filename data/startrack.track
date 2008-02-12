@@ -4,7 +4,7 @@
  (name "Star Track")
  (sky-color    0.0 0.0 0.0 0.0)
  (description "Created by Ingo Ruhnke")
- (music "oggs/Ethereal\ Spectrum\ \(ver\ loop\).ogg")
+ (music "oggs/Ethereal_Spectrum_\(ver_loop\).ogg")
  (screenshot "sshot-startrack.rgb")
  (topview "topview-startrack.rgb")
 )

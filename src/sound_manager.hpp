@@ -50,6 +50,7 @@ public:
     void pauseMusic();
     void resumeMusic();
     const std::vector<std::string>& getDescription() {return m_description;}
+    std::string getCurrentMusicFile() {return m_current_music_file;}
 
 private:
 
@@ -58,6 +59,7 @@ private:
     SFXsType m_sfxs;
     Music* m_current_music;
     std::vector<std::string> m_description;
+    std::string m_current_music_file;
        
     bool m_initialized; //If the sound could not be initialized, for example,
                         //if the player doesn't has a sound card, we want
