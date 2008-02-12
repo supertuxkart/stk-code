@@ -3,7 +3,7 @@
 (tuxkart-track
  (name        "On the Beach")
  (description "Created by Ingo Ruhnke")
- (music       "oggs/Boom_boom_boom.ogg")
+ (music       "oggs/CaribicMusic.ogg")
  (screenshot  "sshot-beach.rgb")
  (topview     "topview-beach.rgb")
 )
