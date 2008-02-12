@@ -22,6 +22,7 @@
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "sound_manager.hpp"
 
 enum WidgetTokens
 {
@@ -96,11 +97,13 @@ void ConfigSound::select()
         {
             user_config->setMusic(UserConfig::UC_DISABLE);
             widget_manager->setWgtText(WTOK_MUSIC, _("Turn on music"));
+            sound_manager->stopMusic();
         }
         else
         {
             user_config->setMusic(UserConfig::UC_ENABLE);
             widget_manager->setWgtText(WTOK_MUSIC, _("Turn off music"));
+	    sound_manager->playMusic(stk_config->m_title_music);
         }
         break;
     case WTOK_SFX:
