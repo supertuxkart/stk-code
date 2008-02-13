@@ -74,7 +74,7 @@ public:
                 World(const RaceSetup& raceSetup);
     virtual    ~World();
     void        update(float delta);
-    bool        isStartPhase() const  {return m_phase<=GO_PHASE;}
+    bool        isStartPhase() const  {return m_phase<GO_PHASE;}
     void        restartRace();
     void        disableRace(); // Put race into limbo phase
 
