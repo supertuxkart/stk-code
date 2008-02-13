@@ -755,12 +755,10 @@ void DefaultRobot::reset()
 
     m_crash_time = 0.0f;
 
-#if 0
     m_time_since_stuck     = 0.0f;
-#endif
 
     AutoKart::reset();
-}
+}   // reset
 
 //-----------------------------------------------------------------------------
 inline float DefaultRobot::normalize_angle( float angle )
