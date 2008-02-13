@@ -161,6 +161,11 @@ refs 4
 8 1.0 0.509764909744
 kids 0
 OBJECT poly
+name "wrapper"
+data 14
+@autotex y=0.1
+kids 1
+OBJECT poly
 name "Plane_1"
 data 8
 Mesh.031
@@ -14043,6 +14048,11 @@ refs 4
 300 1.0 0.0
 258 1.0 0.5
 kids 0
+OBJECT poly
+name "wrapper"
+data 14
+@autotex y=0.1
+kids 1
 OBJECT poly
 name "Mesh.001-sub8"
 data 8
