@@ -224,7 +224,12 @@ World::~World()
 void World::resetAllKarts()
 {
     bool all_finished=false;
-    for(int i=0; i<10; i++) m_physics->update(1.f/60.f);
+    // kart->isInRest() is not fully correct, since it only takes the
+    // velocity in count, which might be close to zero when the kart
+    // is just hitting the floor, before being pushed up again by
+    // the suspension. So we just do a longer initial simulation,
+    // which should be long enough for all karts to be firmly on ground.
+    for(int i=0; i<100; i++) m_physics->update(1.f/60.f);
     while(!all_finished)
     {
         m_physics->update(1.f/60.f);

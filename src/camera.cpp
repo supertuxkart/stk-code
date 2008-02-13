@@ -132,15 +132,20 @@ void Camera::update (float dt)
     // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
     kartcoord.hpr[1]=RAD_TO_DEGREE( kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
     kartcoord.hpr[2] = 0;
-    // If the terrain pitch is 'significantly' different from the camera angle,
-    // start adjusting the camera. This helps with steep declines, where
-    // otherwise the track is not visible anymore.
-    if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
-        kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
-    }
-    else
+    // Only adjust the pitch if it's not the first frame (which is indicated by having
+    // dt=0). Otherwise the camera will change pitch during ready-set-go.
+    if(dt>0)
     {
-        kartcoord.hpr[1]=m_LastPitch;
+        // If the terrain pitch is 'significantly' different from the camera angle,
+        // start adjusting the camera. This helps with steep declines, where
+        // otherwise the track is not visible anymore.
+        if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
+            kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
+        }
+        else
+        {
+            kartcoord.hpr[1]=m_LastPitch;
+        }
     }
     m_LastPitch = kartcoord.hpr[1];
 
