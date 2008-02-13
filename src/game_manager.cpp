@@ -81,7 +81,9 @@ void GameManager::run()
         {
             music_on = false; 
             float dt = (m_curr_time - m_prev_time ) * 0.001f;
-            scene->draw(dt);
+            // In the first call dt might be large (includes loading time),
+            // which can cause the camera to significantly tilt
+            scene->draw(world->getPhase()==World::SETUP_PHASE ? 0.0f : dt);
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
                 world->update(dt);

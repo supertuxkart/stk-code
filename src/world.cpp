@@ -91,9 +91,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    printf("begin loading track\n");
     loadTrack() ;
-    printf("endloading track\n");
 
     int pos = 0;
     int playerIndex = 0;
