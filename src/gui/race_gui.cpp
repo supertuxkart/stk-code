@@ -908,23 +908,25 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     glEnable       ( GL_BLEND        );
 
     glOrtho        ( 0, user_config->m_width, 0, user_config->m_height, 0, 100 ) ;
-    switch (world->m_ready_set_go)
+    switch (world->getPhase())
     {
-    case 2: font_race->PrintShadow(_("Ready!"), 90, 
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   230, 170, 160);
-        break;
-    case 1: font_race->PrintShadow(_("Set!"), 90, 
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   230, 230, 160);
-        break;
-    case 0: font_race->PrintShadow(_("Go!"), 90, 
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   100, 210, 100);
-        break;
+    case World::READY_PHASE: font_race->PrintShadow(_("Ready!"), 90, 
+                                                    Font::CENTER_OF_SCREEN,
+                                                    Font::CENTER_OF_SCREEN,
+                                                    230, 170, 160);
+         break;
+    case World::SET_PHASE:   font_race->PrintShadow(_("Set!"), 90, 
+                                                    Font::CENTER_OF_SCREEN,
+                                                    Font::CENTER_OF_SCREEN,
+                                                    230, 230, 160);
+         break;
+    case World::GO_PHASE:    font_race->PrintShadow(_("Go!"), 90, 
+                                                    Font::CENTER_OF_SCREEN,
+                                                    Font::CENTER_OF_SCREEN,
+                                                    100, 210, 100);
+         break;
+    default: 
+         break;
     }   // switch
 
     for(int i = 0; i < 10; ++i)
@@ -933,7 +935,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
             font_race->Print(world->m_debug_text[i].c_str(),
                              20, 20, 200 -i*20, 100, 210, 100);
     }
-    if(world->getPhase()==World::START_PHASE)
+    if(world->isStartPhase())
     {
         for(int i=0; i<raceSetup.getNumPlayers(); i++)
         {

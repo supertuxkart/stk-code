@@ -46,9 +46,15 @@ public:
     RaceSetup m_race_setup;
 
     enum Phase {
-        // The traffic light is shown and all players stay in position
-        START_PHASE,
-        // The traffic light turned green and all driver, drive around the track
+        // Game setup, e.g. track loading
+        SETUP_PHASE,
+        // 'Ready' is displayed
+        READY_PHASE,
+        // 'Set' is displayed
+        SET_PHASE,
+        // 'Go' is displayed, but this is already race phase
+        GO_PHASE,
+        // the actual race has started, no ready/set/go is displayed anymore
         RACE_PHASE,
         // All players have finished, now wait a certain amount of time for AI
         // karts to finish. If they do not finish in that time, finish the race
@@ -60,8 +66,6 @@ public:
         LIMBO_PHASE,
     };
 
-    int m_ready_set_go;
-
     Track* m_track;
     
         /** debug text that will be overlaid to the screen */
@@ -70,6 +74,7 @@ public:
                 World(const RaceSetup& raceSetup);
     virtual    ~World();
     void        update(float delta);
+    bool        isStartPhase() const  {return m_phase<=GO_PHASE;}
     void        restartRace();
     void        disableRace(); // Put race into limbo phase
 
@@ -100,6 +105,7 @@ public:
 
     void  pause();
     void  unpause();
+
 private:
     Karts       m_kart;
     float       m_finish_delay_start_time;
@@ -112,7 +118,7 @@ private:
 
     void updateRacePosition( int k );
     void loadTrack();
-    void checkRaceStatus();
+    void updateRaceStatus(float dt);
     void resetAllKarts();
     Kart* loadRobot(const KartProperties *kart_properties, int position,
                  sgCoord init_pos);

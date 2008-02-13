@@ -121,7 +121,7 @@ void PlayerKart::update(float dt)
 
     m_controls.accel = m_accel_val / 32768.0f;
 
-    if(world->getPhase()==World::START_PHASE)
+    if(world->isStartPhase())
     {
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||
            m_controls.fire|m_controls.wheelie|m_controls.jump)

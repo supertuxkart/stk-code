@@ -46,7 +46,6 @@ GameManager* game_manager = 0;
 GameManager::GameManager() :
 m_abort(false),
 m_frame_count(0),
-m_started(false),
 m_curr_time(m_prev_time),
 m_prev_time(SDL_GetTicks())
 {
@@ -64,19 +63,12 @@ void GameManager::run()
         material_manager->getMaterial("st_title_screen.rgb")->getIndex();
        
     bool music_on = false;
+    m_curr_time = SDL_GetTicks();
     while(!m_abort)
     {
         sdl_input();
 
-        // Now the screen may have changed and
-        // needs to be updated.
-        if(m_started) m_prev_time = m_curr_time;
-        else if( race_manager->raceIsActive() )
-        {
-            m_prev_time = SDL_GetTicks();
-            m_started = true;
-        }
-
+        m_prev_time = m_curr_time;
         m_curr_time = SDL_GetTicks();
 		
 		if (!music_on && !race_manager->raceIsActive())
@@ -88,10 +80,11 @@ void GameManager::run()
         if (race_manager->raceIsActive())
         {
             music_on = false; 
-            scene->draw((m_curr_time - m_prev_time ) * 0.001f);
+            float dt = (m_curr_time - m_prev_time ) * 0.001f;
+            scene->draw(dt);
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
-                world->update((m_curr_time - m_prev_time ) * 0.001f);
+                world->update(dt);
 
                 if(user_config->m_profile)
                 {

@@ -62,7 +62,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 {
     delete world;
     world          = this;
-    m_phase        = START_PHASE;
+    m_phase        = SETUP_PHASE;
 
     m_track        = NULL;
 
@@ -91,7 +91,9 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
+    printf("begin loading track\n");
     loadTrack() ;
+    printf("endloading track\n");
 
     int pos = 0;
     int playerIndex = 0;
@@ -158,16 +160,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();
     if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME);
 
-    if(user_config->m_profile)
-    {
-        m_ready_set_go = -1;
-        m_phase        = RACE_PHASE;
-    }
-    else
-    {
-        m_phase        = START_PHASE;  // profile starts without countdown
-        m_ready_set_go = 3;
-    }
+    m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
 
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
@@ -254,13 +247,7 @@ void World::resetAllKarts()
 void World::update(float dt)
 {
     if(user_config->m_replay_history) dt=history->GetNextDelta();
-
-    checkRaceStatus();
-    // this line was before checkRaceStatus. but m_clock is set to 0.0 in
-    // checkRaceStatus on start, so m_clock would not be synchronized and the
-    // first delta would not be added .. that would cause a gap in 
-    // replay-recording
-    m_clock += dt;
+    updateRaceStatus(dt);
 
     if( getPhase() == FINISH_PHASE )
     {
@@ -326,7 +313,7 @@ void World::update(float dt)
 #ifdef HAVE_GHOST_REPLAY
     // we start recording after START_PHASE, since during start-phase m_clock is incremented
     // normally, but after switching to RACE_PHASE m_clock is set back to 0.0
-    if( m_phase != START_PHASE ) 
+    if( m_phase == GO_PHASE ) 
     {
         m_replay_recorder.pushFrame();
         if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
@@ -423,39 +410,42 @@ bool World::loadReplayHumanReadable( std::string const &filename )
 
 //-----------------------------------------------------------------------------
 
-void World::checkRaceStatus()
+void World::updateRaceStatus(float dt)
 {
-    if (m_clock > 1.0 && m_ready_set_go == 0)
-    {
-        m_ready_set_go = -1;
-    }
-    else if (m_clock > 2.0 && m_ready_set_go == 1)
-    {
-        m_ready_set_go = 0;
-        m_phase = RACE_PHASE;
-        m_clock = 0.0f;
-        sound_manager->playSfx(SOUND_START);
-        // Reset the brakes now that the prestart phase is over
-        // (braking prevents the karts from sliding downhill)
-        for(unsigned int i=0; i<m_kart.size(); i++) 
-        {
-            m_kart[i]->resetBrakes();
-        }
+    switch (m_phase) {
+        case SETUP_PHASE:   m_clock=0.0f;  m_phase=READY_PHASE;
+                            dt = 0.0f;  // solves the problem of adding track loading time
+                            break;                // loading time, don't play sound yet
+        case READY_PHASE:   if(m_clock==0.0)      // play sound at beginning of next frame
+                                sound_manager->playSfx(SOUND_PRESTART);
+                            if(m_clock>1.0)
+                            {
+                                m_phase=SET_PHASE;   
+                                sound_manager->playSfx(SOUND_PRESTART);
+                            }
+                            break;
+        case SET_PHASE  :   if(m_clock>2.0) 
+                            {
+                                m_phase=GO_PHASE;
+                                m_clock=0.0f;
+                                sound_manager->playSfx(SOUND_START);
+                                // Reset the brakes now that the prestart 
+                                // phase is over (braking prevents the karts 
+                                // from sliding downhill)
+                                for(unsigned int i=0; i<m_kart.size(); i++) 
+                                {
+                                    m_kart[i]->resetBrakes();
+                                }
 #ifdef HAVE_GHOST_REPLAY
-        // push positions at time 0.0 to replay-data
-        m_replay_recorder.pushFrame();
+                                // push positions at time 0.0 to replay-data
+                                m_replay_recorder.pushFrame();
 #endif
-    }
-    else if (m_clock > 1.0 && m_ready_set_go == 2)
-    {
-        sound_manager->playSfx(SOUND_PRESTART);
-        m_ready_set_go = 1;
-    }
-    else if (m_clock > 0.0 && m_ready_set_go == 3)
-    {
-        sound_manager->playSfx(SOUND_PRESTART);
-        m_ready_set_go = 2;
-    }
+                            }
+                            break;
+        case GO_PHASE  :    if(m_clock>1.0) m_phase=RACE_PHASE;    break;
+        default        :    break;
+    }   // switch
+    m_clock += dt;
 
     /*if all players have finished, or if only one kart is not finished when
       not in time trial mode, the race is over. Players are the last in the
@@ -523,7 +513,7 @@ void World::checkRaceStatus()
             }   // if !raceIsFinished
         }   // for i
     }
-}  // checkRaceStatus
+}  // updateRaceStatus
 
 //-----------------------------------------------------------------------------
 void World::updateRacePosition ( int k )
@@ -597,9 +587,8 @@ void World::loadTrack()
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
-    m_ready_set_go = 3;
     m_clock        = 0.0f;
-    m_phase        = START_PHASE;
+    m_phase        = SETUP_PHASE;
 
     for ( Karts::iterator i = m_kart.begin(); i != m_kart.end() ; ++i )
     {

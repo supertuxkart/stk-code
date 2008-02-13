@@ -29,7 +29,6 @@ private:
     bool m_abort;
 
     int      m_frame_count;
-    bool     m_started;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
 

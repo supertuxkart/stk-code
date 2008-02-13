@@ -88,7 +88,7 @@ DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
 //line, then move forward while turning.
 void DefaultRobot::update( float delta )
 {
-    if( world->getPhase() == World::START_PHASE )
+    if( world->isStartPhase())
     {
         handle_race_start();
         AutoKart::update( delta );
@@ -481,7 +481,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
 
     // check if kart is stuck
     if(getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f &&
-       !isRescue() && world->getPhase() != World::START_PHASE               )
+       !isRescue() && !world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
