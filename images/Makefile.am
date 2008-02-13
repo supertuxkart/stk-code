@@ -14,6 +14,7 @@ brick.rgb \
 butterfly.rgb \
 bzzt.rgb \
 candy_stripe.rgb \
+coniferous_tree.rgb \
 chess.rgb \
 chrome2.rgb \
 chrome.rgb \
@@ -46,6 +47,8 @@ homingmissile.rgb \
 icecreamtruck.rgb \
 lava2.rgb \
 lava.rgb \
+lighthouse.rgb \
+lighthouse_sky.rgb \
 lscales.rgb \
 lunchbox2.rgb \
 lunchbox.rgb \
@@ -74,9 +77,11 @@ rainbow3.rgb \
 rainbow.rgb \
 redwhite.rgb \
 roadway.rgb \
+rock.rgb \
 ruler.rgb \
 sandgrass.rgb \
 sand.rgb \
+sea.rgb \
 shine.rgb \
 skirpyicon.rgb \
 smoke.rgb \
@@ -130,6 +135,7 @@ tuxkartshadow.rgb \
 tv.rgb \
 usaflag.rgb \
 water.rgb \
+water_light.rgb \
 wheel.rgb \
 window.rgb \
 wood.rgb \
