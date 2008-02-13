@@ -213,7 +213,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
            segment you are on will have a smaller absolute value
            of dist anyways.
         */
-        if( dist > -3.5 && dist < near_dist)
+        if( dist > -2.0 && dist < near_dist)
         {
             near_dist = dist;
             nearest = i;
