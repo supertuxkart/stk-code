@@ -2,7 +2,7 @@
 
 (tuxkart-track
  (name        "Shifting Sands")
- (description "Created by Oliver & Steve Baker")
+ (description "Created by Oliver & Steve Baker, modified by M. Gagnon")
  (music       "oggs/desert_dunes.ogg" "oggs/tk7.ogg")
  (screenshot  "sshot-sandtrack.rgb")
  (topview     "topview-sandtrack.rgb")
