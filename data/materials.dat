@@ -184,5 +184,6 @@
 "lighthouse_sky.rgb"        N N    N    0.0    N     N    0.5   N   N   Y   Y
 "sea.rgb"                   N N    N    0.0    N     N    0.5   N   N   Y   Y
 "rock.rgb"                  N N    N    0.0    N     N    0.5   N   N   N   N
+"coniferous_tree.rgb"       Y Y    Y    0.5    N     N    0.5   N   N   N   N
  
 # EOF #
