@@ -208,10 +208,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
            is on top, so we have to rule it out.
            
            However, for some reason there are cases where we get
-           negative values for the track segment we should be on,
-           so we just use the absolute values, since the track
-           segment you are on will have a smaller absolute value
-           of dist anyways.
+           negative values for the track segment we should be on.
         */
         if( dist > -2.0 && dist < near_dist)
         {
