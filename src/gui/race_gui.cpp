@@ -319,39 +319,6 @@ void RaceGUI::drawMap ()
 }   // drawMap
 
 //-----------------------------------------------------------------------------
-
-// This is displayed during the 'delay_finish_phase', i.e. while waiting for
-// other karts to finish the race
-void RaceGUI::drawGameOverText (const float dt)
-{
-    static float timer = 0 ;
-
-    /* Calculate a color. This will result in an animation effect. */
-    int red   = (int)(255 * sin ( (float)timer/5.1f ) / 2.0f + 0.5f);
-    int green = (int)(255 * (sin ( (float)timer/6.3f ) / 2.0f + 0.5f));
-    int blue  = (int)(255 * sin ( (float)timer/7.2f ) / 2.0f + 0.5f);
-    timer += dt;
-
-    assert(world != NULL);
-    int finishing_position = world->getPlayerKart(0)->getPosition();
-
-    if ( finishing_position > 1 )
-    {
-        char s[255];
-        sprintf(s,_("YOU FINISHED %s"),m_pos_string[finishing_position]);
-        font_race->PrintShadow(s, 64, 130, 300, red, green, blue);
-    }
-    else
-    {
-        font_race->PrintShadow(_("CONGRATULATIONS"),   64, 130, 300, 
-                               red, green, blue);
-        font_race->PrintShadow(_("YOU WON THE RACE!"), 64, 130, 210, 
-                               red, green, blue);
-    }
-}   // drawGameOverText
-
-//-----------------------------------------------------------------------------
-
 // Draw players position on the race
 void RaceGUI::drawPlayerIcons ()
 {
@@ -956,12 +923,6 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     if(raceSetup.getNumPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
-    if ( world->getPhase() == World::FINISH_PHASE )
-    {
-        // FIXME: is this still used? It should be replaced by a special
-        //        end page.
-        drawGameOverText(dt) ;
-    }   // if FINISH_PHASE
     if ( world->isRacePhase() )
     {
         const int numPlayers = raceSetup.getNumPlayers();

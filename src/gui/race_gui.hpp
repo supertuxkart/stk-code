@@ -95,7 +95,6 @@ private:
                                 float ratio_x,  float ratio_y  );
     void drawPlayerIcons       ();
     void oldDrawPlayerIcons    ();
-    void drawGameOverText      (const float dt);
     void drawMap               ();
     void drawTimer             ();
     void drawFPS               ();
