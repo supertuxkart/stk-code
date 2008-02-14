@@ -144,12 +144,19 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            if(!kart_properties_manager->getKart(argv[i+1]))
-	    {
-	      fprintf(stdout, _("Kart '%s' not found, ignored.\n"),
-		      argv[i+1]);
-	    }
-	    else race_manager->setPlayerKart(0, argv[i+1]);
+            std::string filename=std::string("data")+
+                                  Loader::DIR_SEPARATOR+argv[i+1]+".tkkf";
+            try
+            {
+                std::string s=loader->getPath(filename);
+                race_manager->setPlayerKart(0, argv[i+1]);
+                fprintf ( stdout, _("You choose to use kart '%s'.\n"), argv[i+1] ) ;
+            }
+            catch(std::runtime_error)
+            {
+	            fprintf(stdout, _("Kart '%s' not found, ignored.\n"),
+		                argv[i+1]);
+            }
         }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
         {
