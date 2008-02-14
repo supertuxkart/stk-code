@@ -320,7 +320,8 @@ void RaceGUI::drawMap ()
 
 //-----------------------------------------------------------------------------
 
-// FIXME: is this still used? Afaik a special end page is displayed instead
+// This is displayed during the 'delay_finish_phase', i.e. while waiting for
+// other karts to finish the race
 void RaceGUI::drawGameOverText (const float dt)
 {
     static float timer = 0 ;
@@ -961,8 +962,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
         //        end page.
         drawGameOverText(dt) ;
     }   // if FINISH_PHASE
-    if ( world->getPhase() == World::RACE_PHASE         ||
-         world->getPhase() == World::DELAY_FINISH_PHASE   )
+    if ( world->isRacePhase() )
     {
         const int numPlayers = raceSetup.getNumPlayers();
 
