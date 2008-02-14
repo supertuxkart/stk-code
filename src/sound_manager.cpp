@@ -24,6 +24,7 @@
 #include "user_config.hpp"
 #include "string_utils.hpp"
 #include "gui/font.hpp"
+#include "loader.hpp"
 
 #define USE_PLIB_SOUND !(HAVE_OPENAL && HAVE_OGGVORBIS)
 #if USE_PLIB_SOUND
@@ -191,7 +192,7 @@ void SoundManager::playMusic(const std::string& filename)
 
     // Read up to two lines from the corresponding .readme file: first one 
     // the title, second the composer. This is then displayed by the race gui
-    std::string name_readme = StringUtils::without_extension(filename)+".readme";    
+    std::string name_readme = loader->getPath(StringUtils::without_extension(filename)+".readme");
     std::ifstream f(name_readme.c_str());
     if(f)
     { 
