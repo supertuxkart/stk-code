@@ -144,7 +144,12 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            race_manager->setPlayerKart(0, argv[i+1]);
+            if(!kart_properties_manager->getKart(argv[i+1]))
+	    {
+	      fprintf(stdout, _("Kart '%s' not found, ignored.\n"),
+		      argv[i+1]);
+	    }
+	    else race_manager->setPlayerKart(0, argv[i+1]);
         }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
         {
