@@ -4,8 +4,14 @@
  (name        "Hexley")
  (model-file  "hexleykart.ac")
  (icon-file   "hexleyicon.rgb")
- (shadow-file "hexleyshadow.rgb")
+ (shadow-file "hexleyshadow.rgb") 
 
+;; some changed physics parameter to  prevent
+;; hexley from toppling over all the time
+ (suspension-rest           0.08  )
+ (gravity-center-shift      0.5  )
+ (wheel-damping-relaxation  12.3  )
+ 
  (red         0.9)
  (green       0.2)
  (blue        0.2)
