@@ -6,6 +6,12 @@
  (icon-file   "wilbericon.rgb")
  (shadow-file "wilbershadow.rgb")
 
+;; some changed physics parameter to  prevent
+;; wilbert from toppling over all the time
+ (suspension-rest           0.08  )
+ (gravity-center-shift      0.5  )
+ (wheel-damping-relaxation  12.3  )
+
  (red   0.25)
  (green 0.23)
  (blue  0.18)
