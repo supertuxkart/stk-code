@@ -17,7 +17,6 @@ subject to the following restrictions:
 
 #include "BulletCollision/CollisionShapes/btConvexShape.h"
 #include "BulletCollision/CollisionShapes/btTriangleShape.h"
-#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
 #include "BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h"
 #include "BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h"
 #include "BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.h"
@@ -124,6 +123,7 @@ btTriangleConvexcastCallback::processTriangle (btVector3* triangle, int partId, 
 
 
 //#define  USE_SUBSIMPLEX_CONVEX_CAST 1
+//if you reenable USE_SUBSIMPLEX_CONVEX_CAST see commented out code below
 #ifdef USE_SUBSIMPLEX_CONVEX_CAST
 	btSubsimplexConvexCast convexCaster(m_convexShape, &triangleShape, &simplexSolver);
 #else
@@ -140,11 +140,13 @@ btTriangleConvexcastCallback::processTriangle (btVector3* triangle, int partId, 
 		{					
 			if (castResult.m_fraction < m_hitFraction)
 			{
-
+/* btContinuousConvexCast's normal is already in world space */
+/*
 #ifdef USE_SUBSIMPLEX_CONVEX_CAST
 				//rotate normal into worldspace
 				castResult.m_normal = m_convexShapeFrom.getBasis() * castResult.m_normal;
 #endif //USE_SUBSIMPLEX_CONVEX_CAST
+*/
 				castResult.m_normal.normalize();
 
 				reportHit (castResult.m_normal,

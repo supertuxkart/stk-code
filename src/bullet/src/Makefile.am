@@ -12,6 +12,7 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btTransform.h 		LinearMath/btGeometryUtil.h	 \
 	LinearMath/btQuaternion.h		LinearMath/btTransformUtil.h	 \
 	LinearMath/btIDebugDraw.h		LinearMath/btQuickprof.cpp  	 \
+	LinearMath/btTypedUserInfo.h		LinearMath/btTypedUserInfo.h	 \
 	LinearMath/btVector3.h
 
 libbulletcollision_a_SOURCES := \
@@ -80,6 +81,8 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/CollisionShapes/btConcaveShape.h			 \
 	BulletCollision/CollisionShapes/btConeShape.cpp				 \
 	BulletCollision/CollisionShapes/btConeShape.h				 \
+	BulletCollision/CollisionShapes/btConvexHull.cpp			 \
+	BulletCollision/CollisionShapes/btConvexHull.h				 \
 	BulletCollision/CollisionShapes/btConvexHullShape.cpp			 \
 	BulletCollision/CollisionShapes/btConvexHullShape.h			 \
 	BulletCollision/CollisionShapes/btConvexInternalShape.cpp		 \
@@ -102,6 +105,8 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/CollisionShapes/btOptimizedBvh.h			 \
 	BulletCollision/CollisionShapes/btPolyhedralConvexShape.cpp		 \
 	BulletCollision/CollisionShapes/btPolyhedralConvexShape.h		 \
+	BulletCollision/CollisionShapes/btShapeHull.cpp				 \
+	BulletCollision/CollisionShapes/btShapeHull.h				 \
 	BulletCollision/CollisionShapes/btSphereShape.cpp			 \
 	BulletCollision/CollisionShapes/btSphereShape.h				 \
 	BulletCollision/CollisionShapes/btStaticPlaneShape.cpp			 \

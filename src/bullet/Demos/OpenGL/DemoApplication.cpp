@@ -72,15 +72,19 @@ m_shootBoxShape(0),
 	m_singleStep(false),
 	m_idle(false)
 {
+#ifndef BT_NO_PROFILE
 	m_profileIterator = CProfileManager::Get_Iterator();
+#endif //BT_NO_PROFILE
 }
 
 
 
 DemoApplication::~DemoApplication()
 {
-
+#ifndef BT_NO_PROFILE
 	CProfileManager::Release_Iterator(m_profileIterator);
+#endif //BT_NO_PROFILE
+
 	if (m_shootBoxShape)
 		delete m_shootBoxShape;
 
@@ -177,10 +181,11 @@ void DemoApplication::updateCamera() {
 	m_cameraPosition[2] = eyePos.getZ();
  
     glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 10000.0);
-    gluLookAt(m_cameraPosition[0], m_cameraPosition[1], m_cameraPosition[2], 
+    glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(m_cameraPosition[0], m_cameraPosition[1], m_cameraPosition[2], 
               m_cameraTargetPosition[0], m_cameraTargetPosition[1], m_cameraTargetPosition[2], 
 			  m_cameraUp.getX(),m_cameraUp.getY(),m_cameraUp.getZ());
-    glMatrixMode(GL_MODELVIEW);
 }
 
 
@@ -242,6 +247,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
 		m_lastKey = 0;
 
+#ifndef BT_NO_PROFILE
         if (key >= 0x31 && key < 0x37)
         {
                 int child = key-0x31;
@@ -251,7 +257,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
         {
                 m_profileIterator->Enter_Parent();
         }
-
+#endif //BT_NO_PROFILE
 
     switch (key) 
     {
@@ -736,12 +742,16 @@ btRigidBody*	DemoApplication::localCreateRigidBody(float mass, const btTransform
 #define USE_MOTIONSTATE 1
 #ifdef USE_MOTIONSTATE
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-	btRigidBody* body = new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(mass,myMotionState,shape,localInertia));
+
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
+
+	btRigidBody* body = new btRigidBody(cInfo);
 
 #else
 	btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);	
 	body->setWorldTransform(startTransform);
 #endif//
+
 	m_dynamicsWorld->addRigidBody(body);
 	
 	return body;
@@ -753,6 +763,7 @@ void DemoApplication::setOrthographicProjection()
 
 	// switch to projection mode
 	glMatrixMode(GL_PROJECTION);
+
 	// save previous matrix which contains the 
 	//settings for the perspective projection
 	glPushMatrix();
@@ -760,19 +771,24 @@ void DemoApplication::setOrthographicProjection()
 	glLoadIdentity();
 	// set a 2D orthographic projection
 	gluOrtho2D(0, m_glutScreenWidth, 0, m_glutScreenHeight);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	// invert the y axis, down is positive
 	glScalef(1, -1, 1);
 	// mover the origin from the bottom left corner
 	// to the upper left corner
 	glTranslatef(0, -m_glutScreenHeight, 0);
-	glMatrixMode(GL_MODELVIEW);
+
 }
 
 void DemoApplication::resetPerspectiveProjection() 
 {
+
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+	updateCamera();
 }
 
 
@@ -789,6 +805,7 @@ void DemoApplication::displayProfileString(int xOffset,int yStart,char* message)
 
 void DemoApplication::showProfileInfo(float& xOffset,float& yStart, float yIncr)
 {
+#ifndef BT_NO_PROFILE
 
 	static double time_since_reset = 0.f;
 	if (!m_idle)
@@ -851,6 +868,7 @@ void DemoApplication::showProfileInfo(float& xOffset,float& yStart, float yIncr)
 		yStart += yIncr;
 
 	}
+#endif//BT_NO_PROFILE
 
 
 
@@ -909,7 +927,7 @@ void DemoApplication::renderme()
 				}
 			}
 
-			GL_ShapeDrawer::drawOpenGL(m,colObj->getCollisionShape(),wireColor,getDebugMode());
+			m_shapeDrawer.drawOpenGL(m,colObj->getCollisionShape(),wireColor,getDebugMode());
 		}
 
 
@@ -1078,6 +1096,8 @@ void DemoApplication::renderme()
 
 		
 	}
+
+	updateCamera();
 
 }
 

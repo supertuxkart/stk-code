@@ -176,6 +176,9 @@ void DefaultRobot::handle_braking()
 #ifdef AI_DEBUG
         std::cout << "BRAKING" << std::endl;
 #endif
+        printf("vel %f %f ang %f %f\n",
+                getVelocityLC().getY(), m_curve_target_speed,
+            kart_ang_diff,MIN_TRACK_ANGLE );
             m_controls.brake = true;
             return;
         }

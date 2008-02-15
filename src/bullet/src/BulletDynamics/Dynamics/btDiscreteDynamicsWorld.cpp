@@ -42,6 +42,7 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
 #include "BulletCollision/CollisionShapes/btTriangleCallback.h"
 #include "BulletCollision/CollisionShapes/btTriangleMeshShape.h"
+#include "BulletCollision/CollisionShapes/btStaticPlaneShape.h"
 #include "LinearMath/btIDebugDraw.h"
 
 
@@ -329,7 +330,9 @@ int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, 
 
 	clearForces();
 
+#ifndef BT_NO_PROFILE
 	CProfileManager::Increment_Frame_Counter();
+#endif //BT_NO_PROFILE
 	
 	return numSimulationSubSteps;
 }
@@ -386,6 +389,11 @@ void	btDiscreteDynamicsWorld::setGravity(const btVector3& gravity)
 			body->setGravity(gravity);
 		}
 	}
+}
+
+btVector3 btDiscreteDynamicsWorld::getGravity () const
+{
+	return m_gravity;
 }
 
 
@@ -593,7 +601,11 @@ void	btDiscreteDynamicsWorld::solveConstraints(btContactSolverInfo& solverInfo)
 					}
 				}
 
-				m_solver->solveGroup( bodies,numBodies,manifolds, numManifolds,startConstraint,numCurConstraints,m_solverInfo,m_debugDrawer,m_stackAlloc,m_dispatcher);
+				///only call solveGroup if there is some work: avoid virtual function call, its overhead can be excessive
+				if (numManifolds + numCurConstraints)
+				{
+					m_solver->solveGroup( bodies,numBodies,manifolds, numManifolds,startConstraint,numCurConstraints,m_solverInfo,m_debugDrawer,m_stackAlloc,m_dispatcher);
+				}
 		
 			}
 		}
@@ -717,40 +729,10 @@ void	btDiscreteDynamicsWorld::startProfiling(btScalar timeStep)
 {
 	(void)timeStep;
 
+#ifndef BT_NO_PROFILE
 	CProfileManager::Reset();
+#endif //BT_NO_PROFILE
 
-	
-	#ifdef USE_QUICKPROF
-
-
-	//toggle btProfiler
-	if ( m_debugDrawer && m_debugDrawer->getDebugMode() & btIDebugDraw::DBG_ProfileTimings)
-	{
-		if (!m_profileTimings)
-		{
-			m_profileTimings = 1;
-			// To disable profiling, simply comment out the following line.
-			static int counter = 0;
-
-			char filename[128];
-			sprintf(filename,"quickprof_bullet_timings%i.csv",counter++);
-			btProfiler::init(filename, btProfiler::BLOCK_CYCLE_SECONDS);//BLOCK_TOTAL_MICROSECONDS
-		} else
-		{
-			btProfiler::endProfilingCycle();
-		}
-
-	} else
-	{
-		if (m_profileTimings)
-		{
-			btProfiler::endProfilingCycle();
-
-			m_profileTimings = 0;
-			btProfiler::destroy();
-		}
-	}
-#endif //USE_QUICKPROF
 }
 
 
@@ -937,6 +919,25 @@ void btDiscreteDynamicsWorld::debugDrawObject(const btTransform& worldTransform,
 				getDebugDrawer()->drawLine(start+worldTransform.getBasis() * (offsetHeight-offsetRadius),start+worldTransform.getBasis() * (-offsetHeight-offsetRadius),color);
 				break;
 			}
+
+			case STATIC_PLANE_PROXYTYPE:
+				{
+					const btStaticPlaneShape* staticPlaneShape = static_cast<const btStaticPlaneShape*>(shape);
+					btScalar planeConst = staticPlaneShape->getPlaneConstant();
+					const btVector3& planeNormal = staticPlaneShape->getPlaneNormal();
+					btVector3 planeOrigin = planeNormal * planeConst;
+					btVector3 vec0,vec1;
+					btPlaneSpace1(planeNormal,vec0,vec1);
+					btScalar vecLen = 100.f;
+					btVector3 pt0 = planeOrigin + vec0*vecLen;
+					btVector3 pt1 = planeOrigin - vec0*vecLen;
+					btVector3 pt2 = planeOrigin + vec1*vecLen;
+					btVector3 pt3 = planeOrigin - vec1*vecLen;
+					getDebugDrawer()->drawLine(worldTransform*pt0,worldTransform*pt1,color);
+					getDebugDrawer()->drawLine(worldTransform*pt2,worldTransform*pt3,color);
+					break;
+
+				}
 		default:
 			{
 

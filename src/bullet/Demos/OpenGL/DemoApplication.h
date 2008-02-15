@@ -18,6 +18,7 @@ subject to the following restrictions:
 
 
 #include "GlutStuff.h"
+#include "GL_ShapeDrawer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,15 +38,15 @@ class	btTypedConstraint;
 
 
 
-
 class DemoApplication
 {
 	void	displayProfileString(int xOffset,int yStart,char* message);
 	class CProfileIterator* m_profileIterator;
 
 	protected:
-
+#ifdef USE_BT_CLOCK
 	btClock m_clock;
+#endif //USE_BT_CLOCK
 
 	///this is the most important class
 	btDynamicsWorld*		m_dynamicsWorld;
@@ -80,6 +81,7 @@ class DemoApplication
 
 	void showProfileInfo(float& xOffset,float& yStart, float yIncr);
 
+	GL_ShapeDrawer	m_shapeDrawer;
 
 public:
 		
@@ -127,6 +129,16 @@ public:
 		return m_cameraTargetPosition;
 	}
 
+	btScalar	getDeltaTimeMicroseconds()
+	{
+#ifdef USE_BT_CLOCK
+		btScalar dt = m_clock.getTimeMicroseconds();
+		m_clock.reset();
+		return dt;
+#else
+		return btScalar(16666.);
+#endif
+	}
 
 	///glut callbacks
 				

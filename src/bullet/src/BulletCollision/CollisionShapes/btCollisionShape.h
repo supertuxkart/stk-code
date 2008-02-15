@@ -16,6 +16,7 @@ subject to the following restrictions:
 #ifndef COLLISION_SHAPE_H
 #define COLLISION_SHAPE_H
 
+class btTypedUserInfo;
 #include "LinearMath/btTransform.h"
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
@@ -25,9 +26,13 @@ subject to the following restrictions:
 ///btCollisionShape provides interface for collision shapes that can be shared among btCollisionObjects.
 class btCollisionShape
 {
+
+	void* m_userPointer;
+	btTypedUserInfo* m_typedUserInfo;
+
 public:
 
-	btCollisionShape() 
+	btCollisionShape() : m_userPointer(0), m_typedUserInfo (0)
 	{
 	}
 	virtual ~btCollisionShape()
@@ -45,7 +50,7 @@ public:
 
 	///calculateTemporalAabb calculates the enclosing aabb for the moving object over interval [0..timeStep)
 	///result is conservative
-	void calculateTemporalAabb(const btTransform& curTrans,const btVector3& linvel,const btVector3& angvel,btScalar timeStep, btVector3& temporalAabbMin,btVector3& temporalAabbMax);
+	void calculateTemporalAabb(const btTransform& curTrans,const btVector3& linvel,const btVector3& angvel,btScalar timeStep, btVector3& temporalAabbMin,btVector3& temporalAabbMax) const;
 
 #ifndef __SPU__
 
@@ -88,6 +93,27 @@ public:
 	virtual void	setMargin(btScalar margin) = 0;
 	virtual btScalar	getMargin() const = 0;
 
+	
+	///optional user data pointer
+	void	setUserPointer(void* userPtr)
+	{
+		m_userPointer = userPtr;
+	}
+
+	void*	getUserPointer() const
+	{
+		return m_userPointer;
+	}
+
+	btTypedUserInfo* getTypedUserInfo () const
+	{
+		return m_typedUserInfo;
+	}
+
+	void setTypedUserInfo (btTypedUserInfo* typedUserInfo)
+	{
+		m_typedUserInfo = typedUserInfo;
+	}
 };	
 
 #endif //COLLISION_SHAPE_H

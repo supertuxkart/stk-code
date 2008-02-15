@@ -27,6 +27,7 @@ subject to the following restrictions:
 
 struct	btBroadphaseProxy;
 class	btCollisionShape;
+class   btTypedUserInfo;
 #include "LinearMath/btMotionState.h"
 #include "LinearMath/btAlignedAllocator.h"
 
@@ -68,6 +69,8 @@ protected:
 
 	///m_internalOwner is reserved to point to Bullet's btRigidBody. Don't use this, use m_userObjectPointer instead.
 	void*			m_internalOwner;
+
+	btTypedUserInfo*        m_typedUserInfo;
 
 	///time of impact calculation
 	btScalar		m_hitFraction; 
@@ -334,6 +337,16 @@ public:
 		m_userObjectPointer = userPointer;
 	}
 
+	btTypedUserInfo* getTypedUserInfo () const
+	{
+		return m_typedUserInfo;
+	}
+
+	void setTypedUserInfo (btTypedUserInfo* typedUserInfo)
+	{
+		m_typedUserInfo = typedUserInfo;
+	}
+
 	inline bool checkCollideWith(btCollisionObject* co)
 	{
 		if (m_checkCollideWith)
@@ -341,9 +354,6 @@ public:
 
 		return true;
 	}
-
-
-}
-;
+};
 
 #endif //COLLISION_OBJECT_H

@@ -27,12 +27,15 @@
 
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"
+#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+
 class Physics : public btSequentialImpulseConstraintSolver
 {
 private:
     btDynamicsWorld                 *m_dynamics_world;
     Kart                            *m_kart;
     GLDebugDrawer                   *m_debug_drawer;
+    GL_ShapeDrawer                   m_shape_drawer;
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;

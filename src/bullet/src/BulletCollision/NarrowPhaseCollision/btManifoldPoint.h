@@ -30,6 +30,7 @@ class btManifoldPoint
 		public:
 			btManifoldPoint()
 				:m_userPersistentData(0),
+				m_appliedImpulse(0.f),
 				m_lifeTime(0)
 			{
 			}
@@ -43,7 +44,8 @@ class btManifoldPoint
 					m_distance1( distance ),
 					m_combinedFriction(btScalar(0.)),
 					m_combinedRestitution(btScalar(0.)),
-					m_userPersistentData(0),					
+					m_userPersistentData(0),
+					m_appliedImpulse(0.f),
 					m_lifeTime(0)
 			{
 				
@@ -63,8 +65,14 @@ class btManifoldPoint
 			btScalar	m_combinedFriction;
 			btScalar	m_combinedRestitution;
 
+         //BP mod, store contact triangles.
+         int	   m_partId0;
+         int      m_partId1;
+         int      m_index0;
+         int      m_index1;
 				
 			mutable void*	m_userPersistentData;
+			btScalar		m_appliedImpulse;
 
 			int		m_lifeTime;//lifetime of the contactpoint in frames
 			

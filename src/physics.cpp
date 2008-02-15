@@ -17,9 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
-
 #include "physics.hpp"
 #include "ssg_help.hpp"
 #include "world.hpp"
@@ -285,7 +282,7 @@ void Physics::draw()
 void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
     
 {
-    GL_ShapeDrawer::drawOpenGL(m, s, color, 0);
+    m_shape_drawer.drawOpenGL(m, s, color, 0);
     //                               btIDebugDraw::DBG_DrawWireframe);
     //                               btIDebugDraw::DBG_DrawAabb);
 
