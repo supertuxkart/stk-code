@@ -160,6 +160,8 @@
 "pennyshadow.rgb"           Y Y    Y    0.0    N     N    1.0   Y   N   N   N
 "hexleyicon.rgb"            Y Y    Y    0.0    N     N    1.0   Y   N   N   N
 "hexleyshadow.rgb"          Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"wilbericon.rgb"          Y Y    Y    0.0    N     N    1.0   Y   N   N   N
+"wilbershadow.rgb"          Y Y    Y    0.0    N     N    1.0   Y   N   N   N
 "spark.rgb"                 Y Y    N    0.2    N     N    1.0   Y   N   N   N
 "smoke.rgb"                 Y Y    Y    0.0    N     N    1.0   Y   N   N   N
 "explode.rgb"               Y Y    Y    0.2    N     N    1.0   Y   N   N   N

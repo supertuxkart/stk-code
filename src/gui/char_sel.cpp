@@ -83,14 +83,14 @@ CharSel::CharSel(int whichPlayer)
         // Check if i has been previously selected
         if (kartAvailable(i))
         {
-        	const KartProperties* kp= kart_properties_manager->getKartById(i);
-        	Material *m = material_manager->getMaterial(kp->getIconFile());
-        	widget_manager->addWgt( WTOK_RACER0 + i, 10, 13);
-        	widget_manager->showWgtRect( WTOK_RACER0 + i);
-        	widget_manager->setWgtColor( WTOK_RACER0 + i, WGT_GRAY);
-        	widget_manager->setWgtTexture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
-        	widget_manager->showWgtTexture( WTOK_RACER0 + i );
-        	widget_manager->activateWgt( WTOK_RACER0 + i );
+            const KartProperties* kp= kart_properties_manager->getKartById(i);
+            Material *m = material_manager->getMaterial(kp->getIconFile());
+            widget_manager->addWgt( WTOK_RACER0 + i, 8, 11);
+            widget_manager->showWgtRect( WTOK_RACER0 + i);
+            widget_manager->setWgtColor( WTOK_RACER0 + i, WGT_GRAY);
+            widget_manager->setWgtTexture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
+            widget_manager->showWgtTexture( WTOK_RACER0 + i );
+            widget_manager->activateWgt( WTOK_RACER0 + i );
         }
     }
 
