@@ -55,7 +55,7 @@ void MusicPlib::update()
 }
 
 //-----------------------------------------------------------------------------
-bool MusicPlib::load(const char* filename)
+bool MusicPlib::load(const std::string& filename)
 {
     m_filename= loader->getPath(filename);
     return true;
