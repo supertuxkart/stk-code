@@ -211,7 +211,7 @@ void ConfigDisplay::select()
 
     case WTOK_INCR_RES:
         {
-            const int NUM_RES = m_sizes.size();
+            const int NUM_RES = (int)m_sizes.size();
             m_curr_res = std::min(NUM_RES - 1, m_curr_res + 1);
 
             if ( user_config->m_fullscreen &&
@@ -273,7 +273,7 @@ void ConfigDisplay::select()
 
     case WTOK_CLEAR_BLACKLIST:
         {
-            const int NUM_BLACKLISTED = user_config->m_blacklist_res.size();
+            const int NUM_BLACKLISTED = (int)user_config->m_blacklist_res.size();
             int black_width, black_height = 0;
             int id = -1;
 
@@ -404,7 +404,7 @@ void ConfigDisplay::getScreenModes()
         //Prevent use of very small resolutions
         const int MIN_WIDTH = 640;
         const int MIN_HEIGHT = 480;
-        const int NUM_RES = m_sizes.size();
+        const int NUM_RES = (int)m_sizes.size();
 
         for (int i = NUM_RES - 1; i >= 0; --i)
         {
@@ -426,7 +426,7 @@ void ConfigDisplay::getScreenModes()
     //Set the same resolution as the one in the config file; if it's not
     //found, set it to the lowest resolution available as a sane default.
     m_curr_res = -1;
-    const int NUM_RES = m_sizes.size();
+    const int NUM_RES = (int)m_sizes.size();
 
     for (int i = 0; i < NUM_RES; ++i)
     {
@@ -479,7 +479,7 @@ int ConfigDisplay::isBlacklisted()
 bool ConfigDisplay::isBlacklisted(int width, int height)
 {
     int black_width, black_height;
-    const int NUM_BLACKLISTED = user_config->m_blacklist_res.size();
+    const int NUM_BLACKLISTED = (int)user_config->m_blacklist_res.size();
 
     for (int i = 0; i < NUM_BLACKLISTED; ++i)
     {
@@ -487,7 +487,7 @@ bool ConfigDisplay::isBlacklisted(int width, int height)
         "%dx%d", &black_width, &black_height );
 
         if (width == black_width && height == black_height) return true;
-            return i;
+        return i;
     }
 
     return false;
