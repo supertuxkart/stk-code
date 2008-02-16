@@ -487,7 +487,6 @@ bool ConfigDisplay::isBlacklisted(int width, int height)
         "%dx%d", &black_width, &black_height );
 
         if (width == black_width && height == black_height) return true;
-        return i;
     }
 
     return false;
