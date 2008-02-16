@@ -35,23 +35,27 @@ public:
     void select();
 
 private:
-    std::vector<std::pair<int,int> > m_sizes;
-    int m_sizes_index;
-    int m_sizes_size;
-    char m_resolution[MAX_MESSAGE_LENGTH];
+    std::vector< std::pair<int,int> > m_sizes;
+    int m_curr_res;
+
     int m_curr_width;
     int m_curr_height;
-    int m_blacklist_res_size;
-        
-    // changeResolution reverse param is set true when changing to a previous resolution  
-    void changeResolution(int width, int height, bool reverse=false);
+
+    // changeResolution() reverse param is set true when changing to a previous resolution,
+    // thought it is disabled for now.
+    void changeResolution(int width, int height/*, bool reverse*/);
     void getScreenModes();
     void changeApplyButton();
-    // onBlacklist returns the index of the resolution in the blacklist 
+
+#if 0
+    // isBlacklisted() returns the index of the resolution in the blacklist 
     // or -1 if not in the blacklist
-    int onBlacklist(); 
-    int onBlacklist(int width, int height);  
+    int isBlacklisted(); 
+#endif
+    bool isBlacklisted(int width, int height);
     void showBlacklistButtons();
+
+    void loadDefaultModes();
 };
 
 #endif

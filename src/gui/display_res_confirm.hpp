@@ -27,7 +27,7 @@
 class DisplayResConfirm: public BaseGUI
 {
 public:
-    DisplayResConfirm();
+    DisplayResConfirm( const bool FROM_WINDOW_ );
     ~DisplayResConfirm();
 
     void select();
@@ -36,7 +36,8 @@ public:
 private:
     char m_count[60];
     int m_counter;
-    
+    const bool FROM_WINDOW;
+
     SDL_TimerID m_timer;
 };
 

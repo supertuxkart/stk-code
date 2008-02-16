@@ -200,9 +200,18 @@ void MenuManager::update()
             case MENUID_CONFIG_DISPLAY:
                 m_current_menu= new ConfigDisplay();
                 break;
-            case MENUID_DISPLAY_RES_CONFIRM:
-            	m_current_menu= new DisplayResConfirm();
-            	break;
+            case MENUID_RESOLUTION_CONFIRM_FS:
+                {
+                    const bool FROM_FULLSCREEN = false;
+                    m_current_menu= new DisplayResConfirm( FROM_FULLSCREEN );
+                }
+                break;
+            case MENUID_RESOLUTION_CONFIRM_WIN:
+                {
+                    const bool FROM_WINDOW = true;
+                    m_current_menu= new DisplayResConfirm( FROM_WINDOW );
+                }
+                break;
             case MENUID_CONFIG_SOUND:
                 m_current_menu= new ConfigSound();
                 break;
