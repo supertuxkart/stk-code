@@ -139,6 +139,8 @@ void Scene::draw(float dt)
 
         if(!user_config->m_bullet_debug)
         {
+            // Use this for faster profiling by disabling drawing the scene graph
+            //if(!user_config->m_profile)ssgCullAndDraw ( m_scenegraph );
             ssgCullAndDraw ( m_scenegraph );
         }
         else

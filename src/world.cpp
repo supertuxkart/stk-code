@@ -106,6 +106,12 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
             // In profile mode, load only the old kart
             newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
                     init_pos);
+	    // Create a camera for the last kart (since this way more of the 
+	    // karts can be seen.
+	    if((i+1)==m_race_setup.m_karts.end()) 
+            {
+	        scene->createCamera(m_race_setup.getNumPlayers(), playerIndex);
+            }
         }
         else
         {
@@ -488,12 +494,29 @@ void World::updateRaceStatus(float dt)
     if(race_manager->getFinishedKarts() >= m_race_setup.getNumKarts() )
     {
         m_phase = FINISH_PHASE;
+	if(user_config->m_profile<0)  // profiling number of laps -> print stats
+        {
+	  float min_t=999999.9, max_t=0.0, av_t=0.0;
+            for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+            {
+                max_t = std::max(max_t, m_kart[i]->getFinishTime());
+                min_t = std::min(min_t, m_kart[i]->getFinishTime());
+		av_t += m_kart[i]->getFinishTime();
+	        printf("%s  start %d  end %d time %f\n",
+                       m_kart[i]->getName().c_str(),(int)i,
+                       m_kart[i]->getPosition(),
+                       m_kart[i]->getFinishTime());
+	    } 
+	    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
+            std::exit(-2);
+	}
     }
 
     // 2) All player karts are finished --> wait some
     //    time for AI karts to arrive before finishing
     // ===============================================
-    else if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE)
+    else if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE &&
+            !user_config->m_profile)
     {
         m_phase = DELAY_FINISH_PHASE;
         m_finish_delay_start_time = m_clock;
@@ -502,7 +525,8 @@ void World::updateRaceStatus(float dt)
     // 3) If the 'wait for AI' time is over, estimate arrival times & finish
     // =====================================================================
     else if(m_phase==DELAY_FINISH_PHASE &&
-            m_clock-m_finish_delay_start_time>TIME_DELAY_TILL_FINISH)
+            m_clock-m_finish_delay_start_time>TIME_DELAY_TILL_FINISH &&
+            !user_config->m_profile)
     {
         m_phase = FINISH_PHASE;
         for ( Karts::size_type i = 0; i < m_kart.size(); ++i)

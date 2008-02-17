@@ -100,6 +100,7 @@ void cmdLineHelp (char* invocation)
     // should not be used by unaware users:
     // "  --profile            Enable automatic driven profile mode for 20 seconds\n"
     // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
+    // "                       if n<0 --> (-n) = number of laps to drive
     // "  --history            Replay history file 'history.dat'\n"
     "  --log=terminal          Write messages to screen\n"
     "  --log=file              Write messages/warning to log files stdout.log/stderr.log\n"
@@ -328,6 +329,16 @@ int handleCmdLine(int argc, char **argv)
         }else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
             user_config->m_profile=n;
+	    if(n<0) 
+	    {
+                fprintf(stdout,"Profiling %d laps\n",-n);
+                race_manager->setNumLaps(-n);
+	    }
+	    else
+            {
+	        printf("Profiling: %d seconds.\n",user_config->m_profile);
+                race_manager->setNumLaps   (999999); // profile end depends on time
+            }
         }
         else if( !strcmp(argv[i], "--profile") )
         {
@@ -350,7 +361,6 @@ int handleCmdLine(int argc, char **argv)
     }   // for i <argc
     if(user_config->m_profile)
     {
-        printf("Profiling: %d seconds.\n",user_config->m_profile);
         user_config->setSFX(UserConfig::UC_DISABLE);  // Disable sound effects 
         user_config->setMusic(UserConfig::UC_DISABLE);// and music when profiling
     }
@@ -486,7 +496,7 @@ int main(int argc, char *argv[] )
                 race_manager->start();
             }
         }
-        else  // profilie
+        else  // profile
         {
 
             // Profiling
@@ -494,8 +504,7 @@ int main(int argc, char *argv[] )
             race_manager->setNumPlayers(1);
             race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
             race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-            race_manager->setDifficulty(RD_MEDIUM);
-            race_manager->setNumLaps   (999999); // profile end depends on time
+            race_manager->setDifficulty(RD_HARD);
             race_manager->start();
         }
         game_manager->run();

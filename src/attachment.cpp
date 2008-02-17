@@ -28,6 +28,7 @@
 #include "world.hpp"
 #include "sound_manager.hpp"
 #include "stk_config.hpp"
+#include "user_config.hpp"
 
 Attachment::Attachment(Kart* _kart)
 {
@@ -64,6 +65,7 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 // -----------------------------------------------------------------------------
 void Attachment::hitGreenHerring()
 {
+    if(user_config->m_profile) return;
     int random_attachment;
     float leftover_time   = 0.0f;
     switch(getType())   // If there already is an attachment, make it worse :)

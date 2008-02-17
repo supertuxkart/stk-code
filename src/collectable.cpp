@@ -175,7 +175,8 @@ void Collectable::hitRedHerring(int n)
         newC = (CollectableType)(rand()%(COLLECT_MAX - 1 - nIgnore) + 1);
     }
     else
-    {
+      {   // for now: no collectables when profiling
+        return;
         // No random effects when profiling!
         static int simpleCounter=-1;
         simpleCounter++;
