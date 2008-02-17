@@ -825,7 +825,7 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("sun-ambient",   m_ambient_col);
     LISP->get      ("sun-specular",  m_specular_col);
     LISP->get      ("sun-diffuse",   m_diffuse_col);
-    LISP->get      ("m_gravity",     m_gravity);
+    LISP->get      ("gravity",       m_gravity);
     delete ROOT;
 }
 
