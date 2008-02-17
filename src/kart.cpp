@@ -175,6 +175,19 @@ void Kart::createPhysics(ssgEntity *obj)
     //    ssgEntity *model = getModel();
     float x_min, x_max, y_min, y_max, z_min, z_max;
     MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
+    if(getName()=="Hexley" || getName()=="Wilber")
+    {
+        // These kart models are too small, so we get problems with stability. 
+        // Till we find either better (bigger) models or improve their physics 
+        // parameters to become playable, we just adjust the size of their 
+        // physical models to be the same as the tuxkart model
+        x_min=-0.473799;
+	x_max= 0.486361;
+	y_min=-0.772244;
+	y_max= 0.739075;
+	z_min= 0.002806;
+	z_max= 0.701095;
+    }
     float kart_width  = x_max-x_min;
     m_kart_length = y_max-y_min;
     if(m_kart_length<1.2) m_kart_length=1.5f;
