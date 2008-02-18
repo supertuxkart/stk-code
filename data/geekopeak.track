@@ -3,7 +3,7 @@
 (tuxkart-track
  (name        "Geeko Peak")
  (description "Created by Oliver & Steve Baker")
- (music       "oggs/tk2.ogg")
+ (music       "oggs/tk2.ogg" "oggs/kart_grand_prix.ogg")
  (screenshot  "sshot-geekopeak.rgb")
  (topview     "topview-geekopeak.rgb")
  (AI-curve-speed-adjust  2.0)
