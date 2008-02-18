@@ -137,6 +137,9 @@ usaflag.rgb \
 water.rgb \
 water_light.rgb \
 wheel.rgb \
+wilbericon.rgb \
+wilber.rgb \
+wilbershadow.rgb \
 window.rgb \
 wood.rgb \
 yetiicon.rgb \
