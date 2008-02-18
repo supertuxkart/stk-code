@@ -6,6 +6,8 @@
  (music       "oggs/tk2.ogg")
  (screenshot  "sshot-geekopeak.rgb")
  (topview     "topview-geekopeak.rgb")
+ (AI-curve-speed-adjust  2.0)
+ (AI-angle-adjust        4.0)
 )
 
 ;; EOF ;;

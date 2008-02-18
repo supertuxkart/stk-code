@@ -6,6 +6,8 @@
  (music       "oggs/Boom_boom_boom.ogg")
  (screenshot  "sshot-olivermath.rgb")
  (topview     "topview-olivermath.rgb")
+ (AI-curve-speed-adjust  1.3)
+ (AI-angle-adjust        1.7)
 )
 
 ;; EOF ;;

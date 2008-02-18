@@ -18,6 +18,8 @@
  (music      "oggs/tk5a.ogg")
  (screenshot "sshot-littlevolcano.rgb")
  (topview    "topview-littlevolcano.rgb")
+ (AI-curve-speed-adjust  3.0)
+ (AI-angle-adjust        3.3)
 )
 
 ;; EOF ;;

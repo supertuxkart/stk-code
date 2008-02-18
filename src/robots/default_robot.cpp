@@ -170,8 +170,10 @@ void DefaultRobot::handle_braking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        if(getVelocityLC().getY() > m_curve_target_speed ||
-           kart_ang_diff > MIN_TRACK_ANGLE )
+        float angle_adjust = world->m_track->getAIAngleAdjustment();
+        float speed_adjust = world->m_track->getAICurveSpeedAdjustment();
+        if(getVelocityLC().getY() > speed_adjust*m_curve_target_speed ||
+           kart_ang_diff          > angle_adjust*MIN_TRACK_ANGLE         )
         {
 #ifdef AI_DEBUG
         std::cout << "BRAKING" << std::endl;

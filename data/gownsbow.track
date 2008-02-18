@@ -7,6 +7,8 @@
  (music       "oggs/another_caribbean_beat.ogg")
  (screenshot  "sshot-gownsbow.rgb")
  (topview     "topview-gownsbow.rgb")
+ (AI-curve-speed-adjust  1.3)
+ (AI-angle-adjust        2.3)
 )
 
 ;; EOF ;;

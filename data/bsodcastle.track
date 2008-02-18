@@ -6,6 +6,8 @@
  (music       "oggs/Lava_Lagoon_2.ogg")
  (screenshot  "sshot-bsodcastle.rgb")
  (topview     "topview-bsodcastle.rgb")
+ (AI-curve-speed-adjust  2.0)
+ (AI-angle-adjust        2.0)
 )
 
 ;; EOF ;;

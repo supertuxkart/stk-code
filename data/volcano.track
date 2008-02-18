@@ -6,6 +6,8 @@
  (music       "oggs/Boom_boom_boom.ogg")
  (screenshot  "sshot-volcano.rgb")
  (topview     "topview-volcano.rgb")
+ (AI-curve-speed-adjust  2.0)
+ (AI-angle-adjust        2.3)
 )
 
 ;; EOF ;;

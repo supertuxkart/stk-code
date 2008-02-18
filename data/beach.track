@@ -1,11 +1,13 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-track
- (name        "On the Beach")
- (description "Created by Ingo Ruhnke")
- (music       "oggs/CaribbeanMusic.ogg")
- (screenshot  "sshot-beach.rgb")
- (topview     "topview-beach.rgb")
+ (name                   "On the Beach")
+ (description            "Created by Ingo Ruhnke")
+ (music                  "oggs/CaribbeanMusic.ogg")
+ (screenshot             "sshot-beach.rgb")
+ (topview                "topview-beach.rgb")
+ (AI-curve-speed-adjust  2.0)
+ (AI-angle-adjust        2.7)
 )
 
 ;; EOF ;;

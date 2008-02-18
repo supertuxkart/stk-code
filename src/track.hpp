@@ -52,7 +52,11 @@ private:
     ssgBranch*               m_model;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
-
+    // The next two variables are for AI improvements: the AI sometimes does
+    // not estimate curve speed and/or angle correctly, resulting in too much
+    // braking. These factors are used to adjust this.
+    float                    m_AI_angle_adjustment;
+    float                    m_AI_curve_speed_adjustment;
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -175,6 +179,8 @@ public:
     const float&  getFogDensity         () const {return m_fog_density;    }
     const float&  getFogStart           () const {return m_fog_start;      }
     const float&  getFogEnd             () const {return m_fog_end;        }
+    const float&  getAIAngleAdjustment  () const {return m_AI_angle_adjustment;}
+    const float&  getAICurveSpeedAdjustment() const {return m_AI_curve_speed_adjustment;}
     const sgVec4& getSkyColor           () const {return m_sky_color;      }
     const std::string& getDescription   () const {return m_description;    }
     const std::string& getTopviewFile   () const {return m_top_view;       }
@@ -183,7 +189,6 @@ public:
     const std::vector<SGfloat>& getWidth() const {return m_path_width;     }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
     void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
-    //    static const Material* getMaterial  (unsigned int n) {return m_triangleIndex2Material[n];}
     void  getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
                          const Material **material) const;
     void createPhysicsModel             ();

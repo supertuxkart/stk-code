@@ -7,6 +7,8 @@
  (music "oggs/Ethereal_Spectrum_\(ver_loop\).ogg")
  (screenshot "sshot-startrack.rgb")
  (topview "topview-startrack.rgb")
+ (AI-curve-speed-adjust  1.7)
+ (AI-angle-adjust        2.0)
 )
 
 ;; EOF ;;

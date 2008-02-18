@@ -18,6 +18,8 @@
  (music      "oggs/tuxr.ogg")
  (screenshot "sshot-subseatrack.rgb")
  (topview    "topview-subseatrack.rgb")
+ (AI-curve-speed-adjust  2.3)
+ (AI-angle-adjust        4.0)
 )
 
 ;; EOF ;;

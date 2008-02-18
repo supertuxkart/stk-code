@@ -6,6 +6,8 @@
  (music       "oggs/tk5a.ogg" "oggs/tk2.ogg")
  (screenshot  "sshot-race.rgb")
  (topview     "topview-race.rgb")
+ (AI-curve-speed-adjust  1.3)
+ (AI-angle-adjust        2.0)
 )
 
 ;; EOF ;;

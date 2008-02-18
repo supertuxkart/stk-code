@@ -777,10 +777,12 @@ void Track::loadTrack(std::string filename_)
     // Default values
     m_use_fog = false;
     sgSetVec4 ( m_fog_color  , 0.3f, 0.7f, 0.9f, 1.0f ) ;
-    m_fog_density = 1.0f/100.0f;
-    m_fog_start   = 0.0f;
-    m_fog_end     = 1000.0f;
-    m_gravity     = 9.80665f;
+    m_fog_density               = 1.0f/100.0f;
+    m_fog_start                 = 0.0f;
+    m_fog_end                   = 1000.0f;
+    m_gravity                   = 9.80665f;
+    m_AI_angle_adjustment       = 1.0f;
+    m_AI_curve_speed_adjustment = 1.0f;
 
     sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
     sgSetVec4 ( m_sky_color,     0.3f, 0.7f, 0.9f, 1.0f );
@@ -803,29 +805,30 @@ void Track::loadTrack(std::string filename_)
         throw std::runtime_error(msg);
     }
 
-    LISP->get      ("name",          m_name);
-    LISP->get      ("description",   m_description);
-    LISP->getVector("music",         m_music_filenames);
-    LISP->get      ("herring",       m_herring_style);
-    LISP->get      ("screenshot",    m_screenshot);
-    LISP->get      ("topview",       m_top_view);
-    LISP->get      ("sky-color",     m_sky_color);
-    LISP->getVector("start-x",       m_start_x);
-    LISP->getVector("start-y",       m_start_y);
-    LISP->getVector("start-z",       m_start_z);
-    LISP->getVector("start-heading", m_start_heading);
+    LISP->get      ("name",                  m_name);
+    LISP->get      ("description",           m_description);
+    LISP->getVector("music",                 m_music_filenames);
+    LISP->get      ("herring",               m_herring_style);
+    LISP->get      ("screenshot",            m_screenshot);
+    LISP->get      ("topview",               m_top_view);
+    LISP->get      ("sky-color",             m_sky_color);
+    LISP->getVector("start-x",               m_start_x);
+    LISP->getVector("start-y",               m_start_y);
+    LISP->getVector("start-z",               m_start_z);
+    LISP->getVector("start-heading",         m_start_heading);
+    LISP->get      ("use-fog",               m_use_fog);
+    LISP->get      ("fog-color",             m_fog_color);
+    LISP->get      ("fog-density",           m_fog_density);
+    LISP->get      ("fog-start",             m_fog_start);
+    LISP->get      ("fog-end",               m_fog_end);
+    LISP->get      ("sun-position",          m_sun_position);
+    LISP->get      ("sun-ambient",           m_ambient_col);
+    LISP->get      ("sun-specular",          m_specular_col);
+    LISP->get      ("sun-diffuse",           m_diffuse_col);
+    LISP->get      ("gravity",               m_gravity);
+    LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
+    LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
 
-    LISP->get      ("use-fog",       m_use_fog);
-    LISP->get      ("fog-color",     m_fog_color);
-    LISP->get      ("fog-density",   m_fog_density);
-    LISP->get      ("fog-start",     m_fog_start);
-    LISP->get      ("fog-end",       m_fog_end);
-
-    LISP->get      ("sun-position",  m_sun_position);
-    LISP->get      ("sun-ambient",   m_ambient_col);
-    LISP->get      ("sun-specular",  m_specular_col);
-    LISP->get      ("sun-diffuse",   m_diffuse_col);
-    LISP->get      ("gravity",       m_gravity);
     delete ROOT;
 }
 
