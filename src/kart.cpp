@@ -181,12 +181,12 @@ void Kart::createPhysics(ssgEntity *obj)
         // Till we find either better (bigger) models or improve their physics 
         // parameters to become playable, we just adjust the size of their 
         // physical models to be the same as the tuxkart model
-        x_min=-0.473799;
-	x_max= 0.486361;
-	y_min=-0.772244;
-	y_max= 0.739075;
-	z_min= 0.002806;
-	z_max= 0.701095;
+        x_min=-0.473799f;
+        x_max= 0.486361f;
+        y_min=-0.772244f;
+        y_max= 0.739075f;
+        z_min= 0.002806f;
+        z_max= 0.701095f;
     }
     float kart_width  = x_max-x_min;
     m_kart_length = y_max-y_min;
