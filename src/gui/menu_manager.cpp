@@ -69,10 +69,9 @@ MenuManager::~MenuManager()
     delete m_current_menu;
 }
 
-//-----------------------------------------------------------------------------
 /** Puts the given menu into the menu stack and saves the widgetToken of
   * the last selected widget for later reactivation.
- */
+  */
 void MenuManager::pushMenu(MenuManagerIDs id)
 {
 	// If there is already an element then this is the one for the menu
@@ -98,9 +97,10 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 	pair <MenuManagerIDs, int> element;
 	element.first = id;
 	element.second = WidgetManager::WGT_NONE;
-	
+
     m_menu_stack.push_back(element);
 
+    if( m_current_menu) m_current_menu->lockInput();
     m_change_menu = true;
 }
 
@@ -108,8 +108,9 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 void MenuManager::popMenu()
 {
     sound_manager->playSfx(SOUND_BACK_MENU);
-	
+
 	m_menu_stack.pop_back();
+    if( m_current_menu ) m_current_menu->lockInput();
     m_change_menu = true;
 }
 
@@ -136,7 +137,7 @@ void MenuManager::update()
 			pair<MenuManagerIDs, int> saved = m_menu_stack.back();
             MenuManagerIDs id = saved.first;
 			int saved_widget = saved.second;
-			
+
             switch (id)
             {
             case MENUID_MAINMENU:
@@ -264,7 +265,6 @@ void MenuManager::switchToGrandPrixEnding()
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_change_menu = true;
 
     m_menu_stack.clear();
     pushMenu(MENUID_GRANDPRIXEND);
@@ -300,7 +300,6 @@ void MenuManager::switchToMainMenu()
         delete m_current_menu;
         m_current_menu= NULL;
     }
-    m_change_menu = true;
 
     m_menu_stack.clear();
     pushMenu(MENUID_MAINMENU);

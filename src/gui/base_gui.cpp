@@ -42,10 +42,11 @@ BaseGUI::animateWidget(const int PREV_SELECTED_WGT, const int SELECTED_WGT)
 void
 BaseGUI::handle(GameAction action, int value)
 {
+    if( m_locked ) return;
+
     // Skip on keypress, act on keyrelease only.
-    if (value)
-        return;
-	
+    if (value) return;
+
 	int previous = widget_manager->getSelectedWgt();
 
     switch ( action )
@@ -53,7 +54,7 @@ BaseGUI::handle(GameAction action, int value)
     case GA_CURSOR_LEFT:
 		animateWidget(previous,
 					  widget_manager->handleLeft());
-		
+
 		break;
     case GA_CURSOR_RIGHT:
 		animateWidget(previous,
@@ -100,6 +101,8 @@ BaseGUI::handle(GameAction action, int value)
 void
 BaseGUI::inputPointer(int x, int y)
 {
+    if( m_locked ) return;
+
     const int PREV_SELECTED_WGT = widget_manager->getSelectedWgt();
     const int SELECTED_WGT = widget_manager->handlePointer( x, y );
 

@@ -28,7 +28,7 @@ class BaseGUI
 	void animateWidget(const int, const int);
 		
 public:
-    BaseGUI() {}
+    BaseGUI() : m_locked(false) {}
     virtual ~BaseGUI() {}
 
     virtual void update(float dt);
@@ -42,9 +42,17 @@ public:
 
     void inputPointer(int x, int y);
 
+    //At times, we want to make sure that we won't be getting any kind of
+    //input to the gui, for example, during transitions from one screen
+    //to another. At those times, it's best to lock the input and unlock it
+    //afterwards.
+    void lockInput() { m_locked = true; }
+    void unlockInput() { m_locked = false; }
+
     void  TimeToString(const double time, char *s);
 protected:
 
+    bool m_locked;
     int m_menu_id;
 };
 
