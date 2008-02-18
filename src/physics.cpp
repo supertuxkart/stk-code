@@ -91,7 +91,10 @@ void Physics::update(float dt)
     // are stored in a vector, but only one entry per collision pair
     // of objects.
     m_all_collisions.clear();
-    m_dynamics_world->stepSimulation(dt);
+
+    // Maximum of three substeps. This will work for framerate down to
+    // 20 FPS (bullet default frequency is 60 HZ).
+    m_dynamics_world->stepSimulation(dt, 3);
 
     // Now handle the actual collision. Note: rockets can not be removed
     // inside of this loop, since the same rocket might hit more than one
@@ -216,7 +219,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 #if defined(WIN32) && !defined(__CYGWIN__)
                 0  // avoid VS compiler warning while the above statement is commented out
 #endif
-	        ;
+                 ;
         }
         // 2) object a is a kart
         // =====================
