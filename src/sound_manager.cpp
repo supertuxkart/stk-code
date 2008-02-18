@@ -190,9 +190,21 @@ void SoundManager::playMusic(const std::string& filename)
         return;
     }
 
+    m_current_music->playMusic();
+
     // Read up to two lines from the corresponding .readme file: first one 
     // the title, second the composer. This is then displayed by the race gui
-    std::string name_readme = loader->getPath(StringUtils::without_extension(filename)+".readme");
+    std::string name_readme;
+    try
+    {
+        name_readme = loader->getPath(
+                            StringUtils::without_extension(filename)+".readme");
+    }
+    catch(std::exception)
+    {
+        // Silently ignore any missing .readme files, m_description was cleared above
+        return;
+    }
     std::ifstream f(name_readme.c_str());
     if(f)
     { 
@@ -201,7 +213,6 @@ void SoundManager::playMusic(const std::string& filename)
         std::getline(f,s); if(!f.eof()) m_description.push_back(s);
         f.close();
     }
-    m_current_music->playMusic();
 }   // playMusic
 
 //-----------------------------------------------------------------------------
