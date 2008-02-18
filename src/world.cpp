@@ -496,7 +496,7 @@ void World::updateRaceStatus(float dt)
         m_phase = FINISH_PHASE;
 	if(user_config->m_profile<0)  // profiling number of laps -> print stats
         {
-	  float min_t=999999.9, max_t=0.0, av_t=0.0;
+	  float min_t=999999.9f, max_t=0.0, av_t=0.0;
             for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
             {
                 max_t = std::max(max_t, m_kart[i]->getFinishTime());
