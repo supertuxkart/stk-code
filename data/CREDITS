@@ -14,7 +14,8 @@ Project Leaders
 Additional coding
 --------------------
    Robert Schuster 
-         - IO handling
+         - user settings updates
+         - input handling
          - SDL port
          - bug fixes
 
