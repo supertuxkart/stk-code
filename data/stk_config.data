@@ -22,7 +22,7 @@
  (anvil-time                 2.0 )  ;; time an anvil is active
  (zipper-time                5.0 )  ;; time a zipper is active
  (zipper-force             800.0 )  ;; additional zipper force
- (shortcut-road-distance    23.0 )  ;; max. distance from side of road to be still 
+ (shortcut-road-distance  9999.0 )  ;; max. distance from side of road to be still 
                                     ;; considered on the road (otherwise shortcut)
                                     ;; usually 5 is a good value, but for the math class
                                     ;; we have to use at least 21(!!)
