@@ -16,6 +16,7 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btVector3.h
 
 libbulletcollision_a_SOURCES := \
+	btBulletCollisionCommon.h						 \
 	BulletCollision/BroadphaseCollision/btAxisSweep3.cpp			 \
 	BulletCollision/BroadphaseCollision/btAxisSweep3.h			 \
 	BulletCollision/BroadphaseCollision/btBroadphaseInterface.h		 \
@@ -43,7 +44,7 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp	 \
-	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm..h	 \
+	BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp	 \
 	BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h	 \
 	BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp		 \
@@ -157,6 +158,8 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h
 
 libbulletdynamics_a_SOURCES	= \
+	Bullet-C-Api.h					 			 \
+	btBulletDynamicsCommon.h			 			 \
 	BulletDynamics/ConstraintSolver/btConeTwistConstraint.cpp		 \
 	BulletDynamics/ConstraintSolver/btConeTwistConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btConstraintSolver.h			 \

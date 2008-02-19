@@ -1,6 +1,6 @@
 dnl Process this file with autogen.sh to produce a configure script.
 
-AC_INIT
+AC_INIT(supertuxkart, SVN)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
 dnl Require at least automake 2.59
@@ -11,7 +11,7 @@ dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 dnl ================================================
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE(supertuxkart, SVN)
+AM_INIT_AUTOMAKE([tar-ustar])
 
 
 dnl =====================================================
