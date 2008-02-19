@@ -89,7 +89,7 @@ TrackSel::TrackSel()
     widget_manager->hideWgtText(WTOK_IMG1);
     widget_manager->breakLine();
 
-    widget_manager->addWgt( WTOK_AUTHOR, 80, 7 );
+    widget_manager->addWgt( WTOK_AUTHOR, 80, 9 );
     widget_manager->setWgtText( WTOK_AUTHOR, "No track selected" );
     widget_manager->setWgtTextSize( WTOK_AUTHOR, WGT_FNT_MED );
 
