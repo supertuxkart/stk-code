@@ -1,3 +1,15 @@
+SuperTuxKart 0.4 (February 2008)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* New physics handling using the bullet physics engine
+* New kart: wilber
+* Improved 'Shifting Sands' and 'Lighthouse' tracks
+* Improved AI
+* New GUI handling, including resolution switching GUI
+* Improved input handling	
+* Jump and look-back featue
+* Additional music and main theme
+	
+	
 SuperTuxKart 0.3 (May 2007)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Highscore lists	

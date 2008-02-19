@@ -1,9 +1,8 @@
-Super TuxKart - 0.3
-==========================
-Super TuxKart is a new and improved version
-of tuxkart.
+SuperTuxKart - 0.4 RC 1
+=====================
+Super TuxKart is fun kart racing game.
 
-http://supertuxkart.berlios.de/
+http://sourceforge.net/supertuxkart
 
 Project Leaders
 -----------------
@@ -14,28 +13,56 @@ Project Leaders
 
 Additional coding
 --------------------
+   Robert Schuster 
+         - IO handling
+         - SDL port
+         - bug fixes
+
+   Paul Elms (scifly)
+         - bug fixes
+         - change resoluton gui
+
+   Hans Dzaack (Hans the farmer)
+         - physics tuning
+
+   Maik Semder (Ikework)
+         - Bugfixes
+
    Canarix
          - User interface
          - Testing
+
+   Damien
+         - Ogg vorbis support
 
    Patrick Ammann
          - bug fixes, code cleanup
          - OpenAL support
 
-   Robert Schuster 
-         - SDL port
-         - bug fixes
-
-   Damien
-         - Ogg vorbis support
    
 Artists
 ---------------
+   SuperTuxKart Music Theme
+          - Weirwood
+
+   Additional music
+          - Weirwood
+          - Lukas Siewert (Dr.Sternhagel)
+          - Paul Esra Martin (P@ule)
+          - Asha B.
+          - ??? (KingArthur's Castle)
+
+   3D track improvements (Shifting Sands, Lighthouse)
+         - Marianne Gagnon (auria)
+
    Island track creation
          - Johannes Sjolund
 
    2D art
          - Canarix
+
+   Wilber kart
+         - Marianne Gagnon (auria)
 
    Hexley the platypus creation
          - Frederico de Oliveira Linhares
@@ -55,14 +82,16 @@ Support for Mac-Linux-PPC
 
 Playtester
 ----------
-   Too many friendly people at the 
-   Games4Mac Forum to list them all
-   (http://community.games4mac.de)
+   - Constantin Pelikan
+   - Too many friendly people at the 
+     Games4Mac Forum to list them all
+     (http://community.games4mac.de)
 
 Donations
 ---------
    - Michael Roessner
      http://www.retrax.de
+
 
 Previous releases
 =================
