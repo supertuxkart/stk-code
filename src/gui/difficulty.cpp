@@ -28,7 +28,7 @@ enum WidgetTokens
     WTOK_TITLE,
 
     WTOK_HARD,
-    WTOK_MEDIUM,
+    //    WTOK_MEDIUM,
     WTOK_EASY,
 
     WTOK_QUIT
@@ -53,8 +53,8 @@ Difficulty::Difficulty()
     widget_manager->addWgt(WTOK_HARD, 60, 7);
     widget_manager->setWgtText(WTOK_HARD, _("Racer"));
 
-    widget_manager->addWgt(WTOK_MEDIUM, 60, 7);
-    widget_manager->setWgtText(WTOK_MEDIUM, _("Driver"));
+    //widget_manager->addWgt(WTOK_MEDIUM, 60, 7);
+    //widget_manager->setWgtText(WTOK_MEDIUM, _("Driver"));
 
     widget_manager->addWgt(WTOK_EASY, 60, 7);
     widget_manager->setWgtText(WTOK_EASY, _("Novice"));
@@ -80,10 +80,10 @@ void Difficulty::select()
         race_manager->setDifficulty(RD_EASY);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
-    case WTOK_MEDIUM:
-        race_manager->setDifficulty(RD_MEDIUM);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1);
-        break;
+	//    case WTOK_MEDIUM:
+	//        race_manager->setDifficulty(RD_MEDIUM);
+	//        menu_manager->pushMenu(MENUID_CHARSEL_P1);
+	//        break;
     case WTOK_HARD:
         race_manager->setDifficulty(RD_HARD);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
