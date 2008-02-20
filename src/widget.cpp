@@ -380,11 +380,11 @@ bool Widget::createRect(int radius)
     //TODO: show warning if text > rect
     if(radius > m_width * 0.5)
     {
-        std::cerr << "Warning: widget's radius > half width.\n";
+      //std::cerr << "Warning: widget's radius > half width.\n";
     }
     if(radius > m_height * 0.5)
     {
-        std::cerr << "Warning: widget's radius > half height.\n";
+      // std::cerr << "Warning: widget's radius > half height.\n";
     }
     if(radius < 1)
     {
