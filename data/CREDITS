@@ -32,6 +32,9 @@ Additional coding
    Stephan Wiefling
          - Menu sounds
 
+   Sam Clarke
+         - Windows Installer
+   
    Canarix
          - User interface
          - Testing
@@ -43,7 +46,6 @@ Additional coding
          - bug fixes, code cleanup
          - OpenAL support
 
-   
 Artists
 ---------------
    SuperTuxKart Music Theme
