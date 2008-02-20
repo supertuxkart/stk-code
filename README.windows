@@ -1,3 +1,19 @@
+NOTE
+====
+If you have downloaded the 0.4rc1 version and it does not start, please 
+install the Microsoft Visual C++ redistributable package ('vcredist_x86.exe')
+included in this directory.
+
+If you don't hear any sound, you have to install OpenAL (see http://ww.openal.org).
+Simply install the OpenAL redistributable ('oalinst.exe').
+
+We hope to have a full installer ready for the release, which will automatically
+do these steps for you.
+
+
+If you are downloading a source version and want to compile it yourself:
+
+
 There are two documented ways to compile an executable for windows: using
 cygwin, and using visual c++ (tested with the free Express version).
 
