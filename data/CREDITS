@@ -1,6 +1,6 @@
 SuperTuxKart - 0.4 RC 1
 =====================
-Super TuxKart is fun kart racing game.
+Super TuxKart is a fun kart racing game.
 
 http://sourceforge.net/supertuxkart
 
@@ -14,17 +14,17 @@ Project Leaders
 Additional coding
 --------------------
    Robert Schuster 
-         - user settings updates
-         - input handling
+         - User settings updates
+         - Input handling
          - SDL port
-         - bug fixes
+         - Bug fixes
 
    Paul Elms (scifly)
-         - bug fixes
-         - change resoluton gui
+         - Bug fixes
+         - Change resoluton gui
 
    Hans Dzaack (Hans the farmer)
-         - physics tuning
+         - Physics tuning
 
    Maik Semder (Ikework)
          - Bugfixes
@@ -43,7 +43,7 @@ Additional coding
          - Ogg vorbis support
 
    Patrick Ammann
-         - bug fixes, code cleanup
+         - Bug fixes, code cleanup
          - OpenAL support
 
 Artists
