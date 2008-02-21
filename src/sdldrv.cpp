@@ -216,7 +216,7 @@ void drv_deinit()
     for (int i=0;i<NUM_STICKS;i++)
         delete stickInfos[i];
 
-    delete stickInfos;
+    delete [] stickInfos;
 
     SDL_FreeSurface(mainSurface);
 
