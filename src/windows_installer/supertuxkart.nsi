@@ -1,13 +1,18 @@
-;Before you start you will need the shelllink plugin for NSIS
+; Before you start you will need the shelllink plugin for NSIS
+; Download it from the nsis webpage, and unzip it in the NSIS
+; install dir.
 ;
-;To use just put this in a directory below the supertuxkart directory
-;which should be called "supertuxkart" and then copy the
-;GPL in the supertuxkart directory to 'license.txt'.
+; To use just put this in a directory below the supertuxkart directory
+; which should be called "supertuxkart" and then copy the
+; GPL in the supertuxkart directory to 'license.txt'.
+; Next to supertuxkart create a subdirectory called 'prerequisites'
+; and copy the VC++ (vcredist_x86.exe) and OpenAL (oalinst.exe) 
+; redistributables.
 ; You will then need to make an icon, you can use:
-;http://tools.dynamicdrive.com/favicon/ to convert a png to an icon.
-;Once you have made an icon put it in the supertuxkart dir and call it
-;icon.ico. You will need to do the same for install.ico nd uninstall.ico
-;Once there done then all you need to do is compile with NSIS.
+; http://tools.dynamicdrive.com/favicon/ to convert a png to an icon.
+; Once you have made an icon put it in the supertuxkart dir and call it
+; icon.ico. You will need to do the same for install.ico nd uninstall.ico
+; Once there done then all you need to do is compile with NSIS.
 
 ;--------------------------------
 ;Include Modern UI
@@ -102,16 +107,29 @@ Section "Main Section" SecMain
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Run.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
-;NECJH;    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\Run.lnk 0
+    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\Run.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
 
+Section -Prerequisites
+  SetOutPath $INSTDIR\Prerequisites
+  MessageBox MB_YESNO "Install Microsoft VC++ runtime libraries?" /SD IDYES IDNO endVC
+    File "prerequisites\vcredist_x86.exe"
+    ExecWait "$INSTDIR\prerequisites\vcredist_x86.exe"
+    Goto endVC
+  endVC:
+  MessageBox MB_YESNO "Install OpenAL sound libraries?" /SD IDYES IDNO endOA
+    File "prerequisites\oalinst.exe"
+    ExecWait "$INSTDIR\prerequisites\oalinst.exe"
+    Goto endOA
+  endOA:
+SectionEnd
 ;--------------------------------
 ;Uninstaller Section
 
-Section "Uninstall"
+Section "Uninstall"redist
 
   ;Removes all the supertuxkart data files
   RMDir /r /REBOOTOK $INSTDIR
