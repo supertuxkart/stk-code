@@ -296,6 +296,7 @@ void Kart::createPhysics(ssgEntity *obj)
 Kart::~Kart() 
 {
     if(m_smokepuff) delete m_smokepuff;
+    if(m_smoke_system != NULL) delete m_smoke_system;
 
     sgMat4 wheel_steer;
     sgMakeIdentMat4(wheel_steer);
@@ -358,6 +359,7 @@ void Kart::reset()
     m_lap_start_time       = -1.0f;
     m_time_at_last_lap     = 99999.9f;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
+    m_is_shortcut          = false;
     m_race_position        = 9;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
