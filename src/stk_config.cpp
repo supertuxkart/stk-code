@@ -107,7 +107,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
     CHECK_NEG(m_zipper_time,               "zipper-time"                );
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
-    CHECK_NEG(m_max_road_distance,         "shortcut-road-distance"     );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
@@ -131,8 +130,7 @@ void STKConfig::init_defaults()
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
     m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] =
     m_parachute_time = m_bomb_time = m_bomb_time_increase= m_anvil_time = 
-    m_zipper_time = m_zipper_force = 
-    m_parachute_time_other = m_max_road_distance = m_shortcut_segments =
+    m_zipper_time = m_zipper_force = m_parachute_time_other = m_shortcut_segments =
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
@@ -155,7 +153,6 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     // Get the values which are not part of the default KartProperties
     // ---------------------------------------------------------------
     lisp->get("anvil-weight",                 m_anvil_weight        );
-    lisp->get("shortcut-road-distance",       m_max_road_distance   );
     lisp->get("shortcut-skipped-segments",    m_shortcut_segments   );
     lisp->get("anvil-speed-factor",           m_anvil_speed_factor  );
     lisp->get("parachute-friction",           m_parachute_friction  );

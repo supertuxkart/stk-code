@@ -47,7 +47,7 @@ public:
         const;
 
     void       addSearchPath(const std::string& path);
-    void       addSearchPath(const char* path);
+    void       addSearchPath(const char* path) {addSearchPath(std::string(path)); }
     void       initConfigDir();
     ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true);
     void       setCallbackType(CallbackType t)   {m_current_callback_type=t;}

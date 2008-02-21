@@ -357,9 +357,7 @@ void Kart::reset()
     m_race_lap             = -1;
     m_lap_start_time       = -1.0f;
     m_time_at_last_lap     = 99999.9f;
-    m_shortcut_count       = 0;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
-    m_shortcut_type        = SC_NONE;
     m_race_position        = 9;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -430,10 +428,7 @@ void Kart::reset()
 void Kart::doLapCounting ()
 {
     bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f;
-    if (  newLap   &&
-         (world->m_race_setup.m_difficulty==RD_EASY                         ||
-          world->m_race_setup.m_difficulty==RD_MEDIUM && m_shortcut_count<2 ||
-          world->m_race_setup.m_difficulty==RD_HARD   && m_shortcut_count<1   ) )
+    if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
         // kart hasn't already finished the race (otherwise the race_gui
@@ -444,7 +439,7 @@ void Kart::doLapCounting ()
             m_race_lap++ ;
         }
 
-        m_shortcut_count = 0;
+        m_is_shortcut = false;
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
         if(m_lap_start_time>=0.0)
@@ -482,17 +477,6 @@ void Kart::doLapCounting ()
             }
         }
         m_lap_start_time = world->getTime();
-    }
-    else if ( newLap )
-    {
-        // Might happen if the option menu is called
-        RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-        if(m)
-        {
-            m->addMessage(_("Lap not counted"),  this, 2.0f, 60);
-            m->addMessage(_("(shortcut taken)"), this, 2.0f, 60);
-        }
-        m_shortcut_count = 0;
     }
     else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
     {
@@ -675,18 +659,11 @@ void Kart::update (float dt)
         world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
 
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(m_shortcut_type!=SC_SKIPPED_SECTOR && !m_rescue)
+    if(!m_is_shortcut && !m_rescue)
     {
         if(world->m_track->isShortcut(prev_sector, m_track_sector))
         {
-            // Skipped sectors are more severe then getting outside the 
-            // road, so count this as two. But if the kart is already
-            // outside the track, only one is added (since the outside
-            // track shortcut already added 1).
-            
-            // This gets subtracted again when doing the rescue
-            m_shortcut_count+= m_shortcut_type==SC_NONE ? 2 : 1;
-            m_shortcut_type  = SC_SKIPPED_SECTOR;
+            m_is_shortcut = true;
             if(isPlayerKart())
             {
                 forceRescue();  // bring karts back to where they left the track.
@@ -701,7 +678,7 @@ void Kart::update (float dt)
     {   // The kart is already doing a skipped sector --> reset
         // the flag, since from now on (it's on a new sector) it's
         // not a shortcut anymore.
-        m_shortcut_type=SC_NONE;
+        m_is_shortcut=false;
     }
 
     if (m_track_sector == Track::UNKNOWN_SECTOR && !m_rescue)
@@ -722,29 +699,7 @@ void Kart::update (float dt)
     int sector = world->m_track->spatialToTrack( m_curr_track_coords, 
                                                  m_curr_pos.xyz,
                                                  m_track_sector      );
-    // If the kart is more thanm_max_road_distance away from the border of
-    // the track, the kart is considered taking a shortcut (but not on level
-    // easy, and not while being rescued)
 
-    if(world->m_race_setup.m_difficulty             != RD_EASY               &&
-       !m_rescue                                                             &&
-       m_shortcut_type                              != SC_SKIPPED_SECTOR     &&
-         fabsf(m_curr_track_coords[0])-stk_config->m_max_road_distance 
-         >  m_curr_track_coords[2] ) 
-    {
-        m_shortcut_sector = sector;
-        // Increase the error count the first time this happens
-        if(m_shortcut_type==SC_NONE)
-            m_shortcut_count++;
-        m_shortcut_type   = SC_OUTSIDE_TRACK;
-    }
-    else 
-    {
-        // Kart was taking a shortcut before, but it finished. So increase the
-        // overall shortcut count.
-        if(m_shortcut_type == SC_OUTSIDE_TRACK) 
-            m_shortcut_type = SC_NONE;
-    }
     doLapCounting () ;
     processSkidMarks();
 }   // update
@@ -943,17 +898,15 @@ float Kart::NormalizedLateralForce(float alpha, float corner) const
 }   // NormalizedLateralForce
 
 //-----------------------------------------------------------------------------
-void Kart::forceRescue()
+void Kart::forceRescue(bool is_shortcut)
 {
     m_rescue=true;
     // If rescue is triggered while doing a shortcut, reset the kart to the
     // segment where the shortcut started!! And then reset the shortcut
     // flag, so that this shortcut is not counted!
-    if(m_shortcut_type!=SC_NONE)
+    if(is_shortcut)
     {
         m_track_sector   = m_shortcut_sector;
-        m_shortcut_count-= m_shortcut_type==SC_OUTSIDE_TRACK ? 1 : 2;
-        m_shortcut_type  = SC_NONE;
     } 
 }   // forceRescue
 //-----------------------------------------------------------------------------

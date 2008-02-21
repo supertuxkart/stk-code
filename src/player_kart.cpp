@@ -240,14 +240,5 @@ void PlayerKart::addMessages()
         }  // if angle is too big
     }  // if difficulty easy
 
-    // 2) Check if a shortcut is currently be taken
-    // --------------------------------------------
-
-    if(world->m_race_setup.m_difficulty != RD_EASY      && 
-       m_shortcut_type                  == SC_OUTSIDE_TRACK)
-    {
-        m->addMessage(_("Invalid short-cut!"), this, -1.0f, 60);
-    }
-
 }   // addMessages
 /* EOF */

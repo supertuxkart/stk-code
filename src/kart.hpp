@@ -91,12 +91,9 @@ protected:
     float        m_lap_start_time;     // Time at start of a new lap
     float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
-    int          m_shortcut_count;     // counts number of times a shortcut is used
+
+    bool         m_is_shortcut;        // true if the kart is taking a shortcut
     int          m_shortcut_sector;    // segment on which the shortcut was started
-    enum        {SC_NONE,              // no shortcut
-                 SC_SKIPPED_SECTOR,    // skipped too many sectors
-                 SC_OUTSIDE_TRACK}     // too far away from tracj
-                 m_shortcut_type  ;    // what kind of shortcut was detected
 
     // physics parameters, storing it saves time
     btRaycastVehicle::btVehicleTuning  *m_tuning;
@@ -167,7 +164,6 @@ public:
     int            getPosition         () const { return  m_race_position ;      }
     void           setFinishingState(float time);
     float          getFinishTime       () const  { return m_finish_time;         }
-    bool           isTakingShortcut    () const  { return m_shortcut_type!=SC_NONE;}
     bool           raceIsFinished      () const  { return m_finished_race;       }
     void           endRescue           ();
     float          estimateFinishTime  ();
@@ -233,7 +229,7 @@ public:
     bool           isRescue         () const {return m_rescue;}
     void           resetBrakes      ();
     void           adjustSpeedWeight(float f);
-    void           forceRescue      ();
+    void           forceRescue      (bool is_rescue=false);
     void           handleExplosion  (const sgVec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }

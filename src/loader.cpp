@@ -126,12 +126,6 @@ void Loader::addSearchPath(const std::string& PATH)
 }   // addSearchPath
 
 //-----------------------------------------------------------------------------
-void Loader::addSearchPath(const char* PATH)
-{
-    m_search_path.push_back(std::string(PATH));
-}   // addSearchPath
-
-//-----------------------------------------------------------------------------
 void Loader::initConfigDir()
 {
 #ifdef WIN32

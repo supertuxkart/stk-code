@@ -38,7 +38,6 @@ public:
     float m_anvil_time;              // time an anvil is active
     float m_zipper_time;             // duration a zipper is active
     float m_zipper_force;            // additional force added to the acceleration
-    float m_max_road_distance;       // max distance from road to be still ON road
     float m_shortcut_segments;       // skipping more than this number of segments is
                                      // considered to be a shortcut
     float m_explosion_impulse;       // impulse affecting each non-hit kart
