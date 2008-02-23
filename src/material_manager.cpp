@@ -22,6 +22,8 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
+#include "string_utils.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #  define strdup _strdup
@@ -65,20 +67,17 @@ void MaterialManager::reInit()
 //-----------------------------------------------------------------------------
 void MaterialManager::loadMaterial()
 {
-    // Create the default/empty material. The Material
-    // constructor will add the material to (this) material_manager
-    new Material ();
+    // Create the default/empty material.
+    m_materials.push_back(new Material((int)m_materials.size()));
 
-    char fname [ 1000 ] ;
-
-    sprintf ( fname, "data/materials.dat" ) ;
+    std::string fname="data/materials.dat";
     std::string path = loader->getPath(fname);
-    FILE *fd = fopen ( path.c_str(), "r" ) ;
+    FILE *fd = fopen(path.c_str(), "r" );
 
     if ( fd == NULL )
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", fname);
+        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", fname.c_str());
         throw std::runtime_error(msg);
     }
 
@@ -125,7 +124,7 @@ char* MaterialManager::parseFileName(char **str)
     *str = ++p ;
 
     return f ;
-}
+}   // parseFilename
 
 //-----------------------------------------------------------------------------
 int MaterialManager::parseMaterial ( FILE *fd )
@@ -145,19 +144,19 @@ int MaterialManager::parseMaterial ( FILE *fd )
 
         if ( f != NULL )
         {
-            new Material ( f, s ) ;
+            m_materials.push_back(new Material (f, s, (int)m_materials.size() ));
             return true ;
         }
     }
 
     return false ;
-}
+}   // parseMaterial
 
 //-----------------------------------------------------------------------------
 Material *MaterialManager::getMaterial ( ssgLeaf *l )
 {
     return m_materials[l -> getExternalPropertyIndex ()] ;
-}
+}   // getMaterial
 
 //-----------------------------------------------------------------------------
 Material *MaterialManager::getMaterial ( const char* fname )
@@ -174,84 +173,24 @@ Material *MaterialManager::getMaterial ( const char* fname )
     }
 
     //This copy is made so the original fname is not modified
-    char *fname_copy = strdup(fname);
-    const char *fn;
-    /* Remove all leading path information. */
+    std::string basename=StringUtils::basename(fname);
 
-    for ( fn = & fname_copy [ strlen ( fname_copy ) - 1 ] ;
-          fn != fname_copy && *fn != '/' ; fn-- )
-        /* Search back for a '/' */ ;
-
-    if ( *fn == '/' )
-        fn++ ;
-
-    char basename [ 1024 ] ;
-
-    strcpy ( basename, fn ) ;
-
-    /* Remove last trailing extension. */
-
-    char* fno;
-    for ( fno = & basename [ strlen ( basename ) - 1 ] ; fno != basename &&
-          *fno != '.' ; fno-- )
-        /* Search back for a '.' */ ;
-
-    if ( *fno == '.' )
-        *fno = '\0' ;
-
-
-    char *fname2;
-
-    for ( int i = 0 ; i < getNumEntities () ; i++ )
+    for(unsigned int i = 0 ; i < m_materials.size(); i++ )
     {
-        fname2 = m_materials[i]-> getTexFname () ;
-
-        if ( fname2 != NULL && fname2[0] != '\0' )
-        {
-            char *fn2 ;
-
-            /* Remove all leading path information. */
-
-            for ( fn2 = & fname2 [ strlen ( fname2 ) -1 ] ; fn2 != fname2 &&
-                  *fn2 != '/' ; fn2-- )
-                /* Search back for a '/' */ ;
-
-            if ( *fn2 == '/' )
-                fn2++ ;
-
-            char basename2 [ 1024 ] ;
-
-            strcpy ( basename2, fn2 ) ;
-
-            /* Remove last trailing extension. */
-
-            for ( fn2 = & basename2 [ strlen ( basename2 ) - 1 ] ; fn2 != basename2 &&
-                  *fn2 != '.' ; fn2-- )
-                /* Search back for a '.' */ ;
-
-            if ( *fn2 == '.' )
-                *fn2 = '\0' ;
-            if ( strcmp ( basename, basename2 ) == 0 )
-            {
-                free(fname_copy);
-                return m_materials[i] ;
-            }
-        }
+        if(m_materials[i]->getTexFname()==basename) return m_materials[i];
     }
 
-    // Add the material: the material constructor adds the material
-    // to (this) material_manager.
-    Material* m=new Material(fname,"");
-    // Since fn is a pointer into fname_copy, fname_copy must be freed
-    // here, not earlier.
-    free(fname_copy);
+    // Add the new material
+    Material* m=new Material(fname,"", (int)m_materials.size());
+    m_materials.push_back(m);
+
     return m ;
-}
+}   // getMaterial
 
 //=============================================================================
 ssgState *getAppState ( char *fname )
 {
     Material *m = material_manager->getMaterial ( fname ) ;
     return ( m == NULL ) ? NULL : m -> getState () ;
-}
+}   // getAppState
 

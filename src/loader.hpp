@@ -39,7 +39,7 @@ public:
     ~Loader();
 
     virtual void makeModelPath(char* path, const char* fname) const;
-    virtual void makeTexturePath(char* path, const char* fname) const;
+    std::string getTexture(const std::string& fname) const;
 
     std::string getPath(const char* name) const;
     std::string getPath(const std::string name) const {return getPath(name.c_str());}

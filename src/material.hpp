@@ -20,41 +20,39 @@
 #ifndef HEADER_MATERIAL_H
 #define HEADER_MATERIAL_H
 
+#include <string>
 #include <plib/ssg.h>
 
 class Material
 {
-    ssgSimpleState *m_state ;
-    ssgCallback m_predraw ;
-    ssgCallback m_postdraw ;
+private:
+    ssgSimpleState *m_state;
+    ssgCallback     m_predraw;
+    ssgCallback     m_postdraw;
+    int             m_index;
+    std::string     m_texname;
+    bool            m_collideable;
+    bool            m_zipper;
+    bool            m_resetter;
+    bool            m_ignore;
+    int             m_clamp_tex;
+    bool            m_lighting;
+    bool            m_sphere_map;
+    bool            m_transparency;
+    float           m_alpha_ref;
+    float           m_friction;
 
-    int   m_index ;
+    bool  parseBool  ( char **p );
+    int   parseInt   ( char **p );
+    float parseFloat ( char **p );
 
-    char *m_texname      ;
-
-    bool  m_collideable  ;
-    bool  m_zipper       ;
-    bool  m_resetter     ;
-    bool  m_ignore       ;
-
-    int   m_clamp_tex    ;
-    bool  m_lighting     ;
-    bool  m_sphere_map   ;
-    bool  m_transparency ;
-    float m_alpha_ref    ;
-    float m_friction     ;
-
-    bool  parseBool  ( char **p ) ;
-    int   parseInt   ( char **p ) ;
-    float parseFloat ( char **p ) ;
-
-    void init    () ;
+    void init    (int index);
     void install () ;
 
 public:
 
-    Material () ;
-    Material (const char *fname, char *description ) ;
+    Material(int index);
+    Material(const std::string& fname, char *description, int index);
 
     ~Material ();
 
@@ -68,12 +66,12 @@ public:
     bool  isCrashable () const { return m_collideable; }
     bool  isReset     () const { return m_resetter;    }
     float getFriction () const { return m_friction;    }
-    char *getTexFname () const { return m_texname;     }
+    const std::string& 
+          getTexFname () const { return m_texname;     }
     int   getIndex    () const { return m_index;       }
     void  apply       ()       { m_state -> apply ();  }
 
     void applyToLeaf ( ssgLeaf *l ) ;
-
 
 } ;
 

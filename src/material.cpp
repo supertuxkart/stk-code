@@ -19,7 +19,6 @@
 
 #include "loader.hpp"
 #include "material.hpp"
-#include "material_manager.hpp"
 
 #define UCLAMP   1
 #define VCLAMP   2
@@ -29,7 +28,7 @@ int clearSpheremap ( ssgEntity * )
     glDisable   ( GL_TEXTURE_GEN_S ) ;
     glDisable   ( GL_TEXTURE_GEN_T ) ;
     return true ;
-}
+}   // clearSpheremap
 
 //=============================================================================
 int setSpheremap ( ssgEntity * )
@@ -39,7 +38,7 @@ int setSpheremap ( ssgEntity * )
     glEnable    ( GL_TEXTURE_GEN_S ) ;
     glEnable    ( GL_TEXTURE_GEN_T ) ;
     return true ;
-}
+}   // setSpheremap
 
 //=============================================================================
 bool Material::parseBool ( char **p )
@@ -53,7 +52,7 @@ bool Material::parseBool ( char **p )
     while ( **p > ' ' && **p != '\0' ) (*p)++ ;
 
     return RES ;
-}
+}   // parseBool
 
 //-----------------------------------------------------------------------------
 int Material::parseInt ( char **p )
@@ -63,7 +62,7 @@ int Material::parseInt ( char **p )
     while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
 
     return strtol ( *p, p, 0 ) ;
-}
+}   // parseInt 
 
 //-----------------------------------------------------------------------------
 float Material::parseFloat ( char **p )
@@ -73,27 +72,25 @@ float Material::parseFloat ( char **p )
     while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
 
     return (float)strtod ( *p, p ) ;
-}
+}   // parseFloat 
 
 //-----------------------------------------------------------------------------
-Material::Material ()
+Material::Material(int index)
 {
-    m_texname = new char [ 1 ] ;
-    m_texname [ 0 ] = '\0' ;
+    m_texname = "";
     m_predraw  = m_postdraw = NULL ;
 
-    init    () ;
-    install () ;
-}
+    init    (index);
+    install ();
+}   // Material
 
 //-----------------------------------------------------------------------------
-Material::Material (const char *fname, char *description )
+Material::Material(const std::string& fname, char *description, int index)
 {
-    m_texname = new char [ strlen ( fname ) + 1 ] ;
-    strcpy ( m_texname, fname ) ;
+    m_texname = fname;
     m_predraw  = m_postdraw = NULL ;
 
-    init () ;
+    init (index);
 
     if(strlen(description)>0)
     {
@@ -111,19 +108,18 @@ Material::Material (const char *fname, char *description )
         m_collideable  = parseBool  ( & description ) ;
     }
     install () ;
-}
+}   // Material
 
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
     ssgDeRefDelete(m_state);
-    delete[] m_texname;
-}
+}   // ~Material
 
 //-----------------------------------------------------------------------------
-void Material::init ()
+void Material::init(int index)
 {
-    m_index = material_manager -> addEntity ( this ) ;
+    m_index        = index ;
     m_clamp_tex    = 0     ;
     m_transparency = false ;
     m_alpha_ref    = 0.1f  ;
@@ -137,11 +133,11 @@ void Material::init ()
 }
 
 //-----------------------------------------------------------------------------
-void Material::applyToLeaf ( ssgLeaf *l )
+void Material::applyToLeaf(ssgLeaf *l)
 {
     if ( m_predraw  ) l -> setCallback ( SSG_CALLBACK_PREDRAW , m_predraw  ) ;
     if ( m_postdraw ) l -> setCallback ( SSG_CALLBACK_POSTDRAW, m_postdraw ) ;
-}
+}   // applyToLeaf
 
 //-----------------------------------------------------------------------------
 void Material::install ()
@@ -156,9 +152,9 @@ void Material::install ()
 
     m_state -> ref () ;
     m_state -> setExternalPropertyIndex ( m_index ) ;
-    if ( m_texname != NULL && m_texname [ 0 ] != '\0' )
+    if ( m_texname.size()>0 )
     {
-        std::string fn=std::string("images")+Loader::DIR_SEPARATOR+m_texname;
+        std::string fn=loader->getTexture(m_texname);
         m_state -> setTexture ( loader->getPath(fn).c_str(), !(m_clamp_tex & UCLAMP),
                               !(m_clamp_tex & VCLAMP) );
         m_state -> enable  ( GL_TEXTURE_2D ) ;

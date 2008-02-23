@@ -114,9 +114,11 @@ void Loader::makeModelPath(char* path, const char* FNAME) const
 }   // makeModelPath
 
 //-----------------------------------------------------------------------------
-void Loader::makeTexturePath(char* path, const char* FNAME) const
+std::string Loader::getTexture(const std::string& FNAME) const
 {
-    makePath(path, getTextureDir(), FNAME);
+    char path[1024];
+    makePath(path, getTextureDir(), FNAME.c_str());
+    return std::string(path);
 }   // makeTexturePath
 
 //-----------------------------------------------------------------------------
@@ -232,8 +234,8 @@ ssgEntity *Loader::load(const std::string& filename, CallbackType t,
                         bool optimise)
 {
     m_current_callback_type=t;
-    ssgEntity *obj = optimise ? ssgLoad(filename.c_str(), this) :
-           ssgLoadAC(filename.c_str(), this);
+    ssgEntity *obj = optimise ? ssgLoad  (filename.c_str(), this) 
+                              : ssgLoadAC(filename.c_str(), this);
     preProcessObj(obj, false);
     return obj;
 }   // load

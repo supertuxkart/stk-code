@@ -185,7 +185,6 @@ public:
     const std::string& getDescription   () const {return m_description;    }
     const std::string& getTopviewFile   () const {return m_top_view;       }
     const std::string& getScreenshotFile() const {return m_screenshot;     }
-    const std::vector<sgVec3Wrapper>& getDriveline () const {return m_driveline;}
     const std::vector<SGfloat>& getWidth() const {return m_path_width;     }
     const std::string& getHerringStyle  () const {return m_herring_style;  }
     void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
