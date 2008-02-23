@@ -122,7 +122,9 @@ supertuxkart_SOURCES =             main.cpp  			\
 	replay_buffers.hpp	   replay_buffers.cpp		\
 	replay_base.hpp		   replay_base.cpp		\
 	replay_player.hpp          replay_player.cpp		\
-	replay_recorder.hpp	   replay_recorder.cpp       
+	replay_recorder.hpp	   replay_recorder.cpp       	\
+	ide/vc8/supertuxkart.sln   ide/vc8/supertuxkart.vcproj	\
+	ide/vc8/bullet_lib.vcproj
 
 
 # Link in the specific gcc 4.1 bug work around
