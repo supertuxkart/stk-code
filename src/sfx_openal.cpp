@@ -39,7 +39,8 @@ SFXImpl::SFXImpl(const char* filename)
 {
     m_soundBuffer= 0;
     m_soundSource= 0;
-    assert(load(filename));
+    bool ok=load(filename);
+    assert(ok);
 }
 
 //-----------------------------------------------------------------------------
@@ -53,6 +54,15 @@ SFXImpl::~SFXImpl()
 void SFXImpl::play()
 {
     alSourcePlay(m_soundSource);
+
+    // Check (and clear) the error flag
+    int error = alGetError();
+
+    if(error != AL_NO_ERROR)
+    {
+        fprintf(stderr, "SFX OpenAL error: %d\n", error);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
