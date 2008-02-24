@@ -58,50 +58,19 @@ void SFXImpl::play()
 //-----------------------------------------------------------------------------
 bool SFXImpl::load(const char* filename)
 {
-    std::string path=  loader->getPath(filename);
+    std::string path = loader->getPath(filename);
 
-    alGenBuffers(1, &m_soundBuffer);
-    if (alGetError() != AL_NO_ERROR) 
-    {
-        fprintf(stderr, "Loading '%s' failed\n",filename); 
-        return false; 
-    }
-    ALenum format= 0;
-    ALsizei size= 0, freq= 0;
-    ALvoid* data= NULL;
-    ALboolean loop= AL_FALSE;
-
-#ifdef __APPLE__
-    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq);
-#else
-    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq, &loop);
-#endif
-
-    if (data == NULL)
+    m_soundBuffer = alutCreateBufferFromFile( path.c_str() );
+    if( m_soundBuffer == AL_NONE )
     {
         fprintf(stderr, "Error 1 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
-    alBufferData(m_soundBuffer, format, data, size, freq);
+    alGenSources(1, &m_soundSource );
     if (alGetError() != AL_NO_ERROR)
     {
         fprintf(stderr, "Error 2 loading SFX: %s failed\n", path.c_str());
-        return false;
-    }
-
-    alutUnloadWAV(format, data, size, freq);
-    if (alGetError() != AL_NO_ERROR)
-    {
-        fprintf(stderr, "Error 3 loading SFX: %s failed\n", path.c_str());
-        return false;
-    }
-
-    // Bind buffer with a source.
-    alGenSources(1, &m_soundSource);
-    if (alGetError() != AL_NO_ERROR)
-    {
-        fprintf(stderr, "Error 4 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
