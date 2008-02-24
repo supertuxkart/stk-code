@@ -135,6 +135,7 @@ tuxkartshadow.rgb \
 tv.rgb \
 usaflag.rgb \
 water.rgb \
+waterfall.rgb \
 water_light.rgb \
 wheel.rgb \
 wilbericon.rgb \
