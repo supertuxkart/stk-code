@@ -413,7 +413,7 @@ echo "Done!"
 e.g.: chmod 744 buildUB.sh
 
 
-3. Download SuperTuxKart-Source from "http://developer.berlios.de/project/showfiles.php?group_id=2765".
+3. Download SuperTuxKart-Source from "http://sourceforge.net/project/showfiles.php?group_id=202302".
 
 
 4. Go in the folder SuperTuxKart.

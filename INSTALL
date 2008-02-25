@@ -48,7 +48,7 @@ install following packages:
 libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
 
 do a:
-$ svn checkout svn://svn.berlios.de/supertuxkart/trunk
+$ svn checkout http://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/trunk/supertuxkart
 
 then:
 $ cd trunk
@@ -72,7 +72,7 @@ If you checked out your copy directly from SVN, you have to run
 
 You should check the SuperTuxKart wiki at:
 
-  http://supertuxkart.berlios.de/wiki
+http://supertuxkart.sourceforge.net/
 
 
 Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
