@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <sys/stat.h>
+#include <string>
 #ifdef WIN32
 #  include <io.h>
 #  include <stdio.h>
@@ -38,16 +39,53 @@
 #include "translation.hpp"
 #include "material_manager.hpp"
 
+#ifdef __APPLE__
+// dynamic data path detection onmac
+#  include <CoreFoundation/CoreFoundation.h>
+
+bool macSetBundlePathIfRelevant(std::string& data_dir)
+{
+    printf("checking whether we are using an app bundle... ");
+    // the following code will enable STK to find its data when placed in an app bundle on mac OS X.
+    // returns true if path is set, returns false if path was not set
+    char path[1024];
+    CFBundleRef main_bundle = CFBundleGetMainBundle(); assert(main_bundle);
+    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle); assert(main_bundle_URL);
+    CFStringRef cf_string_ref = CFURLCopyFileSystemPath( main_bundle_URL, kCFURLPOSIXPathStyle); assert(cf_string_ref);
+    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
+    CFRelease(main_bundle_URL);
+    CFRelease(cf_string_ref);
+    
+    std::string contents = std::string(path) + std::string("/Contents");
+    if(contents.find(".app") != std::string::npos)
+    {
+        printf("yes\n");
+        // executable is inside an app bundle, use app bundle-relative paths
+        data_dir = contents + std::string("/Resources/data");
+        return true;
+    }
+    else
+    {
+        printf("no\n");
+        return false;
+    }
+}
+#endif
+
 Loader* loader = 0;
 
 Loader::Loader()
 {
-    const char *datadir;
+    std::string datadir;
     m_current_callback_type = CB_COLLECTABLE;
 
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
     else
+#ifdef __APPLE__
+        if( macSetBundlePathIfRelevant( datadir ) ) { /* nothing to do */ }
+    else
+#endif
 #ifdef _MSC_VER
         if ( _access ( "data\\tuxtrack.track", 04 ) == 0 )
 #else
@@ -68,7 +106,7 @@ Loader::Loader()
                 datadir = "/usr/local/share/games/supertuxkart" ;
 #endif
     fprintf(stderr, _("Data files will be fetched from: '%s'\n"), 
-            datadir ) ;
+            datadir.c_str() ) ;
     addSearchPath(datadir);
 }  // Loader
 
