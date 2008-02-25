@@ -124,7 +124,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	replay_player.hpp          replay_player.cpp		\
 	replay_recorder.hpp	   replay_recorder.cpp       	\
 	ide/vc8/supertuxkart.sln   ide/vc8/supertuxkart.vcproj	\
-	ide/vc8/bullet_lib.vcproj
+	ide/vc8/bullet_lib.vcproj  ide/vc8/README
 
 
 # Link in the specific gcc 4.1 bug work around
@@ -135,3 +135,5 @@ supertuxkart_LDADD = -L. -lstatic_ssg \
 .PHONY: pot
 pot:
 	xgettext -o supertuxkart.pot -k_ --c++ *.?pp */*.?pp
+
+SUBDIRS = robots

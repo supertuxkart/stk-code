@@ -1,6 +1,6 @@
 To create a robot, here is what you should do:
 
-- There is a template for the robots in the contrib/ directory, modify it
+- There is a template for the robots in the src/robots directory, modify it
   to create your own robot, the files are named empty_robot.cpp and
   empty_robot.hpp .
 - Name your source file <name of robot>_robot.cpp, and your header as

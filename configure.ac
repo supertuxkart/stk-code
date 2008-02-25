@@ -383,11 +383,6 @@ dnl Bullet physics
 dnl ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 CXXFLAGS="$CXXFLAGS -Ibullet/src"
-AC_CONFIG_FILES([         \
-		 src/bullet/Makefile      \
-		 src/bullet/src/Makefile  \
-		 src/bullet/Demos/OpenGL/Makefile
-])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
 
@@ -405,17 +400,23 @@ AC_SUBST(BULLETTREE)
 dnl ================
 dnl Create makefiles
 dnl ================
-AC_CONFIG_FILES([         \
- Makefile                 \
- data/Makefile            \
- fonts/Makefile           \
- images/Makefile          \
- models/Makefile          \
- oggs/Makefile		  \
- src/Makefile             \
- wavs/Makefile            \
- wavs/radio/Makefile      \
- wavs/tintagel/Makefile   \
+AC_CONFIG_FILES([                 \
+ Makefile                         \
+ data/Makefile                    \
+ doc/Makefile                     \
+ doc/players_manual/Makefile      \
+ fonts/Makefile                   \
+ images/Makefile                  \
+ models/Makefile                  \
+ oggs/Makefile		          \
+ src/Makefile                     \
+ src/robots/Makefile              \
+ src/bullet/Makefile              \
+ src/bullet/src/Makefile          \
+ src/bullet/Demos/OpenGL/Makefile \
+ wavs/Makefile                    \
+ wavs/radio/Makefile              \
+ wavs/tintagel/Makefile           \
  models/herrings/Makefile
 ])
 AC_OUTPUT
