@@ -26,20 +26,31 @@
 #include <set>
 #include "callback_manager.hpp"
 
-
 class Loader : public ssgLoaderOptions
 {
-public:
 #ifdef _MSC_VER
     static const char DIR_SEPARATOR='\\';
+#   define            CONFIGDIR     "."
 #else
     static const char DIR_SEPARATOR='/';
+#   define            CONFIGDIR     ".supertuxkart"
 #endif
+
+public:
     Loader();
     ~Loader();
 
-    virtual void makeModelPath(char* path, const char* fname) const;
-    std::string getTexture(const std::string& fname) const;
+    virtual void makeModelPath  (char* path, const char* fname) const;
+    std::string getTextureFile  (const std::string& fname) const;
+    std::string getKartFile     (const std::string& fname) const;
+    std::string getTrackFile    (const std::string& fname) const;
+    std::string getConfigFile   (const std::string& fname) const;
+    std::string getHighscoreFile(const std::string& fname) const;
+    std::string getLogFile      (const std::string& fname) const;
+    std::string getHomeDir      () const;
+#ifdef HAVE_GHOST_REPLAY
+    std::string getReplayFile(const std::string& fname) const;
+#endif
 
     std::string getPath(const char* name) const;
     std::string getPath(const std::string name) const {return getPath(name.c_str());}
@@ -55,7 +66,8 @@ private:
     std::vector<std::string> m_search_path;
     CallbackType             m_current_callback_type;
 
-    void         makePath(char* path, const char* dir, const char* fname) const;
+    void         makePath(std::string& path, const std::string& dir, 
+                          const std::string& fname) const;
     ssgBranch   *createBranch(char *data) const;
     void preProcessObj ( ssgEntity *n, bool mirror );
     ssgBranch   *animInit    (char *data) const;

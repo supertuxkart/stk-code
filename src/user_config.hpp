@@ -49,8 +49,6 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 
-#define CONFIGDIR ".supertuxkart"
-
 class ActionMap;
 
 /*class for managing general tuxkart configuration data*/
@@ -63,7 +61,7 @@ private:
 		Input *inputs;
 	} InputMapEntry;
 		
-    std::string filename;
+    std::string m_filename;
 	
 	/** Stores the GameAction->Input mappings in a way that is suitable for
 	  * quick modification of the mappings. Internally this allows multiple
@@ -165,7 +163,6 @@ public:
     UserConfig();
     UserConfig(const std::string& filename);
     ~UserConfig();
-    std::string getConfigDir     ();
     void setDefaults();
     void setMusic(int m)     { m_music        =  m;        }
     void setSFX  (int m)     { m_sfx          =  m;        }

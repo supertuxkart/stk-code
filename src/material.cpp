@@ -154,7 +154,7 @@ void Material::install ()
     m_state -> setExternalPropertyIndex ( m_index ) ;
     if ( m_texname.size()>0 )
     {
-        std::string fn=loader->getTexture(m_texname);
+        std::string fn=loader->getTextureFile(m_texname);
         m_state -> setTexture ( fn.c_str(), !(m_clamp_tex & UCLAMP),
                               !(m_clamp_tex & VCLAMP) );
         m_state -> enable  ( GL_TEXTURE_2D ) ;

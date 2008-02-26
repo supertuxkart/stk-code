@@ -335,17 +335,7 @@ void World::update(float dt)
 bool World::saveReplayHumanReadable( std::string const &filename ) const
 {
     std::string path;
-    try
-    {
-        path = loader->getPath( ReplayBase::REPLAY_FOLDER );
-    }
-    catch(std::runtime_error& e)
-    {
-        fprintf( stderr, _("Couldn't find replay-path: '%s'\n"), ReplayBase::REPLAY_FOLDER.c_str() );
-        return false;
-    }
-    path += DIR_SEPARATOR + filename + ".";
-    path += ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE;
+    path = loader->getReplayFile(filename+"."+ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
 
     FILE *fd = fopen( path.c_str(), "w" );
     if( !fd ) 
@@ -388,9 +378,8 @@ bool World::loadReplayHumanReadable( std::string const &filename )
     assert( m_p_replay_player );
     m_p_replay_player->destroy();
 
-    std::string path = ReplayBase::REPLAY_FOLDER + DIR_SEPARATOR;
-    path += filename + ".";
-    path += ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE;
+    std::string path = loader->getReplayFile(filename+"."+ 
+            ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
 
     try
     {

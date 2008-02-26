@@ -115,7 +115,7 @@ Loader::~Loader()
 {}   // ~Loader
 
 //-----------------------------------------------------------------------------
-void Loader::makePath(char* path, const char* dir, const char* fname) const
+void Loader::makePath(std::string& path, const std::string& dir, const std::string& fname) const
 {
 
     struct stat mystat;
@@ -123,23 +123,13 @@ void Loader::makePath(char* path, const char* dir, const char* fname) const
     for(std::vector<std::string>::const_iterator i = m_search_path.begin();
         i != m_search_path.end(); ++i)
     {
-        sprintf(path, "%s%c%s%c%s", i->c_str(), DIR_SEPARATOR, dir,
-                DIR_SEPARATOR, fname);
-        // convert backslashes and slashes to the native form
-        const size_t LEN = strlen(path);
-        for(size_t i = 0; i < LEN; ++i)
-            if(path[i] == '\\' || path[i] == '/')
-                path[i] = DIR_SEPARATOR;
-
-        if(stat(path, &mystat) < 0)
-            continue;
-
-        return;
+        path=(*i)+DIR_SEPARATOR+dir+DIR_SEPARATOR+fname;
+        if(stat(path.c_str(), &mystat) >= 0) return;
     }
 
     // error case...
     char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), "Could not find path for '%s'.", fname);
+    snprintf(msg, sizeof(msg), "Could not find path for '%s'.", fname.c_str());
 
     throw std::runtime_error(msg);
 
@@ -148,17 +138,87 @@ void Loader::makePath(char* path, const char* dir, const char* fname) const
 //-----------------------------------------------------------------------------
 void Loader::makeModelPath(char* path, const char* FNAME) const
 {
-    makePath(path, getModelDir(), FNAME);
+    std::string p(path);
+    makePath(p, std::string(getModelDir()), FNAME);
+    strcpy(path, p.c_str());
 }   // makeModelPath
 
 //-----------------------------------------------------------------------------
-std::string Loader::getTexture(const std::string& FNAME) const
+std::string Loader::getTextureFile(const std::string& FNAME) const
 {
-    char path[1024];
+    std::string path;
     makePath(path, getTextureDir(), FNAME.c_str());
-    return std::string(path);
+    return path;
 }   // makeTexturePath
 
+//-----------------------------------------------------------------------------
+std::string Loader::getKartFile(const std::string& fname) const
+{
+    std::string path;
+    makePath(path, "data", fname.c_str());
+    return path;
+}   // getKartFile
+
+//-----------------------------------------------------------------------------
+std::string Loader::getTrackFile(const std::string& fname) const
+{
+    std::string path;
+    makePath(path, "data", fname.c_str());
+    return path;
+}   // getTrackFile
+
+//-----------------------------------------------------------------------------
+std::string Loader::getConfigFile(const std::string& fname) const
+{
+    std::string path;
+    makePath(path, "data", fname.c_str());
+    return path;
+}   // getConfigFile
+
+//-----------------------------------------------------------------------------
+std::string Loader::getHomeDir() const
+{
+    std::string DIRNAME;
+#ifdef WIN32
+    // For now the old windows config way is used: store a config file
+    // in the current directory (in other OS a special subdirectory is created)
+    DIRNAME=".";
+#else
+    if(getenv("HOME")!=NULL)
+    {
+        DIRNAME = getenv("HOME");
+    }
+    else
+    {
+        DIRNAME = ".";
+    }
+    DIRNAME += DIR_SEPARATOR+CONFIGDIR;
+#endif
+    return DIRNAME;
+}   // getHomeDir
+
+//-----------------------------------------------------------------------------
+std::string Loader::getLogFile(const std::string& fname) const
+{
+    return getHomeDir()+DIR_SEPARATOR+fname;
+}   // getConfigFile
+
+//-----------------------------------------------------------------------------
+std::string Loader::getHighscoreFile(const std::string& fname) const
+{
+    return getHomeDir()+DIR_SEPARATOR+fname;
+}   // getHighscoreFile
+
+//-----------------------------------------------------------------------------
+#ifdef HAVE_GHOST_REPLAY
+std::string Loader::getReplayFile(const std::string& fname) const
+{
+    std::string path;
+    makePath(path, "replay", fname.c_str());
+    return path;
+
+}   // getReplayFile
+#endif
 //-----------------------------------------------------------------------------
 void Loader::addSearchPath(const std::string& PATH)
 {
@@ -219,25 +279,20 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
     {
         struct stat mystat;
 
-#ifdef DEBUG
         // don't list directories with a slash on the end, it'll fail on win32
         assert(dir[dir.size()-1] != '/');
-#endif
 
         result.clear();
 
         for(std::vector<std::string>::const_iterator i = m_search_path.begin();
             i != m_search_path.end(); ++i)
         {
-            std::string path = *i;
-            path += DIR_SEPARATOR;
-            path += dir;
+            std::string path = *i+DIR_SEPARATOR+dir;
 
             if(stat(path.c_str(), &mystat) < 0)
                 continue;
             if(! S_ISDIR(mystat.st_mode))
                 continue;
-
 
             ulDir* mydir = ulOpenDir(path.c_str());
             if(!mydir) continue;

@@ -41,6 +41,7 @@
 #include "lisp/writer.hpp"
 #include "translation.hpp"
 #include "race_manager.hpp"
+#include "loader.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -69,40 +70,15 @@ UserConfig::~UserConfig()
 {}
 
 // -----------------------------------------------------------------------------
-std::string UserConfig::getConfigDir()
-{
-    string DIRNAME;
-#ifdef WIN32
-    // For now the old windows config way is used: store a config file
-    // in the current directory (in other OS a special subdirectory is created)
-    DIRNAME = ".";
-#else
-    if(getenv("HOME")!=NULL)
-    {
-        DIRNAME = getenv("HOME");
-    }
-    else
-    {
-        DIRNAME = ".";
-    }
-    DIRNAME += "/";
-    DIRNAME += CONFIGDIR;
-#endif
-    return DIRNAME;
-}  // getConfigDir
-
-// -----------------------------------------------------------------------------
 /**
  * Set the config filename for each platform
  */
 void UserConfig::setFilename()
 {
-    filename = getConfigDir();
-    filename += "/";
 #ifdef WIN32
-    filename += "supertuxkart.cfg";
+    m_filename = loader->getLogFile("supertuxkart.cfg");
 #else
-    filename += "config";
+    m_filename = loader->getLogFile("config");
 #endif
 }   // setFilename
 
@@ -309,7 +285,7 @@ void UserConfig::setDefaults()
  */
 void UserConfig::loadConfig()
 {
-    loadConfig(filename);
+    loadConfig(m_filename);
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
@@ -322,7 +298,7 @@ void UserConfig::loadConfig()
  */
 int UserConfig::CheckAndCreateDir()
 {
-    const std::string DIRNAME = getConfigDir();
+    const std::string DIRNAME = loader->getHomeDir();
     ulDir*      u       = ulOpenDir(DIRNAME.c_str());
     if(u)
     {  // OK, directory exists
@@ -593,7 +569,7 @@ UserConfig::readInput(const lisp::Lisp* r,
 /** Call saveConfig with the default filename for this platform. */
 void UserConfig::saveConfig()
 {
-    saveConfig(filename);
+    saveConfig(m_filename);
 }   // saveConfig
 
 // -----------------------------------------------------------------------------

@@ -145,8 +145,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            std::string filename=std::string("data")+
-                                  Loader::DIR_SEPARATOR+argv[i+1]+".tkkf";
+            std::string filename=loader->getKartFile(std::string(argv[i+1])+".tkkf");
             try
             {
                 std::string s=loader->getPath(filename);
@@ -182,7 +181,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
-            stk_config->load(std::string("data")+Loader::DIR_SEPARATOR+argv[i+1]);
+            stk_config->load(loader->getConfigFile(argv[i+1]));
             fprintf ( stdout, _("STK config will be read from %s.\n"), argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
@@ -399,7 +398,7 @@ void InitTuxkart()
     race_manager->setNumLaps   (3);
     race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
     race_manager->setDifficulty(RD_MEDIUM);
-    stk_config->load(std::string("data")+Loader::DIR_SEPARATOR+ "stk_config.data");
+    stk_config->load(loader->getConfigFile("stk_config.data"));
 }
 
 //=============================================================================
@@ -416,13 +415,10 @@ int main(int argc, char *argv[] )
         
         if (user_config->m_log_errors) //Enable logging of stdout and stderr to logfile
         {
-            std::string logoutfile = user_config->getConfigDir();
-            logoutfile += Loader::DIR_SEPARATOR;
+            std::string logoutfile = loader->getLogFile("stdout.log");
+            std::string logerrfile = loader->getLogFile("stderr.log");
             std::cout << "Error messages and other text output will be logged to " ;
-            std::cout << logoutfile << "stderr.log and stdout.log" << std::endl; 
-            std::string logerrfile = logoutfile;
-            logoutfile += "stdout.log";
-            logerrfile += "stderr.log";
+            std::cout << logoutfile << " and "<<logerrfile;
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
                 fprintf(stderr, "Can not open log file '%s'. Writing to stdout instead.\n",

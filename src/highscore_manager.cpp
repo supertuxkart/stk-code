@@ -55,22 +55,14 @@ void HighscoreManager::SetFilename()
     if ( getenv("SUPERTUXKART_HIGHSCOREDIR") != NULL )
     {
         m_filename = getenv("SUPERTUXKART_HIGHSCOREDIR")
-                 + std::string("/highscores/highscores.data");
+                 + std::string("/highscore.data");
     }
     else 
     {
-        m_filename=user_config->getConfigDir();
+        m_filename=loader->getHighscoreFile("highscore.data");
     }
-    m_filename += "/highscore.data";
 
-    // Set the correct directory separator
-    for(unsigned int i=0; i<m_filename.size(); i++)
-    {
-        if(m_filename[i]=='\\' || m_filename[i]=='/')
-            m_filename[i]=Loader::DIR_SEPARATOR;
-    }
     return;
-
 }   // SetFilename
 
 // -----------------------------------------------------------------------------

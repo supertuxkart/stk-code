@@ -940,12 +940,7 @@ Track::loadDriveline()
 void
 Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
 {
-    std::string path = "data";
-    path += Loader::DIR_SEPARATOR;
-    path += m_ident;
-    path += file_ext;
-    path = loader->getPath(path.c_str());
-
+    std::string path = loader->getTrackFile(m_ident+file_ext);
     FILE *fd = fopen ( path.c_str(), "r" ) ;
 
     if ( fd == NULL )
