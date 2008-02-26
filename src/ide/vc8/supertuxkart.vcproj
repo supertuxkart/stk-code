@@ -982,6 +982,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\num_karts.cpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\num_laps.cpp"
 					>
 				</File>
@@ -1401,6 +1405,10 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\menu_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\num_karts.hpp"
 					>
 				</File>
 				<File

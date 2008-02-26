@@ -235,11 +235,12 @@ void CharSel::select()
         }
     }
 
-    if (race_manager->getRaceMode() != RaceSetup::RM_GRAND_PRIX)
-        menu_manager->pushMenu(MENUID_TRACKSEL);
+    if (race_manager->getRaceMode() == RaceSetup::RM_GRAND_PRIX)
+        menu_manager->pushMenu(MENUID_NUMKARTS);
     else
-        race_manager->start();
-}
+        menu_manager->pushMenu(MENUID_TRACKSEL);
+}   // select
+
 //----------------------------------------------------------------------------
 // Function checks the vector of previously selected karts and returns true if
 // kart i is in the vector and false if it is not.

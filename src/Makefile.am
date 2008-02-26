@@ -99,6 +99,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/race_results_gui.cpp   gui/race_results_gui.hpp 	\
 	gui/grand_prix_ending.cpp  gui/grand_prix_ending.hpp 	\
 	gui/num_laps.cpp	   gui/num_laps.hpp	        \
+	gui/num_karts.cpp	   gui/num_karts.hpp	        \
 	gui/race_menu.cpp	   gui/race_menu.hpp	        \
 	gui/num_players.cpp	   gui/num_players.hpp       	\
 	gui/track_sel.cpp	   gui/track_sel.hpp	        \
