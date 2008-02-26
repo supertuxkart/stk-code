@@ -89,6 +89,8 @@ NumLaps::NumLaps() : laps(3)
     widget_manager->activateWgt(WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
+
+    widget_manager->setSelectedWgt(WTOK_START);
 }
 
 // -----------------------------------------------------------------------------
