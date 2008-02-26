@@ -57,7 +57,7 @@ void KartProperties::load(const std::string filename, const std::string node,
     try
     {
         lisp::Parser parser;
-        root = parser.parse(loader->getPath(filename));
+        root = parser.parse(filename);
 
         const lisp::Lisp* const LISP = root->getLisp(node);
         if(!LISP)

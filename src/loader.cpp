@@ -192,7 +192,8 @@ std::string Loader::getHomeDir() const
     {
         DIRNAME = ".";
     }
-    DIRNAME += DIR_SEPARATOR+CONFIGDIR;
+    DIRNAME += DIR_SEPARATOR;
+    DIRNAME += CONFIGDIR;
 #endif
     return DIRNAME;
 }   // getHomeDir

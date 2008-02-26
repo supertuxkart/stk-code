@@ -792,7 +792,7 @@ void Track::loadTrack(std::string filename_)
     sgSetVec4 ( m_diffuse_col,   1.0f, 1.0f, 1.0f, 1.0f );
 
     lisp::Parser parser;
-    const lisp::Lisp* const ROOT = parser.parse(loader->getPath(m_filename));
+    const lisp::Lisp* const ROOT = parser.parse(m_filename);
 
     const lisp::Lisp* const LISP = ROOT->getLisp("tuxkart-track");
     if(!LISP)
