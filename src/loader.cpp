@@ -38,6 +38,7 @@
 #include "moving_texture.hpp"
 #include "translation.hpp"
 #include "material_manager.hpp"
+#include "string_utils.hpp"
 
 #ifdef __APPLE__
 // dynamic data path detection onmac
@@ -87,16 +88,16 @@ Loader::Loader()
     else
 #endif
 #ifdef _MSC_VER
-        if ( _access ( "data\\tuxtrack.track", 04 ) == 0 )
+        if ( _access ( "data\\stk_config.data", 04 ) == 0 )
 #else
-        if ( access ( "data/tuxtrack.track", F_OK ) == 0 )
+        if ( access ( "data/stk_config.data", F_OK ) == 0 )
 #endif
             datadir = "." ;
         else
 #ifdef _MSC_VER
-            if ( _access ( "..\\data\\tuxtrack.track", 04 ) == 0 )
+            if ( _access ( "..\\data\\stk_config.data", 04 ) == 0 )
 #else
-            if ( access ( "../data/tuxtrack.track", F_OK ) == 0 )
+            if ( access ( "../data/stk_config.data", F_OK ) == 0 )
 #endif
                 datadir = ".." ;
             else
@@ -117,13 +118,13 @@ Loader::~Loader()
 //-----------------------------------------------------------------------------
 void Loader::makePath(std::string& path, const std::string& dir, const std::string& fname) const
 {
-
     struct stat mystat;
 
     for(std::vector<std::string>::const_iterator i = m_search_path.begin();
         i != m_search_path.end(); ++i)
     {
-        path=(*i)+DIR_SEPARATOR+dir+DIR_SEPARATOR+fname;
+        if(dir  !="") path+=(*i)+DIR_SEPARATOR+dir;
+        if(fname!="") path+=(*i)+DIR_SEPARATOR+fname;
         if(stat(path.c_str(), &mystat) >= 0) return;
     }
 
@@ -138,7 +139,7 @@ void Loader::makePath(std::string& path, const std::string& dir, const std::stri
 //-----------------------------------------------------------------------------
 void Loader::makeModelPath(char* path, const char* FNAME) const
 {
-    std::string p(path);
+    std::string p;
     makePath(p, std::string(getModelDir()), FNAME);
     strcpy(path, p.c_str());
 }   // makeModelPath
@@ -160,11 +161,19 @@ std::string Loader::getKartFile(const std::string& fname) const
 }   // getKartFile
 
 //-----------------------------------------------------------------------------
+std::string Loader::getTrackDir() const
+{
+    std::string path;
+    makePath(path, "data/tracks", "");    
+    return path;
+}   // getTrackDir
+//-----------------------------------------------------------------------------
 std::string Loader::getTrackFile(const std::string& fname) const
 {
     std::string path;
-    makePath(path, "data", fname.c_str());
-    return path;
+    // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
+    std::string basename=StringUtils::without_extension(fname);
+    return getTrackDir()+DIR_SEPARATOR+basename+DIR_SEPARATOR+fname;
 }   // getTrackFile
 
 //-----------------------------------------------------------------------------

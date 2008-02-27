@@ -352,7 +352,7 @@ bool World::saveReplayHumanReadable( std::string const &filename ) const
     fprintf(fd, "numkarts: %d\n",   m_kart.size());
     fprintf(fd, "numplayers: %d\n", m_race_setup.getNumPlayers());
     fprintf(fd, "difficulty: %d\n", m_race_setup.m_difficulty);
-    fprintf(fd, "track: %s\n",      m_track->getIdent());
+    fprintf(fd, "track: %s\n",      m_track->getIdent().c_str());
 
     for (RaceSetup::Karts::const_iterator i = m_race_setup.m_karts.begin() ;
          i != m_race_setup.m_karts.end() ; ++i )
@@ -559,11 +559,6 @@ void World::updateRacePosition ( int k )
 //-----------------------------------------------------------------------------
 void World::loadTrack()
 {
-    std::string path = "data/";
-    path += m_track->getIdent();
-    path += ".loc";
-    path = loader->getPath(path.c_str());
-
     // remove old herrings (from previous race), and remove old
     // track specific herring models
     herring_manager->cleanup();

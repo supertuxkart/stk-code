@@ -48,6 +48,7 @@ public:
     std::string getHighscoreFile(const std::string& fname) const;
     std::string getLogFile      (const std::string& fname) const;
     std::string getHomeDir      () const;
+    std::string getTrackDir     () const;
 #ifdef HAVE_GHOST_REPLAY
     std::string getReplayFile(const std::string& fname) const;
 #endif

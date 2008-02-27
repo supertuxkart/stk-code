@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <stdio.h>
 #include <stdexcept>
 #include "loader.hpp"
 #include "string_utils.hpp"
@@ -71,14 +72,25 @@ TrackManager::loadTrackList ()
 {
     // Load up a list of tracks - and their names
     std::set<std::string> files;
-    loader->listFiles(files, "data");
+    loader->listFiles(files, loader->getTrackDir());
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
+    {
+        if(*i=="." || *i=="..") continue;
+
+        std::string config_file;
+        try
         {
-            if(StringUtils::has_suffix(*i, ".track"))
-            {
-                std::string track_name= loader->getTrackFile(*i);
-                m_tracks.push_back(new Track(track_name.c_str()));
-            }
+            config_file = loader->getTrackFile((*i)+".track");
         }
+        catch (std::exception& e)
+        {
+            (void)e;   // remove warning about unused variable
+            continue;
+        }
+        FILE *f=fopen(config_file.c_str(),"r");
+        if(!f) continue;
+
+        m_tracks.push_back(new Track(config_file));
+    }
 }
 

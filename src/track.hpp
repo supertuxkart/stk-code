@@ -166,7 +166,7 @@ public:
     bool               isShortcut       (const int OLDSEC, const int NEWSEC) const;
     float              getGravity       () const {return m_gravity;        }
     float              getTrackLength   () const {return m_total_distance; }
-    const char*        getIdent         () const {return m_ident.c_str();  }
+    const std::string& getIdent         () const {return m_ident;          }
     const char*        getName          () const {return m_name.c_str();   }
     const std::string& getMusic         () const;
     const std::string& getFilename      () const {return m_filename; }

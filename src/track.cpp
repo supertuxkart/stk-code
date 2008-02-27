@@ -1097,10 +1097,7 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 // ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
-    std::string path = "data/";
-    path += getIdent();
-    path += ".loc";
-    path = loader->getPath(path.c_str());
+    std::string path = loader->getTrackFile(getIdent()+".loc");
 
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
