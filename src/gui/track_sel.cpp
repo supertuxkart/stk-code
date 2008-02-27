@@ -90,7 +90,7 @@ TrackSel::TrackSel()
     widget_manager->breakLine();
 
     widget_manager->addWgt( WTOK_AUTHOR, 80, 9 );
-    widget_manager->setWgtText( WTOK_AUTHOR, "No track selected" );
+    widget_manager->setWgtText( WTOK_AUTHOR, _("No track selected") );
     widget_manager->setWgtTextSize( WTOK_AUTHOR, WGT_FNT_MED );
 
     widget_manager->layout(WGT_AREA_TOP);
@@ -106,6 +106,11 @@ TrackSel::~TrackSel()
 void TrackSel::update(float dt)
 {
     const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
+    if(SELECTED_TRACK<0 || SELECTED_TRACK>=(int)track_manager->getTrackCount())
+    {
+        BaseGUI::update(dt);
+        return;
+    }
     const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
 
     widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
@@ -244,6 +249,11 @@ void TrackSel::update(float dt)
 void TrackSel::select()
 {
     const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
+    unsigned int track_number = CLICKED_TOKEN - WTOK_TRACK0;
+    if(track_number<0 || track_number >= track_manager->getTrackCount())
+    {
+        return;   // not clicked on a track, ignore
+    }
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
     race_manager->setTrack(TRACK->getIdent());
     if(race_manager->getRaceMode()==RaceSetup::RM_TIME_TRIAL)
