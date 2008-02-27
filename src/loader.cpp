@@ -119,12 +119,13 @@ Loader::~Loader()
 void Loader::makePath(std::string& path, const std::string& dir, const std::string& fname) const
 {
     struct stat mystat;
-
+    
     for(std::vector<std::string>::const_iterator i = m_search_path.begin();
         i != m_search_path.end(); ++i)
     {
-        if(dir  !="") path+=(*i)+DIR_SEPARATOR+dir;
-        if(fname!="") path+=(*i)+DIR_SEPARATOR+fname;
+        path=*i;
+        if(dir  !="") path+=DIR_SEPARATOR+dir;
+        if(fname!="") path+=DIR_SEPARATOR+fname;
         if(stat(path.c_str(), &mystat) >= 0) return;
     }
 
@@ -284,9 +285,9 @@ std::string Loader::getPath(const char* FNAME) const
 }   // getPath
 
 //-----------------------------------------------------------------------------
-void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
-    const
-    {
+void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
+                       bool is_full_path) const
+{
         struct stat mystat;
 
         // don't list directories with a slash on the end, it'll fail on win32
@@ -297,7 +298,7 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir)
         for(std::vector<std::string>::const_iterator i = m_search_path.begin();
             i != m_search_path.end(); ++i)
         {
-            std::string path = *i+DIR_SEPARATOR+dir;
+            std::string path = is_full_path ? dir : *i+DIR_SEPARATOR+dir;
 
             if(stat(path.c_str(), &mystat) < 0)
                 continue;

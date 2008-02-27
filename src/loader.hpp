@@ -55,7 +55,8 @@ public:
 
     std::string getPath(const char* name) const;
     std::string getPath(const std::string name) const {return getPath(name.c_str());}
-    void listFiles(std::set<std::string>& result, const std::string& dir)
+    void listFiles(std::set<std::string>& result, const std::string& dir,
+                   bool is_full_path=false)
         const;
 
     void       addSearchPath(const std::string& path);

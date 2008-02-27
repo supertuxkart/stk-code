@@ -72,11 +72,10 @@ TrackManager::loadTrackList ()
 {
     // Load up a list of tracks - and their names
     std::set<std::string> files;
-    loader->listFiles(files, loader->getTrackDir());
+    loader->listFiles(files, loader->getTrackDir(), /*is_full_path*/ true);
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
         if(*i=="." || *i=="..") continue;
-
         std::string config_file;
         try
         {

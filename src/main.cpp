@@ -203,7 +203,7 @@ int handleCmdLine(int argc, char **argv)
             fprintf ( stdout, _("  Available tracks:\n") );
             for (size_t i = 0; i != track_manager->getTrackCount(); i++)
                 fprintf ( stdout, "\t%10s: %s\n",
-                          track_manager->getTrack(i)->getIdent(),
+                          track_manager->getTrack(i)->getIdent().c_str(),
                           track_manager->getTrack(i)->getName());
 
             fprintf ( stdout, _("Use --track N to choose track.\n\n"));
