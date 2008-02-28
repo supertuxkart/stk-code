@@ -39,8 +39,8 @@ SFXImpl::SFXImpl(const char* filename)
 {
     m_soundBuffer= 0;
     m_soundSource= 0;
-    bool ok=load(filename);
-    assert(ok);
+    const bool LOADED = load(filename);
+    assert( LOADED );
 }
 
 //-----------------------------------------------------------------------------
@@ -70,20 +70,67 @@ bool SFXImpl::load(const char* filename)
 {
     std::string path = loader->getPath(filename);
 
-    m_soundBuffer = alutCreateBufferFromFile( path.c_str() );
-    if( m_soundBuffer == AL_NONE )
+#if ALUT_API_MAJOR_VERSION == 1 && ALUT_API_MINOR_VERSION < 1
+    alGenBuffers(1, &m_soundBuffer);
+    if (alGetError() != AL_NO_ERROR)
     {
-        const int error = alutGetError();
-        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(error));
+        fprintf(stderr, "Loading '%s' failed\n",filename);
+        return false;
+    }
+    ALenum format = 0;
+    ALsizei size = 0, freq = 0;
+    ALvoid* data = NULL;
+    ALboolean loop = AL_FALSE;
+
+#ifdef __APPLE__
+    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq);
+#else
+    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq, &loop);
+#endif
+
+    if (data == NULL)
+    {
+        const int ERROR = alutGetError();
+        fprintf(stderr, "Error 1a loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ERROR));
+        return false;
+    }
+
+    alBufferData(m_soundBuffer, format, data, size, freq);
+    if (alGetError() != AL_NO_ERROR)
+    {
+        fprintf(stderr, "Error 2a loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
+
+    alutUnloadWAV(format, data, size, freq);
+    if (alGetError() != AL_NO_ERROR)
+    {
+        fprintf(stderr, "Error 3a loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
     alGenSources(1, &m_soundSource );
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, "Error 2 loading SFX: %s failed\n", path.c_str());
+        fprintf(stderr, "Error 4a loading SFX: %s failed\n", path.c_str());
         return false;
     }
+#else
+    m_soundBuffer = alutCreateBufferFromFile( path.c_str() );
+    if( m_soundBuffer == AL_NONE )
+    {
+        const int ERROR = alutGetError();
+        fprintf(stderr, "Error 1b loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ERROR));
+        return false;
+    }
+
+    alGenSources(1, &m_soundSource );
+    if (alGetError() != AL_NO_ERROR)
+    {
+        fprintf(stderr, "Error 2b loading SFX: %s failed\n", path.c_str());
+        return false;
+    }
+#endif
 
     // not 3D yet
     alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);

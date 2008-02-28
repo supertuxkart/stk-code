@@ -232,7 +232,7 @@ case "${host}" in
            SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
        fi
    else
-       SUMMARY="$SUMMARY\nInstall OpenAL and freealut for better sound!"
+       SUMMARY="$SUMMARY\nInstall OpenAL and freealut for music!"
    fi
 
    LIBS=$save_LIBS
