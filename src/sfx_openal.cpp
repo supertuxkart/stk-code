@@ -73,7 +73,8 @@ bool SFXImpl::load(const char* filename)
     m_soundBuffer = alutCreateBufferFromFile( path.c_str() );
     if( m_soundBuffer == AL_NONE )
     {
-        fprintf(stderr, "Error 1 loading SFX: %s failed\n", path.c_str());
+        const int error = alutGetError();
+        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(error));
         return false;
     }
 
