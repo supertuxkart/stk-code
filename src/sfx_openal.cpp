@@ -68,7 +68,7 @@ void SFXImpl::play()
 //-----------------------------------------------------------------------------
 bool SFXImpl::load(const char* filename)
 {
-    std::string path = loader->getPath(filename);
+    std::string path = loader->getSFXFile(filename);
 
 #if ALUT_API_MAJOR_VERSION == 1 && ALUT_API_MINOR_VERSION < 1
     alGenBuffers(1, &m_soundBuffer);

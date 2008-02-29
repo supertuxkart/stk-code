@@ -64,8 +64,7 @@ GrandPrixSelect::GrandPrixSelect()
         {
             if (StringUtils::has_suffix(*i, ".cup"))
             {
-                std::string fullPath= "data/" + (std::string)*i;
-                CupData cup(fullPath.c_str());
+                CupData cup(*i);
                 m_all_cups.push_back(cup);
                 widget_manager->addWgt(WTOK_FIRSTPRIX + nId, 40, 7);
                 widget_manager->setWgtText(WTOK_FIRSTPRIX + nId, cup.getName());

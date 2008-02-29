@@ -32,7 +32,7 @@ CupData::CupData(const std::string filename_)
     try
     {
         lisp::Parser parser;
-        lisp = parser.parse(loader->getPath(m_filename));
+        lisp = parser.parse(loader->getConfigFile(m_filename));
 
         lisp = lisp->getLisp("supertuxkart-cup");
         if(!lisp)

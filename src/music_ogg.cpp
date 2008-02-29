@@ -59,14 +59,9 @@ bool MusicOggStream::load(const std::string& filename)
         return false;
     }
 
-    try
-    {
-      m_fileName =  loader->getPath(filename);
-    }
-    catch(std::runtime_error)
-    {
-	return false;
-    }
+    m_fileName =  loader->getMusicFile(filename);
+    if(m_fileName=="") return false;
+    
     oggFile = fopen(m_fileName.c_str(), "rb");
 
 #if defined( WIN32 ) || defined( WIN64 )

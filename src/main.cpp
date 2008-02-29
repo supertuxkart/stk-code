@@ -146,13 +146,12 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
             std::string filename=loader->getKartFile(std::string(argv[i+1])+".tkkf");
-            try
+            if(filename!="")
             {
-                std::string s=loader->getPath(filename);
                 race_manager->setPlayerKart(0, argv[i+1]);
                 fprintf ( stdout, _("You choose to use kart '%s'.\n"), argv[i+1] ) ;
             }
-            catch(std::runtime_error)
+            else
             {
 	            fprintf(stdout, _("Kart '%s' not found, ignored.\n"),
 		                argv[i+1]);
@@ -371,8 +370,6 @@ int handleCmdLine(int argc, char **argv)
 void InitTuxkart()
 {
     loader = new Loader();
-    loader->setModelDir("models");
-    loader->setTextureDir("images");
     loader->setCreateStateCallback(getAppState);
     user_config             = new UserConfig();
     sound_manager           = new SoundManager();

@@ -42,7 +42,7 @@ CreditsMenu::CreditsMenu()
     std::string line;
     std::string credits_text;
 
-    filename = loader->getPath("data/CREDITS");
+    filename = loader->getConfigFile("CREDITS");
     std::ifstream file(filename.c_str());
 
     if( file.is_open() )

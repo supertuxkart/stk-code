@@ -89,7 +89,7 @@ void CollectableManager::Load(int collectType, const char* filename)
 
     lisp::Parser parser;
     std::string tmp= "data/" + (std::string)filename;
-    ROOT = parser.parse(loader->getPath(tmp.c_str()));
+    ROOT = parser.parse(loader->getConfigFile(filename));
         
     const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
     if(!lisp)

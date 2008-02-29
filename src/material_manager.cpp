@@ -37,7 +37,7 @@ MaterialManager::MaterialManager()
 {
     /* Create list - and default material zero */
 
-    m_materials.reserve(100);
+    m_materials.reserve(256);
     // We can't call init/loadMaterial here, since the global variable
     // material_manager has not yet been initialised, and
     // material_manager is used in the Material constructor.
@@ -70,25 +70,52 @@ void MaterialManager::loadMaterial()
     // Create the default/empty material.
     m_materials.push_back(new Material((int)m_materials.size()));
 
-    std::string fname="data/materials.dat";
-    std::string path = loader->getPath(fname);
-    FILE *fd = fopen(path.c_str(), "r" );
-
-    if ( fd == NULL )
+    // Use temp material for reading, but then set the shared
+    // material index later, so that these materials are not popped
+    const std::string fname     = "materials.dat";
+    std::string       full_name = loader->getTextureFile(fname);
+    if(full_name=="")
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", fname.c_str());
         throw std::runtime_error(msg);
     }
+    if(!pushTempMaterial(full_name))
+    {
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), "FATAL: Parsing error in '%s'\n", full_name.c_str());
+        throw std::runtime_error(msg);
+    }
+
+    ssgSetAppStateCallback(getAppState);
+    fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
+    // Save index of shared textures
+    m_shared_material_index = (int)m_materials.size();
+}   // MaterialManager
+
+//-----------------------------------------------------------------------------
+bool MaterialManager::pushTempMaterial(const std::string& filename)
+{
+    FILE *fd = fopen(filename.c_str(), "r" );
+
+    if ( fd == NULL ) return false;
 
     while ( parseMaterial ( fd ) )
         /* Read file */ ;
 
     fclose ( fd ) ;
+    return true;
+}   // pushTempMaterial
 
-    ssgSetAppStateCallback ( getAppState ) ;
-    fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
-}   // MaterialManager
+//-----------------------------------------------------------------------------
+void MaterialManager::popTempMaterial()
+{
+    for(int i=(int)m_materials.size()-1; i>=this->m_shared_material_index; i--)
+    {
+        delete m_materials[i];
+        m_materials.pop_back();
+    }   // for i
+}   // popTempMaterial
 
 //-----------------------------------------------------------------------------
 char* MaterialManager::parseFileName(char **str)
@@ -159,9 +186,10 @@ Material *MaterialManager::getMaterial ( ssgLeaf *l )
 }   // getMaterial
 
 //-----------------------------------------------------------------------------
-Material *MaterialManager::getMaterial ( const char* fname )
+Material *MaterialManager::getMaterial(const std::string& fname, 
+                                       bool is_full_path )
 {
-    if ( fname == NULL || fname[0] == '\0' )
+    if(fname=="")
     {
         // This happens while reading the stk_config file, which contains
         // kart_properties information (but no icon file): since at this 
@@ -172,16 +200,16 @@ Material *MaterialManager::getMaterial ( const char* fname )
         return NULL;
     }
 
-    //This copy is made so the original fname is not modified
     std::string basename=StringUtils::basename(fname);
 
-    for(unsigned int i = 0 ; i < m_materials.size(); i++ )
+    // Search backward so that temporary (track) textures are found first
+    for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
         if(m_materials[i]->getTexFname()==basename) return m_materials[i];
     }
 
     // Add the new material
-    Material* m=new Material(fname,"", (int)m_materials.size());
+    Material* m=new Material(fname,"", (int)m_materials.size(), is_full_path);
     m_materials.push_back(m);
 
     return m ;

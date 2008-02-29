@@ -112,6 +112,7 @@ void TrackSel::update(float dt)
         return;
     }
     const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
+    const bool FULL_PATH=true;
 
     widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
 
@@ -120,14 +121,14 @@ void TrackSel::update(float dt)
 
     if( !screenshot.empty() && !topview.empty() )
     {
-        Material *m = material_manager->getMaterial( screenshot );
+        const Material *m =material_manager->getMaterial(screenshot, FULL_PATH);
         widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
         widget_manager->showWgtRect( WTOK_IMG0 );
         widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
         widget_manager->showWgtTexture( WTOK_IMG0 );
         widget_manager->hideWgtTrack( WTOK_IMG0 );
 
-        m = material_manager->getMaterial( topview );
+        m = material_manager->getMaterial(topview, FULL_PATH);
         widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
         widget_manager->showWgtRect( WTOK_IMG1 );
         widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
@@ -136,7 +137,7 @@ void TrackSel::update(float dt)
     }
     else if( topview.empty() )
     {
-        Material *m = material_manager->getMaterial( screenshot );
+        const Material *m = material_manager->getMaterial(screenshot, FULL_PATH);
         widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
         widget_manager->showWgtRect( WTOK_IMG0 );
         widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
@@ -155,7 +156,7 @@ void TrackSel::update(float dt)
         widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
         widget_manager->showWgtTrack( WTOK_IMG0 );
 
-        Material *m = material_manager->getMaterial( topview );
+        Material *m = material_manager->getMaterial(topview, FULL_PATH);
         widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
         widget_manager->showWgtRect( WTOK_IMG1 );
         widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );

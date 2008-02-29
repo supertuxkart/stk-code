@@ -6,7 +6,7 @@ initTranslations::initTranslations() {
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
     setlocale (LC_CTYPE,    "");
-    setlocale (LC_MESSAGES, "");
+//    setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, "./po");
     //bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);

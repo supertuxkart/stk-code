@@ -28,14 +28,15 @@
 
 class Loader : public ssgLoaderOptions
 {
-#ifdef _MSC_VER
-    static const char DIR_SEPARATOR='\\';
-#   define            CONFIGDIR     "."
-#else
-    static const char DIR_SEPARATOR='/';
-#   define            CONFIGDIR     ".supertuxkart"
-#endif
-
+private:
+    bool                        m_is_full_path;
+    std::string                 m_root_dir;
+    std::vector<std::string>    m_texture_search_path,
+                                m_model_search_path,
+                                m_music_search_path;
+    bool findFile               (std::string& full_path,
+                                 const std::string& fname, 
+                                 const std::vector<std::string>& search_path) const;
 public:
     Loader();
     ~Loader();
@@ -43,36 +44,46 @@ public:
     virtual void makeModelPath  (char* path, const char* fname) const;
     std::string getTextureFile  (const std::string& fname) const;
     std::string getKartFile     (const std::string& fname) const;
-    std::string getTrackFile    (const std::string& fname) const;
+    std::string getTrackFile    (const std::string& fname, 
+                                 const std::string& track="") const;
     std::string getConfigFile   (const std::string& fname) const;
     std::string getHighscoreFile(const std::string& fname) const;
     std::string getLogFile      (const std::string& fname) const;
+    std::string getMusicFile    (const std::string& fname) const;
+    std::string getSFXFile      (const std::string& fname) const;
+    std::string getFontFile     (const std::string& fname) const;
+    std::string getModelFile    (const std::string& fname) const;
     std::string getHomeDir      () const;
     std::string getTrackDir     () const;
 #ifdef HAVE_GHOST_REPLAY
     std::string getReplayFile(const std::string& fname) const;
 #endif
 
-    std::string getPath(const char* name) const;
-    std::string getPath(const std::string name) const {return getPath(name.c_str());}
     void listFiles(std::set<std::string>& result, const std::string& dir,
                    bool is_full_path=false)
         const;
 
-    void       addSearchPath(const std::string& path);
-    void       addSearchPath(const char* path) {addSearchPath(std::string(path)); }
+    void       pushTextureSearchPath(const std::string& path) 
+                                    { m_texture_search_path.push_back(path);}
+    void       pushModelSearchPath  (const std::string& path)
+                                    { m_model_search_path.push_back(path);  }
+    void       pushMusicSearchPath  (const std::string& path)
+                                    { m_music_search_path.push_back(path);  }
+    void       popTextureSearchPath () {m_texture_search_path.pop_back();   }
+    void       popModelSearchPath   () {m_model_search_path.pop_back();     }
+    void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
     void       initConfigDir();
-    ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true);
-    void       setCallbackType(CallbackType t)   {m_current_callback_type=t;}
+    ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true,
+                    bool is_full_path=false);
+    void         setCallbackType(CallbackType t)   {m_current_callback_type=t;}
 private:
-    std::vector<std::string> m_search_path;
-    CallbackType             m_current_callback_type;
+    CallbackType m_current_callback_type;
 
-    void         makePath(std::string& path, const std::string& dir, 
-                          const std::string& fname) const;
-    ssgBranch   *createBranch(char *data) const;
-    void preProcessObj ( ssgEntity *n, bool mirror );
-    ssgBranch   *animInit    (char *data) const;
+    void         makePath     (std::string& path, const std::string& dir, 
+                               const std::string& fname) const;
+    ssgBranch   *createBranch (char *data) const;
+    void         preProcessObj( ssgEntity *n, bool mirror );
+    ssgBranch   *animInit     (char *data) const;
 };
 
 extern Loader* loader;

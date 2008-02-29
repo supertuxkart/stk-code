@@ -47,12 +47,13 @@ private:
     float parseFloat ( char **p );
 
     void init    (int index);
-    void install () ;
+    void install (bool is_full_path=false);
 
 public:
 
     Material(int index);
-    Material(const std::string& fname, char *description, int index);
+    Material(const std::string& fname, char *description, int index,
+             bool is_full_path=false);
 
     ~Material ();
 
@@ -69,7 +70,8 @@ public:
     const std::string& 
           getTexFname () const { return m_texname;     }
     int   getIndex    () const { return m_index;       }
-    void  apply       ()       { m_state -> apply ();  }
+    void  apply       ()       { m_state ->apply();    }
+    void  force       ()       { m_state ->force();    }
 
     void applyToLeaf ( ssgLeaf *l ) ;
 

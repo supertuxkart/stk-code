@@ -406,7 +406,6 @@ AC_CONFIG_FILES([                 \
  doc/Makefile                     \
  doc/players_manual/Makefile      \
  fonts/Makefile                   \
- images/Makefile                  \
  models/Makefile                  \
  oggs/Makefile		          \
  src/Makefile                     \

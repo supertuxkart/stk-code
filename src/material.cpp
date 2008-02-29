@@ -80,12 +80,13 @@ Material::Material(int index)
     m_texname = "";
     m_predraw  = m_postdraw = NULL ;
 
-    init    (index);
-    install ();
+    init   (index);
+    install();
 }   // Material
 
 //-----------------------------------------------------------------------------
-Material::Material(const std::string& fname, char *description, int index)
+Material::Material(const std::string& fname, char *description, 
+                   int index, bool is_full_path)
 {
     m_texname = fname;
     m_predraw  = m_postdraw = NULL ;
@@ -94,20 +95,20 @@ Material::Material(const std::string& fname, char *description, int index)
 
     if(strlen(description)>0)
     {
-        m_clamp_tex    = parseBool  ( & description ) ? UCLAMP : 0 ;
-        m_clamp_tex   += parseBool  ( & description ) ? VCLAMP : 0 ;
+        m_clamp_tex    = parseBool (&description) ? UCLAMP : 0 ;
+        m_clamp_tex   += parseBool (&description) ? VCLAMP : 0 ;
         
-        m_transparency = parseBool  ( & description ) ;
-        m_alpha_ref    = parseFloat ( & description ) ;
-        m_lighting     = parseBool  ( & description ) ;
-        m_sphere_map   = parseBool  ( & description ) ;
-        m_friction     = parseFloat ( & description ) ;
-        m_ignore       = parseBool  ( & description ) ;
-        m_zipper       = parseBool  ( & description ) ;
-        m_resetter     = parseBool  ( & description ) ;
-        m_collideable  = parseBool  ( & description ) ;
+        m_transparency = parseBool (&description);
+        m_alpha_ref    = parseFloat(&description);
+        m_lighting     = parseBool (&description);
+        m_sphere_map   = parseBool (&description);
+        m_friction     = parseFloat(&description);
+        m_ignore       = parseBool (&description);
+        m_zipper       = parseBool (&description);
+        m_resetter     = parseBool (&description);
+        m_collideable  = parseBool (&description);
     }
-    install () ;
+    install(is_full_path);
 }   // Material
 
 //-----------------------------------------------------------------------------
@@ -140,7 +141,7 @@ void Material::applyToLeaf(ssgLeaf *l)
 }   // applyToLeaf
 
 //-----------------------------------------------------------------------------
-void Material::install ()
+void Material::install(bool is_full_path)
 {
     if ( isSphereMap () )
     {
@@ -154,7 +155,13 @@ void Material::install ()
     m_state -> setExternalPropertyIndex ( m_index ) ;
     if ( m_texname.size()>0 )
     {
-        std::string fn=loader->getTextureFile(m_texname);
+        std::string fn=is_full_path ? m_texname 
+                                    : loader->getTextureFile(m_texname);
+        if(fn=="")
+        {
+            fprintf(stderr, "WARNING: texture '%s' not found.\n", 
+                    m_texname.c_str());
+        }
         m_state -> setTexture ( fn.c_str(), !(m_clamp_tex & UCLAMP),
                               !(m_clamp_tex & VCLAMP) );
         m_state -> enable  ( GL_TEXTURE_2D ) ;

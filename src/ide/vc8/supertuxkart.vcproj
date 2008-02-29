@@ -543,7 +543,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
 				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;;&quot;$(GETTEXT_PATH)\lib&quot;"
@@ -676,10 +676,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\attachment.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\attachment_manager.cpp"
 				>
 			</File>
 			<File
@@ -1479,6 +1475,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath="../../../src\attachment_manager.cpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

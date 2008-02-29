@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//            (C) 2008 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,8 +28,14 @@
 #  include <stdio.h>
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+     //   Some portabilty defines
 #    define snprintf       _snprintf
+#    define access         _access
+#    define                F_OK  04
 #  endif
+#  define CONFIGDIR       "."
+#else
+#  define CONFIGDIR       ".supertuxkart"
 #endif
 #include "plib/ul.h"
 #include "loader.hpp"
@@ -77,112 +84,119 @@ Loader* loader = 0;
 
 Loader::Loader()
 {
-    std::string datadir;
+    m_is_full_path = false;
+    
     m_current_callback_type = CB_COLLECTABLE;
 
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        datadir = getenv ( "SUPERTUXKART_DATADIR" ) ;
-    else
+        m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
 #ifdef __APPLE__
-        if( macSetBundlePathIfRelevant( datadir ) ) { /* nothing to do */ }
+    else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
+#endif
+    else if ( access ( "data/stk_config.data", F_OK ) == 0 )
+        m_root_dir = "." ;
+    else if ( access ( "../data/stk_config.data", F_OK ) == 0 )
+        m_root_dir = ".." ;
     else
-#endif
-#ifdef _MSC_VER
-        if ( _access ( "data\\stk_config.data", 04 ) == 0 )
-#else
-        if ( access ( "data/stk_config.data", F_OK ) == 0 )
-#endif
-            datadir = "." ;
-        else
-#ifdef _MSC_VER
-            if ( _access ( "..\\data\\stk_config.data", 04 ) == 0 )
-#else
-            if ( access ( "../data/stk_config.data", F_OK ) == 0 )
-#endif
-                datadir = ".." ;
-            else
 #ifdef SUPERTUXKART_DATADIR
-                datadir = SUPERTUXKART_DATADIR ;
+        m_root_dir = SUPERTUXKART_DATADIR ;
 #else
-                datadir = "/usr/local/share/games/supertuxkart" ;
+        m_root_dir = "/usr/local/share/games/supertuxkart" ;
 #endif
     fprintf(stderr, _("Data files will be fetched from: '%s'\n"), 
-            datadir.c_str() ) ;
-    addSearchPath(datadir);
+            m_root_dir.c_str() );
+
+    pushTextureSearchPath(m_root_dir+"/data/textures");
+    pushModelSearchPath  (m_root_dir+"/models"       );
+    pushMusicSearchPath  (m_root_dir+"/ogg"          );
 }  // Loader
 
 //-----------------------------------------------------------------------------
 Loader::~Loader()
-{}   // ~Loader
+{
+    popMusicSearchPath();
+    popModelSearchPath();
+    popTextureSearchPath();
+}   // ~Loader
 
 //-----------------------------------------------------------------------------
-void Loader::makePath(std::string& path, const std::string& dir, const std::string& fname) const
+bool Loader::findFile(std::string& full_path,
+                      const std::string& fname, 
+                      const std::vector<std::string>& search_path) const
 {
     struct stat mystat;
     
-    for(std::vector<std::string>::const_iterator i = m_search_path.begin();
-        i != m_search_path.end(); ++i)
+    for(std::vector<std::string>::const_iterator i = search_path.begin();
+        i != search_path.end(); ++i)
     {
-        path=*i;
-        if(dir  !="") path+=DIR_SEPARATOR+dir;
-        if(fname!="") path+=DIR_SEPARATOR+fname;
-        if(stat(path.c_str(), &mystat) >= 0) return;
+        //full_path=m_root_dir + "/" + *i + "/" + fname;
+        full_path = *i + "/" + fname;
+        if(stat(full_path.c_str(), &mystat) >= 0) return true;
     }
-
-    // error case...
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), "Could not find path for '%s'.", fname.c_str());
-
-    throw std::runtime_error(msg);
-
-}   // makePath
+    full_path="";
+    return false;
+}   // findFile
 
 //-----------------------------------------------------------------------------
 void Loader::makeModelPath(char* path, const char* FNAME) const
 {
+    if(m_is_full_path)
+    {
+        strcpy(path, FNAME);
+        return;
+    }
+    
     std::string p;
-    makePath(p, std::string(getModelDir()), FNAME);
-    strcpy(path, p.c_str());
+    if(findFile(p, FNAME, m_model_search_path))
+    {
+        strcpy(path, p.c_str());
+        return;
+    }
 }   // makeModelPath
 
 //-----------------------------------------------------------------------------
 std::string Loader::getTextureFile(const std::string& FNAME) const
 {
     std::string path;
-    makePath(path, getTextureDir(), FNAME.c_str());
+    findFile(path, FNAME, m_texture_search_path);
+    return path;
+}   // makeTexturePath
+
+//-----------------------------------------------------------------------------
+std::string Loader::getModelFile(const std::string& FNAME) const
+{
+    std::string path;
+    findFile(path, FNAME, m_model_search_path);
     return path;
 }   // makeTexturePath
 
 //-----------------------------------------------------------------------------
 std::string Loader::getKartFile(const std::string& fname) const
 {
-    std::string path;
-    makePath(path, "data", fname.c_str());
-    return path;
+    return m_root_dir+"/data/"+fname;
 }   // getKartFile
 
 //-----------------------------------------------------------------------------
 std::string Loader::getTrackDir() const
 {
-    std::string path;
-    makePath(path, "data/tracks", "");    
-    return path;
+    return m_root_dir+"/data/tracks";
 }   // getTrackDir
 //-----------------------------------------------------------------------------
-std::string Loader::getTrackFile(const std::string& fname) const
+std::string Loader::getTrackFile(const std::string& fname,
+                                 const std::string& track_name) const
 {
-    std::string path;
     // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
-    std::string basename=StringUtils::without_extension(fname);
-    return getTrackDir()+DIR_SEPARATOR+basename+DIR_SEPARATOR+fname;
+    // but if a track name is supplied use it (which is necessary
+    // e.g. to load a model from a track directory
+    std::string basename = (track_name!="") ? track_name 
+                           : StringUtils::without_extension(fname);
+    return getTrackDir()+"/"+basename+"/"+fname;
 }   // getTrackFile
 
 //-----------------------------------------------------------------------------
 std::string Loader::getConfigFile(const std::string& fname) const
 {
-    std::string path;
-    makePath(path, "data", fname.c_str());
-    return path;
+    return m_root_dir+"/data/"+fname;
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
@@ -202,7 +216,7 @@ std::string Loader::getHomeDir() const
     {
         DIRNAME = ".";
     }
-    DIRNAME += DIR_SEPARATOR;
+    DIRNAME += "/";
     DIRNAME += CONFIGDIR;
 #endif
     return DIRNAME;
@@ -211,31 +225,37 @@ std::string Loader::getHomeDir() const
 //-----------------------------------------------------------------------------
 std::string Loader::getLogFile(const std::string& fname) const
 {
-    return getHomeDir()+DIR_SEPARATOR+fname;
-}   // getConfigFile
+    return getHomeDir()+"/"+fname;
+}   // getLogFile
 
+//-----------------------------------------------------------------------------
+std::string Loader::getMusicFile(const std::string& fname) const
+{
+    return m_root_dir+"/oggs/"+fname;
+}   // getMusicFile
+//-----------------------------------------------------------------------------
+std::string Loader::getSFXFile(const std::string& fname) const
+{
+    return m_root_dir+"/wavs/"+fname;
+}   // getSFXFile
+//-----------------------------------------------------------------------------
+std::string Loader::getFontFile(const std::string& fname) const
+{
+    return m_root_dir+"/fonts/"+fname;
+}   // getFontFile
 //-----------------------------------------------------------------------------
 std::string Loader::getHighscoreFile(const std::string& fname) const
 {
-    return getHomeDir()+DIR_SEPARATOR+fname;
+    return getHomeDir()+"/"+fname;
 }   // getHighscoreFile
 
 //-----------------------------------------------------------------------------
 #ifdef HAVE_GHOST_REPLAY
 std::string Loader::getReplayFile(const std::string& fname) const
 {
-    std::string path;
-    makePath(path, "replay", fname.c_str());
-    return path;
-
+    return m_root_dir+"/replay/"+fname;
 }   // getReplayFile
 #endif
-//-----------------------------------------------------------------------------
-void Loader::addSearchPath(const std::string& PATH)
-{
-    m_search_path.push_back(PATH);
-}   // addSearchPath
-
 //-----------------------------------------------------------------------------
 void Loader::initConfigDir()
 {
@@ -255,36 +275,6 @@ void Loader::initConfigDir()
 }   // initConfigDir
 
 //-----------------------------------------------------------------------------
-std::string Loader::getPath(const char* FNAME) const
-{
-    struct stat mystat;
-    std::string result;
-
-    std::string native_fname=FNAME;
-    const size_t LEN = strlen(FNAME);
-    for(size_t i = 0; i < LEN; ++i)
-        if(native_fname[i] == '\\' || native_fname[i] == '/')
-            native_fname[i] = DIR_SEPARATOR;
-
-    for(std::vector<std::string>::const_iterator i = m_search_path.begin();
-        i != m_search_path.end(); ++i)
-    {
-        result = *i;
-        result += DIR_SEPARATOR;
-        result += native_fname;
-
-        if(stat(result.c_str(), &mystat) < 0)
-            continue;
-
-        return result;
-    }
-
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), _("Couldn't find file '%s'."), FNAME);
-    throw std::runtime_error(msg);
-}   // getPath
-
-//-----------------------------------------------------------------------------
 void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
                        bool is_full_path) const
 {
@@ -295,27 +285,21 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
 
         result.clear();
 
-        for(std::vector<std::string>::const_iterator i = m_search_path.begin();
-            i != m_search_path.end(); ++i)
+        std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
+
+        if(stat(path.c_str(), &mystat) < 0) return;
+        if(! S_ISDIR(mystat.st_mode))       return; 
+
+        ulDir* mydir = ulOpenDir(path.c_str());
+        if(!mydir) return;
+
+        ulDirEnt* mydirent;
+        while( (mydirent = ulReadDir(mydir)) != 0)
         {
-            std::string path = is_full_path ? dir : *i+DIR_SEPARATOR+dir;
-
-            if(stat(path.c_str(), &mystat) < 0)
-                continue;
-            if(! S_ISDIR(mystat.st_mode))
-                continue;
-
-            ulDir* mydir = ulOpenDir(path.c_str());
-            if(!mydir) continue;
-
-            ulDirEnt* mydirent;
-            while( (mydirent = ulReadDir(mydir)) != 0)
-            {
-                result.insert(mydirent->d_name);
-            }
-            ulCloseDir(mydir);
+            result.insert(mydirent->d_name);
         }
-    }   // listFiles
+        ulCloseDir(mydir);
+}   // listFiles
 
 //-----------------------------------------------------------------------------
 /** Loads a .ac model
@@ -335,11 +319,12 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
  *                  be flattened.
  */
 ssgEntity *Loader::load(const std::string& filename, CallbackType t,
-                        bool optimise)
+                        bool optimise, bool is_full_path)
 {
-    m_current_callback_type=t;
-    ssgEntity *obj = optimise ? ssgLoad  (filename.c_str(), this) 
-                              : ssgLoadAC(filename.c_str(), this);
+    m_current_callback_type   = t;
+    m_is_full_path            = is_full_path;
+    ssgEntity *obj            = optimise ? ssgLoad  (filename.c_str(), this) 
+                                         : ssgLoadAC(filename.c_str(), this);
     preProcessObj(obj, false);
     return obj;
 }   // load

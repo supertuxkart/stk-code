@@ -332,8 +332,8 @@ void HerringManager::loadHerringStyle(const std::string filename)
     if(filename.length()==0) return;
     const lisp::Lisp* root = 0;
     lisp::Parser parser;
-    const std::string TMP = "data/" + (std::string)filename + ".herring";
-    root = parser.parse(loader->getPath(TMP));
+    
+    root = parser.parse(loader->getConfigFile(filename + ".herring"));
 
     const lisp::Lisp* herring_node = root->getLisp("herring");
     if(!herring_node)

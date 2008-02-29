@@ -142,56 +142,56 @@ public:
           m_scale_y;        // track2dWidth/Heightheigth
     bool m_do_stretch;      // 2d track display might be stretched to fit better
 
-    Track            (std::string filename,float w=100,
-                      float h=100, bool stretch=1);
-    ~Track            ();
-    void               cleanup          ();
-    void               addDebugToScene  (int type                    ) const;
-    void               draw2Dview       (float x_offset,
-                                         float y_offset              ) const;
-    void               drawScaled2D     (float x, float y, float w,
-                                         float h                     ) const;
+                       Track             (std::string filename,float w=100,
+                                          float h=100, bool stretch=1);
+                      ~Track             ();
+    void               cleanup           ();
+    void               addDebugToScene   (int type                    ) const;
+    void               draw2Dview        (float x_offset,
+                                          float y_offset              ) const;
+    void               drawScaled2D      (float x, float y, float w,
+                                          float h                     ) const;
 
-    void               findRoadSector   (const sgVec3 XYZ, int *sector) const;
+    void               findRoadSector    (const sgVec3 XYZ, int *sector) const;
     int                findOutOfRoadSector(const sgVec3 XYZ,
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR
                                            ) const;
-    int                spatialToTrack   (sgVec3 dst,
-                                         const sgVec2 POS,
-                                         const int SECTOR            ) const;
-    void               trackToSpatial   (sgVec3 xyz, const int SECTOR) const;
-    ssgBranch*         getModel         () const {return m_model;}
-    void               loadTrackModel   ();
-    bool               isShortcut       (const int OLDSEC, const int NEWSEC) const;
-    float              getGravity       () const {return m_gravity;        }
-    float              getTrackLength   () const {return m_total_distance; }
-    const std::string& getIdent         () const {return m_ident;          }
-    const char*        getName          () const {return m_name.c_str();   }
-    const std::string& getMusic         () const;
-    const std::string& getFilename      () const {return m_filename; }
-    const sgVec3& getSunPos             () const {return m_sun_position;   }
-    const sgVec4& getAmbientCol         () const {return m_ambient_col;    }
-    const sgVec4& getDiffuseCol         () const {return m_diffuse_col;    }
-    const sgVec4& getSpecularCol        () const {return m_specular_col;   }
-    const bool&   useFog                () const {return m_use_fog;        }
-    const sgVec4& getFogColor           () const {return m_fog_color;      }
-    const float&  getFogDensity         () const {return m_fog_density;    }
-    const float&  getFogStart           () const {return m_fog_start;      }
-    const float&  getFogEnd             () const {return m_fog_end;        }
-    const float&  getAIAngleAdjustment  () const {return m_AI_angle_adjustment;}
+    int                spatialToTrack    (sgVec3 dst,
+                                          const sgVec2 POS,
+                                          const int SECTOR            ) const;
+    void               trackToSpatial    (sgVec3 xyz, const int SECTOR) const;
+    void               loadTrackModel    ();
+    bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
+    ssgBranch*         getModel          () const {return m_model;              }
+    float              getGravity        () const {return m_gravity;            }
+    float              getTrackLength    () const {return m_total_distance;     }
+    const std::string& getIdent          () const {return m_ident;              }
+    const char*        getName           () const {return m_name.c_str();       }
+    const std::string& getMusic          () const;
+    const std::string& getFilename       () const {return m_filename;           }
+    const sgVec3& getSunPos              () const {return m_sun_position;       }
+    const sgVec4& getAmbientCol          () const {return m_ambient_col;        }
+    const sgVec4& getDiffuseCol          () const {return m_diffuse_col;        }
+    const sgVec4& getSpecularCol         () const {return m_specular_col;       }
+    const bool&   useFog                 () const {return m_use_fog;            }
+    const sgVec4& getFogColor            () const {return m_fog_color;          }
+    const float&  getFogDensity          () const {return m_fog_density;        }
+    const float&  getFogStart            () const {return m_fog_start;          }
+    const float&  getFogEnd              () const {return m_fog_end;            }
+    const float&  getAIAngleAdjustment   () const {return m_AI_angle_adjustment;}
     const float&  getAICurveSpeedAdjustment() const {return m_AI_curve_speed_adjustment;}
-    const sgVec4& getSkyColor           () const {return m_sky_color;      }
-    const std::string& getDescription   () const {return m_description;    }
-    const std::string& getTopviewFile   () const {return m_top_view;       }
-    const std::string& getScreenshotFile() const {return m_screenshot;     }
-    const std::vector<SGfloat>& getWidth() const {return m_path_width;     }
-    const std::string& getHerringStyle  () const {return m_herring_style;  }
-    void               getStartCoords   (unsigned int pos, sgCoord* coords) const;
+    const sgVec4& getSkyColor            () const {return m_sky_color;          }
+    const std::string& getDescription    () const {return m_description;        }
+    const std::string& getTopviewFile    () const {return m_top_view;           }
+    const std::string& getScreenshotFile () const {return m_screenshot;         }
+    const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
+    const std::string& getHerringStyle   () const {return m_herring_style;      }
+    void               getStartCoords    (unsigned int pos, sgCoord* coords) const;
     void  getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
                          const Material **material) const;
-    void createPhysicsModel             ();
-    void               glVtx            (sgVec2 v, float x_offset, float y_offset) const
+    void createPhysicsModel              ();
+    void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(
             x_offset+(v[0]-m_driveline_min[0])*m_scale_x,

@@ -60,7 +60,7 @@ GameManager::~GameManager()
 void GameManager::run()
 {
     const GLuint TITLE_SCREEN_TEXTURE = 
-        material_manager->getMaterial("st_title_screen.rgb")->getIndex();
+        material_manager->getMaterial("st_title_screen.rgb")->getState()->getTextureHandle();
        
     bool music_on = false;
     m_curr_time = SDL_GetTicks();

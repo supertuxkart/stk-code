@@ -77,7 +77,10 @@ void Track::cleanup()
 {
     delete m_non_collision_mesh;
     delete m_track_mesh;
-}   // ~Track
+
+    // remove temporary materials loaded by the material manager
+    material_manager->popTempMaterial();
+}   // cleanup
 
 //-----------------------------------------------------------------------------
 /** Finds on which side of the line segment a given point is.
@@ -829,8 +832,12 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
     LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
 
+    // Set the correct paths
+    m_screenshot = loader->getTrackFile(m_screenshot, getIdent());
+    m_top_view   = loader->getTrackFile(m_top_view,   getIdent());
+    
     delete ROOT;
-}
+}   // loadTrack
 
 //-----------------------------------------------------------------------------
 const std::string& Track::getMusic() const {
@@ -1097,6 +1104,20 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 // ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
+    // Add the track directory to the texture search path
+    loader->pushTextureSearchPath(loader->getTrackFile("",getIdent()));
+    loader->pushModelSearchPath  (loader->getTrackFile("",getIdent()));
+    // First read the temporary materials.dat file if it exists
+    try
+    {
+        std::string materials_file = loader->getTrackFile("materials.dat",getIdent());
+        material_manager->pushTempMaterial(materials_file);
+    }
+    catch (std::exception& e)
+    {
+        // no temporary materials.dat file, ignore
+        (void)e;
+    }
     std::string path = loader->getTrackFile(getIdent()+".loc");
 
     FILE *fd = fopen (path.c_str(), "r" );
@@ -1228,7 +1249,19 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
-            ssgEntity        *obj   = loader->load(fname, CB_TRACK);
+            ssgEntity        *obj   = loader->load(loader->getModelFile(fname),
+                                                   CB_TRACK,
+                                                   /* optimise   */  true,
+                                                   /*is_full_path*/  true);
+            if(!obj)
+            {
+                fclose(fd);
+                char msg[MAX_ERROR_MESSAGE_LENGTH];
+                snprintf(msg, sizeof(msg), "Can't open track model '%s'",fname);
+                loader->popTextureSearchPath();
+                loader->popModelSearchPath  ();
+                throw std::runtime_error(msg);
+            }
             createDisplayLists(obj);
             ssgRangeSelector *lod   = new ssgRangeSelector ;
             ssgTransform     *trans = new ssgTransform ( & loc ) ;
@@ -1255,6 +1288,8 @@ void Track::loadTrackModel()
     }   // while fgets
 
     fclose ( fd ) ;
+    loader->popTextureSearchPath();
+    loader->popModelSearchPath  ();
 
     createPhysicsModel();
 }   // loadTrack

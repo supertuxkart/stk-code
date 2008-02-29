@@ -26,8 +26,8 @@ Font* font_race;
 
 int init_fonts()
 {
-    font_gui = new Font("fonts/AvantGarde-Demi.txf");
-    font_race = new Font("fonts/DomesticManners.txf");
+    font_gui = new Font("AvantGarde-Demi.txf");
+    font_race = new Font("DomesticManners.txf");
     return ( font_gui && font_race );
 }   // init_fonts
 
@@ -42,7 +42,7 @@ int delete_fonts()
 // =============================================================================
 Font::Font(const char *fontname)
 {
-    m_fnt      = new fntTexFont(loader->getPath(fontname).c_str(),
+    m_fnt      = new fntTexFont(loader->getFontFile(fontname).c_str(),
                                 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
     m_text_out = new fntRenderer();
     m_text_out->setFont(m_fnt);

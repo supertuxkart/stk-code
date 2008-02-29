@@ -82,25 +82,25 @@ SoundManager::SoundManager()
     {
         // must be in sync with enumSoundSFX
         SFX* sfx= NULL;
-        sfx = new SFXImpl("wavs/ugh.wav");       m_sfxs[SOUND_UGH]= sfx;
-        sfx = new SFXImpl("wavs/radio/grandprix_winner.wav"); m_sfxs[SOUND_WINNER] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/grab_collectable.wav"); m_sfxs[SOUND_GRAB] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/crash.wav"); m_sfxs[SOUND_CRASH] = sfx;
-        sfx = new SFXImpl("wavs/radio/shot.wav"); m_sfxs[SOUND_SHOT] = sfx;
-        sfx = new SFXImpl("wavs/explosion.wav"); m_sfxs[SOUND_EXPLOSION] = sfx;
-        sfx = new SFXImpl("wavs/bzzt.wav"); m_sfxs[SOUND_BZZT] = sfx;
-        sfx = new SFXImpl("wavs/radio/horn.wav"); m_sfxs[SOUND_BEEP] = sfx;
-        sfx = new SFXImpl("wavs/radio/slap.wav"); m_sfxs[SOUND_USE_ANVIL] = sfx;
-        sfx = new SFXImpl("wavs/radio/squeaky.wav"); m_sfxs[SOUND_USE_PARACHUTE] = sfx;
-        sfx = new SFXImpl("wavs/wee.wav"); m_sfxs[SOUND_WEE] = sfx;
+        sfx = new SFXImpl("ugh.wav");       m_sfxs[SOUND_UGH]= sfx;
+        sfx = new SFXImpl("radio/grandprix_winner.wav"); m_sfxs[SOUND_WINNER] = sfx;
+        sfx = new SFXImpl("tintagel/grab_collectable.wav"); m_sfxs[SOUND_GRAB] = sfx;
+        sfx = new SFXImpl("tintagel/crash.wav"); m_sfxs[SOUND_CRASH] = sfx;
+        sfx = new SFXImpl("radio/shot.wav"); m_sfxs[SOUND_SHOT] = sfx;
+        sfx = new SFXImpl("explosion.wav"); m_sfxs[SOUND_EXPLOSION] = sfx;
+        sfx = new SFXImpl("bzzt.wav"); m_sfxs[SOUND_BZZT] = sfx;
+        sfx = new SFXImpl("radio/horn.wav"); m_sfxs[SOUND_BEEP] = sfx;
+        sfx = new SFXImpl("radio/slap.wav"); m_sfxs[SOUND_USE_ANVIL] = sfx;
+        sfx = new SFXImpl("radio/squeaky.wav"); m_sfxs[SOUND_USE_PARACHUTE] = sfx;
+        sfx = new SFXImpl("wee.wav"); m_sfxs[SOUND_WEE] = sfx;
 
-        sfx = new SFXImpl("wavs/tintagel/deselect_option.wav"); m_sfxs[SOUND_BACK_MENU] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/select_option.wav"); m_sfxs[SOUND_SELECT_MENU] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/move_option.wav"); m_sfxs[SOUND_MOVE_MENU] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/energy_bar_full.wav"); m_sfxs[SOUND_FULL] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/pre_start_race.wav"); m_sfxs[SOUND_PRESTART] = sfx;
-        sfx = new SFXImpl("wavs/tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;
-        sfx = new SFXImpl("wavs/radio/radarping.wav"); m_sfxs[SOUND_MISSILE_LOCK] = sfx;
+        sfx = new SFXImpl("tintagel/deselect_option.wav"); m_sfxs[SOUND_BACK_MENU] = sfx;
+        sfx = new SFXImpl("tintagel/select_option.wav"); m_sfxs[SOUND_SELECT_MENU] = sfx;
+        sfx = new SFXImpl("tintagel/move_option.wav"); m_sfxs[SOUND_MOVE_MENU] = sfx;
+        sfx = new SFXImpl("tintagel/energy_bar_full.wav"); m_sfxs[SOUND_FULL] = sfx;
+        sfx = new SFXImpl("tintagel/pre_start_race.wav"); m_sfxs[SOUND_PRESTART] = sfx;
+        sfx = new SFXImpl("tintagel/start_race.wav"); m_sfxs[SOUND_START] = sfx;
+        sfx = new SFXImpl("radio/radarping.wav"); m_sfxs[SOUND_MISSILE_LOCK] = sfx;
     }
 }  // SoundManager
 
@@ -197,7 +197,7 @@ void SoundManager::playMusic(const std::string& filename)
     std::string name_readme;
     try
     {
-        name_readme = loader->getPath(
+        name_readme = loader->getMusicFile(
                             StringUtils::without_extension(filename)+".readme");
     }
     catch(std::exception)
