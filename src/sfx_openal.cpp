@@ -70,7 +70,6 @@ bool SFXImpl::load(const char* filename)
 {
     std::string path = loader->getSFXFile(filename);
 
-#if ALUT_API_MAJOR_VERSION == 1 && ALUT_API_MINOR_VERSION < 1
     alGenBuffers(1, &m_soundBuffer);
     if (alGetError() != AL_NO_ERROR)
     {
@@ -91,47 +90,30 @@ bool SFXImpl::load(const char* filename)
     if (data == NULL)
     {
         const int ERROR = alutGetError();
-        fprintf(stderr, "Error 1a loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ERROR));
+        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ERROR));
         return false;
     }
 
     alBufferData(m_soundBuffer, format, data, size, freq);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, "Error 2a loading SFX: %s failed\n", path.c_str());
+        fprintf(stderr, "Error 2 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
     alutUnloadWAV(format, data, size, freq);
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, "Error 3a loading SFX: %s failed\n", path.c_str());
+        fprintf(stderr, "Error 3 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
     alGenSources(1, &m_soundSource );
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, "Error 4a loading SFX: %s failed\n", path.c_str());
+        fprintf(stderr, "Error 4 loading SFX: %s failed\n", path.c_str());
         return false;
     }
-#else
-    m_soundBuffer = alutCreateBufferFromFile( path.c_str() );
-    if( m_soundBuffer == AL_NONE )
-    {
-        const int ALUT_ERROR = alutGetError();
-        fprintf(stderr, "Error 1b loading SFX: %s failed because %s \n", path.c_str(),
-                alutGetErrorString(ALUT_ERROR));
-        return false;
-    }
-
-    alGenSources(1, &m_soundSource );
-    if (alGetError() != AL_NO_ERROR)
-    {
-        fprintf(stderr, "Error 2b loading SFX: %s failed\n", path.c_str());
-        return false;
-    }
-#endif
 
     // not 3D yet
     alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
