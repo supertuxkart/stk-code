@@ -246,8 +246,14 @@ void TrackSel::select()
     const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
     race_manager->setTrack(TRACK->getIdent());
-
-    menu_manager->pushMenu(MENUID_NUMLAPS);
-}
+    if(race_manager->getRaceMode()==RaceSetup::RM_TIME_TRIAL)
+    {
+        menu_manager->pushMenu(MENUID_NUMLAPS);
+    }
+    else
+    {
+        menu_manager->pushMenu(MENUID_NUMKARTS);
+    }
+}   // select
 
 /* EOF */

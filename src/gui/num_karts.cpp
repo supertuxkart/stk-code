@@ -1,4 +1,4 @@
-//  $Id$
+//  $Id: num_laps.cpp 1369 2007-12-25 03:23:32Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006, 2007 SuperTuxKart-Team
@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "race_manager.hpp"
-#include "num_laps.hpp"
+#include "num_karts.hpp"
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -34,16 +34,16 @@ enum WidgetTokens
     WTOK_LESS,
     WTOK_MORE,
 
-    WTOK_START,
+    WTOK_CONTINUE,
     WTOK_QUIT
 };
 
-NumLaps::NumLaps() : laps(3)
+NumKarts::NumKarts()
 {
     widget_manager->addWgt(WTOK_TITLE, 50, 7);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);
-    widget_manager->setWgtText(WTOK_TITLE, _("Choose number of laps"));
+    widget_manager->setWgtText(WTOK_TITLE, _("Choose number of karts"));
     widget_manager->breakLine();
 
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
@@ -52,7 +52,9 @@ NumLaps::NumLaps() : laps(3)
     widget_manager->addWgt(WTOK_NUMLAPS, 20, 7);
     widget_manager->showWgtRect(WTOK_NUMLAPS);
     widget_manager->showWgtText(WTOK_NUMLAPS);
-    widget_manager->setWgtText(WTOK_NUMLAPS, _("Laps: 3"));
+    m_num_karts = race_manager->getNumKarts();
+    snprintf(m_kart_label, MAX_MESSAGE_LENGTH, _("Karts: %d"), m_num_karts);
+	widget_manager->setWgtText(WTOK_NUMLAPS, m_kart_label);
     widget_manager->breakLine();
 
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
@@ -75,11 +77,15 @@ NumLaps::NumLaps() : laps(3)
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 5);
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_START, 30, 7);
-    widget_manager->showWgtRect(WTOK_START);
-    widget_manager->showWgtText(WTOK_START);
-    widget_manager->setWgtText(WTOK_START, _("Start race"));
-    widget_manager->activateWgt(WTOK_START);
+    widget_manager->addWgt(WTOK_CONTINUE, 30, 7);
+    widget_manager->showWgtRect(WTOK_CONTINUE);
+    widget_manager->showWgtText(WTOK_CONTINUE);
+    if (race_manager->getRaceMode() == RaceSetup::RM_GRAND_PRIX)
+        widget_manager->setWgtText(WTOK_CONTINUE, _("Start race"));
+    else
+        widget_manager->setWgtText(WTOK_CONTINUE, _("Continue"));
+
+    widget_manager->activateWgt(WTOK_CONTINUE);
     widget_manager->breakLine();
 
     widget_manager->addWgt(WTOK_QUIT, 50, 7);
@@ -90,39 +96,43 @@ NumLaps::NumLaps() : laps(3)
 
     widget_manager->layout(WGT_AREA_ALL);
 
-    widget_manager->setSelectedWgt(WTOK_START);
+    widget_manager->setSelectedWgt(WTOK_CONTINUE);
 }
 
 // -----------------------------------------------------------------------------
-NumLaps::~NumLaps()
+NumKarts::~NumKarts()
 {
     widget_manager->reset();
-}   // ~NumLaps
+}   // ~NumKarts
 
 // -----------------------------------------------------------------------------
-void NumLaps::select()
+void NumKarts::select()
 {
     const int WGT = widget_manager->getSelectedWgt();
     switch (WGT)
     {
       case WTOK_LESS:
-        laps = std::max(1, laps-1);
-        snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-	    widget_manager->setWgtText(WTOK_NUMLAPS, lap_label);
+        m_num_karts = std::max(race_manager->getNumPlayers(), m_num_karts-1);
+        snprintf(m_kart_label, MAX_MESSAGE_LENGTH, "Karts: %d", m_num_karts);
+	             widget_manager->setWgtText(WTOK_NUMLAPS, m_kart_label);
         break;
       case WTOK_MORE:
-        laps = std::min(10, laps+1);
-        snprintf(lap_label, MAX_MESSAGE_LENGTH, "Laps: %d", laps);
-        widget_manager->setWgtText(WTOK_NUMLAPS, lap_label);
+        m_num_karts = std::min(stk_config->m_max_karts, m_num_karts+1);
+        snprintf(m_kart_label, MAX_MESSAGE_LENGTH, "Karts: %d", m_num_karts);
+        widget_manager->setWgtText(WTOK_NUMLAPS, m_kart_label);
         break;
-      case WTOK_START:
-        race_manager->setNumLaps(laps);
-        race_manager->start();
+      case WTOK_CONTINUE:
+        race_manager->setNumKarts(m_num_karts);
+        if (race_manager->getRaceMode() == RaceSetup::RM_GRAND_PRIX)
+            race_manager->start();
+        else
+            menu_manager->pushMenu(MENUID_NUMLAPS);
         break;
       case WTOK_QUIT:
         menu_manager->popMenu();
 	break;
     }
+
 }   // select
 
 

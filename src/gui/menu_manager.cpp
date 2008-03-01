@@ -31,6 +31,7 @@
 #include "options.hpp"
 #include "track_sel.hpp"
 #include "num_laps.hpp"
+#include "num_karts.hpp"
 #include "num_players.hpp"
 #include "config_controls.hpp"
 #include "config_display.hpp"
@@ -163,6 +164,9 @@ void MenuManager::update()
                 break;
             case MENUID_NUMLAPS:
                 m_current_menu= new NumLaps();
+                break;
+            case MENUID_NUMKARTS:
+                m_current_menu= new NumKarts();
                 break;
             case MENUID_NUMPLAYERS:
                 m_current_menu= new NumPlayers();
