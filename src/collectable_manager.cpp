@@ -20,7 +20,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "collectable_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
@@ -89,7 +89,7 @@ void CollectableManager::Load(int collectType, const char* filename)
 
     lisp::Parser parser;
     std::string tmp= "data/" + (std::string)filename;
-    ROOT = parser.parse(loader->getConfigFile(filename));
+    ROOT = parser.parse(file_manager->getConfigFile(filename));
         
     const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
     if(!lisp)
@@ -124,7 +124,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     if(sModel!="")
     {
-        ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
+        ssgEntity* e = file_manager->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();
         e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);

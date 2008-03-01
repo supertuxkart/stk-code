@@ -28,7 +28,7 @@
 #include <AL/alut.h>
 
 #include "music_ogg.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "user_config.hpp"
 
 #define BUFFER_SIZE (4096 * 8)
@@ -59,7 +59,7 @@ bool MusicOggStream::load(const std::string& filename)
         return false;
     }
 
-    m_fileName =  loader->getMusicFile(filename);
+    m_fileName =  file_manager->getMusicFile(filename);
     if(m_fileName=="") return false;
     
     oggFile = fopen(m_fileName.c_str(), "rb");

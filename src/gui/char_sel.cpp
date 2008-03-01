@@ -20,7 +20,6 @@
 #include <sstream>
 #include <string>
 
-#include "loader.hpp"
 #include "char_sel.hpp"
 #include "kart_properties_manager.hpp"
 #include "widget_manager.hpp"

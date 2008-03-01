@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <set>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "string_utils.hpp"
 #include "grand_prix_select.hpp"
 #include "widget_manager.hpp"
@@ -54,7 +54,7 @@ GrandPrixSelect::GrandPrixSelect()
     widget_manager->setWgtText(WTOK_TITLE,  _("Choose a Grand Prix"));
 
     std::set<std::string> result;
-    loader->listFiles(result, "data");
+    file_manager->listFiles(result, "data");
 
     widget_manager->setInitialActivationState(true);
     // Findout which grand prixs are available and load them

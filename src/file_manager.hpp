@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_LOADER_H
-#define HEADER_LOADER_H
+#ifndef HEADER_FILE_MANAGER_H
+#define HEADER_FILE_MANAGER_H
 
 #include <plib/ssg.h>
 #include <string>
@@ -26,7 +26,7 @@
 #include <set>
 #include "callback_manager.hpp"
 
-class Loader : public ssgLoaderOptions
+class FileManager : public ssgLoaderOptions
 {
 private:
     bool                        m_is_full_path;
@@ -38,8 +38,8 @@ private:
                                  const std::string& fname, 
                                  const std::vector<std::string>& search_path) const;
 public:
-    Loader();
-    ~Loader();
+    FileManager();
+    ~FileManager();
 
     virtual void makeModelPath  (char* path, const char* fname) const;
     std::string getTextureFile  (const std::string& fname) const;
@@ -86,7 +86,7 @@ private:
     ssgBranch   *animInit     (char *data) const;
 };
 
-extern Loader* loader;
+extern FileManager* file_manager;
 
 #endif
 

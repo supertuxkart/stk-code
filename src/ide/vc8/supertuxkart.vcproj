@@ -703,6 +703,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\file_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\flyable.cpp"
 				>
 			</File>
@@ -748,10 +752,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\kart_properties_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\loader.cpp"
 				>
 			</File>
 			<File
@@ -1097,6 +1097,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\file_manager.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\flyable.hpp"
 				>
 			</File>
@@ -1154,10 +1158,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\kart_properties_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\loader.hpp"
 				>
 			</File>
 			<File

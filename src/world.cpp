@@ -27,7 +27,7 @@
 #include "herring_manager.hpp"
 #include "projectile_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "player_kart.hpp"
 #include "auto_kart.hpp"
 #include "track.hpp"
@@ -335,7 +335,7 @@ void World::update(float dt)
 bool World::saveReplayHumanReadable( std::string const &filename ) const
 {
     std::string path;
-    path = loader->getReplayFile(filename+"."+ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
+    path = file_manager->getReplayFile(filename+"."+ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
 
     FILE *fd = fopen( path.c_str(), "w" );
     if( !fd ) 
@@ -378,12 +378,12 @@ bool World::loadReplayHumanReadable( std::string const &filename )
     assert( m_p_replay_player );
     m_p_replay_player->destroy();
 
-    std::string path = loader->getReplayFile(filename+"."+ 
+    std::string path = file_manager->getReplayFile(filename+"."+ 
             ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
 
     try
     {
-        path = loader->getPath(path.c_str());
+        path = file_manager->getPath(path.c_str());
     }
     catch(std::runtime_error& e)
     {

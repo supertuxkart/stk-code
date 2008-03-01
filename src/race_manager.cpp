@@ -19,7 +19,6 @@
 
 #include <iostream>
 
-#include "loader.hpp"
 #include "track_manager.hpp"
 #include "race_setup.hpp"
 #include "game_manager.hpp"

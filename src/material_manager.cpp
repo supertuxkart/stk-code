@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdexcept>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
@@ -73,7 +73,7 @@ void MaterialManager::loadMaterial()
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
     const std::string fname     = "materials.dat";
-    std::string       full_name = loader->getTextureFile(fname);
+    std::string       full_name = file_manager->getTextureFile(fname);
     if(full_name=="")
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];

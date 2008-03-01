@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "user_config.hpp"
 #include "gui/font.hpp"
 
@@ -42,7 +42,7 @@ int delete_fonts()
 // =============================================================================
 Font::Font(const char *fontname)
 {
-    m_fnt      = new fntTexFont(loader->getFontFile(fontname).c_str(),
+    m_fnt      = new fntTexFont(file_manager->getFontFile(fontname).c_str(),
                                 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
     m_text_out = new fntRenderer();
     m_text_out->setFont(m_fnt);

@@ -22,7 +22,7 @@
 
 #include <SDL/SDL.h>
 
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_properties_manager.hpp"
@@ -177,7 +177,7 @@ GrandPrixEnd::~GrandPrixEnd()
     //going white after finishing the grandprix
     // FIXME: I think this is not necessary anymore after the
     //        texture bug fix (r733) - but I can't currently test this.
-    loader->shared_textures.removeAll();
+    file_manager->shared_textures.removeAll();
 }
 
 //-----------------------------------------------------------------------------

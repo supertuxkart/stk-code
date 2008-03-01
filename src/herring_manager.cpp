@@ -22,7 +22,7 @@
 #include <sstream>
 #include "user_config.hpp"
 #include "herring_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "kart.hpp"
@@ -116,19 +116,19 @@ HerringManager::~HerringManager()
 //-----------------------------------------------------------------------------
 void HerringManager::loadDefaultHerrings()
 {
-    // Load all models. This can't be done in the constructor, since the loader
+    // Load all models. This can't be done in the constructor, since the file_manager
     // isn't ready at that stage.
 
     // Load all models from the models/herrings directory
     // --------------------------------------------------
     std::set<std::string> files;
-    loader->listFiles(files, "models/herrings");
+    file_manager->listFiles(files, "models/herrings");
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
             std::string fullName  = "herrings/"+(*i);
-            ssgEntity*  h         = loader->load(fullName, CB_HERRING);
+            ssgEntity*  h         = file_manager->load(fullName, CB_HERRING);
             std::string shortName = StringUtils::without_extension(*i);
             h->ref();
             h->setName(shortName.c_str());
@@ -333,7 +333,7 @@ void HerringManager::loadHerringStyle(const std::string filename)
     const lisp::Lisp* root = 0;
     lisp::Parser parser;
     
-    root = parser.parse(loader->getConfigFile(filename + ".herring"));
+    root = parser.parse(file_manager->getConfigFile(filename + ".herring"));
 
     const lisp::Lisp* herring_node = root->getLisp("herring");
     if(!herring_node)

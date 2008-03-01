@@ -23,7 +23,7 @@
 
 #include "herring_manager.hpp"
 #include "sound_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "skid_mark.hpp"
 #include "user_config.hpp"
 #include "constants.hpp"
@@ -1104,7 +1104,7 @@ void Kart::loadData()
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
     m_smokepuff = new ssgSimpleState ();
-    m_smokepuff -> setTexture        (loader->createTexture ("smoke.rgb", true, true, true)) ;
+    m_smokepuff -> setTexture        (file_manager->createTexture ("smoke.rgb", true, true, true)) ;
     m_smokepuff -> setTranslucent    () ;
     m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
     m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;

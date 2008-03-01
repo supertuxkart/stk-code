@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <plib/ssgAux.h>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "track.hpp"
 #include "string_utils.hpp"
 #include "lisp/lisp.hpp"
@@ -833,8 +833,8 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
 
     // Set the correct paths
-    m_screenshot = loader->getTrackFile(m_screenshot, getIdent());
-    m_top_view   = loader->getTrackFile(m_top_view,   getIdent());
+    m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
+    m_top_view   = file_manager->getTrackFile(m_top_view,   getIdent());
     
     delete ROOT;
 }   // loadTrack
@@ -947,7 +947,7 @@ Track::loadDriveline()
 void
 Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
 {
-    std::string path = loader->getTrackFile(m_ident+file_ext);
+    std::string path = file_manager->getTrackFile(m_ident+file_ext);
     FILE *fd = fopen ( path.c_str(), "r" ) ;
 
     if ( fd == NULL )
@@ -1105,12 +1105,12 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 void Track::loadTrackModel()
 {
     // Add the track directory to the texture search path
-    loader->pushTextureSearchPath(loader->getTrackFile("",getIdent()));
-    loader->pushModelSearchPath  (loader->getTrackFile("",getIdent()));
+    file_manager->pushTextureSearchPath(file_manager->getTrackFile("",getIdent()));
+    file_manager->pushModelSearchPath  (file_manager->getTrackFile("",getIdent()));
     // First read the temporary materials.dat file if it exists
     try
     {
-        std::string materials_file = loader->getTrackFile("materials.dat",getIdent());
+        std::string materials_file = file_manager->getTrackFile("materials.dat",getIdent());
         material_manager->pushTempMaterial(materials_file);
     }
     catch (std::exception& e)
@@ -1118,7 +1118,7 @@ void Track::loadTrackModel()
         // no temporary materials.dat file, ignore
         (void)e;
     }
-    std::string path = loader->getTrackFile(getIdent()+".loc");
+    std::string path = file_manager->getTrackFile(getIdent()+".loc");
 
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
@@ -1249,7 +1249,7 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
-            ssgEntity        *obj   = loader->load(loader->getModelFile(fname),
+            ssgEntity        *obj   = file_manager->load(file_manager->getModelFile(fname),
                                                    CB_TRACK,
                                                    /* optimise   */  true,
                                                    /*is_full_path*/  true);
@@ -1258,8 +1258,8 @@ void Track::loadTrackModel()
                 fclose(fd);
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
                 snprintf(msg, sizeof(msg), "Can't open track model '%s'",fname);
-                loader->popTextureSearchPath();
-                loader->popModelSearchPath  ();
+                file_manager->popTextureSearchPath();
+                file_manager->popModelSearchPath  ();
                 throw std::runtime_error(msg);
             }
             createDisplayLists(obj);
@@ -1288,8 +1288,8 @@ void Track::loadTrackModel()
     }   // while fgets
 
     fclose ( fd ) ;
-    loader->popTextureSearchPath();
-    loader->popModelSearchPath  ();
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath  ();
 
     createPhysicsModel();
 }   // loadTrack

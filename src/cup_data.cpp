@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
@@ -32,7 +32,7 @@ CupData::CupData(const std::string filename_)
     try
     {
         lisp::Parser parser;
-        lisp = parser.parse(loader->getConfigFile(m_filename));
+        lisp = parser.parse(file_manager->getConfigFile(m_filename));
 
         lisp = lisp->getLisp("supertuxkart-cup");
         if(!lisp)

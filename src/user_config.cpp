@@ -41,7 +41,7 @@
 #include "lisp/writer.hpp"
 #include "translation.hpp"
 #include "race_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -76,9 +76,9 @@ UserConfig::~UserConfig()
 void UserConfig::setFilename()
 {
 #ifdef WIN32
-    m_filename = loader->getLogFile("supertuxkart.cfg");
+    m_filename = file_manager->getLogFile("supertuxkart.cfg");
 #else
-    m_filename = loader->getLogFile("config");
+    m_filename = file_manager->getLogFile("config");
 #endif
 }   // setFilename
 
@@ -298,7 +298,7 @@ void UserConfig::loadConfig()
  */
 int UserConfig::CheckAndCreateDir()
 {
-    const std::string DIRNAME = loader->getHomeDir();
+    const std::string DIRNAME = file_manager->getHomeDir();
     ulDir*      u       = ulOpenDir(DIRNAME.c_str());
     if(u)
     {  // OK, directory exists

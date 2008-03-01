@@ -38,7 +38,7 @@
 #  define CONFIGDIR       ".supertuxkart"
 #endif
 #include "plib/ul.h"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "world.hpp"
 #include "btBulletDynamicsCommon.h"
 #include "moving_physics.hpp"
@@ -80,9 +80,9 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 }
 #endif
 
-Loader* loader = 0;
+FileManager* file_manager = 0;
 
-Loader::Loader()
+FileManager::FileManager()
 {
     m_is_full_path = false;
     
@@ -109,18 +109,18 @@ Loader::Loader()
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/models"       );
     pushMusicSearchPath  (m_root_dir+"/ogg"          );
-}  // Loader
+}  // FileManager
 
 //-----------------------------------------------------------------------------
-Loader::~Loader()
+FileManager::~FileManager()
 {
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
-}   // ~Loader
+}   // ~FileManager
 
 //-----------------------------------------------------------------------------
-bool Loader::findFile(std::string& full_path,
+bool FileManager::findFile(std::string& full_path,
                       const std::string& fname, 
                       const std::vector<std::string>& search_path) const
 {
@@ -138,7 +138,7 @@ bool Loader::findFile(std::string& full_path,
 }   // findFile
 
 //-----------------------------------------------------------------------------
-void Loader::makeModelPath(char* path, const char* FNAME) const
+void FileManager::makeModelPath(char* path, const char* FNAME) const
 {
     if(m_is_full_path)
     {
@@ -155,7 +155,7 @@ void Loader::makeModelPath(char* path, const char* FNAME) const
 }   // makeModelPath
 
 //-----------------------------------------------------------------------------
-std::string Loader::getTextureFile(const std::string& FNAME) const
+std::string FileManager::getTextureFile(const std::string& FNAME) const
 {
     std::string path;
     findFile(path, FNAME, m_texture_search_path);
@@ -163,7 +163,7 @@ std::string Loader::getTextureFile(const std::string& FNAME) const
 }   // makeTexturePath
 
 //-----------------------------------------------------------------------------
-std::string Loader::getModelFile(const std::string& FNAME) const
+std::string FileManager::getModelFile(const std::string& FNAME) const
 {
     std::string path;
     findFile(path, FNAME, m_model_search_path);
@@ -171,18 +171,18 @@ std::string Loader::getModelFile(const std::string& FNAME) const
 }   // makeTexturePath
 
 //-----------------------------------------------------------------------------
-std::string Loader::getKartFile(const std::string& fname) const
+std::string FileManager::getKartFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
 }   // getKartFile
 
 //-----------------------------------------------------------------------------
-std::string Loader::getTrackDir() const
+std::string FileManager::getTrackDir() const
 {
     return m_root_dir+"/data/tracks";
 }   // getTrackDir
 //-----------------------------------------------------------------------------
-std::string Loader::getTrackFile(const std::string& fname,
+std::string FileManager::getTrackFile(const std::string& fname,
                                  const std::string& track_name) const
 {
     // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
@@ -194,13 +194,13 @@ std::string Loader::getTrackFile(const std::string& fname,
 }   // getTrackFile
 
 //-----------------------------------------------------------------------------
-std::string Loader::getConfigFile(const std::string& fname) const
+std::string FileManager::getConfigFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
-std::string Loader::getHomeDir() const
+std::string FileManager::getHomeDir() const
 {
     std::string DIRNAME;
 #ifdef WIN32
@@ -223,41 +223,41 @@ std::string Loader::getHomeDir() const
 }   // getHomeDir
 
 //-----------------------------------------------------------------------------
-std::string Loader::getLogFile(const std::string& fname) const
+std::string FileManager::getLogFile(const std::string& fname) const
 {
     return getHomeDir()+"/"+fname;
 }   // getLogFile
 
 //-----------------------------------------------------------------------------
-std::string Loader::getMusicFile(const std::string& fname) const
+std::string FileManager::getMusicFile(const std::string& fname) const
 {
     return m_root_dir+"/oggs/"+fname;
 }   // getMusicFile
 //-----------------------------------------------------------------------------
-std::string Loader::getSFXFile(const std::string& fname) const
+std::string FileManager::getSFXFile(const std::string& fname) const
 {
     return m_root_dir+"/wavs/"+fname;
 }   // getSFXFile
 //-----------------------------------------------------------------------------
-std::string Loader::getFontFile(const std::string& fname) const
+std::string FileManager::getFontFile(const std::string& fname) const
 {
     return m_root_dir+"/fonts/"+fname;
 }   // getFontFile
 //-----------------------------------------------------------------------------
-std::string Loader::getHighscoreFile(const std::string& fname) const
+std::string FileManager::getHighscoreFile(const std::string& fname) const
 {
     return getHomeDir()+"/"+fname;
 }   // getHighscoreFile
 
 //-----------------------------------------------------------------------------
 #ifdef HAVE_GHOST_REPLAY
-std::string Loader::getReplayFile(const std::string& fname) const
+std::string FileManager::getReplayFile(const std::string& fname) const
 {
     return m_root_dir+"/replay/"+fname;
 }   // getReplayFile
 #endif
 //-----------------------------------------------------------------------------
-void Loader::initConfigDir()
+void FileManager::initConfigDir()
 {
 #ifdef WIN32
     /*nothing*/
@@ -275,7 +275,7 @@ void Loader::initConfigDir()
 }   // initConfigDir
 
 //-----------------------------------------------------------------------------
-void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
+void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,
                        bool is_full_path) const
 {
         struct stat mystat;
@@ -318,7 +318,7 @@ void Loader::listFiles(std::set<std::string>& result, const std::string& dir,
  *  \param optimise Default is true. If set to false, the model will not
  *                  be flattened.
  */
-ssgEntity *Loader::load(const std::string& filename, CallbackType t,
+ssgEntity *FileManager::load(const std::string& filename, CallbackType t,
                         bool optimise, bool is_full_path)
 {
     m_current_callback_type   = t;
@@ -330,7 +330,7 @@ ssgEntity *Loader::load(const std::string& filename, CallbackType t,
 }   // load
 
 //-----------------------------------------------------------------------------
-void Loader::preProcessObj ( ssgEntity *n, bool mirror )
+void FileManager::preProcessObj ( ssgEntity *n, bool mirror )
 {
     if ( n == NULL ) return ;
 
@@ -365,7 +365,7 @@ void Loader::preProcessObj ( ssgEntity *n, bool mirror )
 }
 
 //-----------------------------------------------------------------------------
-ssgBranch *Loader::animInit (char *data ) const
+ssgBranch *FileManager::animInit (char *data ) const
 {
     while ( ! isdigit ( *data ) && *data != '\0' )
         data++ ;
@@ -399,7 +399,7 @@ ssgBranch *Loader::animInit (char *data ) const
  * to be created, which are then handled by the callback manager.
  */
 
-ssgBranch *Loader::createBranch(char *data) const
+ssgBranch *FileManager::createBranch(char *data) const
 {
 
     if ( data == NULL || data[0] != '@' ) return NULL;

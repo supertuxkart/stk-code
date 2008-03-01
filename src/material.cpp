@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "material.hpp"
 
 #define UCLAMP   1
@@ -156,7 +156,7 @@ void Material::install(bool is_full_path)
     if ( m_texname.size()>0 )
     {
         std::string fn=is_full_path ? m_texname 
-                                    : loader->getTextureFile(m_texname);
+                                    : file_manager->getTextureFile(m_texname);
         if(fn=="")
         {
             fprintf(stderr, "WARNING: texture '%s' not found.\n", 

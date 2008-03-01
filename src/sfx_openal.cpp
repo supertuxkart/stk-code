@@ -31,7 +31,7 @@
 #include <AL/alut.h>
 
 #include "sfx_openal.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 
 
 
@@ -68,7 +68,7 @@ void SFXImpl::play()
 //-----------------------------------------------------------------------------
 bool SFXImpl::load(const char* filename)
 {
-    std::string path = loader->getSFXFile(filename);
+    std::string path = file_manager->getSFXFile(filename);
 
     alGenBuffers(1, &m_soundBuffer);
     if (alGetError() != AL_NO_ERROR)
@@ -89,8 +89,8 @@ bool SFXImpl::load(const char* filename)
 
     if (data == NULL)
     {
-        const int ERROR = alutGetError();
-        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ERROR));
+        const int ALUT_ERROR = alutGetError();
+        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ALUT_ERROR));
         return false;
     }
 

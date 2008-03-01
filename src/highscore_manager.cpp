@@ -23,7 +23,7 @@
 #include "lisp/writer.hpp"
 #include "translation.hpp"
 #include "string_utils.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "race_setup.hpp"
 #include "user_config.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -59,7 +59,7 @@ void HighscoreManager::SetFilename()
     }
     else 
     {
-        m_filename=loader->getHighscoreFile("highscore.data");
+        m_filename=file_manager->getHighscoreFile("highscore.data");
     }
 
     return;

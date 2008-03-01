@@ -24,7 +24,6 @@
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "constants.hpp"
-#include "loader.hpp"
 #include "world.hpp"
 #include "sound_manager.hpp"
 #include "stk_config.hpp"

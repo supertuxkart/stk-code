@@ -24,7 +24,7 @@
 #include "user_config.hpp"
 #include "string_utils.hpp"
 #include "gui/font.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 
 #define USE_PLIB_SOUND !(HAVE_OPENAL && HAVE_OGGVORBIS)
 #if USE_PLIB_SOUND
@@ -197,7 +197,7 @@ void SoundManager::playMusic(const std::string& filename)
     std::string name_readme;
     try
     {
-        name_readme = loader->getMusicFile(
+        name_readme = file_manager->getMusicFile(
                             StringUtils::without_extension(filename)+".readme");
     }
     catch(std::exception)

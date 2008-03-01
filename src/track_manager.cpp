@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdexcept>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "string_utils.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
@@ -72,14 +72,14 @@ TrackManager::loadTrackList ()
 {
     // Load up a list of tracks - and their names
     std::set<std::string> files;
-    loader->listFiles(files, loader->getTrackDir(), /*is_full_path*/ true);
+    file_manager->listFiles(files, file_manager->getTrackDir(), /*is_full_path*/ true);
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
         if(*i=="." || *i=="..") continue;
         std::string config_file;
         try
         {
-            config_file = loader->getTrackFile((*i)+".track");
+            config_file = file_manager->getTrackFile((*i)+".track");
         }
         catch (std::exception& e)
         {

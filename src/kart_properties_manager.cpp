@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <ctime>
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "string_utils.hpp"
 #include "kart_properties_manager.hpp"
 #include "kart_properties.hpp"
@@ -59,7 +59,7 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
 {
     m_max_steer_angle = -1.0f;
     std::set<std::string> result;
-    loader->listFiles(result, "data");
+    file_manager->listFiles(result, "data");
 
     // Find out which characters are available and load them
     for(std::set<std::string>::iterator i = result.begin();
@@ -68,7 +68,7 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
             if (StringUtils::has_suffix(*i, ".tkkf"))
             {
                 KartProperties* kp = new KartProperties();
-                std::string filename=loader->getKartFile(*i);
+                std::string filename=file_manager->getKartFile(*i);
                 kp->load(filename.c_str(), "tuxkart-kart", dont_load_models);
                 m_karts_properties.push_back(kp);
                 if(kp->getMaxSteerAngle() > m_max_steer_angle)

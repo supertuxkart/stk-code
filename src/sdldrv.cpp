@@ -36,7 +36,7 @@
 #include "collectable_manager.hpp"
 #include "attachment_manager.hpp"
 #include "projectile_manager.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "player.hpp"
 #include "gui/font.hpp"
@@ -176,7 +176,7 @@ void setVideoMode(bool resetTextures)
     if(resetTextures)
     {
         // Clear plib internal texture cache
-        loader->endLoad();
+        file_manager->endLoad();
 
         // Windows needs to reload all textures, display lists, ... which means
         // that all models have to be reloaded. So first, free all textures,

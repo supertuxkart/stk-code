@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "credits_menu.hpp"
-#include "loader.hpp"
+#include "file_manager.hpp"
 #include "translation.hpp"
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
@@ -42,7 +42,7 @@ CreditsMenu::CreditsMenu()
     std::string line;
     std::string credits_text;
 
-    filename = loader->getConfigFile("CREDITS");
+    filename = file_manager->getConfigFile("CREDITS");
     std::ifstream file(filename.c_str());
 
     if( file.is_open() )
