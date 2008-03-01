@@ -183,18 +183,21 @@ class Widget
 
     void update(const float DELTA);
 
-    void resizeToText(); //This checks if the widget is smaller than the
-                           //text, and if so, changes the width and height.
-    bool createRect(int radius);
-
     /* Time limited features' functions. */
     void pulse() {m_text_scale = MAX_TEXT_SCALE;}
 
     /* Convenience functions. */
+    void resizeToText(); //This checks if the widget is smaller than the
+                           //text, and if so, changes the width and height.
+
     void lightenColor();
     void darkenColor();
 
     void setFont( const WidgetFont FONT);
+
+    /* Functions created simply to organize the code */
+    bool createRect(int radius);
+    void applyTransformations();
 
 };
 

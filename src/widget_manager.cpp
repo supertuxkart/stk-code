@@ -20,6 +20,12 @@
 
 #include "user_config.hpp"
 
+#ifdef __APPLE__
+#  include <OpenGL/glu.h>
+#else
+#  include <GL/glu.h>
+#endif
+
 #include <iostream>
 #include <cstdlib>
 #include <iterator>
@@ -1247,40 +1253,100 @@ void WidgetManager::darkenWgtColor(const int TOKEN)
  */
 int WidgetManager::handlePointer(const int X, const int Y )
 {
-    //Search if the given x and y positions are on top of any widget. Please
-    //note that the bounding box for each widget is used instead of the
-    //real widget shape.
+    const int NUM_WGTS = m_widgets.size();
+    if( NUM_WGTS < 1 ) return WGT_NONE;
 
-    //The search starts with the current selected widget(since it's most
-    //probable that the mouse is on top of it )
-    const int NUM_WIDGETS = (int)m_widgets.size();
+    //OpenGL provides a mechanism to select objects; simply 'draw' named
+    //objects, and for each non-culled visible object a 'hit' will be saved
+    //into a selection buffer. Objects are named by using OpenGL's name
+    //stack. The information in each hit is the number of names in the name
+    //stack, two hard-to-explain depth values that aren't used in this
+    //function, and the contents of the name stack at the time of the hit.
 
-    if( m_selected_wgt_token != WGT_NONE )
-    {
-        const int SELECTED_WGT_ID = findId(m_selected_wgt_token);
+    //This function loads 1 name into the stack (because if you pop an empty
+    //stack you get an error), then uses glLoadName (which is a shortcut for
+    //popping then pushing) to change the name. That means that each time a
+    //hit is recorded, only the last drawn widget will be on the name stack.
 
-        if(( X > m_widgets[SELECTED_WGT_ID].widget->m_x ) &&
-           ( X < m_widgets[SELECTED_WGT_ID].widget->m_x + m_widgets[SELECTED_WGT_ID].widget->m_width ) &&
-           ( Y > m_widgets[SELECTED_WGT_ID].widget->m_y ) &&
-           ( Y < m_widgets[SELECTED_WGT_ID].widget->m_y + m_widgets[SELECTED_WGT_ID].widget->m_height ))
-        {
-            return WGT_NONE;
-        }
-    }
+    const int HIT_SIZE = 4; //1 Gluint for the number of names, 2 depth
+                            //values, and 1 for the token of the widget.
+    const int BUFFER_SIZE = HIT_SIZE * NUM_WGTS;
 
-    for( int i = 0; i < NUM_WIDGETS; ++i )
+    GLuint select_buffer[BUFFER_SIZE];
+    glSelectBuffer(BUFFER_SIZE, select_buffer);
+
+    glRenderMode(GL_SELECT);
+
+    //Set the viewport to draw only what's under the mouse
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    gluPickMatrix(X, Y, 1,1,viewport);
+    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    glInitNames();
+    glPushName(WGT_NONE);
+
+    glPushMatrix();
+
+    for( int i = 0; i < NUM_WGTS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
 
-        //Simple bounding box test
-        if(( X > m_widgets[i].widget->m_x ) &&
-           ( X < m_widgets[i].widget->m_x + m_widgets[i].widget->m_width ) &&
-           ( Y > m_widgets[i].widget->m_y ) &&
-           ( Y < m_widgets[i].widget->m_y + m_widgets[i].widget->m_height ))
+        glLoadName( m_widgets[i].token );
+
+        glPushMatrix();
+        m_widgets[i].widget->applyTransformations();
+        //In case this ever becomes a performance bottleneck:
+        //the m_rect_list includes texture coordinates, which are not
+        //needed for selection.
+        glCallList( m_widgets[i].widget->m_rect_list );
+        glPopMatrix();
+    }
+    glFlush();
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glFlush();
+
+    GLuint* position = select_buffer;
+    const GLint NUM_HITS = glRenderMode(GL_RENDER);
+
+    if( NUM_HITS > 0 )
+    {
+        float dist;
+        float near_dist = 9999999.0f;
+        int nearest = WGT_NONE;
+        int wgt_x_center, wgt_y_center;
+        int curr_wgt;
+        for( int i = 0; i < NUM_HITS; ++i )
         {
-            m_selected_wgt_token = m_widgets[i].token;
-            return m_selected_wgt_token;
+            position += 3;
+            curr_wgt = *position;
+
+            wgt_x_center = m_widgets[curr_wgt].widget->m_x + m_widgets[i].widget->m_width / 2;
+            wgt_y_center = m_widgets[curr_wgt].widget->m_y + m_widgets[i].widget->m_height / 2;
+            //Check if it's the closest one to the mouse
+            dist = ( fabsf(X - wgt_x_center) + fabsf(Y - wgt_y_center));
+            if(dist < near_dist )
+            {
+                near_dist = dist;
+                nearest = curr_wgt;
+            }
+
+            ++position;
         }
+        if( nearest == m_selected_wgt_token ) return WGT_NONE;
+
+        m_selected_wgt_token = nearest;
+        return m_selected_wgt_token;
     }
 
     return WGT_NONE;
@@ -1293,7 +1359,7 @@ int
 WidgetManager::handleLeft()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
-	
+
 	return handleFinish(findLeftWidget(findId(m_selected_wgt_token)));
 }
 
@@ -1301,7 +1367,7 @@ WidgetManager::handleLeft()
 WidgetManager::handleRight()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
-	
+
 	return handleFinish(findRightWidget(findId(m_selected_wgt_token)));
 }
 
@@ -1309,7 +1375,7 @@ int
 WidgetManager::handleUp()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
-	
+
 	return handleFinish(findTopWidget(findId(m_selected_wgt_token)));
 }
 
@@ -1317,7 +1383,7 @@ int
 WidgetManager::handleDown()
 {
     if( m_selected_wgt_token == WGT_NONE ) return WGT_NONE;
-	
+
 	return handleFinish(findBottomWidget(findId(m_selected_wgt_token)));
 }
 
@@ -1326,9 +1392,9 @@ WidgetManager::handleFinish(const int next_wgt)
 {
     if( next_wgt == WGT_NONE)
 		return WGT_NONE;
-	
+
 	m_selected_wgt_token = m_widgets[next_wgt].token;
-	
+
 	return m_selected_wgt_token;
 }
 

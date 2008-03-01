@@ -103,15 +103,9 @@ void Widget::update(const float DELTA)
      */
 
     glClear( GL_STENCIL_BUFFER_BIT );
-    glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
 
-    m_rotation_angle += m_rotation_speed * DELTA;
-    if( m_enable_rotation )
-    {
-        glRotatef( (GLfloat)m_rotation_angle, 0.0f, 0.0f, (GLfloat)1.0f );
-    }
-
-
+    if( m_enable_rotation ) m_rotation_angle += m_rotation_speed * DELTA;
+    applyTransformations();
 
     /*Handle delta time dependant features*/
     if(m_text_scale > MIN_TEXT_SCALE)
@@ -370,6 +364,145 @@ void Widget::update(const float DELTA)
     glPopMatrix();
 }
 
+//-----------------------------------------------------------------------------
+void Widget::resizeToText()
+{
+    if( !m_text.empty() )
+    {
+        float left, right, bottom, top;
+        m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
+
+        const int TEXT_WIDTH = (int)(right - left);
+        const int TEXT_HEIGHT = (int)(top - bottom);
+
+        if( TEXT_WIDTH > m_width ) m_width = TEXT_WIDTH;
+        if( TEXT_HEIGHT > m_height ) m_height = TEXT_HEIGHT;
+    }
+}
+
+//-----------------------------------------------------------------------------
+/* Please note that this function only lightens 'non-light' colors */
+void Widget::lightenColor()
+{
+    if(m_rect_color == WGT_GRAY)
+    {
+        m_rect_color = WGT_LIGHT_GRAY;
+    }
+    if(m_rect_color == WGT_BLACK)
+    {
+        m_rect_color = WGT_LIGHT_BLACK;
+    }
+    else if (m_rect_color == WGT_YELLOW)
+    {
+        m_rect_color = WGT_LIGHT_YELLOW;
+    }
+    else if (m_rect_color == WGT_RED)
+    {
+        m_rect_color = WGT_LIGHT_RED;
+    }
+    else if (m_rect_color == WGT_GREEN)
+    {
+        m_rect_color = WGT_LIGHT_GREEN;
+    }
+    else if (m_rect_color == WGT_BLUE)
+    {
+        m_rect_color = WGT_LIGHT_BLUE;
+    }
+    else if (m_rect_color == WGT_TRANS_GRAY)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_GRAY;
+    }
+    else if (m_rect_color == WGT_TRANS_BLACK)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_BLACK;
+    }
+    else if (m_rect_color == WGT_TRANS_YELLOW)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_YELLOW;
+    }
+    else if (m_rect_color == WGT_TRANS_RED)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_RED;
+    }
+    else if (m_rect_color == WGT_TRANS_GREEN)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_GREEN;
+    }
+    else if (m_rect_color == WGT_TRANS_BLUE)
+    {
+        m_rect_color = WGT_LIGHT_TRANS_BLUE;
+    }
+}
+
+//-----------------------------------------------------------------------------
+/* Please note that this function only darkens 'light' colors. */
+void Widget::darkenColor()
+{
+    if(m_rect_color == WGT_LIGHT_GRAY)
+    {
+        m_rect_color = WGT_GRAY;
+    }
+    if(m_rect_color == WGT_LIGHT_BLACK)
+    {
+        m_rect_color = WGT_BLACK;
+    }
+    else if (m_rect_color == WGT_LIGHT_YELLOW)
+    {
+        m_rect_color = WGT_YELLOW;
+    }
+    else if (m_rect_color == WGT_LIGHT_RED)
+    {
+        m_rect_color = WGT_RED;
+    }
+    else if (m_rect_color == WGT_LIGHT_GREEN)
+    {
+        m_rect_color = WGT_GREEN;
+    }
+    else if (m_rect_color == WGT_LIGHT_BLUE)
+    {
+        m_rect_color = WGT_BLUE;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_GRAY)
+    {
+        m_rect_color = WGT_TRANS_GRAY;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_BLACK)
+    {
+        m_rect_color = WGT_TRANS_BLACK;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_YELLOW)
+    {
+        m_rect_color = WGT_TRANS_YELLOW;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_RED)
+    {
+        m_rect_color = WGT_TRANS_RED;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_GREEN)
+    {
+        m_rect_color = WGT_TRANS_GREEN;
+    }
+    else if (m_rect_color == WGT_LIGHT_TRANS_BLUE)
+    {
+        m_rect_color = WGT_TRANS_BLUE;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void Widget::setFont( const WidgetFont FONT )
+{
+    switch( FONT )
+    {
+        case WGT_FONT_GUI:
+            m_font = font_gui;
+            break;
+
+        case WGT_FONT_RACE:
+            m_font = font_race;
+            break;
+    };
+}
+
 /** Initialize a display list containing a rectangle that can have rounded
  *  corners, with texture coordinates to properly apply a texture
  *  map to the rectangle as though the corners were not rounded . Returns
@@ -541,140 +674,13 @@ bool Widget::createRect(int radius)
 }
 
 //-----------------------------------------------------------------------------
-void Widget::resizeToText()
+void Widget::applyTransformations()
 {
-    if( !m_text.empty() )
+    glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
+
+    if( m_enable_rotation )
     {
-        float left, right, bottom, top;
-        m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
-
-        const int TEXT_WIDTH = (int)(right - left);
-        const int TEXT_HEIGHT = (int)(top - bottom);
-
-        if( TEXT_WIDTH > m_width ) m_width = TEXT_WIDTH;
-        if( TEXT_HEIGHT > m_height ) m_height = TEXT_HEIGHT;
+        glRotatef( (GLfloat)m_rotation_angle, 0.0f, 0.0f, (GLfloat)1.0f );
     }
 }
 
-//-----------------------------------------------------------------------------
-/* Please note that this function only lightens 'non-light' colors */
-void Widget::lightenColor()
-{
-    if(m_rect_color == WGT_GRAY)
-    {
-        m_rect_color = WGT_LIGHT_GRAY;
-    }
-    if(m_rect_color == WGT_BLACK)
-    {
-        m_rect_color = WGT_LIGHT_BLACK;
-    }
-    else if (m_rect_color == WGT_YELLOW)
-    {
-        m_rect_color = WGT_LIGHT_YELLOW;
-    }
-    else if (m_rect_color == WGT_RED)
-    {
-        m_rect_color = WGT_LIGHT_RED;
-    }
-    else if (m_rect_color == WGT_GREEN)
-    {
-        m_rect_color = WGT_LIGHT_GREEN;
-    }
-    else if (m_rect_color == WGT_BLUE)
-    {
-        m_rect_color = WGT_LIGHT_BLUE;
-    }
-    else if (m_rect_color == WGT_TRANS_GRAY)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_GRAY;
-    }
-    else if (m_rect_color == WGT_TRANS_BLACK)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_BLACK;
-    }
-    else if (m_rect_color == WGT_TRANS_YELLOW)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_YELLOW;
-    }
-    else if (m_rect_color == WGT_TRANS_RED)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_RED;
-    }
-    else if (m_rect_color == WGT_TRANS_GREEN)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_GREEN;
-    }
-    else if (m_rect_color == WGT_TRANS_BLUE)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_BLUE;
-    }
-}
-
-//-----------------------------------------------------------------------------
-/* Please note that this function only darkens 'light' colors. */
-void Widget::darkenColor()
-{
-    if(m_rect_color == WGT_LIGHT_GRAY)
-    {
-        m_rect_color = WGT_GRAY;
-    }
-    if(m_rect_color == WGT_LIGHT_BLACK)
-    {
-        m_rect_color = WGT_BLACK;
-    }
-    else if (m_rect_color == WGT_LIGHT_YELLOW)
-    {
-        m_rect_color = WGT_YELLOW;
-    }
-    else if (m_rect_color == WGT_LIGHT_RED)
-    {
-        m_rect_color = WGT_RED;
-    }
-    else if (m_rect_color == WGT_LIGHT_GREEN)
-    {
-        m_rect_color = WGT_GREEN;
-    }
-    else if (m_rect_color == WGT_LIGHT_BLUE)
-    {
-        m_rect_color = WGT_BLUE;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_GRAY)
-    {
-        m_rect_color = WGT_TRANS_GRAY;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_BLACK)
-    {
-        m_rect_color = WGT_TRANS_BLACK;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_YELLOW)
-    {
-        m_rect_color = WGT_TRANS_YELLOW;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_RED)
-    {
-        m_rect_color = WGT_TRANS_RED;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_GREEN)
-    {
-        m_rect_color = WGT_TRANS_GREEN;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_BLUE)
-    {
-        m_rect_color = WGT_TRANS_BLUE;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void Widget::setFont( const WidgetFont FONT )
-{
-    switch( FONT )
-    {
-        case WGT_FONT_GUI:
-            m_font = font_gui;
-            break;
-
-        case WGT_FONT_RACE:
-            m_font = font_race;
-            break;
-    };
-}
