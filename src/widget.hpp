@@ -149,6 +149,10 @@ class Widget
     std::string m_text;
     WidgetFontSize m_text_size;
 
+    //TODO: This variable exists only to go around a bug; should be removed
+    //after better restructuration.
+    WidgetFont m_curr_widget_font;
+
     static const int MAX_SCROLL;
     bool m_enable_scroll;
     float m_scroll_pos_x;

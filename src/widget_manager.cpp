@@ -1658,3 +1658,19 @@ int WidgetManager::findBottomWidget(const int START_WGT) const
     return closest_wgt;
 }
 
+/** reloadFonts() sets the pointers to the fonts of the guis
+ * to their choosen fonts; it's useful in cases where you
+ * free the font's memory (which makes the pointers invalid),
+ * then reload the fonts, like it happens when you change resolution
+ * on the Macs or Windows.
+ */
+void WidgetManager::reloadFonts()
+{
+    const int NUM_WIDGETS = (int)m_widgets.size();
+    for( int i = 0; i < NUM_WIDGETS; ++i )
+    {
+        m_widgets[i].widget->setFont(
+            m_widgets[i].widget->m_curr_widget_font );
+    }
+}
+
