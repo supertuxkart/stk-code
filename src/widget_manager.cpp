@@ -1253,7 +1253,7 @@ void WidgetManager::darkenWgtColor(const int TOKEN)
  */
 int WidgetManager::handlePointer(const int X, const int Y )
 {
-    const int NUM_WGTS = m_widgets.size();
+    const int NUM_WGTS = (int)m_widgets.size();
     if( NUM_WGTS < 1 ) return WGT_NONE;
 
     //OpenGL provides a mechanism to select objects; simply 'draw' named
@@ -1272,7 +1272,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
                             //values, and 1 for the token of the widget.
     const int BUFFER_SIZE = HIT_SIZE * NUM_WGTS;
 
-    GLuint select_buffer[BUFFER_SIZE];
+    GLuint* select_buffer = new GLuint[BUFFER_SIZE];
     glSelectBuffer(BUFFER_SIZE, select_buffer);
 
     glRenderMode(GL_SELECT);
@@ -1334,7 +1334,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
             wgt_x_center = m_widgets[curr_wgt].widget->m_x + m_widgets[i].widget->m_width / 2;
             wgt_y_center = m_widgets[curr_wgt].widget->m_y + m_widgets[i].widget->m_height / 2;
             //Check if it's the closest one to the mouse
-            dist = ( fabsf(X - wgt_x_center) + fabsf(Y - wgt_y_center));
+            dist = (float)( abs(X - wgt_x_center) + abs(Y - wgt_y_center));
             if(dist < near_dist )
             {
                 near_dist = dist;
@@ -1349,6 +1349,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
         return m_selected_wgt_token;
     }
 
+    delete select_buffer;
     return WGT_NONE;
 }
 
