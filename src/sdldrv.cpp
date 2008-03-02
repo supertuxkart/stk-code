@@ -38,6 +38,7 @@
 #include "projectile_manager.hpp"
 #include "loader.hpp"
 #include "gui/menu_manager.hpp"
+#include "widget_manager.hpp"
 #include "player.hpp"
 #include "gui/font.hpp"
 #include "user_config.hpp"
@@ -205,6 +206,10 @@ void setVideoMode(bool resetTextures)
         //Reinit fonts
         delete_fonts();
         init_fonts();
+
+        //TODO: this function probably will get deleted in the future; if
+        //so, the widget_manager.hpp include has no other reason to be here.
+        widget_manager->reloadFonts();
     }
 #endif
 }

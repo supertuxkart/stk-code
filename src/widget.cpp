@@ -677,4 +677,8 @@ void Widget::setFont( const WidgetFont FONT )
             m_font = font_race;
             break;
     };
+
+    //TODO: the curr_widget_font variable exists only for a bug around; after
+    //some restructuration, it should be fine to remove this.
+    m_curr_widget_font = FONT;
 }

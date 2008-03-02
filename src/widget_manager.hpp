@@ -232,6 +232,7 @@ public:
     void setWgtFont( const int TOKEN, const WidgetFont FONT);
     void showWgtText( const int TOKEN );
     void hideWgtText( const int TOKEN );
+    void reloadFonts();
 
     //FIXME: change to enableWgtScrolling, since it enables or disables
     //FIXME: maybe all that enabling the scrolling should do, is to allow
