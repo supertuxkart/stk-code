@@ -633,7 +633,7 @@ void Kart::update (float dt)
     Moveable::update(dt);
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if((fabs(m_curr_pos.hpr[2])>60 && getSpeed()<3.0f) )
+    if((fabs(m_curr_pos.hpr[2])>60 && fabs(getSpeed())<3.0f) )
     {
         forceRescue();
     }
