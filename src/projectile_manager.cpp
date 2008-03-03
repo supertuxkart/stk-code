@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "file_manager.hpp"
+#include "loader.hpp"
 #include "projectile_manager.hpp"
 #include "spark.hpp"
 #include "missile.hpp"
@@ -36,7 +36,7 @@ void ProjectileManager::loadData()
 
     // Load the explosion model and find the actual selector branch in it.
     // Only the explosion model is loaded here, see collectable_manager.
-    m_explosion_model = find_selector((ssgBranch*)file_manager->load("explode.ac",
+    m_explosion_model = find_selector((ssgBranch*)loader->load("explode.ac",
                                    CB_EXPLOSION) );
     m_explosion_model->ref();
     if ( m_explosion_model == NULL )

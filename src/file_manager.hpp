@@ -20,7 +20,6 @@
 #ifndef HEADER_FILE_MANAGER_H
 #define HEADER_FILE_MANAGER_H
 
-#include <plib/ssg.h>
 #include <string>
 #include <vector>
 #include <set>
@@ -41,9 +40,12 @@ public:
     FileManager();
     ~FileManager();
 
-    virtual void makeModelPath  (char* path, const char* fname) const;
+    std::string getHomeDir      () const;
+    std::string getTrackDir     () const;
+    std::string getKartDir      () const;
     std::string getTextureFile  (const std::string& fname) const;
-    std::string getKartFile     (const std::string& fname) const;
+    std::string getKartFile     (const std::string& fname,
+                                 const std::string& kart="") const;
     std::string getTrackFile    (const std::string& fname, 
                                  const std::string& track="") const;
     std::string getConfigFile   (const std::string& fname) const;
@@ -53,8 +55,6 @@ public:
     std::string getSFXFile      (const std::string& fname) const;
     std::string getFontFile     (const std::string& fname) const;
     std::string getModelFile    (const std::string& fname) const;
-    std::string getHomeDir      () const;
-    std::string getTrackDir     () const;
 #ifdef HAVE_GHOST_REPLAY
     std::string getReplayFile(const std::string& fname) const;
 #endif
@@ -73,17 +73,9 @@ public:
     void       popModelSearchPath   () {m_model_search_path.pop_back();     }
     void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
     void       initConfigDir();
-    ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true,
-                    bool is_full_path=false);
-    void         setCallbackType(CallbackType t)   {m_current_callback_type=t;}
 private:
-    CallbackType m_current_callback_type;
-
     void         makePath     (std::string& path, const std::string& dir, 
                                const std::string& fname) const;
-    ssgBranch   *createBranch (char *data) const;
-    void         preProcessObj( ssgEntity *n, bool mirror );
-    ssgBranch   *animInit     (char *data) const;
 };
 
 extern FileManager* file_manager;

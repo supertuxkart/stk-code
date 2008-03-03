@@ -27,6 +27,8 @@
 #include "spark.hpp"
 #include "missile.hpp"
 #include "homing.hpp"
+#include "loader.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -124,7 +126,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     if(sModel!="")
     {
-        ssgEntity* e = file_manager->load(sModel, CB_COLLECTABLE);
+        ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();
         e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);

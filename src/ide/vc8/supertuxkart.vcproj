@@ -755,6 +755,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\loader.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\main.cpp"
 				>
 			</File>
@@ -1158,6 +1162,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\kart_properties_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\loader.hpp"
 				>
 			</File>
 			<File

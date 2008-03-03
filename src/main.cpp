@@ -51,6 +51,7 @@
 #include "projectile_manager.hpp"
 #include "race_manager.hpp"
 #include "file_manager.hpp"
+#include "loader.hpp"
 #include "game_manager.hpp"
 #include "widget_manager.hpp"
 #include "material_manager.hpp"
@@ -370,7 +371,8 @@ int handleCmdLine(int argc, char **argv)
 void InitTuxkart()
 {
     file_manager = new FileManager();
-    file_manager->setCreateStateCallback(getAppState);
+    loader       = new Loader();
+    loader->setCreateStateCallback(getAppState);
     user_config             = new UserConfig();
     sound_manager           = new SoundManager();
 

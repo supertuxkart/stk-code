@@ -23,6 +23,7 @@
 #include "material_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
+#include "loader.hpp"
 #include "file_manager.hpp"
 #include "string_utils.hpp"
 #include "kart_properties.hpp"
@@ -83,7 +84,8 @@ void KartProperties::load(const std::string filename, const std::string node,
     // Load model, except when called as part of --list-karts
     if(m_model_file.length()>0 && !dont_load_models)
     {
-        m_model = file_manager->load(m_model_file, CB_KART, false);
+        
+        m_model = loader->load(m_model_file, CB_KART, false);
         ssgStripify(m_model);
         float x_min, x_max, y_min, y_max, z_min, z_max;
         MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);

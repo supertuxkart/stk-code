@@ -86,8 +86,6 @@ FileManager::FileManager()
 {
     m_is_full_path = false;
     
-    m_current_callback_type = CB_COLLECTABLE;
-
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
 #ifdef __APPLE__
@@ -138,23 +136,6 @@ bool FileManager::findFile(std::string& full_path,
 }   // findFile
 
 //-----------------------------------------------------------------------------
-void FileManager::makeModelPath(char* path, const char* FNAME) const
-{
-    if(m_is_full_path)
-    {
-        strcpy(path, FNAME);
-        return;
-    }
-    
-    std::string p;
-    if(findFile(p, FNAME, m_model_search_path))
-    {
-        strcpy(path, p.c_str());
-        return;
-    }
-}   // makeModelPath
-
-//-----------------------------------------------------------------------------
 std::string FileManager::getTextureFile(const std::string& FNAME) const
 {
     std::string path;
@@ -171,19 +152,20 @@ std::string FileManager::getModelFile(const std::string& FNAME) const
 }   // makeTexturePath
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getKartFile(const std::string& fname) const
-{
-    return m_root_dir+"/data/"+fname;
-}   // getKartFile
-
-//-----------------------------------------------------------------------------
 std::string FileManager::getTrackDir() const
 {
     return m_root_dir+"/data/tracks";
 }   // getTrackDir
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getKartDir() const
+{
+    return m_root_dir+"/data/karts";
+}   // getKartDir
+
 //-----------------------------------------------------------------------------
 std::string FileManager::getTrackFile(const std::string& fname,
-                                 const std::string& track_name) const
+                                      const std::string& track_name) const
 {
     // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
     // but if a track name is supplied use it (which is necessary
@@ -192,6 +174,18 @@ std::string FileManager::getTrackFile(const std::string& fname,
                            : StringUtils::without_extension(fname);
     return getTrackDir()+"/"+basename+"/"+fname;
 }   // getTrackFile
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getKartFile(const std::string& fname,
+                                     const std::string& kart_name) const
+{
+    // kart file are in data/karts/KARTNAME/KARTNAME.ext
+    // but if a kart name is supplied use it (which is necessary
+    // e.g. to load a model from a kart directory
+    std::string basename = (kart_name!="") ? kart_name 
+                           : StringUtils::without_extension(fname);
+    return getKartDir()+"/"+basename+"/"+fname;
+}   // getKartFile
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getConfigFile(const std::string& fname) const
@@ -302,158 +296,3 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 }   // listFiles
 
 //-----------------------------------------------------------------------------
-/** Loads a .ac model
- *
- *  Loads the .ac model 'filename'. Callbacks contained in this file
- *  are stored in the callback class t. If optimise is set to false,
- *  the file will not be flattened, which is necessary for the kart
- *  models - flattening them will remove the wheel nodes, withouth
- *  which the wheels do not rotate.
- *
- *  \param filename File to load
- *
- *  \param t        Callback category for callbacks included in this
- *                  file (see callback_manager.hpp)
- *
- *  \param optimise Default is true. If set to false, the model will not
- *                  be flattened.
- */
-ssgEntity *FileManager::load(const std::string& filename, CallbackType t,
-                        bool optimise, bool is_full_path)
-{
-    m_current_callback_type   = t;
-    m_is_full_path            = is_full_path;
-    ssgEntity *obj            = optimise ? ssgLoad  (filename.c_str(), this) 
-                                         : ssgLoadAC(filename.c_str(), this);
-    preProcessObj(obj, false);
-    return obj;
-}   // load
-
-//-----------------------------------------------------------------------------
-void FileManager::preProcessObj ( ssgEntity *n, bool mirror )
-{
-    if ( n == NULL ) return ;
-
-    n -> dirtyBSphere () ;
-
-    if ( n -> isAKindOf ( ssgTypeLeaf() ) )
-    {
-        if ( mirror )
-            for ( int i = 0 ; i < ((ssgLeaf *)n) -> getNumVertices () ; i++ )
-                ((ssgLeaf *)n) -> getVertex ( i ) [ 0 ] *= -1.0f ;
-
-        material_manager->getMaterial ( (ssgLeaf *) n ) -> applyToLeaf ( (ssgLeaf *) n ) ;
-        return ;
-    }
-
-    if ( mirror && n -> isAKindOf ( ssgTypeTransform () ) )
-    {
-        sgMat4 xform ;
-
-        ((ssgTransform *)n) -> getTransform ( xform ) ;
-        xform [ 0 ][ 0 ] *= -1.0f ;
-        xform [ 1 ][ 0 ] *= -1.0f ;
-        xform [ 2 ][ 0 ] *= -1.0f ;
-        xform [ 3 ][ 0 ] *= -1.0f ;
-        ((ssgTransform *)n) -> setTransform ( xform ) ;
-    }
-
-    ssgBranch *b = (ssgBranch *) n ;
-
-    for ( int i = 0 ; i < b -> getNumKids () ; i++ )
-        preProcessObj ( b -> getKid ( i ), mirror ) ;
-}
-
-//-----------------------------------------------------------------------------
-ssgBranch *FileManager::animInit (char *data ) const
-{
-    while ( ! isdigit ( *data ) && *data != '\0' )
-        data++ ;
-
-    const int   START_LIM =        strtol(data, &data, 0 );
-    const int   END_LIM   =        strtol(data, &data, 0 );
-    const float TIME_LIM  = (float)strtod(data, &data    );
-
-    while ( *data <= ' ' && *data != '\0' )
-        data++ ;
-
-    char mode = toupper ( *data ) ;
-
-    ssgTimedSelector *br = new ssgTimedSelector;
-
-    br->setLimits  (START_LIM+1, END_LIM+1 ) ;
-    br->setDuration(TIME_LIM ) ;
-    br->setMode    ((mode=='O') ?  SSG_ANIM_ONESHOT
-                    :  (mode=='S') ?  SSG_ANIM_SWING
-                    : SSG_ANIM_SHUTTLE ) ;
-    br->control    (SSG_ANIM_START ) ;
-
-    return br;
-}   // animInit
-
-
-//-----------------------------------------------------------------------------
-/** Handle userdata that is stored in the model files. Mostly the userdata
- *  indicates that a special branch is to be created (e.g. a ssgCutout instead
- * of the standard branch). But some userdata indicate that callbacks need
- * to be created, which are then handled by the callback manager.
- */
-
-ssgBranch *FileManager::createBranch(char *data) const
-{
-
-    if ( data == NULL || data[0] != '@' ) return NULL;
-
-    data++ ;   /* Skip the '@' */
-
-    if ( strncmp("billboard", data, strlen("billboard") ) == 0 )
-        return  new ssgCutout();
-
-    if ( strncmp("DONT_DELETE", data, strlen("DONT_DELETE") ) == 0 )
-    {
-        printf("DONT\n");
-        ssgBranch *br = new ssgTransform();
-        br->setUserData(new ssgBase());
-        return br;
-    }
-
-    if ( strncmp("invisible", data, strlen("invisible") ) == 0 )
-        return new ssgInvisible();
-
-    if ( strncmp ( "switch", data, strlen ( "switch" ) ) == 0 )
-    {
-        ssgSelector *sel = new ssgSelector();
-        sel->select(0);
-        return sel;
-    }
-
-    if ( strncmp ( "animate", data, strlen ( "animate" ) ) == 0 )
-        return animInit(data);
-
-
-    if ( strncmp ( "autodcs", data, strlen ( "autodcs" ) ) == 0 )
-    {
-        ssgTransform *br = new ssgTransform();
-        Callback     *c  = new MovingTexture(data, br);
-        br->setUserData(new ssgBase());
-        callback_manager->addCallback(c, m_current_callback_type);
-        return br;
-    }
-
-    if ( strncmp ( "autotex", data, strlen ( "autotex" ) ) == 0 )
-    {
-        ssgTexTrans *br = new ssgTexTrans();
-        Callback    *c  = new MovingTexture(data, br);
-        callback_manager->addCallback(c, m_current_callback_type);
-        return br;
-    }
-    if(strncmp("physics", data, strlen("physics")) == 0)
-    {
-        MovingPhysics *mp = new MovingPhysics(std::string(data));
-        callback_manager->addCallback(mp, m_current_callback_type);
-        return mp;
-    }
-    fprintf(stderr, "Warning: Ignoring userdata '%s'\n", data);
-    return NULL ;
-}   // createBranch
-

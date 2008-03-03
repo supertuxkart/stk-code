@@ -59,24 +59,35 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
 {
     m_max_steer_angle = -1.0f;
     std::set<std::string> result;
-    file_manager->listFiles(result, "data");
+    file_manager->listFiles(result, file_manager->getKartDir(), 
+                            /*is_full_path*/ true);
 
     // Find out which characters are available and load them
     for(std::set<std::string>::iterator i = result.begin();
             i != result.end(); ++i)
+    {
+        std::string kart_file;
+        if(*i=="." || *i=="..") continue;
+        try
         {
-            if (StringUtils::has_suffix(*i, ".tkkf"))
-            {
-                KartProperties* kp = new KartProperties();
-                std::string filename=file_manager->getKartFile(*i);
-                kp->load(filename.c_str(), "tuxkart-kart", dont_load_models);
-                m_karts_properties.push_back(kp);
-                if(kp->getMaxSteerAngle() > m_max_steer_angle)
-                {
-                    m_max_steer_angle = kp->getMaxSteerAngle();
-                }
-            }   // if
-        }   // for i
+            kart_file = file_manager->getKartFile((*i)+".kart");
+        }
+        catch (std::exception& e)
+        {
+            (void)e;   // remove warning about unused variable
+            continue;
+        }
+        FILE *f=fopen(kart_file.c_str(),"r");
+        if(!f) continue;
+        fclose(f);
+        KartProperties* kp = new KartProperties();
+        kp->load(kart_file, "tuxkart-kart", dont_load_models);
+        m_karts_properties.push_back(kp);
+        if(kp->getMaxSteerAngle() > m_max_steer_angle)
+        {
+            m_max_steer_angle = kp->getMaxSteerAngle();
+        }
+    }   // for i
 }   // loadKartData
 
 //-----------------------------------------------------------------------------

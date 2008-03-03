@@ -23,6 +23,7 @@
 #include "user_config.hpp"
 #include "herring_manager.hpp"
 #include "file_manager.hpp"
+#include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "kart.hpp"
@@ -128,7 +129,7 @@ void HerringManager::loadDefaultHerrings()
         {
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
             std::string fullName  = "herrings/"+(*i);
-            ssgEntity*  h         = file_manager->load(fullName, CB_HERRING);
+            ssgEntity*  h         = loader->load(fullName, CB_HERRING);
             std::string shortName = StringUtils::without_extension(*i);
             h->ref();
             h->setName(shortName.c_str());

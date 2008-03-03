@@ -22,6 +22,7 @@
 #include <sstream>
 #include <plib/ssgAux.h>
 #include "file_manager.hpp"
+#include "loader.hpp"
 #include "track.hpp"
 #include "string_utils.hpp"
 #include "lisp/lisp.hpp"
@@ -1249,7 +1250,7 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
-            ssgEntity        *obj   = file_manager->load(file_manager->getModelFile(fname),
+            ssgEntity        *obj   = loader->load(file_manager->getModelFile(fname),
                                                    CB_TRACK,
                                                    /* optimise   */  true,
                                                    /*is_full_path*/  true);

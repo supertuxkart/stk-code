@@ -19,6 +19,7 @@
 
 #include "attachment_manager.hpp"
 #include "file_manager.hpp"
+#include "loader.hpp"
 
 AttachmentManager *attachment_manager = 0;
 
@@ -65,7 +66,7 @@ void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
     {
-        m_attachments[iat[i].attachment]=file_manager->load(iat[i].file, CB_ATTACHMENT);
+        m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
         m_attachments[iat[i].attachment]->ref();
     }   // for
 }   // reInit
