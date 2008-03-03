@@ -92,7 +92,6 @@ protected:
     float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
 
-    bool         m_is_shortcut;        // true if the kart is taking a shortcut
     int          m_shortcut_sector;    // segment on which the shortcut was started
 
     // physics parameters, storing it saves time

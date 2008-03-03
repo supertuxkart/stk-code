@@ -359,7 +359,6 @@ void Kart::reset()
     m_lap_start_time       = -1.0f;
     m_time_at_last_lap     = 99999.9f;
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
-    m_is_shortcut          = false;
     m_race_position        = 9;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -441,7 +440,6 @@ void Kart::doLapCounting ()
             m_race_lap++ ;
         }
 
-        m_is_shortcut = false;
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
         if(m_lap_start_time>=0.0)
@@ -661,26 +659,16 @@ void Kart::update (float dt)
         world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
 
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(!m_is_shortcut && !m_rescue)
+    if(!m_rescue && world->m_track->isShortcut(prev_sector, m_track_sector))
     {
-        if(world->m_track->isShortcut(prev_sector, m_track_sector))
+        if(isPlayerKart())
         {
-            m_is_shortcut = true;
-            if(isPlayerKart())
-            {
-                forceRescue();  // bring karts back to where they left the track.
-                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-                // Can happen if the option menu is called
-                if(m)
-                    m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);
-            }
+            forceRescue(/*is rescue*/ true);  // bring karts back to where they left the track.
+            RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+            // Can happen if the option menu is called
+            if(m)
+                m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);
         }
-    } 
-    else
-    {   // The kart is already doing a skipped sector --> reset
-        // the flag, since from now on (it's on a new sector) it's
-        // not a shortcut anymore.
-        m_is_shortcut=false;
     }
 
     if (m_track_sector == Track::UNKNOWN_SECTOR && !m_rescue)
