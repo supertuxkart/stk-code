@@ -642,7 +642,8 @@ void Kart::update (float dt)
     // Add a certain epsilon (0.1) to the height of the kart. This avoids
     // problems of the ray being cast from under the track (which happened
     // e.g. on tux tollway when jumping down from the ramp).
-    TerrainInfo::update(trans.getOrigin()+btVector3(0,0,0.1f));
+    btVector3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.1f);
+    TerrainInfo::update(pos_plus_epsilon);
     if (getHoT()==Track::NOHIT                   || 
        (getMaterial()->isReset() && isOnGround())   )
     {
