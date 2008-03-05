@@ -1,3 +1,17 @@
+NOTE
+====
+If you have downloaded the 0.4 version and it does not start, please 
+install the Microsoft Visual C++ redistributable package ('vcredist_x86.exe')
+included in this directory.
+
+If you don't hear any sound, you have to install OpenAL (see http://ww.openal.org).
+Simply install the OpenAL redistributable ('oalinst.exe').
+
+The release comes with a full installer, which includes these redistributables.
+
+
+If you are downloading a source version and want to compile it yourself:
+
 There are two documented ways to compile an executable for windows: using
 cygwin, and using visual c++ (tested with the free Express version).
 
@@ -42,6 +56,8 @@ can be found in .../src/ide/vc8/README.
 
 You still have to install all dependencies, and:
 1) Modify plib:
+   Best choice would be to use the plib version from our download page,
+   since it contains all bugfixes that are necessary. Otherwise:
    In src/ssg/ssgLoadAC.cxx replace:
       loader_fd = fopen ( filename, "ra" ) ;
    with
