@@ -1,3 +1,12 @@
+The latest information about compilation on Mac are on our wiki:
+http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX
+
+The older instructions should still work, and are quite detailed.
+Note that we supply a modified version of plib (on our download page
+at http://sourceforge.net/project/showfiles.php?group_id=202302)
+which fixes a few compilation problems on Macs. We strongly recommend
+to use this version (unless a newer plib version is released).
+
 System requirements Mac: 
 PowerPC- or Intel-Mac with  800 MHz or more, 
 1 GHz recommended 3D-graphics card with 32 MB or more. 
