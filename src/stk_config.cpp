@@ -25,7 +25,11 @@ STKConfig* stk_config=0;
 void STKConfig::load(const std::string filename)
 {
 
-    KartProperties::load(filename, "config");
+    // Use the kart properties loader to read in the default kart
+    // values, but don't try to load any models or materials       */
+    KartProperties::load(filename, "config",
+                        /*dont_load_models   */ true,
+                        /*dont_load_materials*/ true  );
 
     // Check that all necessary values are indeed set physics.data file
 

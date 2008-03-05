@@ -47,7 +47,7 @@ KartProperties::KartProperties() : m_icon_material(0), m_model(0)
 
 //-----------------------------------------------------------------------------
 void KartProperties::load(const std::string filename, const std::string node,
-                          bool dont_load_models)
+                          bool dont_load_models, bool dont_load_materials)
 {
 
     init_defaults();
@@ -78,14 +78,28 @@ void KartProperties::load(const std::string filename, const std::string node,
     }
     delete root;
 
-    // Load material
-    m_icon_material = material_manager->getMaterial(m_icon_file);
+    if(!dont_load_materials)
+    {
+        // Load material
+        std::string materials_file = file_manager->getKartFile("materials.dat",getIdent());
+        file_manager->pushModelSearchPath(file_manager->getKartFile("", getIdent()));
+        file_manager->pushTextureSearchPath(file_manager->getKartFile("", getIdent()));
 
+        // addShared makes sure that these textures/material infos stay in memory
+        material_manager->addSharedMaterial(materials_file);
+        m_icon_material = material_manager->getMaterial(m_icon_file);
+    }
     // Load model, except when called as part of --list-karts
     if(m_model_file.length()>0 && !dont_load_models)
     {
-        
         m_model = loader->load(m_model_file, CB_KART, false);
+        if(!m_model)
+        {
+            fprintf(stderr, "Can't find kart model '%s'.\n",m_model_file);
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+            return;
+        }
         ssgStripify(m_model);
         float x_min, x_max, y_min, y_max, z_min, z_max;
         MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
@@ -93,6 +107,11 @@ void KartProperties::load(const std::string filename, const std::string node,
         m_kart_length = y_max-y_min;
         m_model->ref();
     }  // if
+    if(!dont_load_materials)
+    {
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+    }
 
 }   // load
 

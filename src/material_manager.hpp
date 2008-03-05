@@ -38,14 +38,14 @@ private:
     std::vector<Material*> m_materials;
 public:
     MaterialManager();
-    void      loadMaterial    ();
-    void      reInit          ();
-    int       addEntity       (Material *m);
-    Material *getMaterial     (ssgLeaf *lf);
-//    Material *getMaterial     (const char *texname);
-    Material *getMaterial     (const std::string& t, bool is_full_path=false);
-    bool      pushTempMaterial(const std::string& filename);
-    void      popTempMaterial ();
+    void      loadMaterial     ();
+    void      reInit           ();
+    int       addEntity        (Material *m);
+    Material *getMaterial      (ssgLeaf *lf);
+    Material *getMaterial      (const std::string& t, bool is_full_path=false);
+    void      addSharedMaterial(const std::string& filename);
+    bool      pushTempMaterial (const std::string& filename);
+    void      popTempMaterial  ();
 };
 
 extern ssgState *fuzzy_gst, *herringbones_gst;

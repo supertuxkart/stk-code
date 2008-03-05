@@ -74,24 +74,33 @@ void MaterialManager::loadMaterial()
     // material index later, so that these materials are not popped
     const std::string fname     = "materials.dat";
     std::string       full_name = file_manager->getTextureFile(fname);
-    if(full_name=="")
-    {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", fname.c_str());
-        throw std::runtime_error(msg);
-    }
-    if(!pushTempMaterial(full_name))
-    {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "FATAL: Parsing error in '%s'\n", full_name.c_str());
-        throw std::runtime_error(msg);
-    }
+    addSharedMaterial(full_name);
 
     ssgSetAppStateCallback(getAppState);
     fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
     // Save index of shared textures
     m_shared_material_index = (int)m_materials.size();
 }   // MaterialManager
+
+//-----------------------------------------------------------------------------
+void MaterialManager::addSharedMaterial(const std::string& filename)
+{
+    // Use temp material for reading, but then set the shared
+    // material index later, so that these materials are not popped
+    if(filename=="")
+    {
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", filename.c_str());
+        throw std::runtime_error(msg);
+    }
+    if(!pushTempMaterial(filename))
+    {
+        char msg[MAX_ERROR_MESSAGE_LENGTH];
+        snprintf(msg, sizeof(msg), "FATAL: Parsing error in '%s'\n", filename.c_str());
+        throw std::runtime_error(msg);
+    }
+    m_shared_material_index = (int)m_materials.size();
+}   // addSharedMaterial
 
 //-----------------------------------------------------------------------------
 bool MaterialManager::pushTempMaterial(const std::string& filename)

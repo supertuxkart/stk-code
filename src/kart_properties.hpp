@@ -108,7 +108,8 @@ public:
     virtual void  getAllData       (const lisp::Lisp* lisp);
     virtual void  load             (const std::string filename,
                                     const std::string node="tuxkart-kart",
-                                    bool dont_load_models=false);
+                                    bool dont_load_models=false,
+                                    bool dont_load_materials=false);
 
     Material*     getIconMaterial        () const {return m_icon_material;          }
     ssgEntity*    getModel               () const {return m_model;                  }
