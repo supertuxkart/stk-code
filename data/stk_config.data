@@ -20,8 +20,9 @@
  (bomb-time                 30.0 )  ;; time till a bomb explodes
  (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
  (anvil-time                 2.0 )  ;; time an anvil is active
- (zipper-time                5.0 )  ;; time a zipper is active
- (zipper-force             800.0 )  ;; additional zipper force
+ (zipper-time                3.0 )  ;; time a zipper is active
+ (zipper-force              800.0 )  ;; additional zipper force
+ (zipper-speed-gain         10.0 )  ;; one time additional speed boost given by zippers
  (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
                                     ;; is considered to be a shortcut
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
@@ -32,9 +33,6 @@
  ;; -------------------------
  (jump-impulse             5400.0 ) ;; percentage of gravity!
 
- (reduce-air-resistance-racer  0.6) ;; reduce air-resistance for hard
- (reduce-air-resistance-driver 0.8) ;; and medium skill level
-
  ;; The following files are the defaults for karts
  ;; ----------------------------------------------
  (kart-defaults
@@ -44,9 +42,6 @@
    (brake-factor             2.75)
    (brake-force              2.5 )
    (mass                   125   )
-   (air-resistance           1.8 )
-   (roll-resistance          1.05)
-   (tire-grip                0.9 )
    (max-steer-angle         55   )
    (time-full-steer          0.3 )
    (corn-f                   4   )

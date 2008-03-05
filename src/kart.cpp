@@ -699,9 +699,16 @@ void Kart::update (float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+// Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()
 {
-    m_zipper_time_left = stk_config->m_zipper_time;
+    m_zipper_time_left  = stk_config->m_zipper_time;
+    const btVector3& v  = m_body->getLinearVelocity();
+    float current_speed = v.length();
+    float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain, 
+                                   getMaxSpeed());
+    
+    m_body->setLinearVelocity(v/current_speed*speed);
 }   // handleZipper
 //-----------------------------------------------------------------------------
 #define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
@@ -875,21 +882,6 @@ void Kart::updatePhysics (float dt)
          m_speed = 0;
 }   // updatePhysics
 
-//-----------------------------------------------------------------------------
-// PHORS recommends: f=B*alpha/(1+fabs(A*alpha)^p), where A, B, and p
-//                   are appropriately chosen constants.
-float Kart::NormalizedLateralForce(float alpha, float corner) const
-{
-    float const MAX_ALPHA=3.14f/4.0f;
-    if(fabsf(alpha)<MAX_ALPHA)
-    {
-        return corner*alpha;
-    }
-    else
-    {
-        return alpha>0.0f ? corner*MAX_ALPHA : -corner*MAX_ALPHA;
-    }
-}   // NormalizedLateralForce
 
 //-----------------------------------------------------------------------------
 void Kart::forceRescue(bool is_shortcut)
@@ -933,15 +925,6 @@ void Kart::endRescue()
     world->getPhysics()->addKart(this, m_vehicle);
     setTrans(pos);
 }   // endRescue
-
-//-----------------------------------------------------------------------------
-float Kart::getAirResistance() const
-{
-    return (m_kart_properties->getAirResistance() +
-            m_attachment.AirResistanceAdjust()    )
-           * stk_config->m_air_res_reduce[world->m_race_setup.m_difficulty];
-
-}
 
 //-----------------------------------------------------------------------------
 void Kart::processSkidMarks()

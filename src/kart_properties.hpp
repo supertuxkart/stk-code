@@ -53,13 +53,10 @@ protected:
     float m_kart_width;               // width of kart
     float m_kart_length;              // length of kart
     float m_mass;                     // weight of kart
-    float m_air_resistance;           // air resistance
-    float m_roll_resistance;          // rolling resistance etc
     float m_wheel_base;               // distance between front and read wheels
     float m_height_cog;               // height of center of gravity
     float m_engine_power;             // maximum force from engine
     float m_brake_factor;             // braking factor * engine_power = braking force
-    float m_brake_force;              // braking force
     float m_tire_grip;                // grip of tires in longitudinal direction
     float m_max_steer_angle;          // maximum steering angle
     float m_time_full_steer;          // time for player karts to reach full steer angle
@@ -119,15 +116,11 @@ public:
     const char*   getIconFile            () const {return m_icon_file.c_str();      }
     const sgVec3* getColor               () const {return &m_color;                 }
     float         getMass                () const {return m_mass;                   }
-    float         getAirResistance       () const {return m_air_resistance;         }
-    float         getRollResistance      () const {return m_roll_resistance;        }
     float         getMaxPower            () const {return m_engine_power;           }
     float         getTimeFullSteer       () const {return m_time_full_steer;        }
     float         getBrakeFactor         () const {return m_brake_factor;           }
-    float         getBrakeForce          () const {return m_brake_force;            }
     float         getWheelBase           () const {return m_wheel_base;             }
     float         getHeightCOG           () const {return m_height_cog;             }
-    float         getTireGrip            () const {return m_tire_grip;              }
     float         getMaxSteerAngle       () const {return m_max_steer_angle;        }
     float         getCornerStiffF        () const {return m_corn_f;                 }
     float         getCornerStiffR        () const {return m_corn_r;                 }

@@ -137,10 +137,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("bullet-engine-power",     m_engine_power);
     lisp->get("time-full-steer",         m_time_full_steer);
     lisp->get("brake-factor",            m_brake_factor);
-    lisp->get("brake-force",             m_brake_force);
-    lisp->get("roll-resistance",         m_roll_resistance);
     lisp->get("bullet-mass",             m_mass);
-    lisp->get("air-resistance",          m_air_resistance);
     lisp->get("tire-grip",               m_tire_grip);
     lisp->get("bullet-max-steer-angle",  m_max_steer_angle);
     lisp->get("corn-f",                  m_corn_f);
@@ -200,10 +197,7 @@ void KartProperties::init_defaults()
     m_engine_power              = stk_config->m_engine_power;
     m_time_full_steer           = stk_config->m_time_full_steer;
     m_brake_factor              = stk_config->m_brake_factor;
-    m_brake_force               = stk_config->m_brake_force;
-    m_roll_resistance           = stk_config->m_roll_resistance;
     m_mass                      = stk_config->m_mass;
-    m_air_resistance            = stk_config->m_air_resistance;
     m_tire_grip                 = stk_config->m_tire_grip;
     m_max_steer_angle           = stk_config->m_max_steer_angle;
     m_corn_f                    = stk_config->m_corn_f;

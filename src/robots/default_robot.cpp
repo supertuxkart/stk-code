@@ -906,5 +906,8 @@ void DefaultRobot::find_curve()
 
     m_curve_angle = normalize_angle(world->m_track->m_angle[i] - world->m_track->m_angle[m_track_sector]);
     m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
-    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->getGravity() * getTireGrip());
+    // FIXME: 0.9 is the tire grip - but this was never used. For now this
+    // 0.9 is left in place to reproduce the same results and AI behaviour,
+    // but this function should be updated to bullet physics
+    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->getGravity() * 0.9f);
 }

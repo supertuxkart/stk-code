@@ -30,7 +30,6 @@ public:
     float m_anvil_speed_factor;      // To decrease speed once when attached
     float m_parachute_friction;      // Increased air friction when parachute
     float m_jump_impulse;            // percentage of gravity when jumping
-    float m_air_res_reduce[3];       // air resistance reduction for the three levels
     float m_parachute_time;          // time a parachute is active
     float m_parachute_time_other;    // time a parachute attached to other karts is active
     float m_bomb_time;               // time before a bomb explodes
@@ -38,6 +37,7 @@ public:
     float m_anvil_time;              // time an anvil is active
     float m_zipper_time;             // duration a zipper is active
     float m_zipper_force;            // additional force added to the acceleration
+    float m_zipper_speed_gain;       // initial one time speed gain
     float m_shortcut_segments;       // skipping more than this number of segments is
                                      // considered to be a shortcut
     float m_explosion_impulse;       // impulse affecting each non-hit kart

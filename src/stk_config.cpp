@@ -64,19 +64,12 @@ void STKConfig::load(const std::string filename)
 
     CHECK_NEG(m_mass,                    "mass"                         );
     CHECK_NEG(m_inertia,                 "m_inertia"                    );
-    CHECK_NEG(m_tire_grip,               "tire-grip"                    );
     CHECK_NEG(m_height_cog,              "heightCOG"                    );
     CHECK_NEG(m_wheel_base,              "wheel-base"                   );
     CHECK_NEG(m_engine_power,            "engine-power"                 );
-    CHECK_NEG(m_air_resistance,          "air-resistance"               );
     CHECK_NEG(m_max_steer_angle,         "max-steer-angle"              );
-    CHECK_NEG(m_roll_resistance,         "roll-resistance"              );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
-    CHECK_NEG(m_brake_force,             "brake-force"                  );
     CHECK_NEG(m_jump_impulse,            "jump-impulse"                 );
-
-    CHECK_NEG(m_air_res_reduce[1],       "reduce-air-resistance-driver" );
-    CHECK_NEG(m_air_res_reduce[2],       "reduce-air-resistance-racer"  );
 
     CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
     CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
@@ -111,6 +104,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
     CHECK_NEG(m_zipper_time,               "zipper-time"                );
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
+    CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
@@ -126,27 +120,27 @@ void STKConfig::load(const std::string filename)
  */
 void STKConfig::init_defaults()
 {
-    m_wheel_base  = m_height_cog      = m_roll_resistance  = m_mass =
-    m_corn_r      = m_air_resistance = m_tire_grip        = m_max_steer_angle  =
-    m_corn_f      = m_inertia        = m_anvil_weight      = m_parachute_friction =
-    m_engine_power = m_jump_impulse      = m_brake_factor     =
+    m_wheel_base   = m_height_cog      = m_mass =
+    m_corn_r       = m_max_steer_angle =
+    m_corn_f       = m_inertia         = m_anvil_weight = m_parachute_friction =
+    m_engine_power = m_jump_impulse    = m_brake_factor =
     m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
-    m_wheelie_speed_boost = m_air_res_reduce[2] = m_air_res_reduce[1] =
+    m_wheelie_speed_boost =
     m_parachute_time = m_bomb_time = m_bomb_time_increase= m_anvil_time = 
-    m_zipper_time = m_zipper_force = m_parachute_time_other = m_shortcut_segments =
+    m_zipper_time = m_zipper_force = m_zipper_speed_gain = 
+    m_parachute_time_other = m_shortcut_segments =
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
     m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
     m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
     m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
-    m_maximum_speed = m_brake_force = m_gravity_center_shift = m_suspension_rest =
+    m_maximum_speed = m_gravity_center_shift = m_suspension_rest =
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
     m_explosion_impulse_objects = -99.9f;
 
     m_max_karts            = -100;
     m_grid_order           = -100;
-    m_air_res_reduce[0]    = 1.0f;
     m_title_music          = "";
 }   // init_defaults
 
@@ -161,8 +155,6 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("anvil-speed-factor",           m_anvil_speed_factor  );
     lisp->get("parachute-friction",           m_parachute_friction  );
     lisp->get("jump-impulse",                 m_jump_impulse        );
-    lisp->get("reduce-air-resistance-racer",  m_air_res_reduce[2]   );
-    lisp->get("reduce-air-resistance-driver", m_air_res_reduce[1]   );
     lisp->get("parachute-time",               m_parachute_time      );
     lisp->get("parachute-time-other",         m_parachute_time_other);
     lisp->get("bomb-time",                    m_bomb_time           );
@@ -170,6 +162,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("anvil-time",                   m_anvil_time          );
     lisp->get("zipper-time",                  m_zipper_time         );
     lisp->get("zipper-force",                 m_zipper_force        );
+    lisp->get("zipper-speed-gain",            m_zipper_speed_gain   );
     lisp->get("explosion-impulse",            m_explosion_impulse   );
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts           );

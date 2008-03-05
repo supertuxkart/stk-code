@@ -169,7 +169,6 @@ public:
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
-    float          NormalizedLateralForce(float alpha, float corner) const;
 
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
@@ -180,14 +179,11 @@ public:
         return m_kart_properties->getMass()
                + m_attachment.WeightAdjust();
     }
-    float          getRollResistance() const {return m_kart_properties->getRollResistance();}
     float          getMaxPower      () const {return m_kart_properties->getMaxPower();}
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
-    float          getBrakeForce    () const {return m_kart_properties->getBrakeForce();}
     float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
-    float          getTireGrip      () const {return m_kart_properties->getTireGrip();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
     float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
     float          getCornerStiffF  () const {return m_kart_properties->getCornerStiffF();}
@@ -207,7 +203,6 @@ public:
         {return m_kart_properties->getWheelieSpeedBoost();                     }
     float          getSteerAngle    () const
         {return m_controls.lr*m_kart_properties->getMaxSteerAngle();           }
-    float          getAirResistance () const;
     float          getSteerPercent  () const {return m_controls.lr;            }
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
