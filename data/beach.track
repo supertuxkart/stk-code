@@ -2,7 +2,8 @@
 
 (tuxkart-track
  (name                   "On the Beach")
- (description            "Created by Ingo Ruhnke")
+ (description            "Created by Ingo Ruhnke,
+modified by M. Gagnon")
  (music                  "oggs/CaribbeanMusic.ogg")
  (screenshot             "sshot-beach.rgb")
  (topview                "topview-beach.rgb")
