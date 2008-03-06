@@ -57,12 +57,8 @@ protected:
     float m_height_cog;               // height of center of gravity
     float m_engine_power;             // maximum force from engine
     float m_brake_factor;             // braking factor * engine_power = braking force
-    float m_tire_grip;                // grip of tires in longitudinal direction
     float m_max_steer_angle;          // maximum steering angle
     float m_time_full_steer;          // time for player karts to reach full steer angle
-    float m_corn_f;
-    float m_corn_r;
-    float m_inertia;
     float m_wheelie_max_speed_ratio;  // percentage of maximum speed for wheelies
     float m_wheelie_max_pitch;        // maximum pitch for wheelies
     float m_wheelie_pitch_rate;       // rate/sec with which kart goes up
@@ -122,9 +118,6 @@ public:
     float         getWheelBase           () const {return m_wheel_base;             }
     float         getHeightCOG           () const {return m_height_cog;             }
     float         getMaxSteerAngle       () const {return m_max_steer_angle;        }
-    float         getCornerStiffF        () const {return m_corn_f;                 }
-    float         getCornerStiffR        () const {return m_corn_r;                 }
-    float         getInertia             () const {return m_inertia;                }
     float         getMaxSpeedReverseRatio() const {return m_max_speed_reverse_ratio;}
     float         getWheelieMaxSpeedRatio() const {return m_wheelie_max_speed_ratio;}
     float         getWheelieMaxPitch     () const {return m_wheelie_max_pitch;      }

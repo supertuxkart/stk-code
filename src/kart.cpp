@@ -846,7 +846,7 @@ void Kart::updatePhysics (float dt)
         getBody()->setLinearVelocity( velocity );
 
     }
-    const float steering = getMaxSteerAngle() * m_controls.lr * 0.00444f;
+    const float steering = DEGREE_TO_RAD(getMaxSteerAngle()) * m_controls.lr;
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
 
@@ -1136,7 +1136,7 @@ void Kart::placeModel ()
     sgMat4 wheel_rot;
 
     sgMakeRotMat4( wheel_rot, 0, RAD_TO_DEGREE(-m_wheel_rotation), 0);
-    sgMakeRotMat4( wheel_steer, getSteerAngle()/getMaxSteerAngle() * 30.0f , 0, 0);
+    sgMakeRotMat4( wheel_steer, m_controls.lr * 30.0f , 0, 0);
 
     sgMultMat4(wheel_front, wheel_steer, wheel_rot);
 

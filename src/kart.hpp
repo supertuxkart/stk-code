@@ -186,9 +186,6 @@ public:
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
     float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
-    float          getCornerStiffF  () const {return m_kart_properties->getCornerStiffF();}
-    float          getCornerStiffR  () const {return m_kart_properties->getCornerStiffR();}
-    float          getInertia       () const {return m_kart_properties->getInertia();     }
     float          getGravityCenterShift   () const
         {return m_kart_properties->getGravityCenterShift();                    }
     float          getWheelieMaxSpeedRatio () const

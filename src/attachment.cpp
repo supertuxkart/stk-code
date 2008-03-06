@@ -91,10 +91,11 @@ void Attachment::hitGreenHerring()
                        break;
     default:           random_attachment = rand()%3;
     }   // switch
-    
+
     switch (random_attachment)
     {
     case 0: set( ATTACH_PARACHUTE, stk_config->m_parachute_time+leftover_time);
+        m_initial_speed = m_kart->getSpeed();
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
@@ -130,8 +131,16 @@ void Attachment::update(float dt)
 
     switch (m_type)
     {
-    case ATTACH_PARACHUTE:  // handled in Kart::updatePhysics
-    case ATTACH_ANVIL:      // handled in Kart::updatePhysics
+    case ATTACH_PARACHUTE: // Partly handled in Kart::updatePhysics
+                           // Otherwise: disable if a certain percantage of
+                           // initial speed was lost
+                           if(m_kart->getSpeed()<=
+                               m_initial_speed*stk_config->m_parachute_done_fraction)
+                           {
+                                   m_time_left = -1;
+                           }
+                           break;
+    case ATTACH_ANVIL:     // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:       break;
     case ATTACH_BOMB:      if(m_time_left<=0.0) 

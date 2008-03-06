@@ -29,9 +29,10 @@ public:
     float m_anvil_weight;            // Additional kart weight if anvil is attached
     float m_anvil_speed_factor;      // To decrease speed once when attached
     float m_parachute_friction;      // Increased air friction when parachute
-    float m_jump_impulse;            // percentage of gravity when jumping
+    float m_parachute_done_fraction; // fraction of speed when lost will detach parachute
     float m_parachute_time;          // time a parachute is active
     float m_parachute_time_other;    // time a parachute attached to other karts is active
+    float m_jump_impulse;            // percentage of gravity when jumping
     float m_bomb_time;               // time before a bomb explodes
     float m_bomb_time_increase;      // time added to bomb timer when it's passed on
     float m_anvil_time;              // time an anvil is active

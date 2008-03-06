@@ -134,15 +134,11 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
 
     lisp->get("wheel-base",              m_wheel_base);
     lisp->get("heightCOG",               m_height_cog);
-    lisp->get("bullet-engine-power",     m_engine_power);
+    lisp->get("engine-power",            m_engine_power);
     lisp->get("time-full-steer",         m_time_full_steer);
     lisp->get("brake-factor",            m_brake_factor);
-    lisp->get("bullet-mass",             m_mass);
-    lisp->get("tire-grip",               m_tire_grip);
-    lisp->get("bullet-max-steer-angle",  m_max_steer_angle);
-    lisp->get("corn-f",                  m_corn_f);
-    lisp->get("corn-r",                  m_corn_r);
-    lisp->get("inertia",                 m_inertia);
+    lisp->get("mass",                    m_mass);
+    lisp->get("max-steer-angle",         m_max_steer_angle);
     lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio );
     lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch       );
     lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate      );
@@ -198,11 +194,7 @@ void KartProperties::init_defaults()
     m_time_full_steer           = stk_config->m_time_full_steer;
     m_brake_factor              = stk_config->m_brake_factor;
     m_mass                      = stk_config->m_mass;
-    m_tire_grip                 = stk_config->m_tire_grip;
     m_max_steer_angle           = stk_config->m_max_steer_angle;
-    m_corn_f                    = stk_config->m_corn_f;
-    m_corn_r                    = stk_config->m_corn_r;
-    m_inertia                   = stk_config->m_inertia;
     m_wheelie_max_speed_ratio   = stk_config->m_wheelie_max_speed_ratio;
     m_wheelie_max_pitch         = stk_config->m_wheelie_max_pitch;
     m_wheelie_pitch_rate        = stk_config->m_wheelie_pitch_rate;

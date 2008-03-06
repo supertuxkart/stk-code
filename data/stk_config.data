@@ -17,11 +17,12 @@
  (parachute-friction         2.0 )  ;; friction increase when a parachute is sttached
  (parachute-time             4.0 )  ;; time an attached parachute is active
  (parachute-time-other       8.0 )  ;; time a parachute attached from other kart is active
+ (parachute-done-fraction    0.7 )  ;; fraction of speed when lost will detach parachute
  (bomb-time                 30.0 )  ;; time till a bomb explodes
  (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
  (anvil-time                 2.0 )  ;; time an anvil is active
  (zipper-time                3.0 )  ;; time a zipper is active
- (zipper-force              800.0 )  ;; additional zipper force
+ (zipper-force             800.0 )  ;; additional zipper force
  (zipper-speed-gain         10.0 )  ;; one time additional speed boost given by zippers
  (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
                                     ;; is considered to be a shortcut
@@ -38,11 +39,6 @@
  (kart-defaults
    (wheel-base               1.2 )
    (heightCOG                0.2 )
-   (engine-power           400   )
-   (brake-factor             2.75)
-   (brake-force              2.5 )
-   (mass                   125   )
-   (max-steer-angle         55   )
    (time-full-steer          0.3 )
    (corn-f                   4   )
    (corn-r                   4   )
@@ -61,9 +57,10 @@
    (inertia                  5.0 )
 
    ;; Bullet physics attributes
-   (bullet-engine-power      400   )
-   (bullet-mass              225   )
-   (bullet-max-steer-angle    25   )
+   (brake-factor              2.75 )
+   (max-steer-angle           6.4  )
+   (engine-power            400    )
+   (mass                    225    )
    (suspension-stiffness      8.0  )
    (wheel-damping-relaxation  2.3  )
    (wheel-damping-compression 4.4  )

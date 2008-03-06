@@ -38,6 +38,7 @@ private:
     attachmentType  m_type;            // attachment type
     Kart           *m_kart;            // kart the attachment is attached to
     float           m_time_left;       // time left till attachment expires
+    float           m_initial_speed;   // for parachutes only
     ssgSelector    *m_holder;          // where the attachment is put on the kart
     Kart           *m_previous_owner;  // used by bombs so that it's not passed
                                        // back to previous owner
