@@ -2,8 +2,8 @@
 
 (supertuxkart-cup
  (name "Volcano Tracks")
- (description "All four tracks with Volcanos")
- (tracks "volcano" "bsodcastle" "geekopeak" "littlevolcano" )
+ (description "All three tracks with Volcanos")
+ (tracks "volcano" "bsodcastle" "littlevolcano" )
  (laps        3         3            3             3) 
 )
 
