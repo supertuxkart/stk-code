@@ -62,10 +62,11 @@ public:
         will be used in the order in which they are given */
     Karts m_karts;
 
-    unsigned int getNumKarts()  const { return (unsigned int) m_karts.size(); }
-    int getNumPlayers() const                 { return (int)m_players.size(); }
-    const std::string& getHerringStyle()          const {return m_herring_style;}
-    const void         setHerringStyle(const std::string& s) {m_herring_style=s;}
+    unsigned int       getNumKarts()     const { return (unsigned int) m_karts.size(); }
+    int                getNumPlayers()   const { return (int)m_players.size();         }
+    const std::string& getHerringStyle() const { return m_herring_style;               }
+    RaceDifficulty     getDifficulty()   const { return m_difficulty;                  }
+    const void         setHerringStyle(const std::string& s) {m_herring_style=s;       }
 };
 
 #endif
