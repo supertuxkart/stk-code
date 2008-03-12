@@ -6,9 +6,8 @@ has developed a life on its own. The SuperTuxKart homepage can be found at:
 
   http://supertuxkart.sourceforge.net
 
-To contact the active maintainers, please send an email to:
-
-  supertuxkart-devel@lists.sourceforge.net
+The official SuperTuxKart forum is at:
+http://forum.freegamedev.net/index.php?t=i&cat=7
 
 A big "thank you" to Steve Baker for designing and implementing the
 original TuxKart, and to the GotM team for their invaluable work.
@@ -23,7 +22,7 @@ HARDWARE REQUIREMENTS
 =====================
 * You need a 3D graphics card that supports OpenGL or Mesa.
 * You should have a CPU that's running at 450MHz or better.
-* You'll need at least 32Mb RAM. 
+* You'll need at least 128Mb RAM. 
 * A sound card would be nice - but it's not essential.
 * Ideally, you want a joystick with at least 6 buttons.
 
@@ -86,13 +85,10 @@ The main webpage is at:
 
   http://supertuxkart.sourceforge.net
 
-If you have any problems, please contact the SuperTuxKart mailing list at:
+If you have any problems, please go to the official SuperTuxKart Forum at:
 
-  supertuxkart-devel@lists.sourceforge.net
+http://forum.freegamedev.net/index.php?t=i&cat=7
 
-The archives of this mailing list can be found at:
-
-  http://sourceforge.net/mailarchive/forum.php?forum_name=supertuxkart-devel
 
 LICENSE
 =======
