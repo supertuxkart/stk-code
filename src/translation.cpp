@@ -7,7 +7,7 @@ initTranslations::initTranslations() {
     // used in driveline files.
     setlocale (LC_CTYPE,    "");
 //    setlocale (LC_MESSAGES, "");
-    bindtextdomain (PACKAGE, "./po");
+    bindtextdomain (PACKAGE, "./data/po");
     //bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
