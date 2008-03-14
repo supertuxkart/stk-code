@@ -230,7 +230,7 @@ std::string FileManager::getMusicFile(const std::string& fname) const
 //-----------------------------------------------------------------------------
 std::string FileManager::getSFXFile(const std::string& fname) const
 {
-    return m_root_dir+"/wavs/"+fname;
+    return m_root_dir+"/sfx/"+fname;
 }   // getSFXFile
 //-----------------------------------------------------------------------------
 std::string FileManager::getFontFile(const std::string& fname) const
