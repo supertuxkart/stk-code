@@ -67,7 +67,6 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
             i != result.end(); ++i)
     {
         std::string kart_file;
-        if(*i=="." || *i=="..") continue;
         try
         {
             kart_file = file_manager->getKartFile((*i)+".kart");

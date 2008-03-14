@@ -34,6 +34,19 @@ namespace StringUtils
             return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), rhs.c_str())==0;
     }
 
+//--------------------------i---------------------------------------------------
+    std::string path(const std::string& filename)
+    {
+        for(int i = int(filename.size()) - 1; i >= 0; --i)
+        {
+            if (filename[i]=='/' || filename[i]=='\\')
+            {
+                return filename.substr(0,i);
+            }
+        }
+        return "";
+    }
+
 //-----------------------------------------------------------------------------
     std::string basename(const std::string& filename)
     {

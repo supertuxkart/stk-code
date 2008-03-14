@@ -38,6 +38,7 @@
 #include "user_config.hpp"
 #include "herring.hpp"
 #include "herring_manager.hpp"
+#include "sound_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -811,7 +812,9 @@ void Track::loadTrack(std::string filename_)
 
     LISP->get      ("name",                  m_name);
     LISP->get      ("description",           m_description);
-    LISP->getVector("music",                 m_music_filenames);
+    std::vector<std::string> filenames;
+    LISP->getVector("music",                 filenames);
+    getMusicInformation(filenames, m_music);
     LISP->get      ("herring",               m_herring_style);
     LISP->get      ("screenshot",            m_screenshot);
     LISP->get      ("topview",               m_top_view);
@@ -841,8 +844,33 @@ void Track::loadTrack(std::string filename_)
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
-const std::string& Track::getMusic() const {
-    return m_music_filenames[rand()% m_music_filenames.size()];
+void Track::getMusicInformation(std::vector<std::string>&             filenames, 
+                                std::vector<MusicInformation const *>& music    )
+{
+    for(int i=0; i<(int)filenames.size(); i++)
+    {
+        std::string full_path = file_manager->getTrackFile(filenames[i], getIdent());
+        const MusicInformation* mi;
+        try
+        {
+            mi = sound_manager->getMusicInformation(full_path);
+        }
+        catch(std::runtime_error)
+        {
+            mi = sound_manager->getMusicInformation(file_manager->getMusicFile(filenames[i]));
+        }
+        if(!mi)
+        {
+            fprintf(stderr, "Music information file '%s' not found - ignored.\n",filenames[i]);
+            continue;
+        }
+        m_music.push_back(mi);
+    }   // for i in filenames
+}   // getMusicInformation
+
+//-----------------------------------------------------------------------------
+void Track::playMusic() const {
+    sound_manager->playMusic(m_music[rand()% m_music.size()]);
 }   // getMusic
 
 //-----------------------------------------------------------------------------

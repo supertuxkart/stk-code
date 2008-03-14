@@ -43,6 +43,8 @@ public:
     std::string getHomeDir      () const;
     std::string getTrackDir     () const;
     std::string getKartDir      () const;
+    std::string getHerringDir   () const;
+    std::vector<std::string>getMusicDirs() const;
     std::string getTextureFile  (const std::string& fname) const;
     std::string getKartFile     (const std::string& fname,
                                  const std::string& kart="") const;
@@ -51,6 +53,7 @@ public:
     std::string getConfigFile   (const std::string& fname) const;
     std::string getHighscoreFile(const std::string& fname) const;
     std::string getLogFile      (const std::string& fname) const;
+    std::string getHerringFile  (const std::string& fname) const;
     std::string getMusicFile    (const std::string& fname) const;
     std::string getSFXFile      (const std::string& fname) const;
     std::string getFontFile     (const std::string& fname) const;
@@ -60,7 +63,7 @@ public:
 #endif
 
     void listFiles(std::set<std::string>& result, const std::string& dir,
-                   bool is_full_path=false)
+                   bool is_full_path=false, bool make_full_path=false)
         const;
 
     void       pushTextureSearchPath(const std::string& path) 

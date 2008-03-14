@@ -161,8 +161,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     callback_manager->initAll();
     menu_manager->switchToRace();
 
-    const std::string& MUSIC_NAME= track_manager->getTrack(m_race_setup.m_track)->getMusic();
-    if (MUSIC_NAME.size()>0) sound_manager->playMusic(MUSIC_NAME);
+    m_track->playMusic();
 
     m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
 

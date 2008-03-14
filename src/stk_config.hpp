@@ -21,6 +21,7 @@
 #define HEADER_STKCONFIG_H
 
 #include "kart_properties.hpp"
+#include "music_information.hpp"
 #include "lisp/lisp.hpp"
 
 class STKConfig : public KartProperties
@@ -45,7 +46,7 @@ public:
     float m_explosion_impulse_objects;// impulse of explosion on moving objects, e.g. road cones, ...
     int   m_max_karts;               // maximum number of karts
     int   m_grid_order;              // whether grand prix grid is in point order or reverse point order
-    std::string m_title_music;       // filename of the title music to play
+    MusicInformation* m_title_music;  // filename of the title music to play
 
     STKConfig() : KartProperties() {};
     void init_defaults    ();

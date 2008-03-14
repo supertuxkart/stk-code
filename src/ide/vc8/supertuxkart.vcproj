@@ -787,6 +787,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\music_information.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\music_ogg.cpp"
 				>
 			</File>
@@ -1194,6 +1198,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\music.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\music_information.hpp"
 				>
 			</File>
 			<File

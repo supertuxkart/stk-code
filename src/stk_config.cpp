@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stk_config.hpp"
+#include "file_manager.hpp"
 
 STKConfig* stk_config=0;
 
@@ -139,7 +140,7 @@ void STKConfig::init_defaults()
 
     m_max_karts            = -100;
     m_grid_order           = -100;
-    m_title_music          = "";
+    m_title_music          = NULL;
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -166,7 +167,9 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts                );
     lisp->get("grid-order",                   m_grid_order               );
-    lisp->get("title-music",                  m_title_music              );
+    std::string title_music;
+    lisp->get("title-music",                  title_music                );
+    m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));
 
     // Get the default KartProperties
     // ------------------------------

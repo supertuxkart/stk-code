@@ -117,20 +117,21 @@ HerringManager::~HerringManager()
 //-----------------------------------------------------------------------------
 void HerringManager::loadDefaultHerrings()
 {
-    // Load all models. This can't be done in the constructor, since the file_manager
-    // isn't ready at that stage.
-
-    // Load all models from the models/herrings directory
-    // --------------------------------------------------
+    // Load all models. This can't be done in the constructor, 
+    // since the file_manager isn't ready at that stage.
+    // -------------------------------------------------------
     std::set<std::string> files;
-    file_manager->listFiles(files, "models/herrings");
+    file_manager->listFiles(files, file_manager->getHerringDir(),
+                            /*is_full_path*/true, 
+                            /*make_full_path*/true);
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
-            std::string fullName  = "herrings/"+(*i);
-            ssgEntity*  h         = loader->load(fullName, CB_HERRING);
-            std::string shortName = StringUtils::without_extension(*i);
+            ssgEntity*  h         = loader->load(*i, CB_HERRING, 
+                                                 /*optimise*/true, 
+                                                 /*full_path*/true);
+            std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
             h->ref();
             h->setName(shortName.c_str());
             m_all_models[shortName] = h;

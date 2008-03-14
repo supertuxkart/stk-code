@@ -390,8 +390,8 @@ void InitTuxkart()
     herring_manager         = new HerringManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
-    track_manager   ->loadTrackList () ;
-
+    track_manager->loadTrackList();
+    sound_manager->addMusicToTracks();
     // default settings for Quickstart
     race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);

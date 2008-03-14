@@ -23,23 +23,23 @@
 #include "string_utils.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
+#include "sound_manager.hpp"
 #include "translation.hpp"
 
 TrackManager* track_manager = 0;
 
 TrackManager::TrackManager()
-{}
+{}   // TrackManager
 
 //-----------------------------------------------------------------------------
 TrackManager::~TrackManager()
 {
     for(Tracks::iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
         delete *i;
-}
+}   // ~TrackManager
 
 //-----------------------------------------------------------------------------
-Track*
-TrackManager::getTrack(const std::string& ident) const
+Track* TrackManager::getTrack(const std::string& ident) const
 {
     for(Tracks::const_iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
     {
@@ -50,36 +50,34 @@ TrackManager::getTrack(const std::string& ident) const
     char msg[MAX_ERROR_MESSAGE_LENGTH];
     fprintf(stderr, "TrackManager: Couldn't find track: '%s'", ident.c_str() );
     throw std::runtime_error(msg);
-}
+}   // getTrack
 
 //-----------------------------------------------------------------------------
-Track*
-TrackManager::getTrack(size_t id) const
+Track* TrackManager::getTrack(size_t id) const
 {
     return m_tracks[id];
-}
+}  // getTrack
 
 //-----------------------------------------------------------------------------
-size_t
-TrackManager::getTrackCount() const
+size_t TrackManager::getTrackCount() const
 {
     return m_tracks.size();
-}
+}   // getTrackCount
 
 //-----------------------------------------------------------------------------
-void
-TrackManager::loadTrackList ()
+void TrackManager::loadTrackList ()
 {
     // Load up a list of tracks - and their names
-    std::set<std::string> files;
-    file_manager->listFiles(files, file_manager->getTrackDir(), /*is_full_path*/ true);
-    for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
+    std::set<std::string> dirs;
+    file_manager->listFiles(dirs, file_manager->getTrackDir(), /*is_full_path*/ true);
+    for(std::set<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
     {
-        if(*i=="." || *i=="..") continue;
+        if(*dir=="." || *dir=="..") continue;
         std::string config_file;
         try
         {
-            config_file = file_manager->getTrackFile((*i)+".track");
+            // getTrackFile appends dir, so it's opening: *dir/*dir.track
+            config_file = file_manager->getTrackFile((*dir)+".track");
         }
         catch (std::exception& e)
         {
@@ -90,6 +88,8 @@ TrackManager::loadTrackList ()
         if(!f) continue;
 
         m_tracks.push_back(new Track(config_file));
-    }
-}
 
+        // Read music files in that dir as well
+        sound_manager->loadMusicFromOneDir(*dir);
+    }
+}  // loadTrackList

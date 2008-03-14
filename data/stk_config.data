@@ -8,7 +8,7 @@
  (grid-order	   	     1   )  ;; order for grand prix, 1 is most 
 				    ;; points 1st, 0 is least points
 				    ;; 1st
- (title-music              "main_theme.ogg")
+ (title-music              "main_theme.music")
 
  ;; Attachment related parameters
  ;; -----------------------------

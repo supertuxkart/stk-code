@@ -52,6 +52,7 @@ MusicOggStream::~MusicOggStream()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::load(const std::string& filename)
 {
+    m_error = true;
     if(!release())
     {
         user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
@@ -59,25 +60,32 @@ bool MusicOggStream::load(const std::string& filename)
         return false;
     }
 
-    m_fileName =  file_manager->getMusicFile(filename);
+    //m_fileName =  file_manager->getMusicFile(filename);
+    m_fileName = filename;
     if(m_fileName=="") return false;
     
-    oggFile = fopen(m_fileName.c_str(), "rb");
+    m_oggFile = fopen(m_fileName.c_str(), "rb");
 
-#if defined( WIN32 ) || defined( WIN64 )
-    if( ov_open_callbacks((void *)oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT) < 0)
-#else
-    if (ov_open(oggFile, &m_oggStream, NULL, 0) < 0)
-#endif
+    if(!m_oggFile)
     {
-	fclose(oggFile);
         printf("Loading Music: %s failed\n", m_fileName.c_str());
         return false;
     }
 
-    vorbisInfo = ov_info(&m_oggStream, -1);
+#if defined( WIN32 ) || defined( WIN64 )
+    if( ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT) < 0)
+#else
+    if (ov_open(m_oggFile, &m_oggStream, NULL, 0) < 0)
+#endif
+    {
+        fclose(m_oggFile);
+        printf("Loading Music: %s failed\n", m_fileName.c_str());
+        return false;
+    }
+    
+    m_vorbisInfo = ov_info(&m_oggStream, -1);
 
-    if(vorbisInfo->channels == 1)
+    if(m_vorbisInfo->channels == 1)
         nb_channels = AL_FORMAT_MONO16;
     else
         nb_channels = AL_FORMAT_STEREO16;
@@ -85,7 +93,7 @@ bool MusicOggStream::load(const std::string& filename)
 
     alGenBuffers(2, m_soundBuffers);
     if(check() == false)
-        return false;;
+        return false;
 
     alGenSources(1, &m_soundSource);
     if(check() == false)
@@ -97,6 +105,7 @@ bool MusicOggStream::load(const std::string& filename)
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.0          );
     alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
 
+    m_error=false;
     return true;
 }
 
@@ -135,7 +144,9 @@ bool MusicOggStream::release()
     check();
     alDeleteBuffers(2, m_soundBuffers);
     check();
-    ov_clear(&m_oggStream);
+
+    // Handle error correctly
+    if(!m_error) ov_clear(&m_oggStream);
 
     return true;
 }
@@ -283,7 +294,7 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
         return false;
 
 
-    alBufferData(buffer, nb_channels, pcm, size, vorbisInfo->rate);
+    alBufferData(buffer, nb_channels, pcm, size, m_vorbisInfo->rate);
     check();
 
     return true;

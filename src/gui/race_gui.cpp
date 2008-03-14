@@ -838,19 +838,21 @@ void RaceGUI::addMessage(const char *msg, Kart *kart, float time,
 // usually the title and composer.
 void RaceGUI::drawMusicDescription()
 {
-    const std::vector<std::string>& description = sound_manager->getDescription();
+    const MusicInformation* mi=sound_manager->getCurrentMusic();
+
     int y=0;
-    for(int i=(int)description.size()-1; i>=0; i--)
+    if(mi->getComposer()!="")
     {
-        std::string s=description[i];
-        if(i==0) s="\""+s+"\"";
-        if(i==1) s="by "+s;
+        std::string s="by "+mi->getComposer();
         font_race->Print( s.c_str(), 25, 
                           Font::CENTER_OF_SCREEN, y,
                           255, 255, 255);
         y+=20;
-    }  // for i<m_description.size()
-
+    }
+    std::string s="\""+mi->getTitle()+"\"";
+    font_race->Print( s.c_str(), 25, 
+                      Font::CENTER_OF_SCREEN, y,
+                      255, 255, 255);
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------

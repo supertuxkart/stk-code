@@ -31,9 +31,7 @@ using namespace std;
 #else
 #  include <AL/al.h>
 #endif
-
 #include "music.hpp"
-
 
 class MusicOggStream : public Music
 {
@@ -62,9 +60,10 @@ private:
     bool streamIntoBuffer(ALuint buffer);
 
     string          m_fileName;
-    FILE*           oggFile;
+    FILE*           m_oggFile;
     OggVorbis_File  m_oggStream;
-    vorbis_info*    vorbisInfo;
+    vorbis_info*    m_vorbisInfo;
+    bool            m_error;
 
     ALuint m_soundBuffers[2];
     ALuint m_soundSource;

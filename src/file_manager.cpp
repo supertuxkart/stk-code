@@ -105,8 +105,47 @@ FileManager::FileManager()
             m_root_dir.c_str() );
 
     pushTextureSearchPath(m_root_dir+"/data/textures");
-    pushModelSearchPath  (m_root_dir+"/models"       );
-    pushMusicSearchPath  (m_root_dir+"/ogg"          );
+    pushModelSearchPath  (m_root_dir+"/data/models"  );
+    pushMusicSearchPath  (m_root_dir+"/data/music"   );
+    // Add more paths from the STK_MUSIC_PATH environment variable
+    if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
+    {
+        std::string path=getenv("SUPERTUXKART_MUSIC_PATH");
+        std::vector<std::string> dirs=StringUtils::split(path,':');
+        for(int i=(int)dirs.size()-1; i>=0; i--)
+        {
+            // Remove '/' at the end of paths, since this can cause
+            // problems with windows when using stat()
+            while(dirs[i].size()>=1 && dirs[i][dirs[i].size()-1]=='/')
+            {
+                dirs[i]=dirs[i].substr(0, dirs[i].size()-1);
+            }
+            // remove empty entries
+            if(dirs[i].size()==0)
+            {
+                dirs.erase(dirs.begin()+i);
+                continue;
+            }
+        }
+#ifdef WIN32
+        // Handle filenames like d:/dir, which becomes ["d","/dir"]
+        for(int i=(int)dirs.size()-1; i>=0; i--)
+        {
+            if(dirs[i].size()>1) continue;
+            if(i==dirs.size()-1)    // last element
+            {
+                dirs[i]+=":";      // turn "c" back into "c:"
+            }
+            else
+            {
+                dirs[i]+=":"+dirs[i+1]; // restore "d:/dir" back 
+                dirs.erase(dirs.begin()+i+1);
+            }
+        }
+#endif
+        for(int i=0;i<(int)dirs.size(); i++)
+            pushMusicSearchPath(dirs[i]);
+    }
 }  // FileManager
 
 //-----------------------------------------------------------------------------
@@ -149,7 +188,7 @@ std::string FileManager::getModelFile(const std::string& FNAME) const
     std::string path;
     findFile(path, FNAME, m_model_search_path);
     return path;
-}   // makeTexturePath
+}   // getModelFile
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getTrackDir() const
@@ -162,6 +201,18 @@ std::string FileManager::getKartDir() const
 {
     return m_root_dir+"/data/karts";
 }   // getKartDir
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getHerringDir() const
+{
+    return m_root_dir+"/data/herrings";
+}   // getHerringDir
+
+//-----------------------------------------------------------------------------
+std::vector<std::string> FileManager::getMusicDirs() const
+{
+    return m_music_search_path;
+}   // getMusicDirs
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getTrackFile(const std::string& fname,
@@ -191,6 +242,12 @@ std::string FileManager::getKartFile(const std::string& fname,
 std::string FileManager::getConfigFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
+}   // getConfigFile
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getHerringFile(const std::string& fname) const
+{
+    return getHerringDir()+"/"+fname;
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
@@ -225,17 +282,20 @@ std::string FileManager::getLogFile(const std::string& fname) const
 //-----------------------------------------------------------------------------
 std::string FileManager::getMusicFile(const std::string& fname) const
 {
-    return m_root_dir+"/oggs/"+fname;
+    std::string path;
+    findFile(path, fname, m_music_search_path);
+    return path;
 }   // getMusicFile
+
 //-----------------------------------------------------------------------------
 std::string FileManager::getSFXFile(const std::string& fname) const
 {
-    return m_root_dir+"/sfx/"+fname;
+    return m_root_dir+"/data/sfx/"+fname;
 }   // getSFXFile
 //-----------------------------------------------------------------------------
 std::string FileManager::getFontFile(const std::string& fname) const
 {
-    return m_root_dir+"/fonts/"+fname;
+    return m_root_dir+"/data/fonts/"+fname;
 }   // getFontFile
 //-----------------------------------------------------------------------------
 std::string FileManager::getHighscoreFile(const std::string& fname) const
@@ -270,12 +330,12 @@ void FileManager::initConfigDir()
 
 //-----------------------------------------------------------------------------
 void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,
-                       bool is_full_path) const
+                            bool is_full_path, bool make_full_path) const
 {
         struct stat mystat;
 
         // don't list directories with a slash on the end, it'll fail on win32
-        assert(dir[dir.size()-1] != '/');
+//        assert(dir[dir.size()-1] != '/');
 
         result.clear();
 
@@ -290,7 +350,8 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
         ulDirEnt* mydirent;
         while( (mydirent = ulReadDir(mydir)) != 0)
         {
-            result.insert(mydirent->d_name);
+            result.insert(make_full_path ? path+"/"+mydirent->d_name
+                                         :          mydirent->d_name);
         }
         ulCloseDir(mydir);
 }   // listFiles

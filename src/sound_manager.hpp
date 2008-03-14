@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2008 Patrick Ammann <pammann@aro.ch>, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +26,7 @@
 #include <string>
 
 #include "music.hpp"
+#include "music_information.hpp"
 #include "sfx.hpp"
 
 enum enumSFX {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
@@ -37,29 +39,30 @@ enum enumSFX {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
 
 class SoundManager
 {
+private:
+    void                    loadMusicInformation();
+    std::map<std::string, const MusicInformation*> m_allMusic;
 public:
     SoundManager();
     virtual ~SoundManager();
 
-    void update();
-
-    void playSfx(unsigned int id);
-
-    void playMusic(const std::string& filename);
-    void stopMusic();
-    void pauseMusic();
-    void resumeMusic();
-    const std::vector<std::string>& getDescription() {return m_description;}
-    std::string getCurrentMusicFile() {return m_current_music_file;}
-
+    void                    update();
+    void                    playSfx(unsigned int id);
+    void                    playMusic(const MusicInformation* mi);
+    void                    stopMusic();
+    void                    pauseMusic();
+    void                    resumeMusic();
+    const MusicInformation* getCurrentMusic() {return m_music_information; }    
+    const MusicInformation* getMusicInformation(const std::string& filename);
+    void                    loadMusicFromOneDir(const std::string& dir);
+    void                    addMusicToTracks() const;
 private:
 
-    typedef std::map<int, SFX*> SFXsType;
+    typedef std::vector<SFX*> SFXsType;
 
-    SFXsType m_sfxs;
-    Music* m_current_music;
-    std::vector<std::string> m_description;
-    std::string m_current_music_file;
+    SFXsType                m_sfxs;
+    Music*                  m_current_music;
+    MusicInformation const* m_music_information;
        
     bool m_initialized; //If the sound could not be initialized, for example,
                         //if the player doesn't has a sound card, we want

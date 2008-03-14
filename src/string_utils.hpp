@@ -33,6 +33,9 @@ namespace StringUtils
     /** Return the filename part of a path */
     std::string basename(const std::string& filename);
 
+    /** Return the path (i.e. up to the last /  */
+    std::string path(const std::string& filename);
+
     std::string without_extension(const std::string& filename);
     std::string extension(const std::string& filename);
 

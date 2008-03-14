@@ -36,6 +36,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "material.hpp"
 #include "triangle_mesh.hpp"
+#include "music_information.hpp"
 
 class Track
 {
@@ -44,7 +45,8 @@ private:
     std::string              m_ident;
     std::string              m_screenshot;
     std::string              m_top_view;
-    std::vector<std::string> m_music_filenames;
+    std::vector<MusicInformation const *> m_music;
+    std::vector<MusicInformation const *> m_music_last_lap;
     std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
     std::string              m_herring_style;
     std::string              m_description;
@@ -163,12 +165,16 @@ public:
     void               trackToSpatial    (sgVec3 xyz, const int SECTOR) const;
     void               loadTrackModel    ();
     bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
+    void               addMusic          (const MusicInformation* mi)
+                                                  {m_music.push_back(mi);       }
+    void               addMusicLastLap   (const MusicInformation* mi)
+                                                {m_music_last_lap.push_back(mi);}
     ssgBranch*         getModel          () const {return m_model;              }
     float              getGravity        () const {return m_gravity;            }
     float              getTrackLength    () const {return m_total_distance;     }
     const std::string& getIdent          () const {return m_ident;              }
     const char*        getName           () const {return m_name.c_str();       }
-    const std::string& getMusic          () const;
+    void               playMusic         () const;
     const std::string& getFilename       () const {return m_filename;           }
     const sgVec3& getSunPos              () const {return m_sun_position;       }
     const sgVec4& getAmbientCol          () const {return m_ambient_col;        }
@@ -210,6 +216,8 @@ private:
                           const sgVec2 P ) const;
     int   pointInQuad(const sgVec2 A, const sgVec2 B,
                       const sgVec2 C, const sgVec2 D, const sgVec2 POINT ) const;
+    void  getMusicInformation(std::vector<std::string>&             filenames, 
+                              std::vector<MusicInformation const*>& m_music   );
 }
 ;   // class Track
 
