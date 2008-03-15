@@ -405,18 +405,11 @@ AC_CONFIG_FILES([                 \
  data/Makefile                    \
  doc/Makefile                     \
  doc/players_manual/Makefile      \
- fonts/Makefile                   \
- models/Makefile                  \
- oggs/Makefile		          \
  src/Makefile                     \
  src/robots/Makefile              \
  src/bullet/Makefile              \
  src/bullet/src/Makefile          \
  src/bullet/Demos/OpenGL/Makefile \
- wavs/Makefile                    \
- wavs/radio/Makefile              \
- wavs/tintagel/Makefile           \
- models/herrings/Makefile
 ])
 AC_OUTPUT
 echo -e $SUMMARY
