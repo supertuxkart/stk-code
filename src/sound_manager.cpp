@@ -295,28 +295,31 @@ void SoundManager::resumeMusic()
 //-----------------------------------------------------------------------------
 void SoundManager::update(float dt)
 {
-    switch(m_mode)
+    if (m_normal_music != NULL)
     {
-    case SOUND_FADING: {
-         m_time_since_fade +=dt;
-         if(m_time_since_fade>=m_music_information->getFadeTime())
-         {
-             m_mode=SOUND_FAST;
-             m_normal_music->stopMusic();
+        switch(m_mode)
+        {
+        case SOUND_FADING: {
+             m_time_since_fade +=dt;
+             if(m_time_since_fade>=m_music_information->getFadeTime())
+             {
+                 m_mode=SOUND_FAST;
+                 m_normal_music->stopMusic();
+                 m_fast_music->update();
+                 return;
+             }
+             float fraction=m_time_since_fade/m_music_information->getFadeTime();
+             m_normal_music->updateFading(1-fraction);
+             m_fast_music->updateFading(fraction);
+             break;
+             }
+        case SOUND_NORMAL:
+             m_normal_music->update();
+             break;
+        case SOUND_FAST:
              m_fast_music->update();
-             return;
-         }
-         float fraction=m_time_since_fade/m_music_information->getFadeTime();
-         m_normal_music->updateFading(1-fraction);
-         m_fast_music->updateFading(fraction);
-         break;
-         }
-    case SOUND_NORMAL:
-         m_normal_music->update();
-         break;
-    case SOUND_FAST:
-         m_fast_music->update();
-         break;
-    }   // switch
+             break;
+        }   // switch
+    }
 }   // update
 
