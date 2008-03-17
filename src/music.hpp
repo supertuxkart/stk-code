@@ -25,16 +25,15 @@
 class Music
 {
 public:
-  virtual bool load(const std::string& filename)= 0;
+    virtual bool load        (const std::string& filename) = 0;
+    virtual bool playMusic   ()                            = 0;
+    virtual bool stopMusic   ()                            = 0;
+    virtual bool pauseMusic  ()                            = 0;
+    virtual bool resumeMusic ()                            = 0;
+    virtual void updateFading(float percent)               = 0;
+    virtual void update      ()                            = 0;
 
-    virtual bool playMusic()= 0;
-    virtual bool stopMusic()= 0;
-    virtual bool pauseMusic()= 0;
-    virtual bool resumeMusic()= 0;
-
-    virtual void update()= 0;
-
-    virtual ~Music(){};
+    virtual     ~Music       () {};
 };
 
 #endif // HEADER_MUSIC_H

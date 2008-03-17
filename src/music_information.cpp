@@ -34,16 +34,18 @@
 
 MusicInformation::MusicInformation(const std::string& filename)
 {
-    m_title    = "";
-    m_composer = "";
-    m_numLoops = LOOP_FOREVER;
-
+    m_title           = "";
+    m_composer        = "";
+    m_numLoops        = LOOP_FOREVER;
+    m_normal_filename = "";
+    m_fast_filename   = "";
+    m_fade_time       = 1.0f;
     if(StringUtils::extension(filename)!="music")
     {
         // Create information just from ogg file
         // -------------------------------------
-        m_title        = StringUtils::without_extension(StringUtils::basename(filename));
-        m_ogg_filename = filename;
+        m_title           = StringUtils::without_extension(StringUtils::basename(filename));
+        m_normal_filename = filename;
         return;
     }
    
@@ -63,15 +65,23 @@ MusicInformation::MusicInformation(const std::string& filename)
                  filename.c_str());
         throw std::runtime_error(msg);
     }
-    LISP->get      ("title",    m_title       );
-    LISP->get      ("composer", m_composer    );
-    LISP->get      ("loop",     m_numLoops    );
-    LISP->get      ("music",    m_ogg_filename);
-    LISP->getVector("tracks",   m_all_tracks);
+    LISP->get      ("title",      m_title          );
+    LISP->get      ("composer",   m_composer       );
+    LISP->get      ("loop",       m_numLoops       );
+    LISP->get      ("music",      m_normal_filename);
+    LISP->get      ("fast-music", m_fast_filename  );
+    LISP->get      ("fade-time",  m_fade_time      );
+    LISP->getVector("tracks",     m_all_tracks     );
 
     // Get the path from the filename and add it to the ogg filename
     std::string path=StringUtils::path(filename);
-    m_ogg_filename=path+"/"+m_ogg_filename;
+    m_normal_filename=path+"/"+m_normal_filename;
+
+    // Get the path from the filename and add it to the ogg filename
+    if(m_fast_filename!="")
+    {
+        m_fast_filename=path+"/"+m_fast_filename;
+    }
 
     delete ROOT;
 

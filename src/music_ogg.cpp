@@ -215,6 +215,13 @@ bool MusicOggStream::resumeMusic()
 }
 
 //-----------------------------------------------------------------------------
+void MusicOggStream::updateFading(float percent)
+{
+    alSourcef(m_soundSource,AL_GAIN,percent);
+    update();
+}   // updateFading
+
+//-----------------------------------------------------------------------------
 void MusicOggStream::update()
 {
 
@@ -252,7 +259,7 @@ void MusicOggStream::update()
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-	    fprintf(stderr,"WARNING: Alsa source state: %d\n", state);
+	        fprintf(stderr,"WARNING: Alsa source state: %d\n", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }
@@ -260,7 +267,7 @@ void MusicOggStream::update()
     else
     {
         // no more data. Seek to beginning -> loop
-	ov_time_seek(&m_oggStream, 0);
+	    ov_time_seek(&m_oggStream, 0);
     }
 }
 

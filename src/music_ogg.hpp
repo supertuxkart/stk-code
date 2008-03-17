@@ -40,6 +40,7 @@ public:
     virtual ~MusicOggStream();
 
     virtual void update();
+    virtual void updateFading(float percent);
 
     virtual bool load(const std::string& filename);
 

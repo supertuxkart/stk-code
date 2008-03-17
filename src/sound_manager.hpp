@@ -40,33 +40,39 @@ enum enumSFX {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
 class SoundManager
 {
 private:
+
+    typedef std::vector<SFX*> SFXsType;
+
+    SFXsType                m_sfxs;
+    Music                  *m_normal_music,
+                           *m_fast_music;
+    MusicInformation const *m_music_information;
+       
+    bool                    m_initialized; //If the sound could not be initialized, e.g.
+                                           //if the player doesn't has a sound card, we want
+                                           //to avoid anything sound related so we crash the game.
+    std::map<std::string,   const MusicInformation*> 
+                            m_allMusic;
     void                    loadMusicInformation();
-    std::map<std::string, const MusicInformation*> m_allMusic;
+    enum {SOUND_NORMAL, SOUND_FADING, 
+         SOUND_FAST}        m_mode; 
+    float                   m_time_since_fade;
+
 public:
     SoundManager();
     virtual ~SoundManager();
 
-    void                    update();
+    void                    update(float dt);
     void                    playSfx(unsigned int id);
     void                    playMusic(const MusicInformation* mi);
     void                    stopMusic();
     void                    pauseMusic();
     void                    resumeMusic();
+    void                    switchToFastMusic();
     const MusicInformation* getCurrentMusic() {return m_music_information; }    
     const MusicInformation* getMusicInformation(const std::string& filename);
     void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks() const;
-private:
-
-    typedef std::vector<SFX*> SFXsType;
-
-    SFXsType                m_sfxs;
-    Music*                  m_current_music;
-    MusicInformation const* m_music_information;
-       
-    bool m_initialized; //If the sound could not be initialized, for example,
-                        //if the player doesn't has a sound card, we want
-                        //to avoid anything sound related so we crash the game.
 
 };
 

@@ -45,7 +45,8 @@ SoundManager* sound_manager= NULL;
 
 SoundManager::SoundManager() : m_sfxs(NUM_SOUNDS)
 {
-    m_current_music = NULL;
+    m_normal_music = NULL;
+    m_fast_music   = NULL;
 
     if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
         m_initialized = true;
@@ -93,10 +94,15 @@ SoundManager::~SoundManager()
     }
     m_sfxs.empty();
 
-    if (m_current_music != NULL)
+    if (m_normal_music != NULL)
     {
-        delete m_current_music;
-        m_current_music = NULL;
+        delete m_normal_music;
+        m_normal_music = NULL;
+    }
+    if (m_fast_music != NULL)
+    {
+        delete m_fast_music;
+        m_fast_music = NULL;
     }
 
     if(m_initialized)
@@ -147,8 +153,8 @@ const MusicInformation* SoundManager::getMusicInformation(const std::string& fil
     {
         return NULL;
     }
-    const std::string basename=StringUtils::basename(filename);
-    const MusicInformation* mi=m_allMusic[basename];
+    const std::string basename = StringUtils::basename(filename);
+    const MusicInformation* mi = m_allMusic[basename];
     if(!mi)
     {
         mi = new MusicInformation(filename);
@@ -173,47 +179,75 @@ void SoundManager::playSfx(unsigned int id)
 void SoundManager::playMusic(const MusicInformation* mi)
 {
     m_music_information  = mi;
+    m_time_since_fade    = 0.0f;
+    m_mode               = SOUND_NORMAL;
     if(!user_config->doMusic() || !m_initialized) return;
-
-    if (m_current_music != NULL)
+    
+    if (m_normal_music != NULL)
     {
-        delete m_current_music;
-        m_current_music = NULL;
+        delete m_normal_music;
+        m_normal_music = NULL;
     }
 
-    if (mi->getFilename()== "")
+    if (mi->getNormalFilename()== "")   // nothing to play
     {
-        // nothing to play
-        return;
-    }
-    const std::string& filename=mi->getFilename();
-    if (!strcasecmp(".ogg", filename.c_str()+filename.size()-4))
-        m_current_music= new MusicOggStream();
-
-    if(m_current_music == NULL)	// no support for file
-    {
-      fprintf(stderr, "WARNING: music file %s format not recognized.\n", filename.c_str());
         return;
     }
 
-    if((m_current_music->load(filename)) == false)
+    // First load the 'normal' music
+    // -----------------------------
+    const std::string& filename_normal=mi->getNormalFilename();
+    if(StringUtils::extension(filename_normal)!="ogg")
     {
-        delete m_current_music;
-        m_current_music=0;
+        fprintf(stderr, "WARNING: music file %s format not recognized.\n", 
+                filename_normal.c_str());
+        return;
+    }
+    m_normal_music= new MusicOggStream();
+
+    if((m_normal_music->load(filename_normal)) == false)
+    {
+        delete m_normal_music;
+        m_normal_music=0;
 	    fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
-                filename.c_str());
+                filename_normal.c_str());
+        return;
+    }
+    m_normal_music->playMusic();
+
+    // Then (if available) load the music for the last track
+    // -----------------------------------------------------
+    const std::string& filename_fast=mi->getFastFilename();
+    if(StringUtils::extension(filename_fast)!="ogg")
+    {
+        fprintf(stderr, 
+                "WARNING: music file %s format not recognized, fast music is ignored\n", 
+                filename_fast.c_str());
+        return;
+    }
+    m_fast_music= new MusicOggStream();
+
+    if((m_fast_music->load(filename_fast)) == false)
+    {
+        delete m_fast_music;
+        m_fast_music=0;
+	    fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
+                filename_fast.c_str());
         return;
     }
 
-    m_current_music->playMusic();
 }   // playMusic
 
 //-----------------------------------------------------------------------------
 void SoundManager::stopMusic()
 {
-    if (m_current_music != NULL)
+    if (m_normal_music != NULL)
     {
-        m_current_music->stopMusic();
+        m_normal_music->stopMusic();
+    }
+    if (m_fast_music != NULL)
+    {
+        m_fast_music->stopMusic();
     }
     m_music_information = NULL;
 }   // stopMusic
@@ -221,28 +255,68 @@ void SoundManager::stopMusic()
 //-----------------------------------------------------------------------------
 void SoundManager::pauseMusic()
 {
-    if (m_current_music != NULL)
+    if (m_normal_music != NULL)
     {
-        m_current_music->pauseMusic();
+        m_normal_music->pauseMusic();
+    }
+    if (m_fast_music != NULL)
+    {
+        m_fast_music->pauseMusic();
     }
 
 }   // pauseMusic
 
 //-----------------------------------------------------------------------------
+/*** If available select the faster music (usually for the last track).
+*/
+void SoundManager::switchToFastMusic()
+{
+    if(m_fast_music && m_mode==SOUND_NORMAL)
+    {
+        m_mode            = SOUND_FADING;
+        m_time_since_fade = 0.0f;
+        m_fast_music->playMusic();
+    }
+}   // switchToFastMusic
+//-----------------------------------------------------------------------------
+
 void SoundManager::resumeMusic()
 {
-    if (m_current_music != NULL)
+    if (m_normal_music != NULL)
     {
-        m_current_music->resumeMusic();
+        m_normal_music->resumeMusic();
+    }
+    if (m_fast_music != NULL)
+    {
+        m_fast_music->resumeMusic();
     }
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-void SoundManager::update()
+void SoundManager::update(float dt)
 {
-    if (m_current_music != NULL)
-    {	
-    	m_current_music->update();
-    }
+    switch(m_mode)
+    {
+    case SOUND_FADING: {
+         m_time_since_fade +=dt;
+         if(m_time_since_fade>=m_music_information->getFadeTime())
+         {
+             m_mode=SOUND_FAST;
+             m_normal_music->stopMusic();
+             m_fast_music->update();
+             return;
+         }
+         float fraction=m_time_since_fade/m_music_information->getFadeTime();
+         m_normal_music->updateFading(1-fraction);
+         m_fast_music->updateFading(fraction);
+         break;
+         }
+    case SOUND_NORMAL:
+         m_normal_music->update();
+         break;
+    case SOUND_FAST:
+         m_fast_music->update();
+         break;
+    }   // switch
 }   // update
 

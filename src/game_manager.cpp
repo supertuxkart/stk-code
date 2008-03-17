@@ -70,7 +70,8 @@ void GameManager::run()
 
         m_prev_time = m_curr_time;
         m_curr_time = SDL_GetTicks();
-		
+		float dt = (m_curr_time - m_prev_time ) * 0.001f;
+
 		if (!music_on && !race_manager->raceIsActive())
 		{
         	sound_manager->playMusic(stk_config->m_title_music);
@@ -80,8 +81,7 @@ void GameManager::run()
         if (race_manager->raceIsActive())
         {
             music_on = false; 
-            float dt = (m_curr_time - m_prev_time ) * 0.001f;
-	    if(user_config->m_profile) dt=1.0f/60.0f;
+	        if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
             scene->draw(world->getPhase()==World::SETUP_PHASE ? 0.0f : dt);
@@ -145,7 +145,7 @@ void GameManager::run()
         }
 
         menu_manager->update();
-        sound_manager->update();
+        sound_manager->update(dt);
 
         glFlush();
         SDL_GL_SwapBuffers();

@@ -28,16 +28,20 @@ class MusicInformation
 private:
     std::string              m_composer;
     std::string              m_title;
-    std::string              m_ogg_filename;
+    std::string              m_normal_filename;
+    std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
     int                      m_numLoops;
+    float                    m_fade_time;
     static const int         LOOP_FOREVER=-1;
 public:
-                       MusicInformation(const std::string& filename);
-    const std::string& getComposer     () const {return m_composer;     }
-    const std::string& getTitle        () const {return m_title;        }
-    const std::string& getFilename     () const {return m_ogg_filename; }
-    int                getNumLoops     () const {return m_numLoops;     }
-    void               addMusicToTracks() const;
+                       MusicInformation (const std::string& filename);
+    const std::string& getComposer      () const {return m_composer;        }
+    const std::string& getTitle         () const {return m_title;           }
+    const std::string& getNormalFilename() const {return m_normal_filename; }
+    const std::string& getFastFilename  () const {return m_fast_filename;   }
+    int                getNumLoops      () const {return m_numLoops;        }
+    float              getFadeTime      () const {return m_fade_time;       }
+    void               addMusicToTracks () const;
 };   // MusicInformation
 #endif
