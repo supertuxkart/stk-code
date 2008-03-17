@@ -19,6 +19,7 @@
 
 #include "file_manager.hpp"
 #include "material.hpp"
+#include "string_utils.hpp"
 
 #define UCLAMP   1
 #define VCLAMP   2
@@ -194,5 +195,8 @@ void Material::install(bool is_full_path)
         m_state -> setOpaque () ;
         m_state -> disable   ( GL_BLEND ) ;
     }
+
+    // now set the name to the basename, so that all tests work as expected
+    m_texname  = StringUtils::basename(m_texname);
 }
 
