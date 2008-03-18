@@ -56,6 +56,8 @@ public:
     void    crashed           ();
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);
+    virtual void setPosition  (int p);
+
     int     isPlayerKart      () const {return 1;}
 
     void    reset();

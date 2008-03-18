@@ -180,6 +180,18 @@ void PlayerKart::crashed()
 }   // crashed
 
 //-----------------------------------------------------------------------------
+/** Checks if the kart was overtaken, and if so plays a sound
+*/
+void PlayerKart::setPosition(int p)
+{
+    if(getPosition()<p)
+    {
+        sound_manager->playSfx(SOUND_BEEP);
+    }
+    Kart::setPosition(p);
+}   // setPosition
+
+//-----------------------------------------------------------------------------
 void PlayerKart::handleZipper()
 {
     Kart::handleZipper();

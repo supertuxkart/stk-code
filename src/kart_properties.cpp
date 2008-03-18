@@ -95,7 +95,7 @@ void KartProperties::load(const std::string filename, const std::string node,
         m_model = loader->load(m_model_file, CB_KART, false);
         if(!m_model)
         {
-            fprintf(stderr, "Can't find kart model '%s'.\n",m_model_file);
+	  fprintf(stderr, "Can't find kart model '%s'.\n",m_model_file.c_str());
         file_manager->popTextureSearchPath();
         file_manager->popModelSearchPath();
             return;
