@@ -32,7 +32,8 @@ public:
 
     void select();
     void countdown();
-
+    void handle(GameAction ga, int value);
+    
 private:
     char m_count[60];
     int m_counter;

@@ -79,6 +79,9 @@ ConfigDisplay::ConfigDisplay()
 #endif
     getScreenModes(); //Fill the vector m_sizes with possible resolutions
 
+    m_curr_width = m_sizes[m_curr_res].first;
+    m_curr_height = m_sizes[m_curr_res].second;
+    
     const bool SHOW_RECT = true;
     const bool SHOW_TEXT = true;
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
@@ -121,10 +124,6 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->deactivateWgt( WTOK_EMPTY );
     widget_manager->hideWgtRect( WTOK_EMPTY );
     widget_manager->hideWgtText( WTOK_EMPTY );
-
-
-    m_curr_width = m_sizes[m_curr_res].first;
-    m_curr_height = m_sizes[m_curr_res].second;
 
     widget_manager->addWgt( WTOK_CURRENT_RES, 40, 7);
     char msg [MAX_MESSAGE_LENGTH];
@@ -253,14 +252,16 @@ void ConfigDisplay::select()
                 if ( isBlacklisted( user_config->m_width,
                     user_config->m_height ))
                 {
-                    //    widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen Unavailable"));
+                    //widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen Unavailable"));
                     widget_manager->hideWgtText(WTOK_FULLSCREEN);
                     widget_manager->hideWgtRect(WTOK_FULLSCREEN);
                     widget_manager->deactivateWgt(WTOK_FULLSCREEN);
                 }
                 else
                 {
-                    widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen mode"));
+                    //widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen mode"));
+                    widget_manager->showWgtText(WTOK_FULLSCREEN);
+                    widget_manager->showWgtRect(WTOK_FULLSCREEN);
                     widget_manager->activateWgt(WTOK_FULLSCREEN);
                 }
                 widget_manager->layout();

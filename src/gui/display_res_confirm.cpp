@@ -43,7 +43,7 @@ enum WidgetTokens
     WTOK_QUIT
 };
 
-//FIXME: at the moment, FROM_WINDOW is not used.
+
 DisplayResConfirm::DisplayResConfirm( const bool FROM_WINDOW_ ) :
     FROM_WINDOW (FROM_WINDOW_)
 {
@@ -108,6 +108,12 @@ void DisplayResConfirm::select()
         break;
     case WTOK_QUIT:
         SDL_RemoveTimer(m_timer);
+        if (FROM_WINDOW) 
+        {
+            drv_toggleFullscreen();
+            user_config->m_crashed = false;
+            user_config->saveConfig();
+        }
         menu_manager->popMenu();
         break;
     default: break;
@@ -142,6 +148,29 @@ void DisplayResConfirm::countdown()
 
 
         menu_manager->popMenu();
+    }
+}
+//-----------------------------------------------------------------------------
+void DisplayResConfirm::handle(GameAction ga, int value)
+{
+    switch ( ga )
+    {
+    case GA_LEAVE:
+        if (value)
+            break;
+		SDL_RemoveTimer(m_timer);
+        if (FROM_WINDOW) 
+        {
+            drv_toggleFullscreen();
+            user_config->m_crashed = false;
+            user_config->saveConfig();
+        }
+        menu_manager->popMenu();
+        break;
+
+    default:
+        BaseGUI::handle(ga, value);
+        break;
     }
 }
 
