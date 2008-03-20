@@ -1298,7 +1298,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
     {
         if(!(m_widgets[i].active)) continue;
 
-        glLoadName( m_widgets[i].token );
+        glLoadName( i );
 
         glPushMatrix();
         m_widgets[i].widget->applyTransformations();
@@ -1323,29 +1323,36 @@ int WidgetManager::handlePointer(const int X, const int Y )
     {
         float dist;
         float near_dist = 9999999.0f;
-        int nearest = WGT_NONE;
+        int curr_wgt_id;
+        int nearest_id = WGT_NONE;
         int wgt_x_center, wgt_y_center;
-        int curr_wgt;
         for( int i = 0; i < NUM_HITS; ++i )
         {
             position += 3;
-            curr_wgt = *position;
+            curr_wgt_id = *position;
 
-            wgt_x_center = m_widgets[curr_wgt].widget->m_x + m_widgets[i].widget->m_width / 2;
-            wgt_y_center = m_widgets[curr_wgt].widget->m_y + m_widgets[i].widget->m_height / 2;
+            wgt_x_center = m_widgets[curr_wgt_id].widget->m_x +
+                m_widgets[i].widget->m_width / 2;
+            wgt_y_center = m_widgets[curr_wgt_id].widget->m_y +
+                m_widgets[i].widget->m_height / 2;
+
             //Check if it's the closest one to the mouse
             dist = (float)( abs(X - wgt_x_center) + abs(Y - wgt_y_center));
             if(dist < near_dist )
             {
                 near_dist = dist;
-                nearest = curr_wgt;
+                nearest_id = curr_wgt_id;
             }
 
             ++position;
         }
-        if( nearest == m_selected_wgt_token ) return WGT_NONE;
 
-        m_selected_wgt_token = nearest;
+        if( m_widgets[nearest_id].token == m_selected_wgt_token )
+        {
+            return WGT_NONE;
+        }
+
+        m_selected_wgt_token = m_widgets[nearest_id].token;
         return m_selected_wgt_token;
     }
 
