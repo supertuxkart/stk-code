@@ -218,6 +218,12 @@ void SoundManager::playMusic(const MusicInformation* mi)
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
     const std::string& filename_fast=mi->getFastFilename();
+    if(filename_fast=="") 
+    {
+        m_fast_music = NULL;
+        return;   // no fast music
+    }
+
     if(StringUtils::extension(filename_fast)!="ogg")
     {
         fprintf(stderr, 
