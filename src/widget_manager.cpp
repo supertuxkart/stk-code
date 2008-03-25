@@ -1346,6 +1346,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
 
             ++position;
         }
+        delete select_buffer;
 
         if( m_widgets[nearest_id].token == m_selected_wgt_token )
         {
