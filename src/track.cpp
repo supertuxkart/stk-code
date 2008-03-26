@@ -861,7 +861,8 @@ void Track::getMusicInformation(std::vector<std::string>&             filenames,
         }
         if(!mi)
         {
-            fprintf(stderr, "Music information file '%s' not found - ignored.\n",filenames[i]);
+            fprintf(stderr, "Music information file '%s' not found - ignored.\n",
+                    filenames[i].c_str());
             continue;
         }
         m_music.push_back(mi);
