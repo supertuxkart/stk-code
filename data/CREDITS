@@ -1,140 +1,177 @@
-SuperTuxKart - 0.4 RC 1
-=====================
-Super TuxKart is a fun kart racing game.
+Super TuxKart - SVN
+=================
+Visit us at http://supertuxkart.sourceforge.net
 
-http://sourceforge.net/supertuxkart
 
 Project Leaders
------------------
-   Joerg Henrichs (hiker)
-
-   Eduardo Hernandez Munoz (coz)
-
-
-Additional coding
---------------------
-   Robert Schuster 
-         - User settings updates
-         - Input handling
-         - SDL port
-         - Bug fixes
-
-   Paul Elms (scifly)
-         - Bug fixes
-         - Change resoluton gui
-
-   Hans Dzaack (Hans the farmer)
-         - Physics tuning
-
-   Maik Semder (Ikework)
-         - Bugfixes
-
-   Stephan Wiefling
-         - Menu sounds
-
-   Sam Clarke
-         - Windows Installer
-   
-   Canarix
-         - User interface
-         - Testing
-
-   Damien
-         - Ogg vorbis support
-
-   Patrick Ammann
-         - Bug fixes, code cleanup
-         - OpenAL support
-
-Artists
 ---------------
-   SuperTuxKart Music Theme
-          - Weirwood
 
-   Additional music
-          - Weirwood
-          - Lukas Siewert (Dr.Sternhagel)
-          - Paul Esra Martin (P@ule)
-          - Asha B.
-          - Magne Djupvik
+Joerg Henrichs (hiker)
 
-   3D track improvements (Shifting Sands, Lighthouse, Beach)
-         - Marianne Gagnon (auria)
+Eduardo Hernandez Munoz (Coz)
 
-   Island track creation
-         - Johannes Sjolund
 
-   2D art
-         - Canarix
+Programming
+-----------
 
-   Wilber kart
-         - Marianne Gagnon (auria)
+Charlie Head
+- Bugfix: widget manager's selection memory leak
 
-   Hexley the platypus creation
-         - Frederico de Oliveira Linhares
+Canarix
+- User interface
 
-Support for OS-X
-----------------
-   Port and package creation:
-         - Florian, -Nuke-, TinGamer, Xeno74,
-         Auria, JPenguin
+Maik Semder (Ikework)
+- Bug fixes
 
-   Additional artwork/documentation:
-         - Cherryprice, -Nuke-, and Xeno74
+Patrick Ammann
+- OpenAL support
+- Bug fixes
+- Code cleanup
 
-Support for Mac-Linux-PPC
--------------------------
-   Port and package creation:
-         - Xeno74
+Paul Elms (scifly)
+- Change resoluton GUI
+- Bug fixes
 
-Playtester
+Robert Schuster
+- User settings updates
+- Input handling improvements
+- SDL port
+- Bug fixes
+
+
+Visual art
 ----------
-   - Constantin Pelikan
-   - Too many friendly people at the 
-     Games4Mac Forum to list them all
-     (http://community.games4mac.de)
 
-Donations
+Canarix
+- 2D art
+
+Marianne Gagnon (Auria)
+- 'SnowTux peak' track
+- 'Shifting sands', 'Around the Lighthouse and 'On the beach' track improvements
+- Wilber kart
+- 'Amazing journey' track
+
+Damien
+- Ogg vorbis support
+
+Frederico de Oliveira Linhares
+- Hexley the platypus kart
+
+Johannes Sjolund
+- 'The Island' track
+
+
+Audio art
 ---------
-   - Michael Roessner
-     http://www.retrax.de
+
+Weirwood
+- Super TuxKart music theme
+- 'Kart grand prix' song
+
+Asha B.
+- 'Ethereal Spectrum' song
+- 'Lava Lagoon' song
+
+Lukas Siewert (Dr.Sternhagel)
+- 'Caribbean music' song
+- 'Another caribbean beat' song
+
+Magne Djupvik
+- 'King Arthur's castle' song
+
+Paul Esra Martin (P@ule)
+- 'G4M fan track' song
+
+Stephan Wiefling
+- Menu sounds
 
 
-Previous releases
-=================
 
-Game of the Month group:
-----------------------------
-http://happypenguin.org/forums/viewforum.php?f=21
+Mac OS X port
+-------------
 
-   Ingo Ruhnke
-   Matthias Braun
-   James Gregory
-   Jacob Persson
-   Paul Carley
-   Craig Keogh
-   Pascal Giard
-   Caleb Sawtell
-   Ricardo Cruz
-   Oliver Jeeves
-   Jacob Persson
-   Willian Padovani Germano
+Cherryprice
+- Mac OS X artwork & documentation
 
-Original Tuxkart Design:
---------------------------
-   Steve Baker
-   http://www.sjbaker.org/
+Nuke
+- Mac OS X port & package creation
+- Mac OS X artwork & documentation
 
-Models and Track Design:
-----------------------------
-   Original TuxKart models:
-   Steve Baker, Oliver Baker
+Florian
+- Mac OS X port & package creation
 
-   New SuperTuxKart models:
-   Ingo Ruhnke
+JPenguin
+- Mac OS X port & package creation
 
-Music:
+Marianne Gagnon (Auria)
+- Mac OS X port & package creation
+
+TinGamer
+- Mac OS X port & package creation
+
+Xeno74
+- Mac OS X port & package creation
+- Mac-Linux-PPC port & package creation
+- Mac OS X artwork & documentation
+
+
+Testing
 -------
-   Matt Thomas
-   
 
+Canarix
+
+The friendly people at the Games4Mac Forum
+Website: http://community.games4mac.de
+
+
+Webmasters
+----------
+
+Constantin Pelikan
+- General improvements
+
+Remy le Guen (Vivelefrat)
+- Website improvements
+
+Sebastian Rode
+- STK description on the website
+
+
+Misc
+----
+
+Hans Dzaack (Hans the farmer)
+- Physics tuning
+
+Michael Roessner
+Website: http://www.retrax.de
+- Donator
+
+Sam Clarke
+- Windows Installer
+
+
+Game of the Month, STK version 0.0.0
+------------------------------------------
+See http://happypenguin.org/forums/viewforum.php?f=21
+
+Caleb Sawtell
+Craig Keogh
+Ingo Ruhnke
+Jacob Persson
+James Gregory
+Matthias Braun
+Oliver Jeeves
+Pascal Giard
+Paul Carley
+Ricardo Cruz
+Willian Padovani Germano
+
+Original Tuxkart
+------------------
+Matt Thomas
+- Music
+
+Steve Baker, Oliver Baker
+Website: http://www.sjbaker.org/
+- Everything except the music
