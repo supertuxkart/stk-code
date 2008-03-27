@@ -20,7 +20,6 @@
 #include <algorithm>
 #include "challenges/energy_math_class.hpp"
 #include "world.hpp"
-#include "unlock_manager.hpp"
 
 EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", "Collect Coins in Race track")
 {

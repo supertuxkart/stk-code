@@ -20,7 +20,6 @@
 #include <algorithm>
 #include "challenges/win_gotm_cup.hpp"
 #include "world.hpp"
-#include "unlock_manager.hpp"
 #include "race_setup.hpp"
 #include "race_manager.hpp"
 

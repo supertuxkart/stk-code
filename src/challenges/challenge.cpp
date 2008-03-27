@@ -18,7 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "challenges/challenge.hpp"
-#include "unlock_manager.hpp"
 
 Challenge::Challenge(std::string id, std::string name) : 
     m_state(CH_INACTIVE), m_Id(id), m_Name(name)

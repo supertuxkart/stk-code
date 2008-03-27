@@ -20,7 +20,6 @@
 #include <algorithm>
 #include "challenges/all_tracks.hpp"
 #include "world.hpp"
-#include "unlock_manager.hpp"
 
 AllTracks::AllTracks() : Challenge("alltracks", "All Tracks")
 {

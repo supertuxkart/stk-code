@@ -92,7 +92,13 @@ void UnlockManager::computeActive()
     {
         // If a challenge is solved, nothing needs to be done
         // --------------------------------------------------
-        if((i->second)->isSolved()) continue;
+        if((i->second)->isSolved()) 
+        {
+            // The constructor calls computeActive, which actually locks all features, 
+            // so unlock them
+            unlockFeature(i->second);
+            continue;
+        }
 
         // Otherwise lock the feature, and check if the challenge is active
         // ----------------------------------------------------------------
