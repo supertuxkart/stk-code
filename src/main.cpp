@@ -44,6 +44,7 @@
 #include <algorithm>
 
 #include "user_config.hpp"
+#include "unlock_manager.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "kart_properties_manager.hpp"
@@ -370,9 +371,12 @@ int handleCmdLine(int argc, char **argv)
 //=============================================================================
 void InitTuxkart()
 {
-    file_manager = new FileManager();
-    loader       = new Loader();
+    file_manager            = new FileManager();
+    translations            = new Translations();
+    loader                  = new Loader();
     loader->setCreateStateCallback(getAppState);
+    // unlock manager is needed when reading the config file
+    unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
     sound_manager           = new SoundManager();
 
@@ -405,7 +409,6 @@ void InitTuxkart()
 int main(int argc, char *argv[] ) 
 {
     try {
-        initTranslations();
         glutInit(&argc, argv);
         InitTuxkart();
 

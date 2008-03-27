@@ -26,6 +26,7 @@
 #include "user_config.hpp"
 #include "material.hpp"
 #include "material_manager.hpp"
+#include "unlock_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens
@@ -62,8 +63,19 @@ TrackSel::TrackSel()
 
     for (unsigned int i = 0; i != track_manager->getTrackCount(); ++i)
     {
+        // snowtuxpeak must be unlocked
+        const Track *track = track_manager->getTrack(i);
+        bool isAvailable = !unlock_manager->isLocked(track->getIdent());
         widget_manager->addWgt( WTOK_TRACK0 + i, 40, 6);
-        widget_manager->setWgtText( WTOK_TRACK0 + i, track_manager->getTrack(i)->getName());
+        if(isAvailable)
+        {
+            widget_manager->setWgtText( WTOK_TRACK0 + i, track->getName());
+        }
+        else
+        {
+            widget_manager->setWgtText( WTOK_TRACK0 + i, "???");
+            widget_manager->deactivateWgt(WTOK_TRACK0 + i);
+        }
         if( i%2 != 0 ) widget_manager->breakLine();
         else if (i + 1 == track_manager->getTrackCount() )
         {

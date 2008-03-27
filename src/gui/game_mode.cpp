@@ -23,6 +23,7 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
+#include "unlock_manager.hpp"
 
 enum WidgetTokens
 {
@@ -49,7 +50,15 @@ GameMode::GameMode()
 
     widget_manager->setInitialActivationState(true);
     widget_manager->addWgt(WTOK_GP, 50, 7);
-    widget_manager->setWgtText( WTOK_GP, _("Grand Prix"));
+    if(unlock_manager->isLocked("grandprix"))
+    {
+        widget_manager->setWgtText( WTOK_GP, "???");
+        widget_manager->deactivateWgt(WTOK_GP);
+    }
+    else
+    {
+        widget_manager->setWgtText( WTOK_GP, _("Grand Prix"));
+    }
 
     widget_manager->addWgt(WTOK_QUICKRACE, 50, 7);
     widget_manager->setWgtText( WTOK_QUICKRACE, _("Quick Race"));

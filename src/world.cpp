@@ -44,6 +44,7 @@
 #include "scene.hpp"
 #include "camera.hpp"
 #include "robots/default_robot.hpp"
+#include "unlock_manager.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
 #endif
@@ -528,6 +529,7 @@ void World::updateRaceStatus(float dt)
             }   // if !raceIsFinished
         }   // for i
     }
+    if(m_phase==FINISH_PHASE) unlock_manager->raceFinished();
 }  // updateRaceStatus
 
 //-----------------------------------------------------------------------------

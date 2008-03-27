@@ -52,6 +52,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	stk_config.cpp		   stk_config.hpp    		\
 	highscores.cpp		   highscores.hpp		\
 	highscore_manager.cpp	   highscore_manager.hpp	\
+	unlock_manager.cpp	   unlock_manager.hpp		\
 	file_manager.cpp           file_manager.hpp           	\
 	loader.cpp		   loadre.hpp			\
 	race_manager.cpp	   race_manager.hpp          	\
@@ -91,6 +92,10 @@ supertuxkart_SOURCES =             main.cpp  			\
 	translation.cpp		   translation.hpp 		\
 	traffic.cpp 			  	        	\
 	player.hpp		   				\
+	challenges/challenge.hpp   challenges/challenge.cpp	\
+	challenges/all_tracks.cpp  challenges/all_tracks.hpp	\
+	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\
+	challenges/win_gotm_cup.cpp challenges/win_gotm_cup.hpp \
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\
@@ -119,6 +124,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
+	gui/challenges_menu.cpp	   gui/challenges_menu.hpp	\
+	gui/feature_unlocked.cpp   gui/feature_unlocked.hpp	\
 	gui/font.hpp		   gui/font.cpp                 \
 	robots/default_robot.cpp   robots/default_robot.hpp	\
 	replay_buffer_tpl.hpp 					\

@@ -101,7 +101,9 @@ FileManager::FileManager()
 #else
         m_root_dir = "/usr/local/share/games/supertuxkart" ;
 #endif
-    fprintf(stderr, _("Data files will be fetched from: '%s'\n"), 
+    // We can't use _() here, since translations will only be initalised
+    // after the filemanager (to get the path to the tranlsations from it)
+    fprintf(stderr, "Data files will be fetched from: '%s'\n", 
             m_root_dir.c_str() );
 
     pushTextureSearchPath(m_root_dir+"/data/textures");
@@ -207,6 +209,11 @@ std::string FileManager::getHerringDir() const
 {
     return m_root_dir+"/data/herrings";
 }   // getHerringDir
+//-----------------------------------------------------------------------------
+std::string FileManager::getTranslationDir() const
+{
+    return m_root_dir+"/data/po";
+}   // getTranslationDir
 
 //-----------------------------------------------------------------------------
 std::vector<std::string> FileManager::getMusicDirs() const

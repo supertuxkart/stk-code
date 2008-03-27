@@ -26,6 +26,7 @@
 #include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_properties_manager.hpp"
+#include "unlock_manager.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "game_manager.hpp"
@@ -142,7 +143,14 @@ GrandPrixEnd::GrandPrixEnd()
     widget_manager->activateWgt(WTOK_QUIT);
     widget_manager->showWgtRect(WTOK_QUIT);
     widget_manager->showWgtText(WTOK_QUIT);
-    widget_manager->setWgtText(WTOK_QUIT, _("Back to the main menu"));
+    if(unlock_manager->getUnlockedFeatures().size()>0)
+    {
+        widget_manager->setWgtText(WTOK_QUIT, _("Continue"));
+    }
+    else
+    {
+        widget_manager->setWgtText(WTOK_QUIT, _("Back to the main menu"));
+    }
 
     widget_manager->layout(WGT_AREA_TOP);
 
@@ -218,5 +226,17 @@ void GrandPrixEnd::update(float dt)
 //-----------------------------------------------------------------------------
 void GrandPrixEnd::select()
 {
+    // If a new feature was unlocked, display the new feature first
+    // before returning to the main menu
+    if(unlock_manager->getUnlockedFeatures().size()>0)
+    {
+        // This removes this menu from the stack, and adds the main menu. 
+        // Then we push the new feature menu on top, so that it will be
+        // displayed next, and on return the main menu is shown.
+        menu_manager->switchToMainMenu();
+        menu_manager->pushMenu(MENUID_UNLOCKED_FEATURE);
+        return;
+    }
+
     menu_manager->switchToMainMenu();
 }

@@ -40,26 +40,27 @@ public:
     FileManager();
     ~FileManager();
 
-    std::string getHomeDir      () const;
-    std::string getTrackDir     () const;
-    std::string getKartDir      () const;
-    std::string getHerringDir   () const;
+    std::string getHomeDir       () const;
+    std::string getTrackDir      () const;
+    std::string getKartDir       () const;
+    std::string getHerringDir    () const;
+    std::string getTranslationDir() const;
     std::vector<std::string>getMusicDirs() const;
-    std::string getTextureFile  (const std::string& fname) const;
-    std::string getKartFile     (const std::string& fname,
-                                 const std::string& kart="") const;
-    std::string getTrackFile    (const std::string& fname, 
-                                 const std::string& track="") const;
-    std::string getConfigFile   (const std::string& fname) const;
-    std::string getHighscoreFile(const std::string& fname) const;
-    std::string getLogFile      (const std::string& fname) const;
-    std::string getHerringFile  (const std::string& fname) const;
-    std::string getMusicFile    (const std::string& fname) const;
-    std::string getSFXFile      (const std::string& fname) const;
-    std::string getFontFile     (const std::string& fname) const;
-    std::string getModelFile    (const std::string& fname) const;
+    std::string getTextureFile   (const std::string& fname) const;
+    std::string getKartFile      (const std::string& fname,
+                                  const std::string& kart="") const;
+    std::string getTrackFile     (const std::string& fname, 
+                                  const std::string& track="") const;
+    std::string getConfigFile    (const std::string& fname) const;
+    std::string getHighscoreFile (const std::string& fname) const;
+    std::string getLogFile       (const std::string& fname) const;
+    std::string getHerringFile   (const std::string& fname) const;
+    std::string getMusicFile     (const std::string& fname) const;
+    std::string getSFXFile       (const std::string& fname) const;
+    std::string getFontFile      (const std::string& fname) const;
+    std::string getModelFile     (const std::string& fname) const;
 #ifdef HAVE_GHOST_REPLAY
-    std::string getReplayFile(const std::string& fname) const;
+    std::string getReplayFile    (const std::string& fname) const;
 #endif
 
     void listFiles(std::set<std::string>& result, const std::string& dir,

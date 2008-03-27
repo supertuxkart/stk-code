@@ -52,6 +52,8 @@
 #include "sdldrv.hpp"
 #include "user_config.hpp"
 #include "widget_manager.hpp"
+#include "challenges_menu.hpp"
+#include "feature_unlocked.hpp"
 
 using namespace std;
 
@@ -144,6 +146,9 @@ void MenuManager::update()
             case MENUID_MAINMENU:
                 m_current_menu= new MainMenu();
                 break;
+            case MENUID_CHALLENGES:
+                m_current_menu= new ChallengesMenu();
+                break;
             case MENUID_CHARSEL_P1:
             case MENUID_CHARSEL_P2:
             case MENUID_CHARSEL_P3:
@@ -161,6 +166,9 @@ void MenuManager::update()
                 break;
             case MENUID_TRACKSEL:
                 m_current_menu= new TrackSel();
+                break;
+            case MENUID_UNLOCKED_FEATURE:
+                m_current_menu = new FeatureUnlocked();
                 break;
             case MENUID_NUMLAPS:
                 m_current_menu= new NumLaps();
@@ -260,7 +268,7 @@ void MenuManager::update()
     }
 }   // update
 
-//-----------------------------------------------------------------------------
+//----------k-------------------------------------------------------------------
 void MenuManager::switchToGrandPrixEnding()
 {
     if (m_current_menu != NULL)

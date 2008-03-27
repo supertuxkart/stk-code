@@ -24,6 +24,7 @@
 #include "game_manager.hpp"
 #include "kart_properties_manager.hpp"
 #include "race_manager.hpp"
+#include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "world.hpp"
 #include "scene.hpp"
@@ -155,7 +156,6 @@ GrandPrixMode::next()
     {
         scene->clear();
         start_race(m_track);
-
     }
     else
     {
@@ -173,6 +173,7 @@ GrandPrixMode::exit_race()
     }
     else
     {
+        unlock_manager->grandPrixFinished();
         menu_manager->switchToGrandPrixEnding();
     }
 }

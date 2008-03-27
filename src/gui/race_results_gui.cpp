@@ -27,6 +27,7 @@
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "highscore_manager.hpp"
+#include "unlock_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens
@@ -149,26 +150,35 @@ RaceResultsGUI::RaceResultsGUI()
 
     widget_manager->setInitialActivationState(true);
     widget_manager->addWgt( WTOK_CONTINUE, 60, 7);
-    if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
-    {
-        widget_manager->setWgtText( WTOK_CONTINUE, _("Continue Grand Prix"));
-    }
-    else
-    {
-        widget_manager->setWgtText( WTOK_CONTINUE, _("Back to the main menu"));
-    }
-    widget_manager->breakLine();
 
-    widget_manager->addWgt( WTOK_RESTART_RACE, 60, 7);
-    widget_manager->setWgtText( WTOK_RESTART_RACE, _("Race in this track again"));
-    widget_manager->breakLine();
-
-    if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
+    // If a new feature was unlocked, only offer 'continue' otherwise add the 
+    // full menu choices. The new feature menu returns to this menu, and will
+    // then display the whole menu.
+    if(unlock_manager->getUnlockedFeatures().size()>0)
     {
-        widget_manager->addWgt( WTOK_SETUP_NEW_RACE, 60, 7);
-        widget_manager->setWgtText( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
-    }
+        widget_manager->setWgtText( WTOK_CONTINUE, _("Continue"));
+    } else
+    {
+        if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
+        {
+            widget_manager->setWgtText( WTOK_CONTINUE, _("Continue Grand Prix"));
+        }
+        else
+        {
+            widget_manager->setWgtText( WTOK_CONTINUE, _("Back to the main menu"));
+        }
+        widget_manager->breakLine();
 
+        widget_manager->addWgt( WTOK_RESTART_RACE, 60, 7);
+        widget_manager->setWgtText( WTOK_RESTART_RACE, _("Race in this track again"));
+        widget_manager->breakLine();
+
+        if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
+        {
+            widget_manager->addWgt( WTOK_SETUP_NEW_RACE, 60, 7);
+            widget_manager->setWgtText( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
+        }
+    }   // if !unlock_manager has something unlocked
     widget_manager->layout(WGT_AREA_ALL);
 }  // RaceResultsGUI
 
@@ -183,6 +193,14 @@ RaceResultsGUI::~RaceResultsGUI()
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::select()
 {
+    // Push the unlocked-feature menu in for now
+    if(unlock_manager->getUnlockedFeatures().size()>0)
+    {
+        // Push the new feature menu on the stack, from where
+        // control will be returned to this menu.
+        menu_manager->pushMenu(MENUID_UNLOCKED_FEATURE);
+        return;
+    }
     switch( widget_manager->getSelectedWgt() )
     {
     case WTOK_CONTINUE:

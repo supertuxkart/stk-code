@@ -522,7 +522,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;;&quot;$(GETTEXT_PATH)/include&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -550,6 +550,9 @@
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
 				SubSystem="1"
 				LinkTimeCodeGeneration="0"
 				TargetMachine="1"
@@ -903,6 +906,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\unlock_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\user_config.cpp"
 				>
 			</File>
@@ -923,6 +930,10 @@
 				>
 				<File
 					RelativePath="../../../src\gui\base_gui.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\challenges_menu.cpp"
 					>
 				</File>
 				<File
@@ -951,6 +962,10 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\display_res_confirm.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\feature_unlocked.cpp"
 					>
 				</File>
 				<File
@@ -1047,6 +1062,26 @@
 				>
 				<File
 					RelativePath="../../../src\robots\default_robot.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="challenges"
+				>
+				<File
+					RelativePath="..\..\challenges\all_tracks.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\challenge.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\energy_math_class.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\win_gotm_cup.cpp"
 					>
 				</File>
 			</Filter>
@@ -1333,6 +1368,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\unlock_manager.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\user_config.hpp"
 				>
 			</File>
@@ -1357,6 +1396,10 @@
 				>
 				<File
 					RelativePath="../../../src\gui\base_gui.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\challenges_menu.hpp"
 					>
 				</File>
 				<File
@@ -1385,6 +1428,10 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\display_res_confirm.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\feature_unlocked.hpp"
 					>
 				</File>
 				<File
@@ -1481,6 +1528,26 @@
 				>
 				<File
 					RelativePath="../../../src\robots\default_robot.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="challenges"
+				>
+				<File
+					RelativePath="..\..\challenges\all_tracks.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\challenge.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\energy_math_class.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\win_gotm_cup.hpp"
 					>
 				</File>
 			</Filter>

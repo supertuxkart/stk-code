@@ -25,12 +25,14 @@
 #  define _(String) gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) gettext_noop (String)
+// libintl defines its own fprintf, which doesn't work for me :(
+#  if defined(WIN32) && !defined(__CYGWIN__)
+#    undef fprintf
+#  endif
 #else
 #  define _(String) (String)
 #  define gettext_noop(String) String
 #  define N_(String) String
-#  define textdomain(Domain)
-#  define bindtextdomain(Package, Directory)
 #endif
 
 // This length is used for all translated error messages.
@@ -38,11 +40,12 @@
 
 // This length is used for all normal messages
 #define MAX_MESSAGE_LENGTH        80
-class initTranslations
+class Translations
 {
 public:
-    initTranslations();
+    Translations();
 };
 
+extern Translations* translations;
 #endif
 /* EOF */

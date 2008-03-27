@@ -25,6 +25,7 @@
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
+#include "unlock_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens
@@ -65,6 +66,7 @@ GrandPrixSelect::GrandPrixSelect()
             if (StringUtils::has_suffix(*i, ".cup"))
             {
                 CupData cup(*i);
+                if(unlock_manager->isLocked(cup.getName())) continue;
                 m_all_cups.push_back(cup);
                 widget_manager->addWgt(WTOK_FIRSTPRIX + nId, 40, 7);
                 widget_manager->setWgtText(WTOK_FIRSTPRIX + nId, cup.getName());

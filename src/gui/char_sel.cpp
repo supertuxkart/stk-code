@@ -29,6 +29,7 @@
 #include "kart_properties.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
+#include "unlock_manager.hpp"
 #include "translation.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -83,6 +84,7 @@ CharSel::CharSel(int whichPlayer)
         if (kartAvailable(i))
         {
             const KartProperties* kp= kart_properties_manager->getKartById(i);
+            if(unlock_manager->isLocked(kp->getIdent())) continue;
             Material *m = material_manager->getMaterial(kp->getIconFile());
             widget_manager->addWgt( WTOK_RACER0 + i, 8, 11);
             widget_manager->showWgtRect( WTOK_RACER0 + i);

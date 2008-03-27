@@ -25,11 +25,13 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
+#include "unlock_manager.hpp"
 
 enum WidgetTokens
 {
     WTOK_SINGLE,
     WTOK_MULTI,
+    WTOK_CHALLENGES,
     WTOK_OPTIONS,
     WTOK_QUIT,
     WTOK_EMPTY,
@@ -54,6 +56,12 @@ MainMenu::MainMenu()
     widget_manager->addWgt(WTOK_MULTI, 25, 7);
     widget_manager->setWgtText( WTOK_MULTI, _("Multiplayer") );
 
+    std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
+    if(all_challenges.size()>0)
+    {
+        widget_manager->addWgt(WTOK_CHALLENGES, 25, 7);
+        widget_manager->setWgtText( WTOK_CHALLENGES, _("Challenges") );
+    }
     widget_manager->addWgt(WTOK_OPTIONS, 25, 7);
     widget_manager->setWgtText( WTOK_OPTIONS, _("Options") );
 
@@ -105,7 +113,9 @@ void MainMenu::select()
     case WTOK_MULTI:
         menu_manager->pushMenu(MENUID_NUMPLAYERS);
         break;
-
+    case WTOK_CHALLENGES:
+        menu_manager->pushMenu(MENUID_CHALLENGES);
+        break;
     case WTOK_OPTIONS:
         menu_manager->pushMenu(MENUID_OPTIONS);
         break;

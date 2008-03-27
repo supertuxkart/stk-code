@@ -40,6 +40,7 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "translation.hpp"
+#include "unlock_manager.hpp"
 #include "race_manager.hpp"
 #include "file_manager.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -430,6 +431,10 @@ void UserConfig::loadConfig(const std::string& filename)
         //get whether to log errors to file
         lisp->get("log-errors",       m_log_errors);
 
+        // Unlock information:
+        const lisp::Lisp* unlock_info = lisp->getLisp("unlock-info");
+        if(unlock_info) unlock_manager->load(unlock_info);
+
         /*get player configurations*/
         for(i=0; i<PLAYERS; ++i)
         {
@@ -492,6 +497,8 @@ void UserConfig::loadConfig(const std::string& filename)
         fprintf(stderr,  e.what());
         fprintf(stderr, "\n");
     }
+
+
     delete root;
 }   // loadConfig
 // -----------------------------------------------------------------------------
@@ -625,6 +632,11 @@ void UserConfig::saveConfig(const std::string& filename)
         
         writer->writeComment("error logging to log (true) or stderr (false)");
         writer->write("log-errors\t", m_log_errors);
+
+        // Write unlock information back
+        writer->beginList("unlock-info");
+        unlock_manager->save(writer);
+        writer->endList("unlock-info");
 
         /* write player configurations */
         for(i=0; i<PLAYERS; ++i)
