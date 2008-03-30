@@ -43,30 +43,18 @@
 #include "gui/font.hpp"
 #include "user_config.hpp"
 
-Input *sensedInput = 0;
-ActionMap *actionMap = 0;
-
-SDL_Surface *mainSurface;
-long flags;
-StickInfo **stickInfos = 0;
-
-InputDriverMode mode = BOOTSTRAP;
-
 #define DEADZONE_MOUSE 150
 #define DEADZONE_MOUSE_SENSE 200
 #define DEADZONE_JOYSTICK 1000
 
 #define MULTIPLIER_MOUSE 750
 
-/** Helper values to store and track the relative mouse movements. If these
-  * values exceed the deadzone value the input is reported to the game. This
-  * Makes the mouse behave like an analog axis on a gamepad/joystick.
-  */
-int mouseValX = 0;
-int mouseValY = 0;
+SDLDriver *inputDriver;
 
 //-----------------------------------------------------------------------------
-void drv_init()
+SDLDriver::SDLDriver()
+	: sensedInput(0), actionMap(0), mainSurface(0), flags(0), stickInfos(0),
+	mode(BOOTSTRAP), mouseValX(0), mouseValY(0)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER);
 
@@ -125,23 +113,24 @@ void drv_init()
     SDL_WM_SetCaption("SuperTuxKart", NULL);
 
 	// Get into menu mode initially.
-	drv_setMode(MENU);
+	setMode(MENU);
 }
 
 //-----------------------------------------------------------------------------
 void
-showPointer()
+SDLDriver::showPointer()
 {
   SDL_ShowCursor(SDL_ENABLE);
 }
 //-----------------------------------------------------------------------------
 void
-hidePointer()
+SDLDriver::hidePointer()
 {
   SDL_ShowCursor(SDL_DISABLE);
 }
 //-----------------------------------------------------------------------------
-void drv_toggleFullscreen(bool resetTextures)
+void
+SDLDriver::toggleFullscreen(bool resetTextures)
 {
     user_config->m_fullscreen = !user_config->m_fullscreen;
 
@@ -167,7 +156,8 @@ void drv_toggleFullscreen(bool resetTextures)
 }
 
 //-----------------------------------------------------------------------------
-void setVideoMode(bool resetTextures)
+void
+SDLDriver::setVideoMode(bool resetTextures)
 {
     //Is SDL_FreeSurface necessary? SDL wiki says not??
     SDL_FreeSurface(mainSurface);
@@ -215,7 +205,7 @@ void setVideoMode(bool resetTextures)
 }
 
 //-----------------------------------------------------------------------------
-void drv_deinit()
+SDLDriver::~SDLDriver()
 {
     const int NUM_STICKS = SDL_NumJoysticks();
     for (int i=0;i<NUM_STICKS;i++)
@@ -241,7 +231,8 @@ void drv_deinit()
   * Note: It is the obligation of the called menu to switch of the sense mode.
   *
   */
-void input(InputType type, int id0, int id1, int id2, int value)
+void
+SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
 {
     BaseGUI* menu = menu_manager->getCurrentMenu();
 
@@ -296,7 +287,8 @@ void input(InputType type, int id0, int id1, int id2, int value)
   * flexibility (= treat 4 directions as four buttons).
   *
   */
-void sdl_input()
+void
+SDLDriver::input()
 {
     SDL_Event ev;
 
@@ -459,7 +451,7 @@ void sdl_input()
   * It is wrong to call it when not in input sensing mode anymore.
   */
 Input &
-drv_getSensedInput()
+SDLDriver::getSensedInput()
 {
 	assert (mode == INPUT_SENSE);
 
@@ -473,7 +465,7 @@ drv_getSensedInput()
 /** Queries the input driver whether it is in the given expected mode.
   */
 bool
-drv_isInMode(InputDriverMode expMode)
+SDLDriver::isInMode(InputDriverMode expMode)
 {
 	return mode == expMode;
 }
@@ -518,7 +510,7 @@ drv_isInMode(InputDriverMode expMode)
   *
   */
 void
-drv_setMode(InputDriverMode newMode)
+SDLDriver::setMode(InputDriverMode newMode)
 {
 	switch (newMode)
 	{

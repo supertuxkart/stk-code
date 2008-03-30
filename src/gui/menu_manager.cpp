@@ -129,7 +129,7 @@ void MenuManager::update()
             && m_current_menu == m_RaceGUI)
         {
             m_RaceGUI = 0;
-            drv_setMode(MENU);
+            inputDriver->setMode(MENU);
         }
 
         delete m_current_menu;
@@ -180,7 +180,7 @@ void MenuManager::update()
                 m_current_menu= new NumPlayers();
                 break;
             case MENUID_RACE:
-                drv_setMode(INGAME);
+                inputDriver->setMode(INGAME);
                 m_current_menu = new RaceGUI();
                 m_RaceGUI      = m_current_menu;
                 break;

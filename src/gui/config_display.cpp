@@ -66,7 +66,7 @@ ConfigDisplay::ConfigDisplay()
     }
     else if( user_config->m_prev_windowed && user_config->m_fullscreen )
     {
-        drv_toggleFullscreen();
+        inputDriver->toggleFullscreen();
         user_config->m_prev_windowed = false;
         user_config->m_crashed = false;
         user_config->saveConfig();
@@ -194,7 +194,7 @@ void ConfigDisplay::select()
     switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_FULLSCREEN:
-        drv_toggleFullscreen();
+        inputDriver->toggleFullscreen();
         if( user_config->m_fullscreen )
         {
             menu_manager->pushMenu( MENUID_RESOLUTION_CONFIRM_WIN );
@@ -346,8 +346,7 @@ void ConfigDisplay::changeResolution(int width, int height/*, bool reverse*/)
         user_config->saveConfig();
     }
 
-    //FIXME: setVideoMode() should be put inside a namespace or something
-    setVideoMode();
+    inputDriver->setVideoMode();
     glViewport(0,0,user_config->m_width, user_config->m_height);
 }
 

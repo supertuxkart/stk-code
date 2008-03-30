@@ -129,7 +129,7 @@ PlayerControls::select()
 			// Switch to typing in the player's name.
 			widget_manager->setWgtText(WTOK_PLYR_NAME1, (m_name + "<").c_str());
 		
-			drv_setMode(LOWLEVEL);
+			inputDriver->setMode(LOWLEVEL);
 		
         	break;
 		case WTOK_QUIT:
@@ -151,7 +151,7 @@ PlayerControls::select()
 		    m_edit_action = static_cast<KartAction>(selected - WTOK_LEFT);
 		    widget_manager->setWgtText(selected, _("Press key"));
 			
-			drv_setMode(INPUT_SENSE);
+			inputDriver->setMode(INPUT_SENSE);
 			
 			break;
 	}
@@ -228,10 +228,10 @@ void PlayerControls::handle(GameAction ga, int value)
 			// Updates the configuration with the newly sensed input.
             user_config->setInput(m_player_index,
 								  m_edit_action,
-								  drv_getSensedInput());
+								  inputDriver->getSensedInput());
 			// Fall through to recover the widget labels.
 		case GA_SENSE_CANCEL:
-			drv_setMode(MENU);
+			inputDriver->setMode(MENU);
 		
 			// Refresh all key labels since they mave changed because of
 			// conflicting bindings.
@@ -240,7 +240,7 @@ void PlayerControls::handle(GameAction ga, int value)
 		case GA_ENTER:
 			// If the user is typing her name this will be finished at this
 			// point.
-			if (drv_isInMode(LOWLEVEL))
+			if (inputDriver->isInMode(LOWLEVEL))
 			{
 				// Prevents zero-length names.
 				if (m_name.length() == 0)
@@ -248,7 +248,7 @@ void PlayerControls::handle(GameAction ga, int value)
 				user_config->m_player[m_player_index].setName(m_name);
 				widget_manager->setWgtText(WTOK_PLYR_NAME1, m_name.c_str());
 
-				drv_setMode(MENU);
+				inputDriver->setMode(MENU);
 			}
 			else
 				select();
@@ -256,12 +256,12 @@ void PlayerControls::handle(GameAction ga, int value)
 		case GA_LEAVE:
 			// If the user is typing her name this will be cancelled at this
 			// point.
-			if (drv_isInMode(LOWLEVEL))
+			if (inputDriver->isInMode(LOWLEVEL))
 			{
 				m_name = user_config->m_player[m_player_index].getName();
 				widget_manager->setWgtText(WTOK_PLYR_NAME1, m_name.c_str());
 
-				drv_setMode(MENU);
+				inputDriver->setMode(MENU);
 				break;
 			}
 			// Fall through to reach the usual GA_LEAVE code (leave menu).

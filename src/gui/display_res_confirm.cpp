@@ -110,7 +110,7 @@ void DisplayResConfirm::select()
         SDL_RemoveTimer(m_timer);
         if (FROM_WINDOW) 
         {
-            drv_toggleFullscreen();
+            inputDriver->toggleFullscreen();
             user_config->m_crashed = false;
             user_config->saveConfig();
         }
@@ -140,7 +140,7 @@ void DisplayResConfirm::countdown()
 
         if( FROM_WINDOW )
         {
-            drv_toggleFullscreen();
+            inputDriver->toggleFullscreen();
             user_config->m_prev_windowed = false;
             user_config->m_crashed = false;
             user_config->saveConfig();
@@ -161,7 +161,7 @@ void DisplayResConfirm::handle(GameAction ga, int value)
 		SDL_RemoveTimer(m_timer);
         if (FROM_WINDOW) 
         {
-            drv_toggleFullscreen();
+            inputDriver->toggleFullscreen();
             user_config->m_crashed = false;
             user_config->saveConfig();
         }

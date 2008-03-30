@@ -21,6 +21,7 @@
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "user_config.hpp"
 
 enum WidgetTokens
 {
@@ -106,6 +107,9 @@ void Options::select()
         menu_manager->pushMenu(MENUID_CONFIG_SOUND);
         break;
     case WTOK_BACK:
+		// Make config changes permanent.
+		user_config->saveConfig();
+				
         menu_manager->popMenu();
         break;
     default:

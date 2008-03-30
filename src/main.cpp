@@ -434,7 +434,7 @@ int main(int argc, char *argv[] )
         }
         
         //FIXME: this needs a better organization
-        drv_init();
+        inputDriver = new SDLDriver ();
         ssgInit () ;
         
         game_manager = new GameManager ();
@@ -515,10 +515,8 @@ int main(int argc, char *argv[] )
     }
 
     /* Program closing...*/
-       
-    user_config->saveConfig();
 
-    drv_deinit();
+    delete inputDriver;
     
     if (user_config->m_log_errors) //close logfiles
     {

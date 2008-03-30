@@ -44,18 +44,49 @@ struct StickInfo {
 	~StickInfo();
 };
 
-void drv_init();
-void drv_deinit();
+class SDLDriver
+{
+	Input *sensedInput;
+	ActionMap *actionMap;
+	
+	SDL_Surface *mainSurface;
+	long flags;
+	
 
-void drv_toggleFullscreen(bool resetTextures=1);
-void setVideoMode(bool resetTextures=1);
+	StickInfo **stickInfos;
 
-void sdl_input();
+	InputDriverMode mode;
+	
+	/* Helper values to store and track the relative mouse movements. If these
+	* values exceed the deadzone value the input is reported to the game. This
+  	* makes the mouse behave like an analog axis on a gamepad/joystick.
+	*/
+	int mouseValX;
+	int mouseValY;
+	
+	void showPointer();
+	
+	void hidePointer();
+	
+	void input(InputType, int, int, int, int);
+	
+public:
+	SDLDriver();
+	~SDLDriver();
 
-void drv_setMode(InputDriverMode);
-bool drv_isInMode(InputDriverMode);
+	void toggleFullscreen(bool resetTextures=1);
+		
+	void setVideoMode(bool resetTextures=1);
 
-Input &drv_getSensedInput();
+	void input();
 
+	void setMode(InputDriverMode);
+		
+	bool isInMode(InputDriverMode);
+
+	Input &getSensedInput();
+};
+
+extern SDLDriver *inputDriver;
 
 #endif

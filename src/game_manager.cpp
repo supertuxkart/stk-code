@@ -66,7 +66,7 @@ void GameManager::run()
     m_curr_time = SDL_GetTicks();
     while(!m_abort)
     {
-        sdl_input();
+        inputDriver->input();
 
         m_prev_time = m_curr_time;
         m_curr_time = SDL_GetTicks();

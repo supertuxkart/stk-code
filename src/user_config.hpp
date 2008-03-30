@@ -24,7 +24,7 @@
 #define PLAYERS 4
 
 /* The following config versions are currently used:
-   0: the 0.2 release config file, without config-verison number
+   0: the 0.2 release config file, without config-version number
       (so that defaults to 0)
    1: Removed singleWindowMenu, newKeyboardStyle, oldStatusDisplay,
       added config-version number
