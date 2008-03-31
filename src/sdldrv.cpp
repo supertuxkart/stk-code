@@ -45,9 +45,11 @@
 
 #define DEADZONE_MOUSE 150
 #define DEADZONE_MOUSE_SENSE 200
-#define DEADZONE_JOYSTICK 1000
+#define DEADZONE_JOYSTICK (1000)
 
 #define MULTIPLIER_MOUSE 750
+
+using namespace std;
 
 SDLDriver *inputDriver;
 
@@ -105,15 +107,93 @@ SDLDriver::SDLDriver()
 
     SDL_JoystickEventState(SDL_ENABLE);
 
-    const int numSticks = SDL_NumJoysticks();
-    stickInfos = new StickInfo *[numSticks];
-    for (int i = 0; i < numSticks; i++)
-        stickInfos[i] = new StickInfo(i);
+	initStickInfos();
 	
     SDL_WM_SetCaption("SuperTuxKart", NULL);
 
 	// Get into menu mode initially.
 	setMode(MENU);
+}
+
+void
+SDLDriver::initStickInfos()
+{
+	int nextIndex = 0;
+	
+	// Prepare a list of connected joysticks.
+    const int numSticks = SDL_NumJoysticks();
+	stickInfos = new StickInfo *[numSticks];
+    vector<StickInfo *> *si = new vector<StickInfo *>;
+    for (int i = 0; i < numSticks; i++)
+        si->push_back(stickInfos[i] = new StickInfo(i));
+		
+	// Get the list of known configs and make a copy of it.
+	vector<UserConfig::StickConfig *> *sc
+		= new vector<UserConfig::StickConfig *>(*user_config->getStickConfigs());
+	
+	bool match;
+	vector<StickInfo *>::iterator si_ite = si->begin();
+	while (si_ite != si->end())
+	{
+		match = false;
+		
+		vector<UserConfig::StickConfig *>::iterator sc_ite = sc->begin();
+		while (sc_ite != sc->end())
+		{
+			if (nextIndex <= (*sc_ite)->preferredIndex)
+				nextIndex = (*sc_ite)->preferredIndex + 1;
+			
+			if (!(*si_ite)->id->compare((*sc_ite)->id))
+			{
+				// Connected stick matches a stored one.
+				
+				// Copy important properties.
+				
+				// Deadzone is taken only if its not null.
+				if ((*sc_ite)->deadzone)
+					(*si_ite)->deadzone = (*sc_ite)->deadzone;
+						   
+				// Restore former used index and other properties.
+				(*si_ite)->index = (*sc_ite)->preferredIndex;
+				
+				// Remove matching entries from the list to prevent double
+				// allocation.
+				sc->erase(sc_ite);
+				si->erase(si_ite);
+				
+				match = true;
+				
+				break;
+			}
+				
+			sc_ite++;
+		}
+		
+		if (!match)
+			si_ite++;
+	}
+	delete sc;
+	
+	// si now contains all those stick infos which have no stick config yet
+	// and nextIndex is set to the next free index. 
+	
+	// Now add all those new sticks and generate a config for them.
+	si_ite = si->begin();
+	while (si_ite != si->end())
+	{
+		(*si_ite)->index = nextIndex;
+		
+		UserConfig::StickConfig *sc = new UserConfig::StickConfig(*(*si_ite)->id);
+		sc->preferredIndex = nextIndex;
+		sc->deadzone = DEADZONE_JOYSTICK;
+
+		user_config->addStickConfig(sc);
+		
+		nextIndex++;
+		si_ite++;
+	}
+	
+	delete si;
 }
 
 //-----------------------------------------------------------------------------
@@ -208,9 +288,9 @@ SDLDriver::setVideoMode(bool resetTextures)
 SDLDriver::~SDLDriver()
 {
     const int NUM_STICKS = SDL_NumJoysticks();
-    for (int i=0;i<NUM_STICKS;i++)
-        delete stickInfos[i];
-
+    for (int i = 0; i < NUM_STICKS; i++)
+		delete stickInfos[i];
+	
     delete [] stickInfos;
 
     SDL_FreeSurface(mainSurface);
@@ -271,7 +351,7 @@ SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
 
 //-----------------------------------------------------------------------------
 /** Reads the SDL event loop, does some tricks with certain values and calls
-  * input() is appropriate.
+  * input() if appropriate.
   *
   * Digital inputs get the value of 32768 when pressed (key/button press,
   * digital axis) because this is what SDL provides. Relative mouse inputs
@@ -291,6 +371,10 @@ void
 SDLDriver::input()
 {
     SDL_Event ev;
+	/* Logical joystick index that is reported to the higher game APIs which
+	 * may not be equal to SDL's joystick index.
+	 */
+	int stickIndex;
 
     while(SDL_PollEvent(&ev))
     {
@@ -365,20 +449,21 @@ SDLDriver::input()
             break;
 
         case SDL_JOYAXISMOTION:
+			stickIndex = stickInfos[ev.jaxis.which]->index;
 			// If the joystick axis exceeds the deadzone report the input.
 			// In menu mode (mode = MENU = 0) the joystick number is reported
 			// to be zero in all cases. This has the neat effect that all
 			// joysticks can be used to control the menu.
-            if(ev.jaxis.value <= -DEADZONE_JOYSTICK)
+            if(ev.jaxis.value <= -stickInfos[ev.jaxis.which]->deadzone)
 			{
-                input(IT_STICKMOTION, !mode ? 0 : ev.jaxis.which,
+                input(IT_STICKMOTION, !mode ? 0 : stickIndex,
 					  ev.jaxis.axis, AD_NEGATIVE, -ev.jaxis.value);
 				stickInfos[ev.jaxis.which]->prevAxisDirections[ev.jaxis.axis]
 					= AD_NEGATIVE;
 			}
-			else if(ev.jaxis.value >= DEADZONE_JOYSTICK)
+			else if(ev.jaxis.value >= stickInfos[ev.jaxis.which]->deadzone)
 			{
-				input(IT_STICKMOTION, !mode ? 0 : ev.jaxis.which,
+				input(IT_STICKMOTION, !mode ? 0 : stickIndex,
 					  ev.jaxis.axis, AD_POSITIVE, ev.jaxis.value);
 				stickInfos[ev.jaxis.which]->prevAxisDirections[ev.jaxis.axis]
 					= AD_POSITIVE;
@@ -394,11 +479,11 @@ SDLDriver::input()
 				// two buttons).				
 				if (stickInfos[ev.jaxis.which]
 					->prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
-               		input(IT_STICKMOTION, !mode ? 0 : ev.jaxis.which,
+               		input(IT_STICKMOTION, !mode ? 0 : stickIndex,
 						  ev.jaxis.axis, AD_NEGATIVE, 0);
 				else if (stickInfos[ev.jaxis.which]
 						 ->prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
-               		input(IT_STICKMOTION, !mode ? 0 : ev.jaxis.which,
+               		input(IT_STICKMOTION, !mode ? 0 : stickIndex,
 						  ev.jaxis.axis, AD_POSITIVE, 0);
 				
 				stickInfos[ev.jaxis.which]->prevAxisDirections[ev.jaxis.axis]
@@ -407,13 +492,17 @@ SDLDriver::input()
 
             break;
         case SDL_JOYBUTTONUP:
+			stickIndex = stickInfos[ev.jbutton.which]->index;
+					
 			// See the SDL_JOYAXISMOTION case label because of !mode thingie.
-            input(IT_STICKBUTTON, !mode ? 0 : ev.jbutton.which, ev.jbutton.button, 0,
+            input(IT_STICKBUTTON, !mode ? 0 : stickIndex, ev.jbutton.button, 0,
                   0);
             break;
         case SDL_JOYBUTTONDOWN:
+			stickIndex = stickInfos[ev.jbutton.which]->index;
+
 			// See the SDL_JOYAXISMOTION case label because of !mode thingie.
-            input(IT_STICKBUTTON, !mode ? 0 : ev.jbutton.which, ev.jbutton.button, 0,
+            input(IT_STICKBUTTON, !mode ? 0 : stickIndex, ev.jbutton.button, 0,
                   32768);
             break;
         case SDL_USEREVENT:
@@ -616,18 +705,27 @@ SDLDriver::setMode(InputDriverMode newMode)
 	}
 }
 
-StickInfo::StickInfo(int index)
+SDLDriver::StickInfo::StickInfo(int sdlIndex)
 {
-	sdlJoystick = SDL_JoystickOpen(index);
+	sdlJoystick = SDL_JoystickOpen(sdlIndex);
+	
+	id = new string(SDL_JoystickName(sdlIndex));
+	
 	const int count = SDL_JoystickNumAxes(sdlJoystick);
 	prevAxisDirections = new AxisDirection[count];
 	
 	for (int i = 0; i < count; i++)
 		prevAxisDirections[i] = AD_NEUTRAL;
+	
+	deadzone = DEADZONE_JOYSTICK;
+	
+	index = -1;
 }
 
-StickInfo::~StickInfo()
+SDLDriver::StickInfo::~StickInfo()
 {
+	delete id;
+	
 	delete prevAxisDirections;
 	
 	SDL_JoystickClose(sdlJoystick);

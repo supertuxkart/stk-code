@@ -116,3 +116,12 @@ void Options::select()
         break;
     }  // switch
 }
+
+void Options::handle(GameAction action, int value)
+{
+	// Save config on leave.
+	if (!value && action == GA_LEAVE)
+		user_config->saveConfig();
+
+	BaseGUI::handle(action, value);
+}

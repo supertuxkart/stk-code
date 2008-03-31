@@ -38,8 +38,9 @@
       --> if a kart control for (say) player 2 uses the same key as
       jump for player 1, this problem is not noticed in 0.3, but will
       cause an undefined game action now
+   6: Added stick configurations.
 */
-#define CURRENT_CONFIG_VERSION   5
+#define CURRENT_CONFIG_VERSION   6
 
 #include <string>
 #include <vector>
@@ -54,7 +55,25 @@ class ActionMap;
 /*class for managing general tuxkart configuration data*/
 class UserConfig
 {
+public:
+		
+	class StickConfig
+	{
+	public:
+		std::string &id;
+	
+		int preferredIndex;
+				
+		int deadzone;
+			
+		StickConfig(std::string &);
+				
+	};
+
 private:
+			
+	std::vector <StickConfig *> m_stickconfigs;
+			
 	typedef struct 
 	{
 		int count;
@@ -80,10 +99,20 @@ private:
     int         m_music;
     std::string m_warning;
 
+	void readStickConfigs(const lisp::Lisp *);
+
+	void writeStickConfigs(lisp::Writer *);
+			
 	void readPlayerInput(const lisp::Lisp *,
 						 const char *,
 						 KartAction ka,
 						 int);
+
+	void writePlayerInput(lisp::Writer *,
+						  const char *,
+						  KartAction,
+						  int);
+
 
     void readInput(const lisp::Lisp *,
                    const char *,
@@ -93,10 +122,6 @@ private:
                     const char *,
 					GameAction);
 	
-	void writePlayerInput(lisp::Writer *,
-						  const char *,
-						  KartAction,
-						  int);
 	
 	/** Iterates through the input mapping and unsets all
 	 * where the given input occurs.
@@ -172,7 +197,12 @@ public:
     void loadConfig(const std::string& filename);
     void saveConfig();
     void saveConfig(const std::string& filename);
-	
+			
+	void addStickConfig(UserConfig::StickConfig *);
+			
+	const std::vector<StickConfig *> *getStickConfigs() const;
+
+			
 	/** Retrieves a human readable string of the mapping for a GameAction */
     std::string getMappingAsString(GameAction);
 	/** Retrieves a human readable string of the mapping for the given
@@ -199,6 +229,7 @@ public:
 	
 	/** Creates ActionMap for use in ingame mode. */
 	ActionMap *newIngameActionMap();
+			
 };
 
 

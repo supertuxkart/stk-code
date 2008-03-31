@@ -20,6 +20,9 @@
 #ifndef HEADER_SDLDRV_H
 #define HEADER_SDLDRV_H
 
+#include <string>
+#include <vector>
+
 #include <SDL/SDL.h>
 
 #include "input.hpp"
@@ -36,25 +39,33 @@ enum InputDriverMode {
 	BOOTSTRAP
 };
 
-struct StickInfo {
-	SDL_Joystick *sdlJoystick;
-	AxisDirection *prevAxisDirections;
-	
-	StickInfo(int);
-	~StickInfo();
-};
-
 class SDLDriver
 {
+	class StickInfo {
+	public:
+		SDL_Joystick *sdlJoystick;
+
+		std::string *id;
+				
+		int deadzone;
+		
+		int index;
+		
+		AxisDirection *prevAxisDirections;
+
+		StickInfo(int);
+				
+		~StickInfo();
+	};
+
 	Input *sensedInput;
 	ActionMap *actionMap;
 	
 	SDL_Surface *mainSurface;
 	long flags;
-	
 
 	StickInfo **stickInfos;
-
+		
 	InputDriverMode mode;
 	
 	/* Helper values to store and track the relative mouse movements. If these
@@ -73,6 +84,8 @@ class SDLDriver
 public:
 	SDLDriver();
 	~SDLDriver();
+			
+	void initStickInfos();
 
 	void toggleFullscreen(bool resetTextures=1);
 		

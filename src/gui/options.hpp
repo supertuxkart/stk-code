@@ -29,6 +29,8 @@ public:
     ~Options();
 
     void select();
+	void handle(GameAction, int);
+
 };
 
 #endif

@@ -68,7 +68,8 @@ UserConfig::UserConfig(const std::string& filename)
 
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
-{}
+{
+}
 
 // -----------------------------------------------------------------------------
 /**
@@ -333,7 +334,7 @@ void UserConfig::loadConfig(const std::string& filename)
 {
     std::string temp;
     const lisp::Lisp* root = 0;
-    int i;
+    int i = 0;
     int dirExist = CheckAndCreateDir();
     // Check if the config directory exists. If not, exit without an error
     // message, an appropriate message was printed by CheckAndCreateDir
@@ -430,6 +431,9 @@ void UserConfig::loadConfig(const std::string& filename)
 
         //get whether to log errors to file
         lisp->get("log-errors",       m_log_errors);
+		
+		// Handle loading the stick config in it own method.
+		readStickConfigs(lisp);
 
         // Unlock information:
         const lisp::Lisp* unlock_info = lisp->getLisp("unlock-info");
@@ -501,6 +505,43 @@ void UserConfig::loadConfig(const std::string& filename)
 
     delete root;
 }   // loadConfig
+
+// -----------------------------------------------------------------------------
+
+void
+UserConfig::readStickConfigs(const lisp::Lisp *r)
+{
+	string temp;
+	int count = 0;
+	
+	const lisp::Lisp *scsreader = r->getLisp("stick-configs");
+	if (scsreader)
+	{
+		scsreader->get("count", count);
+			
+		for (int i = 0; i < count; i++)
+		{
+			temp = "stick-";
+			temp += (i + '1');
+			const lisp::Lisp *screader = scsreader->getLisp(temp);
+			if (screader)
+			{
+				string *id = new string();
+				screader->get("id", *id);
+				
+				StickConfig *sc = new StickConfig(*id);
+				
+				screader->get("preferredIndex", sc->preferredIndex);
+				screader->get("deadzone", sc->deadzone);
+				
+ 				m_stickconfigs.push_back(sc);
+			}
+		}
+		
+	}
+
+}
+
 // -----------------------------------------------------------------------------
 void
 UserConfig::readPlayerInput(const lisp::Lisp *r, const char *node,
@@ -632,6 +673,8 @@ void UserConfig::saveConfig(const std::string& filename)
         
         writer->writeComment("error logging to log (true) or stderr (false)");
         writer->write("log-errors\t", m_log_errors);
+		
+		writeStickConfigs(writer);
 
         // Write unlock information back
         writer->beginList("unlock-info");
@@ -678,6 +721,38 @@ void UserConfig::saveConfig(const std::string& filename)
 	
 	delete writer;
 }   // saveConfig
+
+// -----------------------------------------------------------------------------
+
+void
+UserConfig::writeStickConfigs(lisp::Writer *writer)
+{
+	int count = 0;
+	string temp;
+	
+	writer->beginList("stick-configs");
+	
+	count = m_stickconfigs.size();
+	writer->write("count", count);
+	
+	for (int i = 0; i < count; i++)
+	{
+		StickConfig *sc = m_stickconfigs[i];
+		temp = "stick-";
+		temp += i + '1';
+		
+		writer->beginList(temp);
+				
+		writer->write("id", sc->id);
+		writer->write("preferredIndex", sc->preferredIndex);
+		writer->writeComment("0 means that the default deadzone value is used.");
+		writer->write("deadzone", sc->deadzone);
+		
+		writer->endList(temp);
+	}
+	
+	writer->endList("stick-configs");
+}
 
 // -----------------------------------------------------------------------------
 void
@@ -974,6 +1049,27 @@ UserConfig::isFixedInput(InputType type, int id0, int id1, int id2)
 	}
 	
 	return false;
+}
+
+// -----------------------------------------------------------------------------
+
+void
+UserConfig::addStickConfig(StickConfig *sc)
+{
+	m_stickconfigs.push_back(sc);
+}
+
+// -----------------------------------------------------------------------------
+const std::vector<UserConfig::StickConfig *> *
+UserConfig::getStickConfigs() const
+{
+	return &m_stickconfigs;
+}
+
+UserConfig::StickConfig::StickConfig(string &newId)
+: id(newId)
+{
+	// Nothing else to do.
 }
 
 /*EOF*/
