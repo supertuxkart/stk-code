@@ -594,8 +594,11 @@ bool Widget::createRect(int radius)
     const int SMALLER_SIDE_LENGTH = m_height < m_width ? m_height / 2 : m_width / 2;
     const float BORDER_LENGTH = SMALLER_SIDE_LENGTH * m_border_percentage;
 
-    float inner_vertex [(NUM_QUADS + 1) * 2][3];
-    float outer_vertex [(NUM_QUADS + 1) * 2][3];
+    typedef std::vector<float> float3;
+    std::vector<float3> inner_vertex;
+    std::vector<float3> outer_vertex;
+    inner_vertex.resize((NUM_QUADS + 1) * 2);
+    outer_vertex.resize((NUM_QUADS + 1) * 2);
 
     const float HALF_WIDTH = m_width * 0.5f;
     const float HALF_HEIGHT = m_height * 0.5f;
@@ -636,6 +639,8 @@ bool Widget::createRect(int radius)
                 //position for the circle is dependant on rect; if a corner
                 //wasn't given, then the y position is computed as if it was
                 //for a rectangle without rounder corners.
+                inner_vertex[i].resize(3);
+                outer_vertex[i].resize(3);
                 outer_vertex[i][0] = radius - circle_x;
                 inner_vertex[i][0] = outer_vertex[i][0] + BORDER_LENGTH;
 
@@ -646,7 +651,7 @@ bool Widget::createRect(int radius)
                 }
                 else
                 {
-                    outer_vertex[i][1] = m_height;
+                    outer_vertex[i][1] =(float) m_height;
                     inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
                 }
 
@@ -678,6 +683,8 @@ bool Widget::createRect(int radius)
                 circle_x = radius * sin(angle);
                 circle_y = radius * cos(angle);
 
+                inner_vertex[i+1].resize(3);
+                outer_vertex[i+1].resize(3);
                 outer_vertex[i+1][0] = m_width - radius + circle_x;
                 inner_vertex[i+1][0] = outer_vertex[i+1][0] - BORDER_LENGTH;
 
@@ -688,7 +695,7 @@ bool Widget::createRect(int radius)
                 }
                 else
                 {
-                    outer_vertex[i+1][1] = m_height;
+                    outer_vertex[i+1][1] = (float)m_height;
                     inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
                 }
 
