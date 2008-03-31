@@ -119,7 +119,7 @@ extern const GLfloat WGT_LIGHT_TRANS_RED    [4];
 extern const GLfloat WGT_LIGHT_TRANS_GREEN  [4];
 extern const GLfloat WGT_LIGHT_TRANS_BLUE   [4];
 
-extern const GLfloat WGT_TRANSPARENT   [4];
+extern const GLfloat WGT_TRANSPARENT [4];
 
 
 class Widget
@@ -136,10 +136,15 @@ class Widget
     /* Low level features. They are off by default. */
     bool m_enable_rect;
     GLuint  m_rect_list; //A display list number that draws the rectangle with
-                      //possibly rounded corners.
+                         //possibly rounded corners.
     const GLfloat *m_rect_color; //This const cannot change the value it points to, but it
                                  //can change where it points to.
     WidgetArea m_round_corners;
+
+    bool m_enable_border;
+    GLuint m_border_list; //Display list for the border
+    float m_border_percentage;
+    const GLfloat *m_border_color;
 
     bool m_enable_texture;
     GLuint m_texture;

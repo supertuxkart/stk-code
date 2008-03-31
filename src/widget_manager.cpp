@@ -82,6 +82,10 @@ bool WidgetManager::addWgt
     new_id.widget->m_enable_rect = m_default_show_rect;
     new_id.widget->m_rect_color = m_default_rect_color;
 
+    new_id.widget->m_enable_border = m_default_show_border;
+    new_id.widget->m_border_percentage = m_default_border_percentage;
+    new_id.widget->m_border_color = m_default_border_color;
+
     new_id.widget->m_enable_texture = m_default_show_texture;
     new_id.widget->m_texture = m_default_texture;
 
@@ -747,6 +751,19 @@ void WidgetManager::setInitialRectState
 }
 
 //-----------------------------------------------------------------------------
+void WidgetManager::setInitialBorderState
+(
+    const bool SHOW,
+    const int PERCENTAGE,
+    const GLfloat* const COLOR
+)
+{
+    m_default_show_border = SHOW;
+    m_default_border_percentage = PERCENTAGE * 0.01;
+    m_default_border_color = COLOR;
+}
+
+//-----------------------------------------------------------------------------
 void WidgetManager::setInitialTextureState
 (
     const bool SHOW,
@@ -821,6 +838,9 @@ void WidgetManager::restoreDefaultStates()
     m_default_show_rect = false;
     m_default_rect_round_corners = WGT_AREA_NONE;
     m_default_rect_color = WGT_TRANS_BLACK;
+    m_default_show_border = false;
+    m_default_border_percentage = 0.0;
+    m_default_border_color = WGT_TRANS_WHITE;
     m_default_show_texture = false;
     m_default_texture = 0;
     m_default_show_text = false;
@@ -906,6 +926,69 @@ void WidgetManager::hideWgtRect(const int TOKEN)
     else
     {
         std::cerr << "WARNING: tried to hide the rect of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtBorderColor(const int TOKEN, const GLfloat* const COLOR)
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_border_color = COLOR;
+    else
+    {
+        std::cerr << "WARNING: tried to change the border color of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtBorderPercentage(const int TOKEN, const int PERCENTAGE)
+{
+    if( PERCENTAGE > 100 )
+    {
+        std::cerr << "WARNING: tried to set the border's percentage of " <<
+            "widget with token " << TOKEN << " to something bigger than " <<
+            "100% \n";
+        return;
+    }
+    else if( PERCENTAGE < 1 )
+    {
+        std::cerr << "WARNING: tried to set the border's percentage of " <<
+            "widget with token " << TOKEN << " to something smaller than " <<
+            "1% \n";
+        return;
+    }
+
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_border_percentage = PERCENTAGE * 0.01;
+    else
+    {
+        std::cerr << "WARNING: tried to change the rect color of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::showWgtBorder(const int TOKEN)
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_border = true;
+    else
+    {
+        std::cerr << "WARNING: tried to show the border of an unnamed widget "
+            << "with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::hideWgtBorder(const int TOKEN)
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_enable_border = false;
+    else
+    {
+        std::cerr << "WARNING: tried to hide the border of an unnamed widget "
             << "with token " << TOKEN << '\n';
     }
 }
@@ -1346,7 +1429,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
 
             ++position;
         }
-        delete select_buffer;
+        delete[] select_buffer;
 
         if( m_widgets[nearest_id].token == m_selected_wgt_token )
         {
@@ -1357,7 +1440,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
         return m_selected_wgt_token;
     }
 
-    delete select_buffer;
+    delete[] select_buffer;
     return WGT_NONE;
 }
 

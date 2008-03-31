@@ -77,6 +77,7 @@ Widget::Widget
     m_width(WIDTH_), m_height(HEIGHT_),
     m_rect_list(0),
     m_round_corners(WGT_AREA_ALL),
+    m_border_list(0),
     m_scroll_pos_x(0), m_scroll_pos_y(0),
     m_text_scale(1.0f)
 {
@@ -89,6 +90,12 @@ Widget::~Widget()
     {
         glDeleteLists(m_rect_list, 1);
     }
+
+    if(glIsList(m_border_list))
+    {
+        glDeleteLists(m_border_list, 1);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -136,6 +143,10 @@ void Widget::update(const float DELTA)
 
     if(glIsList(m_rect_list))
     {
+        //m_enable_rect == false doesn't disables this chunk of code because
+        //we still need to draw the rect into OpenGL's selection buffer even
+        //if it's not visible
+
         //FIXME: maybe there is some sort of stacking method to disable/enable
         //color masking
         if(!m_enable_rect)
@@ -164,6 +175,26 @@ void Widget::update(const float DELTA)
         std::cerr << "Warning: widget tried to draw null rect list.\n";
         std::cerr << "(Did you created the rect?)\n";
     }
+
+    if(glIsList(m_border_list))
+    {
+        if( m_enable_border )
+        {
+            glColor4fv(m_border_color);
+
+            //FIXME: I should probably revert the values to the defaults within the widget manager
+            //(if glPushAttrib() doesn't)
+            glStencilFunc(GL_ALWAYS, 0x1, 0x1);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+            glCallList(m_border_list);
+        }
+    }
+    else
+    {
+        std::cerr << "Warning: widget tried to draw null border list.\n";
+        std::cerr << "(Did you created the border?)\n";
+    }
+
 
     if( m_enable_track )
     {
@@ -553,31 +584,32 @@ bool Widget::createRect(int radius)
     }
 
     //Calculate the number of quads each side should have. The algorithm
-    //isn't based on pure logic, instead it's based on the perception of
-    //roundness and some visual testing.
+    //isn't based just on logic, since it went through visual testing to give
+    //the perception of roundness.
     const int MIN_QUADS = 2;
-    const float QUAD_RADIUS_RAISE = 0.413f;
-    const int NUM_QUADS = MIN_QUADS + (int)(pow((float)radius, QUAD_RADIUS_RAISE));
+    const int NUM_QUADS = MIN_QUADS + radius;
 
     int i;
 
+    const int SMALLER_SIDE_LENGTH = m_height < m_width ? m_height / 2 : m_width / 2;
+    const float BORDER_LENGTH = SMALLER_SIDE_LENGTH * m_border_percentage;
+
+    float inner_vertex [(NUM_QUADS + 1) * 2][3];
+    float outer_vertex [(NUM_QUADS + 1) * 2][3];
+
+    const float HALF_WIDTH = m_width * 0.5f;
+    const float HALF_HEIGHT = m_height * 0.5f;
+
     glNewList(m_rect_list, GL_COMPILE);
     {
-        //To create a rounded rectangle, we generate lines that are
-        //progressively bigger, which are given as vertex points for each
-        //quad.
         glBegin(GL_QUAD_STRIP);
         {
             //These are used to center the widget; without centering, the
             //widget's 0,0 coordinates are at the lower left corner.
-            float half_width = m_width * 0.5f;
-            float half_height = m_height * 0.5f;
-
             float angle;
             float circle_x, circle_y;
-            float vertex_x, vertex_ya, vertex_yb;
 
-            //Draw the left side of a rectangle.
+            //Draw the left side of the inside
             for (i = 0; i <= NUM_QUADS; ++i)
             {
                 //To find the position in the X and Y axis of each point of
@@ -604,73 +636,117 @@ bool Widget::createRect(int radius)
                 //position for the circle is dependant on rect; if a corner
                 //wasn't given, then the y position is computed as if it was
                 //for a rectangle without rounder corners.
-                vertex_x  = radius - circle_x;
+                outer_vertex[i][0] = radius - circle_x;
+                inner_vertex[i][0] = outer_vertex[i][0] + BORDER_LENGTH;
 
                 if( m_round_corners & WGT_AREA_NW )
                 {
-                    vertex_ya = m_height + circle_y - radius;
+                    outer_vertex[i][1] = m_height + circle_y - radius;
+                    inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
                 }
                 else
                 {
-                    vertex_ya = (float)m_height;
+                    outer_vertex[i][1] = m_height;
+                    inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
                 }
 
                 if( m_round_corners & WGT_AREA_SW )
                 {
-                    vertex_yb = radius - circle_y;
+                    outer_vertex[i][2] = radius - circle_y;
+                    inner_vertex[i][2] = outer_vertex[i][2] + BORDER_LENGTH;
                 }
                 else
                 {
-                    vertex_yb = 0;
+                    outer_vertex[i][2] = 0;
+                    inner_vertex[i][2] = outer_vertex[i][2] + BORDER_LENGTH;
                 }
 
-                glTexCoord2f(vertex_x / m_width, vertex_ya / m_height);
-                glVertex2f(vertex_x - half_width, vertex_ya - half_height);
+                glTexCoord2f(inner_vertex[i][0] / (float)m_width, inner_vertex[i][1] / (float)m_height);
+                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][1] - HALF_HEIGHT);
 
-                glTexCoord2f(vertex_x / m_width, vertex_yb / m_height);
-                glVertex2f(vertex_x - half_width, vertex_yb - half_height);
+                glTexCoord2f(inner_vertex[i][0] / (float)m_width, inner_vertex[i][2] / (float)m_height);
+                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][2] - HALF_HEIGHT);
             }
 
             //Draw the right side of a rectangle
-            for (i = 0; i <= NUM_QUADS; ++i)
+            for (i = NUM_QUADS; i < NUM_QUADS * 2 + 1; ++i)
             {
-                angle = 0.5f * M_PI * (float) i / (float) NUM_QUADS;
+                angle = 0.5f * M_PI * (float) (i - NUM_QUADS) / (float) NUM_QUADS;
 
                 //By inverting the use of sin and cos we get corners that are
                 //drawn from left to right instead of right to left
                 circle_x = radius * sin(angle);
                 circle_y = radius * cos(angle);
 
-                vertex_x  = m_width - radius + circle_x;
+                outer_vertex[i+1][0] = m_width - radius + circle_x;
+                inner_vertex[i+1][0] = outer_vertex[i+1][0] - BORDER_LENGTH;
 
                 if( m_round_corners & WGT_AREA_NE )
                 {
-                    vertex_ya = m_height + circle_y - radius;
+                    outer_vertex[i+1][1] = m_height - radius + circle_y;
+                    inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
                 }
                 else
                 {
-                    vertex_ya = (float)m_height;
+                    outer_vertex[i+1][1] = m_height;
+                    inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
                 }
 
                 if( m_round_corners & WGT_AREA_SE )
                 {
-                    vertex_yb = radius - circle_y;
+                    outer_vertex[i+1][2] = radius - circle_y;
+                    inner_vertex[i+1][2] = outer_vertex[i+1][2] + BORDER_LENGTH;
                 }
                 else
                 {
-                    vertex_yb = 0;
+                    outer_vertex[i+1][2] = 0;
+                    inner_vertex[i+1][2] = outer_vertex[i+1][2] + BORDER_LENGTH;
                 }
 
+                glTexCoord2f(inner_vertex[i+1][0] / (float)m_width, inner_vertex[i+1][1] / (float)m_height);
+                glVertex2f(inner_vertex[i+1][0] - HALF_WIDTH, inner_vertex[i+1][1] - HALF_HEIGHT);
 
-                glTexCoord2f(vertex_x / m_width, vertex_ya / m_height);
-                glVertex2f(vertex_x - half_width, vertex_ya - half_height);
-
-                glTexCoord2f(vertex_x / m_width, vertex_yb / m_height);
-                glVertex2f(vertex_x - half_width, vertex_yb - half_height);
+                glTexCoord2f(inner_vertex[i+1][0] / (float)m_width, inner_vertex[i+1][2] / (float)m_height);
+                glVertex2f(inner_vertex[i+1][0] - HALF_WIDTH, inner_vertex[i+1][2] - HALF_HEIGHT);
             }
-
         }
         glEnd();
+    }
+    glEndList();
+
+
+    if(!glIsList(m_border_list))
+    {
+        m_border_list = glGenLists(1);
+        if(m_border_list == 0)
+        {
+            std::cerr << "Error: could not create a widget's border list.\n";
+            return false;
+        }
+    }
+
+    glNewList(m_border_list, GL_COMPILE);
+    {
+        glBegin(GL_QUAD_STRIP);
+        {
+            for (i = NUM_QUADS * 2 + 1; i >= 0 ; --i)
+            {
+                glVertex2f(outer_vertex[i][0] - HALF_WIDTH, outer_vertex[i][1] - HALF_HEIGHT);
+                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][1] - HALF_HEIGHT);
+            }
+
+            for (i = 0; i <= NUM_QUADS * 2 + 1; ++i)
+            {
+                glVertex2f(outer_vertex[i][0] - HALF_WIDTH, outer_vertex[i][2] - HALF_HEIGHT);
+                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][2] - HALF_HEIGHT);
+            }
+
+            //Close the border
+            glVertex2f(outer_vertex[NUM_QUADS * 2 + 1][0] - HALF_WIDTH, outer_vertex[NUM_QUADS * 2 + 1][1] - HALF_HEIGHT);
+            glVertex2f(inner_vertex[NUM_QUADS * 2 + 1][0] - HALF_WIDTH, inner_vertex[NUM_QUADS * 2 + 1][1] - HALF_HEIGHT);
+        }
+        glEnd();
+
     }
     glEndList();
 

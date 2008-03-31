@@ -96,6 +96,10 @@ class WidgetManager
     bool m_default_rect_round_corners;
     const GLfloat *m_default_rect_color;
 
+    bool m_default_show_border;
+    float m_default_border_percentage;
+    const GLfloat *m_default_border_color;
+
     bool m_default_show_texture;
     int m_default_texture;
 
@@ -177,8 +181,22 @@ public:
 
     /* On/off widget switch features. They are all disabled/hidden initially. */
     void setInitialActivationState( const bool ACTIVE);
-    void setInitialRectState(const bool SHOW, const WidgetArea ROUND_CORNERS, const GLfloat* const COLOR );
+
+    void setInitialRectState
+    (
+        const bool SHOW,
+        const WidgetArea ROUND_CORNERS,
+        const GLfloat* const COLOR
+    );
+
     void setInitialTextureState(const bool SHOW, const int TEXTURE );
+
+    void setInitialBorderState
+    (
+        const bool SHOW,
+        const int PERCENTAGE,
+        const GLfloat* const COLOR
+    );
 
     void setInitialTextState
     (
@@ -221,6 +239,11 @@ public:
     void setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS);
     void showWgtRect(const int TOKEN);
     void hideWgtRect(const int TOKEN);
+
+    void setWgtBorderColor(const int TOKEN, const GLfloat* const COLOR);
+    void setWgtBorderPercentage(const int TOKEN, const int PERCENTAGE);
+    void showWgtBorder(const int TOKEN);
+    void hideWgtBorder(const int TOKEN);
 
     void setWgtTexture(const int TOKEN, const int TEXTURE);
     void showWgtTexture(const int TOKEN);
