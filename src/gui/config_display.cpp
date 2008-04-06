@@ -259,7 +259,7 @@ void ConfigDisplay::select()
                 }
                 else
                 {
-                    //widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen mode"));
+                    widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen mode"));
                     widget_manager->showWgtText(WTOK_FULLSCREEN);
                     widget_manager->showWgtRect(WTOK_FULLSCREEN);
                     widget_manager->activateWgt(WTOK_FULLSCREEN);
