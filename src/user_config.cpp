@@ -732,7 +732,7 @@ UserConfig::writeStickConfigs(lisp::Writer *writer)
 	
 	writer->beginList("stick-configs");
 	
-	count = m_stickconfigs.size();
+	count = (int)m_stickconfigs.size();
 	writer->write("count", count);
 	
 	for (int i = 0; i < count; i++)

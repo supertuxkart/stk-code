@@ -1272,10 +1272,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\race_setup.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\replay_base.hpp"
 				>
 			</File>

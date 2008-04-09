@@ -19,12 +19,12 @@
 
 #include <stdexcept>
 #include "highscore_manager.hpp"
+#include "race_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "translation.hpp"
 #include "string_utils.hpp"
 #include "file_manager.hpp"
-#include "race_setup.hpp"
 #include "user_config.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -171,11 +171,7 @@ void HighscoreManager::Save()
 }   // Save
 
 // -----------------------------------------------------------------------------
-Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type, 
-                                            const int             num_karts,
-                                            const RaceDifficulty  difficulty,
-                                            const std::string     track, 
-                                            const int             number_of_laps)
+Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type)
 {
     Highscores *highscores = 0;
 
@@ -184,8 +180,9 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
     for(type_all_scores::iterator i  = m_allScores.begin(); 
                                   i != m_allScores.end();  i++)
     {
-      if((*i)->matches(highscore_type, num_karts, difficulty, track,
-                       number_of_laps))
+        if((*i)->matches(highscore_type, race_manager->getNumKarts(), 
+                         race_manager->getDifficulty(), race_manager->getTrackName(),
+                         race_manager->getNumLaps()))
         {
             return (*i);
         }
@@ -201,19 +198,13 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
 // If it's one of the fastest HIGHSCORE_LEN results, it is put into the
 // list and the new position (1 ... HIGHSCORE_LEN) is returned, otherwise 0.
 Highscores * HighscoreManager::addResult(const Highscores::HighscoreType highscore_type, 
-                                         const int num_karts, 
-                                         const RaceDifficulty difficulty,
-                                         const std::string track, 
                                          const std::string kart_name,
                                          const std::string name, 
-                                         const float time,
-                                         const int number_of_laps)
+                                         const float time)
 {
-    Highscores *highscores = getHighscores(highscore_type, num_karts,
-                                           difficulty, track, number_of_laps);
+    Highscores *highscores = getHighscores(highscore_type);
 
-    if(highscores->addData(highscore_type, num_karts, difficulty,
-                           track, kart_name, name, time, number_of_laps) >0)
+    if(highscores->addData(highscore_type, kart_name, name, time) >0)
     {
         Save();
     }

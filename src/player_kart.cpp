@@ -238,7 +238,7 @@ void PlayerKart::addMessages()
 
     // 1) check if the player is going in the wrong direction
     // ------------------------------------------------------
-    if(world->m_race_setup.m_difficulty==RD_EASY)
+    if(race_manager->getDifficulty()==RaceManager::RD_EASY)
     {
         float angle_diff = getCoord()->hpr[0] - world->m_track->m_angle[getSector()];
         if(angle_diff > 180.0f) angle_diff -= 360.0f;

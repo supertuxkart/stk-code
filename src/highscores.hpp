@@ -25,7 +25,7 @@
 
 #include "lisp/lisp.hpp"
 #include "lisp/writer.hpp"
-#include "race_setup.hpp"
+#include "race_manager.hpp"
 
 class Highscores
 {
@@ -50,12 +50,10 @@ public:
     void Read      (const lisp::Lisp* const node);
     void Write     (lisp::Writer* writer);
     int  matches   (HighscoreType highscore_type, int num_karts,
-                    const RaceDifficulty difficulty,    const std::string &track,
-		    const int number_of_laps);
-    int  addData   (const HighscoreType highscore_type, const int num_karts,
-                    const RaceDifficulty difficulty,    const std::string track,
-                    const std::string kart_name,        const std::string name, 
-                    const float time,                   const int number_of_laps);
+                    const RaceManager::Difficulty difficulty, 
+                    const std::string &track, const int number_of_laps);
+    int  addData   (const HighscoreType highscore_type, const std::string kart_name,
+                    const std::string name, const float time);
     int  getNumberEntries() const;
     void getEntry  (int number, std::string &kart_name,
                     std::string &name, float *const time) const;

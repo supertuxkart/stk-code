@@ -36,7 +36,7 @@
 #include "collectable_manager.hpp"
 #include "attachment_manager.hpp"
 #include "projectile_manager.hpp"
-#include "file_manager.hpp"
+#include "loader.hpp"
 #include "gui/menu_manager.hpp"
 #include "widget_manager.hpp"
 #include "player.hpp"
@@ -133,7 +133,13 @@ SDLDriver::initStickInfos()
 	
 	bool match;
 	vector<StickInfo *>::iterator si_ite = si->begin();
-	while (si_ite != si->end())
+
+    // FIXME: Visual Studio triggers an exception (in debug mode) when si 
+    // becomes empty (incompatible iterators). This is apparently caused
+    // by using erase. For now I added a work around by checking for 
+    // si->size()>0, which solves the problem for me. But I have only one
+    // gamepad, I'd suspect that with more gamepads the problem still exists.
+	while (si->size()>0 && si_ite != si->end())
 	{
 		match = false;
 		
@@ -247,7 +253,7 @@ SDLDriver::setVideoMode(bool resetTextures)
     if(resetTextures)
     {
         // Clear plib internal texture cache
-        file_manager->endLoad();
+        loader->endLoad();
 
         // Windows needs to reload all textures, display lists, ... which means
         // that all models have to be reloaded. So first, free all textures,

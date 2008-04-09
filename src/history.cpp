@@ -61,14 +61,14 @@ float History::GetNextDelta()
 void History::Save()
 {
     FILE *fd = fopen("history.dat","w");
-    int  nKarts = world->getNumKarts();
+    int  nKarts = race_manager->getNumKarts();
 #ifdef VERSION
     fprintf(fd, "Version:  %s\n",   VERSION);
 #endif
     fprintf(fd, "numkarts: %d\n",   nKarts);
-    fprintf(fd, "numplayers: %d\n", world->m_race_setup.getNumPlayers());
-    fprintf(fd, "difficulty: %d\n", world->m_race_setup.getDifficulty());
-    fprintf(fd, "track: %s\n",      world->m_track->getIdent().c_str());
+    fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
+    fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
+    fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
 
     int k;
     for(k=0; k<nKarts; k++)
@@ -142,7 +142,7 @@ void History::Load()
         fprintf(stderr,"WARNING: No difficulty found in history file.\n");
         exit(-2);
     }
-    race_manager->setDifficulty((RaceDifficulty)n);
+    race_manager->setDifficulty((RaceManager::Difficulty)n);
 
     fgets(s, 1023, m_fd);
     if(sscanf(s, "track: %s",s1)!=1)

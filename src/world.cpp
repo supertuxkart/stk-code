@@ -56,7 +56,7 @@
 
 World* world = 0;
 
-World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
+World::World()
 #ifdef HAVE_GHOST_REPLAY
 , m_p_replay_player(NULL)
 #endif
@@ -64,7 +64,6 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     delete world;
     world          = this;
     m_phase        = SETUP_PHASE;
-
     m_track        = NULL;
 
     m_clock        = 0.0f;
@@ -75,89 +74,81 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     // Grab the track file
     try
     {
-        m_track = track_manager->getTrack(m_race_setup.m_track) ;
+        m_track = track_manager->getTrack(race_manager->getTrackName());
     }
     catch(std::runtime_error)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
         snprintf(msg, sizeof(msg), 
-                 "Track '%s' not found.\n",m_race_setup.m_track.c_str());
+                 "Track '%s' not found.\n",race_manager->getTrackName().c_str());
         throw std::runtime_error(msg);
     }
 
     // Create the physics
-    m_physics = new Physics(getGravity());
+    m_physics = new Physics(m_track->getGravity());
 
-    assert(m_race_setup.m_karts.size() > 0);
+    assert(race_manager->getNumKarts() > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
     loadTrack() ;
 
-    int pos = 0;
     int playerIndex = 0;
-    for (RaceSetup::Karts::iterator i = m_race_setup.m_karts.begin() ;
-         i != m_race_setup.m_karts.end() ; ++i )
+    for(unsigned int position=0; position<race_manager->getNumKarts(); position++)
     {
         sgCoord init_pos;
-        m_track->getStartCoords(pos, &init_pos);
+        m_track->getStartCoords(position, &init_pos);
         Kart* newkart;
+        const std::string& kart_name=race_manager->getKartName(position);
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
-            newkart = new DefaultRobot (kart_properties_manager->getKart("tuxkart"), pos,
-                    init_pos);
-	    // Create a camera for the last kart (since this way more of the 
-	    // karts can be seen.
-	    if((i+1)==m_race_setup.m_karts.end()) 
+            newkart = new DefaultRobot(kart_name, position, init_pos);
+    	    // Create a camera for the last kart (since this way more of the 
+	        // karts can be seen.
+            if(position==race_manager->getNumKarts()-1) 
             {
-	        scene->createCamera(m_race_setup.getNumPlayers(), playerIndex);
+                scene->createCamera(race_manager->getNumPlayers(), playerIndex);
             }
         }
         else
         {
-            if (std::find(m_race_setup.m_players.begin(),
-                          m_race_setup.m_players.end(), pos) != m_race_setup.m_players.end())
+            if (race_manager->isPlayer(position))
             {
-                
-                Camera *cam = scene->createCamera(m_race_setup.getNumPlayers(), playerIndex);
+                Camera *cam = scene->createCamera(race_manager->getNumPlayers(), playerIndex);
                 // the given position belongs to a player
-                newkart = new PlayerKart (kart_properties_manager->getKart(*i), pos,
-                                          &(user_config->m_player[playerIndex]),
-                                          init_pos, cam);
+                newkart = new PlayerKart(kart_name, position,
+                                         &(user_config->m_player[playerIndex]),
+                                         init_pos, cam);
+                m_player_karts.push_back((PlayerKart*)newkart);
                 playerIndex++;
             }
             else
             {
-                newkart = loadRobot(kart_properties_manager->getKart(*i), pos,
-                    init_pos);
+                newkart = loadRobot(kart_name, position, init_pos);
             }
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)
         {
-            history->LoadKartData(newkart, pos);
+            history->LoadKartData(newkart, position);
         }
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
         scene->add ( newkart -> getModelTransform() ) ;
         m_kart.push_back(newkart);
-        pos++;
     }  // for i
 
     resetAllKarts();
 
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-    //ssgSetBackFaceCollisions ( m_race_setup.mirror ) ;
+    //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
 #endif
 
-    Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+    Highscores::HighscoreType hst = (race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
 
-    m_highscores   = highscore_manager->getHighscores(hst, (int)m_kart.size(),
-                                                      m_race_setup.m_difficulty, 
-                                                      m_track->getName(),
-                                                      m_race_setup.m_num_laps);
+    m_highscores   = highscore_manager->getHighscores(hst);
 
     callback_manager->initAll();
     menu_manager->switchToRace();
@@ -167,7 +158,7 @@ World::World(const RaceSetup& raceSetup_) : m_race_setup(raceSetup_)
     m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
 
 #ifdef HAVE_GHOST_REPLAY
-    m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
+    m_replay_recorder.initRecorder( race_manager->getNumKarts() );
 
     m_p_replay_player = new ReplayPlayer;
     if( !loadReplayHumanReadable( "test1" ) ) 
@@ -273,7 +264,7 @@ void World::update(float dt)
 
         // Don't record the time for the last kart, since it didn't finish
         // the race - unless it's timetrial (then there is only one kart)
-        unsigned int karts_to_enter = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
+        unsigned int karts_to_enter = (race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
                                     ? (unsigned int)m_kart.size() : (unsigned int)m_kart.size()-1;
         for(unsigned int pos=0; pos<karts_to_enter; pos++)
         {
@@ -282,16 +273,13 @@ void World::update(float dt)
 
             PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
             
-            Highscores::HighscoreType hst = (m_race_setup.m_mode==RaceSetup::RM_TIME_TRIAL) 
-                                  ? Highscores::HST_TIMETRIAL_OVERALL_TIME
-                                  : Highscores::HST_RACE_OVERALL_TIME;
-            if(m_highscores->addData(hst, (int)m_kart.size(),
-                     m_race_setup.m_difficulty, 
-                     m_track->getName(),
-                     k->getName(),
-                     k->getPlayer()->getName(),
-                     k->getFinishTime(),
-                     m_race_setup.m_num_laps)>0)
+            Highscores::HighscoreType hst = (race_manager->getRaceMode()==
+                                                    RaceManager::RM_TIME_TRIAL) 
+                                            ? Highscores::HST_TIMETRIAL_OVERALL_TIME
+                                            : Highscores::HST_RACE_OVERALL_TIME;
+            if(m_highscores->addData(hst, k->getName(),
+                                     k->getPlayer()->getName(),
+                                     k->getFinishTime())>0      )
             {
                 highscore_manager->Save();
             }
@@ -350,14 +338,13 @@ bool World::saveReplayHumanReadable( std::string const &filename ) const
 #endif
     fprintf(fd, "Version:  %s\n",   version);
     fprintf(fd, "numkarts: %d\n",   m_kart.size());
-    fprintf(fd, "numplayers: %d\n", m_race_setup.getNumPlayers());
-    fprintf(fd, "difficulty: %d\n", m_race_setup.m_difficulty);
+    fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
+    fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      m_track->getIdent().c_str());
 
-    for (RaceSetup::Karts::const_iterator i = m_race_setup.m_karts.begin() ;
-         i != m_race_setup.m_karts.end() ; ++i )
+    for(int i=0; i<race_manager->getNumKarts(); i++)
     {
-        fprintf(fd, "model %d: %s\n", i-m_race_setup.m_karts.begin(), (*i).c_str());
+        fprintf(fd, "model %d: %s\n", i, race_manager->getKartName(i).c_str());
     }
     if( !m_replay_recorder.saveReplayHumanReadable( fd ) )
     {
@@ -440,9 +427,12 @@ void World::updateRaceStatus(float dt)
 #endif
                             }
                             break;
-        case GO_PHASE  :    if(m_clock>1.0) m_phase=RACE_PHASE;    break;
+        case GO_PHASE  :    if(m_clock>1.0) m_phase=RACE_PHASE;  break;
         default        :    break;
     }   // switch
+    
+    // Now handling of normal race
+    // ===========================
     m_clock += dt;
 
     /*if all players have finished, or if only one kart is not finished when
@@ -453,12 +443,11 @@ void World::updateRaceStatus(float dt)
     for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
     {
         // FIXME: this part should be done as part of Kart::update
-        if ((m_kart[i]->getLap () >= m_race_setup.m_num_laps) && !m_kart[i]->raceIsFinished())
+        if ((m_kart[i]->getLap () >= race_manager->getNumLaps()) && !m_kart[i]->raceIsFinished())
         {
             m_kart[i]->setFinishingState(m_clock);
 
-            race_manager->addKartScore((int)i, m_kart[i]->getPosition());
-            race_manager->addKartOverallTime((int) i, m_clock);
+            race_manager->addKartResult((int)i, m_kart[i]->getPosition(), m_clock);
 
             ++new_finished_karts;
             if(m_kart[i]->isPlayerKart())
@@ -480,7 +469,7 @@ void World::updateRaceStatus(float dt)
 
     // 1) All karts are finished --> end the race
     // ==========================================
-    if(race_manager->getFinishedKarts() >= m_race_setup.getNumKarts() )
+    if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
         m_phase = FINISH_PHASE;
 	    if(user_config->m_profile<0)  // profiling number of laps -> print stats
@@ -524,8 +513,8 @@ void World::updateRaceStatus(float dt)
             {
                 const float est_finish_time = m_kart[i]->estimateFinishTime();
                 m_kart[i]->setFinishingState(est_finish_time);
-                race_manager->addKartScore((int)i, m_kart[i]->getPosition());
-                race_manager->addKartOverallTime((int) i, est_finish_time);
+                race_manager->addKartResult((int)i, m_kart[i]->getPosition(),
+                                            est_finish_time);
             }   // if !raceIsFinished
         }   // for i
     }
@@ -563,17 +552,17 @@ void World::loadTrack()
     // remove old herrings (from previous race), and remove old
     // track specific herring models
     herring_manager->cleanup();
-    if(m_race_setup.m_mode == RaceSetup::RM_GRAND_PRIX)
+    if(race_manager->getRaceMode()== RaceManager::RM_GRAND_PRIX)
     {
         try
         {
-            herring_manager->loadHerringStyle(m_race_setup.getHerringStyle());
+            herring_manager->loadHerringStyle(race_manager->getHerringStyle());
         }
         catch(std::runtime_error)
         {
             fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
                     race_manager->getGrandPrix()->getName().c_str(),
-                    race_manager->getGrandPrix()->getHerringStyle().c_str());
+                    race_manager->getHerringStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
                     race_manager->getGrandPrix()->getFilename().c_str());
         }
@@ -616,7 +605,7 @@ void World::restartRace()
     scene->reset();
 #ifdef HAVE_GHOST_REPLAY
     m_replay_recorder.destroy();
-    m_replay_recorder.initRecorder( m_race_setup.getNumKarts() );
+    m_replay_recorder.initRecorder( race_manager->getNumKarts() );
 
     if( m_p_replay_player ) 
     {
@@ -627,8 +616,8 @@ void World::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
-Kart* World::loadRobot(const KartProperties *kart_properties, int position,
-                 sgCoord init_pos)
+Kart* World::loadRobot(const std::string& kart_name, int position,
+                       sgCoord init_pos)
 {
     Kart* currentRobot;
     
@@ -639,13 +628,11 @@ Kart* World::loadRobot(const KartProperties *kart_properties, int position,
     switch(rand() % NUM_ROBOTS)
     {
         case 0:
-            currentRobot = new DefaultRobot(kart_properties, position,
-                init_pos);
+            currentRobot = new DefaultRobot(kart_name, position, init_pos);
             break;
         default:
             std::cerr << "Warning: Unknown robot, using default." << std::endl;
-            currentRobot = new DefaultRobot(kart_properties, position,
-                init_pos);
+            currentRobot = new DefaultRobot(kart_name, position, init_pos);
             break;
     }
     

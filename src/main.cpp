@@ -164,13 +164,13 @@ int handleCmdLine(int argc, char **argv)
             switch (atoi(argv[i+1]))
             {
             case 1:
-                race_manager->setDifficulty(RD_EASY);
+                race_manager->setDifficulty(RaceManager::RD_EASY);
                 break;
             case 2:
-                race_manager->setDifficulty(RD_MEDIUM);
+                race_manager->setDifficulty(RaceManager::RD_MEDIUM);
                 break;
             case 3:
-                race_manager->setDifficulty(RD_HARD);
+                race_manager->setDifficulty(RaceManager::RD_HARD);
                 break;
             }
         }
@@ -389,19 +389,20 @@ void InitTuxkart()
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     collectable_manager     = new CollectableManager   ();
-    race_manager            = new RaceManager          ();
     callback_manager        = new CallbackManager      ();
     herring_manager         = new HerringManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     track_manager->loadTrackList();
     sound_manager->addMusicToTracks();
+
+    stk_config->load(file_manager->getConfigFile("stk_config.data"));
+    race_manager            = new RaceManager          ();
     // default settings for Quickstart
     race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
-    race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-    race_manager->setDifficulty(RD_MEDIUM);
-    stk_config->load(file_manager->getConfigFile("stk_config.data"));
+    race_manager->setRaceMode  (RaceManager::RM_QUICK_RACE);
+    race_manager->setDifficulty(RaceManager::RD_MEDIUM);
 }
 
 //=============================================================================
@@ -465,7 +466,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            race_manager->start();
+            race_manager->startNew();
             game_manager->run();
             // well, actually run() will never return, since
             // it exits after replaying history (see history::GetNextDT()).
@@ -491,7 +492,7 @@ int main(int argc, char *argv[] )
                 //race_manager->setTrack     ("tuxtrack");
                 //race_manager->setTrack     ("sandtrack");
                 //race_manager->setTrack     ("race");
-                race_manager->start();
+                race_manager->startNew();
             }
         }
         else  // profile
@@ -501,9 +502,9 @@ int main(int argc, char *argv[] )
             // =========
             race_manager->setNumPlayers(1);
             race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
-            race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-            race_manager->setDifficulty(RD_HARD);
-            race_manager->start();
+            race_manager->setRaceMode  (RaceManager::RM_QUICK_RACE);
+            race_manager->setDifficulty(RaceManager::RD_HARD);
+            race_manager->startNew();
         }
         game_manager->run();
 
@@ -516,6 +517,7 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
+    user_config->saveConfig();
     delete inputDriver;
     
     if (user_config->m_log_errors) //close logfiles

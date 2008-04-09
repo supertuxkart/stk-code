@@ -48,7 +48,7 @@ public:
     void       clearUnlocked      () {m_unlocked_features.clear(); }
     void       raceFinished       ();
     void       grandPrixFinished  ();
-    void       unlockFeature      (Challenge* c);
+    void       unlockFeature      (Challenge* c, bool save=true);
     void       lockFeature        (const std::string& feature);
     bool       isLocked           (const std::string& feature);
 };   // UnlockManager

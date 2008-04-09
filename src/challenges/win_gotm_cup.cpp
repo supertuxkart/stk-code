@@ -20,7 +20,6 @@
 #include <algorithm>
 #include "challenges/win_gotm_cup.hpp"
 #include "world.hpp"
-#include "race_setup.hpp"
 #include "race_manager.hpp"
 
 WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", "Win GOTM Cup")
@@ -35,11 +34,10 @@ WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", "Win GOTM Cup")
 //-----------------------------------------------------------------------------
 bool WinGOTMCup::grandPrixFinished()
 {
-    const RaceSetup* race=&world->m_race_setup;
-    if (race->m_mode         != RaceSetup::RM_GRAND_PRIX  ||
-        race->m_difficulty   != RD_HARD                   ||
-        race->getNumKarts()   < 4                         ||
-        race->getNumPlayers() > 1) return false;
+    if (race_manager->getRaceMode()  != RaceManager::RM_GRAND_PRIX  ||
+        race_manager->getDifficulty()!= RaceManager::RD_HARD        ||
+        race_manager->getNumKarts()   < 4                           ||
+        race_manager->getNumPlayers() > 1) return false;
     // Check if the player was number one:
     for(int i=0; i<(int)world->getNumKarts(); i++)
     {

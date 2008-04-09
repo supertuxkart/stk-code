@@ -333,6 +333,10 @@ int Track::findOutOfRoadSector
         }
     }   // for i
 
+    if(sector==UNKNOWN_SECTOR)
+    {
+        printf("unknown sector found.\n");
+    }
     return sector;
 }   // findOutOfRoadSector
 

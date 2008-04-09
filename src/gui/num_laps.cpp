@@ -117,7 +117,7 @@ void NumLaps::select()
         break;
       case WTOK_START:
         race_manager->setNumLaps(laps);
-        race_manager->start();
+        race_manager->startNew();
         break;
       case WTOK_QUIT:
         menu_manager->popMenu();

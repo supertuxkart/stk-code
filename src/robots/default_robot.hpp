@@ -127,7 +127,7 @@ private:
     int m_sector;
 
 public:
-    DefaultRobot(const KartProperties *kart_properties, int position,
+    DefaultRobot(const std::string& kart_name, int position,
              sgCoord init_pos);
 
     void update      (float delta) ;

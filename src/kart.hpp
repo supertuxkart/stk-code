@@ -134,7 +134,7 @@ protected:
     void  load_wheels          (ssgBranch* obj);
 
 public:
-                   Kart(const KartProperties* kartProperties_, int position_, 
+                   Kart(const std::string& kart_name, int position_, 
                         sgCoord init_pos);
     virtual       ~Kart();
     void           loadData();
@@ -237,9 +237,9 @@ public:
 class TrafficDriver : public Kart
 {
 public:
-    TrafficDriver (const KartProperties* kartProperties_, sgVec3 _pos,
+    TrafficDriver (const std::string& kart_name, sgVec3 _pos,
                    sgCoord init_pos)
-        : Kart (kartProperties_, 0, init_pos )
+        : Kart (kart_name, 0, init_pos )
     {
         sgCopyVec3 ( m_reset_pos.xyz, _pos ) ;
         reset () ;

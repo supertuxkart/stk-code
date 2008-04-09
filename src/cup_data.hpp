@@ -48,13 +48,17 @@ public:
     /** Load the CupData from the given filename */
     CupData        (const std::string filename);
     CupData        ()       {}; // empty for initialising
-    const std::string& getName        ()  const { return m_name;        }
-    const std::string& getDescription ()  const { return m_description; }
-    const std::string& getHerringStyle()  const { return m_herring_style;}
-    const std::string& getFilename    ()  const { return m_filename;    }
-    const std::string& getTrack(size_t track_index) const { assert(track_index < m_tracks.size()); return m_tracks[track_index]; }
-    size_t             getTrackCount() const    { return m_tracks.size(); }
-    const int&         getLaps(size_t lap_index) const { assert(lap_index < m_tracks.size()); return m_laps[lap_index]; }
+    const std::string& getName        ()        const { return m_name;          }
+    const std::string& getDescription ()        const { return m_description;   }
+    const std::string& getHerringStyle()        const { return m_herring_style; }
+    const std::string& getFilename    ()        const { return m_filename;      }
+    const std::string& getTrack(size_t track_index) const { assert(track_index < m_tracks.size()); 
+                                                       return m_tracks[track_index]; }
+    const std::vector<std::string>& getTracks()  const {return m_tracks;        }
+    const std::vector<int>&         getLaps()    const {return m_laps;          }
+    size_t             getTrackCount()           const {return m_tracks.size(); }
+    const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
+                                                         return m_laps[lap_index]; }
 }
 ;   // CupData
 

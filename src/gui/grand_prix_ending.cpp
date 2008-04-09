@@ -22,7 +22,7 @@
 
 #include <SDL/SDL.h>
 
-#include "file_manager.hpp"
+#include "loader.hpp"
 #include "sound_manager.hpp"
 #include "grand_prix_ending.hpp"
 #include "kart_properties_manager.hpp"
@@ -60,16 +60,16 @@ GrandPrixEnd::GrandPrixEnd()
     oldContext->makeCurrent();
 
     const unsigned int MAX_STR_LEN = 60;
-    const unsigned int NUM_KARTS = world->getNumKarts();
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
 
     int *scores   = new int[NUM_KARTS];
     int *position = new int[NUM_KARTS];
     double *race_time = new double[NUM_KARTS];
-    for( unsigned int i = 0; i < NUM_KARTS; ++i )
+    for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
     {
-        position[i] = i;
-        scores[i]   = race_manager->getKartScore(i);
-        race_time[i] = race_manager->getKartOverallTime(i);
+        position[kart_id]  = kart_id;
+        scores[kart_id]    = race_manager->getKartScore(kart_id);
+        race_time[kart_id] = race_manager->getOverallTime(kart_id);
     }
 
     //Bubblesort
@@ -102,12 +102,9 @@ GrandPrixEnd::GrandPrixEnd()
         }
     } while(!sorted);
     
-    Kart *kart;
-    kart = world->getKart(position[0]);
-    
     static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
-             _("The winner is %s!"),kart->getName().c_str());
+        _("The winner is %s!"),race_manager->getKartName(position[0]).c_str());
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);
@@ -121,9 +118,8 @@ GrandPrixEnd::GrandPrixEnd()
     {
         char sTime[20];
         TimeToString(race_time[i], sTime);
-        kart = world->getKart(position[i]);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
-                i + 1, kart->getName().c_str(), scores[i], sTime );
+            i + 1, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
 
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);
@@ -185,7 +181,7 @@ GrandPrixEnd::~GrandPrixEnd()
     //going white after finishing the grandprix
     // FIXME: I think this is not necessary anymore after the
     //        texture bug fix (r733) - but I can't currently test this.
-    file_manager->shared_textures.removeAll();
+    loader->shared_textures.removeAll();
 }
 
 //-----------------------------------------------------------------------------

@@ -25,7 +25,7 @@
 #include <set>
 #include "callback_manager.hpp"
 
-class FileManager : public ssgLoaderOptions
+class FileManager 
 {
 private:
     bool                        m_is_full_path;

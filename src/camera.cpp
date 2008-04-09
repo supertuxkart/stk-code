@@ -80,15 +80,15 @@ void Camera::setScreenPosition ( int numPlayers, int pos )
 }  // setScreenPosition
 
 //-----------------------------------------------------------------------------
-Camera::Camera ( int numPlayers, int which_ )
+Camera::Camera(int numPlayers, int which)
   : m_reverse(false)
 {
-    m_which_kart = which_ ;   // Just for now
+    m_which_kart = which;   // Just for now
     m_mode = CM_NORMAL;
     m_context = new ssgContext ;
 
     // FIXME: clipping should be configurable for slower machines
-    const Track* track = track_manager->getTrack(world->m_race_setup.m_track);
+    const Track* track = world->getTrack();
     if (track->useFog())
         m_context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
     else
@@ -99,9 +99,9 @@ Camera::Camera ( int numPlayers, int which_ )
 }   // Camera
 
 //-----------------------------------------------------------------------------
-void Camera::setMode(Mode mode_)
+void Camera::setMode(Mode mode)
 {
-    m_mode = mode_;
+    m_mode = mode;
 }   // setMode
 
 //-----------------------------------------------------------------------------

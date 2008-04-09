@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 #include "highscores.hpp"
+#include "race_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -81,7 +83,7 @@ void Highscores::Write(lisp::Writer *writer)
 
 // -----------------------------------------------------------------------------
 int Highscores::matches(HighscoreType highscore_type,
-                        int num_karts, RaceDifficulty difficulty,
+                        int num_karts, RaceManager::Difficulty difficulty,
                         const std::string &track, const int number_of_laps)
 {
     return (m_highscore_type  == highscore_type   &&
@@ -96,10 +98,8 @@ int Highscores::matches(HighscoreType highscore_type,
  *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
  *  otherwise a 0.
  */
-int Highscores::addData(const HighscoreType highscore_type, const int num_karts,
-                        const RaceDifficulty difficulty,    const std::string track,
-                        const std::string kart_name,        const std::string name, 
-                        const float time,                   const int number_of_laps)
+int Highscores::addData(const HighscoreType highscore_type, const std::string kart_name,
+                        const std::string name, const float time)
 {
     int position=-1;
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -127,11 +127,11 @@ int Highscores::addData(const HighscoreType highscore_type, const int num_karts,
 
     if(position>=0) 
     {
-        m_track               = track;
+        m_track               = race_manager->getTrackName();
         m_highscore_type      = highscore_type;
-        m_number_of_karts     = num_karts;
-        m_difficulty          = difficulty;
-        m_number_of_laps      = number_of_laps;
+        m_number_of_karts     = race_manager->getNumKarts();
+        m_difficulty          = race_manager->getDifficulty();
+        m_number_of_laps      = race_manager->getNumLaps();
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;

@@ -20,7 +20,6 @@
 #include <iostream>
 
 #include "track_manager.hpp"
-#include "race_setup.hpp"
 #include "game_manager.hpp"
 #include "kart_properties_manager.hpp"
 #include "race_manager.hpp"
@@ -31,239 +30,25 @@
 #include "user_config.hpp"
 #include "stk_config.hpp"
 
+
 RaceManager* race_manager= NULL;
 
-
-void
-RaceMode::next()
-{
-    exit_race();
-}
-
-//-----------------------------------------------------------------------------
-void
-RaceMode::exit_race()
-{
-    menu_manager->switchToMainMenu();
-
-    scene->clear();
-
-    delete world;
-    world = 0;
-
-    race_manager->m_active_race = false;
-
-}
-
-//=============================================================================
-GrandPrixMode::GrandPrixMode(const std::vector<std::string>& players_,
-                             const CupData& cup_,
-                             RaceDifficulty difficulty_,
-                             int numKarts_)
-: m_difficulty(difficulty_), m_num_karts(numKarts_), m_players(players_),
-    m_cup(cup_), m_track(0)
-{
-    const int NUM_PLAYERS = (int)m_players.size();
-
-    std::vector<std::string> kart_names;
-    
-    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
-    if((size_t)m_num_karts < m_players.size()) m_num_karts = (int)m_players.size();
-
-    kart_names.resize(m_num_karts);
-
-    for(int i = 0; i < NUM_PLAYERS; ++i)
-    {
-        /*Players position is behind the AI in the first race*/
-        kart_names[m_num_karts-1 - i] = m_players[NUM_PLAYERS - 1 - i];
-    }
-
-    kart_properties_manager->fillWithRandomKarts(kart_names);
-
-    const int NUM_AI_KARTS = m_num_karts - NUM_PLAYERS;
-    //Add the AI karts
-    for(int i = 0; i < NUM_AI_KARTS; ++i)
-        m_karts.push_back(KartStatus(kart_names[i], 0, 0.0f, i, NUM_PLAYERS));
-    //Add the player karts
-    for(int i = 0; i < NUM_PLAYERS; ++i)
-        m_karts.push_back(KartStatus(kart_names[i+NUM_AI_KARTS], 0, 0.0f, i+NUM_AI_KARTS, i));
-}
-
-//-----------------------------------------------------------------------------
-void
-GrandPrixMode::start_race(int n)
-{
-    RaceSetup raceSetup;
-    raceSetup.m_mode       = RaceSetup::RM_GRAND_PRIX;
-    raceSetup.m_difficulty = m_difficulty;
-    raceSetup.m_num_laps   = m_cup.getLaps(n);
-    raceSetup.m_track      = m_cup.getTrack(n);
-    raceSetup.m_karts.resize(m_karts.size());
-    raceSetup.m_players.resize(m_players.size());
-    raceSetup.setHerringStyle(m_cup.getHerringStyle());
-
-    if (n == 0) //The first race, Players start at the back
-    { 
-        for(int i = 0; i < int(m_karts.size()); ++i)
-        {
-            raceSetup.m_karts[m_karts[i].prev_finish_pos] = m_karts[i].ident;
-            if (m_karts[i].player < int(m_players.size()))
-            {
-                raceSetup.m_players[m_karts[i].player] = m_karts[i].prev_finish_pos;
-            }
-        }
-    }
-    else //subsequent races where order of grid is determined by score
-    {
-        std::sort(m_karts.begin(), m_karts.end());//sort karts by increasing score
-        
-        //reverse kart order if flagged in stk_config
-        if (stk_config->m_grid_order)
-        {
-        std::reverse(m_karts.begin(), m_karts.end());
-        } 
-        
-        for(int i = 0;i < int(m_karts.size()); ++i)
-        {
-            raceSetup.m_karts[i] = m_karts[i].ident;
-            if (m_karts[i].player < int(m_players.size()))
-            {
-                raceSetup.m_players[m_karts[i].player] = i;
-            }
-        }
-    }
-    
-    // the constructor assigns this object to the global
-    // variable world. Admittedly a bit ugly, but simplifies
-    // handling of objects which get created in the constructor
-    // and need world to be defined.
-    new World(raceSetup);
-}
-
-//-----------------------------------------------------------------------------
-void
-GrandPrixMode::start()
-{
-    start_race(m_track);
-}
-
-//-----------------------------------------------------------------------------
-void
-GrandPrixMode::next()
-{
-    m_track += 1;
-    if (m_track < int(m_cup.getTrackCount()))
-    {
-        scene->clear();
-        start_race(m_track);
-    }
-    else
-    {
-        exit_race();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void
-GrandPrixMode::exit_race()
-{
-    if (m_track < int(m_cup.getTrackCount()))
-    {
-        RaceMode::exit_race();
-    }
-    else
-    {
-        unlock_manager->grandPrixFinished();
-        menu_manager->switchToGrandPrixEnding();
-    }
-}
-
-
-//=============================================================================
-QuickRaceMode::QuickRaceMode(const std::string& track_,
-                             const std::vector<std::string>& players_,
-                             RaceDifficulty difficulty_,
-                             int numKarts_, int numLaps_)
-        : m_track(track_), m_players(players_), m_difficulty(difficulty_),
-        m_num_karts(numKarts_), m_num_laps(numLaps_)
-{
-    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
-    if((size_t)m_num_karts < m_players.size()) m_num_karts = (int)m_players.size();
-}
-
-//-----------------------------------------------------------------------------
-void
-QuickRaceMode::start()
-{
-    RaceSetup raceSetup;
-
-    raceSetup.m_mode       = RaceSetup::RM_QUICK_RACE;
-    raceSetup.m_difficulty = m_difficulty;
-    raceSetup.m_track      = m_track;
-    raceSetup.m_num_laps   = m_num_laps;
-    raceSetup.m_karts.resize(m_num_karts);
-
-    const int FIRST_PLAYER = m_num_karts - (int)m_players.size();
-    for(int i = 0; i < int(m_players.size()); ++i)
-    {
-        raceSetup.m_karts[FIRST_PLAYER + i] = m_players[i]; // Players starts last in the race
-        raceSetup.m_players.push_back(FIRST_PLAYER + i);
-    }
-
-    kart_properties_manager->fillWithRandomKarts(raceSetup.m_karts);
-
-    // the constructor assigns this object to the global
-    // variable world. Admittedly a bit ugly, but simplifies
-    // handling of objects which get created in the constructor
-    // and need world to be defined.
-    new World(raceSetup);
-}
-
-//=============================================================================
-TimeTrialMode::TimeTrialMode(const std::string& track_, const std::string& kart_,
-                             const int& numLaps_)
-        : m_track(track_), m_kart(kart_), m_num_laps(numLaps_)
-{}
-
-//-----------------------------------------------------------------------------
-void
-TimeTrialMode::start()
-{
-    RaceSetup raceSetup;
-
-    raceSetup.m_mode       = RaceSetup::RM_TIME_TRIAL;
-    raceSetup.m_track      = m_track;
-    raceSetup.m_num_laps   = m_num_laps;
-    raceSetup.m_difficulty = RD_HARD;
-
-    raceSetup.m_karts.push_back(m_kart);
-    raceSetup.m_players.push_back(0);
-
-    // the constructor assigns this object to the global
-    // variable world. Admittedly a bit ugly, but simplifies
-    // handling of objects which get created in the constructor
-    // and need world to be defined.
-    new World(raceSetup);
-}
-
-//=============================================================================
 RaceManager::RaceManager()
 {
-    m_mode        = 0;
-    m_num_karts   = user_config->m_karts;
-    m_difficulty  = RD_MEDIUM;
-    m_race_mode   = RaceSetup::RM_QUICK_RACE;
-    m_track       = "race";
-    m_active_race = false;
-
-    m_players.push_back("tuxkart");
-}
+    m_num_karts                = user_config->m_karts;
+    m_difficulty               = RD_MEDIUM;
+    m_race_mode                = RM_QUICK_RACE;
+    m_track_number             = 0;
+    m_active_race              = false;
+    m_score_for_position = stk_config->m_scores;
+    setTrack("race");
+    setPlayerKart(0, "tuxkart");
+}   // RaceManager
 
 //-----------------------------------------------------------------------------
 RaceManager::~RaceManager()
 {
-    delete m_mode;
-}
+}   // ~RaceManager
 
 //-----------------------------------------------------------------------------
 void RaceManager::reset()
@@ -273,80 +58,167 @@ void RaceManager::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
-void
-RaceManager::setPlayerKart(int player, const std::string& kart)
+void RaceManager::setPlayerKart(unsigned int player, const std::string& kart)
 {
     if (player >= 0 && player < 4)
     {
         if (player >= getNumPlayers())
             setNumPlayers(player+1);
-
-        m_players[player] = kart;
+        m_player_karts[player] = kart;
     }
     else
     {
         fprintf(stderr, "Warning: player '%d' does not exists.\n", player);
     }
-}
+}   // setPlayerKart
 
 //-----------------------------------------------------------------------------
-void
-RaceManager::setNumPlayers(int num)
+void RaceManager::setNumPlayers(int num)
 {
-    m_players.resize(num);
-    for(Players::iterator i = m_players.begin(); i != m_players.end(); ++i)
+    m_player_karts.resize(num);
+    for(PlayerKarts::iterator i = m_player_karts.begin(); i != m_player_karts.end(); ++i)
     {
         if (i->empty())
         {
             *i = "tuxkart";
         }
     }
-}
+}   // setNumPlayers
 
 //-----------------------------------------------------------------------------
-void
-RaceManager::start()
+void RaceManager::setTrack(const std::string& track)
 {
+    m_tracks.clear();
+    m_tracks.push_back(track);
+}   // setTrack
+
+//-----------------------------------------------------------------------------
+void RaceManager::startNew()
+{
+    if(m_race_mode==RM_GRAND_PRIX)   // GP: get tracks and laps from cup object
+    {
+        m_tracks = m_cup.getTracks();
+        m_num_laps = m_cup.getLaps();
+    }
+    assert(m_player_karts.size() > 0);
+
+    // command line parameters: negative numbers=all karts
+    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
+    if((size_t)m_num_karts < m_player_karts.size()) 
+        m_num_karts = (int)m_player_karts.size();
+
+    // Create the list of all kart names to use
+    // ========================================
+    std::vector<std::string> kart_names;
+    kart_names.resize(m_num_karts);
+    for(unsigned int i = 0; i < m_player_karts.size(); i++)
+    {
+        /*Players position is behind the AI in the first race*/
+        kart_names[m_num_karts-1 - i] = m_player_karts[m_player_karts.size() - 1 - i];
+    }
+    kart_properties_manager->fillWithRandomKarts(kart_names);
+
+    // Create the kart status data structure to keep track of scores, times, ...
+    // ==========================================================================
+    const int num_ai_karts = m_num_karts - (int)m_player_karts.size();
+    m_kart_status.clear();
+    for(int i=0; i<m_num_karts; i++)
+    {
+        // AI karts have -1 as player 
+        bool is_player = i>=num_ai_karts;   // players start at the back
+        m_kart_status.push_back(KartStatus(kart_names[i], i,
+                                           is_player ? i-num_ai_karts : -1 ) );
+    }   // for i<m_num_karts
+
+    // Then start the race with the first track
+    // ========================================
+    m_track_number = 0;
+    startNextRace();
+}   // startNew
+
+//-----------------------------------------------------------------------------
+void RaceManager::startNextRace()
+{
+
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
-    delete m_mode;
 
-    assert(m_players.size() > 0);
-    switch(m_race_mode)
-    {
-    case RaceSetup::RM_GRAND_PRIX:
-        m_mode = new GrandPrixMode(m_players, m_cup, m_difficulty, m_num_karts);
-        break;
-    case RaceSetup::RM_TIME_TRIAL:
-        m_mode = new TimeTrialMode(m_track, m_players[0], m_num_laps);
-        break;
-    case RaceSetup::RM_QUICK_RACE:
-        m_mode = new QuickRaceMode(m_track, m_players, m_difficulty, m_num_karts, m_num_laps);
-        break;
-    default:
-        assert(!"Unknown game mode");
-    }
+    // if subsequent race, sort kart status structure
+    // ==============================================
+    if (m_track_number > 0)
+    {  
+        std::sort(m_kart_status.begin(), m_kart_status.end());//sort karts by increasing scor        
+        //reverse kart order if flagged in stk_config
+        if (stk_config->m_grid_order)
+        {
+            std::reverse(m_kart_status.begin(), m_kart_status.end());
+        } 
+    }   // not first race
 
-    m_mode->start();
+    // the constructor assigns this object to the global
+    // variable world. Admittedly a bit ugly, but simplifies
+    // handling of objects which get created in the constructor
+    // and need world to be defined.
+    new World();
 
     m_active_race = true;
-}
+}   // startNextRace
 
 //-----------------------------------------------------------------------------
-void
-RaceManager::next()
+void RaceManager::next()
 {
-    assert(m_mode);
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
-    m_mode->next();
-}
+    m_track_number++;
+    if(m_track_number<(int)m_tracks.size())
+    {
+        scene->clear();
+        startNextRace();
+    }
+    else
+    {
+        exit_race();
+    }
+}   // next
 
 //-----------------------------------------------------------------------------
-void
-RaceManager::exit_race()
+void RaceManager::exit_race()
 {
-    m_mode->exit_race();
-}
+    // Only display the grand prix result screen if all tracks 
+    // were finished, and not when a race is aborted.
+    if(m_race_mode==RM_GRAND_PRIX && m_track_number==m_tracks.size()) 
+    {
+        unlock_manager->grandPrixFinished();
+        menu_manager->switchToGrandPrixEnding();
+    }
+    else
+    {
+        menu_manager->switchToMainMenu();
+    }
+    scene->clear();
+    delete world;
+    world = 0;
+    m_active_race = false;    
+}   // exit_Race
+
+//-----------------------------------------------------------------------------
+void RaceManager::addKartResult(int kart, int pos, float time)
+{
+    m_kart_status[kart].m_score        += m_score_for_position[pos-1];
+    m_kart_status[kart].m_last_score    = m_score_for_position[pos-1];
+    m_kart_status[kart].m_overall_time += time;
+    m_kart_status[kart].m_last_time     = time;
+}   // addKartResult
+//-----------------------------------------------------------------------------
+void RaceManager::restartRace()
+{
+    // Subtract last score from all karts:
+    for(int i=0; i<m_num_karts; i++)
+    {
+        m_kart_status[i].m_score        -= m_kart_status[i].m_last_score;
+        m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
+    }
+    world->restartRace();
+}   // restartRace
 
 /* EOF */

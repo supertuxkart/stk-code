@@ -19,6 +19,7 @@
 
 #include "collectable.hpp"
 #include "user_config.hpp"
+#include "race_manager.hpp"
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "sound_manager.hpp"
@@ -170,7 +171,7 @@ void Collectable::hitRedHerring(int n)
         // A zipper should not be used during time trial, since it
         // brings too much randomness. So ignore the top 3 elements
         // in time trail, but only the top 2 in any other mode
-        int nIgnore = (world->m_race_setup.m_mode == RaceSetup::RM_TIME_TRIAL) 
+        int nIgnore = (race_manager->getRaceMode()== RaceManager::RM_TIME_TRIAL) 
                     ? 3 : 2;
         newC = (CollectableType)(rand()%(COLLECT_MAX - 1 - nIgnore) + 1);
     }

@@ -26,7 +26,6 @@
 
 #include "highscores.hpp"
 #include "lisp/lisp.hpp"
-#include "race_setup.hpp"
 class HighscoreManager
 {
 public:
@@ -44,14 +43,10 @@ public:
     HighscoreManager();
     ~HighscoreManager();
     void Save();
-    Highscores *getHighscores(const Highscores::HighscoreType highscore_type, 
-                              const int num_karts, const RaceDifficulty difficulty, 
-                              const std::string track, const int number_of_laps);
+    Highscores *getHighscores(const Highscores::HighscoreType highscore_type);
     Highscores *addResult    (const Highscores::HighscoreType highscore_type, 
-                              const int num_karts, const RaceDifficulty difficulty, 
-                              const std::string track, const std::string kart_name, 
-                              const std::string name, const float time,
-                              const int number_of_laps);
+                              const std::string kart_name, 
+                              const std::string name, const float time);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

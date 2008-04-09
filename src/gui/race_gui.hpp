@@ -30,6 +30,7 @@
 #include "player_kart.hpp"
 #include "player.hpp"
 #include "world.hpp"
+#include "race_manager.hpp"
 
 class InputMap;
 class RaceSetup;
@@ -55,10 +56,18 @@ class RaceGUI: public BaseGUI
             m_message    = message; 
             m_font_size  = size;
             m_kart       = kart;
-            m_end_time   = time>=0.0f ? world->getTime()+time : -1.0f;
+            m_end_time   = time>=0.0f 
+                         ? (race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER 
+                            ?world->getTime()-time
+                            :world->getTime()+time )
+                         : -1.0f;
             m_red=red; m_blue=blue; m_green=green; 
         }
-        bool done() const {return m_end_time<0 || world->getTime()>m_end_time;}
+        // in follow leader the clock counts backwards
+        bool done() const {return m_end_time<0 || 
+                           (race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER 
+                                  ? world->getTime()<m_end_time
+                                  : world->getTime()>m_end_time);}
     };
 public:
 
@@ -83,7 +92,7 @@ private:
     AllMessageType m_messages;
 
     /* Display informat on screen */
-    void drawStatusText        (const RaceSetup& raceSetup, const float dt);
+    void drawStatusText        (const float dt);
     void drawEnergyMeter       (Kart *player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );

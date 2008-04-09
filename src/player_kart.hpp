@@ -42,10 +42,10 @@ private:
 
     void steer(float, int);
 public:
-    PlayerKart(const KartProperties *kart_properties,
+    PlayerKart(const std::string& kart_name,
                int position, Player *_player,
                sgCoord init_pos, Camera *cam) :
-        Kart(kart_properties, position, init_pos), m_player(_player),
+        Kart(kart_name, position, init_pos), m_player(_player),
         m_penalty_time(0.0), m_camera(cam)       {reset(); }
 
     int     earlyStartPenalty () {return m_penalty_time>0; }
@@ -59,6 +59,7 @@ public:
     virtual void setPosition  (int p);
 
     int     isPlayerKart      () const {return 1;}
+    Camera* getCamera         () {return m_camera;}
 
     void    reset();
 };

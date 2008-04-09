@@ -53,6 +53,11 @@ NumKarts::NumKarts()
     widget_manager->showWgtRect(WTOK_NUMLAPS);
     widget_manager->showWgtText(WTOK_NUMLAPS);
     m_num_karts = race_manager->getNumKarts();
+    // Follow the leader needs at least three karts
+    if(race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER)
+    {
+        m_num_karts = std::max(3,m_num_karts);
+    }
     snprintf(m_kart_label, MAX_MESSAGE_LENGTH, _("Karts: %d"), m_num_karts);
 	widget_manager->setWgtText(WTOK_NUMLAPS, m_kart_label);
     widget_manager->breakLine();
@@ -80,7 +85,8 @@ NumKarts::NumKarts()
     widget_manager->addWgt(WTOK_CONTINUE, 30, 7);
     widget_manager->showWgtRect(WTOK_CONTINUE);
     widget_manager->showWgtText(WTOK_CONTINUE);
-    if (race_manager->getRaceMode() == RaceSetup::RM_GRAND_PRIX)
+    if (race_manager->getRaceMode() == RaceManager::RM_GRAND_PRIX ||
+        race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER )
         widget_manager->setWgtText(WTOK_CONTINUE, _("Start race"));
     else
         widget_manager->setWgtText(WTOK_CONTINUE, _("Continue"));
@@ -112,7 +118,15 @@ void NumKarts::select()
     switch (WGT)
     {
       case WTOK_LESS:
-        m_num_karts = std::max(race_manager->getNumPlayers(), m_num_karts-1);
+        // Follow the leader needs at least three karts
+        if(race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER)
+        {
+            m_num_karts = std::max(3,m_num_karts-1);
+        }
+        else
+        {
+            m_num_karts = std::max((int)race_manager->getNumPlayers(), m_num_karts-1);
+        }
         snprintf(m_kart_label, MAX_MESSAGE_LENGTH, "Karts: %d", m_num_karts);
 	             widget_manager->setWgtText(WTOK_NUMLAPS, m_kart_label);
         break;
@@ -123,8 +137,9 @@ void NumKarts::select()
         break;
       case WTOK_CONTINUE:
         race_manager->setNumKarts(m_num_karts);
-        if (race_manager->getRaceMode() == RaceSetup::RM_GRAND_PRIX)
-            race_manager->start();
+        if (race_manager->getRaceMode() == RaceManager::RM_GRAND_PRIX  ||
+            race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER  )
+            race_manager->startNew();
         else
             menu_manager->pushMenu(MENUID_NUMLAPS);
         break;

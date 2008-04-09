@@ -98,7 +98,7 @@ RaceResultsGUI::RaceResultsGUI()
         TimeToString(T, sTime);
 
         //This shows position + driver name + time + points earned + total points
-        if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
+        if(race_manager->getRaceMode()==RaceManager::RM_GRAND_PRIX)
         {
             sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
                 KART->getPosition(), KART_NAME.c_str(), sTime,
@@ -159,7 +159,7 @@ RaceResultsGUI::RaceResultsGUI()
         widget_manager->setWgtText( WTOK_CONTINUE, _("Continue"));
     } else
     {
-        if(world->m_race_setup.m_mode==RaceSetup::RM_GRAND_PRIX)
+        if(race_manager->getRaceMode()==RaceManager::RM_GRAND_PRIX)
         {
             widget_manager->setWgtText( WTOK_CONTINUE, _("Continue Grand Prix"));
         }
@@ -173,7 +173,7 @@ RaceResultsGUI::RaceResultsGUI()
         widget_manager->setWgtText( WTOK_RESTART_RACE, _("Race in this track again"));
         widget_manager->breakLine();
 
-        if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
+        if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
         {
             widget_manager->addWgt( WTOK_SETUP_NEW_RACE, 60, 7);
             widget_manager->setWgtText( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
@@ -204,15 +204,17 @@ void RaceResultsGUI::select()
     switch( widget_manager->getSelectedWgt() )
     {
     case WTOK_CONTINUE:
+        // Gets called when:
+        // 1) something was unlocked
+        // 2) a Grand Prix is run
+        // 3) "back to the main menu" otherwise
         world->unpause();
         race_manager->next();
         break;
     case WTOK_RESTART_RACE:
         world->unpause();
         menu_manager->popMenu();
-        // TODO: Maybe let this go through the race_manager for
-        // more flexibility.
-        world->restartRace();
+        race_manager->restartRace();
         break;
     case WTOK_SETUP_NEW_RACE:
         world->unpause();

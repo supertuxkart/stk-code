@@ -69,7 +69,7 @@ RaceMenu::RaceMenu()
     widget_manager->setWgtText(WTOK_RESTART_RACE, _("Restart Race"));
     widget_manager->breakLine();
 
-    if(world->m_race_setup.m_mode==RaceSetup::RM_QUICK_RACE)
+    if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
     {
         widget_manager->addWgt(WTOK_SETUP_NEW_RACE, 30, 7);
         widget_manager->setWgtText(WTOK_SETUP_NEW_RACE, _("Setup New Race"));

@@ -57,6 +57,11 @@ void STKConfig::load(const std::string filename)
         exit(-1);
     }
 
+    if(m_scores.size()==0 || (int)m_scores.size()!=m_max_karts)
+    {
+        fprintf(stderr,"Not or not enough scores defined in stk_config");
+        exit(-1);
+    }
     CHECK_NEG(m_max_karts,               "max-karts"                    );
     CHECK_NEG(m_grid_order,              "grid-order"                   );
 
@@ -101,6 +106,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
     CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
+    CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_zipper_time,               "zipper-time"                );
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
@@ -125,7 +131,7 @@ void STKConfig::init_defaults()
     m_engine_power = m_jump_impulse    = m_brake_factor =
     m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
-    m_wheelie_speed_boost =
+    m_wheelie_speed_boost = 
     m_bomb_time = m_bomb_time_increase= m_anvil_time = 
     m_zipper_time = m_zipper_force = m_zipper_speed_gain = 
     m_shortcut_segments =
@@ -141,6 +147,7 @@ void STKConfig::init_defaults()
     m_max_karts            = -100;
     m_grid_order           = -100;
     m_title_music          = NULL;
+    m_scores.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -167,6 +174,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts                );
     lisp->get("grid-order",                   m_grid_order               );
+    lisp->getVector("scores",                 m_scores);
     std::string title_music;
     lisp->get("title-music",                  title_music                );
     m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));

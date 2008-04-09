@@ -27,9 +27,9 @@
 class AutoKart : public Kart
 {
     public:
-        AutoKart(const KartProperties *kart_properties, int position,
+        AutoKart(const std::string& kart_name, int position,
                  sgCoord init_pos) :
-        Kart(kart_properties, position, init_pos) { Kart::reset(); }
+           Kart(kart_name, position, init_pos) { Kart::reset(); }
 
         int  isPlayerKart() const {return 0;}
 };

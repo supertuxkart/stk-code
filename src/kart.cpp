@@ -21,6 +21,7 @@
 #include <iostream>
 #include <plib/ssg.h>
 
+#include "loader.hpp"
 #include "herring_manager.hpp"
 #include "sound_manager.hpp"
 #include "file_manager.hpp"
@@ -33,6 +34,7 @@
 #include "kart.hpp"
 #include "ssg_help.hpp"
 #include "physics.hpp"
+#include "kart_properties_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
@@ -117,7 +119,7 @@ void KartParticleSystem::particle_delete (int , Particle* )
 {}   // particle_delete
 
 //=============================================================================
-Kart::Kart (const KartProperties* kartProperties_, int position_ ,
+Kart::Kart (const std::string& kart_name, int position_ ,
             sgCoord init_pos) 
     : TerrainInfo(1),
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -129,7 +131,7 @@ Kart::Kart (const KartProperties* kartProperties_, int position_ ,
 #  pragma warning(1:4355)
 #endif
 {
-    m_kart_properties      = kartProperties_;
+    m_kart_properties      = kart_properties_manager->getKart(kart_name);
     m_grid_position        = position_ ;
     m_num_herrings_gobbled = 0;
     m_finished_race        = false;
@@ -434,13 +436,13 @@ void Kart::doLapCounting ()
         // Only increase the lap counter and set the new time if the
         // kart hasn't already finished the race (otherwise the race_gui
         // will begin another countdown).
-        if(m_race_lap+1<=world->m_race_setup.m_num_laps)
+        if(m_race_lap+1<=race_manager->getNumLaps())
         {
             setTimeAtLap(world->getTime());
             m_race_lap++ ;
         }
         // Sound manager makes sure that only the first call switches the music
-        if(m_race_lap==world->m_race_setup.m_num_laps-1)   // last lap started
+        if(m_race_lap==race_manager->getNumLaps()-1)   // last lap started
         {
             sound_manager->switchToFastMusic();
         }
@@ -1083,7 +1085,7 @@ void Kart::loadData()
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
     m_smokepuff = new ssgSimpleState ();
-    m_smokepuff -> setTexture        (file_manager->createTexture ("smoke.rgb", true, true, true)) ;
+    m_smokepuff -> setTexture        (loader->createTexture("smoke.rgb", true, true, true)) ;
     m_smokepuff -> setTranslucent    () ;
     m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
     m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
@@ -1198,7 +1200,7 @@ float Kart::estimateFinishTime  ()
 
     // Finish time is the time needed for the whole race with 
     // the average speed computed above.
-    return world->m_race_setup.m_num_laps*world->m_track->getTrackLength() 
+    return race_manager->getNumLaps()*world->getTrack()->getTrackLength() 
           / average_speed;
 
 }   // estimateFinishTime

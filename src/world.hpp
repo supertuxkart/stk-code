@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <plib/ssg.h>
-#include "race_setup.hpp"
 #include "track.hpp"
 #include "player_kart.hpp"
 #include "physics.hpp"
@@ -43,7 +42,6 @@ public:
     /** resources, this should be put in a separate class or replaced by a smart
      * resource manager
      */
-    RaceSetup m_race_setup;
 
     enum Phase {
         // Game setup, e.g. track loading
@@ -71,7 +69,7 @@ public:
         /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];
 
-                World(const RaceSetup& raceSetup);
+                World();
     virtual    ~World();
     void        update(float delta);
     // Note: GO_PHASE is both: start phase and race phase
@@ -80,23 +78,23 @@ public:
     void        restartRace();
     void        disableRace(); // Put race into limbo phase
 
-    PlayerKart* getPlayerKart(int player)
+    PlayerKart* getPlayerKart(int player) const
     {
-        return (PlayerKart*)m_kart[m_race_setup.m_players[player]];
+        return m_player_karts[player];
     }
     
     
-    Kart* getKart(int kartId)
+    Kart* getKart(int kartId) const
     {
         assert(kartId >= 0 &&
                kartId < int(m_kart.size()));
         return m_kart[kartId];
     }
-    unsigned int  getNumKarts() const         {return (int)m_kart.size();          }
+    unsigned int  getNumKarts()   const {return (int)m_kart.size();                 }
+    unsigned int  getNumPlayers() const {return (unsigned int)m_player_karts.size();}
 
     /** Returns the phase of the game */
     Phase getPhase() const                    { return m_phase;                    }
-    float getGravity() const                  { return m_track->getGravity();      }
     Physics *getPhysics() const               { return m_physics;                  }
     Track *getTrack() const                   { return m_track;                    }
     Kart* getFastestKart() const              { return m_fastest_kart;             }
@@ -110,6 +108,7 @@ public:
 
 private:
     Karts       m_kart;
+    std::vector<PlayerKart*>  m_player_karts;
     float       m_finish_delay_start_time;
     Physics*    m_physics;
     float       m_fastest_lap;
@@ -122,8 +121,8 @@ private:
     void loadTrack();
     void updateRaceStatus(float dt);
     void resetAllKarts();
-    Kart* loadRobot(const KartProperties *kart_properties, int position,
-                 sgCoord init_pos);
+    Kart* loadRobot(const std::string& kart_name, int position,
+                    sgCoord init_pos);
 
 #ifdef HAVE_GHOST_REPLAY
 private:

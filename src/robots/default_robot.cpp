@@ -38,19 +38,19 @@
 #include "constants.hpp"
 #include "scene.hpp"
 #include "world.hpp"
+#include "race_manager.hpp"
 
 #include "default_robot.hpp"
 
-DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
+DefaultRobot::DefaultRobot(const std::string& kart_name,
                            int position, sgCoord init_pos ) :
-    AutoKart( kart_properties, position, init_pos )
+    AutoKart( kart_name, position, init_pos )
 {
-    m_kart_properties      = kart_properties;
     reset();
 
-    switch( world->m_race_setup.m_difficulty )
+    switch( race_manager->getDifficulty())
     {
-    case RD_EASY:
+    case RaceManager::RD_EASY:
         m_wait_for_players = true;
         m_max_handicap_accel = 0.9f;
         m_fallback_tactic = FT_AVOID_TRACK_CRASH;
@@ -60,7 +60,7 @@ DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
         m_max_start_delay = 0.5f;
         m_min_steps = 0;
         break;
-    case RD_MEDIUM:
+    case RaceManager::RD_MEDIUM:
         m_wait_for_players = true;
         m_max_handicap_accel = 0.95f;
         m_fallback_tactic = FT_PARALLEL;
@@ -70,7 +70,7 @@ DefaultRobot::DefaultRobot( const KartProperties *kart_properties,
         m_max_start_delay = 0.4f;
         m_min_steps = 1;
         break;
-    case RD_HARD:
+    case RaceManager::RD_HARD:
         m_wait_for_players = false;
         m_max_handicap_accel = 1.0f;
         m_fallback_tactic = FT_FAREST_POINT;
@@ -383,7 +383,7 @@ void DefaultRobot::handle_acceleration( const float DELTA )
     {
         //Find if any player is ahead of this kart
         bool player_winning = false;
-        for( int i = 0; i < world->m_race_setup.getNumPlayers(); ++i )
+        for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
             if( m_race_position > world->getPlayerKart(i)->getPosition() )
             {
                 player_winning = true;
@@ -909,5 +909,5 @@ void DefaultRobot::find_curve()
     // FIXME: 0.9 is the tire grip - but this was never used. For now this
     // 0.9 is left in place to reproduce the same results and AI behaviour,
     // but this function should be updated to bullet physics
-    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->getGravity() * 0.9f);
+    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->m_track->getGravity() * 0.9f);
 }

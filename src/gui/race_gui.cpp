@@ -167,21 +167,21 @@ RaceGUI::handle(GameAction ga, int value)
 	switch (ga)
 	{
 		case GA_DEBUG_ADD_SPARK:
-			if (world->m_race_setup.getNumPlayers() ==1 )
+			if (world->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_SPARK, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
-			if (world->m_race_setup.getNumPlayers() ==1 )
+			if (world->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_MISSILE, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_HOMING:
-			if (world->m_race_setup.getNumPlayers() ==1 )
+			if (world->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_HOMING, 10000);
@@ -232,7 +232,7 @@ RaceGUI::handle(GameAction ga, int value)
 void RaceGUI::update(float dt)
 {
     assert(world != NULL);
-    drawStatusText(world->m_race_setup, dt);
+    drawStatusText(dt);
     cleanupMessages();
 
     BaseGUI::update( dt );
@@ -365,7 +365,7 @@ void RaceGUI::drawPlayerIcons ()
 
         // draw text
         int red=255, green=255, blue=255;
-        int numLaps = world->m_race_setup.m_num_laps;
+        int numLaps = race_manager->getNumLaps();
         if(lap>=numLaps)
         {  // kart is finished, display in green
             red=0; blue=0;
@@ -745,13 +745,15 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
                       float ratio_x, float ratio_y           )
 {
+    // Don't display laps in follow the leader mode
+    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER) return;
 
     float maxRatio = std::max(ratio_x, ratio_y);
     char str[256];
     offset_x += (int)(120*ratio_x);
     offset_y += (int)(70*maxRatio);
 
-    if ( kart->getLap() >= world->m_race_setup.m_num_laps )
+    if ( kart->getLap() >= race_manager->getNumLaps())
     {
         sprintf(str, _("Finished"));
         font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);
@@ -763,7 +765,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
         offset_y -= (int)(50*ratio_y);
 
         sprintf(str, "%d/%d", kart->getLap()<0?0:kart->getLap()+1, 
-                world->m_race_setup.m_num_laps);
+                race_manager->getNumLaps());
         font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);
     }
 } // drawLap
@@ -856,7 +858,7 @@ void RaceGUI::drawMusicDescription()
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
+void RaceGUI::drawStatusText(const float dt)
 {
     assert(world != NULL);
 
@@ -907,7 +909,7 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
     }
     if(world->isStartPhase())
     {
-        for(int i=0; i<raceSetup.getNumPlayers(); i++)
+        for(unsigned int i=0; i<world->getNumPlayers(); i++)
         {
             if(world->getPlayerKart(i)->earlyStartPenalty())
             {
@@ -920,14 +922,14 @@ void RaceGUI::drawStatusText (const RaceSetup& raceSetup, const float dt)
 
     float split_screen_ratio_x, split_screen_ratio_y;
     split_screen_ratio_x = split_screen_ratio_y = 1.0;
-    if(raceSetup.getNumPlayers() >= 2)
+    if(world->getNumPlayers() >= 2)
         split_screen_ratio_y = 0.5;
-    if(raceSetup.getNumPlayers() >= 3)
+    if(world->getNumPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
     if ( world->isRacePhase() )
     {
-        const int numPlayers = raceSetup.getNumPlayers();
+        const int numPlayers = world->getNumPlayers();
 
         for(int pla = 0; pla < numPlayers; pla++)
         {

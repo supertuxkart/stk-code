@@ -77,15 +77,15 @@ void Difficulty::select()
     switch ( widget_manager->getSelectedWgt())
     {
     case WTOK_EASY:
-        race_manager->setDifficulty(RD_EASY);
+        race_manager->setDifficulty(RaceManager::RD_EASY);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_MEDIUM:
-        race_manager->setDifficulty(RD_MEDIUM);
+        race_manager->setDifficulty(RaceManager::RD_MEDIUM);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_HARD:
-        race_manager->setDifficulty(RD_HARD);
+        race_manager->setDifficulty(RaceManager::RD_HARD);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_QUIT:

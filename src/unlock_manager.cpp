@@ -22,6 +22,7 @@
 #include "challenges/all_tracks.hpp"
 #include "challenges/energy_math_class.hpp"
 #include "challenges/win_gotm_cup.hpp"
+#include "user_config.hpp"
 
 UnlockManager* unlock_manager=0;
 //-----------------------------------------------------------------------------
@@ -90,13 +91,14 @@ void UnlockManager::computeActive()
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
     {
-        // If a challenge is solved, nothing needs to be done
-        // --------------------------------------------------
+        // Changed challenge
+        // -----------------
         if((i->second)->isSolved()) 
         {
-            // The constructor calls computeActive, which actually locks all features, 
-            // so unlock them
-            unlockFeature(i->second);
+            // The constructor calls computeActive, which actually locks 
+            // all features, so unlock the solved ones (and don't try to
+            // save the state, since we are currently reading it)
+            unlockFeature(i->second, /*save*/ false);
             continue;
         }
 
@@ -126,7 +128,9 @@ void UnlockManager::computeActive()
             i->second->setActive();
         }   // if solved
     }   // for i
+    clearUnlocked();
 }   // computeActive
+
 //-----------------------------------------------------------------------------
 /** This is called when a race is finished. Call all active challenges
 */
@@ -162,7 +166,7 @@ void UnlockManager::lockFeature(const std::string& feature)
 }   // lockFeature
 
 //-----------------------------------------------------------------------------
-void UnlockManager::unlockFeature(Challenge* c)
+void UnlockManager::unlockFeature(Challenge* c, bool save)
 {
     const std::string& feature=c->getFeature();
     std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
@@ -177,6 +181,9 @@ void UnlockManager::unlockFeature(Challenge* c)
     // Add to list of recently unlocked features
     m_unlocked_features.push_back(c);
     c->setSolved();  // reset isActive flag
+
+    // Save the new unlock informationxt
+    if(save) user_config->saveConfig();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------

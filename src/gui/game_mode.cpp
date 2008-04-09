@@ -94,15 +94,15 @@ void GameMode::select()
     switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_GP:
-        race_manager->setRaceMode(RaceSetup::RM_GRAND_PRIX);
+        race_manager->setRaceMode(RaceManager::RM_GRAND_PRIX);
         menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
         break;
     case WTOK_QUICKRACE:
-        race_manager->setRaceMode(RaceSetup::RM_QUICK_RACE);
+        race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
         menu_manager->pushMenu(MENUID_DIFFICULTY);
         break;
     case WTOK_TIMETRIAL:
-        race_manager->setRaceMode(RaceSetup::RM_TIME_TRIAL);
+        race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
         menu_manager->pushMenu(MENUID_CHARSEL_P1); //difficulty makes no sense here
         break;
     case WTOK_BACK:
