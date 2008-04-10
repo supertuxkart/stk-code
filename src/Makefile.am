@@ -87,8 +87,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	spark.cpp		   spark.hpp			\
 	history.cpp		   history.hpp	        	\
 	scene.hpp		   scene.cpp			\
-	race_setup.hpp	   	   no_copy.hpp	        	\
-	constants.hpp            				\
+	no_copy.hpp	           constants.hpp 		\
 	translation.cpp		   translation.hpp 		\
 	traffic.cpp 			  	        	\
 	player.hpp		   				\
