@@ -36,9 +36,9 @@ public:
         CM_SIMPLE_REPLAY
     };
 protected:
-    ssgContext *m_context  ;
+    ssgContext *m_context ;
 
-    int    m_which_kart ;
+    int    m_which_kart;
     Mode m_mode;
     float m_last_steer_offset;
     float m_x, m_y, m_w, m_h ;

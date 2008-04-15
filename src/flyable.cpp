@@ -150,10 +150,10 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDist, btVector3 *mi
 {
     btTransform tProjectile=getTrans();
     *minDist = 99999.9f;
-    for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
+    for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
         Kart *kart = world -> getKart(i);
-        if(kart == m_owner) continue;
+        if(kart->isEliminated() || kart == m_owner) continue;
         btTransform t=kart->getTrans();
        
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
@@ -224,9 +224,9 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     world->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
-    for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
+    for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
-        Kart *kart = world -> getKart(i);
+        Kart *kart = world->getKart(i);
         // handle the actual explosion. Set a flag it if was a direct hit.
         kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
     }

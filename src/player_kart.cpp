@@ -219,6 +219,7 @@ void PlayerKart::reset()
     m_controls.jump = false;
     m_penalty_time = 0;
     m_time_last_crash_sound = -10.0f;
+    m_camera->setMode(Camera::CM_NORMAL);   // can be changed if camera was eliminated
     m_camera->setReverseHeading(false);
     Kart::reset();
 }   // reset

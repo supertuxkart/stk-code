@@ -135,7 +135,7 @@ void Scene::draw(float dt)
     for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
     {
         (*i)->update(dt);
-        (*i) -> apply () ;
+        (*i)->apply ();
 
         if(!user_config->m_bullet_debug)
         {
@@ -179,15 +179,16 @@ void Scene::draw(float dt)
             glFrustum(-f, f, -f, f, 1.0, 1000.0);
             
             btVector3 pos;
-            sgCoord *c = world->getKart(world->getNumKarts()-1)->getCoord();
+            sgCoord *c = world->getKart(race_manager->getNumKarts()-1)->getCoord();
             gluLookAt(c->xyz[0], c->xyz[1]-5.f, c->xyz[2]+4,
                       c->xyz[0], c->xyz[1],     c->xyz[2],
                       0.0f, 0.0f, 1.0f);
             glMatrixMode(GL_MODELVIEW);
             
-            for (World::Karts::size_type i = 0 ; i < world->getNumKarts(); ++i)
+            for (World::Karts::size_type i = 0 ; i < race_manager->getNumKarts(); ++i)
             {
-                world->getKart((int)i)->draw();
+                Kart *kart=world->getKart((int)i);
+                if(!kart->isEliminated()) kart->draw();
             }
             world->getPhysics()->draw();
         }   //  bullet_debug

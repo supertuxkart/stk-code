@@ -204,11 +204,23 @@ void RaceManager::exit_race()
 //-----------------------------------------------------------------------------
 void RaceManager::addKartResult(int kart, int pos, float time)
 {
+    // In follow the leader mode, kart 0 does not get any points,
+    // so the position of each kart is actually one better --> decrease pos
+    if(m_race_mode==RM_FOLLOW_LEADER) 
+    {
+        pos--;
+        // If the position is negative (i.e. follow leader and kart on 
+        // position 0) set the score of this kart to the lowest possible
+        // score, since the kart is ahead of the leader
+        if(pos<=0) pos=stk_config->m_max_karts;
+    }
+
     m_kart_status[kart].m_score        += m_score_for_position[pos-1];
     m_kart_status[kart].m_last_score    = m_score_for_position[pos-1];
     m_kart_status[kart].m_overall_time += time;
     m_kart_status[kart].m_last_time     = time;
 }   // addKartResult
+
 //-----------------------------------------------------------------------------
 void RaceManager::restartRace()
 {

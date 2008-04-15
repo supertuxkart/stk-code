@@ -90,8 +90,10 @@ public:
                kartId < int(m_kart.size()));
         return m_kart[kartId];
     }
-    unsigned int  getNumKarts()   const {return (int)m_kart.size();                 }
-    unsigned int  getNumPlayers() const {return (unsigned int)m_player_karts.size();}
+    unsigned int getCurrentNumKarts()  const  { return (int)m_kart.size()-
+                                                          m_eliminated_karts;      }
+    unsigned int getCurrentNumPlayers() const { return (int)m_player_karts.size()-
+                                                        m_eliminated_players;      }
 
     /** Returns the phase of the game */
     Phase getPhase() const                    { return m_phase;                    }
@@ -116,11 +118,15 @@ private:
     Highscores* m_highscores;
     Phase       m_phase;
     float       m_clock;
-
-    void updateRacePosition( int k );
-    void loadTrack();
-    void updateRaceStatus(float dt);
-    void resetAllKarts();
+    int         m_eliminated_karts;    // number of eliminated karts
+    int         m_eliminated_players;  // number of eliminated players
+    std::vector<float>
+                m_leader_intervals;    // time till elimination in follow leader
+    void  updateRacePosition( int k );
+    void  loadTrack();
+    void  updateRaceStatus(float dt);
+    void  resetAllKarts();
+    void  removeKart(int kart_number);
     Kart* loadRobot(const std::string& kart_name, int position,
                     sgCoord init_pos);
 

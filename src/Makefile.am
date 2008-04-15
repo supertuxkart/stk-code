@@ -38,6 +38,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	music_ogg.cpp	   	   music_ogg.hpp            	\
 	music_information.cpp  	   music_information.hpp       	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
+	smoke.cpp		   smoke.hpp			\
 	input.hpp 						\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
@@ -95,6 +96,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	challenges/all_tracks.cpp  challenges/all_tracks.hpp	\
 	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\
 	challenges/win_gotm_cup.cpp challenges/win_gotm_cup.hpp \
+	challenges/race_track_time.cpp challenges/race_track_time.hpp\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\
@@ -118,6 +120,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/game_mode.cpp	   gui/game_mode.hpp	        \
 	gui/difficulty.cpp	   gui/difficulty.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
+	gui/leader_result.cpp	   gui/leader_result.hpp	\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
 	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
 	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \

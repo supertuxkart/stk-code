@@ -854,6 +854,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\smoke.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\sound_manager.cpp"
 				>
 			</File>
@@ -993,6 +997,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\leader_result.cpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\main_menu.cpp"
 					>
 				</File>
@@ -1078,6 +1086,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\energy_math_class.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\race_track_time.cpp"
 					>
 				</File>
 				<File
@@ -1316,6 +1328,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\smoke.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\sound_manager.hpp"
 				>
 			</File>
@@ -1455,6 +1471,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\leader_result.hpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\main_menu.hpp"
 					>
 				</File>
@@ -1540,6 +1560,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\energy_math_class.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\race_track_time.hpp"
 					>
 				</File>
 				<File

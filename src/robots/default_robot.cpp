@@ -556,7 +556,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
     m_crashes.clear();
 
-    const size_t NUM_KARTS = world->getNumKarts();
+    const size_t NUM_KARTS = race_manager->getNumKarts();
 
     //Protection against having vel_normal with nan values
     const btVector3 &VEL = getVelocity();
@@ -581,7 +581,8 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                if(world->getKart(j) == this) continue;
+                const Kart* kart=world->getKart(j);
+                if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
 
                 kart_distance = sgDistanceVec2( step_coord,
                     world->getKart(j)->getCoord()->xyz );

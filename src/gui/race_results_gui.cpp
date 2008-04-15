@@ -74,7 +74,7 @@ RaceResultsGUI::RaceResultsGUI()
 
 
     const unsigned int MAX_STR_LEN = 60;
-    const unsigned int NUM_KARTS = world->getNumKarts();
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
 
     int*  order = new int [NUM_KARTS];
     m_score = new char[NUM_KARTS * MAX_STR_LEN];
@@ -82,7 +82,7 @@ RaceResultsGUI::RaceResultsGUI()
 
     for(unsigned int i=0; i < NUM_KARTS; i++)
     {
-        Kart *k = world->getKart(i);
+        Kart *k = world->getKart(i);             // Display even for eliminated karts!
         order[k->getPosition()-1] = i;
         const std::string& s = k->getName();
         unsigned int l = (unsigned int)s.size();

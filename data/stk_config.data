@@ -21,6 +21,7 @@
  (parachute-done-fraction    0.7 )  ;; fraction of speed when lost will detach parachute
  (bomb-time                 30.0 )  ;; time till a bomb explodes
  (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
+ (leader-intervals          30 20 10)  ;; Time till a kart is removed in follow leader mode
  (anvil-time                 2.0 )  ;; time an anvil is active
  (zipper-time                3.0 )  ;; time a zipper is active
  (zipper-force             800.0 )  ;; additional zipper force

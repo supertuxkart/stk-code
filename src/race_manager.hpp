@@ -87,6 +87,12 @@ private:
     unsigned int                     m_num_finished_players;
 
     void startNextRace();    // start a next race
+
+    friend bool operator< (const KartStatus& left, const KartStatus& right)
+    {
+        return (left.m_score < right.m_score);
+    }
+
 public:
     bool                             m_active_race; //True if there is a race
 
@@ -119,10 +125,12 @@ public:
                                              { return m_kart_status[kart].m_ident;}
     const std::string& getHerringStyle() const 
                                              { return m_cup.getHerringStyle();   }
-    int     getKartScore(int kart)     const { return m_kart_status[kart].m_score;}
-    int     getPositionScore(int p)    const { return m_score_for_position[p-1];}
-    double  getOverallTime(int kart)   const {return m_kart_status[kart].m_overall_time;}
+    int     getKartScore(int krt)      const { return m_kart_status[krt].m_score;}
+    int     getPositionScore(int p)    const { return m_score_for_position[p-1]; }
+    double  getOverallTime(int kart)   const { return m_kart_status[kart].m_overall_time;}
     bool    isEliminated(int kart)     const { return m_kart_status[kart].m_is_eliminated;}
+    bool    raceHasLaps()              const { return m_race_mode!=RM_FOLLOW_LEADER;}
+    void    eliminate(int kart)              { m_kart_status[kart].m_is_eliminated=true;}
     void addFinishedKarts(int num)           { m_num_finished_karts += num;      }
     void PlayerFinishes()                    { m_num_finished_players++;         }
     int  allPlayerFinished() const {return m_num_finished_players==m_player_karts.size();}
@@ -136,13 +144,6 @@ public:
     void next();             // start the next race or go back to the start screen
     void restartRace();      // restart same race again
     void exit_race();        // exit a race (and don't start the next one)
-
-    friend bool operator< (const KartStatus& left, const KartStatus& right)
-    {
-        return (left.m_score < right.m_score);
-    }
-
-
 };
 
 extern RaceManager *race_manager;

@@ -20,6 +20,7 @@
 #include <math.h>
 #include <iostream>
 #include <plib/ssg.h>
+#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
 #include "loader.hpp"
 #include "herring_manager.hpp"
@@ -38,87 +39,12 @@
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
-#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+#include "smoke.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
 #endif
 
-KartParticleSystem::KartParticleSystem(Kart* kart_,
-                                       int num, float _create_rate, int _ttf,
-                                       float sz, float bsphere_size)
-        : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
-        m_kart(kart_)
-{
-    getBSphere () -> setCenter ( 0, 0, 0 ) ;
-    getBSphere () -> setRadius ( 1000.0f ) ;
-    dirtyBSphere();
-}   // KartParticleSystem
 
-//-----------------------------------------------------------------------------
-void KartParticleSystem::update ( float t )
-{
-#if 0
-    std::cout << "BSphere: r:" << getBSphere()->radius
-    << " ("  << getBSphere()->center[0]
-    << ", "  << getBSphere()->center[1]
-    << ", "  << getBSphere()->center[2]
-    << ")"
-    << std::endl;
-#endif
-    getBSphere () -> setRadius ( 1000.0f ) ;
-    ParticleSystem::update(t);
-}   // update
-
-//-----------------------------------------------------------------------------
-void KartParticleSystem::particle_create(int, Particle *p)
-{
-    sgSetVec4 ( p -> m_col, 1, 1, 1, 1 ) ; /* initially white */
-    sgSetVec3 ( p -> m_pos, 0, 0, 0 ) ;    /* start off on the ground */
-    sgSetVec3 ( p -> m_vel, 0, 0, 0 ) ;
-    sgSetVec3 ( p -> m_acc, 0, 0, 2.0f ) ; /* Gravity */
-    p -> m_size = .5f;
-    p -> m_time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
-
-    const sgCoord* POS = m_kart->getCoord();
-    const btVector3 VEL = m_kart->getVelocity();
-
-    const float X_DIRECTION = sgCos (POS->hpr[0] - 90.0f); // Point at the rear
-    const float Y_DIRECTION = sgSin (POS->hpr[0] - 90.0f); // Point at the rear
-
-    sgCopyVec3 (p->m_pos, POS->xyz);
-
-    p->m_pos[0] += X_DIRECTION * 0.7f;
-    p->m_pos[1] += Y_DIRECTION * 0.7f;
-
-    const float ABS_VEL = sqrt((VEL.getX() * VEL.getX()) + (VEL.getY() * VEL.getY()));
-
-    p->m_vel[0] = X_DIRECTION * -ABS_VEL/2;
-    p->m_vel[1] = Y_DIRECTION * -ABS_VEL/2;
-
-    p->m_vel[0] += sgCos ((float)(rand()%180));
-    p->m_vel[1] += sgSin ((float)(rand()%180));
-    p->m_vel[2] += sgSin ((float)(rand()%100));
-
-    getBSphere () -> setCenter ( POS->xyz[0], POS->xyz[1], POS->xyz[2] ) ;
-}   // particle_create
-
-//-----------------------------------------------------------------------------
-void KartParticleSystem::particle_update (float delta, int,
-        Particle * particle)
-{
-    particle->m_size    += delta*2.0f;
-    particle->m_col[3]  -= delta * 2.0f;
-
-    particle->m_pos[0] += particle->m_vel[0] * delta;
-    particle->m_pos[1] += particle->m_vel[1] * delta;
-    particle->m_pos[2] += particle->m_vel[2] * delta;
-}  // particle_update
-
-//-----------------------------------------------------------------------------
-void KartParticleSystem::particle_delete (int , Particle* )
-{}   // particle_delete
-
-//=============================================================================
 Kart::Kart (const std::string& kart_name, int position_ ,
             sgCoord init_pos) 
     : TerrainInfo(1),
@@ -134,6 +60,7 @@ Kart::Kart (const std::string& kart_name, int position_ ,
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
     m_grid_position        = position_ ;
     m_num_herrings_gobbled = 0;
+    m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_prev_accel           = 0.0f;
@@ -326,6 +253,17 @@ Kart::~Kart()
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
+void Kart::eliminate()
+{
+    m_eliminated = true;
+    world->getPhysics()->removeKart(this);
+
+    // make the kart invisible by placing it way under the track
+    sgVec3 hell; hell[0]=0.0f; hell[1]=0.0f; hell[2] = -10000.0f;
+    getModelTransform()->setTransform(hell);
+}   // eliminate
+
+//-----------------------------------------------------------------------------
 /** Returns true if the kart is 'resting'
  *
  * Returns true if the kart is 'resting', i.e. (nearly) not moving.
@@ -352,6 +290,10 @@ void Kart::adjustSpeedWeight(float f)
 //-----------------------------------------------------------------------------
 void Kart::reset()
 {
+    if(m_eliminated)
+    {
+        world->getPhysics()->addKart(this, m_vehicle);
+    }
     Moveable::reset();
 
     m_attachment.clear();
@@ -363,6 +305,7 @@ void Kart::reset()
     m_shortcut_sector      = Track::UNKNOWN_SECTOR;
     m_race_position        = 9;
     m_finished_race        = false;
+    m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
     m_num_herrings_gobbled = 0;
@@ -460,7 +403,8 @@ void Kart::doLapCounting ()
             	time_per_lap=world->getTime()-m_lap_start_time;
             }
                         
-            if(time_per_lap < world->getFastestLapTime() )
+            if(time_per_lap < world->getFastestLapTime() &&
+                race_manager->raceHasLaps())
             {
                 world->setFastestLap(this, time_per_lap);
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
@@ -490,6 +434,13 @@ void Kart::doLapCounting ()
         // Prevent cheating by setting time to a negative number, indicating
         // that the line wasn't crossed properly.
         m_lap_start_time = -1.0f;
+    } else
+    {   // Switch to fast music in case of follow the leader when only 3 karts are left
+        if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER &&
+            world->getCurrentNumKarts()==3)  
+        {
+            sound_manager->switchToFastMusic();
+        }
     }
 }   // doLapCounting
 
@@ -1118,7 +1069,7 @@ void Kart::loadData()
 
     // Attach Particle System
     //JH  sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
-    m_smoke_system = new KartParticleSystem(this, 50, 100.0f, true, 0.35f, 1000);
+    m_smoke_system = new Smoke(this, 50, 100.0f, true, 0.35f, 1000);
     m_smoke_system -> init(5);
     //JH      m_smoke_system -> setState (getMaterial ("smoke.png")-> getState() );
     //m_smoke_system -> setState ( m_smokepuff ) ;

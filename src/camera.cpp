@@ -83,9 +83,11 @@ void Camera::setScreenPosition ( int numPlayers, int pos )
 Camera::Camera(int numPlayers, int which)
   : m_reverse(false)
 {
-    m_which_kart = which;   // Just for now
-    m_mode = CM_NORMAL;
-    m_context = new ssgContext ;
+    m_mode       = CM_NORMAL;
+    m_context    = new ssgContext ;
+    m_which_kart = which;
+    if(m_which_kart >= int(race_manager->getNumKarts()) || m_which_kart < 0 )
+        m_which_kart =0;
 
     // FIXME: clipping should be configurable for slower machines
     const Track* track = world->getTrack();
@@ -101,7 +103,10 @@ Camera::Camera(int numPlayers, int which)
 //-----------------------------------------------------------------------------
 void Camera::setMode(Mode mode)
 {
-    m_mode = mode;
+    m_mode      = mode;
+    m_LastPitch = 0.0f;
+    if(m_mode==CM_LEADER_MODE)
+        setReverseHeading(true);
 }   // setMode
 
 //-----------------------------------------------------------------------------
@@ -122,32 +127,44 @@ void Camera::reset()
 //-----------------------------------------------------------------------------
 void Camera::update (float dt)
 {
-    // Update the camera
-    if ( m_which_kart >= int(world->getNumKarts()) || m_which_kart < 0 ) m_which_kart = 0 ;
-
     sgCoord kartcoord;
-    const Kart *kart=world->getPlayerKart(m_which_kart);
-    sgCopyCoord(&kartcoord, world->getPlayerKart(m_which_kart)->getCoord());
-
-    // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
-    kartcoord.hpr[1]=RAD_TO_DEGREE( kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
-    kartcoord.hpr[2] = 0;
-    // Only adjust the pitch if it's not the first frame (which is indicated by having
-    // dt=0). Otherwise the camera will change pitch during ready-set-go.
-    if(dt>0)
+    const Kart *kart;
+    // Update the camera
+    if(m_mode==CM_LEADER_MODE)
     {
-        // If the terrain pitch is 'significantly' different from the camera angle,
-        // start adjusting the camera. This helps with steep declines, where
-        // otherwise the track is not visible anymore.
-        if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
-            kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
-        }
-        else
-        {
-            kartcoord.hpr[1]=m_LastPitch;
-        }
+        kart=world->getKart(0);
+        sgCopyCoord(&kartcoord, kart->getCoord());
+        // This gives a camera slightly above the kart, facing downwards
+        // But this works only when the karts are within a certain distance
+        // otherwise only the track is seen :(
+        // kartcoord.xyz[2]+=3.0f;  // raise camera
+        kartcoord.hpr[1]+=17;       // face downwards
     }
-    m_LastPitch = kartcoord.hpr[1];
+    else
+    {
+        kart=world->getPlayerKart(m_which_kart);
+        sgCopyCoord(&kartcoord, kart->getCoord());
+
+        // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
+        kartcoord.hpr[1]=RAD_TO_DEGREE( kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
+        kartcoord.hpr[2] = 0;
+        // Only adjust the pitch if it's not the first frame (which is indicated by having
+        // dt=0). Otherwise the camera will change pitch during ready-set-go.
+        if(dt>0)
+        {
+            // If the terrain pitch is 'significantly' different from the camera angle,
+            // start adjusting the camera. This helps with steep declines, where
+            // otherwise the track is not visible anymore.
+            if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
+                kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
+            }
+            else
+            {
+                kartcoord.hpr[1]=m_LastPitch;
+            }
+        }   //  dt>0.0
+        m_LastPitch = kartcoord.hpr[1];
+    }   // m_mode!=CM_LEADER_MODE
 
     if (m_mode == CM_SIMPLE_REPLAY)
         kartcoord.hpr[0] = 0;
@@ -180,7 +197,7 @@ void Camera::update (float dt)
     }
     else if (m_mode == CM_NO_FAKE_DRIFT)
     {
-        const float STEER_OFFSET = world->getPlayerKart(m_which_kart)->getSteerAngle()*-10.0f;
+        const float STEER_OFFSET = kart->getSteerAngle()*-10.0f;
 
         sgMat4 cam_rot;
         sgMat4 tmp;

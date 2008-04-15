@@ -31,6 +31,7 @@ enum WidgetTokens
     WTOK_GP,
     WTOK_QUICKRACE,
     WTOK_TIMETRIAL,
+    WTOK_FOLLOW_LEADER,
     WTOK_EMPTY,
     WTOK_BACK
 };
@@ -68,7 +69,16 @@ GameMode::GameMode()
         widget_manager->addWgt(WTOK_TIMETRIAL, 50, 7);
         widget_manager->setWgtText( WTOK_TIMETRIAL, _("Time Trial"));
     }
-
+    widget_manager->addWgt(WTOK_FOLLOW_LEADER, 50, 7);
+    if(unlock_manager->isLocked("followleader"))
+    {
+        widget_manager->setWgtText( WTOK_FOLLOW_LEADER, "???");
+        widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER);
+    }
+    else
+    {
+        widget_manager->setWgtText( WTOK_FOLLOW_LEADER, _("Follow the Leader"));
+    }
     widget_manager->addWgt(WTOK_EMPTY, 50, 7);
     widget_manager->hideWgtRect( WTOK_EMPTY );
     widget_manager->hideWgtText( WTOK_EMPTY );
@@ -99,6 +109,10 @@ void GameMode::select()
         break;
     case WTOK_QUICKRACE:
         race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        break;
+    case WTOK_FOLLOW_LEADER:
+        race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
         menu_manager->pushMenu(MENUID_DIFFICULTY);
         break;
     case WTOK_TIMETRIAL:

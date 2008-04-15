@@ -167,21 +167,21 @@ RaceGUI::handle(GameAction ga, int value)
 	switch (ga)
 	{
 		case GA_DEBUG_ADD_SPARK:
-			if (world->getNumPlayers() ==1 )
+			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_SPARK, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
-			if (world->getNumPlayers() ==1 )
+			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_MISSILE, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_HOMING:
-			if (world->getNumPlayers() ==1 )
+			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
 				kart->setCollectable(COLLECT_HOMING, 10000);
@@ -289,11 +289,12 @@ void RaceGUI::drawMap ()
 
     glBegin ( GL_QUADS ) ;
 
-    for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
+    for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
         sgCoord *c ;
 
         Kart* kart = world->getKart(i);
+        if(kart->isEliminated()) continue;   // don't draw eliminated kart
         glColor3fv ( *kart->getColor());
         c          = kart->getCoord () ;
 
@@ -336,9 +337,10 @@ void RaceGUI::drawPlayerIcons ()
     // Find the best time for the lap. We can't simply use
     // the time of the kart at position 1, since the kart
     // might have been overtaken by now
-    for(unsigned int i = 0; i < world->getNumKarts() ; i++)
+    for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
     {
         Kart* kart     = world->getKart(i);
+        if(kart->isEliminated()) continue;
         float lap_time = kart->getTimeAtLap();
         int laps       = kart->getLap();
 
@@ -355,9 +357,10 @@ void RaceGUI::drawPlayerIcons ()
     }   // for i<getNumKarts
 
     int bFirst                 = 1;
-    for(unsigned int i = 0; i < world->getNumKarts() ; i++)
+    for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
     {
         Kart* kart   = world->getKart(i);
+        if(kart->isEliminated()) continue;
         int position = kart->getPosition();
         int lap      = kart->getLap();
 
@@ -395,8 +398,9 @@ void RaceGUI::drawPlayerIcons ()
                 str[0]='+'; str[1]=0;
                 TimeToString(timeBehind, str+1);
             }
-            font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
-                                   red, green, blue);
+            if(race_manager->raceHasLaps())
+                font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
+                                       red, green, blue);
         }
 
         glEnable(GL_CULL_FACE);
@@ -746,7 +750,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
                       float ratio_x, float ratio_y           )
 {
     // Don't display laps in follow the leader mode
-    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER) return;
+    if(!race_manager->raceHasLaps()) return;
 
     float maxRatio = std::max(ratio_x, ratio_y);
     char str[256];
@@ -909,7 +913,7 @@ void RaceGUI::drawStatusText(const float dt)
     }
     if(world->isStartPhase())
     {
-        for(unsigned int i=0; i<world->getNumPlayers(); i++)
+        for(unsigned int i=0; i<race_manager->getNumPlayers(); i++)
         {
             if(world->getPlayerKart(i)->earlyStartPenalty())
             {
@@ -922,14 +926,14 @@ void RaceGUI::drawStatusText(const float dt)
 
     float split_screen_ratio_x, split_screen_ratio_y;
     split_screen_ratio_x = split_screen_ratio_y = 1.0;
-    if(world->getNumPlayers() >= 2)
+    if(race_manager->getNumPlayers() >= 2)
         split_screen_ratio_y = 0.5;
-    if(world->getNumPlayers() >= 3)
+    if(race_manager->getNumPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
     if ( world->isRacePhase() )
     {
-        const int numPlayers = world->getNumPlayers();
+        const int numPlayers = race_manager->getNumPlayers();
 
         for(int pla = 0; pla < numPlayers; pla++)
         {

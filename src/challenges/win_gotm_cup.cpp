@@ -39,10 +39,10 @@ bool WinGOTMCup::grandPrixFinished()
         race_manager->getNumKarts()   < 4                           ||
         race_manager->getNumPlayers() > 1) return false;
     // Check if the player was number one:
-    for(int i=0; i<(int)world->getNumKarts(); i++)
+    for(int i=0; i<(int)race_manager->getNumKarts(); i++)
     {
         const Kart* k=world->getKart(i);
-        if(k->isPlayerKart()) return  k->getPosition()==1;
+        if(k->isPlayerKart() && !k->isEliminated()) return  k->getPosition()==1;
     }
     return false;
 }   // raceFinished

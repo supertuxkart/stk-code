@@ -46,6 +46,8 @@ public:
     float m_explosion_impulse_objects;// impulse of explosion on moving objects, e.g. road cones, ...
     int   m_max_karts;               // maximum number of karts
     int   m_grid_order;              // whether grand prix grid is in point or reverse point order
+    std::vector<float> 
+          m_leader_intervals;        // interval in follow the leader till last kart is reomved
     std::vector<int> m_scores;       // scores depending on position
 
     MusicInformation* m_title_music;  // filename of the title music to play

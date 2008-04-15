@@ -25,7 +25,6 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "moveable.hpp"
-#include "particle_system.hpp"
 #include "kart_properties.hpp"
 #include "attachment.hpp"
 #include "collectable.hpp"
@@ -46,24 +45,9 @@ struct KartControl
 };
 
 class SkidMark;
-class Kart;
 class Herring;
+class Smoke;
 
-class KartParticleSystem : public ParticleSystem
-{
-private:
-    Kart* m_kart;
-
-public:
-    KartParticleSystem          (Kart* kart, int num, float _create_rate,
-                                 int _turn_to_face, float sz, float bsphere_size);
-    virtual void update         (float t                                        );
-    virtual void particle_create(int index, Particle* p                         );
-    virtual void particle_update(float deltaTime, int index, Particle *p        );
-    virtual void particle_delete(int index, Particle* p                         );
-};
-
-// =============================================================================
 class Kart : public TerrainInfo, public Moveable
 {
 protected:
@@ -105,7 +89,7 @@ private:
     int                 m_num_herrings_gobbled;
     ssgSimpleState*     m_smokepuff;
     // don't delete the following 2 vars (they're kids in the hirarchy)
-    KartParticleSystem* m_smoke_system;
+    Smoke              *m_smoke_system;
     ssgTransform*       m_exhaust_pipe;
 
     float               m_wheel_rotation;
@@ -124,6 +108,7 @@ private:
 
     float               m_speed;
     bool                m_rescue;
+    bool                m_eliminated;
 
 protected:
     float               m_rescue_pitch, m_rescue_roll;
@@ -217,6 +202,8 @@ public:
     float          handleWheelie    (float dt);
     float          getActualWheelForce();
     bool           isOnGround       () const;
+    bool           isEliminated     () const {return m_eliminated;}
+    void           eliminate        ();
     bool           isRescue         () const {return m_rescue;}
     void           resetBrakes      ();
     void           adjustSpeedWeight(float f);

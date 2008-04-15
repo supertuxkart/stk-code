@@ -74,17 +74,17 @@ void Collectable::use()
     case COLLECT_ANVIL:
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
-        for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
+        for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
         {
-            if(world->getKart(i) == m_owner) continue;
-            if(world->getKart(i)->getPosition() == 1)
+            Kart *kart=world->getKart(i);
+            if(kart->isEliminated()) continue;
+            if(kart == m_owner) continue;
+            if(kart->getPosition() == 1)
             {
-                world->getKart(i)->
-                attach(ATTACH_ANVIL, stk_config->m_anvil_time);
-                
-                world->getKart(i)->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
+                kart->attach(ATTACH_ANVIL, stk_config->m_anvil_time);
+                kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
 
-                if(world->getKart(i)->isPlayerKart())
+                if(kart->isPlayerKart())
                     sound_manager->playSfx(SOUND_USE_ANVIL);
                 break;
             }
@@ -98,16 +98,15 @@ void Collectable::use()
             //Attach a parachutte(that last as twice as the
             //one from the bananas) to all the karts that
             //are in front of this one.
-            for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
+            for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
             {
-                if(world->getKart(i) == m_owner) continue;
-                if(m_owner->getPosition() > world->
-                   getKart(i)->getPosition())
+                Kart *kart=world->getKart(i);
+                if(kart->isEliminated() || kart== m_owner) continue;
+                if(m_owner->getPosition() > kart->getPosition())
                 {
-                    world->getKart(i)->attach(
-                        ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
+                    kart->attach(ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
 
-                    if(world->getKart(i)->isPlayerKart())
+                    if(kart->isPlayerKart())
                         player_affected = true;
                 }
 
@@ -137,18 +136,18 @@ void Collectable::hitRedHerring(int n)
 
     if(m_owner->getPosition() != 1 && m_type == COLLECT_NOTHING)
     {
-        const int SPECIAL_PROB = (int)(15.0 / ((float)world->getNumKarts() /
+        const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
                                          (float)m_owner->getPosition()));
         const int RAND_NUM = rand()%100;
         if(RAND_NUM <= SPECIAL_PROB)
         {
             //If the driver in the first position has finished, give the driver
             //the parachute.
-            for(unsigned int i=0; i < world->getNumKarts(); ++i)
+            for(unsigned int i=0; i < race_manager->getNumKarts(); ++i)
             {
-                if(world->getKart(i) == m_owner) continue;
-                if(world->getKart(i)->getPosition() == 1 && world->getKart(i)->
-                   raceIsFinished())
+                Kart *kart = world->getKart(i);
+                if(kart->isEliminated() || kart == m_owner) continue;
+                if(kart->getPosition() == 1 && kart->raceIsFinished())
                 {
                     m_type = COLLECT_PARACHUTE;
                     m_number = 1;

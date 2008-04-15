@@ -22,6 +22,7 @@
 #include "challenges/all_tracks.hpp"
 #include "challenges/energy_math_class.hpp"
 #include "challenges/win_gotm_cup.hpp"
+#include "challenges/race_track_time.hpp"
 #include "user_config.hpp"
 
 UnlockManager* unlock_manager=0;
@@ -39,6 +40,7 @@ UnlockManager::UnlockManager()
     c=new AllTracks();       m_all_challenges[c->getId()]=c;
     c=new EnergyMathClass(); m_all_challenges[c->getId()]=c;
     c=new WinGOTMCup();      m_all_challenges[c->getId()]=c;
+    c=new RaceTrackTime();   m_all_challenges[c->getId()]=c;
 
     computeActive();
 }   // UnlockManager

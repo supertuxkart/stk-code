@@ -62,6 +62,11 @@ void STKConfig::load(const std::string filename)
         fprintf(stderr,"Not or not enough scores defined in stk_config");
         exit(-1);
     }
+    if(m_leader_intervals.size()==0)
+    {
+        fprintf(stderr,"No follow leader interval(s) defined in stk_config");
+        exit(-1);
+    }
     CHECK_NEG(m_max_karts,               "max-karts"                    );
     CHECK_NEG(m_grid_order,              "grid-order"                   );
 
@@ -148,6 +153,7 @@ void STKConfig::init_defaults()
     m_grid_order           = -100;
     m_title_music          = NULL;
     m_scores.clear();
+    m_leader_intervals.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -166,6 +172,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("jump-impulse",                 m_jump_impulse             );
     lisp->get("bomb-time",                    m_bomb_time                );
     lisp->get("bomb-time-increase",           m_bomb_time_increase       );
+    lisp->getVector("leader-intervals",       m_leader_intervals         );
     lisp->get("anvil-time",                   m_anvil_time               );
     lisp->get("zipper-time",                  m_zipper_time              );
     lisp->get("zipper-force",                 m_zipper_force             );

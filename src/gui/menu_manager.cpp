@@ -54,6 +54,7 @@
 #include "widget_manager.hpp"
 #include "challenges_menu.hpp"
 #include "feature_unlocked.hpp"
+#include "leader_result.hpp"
 
 using namespace std;
 
@@ -186,6 +187,9 @@ void MenuManager::update()
                 break;
             case MENUID_RACERESULT:
                 m_current_menu= new RaceResultsGUI();
+                break;
+            case MENUID_LEADERRESULT:
+                m_current_menu= new LeaderResult();
                 break;
             case MENUID_GRANDPRIXEND:
                 m_current_menu= new GrandPrixEnd();
