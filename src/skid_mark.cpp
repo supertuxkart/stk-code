@@ -180,6 +180,7 @@ void SkidMark::SkidMarkPos::add(sgCoord* coord)
     sgVec4 color;
     sgSetVec4(color, 0.07f, 0.07f, 0.07f, 0.8f);
     colours->add(color); colours->add(color);
+    this->dirtyBSphere();
 }   // add
 
 //-----------------------------------------------------------------------------
