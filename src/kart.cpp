@@ -63,7 +63,6 @@ Kart::Kart (const std::string& kart_name, int position_ ,
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
-    m_prev_accel           = 0.0f;
     m_wheelie_angle        = 0.0f;
     m_smokepuff            = NULL;
     m_smoke_system         = NULL;
@@ -524,7 +523,7 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
-void Kart::update (float dt)
+void Kart::update(float dt)
 {
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
@@ -886,11 +885,14 @@ void Kart::endRescue()
 //-----------------------------------------------------------------------------
 void Kart::processSkidMarks()
 {
-    return;
     assert(m_skidmark_left);
     assert(m_skidmark_right);
-
-    if(m_skid_rear || m_skid_front)
+    const float threshold=0.3f;
+    bool skid_front = m_vehicle->getWheelInfo(0).m_skidInfo < threshold ||
+                      m_vehicle->getWheelInfo(1).m_skidInfo < threshold;
+    bool skid_rear  = m_vehicle->getWheelInfo(2).m_skidInfo < threshold ||
+                      m_vehicle->getWheelInfo(3).m_skidInfo < threshold;
+    if(skid_rear || skid_front)
     {
         if(isOnGround())
         {
@@ -959,7 +961,7 @@ void Kart::processSkidMarks()
         }   // on ground
     }
     else
-    {   // !m_skid_rear && !m_skid_front
+    {   // !skid_rear && _skid_front
         if(m_skidmark_left)
             if(m_skidmark_left->wasSkidMarking())
             {

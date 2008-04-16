@@ -65,9 +65,6 @@ protected:
     sgVec2       m_last_track_coords;
     sgVec3       m_curr_track_coords;
     sgVec3       m_velocity_wc;        // velocity in world coordinates
-    float        m_prev_accel;         // acceleration at previous time step
-    bool         m_skid_front;         // true if front tires are skidding
-    bool         m_skid_rear;          // true if rear tires are skidding
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
