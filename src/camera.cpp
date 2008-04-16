@@ -137,8 +137,8 @@ void Camera::update (float dt)
         // This gives a camera slightly above the kart, facing downwards
         // But this works only when the karts are within a certain distance
         // otherwise only the track is seen :(
-        // kartcoord.xyz[2]+=3.0f;  // raise camera
-        kartcoord.hpr[1]+=17;       // face downwards
+        // kartcoord.xyz[2]+=3.0f;     // raise camera
+        // kartcoord.hpr[1]+=17;       // face downwards
     }
     else
     {
