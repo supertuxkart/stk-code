@@ -517,6 +517,7 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
+    if (user_config->m_crashed) user_config->m_crashed = false;
     user_config->saveConfig();
     delete inputDriver;
     
