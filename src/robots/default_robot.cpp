@@ -132,7 +132,6 @@ void DefaultRobot::handle_braking()
         getPosition()<world->getKart(0)->getPosition()            &&
         getInitialPosition()>1                                       )
     {
-        printf("kart %s: braking",this->getName().c_str());
         m_controls.brake = true;
         return;
     }
