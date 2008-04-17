@@ -129,7 +129,7 @@ public:
     int     getPositionScore(int p)    const { return m_score_for_position[p-1]; }
     double  getOverallTime(int kart)   const { return m_kart_status[kart].m_overall_time;}
     bool    isEliminated(int kart)     const { return m_kart_status[kart].m_is_eliminated;}
-    bool    raceHasLaps()              const { return m_race_mode!=RM_FOLLOW_LEADER;}
+    bool    raceHasLaps()              const { return true;}
     void    eliminate(int kart)              { m_kart_status[kart].m_is_eliminated=true;}
     void addFinishedKarts(int num)           { m_num_finished_karts += num;      }
     void PlayerFinishes()                    { m_num_finished_players++;         }

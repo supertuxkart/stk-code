@@ -55,7 +55,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	highscore_manager.cpp	   highscore_manager.hpp	\
 	unlock_manager.cpp	   unlock_manager.hpp		\
 	file_manager.cpp           file_manager.hpp           	\
-	loader.cpp		   loadre.hpp			\
+	loader.cpp		   loader.hpp			\
 	race_manager.cpp	   race_manager.hpp          	\
 	string_utils.cpp	   string_utils.hpp          	\
 	track_manager.cpp	   track_manager.hpp         	\

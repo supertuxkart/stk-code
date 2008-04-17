@@ -400,16 +400,25 @@ AC_SUBST(BULLETTREE)
 dnl ================
 dnl Create makefiles
 dnl ================
-AC_CONFIG_FILES([                 \
- Makefile                         \
- data/Makefile                    \
- doc/Makefile                     \
- doc/players_manual/Makefile      \
- src/Makefile                     \
- src/robots/Makefile              \
- src/bullet/Makefile              \
- src/bullet/src/Makefile          \
- src/bullet/Demos/OpenGL/Makefile \
+AC_CONFIG_FILES([                   \
+ Makefile                           \
+ data/Makefile                      \
+ data/fonts/Makefile                \
+ data/herrings/Makefile             \
+ data/karts/Makefile                \
+ data/models/Makefile               \
+ data/music/Makefile                \
+ data/po/Makefile                   \
+ data/sfx/Makefile                  \
+ data/textures/Makefile             \
+ data/tracks/Makefile               \
+ doc/Makefile                       \
+ doc/players_manual/Makefile        \
+ src/Makefile                       \
+ src/robots/Makefile                \
+ src/bullet/Makefile                \
+ src/bullet/src/Makefile            \
+ src/bullet/Demos/OpenGL/Makefile   \
 ])
 AC_OUTPUT
 echo -e $SUMMARY
