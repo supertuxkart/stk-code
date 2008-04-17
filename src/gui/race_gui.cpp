@@ -381,8 +381,8 @@ void RaceGUI::drawPlayerIcons ()
         glDisable(GL_CULL_FACE);
 
         if(laps_of_leader>0 &&    // Display position during first lap
-           (world->getTime() - kart->getTimeAtLap()<5.0f ||
-            lap!=laps_of_leader))
+           (world->getTime() - kart->getTimeAtLap()<5.0f || lap!=laps_of_leader) &&
+           race_manager->raceHasLaps())
         {  // Display for 5 seconds
             char str[256];
             if(position==1)
@@ -398,9 +398,13 @@ void RaceGUI::drawPlayerIcons ()
                 str[0]='+'; str[1]=0;
                 TimeToString(timeBehind, str+1);
             }
-            if(race_manager->raceHasLaps())
-                font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
-                                       red, green, blue);
+            font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
+                                   red, green, blue);
+        }
+        if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER && i==0)
+        {
+            font_race->PrintShadow(_("Leader"), 30, ICON_PLAYER_WIDHT+x, y+5,
+                                   255, 0, 0);
         }
 
         glEnable(GL_CULL_FACE);

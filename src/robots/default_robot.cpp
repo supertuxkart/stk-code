@@ -126,6 +126,16 @@ void DefaultRobot::handle_wheelie( const int STEPS )
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_braking()
 {
+    // In follow the leader mode, the kart should brake if they are ahead of
+    // the leader (and not the leader, i.e. don't have initial position 1)
+    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER &&
+        getPosition()<world->getKart(0)->getPosition()            &&
+        getInitialPosition()>1                                       )
+    {
+        printf("kart %s: braking",this->getName().c_str());
+        m_controls.brake = true;
+        return;
+    }
     const float MIN_SPEED = world->m_track->getWidth()[m_track_sector];
 
     //We may brake if we are about to get out of the road, but only if the

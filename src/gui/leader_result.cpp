@@ -121,7 +121,7 @@ LeaderResult::LeaderResult()
         char sTime[20];
         TimeToString(race_time[i], sTime);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
-            i + 1, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
+            i , race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
 
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);

@@ -94,26 +94,27 @@ World::World()
     loadTrack() ;
 
     int playerIndex = 0;
-    for(unsigned int position=0; position<race_manager->getNumKarts(); position++)
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
+        int position = i+1;   // position start with 1
         sgCoord init_pos;
-        m_track->getStartCoords(position, &init_pos);
+        m_track->getStartCoords(i, &init_pos);
         Kart* newkart;
-        const std::string& kart_name=race_manager->getKartName(position);
+        const std::string& kart_name=race_manager->getKartName(i);
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot(kart_name, position, init_pos);
     	    // Create a camera for the last kart (since this way more of the 
 	        // karts can be seen.
-            if(position==race_manager->getNumKarts()-1) 
+            if(i==race_manager->getNumKarts()-1) 
             {
                 scene->createCamera(race_manager->getNumPlayers(), playerIndex);
             }
         }
         else
         {
-            if (race_manager->isPlayer(position))
+            if (race_manager->isPlayer(i))
             {
                 Camera *cam = scene->createCamera(race_manager->getNumPlayers(), playerIndex);
                 // the given position belongs to a player
@@ -130,7 +131,7 @@ World::World()
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)
         {
-            history->LoadKartData(newkart, position);
+            history->LoadKartData(newkart, i);
         }
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
@@ -306,7 +307,7 @@ void World::update(float dt)
 
     for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
-        if(!m_kart[i]) continue;   // ignore eliminated kart
+        if(m_kart[i]->isEliminated()) continue;   // ignore eliminated kart
         if(!m_kart[i]->raceIsFinished()) updateRacePosition((int)i);
         if(m_kart[i]->isPlayerKart()) m_kart[i]->addMessages();   // add 'wrong direction'
     }
@@ -465,14 +466,30 @@ void World::updateRaceStatus(float dt)
                 m_leader_intervals.erase(m_leader_intervals.begin());
             m_clock=m_leader_intervals[0];
             int kart_number;
+            // If the leader kart is not the first kart, remove the first
+            // kart, otherwise remove the last kart.
+            int position_to_remove = m_kart[0]->getPosition()==1 
+                                   ? getCurrentNumKarts() : 1;
             for (kart_number=0; kart_number<(int)m_kart.size(); kart_number++)
             {
                 if(m_kart[kart_number]->isEliminated()) continue;
-                if(m_kart[kart_number]->getPosition()==getCurrentNumKarts())
+                if(m_kart[kart_number]->getPosition()==position_to_remove)
                     break;
             }
-            assert(kart_number!=m_kart.size());
-            removeKart(kart_number);
+            if(kart_number==m_kart.size())
+            {
+                fprintf(stderr,"Problem with removing leader: position %d not found\n",
+                        position_to_remove);
+                for(int i=0; i<(int)m_kart.size(); i++)
+                {
+                    fprintf(stderr,"kart %d: eliminated %d position %d\n",
+                        i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
+                }   // for i
+            }  // kart_number==m_kart.size()
+            else
+            {
+                removeKart(kart_number);
+            }
             // The follow the leader race is over if there isonly one kart left,
             // or if all players have gone
             if(getCurrentNumKarts()==2 ||getCurrentNumPlayers()==0)
@@ -614,12 +631,12 @@ void World::removeKart(int kart_number)
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
-
-    // The kart can't be eliminated, since otherwise a race can't be restarted.
-    // So it's only marked to be eliminated (and ignored in all loops). Important:
-    // world->getCurrentNumKarts() returns the number of still racing karts. This
-    // value can not be used for loops over all karts, use race_manager->getNumKarts()
-    // instead!
+    projectile_manager->newExplosion(kart->getCoord());
+    // The kart can't be really removed from the m_kart array, since otherwise 
+    // a race can't be restarted. So it's only marked to be eliminated (and 
+    // ignored in all loops). Important:world->getCurrentNumKarts() returns 
+    // the number of karts still racing. This value can not be used for loops 
+    // over all karts, use race_manager->getNumKarts() instead!
     race_manager->addKartResult(kart_number, kart->getPosition(), m_clock);
     race_manager->eliminate(kart_number);
     kart->eliminate();
@@ -637,7 +654,7 @@ void World::updateRacePosition ( int k )
     for ( Karts::size_type j = 0 ; j < m_kart.size() ; ++j )
     {
         if(int(j) == k) continue;
-        if(!m_kart[j]) continue;   // eliminated karts   
+        if(m_kart[j]->isEliminated()) continue;   // eliminated karts   
 
         // Count karts ahead of the current kart, i.e. kart that are already
         // finished (the current kart k has not yet finished!!), have done more

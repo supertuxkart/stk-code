@@ -58,7 +58,8 @@ Kart::Kart (const std::string& kart_name, int position_ ,
 #endif
 {
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
-    m_grid_position        = position_ ;
+    m_grid_position        = position_;
+    m_initial_position     = position_;
     m_num_herrings_gobbled = 0;
     m_eliminated           = false;
     m_finished_race        = false;

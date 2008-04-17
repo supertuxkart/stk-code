@@ -51,14 +51,14 @@ class Smoke;
 class Kart : public TerrainInfo, public Moveable
 {
 protected:
-    bool         m_on_road;            //true if the kart is on top of the
-                                       //road path drawn by the drivelines
-
+    bool         m_on_road;            // true if the kart is on top of the
+                                       // road path drawn by the drivelines
     Attachment   m_attachment;
     Collectable  m_collectable;
 
     int          m_grid_position;
-    int          m_race_position;
+    int          m_race_position;      // current race position (1-numKarts)
+    int          m_initial_position;   // initial position of kart
     KartControl  m_controls;           // The position of the karts controls
     int          m_track_sector;       // index in driveline, special values
                                        // e.g. UNKNOWN_SECTOR can be negative!
@@ -142,7 +142,8 @@ public:
     int            getNumCollectables  () const { return  m_collectable.getNum();}
     int            getNumHerring       () const { return  m_num_herrings_gobbled;}
     int            getLap              () const { return  m_race_lap;            }
-    int            getPosition         () const { return  m_race_position ;      }
+    int            getPosition         () const { return  m_race_position;       }
+    int            getInitialPosition  () const { return  m_initial_position;    }
     void           setFinishingState(float time);
     float          getFinishTime       () const  { return m_finish_time;         }
     bool           raceIsFinished      () const  { return m_finished_race;       }
