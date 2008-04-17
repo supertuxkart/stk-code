@@ -38,9 +38,9 @@ private:
 public:
                      TerrainInfo(int frequency=1) {m_HoT_frequency=frequency;
                                                    m_HoT_counter=frequency;  }
-                     TerrainInfo(btVector3 &pos, int frequency=1);
+                     TerrainInfo(const btVector3 &pos, int frequency=1);
     virtual         ~TerrainInfo() {};
-    virtual void     update(btVector3 &pos);
+    virtual void     update(const btVector3 &pos);
     float            getHoT()      const { return m_HoT;      }
     const Material*  getMaterial() const { return m_material; }
     const btVector3& getNormal()   const { return m_normal;   }

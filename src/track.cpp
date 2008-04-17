@@ -1346,7 +1346,7 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
 }   // herring_command
 
 // ----------------------------------------------------------------------------
-void  Track::getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
+void  Track::getTerrainInfo(const btVector3 &pos, float *hot, btVector3* normal, 
                             const Material **material) const
 {
     btVector3 to_pos(pos);

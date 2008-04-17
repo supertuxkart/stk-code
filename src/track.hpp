@@ -194,7 +194,7 @@ public:
     const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
     const std::string& getHerringStyle   () const {return m_herring_style;      }
     void               getStartCoords    (unsigned int pos, sgCoord* coords) const;
-    void  getTerrainInfo(btVector3 &pos, float *hot, btVector3* normal, 
+    void  getTerrainInfo(const btVector3 &pos, float *hot, btVector3* normal, 
                          const Material **material) const;
     void createPhysicsModel              ();
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
