@@ -26,12 +26,17 @@
 
 class SkidMark
 {
-
+private:
+    float m_angle_sign;
 public:
-    SkidMark();
+    SkidMark(float angle_sign);
     ~SkidMark();
-    void add           (sgCoord* coord);  // Add a position where the skidmark is
-    void addBreak      (sgCoord *coord);   //Begin or finish an skidmark
+    void add           (const sgCoord& coord,  // Add a position where the skidmark is
+                        float angle,
+                        float length); 
+    void addBreak      (const sgCoord& coord, //Begin or finish an skidmark
+                        float angle, 
+                        float length);  
     bool wasSkidMarking() const;
 
 private:
@@ -46,8 +51,10 @@ class SkidMarkPos : public ssgVtxTable
                       float global_track_offset);
         ~SkidMarkPos ();
         void recalcBSphere();
-        void add          (sgCoord* coord); // Add a position where the skidmark is
-        void addEnd       (sgCoord *coord);
+        void add          (const sgCoord& coord,  // Add a position where the skidmark is
+                           float angle,
+                           float length);
+        void addEnd       (const sgCoord& coord);
     private:
         float m_track_offset;                 // Amount of which the skidmark is lifted
         // above the track to avoid z-buffer errors

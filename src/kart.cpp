@@ -898,7 +898,9 @@ void Kart::processSkidMarks()
 {
     assert(m_skidmark_left);
     assert(m_skidmark_right);
-    const float threshold=0.3f;
+    const float threshold = 0.3f;
+    const float ANGLE     = 43.0f;
+    const float LENGTH    = 0.57f;
     bool skid_front = m_vehicle->getWheelInfo(0).m_skidInfo < threshold ||
                       m_vehicle->getWheelInfo(1).m_skidInfo < threshold;
     bool skid_rear  = m_vehicle->getWheelInfo(2).m_skidInfo < threshold ||
@@ -907,102 +909,23 @@ void Kart::processSkidMarks()
     {
         if(isOnGround())
         {
-            const float LENGTH = 0.57f;
-            if(m_skidmark_left)
-            {
-                const float ANGLE  = -43.0f;
-
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                if(m_skidmark_left->wasSkidMarking())
-                    m_skidmark_left->add(&wheelpos);
-                else
-                    m_skidmark_left->addBreak(&wheelpos);
-            }   // if m_skidmark_left
-
-            if(m_skidmark_right)
-            {
-                const float ANGLE  = 43.0f;
-
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                if(m_skidmark_right->wasSkidMarking())
-                    m_skidmark_right->add(&wheelpos);
-                else
-                    m_skidmark_right->addBreak(&wheelpos);
-            }   // if m_skidmark_right
+            m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
+            m_skidmark_right->add(*getCoord(),  ANGLE, LENGTH);            
         }
         else
         {   // not on ground
-            if(m_skidmark_left)
-            {
-                const float LENGTH = 0.57f;
-                const float ANGLE  = -43.0f;
-
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                m_skidmark_left->addBreak(&wheelpos);
-            }   // if m_skidmark_left
-
-            if(m_skidmark_right)
-            {
-                const float LENGTH = 0.57f;
-                const float ANGLE  = 43.0f;
-
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                m_skidmark_right->addBreak(&wheelpos);
-            }   // if m_skidmark_right
+            m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
+            m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
         }   // on ground
     }
     else
-    {   // !skid_rear && _skid_front
-        if(m_skidmark_left)
-            if(m_skidmark_left->wasSkidMarking())
-            {
-                const float ANGLE  = -43.0f;
-                const float LENGTH = 0.57f;
+    {   // !skid_rear && !skid_front    
+        if(m_skidmark_left->wasSkidMarking())
+            m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
 
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                m_skidmark_left->addBreak(&wheelpos);
-            }   // m_skidmark_left->wasSkidMarking
-
-        if(m_skidmark_right)
-            if(m_skidmark_right->wasSkidMarking())
-            {
-                const float ANGLE  = 43.0f;
-                const float LENGTH = 0.57f;
-
-                sgCoord wheelpos;
-                sgCopyCoord(&wheelpos, getCoord());
-
-                wheelpos.xyz[0] += LENGTH * sgSin(wheelpos.hpr[0] + ANGLE);
-                wheelpos.xyz[1] += LENGTH * -sgCos(wheelpos.hpr[0] + ANGLE);
-
-                m_skidmark_right->addBreak(&wheelpos);
-            }   // m_skidmark_right->wasSkidMarking
-    }   // m_velocity < 20
+        if(m_skidmark_right->wasSkidMarking())
+            m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
+    }
 }   // processSkidMarks
 
 //-----------------------------------------------------------------------------
@@ -1090,8 +1013,9 @@ void Kart::loadData()
     //      m_exhaust_pipe -> addKid (m_smoke_system) ;
     //      comp_model-> addKid (m_exhaust_pipe) ;
 
-    m_skidmark_left  = new SkidMark();
-    m_skidmark_right = new SkidMark();
+    // 
+    m_skidmark_left  = new SkidMark(/* angle sign */ -1);
+    m_skidmark_right = new SkidMark(/* angle sign */  1);
 
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();

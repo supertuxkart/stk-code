@@ -22,9 +22,10 @@
 
 float SkidMark::m_global_track_offset = 0.005f;
 
-SkidMark::SkidMark()
+SkidMark::SkidMark(float angle_sign)
 {
-    m_skid_state = new ssgSimpleState ();
+    m_skid_state = new ssgSimpleState();
+    m_angle_sign = angle_sign;
     m_skid_state->ref();
     m_skid_state -> enable (GL_BLEND);
     //This is just for the skidmarks, so the ones drawn when the kart is in
@@ -48,17 +49,27 @@ SkidMark::~SkidMark()
 }   // ~SkidMark
 
 //-----------------------------------------------------------------------------
-void SkidMark::add(sgCoord* coord)
+void SkidMark::add(const sgCoord& coord, float angle, float length)
 {
-    assert(m_skid_marking);
-
-    const int CURRENT = (int)m_skid_marks.size() - 1;
-    m_skid_marks[CURRENT]->add(coord);
+    if(m_skid_marking)
+    {
+        const int CURRENT = (int)m_skid_marks.size() - 1;
+        m_skid_marks[CURRENT]->add(coord, m_angle_sign*angle, length);
+    }
+    else
+    {
+        addBreak(coord, angle, length);
+    }
 }   // add
 
 //-----------------------------------------------------------------------------
-void SkidMark::addBreak(sgCoord* coord)
+void SkidMark::addBreak(const sgCoord& kart_coord, float angle, float length)
 {
+    sgCoord coord(kart_coord);
+    coord.xyz[0] += length * sgSin(coord.hpr[0] + m_angle_sign*angle);
+    coord.xyz[1] += length* -sgCos(coord.hpr[0] + m_angle_sign*angle);
+
+
     const unsigned int CURRENT = (unsigned int)m_skid_marks.size() - 1;
     if(m_skid_marking)
         m_skid_marks[CURRENT]->addEnd(coord);
@@ -72,16 +83,16 @@ void SkidMark::addBreak(sgCoord* coord)
 
         sgVec3 pos;
         sgSetVec3(pos,
-                  coord->xyz[0] + sgSin(coord->hpr[0]-90) * WIDTH,
-                  coord->xyz[1] - sgCos(coord->hpr[0]-90) * WIDTH,
-                  coord->xyz[2] + m_global_track_offset);
+                  coord.xyz[0] + sgSin(coord.hpr[0]-90) * WIDTH,
+                  coord.xyz[1] - sgCos(coord.hpr[0]-90) * WIDTH,
+                  coord.xyz[2] + m_global_track_offset);
         ssgVertexArray* SkidMarkVertices = new ssgVertexArray;
         SkidMarkVertices->add(pos);
 
         sgSetVec3(pos,
-                  coord->xyz[0] + sgSin(coord->hpr[0]+90) * WIDTH,
-                  coord->xyz[1] - sgCos(coord->hpr[0]+90) * WIDTH,
-                  coord->xyz[2] + m_global_track_offset);
+                  coord.xyz[0] + sgSin(coord.hpr[0]+90) * WIDTH,
+                  coord.xyz[1] - sgCos(coord.hpr[0]+90) * WIDTH,
+                  coord.xyz[2] + m_global_track_offset);
         SkidMarkVertices->add(pos);
 
         sgVec3 norm;
@@ -153,23 +164,29 @@ void SkidMark::SkidMarkPos::recalcBSphere()
 }   // recalcBSphere
 
 //-----------------------------------------------------------------------------
-void SkidMark::SkidMarkPos::add(sgCoord* coord)
+void SkidMark::SkidMarkPos::add(const sgCoord& kart_coord, float angle, float length)
 {
+    sgCoord coord(kart_coord);
+
+    coord.xyz[0] += length *  sgSin(kart_coord.hpr[0] + angle);
+    coord.xyz[1] += length * -sgCos(kart_coord.hpr[0] + angle);
+
+
     // Width of the skidmark
     const float WIDTH = 0.1f;
 
     static float a = 1.0f;
     sgVec3 pos;
     sgSetVec3(pos,
-              coord->xyz[0] + sgSin(coord->hpr[0]+a*90) * WIDTH,
-              coord->xyz[1] - sgCos(coord->hpr[0]+a*90) * WIDTH,
-              coord->xyz[2] + m_track_offset);
+              coord.xyz[0] + sgSin(coord.hpr[0]+a*90) * WIDTH,
+              coord.xyz[1] - sgCos(coord.hpr[0]+a*90) * WIDTH,
+              coord.xyz[2] + m_track_offset);
     vertices->add(pos);
 
     sgSetVec3(pos,
-              coord->xyz[0] + sgSin(coord->hpr[0]-a*90) * WIDTH,
-              coord->xyz[1] - sgCos(coord->hpr[0]-a*90) * WIDTH,
-              coord->xyz[2] + m_track_offset);
+              coord.xyz[0] + sgSin(coord.hpr[0]-a*90) * WIDTH,
+              coord.xyz[1] - sgCos(coord.hpr[0]-a*90) * WIDTH,
+              coord.xyz[2] + m_track_offset);
     vertices->add(pos);
     a = (a > 0.0f ? -1.0f : 1.0f);
 
@@ -184,22 +201,22 @@ void SkidMark::SkidMarkPos::add(sgCoord* coord)
 }   // add
 
 //-----------------------------------------------------------------------------
-void SkidMark::SkidMarkPos::addEnd(sgCoord* coord)
+void SkidMark::SkidMarkPos::addEnd(const sgCoord& coord)
 {
     // Width of the skidmark
     const float width = 0.1f;
 
     sgVec3 pos;
     sgSetVec3(pos,
-              coord->xyz[0] + sgSin(coord->hpr[0]-90) * width,
-              coord->xyz[1] - sgCos(coord->hpr[0]-90) * width,
-              coord->xyz[2] + m_track_offset);
+              coord.xyz[0] + sgSin(coord.hpr[0]-90) * width,
+              coord.xyz[1] - sgCos(coord.hpr[0]-90) * width,
+              coord.xyz[2] + m_track_offset);
     vertices->add(pos);
 
     sgSetVec3(pos,
-              coord->xyz[0] + sgSin(coord->hpr[0]+90) * width,
-              coord->xyz[1] - sgCos(coord->hpr[0]+90) * width,
-              coord->xyz[2] + m_track_offset);
+              coord.xyz[0] + sgSin(coord.hpr[0]+90) * width,
+              coord.xyz[1] - sgCos(coord.hpr[0]+90) * width,
+              coord.xyz[2] + m_track_offset);
     vertices->add(pos);
 
     sgVec3 norm;
