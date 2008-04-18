@@ -40,6 +40,8 @@
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
 #include "smoke.hpp"
+#include "material_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
 #endif
@@ -585,25 +587,33 @@ void Kart::update(float dt)
     // e.g. on tux tollway when jumping down from the ramp).
     btVector3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.1f);
     TerrainInfo::update(pos_plus_epsilon);
-    if (getHoT()==Track::NOHIT                   || 
-       (getMaterial()->isReset() && isOnGround())   )
-    {
-        forceRescue();
-    }
-    else if(getMaterial()->isZipper())
-    {
-        handleZipper();
-    }
-    else
-    {
-        for(int i=0; i<m_vehicle->getNumWheels(); i++)
-        {
-            // terrain dependent friction
-            m_vehicle->getWheelInfo(i).m_frictionSlip = getFrictionSlip() * 
-                                                        getMaterial()->getFriction();
-        }   // for i<getNumWheels
 
-    }   // if there is terrain and it's not a reset material
+    const Material* material=getMaterial();
+    if (getHoT()==Track::NOHIT)   // kart falling off the track
+    {
+        forceRescue();    
+    } 
+    else if(material)
+    {
+        // Sometimes the material can be 0. This can happen if a kart is above
+        // another kart (e.g. mass collision, or one kart falling on another 
+        // kart). Bullet does not have any triangle information in this case,
+        // and so material can not be set. In this case it is simply ignored 
+        // since it can't hurt (material is only used for friction, zipper and
+        // rescue, so those things are not triggered till the kart is on the 
+        // track again)
+        if     (material->isReset()  && isOnGround()) forceRescue();
+        else if(material->isZipper() && isOnGround()) handleZipper();
+        else   // neither zipper nor reset --> set friction
+        {
+            for(int i=0; i<m_vehicle->getNumWheels(); i++)
+            {
+                // terrain dependent friction
+                m_vehicle->getWheelInfo(i).m_frictionSlip = 
+                                getFrictionSlip() * material->getFriction();
+            }   // for i<getNumWheels
+        } // neither reset nor zipper material
+    }   // if there is material
 
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
@@ -1039,7 +1049,7 @@ void Kart::loadData()
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
     m_smokepuff = new ssgSimpleState ();
-    m_smokepuff -> setTexture        (loader->createTexture("smoke.rgb", true, true, true)) ;
+    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
     m_smokepuff -> setTranslucent    () ;
     m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
     m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
