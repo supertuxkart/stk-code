@@ -119,9 +119,11 @@ LeaderResult::LeaderResult()
     for(unsigned int i=1; i < NUM_KARTS; ++i)
     {
         char sTime[20];
-        TimeToString(race_time[i], sTime);
-        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
-            i , race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
+        // For now: don't display the time, since it's not correctly
+        // set in follow-the-leader
+        //TimeToString(race_time[i], sTime);
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d",
+            i , race_manager->getKartName(position[i]).c_str(), scores[i]);
 
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);
