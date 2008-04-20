@@ -43,9 +43,10 @@ MovingPhysics::MovingPhysics(const std::string data)
     }
     parameters.erase(parameters.begin());
     std::string &shape=parameters[0];
-    m_body_type = BODY_NONE;
-    if(shape=="cone") m_body_type = BODY_CONE;
-    if(shape=="box" ) m_body_type = BODY_BOX;
+    m_body_type = MP_NONE;
+    if(shape=="cone"   ) m_body_type = MP_CONE;
+    else if(shape=="box"    ) m_body_type = MP_BOX;
+    else if(shape=="sphere" ) m_body_type = MP_SPHERE;
     parameters.erase(parameters.begin());
 
     // Scan for additional parameters, which are in the form of keyword=value
@@ -155,16 +156,21 @@ void MovingPhysics::init()
     m_half_height = 0.5f*(z_max-z_min);
     switch (m_body_type)
     {
-    case BODY_CONE: radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
+    case MP_CONE:   radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
                     m_shape = new btConeShapeZ(radius, z_max-z_min);
                     setName("cone");
                     break;
-    case BODY_BOX:  m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
+    case MP_BOX:    m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
                                                        0.5f*(y_max-y_min),
                                                        0.5f*(z_max-z_min) ) );
                     setName("box");
                     break;
-    case BODY_NONE: fprintf(stderr, "WARNING: Uninitialised moving shape\n");
+    case MP_SPHERE: radius = std::max(x_max-x_min, y_max-y_min);
+                    radius = 0.5f*std::max(radius, z_max-z_min);
+                    m_shape = new btSphereShape(radius);
+                    setName("sphere");
+                    break;
+    case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         break;
     }
 
@@ -197,7 +203,15 @@ void MovingPhysics::update(float dt)
     // Transfer the new position and hpr to m_curr_pos
     sgCoord m_curr_pos;
     sgSetCoord(&m_curr_pos, m);
+    if(m_curr_pos.xyz[2]<-100)
+    {
+        m_body->setCenterOfMassTransform(m_init_pos);
+        m_curr_pos.xyz[0]=m_init_pos.getOrigin().getX();
+        m_curr_pos.xyz[1]=m_init_pos.getOrigin().getY();
+        m_curr_pos.xyz[2]=m_init_pos.getOrigin().getZ();
+    }
     setTransform(&m_curr_pos);
+
 }   // update
 // -----------------------------------------------------------------------------
 void MovingPhysics::reset()
