@@ -581,7 +581,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
     for(int i = 1; STEPS > i; ++i)
     {
-        sgAddScaledVec2( step_coord, pos, vel_normal, m_kart_properties->getKartLength() * i );
+        sgAddScaledVec3( step_coord, pos, vel_normal, m_kart_properties->getKartLength() * i );
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet

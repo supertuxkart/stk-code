@@ -64,7 +64,6 @@ protected:
                                        // e.g. UNKNOWN_SECTOR can be negative!
     sgVec2       m_last_track_coords;
     sgVec3       m_curr_track_coords;
-    sgVec3       m_velocity_wc;        // velocity in world coordinates
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
