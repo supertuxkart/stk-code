@@ -42,6 +42,7 @@ public:
 
     void update(float dt);
     void select();
+    void handle(GameAction ga, int value);
 };
 
 #endif

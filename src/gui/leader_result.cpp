@@ -240,3 +240,13 @@ void LeaderResult::select()
 
     menu_manager->switchToMainMenu();
 }
+//-----------------------------------------------------------------------------
+void LeaderResult::handle(GameAction ga, int value)
+{
+  // Attempts to close the menu are silently discarded
+  // since they do not make sense at this point.
+  if (ga == GA_LEAVE)
+   return;
+  else
+    BaseGUI::handle(ga, value);
+}
