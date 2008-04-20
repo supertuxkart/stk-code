@@ -5,7 +5,7 @@
  (description "All seven tracks done by the Game of the month team")
  (herring "new")
  (tracks "beach" "lighthouse" "startrack" "volcano" "littlevolcano" "race" "subseatrack" )
- (laps      2          4           3           3           3           5         3)
+ (laps      2          4           3           3           2           5         3)
 )
 
 ;; EOF ;;
