@@ -119,7 +119,7 @@ void Physics::update(float dt)
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
-                p->a->getPointerFlyable()->explode((Kart*)(p->b));
+                p->a->getPointerFlyable()->explode(p->b->getPointerKart());
             }
             else                                     // projectile hits projectile
             {
