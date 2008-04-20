@@ -502,7 +502,7 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
 
         velocity.setX( 0.0f );
         velocity.setY( 0.0f );
-        velocity.setZ( 3.5f );
+        velocity.setZ( 5.0f );
 
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
     }
@@ -510,6 +510,9 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
     {
         sgVec3 diff;
         sgSubVec3(diff, getCoord()->xyz, pos);
+        //if the z component is negative, the resulting impulse could push the 
+        // kart through the floor. So in this case ignore z.
+        if(diff[2]<0) diff[2]=0.0f;
         float len2=sgLengthSquaredVec3(diff);
 
         // The correct formhale would be to first normalise diff,
