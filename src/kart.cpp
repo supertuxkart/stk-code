@@ -635,9 +635,10 @@ void Kart::update(float dt)
     // Check if the kart is taking a shortcut (if it's not already doing one):
     if(!m_rescue && world->m_track->isShortcut(prev_sector, m_track_sector))
     {
-        if(isPlayerKart())
+	    forceRescue(/*is rescue*/ true);  // bring karts back to where they left the track.     
+	    if(isPlayerKart())
         {
-            forceRescue(/*is rescue*/ true);  // bring karts back to where they left the track.
+            
             RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
             // Can happen if the option menu is called
             if(m)
