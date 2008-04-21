@@ -52,7 +52,7 @@ SoundManager::SoundManager() : m_sfxs(NUM_SOUNDS)
         m_initialized = true;
     else
     {
-        fprintf(stderr, _("WARNING: Could not initialize the ALUT based sound.\n"));
+        fprintf(stderr, "WARNING: Could not initialize the ALUT based sound.\n");
         m_initialized = false;
     }
 

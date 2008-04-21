@@ -245,7 +245,7 @@ void HerringManager::cleanup()
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,_("The herring style '%s' in your configuration file does not exist.\nIt is ignored.\n"),
+        fprintf(stderr,"The herring style '%s' in your configuration file does not exist.\nIt is ignored.\n",
                 user_config->m_herring_style.c_str());
         user_config->m_herring_style="";
     }
@@ -256,7 +256,7 @@ void HerringManager::cleanup()
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,_("The herring style '%s' specified on the command line does not exist.\nIt is ignored.\n"),
+        fprintf(stderr,"The herring style '%s' specified on the command line does not exist.\nIt is ignored.\n",
                 m_user_filename.c_str());
         m_user_filename="";  // reset to avoid further warnings.
     }
@@ -341,7 +341,7 @@ void HerringManager::loadHerringStyle(const std::string filename)
     if(!herring_node)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), _("Couldn't load map '%s': no herring node."),
+        snprintf(msg, sizeof(msg), "Couldn't load map '%s': no herring node.",
                  filename.c_str());
 	delete root;
         throw std::runtime_error(msg);

@@ -52,7 +52,7 @@ namespace lisp
         {
             char msg[MAX_ERROR_MESSAGE_LENGTH];
             snprintf(msg, sizeof(msg), 
-                     _("Couldn't open file '%s'."),
+                     "Couldn't open file '%s'.",
                      filename.c_str());
             throw std::runtime_error(msg);
         }

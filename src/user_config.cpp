@@ -316,13 +316,13 @@ int UserConfig::CheckAndCreateDir()
 #endif
     if(bError)
     {
-        fprintf(stderr, _("Couldn't create '%s', config files will not be saved.\n"),
+        fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
                 DIRNAME.c_str());
         return 0;
     }
     else
     {
-        printf(_("Config directory '%s' successfully created.\n"),DIRNAME.c_str());
+        printf("Config directory '%s' successfully created.\n",DIRNAME.c_str());
         return 2;
     }
 
@@ -348,7 +348,7 @@ void UserConfig::loadConfig(const std::string& filename)
     catch(std::exception& e)
     {
         (void)e;  // avoid warning about unreferenced local variable
-        printf(_("Config file '%s' does not exist, it will be created.\n"), 
+        printf("Config file '%s' does not exist, it will be created.\n", 
                filename.c_str());
         delete root;
         return;
@@ -360,7 +360,7 @@ void UserConfig::loadConfig(const std::string& filename)
         if(!lisp) 
         {
             char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), _("No tuxkart-config node"));
+            snprintf(msg, sizeof(msg), "No tuxkart-config node");
             throw std::runtime_error(msg);
         }
         int configFileVersion = 0;
@@ -369,34 +369,34 @@ void UserConfig::loadConfig(const std::string& filename)
         {
             // Give some feedback to the user about what was changed.
             // Do NOT add a break after the case, so that all changes will be printed
-            printf(_("\nConfig file version '%d' is too old.\n"
-                     "The following changes have been applied in the current SuperTuxKart version:\n"),
+            printf("\nConfig file version '%d' is too old.\n"
+                     "The following changes have been applied in the current SuperTuxKart version:\n",
                    configFileVersion);
             int needToAbort=0;
             switch(configFileVersion)
             {
-            case 0:  printf(_("- Single window menu, old status display,new keyboard style settings were removed\n"));
+            case 0:  printf("- Single window menu, old status display,new keyboard style settings were removed\n");
                      needToAbort=std::max(needToAbort,0);
-            case 1:  printf(_("- Key bindings were changed, please check the settings. All existing values were discarded.\n"));
+            case 1:  printf("- Key bindings were changed, please check the settings. All existing values were discarded.\n");
                      needToAbort=std::max(needToAbort,1);// old keybinds wouldn't make any sense
-            case 2:  printf(_("Added username, using: '%s'.\n"), m_username.c_str());
+            case 2:  printf("Added username, using: '%s'.\n", m_username.c_str());
                      needToAbort=std::max(needToAbort,0);
-            case 3:  printf(_("Added username for all players.\n"));
+            case 3:  printf("Added username for all players.\n");
                      needToAbort=std::max(needToAbort,0);
-            case 4:  printf(_("Added jumping, which invalidates all key bindings.\n"));
+            case 4:  printf("Added jumping, which invalidates all key bindings.\n");
                      needToAbort=std::max(needToAbort,0);
             case 99: break;
-            default: printf(_("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n"), configFileVersion);
+            default: printf("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n", configFileVersion);
                      needToAbort=1;
                      break;
             }
             if(needToAbort)
             {
-                printf(_("The old config file is deleted, a new one will be created.\n"));
+                printf("The old config file is deleted, a new one will be created.\n");
                 delete root;
                 return;
             }
-            printf(_("This warning can be ignored, the config file will be automatically updated.\n"));
+            printf("This warning can be ignored, the config file will be automatically updated.\n");
             // Keep on reading the config files as far as possible
         }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
 
@@ -449,7 +449,7 @@ void UserConfig::loadConfig(const std::string& filename)
             if(!reader)
             {
                 char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), _("No '%s' node"), temp.c_str());
+                snprintf(msg, sizeof(msg), "No '%s' node", temp.c_str());
                 throw std::runtime_error(msg);
             }
             std::string name;
@@ -497,7 +497,7 @@ void UserConfig::loadConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
-        fprintf(stderr, _("Error while parsing config '%s':\n"), filename.c_str());
+        fprintf(stderr, "Error while parsing config '%s':\n", filename.c_str());
         fprintf(stderr,  e.what());
         fprintf(stderr, "\n");
     }
@@ -714,7 +714,7 @@ void UserConfig::saveConfig(const std::string& filename)
     }
     catch(std::exception& e)
     {
-        fprintf(stderr, _("Couldn't write config: "));
+        fprintf(stderr, "Couldn't write config: ");
         fprintf(stderr, e.what());
         fprintf(stderr, "\n");
     }
@@ -829,7 +829,7 @@ std::string UserConfig::getInputAsString(Input &input)
         snprintf(msg, sizeof(msg), _("not set"));
         break;
     case IT_KEYBOARD:
-        snprintf(msg, sizeof(msg), _("%s"), SDL_GetKeyName((SDLKey) input.id0));
+        snprintf(msg, sizeof(msg), "%s", SDL_GetKeyName((SDLKey) input.id0));
         break;
     case IT_STICKMOTION:
         snprintf(msg, sizeof(msg), _("joy %d axis %d  %c"),

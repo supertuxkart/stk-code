@@ -336,7 +336,7 @@ bool World::saveReplayHumanReadable( std::string const &filename ) const
     FILE *fd = fopen( path.c_str(), "w" );
     if( !fd ) 
     {
-        fprintf(stderr, _("Error while opening replay file for writing '%s'\n"), path.c_str());
+        fprintf(stderr, "Error while opening replay file for writing '%s'\n", path.c_str());
         return false;
     }
     int  nKarts = world->getNumKarts();
@@ -382,14 +382,14 @@ bool World::loadReplayHumanReadable( std::string const &filename )
     }
     catch(std::runtime_error& e)
     {
-        fprintf( stderr, _("Couldn't find replay-file: '%s'\n"), path.c_str() );
+        fprintf( stderr, "Couldn't find replay-file: '%s'\n", path.c_str() );
         return false;
     }
 
     FILE *fd = fopen( path.c_str(), "r" );
     if( !fd ) 
     {
-        fprintf(stderr, _("Error while opening replay file for loading '%s'\n"), path.c_str());
+        fprintf(stderr, "Error while opening replay file for loading '%s'\n", path.c_str());
         return false;
     }
 

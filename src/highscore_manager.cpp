@@ -122,7 +122,7 @@ void HighscoreManager::Load()
             m_allScores.push_back(highscores);
             highscores->Read(node_record);
         }
-    fprintf(stderr, _("Highscores will be saved in '%s'.\n"),m_filename.c_str());
+    fprintf(stderr, "Highscores will be saved in '%s'.\n",m_filename.c_str());
     }
     catch(std::exception& err)
     {

@@ -57,9 +57,9 @@ CreditsMenu::CreditsMenu()
     }
     else
     {
-        printf(_("Couldn't load '%s'\n"),filename.c_str());
-        credits_text.append(_("CREDIT file was not installed properly!!\n"));
-        credits_text.append(_("Please check 'data/CREDITS'!!"));
+        printf("Couldn't load '%s'\n",filename.c_str());
+        credits_text.append("CREDIT file was not installed properly!!\n");
+        credits_text.append("Please check 'data/CREDITS'!!");
     }
 
 

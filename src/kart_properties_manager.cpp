@@ -102,7 +102,7 @@ const int KartPropertiesManager::getKartId(const std::string IDENT)
     }
 
     char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), _("KartPropertiesManager: Couldn't find kart: '%s'"),
+    snprintf(msg, sizeof(msg), "KartPropertiesManager: Couldn't find kart: '%s'",
              IDENT.c_str());
     throw std::runtime_error(msg);
 }   // getKartId

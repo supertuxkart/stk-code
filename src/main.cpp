@@ -78,7 +78,7 @@
 void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
-  _("Usage: %s [OPTIONS]\n\n"
+    "Usage: %s [OPTIONS]\n\n"
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
     "Options:\n"
@@ -109,7 +109,7 @@ void cmdLineHelp (char* invocation)
     "  -h,  --help             Show this help\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.berlios.de\n\n"), invocation
+    "http://supertuxkart.berlios.de\n\n", invocation
     );
 }   // cmdLineHelp
 
@@ -122,8 +122,8 @@ int handleCmdLine(int argc, char **argv)
         if(argv[i][0] != '-') continue;
         if ( !strcmp(argv[i], "--help"    ) ||
              !strcmp(argv[i], "-help"     ) ||
-             !strcmp(argv[i], _("--help") ) ||
-             !strcmp(argv[i], _("-help" ) ) ||
+             !strcmp(argv[i], "--help" ) ||
+             !strcmp(argv[i], "-help" ) ||
              !strcmp(argv[i], "-h")       )
         {
             cmdLineHelp(argv[0]);
@@ -151,11 +151,11 @@ int handleCmdLine(int argc, char **argv)
             if(filename!="")
             {
                 race_manager->setPlayerKart(0, argv[i+1]);
-                fprintf ( stdout, _("You choose to use kart '%s'.\n"), argv[i+1] ) ;
+                fprintf ( stdout, "You choose to use kart '%s'.\n", argv[i+1] ) ;
             }
             else
             {
-	            fprintf(stdout, _("Kart '%s' not found, ignored.\n"),
+	            fprintf(stdout, "Kart '%s' not found, ignored.\n",
 		                argv[i+1]);
             }
         }
@@ -178,36 +178,36 @@ int handleCmdLine(int argc, char **argv)
                  && i+1<argc                                              )
         {
             race_manager->setTrack(argv[i+1]);
-            fprintf ( stdout, _("You choose to start in track: %s.\n"), argv[i+1] ) ;
+            fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
             stk_config->load(file_manager->getConfigFile(argv[i+1]));
-            fprintf ( stdout, _("STK config will be read from %s.\n"), argv[i+1] ) ;
+            fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
             user_config->m_karts = atoi(argv[i+1]);
             if(user_config->m_karts>stk_config->m_max_karts) {
-                fprintf(stdout, _("Number of karts reset to maximum number %d\n"),
+                fprintf(stdout, "Number of karts reset to maximum number %d\n",
                                   stk_config->m_max_karts);
                 user_config->m_karts = stk_config->m_max_karts;
             }
             race_manager->setNumKarts(user_config->m_karts );
-            fprintf ( stdout, _("%d karts will be used.\n"), user_config->m_karts);
+            fprintf ( stdout, "%d karts will be used.\n", user_config->m_karts);
             i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {
 
-            fprintf ( stdout, _("  Available tracks:\n") );
+            fprintf ( stdout, "  Available tracks:\n" );
             for (size_t i = 0; i != track_manager->getTrackCount(); i++)
                 fprintf ( stdout, "\t%10s: %s\n",
                           track_manager->getTrack(i)->getIdent().c_str(),
                           track_manager->getTrack(i)->getName());
 
-            fprintf ( stdout, _("Use --track N to choose track.\n\n"));
+            fprintf ( stdout, "Use --track N to choose track.\n\n");
             delete track_manager;
             track_manager = 0;
 
@@ -218,7 +218,7 @@ int handleCmdLine(int argc, char **argv)
             bool dont_load_models=true;
             kart_properties_manager->loadKartData(dont_load_models) ;
 
-            fprintf ( stdout, _("  Available karts:\n") );
+            fprintf ( stdout, "  Available karts:\n" );
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
                 const KartProperties* KP= kart_properties_manager->getKartById(i);
@@ -239,7 +239,7 @@ int handleCmdLine(int argc, char **argv)
         else if ( !strcmp(argv[i], "--mirror") )
         {
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-            fprintf ( stdout, _("Enabling mirror mode.\n") ) ;
+            fprintf ( stdout, "Enabling mirror mode.\n" ) ;
             //raceSetup.mirror = 1;
 #else
             //raceSetup.mirror = 0 ;
@@ -248,7 +248,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            fprintf ( stdout, _("You choose to have %d laps.\n"), atoi(argv[i+1]) ) ;
+            fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
             race_manager->setNumLaps(atoi(argv[i+1]));
         }
         /* FIXME:
@@ -262,7 +262,7 @@ int handleCmdLine(int argc, char **argv)
         cmdLineHelp(argv[0]);
         return 0;
           }
-          fprintf ( stdout, _("You choose to have %d players.\n"), atoi(argv[i+1]) ) ;
+          fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
         }
         */
 #if !defined(WIN32) && !defined(__CYGWIN)
@@ -276,7 +276,7 @@ int handleCmdLine(int argc, char **argv)
               user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())         
             	user_config->m_fullscreen = true;
           	else 
-          		fprintf ( stdout, _("Resolution %s has been blacklisted, so it is not available!\n"), res.c_str());
+          		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
@@ -297,15 +297,15 @@ int handleCmdLine(int argc, char **argv)
                 {
                 	user_config->m_prev_width = user_config->m_width = width;
                		user_config->m_prev_height = user_config->m_height = height;
-                	fprintf ( stdout, _("You choose to be in %dx%d.\n"), user_config->m_width,
+                	fprintf ( stdout, "You choose to be in %dx%d.\n", user_config->m_width,
                     	 user_config->m_height );
                	}
                	else
-               		fprintf ( stdout, _("Resolution %s has been blacklisted, so it is not available!\n"), res.c_str());
+               		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
             }
             else
             {
-                fprintf(stderr, _("Error: --screensize argument must be given as WIDTHxHEIGHT\n"));
+                fprintf(stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
                 exit(EXIT_FAILURE);
             }
         }
@@ -354,7 +354,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else
         {
-            fprintf ( stderr, _("Invalid parameter: %s.\n\n"), argv[i] );
+            fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
             cmdLineHelp(argv[0]);
             return 0;
         }
@@ -512,7 +512,7 @@ int main(int argc, char *argv[] )
     catch (std::exception &e)
     {
         fprintf(stderr,e.what());
-        fprintf(stderr,_("\nAborting SuperTuxKart\n"));
+        fprintf(stderr,"\nAborting SuperTuxKart\n");
     }
 
     /* Program closing...*/
