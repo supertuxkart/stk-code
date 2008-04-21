@@ -28,7 +28,7 @@
 class MovingPhysics : public ssgTransform, public Callback
 {
 public:
-    enum bodyTypes {BODY_NONE, BODY_CONE, BODY_BOX};
+    enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
 
 protected:
     bodyTypes             m_body_type;
