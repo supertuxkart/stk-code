@@ -79,6 +79,7 @@ protected:
     btCompoundShape                    m_kart_chassis;
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
+    btUprightConstraint                *m_uprightConstraint;
     float                               m_kart_height;
 
 private:
@@ -191,6 +192,7 @@ public:
     float          getKartHeight    () const {return m_kart_height;            }
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
+    btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           updateBulletPhysics(float dt);
     void           draw             ();
     bool           isInRest         () const;

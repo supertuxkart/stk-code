@@ -29,6 +29,7 @@ subject to the following restrictions:
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btConeTwistConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btUprightConstraint.h"
 
 
 #include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"

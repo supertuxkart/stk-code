@@ -478,6 +478,10 @@
 						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btUprightConstraint.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Dynamics"
@@ -1058,6 +1062,10 @@
 					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btTypedConstraint.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btUprightConstraint.h"
 						>
 					</File>
 				</Filter>

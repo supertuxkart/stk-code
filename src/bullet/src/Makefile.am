@@ -180,6 +180,8 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btSolverBody.h				 \
 	BulletDynamics/ConstraintSolver/btSolverConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.cpp			 \
+	BulletDynamics/ConstraintSolver/btUprightConstraint.h			 \
+	BulletDynamics/ConstraintSolver/btUprightConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.h			 \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp			 \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.h			 \

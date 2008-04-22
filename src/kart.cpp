@@ -219,8 +219,17 @@ void Kart::createPhysics(ssgEntity *obj)
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
     }
+    // Obviously these allocs have to be properly managed/freed
+    btTransform *t=new btTransform();
+    t->setIdentity();
+    m_uprightConstraint=new btUprightConstraint(*m_body, *t);
+    m_uprightConstraint->setLimit(M_PI/8.0f);
+    m_uprightConstraint->setBounce(0.0f);
+    m_uprightConstraint->setMaxLimitForce(300.0f);
+    m_uprightConstraint->setErp(1.0f);
+    m_uprightConstraint->setLimitSoftness(1.0f);
+    m_uprightConstraint->setDamping(0.0f);
     world->getPhysics()->addKart(this, m_vehicle);
-
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
@@ -244,10 +253,11 @@ Kart::~Kart()
     if(m_skidmark_left ) delete m_skidmark_left ;
     if(m_skidmark_right) delete m_skidmark_right;
 
+    world->getPhysics()->removeKart(this);
     delete m_vehicle;
     delete m_tuning;
     delete m_vehicle_raycaster;
-    world->getPhysics()->removeKart(this);
+    delete m_uprightConstraint;
     for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
     {
         delete m_kart_chassis.getChildShape(i);
@@ -718,6 +728,10 @@ float Kart::handleWheelie(float dt)
     if ( m_controls.wheelie && 
          m_speed >= getMaxSpeed()*getWheelieMaxSpeedRatio())
     {
+        // Disable the upright constraint, since it will otherwise
+        // work against the wheelie
+        m_uprightConstraint->setLimit(2.0f*M_PI);
+
         if ( m_wheelie_angle < getWheelieMaxPitch() )
             m_wheelie_angle += getWheeliePitchRate() * dt;
         else
@@ -728,7 +742,11 @@ float Kart::handleWheelie(float dt)
         m_wheelie_angle -= getWheelieRestoreRate() * dt;
         if ( m_wheelie_angle <= 0.0f ) m_wheelie_angle = 0.0f ;
     }
-    if(m_wheelie_angle <=0.0f) return 0.0f;
+    if(m_wheelie_angle <=0.0f) 
+    {
+        m_uprightConstraint->setLimit(M_PI/8.0f);
+        return 0.0f;
+    }
 
     const btTransform& chassisTrans = getTrans();
     btVector3 targetUp(0.0f, 0.0f, 1.0f);
