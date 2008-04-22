@@ -97,16 +97,33 @@ void DefaultRobot::update( float delta )
 
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
-    const int STEPS = calc_steps();
-    check_crashes( STEPS, m_curr_pos.xyz );
+    int steps = 0;
+
+    // This should not happen (anymore :) ), but it keeps the game running
+    // in case that m_future_sector becomes undefined.
+    if(m_future_sector == Track::UNKNOWN_SECTOR )
+    {
+#ifdef DEBUG
+        fprintf(stderr,"DefaultRobot: m_future_sector is undefined.\n");
+        fprintf(stderr,"This shouldn't happen, but can be ignored.\n");
+#endif
+        forceRescue();
+        m_future_sector = 0;
+    }
+    else
+    {
+        steps = calc_steps();
+    }
+
+    check_crashes( steps, m_curr_pos.xyz );
     find_curve();
 
     /*Response handling functions*/
     handle_acceleration( delta );
     handle_steering();
-    handle_items( delta, STEPS );
+    handle_items( delta, steps );
     handle_rescue( delta );
-    handle_wheelie( STEPS );
+    handle_wheelie( steps );
     handle_braking();
     //TODO:handle jumping
 
@@ -415,16 +432,18 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     if( m_crashes.m_road ) return false;
     if( m_crashes.m_kart != -1 ) return false;
 
-    sgVec2 step_coord;
-    sgVec3 step_track_coord;
-    float distance;
-
     //We have to be careful with normalizing, because if the source argument
     //has both the X and Y axis set to 0, it returns nan to the destiny.
     const btVector3 &VEL=getVelocity();
-    if( VEL.getX() == 0.0 && VEL.getY() == 0.0 ) return false;
-    btVector3 vel_normal(VEL.getX(), VEL.getY(), 0.0);
-    vel_normal.normalize();
+    btVector3        vel_normal(VEL.getX(), VEL.getY(), 0.0);
+    float            len=vel_normal.length();
+    // Too slow for wheelies, and it avoids normalisation problems.
+    if(len<getMaxSpeed()*getWheelieMaxSpeedRatio()) return false;
+    vel_normal/=len;
+
+    sgVec2 step_coord;
+    sgVec3 step_track_coord;
+    float distance;
 
     //FIXME: instead of using 1.5, it should find out how much time it
     //will pass to stop doing the wheelie completely from the current state.
@@ -569,14 +588,15 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
     //Protection against having vel_normal with nan values
     const btVector3 &VEL = getVelocity();
-    if( VEL.getX() == 0.0 && VEL.getY() == 0.0 )
+    vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
+    float len=vel_normal.length();
+    if(len>0.0f)
+    {
+        vel_normal/=len;
+    }
+    else
     {
         vel_normal.setValue(0.0, 0.0, 0.0);
-    }
-    else 
-    {
-        vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
-        vel_normal.normalize();
     }
 
     for(int i = 1; STEPS > i; ++i)
@@ -645,7 +665,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
         if( m_sector == Track::UNKNOWN_SECTOR )
         {
-            m_future_sector = world->m_track->findOutOfRoadSector( step_coord,
+            m_future_sector = world->getTrack()->findOutOfRoadSector( step_coord,
                 Track::RS_DONT_KNOW, m_future_sector );
             m_crashes.m_road = true;
             break;
@@ -659,6 +679,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     }
 }
 
+//-----------------------------------------------------------------------------
 /** Find the sector that at the longest distance from the kart, that can be
  *  driven to without crashing with the track, then find towards which of
  *  the two edges of the track is closest to the next curve after wards,
@@ -688,17 +709,16 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         sgSubVec2( direction, world->m_track->m_driveline[target_sector],
             m_curr_pos.xyz );
 
-        steps = int( sgLengthVec2( direction ) / m_kart_properties->getKartLength() );
+        float len=sgLengthVec2(direction);
+        steps = int( len / m_kart_properties->getKartLength() );
         if( steps < 3 ) steps = 3;
 
-        sgVec2 step_coord;
-
         //Protection against having vel_normal with nan values
-        if( direction[0] != 0.0 && direction[1] != 0.0 )
-        {
-            sgNormalizeVec2( direction );
+        if(len>0.0f) {
+            sgScaleVec2(direction, 1.0f/len);
         }
 
+        sgVec2 step_coord;
         //Test if we crash if we drive towards the target sector
         for( int i = 2; i < steps; ++i )
         {
@@ -784,8 +804,10 @@ inline float DefaultRobot::normalize_angle( float angle )
     return angle;
 }
 
+//-----------------------------------------------------------------------------
 /** calc_steps() divides the velocity vector by the lenght of the kart,
- *  and gets the number of steps to use for the sight line of the kart..
+ *  and gets the number of steps to use for the sight line of the kart.
+ *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
  */
 int DefaultRobot::calc_steps()
 {
@@ -796,9 +818,9 @@ int DefaultRobot::calc_steps()
     //mostly for curves.
     if( fabsf(m_controls.lr) > 0.95 )
     {
-        assert( m_future_sector > -1 );
-        const int WIDTH_STEPS = (int)( world->m_track->getWidth(
-            )[m_future_sector] / ( m_kart_properties->getKartLength() * 2.0 ));
+        const int WIDTH_STEPS = 
+            (int)( world->m_track->getWidth()[m_future_sector] 
+                   /( m_kart_properties->getKartLength() * 2.0 ) );
 
         steps += WIDTH_STEPS;
     }
@@ -806,6 +828,7 @@ int DefaultRobot::calc_steps()
     return steps;
 }
 
+//-----------------------------------------------------------------------------
 /** Translates coordinates from an angle(in degrees) to values within the range
  *  of -1.0 to 1.0 to use the same format as the KartControl::lr variable.
  */
@@ -819,6 +842,7 @@ float DefaultRobot::angle_to_control( float angle ) const
     return angle;
 }
 
+//-----------------------------------------------------------------------------
 /** Finds the approximate radius of a track's curve. It needs two arguments,
  *  the number of the drivepoint that marks the beginning of the curve, and
  *  the number of the drivepoint that marks the ending of the curve.
@@ -894,6 +918,7 @@ float DefaultRobot::get_approx_radius(const int START, const int END) const
     return radius;
 }
 
+//-----------------------------------------------------------------------------
 /**Find_curve() gathers info about the closest sectors ahead: the curve
  * angle, the direction of the next turn, and the optimal speed at which the
  * curve can be travelled at it's widest angle.
