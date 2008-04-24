@@ -226,6 +226,7 @@ void SkidMark::SkidMarkPos::addEnd(const sgCoord& coord)
     sgVec4 color;
     sgSetVec4(color, 0.15f, 0.15f, 0.15f, 0.0f);
     colours->add(color); colours->add(color);
+    makeDList();
 }   // addEnd
 
 /* EOF */
