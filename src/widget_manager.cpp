@@ -732,6 +732,101 @@ void WidgetManager::setSelectedWgt(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
+bool WidgetManager::addTitleWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const std::string TEXT
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    showWgtRect( TOKEN );
+    setWgtTextSize( TOKEN, WGT_FNT_LRG );
+    showWgtText( TOKEN );
+    setWgtText( TOKEN, TEXT );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::addTextWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const std::string TEXT
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    showWgtRect( TOKEN );
+    showWgtText( TOKEN );
+    setWgtText( TOKEN, TEXT );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::addTextButtonWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const std::string TEXT
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    showWgtRect( TOKEN );
+    showWgtText( TOKEN );
+    setWgtText( TOKEN, TEXT );
+    activateWgt( TOKEN );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::addImgWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const int IMG
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    setWgtColor( TOKEN, WGT_WHITE );
+    showWgtRect( TOKEN );
+    setWgtTexture( TOKEN, IMG );
+    showWgtTexture( TOKEN );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::addImgButtonWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const int IMG
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    setWgtColor( TOKEN, WGT_WHITE );
+    showWgtRect( TOKEN );
+    setWgtTexture( TOKEN, IMG );
+    showWgtTexture( TOKEN );
+    activateWgt( TOKEN );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 void WidgetManager::setInitialActivationState( const bool ACTIVE)
 {
     m_default_active = ACTIVE;

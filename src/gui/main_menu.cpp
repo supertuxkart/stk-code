@@ -42,52 +42,32 @@ enum WidgetTokens
 
 MainMenu::MainMenu()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialActivationState(true);
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt(WTOK_SINGLE, 25, 7);
-    widget_manager->setWgtText( WTOK_SINGLE, _("Single Player") );
 
-    widget_manager->addWgt(WTOK_MULTI, 25, 7);
-    widget_manager->setWgtText( WTOK_MULTI, _("Multiplayer") );
+    widget_manager->addTextButtonWgt( WTOK_SINGLE, 25, 7, _("Single Player") );
+    widget_manager->addTextButtonWgt( WTOK_MULTI, 25, 7, _("Multiplayer") );
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
     if(all_challenges.size()>0)
     {
-        widget_manager->addWgt(WTOK_CHALLENGES, 25, 7);
-        widget_manager->setWgtText( WTOK_CHALLENGES, _("Challenges") );
+        widget_manager->addTextButtonWgt( WTOK_CHALLENGES, 25, 7, _("Challenges") );
     }
-    widget_manager->addWgt(WTOK_OPTIONS, 25, 7);
-    widget_manager->setWgtText( WTOK_OPTIONS, _("Options") );
 
-    widget_manager->addWgt(WTOK_QUIT, 25, 7);
-    widget_manager->setWgtText( WTOK_QUIT, _("Quit") );
+    widget_manager->addTextButtonWgt( WTOK_OPTIONS, 25, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 25, 7, _("Quit") );
 
-    widget_manager->addWgt(WTOK_EMPTY, 25, 7);
-    widget_manager->hideWgtText( WTOK_EMPTY );
-    widget_manager->hideWgtRect( WTOK_EMPTY );
-    widget_manager->deactivateWgt( WTOK_EMPTY );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 25, 7 );
 
-    widget_manager->addWgt(WTOK_HELP, 25, 7);
-    widget_manager->setWgtText( WTOK_HELP, _("Help") );
-    //FIXME: if text size is not set, we get a crash when resizing the rect to the text
+    widget_manager->addTextButtonWgt( WTOK_HELP, 25, 7, _("Help") );
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
 
-    widget_manager->addWgt(WTOK_CREDITS, 25, 7);
-    widget_manager->setWgtText( WTOK_CREDITS, _("Credits") );
+    widget_manager->addTextButtonWgt( WTOK_CREDITS, 25, 7, _("Credits") );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
 
     if(user_config->getWarning()!="")
     {
-        widget_manager->addWgt( WTOK_WARNING, 80, 8 );
-        widget_manager->setWgtText( WTOK_WARNING, user_config->getWarning().c_str() );
+        widget_manager->addTextWgt( WTOK_WARNING, 80, 8, user_config->getWarning().c_str() );
         widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
-        widget_manager->deactivateWgt(WTOK_WARNING);
         widget_manager->hideWgtRect(WTOK_WARNING);
     }
 

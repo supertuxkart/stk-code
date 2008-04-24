@@ -179,6 +179,56 @@ public:
     int getSelectedWgt() const { return m_selected_wgt_token;}
     void setSelectedWgt(const int TOKEN);
 
+    /* Macro functions. They are widgets with special predefined values. */
+
+    //FIXME: Temporal, till I rename addWgt() to addEmptyWgt()
+    bool addEmptyWgt(const int TOKEN, const int MIN_WIDTH, const int MIN_HEIGHT) {return addWgt(TOKEN,MIN_WIDTH,MIN_HEIGHT);}
+
+    //Widget that adds visible rect & text, sets the text and large font
+    bool addTitleWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const std::string TEXT
+    );
+
+    //Widget that adds visible rect & text, sets the text and is selectable
+    bool addTextButtonWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const std::string TEXT
+    );
+
+    //Widget that adds visible rect & text, and sets the text
+    bool addTextWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const std::string TEXT
+    );
+
+    //Widget that adds visible rect & image, white rect, and sets the texture
+    bool addImgWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const int IMG
+    );
+
+    //Selectable widget with visible rect & image, white rect and texture
+    bool addImgButtonWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const int IMG
+    );
+
     /* On/off widget switch features. They are all disabled/hidden initially. */
     void setInitialActivationState( const bool ACTIVE);
 
