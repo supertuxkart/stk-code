@@ -20,6 +20,7 @@
 #include <algorithm>
 #include "challenges/race_track_time.hpp"
 #include "world.hpp"
+#include "race_manager.hpp"
 
 RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track in 1:15")
 {
@@ -27,6 +28,16 @@ RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track i
     setFeatureDescription("New game mode\n'Follow Leader'\nnow available");
     setFeature("followleader");
 }   // RaceTrackTime
+
+//-----------------------------------------------------------------------------
+void RaceTrackTime::setRace() const {
+    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setTrack("race");
+    race_manager->setDifficulty(RaceManager::RD_EASY);
+    race_manager->setNumLaps(3);
+    race_manager->setNumKarts(1);
+    race_manager->setNumPlayers(1);
+}   // setRace
 
 //-----------------------------------------------------------------------------
 bool RaceTrackTime::raceFinished()

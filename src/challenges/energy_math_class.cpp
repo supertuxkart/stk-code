@@ -19,15 +19,26 @@
 
 #include <algorithm>
 #include "challenges/energy_math_class.hpp"
+#include "race_manager.hpp"
 #include "world.hpp"
 
-EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", "Collect Coins in Race track")
+EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", "Collect Coins in Math Class")
 {
     setChallengeDescription("Collect at least 6 coins\non three laps of\nOliver's Math Class\nin under 1 minute.");
     setFeatureDescription("New game mode\n'Grand Prix'\nnow available");
     setFeature("grandprix");
 }   // EnergyMathClass
 
+//-----------------------------------------------------------------------------
+void EnergyMathClass::setRace() const {
+    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setTrack("olivermath");
+    race_manager->setDifficulty(RaceManager::RD_EASY);
+    race_manager->setNumLaps(3);
+    race_manager->setNumKarts(1);
+    race_manager->setNumPlayers(1);
+}   // setRace
+\
 //-----------------------------------------------------------------------------
 bool EnergyMathClass::raceFinished()
 {

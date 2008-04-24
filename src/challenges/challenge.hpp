@@ -75,5 +75,6 @@ public:
     // the feature remains locked.
     virtual bool raceFinished()                      {return false;}   // end of a race
     virtual bool grandPrixFinished()                 {return false;}   // end of a GP
+    virtual void setRace() const = 0;                                  // set race to use
 };
 #endif

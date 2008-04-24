@@ -32,7 +32,9 @@ private:
 public:
          ChallengesMenu();
         ~ChallengesMenu();
-    void select       ();
+    void select        ();
+    void update        (float dt);
+
 };  // ChallengesMenu
 
 #endif

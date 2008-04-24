@@ -30,6 +30,7 @@ class RaceTrackTime : public Challenge
 public:
                  RaceTrackTime();
     virtual bool raceFinished();
+    virtual void setRace() const;
 };   // RaceTrackTime
 
 #endif

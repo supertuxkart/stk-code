@@ -30,6 +30,7 @@ class WinGOTMCup: public Challenge
 public:
                  WinGOTMCup();
     virtual bool grandPrixFinished();
+    virtual void setRace() const;
 };   // WinGOTMCup
 
 #endif

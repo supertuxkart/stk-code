@@ -69,6 +69,7 @@ ChallengesMenu::ChallengesMenu()
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // ChallengesMenu
+
 //-----------------------------------------------------------------------------
 ChallengesMenu::~ChallengesMenu()
 {
@@ -76,7 +77,18 @@ ChallengesMenu::~ChallengesMenu()
 }   // ~ChallengesMenu
 
 //-----------------------------------------------------------------------------
+void ChallengesMenu::update(float dt)
+{
+    const int challenge= widget_manager->getSelectedWgt() - WTOK_CHALLENGES;
+    if(challenge>=0 && challenge<(int)m_all_challenges.size())
+    {
+        widget_manager->setWgtText(WTOK_DESCRIPTION,
+                                   m_all_challenges[challenge]->getChallengeDescription());
+    }
+    BaseGUI::update(dt);
+}   // update
 
+//-----------------------------------------------------------------------------
 void ChallengesMenu::select()
 {
     if(widget_manager->getSelectedWgt()==WTOK_BACK)
@@ -87,7 +99,7 @@ void ChallengesMenu::select()
     int n=widget_manager->getSelectedWgt()-WTOK_CHALLENGES;
     if(n>=0 && n<(int)m_all_challenges.size())
     {
-        widget_manager->setWgtText(WTOK_DESCRIPTION,
-                                   m_all_challenges[n]->getChallengeDescription());
+        m_all_challenges[n]->setRace();
+        race_manager->startNew();
     }
 }   // select

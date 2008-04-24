@@ -29,12 +29,13 @@ class AllTracks : public Challenge
 {
 private:
     std::vector<std::string> m_raced_tracks;
+    std::vector<std::string> m_all_tracks;
 public:
                  AllTracks();
     virtual void loadState(const lisp::Lisp* config);
     virtual void saveState(lisp::Writer* writer);
     virtual bool raceFinished();
-
+    virtual void setRace() const;
 };   // AllTracks
 
 #endif

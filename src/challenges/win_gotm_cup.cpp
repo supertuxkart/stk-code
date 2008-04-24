@@ -21,6 +21,7 @@
 #include "challenges/win_gotm_cup.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
+#include "cup_data.hpp"
 
 WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", "Win GOTM Cup")
 {
@@ -30,6 +31,16 @@ WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", "Win GOTM Cup")
     addDependency("energymathclass");
     setFeature("jungle");
 }   // WinGOTMCup
+
+//-----------------------------------------------------------------------------
+void WinGOTMCup::setRace() const {
+    race_manager->setRaceMode(RaceManager::RM_GRAND_PRIX);
+    CupData cup("gotm.cup");
+    race_manager->setGrandPrix(cup);
+    race_manager->setDifficulty(RaceManager::RD_HARD);
+    race_manager->setNumKarts(4);
+    race_manager->setNumPlayers(1);
+}   // setRace
 
 //-----------------------------------------------------------------------------
 bool WinGOTMCup::grandPrixFinished()

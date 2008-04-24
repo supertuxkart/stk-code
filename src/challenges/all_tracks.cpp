@@ -20,9 +20,20 @@
 #include <algorithm>
 #include "challenges/all_tracks.hpp"
 #include "world.hpp"
+#include "track_manager.hpp"
+
+char *ALLTRACKS[] = {"beach",         "bsodcastle", " islandtrack", "lighthouse",
+                     "littlevolcano", "olivermath",  "race",        "sandtrack",
+                     "startrack",     "subseatrack", "tuxtrack",    "volcano",
+                     ""};
 
 AllTracks::AllTracks() : Challenge("alltracks", "All Tracks")
 {
+    for(int i=0;; i++)
+    {
+        if(ALLTRACKS[i][0]==0) break;
+        m_all_tracks.push_back(ALLTRACKS[i]);
+    }
     setChallengeDescription("Finish one race\nin each track");
     setFeatureDescription("New track: SnowTuxPeak\nnow available");
     setFeature("snowtuxpeak");
@@ -32,6 +43,15 @@ AllTracks::AllTracks() : Challenge("alltracks", "All Tracks")
 void AllTracks::loadState(const lisp::Lisp* config)
 {
     config->getVector("solved-tracks", m_raced_tracks);
+    // Remove the finished tracks from the list of all tracks, so that
+    // startRace picks a track that wasn't used before.
+    for(std::vector<std::string>::iterator i=m_raced_tracks.begin();
+        i!=m_raced_tracks.end(); i++)
+    {
+        std::vector<std::string>::iterator p=std::find(m_all_tracks.begin(),
+                                                       m_all_tracks.end(),*i);
+        m_all_tracks.erase(p);
+    }
 }   // loadState
 
 //-----------------------------------------------------------------------------
@@ -39,6 +59,19 @@ void AllTracks::saveState(lisp::Writer* writer)
 {
     writer->write("solved-tracks\t", m_raced_tracks);
 }   // saveState
+
+//-----------------------------------------------------------------------------
+void AllTracks::setRace() const
+{
+    assert(m_all_tracks.size()>0);
+    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setTrack(m_all_tracks[0]);
+    race_manager->setDifficulty(RaceManager::RD_EASY);
+    race_manager->setNumLaps(1);
+    race_manager->setNumKarts(4);
+    race_manager->setNumPlayers(1);
+
+}   // setRace
 
 //-----------------------------------------------------------------------------
 bool AllTracks::raceFinished()
@@ -49,9 +82,15 @@ bool AllTracks::raceFinished()
         ==m_raced_tracks.end())
     {
         m_raced_tracks.push_back(track_name);
+        std::vector<std::string>::iterator p=std::find(m_all_tracks.begin(),
+                                                       m_all_tracks.end(), 
+                                                       track_name);
+        // In case that a track was raced (for the first time) that's not
+        // in the list of tracks to race ...
+        if(p!=m_all_tracks.end()) m_all_tracks.erase(p);
     }
 
     // Check if all tracks are finished. If so, unlock feature
-    return (m_raced_tracks.size()==13);
+    return (m_all_tracks.size()==0);
 }   // raceFinished
 //-----------------------------------------------------------------------------

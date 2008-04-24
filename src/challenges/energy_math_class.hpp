@@ -30,6 +30,7 @@ class EnergyMathClass : public Challenge
 public:
                  EnergyMathClass();
     virtual bool raceFinished();
+    virtual void setRace() const;
 };   // EnergyMathClass
 
 #endif
