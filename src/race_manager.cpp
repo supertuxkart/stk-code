@@ -186,7 +186,7 @@ void RaceManager::exit_race()
 {
     // Only display the grand prix result screen if all tracks 
     // were finished, and not when a race is aborted.
-    if(m_race_mode==RM_GRAND_PRIX && m_track_number==m_tracks.size()) 
+    if(m_race_mode==RM_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
         unlock_manager->grandPrixFinished();
         menu_manager->switchToGrandPrixEnding();
