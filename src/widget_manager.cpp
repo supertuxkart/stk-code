@@ -854,7 +854,7 @@ void WidgetManager::setInitialBorderState
 )
 {
     m_default_show_border = SHOW;
-    m_default_border_percentage = PERCENTAGE * 0.01;
+    m_default_border_percentage = PERCENTAGE * 0.01f;
     m_default_border_color = COLOR;
 }
 
@@ -1056,7 +1056,7 @@ void WidgetManager::setWgtBorderPercentage(const int TOKEN, const int PERCENTAGE
     }
 
     const int ID = findId(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->m_border_percentage = PERCENTAGE * 0.01;
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_border_percentage = PERCENTAGE * 0.01f;
     else
     {
         std::cerr << "WARNING: tried to change the rect color of an " <<
