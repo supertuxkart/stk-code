@@ -39,7 +39,9 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_numLoops        = LOOP_FOREVER;
     m_normal_filename = "";
     m_fast_filename   = "";
-    m_fade_time       = 1.0f;
+    m_faster_time     = 1.0f;
+    m_max_pitch       = 0.1f;
+
     if(StringUtils::extension(filename)!="music")
     {
         // Create information just from ogg file
@@ -65,13 +67,19 @@ MusicInformation::MusicInformation(const std::string& filename)
                  filename.c_str());
         throw std::runtime_error(msg);
     }
-    LISP->get      ("title",      m_title          );
-    LISP->get      ("composer",   m_composer       );
-    LISP->get      ("loop",       m_numLoops       );
-    LISP->get      ("music",      m_normal_filename);
-    LISP->get      ("fast-music", m_fast_filename  );
-    LISP->get      ("fade-time",  m_fade_time      );
-    LISP->getVector("tracks",     m_all_tracks     );
+    LISP->get      ("title",       m_title          );
+    LISP->get      ("composer",    m_composer       );
+    LISP->get      ("loop",        m_numLoops       );
+    LISP->get      ("music",       m_normal_filename);
+    LISP->get      ("fast-music",  m_fast_filename  );
+    // m_faster_time is used for twice: either as time to fade in faster music
+    // (if available), or the time to increase the pitch (if no faster music 
+    // is available). We allow each .music file to use any of the two names. 
+    // LISP->get doesn't change the value if the item is not found.
+    LISP->get      ("fade-time",   m_faster_time    );
+    LISP->get      ("faster-time", m_faster_time    );
+    LISP->get      ("max-pitch",   m_max_pitch      );
+    LISP->getVector("tracks",      m_all_tracks     );
 
     // Get the path from the filename and add it to the ogg filename
     std::string path=StringUtils::path(filename);

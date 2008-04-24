@@ -54,9 +54,12 @@ private:
     std::map<std::string,   const MusicInformation*> 
                             m_allMusic;
     void                    loadMusicInformation();
-    enum {SOUND_NORMAL, SOUND_FADING, 
-         SOUND_FAST}        m_mode; 
-    float                   m_time_since_fade;
+    enum {SOUND_NORMAL,                    // normal music is played
+          SOUND_FADING,                    // normal music fading out, faster music fading in
+          SOUND_FASTER,                    // change pitch of normal music (i.e. no faster avail)
+          SOUND_FAST}                      // playing faster music or max pitch reached
+                            m_mode; 
+    float                   m_time_since_faster;
 
 public:
     SoundManager();

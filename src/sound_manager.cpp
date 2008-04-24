@@ -167,10 +167,7 @@ void SoundManager::playSfx(unsigned int id)
 {
     if(!user_config->doSFX() || !m_initialized) return;
 
-    if (id<0 || id>=m_sfxs.size() || !m_sfxs[id])
-    {
-        assert(false);
-    }
+    assert(id>=0 && id<m_sfxs.size() && m_sfxs[id]);
     m_sfxs[id]->play();
 
 }   // playSfx
@@ -179,7 +176,7 @@ void SoundManager::playSfx(unsigned int id)
 void SoundManager::playMusic(const MusicInformation* mi)
 {
     m_music_information  = mi;
-    m_time_since_fade    = 0.0f;
+    m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
     if(!user_config->doMusic() || !m_initialized) return;
     
@@ -277,11 +274,17 @@ void SoundManager::pauseMusic()
 */
 void SoundManager::switchToFastMusic()
 {
-    if(m_fast_music && m_mode==SOUND_NORMAL)
+    if(m_mode!=SOUND_NORMAL) return;  // ignore if already fast
+
+    m_time_since_faster = 0.0f;
+    if(m_fast_music)
     {
-        m_mode            = SOUND_FADING;
-        m_time_since_fade = 0.0f;
+        m_mode = SOUND_FADING;
         m_fast_music->playMusic();
+    }
+    else
+    {
+        m_mode = SOUND_FASTER;
     }
 }   // switchToFastMusic
 //-----------------------------------------------------------------------------
@@ -306,17 +309,35 @@ void SoundManager::update(float dt)
         switch(m_mode)
         {
         case SOUND_FADING: {
-             m_time_since_fade +=dt;
-             if(m_time_since_fade>=m_music_information->getFadeTime())
+             if(!m_music_information) return;
+             m_time_since_faster +=dt;
+             if(m_time_since_faster>=m_music_information->getFasterTime())
              {
                  m_mode=SOUND_FAST;
                  m_normal_music->stopMusic();
                  m_fast_music->update();
                  return;
              }
-             float fraction=m_time_since_fade/m_music_information->getFadeTime();
+             float fraction=m_time_since_faster/m_music_information->getFasterTime();
              m_normal_music->updateFading(1-fraction);
              m_fast_music->updateFading(fraction);
+             break;
+             }
+        case SOUND_FASTER: {
+             if(!m_music_information) return;
+             m_time_since_faster +=dt;
+             if(m_time_since_faster>=m_music_information->getFasterTime())
+             {
+                 // Once the pitch is adjusted, just switch back to normal 
+                 // mode. We can't switch to fast music mode, since this would
+                 // play m_fast_music, which isn't available.
+                 m_mode=SOUND_NORMAL;
+                 return;
+             }
+             float fraction=m_time_since_faster/m_music_information->getFasterTime();
+             m_normal_music->updateFaster(fraction,
+                                          m_music_information->getMaxPitch());
+             
              break;
              }
         case SOUND_NORMAL:

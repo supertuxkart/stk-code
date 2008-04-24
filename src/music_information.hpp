@@ -32,7 +32,9 @@ private:
     std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
     int                      m_numLoops;
-    float                    m_fade_time;
+    float                    m_faster_time;    // Either time for fading faster
+                                               // music in, or time to change pitch
+    float                    m_max_pitch;      // maximum pitch for faster music
     static const int         LOOP_FOREVER=-1;
 public:
                        MusicInformation (const std::string& filename);
@@ -41,7 +43,8 @@ public:
     const std::string& getNormalFilename() const {return m_normal_filename; }
     const std::string& getFastFilename  () const {return m_fast_filename;   }
     int                getNumLoops      () const {return m_numLoops;        }
-    float              getFadeTime      () const {return m_fade_time;       }
+    float              getFasterTime    () const {return m_faster_time;     }
+    float              getMaxPitch      () const {return m_max_pitch;       }
     void               addMusicToTracks () const;
 };   // MusicInformation
 #endif

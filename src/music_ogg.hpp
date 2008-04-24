@@ -41,6 +41,7 @@ public:
 
     virtual void update();
     virtual void updateFading(float percent);
+    virtual void updateFaster(float percent, float max_pitch);
 
     virtual bool load(const std::string& filename);
 
