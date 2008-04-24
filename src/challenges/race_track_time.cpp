@@ -35,7 +35,7 @@ void RaceTrackTime::setRace() const {
     race_manager->setTrack("race");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);
-    race_manager->setNumKarts(1);
+    race_manager->setNumKarts(4);
     race_manager->setNumPlayers(1);
 }   // setRace
 
@@ -47,6 +47,7 @@ bool RaceTrackTime::raceFinished()
     Kart* kart=world->getPlayerKart(0);
     if(kart->getFinishTime()>75) return false;    // too slow
     if(kart->getLap()!=3       ) return false;    // wrong number of laps
+    if(race_manager->getNumKarts()<4) return false; //not enough AI karts
     return true;
 }   // raceFinished
 //-----------------------------------------------------------------------------
