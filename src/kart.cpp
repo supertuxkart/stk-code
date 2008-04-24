@@ -397,7 +397,8 @@ void Kart::doLapCounting ()
             m_race_lap++ ;
         }
         // Sound manager makes sure that only the first call switches the music
-        if(m_race_lap==race_manager->getNumLaps()-1)   // last lap started
+        if(m_race_lap==race_manager->getNumLaps()-1 && 
+           race_manager->getRaceMode()!=RaceManager::RM_FOLLOW_LEADER)   // last lap started
         {
             sound_manager->switchToFastMusic();
         }
