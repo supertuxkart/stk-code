@@ -118,7 +118,7 @@ LeaderResult::LeaderResult()
 
     for(unsigned int i=1; i < NUM_KARTS; ++i)
     {
-        char sTime[20];
+        // char sTime[20];
         // For now: don't display the time, since it's not correctly
         // set in follow-the-leader
         //TimeToString(race_time[i], sTime);
