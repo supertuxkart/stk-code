@@ -50,7 +50,7 @@ HelpPageTwo::HelpPageTwo()
     const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
     widget_manager->setInitialRectState( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
     widget_manager->setInitialTextState( false, "", TEXT_SIZE,
-        WGT_FONT_GUI );
+        WGT_FONT_GUI, WGT_WHITE );
 
     widget_manager->addWgt(WTOK_MSG6, 100, 8);
     widget_manager->setWgtText(WTOK_MSG6,

@@ -113,7 +113,7 @@ RaceGUI::RaceGUI()
 #ifdef USE_WIDGET_MANAGER
     const bool HIDE_TEXT = false;
     widget_manager->setInitialTextState(HIDE_TEXT, "", WGT_FNT_LRG,
-        WGT_FONT_RACE );
+        WGT_FONT_RACE, WGT_WHITE );
 
     widget_manager->addWgt( WTOK_FPS, 30, 10 );
     widget_manager->addWgt( WTOK_EMPTY1, 40, 10 );
@@ -367,15 +367,16 @@ void RaceGUI::drawPlayerIcons ()
         y = user_config->m_height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
 
         // draw text
-        int red=255, green=255, blue=255;
+        GLfloat COLORS[] = {1.0f, 1.0f, 1.0f, 1.0f};
         int numLaps = race_manager->getNumLaps();
+
         if(lap>=numLaps)
         {  // kart is finished, display in green
-            red=0; blue=0;
+            COLORS[1] = COLORS[2] = 0;
         }
         else if(lap>=0 && numLaps>1)
         {
-            green = blue  = 255-(int)((float)lap/((float)numLaps-1.0f)*255.0f);
+            COLORS[1] = COLORS[2] = 1.0f-(float)lap/((float)numLaps-1.0f);
         }
 
         glDisable(GL_CULL_FACE);
@@ -399,12 +400,13 @@ void RaceGUI::drawPlayerIcons ()
                 TimeToString(timeBehind, str+1);
             }
             font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
-                                   red, green, blue);
+                                   COLORS);
         }
         if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER && i==0)
         {
+            GLfloat const RED[] = { 1.0f, 0, 0, 1.0f};
             font_race->PrintShadow(_("Leader"), 30, ICON_PLAYER_WIDHT+x, y+5,
-                                   255, 0, 0);
+                                   RED );
         }
 
         glEnable(GL_CULL_FACE);
@@ -820,9 +822,11 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
         // Display only messages for all karts, or messages for this kart
         if( msg.m_kart && msg.m_kart!=player_kart) continue;
 
+        //FIXME: instead of the next line, in msg there should be a GLfloat that acts as the colors.
+        GLfloat const COLORS[] = {msg.m_red/255.0f, msg.m_green/255.0f, msg.m_blue/255.0f, 255.0f};
         font_race->Print( msg.m_message.c_str(), msg.m_font_size, 
                           Font::CENTER_OF_SCREEN, y,
-                          msg.m_red, msg.m_green, msg.m_blue,
+                          COLORS,
                           ratio_x, ratio_y,
                           offset_x, offset_x+(int)(user_config->m_width*ratio_x));
         // Add 20% of font size as space between the lines
@@ -855,14 +859,12 @@ void RaceGUI::drawMusicDescription()
     {
         std::string s="by "+mi->getComposer();
         font_race->Print( s.c_str(), 25, 
-                          Font::CENTER_OF_SCREEN, y,
-                          255, 255, 255);
+                          Font::CENTER_OF_SCREEN, y );
         y+=20;
     }
     std::string s="\""+mi->getTitle()+"\"";
     font_race->Print( s.c_str(), 25, 
-                      Font::CENTER_OF_SCREEN, y,
-                      255, 255, 255);
+                      Font::CENTER_OF_SCREEN, y );
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------
@@ -890,21 +892,33 @@ void RaceGUI::drawStatusText(const float dt)
     glOrtho        ( 0, user_config->m_width, 0, user_config->m_height, 0, 100 ) ;
     switch (world->getPhase())
     {
-    case World::READY_PHASE: font_race->PrintShadow(_("Ready!"), 90, 
-                                                    Font::CENTER_OF_SCREEN,
-                                                    Font::CENTER_OF_SCREEN,
-                                                    230, 170, 160);
-         break;
-    case World::SET_PHASE:   font_race->PrintShadow(_("Set!"), 90, 
-                                                    Font::CENTER_OF_SCREEN,
-                                                    Font::CENTER_OF_SCREEN,
-                                                    230, 230, 160);
-         break;
-    case World::GO_PHASE:    font_race->PrintShadow(_("Go!"), 90, 
-                                                    Font::CENTER_OF_SCREEN,
-                                                    Font::CENTER_OF_SCREEN,
-                                                    100, 210, 100);
-         break;
+    case World::READY_PHASE:
+        {
+            GLfloat const COLORS[] = { 0.9f, 0.66f, 0.62f, 1.0f };
+            font_race->PrintShadow( _("Ready!"), 90,
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
+                                   COLORS );
+        }
+        break;
+    case World::SET_PHASE:
+        {
+            GLfloat const COLORS[] = { 0.9f, 0.9f, 0.62f, 1.0f };
+            font_race->PrintShadow( _("Set!"), 90,
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
+                                   COLORS );
+        }
+        break;
+    case World::GO_PHASE:
+        {
+            GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
+            font_race->PrintShadow( _("Go!"), 90, 
+                                   Font::CENTER_OF_SCREEN,
+                                   Font::CENTER_OF_SCREEN,
+                                   COLORS );
+        }
+        break;
     default: 
          break;
     }   // switch
@@ -912,8 +926,11 @@ void RaceGUI::drawStatusText(const float dt)
     for(int i = 0; i < 10; ++i)
     {
         if(world->m_debug_text[i] != "")
-            font_race->Print(world->m_debug_text[i].c_str(),
-                             20, 20, 200 -i*20, 100, 210, 100);
+        {
+            GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
+            font_race->Print( world->m_debug_text[i].c_str(),
+                             20, 20, 200 -i*20, COLORS );
+        }
     }
     if(world->isStartPhase())
     {
@@ -921,9 +938,10 @@ void RaceGUI::drawStatusText(const float dt)
         {
             if(world->getPlayerKart(i)->earlyStartPenalty())
             {
-                font_race->PrintShadow(_("Penalty time!!"), 80,
+                GLfloat const COLORS[] = { 0.78f, 0.025f, 0.025f, 1.0f };
+                font_race->PrintShadow( _("Penalty time!!"), 80,
                                        Font::CENTER_OF_SCREEN, 200,
-                                       200, 10, 10);
+                                        COLORS );
             }   // if penalty
         }  // for i < getNumPlayers
     }  // if not RACE_PHASE

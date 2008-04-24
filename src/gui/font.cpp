@@ -59,7 +59,7 @@ Font::~Font()
 
 void Font::Print(const char *text, int size, 
                  int x, int y,
-                 int red, int green, int blue,
+                 const GLfloat* color,
                  float scale_x, float scale_y,
                  int left, int right, int top, int bottom, bool doShadow)
 {
@@ -95,11 +95,19 @@ void Font::Print(const char *text, int size,
     if(doShadow)
     {
         m_text_out->start2f((GLfloat)x-2, (GLfloat)y-2);
-        glColor3ub(0, 0, 0);
+        glColor4ub(0, 0, 0, 100);
         m_text_out->puts(text);
     }
     m_text_out->start2f((GLfloat)x, (GLfloat)y);
-    glColor3ub(red, green, blue);
+
+    if( color == NULL )
+    {
+        glColor4f(1.0f,1.0f,1.0f,1.0f);
+    }
+    else
+    {
+        glColor4fv(color);
+    }
     m_text_out->puts(text);
     m_text_out->end();
 

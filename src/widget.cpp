@@ -383,7 +383,7 @@ void Widget::update(const float DELTA)
                 glScalef(m_text_scale, m_text_scale, 1.0f);
                 m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
                     x_pos, y_pos - m_text_size / 2,
-                    255, 255, 255, 1.0f, 1.0f);
+                    m_text_color, 1.0f, 1.0f);
                 glScalef(1.0f/m_text_scale, 1.0f/m_text_scale, 1.0f);
             }
 

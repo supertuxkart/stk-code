@@ -149,10 +149,11 @@ class Widget
     bool m_enable_texture;
     GLuint m_texture;
 
-    Font *m_font;
     bool m_enable_text;
     std::string m_text;
     WidgetFontSize m_text_size;
+    Font *m_font;
+    const GLfloat *m_text_color;
 
     //TODO: This variable exists only to go around a bug; should be removed
     //after better restructuration.

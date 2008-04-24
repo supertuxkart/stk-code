@@ -59,7 +59,7 @@ TrackSel::TrackSel()
     widget_manager->setInitialActivationState(true);
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_SML,
-        WGT_FONT_GUI );
+        WGT_FONT_GUI, WGT_WHITE );
 
     for (unsigned int i = 0; i != track_manager->getTrackCount(); ++i)
     {

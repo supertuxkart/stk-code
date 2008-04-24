@@ -70,7 +70,7 @@ CreditsMenu::CreditsMenu()
     widget_manager->setInitialActivationState( true );
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->setInitialTextState(SHOW_TEXT, "", TEXT_SIZE,
-        WGT_FONT_GUI );
+        WGT_FONT_GUI, WGT_WHITE );
 
     widget_manager->addWgt( WTOK_CREDITS, 100, 93);
     widget_manager->setWgtText( WTOK_CREDITS, credits_text );

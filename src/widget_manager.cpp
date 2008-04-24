@@ -93,6 +93,7 @@ bool WidgetManager::addWgt
     new_id.widget->m_text.assign(m_default_text);
     new_id.widget->m_text_size = m_default_text_size;
     new_id.widget->setFont( m_default_font );
+    new_id.widget->m_text_color = m_default_text_color;
 
     new_id.widget->m_enable_scroll  = m_default_enable_scroll;
     new_id.widget->m_scroll_pos_x   = (float)m_default_scroll_preset_x;
@@ -875,13 +876,15 @@ void WidgetManager::setInitialTextState
     const bool SHOW,
     const std::string TEXT,
     const WidgetFontSize SIZE,
-    const WidgetFont FONT
+    const WidgetFont FONT,
+    const GLfloat* const COLOR
 )
 {
     m_default_show_text = SHOW;
     m_default_text = TEXT;
     m_default_text_size = SIZE;
     m_default_font = FONT;
+    m_default_text_color = COLOR;
 }
 
 //-----------------------------------------------------------------------------
@@ -939,9 +942,10 @@ void WidgetManager::restoreDefaultStates()
     m_default_show_texture = false;
     m_default_texture = 0;
     m_default_show_text = false;
-    m_default_font = WGT_FONT_GUI;
     m_default_text = "";
     m_default_text_size = WGT_FNT_MED;
+    m_default_font = WGT_FONT_GUI;
+    m_default_text_color = WGT_WHITE;
     m_default_enable_scroll = false;
     m_default_scroll_preset_x = WGT_SCROLL_CENTER;
     m_default_scroll_preset_y = WGT_SCROLL_CENTER;
@@ -1170,6 +1174,18 @@ void WidgetManager::setWgtFont( const int TOKEN, const WidgetFont FONT )
     else
     {
         std::cerr << "WARNING: tried to set the font of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtTextColor( const int TOKEN, const GLfloat* const COLOR)
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->m_text_color = COLOR;
+    else
+    {
+        std::cerr << "WARNING: tried to set the text color of an unnamed " <<
             "widget with token " << TOKEN << '\n';
     }
 }

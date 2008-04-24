@@ -107,6 +107,7 @@ class WidgetManager
     std::string m_default_text;
     WidgetFontSize m_default_text_size;
     WidgetFont m_default_font;
+    const GLfloat* m_default_text_color;
 
     bool m_default_enable_scroll;
     WidgetScrollPos m_default_scroll_preset_x;
@@ -253,7 +254,8 @@ public:
         const bool SHOW,
         const std::string TEXT,
         const WidgetFontSize SIZE,
-        const WidgetFont FONT
+        const WidgetFont FONT,
+        const GLfloat* const COLOR
     );
 
     void setInitialScrollState
@@ -294,6 +296,7 @@ public:
     void setWgtBorderPercentage(const int TOKEN, const int PERCENTAGE);
     void showWgtBorder(const int TOKEN);
     void hideWgtBorder(const int TOKEN);
+    //TODO: add initial border colors, if I don't erase those functions.
 
     void setWgtTexture(const int TOKEN, const int TEXTURE);
     void showWgtTexture(const int TOKEN);
@@ -301,8 +304,9 @@ public:
 
     void setWgtText( const int TOKEN, const char* TEXT );
     void setWgtText( const int TOKEN, const std::string TEXT );
-    void setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE);
-    void setWgtFont( const int TOKEN, const WidgetFont FONT);
+    void setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE );
+    void setWgtFont( const int TOKEN, const WidgetFont FONT );
+    void setWgtTextColor( const int TOKEN, const GLfloat* const COLOR );
     void showWgtText( const int TOKEN );
     void hideWgtText( const int TOKEN );
     void reloadFonts();

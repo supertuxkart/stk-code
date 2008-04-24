@@ -46,7 +46,7 @@ RaceMenu::RaceMenu()
     const bool SHOW_TEXT = true;
     widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
     widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI );
+        WGT_FONT_GUI, WGT_WHITE );
 
     widget_manager->addWgt(WTOK_PAUSE, 30, 7);
     widget_manager->setWgtText(WTOK_PAUSE, _("Paused"));

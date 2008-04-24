@@ -47,30 +47,30 @@ public:
     // ----------------------------------------------
     void Print(      const char *text, int size,
                      int x, int y,
-                     int red=255, int green=255, int blue=255,
+                     const GLfloat* color = NULL,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1,
                      bool doShadow=false);
     void Print(      std::string const &text, int size,
                      int x, int y,
-                     int red=255, int green=255, int blue=255,
+                     const GLfloat* color = NULL,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1,
                      bool doShadow=false)
     {
         Print(text.c_str(), size, x, y,
-              red, green, blue, scale_x, scale_y, left, right, top, bottom,
+              color, scale_x, scale_y, left, right, top, bottom,
               doShadow);
     }
 
     void PrintShadow(const char *text, int size,
                      int x, int y,
-                     int red=255, int green=255, int blue=255,
+                     const GLfloat* color = NULL,
                      float scale_x=1.0f, float scale_y=1.0f,
                      int left=-1, int right=-1, int top=-1, int bottom=-1)
     {
                      Print(text, size, x, y,
-                           red, green, blue, scale_x, scale_y,
+                           color, scale_x, scale_y,
                            left, right, top, bottom, true);
     }
 };
