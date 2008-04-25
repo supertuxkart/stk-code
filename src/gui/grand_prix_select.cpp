@@ -24,6 +24,8 @@
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
+#include "track_manager.hpp"
+#include "material_manager.hpp"
 #include "user_config.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
@@ -34,31 +36,22 @@ enum WidgetTokens
 
     //FIXME: finish the tokens
 
-    WTOK_EMPTY0,
     WTOK_DESCRIPTION,
-    WTOK_EMPTY1,
+    WTOK_TRACKS,
+    WTOK_IMG,
     WTOK_QUIT,
 
     WTOK_FIRSTPRIX
 };
 
-GrandPrixSelect::GrandPrixSelect()
+GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt(WTOK_TITLE, 40, 7);
-    widget_manager->setWgtText(WTOK_TITLE,  _("Choose a Grand Prix"));
+    widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Grand Prix") );
 
+    // Findout which grand prixs are available and load them
     std::set<std::string> result;
     file_manager->listFiles(result, "data");
-
-    widget_manager->setInitialActivationState(true);
-    // Findout which grand prixs are available and load them
     int nId = 0;
     for(std::set<std::string>::iterator i  = result.begin();
             i != result.end()  ; i++)
@@ -68,29 +61,32 @@ GrandPrixSelect::GrandPrixSelect()
                 CupData cup(*i);
                 if(unlock_manager->isLocked(cup.getName())) continue;
                 m_all_cups.push_back(cup);
-                widget_manager->addWgt(WTOK_FIRSTPRIX + nId, 40, 7);
-                widget_manager->setWgtText(WTOK_FIRSTPRIX + nId, cup.getName());
+                widget_manager->addTextButtonWgt(WTOK_FIRSTPRIX + nId, 40, 7, cup.getName() );
                 nId++;
             }   // if
         }   // for i
 
-    widget_manager->setInitialActivationState(false);
-    widget_manager->addWgt(WTOK_EMPTY0, 60, 7);
-    widget_manager->hideWgtRect(WTOK_EMPTY0);
-    widget_manager->hideWgtText(WTOK_EMPTY0);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
-    widget_manager->addWgt(WTOK_DESCRIPTION, 80, 7);
-    widget_manager->setWgtText(WTOK_DESCRIPTION, _("No Grand Prix selected"));
+    widget_manager->addTextWgt( WTOK_DESCRIPTION, 80, 7, _("No Grand Prix selected") );
     widget_manager->setWgtTextSize(WTOK_DESCRIPTION, WGT_FNT_SML);
+    widget_manager->breakLine();
+    widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_EMPTY1, 60, 7);
-    widget_manager->hideWgtRect(WTOK_EMPTY1);
-    widget_manager->hideWgtText(WTOK_EMPTY1);
+    widget_manager->addTextWgt( WTOK_TRACKS, 40, 40, _("No Grand Prix selected"));
+    widget_manager->enableWgtScroll( WTOK_TRACKS );
+    widget_manager->setWgtYScrollSpeed( WTOK_TRACKS, -60 );
 
-    widget_manager->addWgt(WTOK_QUIT, 60, 7);
-    widget_manager->setWgtText(WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->addEmptyWgt( WTOK_IMG, 40, 40 );
+    widget_manager->showWgtRect( WTOK_IMG );
+    widget_manager->setWgtColor( WTOK_IMG, WGT_BLACK );
+    widget_manager->breakLine();
+
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
+    widget_manager->breakLine();
+
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7, _("Press <ESC> to go back") );
     widget_manager->setWgtTextSize(WTOK_QUIT, WGT_FNT_SML);
-    widget_manager->activateWgt(WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // GrandPrixSelect
@@ -104,17 +100,88 @@ GrandPrixSelect::~GrandPrixSelect()
 //-----------------------------------------------------------------------------
 void GrandPrixSelect::update(float dt)
 {
-    BaseGUI::update(dt);
-    const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
-    if(CLICKED_TOKEN < WTOK_FIRSTPRIX) return;
+    const int SELECTED_TOKEN = widget_manager->getSelectedWgt();
 
-    const CupData &cup = m_all_cups[CLICKED_TOKEN - WTOK_FIRSTPRIX];
-    widget_manager->setWgtText(WTOK_DESCRIPTION, cup.getDescription());
+    if( widget_manager->selectionChanged() &&
+        !( SELECTED_TOKEN < WTOK_FIRSTPRIX ))
+    {
+        const int CUP_NUM = SELECTED_TOKEN - WTOK_FIRSTPRIX;
+        const int NUM_TRACKS = m_all_cups[CUP_NUM].getTrackCount();
+
+        const CupData &cup = m_all_cups[CUP_NUM];
+        widget_manager->setWgtText(WTOK_DESCRIPTION, cup.getDescription());
+
+
+        std::string track_list;
+        m_cup_tracks = m_all_cups[CUP_NUM].getTracks();
+
+        for( int i = 0; i < NUM_TRACKS; ++i )
+        {
+            track_list.append( track_manager->getTrack( m_cup_tracks[i] )->getName() );
+            track_list.push_back('\n');
+        }
+        widget_manager->setWgtText( WTOK_TRACKS, track_list );
+
+
+        std::string img_filename;
+        Material *mat;
+
+        m_track_imgs.clear();
+
+        for( int i = 0; i < NUM_TRACKS; ++i )
+        {
+            img_filename = track_manager->getTrack( m_cup_tracks[i] )->getTopviewFile();
+            if( img_filename.empty() )
+            {
+                img_filename = track_manager->getTrack( m_cup_tracks[i] )->getScreenshotFile();
+                if( img_filename.empty() ) continue;
+            }
+
+            mat = material_manager->getMaterial( img_filename, true );
+
+            m_track_imgs.push_back(mat->getState()->getTextureHandle());
+        }
+
+        if( !( m_track_imgs.empty() ))
+        {
+            m_clock = 0.0f;
+            m_curr_track_img = 0;
+
+            widget_manager->showWgtTexture( WTOK_IMG );
+            widget_manager->setWgtTexture( WTOK_IMG,
+                m_track_imgs[ m_curr_track_img ] );
+            widget_manager->setWgtColor( WTOK_IMG, WGT_WHITE );
+        }
+        else
+        {
+            widget_manager->hideWgtTexture( WTOK_IMG );
+            widget_manager->setWgtColor( WTOK_IMG, WGT_BLACK );
+        }
+    }
+
+    if( !( m_track_imgs.empty() ))
+    {
+        m_clock += dt;
+
+        if( m_clock > 1.0f )
+        {
+            m_clock = 0.0f;
+
+            ++m_curr_track_img;
+            if( m_curr_track_img >= m_track_imgs.size() ) m_curr_track_img = 0;
+
+            widget_manager->setWgtTexture( WTOK_IMG,
+                m_track_imgs[ m_curr_track_img ] );
+        }
+    }
+
+    widget_manager->update(dt);
 
     return;
 }
 
 //-----------------------------------------------------------------------------
+//FIXME:Should select() be renamed for 'click()' or 'enter()' or something?
 void GrandPrixSelect::select()
 {
     const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
