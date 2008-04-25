@@ -90,10 +90,6 @@ void btUprightConstraint::solveAngularLimit(
 
     btVector3 motorImp = clippedMotorImpulse * limit->m_axis;
     body0->applyTorqueImpulse(motorImp);
-    printf("angle %f target Vel %f unclimpulse %f impulse %f %f%f\n",
-        limit->m_angle, targetVelocity,unclippedMotorImpulse,
-        motorImp.getX(), motorImp.getY(), motorImp.getZ()
-        );
 }
 
 //!
@@ -154,3 +150,4 @@ void btUprightConstraint::solveConstraint(btScalar    timeStep)
 	solveAngularLimit( &m_limit[ 0 ], m_timeStep, btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
 	solveAngularLimit( &m_limit[ 1 ], m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
 }
+
