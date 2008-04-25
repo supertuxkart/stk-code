@@ -34,7 +34,6 @@ enum WidgetTokens
     WTOK_CHALLENGES,
     WTOK_OPTIONS,
     WTOK_QUIT,
-    WTOK_EMPTY,
     WTOK_HELP,
     WTOK_CREDITS,
     WTOK_WARNING
