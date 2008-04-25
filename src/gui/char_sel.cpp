@@ -158,45 +158,41 @@ void CharSel::switchCharacter(int n)
 void CharSel::update(float dt)
 {
     m_clock += dt * 40.0f;
+    BaseGUI::update(dt);
 
-    if( widget_manager->selectionChanged() )
+    switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
+
+    if (m_kart != NULL)
     {
-        switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
+        ssgContext* oldContext = ssgGetCurrentContext();
+        m_context -> makeCurrent();
 
-        if (m_kart != NULL)
-        {
-            ssgContext* oldContext = ssgGetCurrentContext();
-            m_context -> makeCurrent();
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-            glClear(GL_DEPTH_BUFFER_BIT);
+        // Puts the character in the center. Scaling is done by
+        // applying a big camera FOV.
+        int w = user_config->m_width;
+        int h = user_config->m_height;
+        glViewport ( 0, 0, w, h);
 
-            // Puts the character in the center. Scaling is done by
-            // applying a big camera FOV.
-            int w = user_config->m_width;
-            int h = user_config->m_height;
-            glViewport ( 0, 0, w, h);
+        m_context -> setFOV ( 65.0f, 65.0f * h/w ) ;
+        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
 
-            m_context -> setFOV ( 65.0f, 65.0f * h/w ) ;
-            m_context -> setNearFar ( 0.05f, 1000.0f ) ;
+        sgCoord cam_pos;
+        sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+        m_context -> setCamera ( &cam_pos ) ;
 
-            sgCoord cam_pos;
-            sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
-            m_context -> setCamera ( &cam_pos ) ;
+        glEnable (GL_DEPTH_TEST);
+        sgCoord trans;
+        sgSetCoord(&trans, 0, 3, -.4f, m_clock, 0, 0);
+        m_kart->setTransform (&trans) ;
+        //glShadeModel(GL_SMOOTH);
+        ssgCullAndDraw ( m_kart ) ;
+        glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 
-            glEnable (GL_DEPTH_TEST);
-            sgCoord trans;
-            sgSetCoord(&trans, 0, 3, -.4f, m_clock, 0, 0);
-            m_kart->setTransform (&trans) ;
-            //glShadeModel(GL_SMOOTH);
-            ssgCullAndDraw ( m_kart ) ;
-            glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
-
-            glDisable (GL_DEPTH_TEST);
-            oldContext->makeCurrent();
-        }
+        glDisable (GL_DEPTH_TEST);
+        oldContext->makeCurrent();
     }
-
-    widget_manager->update(dt);
 }
 
 //----------------------------------------------------------------------------
