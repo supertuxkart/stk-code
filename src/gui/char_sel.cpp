@@ -158,9 +158,11 @@ void CharSel::switchCharacter(int n)
 void CharSel::update(float dt)
 {
     m_clock += dt * 40.0f;
-    BaseGUI::update(dt);
 
-    switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
+    if( widget_manager->selectionChanged() )
+    {
+        switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
+    }
 
     if (m_kart != NULL)
     {
@@ -193,6 +195,8 @@ void CharSel::update(float dt)
         glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
     }
+
+    widget_manager->update(dt);
 }
 
 //----------------------------------------------------------------------------
