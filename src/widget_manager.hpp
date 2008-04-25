@@ -89,6 +89,7 @@ class WidgetManager
     int m_y;
 
     int m_selected_wgt_token;
+    bool m_selection_change;
 
     bool m_default_active;
 
@@ -140,6 +141,8 @@ class WidgetManager
 
 	int handleFinish(const int);
 
+    void setSelectedWgtToken(const int TOKEN);
+
 public:
     static const int WGT_NONE;
 
@@ -177,8 +180,11 @@ public:
     bool layout( const WidgetArea POSITION );
 
     //TODO: make all get functions const
-    int getSelectedWgt() const { return m_selected_wgt_token;}
+    int getSelectedWgt() const { return m_selected_wgt_token; }
     void setSelectedWgt(const int TOKEN);
+
+    //Checks if the selected widget changed since the last call to update()
+    bool selectionChanged() const { return m_selection_change; }
 
     /* Macro functions. They are widgets with special predefined values. */
 
@@ -194,8 +200,8 @@ public:
         const std::string TEXT
     );
 
-    //Widget that adds visible rect & text, sets the text and is selectable
-    bool addTextButtonWgt
+    //Widget that adds visible rect & text, and sets the text
+    bool addTextWgt
     (
         const int TOKEN,
         const int MIN_WIDTH,
@@ -203,8 +209,8 @@ public:
         const std::string TEXT
     );
 
-    //Widget that adds visible rect & text, and sets the text
-    bool addTextWgt
+    //Widget that adds visible rect & text, sets the text and is selectable
+    bool addTextButtonWgt
     (
         const int TOKEN,
         const int MIN_WIDTH,

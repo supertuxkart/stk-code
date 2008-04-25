@@ -38,7 +38,8 @@ const int WidgetManager::WGT_NONE = -1;
 WidgetManager::WidgetManager() :
 m_prev_layout_pos(WGT_AREA_NONE),
 m_x( -1 ), m_y( -1 ),
-m_selected_wgt_token( WGT_NONE )
+m_selected_wgt_token( WGT_NONE ),
+m_selection_change( false )
 {
     restoreDefaultStates();
 }
@@ -221,6 +222,7 @@ void WidgetManager::reset()
     restoreDefaultStates();
 
     m_selected_wgt_token = WGT_NONE;
+    m_selection_change = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +242,7 @@ int WidgetManager::findId(const int TOKEN) const
 //-----------------------------------------------------------------------------
 void WidgetManager::update(const float DELTA)
 {
+    m_selection_change = false;
 
     //Enable 2D rendering
     glMatrixMode(GL_PROJECTION);
@@ -364,13 +367,12 @@ bool WidgetManager::layout()
     }
 
     const int PREV_SELECTED_WGT_TOKEN = m_selected_wgt_token;
-
     const int RESULT = layout(m_prev_layout_pos);
     if( RESULT == false ) return false;
 
     if( findId( PREV_SELECTED_WGT_TOKEN ) != WGT_NONE )
     {
-        m_selected_wgt_token = PREV_SELECTED_WGT_TOKEN;
+        setSelectedWgtToken( PREV_SELECTED_WGT_TOKEN );
     }
 
     return true;
@@ -588,12 +590,13 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     }
 
     //Select the first active widget by default
-    m_selected_wgt_token = WGT_NONE;
+    setSelectedWgtToken( WGT_NONE );
+
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
         if( m_widgets[i].active )
         {
-            m_selected_wgt_token = m_widgets[i].token;
+            setSelectedWgtToken( m_widgets[i].token );
             break;
         }
     }
@@ -726,7 +729,7 @@ void WidgetManager::setSelectedWgt(const int TOKEN)
     const int ID = findId(TOKEN);
     if( ID != WGT_NONE )
     {
-        m_selected_wgt_token = TOKEN;
+        setSelectedWgtToken( TOKEN );
     }
     else std::cerr << "WARNING: tried to select unnamed widget with " <<
         "token " << TOKEN << '\n';
@@ -1547,7 +1550,7 @@ int WidgetManager::handlePointer(const int X, const int Y )
             return WGT_NONE;
         }
 
-        m_selected_wgt_token = m_widgets[nearest_id].token;
+        setSelectedWgtToken( m_widgets[nearest_id].token );
         return m_selected_wgt_token;
     }
 
@@ -1596,8 +1599,7 @@ WidgetManager::handleFinish(const int next_wgt)
     if( next_wgt == WGT_NONE)
 		return WGT_NONE;
 
-	m_selected_wgt_token = m_widgets[next_wgt].token;
-
+    setSelectedWgtToken( m_widgets[next_wgt].token );
 	return m_selected_wgt_token;
 }
 
@@ -1858,6 +1860,16 @@ int WidgetManager::findBottomWidget(const int START_WGT) const
     }
 
     return closest_wgt;
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setSelectedWgtToken(const int TOKEN)
+{
+    if( m_selected_wgt_token != TOKEN )
+    {
+        m_selected_wgt_token = TOKEN;
+        m_selection_change = true;
+    }
 }
 
 /** reloadFonts() sets the pointers to the fonts of the guis
