@@ -117,145 +117,77 @@ TrackSel::~TrackSel()
 //-----------------------------------------------------------------------------
 void TrackSel::update(float dt)
 {
-    const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
-    if(SELECTED_TRACK<0 || SELECTED_TRACK>=(int)track_manager->getTrackCount())
+    if( widget_manager->selectionChanged() )
     {
-        BaseGUI::update(dt);
-        return;
-    }
-    const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
-    const bool FULL_PATH=true;
-
-    widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
-
-    const std::string& screenshot = TRACK->getScreenshotFile();
-    const std::string& topview    = TRACK->getTopviewFile();
-
-    if( !screenshot.empty() && !topview.empty() )
-    {
-        const Material *m =material_manager->getMaterial(screenshot, FULL_PATH);
-        widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
-        widget_manager->showWgtRect( WTOK_IMG0 );
-        widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
-        widget_manager->showWgtTexture( WTOK_IMG0 );
-        widget_manager->hideWgtTrack( WTOK_IMG0 );
-
-        m = material_manager->getMaterial(topview, FULL_PATH);
-        widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
-        widget_manager->showWgtRect( WTOK_IMG1 );
-        widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
-        widget_manager->showWgtTexture( WTOK_IMG1 );
-        widget_manager->hideWgtTrack( WTOK_IMG1 );
-    }
-    else if( topview.empty() )
-    {
-        const Material *m = material_manager->getMaterial(screenshot, FULL_PATH);
-        widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
-        widget_manager->showWgtRect( WTOK_IMG0 );
-        widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
-        widget_manager->showWgtTexture( WTOK_IMG0 );
-        widget_manager->hideWgtTrack( WTOK_IMG0 );
-
-        widget_manager->hideWgtRect( WTOK_IMG1 );
-        widget_manager->hideWgtTexture( WTOK_IMG1 );
-        widget_manager->setWgtTrackNum( WTOK_IMG1, SELECTED_TRACK );
-        widget_manager->showWgtTrack( WTOK_IMG1 );
-    }
-    else if( screenshot.empty() )
-    {
-        widget_manager->hideWgtRect( WTOK_IMG0 );
-        widget_manager->hideWgtTexture( WTOK_IMG0 );
-        widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
-        widget_manager->showWgtTrack( WTOK_IMG0 );
-
-        Material *m = material_manager->getMaterial(topview, FULL_PATH);
-        widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
-        widget_manager->showWgtRect( WTOK_IMG1 );
-        widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
-        widget_manager->showWgtTexture( WTOK_IMG1 );
-        widget_manager->hideWgtTrack( WTOK_IMG1 );
-    }
-    else //if( screenshot.empty() && topview.empty() )
-    {
-        widget_manager->hideWgtRect( WTOK_IMG0 );
-        widget_manager->hideWgtTexture( WTOK_IMG0 );
-        widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
-        widget_manager->showWgtTrack( WTOK_IMG0 );
-
-        widget_manager->hideWgtRect( WTOK_IMG1 );
-        widget_manager->hideWgtTexture( WTOK_IMG1 );
-        widget_manager->hideWgtTrack( WTOK_IMG1 );
-    }
-
-#if 0
-    // draw a track preview of the currently highlighted track menu entry
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, +1.0);
-    if(screenshot.size()==0 && topview.size()==0)
-    {
-        glDisable ( GL_TEXTURE_2D ) ;
-        TRACK->drawScaled2D(0.0f, 50.0f, (float)user_config->m_width, 
-                            (float)(user_config->m_height/3)); // (x, y, w, h)
-        glEnable ( GL_TEXTURE_2D ) ;
-    }
-    else
-    {                   // either topview or screenshot specified
-        int xLeft   = user_config->m_width/2;
-        int yBottom = 50;
-        int w       = user_config->m_width/3;
-        int h       = user_config->m_height/3;
-        if(topview.size()==0)
-        {  // no topview, but there is a screenshot!
-            glDisable ( GL_TEXTURE_2D ) ;
-            TRACK->drawScaled2D((float)xLeft, (float)yBottom, (float)w, (float)h);
-            glEnable ( GL_TEXTURE_2D ) ;
+        const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
+        if(SELECTED_TRACK<0 || SELECTED_TRACK>=(int)track_manager->getTrackCount())
+        {
+            return;
         }
-        else
-        {                 // topview is defined
-            Material *m=material_manager->getMaterial(topview);
-            m->apply();
-            glBegin(GL_QUADS) ;
-            glColor4f(1, 1, 1, 1 );
-            glTexCoord2f(0, 0); glVertex2i( xLeft,   yBottom   );
-            glTexCoord2f(1, 0); glVertex2i( xLeft+w, yBottom  );
-            glTexCoord2f(1, 1); glVertex2i( xLeft+w, yBottom+h);
-            glTexCoord2f(0, 1); glVertex2i( xLeft,   yBottom+h);
-            glEnd () ;
+        const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
+        const bool FULL_PATH=true;
 
-        }   // topview is defined
-        Material *m=material_manager->getMaterial(screenshot);
-        xLeft = xLeft - w - 10;
-        m->apply();
-        glBegin(GL_QUADS) ;
-        glColor4f(1, 1, 1, 1 );
-        glTexCoord2f(0, 0); glVertex2i( xLeft,   yBottom   );
-        glTexCoord2f(1, 0); glVertex2i( xLeft+w, yBottom  );
-        glTexCoord2f(1, 1); glVertex2i( xLeft+w, yBottom+h);
-        glTexCoord2f(0, 1); glVertex2i( xLeft,   yBottom+h);
-        glEnd () ;
-    }   // either topview or screenshot specified
-    glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_BLEND);
+        widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
 
-    glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    const GLfloat backgroundColour[4] = { 0.3f, 0.3f, 0.3f, 0.5f };
-    glColor4fv(backgroundColour);
-    glPopMatrix();
-    glDisable(GL_BLEND);
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-#endif
+        const std::string& screenshot = TRACK->getScreenshotFile();
+        const std::string& topview    = TRACK->getTopviewFile();
 
-//Keep the BaseGUI::update() call at the bottom of the function, otherwise
-//the screen will be drawn once without being fully prepared, and this is
-//noticeable sometimes.
-    BaseGUI::update(dt);
+        if( !screenshot.empty() && !topview.empty() )
+        {
+            const Material *m =material_manager->getMaterial(screenshot, FULL_PATH);
+            widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG0 );
+            widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+            widget_manager->showWgtTexture( WTOK_IMG0 );
+            widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+            m = material_manager->getMaterial(topview, FULL_PATH);
+            widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG1 );
+            widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+            widget_manager->showWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+        else if( topview.empty() )
+        {
+            const Material *m = material_manager->getMaterial(screenshot, FULL_PATH);
+            widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG0 );
+            widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+            widget_manager->showWgtTexture( WTOK_IMG0 );
+            widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+            widget_manager->hideWgtRect( WTOK_IMG1 );
+            widget_manager->hideWgtTexture( WTOK_IMG1 );
+            widget_manager->setWgtTrackNum( WTOK_IMG1, SELECTED_TRACK );
+            widget_manager->showWgtTrack( WTOK_IMG1 );
+        }
+        else if( screenshot.empty() )
+        {
+            widget_manager->hideWgtRect( WTOK_IMG0 );
+            widget_manager->hideWgtTexture( WTOK_IMG0 );
+            widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
+            widget_manager->showWgtTrack( WTOK_IMG0 );
+
+            Material *m = material_manager->getMaterial(topview, FULL_PATH);
+            widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG1 );
+            widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+            widget_manager->showWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+        else //if( screenshot.empty() && topview.empty() )
+        {
+            widget_manager->hideWgtRect( WTOK_IMG0 );
+            widget_manager->hideWgtTexture( WTOK_IMG0 );
+            widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
+            widget_manager->showWgtTrack( WTOK_IMG0 );
+
+            widget_manager->hideWgtRect( WTOK_IMG1 );
+            widget_manager->hideWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
