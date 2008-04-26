@@ -66,7 +66,7 @@ class WidgetManager
         ET_COLUMN
     };
 
-    /* I decided to waste one integer per break/column with the wgt_pos
+    /* I decided to waste one integer per break/column with the pos
      * variable inside the WidgetElement struct, since otherwise we
      * would need 2 vectors for breaks and columns, which would use more
      * memory, be slower and more complex than this. -Coz
@@ -74,7 +74,7 @@ class WidgetManager
     struct WidgetElement
     {
         ElementTypes type;
-        int pos; //If the element is a widget, the position fo the widget
+        int pos; //If the element is a widget, the position of the widget
                  //in it's vector
 
         WidgetElement(ElementTypes _type, int _pos):type(_type), pos(_pos){};
