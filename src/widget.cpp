@@ -99,300 +99,10 @@ Widget::~Widget()
 }
 
 //-----------------------------------------------------------------------------
-void Widget::update(const float DELTA)
+void Widget::update( const float DELTA )
 {
-    glPushMatrix();
-
-    /* OpenGL transformations are affected by the order of the calls; but the
-     * operations must be called in the inverse order that you want them to
-     * be applied, since the calls are stacked, and the one at the top is
-     * done first, till the one at the bottom.
-     */
-
-    glClear( GL_STENCIL_BUFFER_BIT );
-
-    if( m_enable_rotation ) m_rotation_angle += m_rotation_speed * DELTA;
-    applyTransformations();
-
-    /*Handle delta time dependant features*/
-    if(m_text_scale > MIN_TEXT_SCALE)
-    {
-        m_text_scale -= MIN_TEXT_SCALE * DELTA;
-        if(m_text_scale < MIN_TEXT_SCALE) m_text_scale = MIN_TEXT_SCALE;
-    }
-
-    /*Start handling of on/off features*/
-    if(m_enable_texture)
-    {
-        glEnable(GL_TEXTURE_2D);
-        if(glIsTexture(m_texture))
-        {
-            glBindTexture(GL_TEXTURE_2D, m_texture);
-        }
-        else
-        {
-            std::cerr << "Warning: widget tried to draw null texture.\n";
-            std::cerr << "(Did you set the texture?)\n";
-        }
-    }
-    else
-    {
-        //This ensures that a texture from another module doesn't affects the widget
-        glDisable(GL_TEXTURE_2D);
-    }
-
-    if(glIsList(m_rect_list))
-    {
-        //m_enable_rect == false doesn't disables this chunk of code because
-        //we still need to draw the rect into OpenGL's selection buffer even
-        //if it's not visible
-
-        //FIXME: maybe there is some sort of stacking method to disable/enable
-        //color masking
-        if(!m_enable_rect)
-        {
-            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        }
-        else
-        {
-            glColor4fv(m_rect_color);
-        }
-
-        //FIXME: I should probably revert the values to the defaults within the widget manager
-        //(if glPushAttrib() doesn't), but right now this is the only thing using the
-        //stencil test anyways.
-        glStencilFunc(GL_ALWAYS, 0x1, 0x1);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glCallList(m_rect_list);
-
-        if(!m_enable_rect)
-        {
-            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        }
-    }
-    else
-    {
-        std::cerr << "Warning: widget tried to draw null rect list.\n";
-        std::cerr << "(Did you created the rect?)\n";
-    }
-
-    if(glIsList(m_border_list))
-    {
-        if( m_enable_border )
-        {
-            glColor4fv(m_border_color);
-
-            //FIXME: I should probably revert the values to the defaults within the widget manager
-            //(if glPushAttrib() doesn't)
-            glStencilFunc(GL_ALWAYS, 0x1, 0x1);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glCallList(m_border_list);
-        }
-    }
-    else
-    {
-        std::cerr << "Warning: widget tried to draw null border list.\n";
-        std::cerr << "(Did you created the border?)\n";
-    }
-
-
-    if( m_enable_track )
-    {
-        if( m_track_num > (int)(track_manager->getTrackCount()) - 1)
-        {
-            std::cerr << "Warning: widget tried to draw a track with a " <<
-                "number bigger than the amount of tracks available.\n";
-        }
-
-        if( m_track_num != -1 )
-        {
-            track_manager->getTrack( m_track_num )->drawScaled2D( 0.0f, 
-                0.0f, (float)m_width, (float)m_height);
-        }
-        else
-        {
-            std::cerr << "Warning: widget tried to draw an unset track.\n";
-        }
-    }
-
-    //For multilines we have to do a *very* ugly workaround for a plib
-    //bug which causes multiline strings to move to the left, at least
-    //while centering, and also gives wrong values for the size of the
-    //text when there are multiple lines. Hopefully this work around will
-    //be removed when we move away from plib; the scrolling and the other
-    //text handling should be cleaned. Also, for some reason, different
-    //positions are needed if the text is centered, and on top of that,
-    //it's not 100% exact. Sorry for the mess.
-    size_t line_end = 0;
-    int lines = 0;
-
-    do
-    {
-        line_end = m_text.find_first_of('\n', line_end + 1);
-        ++lines;
-    } while( line_end != std::string::npos );
-
-    /* Handle preset scrolling positions */
-    // In the Y-axis, a scroll position of 0 leaves the text centered, and
-    // positive values lowers the text, and negatives (obviously) raise the
-    // text, in the X-axis, a position of 0 leaves the text aligned to the
-    // left; positive values move to the right and negative
-    // values to the left.
-
-    float left, right;
-    m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
-    int text_width = (int)(right - left + 0.99);
-
-
-    const int Y_LIMIT = lines * m_text_size + m_height;
-
-    //A work around for yet another bug with multilines: we get the wrong
-    //width when using multilines.
-    if( text_width > m_width )
-    {
-        text_width = m_width;
-    }
-
-    //With the preset positions, we do comparations with the equal sign on
-    //floating point variables; however, no operations are done of the
-    //variables between the assignment of these integer values and the
-    //comparation and the values are small enough to fit in a few bytes,
-    //so no inaccuracies because of floating point rounding should happen.
-    //X-axis preset positions
-    if( m_scroll_pos_x == WGT_SCROLL_START_LEFT )
-    {
-        m_scroll_pos_x = 0;
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_START_RIGHT )
-    {
-        m_scroll_pos_x = (float)m_width;
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_CENTER )
-    {
-        m_scroll_pos_x = (float)( (m_width - text_width) / 2 );
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_END_LEFT )
-    {
-        m_scroll_pos_x = (float)(-text_width);
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
-    {
-        m_scroll_pos_x = (float)(m_width - text_width);
-    }
-    else if( m_scroll_pos_x > MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position is too much to the right to " <<
-            "scroll!.\n";
-    }
-    else if( m_scroll_pos_x < -MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position is too much to the left to " <<
-            "to scroll!.\n";
-    }
-
-    //Y-axis preset positions
-    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
-    {
-        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
-    {
-        m_scroll_pos_y = 0;
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
-    }
-    else if( m_scroll_pos_y > MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too high to scroll!.\n";
-    }
-    else if( m_scroll_pos_y < -MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too low to scroll!.\n";
-    }
-
-    if(m_enable_scroll)
-    {
-        //TODO: constrain speed to sane values
-        m_scroll_pos_x += m_scroll_speed_x * DELTA;
-        m_scroll_pos_y += m_scroll_speed_y * DELTA;
-
-        //Y-axis wrapping
-        if(m_scroll_pos_y * 2 > Y_LIMIT)
-        {
-            m_scroll_pos_y = WGT_SCROLL_END_TOP;
-        }
-        else if(-m_scroll_pos_y * 2 > Y_LIMIT)
-        {
-            m_scroll_pos_y = WGT_SCROLL_START_BOTTOM;
-        }
-
-        //X-axis wrapping
-        if(m_scroll_pos_x > m_width )
-        {
-            m_scroll_pos_x = WGT_SCROLL_END_LEFT;
-        }
-        else if(m_scroll_pos_x < -text_width )
-        {
-            m_scroll_pos_x = WGT_SCROLL_START_RIGHT;
-        }
-
-    }
-
-    if(m_enable_text)
-    {
-        if(m_text.empty())
-        {
-            std::cerr << "Warning: widget tried to print an empty string.\n";
-            std::cerr << "(Did you set the text?)\n";
-        }
-
-        int x_pos = (int)(m_scroll_pos_x - m_width * 0.5f);
-        int y_pos = - (int)m_scroll_pos_y + (lines - 1 )* m_text_size / 2;
-
-        size_t line_start = 0;
-        bool draw;
-
-        glStencilFunc(GL_EQUAL,0x1,0x1);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        do
-        {
-            draw = true;
-            if(y_pos + m_text_size / 2 > m_height / 2 )
-            {
-                if(y_pos - m_text_size / 2 >  m_height / 2) draw = false;
-            }
-            else if(y_pos + (m_height - m_text_size) / 2 < 0)
-            {
-                if(y_pos + (m_height + m_text_size) / 2 < 0) draw = false;
-            }
-
-            line_end = m_text.find_first_of('\n', line_start);
-
-            if( draw )
-            {
-                glScalef(m_text_scale, m_text_scale, 1.0f);
-                m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
-                    x_pos, y_pos - m_text_size / 2,
-                    m_text_color, 1.0f, 1.0f);
-                glScalef(1.0f/m_text_scale, 1.0f/m_text_scale, 1.0f);
-            }
-
-            y_pos -= m_text_size;
-            line_start = line_end + 1;
-
-        } while( line_end != std::string::npos );
-    }
-    glPopMatrix();
+    updateVariables( DELTA );
+    draw();
 }
 
 //-----------------------------------------------------------------------------
@@ -761,8 +471,328 @@ bool Widget::createRect(int radius)
 }
 
 //-----------------------------------------------------------------------------
+void Widget::updateVariables( const float DELTA )
+{
+    if( m_enable_rotation ) m_rotation_angle += m_rotation_speed * DELTA;
+
+    /*Handle delta time dependent features*/
+    if(m_text_scale > MIN_TEXT_SCALE)
+    {
+        m_text_scale -= MIN_TEXT_SCALE * DELTA;
+        if(m_text_scale < MIN_TEXT_SCALE) m_text_scale = MIN_TEXT_SCALE;
+    }
+
+
+    //For multilines we have to do a *very* ugly workaround for a plib
+    //bug which causes multiline strings to move to the left, at least
+    //while centering, and also gives wrong values for the size of the
+    //text when there are multiple lines. Hopefully this work around will
+    //be removed when we move away from plib; the scrolling and the other
+    //text handling should be cleaned. Also, for some reason, different
+    //positions are needed if the text is centered, and on top of that,
+    //it's not 100% exact. Sorry for the mess.
+    size_t line_end = 0;
+    int lines = 0;
+
+    do
+    {
+        line_end = m_text.find_first_of('\n', line_end + 1);
+        ++lines;
+    } while( line_end != std::string::npos );
+
+
+    /* Handle preset scrolling positions */
+    // In the Y-axis, a scroll position of 0 leaves the text centered, and
+    // positive values lowers the text, and negatives (obviously) raise the
+    // text, in the X-axis, a position of 0 leaves the text aligned to the
+    // left; positive values move to the right and negative
+    // values to the left.
+
+    float left, right;
+    m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
+    int text_width = (int)(right - left + 0.99);
+
+
+    const int Y_LIMIT = lines * m_text_size + m_height;
+
+    //A work around for yet another bug with multilines: we get the wrong
+    //width when using multilines.
+    if( text_width > m_width )
+    {
+        text_width = m_width;
+    }
+
+    //With the preset positions, we do comparations with the equal sign on
+    //floating point variables; however, no operations are done of the
+    //variables between the assignment of these integer values and the
+    //comparation and the values are small enough to fit in a few bytes,
+    //so no inaccuracies because of floating point rounding should happen.
+    //X-axis preset positions
+    if( m_scroll_pos_x == WGT_SCROLL_START_LEFT )
+    {
+        m_scroll_pos_x = 0;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_START_RIGHT )
+    {
+        m_scroll_pos_x = (float)m_width;
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_CENTER )
+    {
+        m_scroll_pos_x = (float)( (m_width - text_width) / 2 );
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_END_LEFT )
+    {
+        m_scroll_pos_x = (float)(-text_width);
+    }
+    else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
+    {
+        m_scroll_pos_x = (float)(m_width - text_width);
+    }
+    else if( m_scroll_pos_x > MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position is too much to the right to " <<
+            "scroll!.\n";
+    }
+    else if( m_scroll_pos_x < -MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position is too much to the left to " <<
+            "to scroll!.\n";
+    }
+
+    //Y-axis preset positions
+    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
+    {
+        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
+    {
+        m_scroll_pos_y = (float)(Y_LIMIT / 2);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
+    {
+        m_scroll_pos_y = 0;
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
+    {
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
+    }
+    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
+    {
+        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
+    }
+    else if( m_scroll_pos_y > MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too high to scroll!.\n";
+    }
+    else if( m_scroll_pos_y < -MAX_SCROLL )
+    {
+        std::cerr << "WARNING: text position too low to scroll!.\n";
+    }
+
+    if(m_enable_scroll)
+    {
+        //TODO: constrain speed to sane values
+        m_scroll_pos_x += m_scroll_speed_x * DELTA;
+        m_scroll_pos_y += m_scroll_speed_y * DELTA;
+
+        //Y-axis wrapping
+        if(m_scroll_pos_y * 2 > Y_LIMIT)
+        {
+            m_scroll_pos_y = WGT_SCROLL_END_TOP;
+        }
+        else if(-m_scroll_pos_y * 2 > Y_LIMIT)
+        {
+            m_scroll_pos_y = WGT_SCROLL_START_BOTTOM;
+        }
+
+        //X-axis wrapping
+        if(m_scroll_pos_x > m_width )
+        {
+            m_scroll_pos_x = WGT_SCROLL_END_LEFT;
+        }
+        else if(m_scroll_pos_x < -text_width )
+        {
+            m_scroll_pos_x = WGT_SCROLL_START_RIGHT;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void Widget::draw()
+{
+    glPushMatrix();
+
+    glClear( GL_STENCIL_BUFFER_BIT );
+
+    applyTransformations();
+
+    /*Start handling on/off features*/
+    if( m_enable_texture )
+    {
+        glEnable( GL_TEXTURE_2D );
+        if( glIsTexture ( m_texture ))
+        {
+            glBindTexture( GL_TEXTURE_2D, m_texture );
+        }
+        else
+        {
+            std::cerr << "Warning: widget tried to draw null texture.\n";
+            std::cerr << "(Did you set the texture?)\n";
+        }
+    }
+    else
+    {
+        //This ensures that a texture from another module doesn't affects the widget
+        glDisable ( GL_TEXTURE_2D );
+    }
+
+    if( glIsList ( m_rect_list ))
+    {
+        //m_enable_rect == false doesn't disables this chunk of code because
+        //we still need to draw the rect into OpenGL's selection buffer even
+        //if it's not visible
+
+        //FIXME: maybe there is some sort of stacking method to disable/enable
+        //color masking
+        if(!m_enable_rect)
+        {
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        }
+        else
+        {
+            glColor4fv(m_rect_color);
+        }
+
+        //FIXME: I should probably revert the values to the defaults within the widget manager
+        //(if glPushAttrib() doesn't), but right now this is the only thing using the
+        //stencil test anyways.
+        glStencilFunc(GL_ALWAYS, 0x1, 0x1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glCallList(m_rect_list);
+
+        if(!m_enable_rect)
+        {
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+    }
+    else
+    {
+        std::cerr << "Warning: widget tried to draw null rect list.\n";
+        std::cerr << "(Did you created the rect?)\n";
+    }
+
+    if(glIsList(m_border_list))
+    {
+        if( m_enable_border )
+        {
+            glColor4fv(m_border_color);
+
+            //FIXME: I should probably revert the values to the defaults within the widget manager
+            //(if glPushAttrib() doesn't)
+            glStencilFunc(GL_ALWAYS, 0x1, 0x1);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+            glCallList(m_border_list);
+        }
+    }
+    else
+    {
+        std::cerr << "Warning: widget tried to draw null border list.\n";
+        std::cerr << "(Did you created the border?)\n";
+    }
+
+    if( m_enable_track )
+    {
+        if( m_track_num > (int)(track_manager->getTrackCount()) - 1)
+        {
+            std::cerr << "Warning: widget tried to draw a track with a " <<
+                "number bigger than the amount of tracks available.\n";
+        }
+
+        if( m_track_num != -1 )
+        {
+            track_manager->getTrack( m_track_num )->drawScaled2D( 0.0f, 
+                0.0f, (float)m_width, (float)m_height);
+        }
+        else
+        {
+            std::cerr << "Warning: widget tried to draw an unset track.\n";
+        }
+    }
+
+    if(m_enable_text)
+    {
+        if(m_text.empty())
+        {
+            std::cerr << "Warning: widget tried to print an empty string.\n";
+            std::cerr << "(Did you set the text?)\n";
+        }
+
+
+        //For multilines we have to do a *very* ugly workaround for a plib
+        //bug which causes multiline strings to move to the left, at least
+        //while centering, and also gives wrong values for the size of the
+        //text when there are multiple lines. Hopefully this work around will
+        //be removed when we move away from plib; the scrolling and the other
+        //text handling should be cleaned. Also, for some reason, different
+        //positions are needed if the text is centered, and on top of that,
+        //it's not 100% exact. Sorry for the mess.
+        size_t line_end = 0;
+        int lines = 0;
+
+        do
+        {
+            line_end = m_text.find_first_of('\n', line_end + 1);
+            ++lines;
+        } while( line_end != std::string::npos );
+
+
+        int x_pos = (int)(m_scroll_pos_x - m_width * 0.5f);
+        int y_pos = - (int)m_scroll_pos_y + (lines - 1 )* m_text_size / 2;
+
+        size_t line_start = 0;
+        bool draw;
+
+        glStencilFunc(GL_EQUAL,0x1,0x1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        do
+        {
+            draw = true;
+            if(y_pos + m_text_size / 2 > m_height / 2 )
+            {
+                if(y_pos - m_text_size / 2 >  m_height / 2) draw = false;
+            }
+            else if(y_pos + (m_height - m_text_size) / 2 < 0)
+            {
+                if(y_pos + (m_height + m_text_size) / 2 < 0) draw = false;
+            }
+
+            line_end = m_text.find_first_of('\n', line_start);
+
+            if( draw )
+            {
+                glScalef(m_text_scale, m_text_scale, 1.0f);
+                m_font->Print(m_text.substr(line_start, line_end - line_start).c_str(), m_text_size,
+                    x_pos, y_pos - m_text_size / 2,
+                    m_text_color, 1.0f, 1.0f);
+                glScalef(1.0f/m_text_scale, 1.0f/m_text_scale, 1.0f);
+            }
+
+            y_pos -= m_text_size;
+            line_start = line_end + 1;
+
+        } while( line_end != std::string::npos );
+    }
+    glPopMatrix();
+}
+
+//-----------------------------------------------------------------------------
 void Widget::applyTransformations()
 {
+    /* OpenGL transformations are affected by the order of the calls; but the
+     * operations must be called in the inverse order that you want them to
+     * be applied, since the calls are stacked, and the one at the top is
+     * done first, till the one at the bottom.
+     */
     glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
 
     if( m_enable_rotation )
@@ -770,4 +800,3 @@ void Widget::applyTransformations()
         glRotatef( (GLfloat)m_rotation_angle, 0.0f, 0.0f, (GLfloat)1.0f );
     }
 }
-

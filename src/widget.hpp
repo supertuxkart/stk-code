@@ -207,6 +207,8 @@ class Widget
 
     /* Functions created simply to organize the code */
     bool createRect(int radius);
+    void updateVariables( const float DELTA );
+    void draw();
     void applyTransformations();
 
 };
