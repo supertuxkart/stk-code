@@ -92,7 +92,7 @@ void TrackSel::update(float dt)
 {
     const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
     if( widget_manager->selectionChanged() &&
-        SELECTED_TRACK > 0 &&
+        SELECTED_TRACK >= 0 &&
         SELECTED_TRACK < (int)track_manager->getTrackCount() )
     {
         const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
