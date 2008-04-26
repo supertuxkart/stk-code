@@ -121,29 +121,20 @@ bool WidgetManager::insertColumn()
     const int LAST_ELEM = (int)m_elems.size() - 1;
     const int LAST_WGT = (int)m_widgets.size() - 1;
 
-    if( LAST_ELEM > -1)
+    if( LAST_ELEM > -1 && m_elems[LAST_ELEM].type == ET_COLUMN )
     {
-        if( m_elems[LAST_ELEM].type == ET_WGT )
+        if( LAST_WGT > -1 )
         {
-            std::cerr << "WARNING: tried to add a column after widget " <<
-                "with token " << m_widgets[LAST_WGT].token << ".\n";
-            return false;
+            std::cerr << "WARNING: tried to add a column twice after " <<
+                "widget with token " << m_widgets[LAST_WGT].token <<
+                ".\n";
         }
-        else if ( m_elems[LAST_ELEM].type == ET_WGT )
+        else
         {
-            if( LAST_WGT > -1 )
-            {
-                std::cerr << "WARNING: tried to add a column twice after " <<
-                    "widget with token " << m_widgets[LAST_WGT].token <<
-                    ".\n";
-            }
-            else
-            {
-                std::cerr << "WARNING: tried to add a column twice before" <<
-                    " the first widget.\n";
-            }
-            return false;
+            std::cerr << "WARNING: tried to add a column twice before" <<
+                " the first widget.\n";
         }
+        return false;
     }
 
     m_elems.push_back( WidgetElement( ET_COLUMN, 0));
