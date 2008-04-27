@@ -255,6 +255,7 @@ void World::update(float dt)
         if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
         {
             menu_manager->pushMenu(MENUID_LEADERRESULT);
+            unlock_manager->raceFinished();
             return;
         }
         // Add times to highscore list. First compute the order of karts,
@@ -594,6 +595,7 @@ void World::updateRaceStatus(float dt)
             }   // if !raceIsFinished
         }   // for i
     }
+    
     if(m_phase==FINISH_PHASE) unlock_manager->raceFinished();
 }  // updateRaceStatus
 

@@ -1,4 +1,4 @@
-//  $Id: race_track_time.cpp 1259 2007-09-24 12:28:19Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -17,37 +17,40 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <algorithm>
-#include "challenges/race_track_time.hpp"
-#include "world.hpp"
+#include "challenges/energy_shifting_sands.hpp"
 #include "race_manager.hpp"
+#include "world.hpp"
 
-RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track in 1:15")
+EnergyShiftingSands::EnergyShiftingSands() : Challenge("energyshiftingsands","Collect the Pharaohs Treasure")
 {
-    setChallengeDescription("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes.");
-    setFeatureDescription("New track: Amazonian Jungle\nnow available");
-    setFeature("jungle");
-}   // RaceTrackTime
+    setChallengeDescription("Collect at least 9 coins\non 3 laps of Shifting Sands\nin under 2:10 minutes.");
+    setFeatureDescription("New Grand Prix: To the Moon and Back\nnow available");
+    setFeature("To the Moon and Back");
+    // The energymathclass challenge must be done, otherwise GP can't be selected
+    addDependency("energymathclass");
+    addDependency("racetracktime");
+}
 
 //-----------------------------------------------------------------------------
-void RaceTrackTime::setRace() const {
+void EnergyShiftingSands::setRace() const {
     race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-    race_manager->setTrack("race");
+    race_manager->setTrack("sandtrack");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);
-    race_manager->setNumKarts(4);
+    race_manager->setNumKarts(1);
     race_manager->setNumPlayers(1);
 }   // setRace
 
 //-----------------------------------------------------------------------------
-bool RaceTrackTime::raceFinished()
+bool EnergyShiftingSands::raceFinished()
 {
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!="race"      ) return false;    // wrong track
+    if(track_name!="sandtrack") return false;    // wrong track
     Kart* kart=world->getPlayerKart(0);
-    if(kart->getFinishTime()>75) return false;    // too slow
+    if(kart->getFinishTime()>140) return false;    // too slow
     if(kart->getLap()!=3       ) return false;    // wrong number of laps
-    if(race_manager->getNumKarts()<4) return false; //not enough AI karts
+    if(kart->getNumHerring()<9 ) return false;    // not enough herrings
     return true;
+    
 }   // raceFinished
 //-----------------------------------------------------------------------------

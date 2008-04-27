@@ -1,4 +1,4 @@
-//  $Id: race_track_time.cpp 1259 2007-09-24 12:28:19Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -17,22 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <algorithm>
-#include "challenges/race_track_time.hpp"
+
+#include "challenges/island_follow.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track in 1:15")
+IslandFollow::IslandFollow() : Challenge("islandfollow", "Win Follow the Leader on a Desert Island")
 {
-    setChallengeDescription("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes.");
-    setFeatureDescription("New track: Amazonian Jungle\nnow available");
-    setFeature("jungle");
-}   // RaceTrackTime
+    setChallengeDescription("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island.");
+    setFeatureDescription("New Grand Prix: At World's End\nnow available");
+    setFeature("At world's end");
+    addDependency("moonandbackgp");
+    addDependancy("tollwaytime");
+    addDependancy("citytime");
+}   // IslandFollow
 
 //-----------------------------------------------------------------------------
-void RaceTrackTime::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-    race_manager->setTrack("race");
+void IslandFollow::setRace() const {
+    race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
+    race_manager->setTrack("islandtrack");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);
     race_manager->setNumKarts(4);
@@ -40,14 +43,18 @@ void RaceTrackTime::setRace() const {
 }   // setRace
 
 //-----------------------------------------------------------------------------
-bool RaceTrackTime::raceFinished()
+bool IslandFollow::raceFinished()
 {
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!="race"      ) return false;    // wrong track
-    Kart* kart=world->getPlayerKart(0);
-    if(kart->getFinishTime()>75) return false;    // too slow
-    if(kart->getLap()!=3       ) return false;    // wrong number of laps
+    if(track_name!="islandtrack"      ) return false;    // wrong track
     if(race_manager->getNumKarts()<4) return false; //not enough AI karts
-    return true;
+    //Check if player came first
+    for(int i=0; i<(int)race_manager->getNumKarts(); i++)
+    {
+        const Kart* k=world->getKart(i);
+        if(k->isPlayerKart()) return  k->getPosition()==2;
+    }
+    return false;
+
 }   // raceFinished
 //-----------------------------------------------------------------------------

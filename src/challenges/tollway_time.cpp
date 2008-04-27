@@ -1,4 +1,4 @@
-//  $Id: race_track_time.cpp 1259 2007-09-24 12:28:19Z hiker $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -17,22 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <algorithm>
-#include "challenges/race_track_time.hpp"
+
+#include "challenges/tollway_time.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track in 1:15")
+TollwayTime::TollwayTime() : Challenge("tollwaytime", "Finish Tux Tollway track in 3:00")
 {
-    setChallengeDescription("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes.");
-    setFeatureDescription("New track: Amazonian Jungle\nnow available");
-    setFeature("jungle");
-}   // RaceTrackTime
+    setChallengeDescription("Finish 3 laps on the Tux Tollway track\nwith 3 AI karts\nin under 3:00 minutes.");
+    setFeatureDescription("New track: Canyon\nnow available");
+    setFeature("canyon");
+}   // TollwayTime
 
 //-----------------------------------------------------------------------------
-void RaceTrackTime::setRace() const {
+void TollwayTime::setRace() const {
     race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-    race_manager->setTrack("race");
+    race_manager->setTrack("tuxtrack");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);
     race_manager->setNumKarts(4);
@@ -40,12 +40,12 @@ void RaceTrackTime::setRace() const {
 }   // setRace
 
 //-----------------------------------------------------------------------------
-bool RaceTrackTime::raceFinished()
+bool TollwayTime::raceFinished()
 {
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!="race"      ) return false;    // wrong track
+    if(track_name!="tuxtrack"      ) return false;    // wrong track
     Kart* kart=world->getPlayerKart(0);
-    if(kart->getFinishTime()>75) return false;    // too slow
+    if(kart->getFinishTime()>180) return false;    // too slow
     if(kart->getLap()!=3       ) return false;    // wrong number of laps
     if(race_manager->getNumKarts()<4) return false; //not enough AI karts
     return true;

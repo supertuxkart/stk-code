@@ -95,8 +95,14 @@ supertuxkart_SOURCES =             main.cpp  			\
 	challenges/challenge.hpp   challenges/challenge.cpp	\
 	challenges/all_tracks.cpp  challenges/all_tracks.hpp	\
 	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\
-	challenges/win_gotm_cup.cpp challenges/win_gotm_cup.hpp \
+	challenges/penguin_playground_gp.cpp challenges/penguin_playground_gp.hpp \
 	challenges/race_track_time.cpp challenges/race_track_time.hpp\
+	challenges/tollway_time.cpp challenges/tollway_time.hpp \
+	challenges/jungle_follow.cpp challenges/jungle_follow.hpp \
+	challenges/energy_shifting_sands.cpp challenges/energy_shifting_sands.hpp \
+	challenges/moon_and_back_gp.cpp challenges/moon_and_back_gp.hpp \
+	challenges/city_time.cpp  challenges/city_time.hpp  \
+	challenges/island_follow.cpp  challenges/island_follow.hpp  \
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\

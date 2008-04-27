@@ -19,10 +19,16 @@
 
 #include "unlock_manager.hpp"
 
-#include "challenges/all_tracks.hpp"
+//#include "challenges/all_tracks.hpp"
 #include "challenges/energy_math_class.hpp"
-#include "challenges/win_gotm_cup.hpp"
+#include "challenges/penguin_playground_gp.hpp"
 #include "challenges/race_track_time.hpp"
+#include "challenges/tollway_time.hpp"
+#include "challenges/jungle_follow.hpp"
+#include "challenges/energy_shifting_sands.hpp"
+#include "challenges/moon_and_back_gp.hpp"
+#include "challenges/city_time.hpp"#
+#include "challenges/island_follow.hpp"
 #include "user_config.hpp"
 
 UnlockManager* unlock_manager=0;
@@ -37,10 +43,16 @@ UnlockManager::UnlockManager()
 
     // Add all challenges:
     Challenge *c;
-    c=new AllTracks();       m_all_challenges[c->getId()]=c;
+    //c=new AllTracks();     m_all_challenges[c->getId()]=c;
     c=new EnergyMathClass(); m_all_challenges[c->getId()]=c;
-    c=new WinGOTMCup();      m_all_challenges[c->getId()]=c;
+    c=new PenguinPlaygroundGP(); m_all_challenges[c->getId()]=c;
     c=new RaceTrackTime();   m_all_challenges[c->getId()]=c;
+    c=new TollwayTime();     m_all_challenges[c->getId()]=c;
+    c=new JungleFollow();    m_all_challenges[c->getId()]=c;
+    c=new EnergyShiftingSands(); m_all_challenges[c->getId()]=c;
+    c=new MoonAndBackGP();   m_all_challenges[c->getId()]=c;
+    c=new CityTime();        m_all_challenges[c->getId()]=c;
+    c=new IslandFollow();        m_all_challenges[c->getId()]=c;
 
     computeActive();
 }   // UnlockManager
