@@ -227,7 +227,7 @@ public:
         const int IMG
     );
 
-    //Selectable widget with visible rect & image, white rect and texture
+    //Selectable widget with visible rect & image, gray rect and texture
     bool addImgButtonWgt
     (
         const int TOKEN,
