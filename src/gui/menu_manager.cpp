@@ -53,6 +53,7 @@
 #include "challenges_menu.hpp"
 #include "feature_unlocked.hpp"
 #include "leader_result.hpp"
+#include "start_race_feedback.hpp"
 
 using namespace std;
 
@@ -233,6 +234,8 @@ void MenuManager::update()
             case MENUID_CREDITS:
                 m_current_menu = new CreditsMenu();
                 break;
+            case MENUID_START_RACE_FEEDBACK:
+                m_current_menu = new StartRaceFeedback();
             default:
                 break;
             }   // switch

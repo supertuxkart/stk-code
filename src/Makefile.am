@@ -119,6 +119,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/race_options.cpp   gui/race_options.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
 	gui/leader_result.cpp	   gui/leader_result.hpp	\
+	gui/start_race_feedback.cpp	   gui/start_race_feedback.hpp	\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
 	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
 	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \

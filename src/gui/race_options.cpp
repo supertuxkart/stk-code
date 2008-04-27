@@ -234,7 +234,7 @@ void RaceOptions::select()
             race_manager->setNumLaps( m_num_laps );
         }
 
-        race_manager->startNew();
+        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();
