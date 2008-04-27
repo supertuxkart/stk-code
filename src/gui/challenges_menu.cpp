@@ -100,6 +100,6 @@ void ChallengesMenu::select()
     if(n>=0 && n<(int)m_all_challenges.size())
     {
         m_all_challenges[n]->setRace();
-        race_manager->startNew();
+        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
     }
 }   // select

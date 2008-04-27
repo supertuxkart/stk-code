@@ -28,8 +28,8 @@ IslandFollow::IslandFollow() : Challenge("islandfollow", "Win Follow the Leader 
     setFeatureDescription("New Grand Prix: At World's End\nnow available");
     setFeature("At world's end");
     addDependency("moonandbackgp");
-    addDependancy("tollwaytime");
-    addDependancy("citytime");
+    addDependency("tollwaytime");
+    addDependency("citytime");
 }   // IslandFollow
 
 //-----------------------------------------------------------------------------
