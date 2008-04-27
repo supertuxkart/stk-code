@@ -919,6 +919,9 @@ void Kart::endRescue()
 //-----------------------------------------------------------------------------
 void Kart::processSkidMarks()
 {
+    // FIXME: disable skidmarks for now, they currently look ugly, and are
+    //        sometimes hovering in the air
+    return;
     assert(m_skidmark_left);
     assert(m_skidmark_right);
     const float threshold = 0.3f;
