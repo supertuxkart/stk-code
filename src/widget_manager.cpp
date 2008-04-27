@@ -812,7 +812,7 @@ bool WidgetManager::addImgButtonWgt
 {
     if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
 
-    setWgtColor( TOKEN, WGT_WHITE );
+    setWgtColor( TOKEN, WGT_GRAY );
     showWgtRect( TOKEN );
     setWgtTexture( TOKEN, IMG );
     showWgtTexture( TOKEN );
