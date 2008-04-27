@@ -22,7 +22,7 @@
 #include "world.hpp"
 #include "track_manager.hpp"
 
-char *ALLTRACKS[] = {"beach",         "bsodcastle", " islandtrack", "lighthouse",
+char *ALLTRACKS[] = {"beach",         "bsodcastle", "islandtrack", "lighthouse",
                      "littlevolcano", "olivermath",  "race",        "sandtrack",
                      "startrack",     "subseatrack", "tuxtrack",    "volcano",
                      ""};
