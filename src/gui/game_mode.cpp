@@ -20,6 +20,7 @@
 #include "game_mode.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
+#include "material_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
@@ -55,6 +56,11 @@ GameMode::GameMode()
     {
         widget_manager->setWgtText( WTOK_GP, "???");
         widget_manager->deactivateWgt(WTOK_GP);
+
+        const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
+        widget_manager->setWgtColor( WTOK_GP, WGT_WHITE);
+        widget_manager->setWgtTexture( WTOK_GP, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_GP );
     }
     else
     {
@@ -74,6 +80,11 @@ GameMode::GameMode()
     {
         widget_manager->setWgtText( WTOK_FOLLOW_LEADER, "???");
         widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER);
+
+        const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
+        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_WHITE);
+        widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, m->getState()->getTextureHandle() );
+        widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
     }
     else
     {
