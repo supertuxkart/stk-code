@@ -106,8 +106,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/race_gui.cpp	   gui/race_gui.hpp	        \
 	gui/race_results_gui.cpp   gui/race_results_gui.hpp 	\
 	gui/grand_prix_ending.cpp  gui/grand_prix_ending.hpp 	\
-	gui/num_laps.cpp	   gui/num_laps.hpp	        \
-	gui/num_karts.cpp	   gui/num_karts.hpp	        \
 	gui/race_menu.cpp	   gui/race_menu.hpp	        \
 	gui/num_players.cpp	   gui/num_players.hpp       	\
 	gui/track_sel.cpp	   gui/track_sel.hpp	        \
@@ -118,7 +116,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/config_controls.cpp	   gui/config_controls.hpp   	\
 	gui/options.cpp		   gui/options.hpp	        \
 	gui/game_mode.cpp	   gui/game_mode.hpp	        \
-	gui/difficulty.cpp	   gui/difficulty.hpp       	\
+	gui/race_options.cpp   gui/race_options.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
 	gui/leader_result.cpp	   gui/leader_result.hpp	\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\

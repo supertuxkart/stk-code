@@ -191,7 +191,7 @@ void GrandPrixSelect::select()
         return;
     }
     race_manager->setGrandPrix(m_all_cups[CLICKED_TOKEN-WTOK_FIRSTPRIX]);
-    menu_manager->pushMenu(MENUID_DIFFICULTY);
+    menu_manager->pushMenu(MENUID_RACE_OPTIONS);
 }   // select
 
 /* EOF */

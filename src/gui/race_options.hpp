@@ -1,5 +1,3 @@
-//  $Id: num_karts.hpp 924 2007-03-06 17:33:35Z coz $
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team
 //
@@ -17,24 +15,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KARTSLAPS_H
-#define HEADER_KARTSLAPS_H
+#ifndef HEADER_RACE_OPTIONS_H
+#define HEADER_RACE_OPTIONS_H
 
 #include "base_gui.hpp"
-#include "translation.hpp"
 
-class NumKarts: public BaseGUI
+class RaceOptions: public BaseGUI
 {
+    int m_difficulty;
+    int m_num_karts;
+    int m_num_laps;
+
 public:
-    NumKarts();
-    ~NumKarts();
+    RaceOptions();
+    ~RaceOptions();
 
     void select();
-    
-private:
-    int   m_karts_label_id;
-    int   m_num_karts;
-    char  m_kart_label[MAX_MESSAGE_LENGTH];
 };
 
 #endif

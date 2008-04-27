@@ -174,14 +174,7 @@ void TrackSel::select()
     }
     const Track* TRACK = track_manager->getTrack(CLICKED_TOKEN - WTOK_TRACK0);
     race_manager->setTrack(TRACK->getIdent());
-    if(race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL)
-    {
-        menu_manager->pushMenu(MENUID_NUMLAPS);
-    }
-    else
-    {
-        menu_manager->pushMenu(MENUID_NUMKARTS);
-    }
+    menu_manager->pushMenu(MENUID_RACE_OPTIONS);
 }   // select
 
 /* EOF */

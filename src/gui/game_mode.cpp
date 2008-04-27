@@ -109,15 +109,15 @@ void GameMode::select()
         break;
     case WTOK_QUICKRACE:
         race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_FOLLOW_LEADER:
         race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
-        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_TIMETRIAL:
         race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1); //difficulty makes no sense here
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_BACK:
         menu_manager->popMenu();

@@ -219,7 +219,7 @@ void RaceResultsGUI::select()
     case WTOK_SETUP_NEW_RACE:
         world->unpause();
         race_manager->exit_race();
-        menu_manager->pushMenu(MENUID_DIFFICULTY);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
 
     default:

@@ -26,12 +26,10 @@
 
 #include "main_menu.hpp"
 #include "char_sel.hpp"
-#include "difficulty.hpp"
 #include "game_mode.hpp"
+#include "race_options.hpp"
 #include "options.hpp"
 #include "track_sel.hpp"
-#include "num_laps.hpp"
-#include "num_karts.hpp"
 #include "num_players.hpp"
 #include "config_controls.hpp"
 #include "config_display.hpp"
@@ -156,8 +154,8 @@ void MenuManager::update()
             case MENUID_CHARSEL_P4:
                 m_current_menu= new CharSel(id - MENUID_CHARSEL_P1);
                 break;
-            case MENUID_DIFFICULTY:
-                m_current_menu= new Difficulty();
+            case MENUID_RACE_OPTIONS:
+                m_current_menu= new RaceOptions();
                 break;
             case MENUID_GAMEMODE:
                 m_current_menu= new GameMode();
@@ -170,12 +168,6 @@ void MenuManager::update()
                 break;
             case MENUID_UNLOCKED_FEATURE:
                 m_current_menu = new FeatureUnlocked();
-                break;
-            case MENUID_NUMLAPS:
-                m_current_menu= new NumLaps();
-                break;
-            case MENUID_NUMKARTS:
-                m_current_menu= new NumKarts();
                 break;
             case MENUID_NUMPLAYERS:
                 m_current_menu= new NumPlayers();
