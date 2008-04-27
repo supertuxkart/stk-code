@@ -54,7 +54,7 @@ GameMode::GameMode()
     widget_manager->addWgt(WTOK_GP, 50, 7);
     if(unlock_manager->isLocked("grandprix"))
     {
-        widget_manager->setWgtText( WTOK_GP, "???");
+        widget_manager->hideWgtText(WTOK_GP);
         widget_manager->deactivateWgt(WTOK_GP);
 
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
@@ -78,7 +78,7 @@ GameMode::GameMode()
     widget_manager->addWgt(WTOK_FOLLOW_LEADER, 50, 7);
     if(unlock_manager->isLocked("followleader"))
     {
-        widget_manager->setWgtText( WTOK_FOLLOW_LEADER, "???");
+        widget_manager->hideWgtText(WTOK_FOLLOW_LEADER);
         widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER);
 
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);

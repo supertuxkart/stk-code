@@ -58,7 +58,7 @@ TrackSel::TrackSel()
         widget_manager->setWgtTextSize( WTOK_TRACK0 + i, WGT_FNT_SML );
         if(!isAvailable)
         {
-            widget_manager->setWgtText( WTOK_TRACK0 + i, "???");
+            widget_manager->hideWgtText(WTOK_TRACK0 + i);
             widget_manager->deactivateWgt(WTOK_TRACK0 + i);
 
             const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
