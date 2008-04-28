@@ -27,7 +27,7 @@
 #include "challenges/jungle_follow.hpp"
 #include "challenges/energy_shifting_sands.hpp"
 #include "challenges/moon_and_back_gp.hpp"
-#include "challenges/city_time.hpp"#
+#include "challenges/city_time.hpp"
 #include "challenges/island_follow.hpp"
 #include "user_config.hpp"
 
