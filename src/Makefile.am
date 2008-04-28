@@ -103,6 +103,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	challenges/moon_and_back_gp.cpp challenges/moon_and_back_gp.hpp \
 	challenges/city_time.cpp  challenges/city_time.hpp  \
 	challenges/island_follow.cpp  challenges/island_follow.hpp  \
+	challenges/worlds_end_gp.cpp challenges/worlds_end_gp.hpp  \
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\

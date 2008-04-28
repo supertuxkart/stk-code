@@ -29,6 +29,7 @@
 #include "challenges/moon_and_back_gp.hpp"
 #include "challenges/city_time.hpp"
 #include "challenges/island_follow.hpp"
+#include "challenges/worlds_end_gp.hpp"
 #include "user_config.hpp"
 
 UnlockManager* unlock_manager=0;
@@ -53,13 +54,15 @@ UnlockManager::UnlockManager()
     c=new MoonAndBackGP();   m_all_challenges[c->getId()]=c;
     c=new CityTime();        m_all_challenges[c->getId()]=c;
     c=new IslandFollow();        m_all_challenges[c->getId()]=c;
-
+    c=new WorldsEndGP();        m_all_challenges[c->getId()]=c;
+    
     computeActive();
 }   // UnlockManager
 
 //-----------------------------------------------------------------------------
 std::vector<const Challenge*> UnlockManager::getActiveChallenges()
 {
+    computeActive();
     std::vector<const Challenge*> all_active;
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
@@ -112,7 +115,8 @@ void UnlockManager::computeActive()
             // The constructor calls computeActive, which actually locks 
             // all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
-            unlockFeature(i->second, /*save*/ false);
+            if (isLocked(i->second->getFeature()))  
+                unlockFeature(i->second, /*save*/ false);
             continue;
         }
 
