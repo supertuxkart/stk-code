@@ -227,8 +227,14 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
         Kart *kart = world->getKart(i);
-        // handle the actual explosion. Set a flag it if was a direct hit.
-        kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
+        // Handle the actual explosion. The kart that fired a flyable will 
+        // only be affected if it's a direct hit. This allows karts to use
+        // rockets on short distance.
+        if(m_owner!=kart || m_owner==kart_hit) 
+        {
+            // Set a flag it if was a direct hit.
+            kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
+        }
     }
     callback_manager->handleExplosion(pos, moving_physics);
 }   // explode
