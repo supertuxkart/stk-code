@@ -24,7 +24,7 @@
 MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp","Finish To the Moon and Back Grand Prix")
 {
     setChallengeDescription("Finish the To the Moon and Back\nGrand Prix with 3 'Driver' Level AI karts\nin the top 3.");
-    setFeatureDescription("New Grand Prix: To the Moon and Back\nnow available");
+    setFeatureDescription("New Grand Prix: Snag Drive\nnow available");
     setFeature("Snag Drive");  //gp3
     // The energyshiftingsands challenge must be done, otherwise gp2 can't be selected
     // Thejunglefollow challenge must be done, to get city for gp3
@@ -45,7 +45,6 @@ void MoonAndBackGP::setRace() const {
 //-----------------------------------------------------------------------------
 bool MoonAndBackGP::grandPrixFinished()
 {
-    //const CupData CUP = race_manager->getGrandPrix();
     if (race_manager->getRaceMode()  != RaceManager::RM_GRAND_PRIX  ||
         race_manager->getGrandPrix()->getName() != "To the Moon and Back" ||
         race_manager->getDifficulty()!= RaceManager::RD_HARD        ||
