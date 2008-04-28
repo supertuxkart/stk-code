@@ -689,8 +689,9 @@ void Kart::handleZipper()
     float current_speed = v.length();
     float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain, 
                                    getMaxSpeed());
-    
-    m_body->setLinearVelocity(v/current_speed*speed);
+    // Avoid NAN problems, which can happen if e.g. a kart is rescued on
+    // top of zipper, and then dropped.
+    if(current_speed>0.00001) m_body->setLinearVelocity(v*(speed/current_speed));
 }   // handleZipper
 //-----------------------------------------------------------------------------
 #define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
