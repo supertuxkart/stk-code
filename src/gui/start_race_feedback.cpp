@@ -44,7 +44,7 @@ StartRaceFeedback::~StartRaceFeedback()
 
 
 //-----------------------------------------------------------------------------
-void StartRaceFeedback::update( const float DELTA )
+void StartRaceFeedback::update(float DELTA)
 {
     widget_manager->update(0.0f);
 

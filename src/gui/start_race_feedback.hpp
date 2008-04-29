@@ -26,7 +26,7 @@ public:
     StartRaceFeedback();
     ~StartRaceFeedback();
 
-    void update( const float DELTA );
+    void update(float DELTA);
     void select(){};
 };
 

@@ -106,7 +106,7 @@ void GrandPrixSelect::update(float dt)
         !( SELECTED_TOKEN < WTOK_FIRSTPRIX ))
     {
         const int CUP_NUM = SELECTED_TOKEN - WTOK_FIRSTPRIX;
-        const int NUM_TRACKS = m_all_cups[CUP_NUM].getTrackCount();
+        const int NUM_TRACKS = (int)m_all_cups[CUP_NUM].getTrackCount();
 
         const CupData &cup = m_all_cups[CUP_NUM];
         widget_manager->setWgtText(WTOK_DESCRIPTION, cup.getDescription());
