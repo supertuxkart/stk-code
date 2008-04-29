@@ -200,9 +200,9 @@ void Kart::createPhysics(ssgEntity *obj)
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
     }
     // Obviously these allocs have to be properly managed/freed
-    btTransform *t=new btTransform();
-    t->setIdentity();
-    m_uprightConstraint=new btUprightConstraint(*m_body, *t);
+    btTransform t;
+    t.setIdentity();
+    m_uprightConstraint=new btUprightConstraint(*m_body, t);
     m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     m_uprightConstraint->setBounce(0.0f);
     m_uprightConstraint->setMaxLimitForce(m_kart_properties->getUprightMaxForce());
