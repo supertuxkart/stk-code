@@ -126,3 +126,4 @@ public:
  
 
 #endif //UPRIGHT_CONSTRAINT_H
+

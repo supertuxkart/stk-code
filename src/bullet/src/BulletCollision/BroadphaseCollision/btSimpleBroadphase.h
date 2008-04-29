@@ -31,8 +31,8 @@ struct btSimpleBroadphaseProxy : public btBroadphaseProxy
 	
 	btSimpleBroadphaseProxy() {};
 
-	btSimpleBroadphaseProxy(const btPoint3& minpt,const btPoint3& maxpt,int shapeType,void* userPtr,short int collisionFilterGroup,short int collisionFilterMask)
-	:btBroadphaseProxy(userPtr,collisionFilterGroup,collisionFilterMask),
+	btSimpleBroadphaseProxy(const btPoint3& minpt,const btPoint3& maxpt,int shapeType,void* userPtr,short int collisionFilterGroup,short int collisionFilterMask,void* multiSapProxy)
+	:btBroadphaseProxy(userPtr,collisionFilterGroup,collisionFilterMask,multiSapProxy),
 	m_min(minpt),m_max(maxpt)		
 	{
 		(void)shapeType;
@@ -120,7 +120,7 @@ public:
 		static bool	aabbOverlap(btSimpleBroadphaseProxy* proxy0,btSimpleBroadphaseProxy* proxy1);
 
 
-	virtual btBroadphaseProxy*	createProxy(  const btVector3& aabbMin,  const btVector3& aabbMax,int shapeType,void* userPtr ,short int collisionFilterGroup,short int collisionFilterMask, btDispatcher* dispatcher);
+	virtual btBroadphaseProxy*	createProxy(  const btVector3& aabbMin,  const btVector3& aabbMax,int shapeType,void* userPtr ,short int collisionFilterGroup,short int collisionFilterMask, btDispatcher* dispatcher,void* multiSapProxy);
 
 	virtual void	calculateOverlappingPairs(btDispatcher* dispatcher);
 
@@ -139,6 +139,19 @@ public:
 	bool	testAabbOverlap(btBroadphaseProxy* proxy0,btBroadphaseProxy* proxy1);
 
 
+	///getAabb returns the axis aligned bounding box in the 'global' coordinate frame
+	///will add some transform later
+	virtual void getBroadphaseAabb(btVector3& aabbMin,btVector3& aabbMax) const
+	{
+		aabbMin.setValue(-1e30f,-1e30f,-1e30f);
+		aabbMax.setValue(1e30f,1e30f,1e30f);
+	}
+
+	virtual void	printStats()
+	{
+//		printf("btSimpleBroadphase.h\n");
+//		printf("numHandles = %d, maxHandles = %d\n",m_numHandles,m_maxHandles);
+	}
 };
 
 

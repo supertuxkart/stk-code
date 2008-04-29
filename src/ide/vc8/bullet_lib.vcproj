@@ -46,6 +46,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -202,6 +203,14 @@
 				<Filter
 					Name="CollisionDispatch"
 					>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btBoxBoxCollisionAlgorithm.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btBoxBoxDetector.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btCollisionDispatcher.cpp"
 						>
@@ -732,6 +741,14 @@
 				<Filter
 					Name="CollisionDispatch"
 					>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btBoxBoxCollisionAlgorithm.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btBoxBoxDetector.h"
+						>
+					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionDispatch\btCollisionConfiguration.h"
 						>

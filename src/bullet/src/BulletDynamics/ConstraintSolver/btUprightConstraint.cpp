@@ -32,22 +32,13 @@ void btUprightConstraint::solveAngularLimit(
 {
 	
 	// Work out if limit is violated
+    if(limit->m_angle>=m_loLimit && limit->m_angle<=m_hiLimit) return;
 
-	limit->m_currentLimitError = 0;
-	if ( limit->m_angle < m_loLimit )
-	{
-		limit->m_currentLimitError = limit->m_angle - m_loLimit;
-	}
-	if ( limit->m_angle > m_hiLimit )
-	{
-		limit->m_currentLimitError = limit->m_angle - m_hiLimit;
-	}
-	if( limit->m_currentLimitError == 0.0f )
-	{
-		return;
-	}
+    limit->m_currentLimitError = (limit->m_angle<m_loLimit) 
+                               ? limit->m_angle - m_loLimit
+                               : limit->m_angle - m_hiLimit;
 
-	btScalar targetVelocity       = -m_ERP*limit->m_currentLimitError/(timeStep);
+	btScalar targetVelocity       = -m_ERP*limit->m_currentLimitError/(3.1415f/8.0f*timeStep);
 	btScalar maxMotorForce        = m_maxLimitForce;
 
     maxMotorForce *= timeStep;

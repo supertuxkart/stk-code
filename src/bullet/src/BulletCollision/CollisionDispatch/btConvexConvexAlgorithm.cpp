@@ -15,7 +15,7 @@ subject to the following restrictions:
 
 #include "btConvexConvexAlgorithm.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 #include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseInterface.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
@@ -33,7 +33,6 @@ subject to the following restrictions:
 
 
 
-#include "BulletCollision/CollisionShapes/btMinkowskiSumShape.h"
 #include "BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
 

@@ -3,7 +3,6 @@ cp $LOCATION/AUTHORS .
 cp $LOCATION/BulletLicense.txt .
 cp $LOCATION/ChangeLog.txt .
 cp $LOCATION/LICENSE .
-cp $LOCATION/Makefile.am  .
 cp $LOCATION/README .
 cp $LOCATION/VERSION .
 cp $LOCATION/src/*.h src

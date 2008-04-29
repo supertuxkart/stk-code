@@ -13,7 +13,8 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btQuaternion.h		LinearMath/btTransformUtil.h	 \
 	LinearMath/btIDebugDraw.h		LinearMath/btQuickprof.cpp  	 \
 	LinearMath/btTypedUserInfo.h		LinearMath/btTypedUserInfo.h	 \
-	LinearMath/btVector3.h
+	LinearMath/btVector3.h			LinearMath/btHashMap.h		 \
+	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h
 
 libbulletcollision_a_SOURCES := \
 	btBulletCollisionCommon.h						 \
@@ -33,6 +34,10 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h		 \
 	BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp		 \
 	BulletCollision/BroadphaseCollision/btSimpleBroadphase.h		 \
+	BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h		 \
+	BulletCollision/CollisionDispatch/btBoxBoxDetector.h			 \
+	BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp	 \
+	BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp			 \
 	BulletCollision/CollisionDispatch/btCollisionConfiguration.h		 \
 	BulletCollision/CollisionDispatch/btCollisionCreateFunc.h		 \
 	BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp		 \
@@ -82,8 +87,6 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/CollisionShapes/btConcaveShape.h			 \
 	BulletCollision/CollisionShapes/btConeShape.cpp				 \
 	BulletCollision/CollisionShapes/btConeShape.h				 \
-	BulletCollision/CollisionShapes/btConvexHull.cpp			 \
-	BulletCollision/CollisionShapes/btConvexHull.h				 \
 	BulletCollision/CollisionShapes/btConvexHullShape.cpp			 \
 	BulletCollision/CollisionShapes/btConvexHullShape.h			 \
 	BulletCollision/CollisionShapes/btConvexInternalShape.cpp		 \
@@ -137,6 +140,8 @@ libbulletcollision_a_SOURCES := \
 	BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h\
 	BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp		 \
 	BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h			 \
+	BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp			 \
+	BulletCollision/NarrowPhaseCollision/btGjkEpa2.h			 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpa.cpp			 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpa.h				 \
 	BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp	 \
@@ -171,6 +176,18 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btHingeConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btHingeConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btJacobianEntry.h			 \
+	BulletDynamics/ConstraintSolver/btOdeJoint.cpp				 \
+	BulletDynamics/ConstraintSolver/btOdeTypedJoint.cpp			 \
+	BulletDynamics/ConstraintSolver/btOdeMacros.h				 \
+	BulletDynamics/ConstraintSolver/btOdeSolverBody.h			 \
+	BulletDynamics/ConstraintSolver/btOdeContactJoint.cpp			 \
+	BulletDynamics/ConstraintSolver/btSliderConstraint.cpp			 \
+	BulletDynamics/ConstraintSolver/btSliderConstraint.h			 \
+	BulletDynamics/ConstraintSolver/btSorLcp.cpp				 \
+	BulletDynamics/ConstraintSolver/btSorLcp.h				 \
+	BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.h	 \
+	BulletDynamics/ConstraintSolver/btOdeJoint.h				 \
+	BulletDynamics/ConstraintSolver/btOdeTypedJoint.h			 \
 	BulletDynamics/ConstraintSolver/btPoint2PointConstraint.cpp		 \
 	BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h		 \
 	BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp	 \
