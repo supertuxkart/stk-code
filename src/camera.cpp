@@ -76,7 +76,7 @@ void Camera::setScreenPosition ( int numPlayers, int pos )
             break;
         }
     }
-    m_LastPitch = 0.0f;
+    m_last_pitch = 0.0f;
 }  // setScreenPosition
 
 //-----------------------------------------------------------------------------
@@ -103,8 +103,8 @@ Camera::Camera(int numPlayers, int which)
 //-----------------------------------------------------------------------------
 void Camera::setMode(Mode mode)
 {
-    m_mode      = mode;
-    m_LastPitch = 0.0f;
+    m_mode       = mode;
+    m_last_pitch = 0.0f;
     if(m_mode==CM_LEADER_MODE)
         setReverseHeading(true);
 }   // setMode
@@ -121,7 +121,7 @@ void Camera::setReverseHeading(bool b)
 */
 void Camera::reset()
 {
-    m_LastPitch = 0.0f;
+    m_last_pitch = 0.0f;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -155,15 +155,15 @@ void Camera::update (float dt)
             // If the terrain pitch is 'significantly' different from the camera angle,
             // start adjusting the camera. This helps with steep declines, where
             // otherwise the track is not visible anymore.
-            if(fabsf(kartcoord.hpr[1]-m_LastPitch)>1.0f) {
-                kartcoord.hpr[1] = m_LastPitch + (kartcoord.hpr[1]-m_LastPitch)*2.0f*dt;
+            if(fabsf(kartcoord.hpr[1]-m_last_pitch)>1.0f) {
+                kartcoord.hpr[1] = m_last_pitch + (kartcoord.hpr[1]-m_last_pitch)*2.0f*dt;
             }
             else
             {
-                kartcoord.hpr[1]=m_LastPitch;
+                kartcoord.hpr[1]=m_last_pitch;
             }
         }   //  dt>0.0
-        m_LastPitch = kartcoord.hpr[1];
+        m_last_pitch = kartcoord.hpr[1];
     }   // m_mode!=CM_LEADER_MODE
 
     if (m_mode == CM_SIMPLE_REPLAY)
@@ -183,7 +183,8 @@ void Camera::update (float dt)
     if (m_mode == CM_CLOSEUP)
         sgMakeTransMat4(cam_pos, 0.f, -2.5f, 1.5f);
     else
-        sgMakeTransMat4(cam_pos, 0.f, -3.5f, 1.5f);
+        sgMakeTransMat4(cam_pos, 0.f, 
+                        -kart->getKartProperties()->getCameraDistance(), 1.5f);
 
     if (m_reverse)
     {
@@ -221,10 +222,9 @@ void Camera::update (float dt)
     sgMat4 result;
     sgMultMat4(result, tokart, relative);
 
-    sgCoord cam;
-    sgSetCoord(&cam, result);
+    sgSetCoord(&m_current_pos, result);
 
-    m_context -> setCamera (&cam) ;
+    m_context -> setCamera (&m_current_pos) ;
 }   // update
 
 //-----------------------------------------------------------------------------

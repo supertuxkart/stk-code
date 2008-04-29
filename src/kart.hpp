@@ -69,7 +69,6 @@ protected:
     float        m_wheelie_angle;
     float        m_zipper_time_left;   // zipper time left
     float        m_lap_start_time;     // Time at start of a new lap
-    float        m_kart_length;        // length of kart
     char         m_fastest_lap_message[255];
 
     int          m_shortcut_sector;    // segment on which the shortcut was started
@@ -80,7 +79,6 @@ protected:
     btVehicleRaycaster                 *m_vehicle_raycaster;
     btRaycastVehicle                   *m_vehicle;
     btUprightConstraint                *m_uprightConstraint;
-    float                               m_kart_height;
 
 private:
     int                 m_num_herrings_gobbled;
@@ -187,9 +185,9 @@ public:
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }
-    float          getKartLength    () const {return m_kart_length;            }
     void           createPhysics    (ssgEntity *obj);
-    float          getKartHeight    () const {return m_kart_height;            }
+    float          getKartLength    () const {return m_kart_properties->getKartLength();}
+    float          getKartHeight    () const {return m_kart_properties->getKartHeight();}
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}

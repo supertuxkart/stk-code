@@ -37,12 +37,13 @@ public:
     };
 protected:
     ssgContext *m_context ;
-
-    int    m_which_kart;
-    Mode m_mode;
-    float m_last_steer_offset;
-    float m_x, m_y, m_w, m_h ;
-    float m_LastPitch;
+    sgCoord     m_current_pos;
+    int         m_which_kart;
+    Mode        m_mode;
+    float       m_last_steer_offset;
+    float       m_x, m_y, m_w, m_h;
+    float       m_current_speed;        // current speed of camera
+    float       m_last_pitch;
 
     bool m_reverse;
 

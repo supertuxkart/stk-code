@@ -102,41 +102,21 @@ void Kart::createPhysics(ssgEntity *obj)
 {
     // First: Create the chassis of the kart
     // -------------------------------------
-    // The size for bullet must be specified in half extends!
-    //    ssgEntity *model = getModel();
-    float x_min, x_max, y_min, y_max, z_min, z_max;
-    MinMax(obj, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    if(getName()=="Hexley" || getName()=="Wilber")
-    {
-        // These kart models are too small, so we get problems with stability. 
-        // Till we find either better (bigger) models or improve their physics 
-        // parameters to become playable, we just adjust the size of their 
-        // physical models to be the same as the tuxkart model
-        x_min=-0.473799f;
-        x_max= 0.486361f;
-        y_min=-0.772244f;
-        y_max= 0.739075f;
-        z_min= 0.002806f;
-        z_max= 0.701095f;
-    }
-    float kart_width  = x_max-x_min;
-    m_kart_length = y_max-y_min;
-    if(m_kart_length<1.2) m_kart_length=1.5f;
 
-    // The kart height is needed later to reset the physics to the correct
-    // position.
-    m_kart_height  = z_max-z_min;
+    float kart_width  = m_kart_properties->getKartWidth();
+    float kart_length = m_kart_properties->getKartLength();
+    float kart_height = m_kart_properties->getKartHeight();
 
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                                 0.5f*m_kart_length,
-                                                 0.5f*m_kart_height));
+                                                 0.5f*kart_length,
+                                                 0.5f*kart_height));
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart 
     // won't topple over too easy. This must be between 0 and 0.5
     // (it's in units of kart_height)
     const float CENTER_SHIFT = getGravityCenterShift();
-    shiftCenterOfGravity.setOrigin(btVector3(0.0f,0.0f,CENTER_SHIFT*m_kart_height));
+    shiftCenterOfGravity.setOrigin(btVector3(0.0f,0.0f,CENTER_SHIFT*kart_height));
 
     m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
 
@@ -174,13 +154,13 @@ void Kart::createPhysics(ssgEntity *obj)
     float wheel_width  = m_kart_properties->getWheelWidth();
     float wheel_radius = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
-    float connection_height = -(0.5f-CENTER_SHIFT)*m_kart_height;
+    float connection_height = -(0.5f-CENTER_SHIFT)*kart_height;
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
     // right front wheel
     btVector3 wheel_coord(0.5f*kart_width-0.3f*wheel_width,
-                          0.5f*m_kart_length-wheel_radius,
+                          0.5f*kart_length-wheel_radius,
                           connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -188,7 +168,7 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // left front wheel
     wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
-                            0.5f*m_kart_length-wheel_radius,
+                            0.5f*kart_length-wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -196,7 +176,7 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // right rear wheel
     wheel_coord = btVector3(0.5f*kart_width-0.3f*wheel_width, 
-                            -0.5f*m_kart_length+wheel_radius,
+                            -0.5f*kart_length+wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -204,7 +184,7 @@ void Kart::createPhysics(ssgEntity *obj)
 
     // right rear wheel
     wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
-                            -0.5f*m_kart_length+wheel_radius,
+                            -0.5f*kart_length+wheel_radius,
                             connection_height);
     m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
@@ -223,9 +203,9 @@ void Kart::createPhysics(ssgEntity *obj)
     btTransform *t=new btTransform();
     t->setIdentity();
     m_uprightConstraint=new btUprightConstraint(*m_body, *t);
-    m_uprightConstraint->setLimit(M_PI/8.0f);
+    m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     m_uprightConstraint->setBounce(0.0f);
-    m_uprightConstraint->setMaxLimitForce(300.0f);
+    m_uprightConstraint->setMaxLimitForce(m_kart_properties->getUprightMaxForce());
     m_uprightConstraint->setErp(1.0f);
     m_uprightConstraint->setLimitSoftness(1.0f);
     m_uprightConstraint->setDamping(0.0f);
@@ -360,7 +340,7 @@ void Kart::reset()
     // Set position
     m_transform.setOrigin(btVector3(m_reset_pos.xyz[0],
                                     m_reset_pos.xyz[1],
-                                    m_reset_pos.xyz[2]+0.5f*m_kart_height));
+                                    m_reset_pos.xyz[2]+0.5f*getKartHeight()));
     m_body->setCenterOfMassTransform(m_transform);
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
@@ -732,7 +712,7 @@ float Kart::handleWheelie(float dt)
     {
         // Disable the upright constraint, since it will otherwise
         // work against the wheelie
-        m_uprightConstraint->setLimit(2.0f*M_PI);
+        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
 
         if ( m_wheelie_angle < getWheelieMaxPitch() )
             m_wheelie_angle += getWheeliePitchRate() * dt;
@@ -746,7 +726,7 @@ float Kart::handleWheelie(float dt)
     }
     if(m_wheelie_angle <=0.0f) 
     {
-        m_uprightConstraint->setLimit(M_PI/8.0f);
+        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
         return 0.0f;
     }
 
@@ -909,7 +889,7 @@ void Kart::endRescue()
     // kart will be placed a little bit under the track, triggering
     // a rescue, ...
     pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
-                            m_curr_pos.xyz[2]+0.5f*m_kart_height+0.1f));
+                            m_curr_pos.xyz[2]+0.5f*getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
                                  DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
@@ -1084,7 +1064,7 @@ void Kart::placeModel ()
     //    c.hpr[1] += m_wheelie_angle ;
     //    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS));
     const float CENTER_SHIFT = getGravityCenterShift();
-    c.xyz[2] -= (0.5f-CENTER_SHIFT)*m_kart_height;   // adjust for center of gravity
+    c.xyz[2] -= (0.5f-CENTER_SHIFT)*getKartHeight();   // adjust for center of gravity
     m_model_transform->setTransform(&c);
     Moveable::placeModel();
     

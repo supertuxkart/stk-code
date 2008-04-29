@@ -36,22 +36,23 @@ private:
     ssgEntity* m_model;
 
 protected:
-    /* Display and gui */
-    /* --------------- */
+    // Display and gui
+    // --------------- 
     std::string m_name;         // The human readable Name of the karts driver
     std::string m_ident;        // The computer readable-name of the karts driver
     std::string m_model_file;   // Filename of 3d model that is used for kart
     std::string m_icon_file;    // Filename of icon that represents the kart in
-    // the statusbar and the character select screen
+                                // the statusbar and the character select screen
     std::string m_shadow_file;  // Filename of the image file that contains the
-    // shadow for this kart
+                                // shadow for this kart
     float m_color[3];           // Color the represents the kart in the status
-    // bar and on the track-view
+                                // bar and on the track-view
 
-    /* Physic properties */
-    /* ----------------- */
+    // Physic properties
+    // -----------------
     float m_kart_width;               // width of kart
     float m_kart_length;              // length of kart
+    float m_kart_height;              // height of kart
     float m_mass;                     // weight of kart
     float m_wheel_base;               // distance between front and read wheels
     float m_height_cog;               // height of center of gravity
@@ -69,7 +70,8 @@ protected:
     float m_wheelie_step;
     float m_wheelie_power_boost;      // increase in engine power
 
-    //bullet physics data
+    // bullet physics data 
+    // -------------------
     float m_suspension_stiffness;
     float m_wheel_damping_relaxation;
     float m_wheel_damping_compression;
@@ -84,6 +86,15 @@ protected:
     float m_gravity_center_shift;
     float m_suspension_rest;
     float m_jump_velocity;            // z velocity set when jumping
+    float m_upright_tolerance;
+    float m_upright_max_force;
+
+    // Camera related setting
+    // ----------------------
+    float m_camera_max_accel;         // maximum acceleration of camera
+    float m_camera_max_brake;         // maximum braking of camera
+    float m_camera_distance;          // distance of normal camera from kart
+    //
     // The following two vectors define at what ratio of the maximum speed what
     // gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
     //                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
@@ -112,6 +123,9 @@ public:
     const char*   getIconFile            () const {return m_icon_file.c_str();      }
     const sgVec3* getColor               () const {return &m_color;                 }
     float         getMass                () const {return m_mass;                   }
+    float         getKartLength          () const {return m_kart_length;            }
+    float         getKartWidth           () const {return m_kart_width;             }
+    float         getKartHeight          () const {return m_kart_height;            }
     float         getMaxPower            () const {return m_engine_power;           }
     float         getTimeFullSteer       () const {return m_time_full_steer;        }
     float         getBrakeFactor         () const {return m_brake_factor;           }
@@ -128,8 +142,6 @@ public:
     float         getWheelieBalanceRecovery()const{return m_wheelie_balance_recovery;}
     float         getWheelieStep         () const {return m_wheelie_step;           }
     float         getWheeliePowerBoost   () const {return m_wheelie_power_boost;    }
-    float         getKartLength          () const {return m_kart_length;            }
-    float         getKartWidth           () const {return m_kart_width;             }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }
@@ -145,10 +157,15 @@ public:
     float getGravityCenterShift     () const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getJumpVelocity           () const {return m_jump_velocity;            }
+    float getUprightTolerance       () const {return m_upright_tolerance;        }
+    float getUprightMaxForce        () const {return m_upright_max_force;        }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 
           getGearPowerIncrease      () const {return m_gear_power_increase;      }
+    float getCameraMaxAccel         () const {return m_camera_max_accel;         }
+    float getCameraMaxBrake         () const {return m_camera_max_brake;         }
+    float getCameraDistance         () const {return m_camera_distance;          }
 };
 
 #endif

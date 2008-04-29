@@ -95,16 +95,31 @@ void KartProperties::load(const std::string filename, const std::string node,
         m_model = loader->load(m_model_file, CB_KART, false);
         if(!m_model)
         {
-	  fprintf(stderr, "Can't find kart model '%s'.\n",m_model_file.c_str());
-        file_manager->popTextureSearchPath();
-        file_manager->popModelSearchPath();
+            fprintf(stderr, "Can't find kart model '%s'.\n",m_model_file.c_str());
+            file_manager->popTextureSearchPath();
+            file_manager->popModelSearchPath();
             return;
         }
         ssgStripify(m_model);
         float x_min, x_max, y_min, y_max, z_min, z_max;
         MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-        m_kart_width = x_max-x_min;
-        m_kart_length = y_max-y_min;
+        if(getName()=="Hexley" || getName()=="Wilber")
+        {
+            // These kart models are too small, so we get problems with stability. 
+            // Till we find either better (bigger) models or improve their physics 
+            // parameters to become playable, we just adjust the size of their 
+            // physical models to be the same as the tuxkart model
+            x_min=-0.473799f;
+            x_max= 0.486361f;
+            y_min=-0.772244f;
+            y_max= 0.739075f;
+            z_min= 0.002806f;
+            z_max= 0.701095f;
+        }
+        m_kart_width  = x_max - x_min;
+        m_kart_length = y_max - y_min;
+        m_kart_height = z_max - z_min;
+        if(m_kart_length<1.2) m_kart_length=1.5f;
         m_model->ref();
     }  // if
     if(!dont_load_materials)
@@ -164,6 +179,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("jump-velocity",             m_jump_velocity            );
+    lisp->get("upright-tolerance",         m_upright_tolerance        );
+    lisp->get("upright-max-force",         m_upright_max_force        );
     // getVector appends to existing vectors, so a new one must be used to load
     std::vector<float> temp;
     lisp->getVector("gear-switch-ratio",   temp);
@@ -171,6 +188,11 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     temp.clear();
     lisp->getVector("gear-power-increase", temp);
     if(temp.size()>0) m_gear_power_increase = temp;
+    
+    // Camera
+    lisp->get("camera-max-accel",             m_camera_max_accel);
+    lisp->get("camera-max-brake",             m_camera_max_brake);
+    lisp->get("camera-distance",              m_camera_distance );
 
 }   // getAllData
 
@@ -222,7 +244,11 @@ void KartProperties::init_defaults()
     m_jump_velocity             = stk_config->m_jump_velocity;
     m_gear_switch_ratio         = stk_config->m_gear_switch_ratio;
     m_gear_power_increase       = stk_config->m_gear_power_increase;
-
+    m_upright_tolerance         = stk_config->getUprightTolerance();
+    m_upright_max_force         = stk_config->getUprightMaxForce();
+    m_camera_max_accel          = stk_config->getCameraMaxAccel();
+    m_camera_max_brake          = stk_config->getCameraMaxBrake();
+    m_camera_distance           = stk_config->getCameraDistance();
 }   // init_defaults
 
 /* EOF */

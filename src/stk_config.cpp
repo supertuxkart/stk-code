@@ -32,8 +32,8 @@ void STKConfig::load(const std::string filename)
                         /*dont_load_models   */ true,
                         /*dont_load_materials*/ true  );
 
-    // Check that all necessary values are indeed set physics.data file
-
+    // Check that all necessary values are indeed set 
+    // -----------------------------------------------
 
 #define CHECK_NEG(  a,strA) if(a<-99) {                                \
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
@@ -120,6 +120,11 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
+    CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
+    CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
+    CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
+    CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
+    CHECK_NEG(m_camera_distance,           "camera-distance"            );
 
 }   // load
 
@@ -135,19 +140,22 @@ void STKConfig::init_defaults()
     m_parachute_time = m_parachute_done_fraction = m_parachute_time_other = 
     m_engine_power = m_jump_impulse    = m_brake_factor =
     m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
-    m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheelie_restore_rate =
-    m_wheelie_speed_boost = 
+    m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = 
+    m_wheelie_restore_rate = m_wheelie_speed_boost = 
     m_bomb_time = m_bomb_time_increase= m_anvil_time = 
     m_zipper_time = m_zipper_force = m_zipper_speed_gain = 
     m_shortcut_segments =
     //bullet physics data
-    m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_damping_compression =
-    m_friction_slip = m_roll_influence = m_wheel_radius = m_wheel_width =
-    m_wheelie_lean_recovery = m_wheelie_step = m_wheelie_balance_recovery =
-    m_wheelie_power_boost = m_chassis_linear_damping = m_chassis_angular_damping = 
+    m_suspension_stiffness = m_wheel_damping_relaxation = 
+    m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
+    m_wheel_radius = m_wheel_width = m_wheelie_lean_recovery = 
+    m_wheelie_step = m_wheelie_balance_recovery =m_wheelie_power_boost = 
+    m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_gravity_center_shift = m_suspension_rest =
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
-    m_explosion_impulse_objects = -99.9f;
+    m_explosion_impulse_objects = m_upright_tolerance = m_upright_max_force =
+    // Camera
+    m_camera_max_accel = m_camera_max_brake = m_camera_distance = -99.9f;
 
     m_max_karts            = -100;
     m_grid_order           = -100;
