@@ -527,6 +527,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -961,10 +962,6 @@
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\difficulty.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\gui\display_res_confirm.cpp"
 					>
 				</File>
@@ -1009,14 +1006,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\num_karts.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_laps.cpp"
-					>
-				</File>
-				<File
 					RelativePath="../../../src\gui\num_players.cpp"
 					>
 				</File>
@@ -1037,7 +1026,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\race_options.cpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\race_results_gui.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\start_race_feedback.cpp"
 					>
 				</File>
 				<File
@@ -1085,7 +1082,31 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\city_time.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\energy_math_class.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\energy_shifting_sands.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\island_follow.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\jungle_follow.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\moon_and_back_gp.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\penguin_playground_gp.cpp"
 					>
 				</File>
 				<File
@@ -1093,7 +1114,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\tollway_time.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\win_gotm_cup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\worlds_end_gp.cpp"
 					>
 				</File>
 			</Filter>
@@ -1435,10 +1464,6 @@
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\difficulty.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\gui\display_res_confirm.hpp"
 					>
 				</File>
@@ -1483,14 +1508,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\num_karts.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_laps.hpp"
-					>
-				</File>
-				<File
 					RelativePath="../../../src\gui\num_players.hpp"
 					>
 				</File>
@@ -1511,7 +1528,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\race_options.hpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\race_results_gui.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\start_race_feedback.hpp"
 					>
 				</File>
 				<File
@@ -1559,7 +1584,31 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\city_time.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\energy_math_class.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\energy_shifting_sands.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\island_follow.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\jungle_follow.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\moon_and_back_gp.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\penguin_playground_gp.hpp"
 					>
 				</File>
 				<File
@@ -1567,7 +1616,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\tollway_time.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\win_gotm_cup.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\worlds_end_gp.hpp"
 					>
 				</File>
 			</Filter>
