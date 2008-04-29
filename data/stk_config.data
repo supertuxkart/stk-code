@@ -87,7 +87,11 @@
    ;; gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
    (gear-switch-ratio         0.25  0.5  0.75)
    (gear-power-increase       2.5   1.8  1.4 )
-
+   (upright-tolerance         0.2)
+   (upright-max-force         30)
+   (camera-max-accel          10)
+   (camera-max-brake          10)
+   (camera-distance           3.5) 
   )   ;; end kart-defaults
 )
 ;; EOF ;;
