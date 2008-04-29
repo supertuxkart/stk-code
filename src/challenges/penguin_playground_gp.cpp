@@ -23,7 +23,7 @@
 
 PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp","Finish Penguin Playground Grand Prix")
 {
-    setChallengeDescription("Finish the Penguin Playground Grand\nPrix with 3 'Driver' Level AI karts\nin the top 3.");
+    setChallengeDescription("Finish the Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts\nin the top 3.");
     setFeatureDescription("New game mode\n'Follow Leader'\nnow available");
     setFeature("followleader");
     // The energymathclass challenge must be done, otherwise GP can't be selected
