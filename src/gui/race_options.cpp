@@ -21,6 +21,9 @@
 #include "menu_manager.hpp"
 #include "material_manager.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 enum WidgetTokens
 {
@@ -89,8 +92,8 @@ RaceOptions::RaceOptions() :
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 1);
     }
 
-    if( race_manager->getRaceMode() != ( RaceManager::RM_GRAND_PRIX ||
-            RaceManager::RM_FOLLOW_LEADER ))
+    if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX   &&
+        race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER   )
     {
         widget_manager->insertColumn();
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, 30, 7, _("Number of laps") );
@@ -230,8 +233,8 @@ void RaceOptions::select()
             race_manager->setNumKarts(m_num_karts);
         }
 
-        if( race_manager->getRaceMode() != ( RaceManager::RM_GRAND_PRIX ||
-            RaceManager::RM_FOLLOW_LEADER ))
+        if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX    &&
+            race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER    )
         {
             race_manager->setNumLaps( m_num_laps );
         }
