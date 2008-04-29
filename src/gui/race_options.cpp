@@ -89,7 +89,8 @@ RaceOptions::RaceOptions() :
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 1);
     }
 
-    if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX )
+    if( race_manager->getRaceMode() != ( RaceManager::RM_GRAND_PRIX ||
+            RaceManager::RM_FOLLOW_LEADER ))
     {
         widget_manager->insertColumn();
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, 30, 7, _("Number of laps") );
@@ -229,7 +230,8 @@ void RaceOptions::select()
             race_manager->setNumKarts(m_num_karts);
         }
 
-        if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX )
+        if( race_manager->getRaceMode() != ( RaceManager::RM_GRAND_PRIX ||
+            RaceManager::RM_FOLLOW_LEADER ))
         {
             race_manager->setNumLaps( m_num_laps );
         }
