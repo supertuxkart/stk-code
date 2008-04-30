@@ -51,7 +51,7 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
         return;
     }
     // Now convert the triangle mesh into a static rigid body
-    m_collision_shape = new btBvhTriangleMeshShape(&m_mesh, false);
+    m_collision_shape = new btBvhTriangleMeshShape(&m_mesh, true);
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);
