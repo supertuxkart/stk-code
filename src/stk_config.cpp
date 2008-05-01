@@ -76,7 +76,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_engine_power,            "engine-power"                 );
     CHECK_NEG(m_max_steer_angle,         "max-steer-angle"              );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
-    CHECK_NEG(m_jump_impulse,            "jump-impulse"                 );
 
     CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
     CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
@@ -138,7 +137,7 @@ void STKConfig::init_defaults()
     m_wheel_base   = m_height_cog      = m_mass = m_max_steer_angle =
     m_anvil_weight    = m_parachute_friction =
     m_parachute_time = m_parachute_done_fraction = m_parachute_time_other = 
-    m_engine_power = m_jump_impulse    = m_brake_factor =
+    m_engine_power = m_brake_factor =
     m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
     m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = 
     m_wheelie_restore_rate = m_wheelie_speed_boost = 
@@ -177,7 +176,6 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("parachute-time",               m_parachute_time           );
     lisp->get("parachute-time-other",         m_parachute_time_other     );
     lisp->get("parachute-done-fraction",      m_parachute_done_fraction  );
-    lisp->get("jump-impulse",                 m_jump_impulse             );
     lisp->get("bomb-time",                    m_bomb_time                );
     lisp->get("bomb-time-increase",           m_bomb_time_increase       );
     lisp->getVector("leader-intervals",       m_leader_intervals         );
