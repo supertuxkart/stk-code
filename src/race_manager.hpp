@@ -48,7 +48,7 @@ class RaceManager
 public:
     enum RaceModeType   { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX, 
                           RM_FOLLOW_LEADER };
-    enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD };
+    enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
 
 private:
     struct KartStatus
@@ -105,7 +105,7 @@ public:
     void setNumPlayers(int num);
     void reset();
     void setGrandPrix(const CupData &cup)    { m_cup = cup;                      }
-    void setDifficulty(Difficulty diff)      { m_difficulty = diff;              }
+    void setDifficulty(Difficulty diff);
     void setNumLaps(int num)                 { m_num_laps.clear();
                                                m_num_laps.push_back(num);        }
     void setTrack(const std::string& track);

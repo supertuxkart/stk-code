@@ -598,7 +598,7 @@ void Kart::update(float dt)
         // track again)
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper();
-        else   // neither zipper nor reset --> set friction
+        else if(user_config->m_skidding)  // set friction otherwise if it's enabled
         {
             for(int i=0; i<m_vehicle->getNumWheels(); i++)
             {
@@ -712,7 +712,7 @@ float Kart::handleWheelie(float dt)
     {
         // Disable the upright constraint, since it will otherwise
         // work against the wheelie
-        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
+        m_uprightConstraint->setLimit(M_PI);
 
         if ( m_wheelie_angle < getWheelieMaxPitch() )
             m_wheelie_angle += getWheeliePitchRate() * dt;

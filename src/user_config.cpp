@@ -104,6 +104,7 @@ void UserConfig::setDefaults()
     m_herring_style    = "new";
     m_background_music = "";
     m_profile          = 0;
+    m_skidding         = false;
     m_use_kph          = false;
     m_replay_history   = false;
     m_width            = 800;

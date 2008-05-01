@@ -86,6 +86,21 @@ void RaceManager::setNumPlayers(int num)
 }   // setNumPlayers
 
 //-----------------------------------------------------------------------------
+void RaceManager::setDifficulty(Difficulty diff)
+{
+    if(diff==RD_SKIDDING)
+    {
+        m_difficulty = RD_HARD;
+        user_config->m_skidding = true;
+    }
+    else
+    {
+        m_difficulty = diff;
+        user_config->m_skidding = false;
+    }
+}   // setDifficulty
+
+//-----------------------------------------------------------------------------
 void RaceManager::setTrack(const std::string& track)
 {
     m_tracks.clear();

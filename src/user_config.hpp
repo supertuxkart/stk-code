@@ -169,6 +169,7 @@ public:
     bool        m_display_fps;
     int         m_profile;         // Positive number: time in seconds, neg: # laps
                                    // 0 if no profiling. Never saved in config file!
+    bool        m_skidding;
     std::string m_herring_style;
     std::string m_username;
     std::string m_background_music;

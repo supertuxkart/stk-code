@@ -18,8 +18,10 @@
 #include "race_manager.hpp"
 #include "race_options.hpp"
 #include "widget_manager.hpp"
+#include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "material_manager.hpp"
+#include "unlock_manager.hpp"
 #include "translation.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -133,7 +135,12 @@ void RaceOptions::select()
     switch ( widget_manager->getSelectedWgt() )
     {
         case WTOK_DIFFICULTY_UP:
-            if( m_difficulty == RaceManager::RD_MEDIUM )
+            if( m_difficulty == RaceManager::RD_HARD && !unlock_manager->isLocked("skidding"))
+            {
+                m_difficulty = RaceManager::RD_SKIDDING;
+                widget_manager->setWgtText( WTOK_DIFFICULTY, _("Skidding Preview") );
+            }
+            else if( m_difficulty == RaceManager::RD_MEDIUM )
             {
                 m_difficulty = RaceManager::RD_HARD;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Racer") );
@@ -146,7 +153,13 @@ void RaceOptions::select()
             break;
 
         case WTOK_DIFFICULTY_DOWN:
-            if( m_difficulty == RaceManager::RD_HARD )
+            if( m_difficulty == RaceManager::RD_SKIDDING )
+            {
+                m_difficulty = RaceManager::RD_HARD;
+                widget_manager->setWgtText( WTOK_DIFFICULTY, _("Racer") );
+            }
+
+            else if( m_difficulty == RaceManager::RD_HARD )
             {
                 m_difficulty = RaceManager::RD_MEDIUM;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Driver") );
@@ -214,7 +227,11 @@ void RaceOptions::select()
     case WTOK_START:
         if( race_manager->getRaceMode() != RaceManager::RM_TIME_TRIAL )
         {
-            if( m_difficulty == RaceManager::RD_HARD )
+            if( m_difficulty == RaceManager::RD_SKIDDING )
+            {
+                race_manager->setDifficulty( RaceManager::RD_SKIDDING );
+            }
+            else if( m_difficulty == RaceManager::RD_HARD )
             {
                 race_manager->setDifficulty( RaceManager::RD_HARD );
             }
