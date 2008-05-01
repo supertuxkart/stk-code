@@ -76,9 +76,6 @@ PlayerControls::PlayerControls(int whichPlayer):
 
     widget_manager->addTextWgt( WTOK_PLYR_NAME0, 30, 7, _("Player name") );
 
-
-    widget_manager->addTextWgt( WTOK_PLYR_NAME0, 30, 7, _("Player name") );
-
     m_name = user_config->m_player[m_player_index].getName();
     widget_manager->addTextButtonWgt( WTOK_PLYR_NAME1, 30, 7, m_name );
     widget_manager->breakLine();
