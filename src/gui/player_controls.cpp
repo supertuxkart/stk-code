@@ -25,6 +25,9 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "sdldrv.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 enum WidgetTokens
 {
