@@ -61,9 +61,8 @@ TrackSel::TrackSel()
             widget_manager->hideWgtText(WTOK_TRACK0 + i);
             widget_manager->deactivateWgt(WTOK_TRACK0 + i);
 
-            const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
             widget_manager->setWgtColor( WTOK_TRACK0 + i, WGT_WHITE);
-            widget_manager->setWgtTexture( WTOK_TRACK0 + i, m->getState()->getTextureHandle() );
+            widget_manager->setWgtTexture( WTOK_TRACK0 + i, "gui_lock.rgb" );
             widget_manager->showWgtTexture( WTOK_TRACK0 + i );
         }
         if( i%2 != 0 ) widget_manager->breakLine();
@@ -101,7 +100,6 @@ void TrackSel::update(float dt)
         SELECTED_TRACK < (int)track_manager->getTrackCount() )
     {
         const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
-        const bool FULL_PATH=true;
 
         widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
 
@@ -110,26 +108,23 @@ void TrackSel::update(float dt)
 
         if( !screenshot.empty() && !topview.empty() )
         {
-            const Material *m =material_manager->getMaterial(screenshot, FULL_PATH);
             widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
             widget_manager->showWgtRect( WTOK_IMG0 );
-            widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+            widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
             widget_manager->showWgtTexture( WTOK_IMG0 );
             widget_manager->hideWgtTrack( WTOK_IMG0 );
 
-            m = material_manager->getMaterial(topview, FULL_PATH);
             widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
             widget_manager->showWgtRect( WTOK_IMG1 );
-            widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+            widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
             widget_manager->showWgtTexture( WTOK_IMG1 );
             widget_manager->hideWgtTrack( WTOK_IMG1 );
         }
         else if( topview.empty() )
         {
-            const Material *m = material_manager->getMaterial(screenshot, FULL_PATH);
             widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
             widget_manager->showWgtRect( WTOK_IMG0 );
-            widget_manager->setWgtTexture( WTOK_IMG0, m->getState()->getTextureHandle() );
+            widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
             widget_manager->showWgtTexture( WTOK_IMG0 );
             widget_manager->hideWgtTrack( WTOK_IMG0 );
 
@@ -145,10 +140,9 @@ void TrackSel::update(float dt)
             widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
             widget_manager->showWgtTrack( WTOK_IMG0 );
 
-            Material *m = material_manager->getMaterial(topview, FULL_PATH);
             widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
             widget_manager->showWgtRect( WTOK_IMG1 );
-            widget_manager->setWgtTexture( WTOK_IMG1, m->getState()->getTextureHandle() );
+            widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
             widget_manager->showWgtTexture( WTOK_IMG1 );
             widget_manager->hideWgtTrack( WTOK_IMG1 );
         }

@@ -204,6 +204,7 @@ class Widget
     void darkenColor();
 
     void setFont( const WidgetFont FONT );
+    void setTexture( const char* FILENAME );
 
     /* Functions created simply to organize the code */
     bool createRect(int radius);

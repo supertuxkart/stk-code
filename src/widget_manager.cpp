@@ -1093,11 +1093,24 @@ void WidgetManager::hideWgtBorder(const int TOKEN)
     }
 }
 
+
 //-----------------------------------------------------------------------------
 void WidgetManager::setWgtTexture(const int TOKEN, const int TEXTURE)
 {
     const int ID = findId(TOKEN);
     if( ID != WGT_NONE ) m_widgets[ID].widget->m_texture = TEXTURE;
+    else
+    {
+        std::cerr << "WARNING: tried to set the texture of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtTexture(const int TOKEN, const char* FILENAME)
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].widget->setTexture( FILENAME );
     else
     {
         std::cerr << "WARNING: tried to set the texture of an unnamed " <<

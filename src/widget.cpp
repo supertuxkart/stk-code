@@ -24,6 +24,7 @@
 
 #include "constants.hpp"
 #include "track_manager.hpp"
+#include "material_manager.hpp"
 #include "track.hpp"
 #include <cmath>
 #include <iostream>
@@ -246,6 +247,13 @@ void Widget::setFont( const WidgetFont FONT )
     //TODO: the curr_widget_font variable exists only for a bug around; after
     //some restructuration, it should be fine to remove this.
     m_curr_widget_font = FONT;
+}
+
+//-----------------------------------------------------------------------------
+void Widget::setTexture( const char* FILENAME )
+{
+    Material *m = material_manager->getMaterial( FILENAME );
+    m_texture = m->getState()->getTextureHandle();
 }
 
 /** Initialize a display list containing a rectangle that can have rounded

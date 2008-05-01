@@ -52,19 +52,19 @@ CharSel::CharSel(int whichPlayer)
     ssgContext* oldContext = ssgGetCurrentContext();
     m_context = new ssgContext;
     oldContext->makeCurrent();
-    
+
     // If m_player_index is 0 then this is a single player game or the first
     // player of a multiplayer game so we need to ensure that all karts are available.
     // If m_player_index is less than the number of elements in selected_karts then
-    // the user is moving back through the menus and the last value in the vector 
+    // the user is moving back through the menus and the last value in the vector
     // needs to be made available again.
     if (m_player_index == 0)
-    	kart_properties_manager->m_selected_karts.clear();
-        
-   	if (m_player_index < (int)kart_properties_manager->m_selected_karts.size())
-   		kart_properties_manager->m_selected_karts.pop_back();
-   	
-   	widget_manager->setInitialActivationState(false);
+        kart_properties_manager->m_selected_karts.clear();
+
+    if (m_player_index < (int)kart_properties_manager->m_selected_karts.size())
+    kart_properties_manager->m_selected_karts.pop_back();
+
+    widget_manager->setInitialActivationState(false);
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect( WTOK_TITLE );
     char heading[MAX_MESSAGE_LENGTH];
@@ -85,11 +85,10 @@ CharSel::CharSel(int whichPlayer)
         {
             const KartProperties* kp= kart_properties_manager->getKartById(i);
             if(unlock_manager->isLocked(kp->getIdent())) continue;
-            Material *m = material_manager->getMaterial(kp->getIconFile());
             widget_manager->addWgt( WTOK_RACER0 + i, 8, 11);
             widget_manager->showWgtRect( WTOK_RACER0 + i);
             widget_manager->setWgtColor( WTOK_RACER0 + i, WGT_GRAY);
-            widget_manager->setWgtTexture( WTOK_RACER0 + i, m->getState()->getTextureHandle());
+            widget_manager->setWgtTexture( WTOK_RACER0 + i, kp->getIconFile() );
             widget_manager->showWgtTexture( WTOK_RACER0 + i );
             widget_manager->activateWgt( WTOK_RACER0 + i );
         }
@@ -111,7 +110,7 @@ CharSel::CharSel(int whichPlayer)
     m_current_kart = -1;
 
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
-    if( LAST_KART != -1 && kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts 
+    if( LAST_KART != -1 && kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
     {
         widget_manager->setSelectedWgt(WTOK_RACER0 + LAST_KART);
         switchCharacter(LAST_KART);
@@ -254,13 +253,13 @@ bool CharSel::kartAvailable(int kart)
 {
 	if (!kart_properties_manager->m_selected_karts.empty())
         {
-        	std::vector<int>::iterator it;
-        	for (it = kart_properties_manager->m_selected_karts.begin();
-        	  it < kart_properties_manager->m_selected_karts.end(); it++)
-        	{
-        		if ( kart == *it)
-        			return false;
-        	}
+            std::vector<int>::iterator it;
+            for (it = kart_properties_manager->m_selected_karts.begin();
+                it < kart_properties_manager->m_selected_karts.end(); it++)
+            {
+                if ( kart == *it)
+                return false;
+            }
         }
     return true;
 }
