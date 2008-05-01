@@ -132,25 +132,25 @@ RaceResultsGUI::RaceResultsGUI()
     // then display the whole menu.
     if(unlock_manager->getUnlockedFeatures().size()>0)
     {
-        widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
+        widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
     } else
     {
         if(race_manager->getRaceMode()==RaceManager::RM_GRAND_PRIX)
         {
-            widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
+            widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
         }
         else
         {
-            widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Back to the main menu"));
+            widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Back to the main menu"));
         }
         widget_manager->breakLine();
 
-        widget_manager->addTextWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
+        widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
         widget_manager->breakLine();
 
         if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
         {
-            widget_manager->addTextWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
+            widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
         }
     }   // if !unlock_manager has something unlocked*/
 
