@@ -32,10 +32,6 @@
  (explosion-impulse-objects 500.0  )  ;; explosion impulse for physics objects (smaller
                                     ;; else a cone e.g. will be pushed way too far)
 
- ;; Other kart relates values
- ;; -------------------------
- (jump-impulse             5400.0 ) ;; percentage of gravity!
-
  ;; The following files are the defaults for karts
  ;; ----------------------------------------------
  (kart-defaults
