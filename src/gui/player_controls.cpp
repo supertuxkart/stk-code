@@ -67,46 +67,45 @@ PlayerControls::PlayerControls(int whichPlayer):
     m_player_index(whichPlayer),
     m_grab_input(false)
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
+    char heading[MAX_MESSAGE_LENGTH];
+    snprintf(heading, sizeof(heading), _("Choose your controls, %s"),
+            user_config->m_player[m_player_index].getName().c_str() );
 
-    widget_manager->addWgt( WTOK_TITLE, 60, 7);
-    sprintf(m_heading, _("Choose your controls, %s"),
-            user_config->m_player[m_player_index].getName().c_str());
-    widget_manager->setWgtText( WTOK_TITLE, m_heading);
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, heading );
     widget_manager->breakLine();
 
-    widget_manager->addWgt( WTOK_PLYR_NAME0, 30, 7);
-    widget_manager->setWgtText( WTOK_PLYR_NAME0, _("Player name"));
+    widget_manager->addTextWgt( WTOK_PLYR_NAME0, 30, 7, _("Player name") );
 
-    widget_manager->addWgt( WTOK_PLYR_NAME1, 30, 7);
+
+    widget_manager->addTextWgt( WTOK_PLYR_NAME0, 30, 7, _("Player name") );
+
     m_name = user_config->m_player[m_player_index].getName();
-    widget_manager->setWgtText( WTOK_PLYR_NAME1, m_name);
-    widget_manager->activateWgt( WTOK_PLYR_NAME1);
+    widget_manager->addTextButtonWgt( WTOK_PLYR_NAME1, 30, 7, m_name );
     widget_manager->breakLine();
 
-    KartAction control;
+    widget_manager->insertColumn();
     for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
-        widget_manager->addWgt( WTOK_KEY0 + i, 30, 7);
-        widget_manager->setWgtText( WTOK_KEY0 + i, sKartAction2String[i]);
+        widget_manager->addTextWgt( WTOK_KEY0 + i, 30, 7, sKartAction2String[i] );
+    }
+    widget_manager->breakLine();
 
+
+    KartAction control;
+    widget_manager->insertColumn();
+    for(int i = KA_FIRST; i <= KA_LAST; i++)
+    {
         control = (KartAction)i;
         m_key_names[control] = user_config->getMappingAsString(m_player_index, control);
-        widget_manager->addWgt( WTOK_LEFT + i, 30, 7);
-        widget_manager->setWgtText( WTOK_LEFT + i, m_key_names[control].c_str());
-        widget_manager->activateWgt( WTOK_LEFT + i);
 
-        widget_manager->breakLine();
+        widget_manager->addTextButtonWgt( WTOK_LEFT + i, 30, 7,
+            m_key_names[control].c_str());
     }
+    widget_manager->breakLine();
+    widget_manager->breakLine();
 
-    widget_manager->addWgt( WTOK_QUIT, 60, 7);
-    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->addTextWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML);
-    widget_manager->activateWgt( WTOK_QUIT);
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // PlayerControls

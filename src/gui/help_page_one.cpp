@@ -67,7 +67,7 @@ HelpPageOne::HelpPageOne()
 
     widget_manager->setInitialRectState( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
     widget_manager->setInitialTextState( SHOW_TEXT, "", TEXT_SIZE,
-        WGT_FONT_GUI, WGT_WHITE );
+        WGT_FONT_GUI, WGT_WHITE, false );
 
     /*Help header*/
     widget_manager->addWgt(WTOK_MSG1, 50, 7);
@@ -192,15 +192,6 @@ void HelpPageOne::update(float dt)
         m_context -> makeCurrent();
 
         glClear(GL_DEPTH_BUFFER_BIT);
-
-#if 0
-        GLint viewport[4];
-        glGetIntegerv(GL_VIEWPORT, viewport);
-
-        glViewport ( 0, 0, viewport[2], viewport[3]);
-        m_context -> setFOV ( 45.0f, 45.0f * viewport[2]/viewport[3] ) ;
-        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
-#endif
 
         sgCoord cam_pos;
         sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);

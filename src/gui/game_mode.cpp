@@ -29,78 +29,56 @@
 enum WidgetTokens
 {
     WTOK_TITLE,
+
     WTOK_GP,
     WTOK_QUICKRACE,
     WTOK_TIMETRIAL,
     WTOK_FOLLOW_LEADER,
-    WTOK_EMPTY,
-    WTOK_BACK
+
+    WTOK_QUIT
 };
 
 GameMode::GameMode()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt(WTOK_TITLE, 50, 7);
-    widget_manager->setWgtText( WTOK_TITLE, _("Choose a Race Mode"));
-    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG );
+    widget_manager->addTitleWgt(WTOK_TITLE, 50, 7, _("Choose a Race Mode"));
 
-    widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt(WTOK_GP, 50, 7);
     if(unlock_manager->isLocked("grandprix"))
     {
-        widget_manager->hideWgtText(WTOK_GP);
-        widget_manager->deactivateWgt(WTOK_GP);
-
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->setWgtColor( WTOK_GP, WGT_WHITE);
-        widget_manager->setWgtTexture( WTOK_GP, m->getState()->getTextureHandle() );
-        widget_manager->showWgtTexture( WTOK_GP );
+        widget_manager->addImgWgt(WTOK_GP, 50, 7,
+            m->getState()->getTextureHandle() );
     }
     else
     {
-        widget_manager->setWgtText( WTOK_GP, _("Grand Prix"));
+        widget_manager->addTextButtonWgt( WTOK_GP, 50, 7, _("Grand Prix"));
     }
 
-    widget_manager->addWgt(WTOK_QUICKRACE, 50, 7);
-    widget_manager->setWgtText( WTOK_QUICKRACE, _("Quick Race"));
+    widget_manager->addTextButtonWgt(WTOK_QUICKRACE, 50, 7, _("Quick Race"));
 
     if( race_manager->getNumPlayers() == 1 )
     {
-        widget_manager->addWgt(WTOK_TIMETRIAL, 50, 7);
-        widget_manager->setWgtText( WTOK_TIMETRIAL, _("Time Trial"));
+        widget_manager->addTextButtonWgt(WTOK_TIMETRIAL, 50, 7, _("Time Trial"));
     }
-    widget_manager->addWgt(WTOK_FOLLOW_LEADER, 50, 7);
     if(unlock_manager->isLocked("followleader"))
     {
-        widget_manager->hideWgtText(WTOK_FOLLOW_LEADER);
-        widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER);
-
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_WHITE);
-        widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, m->getState()->getTextureHandle() );
+        widget_manager->addImgWgt(WTOK_GP, 50, 7,
+            m->getState()->getTextureHandle() );
         widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
     }
     else
     {
-        widget_manager->setWgtText( WTOK_FOLLOW_LEADER, _("Follow the Leader"));
+        widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 50, 7,
+            _("Follow the Leader"));
     }
-    widget_manager->addWgt(WTOK_EMPTY, 50, 7);
-    widget_manager->hideWgtRect( WTOK_EMPTY );
-    widget_manager->hideWgtText( WTOK_EMPTY );
-    widget_manager->deactivateWgt( WTOK_EMPTY );
 
-    widget_manager->addWgt(WTOK_BACK, 50, 7);
-    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back"));
-    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 50, 7);
+
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 50, 7, _("Press <ESC> to go back"));
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
-    
 }
 
 //-----------------------------------------------------------------------------
@@ -130,7 +108,7 @@ void GameMode::select()
         race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
         menu_manager->popMenu();
         break;
     default: break;

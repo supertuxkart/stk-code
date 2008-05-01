@@ -37,9 +37,6 @@ enum WidgetTokens
     WTOK_TITLE,
     WTOK_APPLY_RES,
 
-    WTOK_EMPTY,
-    WTOK_EMPTY1,
-
     WTOK_QUIT
 };
 
@@ -49,33 +46,17 @@ DisplayResConfirm::DisplayResConfirm( const bool FROM_WINDOW_ ) :
 {
     m_counter = 5; // Number of seconds in which to confirm
 
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt( WTOK_TITLE, 70, 7);
-    widget_manager->setWgtText( WTOK_TITLE, _("Confirm Resolution Within 5 Seconds"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 70, 7,
+        _("Confirm Resolution Within 5 Seconds"));
 
-    widget_manager->setInitialActivationState(true);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2);
 
-    widget_manager->addWgt( WTOK_EMPTY, 40, 2);
-    widget_manager->deactivateWgt( WTOK_EMPTY );
-    widget_manager->hideWgtRect( WTOK_EMPTY );
-    widget_manager->hideWgtText( WTOK_EMPTY );
+    widget_manager->addTextButtonWgt( WTOK_APPLY_RES, 40, 7, _("Confirm Resolution") );
 
-    widget_manager->addWgt( WTOK_APPLY_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_APPLY_RES, _("Confirm Resolution"));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2);
 
-    widget_manager->addWgt( WTOK_EMPTY1, 40, 2);
-    widget_manager->deactivateWgt( WTOK_EMPTY1 );
-    widget_manager->hideWgtRect( WTOK_EMPTY1 );
-    widget_manager->hideWgtText( WTOK_EMPTY1 );
-
-    widget_manager->addWgt( WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to Cancel"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7, _("Press <ESC> to Cancel") );
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
@@ -85,7 +66,6 @@ DisplayResConfirm::DisplayResConfirm( const bool FROM_WINDOW_ ) :
     {
         std::cerr << "Warning: Timer could not be initialised!\n";
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +88,7 @@ void DisplayResConfirm::select()
         break;
     case WTOK_QUIT:
         SDL_RemoveTimer(m_timer);
-        if (FROM_WINDOW) 
+        if (FROM_WINDOW)
         {
             inputDriver->toggleFullscreen();
             user_config->m_crashed = false;
@@ -127,7 +107,7 @@ void DisplayResConfirm::countdown()
     {
         m_counter--;
         snprintf(m_count, MAX_MESSAGE_LENGTH, _("Confirm Resolution Within %d Seconds"), m_counter);
-        widget_manager->setWgtText(WTOK_TITLE, m_count);
+        widget_manager->setWgtText( WTOK_TITLE, m_count );
     }
     else
     {
@@ -159,7 +139,7 @@ void DisplayResConfirm::handle(GameAction ga, int value)
         if (value)
             break;
 		SDL_RemoveTimer(m_timer);
-        if (FROM_WINDOW) 
+        if (FROM_WINDOW)
         {
             inputDriver->toggleFullscreen();
             user_config->m_crashed = false;

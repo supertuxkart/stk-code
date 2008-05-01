@@ -31,51 +31,36 @@ enum WidgetTokens
     WTOK_MUSIC,
     WTOK_SFX,
 
-    WTOK_EMPTY,
-
     WTOK_QUIT,
 };
 
 ConfigSound::ConfigSound()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt(WTOK_TITLE, 40, 7);
-    widget_manager->setWgtText( WTOK_TITLE, _("Sound Settings"));
+    widget_manager->addTitleWgt(WTOK_TITLE, 40, 7, _("Sound Settings"));
 
     widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt(WTOK_MUSIC, 40, 7);
     if( user_config->doMusic() )
     {
-        widget_manager->setWgtText( WTOK_MUSIC, _("Turn off music"));
+        widget_manager->addTextButtonWgt( WTOK_MUSIC, 40, 7, _("Turn off music"));
     }
     else
     {
-        widget_manager->setWgtText( WTOK_MUSIC, _("Turn on music"));
+        widget_manager->addTextButtonWgt( WTOK_MUSIC, 40, 7, _("Turn on music"));
     }
 
-    widget_manager->addWgt(WTOK_SFX, 40, 7);
     if( user_config->doSFX() )
     {
-        widget_manager->setWgtText( WTOK_SFX, _("Turn off sound effects"));
+        widget_manager->addTextButtonWgt( WTOK_SFX, 40, 7, _("Turn off sound effects"));
     }
     else
     {
-        widget_manager->setWgtText( WTOK_SFX, _("Turn on sound effects"));
+        widget_manager->addTextButtonWgt( WTOK_SFX, 40, 7, _("Turn on sound effects"));
     }
 
-    widget_manager->addWgt(WTOK_EMPTY, 40, 5);
-    widget_manager->deactivateWgt(WTOK_EMPTY);
-    widget_manager->hideWgtRect(WTOK_EMPTY);
-    widget_manager->hideWgtText(WTOK_EMPTY);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 5);
 
-    widget_manager->addWgt(WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText( WTOK_QUIT,  _("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,_("Press <ESC> to go back"));
     widget_manager->setWgtTextSize(WTOK_QUIT, WGT_FNT_SML);
 
     widget_manager->layout(WGT_AREA_ALL);

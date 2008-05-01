@@ -78,6 +78,8 @@ bool WidgetManager::addWgt
     new_id.last_preset_scroll_x = m_default_scroll_preset_x;
     new_id.last_preset_scroll_y = m_default_scroll_preset_y;
 
+    new_id.resize_to_text = m_default_resize_to_text;
+
     new_id.widget = new Widget(0, 0, 0, 0);
 
     new_id.widget->m_enable_rect = m_default_show_rect;
@@ -118,6 +120,9 @@ bool WidgetManager::addWgt
 //-----------------------------------------------------------------------------
 bool WidgetManager::insertColumn()
 {
+    //FIXME: should we add a column specific break? it would be easier to read than
+    //two breakLines().
+
     const int LAST_ELEM = (int)m_elems.size() - 1;
     const int LAST_WGT = (int)m_widgets.size() - 1;
 
@@ -396,10 +401,9 @@ bool WidgetManager::layout(const WidgetArea POSITION)
 
         m_widgets[i].widget->m_width = width;
         m_widgets[i].widget->m_height = height;
-/* TEMP
- *
-            m_widgets[i].widget->resize_to_text();
-*/
+
+        if( m_widgets[i].resize_to_text ) m_widgets[i].widget->
+            resizeToText();
     }
 
     const int WGTS_WIDTH = calcWidth();
@@ -871,7 +875,8 @@ void WidgetManager::setInitialTextState
     const std::string TEXT,
     const WidgetFontSize SIZE,
     const WidgetFont FONT,
-    const GLfloat* const COLOR
+    const GLfloat* const COLOR,
+    const bool RESIZE
 )
 {
     m_default_show_text = SHOW;
@@ -879,6 +884,7 @@ void WidgetManager::setInitialTextState
     m_default_text_size = SIZE;
     m_default_font = FONT;
     m_default_text_color = COLOR;
+    m_default_resize_to_text = RESIZE;
 }
 
 //-----------------------------------------------------------------------------
@@ -940,6 +946,7 @@ void WidgetManager::restoreDefaultStates()
     m_default_text_size = WGT_FNT_MED;
     m_default_font = WGT_FONT_GUI;
     m_default_text_color = WGT_WHITE;
+    m_default_resize_to_text = false;
     m_default_enable_scroll = false;
     m_default_scroll_preset_x = WGT_SCROLL_CENTER;
     m_default_scroll_preset_y = WGT_SCROLL_CENTER;
@@ -1181,6 +1188,18 @@ void WidgetManager::setWgtTextColor( const int TOKEN, const GLfloat* const COLOR
     {
         std::cerr << "WARNING: tried to set the text color of an unnamed " <<
             "widget with token " << TOKEN << '\n';
+    }
+}
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtResizeToText( const int TOKEN, const bool RESIZE )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].resize_to_text = RESIZE;
+    else
+    {
+        std::cerr << "WARNING: tried to set the resize to text value of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
     }
 }
 

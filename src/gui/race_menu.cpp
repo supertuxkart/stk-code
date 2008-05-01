@@ -42,45 +42,24 @@ enum WidgetTokens
 
 RaceMenu::RaceMenu()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
+    widget_manager->insertColumn();
 
-    widget_manager->addWgt(WTOK_PAUSE, 30, 7);
-    widget_manager->setWgtText(WTOK_PAUSE, _("Paused"));
-    widget_manager->breakLine();
+    widget_manager->addTitleWgt( WTOK_PAUSE, 30, 7, _("Paused") );
 
-    widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt(WTOK_RETURN_RACE, 30, 7);
-    widget_manager->setWgtText(WTOK_RETURN_RACE, _("Return To Race"));
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WTOK_OPTIONS, 30, 7);
-    widget_manager->setWgtText(WTOK_OPTIONS, _("Options"));
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WTOK_HELP, 30, 7);
-    widget_manager->setWgtText(WTOK_HELP, _("Help"));
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WTOK_RESTART_RACE, 30, 7);
-    widget_manager->setWgtText(WTOK_RESTART_RACE, _("Restart Race"));
-    widget_manager->breakLine();
+    widget_manager->addTextButtonWgt( WTOK_RETURN_RACE, 30, 7, _("Return To Race"));
+    widget_manager->addTextButtonWgt( WTOK_OPTIONS, 30, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_HELP, 30, 7, _("Help") );
+    widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 30, 7, _("Restart Race") );
 
     if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
     {
-        widget_manager->addWgt(WTOK_SETUP_NEW_RACE, 30, 7);
-        widget_manager->setWgtText(WTOK_SETUP_NEW_RACE, _("Setup New Race"));
-        widget_manager->breakLine();
+        widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 30, 7,
+            _("Setup New Race") );
     }
 
-    widget_manager->addWgt(WTOK_QUIT, 30, 7);
-    widget_manager->setWgtText(WTOK_QUIT, _("Exit Race"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 30, 7, _("Exit Race") );
 
     widget_manager->layout(WGT_AREA_ALL);
-
     if(user_config->m_fullscreen) SDL_ShowCursor(SDL_ENABLE);
 }
 

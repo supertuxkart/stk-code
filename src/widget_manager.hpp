@@ -56,6 +56,11 @@ class WidgetManager
         WidgetScrollPos last_preset_scroll_x;
         WidgetScrollPos last_preset_scroll_y;
 
+        bool resize_to_text; //This has to do with layout, so it shouldn't
+                             //inside the Widget class, even thought
+                             //conceptually most people will asociate it with
+                             //text
+
         Widget *widget;
     };
 
@@ -92,6 +97,7 @@ class WidgetManager
     bool m_selection_change;
 
     bool m_default_active;
+    bool m_default_resize_to_text;
 
     bool m_default_show_rect;
     bool m_default_rect_round_corners;
@@ -261,7 +267,8 @@ public:
         const std::string TEXT,
         const WidgetFontSize SIZE,
         const WidgetFont FONT,
-        const GLfloat* const COLOR
+        const GLfloat* const COLOR,
+        const bool RESIZE_WGT
     );
 
     void setInitialScrollState
@@ -313,6 +320,7 @@ public:
     void setWgtTextSize( const int TOKEN, const WidgetFontSize SIZE );
     void setWgtFont( const int TOKEN, const WidgetFont FONT );
     void setWgtTextColor( const int TOKEN, const GLfloat* const COLOR );
+    void setWgtResizeToText( const int TOKEN, const bool RESIZE );
     void showWgtText( const int TOKEN );
     void hideWgtText( const int TOKEN );
     void reloadFonts();

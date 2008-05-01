@@ -33,10 +33,8 @@
 enum WidgetTokens
 {
     WTOK_TITLE,
-    WTOK_EMPTY0,
     WTOK_HIGHSCORES,
     WTOK_RESULTS,
-    WTOK_EMPTY1,
     WTOK_CONTINUE,
     WTOK_RESTART_RACE,
     WTOK_SETUP_NEW_RACE,
@@ -47,31 +45,17 @@ enum WidgetTokens
 
 RaceResultsGUI::RaceResultsGUI()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
-    widget_manager->addWgt(WTOK_TITLE, 60, 7);
-    widget_manager->setWgtText(WTOK_TITLE, _("Result"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Result") );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_EMPTY0, 60, 5);
-    widget_manager->hideWgtRect(WTOK_EMPTY0);
-    widget_manager->hideWgtText(WTOK_EMPTY0);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 5 );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_RESULTS, 50, 7);
-    widget_manager->setWgtText(WTOK_RESULTS, _("Race results"));
-
-    widget_manager->addWgt(WTOK_HIGHSCORES, 50, 7);
-    widget_manager->setWgtText(WTOK_HIGHSCORES, _("Highscores"));
-
+    widget_manager->addTextWgt( WTOK_RESULTS, 50, 7, _("Race results") );
+    widget_manager->addTextWgt( WTOK_HIGHSCORES, 50, 7, _("Highscores") );
     widget_manager->breakLine();
 
     widget_manager->insertColumn();
-
 
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -111,9 +95,8 @@ RaceResultsGUI::RaceResultsGUI()
                 KART->getPosition(), KART_NAME.c_str(), sTime);
         }
 
-        widget_manager->addWgt(WTOK_FIRST_RESULT + i, 50, 7);
-        widget_manager->setWgtText(WTOK_FIRST_RESULT + i,
-            (char*)(m_score + MAX_STR_LEN * i));
+        widget_manager->addTextWgt( WTOK_FIRST_RESULT + i, 50, 7,
+            (char*)(m_score + MAX_STR_LEN * i) );
     }
 
     delete[] order;
@@ -127,58 +110,50 @@ RaceResultsGUI::RaceResultsGUI()
 
     for(int i=0; i<num_scores; i++)
     {
-
         std::string kart_name, name;
         float T;
         hs->getEntry(i, kart_name, name, &T);
         const int   MINS   = (int) floor ( T / 60.0 ) ;
         const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
         const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-        sprintf((char*)(m_highscores + MAX_STR_LEN * i), 
+        sprintf((char*)( m_highscores + MAX_STR_LEN * i ),
                 "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
-        widget_manager->addWgt(WTOK_FIRST_HIGHSCORE + i, 50, 7);
-        widget_manager->setWgtText(WTOK_FIRST_HIGHSCORE + i,
-            (char*)(m_highscores+MAX_STR_LEN*i));
+        widget_manager->addTextWgt( WTOK_FIRST_HIGHSCORE + i, 50, 7,
+            (char*)( m_highscores+MAX_STR_LEN*i ) );
     }
     widget_manager->breakLine();
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_EMPTY1, 60, 5);
-    widget_manager->hideWgtRect(WTOK_EMPTY1);
-    widget_manager->hideWgtText(WTOK_EMPTY1);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 5 );
     widget_manager->breakLine();
-
-    widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt( WTOK_CONTINUE, 60, 7);
 
     // If a new feature was unlocked, only offer 'continue' otherwise add the 
     // full menu choices. The new feature menu returns to this menu, and will
     // then display the whole menu.
     if(unlock_manager->getUnlockedFeatures().size()>0)
     {
-        widget_manager->setWgtText( WTOK_CONTINUE, _("Continue"));
+        widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
     } else
     {
         if(race_manager->getRaceMode()==RaceManager::RM_GRAND_PRIX)
         {
-            widget_manager->setWgtText( WTOK_CONTINUE, _("Continue Grand Prix"));
+            widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
         }
         else
         {
-            widget_manager->setWgtText( WTOK_CONTINUE, _("Back to the main menu"));
+            widget_manager->addTextWgt( WTOK_CONTINUE, 60, 7, _("Back to the main menu"));
         }
         widget_manager->breakLine();
 
-        widget_manager->addWgt( WTOK_RESTART_RACE, 60, 7);
-        widget_manager->setWgtText( WTOK_RESTART_RACE, _("Race in this track again"));
+        widget_manager->addTextWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
         widget_manager->breakLine();
 
         if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
         {
-            widget_manager->addWgt( WTOK_SETUP_NEW_RACE, 60, 7);
-            widget_manager->setWgtText( WTOK_SETUP_NEW_RACE, _("Setup New Race"));
+            widget_manager->addTextWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
         }
-    }   // if !unlock_manager has something unlocked
+    }   // if !unlock_manager has something unlocked*/
+
     widget_manager->layout(WGT_AREA_ALL);
 }  // RaceResultsGUI
 

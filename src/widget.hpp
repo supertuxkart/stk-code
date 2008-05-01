@@ -203,7 +203,7 @@ class Widget
     void lightenColor();
     void darkenColor();
 
-    void setFont( const WidgetFont FONT);
+    void setFont( const WidgetFont FONT );
 
     /* Functions created simply to organize the code */
     bool createRect(int radius);

@@ -41,69 +41,24 @@ enum WidgetTokens
     WTOK_APPLY_RES,
     WTOK_CLEAR_BLACKLIST,
 
-    WTOK_EMPTY,
-    WTOK_EMPTY1,
-    WTOK_EMPTY2,
-    WTOK_EMPTY3,
-
     WTOK_QUIT
 };
 
 ConfigDisplay::ConfigDisplay()
 {
-    //This is commented because there is no point in checking the resolution
-    //when we enter the display configuration every time; this should be done
-    //at the start of the program and after the resolution confirm screen.
-#if 0
-    // The following code comes before the widget code because it may change
-    // the fullscreen status, which is used in displaying the WTOK_FULLSCREEN
-    // text.
-
-    if( user_config->m_width != user_config->m_prev_width &&
-        user_config->m_height != user_config->m_prev_height )
-    {
-        changeResolution( user_config->m_prev_width, user_config->m_prev_height, true );
-    }
-    else if( user_config->m_prev_windowed && user_config->m_fullscreen )
-    {
-        inputDriver->toggleFullscreen();
-        user_config->m_prev_windowed = false;
-        user_config->m_crashed = false;
-        user_config->saveConfig();
-    }
-    else //no problems detected
-    {
-        user_config->m_crashed = false;
-        user_config->saveConfig();
-    }
-#endif
     getScreenModes(); //Fill the vector m_sizes with possible resolutions
 
     m_curr_width = m_sizes[m_curr_res].first;
     m_curr_height = m_sizes[m_curr_res].second;
-    
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
 
     widget_manager->insertColumn();
-    widget_manager->addWgt( WTOK_TITLE, 40, 7);
-    widget_manager->setWgtText( WTOK_TITLE, _("Display Settings"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 40, 7, _("Display Settings"));
 
-    widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt( WTOK_FULLSCREEN, 40, 7);
     if( isBlacklisted( m_curr_width, m_curr_height ))
     {
-        if (!(user_config->m_fullscreen))
-        {
-//            widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen Unavailable"));
-            widget_manager->hideWgtText(WTOK_FULLSCREEN);
-            widget_manager->hideWgtRect(WTOK_FULLSCREEN);
-            widget_manager->deactivateWgt(WTOK_FULLSCREEN);
-        }
-        else
+        widget_manager->addEmptyWgt( WTOK_FULLSCREEN, 40, 7);
+
+        if (user_config->m_fullscreen)
         {
             std::cerr << "Warning: current screen mode is blacklisted.\n";
         }
@@ -112,74 +67,41 @@ ConfigDisplay::ConfigDisplay()
     {
         if(user_config->m_fullscreen)
         {
-            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Window mode"));
+            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 40, 7,
+                _("Window mode"));
         }
         else
         {
-            widget_manager->setWgtText( WTOK_FULLSCREEN, _("Fullscreen mode"));
+            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 40, 7,
+                _("Fullscreen mode"));
         }
     }
 
-    widget_manager->addWgt( WTOK_EMPTY, 40, 2);
-    widget_manager->deactivateWgt( WTOK_EMPTY );
-    widget_manager->hideWgtRect( WTOK_EMPTY );
-    widget_manager->hideWgtText( WTOK_EMPTY );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
 
-    widget_manager->addWgt( WTOK_CURRENT_RES, 40, 7);
     char msg [MAX_MESSAGE_LENGTH];
     snprintf( msg, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), m_curr_width, m_curr_height );
-    widget_manager->setWgtText( WTOK_CURRENT_RES, msg );
+    widget_manager->addTextWgt( WTOK_CURRENT_RES, 40, 7, msg);
 
-    widget_manager->addWgt( WTOK_INCR_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_INCR_RES, _("Increase Resolution"));
+    widget_manager->addTextButtonWgt( WTOK_INCR_RES, 40, 7,
+        _("Increase Resolution"));
+    widget_manager->addTextButtonWgt( WTOK_DECR_RES, 40, 7,
+        _("Decrease Resolution"));
 
-    widget_manager->addWgt( WTOK_DECR_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_DECR_RES, _("Decrease Resolution"));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
+    widget_manager->addTextButtonWgt( WTOK_APPLY_RES, 40, 7, _("Apply "));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
 
-    widget_manager->addWgt( WTOK_EMPTY2, 40, 2);
-    widget_manager->deactivateWgt( WTOK_EMPTY2 );
-    widget_manager->hideWgtRect( WTOK_EMPTY2 );
-    widget_manager->hideWgtText( WTOK_EMPTY2 );
+    widget_manager->addEmptyWgt( WTOK_CLEAR_BLACKLIST, 40, 7);
+    widget_manager->setWgtText( WTOK_CLEAR_BLACKLIST,
+        _("Clear from Blacklist") );
 
-    widget_manager->addWgt( WTOK_APPLY_RES, 40, 7);
-    widget_manager->setWgtText( WTOK_APPLY_RES, _("Apply "));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
 
-    widget_manager->addWgt( WTOK_EMPTY3, 40, 2);
-    widget_manager->deactivateWgt( WTOK_EMPTY3 );
-    widget_manager->hideWgtRect( WTOK_EMPTY3 );
-    widget_manager->hideWgtText( WTOK_EMPTY3 );
-
-    widget_manager->addWgt( WTOK_CLEAR_BLACKLIST, 40, 7);
-    widget_manager->setWgtText( WTOK_CLEAR_BLACKLIST, _("Clear from Blacklist"));
-    widget_manager->deactivateWgt( WTOK_CLEAR_BLACKLIST);
-    widget_manager->hideWgtRect( WTOK_CLEAR_BLACKLIST);
-    widget_manager->hideWgtText( WTOK_CLEAR_BLACKLIST);
-
-
-    widget_manager->addWgt( WTOK_EMPTY1, 40, 7);
-    widget_manager->deactivateWgt( WTOK_EMPTY1 );
-    widget_manager->hideWgtRect( WTOK_EMPTY1 );
-    widget_manager->hideWgtText( WTOK_EMPTY1 );
-
-    widget_manager->addWgt( WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
-
-    //Custom resolutions are disabled because, SDL *should* give the all the
-    //the available resolutions (i.e. there is no point in using a custom
-    //res), and there is the risk of users changing the configuration to a
-    //setting that causes a crash.
-#if 0
-    if (m_curr_res == -1) //A custom res has been set previously that is not in list
-    {
-        snprintf (m_resolution, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), user_config->m_width, user_config->m_height);
-        widget_manager->setWgtText(WTOK_CURRENT_RES, m_resolution);
-    }
-    else // Find the current res from those in the list
-    {}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +174,6 @@ void ConfigDisplay::select()
                 if ( isBlacklisted( user_config->m_width,
                     user_config->m_height ))
                 {
-                    //widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen Unavailable"));
                     widget_manager->hideWgtText(WTOK_FULLSCREEN);
                     widget_manager->hideWgtRect(WTOK_FULLSCREEN);
                     widget_manager->deactivateWgt(WTOK_FULLSCREEN);
@@ -365,25 +286,6 @@ void ConfigDisplay::getScreenModes()
 
         //FIXME: blacklist all resolutions
 
-#if 0
-        //This isn't enabled because SDL_VideoInfo must be called before the
-        //first SDL_SetVideoMode() call to get the desktop resolution.
-
-        //Erase any resolutions from the list that are bigger than the
-        //current desktop resolution
-        const SDL_VideoInfo *VIDEO_INFO = SDL_GetVideoInfo();
-
-        const int NUM_RES = m_sizes.size();
-        for (int i = 0; i < NUM_RES; ++i)
-        {
-            if (m_sizes[i].first > VIDEO_INFO->current_w &&
-                m_sizes[i].second > VIDEO_INFO->current_h)
-            {
-                m_sizes.erase( m_sizes.begin() + i, m_sizes.end() );
-                break;
-            }
-        }
-#endif
     }
     else if (modes == (SDL_Rect **)-1) //Any screen size can be used
     {
@@ -456,24 +358,6 @@ void ConfigDisplay::changeApplyButton()
     widget_manager->hideWgtText(WTOK_CLEAR_BLACKLIST);
     widget_manager->deactivateWgt(WTOK_CLEAR_BLACKLIST);
 }
-
-//-----------------------------------------------------------------------------
-#if 0
-int ConfigDisplay::isBlacklisted()
-{
-    int black_width, black_height = 0;
-    for (int i = 0; i < m_blacklist_res_size; i++)
-    {
-        sscanf(user_config->m_blacklist_res[i].c_str(),
-        "%dx%d",& black_width, & black_height);
-
-        if (m_sizes[m_curr_res].first == black_width
-            && m_sizes[m_curr_res].second == black_height)
-            return i;
-    }
-    return -1;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 bool ConfigDisplay::isBlacklisted(int width, int height)

@@ -33,7 +33,7 @@ public:
 
     void select();
     void clearMapping();
-	
+
 	void handle(GameAction, int);
 	void inputKeyboard(SDLKey, int);
 	void addKeyLabel(int change_id, KartAction control, bool start);
@@ -41,20 +41,16 @@ public:
 
 private:
 	void updateAllKeyLabels();
-	
+
     int m_player_index;
     bool m_grab_input;
-	
+
 	/** Stores the KartAction for which the input is being sensed. */
     KartAction m_edit_action;
-	
-	// Stores the heading - making this an attribute here avoids
-	// memory leaks or complicated memory management
-	char m_heading[60];
-	
+
     std::string m_name;
     std::string m_key_names[KC_COUNT];
-	
+
 	static const size_t PLAYER_NAME_MAX;
 };
 

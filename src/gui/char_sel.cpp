@@ -67,10 +67,10 @@ CharSel::CharSel(int whichPlayer)
    	widget_manager->setInitialActivationState(false);
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect( WTOK_TITLE );
-    char HEADING[MAX_MESSAGE_LENGTH];
-    snprintf(HEADING, sizeof(HEADING), _("Player %d, choose a driver"),
+    char heading[MAX_MESSAGE_LENGTH];
+    snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
              m_player_index + 1);
-    widget_manager->setWgtText( WTOK_TITLE, HEADING);
+    widget_manager->setWgtText( WTOK_TITLE, heading);
     widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG);
     widget_manager->showWgtText( WTOK_TITLE );
     widget_manager->breakLine();

@@ -34,43 +34,22 @@ enum WidgetTokens
     WTOK_PLYR3,
     WTOK_PLYR4,
 
-    WTOK_SPACE,
-
     WTOK_QUIT
 };
 
 ConfigControls::ConfigControls()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED,
-        WGT_FONT_GUI, WGT_WHITE );
-
     widget_manager->insertColumn();
-    widget_manager->addWgt( WTOK_TITLE, 60, 7 );
-    widget_manager->setWgtText( WTOK_TITLE, _("Edit controls for which player?"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Edit controls for which player?"));
 
-    widget_manager->setInitialActivationState(true);
-    widget_manager->addWgt( WTOK_PLYR1 , 60, 7 );
-    widget_manager->setWgtText( WTOK_PLYR1, _("Player 1"));
+    widget_manager->addTextButtonWgt( WTOK_PLYR1 , 60, 7, _("Player 1"));
+    widget_manager->addTextButtonWgt( WTOK_PLYR2 , 60, 7, _("Player 2"));
+    widget_manager->addTextButtonWgt( WTOK_PLYR3 , 60, 7, _("Player 3"));
+    widget_manager->addTextButtonWgt( WTOK_PLYR4 , 60, 7, _("Player 4"));
 
-    widget_manager->addWgt( WTOK_PLYR2 , 60, 7 );
-    widget_manager->setWgtText( WTOK_PLYR2, _("Player 2"));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 5);
 
-    widget_manager->addWgt( WTOK_PLYR3 , 60, 7 );
-    widget_manager->setWgtText( WTOK_PLYR3, _("Player 3"));
-
-    widget_manager->addWgt( WTOK_PLYR4 , 60, 7 );
-    widget_manager->setWgtText( WTOK_PLYR4, _("Player 4"));
-
-    widget_manager->addWgt( WTOK_SPACE, 60, 5);
-    widget_manager->deactivateWgt( WTOK_SPACE );
-    widget_manager->hideWgtRect( WTOK_SPACE );
-    widget_manager->hideWgtText( WTOK_SPACE );
-
-    widget_manager->addWgt( WTOK_QUIT , 60, 7 );
-    widget_manager->setWgtText( WTOK_QUIT, _("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT , 60, 7, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );
