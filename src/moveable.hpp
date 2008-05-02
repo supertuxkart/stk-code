@@ -62,8 +62,9 @@ public:
     ssgTransform* getModelTransform()          {return m_model_transform;          }
     virtual const btVector3 &getVelocity() const {return m_body->getLinearVelocity();}
     const btVector3 &getVelocityLC() const     {return m_velocityLC;               }
-    virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);    }
+    virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     sgCoord*      getCoord     ()              {return &m_curr_pos;                }
+    const btVector3 getPos     ()  const       {return m_transform.getOrigin();    }
     const sgCoord* getCoord    ()  const       {return &m_curr_pos;                }
     const sgVec4* getNormalHOT ()  const       {return m_normal_hot;               }
     void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);    }
