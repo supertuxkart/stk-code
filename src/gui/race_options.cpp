@@ -249,6 +249,7 @@ void RaceOptions::select()
         {
             race_manager->setNumKarts(m_num_karts);
         }
+        else race_manager->setNumKarts( 1 );
 
         if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX    &&
             race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER    )
