@@ -308,10 +308,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHullShape.cpp"
 						>
 					</File>
@@ -537,6 +533,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\bullet\src\LinearMath\btConvexHull.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\bullet\src\LinearMath\btGeometryUtil.cpp"
 					>
 				</File>
@@ -616,6 +616,10 @@
 				</File>
 				<File
 					RelativePath="..\..\bullet\src\LinearMath\btAlignedObjectArray.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
 					>
 				</File>
 				<File
@@ -855,10 +859,6 @@
 					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConeShape.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\src\BulletCollision\CollisionShapes\btConvexHull.h"
 						>
 					</File>
 					<File
