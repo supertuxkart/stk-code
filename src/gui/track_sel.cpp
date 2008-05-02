@@ -73,11 +73,11 @@ TrackSel::TrackSel()
         }
     }
 
-    widget_manager->addEmptyWgt(WTOK_IMG0, 35, 35);
+    widget_manager->addImgWgt(WTOK_IMG0, 35, 35, 0);
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 5, 35 );
 
-    widget_manager->addEmptyWgt(WTOK_IMG1, 35, 35);
+    widget_manager->addImgWgt(WTOK_IMG1, 35, 35, 0);
     widget_manager->breakLine();
 
     widget_manager->addTextWgt( WTOK_AUTHOR, 80, 9, _("No track selected") );

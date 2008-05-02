@@ -130,12 +130,13 @@ class Widget
     friend class WidgetManager;
 
     /* Basic widget properties that will always be used. */
-    int  m_x, m_y;
-    int  m_width, m_height;
+    int m_x, m_y;
+    int m_width, m_height;
+    int m_radius;
 
     /* Low level features. They are off by default. */
     bool m_enable_rect;
-    GLuint  m_rect_list; //A display list number that draws the rectangle with
+    GLuint m_rect_list; //A display list number that draws the rectangle with
                          //possibly rounded corners.
     const GLfloat *m_rect_color; //This const cannot change the value it points to, but it
                                  //can change where it points to.
@@ -207,7 +208,7 @@ class Widget
     void setTexture( const char* FILENAME );
 
     /* Functions created simply to organize the code */
-    bool createRect(int radius);
+    bool createRect();
     void updateVariables( const float DELTA );
     void draw();
     void applyTransformations();

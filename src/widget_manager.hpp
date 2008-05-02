@@ -47,9 +47,10 @@ class WidgetManager
         bool active; //If true, then this widget is interactive(though by
                        //definition, widgets are supposed to be interactive).
 
-        //The percentages of the container this widget takes
+        //The percentages for the widget's rect
         int min_width;
         int min_height;
+        int min_radius;
 
         //The last given preset scroll position is stored, to restore it in
         //case that the text is changed it needs to be restored.
@@ -100,7 +101,8 @@ class WidgetManager
     bool m_default_resize_to_text;
 
     bool m_default_show_rect;
-    bool m_default_rect_round_corners;
+    WidgetArea m_default_rect_round_corners;
+    int m_default_rect_radius;
     const GLfloat *m_default_rect_color;
 
     bool m_default_show_border;
@@ -150,6 +152,7 @@ class WidgetManager
     void setSelectedWgtToken(const int TOKEN);
 
 public:
+    //TODO: remove return values that we don't check
     static const int WGT_NONE;
 
     WidgetManager();
@@ -197,7 +200,8 @@ public:
     //FIXME: Temporal, till I rename addWgt() to addEmptyWgt()
     bool addEmptyWgt(const int TOKEN, const int MIN_WIDTH, const int MIN_HEIGHT) {return addWgt(TOKEN,MIN_WIDTH,MIN_HEIGHT);}
 
-    //Widget that adds visible rect & text, sets the text and large font
+    //Widget that adds visible rect & text, rounded corners with 20% radius,
+    //sets the text, and large font
     bool addTitleWgt
     (
         const int TOKEN,
@@ -206,7 +210,8 @@ public:
         const std::string TEXT
     );
 
-    //Widget that adds visible rect & text, and sets the text
+    //Widget that adds visible rect & text, rounded corners with 20% radius,
+    //and sets the text
     bool addTextWgt
     (
         const int TOKEN,
@@ -215,7 +220,8 @@ public:
         const std::string TEXT
     );
 
-    //Widget that adds visible rect & text, sets the text and is selectable
+    //Widget that adds visible rect & text, rounded corners with 20% radius,
+    //sets the text and is selectable
     bool addTextButtonWgt
     (
         const int TOKEN,
@@ -224,7 +230,8 @@ public:
         const std::string TEXT
     );
 
-    //Widget that adds visible rect & image, white rect, and sets the texture
+    //Widget that adds visible rect & image, white rect, 5% black
+    //border, and sets the texture
     bool addImgWgt
     (
         const int TOKEN,
@@ -233,7 +240,8 @@ public:
         const int IMG
     );
 
-    //Selectable widget with visible rect & image, gray rect and texture
+    //Selectable widget with visible rect & image, rounded corners with 20% radius,
+    //gray rect and texture
     bool addImgButtonWgt
     (
         const int TOKEN,
@@ -249,6 +257,7 @@ public:
     (
         const bool SHOW,
         const WidgetArea ROUND_CORNERS,
+        const int RADIUS,
         const GLfloat* const COLOR
     );
 
@@ -302,6 +311,10 @@ public:
     //FIXME: maybe this should be setWgtRectColor ? and put after the other rect funcs?
     void setWgtColor(const int TOKEN, const GLfloat* const COLOR);
     void setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS);
+    //The radius given is the percentage of the height or the width of the
+    //widget, whatever is smaller; however, the maximum is 50% (the corner's
+    //size).
+    void setWgtCornerRadius(const int TOKEN, const int RADIUS);
     void showWgtRect(const int TOKEN);
     void hideWgtRect(const int TOKEN);
 

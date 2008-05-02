@@ -32,34 +32,19 @@ enum WidgetTokens
 
 FeatureUnlocked::FeatureUnlocked()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialActivationState(false);
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED, WGT_FONT_GUI, WGT_WHITE, false );
-
-    widget_manager->addWgt( WTOK_TITLE, 60, 10);
-    widget_manager->showWgtRect( WTOK_TITLE );
-    widget_manager->setWgtText( WTOK_TITLE, _("New Feature Unlocked"));
-    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->showWgtText( WTOK_TITLE );
-    widget_manager->breakLine();
+    widget_manager->insertColumn();
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 10,
+        _("New Feature Unlocked"));
 
     m_new_features=unlock_manager->getUnlockedFeatures();
     assert(m_new_features.size()>0);
     unlock_manager->clearUnlocked();
 
-    widget_manager->addWgt( WTOK_DESCRIPTION, 60, 30);
-    widget_manager->showWgtRect( WTOK_DESCRIPTION );
-    widget_manager->setWgtText( WTOK_DESCRIPTION, m_new_features[0]->getFeatureDescription());
-    widget_manager->showWgtText( WTOK_DESCRIPTION );
-    widget_manager->breakLine();
+    widget_manager->addTextWgt( WTOK_DESCRIPTION, 60, 30,
+        m_new_features[0]->getFeatureDescription());
 
-    widget_manager->addWgt(WTOK_CONTINUE, 50, 7);
-    widget_manager->showWgtRect(WTOK_CONTINUE);
-    widget_manager->showWgtText(WTOK_CONTINUE);
-    widget_manager->setWgtText(WTOK_CONTINUE, _("Continue"));
-    widget_manager->activateWgt(WTOK_CONTINUE);
+    widget_manager->addTextButtonWgt(WTOK_CONTINUE, 50, 7,
+        _("Continue"));
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // FeatureUnlocked

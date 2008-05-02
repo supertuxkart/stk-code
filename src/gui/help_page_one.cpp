@@ -35,8 +35,6 @@ enum WidgetTokens
     WTOK_MSG4,
     WTOK_MSG5,
 
-    WTOK_EMPTY,
-
     WTOK_FIRST_KEYNAME,
     WTOK_LAST_KEYNAME = WTOK_FIRST_KEYNAME + KA_LAST,
 
@@ -61,24 +59,23 @@ HelpPageOne::HelpPageOne()
 
 	m_clock = 0;
 
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
-
-    widget_manager->setInitialRectState( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
-    widget_manager->setInitialTextState( SHOW_TEXT, "", TEXT_SIZE,
-        WGT_FONT_GUI, WGT_WHITE, false );
-
-    /*Help header*/
-    widget_manager->addWgt(WTOK_MSG1, 50, 7);
-    widget_manager->setWgtText( WTOK_MSG1, _("Force your rivals bite *your* dust!") );
+    //FIXME: instead of using setInitialTextState, the gui & widget manager macros should improve it's design
+    widget_manager->setInitialTextState
+    (
+        false,
+        "",
+        WGT_FNT_SML,
+        WGT_FONT_GUI,
+        WGT_WHITE,
+        false
+    );
+    widget_manager->addTextWgt( WTOK_MSG1, 50, 7,
+        _("Force your rivals bite *your* dust!") );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_MSG2, 60, 7);
-    widget_manager->setWgtText( WTOK_MSG2, _("Grab blue boxes and coins") );
-
-    widget_manager->addWgt(WTOK_MSG3, 30, 7);
-    widget_manager->setWgtText( WTOK_MSG3, _("Avoid bananas") );
+    widget_manager->addTextWgt( WTOK_MSG2, 60, 7,
+        _("Grab blue boxes and coins") );
+    widget_manager->addTextWgt( WTOK_MSG3, 30, 7, _("Avoid bananas") );
     widget_manager->breakLine();
 
     /*Rotating 3D models*/
@@ -107,20 +104,16 @@ HelpPageOne::HelpPageOne()
     m_banana->addKid(hm);
 
     /*Empty widget to cover the space for the 3D models*/
-    widget_manager->addWgt(WTOK_EMPTY, 100, 15);
-    widget_manager->hideWgtRect(WTOK_EMPTY);
-    widget_manager->hideWgtText(WTOK_EMPTY);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 15);
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_MSG4, 100, 10);
-    widget_manager->setWgtText( WTOK_MSG4,
+    widget_manager->addTextWgt(WTOK_MSG4, 100, 10,
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
 get stuck or fall too far, use the rescue button to get back on track."));
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_MSG5, 70, 7);
-    widget_manager->setWgtText( WTOK_MSG5,
+    widget_manager->addTextWgt(WTOK_MSG5, 70, 7,
         _("Check the current key bindings for the first player"));
     widget_manager->breakLine();
 
@@ -129,34 +122,30 @@ get stuck or fall too far, use the rescue button to get back on track."));
      * number of kart actions without changing this screen. */
     for(int i = WTOK_FIRST_KEYNAME; i <= WTOK_LAST_KEYNAME; ++i)
     {
-        widget_manager->addWgt( i, 20, 4 );
-        widget_manager->setWgtRoundCorners( i, WGT_AREA_LFT );
-        widget_manager->setWgtText( i,
+        widget_manager->addTextWgt( i, 20, 4,
             sKartAction2String[i - WTOK_FIRST_KEYNAME] );
+        widget_manager->setWgtRoundCorners( i, WGT_AREA_LFT );
     }
     widget_manager->breakLine();
 
     widget_manager->insertColumn();
     for(int i = WTOK_FIRST_KEYBINDING; i <= WTOK_LAST_KEYBINDING; ++i)
     {
-        widget_manager->addWgt( i, 20, 4 );
-        widget_manager->setWgtRoundCorners( i, WGT_AREA_RGT );
-        widget_manager->setWgtText( i,
+        widget_manager->addTextWgt( i, 20, 4,
             user_config->getMappingAsString( 0,
             (KartAction)(i - WTOK_FIRST_KEYBINDING)).c_str());
+        widget_manager->setWgtRoundCorners( i, WGT_AREA_RGT );
     }
     widget_manager->breakLine();
     widget_manager->breakLine();
 
     /*Buttons at the bottom*/
-    widget_manager->addWgt(WTOK_SECOND_PAGE, 20, 7);
-    widget_manager->setWgtText(WTOK_SECOND_PAGE, _("Next screen"));
-    widget_manager->activateWgt(WTOK_SECOND_PAGE);
+    widget_manager->addTextButtonWgt(WTOK_SECOND_PAGE, 20, 7,
+        _("Next screen"));
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText(WTOK_QUIT, _("Go back to the main menu"));
-    widget_manager->activateWgt(WTOK_QUIT);
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
+        _("Go back to the main menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpPageOne
@@ -183,7 +172,6 @@ HelpPageOne::~HelpPageOne()
 void HelpPageOne::update(float dt)
 {
     m_clock += dt * 40.0f;
-    BaseGUI::update(dt);
 
     if (m_box != NULL && m_silver_coin != NULL && m_gold_coin != NULL
         && m_banana != NULL )
@@ -221,6 +209,8 @@ void HelpPageOne::update(float dt)
         glDisable (GL_DEPTH_TEST);
         oldContext->makeCurrent();
     }
+
+    widget_manager->update(dt);
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +219,7 @@ void HelpPageOne::select()
     switch ( widget_manager->getSelectedWgt() )
     {
         case WTOK_SECOND_PAGE:
-            //This switches thee first page with the second page, so they
+            //This switches the first page with the second page, so they
             //are not stacked by the menu manager, and the menu that called
             //this help is the one that gets called back when the next page
             //is popped.

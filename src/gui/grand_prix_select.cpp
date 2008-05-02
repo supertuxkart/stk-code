@@ -77,8 +77,7 @@ GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
     widget_manager->enableWgtScroll( WTOK_TRACKS );
     widget_manager->setWgtYScrollSpeed( WTOK_TRACKS, -60 );
 
-    widget_manager->addEmptyWgt( WTOK_IMG, 40, 40 );
-    widget_manager->showWgtRect( WTOK_IMG );
+    widget_manager->addImgWgt( WTOK_IMG, 40, 40, 0 );
     widget_manager->setWgtColor( WTOK_IMG, WGT_BLACK );
     widget_manager->breakLine();
 

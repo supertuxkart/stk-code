@@ -33,39 +33,22 @@ enum WidgetTokens
 
 ChallengesMenu::ChallengesMenu()
 {
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    widget_manager->setInitialActivationState(false);
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", WGT_FNT_MED, WGT_FONT_GUI, WGT_WHITE, false );
-
-    widget_manager->addWgt( WTOK_TITLE, 60, 10);
-    widget_manager->showWgtRect( WTOK_TITLE );
-    widget_manager->setWgtText( WTOK_TITLE, _("Active Challenges"));
-    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->showWgtText( WTOK_TITLE );
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 10, _("Active Challenges"));
     widget_manager->breakLine();
 
     m_all_challenges=unlock_manager->getActiveChallenges();
     for(int i=0; i<(int)m_all_challenges.size(); i++)
     {
-        widget_manager->addWgt(WTOK_CHALLENGES+i, 60, 10);
-        widget_manager->setWgtText( WTOK_CHALLENGES+i, _(m_all_challenges[i]->getName().c_str()) );
-        widget_manager->activateWgt(WTOK_CHALLENGES+i);
-        widget_manager->breakLine();    
+        widget_manager->addTextButtonWgt(WTOK_CHALLENGES+i, 60, 10,
+            _(m_all_challenges[i]->getName().c_str()) );
+        widget_manager->breakLine();
     }
 
-    widget_manager->addWgt( WTOK_DESCRIPTION, 60, 30);
-    widget_manager->showWgtRect( WTOK_DESCRIPTION );
-    widget_manager->setWgtText( WTOK_DESCRIPTION, "");
-    widget_manager->showWgtText( WTOK_DESCRIPTION );
+    widget_manager->addTextButtonWgt( WTOK_DESCRIPTION, 60, 30, "");
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_BACK, 50, 7);
-    widget_manager->showWgtRect(WTOK_BACK);
-    widget_manager->showWgtText(WTOK_BACK);
-    widget_manager->setWgtText(WTOK_BACK, _("Go back to the main menu"));
-    widget_manager->activateWgt(WTOK_BACK);
+    widget_manager->addTextButtonWgt(WTOK_BACK, 50, 7,
+        _("Go back to the main menu"));
 
     widget_manager->layout(WGT_AREA_ALL);
 }   // ChallengesMenu
@@ -83,9 +66,9 @@ void ChallengesMenu::update(float dt)
     if(challenge>=0 && challenge<(int)m_all_challenges.size())
     {
         widget_manager->setWgtText(WTOK_DESCRIPTION,
-                                   m_all_challenges[challenge]->getChallengeDescription());
+            m_all_challenges[challenge]->getChallengeDescription());
     }
-    BaseGUI::update(dt);
+    widget_manager->update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------

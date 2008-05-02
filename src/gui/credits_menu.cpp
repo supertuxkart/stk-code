@@ -63,25 +63,17 @@ CreditsMenu::CreditsMenu()
     }
 
 
-    const bool SHOW_RECT = true;
-    const bool SHOW_TEXT = true;
-    const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
-
-    widget_manager->setInitialActivationState( true );
-    widget_manager->setInitialRectState(SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK);
-    widget_manager->setInitialTextState(SHOW_TEXT, "", TEXT_SIZE,
-        WGT_FONT_GUI, WGT_WHITE, false );
-
-    widget_manager->addWgt( WTOK_CREDITS, 100, 93);
-    widget_manager->setWgtText( WTOK_CREDITS, credits_text );
+    widget_manager->addTextWgt( WTOK_CREDITS, 100, 93, credits_text );
+    widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
     //FIXME: maybe I should make scroll names more consistent
+    widget_manager->activateWgt( WTOK_CREDITS );
     widget_manager->enableWgtScroll( WTOK_CREDITS );
     widget_manager->setWgtYScrollPos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
     widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -80 );
     widget_manager->breakLine();
 
-    widget_manager->addWgt( WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText( WTOK_QUIT, _("Go back to the main menu"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7,
+        _("Go back to the main menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // CreditsMenu

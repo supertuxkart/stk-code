@@ -29,14 +29,14 @@
 
 enum WidgetTokens
 {
-    WTOK_MSG6,
+    WTOK_MSG,
 
-    WTOK_ITEMIMG1, WTOK_ITEMTXT1,
-    WTOK_ITEMIMG2, WTOK_ITEMTXT2,
-    WTOK_ITEMIMG3, WTOK_ITEMTXT3,
-    WTOK_ITEMIMG4, WTOK_ITEMTXT4,
-    WTOK_ITEMIMG5, WTOK_ITEMTXT5,
-    WTOK_ITEMIMG6, WTOK_ITEMTXT6,
+    WTOK_IMG1, WTOK_TXT1,
+    WTOK_IMG2, WTOK_TXT2,
+    WTOK_IMG3, WTOK_TXT3,
+    WTOK_IMG4, WTOK_TXT4,
+    WTOK_IMG5, WTOK_TXT5,
+    WTOK_IMG6, WTOK_TXT6,
 
     WTOK_FIRST_PAGE,
     WTOK_QUIT
@@ -44,110 +44,76 @@ enum WidgetTokens
 
 HelpPageTwo::HelpPageTwo()
 {
+    //FIXME: instead of using setInitialTextState, the gui & widget manager macros should improve it's design
+    widget_manager->setInitialTextState
+    (
+        false,
+        "",
+        WGT_FNT_SML,
+        WGT_FONT_GUI,
+        WGT_WHITE,
+        false
+    );
 
-    /* Add the widgets */
-    const bool SHOW_RECT = true;
-    const WidgetFontSize TEXT_SIZE = WGT_FNT_SML;
-    widget_manager->setInitialRectState( SHOW_RECT, WGT_AREA_ALL, WGT_TRANS_BLACK );
-    widget_manager->setInitialTextState( false, "", TEXT_SIZE,
-        WGT_FONT_GUI, WGT_WHITE, false );
-
-    widget_manager->addWgt(WTOK_MSG6, 100, 8);
-    widget_manager->setWgtText(WTOK_MSG6,
+    widget_manager->addTextWgt( WTOK_MSG, 100, 8,
         _("To help you win, there are certain collectables you can grab:"));
-    widget_manager->showWgtText( WTOK_MSG6 );
     widget_manager->breakLine();
 
-    /* Collectable images and descriptions */
-    widget_manager->addWgt(WTOK_ITEMIMG1, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG1,
+    widget_manager->addImgWgt( WTOK_IMG1, 10, 13,
         collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG1, WGT_WHITE);
-    widget_manager->showWgtTexture(WTOK_ITEMIMG1);
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG1, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT1, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT1,
+    widget_manager->addTextWgt( WTOK_TXT1, 90, 13,
         _("Missile - fast stopper in a straight line"));
-    widget_manager->showWgtText( WTOK_ITEMTXT1 );
+    widget_manager->setWgtRoundCorners( WTOK_TXT1, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_ITEMIMG2, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG2,
+    widget_manager->addImgWgt(WTOK_IMG2, 10, 13,
         collectable_manager->getIcon(COLLECT_HOMING)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG2, WGT_WHITE);
-    widget_manager->showWgtTexture( WTOK_ITEMIMG2 );
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG2, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT2, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT2,
+    widget_manager->addTextWgt(WTOK_TXT2, 90, 13,
         _("Homing missile - follows rivals, but is slower than the missile"));
-    widget_manager->showWgtText( WTOK_ITEMTXT2 );
+    widget_manager->setWgtRoundCorners( WTOK_TXT2, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_ITEMIMG3, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG3,
+    widget_manager->addImgWgt(WTOK_IMG3, 10, 13,
         collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG3, WGT_WHITE);
-    widget_manager->showWgtTexture( WTOK_ITEMIMG3 );
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG3, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT3, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT3,
+    widget_manager->addTextWgt(WTOK_TXT3, 90, 13,
         _("Fuzzy blob/Spark - very slow, but bounces from walls"));
-    widget_manager->showWgtText( WTOK_ITEMTXT3 );
+    widget_manager->setWgtRoundCorners( WTOK_TXT3, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_ITEMIMG4, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG4,
+    widget_manager->addImgWgt(WTOK_IMG4, 10, 13,
         collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG4, WGT_WHITE);
-    widget_manager->showWgtTexture( WTOK_ITEMIMG4 );
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG4, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT4, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT4,
+    widget_manager->addTextWgt(WTOK_TXT4, 90, 13,
         _("Zipper - speed boost"));
-    widget_manager->showWgtText( WTOK_ITEMTXT4 );
+    widget_manager->setWgtRoundCorners(WTOK_TXT4, WGT_AREA_RGT);
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_ITEMIMG5, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG5,
+    widget_manager->addImgWgt(WTOK_IMG5, 10, 13,
         collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG5, WGT_WHITE);
-    widget_manager->showWgtTexture( WTOK_ITEMIMG5 );
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG5, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT5, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT5,
+    widget_manager->addTextWgt(WTOK_TXT5, 90, 13,
         _("Parachute - slows down all karts in a better position!"));
-    widget_manager->showWgtText( WTOK_ITEMTXT5 );
+    widget_manager->setWgtRoundCorners(WTOK_TXT5, WGT_AREA_RGT);
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_ITEMIMG6, 10, 13);
-    widget_manager->setWgtTexture(WTOK_ITEMIMG6,
+    widget_manager->addImgWgt(WTOK_IMG6, 10, 13,
         collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle());
-    widget_manager->setWgtColor(WTOK_ITEMIMG6, WGT_WHITE);
-    widget_manager->showWgtTexture( WTOK_ITEMIMG6 );
-    widget_manager->setWgtRoundCorners(WTOK_ITEMIMG6, WGT_AREA_NONE);
 
-    widget_manager->addWgt(WTOK_ITEMTXT6, 90, 13);
-    widget_manager->setWgtText( WTOK_ITEMTXT6,
+    widget_manager->addTextWgt(WTOK_TXT6, 90, 13,
         _("Anvil - slows down greatly the kart in the first position"));
-    widget_manager->showWgtText( WTOK_ITEMTXT6 );
+    widget_manager->setWgtRoundCorners(WTOK_TXT6, WGT_AREA_RGT);
     widget_manager->breakLine();
 
     /*Buttons at the bottom*/
-    widget_manager->addWgt(WTOK_FIRST_PAGE, 25, 7);
-    widget_manager->setWgtText(WTOK_FIRST_PAGE, _("Previous screen"));
-    widget_manager->showWgtText( WTOK_FIRST_PAGE );
-    widget_manager->activateWgt(WTOK_FIRST_PAGE);
+    widget_manager->addTextButtonWgt(WTOK_FIRST_PAGE, 25, 7,
+        _("Previous screen"));
     widget_manager->breakLine();
 
-    widget_manager->addWgt(WTOK_QUIT, 40, 7);
-    widget_manager->setWgtText(WTOK_QUIT, _("Go back to the main menu"));
-    widget_manager->showWgtText( WTOK_QUIT );
-    widget_manager->activateWgt(WTOK_QUIT);
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
+        _("Go back to the main menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpMenu

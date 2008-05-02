@@ -74,6 +74,7 @@ bool WidgetManager::addWgt
 
     new_id.min_width = MIN_WIDTH;
     new_id.min_height = MIN_HEIGHT;
+    new_id.min_radius = m_default_rect_radius;
 
     new_id.last_preset_scroll_x = m_default_scroll_preset_x;
     new_id.last_preset_scroll_y = m_default_scroll_preset_y;
@@ -83,9 +84,9 @@ bool WidgetManager::addWgt
     new_id.widget = new Widget(0, 0, 0, 0);
 
     new_id.widget->m_enable_rect = m_default_show_rect;
+    new_id.widget->m_round_corners = m_default_rect_round_corners;
     new_id.widget->m_rect_color = m_default_rect_color;
 
-    new_id.widget->m_enable_border = m_default_show_border;
     new_id.widget->m_border_percentage = m_default_border_percentage;
     new_id.widget->m_border_color = m_default_border_color;
 
@@ -388,22 +389,37 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     const int NUM_WIDGETS = (int)m_widgets.size();
     if( NUM_WIDGETS < 1 ) return true;
 
-    int SCREEN_WIDTH = user_config->m_width;
-    int SCREEN_HEIGHT = user_config->m_height;
+    const int SCREEN_WIDTH = user_config->m_width;
+    const int SCREEN_HEIGHT = user_config->m_height;
 
-    int width;
-    int height;
-    //Resize the widgets.
+    int width, height;
+    //Set the widgets' rect shape properties in pixels.
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
-        width = (SCREEN_WIDTH * m_widgets[i].min_width) / 100;
-        height = (SCREEN_HEIGHT * m_widgets[i].min_height) / 100;
+        width = (int)(SCREEN_WIDTH * m_widgets[i].min_width * 0.01);
+        height = (int)(SCREEN_HEIGHT * m_widgets[i].min_height * 0.01);
 
         m_widgets[i].widget->m_width = width;
         m_widgets[i].widget->m_height = height;
 
         if( m_widgets[i].resize_to_text ) m_widgets[i].widget->
             resizeToText();
+
+        if( width < height )
+        {
+            m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
+                m_widgets[i].widget->m_width * 0.01 );
+        }
+        else
+        {
+            m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
+                m_widgets[i].widget->m_height * 0.01 );
+        }
+
+        if( m_widgets[i].widget->m_radius < 1 )
+        {
+            m_widgets[i].widget->m_radius = 1;
+        }
     }
 
     const int WGTS_WIDTH = calcWidth();
@@ -477,14 +493,6 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         break;
     }
 
-    //This formula seems not to have much theory behind it, we pick the
-    //smallest from the screen height and width because if we pick the
-    //biggest one, it might look bad for the smaller one, but it doesn't
-    //happens the other way around, and it's divided by 60, maybe because
-    //it results in small enough values to be of use, or maybe because it's
-    //divided by 60 minutes? The formula was taken from the old Widget Set.
-    const int RADIUS = ( SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH ) / 60;
-
     /* In this loop we give each widget it's true position on the screen and
      * create their rect; we start at the position where the first widget
      * will be, and move right first and down on breaks if the widget is
@@ -532,7 +540,7 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             m_widgets[curr_wgt].widget->m_y = widget_y;
 
             //Create widget's rect
-            if( !(m_widgets[curr_wgt].widget->createRect(RADIUS)) )
+            if( !(m_widgets[curr_wgt].widget->createRect()) )
             {
                 return false;
             }
@@ -745,6 +753,8 @@ bool WidgetManager::addTitleWgt
     setWgtTextSize( TOKEN, WGT_FNT_LRG );
     showWgtText( TOKEN );
     setWgtText( TOKEN, TEXT );
+    setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
+    setWgtCornerRadius( TOKEN, 20 );
 
     return true;
 }
@@ -761,6 +771,8 @@ bool WidgetManager::addTextWgt
     if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
 
     showWgtRect( TOKEN );
+    setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
+    setWgtCornerRadius( TOKEN, 20 );
     showWgtText( TOKEN );
     setWgtText( TOKEN, TEXT );
 
@@ -779,6 +791,8 @@ bool WidgetManager::addTextButtonWgt
     if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
 
     showWgtRect( TOKEN );
+    setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
+    setWgtCornerRadius( TOKEN, 20 );
     showWgtText( TOKEN );
     setWgtText( TOKEN, TEXT );
     activateWgt( TOKEN );
@@ -799,6 +813,9 @@ bool WidgetManager::addImgWgt
 
     setWgtColor( TOKEN, WGT_WHITE );
     showWgtRect( TOKEN );
+    setWgtBorderPercentage( TOKEN, 5 );
+    setWgtBorderColor( TOKEN, WGT_BLACK );
+    showWgtBorder( TOKEN );
     setWgtTexture( TOKEN, IMG );
     showWgtTexture( TOKEN );
 
@@ -818,6 +835,8 @@ bool WidgetManager::addImgButtonWgt
 
     setWgtColor( TOKEN, WGT_GRAY );
     showWgtRect( TOKEN );
+    setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
+    setWgtCornerRadius( TOKEN, 20 );
     setWgtTexture( TOKEN, IMG );
     showWgtTexture( TOKEN );
     activateWgt( TOKEN );
@@ -836,11 +855,13 @@ void WidgetManager::setInitialRectState
 (
     const bool SHOW,
     const WidgetArea ROUND_CORNERS,
+    const int RADIUS,
     const GLfloat* const COLOR
 )
 {
     m_default_show_rect = SHOW;
-    m_default_rect_round_corners = (ROUND_CORNERS!= WGT_AREA_NONE);
+    m_default_rect_round_corners = ROUND_CORNERS;
+    m_default_rect_radius = RADIUS;
     m_default_rect_color = COLOR;
 }
 
@@ -934,8 +955,9 @@ void WidgetManager::restoreDefaultStates()
     //FIXME: maybe instead of 'default' these variables should be 'initial'
     m_default_active = false;
     m_default_show_rect = false;
-    m_default_rect_round_corners = WGT_AREA_NONE;
     m_default_rect_color = WGT_TRANS_BLACK;
+    m_default_rect_round_corners = WGT_AREA_NONE;
+    m_default_rect_radius = 1;
     m_default_show_border = false;
     m_default_border_percentage = 0.0;
     m_default_border_color = WGT_TRANS_WHITE;
@@ -1006,6 +1028,34 @@ void WidgetManager::setWgtRoundCorners(const int TOKEN, const WidgetArea CORNERS
             "unnamed widget with token " << TOKEN << '\n';
     }
 }
+
+//-----------------------------------------------------------------------------
+void WidgetManager::setWgtCornerRadius(const int TOKEN, const int RADIUS)
+{
+    if( RADIUS > 50 )
+    {
+        std::cerr << "WARNING: tried to set the corner's radius " <<
+            "percentage of a widget with token " << TOKEN << " to " <<
+            "something bigger than 50% \n";
+        return;
+    }
+    else if( RADIUS < 1 )
+    {
+        std::cerr << "WARNING: tried to set the corner's radius " <<
+            "percentage of a widget with token " << TOKEN << " to " <<
+            "something smaller than 1% \n";
+        return;
+    }
+
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE ) m_widgets[ID].min_radius = RADIUS;
+    else
+    {
+        std::cerr << "WARNING: tried to change the corner radius of an " <<
+            "unnamed widget with token " << TOKEN << '\n';
+    }
+}
+
 //-----------------------------------------------------------------------------
 void WidgetManager::showWgtRect(const int TOKEN)
 {

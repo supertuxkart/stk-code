@@ -252,7 +252,7 @@ void Widget::setFont( const WidgetFont FONT )
 //-----------------------------------------------------------------------------
 void Widget::setTexture( const char* FILENAME )
 {
-    Material *m = material_manager->getMaterial( FILENAME );
+    Material *m = material_manager->getMaterial( FILENAME, true );
     m_texture = m->getState()->getTextureHandle();
 }
 
@@ -261,21 +261,22 @@ void Widget::setTexture( const char* FILENAME )
  *  map to the rectangle as though the corners were not rounded . Returns
  *  false if the call to glGenLists failed, otherwise it returns true.
  */
-bool Widget::createRect(int radius)
+bool Widget::createRect()
 {
+
     //TODO: show warning if text > rect
-    if(radius > m_width * 0.5)
+    if(m_radius > m_width * 0.5)
     {
         std::cerr << "Warning: widget's radius > half width.\n";
     }
-    if(radius > m_height * 0.5)
+    if(m_radius > m_height * 0.5)
     {
         std::cerr << "Warning: widget's radius > half height.\n";
     }
-    if(radius < 1)
+    if(m_radius < 1)
     {
         std::cerr << "Warning: widget's radius < 1, setting to 1.\n";
-        radius = 1;
+        m_radius = 1;
     }
 
     if(m_width == 0)
@@ -305,7 +306,7 @@ bool Widget::createRect(int radius)
     //isn't based just on logic, since it went through visual testing to give
     //the perception of roundness.
     const int MIN_QUADS = 2;
-    const int NUM_QUADS = MIN_QUADS + radius;
+    const int NUM_QUADS = MIN_QUADS + m_radius;
 
     int i;
 
@@ -348,8 +349,8 @@ bool Widget::createRect(int radius)
                 //+ 1 parts, and use the angles at those parts to find the
                 //X and Y position of the points.
                 angle = 0.5f * M_PI * (float)i / (float)NUM_QUADS;
-                circle_x = radius * cos(angle);
-                circle_y = radius * sin(angle);
+                circle_x = m_radius * cos(angle);
+                circle_y = m_radius * sin(angle);
 
                 //After we generate the positions in circle for the angles,
                 //we have to position each rounded corner properly depending
@@ -359,12 +360,12 @@ bool Widget::createRect(int radius)
                 //for a rectangle without rounder corners.
                 inner_vertex[i].resize(3);
                 outer_vertex[i].resize(3);
-                outer_vertex[i][0] = radius - circle_x;
+                outer_vertex[i][0] = m_radius - circle_x;
                 inner_vertex[i][0] = outer_vertex[i][0] + BORDER_LENGTH;
 
                 if( m_round_corners & WGT_AREA_NW )
                 {
-                    outer_vertex[i][1] = m_height + circle_y - radius;
+                    outer_vertex[i][1] = m_height + circle_y - m_radius;
                     inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
                 }
                 else
@@ -375,7 +376,7 @@ bool Widget::createRect(int radius)
 
                 if( m_round_corners & WGT_AREA_SW )
                 {
-                    outer_vertex[i][2] = radius - circle_y;
+                    outer_vertex[i][2] = m_radius - circle_y;
                     inner_vertex[i][2] = outer_vertex[i][2] + BORDER_LENGTH;
                 }
                 else
@@ -398,17 +399,17 @@ bool Widget::createRect(int radius)
 
                 //By inverting the use of sin and cos we get corners that are
                 //drawn from left to right instead of right to left
-                circle_x = radius * sin(angle);
-                circle_y = radius * cos(angle);
+                circle_x = m_radius * sin(angle);
+                circle_y = m_radius * cos(angle);
 
                 inner_vertex[i+1].resize(3);
                 outer_vertex[i+1].resize(3);
-                outer_vertex[i+1][0] = m_width - radius + circle_x;
+                outer_vertex[i+1][0] = m_width - m_radius + circle_x;
                 inner_vertex[i+1][0] = outer_vertex[i+1][0] - BORDER_LENGTH;
 
                 if( m_round_corners & WGT_AREA_NE )
                 {
-                    outer_vertex[i+1][1] = m_height - radius + circle_y;
+                    outer_vertex[i+1][1] = m_height - m_radius + circle_y;
                     inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
                 }
                 else
@@ -419,7 +420,7 @@ bool Widget::createRect(int radius)
 
                 if( m_round_corners & WGT_AREA_SE )
                 {
-                    outer_vertex[i+1][2] = radius - circle_y;
+                    outer_vertex[i+1][2] = m_radius - circle_y;
                     inner_vertex[i+1][2] = outer_vertex[i+1][2] + BORDER_LENGTH;
                 }
                 else
@@ -693,6 +694,7 @@ void Widget::draw()
     {
         if( m_enable_border )
         {
+            glDisable ( GL_TEXTURE_2D );
             glColor4fv(m_border_color);
 
             //FIXME: I should probably revert the values to the defaults within the widget manager
