@@ -109,13 +109,6 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     }
     m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
-    // FIXME: for now it is necessary to synch the graphical position with the 
-    //        physical position, since 'hot' computation is done using the 
-    //        graphical position (and hot can trigger an explosion when no
-    //        terrain is under the rocket). Once hot is done with bullet as
-    //        well, this shouldn't be necessary anymore.
-    placeModel();
-
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
@@ -210,7 +203,6 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
 	if(m_exploded) return;
 
     m_has_hit_something=true;
-    m_curr_pos.xyz[2] += 1.2f ;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.
     projectile_manager->explode();
@@ -220,7 +212,9 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     m->removeAllKids();
     scene->remove(m);
 
-    btVector3 pos(m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2]);
+    // The explosion is a bit higher in the air
+    btVector3 pos_explosion=getPos();
+    pos_explosion.setZ(pos_explosion.getZ()+1.2f);
     world->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
@@ -233,10 +227,10 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
         if(m_owner!=kart || m_owner==kart_hit) 
         {
             // Set a flag it if was a direct hit.
-            kart->handleExplosion(m_curr_pos.xyz, kart==kart_hit);
+            kart->handleExplosion(getPos(), kart==kart_hit);
         }
     }
-    callback_manager->handleExplosion(pos, moving_physics);
+    callback_manager->handleExplosion(pos_explosion, moving_physics);
 }   // explode
 
 /* EOF */

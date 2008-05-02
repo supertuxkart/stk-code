@@ -205,7 +205,7 @@ public:
     void           resetBrakes      ();
     void           adjustSpeedWeight(float f);
     void           forceRescue      (bool is_rescue=false);
-    void           handleExplosion  (const sgVec3& pos, bool direct_hit);
+    void           handleExplosion  (const btVector3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     virtual int    isPlayerKart     () const {return 0;                        }
     // addMessages gets called by world to add messages to the gui

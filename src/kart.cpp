@@ -486,7 +486,7 @@ bool Kart::isOnGround() const
            m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
 }   // isOnGround
 //-----------------------------------------------------------------------------
-void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
+void Kart::handleExplosion(const btVector3& pos, bool direct_hit)
 {
     if(direct_hit) {
         btVector3 velocity = m_body->getLinearVelocity();
@@ -499,12 +499,11 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
     }
     else  // only affected by a distant explosion
     {
-        sgVec3 diff;
-        sgSubVec3(diff, getCoord()->xyz, pos);
+        btVector3 diff=getPos()-pos;
         //if the z component is negative, the resulting impulse could push the 
         // kart through the floor. So in this case ignore z.
-        if(diff[2]<0) diff[2]=0.0f;
-        float len2=sgLengthSquaredVec3(diff);
+        if(diff.getZ()<0) diff.setZ(0.0f);
+        float len2=diff.length2();
 
         // The correct formhale would be to first normalise diff,
         // then apply the impulse (which decreases 1/r^2 depending
@@ -513,9 +512,8 @@ void Kart::handleExplosion(const sgVec3& pos, bool direct_hit)
         // = diff*impulseSize/len(diff)^3
         // We use diff*impulseSize/len(diff)^2 here, this makes the impulse
         // somewhat larger, which is actually more fun :)
-        sgScaleVec3(diff,stk_config->m_explosion_impulse/len2);
-        btVector3 impulse(diff[0],diff[1], diff[2]);
-        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
+        diff *= stk_config->m_explosion_impulse/len2;
+        getVehicle()->getRigidBody()->applyCentralImpulse(diff);
     }
 }   // handleExplosion
 
@@ -737,21 +735,7 @@ float Kart::handleWheelie(float dt)
                         chassisTrans.getBasis()[2][1]);
     btVector3 crossProd = targetUp.cross(forwardW);
     crossProd.normalize();
-    
-    const float gLeanRecovery   = m_kart_properties->getWheelieLeanRecovery();
-    const float step            = m_kart_properties->getWheelieStep();
-    const float balance_recovery= m_kart_properties->getWheelieBalanceRecovery();
-    float alpha                 = (targetUp.dot(forwardW));
-    float deltaalpha            = m_wheelie_angle*M_PI/180.0f - alpha;
-    btVector3 angvel            = m_body->getAngularVelocity();
-    float projvel               = angvel.dot(crossProd);
-    float deltavel              = -projvel    * gLeanRecovery    / step
-                                  -deltaalpha * balance_recovery / step;
-    btVector3 deltaangvel       = deltavel * crossProd;
-    
-    angvel                     += deltaangvel;
-    m_body->setAngularVelocity(angvel);
-    
+
     return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
           * m_wheelie_angle/getWheelieMaxPitch();
 }   // handleWheelie
@@ -1046,7 +1030,6 @@ void Kart::placeModel ()
 
     if (m_wheel_rear_l) m_wheel_rear_l->setTransform(wheel_rot);
     if (m_wheel_rear_r) m_wheel_rear_r->setTransform(wheel_rot);
-    // We don't have to call Moveable::placeModel, since it does only setTransform
 
     // Only transfer the bullet data to the plib tree if no history is being
     // replayed.
@@ -1060,14 +1043,17 @@ void Kart::placeModel ()
         sgSetCoord(&m_curr_pos, m);
     }
     sgCoord c ;
-    sgCopyCoord ( &c, &m_curr_pos ) ;
-    //    c.hpr[1] += m_wheelie_angle ;
-    //    c.xyz[2] += 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS));
-    const float CENTER_SHIFT = getGravityCenterShift();
-    c.xyz[2] -= (0.5f-CENTER_SHIFT)*getKartHeight();   // adjust for center of gravity
-    m_model_transform->setTransform(&c);
-    Moveable::placeModel();
+    sgCopyCoord ( &c, &m_curr_pos );
+    const float CENTER_SHIFT  = getGravityCenterShift();
+    const float offset_pitch  = m_wheelie_angle;
+    const float offset_z      = 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS))
+                              - (0.5f-CENTER_SHIFT)*getKartHeight();
     
+    m_curr_pos.xyz[2] += offset_z;
+    m_curr_pos.hpr[1] += offset_pitch;
+    Moveable::placeModel();
+    m_curr_pos.xyz[2] -= offset_z;
+    m_curr_pos.hpr[1] -= offset_pitch;
 }   // placeModel
 //-----------------------------------------------------------------------------
 void Kart::setFinishingState(float time)
