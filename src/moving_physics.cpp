@@ -200,17 +200,17 @@ void MovingPhysics::update(float dt)
     float m[4][4];
     t.getOpenGLMatrix((float*)&m);
     
-    // Transfer the new position and hpr to m_curr_pos
-    sgCoord m_curr_pos;
-    sgSetCoord(&m_curr_pos, m);
-    if(m_curr_pos.xyz[2]<-100)
+    // Transfer the new position and hpr to curr_pos
+    sgCoord curr_pos;
+    sgSetCoord(&curr_pos, m);
+    if(curr_pos.xyz[2]<-100)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
-        m_curr_pos.xyz[0]=m_init_pos.getOrigin().getX();
-        m_curr_pos.xyz[1]=m_init_pos.getOrigin().getY();
-        m_curr_pos.xyz[2]=m_init_pos.getOrigin().getZ();
+        curr_pos.xyz[0]=m_init_pos.getOrigin().getX();
+        curr_pos.xyz[1]=m_init_pos.getOrigin().getY();
+        curr_pos.xyz[2]=m_init_pos.getOrigin().getZ();
     }
-    setTransform(&m_curr_pos);
+    setTransform(&curr_pos);
 
 }   // update
 // -----------------------------------------------------------------------------
