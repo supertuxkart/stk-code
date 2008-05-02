@@ -801,9 +801,17 @@ void Kart::updatePhysics (float dt)
         getBody()->setLinearVelocity( velocity );
 
     }
-    const float steering = DEGREE_TO_RAD(getMaxSteerAngle()) * m_controls.lr;
-    m_vehicle->setSteeringValue(steering, 0);
-    m_vehicle->setSteeringValue(steering, 1);
+    if(m_wheelie_angle<=0.0f)
+    {
+        const float steering = DEGREE_TO_RAD(getMaxSteerAngle()) * m_controls.lr;
+        m_vehicle->setSteeringValue(steering, 0);
+        m_vehicle->setSteeringValue(steering, 1);
+    } 
+    else 
+    {
+        m_vehicle->setSteeringValue(0.0f, 0);
+        m_vehicle->setSteeringValue(0.0f, 1);
+    }
 
     //store current velocity
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
