@@ -354,6 +354,7 @@ public:
     void setWgtResizeToText( const int TOKEN, const bool RESIZE );
     void showWgtText( const int TOKEN );
     void hideWgtText( const int TOKEN );
+    void resizeWgtToText( const int TOKEN );
     void reloadFonts();
 
     //FIXME: change to enableWgtScrolling, since it enables or disables

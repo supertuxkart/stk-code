@@ -150,6 +150,7 @@ void RaceOptions::select()
                 m_difficulty = RaceManager::RD_MEDIUM;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Driver") );
             }
+            widget_manager->resizeWgtToText( WTOK_DIFFICULTY );
             break;
 
         case WTOK_DIFFICULTY_DOWN:

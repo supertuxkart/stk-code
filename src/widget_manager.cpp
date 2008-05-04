@@ -1989,6 +1989,31 @@ void WidgetManager::setSelectedWgtToken(const int TOKEN)
     }
 }
 
+//-----------------------------------------------------------------------------
+void WidgetManager::resizeWgtToText( const int TOKEN )
+{
+    const int ID = findId(TOKEN);
+    if( ID != WGT_NONE )
+    {
+        m_widgets[ID].widget->resizeToText();
+
+        const int SCREEN_WIDTH = user_config->m_width;
+        const int SCREEN_HEIGHT = user_config->m_height;
+
+        m_widgets[ID].min_width = ( m_widgets[ID].widget->m_width * 100 ) /
+            SCREEN_WIDTH;
+        m_widgets[ID].min_height = ( m_widgets[ID].widget->m_height * 100 ) /
+            SCREEN_HEIGHT;
+
+        layout();
+    }
+    else
+    {
+        std::cerr << "WARNING: tried to resize the text of an unnamed " <<
+            "widget with token " << TOKEN << '\n';
+    }
+}
+
 /** reloadFonts() sets the pointers to the fonts of the guis
  * to their choosen fonts; it's useful in cases where you
  * free the font's memory (which makes the pointers invalid),
