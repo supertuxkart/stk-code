@@ -40,7 +40,7 @@ enum WidgetTokens
 ConfigControls::ConfigControls()
 {
     widget_manager->insertColumn();
-    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Edit controls for which player?"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Edit controls for who?"));
 
     widget_manager->addTextButtonWgt( WTOK_PLYR1 , 60, 7, _("Player 1"));
     widget_manager->addTextButtonWgt( WTOK_PLYR2 , 60, 7, _("Player 2"));

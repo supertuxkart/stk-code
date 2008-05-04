@@ -28,44 +28,22 @@ enum WidgetTokens
     WTOK_PLAYER_2 = 2,
     WTOK_PLAYER_3,
     WTOK_PLAYER_4,
-    WTOK_BACK
+
+    WTOK_QUIT
 };
 
 NumPlayers::NumPlayers()
 {
-    widget_manager->addWgt(WTOK_PLAYER_2, 35, 7);
-    widget_manager->showWgtRect( WTOK_PLAYER_2 );
-    widget_manager->setWgtText( WTOK_PLAYER_2, _("Two Players") );
-    widget_manager->setWgtTextSize( WTOK_PLAYER_2, WGT_FNT_MED );
-    widget_manager->showWgtText( WTOK_PLAYER_2 );
-    widget_manager->activateWgt( WTOK_PLAYER_2 );
-    widget_manager->breakLine();
+    widget_manager->insertColumn();
+    widget_manager->addTextButtonWgt( WTOK_PLAYER_2, 35, 7, _("Two Players") );
+    widget_manager->addTextButtonWgt( WTOK_PLAYER_3, 35, 7, _("Three Players") );
+    widget_manager->addTextButtonWgt( WTOK_PLAYER_4, 35, 7, _("Four Players") );
 
-    widget_manager->addWgt(WTOK_PLAYER_3, 35, 7);
-    widget_manager->showWgtRect( WTOK_PLAYER_3 );
-    widget_manager->setWgtText( WTOK_PLAYER_3, _("Three Players") );
-    widget_manager->setWgtTextSize( WTOK_PLAYER_3, WGT_FNT_MED );
-    widget_manager->showWgtText( WTOK_PLAYER_3 );
-    widget_manager->activateWgt( WTOK_PLAYER_3);
-    widget_manager->breakLine();
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 35, 7 );
 
-    widget_manager->addWgt(WTOK_PLAYER_4, 35, 7);
-    widget_manager->showWgtRect( WTOK_PLAYER_4 );
-    widget_manager->setWgtText( WTOK_PLAYER_4, _("Four Players") );
-    widget_manager->setWgtTextSize( WTOK_PLAYER_4, WGT_FNT_MED );
-    widget_manager->showWgtText( WTOK_PLAYER_4 );
-    widget_manager->activateWgt( WTOK_PLAYER_4 );
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WidgetManager::WGT_NONE, 35, 7);
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WTOK_BACK, 35, 7);
-    widget_manager->showWgtRect( WTOK_BACK );
-    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back") );
-    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
-    widget_manager->showWgtText( WTOK_BACK );
-    widget_manager->activateWgt( WTOK_BACK );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 35, 7,
+        _("Press <ESC> to go back") );
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -87,7 +65,7 @@ void NumPlayers::select()
         race_manager->setNumPlayers(widget_manager->getSelectedWgt());
         menu_manager->pushMenu(MENUID_GAMEMODE);
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
         menu_manager->popMenu();
         break;
     default:

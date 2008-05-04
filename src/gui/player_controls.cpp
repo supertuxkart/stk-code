@@ -104,7 +104,7 @@ PlayerControls::PlayerControls(int whichPlayer):
     widget_manager->breakLine();
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML);
 
     widget_manager->layout(WGT_AREA_ALL);

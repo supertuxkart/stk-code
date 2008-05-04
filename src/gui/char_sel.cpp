@@ -64,18 +64,13 @@ CharSel::CharSel(int whichPlayer)
     if (m_player_index < (int)kart_properties_manager->m_selected_karts.size())
     kart_properties_manager->m_selected_karts.pop_back();
 
-    widget_manager->setInitialActivationState(false);
-    widget_manager->addWgt( WTOK_TITLE, 60, 10);
-    widget_manager->showWgtRect( WTOK_TITLE );
     char heading[MAX_MESSAGE_LENGTH];
     snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
              m_player_index + 1);
-    widget_manager->setWgtText( WTOK_TITLE, heading);
-    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG);
-    widget_manager->showWgtText( WTOK_TITLE );
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 10, heading );
     widget_manager->breakLine();
 
-    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2);
     widget_manager->breakLine();
 
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
@@ -85,27 +80,19 @@ CharSel::CharSel(int whichPlayer)
         {
             const KartProperties* kp= kart_properties_manager->getKartById(i);
             if(unlock_manager->isLocked(kp->getIdent())) continue;
-            widget_manager->addWgt( WTOK_RACER0 + i, 8, 11);
-            widget_manager->showWgtRect( WTOK_RACER0 + i);
-            widget_manager->setWgtColor( WTOK_RACER0 + i, WGT_GRAY);
-            widget_manager->setWgtTexture( WTOK_RACER0 + i, kp->getIconFile() );
-            widget_manager->showWgtTexture( WTOK_RACER0 + i );
-            widget_manager->activateWgt( WTOK_RACER0 + i );
+
+            widget_manager->addImgButtonWgt( WTOK_RACER0 + i, 8, 11,
+                kp->getIconFile() );
         }
     }
 
     widget_manager->breakLine();
-    widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2);
     widget_manager->breakLine();
 
-    //FIXME: the widget should check if the dimensions > 100
-    widget_manager->addWgt( WTOK_NAME, 30, 7);
-    widget_manager->showWgtRect( WTOK_NAME );
-    widget_manager->showWgtText( WTOK_NAME );
+    widget_manager->addTextWgt( WTOK_NAME, 30, 7, "");
 
-    //FIXME: widget_manager says that token -1 is already in use
     widget_manager->layout(WGT_AREA_TOP);
-
 
     m_current_kart = -1;
 
@@ -207,7 +194,7 @@ void CharSel::select()
     {
         race_manager->setPlayerKart(m_player_index, KP->getIdent());
         user_config->m_player[m_player_index].setLastKartId(TOKEN);
-        // Add selected kart (TOKEN) to selected karts vector so it cannot be 
+        // Add selected kart (TOKEN) to selected karts vector so it cannot be
         // selected again
         kart_properties_manager->m_selected_karts.push_back(TOKEN);
     }

@@ -26,61 +26,36 @@
 enum WidgetTokens
 {
     WTOK_TITLE,
+
     WTOK_CONTROLS,
     WTOK_DISPLAY,
     WTOK_SOUND,
-    WTOK_BACK
+
+    WTOK_QUIT
 };
 
 Options::Options()
 {
-    widget_manager->addWgt(WTOK_TITLE, 35, 7);
-    widget_manager->showWgtRect( WTOK_TITLE );
-    widget_manager->setWgtText( WTOK_TITLE, _("Options") );
-    widget_manager->setWgtTextSize( WTOK_TITLE, WGT_FNT_LRG );
-    widget_manager->showWgtText( WTOK_TITLE );
-    widget_manager->breakLine();
-
-    widget_manager->addWgt(WTOK_CONTROLS, 35, 7);
-    widget_manager->showWgtRect( WTOK_CONTROLS );
-    widget_manager->setWgtText( WTOK_CONTROLS, _("Player Config") );
-    widget_manager->setWgtTextSize( WTOK_CONTROLS, WGT_FNT_MED );
-    widget_manager->showWgtText( WTOK_CONTROLS );
-    widget_manager->activateWgt( WTOK_CONTROLS);
-    widget_manager->breakLine();
+    widget_manager->insertColumn();
+    widget_manager->addTitleWgt( WTOK_TITLE, 35, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_CONTROLS, 35, 7, _("Player Config") );
 
     // Don't display the fullscreen menu when called from within the race.
     // The fullscreen mode will reload all textures, reload the models,
     // ... basically creating a big mess!!  (and all of this only thanks
     // to windows, who discards all textures, ...)
-    if(!menu_manager->isSomewhereOnStack(MENUID_RACE))
+    if(!menu_manager->isSomewhereOnStack( MENUID_RACE ))
     {
-        widget_manager->addWgt(WTOK_DISPLAY, 35, 7);
-        widget_manager->showWgtRect( WTOK_DISPLAY );
-        widget_manager->setWgtText( WTOK_DISPLAY, _("Display") );
-        widget_manager->setWgtTextSize( WTOK_DISPLAY, WGT_FNT_MED );
-        widget_manager->showWgtText( WTOK_DISPLAY );
-        widget_manager->activateWgt( WTOK_DISPLAY );
-        widget_manager->breakLine();
+        widget_manager->addTextButtonWgt( WTOK_DISPLAY, 35, 7, _("Display") );
     }
 
-    widget_manager->addWgt(WTOK_SOUND, 35, 7);
-    widget_manager->showWgtRect( WTOK_SOUND );
-    widget_manager->setWgtText( WTOK_SOUND, _("Sound") );
-    widget_manager->setWgtTextSize( WTOK_SOUND, WGT_FNT_MED );
-    widget_manager->showWgtText( WTOK_SOUND );
-    widget_manager->activateWgt( WTOK_SOUND );
-    widget_manager->breakLine();
+    widget_manager->addTextButtonWgt( WTOK_SOUND, 35, 7, _("Sound") );
 
-    widget_manager->addWgt(WidgetManager::WGT_NONE, 35, 7);
-    widget_manager->breakLine();
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 35, 7 );
 
-    widget_manager->addWgt(WTOK_BACK, 35, 7);
-    widget_manager->showWgtRect( WTOK_BACK );
-    widget_manager->setWgtText( WTOK_BACK, _("Press <ESC> to go back") );
-    widget_manager->setWgtTextSize( WTOK_BACK, WGT_FNT_SML );
-    widget_manager->showWgtText( WTOK_BACK );
-    widget_manager->activateWgt( WTOK_BACK );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 35, 7,
+        _("Press <ESC> to go back") );
+    widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -95,7 +70,6 @@ Options::~Options()
 void Options::select()
 {
     switch ( widget_manager->getSelectedWgt() )
-//    switch ( widgetSet -> get_token (widgetSet -> click()) )
     {
     case WTOK_CONTROLS:
         menu_manager->pushMenu(MENUID_CONFIG_CONTROLS);
@@ -106,10 +80,11 @@ void Options::select()
     case WTOK_SOUND:
         menu_manager->pushMenu(MENUID_CONFIG_SOUND);
         break;
-    case WTOK_BACK:
+    case WTOK_QUIT:
+        //FIXME: this shouldn't be in this screen
 		// Make config changes permanent.
 		user_config->saveConfig();
-				
+
         menu_manager->popMenu();
         break;
     default:

@@ -240,6 +240,15 @@ public:
         const int IMG
     );
 
+    bool addImgWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const char* FILENAME
+    );
+
+
     //Selectable widget with visible rect & image, rounded corners with 20% radius,
     //gray rect and texture
     bool addImgButtonWgt
@@ -248,6 +257,14 @@ public:
         const int MIN_WIDTH,
         const int MIN_HEIGHT,
         const int IMG
+    );
+
+    bool addImgButtonWgt
+    (
+        const int TOKEN,
+        const int MIN_WIDTH,
+        const int MIN_HEIGHT,
+        const char* FILENAME
     );
 
     /* On/off widget switch features. They are all disabled/hidden initially. */

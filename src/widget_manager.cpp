@@ -823,6 +823,28 @@ bool WidgetManager::addImgWgt
 }
 
 //-----------------------------------------------------------------------------
+bool WidgetManager::addImgWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const char* FILENAME
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    setWgtColor( TOKEN, WGT_WHITE );
+    showWgtRect( TOKEN );
+    setWgtBorderPercentage( TOKEN, 5 );
+    setWgtBorderColor( TOKEN, WGT_BLACK );
+    showWgtBorder( TOKEN );
+    setWgtTexture( TOKEN, FILENAME );
+    showWgtTexture( TOKEN );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool WidgetManager::addImgButtonWgt
 (
     const int TOKEN,
@@ -838,6 +860,28 @@ bool WidgetManager::addImgButtonWgt
     setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
     setWgtCornerRadius( TOKEN, 20 );
     setWgtTexture( TOKEN, IMG );
+    showWgtTexture( TOKEN );
+    activateWgt( TOKEN );
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::addImgButtonWgt
+(
+    const int TOKEN,
+    const int MIN_WIDTH,
+    const int MIN_HEIGHT,
+    const char* FILENAME
+)
+{
+    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+
+    setWgtColor( TOKEN, WGT_GRAY );
+    showWgtRect( TOKEN );
+    setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
+    setWgtCornerRadius( TOKEN, 20 );
+    setWgtTexture( TOKEN, FILENAME );
     showWgtTexture( TOKEN );
     activateWgt( TOKEN );
 
