@@ -70,18 +70,24 @@ void GameManager::run()
         inputDriver->input();
 
         m_prev_time = m_curr_time;
-        m_curr_time = SDL_GetTicks();
-		dt = m_curr_time - m_prev_time;
 
-        //This avoid wasting CPU cycles
-        //1000 miliseconds / 125 frames = 125 miliseconds per frame
-        if( dt < 8.0f)
+        while( 1 )
         {
-            //SDL_Delay has a granularity of 10ms on most platforms, so most
-            //likely when frames go faster than 125 frames, at times it might
-            //limit the frames to 100.
-            SDL_Delay((Uint32)(10));
-            dt = 10.0f;
+            m_curr_time = SDL_GetTicks();
+            dt = m_curr_time - m_prev_time;
+
+            //This avoid wasting CPU cycles
+            //1000 miliseconds / 125 frames = 125 miliseconds per frame
+            if( dt < 8.0f)
+            {
+                //SDL_Delay has a granularity of 10ms on most platforms, so
+                //most likely when frames go faster than 125 frames, at times
+                //it might limit the frames to even 55 frames. On some cases,
+                //SDL_Delay(1) will just cause the program to give up the
+                //rest of it's timeslice.
+                SDL_Delay(1);
+            }
+            else break;
         }
         dt *= 0.001f;
 
