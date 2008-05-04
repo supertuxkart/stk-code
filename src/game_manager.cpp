@@ -64,13 +64,26 @@ void GameManager::run()
        
     bool music_on = false;
     m_curr_time = SDL_GetTicks();
+    float dt;
     while(!m_abort)
     {
         inputDriver->input();
 
         m_prev_time = m_curr_time;
         m_curr_time = SDL_GetTicks();
-		float dt = (m_curr_time - m_prev_time ) * 0.001f;
+		dt = m_curr_time - m_prev_time;
+
+        //This avoid wasting CPU cycles
+        //1000 miliseconds / 125 frames = 125 miliseconds per frame
+        if( dt < 8.0f)
+        {
+            //SDL_Delay has a granularity of 10ms on most platforms, so most
+            //likely when frames go faster than 125 frames, at times it might
+            //limit the frames to 100.
+            SDL_Delay((Uint32)(10));
+            dt = 10.0f;
+        }
+        dt *= 0.001f;
 
 		if (!music_on && !race_manager->raceIsActive())
 		{
