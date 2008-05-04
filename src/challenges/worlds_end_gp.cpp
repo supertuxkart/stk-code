@@ -24,7 +24,7 @@
 WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp","Win the At World's End Grand Prix")
 {
     setChallengeDescription("Come first in the At World's End\nGrand Prix with 3 'Racer' Level AI karts.");
-    setFeatureDescription("New Grand Prix: All Track's GP\nand Bonus Preview: Skidding\nnow available.\nSelect 'skidding' as difficulty.");
+    setFeatureDescription("New Grand Prix: All Tracks GP\nand Bonus Preview: Skidding\nnow available.\nSelect 'skidding' as difficulty.");
     setFeature("All tracks");
     setFeature("skidding");          // Add Skidding Preview 
     addDependency("islandfollow");
