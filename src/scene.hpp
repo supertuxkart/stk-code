@@ -26,6 +26,7 @@
 class ssgRoot;
 class ssgEntity;
 class Camera;
+class Kart;
 
 class Scene
 {

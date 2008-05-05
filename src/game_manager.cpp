@@ -74,7 +74,7 @@ void GameManager::run()
         while( 1 )
         {
             m_curr_time = SDL_GetTicks();
-            dt = m_curr_time - m_prev_time;
+            dt =(float)(m_curr_time - m_prev_time);
 
             //This avoid wasting CPU cycles
             //1000 miliseconds / 125 frames = 125 miliseconds per frame
