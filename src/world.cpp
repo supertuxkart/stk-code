@@ -109,18 +109,17 @@ World::World()
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
-                scene->createCamera(race_manager->getNumPlayers(), playerIndex);
+                btVector3 startpos(init_pos.xyz[0], init_pos.xyz[1], init_pos.xyz[2]);
+                scene->createCamera(playerIndex, newkart);
             }
         }
         else
         {
             if (race_manager->isPlayer(i))
             {
-                Camera *cam = scene->createCamera(race_manager->getNumPlayers(), playerIndex);
-                // the given position belongs to a player
                 newkart = new PlayerKart(kart_name, position,
                                          &(user_config->m_player[playerIndex]),
-                                         init_pos, cam);
+                                         init_pos, playerIndex);
                 m_player_karts.push_back((PlayerKart*)newkart);
                 playerIndex++;
             }

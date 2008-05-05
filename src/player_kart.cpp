@@ -28,8 +28,39 @@
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
+#include "scene.hpp"
 #include "camera.hpp"
 
+PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *player,
+                       sgCoord init_pos, int player_index) :
+            Kart(kart_name, position, init_pos)
+{
+    m_player       = player;
+    m_penalty_time = 0.0f;
+    m_camera       = scene->createCamera(player_index, this);
+    m_camera->setMode(Camera::CM_NORMAL);
+    reset();
+}   // PlayerKart
+
+//-----------------------------------------------------------------------------
+void PlayerKart::reset()
+{
+    m_steer_val_l = 0;
+    m_steer_val_r = 0;
+    m_steer_val = 0;
+    m_accel_val = 0;
+    m_controls.accel = 0.0;
+    m_controls.brake =false;
+    m_controls.fire = false;
+    m_controls.wheelie = false;
+    m_controls.jump = false;
+    m_penalty_time = 0;
+    m_time_last_crash_sound = -10.0f;
+    m_camera->setMode(Camera::CM_NORMAL);   // can be changed if camera was eliminated
+    Kart::reset();
+}   // reset
+
+// ----------------------------------------------------------------------------
 void PlayerKart::action(KartAction action, int value)
 {
     switch (action)
@@ -68,7 +99,7 @@ void PlayerKart::action(KartAction action, int value)
         m_controls.fire = (value!=0);
         break;
     case KA_LOOK_BACK:
-        m_camera->setReverseHeading(value!=0);
+        m_camera->setMode(value!=0 ? Camera::CM_REVERSE : Camera::CM_NORMAL);
         break;
     case KA_JUMP:
         m_controls.jump = (value!=0);
@@ -204,25 +235,6 @@ void PlayerKart::collectedHerring(Herring* herring)
     Kart::collectedHerring(herring);
     sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }   // collectedHerring
-
-//-----------------------------------------------------------------------------
-void PlayerKart::reset()
-{
-    m_steer_val_l = 0;
-    m_steer_val_r = 0;
-    m_steer_val = 0;
-    m_accel_val = 0;
-    m_controls.accel = 0.0;
-    m_controls.brake =false;
-    m_controls.fire = false;
-    m_controls.wheelie = false;
-    m_controls.jump = false;
-    m_penalty_time = 0;
-    m_time_last_crash_sound = -10.0f;
-    m_camera->setMode(Camera::CM_NORMAL);   // can be changed if camera was eliminated
-    m_camera->setReverseHeading(false);
-    Kart::reset();
-}   // reset
 
 //-----------------------------------------------------------------------------
 /** This function is called by world to add any messages to the race gui. This

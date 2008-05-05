@@ -21,7 +21,7 @@
 
 //FIXME: make the camera a pointer to vector so it can be forward declared.
 #include <vector>
-//#include <plib/ssg.h>
+#include "LinearMath/btVector3.h"
 
 class ssgRoot;
 class ssgEntity;
@@ -44,8 +44,7 @@ public:
     void remove(ssgEntity *kid);
     void draw(float dt);
 
-    Camera *createCamera(int numPlayers, int playerId);
-
+    Camera *createCamera(int playerId, const Kart* kart);
 };
 
 extern Scene *scene;

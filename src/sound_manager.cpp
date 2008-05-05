@@ -284,7 +284,8 @@ void SoundManager::switchToFastMusic()
     }
     else
     {
-        m_mode = SOUND_FASTER;
+        // FIXME: for now this music is too annoying, 
+        // m_mode = SOUND_FASTER;
     }
 }   // switchToFastMusic
 //-----------------------------------------------------------------------------

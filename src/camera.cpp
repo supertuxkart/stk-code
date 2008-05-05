@@ -27,93 +27,82 @@
 #include "user_config.hpp"
 #include "constants.hpp"
 
-void Camera::setScreenPosition ( int numPlayers, int pos )
+Camera::Camera(int camera_index, const Kart* kart)
 {
-    assert(pos >= 0 && pos <= 3);
+    m_mode              = CM_NORMAL;
+    m_context           = new ssgContext ;
+    m_distance          = kart->getKartProperties()->getCameraDistance();
+    m_kart              = kart;
 
-    if (numPlayers == 1)
+    btVector3 start_pos = m_kart->getPos();
+    sgSetVec3(m_current_pos.xyz, start_pos.getX(), start_pos.getY(), start_pos.getZ());
+    sgSetVec3(m_current_pos.hpr, 0, 0, 0);
+
+    // FIXME: clipping should be configurable for slower machines
+    const Track* track  = world->getTrack();
+    if (track->useFog())
+        m_context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
+    else
+        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
+
+    setScreenPosition(camera_index);
+}   // Camera
+
+// ----------------------------------------------------------------------------
+void Camera::setScreenPosition(int camera_index)
+{
+    const int num_players = race_manager->getNumPlayers();
+    assert(camera_index >= 0 && camera_index <= 3);
+
+    if (num_players == 1)
     {
         m_context -> setFOV ( 75.0f, 0.0f ) ;
         m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 1.0f ;
     }
-    else if (numPlayers == 2)
+    else if (num_players == 2)
     {
         m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
-        switch ( pos )
+        switch ( camera_index )
         {
-        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 1.0f; m_h = 0.5f;
-            break;
-        case 1 : m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 0.5f;
-            break;
+        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 1.0f; m_h = 0.5f; break;
+        case 1 : m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 0.5f; break;
         }
     }
-    else if (numPlayers == 3)
+    else if (num_players == 3)
     {
         m_context -> setFOV ( 50.0f, 0.0f );
-        switch ( pos )
+        switch ( camera_index )
         {
-        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
-            break;
-        case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
-            break;
+        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
+        case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
         case 2 : m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 0.5f;
-            m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
-            break;
+                 m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ); break;
         }
     }
-    else if (numPlayers == 4)
+    else if (num_players == 4)
     {
         m_context -> setFOV ( 50.0f, 0.0f );
-        switch ( pos )
+        switch ( camera_index )
         {
-        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
-            break;
-        case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f;
-            break;
-        case 2 : m_x = 0.0f; m_y = 0.0f; m_w = 0.5f; m_h = 0.5f;
-            break;
-        case 3 : m_x = 0.5f; m_y = 0.0f; m_w = 0.5f; m_h = 0.5f;
-            break;
+        case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
+        case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
+        case 2 : m_x = 0.0f; m_y = 0.0f; m_w = 0.5f; m_h = 0.5f; break;
+        case 3 : m_x = 0.5f; m_y = 0.0f; m_w = 0.5f; m_h = 0.5f; break;
         }
     }
     m_last_pitch = 0.0f;
 }  // setScreenPosition
 
 //-----------------------------------------------------------------------------
-Camera::Camera(int numPlayers, int which)
-  : m_reverse(false)
-{
-    m_mode       = CM_NORMAL;
-    m_context    = new ssgContext ;
-    m_which_kart = which;
-    if(m_which_kart >= int(race_manager->getNumKarts()) || m_which_kart < 0 )
-        m_which_kart =0;
-
-    // FIXME: clipping should be configurable for slower machines
-    const Track* track = world->getTrack();
-    if (track->useFog())
-        m_context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
-    else
-        m_context -> setNearFar ( 0.05f, 1000.0f ) ;
-
-    setScreenPosition ( numPlayers, m_which_kart ) ;
-    m_last_steer_offset = 0;
-}   // Camera
-
-//-----------------------------------------------------------------------------
 void Camera::setMode(Mode mode)
 {
     m_mode       = mode;
     m_last_pitch = 0.0f;
-    if(m_mode==CM_LEADER_MODE)
-        setReverseHeading(true);
+    if(m_mode==CM_CLOSEUP)
+        m_distance = 2.5f;
+    else
+        m_distance = m_kart->getKartProperties()->getCameraDistance();
 }   // setMode
-
-//-----------------------------------------------------------------------------
-void Camera::setReverseHeading(bool b)
-{
-  m_reverse = b;
-}   // setReverseHeading
 
 //-----------------------------------------------------------------------------
 /** Reset is called when a new race starts. Make sure that the camera
@@ -129,24 +118,20 @@ void Camera::update (float dt)
 {
     sgCoord kartcoord;
     const Kart *kart;
-    // Update the camera
+    
+    // First define the position of the kart
     if(m_mode==CM_LEADER_MODE)
     {
         kart=world->getKart(0);
         sgCopyCoord(&kartcoord, kart->getCoord());
-        // This gives a camera slightly above the kart, facing downwards
-        // But this works only when the karts are within a certain distance
-        // otherwise only the track is seen :(
-        // kartcoord.xyz[2]+=3.0f;     // raise camera
-        // kartcoord.hpr[1]+=17;       // face downwards
     }
     else
     {
-        kart=world->getPlayerKart(m_which_kart);
+        kart = m_kart;
         sgCopyCoord(&kartcoord, kart->getCoord());
 
         // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
-        kartcoord.hpr[1]=RAD_TO_DEGREE( kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
+        kartcoord.hpr[1]=RAD_TO_DEGREE(m_kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
         kartcoord.hpr[2] = 0;
         // Only adjust the pitch if it's not the first frame (which is indicated by having
         // dt=0). Otherwise the camera will change pitch during ready-set-go.
@@ -165,60 +150,30 @@ void Camera::update (float dt)
         }   //  dt>0.0
         m_last_pitch = kartcoord.hpr[1];
     }   // m_mode!=CM_LEADER_MODE
+    if(m_mode==CM_SIMPLE_REPLAY) kartcoord.hpr[0] = 0;
 
-    if (m_mode == CM_SIMPLE_REPLAY)
-        kartcoord.hpr[0] = 0;
+    // Set the camera position relative to the kart
+    // --------------------------------------------
+    sgMat4 cam_pos;
 
-    // Uncomment this for a simple MarioKart-like replay-camera
-    // kartcoord.hpr[0] = 0;
-
+    // The reverse mode and the cam used in follow the leader mode (when a
+    // kart has been eliminated) are facing backwards:
+    bool reverse= m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
+    sgMakeTransMat4(cam_pos, 0.f, -m_distance, reverse ? 0.75f : 1.5f);
+    
+    // Set the camera rotation
+    // -----------------------
+    sgMat4 cam_rot;
+    sgMakeRotMat4(cam_rot, reverse            ? 180.0f : 0.0f,
+                           m_mode==CM_CLOSEUP ? -15.0f : -5.0f,
+                           0);
+    
     // Matrix that transforms stuff to kart-space
     sgMat4 tokart;
     sgMakeCoordMat4 (tokart, &kartcoord);
 
-    // Relative position from the middle of the kart
     sgMat4 relative;
-    sgMat4 cam_pos;
-
-    if (m_mode == CM_CLOSEUP)
-        sgMakeTransMat4(cam_pos, 0.f, -2.5f, 1.5f);
-    else
-        sgMakeTransMat4(cam_pos, 0.f, 
-                        -kart->getKartProperties()->getCameraDistance(), 1.5f);
-
-    if (m_reverse)
-    {
-      // If player is looking back all other camera options are ignored.
-      sgMat4 cam_lb;
-      sgMakeTransMat4(cam_pos, 0.f, -2.5f, 0.75f);
-
-      // Applies 'look back' rotation.
-      sgMakeRotMat4(cam_lb, 180, 0, 0);
-      sgMultMat4(relative, cam_pos, cam_lb);
-    }
-    else if (m_mode == CM_NO_FAKE_DRIFT)
-    {
-        const float STEER_OFFSET = kart->getSteerAngle()*-10.0f;
-
-        sgMat4 cam_rot;
-        sgMat4 tmp;
-        sgMakeRotMat4(cam_rot, 0, -5, 0);
-        sgMultMat4(tmp, cam_pos, cam_rot);
-        sgMakeRotMat4(cam_rot, STEER_OFFSET, 0, 0);
-        sgMultMat4(relative, cam_rot, tmp);
-    }
-    else
-    {
-      sgMat4 cam_rot;
-
-      if (m_mode == CM_CLOSEUP)
-        sgMakeRotMat4(cam_rot, 0, -15, 0);
-      else
-        sgMakeRotMat4(cam_rot, 0, -5, 0);
-
-      sgMultMat4(relative, cam_pos, cam_rot);
-    }
-
+    sgMultMat4(relative, cam_pos, cam_rot);
     sgMat4 result;
     sgMultMat4(result, tokart, relative);
 

@@ -62,10 +62,9 @@ void Scene::clear ()
 
 //-----------------------------------------------------------------------------
 
-Camera *
-Scene::createCamera(int numPlayers, int playerId)
+Camera *Scene::createCamera(int playerId, const Kart* kart)
 {
-  Camera *cam = new Camera(numPlayers, playerId);
+  Camera *cam = new Camera(playerId, kart);
 
   m_cameras.push_back(cam);
 

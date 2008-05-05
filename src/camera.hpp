@@ -22,46 +22,40 @@
 #ifndef HEADER_CAMERA_H
 #define HEADER_CAMERA_H
 
+#include "LinearMath/btVector3.h"
+
 class ssgContext;
+class Kart;
 
 class Camera
 {
 public:
     enum Mode {
-        CM_NORMAL,
-        CM_CLOSEUP,
+        CM_NORMAL,        // Normal camera mode
+        CM_CLOSEUP,       // Normal camera, closer to kart
+        CM_DRIFTING,      // FIXME: drifting behind when accelerating = not yet implemented
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
-        //FIXME: NO_FAKE_DRIFT is broken
-        CM_NO_FAKE_DRIFT,
+        CM_REVERSE,       // Camera is pointing backwards
         CM_SIMPLE_REPLAY
     };
 protected:
     ssgContext *m_context ;
     sgCoord     m_current_pos;
-    int         m_which_kart;
-    Mode        m_mode;
-    float       m_last_steer_offset;
-    float       m_x, m_y, m_w, m_h;
+    const Kart *m_kart;                 // the kart the camera is attached to
+    Mode        m_mode;                 // CM_ value, see above
+    float       m_x, m_y, m_w, m_h;     // window to us
     float       m_current_speed;        // current speed of camera
-    float       m_last_pitch;
+    float       m_last_pitch;           // for tiling the camera when going downhill
+    float       m_distance;             // distance between camera and kart
 
-    bool m_reverse;
 
 public:
-    Camera ( int numPlayers, int id ) ;
-
-    /** Set the camera to the given mode */
-    void setMode(Mode mode_);
-
-    void setReverseHeading(bool);
-
-    void setScreenPosition ( int numPlayers, int pos ) ;
-
-    void reset();
-    void update (float dt) ;
-    void apply  () ;
-
-    int getKartId() const { return m_which_kart; }
+         Camera           (int camera_index, const Kart* kart);
+    void setMode          (Mode mode_);    /** Set the camera to the given mode */
+    void setScreenPosition(int pos);
+    void reset            ();
+    void update           (float dt);
+    void apply            ();
 } ;
 
 #endif
