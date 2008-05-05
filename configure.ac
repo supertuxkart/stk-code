@@ -61,6 +61,10 @@ if test x$enable_debug = xyes; then
     CFLAGS="$CFLAGS -g -pg"
     CXXFLAGS="$CXXFLAGS -g -pg"
     SUMMARY="$SUMMARY\nEnabled debugging, please disable for a release!!"
+else
+    CFLAGS="$CFLAGS -DNDEBUG"
+    CXXFLAGS="$CXXFLAGS -DNDEBUG"
+    SUMMARY="$SUMMARY\nDisabled debugging, asserts have been turned off"
 fi
 
 AC_ARG_ENABLE(optimization, [  --disable-optimization    Disable compiler optimizations],,
