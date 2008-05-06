@@ -36,6 +36,7 @@ Translations::Translations() {
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
     textdomain (PACKAGE);
+    bind_textdomain_codeset(PACKAGE, "iso-8859-1");
 #endif
 }   // Translations
 
