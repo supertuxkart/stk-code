@@ -18,36 +18,34 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "translation.hpp"
-#include "challenges/city_time.hpp"
+#include "tollway_head2head.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-CityTime::CityTime() : Challenge("citytime", _("Finish the City track in 5:20"))
+TollwayHead2Head::TollwayHead2Head() : Challenge("tollwayhead", _("Win a Head to Head on\nTux Tollway"))
 {
-    setChallengeDescription(_("Finish 3 laps on the City track\nwith 3 AI karts\nin under 5:20 minutes."));
-    setFeatureDescription(_("New track: SnowTux Peak\nnow available"));
-    setFeature("snowtuxpeak");
-    addDependency("junglefollow");
-}   // CityTime
+    setChallengeDescription(_("Win a 1 lap Head to Head\non Tux Tollway against 1 'Driver'\nlevel AI kart."));
+    setFeatureDescription(_("New track: Fort Magma\nnow available"));
+    setFeature("fortmagma");
+}   // TollwayTime
+
 //-----------------------------------------------------------------------------
-void CityTime::setRace() const {
+void TollwayHead2Head::setRace() const {
     race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-    race_manager->setTrack("city");
-    race_manager->setDifficulty(RaceManager::RD_EASY);
-    race_manager->setNumLaps(3);
-    race_manager->setNumKarts(4);
+    race_manager->setTrack("tuxtrack");
+    race_manager->setDifficulty(RaceManager::RD_HARD);
+    race_manager->setNumLaps(1);
+    race_manager->setNumKarts(2);
     race_manager->setNumPlayers(1);
 }   // setRace
 
 //-----------------------------------------------------------------------------
-bool CityTime::raceFinished()
+bool TollwayHead2Head::raceFinished()
 {
     std::string track_name = world->getTrack()->getIdent();
-    if(track_name!="city"      ) return false;    // wrong track
+    if(track_name!="tuxtrack"      ) return false;    // wrong track
     Kart* kart=world->getPlayerKart(0);
-    if(kart->getFinishTime()>320) return false;    // too slow
-    if(kart->getLap()!=3       ) return false;    // wrong number of laps
-    if(race_manager->getNumKarts()<4) return false; //not enough AI karts
+    if(kart->getLap()!=1       ) return false;    // wrong number of laps
+    if(race_manager->getNumKarts()!=2 ) return false; //wrong number of AI karts
     return true;
 }   // raceFinished
-//-----------------------------------------------------------------------------

@@ -22,9 +22,9 @@
 #include "race_manager.hpp"
 #include "world.hpp"
 
-PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp", _("Finish Penguin Playground Grand Prix"))
+PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp", _("Win Penguin Playground Grand\nPrix"))
 {
-    setChallengeDescription(_("Finish the Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts\nin the top 3."));
+    setChallengeDescription(_("Win Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts."));
     setFeatureDescription(_("New game mode\n'Follow Leader'\nnow available"));
     setFeature("followleader");
     // The energymathclass challenge must be done, otherwise GP can't be selected

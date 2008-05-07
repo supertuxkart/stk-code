@@ -22,9 +22,9 @@
 #include "race_manager.hpp"
 #include "world.hpp"
 
-MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp",_("Finish To the Moon and Back Grand Prix"))
+MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp",_("Win To the Moon and Back\nGrand Prix"))
 {
-    setChallengeDescription(_("Finish the To the Moon and Back\nGrand Prix with 3 'Racer' Level AI karts\nin the top 3."));
+    setChallengeDescription(_("Win the To the Moon and Back\nGrand Prix with 3 'Racer'\nLevel AI karts."));
     setFeatureDescription(_("New Grand Prix: Snag Drive\nnow available"));
     setFeature("Snag Drive");  //gp3
     // The energyshiftingsands challenge must be done, otherwise gp2 can't be selected

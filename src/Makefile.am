@@ -104,6 +104,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	challenges/city_time.cpp  challenges/city_time.hpp  \
 	challenges/island_follow.cpp  challenges/island_follow.hpp  \
 	challenges/worlds_end_gp.cpp challenges/worlds_end_gp.hpp  \
+	challenges/tollway_head2head.cpp  challenges/tollway_head2head.hpp  \
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\

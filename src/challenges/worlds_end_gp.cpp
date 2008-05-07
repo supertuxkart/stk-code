@@ -22,9 +22,9 @@
 #include "race_manager.hpp"
 #include "world.hpp"
 
-WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp",_("Win the At World's End Grand Prix"))
+WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp",_("Win the At World's End\nGrand Prix"))
 {
-    setChallengeDescription(_("Come first in the At World's End\nGrand Prix with 3 'Racer' Level AI karts."));
+    setChallengeDescription(_("Come first in the At World's End\nGrand Prix with 3 'Racer'\nLevel AI karts."));
     setFeatureDescription(_("New Grand Prix: All Tracks GP\nand Bonus Preview: Skidding\nnow available.\nSelect 'skidding' as difficulty."));
     setFeature("All tracks");
     setFeature("skidding");          // Add Skidding Preview 
@@ -33,6 +33,7 @@ WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp",_("Win the At World's End G
     addDependency("tollwaytime");
     addDependency("junglefollow");
     addDependency("citytime");
+    addDependency("tollwayhead");
 }
 
 //-----------------------------------------------------------------------------

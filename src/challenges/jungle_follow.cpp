@@ -22,7 +22,7 @@
 #include "world.hpp"
 #include "race_manager.hpp"
 
-JungleFollow::JungleFollow() : Challenge("junglefollow", _("Win Follow the Leader in the Jungle"))
+JungleFollow::JungleFollow() : Challenge("junglefollow", _("Follow the Leader in the Jungle"))
 {
     setChallengeDescription(_("Win a Follow the Leader race\nwith 3 AI karts\nin the Amazonian Jungle."));
     setFeatureDescription(_("New track: City\nnow available"));

@@ -30,6 +30,7 @@
 #include "challenges/city_time.hpp"
 #include "challenges/island_follow.hpp"
 #include "challenges/worlds_end_gp.hpp"
+#include "challenges/tollway_head2head.hpp"
 #include "user_config.hpp"
 
 UnlockManager* unlock_manager=0;
@@ -55,6 +56,7 @@ UnlockManager::UnlockManager()
     c=new CityTime();        m_all_challenges[c->getId()]=c;
     c=new IslandFollow();        m_all_challenges[c->getId()]=c;
     c=new WorldsEndGP();        m_all_challenges[c->getId()]=c;
+    c=new TollwayHead2Head(); m_all_challenges[c->getId()]=c;
     
     computeActive();
 }   // UnlockManager

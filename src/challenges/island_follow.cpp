@@ -22,7 +22,7 @@
 #include "world.hpp"
 #include "race_manager.hpp"
 
-IslandFollow::IslandFollow() : Challenge("islandfollow", _("Win Follow the Leader on a Desert Island"))
+IslandFollow::IslandFollow() : Challenge("islandfollow", _("Follow the Leader on a\nDesert Island"))
 {
     setChallengeDescription(_("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island."));
     setFeatureDescription(_("New Grand Prix: At World's End\nnow available"));
