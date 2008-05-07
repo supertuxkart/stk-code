@@ -1,0 +1,560 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-04-21 09:39-0400\n"
+"PO-Revision-Date: 2008-04-24 22:12+CET\n"
+"Last-Translator: Asciimonser <asciimonster@myrealbox.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/gui/config_display.cpp:501
+#, c-format
+msgid "%dx%d Blacklisted"
+msgstr "%dx%d op Verbanningslijst"
+
+#: src/world.cpp:620
+#, c-format
+msgid ""
+"'%s' has\n"
+"been eliminated."
+msgstr ""
+"'%s' is\n"
+"geëlimineerd."
+
+#: src/gui/player_controls.cpp:61
+msgid "Accelerate"
+msgstr "Versnellen"
+
+#: src/gui/challenges_menu.cpp:44
+msgid "Active Challenges"
+msgstr "Actieve Uitdagingen"
+
+#: src/gui/help_page_two.cpp:136
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr "Aambeeld – Remt de kart in leidende positie af"
+
+#: src/gui/config_display.cpp:145
+msgid "Apply "
+msgstr "Toepassen"
+
+#: src/gui/config_display.cpp:449
+#, c-format
+msgid "Apply %dx%d"
+msgstr "Toepassen %dx%d"
+
+#: src/gui/help_page_one.cpp:118
+msgid ""
+"At high speeds wheelies drive you faster, but you can't steer. If you\n"
+"get stuck or fall too far, use the rescue button to get back on track."
+msgstr ""
+"Een wheelie geeft je extra snelheid, maar je verliest bestuurbaarheid\n"
+"Gebruik de herstel knop als je vast komt te zitten of van de baan valt."
+
+#: src/gui/help_page_one.cpp:81
+msgid "Avoid bananas"
+msgstr "Vermijd bananen"
+
+#: src/gui/grand_prix_ending.cpp:148 src/gui/leader_result.cpp:152
+#: src/gui/race_results_gui.cpp:168
+msgid "Back to the main menu"
+msgstr "Terug naar het hoofdmenu"
+
+#: src/gui/player_controls.cpp:62
+msgid "Brake"
+msgstr "Remmen"
+
+#: src/gui/main_menu.cpp:63
+msgid "Challenges"
+msgstr "Uitdagingen"
+
+#: src/gui/help_page_one.cpp:124
+msgid "Check the current key bindings for the first player"
+msgstr "Controleer de toetsinstellingen voor de eerste speler"
+
+#: src/gui/grand_prix_select.cpp:55
+msgid "Choose a Grand Prix"
+msgstr "Kies een Grand Prix"
+
+#: src/gui/game_mode.cpp:49
+msgid "Choose a Race Mode"
+msgstr "Kies een wedstrijdtype"
+
+#: src/gui/track_sel.cpp:50
+msgid "Choose a track"
+msgstr "Kies een parcours"
+
+#: src/gui/num_karts.cpp:46
+msgid "Choose number of karts"
+msgstr "Kies het aantal karts"
+
+#: src/gui/num_laps.cpp:46
+msgid "Choose number of laps"
+msgstr "Kies het aantal ronden"
+
+#: src/gui/player_controls.cpp:77
+#, c-format
+msgid "Choose your controls, %s"
+msgstr "Stel de toetsen in, %s"
+
+#: src/gui/difficulty.cpp:50
+msgid "Choose your skill level"
+msgstr "Kies je niveau"
+
+#: src/gui/config_display.cpp:153
+msgid "Clear from Blacklist"
+msgstr "Verwijderen uit verbanningslijst"
+
+#: src/gui/display_res_confirm.cpp:70
+msgid "Confirm Resolution"
+msgstr "Resolutie bevestigen"
+
+#: src/gui/display_res_confirm.cpp:129
+#, c-format
+msgid "Confirm Resolution Within %d Seconds"
+msgstr "Bevestig de nieuwe resolutie binnen %d seconden"
+
+#: src/gui/display_res_confirm.cpp:60
+msgid "Confirm Resolution Within 5 Seconds"
+msgstr "Bevestig de nieuwe resolutie binnen 5 seconden"
+
+#: src/gui/feature_unlocked.cpp:61 src/gui/grand_prix_ending.cpp:144
+#: src/gui/leader_result.cpp:148 src/gui/num_karts.cpp:92
+#: src/gui/race_results_gui.cpp:159
+msgid "Continue"
+msgstr "Doorgaan"
+
+#: src/gui/race_results_gui.cpp:164
+msgid "Continue Grand Prix"
+msgstr "Doorgaan met Grand Prix"
+
+#: src/gui/main_menu.cpp:82
+msgid "Credits"
+msgstr "Auteurs"
+
+#: src/gui/config_display.cpp:130 src/gui/config_display.cpp:177
+#, c-format
+msgid "Current: %dx%d"
+msgstr "Huidig: %dx%d"
+
+#: src/gui/config_display.cpp:137
+msgid "Decrease Resolution"
+msgstr "Verlaag resolutie"
+
+#: src/gui/options.cpp:60
+msgid "Display"
+msgstr "Grafisch"
+
+#: src/gui/config_display.cpp:93
+msgid "Display Settings"
+msgstr "Grafische instellingen"
+
+#: src/gui/difficulty.cpp:57
+msgid "Driver"
+msgstr "Driver"
+
+#: src/gui/config_controls.cpp:52
+msgid "Edit controls for which player?"
+msgstr "Voor welke speler de toetsen wijzigen?"
+
+#: src/gui/race_menu.cpp:80
+msgid "Exit Race"
+msgstr "Verlaat wedstrijd"
+
+#: src/gui/race_gui.cpp:766
+#, c-format
+msgid "Finished"
+msgstr "Klaar"
+
+#: src/gui/player_controls.cpp:63
+msgid "Fire"
+msgstr "Vuren"
+
+#: src/gui/game_mode.cpp:80
+msgid "Follow the Leader"
+msgstr "Zwaan kleef aan"
+
+#: src/gui/help_page_one.cpp:74
+msgid "Force your rivals bite *your* dust!"
+msgstr "Laat je rivalen stof happen!"
+
+#: src/gui/num_players.cpp:54
+msgid "Four Players"
+msgstr "Vier spelers"
+
+#: src/gui/config_display.cpp:119 src/gui/config_display.cpp:206
+#: src/gui/config_display.cpp:262
+msgid "Fullscreen mode"
+msgstr "Volledig scherm"
+
+#: src/gui/help_page_two.cpp:97
+msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
+msgstr "Vonk – erg langzaam, maar stuitert van de muren"
+
+#: src/gui/challenges_menu.cpp:67 src/gui/credits_menu.cpp:84
+#: src/gui/help_page_one.cpp:158 src/gui/help_page_two.cpp:148
+msgid "Go back to the main menu"
+msgstr "Terug naar het hoofdmenu"
+
+#: src/gui/race_gui.cpp:903
+msgid "Go!"
+msgstr "Start!"
+
+#: src/gui/help_page_one.cpp:78
+msgid "Grab blue boxes and coins"
+msgstr "Pak blauwe dozen en munten"
+
+#: src/gui/game_mode.cpp:61
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#: src/gui/main_menu.cpp:77 src/gui/race_menu.cpp:65
+msgid "Help"
+msgstr "Hulp"
+
+#: src/gui/race_results_gui.cpp:69
+msgid "Highscores"
+msgstr "Hoogste scores"
+
+#: src/gui/help_page_two.cpp:84
+msgid "Homing missile - follows rivals, but is slower than the missile"
+msgstr "Doel zoekende raket – Volgt tegenstanders, maar is langzamer dan een standaard raket"
+
+#: src/gui/config_display.cpp:134
+msgid "Increase Resolution"
+msgstr "Verhoog Resolutie"
+
+#: src/user_config.cpp:852
+#, c-format
+msgid "Invalid"
+msgstr "Ongeldig"
+
+#: src/kart.cpp:644
+msgid "Invalid short-cut!!"
+msgstr "Niet afsteken!!"
+
+#: src/gui/player_controls.cpp:62
+msgid "Jump"
+msgstr "Springen"
+
+#: src/gui/num_karts.cpp:61
+#, c-format
+msgid "Karts: %d"
+msgstr "Kars: %d"
+
+#: src/gui/race_gui.cpp:771
+msgid "Lap"
+msgstr "Ronde"
+
+#: src/gui/num_laps.cpp:55
+msgid "Laps: 3"
+msgstr "Ronden: 3"
+
+#: src/gui/race_gui.cpp:406
+msgid "Leader"
+msgstr "Leider"
+
+#: src/gui/player_controls.cpp:61
+msgid "Left"
+msgstr "Links"
+
+#: src/gui/num_karts.cpp:71 src/gui/num_laps.cpp:64
+msgid "Less"
+msgstr "Minder"
+
+#: src/gui/player_controls.cpp:63
+msgid "Look back"
+msgstr "Achteruit kijken"
+
+#: src/gui/help_page_two.cpp:71
+msgid "Missile - fast stopper in a straight line"
+msgstr "Raket – snel en rechtlijnig, maar zeer effectief"
+
+#: src/gui/num_karts.cpp:78 src/gui/num_laps.cpp:71
+msgid "More"
+msgstr "Meer"
+
+#: src/gui/main_menu.cpp:57
+msgid "Multiplayer"
+msgstr "Meerder spelers"
+
+#: src/gui/feature_unlocked.cpp:43
+msgid "New Feature Unlocked"
+msgstr "Nieuwe optie geactiveerd"
+
+#: src/kart.cpp:415
+msgid "New fastest lap"
+msgstr "Nieuwe snelste ronde"
+
+#: src/gui/help_page_one.cpp:153
+msgid "Next screen"
+msgstr "Volgende scherm"
+
+#: src/gui/grand_prix_select.cpp:83
+msgid "No Grand Prix selected"
+msgstr "Geen Grand Prix geselecteerd"
+
+#: src/gui/track_sel.cpp:105
+msgid "No track selected"
+msgstr "Geen parcours geselecteerd"
+
+#: src/gui/difficulty.cpp:60
+msgid "Novice"
+msgstr "Beginneling"
+
+#: src/user_config.cpp:483
+msgid "Old config file found, check your key bindings!"
+msgstr "Oud configuratiebestand gevonden, controleer toetsinstellingen!"
+
+#: src/gui/main_menu.cpp:66 src/gui/options.cpp:39 src/gui/race_menu.cpp:61
+msgid "Options"
+msgstr "Opties"
+
+#: src/gui/help_page_two.cpp:123
+msgid "Parachute - slows down all karts in a better position!"
+msgstr "Parachute – remt alle karts voor je af!"
+
+#: src/gui/race_menu.cpp:52
+msgid "Paused"
+msgstr "Gepauzeerd"
+
+#: src/gui/race_gui.cpp:924
+msgid "Penalty time!!"
+msgstr "Straftijd!!"
+
+#: src/gui/player_controls.cpp:247
+msgid "Player "
+msgstr "Speler"
+
+#: src/gui/char_sel.cpp:71
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr "Speler %d, kies een karakter"
+
+#: src/gui/config_controls.cpp:56
+msgid "Player 1"
+msgstr "Speler 1"
+
+#: src/gui/config_controls.cpp:59
+msgid "Player 2"
+msgstr "Speler 2"
+
+#: src/gui/config_controls.cpp:62
+msgid "Player 3"
+msgstr "Speler 3"
+
+#: src/gui/config_controls.cpp:65
+msgid "Player 4"
+msgstr "Speler 4"
+
+#: src/gui/options.cpp:46
+msgid "Player Config"
+msgstr "Speler instellingen"
+
+#: src/gui/player_controls.cpp:83
+msgid "Player name"
+msgstr "Naam speler"
+
+#: src/gui/display_res_confirm.cpp:78
+msgid "Press <ESC> to Cancel"
+msgstr "Druk op <ESC> om te annuleren"
+
+#: src/gui/config_controls.cpp:73 src/gui/config_display.cpp:165
+#: src/gui/config_sound.cpp:78 src/gui/difficulty.cpp:63
+#: src/gui/game_mode.cpp:88 src/gui/grand_prix_select.cpp:91
+#: src/gui/num_karts.cpp:100 src/gui/num_laps.cpp:88
+#: src/gui/num_players.cpp:65 src/gui/options.cpp:80
+#: src/gui/player_controls.cpp:107
+msgid "Press <ESC> to go back"
+msgstr "Druk op <ESC> om terug te keren"
+
+#: src/gui/player_controls.cpp:152
+msgid "Press key"
+msgstr "Druk op een toets"
+
+#: src/gui/help_page_two.cpp:142
+msgid "Previous screen"
+msgstr "Vorig scherm"
+
+#: src/gui/game_mode.cpp:65
+msgid "Quick Race"
+msgstr "Instant wedstrijd"
+
+#: src/gui/main_menu.cpp:69
+msgid "Quit"
+msgstr "Einde"
+
+#: src/gui/race_gui.cpp:712
+msgid "REV"
+msgstr "R"
+
+#: src/gui/race_results_gui.cpp:173
+msgid "Race in this track again"
+msgstr "Doe dit parcours opnieuw"
+
+#: src/gui/race_results_gui.cpp:66
+msgid "Race results"
+msgstr "Wedstrijdresultaat"
+
+#: src/gui/difficulty.cpp:54
+msgid "Racer"
+msgstr "Coureur"
+
+#: src/gui/race_gui.cpp:893
+msgid "Ready!"
+msgstr "Op uw plaatsen?"
+
+#: src/gui/player_controls.cpp:63
+msgid "Rescue"
+msgstr "Herstellen"
+
+#: src/gui/race_menu.cpp:69
+msgid "Restart Race"
+msgstr "Herstart wedstrijd"
+
+#: src/gui/race_results_gui.cpp:57
+msgid "Result"
+msgstr "Resultaat"
+
+#: src/gui/race_menu.cpp:57
+msgid "Return To Race"
+msgstr "Terug naar de wedstrijd"
+
+#: src/gui/player_controls.cpp:61
+msgid "Right"
+msgstr "Rechts"
+
+#: src/gui/race_gui.cpp:898
+msgid "Set!"
+msgstr "Klaar?"
+
+#: src/gui/race_menu.cpp:75 src/gui/race_results_gui.cpp:179
+msgid "Setup New Race"
+msgstr "Nieuwe wedstrijd maken"
+
+#: src/gui/main_menu.cpp:54
+msgid "Single Player"
+msgstr "Enkele speler"
+
+#: src/gui/options.cpp:69
+msgid "Sound"
+msgstr "Geluid"
+
+#: src/gui/config_sound.cpp:49
+msgid "Sound Settings"
+msgstr "Geluid instellingen"
+
+#: src/gui/num_karts.cpp:90 src/gui/num_laps.cpp:81
+msgid "Start race"
+msgstr "Start wedstrijd"
+
+#: src/gui/grand_prix_ending.cpp:107 src/gui/leader_result.cpp:109
+#, c-format
+msgid "The winner is %s!"
+msgstr "De winnar is %s!"
+
+#: src/gui/num_players.cpp:46
+msgid "Three Players"
+msgstr "Drie spelers"
+
+#: src/gui/game_mode.cpp:70
+msgid "Time Trial"
+msgstr "Tegen de klok"
+
+#: src/gui/help_page_two.cpp:57
+msgid "To help you win, there are certain collectables you can grab:"
+msgstr "Om je te helpen, kun je deze dingen pakken:"
+
+#: src/gui/config_sound.cpp:55 src/gui/config_sound.cpp:105
+msgid "Turn off music"
+msgstr "Muziek uit"
+
+#: src/gui/config_sound.cpp:65 src/gui/config_sound.cpp:118
+msgid "Turn off sound effects"
+msgstr "Geluidseffecten uit"
+
+#: src/gui/config_sound.cpp:59 src/gui/config_sound.cpp:99
+msgid "Turn on music"
+msgstr "Muziek aan"
+
+#: src/gui/config_sound.cpp:69 src/gui/config_sound.cpp:113
+msgid "Turn on sound effects"
+msgstr "Geluidseffecten aan"
+
+#: src/gui/num_players.cpp:38
+msgid "Two Players"
+msgstr "Twee spelers"
+
+#: src/player_kart.cpp:252
+msgid "WRONG WAY!"
+msgstr "VERKEERDE RICHTING!"
+
+#: src/gui/player_controls.cpp:62
+msgid "Wheelie"
+msgstr "Wheelie"
+
+#: src/gui/config_display.cpp:115
+msgid "Window mode"
+msgstr "In venster"
+
+#: src/world.cpp:537
+msgid "You finished"
+msgstr "Je eindigde"
+
+#: src/world.cpp:615
+msgid ""
+"You have been\n"
+"eliminated!"
+msgstr ""
+"Je bent\n"
+"geëlimineerd!"
+
+#: src/world.cpp:536
+msgid "You won"
+msgstr "Je hebt de"
+
+#: src/gui/help_page_two.cpp:110
+msgid "Zipper - speed boost"
+msgstr "Pijltje – extra snelheid"
+
+#: src/user_config.cpp:835
+#, c-format
+msgid "joy %d axis %d  %c"
+msgstr "joystick %d as %d  %c"
+
+#: src/user_config.cpp:839
+#, c-format
+msgid "joy %d btn %d"
+msgstr "joystick %d knop %d"
+
+#: src/user_config.cpp:842
+#, c-format
+msgid "joy %d hat %d"
+msgstr "joystick %d hat %d"
+
+#: src/user_config.cpp:848
+#, c-format
+msgid "mouse axis %d %c"
+msgstr "muis as %d %c"
+
+#: src/user_config.cpp:845
+#, c-format
+msgid "mouse btn %d"
+msgstr "muisknop %d"
+
+#: src/user_config.cpp:829 src/user_config.cpp:874
+#, c-format
+msgid "not set"
+msgstr "geen waarde"
+
+#: src/world.cpp:539
+msgid "the race!"
+msgstr "wedstrijd gewonnen"
