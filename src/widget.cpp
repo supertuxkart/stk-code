@@ -316,6 +316,9 @@ bool Widget::createRect()
     typedef std::vector<float> float3;
     std::vector<float3> inner_vertex;
     std::vector<float3> outer_vertex;
+
+    //NUM_QUADS + 1, because we have to add the union between the sides, and
+    //multiplied by 2, because there are two sides
     inner_vertex.resize((NUM_QUADS + 1) * 2);
     outer_vertex.resize((NUM_QUADS + 1) * 2);
 
@@ -358,6 +361,10 @@ bool Widget::createRect()
                 //position for the circle is dependant on rect; if a corner
                 //wasn't given, then the y position is computed as if it was
                 //for a rectangle without rounder corners.
+                //
+                //The value in the position 0 of these vectors is X, the
+                //second the Y for the top part of the widget and the third
+                //the Y for the lower part of the widget.
                 inner_vertex[i].resize(3);
                 outer_vertex[i].resize(3);
                 outer_vertex[i][0] = m_radius - circle_x;
