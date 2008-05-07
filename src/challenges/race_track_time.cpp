@@ -18,14 +18,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <algorithm>
+#include "translation.hpp"
 #include "challenges/race_track_time.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", "Finish Race track in 1:15")
+RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", _("Finish Race track in 1:15"))
 {
-    setChallengeDescription("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes.");
-    setFeatureDescription("New track: Amazonian Journey\nnow available");
+    setChallengeDescription(_("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes."));
+    setFeatureDescription(_("New track: Amazonian Journey\nnow available"));
     setFeature("jungle");
 }   // RaceTrackTime
 

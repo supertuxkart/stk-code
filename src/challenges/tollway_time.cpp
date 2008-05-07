@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "translation.hpp"
 #include "challenges/tollway_time.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-TollwayTime::TollwayTime() : Challenge("tollwaytime", "Finish Tux Tollway track in 3:00")
+TollwayTime::TollwayTime() : Challenge("tollwaytime", _("Finish Tux Tollway track in 3:00"))
 {
-    setChallengeDescription("Finish 3 laps on the Tux Tollway track\nwith 3 AI karts\nin under 3:00 minutes.");
-    setFeatureDescription("New track: Canyon\nnow available");
+    setChallengeDescription(_("Finish 3 laps on the Tux Tollway track\nwith 3 AI karts\nin under 3:00 minutes."));
+    setFeatureDescription(_("New track: Canyon\nnow available"));
     setFeature("canyon");
 }   // TollwayTime
 

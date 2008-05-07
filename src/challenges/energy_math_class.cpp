@@ -18,14 +18,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <algorithm>
+#include "translation.hpp"
 #include "challenges/energy_math_class.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
 
-EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", "Collect Coins in Math Class")
+EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", _("Collect Coins in Math Class"))
 {
-    setChallengeDescription("Collect at least 6 coins\non three laps of\nOliver's Math Class\nin under 1 minute.");
-    setFeatureDescription("New game mode\n'Grand Prix'\nnow available");
+    setChallengeDescription(_("Collect at least 6 coins\non three laps of\nOliver's Math Class\nin under 1 minute."));
+    setFeatureDescription(_("New game mode\n'Grand Prix'\nnow available"));
     setFeature("grandprix");
 }   // EnergyMathClass
 

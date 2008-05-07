@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "translation.hpp"
 #include "challenges/island_follow.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-IslandFollow::IslandFollow() : Challenge("islandfollow", "Win Follow the Leader on a Desert Island")
+IslandFollow::IslandFollow() : Challenge("islandfollow", _("Win Follow the Leader on a Desert Island"))
 {
-    setChallengeDescription("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island.");
-    setFeatureDescription("New Grand Prix: At World's End\nnow available");
+    setChallengeDescription(_("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island."));
+    setFeatureDescription(_("New Grand Prix: At World's End\nnow available"));
     setFeature("At world's end");
     addDependency("moonandbackgp");
     addDependency("tollwaytime");

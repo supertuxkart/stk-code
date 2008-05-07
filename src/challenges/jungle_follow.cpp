@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "translation.hpp"
 #include "challenges/jungle_follow.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-JungleFollow::JungleFollow() : Challenge("junglefollow", "Win Follow the Leader in the Jungle")
+JungleFollow::JungleFollow() : Challenge("junglefollow", _("Win Follow the Leader in the Jungle"))
 {
-    setChallengeDescription("Win a Follow the Leader race\nwith 3 AI karts\nin the Amazonian Jungle.");
-    setFeatureDescription("New track: City\nnow available");
+    setChallengeDescription(_("Win a Follow the Leader race\nwith 3 AI karts\nin the Amazonian Jungle."));
+    setFeatureDescription(_("New track: City\nnow available"));
     setFeature("city");
     addDependency("penguinplaygroundgp");
     addDependency("racetracktime");

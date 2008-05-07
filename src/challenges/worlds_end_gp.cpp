@@ -17,14 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "translation.hpp"
 #include "worlds_end_gp.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
 
-WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp","Win the At World's End Grand Prix")
+WorldsEndGP::WorldsEndGP() : Challenge("worldsendgp",_("Win the At World's End Grand Prix"))
 {
-    setChallengeDescription("Come first in the At World's End\nGrand Prix with 3 'Racer' Level AI karts.");
-    setFeatureDescription("New Grand Prix: All Tracks GP\nand Bonus Preview: Skidding\nnow available.\nSelect 'skidding' as difficulty.");
+    setChallengeDescription(_("Come first in the At World's End\nGrand Prix with 3 'Racer' Level AI karts."));
+    setFeatureDescription(_("New Grand Prix: All Tracks GP\nand Bonus Preview: Skidding\nnow available.\nSelect 'skidding' as difficulty."));
     setFeature("All tracks");
     setFeature("skidding");          // Add Skidding Preview 
     addDependency("islandfollow");

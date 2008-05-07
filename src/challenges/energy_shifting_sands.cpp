@@ -17,14 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "translation.hpp"
 #include "challenges/energy_shifting_sands.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
 
-EnergyShiftingSands::EnergyShiftingSands() : Challenge("energyshiftingsands","Collect the Pharaohs Treasure")
+EnergyShiftingSands::EnergyShiftingSands() : Challenge("energyshiftingsands", _("Collect the Pharaohs Treasure"))
 {
-    setChallengeDescription("Collect at least 9 coins\non 3 laps of Shifting Sands\nin under 2:20 minutes.");
-    setFeatureDescription("New Grand Prix: To the Moon and Back\nnow available");
+    setChallengeDescription(_("Collect at least 9 coins\non 3 laps of Shifting Sands\nin under 2:20 minutes."));
+    setFeatureDescription(_("New Grand Prix: To the Moon and Back\nnow available"));
     setFeature("To the Moon and Back");
     // The energymathclass challenge must be done, otherwise GP can't be selected
     addDependency("energymathclass");

@@ -17,14 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "translation.hpp"
 #include "challenges/moon_and_back_gp.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
 
-MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp","Finish To the Moon and Back Grand Prix")
+MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp",_("Finish To the Moon and Back Grand Prix"))
 {
-    setChallengeDescription("Finish the To the Moon and Back\nGrand Prix with 3 'Racer' Level AI karts\nin the top 3.");
-    setFeatureDescription("New Grand Prix: Snag Drive\nnow available");
+    setChallengeDescription(_("Finish the To the Moon and Back\nGrand Prix with 3 'Racer' Level AI karts\nin the top 3."));
+    setFeatureDescription(_("New Grand Prix: Snag Drive\nnow available"));
     setFeature("Snag Drive");  //gp3
     // The energyshiftingsands challenge must be done, otherwise gp2 can't be selected
     // Thejunglefollow challenge must be done, to get city for gp3

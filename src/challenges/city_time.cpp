@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "translation.hpp"
 #include "challenges/city_time.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 
-CityTime::CityTime() : Challenge("citytime", "Finish the City track in 5:00")
+CityTime::CityTime() : Challenge("citytime", _("Finish the City track in 5:00"))
 {
-    setChallengeDescription("Finish 3 laps on the City track\nwith 3 AI karts\nin under 5:00 minutes.");
-    setFeatureDescription("New track: SnowTux Peak\nnow available");
+    setChallengeDescription(_("Finish 3 laps on the City track\nwith 3 AI karts\nin under 5:00 minutes."));
+    setFeatureDescription(_("New track: SnowTux Peak\nnow available"));
     setFeature("snowtuxpeak");
     addDependency("junglefollow");
 }   // CityTime

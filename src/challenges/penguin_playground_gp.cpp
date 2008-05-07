@@ -17,14 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "translation.hpp"
 #include "challenges/penguin_playground_gp.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"
 
-PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp","Finish Penguin Playground Grand Prix")
+PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp", _("Finish Penguin Playground Grand Prix"))
 {
-    setChallengeDescription("Finish the Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts\nin the top 3.");
-    setFeatureDescription("New game mode\n'Follow Leader'\nnow available");
+    setChallengeDescription(_("Finish the Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts\nin the top 3."));
+    setFeatureDescription(_("New game mode\n'Follow Leader'\nnow available"));
     setFeature("followleader");
     // The energymathclass challenge must be done, otherwise GP can't be selected
     addDependency("energymathclass");

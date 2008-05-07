@@ -18,15 +18,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <algorithm>
+#include "translation.hpp"
 #include "challenges/win_gotm_cup.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
 #include "cup_data.hpp"
 
-WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", "Win GOTM Cup")
+WinGOTMCup::WinGOTMCup() : Challenge("wingotmcup", _("Win GOTM Cup"))
 {
-    setChallengeDescription("Win the GOTM Cup\non level 'racer'\nwith at least\nthree computer opponents.");
-    setFeatureDescription("New track\n'Amazonian Journey'\navailable");
+    setChallengeDescription(_("Win the GOTM Cup\non level 'racer'\nwith at least\nthree computer opponents."));
+    setFeatureDescription(_("New track\n'Amazonian Journey'\navailable"));
     // The energymathclass challenge must be done, otherwise GP can't be selected
     addDependency("energymathclass");
     setFeature("jungle");
