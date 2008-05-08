@@ -98,6 +98,7 @@ case "${host}" in
   if test x$have_pkg_config != xno; then
     LDFLAGS="$LDFLAGS `pkg-config --libs freealut`"
   fi
+  LDFLAGS="$LDFLAGS -lintl"
 esac
 
 
