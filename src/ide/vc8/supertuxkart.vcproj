@@ -1114,6 +1114,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\tollway_head2head.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\tollway_time.cpp"
 					>
 				</File>
@@ -1613,6 +1617,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\race_track_time.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\tollway_head2head.hpp"
 					>
 				</File>
 				<File
