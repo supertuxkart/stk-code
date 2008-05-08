@@ -75,7 +75,12 @@ void GameManager::run()
         {
             m_curr_time = SDL_GetTicks();
             dt =(float)(m_curr_time - m_prev_time);
-
+            
+            // don't allow the game to run slower than a certain amount.
+            // when the computer can't keep it up, slow down the shown time instead
+            static const float max_elapsed_time = 3.0f*1.0f/60.0f*1000.0f; /* time 3 internal substeps take */
+            if(dt > max_elapsed_time) dt=max_elapsed_time;
+                                               
             //This avoid wasting CPU cycles
             //1000 miliseconds / 125 frames = 125 miliseconds per frame
             if( dt < 8.0f)
