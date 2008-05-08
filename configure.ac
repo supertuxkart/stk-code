@@ -20,7 +20,7 @@ dnl If these were not set, the AC_PROG_CC and AC_PROG_CXX
 dnl scripts set them to "-g -O2".
 dnl =====================================================
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
-CXXFLAGS="$CXXFLAGS -Wall"
+CXXFLAGS="$CXXFLAGS -Wall -DHAS_GETTEXT"
 
 dnl ===================
 dnl Check for compilers

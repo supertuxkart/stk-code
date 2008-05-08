@@ -26,8 +26,8 @@ Font* font_race;
 
 int init_fonts()
 {
-    font_gui = new Font("AvantGarde-Demi.txf");
-    font_race = new Font("DomesticManners.txf");
+    font_gui = new Font("DomesticMannersLatin1.txf");
+    font_race = new Font("DomesticMannersLatin1.txf");
     return ( font_gui && font_race );
 }   // init_fonts
 
