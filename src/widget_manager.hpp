@@ -342,7 +342,7 @@ public:
     //TODO: add initial border colors, if I don't erase those functions.
 
     void setWgtTexture(const int TOKEN, const int TEXTURE);
-    void setWgtTexture(const int TOKEN, const char* FILENAME);
+    void setWgtTexture(const int TOKEN, const char* FILENAME, const bool is_full_path=true);
     void showWgtTexture(const int TOKEN);
     void hideWgtTexture(const int TOKEN);
 

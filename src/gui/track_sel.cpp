@@ -62,7 +62,7 @@ TrackSel::TrackSel()
             widget_manager->deactivateWgt(WTOK_TRACK0 + i);
 
             widget_manager->setWgtColor( WTOK_TRACK0 + i, WGT_WHITE);
-            widget_manager->setWgtTexture( WTOK_TRACK0 + i, "gui_lock.rgb" );
+            widget_manager->setWgtTexture( WTOK_TRACK0 + i, "gui_lock.rgb", false );
             widget_manager->showWgtTexture( WTOK_TRACK0 + i );
         }
         if( i%2 != 0 ) widget_manager->breakLine();

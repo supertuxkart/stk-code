@@ -250,9 +250,9 @@ void Widget::setFont( const WidgetFont FONT )
 }
 
 //-----------------------------------------------------------------------------
-void Widget::setTexture( const char* FILENAME )
+void Widget::setTexture( const char* FILENAME, bool is_full_path )
 {
-    Material *m = material_manager->getMaterial( FILENAME, true );
+    Material *m = material_manager->getMaterial( FILENAME, is_full_path );
     m_texture = m->getState()->getTextureHandle();
 }
 

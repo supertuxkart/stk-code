@@ -205,7 +205,7 @@ class Widget
     void darkenColor();
 
     void setFont( const WidgetFont FONT );
-    void setTexture( const char* FILENAME );
+    void setTexture( const char* FILENAME, const bool is_full_path=true );
 
     /* Functions created simply to organize the code */
     bool createRect();

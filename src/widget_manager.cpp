@@ -1201,10 +1201,11 @@ void WidgetManager::setWgtTexture(const int TOKEN, const int TEXTURE)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::setWgtTexture(const int TOKEN, const char* FILENAME)
+void WidgetManager::setWgtTexture(const int TOKEN, const char* FILENAME, 
+                                  const bool is_full_path)
 {
     const int ID = findId(TOKEN);
-    if( ID != WGT_NONE ) m_widgets[ID].widget->setTexture( FILENAME );
+    if( ID != WGT_NONE ) m_widgets[ID].widget->setTexture( FILENAME, is_full_path );
     else
     {
         std::cerr << "WARNING: tried to set the texture of an unnamed " <<
