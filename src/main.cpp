@@ -109,7 +109,7 @@ void cmdLineHelp (char* invocation)
     "  -h,  --help             Show this help\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.berlios.de\n\n", invocation
+    "http://supertuxkart.sourceforge.net\n\n", invocation
     );
 }   // cmdLineHelp
 
@@ -177,8 +177,17 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
         {
-            race_manager->setTrack(argv[i+1]);
-            fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+            if (!unlock_manager->isLocked(argv[i+1]))
+            {
+                race_manager->setTrack(argv[i+1]);
+                fprintf ( stdout, "You choose to start in track: %s.\n", argv[i+1] ) ;
+            }
+            else 
+            {
+                fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
+                fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
+                return 0;
+            }    
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
@@ -203,9 +212,15 @@ int handleCmdLine(int argc, char **argv)
 
             fprintf ( stdout, "  Available tracks:\n" );
             for (size_t i = 0; i != track_manager->getTrackCount(); i++)
-                fprintf ( stdout, "\t%10s: %s\n",
-                          track_manager->getTrack(i)->getIdent().c_str(),
-                          track_manager->getTrack(i)->getName());
+            {
+                const Track *track = track_manager->getTrack(i);
+                if (!unlock_manager->isLocked(track->getIdent()))
+                {
+                    fprintf ( stdout, "\t%10s: %s\n",
+                              track->getIdent().c_str(),
+                              track->getName());
+                }
+            }    
 
             fprintf ( stdout, "Use --track N to choose track.\n\n");
             delete track_manager;
