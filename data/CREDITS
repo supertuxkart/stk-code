@@ -14,9 +14,6 @@ Eduardo Hernandez Munoz (Coz)
 Programming
 -----------
 
-Charlie Head
-- Bugfix: widget manager's selection memory leak
-
 Canarix
 - User interface
 
@@ -24,6 +21,9 @@ Damien
 - Ogg vorbis support
 
 Maik Semder (Ikework)
+- Bug fixes
+
+Marianne Gagnon (Auria)
 - Bug fixes
 
 Patrick Ammann
@@ -50,9 +50,10 @@ Canarix
 
 Marianne Gagnon (Auria)
 - 'SnowTux peak' track
-- 'Shifting sands', 'Around the Lighthouse and 'On the beach' track improvements
+- 'Shifting sands', 'Around the Lighthouse' and 'On the beach' track improvements
 - Wilber kart
-- 'Amazing journ:ey' track
+- 'Amazonian Journey' track
+- 'Fort Magma' track
 
 Frederico de Oliveira Linhares
 - Hexley the platypus kart

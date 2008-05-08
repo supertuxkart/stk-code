@@ -1,3 +1,18 @@
+SuperTuxKart 0.4.1 (May 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Five new tracks: Fort Magma, SnowTux Peak, Amazonian Journey, City and Canyon
+* Complete Challenges to unlock game modes, new tracks and a skidding preview
+* New Follow the Leader game mode
+* New Grand Prix
+* Improved User Interface
+* Improved game pad/joystick handling
+* German, French and Dutch translations
+* Additional music
+* Many Bugfixes including:
+	a memory leak fix (Charlie Head)
+	an AI crash fix (Chris Morris)
+
+
 SuperTuxKart 0.4 (February 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * New physics handling using the bullet physics engine
