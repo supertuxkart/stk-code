@@ -44,38 +44,30 @@ private:
     typedef std::vector<SFX*> SFXsType;
 
     SFXsType                m_sfxs;
-    Music                  *m_normal_music,
-                           *m_fast_music;
-    MusicInformation const *m_music_information;
+    MusicInformation       *m_current_music;
        
     bool                    m_initialized; //If the sound could not be initialized, e.g.
                                            //if the player doesn't has a sound card, we want
                                            //to avoid anything sound related so we crash the game.
-    std::map<std::string,   const MusicInformation*> 
+    std::map<std::string,   MusicInformation*> 
                             m_allMusic;
     void                    loadMusicInformation();
-    enum {SOUND_NORMAL,                    // normal music is played
-          SOUND_FADING,                    // normal music fading out, faster music fading in
-          SOUND_FASTER,                    // change pitch of normal music (i.e. no faster avail)
-          SOUND_FAST}                      // playing faster music or max pitch reached
-                            m_mode; 
-    float                   m_time_since_faster;
 
 public:
     SoundManager();
     virtual ~SoundManager();
 
-    void                    update(float dt);
     void                    playSfx(unsigned int id);
-    void                    playMusic(const MusicInformation* mi);
+    void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
-    void                    pauseMusic();
-    void                    resumeMusic();
-    void                    switchToFastMusic();
-    const MusicInformation* getCurrentMusic() {return m_music_information; }    
-    const MusicInformation* getMusicInformation(const std::string& filename);
+    void                    update(float dt)    {m_current_music->update(dt);          }
+    void                    pauseMusic()        {m_current_music->pauseMusic();        }
+    void                    resumeMusic()       {m_current_music->resumeMusic();       }
+    void                    switchToFastMusic() {m_current_music->switchToFastMusic(); }
+    MusicInformation       *getCurrentMusic() {return m_current_music; }    
+    MusicInformation       *getMusicInformation(const std::string& filename);
     void                    loadMusicFromOneDir(const std::string& dir);
-    void                    addMusicToTracks() const;
+    void                    addMusicToTracks();
 
 };
 

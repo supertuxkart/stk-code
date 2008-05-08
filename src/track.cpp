@@ -848,13 +848,13 @@ void Track::loadTrack(std::string filename_)
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
-void Track::getMusicInformation(std::vector<std::string>&             filenames, 
-                                std::vector<MusicInformation const *>& music    )
+void Track::getMusicInformation(std::vector<std::string>&       filenames, 
+                                std::vector<MusicInformation*>& music    )
 {
     for(int i=0; i<(int)filenames.size(); i++)
     {
         std::string full_path = file_manager->getTrackFile(filenames[i], getIdent());
-        const MusicInformation* mi;
+        MusicInformation* mi;
         try
         {
             mi = sound_manager->getMusicInformation(full_path);
@@ -874,9 +874,9 @@ void Track::getMusicInformation(std::vector<std::string>&             filenames,
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------
-void Track::playMusic() const {
-    sound_manager->playMusic(m_music[rand()% m_music.size()]);
-}   // getMusic
+void Track::startMusic() const {
+    sound_manager->startMusic(m_music[rand()% m_music.size()]);
+}   // startMusic
 
 //-----------------------------------------------------------------------------
 void

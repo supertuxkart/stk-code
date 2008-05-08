@@ -61,15 +61,16 @@ World::World()
 #endif
 {
     delete world;
-    world                = this;
-    m_phase              = SETUP_PHASE;
-    m_track              = NULL;
-    m_clock              = 0.0f;
-    m_fastest_lap        = 9999999.9f;
-    m_fastest_kart       = 0;
-    m_eliminated_karts   = 0;
-    m_eliminated_players = 0;
-    m_leader_intervals   = stk_config->m_leader_intervals;
+    world                 = this;
+    m_phase               = SETUP_PHASE;
+    m_track               = NULL;
+    m_clock               = 0.0f;
+    m_faster_music_active = false;
+    m_fastest_lap         = 9999999.9f;
+    m_fastest_kart        = 0;
+    m_eliminated_karts    = 0;
+    m_eliminated_players  = 0;
+    m_leader_intervals    = stk_config->m_leader_intervals;
 
     // Grab the track file
     try
@@ -153,7 +154,7 @@ World::World()
     callback_manager->initAll();
     menu_manager->switchToRace();
 
-    m_track->playMusic();
+    m_track->startMusic();
 
     m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
 
@@ -668,6 +669,18 @@ void World::updateRacePosition ( int k )
     }
 
     m_kart[k]->setPosition(p);
+    // Switch on faster music (except in follow leader mode) if not already 
+    // done so, and the first kart is doing its last lap, and the estimated
+    // remaining time is less than 30 seconds.
+    if(!m_faster_music_active                                      && 
+        m_kart[k]->getLap()==race_manager->getNumLaps()-1          && 
+        p==1                                                       &&
+        race_manager->getRaceMode()!=RaceManager::RM_FOLLOW_LEADER &&
+        m_kart[k]->estimateFinishTime()-getTime()<30.0f               ) 
+    {
+        sound_manager->switchToFastMusic();
+        m_faster_music_active=true;
+    }
 }   // updateRacePosition
 
 //-----------------------------------------------------------------------------
@@ -712,17 +725,20 @@ void World::loadTrack()
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
-    m_clock              = 0.0f;
-    m_phase              = SETUP_PHASE;
-    m_eliminated_karts   = 0;
-    m_eliminated_players = 0;
-    m_leader_intervals   = stk_config->m_leader_intervals;
+    m_clock               = 0.0f;
+    m_phase               = SETUP_PHASE;
+    m_faster_music_active = false;
+    m_eliminated_karts    = 0;
+    m_eliminated_players  = 0;
+    m_leader_intervals    = stk_config->m_leader_intervals;
 
     for ( Karts::iterator i = m_kart.begin(); i != m_kart.end() ; ++i )
     {
         (*i)->reset();
     }
     resetAllKarts();
+    sound_manager->stopMusic();     // Start music from beginning
+    m_track->startMusic();
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
@@ -776,7 +792,6 @@ void  World::pause()
 //-----------------------------------------------------------------------------
 void  World::unpause()
 {
-    sound_manager -> resumeMusic() ;
     m_phase = RACE_PHASE;
 }
 

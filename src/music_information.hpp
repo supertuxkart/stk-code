@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include "music.hpp"
 
 class MusicInformation
 {
@@ -36,6 +37,15 @@ private:
                                                // music in, or time to change pitch
     float                    m_max_pitch;      // maximum pitch for faster music
     static const int         LOOP_FOREVER=-1;
+    Music                   *m_normal_music,
+                            *m_fast_music;
+    enum {SOUND_NORMAL,                        // normal music is played
+          SOUND_FADING,                        // normal music fading out, faster fading in
+          SOUND_FASTER,                        // change pitch of normal music
+          SOUND_FAST}                          // playing faster music or max pitch reached
+                             m_mode; 
+    float                    m_time_since_faster;
+
 public:
                        MusicInformation (const std::string& filename);
     const std::string& getComposer      () const {return m_composer;        }
@@ -45,6 +55,12 @@ public:
     int                getNumLoops      () const {return m_numLoops;        }
     float              getFasterTime    () const {return m_faster_time;     }
     float              getMaxPitch      () const {return m_max_pitch;       }
-    void               addMusicToTracks () const;
+    void               addMusicToTracks ();
+    void               update           (float dt);
+    void               startMusic       ();
+    void               stopMusic        ();
+    void               pauseMusic       ();
+    void               resumeMusic      ();
+    void               switchToFastMusic();
 };   // MusicInformation
 #endif

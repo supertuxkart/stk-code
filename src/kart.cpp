@@ -376,12 +376,6 @@ void Kart::doLapCounting ()
             setTimeAtLap(world->getTime());
             m_race_lap++ ;
         }
-        // Sound manager makes sure that only the first call switches the music
-        if(m_race_lap==race_manager->getNumLaps()-1 && 
-           race_manager->getRaceMode()!=RaceManager::RM_FOLLOW_LEADER)   // last lap started
-        {
-            sound_manager->switchToFastMusic();
-        }
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
         if(m_lap_start_time>=0.0)

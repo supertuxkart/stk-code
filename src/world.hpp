@@ -122,6 +122,7 @@ private:
     int         m_eliminated_players;  // number of eliminated players
     std::vector<float>
                 m_leader_intervals;    // time till elimination in follow leader
+    bool        m_faster_music_active; // true if faster music was activated
     void  updateRacePosition( int k );
     void  loadTrack();
     void  updateRaceStatus(float dt);

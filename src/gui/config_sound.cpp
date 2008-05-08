@@ -88,7 +88,7 @@ void ConfigSound::select()
         {
             user_config->setMusic(UserConfig::UC_ENABLE);
             widget_manager->setWgtText(WTOK_MUSIC, _("Turn off music"));
-            sound_manager->playMusic(sound_manager->getCurrentMusic());
+            sound_manager->startMusic(sound_manager->getCurrentMusic());
         }
         break;
     case WTOK_SFX:

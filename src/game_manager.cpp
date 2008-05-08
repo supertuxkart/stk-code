@@ -91,11 +91,12 @@ void GameManager::run()
         }
         dt *= 0.001f;
 
-		if (!music_on && !race_manager->raceIsActive())
-		{
-        	sound_manager->playMusic(stk_config->m_title_music);
+        if (!music_on && !race_manager->raceIsActive())
+        {
+            sound_manager->stopMusic();   // stop potential 'left over' music from race
+        	sound_manager->startMusic(stk_config->m_title_music);
 		    music_on = true;
-		}
+        }
 
         if (race_manager->raceIsActive())
         {

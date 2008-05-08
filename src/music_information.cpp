@@ -27,6 +27,8 @@
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "translation.hpp"
+#include "user_config.hpp"
+#include "music_ogg.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -39,6 +41,8 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_numLoops        = LOOP_FOREVER;
     m_normal_filename = "";
     m_fast_filename   = "";
+    m_normal_music    = NULL;
+    m_fast_music      = NULL;
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
 
@@ -96,7 +100,7 @@ MusicInformation::MusicInformation(const std::string& filename)
 }   // MusicInformation
 
 //-----------------------------------------------------------------------------
-void MusicInformation::addMusicToTracks() const
+void MusicInformation::addMusicToTracks()
 {
     for(int i=0; i<(int)m_all_tracks.size(); i++)
     {
@@ -104,5 +108,148 @@ void MusicInformation::addMusicToTracks() const
         if(track) track->addMusic(this);
     }
 }   // addMusicToTracks
+
+//-----------------------------------------------------------------------------
+void MusicInformation::startMusic()
+{
+    m_time_since_faster  = 0.0f;
+    m_mode               = SOUND_NORMAL;
+
+    if (m_normal_filename== "") return;
+
+    // First load the 'normal' music
+    // -----------------------------
+    if(StringUtils::extension(m_normal_filename)!="ogg")
+    {
+        fprintf(stderr, "WARNING: music file %s format not recognized.\n", 
+                m_normal_filename.c_str());
+        return;
+    }
+    m_normal_music = new MusicOggStream();
+
+    if((m_normal_music->load(m_normal_filename)) == false)
+    {
+        delete m_normal_music;
+        m_normal_music=0;
+	    fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
+                m_normal_filename.c_str());
+        return;
+    }
+    m_normal_music->playMusic();
+
+    // Then (if available) load the music for the last track
+    // -----------------------------------------------------
+    if(m_fast_filename=="") 
+    {
+        m_fast_music = NULL;
+        return;   // no fast music
+    }
+
+    if(StringUtils::extension(m_fast_filename)!="ogg")
+    {
+        fprintf(stderr, 
+                "WARNING: music file %s format not recognized, fast music is ignored\n", 
+                m_fast_filename.c_str());
+        return;
+    }
+    m_fast_music= new MusicOggStream();
+
+    if((m_fast_music->load(m_fast_filename)) == false)
+    {
+        delete m_fast_music;
+        m_fast_music=0;
+	    fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
+                m_fast_filename.c_str());
+        return;
+    }
+}   // startMusic
+
+//-----------------------------------------------------------------------------
+void MusicInformation::update(float dt)
+{
+    switch(m_mode)
+    {
+    case SOUND_FADING: {
+        m_time_since_faster +=dt;
+        if(m_time_since_faster>=m_faster_time)
+        {
+            m_mode=SOUND_FAST;
+            m_normal_music->stopMusic();
+            m_fast_music->update();
+            return;
+        }
+        float fraction=m_time_since_faster/m_faster_time;
+        m_normal_music->updateFading(1-fraction);
+        m_fast_music->updateFading(fraction);
+        break;
+                       }
+    case SOUND_FASTER: {
+        m_time_since_faster +=dt;
+        if(m_time_since_faster>=m_faster_time)
+        {
+            // Once the pitch is adjusted, just switch back to normal 
+            // mode. We can't switch to fast music mode, since this would
+            // play m_fast_music, which isn't available.
+            m_mode=SOUND_NORMAL;
+            return;
+        }
+        float fraction=m_time_since_faster/m_faster_time;
+        m_normal_music->updateFaster(fraction, m_max_pitch);
+
+        break;
+                       }
+    case SOUND_NORMAL:
+        m_normal_music->update();
+        break;
+    case SOUND_FAST:
+        m_fast_music->update();
+        break;
+    }   // switch
+
+}   // update
+
+//-----------------------------------------------------------------------------
+void MusicInformation::stopMusic()
+{
+    if (m_normal_music != NULL)  
+    {
+        m_normal_music->stopMusic();
+        m_normal_music = NULL;
+    }
+    if (m_fast_music   != NULL)
+    {
+        m_fast_music->stopMusic();
+        m_fast_music=NULL;
+    }
+}   // stopMusic
+
+//-----------------------------------------------------------------------------
+void MusicInformation::pauseMusic()
+{
+    if (m_normal_music != NULL) m_normal_music->pauseMusic();
+    if (m_fast_music   != NULL) m_fast_music->pauseMusic();
+}   // pauseMusic
+//-----------------------------------------------------------------------------
+void MusicInformation::resumeMusic()
+{
+    if (m_normal_music != NULL) m_normal_music->resumeMusic();
+    if (m_fast_music   != NULL) m_fast_music->resumeMusic();
+}   // resumeMusic
+
+//-----------------------------------------------------------------------------
+void MusicInformation::switchToFastMusic()
+{    
+    m_time_since_faster = 0.0f;
+    if(m_fast_music)
+    {
+        m_mode = SOUND_FADING;
+        m_fast_music->playMusic();
+    }
+    else
+    {
+        // FIXME: for now this music is too annoying, 
+        m_mode = SOUND_FASTER;
+    }
+}   // switchToFastMusic
 
 //-----------------------------------------------------------------------------
