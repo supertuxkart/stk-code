@@ -19,7 +19,6 @@
 
 #include "unlock_manager.hpp"
 
-//#include "challenges/all_tracks.hpp"
 #include "challenges/energy_math_class.hpp"
 #include "challenges/penguin_playground_gp.hpp"
 #include "challenges/race_track_time.hpp"
@@ -45,7 +44,6 @@ UnlockManager::UnlockManager()
 
     // Add all challenges:
     Challenge *c;
-    //c=new AllTracks();     m_all_challenges[c->getId()]=c;
     c=new EnergyMathClass(); m_all_challenges[c->getId()]=c;
     c=new PenguinPlaygroundGP(); m_all_challenges[c->getId()]=c;
     c=new RaceTrackTime();   m_all_challenges[c->getId()]=c;

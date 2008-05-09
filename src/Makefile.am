@@ -93,7 +93,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	traffic.cpp 			  	        	\
 	player.hpp		   				\
 	challenges/challenge.hpp   challenges/challenge.cpp	\
-	challenges/all_tracks.cpp  challenges/all_tracks.hpp	\
 	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\
 	challenges/penguin_playground_gp.cpp challenges/penguin_playground_gp.hpp \
 	challenges/race_track_time.cpp challenges/race_track_time.hpp\
