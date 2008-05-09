@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-08 14:44-0400\n"
-"PO-Revision-Date: 2008-05-08 15:10-0500\n"
+"POT-Creation-Date: 2008-05-09 14:30-0400\n"
+"PO-Revision-Date: 2008-05-09 14:50-0500\n"
 "Last-Translator: Marianne Gagnon <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -24,14 +24,6 @@ msgid ""
 msgstr ""
 "'%s' a\n"
 "été éliminé."
-
-#: src/gui/race_options.cpp:104
-msgid "3"
-msgstr ""
-
-#: src/gui/race_options.cpp:86
-msgid "4"
-msgstr ""
 
 #: src/gui/player_controls.cpp:64
 msgid "Accelerate"
@@ -82,7 +74,7 @@ msgstr "Défis"
 
 #: src/gui/help_page_one.cpp:117
 msgid "Check the current key bindings for the first player"
-msgstr "Vérifie les touches du premier joueur."
+msgstr "Touches du premier joueur"
 
 #: src/gui/grand_prix_select.cpp:50
 msgid "Choose a Grand Prix"
@@ -417,13 +409,6 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/challenges/win_gotm_cup.cpp:30
-msgid ""
-"New track\n"
-"'Amazonian Journey'\n"
-"available"
-msgstr ""
-
 #: src/challenges/race_track_time.cpp:29
 msgid ""
 "New track: Amazonian Journey\n"
@@ -501,14 +486,14 @@ msgstr "Pause"
 msgid "Penalty time!!"
 msgstr "Temps de pénalité!!"
 
-#: src/gui/player_controls.cpp:246
+#: src/gui/player_controls.cpp:251
 msgid "Player "
 msgstr "Joueur"
 
 #: src/gui/char_sel.cpp:68
 #, c-format
 msgid "Player %d, choose a driver"
-msgstr "Jouer %d, choisis un personnage"
+msgstr "Personnage du joueur %d"
 
 #: src/gui/config_controls.cpp:45
 msgid "Player 1"
@@ -528,7 +513,7 @@ msgstr "Joueur 4"
 
 #: src/gui/options.cpp:41
 msgid "Player Config"
-msgstr "Configuration du joueur"
+msgstr "Joueurs/Touches"
 
 #: src/gui/player_controls.cpp:80
 msgid "Player name"
@@ -545,12 +530,12 @@ msgstr "Appuie sur <ESC> pour annuler"
 #: src/gui/grand_prix_select.cpp:87
 #: src/gui/num_players.cpp:45
 #: src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:107
+#: src/gui/player_controls.cpp:112
 #: src/gui/race_options.cpp:121
 msgid "Press <ESC> to go back"
 msgstr "Appuie sur <ESC> pour revenir"
 
-#: src/gui/player_controls.cpp:151
+#: src/gui/player_controls.cpp:156
 msgid "Press key"
 msgstr "Appuie sur une touche"
 
@@ -567,7 +552,6 @@ msgid "Quit"
 msgstr "Quitter"
 
 #: src/gui/race_gui.cpp:714
-#, fuzzy
 msgid "REV"
 msgstr "REV"
 
@@ -611,13 +595,12 @@ msgstr "Droite"
 
 #: src/gui/race_gui.cpp:907
 msgid "Set!"
-msgstr "Prêt"
+msgstr "Prêts"
 
 #: src/gui/race_menu.cpp:57
 #: src/gui/race_results_gui.cpp:153
-#, fuzzy
 msgid "Setup New Race"
-msgstr "Préparer une nouvelle course"
+msgstr "Nouvelle course"
 
 #: src/gui/main_menu.cpp:46
 msgid "Single Player"
@@ -690,10 +673,6 @@ msgstr "MAUVAISE DIRECTION!"
 msgid "Wheelie"
 msgstr "Wheelie"
 
-#: src/challenges/win_gotm_cup.cpp:27
-msgid "Win GOTM Cup"
-msgstr ""
-
 #: src/challenges/penguin_playground_gp.cpp:25
 msgid ""
 "Win Penguin Playground Grand\n"
@@ -745,14 +724,6 @@ msgid ""
 "Grand Prix"
 msgstr ""
 
-#: src/challenges/win_gotm_cup.cpp:29
-msgid ""
-"Win the GOTM Cup\n"
-"on level 'racer'\n"
-"with at least\n"
-"three computer opponents."
-msgstr ""
-
 #: src/challenges/moon_and_back_gp.cpp:27
 msgid ""
 "Win the To the Moon and Back\n"
@@ -781,7 +752,6 @@ msgid "You won"
 msgstr "Tu as gagné"
 
 #: src/gui/help_page_two.cpp:90
-#, fuzzy
 msgid "Zipper - speed boost"
 msgstr "Zipper - augmente la vitesse"
 
@@ -812,12 +782,11 @@ msgstr "souris, btn %d"
 
 #: src/user_config.cpp:830
 #: src/user_config.cpp:875
-#, fuzzy, c-format
+#, c-format
 msgid "not set"
 msgstr "(non défini)"
 
 #: src/world.cpp:540
-#, fuzzy
 msgid "the race!"
 msgstr "la course!"
 
