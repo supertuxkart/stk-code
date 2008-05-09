@@ -60,7 +60,8 @@ public:
     void                    playSfx(unsigned int id);
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
-    void                    update(float dt)    {m_current_music->update(dt);          }
+    void                    update(float dt)    {if(m_current_music)
+                                                     m_current_music->update(dt);      }
     void                    pauseMusic()        {m_current_music->pauseMusic();        }
     void                    resumeMusic()       {m_current_music->resumeMusic();       }
     void                    switchToFastMusic() {m_current_music->switchToFastMusic(); }
