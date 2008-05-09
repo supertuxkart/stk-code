@@ -80,7 +80,8 @@ Widget::Widget
     m_round_corners(WGT_AREA_ALL),
     m_border_list(0),
     m_scroll_pos_x(0), m_scroll_pos_y(0),
-    m_text_scale(1.0f)
+    m_text_scale(1.0f),
+    m_enable_border(false)
 {
 }
 
