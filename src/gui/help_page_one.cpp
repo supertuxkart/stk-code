@@ -123,7 +123,7 @@ get stuck or fall too far, use the rescue button to get back on track."));
     for(int i = WTOK_FIRST_KEYNAME; i <= WTOK_LAST_KEYNAME; ++i)
     {
         widget_manager->addTextWgt( i, 20, 4,
-            sKartAction2String[i - WTOK_FIRST_KEYNAME] );
+            _(sKartAction2String[i - WTOK_FIRST_KEYNAME]) );
         widget_manager->setWgtRoundCorners( i, WGT_AREA_LFT );
     }
     widget_manager->breakLine();

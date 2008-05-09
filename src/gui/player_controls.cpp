@@ -86,7 +86,12 @@ PlayerControls::PlayerControls(int whichPlayer):
     widget_manager->insertColumn();
     for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
-        widget_manager->addTextWgt( WTOK_KEY0 + i, 30, 7, sKartAction2String[i] );
+        // Note: even though that all strings in sKartAction2Strings above
+        // are in _(), they are not translated (since gettext is actually 
+        // called at startup (just after loading) of the program, when
+        // gettext is not yet initialised - so it returns the untranslated
+        // strings). So we add an additional _() here (and in help_page_one).
+        widget_manager->addTextWgt( WTOK_KEY0 + i, 30, 7, _(sKartAction2String[i]) );
     }
     widget_manager->breakLine();
 
