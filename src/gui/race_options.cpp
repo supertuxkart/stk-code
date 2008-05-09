@@ -83,7 +83,7 @@ RaceOptions::RaceOptions() :
         widget_manager->addTextWgt( WTOK_KARTS_TITLE, 30, 7, _("Number of karts") );
         widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 12, 12, _("More") );
 
-        widget_manager->addTextWgt( WTOK_KARTS, 12, 7, _("4") );
+        widget_manager->addTextWgt( WTOK_KARTS, 12, 7, "4" );
         widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
         widget_manager->showWgtBorder( WTOK_KARTS );
         widget_manager->hideWgtRect( WTOK_KARTS );
@@ -101,7 +101,7 @@ RaceOptions::RaceOptions() :
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, 30, 7, _("Number of laps") );
         widget_manager->addTextButtonWgt( WTOK_LAPS_UP, 12, 12, _("More") );
 
-        widget_manager->addTextWgt( WTOK_LAPS, 12, 7, _("3") );
+        widget_manager->addTextWgt( WTOK_LAPS, 12, 7, "3" );
         widget_manager->setWgtBorderPercentage( WTOK_LAPS, 10 );
         widget_manager->showWgtBorder( WTOK_LAPS );
         widget_manager->hideWgtRect( WTOK_LAPS );
