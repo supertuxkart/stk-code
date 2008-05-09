@@ -792,6 +792,7 @@ void  World::pause()
 //-----------------------------------------------------------------------------
 void  World::unpause()
 {
+    sound_manager -> resumeMusic() ;
     m_phase = RACE_PHASE;
 }
 
