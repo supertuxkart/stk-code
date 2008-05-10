@@ -60,7 +60,6 @@ bool MusicOggStream::load(const std::string& filename)
         return false;
     }
 
-    //m_fileName =  file_manager->getMusicFile(filename);
     m_fileName = filename;
     if(m_fileName=="") return false;
     

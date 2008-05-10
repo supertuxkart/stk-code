@@ -170,6 +170,8 @@ void MusicInformation::update(float dt)
     switch(m_mode)
     {
     case SOUND_FADING: {
+        if ( m_normal_music == NULL || m_fast_music == NULL ) break;
+
         m_time_since_faster +=dt;
         if(m_time_since_faster>=m_faster_time)
         {
@@ -184,10 +186,12 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_FASTER: {
+        if ( m_normal_music == NULL ) break;
+
         m_time_since_faster +=dt;
         if(m_time_since_faster>=m_faster_time)
         {
-            // Once the pitch is adjusted, just switch back to normal 
+            // Once the pitch is adjusted, just switch back to normal
             // mode. We can't switch to fast music mode, since this would
             // play m_fast_music, which isn't available.
             m_mode=SOUND_NORMAL;
@@ -199,9 +203,13 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
+        if ( m_normal_music == NULL ) break;
+
         m_normal_music->update();
         break;
     case SOUND_FAST:
+        if ( m_fast_music == NULL ) break;
+
         m_fast_music->update();
         break;
     }   // switch
