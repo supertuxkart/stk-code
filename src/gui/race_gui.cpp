@@ -523,6 +523,8 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
     int wl = (int)(ratio_x);
     if(wl < 1)
         wl = 1;
+    const int GRADS = (int)(MAX_HERRING_EATEN/5);  // each graduation equals 5 herring
+    int gh = (int)(h/GRADS);  //graduation height
 
     glDisable(GL_TEXTURE_2D);
     // Draw a Meter border
@@ -594,6 +596,20 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
     glVertex2i ( x,   y ) ;
     glEnd () ;
 
+    //Graduations
+    int gh_incr = gh;
+    for (int i=0; i<GRADS-1; i++)
+    {
+        glBegin( GL_QUADS );
+        glColor3f(METER_BORDER_WHITE);
+        glVertex2i(x,   y+gh);
+        glVertex2i(x+w, y+gh);
+        glVertex2i(x+w, y+gh+wl);
+        glVertex2i(x,   y+gh+wl);
+        glEnd();
+        gh+=gh_incr;
+    }
+    
     // up side
     glBegin ( GL_QUADS ) ;
     glColor3f ( METER_BORDER_WHITE ) ;
