@@ -39,7 +39,9 @@ enum WidgetTokens
     WTOK_IMG6, WTOK_TXT6,
 
     WTOK_FIRST_PAGE,
+    WTOK_THIRD_PAGE,
     WTOK_QUIT
+
 };
 
 HelpPageTwo::HelpPageTwo()
@@ -55,65 +57,69 @@ HelpPageTwo::HelpPageTwo()
         false
     );
 
-    widget_manager->addTextWgt( WTOK_MSG, 100, 8,
+    widget_manager->addTextWgt( WTOK_MSG, 100, 7,
         _("To help you win, there are certain collectables you can grab:"));
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt( WTOK_IMG1, 10, 13,
+    widget_manager->addImgWgt( WTOK_IMG1, 10, 12,
         collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt( WTOK_TXT1, 90, 13,
+    widget_manager->addTextWgt( WTOK_TXT1, 90, 12,
         _("Missile - fast stopper in a straight line"));
     widget_manager->setWgtRoundCorners( WTOK_TXT1, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt(WTOK_IMG2, 10, 13,
+    widget_manager->addImgWgt(WTOK_IMG2, 10, 12,
         collectable_manager->getIcon(COLLECT_HOMING)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt(WTOK_TXT2, 90, 13,
+    widget_manager->addTextWgt(WTOK_TXT2, 90, 12,
         _("Homing missile - follows rivals, but is slower than the missile"));
     widget_manager->setWgtRoundCorners( WTOK_TXT2, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt(WTOK_IMG3, 10, 13,
+    widget_manager->addImgWgt(WTOK_IMG3, 10, 12,
         collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt(WTOK_TXT3, 90, 13,
+    widget_manager->addTextWgt(WTOK_TXT3, 90, 12,
         _("Fuzzy blob/Spark - very slow, but bounces from walls"));
     widget_manager->setWgtRoundCorners( WTOK_TXT3, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt(WTOK_IMG4, 10, 13,
+    widget_manager->addImgWgt(WTOK_IMG4, 10, 12,
         collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt(WTOK_TXT4, 90, 13,
+    widget_manager->addTextWgt(WTOK_TXT4, 90, 12,
         _("Zipper - speed boost"));
     widget_manager->setWgtRoundCorners(WTOK_TXT4, WGT_AREA_RGT);
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt(WTOK_IMG5, 10, 13,
+    widget_manager->addImgWgt(WTOK_IMG5, 10, 12,
         collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt(WTOK_TXT5, 90, 13,
+    widget_manager->addTextWgt(WTOK_TXT5, 90, 12,
         _("Parachute - slows down all karts in a better position!"));
     widget_manager->setWgtRoundCorners(WTOK_TXT5, WGT_AREA_RGT);
     widget_manager->breakLine();
 
-    widget_manager->addImgWgt(WTOK_IMG6, 10, 13,
+    widget_manager->addImgWgt(WTOK_IMG6, 10, 12,
         collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle());
 
-    widget_manager->addTextWgt(WTOK_TXT6, 90, 13,
+    widget_manager->addTextWgt(WTOK_TXT6, 90, 12,
         _("Anvil - slows down greatly the kart in the first position"));
     widget_manager->setWgtRoundCorners(WTOK_TXT6, WGT_AREA_RGT);
     widget_manager->breakLine();
 
     /*Buttons at the bottom*/
-    widget_manager->addTextButtonWgt(WTOK_FIRST_PAGE, 25, 7,
+    widget_manager->addTextButtonWgt(WTOK_FIRST_PAGE, 40, 7,
         _("Previous screen"));
     widget_manager->breakLine();
 
+    widget_manager->addTextButtonWgt(WTOK_THIRD_PAGE, 40, 7,
+        _("Next help screen"));
+    widget_manager->breakLine();
+
     widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
-        _("Go back to the main menu"));
+        _("Back to the menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpMenu
@@ -132,6 +138,11 @@ void HelpPageTwo::select()
         case WTOK_FIRST_PAGE:
             menu_manager->popMenu();
             menu_manager->pushMenu(MENUID_HELP1);
+            break;
+
+        case WTOK_THIRD_PAGE:
+            menu_manager->popMenu();
+            menu_manager->pushMenu(MENUID_HELP3);
             break;
 
         case WTOK_QUIT:

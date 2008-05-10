@@ -130,6 +130,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
 	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
 	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \
+	gui/help_page_three.cpp  gui/help_page_three.hpp 	        \
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/challenges_menu.cpp	   gui/challenges_menu.hpp	\

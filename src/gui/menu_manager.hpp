@@ -61,6 +61,7 @@ enum MenuManagerIDs
     // help and credit menu
     MENUID_HELP1,
     MENUID_HELP2,
+    MENUID_HELP3,
     MENUID_CREDITS,
 
     // race gui

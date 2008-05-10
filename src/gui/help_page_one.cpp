@@ -141,11 +141,11 @@ get stuck or fall too far, use the rescue button to get back on track."));
 
     /*Buttons at the bottom*/
     widget_manager->addTextButtonWgt(WTOK_SECOND_PAGE, 20, 7,
-        _("Next screen"));
+        _("Next help screen"));
     widget_manager->breakLine();
 
     widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
-        _("Go back to the main menu"));
+        _("Go back to the menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpPageOne

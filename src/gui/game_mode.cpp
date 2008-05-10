@@ -35,6 +35,7 @@ enum WidgetTokens
     WTOK_TIMETRIAL,
     WTOK_FOLLOW_LEADER,
 
+    WTOK_HELP,
     WTOK_QUIT
 };
 
@@ -75,6 +76,11 @@ GameMode::GameMode()
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
 
+    widget_manager->addTextButtonWgt( WTOK_HELP, 60, 7, _("Game mode help"));
+    widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
+
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
+
     widget_manager->addTextButtonWgt(WTOK_QUIT, 60, 7, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
@@ -107,6 +113,9 @@ void GameMode::select()
     case WTOK_TIMETRIAL:
         race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        break;
+    case WTOK_HELP:
+        menu_manager->pushMenu(MENUID_HELP3);
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();

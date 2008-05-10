@@ -44,6 +44,7 @@
 #include "race_menu.hpp"
 #include "help_page_one.hpp"
 #include "help_page_two.hpp"
+#include "help_page_three.hpp"
 #include "credits_menu.hpp"
 #include "grand_prix_select.hpp"
 #include "sound_manager.hpp"
@@ -230,6 +231,9 @@ void MenuManager::update()
                 break;
             case MENUID_HELP2:
                 m_current_menu = new HelpPageTwo();
+                break;
+            case MENUID_HELP3:
+                m_current_menu = new HelpPageThree();
                 break;
             case MENUID_CREDITS:
                 m_current_menu = new CreditsMenu();
