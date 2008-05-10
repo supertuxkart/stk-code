@@ -1074,10 +1074,6 @@
 				Name="challenges"
 				>
 				<File
-					RelativePath="..\..\challenges\all_tracks.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\challenges\challenge.cpp"
 					>
 				</File>
@@ -1119,10 +1115,6 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\tollway_time.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\win_gotm_cup.cpp"
 					>
 				</File>
 				<File
@@ -1580,10 +1572,6 @@
 				Name="challenges"
 				>
 				<File
-					RelativePath="..\..\challenges\all_tracks.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\challenges\challenge.hpp"
 					>
 				</File>
@@ -1625,10 +1613,6 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\tollway_time.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\win_gotm_cup.hpp"
 					>
 				</File>
 				<File
