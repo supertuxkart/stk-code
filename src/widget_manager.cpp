@@ -1012,7 +1012,7 @@ void WidgetManager::restoreDefaultStates()
     m_default_text_size = WGT_FNT_MED;
     m_default_font = WGT_FONT_GUI;
     m_default_text_color = WGT_WHITE;
-    m_default_resize_to_text = false;
+    m_default_resize_to_text = true;
     m_default_enable_scroll = false;
     m_default_scroll_preset_x = WGT_SCROLL_CENTER;
     m_default_scroll_preset_y = WGT_SCROLL_CENTER;

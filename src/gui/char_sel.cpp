@@ -67,10 +67,10 @@ CharSel::CharSel(int whichPlayer)
     char heading[MAX_MESSAGE_LENGTH];
     snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
              m_player_index + 1);
-    widget_manager->addTitleWgt( WTOK_TITLE, 60, 10, heading );
+    widget_manager->addTitleWgt( WTOK_TITLE, 100, 10, heading );
     widget_manager->breakLine();
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
     widget_manager->breakLine();
 
     for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
@@ -87,7 +87,7 @@ CharSel::CharSel(int whichPlayer)
     }
 
     widget_manager->breakLine();
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
     widget_manager->breakLine();
 
     widget_manager->addTextWgt( WTOK_NAME, 30, 7, "");

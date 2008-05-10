@@ -63,15 +63,15 @@ RaceOptions::RaceOptions() :
     if( race_manager->getRaceMode() != RaceManager::RM_TIME_TRIAL )
     {
         widget_manager->insertColumn();
-        widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 30, 7, _("Difficulty") );
-        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 12, 12, _("More") );
+        widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 32, 7, _("Difficulty") );
+        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 20, 12, _("More") );
 
-        widget_manager->addTextWgt( WTOK_DIFFICULTY, 12, 7, _("Racer") );
+        widget_manager->addTextWgt( WTOK_DIFFICULTY, 32, 7, _("Racer") );
         widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );
         widget_manager->showWgtBorder( WTOK_DIFFICULTY );
         widget_manager->hideWgtRect( WTOK_DIFFICULTY );
 
-        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 12, 12, _("Less") );
+        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 20, 12, _("Less") );
 
         widget_manager->breakLine();
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 1);
@@ -80,15 +80,15 @@ RaceOptions::RaceOptions() :
     if( race_manager->getRaceMode() != RaceManager::RM_TIME_TRIAL )
     {
         widget_manager->insertColumn();
-        widget_manager->addTextWgt( WTOK_KARTS_TITLE, 30, 7, _("Number of karts") );
-        widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 12, 12, _("More") );
+        widget_manager->addTextWgt( WTOK_KARTS_TITLE, 32, 7, _("Number of karts") );
+        widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 20, 12, _("More") );
 
-        widget_manager->addTextWgt( WTOK_KARTS, 12, 7, "4" );
+        widget_manager->addTextWgt( WTOK_KARTS, 32, 7, "4" );
         widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
         widget_manager->showWgtBorder( WTOK_KARTS );
         widget_manager->hideWgtRect( WTOK_KARTS );
 
-        widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 12, 12, _("Less") );
+        widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 20, 12, _("Less") );
 
         widget_manager->breakLine();
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 1);
@@ -98,15 +98,15 @@ RaceOptions::RaceOptions() :
         race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER   )
     {
         widget_manager->insertColumn();
-        widget_manager->addTextWgt( WTOK_LAPS_TITLE, 30, 7, _("Number of laps") );
-        widget_manager->addTextButtonWgt( WTOK_LAPS_UP, 12, 12, _("More") );
+        widget_manager->addTextWgt( WTOK_LAPS_TITLE, 32, 7, _("Number of laps") );
+        widget_manager->addTextButtonWgt( WTOK_LAPS_UP, 20, 12, _("More") );
 
-        widget_manager->addTextWgt( WTOK_LAPS, 12, 7, "3" );
+        widget_manager->addTextWgt( WTOK_LAPS, 32, 7, "3" );
         widget_manager->setWgtBorderPercentage( WTOK_LAPS, 10 );
         widget_manager->showWgtBorder( WTOK_LAPS );
         widget_manager->hideWgtRect( WTOK_LAPS );
 
-        widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 12, 12, _("Less") );
+        widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 20, 12, _("Less") );
         widget_manager->breakLine();
     }
 
@@ -150,7 +150,6 @@ void RaceOptions::select()
                 m_difficulty = RaceManager::RD_MEDIUM;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Driver") );
             }
-            widget_manager->resizeWgtToText( WTOK_DIFFICULTY );
             break;
 
         case WTOK_DIFFICULTY_DOWN:

@@ -52,11 +52,11 @@ ConfigDisplay::ConfigDisplay()
     m_curr_height = m_sizes[m_curr_res].second;
 
     widget_manager->insertColumn();
-    widget_manager->addTitleWgt( WTOK_TITLE, 40, 7, _("Display Settings"));
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Display Settings"));
 
     if( isBlacklisted( m_curr_width, m_curr_height ))
     {
-        widget_manager->addEmptyWgt( WTOK_FULLSCREEN, 40, 7);
+        widget_manager->addEmptyWgt( WTOK_FULLSCREEN, 1, 7);
 
         if (user_config->m_fullscreen)
         {
@@ -67,38 +67,38 @@ ConfigDisplay::ConfigDisplay()
     {
         if(user_config->m_fullscreen)
         {
-            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 40, 7,
+            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 60, 7,
                 _("Window mode"));
         }
         else
         {
-            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 40, 7,
+            widget_manager->addTextButtonWgt( WTOK_FULLSCREEN, 60, 7,
                 _("Fullscreen mode"));
         }
     }
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 2 );
 
     char msg [MAX_MESSAGE_LENGTH];
     snprintf( msg, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), m_curr_width, m_curr_height );
-    widget_manager->addTextWgt( WTOK_CURRENT_RES, 40, 7, msg);
+    widget_manager->addTextWgt( WTOK_CURRENT_RES, 60, 7, msg);
 
-    widget_manager->addTextButtonWgt( WTOK_INCR_RES, 40, 7,
+    widget_manager->addTextButtonWgt( WTOK_INCR_RES, 60, 7,
         _("Increase Resolution"));
-    widget_manager->addTextButtonWgt( WTOK_DECR_RES, 40, 7,
+    widget_manager->addTextButtonWgt( WTOK_DECR_RES, 60, 7,
         _("Decrease Resolution"));
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
-    widget_manager->addTextButtonWgt( WTOK_APPLY_RES, 40, 7, _("Apply "));
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2 );
+    widget_manager->addTextButtonWgt( WTOK_APPLY_RES, 60, 7, _("Apply "));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2 );
 
-    widget_manager->addEmptyWgt( WTOK_CLEAR_BLACKLIST, 40, 7);
+    widget_manager->addEmptyWgt( WTOK_CLEAR_BLACKLIST, 60, 7);
     widget_manager->setWgtText( WTOK_CLEAR_BLACKLIST,
         _("Clear from Blacklist") );
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2 );
 
-    widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7, _("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_ALL );

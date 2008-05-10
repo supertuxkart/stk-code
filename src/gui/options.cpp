@@ -37,8 +37,8 @@ enum WidgetTokens
 Options::Options()
 {
     widget_manager->insertColumn();
-    widget_manager->addTitleWgt( WTOK_TITLE, 35, 7, _("Options") );
-    widget_manager->addTextButtonWgt( WTOK_CONTROLS, 35, 7, _("Player Config") );
+    widget_manager->addTitleWgt( WTOK_TITLE, 45, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_CONTROLS, 45, 7, _("Player Config") );
 
     // Don't display the fullscreen menu when called from within the race.
     // The fullscreen mode will reload all textures, reload the models,
@@ -46,14 +46,14 @@ Options::Options()
     // to windows, who discards all textures, ...)
     if(!menu_manager->isSomewhereOnStack( MENUID_RACE ))
     {
-        widget_manager->addTextButtonWgt( WTOK_DISPLAY, 35, 7, _("Display") );
+        widget_manager->addTextButtonWgt( WTOK_DISPLAY, 45, 7, _("Display") );
     }
 
-    widget_manager->addTextButtonWgt( WTOK_SOUND, 35, 7, _("Sound") );
+    widget_manager->addTextButtonWgt( WTOK_SOUND, 45, 7, _("Sound") );
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 35, 7 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7 );
 
-    widget_manager->addTextButtonWgt( WTOK_QUIT, 35, 7,
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 45, 7,
         _("Press <ESC> to go back") );
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 

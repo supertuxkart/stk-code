@@ -41,41 +41,41 @@ enum WidgetTokens
 GameMode::GameMode()
 {
     widget_manager->insertColumn();
-    widget_manager->addTitleWgt(WTOK_TITLE, 50, 7, _("Choose a Race Mode"));
+    widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Race Mode"));
 
     if(unlock_manager->isLocked("grandprix"))
     {
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->addImgWgt(WTOK_GP, 50, 7,
+        widget_manager->addImgWgt(WTOK_GP, 60, 7,
             m->getState()->getTextureHandle() );
     }
     else
     {
-        widget_manager->addTextButtonWgt( WTOK_GP, 50, 7, _("Grand Prix"));
+        widget_manager->addTextButtonWgt( WTOK_GP, 60, 7, _("Grand Prix"));
     }
 
-    widget_manager->addTextButtonWgt(WTOK_QUICKRACE, 50, 7, _("Quick Race"));
+    widget_manager->addTextButtonWgt(WTOK_QUICKRACE, 60, 7, _("Quick Race"));
 
     if( race_manager->getNumPlayers() == 1 )
     {
-        widget_manager->addTextButtonWgt(WTOK_TIMETRIAL, 50, 7, _("Time Trial"));
+        widget_manager->addTextButtonWgt(WTOK_TIMETRIAL, 60, 7, _("Time Trial"));
     }
     if(unlock_manager->isLocked("followleader"))
     {
         const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->addImgWgt(WTOK_GP, 50, 7,
+        widget_manager->addImgWgt(WTOK_GP, 60, 7,
             m->getState()->getTextureHandle() );
         widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
     }
     else
     {
-        widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 50, 7,
+        widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 60, 7,
             _("Follow the Leader"));
     }
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 50, 7);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
 
-    widget_manager->addTextButtonWgt(WTOK_QUIT, 50, 7, _("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 60, 7, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout(WGT_AREA_ALL);

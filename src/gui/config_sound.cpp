@@ -37,30 +37,30 @@ enum WidgetTokens
 ConfigSound::ConfigSound()
 {
     widget_manager->insertColumn();
-    widget_manager->addTitleWgt(WTOK_TITLE, 40, 7, _("Sound Settings"));
+    widget_manager->addTitleWgt(WTOK_TITLE, 50, 7, _("Sound Settings"));
 
     widget_manager->setInitialActivationState(true);
     if( user_config->doMusic() )
     {
-        widget_manager->addTextButtonWgt( WTOK_MUSIC, 40, 7, _("Turn off music"));
+        widget_manager->addTextButtonWgt( WTOK_MUSIC, 50, 7, _("Turn off music"));
     }
     else
     {
-        widget_manager->addTextButtonWgt( WTOK_MUSIC, 40, 7, _("Turn on music"));
+        widget_manager->addTextButtonWgt( WTOK_MUSIC, 50, 7, _("Turn on music"));
     }
 
     if( user_config->doSFX() )
     {
-        widget_manager->addTextButtonWgt( WTOK_SFX, 40, 7, _("Turn off sound effects"));
+        widget_manager->addTextButtonWgt( WTOK_SFX, 50, 7, _("Turn off sound effects"));
     }
     else
     {
-        widget_manager->addTextButtonWgt( WTOK_SFX, 40, 7, _("Turn on sound effects"));
+        widget_manager->addTextButtonWgt( WTOK_SFX, 50, 7, _("Turn on sound effects"));
     }
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 5);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 5);
 
-    widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,_("Press <ESC> to go back"));
+    widget_manager->addTextButtonWgt(WTOK_QUIT, 50, 7,_("Press <ESC> to go back"));
     widget_manager->setWgtTextSize(WTOK_QUIT, WGT_FNT_SML);
 
     widget_manager->layout(WGT_AREA_ALL);

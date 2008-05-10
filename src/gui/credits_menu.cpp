@@ -63,7 +63,7 @@ CreditsMenu::CreditsMenu()
     }
 
 
-    widget_manager->addTextWgt( WTOK_CREDITS, 100, 93, credits_text );
+    widget_manager->addTextWgt( WTOK_CREDITS, 100, 93, "" );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
     //FIXME: maybe I should make scroll names more consistent
     widget_manager->activateWgt( WTOK_CREDITS );
@@ -76,6 +76,9 @@ CreditsMenu::CreditsMenu()
         _("Go back to the main menu"));
 
     widget_manager->layout( WGT_AREA_TOP );
+
+    //This is done after layout so the widget doesn't gets resized.
+    widget_manager->setWgtText( WTOK_CREDITS, credits_text );
 }   // CreditsMenu
 
 //-----------------------------------------------------------------------------
