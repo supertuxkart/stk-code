@@ -1,8 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (supertuxkart-cup
- (name "Snag Drive")
- (description "Third grand prix")
+ (name _("Snag Drive"))
+ (description _("Third grand prix"))
  (tracks "islandtrack" "sandtrack" "city" "littlevolcano")
  (laps      2               3           2          2)
 )
