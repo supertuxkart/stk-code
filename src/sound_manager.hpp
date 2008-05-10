@@ -62,9 +62,12 @@ public:
     void                    stopMusic();
     void                    update(float dt)    {if(m_current_music)
                                                      m_current_music->update(dt);      }
-    void                    pauseMusic()        {m_current_music->pauseMusic();        }
-    void                    resumeMusic()       {m_current_music->resumeMusic();       }
-    void                    switchToFastMusic() {m_current_music->switchToFastMusic(); }
+    void                    pauseMusic()        {if(m_current_music)
+                                                     m_current_music->pauseMusic();    }
+    void                    resumeMusic()       {if(m_current_music)
+                                                     m_current_music->resumeMusic();   }
+    void                    switchToFastMusic() {if(m_current_music)
+                                                    m_current_music->switchToFastMusic();}
     MusicInformation       *getCurrentMusic() {return m_current_music; }    
     MusicInformation       *getMusicInformation(const std::string& filename);
     void                    loadMusicFromOneDir(const std::string& dir);
