@@ -67,7 +67,7 @@ HelpPageOne::HelpPageOne()
         WGT_FNT_SML,
         WGT_FONT_GUI,
         WGT_WHITE,
-        false
+        true
     );
     widget_manager->addTextWgt( WTOK_MSG1, 50, 7,
         _("Force your rivals bite *your* dust!") );
