@@ -147,8 +147,14 @@ void RaceOptions::select()
             }
             else if( m_difficulty == RaceManager::RD_EASY )
             {
+//TEMP: done just for the release after 0.4 because of AI problems
+#if 0
                 m_difficulty = RaceManager::RD_MEDIUM;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Driver") );
+#else
+                m_difficulty = RaceManager::RD_HARD;
+                widget_manager->setWgtText( WTOK_DIFFICULTY, _("Racer") );
+#endif
             }
             break;
 
@@ -161,8 +167,14 @@ void RaceOptions::select()
 
             else if( m_difficulty == RaceManager::RD_HARD )
             {
+//TEMP: done just for the release after 0.4 because of AI problems
+#if 0
                 m_difficulty = RaceManager::RD_MEDIUM;
                 widget_manager->setWgtText( WTOK_DIFFICULTY, _("Driver") );
+#else
+                m_difficulty = RaceManager::RD_EASY;
+                widget_manager->setWgtText( WTOK_DIFFICULTY, _("Novice") );
+#endif
             }
             else if( m_difficulty == RaceManager::RD_MEDIUM )
             {
