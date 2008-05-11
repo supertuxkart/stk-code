@@ -38,6 +38,7 @@ void EnergyMathClass::setRace() const {
     race_manager->setNumLaps(3);
     race_manager->setNumKarts(1);
     race_manager->setNumPlayers(1);
+    race_manager->setCoinTarget(6);
 }   // setRace
 \
 //-----------------------------------------------------------------------------

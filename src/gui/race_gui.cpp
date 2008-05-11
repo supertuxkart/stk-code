@@ -509,6 +509,7 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
 // Meter border color (0.0 - 1.0)
 #define METER_BORDER_BLACK 0.0, 0.0, 0.0
 #define METER_BORDER_WHITE 1.0, 1.0, 1.0
+#define METER_TARGET_RED   1.0, 0.0, 0.0
 
 //-----------------------------------------------------------------------------
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
@@ -525,6 +526,8 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
         wl = 1;
     const int GRADS = (int)(MAX_HERRING_EATEN/5);  // each graduation equals 5 herring
     int gh = (int)(h/GRADS);  //graduation height
+    float coin_target = (float)race_manager->getCoinTarget();
+    int th = (int)(h*(coin_target/MAX_HERRING_EATEN));
 
     glDisable(GL_TEXTURE_2D);
     // Draw a Meter border
@@ -608,6 +611,18 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
         glVertex2i(x,   y+gh+wl);
         glEnd();
         gh+=gh_incr;
+    }
+    
+    //Target line
+    if (coin_target > 0)
+    {
+        glBegin ( GL_QUADS );
+        glColor3f(METER_TARGET_RED);
+        glVertex2i(x,   y+th);
+        glVertex2i(x+w, y+th);
+        glVertex2i(x+w, y+th+wl);
+        glVertex2i(x,   y+th+wl);
+        glEnd();
     }
     
     // up side

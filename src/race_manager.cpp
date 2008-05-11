@@ -43,6 +43,7 @@ RaceManager::RaceManager()
     m_score_for_position = stk_config->m_scores;
     setTrack("race");
     setPlayerKart(0, "tuxkart");
+    m_coin_target               = 0;
 }   // RaceManager
 
 //-----------------------------------------------------------------------------

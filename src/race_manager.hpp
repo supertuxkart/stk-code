@@ -85,6 +85,7 @@ private:
     int                              m_num_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
+    int                              m_coin_target;
 
     void startNextRace();    // start a next race
 
@@ -111,6 +112,7 @@ public:
     void setTrack(const std::string& track);
     void setRaceMode(RaceModeType mode)      { m_race_mode = mode;               }
     void setNumKarts(int num)                { m_num_karts = num;                }
+    void setCoinTarget(int num)              { m_coin_target = num;              }
     void addKartResult(int kart, int pos, float time);
     RaceModeType       getRaceMode()   const { return m_race_mode;               }
     unsigned int       getNumKarts()   const { return m_num_karts;               }
@@ -128,6 +130,7 @@ public:
     int     getKartScore(int krt)      const { return m_kart_status[krt].m_score;}
     int     getPositionScore(int p)    const { return m_score_for_position[p-1]; }
     double  getOverallTime(int kart)   const { return m_kart_status[kart].m_overall_time;}
+    int     getCoinTarget()            const { return m_coin_target;            }
     bool    isEliminated(int kart)     const { return m_kart_status[kart].m_is_eliminated;}
     bool    raceHasLaps()              const { return m_race_mode!=RM_FOLLOW_LEADER;}
     void    eliminate(int kart)              { m_kart_status[kart].m_is_eliminated=true;}

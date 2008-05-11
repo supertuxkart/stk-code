@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "unlock_manager.hpp"
+#include "race_manager.hpp"
 
 #include "challenges/energy_math_class.hpp"
 #include "challenges/penguin_playground_gp.hpp"
@@ -162,6 +163,7 @@ void UnlockManager::raceFinished()
             unlockFeature(i->second);
         }   // if isActive && challenge solved
     }
+    race_manager->setCoinTarget(0);  //reset
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
@@ -175,6 +177,7 @@ void UnlockManager::grandPrixFinished()
             unlockFeature(i->second);
         }
     }
+    race_manager->setCoinTarget(0);
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
