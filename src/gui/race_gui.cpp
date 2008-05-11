@@ -29,6 +29,7 @@
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
 #include "sound_manager.hpp"
+#include "race_manager.hpp"
 
 #undef USE_WIDGET_MANAGER
 #ifdef USE_WIDGET_MANAGER
@@ -1037,7 +1038,14 @@ void RaceGUI::drawStatusText(const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
         }   // for pla
         drawTimer           ();
-        if(world->getTime()<TIME_MUSIC_DESCRIPTION) drawMusicDescription();
+        if(world->getTime()<TIME_MUSIC_DESCRIPTION 
+          && race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER)
+        {
+            drawMusicDescription();
+        }
+        else if (world->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION)
+            drawMusicDescription();
+            
         drawMap             ();
         if ( user_config->m_display_fps ) drawFPS ();
         drawPlayerIcons     ();
