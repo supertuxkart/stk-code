@@ -990,6 +990,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\help_page_three.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\help_page_two.cpp"
 					>
 				</File>
@@ -1485,6 +1489,10 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\help_page_one.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\help_page_three.hpp"
 					>
 				</File>
 				<File
