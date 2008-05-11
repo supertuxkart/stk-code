@@ -869,7 +869,7 @@ void RaceGUI::addMessage(const char *msg, Kart *kart, float time,
 void RaceGUI::drawMusicDescription()
 {
     const MusicInformation* mi=sound_manager->getCurrentMusic();
-
+    if(!mi) return;
     int y=0;
     if(mi->getComposer()!="")
     {
