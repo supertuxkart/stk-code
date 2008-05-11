@@ -104,24 +104,24 @@ namespace lisp
             }
         case Lexer::TOKEN_TRANSLATION:
            {
-	    result = new Lisp(Lisp::TYPE_STRING);
-	    m_token = m_lexer->getNextToken();
-	    Lisp* next=read();
-	    if(next->getType()!=Lisp::TYPE_STRING)
-            {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), 
-                         "Parse Error at line %d: No string inside translation.",
-                         m_lexer->getLineNumber());
-                throw std::runtime_error(msg);
-	    }
-	    const char* trans=_(next->m_v.m_string);
-	    const size_t LEN = strlen(trans) + 1;
-	    result->m_v.m_string = new char[LEN];
-	    memcpy(result->m_v.m_string, trans, LEN);
-	    delete next;
-	    break;
-	    }
+	            result = new Lisp(Lisp::TYPE_STRING);
+                m_token = m_lexer->getNextToken();
+                Lisp* next=read();
+                if(next->getType()!=Lisp::TYPE_STRING)
+                {
+                    char msg[MAX_ERROR_MESSAGE_LENGTH];
+                    snprintf(msg, sizeof(msg), 
+                        "Parse Error at line %d: No string inside translation.",
+                        m_lexer->getLineNumber());
+                    throw std::runtime_error(msg);
+                }
+                const char* trans=_(next->m_v.m_string);
+                const size_t LEN = strlen(trans) + 1;
+                result->m_v.m_string = new char[LEN];
+                memcpy(result->m_v.m_string, trans, LEN);
+                delete next;
+                break;
+           }
         case Lexer::TOKEN_OPEN_PAREN:
             result = new Lisp(Lisp::TYPE_CONS);
 

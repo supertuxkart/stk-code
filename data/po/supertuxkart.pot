@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-11 00:46+1000\n"
+"POT-Creation-Date: 2008-05-11 14:54+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,15 +21,11 @@ msgstr ""
 msgid "%dx%d Blacklisted"
 msgstr ""
 
-#: src/world.cpp:622
+#: src/modified/world.cpp:624 src/world.cpp:622
 #, c-format
 msgid ""
 "'%s' has\n"
 "been eliminated."
-msgstr ""
-
-#: src/main.cpp:132
-msgid "--keyboard-debug"
 msgstr ""
 
 #: src/gui/player_controls.cpp:64
@@ -52,7 +48,7 @@ msgstr ""
 msgid "Amazonian Journey"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:106
+#: src/gui/help_page_two.cpp:108
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr ""
 
@@ -88,6 +84,10 @@ msgstr ""
 msgid "Back to the main menu"
 msgstr ""
 
+#: src/gui/help_page_two.cpp:122
+msgid "Back to the menu"
+msgstr ""
+
 #: src/gui/player_controls.cpp:65
 msgid "Brake"
 msgstr ""
@@ -108,11 +108,11 @@ msgstr ""
 msgid "Choose a Grand Prix"
 msgstr ""
 
-#: src/gui/game_mode.cpp:44
+#: src/gui/game_mode.cpp:45
 msgid "Choose a Race Mode"
 msgstr ""
 
-#: src/gui/track_sel.cpp:46
+#: src/gui/track_sel.cpp:49
 msgid "Choose a track"
 msgstr ""
 
@@ -176,8 +176,8 @@ msgstr ""
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr ""
 
-#: src/gui/grand_prix_ending.cpp:144 src/gui/leader_result.cpp:148
-#: src/gui/feature_unlocked.cpp:47 src/gui/race_results_gui.cpp:135
+#: src/gui/feature_unlocked.cpp:47 src/gui/grand_prix_ending.cpp:144
+#: src/gui/leader_result.cpp:148 src/gui/race_results_gui.cpp:135
 msgid "Continue"
 msgstr ""
 
@@ -185,26 +185,10 @@ msgstr ""
 msgid "Continue Grand Prix"
 msgstr ""
 
-#: data/tracks/littlevolcano/littlevolcano.track:5
-#: data/tracks/race/race.track:5 data/tracks/startrack/startrack.track:6
-#: data/tracks/subseatrack/subseatrack.track:5
-#: data/tracks/volcano/volcano.track:5
-msgid "Created by Ingo Ruhnke"
-msgstr ""
-
 #: data/tracks/beach/beach.track:5 data/tracks/lighthouse/lighthouse.track:5
 msgid ""
 "Created by Ingo Ruhnke,\n"
 "modified by M. Gagnon"
-msgstr ""
-
-#: data/tracks/islandtrack/islandtrack.track:5
-msgid "Created by Johannes Sjolund"
-msgstr ""
-
-#: data/tracks/olivermath/olivermath.track:5
-#: data/tracks/tuxtrack/tuxtrack.track:5
-msgid "Created by Oliver & Steve Baker"
 msgstr ""
 
 #: data/tracks/fortmagma/fortmagma.track:5
@@ -223,10 +207,6 @@ msgstr ""
 msgid ""
 "Created by Oliver & Steve Baker,\n"
 "modified by M. Gagnon"
-msgstr ""
-
-#: data/tracks/canyon/canyon.track:5 data/tracks/city/city.track:5
-msgid "Created by Thomas Oppl"
 msgstr ""
 
 #: src/gui/main_menu.cpp:63
@@ -312,7 +292,7 @@ msgstr ""
 msgid "First grand prix, easy to get started"
 msgstr ""
 
-#: src/gui/game_mode.cpp:73
+#: src/gui/game_mode.cpp:74
 msgid "Follow the Leader"
 msgstr ""
 
@@ -343,13 +323,20 @@ msgstr ""
 msgid "Fullscreen mode"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:82
+#: src/gui/help_page_two.cpp:84
 msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
 msgstr ""
 
-#: src/gui/credits_menu.cpp:76 src/gui/help_page_two.cpp:116
-#: src/gui/help_page_one.cpp:148 src/gui/challenges_menu.cpp:51
+#: src/gui/game_mode.cpp:79
+msgid "Game mode help"
+msgstr ""
+
+#: src/gui/challenges_menu.cpp:51 src/gui/credits_menu.cpp:76
 msgid "Go back to the main menu"
+msgstr ""
+
+#: src/gui/help_page_one.cpp:148
+msgid "Go back to the menu"
 msgstr ""
 
 #: src/gui/race_gui.cpp:932
@@ -360,7 +347,7 @@ msgstr ""
 msgid "Grab blue boxes and coins"
 msgstr ""
 
-#: src/gui/game_mode.cpp:54
+#: src/gui/game_mode.cpp:55
 msgid "Grand Prix"
 msgstr ""
 
@@ -372,7 +359,7 @@ msgstr ""
 msgid "Highscores"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:74
+#: src/gui/help_page_two.cpp:76
 msgid "Homing missile - follows rivals, but is slower than the missile"
 msgstr ""
 
@@ -385,7 +372,7 @@ msgstr ""
 msgid "Invalid"
 msgstr ""
 
-#: src/kart.cpp:628
+#: src/kart.cpp:628 src/modified/kart.cpp:627
 msgid "Invalid short-cut!!"
 msgstr ""
 
@@ -426,7 +413,7 @@ msgstr ""
 msgid "Look back"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:66
+#: src/gui/help_page_two.cpp:68
 msgid "Missile - fast stopper in a straight line"
 msgstr ""
 
@@ -470,7 +457,7 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/kart.cpp:400
+#: src/kart.cpp:400 src/modified/kart.cpp:399
 msgid "New fastest lap"
 msgstr ""
 
@@ -518,15 +505,15 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:144
-msgid "Next screen"
+#: src/gui/help_page_one.cpp:144 src/gui/help_page_two.cpp:118
+msgid "Next help screen"
 msgstr ""
 
 #: src/gui/grand_prix_select.cpp:71 src/gui/grand_prix_select.cpp:76
 msgid "No Grand Prix selected"
 msgstr ""
 
-#: src/gui/track_sel.cpp:83
+#: src/gui/track_sel.cpp:86
 msgid "No track selected"
 msgstr ""
 
@@ -554,11 +541,11 @@ msgstr ""
 msgid "On the Beach"
 msgstr ""
 
-#: src/gui/options.cpp:40 src/gui/main_menu.cpp:55 src/gui/race_menu.cpp:50
+#: src/gui/main_menu.cpp:55 src/gui/options.cpp:40 src/gui/race_menu.cpp:50
 msgid "Options"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:98
+#: src/gui/help_page_two.cpp:100
 msgid "Parachute - slows down all karts in a better position!"
 msgstr ""
 
@@ -611,11 +598,11 @@ msgstr ""
 msgid "Press <ESC> to Cancel"
 msgstr ""
 
+#: src/gui/config_controls.cpp:52 src/gui/config_display.cpp:101
+#: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:84
+#: src/gui/grand_prix_select.cpp:87 src/gui/num_players.cpp:45
 #: src/gui/options.cpp:57 src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:121 src/gui/config_display.cpp:101
-#: src/gui/game_mode.cpp:78 src/gui/config_sound.cpp:63
-#: src/gui/config_controls.cpp:52 src/gui/grand_prix_select.cpp:87
-#: src/gui/num_players.cpp:45
+#: src/gui/race_options.cpp:121
 msgid "Press <ESC> to go back"
 msgstr ""
 
@@ -623,11 +610,11 @@ msgstr ""
 msgid "Press key"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:112
+#: src/gui/help_page_two.cpp:114
 msgid "Previous screen"
 msgstr ""
 
-#: src/gui/game_mode.cpp:57
+#: src/gui/game_mode.cpp:58
 msgid "Quick Race"
 msgstr ""
 
@@ -749,11 +736,11 @@ msgstr ""
 msgid "Three Players"
 msgstr ""
 
-#: src/gui/game_mode.cpp:61
+#: src/gui/game_mode.cpp:62
 msgid "Time Trial"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:59
+#: src/gui/help_page_two.cpp:61
 msgid "To help you win, there are certain collectables you can grab:"
 msgstr ""
 
@@ -859,26 +846,22 @@ msgstr ""
 msgid "Window mode"
 msgstr ""
 
-#: src/world.cpp:538
+#: src/modified/world.cpp:540 src/world.cpp:538
 msgid "You finished"
 msgstr ""
 
-#: src/world.cpp:617
+#: src/modified/world.cpp:619 src/world.cpp:617
 msgid ""
 "You have been\n"
 "eliminated!"
 msgstr ""
 
-#: src/world.cpp:537
+#: src/modified/world.cpp:539 src/world.cpp:537
 msgid "You won"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:90
+#: src/gui/help_page_two.cpp:92
 msgid "Zipper - speed boost"
-msgstr ""
-
-#: data/tracks/jungle/jungle.track:5
-msgid "by M. Gagnon"
 msgstr ""
 
 #: src/user_config.cpp:836
@@ -911,6 +894,6 @@ msgstr ""
 msgid "not set"
 msgstr ""
 
-#: src/world.cpp:540
+#: src/modified/world.cpp:542 src/world.cpp:540
 msgid "the race!"
 msgstr ""

@@ -28,6 +28,9 @@
 #include "material_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 enum WidgetTokens
 {
@@ -100,9 +103,18 @@ void TrackSel::update(float dt)
         SELECTED_TRACK < (int)track_manager->getTrackCount() )
     {
         const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
-
-        widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
-
+        const std::string& description = TRACK->getDescription();
+        if(description!="")
+        {
+            widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
+        }
+        else
+        {
+            char designedby[MAX_MESSAGE_LENGTH];
+            snprintf(designedby, MAX_MESSAGE_LENGTH, 
+                     "Designed by %s", TRACK->getDesigner().c_str());
+            widget_manager->setWgtText( WTOK_AUTHOR, designedby );
+        }
         const std::string& screenshot = TRACK->getScreenshotFile();
         const std::string& topview    = TRACK->getTopviewFile();
 

@@ -49,6 +49,7 @@ private:
     std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
     std::string              m_herring_style;
     std::string              m_description;
+    std::string              m_designer;
     std::string              m_filename;
     ssgBranch*               m_model;
     TriangleMesh*            m_track_mesh;
@@ -186,6 +187,7 @@ public:
     const float&  getAICurveSpeedAdjustment() const {return m_AI_curve_speed_adjustment;}
     const sgVec4& getSkyColor            () const {return m_sky_color;          }
     const std::string& getDescription    () const {return m_description;        }
+    const std::string& getDesigner       () const {return m_designer;           }
     const std::string& getTopviewFile    () const {return m_top_view;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
     const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
