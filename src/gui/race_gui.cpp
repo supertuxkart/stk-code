@@ -1043,7 +1043,8 @@ void RaceGUI::drawStatusText(const float dt)
         {
             drawMusicDescription();
         }
-        else if (world->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION)
+        else if (world->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION 
+          && race_manager->getRaceMode()== RaceManager::RM_FOLLOW_LEADER)
             drawMusicDescription();
             
         drawMap             ();
