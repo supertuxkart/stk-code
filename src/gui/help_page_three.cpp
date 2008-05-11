@@ -52,19 +52,19 @@ HelpPageThree::HelpPageThree()
     {
         widget_manager->addTextWgt( WTOK_TXT1, 100, 10,
             _("Grand Prix\n\
-Race through a group of tracks, the one with the most\n\
+Race through a group of tracks, the one with the most  \n\
 points wins!"));
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
     }
 
     widget_manager->addTextWgt( WTOK_TXT2, 100, 10,
         _("Quick race\n\
-Configurable track selection"));
+Configurable track selection                                 "));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
     widget_manager->addTextWgt( WTOK_TXT3, 100, 10,
         _("Time Trial\n\
-Single kart race through a track against the clock!\n\
+Single kart race through a track against the clock!    \n\
 Boosters items are disabled."));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
