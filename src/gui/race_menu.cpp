@@ -44,20 +44,20 @@ RaceMenu::RaceMenu()
 {
     widget_manager->insertColumn();
 
-    widget_manager->addTitleWgt( WTOK_PAUSE, 30, 7, _("Paused") );
+    widget_manager->addTitleWgt( WTOK_PAUSE, 50, 7, _("Paused") );
 
-    widget_manager->addTextButtonWgt( WTOK_RETURN_RACE, 30, 7, _("Return To Race"));
-    widget_manager->addTextButtonWgt( WTOK_OPTIONS, 30, 7, _("Options") );
-    widget_manager->addTextButtonWgt( WTOK_HELP, 30, 7, _("Help") );
-    widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 30, 7, _("Restart Race") );
+    widget_manager->addTextButtonWgt( WTOK_RETURN_RACE, 50, 7, _("Return To Race"));
+    widget_manager->addTextButtonWgt( WTOK_OPTIONS, 50, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_HELP, 50, 7, _("Help") );
+    widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 50, 7, _("Restart Race") );
 
     if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
     {
-        widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 30, 7,
+        widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 50, 7,
             _("Setup New Race") );
     }
 
-    widget_manager->addTextButtonWgt( WTOK_QUIT, 30, 7, _("Exit Race") );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, 50, 7, _("Exit Race") );
 
     widget_manager->layout(WGT_AREA_ALL);
     if(user_config->m_fullscreen) SDL_ShowCursor(SDL_ENABLE);
