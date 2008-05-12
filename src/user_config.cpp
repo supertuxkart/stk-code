@@ -105,6 +105,8 @@ void UserConfig::setDefaults()
     m_background_music = "";
     m_profile          = 0;
     m_skidding         = false;
+    m_max_fps          = 120;
+    m_sfx_volume       = 1.0f;
     m_use_kph          = false;
     m_replay_history   = false;
     m_width            = 800;
@@ -414,6 +416,8 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("displayFPS",       m_display_fps);
         lisp->get("herringStyle",     m_herring_style);
         lisp->get("background-music", m_background_music);
+        lisp->get("max-fps",          m_max_fps);
+        lisp->get("sfx-volume",       m_sfx_volume);
         lisp->get("useKPH",           m_use_kph);
 
         /*get resolution width/height*/
@@ -655,6 +659,10 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("background-music\t", m_background_music);
         writer->writeComment("Use of kilometers per hours (km/h) instead of mph");
         writer->write("useKPH\t", m_use_kph);
+        writer->writeComment("maximum fps, should be at least 60");
+        writer->write("max-fps\t", m_max_fps);
+        writer->writeComment("Volume for sound effects, see openal AL_GAIN for interpretation");
+        writer->write("sfx-volumet", m_sfx_volume);
 
         writer->writeComment("screen resolution and windowing mode");
         writer->write("width\t", m_width);

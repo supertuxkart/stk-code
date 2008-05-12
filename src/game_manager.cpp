@@ -81,9 +81,9 @@ void GameManager::run()
             static const float max_elapsed_time = 3.0f*1.0f/60.0f*1000.0f; /* time 3 internal substeps take */
             if(dt > max_elapsed_time) dt=max_elapsed_time;
                                                
-            //This avoid wasting CPU cycles
-            //1000 miliseconds / 125 frames = 125 miliseconds per frame
-            if( dt < 8.0f)
+            // Throttle fps if more than maximum, which can reduce 
+            // the noise the fan on a graphics card makes
+            if( dt*user_config->m_max_fps < 1000.0f)
             {
                 //SDL_Delay has a granularity of 10ms on most platforms, so
                 //most likely when frames go faster than 125 frames, at times

@@ -32,8 +32,7 @@
 
 #include "sfx_openal.hpp"
 #include "file_manager.hpp"
-
-
+#include "user_config.hpp"
 
 SFXImpl::SFXImpl(const char* filename)
 {
@@ -53,6 +52,7 @@ SFXImpl::~SFXImpl()
 //-----------------------------------------------------------------------------
 void SFXImpl::play()
 {
+    alSourcef(m_soundSource,AL_GAIN,user_config->m_sfx_volume);
     alSourcePlay(m_soundSource);
 
     // Check (and clear) the error flag
