@@ -38,10 +38,7 @@ public:
     Font(const std::string &fontname) { Font(fontname.c_str()); }
     ~Font();
     void getBBox(const std::string &text, int size, bool italic,
-                 float *left, float *right, float *bot, float *top)
-    {
-        m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
-    }
+                 float *left, float *right, float *bot, float *top);
 
     // The actual main function which does everything
     // ----------------------------------------------

@@ -163,3 +163,18 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     m_text_out->end();
 
 }   // PrintBold
+
+// ----------------------------------------------------------------------------
+void Font::getBBox(const std::string &text, int size, bool italic,
+                  float *left, float *right, float *bot, float *top)
+{
+    m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
+    if(user_config->m_width<800) {
+        float fract=(float)user_config->m_width/800.0f;
+        *left  *= fract;
+        *right *= fract;
+        if(bot) *bot   *= fract;
+        if(top) *top   *= fract;
+    }
+
+}
