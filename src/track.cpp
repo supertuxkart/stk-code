@@ -39,6 +39,7 @@
 #include "herring.hpp"
 #include "herring_manager.hpp"
 #include "sound_manager.hpp"
+#include "race_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -1344,6 +1345,10 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
     if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
     if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
     if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
+
+    // Time trial does not have any red herrings
+    if(type==HE_RED && race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
+        return;
     herring_manager->newHerring(type, xyz);
 }   // herring_command
 
