@@ -164,7 +164,7 @@ void SoundManager::startMusic(MusicInformation* mi)
 {
     m_current_music = mi;
     
-    if(!user_config->doMusic() || !m_initialized) return;
+    if(!mi || !user_config->doMusic() || !m_initialized) return;
     
     mi->startMusic();
 }   // startMusic
@@ -173,7 +173,6 @@ void SoundManager::startMusic(MusicInformation* mi)
 void SoundManager::stopMusic()
 {
     if(m_current_music) m_current_music->stopMusic();
-    m_current_music=NULL;
 }   // stopMusic
 
 //-----------------------------------------------------------------------------
