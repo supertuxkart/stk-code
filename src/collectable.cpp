@@ -180,12 +180,7 @@ void Collectable::hitRedHerring(int n)
     CollectableType newC;
     if(!user_config->m_profile)
     {
-        // A zipper should not be used during time trial, since it
-        // brings too much randomness. So ignore the top 3 elements
-        // in time trail, but only the top 2 in any other mode
-        int nIgnore = (race_manager->getRaceMode()== RaceManager::RM_TIME_TRIAL) 
-                    ? 3 : 2;
-        newC = (CollectableType)(rand()%(COLLECT_MAX - 1 - nIgnore) + 1);
+        newC = (CollectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
     }
     else
       {   // for now: no collectables when profiling

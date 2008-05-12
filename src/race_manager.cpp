@@ -36,7 +36,7 @@ RaceManager* race_manager= NULL;
 RaceManager::RaceManager()
 {
     m_num_karts                = user_config->m_karts;
-    m_difficulty               = RD_MEDIUM;
+    m_difficulty               = RD_HARD;
     m_race_mode                = RM_QUICK_RACE;
     m_track_number             = 0;
     m_active_race              = false;
