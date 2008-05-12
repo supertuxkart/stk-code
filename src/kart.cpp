@@ -644,9 +644,9 @@ void Kart::update(float dt)
         m_on_road = true;
     }
 
-    int sector = world->m_track->spatialToTrack( m_curr_track_coords, 
-                                                 m_curr_pos.xyz,
-                                                 m_track_sector      );
+    world->m_track->spatialToTrack( m_curr_track_coords, 
+                                    m_curr_pos.xyz,
+                                    m_track_sector      );
 
     doLapCounting () ;
     processSkidMarks();

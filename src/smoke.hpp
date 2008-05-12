@@ -39,3 +39,4 @@ public:
     virtual void particle_delete(int index, Particle* p                         );
 };
 #endif
+
