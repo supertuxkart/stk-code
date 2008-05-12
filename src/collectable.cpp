@@ -30,11 +30,11 @@
 Collectable::Collectable(Kart* kart_)
 {
     m_owner  = kart_;
-    clear();
+    reset();
 }   // Collectable
 
 //-----------------------------------------------------------------------------
-void Collectable::clear()
+void Collectable::reset()
 {
     if(race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL)
     {
@@ -46,7 +46,8 @@ void Collectable::clear()
         m_type   = COLLECT_NOTHING;
         m_number = 0;
     }
-}   // clear
+}   // reset
+
 //-----------------------------------------------------------------------------
 void Collectable::set(CollectableType type, int n)
 {
@@ -136,7 +137,8 @@ void Collectable::use()
 
     if ( m_number <= 0 )
     {
-        clear();
+        m_number = 0;
+        m_type   = COLLECT_NOTHING;
     }
 }   // use
 

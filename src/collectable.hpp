@@ -36,7 +36,7 @@ protected:
 public:
                     Collectable  (Kart* kart_);
     void            set          (CollectableType _type, int n=1);
-    void            clear        ();
+    void            reset        ();
     int             getNum       () const {return m_number;}
     CollectableType getType      () const {return m_type;  }
     void            hitRedHerring(int n);

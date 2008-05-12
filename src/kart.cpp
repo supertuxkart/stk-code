@@ -289,7 +289,7 @@ void Kart::reset()
     Moveable::reset();
 
     m_attachment.clear();
-    m_collectable.clear();
+    m_collectable.reset();
 
     m_race_lap             = -1;
     m_lap_start_time       = -1.0f;
