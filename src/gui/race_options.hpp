@@ -22,10 +22,11 @@
 
 class RaceOptions: public BaseGUI
 {
+private:
     int m_difficulty;
     int m_num_karts;
     int m_num_laps;
-
+    const char *getDifficultyString(int) const;
 public:
     RaceOptions();
     ~RaceOptions();
