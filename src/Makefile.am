@@ -1,5 +1,5 @@
 # src/
-
+bindir=@prefix@/games
 bin_PROGRAMS = supertuxkart
 
 # This is a VERY ugly work-around for a compiler bug: if static_ssg s compiled with -O2
