@@ -662,7 +662,7 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->writeComment("maximum fps, should be at least 60");
         writer->write("max-fps\t", m_max_fps);
         writer->writeComment("Volume for sound effects, see openal AL_GAIN for interpretation");
-        writer->write("sfx-volumet", m_sfx_volume);
+        writer->write("sfx-volume", m_sfx_volume);
 
         writer->writeComment("screen resolution and windowing mode");
         writer->write("width\t", m_width);
