@@ -25,8 +25,7 @@
 JungleFollow::JungleFollow() : Challenge("junglefollow", _("Follow the Leader in the Jungle"))
 {
     setChallengeDescription(_("Win a Follow the Leader race\nwith 3 AI karts\nin the Amazonian Jungle."));
-    setFeatureDescription(_("New track: City\nnow available"));
-    setFeature("city");
+    addUnlockTrackReward("city");
     addDependency("penguinplaygroundgp");
     addDependency("racetracktime");
 }   // JungleFollow

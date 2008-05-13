@@ -26,8 +26,7 @@
 RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", _("Finish Race track in 1:15"))
 {
     setChallengeDescription(_("Finish 3 laps in the Race track\nwith 3 AI karts\nin under 1:15 minutes."));
-    setFeatureDescription(_("New track: Amazonian Journey\nnow available"));
-    setFeature("jungle");
+    addUnlockTrackReward("jungle");
 }   // RaceTrackTime
 
 //-----------------------------------------------------------------------------

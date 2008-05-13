@@ -27,6 +27,18 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 
+enum REWARD_TYPE
+   {UNLOCK_TRACK,
+    UNLOCK_GP,
+    UNLOCK_MODE,
+    UNLOCK_DIFFICULTY};
+
+struct UnlockableFeature
+{
+    std::string name; // itnernal name
+    std::string user_name; // not all types of feature have one
+    REWARD_TYPE type;
+};
 
 // A base class for all challenges
 class Challenge
@@ -36,32 +48,34 @@ class Challenge
           CH_SOLVED}         m_state;  // challenge was solved
     std::string              m_Id;                    // short, internal name for this challenge
     std::string              m_Name;                  // name used in menu for this challenge
-    std::string              m_Description;           // description
-    std::string              m_feature_description;   // Description of feature to unlock
-    std::string              m_feature;               // Feature to unlock
-    std::vector<std::string> m_prerequisites; 
+    std::string              m_challenge_description; // Message the user gets when the feature is not yet unlocked
+    std::vector<UnlockableFeature> m_feature;         // Features to unlock
+    std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
              Challenge(std::string id, std::string name);
     virtual ~Challenge() {};
     const std::string& getId() const             {return m_Id;                  }
     const std::string& getName() const           {return m_Name;                }
-    void  setFeatureDescription(const std::string& f) 
-                                                 {m_feature_description=f;      }
-    const std::string&
-          getFeatureDescription() const          {return m_feature_description; }
-    void  setFeature(const std::string& s)       {m_feature=s;                  }
-    const std::string& getFeature() const        {return m_feature;             }
+    
+    void addUnlockTrackReward(std::string track_name);
+    void addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name);
+    void addUnlockGPReward(std::string gp_name);
+    void addUnlockDifficultyReward(std::string internal_name, std::string user_name);
+    
+    const std::string getUnlockedMessage() const;
+    const std::vector<UnlockableFeature>&
+          getFeatures() const                    {return m_feature;               }
     void  setChallengeDescription(const std::string& d) 
-                                                 {m_Description=d;              }
+                                                 {m_challenge_description=d;      }
     const std::string& 
-          getChallengeDescription() const        {return m_Description;         }
-    void  addDependency(const std::string id)    {m_prerequisites.push_back(id);}
-    bool  isSolved() const                       {return m_state==CH_SOLVED;    }
-    bool  isActive() const                       {return m_state==CH_ACTIVE;    }
-    void  setSolved()                            {m_state = CH_SOLVED;          }
-    void  setActive()                            {m_state = CH_ACTIVE;          }
+          getChallengeDescription() const        {return m_challenge_description; }
+    void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
+    bool  isSolved() const                       {return m_state==CH_SOLVED;      }
+    bool  isActive() const                       {return m_state==CH_ACTIVE;      }
+    void  setSolved()                            {m_state = CH_SOLVED;            }
+    void  setActive()                            {m_state = CH_ACTIVE;            }
     const std::vector<std::string>& 
-          getPrerequisites() const               {return m_prerequisites;       }
+          getPrerequisites() const               {return m_prerequisites;         }
     void  load(const lisp::Lisp* config);
     void  save(lisp::Writer* writer);
 

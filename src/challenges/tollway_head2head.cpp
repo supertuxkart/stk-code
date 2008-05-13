@@ -25,9 +25,8 @@
 TollwayHead2Head::TollwayHead2Head() : Challenge("tollwayhead", _("Win a Head to Head on\nTux Tollway"))
 {
     setChallengeDescription(_("Win a 1 lap Head to Head\non Tux Tollway against 1 'Racer'\nlevel AI kart."));
-    setFeatureDescription(_("New track: Fort Magma\nnow available"));
-    setFeature("fortmagma");
-}   // TollwayTime
+    addUnlockTrackReward("fortmagma");
+}
 
 //-----------------------------------------------------------------------------
 void TollwayHead2Head::setRace() const {

@@ -25,8 +25,7 @@
 CityTime::CityTime() : Challenge("citytime", _("Finish the City track in 5:20"))
 {
     setChallengeDescription(_("Finish 3 laps on the City track\nwith 3 AI karts\nin under 5:20 minutes."));
-    setFeatureDescription(_("New track: SnowTux Peak\nnow available"));
-    setFeature("snowtuxpeak");
+    addUnlockTrackReward("snowtuxpeak");
     addDependency("junglefollow");
 }   // CityTime
 //-----------------------------------------------------------------------------

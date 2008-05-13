@@ -25,8 +25,7 @@
 TollwayTime::TollwayTime() : Challenge("tollwaytime", _("Finish Tux Tollway track in 3:00"))
 {
     setChallengeDescription(_("Finish 3 laps on the Tux Tollway\ntrack with 3 AI karts\nin under 3:00 minutes."));
-    setFeatureDescription(_("New track: Canyon\nnow available"));
-    setFeature("canyon");
+    addUnlockTrackReward("canyon");
 }   // TollwayTime
 
 //-----------------------------------------------------------------------------

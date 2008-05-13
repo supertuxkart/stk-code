@@ -41,7 +41,7 @@ FeatureUnlocked::FeatureUnlocked()
     unlock_manager->clearUnlocked();
 
     widget_manager->addTextWgt( WTOK_DESCRIPTION, 60, 30,
-        m_new_features[0]->getFeatureDescription());
+        m_new_features[0]->getUnlockedMessage());
 
     widget_manager->addTextButtonWgt(WTOK_CONTINUE, 50, 7,
         _("Continue"));
@@ -63,7 +63,7 @@ void FeatureUnlocked::select()
     m_new_features.erase(m_new_features.begin());
     if(m_new_features.size()>0)
     {
-        widget_manager->setWgtText( WTOK_DESCRIPTION, m_new_features[0]->getFeature());
+        widget_manager->setWgtText( WTOK_DESCRIPTION, m_new_features[0]->getUnlockedMessage() );
     }
     else
     {

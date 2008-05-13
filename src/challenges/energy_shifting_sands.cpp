@@ -25,8 +25,7 @@
 EnergyShiftingSands::EnergyShiftingSands() : Challenge("energyshiftingsands", _("Collect the Pharaohs Treasure"))
 {
     setChallengeDescription(_("Collect at least 9 coins\non 3 laps of Shifting Sands\nin under 2:20 minutes."));
-    setFeatureDescription(_("New Grand Prix:\nTo the Moon and Back\nnow available"));
-    setFeature("To the Moon and Back");
+    addUnlockGPReward("To the Moon and Back");
     // The energymathclass challenge must be done, otherwise GP can't be selected
     addDependency("energymathclass");
     addDependency("racetracktime");

@@ -49,7 +49,7 @@ public:
     void       raceFinished       ();
     void       grandPrixFinished  ();
     void       unlockFeature      (Challenge* c, bool save=true);
-    void       lockFeature        (const std::string& feature);
+    void       lockFeature        (Challenge* challenge);
     bool       isLocked           (const std::string& feature);
 };   // UnlockManager
 

@@ -25,8 +25,7 @@
 MoonAndBackGP::MoonAndBackGP() : Challenge("moonandbackgp",_("Win To the Moon and Back\nGrand Prix"))
 {
     setChallengeDescription(_("Win the To the Moon and Back\nGrand Prix with 3 'Racer'\nLevel AI karts."));
-    setFeatureDescription(_("New Grand Prix: Snag Drive\nnow available"));
-    setFeature("Snag Drive");  //gp3
+    addUnlockGPReward("Snag Drive");
     // The energyshiftingsands challenge must be done, otherwise gp2 can't be selected
     // Thejunglefollow challenge must be done, to get city for gp3
     addDependency("energyshiftingsands");

@@ -116,14 +116,14 @@ void UnlockManager::computeActive()
             // The constructor calls computeActive, which actually locks 
             // all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
-            if (isLocked(i->second->getFeature()))  
-                unlockFeature(i->second, /*save*/ false);
+            
+            unlockFeature(i->second, /*save*/ false);
             continue;
         }
 
         // Otherwise lock the feature, and check if the challenge is active
         // ----------------------------------------------------------------
-        lockFeature(i->second->getFeature());
+        lockFeature(i->second);
         std::vector<std::string> pre_req=(i->second)->getPrerequisites();
         bool allSolved=true;
         for(std::vector<std::string>::iterator pre =pre_req.begin();
@@ -181,29 +181,36 @@ void UnlockManager::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-void UnlockManager::lockFeature(const std::string& feature)
+void UnlockManager::lockFeature(Challenge* challenge)
 {
-    m_locked_features[feature]=true;
+    const unsigned int amount = challenge->getFeatures().size();
+    for(unsigned int n=0; n<amount; n++)
+        m_locked_features[challenge->getFeatures()[n].name]=true;
 }   // lockFeature
 
 //-----------------------------------------------------------------------------
+
 void UnlockManager::unlockFeature(Challenge* c, bool save)
 {
-    const std::string& feature=c->getFeature();
-    std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
-    if(p==m_locked_features.end())
+    const unsigned int amount = c->getFeatures().size();
+    for(unsigned int n=0; n<amount; n++)
     {
-        fprintf(stderr,"Unlocking feature '%s' failed: feature is not locked.\n",
-                (feature).c_str());
-        return;
+        std::string feature = c->getFeatures()[n].name;
+        std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
+        if(p==m_locked_features.end())
+        {
+            //fprintf(stderr,"Unlocking feature '%s' failed: feature is not locked.\n",
+            //        (feature).c_str());
+            return;
+        }
+        m_locked_features.erase(p);
     }
-    m_locked_features.erase(p);
-
+    
     // Add to list of recently unlocked features
     m_unlocked_features.push_back(c);
     c->setSolved();  // reset isActive flag
-
-    // Save the new unlock informationxt
+    
+    // Save the new unlock information
     if(save) user_config->saveConfig();
 }   // unlockFeature
 

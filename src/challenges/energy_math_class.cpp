@@ -26,8 +26,7 @@
 EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", _("Collect Coins in Math Class"))
 {
     setChallengeDescription(_("Collect at least 6 coins\non three laps of\nOliver's Math Class\nin under 1 minute."));
-    setFeatureDescription(_("New game mode\n'Grand Prix'\nnow available"));
-    setFeature("grandprix");
+    addUnlockModeReward("grandprix", _("Grand Prix"));
 }   // EnergyMathClass
 
 //-----------------------------------------------------------------------------

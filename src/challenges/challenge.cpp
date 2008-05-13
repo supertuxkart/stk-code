@@ -17,7 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "translation.hpp"
 #include "challenges/challenge.hpp"
+#include "world.hpp"
+#include "race_manager.hpp"
+#include "track_manager.hpp"
 
 Challenge::Challenge(std::string id, std::string name) : 
     m_state(CH_INACTIVE), m_Id(id), m_Name(name)
@@ -51,3 +55,71 @@ void Challenge::save(lisp::Writer* writer)
 }   // save
 
 //-----------------------------------------------------------------------------
+void Challenge::addUnlockTrackReward(std::string track_name)
+{
+    UnlockableFeature feature;
+    feature.name = track_name;
+    feature.type = UNLOCK_TRACK;
+    m_feature.push_back(feature);
+}
+//-----------------------------------------------------------------------------
+void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name)
+{
+    UnlockableFeature feature;
+    feature.name = internal_mode_name;
+    feature.type = UNLOCK_MODE;
+    feature.user_name = user_mode_name;
+    m_feature.push_back(feature);
+}
+//-----------------------------------------------------------------------------
+void Challenge::addUnlockGPReward(std::string gp_name)
+{
+    UnlockableFeature feature;
+    feature.name = gp_name;
+    feature.type = UNLOCK_GP;
+    m_feature.push_back(feature);
+}
+//-----------------------------------------------------------------------------
+void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string user_name)
+{
+    UnlockableFeature feature;
+    feature.name = internal_name;
+    feature.type = UNLOCK_DIFFICULTY;
+    feature.user_name = user_name;
+    m_feature.push_back(feature);
+}
+//-----------------------------------------------------------------------------
+const std::string Challenge::getUnlockedMessage() const
+{
+    std::string unlocked_message;
+    
+    const unsigned int amount = m_feature.size();
+    for(unsigned int n=0; n<amount; n++)
+    {
+        // add line break if we are showing multiple messages
+        if(n>0) unlocked_message+='\n';
+        
+        char message[128];
+        
+        // write message depending on feature type
+        switch(m_feature[n].type)
+        {
+            case UNLOCK_TRACK:
+                Track* track = track_manager->getTrack( m_feature[n].name );
+                snprintf(message, 127, _("New track '%s'\nnow available"), gettext(track->getName()) );
+                break;
+            case UNLOCK_MODE:
+                snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
+                break;
+            case UNLOCK_GP:
+                snprintf(message, 127, _("New Grand Prix '%s'\nnow available"), m_feature[n].name.c_str() );
+                break;
+            case UNLOCK_DIFFICULTY:
+                snprintf(message, 127, _("New difficulty\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
+                break;
+        }
+        unlocked_message += message;
+    }
+    
+    return unlocked_message;
+}
