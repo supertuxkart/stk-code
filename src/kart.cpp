@@ -482,14 +482,20 @@ bool Kart::isOnGround() const
 //-----------------------------------------------------------------------------
 void Kart::handleExplosion(const btVector3& pos, bool direct_hit)
 {
-    if(direct_hit) {
-        btVector3 velocity = m_body->getLinearVelocity();
-
-        velocity.setX( 0.0f );
-        velocity.setY( 0.0f );
-        velocity.setZ( 5.0f );
-
-        getVehicle()->getRigidBody()->setLinearVelocity( velocity );
+    if(direct_hit) 
+    {
+#define WILD_EXPLOSION
+#ifdef WILD_EXPLOSION
+        btVector3 diff(rand()%16/16, rand()%16/16, 2.0f);
+        diff.normalize();
+        diff*=stk_config->m_explosion_impulse/5.0f;
+        getVehicle()->getRigidBody()->applyCentralImpulse(diff);
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(rand()%32*M_PI,
+                                                                   rand()%32*M_PI,
+                                                                   rand()%32*M_PI));
+#else
+        forceRescue();
+#endif  
     }
     else  // only affected by a distant explosion
     {
