@@ -22,6 +22,10 @@
 #include "world.hpp"
 #include "race_manager.hpp"
 #include "track_manager.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
+
 
 Challenge::Challenge(std::string id, std::string name) : 
     m_state(CH_INACTIVE), m_Id(id), m_Name(name)
@@ -93,7 +97,7 @@ const std::string Challenge::getUnlockedMessage() const
 {
     std::string unlocked_message;
     
-    const unsigned int amount = m_feature.size();
+    const unsigned int amount = (unsigned int)m_feature.size();
     for(unsigned int n=0; n<amount; n++)
     {
         // add line break if we are showing multiple messages
