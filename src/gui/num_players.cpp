@@ -34,7 +34,7 @@ enum WidgetTokens
 
 NumPlayers::NumPlayers()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTextButtonWgt( WTOK_PLAYER_2, 35, 7, _("Two Players") );
     widget_manager->addTextButtonWgt( WTOK_PLAYER_3, 35, 7, _("Three Players") );
     widget_manager->addTextButtonWgt( WTOK_PLAYER_4, 35, 7, _("Four Players") );

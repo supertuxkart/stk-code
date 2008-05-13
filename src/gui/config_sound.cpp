@@ -36,7 +36,7 @@ enum WidgetTokens
 
 ConfigSound::ConfigSound()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt(WTOK_TITLE, 50, 7, _("Sound Settings"));
 
     widget_manager->setInitialActivationState(true);

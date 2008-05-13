@@ -51,7 +51,7 @@ ConfigDisplay::ConfigDisplay()
     m_curr_width = m_sizes[m_curr_res].first;
     m_curr_height = m_sizes[m_curr_res].second;
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Display Settings"));
 
     if( isBlacklisted( m_curr_width, m_curr_height ))

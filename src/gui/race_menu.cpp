@@ -42,7 +42,7 @@ enum WidgetTokens
 
 RaceMenu::RaceMenu()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
 
     widget_manager->addTitleWgt( WTOK_PAUSE, 50, 7, _("Paused") );
 

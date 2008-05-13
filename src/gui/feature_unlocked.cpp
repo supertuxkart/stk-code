@@ -32,7 +32,7 @@ enum WidgetTokens
 
 FeatureUnlocked::FeatureUnlocked()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 10,
         _("New Feature Unlocked"));
 

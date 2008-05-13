@@ -83,7 +83,7 @@ PlayerControls::PlayerControls(int whichPlayer):
     widget_manager->addTextButtonWgt( WTOK_PLYR_NAME1, 30, 7, m_name );
     widget_manager->breakLine();
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
         // Note: even though that all strings in sKartAction2Strings above
@@ -97,7 +97,7 @@ PlayerControls::PlayerControls(int whichPlayer):
 
 
     KartAction control;
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     for(int i = KA_FIRST; i <= KA_LAST; i++)
     {
         control = (KartAction)i;

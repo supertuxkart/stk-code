@@ -117,7 +117,7 @@ get stuck or fall too far, use the rescue button to get back on track."));
         _("Check the current key bindings for the first player"));
     widget_manager->breakLine();
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     /*The keybindings are placed with loops because it allows to change the
      * number of kart actions without changing this screen. */
     for(int i = WTOK_FIRST_KEYNAME; i <= WTOK_LAST_KEYNAME; ++i)
@@ -128,7 +128,7 @@ get stuck or fall too far, use the rescue button to get back on track."));
     }
     widget_manager->breakLine();
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     for(int i = WTOK_FIRST_KEYBINDING; i <= WTOK_LAST_KEYBINDING; ++i)
     {
         widget_manager->addTextWgt( i, 20, 4,

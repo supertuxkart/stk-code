@@ -41,7 +41,7 @@ enum WidgetTokens
 
 MainMenu::MainMenu()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
 
     widget_manager->addTextButtonWgt( WTOK_SINGLE, 25, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, 25, 7, _("Multiplayer") );

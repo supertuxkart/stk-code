@@ -23,20 +23,16 @@
 #include <vector>
 
 
-/* Here are some big-picture instructions about how to use this widget
- * manager: the extern widget_manager is a global interface to the class. Call
- * addWgt() to specify the widgets you want, and for each widget specify the
- * details of it with the 'switch features', that can be changed between
- * show/hide, the initial setting for all of them is to be hidden. You will
- * usually have to call it's set*() function, then the show_*() functions.
- * After you have defined all the widgets in the screen, call layout(), that
- * will do the actual work at creating the widgets. Call the activated
- * functions during the time the widgets are alive, and make sure that
- * update() is called each frame.
+/* Big-picture instructions: the extern widget_manager is a global interface
+ * to the class. Call add*Wgt() to insert new widgets, and change details
+ * using the 'switch features'. By default no feature besides the one for
+ * each widget type are enabled.
  *
- * You can use setInitial*State() to avoid setting the state of the same
- * switch features with same values over and over; the default states are
- * reset when you call reset() or you can use resetDefaultStates().
+ * After you defined the entire screen, call layout(), that creates and
+ * places the widgets. Call the activated functions during the time the
+ * widgets are alive, and make sure that update() is called each frame.
+ *
+ * To remove the widgets, you have to call reset().
  */
 
 class WidgetManager
@@ -69,13 +65,15 @@ class WidgetManager
     {
         ET_WGT,
         ET_BREAK,
-        ET_COLUMN
+        ET_SWITCH //Switch orientation
     };
 
-    /* I decided to waste one integer per break/column with the pos
+    /* I decided to waste one integer per break/switch with the pos
      * variable inside the WidgetElement struct, since otherwise we
      * would need 2 vectors for breaks and columns, which would use more
-     * memory, be slower and more complex than this. -Coz
+     * memory, be slower and more complex than this; another approach
+     * is to use classes for each ElementType, but this most likely will also
+     * waste more resources. -Coz
      */
     struct WidgetElement
     {
@@ -131,16 +129,28 @@ class WidgetManager
     int m_default_show_track;
     int m_default_track_num;
 
-
-    bool isColumnBreak( const int BREAK_POST ) const;
-
     int findId(const int TOKEN) const;
-    int calcWidth() const;
-    int calcHeight() const;
-    int calcLineWidth(const int START_ELEM) const;
-    int calcLineHeight(const int START_ELEM) const;
-    int calcColumnWidth(const int START_ELEM) const;
-    int calcColumnHeight(const int START_ELEM) const;
+
+    int calcLineWidth( const int POS );
+    int calcLineHeight( const int POS );
+    int calcColumnWidth( const int POS );
+    int calcColumnHeight( const int POS );
+
+    //These get* functions return the same thing as the above functions, but
+    //they modify pos and set it to the position of the last element
+    int getLineWidth( int& pos);
+    int getLineHeight( int& pos );
+    int getColumnWidth( int& pos );
+    int getColumnHeight( int& pos );
+
+    int calcLineX( const int POS );
+    int calcColumnX( const int POS );
+
+    int calcWidth();
+    int calcHeight();
+
+    bool layoutLine( int& x, int& y, int& pos );
+    bool layoutColumn( int& x, int& y, int& pos );
 
     int findLeftWidget(const int START_WGT) const;
     int findRightWidget(const int START_WGT) const;
@@ -167,15 +177,10 @@ public:
                              //is the whole screen.
         const int MIN_HEIGHT
     );
-    bool insertColumn(); //This function changes the orientation from left to
-                          //right and top to bottom of the widgets at line
-                          //breaks, and switches it, making it from top to
-                          //bottom, and left to right at a line break,
-                          //until the next line break or reset() call. It can
-                          //only be used right at the beginning
-                          //of a line (that is, before any widgets have been
-                          //created, or just after a line break).
+
     bool breakLine();
+    bool switchOrder(); //This changes the orientation from horizontal to
+                        //vertical. It's reverted at line breaks;
 
     void reset();
 

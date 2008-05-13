@@ -46,7 +46,7 @@ enum WidgetTokens
 
 GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Grand Prix") );
 
     // Findout which grand prixs are available and load them

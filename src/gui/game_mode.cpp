@@ -41,7 +41,7 @@ enum WidgetTokens
 
 GameMode::GameMode()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Race Mode"));
 
     if(unlock_manager->isLocked("grandprix"))

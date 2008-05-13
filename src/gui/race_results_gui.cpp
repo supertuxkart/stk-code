@@ -55,7 +55,7 @@ RaceResultsGUI::RaceResultsGUI()
     widget_manager->addTextWgt( WTOK_HIGHSCORES, 50, 7, _("Highscores") );
     widget_manager->breakLine();
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
 
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -102,7 +102,7 @@ RaceResultsGUI::RaceResultsGUI()
     delete[] order;
 
     widget_manager->breakLine();
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
 
     const Highscores *hs = world->getHighscores();
     int num_scores = hs->getNumberEntries();

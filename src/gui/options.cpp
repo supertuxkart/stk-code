@@ -36,7 +36,7 @@ enum WidgetTokens
 
 Options::Options()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 45, 7, _("Options") );
     widget_manager->addTextButtonWgt( WTOK_CONTROLS, 45, 7, _("Player Config") );
 

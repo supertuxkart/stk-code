@@ -46,7 +46,7 @@ DisplayResConfirm::DisplayResConfirm( const bool FROM_WINDOW_ ) :
 {
     m_counter = 5; // Number of seconds in which to confirm
 
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 70, 7,
         _("Confirm Resolution Within 5 Seconds"));
 

@@ -30,6 +30,8 @@
 #include <cstdlib>
 #include <iterator>
 #include <algorithm>
+#include <cassert>
+#include <stack>
 
 WidgetManager *widget_manager;
 
@@ -119,48 +121,36 @@ bool WidgetManager::addWgt
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::insertColumn()
+bool WidgetManager::switchOrder()
 {
-    //FIXME: should we add a column specific break? it would be easier to read than
-    //two breakLines().
-
+#if 0
     const int LAST_ELEM = (int)m_elems.size() - 1;
-    const int LAST_WGT = (int)m_widgets.size() - 1;
 
-    if( LAST_ELEM > -1 && m_elems[LAST_ELEM].type == ET_COLUMN )
+    if( LAST_ELEM > -1 )
     {
-        if( LAST_WGT > -1 )
+        if( m_elems[ LAST_ELEM ].type == ET_SWITCH )
         {
-            std::cerr << "WARNING: tried to add a column twice after " <<
-                "widget with token " << m_widgets[LAST_WGT].token <<
-                ".\n";
-        }
-        else
-        {
-            std::cerr << "WARNING: tried to add a column twice before" <<
-                " the first widget.\n";
-        }
-        return false;
-    }
+            const int LAST_WGT = (int)m_widgets.size() - 1;
 
-    m_elems.push_back( WidgetElement( ET_COLUMN, 0));
+            if( LAST_WGT > -1 )
+            {
+                std::cerr << "WARNING: tried to switch the order twice " <<
+                    "in a row after widget with token " <<
+                    m_widgets[LAST_WGT].token << ".\n";
+            }
+            else
+            {
+                std::cerr << "WARNING: tried to switch the order twice " <<
+                    "in a row before the first widget.\n";
+            }
+            return false;
+        }
+    }
+#endif
+
+    m_elems.push_back( WidgetElement( ET_SWITCH, 0 ));
 
     return true;
-}
-
-/** isColumnBreak() checks if the line break at the given position marks
- *  the end of a column, assuming that at the position given there is a line
- *  break. If there is no column returns false.
- */
-bool WidgetManager::isColumnBreak( const int BREAK_POS) const
-{
-    for(int i = BREAK_POS - 1; i > -1; --i)
-    {
-        if (m_elems[i].type == ET_BREAK ) return false;
-        else if( m_elems[i].type == ET_COLUMN ) return true;
-    }
-
-    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -176,29 +166,14 @@ bool WidgetManager::breakLine()
     }
 
     const int LAST_ELEM = (int)m_elems.size() - 1;
-    if( m_elems[LAST_ELEM].type == ET_COLUMN )
+    if( m_elems[LAST_ELEM].type == ET_SWITCH )
     {
-        std::cerr << "WARNING: tried to add a break to end a column " <<
-            "with no widgets inside the column, after widget with " <<
-            "token " << m_widgets[LAST_WGT].token << ".\n";
-
-        m_elems.pop_back();
+        std::cerr << "WARNING: tried to add a break after a switch, last " <<
+            "widget had token " << m_widgets[ LAST_WGT ].token << ".\n";
         return false;
     }
 
-    if( LAST_ELEM > 0 )//If there are at least two elements
-    {
-        if( m_elems[LAST_ELEM].type == ET_BREAK &&
-            !isColumnBreak( LAST_ELEM ))
-        {
-            std::cerr << "WARNING: tried to add an non-column line break "
-                "twice after widget with token " <<
-                m_widgets[LAST_WGT].token << ".\n";
-            return false;
-        }
-    }
-
-    m_elems.push_back(WidgetElement(ET_BREAK,0));
+    m_elems.push_back(WidgetElement( ET_BREAK, 0 ));
 
     return true;
 }
@@ -275,66 +250,6 @@ void WidgetManager::update(const float DELTA)
 
 }
 
-/** The calcWidth() function retrieves the width of the smallest rectangle
- *  that contains all the widgets being handled by the widget manager.
- */
-int WidgetManager::calcWidth() const
-{
-    const int NUM_ELEMS = (int)m_elems.size();
-    int curr_width = 0, total_width = 0;
-
-    for( int i = 0; i < NUM_ELEMS; ++i )
-    {
-        switch( m_elems[i].type)
-        {
-        case ET_WGT:
-            curr_width += m_widgets[ m_elems[i].pos ].widget->m_width;
-            break;
-
-        case ET_BREAK:
-            if( curr_width > total_width ) total_width = curr_width;
-            curr_width = 0;
-            break;
-
-        case ET_COLUMN:
-            curr_width = calcColumnWidth(i);
-
-            //Jump to the next line break
-            while( i < NUM_ELEMS )
-            {
-                if( m_elems[i].type == ET_BREAK) break;
-                ++i;
-            }
-            break;
-        }
-    }
-
-    if( curr_width > total_width ) total_width = curr_width;
-
-    return total_width;
-}
-
-/** The calcHeight() function retrieves the height of the smallest rectangle
- *  that contains all the widgets being handled by the widget manager.
- */
-int WidgetManager::calcHeight() const
-{
-    const int NUM_ELEMS = (int)m_elems.size();
-    if( NUM_ELEMS < 0 ) return 0;
-
-    int total_height = calcLineHeight(0);
-    for( int i = 1; i < NUM_ELEMS; ++i )
-    {
-        if( m_elems[i-1].type == ET_BREAK &&
-            !isColumnBreak( i-1 ))
-        {
-            total_height += calcLineHeight(i);
-        }
-    }
-
-    return total_height;
-}
-
 /** This argument-less layout() function serves as a recall to the other
  *  layout function in case you want to change the way widgets are put on
  *  the screen. It calls layout(POSITION) with the last given position,
@@ -353,6 +268,7 @@ bool WidgetManager::layout()
         return false;
     }
 
+
     const int NUM_WIDGETS = (int)m_widgets.size();
     for( int i = 0; i < NUM_WIDGETS; ++i )
     {
@@ -363,9 +279,10 @@ bool WidgetManager::layout()
             (float)m_widgets[i].last_preset_scroll_y;
     }
 
+
     const int PREV_SELECTED_WGT_TOKEN = m_selected_wgt_token;
-    const int RESULT = layout(m_prev_layout_pos);
-    if( RESULT == false ) return false;
+
+    if( !layout( m_prev_layout_pos )) return false;
 
     if( findId( PREV_SELECTED_WGT_TOKEN ) != WGT_NONE )
     {
@@ -378,6 +295,7 @@ bool WidgetManager::layout()
 //-----------------------------------------------------------------------------
 bool WidgetManager::layout(const WidgetArea POSITION)
 {
+    //TODO: split layout(WidgetArea) into smaller functions
     if( POSITION == WGT_AREA_NONE )
     {
         std::cerr << "WARNING: called layout with WGT_AREA_NONE.\n";
@@ -392,33 +310,35 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     const int SCREEN_WIDTH = user_config->m_width;
     const int SCREEN_HEIGHT = user_config->m_height;
 
-    int width, height;
-    //Set the widgets' rect shape properties in pixels.
-    for( int i = 0; i < NUM_WIDGETS; ++i )
     {
-        width = (int)(SCREEN_WIDTH * m_widgets[i].min_width * 0.01);
-        height = (int)(SCREEN_HEIGHT * m_widgets[i].min_height * 0.01);
-
-        m_widgets[i].widget->m_width = width;
-        m_widgets[i].widget->m_height = height;
-
-        if( m_widgets[i].resize_to_text ) m_widgets[i].widget->
-            resizeToText();
-
-        if( width < height )
+        int width, height;
+        //Set the widgets' rect shape properties in pixels.
+        for( int i = 0; i < NUM_WIDGETS; ++i )
         {
-            m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
-                m_widgets[i].widget->m_width * 0.01 );
-        }
-        else
-        {
-            m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
-                m_widgets[i].widget->m_height * 0.01 );
-        }
+            width = (int)(SCREEN_WIDTH * m_widgets[i].min_width * 0.01);
+            height = (int)(SCREEN_HEIGHT * m_widgets[i].min_height * 0.01);
 
-        if( m_widgets[i].widget->m_radius < 1 )
-        {
-            m_widgets[i].widget->m_radius = 1;
+            m_widgets[i].widget->m_width = width;
+            m_widgets[i].widget->m_height = height;
+
+            if( m_widgets[i].resize_to_text ) m_widgets[i].widget->
+                resizeToText();
+
+            if( width < height )
+            {
+                m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
+                    m_widgets[i].widget->m_width * 0.01 );
+            }
+            else
+            {
+                m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
+                    m_widgets[i].widget->m_height * 0.01 );
+            }
+
+            if( m_widgets[i].widget->m_radius < 1 )
+            {
+                m_widgets[i].widget->m_radius = 1;
+            }
         }
     }
 
@@ -493,18 +413,251 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         break;
     }
 
-    /* In this loop we give each widget it's true position on the screen and
-     * create their rect; we start at the position where the first widget
-     * will be, and move right first and down on breaks if the widget is
-     * outside of a column, and inside columns we move down first and right
-     * at breaks. The position used is the top left corner of the widget or
-     * column, and is moved to the bottom left corner just to create the
-     * rect, then we move to the top left corner of the next widget. Widgets
-     * are centered in the X-axis around their line(if outside a column), or
-     * around their column(if inside one), but always are stuck to the top
-     * of their line/column.
+/*TMP: CHECKS
+ *4 wgts of different sizes
+ *switch; 4 wgts of different sizes
+ *4 wgts
+ *
+ *
+ *
+ */
+    /* We have to give each widget it's pixel position and create their rect.
+     * The position given to the widgets is their bottom left corner; since
+     * OpenGL the bottom left corner of the screen for (0,0), it's easier
+     * that way. Widgets are centered on the X-axis around their line or
+     * column (if it's inside one), but are always stuck to the top of their
+     * line or column.
      */
 
+    int cursor_x = m_x + ( WGTS_WIDTH - calcLineWidth( 0 )) / 2;
+    int cursor_y = m_y;
+    int line_pos = 0;
+    WidgetID* curr_wgt = 0;
+
+    const int NUM_ELEMS = (int)m_elems.size();
+
+    for( int i = 0; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[ i ].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            cursor_x += curr_wgt->widget->m_width;
+            break;
+
+        case ET_BREAK:
+            cursor_x = m_x + ( WGTS_WIDTH - calcLineWidth( i + 1 )) / 2;
+            cursor_y -= calcLineHeight( line_pos );
+            line_pos = i + 1;
+            break;
+
+        case ET_SWITCH:
+            ++i;
+
+            if( !layoutColumn( cursor_x, cursor_y, i )) return false;
+
+            break;
+        }
+    }
+#if 0
+    int cursor_x = x;
+    int cursor_y = y;
+    WidgetID* curr_wgt = 0;
+
+    const int NUM_ELEMS = (int)m_elems.size();
+    int i;
+
+    for( i = pos; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[ i ].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            cursor_x += curr_wgt->widget->m_width;
+            break;
+
+        case ET_BREAK:
+            x += ( calcLineWidth( pos ) - calcLineWidth( i + 1 )) / 2;
+            std::cerr << pos << " " << calcLineWidth ( pos ) << " " << i << " " << calcLineWidth(i+1) << std::endl;
+            y = cursor_y - calcLineHeight( pos );
+            pos = i;
+            return true;
+
+        case ET_SWITCH:
+            ++i;
+            layoutColumn( cursor_x, cursor_y, i );
+            break;
+        }
+    }
+
+    pos = i;
+    return true;
+#endif
+
+
+#if 0
+    //The container is the line/row or column that contains a widget,
+    //including the starting position.
+    //A new value is pushed with each orientation switch, and popped with
+    //each break that closes a switch.
+    std::stack<int> container_x;
+    std::stack<int> container_y;
+    std::stack<int> container_pos;
+
+    int cursor_x = m_x + ( WGTS_WIDTH - calcLineWidth( 0 )) / 2;
+    int cursor_y = m_y;
+
+    container_x.push( cursor_x );
+    container_y.push( cursor_y );
+    container_pos.push( 0 );
+
+    WidgetID* curr_wgt = 0;
+
+    bool horizontal = true;
+    bool order_was_switched = false;
+
+    const int NUM_ELEMS = (int)m_elems.size();
+
+    for( int i = 0; i < NUM_ELEMS; ++i )
+    {
+        std::cerr << "I " << m_elems[i].type << " " << i << std::endl;
+        std::cerr << "x " << cursor_x << std::endl;
+        std::cerr << "y " << cursor_y << std::endl;
+        switch( m_elems[i].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner, not the
+            //top left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            if( horizontal )
+            {
+                cursor_x += curr_wgt->widget->m_width;
+            }
+            else if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }
+
+                cursor_y -= curr_wgt->widget->m_height;
+            }
+            break;
+
+        case ET_BREAK:
+            assert( curr_wgt != 0 );
+
+            if( horizontal )
+            {
+                cursor_y -= calcLineHeight( container_pos.top() + 1 );
+            }
+
+            if( order_was_switched )
+            {
+                container_x.pop();
+                container_y.pop();
+                container_pos.pop();
+            }
+
+            if( horizontal )
+            {
+//                cursor_x.top() -= ( calcLineWidth( cursor_pos.top() ) +
+//                    calcLineWidth( i + 1 )) / 2;
+//                cursor_x.top() += ( calcLineWidth( cursor_pos.top() ) -
+//                    calcLineWidth( i + 1 )) / 2;
+                cursor_x = container_x.top() +
+                    ( calcLineWidth( container_pos.top() ) -
+                      calcLineWidth( i + 1 )) / 2;
+            }
+            else
+            {
+                cursor_x = container_x.top() +
+                    calcLineWidth( container_pos.top() ) -
+                    calcColumnWidth( i + 1 );
+                cursor_y = container_y.top();
+            }
+
+            if( order_was_switched )
+            {
+                horizontal = !horizontal;
+                if( container_x.size() < 2 ) order_was_switched = false;
+            }
+            break;
+
+        case ET_SWITCH:
+            horizontal = !horizontal;
+
+            container_x.push( cursor_x );
+            container_y.push( cursor_y );
+            container_pos.push( i );
+
+            if( horizontal )
+            {
+                //TODO: Check when the first line is smaller than the rest
+//                cursor_x = calcColumnWidth( i ) - calcLineWidth( i + 1 );
+            }
+            else if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        /*cursor_x += ( calcLineWidth( i ) -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;*/
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( calcLineWidth( i ) -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }
+/*            {
+                cursor_x.top() += calcLineWidth( i ) - calcColumnWidth( i + 1 );*/
+            }
+
+            order_was_switched = true;
+            break;
+    }
+#endif
+#if 0
     //Position the first widget, these coordinates are for the top left
     //corner of the first widget.
     int widget_x = m_x + ( WGTS_WIDTH - calcLineWidth( 0 )) / 2;
@@ -586,11 +739,12 @@ bool WidgetManager::layout(const WidgetArea POSITION)
             }
             break;
 
-        case ET_COLUMN:
+        case ET_COLUMN_START:
             column_pos = i;
             break;
         }
     }
+#endif
 
     //Select the first active widget by default
     setSelectedWgtToken( WGT_NONE );
@@ -607,6 +761,236 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool WidgetManager::layoutLine( int& x, int& y, int& pos )
+{
+    int cursor_x = x;
+    int cursor_y = y;
+    WidgetID* curr_wgt = 0;
+
+    const int NUM_ELEMS = (int)m_elems.size();
+    int i;
+
+    for( i = pos; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[ i ].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            cursor_x += curr_wgt->widget->m_width;
+            break;
+
+        case ET_BREAK:
+            x += ( calcLineWidth( pos ) - calcColumnWidth( i + 1 )) / 2;
+            y = cursor_y - calcLineHeight( pos );
+            pos = i;
+            return true;
+
+        case ET_SWITCH:
+            ++i;
+            layoutColumn( cursor_x, cursor_y, i );
+            break;
+        }
+    }
+
+    pos = i;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool WidgetManager::layoutColumn( int& x, int& y, int& pos )
+{
+    int cursor_x = x + calcColumnX( pos );
+    int cursor_y = y;
+    WidgetID* curr_wgt = 0;
+
+    const int NUM_ELEMS = (int)m_elems.size();
+    int i;
+
+    for( i = pos; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[i].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }
+
+                cursor_y -= curr_wgt->widget->m_height;
+            }
+            break;
+
+        case ET_BREAK:
+            x += calcColumnWidth( pos );
+//            y = ??? Unnecesary?;
+            pos = i;
+            return true;
+
+        case ET_SWITCH:
+            ++i;
+            layoutLine( cursor_x, cursor_y, i );
+            break;
+        }
+    }
+
+    pos = i;
+    return true;
+#if 0
+    for( int i = 0; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[i].type )
+        {
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            curr_wgt->widget->m_x = cursor_x;
+
+            //We have to give createRect() the bottom left corner, not the
+            //top left corner
+            curr_wgt->widget->m_y = cursor_y - curr_wgt->widget->m_height;
+
+            if( !(curr_wgt->widget->createRect()) ) return false;
+
+            if( horizontal )
+            {
+                cursor_x += curr_wgt->widget->m_width;
+            }
+            else if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }
+
+                cursor_y -= curr_wgt->widget->m_height;
+            }
+            break;
+
+        case ET_BREAK:
+            assert( curr_wgt != 0 );
+
+            if( horizontal )
+            {
+                cursor_y -= calcLineHeight( container_pos.top() + 1 );
+            }
+
+            if( order_was_switched )
+            {
+                container_x.pop();
+                container_y.pop();
+                container_pos.pop();
+            }
+
+            if( horizontal )
+            {
+//                cursor_x.top() -= ( calcLineWidth( cursor_pos.top() ) +
+//                    calcLineWidth( i + 1 )) / 2;
+//                cursor_x.top() += ( calcLineWidth( cursor_pos.top() ) -
+//                    calcLineWidth( i + 1 )) / 2;
+                cursor_x = container_x.top() +
+                    ( calcLineWidth( container_pos.top() ) -
+                      calcLineWidth( i + 1 )) / 2;
+            }
+            else
+            {
+                cursor_x = container_x.top() +
+                    calcLineWidth( container_pos.top() ) -
+                    calcColumnWidth( i + 1 );
+                cursor_y = container_y.top();
+            }
+
+            if( order_was_switched )
+            {
+                horizontal = !horizontal;
+                if( container_x.size() < 2 ) order_was_switched = false;
+            }
+            break;
+
+        case ET_SWITCH:
+            horizontal = !horizontal;
+
+            container_x.push( cursor_x );
+            container_y.push( cursor_y );
+            container_pos.push( i );
+
+            if( horizontal )
+            {
+                //TODO: Check when the first line is smaller than the rest
+//                cursor_x = calcColumnWidth( i ) - calcLineWidth( i + 1 );
+            }
+            else if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        /*cursor_x += ( calcLineWidth( i ) -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;*/
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( calcLineWidth( i ) -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }
+/*            {
+                cursor_x.top() += calcLineWidth( i ) - calcColumnWidth( i + 1 );*/
+            }
+
+            order_was_switched = true;
+            break;
+    }
+#endif
+}
+
+#if 0
 //-----------------------------------------------------------------------------
 int WidgetManager::calcLineWidth( const int START_ELEM ) const
 {
@@ -626,7 +1010,7 @@ int WidgetManager::calcLineWidth( const int START_ELEM ) const
         case ET_BREAK:
             return total_width;
 
-        case ET_COLUMN:
+        case ET_COLUMN_START:
             total_width += calcColumnWidth(i);
 
             while( i < NUM_ELEMS )
@@ -664,7 +1048,7 @@ int WidgetManager::calcLineHeight( const int START_ELEM ) const
         case ET_BREAK:
             return line_height;
 
-        case ET_COLUMN:
+        case ET_COLUMN_START:
             column_height = calcColumnHeight(i);
 
             if( line_height < column_height )
@@ -682,48 +1066,380 @@ int WidgetManager::calcLineHeight( const int START_ELEM ) const
 
     return line_height;
 }
+#endif
 
-//-----------------------------------------------------------------------------
-int WidgetManager::calcColumnWidth(const int START_ELEM) const
+/** This getLineWidth() function returns the width of the smallest
+ *  rectangle that contains the widgets in the given line. It expects
+ *  the first element of the line as the argument, and will set pos
+ *  to the last element of the line, usually a break.
+ */
+int WidgetManager::getLineWidth( int& pos )
 {
-    int curr_wgt;
-    int column_width = 0;
     const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
 
-    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
+    for( ; pos < NUM_ELEMS; ++pos )
     {
-        if( m_elems[i].type == ET_WGT )
+        switch( m_elems[ pos ].type)
         {
-            curr_wgt = m_elems[i].pos;
-            if( column_width < m_widgets[curr_wgt].widget->m_width )
-            {
-                column_width = m_widgets[curr_wgt].widget->m_width;
-            }
+        case ET_WGT:
+            width += m_widgets[ m_elems[ pos ].pos ].widget->m_width;
+            break;
+
+        case ET_BREAK:
+            return width;
+
+        case ET_SWITCH:
+            ++pos;
+            width += getColumnWidth( pos );
+            break;
         }
-        else if (m_elems[i].type == ET_BREAK ) return column_width;
     }
 
-    return column_width;
+    return width;
+}
+
+/** This getLineHeight() function returns the height of the smallest
+ *  rectangle that contains the widgets in the given line. It expects
+ *  the first element of the line as the argument, and will set pos
+ *  to the last element of the line, usually a break.
+ */
+int WidgetManager::getLineHeight( int& pos )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int height = 0;
+    int column_height;
+
+    for( ; pos < NUM_ELEMS; ++pos )
+    {
+        switch( m_elems[ pos ].type)
+        {
+        case ET_WGT:
+            if( m_widgets[ m_elems[ pos ].pos ].widget->m_height > height )
+            {
+                height = m_widgets[ m_elems[ pos ].pos ].widget->m_height;
+            }
+            break;
+
+        case ET_BREAK:
+            return height;
+
+        case ET_SWITCH:
+            ++pos;
+            column_height = getColumnHeight( pos );
+            if( column_height > height ) height = column_height;
+            break;
+        }
+    }
+
+    return height;
+}
+
+/** This getColumnWidth() function returns the width of the smallest
+ *  rectangle that contains the widgets in the given column. It expects
+ *  the first element of the column as the argument, and will set pos
+ *  to the last element of the column, usually a break.
+ */
+int WidgetManager::getColumnWidth( int& pos )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
+    int line_width;
+
+    for( ; pos < NUM_ELEMS; ++pos )
+    {
+        switch( m_elems[ pos ].type )
+        {
+            case ET_WGT:
+            if( m_widgets[ m_elems[ pos ].pos ].widget->m_width > width )
+            {
+                width = m_widgets[ m_elems[ pos ].pos ].widget->m_width;
+            }
+            break;
+
+            case ET_BREAK:
+                return width;
+
+            case ET_SWITCH:
+                ++pos;
+                line_width = getLineWidth( pos );
+                if( line_width > width ) width = line_width;
+                break;
+
+        }
+    }
+
+    return width;
+}
+
+/** This getColumnHeight() function returns the height of the smallest
+ *  rectangle that contains the widgets in the given column. It expects
+ *  the first element of the column as the argument, and will set pos
+ *  to the last element of the column, usually a break.
+ */
+int WidgetManager::getColumnHeight( int& pos )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int height = 0;
+
+    for( ; pos < NUM_ELEMS; ++pos )
+    {
+        switch( m_elems[ pos ].type)
+        {
+        case ET_WGT:
+            height += m_widgets[ m_elems[ pos ].pos ].widget->m_height;
+            break;
+
+        case ET_BREAK:
+            return height;
+
+        case ET_SWITCH:
+            ++pos;
+            height += getLineHeight( pos );
+            break;
+        }
+    }
+
+    return height;
+}
+
+/** This calcLineWidth() function returns the width of the smallest
+ *  rectangle that contains the widgets in the given line. It expects
+ *  the first element of the line as the argument.
+ */
+int WidgetManager::calcLineWidth( const int POS )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
+
+    for( int i = POS; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[i].type)
+        {
+        case ET_WGT:
+            width += m_widgets[ m_elems[ i ].pos ].widget->m_width;
+            break;
+
+        case ET_BREAK:
+            return width;
+
+        case ET_SWITCH:
+            ++i;
+            width += getColumnWidth( i );
+            break;
+        }
+    }
+
+    return width;
+}
+
+/** This calcLineHeight() function returns the height of the smallest
+ *  rectangle that contains the widgets in the given line. It expects
+ *  the first element of the line as the argument.
+ */
+int WidgetManager::calcLineHeight( const int POS )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int height = 0;
+    int column_height;
+
+    for( int i = POS; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[i].type)
+        {
+        case ET_WGT:
+            if( m_widgets[ m_elems[ i ].pos ].widget->m_height > height )
+            {
+                height = m_widgets[ m_elems[ i ].pos ].widget->m_height;
+            }
+            break;
+
+        case ET_BREAK:
+            return height;
+
+        case ET_SWITCH:
+            ++i;
+            column_height = getColumnHeight( i );
+            if( column_height > height ) height = column_height;
+            break;
+        }
+    }
+
+    return height;
+}
+
+/** This calcColumnWidth() function returns the width of the smallest
+ *  rectangle that contains the widgets in the given column. It expects
+ *  the first element of the column as the argument.
+ */
+int WidgetManager::calcColumnWidth( const int POS )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
+    int line_width;
+
+    for( int i = POS; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[ i ].type )
+        {
+            case ET_WGT:
+            if( m_widgets[ m_elems[ i ].pos ].widget->m_width > width )
+            {
+                width = m_widgets[ m_elems[ i ].pos ].widget->m_width;
+            }
+            break;
+
+            case ET_BREAK:
+                return width;
+
+            case ET_SWITCH:
+                ++i;
+                line_width = getLineWidth( i );
+                if( line_width > width ) width = line_width;
+                break;
+
+        }
+    }
+
+    return width;
+}
+
+/** This calcColumnHeight() function returns the height of the smallest
+ *  rectangle that contains the widgets in the given column. It expects
+ *  the first element of the column as the argument.
+ */
+int WidgetManager::calcColumnHeight( const int POS )
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int height = 0;
+
+    for( int i = POS; i < NUM_ELEMS; ++i )
+    {
+        switch( m_elems[i].type)
+        {
+        case ET_WGT:
+            height += m_widgets[ m_elems[ i ].pos ].widget->m_height;
+            break;
+
+        case ET_BREAK:
+            return height;
+
+        case ET_SWITCH:
+            ++i;
+            height += getLineHeight( i );
+            break;
+        }
+    }
+
+    return height;
 }
 
 //-----------------------------------------------------------------------------
-int WidgetManager::calcColumnHeight(const int START_ELEM) const
+int WidgetManager::calcLineX( const int POS )
 {
-    int curr_wgt;
-    int total_height = 0;
-    const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
+    WidgetID* curr_wgt = 0;
 
-    for( int i = START_ELEM; i < NUM_ELEMS; ++i )
+    const int NUM_ELEMS = m_elems.size();
+
+    for( int i = POS; i < NUM_ELEMS; ++i )
     {
-        if( m_elems[i].type == ET_WGT )
+        switch( m_elems[ i ].type )
         {
-            curr_wgt = m_elems[i].pos;
-            total_height += m_widgets[curr_wgt].widget->m_height;
+        case ET_WGT:
+            curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+
+            width += curr_wgt->widget->m_width;
+            break;
+
+        case ET_SWITCH:
+            break;
+
+        case ET_BREAK:
+            return width;
         }
-        else if (m_elems[i].type == ET_BREAK ) return total_height;
     }
 
-    return total_height;
+/*
+            if( i + 1 < NUM_ELEMS )
+            {
+                switch( m_elems[ i + 1 ].type )
+                {
+                    case ET_WGT:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            m_widgets[ m_elems[ i + 1 ].pos ].widget->
+                            m_width ) / 2;
+                        break;
+
+                    case ET_SWITCH:
+                        cursor_x += ( curr_wgt->widget->m_width -
+                            calcLineWidth( i + 2 ) ) / 2;
+                        break;
+
+                    case ET_BREAK:
+                        break;
+                }*/
+
+
+
+    return width;
+}
+
+//-----------------------------------------------------------------------------
+int WidgetManager::calcColumnX( const int POS )
+{
+    if( POS >= (int)m_elems.size() ) return 0;
+
+    WidgetID* curr_wgt = &m_widgets[ m_elems[ POS ].pos ];
+
+    switch( m_elems[ POS ].type )
+    {
+        case ET_WGT:
+            return ( calcColumnWidth( POS ) - curr_wgt->widget->m_width ) / 2;
+
+        case ET_SWITCH:
+            return ( curr_wgt->widget->m_width -
+                     calcLineWidth( POS + 1 )) / 2;
+
+        case ET_BREAK:
+            break;
+    }
+
+    return 0;
+}
+
+/** The calcWidth() function retrieves the width of the smallest rectangle
+ *  that contains all the widgets being handled by the widget manager.
+ */
+int WidgetManager::calcWidth()
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int width = 0;
+    int line_width;
+
+    for( int i = 0; i < NUM_ELEMS; ++i )
+    {
+        line_width = getLineWidth( i );
+        if( line_width > width ) width = line_width;
+    }
+
+    return width;
+}
+
+/** The calcHeight() function retrieves the height of the smallest rectangle
+ *  that contains all the widgets being handled by the widget manager.
+ */
+int WidgetManager::calcHeight()
+{
+    const int NUM_ELEMS = (int)m_elems.size();
+    int height = 0;
+
+    for( int i = 0; i < NUM_ELEMS; ++i )
+    {
+        height += getLineHeight( i );
+    }
+
+    return height;
 }
 
 //-----------------------------------------------------------------------------
@@ -1647,9 +2363,9 @@ int WidgetManager::handlePointer(const int X, const int Y )
             curr_wgt_id = *position;
 
             wgt_x_center = m_widgets[curr_wgt_id].widget->m_x +
-                m_widgets[i].widget->m_width / 2;
+                (m_widgets[i].widget->m_width / 2);
             wgt_y_center = m_widgets[curr_wgt_id].widget->m_y +
-                m_widgets[i].widget->m_height / 2;
+                (m_widgets[i].widget->m_height / 2);
 
             //Check if it's the closest one to the mouse
             dist = (float)( abs(X - wgt_x_center) + abs(Y - wgt_y_center));
@@ -1783,9 +2499,9 @@ int WidgetManager::findLeftWidget(const int START_WGT) const
     int closest_y_dist = user_config->m_height;
 
     const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
-        m_widgets[START_WGT].widget->m_height / 2;
+        ( m_widgets[START_WGT].widget->m_height / 2 );
     const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
-        m_widgets[START_WGT].widget->m_width / 2;
+        ( m_widgets[START_WGT].widget->m_width / 2 );
 
     int curr_wgt_x_center, curr_wgt_y_center;
     int x_dist, y_dist;
@@ -1794,8 +2510,8 @@ int WidgetManager::findLeftWidget(const int START_WGT) const
     {
         if(!(m_widgets[i].active)) continue;
 
-        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+        curr_wgt_y_center = m_widgets[i].widget->m_y + ( m_widgets[i].widget->m_height / 2 );
+        curr_wgt_x_center = m_widgets[i].widget->m_x + ( m_widgets[i].widget->m_width / 2 );
 
         x_dist = START_WGT_X_CENTER - curr_wgt_x_center;
         y_dist = abs( curr_wgt_y_center - START_WGT_Y_CENTER );
@@ -1836,9 +2552,9 @@ int WidgetManager::findRightWidget(const int START_WGT) const
     int closest_y_dist = user_config->m_height;
 
     const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
-        m_widgets[START_WGT].widget->m_height / 2;
+        ( m_widgets[START_WGT].widget->m_height / 2 );
     const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
-        m_widgets[START_WGT].widget->m_width / 2;
+        ( m_widgets[START_WGT].widget->m_width / 2 );
 
     int curr_wgt_x_center, curr_wgt_y_center;
     int x_dist, y_dist;
@@ -1847,8 +2563,8 @@ int WidgetManager::findRightWidget(const int START_WGT) const
     {
         if(!(m_widgets[i].active)) continue;
 
-        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+        curr_wgt_y_center = m_widgets[i].widget->m_y + ( m_widgets[i].widget->m_height / 2 );
+        curr_wgt_x_center = m_widgets[i].widget->m_x + ( m_widgets[i].widget->m_width / 2 );
 
         //Notice that the order of this substraction is the *only* difference
         //from the findLeftWidget() function
@@ -1886,9 +2602,9 @@ int WidgetManager::findTopWidget(const int START_WGT) const
     int closest_y_dist = user_config->m_height;
 
     const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
-        m_widgets[START_WGT].widget->m_height / 2;
+        ( m_widgets[START_WGT].widget->m_height / 2 );
     const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
-        m_widgets[START_WGT].widget->m_width / 2;
+        ( m_widgets[START_WGT].widget->m_width / 2 );
 
     int curr_wgt_x_center, curr_wgt_y_center;
     int x_dist, y_dist;
@@ -1897,8 +2613,8 @@ int WidgetManager::findTopWidget(const int START_WGT) const
     {
         if(!(m_widgets[i].active)) continue;
 
-        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+        curr_wgt_y_center = m_widgets[i].widget->m_y + ( m_widgets[i].widget->m_height / 2 );
+        curr_wgt_x_center = m_widgets[i].widget->m_x + ( m_widgets[i].widget->m_width / 2 );
 
         y_dist = curr_wgt_y_center - START_WGT_Y_CENTER;
         x_dist = abs( curr_wgt_x_center - START_WGT_X_CENTER );
@@ -1941,9 +2657,9 @@ int WidgetManager::findBottomWidget(const int START_WGT) const
     int closest_y_dist = user_config->m_height;
 
     const int START_WGT_Y_CENTER = m_widgets[START_WGT].widget->m_y +
-        m_widgets[START_WGT].widget->m_height / 2;
+        ( m_widgets[START_WGT].widget->m_height / 2 );
     const int START_WGT_X_CENTER = m_widgets[START_WGT].widget->m_x +
-        m_widgets[START_WGT].widget->m_width / 2;
+        ( m_widgets[START_WGT].widget->m_width / 2 );
 
     int curr_wgt_x_center, curr_wgt_y_center;
     int x_dist, y_dist;
@@ -1952,8 +2668,8 @@ int WidgetManager::findBottomWidget(const int START_WGT) const
     {
         if(!(m_widgets[i].active)) continue;
 
-        curr_wgt_y_center = m_widgets[i].widget->m_y + m_widgets[i].widget->m_height / 2;
-        curr_wgt_x_center = m_widgets[i].widget->m_x + m_widgets[i].widget->m_width / 2;
+        curr_wgt_y_center = m_widgets[i].widget->m_y + ( m_widgets[i].widget->m_height / 2 );
+        curr_wgt_x_center = m_widgets[i].widget->m_x + ( m_widgets[i].widget->m_width / 2 );
 
         //Notice that the order of this substraction is the *only* difference
         //from the findTopWidget() function

@@ -43,7 +43,7 @@ enum WidgetTokens
 
 HelpPageThree::HelpPageThree()
 {
-    widget_manager->insertColumn();
+    widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 100, 8, _("Game modes"));
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2 );
