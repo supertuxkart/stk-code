@@ -105,9 +105,11 @@ const std::string Challenge::getUnlockedMessage() const
         switch(m_feature[n].type)
         {
             case UNLOCK_TRACK:
-                Track* track = track_manager->getTrack( m_feature[n].name );
-                snprintf(message, 127, _("New track '%s'\nnow available"), gettext(track->getName()) );
-                break;
+                {
+                    Track* track = track_manager->getTrack( m_feature[n].name );
+                    snprintf(message, 127, _("New track '%s'\nnow available"), gettext(track->getName()) );
+                    break;
+                }
             case UNLOCK_MODE:
                 snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
                 break;
