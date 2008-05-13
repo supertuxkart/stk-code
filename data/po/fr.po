@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-13 14:56-0400\n"
-"PO-Revision-Date: 2008-05-13 14:56-0500\n"
+"PO-Revision-Date: 2008-05-13 15:11-0500\n"
 "Last-Translator: Marianne Gagnon <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -722,7 +722,7 @@ msgstr "Dérapage (aperçu)"
 
 #: data/gp3.cup:4
 msgid "Snag Drive"
-msgstr "Parcours facile non inclus"
+msgstr "Chemin des Embûches"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.track:4
 msgid "SnowTux Peak"
