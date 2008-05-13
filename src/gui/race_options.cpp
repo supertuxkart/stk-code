@@ -61,7 +61,7 @@ RaceOptions::RaceOptions() :
     widget_manager->switchOrder();
     widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 38, 7, _("Difficulty") );
     widget_manager->switchOrder();
-    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, _("<") );
+    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, "<" );
 
     widget_manager->addTextWgt( WTOK_DIFFICULTY, 32, 7, getDifficultyString(m_difficulty));
     widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );

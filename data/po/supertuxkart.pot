@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-11 14:54+1000\n"
+"POT-Creation-Date: 2008-05-13 14:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "%dx%d Blacklisted"
 msgstr ""
 
-#: src/modified/world.cpp:624 src/world.cpp:622
+#: src/world.cpp:622
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -36,12 +36,12 @@ msgstr ""
 msgid "Active Challenges"
 msgstr ""
 
-#: data/all.cup:5
-msgid "All 13 tracks included in SuperTuxKart"
-msgstr ""
-
 #: data/all.cup:4
 msgid "All tracks"
+msgstr ""
+
+#: data/all.cup:5
+msgid "All tracks included in SuperTuxKart"
 msgstr ""
 
 #: data/tracks/jungle/jungle.track:4
@@ -114,10 +114,6 @@ msgstr ""
 
 #: src/gui/track_sel.cpp:49
 msgid "Choose a track"
-msgstr ""
-
-#: src/gui/race_options.cpp:57
-msgid "Choose the race options"
 msgstr ""
 
 #: src/gui/player_controls.cpp:74
@@ -222,7 +218,7 @@ msgstr ""
 msgid "Decrease Resolution"
 msgstr ""
 
-#: src/gui/race_options.cpp:66
+#: src/gui/race_options.cpp:62
 msgid "Difficulty"
 msgstr ""
 
@@ -234,7 +230,7 @@ msgstr ""
 msgid "Display Settings"
 msgstr ""
 
-#: src/gui/race_options.cpp:151 src/gui/race_options.cpp:165
+#: src/gui/race_options.cpp:282
 msgid "Driver"
 msgstr ""
 
@@ -279,7 +275,7 @@ msgstr ""
 msgid "Finish the City track in 5:20"
 msgstr ""
 
-#: src/gui/race_gui.cpp:784
+#: src/gui/race_gui.cpp:800
 #, c-format
 msgid "Finished"
 msgstr ""
@@ -292,7 +288,7 @@ msgstr ""
 msgid "First grand prix, easy to get started"
 msgstr ""
 
-#: src/gui/game_mode.cpp:74
+#: src/challenges/penguin_playground_gp.cpp:28 src/gui/game_mode.cpp:74
 msgid "Follow the Leader"
 msgstr ""
 
@@ -304,6 +300,13 @@ msgstr ""
 msgid ""
 "Follow the Leader on a\n"
 "Desert Island"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:74
+msgid ""
+"Follow the leader: Stay behind the leader kart.\n"
+"When the countdown reaches zero, a kart ahead\n"
+"of the leader or the last kart is eliminated."
 msgstr ""
 
 #: src/gui/help_page_one.cpp:73
@@ -331,15 +334,19 @@ msgstr ""
 msgid "Game mode help"
 msgstr ""
 
+#: src/gui/help_page_three.cpp:47
+msgid "Game modes"
+msgstr ""
+
 #: src/gui/challenges_menu.cpp:51 src/gui/credits_menu.cpp:76
 msgid "Go back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:148
+#: src/gui/help_page_one.cpp:148 src/gui/help_page_three.cpp:87
 msgid "Go back to the menu"
 msgstr ""
 
-#: src/gui/race_gui.cpp:932
+#: src/gui/race_gui.cpp:948
 msgid "Go!"
 msgstr ""
 
@@ -347,8 +354,15 @@ msgstr ""
 msgid "Grab blue boxes and coins"
 msgstr ""
 
-#: src/gui/game_mode.cpp:55
+#: src/challenges/energy_math_class.cpp:29 src/gui/game_mode.cpp:55
 msgid "Grand Prix"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:54
+msgid ""
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
 msgstr ""
 
 #: src/gui/main_menu.cpp:60 src/gui/race_menu.cpp:51
@@ -367,12 +381,12 @@ msgstr ""
 msgid "Increase Resolution"
 msgstr ""
 
-#: src/user_config.cpp:853
+#: src/user_config.cpp:861
 #, c-format
 msgid "Invalid"
 msgstr ""
 
-#: src/kart.cpp:628 src/modified/kart.cpp:627
+#: src/kart.cpp:634
 msgid "Invalid short-cut!!"
 msgstr ""
 
@@ -380,7 +394,7 @@ msgstr ""
 msgid "Jump"
 msgstr ""
 
-#: src/gui/race_gui.cpp:789
+#: src/gui/race_gui.cpp:805
 msgid "Lap"
 msgstr ""
 
@@ -388,17 +402,12 @@ msgstr ""
 msgid "Last grand prix, longer and harder"
 msgstr ""
 
-#: src/gui/race_gui.cpp:408
+#: src/gui/race_gui.cpp:409
 msgid "Leader"
 msgstr ""
 
 #: src/gui/player_controls.cpp:64
 msgid "Left"
-msgstr ""
-
-#: src/gui/race_options.cpp:74 src/gui/race_options.cpp:91
-#: src/gui/race_options.cpp:109
-msgid "Less"
 msgstr ""
 
 #: data/tracks/littlevolcano/littlevolcano.track:4
@@ -417,11 +426,6 @@ msgstr ""
 msgid "Missile - fast stopper in a straight line"
 msgstr ""
 
-#: src/gui/race_options.cpp:67 src/gui/race_options.cpp:84
-#: src/gui/race_options.cpp:102
-msgid "More"
-msgstr ""
-
 #: src/gui/main_menu.cpp:47
 msgid "Multiplayer"
 msgstr ""
@@ -430,78 +434,37 @@ msgstr ""
 msgid "New Feature Unlocked"
 msgstr ""
 
-#: src/challenges/energy_shifting_sands.cpp:28
+#: src/challenges/challenge.cpp:121
+#, c-format
 msgid ""
-"New Grand Prix:\n"
-"To the Moon and Back\n"
+"New Grand Prix '%s'\n"
 "now available"
 msgstr ""
 
-#: src/challenges/worlds_end_gp.cpp:28
+#: src/challenges/challenge.cpp:124
+#, c-format
 msgid ""
-"New Grand Prix: All Tracks GP\n"
-"and Bonus Preview: Skidding\n"
-"now available.\n"
-"Select 'skidding' as difficulty."
-msgstr ""
-
-#: src/challenges/island_follow.cpp:28
-msgid ""
-"New Grand Prix: At World's End\n"
+"New difficulty\n"
+"'%s'\n"
 "now available"
 msgstr ""
 
-#: src/challenges/moon_and_back_gp.cpp:28
-msgid ""
-"New Grand Prix: Snag Drive\n"
-"now available"
-msgstr ""
-
-#: src/kart.cpp:400 src/modified/kart.cpp:399
+#: src/kart.cpp:400
 msgid "New fastest lap"
 msgstr ""
 
-#: src/challenges/penguin_playground_gp.cpp:28
+#: src/challenges/challenge.cpp:118
+#, c-format
 msgid ""
 "New game mode\n"
-"'Follow Leader'\n"
+"'%s'\n"
 "now available"
 msgstr ""
 
-#: src/challenges/energy_math_class.cpp:29
+#: src/challenges/challenge.cpp:114
+#, c-format
 msgid ""
-"New game mode\n"
-"'Grand Prix'\n"
-"now available"
-msgstr ""
-
-#: src/challenges/race_track_time.cpp:29
-msgid ""
-"New track: Amazonian Journey\n"
-"now available"
-msgstr ""
-
-#: src/challenges/tollway_time.cpp:28
-msgid ""
-"New track: Canyon\n"
-"now available"
-msgstr ""
-
-#: src/challenges/jungle_follow.cpp:28
-msgid ""
-"New track: City\n"
-"now available"
-msgstr ""
-
-#: src/challenges/tollway_head2head.cpp:28
-msgid ""
-"New track: Fort Magma\n"
-"now available"
-msgstr ""
-
-#: src/challenges/city_time.cpp:28
-msgid ""
-"New track: SnowTux Peak\n"
+"New track '%s'\n"
 "now available"
 msgstr ""
 
@@ -517,19 +480,19 @@ msgstr ""
 msgid "No track selected"
 msgstr ""
 
-#: src/gui/race_options.cpp:170
+#: src/gui/race_options.cpp:281 src/gui/race_options.cpp:285
 msgid "Novice"
 msgstr ""
 
-#: src/gui/race_options.cpp:83
+#: src/gui/race_options.cpp:80
 msgid "Number of karts"
 msgstr ""
 
-#: src/gui/race_options.cpp:101
+#: src/gui/race_options.cpp:106
 msgid "Number of laps"
 msgstr ""
 
-#: src/user_config.cpp:484
+#: src/user_config.cpp:488
 msgid "Old config file found, check your key bindings!"
 msgstr ""
 
@@ -553,7 +516,7 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-#: src/gui/race_gui.cpp:958
+#: src/gui/race_gui.cpp:974
 msgid "Penalty time!!"
 msgstr ""
 
@@ -602,12 +565,16 @@ msgstr ""
 #: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:84
 #: src/gui/grand_prix_select.cpp:87 src/gui/num_players.cpp:45
 #: src/gui/options.cpp:57 src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:121
+#: src/gui/race_options.cpp:134
 msgid "Press <ESC> to go back"
 msgstr ""
 
 #: src/gui/player_controls.cpp:156
 msgid "Press key"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:83
+msgid "Previous help screen"
 msgstr ""
 
 #: src/gui/help_page_two.cpp:114
@@ -618,11 +585,15 @@ msgstr ""
 msgid "Quick Race"
 msgstr ""
 
+#: src/gui/help_page_three.cpp:62
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr ""
+
 #: src/gui/main_menu.cpp:56
 msgid "Quit"
 msgstr ""
 
-#: src/gui/race_gui.cpp:730
+#: src/gui/race_gui.cpp:746
 msgid "REV"
 msgstr ""
 
@@ -638,12 +609,11 @@ msgstr ""
 msgid "Race results"
 msgstr ""
 
-#: src/gui/race_options.cpp:69 src/gui/race_options.cpp:146
-#: src/gui/race_options.cpp:159
+#: src/gui/race_options.cpp:283
 msgid "Racer"
 msgstr ""
 
-#: src/gui/race_gui.cpp:914
+#: src/gui/race_gui.cpp:930
 msgid "Ready!"
 msgstr ""
 
@@ -671,7 +641,7 @@ msgstr ""
 msgid "Second grand prix"
 msgstr ""
 
-#: src/gui/race_gui.cpp:923
+#: src/gui/race_gui.cpp:939
 msgid "Set!"
 msgstr ""
 
@@ -687,7 +657,7 @@ msgstr ""
 msgid "Single Player"
 msgstr ""
 
-#: src/gui/race_options.cpp:141
+#: src/gui/race_options.cpp:284
 msgid "Skidding Preview"
 msgstr ""
 
@@ -711,7 +681,7 @@ msgstr ""
 msgid "Star Track"
 msgstr ""
 
-#: src/gui/race_options.cpp:118
+#: src/gui/race_options.cpp:129
 msgid "Start race"
 msgstr ""
 
@@ -738,6 +708,10 @@ msgstr ""
 
 #: src/gui/game_mode.cpp:62
 msgid "Time Trial"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:67
+msgid "Time Trial: As quick race, but no items.                       "
 msgstr ""
 
 #: src/gui/help_page_two.cpp:61
@@ -805,7 +779,7 @@ msgstr ""
 #: src/challenges/tollway_head2head.cpp:27
 msgid ""
 "Win a 1 lap Head to Head\n"
-"on Tux Tollway against 1 'Driver'\n"
+"on Tux Tollway against 1 'Racer'\n"
 "level AI kart."
 msgstr ""
 
@@ -846,17 +820,17 @@ msgstr ""
 msgid "Window mode"
 msgstr ""
 
-#: src/modified/world.cpp:540 src/world.cpp:538
+#: src/world.cpp:538
 msgid "You finished"
 msgstr ""
 
-#: src/modified/world.cpp:619 src/world.cpp:617
+#: src/world.cpp:617
 msgid ""
 "You have been\n"
 "eliminated!"
 msgstr ""
 
-#: src/modified/world.cpp:539 src/world.cpp:537
+#: src/world.cpp:537
 msgid "You won"
 msgstr ""
 
@@ -864,36 +838,36 @@ msgstr ""
 msgid "Zipper - speed boost"
 msgstr ""
 
-#: src/user_config.cpp:836
+#: src/user_config.cpp:844
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr ""
 
-#: src/user_config.cpp:840
+#: src/user_config.cpp:848
 #, c-format
 msgid "joy %d btn %d"
 msgstr ""
 
-#: src/user_config.cpp:843
+#: src/user_config.cpp:851
 #, c-format
 msgid "joy %d hat %d"
 msgstr ""
 
-#: src/user_config.cpp:849
+#: src/user_config.cpp:857
 #, c-format
 msgid "mouse axis %d %c"
 msgstr ""
 
-#: src/user_config.cpp:846
+#: src/user_config.cpp:854
 #, c-format
 msgid "mouse btn %d"
 msgstr ""
 
-#: src/user_config.cpp:830 src/user_config.cpp:875
+#: src/user_config.cpp:838 src/user_config.cpp:883
 #, c-format
 msgid "not set"
 msgstr ""
 
-#: src/modified/world.cpp:542 src/world.cpp:540
+#: src/world.cpp:540
 msgid "the race!"
 msgstr ""
