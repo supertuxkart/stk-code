@@ -658,6 +658,8 @@ void Kart::update(float dt)
 // Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()
 {
+    // Ignore a zipper that's activated while braking
+    if(m_controls.brake) return;
     m_zipper_time_left  = stk_config->m_zipper_time;
     const btVector3& v  = m_body->getLinearVelocity();
     float current_speed = v.length();
