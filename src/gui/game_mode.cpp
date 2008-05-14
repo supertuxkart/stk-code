@@ -44,16 +44,18 @@ GameMode::GameMode()
     widget_manager->switchOrder();
     widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Race Mode"));
 
+    widget_manager->addTextButtonWgt( WTOK_GP, 60, 7, _("Grand Prix"));
+
     if(unlock_manager->isLocked("grandprix"))
     {
-        const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->addImgWgt(WTOK_GP, 60, 7,
-            m->getState()->getTextureHandle() );
+        widget_manager->hideWgtText( WTOK_GP );
+        widget_manager->deactivateWgt( WTOK_GP );
+
+        widget_manager->setWgtColor( WTOK_GP, WGT_WHITE);
+        widget_manager->setWgtTexture( WTOK_GP, "gui_lock.rgb", false );
+        widget_manager->showWgtTexture( WTOK_GP );
     }
-    else
-    {
-        widget_manager->addTextButtonWgt( WTOK_GP, 60, 7, _("Grand Prix"));
-    }
+
 
     widget_manager->addTextButtonWgt(WTOK_QUICKRACE, 60, 7, _("Quick Race"));
 
@@ -61,17 +63,19 @@ GameMode::GameMode()
     {
         widget_manager->addTextButtonWgt(WTOK_TIMETRIAL, 60, 7, _("Time Trial"));
     }
+
+
+    widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 60, 7,
+        _("Follow the Leader"));
+
     if(unlock_manager->isLocked("followleader"))
     {
-        const Material *m = material_manager->getMaterial("gui_lock.rgb", false);
-        widget_manager->addImgWgt(WTOK_GP, 60, 7,
-            m->getState()->getTextureHandle() );
+        widget_manager->hideWgtText( WTOK_FOLLOW_LEADER );
+        widget_manager->deactivateWgt( WTOK_FOLLOW_LEADER );
+
+        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_WHITE);
+        widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, "gui_lock.rgb", false );
         widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
-    }
-    else
-    {
-        widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 60, 7,
-            _("Follow the Leader"));
     }
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
