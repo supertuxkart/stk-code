@@ -75,8 +75,8 @@ void Attachment::hitGreenHerring()
                        // attachment. Unfortunately, handleExplosion() is not
                        // really severe enough, and forceRescue() attaches
                        // tinytux, so that the new attachment is immediately lost.
-                       //m_kart->handleExplosion(m_kart->getCoord()->xyz, true);
-                       m_kart->forceRescue();
+                       // m_kart->handleExplosion(m_kart->getCoord()->xyz, true);
+                       m_kart->handleExplosion(m_kart->getPos(), /*direct_hit*/ true);
                        clear();
                        random_attachment = rand()%3;
                        break;
@@ -146,7 +146,8 @@ void Attachment::update(float dt)
     case ATTACH_BOMB:      if(m_time_left<=0.0) 
                            {
                                projectile_manager->newExplosion(m_kart->getCoord());
-                               m_kart->forceRescue();
+                               m_kart->handleExplosion(m_kart->getPos(), 
+                                                       /*direct_hit*/ true);
                            }
                            break;
     case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->endRescue();
