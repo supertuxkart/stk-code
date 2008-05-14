@@ -63,6 +63,7 @@ protected:
 	btScalar    m_limitSoftness;
  	btScalar	m_hiLimit;
 	btScalar	m_loLimit;
+    btScalar    m_disable_time;
 
 	btUprightConstraintLimit	m_limit[ 2 ];
 
@@ -118,6 +119,10 @@ public:
 	{
 		m_damping = damping;
 	}
+    void setDisableTime( btScalar t )
+    {
+        m_disable_time = t;
+    }
 
     virtual void  buildJacobian();
     virtual void  solveConstraint(btScalar      timeStep);

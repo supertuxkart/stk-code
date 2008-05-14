@@ -484,18 +484,14 @@ void Kart::handleExplosion(const btVector3& pos, bool direct_hit)
 {
     if(direct_hit) 
     {
-#define WILD_EXPLOSION
-#ifdef WILD_EXPLOSION
-        btVector3 diff(rand()%16/16, rand()%16/16, 2.0f);
+        btVector3 diff((float)(rand()%16/16), (float)(rand()%16/16), 2.0f);
         diff.normalize();
         diff*=stk_config->m_explosion_impulse/5.0f;
+        this->m_uprightConstraint->setDisableTime(10.0f);
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(rand()%32*M_PI,
-                                                                   rand()%32*M_PI,
-                                                                   rand()%32*M_PI));
-#else
-        forceRescue();
-#endif  
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(float(rand()%32*5),
+                                                                   float(rand()%32*5),
+                                                                   float(rand()%32*5)));
     }
     else  // only affected by a distant explosion
     {

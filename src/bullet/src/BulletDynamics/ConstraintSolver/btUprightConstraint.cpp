@@ -97,10 +97,11 @@ btUprightConstraint::btUprightConstraint(btRigidBody& rbA, const btTransform& fr
       m_damping                       = 1.0f;
       m_limitSoftness                 = 1.0f;
       m_maxLimitForce                 = 3000.0f;
+      m_disable_time                  = 0.0f;
       m_limit[0].m_accumulatedImpulse = 0.0f;
       m_limit[1].m_accumulatedImpulse = 0.0f;
-	  m_limit[ 0 ].m_axis		      =  btVector3( 1, 0, 0 );
-	  m_limit[ 1 ].m_axis		      =  btVector3( 0, 1, 0 );
+	  m_limit[ 0 ].m_axis		      = btVector3( 1, 0, 0 );
+	  m_limit[ 1 ].m_axis		      = btVector3( 0, 1, 0 );
 	  setLimit( SIMD_PI * 0.4f );
 }
  
@@ -137,6 +138,14 @@ void btUprightConstraint::buildJacobian()
 void btUprightConstraint::solveConstraint(btScalar    timeStep)
 {
     m_timeStep = timeStep;
+
+    // Update disable time and return if constraint is still disabled
+    if(m_disable_time>0.0f)
+    {
+        m_disable_time -= timeStep;
+        printf("m_disable %f timestep %f\n", m_disable_time, timeStep);
+        if(m_disable_time>0.0f) return;
+    }
 
 	solveAngularLimit( &m_limit[ 0 ], m_timeStep, btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
 	solveAngularLimit( &m_limit[ 1 ], m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
