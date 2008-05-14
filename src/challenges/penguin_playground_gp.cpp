@@ -52,7 +52,7 @@ bool PenguinPlaygroundGP::grandPrixFinished()
     for(int i=0; i<(int)race_manager->getNumKarts(); i++)
     {
         const Kart* k=world->getKart(i);
-        if(k->isPlayerKart() && !k->isEliminated()) return  k->getPosition()<4;
+        if(k->isPlayerKart() && !k->isEliminated()) return  k->getPosition()==1;
     }
     return false;
     

@@ -30,7 +30,7 @@ TollwayHead2Head::TollwayHead2Head() : Challenge("tollwayhead", _("Win a Head to
 
 //-----------------------------------------------------------------------------
 void TollwayHead2Head::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
     race_manager->setTrack("tuxtrack");
     race_manager->setDifficulty(RaceManager::RD_HARD);
     race_manager->setNumLaps(1);
@@ -46,5 +46,11 @@ bool TollwayHead2Head::raceFinished()
     Kart* kart=world->getPlayerKart(0);
     if(kart->getLap()!=1       ) return false;    // wrong number of laps
     if(race_manager->getNumKarts()!=2 ) return false; //wrong number of AI karts
-    return true;
+    // Check if the player was first:
+    for(int i=0; i<(int)race_manager->getNumKarts(); i++)
+    {
+        const Kart* k=world->getKart(i);
+        if(k->isPlayerKart() && !k->isEliminated()) return  k->getPosition()==1;
+    }
+    return false;
 }   // raceFinished
