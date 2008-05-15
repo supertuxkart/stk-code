@@ -147,6 +147,18 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
 
     m_text_out->begin();
     m_text_out->setPointSize((float)sz);
+
+    // print shadow
+    // ------------
+    glColor4f(0.0f,0.0f,0.0f,1.0f);
+    float xf=(GLfloat)x+3;
+    float yf=(GLfloat)y-3;
+    for(float r=-1; r<=0; r+=0.5)
+    {
+        m_text_out->start2f(xf-r, yf-r);
+        m_text_out->puts(text.c_str());
+    }
+
     if( color == NULL )
     {
         glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -155,9 +167,17 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     {
         glColor4fv(color);
     }
-    for(float r=-1; r<=0; r+=0.5)
+    xf=(GLfloat)x;
+    yf=(GLfloat)y;
+    for(float r=-1.0f; r<=0.0f; r+=0.5f)
     {
-        m_text_out->start2f((GLfloat)x-r, (GLfloat)y-r);
+        // This kind of simulates an outline, but it's not too good
+        //if(r==-1.0f || r==0.0f)
+        //    glColor4f(0.0f,0.0f,0.0f,1.0f);
+        //else
+        //    glColor4f(1.0f,1.0f,1.0f,1.0f);
+
+        m_text_out->start2f((GLfloat)x+r, (GLfloat)y+r);
         m_text_out->puts(text.c_str());
     }
     m_text_out->end();
