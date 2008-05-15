@@ -20,3 +20,9 @@ icondir = $(prefix)/share/pixmaps
 icon_DATA = supertuxkart_32.xpm supertuxkart_64.xpm
 
 EXTRA_DIST = $(pkgdata_DATA)
+
+# The desktop file needs the absolute path to the binary
+# since e.g. /usr/games might not be in the standard path
+
+supertuxkart.desktop: supertuxkart_desktop.template
+	cat supertuxkart_desktop.template | sed 's#BINDIR#@prefix@/games#' >supertuxkart.desktop

@@ -1,13 +1,14 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Supertuxkart
+Version=0.5
 Icon=supertuxkart_64.xpm
 Comment=A kart racing game
 Comment[fr_FR]=Un jeu de karting
 Comment[ro_RO]=Un joc de curse cu carturi
-Exec=supertuxkart --log=file
+Exec=/usr/games/supertuxkart --log=file
 Terminal=false
 StartupNotify=false
 Type=Application
-TryExec=supertuxkart
-Categories=3DGraphics;Game;ActionGame;Simulation;SportsGame;
+TryExec=BINDIR/supertuxkart
+Categories=Game;ArcadeGame
