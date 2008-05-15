@@ -1,13 +1,12 @@
 SuperTuxKart
 ==============
-SuperTuxKart is a fun kart racing game. It was originally based on 
-TuxKart (http://tuxkart.sourceforge.net) by Steve Baker, but by now
-has developed a life on its own. The SuperTuxKart homepage can be found at:
+SuperTuxKart is a free kart racing game. It is focusing on fun and
+not on realistic kart physics. The SuperTuxKart homepage can be found at:
 
   http://supertuxkart.sourceforge.net
 
 The official SuperTuxKart forum is at:
-http://forum.freegamedev.net/index.php?t=i&cat=7
+http://supertuxkart.sourceforge.net/forum
 
 A big "thank you" to Steve Baker for designing and implementing the
 original TuxKart, and to the GotM team for their invaluable work.
@@ -87,7 +86,7 @@ The main webpage is at:
 
 If you have any problems, please go to the official SuperTuxKart Forum at:
 
-http://forum.freegamedev.net/index.php?t=i&cat=7
+http://supertuxkart.sourceforge.net/forum
 
 
 LICENSE
