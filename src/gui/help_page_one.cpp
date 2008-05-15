@@ -111,6 +111,7 @@ HelpPageOne::HelpPageOne()
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
 get stuck or fall too far, use the rescue button to get back on track."));
+    widget_manager->setWgtResizeToText( WTOK_MSG4, false );
     widget_manager->breakLine();
 
     widget_manager->addTextWgt(WTOK_MSG5, 70, 7,

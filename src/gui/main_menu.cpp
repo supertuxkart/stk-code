@@ -44,6 +44,7 @@ MainMenu::MainMenu()
     widget_manager->switchOrder();
 
     widget_manager->addTextButtonWgt( WTOK_SINGLE, 25, 7, _("Single Player") );
+    widget_manager->setWgtResizeToText( WTOK_SINGLE, false );
     widget_manager->addTextButtonWgt( WTOK_MULTI, 25, 7, _("Multiplayer") );
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
