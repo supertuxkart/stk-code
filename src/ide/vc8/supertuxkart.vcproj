@@ -522,7 +522,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;;&quot;$(GETTEXT_PATH)/include&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.5rc1\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -611,7 +611,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;"
-				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.4alpha\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE"
+				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;0.5rc1\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -629,7 +629,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
 				OutputFile="./../../../$(ProjectName)_bullet.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;"
