@@ -70,6 +70,7 @@ GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
 
     widget_manager->addTextWgt( WTOK_DESCRIPTION, 80, 7, _("No Grand Prix selected") );
     widget_manager->setWgtTextSize(WTOK_DESCRIPTION, WGT_FNT_SML);
+    widget_manager->hideWgtRect(WTOK_DESCRIPTION);
     widget_manager->breakLine();
     widget_manager->breakLine();
 
