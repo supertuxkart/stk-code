@@ -964,7 +964,10 @@ void RaceGUI::drawStatusText(const float dt)
                              20, 20, 200 -i*20, COLORS );
         }
     }
-    if(world->isStartPhase())
+    // The penalty message needs to be displayed for up to one second
+    // after the start of the race, otherwise it disappears if 
+    // "Go" is displayed and the race starts
+    if(world->isStartPhase() || world->getTime()<1.0f)
     {
         for(unsigned int i=0; i<race_manager->getNumPlayers(); i++)
         {
