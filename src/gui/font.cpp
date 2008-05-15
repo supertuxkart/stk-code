@@ -17,9 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <vector>
+
 #include "file_manager.hpp"
 #include "user_config.hpp"
 #include "gui/font.hpp"
+#include "string_utils.hpp"
 
 Font* font_gui;
 Font* font_race;
@@ -124,7 +127,7 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     int   sz          = (int)(size*std::max(scale_x,scale_y)*fontScaling);
 
     float l,r,t,b;
-    m_fnt->getBBox(text.c_str(), (float)sz, 0, &l, &r, &b, &t);
+    getBBoxMultiLine(text, sz, 0, &l, &r, &b, &t);
     const int W = (int)((r-l+0.99));
     const int H = (int)((t-b+0.99));
 
@@ -189,6 +192,34 @@ void Font::getBBox(const std::string &text, int size, bool italic,
                   float *left, float *right, float *bot, float *top)
 {
     m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
+    if(user_config->m_width<800) {
+        float fract=(float)user_config->m_width/800.0f;
+        *left  *= fract;
+        *right *= fract;
+        if(bot) *bot   *= fract;
+        if(top) *top   *= fract;
+    }
+
+}
+// ----------------------------------------------------------------------------
+
+void Font::getBBoxMultiLine(const std::string &text, int size, bool italic,
+                            float *left, float *right, float *bot, float *top)
+{
+    // Plib does not handle multi-lines strings as expected. So as a work
+    // around we split strings into lines, and compute the size for each
+    // line, and take the maximum size at the end.
+    std::vector<std::string> s=StringUtils::split(text,'\n');
+    m_fnt->getBBox(s[0].c_str(), (float)size, italic, left, right, bot, top);
+    for(unsigned int i=1; i<s.size(); i++)
+    {
+        float l,r,b,t;
+        m_fnt->getBBox(s[i].c_str(), (float)size, italic, &l, &r, &b, &t);
+        if(left) *left  = std::min(*left,  l);
+        if(bot ) *bot   = std::min(*bot,   b);
+        if(right)*right = std::max(*right, r); 
+        if(top)  *top   = std::max(*top,   t);
+    }
     if(user_config->m_width<800) {
         float fract=(float)user_config->m_width/800.0f;
         *left  *= fract;

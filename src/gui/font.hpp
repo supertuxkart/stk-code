@@ -39,6 +39,8 @@ public:
     ~Font();
     void getBBox(const std::string &text, int size, bool italic,
                  float *left, float *right, float *bot, float *top);
+    void getBBoxMultiLine(const std::string &text, int size, bool italic,
+                          float *left, float *right, float *bot, float *top);
 
     // The actual main function which does everything
     // ----------------------------------------------

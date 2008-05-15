@@ -113,7 +113,7 @@ void Widget::resizeToText()
     if( !m_text.empty() )
     {
         float left, right, bottom, top;
-        m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, &bottom, &top);
+        m_font->getBBoxMultiLine(m_text, m_text_size, false, &left, &right, &bottom, &top);
 
         const int TEXT_WIDTH = (int)(right - left);
         const int TEXT_HEIGHT = (int)(top - bottom);
@@ -526,7 +526,7 @@ void Widget::updateVariables( const float DELTA )
     // values to the left.
 
     float left, right;
-    m_font->getBBox(m_text.c_str(), m_text_size, false, &left, &right, NULL, NULL);
+    m_font->getBBoxMultiLine(m_text, m_text_size, false, &left, &right, NULL, NULL);
     int text_width = (int)(right - left + 0.99);
 
 
