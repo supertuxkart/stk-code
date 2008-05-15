@@ -15,10 +15,8 @@ If you are downloading a source version and want to compile it yourself:
 There are two documented ways to compile an executable for windows: using
 cygwin, and using visual c++ (tested with the free Express version).
 
-If you have any problems, please post on the mailing list - I am 
-not a regular windows user, so am probably not able to help you.
-
-   hiker
+If you have any problems, please post on the mailing list, and we will
+do our best to help you. 
 
 
 Cygwin
@@ -57,7 +55,8 @@ can be found in .../src/ide/vc8/README.
 You still have to install all dependencies, and:
 1) Modify plib:
    Best choice would be to use the plib version from our download page,
-   since it contains all bugfixes that are necessary. Otherwise:
+   since it contains all bugfixes that are necessary. The latest
+   release (1.8.5) might work, if you are using 1.8.4:
    In src/ssg/ssgLoadAC.cxx replace:
       loader_fd = fopen ( filename, "ra" ) ;
    with
