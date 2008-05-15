@@ -42,7 +42,6 @@ enum WidgetTokens
 GameMode::GameMode()
 {
     widget_manager->switchOrder();
-    widget_manager->addTitleWgt(WTOK_TITLE, 60, 7, _("Choose a Race Mode"));
 
     widget_manager->addTextButtonWgt( WTOK_GP, 60, 7, _("Grand Prix"));
 

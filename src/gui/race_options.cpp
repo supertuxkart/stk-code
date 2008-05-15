@@ -58,28 +58,26 @@ RaceOptions::RaceOptions() :
 {
     // Difficulty
     // ==========
-    widget_manager->switchOrder();
     widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 38, 7, _("Difficulty") );
-    widget_manager->switchOrder();
-    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, "<" );
+    widget_manager->hideWgtRect(WTOK_DIFFICULTY_TITLE);
+    widget_manager->setWgtTextSize(WTOK_DIFFICULTY_TITLE, WGT_FNT_LRG);
+    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, " < " );
 
     widget_manager->addTextWgt( WTOK_DIFFICULTY, 32, 7, getDifficultyString(m_difficulty));
     widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );
     widget_manager->showWgtBorder( WTOK_DIFFICULTY );
     widget_manager->hideWgtRect( WTOK_DIFFICULTY );
 
-    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 3, 7, ">" );
+    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 3, 7, " > " );
 
     widget_manager->breakLine();
-    widget_manager->breakLine();
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 2, 1);
 
     // Number of karts
     // ===============
-    widget_manager->switchOrder();
     widget_manager->addTextWgt( WTOK_KARTS_TITLE, 38, 7, _("Number of karts") );
-    widget_manager->switchOrder();
-    widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, "<" );
+    widget_manager->hideWgtRect(WTOK_KARTS_TITLE);
+    widget_manager->setWgtTextSize(WTOK_KARTS_TITLE, WGT_FNT_LRG);
+    widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, " < " );
 
     char string_num_karts[MAX_MESSAGE_LENGTH];
     snprintf(string_num_karts, MAX_MESSAGE_LENGTH, "%d", m_num_karts);
@@ -88,13 +86,8 @@ RaceOptions::RaceOptions() :
     widget_manager->showWgtBorder( WTOK_KARTS );
     widget_manager->hideWgtRect( WTOK_KARTS );
 
-    widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 3, 7, ">" );
+    widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 3, 7, " > " );
 
-    widget_manager->breakLine();
-    widget_manager->breakLine();
-    widget_manager->breakLine();
-
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 2, 1);
     widget_manager->breakLine();
 
     // Number of laps
@@ -102,10 +95,10 @@ RaceOptions::RaceOptions() :
     if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX   &&
         race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER   )
     {
-        widget_manager->switchOrder();
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, 38, 7, _("Number of laps") );
-        widget_manager->switchOrder();
-        widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 3, 7, "<" );
+        widget_manager->hideWgtRect(WTOK_LAPS_TITLE);
+        widget_manager->setWgtTextSize(WTOK_LAPS_TITLE, WGT_FNT_LRG);
+        widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 3, 7, " < " );
 
         char string_num_laps[MAX_MESSAGE_LENGTH];
         snprintf(string_num_laps, MAX_MESSAGE_LENGTH, "%d", m_num_laps);
@@ -114,23 +107,19 @@ RaceOptions::RaceOptions() :
         widget_manager->showWgtBorder( WTOK_LAPS );
         widget_manager->hideWgtRect( WTOK_LAPS );
 
-        widget_manager->addTextButtonWgt( WTOK_LAPS_UP, 3, 7, ">" );
-        widget_manager->breakLine();
-        widget_manager->breakLine();
+        widget_manager->addTextButtonWgt( WTOK_LAPS_UP, 3, 7, " > " );
     }
-
+    widget_manager->breakLine();
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 10, 10 );
     widget_manager->breakLine();
 
     //Lower buttons
     //=============
-    widget_manager->switchOrder();
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
-
     widget_manager->addTextButtonWgt( WTOK_START, 60, 7, _("Start race") );
     widget_manager->setWgtBorderPercentage( WTOK_START, 20 );
     widget_manager->setWgtBorderColor( WTOK_START, WGT_TRANS_BLUE );
     widget_manager->showWgtBorder( WTOK_START );
-
+    widget_manager->breakLine();
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
 
     widget_manager->addTextButtonWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );

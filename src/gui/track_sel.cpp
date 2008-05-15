@@ -46,7 +46,8 @@ enum WidgetTokens
 
 TrackSel::TrackSel()
 {
-    widget_manager->addTitleWgt( WTOK_TITLE, 40, 7, _("Choose a track") );
+    //    widget_manager->addTitleWgt( WTOK_TITLE, 40, 7, _("Choose a track") );
+    widget_manager->addEmptyWgt(WTOK_TITLE, 40, 7);
     widget_manager->breakLine();
 
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 1);
@@ -84,7 +85,7 @@ TrackSel::TrackSel()
     widget_manager->breakLine();
 
     widget_manager->addTextWgt( WTOK_AUTHOR, 80, 9, _("No track selected") );
-
+    widget_manager->hideWgtRect(WTOK_AUTHOR);
     widget_manager->layout(WGT_AREA_TOP);
 }
 
