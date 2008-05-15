@@ -47,34 +47,12 @@ Thanks in advance!
 ********************************
 ********************************
 
-Known bugs
-==========
-This contains either hard, or not reproducible errors. 
-
-- Fix keyboard bug: the first time turning left/right while
-  pressing the up key is ignored. See bug 6168
-  Might be difficult to fix, since it occurs (it appears) in the interface
-  between X and plib.
-
 Things that would be nice to fix, but are not urgent
 =====================================================
-- Write some documentation. Things to include:
-  - taking shortcuts might result in not finishing a lap
-  - lap display colour for all karts changes colour whenever
-    a lap is finished
+- Write some documentation.
 - Display skid marks again (currently disabled due to problems of 
   skid marks being 'in the air').
 - Added settings menu (e.g. for MPH vs KPH (vs. KM/H), ...)
-- Enable real fullscreen support
-- Top 10 lists for time trial, and grand prix.
-- Display the time difference to either the
-  kart in front of the kart, or to the first kart.
-- Add track sections which must be passed in order to finish
-  a lap. This would avoid karts taking shortcuts.
-  That's already in the code, but currently the user does 
-  not get any feedback if a driveline is skipped --> after 
-  crossing the finishing line, the race might not end for a
-  kart. Well, there is the 'wrong direction' message (?)
 - Add a tutorial course
 - Valgrind for memory bugs.
 - Update the web page, make more screen shots, ...
@@ -84,9 +62,6 @@ Things that would be nice to fix, but are not urgent
 
 long term
 =========
-- OpenAL support (optional)  [patrick]
-- Improved physics to support skidding
-- Improved collision handling
 - Add network multiplayer
 - Make full use of OpenAL
 - Performance tuning
@@ -113,13 +88,4 @@ long term
   ambience, ...
 - More tracks
 - More grand prixs
-- Support for translations(?)
-- Support for easy-to-plugin different AIs, and allow different karts
-  to have different AIs
 - Code cleanup
-  - Consistent style (which needs to be defined)
-  - Replace (as far as possible) all char* with std::string
-  - Rather complicated way of passing information to world, a 
-    mixture of CupData, raceSetup, race_manager. This could
-    probably all be simplified by only using the race_manager,
-    removing the raceSetup class completely.
