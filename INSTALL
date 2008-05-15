@@ -9,9 +9,8 @@ First, make sure that you have the following packages installed:
   * OpenGL (or Mesa 3.0 or later)
   * PLIB version 1.8.4 or later
   * SDL 1.2 or later
-  * OpenAL (optional)
-  * freealut (optional)
-  * MikMod (optional)
+  * OpenAL
+  * freealut
 
 Unpack the files from the tarball like this:
 
@@ -63,9 +62,6 @@ If you want to install the game system-wide, do 'make install'.
 
 But it didn't work!
 -------------------
-
-Right now there is no proper windows compilation. You can still compile
-for windows using cygwin, see README.cygwin for details.
 
 If you checked out your copy directly from SVN, you have to run
 'sh autogen.sh' to generate the configure script.
