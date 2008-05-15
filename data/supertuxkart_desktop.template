@@ -2,13 +2,13 @@
 Encoding=UTF-8
 Name=Supertuxkart
 Version=0.5
-Icon=supertuxkart_64.xpm
+Icon=PREFIX/share/pixmaps/supertuxkart_64.xpm
 Comment=A kart racing game
 Comment[fr_FR]=Un jeu de karting
 Comment[ro_RO]=Un joc de curse cu carturi
-Exec=/usr/games/supertuxkart --log=file
+Exec=PREFIX/games/supertuxkart --log=file
 Terminal=false
 StartupNotify=false
 Type=Application
-TryExec=BINDIR/supertuxkart
+TryExec=PREFIX/games/supertuxkart
 Categories=Game;ArcadeGame

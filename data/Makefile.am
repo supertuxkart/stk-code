@@ -25,5 +25,5 @@ EXTRA_DIST = $(pkgdata_DATA)
 # since e.g. /usr/games might not be in the standard path
 
 supertuxkart.desktop: supertuxkart_desktop.template
-	cat supertuxkart_desktop.template | sed 's#BINDIR#@prefix@/games#' >supertuxkart.desktop
+	cat supertuxkart_desktop.template | sed 's#PREFIX#@prefix@#' >supertuxkart.desktop
 
