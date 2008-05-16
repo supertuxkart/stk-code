@@ -51,11 +51,14 @@ enum WidgetTokens
     WTOK_QUIT
 };
 
-RaceOptions::RaceOptions() :
-             m_difficulty(race_manager->getDifficulty()),
-             m_num_karts(race_manager->getNumKarts()),
-             m_num_laps(race_manager->getNumLaps())
+RaceOptions::RaceOptions() 
 {
+    m_difficulty=race_manager->getDifficulty();
+    // FIXME: no medium AI atm
+    if(m_difficulty==RaceManager::RD_MEDIUM) m_difficulty=RaceManager::RD_HARD;
+    m_num_karts=race_manager->getNumKarts();
+    m_num_laps=race_manager->getNumLaps();
+
     // Difficulty
     // ==========
     widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 38, 7, _("Difficulty") );
