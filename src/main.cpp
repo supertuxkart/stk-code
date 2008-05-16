@@ -167,7 +167,8 @@ int handleCmdLine(int argc, char **argv)
                 race_manager->setDifficulty(RaceManager::RD_EASY);
                 break;
             case 2:
-                race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+                // FIXME: no medium AI atm race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+                race_manager->setDifficulty(RaceManager::RD_HARD);
                 break;
             case 3:
                 race_manager->setDifficulty(RaceManager::RD_HARD);
@@ -417,7 +418,7 @@ void InitTuxkart()
     race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
     race_manager->setRaceMode  (RaceManager::RM_QUICK_RACE);
-    race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+    race_manager->setDifficulty(RaceManager::RD_HARD);
 }
 
 //=============================================================================
@@ -498,15 +499,6 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                //race_manager->setNumPlayers(1);
-                //race_manager->setNumKarts  (4);
-                //race_manager->setRaceMode  (RaceSetup::RM_QUICK_RACE);
-                //race_manager->setDifficulty(RD_MEDIUM);
-                //race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
-                //race_manager->setNumLaps   (3);
-                //race_manager->setTrack     ("tuxtrack");
-                //race_manager->setTrack     ("sandtrack");
-                //race_manager->setTrack     ("race");
                 race_manager->startNew();
             }
         }
