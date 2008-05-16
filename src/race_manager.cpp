@@ -1,3 +1,4 @@
+
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
@@ -213,8 +214,9 @@ void RaceManager::exit_race()
     }
     scene->clear();
     delete world;
-    world = 0;
-    m_active_race = false;    
+    world          = 0;
+    m_track_number = 0;
+    m_active_race  = false;    
 }   // exit_Race
 
 //-----------------------------------------------------------------------------
