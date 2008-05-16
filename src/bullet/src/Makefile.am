@@ -186,6 +186,8 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btSliderConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btSorLcp.cpp				 \
 	BulletDynamics/ConstraintSolver/btSorLcp.h				 \
+	BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.h	 \
+	BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.cpp	 \
 	BulletDynamics/ConstraintSolver/btOdeJoint.h				 \
 	BulletDynamics/ConstraintSolver/btOdeTypedJoint.h			 \
 	BulletDynamics/ConstraintSolver/btPoint2PointConstraint.cpp		 \
