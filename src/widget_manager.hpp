@@ -179,8 +179,10 @@ public:
     );
 
     bool breakLine();
-    bool switchOrder(); //This changes the orientation from horizontal to
-                        //vertical. It's reverted at line breaks;
+    void switchOrder(); //This changes the orientation from horizontal to
+                        //vertical. It's reverted at line breaks. There are
+                        //no situations where you cannot use a switch order
+                        //so it should always succeed.
 
     void reset();
 
