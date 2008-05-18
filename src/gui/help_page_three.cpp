@@ -50,7 +50,7 @@ HelpPageThree::HelpPageThree()
 
     if(!unlock_manager->isLocked("grandprix"))
     {
-        widget_manager->addTextWgt( WTOK_TXT1, 100, 10,
+        widget_manager->addTextWgt( WTOK_TXT1, 100, 15,
             _("Grand Prix: Win victory points \n\
 by racing through a group of tracks,  \n\
 most points wins (shortest time in case of a tie!)          "));
@@ -58,24 +58,24 @@ most points wins (shortest time in case of a tie!)          "));
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
     }
 
-    widget_manager->addTextWgt( WTOK_TXT2, 100, 10,
+    widget_manager->addTextWgt( WTOK_TXT2, 100, 15,
         _("Quick race: Pick a single track, shortest time wins.         "));
         widget_manager->setWgtTextSize( WTOK_TXT2, WGT_FNT_SML );
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
-    widget_manager->addTextWgt( WTOK_TXT3, 100, 10,
+    widget_manager->addTextWgt( WTOK_TXT3, 100, 15,
         _("Time Trial: As quick race, but no items.                       "));
         widget_manager->setWgtTextSize( WTOK_TXT3, WGT_FNT_SML );
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
     if(!unlock_manager->isLocked("followleader"))
     {
-        widget_manager->addTextWgt( WTOK_TXT4, 100, 10,
+        widget_manager->addTextWgt( WTOK_TXT4, 100, 15,
             _("Follow the leader: Stay behind the leader kart.                 \n\
 When the countdown reaches zero, a kart ahead\n\
 of the leader or the last kart is eliminated."));
         widget_manager->setWgtTextSize( WTOK_TXT4, WGT_FNT_SML );
-        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
+        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 13 );
     }
 
     /*Buttons at the bottom*/
