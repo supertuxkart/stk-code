@@ -89,6 +89,7 @@ bool WidgetManager::addWgt
     new_id.widget->m_round_corners = m_default_rect_round_corners;
     new_id.widget->m_rect_color = m_default_rect_color;
 
+    new_id.widget->m_enable_border = m_default_show_border;
     new_id.widget->m_border_percentage = m_default_border_percentage;
     new_id.widget->m_border_color = m_default_border_color;
 
