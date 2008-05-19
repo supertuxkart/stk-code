@@ -570,10 +570,15 @@ void Kart::update(float dt)
     }
 
     btTransform trans=getTrans();
-    // Add a certain epsilon (0.1) to the height of the kart. This avoids
+    // Add a certain epsilon (0.2) to the height of the kart. This avoids
     // problems of the ray being cast from under the track (which happened
     // e.g. on tux tollway when jumping down from the ramp).
-    btVector3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.1f);
+    // FIXME: this should be more thoroughly fixed, the constant is probably
+    // dependent on the wheel size, suspension data etc.: when jumping,
+    // the wheel suspension will be fully compressed, resulting in the
+    // ray to start too low (under the track).
+    btVector3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.2f);
+    //btVector3 pos_plus_epsilon (-56.6874237, -137.48851, -3.06826854);
     TerrainInfo::update(pos_plus_epsilon);
 
     const Material* material=getMaterial();
