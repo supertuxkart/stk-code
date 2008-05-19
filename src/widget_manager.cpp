@@ -829,7 +829,7 @@ int WidgetManager::calcLineX( const int POS )
     int width = 0;
     WidgetID* curr_wgt = 0;
 
-    const int NUM_ELEMS = m_elems.size();
+    const int NUM_ELEMS = (int)m_elems.size();
 
     for( int i = POS; i < NUM_ELEMS; ++i )
     {
