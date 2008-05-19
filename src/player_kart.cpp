@@ -178,13 +178,11 @@ void PlayerKart::update(float dt)
         m_collectable.use() ;
         m_controls.fire = false;
     }
-#ifdef DEBUG
-    // Allow rescuing while still falling ... it's convenient for debugging, but
-    // not for a release
+
+    // We can't restrict rescue to fulfil isOnGround() (which would be more like
+    // MK), since e.g. in the City track it is possible for the kart to end
+    // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls.rescue )
-#else
-    if ( isOnGround()  &&  m_controls.rescue )
-#endif
     {
         sound_manager -> playSfx ( SOUND_BEEP ) ;
         forceRescue();
