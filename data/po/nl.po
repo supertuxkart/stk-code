@@ -3,25 +3,24 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-21 09:39-0400\n"
-"PO-Revision-Date: 2008-04-24 22:12+CET\n"
-"Last-Translator: Asciimonser <asciimonster@myrealbox.com>\n"
+"POT-Creation-Date: 2008-05-13 14:56-0400\n"
+"PO-Revision-Date: 2008-05-19 22:08+0100\n"
+"Last-Translator: Asciimonster <asciimonster@myrealbox.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/gui/config_display.cpp:501
+#: src/gui/config_display.cpp:385
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d op Verbanningslijst"
 
-#: src/world.cpp:620
+#: src/world.cpp:622
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -30,28 +29,44 @@ msgstr ""
 "'%s' is\n"
 "geëlimineerd."
 
-#: src/gui/player_controls.cpp:61
+#: src/gui/player_controls.cpp:64
 msgid "Accelerate"
 msgstr "Versnellen"
 
-#: src/gui/challenges_menu.cpp:44
+#: src/gui/challenges_menu.cpp:36
 msgid "Active Challenges"
 msgstr "Actieve Uitdagingen"
 
-#: src/gui/help_page_two.cpp:136
+#: data/all.cup:4
+msgid "All tracks"
+msgstr "Alle levels"
+
+#: data/all.cup:5
+msgid "All tracks included in SuperTuxKart"
+msgstr "Alle levels in SuperTuxKart"
+
+#: data/tracks/jungle/jungle.track:4
+msgid "Amazonian Journey"
+msgstr "Tocht door de Amazone"
+
+#: src/gui/help_page_two.cpp:108
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Aambeeld – Remt de kart in leidende positie af"
 
-#: src/gui/config_display.cpp:145
+#: src/gui/config_display.cpp:92
 msgid "Apply "
 msgstr "Toepassen"
 
-#: src/gui/config_display.cpp:449
+#: src/gui/config_display.cpp:351
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Toepassen %dx%d"
 
-#: src/gui/help_page_one.cpp:118
+#: data/tracks/lighthouse/lighthouse.track:4
+msgid "Around the Lighthouse"
+msgstr "Rond de vuurtoren"
+
+#: src/gui/help_page_one.cpp:112
 msgid ""
 "At high speeds wheelies drive you faster, but you can't steer. If you\n"
 "get stuck or fall too far, use the rescue button to get back on track."
@@ -59,457 +74,852 @@ msgstr ""
 "Een wheelie geeft je extra snelheid, maar je verliest bestuurbaarheid\n"
 "Gebruik de herstel knop als je vast komt te zitten of van de baan valt."
 
-#: src/gui/help_page_one.cpp:81
+#: data/gp4.cup:4
+msgid "At world's end"
+msgstr "Het einde van de wereld"
+
+#: src/gui/help_page_one.cpp:78
 msgid "Avoid bananas"
 msgstr "Vermijd bananen"
 
-#: src/gui/grand_prix_ending.cpp:148 src/gui/leader_result.cpp:152
-#: src/gui/race_results_gui.cpp:168
+#: src/gui/grand_prix_ending.cpp:148
+#: src/gui/leader_result.cpp:152
+#: src/gui/race_results_gui.cpp:144
 msgid "Back to the main menu"
 msgstr "Terug naar het hoofdmenu"
 
-#: src/gui/player_controls.cpp:62
+#: src/gui/help_page_two.cpp:122
+msgid "Back to the menu"
+msgstr "Terug naar het menu"
+
+#: src/gui/player_controls.cpp:65
 msgid "Brake"
 msgstr "Remmen"
 
-#: src/gui/main_menu.cpp:63
+#: data/tracks/canyon/canyon.track:4
+msgid "Canyon"
+msgstr "Het ravijn"
+
+#: src/gui/main_menu.cpp:52
 msgid "Challenges"
 msgstr "Uitdagingen"
 
-#: src/gui/help_page_one.cpp:124
+#: src/gui/help_page_one.cpp:117
 msgid "Check the current key bindings for the first player"
 msgstr "Controleer de toetsinstellingen voor de eerste speler"
 
-#: src/gui/grand_prix_select.cpp:55
+#: src/gui/grand_prix_select.cpp:50
 msgid "Choose a Grand Prix"
 msgstr "Kies een Grand Prix"
 
-#: src/gui/game_mode.cpp:49
+#: src/gui/game_mode.cpp:45
 msgid "Choose a Race Mode"
 msgstr "Kies een wedstrijdtype"
 
-#: src/gui/track_sel.cpp:50
+#: src/gui/track_sel.cpp:49
 msgid "Choose a track"
 msgstr "Kies een parcours"
 
-#: src/gui/num_karts.cpp:46
-msgid "Choose number of karts"
-msgstr "Kies het aantal karts"
-
-#: src/gui/num_laps.cpp:46
-msgid "Choose number of laps"
-msgstr "Kies het aantal ronden"
-
-#: src/gui/player_controls.cpp:77
+#: src/gui/player_controls.cpp:74
 #, c-format
 msgid "Choose your controls, %s"
 msgstr "Stel de toetsen in, %s"
 
-#: src/gui/difficulty.cpp:50
-msgid "Choose your skill level"
-msgstr "Kies je niveau"
+#: data/tracks/city/city.track:4
+msgid "City"
+msgstr "In de stad"
 
-#: src/gui/config_display.cpp:153
+#: src/gui/config_display.cpp:97
 msgid "Clear from Blacklist"
 msgstr "Verwijderen uit verbanningslijst"
 
-#: src/gui/display_res_confirm.cpp:70
+#: src/challenges/energy_math_class.cpp:26
+msgid "Collect Coins in Math Class"
+msgstr "Verzamel munten in het wiskundelokaal"
+
+#: src/challenges/energy_math_class.cpp:28
+msgid ""
+"Collect at least 6 coins\n"
+"on three laps of\n"
+"Oliver's Math Class\n"
+"in under 1 minute."
+msgstr ""
+"Verzamel ten minste 6 munten \n"
+"in drie ronden door het \n"
+"wiskundelokaal van Olivier \n"
+"binnen 1 minuut "
+
+#: src/challenges/energy_shifting_sands.cpp:27
+msgid ""
+"Collect at least 9 coins\n"
+"on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Verzamel binnen 2 minuut 20 \n"
+"ten minste 9 munten op 3 \n"
+"ronden van 'de Zandduinen'"
+
+#: src/challenges/energy_shifting_sands.cpp:25
+msgid "Collect the Pharaohs Treasure"
+msgstr "Vergaar de schat van de Farao"
+
+#: src/challenges/worlds_end_gp.cpp:27
+msgid ""
+"Come first in the At World's End\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Wordt eerste in 'het einde \n"
+"van de wereld' op niveau \n"
+"'Coureur' met 3 tegenstanders"
+
+#: src/gui/display_res_confirm.cpp:55
 msgid "Confirm Resolution"
 msgstr "Resolutie bevestigen"
 
-#: src/gui/display_res_confirm.cpp:129
+#: src/gui/display_res_confirm.cpp:109
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
 msgstr "Bevestig de nieuwe resolutie binnen %d seconden"
 
-#: src/gui/display_res_confirm.cpp:60
+#: src/gui/display_res_confirm.cpp:51
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr "Bevestig de nieuwe resolutie binnen 5 seconden"
 
-#: src/gui/feature_unlocked.cpp:61 src/gui/grand_prix_ending.cpp:144
-#: src/gui/leader_result.cpp:148 src/gui/num_karts.cpp:92
-#: src/gui/race_results_gui.cpp:159
+#: src/gui/feature_unlocked.cpp:47
+#: src/gui/grand_prix_ending.cpp:144
+#: src/gui/leader_result.cpp:148
+#: src/gui/race_results_gui.cpp:135
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: src/gui/race_results_gui.cpp:164
+#: src/gui/race_results_gui.cpp:140
 msgid "Continue Grand Prix"
 msgstr "Doorgaan met Grand Prix"
 
-#: src/gui/main_menu.cpp:82
+#: data/tracks/beach/beach.track:5
+#: data/tracks/lighthouse/lighthouse.track:5
+msgid ""
+"Created by Ingo Ruhnke,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Ontworpen Ingo Ruhnke,\n"
+"aangepast door Marianne Gagnon"
+
+#: data/tracks/fortmagma/fortmagma.track:5
+msgid ""
+"Created by Oliver & Steve Baker\n"
+"modified by Marianne Gagnon"
+msgstr ""
+"Ontworpen door Oliver & Steve Baker,\n"
+"aangepast door Marianne Gagnon"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+msgid ""
+"Created by Oliver & Steve Baker,\n"
+" modified by M. Gagnon"
+msgstr ""
+"Ontworpen door Oliver & Steve Baker,\n"
+"aangepast door Marianne Gagnon"
+
+#: data/tracks/sandtrack/sandtrack.track:5
+msgid ""
+"Created by Oliver & Steve Baker,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Ontworpen door Oliver & Steve Baker,\n"
+"aangepast door Marianne Gagnon"
+
+#: src/gui/main_menu.cpp:63
 msgid "Credits"
 msgstr "Auteurs"
 
-#: src/gui/config_display.cpp:130 src/gui/config_display.cpp:177
+#: src/gui/config_display.cpp:83
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Huidig: %dx%d"
 
-#: src/gui/config_display.cpp:137
+#: src/gui/config_display.cpp:89
 msgid "Decrease Resolution"
 msgstr "Verlaag resolutie"
 
-#: src/gui/options.cpp:60
+#: src/gui/race_options.cpp:62
+msgid "Difficulty"
+msgstr "Niveau"
+
+#: src/gui/options.cpp:49
 msgid "Display"
 msgstr "Grafisch"
 
-#: src/gui/config_display.cpp:93
+#: src/gui/config_display.cpp:55
 msgid "Display Settings"
 msgstr "Grafische instellingen"
 
-#: src/gui/difficulty.cpp:57
+#: src/gui/race_options.cpp:282
 msgid "Driver"
-msgstr "Driver"
+msgstr "Chauffeur"
 
-#: src/gui/config_controls.cpp:52
-msgid "Edit controls for which player?"
+#: src/gui/config_controls.cpp:43
+msgid "Edit controls for who?"
 msgstr "Voor welke speler de toetsen wijzigen?"
 
-#: src/gui/race_menu.cpp:80
+#: src/gui/race_menu.cpp:60
 msgid "Exit Race"
 msgstr "Verlaat wedstrijd"
 
-#: src/gui/race_gui.cpp:766
+#: src/challenges/race_track_time.cpp:28
+msgid ""
+"Finish 3 laps in the Race track\n"
+"with 3 AI karts\n"
+"in under 1:15 minutes."
+msgstr ""
+"Voltooi 3 ronden op \n"
+"'Het racecircuit' binnen \n"
+"1:15 met 3 tegenstanders"
+
+#: src/challenges/city_time.cpp:27
+msgid ""
+"Finish 3 laps on the City track\n"
+"with 3 AI karts\n"
+"in under 5:20 minutes."
+msgstr ""
+"Voltooi 3 ronden van \n"
+"'In de stad' binnen 5:20 \n"
+"met 3 tegenstanders"
+
+#: src/challenges/tollway_time.cpp:27
+msgid ""
+"Finish 3 laps on the Tux Tollway\n"
+"track with 3 AI karts\n"
+"in under 3:00 minutes."
+msgstr ""
+"Rij 3 ronden over de \n"
+"Tolweg binnen 1:15 \n"
+"met 3 tegenstanders"
+
+#: src/challenges/race_track_time.cpp:26
+msgid "Finish Race track in 1:15"
+msgstr "Voltooi het racecircuit binnen 1:15"
+
+#: src/challenges/tollway_time.cpp:25
+msgid "Finish Tux Tollway track in 3:00"
+msgstr "Doe de tolweg binnen 3 minuten"
+
+#: src/challenges/city_time.cpp:25
+msgid "Finish the City track in 5:20"
+msgstr "Doe het stadsparcours binnen 5:20"
+
+#: src/gui/race_gui.cpp:800
 #, c-format
 msgid "Finished"
 msgstr "Klaar"
 
-#: src/gui/player_controls.cpp:63
+#: src/gui/player_controls.cpp:66
 msgid "Fire"
 msgstr "Vuren"
 
-#: src/gui/game_mode.cpp:80
+#: data/gp1.cup:5
+msgid "First grand prix, easy to get started"
+msgstr "De eerste Grand Prix. Om er even in te komen"
+
+#: src/challenges/penguin_playground_gp.cpp:28
+#: src/gui/game_mode.cpp:74
 msgid "Follow the Leader"
 msgstr "Zwaan kleef aan"
 
-#: src/gui/help_page_one.cpp:74
+#: src/challenges/jungle_follow.cpp:25
+msgid "Follow the Leader in the Jungle"
+msgstr "Zwaan-kleef-aan in de jungle"
+
+#: src/challenges/island_follow.cpp:25
+msgid ""
+"Follow the Leader on a\n"
+"Desert Island"
+msgstr ""
+"Zwaan-kleef-aan op \n"
+"een tropisch eiland"
+
+#: src/gui/help_page_three.cpp:74
+msgid ""
+"Follow the leader: Stay behind the leader kart.\n"
+"When the countdown reaches zero, a kart ahead\n"
+"of the leader or the last kart is eliminated."
+msgstr ""
+"Volg de leider: Volg de leider. \n"
+"Wanneer de klok afloopt, wordt de kart voor de \n"
+"leider of de laaste kart van de rij geëlimineerd"
+
+#: src/gui/help_page_one.cpp:73
 msgid "Force your rivals bite *your* dust!"
 msgstr "Laat je rivalen stof happen!"
 
-#: src/gui/num_players.cpp:54
+#: data/tracks/fortmagma/fortmagma.track:4
+msgid "Fort Magma"
+msgstr "Fort magma"
+
+#: src/gui/num_players.cpp:40
 msgid "Four Players"
 msgstr "Vier spelers"
 
-#: src/gui/config_display.cpp:119 src/gui/config_display.cpp:206
-#: src/gui/config_display.cpp:262
+#: src/gui/config_display.cpp:76
+#: src/gui/config_display.cpp:128
+#: src/gui/config_display.cpp:183
 msgid "Fullscreen mode"
 msgstr "Volledig scherm"
 
-#: src/gui/help_page_two.cpp:97
+#: src/gui/help_page_two.cpp:84
 msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
 msgstr "Vonk – erg langzaam, maar stuitert van de muren"
 
-#: src/gui/challenges_menu.cpp:67 src/gui/credits_menu.cpp:84
-#: src/gui/help_page_one.cpp:158 src/gui/help_page_two.cpp:148
+#: src/gui/game_mode.cpp:79
+msgid "Game mode help"
+msgstr "Spelvorm informatie"
+
+#: src/gui/help_page_three.cpp:47
+msgid "Game modes"
+msgstr "Spelvormen"
+
+#: src/gui/challenges_menu.cpp:51
+#: src/gui/credits_menu.cpp:76
 msgid "Go back to the main menu"
 msgstr "Terug naar het hoofdmenu"
 
-#: src/gui/race_gui.cpp:903
-msgid "Go!"
-msgstr "Start!"
+#: src/gui/help_page_one.cpp:148
+#: src/gui/help_page_three.cpp:87
+msgid "Go back to the menu"
+msgstr "Terug naar het hoofdmenu"
 
-#: src/gui/help_page_one.cpp:78
+#: src/gui/race_gui.cpp:948
+msgid "Go!"
+msgstr "Af!"
+
+#: src/gui/help_page_one.cpp:77
 msgid "Grab blue boxes and coins"
 msgstr "Pak blauwe dozen en munten"
 
-#: src/gui/game_mode.cpp:61
+#: src/challenges/energy_math_class.cpp:29
+#: src/gui/game_mode.cpp:55
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
-#: src/gui/main_menu.cpp:77 src/gui/race_menu.cpp:65
+#: src/gui/help_page_three.cpp:54
+msgid ""
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
+msgstr ""
+"Grand Prix: Per parcours win je punten door vooraan te \n"
+"eindigen in de groep. De beste over alle parcoursen wit! \n"
+"(Bij gelijkspel geldt de laaste totaaltijd)"
+
+#: src/gui/main_menu.cpp:60
+#: src/gui/race_menu.cpp:51
 msgid "Help"
 msgstr "Hulp"
 
-#: src/gui/race_results_gui.cpp:69
+#: src/gui/race_results_gui.cpp:55
 msgid "Highscores"
 msgstr "Hoogste scores"
 
-#: src/gui/help_page_two.cpp:84
+#: src/gui/help_page_two.cpp:76
 msgid "Homing missile - follows rivals, but is slower than the missile"
 msgstr "Doel zoekende raket – Volgt tegenstanders, maar is langzamer dan een standaard raket"
 
-#: src/gui/config_display.cpp:134
+#: src/gui/config_display.cpp:87
 msgid "Increase Resolution"
-msgstr "Verhoog Resolutie"
+msgstr "Verhoog resolutie"
 
-#: src/user_config.cpp:852
+#: src/user_config.cpp:861
 #, c-format
 msgid "Invalid"
 msgstr "Ongeldig"
 
-#: src/kart.cpp:644
+#: src/kart.cpp:634
 msgid "Invalid short-cut!!"
 msgstr "Niet afsteken!!"
 
-#: src/gui/player_controls.cpp:62
+#: src/gui/player_controls.cpp:65
 msgid "Jump"
 msgstr "Springen"
 
-#: src/gui/num_karts.cpp:61
-#, c-format
-msgid "Karts: %d"
-msgstr "Kars: %d"
-
-#: src/gui/race_gui.cpp:771
+#: src/gui/race_gui.cpp:805
 msgid "Lap"
 msgstr "Ronde"
 
-#: src/gui/num_laps.cpp:55
-msgid "Laps: 3"
-msgstr "Ronden: 3"
+#: data/gp4.cup:5
+msgid "Last grand prix, longer and harder"
+msgstr "De laatse Grand Prix. Langer en zwaarder"
 
-#: src/gui/race_gui.cpp:406
+#: src/gui/race_gui.cpp:409
 msgid "Leader"
 msgstr "Leider"
 
-#: src/gui/player_controls.cpp:61
+#: src/gui/player_controls.cpp:64
 msgid "Left"
 msgstr "Links"
 
-#: src/gui/num_karts.cpp:71 src/gui/num_laps.cpp:64
-msgid "Less"
-msgstr "Minder"
+#: data/tracks/littlevolcano/littlevolcano.track:4
+msgid "Little Volcano"
+msgstr "Kleine vulkaan"
 
-#: src/gui/player_controls.cpp:63
+#: src/gui/start_race_feedback.cpp:35
+msgid "Loading race..."
+msgstr "Bezig met het laden..."
+
+#: src/gui/player_controls.cpp:66
 msgid "Look back"
 msgstr "Achteruit kijken"
 
-#: src/gui/help_page_two.cpp:71
+#: src/gui/help_page_two.cpp:68
 msgid "Missile - fast stopper in a straight line"
 msgstr "Raket – snel en rechtlijnig, maar zeer effectief"
 
-#: src/gui/num_karts.cpp:78 src/gui/num_laps.cpp:71
-msgid "More"
-msgstr "Meer"
-
-#: src/gui/main_menu.cpp:57
+#: src/gui/main_menu.cpp:47
 msgid "Multiplayer"
 msgstr "Meerder spelers"
 
-#: src/gui/feature_unlocked.cpp:43
+#: src/gui/feature_unlocked.cpp:37
 msgid "New Feature Unlocked"
 msgstr "Nieuwe optie geactiveerd"
 
-#: src/kart.cpp:415
+#: src/challenges/challenge.cpp:121
+#, c-format
+msgid ""
+"New Grand Prix '%s'\n"
+"now available"
+msgstr ""
+"Grand Prix '%s'\n"
+"is nu beschikbaar!"
+
+#: src/challenges/challenge.cpp:124
+#, c-format
+msgid ""
+"New difficulty\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Nieuw niveau\n"
+"'%s'\n"
+"is nu beschikbaar!"
+
+#: src/kart.cpp:400
 msgid "New fastest lap"
 msgstr "Nieuwe snelste ronde"
 
-#: src/gui/help_page_one.cpp:153
-msgid "Next screen"
-msgstr "Volgende scherm"
+#: src/challenges/challenge.cpp:118
+#, c-format
+msgid ""
+"New game mode\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Nieuwe spelvorm\n"
+"'%s'is nu beschikbaar!"
 
-#: src/gui/grand_prix_select.cpp:83
+#: src/challenges/challenge.cpp:114
+#, c-format
+msgid ""
+"New track '%s'\n"
+"now available"
+msgstr ""
+"Nieuw parcours '%s'\n"
+"is nu beschikbaar!"
+
+#: src/gui/help_page_one.cpp:144
+#: src/gui/help_page_two.cpp:118
+msgid "Next help screen"
+msgstr "Volgend scherm"
+
+#: src/gui/grand_prix_select.cpp:71
+#: src/gui/grand_prix_select.cpp:76
 msgid "No Grand Prix selected"
 msgstr "Geen Grand Prix geselecteerd"
 
-#: src/gui/track_sel.cpp:105
+#: src/gui/track_sel.cpp:86
 msgid "No track selected"
 msgstr "Geen parcours geselecteerd"
 
-#: src/gui/difficulty.cpp:60
+#: src/gui/race_options.cpp:281
+#: src/gui/race_options.cpp:285
 msgid "Novice"
 msgstr "Beginneling"
 
-#: src/user_config.cpp:483
+#: src/gui/race_options.cpp:80
+msgid "Number of karts"
+msgstr "Kies het aantal karts"
+
+#: src/gui/race_options.cpp:106
+msgid "Number of laps"
+msgstr "Kies het aantal ronden"
+
+#: src/user_config.cpp:488
 msgid "Old config file found, check your key bindings!"
 msgstr "Oud configuratiebestand gevonden, controleer toetsinstellingen!"
 
-#: src/gui/main_menu.cpp:66 src/gui/options.cpp:39 src/gui/race_menu.cpp:61
+#: data/tracks/olivermath/olivermath.track:4
+msgid "Oliver's Math Class"
+msgstr "De wiskundeklas van Olivier"
+
+#: data/tracks/beach/beach.track:4
+msgid "On the Beach"
+msgstr "Strandvakantie"
+
+#: src/gui/main_menu.cpp:55
+#: src/gui/options.cpp:40
+#: src/gui/race_menu.cpp:50
 msgid "Options"
 msgstr "Opties"
 
-#: src/gui/help_page_two.cpp:123
+#: src/gui/help_page_two.cpp:100
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Parachute – remt alle karts voor je af!"
 
-#: src/gui/race_menu.cpp:52
+#: src/gui/race_menu.cpp:47
 msgid "Paused"
 msgstr "Gepauzeerd"
 
-#: src/gui/race_gui.cpp:924
+#: src/gui/race_gui.cpp:974
 msgid "Penalty time!!"
 msgstr "Straftijd!!"
 
-#: src/gui/player_controls.cpp:247
+#: data/gp1.cup:4
+msgid "Penguin Playground"
+msgstr "Speeltuin voor pinguïns"
+
+#: src/gui/player_controls.cpp:251
 msgid "Player "
 msgstr "Speler"
 
-#: src/gui/char_sel.cpp:71
+#: src/gui/char_sel.cpp:68
 #, c-format
 msgid "Player %d, choose a driver"
 msgstr "Speler %d, kies een karakter"
 
-#: src/gui/config_controls.cpp:56
+#: src/gui/config_controls.cpp:45
 msgid "Player 1"
 msgstr "Speler 1"
 
-#: src/gui/config_controls.cpp:59
+#: src/gui/config_controls.cpp:46
 msgid "Player 2"
 msgstr "Speler 2"
 
-#: src/gui/config_controls.cpp:62
+#: src/gui/config_controls.cpp:47
 msgid "Player 3"
 msgstr "Speler 3"
 
-#: src/gui/config_controls.cpp:65
+#: src/gui/config_controls.cpp:48
 msgid "Player 4"
 msgstr "Speler 4"
 
-#: src/gui/options.cpp:46
+#: src/gui/options.cpp:41
 msgid "Player Config"
 msgstr "Speler instellingen"
 
-#: src/gui/player_controls.cpp:83
+#: src/gui/player_controls.cpp:80
 msgid "Player name"
 msgstr "Naam speler"
 
-#: src/gui/display_res_confirm.cpp:78
+#: src/gui/display_res_confirm.cpp:59
 msgid "Press <ESC> to Cancel"
 msgstr "Druk op <ESC> om te annuleren"
 
-#: src/gui/config_controls.cpp:73 src/gui/config_display.cpp:165
-#: src/gui/config_sound.cpp:78 src/gui/difficulty.cpp:63
-#: src/gui/game_mode.cpp:88 src/gui/grand_prix_select.cpp:91
-#: src/gui/num_karts.cpp:100 src/gui/num_laps.cpp:88
-#: src/gui/num_players.cpp:65 src/gui/options.cpp:80
-#: src/gui/player_controls.cpp:107
+#: src/gui/config_controls.cpp:52
+#: src/gui/config_display.cpp:101
+#: src/gui/config_sound.cpp:63
+#: src/gui/game_mode.cpp:84
+#: src/gui/grand_prix_select.cpp:87
+#: src/gui/num_players.cpp:45
+#: src/gui/options.cpp:57
+#: src/gui/player_controls.cpp:112
+#: src/gui/race_options.cpp:134
 msgid "Press <ESC> to go back"
 msgstr "Druk op <ESC> om terug te keren"
 
-#: src/gui/player_controls.cpp:152
+#: src/gui/player_controls.cpp:156
 msgid "Press key"
 msgstr "Druk op een toets"
 
-#: src/gui/help_page_two.cpp:142
+#: src/gui/help_page_three.cpp:83
+msgid "Previous help screen"
+msgstr "Vorig scherm"
+
+#: src/gui/help_page_two.cpp:114
 msgid "Previous screen"
 msgstr "Vorig scherm"
 
-#: src/gui/game_mode.cpp:65
+#: src/gui/game_mode.cpp:58
 msgid "Quick Race"
 msgstr "Instant wedstrijd"
 
-#: src/gui/main_menu.cpp:69
+#: src/gui/help_page_three.cpp:62
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr "Snelle race: Één enkel parcours, snelste tijd wint"
+
+#: src/gui/main_menu.cpp:56
 msgid "Quit"
 msgstr "Einde"
 
-#: src/gui/race_gui.cpp:712
+#: src/gui/race_gui.cpp:746
 msgid "REV"
 msgstr "R"
 
-#: src/gui/race_results_gui.cpp:173
+#: data/tracks/race/race.track:4
+msgid "Race Track"
+msgstr "Racecircuit"
+
+#: src/gui/race_results_gui.cpp:148
 msgid "Race in this track again"
 msgstr "Doe dit parcours opnieuw"
 
-#: src/gui/race_results_gui.cpp:66
+#: src/gui/race_results_gui.cpp:54
 msgid "Race results"
 msgstr "Wedstrijdresultaat"
 
-#: src/gui/difficulty.cpp:54
+#: src/gui/race_options.cpp:283
 msgid "Racer"
 msgstr "Coureur"
 
-#: src/gui/race_gui.cpp:893
+#: src/gui/race_gui.cpp:930
 msgid "Ready!"
 msgstr "Op uw plaatsen?"
 
-#: src/gui/player_controls.cpp:63
+#: src/gui/player_controls.cpp:66
 msgid "Rescue"
 msgstr "Herstellen"
 
-#: src/gui/race_menu.cpp:69
+#: src/gui/race_menu.cpp:52
 msgid "Restart Race"
 msgstr "Herstart wedstrijd"
 
-#: src/gui/race_results_gui.cpp:57
+#: src/gui/race_results_gui.cpp:48
 msgid "Result"
 msgstr "Resultaat"
 
-#: src/gui/race_menu.cpp:57
+#: src/gui/race_menu.cpp:49
 msgid "Return To Race"
 msgstr "Terug naar de wedstrijd"
 
-#: src/gui/player_controls.cpp:61
+#: src/gui/player_controls.cpp:64
 msgid "Right"
 msgstr "Rechts"
 
-#: src/gui/race_gui.cpp:898
+#: data/gp2.cup:5
+msgid "Second grand prix"
+msgstr "Tweede Grand Prix"
+
+#: src/gui/race_gui.cpp:939
 msgid "Set!"
 msgstr "Klaar?"
 
-#: src/gui/race_menu.cpp:75 src/gui/race_results_gui.cpp:179
+#: src/gui/race_menu.cpp:57
+#: src/gui/race_results_gui.cpp:153
 msgid "Setup New Race"
 msgstr "Nieuwe wedstrijd maken"
 
-#: src/gui/main_menu.cpp:54
+#: data/tracks/sandtrack/sandtrack.track:4
+msgid "Shifting Sands"
+msgstr "De zandduinen"
+
+#: src/gui/main_menu.cpp:46
 msgid "Single Player"
 msgstr "Enkele speler"
 
-#: src/gui/options.cpp:69
+#: src/gui/race_options.cpp:284
+msgid "Skidding Preview"
+msgstr "Voorproefje v/h driften"
+
+#: data/gp3.cup:4
+msgid "Snag Drive"
+msgstr "Beren op de weg"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
+msgid "SnowTux Peak"
+msgstr "SneeuwTux berg"
+
+#: src/gui/options.cpp:52
 msgid "Sound"
 msgstr "Geluid"
 
-#: src/gui/config_sound.cpp:49
+#: src/gui/config_sound.cpp:40
 msgid "Sound Settings"
 msgstr "Geluid instellingen"
 
-#: src/gui/num_karts.cpp:90 src/gui/num_laps.cpp:81
+#: data/tracks/startrack/startrack.track:4
+msgid "Star Track"
+msgstr "Tussen de sterren"
+
+#: src/gui/race_options.cpp:129
 msgid "Start race"
 msgstr "Start wedstrijd"
 
-#: src/gui/grand_prix_ending.cpp:107 src/gui/leader_result.cpp:109
+#: data/tracks/subseatrack/subseatrack.track:4
+msgid "Sub Sea"
+msgstr "Onder de Zee"
+
+#: data/tracks/islandtrack/islandtrack.track:4
+msgid "The Island"
+msgstr "Het Eiland"
+
+#: src/gui/grand_prix_ending.cpp:107
+#: src/gui/leader_result.cpp:109
 #, c-format
 msgid "The winner is %s!"
 msgstr "De winnar is %s!"
 
-#: src/gui/num_players.cpp:46
+#: data/gp3.cup:5
+msgid "Third grand prix"
+msgstr "Derde Grand Prix"
+
+#: src/gui/num_players.cpp:39
 msgid "Three Players"
 msgstr "Drie spelers"
 
-#: src/gui/game_mode.cpp:70
+#: src/gui/game_mode.cpp:62
 msgid "Time Trial"
 msgstr "Tegen de klok"
 
-#: src/gui/help_page_two.cpp:57
+#: src/gui/help_page_three.cpp:67
+msgid "Time Trial: As quick race, but no items.                       "
+msgstr "Tegen de klok: Een snelle race, maar geen hulpmiddelen"
+
+#: src/gui/help_page_two.cpp:61
 msgid "To help you win, there are certain collectables you can grab:"
 msgstr "Om je te helpen, kun je deze dingen pakken:"
 
-#: src/gui/config_sound.cpp:55 src/gui/config_sound.cpp:105
+#: data/gp2.cup:4
+msgid "To the Moon and Back"
+msgstr "Naar de maan (en terug)"
+
+#: src/gui/config_sound.cpp:45
+#: src/gui/config_sound.cpp:90
 msgid "Turn off music"
 msgstr "Muziek uit"
 
-#: src/gui/config_sound.cpp:65 src/gui/config_sound.cpp:118
+#: src/gui/config_sound.cpp:54
+#: src/gui/config_sound.cpp:103
 msgid "Turn off sound effects"
 msgstr "Geluidseffecten uit"
 
-#: src/gui/config_sound.cpp:59 src/gui/config_sound.cpp:99
+#: src/gui/config_sound.cpp:49
+#: src/gui/config_sound.cpp:84
 msgid "Turn on music"
 msgstr "Muziek aan"
 
-#: src/gui/config_sound.cpp:69 src/gui/config_sound.cpp:113
+#: src/gui/config_sound.cpp:58
+#: src/gui/config_sound.cpp:98
 msgid "Turn on sound effects"
 msgstr "Geluidseffecten aan"
+
+#: data/tracks/tuxtrack/tuxtrack.track:4
+msgid "Tux Tollway"
+msgstr "Tolweg van Tux"
 
 #: src/gui/num_players.cpp:38
 msgid "Two Players"
 msgstr "Twee spelers"
 
-#: src/player_kart.cpp:252
+#: data/tracks/volcano/volcano.track:4
+msgid "Volcano"
+msgstr "De vulkaan"
+
+#: src/player_kart.cpp:264
 msgid "WRONG WAY!"
 msgstr "VERKEERDE RICHTING!"
 
-#: src/gui/player_controls.cpp:62
+#: src/gui/player_controls.cpp:65
 msgid "Wheelie"
 msgstr "Wheelie"
 
-#: src/gui/config_display.cpp:115
+#: src/challenges/penguin_playground_gp.cpp:25
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix"
+msgstr ""
+"Win de Grand Prix \n"
+"'Speeltuin voor pinguïns'"
+
+#: src/challenges/penguin_playground_gp.cpp:27
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix with 3 'Racer' Level AI karts."
+msgstr ""
+"Win de Grand Prix \n"
+"'Speeltuin voor pinguïns' \n"
+"op niveau 'Coureur' en 3 tegenstanders"
+
+#: src/challenges/moon_and_back_gp.cpp:25
+msgid ""
+"Win To the Moon and Back\n"
+"Grand Prix"
+msgstr ""
+"Win de Grand Prix \n"
+"'Naar de maan (en terug)'"
+
+#: src/challenges/tollway_head2head.cpp:27
+msgid ""
+"Win a 1 lap Head to Head\n"
+"on Tux Tollway against 1 'Racer'\n"
+"level AI kart."
+msgstr ""
+"Race en win 1 ronde over de \n"
+"tolweg tegen 1 tegenstander \n"
+"op 'Coureur' niveau"
+
+#: src/challenges/jungle_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"in the Amazonian Jungle."
+msgstr ""
+"Win een zwaan-kleef-aan \n"
+"met 3 tegenstanders \n"
+"in de Amazone"
+
+#: src/challenges/island_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"on a Desert Island."
+msgstr ""
+"Win een zwaan-kleef-aan \n"
+"met 3 tegenstanders \n"
+"op het tropisch eiland"
+
+#: src/challenges/tollway_head2head.cpp:25
+msgid ""
+"Win a Head to Head on\n"
+"Tux Tollway"
+msgstr ""
+"Win een 1 op 1 duel \n"
+"over de tolweg"
+
+#: src/challenges/worlds_end_gp.cpp:25
+msgid ""
+"Win the At World's End\n"
+"Grand Prix"
+msgstr ""
+"Win de Grand Prix\n"
+"'Het einde van de wereld'"
+
+#: src/challenges/moon_and_back_gp.cpp:27
+msgid ""
+"Win the To the Moon and Back\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Win de Grand Prix 'Naar de \n"
+"maan' met drie tegenstandes \n"
+"op 'Coureur' niveau"
+
+#: src/gui/config_display.cpp:71
 msgid "Window mode"
 msgstr "In venster"
 
-#: src/world.cpp:537
+#: src/world.cpp:538
 msgid "You finished"
-msgstr "Je eindigde"
+msgstr "Race afgelopen"
 
-#: src/world.cpp:615
+#: src/world.cpp:617
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -517,44 +927,59 @@ msgstr ""
 "Je bent\n"
 "geëlimineerd!"
 
-#: src/world.cpp:536
+#: src/world.cpp:537
 msgid "You won"
-msgstr "Je hebt de"
+msgstr ""
+"Je hebt\n"
+"gewonnen!"
 
-#: src/gui/help_page_two.cpp:110
+#: src/gui/help_page_two.cpp:92
 msgid "Zipper - speed boost"
 msgstr "Pijltje – extra snelheid"
 
-#: src/user_config.cpp:835
+#: src/user_config.cpp:844
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joystick %d as %d  %c"
 
-#: src/user_config.cpp:839
+#: src/user_config.cpp:848
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joystick %d knop %d"
 
-#: src/user_config.cpp:842
+#: src/user_config.cpp:851
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joystick %d hat %d"
 
-#: src/user_config.cpp:848
+#: src/user_config.cpp:857
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "muis as %d %c"
 
-#: src/user_config.cpp:845
+#: src/user_config.cpp:854
 #, c-format
 msgid "mouse btn %d"
 msgstr "muisknop %d"
 
-#: src/user_config.cpp:829 src/user_config.cpp:874
+#: src/user_config.cpp:838
+#: src/user_config.cpp:883
 #, c-format
 msgid "not set"
 msgstr "geen waarde"
 
-#: src/world.cpp:539
+#: src/world.cpp:540
 msgid "the race!"
-msgstr "wedstrijd gewonnen"
+msgstr " "
+
+#~ msgid "Choose your skill level"
+#~ msgstr "Kies je niveau"
+#~ msgid "Karts: %d"
+#~ msgstr "Kars: %d"
+#~ msgid "Laps: 3"
+#~ msgstr "Ronden: 3"
+#~ msgid "Less"
+#~ msgstr "Minder"
+#~ msgid "More"
+#~ msgstr "Meer"
+
