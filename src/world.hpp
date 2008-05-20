@@ -117,6 +117,7 @@ private:
     Highscores* m_highscores;
     Phase       m_phase;
     float       m_clock;
+    float       m_finish_delay_start_time;
     int         m_eliminated_karts;    // number of eliminated karts
     int         m_eliminated_players;  // number of eliminated players
     std::vector<float>

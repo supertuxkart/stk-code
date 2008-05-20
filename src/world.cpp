@@ -465,7 +465,8 @@ void World::updateRaceStatus(float dt)
                             {
                                 m_clock += dt;
                                 // Nothing more to do if delay time is not over yet
-                                if(m_clock < TIME_DELAY_TILL_FINISH) return;
+                                if(m_clock - m_finish_delay_start_time 
+                                  < TIME_DELAY_TILL_FINISH) return;
                    
                                 m_phase = FINISH_PHASE;
                                 estimateFinishTimes();
@@ -498,7 +499,7 @@ void World::updateRaceStatus(float dt)
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
         m_phase = DELAY_FINISH_PHASE;
-        m_clock = 0.0f;
+        m_finish_delay_start_time = m_clock;
     }
 }  // updateRaceStatus
 
