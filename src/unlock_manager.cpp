@@ -183,7 +183,7 @@ void UnlockManager::grandPrixFinished()
 //-----------------------------------------------------------------------------
 void UnlockManager::lockFeature(Challenge* challenge)
 {
-    const unsigned int amount = challenge->getFeatures().size();
+    const unsigned int amount = (unsigned int)challenge->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
         m_locked_features[challenge->getFeatures()[n].name]=true;
 }   // lockFeature
@@ -192,7 +192,7 @@ void UnlockManager::lockFeature(Challenge* challenge)
 
 void UnlockManager::unlockFeature(Challenge* c, bool save)
 {
-    const unsigned int amount = c->getFeatures().size();
+    const unsigned int amount = (unsigned int)c->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
     {
         std::string feature = c->getFeatures()[n].name;
