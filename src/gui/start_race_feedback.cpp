@@ -28,7 +28,7 @@ enum WidgetTokens
     WTOK_MSG
 };
 
-StartRaceFeedback::StartRaceFeedback()
+StartRaceFeedback::StartRaceFeedback() : m_updated( false )
 {
     //Add some feedback so people know they are going to start the race
     widget_manager->reset();
@@ -50,8 +50,7 @@ void StartRaceFeedback::update(float DELTA)
 
     //I consider that in this case, a static variable is cleaner than a
     //member variable of this class. -Coz
-    static bool updated = false;
-    if( updated == true ) race_manager->startNew();
-    else updated = true;
+    if( m_updated == true ) race_manager->startNew();
+    else m_updated = true;
 }
 
