@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <plib/sg.h>
+#include "btBulletDynamicsCommon.h"
 
 namespace lisp
 {
@@ -137,6 +138,28 @@ namespace lisp
                     m_car->get(val[i]);
                     lisp = lisp->getCdr();
                 }
+                return true;
+            }
+        bool get(const char* name, btVector3& val) const
+            {
+                const Lisp* lisp = getLisp(name);
+                if(!lisp)
+                    return false;
+
+                lisp = lisp->getCdr();
+                if(!lisp)
+                    return false;
+                float f[3];
+                for(int i = 0; i < 3 && lisp; ++i)
+                {
+                    const Lisp* m_car = lisp->getCar();
+                    if(!m_car)
+                        return false;
+                    m_car->get(f[i]);
+                    lisp = lisp->getCdr();
+                }
+                // Lists are stored in reverse order, so reverse to original order
+                val.setValue(f[2],f[1],f[0]);
                 return true;
             }
 

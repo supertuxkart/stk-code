@@ -53,7 +53,7 @@ protected:
     btRigidBody*          m_body;
     btDefaultMotionState* m_motion_state;
     btTransform   m_transform;
-
+    btVector3     m_hpr;
 public:
 
     Moveable (bool bHasHistory=false);
@@ -64,9 +64,11 @@ public:
     const btVector3 &getVelocityLC() const     {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     sgCoord*      getCoord     ()              {return &m_curr_pos;                }
-    const btVector3 getPos     ()  const       {return m_transform.getOrigin();    }
+    const btVector3& getPos    ()  const       {return m_transform.getOrigin();    }
+    const btVector3& getRotation() const       {return m_hpr;                      }
     const sgCoord* getCoord    ()  const       {return &m_curr_pos;                }
     const sgVec4* getNormalHOT ()  const       {return m_normal_hot;               }
+    const sgCoord* getResetPos ()  const       {return &m_reset_pos;               }
     void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);    }
     virtual void  placeModel   ();
     virtual void  handleZipper ()              {};

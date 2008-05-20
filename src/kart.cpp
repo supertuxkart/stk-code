@@ -74,6 +74,7 @@ Kart::Kart (const std::string& kart_name, int position_ ,
     m_skidmark_right       = NULL;
     m_track_sector         = Track::UNKNOWN_SECTOR;
     sgCopyCoord(&m_reset_pos, &init_pos);
+
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
@@ -376,6 +377,12 @@ void Kart::doLapCounting ()
             setTimeAtLap(world->getTime());
             m_race_lap++ ;
         }
+        // Race finished
+        // =============
+        if(m_race_lap>=race_manager->getNumLaps())
+        {
+            raceFinished(world->getTime());
+        }
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
         if(m_lap_start_time>=0.0)
@@ -430,6 +437,14 @@ void Kart::doLapCounting ()
         }
     }
 }   // doLapCounting
+
+//-----------------------------------------------------------------------------
+void Kart::raceFinished(float time)
+{
+    m_finished_race = true;
+    m_finish_time   = time;
+    race_manager->RaceFinished(this, time);
+}   // raceFinished
 
 //-----------------------------------------------------------------------------
 void Kart::collectedHerring(Herring* herring)
@@ -655,7 +670,7 @@ void Kart::update(float dt)
                                     m_curr_pos.xyz,
                                     m_track_sector      );
 
-    doLapCounting () ;
+    if(!m_finished_race) doLapCounting();
     processSkidMarks();
 }   // update
 
@@ -1066,13 +1081,6 @@ void Kart::placeModel ()
     m_curr_pos.xyz[2] -= offset_z;
     m_curr_pos.hpr[1] -= offset_pitch;
 }   // placeModel
-//-----------------------------------------------------------------------------
-void Kart::setFinishingState(float time)
-{
-    m_finished_race = true;
-    m_finish_time   = time;
-}   // setFinishingState
-
 //-----------------------------------------------------------------------------
 float Kart::estimateFinishTime  ()
 {

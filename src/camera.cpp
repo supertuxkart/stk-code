@@ -36,6 +36,7 @@ Camera::Camera(int camera_index, const Kart* kart)
 
     btVector3 start_pos = m_kart->getPos();
     sgSetVec3(m_current_pos.xyz, start_pos.getX(), start_pos.getY(), start_pos.getZ());
+    sgSetVec3(m_current_pos.xyz, 0, 0, 0);
     sgSetVec3(m_current_pos.hpr, 0, 0, 0);
 
     // FIXME: clipping should be configurable for slower machines
@@ -96,6 +97,20 @@ void Camera::setScreenPosition(int camera_index)
 //-----------------------------------------------------------------------------
 void Camera::setMode(Mode mode)
 {
+    if(mode==CM_FINAL)
+    {
+        const Track* track=world->getTrack();
+        // If the track doesn't have a final position, ignore this mode
+        if(!track->hasFinalCamera()) return;
+        btVector3 coord(m_current_pos.xyz[0],m_current_pos.xyz[1],
+                        m_current_pos.xyz[2]);
+        m_velocity = (track->getCameraPosition()-coord)/1.0f;
+        btVector3 rotation(m_current_pos.hpr[0],m_current_pos.hpr[1],
+                           m_current_pos.hpr[2]);
+        // Rotate faster
+        m_angular_velocity = (track->getCameraHPR()-rotation)/1.0f;
+        m_final_time=0.0f;
+    }
     m_mode       = mode;
     m_last_pitch = 0.0f;
     if(m_mode==CM_CLOSEUP)
@@ -119,6 +134,8 @@ void Camera::update (float dt)
     sgCoord kartcoord;
     const Kart *kart;
     
+    if(m_mode==CM_FINAL) return finalCamera(dt);
+
     // First define the position of the kart
     if(m_mode==CM_LEADER_MODE)
     {
@@ -183,6 +200,29 @@ void Camera::update (float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+void Camera::finalCamera(float dt)
+{
+    // Turn/move the camera for 1 second only
+    m_final_time += dt;    
+    if( m_final_time<1.0f )
+    {
+        btVector3 coord(m_current_pos.xyz[0],m_current_pos.xyz[1],m_current_pos.xyz[2]);
+        coord += m_velocity*dt;
+        printf("y %f vely %f dt %f\n",coord.getY(), m_velocity.getY(), dt);
+        m_current_pos.xyz[0]=coord.getX();
+        m_current_pos.xyz[1]=coord.getY();
+        m_current_pos.xyz[2]=coord.getZ();
+        btVector3 rotation(m_current_pos.hpr[0],m_current_pos.hpr[1],m_current_pos.hpr[2]);
+        rotation += m_angular_velocity*dt;
+        m_current_pos.hpr[0]=rotation.getX();
+        m_current_pos.hpr[1]=rotation.getY();
+        m_current_pos.hpr[2]=rotation.getZ();
+        m_context->setCamera(&m_current_pos);
+    }
+}   // finalCamera
+
+//-----------------------------------------------------------------------------
+
 void Camera::apply ()
 {
     int width  = user_config->m_width ;

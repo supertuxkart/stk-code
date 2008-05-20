@@ -795,7 +795,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
     offset_x += (int)(120*ratio_x);
     offset_y += (int)(70*maxRatio);
 
-    if ( kart->getLap() >= race_manager->getNumLaps())
+    if(kart->hasFinishedRace())
     {
         sprintf(str, _("Finished"));
         font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);

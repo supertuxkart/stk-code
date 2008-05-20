@@ -54,15 +54,16 @@ const int   Track::UNKNOWN_SECTOR  = -1;
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
-    m_filename        = filename_;
-    m_herring_style   = "";
-    m_track_2d_width  = w;
-    m_track_2d_height = h;
-    m_do_stretch      = stretch;
-    m_description     = "";
-    m_designer        = "";
-    m_screenshot      = "";
-    m_top_view        = "";
+    m_filename         = filename_;
+    m_herring_style    = "";
+    m_track_2d_width   = w;
+    m_track_2d_height  = h;
+    m_do_stretch       = stretch;
+    m_description      = "";
+    m_designer         = "";
+    m_screenshot       = "";
+    m_top_view         = "";
+    m_has_final_camera = false;
 
     loadTrack(m_filename);
     loadDriveline();
@@ -842,6 +843,10 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("gravity",               m_gravity);
     LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
     LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
+    // if both camera position and rotation are defined,
+    // set the flag that the track has final camera position
+    m_has_final_camera  = LISP->get("camera-final-position", m_camera_final_position);
+    m_has_final_camera &= LISP->get("camera-final-hpr",      m_camera_final_hpr);
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());

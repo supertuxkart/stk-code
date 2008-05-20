@@ -36,6 +36,7 @@ public:
         CM_DRIFTING,      // FIXME: drifting behind when accelerating = not yet implemented
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
         CM_REVERSE,       // Camera is pointing backwards
+        CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY
     };
 protected:
@@ -47,8 +48,12 @@ protected:
     float       m_current_speed;        // current speed of camera
     float       m_last_pitch;           // for tiling the camera when going downhill
     float       m_distance;             // distance between camera and kart
+    btVector3   m_velocity;             // camera velocity for final mode
+    btVector3   m_angular_velocity;     // camera angular velocity for final mode
+    float       m_final_time;           // time when final camera mode started
 
-
+private:
+    void finalCamera      (float dt);   // handle the final camera
 public:
          Camera           (int camera_index, const Kart* kart);
     void setMode          (Mode mode_);    /** Set the camera to the given mode */

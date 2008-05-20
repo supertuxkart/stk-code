@@ -219,10 +219,25 @@ void RaceManager::exit_race()
 }   // exit_Race
 
 //-----------------------------------------------------------------------------
-void RaceManager::addKartResult(int kart, int pos, float time)
+// Kart kart has finished the race at the specified time (which can be different
+// from world->getClock() in case of setting extrapolated arrival times).
+void RaceManager::RaceFinished(const Kart *kart, float time)
 {
+    unsigned i;
+    for(i=0; i<m_kart_status.size(); i++)
+    {
+        printf("i %d %s %s\n",i,kart->getName().c_str(),m_kart_status[i].m_ident.c_str());
+        if(kart->getIdent()==m_kart_status[i].m_ident) break;
+    }   // for i
+    if(i>=m_kart_status.size())
+    {
+        fprintf(stderr, "Kart '%s' not found. Ignored.\n",kart->getName().c_str());
+        return;
+    }
+
     // In follow the leader mode, kart 0 does not get any points,
     // so the position of each kart is actually one better --> decrease pos
+    int pos = kart->getPosition();
     if(m_race_mode==RM_FOLLOW_LEADER) 
     {
         pos--;
@@ -232,11 +247,13 @@ void RaceManager::addKartResult(int kart, int pos, float time)
         if(pos<=0) pos=stk_config->m_max_karts;
     }
 
-    m_kart_status[kart].m_score        += m_score_for_position[pos-1];
-    m_kart_status[kart].m_last_score    = m_score_for_position[pos-1];
-    m_kart_status[kart].m_overall_time += time;
-    m_kart_status[kart].m_last_time     = time;
-}   // addKartResult
+    m_kart_status[i].m_score        += m_score_for_position[pos-1];
+    m_kart_status[i].m_last_score    = m_score_for_position[pos-1];
+    m_kart_status[i].m_overall_time += time;
+    m_kart_status[i].m_last_time     = time;
+    m_num_finished_karts ++;
+    if(kart->isPlayerKart()) m_num_finished_players++;
+}   // raceFinished
 
 //-----------------------------------------------------------------------------
 void RaceManager::restartRace()

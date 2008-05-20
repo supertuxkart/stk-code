@@ -102,46 +102,47 @@ public:
     RaceManager();
     ~RaceManager();
 
-    void setPlayerKart(unsigned int player, const std::string& kart);
-    void setNumPlayers(int num);
-    void reset();
-    void setGrandPrix(const CupData &cup)    { m_cup = cup;                      }
-    void setDifficulty(Difficulty diff);
-    void setNumLaps(int num)                 { m_num_laps.clear();
-                                               m_num_laps.push_back(num);        }
-    void setTrack(const std::string& track);
-    void setRaceMode(RaceModeType mode)      { m_race_mode = mode;               }
-    void setNumKarts(int num)                { m_num_karts = num;                }
-    void setCoinTarget(int num)              { m_coin_target = num;              }
-    void addKartResult(int kart, int pos, float time);
-    RaceModeType       getRaceMode()   const { return m_race_mode;               }
-    unsigned int       getNumKarts()   const { return m_num_karts;               }
-    unsigned int       getNumPlayers() const { return (int)m_player_karts.size();}
-    int                getNumLaps()    const { return m_num_laps[m_track_number];}
-    Difficulty         getDifficulty() const { return m_difficulty;              }
-    const std::string& getTrackName()  const { return m_tracks[m_track_number];  }
-    const CupData     *getGrandPrix()  const { return &m_cup;                    }
-    unsigned int    getFinishedKarts() const { return m_num_finished_karts;      }
-    unsigned int  getFinishedPlayers() const { return m_num_finished_players;    }
-    const std::string&  getKartName(int kart) const
-                                             { return m_kart_status[kart].m_ident;}
-    const std::string& getHerringStyle() const 
-                                             { return m_cup.getHerringStyle();   }
-    int     getKartScore(int krt)      const { return m_kart_status[krt].m_score;}
-    int     getPositionScore(int p)    const { return m_score_for_position[p-1]; }
-    double  getOverallTime(int kart)   const { return m_kart_status[kart].m_overall_time;}
-    int     getCoinTarget()            const { return m_coin_target;            }
-    bool    isEliminated(int kart)     const { return m_kart_status[kart].m_is_eliminated;}
-    bool    raceHasLaps()              const { return m_race_mode!=RM_FOLLOW_LEADER;}
-    void    eliminate(int kart)              { m_kart_status[kart].m_is_eliminated=true;}
-    void addFinishedKarts(int num)           { m_num_finished_karts += num;      }
-    void PlayerFinishes()                    { m_num_finished_players++;         }
-    int  allPlayerFinished() const {return m_num_finished_players==m_player_karts.size();}
-    int  raceIsActive() const                { return m_active_race;             }
-    bool isPlayer(int kart) const    {return m_kart_status[kart].m_player_id>-1; }
+    void         setPlayerKart(unsigned int player, const std::string& kart);
+    void         setNumPlayers(int num);
+    void         reset();
+    void         RaceFinished(const Kart* kart, float time);
+    void         setTrack(const std::string& track);
+    void         setGrandPrix(const CupData &cup){ m_cup = cup;                     }
+    void         setDifficulty(Difficulty diff);
+    void         setNumLaps(int num)            { m_num_laps.clear();
+                                                  m_num_laps.push_back(num);        }
+    void         setRaceMode(RaceModeType mode) { m_race_mode = mode;               }
+    void         setNumKarts(int num)           { m_num_karts = num;                }
+    void         setCoinTarget(int num)         { m_coin_target = num;              }
+    RaceModeType getRaceMode()            const { return m_race_mode;               }
+    unsigned int getNumKarts()            const { return m_num_karts;               }
+    unsigned int getNumPlayers()          const { return (int)m_player_karts.size();}
+    int          getNumLaps()             const { return m_num_laps[m_track_number];}
+    Difficulty   getDifficulty()          const { return m_difficulty;              }
+    const std::string& 
+                 getTrackName()           const { return m_tracks[m_track_number];  }
+    const CupData 
+                *getGrandPrix()           const { return &m_cup;                    }
+    unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
+    unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
+    const std::string&  
+                 getKartName(int kart)    const { return m_kart_status[kart].m_ident;}
+    const std::string& 
+                 getHerringStyle()        const { return m_cup.getHerringStyle();   }
+    int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;}
+    int          getPositionScore(int p)  const { return m_score_for_position[p-1]; }
+    double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
+    int          getCoinTarget()          const { return m_coin_target;            }
+    bool         isEliminated(int kart)   const { return m_kart_status[kart].m_is_eliminated;}
+    bool         raceHasLaps()            const { return m_race_mode!=RM_FOLLOW_LEADER;}
+    void         eliminate(int kart)            { m_kart_status[kart].m_is_eliminated=true;}
+    int          allPlayerFinished()      const {return 
+                                          m_num_finished_players==m_player_karts.size();    }
+    int          raceIsActive()           const { return m_active_race;             }
+    bool         isPlayer(int kart)       const {return m_kart_status[kart].m_player_id>-1; }
 
-    void setMirror() {/*FIXME*/}
-    void setReverse(){/*FIXME*/}
+    void         setMirror() {/*FIXME*/}
+    void         setReverse(){/*FIXME*/}
 
     void startNew();         // start new race/GP/...
     void next();             // start the next race or go back to the start screen

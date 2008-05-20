@@ -59,6 +59,9 @@ private:
     // braking. These factors are used to adjust this.
     float                    m_AI_angle_adjustment;
     float                    m_AI_curve_speed_adjustment;
+    bool                     m_has_final_camera;
+    btVector3                m_camera_final_position;
+    btVector3                m_camera_final_hpr;
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -192,6 +195,9 @@ public:
     const std::string& getScreenshotFile () const {return m_screenshot;         }
     const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
     const std::string& getHerringStyle   () const {return m_herring_style;      }
+    bool               hasFinalCamera    () const {return m_has_final_camera;   }
+    const btVector3&   getCameraPosition () const {return m_camera_final_position;}
+    const btVector3&   getCameraHPR      () const {return m_camera_final_hpr;   }
     void               getStartCoords    (unsigned int pos, sgCoord* coords) const;
     void  getTerrainInfo(const btVector3 &pos, float *hot, btVector3* normal, 
                          const Material **material) const;

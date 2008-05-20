@@ -221,6 +221,20 @@ void PlayerKart::setPosition(int p)
 }   // setPosition
 
 //-----------------------------------------------------------------------------
+void PlayerKart::raceFinished(float time)
+{
+    Kart::raceFinished(time);
+    m_camera->setMode(Camera::CM_FINAL);   // set race over camera
+    RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+    if(m)
+    {
+        m->addMessage(getPosition()==1 ? _("You won") : _("You finished") ,
+                      this, 2.0f, 60);
+        m->addMessage( _("the race!"), this, 2.0f, 60);
+    }
+}   // raceFinished
+
+//-----------------------------------------------------------------------------
 void PlayerKart::handleZipper()
 {
     Kart::handleZipper();
@@ -257,7 +271,7 @@ void PlayerKart::addMessages()
         // Display a warning message if the kart is going back way (unless
         // the kart has already finished the race).
         if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-            getVelocity().getY() > 0.0f  && !raceIsFinished() )
+            getVelocity().getY() > 0.0f  && !hasFinishedRace() )
         {
             m->addMessage(_("WRONG WAY!"), this, -1.0f, 60);
         }  // if angle is too big

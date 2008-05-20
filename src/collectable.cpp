@@ -162,7 +162,7 @@ void Collectable::hitRedHerring(int n)
             {
                 Kart *kart = world->getKart(i);
                 if(kart->isEliminated() || kart == m_owner) continue;
-                if(kart->getPosition() == 1 && kart->raceIsFinished())
+                if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {
                     m_type = COLLECT_PARACHUTE;
                     m_number = 1;

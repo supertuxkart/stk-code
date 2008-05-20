@@ -258,36 +258,7 @@ void World::update(float dt)
             unlock_manager->raceFinished();
             return;
         }
-        // Add times to highscore list. First compute the order of karts,
-        // so that the timing of the fastest kart is added first (otherwise
-        // someone might get into the highscore list, only to be kicked out
-        // again by a faster kart in the same race), which might be confusing
-        // if we ever decide to display a message (e.g. during a race)
-        unsigned int *index = new unsigned int[m_kart.size()];
-        for (unsigned int i=0; i<m_kart.size(); i++ )
-        {
-            index[m_kart[i]->getPosition()-1] = i;
-        }
-
-        for(unsigned int pos=0; pos<m_kart.size(); pos++)
-        {
-            // Only record times for player karts
-            if(!m_kart[index[pos]]->isPlayerKart()) continue;
-
-            PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
-            
-            Highscores::HighscoreType hst = (race_manager->getRaceMode()==
-                                                    RaceManager::RM_TIME_TRIAL) 
-                                            ? Highscores::HST_TIMETRIAL_OVERALL_TIME
-                                            : Highscores::HST_RACE_OVERALL_TIME;
-            if(m_highscores->addData(hst, k->getName(),
-                                     k->getPlayer()->getName(),
-                                     k->getFinishTime())>0      )
-            {
-                highscore_manager->Save();
-            }
-        }
-        delete []index;
+        updateHighscores();
         pause();
         menu_manager->pushMenu(MENUID_RACERESULT);
     }
@@ -305,7 +276,7 @@ void World::update(float dt)
     for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
     {
         if(m_kart[i]->isEliminated()) continue;   // ignore eliminated kart
-        if(!m_kart[i]->raceIsFinished()) updateRacePosition((int)i);
+        if(!m_kart[i]->hasFinishedRace()) updateRacePosition((int)i);
         if(m_kart[i]->isPlayerKart()) m_kart[i]->addMessages();   // add 'wrong direction'
     }
 
@@ -322,9 +293,43 @@ void World::update(float dt)
     }
 #endif
 }
+// ----------------------------------------------------------------------------
+void World::updateHighscores()
+{
+    // Add times to highscore list. First compute the order of karts,
+    // so that the timing of the fastest kart is added first (otherwise
+    // someone might get into the highscore list, only to be kicked out
+    // again by a faster kart in the same race), which might be confusing
+    // if we ever decide to display a message (e.g. during a race)
+    unsigned int *index = new unsigned int[m_kart.size()];
+    for (unsigned int i=0; i<m_kart.size(); i++ )
+    {
+        index[m_kart[i]->getPosition()-1] = i;
+    }
 
+    for(unsigned int pos=0; pos<m_kart.size(); pos++)
+    {
+        // Only record times for player karts
+        if(!m_kart[index[pos]]->isPlayerKart()) continue;
+
+        PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
+
+        Highscores::HighscoreType hst = (race_manager->getRaceMode()==
+            RaceManager::RM_TIME_TRIAL) 
+            ? Highscores::HST_TIMETRIAL_OVERALL_TIME
+            : Highscores::HST_RACE_OVERALL_TIME;
+        if(m_highscores->addData(hst, k->getName(),
+            k->getPlayer()->getName(),
+            k->getFinishTime())>0      )
+        {
+            highscore_manager->Save();
+        }
+    }
+    delete []index;
+}   // updateHighscores
+
+// ----------------------------------------------------------------------------
 #ifdef HAVE_GHOST_REPLAY
-//-----------------------------------------------------------------------------
 bool World::saveReplayHumanReadable( std::string const &filename ) const
 {
     std::string path;
@@ -403,17 +408,23 @@ bool World::loadReplayHumanReadable( std::string const &filename )
 void World::updateRaceStatus(float dt)
 {
     switch (m_phase) {
-        case SETUP_PHASE:   m_clock=0.0f;  m_phase=READY_PHASE;
+        // Note: setup phase must be a separate phase, since the race_manager
+        // checks the phase when updating the camera: in the very first time
+        // step dt is large (it includes loading time), so the camera might
+        // tilt way too much. A separate setup phase for the first frame
+        // simplifies this handling
+        case SETUP_PHASE:   m_clock = 0.0f;  
+                            m_phase = READY_PHASE;
+                            sound_manager->playSfx(SOUND_PRESTART);
                             dt = 0.0f;  // solves the problem of adding track loading time
-                            break;                // loading time, don't play sound yet
-        case READY_PHASE:   if(m_clock==0.0)      // play sound at beginning of next frame
-                                sound_manager->playSfx(SOUND_PRESTART);
-                            if(m_clock>1.0)
+                            return;               // loading time, don't play sound yet
+        case READY_PHASE:   if(m_clock>1.0)
                             {
                                 m_phase=SET_PHASE;   
                                 sound_manager->playSfx(SOUND_PRESTART);
                             }
-                            break;
+                            m_clock += dt;
+                            return;
         case SET_PHASE  :   if(m_clock>2.0) 
                             {
                                 m_phase=GO_PHASE;
@@ -434,166 +445,147 @@ void World::updateRaceStatus(float dt)
                                 m_replay_recorder.pushFrame();
 #endif
                             }
-                            break;
+                            m_clock += dt;
+                            return;
         case GO_PHASE  :    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
                             {
                                 // Switch to race if more than 1 second has past
                                 if(m_clock<m_leader_intervals[0]-1.0f)
                                     m_phase=RACE_PHASE;
+                                m_clock -= dt;
                             }
                             else
                             {
                                 if(m_clock>1.0)    // how long to display the 'go' message  
                                     m_phase=RACE_PHASE;    
+                                m_clock += dt;
                             }
-
-                            break;
+                            return;
+        case DELAY_FINISH_PHASE :
+                            {
+                                m_clock += dt;
+                                // Nothing more to do if delay time is not over yet
+                                if(m_clock < TIME_DELAY_TILL_FINISH) return;
+                   
+                                m_phase = FINISH_PHASE;
+                                estimateFinishTimes();
+                                unlock_manager->raceFinished();
+                                return;             
+                            }
         default        :    break;
     }   // switch
+
     if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
-    {
-        // Count 'normal' till race phase has started, then count backwards
-        if(m_phase==RACE_PHASE || m_phase==GO_PHASE)
-            m_clock -=dt;
-        else
-            m_clock +=dt;
-        if(m_clock<0.0f)
-        {
-            if(m_leader_intervals.size()>1)
-                m_leader_intervals.erase(m_leader_intervals.begin());
-            m_clock=m_leader_intervals[0];
-            int kart_number;
-            // If the leader kart is not the first kart, remove the first
-            // kart, otherwise remove the last kart.
-            int position_to_remove = m_kart[0]->getPosition()==1 
-                                   ? getCurrentNumKarts() : 1;
-            for (kart_number=0; kart_number<(int)m_kart.size(); kart_number++)
-            {
-                if(m_kart[kart_number]->isEliminated()) continue;
-                if(m_kart[kart_number]->getPosition()==position_to_remove)
-                    break;
-            }
-            if(kart_number==m_kart.size())
-            {
-                fprintf(stderr,"Problem with removing leader: position %d not found\n",
-                        position_to_remove);
-                for(int i=0; i<(int)m_kart.size(); i++)
-                {
-                    fprintf(stderr,"kart %d: eliminated %d position %d\n",
-                        i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
-                }   // for i
-            }  // kart_number==m_kart.size()
-            else
-            {
-                removeKart(kart_number);
-            }
-            // The follow the leader race is over if there isonly one kart left,
-            // or if all players have gone
-            if(getCurrentNumKarts()==2 ||getCurrentNumPlayers()==0)
-            {
-                // Add the results for the remaining kart
-                for(int i=1; i<(int)race_manager->getNumKarts(); i++)
-                    if(!m_kart[i]->isEliminated()) 
-                        race_manager->addKartResult(i, m_kart[i]->getPosition(), 
-                                                    m_clock);
-                m_phase=FINISH_PHASE;
-                return;
-            }
-        }   // m_clock<0
-        return;
-    }   // if is follow leader mode
+        return updateLeaderMode(dt);
     
-    // Now handling of normal race
-    // ===========================
-    m_clock += dt;
+    // The status must now be race mode!
+    // =================================
+    m_clock += dt; 
 
-    /*if all players have finished, or if only one kart is not finished when
-      not in time trial mode, the race is over. Players are the last in the
-      vector, so substracting the number of players finds the first player's
-      position.*/
-    int new_finished_karts   = 0;
-    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-    {
-        if(m_kart[i]->isEliminated()) continue;
-        // FIXME: this part should be done as part of Kart::update
-        if ((m_kart[i]->getLap () >= race_manager->getNumLaps()) && !m_kart[i]->raceIsFinished())
-        {
-            m_kart[i]->setFinishingState(m_clock);
-
-            race_manager->addKartResult((int)i, m_kart[i]->getPosition(), m_clock);
-
-            ++new_finished_karts;
-            if(m_kart[i]->isPlayerKart())
-            {
-                race_manager->PlayerFinishes();
-                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-                if(m)
-                {
-                    m->addMessage(m_kart[i]->getPosition()==1
-                                  ? _("You won") 
-                                  : _("You finished") ,
-                                  m_kart[i], 2.0f, 60);
-                    m->addMessage( _("the race!"), m_kart[i], 2.0f, 60);
-                }
-            }
-        }
-    }
-    race_manager->addFinishedKarts(new_finished_karts);
-
-    // 1) All karts are finished --> end the race
-    // ==========================================
+    // 2) A player comes in last, go immediately to finish phase
+    // =========================================================
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
         m_phase = FINISH_PHASE;
-	    if(user_config->m_profile<0)  // profiling number of laps -> print stats
-        {
-	        float min_t=999999.9f, max_t=0.0, av_t=0.0;
-            for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-            {
-                max_t = std::max(max_t, m_kart[i]->getFinishTime());
-                min_t = std::min(min_t, m_kart[i]->getFinishTime());
-		        av_t += m_kart[i]->getFinishTime();
-	            printf("%s  start %d  end %d time %f\n",
-                       m_kart[i]->getName().c_str(),(int)i,
-                       m_kart[i]->getPosition(),
-                       m_kart[i]->getFinishTime());
-	        } 
-	        printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
-            std::exit(-2);
-	    }
+	    if(user_config->m_profile<0) printProfileResultAndExit();
+        unlock_manager->raceFinished();
     }   // if all karts are finished
 
-    // 2) All player karts are finished --> wait some
-    //    time for AI karts to arrive before finishing
-    // ===============================================
-    else if(race_manager->allPlayerFinished() && m_phase == RACE_PHASE &&
-            !user_config->m_profile)
+    // 3) All player karts are finished, but computer still racing
+    // ===========================================================
+    else if(race_manager->allPlayerFinished())
     {
+        // Set delay mode to have time for camera animation, and
+        // to give the AI some time to get non-estimated timings
         m_phase = DELAY_FINISH_PHASE;
-        m_finish_delay_start_time = m_clock;
+        m_clock = 0.0f;
     }
-
-    // 3) If the 'wait for AI' time is over, estimate arrival times & finish
-    // =====================================================================
-    else if(m_phase==DELAY_FINISH_PHASE &&
-            m_clock-m_finish_delay_start_time>TIME_DELAY_TILL_FINISH &&
-            !user_config->m_profile)
-    {
-        m_phase = FINISH_PHASE;
-        for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-        {
-            if(!m_kart[i]->raceIsFinished())
-            {
-                const float est_finish_time = m_kart[i]->estimateFinishTime();
-                m_kart[i]->setFinishingState(est_finish_time);
-                race_manager->addKartResult((int)i, m_kart[i]->getPosition(),
-                                            est_finish_time);
-            }   // if !raceIsFinished
-        }   // for i
-    }
-    
-    if(m_phase==FINISH_PHASE) unlock_manager->raceFinished();
 }  // updateRaceStatus
+
+//-----------------------------------------------------------------------------
+void World::estimateFinishTimes()
+{
+    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+    {
+        if(!m_kart[i]->hasFinishedRace())
+        {
+            const float est_finish_time = m_kart[i]->estimateFinishTime();
+            m_kart[i]->raceFinished(est_finish_time);
+        }  // if !hasFinishedRace
+    }   // for i
+}  // estimateFinishTimes
+
+//-----------------------------------------------------------------------------
+void World::updateLeaderMode(float dt)
+{
+    // Count 'normal' till race phase has started, then count backwards
+    if(m_phase==RACE_PHASE || m_phase==GO_PHASE)
+        m_clock -=dt;
+    else
+        m_clock +=dt;
+    if(m_clock<0.0f)
+    {
+        if(m_leader_intervals.size()>1)
+            m_leader_intervals.erase(m_leader_intervals.begin());
+        m_clock=m_leader_intervals[0];
+        int kart_number;
+        // If the leader kart is not the first kart, remove the first
+        // kart, otherwise remove the last kart.
+        int position_to_remove = m_kart[0]->getPosition()==1 
+                               ? getCurrentNumKarts() : 1;
+        for (kart_number=0; kart_number<(int)m_kart.size(); kart_number++)
+        {
+            if(m_kart[kart_number]->isEliminated()) continue;
+            if(m_kart[kart_number]->getPosition()==position_to_remove)
+                break;
+        }
+        if(kart_number==m_kart.size())
+        {
+            fprintf(stderr,"Problem with removing leader: position %d not found\n",
+                position_to_remove);
+            for(int i=0; i<(int)m_kart.size(); i++)
+            {
+                fprintf(stderr,"kart %d: eliminated %d position %d\n",
+                    i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
+            }   // for i
+        }  // kart_number==m_kart.size()
+        else
+        {
+            removeKart(kart_number);
+        }
+        // The follow the leader race is over if there is only one kart left,
+        // or if all players have gone
+        if(getCurrentNumKarts()==2 ||getCurrentNumPlayers()==0)
+        {
+            // Add the results for the remaining kart
+            for(int i=1; i<(int)race_manager->getNumKarts(); i++)
+                if(!m_kart[i]->isEliminated()) 
+                    race_manager->RaceFinished(m_kart[i], m_clock);
+            m_phase=FINISH_PHASE;
+            return;
+        }
+    }   // m_clock<0
+    return;
+
+}   // updateLeaderMode
+
+//-----------------------------------------------------------------------------
+void World::printProfileResultAndExit()
+{
+    float min_t=999999.9f, max_t=0.0, av_t=0.0;
+    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+    {
+        max_t = std::max(max_t, m_kart[i]->getFinishTime());
+        min_t = std::min(min_t, m_kart[i]->getFinishTime());
+        av_t += m_kart[i]->getFinishTime();
+        printf("%s  start %d  end %d time %f\n",
+            m_kart[i]->getName().c_str(),(int)i,
+            m_kart[i]->getPosition(),
+            m_kart[i]->getFinishTime());
+    } 
+    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
+    std::exit(-2);
+}   // printProfileResultAndExit
 
 //-----------------------------------------------------------------------------
 /** Called in follow-leader-mode to remove the last kart
@@ -635,7 +627,7 @@ void World::removeKart(int kart_number)
     // ignored in all loops). Important:world->getCurrentNumKarts() returns 
     // the number of karts still racing. This value can not be used for loops 
     // over all karts, use race_manager->getNumKarts() instead!
-    race_manager->addKartResult(kart_number, kart->getPosition(), m_clock);
+    race_manager->RaceFinished(kart, m_clock);
     race_manager->eliminate(kart_number);
     kart->eliminate();
     m_eliminated_karts++;
@@ -657,7 +649,7 @@ void World::updateRacePosition ( int k )
         // Count karts ahead of the current kart, i.e. kart that are already
         // finished (the current kart k has not yet finished!!), have done more
         // laps, or the same number of laps, but a greater distance.
-        if (m_kart[j]->raceIsFinished()                                          ||
+        if (m_kart[j]->hasFinishedRace()                                           ||
             m_kart[j]->getLap() >  m_kart[k]->getLap()                             ||
             (m_kart[j]->getLap() == m_kart[k]->getLap() &&
              m_kart[j]->getDistanceDownTrack() > m_kart[k]->getDistanceDownTrack()) )

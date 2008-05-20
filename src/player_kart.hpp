@@ -55,6 +55,7 @@ public:
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);
     virtual void setPosition  (int p);
+    virtual void raceFinished (float time);
 
     int     isPlayerKart      () const {return 1;}
     Camera* getCamera         () {return m_camera;}

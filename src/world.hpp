@@ -111,7 +111,6 @@ public:
 private:
     Karts       m_kart;
     std::vector<PlayerKart*>  m_player_karts;
-    float       m_finish_delay_start_time;
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;
@@ -123,14 +122,18 @@ private:
     std::vector<float>
                 m_leader_intervals;    // time till elimination in follow leader
     bool        m_faster_music_active; // true if faster music was activated
-    void  updateRacePosition( int k );
-    void  loadTrack();
-    void  updateRaceStatus(float dt);
-    void  resetAllKarts();
-    void  removeKart(int kart_number);
-    Kart* loadRobot(const std::string& kart_name, int position,
-                    sgCoord init_pos);
 
+    void  updateRacePosition(int k);
+    void  updateHighscores  ();
+    void  loadTrack         ();
+    void  updateRaceStatus  (float dt);
+    void  resetAllKarts     ();
+    void  removeKart        (int kart_number);
+    Kart* loadRobot         (const std::string& kart_name, int position,
+                             sgCoord init_pos);
+    void  updateLeaderMode  (float dt);
+    void  printProfileResultAndExit();
+    void  estimateFinishTimes();
 #ifdef HAVE_GHOST_REPLAY
 private:
     bool    saveReplayHumanReadable( std::string const &filename ) const;

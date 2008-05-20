@@ -142,9 +142,8 @@ public:
     int            getLap              () const { return  m_race_lap;            }
     int            getPosition         () const { return  m_race_position;       }
     int            getInitialPosition  () const { return  m_initial_position;    }
-    void           setFinishingState(float time);
-    float          getFinishTime       () const  { return m_finish_time;         }
-    bool           raceIsFinished      () const  { return m_finished_race;       }
+    float          getFinishTime       () const { return  m_finish_time;         }
+    bool           hasFinishedRace     () const { return  m_finished_race;       }
     void           endRescue           ();
     float          estimateFinishTime  ();
     void           processSkidMarks    ();
@@ -207,6 +206,7 @@ public:
     void           forceRescue      (bool is_rescue=false);
     void           handleExplosion  (const btVector3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
+    const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     virtual int    isPlayerKart     () const {return 0;                        }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
@@ -215,7 +215,8 @@ public:
     virtual void   handleZipper     ();
     virtual void   crashed          () {};
     virtual void   doLapCounting    ();
-    virtual void   update           (float dt               );
+    virtual void   update           (float dt);
+    virtual void   raceFinished     (float time);
 };
 
 class TrafficDriver : public Kart
