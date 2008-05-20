@@ -118,9 +118,9 @@ public:
     Material*     getIconMaterial        () const {return m_icon_material;          }
     ssgEntity*    getModel               () const {return m_model;                  }
     const std::string& getName           () const {return m_name;                   }
-    const char*   getIdent               () const {return m_ident.c_str();          }
-    const char*   getShadowFile          () const {return m_shadow_file.c_str();    }
-    const char*   getIconFile            () const {return m_icon_file.c_str();      }
+    const std::string& getIdent          () const {return m_ident;                  }
+    const std::string& getShadowFile     () const {return m_shadow_file;            }
+    const std::string& getIconFile       () const {return m_icon_file;              }
     const sgVec3* getColor               () const {return &m_color;                 }
     float         getMass                () const {return m_mass;                   }
     float         getKartLength          () const {return m_kart_length;            }

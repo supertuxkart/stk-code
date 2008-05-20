@@ -1047,7 +1047,7 @@ bool WidgetManager::addImgButtonWgt
     const int TOKEN,
     const int MIN_WIDTH,
     const int MIN_HEIGHT,
-    const char* FILENAME
+    const std::string& FILENAME
 )
 {
     if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
@@ -1376,7 +1376,7 @@ void WidgetManager::setWgtTexture(const int TOKEN, const int TEXTURE)
 }
 
 //-----------------------------------------------------------------------------
-void WidgetManager::setWgtTexture(const int TOKEN, const char* FILENAME, 
+void WidgetManager::setWgtTexture(const int TOKEN, const std::string& FILENAME, 
                                   const bool is_full_path)
 {
     const int ID = findId(TOKEN);

@@ -82,7 +82,7 @@ CharSel::CharSel(int whichPlayer)
             if(unlock_manager->isLocked(kp->getIdent())) continue;
 
             widget_manager->addImgButtonWgt( WTOK_RACER0 + i, 8, 11,
-                kp->getIconFile() );
+                                             kp->getIconFile() );
         }
     }
 
