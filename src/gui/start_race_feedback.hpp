@@ -22,6 +22,8 @@
 
 class StartRaceFeedback: public BaseGUI
 {
+    bool m_updated;
+
 public:
     StartRaceFeedback();
     ~StartRaceFeedback();
