@@ -129,6 +129,12 @@ void SoundManager::addMusicToTracks()
     for(std::map<std::string,MusicInformation*>::iterator i=m_allMusic.begin();
                                                           i!=m_allMusic.end(); i++)
     {
+        if(!i->second) 
+        {
+            fprintf(stderr, "Can't find music file '%s' - ignored.\n",
+                    i->first.c_str());
+            continue;
+        }
         i->second->addMusicToTracks();
     }
 }   // addMusicToTracks
