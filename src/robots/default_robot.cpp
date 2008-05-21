@@ -71,6 +71,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_min_steps = 1;
         break;
     case RaceManager::RD_HARD:
+    case RaceManager::RD_SKIDDING:
         m_wait_for_players = false;
         m_max_handicap_accel = 1.0f;
         m_fallback_tactic = FT_FAREST_POINT;
