@@ -28,7 +28,8 @@
 #else
 #  include <AL/al.h>
 #endif
-#include <AL/alut.h>
+
+#include <SDL/SDL.h>
 
 #include "sfx_openal.hpp"
 #include "file_manager.hpp"
@@ -77,41 +78,45 @@ bool SFXImpl::load(const char* filename)
         return false;
     }
     ALenum format = 0;
-    ALsizei size = 0, freq = 0;
-    ALvoid* data = NULL;
-    ALboolean loop = AL_FALSE;
+    Uint32 size = 0;
+    Uint8* data = NULL;
+    SDL_AudioSpec spec;
 
-#ifdef __APPLE__
-    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq);
-#else
-    alutLoadWAVFile((ALbyte*)path.c_str(), &format, &data, &size, &freq, &loop);
-#endif
-
-    if (data == NULL)
+    if( SDL_LoadWAV( path.c_str(), &spec, &data, &size ) == NULL)
     {
-        const int ALUT_ERROR = alutGetError();
-        fprintf(stderr, "Error 1 loading SFX: %s failed because %s \n", path.c_str(), alutGetErrorString(ALUT_ERROR));
+        fprintf(stderr, "Error 1 loading SFX: with file %s, SDL_LoadWAV() failed\n", path.c_str());
         return false;
     }
 
-    alBufferData(m_soundBuffer, format, data, size, freq);
+    switch( spec.format )
+    {
+        case AUDIO_U8:
+        case AUDIO_S8:
+            if( spec.channels == 2 ) format = AL_FORMAT_STEREO8;
+            else format = AL_FORMAT_MONO8;
+            break;
+        case AUDIO_U16LSB:
+        case AUDIO_S16LSB:
+        case AUDIO_U16MSB:
+        case AUDIO_S16MSB:
+            if( spec.channels == 2 ) format = AL_FORMAT_STEREO16;
+            else format = AL_FORMAT_MONO16;
+            break;
+    }
+
+    alBufferData(m_soundBuffer, format, data, size, spec.freq);
     if (alGetError() != AL_NO_ERROR)
     {
         fprintf(stderr, "Error 2 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 
-    alutUnloadWAV(format, data, size, freq);
-    if (alGetError() != AL_NO_ERROR)
-    {
-        fprintf(stderr, "Error 3 loading SFX: %s failed\n", path.c_str());
-        return false;
-    }
+    SDL_FreeWAV(data);
 
     alGenSources(1, &m_soundSource );
     if (alGetError() != AL_NO_ERROR)
     {
-        fprintf(stderr, "Error 4 loading SFX: %s failed\n", path.c_str());
+        fprintf(stderr, "Error 3 loading SFX: %s failed\n", path.c_str());
         return false;
     }
 

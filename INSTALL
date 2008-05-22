@@ -10,7 +10,6 @@ First, make sure that you have the following packages installed:
   * PLIB version 1.8.4 or later
   * SDL 1.2 or later
   * OpenAL
-  * freealut
 
 Unpack the files from the tarball like this:
 
@@ -43,7 +42,7 @@ Here are the compilation instructions for the current svn(05 oct. 2006) of
 Super Tux Kart on Ubuntu Edgy, contributed by Damien:
 
 install following packages:
-# apt-get install libopenal-dev libalut-dev libmikmod2-dev plib1.8.4-dev
+# apt-get install libopenal-dev libmikmod2-dev plib1.8.4-dev
 libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
 
 do a:

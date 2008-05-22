@@ -94,10 +94,6 @@ dnl Add special compiler flags for certain platforms
 dnl ================================================
 case "${host}" in
 *darwin*|*macosx*)
-  AC_CHECK_PROGS(have_pkg_config,[pkg-config],"no")
-  if test x$have_pkg_config != xno; then
-    LDFLAGS="$LDFLAGS `pkg-config --libs freealut`"
-  fi
   LDFLAGS="$LDFLAGS -lintl"
 esac
 
@@ -142,14 +138,14 @@ case "${host}" in
 esac
 
 dnl ========================================
-dnl check for OpenAL (al and alut) libraries
+dnl check for OpenAL libraries
 dnl ========================================
 dnl FIXME: this all appears too complicated, doing unnecesary
 dnl        tests etc --> needs cleanup
 
 dnl The check for OpenAL headers depends on the OS, since 
 dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
-AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)   
+AC_SEARCH_LIBS(alGenBuffers, [openal], have_al_lib=yes)   
 
 dnl We also check for ogg vorbis support now.
 dnl we have 4 sound libraries to check, first we check for OpenAL   
@@ -171,33 +167,6 @@ case "${host}" in
    dnl check for libraries
    save_LIBS=$LIBS
 
-   dnl AL/al.h is checked before, since Macs need a different path
-
-   dnl check for freealut
-   AC_SEARCH_LIBS(alutInit, alut, have_alut_lib=yes)
-   if test x$have_alut_lib = xyes; then
-      AC_CHECK_HEADER(AL/alut.h, have_alut_hdr=yes)
-
-      if test x$have_alut_hdr = xyes; then
-          AC_MSG_CHECKING([for alut version 1.0.0 or later ])
-
-   	       dnl check for right version of alut, must be at least 1.0
-	       AC_RUN_IFELSE([
-#             include <AL/alut.h>
-#             define MIN_ALUT_VERSION 1
-              int main()  {
-/*            if(alutGetMajorVersion()<MIN_ALUT_VERSION) return -1;*/
-                return 0; }
-
-              ],
-              alut_version_ok=yes
-              [ AC_MSG_RESULT(yes)],
-              AC_MSG_FAILURE(too old alut version - using plib instead),
-              alut_version_ok=yes
-              [ AC_MSG_RESULT(yes)])
-      fi
-   fi
-
    dnl search for the libraries needed to use ogg vorbis
    AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
 
@@ -213,15 +182,7 @@ case "${host}" in
        SUMMARY="$SUMMARY You DO NOT have OpenAL."
    fi
 
-   if test x$have_alut_hdr = xyes; then
-       if test x$alut_version_ok != xyes; then
-           SUMMARY="$SUMMARY You need to update freealut."
-       fi
-   else
-       SUMMARY="$SUMMARY You DO NOT have freealut."
-   fi
-   
-   if test x$have_al_hdr = xyes -a x$alut_version_ok = xyes; then
+   if test x$have_al_hdr = xyes ; then
        openal_LIBS="$LIBS"
        AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
        SUMMARY="$SUMMARY\nUsing OpenAL for sound."
@@ -237,7 +198,7 @@ case "${host}" in
            SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
        fi
    else
-       SUMMARY="$SUMMARY\nInstall OpenAL and freealut for music!"
+       SUMMARY="$SUMMARY\nInstall OpenAL for music!"
    fi
 
    LIBS=$save_LIBS

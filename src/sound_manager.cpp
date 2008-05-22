@@ -29,10 +29,11 @@
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
+#  include <OpenAL/alc.h>
 #else
 #  include <AL/al.h>
+#  include <AL/alc.h>
 #endif
-#include <AL/alut.h>
 
 #include "music_ogg.hpp"
 #include "sfx_openal.hpp"
@@ -46,12 +47,28 @@ SoundManager* sound_manager= NULL;
 SoundManager::SoundManager() : m_sfxs(NUM_SOUNDS)
 {
     m_current_music= NULL;
-    if(alutInit(0, NULL) == AL_TRUE)  // init OpenAL sound system
-        m_initialized = true;
+
+    ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
+    if( device == NULL )
+    {
+        fprintf(stderr, "WARNING: Could open the default sound device.\n");
+        m_initialized = false;
+    }
     else
     {
-        fprintf(stderr, "WARNING: Could not initialize the ALUT based sound.\n");
-        m_initialized = false;
+
+        ALCcontext* context = alcCreateContext( device, NULL );
+
+        if( context == NULL )
+        {
+            fprintf(stderr, "WARNING: Could create a sound context.\n");
+            m_initialized = false;
+        }
+        else
+        {
+            alcMakeContextCurrent( context );
+            m_initialized = true;
+        }
     }
 
     alGetError(); //Called here to clear any non-important errors found
@@ -94,7 +111,13 @@ SoundManager::~SoundManager()
 
     if(m_initialized)
     {
-        alutExit();
+        ALCcontext* context = alcGetCurrentContext();
+        ALCdevice* device = alcGetContextsDevice( context );
+
+        alcMakeContextCurrent( NULL );
+        alcDestroyContext( context );
+
+        alcCloseDevice( device );
     }
 }   // ~SoundManager
 

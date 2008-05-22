@@ -25,7 +25,6 @@
 #else
 #  include <AL/al.h>
 #endif
-#include <AL/alut.h>
 
 #include "music_ogg.hpp"
 #include "file_manager.hpp"
