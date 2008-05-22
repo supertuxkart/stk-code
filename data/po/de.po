@@ -850,7 +850,7 @@ msgid ""
 "Grand Prix"
 msgstr ""
 "Gewinne den Gran Prix\n"
-"zum Mond und zurück"
+"'Zum Mond und zurück'"
 
 #: src/challenges/tollway_head2head.cpp:27
 msgid ""
@@ -935,7 +935,7 @@ msgstr "Reißverschluss - Geschwindigkeitssteigerung"
 #: src/user_config.cpp:844
 #, c-format
 msgid "joy %d axis %d  %c"
-msgstr "Joystick %d Achsen %d  %c"
+msgstr "Joystick %d Achse %d  %c"
 
 #: src/user_config.cpp:848
 #, c-format
@@ -950,7 +950,7 @@ msgstr "Joystick %d Richtungstasten %d"
 #: src/user_config.cpp:857
 #, c-format
 msgid "mouse axis %d %c"
-msgstr "Maus Achsen %d %c"
+msgstr "Maus Achse %d %c"
 
 #: src/user_config.cpp:854
 #, c-format
