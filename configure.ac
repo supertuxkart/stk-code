@@ -145,7 +145,7 @@ dnl        tests etc --> needs cleanup
 
 dnl The check for OpenAL headers depends on the OS, since 
 dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
-AC_SEARCH_LIBS(alGenBuffers, [openal], have_al_lib=yes)   
+AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)   
 
 dnl We also check for ogg vorbis support now.
 dnl we have 4 sound libraries to check, first we check for OpenAL   
