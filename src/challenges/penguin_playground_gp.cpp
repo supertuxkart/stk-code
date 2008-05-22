@@ -27,7 +27,6 @@ PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp", _(
     setChallengeDescription(_("Win Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts."));
     addUnlockModeReward("followleader", _("Follow the Leader"));
     // The energymathclass challenge must be done, otherwise GP can't be selected
-    addDependency("energymathclass");
 }
 
 //-----------------------------------------------------------------------------
