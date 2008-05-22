@@ -3,7 +3,7 @@
 (supertuxkart-cup
  (name _("Snag Drive"))
  (description _("Third grand prix"))
- (tracks "islandtrack" "sandtrack" "city" "littlevolcano")
+ (tracks "islandtrack" "sandtrack" "city" "crescentcrossing")
  (laps      2               3           2          2)
 )
 
