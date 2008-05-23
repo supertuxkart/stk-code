@@ -51,7 +51,7 @@ void WorldsEndGP::setRace() const {
 bool WorldsEndGP::grandPrixFinished()
 {
     if (race_manager->getRaceMode()  != RaceManager::RM_GRAND_PRIX  ||
-        race_manager->getGrandPrix()->getName() != "At world's end" ||
+        race_manager->getGrandPrix()->getName() != _("At world's end") ||
         race_manager->getDifficulty()!= RaceManager::RD_HARD        ||
         race_manager->getNumKarts()   < 4                           ||
         race_manager->getNumPlayers() > 1) return false;

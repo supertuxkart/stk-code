@@ -46,7 +46,7 @@ void MoonAndBackGP::setRace() const {
 bool MoonAndBackGP::grandPrixFinished()
 {
     if (race_manager->getRaceMode()  != RaceManager::RM_GRAND_PRIX  ||
-        race_manager->getGrandPrix()->getName() != "To the Moon and Back" ||
+        race_manager->getGrandPrix()->getName() != _("To the Moon and Back") ||
         race_manager->getDifficulty()!= RaceManager::RD_HARD        ||
         race_manager->getNumKarts()   < 4                           ||
         race_manager->getNumPlayers() > 1) return false;
