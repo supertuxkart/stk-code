@@ -34,12 +34,7 @@ enum WidgetTokens
     WTOK_MSG3,
     WTOK_MSG4,
     WTOK_MSG5,
-
-    WTOK_FIRST_KEYNAME,
-    WTOK_LAST_KEYNAME = WTOK_FIRST_KEYNAME + KA_LAST,
-
-    WTOK_FIRST_KEYBINDING,
-    WTOK_LAST_KEYBINDING = WTOK_FIRST_KEYBINDING + KA_LAST,
+    WTOK_MSG6,
 
     WTOK_SECOND_PAGE,
     WTOK_QUIT
@@ -111,31 +106,21 @@ HelpPageOne::HelpPageOne()
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
 get stuck or fall too far, use the rescue button to get back on track."));
+    widget_manager->setWgtResizeToText( WTOK_MSG4, false );
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt(WTOK_MSG5, 70, 7,
-        _("Check the current key bindings for the first player"));
+    widget_manager->addTextWgt(WTOK_MSG5, 80, 10,
+        _("The current key bindings can be seen/changed in the\nOptions->Player Config menu."));
     widget_manager->breakLine();
 
-    widget_manager->switchOrder();
-    /*The keybindings are placed with loops because it allows to change the
-     * number of kart actions without changing this screen. */
-    for(int i = WTOK_FIRST_KEYNAME; i <= WTOK_LAST_KEYNAME; ++i)
-    {
-        widget_manager->addTextWgt( i, 20, 4,
-            _(sKartAction2String[i - WTOK_FIRST_KEYNAME]) );
-        widget_manager->setWgtRoundCorners( i, WGT_AREA_LFT );
-    }
+    widget_manager->addTextWgt(WTOK_MSG6, 100, 17,
+_("Collecting coins increases the number of collectables you receive.\n\
+After 5 silver coins, each blue box will yield 2 collectables,\nafter 10,\
+ 3 collectables and so on.\nEach gold coin is worth 3 silver coins, \
+so look out for them!"));
+    widget_manager->setWgtResizeToText( WTOK_MSG6, false);
     widget_manager->breakLine();
-
-    widget_manager->switchOrder();
-    for(int i = WTOK_FIRST_KEYBINDING; i <= WTOK_LAST_KEYBINDING; ++i)
-    {
-        widget_manager->addTextWgt( i, 20, 4,
-            user_config->getMappingAsString( 0,
-            (KartAction)(i - WTOK_FIRST_KEYBINDING)).c_str());
-        widget_manager->setWgtRoundCorners( i, WGT_AREA_RGT );
-    }
+    
     widget_manager->breakLine();
     widget_manager->breakLine();
 
