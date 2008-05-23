@@ -1,12 +1,13 @@
 SuperTuxKart 0.5 (May 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Five new tracks: Fort Magma, SnowTux Peak, Amazonian Journey, City and Canyon
+* Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, 
+   Canyon, Crescent Crossing and StarTrack
 * Complete Challenges to unlock game modes, new tracks and a skidding preview
 * New Follow the Leader game mode
 * New Grand Prix
 * Improved User Interface
 * Improved game pad/joystick handling
-* German, French, Dutch, Spanish, and Italian translations
+* German, French, Dutch, Spanish, Italian and Swedish translations
 * Additional music
 * Many Bugfixes including:
 	a memory leak fix (Charlie Head)
