@@ -79,7 +79,7 @@ void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string 
 void Challenge::addUnlockGPReward(std::string gp_name)
 {
     UnlockableFeature feature;
-    feature.name = gp_name;
+    feature.name = _(gp_name.c_str());
     feature.type = UNLOCK_GP;
     m_feature.push_back(feature);
 }
