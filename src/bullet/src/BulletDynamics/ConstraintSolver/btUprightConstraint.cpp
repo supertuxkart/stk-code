@@ -143,7 +143,6 @@ void btUprightConstraint::solveConstraint(btScalar    timeStep)
     if(m_disable_time>0.0f)
     {
         m_disable_time -= timeStep;
-        printf("m_disable %f timestep %f\n", m_disable_time, timeStep);
         if(m_disable_time>0.0f) return;
     }
 
