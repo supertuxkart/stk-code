@@ -6,6 +6,7 @@ Icon=PREFIX/share/pixmaps/supertuxkart_64.xpm
 Comment=A kart racing game
 Comment[fr_FR]=Un jeu de karting
 Comment[ro_RO]=Un joc de curse cu carturi
+Comment[de_DE]=Ein Kart-Rennspiel
 Exec=PREFIX/games/supertuxkart --log=file
 Terminal=false
 StartupNotify=false
