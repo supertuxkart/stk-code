@@ -61,7 +61,7 @@ GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
                 CupData cup(*i);
                 if(unlock_manager->isLocked(cup.getName())) continue;
                 m_all_cups.push_back(cup);
-                widget_manager->addTextButtonWgt(WTOK_FIRSTPRIX + nId, 40, 7, cup.getName() );
+                widget_manager->addTextButtonWgt(WTOK_FIRSTPRIX + nId, 60, 7, cup.getName() );
                 nId++;
             }   // if
         }   // for i
@@ -74,7 +74,7 @@ GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
     widget_manager->breakLine();
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt( WTOK_TRACKS, 40, 40, _("No Grand Prix selected"));
+    widget_manager->addTextWgt( WTOK_TRACKS, 60, 40, _("No Grand Prix selected"));
     widget_manager->enableWgtScroll( WTOK_TRACKS );
     widget_manager->setWgtYScrollSpeed( WTOK_TRACKS, -60 );
 
