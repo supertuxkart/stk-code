@@ -103,7 +103,7 @@ void GameMode::select()
     {
     case WTOK_GP:
         race_manager->setRaceMode(RaceManager::RM_GRAND_PRIX);
-        menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
+        menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_QUICKRACE:
         race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);

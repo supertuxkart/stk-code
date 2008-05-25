@@ -82,7 +82,7 @@ CharSel::CharSel(int whichPlayer)
             if(unlock_manager->isLocked(kp->getIdent())) continue;
 
             widget_manager->addImgButtonWgt( WTOK_RACER0 + i, 8, 11,
-                kp->getIconFile() );
+                                             kp->getIconFile() );
         }
     }
 
@@ -227,7 +227,7 @@ void CharSel::select()
     }
 
     if (race_manager->getRaceMode() == RaceManager::RM_GRAND_PRIX)
-        menu_manager->pushMenu(MENUID_RACE_OPTIONS);
+        menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
     else
         menu_manager->pushMenu(MENUID_TRACKSEL);
 }   // select
