@@ -532,11 +532,11 @@ msgstr "Fahranfänger"
 
 #: src/gui/race_options.cpp:80
 msgid "Number of karts"
-msgstr "Wähle die Anzahl der Karts"
+msgstr "Anzahl der Karts"
 
 #: src/gui/race_options.cpp:101
 msgid "Number of laps"
-msgstr "Wähle die Anzahl der Runden"
+msgstr "Anzahl der Runden"
 
 #: src/user_config.cpp:488
 msgid "Old config file found, check your key bindings!"
