@@ -63,6 +63,7 @@ World::World()
     delete world;
     world                 = this;
     m_phase               = SETUP_PHASE;
+    m_previous_phase      = SETUP_PHASE;  // initialise it just in case
     m_track               = NULL;
     m_clock               = 0.0f;
     m_faster_music_active = false;
@@ -540,7 +541,7 @@ void World::updateLeaderMode(float dt)
             if(m_kart[kart_number]->getPosition()==position_to_remove)
                 break;
         }
-        if(kart_number==m_kart.size())
+        if(kart_number==(int)m_kart.size())
         {
             fprintf(stderr,"Problem with removing leader: position %d not found\n",
                 position_to_remove);
@@ -716,6 +717,7 @@ void World::restartRace()
 {
     m_clock               = 0.0f;
     m_phase               = SETUP_PHASE;
+    m_previous_phase      = SETUP_PHASE;
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -775,6 +777,7 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 void  World::pause()
 {
     sound_manager -> pauseMusic() ;
+    m_previous_phase = m_phase;
     m_phase = LIMBO_PHASE;
 }
 
@@ -782,7 +785,7 @@ void  World::pause()
 void  World::unpause()
 {
     sound_manager -> resumeMusic() ;
-    m_phase = RACE_PHASE;
+    m_phase = m_previous_phase;
 }
 
 /* EOF */

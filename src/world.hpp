@@ -116,6 +116,7 @@ private:
     Kart*       m_fastest_kart;
     Highscores* m_highscores;
     Phase       m_phase;
+    Phase       m_previous_phase;      // used during the race popup menu
     float       m_clock;
     float       m_finish_delay_start_time;
     int         m_eliminated_karts;    // number of eliminated karts
