@@ -30,6 +30,7 @@
 #endif
 
 #include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
 
 #include "sfx_openal.hpp"
 #include "file_manager.hpp"
@@ -101,6 +102,17 @@ bool SFXImpl::load(const char* filename)
         case AUDIO_S16MSB:
             if( spec.channels == 2 ) format = AL_FORMAT_STEREO16;
             else format = AL_FORMAT_MONO16;
+            
+            #ifdef WORDS_BIGENDIAN
+            // swap bytes around for big-endian systems
+            for(unsigned int n=0; n<size-1; n+=2)
+            {
+                Uint8 temp = data[n+1];
+                data[n+1] = data[n];
+                data[n] = temp;
+            }
+            #endif
+            
             break;
     }
 
