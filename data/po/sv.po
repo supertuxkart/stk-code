@@ -67,8 +67,9 @@ msgid ""
 "At high speeds wheelies drive you faster, but you can't steer. If you\n"
 "get stuck or fall too far, use the rescue button to get back on track."
 msgstr ""
-"Vid höga hastigheter gör stegringar att du kör fortare, men kan inte styra. Om du\n"
-"fastnar eller faller för långt använd då räddningsknappen för att ta dig tillbaka på banan."
+"Vid höga hastigheter gör stegringar att du kör fortare, men kan inte styra.\n"
+"Om du fastnar eller faller för långt använd då räddningsknappen för att ta \n"
+"dig tillbaka på banan."
 
 #: data/gp4.cup:4
 msgid "At world's end"
