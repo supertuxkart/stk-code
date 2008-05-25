@@ -227,7 +227,7 @@ void CharSel::select()
     }
 
     if (race_manager->getRaceMode() == RaceManager::RM_GRAND_PRIX)
-        menu_manager->pushMenu(MENUID_RACE_OPTIONS);
+        menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
     else
         menu_manager->pushMenu(MENUID_TRACKSEL);
 }   // select
