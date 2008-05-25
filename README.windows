@@ -28,7 +28,10 @@ Cygwin
 2) Compile and install plib
    This should work straight out of the box.
 
-3) Unpack supertuxkart and run ./configure  and  make.
+3) Install OpenAL
+   We have had some problems with this in the past, so it might be tricky.
+
+4) Unpack supertuxkart and run ./configure  and  make.
 
 That should be all.
 

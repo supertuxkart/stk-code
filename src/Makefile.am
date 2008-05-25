@@ -35,7 +35,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	collectable.cpp		   collectable.hpp	        \
 	collectable_manager.cpp	   collectable_manager.hpp   	\
 	sound_manager.cpp	   sound_manager.hpp           	\
-	sound_plib.cpp             sound_plib.hpp              	\
 	music_ogg.cpp	   	   music_ogg.hpp            	\
 	music_information.cpp  	   music_information.hpp       	\
 	sfx_openal.cpp             sfx_openal.hpp              	\

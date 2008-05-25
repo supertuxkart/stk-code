@@ -160,6 +160,15 @@ if test x$have_al_lib = xyes; then
   esac
 fi
 
+   if test x$have_al_hdr != xyes; then
+        echo ""
+        echo "You need to install OpenAL"
+        echo "Configure aborted"
+        echo ""
+        exit
+   fi
+
+
 case "${host}" in
 *)
    dnl default unix style machines
@@ -176,29 +185,18 @@ case "${host}" in
        AC_CHECK_HEADER(ogg/ogg.h, have_ogg_hdr=yes)
    fi
 
-   dnl create OpenAL defines and a summary of the optional sound components
    SUMMARY="$SUMMARY\n"
-   if test x$have_al_hdr != xyes; then
-       SUMMARY="$SUMMARY You DO NOT have OpenAL."
-   fi
 
-   if test x$have_al_hdr = xyes ; then
-       openal_LIBS="$LIBS"
-       AC_DEFINE([HAVE_OPENAL], 1, [Defined when OpenAL is available])
-       SUMMARY="$SUMMARY\nUsing OpenAL for sound."
-
-       if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
-           AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
-           SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
-           # ov_read for ogg music needs endianness flag. This macro defines
-           # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
-	   AC_C_BIGENDIAN
-       else
-           SUMMARY="$SUMMARY\nNo Ogg Vorbis support - the game will play with sound effects, but without music."
-           SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
-       fi
+   openal_LIBS="$LIBS"
+   if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
+       AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
+       SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
+       # ov_read for ogg music needs endianness flag. This macro defines
+       # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
+   AC_C_BIGENDIAN
    else
-       SUMMARY="$SUMMARY\nInstall OpenAL for music!"
+       SUMMARY="$SUMMARY\nNo Ogg Vorbis support - the game will play with sound effects, but without music."
+       SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
    fi
 
    LIBS=$save_LIBS
