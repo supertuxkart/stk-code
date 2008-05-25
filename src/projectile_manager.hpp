@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <plib/ssg.h>
+#include "vec3.hpp"
 #include "flyable.hpp"
 #include "collectable_manager.hpp"
 
@@ -60,7 +61,7 @@ public:
     void             cleanup          ();
     void             update           (float dt);
     Flyable*         newProjectile    (Kart *kart, CollectableType type);
-    Explosion*       newExplosion     (sgCoord *coord);
+    Explosion*       newExplosion     (const Vec3& coord);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
 };

@@ -21,6 +21,7 @@
 #define HEADER_EXPLOSION_H
 
 #include <plib/sg.h>
+#include "vec3.hpp"
 
 class Explosion : public ssgTransform
 {
@@ -29,8 +30,8 @@ public:
     ssgSelector  *m_seq ;
 public:
 
-         Explosion(sgCoord* coord);
-    void init     (sgCoord *coord);
+         Explosion(const Vec3& coord);
+    void init     (const Vec3& coord);
     void update   (float delta_t);
     int  inUse    () {return (m_step >= 0);                 }
     bool hasEnded () {return m_step >= m_seq->getNumKids(); }

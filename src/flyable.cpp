@@ -76,7 +76,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
                         trans.getBasis()[2][1]);
     float heading=atan2(-direction.getX(), direction.getY());
 
-    TerrainInfo::update(trans.getOrigin());
+    TerrainInfo::update(m_owner->getPos());
     float pitch = getTerrainPitch(heading);
 
     btMatrix3x3 m;
@@ -166,15 +166,15 @@ void Flyable::update (float dt)
 {
     if(m_exploded) return;
 	
-    btTransform trans=getBody()->getWorldTransform();
-    TerrainInfo::update(trans.getOrigin());
+    Vec3 pos=getBody()->getWorldTransform().getOrigin();
+    TerrainInfo::update(pos);
     if(getHoT()==Track::NOHIT) 
     {
         explode(NULL);    // flyable out of track boundary
         return;
     }
 
-    float hat = trans.getOrigin().getZ()-getHoT();
+    float hat = pos.getZ()-getHoT();
 
     // Use the Height Above Terrain to set the Z velocity.
     // HAT is clamped by min/max height. This might be somewhat

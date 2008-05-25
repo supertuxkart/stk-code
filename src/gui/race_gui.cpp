@@ -296,7 +296,7 @@ void RaceGUI::drawMap ()
 
         Kart* kart = world->getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        glColor3fv ( *kart->getColor());
+        glColor3fv ( kart->getColor().toFloat());
         c          = kart->getCoord () ;
 
         /* If it's a player, draw a bigger sign */

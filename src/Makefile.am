@@ -26,6 +26,7 @@ libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 
 supertuxkart_SOURCES =             main.cpp  			\
+	vec3.cpp		   vec3.hpp			\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	material_manager.cpp	   material_manager.hpp    	\
@@ -39,7 +40,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	music_information.cpp  	   music_information.hpp       	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
 	smoke.cpp		   smoke.hpp			\
-	input.hpp 						\
+	input.hpp 		   				\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
 	herring.cpp 		   herring.hpp              	\
@@ -90,7 +91,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	scene.hpp		   scene.cpp			\
 	no_copy.hpp	           constants.hpp 		\
 	translation.cpp		   translation.hpp 		\
-	traffic.cpp 			  	        	\
 	player.hpp		   				\
 	challenges/challenge.hpp   challenges/challenge.cpp	\
 	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\

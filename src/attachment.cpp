@@ -69,13 +69,7 @@ void Attachment::hitGreenHerring()
     float leftover_time   = 0.0f;
     switch(getType())   // If there already is an attachment, make it worse :)
     {
-    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getCoord());
-                       // Best solution would probably be to trigger the
-                       // explosion, and then to attach a new, random
-                       // attachment. Unfortunately, handleExplosion() is not
-                       // really severe enough, and forceRescue() attaches
-                       // tinytux, so that the new attachment is immediately lost.
-                       // m_kart->handleExplosion(m_kart->getCoord()->xyz, true);
+    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getPos());
                        m_kart->handleExplosion(m_kart->getPos(), /*direct_hit*/ true);
                        clear();
                        random_attachment = rand()%3;
@@ -145,7 +139,7 @@ void Attachment::update(float dt)
     case ATTACH_MAX:       break;
     case ATTACH_BOMB:      if(m_time_left<=0.0) 
                            {
-                               projectile_manager->newExplosion(m_kart->getCoord());
+                               projectile_manager->newExplosion(m_kart->getPos());
                                m_kart->handleExplosion(m_kart->getPos(), 
                                                        /*direct_hit*/ true);
                            }

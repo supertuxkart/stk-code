@@ -143,9 +143,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("model-file",              m_model_file);
     lisp->get("icon-file",               m_icon_file);
     lisp->get("shadow-file",             m_shadow_file);
-    lisp->get("red",                     m_color[0]);
-    lisp->get("green",                   m_color[1]);
-    lisp->get("blue",                    m_color[2]);
+    lisp->get("rgb",                     m_color);
 
     lisp->get("wheel-base",              m_wheel_base);
     lisp->get("heightCOG",               m_height_cog);
@@ -206,7 +204,7 @@ void KartProperties::init_defaults()
     m_icon_file     = "tuxicon.png";
     m_shadow_file   = "tuxkartshadow.png";
 
-    m_color[0] = 1.0f; m_color[1] = 0.0f; m_color[2] = 0.0f;
+    m_color.setValue(1.0f, 0.0f, 0.0f);
 
     m_kart_width                = 1.0f;
     m_kart_length               = 1.5f;

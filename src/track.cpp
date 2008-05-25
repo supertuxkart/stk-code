@@ -431,9 +431,9 @@ void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
   coords->hpr[1] = 0.0f;
   coords->hpr[2] = 0.0f;
 
-  btVector3 tmp_pos(coords->xyz[0],coords->xyz[1],coords->xyz[2]);
+  Vec3 tmp_pos(coords->xyz);
 
-  btVector3 normal;
+  Vec3 normal;
   const Material *material=NULL;
   getTerrainInfo(tmp_pos, &(coords->xyz[2]), &normal, &material);
 
@@ -1358,7 +1358,7 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
 }   // herring_command
 
 // ----------------------------------------------------------------------------
-void  Track::getTerrainInfo(const btVector3 &pos, float *hot, btVector3* normal, 
+void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 
                             const Material **material) const
 {
     btVector3 to_pos(pos);

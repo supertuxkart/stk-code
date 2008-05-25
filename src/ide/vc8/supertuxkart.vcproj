@@ -683,6 +683,10 @@
 				>
 			</File>
 			<File
+				RelativePath="../../../src\attachment_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\callback_manager.cpp"
 				>
 			</File>
@@ -899,10 +903,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\traffic.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\translation.cpp"
 				>
 			</File>
@@ -916,6 +916,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\user_config.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\vec3.cpp"
 				>
 			</File>
 			<File
@@ -1305,6 +1309,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\position.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\projectile_manager.hpp"
 				>
 			</File>
@@ -1418,6 +1426,10 @@
 			</File>
 			<File
 				RelativePath="..\..\user_pointer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\vec3.hpp"
 				>
 			</File>
 			<File
@@ -1635,10 +1647,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath="../../../src\attachment_manager.cpp"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

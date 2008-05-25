@@ -20,7 +20,7 @@
 #ifndef HEADER_TERRAIN_INFO_H
 #define HEADER_TERRAIN_INFO_H
 
-#include "btBulletDynamicsCommon.h"
+#include "vec3.hpp"
 #include "material.hpp"
 
 /** This class stores information about the triangle that's under an object, i.e.:
@@ -31,19 +31,19 @@ class TerrainInfo
 private:
     int               m_HoT_frequency;      // how often hight of terrain is computed
     int               m_HoT_counter;        // compute HAT only every N timesteps
-    btVector3         m_normal;             // normal of the triangle under the object
+    Vec3              m_normal;             // normal of the triangle under the object
     const Material   *m_material;           // material of the triangle under the object
     float             m_HoT;                // height of terrain
 
 public:
                      TerrainInfo(int frequency=1) {m_HoT_frequency=frequency;
                                                    m_HoT_counter=frequency;  }
-                     TerrainInfo(const btVector3 &pos, int frequency=1);
+                     TerrainInfo(const Vec3 &pos, int frequency=1);
     virtual         ~TerrainInfo() {};
-    virtual void     update(const btVector3 &pos);
+    virtual void     update(const Vec3 &pos);
     float            getHoT()      const { return m_HoT;      }
-    const Material*  getMaterial() const { return m_material; }
-    const btVector3& getNormal()   const { return m_normal;   }
+    const Material  *getMaterial() const { return m_material; }
+    const Vec3      &getNormal()   const { return m_normal;   }
     float            getTerrainPitch(float heading) const;
 
 };   // TerrainInfo

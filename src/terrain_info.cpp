@@ -23,7 +23,7 @@
 #include "world.hpp"
 #include "constants.hpp"
 
-TerrainInfo::TerrainInfo(const btVector3 &pos, int frequency)
+TerrainInfo::TerrainInfo(const Vec3 &pos, int frequency)
 {
     m_HoT_frequency = frequency;
     m_HoT_counter   = frequency;
@@ -31,7 +31,7 @@ TerrainInfo::TerrainInfo(const btVector3 &pos, int frequency)
     update(pos);
 }
 //-----------------------------------------------------------------------------
-void TerrainInfo::update(const btVector3& pos)
+void TerrainInfo::update(const Vec3& pos)
 {
     m_HoT_counter++;
     if(m_HoT_counter>=m_HoT_frequency)

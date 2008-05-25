@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include "vec3.hpp"
 #include "lisp/lisp.hpp"
 #include "no_copy.hpp"
 
@@ -45,7 +46,7 @@ protected:
                                 // the statusbar and the character select screen
     std::string m_shadow_file;  // Filename of the image file that contains the
                                 // shadow for this kart
-    float m_color[3];           // Color the represents the kart in the status
+    Vec3 m_color;               // Color the represents the kart in the status
                                 // bar and on the track-view
 
     // Physic properties
@@ -121,7 +122,7 @@ public:
     const std::string& getIdent          () const {return m_ident;                  }
     const std::string& getShadowFile     () const {return m_shadow_file;            }
     const std::string& getIconFile       () const {return m_icon_file;              }
-    const sgVec3* getColor               () const {return &m_color;                 }
+    const Vec3   &getColor               () const {return m_color;                  }
     float         getMass                () const {return m_mass;                   }
     float         getKartLength          () const {return m_kart_length;            }
     float         getKartWidth           () const {return m_kart_width;             }

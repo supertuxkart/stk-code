@@ -160,6 +160,9 @@ void Moveable::update (float dt)
     }   // if m_history_position
 
     m_velocityLC = getVelocity()*getTrans().getBasis();
+    const btMatrix3x3& basis=m_body->getWorldTransform().getBasis();
+    m_hpr.setHPR(basis);
+
     placeModel();
     m_first_time = false ;
 }   // update

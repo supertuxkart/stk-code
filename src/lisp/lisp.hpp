@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 #include <plib/sg.h>
-#include "btBulletDynamicsCommon.h"
+#include "vec3.hpp"
 
 namespace lisp
 {
@@ -140,7 +140,7 @@ namespace lisp
                 }
                 return true;
             }
-        bool get(const char* name, btVector3& val) const
+        bool get(const char* name, Vec3& val) const
             {
                 const Lisp* lisp = getLisp(name);
                 if(!lisp)

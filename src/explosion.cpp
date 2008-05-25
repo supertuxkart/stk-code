@@ -24,7 +24,7 @@
 #include "scene.hpp"
 
 
-Explosion::Explosion(sgCoord* coord) : ssgTransform()
+Explosion::Explosion(const Vec3& coord) : ssgTransform()
 {
     this->ref();
     ssgCutout *cut = new ssgCutout();
@@ -35,11 +35,14 @@ Explosion::Explosion(sgCoord* coord) : ssgTransform()
 }   // Explosion
 
 //-----------------------------------------------------------------------------
-void Explosion::init(sgCoord* coord)
+void Explosion::init(const Vec3& coord)
 {
     sound_manager->playSfx( SOUND_EXPLOSION );
 
-    setTransform(coord);
+    sgCoord c;
+    c.xyz[0]=coord[0];c.xyz[1]=coord[1];c.xyz[2]=coord[2];
+    c.hpr[0]=0; c.hpr[1]=0; c.hpr[2]=0;
+    setTransform(&c);
     m_step = -1;
     scene->add(this);
 }
@@ -58,5 +61,3 @@ void Explosion::update (float dt)
     m_seq -> selectStep ( m_step ) ;
 
 }
-
-

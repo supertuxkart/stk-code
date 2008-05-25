@@ -623,7 +623,7 @@ void World::removeKart(int kart_number)
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
-    projectile_manager->newExplosion(kart->getCoord());
+    projectile_manager->newExplosion(kart->getPos());
     // The kart can't be really removed from the m_kart array, since otherwise 
     // a race can't be restarted. So it's only marked to be eliminated (and 
     // ignored in all loops). Important:world->getCurrentNumKarts() returns 

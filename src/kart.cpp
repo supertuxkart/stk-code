@@ -360,7 +360,7 @@ void Kart::reset()
     m_rescue               = false;
 
     placeModel();
-    TerrainInfo::update(m_transform.getOrigin());
+    TerrainInfo::update(getPos());
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -592,7 +592,7 @@ void Kart::update(float dt)
     // dependent on the wheel size, suspension data etc.: when jumping,
     // the wheel suspension will be fully compressed, resulting in the
     // ray to start too low (under the track).
-    btVector3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.2f);
+    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.2f);
     //btVector3 pos_plus_epsilon (-56.6874237, -137.48851, -3.06826854);
     TerrainInfo::update(pos_plus_epsilon);
 

@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include "btBulletDynamicsCommon.h"
+#include "vec3.hpp"
 #include "material.hpp"
 #include "triangle_mesh.hpp"
 #include "music_information.hpp"
@@ -60,8 +61,8 @@ private:
     float                    m_AI_angle_adjustment;
     float                    m_AI_curve_speed_adjustment;
     bool                     m_has_final_camera;
-    btVector3                m_camera_final_position;
-    btVector3                m_camera_final_hpr;
+    Vec3                     m_camera_final_position;
+    Vec3                     m_camera_final_hpr;
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -196,10 +197,10 @@ public:
     const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
     const std::string& getHerringStyle   () const {return m_herring_style;      }
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
-    const btVector3&   getCameraPosition () const {return m_camera_final_position;}
-    const btVector3&   getCameraHPR      () const {return m_camera_final_hpr;   }
+    const Vec3&        getCameraPosition () const {return m_camera_final_position;}
+    const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }
     void               getStartCoords    (unsigned int pos, sgCoord* coords) const;
-    void  getTerrainInfo(const btVector3 &pos, float *hot, btVector3* normal, 
+    void  getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal, 
                          const Material **material) const;
     void createPhysicsModel              ();
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
