@@ -43,25 +43,25 @@ MainMenu::MainMenu()
 {
     widget_manager->switchOrder();
 
-    widget_manager->addTextButtonWgt( WTOK_SINGLE, 25, 7, _("Single Player") );
-    widget_manager->setWgtResizeToText( WTOK_SINGLE, false );
-    widget_manager->addTextButtonWgt( WTOK_MULTI, 25, 7, _("Multiplayer") );
+    const int WIDTH=30;
+    widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
+    widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Multiplayer") );
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
     if(all_challenges.size()>0)
     {
-        widget_manager->addTextButtonWgt( WTOK_CHALLENGES, 25, 7, _("Challenges") );
+        widget_manager->addTextButtonWgt( WTOK_CHALLENGES, WIDTH, 7, _("Challenges") );
     }
 
-    widget_manager->addTextButtonWgt( WTOK_OPTIONS, 25, 7, _("Options") );
-    widget_manager->addTextButtonWgt( WTOK_QUIT, 25, 7, _("Quit") );
+    widget_manager->addTextButtonWgt( WTOK_OPTIONS, WIDTH, 7, _("Options") );
+    widget_manager->addTextButtonWgt( WTOK_QUIT, WIDTH, 7, _("Quit") );
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 25, 7 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 7 );
 
-    widget_manager->addTextButtonWgt( WTOK_HELP, 25, 7, _("Help") );
+    widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, 7, _("Help") );
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
 
-    widget_manager->addTextButtonWgt( WTOK_CREDITS, 25, 7, _("Credits") );
+    widget_manager->addTextButtonWgt( WTOK_CREDITS, WIDTH, 7, _("Credits") );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
 
     if(user_config->getWarning()!="")

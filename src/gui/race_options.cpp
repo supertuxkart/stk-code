@@ -59,14 +59,17 @@ RaceOptions::RaceOptions()
     m_num_karts=race_manager->getNumKarts();
     m_num_laps=race_manager->getNumLaps();
 
+    const int DESC_WIDTH=48;
+    const int ITEM_WIDTH=35;
+
     // Difficulty
     // ==========
-    widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, 38, 7, _("Difficulty") );
+    widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, DESC_WIDTH, 7, _("Difficulty") );
     widget_manager->hideWgtRect(WTOK_DIFFICULTY_TITLE);
     widget_manager->setWgtTextSize(WTOK_DIFFICULTY_TITLE, WGT_FNT_LRG);
     widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, " < " );
 
-    widget_manager->addTextWgt( WTOK_DIFFICULTY, 32, 7, getDifficultyString(m_difficulty));
+    widget_manager->addTextWgt( WTOK_DIFFICULTY, ITEM_WIDTH, 7, getDifficultyString(m_difficulty));
     widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );
     widget_manager->showWgtBorder( WTOK_DIFFICULTY );
     widget_manager->hideWgtRect( WTOK_DIFFICULTY );
@@ -77,14 +80,14 @@ RaceOptions::RaceOptions()
 
     // Number of karts
     // ===============
-    widget_manager->addTextWgt( WTOK_KARTS_TITLE, 38, 7, _("Number of karts") );
+    widget_manager->addTextWgt( WTOK_KARTS_TITLE, DESC_WIDTH, 7, _("Number of karts") );
     widget_manager->hideWgtRect(WTOK_KARTS_TITLE);
     widget_manager->setWgtTextSize(WTOK_KARTS_TITLE, WGT_FNT_LRG);
     widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, " < " );
 
     char string_num_karts[MAX_MESSAGE_LENGTH];
     snprintf(string_num_karts, MAX_MESSAGE_LENGTH, "%d", m_num_karts);
-    widget_manager->addTextWgt( WTOK_KARTS, 32, 7, string_num_karts );
+    widget_manager->addTextWgt( WTOK_KARTS, ITEM_WIDTH, 7, string_num_karts );
     widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
     widget_manager->showWgtBorder( WTOK_KARTS );
     widget_manager->hideWgtRect( WTOK_KARTS );
@@ -98,14 +101,14 @@ RaceOptions::RaceOptions()
     if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX   &&
         race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER   )
     {
-        widget_manager->addTextWgt( WTOK_LAPS_TITLE, 38, 7, _("Number of laps") );
+        widget_manager->addTextWgt( WTOK_LAPS_TITLE, DESC_WIDTH, 7, _("Number of laps") );
         widget_manager->hideWgtRect(WTOK_LAPS_TITLE);
         widget_manager->setWgtTextSize(WTOK_LAPS_TITLE, WGT_FNT_LRG);
         widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 3, 7, " < " );
 
         char string_num_laps[MAX_MESSAGE_LENGTH];
         snprintf(string_num_laps, MAX_MESSAGE_LENGTH, "%d", m_num_laps);
-        widget_manager->addTextWgt( WTOK_LAPS, 32, 7, string_num_laps );
+        widget_manager->addTextWgt( WTOK_LAPS, ITEM_WIDTH, 7, string_num_laps );
         widget_manager->setWgtBorderPercentage( WTOK_LAPS, 10 );
         widget_manager->showWgtBorder( WTOK_LAPS );
         widget_manager->hideWgtRect( WTOK_LAPS );
