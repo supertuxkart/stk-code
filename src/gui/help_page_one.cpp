@@ -35,6 +35,9 @@ enum WidgetTokens
     WTOK_MSG4,
     WTOK_MSG5,
     WTOK_MSG6,
+    WTOK_MSG7,
+
+    WTOK_LOCK,
 
     WTOK_SECOND_PAGE,
     WTOK_QUIT
@@ -102,15 +105,20 @@ HelpPageOne::HelpPageOne()
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 15);
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt(WTOK_MSG4, 100, 15,
+    widget_manager->addTextWgt(WTOK_MSG4, 100, 13,
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
 get stuck or fall too far, use the rescue button to get back on track."));
     widget_manager->setWgtResizeToText( WTOK_MSG4, false );
     widget_manager->breakLine();
 
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
+    widget_manager->breakLine();
+
     widget_manager->addTextWgt(WTOK_MSG5, 80, 10,
         _("The current key bindings can be seen/changed in the\nOptions->Player Config menu."));
+    widget_manager->breakLine();
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
 
     widget_manager->addTextWgt(WTOK_MSG6, 100, 17,
@@ -120,8 +128,19 @@ After 5 silver coins, each blue box will yield 2 collectables,\nafter 10,\
 so look out for them!"));
     widget_manager->setWgtResizeToText( WTOK_MSG6, false);
     widget_manager->breakLine();
-    
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
+
+    widget_manager->addTextWgt(WTOK_MSG7, 87, 13,
+_("If you see a button with a lock like the one to the right,\n\
+you need to complete a challenge to unlock it. You can click on\n\
+the locks to know the name of what is behind the lock."));
+
+    widget_manager->addImgWgt(WTOK_LOCK, 10, 13, 0);
+    widget_manager->setWgtTexture(WTOK_LOCK, "gui_help_lock.rgb", false);
+    widget_manager->breakLine();
+
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
 
     /*Buttons at the bottom*/
