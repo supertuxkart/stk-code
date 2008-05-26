@@ -70,9 +70,10 @@ GameMode::GameMode()
     if(unlock_manager->isLocked("followleader"))
     {
         widget_manager->hideWgtText( WTOK_FOLLOW_LEADER );
-        widget_manager->deactivateWgt( WTOK_FOLLOW_LEADER );
 
-        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_WHITE);
+//        widget_manager->deactivateWgt( WTOK_FOLLOW_LEADER );
+
+        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_GRAY);
         widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, "gui_lock.rgb", false );
         widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
     }
@@ -110,8 +111,17 @@ void GameMode::select()
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
     case WTOK_FOLLOW_LEADER:
-        race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        if(unlock_manager->isLocked("followleader"))
+        {
+            widget_manager->showWgtText( WTOK_FOLLOW_LEADER );
+            widget_manager->setWgtTextColor( WTOK_FOLLOW_LEADER, WGT_TRANS_GRAY);
+            widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_TRANS_GRAY);
+        }
+        else
+        {
+            race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
+            menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        }
         break;
     case WTOK_TIMETRIAL:
         race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
