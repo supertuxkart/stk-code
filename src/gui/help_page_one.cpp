@@ -131,12 +131,11 @@ so look out for them!"));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt(WTOK_MSG7, 87, 13,
+    widget_manager->addTextWgt(WTOK_MSG7, 87, 8,
 _("If you see a button with a lock like the one to the right,\n\
-you need to complete a challenge to unlock it. You can click on\n\
-the locks to know the name of what is behind the lock."));
+you need to complete a challenge to unlock it."));
 
-    widget_manager->addImgWgt(WTOK_LOCK, 10, 13, 0);
+    widget_manager->addImgWgt(WTOK_LOCK, 6, 8, 0);
     widget_manager->setWgtTexture(WTOK_LOCK, "gui_help_lock.rgb", false);
     widget_manager->breakLine();
 
