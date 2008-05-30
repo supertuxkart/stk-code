@@ -78,11 +78,13 @@ MenuManager::~MenuManager()
   */
 void MenuManager::pushMenu(MenuManagerIDs id)
 {
-	// If there is already an element then this is the one for the menu
-	// which is still visible. We store its currently selected widget
-	// therein.
-	if (m_menu_stack.size())
+    // If we store the selected widget when we have send the order to change
+    // the menu but haven't done it, we would change the previous menu, not
+    // the current menu.
+	if ( m_menu_stack.size() && m_change_menu != true )
+    {
 		m_menu_stack.back().second = widget_manager->getSelectedWgt();
+    }
 
 	// used to suppress select-sound on startup
     static bool is_startup = true;
