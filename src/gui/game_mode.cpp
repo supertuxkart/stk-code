@@ -76,6 +76,8 @@ GameMode::GameMode()
         widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_GRAY);
         widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, "gui_lock.rgb", false );
         widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
+        widget_manager->setWgtText(WTOK_FOLLOW_LEADER,
+                                        _("Fulfil challenge to unlock"));
     }
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);

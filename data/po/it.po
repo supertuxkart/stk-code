@@ -2,10 +2,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-13 14:56-0400\n"
-"PO-Revision-Date: 2008-05-21 00:25+0100\n"
+"POT-Creation-Date: 2008-05-25 13:22+1000\n"
+"PO-Revision-Date: 2008-05-28 15:25+0100\n"
 "Last-Translator: Vincenzo <pvinci26@hotmail.it>\n"
-"Language-Team: STK italian\n"
+"Language-Team: STK italian <pvinci26@hotmail.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,7 +16,7 @@ msgstr ""
 msgid "%dx%d Blacklisted"
 msgstr ""
 
-#: src/world.cpp:622
+#: src/world.cpp:611
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -62,7 +62,7 @@ msgstr "Applica %dx%d"
 msgid "Around the Lighthouse"
 msgstr "Intorno al Faro"
 
-#: src/gui/help_page_one.cpp:112
+#: src/gui/help_page_one.cpp:107
 msgid ""
 "At high speeds wheelies drive you faster, but you can't steer. If you\n"
 "get stuck or fall too far, use the rescue button to get back on track."
@@ -70,11 +70,12 @@ msgstr ""
 "Ad alta velocità impennare fa andare più veloce, ma si perde il controllo.\n"
 "Se vai fuori pista o cadi, usa il tasto Riposiziona per tornare in pista."
 
+#: src/challenges/worlds_end_gp.cpp:54
 #: data/gp4.cup:4
 msgid "At world's end"
 msgstr "La fine del Mondo"
 
-#: src/gui/help_page_one.cpp:78
+#: src/gui/help_page_one.cpp:73
 msgid "Avoid bananas"
 msgstr "Evitare le banane"
 
@@ -100,22 +101,6 @@ msgstr "Canyon"
 msgid "Challenges"
 msgstr "Sfide"
 
-#: src/gui/help_page_one.cpp:117
-msgid "Check the current key bindings for the first player"
-msgstr "Verificare i seguenti comandi per il primo giocatore"
-
-#: src/gui/grand_prix_select.cpp:50
-msgid "Choose a Grand Prix"
-msgstr "Scegliere un Gran Premio"
-
-#: src/gui/game_mode.cpp:45
-msgid "Choose a Race Mode"
-msgstr "Scegliere una modalità di corsa"
-
-#: src/gui/track_sel.cpp:49
-msgid "Choose a track"
-msgstr "Scegli una pista"
-
 #: src/gui/player_controls.cpp:74
 #, c-format
 msgid "Choose your controls, %s"
@@ -137,7 +122,8 @@ msgstr ""
 
 #: src/challenges/energy_math_class.cpp:28
 msgid ""
-"Collect at least 6 coins\n"
+"Collect at least 6 points\n"
+"worth of coins\n"
 "on three laps of\n"
 "Oliver's Math Class\n"
 "in under 1 minute."
@@ -162,6 +148,18 @@ msgstr ""
 msgid "Collect the Pharaohs Treasure"
 msgstr "Colleziona il tesoro dei Faraoni"
 
+#: src/gui/help_page_one.cpp:117
+msgid ""
+"Collecting coins increases the number of collectables you receive.\n"
+"After 5 silver coins, each blue box will yield 2 collectables,\n"
+"after 10, 3 collectables and so on.\n"
+"Each gold coin is worth 3 silver coins, so look out for them!"
+msgstr ""
+"Raccogliere le monete aumenta il numero di oggetti che ricevi.\n"
+"Dopo 5 monete d'argento, ogni scatola blu produrrà 2 oggetti,\n"
+"dopo 10, 3 oggetti e così via. \n"
+" Ogni medaglia d'oro vale 3 monete d'argento!"
+
 #: src/challenges/worlds_end_gp.cpp:27
 msgid ""
 "Come first in the At World's End\n"
@@ -185,9 +183,9 @@ msgstr "Conferma Risoluzione entro %d secondi"
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr "Conferma Risoluzione entro 5 secondi"
 
-#: src/gui/feature_unlocked.cpp:47
 #: src/gui/grand_prix_ending.cpp:144
 #: src/gui/leader_result.cpp:148
+#: src/gui/feature_unlocked.cpp:47
 #: src/gui/race_results_gui.cpp:135
 msgid "Continue"
 msgstr "Continua"
@@ -206,6 +204,8 @@ msgstr ""
 "modificato da M. Gagnon"
 
 #: data/tracks/fortmagma/fortmagma.track:5
+#: data/tracks/sandtrack/sandtrack.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
@@ -213,25 +213,13 @@ msgstr ""
 "Creato da Oliver & Steve Baker\n"
 "modificato da Marianne Gagnon"
 
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
-msgid ""
-"Created by Oliver & Steve Baker,\n"
-" modified by M. Gagnon"
-msgstr ""
-"Creato da Oliver & Steve Baker,\n"
-" modificato da M. Gagnon"
-
-#: data/tracks/sandtrack/sandtrack.track:5
-msgid ""
-"Created by Oliver & Steve Baker,\n"
-"modified by M. Gagnon"
-msgstr ""
-"Creato da Oliver & Steve Baker,\n"
-"modificato da M. Gagnon"
-
 #: src/gui/main_menu.cpp:63
 msgid "Credits"
 msgstr "Crediti"
+
+#: data/tracks/crescentcrossing/crescentcrossing.track:4
+msgid "Crescent Crossing"
+msgstr "Cimitero"
 
 #: src/gui/config_display.cpp:83
 #, c-format
@@ -242,7 +230,7 @@ msgstr "Corrente: %dx%d"
 msgid "Decrease Resolution"
 msgstr "Diminuisci Risoluzione"
 
-#: src/gui/race_options.cpp:62
+#: src/gui/race_options.cpp:64
 msgid "Difficulty"
 msgstr "Difficoltà"
 
@@ -254,7 +242,7 @@ msgstr "Video"
 msgid "Display Settings"
 msgstr "Impostazioni Video"
 
-#: src/gui/race_options.cpp:282
+#: src/gui/race_options.cpp:276
 msgid "Driver"
 msgstr "Pilota"
 
@@ -292,9 +280,10 @@ msgid ""
 "track with 3 AI karts\n"
 "in under 3:00 minutes."
 msgstr ""
-"Finisci 3 giri nella pista Tux Tollway\n"
-"contro 3 AI karts in meno\n"
-"di 3:00 minuti."
+"Finisci 3 giri nella pista\n"
+"Autodromo Tux contro\n"
+"3 AI karts in meno di\n"
+"3:00 minuti."
 
 #: src/challenges/race_track_time.cpp:26
 msgid "Finish Race track in 1:15"
@@ -302,7 +291,9 @@ msgstr "Finire la pista Circuito in 1:15"
 
 #: src/challenges/tollway_time.cpp:25
 msgid "Finish Tux Tollway track in 3:00"
-msgstr "Finisci la pista TuxTollway in 3:00"
+msgstr ""
+"Finisci la pista Autodromo\n"
+"Tux in 3:00"
 
 #: src/challenges/city_time.cpp:25
 msgid "Finish the City track in 5:20"
@@ -321,8 +312,8 @@ msgstr "Sparare"
 msgid "First grand prix, easy to get started"
 msgstr "Primo gran premio, facile per iniziare"
 
+#: src/gui/game_mode.cpp:68
 #: src/challenges/penguin_playground_gp.cpp:28
-#: src/gui/game_mode.cpp:74
 msgid "Follow the Leader"
 msgstr "Insegui il kart in Testa"
 
@@ -340,15 +331,15 @@ msgstr ""
 
 #: src/gui/help_page_three.cpp:74
 msgid ""
-"Follow the leader: Stay behind the leader kart.\n"
+"Follow the leader: Stay behind the leader kart.                 \n"
 "When the countdown reaches zero, a kart ahead\n"
 "of the leader or the last kart is eliminated."
 msgstr ""
 "Insegui il kart in Testa: Mantieniti dietro il kart in Testa.\n"
-"Quando il contro alla rovescia termina, l'ultimo kart\n"
+"Quando il conto alla rovescia termina, l'ultimo kart\n"
 "viene eliminato."
 
-#: src/gui/help_page_one.cpp:73
+#: src/gui/help_page_one.cpp:68
 msgid "Force your rivals bite *your* dust!"
 msgstr "Fagli mangiare la polvere!"
 
@@ -370,7 +361,7 @@ msgstr "Modalità schermo intero"
 msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
 msgstr "Goccia scintillante - molto lento, ma rimbalza sulle pareti"
 
-#: src/gui/game_mode.cpp:79
+#: src/gui/game_mode.cpp:82
 msgid "Game mode help"
 msgstr "Aiuto del gioco"
 
@@ -378,13 +369,13 @@ msgstr "Aiuto del gioco"
 msgid "Game modes"
 msgstr "Modalità di gioco"
 
-#: src/gui/challenges_menu.cpp:51
 #: src/gui/credits_menu.cpp:76
+#: src/gui/challenges_menu.cpp:51
 msgid "Go back to the main menu"
 msgstr "Torna al menu principale"
 
-#: src/gui/help_page_one.cpp:148
 #: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_one.cpp:133
 msgid "Go back to the menu"
 msgstr "Torna al menu"
 
@@ -392,12 +383,11 @@ msgstr "Torna al menu"
 msgid "Go!"
 msgstr "Via!"
 
-#: src/gui/help_page_one.cpp:77
+#: src/gui/help_page_one.cpp:72
 msgid "Grab blue boxes and coins"
 msgstr "Prendi le scatole blu e le monete"
 
-#: src/challenges/energy_math_class.cpp:29
-#: src/gui/game_mode.cpp:55
+#: src/gui/game_mode.cpp:46
 msgid "Grand Prix"
 msgstr "Gran Premio"
 
@@ -407,9 +397,9 @@ msgid ""
 "by racing through a group of tracks,  \n"
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
-"Gran Premio: conquista i punti della vittoria\n"
-"correndo attraverso un gruppo di piste. \n"
-"In caso di parità vince chi ha terminate le piste nel minor tempo possibile. "
+"Gran Premio: conquista i punti della vittoria correndo attraverso\n"
+"un gruppo di piste. In caso di parità vince chi ha terminate\n"
+"le piste nel minor tempo possibile. "
 
 #: src/gui/main_menu.cpp:60
 #: src/gui/race_menu.cpp:51
@@ -433,7 +423,7 @@ msgstr "Aumenta Risoluzione"
 msgid "Invalid"
 msgstr ""
 
-#: src/kart.cpp:634
+#: src/kart.cpp:650
 msgid "Invalid short-cut!!"
 msgstr "Scorciatoia non valida!!"
 
@@ -456,10 +446,6 @@ msgstr "In Testa"
 #: src/gui/player_controls.cpp:64
 msgid "Left"
 msgstr "Sinistra"
-
-#: data/tracks/littlevolcano/littlevolcano.track:4
-msgid "Little Volcano"
-msgstr "Piccolo Vulcano"
 
 #: src/gui/start_race_feedback.cpp:35
 msgid "Loading race..."
@@ -501,7 +487,7 @@ msgstr ""
 "'%s'\n"
 "ora disponibile"
 
-#: src/kart.cpp:400
+#: src/kart.cpp:407
 msgid "New fastest lap"
 msgstr "Nuovo giro più veloce"
 
@@ -525,22 +511,22 @@ msgstr ""
 "Nuova pista '%s'\n"
 "ora disponibile"
 
-#: src/gui/help_page_one.cpp:144
 #: src/gui/help_page_two.cpp:118
+#: src/gui/help_page_one.cpp:129
 msgid "Next help screen"
 msgstr "Prossima schermata di aiuto"
 
 #: src/gui/grand_prix_select.cpp:71
-#: src/gui/grand_prix_select.cpp:76
+#: src/gui/grand_prix_select.cpp:77
 msgid "No Grand Prix selected"
 msgstr "Gran Premio non selezionato"
 
-#: src/gui/track_sel.cpp:86
+#: src/gui/track_sel.cpp:87
 msgid "No track selected"
 msgstr "Pista non selezionata"
 
-#: src/gui/race_options.cpp:281
-#: src/gui/race_options.cpp:285
+#: src/gui/race_options.cpp:275
+#: src/gui/race_options.cpp:279
 msgid "Novice"
 msgstr "Principiante"
 
@@ -548,7 +534,7 @@ msgstr "Principiante"
 msgid "Number of karts"
 msgstr "Numero partecipanti"
 
-#: src/gui/race_options.cpp:106
+#: src/gui/race_options.cpp:101
 msgid "Number of laps"
 msgstr "Numero di giri"
 
@@ -564,8 +550,8 @@ msgstr "Aula di Matematica di Oliver"
 msgid "On the Beach"
 msgstr "Sulla Spiaggia"
 
-#: src/gui/main_menu.cpp:55
 #: src/gui/options.cpp:40
+#: src/gui/main_menu.cpp:55
 #: src/gui/race_menu.cpp:50
 msgid "Options"
 msgstr "Opzioni"
@@ -578,10 +564,11 @@ msgstr "Paracadute - rallenta tutti i kart in posizioni migliori!"
 msgid "Paused"
 msgstr "Pausa"
 
-#: src/gui/race_gui.cpp:974
+#: src/gui/race_gui.cpp:977
 msgid "Penalty time!!"
 msgstr "Partenza anticipata!!"
 
+#: src/challenges/penguin_playground_gp.cpp:46
 #: data/gp1.cup:4
 msgid "Penguin Playground"
 msgstr "Livello Pinguino"
@@ -623,15 +610,15 @@ msgstr "Nome Giocatore"
 msgid "Press <ESC> to Cancel"
 msgstr "Premere <ESC> per Cancellare"
 
-#: src/gui/config_controls.cpp:52
-#: src/gui/config_display.cpp:101
-#: src/gui/config_sound.cpp:63
-#: src/gui/game_mode.cpp:84
-#: src/gui/grand_prix_select.cpp:87
-#: src/gui/num_players.cpp:45
 #: src/gui/options.cpp:57
 #: src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:134
+#: src/gui/race_options.cpp:128
+#: src/gui/config_display.cpp:101
+#: src/gui/game_mode.cpp:87
+#: src/gui/config_sound.cpp:63
+#: src/gui/config_controls.cpp:52
+#: src/gui/grand_prix_select.cpp:88
+#: src/gui/num_players.cpp:45
 msgid "Press <ESC> to go back"
 msgstr "Premere <ESC> per tornare indietro"
 
@@ -647,7 +634,7 @@ msgstr "Schermata precedente di aiuto"
 msgid "Previous screen"
 msgstr "Schermata precedente"
 
-#: src/gui/game_mode.cpp:58
+#: src/gui/game_mode.cpp:59
 msgid "Quick Race"
 msgstr "Corsa Veloce"
 
@@ -675,7 +662,7 @@ msgstr "Corri ancora in questa pista"
 msgid "Race results"
 msgstr "Risultati corsa"
 
-#: src/gui/race_options.cpp:283
+#: src/gui/race_options.cpp:277
 msgid "Racer"
 msgstr "Corridore"
 
@@ -724,7 +711,7 @@ msgstr "Sabbie Mobili"
 msgid "Single Player"
 msgstr "1 Giocatore"
 
-#: src/gui/race_options.cpp:284
+#: src/gui/race_options.cpp:278
 msgid "Skidding Preview"
 msgstr ""
 
@@ -744,11 +731,12 @@ msgstr "Audio"
 msgid "Sound Settings"
 msgstr "Impostazioni Audio"
 
+#: data/tracks/startrack.new/startrack.track:4
 #: data/tracks/startrack/startrack.track:4
 msgid "Star Track"
-msgstr "Pista Star"
+msgstr "Pista Stellare"
 
-#: src/gui/race_options.cpp:129
+#: src/gui/race_options.cpp:121
 msgid "Start race"
 msgstr "Inizia corsa"
 
@@ -759,6 +747,14 @@ msgstr "In fondo al mare"
 #: data/tracks/islandtrack/islandtrack.track:4
 msgid "The Island"
 msgstr "L'Isola"
+
+#: src/gui/help_page_one.cpp:113
+msgid ""
+"The current key bindings can be seen/changed in the\n"
+"Options->Player Config menu."
+msgstr ""
+"I comandi di gioco possono essere visti/modificati in\n"
+"Opzioni->Impostazioni Giocatore."
 
 #: src/gui/grand_prix_ending.cpp:107
 #: src/gui/leader_result.cpp:109
@@ -774,7 +770,7 @@ msgstr "Terzo Gran Premio"
 msgid "Three Players"
 msgstr "Tre Giocatori"
 
-#: src/gui/game_mode.cpp:62
+#: src/gui/game_mode.cpp:63
 msgid "Time Trial"
 msgstr "Cronometro"
 
@@ -786,6 +782,7 @@ msgstr "Cronometro: Come Corsa Veloce, ma senza oggetti."
 msgid "To help you win, there are certain collectables you can grab:"
 msgstr "Per aiutarti a vincere, ci sono alcuni aiuti che puoi prendere:"
 
+#: src/challenges/moon_and_back_gp.cpp:49
 #: data/gp2.cup:4
 msgid "To the Moon and Back"
 msgstr "Andata e Ritorno sulla Luna"
@@ -812,7 +809,7 @@ msgstr "Attiva effetti audio"
 
 #: data/tracks/tuxtrack/tuxtrack.track:4
 msgid "Tux Tollway"
-msgstr "Tux Tollway"
+msgstr "Autodromo Tux"
 
 #: src/gui/num_players.cpp:38
 msgid "Two Players"
@@ -822,7 +819,7 @@ msgstr "Due Giocatori"
 msgid "Volcano"
 msgstr "Vulcano"
 
-#: src/player_kart.cpp:264
+#: src/player_kart.cpp:276
 msgid "WRONG WAY!"
 msgstr "DIREZIONE ERRATA!"
 
@@ -862,7 +859,7 @@ msgid ""
 "level AI kart."
 msgstr ""
 "Vinci un testa a testa in\n"
-"Tux Tollway contro 1 kart\n"
+"Autodromo Tux contro 1 kart\n"
 "a livello 'Corridore'"
 
 #: src/challenges/jungle_follow.cpp:27
@@ -890,7 +887,7 @@ msgid ""
 "Tux Tollway"
 msgstr ""
 "Vinci un testa a testa in\n"
-"Tux Tollway"
+"Autodromo Tux"
 
 #: src/challenges/worlds_end_gp.cpp:25
 msgid ""
@@ -915,11 +912,11 @@ msgstr ""
 msgid "Window mode"
 msgstr "Modalità finestra"
 
-#: src/world.cpp:538
+#: src/player_kart.cpp:231
 msgid "You finished"
 msgstr "Hai finito"
 
-#: src/world.cpp:617
+#: src/world.cpp:606
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -927,7 +924,7 @@ msgstr ""
 "Sei stato\n"
 "eliminato!"
 
-#: src/world.cpp:537
+#: src/player_kart.cpp:231
 msgid "You won"
 msgstr "Hai Vinto"
 
@@ -966,7 +963,30 @@ msgstr ""
 msgid "not set"
 msgstr "non impostato"
 
-#: src/world.cpp:540
+#: src/player_kart.cpp:233
 msgid "the race!"
 msgstr "la corsa!"
+
+#~ msgid "Check the current key bindings for the first player"
+#~ msgstr "Verificare i seguenti comandi per il primo giocatore"
+#~ msgid "Choose a Grand Prix"
+#~ msgstr "Scegliere un Gran Premio"
+#~ msgid "Choose a Race Mode"
+#~ msgstr "Scegliere una modalità di corsa"
+#~ msgid "Choose a track"
+#~ msgstr "Scegli una pista"
+#~ msgid ""
+#~ "Created by Oliver & Steve Baker,\n"
+#~ " modified by M. Gagnon"
+#~ msgstr ""
+#~ "Creato da Oliver & Steve Baker,\n"
+#~ " modificato da M. Gagnon"
+#~ msgid ""
+#~ "Created by Oliver & Steve Baker,\n"
+#~ "modified by M. Gagnon"
+#~ msgstr ""
+#~ "Creato da Oliver & Steve Baker,\n"
+#~ "modificato da M. Gagnon"
+#~ msgid "Little Volcano"
+#~ msgstr "Piccolo Vulcano"
 

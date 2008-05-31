@@ -68,6 +68,7 @@ TrackSel::TrackSel()
             widget_manager->setWgtColor( WTOK_TRACK0 + i, WGT_GRAY );
             widget_manager->setWgtTexture( WTOK_TRACK0 + i, "gui_lock.rgb", false );
             widget_manager->showWgtTexture( WTOK_TRACK0 + i );
+            widget_manager->setWgtText(WTOK_TRACK0+i, _("Fulfil challenge to unlock"));
         }
         if( i%2 != 0 ) widget_manager->breakLine();
         else if (i + 1 == track_manager->getTrackCount() )
