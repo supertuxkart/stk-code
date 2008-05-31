@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: supertuxkart\n"
+"Project-Id-Version: supertuxkart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-13 14:56-0400\n"
 "PO-Revision-Date: 2008-05-13 15:11-0500\n"
