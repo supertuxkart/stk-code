@@ -106,7 +106,7 @@ void GameManager::run()
         if (race_manager->raceIsActive())
         {
             music_on = false; 
-	        if(user_config->m_profile) dt=1.0f/60.0f;
+            if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
             scene->draw(world->getPhase()==World::SETUP_PHASE ? 0.0f : dt);
@@ -126,10 +126,10 @@ void GameManager::run()
                                (float)m_frame_count/(SDL_GetTicks() * 0.001));
                         if(!user_config->m_replay_history) history->Save();
                         std::exit(-2);
-                    }
+                    }   // if profile finished
                 }   // if m_profile
-            }
-        }
+            }   // phase != limbo phase
+        }   // if race is active
         else
         {
             glMatrixMode   ( GL_PROJECTION ) ;

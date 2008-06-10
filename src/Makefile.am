@@ -27,6 +27,7 @@ AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
 
 supertuxkart_SOURCES =             main.cpp  			\
 	vec3.cpp		   vec3.hpp			\
+	coord.hpp						\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	material_manager.cpp	   material_manager.hpp    	\

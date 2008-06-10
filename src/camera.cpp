@@ -19,6 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <plib/ssg.h>
+#include "coord.hpp"
 #include "world.hpp"
 #include "player_kart.hpp"
 #include "track_manager.hpp"
@@ -29,15 +30,12 @@
 
 Camera::Camera(int camera_index, const Kart* kart)
 {
-    m_mode              = CM_NORMAL;
-    m_context           = new ssgContext ;
-    m_distance          = kart->getKartProperties()->getCameraDistance();
-    m_kart              = kart;
-
-    btVector3 start_pos = m_kart->getPos();
-    sgSetVec3(m_current_pos.xyz, start_pos.getX(), start_pos.getY(), start_pos.getZ());
-    sgSetVec3(m_current_pos.xyz, 0, 0, 0);
-    sgSetVec3(m_current_pos.hpr, 0, 0, 0);
+    m_mode     = CM_NORMAL;
+    m_context  = new ssgContext ;
+    m_distance = kart->getKartProperties()->getCameraDistance();
+    m_kart     = kart;
+    m_xyz      = kart->getPos();
+    m_hpr      = Vec3(0,0,0);
 
     // FIXME: clipping should be configurable for slower machines
     const Track* track  = world->getTrack();
@@ -102,14 +100,10 @@ void Camera::setMode(Mode mode)
         const Track* track=world->getTrack();
         // If the track doesn't have a final position, ignore this mode
         if(!track->hasFinalCamera()) return;
-        btVector3 coord(m_current_pos.xyz[0],m_current_pos.xyz[1],
-                        m_current_pos.xyz[2]);
-        m_velocity = (track->getCameraPosition()-coord)/1.0f;
-        btVector3 rotation(m_current_pos.hpr[0],m_current_pos.hpr[1],
-                           m_current_pos.hpr[2]);
-        // Rotate faster
-        m_angular_velocity = (track->getCameraHPR()-rotation)/1.0f;
-        m_final_time=0.0f;
+        const float duration = 1.0f;
+        m_velocity           = (track->getCameraPosition()-m_xyz)/duration;
+        m_angular_velocity   = (track->getCameraHPR()-m_hpr)/duration;
+        m_final_time         = 0.0f;
     }
     m_mode       = mode;
     m_last_pitch = 0.0f;
@@ -125,78 +119,73 @@ void Camera::setMode(Mode mode)
 */
 void Camera::reset()
 {
+    setMode(CM_NORMAL);
     m_last_pitch = 0.0f;
+    m_xyz        = m_kart->getPos();
+    m_hpr        = Vec3(0,0,0);
 }   // reset
 
 //-----------------------------------------------------------------------------
 void Camera::update (float dt)
 {
-    sgCoord kartcoord;
-    const Kart *kart;
-    
     if(m_mode==CM_FINAL) return finalCamera(dt);
 
+    Vec3        kart_xyz, kart_hpr;
+    const Kart *kart;
+    
     // First define the position of the kart
     if(m_mode==CM_LEADER_MODE)
     {
-        kart=world->getKart(0);
-        sgCopyCoord(&kartcoord, kart->getCoord());
+        kart     = world->getKart(0);
+        kart_hpr = kart->getRotation();
     }
     else
     {
-        kart = m_kart;
-        sgCopyCoord(&kartcoord, kart->getCoord());
-
+        kart     = m_kart;
+        kart_hpr = kart->getRotation();
         // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
-        kartcoord.hpr[1]=RAD_TO_DEGREE(m_kart->getTerrainPitch(DEGREE_TO_RAD(kartcoord.hpr[0])) );
-        kartcoord.hpr[2] = 0;
-        // Only adjust the pitch if it's not the first frame (which is indicated by having
-        // dt=0). Otherwise the camera will change pitch during ready-set-go.
-        if(dt>0)
+        kart_hpr.setPitch( m_kart->getTerrainPitch(kart_hpr.getHeading()) );
+        kart_hpr.setRoll(0.0f);
+        // Only adjust the pitch if it's not the race start, otherwise 
+        // the camera will change pitch during ready-set-go.
+	if(world->isRacePhase())
         {
             // If the terrain pitch is 'significantly' different from the camera angle,
             // start adjusting the camera. This helps with steep declines, where
             // otherwise the track is not visible anymore.
-            if(fabsf(kartcoord.hpr[1]-m_last_pitch)>1.0f) {
-                kartcoord.hpr[1] = m_last_pitch + (kartcoord.hpr[1]-m_last_pitch)*2.0f*dt;
+            if(fabsf(kart_hpr.getPitch()-m_last_pitch)>M_PI/180.0f) {
+                m_last_pitch = m_last_pitch + (kart_hpr.getPitch()-m_last_pitch)*2.0f*dt;
             }
-            else
-            {
-                kartcoord.hpr[1]=m_last_pitch;
-            }
+            kart_hpr.setPitch(m_last_pitch);
         }   //  dt>0.0
-        m_last_pitch = kartcoord.hpr[1];
     }   // m_mode!=CM_LEADER_MODE
-    if(m_mode==CM_SIMPLE_REPLAY) kartcoord.hpr[0] = 0;
+    kart_xyz = kart->getPos();
+    if(m_mode==CM_SIMPLE_REPLAY) kart_hpr.setHeading(0.0f);
 
     // Set the camera position relative to the kart
     // --------------------------------------------
-    sgMat4 cam_pos;
-
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
-    bool reverse= m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
-    sgMakeTransMat4(cam_pos, 0.f, -m_distance, reverse ? 0.75f : 1.5f);
-    
+    bool reverse = m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
+    Vec3 cam_rel_pos(0.f, -m_distance, reverse ? 0.75f : 1.5f) ;
+
     // Set the camera rotation
     // -----------------------
-    sgMat4 cam_rot;
-    sgMakeRotMat4(cam_rot, reverse            ? 180.0f : 0.0f,
-                           m_mode==CM_CLOSEUP ? -15.0f : -5.0f,
-                           0);
+    btQuaternion cam_rot(0.0f,
+                         m_mode==CM_CLOSEUP ? -0.2618f : -0.0873f,  // -15 or -5 degrees
+                         reverse            ? M_PI     : 0.0f);
+    // Camera position relative to the kart
+    btTransform relative_to_kart(cam_rot, cam_rel_pos);
+
+    btMatrix3x3 rotation;
+    rotation.setEulerZYX(kart_hpr.getPitch(), kart_hpr.getRoll(), kart_hpr.getHeading());
+    btTransform result = btTransform(rotation, kart_xyz) * relative_to_kart;
     
-    // Matrix that transforms stuff to kart-space
-    sgMat4 tokart;
-    sgMakeCoordMat4 (tokart, &kartcoord);
-
-    sgMat4 relative;
-    sgMultMat4(relative, cam_pos, cam_rot);
-    sgMat4 result;
-    sgMultMat4(result, tokart, relative);
-
-    sgSetCoord(&m_current_pos, result);
-
-    m_context -> setCamera (&m_current_pos) ;
+    // Convert transform to coordinate and pass on to plib
+    Coord c(result);
+    m_xyz = c.getXYZ();
+    m_hpr = c.getHPR();
+    m_context -> setCamera(&c.toSgCoord());
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -206,18 +195,10 @@ void Camera::finalCamera(float dt)
     m_final_time += dt;    
     if( m_final_time<1.0f )
     {
-        btVector3 coord(m_current_pos.xyz[0],m_current_pos.xyz[1],m_current_pos.xyz[2]);
-        coord += m_velocity*dt;
-        printf("y %f vely %f dt %f\n",coord.getY(), m_velocity.getY(), dt);
-        m_current_pos.xyz[0]=coord.getX();
-        m_current_pos.xyz[1]=coord.getY();
-        m_current_pos.xyz[2]=coord.getZ();
-        btVector3 rotation(m_current_pos.hpr[0],m_current_pos.hpr[1],m_current_pos.hpr[2]);
-        rotation += m_angular_velocity*dt;
-        m_current_pos.hpr[0]=rotation.getX();
-        m_current_pos.hpr[1]=rotation.getY();
-        m_current_pos.hpr[2]=rotation.getZ();
-        m_context->setCamera(&m_current_pos);
+        m_xyz += m_velocity*dt;
+        m_hpr += m_angular_velocity*dt;
+        Coord coord(m_xyz, m_hpr);
+        m_context->setCamera(&coord.toSgCoord());
     }
 }   // finalCamera
 

@@ -23,6 +23,7 @@
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
 #include "loader.hpp"
+#include "coord.hpp"
 #include "herring_manager.hpp"
 #include "sound_manager.hpp"
 #include "file_manager.hpp"
@@ -552,7 +553,7 @@ void Kart::update(float dt)
             world->getPhysics()->removeKart(this);
         }
         m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
-
+	
         m_transform.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
                                         m_curr_pos.xyz[2]));
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
@@ -560,9 +561,7 @@ void Kart::update(float dt)
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
         m_transform.setRotation(m_transform.getRotation()*q_roll*q_pitch);
-        m_body->setCenterOfMassTransform(m_transform);
-
-        //printf("Set %f %f %f\n",pos.getOrigin().x(),pos.getOrigin().y(),pos.getOrigin().z());     
+        m_motion_state->setWorldTransform(m_transform);
     }   // if m_rescue
     m_attachment.update(dt);
 
@@ -1061,12 +1060,12 @@ void Kart::placeModel ()
     // replayed.
     if(!user_config->m_replay_history)
     {
-        float m[4][4];
-        getTrans().getOpenGLMatrix((float*)&m);
-        
-        //printf(" is %f %f %f\n",t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z());
+        //float m[4][4];
+        //getTrans().getOpenGLMatrix((float*)&m);
+        //sgSetCoord(&m_curr_pos, m);
+        Coord coord(getTrans());
         // Transfer the new position and hpr to m_curr_pos
-        sgSetCoord(&m_curr_pos, m);
+        sgCopyCoord(&m_curr_pos, &(coord.toSgCoord()));
     }
     sgCoord c ;
     sgCopyCoord ( &c, &m_curr_pos );

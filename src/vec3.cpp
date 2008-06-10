@@ -18,14 +18,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "vec3.hpp"
+#include "constants.hpp"
 
 void Vec3::setHPR(const btMatrix3x3& m)
 {
     float f[4][4];
     m.getOpenGLSubMatrix((float*)f);
-
-//     sgSetCoord(m_curr_pos, f);    
-//void sgSetCoord ( sgCoord *dst, const sgMat4 src )
 
     float s = m.getColumn(0).length();
 
@@ -75,5 +73,13 @@ void Vec3::setHPR(const btMatrix3x3& m)
         setZ(atan2(sr, cr ));
     }
 }   // setHPR
+
+// ----------------------------------------------------------------------------
+void Vec3::degreeToRad()
+{
+    m_x=DEGREE_TO_RAD(m_x);      
+    m_y=DEGREE_TO_RAD(m_y);      
+    m_z=DEGREE_TO_RAD(m_z);
+}   // degreeToRad
 
 // ----------------------------------------------------------------------------

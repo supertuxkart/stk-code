@@ -25,17 +25,28 @@
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
+
 class Vec3 : public btVector3
 {
 private:
-    inline float   clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
+    inline float clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
 public:
                    inline Vec3(sgVec3 a) : btVector3(a[0], a[1], a[2]) {}
                    inline Vec3(const btVector3& a) : btVector3(a)      {}
                    inline Vec3()                   : btVector3()       {}
-    void           setHPR(const btMatrix3x3& m);
+                   inline Vec3(float x, float y, float z) 
+                                                   : btVector3(x,y,z)  {}
+
+    void                  setHPR(const btMatrix3x3& m);
     inline const float    operator[](int n) const         {return *(&m_x+n); }
-    float*         toFloat() const                 {return (float*)this;     }
+    inline const float    getHeading() const       {return m_x; }
+    inline const float    getPitch() const         {return m_y; }
+    inline const float    getRoll() const          {return m_z; }
+    inline const void     setHeading(float f)      {m_x = f;}
+    inline const void     setPitch(float f)        {m_y = f;}
+    inline const void     setRoll(float f)         {m_z = f;}
+    float*                toFloat() const          {return (float*)this;     }
+    void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}
 };    // Vec3

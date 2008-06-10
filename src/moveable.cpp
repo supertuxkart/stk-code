@@ -72,8 +72,9 @@ void Moveable::reset ()
     m_material_hot     = NULL;
     m_normal_hot       = NULL;
     if(m_body) m_body->setLinearVelocity(btVector3(0.0, 0.0, 0.0));
-    sgCopyCoord ( &m_curr_pos, &m_reset_pos ) ;
-
+    sgCopyCoord( &m_curr_pos, &m_reset_pos );
+    m_hpr = Vec3(m_curr_pos.hpr);
+    m_hpr.degreeToRad();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -95,6 +96,8 @@ void Moveable::createBody(float mass, btTransform& trans,
     // functions are not called correctly. So only init the pointer to zero.
     m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);
+    const btMatrix3x3& basis=m_body->getWorldTransform().getBasis();
+    m_hpr.setHPR(basis);
 }   // createBody
 
 //-----------------------------------------------------------------------------
@@ -160,8 +163,8 @@ void Moveable::update (float dt)
     }   // if m_history_position
 
     m_velocityLC = getVelocity()*getTrans().getBasis();
-    const btMatrix3x3& basis=m_body->getWorldTransform().getBasis();
-    m_hpr.setHPR(basis);
+    m_motion_state->getWorldTransform(m_transform);
+    m_hpr.setHPR(m_transform.getBasis());
 
     placeModel();
     m_first_time = false ;
@@ -170,7 +173,6 @@ void Moveable::update (float dt)
 //-----------------------------------------------------------------------------
 void Moveable::placeModel()
 {
-    m_motion_state->getWorldTransform(m_transform);
     m_model_transform->setTransform(&m_curr_pos);
 }   // placeModel
 

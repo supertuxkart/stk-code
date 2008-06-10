@@ -56,8 +56,8 @@ void PlayerKart::reset()
     m_controls.jump = false;
     m_penalty_time = 0;
     m_time_last_crash_sound = -10.0f;
-    m_camera->setMode(Camera::CM_NORMAL);   // can be changed if camera was eliminated
     Kart::reset();
+    m_camera->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -161,7 +161,15 @@ void PlayerKart::update(float dt)
             m_penalty_time=1.0;
             // A warning gets displayed in RaceGUI
         }
-        placeModel();
+	else
+        {
+	    // The call to update is necessary here (even though the kart
+            // shouldn't actually change) to update m_transform. Otherwise
+	    // the camera gets the wrong position. 
+            // FIXME: that might not necessary anymore once m_curr_pos is removed!
+	    Kart::update(dt);
+	}
+        
         return;
     }
     if(m_penalty_time>0.0)

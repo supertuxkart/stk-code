@@ -66,7 +66,7 @@ public:
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     sgCoord*      getCoord     ()              {return &m_curr_pos;                }
     const Vec3&   getPos    ()  const          {return (Vec3&)m_transform.getOrigin();}
-    const Vec3& getRotation() const       {return m_hpr;                      }
+    const Vec3&   getRotation() const          {return m_hpr;                      }
     const sgCoord* getCoord    ()  const       {return &m_curr_pos;                }
     const sgVec4* getNormalHOT ()  const       {return m_normal_hot;               }
     const sgCoord* getResetPos ()  const       {return &m_reset_pos;               }

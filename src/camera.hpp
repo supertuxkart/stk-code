@@ -22,7 +22,7 @@
 #ifndef HEADER_CAMERA_H
 #define HEADER_CAMERA_H
 
-#include "LinearMath/btVector3.h"
+#include "vec3.hpp"
 
 class ssgContext;
 class Kart;
@@ -41,15 +41,17 @@ public:
     };
 protected:
     ssgContext *m_context ;
-    sgCoord     m_current_pos;
+//    sgCoord     m_current_pos;
+    Vec3        m_xyz;                  // current position of camera
+    Vec3        m_hpr;                  // heading, pitch, roll of camera
     const Kart *m_kart;                 // the kart the camera is attached to
     Mode        m_mode;                 // CM_ value, see above
     float       m_x, m_y, m_w, m_h;     // window to us
     float       m_current_speed;        // current speed of camera
     float       m_last_pitch;           // for tiling the camera when going downhill
     float       m_distance;             // distance between camera and kart
-    btVector3   m_velocity;             // camera velocity for final mode
-    btVector3   m_angular_velocity;     // camera angular velocity for final mode
+    Vec3        m_velocity;             // camera velocity for final mode
+    Vec3        m_angular_velocity;     // camera angular velocity for final mode
     float       m_final_time;           // time when final camera mode started
 
 private:
