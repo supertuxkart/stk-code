@@ -226,7 +226,6 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     unsigned i;
     for(i=0; i<m_kart_status.size(); i++)
     {
-        printf("i %d %s %s\n",i,kart->getName().c_str(),m_kart_status[i].m_ident.c_str());
         if(kart->getIdent()==m_kart_status[i].m_ident) break;
     }   // for i
     if(i>=m_kart_status.size())
