@@ -3,7 +3,7 @@
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU bteral Public License
- * as published by the Free Software Foundation; either version 2
+ * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version. The Blender
  * Foundation also sells licenses for use in proprietary software under
  * the Blender License.  See http://www.blender.org/BL/ for information
