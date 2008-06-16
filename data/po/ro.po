@@ -1,0 +1,916 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SuperTuxKart\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-06-14 22:56+0300\n"
+"PO-Revision-Date: 2008-06-15 01:03+0200\n"
+"Last-Translator: Dominique Leuenberger <dominique-<@antispam>@leuenberger.net>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Romanian\n"
+
+#: src/gui/config_display.cpp:385
+#, c-format
+msgid "%dx%d Blacklisted"
+msgstr ""
+
+#: src/world.cpp:612
+#, c-format
+msgid ""
+"'%s' has\n"
+"been eliminated."
+msgstr ""
+
+#: src/gui/player_controls.cpp:64
+msgid "Accelerate"
+msgstr "Accelereaza"
+
+#: src/gui/challenges_menu.cpp:36
+msgid "Active Challenges"
+msgstr ""
+
+#: data/all.cup:4
+msgid "All tracks"
+msgstr "Toate pistele"
+
+#: data/all.cup:5
+msgid "All tracks included in SuperTuxKart"
+msgstr "Toate pistele incluse in SuperTuxKart"
+
+#: data/tracks/jungle/jungle.track:4
+msgid "Amazonian Journey"
+msgstr ""
+
+#: src/gui/help_page_two.cpp:108
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr "Nicovala - incetineste foarte mult masina din prima pozitie"
+
+#: src/gui/config_display.cpp:92
+msgid "Apply "
+msgstr "Aplica"
+
+#: src/gui/config_display.cpp:351
+#, c-format
+msgid "Apply %dx%d"
+msgstr "Aplica %dx%d"
+
+#: data/tracks/lighthouse/lighthouse.track:4
+msgid "Around the Lighthouse"
+msgstr "In jurul Farului"
+
+#: src/gui/help_page_one.cpp:110
+msgid ""
+"At high speeds wheelies drive you faster, but you can't steer. If you\n"
+"get stuck or fall too far, use the rescue button to get back on track."
+msgstr ""
+
+#: src/challenges/worlds_end_gp.cpp:54
+#: data/gp4.cup:4
+msgid "At world's end"
+msgstr "La sfarsitul lumii"
+
+#: src/gui/help_page_one.cpp:76
+msgid "Avoid bananas"
+msgstr "Evita bananele"
+
+#: src/gui/grand_prix_ending.cpp:148
+#: src/gui/leader_result.cpp:152
+#: src/gui/race_results_gui.cpp:144
+msgid "Back to the main menu"
+msgstr "Inapoi la meniul principal "
+
+#: src/gui/help_page_two.cpp:122
+msgid "Back to the menu"
+msgstr "Inapoi la meniu"
+
+#: src/gui/player_controls.cpp:65
+msgid "Brake"
+msgstr "Frana"
+
+#: data/tracks/canyon/canyon.track:4
+msgid "Canyon"
+msgstr "Canion"
+
+#: src/gui/main_menu.cpp:53
+msgid "Challenges"
+msgstr "Provocari"
+
+#: src/gui/player_controls.cpp:74
+#, c-format
+msgid "Choose your controls, %s"
+msgstr ""
+
+#: data/tracks/city/city.track:4
+msgid "City"
+msgstr "Oras"
+
+#: src/gui/config_display.cpp:97
+msgid "Clear from Blacklist"
+msgstr "Sterge din lista neagra"
+
+#: src/challenges/energy_math_class.cpp:26
+msgid "Collect Coins in Math Class"
+msgstr "Aduna monede in Lectia de Matematica"
+
+#: src/challenges/energy_math_class.cpp:28
+msgid ""
+"Collect at least 6 points\n"
+"worth of coins\n"
+"on three laps of\n"
+"Oliver's Math Class\n"
+"in under 1 minute."
+msgstr ""
+"Aduna cel putin 6 puncte\n"
+"valoarea punctelor\n"
+"in trei runde de\n"
+"Lectia de Matematica a lui Oliver\n"
+"in mai putin de 1 minut."
+
+#: src/challenges/energy_shifting_sands.cpp:27
+msgid ""
+"Collect at least 9 coins\n"
+"on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Aduna cel putin 9 monede\n"
+"in 3 runde de Nisipuri Miscatoare\n"
+"in mai putin de 2:20 minute."
+
+#: src/challenges/energy_shifting_sands.cpp:25
+msgid "Collect the Pharaohs Treasure"
+msgstr "Aduna Comoara Faraonului"
+
+#: src/gui/help_page_one.cpp:125
+msgid ""
+"Collecting coins increases the number of collectables you receive.\n"
+"After 5 silver coins, each blue box will yield 2 collectables,\n"
+"after 10, 3 collectables and so on.\n"
+"Each gold coin is worth 3 silver coins, so look out for them!"
+msgstr ""
+
+#: src/challenges/worlds_end_gp.cpp:27
+msgid ""
+"Come first in the At World's End\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+
+#: src/gui/display_res_confirm.cpp:55
+msgid "Confirm Resolution"
+msgstr "Confirma rezolutia"
+
+#: src/gui/display_res_confirm.cpp:109
+#, c-format
+msgid "Confirm Resolution Within %d Seconds"
+msgstr "Confirma rezolutia in %d secunde"
+
+#: src/gui/display_res_confirm.cpp:51
+msgid "Confirm Resolution Within 5 Seconds"
+msgstr "Confirma rezolutia in 5 secunde"
+
+#: src/gui/grand_prix_ending.cpp:144
+#: src/gui/leader_result.cpp:148
+#: src/gui/feature_unlocked.cpp:47
+#: src/gui/race_results_gui.cpp:135
+msgid "Continue"
+msgstr "Continua"
+
+#: src/gui/race_results_gui.cpp:140
+msgid "Continue Grand Prix"
+msgstr "Continua Grand Prix"
+
+#: data/tracks/beach/beach.track:5
+#: data/tracks/lighthouse/lighthouse.track:5
+msgid ""
+"Created by Ingo Ruhnke,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Creat de Ingo Ruhnke,\n"
+"modificat de M.Gagnon"
+
+#: data/tracks/fortmagma/fortmagma.track:5
+#: data/tracks/sandtrack/sandtrack.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+msgid ""
+"Created by Oliver & Steve Baker\n"
+"modified by Marianne Gagnon"
+msgstr ""
+"Creat de Oliver & Steve Baker\n"
+"modificat de Marianne Gagnon"
+
+#: src/gui/main_menu.cpp:64
+msgid "Credits"
+msgstr "Autori"
+
+#: data/tracks/crescentcrossing/crescentcrossing.track:4
+msgid "Crescent Crossing"
+msgstr ""
+
+#: src/gui/config_display.cpp:83
+#, c-format
+msgid "Current: %dx%d"
+msgstr "Rezolutia actuala: %dx%d"
+
+#: src/gui/config_display.cpp:89
+msgid "Decrease Resolution"
+msgstr "Micsoreaza rezolutia"
+
+#: src/gui/race_options.cpp:67
+msgid "Difficulty"
+msgstr "Dificultate"
+
+#: src/gui/options.cpp:49
+msgid "Display"
+msgstr ""
+
+#: src/gui/config_display.cpp:55
+msgid "Display Settings"
+msgstr ""
+
+#: src/gui/race_options.cpp:279
+msgid "Driver"
+msgstr "Sofer"
+
+#: src/gui/config_controls.cpp:43
+msgid "Edit controls for who?"
+msgstr "Editare setari pentru cine?"
+
+#: src/gui/race_menu.cpp:60
+msgid "Exit Race"
+msgstr "Iesire cursa"
+
+#: src/challenges/race_track_time.cpp:28
+msgid ""
+"Finish 3 laps in the Race track\n"
+"with 3 AI karts\n"
+"in under 1:15 minutes."
+msgstr ""
+
+#: src/challenges/city_time.cpp:27
+msgid ""
+"Finish 3 laps on the City track\n"
+"with 3 AI karts\n"
+"in under 5:20 minutes."
+msgstr ""
+
+#: src/challenges/tollway_time.cpp:27
+msgid ""
+"Finish 3 laps on the Tux Tollway\n"
+"track with 3 AI karts\n"
+"in under 3:00 minutes."
+msgstr ""
+
+#: src/challenges/race_track_time.cpp:26
+msgid "Finish Race track in 1:15"
+msgstr ""
+
+#: src/challenges/tollway_time.cpp:25
+msgid "Finish Tux Tollway track in 3:00"
+msgstr ""
+
+#: src/challenges/city_time.cpp:25
+msgid "Finish the City track in 5:20"
+msgstr ""
+
+#: src/gui/race_gui.cpp:800
+#, c-format
+msgid "Finished"
+msgstr "Sfarsit"
+
+#: src/gui/player_controls.cpp:66
+msgid "Fire"
+msgstr "Foc"
+
+#: data/gp1.cup:5
+msgid "First grand prix, easy to get started"
+msgstr "Primul Grand Prix, usor pentru inceput"
+
+#: src/gui/game_mode.cpp:68
+#: src/challenges/penguin_playground_gp.cpp:28
+msgid "Follow the Leader"
+msgstr ""
+
+#: src/challenges/jungle_follow.cpp:25
+msgid "Follow the Leader in the Jungle"
+msgstr ""
+
+#: src/challenges/island_follow.cpp:25
+msgid ""
+"Follow the Leader on a\n"
+"Desert Island"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:74
+msgid ""
+"Follow the leader: Stay behind the leader kart.                 \n"
+"When the countdown reaches zero, a kart ahead\n"
+"of the leader or the last kart is eliminated."
+msgstr ""
+
+#: src/gui/help_page_one.cpp:71
+msgid "Force your rivals bite *your* dust!"
+msgstr ""
+
+#: data/tracks/fortmagma/fortmagma.track:4
+msgid "Fort Magma"
+msgstr ""
+
+#: src/gui/num_players.cpp:40
+msgid "Four Players"
+msgstr "Patru jucatori"
+
+#: src/gui/game_mode.cpp:80
+#: src/gui/track_sel.cpp:71
+msgid "Fulfil challenge to unlock"
+msgstr ""
+
+#: src/gui/config_display.cpp:76
+#: src/gui/config_display.cpp:128
+#: src/gui/config_display.cpp:183
+msgid "Fullscreen mode"
+msgstr ""
+
+#: src/gui/help_page_two.cpp:84
+msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
+msgstr ""
+
+#: src/gui/game_mode.cpp:85
+msgid "Game mode help"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:47
+msgid "Game modes"
+msgstr ""
+
+#: src/gui/credits_menu.cpp:76
+#: src/gui/challenges_menu.cpp:51
+msgid "Go back to the main menu"
+msgstr "Inapoi la Meniul Principal"
+
+#: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_one.cpp:151
+msgid "Go back to the menu"
+msgstr "Inapoi la meniu"
+
+#: src/gui/race_gui.cpp:948
+msgid "Go!"
+msgstr "Start!"
+
+#: src/gui/help_page_one.cpp:75
+msgid "Grab blue boxes and coins"
+msgstr "Aduna cutii albastre si monede"
+
+#: src/gui/game_mode.cpp:46
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#: src/gui/help_page_three.cpp:54
+msgid ""
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
+msgstr ""
+"Grand Prix: Castiga puncte de victorie\n"
+"participand la un grup de curse, \n"
+"jucatorul cu cele mai multe puncte castiga (cel mai scurt timp in caz de egalitate!)"
+
+#: src/gui/main_menu.cpp:61
+#: src/gui/race_menu.cpp:51
+msgid "Help"
+msgstr "Ajutor"
+
+#: src/gui/race_results_gui.cpp:55
+msgid "Highscores"
+msgstr "Cele mai bune rezultate"
+
+#: src/gui/help_page_two.cpp:76
+msgid "Homing missile - follows rivals, but is slower than the missile"
+msgstr ""
+
+#: src/gui/help_page_one.cpp:135
+msgid ""
+"If you see a button with a lock like the one to the right,\n"
+"you need to complete a challenge to unlock it."
+msgstr ""
+"Daca vezi un buton cu lacata precum cel din dreapta,\n"
+"trebuie sa inchei competitia pentru a-l deschide. "
+
+#: src/gui/config_display.cpp:87
+msgid "Increase Resolution"
+msgstr "Creste rezolutia"
+
+#: src/user_config.cpp:861
+#, c-format
+msgid "Invalid"
+msgstr "Invalid"
+
+#: src/kart.cpp:649
+msgid "Invalid short-cut!!"
+msgstr "Scurtatura invalida!"
+
+#: src/gui/player_controls.cpp:65
+msgid "Jump"
+msgstr "Sari"
+
+#: src/gui/race_gui.cpp:805
+msgid "Lap"
+msgstr "Runda"
+
+#: data/gp4.cup:5
+msgid "Last grand prix, longer and harder"
+msgstr "Ultimul grand prix, mai lung si mai greu"
+
+#: src/gui/race_gui.cpp:409
+msgid "Leader"
+msgstr ""
+
+#: src/gui/player_controls.cpp:64
+msgid "Left"
+msgstr "Stanga"
+
+#: src/gui/start_race_feedback.cpp:35
+msgid "Loading race..."
+msgstr "Se incarca cursa..."
+
+#: src/gui/player_controls.cpp:66
+msgid "Look back"
+msgstr "Priveste inapoi"
+
+#: src/gui/help_page_two.cpp:68
+msgid "Missile - fast stopper in a straight line"
+msgstr "Racheta - opreste rapid pe traiectorie dreapta"
+
+#: src/gui/main_menu.cpp:48
+msgid "Multiplayer"
+msgstr "Jucatori multipli"
+
+#: src/gui/feature_unlocked.cpp:37
+msgid "New Feature Unlocked"
+msgstr ""
+
+#: src/challenges/challenge.cpp:121
+#, c-format
+msgid ""
+"New Grand Prix '%s'\n"
+"now available"
+msgstr ""
+
+#: src/challenges/challenge.cpp:124
+#, c-format
+msgid ""
+"New difficulty\n"
+"'%s'\n"
+"now available"
+msgstr ""
+
+#: src/kart.cpp:408
+msgid "New fastest lap"
+msgstr ""
+
+#: src/challenges/challenge.cpp:118
+#, c-format
+msgid ""
+"New game mode\n"
+"'%s'\n"
+"now available"
+msgstr ""
+
+#: src/challenges/challenge.cpp:114
+#, c-format
+msgid ""
+"New track '%s'\n"
+"now available"
+msgstr ""
+"Urmatoarea pista '%s'\n"
+"acum disponibila"
+
+#: src/gui/help_page_two.cpp:118
+#: src/gui/help_page_one.cpp:147
+msgid "Next help screen"
+msgstr ""
+
+#: src/gui/grand_prix_select.cpp:71
+#: src/gui/grand_prix_select.cpp:77
+msgid "No Grand Prix selected"
+msgstr "Nici un Grand Prix selectat"
+
+#: src/gui/track_sel.cpp:88
+msgid "No track selected"
+msgstr "Nici o pista selectata"
+
+#: src/gui/race_options.cpp:278
+#: src/gui/race_options.cpp:282
+msgid "Novice"
+msgstr "Novice"
+
+#: src/gui/race_options.cpp:83
+msgid "Number of karts"
+msgstr "Numarul de masini"
+
+#: src/gui/race_options.cpp:104
+msgid "Number of laps"
+msgstr "Numarul de runde"
+
+#: src/user_config.cpp:488
+msgid "Old config file found, check your key bindings!"
+msgstr ""
+
+#: data/tracks/olivermath/olivermath.track:4
+msgid "Oliver's Math Class"
+msgstr "Lectia de Matematica a lui Oliver"
+
+#: data/tracks/beach/beach.track:4
+msgid "On the Beach"
+msgstr "Pe plaja"
+
+#: src/gui/options.cpp:40
+#: src/gui/main_menu.cpp:56
+#: src/gui/race_menu.cpp:50
+msgid "Options"
+msgstr "Optiuni"
+
+#: src/gui/help_page_two.cpp:100
+msgid "Parachute - slows down all karts in a better position!"
+msgstr "Parasuta - incetineste masinile din fata ta!"
+
+#: src/gui/race_menu.cpp:47
+msgid "Paused"
+msgstr "Pauza"
+
+#: src/gui/race_gui.cpp:977
+msgid "Penalty time!!"
+msgstr "Timp de penalizare!"
+
+#: src/challenges/penguin_playground_gp.cpp:46
+#: data/gp1.cup:4
+msgid "Penguin Playground"
+msgstr ""
+
+#: src/gui/player_controls.cpp:251
+msgid "Player "
+msgstr "Jucator"
+
+#: src/gui/char_sel.cpp:68
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr ""
+
+#: src/gui/config_controls.cpp:45
+msgid "Player 1"
+msgstr "Jucatorul 1"
+
+#: src/gui/config_controls.cpp:46
+msgid "Player 2"
+msgstr "Jucatorul 2"
+
+#: src/gui/config_controls.cpp:47
+msgid "Player 3"
+msgstr "Jucatorul 3"
+
+#: src/gui/config_controls.cpp:48
+msgid "Player 4"
+msgstr "Jucatorul 4"
+
+#: src/gui/options.cpp:41
+msgid "Player Config"
+msgstr ""
+
+#: src/gui/player_controls.cpp:80
+msgid "Player name"
+msgstr "Numele jucatorului"
+
+#: src/gui/display_res_confirm.cpp:59
+msgid "Press <ESC> to Cancel"
+msgstr "Apasa <ESC> pentru anulare"
+
+#: src/gui/options.cpp:57
+#: src/gui/player_controls.cpp:112
+#: src/gui/race_options.cpp:131
+#: src/gui/config_display.cpp:101
+#: src/gui/game_mode.cpp:90
+#: src/gui/config_sound.cpp:63
+#: src/gui/config_controls.cpp:52
+#: src/gui/grand_prix_select.cpp:88
+#: src/gui/num_players.cpp:45
+msgid "Press <ESC> to go back"
+msgstr "Apasa <ESC> pentru a merge inapoi "
+
+#: src/gui/player_controls.cpp:156
+msgid "Press key"
+msgstr "Apasa tasta"
+
+#: src/gui/help_page_three.cpp:83
+msgid "Previous help screen"
+msgstr ""
+
+#: src/gui/help_page_two.cpp:114
+msgid "Previous screen"
+msgstr ""
+
+#: src/gui/game_mode.cpp:59
+msgid "Quick Race"
+msgstr "Cursa rapida"
+
+#: src/gui/help_page_three.cpp:62
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr "Cursa rapida: Alege o singura pista, castiga jucatorul cu cel mai scurt timp."
+
+#: src/gui/main_menu.cpp:57
+msgid "Quit"
+msgstr ""
+
+#: src/gui/race_gui.cpp:746
+msgid "REV"
+msgstr ""
+
+#: data/tracks/race/race.track:4
+msgid "Race Track"
+msgstr ""
+
+#: src/gui/race_results_gui.cpp:148
+msgid "Race in this track again"
+msgstr "Participa la aceasta pista din nou"
+
+#: src/gui/race_results_gui.cpp:54
+msgid "Race results"
+msgstr "Rezultatele cursei"
+
+#: src/gui/race_options.cpp:280
+msgid "Racer"
+msgstr ""
+
+#: src/gui/race_gui.cpp:930
+msgid "Ready!"
+msgstr "Pe locuri!"
+
+#: src/gui/player_controls.cpp:66
+msgid "Rescue"
+msgstr ""
+
+#: src/gui/race_menu.cpp:52
+msgid "Restart Race"
+msgstr ""
+
+#: src/gui/race_results_gui.cpp:48
+msgid "Result"
+msgstr "Rezultat"
+
+#: src/gui/race_menu.cpp:49
+msgid "Return To Race"
+msgstr ""
+
+#: src/gui/player_controls.cpp:64
+msgid "Right"
+msgstr "Dreapta"
+
+#: data/gp2.cup:5
+msgid "Second grand prix"
+msgstr ""
+
+#: src/gui/race_gui.cpp:939
+msgid "Set!"
+msgstr ""
+
+#: src/gui/race_menu.cpp:57
+#: src/gui/race_results_gui.cpp:153
+msgid "Setup New Race"
+msgstr ""
+
+#: data/tracks/sandtrack/sandtrack.track:4
+msgid "Shifting Sands"
+msgstr "Nisipuri Miscatoare"
+
+#: src/gui/main_menu.cpp:47
+msgid "Single Player"
+msgstr "Un singur jucator"
+
+#: src/gui/race_options.cpp:281
+msgid "Skidding Preview"
+msgstr ""
+
+#: data/gp3.cup:4
+msgid "Snag Drive"
+msgstr ""
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
+msgid "SnowTux Peak"
+msgstr ""
+
+#: src/gui/options.cpp:52
+msgid "Sound"
+msgstr "Sunet"
+
+#: src/gui/config_sound.cpp:40
+msgid "Sound Settings"
+msgstr "Setarile sunetului"
+
+#: data/tracks/startrack/startrack.track:4
+msgid "Star Track"
+msgstr ""
+
+#: src/gui/race_options.cpp:124
+msgid "Start race"
+msgstr ""
+
+#: data/tracks/subseatrack/subseatrack.track:4
+msgid "Sub Sea"
+msgstr ""
+
+#: data/tracks/islandtrack/islandtrack.track:4
+msgid "The Island"
+msgstr "Insula"
+
+#: src/gui/help_page_one.cpp:119
+msgid ""
+"The current key bindings can be seen/changed in the\n"
+"Options->Player Config menu."
+msgstr ""
+
+#: src/gui/grand_prix_ending.cpp:107
+#: src/gui/leader_result.cpp:109
+#, c-format
+msgid "The winner is %s!"
+msgstr "Castigatorul este %s!"
+
+#: data/gp3.cup:5
+msgid "Third grand prix"
+msgstr ""
+
+#: src/gui/num_players.cpp:39
+msgid "Three Players"
+msgstr ""
+
+#: src/gui/game_mode.cpp:63
+msgid "Time Trial"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:67
+msgid "Time Trial: As quick race, but no items.                       "
+msgstr ""
+
+#: src/gui/help_page_two.cpp:61
+msgid "To help you win, there are certain collectables you can grab:"
+msgstr ""
+
+#: src/challenges/moon_and_back_gp.cpp:49
+#: data/gp2.cup:4
+msgid "To the Moon and Back"
+msgstr "Pana la Luna si Inapoi!"
+
+#: src/gui/config_sound.cpp:45
+#: src/gui/config_sound.cpp:90
+msgid "Turn off music"
+msgstr "Opreste muzica"
+
+#: src/gui/config_sound.cpp:54
+#: src/gui/config_sound.cpp:103
+msgid "Turn off sound effects"
+msgstr "Opreste efectele sonore"
+
+#: src/gui/config_sound.cpp:49
+#: src/gui/config_sound.cpp:84
+msgid "Turn on music"
+msgstr ""
+
+#: src/gui/config_sound.cpp:58
+#: src/gui/config_sound.cpp:98
+msgid "Turn on sound effects"
+msgstr ""
+
+#: data/tracks/tuxtrack/tuxtrack.track:4
+msgid "Tux Tollway"
+msgstr ""
+
+#: src/gui/num_players.cpp:38
+msgid "Two Players"
+msgstr "Doi jucatori"
+
+#: data/tracks/volcano/volcano.track:4
+msgid "Volcano"
+msgstr ""
+
+#: src/player_kart.cpp:284
+msgid "WRONG WAY!"
+msgstr ""
+
+#: src/gui/player_controls.cpp:65
+msgid "Wheelie"
+msgstr ""
+
+#: src/challenges/penguin_playground_gp.cpp:25
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix"
+msgstr ""
+
+#: src/challenges/penguin_playground_gp.cpp:27
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix with 3 'Racer' Level AI karts."
+msgstr ""
+
+#: src/challenges/moon_and_back_gp.cpp:25
+msgid ""
+"Win To the Moon and Back\n"
+"Grand Prix"
+msgstr ""
+
+#: src/challenges/tollway_head2head.cpp:27
+msgid ""
+"Win a 1 lap Head to Head\n"
+"on Tux Tollway against 1 'Racer'\n"
+"level AI kart."
+msgstr ""
+
+#: src/challenges/jungle_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"in the Amazonian Jungle."
+msgstr ""
+
+#: src/challenges/island_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"on a Desert Island."
+msgstr ""
+
+#: src/challenges/tollway_head2head.cpp:25
+msgid ""
+"Win a Head to Head on\n"
+"Tux Tollway"
+msgstr ""
+
+#: src/challenges/worlds_end_gp.cpp:25
+msgid ""
+"Win the At World's End\n"
+"Grand Prix"
+msgstr ""
+
+#: src/challenges/moon_and_back_gp.cpp:27
+msgid ""
+"Win the To the Moon and Back\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+
+#: src/gui/config_display.cpp:71
+msgid "Window mode"
+msgstr ""
+
+#: src/player_kart.cpp:239
+msgid "You finished"
+msgstr ""
+
+#: src/world.cpp:607
+msgid ""
+"You have been\n"
+"eliminated!"
+msgstr ""
+
+#: src/player_kart.cpp:239
+msgid "You won"
+msgstr ""
+
+#: src/gui/help_page_two.cpp:92
+msgid "Zipper - speed boost"
+msgstr ""
+
+#: src/user_config.cpp:844
+#, c-format
+msgid "joy %d axis %d  %c"
+msgstr ""
+
+#: src/user_config.cpp:848
+#, c-format
+msgid "joy %d btn %d"
+msgstr ""
+
+#: src/user_config.cpp:851
+#, c-format
+msgid "joy %d hat %d"
+msgstr ""
+
+#: src/user_config.cpp:857
+#, c-format
+msgid "mouse axis %d %c"
+msgstr ""
+
+#: src/user_config.cpp:854
+#, c-format
+msgid "mouse btn %d"
+msgstr ""
+
+#: src/user_config.cpp:838
+#: src/user_config.cpp:883
+#, c-format
+msgid "not set"
+msgstr ""
+
+#: src/player_kart.cpp:241
+msgid "the race!"
+msgstr ""
+
