@@ -91,7 +91,7 @@ void cmdLineHelp (char* invocation)
     "       --list-karts       Show available karts\n"
     "       --laps N           Define number of laps to N\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer\n"
-    "  --players n             Define number of players to between 1 and 4.\n"
+    //FIXME"     --players n             Define number of players to between 1 and 4.\n"
     //FIXME     "  --reverse               Enable reverse mode\n"
     //FIXME     "  --mirror                Enable mirror mode (when supported)\n"
     "       --herring STYLE    Use STYLE as your herring style\n"
