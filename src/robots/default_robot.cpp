@@ -43,7 +43,7 @@
 #include "default_robot.hpp"
 
 DefaultRobot::DefaultRobot(const std::string& kart_name,
-                           int position, sgCoord init_pos ) :
+                           int position, const btTransform& init_pos ) :
     AutoKart( kart_name, position, init_pos )
 {
     reset();
@@ -116,7 +116,7 @@ void DefaultRobot::update( float delta )
         steps = calc_steps();
     }
 
-    check_crashes( steps, m_curr_pos.xyz );
+    check_crashes( steps, getXYZ() );
     find_curve();
 
     /*Response handling functions*/
@@ -161,7 +161,7 @@ void DefaultRobot::handle_braking()
     if ( m_crashes.m_road && m_on_road && getVelocityLC().getY() > MIN_SPEED)
     {
         float kart_ang_diff = world->m_track->m_angle[m_track_sector] -
-            m_curr_pos.hpr[0];
+                              RAD_TO_DEGREE(getHPR().getHeading());
         kart_ang_diff = normalize_angle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
@@ -341,7 +341,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 {
                     const float ANGLE_DIFF = fabsf( normalize_angle(
                         world->m_track->m_angle[m_track_sector]-
-                        m_curr_pos.hpr[0] ) );
+                        RAD_TO_DEGREE(getHPR().getHeading()) ) );
 
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
                         15.0f && !m_crashes.m_road && STEPS > 8 )
@@ -356,9 +356,8 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             case COLLECT_HOMING:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
-                    if( sgDistanceVec2( m_curr_pos.xyz,
-                        world->getKart(m_crashes.m_kart)->getCoord()->xyz ) >
-                        m_kart_properties->getKartLength() * 2.5f )
+		  if( (getXYZ()-world->getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
+		      m_kart_properties->getKartLength() * 2.5f )
                     {
                         m_controls.fire = true;
                         m_time_since_last_shot = 0.0f;
@@ -435,15 +434,15 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
 
     //We have to be careful with normalizing, because if the source argument
     //has both the X and Y axis set to 0, it returns nan to the destiny.
-    const btVector3 &VEL=getVelocity();
-    btVector3        vel_normal(VEL.getX(), VEL.getY(), 0.0);
-    float            len=vel_normal.length();
+    const Vec3 &VEL      = getVelocity();
+    Vec3        vel_normal(VEL.getX(), VEL.getY(), 0.0);
+    float       len      = vel_normal.length();
     // Too slow for wheelies, and it avoids normalisation problems.
     if(len<getMaxSpeed()*getWheelieMaxSpeedRatio()) return false;
     vel_normal/=len;
 
-    sgVec2 step_coord;
-    sgVec3 step_track_coord;
+    Vec3 step_coord;
+    Vec3 step_track_coord;
     float distance;
 
     //FIXME: instead of using 1.5, it should find out how much time it
@@ -458,11 +457,10 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
 
     for( int i = WHEELIE_STEPS; i > STEPS - 1; --i )
     {
-        sgAddScaledVec2( step_coord, m_curr_pos.xyz, vel_normal,
-            m_kart_properties->getKartLength() * i );
+        step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * i ;
 
-        world->m_track->spatialToTrack( step_track_coord, step_coord,
-            m_future_sector );
+        world->m_track->spatialToTrack(step_track_coord, step_coord,
+                                       m_future_sector );
 
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];
@@ -533,7 +531,7 @@ float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
     float angle = world->m_track->m_angle[SECTOR];
 
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - m_curr_pos.hpr[0];
+    float steer_angle = angle - RAD_TO_DEGREE(getHPR().getHeading());
 
     steer_angle += ANGLE;
     steer_angle = normalize_angle( steer_angle );
@@ -545,8 +543,8 @@ float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
 //-----------------------------------------------------------------------------
 float DefaultRobot::steer_to_point( const sgVec2 POINT )
 {
-    const SGfloat ADJACENT_LINE = POINT[0] - m_curr_pos.xyz[0];
-    const SGfloat OPPOSITE_LINE = POINT[1] - m_curr_pos.xyz[1];
+    const SGfloat ADJACENT_LINE = POINT[0] - getXYZ().getX();
+    const SGfloat OPPOSITE_LINE = POINT[1] - getXYZ().getY();
     SGfloat theta;
 
     //Protection from division by zero
@@ -559,14 +557,14 @@ float DefaultRobot::steer_to_point( const sgVec2 POINT )
     //The real value depends on the side of the track that the kart is
     theta += ADJACENT_LINE < 0.0f ? 90.0f : -90.0f;
 
-    float steer_angle = theta - getCoord()->hpr[0];
+    float steer_angle = theta - RAD_TO_DEGREE(getHPR().getHeading());
     steer_angle = normalize_angle( steer_angle );
 
     return steer_angle;
 }
 
 //-----------------------------------------------------------------------------
-void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
+void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 {
     //Right now there are 2 kind of 'crashes': with other karts and another
     //with the track. The sight line is used to find if the karts crash with
@@ -574,21 +572,21 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
 
-    btVector3 vel_normal;
+    Vec3 vel_normal;
 	//in this func we use it as a 2d-vector, but later on it is passed
 	//to world->m_track->findRoadSector, there it is used as a 3d-vector
 	//to find distance to plane, so z must be initialized to zero
-	sgVec3 step_coord;
+    Vec3 step_coord;
     SGfloat kart_distance;
 
-	step_coord[2] = 0.0;
+    step_coord.setZ(0.0);
 
     m_crashes.clear();
 
     const size_t NUM_KARTS = race_manager->getNumKarts();
 
     //Protection against having vel_normal with nan values
-    const btVector3 &VEL = getVelocity();
+    const Vec3 &VEL = getVelocity();
     vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
     float len=vel_normal.length();
     if(len>0.0f)
@@ -602,7 +600,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
 
     for(int i = 1; STEPS > i; ++i)
     {
-        sgAddScaledVec3( step_coord, pos, vel_normal, m_kart_properties->getKartLength() * i );
+	step_coord = pos + vel_normal* m_kart_properties->getKartLength() * i;
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet
@@ -614,8 +612,7 @@ void DefaultRobot::check_crashes( const int STEPS, sgVec3 const pos )
                 const Kart* kart=world->getKart(j);
                 if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
 
-                kart_distance = sgDistanceVec2( step_coord,
-                    world->getKart(j)->getCoord()->xyz );
+		kart_distance = (step_coord-world->getKart(j)->getXYZ()).length_2d();
 
                 if( kart_distance < m_kart_properties->getKartLength() + 0.125f * i )
                     if( getVelocityLC().getY() > world->getKart(j)->
@@ -694,8 +691,8 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         m_track_sector + 1 : 0;
     int target_sector;
 
-    sgVec2 direction;
-    sgVec3 step_track_coord;
+    Vec3 direction;
+    Vec3 step_track_coord;
     SGfloat distance;
     int steps;
 
@@ -707,24 +704,22 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         target_sector = sector + 1 < DRIVELINE_SIZE ? sector + 1 : 0;
 
         //direction is a vector from our kart to the sectors we are testing
-        sgSubVec2( direction, world->m_track->m_driveline[target_sector],
-            m_curr_pos.xyz );
+	direction = world->m_track->m_driveline[target_sector] - getXYZ();
 
-        float len=sgLengthVec2(direction);
+        float len=direction.length_2d();
         steps = int( len / m_kart_properties->getKartLength() );
         if( steps < 3 ) steps = 3;
 
         //Protection against having vel_normal with nan values
         if(len>0.0f) {
-            sgScaleVec2(direction, 1.0f/len);
+            direction*= 1.0f/len;
         }
 
-        sgVec2 step_coord;
+        Vec3 step_coord;
         //Test if we crash if we drive towards the target sector
         for( int i = 2; i < steps; ++i )
         {
-            sgAddScaledVec2( step_coord, m_curr_pos.xyz, direction,
-                m_kart_properties->getKartLength() * i );
+            step_coord = getXYZ()+direction*m_kart_properties->getKartLength() * i ;
 
             world->m_track->spatialToTrack( step_track_coord, step_coord,
                 sector );

@@ -44,7 +44,7 @@ private:
 public:
     PlayerKart(const std::string& kart_name,
                int position, Player *_player,
-               sgCoord init_pos, int player_index);
+               const btTransform& init_pos, int player_index);
 
     int     earlyStartPenalty () {return m_penalty_time>0; }
     Player* getPlayer         () {return m_player;        }

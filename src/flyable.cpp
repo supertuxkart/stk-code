@@ -76,7 +76,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
                         trans.getBasis()[2][1]);
     float heading=atan2(-direction.getX(), direction.getY());
 
-    TerrainInfo::update(m_owner->getPos());
+    TerrainInfo::update(m_owner->getXYZ());
     float pitch = getTerrainPitch(heading);
 
     btMatrix3x3 m;
@@ -187,15 +187,6 @@ void Flyable::update (float dt)
 
     Moveable::update(dt);
 }   // update
-// -----------------------------------------------------------------------------
-void Flyable::placeModel()
-{
-	btTransform t=getTrans();
-    float m[4][4];
-    t.getOpenGLMatrix((float*)&m);
-    sgSetCoord(&m_curr_pos, m);
-    Moveable::placeModel();
-}  // placeModel
 
 // -----------------------------------------------------------------------------
 void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
@@ -213,7 +204,7 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     scene->remove(m);
 
     // The explosion is a bit higher in the air
-    btVector3 pos_explosion=getPos();
+    Vec3 pos_explosion=getXYZ();
     pos_explosion.setZ(pos_explosion.getZ()+1.2f);
     world->getPhysics()->removeBody(getBody());
 	m_exploded=true;
@@ -227,7 +218,7 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
         if(m_owner!=kart || m_owner==kart_hit) 
         {
             // Set a flag it if was a direct hit.
-            kart->handleExplosion(getPos(), kart==kart_hit);
+            kart->handleExplosion(getXYZ(), kart==kart_hit);
         }
     }
     callback_manager->handleExplosion(pos_explosion, moving_physics);

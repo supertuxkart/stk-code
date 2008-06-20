@@ -115,7 +115,7 @@ private:
     float steer_to_point(const sgVec2 POINT);
 
     bool do_wheelie(const int STEPS);
-    void check_crashes(const int STEPS, sgVec3 const pos);
+    void check_crashes(const int STEPS, const Vec3& pos);
     void find_non_crashing_point(sgVec2 result);
 
     float normalize_angle (float angle);
@@ -128,11 +128,10 @@ private:
 
 public:
     DefaultRobot(const std::string& kart_name, int position,
-             sgCoord init_pos);
+                 const btTransform& init_pos);
 
     void update      (float delta) ;
     void reset       ();
-    int  isPlayerKart() const {return 0;}
 };
 
 #endif

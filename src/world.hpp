@@ -132,7 +132,7 @@ private:
     void  resetAllKarts     ();
     void  removeKart        (int kart_number);
     Kart* loadRobot         (const std::string& kart_name, int position,
-                             sgCoord init_pos);
+                             const btTransform& init_pos);
     void  updateLeaderMode  (float dt);
     void  printProfileResultAndExit();
     void  estimateFinishTimes();

@@ -177,10 +177,9 @@ void Scene::draw(float dt)
             float f=2.0f;
             glFrustum(-f, f, -f, f, 1.0, 1000.0);
             
-            btVector3 pos;
-            sgCoord *c = world->getKart(race_manager->getNumKarts()-1)->getCoord();
-            gluLookAt(c->xyz[0], c->xyz[1]-5.f, c->xyz[2]+4,
-                      c->xyz[0], c->xyz[1],     c->xyz[2],
+            Vec3 xyz = world->getKart(race_manager->getNumKarts()-1)->getXYZ();
+            gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
+                      xyz.getX(), xyz.getY(),     xyz.getZ(),
                       0.0f, 0.0f, 1.0f);
             glMatrixMode(GL_MODELVIEW);
             

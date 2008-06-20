@@ -17,37 +17,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "vec3.hpp"
 #include "world.hpp"
 #include "herring.hpp"
 #include "kart.hpp"
 #include "scene.hpp"
+#include "coord.hpp"
 
-Herring::Herring(herringType _type, sgVec3* xyz, ssgEntity* model)
+Herring::Herring(herringType type, const Vec3& xyz, ssgEntity* model) 
+        : m_coord(xyz, Vec3(0, 0, 0))
 {
-    sgSetVec3(m_coord.hpr, 0.0f, 0.0f, 0.0f);
-
-    sgCopyVec3(m_coord.xyz, *xyz);
-    m_root   = new ssgTransform();
+    m_type           = type;
+    m_eaten          = false;
+    m_time_to_return = 0.0f;  // not strictly necessary, see isEaten()
+    m_root           = new ssgTransform();
     m_root->ref();
-    m_root->setTransform(&m_coord);
-
-    m_rotate = new ssgTransform();
-    m_rotate->ref();
-    m_rotate->addKid(model);
-    m_root->addKid(m_rotate);
+    m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
+    m_root->addKid(model);
     scene->add(m_root);
 
-    m_type           = _type;
-    m_eaten         = false;
-    m_rotation       = 0.0f;
-    m_time_to_return = 0.0f;  // not strictly necessary, see isEaten()
 }   // Herring
 
 //-----------------------------------------------------------------------------
 Herring::~Herring()
 {
     ssgDeRefDelete(m_root);
-    ssgDeRefDelete(m_rotate);
 }   // ~Herring
 
 //-----------------------------------------------------------------------------
@@ -55,13 +49,13 @@ void Herring::reset()
 {
     m_eaten         = false;
     m_time_to_return = 0.0f;
-    m_root->setTransform(&m_coord);
+    m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 }   // reset
 
 //-----------------------------------------------------------------------------
 int Herring::hitKart(Kart* kart)
 {
-    return sgDistanceSquaredVec3 ( kart->getCoord()->xyz, m_coord.xyz ) < 0.8f;
+    return (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
 }   // hitKart
 
 //-----------------------------------------------------------------------------
@@ -72,26 +66,24 @@ void Herring::update(float delta)
         const float T = m_time_to_return - world->getTime();
         if ( T > 0 )
         {
-            sgVec3 hell;
-            sgCopyVec3(hell, m_coord.xyz);
+	  Vec3 hell(m_coord.getXYZ());
 
-            hell[2] = ( T > 1.0f ) ? -1000000.0f : m_coord.xyz[2] - T / 2.0f;
-            m_root -> setTransform(hell);
+            hell.setZ( (T>1.0f) ? -1000000.0f : m_coord.getXYZ().getZ() - T / 2.0f);
+            m_root->setTransform(hell.toFloat());
         }
         else
         {
-            m_eaten   = false;
-            m_rotation = 0.0f;
-            m_root -> setTransform(&m_coord);
+            m_eaten    = false;
+            m_coord.setHPR(Vec3(0.0f));
+            m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
         }   // T>0
 
     }
     else
     {   // not m_eaten
-        sgCoord c = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } } ;
-        c.hpr[0] = m_rotation;
-        m_rotation += 180.0f*delta;
-        m_rotate -> setTransform ( &c ) ;
+        Vec3 rotation(delta*M_PI, 0, 0);
+        m_coord.setHPR(m_coord.getHPR()+rotation);
+        m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     }
 }   // update
 

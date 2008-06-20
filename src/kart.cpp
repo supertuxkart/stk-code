@@ -48,8 +48,8 @@
 #endif
 
 
-Kart::Kart (const std::string& kart_name, int position_ ,
-            sgCoord init_pos) 
+Kart::Kart (const std::string& kart_name, int position,
+            const btTransform& init_transform) 
     : TerrainInfo(1),
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
@@ -61,8 +61,8 @@ Kart::Kart (const std::string& kart_name, int position_ ,
 #endif
 {
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
-    m_grid_position        = position_;
-    m_initial_position     = position_;
+    m_grid_position        = position;
+    m_initial_position     = position;
     m_num_herrings_gobbled = 0;
     m_eliminated           = false;
     m_finished_race        = false;
@@ -74,7 +74,9 @@ Kart::Kart (const std::string& kart_name, int position_ ,
     m_skidmark_left        = NULL;
     m_skidmark_right       = NULL;
     m_track_sector         = Track::UNKNOWN_SECTOR;
-    sgCopyCoord(&m_reset_pos, &init_pos);
+
+    // Set position and heading:
+    m_reset_transform      = init_transform;
 
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
@@ -97,6 +99,7 @@ Kart::Kart (const std::string& kart_name, int position_ ,
     m_wheel_rear_r            = NULL;
     m_lap_start_time          = -1.0f;
     loadData();
+    reset();
 }   // Kart
 
 // -----------------------------------------------------------------------------v
@@ -288,7 +291,6 @@ void Kart::reset()
     {
         world->getPhysics()->addKart(this, m_vehicle);
     }
-    Moveable::reset();
 
     m_attachment.clear();
     m_collectable.reset();
@@ -306,17 +308,19 @@ void Kart::reset()
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
 
-    m_controls.lr      = 0.0f;
-    m_controls.accel   = 0.0f;
-    m_controls.brake   = false;
-    m_controls.wheelie = false;
-    m_controls.jump    = false;
-    m_controls.fire    = false;
+    m_controls.lr          = 0.0f;
+    m_controls.accel       = 0.0f;
+    m_controls.brake       = false;
+    m_controls.wheelie     = false;
+    m_controls.jump        = false;
+    m_controls.fire        = false;
 
     // Set the brakes so that karts don't slide downhill
     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
 
-    world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
+    m_transform = m_reset_transform;
+
+    world->m_track->findRoadSector(getXYZ(), &m_track_sector);
 
     //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     //the road, so we have to use another function to find the sector.
@@ -324,29 +328,20 @@ void Kart::reset()
     {
         m_on_road = false;
         m_track_sector = world->m_track->findOutOfRoadSector(
-            m_curr_pos.xyz, Track::RS_DONT_KNOW, Track::UNKNOWN_SECTOR );
+            getXYZ(), Track::RS_DONT_KNOW, Track::UNKNOWN_SECTOR );
     }
     else
     {
         m_on_road = true;
     }
 
-    world->m_track->spatialToTrack( m_curr_track_coords, m_curr_pos.xyz,
-        m_track_sector );
+    world->m_track->spatialToTrack(m_curr_track_coords, getXYZ(),
+                                   m_track_sector );
 
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
-    // Set heading:
-    m_transform.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-                                         DEGREE_TO_RAD(m_reset_pos.hpr[0])) );
-    // Set position
-    m_transform.setOrigin(btVector3(m_reset_pos.xyz[0],
-                                    m_reset_pos.xyz[1],
-                                    m_reset_pos.xyz[2]+0.5f*getKartHeight()));
-    m_body->setCenterOfMassTransform(m_transform);
-    m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
-    m_motion_state->setWorldTransform(m_transform);
+
+    Moveable::reset();
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
@@ -359,15 +354,13 @@ void Kart::reset()
         world->getPhysics()->addKart(this, m_vehicle);
     }
     m_rescue               = false;
-
-    placeModel();
-    TerrainInfo::update(getPos());
+    TerrainInfo::update(getXYZ());
 }   // reset
 
 //-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
-    bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords[1] <  20.0f;
+    bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords.getY() <  20.0f;
     if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
@@ -423,7 +416,7 @@ void Kart::doLapCounting ()
         }
         m_lap_start_time = world->getTime();
     }
-    else if ( m_curr_track_coords[1] > 300.0f && m_last_track_coords[1] <  20.0f)
+    else if ( m_curr_track_coords.getY() > 300.0f && m_last_track_coords[1] <  20.0f)
     {
         m_race_lap-- ;
         // Prevent cheating by setting time to a negative number, indicating
@@ -496,7 +489,7 @@ bool Kart::isOnGround() const
            m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
 }   // isOnGround
 //-----------------------------------------------------------------------------
-void Kart::handleExplosion(const btVector3& pos, bool direct_hit)
+void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 {
     if(direct_hit) 
     {
@@ -511,7 +504,7 @@ void Kart::handleExplosion(const btVector3& pos, bool direct_hit)
     }
     else  // only affected by a distant explosion
     {
-        btVector3 diff=getPos()-pos;
+        btVector3 diff=getXYZ()-pos;
         //if the z component is negative, the resulting impulse could push the 
         // kart through the floor. So in this case ignore z.
         if(diff.getZ()<0) diff.setZ(0.0f);
@@ -548,20 +541,16 @@ void Kart::update(float dt)
         {
             if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
             m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
-            m_rescue_pitch = m_curr_pos.hpr[1];
-            m_rescue_roll  = m_curr_pos.hpr[2];
+            m_rescue_pitch = getHPR().getPitch();
+            m_rescue_roll  = getHPR().getRoll();
             world->getPhysics()->removeKart(this);
         }
-        m_curr_pos.xyz[2] += rescue_height*dt/rescue_time;
-	
-        m_transform.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
-                                        m_curr_pos.xyz[2]));
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
-        m_transform.setRotation(m_transform.getRotation()*q_roll*q_pitch);
-        m_motion_state->setWorldTransform(m_transform);
+        setXYZRotation(getXYZ()+Vec3(0, 0, rescue_height*dt/rescue_time),
+                       getRotation()*q_roll*q_pitch);
     }   // if m_rescue
     m_attachment.update(dt);
 
@@ -573,12 +562,12 @@ void Kart::update(float dt)
     }  // user_config->smoke
     updatePhysics(dt);
 
-    sgCopyVec2  ( m_last_track_coords, m_curr_track_coords );
-    
+    m_last_track_coords = m_curr_track_coords;
+
     Moveable::update(dt);
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if((fabs(m_curr_pos.hpr[2])>60 && fabs(getSpeed())<3.0f) )
+    if((fabs(getHPR().getRoll())>60 && fabs(getSpeed())<3.0f) )
     {
         forceRescue();
     }
@@ -634,7 +623,7 @@ void Kart::update(float dt)
 
     int prev_sector = m_track_sector;
     if(!m_rescue)
-        world->m_track->findRoadSector(m_curr_pos.xyz, &m_track_sector);
+        world->m_track->findRoadSector(getXYZ(), &m_track_sector);
 
     // Check if the kart is taking a shortcut (if it's not already doing one):
     if(!m_rescue && world->m_track->isShortcut(prev_sector, m_track_sector))
@@ -655,10 +644,10 @@ void Kart::update(float dt)
         m_on_road = false;
         if( m_curr_track_coords[0] > 0.0 )
             m_track_sector = world->m_track->findOutOfRoadSector(
-               m_curr_pos.xyz, Track::RS_RIGHT, prev_sector );
+               getXYZ(), Track::RS_RIGHT, prev_sector );
         else
             m_track_sector = world->m_track->findOutOfRoadSector(
-               m_curr_pos.xyz, Track::RS_LEFT, prev_sector );
+               getXYZ(), Track::RS_LEFT, prev_sector );
     }
     else
     {
@@ -666,7 +655,7 @@ void Kart::update(float dt)
     }
 
     world->m_track->spatialToTrack( m_curr_track_coords, 
-                                    m_curr_pos.xyz,
+                                    getXYZ(),
                                     m_track_sector      );
 
     if(!m_finished_race) doLapCounting();
@@ -881,8 +870,10 @@ void Kart::forceRescue(bool is_shortcut)
 void Kart::endRescue()
 {
     if ( m_track_sector > 0 ) m_track_sector-- ;
-    world ->m_track -> trackToSpatial ( m_curr_pos.xyz, m_track_sector ) ;
-    m_curr_pos.hpr[0] = world->m_track->m_angle[m_track_sector] ;
+    setXYZ( world->m_track->trackToSpatial(m_track_sector) );
+    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
+                         DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector]) );
+    setRotation(heading);
     m_rescue = false ;
 
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
@@ -897,8 +888,7 @@ void Kart::endRescue()
     // that the drivelines are somewhat under the track. Otherwise, the
     // kart will be placed a little bit under the track, triggering
     // a rescue, ...
-    pos.setOrigin(btVector3(m_curr_pos.xyz[0],m_curr_pos.xyz[1],
-                            m_curr_pos.xyz[2]+0.5f*getKartHeight()+0.1f));
+    pos.setOrigin(getXYZ()+btVector3(0, 0, 0.5f*getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
                                  DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
@@ -925,22 +915,22 @@ void Kart::processSkidMarks()
     {
         if(isOnGround())
         {
-            m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
-            m_skidmark_right->add(*getCoord(),  ANGLE, LENGTH);            
+	  //FIXME: no getCoord anymore  m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
+          //FIXME  m_skidmark_right->add(*getCoord(),  ANGLE, LENGTH);            
         }
         else
         {   // not on ground
-            m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
-            m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
+            //FIXME m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
+            //FIRME m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
         }   // on ground
     }
     else
     {   // !skid_rear && !skid_front    
-        if(m_skidmark_left->wasSkidMarking())
-            m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
+        //FIXME if(m_skidmark_left->wasSkidMarking())
+        //FIXME     m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
 
-        if(m_skidmark_right->wasSkidMarking())
-            m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
+        //FIXME if(m_skidmark_right->wasSkidMarking())
+        //FIXME    m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
     }
 }   // processSkidMarks
 
@@ -1039,7 +1029,7 @@ void Kart::loadData()
 }   // loadData
 
 //-----------------------------------------------------------------------------
-void Kart::placeModel ()
+void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 {
     sgMat4 wheel_front;
     sgMat4 wheel_steer;
@@ -1056,30 +1046,14 @@ void Kart::placeModel ()
     if (m_wheel_rear_l) m_wheel_rear_l->setTransform(wheel_rot);
     if (m_wheel_rear_r) m_wheel_rear_r->setTransform(wheel_rot);
 
-    // Only transfer the bullet data to the plib tree if no history is being
-    // replayed.
-    if(!user_config->m_replay_history)
-    {
-        //float m[4][4];
-        //getTrans().getOpenGLMatrix((float*)&m);
-        //sgSetCoord(&m_curr_pos, m);
-        Coord coord(getTrans());
-        // Transfer the new position and hpr to m_curr_pos
-        sgCopyCoord(&m_curr_pos, &(coord.toSgCoord()));
-    }
-    sgCoord c ;
-    sgCopyCoord ( &c, &m_curr_pos );
     const float CENTER_SHIFT  = getGravityCenterShift();
-    const float offset_pitch  = m_wheelie_angle;
+    const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
     const float offset_z      = 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS))
                               - (0.5f-CENTER_SHIFT)*getKartHeight();
     
-    m_curr_pos.xyz[2] += offset_z;
-    m_curr_pos.hpr[1] += offset_pitch;
-    Moveable::placeModel();
-    m_curr_pos.xyz[2] -= offset_z;
-    m_curr_pos.hpr[1] -= offset_pitch;
-}   // placeModel
+    Moveable::updateGraphics(Vec3(0, 0, offset_z), Vec3(0, offset_pitch, 0));
+}   // updateGraphics
+
 //-----------------------------------------------------------------------------
 float Kart::estimateFinishTime  ()
 {

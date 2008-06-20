@@ -66,12 +66,10 @@ public:
                               CollectableType type);
     virtual void update      (float);
 
-    void placeModel          ();
     virtual void hitTrack    () {};
     void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
     bool         hasHit      ()               { return m_has_hit_something; }
-    void         reset       () { Moveable::reset();
-                                  sgCopyCoord(&m_last_pos,&m_reset_pos );   }
+    void         reset       () { Moveable::reset(); }
 };   // Flyable
 
 #endif

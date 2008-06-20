@@ -35,9 +35,6 @@ Moveable::Moveable (bool bHasHistory)
 
     m_model_transform->ref();
 
-    sgZeroVec3 ( m_reset_pos.xyz ) ; sgZeroVec3 ( m_reset_pos.hpr ) ;
-
-    reset ();
     if(bHasHistory)
     {
         m_history_velocity = new sgCoord[history->GetSize()];
@@ -65,16 +62,21 @@ Moveable::~Moveable()
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------
+// The reset position must be set before calling reset
 void Moveable::reset ()
 {
     m_collided         = false;
     m_crashed          = false;
     m_material_hot     = NULL;
     m_normal_hot       = NULL;
-    if(m_body) m_body->setLinearVelocity(btVector3(0.0, 0.0, 0.0));
-    sgCopyCoord( &m_curr_pos, &m_reset_pos );
-    m_hpr = Vec3(m_curr_pos.hpr);
-    m_hpr.degreeToRad();
+    if(m_body)
+    {
+        m_body->setLinearVelocity(btVector3(0.0, 0.0, 0.0));
+        m_body->setAngularVelocity(btVector3(0, 0, 0));
+        m_body->setCenterOfMassTransform(m_transform);
+    }
+    Coord c(m_transform);
+    m_hpr = c.getHPR();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -103,18 +105,16 @@ void Moveable::createBody(float mass, btTransform& trans,
 //-----------------------------------------------------------------------------
 void Moveable::update (float dt)
 {
+    m_motion_state->getWorldTransform(m_transform);
+    m_velocityLC = getVelocity()*getTrans().getBasis();
+    m_hpr.setHPR(m_transform.getBasis());
+
     if(m_history_velocity)
     {
         if(user_config->m_replay_history)
         {
             sgCoord tmp;
             sgCopyCoord(&tmp, &(m_history_velocity[history->GetCurrentIndex()]));
-            //printf("m_velocity=%f,%f,%f,%f,%f,%f\n",
-            //     m_velocity.xyz[0],m_velocity.xyz[1],m_velocity.xyz[2],
-            //     m_velocity.hpr[0],m_velocity.hpr[1],m_velocity.hpr[2]);
-            //printf("tmp     =%f,%f,%f,%f,%f,%f\n",
-            //     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
-            //     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2]);
 
 #undef IGNORE_Z_IN_HISTORY
 #ifdef IGNORE_Z_IN_HISTORY
@@ -139,42 +139,35 @@ void Moveable::update (float dt)
         {
             sgCoord tmp;
             sgCopyCoord(&tmp, &(m_history_position[history->GetCurrentIndex()]));
-            //printf("m_curr_pos=%f,%f,%f,%f,%f,%f\n",
-            //     m_curr_pos.xyz[0],m_curr_pos.xyz[1],m_curr_pos.xyz[2],
-            //     m_curr_pos.hpr[0],m_curr_pos.hpr[1],m_curr_pos.hpr[2]);
-            //printf("tmp     =%f,%f,%f,%f,%f,%f --> %d\n",
-            //     tmp.xyz[0],tmp.xyz[1],tmp.xyz[2],
-            //     tmp.hpr[0],tmp.hpr[1],tmp.hpr[2],
-            //     history->GetCurrentIndex());
-
-#ifdef IGNORE_Z_IN_HISTORY
-            const float DUMMY=m_curr_pos.xyz[2];
-            sgCopyCoord(&m_curr_pos, &tmp);
-            m_curr_pos.xyz[2]=DUMMY;
-#else
-            sgCopyCoord(&m_curr_pos, &tmp);
-#endif
+            Vec3 hpr(tmp.hpr);
+            hpr.degreeToRad();
+            btMatrix3x3 rotation;
+            rotation.setEulerZYX(hpr.getPitch(), hpr.getRoll(), hpr.getHeading());
+            m_transform.setBasis(rotation);
+            m_transform.setOrigin(Vec3(tmp.xyz));
 
         }
         else
         {
-            sgCopyCoord(&(m_history_position[history->GetCurrentIndex()]), &m_curr_pos);
+            Coord c(m_transform);
+            sgCopyCoord(&(m_history_position[history->GetCurrentIndex()]), &c.toSgCoord());
         }
     }   // if m_history_position
 
-    m_velocityLC = getVelocity()*getTrans().getBasis();
-    m_motion_state->getWorldTransform(m_transform);
-    m_hpr.setHPR(m_transform.getBasis());
 
-    placeModel();
+    updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;
 }   // update
 
 //-----------------------------------------------------------------------------
-void Moveable::placeModel()
+void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
 {
-    m_model_transform->setTransform(&m_curr_pos);
-}   // placeModel
+    Vec3 xyz=getXYZ()+off_xyz;
+    Vec3 hpr=getHPR()+off_hpr;
+    sgCoord c=Coord(xyz, hpr).toSgCoord();
+    
+    m_model_transform->setTransform(&c);
+}   // updateGraphics
 
 //-----------------------------------------------------------------------------
 void Moveable::WriteHistory(char* s, int kartNumber, int indx)

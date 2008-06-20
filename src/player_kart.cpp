@@ -32,7 +32,7 @@
 #include "camera.hpp"
 
 PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *player,
-                       sgCoord init_pos, int player_index) :
+                       const btTransform& init_pos, int player_index) :
             Kart(kart_name, position, init_pos)
 {
     m_player       = player;
@@ -166,7 +166,6 @@ void PlayerKart::update(float dt)
 	    // The call to update is necessary here (even though the kart
             // shouldn't actually change) to update m_transform. Otherwise
 	    // the camera gets the wrong position. 
-            // FIXME: that might not necessary anymore once m_curr_pos is removed!
 	    Kart::update(dt);
 	}
         
@@ -273,7 +272,7 @@ void PlayerKart::addMessages()
     // ------------------------------------------------------
     if(race_manager->getDifficulty()==RaceManager::RD_EASY)
     {
-        float angle_diff = getCoord()->hpr[0] - world->m_track->m_angle[getSector()];
+      float angle_diff = RAD_TO_DEGREE(getHPR().getHeading()) - world->m_track->m_angle[getSector()];
         if(angle_diff > 180.0f) angle_diff -= 360.0f;
         else if (angle_diff < -180.0f) angle_diff += 360.0f;
         // Display a warning message if the kart is going back way (unless

@@ -21,6 +21,7 @@
 #define HEADER_HERRING_H
 
 #include <plib/sg.h>
+#include "coord.hpp"
 
 class Kart;
 class ssgTransform;
@@ -34,24 +35,22 @@ class Herring
 {
 private:
     herringType   m_type;         // Herring type
-    bool          m_eaten;       // true if herring  was eaten & is not displayed
+    bool          m_eaten;        // true if herring  was eaten & is not displayed
     float         m_time_to_return;  // world->clock when an eaten herring reappears
-    sgCoord       m_coord;        // Original coordinates, used mainly when
-    // eaten herrings reappear.
+    Coord         m_coord;        // Original coordinates, used mainly when
+                                  // eaten herrings reappear.
     ssgTransform* m_root;         // The actual root of the herring
-    ssgTransform* m_rotate;       // Just below root is a node only rotating
-    float         m_rotation;     // Amount of rotation
 
 public:
-    Herring   (herringType type, sgVec3* xyz, ssgEntity* model);
-    ~Herring   ();
-    void        update    (float delta);
-    bool        wasEaten  ()            {return m_eaten;}
-    void        isEaten   ();
-    herringType getType   ()            {return m_type;}
-    int         hitKart   (Kart* kart );
-    void        reset     ();
+                  Herring (herringType type, const Vec3& xyz, ssgEntity* model);
+                 ~Herring ();
+    void          update  (float delta);
+    void          isEaten ();
+    int           hitKart (Kart* kart );
+    void          reset   ();
     ssgTransform* getRoot () const {return m_root;}
+    herringType   getType () const {return m_type;}
+    bool          wasEaten() const {return m_eaten;}
 }
 ;   // class Herring
 

@@ -1,5 +1,3 @@
-//  $Id$
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
@@ -98,45 +96,21 @@ public:
     sgVec4      m_specular_col;
     sgVec4      m_diffuse_col;
 
-    /** sgVec3 is a float[3] array, so unfortunately we can't put it in a
-    * std::vector because it lacks a copy-constructor, this hack should help...
-    */
-    class sgVec3Wrapper
-    {
-    private:
-        sgVec3 vec;
-
-    public:
-        sgVec3Wrapper(const sgVec3& o)
-        {
-            sgCopyVec3(vec, o);
-        }
-
-        operator const float* () const
-        {
-            return vec;
-        }
-
-        operator float* ()
-        {
-            return vec;
-        }
-    };
     //FIXME: Maybe the next 4 vectors should be inside an struct and be used
     //from a vector of structs?
     //FIXME: should the driveline be set as a sgVec2?
-    std::vector<sgVec3Wrapper> m_driveline;
+    std::vector<Vec3> m_driveline;
     std::vector<SGfloat> m_distance_from_start;
     std::vector<SGfloat> m_path_width;
     std::vector<SGfloat> m_angle;
 
 	//Left and Right drivelines for overhead map rendering.
 	//(Should probably be private as they are only use internally right now)
-    std::vector<sgVec3Wrapper> m_left_driveline;
-    std::vector<sgVec3Wrapper> m_right_driveline;
+    std::vector<Vec3> m_left_driveline;
+    std::vector<Vec3> m_right_driveline;
 
-    sgVec2 m_driveline_min;
-    sgVec2 m_driveline_max;
+    Vec3 m_driveline_min;
+    Vec3 m_driveline_max;
 
 
     float m_total_distance;
@@ -158,15 +132,15 @@ public:
     void               drawScaled2D      (float x, float y, float w,
                                           float h                     ) const;
 
-    void               findRoadSector    (const sgVec3 XYZ, int *sector) const;
-    int                findOutOfRoadSector(const sgVec3 XYZ,
+    void               findRoadSector    (const Vec3& XYZ, int *sector) const;
+    int                findOutOfRoadSector(const Vec3& XYZ,
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR
                                            ) const;
-    int                spatialToTrack    (sgVec3 dst,
-                                          const sgVec2 POS,
+    int                spatialToTrack    (Vec3& dst,
+                                          const Vec3& POS,
                                           const int SECTOR            ) const;
-    void               trackToSpatial    (sgVec3 xyz, const int SECTOR) const;
+    const Vec3&        trackToSpatial    (const int SECTOR) const;
     void               loadTrackModel    ();
     bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
     void               addMusic          (MusicInformation* mi)
@@ -199,7 +173,7 @@ public:
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}
     const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }
-    void               getStartCoords    (unsigned int pos, sgCoord* coords) const;
+    btTransform        getStartTransform (unsigned int pos) const;
     void  getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal, 
                          const Material **material) const;
     void createPhysicsModel              ();
@@ -214,14 +188,14 @@ private:
     void  loadTrack                      (std::string filename);
     void  herring_command                (sgVec3 *xyz, char htype, int bNeedHeight);
     void  loadDriveline                  ();
-    void  readDrivelineFromFile          (std::vector<sgVec3Wrapper>& line,
+    void  readDrivelineFromFile          (std::vector<Vec3>& line,
                                          const std::string& file_ext      );
     void  convertTrackToBullet           (ssgEntity *track, sgMat4 m);
 
-    float pointSideToLine(const sgVec2 L1, const sgVec2 L2,
-                          const sgVec2 P ) const;
-    int   pointInQuad(const sgVec2 A, const sgVec2 B,
-                      const sgVec2 C, const sgVec2 D, const sgVec2 POINT ) const;
+    float pointSideToLine(const Vec3& L1, const Vec3& L2,
+                          const Vec3& P ) const;
+    int   pointInQuad(const Vec3& A, const Vec3& B,
+                      const Vec3& C, const Vec3& D, const Vec3& POINT ) const;
     void  getMusicInformation(std::vector<std::string>&             filenames, 
                               std::vector<MusicInformation*>& m_music   );
 }

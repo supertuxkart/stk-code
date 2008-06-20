@@ -99,8 +99,7 @@ World::World()
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         int position = i+1;   // position start with 1
-        sgCoord init_pos;
-        m_track->getStartCoords(i, &init_pos);
+        btTransform init_pos=m_track->getStartTransform(position);
         Kart* newkart;
         const std::string& kart_name=race_manager->getKartName(i);
         if(user_config->m_profile)
@@ -111,7 +110,6 @@ World::World()
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
-                btVector3 startpos(init_pos.xyz[0], init_pos.xyz[1], init_pos.xyz[2]);
                 scene->createCamera(playerIndex, newkart);
             }
         }
@@ -623,7 +621,7 @@ void World::removeKart(int kart_number)
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
-    projectile_manager->newExplosion(kart->getPos());
+    projectile_manager->newExplosion(kart->getXYZ());
     // The kart can't be really removed from the m_kart array, since otherwise 
     // a race can't be restarted. So it's only marked to be eliminated (and 
     // ignored in all loops). Important:world->getCurrentNumKarts() returns 
@@ -751,7 +749,7 @@ void World::restartRace()
 
 //-----------------------------------------------------------------------------
 Kart* World::loadRobot(const std::string& kart_name, int position,
-                       sgCoord init_pos)
+                       const btTransform& init_pos)
 {
     Kart* currentRobot;
     

@@ -39,8 +39,6 @@ private:
     btVector3     m_velocityLC;      /* velocity in kart coordinates                */
 protected:
     UserPointer   m_user_pointer;
-    sgCoord       m_reset_pos;       /* Where to start in case of a reset           */
-    sgCoord       m_curr_pos;        /* current position                            */
     sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
     Material*     m_material_hot;    /* Material at HOT                             */
     ssgTransform* m_model_transform;            // The transform where the model is under
@@ -64,14 +62,19 @@ public:
     virtual const btVector3 &getVelocity() const {return m_body->getLinearVelocity();}
     const btVector3 &getVelocityLC() const     {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
-    sgCoord*      getCoord     ()              {return &m_curr_pos;                }
-    const Vec3&   getPos    ()  const          {return (Vec3&)m_transform.getOrigin();}
-    const Vec3&   getRotation() const          {return m_hpr;                      }
-    const sgCoord* getCoord    ()  const       {return &m_curr_pos;                }
-    const sgVec4* getNormalHOT ()  const       {return m_normal_hot;               }
-    const sgCoord* getResetPos ()  const       {return &m_reset_pos;               }
-    void          setCoord     (sgCoord* pos)  {sgCopyCoord ( &m_curr_pos,pos);    }
-    virtual void  placeModel   ();
+    const Vec3&   getXYZ       () const        {return (Vec3&)m_transform.getOrigin();}
+    const Vec3&   getHPR       () const        {return m_hpr;                      }
+    const btQuaternion getRotation() const     {return m_transform.getRotation();  }
+    void          setXYZ       (const Vec3& a) {m_transform.setOrigin(a);
+                                                m_motion_state->setWorldTransform(m_transform);}
+    void          setRotation  (const btQuaternion&a){m_transform.setRotation(a);
+                                                m_motion_state->setWorldTransform(m_transform);}
+    void          setXYZRotation(const Vec3& xyz, const btQuaternion& a)
+                                               {m_transform.setRotation(a);
+                                                m_transform.setOrigin(xyz);
+                                                m_motion_state->setWorldTransform(m_transform);}
+    const sgVec4* getNormalHOT () const        {return m_normal_hot;               }
+    virtual void  updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr);
     virtual void  handleZipper ()              {};
     virtual void  reset        ();
     virtual void  update       (float dt) ;

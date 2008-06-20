@@ -292,27 +292,25 @@ void RaceGUI::drawMap ()
 
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
-        sgCoord *c ;
-
         Kart* kart = world->getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
         glColor3fv ( kart->getColor().toFloat());
-        c          = kart->getCoord () ;
+	const Vec3& xyz = kart->getXYZ();
 
         /* If it's a player, draw a bigger sign */
         if (kart -> isPlayerKart ())
         {
-            world -> m_track->glVtx ( c->xyz, (float)xLeft+3, (float)yTop+3);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop+3);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft-2, (float)yTop-2);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft+3, (float)yTop-2);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop+3);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop+3);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop-2);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop-2);
         }
         else
         {
-            world -> m_track->glVtx ( c->xyz, (float)xLeft+2, (float)yTop+2);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft-1, (float)yTop+2);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft-1, (float)yTop-1);
-            world -> m_track->glVtx ( c->xyz, (float)xLeft+2, (float)yTop-1);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop+2);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop+2);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop-1);
+            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop-1);
         }
     }
 

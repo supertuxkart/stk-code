@@ -57,7 +57,7 @@ public:
     ~HerringManager();
     void        loadDefaultHerrings();
     void        loadHerringStyle(const std::string filename);
-    Herring*    newHerring      (herringType type, sgVec3* xyz);
+    Herring*    newHerring      (herringType type, const Vec3& xyz);
     void        update          (float delta);
     void        hitHerring      (Kart* kart);
     void        cleanup         ();

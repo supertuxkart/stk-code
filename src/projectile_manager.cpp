@@ -94,7 +94,7 @@ void ProjectileManager::update(float dt)
         while(p!=m_active_projectiles.end())
         {
             if(! (*p)->hasHit()) { p++; continue; }
-            newExplosion((const Vec3&)(*p)->getPos());
+            newExplosion((*p)->getXYZ());
             Flyable *f=*p;
             Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
             delete f;

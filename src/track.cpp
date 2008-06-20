@@ -90,10 +90,10 @@ void Track::cleanup()
 //-----------------------------------------------------------------------------
 /** Finds on which side of the line segment a given point is.
  */
-inline float Track::pointSideToLine( const sgVec2 L1, const sgVec2 L2,
-    const sgVec2 P ) const
+inline float Track::pointSideToLine( const Vec3& L1, const Vec3& L2,
+    const Vec3& P ) const
 {
-    return ( L2[0]-L1[0] )*( P[1]-L1[1] )-( L2[1]-L1[1] )*( P[0]-L1[0] );
+    return ( L2.getX()-L1.getX() )*( P.getY()-L1.getY() )-( L2.getY()-L1.getY() )*( P.getX()-L1.getX() );
 }   // pointSideToLine
 
 //-----------------------------------------------------------------------------
@@ -107,11 +107,11 @@ inline float Track::pointSideToLine( const sgVec2 L1, const sgVec2 L2,
  */
 int Track::pointInQuad
 (
-    const sgVec2 A,
-    const sgVec2 B,
-    const sgVec2 C,
-    const sgVec2 D,
-    const sgVec2 POINT
+    const Vec3& A,
+    const Vec3& B,
+    const Vec3& C,
+    const Vec3& D,
+    const Vec3& POINT
 ) const
 {
     if(pointSideToLine( C, A, POINT ) >= 0.0 )
@@ -139,7 +139,7 @@ int Track::pointInQuad
  *  The 'sector' could be defined as the number of the closest track
  *  segment to XYZ.
  */
-void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
+void Track::findRoadSector(const Vec3& XYZ, int *sector )const
 {
     if(*sector!=UNKNOWN_SECTOR)
     {
@@ -166,7 +166,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
                                 m_right_driveline[next], m_left_driveline[next], 
                                 XYZ );
 
-        if (triangle != QUAD_TRI_NONE && ((XYZ[2]-m_left_driveline[i][2]) < 1.0f))
+        if (triangle != QUAD_TRI_NONE && ((XYZ.getZ()-m_left_driveline[i].getZ()) < 1.0f))
         {
             possible_segment_tris.push_back(SegmentTriangle((int)i, triangle));
         }
@@ -201,16 +201,18 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
         
         if( possible_segment_tris[i].triangle == QUAD_TRI_FIRST )
         {
-            sgMakePlane( plane, m_left_driveline[segment],
-                         m_right_driveline[segment], m_right_driveline[next] );
+            sgMakePlane( plane, m_left_driveline[segment].toFloat(),
+                                m_right_driveline[segment].toFloat(), 
+                                m_right_driveline[next].toFloat() );
         }
         else //possible_segment_tris[i].triangle == QUAD_TRI_SECOND
         {
-            sgMakePlane( plane, m_right_driveline[next],
-                         m_left_driveline[next], m_left_driveline[segment] );
+            sgMakePlane( plane, m_right_driveline[next].toFloat(),
+                                m_left_driveline[next].toFloat(),
+                                m_left_driveline[segment].toFloat() );
         }
         
-        dist = sgHeightAbovePlaneVec3( plane, XYZ );
+        dist = sgHeightAbovePlaneVec3( plane, XYZ.toFloat() );
         
         /* sgHeightAbovePlaneVec3 gives a negative dist if the plane
            is on top, so we have to rule it out.
@@ -264,7 +266,7 @@ void Track::findRoadSector( const sgVec3 XYZ, int *sector )const
  */
 int Track::findOutOfRoadSector
 (
-    const sgVec3 XYZ,
+    const Vec3& XYZ,
     const RoadSide SIDE,
     const int CURR_SECTOR
 ) const
@@ -309,10 +311,10 @@ int Track::findOutOfRoadSector
 
         if( SIDE != RS_RIGHT)
         {
-            sgCopyVec3( line_seg.a, m_left_driveline[i] );
-            sgCopyVec3( line_seg.b, m_left_driveline[next_sector] );
+            sgCopyVec3( line_seg.a, m_left_driveline[i].toFloat() );
+            sgCopyVec3( line_seg.b, m_left_driveline[next_sector].toFloat() );
 
-            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
+	    dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
 
             if ( dist < nearest_dist )
             {
@@ -323,10 +325,10 @@ int Track::findOutOfRoadSector
 
         if( SIDE != RS_LEFT )
         {
-            sgCopyVec3( line_seg.a, m_right_driveline[i] );
-            sgCopyVec3( line_seg.b, m_right_driveline[next_sector] );
+            sgCopyVec3( line_seg.a, m_right_driveline[i].toFloat() );
+            sgCopyVec3( line_seg.b, m_right_driveline[next_sector].toFloat() );
 
-            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ );
+	    dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
 
             if ( dist < nearest_dist )
             {
@@ -355,8 +357,8 @@ int Track::findOutOfRoadSector
  */
 int Track::spatialToTrack
 (
-    sgVec3 dst,
-    const sgVec2 POS,
+    Vec3& dst,
+    const Vec3& POS,
     const int SECTOR
 ) const
 {
@@ -370,8 +372,8 @@ int Track::spatialToTrack
     const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
     const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
 
-    const float DIST_PREV = sgDistanceVec2 ( m_driveline[PREV], POS );
-    const float DIST_NEXT = sgDistanceVec2 ( m_driveline[NEXT], POS );
+    const float DIST_PREV = (m_driveline[PREV]-POS).length2_2d();
+    const float DIST_NEXT = (m_driveline[NEXT]-POS).length2_2d();
 
     size_t p1, p2;
     if ( DIST_NEXT < DIST_PREV )
@@ -386,14 +388,14 @@ int Track::spatialToTrack
     sgVec3 line_eqn;
     sgVec2 tmp;
 
-    sgMake2DLine ( line_eqn, m_driveline[p1], m_driveline[p2] );
+    sgMake2DLine ( line_eqn, m_driveline[p1].toFloat(), m_driveline[p2].toFloat() );
 
-    dst[0] = sgDistToLineVec2 ( line_eqn, POS );
+    dst.setX(sgDistToLineVec2 ( line_eqn, POS.toFloat() ) );
 
-    sgAddScaledVec2 ( tmp, POS, line_eqn, -dst [0] );
+    sgAddScaledVec2 ( tmp, POS.toFloat(), line_eqn, -dst.getX() );
 
-    float dist_from_driveline_p1 = sgDistanceVec2 ( tmp, m_driveline[p1] );
-    dst[1] = dist_from_driveline_p1 + m_distance_from_start[p1];
+    float dist_from_driveline_p1 = sgDistanceVec2 ( tmp, m_driveline[p1].toFloat() );
+    dst.setY(dist_from_driveline_p1 + m_distance_from_start[p1]);
     // Set z-axis to half the width (linear interpolation between the
     // width at p1 and p2) - m_path_width is actually already half the width
     // of the track. This is used to determine if a kart is too far
@@ -401,43 +403,39 @@ int Track::spatialToTrack
 
     float fraction = dist_from_driveline_p1
                    / (m_distance_from_start[p2]-m_distance_from_start[p1]);
-    dst[2] = m_path_width[p1]*(1-fraction)+fraction*m_path_width[p2];
+    dst.setZ(m_path_width[p1]*(1-fraction)+fraction*m_path_width[p2]);
 
     return (int)p1;
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
-void Track::trackToSpatial ( sgVec3 xyz, const int SECTOR ) const
+const Vec3& Track::trackToSpatial(const int SECTOR ) const
 {
-    sgCopyVec3 ( xyz, m_driveline [ SECTOR ] ) ;
+    return m_driveline[SECTOR];
 }   // trackToSpatial
 
 //-----------------------------------------------------------------------------
 /** Returns the start coordinates for a kart on a given position pos
     (with 0<=pos).
  */
-void Track::getStartCoords(unsigned int pos, sgCoord* coords) const {
+btTransform Track::getStartTransform(unsigned int pos) const {
   // Bug fix/workaround: sometimes the first kart would be too close
   // to the first driveline point and not to the last one -->
   // This kart would not get any lap counting done in the first
   // lap! Therefor -1.5 is subtracted from the y position - which
   // is a somewhat arbitrary value.
-  coords->xyz[0] = pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f);
-  coords->xyz[1] = pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f;
-   // height must be larger than the actual hight for which hot is computed.
-  coords->xyz[2] = pos<m_start_z.size() ? m_start_z[pos] : 1.0f;
-
-  coords->hpr[0] = pos<m_start_heading.size() ? m_start_heading[pos] : 0.0f;
-  coords->hpr[1] = 0.0f;
-  coords->hpr[2] = 0.0f;
-
-  Vec3 tmp_pos(coords->xyz);
-
-  Vec3 normal;
-  const Material *material=NULL;
-  getTerrainInfo(tmp_pos, &(coords->xyz[2]), &normal, &material);
-
-}   // getStartCoords
+  Vec3 orig;
+  pos--;        // adjust from "1 to n" index to "0 to n-1"
+  orig.setX( pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f) );
+  orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f          );
+  orig.setZ( pos<m_start_z.size() ? m_start_z[pos] : 1.0f                    );
+  btTransform start;
+  start.setOrigin(orig);
+  start.setRotation(btQuaternion(btVector3(0, 0, 1), 
+				 pos<m_start_heading.size() 
+				 ? DEGREE_TO_RAD(m_start_heading[pos]) : 0.0f ));
+  return start;
+}   // getStartTransform
 
 //-----------------------------------------------------------------------------
 /** Determines if a kart moving from sector OLDSEC to sector NEWSEC
@@ -450,7 +448,7 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
     if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
     unsigned int distance_sectors = abs(OLDSEC-NEWSEC);
     // Handle 'wrap around': if the distance is more than half the 
-    // number of driveline poins, assume it's a 'wrap around'
+    // number of driveline points, assume it's a 'wrap around'
     if(2*distance_sectors > (unsigned int)m_driveline.size())
         distance_sectors = (unsigned int)m_driveline.size() - distance_sectors;
     return (distance_sectors>stk_config->m_shortcut_segments);
@@ -467,7 +465,7 @@ void Track::addDebugToScene(int type) const
         for(unsigned int i = 0; i < m_driveline.size(); ++i)
         {
             sphere = new ssgaSphere;
-            sgCopyVec3(center, m_driveline[i]);
+            sgCopyVec3(center, m_driveline[i].toFloat());
             sphere->setCenter(center);
             sphere->setSize(getWidth()[i] / 4.0f);
         
@@ -495,10 +493,10 @@ void Track::addDebugToScene(int type) const
             // The segment display must be slightly higher than the
             // track, otherwise it's not clearly visible.
             sgVec3 v;
-            sgCopyVec3(v,m_left_driveline [i  ]); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[i  ]); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[ip1]); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_left_driveline [ip1]); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_left_driveline [i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_right_driveline[i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_right_driveline[ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,m_left_driveline [ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
             sgVec4 vc;
             vc[0] = i%2==0 ? 1.0f : 0.0f;
             vc[1] = 1.0f-v[0];
@@ -528,16 +526,15 @@ void Track::addDebugToScene(int type) const
 
 void Track::drawScaled2D(float x, float y, float w, float h) const
 {
-    sgVec2 sc;
-    sgSubVec2 ( sc, m_driveline_max, m_driveline_min );
+  float width = m_driveline_max.getX() - m_driveline_min.getX();
 
-    float sx = w / sc[0];
-    float sy = h / sc[1];
+    float sx = w / width;
+    float sy = h / ( m_driveline_max.getY()-m_driveline_min.getY() );
 
     if( sx > sy )
     {
         sx = sy;
-        x += w/2 - sc[0]*sx/2;
+        x += w/2 - width*sx/2;
     }
     else
     {
@@ -558,16 +555,16 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
 
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-      glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
-          y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy) ;
+      glVertex2f ( x + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+          y + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * sy) ;
 
-      glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
-          y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+      glVertex2f ( x + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+          y + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
     }
-    glVertex2f ( x + ( m_left_driveline[0][0] - m_driveline_min[0] ) * sx,
-        y + ( m_left_driveline[0][1] - m_driveline_min[1] ) * sy) ;
-    glVertex2f ( x + ( m_right_driveline[0][0] - m_driveline_min[0] ) * sx,
-        y + ( m_right_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+    glVertex2f ( x + ( m_left_driveline[0].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_left_driveline[0].getY() - m_driveline_min.getY() ) * sy) ;
+    glVertex2f ( x + ( m_right_driveline[0].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_right_driveline[0].getY() - m_driveline_min.getY() ) * sy ) ;
 
     glEnd () ;
 
@@ -585,35 +582,35 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
     for ( size_t i = 0 ; i < DRIVELINE_SIZE - 1 ; ++i )
     {
         /*Draw left driveline of the map*/
-        glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
-            y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+            y + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
 
-        glVertex2f ( x + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * sx,
-            y + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_left_driveline[i+1].getX() - m_driveline_min.getX() ) * sx,
+            y + ( m_left_driveline[i+1].getY() - m_driveline_min.getY() ) * sy ) ;
 
 
         /*Draw left driveline of the map*/
-        glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
-	        y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+	        y + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
 
-        glVertex2f ( x + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * sx,
-	        y + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_right_driveline[i+1].getX() - m_driveline_min.getX() ) * sx,
+	        y + ( m_right_driveline[i+1].getY() - m_driveline_min.getY() ) * sy ) ;
     }
 
     //Close the left driveline
-    glVertex2f ( x + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * sx,
-        y + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * sy ) ;
+    glVertex2f ( x + ( m_left_driveline[DRIVELINE_SIZE - 1].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_left_driveline[DRIVELINE_SIZE - 1].getY() - m_driveline_min.getY() ) * sy ) ;
 
-    glVertex2f ( x + ( m_left_driveline[0][0] - m_driveline_min[0] ) * sx,
-        y + ( m_left_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+    glVertex2f ( x + ( m_left_driveline[0].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_left_driveline[0].getY() - m_driveline_min.getY() ) * sy ) ;
 
 
     //Close the right driveline
-    glVertex2f ( x + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * sx,
-        y + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * sy ) ;
+    glVertex2f ( x + ( m_right_driveline[DRIVELINE_SIZE - 1].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_right_driveline[DRIVELINE_SIZE - 1].getY() - m_driveline_min.getY() ) * sy ) ;
 
-    glVertex2f ( x + ( m_right_driveline[0][0] - m_driveline_min[0] ) * sx,
-        y + ( m_right_driveline[0][1] - m_driveline_min[1] ) * sy ) ;
+    glVertex2f ( x + ( m_right_driveline[0].getX() - m_driveline_min.getX() ) * sx,
+        y + ( m_right_driveline[0].getY() - m_driveline_min.getY() ) * sy ) ;
     glEnd () ;
 
 #if 0
@@ -624,16 +621,16 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
-            y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+            y + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
     }
     glEnd () ;
 
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
-	        y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+        glVertex2f ( x + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+	        y + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
     }
     glEnd () ;
 #endif
@@ -642,11 +639,11 @@ void Track::drawScaled2D(float x, float y, float w, float h) const
     glBegin ( GL_POINTS ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-      glVertex2f ( x + ( m_left_driveline[i][0] - m_driveline_min[0] ) * sx,
-          y + ( m_left_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+      glVertex2f ( x + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+          y + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
 
-      glVertex2f ( x + ( m_right_driveline[i][0] - m_driveline_min[0] ) * sx,
-          y + ( m_right_driveline[i][1] - m_driveline_min[1] ) * sy ) ;
+      glVertex2f ( x + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * sx,
+          y + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * sy ) ;
     }
     glEnd () ;
 
@@ -667,7 +664,7 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     glDisable (GL_TEXTURE_2D);
 
     //TODO: maybe colors should be configurable, or at least the alpha value
-    glColor4f ( 1.0f,1.0f,1, 0.4f) ;
+    glColor4f ( 1.0f, 1.0f, 1.0f, 0.4f) ;
 
 
 /*FIXME: Too much calculations here, we should be generating scaled driveline arrays
@@ -678,15 +675,15 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     glBegin ( GL_QUAD_STRIP ) ;
 
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i ) {
-      glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-          y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y) ;
-      glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-          y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+      glVertex2f ( x_offset + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+          y_offset + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y) ;
+      glVertex2f ( x_offset + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+          y_offset + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     }
-    glVertex2f ( x_offset + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
-    glVertex2f ( x_offset + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[0].getX() - m_driveline_min.getX() ) * m_scale_x,
+        y_offset + ( m_left_driveline[0].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[0].getX() - m_driveline_min.getX() ) * m_scale_x,
+        y_offset + ( m_right_driveline[0].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
     glEnd () ;
 
@@ -706,35 +703,35 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     for ( size_t i = 0 ; i < DRIVELINE_SIZE - 1 ; ++i )
     {
         /*Draw left driveline of the map*/
-        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+            y_offset + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
-        glVertex2f ( x_offset + ( m_left_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
-            y_offset + ( m_left_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i+1].getX() - m_driveline_min.getX() ) * m_scale_x,
+            y_offset + ( m_left_driveline[i+1].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
 
         /*Draw left driveline of the map*/
-        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	        y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
-        glVertex2f ( x_offset + ( m_right_driveline[i+1][0] - m_driveline_min[0] ) * m_scale_x,
-	        y_offset + ( m_right_driveline[i+1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i+1].getX() - m_driveline_min.getX() ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i+1].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     }
 
     //Close the left driveline
-    glVertex2f ( x_offset + ( m_left_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_left_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[DRIVELINE_SIZE - 1].getX() - m_driveline_min.getX() ) * m_scale_x,
+		 y_offset + ( m_left_driveline[DRIVELINE_SIZE - 1].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
-    glVertex2f ( x_offset + ( m_left_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_left_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_left_driveline[0].getX() - m_driveline_min.getX() ) * m_scale_x,
+        y_offset + ( m_left_driveline[0].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
 
     //Close the right driveline
-    glVertex2f ( x_offset + ( m_right_driveline[DRIVELINE_SIZE - 1][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_right_driveline[DRIVELINE_SIZE - 1][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[DRIVELINE_SIZE - 1].getX() - m_driveline_min.getX() ) * m_scale_x,
+        y_offset + ( m_right_driveline[DRIVELINE_SIZE - 1].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
-    glVertex2f ( x_offset + ( m_right_driveline[0][0] - m_driveline_min[0] ) * m_scale_x,
-        y_offset + ( m_right_driveline[0][1] - m_driveline_min[1] ) * m_scale_y ) ;
+    glVertex2f ( x_offset + ( m_right_driveline[0].getX() - m_driveline_min.getX() ) * m_scale_x,
+        y_offset + ( m_right_driveline[0].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     glEnd () ;
 
 #if 0
@@ -745,16 +742,16 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+            y_offset + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     }
     glEnd () ;
 
     glBegin ( GL_LINE_LOOP ) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	        y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i].get() - m_driveline_min.getX() ) * m_scale_x,
+	        y_offset + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     }
     glEnd () ;
 #endif
@@ -766,11 +763,11 @@ void Track::draw2Dview (float x_offset, float y_offset) const
     glBegin ( GL_POINTS) ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
-        glVertex2f ( x_offset + ( m_left_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-            y_offset + ( m_left_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_left_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+            y_offset + ( m_left_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
 
-        glVertex2f ( x_offset + ( m_right_driveline[i][0] - m_driveline_min[0] ) * m_scale_x,
-	      y_offset + ( m_right_driveline[i][1] - m_driveline_min[1] ) * m_scale_y ) ;
+        glVertex2f ( x_offset + ( m_right_driveline[i].getX() - m_driveline_min.getX() ) * m_scale_x,
+	      y_offset + ( m_right_driveline[i].getY() - m_driveline_min.getY() ) * m_scale_y ) ;
     }
     glEnd () ;
 
@@ -902,21 +899,16 @@ Track::loadDriveline()
         "and the left driveline is " << m_left_driveline.size()
         << " vertex long. Track is " << m_name << " ." << std::endl;
 
-    SGfloat width;
-    sgVec3 center_point, width_vector;
     m_driveline.reserve(DRIVELINE_SIZE);
     m_path_width.reserve(DRIVELINE_SIZE);
     m_angle.reserve(DRIVELINE_SIZE);
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
-        sgAddVec3(center_point, m_left_driveline[i], m_right_driveline[i]);
-        sgScaleVec3(center_point, 0.5f);
+        Vec3 center_point = (m_left_driveline[i]+m_right_driveline[i])*0.5;
         m_driveline.push_back(center_point);
 
-        sgSubVec3(width_vector, m_right_driveline[i], center_point);
-        width = sgLengthVec3(width_vector);
-        if(width > 0.0f) m_path_width.push_back(width);
-        else m_path_width.push_back(-width);
+        float width = ( m_right_driveline[i] - center_point ).length();
+        m_path_width.push_back(width);
     }
 
     size_t next;
@@ -926,8 +918,8 @@ Track::loadDriveline()
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
         next = i + 1 >= DRIVELINE_SIZE ? 0 : i + 1;
-        adjacent_line = m_driveline[next][0] - m_driveline[i][0];
-        opposite_line = m_driveline[next][1] - m_driveline[i][1];
+        adjacent_line = m_driveline[next].getX() - m_driveline[i].getX();
+        opposite_line = m_driveline[next].getY() - m_driveline[i].getY();
 
         theta = sgATan(opposite_line/adjacent_line);
         theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
@@ -935,8 +927,8 @@ Track::loadDriveline()
         m_angle.push_back(theta);
     }
 
-    sgSetVec2 ( m_driveline_min,  SG_MAX/2.0f,  SG_MAX/2.0f ) ;
-    sgSetVec2 ( m_driveline_max, -SG_MAX/2.0f, -SG_MAX/2.0f ) ;
+    m_driveline_min = Vec3( SG_MAX/2.0f);
+    m_driveline_max = Vec3(-SG_MAX/2.0f);
 
 
     m_distance_from_start.reserve(DRIVELINE_SIZE);
@@ -946,40 +938,19 @@ Track::loadDriveline()
         //Both drivelines must be checked to get the true size of
         //the drivelines, and using the center driveline is not
         //good enough.
-        if ( m_right_driveline[i][0] < m_driveline_min[0] )
-            m_driveline_min[0] = m_right_driveline[i][0] ;
-        if ( m_right_driveline[i][1] < m_driveline_min[1] )
-            m_driveline_min[1] = m_right_driveline[i][1] ;
-        if ( m_right_driveline[i][0] > m_driveline_max[0] )
-            m_driveline_max[0] = m_right_driveline[i][0] ;
-        if ( m_right_driveline[i][1] > m_driveline_max[1] )
-            m_driveline_max[1] = m_right_driveline[i][1] ;
-
-        if ( m_left_driveline[i][0] < m_driveline_min[0] )
-            m_driveline_min[0] = m_left_driveline[i][0] ;
-        if ( m_left_driveline[i][1] < m_driveline_min[1] )
-            m_driveline_min[1] = m_left_driveline[i][1] ;
-        if ( m_left_driveline[i][0] > m_driveline_max[0] )
-            m_driveline_max[0] = m_left_driveline[i][0] ;
-        if ( m_left_driveline[i][1] > m_driveline_max[1] )
-            m_driveline_max[1] = m_left_driveline[i][1] ;
-
+        m_driveline_min.min(m_right_driveline[i]);
+        m_driveline_min.min(m_left_driveline[i] );
+        m_driveline_max.max(m_right_driveline[i]);
+        m_driveline_max.max(m_left_driveline[i] );
 
         m_distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
-
-        if ( i == DRIVELINE_SIZE - 1 )
-            d += sgDistanceVec2 ( m_driveline[i], m_driveline[0] ) ;
-        else
-            d += sgDistanceVec2 ( m_driveline[i], m_driveline[i+1] ) ;
+        d += (m_driveline[i]-m_driveline[ i==DRIVELINE_SIZE-1 ? 0 : i+1 ]).length();
     }
-
     m_total_distance = d;
+    Vec3 sc = m_driveline_max - m_driveline_min;
 
-    sgVec2 sc ;
-    sgSubVec2 ( sc, m_driveline_max, m_driveline_min ) ;
-
-    m_scale_x = m_track_2d_width  / sc[0] ;
-    m_scale_y = m_track_2d_height / sc[1] ;
+    m_scale_x = m_track_2d_width  / sc.getX();
+    m_scale_y = m_track_2d_height / sc.getY();
 
     if(!m_do_stretch) m_scale_x = m_scale_y = std::min(m_scale_x, m_scale_y);
     
@@ -987,7 +958,7 @@ Track::loadDriveline()
 
 //-----------------------------------------------------------------------------
 void
-Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string& file_ext)
+Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ext)
 {
     std::string path = file_manager->getTrackFile(m_ident+file_ext);
     FILE *fd = fopen ( path.c_str(), "r" ) ;
@@ -1022,13 +993,10 @@ Track::readDrivelineFromFile(std::vector<sgVec3Wrapper>& line, const std::string
             throw std::runtime_error(msg);
         }
 
-        sgVec3 point;
-        point[0] = x;
-        point[1] = y;
-        point[2] = z;
+        Vec3 point(x,y,z);
 
-        if(prev_sector != UNKNOWN_SECTOR) prev_distance = sgDistanceVec2(
-            point, line[prev_sector] );
+        if(prev_sector != UNKNOWN_SECTOR) 
+            prev_distance = (point-line[prev_sector]).length2_2d();
 
         //1.5f was choosen because it's more or less the length of the tuxkart
         if(prev_distance < 0.0000001)
@@ -1354,7 +1322,8 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
     // Time trial does not have any red herrings
     if(type==HE_RED && race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
         return;
-    herring_manager->newHerring(type, xyz);
+    Vec3 loc((*xyz));
+    herring_manager->newHerring(type, loc);
 }   // herring_command
 
 // ----------------------------------------------------------------------------

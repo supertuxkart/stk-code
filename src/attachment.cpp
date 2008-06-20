@@ -69,8 +69,8 @@ void Attachment::hitGreenHerring()
     float leftover_time   = 0.0f;
     switch(getType())   // If there already is an attachment, make it worse :)
     {
-    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getPos());
-                       m_kart->handleExplosion(m_kart->getPos(), /*direct_hit*/ true);
+    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getXYZ());
+                       m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
                        clear();
                        random_attachment = rand()%3;
                        break;
@@ -139,8 +139,8 @@ void Attachment::update(float dt)
     case ATTACH_MAX:       break;
     case ATTACH_BOMB:      if(m_time_left<=0.0) 
                            {
-                               projectile_manager->newExplosion(m_kart->getPos());
-                               m_kart->handleExplosion(m_kart->getPos(), 
+                               projectile_manager->newExplosion(m_kart->getXYZ());
+                               m_kart->handleExplosion(m_kart->getXYZ(), 
                                                        /*direct_hit*/ true);
                            }
                            break;

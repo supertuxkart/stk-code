@@ -62,8 +62,9 @@ protected:
     KartControl  m_controls;           // The position of the karts controls
     int          m_track_sector;       // index in driveline, special values
                                        // e.g. UNKNOWN_SECTOR can be negative!
-    sgVec2       m_last_track_coords;
-    sgVec3       m_curr_track_coords;
+    btTransform  m_reset_transform;    // reset position
+    Vec3         m_curr_track_coords;
+    Vec3         m_last_track_coords;
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
@@ -114,11 +115,11 @@ protected:
     void  load_wheels          (ssgBranch* obj);
 
 public:
-                   Kart(const std::string& kart_name, int position_, 
-                        sgCoord init_pos);
+                   Kart(const std::string& kart_name, int position, 
+                        const btTransform& init_transform);
     virtual       ~Kart();
     void           loadData();
-    void           placeModel ();
+    virtual void   updateGraphics      (const Vec3& off_xyz,  const Vec3& off_hpr);
     const KartProperties* 
                    getKartProperties   () const      { return m_kart_properties; }
     void           setKartProperties   (const KartProperties *kp)
@@ -130,8 +131,8 @@ public:
     virtual void   setPosition         (int p)    
                                           { m_race_position = p;                 }
     int            getSector           () const { return m_track_sector;         }
-    float          getDistanceDownTrack() const { return m_curr_track_coords[1]; }
-    float          getDistanceToCenter () const { return m_curr_track_coords[0]; }
+    float          getDistanceDownTrack() const { return m_curr_track_coords.getY(); }
+    float          getDistanceToCenter () const { return m_curr_track_coords.getX(); }
     Attachment    *getAttachment       ()       { return &m_attachment;          }
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
                                         Kart*k=NULL)
@@ -204,7 +205,7 @@ public:
     void           resetBrakes      ();
     void           adjustSpeedWeight(float f);
     void           forceRescue      (bool is_rescue=false);
-    void           handleExplosion  (const btVector3& pos, bool direct_hit);
+    void           handleExplosion  (const Vec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     virtual int    isPlayerKart     () const {return 0;                        }

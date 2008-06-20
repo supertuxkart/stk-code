@@ -34,7 +34,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_context  = new ssgContext ;
     m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
-    m_xyz      = kart->getPos();
+    m_xyz      = kart->getXYZ();
     m_hpr      = Vec3(0,0,0);
 
     // FIXME: clipping should be configurable for slower machines
@@ -121,7 +121,7 @@ void Camera::reset()
 {
     setMode(CM_NORMAL);
     m_last_pitch = 0.0f;
-    m_xyz        = m_kart->getPos();
+    m_xyz        = m_kart->getXYZ();
     m_hpr        = Vec3(0,0,0);
 }   // reset
 
@@ -142,7 +142,7 @@ void Camera::update (float dt)
     else
     {
         kart     = m_kart;
-        kart_hpr = kart->getRotation();
+        kart_hpr = kart->getHPR();
         // Use the terrain pitch to avoid the camera following a wheelie the kart is doing
         kart_hpr.setPitch( m_kart->getTerrainPitch(kart_hpr.getHeading()) );
         kart_hpr.setRoll(0.0f);
@@ -159,7 +159,7 @@ void Camera::update (float dt)
             kart_hpr.setPitch(m_last_pitch);
         }   //  dt>0.0
     }   // m_mode!=CM_LEADER_MODE
-    kart_xyz = kart->getPos();
+    kart_xyz = kart->getXYZ();
     if(m_mode==CM_SIMPLE_REPLAY) kart_hpr.setHeading(0.0f);
 
     // Set the camera position relative to the kart

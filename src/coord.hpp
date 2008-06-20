@@ -5,7 +5,7 @@
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 2
+//  as published by the Free Software Foundation; either version 3
 //  of the License, or (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
@@ -58,9 +58,11 @@ public:
         setSgCoord();
     }   // Coord
     // ------------------------------------------------------------------------
-    const sgCoord& toSgCoord() const { return m_coord; }
-    const Vec3&    getXYZ()    const { return m_xyz;   }
-    const Vec3&    getHPR()    const { return m_hpr;   }
+    const sgCoord& toSgCoord() const     { return m_coord;          }
+    const Vec3&    getXYZ()    const     { return m_xyz;            }
+    const Vec3&    getHPR()    const     { return m_hpr;            }
+    void           setHPR(const Vec3& a) { m_hpr = a; setSgCoord(); }
+    void           setXYZ(const Vec3& a) { m_xyz = a; setSgCoord(); }
 };   // Coord
 
 #endif

@@ -1,8 +1,4 @@
 //  $Id: vec3.hpp 1954 2008-05-20 10:01:26Z scifly $
-//
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
-//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -36,6 +32,7 @@ public:
                    inline Vec3()                   : btVector3()       {}
                    inline Vec3(float x, float y, float z) 
                                                    : btVector3(x,y,z)  {}
+                   inline Vec3(float x)            : btVector3(x,x,x)  {}
 
     void                  setHPR(const btMatrix3x3& m);
     inline const float    operator[](int n) const         {return *(&m_x+n); }
@@ -49,5 +46,17 @@ public:
     void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}
+    Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
+    // Helper functions to treat this vec3 as a 2d vector:
+    float          length2_2d()                    {return m_x*m_x + m_y*m_y;}
+    float          length_2d()                     {return sqrt(m_x*m_x + m_y*m_y);}
+    void           max(const Vec3& a)              {if(a.getX()>m_x) m_x=a.getX();
+                                                    if(a.getY()>m_y) m_y=a.getY();
+                                                    if(a.getZ()>m_z) m_z=a.getZ();}
+    void           min(const Vec3& a)              {if(a.getX()<m_x) m_x=a.getX();
+                                                    if(a.getY()<m_y) m_y=a.getY();
+                                                    if(a.getZ()<m_z) m_z=a.getZ();}
 };    // Vec3
+
+
 #endif

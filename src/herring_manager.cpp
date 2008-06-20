@@ -195,7 +195,7 @@ void HerringManager::setDefaultHerringStyle()
 }   // setDefaultHerringStyle
 
 //-----------------------------------------------------------------------------
-Herring* HerringManager::newHerring(herringType type, sgVec3* xyz)
+Herring* HerringManager::newHerring(herringType type, const Vec3& xyz)
 {
     Herring* h = new Herring(type, xyz, m_herring_model[type]);
     m_all_herrings.push_back(h);
