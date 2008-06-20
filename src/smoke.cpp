@@ -57,13 +57,14 @@ void Smoke::particle_create(int, Particle *p)
     p -> m_size = .5f;
     p -> m_time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
 
-    const sgCoord* POS = m_kart->getCoord();
+    const Vec3& hpr = m_kart->getHPR();
+    const Vec3& xyz = m_kart->getXYZ();
     const btVector3 VEL = m_kart->getVelocity();
 
-    const float X_DIRECTION = sgCos (POS->hpr[0] - 90.0f); // Point at the rear
-    const float Y_DIRECTION = sgSin (POS->hpr[0] - 90.0f); // Point at the rear
+    const float X_DIRECTION = cos (hpr.getHeading() - M_PI*0.5f); // Point at the rear
+    const float Y_DIRECTION = sin (hpr.getHeading() - M_PI*0.5f); // Point at the rear
 
-    sgCopyVec3 (p->m_pos, POS->xyz);
+    sgCopyVec3 (p->m_pos, xyz.toFloat());
 
     p->m_pos[0] += X_DIRECTION * 0.7f;
     p->m_pos[1] += Y_DIRECTION * 0.7f;
@@ -77,7 +78,7 @@ void Smoke::particle_create(int, Particle *p)
     p->m_vel[1] += sgSin ((float)(rand()%180));
     p->m_vel[2] += sgSin ((float)(rand()%100));
 
-    getBSphere () -> setCenter ( POS->xyz[0], POS->xyz[1], POS->xyz[2] ) ;
+    getBSphere()->setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
 }   // particle_create
 
 //-----------------------------------------------------------------------------

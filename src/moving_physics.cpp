@@ -197,20 +197,14 @@ void MovingPhysics::update(float dt)
 {
     btTransform t;
     m_motion_state->getWorldTransform(t);
-    float m[4][4];
-    t.getOpenGLMatrix((float*)&m);
-    
-    // Transfer the new position and hpr to curr_pos
-    sgCoord curr_pos;
-    sgSetCoord(&curr_pos, m);
-    if(curr_pos.xyz[2]<-100)
+    Coord c(t);
+    if(c.getXYZ().getZ()<-100)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
-        curr_pos.xyz[0]=m_init_pos.getOrigin().getX();
-        curr_pos.xyz[1]=m_init_pos.getOrigin().getY();
-        curr_pos.xyz[2]=m_init_pos.getOrigin().getZ();
+	c.setXYZ(m_init_pos.getOrigin());
     }
-    setTransform(&curr_pos);
+
+    setTransform(const_cast<sgCoord*>(&c.toSgCoord()));
 
 }   // update
 // -----------------------------------------------------------------------------
