@@ -51,7 +51,7 @@ SoundManager::SoundManager() : m_sfxs(NUM_SOUNDS)
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
     {
-        fprintf(stderr, "WARNING: Could open the default sound device.\n");
+        fprintf(stderr, "WARNING: Could not open the default sound device.\n");
         m_initialized = false;
     }
     else
@@ -61,7 +61,7 @@ SoundManager::SoundManager() : m_sfxs(NUM_SOUNDS)
 
         if( context == NULL )
         {
-            fprintf(stderr, "WARNING: Could create a sound context.\n");
+            fprintf(stderr, "WARNING: Could not create a sound context.\n");
             m_initialized = false;
         }
         else
