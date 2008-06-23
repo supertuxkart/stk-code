@@ -38,10 +38,15 @@
 enum WidgetTokens
 {
     WTOK_TITLE,
-    WTOK_NAME,
 
     WTOK_QUIT,
-    WTOK_RACER0
+    WTOK_EMPTY_UP,
+    WTOK_UP,
+    WTOK_EMPTY_DOWN,
+    WTOK_DOWN,
+    WTOK_EMPTY0 = 10,
+    WTOK_NAME0  = 20,
+    WTOK_RACER0 = 30
 };
 
 CharSel::CharSel(int whichPlayer)
@@ -62,7 +67,7 @@ CharSel::CharSel(int whichPlayer)
         kart_properties_manager->m_selected_karts.clear();
 
     if (m_player_index < (int)kart_properties_manager->m_selected_karts.size())
-    kart_properties_manager->m_selected_karts.pop_back();
+        kart_properties_manager->m_selected_karts.pop_back();
 
     char heading[MAX_MESSAGE_LENGTH];
     snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
@@ -73,26 +78,50 @@ CharSel::CharSel(int whichPlayer)
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
     widget_manager->breakLine();
 
-    for (unsigned int i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    m_num_entries = 0;
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
     {
-        // Check if i has been previously selected
-        if (kartAvailable(i))
+        if(kartAvailable(i))
         {
-            const KartProperties* kp= kart_properties_manager->getKartById(i);
-            if(unlock_manager->isLocked(kp->getIdent())) continue;
-
-            widget_manager->addImgButtonWgt( WTOK_RACER0 + i, 8, 11,
-                                             kp->getIconFile() );
+            m_indexAvailKart.push_back(i);
+            m_num_entries++;
         }
     }
+    if(m_num_entries>7) m_num_entries = 7;
+
+    const int HEIGHT = 10;
+    widget_manager->addEmptyWgt(WTOK_EMPTY_UP, computeIndent(0), HEIGHT/2);
+    widget_manager->addTextButtonWgt(WTOK_UP, 20, HEIGHT/2, "^");
+    widget_manager->breakLine();
+
+
+    int indx;
+    const KartProperties* kp;
+
+    for (unsigned int i = 0; i < m_num_entries; i++)
+    {
+        indx = m_indexAvailKart[i];
+        kp = kart_properties_manager->getKartById(indx);
+        widget_manager->addEmptyWgt( WTOK_EMPTY0+i, computeIndent(i), HEIGHT );
+        widget_manager->addImgButtonWgt(WTOK_RACER0 + i, 8, HEIGHT,
+            kp->getIconFile() );
+        widget_manager->addTextButtonWgt(WTOK_NAME0+i, 30, HEIGHT, kp->getName());
+        widget_manager->setWgtTextSize(WTOK_NAME0+i, WGT_FNT_SML);
+        widget_manager->breakLine();
+    }
+
+    m_offset = 0;
+    updateScrollPosition();
+
+    widget_manager->addEmptyWgt(WTOK_EMPTY_DOWN, computeIndent(m_num_entries), HEIGHT/2);
+    widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
+    widget_manager->breakLine();
 
     widget_manager->breakLine();
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
     widget_manager->breakLine();
 
-    widget_manager->addTextWgt( WTOK_NAME, 30, 7, "");
-
-    widget_manager->layout(WGT_AREA_TOP);
+    widget_manager->layout(WGT_AREA_RGT);
 
     m_current_kart = -1;
 
@@ -107,11 +136,11 @@ CharSel::CharSel(int whichPlayer)
         switchCharacter(0);
     }
 
-
-    m_clock = 0;
+    m_offset = 0;
+    m_clock  = 0;
     //test
 
-}
+}   // CharSel
 
 //-----------------------------------------------------------------------------
 CharSel::~CharSel()
@@ -120,16 +149,30 @@ CharSel::~CharSel()
     ssgDeRefDelete(m_kart);
 
     delete m_context;
-}
+}   // ~CharSel
+
+//-----------------------------------------------------------------------------
+void CharSel::updateScrollPosition()
+{
+    for(unsigned int i=0; i<m_num_entries; i++)
+    {
+        int indx = (i+m_offset) % m_indexAvailKart.size();
+        indx     = m_indexAvailKart[indx];
+
+        const KartProperties* kp= kart_properties_manager->getKartById(indx);
+
+        if(unlock_manager->isLocked(kp->getIdent())) continue;
+        widget_manager->setWgtText(WTOK_NAME0 + i, kp->getName());
+        widget_manager->setWgtTexture(WTOK_RACER0 + i, kp->getIconFile() );
+    }   // for i
+}   // updateScrollPosition<
 
 //-----------------------------------------------------------------------------
 void CharSel::switchCharacter(int n)
 {
-    const KartProperties* kp= kart_properties_manager->getKartById(n);
+    const KartProperties* kp= kart_properties_manager->getKartById(m_indexAvailKart[n]);
     if (m_current_kart != n && kp != NULL)
     {
-        widget_manager->setWgtText( WTOK_NAME, kp->getName().c_str());
-
         m_current_kart = n;
         ssgDeRefDelete(m_kart);
         m_kart = new ssgTransform;
@@ -138,7 +181,7 @@ void CharSel::switchCharacter(int n)
 
         m_kart->addKid(kartentity);
     }
-}
+}   // switchCharacter
 
 //-----------------------------------------------------------------------------
 void CharSel::update(float dt)
@@ -147,7 +190,10 @@ void CharSel::update(float dt)
 
     if( widget_manager->selectionChanged() )
     {
-        switchCharacter(widget_manager->getSelectedWgt() - WTOK_RACER0);
+        int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
+        if(token<0 || token>(int)m_num_entries)
+            token = widget_manager->getSelectedWgt() - WTOK_NAME0;
+        switchCharacter((token+m_offset)%kart_properties_manager->getNumberOfKarts());
     }
 
     if (m_kart != NULL)
@@ -161,7 +207,7 @@ void CharSel::update(float dt)
         // applying a big camera FOV.
         int w = user_config->m_width;
         int h = user_config->m_height;
-        glViewport ( 0, 0, w, h);
+        glViewport ( 0, h*1/4, (int)(0.7f*w), (int)(0.7f*h));
 
         m_context -> setFOV ( 65.0f, 65.0f * h/w ) ;
         m_context -> setNearFar ( 0.05f, 1000.0f ) ;
@@ -183,20 +229,42 @@ void CharSel::update(float dt)
     }
 
     widget_manager->update(dt);
-}
+}   // update
 
 //----------------------------------------------------------------------------
 void CharSel::select()
 {
-    const int TOKEN = widget_manager->getSelectedWgt() - WTOK_RACER0;
-    const KartProperties* KP = kart_properties_manager->getKartById(TOKEN);
+    int wgt = widget_manager->getSelectedWgt();
+    if(wgt==WTOK_UP)
+    {
+        m_offset--;
+        if(m_offset < 0) m_offset = m_indexAvailKart.size() - 1;
+        updateScrollPosition();
+        return;
+    }
+    if(wgt==WTOK_DOWN)
+    {
+        m_offset++;
+        if( m_offset >= (int)m_indexAvailKart.size() ) m_offset=0;
+        updateScrollPosition();
+        return;
+    }
+    int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
+    if(token<0 || token>(int)m_num_entries)
+    {
+        token = widget_manager->getSelectedWgt() - WTOK_NAME0;
+    }
+    token = (token+m_offset) % m_indexAvailKart.size();
+    int kart_id = m_indexAvailKart[token];
+    const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
     if (KP != NULL)
     {
+        printf("selecting kart %s\n",KP->getIdent().c_str());
         race_manager->setPlayerKart(m_player_index, KP->getIdent());
-        user_config->m_player[m_player_index].setLastKartId(TOKEN);
-        // Add selected kart (TOKEN) to selected karts vector so it cannot be
+        user_config->m_player[m_player_index].setLastKartId(kart_id);
+        // Add selected kart (token) to selected karts vector so it cannot be
         // selected again
-        kart_properties_manager->m_selected_karts.push_back(TOKEN);
+        kart_properties_manager->m_selected_karts.push_back(kart_id);
     }
 
     if (race_manager->getNumPlayers() > 1)
@@ -249,4 +317,4 @@ bool CharSel::kartAvailable(int kart)
             }
         }
     return true;
-}
+}   // kartAvailable

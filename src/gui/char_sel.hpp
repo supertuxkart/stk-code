@@ -20,6 +20,7 @@
 #ifndef HEADER_CHARSEL_H
 #define HEADER_CHARSEL_H
 
+#include <vector>
 #include "base_gui.hpp"
 
 class ssgTransform;
@@ -28,15 +29,18 @@ class ssgContext;
 class CharSel: public BaseGUI
 {
 private:
-    ssgContext* m_context;
-    ssgTransform* m_kart;
-    int m_current_kart;
-    float m_clock;
-
-    int m_player_index;
+    ssgContext      *m_context;
+    ssgTransform    *m_kart;
+    int              m_current_kart;
+    float            m_clock;
+    int              m_player_index;
+    int              m_offset;        // index of first racer displayed
+    unsigned int     m_num_entries;   // number of entries to display
+    std::vector<int> m_indexAvailKart;
     
-    bool kartAvailable(int kart);
-
+    bool             kartAvailable(int kart);
+    void             updateScrollPosition();
+    int              computeIndent(int n) {return 40+abs((m_num_entries-1)/2 - n)*3;}
 public:
     CharSel(int which_player);
     ~CharSel();
