@@ -79,6 +79,7 @@ private:
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
+    int   m_collided;           // true if the kart collided with the track
 
     float m_time_since_last_shot;
     int   m_future_sector;
@@ -132,6 +133,7 @@ public:
 
     void update      (float delta) ;
     void reset       ();
+    virtual void crashed() {m_collided = true;};
 };
 
 #endif

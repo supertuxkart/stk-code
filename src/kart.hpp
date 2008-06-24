@@ -50,6 +50,11 @@ class Smoke;
 
 class Kart : public TerrainInfo, public Moveable
 {
+private:
+    btTransform  m_reset_transform;    // reset position
+    Vec3         m_curr_track_coords;
+    Vec3         m_last_track_coords;
+
 protected:
     bool         m_on_road;            // true if the kart is on top of the
                                        // road path drawn by the drivelines
@@ -62,9 +67,6 @@ protected:
     KartControl  m_controls;           // The position of the karts controls
     int          m_track_sector;       // index in driveline, special values
                                        // e.g. UNKNOWN_SECTOR can be negative!
-    btTransform  m_reset_transform;    // reset position
-    Vec3         m_curr_track_coords;
-    Vec3         m_last_track_coords;
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;

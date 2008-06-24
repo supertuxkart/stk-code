@@ -37,22 +37,19 @@ class Moveable
 {
 private:
     btVector3     m_velocityLC;      /* velocity in kart coordinates                */
+    btTransform   m_transform;
+    Vec3          m_hpr;
 protected:
     UserPointer   m_user_pointer;
     sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
     Material*     m_material_hot;    /* Material at HOT                             */
     ssgTransform* m_model_transform;            // The transform where the model is under
     ssgTransform* m_shadow;
-    int           m_collided;
-    int           m_crashed;
-    sgVec3        m_surface_avoidance_vector ;
     int           m_first_time ;
     sgCoord*      m_history_velocity;
     sgCoord*      m_history_position;
     btRigidBody*          m_body;
     btDefaultMotionState* m_motion_state;
-    btTransform   m_transform;
-    Vec3          m_hpr;
 public:
 
     Moveable (bool bHasHistory=false);
@@ -84,7 +81,7 @@ public:
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape);
     const btTransform&  getTrans() const {return m_transform;}
-    void          setTrans  (btTransform& t){m_transform=t;m_motion_state->setWorldTransform(t);}
+    void          setTrans  (const btTransform& t){m_transform=t;m_motion_state->setWorldTransform(t);}
 }
 ;   // class Moveable
 

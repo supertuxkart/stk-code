@@ -130,6 +130,7 @@ void DefaultRobot::update( float delta )
 
     /*And obviously general kart stuff*/
     AutoKart::update( delta );
+    m_collided = false;
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -175,7 +176,7 @@ void DefaultRobot::handle_braking()
             //if the curve angle is bigger than what the kart can steer, brake
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
-            if(!(m_curr_track_coords[0] > world->m_track->
+            if(!(getDistanceToCenter() > world->m_track->
                 getWidth()[m_track_sector] * -CURVE_INSIDE_PERC ||
                 m_curve_angle > getMaxSteerAngle()))
             {
@@ -185,7 +186,7 @@ void DefaultRobot::handle_braking()
         }
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
-            if(!(m_curr_track_coords[0] < world->m_track->
+            if(!(getDistanceToCenter() < world->m_track->
                 getWidth()[m_track_sector] * CURVE_INSIDE_PERC ||
                 m_curve_angle < -getMaxSteerAngle()))
             {
@@ -226,7 +227,7 @@ void DefaultRobot::handle_steering()
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_curr_track_coords[0]) + 0.5 >
+    if( fabsf(getDistanceToCenter()) + 0.5 >
         world->m_track->getWidth()[m_track_sector] )
     {
         steer_angle = steer_to_point( world->m_track->
@@ -254,7 +255,7 @@ void DefaultRobot::handle_steering()
         }
         else
         {
-            if(m_curr_track_coords[0] > world->getKart(m_crashes.m_kart)->
+            if(getDistanceToCenter() > world->getKart(m_crashes.m_kart)->
                getDistanceToCenter())
             {
                 steer_angle = steer_to_angle( NEXT_SECTOR, -90.0f );
@@ -496,8 +497,8 @@ void DefaultRobot::handle_rescue(const float DELTA)
     //TODO: check if we collided against a dynamic object (ej.:kart) or
     //against the track's static object.
     //The m_crash_time measures if a kart has been crashing for too long
-    m_crash_time += (m_collided && isOnGround()) ? 3.0f * DELTA : -0.25f * DELTA;
 
+    m_crash_time += (m_collided && isOnGround()) ? 3.0f * DELTA : -0.25f * DELTA;
     if( m_crash_time < 0.0f ) m_crash_time = 0.0f;
 
     //Reaction to being stuck
@@ -780,8 +781,9 @@ void DefaultRobot::reset()
 
     m_future_sector = 0;
     m_time_till_start = -1.0f;
-
     m_crash_time = 0.0f;
+    m_collided = false;
+
 
     m_time_since_stuck     = 0.0f;
 

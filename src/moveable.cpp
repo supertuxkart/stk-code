@@ -65,8 +65,6 @@ Moveable::~Moveable()
 // The reset position must be set before calling reset
 void Moveable::reset ()
 {
-    m_collided         = false;
-    m_crashed          = false;
     m_material_hot     = NULL;
     m_normal_hot       = NULL;
     if(m_body)

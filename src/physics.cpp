@@ -213,14 +213,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
-                // FIXME: sound disabled for now, since the chassis of the karts hits
-                //        the track when accelerating, causing a constant crash sfx
-                //        to be played. Might be fixed with better physics parameters
-                //upB->getPointerKart()->crashed();
-#if defined(WIN32) && !defined(__CYGWIN__)
-                0  // avoid VS compiler warning while the above statement is commented out
-#endif
-                 ;
+                upB->getPointerKart()->crashed();
         }
         // 2) object a is a kart
         // =====================

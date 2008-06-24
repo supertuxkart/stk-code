@@ -208,9 +208,13 @@ void PlayerKart::crashed()
     // noise by playing the crash sound over and over again. To prevent
     // this, the crash sound is only played if there was at least 0.5
     // seconds since the last time it was played (for this kart)
+
     if(world->getTime() - m_time_last_crash_sound > 0.5f) 
     {
-        sound_manager->playSfx( SOUND_CRASH );
+        // FIXME: sound disabled for now, since the chassis of the karts hits
+        //        the track when accelerating, causing a constant crash sfx
+        //        to be played. Might be fixed with better physics parameters
+        //sound_manager->playSfx( SOUND_CRASH );
         m_time_last_crash_sound = world->getTime();
     }
 }   // crashed

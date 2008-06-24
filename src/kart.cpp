@@ -318,7 +318,7 @@ void Kart::reset()
     // Set the brakes so that karts don't slide downhill
     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
 
-    m_transform = m_reset_transform;
+    setTrans(m_reset_transform);
 
     world->m_track->findRoadSector(getXYZ(), &m_track_sector);
 
