@@ -36,7 +36,7 @@ class Herring
 private:
     herringType   m_type;         // Herring type
     bool          m_eaten;        // true if herring  was eaten & is not displayed
-    float         m_time_to_return;  // world->clock when an eaten herring reappears
+    float         m_time_till_return;  // time till an eaten herring reappears
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // eaten herrings reappear.
     ssgTransform* m_root;         // The actual root of the herring

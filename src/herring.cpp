@@ -27,10 +27,10 @@
 Herring::Herring(herringType type, const Vec3& xyz, ssgEntity* model) 
         : m_coord(xyz, Vec3(0, 0, 0))
 {
-    m_type           = type;
-    m_eaten          = false;
-    m_time_to_return = 0.0f;  // not strictly necessary, see isEaten()
-    m_root           = new ssgTransform();
+    m_type             = type;
+    m_eaten            = false;
+    m_time_till_return = 0.0f;  // not strictly necessary, see isEaten()
+    m_root             = new ssgTransform();
     m_root->ref();
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
@@ -47,8 +47,8 @@ Herring::~Herring()
 //-----------------------------------------------------------------------------
 void Herring::reset()
 {
-    m_eaten         = false;
-    m_time_to_return = 0.0f;
+    m_eaten            = false;
+    m_time_till_return = 0.0f;
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 }   // reset
 
@@ -63,12 +63,13 @@ void Herring::update(float delta)
 {
     if(m_eaten)
     {
-        const float T = m_time_to_return - world->getTime();
-        if ( T > 0 )
+        m_time_till_return -= delta;
+        if ( m_time_till_return > 0 )
         {
-	  Vec3 hell(m_coord.getXYZ());
+            Vec3 hell(m_coord.getXYZ());
 
-            hell.setZ( (T>1.0f) ? -1000000.0f : m_coord.getXYZ().getZ() - T / 2.0f);
+            hell.setZ( (m_time_till_return>1.0f) ? -1000000.0f 
+		       : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
             m_root->setTransform(hell.toFloat());
         }
         else
@@ -90,7 +91,7 @@ void Herring::update(float delta)
 //-----------------------------------------------------------------------------
 void Herring::isEaten()
 {
-    m_eaten=true;
-    m_time_to_return=world->getTime()+2.0f;
+    m_eaten            = true;
+    m_time_till_return = 2.0f;
 }
 
