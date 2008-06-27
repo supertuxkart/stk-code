@@ -137,7 +137,7 @@ void Camera::update (float dt)
     if(m_mode==CM_LEADER_MODE)
     {
         kart     = world->getKart(0);
-        kart_hpr = kart->getRotation();
+        kart_hpr = kart->getHPR();
     }
     else
     {
