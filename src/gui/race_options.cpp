@@ -56,8 +56,17 @@ RaceOptions::RaceOptions()
     m_difficulty=race_manager->getDifficulty();
     // FIXME: no medium AI atm
     if(m_difficulty==RaceManager::RD_MEDIUM) m_difficulty=RaceManager::RD_HARD;
-    m_num_karts=race_manager->getNumKarts();
     m_num_laps=race_manager->getNumLaps();
+    // Determine the minimum number of karts
+    m_min_karts = (int)race_manager->getNumPlayers();
+    if(race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER)
+    {
+        // if playing follow the leader single mode, there should be at
+        // least one opponent in addition to the leader
+        m_min_karts += (race_manager->getNumPlayers()==1 ? 2 : 1);
+    }
+    m_num_karts=std::max((int)race_manager->getNumKarts(), m_min_karts);
+
 
     const int DESC_WIDTH=48;
     const int ITEM_WIDTH=35;
@@ -191,7 +200,8 @@ void RaceOptions::select()
 
         case WTOK_KARTS_UP:
             {
-                m_num_karts = std::min( stk_config->m_max_karts, m_num_karts + 1 );
+	        m_num_karts = m_num_karts==stk_config->m_max_karts 
+                            ? m_min_karts : m_num_karts + 1;
 
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_karts );
@@ -202,17 +212,8 @@ void RaceOptions::select()
 
         case WTOK_KARTS_DOWN:
             {
-                // Follow the leader needs at least three karts
-                if(race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER)
-                {
-                    m_num_karts = std::max( 3, m_num_karts - 1 );
-                }
-                else
-                {
-                    m_num_karts = std::max( (int)race_manager->getNumPlayers(),
-                        m_num_karts - 1 );
-                }
-
+                m_num_karts = m_num_karts==m_min_karts 
+                            ? stk_config->m_max_karts : m_num_karts-1;
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_karts );
 
@@ -222,7 +223,8 @@ void RaceOptions::select()
 
         case WTOK_LAPS_UP:
             {
-                m_num_laps = std::min( 10, m_num_laps + 1 );
+                m_num_laps++;
+                if(m_num_laps>10) m_num_laps=1;
 
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );
@@ -233,7 +235,8 @@ void RaceOptions::select()
 
         case WTOK_LAPS_DOWN:
             {
-                m_num_laps = std::max( 1, m_num_laps - 1 );
+	        m_num_laps--;
+		if(m_num_laps<1) m_num_laps=10;
 
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );

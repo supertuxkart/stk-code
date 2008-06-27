@@ -25,6 +25,7 @@ class RaceOptions: public BaseGUI
 private:
     int m_difficulty;
     int m_num_karts;
+    int m_min_karts;         // minimum number of karts, depending on mode etc.
     int m_num_laps;
     const char *getDifficultyString(int) const;
 public:
