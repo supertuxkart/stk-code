@@ -844,6 +844,7 @@ void Track::loadTrack(std::string filename_)
     // set the flag that the track has final camera position
     m_has_final_camera  = LISP->get("camera-final-position", m_camera_final_position);
     m_has_final_camera &= LISP->get("camera-final-hpr",      m_camera_final_hpr);
+    m_camera_final_hpr.degreeToRad();
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
