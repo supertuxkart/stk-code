@@ -110,9 +110,6 @@ CharSel::CharSel(int whichPlayer)
         widget_manager->breakLine();
     }
 
-    m_offset = 0;
-    updateScrollPosition();
-
     widget_manager->addEmptyWgt(WTOK_EMPTY_DOWN, computeIndent(m_num_entries), HEIGHT/2);
     widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
     widget_manager->breakLine();
@@ -128,15 +125,17 @@ CharSel::CharSel(int whichPlayer)
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
     if( LAST_KART != -1 && kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
     {
+        m_offset = LAST_KART - m_num_entries/2;
         widget_manager->setSelectedWgt(WTOK_RACER0 + LAST_KART);
         switchCharacter(LAST_KART);
     }
     else
     {
+        m_offset = 0;
         switchCharacter(0);
     }
+    updateScrollPosition();
 
-    m_offset = 0;
     m_clock  = 0;
     //test
 
@@ -259,7 +258,6 @@ void CharSel::select()
     const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
     if (KP != NULL)
     {
-        printf("selecting kart %s\n",KP->getIdent().c_str());
         race_manager->setPlayerKart(m_player_index, KP->getIdent());
         user_config->m_player[m_player_index].setLastKartId(kart_id);
         // Add selected kart (token) to selected karts vector so it cannot be
