@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(GLUT_PATH)\include&quot;;&quot;$(STK_INCLUDE)\include&quot;;c:\cygwin\home\joerg\local\include"
+				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(STK_INCLUDE)&quot;"
 				PreprocessorDefinitions="WIN32;BT_NO_PROFILE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -108,7 +108,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(GLUT_PATH)\include&quot;"
+				AdditionalIncludeDirectories="..\..\bullet\src;&quot;$(STK_INCLUDE)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;BT_NO_PROFILE"
 				MinimalRebuild="true"
 				RuntimeLibrary="0"
