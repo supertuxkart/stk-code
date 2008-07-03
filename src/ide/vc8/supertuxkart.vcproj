@@ -521,8 +521,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;;&quot;$(GETTEXT_PATH)/include&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -544,10 +544,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
 				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;;&quot;$(GETTEXT_PATH)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
@@ -610,7 +610,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="./../../../src;&quot;$(PLIB_PATH)&quot;;&quot;$(SDL_PATH)\include&quot;;&quot;$(ALUT_PATH)\include&quot;;&quot;$(OGG_PATH)\include&quot;;&quot;$(VORBIS_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include&quot;;&quot;$(OPENAL_PATH)\include\AL&quot;;../../../src/bullet/src;&quot;$(GLUT_PATH)\include&quot;"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
 				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -629,10 +629,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib alut.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
 				OutputFile="./../../../$(ProjectName)_bullet.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SDL_PATH)\lib&quot;;&quot;$(PLIB_PATH)\plib&quot;;&quot;$(OPENAL_PATH)\libs\Win32&quot;;&quot;$(ALUT_PATH)\lib&quot;;&quot;$(OGG_PATH)\win32\VS2003\libogg\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbis\Release&quot;;&quot;$(VORBIS_PATH)\win32\VS2005\libvorbisfile\Release&quot;;&quot;$(GLUT_PATH)&quot;"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -864,10 +864,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\sound_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sound_plib.cpp"
 				>
 			</File>
 			<File
@@ -1374,10 +1370,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\sound_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sound_plib.hpp"
 				>
 			</File>
 			<File
