@@ -32,7 +32,10 @@
 KartPropertiesManager *kart_properties_manager=0;
 
 KartPropertiesManager::KartPropertiesManager()
-{}
+{
+    m_all_groups.clear();
+    m_all_groups.push_back("standard");
+}
 
 //-----------------------------------------------------------------------------
 KartPropertiesManager::~KartPropertiesManager()
@@ -86,11 +89,20 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
         {
             m_max_steer_angle = kp->getMaxSteerAngle();
         }
+        const std::vector<std::string>& groups=kp->getGroups();
+        for(unsigned int i=0; i<groups.size(); i++)
+        {
+            if(std::find(m_all_groups.begin(), m_all_groups.end(), groups[i]) 
+				== m_all_groups.end())
+            {
+                m_all_groups.push_back(groups[i]);
+            }
+        }
     }   // for i
 }   // loadKartData
 
 //-----------------------------------------------------------------------------
-const int KartPropertiesManager::getKartId(const std::string IDENT)
+const int KartPropertiesManager::getKartId(const std::string IDENT) const
 {
     int j = 0;
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
@@ -108,7 +120,7 @@ const int KartPropertiesManager::getKartId(const std::string IDENT)
 }   // getKartId
 
 //-----------------------------------------------------------------------------
-const KartProperties* KartPropertiesManager::getKart(const std::string IDENT)
+const KartProperties* KartPropertiesManager::getKart(const std::string IDENT) const
 {
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
@@ -121,7 +133,7 @@ const KartProperties* KartPropertiesManager::getKart(const std::string IDENT)
 }   // getKart
 
 //-----------------------------------------------------------------------------
-const KartProperties* KartPropertiesManager::getKartById(int i)
+const KartProperties* KartPropertiesManager::getKartById(int i) const
 {
     if (i < 0 || i >= int(m_karts_properties.size()))
         return NULL;
@@ -129,9 +141,28 @@ const KartProperties* KartPropertiesManager::getKartById(int i)
     return m_karts_properties[i];
 }
 
+//-----------------------------------------------------------------------------
+/** Returns the (global) index of the n-th kart of a given group. If there is
+  * no such kart, -1 is returned 
+  */
+int KartPropertiesManager::getKartByGroup(const std::string& group, int n) const
+{
+    int count=0;
+    for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
+        i != m_karts_properties.end(); ++i)
+    {
+		std::vector<std::string> groups=(*i)->getGroups();
+        if (std::find(groups.begin(), groups.end(), group)==groups.end()) continue;
+        if(count==n) return (int)(i-m_karts_properties.begin());
+        count=count+1;
+    }
+    return -1;
+}   // getKartByGroup
+
 /*FIXME: the next function is unused, if it is not useful, it should be
   deleted.*/
 //-----------------------------------------------------------------------------
+
 std::vector<std::string> KartPropertiesManager::getRandomKarts(int len)
 {
     std::vector<std::string> all_karts;

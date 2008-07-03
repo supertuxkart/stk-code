@@ -33,8 +33,9 @@ class KartProperties : public NoCopy
 {
 private:
 
-    Material* m_icon_material;
-    ssgEntity* m_model;
+    Material                *m_icon_material;
+    ssgEntity               *m_model;
+    std::vector<std::string> m_groups;  // list of all groups the kart belongs to
 
 protected:
     // Display and gui
@@ -66,9 +67,6 @@ protected:
     float m_wheelie_pitch_rate;       // rate/sec with which kart goes up
     float m_wheelie_restore_rate;     // rate/sec with which kart does down
     float m_wheelie_speed_boost;      // speed boost while doing a wheelie
-    float m_wheelie_lean_recovery;
-    float m_wheelie_balance_recovery;
-    float m_wheelie_step;
     float m_wheelie_power_boost;      // increase in engine power
 
     // bullet physics data 
@@ -86,6 +84,7 @@ protected:
     float m_max_speed_reverse_ratio;
     float m_gravity_center_shift;
     float m_suspension_rest;
+	float m_suspension_travel_cm;
     float m_jump_velocity;            // z velocity set when jumping
     float m_upright_tolerance;
     float m_upright_max_force;
@@ -116,33 +115,32 @@ public:
                                     bool dont_load_models=false,
                                     bool dont_load_materials=false);
 
-    Material*     getIconMaterial        () const {return m_icon_material;          }
-    ssgEntity*    getModel               () const {return m_model;                  }
-    const std::string& getName           () const {return m_name;                   }
-    const std::string& getIdent          () const {return m_ident;                  }
-    const std::string& getShadowFile     () const {return m_shadow_file;            }
-    const std::string& getIconFile       () const {return m_icon_file;              }
-    const Vec3   &getColor               () const {return m_color;                  }
-    float         getMass                () const {return m_mass;                   }
-    float         getKartLength          () const {return m_kart_length;            }
-    float         getKartWidth           () const {return m_kart_width;             }
-    float         getKartHeight          () const {return m_kart_height;            }
-    float         getMaxPower            () const {return m_engine_power;           }
-    float         getTimeFullSteer       () const {return m_time_full_steer;        }
-    float         getBrakeFactor         () const {return m_brake_factor;           }
-    float         getWheelBase           () const {return m_wheel_base;             }
-    float         getHeightCOG           () const {return m_height_cog;             }
-    float         getMaxSteerAngle       () const {return m_max_steer_angle;        }
-    float         getMaxSpeedReverseRatio() const {return m_max_speed_reverse_ratio;}
-    float         getWheelieMaxSpeedRatio() const {return m_wheelie_max_speed_ratio;}
-    float         getWheelieMaxPitch     () const {return m_wheelie_max_pitch;      }
-    float         getWheeliePitchRate    () const {return m_wheelie_pitch_rate;     }
-    float         getWheelieRestoreRate  () const {return m_wheelie_restore_rate;   }
-    float         getWheelieSpeedBoost   () const {return m_wheelie_speed_boost;    }
-    float         getWheelieLeanRecovery () const {return m_wheelie_lean_recovery;  }
-    float         getWheelieBalanceRecovery()const{return m_wheelie_balance_recovery;}
-    float         getWheelieStep         () const {return m_wheelie_step;           }
-    float         getWheeliePowerBoost   () const {return m_wheelie_power_boost;    }
+    Material*     getIconMaterial   () const {return m_icon_material;          }
+    ssgEntity*    getModel          () const {return m_model;                  }
+    const std::string& getName      () const {return m_name;                   }
+    const std::string& getIdent     () const {return m_ident;                  }
+    const std::string& getShadowFile() const {return m_shadow_file;            }
+    const std::string& getIconFile  () const {return m_icon_file;              }
+    const Vec3   &getColor          () const {return m_color;                  }
+    const std::vector<std::string>&
+                  getGroups         () const {return m_groups;                   }
+    float getMass                   () const {return m_mass;                     }
+    float getKartLength             () const {return m_kart_length;              }
+    float getKartWidth              () const {return m_kart_width;               }
+    float getKartHeight             () const {return m_kart_height;              }
+    float getMaxPower               () const {return m_engine_power;             }
+    float getTimeFullSteer          () const {return m_time_full_steer;          }
+    float getBrakeFactor            () const {return m_brake_factor;             }
+    float getWheelBase              () const {return m_wheel_base;               }
+    float getHeightCOG              () const {return m_height_cog;               }
+    float getMaxSteerAngle          () const {return m_max_steer_angle;          }
+    float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
+    float getWheelieMaxSpeedRatio   () const {return m_wheelie_max_speed_ratio;  }
+    float getWheelieMaxPitch        () const {return m_wheelie_max_pitch;        }
+    float getWheeliePitchRate       () const {return m_wheelie_pitch_rate;       }
+    float getWheelieRestoreRate     () const {return m_wheelie_restore_rate;     }
+    float getWheelieSpeedBoost      () const {return m_wheelie_speed_boost;      }
+    float getWheeliePowerBoost      () const {return m_wheelie_power_boost;      }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }
@@ -157,6 +155,7 @@ public:
     float getMaximumSpeed           () const {return m_maximum_speed;            }
     float getGravityCenterShift     () const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
+    float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }

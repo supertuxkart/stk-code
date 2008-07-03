@@ -35,15 +35,15 @@ RaceManager* race_manager= NULL;
 
 RaceManager::RaceManager()
 {
-    m_num_karts                = user_config->m_karts;
-    m_difficulty               = RD_HARD;
-    m_race_mode                = RM_QUICK_RACE;
-    m_track_number             = 0;
-    m_active_race              = false;
+    m_num_karts          = user_config->m_karts;
+    m_difficulty         = RD_HARD;
+    m_race_mode          = RM_QUICK_RACE;
+    m_track_number       = 0;
+    m_active_race        = false;
     m_score_for_position = stk_config->m_scores;
+    m_coin_target        = 0;
     setTrack("race");
     setPlayerKart(0, "tuxkart");
-    m_coin_target               = 0;
 }   // RaceManager
 
 //-----------------------------------------------------------------------------

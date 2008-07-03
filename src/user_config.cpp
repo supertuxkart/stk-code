@@ -118,6 +118,8 @@ void UserConfig::setDefaults()
     m_blacklist_res.clear();
     m_karts            = 4;
     m_log_errors       = false;
+    m_kart_group       = "standard";
+    m_track_group      = "standard";
 
     if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");
@@ -131,6 +133,7 @@ void UserConfig::setDefaults()
     for(int i=0; i<4; i++) 
     {
         m_player[i].setName(m_username);
+		m_player[i].setLastKartId(0);
     }
 	
 	// Clear every entry.
@@ -304,7 +307,7 @@ void UserConfig::loadConfig()
 int UserConfig::CheckAndCreateDir()
 {
     const std::string DIRNAME = file_manager->getHomeDir();
-    ulDir*      u       = ulOpenDir(DIRNAME.c_str());
+    ulDir*            u       = ulOpenDir(DIRNAME.c_str());
     if(u)
     {  // OK, directory exists
         ulCloseDir(u);
@@ -436,7 +439,8 @@ void UserConfig::loadConfig(const std::string& filename)
 
         //get whether to log errors to file
         lisp->get("log-errors",       m_log_errors);
-		
+		lisp->get("kart-group",       m_kart_group);
+        lisp->get("track-group",      m_track_group);
 		// Handle loading the stick config in it own method.
 		readStickConfigs(lisp);
 
@@ -683,6 +687,10 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->writeComment("error logging to log (true) or stderr (false)");
         writer->write("log-errors\t", m_log_errors);
 		
+        writer->writeComment("Last selected kart group");
+        writer->write("kart-group", m_kart_group);
+        writer->writeComment("Last selected track group");
+        writer->write("track-group", m_track_group);
 		writeStickConfigs(writer);
 
         // Write unlock information back

@@ -50,6 +50,7 @@ private:
     std::string              m_description;
     std::string              m_designer;
     std::string              m_filename;
+    std::vector<std::string> m_groups;
     ssgBranch*               m_model;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
@@ -150,6 +151,8 @@ public:
     float              getTrackLength    () const {return m_total_distance;     }
     const std::string& getIdent          () const {return m_ident;              }
     const char*        getName           () const {return m_name.c_str();       }
+    const std::vector<std::string>
+                       getGroups         () const {return m_groups;             }
     void               startMusic        () const;
     const std::string& getFilename       () const {return m_filename;           }
     const sgVec3& getSunPos              () const {return m_sun_position;       }

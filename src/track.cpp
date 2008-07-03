@@ -840,6 +840,9 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("gravity",               m_gravity);
     LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
     LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
+    LISP->getVector("groups",                m_groups);
+    if(m_groups.size()==0)
+        m_groups.push_back("standard");
     // if both camera position and rotation are defined,
     // set the flag that the track has final camera position
     m_has_final_camera  = LISP->get("camera-final-position", m_camera_final_position);

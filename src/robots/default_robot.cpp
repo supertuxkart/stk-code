@@ -458,7 +458,7 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
 
     for( int i = WHEELIE_STEPS; i > STEPS - 1; --i )
     {
-        step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * i ;
+        step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * float(i);
 
         world->m_track->spatialToTrack(step_track_coord, step_coord,
                                        m_future_sector );
@@ -601,7 +601,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 
     for(int i = 1; STEPS > i; ++i)
     {
-	step_coord = pos + vel_normal* m_kart_properties->getKartLength() * i;
+	step_coord = pos + vel_normal* m_kart_properties->getKartLength() * float(i);
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet
@@ -720,7 +720,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         //Test if we crash if we drive towards the target sector
         for( int i = 2; i < steps; ++i )
         {
-            step_coord = getXYZ()+direction*m_kart_properties->getKartLength() * i ;
+            step_coord = getXYZ()+direction*m_kart_properties->getKartLength() * float(i);
 
             world->m_track->spatialToTrack( step_track_coord, step_coord,
                 sector );

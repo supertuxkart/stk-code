@@ -26,6 +26,9 @@ class KartProperties;
 
 class KartPropertiesManager
 {
+private:
+    std::vector<std::string> m_all_groups;
+
 protected:
     float m_max_steer_angle;
 
@@ -42,13 +45,14 @@ public:
 	// than once.
     std::vector<int>		 m_selected_karts;  
     
-    const KartProperties*    getKartById            (int i);
-    const KartProperties*    getKart                (const std::string IDENT);
-    const int                getKartId              (const std::string IDENT);
+    const KartProperties*    getKartById            (int i) const;
+    const KartProperties*    getKart                (const std::string IDENT) const;
+    const int                getKartId              (const std::string IDENT) const;
+    int                      getKartByGroup         (const std::string& group, int i) const;
     void                     loadKartData           (bool dont_load_models=false);
-    const float              getMaximumSteeringAngle() {return m_max_steer_angle;}
-    const unsigned int       getNumberOfKarts       () {return (unsigned int)m_karts_properties.size();}
-
+    const float              getMaximumSteeringAngle() const {return m_max_steer_angle;}
+    const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
+    const std::vector<std::string>& getAllGroups    () const {return m_all_groups;     }
     /** Return len random karts */
     std::vector<std::string> getRandomKarts         (int len);
 

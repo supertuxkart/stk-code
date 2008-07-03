@@ -29,23 +29,26 @@ class Track;
 class TrackManager
 {
 private:
-    typedef std::vector<Track*> Tracks;
-    Tracks m_tracks;
+    typedef std::vector<Track*>   Tracks;
+    Tracks        m_tracks;
+    std::vector<std::string>
+		          m_all_groups;
+    void          updateGroups(const Track* track);
 
 public:
-    TrackManager();
-    ~TrackManager();
+                  TrackManager();
+                 ~TrackManager();
 
-    /** get TrackData by the track ident (aka filename without
-        .track) */
-    Track* getTrack(const std::string& ident) const;
-    Track* getTrack(size_t id) const;
+    /** get TrackData by the track ident (aka filename without .track) */
+    Track        *getTrack(const std::string& ident) const;
+	Track        *getTrack(size_t id) const {return m_tracks[id];   }
+	int           getTrackByGroup(const std::string& group, int n) const;
+    const std::vector<std::string>
+		          getAllGroups();
+	size_t        getNumberOfTracks() const  {return m_tracks.size();}
 
-    size_t getTrackCount() const;
-
-    /** initialize the track list by searching through all directories
-        for .track files */
-    void loadTrackList ();
+    /** load all .track files from all directories */
+    void          loadTrackList ();
 };
 
 extern TrackManager* track_manager;

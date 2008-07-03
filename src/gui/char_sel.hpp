@@ -36,11 +36,12 @@ private:
     int              m_player_index;
     int              m_offset;        // index of first racer displayed
     unsigned int     m_num_entries;   // number of entries to display
-    std::vector<int> m_indexAvailKart;
-    
+    std::vector<int> m_index_avail_karts;
+	static const int m_max_entries=7;
     bool             kartAvailable(int kart);
     void             updateScrollPosition();
-    int              computeIndent(int n) {return 40+abs((m_num_entries-1)/2 - n)*3;}
+    int              computeIndent(int n) {return 40+abs((int)(m_max_entries-1)/2 - n)*3;}
+    void             switchGroup();
 public:
     CharSel(int which_player);
     ~CharSel();

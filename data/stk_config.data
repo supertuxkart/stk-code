@@ -69,6 +69,7 @@
    (gravity-center-shift      0.4  ) ;; Shift center of gravity down by that many
                                      ;; units of kart_height (usually between 0 and 0.5)
    (suspension-rest           0.1  )
+   (suspension-travel-cm    500    )
 
    ;; The z-axis velocity set when a jump is initiated. This will cause the
    ;; kart to start rising, till it is pulled back by gravity. A higher value

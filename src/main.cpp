@@ -212,7 +212,7 @@ int handleCmdLine(int argc, char **argv)
         {
 
             fprintf ( stdout, "  Available tracks:\n" );
-            for (size_t i = 0; i != track_manager->getTrackCount(); i++)
+            for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
                 if (!unlock_manager->isLocked(track->getIdent()))

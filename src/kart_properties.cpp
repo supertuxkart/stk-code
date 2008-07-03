@@ -157,9 +157,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate      );
     lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate    );
     lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost     );
-    lisp->get("wheelie-lean-recovery",   m_wheelie_lean_recovery   );
-    lisp->get("wheelie-step",            m_wheelie_step            );
-    lisp->get("wheelie-balance-recovery",m_wheelie_balance_recovery);
     lisp->get("wheelie-power-boost",     m_wheelie_power_boost     );
 
     //bullet physics data
@@ -176,9 +173,14 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("maximum-speed",             m_maximum_speed            );
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
+    lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
     lisp->get("jump-velocity",             m_jump_velocity            );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
+    lisp->getVector("groups",              m_groups                   );
+    if(m_groups.size()==0)
+        m_groups.push_back("standard");
+
     // getVector appends to existing vectors, so a new one must be used to load
     std::vector<float> temp;
     lisp->getVector("gear-switch-ratio",   temp);
@@ -203,6 +205,7 @@ void KartProperties::init_defaults()
     m_model_file    = "tuxkart.ac";
     m_icon_file     = "tuxicon.png";
     m_shadow_file   = "tuxkartshadow.png";
+    m_groups.clear();
 
     m_color.setValue(1.0f, 0.0f, 0.0f);
 
@@ -220,9 +223,6 @@ void KartProperties::init_defaults()
     m_wheelie_pitch_rate        = stk_config->m_wheelie_pitch_rate;
     m_wheelie_restore_rate      = stk_config->m_wheelie_restore_rate;
     m_wheelie_speed_boost       = stk_config->m_wheelie_speed_boost;
-    m_wheelie_lean_recovery     = stk_config->m_wheelie_lean_recovery;
-    m_wheelie_balance_recovery  = stk_config->m_wheelie_balance_recovery;
-    m_wheelie_step              = stk_config->m_wheelie_step;
     m_wheelie_power_boost       = stk_config->m_wheelie_power_boost;
 
     //bullet physics data
@@ -239,6 +239,7 @@ void KartProperties::init_defaults()
     m_max_speed_reverse_ratio   = stk_config->m_max_speed_reverse_ratio;
     m_gravity_center_shift      = stk_config->m_gravity_center_shift;
     m_suspension_rest           = stk_config->m_suspension_rest;
+    m_suspension_travel_cm      = stk_config->m_suspension_travel_cm;
     m_jump_velocity             = stk_config->m_jump_velocity;
     m_gear_switch_ratio         = stk_config->m_gear_switch_ratio;
     m_gear_power_increase       = stk_config->m_gear_power_increase;

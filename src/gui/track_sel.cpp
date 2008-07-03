@@ -53,7 +53,7 @@ TrackSel::TrackSel()
     widget_manager->addWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
 
-    for (unsigned int i = 0; i != track_manager->getTrackCount(); ++i)
+    for (unsigned int i = 0; i != track_manager->getNumberOfTracks(); ++i)
     {
         // snowtuxpeak must be unlocked
         const Track *track = track_manager->getTrack(i);
@@ -71,7 +71,7 @@ TrackSel::TrackSel()
             widget_manager->setWgtText(WTOK_TRACK0+i, _("Fulfil challenge to unlock"));
         }
         if( i%2 != 0 ) widget_manager->breakLine();
-        else if (i + 1 == track_manager->getTrackCount() )
+        else if (i + 1 == track_manager->getNumberOfTracks() )
         {
             widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 6 );
             widget_manager->breakLine();
@@ -102,7 +102,7 @@ void TrackSel::update(float dt)
     const int SELECTED_TRACK = widget_manager->getSelectedWgt() - WTOK_TRACK0;
     if( widget_manager->selectionChanged() &&
         SELECTED_TRACK >= 0 &&
-        SELECTED_TRACK < (int)track_manager->getTrackCount() )
+        SELECTED_TRACK < (int)track_manager->getNumberOfTracks() )
     {
         const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
         bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
@@ -187,7 +187,7 @@ void TrackSel::select()
 {
     const int CLICKED_TOKEN = widget_manager->getSelectedWgt();
     unsigned int track_number = CLICKED_TOKEN - WTOK_TRACK0;
-    if(track_number<0 || track_number >= track_manager->getTrackCount())
+    if(track_number<0 || track_number >= track_manager->getNumberOfTracks())
     {
         return;   // not clicked on a track, ignore
     }

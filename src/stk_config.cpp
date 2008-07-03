@@ -82,9 +82,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_wheelie_pitch_rate,      "wheelie-pitch-rate"           );
     CHECK_NEG(m_wheelie_restore_rate,    "wheelie-restore-rate"         );
     CHECK_NEG(m_wheelie_speed_boost,     "wheelie-speed-boost"          );
-    CHECK_NEG(m_wheelie_lean_recovery,   "wheelie-lean-recovery"        );
-    CHECK_NEG(m_wheelie_balance_recovery,"wheelie-balance-recovery"     );
-    CHECK_NEG(m_wheelie_step,            "wheelie-step"                 );
     CHECK_NEG(m_wheelie_power_boost,     "wheelie-power-boost"          );
 
     CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
@@ -116,6 +113,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_shortcut_segments,         "shortcut-skipped-segments"  );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
+    CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
@@ -147,12 +145,12 @@ void STKConfig::init_defaults()
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = 
     m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
-    m_wheel_radius = m_wheel_width = m_wheelie_lean_recovery = 
-    m_wheelie_step = m_wheelie_balance_recovery =m_wheelie_power_boost = 
+    m_wheel_radius = m_wheel_width = m_wheelie_power_boost = 
     m_chassis_linear_damping = m_chassis_angular_damping = 
-    m_maximum_speed = m_gravity_center_shift = m_suspension_rest =
+    m_maximum_speed = m_gravity_center_shift = m_suspension_rest = 
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
     m_explosion_impulse_objects = m_upright_tolerance = m_upright_max_force =
+	m_suspension_travel_cm =
     // Camera
     m_camera_max_accel = m_camera_max_brake = m_camera_distance = -99.9f;
 

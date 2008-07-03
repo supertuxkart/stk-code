@@ -909,6 +909,7 @@ void WidgetManager::setSelectedWgt(const int TOKEN)
     {
         setSelectedWgtToken( TOKEN );
     }
+
     else std::cerr << "WARNING: tried to select unnamed widget with " <<
         "token " << TOKEN << '\n';
 }

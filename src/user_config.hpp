@@ -175,6 +175,8 @@ public:
     std::string m_herring_style;
     std::string m_username;
     std::string m_background_music;
+    std::string m_kart_group;      // Kart group used last
+    std::string m_track_group;     // Track group used last
     bool        m_replay_history;
     bool        m_use_kph;
     int         m_width;

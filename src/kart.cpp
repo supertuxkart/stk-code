@@ -148,6 +148,7 @@ void Kart::createPhysics(ssgEntity *obj)
     m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
     m_tuning  = new btRaycastVehicle::btVehicleTuning();
+	m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
     m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
 
     // never deactivate the vehicle

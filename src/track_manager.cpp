@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include <algorithm>
 #include "file_manager.hpp"
 #include "string_utils.hpp"
 #include "track_manager.hpp"
@@ -53,18 +54,6 @@ Track* TrackManager::getTrack(const std::string& ident) const
 }   // getTrack
 
 //-----------------------------------------------------------------------------
-Track* TrackManager::getTrack(size_t id) const
-{
-    return m_tracks[id];
-}  // getTrack
-
-//-----------------------------------------------------------------------------
-size_t TrackManager::getTrackCount() const
-{
-    return m_tracks.size();
-}   // getTrackCount
-
-//-----------------------------------------------------------------------------
 void TrackManager::loadTrackList ()
 {
     // Load up a list of tracks - and their names
@@ -87,9 +76,37 @@ void TrackManager::loadTrackList ()
         FILE *f=fopen(config_file.c_str(),"r");
         if(!f) continue;
 
-        m_tracks.push_back(new Track(config_file));
-
+        Track *track = new Track(config_file);
+        m_tracks.push_back(track);
+        updateGroups(track);
         // Read music files in that dir as well
         sound_manager->loadMusicFromOneDir(*dir);
     }
 }  // loadTrackList
+// ----------------------------------------------------------------------------
+
+void TrackManager::updateGroups(const Track* track)
+{
+    const std::vector<std::string>& new_groups = track->getGroups();
+    for(unsigned int i=0; i<new_groups.size(); i++)
+    {
+        if(std::find(m_all_groups.begin(), m_all_groups.end(), new_groups[i])
+            == m_all_groups.end()) continue;
+        m_all_groups.push_back(new_groups[i]);
+    }
+}   // updateGroups
+
+// ----------------------------------------------------------------------------
+int TrackManager::getTrackByGroup(const std::string& group, int n) const
+{
+    int count=0;
+    for(Tracks::const_iterator i  = m_tracks.begin(); i != m_tracks.end(); i++)
+    {
+		std::vector<std::string> groups=(*i)->getGroups();
+        if (std::find(groups.begin(), groups.end(), group)==groups.end()) continue;
+        if(count==n) return (int)(i-m_tracks.begin());
+        count=count+1;
+    }
+    return -1;
+
+}   // getTrackByGroup

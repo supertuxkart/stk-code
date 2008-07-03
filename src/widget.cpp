@@ -719,7 +719,7 @@ void Widget::draw()
 
     if( m_enable_track )
     {
-        if( m_track_num > (int)(track_manager->getTrackCount()) - 1)
+        if( m_track_num > (int)(track_manager->getNumberOfTracks()) - 1)
         {
             std::cerr << "Warning: widget tried to draw a track with a " <<
                 "number bigger than the amount of tracks available.\n";

@@ -20,6 +20,7 @@
 
 #include "smoke.hpp"
 #include "kart.hpp"
+#include "constants.hpp"
 
 Smoke::Smoke(Kart* kart_,
                                        int num, float _create_rate, int _ttf,
