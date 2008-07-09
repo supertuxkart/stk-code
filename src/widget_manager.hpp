@@ -170,7 +170,7 @@ public:
 
     bool isEmpty() { return m_widgets.empty(); }
 
-    bool addWgt
+    Widget *addWgt
     (
         const int TOKEN, //A number that names the widget.
         const int MIN_WIDTH, //These values are percentages not pixels. 100%
@@ -205,85 +205,43 @@ public:
     /* Macro functions. They are widgets with special predefined values. */
 
     //FIXME: Temporal, till I rename addWgt() to addEmptyWgt()
-    bool addEmptyWgt(const int TOKEN, const int MIN_WIDTH, const int MIN_HEIGHT) {return addWgt(TOKEN,MIN_WIDTH,MIN_HEIGHT);}
+    Widget *addEmptyWgt     (const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT) {return addWgt(TOKEN,MIN_WIDTH,MIN_HEIGHT);}
 
     //Widget that adds visible rect & text, rounded corners with 20% radius,
     //sets the text, and large font
-    bool addTitleWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const std::string TEXT
-    );
+    Widget *addTitleWgt     (const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT, const std::string TEXT);
 
     //Widget that adds visible rect & text, rounded corners with 20% radius,
     //and sets the text
-    bool addTextWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const std::string TEXT
-    );
+    Widget *addTextWgt      (const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT, const std::string TEXT);
 
     //Widget that adds visible rect & text, rounded corners with 20% radius,
     //sets the text and is selectable
-    bool addTextButtonWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const std::string TEXT
-    );
+    Widget *addTextButtonWgt(const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT, const std::string TEXT);
 
     //Widget that adds visible rect & image, white rect, 5% black
     //border, and sets the texture
-    bool addImgWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const int IMG
-    );
-
-    bool addImgWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const char* FILENAME
-    );
-
+    Widget *addImgWgt       (const int TOKEN, const int MIN_WIDTH,
+                             const int MIN_HEIGHT, const int IMG);
+    Widget *addImgWgt       (const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT, const char* FILENAME);
 
     //Selectable widget with visible rect & image, rounded corners with 20% radius,
     //gray rect and texture
-    bool addImgButtonWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const int IMG
-    );
-
-    bool addImgButtonWgt
-    (
-        const int TOKEN,
-        const int MIN_WIDTH,
-        const int MIN_HEIGHT,
-        const std::string& FILENAME
-    );
+    Widget *addImgButtonWgt (const int TOKEN, const int MIN_WIDTH, 
+                             const int MIN_HEIGHT, const int IMG);
+    Widget *addImgButtonWgt (const int TOKEN, const int MIN_WIDTH,
+                             const int MIN_HEIGHT,const std::string& FILENAME);
 
     /* On/off widget switch features. They are all disabled/hidden initially. */
     void setInitialActivationState( const bool ACTIVE);
 
-    void setInitialRectState
-    (
-        const bool SHOW,
-        const WidgetArea ROUND_CORNERS,
-        const int RADIUS,
-        const GLfloat* const COLOR
-    );
+    void setInitialRectState(const bool SHOW,const WidgetArea ROUND_CORNERS,
+                             const int RADIUS,const GLfloat* const COLOR);
 
     void setInitialTextureState(const bool SHOW, const int TEXTURE );
 
@@ -401,6 +359,10 @@ public:
 	/* Scrolling modification. */
 	void increaseScrollSpeed(bool = false);
 	void decreaseScrollSpeed(bool = false);
+	void setPosition(const int token, 
+		             WidgetDirection hori, float percentage_x, 
+		             WidgetDirection verti, float percentage_y);
+	void sameWidth(int widget_min, int widget_max);
 };
 
 extern WidgetManager *widget_manager;

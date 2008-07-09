@@ -91,7 +91,7 @@ void TrackManager::updateGroups(const Track* track)
     for(unsigned int i=0; i<new_groups.size(); i++)
     {
         if(std::find(m_all_groups.begin(), m_all_groups.end(), new_groups[i])
-            == m_all_groups.end()) continue;
+            != m_all_groups.end()) continue;
         m_all_groups.push_back(new_groups[i]);
     }
 }   // updateGroups

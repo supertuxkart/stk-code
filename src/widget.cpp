@@ -76,6 +76,7 @@ Widget::Widget
 //handles that.
     m_x(X_), m_y(Y_),
     m_width(WIDTH_), m_height(HEIGHT_),
+    m_fixed_position(false),
     m_rect_list(0),
     m_round_corners(WGT_AREA_ALL),
     m_border_list(0),
@@ -98,6 +99,78 @@ Widget::~Widget()
     }
 
 }
+
+//-----------------------------------------------------------------------------
+void Widget::setPosition(WidgetDirection horizontal, float percentage_horizontal, 
+                         const Widget *w_hori,
+		                 WidgetDirection vertical,   float percentage_vertical,
+                         const Widget *w_verti)
+{
+	m_fixed_position    = true;
+    m_horizontal        = horizontal;
+    m_percentage_x      = percentage_horizontal;
+    m_widget_horizontal = w_hori;
+    // If the direction is left/right of a widget, but that widget is not defined
+    // use left/right (of screen). This simplified programming, since the e.g. 
+    // left-most widget will be positioned relative to the side of the screen
+    if(!w_hori)
+    {
+        if(m_horizontal==WGT_DIR_LEFT_WIDGET ) m_horizontal = WGT_DIR_FROM_RIGHT;
+        if(m_horizontal==WGT_DIR_RIGHT_WIDGET) m_horizontal = WGT_DIR_FROM_LEFT;
+    }
+    m_vertical          = vertical;
+    m_percentage_y      = percentage_vertical;
+    m_widget_vertical   = w_verti;
+    if(!w_verti)
+    {
+        if(m_vertical==WGT_DIR_ABOVE_WIDGET) m_vertical = WGT_DIR_FROM_BOTTOM;
+        if(m_vertical==WGT_DIR_UNDER_WIDGET) m_vertical = WGT_DIR_FROM_TOP;
+    }
+
+}   // setPosition
+// ----------------------------------------------------------------------------
+void Widget::layout()
+{
+	if(!hasFixedPosition())
+	{
+        std::cerr << "Warning: layout called for widget without fixed position.\n";
+        return;
+	}
+    if( !createRect() ) return;
+
+    switch(m_horizontal)
+    {
+    case WGT_DIR_FROM_LEFT: 
+        m_x = (int)(user_config->m_width*m_percentage_x); break;
+    case WGT_DIR_FROM_RIGHT:
+        m_x = (int)(user_config->m_width*(1-m_percentage_x)-m_width); break;
+    case WGT_DIR_CENTER:
+        m_x = (int)((user_config->m_width-m_width)*0.5f); break;
+    case WGT_DIR_LEFT_WIDGET:
+        m_x = m_widget_horizontal->m_x - m_width; break;
+    case WGT_DIR_RIGHT_WIDGET:
+        m_x = m_widget_horizontal->m_x+m_widget_horizontal->m_width; break;
+    default:
+        break;
+    }   // switch
+
+    switch(m_vertical)
+    {
+    case WGT_DIR_FROM_TOP: 
+        m_y = (int)(user_config->m_height*(1-m_percentage_y)-m_height); break;
+    case WGT_DIR_FROM_BOTTOM:
+        m_y = (int)(user_config->m_height*m_percentage_y); break;
+    case WGT_DIR_CENTER:
+        m_y = (int)((user_config->m_height-m_height)*0.5f); break;
+    case WGT_DIR_ABOVE_WIDGET:
+        m_y = m_widget_vertical->m_y + m_widget_vertical->m_height; break;
+    case WGT_DIR_UNDER_WIDGET:
+        m_y = m_widget_vertical->m_y-m_height; break;
+    default:
+        break;
+    }   // switch
+
+}   // layout
 
 //-----------------------------------------------------------------------------
 void Widget::update( const float DELTA )

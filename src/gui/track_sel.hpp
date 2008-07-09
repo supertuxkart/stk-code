@@ -20,10 +20,21 @@
 #ifndef HEADER_TRACKSEL_H
 #define HEADER_TRACKSEL_H
 
+#include <vector>
 #include "base_gui.hpp"
 
 class TrackSel: public BaseGUI
 {
+private:
+	unsigned int      m_num_entries;   // number of entries in scrolling menu
+    int               m_offset;        // index of first track
+    int               m_current_track; // id of current track
+    std::vector<int>  m_index_avail_tracks;
+    const static int  m_max_entries = 7;
+
+    int computeIndent(int n) {return 40+abs((int)(m_num_entries-1)/2 - n)*3;}
+	void updateScrollPosition();
+	void switchGroup();
 public:
     TrackSel();
     ~TrackSel();

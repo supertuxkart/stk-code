@@ -53,7 +53,7 @@ WidgetManager::~WidgetManager()
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addWgt
+Widget *WidgetManager::addWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -64,7 +64,7 @@ bool WidgetManager::addWgt
     {
         std::cerr << "WARNING: tried to create widget with token " <<
             TOKEN << " but it is already in use.\n";
-        return false;
+        return NULL;
     }
 
     WidgetID new_id;
@@ -115,10 +115,13 @@ bool WidgetManager::addWgt
     new_id.widget->m_enable_track = m_default_show_track;
     new_id.widget->m_track_num = m_default_track_num;
 
+	new_id.widget->m_width = (int)(user_config->m_width  * new_id.min_width  * 0.01);
+	new_id.widget->m_height =(int)(user_config->m_height * new_id.min_height * 0.01);
+
     m_elems.push_back(WidgetElement(ET_WGT, (int)m_widgets.size()));
     m_widgets.push_back(new_id);
 
-    return true;
+    return new_id.widget;
 }
 
 //-----------------------------------------------------------------------------
@@ -285,20 +288,12 @@ bool WidgetManager::layout(const WidgetArea POSITION)
     const int SCREEN_HEIGHT = user_config->m_height;
 
     {
-        int width, height;
         //Set the widgets' rect shape properties in pixels.
         for( int i = 0; i < NUM_WIDGETS; ++i )
         {
-            width = (int)(SCREEN_WIDTH * m_widgets[i].min_width * 0.01);
-            height = (int)(SCREEN_HEIGHT * m_widgets[i].min_height * 0.01);
-
-            m_widgets[i].widget->m_width = width;
-            m_widgets[i].widget->m_height = height;
-
-            if( m_widgets[i].resize_to_text ) m_widgets[i].widget->
-                resizeToText();
-
-            if( width < height )
+            Widget *w=m_widgets[i].widget;
+            if( m_widgets[i].resize_to_text ) w->resizeToText();
+            if( w->m_width < w->m_height )
             {
                 m_widgets[i].widget->m_radius = (int)( m_widgets[i].min_radius *
                     m_widgets[i].widget->m_width * 0.01 );
@@ -408,7 +403,11 @@ bool WidgetManager::layout(const WidgetArea POSITION)
         {
         case ET_WGT:
             curr_wgt = &m_widgets[ m_elems[ i ].pos ];
-
+            if(curr_wgt->widget->hasFixedPosition())
+			{
+                curr_wgt->widget->layout();
+				break;
+			}
             curr_wgt->widget->m_x = cursor_x;
 
             //We have to give createRect() the bottom left corner
@@ -465,6 +464,7 @@ bool WidgetManager::layoutLine( int& x, int& y, int& pos )
         {
         case ET_WGT:
             curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+            if(curr_wgt->widget->hasFixedPosition()) break;
 
             curr_wgt->widget->m_x = cursor_x;
 
@@ -509,6 +509,7 @@ bool WidgetManager::layoutColumn( int& x, int& y, int& pos )
         {
         case ET_WGT:
             curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+            if(curr_wgt->widget->hasFixedPosition()) break;
 
             curr_wgt->widget->m_x = cursor_x;
 
@@ -572,7 +573,8 @@ int WidgetManager::getLineWidth( int& pos )
         switch( m_elems[ pos ].type)
         {
         case ET_WGT:
-            width += m_widgets[ m_elems[ pos ].pos ].widget->m_width;
+            if(!m_widgets[ m_elems[ pos ].pos ].widget->hasFixedPosition())
+                width += m_widgets[ m_elems[ pos ].pos ].widget->m_width;
             break;
 
         case ET_BREAK:
@@ -604,6 +606,7 @@ int WidgetManager::getLineHeight( int& pos )
         switch( m_elems[ pos ].type)
         {
         case ET_WGT:
+            if( m_widgets[ m_elems[ pos ].pos ].widget->hasFixedPosition()) break;
             if( m_widgets[ m_elems[ pos ].pos ].widget->m_height > height )
             {
                 height = m_widgets[ m_elems[ pos ].pos ].widget->m_height;
@@ -640,11 +643,12 @@ int WidgetManager::getColumnWidth( int& pos )
         switch( m_elems[ pos ].type )
         {
             case ET_WGT:
-            if( m_widgets[ m_elems[ pos ].pos ].widget->m_width > width )
-            {
-                width = m_widgets[ m_elems[ pos ].pos ].widget->m_width;
-            }
-            break;
+                if(m_widgets[ m_elems[ pos ].pos ].widget->hasFixedPosition()) break;
+                if( m_widgets[ m_elems[ pos ].pos ].widget->m_width > width )
+                {
+                    width = m_widgets[ m_elems[ pos ].pos ].widget->m_width;
+                }
+                break;
 
             case ET_BREAK:
                 return width;
@@ -676,6 +680,7 @@ int WidgetManager::getColumnHeight( int& pos )
         switch( m_elems[ pos ].type)
         {
         case ET_WGT:
+            if(m_widgets[ m_elems[ pos ].pos ].widget->hasFixedPosition()) break;
             height += m_widgets[ m_elems[ pos ].pos ].widget->m_height;
             break;
 
@@ -706,6 +711,7 @@ int WidgetManager::calcLineWidth( const int POS )
         switch( m_elems[i].type)
         {
         case ET_WGT:
+            if(m_widgets[ m_elems[ i ].pos ].widget->hasFixedPosition()) break;
             width += m_widgets[ m_elems[ i ].pos ].widget->m_width;
             break;
 
@@ -737,6 +743,7 @@ int WidgetManager::calcLineHeight( const int POS )
         switch( m_elems[i].type)
         {
         case ET_WGT:
+            if( m_widgets[ m_elems[ i ].pos ].widget->hasFixedPosition()) break;
             if( m_widgets[ m_elems[ i ].pos ].widget->m_height > height )
             {
                 height = m_widgets[ m_elems[ i ].pos ].widget->m_height;
@@ -772,11 +779,12 @@ int WidgetManager::calcColumnWidth( const int POS )
         switch( m_elems[ i ].type )
         {
             case ET_WGT:
-            if( m_widgets[ m_elems[ i ].pos ].widget->m_width > width )
-            {
-                width = m_widgets[ m_elems[ i ].pos ].widget->m_width;
-            }
-            break;
+                if( m_widgets[ m_elems[ i ].pos ].widget->hasFixedPosition()) break;
+                if( m_widgets[ m_elems[ i ].pos ].widget->m_width > width )
+                {
+                    width = m_widgets[ m_elems[ i ].pos ].widget->m_width;
+                }
+                break;
 
             case ET_BREAK:
                 return width;
@@ -807,6 +815,7 @@ int WidgetManager::calcColumnHeight( const int POS )
         switch( m_elems[i].type)
         {
         case ET_WGT:
+            if(m_widgets[ m_elems[ i ].pos ].widget->hasFixedPosition()) break;
             height += m_widgets[ m_elems[ i ].pos ].widget->m_height;
             break;
 
@@ -837,6 +846,7 @@ int WidgetManager::calcLineX( const int POS )
         {
         case ET_WGT:
             curr_wgt = &m_widgets[ m_elems[ i ].pos ];
+            if(curr_wgt->widget->hasFixedPosition()) break;
 
             width += curr_wgt->widget->m_width;
             break;
@@ -915,7 +925,7 @@ void WidgetManager::setSelectedWgt(const int TOKEN)
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addTitleWgt
+Widget *WidgetManager::addTitleWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -923,7 +933,8 @@ bool WidgetManager::addTitleWgt
     const std::string TEXT
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     showWgtRect( TOKEN );
     setWgtTextSize( TOKEN, WGT_FNT_LRG );
@@ -932,11 +943,11 @@ bool WidgetManager::addTitleWgt
     setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
     setWgtCornerRadius( TOKEN, 20 );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addTextWgt
+Widget *WidgetManager::addTextWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -944,7 +955,8 @@ bool WidgetManager::addTextWgt
     const std::string TEXT
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     showWgtRect( TOKEN );
     setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
@@ -952,11 +964,11 @@ bool WidgetManager::addTextWgt
     showWgtText( TOKEN );
     setWgtText( TOKEN, TEXT );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addTextButtonWgt
+Widget *WidgetManager::addTextButtonWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -964,7 +976,8 @@ bool WidgetManager::addTextButtonWgt
     const std::string TEXT
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     showWgtRect( TOKEN );
     setWgtRoundCorners( TOKEN, WGT_AREA_ALL );
@@ -973,11 +986,11 @@ bool WidgetManager::addTextButtonWgt
     setWgtText( TOKEN, TEXT );
     activateWgt( TOKEN );
 
-    return true;
-}
+    return w;
+}   // addTextButtonWgt
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addImgWgt
+Widget *WidgetManager::addImgWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -985,7 +998,8 @@ bool WidgetManager::addImgWgt
     const int IMG
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     setWgtColor( TOKEN, WGT_WHITE );
     showWgtRect( TOKEN );
@@ -995,11 +1009,11 @@ bool WidgetManager::addImgWgt
     setWgtTexture( TOKEN, IMG );
     showWgtTexture( TOKEN );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addImgWgt
+Widget *WidgetManager::addImgWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -1007,7 +1021,8 @@ bool WidgetManager::addImgWgt
     const char* FILENAME
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     setWgtColor( TOKEN, WGT_WHITE );
     showWgtRect( TOKEN );
@@ -1017,11 +1032,11 @@ bool WidgetManager::addImgWgt
     setWgtTexture( TOKEN, FILENAME );
     showWgtTexture( TOKEN );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addImgButtonWgt
+Widget *WidgetManager::addImgButtonWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -1029,7 +1044,8 @@ bool WidgetManager::addImgButtonWgt
     const int IMG
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     setWgtColor( TOKEN, WGT_GRAY );
     showWgtRect( TOKEN );
@@ -1039,11 +1055,11 @@ bool WidgetManager::addImgButtonWgt
     showWgtTexture( TOKEN );
     activateWgt( TOKEN );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
-bool WidgetManager::addImgButtonWgt
+Widget *WidgetManager::addImgButtonWgt
 (
     const int TOKEN,
     const int MIN_WIDTH,
@@ -1051,7 +1067,8 @@ bool WidgetManager::addImgButtonWgt
     const std::string& FILENAME
 )
 {
-    if( !( addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT ))) return false;
+    Widget *w=addWgt( TOKEN, MIN_WIDTH, MIN_HEIGHT );
+    if( !w) return false;
 
     setWgtColor( TOKEN, WGT_GRAY );
     showWgtRect( TOKEN );
@@ -1061,7 +1078,7 @@ bool WidgetManager::addImgButtonWgt
     showWgtTexture( TOKEN );
     activateWgt( TOKEN );
 
-    return true;
+    return w;
 }
 
 //-----------------------------------------------------------------------------
@@ -2206,4 +2223,40 @@ void WidgetManager::reloadFonts()
             m_widgets[i].widget->m_curr_widget_font );
     }
 }
+
+// ----------------------------------------------------------------------------
+void WidgetManager::setPosition(const int token,
+								WidgetDirection hori,  float percentage_x, 
+								WidgetDirection verti, float percentage_y)
+{
+    const int id = findId(token);
+	if( id != WGT_NONE )
+		m_widgets[id].widget->setPosition(hori,  percentage_x,
+										  verti, percentage_y);
+}   // setPosition
+
+// ----------------------------------------------------------------------------
+/** Sets the width of all widgets between widget_min and widget_max to 
+	be the same */
+void WidgetManager::sameWidth(int widget_min, int widget_max)
+{
+	int width = -1;
+	for(int i=widget_min; i<=widget_max; i++)
+	{
+		const int id = findId(i);
+		Widget *w = m_widgets[id].widget;
+		w->m_width = (int)(user_config->m_width * m_widgets[id].min_width * 0.01);
+
+		if( m_widgets[id].resize_to_text ) w->resizeToText();
+
+		if(width < w->m_width)
+			width = w->m_width;
+	}
+	for(int i=widget_min; i<=widget_max; i++)
+	{
+		const int id = findId(i);
+		m_widgets[id].widget->m_width = width;
+	}
+
+}   // sameWidth
 

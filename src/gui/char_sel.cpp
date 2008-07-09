@@ -101,14 +101,8 @@ CharSel::CharSel(int whichPlayer)
 
 	widget_manager->addEmptyWgt(WTOK_EMPTY_DOWN, computeIndent(m_max_entries), HEIGHT/2);
 	widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
-	//widget_manager->breakLine();
 
 	switchGroup();  // select all karts from the currently selected group
-
-
-    //widget_manager->breakLine();
-    //widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
-    //widget_manager->breakLine();
 
     widget_manager->layout(WGT_AREA_RGT);
 
@@ -194,7 +188,7 @@ void CharSel::updateScrollPosition()
         }
         else
         {
-            const std::vector<std::string> groups=kart_properties_manager->getAllGroups();
+            const std::vector<std::string> &groups=kart_properties_manager->getAllGroups();
             widget_manager->setWgtText(WTOK_NAME0+i, groups[-indx-1]);
 			widget_manager->hideWgtTexture(WTOK_RACER0 + i);
 			widget_manager->hideWgtRect(WTOK_RACER0 + i);
@@ -277,7 +271,7 @@ void CharSel::update(float dt)
         int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
         if(token<0 || token>(int)m_index_avail_karts.size())
             token = widget_manager->getSelectedWgt() - WTOK_NAME0;
-		switchCharacter((token+m_offset)%(int)m_index_avail_karts.size());
+		switchCharacter((token+m_offset)%m_index_avail_karts.size());
     }
 
     if (m_kart != NULL)

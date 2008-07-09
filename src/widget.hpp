@@ -36,8 +36,6 @@
 #  pragma warning(default:4312)
 #endif
 
-#include "gui/font.hpp"
-
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #else
@@ -47,7 +45,14 @@
 #  endif
 #  include <GL/gl.h>
 #endif
+#include "gui/font.hpp"
+#include "user_config.hpp"
 
+// For widgets with fixed position
+enum WidgetDirection{ WGT_DIR_FROM_LEFT, WGT_DIR_FROM_RIGHT, 
+                      WGT_DIR_LEFT_WIDGET, WGT_DIR_RIGHT_WIDGET, WGT_DIR_CENTER,
+                      WGT_DIR_FROM_TOP, WGT_DIR_FROM_BOTTOM,
+                      WGT_DIR_ABOVE_WIDGET, WGT_DIR_UNDER_WIDGET};
 
 enum WidgetFontSize { WGT_FNT_SML = 18, WGT_FNT_MED = 24, WGT_FNT_LRG = 30};
 
@@ -134,6 +139,13 @@ class Widget
     int m_width, m_height;
     int m_radius;
 
+    /* support for specifying the position of a widget */
+    bool m_fixed_position;
+	WidgetDirection m_horizontal, m_vertical;
+	float           m_percentage_x, m_percentage_y;
+    const Widget   *m_widget_horizontal,
+                   *m_widget_vertical;
+
     /* Low level features. They are off by default. */
     bool m_enable_rect;
     GLuint m_rect_list; //A display list number that draws the rectangle with
@@ -198,8 +210,6 @@ class Widget
     void pulse() {m_text_scale = MAX_TEXT_SCALE;}
 
     /* Convenience functions. */
-    void resizeToText(); //This checks if the widget is smaller than the
-                           //text, and if so, changes the width and height.
 
     void lightenColor();
     void darkenColor();
@@ -207,11 +217,27 @@ class Widget
     void setFont( const WidgetFont FONT );
     void setTexture( const std::string& FILENAME, const bool is_full_path=true );
 
+    /* position support */
+    bool hasFixedPosition() const {return m_fixed_position;}
+	void layout();
     /* Functions created simply to organize the code */
     bool createRect();
     void updateVariables( const float DELTA );
     void draw();
     void applyTransformations();
+public:
+    void setPosition(WidgetDirection horizontal, float percentage_horizontal, 
+		             WidgetDirection vertical,   float percentage_vertical)
+    {
+        setPosition(horizontal, percentage_horizontal, NULL,
+                 vertical, percentage_vertical, NULL);
+    }
+    void setPosition(WidgetDirection horizontal, float percentage_horizontal, 
+                     const Widget *w_hori,
+		             WidgetDirection vertical,   float percentage_vertical,
+                     const Widget *w_verti);
+    void resizeToText();   //This checks if the widget is smaller than the
+                           //text, and if so, changes the width and height.
 
 };
 

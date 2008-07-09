@@ -40,12 +40,12 @@ public:
                  ~TrackManager();
 
     /** get TrackData by the track ident (aka filename without .track) */
+    const std::vector<std::string>&
+		          getAllGroups()      const { return m_all_groups;    }
+	size_t        getNumberOfTracks() const { return m_tracks.size(); }
+	Track        *getTrack(size_t id) const { return m_tracks[id];    }
     Track        *getTrack(const std::string& ident) const;
-	Track        *getTrack(size_t id) const {return m_tracks[id];   }
 	int           getTrackByGroup(const std::string& group, int n) const;
-    const std::vector<std::string>
-		          getAllGroups();
-	size_t        getNumberOfTracks() const  {return m_tracks.size();}
 
     /** load all .track files from all directories */
     void          loadTrackList ();
