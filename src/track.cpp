@@ -1367,7 +1367,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
     *normal   = rayCallback.m_hitNormalWorld;
     *material = rayCallback.m_material;
     // Note: material might be NULL. This happens if the ray cast does not
-    // hit the track, but anoterh rigid body (kart, moving_physics) - e.g.
+    // hit the track, but another rigid body (kart, moving_physics) - e.g.
     // assume two karts falling down, one over the other. Bullet does not
     // have any triangle/material information in this case!
 }   // getTerrainInfo

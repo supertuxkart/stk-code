@@ -208,13 +208,13 @@ void CharSel::switchGroup()
 	m_index_avail_karts.clear();
     // This loop is too long (since getNumberOfKarts returns all karts in all groups),
     // but the loop is left if no more kart is found.
-    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
-    {
-        int globalIndex = kart_properties_manager->getKartByGroup(user_config->m_kart_group, i);
-        if(globalIndex==-1) break;
-        if(kartAvailable(globalIndex))
+    const std::vector<int> &karts =
+        kart_properties_manager->getKartsInGroup(user_config->m_kart_group);
+    for(unsigned int i=0; i<karts.size(); i++)
+    {   
+        if(kartAvailable(karts[i]))
         {
-            m_index_avail_karts.push_back(globalIndex);
+            m_index_avail_karts.push_back(karts[i]);
         }
     }
 

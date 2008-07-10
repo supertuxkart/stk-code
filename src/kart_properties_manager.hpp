@@ -21,14 +21,15 @@
 #define HEADER_KARTPROPERTIESMANAGER_H
 
 #include <vector>
-//#include "kart_properties.hpp"
+#include <map>
+
 class KartProperties;
 
 class KartPropertiesManager
 {
 private:
     std::vector<std::string> m_all_groups;
-
+    std::map<std::string, std::vector<int>> m_groups;
 protected:
     float m_max_steer_angle;
 
@@ -52,9 +53,10 @@ public:
     void                     loadKartData           (bool dont_load_models=false);
     const float              getMaximumSteeringAngle() const {return m_max_steer_angle;}
     const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
-    const std::vector<std::string>& getAllGroups    () const {return m_all_groups;     }
-    /** Return len random karts */
-    std::vector<std::string> getRandomKarts         (int len);
+    const std::vector<std::string>& 
+                             getAllGroups           () const {return m_all_groups;     }
+    const std::vector<int>&  getKartsInGroup        (const std::string& g)
+                                                             {return m_groups[g];      }
 
     /** Fill the empty positions in the given vector with random karts */
     void fillWithRandomKarts (std::vector<std::string>& vec);

@@ -25,6 +25,7 @@
 #include "kart_properties_manager.hpp"
 #include "kart_properties.hpp"
 #include "translation.hpp"
+#include "user_config.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -34,8 +35,7 @@ KartPropertiesManager *kart_properties_manager=0;
 KartPropertiesManager::KartPropertiesManager()
 {
     m_all_groups.clear();
-    m_all_groups.push_back("standard");
-}
+}   // KartPropertiesManager
 
 //-----------------------------------------------------------------------------
 KartPropertiesManager::~KartPropertiesManager()
@@ -90,13 +90,13 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
             m_max_steer_angle = kp->getMaxSteerAngle();
         }
         const std::vector<std::string>& groups=kp->getGroups();
-        for(unsigned int i=0; i<groups.size(); i++)
+        for(unsigned int g=0; g<groups.size(); g++)
         {
-            if(std::find(m_all_groups.begin(), m_all_groups.end(), groups[i]) 
-				== m_all_groups.end())
+            if(m_groups.find(groups[g])==m_groups.end())
             {
-                m_all_groups.push_back(groups[i]);
+                m_all_groups.push_back(groups[g]);
             }
+            m_groups[groups[g]].push_back(m_karts_properties.size()-1);
         }
     }   // for i
 }   // loadKartData
@@ -159,57 +159,75 @@ int KartPropertiesManager::getKartByGroup(const std::string& group, int n) const
     return -1;
 }   // getKartByGroup
 
-/*FIXME: the next function is unused, if it is not useful, it should be
-  deleted.*/
-//-----------------------------------------------------------------------------
-
-std::vector<std::string> KartPropertiesManager::getRandomKarts(int len)
-{
-    std::vector<std::string> all_karts;
-
-    for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
-        i != m_karts_properties.end(); ++i)
-    {
-        all_karts.push_back((*i)->getIdent());
-    }
-
-    std::random_shuffle(all_karts.begin(), all_karts.end());
-
-    all_karts.resize(len);
-
-    return all_karts;
-}   // getRandomKart
-
 //-----------------------------------------------------------------------------
 void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
 {
+    // First: set up flags (based on global kart 
+    // index) for which karts are already used
+    // -----------------------------------------
+    std::vector<bool> used;
+    used.resize(getNumberOfKarts(), false);
+
+    int count=vec.size();
     std::vector<std::string> all_karts;
-
-    for(KartPropertiesVector::const_iterator i = m_karts_properties.begin();
-        i != m_karts_properties.end(); ++i)
-        all_karts.push_back((*i)->getIdent());
-
-    std::srand((unsigned int)std::time(0));
-
-    std::random_shuffle(all_karts.begin(), all_karts.end());
-
-    int new_kart = 0;
-    for(int i = 0; i < int(vec.size()); ++i)
+    for(unsigned int i=0; i<vec.size(); i++)
     {
-        while(vec[i].empty())
-        {
-            if (std::find(vec.begin(), vec.end(), all_karts[new_kart]) == vec.end())
-            { // Found a new kart, so use it
-                vec[i] = all_karts[new_kart];
-            }
-            else if (!(all_karts.size() >= vec.size()))
-            { // We need to fill more karts than we have available, so don't care about dups
-                vec[i] = all_karts[new_kart];
-            }
+        if(vec[i].empty()) continue;
+        int id=getKartId(vec[i]);
+        used[id] = true;
+        count --;
+    }
 
-            new_kart += 1;
-        }   // while
-    }   // for i
-}
+    // Add karts from the current group
+    // --------------------------------
+    std::vector<int> karts = getKartsInGroup(user_config->m_kart_group);
+    std::vector<int>::iterator k;
+    // Remove karts that are already used
+    for(unsigned int i=0; i<karts.size();)
+    {
+        if(used[karts[i]])
+            karts.erase(karts.begin()+i);
+        else
+            i++;
+    }
+    std::srand((unsigned int)std::time(0));
+    std::random_shuffle(karts.begin(), karts.end());
+
+    // Loop over all karts to fill till either all slots are filled, or
+    // there are no more karts in the current group
+    for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
+    {
+        if(vec[i].empty())
+        {
+            used[karts.back()] = true;
+            vec[i] = m_karts_properties[karts.back()]->getIdent();
+            karts.pop_back();
+            count --;
+        }
+    }
+    if(count==0) return;
+
+    // Not enough karts in chosen group, so fill the rest with arbitrary karts
+    // -----------------------------------------------------------------------
+    // First create an index list with all unused karts.
+    karts.clear();
+    for(unsigned int i=0; i<getNumberOfKarts(); i++)
+    {
+        if(!used[i]) karts.push_back(i);
+    }
+    std::random_shuffle(karts.begin(), karts.end());
+    // Then fill up the remaining empty spaces
+    for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
+    {
+        if(vec[i].empty())
+        {
+            vec[i] = m_karts_properties[karts.back()]->getIdent();
+            karts.pop_back();
+            count --;
+        }
+    }
+    // There should never be more karts to be selected than there are.
+    assert(count==0);
+}   // fillWithRandomKarts    
 
 /* EOF */
