@@ -226,7 +226,11 @@ void World::resetAllKarts()
     // is just hitting the floor, before being pushed up again by
     // the suspension. So we just do a longer initial simulation,
     // which should be long enough for all karts to be firmly on ground.
-    for(int i=0; i<100; i++) m_physics->update(1.f/60.f);
+    for(int i=0; i<200; i++) m_physics->update(1.f/60.f);
+
+    // Stil wait will all karts are in rest (and handle the case that a kart
+    // fell through the ground, which can happen if a kart falls for a long
+    // time, therefore having a high speed when hitting the ground.
     while(!all_finished)
     {
         m_physics->update(1.f/60.f);
@@ -235,6 +239,23 @@ void World::resetAllKarts()
         {
             if(!(*i)->isInRest()) 
             {
+                float           hot;
+                Vec3            normal;
+                const Material *material;
+                // We can't use (*i)->getXYZ(), since this is only defined 
+                // after update() was called. Instead we have to get the
+                // real position of the rigid body.
+                btTransform     t;
+                (*i)->getBody()->getMotionState()->getWorldTransform(t);
+                // This test can not be done only once before the loop, since 
+                // it can happen that the kart falls through the track later!
+                m_track->getTerrainInfo(t.getOrigin(), &hot, &normal, &material);
+                if(!material)
+                {
+                    fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
+                        i-m_kart.begin(), m_track->getIdent().c_str());
+                    exit(-1);
+                }
                 all_finished=false;
                 break;
             }
