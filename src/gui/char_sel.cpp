@@ -194,6 +194,12 @@ void CharSel::updateScrollPosition()
 			widget_manager->hideWgtRect(WTOK_RACER0 + i);
         }
     }   // for i
+    // set the 'selection changed' flag in the widget_manager, since update 
+    // scroll position (when called on action up/down) will change the kart
+    // to display, even though it's the same widget
+    int current_widget = widget_manager->getSelectedWgt();
+    widget_manager->setSelectedWgt(current_widget+1);
+    widget_manager->setSelectedWgt(current_widget);
 }   // updateScrollPosition
 
 //-----------------------------------------------------------------------------
@@ -388,6 +394,30 @@ void CharSel::select()
     else
         menu_manager->pushMenu(MENUID_TRACKSEL);
 }   // select
+
+//----------------------------------------------------------------------------
+void CharSel::handle(GameAction action, int value)
+{
+    // Forward keypresses to basegui
+    if(value) return BaseGUI::handle(action, value);
+
+    if(action==GA_CURSOR_UP)
+    {
+        m_offset--;
+        if(m_offset < 0) m_offset = (int)m_index_avail_karts.size() - 1;
+        updateScrollPosition();
+        return;
+
+    }   // if cursor up
+    if(action ==GA_CURSOR_DOWN)
+    {
+        m_offset++;
+        if( m_offset >= (int)m_index_avail_karts.size() ) m_offset=0;
+        updateScrollPosition();
+        return;
+    }   // if cursor down
+    BaseGUI::handle(action, value);
+}   // handle
 
 //----------------------------------------------------------------------------
 // Function checks the vector of previously selected karts and returns true if

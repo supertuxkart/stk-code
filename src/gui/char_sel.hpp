@@ -49,6 +49,7 @@ public:
     void switchCharacter(int n);
     void update(float dt);
     void select();
+    virtual void handle(GameAction, int);
 };
 
 #endif
