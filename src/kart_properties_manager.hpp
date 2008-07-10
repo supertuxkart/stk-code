@@ -29,7 +29,7 @@ class KartPropertiesManager
 {
 private:
     std::vector<std::string> m_all_groups;
-    std::map<std::string, std::vector<int>> m_groups;
+    std::map<std::string, std::vector<int> > m_groups;
 protected:
     float m_max_steer_angle;
 
