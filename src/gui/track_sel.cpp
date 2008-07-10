@@ -39,10 +39,7 @@ enum WidgetTokens
     WTOK_IMG0,
     WTOK_IMG1,
     WTOK_AUTHOR,
-
-    WTOK_EMPTY_UP,
     WTOK_UP,
-    WTOK_EMPTY_DOWN,
     WTOK_DOWN,
     WTOK_EMPTY0  = 1000,
     WTOK_TRACK0  = 2000
@@ -75,7 +72,7 @@ TrackSel::TrackSel()
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, WGT_DIR_FROM_TOP, 0.2f);
     prev_widget = w;
 	w = widget_manager->addImgWgt(WTOK_IMG1, 35, 35, 0);
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET,0, prev_widget); 
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET,0, prev_widget);
     prev_widget = w;
     w = widget_manager->addTextWgt(WTOK_AUTHOR, 50, 9, "" );
     widget_manager->setWgtResizeToText(WTOK_AUTHOR, true);
@@ -94,11 +91,12 @@ TrackSel::TrackSel()
     updateScrollPosition();
 
     // Make sure to select one track. The call to update() here is necessary,
-    // since it guarantees that selectedWgt is indeed track0 (otherwise the
+    // since it guarantees that selectedWgt is indeed a track (otherwise the
     // manager might select e.g. arrow up, and then no track is displayed).
     widget_manager->setSelectedWgt(WTOK_TRACK0+(m_max_entries-1)/2);
-    update(0);
+    displayImages(0);
     widget_manager->layout(WGT_AREA_TOP);
+    //update(0);
 }   // TrackSel
 
 //-----------------------------------------------------------------------------
@@ -143,6 +141,7 @@ void TrackSel::updateScrollPosition()
             widget_manager->setWgtText(WTOK_TRACK0+i, g[-indx-1]);
         }
 	}   // for i
+    m_current_track = -1;  // force new display of tracks
 }   // updateScrollPosition
 
 //-----------------------------------------------------------------------------
@@ -190,6 +189,106 @@ void TrackSel::switchGroup()
 }   // switchGroup
 
 //-----------------------------------------------------------------------------
+void TrackSel::displayImages(int selected_track)
+{
+    if( m_current_track == selected_track) return;
+    m_current_track = selected_track;
+    if(selected_track<0)
+    {
+        widget_manager->hideWgtTexture(WTOK_IMG0);
+        widget_manager->hideWgtTexture(WTOK_IMG1);
+        widget_manager->hideWgtRect(WTOK_IMG0);
+        widget_manager->hideWgtRect(WTOK_IMG1);
+        widget_manager->hideWgtBorder(WTOK_IMG0);
+        widget_manager->hideWgtBorder(WTOK_IMG1);
+        widget_manager->hideWgtRect(WTOK_AUTHOR);
+        widget_manager->hideWgtText(WTOK_AUTHOR);
+        return;
+    }
+    
+    // Now we have to display new images
+    // ---------------------------------
+    widget_manager->showWgtBorder(WTOK_IMG0);
+    widget_manager->showWgtBorder(WTOK_IMG1);
+    widget_manager->showWgtRect(WTOK_AUTHOR);
+    widget_manager->showWgtText(WTOK_AUTHOR);
+
+    const Track* TRACK = track_manager->getTrack(selected_track);
+    bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
+
+    if( isAvailable )
+    {
+
+        const std::string& description = TRACK->getDescription();
+        if(description!="")
+        {
+            widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
+        }
+        else
+        {
+            char designedby[MAX_MESSAGE_LENGTH];
+            snprintf(designedby, MAX_MESSAGE_LENGTH, 
+                "Designed by %s", TRACK->getDesigner().c_str());
+            widget_manager->setWgtText( WTOK_AUTHOR, designedby );
+        }
+        const std::string& screenshot = TRACK->getScreenshotFile();
+        const std::string& topview    = TRACK->getTopviewFile();
+
+        if( !screenshot.empty() && !topview.empty() )
+        {
+            widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG0 );
+            widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
+            widget_manager->showWgtTexture( WTOK_IMG0 );
+            widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+            widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG1 );
+            widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
+            widget_manager->showWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+        else if( topview.empty() )
+        {
+            widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG0 );
+            widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
+            widget_manager->showWgtTexture( WTOK_IMG0 );
+            widget_manager->hideWgtTrack( WTOK_IMG0 );
+
+            widget_manager->hideWgtRect( WTOK_IMG1 );
+            widget_manager->hideWgtTexture( WTOK_IMG1 );
+            widget_manager->setWgtTrackNum( WTOK_IMG1, selected_track );
+            widget_manager->showWgtTrack( WTOK_IMG1 );
+        }
+        else if( screenshot.empty() )
+        {
+            widget_manager->hideWgtRect( WTOK_IMG0 );
+            widget_manager->hideWgtTexture( WTOK_IMG0 );
+            widget_manager->setWgtTrackNum( WTOK_IMG0, selected_track );
+            widget_manager->showWgtTrack( WTOK_IMG0 );
+
+            widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
+            widget_manager->showWgtRect( WTOK_IMG1 );
+            widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
+            widget_manager->showWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+        else //if( screenshot.empty() && topview.empty() )
+        {
+            widget_manager->hideWgtRect( WTOK_IMG0 );
+            widget_manager->hideWgtTexture( WTOK_IMG0 );
+            widget_manager->setWgtTrackNum( WTOK_IMG0, selected_track );
+            widget_manager->showWgtTrack( WTOK_IMG0 );
+
+            widget_manager->hideWgtRect( WTOK_IMG1 );
+            widget_manager->hideWgtTexture( WTOK_IMG1 );
+            widget_manager->hideWgtTrack( WTOK_IMG1 );
+        }
+    }   // isAvailable
+}   // displayImages
+
+//-----------------------------------------------------------------------------
 void TrackSel::update(float dt)
 {
     int indx = widget_manager->getSelectedWgt() - WTOK_TRACK0;
@@ -209,110 +308,7 @@ void TrackSel::update(float dt)
         widget_manager->update(dt);
         return;
     }
-    const int SELECTED_TRACK = m_index_avail_tracks[indx];
-    // Group selected, disable track imagess
-    if( m_current_track != SELECTED_TRACK)
-    {
-        if(SELECTED_TRACK<0)
-        {
-            widget_manager->hideWgtTexture(WTOK_IMG0);
-            widget_manager->hideWgtTexture(WTOK_IMG1);
-            widget_manager->hideWgtRect(WTOK_IMG0);
-            widget_manager->hideWgtRect(WTOK_IMG1);
-            widget_manager->hideWgtBorder(WTOK_IMG0);
-            widget_manager->hideWgtBorder(WTOK_IMG1);
-            widget_manager->hideWgtRect(WTOK_AUTHOR);
-            widget_manager->hideWgtText(WTOK_AUTHOR);
-
-        }
-        else
-        {
-            widget_manager->showWgtBorder(WTOK_IMG0);
-            widget_manager->showWgtBorder(WTOK_IMG1);
-            widget_manager->showWgtRect(WTOK_AUTHOR);
-            widget_manager->showWgtText(WTOK_AUTHOR);
-        }
-    }
-    if( m_current_track != SELECTED_TRACK &&
-        SELECTED_TRACK >= 0 &&
-        SELECTED_TRACK < (int)track_manager->getNumberOfTracks() )
-    {
-        const Track* TRACK = track_manager->getTrack( SELECTED_TRACK );
-        bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
-
-        if( isAvailable )
-        {
-
-            const std::string& description = TRACK->getDescription();
-            if(description!="")
-            {
-                widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
-            }
-            else
-            {
-                char designedby[MAX_MESSAGE_LENGTH];
-                snprintf(designedby, MAX_MESSAGE_LENGTH, 
-                         "Designed by %s", TRACK->getDesigner().c_str());
-                widget_manager->setWgtText( WTOK_AUTHOR, designedby );
-            }
-            const std::string& screenshot = TRACK->getScreenshotFile();
-            const std::string& topview    = TRACK->getTopviewFile();
-
-            if( !screenshot.empty() && !topview.empty() )
-            {
-                widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
-                widget_manager->showWgtRect( WTOK_IMG0 );
-                widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
-                widget_manager->showWgtTexture( WTOK_IMG0 );
-                widget_manager->hideWgtTrack( WTOK_IMG0 );
-
-                widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
-                widget_manager->showWgtRect( WTOK_IMG1 );
-                widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
-                widget_manager->showWgtTexture( WTOK_IMG1 );
-                widget_manager->hideWgtTrack( WTOK_IMG1 );
-            }
-            else if( topview.empty() )
-            {
-                widget_manager->setWgtColor( WTOK_IMG0, WGT_WHITE);
-                widget_manager->showWgtRect( WTOK_IMG0 );
-                widget_manager->setWgtTexture( WTOK_IMG0, screenshot.c_str() );
-                widget_manager->showWgtTexture( WTOK_IMG0 );
-                widget_manager->hideWgtTrack( WTOK_IMG0 );
-
-                widget_manager->hideWgtRect( WTOK_IMG1 );
-                widget_manager->hideWgtTexture( WTOK_IMG1 );
-                widget_manager->setWgtTrackNum( WTOK_IMG1, SELECTED_TRACK );
-                widget_manager->showWgtTrack( WTOK_IMG1 );
-            }
-            else if( screenshot.empty() )
-            {
-                widget_manager->hideWgtRect( WTOK_IMG0 );
-                widget_manager->hideWgtTexture( WTOK_IMG0 );
-                widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
-                widget_manager->showWgtTrack( WTOK_IMG0 );
-
-                widget_manager->setWgtColor( WTOK_IMG1, WGT_WHITE);
-                widget_manager->showWgtRect( WTOK_IMG1 );
-                widget_manager->setWgtTexture( WTOK_IMG1, topview.c_str() );
-                widget_manager->showWgtTexture( WTOK_IMG1 );
-                widget_manager->hideWgtTrack( WTOK_IMG1 );
-            }
-            else //if( screenshot.empty() && topview.empty() )
-            {
-                widget_manager->hideWgtRect( WTOK_IMG0 );
-                widget_manager->hideWgtTexture( WTOK_IMG0 );
-                widget_manager->setWgtTrackNum( WTOK_IMG0, SELECTED_TRACK );
-                widget_manager->showWgtTrack( WTOK_IMG0 );
-
-                widget_manager->hideWgtRect( WTOK_IMG1 );
-                widget_manager->hideWgtTexture( WTOK_IMG1 );
-                widget_manager->hideWgtTrack( WTOK_IMG1 );
-            }
-        }   // isAvailable
-    }   // m_current_track != SELECTED_TRACK && ...
-    
-    m_current_track = SELECTED_TRACK;
+    displayImages(m_index_avail_tracks[indx]);
     widget_manager->update(dt);
 }   // update
 
@@ -369,4 +365,28 @@ void TrackSel::select()
     }
 }   // select
 
+// ----------------------------------------------------------------------------
+
+void TrackSel::handle(GameAction action, int value)
+{
+    // Forward keypresses to basegui
+    if(value) return BaseGUI::handle(action, value);
+
+    if(action==GA_CURSOR_UP)
+    {
+        m_offset--;
+        if(m_offset < 0) m_offset = (int)m_index_avail_tracks.size() - 1;
+        updateScrollPosition();
+        return;
+
+    }   // if cursor up
+    if(action ==GA_CURSOR_DOWN)
+    {
+        m_offset++;
+        if(m_offset >= (int)m_index_avail_tracks.size()) m_offset = 0;
+        updateScrollPosition();
+        return;
+    }   // if cursor down
+    BaseGUI::handle(action, value);
+}   // handle
 /* EOF */

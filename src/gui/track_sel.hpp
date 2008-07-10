@@ -35,11 +35,13 @@ private:
     int computeIndent(int n) {return 40+abs((int)(m_num_entries-1)/2 - n)*3;}
 	void updateScrollPosition();
 	void switchGroup();
+    void displayImages(int selected_track);
 public:
     TrackSel();
     ~TrackSel();
 
     void update(float dt);
+    virtual void handle(GameAction, int);
     void select();
 };
 
