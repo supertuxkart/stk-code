@@ -60,7 +60,6 @@ protected:
     float m_height_cog;               // height of center of gravity
     float m_engine_power;             // maximum force from engine
     float m_brake_factor;             // braking factor * engine_power = braking force
-    float m_max_steer_angle;          // maximum steering angle
     float m_time_full_steer;          // time for player karts to reach full steer angle
     float m_wheelie_max_speed_ratio;  // percentage of maximum speed for wheelies
     float m_wheelie_max_pitch;        // maximum pitch for wheelies
@@ -68,6 +67,10 @@ protected:
     float m_wheelie_restore_rate;     // rate/sec with which kart does down
     float m_wheelie_speed_boost;      // speed boost while doing a wheelie
     float m_wheelie_power_boost;      // increase in engine power
+
+    float m_min_speed_turn, m_angle_at_min;  // speed dependent steering: max 
+    float m_max_speed_turn, m_angle_at_max;  // turn angle at lowest speed etc
+    float m_speed_angle_increase;
 
     // bullet physics data 
     // -------------------
@@ -106,14 +109,15 @@ protected:
 
 public:
     KartProperties   ();
-    virtual      ~KartProperties   ();
+    virtual      ~KartProperties    ();
 
-    virtual void  init_defaults    ();
-    virtual void  getAllData       (const lisp::Lisp* lisp);
-    virtual void  load             (const std::string filename,
-                                    const std::string node="tuxkart-kart",
-                                    bool dont_load_models=false,
-                                    bool dont_load_materials=false);
+    virtual void  init_defaults     ();
+    virtual void  getAllData        (const lisp::Lisp* lisp);
+    virtual void  load              (const std::string filename,
+                                     const std::string node="tuxkart-kart",
+                                     bool dont_load_models=false,
+                                     bool dont_load_materials=false);
+    float getMaxSteerAngle          (float speed) const;
 
     Material*     getIconMaterial   () const {return m_icon_material;          }
     ssgEntity*    getModel          () const {return m_model;                  }
@@ -133,7 +137,6 @@ public:
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getWheelBase              () const {return m_wheel_base;               }
     float getHeightCOG              () const {return m_height_cog;               }
-    float getMaxSteerAngle          () const {return m_max_steer_angle;          }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
     float getWheelieMaxSpeedRatio   () const {return m_wheelie_max_speed_ratio;  }
     float getWheelieMaxPitch        () const {return m_wheelie_max_pitch;        }

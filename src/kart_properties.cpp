@@ -151,7 +151,37 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("time-full-steer",         m_time_full_steer);
     lisp->get("brake-factor",            m_brake_factor);
     lisp->get("mass",                    m_mass);
-    lisp->get("max-steer-angle",         m_max_steer_angle);
+
+    std::vector<float> v;
+    if(lisp->getVector("max-speed-angle",      v))
+    {
+        if(v.size()!=2)
+            printf("Incorrect max-speed-angle specifications for kart %'s'\n",
+                   getIdent());
+        else
+        {
+            m_max_speed_turn = v[0];
+            m_angle_at_max   = v[1];
+        }
+    }
+    v.clear();
+    if(lisp->getVector("min-speed-angle",      v))
+    {
+        if(v.size()!=2)
+            printf("Incorrect min-speed-angle specifications for kart %'s'\n",
+                   getIdent());
+        else
+        {
+            m_min_speed_turn = v[0];
+            m_angle_at_min   = v[1];
+        }
+    }
+    if(m_max_speed_turn == m_min_speed_turn)
+        m_speed_angle_increase = 0.0;
+    else
+        m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
+                               / (m_max_speed_turn - m_min_speed_turn);
+                             
     lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio );
     lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch       );
     lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate      );
@@ -217,7 +247,6 @@ void KartProperties::init_defaults()
     m_time_full_steer           = stk_config->m_time_full_steer;
     m_brake_factor              = stk_config->m_brake_factor;
     m_mass                      = stk_config->m_mass;
-    m_max_steer_angle           = stk_config->m_max_steer_angle;
     m_wheelie_max_speed_ratio   = stk_config->m_wheelie_max_speed_ratio;
     m_wheelie_max_pitch         = stk_config->m_wheelie_max_pitch;
     m_wheelie_pitch_rate        = stk_config->m_wheelie_pitch_rate;
@@ -248,6 +277,19 @@ void KartProperties::init_defaults()
     m_camera_max_accel          = stk_config->getCameraMaxAccel();
     m_camera_max_brake          = stk_config->getCameraMaxBrake();
     m_camera_distance           = stk_config->getCameraDistance();
+    m_min_speed_turn            = stk_config->m_min_speed_turn;
+    m_angle_at_min              = stk_config->m_angle_at_min;
+    m_max_speed_turn            = stk_config->m_max_speed_turn;
+    m_angle_at_max              = stk_config->m_angle_at_max;
 }   // init_defaults
+
+// ----------------------------------------------------------------------------
+float KartProperties::getMaxSteerAngle(float speed) const
+{
+    if(speed<=m_min_speed_turn) return m_angle_at_min;
+    if(speed>=m_max_speed_turn) return m_angle_at_max;
+    return m_angle_at_min - speed*m_speed_angle_increase;
+}   // getMaxSteerAngle
+
 
 /* EOF */

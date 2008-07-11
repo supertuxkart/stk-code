@@ -74,7 +74,10 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_height_cog,              "heightCOG"                    );
     CHECK_NEG(m_wheel_base,              "wheel-base"                   );
     CHECK_NEG(m_engine_power,            "engine-power"                 );
-    CHECK_NEG(m_max_steer_angle,         "max-steer-angle"              );
+    CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
+    CHECK_NEG(m_angle_at_min,            "min-speed-angle"              );
+    CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
+    CHECK_NEG(m_angle_at_max,            "max-speed-angle"              );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
 
     CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
@@ -132,7 +135,8 @@ void STKConfig::load(const std::string filename)
  */
 void STKConfig::init_defaults()
 {
-    m_wheel_base   = m_height_cog      = m_mass = m_max_steer_angle =
+    m_wheel_base   = m_height_cog      = m_mass = 
+    m_min_speed_turn = m_angle_at_min = m_max_speed_turn = m_angle_at_max = 
     m_anvil_weight    = m_parachute_friction =
     m_parachute_time = m_parachute_done_fraction = m_parachute_time_other = 
     m_engine_power = m_brake_factor =

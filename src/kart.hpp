@@ -168,7 +168,8 @@ public:
     float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
     float          getHeightCOG     () const {return m_kart_properties->getHeightCOG();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
-    float          getMaxSteerAngle () const {return m_kart_properties->getMaxSteerAngle();}
+    float          getMaxSteerAngle () const
+                       {return m_kart_properties->getMaxSteerAngle(getSpeed());}
     float          getGravityCenterShift   () const
         {return m_kart_properties->getGravityCenterShift();                    }
     float          getWheelieMaxSpeedRatio () const
@@ -181,8 +182,6 @@ public:
         {return m_kart_properties->getWheelieRestoreRate();                    }
     float          getWheelieSpeedBoost() const
         {return m_kart_properties->getWheelieSpeedBoost();                     }
-    float          getSteerAngle    () const
-        {return m_controls.lr*m_kart_properties->getMaxSteerAngle();           }
     float          getSteerPercent  () const {return m_controls.lr;            }
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }

@@ -85,9 +85,9 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
         KartProperties* kp = new KartProperties();
         kp->load(kart_file, "tuxkart-kart", dont_load_models);
         m_karts_properties.push_back(kp);
-        if(kp->getMaxSteerAngle() > m_max_steer_angle)
+        if(kp->getMaxSteerAngle(0) > m_max_steer_angle)
         {
-            m_max_steer_angle = kp->getMaxSteerAngle();
+            m_max_steer_angle = kp->getMaxSteerAngle(0);
         }
         const std::vector<std::string>& groups=kp->getGroups();
         for(unsigned int g=0; g<groups.size(); g++)
