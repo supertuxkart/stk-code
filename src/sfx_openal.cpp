@@ -103,7 +103,7 @@ bool SFXImpl::load(const char* filename)
             if( spec.channels == 2 ) format = AL_FORMAT_STEREO16;
             else format = AL_FORMAT_MONO16;
             
-            #ifdef WORDS_BIGENDIAN
+            #if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER==SDL_BIG_ENDIAN
             // swap bytes around for big-endian systems
             for(unsigned int n=0; n<size-1; n+=2)
             {

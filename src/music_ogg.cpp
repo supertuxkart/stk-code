@@ -26,6 +26,7 @@
 #  include <AL/al.h>
 #endif
 
+#include <SDL/SDL_endian.h>
 #include "music_ogg.hpp"
 #include "file_manager.hpp"
 #include "user_config.hpp"
@@ -280,7 +281,7 @@ void MusicOggStream::update()
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
     char pcm[BUFFER_SIZE];
-#ifdef WORDS_BIGENDIAN
+#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER==SDL_BIG_ENDIAN
     int  isBigEndian = 1;
 #else
     int  isBigEndian = 0;
