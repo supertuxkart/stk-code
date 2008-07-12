@@ -798,7 +798,7 @@ void Kart::updatePhysics (float dt)
         }
     }
 
-    if(isOnGround() && m_controls.jump)
+    if(m_controls.jump && isOnGround())
     { 
       //Vector3 impulse(0.0f, 0.0f, 10.0f);
       //        getVehicle()->getRigidBody()->applyCentralImpulse(impulse);
