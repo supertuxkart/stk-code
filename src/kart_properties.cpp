@@ -156,8 +156,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     if(lisp->getVector("max-speed-angle",      v))
     {
         if(v.size()!=2)
-            printf("Incorrect max-speed-angle specifications for kart %'s'\n",
-                   getIdent());
+            printf("Incorrect max-speed-angle specifications for kart '%s'\n",
+                   getIdent().c_str());
         else
         {
             m_max_speed_turn = v[0];
@@ -168,8 +168,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     if(lisp->getVector("min-speed-angle",      v))
     {
         if(v.size()!=2)
-            printf("Incorrect min-speed-angle specifications for kart %'s'\n",
-                   getIdent());
+            printf("Incorrect min-speed-angle specifications for kart '%s'\n",
+                   getIdent().c_str());
         else
         {
             m_min_speed_turn = v[0];
@@ -288,7 +288,7 @@ float KartProperties::getMaxSteerAngle(float speed) const
 {
     if(speed<=m_min_speed_turn) return m_angle_at_min;
     if(speed>=m_max_speed_turn) return m_angle_at_max;
-    return m_angle_at_min - speed*m_speed_angle_increase;
+    return m_angle_at_min - (speed-m_min_speed_turn)*m_speed_angle_increase;
 }   // getMaxSteerAngle
 
 
