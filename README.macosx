@@ -1,5 +1,6 @@
-The latest information about compilation on Mac are on our wiki:
+(*) The latest information about compilation on Mac are on our wiki:
 http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX
+(*) There is an experimental Xcode project in /src/ide/Xcode/. It will still require that all dependencies are installed as explained on the wiki. It currently does not build bullet, so you'll need to build from terminal at least once to get bullet built.
 
 The older instructions should still work, and are quite detailed.
 Note that we supply a modified version of plib (on our download page

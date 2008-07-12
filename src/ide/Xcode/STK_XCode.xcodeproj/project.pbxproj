@@ -379,6 +379,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		954DF4040E283AB1007270E0 /* model.xcclassmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcclassmodel; path = model.xcclassmodel; sourceTree = "<group>"; };
 		95F4221E0E26DF0A00692113 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -393,10 +394,10 @@
 		95F42D3F0E26E84D00692113 /* attachment_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = attachment_manager.cpp; path = ../../attachment_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95F42D400E26E84D00692113 /* attachment_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = attachment_manager.hpp; path = ../../attachment_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95F42D420E26E84D00692113 /* auto_kart.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = auto_kart.hpp; path = ../../auto_kart.hpp; sourceTree = SOURCE_ROOT; };
-		95F42D700E26E84D00692113 /* libbulletopenglsupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletopenglsupport.a; path = ../../bullet/Demos/OpenGL/libbulletopenglsupport.a; sourceTree = "<group>"; };
-		95F42F040E26E85000692113 /* libbulletcollision.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletcollision.a; path = ../../bullet/src/libbulletcollision.a; sourceTree = "<group>"; };
-		95F42F050E26E85000692113 /* libbulletdynamics.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletdynamics.a; path = ../../bullet/src/libbulletdynamics.a; sourceTree = "<group>"; };
-		95F42F060E26E85000692113 /* libbulletmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletmath.a; path = ../../bullet/src/libbulletmath.a; sourceTree = "<group>"; };
+		95F42D700E26E84D00692113 /* libbulletopenglsupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletopenglsupport.a; path = ../../bullet/Demos/OpenGL/libbulletopenglsupport.a; sourceTree = SOURCE_ROOT; };
+		95F42F040E26E85000692113 /* libbulletcollision.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletcollision.a; path = ../../bullet/src/libbulletcollision.a; sourceTree = SOURCE_ROOT; };
+		95F42F050E26E85000692113 /* libbulletdynamics.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletdynamics.a; path = ../../bullet/src/libbulletdynamics.a; sourceTree = SOURCE_ROOT; };
+		95F42F060E26E85000692113 /* libbulletmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbulletmath.a; path = ../../bullet/src/libbulletmath.a; sourceTree = SOURCE_ROOT; };
 		95F42F290E26E85000692113 /* callback.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = callback.hpp; path = ../../callback.hpp; sourceTree = SOURCE_ROOT; };
 		95F42F2A0E26E85000692113 /* callback_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = callback_manager.cpp; path = ../../callback_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95F42F2B0E26E85000692113 /* callback_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = callback_manager.hpp; path = ../../callback_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -658,6 +659,7 @@
 				95F42F040E26E85000692113 /* libbulletcollision.a */,
 				95F42F060E26E85000692113 /* libbulletmath.a */,
 				95F42F050E26E85000692113 /* libbulletdynamics.a */,
+				954DF4040E283AB1007270E0 /* model.xcclassmodel */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
 			name = STK_XCode;
@@ -1107,31 +1109,21 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../\"";
-				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(PROJECT_DIR)/../../bullet/src\"";
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_6)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_9)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(PROJECT_DIR)/../../bullet/src\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(PROJECT_DIR)/../..\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(PROJECT_DIR)/../../bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(PROJECT_DIR)/../..\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(PROJECT_DIR)/../../bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_9 = "\"$(PROJECT_DIR)/../../src\"";
-				OTHER_CFLAGS = "-DHAVE_OGGVORBIS";
+				OTHER_CFLAGS = (
+					"-DHAVE_OGGVORBIS",
+					"-I$(PROJECT_DIR)/../../",
+					"-I$(PROJECT_DIR)/../../bullet/src",
+				);
 				OTHER_LDFLAGS = (
 					"-L/usr/local/lib",
 					"-lSDL",
@@ -1162,31 +1154,21 @@
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../\"";
-				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(PROJECT_DIR)/../../bullet/src\"";
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_6)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_9)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(PROJECT_DIR)/../../bullet/src\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(PROJECT_DIR)/../..\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(PROJECT_DIR)/../../bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(PROJECT_DIR)/../..\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(PROJECT_DIR)/../../bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(PROJECT_DIR)/../../bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_9 = "\"$(PROJECT_DIR)/../../src\"";
-				OTHER_CFLAGS = "-DHAVE_OGGVORBIS";
+				OTHER_CFLAGS = (
+					"-DHAVE_OGGVORBIS",
+					"-I$(PROJECT_DIR)/../../",
+					"-I$(PROJECT_DIR)/../../bullet/src",
+				);
 				OTHER_LDFLAGS = (
 					"-L/usr/local/lib",
 					"-lSDL",
