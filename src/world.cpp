@@ -95,13 +95,15 @@ World::World()
     // karts can be positioned properly on (and not in) the tracks.
     loadTrack() ;
 
-    int playerIndex = 0;
+    m_player_karts.resize(race_manager->getNumPlayers());
+
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         int position = i+1;   // position start with 1
         btTransform init_pos=m_track->getStartTransform(position);
         Kart* newkart;
         const std::string& kart_name=race_manager->getKartName(i);
+        int player_id = race_manager->getkartPlayerId(i);
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
@@ -110,7 +112,7 @@ World::World()
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
-                scene->createCamera(playerIndex, newkart);
+                scene->createCamera(player_id, newkart);
             }
         }
         else
@@ -118,10 +120,9 @@ World::World()
             if (race_manager->isPlayer(i))
             {
                 newkart = new PlayerKart(kart_name, position,
-                                         &(user_config->m_player[playerIndex]),
-                                         init_pos, playerIndex);
-                m_player_karts.push_back((PlayerKart*)newkart);
-                playerIndex++;
+                                         &(user_config->m_player[player_id]),
+                                         init_pos, player_id);
+                m_player_karts[player_id] = (PlayerKart*)newkart;
             }
             else
             {
@@ -322,6 +323,10 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
+#ifdef DEBUG
+    // FIXME begin: for debugging only: had a bug here once, couldn't reproduce it:
+    for(unsigned int i=0; i<m_kart.size(); i++) index[i]=-1;
+#endif
     for (unsigned int i=0; i<m_kart.size(); i++ )
     {
         index[m_kart[i]->getPosition()-1] = i;
@@ -329,6 +334,19 @@ void World::updateHighscores()
 
     for(unsigned int pos=0; pos<m_kart.size(); pos++)
     {
+#ifdef DEBUG
+        // FIXME begin: triggered if the positions of the karts are incorrect:
+        if(index[pos]<0)
+        {
+            fprintf(stderr, "Error, incorrect kart positions:");
+            for (unsigned int i=0; i<m_kart.size(); i++ )
+            {
+                fprintf(stderr, "i=%d position %d\n",i, m_kart[i]->getPosition());
+            }
+        }
+#endif
+        // FIXME: end
+
         // Only record times for player karts
         if(!m_kart[index[pos]]->isPlayerKart()) continue;
 

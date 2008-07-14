@@ -130,6 +130,7 @@ public:
     const std::string& 
                  getHerringStyle()        const { return m_cup.getHerringStyle();   }
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;}
+    int          getkartPlayerId(int krt) const { return m_kart_status[krt].m_player_id;}
     int          getPositionScore(int p)  const { return m_score_for_position[p-1]; }
     double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
     int          getCoinTarget()          const { return m_coin_target;            }
