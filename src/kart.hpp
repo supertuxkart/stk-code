@@ -215,7 +215,7 @@ public:
     virtual void   collectedHerring (Herring* herring);
     virtual void   reset            ();
     virtual void   handleZipper     ();
-    virtual void   crashed          () {};
+    virtual void   crashed          (Kart *k) {};
     virtual void   doLapCounting    ();
     virtual void   update           (float dt);
     virtual void   raceFinished     (float time);

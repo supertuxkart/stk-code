@@ -137,8 +137,8 @@ void Physics::update(float dt)
  */
 void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 {
-    kartA->crashed();   // will play crash sound for player karts
-    kartB->crashed(); 
+    kartA->crashed(kartB);   // will play crash sound for player karts
+    kartB->crashed(kartA); 
     Attachment *attachmentA=kartA->getAttachment();
     Attachment *attachmentB=kartB->getAttachment();
 
@@ -213,18 +213,14 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
-                upB->getPointerKart()->crashed();
+                upB->getPointerKart()->crashed(NULL);
         }
         // 2) object a is a kart
         // =====================
         else if(upA->is(UserPointer::UP_KART))
         {
             if(upB->is(UserPointer::UP_TRACK))
-                // FIXME: sound disabled for now, since the chassis of the karts hits
-                //        the track when accelerating, causing a constant crash sfx
-                //        to be played. Might be fixed with better physics parameters
-                // upA->getPointerKart()->crashed(); // Kart hit track
-                ;
+                upA->getPointerKart()->crashed(NULL);   // Kart hit track
             else if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart
             else if(upB->is(UserPointer::UP_KART))

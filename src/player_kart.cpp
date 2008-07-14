@@ -200,9 +200,9 @@ void PlayerKart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void PlayerKart::crashed()
+void PlayerKart::crashed(Kart *kart)
 {
-    Kart::crashed();
+    Kart::crashed(kart);
     // A collision is usually reported several times, even when hitting
     // something only once. This results in a kind of 'machine gun'
     // noise by playing the crash sound over and over again. To prevent
@@ -211,11 +211,15 @@ void PlayerKart::crashed()
 
     if(world->getTime() - m_time_last_crash_sound > 0.5f) 
     {
-        // FIXME: sound disabled for now, since the chassis of the karts hits
+        // FIXME: sounds when hitting the track (i.e. the kart argument is NULL)
+        //        are disabled for now, since the chassis of the karts hits
         //        the track when accelerating, causing a constant crash sfx
         //        to be played. Might be fixed with better physics parameters
-        //sound_manager->playSfx( SOUND_CRASH );
-        m_time_last_crash_sound = world->getTime();
+        if(kart)
+        {
+            sound_manager->playSfx( SOUND_CRASH );
+            m_time_last_crash_sound = world->getTime();
+        }
     }
 }   // crashed
 

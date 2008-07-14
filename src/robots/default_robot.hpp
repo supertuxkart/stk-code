@@ -133,7 +133,7 @@ public:
 
     void update      (float delta) ;
     void reset       ();
-    virtual void crashed() {m_collided = true;};
+    virtual void crashed(Kart *k) {if(k) m_collided = true;};
 };
 
 #endif

@@ -51,7 +51,7 @@ public:
     void    update            (float);
     void    addMessages       ();
     void    action            (KartAction action, int value);
-    void    crashed           ();
+    void    crashed           (Kart *k);
     void    handleZipper      ();
     void    collectedHerring  (Herring* herring);
     virtual void setPosition  (int p);
