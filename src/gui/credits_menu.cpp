@@ -66,7 +66,6 @@ CreditsMenu::CreditsMenu()
     widget_manager->addTextWgt( WTOK_CREDITS, 100, 93, "" );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
     //FIXME: maybe I should make scroll names more consistent
-    widget_manager->activateWgt( WTOK_CREDITS );
     widget_manager->enableWgtScroll( WTOK_CREDITS );
     widget_manager->setWgtYScrollPos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
     widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -80 );
