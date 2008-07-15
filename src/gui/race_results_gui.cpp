@@ -189,7 +189,7 @@ void RaceResultsGUI::select()
     case WTOK_RESTART_RACE:
         world->unpause();
         menu_manager->popMenu();
-        race_manager->restartRace();
+        race_manager->rerunRace();
         break;
     case WTOK_SETUP_NEW_RACE:
         world->unpause();

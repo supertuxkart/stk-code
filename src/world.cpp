@@ -288,7 +288,7 @@ void World::update(float dt)
     for (int i = 0 ; i <(int) m_kart.size(); ++i)
     {
         // Update all karts that are not eliminated
-        if(!race_manager->isEliminated(i)) m_kart[i]->update(dt) ;
+        if(!m_kart[i]->isEliminated()) m_kart[i]->update(dt) ;
     }
 
     projectile_manager->update(dt);
@@ -667,7 +667,6 @@ void World::removeKart(int kart_number)
     // the number of karts still racing. This value can not be used for loops 
     // over all karts, use race_manager->getNumKarts() instead!
     race_manager->RaceFinished(kart, m_clock);
-    race_manager->eliminate(kart_number);
     kart->eliminate();
     m_eliminated_karts++;
 

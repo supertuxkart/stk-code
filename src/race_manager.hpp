@@ -60,14 +60,12 @@ private:
         double      m_last_time;        // needed for restart
         int         m_prev_finish_pos;  // previous finished position
         int         m_player_id;        // player controling the kart, for AI: -1
-        bool        m_is_eliminated;    // for mini games which can eliminate karts
 
         KartStatus(const std::string& ident, const int& prev_finish_pos, 
                    const int& player_id) :
                    m_ident(ident), m_score(0), m_last_score(0), 
                    m_overall_time(0.0f), m_last_time(0.0f),
-                   m_prev_finish_pos(prev_finish_pos), m_player_id(player_id),
-                   m_is_eliminated(false)
+                   m_prev_finish_pos(prev_finish_pos), m_player_id(player_id)
                 {}
         
     };   // KartStatus
@@ -134,9 +132,7 @@ public:
     int          getPositionScore(int p)  const { return m_score_for_position[p-1]; }
     double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
     int          getCoinTarget()          const { return m_coin_target;            }
-    bool         isEliminated(int kart)   const { return m_kart_status[kart].m_is_eliminated;}
     bool         raceHasLaps()            const { return m_race_mode!=RM_FOLLOW_LEADER;}
-    void         eliminate(int kart)            { m_kart_status[kart].m_is_eliminated=true;}
     int          allPlayerFinished()      const {return 
                                           m_num_finished_players==m_player_karts.size();    }
     int          raceIsActive()           const { return m_active_race;             }
@@ -147,7 +143,7 @@ public:
 
     void startNew();         // start new race/GP/...
     void next();             // start the next race or go back to the start screen
-    void restartRace();      // restart same race again
+    void rerunRace();        // Rerun the same race again
     void exit_race();        // exit a race (and don't start the next one)
 };
 
