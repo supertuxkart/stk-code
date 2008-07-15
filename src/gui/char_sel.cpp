@@ -45,8 +45,8 @@ enum WidgetTokens
     WTOK_EMPTY_DOWN,
     WTOK_DOWN,
     WTOK_EMPTY0 = 10,
-    WTOK_NAME0  = 20,
-    WTOK_RACER0 = 30
+    WTOK_NAME0  = 2000,
+    WTOK_RACER0 = 3000
 };
 
 CharSel::CharSel(int whichPlayer)
@@ -122,7 +122,7 @@ CharSel::CharSel(int whichPlayer)
 		}
 		m_offset = local_index - m_max_entries/2;
 		if(m_offset<0) m_offset+=(int)m_index_avail_karts.size();
-        widget_manager->setSelectedWgt(WTOK_RACER0 + local_index);
+        widget_manager->setSelectedWgt(WTOK_NAME0 +(m_max_entries-1)/2);
         switchCharacter(local_index);
     }
     else

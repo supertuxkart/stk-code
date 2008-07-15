@@ -90,12 +90,12 @@ TrackSel::TrackSel()
 	switchGroup();
     updateScrollPosition();
 
+    widget_manager->layout(WGT_AREA_TOP);
     // Make sure to select one track. The call to update() here is necessary,
     // since it guarantees that selectedWgt is indeed a track (otherwise the
     // manager might select e.g. arrow up, and then no track is displayed).
     widget_manager->setSelectedWgt(WTOK_TRACK0+(m_max_entries-1)/2);
     displayImages(0);
-    widget_manager->layout(WGT_AREA_TOP);
     //update(0);
 }   // TrackSel
 
