@@ -158,7 +158,9 @@ void UserConfig::setDefaults()
 	set(GA_CURSOR_DOWN,
 		Input(IT_KEYBOARD, SDLK_DOWN),
 		Input(IT_STICKMOTION, 0, 1, AD_POSITIVE));
-	
+    set(GA_CURSOR_UP,   Input(IT_MOUSEBUTTON, 4));
+    set(GA_CURSOR_DOWN, Input(IT_MOUSEBUTTON, 5));
+
 	set(GA_CURSOR_LEFT,
 		Input(IT_KEYBOARD, SDLK_LEFT),
 		Input(IT_STICKMOTION, 0, 0, AD_NEGATIVE));
