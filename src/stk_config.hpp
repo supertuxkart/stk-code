@@ -27,6 +27,7 @@
 class STKConfig : public KartProperties
 {
 public:
+    static float UNDEFINED;
     float m_anvil_weight;            // Additional kart weight if anvil is attached
     float m_anvil_speed_factor;      // To decrease speed once when attached
     float m_parachute_friction;      // Increased air friction when parachute

@@ -211,15 +211,8 @@ void PlayerKart::crashed(Kart *kart)
 
     if(world->getTime() - m_time_last_crash_sound > 0.5f) 
     {
-        // FIXME: sounds when hitting the track (i.e. the kart argument is NULL)
-        //        are disabled for now, since the chassis of the karts hits
-        //        the track when accelerating, causing a constant crash sfx
-        //        to be played. Might be fixed with better physics parameters
-        if(kart)
-        {
-            sound_manager->playSfx( SOUND_CRASH );
-            m_time_last_crash_sound = world->getTime();
-        }
+        sound_manager->playSfx( SOUND_CRASH );
+        m_time_last_crash_sound = world->getTime();
     }
 }   // crashed
 

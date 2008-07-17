@@ -118,10 +118,8 @@ void Kart::createPhysics(ssgEntity *obj)
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart 
-    // won't topple over too easy. This must be between 0 and 0.5
-    // (it's in units of kart_height)
-    const float CENTER_SHIFT = getGravityCenterShift();
-    shiftCenterOfGravity.setOrigin(btVector3(0.0f,0.0f,CENTER_SHIFT*kart_height));
+    // won't topple over too easy. 
+    shiftCenterOfGravity.setOrigin(getGravityCenterShift());
 
     m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
 
@@ -157,42 +155,45 @@ void Kart::createPhysics(ssgEntity *obj)
     
     // Add wheels
     // ----------
-    float wheel_width  = m_kart_properties->getWheelWidth();
-    float wheel_radius = m_kart_properties->getWheelRadius();
+    float wheel_width     = m_kart_properties->getWheelWidth();
+    float wheel_radius    = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
-    float connection_height = -(0.5f-CENTER_SHIFT)*kart_height;
+    Vec3  front_wheel     = m_kart_properties->getFrontWheelConnection();
+    if(front_wheel.getX()==STKConfig::UNDEFINED)
+        front_wheel.setX(0.5f*kart_width-0.3f*wheel_width);
+    if(front_wheel.getY()==STKConfig::UNDEFINED)
+        front_wheel.setY(0.5f*kart_length-wheel_radius);
+    if(front_wheel.getZ()==STKConfig::UNDEFINED)
+        front_wheel.setZ(0);
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
     // right front wheel
-    btVector3 wheel_coord(0.5f*kart_width-0.3f*wheel_width,
-                          0.5f*kart_length-wheel_radius,
-                          connection_height);
-    m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
+    m_vehicle->addWheel(front_wheel, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ true);
 
-    // left front wheel
-    wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
-                            0.5f*kart_length-wheel_radius,
-                            connection_height);
-    m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
+    // left front wheel: mirror X axis
+    front_wheel.setX(-front_wheel.getX());
+    m_vehicle->addWheel(front_wheel, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ true);
 
     // right rear wheel
-    wheel_coord = btVector3(0.5f*kart_width-0.3f*wheel_width, 
-                            -0.5f*kart_length+wheel_radius,
-                            connection_height);
-    m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
+    Vec3  rear_wheel = m_kart_properties->getRearWheelConnection();
+    if(rear_wheel.getX()==STKConfig::UNDEFINED)
+        rear_wheel.setX(0.5f*kart_width-0.3f*wheel_width);
+    if(rear_wheel.getY()==STKConfig::UNDEFINED)
+        rear_wheel.setY(-0.5f*kart_length+wheel_radius);
+    if(rear_wheel.getZ()==STKConfig::UNDEFINED)
+        rear_wheel.setZ(0);
+    m_vehicle->addWheel(rear_wheel, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ false);
 
-    // right rear wheel
-    wheel_coord = btVector3(-0.5f*kart_width+0.3f*wheel_width,
-                            -0.5f*kart_length+wheel_radius,
-                            connection_height);
-    m_vehicle->addWheel(wheel_coord, wheel_direction, wheel_axle,
+    // left rear wheel: mirror X axis
+    rear_wheel.setX(-rear_wheel.getX());
+    m_vehicle->addWheel(rear_wheel, wheel_direction, wheel_axle,
                         suspension_rest, wheel_radius, *m_tuning,
                         /* isFrontWheel: */ false);
 
@@ -1047,12 +1048,12 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     if (m_wheel_rear_l) m_wheel_rear_l->setTransform(wheel_rot);
     if (m_wheel_rear_r) m_wheel_rear_r->setTransform(wheel_rot);
 
-    const float CENTER_SHIFT  = getGravityCenterShift();
+    Vec3        center_shift  = getGravityCenterShift();
+    center_shift.setZ(-center_shift.getZ()
+                      + 0.3f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle))) );
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
-    const float offset_z      = 0.3f*fabs(sin(m_wheelie_angle*SG_DEGREES_TO_RADIANS))
-                              - (0.5f-CENTER_SHIFT)*getKartHeight();
     
-    Moveable::updateGraphics(Vec3(0, 0, offset_z), Vec3(0, offset_pitch, 0));
+    Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

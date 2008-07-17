@@ -145,6 +145,10 @@ int handleCmdLine(int argc, char **argv)
         {
             user_config->m_bullet_debug=1;
         }
+        else if(!strcmp(argv[i], "--kartsize-debug"))
+        {
+            user_config->m_print_kart_sizes=true;
+        }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");

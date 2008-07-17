@@ -168,6 +168,7 @@ public:
     bool        m_smoke;
     bool        m_display_fps;
     int         m_profile;         // Positive number: time in seconds, neg: # laps
+    bool        m_print_kart_sizes; // print all kart sizes
                                    // 0 if no profiling. Never saved in config file!
     bool        m_skidding;
     float       m_sfx_volume;

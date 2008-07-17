@@ -30,6 +30,8 @@
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "ssg_help.hpp"
+#include "user_config.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -103,23 +105,14 @@ void KartProperties::load(const std::string filename, const std::string node,
         ssgStripify(m_model);
         float x_min, x_max, y_min, y_max, z_min, z_max;
         MinMax(m_model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-        if(getName()=="Hexley" || getName()=="Wilber")
-        {
-            // These kart models are too small, so we get problems with stability. 
-            // Till we find either better (bigger) models or improve their physics 
-            // parameters to become playable, we just adjust the size of their 
-            // physical models to be the same as the tuxkart model
-            x_min=-0.473799f;
-            x_max= 0.486361f;
-            y_min=-0.772244f;
-            y_max= 0.739075f;
-            z_min= 0.002806f;
-            z_max= 0.701095f;
-        }
         m_kart_width  = x_max - x_min;
         m_kart_length = y_max - y_min;
         m_kart_height = z_max - z_min;
-        if(m_kart_length<1.2) m_kart_length=1.5f;
+
+        // Useful when tweaking kart parameters
+        if(user_config->m_print_kart_sizes)
+            printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(), 
+                   m_kart_width, m_kart_length, m_kart_height);
         m_model->ref();
     }  // if
     if(!dont_load_materials)
@@ -146,7 +139,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("rgb",                     m_color);
 
     lisp->get("wheel-base",              m_wheel_base);
-    lisp->get("heightCOG",               m_height_cog);
     lisp->get("engine-power",            m_engine_power);
     lisp->get("time-full-steer",         m_time_full_steer);
     lisp->get("brake-factor",            m_brake_factor);
@@ -202,6 +194,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("max-speed-reverse-ratio",   m_max_speed_reverse_ratio  );
     lisp->get("maximum-speed",             m_maximum_speed            );
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
+    lisp->get("front-wheel-connection",    m_front_wheel_connection   );
+    lisp->get("rear-wheel-connection",     m_rear_wheel_connection    );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
     lisp->get("jump-velocity",             m_jump_velocity            );
@@ -242,7 +236,6 @@ void KartProperties::init_defaults()
     m_kart_width                = 1.0f;
     m_kart_length               = 1.5f;
     m_wheel_base                = stk_config->m_wheel_base;
-    m_height_cog                = stk_config->m_height_cog;
     m_engine_power              = stk_config->m_engine_power;
     m_time_full_steer           = stk_config->m_time_full_steer;
     m_brake_factor              = stk_config->m_brake_factor;
@@ -267,6 +260,8 @@ void KartProperties::init_defaults()
     m_maximum_speed             = stk_config->m_maximum_speed;
     m_max_speed_reverse_ratio   = stk_config->m_max_speed_reverse_ratio;
     m_gravity_center_shift      = stk_config->m_gravity_center_shift;
+    m_front_wheel_connection    = stk_config->m_front_wheel_connection;
+    m_rear_wheel_connection     = stk_config->m_rear_wheel_connection;
     m_suspension_rest           = stk_config->m_suspension_rest;
     m_suspension_travel_cm      = stk_config->m_suspension_travel_cm;
     m_jump_velocity             = stk_config->m_jump_velocity;

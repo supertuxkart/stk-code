@@ -57,7 +57,6 @@ protected:
     float m_kart_height;              // height of kart
     float m_mass;                     // weight of kart
     float m_wheel_base;               // distance between front and read wheels
-    float m_height_cog;               // height of center of gravity
     float m_engine_power;             // maximum force from engine
     float m_brake_factor;             // braking factor * engine_power = braking force
     float m_time_full_steer;          // time for player karts to reach full steer angle
@@ -85,7 +84,10 @@ protected:
     float m_chassis_angular_damping;
     float m_maximum_speed;
     float m_max_speed_reverse_ratio;
-    float m_gravity_center_shift;
+    Vec3  m_gravity_center_shift;    // shift of center of gravity
+    Vec3  m_front_wheel_connection;  // connection point relative to center of
+    Vec3  m_rear_wheel_connection;   // gravity for front and rear right wheels
+                                     // (X is mirrored for left wheels)
     float m_suspension_rest;
 	float m_suspension_travel_cm;
     float m_jump_velocity;            // z velocity set when jumping
@@ -136,7 +138,6 @@ public:
     float getTimeFullSteer          () const {return m_time_full_steer;          }
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getWheelBase              () const {return m_wheel_base;               }
-    float getHeightCOG              () const {return m_height_cog;               }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
     float getWheelieMaxSpeedRatio   () const {return m_wheelie_max_speed_ratio;  }
     float getWheelieMaxPitch        () const {return m_wheelie_max_pitch;        }
@@ -156,7 +157,9 @@ public:
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }
-    float getGravityCenterShift     () const {return m_gravity_center_shift;     }
+    const Vec3& getGravityCenterShift() const {return m_gravity_center_shift;    }
+    const Vec3& getFrontWheelConnection()const {return m_front_wheel_connection; }
+    const Vec3& getRearWheelConnection()const {return m_rear_wheel_connection;   }
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }

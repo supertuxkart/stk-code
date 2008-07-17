@@ -21,6 +21,7 @@
 #include "file_manager.hpp"
 
 STKConfig* stk_config=0;
+float STKConfig::UNDEFINED = -99.9f;
 
 //-----------------------------------------------------------------------------
 void STKConfig::load(const std::string filename)
@@ -35,7 +36,7 @@ void STKConfig::load(const std::string filename)
     // Check that all necessary values are indeed set 
     // -----------------------------------------------
 
-#define CHECK_NEG(  a,strA) if(a<-99) {                                \
+#define CHECK_NEG(  a,strA) if(a==UNDEFINED) {                         \
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
@@ -71,7 +72,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_grid_order,              "grid-order"                   );
 
     CHECK_NEG(m_mass,                    "mass"                         );
-    CHECK_NEG(m_height_cog,              "heightCOG"                    );
     CHECK_NEG(m_wheel_base,              "wheel-base"                   );
     CHECK_NEG(m_engine_power,            "engine-power"                 );
     CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
@@ -106,7 +106,9 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
     CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
     CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
-    CHECK_NEG(m_gravity_center_shift,      "gravity-center-shift"       );
+    CHECK_NEG(m_gravity_center_shift[0],   "gravity-center-shift"       );
+    CHECK_NEG(m_gravity_center_shift[1],   "gravity-center-shift"       );
+    CHECK_NEG(m_gravity_center_shift[2],   "gravity-center-shift"       );
     CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
     CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
@@ -135,7 +137,7 @@ void STKConfig::load(const std::string filename)
  */
 void STKConfig::init_defaults()
 {
-    m_wheel_base   = m_height_cog      = m_mass = 
+    m_wheel_base   = m_mass = 
     m_min_speed_turn = m_angle_at_min = m_max_speed_turn = m_angle_at_max = 
     m_anvil_weight    = m_parachute_friction =
     m_parachute_time = m_parachute_done_fraction = m_parachute_time_other = 
@@ -151,16 +153,18 @@ void STKConfig::init_defaults()
     m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
     m_wheel_radius = m_wheel_width = m_wheelie_power_boost = 
     m_chassis_linear_damping = m_chassis_angular_damping = 
-    m_maximum_speed = m_gravity_center_shift = m_suspension_rest = 
+    m_maximum_speed = m_suspension_rest = 
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
     m_explosion_impulse_objects = m_upright_tolerance = m_upright_max_force =
 	m_suspension_travel_cm =
     // Camera
-    m_camera_max_accel = m_camera_max_brake = m_camera_distance = -99.9f;
-
-    m_max_karts            = -100;
-    m_grid_order           = -100;
-    m_title_music          = NULL;
+    m_camera_max_accel = m_camera_max_brake = m_camera_distance = UNDEFINED;
+    m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_front_wheel_connection = Vec3(UNDEFINED);
+    m_rear_wheel_connection  = Vec3(UNDEFINED);
+    m_max_karts              = -100;
+    m_grid_order             = -100;
+    m_title_music            = NULL;
     m_scores.clear();
     m_leader_intervals.clear();
 }   // init_defaults

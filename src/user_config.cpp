@@ -104,6 +104,7 @@ void UserConfig::setDefaults()
     m_herring_style    = "new";
     m_background_music = "";
     m_profile          = 0;
+    m_print_kart_sizes = false;
     m_skidding         = false;
     m_max_fps          = 120;
     m_sfx_volume       = 1.0f;
