@@ -115,7 +115,7 @@ void TrackSel::updateScrollPosition()
 		end   = start+m_index_avail_tracks.size()-1;
 	}
 
-	for(unsigned int i=0; i<m_max_entries; i++)
+	for(unsigned int i=0; i<(unsigned int)m_max_entries; i++)
     {
 		if(i<start || i>end)
 		{
@@ -292,7 +292,7 @@ void TrackSel::displayImages(int selected_track)
 void TrackSel::update(float dt)
 {
     int indx = widget_manager->getSelectedWgt() - WTOK_TRACK0;
-    if(indx<0 || indx >= m_max_entries) 
+    if(indx<0 || indx >= (int)m_max_entries) 
     {
         widget_manager->update(dt);
         return;
