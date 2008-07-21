@@ -78,18 +78,18 @@ CharSel::CharSel(int whichPlayer)
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);
     widget_manager->breakLine();
 
-	const int HEIGHT = 10;
-	widget_manager->addEmptyWgt(WTOK_EMPTY_UP, computeIndent(0), HEIGHT/2);
-	widget_manager->addTextButtonWgt(WTOK_UP, 20, HEIGHT/2, "^");
-	widget_manager->breakLine();
+    const int HEIGHT = 10;
+    widget_manager->addEmptyWgt(WTOK_EMPTY_UP, computeIndent(0), HEIGHT/2);
+    widget_manager->addTextButtonWgt(WTOK_UP, 20, HEIGHT/2, "^");
+    widget_manager->breakLine();
 
     for (unsigned int i = 0; i < m_max_entries; i++)
     {
-		// Depending on previously selected kart indx here might be a group,
-		// i.e. indx is negative, and kp is not defined. To avoid this,
-		// all widgets are _initialised_ with kart 0 (which surely exists),
-		// before later calling switchCharacter, which will define the 
-		// proper icons and texts.
+        // Depending on previously selected kart indx here might be a group,
+        // i.e. indx is negative, and kp is not defined. To avoid this,
+        // all widgets are _initialised_ with kart 0 (which surely exists),
+        // before later calling switchCharacter, which will define the 
+        // proper icons and texts.
         const KartProperties* kp = kart_properties_manager->getKartById(0);
         widget_manager->addEmptyWgt(WTOK_EMPTY0+i, computeIndent(i), HEIGHT );
         widget_manager->addImgButtonWgt(WTOK_RACER0 + i, 8, HEIGHT,
@@ -99,10 +99,10 @@ CharSel::CharSel(int whichPlayer)
         widget_manager->breakLine();
     }
 
-	widget_manager->addEmptyWgt(WTOK_EMPTY_DOWN, computeIndent(m_max_entries), HEIGHT/2);
-	widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
+    widget_manager->addEmptyWgt(WTOK_EMPTY_DOWN, computeIndent(m_max_entries), HEIGHT/2);
+    widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
 
-	switchGroup();  // select all karts from the currently selected group
+    switchGroup();  // select all karts from the currently selected group
 
     widget_manager->layout(WGT_AREA_RGT);
 
@@ -111,17 +111,17 @@ CharSel::CharSel(int whichPlayer)
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
     if( LAST_KART != -1 && kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
     {
-		int local_index = 0;
-		for(unsigned int i=0; i<m_index_avail_karts.size(); i++)
-		{
-			if(m_index_avail_karts[i]==LAST_KART) 
-			{
-				local_index = i;
-				break;
-			}
-		}
-		m_offset = local_index - m_max_entries/2;
-		if(m_offset<0) m_offset+=(int)m_index_avail_karts.size();
+        int local_index = 0;
+        for(unsigned int i=0; i<m_index_avail_karts.size(); i++)
+        {
+            if(m_index_avail_karts[i]==LAST_KART) 
+            {
+                local_index = i;
+                break;
+            }
+        }
+        m_offset = local_index - m_max_entries/2;
+        if(m_offset<0) m_offset+=(int)m_index_avail_karts.size();
         widget_manager->setSelectedWgt(WTOK_NAME0 +(m_max_entries-1)/2);
         switchCharacter(local_index);
     }
@@ -149,30 +149,30 @@ CharSel::~CharSel()
 //-----------------------------------------------------------------------------
 void CharSel::updateScrollPosition()
 {
-	// Handle the special case of less karts (plus groups) than widgets.
-	// Some of the widgets then need to be disabled.
-	unsigned int start = 0, end=m_max_entries;
-	if(m_index_avail_karts.size()<m_max_entries)
-	{
-		start = (unsigned int)(m_max_entries-m_index_avail_karts.size()+1)/2;
-		end   = start+m_index_avail_karts.size()-1;
-	}
+        // Handle the special case of less karts (plus groups) than widgets.
+        // Some of the widgets then need to be disabled.
+        unsigned int start = 0, end=m_max_entries;
+        if(m_index_avail_karts.size()<m_max_entries)
+        {
+                start = (unsigned int)(m_max_entries-m_index_avail_karts.size()+1)/2;
+                end   = start+m_index_avail_karts.size()-1;
+        }
 
-	for(unsigned int i=0; i<m_max_entries; i++)
+        for(unsigned int i=0; i<m_max_entries; i++)
     {
-		if(i<start || i>end)
-		{
-			widget_manager->hideWgtRect   (WTOK_NAME0 +i);
-			widget_manager->hideWgtRect   (WTOK_RACER0+i);
-			widget_manager->hideWgtText   (WTOK_NAME0 +i);
-			widget_manager->hideWgtTexture(WTOK_RACER0+i);
-			continue;
-		}
+                if(i<start || i>end)
+                {
+                        widget_manager->hideWgtRect   (WTOK_NAME0 +i);
+                        widget_manager->hideWgtRect   (WTOK_RACER0+i);
+                        widget_manager->hideWgtText   (WTOK_NAME0 +i);
+                        widget_manager->hideWgtTexture(WTOK_RACER0+i);
+                        continue;
+                }
 
-		// Otherwise enable the widgets again (just in case that they
-		// had been disabled before)
-		widget_manager->showWgtRect   (WTOK_NAME0 +i);
-		widget_manager->showWgtText   (WTOK_NAME0 +i);
+                // Otherwise enable the widgets again (just in case that they
+                // had been disabled before)
+                widget_manager->showWgtRect   (WTOK_NAME0 +i);
+                widget_manager->showWgtText   (WTOK_NAME0 +i);
 
         int indx = (i+m_offset)%m_index_avail_karts.size();
         indx     = m_index_avail_karts[indx];
@@ -183,15 +183,15 @@ void CharSel::updateScrollPosition()
             if(unlock_manager->isLocked(kp->getIdent())) continue;
             widget_manager->setWgtText(WTOK_NAME0 + i, kp->getName());
             widget_manager->setWgtTexture(WTOK_RACER0 + i, kp->getIconFile() );
-			widget_manager->showWgtTexture(WTOK_RACER0 + i);
-			widget_manager->showWgtRect(WTOK_RACER0 + i);
+                        widget_manager->showWgtTexture(WTOK_RACER0 + i);
+                        widget_manager->showWgtRect(WTOK_RACER0 + i);
         }
         else
         {
             const std::vector<std::string> &groups=kart_properties_manager->getAllGroups();
             widget_manager->setWgtText(WTOK_NAME0+i, groups[-indx-1]);
-			widget_manager->hideWgtTexture(WTOK_RACER0 + i);
-			widget_manager->hideWgtRect(WTOK_RACER0 + i);
+                        widget_manager->hideWgtTexture(WTOK_RACER0 + i);
+                        widget_manager->hideWgtRect(WTOK_RACER0 + i);
         }
     }   // for i
     // set the 'selection changed' flag in the widget_manager, since update 
@@ -205,7 +205,7 @@ void CharSel::updateScrollPosition()
 //-----------------------------------------------------------------------------
 void CharSel::switchGroup()
 {
-	m_index_avail_karts.clear();
+        m_index_avail_karts.clear();
     // This loop is too long (since getNumberOfKarts returns all karts in all groups),
     // but the loop is left if no more kart is found.
     const std::vector<int> &karts =
@@ -223,35 +223,35 @@ void CharSel::switchGroup()
     const std::vector<std::string> groups=kart_properties_manager->getAllGroups();
     for(int i =0; i<(int)groups.size(); i++)
     {
-		// Only add groups other than the current one
-		if(groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
+                // Only add groups other than the current one
+                if(groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
     }
     if(m_index_avail_karts.size()>=m_max_entries) 
-	{
-		m_offset          = 0;
-		widget_manager->showWgtRect(WTOK_DOWN);
-		widget_manager->showWgtText(WTOK_DOWN);
-		widget_manager->showWgtRect(WTOK_UP);
-		widget_manager->showWgtText(WTOK_UP);
-	}
-	else
-	{
-		// Less entries than maximum -> set m_offset to a negative number, so
-		// that the actual existing entries are displayed 
-		m_offset          = - (int)(m_max_entries-m_index_avail_karts.size())/2-1;
-		widget_manager->hideWgtRect(WTOK_DOWN);
-		widget_manager->hideWgtText(WTOK_DOWN);
-		widget_manager->hideWgtRect(WTOK_UP);
-		widget_manager->hideWgtText(WTOK_UP);
-	}
-	
+        {
+                m_offset          = 0;
+                widget_manager->showWgtRect(WTOK_DOWN);
+                widget_manager->showWgtText(WTOK_DOWN);
+                widget_manager->showWgtRect(WTOK_UP);
+                widget_manager->showWgtText(WTOK_UP);
+        }
+        else
+        {
+                // Less entries than maximum -> set m_offset to a negative number, so
+                // that the actual existing entries are displayed 
+                m_offset          = - (int)(m_max_entries-m_index_avail_karts.size())/2-1;
+                widget_manager->hideWgtRect(WTOK_DOWN);
+                widget_manager->hideWgtText(WTOK_DOWN);
+                widget_manager->hideWgtRect(WTOK_UP);
+                widget_manager->hideWgtText(WTOK_UP);
+        }
+        
 }   // switchGroup
 
 //-----------------------------------------------------------------------------
 void CharSel::switchCharacter(int n)
 {
     int indx=m_index_avail_karts[n];
-	// if a group is hovered about, don't do anything
+        // if a group is hovered about, don't do anything
     if(indx<0) return;
     
     const KartProperties* kp= kart_properties_manager->getKartById(indx);
@@ -277,7 +277,7 @@ void CharSel::update(float dt)
         int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
         if(token<0 || token>(int)m_index_avail_karts.size())
             token = widget_manager->getSelectedWgt() - WTOK_NAME0;
-		switchCharacter((token+m_offset)%m_index_avail_karts.size());
+                switchCharacter((token+m_offset)%m_index_avail_karts.size());
     }
 
     if (m_kart != NULL)
@@ -341,17 +341,17 @@ void CharSel::select()
 
     token = (token+m_offset) % (int)m_index_avail_karts.size();
     int kart_id = m_index_avail_karts[token];
-	if(kart_id < 0) // group selected
-	{
+        if(kart_id < 0) // group selected
+        {
         user_config->m_kart_group = kart_properties_manager->getAllGroups()[-kart_id-1];
-		switchGroup();
-		// forces redraw of the model, otherwise (if m_current_kart=0) the new
-		// model would not be displayed.
-		m_current_kart = -1;
-		switchCharacter(0);
-		updateScrollPosition();
-		return;
-	}
+                switchGroup();
+                // forces redraw of the model, otherwise (if m_current_kart=0) the new
+                // model would not be displayed.
+                m_current_kart = -1;
+                switchCharacter(0);
+                updateScrollPosition();
+                return;
+        }
     const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
     if (KP != NULL)
     {
@@ -425,15 +425,15 @@ void CharSel::handle(GameAction action, int value)
 
 bool CharSel::kartAvailable(int kart)
 {
-	if (!kart_properties_manager->m_selected_karts.empty())
+    if (!kart_properties_manager->m_selected_karts.empty())
+    {
+        std::vector<int>::iterator it;
+        for (it = kart_properties_manager->m_selected_karts.begin();
+             it < kart_properties_manager->m_selected_karts.end(); it++)
         {
-            std::vector<int>::iterator it;
-            for (it = kart_properties_manager->m_selected_karts.begin();
-                it < kart_properties_manager->m_selected_karts.end(); it++)
-            {
-                if ( kart == *it)
-                return false;
-            }
-        }
+            if ( kart == *it)
+            return false;
+	}
+    }
     return true;
 }   // kartAvailable
