@@ -145,7 +145,7 @@ World::World()
     //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
 #endif
 
-    Highscores::HighscoreType hst = (race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
+    Highscores::HighscoreType hst = (race_manager->getMinorMode()==RaceManager::RM_TIME_TRIAL) 
                                   ? Highscores::HST_TIMETRIAL_OVERALL_TIME
                                   : Highscores::HST_RACE_OVERALL_TIME;
 
@@ -273,9 +273,10 @@ void World::update(float dt)
 
     if( getPhase() == FINISH_PHASE )
     {
-        if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
+        if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
         {
-            menu_manager->pushMenu(MENUID_LEADERRESULT);
+            pause();
+            menu_manager->pushMenu(MENUID_RACERESULT);
             unlock_manager->raceFinished();
             return;
         }
@@ -352,13 +353,13 @@ void World::updateHighscores()
 
         PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
 
-        Highscores::HighscoreType hst = (race_manager->getRaceMode()==
-            RaceManager::RM_TIME_TRIAL) 
-            ? Highscores::HST_TIMETRIAL_OVERALL_TIME
-            : Highscores::HST_RACE_OVERALL_TIME;
+        Highscores::HighscoreType hst = (race_manager->getMinorMode()==
+                                         RaceManager::RM_TIME_TRIAL) 
+                                         ? Highscores::HST_TIMETRIAL_OVERALL_TIME
+                                         : Highscores::HST_RACE_OVERALL_TIME;
         if(m_highscores->addData(hst, k->getName(),
-            k->getPlayer()->getName(),
-            k->getFinishTime())>0      )
+                                 k->getPlayer()->getName(),
+                                 k->getFinishTime())>0      )
         {
             highscore_manager->Save();
         }
@@ -466,7 +467,7 @@ void World::updateRaceStatus(float dt)
         case SET_PHASE  :   if(m_clock>2.0) 
                             {
                                 m_phase=GO_PHASE;
-                                if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
+                                if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
                                     m_clock=m_leader_intervals[0];
                                 else
                                     m_clock=0.0f;
@@ -485,7 +486,7 @@ void World::updateRaceStatus(float dt)
                             }
                             m_clock += dt;
                             return;
-        case GO_PHASE  :    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
+        case GO_PHASE  :    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
                             {
                                 // Switch to race if more than 1 second has past
                                 if(m_clock<m_leader_intervals[0]-1.0f)
@@ -514,7 +515,7 @@ void World::updateRaceStatus(float dt)
         default        :    break;
     }   // switch
 
-    if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER)
+    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
         return updateLeaderMode(dt);
     
     // The status must now be race mode!
@@ -698,11 +699,11 @@ void World::updateRacePosition ( int k )
     // Switch on faster music (except in follow leader mode) if not already 
     // done so, and the first kart is doing its last lap, and the estimated
     // remaining time is less than 30 seconds.
-    if(!m_faster_music_active                                      && 
-        m_kart[k]->getLap()==race_manager->getNumLaps()-1          && 
-        p==1                                                       &&
-        race_manager->getRaceMode()!=RaceManager::RM_FOLLOW_LEADER &&
-        m_kart[k]->estimateFinishTime()-getTime()<30.0f               ) 
+    if(!m_faster_music_active                                       && 
+        m_kart[k]->getLap()==race_manager->getNumLaps()-1           && 
+        p==1                                                        &&
+        race_manager->getMinorMode()!=RaceManager::RM_FOLLOW_LEADER &&
+        m_kart[k]->estimateFinishTime()-getTime()<30.0f                ) 
     {
         sound_manager->switchToFastMusic();
         m_faster_music_active=true;
@@ -715,7 +716,7 @@ void World::loadTrack()
     // remove old herrings (from previous race), and remove old
     // track specific herring models
     herring_manager->cleanup();
-    if(race_manager->getRaceMode()== RaceManager::RM_GRAND_PRIX)
+    if(race_manager->getMajorMode()== RaceManager::RM_GRAND_PRIX)
     {
         try
         {

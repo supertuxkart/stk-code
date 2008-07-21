@@ -1324,7 +1324,7 @@ void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
     if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
 
     // Time trial does not have any red herrings
-    if(type==HE_RED && race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL) 
+    if(type==HE_RED && race_manager->getMinorMode()==RaceManager::RM_TIME_TRIAL) 
         return;
     Vec3 loc((*xyz));
     herring_manager->newHerring(type, loc);

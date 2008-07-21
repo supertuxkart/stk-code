@@ -60,7 +60,7 @@ TrackSel::TrackSel()
         w = widget_manager->addTextButtonWgt(WTOK_TRACK0+i, 30, HEIGHT, "");
         widget_manager->setWgtTextSize(WTOK_TRACK0+i, WGT_FNT_SML);
         w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset, NULL, 
-					   WGT_DIR_UNDER_WIDGET, 0.15f, prev_widget);
+					   WGT_DIR_UNDER_WIDGET, 0.f, prev_widget);
         prev_widget = w;
     }   // for i
 	widget_manager->sameWidth(WTOK_TRACK0, WTOK_TRACK0+m_max_entries-1);
@@ -83,7 +83,7 @@ TrackSel::TrackSel()
         widget_manager->setWgtText(WTOK_AUTHOR, track_manager->getTrack(i)->getDescription());
         w->resizeToText();
     }
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET, 0.05f, prev_widget);
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_FROM_BOTTOM, 0.0f, prev_widget);
 
     m_offset        = 0;
     m_current_track = -1;

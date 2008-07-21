@@ -30,7 +30,8 @@ CityTime::CityTime() : Challenge("citytime", _("Finish the City track in 5:20"))
 }   // CityTime
 //-----------------------------------------------------------------------------
 void CityTime::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
     race_manager->setTrack("city");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);

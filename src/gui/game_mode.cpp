@@ -28,12 +28,15 @@
 
 enum WidgetTokens
 {
-    WTOK_TITLE,
+    WTOK_TITLE_SINGLE,
+    WTOK_QUICK_RACE_SINGLE,
+    WTOK_TIMETRIAL_SINGLE,
+    WTOK_FOLLOW_LEADER_SINGLE,
 
-    WTOK_GP,
-    WTOK_QUICKRACE,
-    WTOK_TIMETRIAL,
-    WTOK_FOLLOW_LEADER,
+    WTOK_TITLE_GP, 
+    WTOK_QUICK_RACE_GP,
+    WTOK_TIMETRIAL_GP,
+    WTOK_FOLLOW_LEADER_GP,
 
     WTOK_HELP,
     WTOK_QUIT
@@ -41,54 +44,89 @@ enum WidgetTokens
 
 GameMode::GameMode()
 {
-    widget_manager->switchOrder();
+    const int HEIGHT = 7;
+    const int WIDTH  = 5;
+    
+    // First the single race events
+    // ============================
+    Widget *w=widget_manager->addTextWgt(WTOK_TITLE_SINGLE, WIDTH,
+                                         HEIGHT, _("Single Race"));
+    widget_manager->hideWgtRect(WTOK_TITLE_SINGLE);
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+                   WGT_DIR_FROM_TOP,  0.2f, NULL);
+    Widget *w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_QUICK_RACE_SINGLE, WIDTH, HEIGHT,
+                                       _("Quick Race"));
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_TIMETRIAL_SINGLE, WIDTH, HEIGHT,
+                                       _("Time Trial"));
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_FOLLOW_LEADER_SINGLE, WIDTH, HEIGHT,
+                                       _("Follow the Leader"));
+    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_FOLLOW_LEADER_SINGLE);
 
-    widget_manager->addTextButtonWgt( WTOK_GP, 60, 7, _("Grand Prix"));
+    // Then the GPs
+    // ============
+    w=widget_manager->addTextWgt(WTOK_TITLE_GP, WIDTH,
+                                 HEIGHT, _("Grand Prix"));
+    widget_manager->hideWgtRect(WTOK_TITLE_GP);
+    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+                   WGT_DIR_FROM_TOP,  0.2f, NULL);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_QUICK_RACE_GP, WIDTH, HEIGHT,
+                                       _("Quick Race"));
+    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_TIMETRIAL_GP, WIDTH, HEIGHT,
+                                       _("Time Trial"));
+    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_FOLLOW_LEADER_GP, WIDTH, HEIGHT,
+                                       _("Follow the Leader"));
+    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    w_prev=w;
+    widget_manager->sameWidth(WTOK_TITLE_GP, WTOK_FOLLOW_LEADER_GP);
 
     if(unlock_manager->isLocked("grandprix"))
     {
-        widget_manager->hideWgtText( WTOK_GP );
-        widget_manager->deactivateWgt( WTOK_GP );
+        for(int i=WTOK_QUICK_RACE_GP; i<=WTOK_FOLLOW_LEADER_GP; i++)
+        {
+            widget_manager->hideWgtText(i);
+            widget_manager->deactivateWgt(i);
 
-        widget_manager->setWgtColor( WTOK_GP, WGT_WHITE);
-        widget_manager->setWgtTexture( WTOK_GP, "gui_lock.rgb", false );
-        widget_manager->showWgtTexture( WTOK_GP );
+            widget_manager->setWgtColor(i, WGT_WHITE);
+            widget_manager->setWgtTexture(i, "gui_lock.rgb", false);
+            widget_manager->showWgtTexture(i);
+        }
     }
-
-
-    widget_manager->addTextButtonWgt(WTOK_QUICKRACE, 60, 7, _("Quick Race"));
-
-    if( race_manager->getNumPlayers() == 1 )
-    {
-        widget_manager->addTextButtonWgt(WTOK_TIMETRIAL, 60, 7, _("Time Trial"));
-    }
-
-
-    widget_manager->addTextButtonWgt( WTOK_FOLLOW_LEADER, 60, 7,
-        _("Follow the Leader"));
 
     if(unlock_manager->isLocked("followleader"))
     {
-        widget_manager->hideWgtText( WTOK_FOLLOW_LEADER );
-
-//        widget_manager->deactivateWgt( WTOK_FOLLOW_LEADER );
-
-        widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_GRAY);
-        widget_manager->setWgtTexture( WTOK_FOLLOW_LEADER, "gui_lock.rgb", false );
-        widget_manager->showWgtTexture( WTOK_FOLLOW_LEADER );
-        widget_manager->setWgtText(WTOK_FOLLOW_LEADER,
+        widget_manager->hideWgtText(WTOK_FOLLOW_LEADER_SINGLE);
+        widget_manager->setWgtColor(WTOK_FOLLOW_LEADER_SINGLE, WGT_GRAY);
+        widget_manager->setWgtTexture(WTOK_FOLLOW_LEADER_SINGLE, "gui_lock.rgb", false );
+        widget_manager->showWgtTexture(WTOK_FOLLOW_LEADER_SINGLE);
+        widget_manager->setWgtText(WTOK_FOLLOW_LEADER_SINGLE,
                                         _("Fulfil challenge to unlock"));
     }
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
-
-    widget_manager->addTextButtonWgt( WTOK_HELP, 60, 7, _("Game mode help"));
+    w=widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, HEIGHT, _("Game mode help"));
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
+    w->setPosition(WGT_DIR_CENTER, 0.0f, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, w_prev);
+    w_prev=w;
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 7);
-
-    widget_manager->addTextButtonWgt(WTOK_QUIT, 60, 7, _("Press <ESC> to go back"));
+    w=widget_manager->addTextButtonWgt(WTOK_QUIT, WIDTH, HEIGHT, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
+    w->setPosition(WGT_DIR_CENTER, 0.0f, NULL, WGT_DIR_FROM_BOTTOM, 0.0f, w_prev);
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -102,41 +140,42 @@ GameMode::~GameMode()
 //-----------------------------------------------------------------------------
 void GameMode::select()
 {
-    switch ( widget_manager->getSelectedWgt() )
+    int mode = widget_manager->getSelectedWgt();
+    switch (mode)
     {
-    case WTOK_GP:
-        race_manager->setRaceMode(RaceManager::RM_GRAND_PRIX);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1);
-        break;
-    case WTOK_QUICKRACE:
-        race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1);
-        break;
-    case WTOK_FOLLOW_LEADER:
-        if(unlock_manager->isLocked("followleader"))
-        {
-            widget_manager->showWgtText( WTOK_FOLLOW_LEADER );
-            widget_manager->setWgtTextColor( WTOK_FOLLOW_LEADER, WGT_TRANS_GRAY);
-            widget_manager->setWgtColor( WTOK_FOLLOW_LEADER, WGT_TRANS_GRAY);
-        }
-        else
-        {
-            race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
-            menu_manager->pushMenu(MENUID_CHARSEL_P1);
-        }
-        break;
-    case WTOK_TIMETRIAL:
-        race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
-        menu_manager->pushMenu(MENUID_CHARSEL_P1);
-        break;
+    case WTOK_QUICK_RACE_SINGLE:
+         race_manager->setMajorMode(RaceManager::RM_SINGLE);
+         race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
+         break;
+    case WTOK_TIMETRIAL_SINGLE:
+         race_manager->setMajorMode(RaceManager::RM_SINGLE);
+         race_manager->setMinorMode(RaceManager::RM_TIME_TRIAL);
+         break;
+    case WTOK_FOLLOW_LEADER_SINGLE:
+         race_manager->setMajorMode(RaceManager::RM_SINGLE);
+         race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
+         break;
+    case WTOK_QUICK_RACE_GP:
+         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
+         break;
+    case WTOK_TIMETRIAL_GP:
+         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::RM_TIME_TRIAL);
+         break;
+    case WTOK_FOLLOW_LEADER_GP:
+         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
+         break;
     case WTOK_HELP:
-        menu_manager->pushMenu(MENUID_HELP3);
-        break;
+         menu_manager->pushMenu(MENUID_HELP3);
+         return;
     case WTOK_QUIT:
-        menu_manager->popMenu();
-        break;
+         menu_manager->popMenu();
+        return;
     default: break;
     }
+    menu_manager->pushMenu(MENUID_CHARSEL_P1);
 }
 
 

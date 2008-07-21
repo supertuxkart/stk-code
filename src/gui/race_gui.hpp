@@ -57,7 +57,7 @@ class RaceGUI: public BaseGUI
             m_font_size  = size;
             m_kart       = kart;
             m_end_time   = time>=0.0f 
-                         ? (race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER 
+                         ? (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER 
                             ?world->getTime()-time
                             :world->getTime()+time )
                          : -1.0f;
@@ -65,7 +65,7 @@ class RaceGUI: public BaseGUI
         }
         // in follow leader the clock counts backwards
         bool done() const {return m_end_time<0 || 
-                           (race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER 
+                           (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER 
                                   ? world->getTime()<m_end_time
                                   : world->getTime()>m_end_time);}
     };

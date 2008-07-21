@@ -401,7 +401,7 @@ void RaceGUI::drawPlayerIcons ()
             font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
                                    COLORS);
         }
-        if(race_manager->getRaceMode()==RaceManager::RM_FOLLOW_LEADER && i==0)
+        if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER && i==0)
         {
             GLfloat const RED[] = { 1.0f, 0, 0, 1.0f};
             font_race->PrintShadow(_("Leader"), 30, ICON_PLAYER_WIDHT+x, y+5,
@@ -1040,12 +1040,12 @@ void RaceGUI::drawStatusText(const float dt)
         }   // for pla
         drawTimer           ();
         if(world->getTime()<TIME_MUSIC_DESCRIPTION 
-          && race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER)
+          && race_manager->getMinorMode() != RaceManager::RM_FOLLOW_LEADER)
         {
             drawMusicDescription();
         }
         else if (world->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION 
-          && race_manager->getRaceMode()== RaceManager::RM_FOLLOW_LEADER)
+          && race_manager->getMinorMode()== RaceManager::RM_FOLLOW_LEADER)
             drawMusicDescription();
             
         drawMap             ();

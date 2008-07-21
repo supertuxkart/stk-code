@@ -31,7 +31,8 @@ PenguinPlaygroundGP::PenguinPlaygroundGP() : Challenge("penguinplaygroundgp", _(
 
 //-----------------------------------------------------------------------------
 void PenguinPlaygroundGP::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_GRAND_PRIX);
+    race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
+    race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
     CupData cup("gp1.cup");
     race_manager->setGrandPrix(cup);
     race_manager->setDifficulty(RaceManager::RD_HARD);
@@ -42,10 +43,11 @@ void PenguinPlaygroundGP::setRace() const {
 //-----------------------------------------------------------------------------
 bool PenguinPlaygroundGP::grandPrixFinished()
 {
-    if (race_manager->getRaceMode()  != RaceManager::RM_GRAND_PRIX  ||
+    if (race_manager->getMajorMode()  != RaceManager::RM_GRAND_PRIX        ||
+        race_manager->getMinorMode()  != RaceManager::RM_QUICK_RACE        ||
         race_manager->getGrandPrix()->getName() != _("Penguin Playground") ||
-        race_manager->getDifficulty()!= RaceManager::RD_HARD        ||
-        race_manager->getNumKarts()   < 4                           ||
+        race_manager->getDifficulty()!= RaceManager::RD_HARD               ||
+        race_manager->getNumKarts()   < 4                                  ||
         race_manager->getNumPlayers() > 1) return false;
     // Check if the player was in top 3:
     for(int i=0; i<(int)race_manager->getNumKarts(); i++)

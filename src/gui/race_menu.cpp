@@ -51,7 +51,7 @@ RaceMenu::RaceMenu()
     widget_manager->addTextButtonWgt( WTOK_HELP, 50, 7, _("Help") );
     widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 50, 7, _("Restart Race") );
 
-    if(race_manager->getRaceMode()==RaceManager::RM_QUICK_RACE)
+    if(race_manager->getMinorMode()==RaceManager::RM_QUICK_RACE)
     {
         widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 50, 7,
             _("Setup New Race") );

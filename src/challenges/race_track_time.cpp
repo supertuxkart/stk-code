@@ -31,7 +31,8 @@ RaceTrackTime::RaceTrackTime() : Challenge("racetracktime", _("Finish Race track
 
 //-----------------------------------------------------------------------------
 void RaceTrackTime::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
     race_manager->setTrack("race");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);

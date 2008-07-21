@@ -36,7 +36,7 @@ Collectable::Collectable(Kart* kart_)
 //-----------------------------------------------------------------------------
 void Collectable::reset()
 {
-    if(race_manager->getRaceMode()==RaceManager::RM_TIME_TRIAL)
+    if(race_manager->getMinorMode()==RaceManager::RM_TIME_TRIAL)
     {
         m_type   = COLLECT_ZIPPER;
         m_number = race_manager->getNumLaps();

@@ -59,7 +59,7 @@ RaceOptions::RaceOptions()
     m_num_laps=race_manager->getNumLaps();
     // Determine the minimum number of karts
     m_min_karts = (int)race_manager->getNumPlayers();
-    if(race_manager->getRaceMode() == RaceManager::RM_FOLLOW_LEADER)
+    if(race_manager->getMinorMode() == RaceManager::RM_FOLLOW_LEADER)
     {
         // if playing follow the leader single mode, there should be at
         // least one opponent in addition to the leader
@@ -107,8 +107,8 @@ RaceOptions::RaceOptions()
 
     // Number of laps
     // ==============
-    if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX   &&
-        race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER   )
+    if( race_manager->getMajorMode() != RaceManager::RM_GRAND_PRIX   &&
+        race_manager->getMinorMode() != RaceManager::RM_FOLLOW_LEADER   )
     {
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, DESC_WIDTH, 7, _("Number of laps") );
         widget_manager->hideWgtRect(WTOK_LAPS_TITLE);
@@ -235,8 +235,8 @@ void RaceOptions::select()
 
         case WTOK_LAPS_DOWN:
             {
-	        m_num_laps--;
-		if(m_num_laps<1) m_num_laps=10;
+                m_num_laps--;
+                if(m_num_laps<1) m_num_laps=10;
 
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );
@@ -258,8 +258,8 @@ void RaceOptions::select()
 
         race_manager->setNumKarts(m_num_karts);
 
-        if( race_manager->getRaceMode() != RaceManager::RM_GRAND_PRIX    &&
-            race_manager->getRaceMode() != RaceManager::RM_FOLLOW_LEADER    )
+        if( race_manager->getMajorMode() != RaceManager::RM_GRAND_PRIX    &&
+            race_manager->getMinorMode() != RaceManager::RM_FOLLOW_LEADER    )
         {
             race_manager->setNumLaps( m_num_laps );
         }

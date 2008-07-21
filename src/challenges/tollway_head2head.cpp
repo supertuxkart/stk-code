@@ -30,7 +30,8 @@ TollwayHead2Head::TollwayHead2Head() : Challenge("tollwayhead", _("Win a Head to
 
 //-----------------------------------------------------------------------------
 void TollwayHead2Head::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_TIME_TRIAL);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMinorMode(RaceManager::RM_TIME_TRIAL);
     race_manager->setTrack("tuxtrack");
     race_manager->setDifficulty(RaceManager::RD_HARD);
     race_manager->setNumLaps(1);

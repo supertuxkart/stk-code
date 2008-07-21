@@ -421,7 +421,8 @@ void InitTuxkart()
     // default settings for Quickstart
     race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
-    race_manager->setRaceMode  (RaceManager::RM_QUICK_RACE);
+    race_manager->setMajorMode (RaceManager::RM_SINGLE);
+    race_manager->setMinorMode (RaceManager::RM_QUICK_RACE);
     race_manager->setDifficulty(RaceManager::RD_HARD);
 }
 
@@ -513,7 +514,8 @@ int main(int argc, char *argv[] )
             // =========
             race_manager->setNumPlayers(1);
             race_manager->setPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
-            race_manager->setRaceMode  (RaceManager::RM_QUICK_RACE);
+            race_manager->setMajorMode (RaceManager::RM_SINGLE);
+            race_manager->setMinorMode (RaceManager::RM_QUICK_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
             race_manager->startNew();
         }

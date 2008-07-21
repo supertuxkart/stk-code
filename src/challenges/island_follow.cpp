@@ -33,7 +33,8 @@ IslandFollow::IslandFollow() : Challenge("islandfollow", _("Follow the Leader on
 
 //-----------------------------------------------------------------------------
 void IslandFollow::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
     race_manager->setTrack("islandtrack");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);

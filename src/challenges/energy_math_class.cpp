@@ -31,7 +31,8 @@ EnergyMathClass::EnergyMathClass() : Challenge("energymathclass", _("Collect Coi
 
 //-----------------------------------------------------------------------------
 void EnergyMathClass::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_QUICK_RACE);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMajorMode(RaceManager::RM_QUICK_RACE);
     race_manager->setTrack("olivermath");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);

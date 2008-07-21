@@ -20,15 +20,22 @@
 #ifndef HEADER_RACERESULTSGUI_H
 #define HEADER_RACERESULTSGUI_H
 
+#include <vector>
+
 #include "base_gui.hpp"
+#include "widget.hpp"
 
 /** GUI that shows the RaceResults, times and such */
 class RaceResultsGUI : public BaseGUI
 {
 private:
-    char* m_score;
-    char* m_highscores;
+    std::vector<int> m_order;
 
+    Widget          *displayLeaderResults();
+    Widget          *displayRaceResults();
+    Widget          *displayKartList(unsigned int from, unsigned int to,
+                                     Widget *w_prev, int *order, bool display_time,
+                                     float horizontal);
 public:
     RaceResultsGUI();
     ~RaceResultsGUI();

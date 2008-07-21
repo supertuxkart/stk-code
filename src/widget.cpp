@@ -165,7 +165,7 @@ void Widget::layout()
     case WGT_DIR_ABOVE_WIDGET:
         m_y = m_widget_vertical->m_y + m_widget_vertical->m_height; break;
     case WGT_DIR_UNDER_WIDGET:
-        m_y = m_widget_vertical->m_y-m_height; break;
+        m_y = m_widget_vertical->m_y-m_height-(int)(m_percentage_y*user_config->m_height); break;
     default:
         break;
     }   // switch

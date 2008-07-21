@@ -32,7 +32,8 @@ JungleFollow::JungleFollow() : Challenge("junglefollow", _("Follow the Leader in
 
 //-----------------------------------------------------------------------------
 void JungleFollow::setRace() const {
-    race_manager->setRaceMode(RaceManager::RM_FOLLOW_LEADER);
+    race_manager->setMajorMode(RaceManager::RM_SINGLE);
+    race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
     race_manager->setTrack("jungle");
     race_manager->setDifficulty(RaceManager::RD_EASY);
     race_manager->setNumLaps(3);

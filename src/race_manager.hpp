@@ -46,8 +46,8 @@
 class RaceManager
 {
 public:
-    enum RaceModeType   { RM_TIME_TRIAL, RM_QUICK_RACE, RM_GRAND_PRIX, 
-                          RM_FOLLOW_LEADER };
+    enum RaceModeType   { RM_GRAND_PRIX, RM_SINGLE, // The two current major modes
+                          RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER };
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
 
 private:
@@ -72,7 +72,7 @@ private:
 
     std::vector<KartStatus>          m_kart_status;
     Difficulty                       m_difficulty;
-    RaceModeType                     m_race_mode;
+    RaceModeType                     m_major_mode, m_minor_mode;
     typedef std::vector<std::string> PlayerKarts;
     PlayerKarts                      m_player_karts;
     std::vector<std::string>         m_tracks;
@@ -109,10 +109,12 @@ public:
     void         setDifficulty(Difficulty diff);
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
-    void         setRaceMode(RaceModeType mode) { m_race_mode = mode;               }
+    void         setMajorMode(RaceModeType mode){ m_major_mode = mode;              }
+    void         setMinorMode(RaceModeType mode){ m_minor_mode = mode;              }
     void         setNumKarts(int num)           { m_num_karts = num;                }
     void         setCoinTarget(int num)         { m_coin_target = num;              }
-    RaceModeType getRaceMode()            const { return m_race_mode;               }
+    RaceModeType getMajorMode()           const { return m_major_mode;              }
+    RaceModeType getMinorMode()           const { return m_minor_mode;              }
     unsigned int getNumKarts()            const { return m_num_karts;               }
     unsigned int getNumPlayers()          const { return (int)m_player_karts.size();}
     int          getNumLaps()             const { return m_num_laps[m_track_number];}
@@ -128,11 +130,12 @@ public:
     const std::string& 
                  getHerringStyle()        const { return m_cup.getHerringStyle();   }
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;}
+    int          getKartPrevScore(int krt)const { return m_kart_status[krt].m_last_score;}
     int          getkartPlayerId(int krt) const { return m_kart_status[krt].m_player_id;}
     int          getPositionScore(int p)  const { return m_score_for_position[p-1]; }
     double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
-    int          getCoinTarget()          const { return m_coin_target;            }
-    bool         raceHasLaps()            const { return m_race_mode!=RM_FOLLOW_LEADER;}
+    int          getCoinTarget()          const { return m_coin_target;             }
+    bool         raceHasLaps()            const { return m_minor_mode!=RM_FOLLOW_LEADER;}
     int          allPlayerFinished()      const {return 
                                           m_num_finished_players==m_player_karts.size();    }
     int          raceIsActive()           const { return m_active_race;             }
