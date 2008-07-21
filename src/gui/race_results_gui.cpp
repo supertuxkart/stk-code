@@ -88,7 +88,6 @@ RaceResultsGUI::RaceResultsGUI()
 // ----------------------------------------------------------------------------
 Widget *RaceResultsGUI::displayLeaderResults()
 {
-    const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
 
     int *scores       = new int[NUM_KARTS];
