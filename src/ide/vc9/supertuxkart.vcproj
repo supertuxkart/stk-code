@@ -991,10 +991,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\leader_result.cpp"
-					>
-				</File>
-				<File
 					RelativePath="../../../src\gui\main_menu.cpp"
 					>
 				</File>
@@ -1498,10 +1494,6 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\help_page_two.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\leader_result.hpp"
 					>
 				</File>
 				<File

@@ -254,7 +254,7 @@ void World::resetAllKarts()
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-                        i-m_kart.begin(), m_track->getIdent().c_str());
+			    (int)(i-m_kart.begin()), m_track->getIdent().c_str());
                     exit(-1);
                 }
                 all_finished=false;

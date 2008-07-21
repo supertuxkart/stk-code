@@ -90,23 +90,10 @@ void TrackManager::updateGroups(const Track* track)
     const std::vector<std::string>& new_groups = track->getGroups();
     for(unsigned int i=0; i<new_groups.size(); i++)
     {
-        if(std::find(m_all_groups.begin(), m_all_groups.end(), new_groups[i])
-            != m_all_groups.end()) continue;
-        m_all_groups.push_back(new_groups[i]);
+        if(m_groups.find(new_groups[i])==m_groups.end())
+            m_all_groups.push_back(new_groups[i]);
+	m_groups[new_groups[i]].push_back(m_tracks.size()-1);
     }
 }   // updateGroups
 
 // ----------------------------------------------------------------------------
-int TrackManager::getTrackByGroup(const std::string& group, int n) const
-{
-    int count=0;
-    for(Tracks::const_iterator i  = m_tracks.begin(); i != m_tracks.end(); i++)
-    {
-		std::vector<std::string> groups=(*i)->getGroups();
-        if (std::find(groups.begin(), groups.end(), group)==groups.end()) continue;
-        if(count==n) return (int)(i-m_tracks.begin());
-        count=count+1;
-    }
-    return -1;
-
-}   // getTrackByGroup

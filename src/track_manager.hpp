@@ -22,6 +22,8 @@
 
 #include <string>
 #include <vector>
+#include <map>
+
 class Track;
 
 /** Simple class to load and manage track data, track names and
@@ -31,8 +33,8 @@ class TrackManager
 private:
     typedef std::vector<Track*>   Tracks;
     Tracks        m_tracks;
-    std::vector<std::string>
-		          m_all_groups;
+    std::map<std::string, std::vector<int> > m_groups;
+    std::vector<std::string>                 m_all_groups;
     void          updateGroups(const Track* track);
 
 public:
@@ -41,12 +43,13 @@ public:
 
     /** get TrackData by the track ident (aka filename without .track) */
     const std::vector<std::string>&
-		          getAllGroups()      const { return m_all_groups;    }
-	size_t        getNumberOfTracks() const { return m_tracks.size(); }
-	Track        *getTrack(size_t id) const { return m_tracks[id];    }
+                  getAllGroups()      const { return m_all_groups;    }
+    size_t        getNumberOfTracks() const { return m_tracks.size(); }
+    Track        *getTrack(size_t id) const { return m_tracks[id];    }
     Track        *getTrack(const std::string& ident) const;
-	int           getTrackByGroup(const std::string& group, int n) const;
-
+    const std::vector<int>& 
+                  getTracksInGroup(const std::string& g) {return m_groups[g];}
+ 
     /** load all .track files from all directories */
     void          loadTrackList ();
 };

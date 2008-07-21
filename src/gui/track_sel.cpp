@@ -56,14 +56,14 @@ TrackSel::TrackSel()
     prev_widget = w;
     for (unsigned int i = 0; i <m_max_entries; i++)
     {
-		int offset = (m_max_entries-1)/2-abs((int)(i-(m_max_entries-1)/2))+1;
+        int offset = (m_max_entries-1)/2-abs((int)(i-(m_max_entries-1)/2))+1;
         w = widget_manager->addTextButtonWgt(WTOK_TRACK0+i, 30, HEIGHT, "");
         widget_manager->setWgtTextSize(WTOK_TRACK0+i, WGT_FNT_SML);
         w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset, NULL, 
-					   WGT_DIR_UNDER_WIDGET, 0.f, prev_widget);
+                       WGT_DIR_UNDER_WIDGET, 0.f, prev_widget);
         prev_widget = w;
     }   // for i
-	widget_manager->sameWidth(WTOK_TRACK0, WTOK_TRACK0+m_max_entries-1);
+    widget_manager->sameWidth(WTOK_TRACK0, WTOK_TRACK0+m_max_entries-1);
 
     w = widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
     w->setPosition(WGT_DIR_FROM_RIGHT, 0.05f, NULL, WGT_DIR_UNDER_WIDGET, 0, prev_widget);
@@ -71,7 +71,7 @@ TrackSel::TrackSel()
     w = widget_manager->addImgWgt(WTOK_IMG0, 35, 35, 0);
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, WGT_DIR_FROM_TOP, 0.2f);
     prev_widget = w;
-	w = widget_manager->addImgWgt(WTOK_IMG1, 35, 35, 0);
+    w = widget_manager->addImgWgt(WTOK_IMG1, 35, 35, 0);
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET,0, prev_widget);
     prev_widget = w;
     w = widget_manager->addTextWgt(WTOK_AUTHOR, 50, 9, "" );
@@ -87,7 +87,7 @@ TrackSel::TrackSel()
 
     m_offset        = 0;
     m_current_track = -1;
-	switchGroup();
+    switchGroup();
     updateScrollPosition();
 
     widget_manager->layout(WGT_AREA_TOP);
@@ -108,28 +108,28 @@ TrackSel::~TrackSel()
 //-----------------------------------------------------------------------------
 void TrackSel::updateScrollPosition()
 {
-	unsigned int start = 0, end=m_max_entries;
-	if(m_index_avail_tracks.size()<m_max_entries)
-	{
-		start = (unsigned int)(m_max_entries-m_index_avail_tracks.size()+1)/2;
-		end   = start+m_index_avail_tracks.size()-1;
-	}
-
-	for(unsigned int i=0; i<(unsigned int)m_max_entries; i++)
+    unsigned int start = 0, end=m_max_entries;
+    if(m_index_avail_tracks.size()<m_max_entries)
     {
-		if(i<start || i>end)
-		{
-			widget_manager->hideWgtRect(WTOK_TRACK0+i);
-			widget_manager->hideWgtText(WTOK_TRACK0+i);
+        start = (unsigned int)(m_max_entries-m_index_avail_tracks.size()+1)/2;
+        end   = start+m_index_avail_tracks.size()-1;
+    }
+
+    for(unsigned int i=0; i<(unsigned int)m_max_entries; i++)
+    {
+        if(i<start || i>end)
+        {
+            widget_manager->hideWgtRect(WTOK_TRACK0+i);
+            widget_manager->hideWgtText(WTOK_TRACK0+i);
             widget_manager->deactivateWgt(WTOK_TRACK0+i);
-			continue;
-		}
-		// Make them visible again (e.g. after a change of groups)
+            continue;
+        }
+        // Make them visible again (e.g. after a change of groups)
         widget_manager->activateWgt(WTOK_TRACK0+i);
         widget_manager->showWgtRect(WTOK_TRACK0+i);
-		widget_manager->showWgtText(WTOK_TRACK0+i);
-		int indx = (i+m_offset)%m_index_avail_tracks.size();
-		indx     = m_index_avail_tracks[indx];
+        widget_manager->showWgtText(WTOK_TRACK0+i);
+        int indx = (i+m_offset)%m_index_avail_tracks.size();
+        indx     = m_index_avail_tracks[indx];
         if(indx>=0)
         {
             const Track *track = track_manager->getTrack(indx);
@@ -140,23 +140,23 @@ void TrackSel::updateScrollPosition()
             const std::vector<std::string>& g=track_manager->getAllGroups();
             widget_manager->setWgtText(WTOK_TRACK0+i, g[-indx-1]);
         }
-	}   // for i
+    }   // for i
     m_current_track = -1;  // force new display of tracks
 }   // updateScrollPosition
 
 //-----------------------------------------------------------------------------
 void TrackSel::switchGroup()
 {
-	m_index_avail_tracks.clear();
-    // This loop is too long (since getNumberOfKarts returns all karts in all groups),
-    // but the loop is left if no more kart is found.
-	for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
+    m_index_avail_tracks.clear();
+
+    const std::vector<int> &tracks = 
+                            track_manager->getTracksInGroup(user_config->m_track_group);
+
+    for(unsigned int i=0; i<tracks.size(); i++)
     {
-        int globalIndex = track_manager->getTrackByGroup(user_config->m_track_group, i);
-        if(globalIndex==-1) break;
-		if(!unlock_manager->isLocked(track_manager->getTrack(globalIndex)->getIdent()))
-		{
-            m_index_avail_tracks.push_back(globalIndex);
+        if(!unlock_manager->isLocked(track_manager->getTrack(tracks[i])->getIdent()))
+        {
+            m_index_avail_tracks.push_back(tracks[i]);
         }
     }
 
@@ -165,27 +165,27 @@ void TrackSel::switchGroup()
     const std::vector<std::string>& groups=track_manager->getAllGroups();
     for(int i =0; i<(int)groups.size(); i++)
     {
-		// Only add groups other than the current one
-		if(groups[i]!=user_config->m_track_group) m_index_avail_tracks.push_back(-i-1);
+        // Only add groups other than the current one
+        if(groups[i]!=user_config->m_track_group) m_index_avail_tracks.push_back(-i-1);
     }
     if(m_index_avail_tracks.size()>=m_max_entries) 
-	{
-		m_offset          = 0;
-		widget_manager->showWgtRect(WTOK_DOWN);
-		widget_manager->showWgtText(WTOK_DOWN);
-		widget_manager->showWgtRect(WTOK_UP);
-		widget_manager->showWgtText(WTOK_UP);
-	}
-	else
-	{
-		// Less entries than maximum -> set m_offset to a negative number, so
-		// that the actual existing entries are displayed 
-		m_offset          = - (int)(1+m_max_entries-m_index_avail_tracks.size())/2;
-		widget_manager->hideWgtRect(WTOK_DOWN);
-		widget_manager->hideWgtText(WTOK_DOWN);
-		widget_manager->hideWgtRect(WTOK_UP);
-		widget_manager->hideWgtText(WTOK_UP);
-	}
+    {
+        m_offset          = 0;
+        widget_manager->showWgtRect(WTOK_DOWN);
+        widget_manager->showWgtText(WTOK_DOWN);
+        widget_manager->showWgtRect(WTOK_UP);
+        widget_manager->showWgtText(WTOK_UP);
+    }
+    else
+    {
+        // Less entries than maximum -> set m_offset to a negative number, so
+        // that the actual existing entries are displayed 
+        m_offset          = - (int)(1+m_max_entries-m_index_avail_tracks.size())/2;
+        widget_manager->hideWgtRect(WTOK_DOWN);
+        widget_manager->hideWgtText(WTOK_DOWN);
+        widget_manager->hideWgtRect(WTOK_UP);
+        widget_manager->hideWgtText(WTOK_UP);
+    }
 }   // switchGroup
 
 //-----------------------------------------------------------------------------
@@ -340,13 +340,13 @@ void TrackSel::select()
     if(indx<0)   // group selected
     {
         user_config->m_track_group = track_manager->getAllGroups()[-indx-1];
-		switchGroup();
-		// forces redraw of the model, otherwise (if m_current_kart=0) the new
-		// model would not be displayed.
-		//m_current_kart = -1;
-		updateScrollPosition();
-		return;
-	}
+        switchGroup();
+        // forces redraw of the model, otherwise (if m_current_kart=0) the new
+        // model would not be displayed.
+        //m_current_kart = -1;
+        updateScrollPosition();
+        return;
+    }
 
     const Track* TRACK = track_manager->getTrack(m_index_avail_tracks[track_number]);
     bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
