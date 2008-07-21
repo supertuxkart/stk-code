@@ -77,7 +77,7 @@ void Collectable::use()
     case COLLECT_ZIPPER:   m_owner->handleZipper();
         break ;
     case COLLECT_HOMING:
-    case COLLECT_SPARK:
+    case COLLECT_BOWLING:
     case COLLECT_MISSILE:
         if(m_owner->isPlayerKart())
             sound_manager->playSfx(SOUND_SHOT);

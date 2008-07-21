@@ -33,7 +33,7 @@ class Flyable : public Moveable, public TerrainInfo
     bool              m_exploded;
 
 protected:
-    const Kart*       m_owner;              // the kart which released this flyable
+    Kart*             m_owner;              // the kart which released this flyable
     btCollisionShape *m_shape;
     float             m_max_height;
     float             m_min_height;
@@ -57,10 +57,10 @@ protected:
                                      btVector3 *minDelta) const;
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
-                                    btCollisionShape *shape);
+                                    btCollisionShape *shape, const bool gravity=false, const bool rotates=false);
 public:
 
-                 Flyable     (Kart* kart, CollectableType type);
+                 Flyable     (Kart* kart, CollectableType type, float mass=1.0f);
     virtual     ~Flyable     ();
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
                               CollectableType type);

@@ -19,6 +19,7 @@
 
 #include "stk_config.hpp"
 #include "file_manager.hpp"
+#include "music_information.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;

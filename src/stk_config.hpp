@@ -21,8 +21,9 @@
 #define HEADER_STKCONFIG_H
 
 #include "kart_properties.hpp"
-#include "music_information.hpp"
 #include "lisp/lisp.hpp"
+
+class MusicInformation;
 
 class STKConfig : public KartProperties
 {

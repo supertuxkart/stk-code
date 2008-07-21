@@ -78,7 +78,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG3, 10, 12,
-        collectable_manager->getIcon(COLLECT_SPARK)->getState()->getTextureHandle());
+        collectable_manager->getIcon(COLLECT_BOWLING)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT3, 90, 12,
         _("Fuzzy blob/Spark - very slow, but bounces from walls"));

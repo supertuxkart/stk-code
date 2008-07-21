@@ -22,7 +22,7 @@ float Spark::m_st_max_distance;   // maximum distance for a spark to be attracte
 float Spark::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_SPARK)
+Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_BOWLING)
 {
     float y_offset = -0.5f*kart->getKartLength()-2.0f*m_extend.getY();
     float speed    = -m_speed;
@@ -34,7 +34,7 @@ Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_SPARK)
     }
 
     createPhysics(y_offset, btVector3(0.0f, speed, 0.0f),
-                  new btSphereShape(0.5f*m_extend.getY()));
+                  new btSphereShape(0.5f*m_extend.getY()), true /*gravity*/, true /*rotates*/);
 
     // unset no_contact_response flags, so that the spark 
     // will bounce off the track
@@ -46,7 +46,7 @@ Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_SPARK)
 // -----------------------------------------------------------------------------
 void Spark::init(const lisp::Lisp* lisp, ssgEntity *spark)
 {
-    Flyable::init(lisp, spark, COLLECT_SPARK);
+    Flyable::init(lisp, spark, COLLECT_BOWLING);
     m_st_max_distance    = 20.0f;
     m_st_force_to_target = 10.0f;
  
@@ -82,7 +82,7 @@ void Spark::update(float dt)
             if(vlen<0.8*m_speed*m_speed)
             {   // spark lost energy (less than 80%), i.e. it's too slow - speed it up:
                 if(vlen==0.0f) {
-                    v    = btVector3(.5f, .5f, .5f);  // avoid 0 div.
+                    v    = btVector3(.5f, .5f, 0.0f);  // avoid 0 div.
                 }
                 else
                 {

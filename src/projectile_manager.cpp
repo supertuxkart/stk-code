@@ -129,7 +129,7 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
 {
     Flyable *f;
     switch(type) {
-    case COLLECT_SPARK:   f = new Spark(kart);   break;
+    case COLLECT_BOWLING: f = new Spark(kart);   break;
     case COLLECT_HOMING:  f = new Homing(kart);  break;
     case COLLECT_MISSILE: f = new Missile(kart); break;
     default:              return NULL;

@@ -23,9 +23,10 @@
 
 #include <plib/ssg.h>
 #include "vec3.hpp"
-#include "material.hpp"
 #include "btBulletDynamicsCommon.h"
 #include "user_pointer.hpp"
+
+class Material;
 
 /* Limits of Kart performance */
 #define CRASH_PITCH          -45.0f

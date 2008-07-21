@@ -37,7 +37,7 @@ float      Flyable::m_st_force_updown[COLLECT_MAX];
 btVector3  Flyable::m_st_extend[COLLECT_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
+Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable(false)
 {
     // get the appropriate data from the static fields
     m_speed             = m_st_speed[type];
@@ -52,7 +52,7 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
     m_last_radar_beep   = -1;
     m_exploded          = false;
     m_shape             = NULL;
-    m_mass              = 1.0f;
+    m_mass              = mass;
 
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
@@ -61,29 +61,12 @@ Flyable::Flyable(Kart *kart, CollectableType type) : Moveable(false)
 }   // Flyable
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 velocity,
-                            btCollisionShape *shape)
+                            btCollisionShape *shape, const bool gravity, const bool rotates)
 {
-    // The actual transform is determined as follows:
-    // 1) Compute the heading of the kart
-    // 2) Compute the pitch of the terrain. This avoids the problem of the
-    //    rocket hitting the floor (e.g. if the kart is braking and therefore
-    //    pointing downwards).
-    btTransform trans = m_owner->getTrans();
+    // Get Kart heading direction
+    btTransform trans = m_owner->getKartHeading();
 
-    // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
-    btVector3 direction(trans.getBasis()[0][1],
-                        trans.getBasis()[1][1],
-                        trans.getBasis()[2][1]);
-    float heading=atan2(-direction.getX(), direction.getY());
-
-    TerrainInfo::update(m_owner->getXYZ());
-    float pitch = getTerrainPitch(heading);
-
-    btMatrix3x3 m;
-    m.setEulerZYX(pitch, 0.0f, heading);
-    trans.setBasis(m);
-
-    // Apply rotation and offset
+    // Apply offset
     btTransform offset_transform;
     offset_transform.setIdentity();
     btVector3 offset=btVector3(0,y_offset,m_average_height);
@@ -96,8 +79,8 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     m_user_pointer.set(this);
     world->getPhysics()->addBody(getBody());
 
-    // Simplified rockets: no gravity
-    m_body->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+    if(gravity) m_body->setGravity(btVector3(0.0f, 0.0f, -9.8f));
+    else m_body->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -105,7 +88,8 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     if(m_mass!=0.0f)  // Don't set velocity for kinematic or static objects
     {
         m_body->setLinearVelocity(v);
-        m_body->setAngularFactor(0.0f);   // prevent rotations
+        if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
+        //else  m_body->setAngularVelocity( btVector3(5,0,0) );
     }
     m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 

@@ -153,6 +153,8 @@ public:
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 
+    btTransform getKartHeading();
+    
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
     // -------------------------------------------------------------------------

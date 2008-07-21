@@ -171,7 +171,7 @@ RaceGUI::handle(GameAction ga, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);
-				kart->setCollectable(COLLECT_SPARK, 10000);
+				kart->setCollectable(COLLECT_BOWLING, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:

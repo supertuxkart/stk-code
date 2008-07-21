@@ -102,7 +102,28 @@ Kart::Kart (const std::string& kart_name, int position,
     reset();
 }   // Kart
 
-// -----------------------------------------------------------------------------v
+// -----------------------------------------------------------------------------
+
+btTransform Kart::getKartHeading()
+{
+    btTransform trans = this->getTrans();
+    
+    // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
+    btVector3 direction(trans.getBasis()[0][1],
+                        trans.getBasis()[1][1],
+                        trans.getBasis()[2][1]);
+    float heading=atan2(-direction.getX(), direction.getY());
+    
+    TerrainInfo::update(this->getXYZ());
+    float pitch = getTerrainPitch(heading);
+    
+    btMatrix3x3 m;
+    m.setEulerZYX(pitch, 0.0f, heading);
+    trans.setBasis(m);
+    
+    return trans;
+}
+
 void Kart::createPhysics(ssgEntity *obj)
 {
     // First: Create the chassis of the kart

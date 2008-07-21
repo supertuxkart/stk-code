@@ -31,7 +31,7 @@ class ssgEntity;
 // zipper just before them (see collectable::hitRedHerring).
 enum CollectableType {COLLECT_NOTHING,
                       COLLECT_MISSILE, COLLECT_HOMING,
-                      COLLECT_SPARK, COLLECT_ZIPPER,
+                      COLLECT_BOWLING, COLLECT_ZIPPER,
                       COLLECT_PARACHUTE, COLLECT_ANVIL,
                       COLLECT_MAX};
 

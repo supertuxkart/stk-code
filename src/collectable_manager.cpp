@@ -43,7 +43,7 @@ initCollectableType;
 initCollectableType ict[]=
 {
     {COLLECT_ZIPPER,    "zipper.collectable"       },
-    {COLLECT_SPARK,     "spark.projectile"         },
+    {COLLECT_BOWLING,   "bowling.projectile"         },
     {COLLECT_MISSILE,   "missile.projectile"       },
     {COLLECT_HOMING,    "homingmissile.projectile" },
     {COLLECT_ANVIL,     "anvil.collectable"        },
@@ -122,7 +122,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
     //this is just a quick fix.
-    if(collectType == COLLECT_SPARK) m_all_icons[COLLECT_SPARK]->getState()->disable ( GL_CULL_FACE ) ;
+    if(collectType == COLLECT_BOWLING) m_all_icons[COLLECT_BOWLING]->getState()->disable ( GL_CULL_FACE ) ;
 
     if(sModel!="")
     {
@@ -139,7 +139,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     // Load special attributes for certain collectables
     switch (collectType) {
-        case COLLECT_SPARK:          
+        case COLLECT_BOWLING:          
              Spark::init  (lisp, m_all_models[collectType]); break;
         case COLLECT_MISSILE:        
              Missile::init(lisp, m_all_models[collectType]); break;
