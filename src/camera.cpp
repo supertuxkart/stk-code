@@ -112,6 +112,10 @@ void Camera::setMode(Mode mode)
     else
         m_distance = m_kart->getKartProperties()->getCameraDistance();
 }   // setMode
+Camera::Mode Camera::getMode()
+{
+    return m_mode;
+}
 
 //-----------------------------------------------------------------------------
 /** Reset is called when a new race starts. Make sure that the camera

@@ -18,22 +18,34 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "spark.hpp"
+#include "player_kart.hpp"
+#include "camera.hpp"
+
 float Spark::m_st_max_distance;   // maximum distance for a spark to be attracted
 float Spark::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
 Spark::Spark(Kart *kart) : Flyable(kart, COLLECT_BOWLING)
 {
-    float y_offset = -0.5f*kart->getKartLength()-2.0f*m_extend.getY();
-    float speed    = -m_speed;
-    // if the kart is driving backwards, release from the front
-    if(m_owner->getSpeed()<0) 
+    float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
+    
+    // if the kart is looking backwards, release from the back
+    PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
+    const bool reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
+    if( reverse_mode ) 
     {
-        y_offset = -y_offset;
-        speed    = -speed;
+        y_offset   = -y_offset;
+        m_speed    = -m_speed*2;
+    }
+    else
+    {
+        /* make it go faster when throwing forward
+           so the player doesn't catch up with the ball
+           and explode by touching it */
+        m_speed *= 3;
     }
 
-    createPhysics(y_offset, btVector3(0.0f, speed, 0.0f),
+    createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
                   new btSphereShape(0.5f*m_extend.getY()), true /*gravity*/, true /*rotates*/);
 
     // unset no_contact_response flags, so that the spark 

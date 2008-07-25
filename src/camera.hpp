@@ -59,6 +59,7 @@ private:
 public:
          Camera           (int camera_index, const Kart* kart);
     void setMode          (Mode mode_);    /** Set the camera to the given mode */
+    Mode getMode();
     void setScreenPosition(int pos);
     void reset            ();
     void update           (float dt);
