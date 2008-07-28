@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9518616A0E3CC9AA00A5D4C9 /* bowling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951861680E3CC9AA00A5D4C9 /* bowling.cpp */; };
+		9518616B0E3CC9AA00A5D4C9 /* bowling.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 951861690E3CC9AA00A5D4C9 /* bowling.hpp */; };
 		95E106F00E28F66200503124 /* BMF_Api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E1050F0E28F65D00503124 /* BMF_Api.cpp */; };
 		95E106F10E28F66200503124 /* BMF_Api.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95E105100E28F65D00503124 /* BMF_Api.h */; };
 		95E106F30E28F66200503124 /* BMF_BitmapFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E105120E28F65D00503124 /* BMF_BitmapFont.cpp */; };
@@ -455,8 +457,6 @@
 		95F4341E0E26E85500692113 /* smoke.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F430610E26E85200692113 /* smoke.hpp */; };
 		95F434200E26E85500692113 /* sound_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F430630E26E85200692113 /* sound_manager.cpp */; };
 		95F434210E26E85500692113 /* sound_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F430640E26E85200692113 /* sound_manager.hpp */; };
-		95F434230E26E85500692113 /* spark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F430660E26E85200692113 /* spark.cpp */; };
-		95F434240E26E85500692113 /* spark.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F430670E26E85200692113 /* spark.hpp */; };
 		95F434260E26E85500692113 /* ssg_help.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F430690E26E85200692113 /* ssg_help.cpp */; };
 		95F434270E26E85500692113 /* ssg_help.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F4306A0E26E85200692113 /* ssg_help.hpp */; };
 		95F4342A0E26E85600692113 /* static_ssg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F4306D0E26E85200692113 /* static_ssg.cpp */; };
@@ -599,7 +599,6 @@
 				95F4341B0E26E85500692113 /* skid_mark.hpp in CopyFiles */,
 				95F4341E0E26E85500692113 /* smoke.hpp in CopyFiles */,
 				95F434210E26E85500692113 /* sound_manager.hpp in CopyFiles */,
-				95F434240E26E85500692113 /* spark.hpp in CopyFiles */,
 				95F434270E26E85500692113 /* ssg_help.hpp in CopyFiles */,
 				95F4342B0E26E85600692113 /* static_ssg.hpp in CopyFiles */,
 				95F4342D0E26E85600692113 /* stk_config.hpp in CopyFiles */,
@@ -762,12 +761,15 @@
 				95E108B00E28F66300503124 /* btTransformUtil.h in CopyFiles */,
 				95E108B10E28F66300503124 /* btTypedUserInfo.h in CopyFiles */,
 				95E108B20E28F66300503124 /* btVector3.h in CopyFiles */,
+				9518616B0E3CC9AA00A5D4C9 /* bowling.hpp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		951861680E3CC9AA00A5D4C9 /* bowling.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = bowling.cpp; sourceTree = "<group>"; };
+		951861690E3CC9AA00A5D4C9 /* bowling.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = bowling.hpp; sourceTree = "<group>"; };
 		954DF4040E283AB1007270E0 /* model.xcclassmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcclassmodel; path = model.xcclassmodel; sourceTree = "<group>"; };
 		95E1050F0E28F65D00503124 /* BMF_Api.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = BMF_Api.cpp; sourceTree = "<group>"; };
 		95E105100E28F65D00503124 /* BMF_Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = BMF_Api.h; sourceTree = "<group>"; };
@@ -1220,8 +1222,6 @@
 		95F430610E26E85200692113 /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../smoke.hpp; sourceTree = SOURCE_ROOT; };
 		95F430630E26E85200692113 /* sound_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sound_manager.cpp; path = ../../sound_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95F430640E26E85200692113 /* sound_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = sound_manager.hpp; path = ../../sound_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95F430660E26E85200692113 /* spark.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = spark.cpp; path = ../../spark.cpp; sourceTree = SOURCE_ROOT; };
-		95F430670E26E85200692113 /* spark.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = spark.hpp; path = ../../spark.hpp; sourceTree = SOURCE_ROOT; };
 		95F430690E26E85200692113 /* ssg_help.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ssg_help.cpp; path = ../../ssg_help.cpp; sourceTree = SOURCE_ROOT; };
 		95F4306A0E26E85200692113 /* ssg_help.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = ssg_help.hpp; path = ../../ssg_help.hpp; sourceTree = SOURCE_ROOT; };
 		95F4306D0E26E85200692113 /* static_ssg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = static_ssg.cpp; path = ../../static_ssg.cpp; sourceTree = SOURCE_ROOT; };
@@ -1683,6 +1683,8 @@
 				95F42D3F0E26E84D00692113 /* attachment_manager.cpp */,
 				95F42D400E26E84D00692113 /* attachment_manager.hpp */,
 				95F42D420E26E84D00692113 /* auto_kart.hpp */,
+				951861680E3CC9AA00A5D4C9 /* bowling.cpp */,
+				951861690E3CC9AA00A5D4C9 /* bowling.hpp */,
 				95F42F290E26E85000692113 /* callback.hpp */,
 				95F42F2A0E26E85000692113 /* callback_manager.cpp */,
 				95F42F2B0E26E85000692113 /* callback_manager.hpp */,
@@ -1785,8 +1787,6 @@
 				95F430610E26E85200692113 /* smoke.hpp */,
 				95F430630E26E85200692113 /* sound_manager.cpp */,
 				95F430640E26E85200692113 /* sound_manager.hpp */,
-				95F430660E26E85200692113 /* spark.cpp */,
-				95F430670E26E85200692113 /* spark.hpp */,
 				95F430690E26E85200692113 /* ssg_help.cpp */,
 				95F4306A0E26E85200692113 /* ssg_help.hpp */,
 				95F4306D0E26E85200692113 /* static_ssg.cpp */,
@@ -2078,7 +2078,6 @@
 				95F4341A0E26E85500692113 /* skid_mark.cpp in Sources */,
 				95F4341D0E26E85500692113 /* smoke.cpp in Sources */,
 				95F434200E26E85500692113 /* sound_manager.cpp in Sources */,
-				95F434230E26E85500692113 /* spark.cpp in Sources */,
 				95F434260E26E85500692113 /* ssg_help.cpp in Sources */,
 				95F4342A0E26E85600692113 /* static_ssg.cpp in Sources */,
 				95F4342C0E26E85600692113 /* stk_config.cpp in Sources */,
@@ -2195,6 +2194,7 @@
 				95E1089B0E28F66300503124 /* btConvexHull.cpp in Sources */,
 				95E1089E0E28F66300503124 /* btGeometryUtil.cpp in Sources */,
 				95E108AA0E28F66300503124 /* btQuickprof.cpp in Sources */,
+				9518616A0E3CC9AA00A5D4C9 /* bowling.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
