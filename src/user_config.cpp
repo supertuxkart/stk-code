@@ -188,7 +188,7 @@ void UserConfig::setDefaults()
         set(GA_LEAVE_RACE,
                 Input(IT_KEYBOARD, SDLK_ESCAPE));
 #ifdef DEBUG
-        set(GA_DEBUG_ADD_SPARK,
+        set(GA_DEBUG_ADD_BOWLING,
                 Input(IT_KEYBOARD, SDLK_F1));
         set(GA_DEBUG_ADD_MISSILE,
                 Input(IT_KEYBOARD, SDLK_F2));

@@ -19,7 +19,7 @@
 
 #include "loader.hpp"
 #include "projectile_manager.hpp"
-#include "spark.hpp"
+#include "bowling.hpp"
 #include "missile.hpp"
 #include "homing.hpp"
 #include "explosion.hpp"
@@ -129,7 +129,7 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
 {
     Flyable *f;
     switch(type) {
-    case COLLECT_BOWLING: f = new Spark(kart);   break;
+    case COLLECT_BOWLING: f = new Bowling(kart);   break;
     case COLLECT_HOMING:  f = new Homing(kart);  break;
     case COLLECT_MISSILE: f = new Missile(kart); break;
     default:              return NULL;

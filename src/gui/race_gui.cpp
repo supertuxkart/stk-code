@@ -167,7 +167,7 @@ RaceGUI::handle(GameAction ga, int value)
 	
 	switch (ga)
 	{
-		case GA_DEBUG_ADD_SPARK:
+		case GA_DEBUG_ADD_BOWLING:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = world->getPlayerKart(0);

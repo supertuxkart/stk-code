@@ -1,7 +1,7 @@
-//  $Id: spark.hpp 1284 2007-11-08 12:31:54Z hikerstk $
+//  $Id: bowling.hpp 1284 2007-11-08 12:31:54Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,22 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SPARK_H
-#define HEADER_SPARK_H
+#ifndef HEADER_BOWLING_H
+#define HEADER_BOWLING_H
 
 #include "flyable.hpp"
 
-class Spark : public Flyable
+class Bowling : public Flyable
 {
 private:
-    static float m_st_max_distance;   // maximum distance for a spark to be attracted
+    static float m_st_max_distance;   // maximum distance for a bowling ball to be attracted
     static float m_st_force_to_target;
 
 public:
-    Spark(Kart* kart);
-    static  void init(const lisp::Lisp* lisp, ssgEntity* spark);
+    Bowling(Kart* kart);
+    static  void init(const lisp::Lisp* lisp, ssgEntity* bowling);
     virtual void update(float dt);
     
-};   // Spark
+};   // Bowling
 
 #endif

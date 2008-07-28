@@ -24,7 +24,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
-#include "spark.hpp"
+#include "bowling.hpp"
 #include "missile.hpp"
 #include "homing.hpp"
 #include "loader.hpp"
@@ -120,10 +120,6 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     m_all_icons[collectType] = material_manager->getMaterial(sIconFile);
     m_all_icons[collectType]->getState()->ref();
 
-    //FIXME: something probably forgets to disable GL_CULL_FACE after enabling it,
-    //this is just a quick fix.
-    if(collectType == COLLECT_BOWLING) m_all_icons[COLLECT_BOWLING]->getState()->disable ( GL_CULL_FACE ) ;
-
     if(sModel!="")
     {
         ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
@@ -140,7 +136,7 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     // Load special attributes for certain collectables
     switch (collectType) {
         case COLLECT_BOWLING:          
-             Spark::init  (lisp, m_all_models[collectType]); break;
+             Bowling::init  (lisp, m_all_models[collectType]); break;
         case COLLECT_MISSILE:        
              Missile::init(lisp, m_all_models[collectType]); break;
         case COLLECT_HOMING: 

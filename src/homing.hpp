@@ -25,7 +25,7 @@
 class Homing : public Flyable
 {
 private:
-    static float m_st_max_distance;    // maximum distance for a spark to be attracted
+    static float m_st_max_distance;    // maximum distance for a missile to be attracted
     static float m_st_max_turn_angle;
     btVector3    m_initial_velocity;
     float        steerTowards(btTransform& trans, btVector3& target);

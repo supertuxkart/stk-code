@@ -86,7 +86,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	flyable.cpp		   flyable.hpp			\
 	missile.cpp		   missile.hpp			\
 	homing.cpp		   homing.hpp			\
-	spark.cpp		   spark.hpp			\
+	bowling.cpp		   bowling.hpp			\
 	history.cpp		   history.hpp	        	\
 	scene.hpp		   scene.cpp			\
 	no_copy.hpp	           constants.hpp 		\

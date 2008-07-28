@@ -45,7 +45,7 @@ protected:
     // The flyable class stores the values for each flyable type, e.g. 
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
-    // for sparks, missiles, ...
+    // for bowling balls, missiles, ...
     static float      m_st_speed[COLLECT_MAX];         // Speed of the projectile
     static ssgEntity* m_st_model[COLLECT_MAX];         // 3d model
     static float      m_st_min_height[COLLECT_MAX];    // min height above track

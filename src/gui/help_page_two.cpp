@@ -81,7 +81,7 @@ HelpPageTwo::HelpPageTwo()
         collectable_manager->getIcon(COLLECT_BOWLING)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT3, 90, 12,
-        _("Fuzzy blob/Spark - very slow, but bounces from walls"));
+        _("Bowling Ball - bounces off walls. If you are looking back,\nit will be thrown backwards."));
     widget_manager->setWgtRoundCorners( WTOK_TXT3, WGT_AREA_RGT );
     widget_manager->breakLine();
 
