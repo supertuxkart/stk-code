@@ -23,9 +23,10 @@
  (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
  (leader-intervals          30 20 10)  ;; Time till a kart is removed in follow leader mode
  (anvil-time                 2.0 )  ;; time an anvil is active
- (zipper-time                3.0 )  ;; time a zipper is active
- (zipper-force             800.0 )  ;; additional zipper force
- (zipper-speed-gain         10.0 )  ;; one time additional speed boost given by zippers
+ (zipper-time                3.5 )  ;; time a zipper is active
+ (zipper-force             250.0 )  ;; additional zipper force
+ (zipper-speed-gain          4.5 )  ;; one time additional speed  
+
  (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
                                     ;; is considered to be a shortcut
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
@@ -60,7 +61,7 @@
    (max-speed-angle          12  6.4)
    (engine-power            400    )
    (mass                    225    )
-   (suspension-stiffness     18.0  )
+   (suspension-stiffness     48.0  )
    (wheel-damping-relaxation  2.3  )
    (wheel-damping-compression 4.4  )
    (friction-slip      10000000    )
