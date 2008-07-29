@@ -227,6 +227,8 @@ Widget *RaceResultsGUI::displayKartList(unsigned int from, unsigned int to,
 
         Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + i, 7, 7,
                                        KART->getKartProperties()->getIconFile() );
+        widget_manager->deactivateWgt(WTOK_FIRST_IMAGE+i);
+
         image->setPosition(WGT_DIR_FROM_LEFT, horizontal, NULL, 
                            WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
         Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + i, 5, 7,

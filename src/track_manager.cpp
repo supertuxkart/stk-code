@@ -49,7 +49,7 @@ Track* TrackManager::getTrack(const std::string& ident) const
     }
 
     char msg[MAX_ERROR_MESSAGE_LENGTH];
-    fprintf(stderr, "TrackManager: Couldn't find track: '%s'", ident.c_str() );
+    sprintf(msg, "TrackManager: Couldn't find track: '%s'", ident.c_str() );
     throw std::runtime_error(msg);
 }   // getTrack
 

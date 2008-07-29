@@ -61,16 +61,22 @@ GrandPrixData::GrandPrixData(const std::string filename)
 // ----------------------------------------------------------------------------
 bool GrandPrixData::checkConsistency()
 {
-    bool correct=true;
     for(unsigned int i=0; i<m_tracks.size(); i++)
     {
-        if(!track_manager->getTrack(m_tracks[i]))
+        try
         {
-            fprintf(stderr, "Grand Prix '%s': Track '%s' does not exist!",
-                    m_name.c_str(), m_tracks[i].c_str());
-            correct=false;
+            Track *track=track_manager->getTrack(m_tracks[i]);
         }
+        catch(std::exception& e)
+        {
+            (void)e;
+            fprintf(stderr, "Grand Prix '%s': Track '%s' does not exist!\n",
+                m_name.c_str(), m_tracks[i].c_str());
+            fprintf(stderr, "This Grand Prix will not be available.\n");
+            return false;
+        }
+        
     }   // for i
-    return correct;
+    return true;
 }
 /* EOF */

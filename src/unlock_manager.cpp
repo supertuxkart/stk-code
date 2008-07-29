@@ -102,6 +102,16 @@ UnlockManager::UnlockManager()
         addChallenge(new ChallengeData(challenge_file));
     }   // for i
 
+    // Challenges from .../data/grandprix
+    // ----------------------------------
+    file_manager->listFiles(result, "data/grandprix");
+    for(std::set<std::string>::iterator i  = result.begin();
+                                        i != result.end()  ; i++)
+    {
+        if (StringUtils::has_suffix(*i, ".challenge")) 
+            addChallenge(file_manager->getConfigFile("grandprix/"+*i));
+    }   // for i
+
     // Hard coded challenges can be added here.
 
     computeActive();

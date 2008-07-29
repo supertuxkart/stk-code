@@ -22,7 +22,6 @@
 #include "string_utils.hpp"
 #include "file_manager.hpp"
 #include "grand_prix_manager.hpp"
-#include "unlock_manager.hpp"
 
 GrandPrixManager *grand_prix_manager = NULL;
 
@@ -35,8 +34,6 @@ GrandPrixManager::GrandPrixManager()
                                         i != result.end()  ; i++)
     {
         if (StringUtils::has_suffix(*i, ".grandprix")) load("grandprix/"+*i);
-        if (StringUtils::has_suffix(*i, ".challenge")) 
-            unlock_manager->addChallenge(file_manager->getConfigFile("grandprix/"+*i));
     }   // for i
 }   // GrandPrixManager
 
@@ -67,7 +64,12 @@ void GrandPrixManager::checkConsistency()
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
     {
-        m_gp_data[i]->checkConsistency();
+        if(!m_gp_data[i]->checkConsistency())
+        {
+            // delete this GP, since a track is missing
+            m_gp_data.erase(m_gp_data.begin()+i);
+            i--;
+        }
     }
 }   // checkConsistency
 // ----------------------------------------------------------------------------
