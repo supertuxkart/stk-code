@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CUPDATA_H
-#define HEADER_CUPDATA_H
+#ifndef HEADER_GRAND_PRIX_DATA_H
+#define HEADER_GRAND_PRIX_DATA_H
 
 #include <string>
 #include <vector>
@@ -27,16 +27,16 @@
 
 #include "herring_manager.hpp"
 
-/** Simple class that hold the data relevant to a 'cup', aka. a number
+/** Simple class that hold the data relevant to a 'grand_prix', aka. a number
     of races that has to be completed one after the other */
-class CupData
+class GrandPrixData
 {
-    std::string m_name;         // The name of the cup - might be translated!
-    std::string m_id;           // Internal name of the cup, not translated
+    std::string m_name;         // The name of the grand prix - might be translated!
+    std::string m_id;           // Internal name of the grand prix, not translated
     std::string m_filename;     // Original filename, only for error handling needed
     std::string m_description;  // Description for this track
     std::string m_herring_style; // herring style which overwrites the track default
-    /** The ident of the tracks in this cup in their right order, ident
+    /** The ident of the tracks in this grand prix in their right order, ident
         means the filename of the .track file without .track extension
         (ie. 'volcano') */
     std::vector<std::string> m_tracks;
@@ -46,9 +46,9 @@ class CupData
 
 public:
 
-    /** Load the CupData from the given filename */
-    CupData        (const std::string filename);
-    CupData        ()       {}; // empty for initialising
+    /** Load the GrandPrixData from the given filename */
+                       GrandPrixData  (const std::string filename);
+                       GrandPrixData  ()       {}; // empty for initialising
     const std::string& getName        ()        const { return m_name;          }
     const std::string& getId          ()        const { return m_id;            }
     const std::string& getDescription ()        const { return m_description;   }
@@ -60,10 +60,10 @@ public:
     const std::vector<int>&         getLaps()    const {return m_laps;          }
     size_t             getTrackCount()           const {return m_tracks.size(); }
     const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
-                                                         return m_laps[lap_index]; }
+                                                        return m_laps[lap_index];}
     bool               checkConsistency();
 }
-;   // CupData
+;   // GrandPrixData
 
 #endif
 

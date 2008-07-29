@@ -22,12 +22,12 @@
 
 #include <vector>
 #include "base_gui.hpp"
-#include "cup_data.hpp"
+#include "grand_prix_data.hpp"
 
 class GrandPrixSelect: public BaseGUI
 {
 private:
-    std::vector<std::string>  m_cup_tracks;
+    std::vector<std::string>  m_gp_tracks;
     std::vector<int>          m_track_imgs;
     std::vector<unsigned int> m_gp_index;
     unsigned int              m_curr_track_img;

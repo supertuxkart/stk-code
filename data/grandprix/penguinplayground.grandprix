@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
-(supertuxkart-cup
+(supertuxkart-grand-prix
  (name _("Penguin Playground"))
  (description _("First grand prix, easy to get started"))
  (tracks "tuxtrack" "race" "olivermath")

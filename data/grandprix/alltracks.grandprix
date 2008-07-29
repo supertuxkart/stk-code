@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
-(supertuxkart-cup
+(supertuxkart-grand-prix
  (name _("All tracks"))
  (description _("All tracks included in SuperTuxKart"))
  (tracks "beach" "startrack" "lighthouse" "jungle" "volcano" "islandtrack" "sandtrack" "fortmagma" "snowtuxpeak" "crescentcrossing" "olivermath" "race" "city" "canyon" "subseatrack" "tuxtrack")

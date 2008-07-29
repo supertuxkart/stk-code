@@ -700,10 +700,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\cup_data.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\explosion.cpp"
 				>
 			</File>
@@ -717,6 +713,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\game_manager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\grand_prix_data.cpp"
 				>
 			</File>
 			<File
@@ -1078,10 +1078,6 @@
 					RelativePath="..\..\challenges\challenge_data.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\challenges\worlds_end_gp.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1138,10 +1134,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\cup_data.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\explosion.hpp"
 				>
 			</File>
@@ -1155,6 +1147,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\game_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\grand_prix_data.hpp"
 				>
 			</File>
 			<File
@@ -1550,10 +1546,6 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\challenge_data.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\worlds_end_gp.hpp"
 					>
 				</File>
 			</Filter>

@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
-(supertuxkart-cup
+(supertuxkart-grand-prix
  (name _("To the Moon and Back"))
  (description _("Second grand prix"))
  (tracks "beach" "startrack" "jungle" "lighthouse")

@@ -23,7 +23,7 @@
 #include "lisp/parser.hpp"
 #include "translation.hpp"
 #include "world.hpp"
-#include "cup_data.hpp"
+#include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -198,8 +198,8 @@ void ChallengeData::setRace() const
     else   // GP
     {
         race_manager->setMinorMode(m_minor);
-        const CupData *cup = grand_prix_manager->getCup(m_gp_id);
-        race_manager->setGrandPrix(*cup);
+        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(m_gp_id);
+        race_manager->setGrandPrix(*gp);
         race_manager->setDifficulty(m_difficulty);
         race_manager->setNumKarts(m_num_karts);
         race_manager->setNumPlayers(1);

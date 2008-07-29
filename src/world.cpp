@@ -724,7 +724,7 @@ void World::loadTrack()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The cup '%s' contains an invalid herring style '%s'.\n",
+            fprintf(stderr, "The grand prix '%s' contains an invalid herring style '%s'.\n",
                     race_manager->getGrandPrix()->getName().c_str(),
                     race_manager->getHerringStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",

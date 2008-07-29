@@ -43,31 +43,31 @@ GrandPrixManager::GrandPrixManager()
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
 {
-    for(unsigned int i=0; i<m_cup_data.size(); i++)
+    for(unsigned int i=0; i<m_gp_data.size(); i++)
     {
-        delete m_cup_data[i];
+        delete m_gp_data[i];
     }   // for i
 
 }   // ~GrandPrixManager
 // ----------------------------------------------------------------------------
-const CupData* GrandPrixManager::getCup(const std::string& s) const
+const GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
-    for(unsigned int i=0; i<m_cup_data.size(); i++)
-        if(m_cup_data[i]->getId()==s) return m_cup_data[i];
+    for(unsigned int i=0; i<m_gp_data.size(); i++)
+        if(m_gp_data[i]->getId()==s) return m_gp_data[i];
     return NULL;
-}   // getCup
+}   // getGrandPrix
 // ----------------------------------------------------------------------------
 void GrandPrixManager::load(const std::string& filename)
 {
-    m_cup_data.push_back(new CupData(filename));
+    m_gp_data.push_back(new GrandPrixData(filename));
 }   // load
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::checkConsistency()
 {
-    for(unsigned int i=0; i<m_cup_data.size(); i++)
+    for(unsigned int i=0; i<m_gp_data.size(); i++)
     {
-        m_cup_data[i]->checkConsistency();
+        m_gp_data[i]->checkConsistency();
     }
 }   // checkConsistency
 // ----------------------------------------------------------------------------

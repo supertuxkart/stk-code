@@ -42,7 +42,7 @@ private:
     ssgEntity *m_herring_model[HE_SILVER+1];
 
     // This is the active model. It gets determined by first loading the
-    // default, then track models, user models, cup models. This means, that
+    // default, then track models, user models, grand prix models. This means that
     // a herring style specified in a track overwrites a command line option.
     std::map<std::string,ssgEntity*> m_all_models;
 

@@ -22,20 +22,20 @@
 
 #include <vector>
 #include <string>
-#include "cup_data.hpp"
+#include "grand_prix_data.hpp"
 
 class GrandPrixManager
 {
 private:
-    std::vector<CupData*> m_cup_data;
+    std::vector<GrandPrixData*> m_gp_data;
 public:
-                   GrandPrixManager();
-                  ~GrandPrixManager();
-    void           load(const std::string &filename);
-    const CupData* getCup(int i)          const { return m_cup_data[i];     }
-    const CupData* getCup(const std::string& s) const;
-    unsigned int   getNumberOfGrandPrix() const { return m_cup_data.size(); }
-    void           checkConsistency();
+                         GrandPrixManager();
+                        ~GrandPrixManager();
+    void                 load(const std::string &filename);
+    const GrandPrixData* getGrandPrix(int i)    const { return m_gp_data[i];     }
+    const GrandPrixData* getGrandPrix(const std::string& s) const;
+    unsigned int         getNumberOfGrandPrix() const { return m_gp_data.size(); }
+    void                 checkConsistency();
 
 };   // GrandPrixManager
 

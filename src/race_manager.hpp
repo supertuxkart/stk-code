@@ -24,7 +24,7 @@
 #include <algorithm>
 
 #include <string>
-#include "cup_data.hpp"
+#include "grand_prix_data.hpp"
 
 /** The race manager has two functions:
     1) it stores information about the race the user selected (e.g. number
@@ -79,7 +79,7 @@ private:
     std::vector<int>                 m_num_laps;
     std::vector<int>                 m_score_for_position;
     int                              m_track_number;
-    CupData                          m_cup;
+    GrandPrixData                    m_grand_prix;
     int                              m_num_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -105,7 +105,7 @@ public:
     void         reset();
     void         RaceFinished(const Kart* kart, float time);
     void         setTrack(const std::string& track);
-    void         setGrandPrix(const CupData &cup){ m_cup = cup;                     }
+    void         setGrandPrix(const GrandPrixData &gp){ m_grand_prix = gp;          }
     void         setDifficulty(Difficulty diff);
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
@@ -121,14 +121,14 @@ public:
     Difficulty   getDifficulty()          const { return m_difficulty;              }
     const std::string& 
                  getTrackName()           const { return m_tracks[m_track_number];  }
-    const CupData 
-                *getGrandPrix()           const { return &m_cup;                    }
+    const GrandPrixData 
+                *getGrandPrix()           const { return &m_grand_prix;             }
     unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
     const std::string&  
                  getKartName(int kart)    const { return m_kart_status[kart].m_ident;}
     const std::string& 
-                 getHerringStyle()        const { return m_cup.getHerringStyle();   }
+                 getHerringStyle()        const { return m_grand_prix.getHerringStyle();}
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;}
     int          getKartPrevScore(int krt)const { return m_kart_status[krt].m_last_score;}
     int          getkartPlayerId(int krt) const { return m_kart_status[krt].m_player_id;}

@@ -23,24 +23,24 @@
 #include "file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
-#include "cup_data.hpp"
+#include "grand_prix_data.hpp"
 #include "string_utils.hpp"
 #include "track_manager.hpp"
 
-CupData::CupData(const std::string filename)
+GrandPrixData::GrandPrixData(const std::string filename)
 {
     m_filename = filename;
-    m_id       = StringUtils::without_extension(filename);
+    m_id       = StringUtils::basename(StringUtils::without_extension(filename));
     const lisp::Lisp* lisp = 0;
     try
     {
         lisp::Parser parser;
         lisp = parser.parse(file_manager->getConfigFile(m_filename));
 
-        lisp = lisp->getLisp("supertuxkart-cup");
+        lisp = lisp->getLisp("supertuxkart-grand-prix");
         if(!lisp)
         {
-            throw std::runtime_error("No supertuxkart-cup node");
+            throw std::runtime_error("No supertuxkart-grand-prix node");
         }
 
         lisp->get      ("name",        m_name        );
@@ -51,7 +51,7 @@ CupData::CupData(const std::string filename)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while reading cup file '%s'\n", filename.c_str());
+        fprintf(stderr, "Error while reading grandprix file '%s'\n", filename.c_str());
         fprintf(stderr, err.what());
         fprintf(stderr, "\n");
     }
@@ -59,7 +59,7 @@ CupData::CupData(const std::string filename)
     delete lisp;
 }
 // ----------------------------------------------------------------------------
-bool CupData::checkConsistency()
+bool GrandPrixData::checkConsistency()
 {
     bool correct=true;
     for(unsigned int i=0; i<m_tracks.size(); i++)

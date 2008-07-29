@@ -112,10 +112,10 @@ void RaceManager::setTrack(const std::string& track)
 //-----------------------------------------------------------------------------
 void RaceManager::startNew()
 {
-    if(m_major_mode==RM_GRAND_PRIX)   // GP: get tracks and laps from cup object
+    if(m_major_mode==RM_GRAND_PRIX)   // GP: get tracks and laps from grand prix
     {
-        m_tracks = m_cup.getTracks();
-        m_num_laps = m_cup.getLaps();
+        m_tracks   = m_grand_prix.getTracks();
+        m_num_laps = m_grand_prix.getLaps();
     }
     assert(m_player_karts.size() > 0);
 

@@ -51,9 +51,9 @@ GrandPrixSelect::GrandPrixSelect() : m_curr_track_img(0), m_clock(0.0f)
     m_gp_index.clear();
     for(unsigned int i=0; i<grand_prix_manager->getNumberOfGrandPrix(); i++)
     {
-        const CupData *cup = grand_prix_manager->getCup(i);
-        if(unlock_manager->isLocked(cup->getName())) continue;
-        widget_manager->addTextButtonWgt(WTOK_FIRSTPRIX + nId, 60, 7, cup->getName() );
+        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(i);
+        if(unlock_manager->isLocked(gp->getId())) continue;
+        widget_manager->addTextButtonWgt(WTOK_FIRSTPRIX + nId, 60, 7, gp->getName() );
         m_gp_index.push_back(i);
         nId++;
     }   // for i
@@ -97,19 +97,19 @@ void GrandPrixSelect::update(float dt)
     if( widget_manager->selectionChanged() &&
         !( SELECTED_TOKEN < WTOK_FIRSTPRIX ))
     {
-        const int CUP_NUM    = m_gp_index[SELECTED_TOKEN - WTOK_FIRSTPRIX];
-        const CupData *cup   = grand_prix_manager->getCup(CUP_NUM);
-        const int NUM_TRACKS = cup->getTrackCount();
+        const int NUM           = m_gp_index[SELECTED_TOKEN - WTOK_FIRSTPRIX];
+        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(NUM);
+        const int NUM_TRACKS    = gp->getTrackCount();
 
-        widget_manager->setWgtText(WTOK_DESCRIPTION, cup->getDescription());
+        widget_manager->setWgtText(WTOK_DESCRIPTION, gp->getDescription());
 
 
         std::string track_list;
-        m_cup_tracks = cup->getTracks();
+        m_gp_tracks = gp->getTracks();
 
         for( int i = 0; i < NUM_TRACKS; ++i )
         {
-            track_list.append( track_manager->getTrack( m_cup_tracks[i] )->getName() );
+            track_list.append( track_manager->getTrack( m_gp_tracks[i] )->getName() );
             track_list.push_back('\n');
         }
         widget_manager->setWgtText( WTOK_TRACKS, track_list );
@@ -122,10 +122,10 @@ void GrandPrixSelect::update(float dt)
 
         for( int i = 0; i < NUM_TRACKS; ++i )
         {
-            img_filename = track_manager->getTrack( m_cup_tracks[i] )->getTopviewFile();
+            img_filename = track_manager->getTrack( m_gp_tracks[i] )->getTopviewFile();
             if( img_filename.empty() )
             {
-                img_filename = track_manager->getTrack( m_cup_tracks[i] )->getScreenshotFile();
+                img_filename = track_manager->getTrack( m_gp_tracks[i] )->getScreenshotFile();
                 if( img_filename.empty() ) continue;
             }
 
@@ -182,8 +182,8 @@ void GrandPrixSelect::select()
         menu_manager->popMenu();
         return;
     }
-    const CupData *cup=grand_prix_manager->getCup(m_gp_index[CLICKED_TOKEN-WTOK_FIRSTPRIX]);
-    race_manager->setGrandPrix(*cup);
+    const GrandPrixData *gp=grand_prix_manager->getGrandPrix(m_gp_index[CLICKED_TOKEN-WTOK_FIRSTPRIX]);
+    race_manager->setGrandPrix(*gp);
     menu_manager->pushMenu(MENUID_RACE_OPTIONS);
 }   // select
 
