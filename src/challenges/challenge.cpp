@@ -22,6 +22,8 @@
 #include "world.hpp"
 #include "race_manager.hpp"
 #include "track_manager.hpp"
+#include "kart_properties_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -93,6 +95,15 @@ void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string
     m_feature.push_back(feature);
 }
 //-----------------------------------------------------------------------------
+void Challenge::addUnlockKartReward(std::string internal_name, std::string user_name)
+{
+    UnlockableFeature feature;
+    feature.name = internal_name;
+    feature.type = UNLOCK_KART;
+    feature.user_name = user_name;
+    m_feature.push_back(feature);
+}
+//-----------------------------------------------------------------------------
 const std::string Challenge::getUnlockedMessage() const
 {
     std::string unlocked_message;
@@ -109,10 +120,10 @@ const std::string Challenge::getUnlockedMessage() const
         switch(m_feature[n].type)
         {
             case UNLOCK_TRACK:
-                {
+                {    // {} avoids compiler warning
                     Track* track = track_manager->getTrack( m_feature[n].name );
                     snprintf(message, 127, _("New track '%s'\nnow available"), _(track->getName()) );
-                    break;
+                    break; 
                 }
             case UNLOCK_MODE:
                 snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
@@ -123,9 +134,13 @@ const std::string Challenge::getUnlockedMessage() const
             case UNLOCK_DIFFICULTY:
                 snprintf(message, 127, _("New difficulty\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
                 break;
-        }
+            case UNLOCK_KART:
+                const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
+                    snprintf(message, 127, _("New kart\n'%s'\nnow available"), kp->getName());
+                break;
+        }   // switch
         unlocked_message += message;
-    }
+    }   // for n
     
     return unlocked_message;
 }

@@ -149,30 +149,30 @@ CharSel::~CharSel()
 //-----------------------------------------------------------------------------
 void CharSel::updateScrollPosition()
 {
-        // Handle the special case of less karts (plus groups) than widgets.
-        // Some of the widgets then need to be disabled.
-        unsigned int start = 0, end=m_max_entries;
-        if(m_index_avail_karts.size()<m_max_entries)
+    // Handle the special case of less karts (plus groups) than widgets.
+    // Some of the widgets then need to be disabled.
+    unsigned int start = 0, end=m_max_entries;
+    if(m_index_avail_karts.size()<m_max_entries)
+    {
+        start = (unsigned int)(m_max_entries-m_index_avail_karts.size()+1)/2;
+        end   = start+m_index_avail_karts.size()-1;
+    }
+
+    for(unsigned int i=0; i<m_max_entries; i++)
+    {
+        if(i<start || i>end)
         {
-                start = (unsigned int)(m_max_entries-m_index_avail_karts.size()+1)/2;
-                end   = start+m_index_avail_karts.size()-1;
+            widget_manager->hideWgtRect   (WTOK_NAME0 +i);
+            widget_manager->hideWgtRect   (WTOK_RACER0+i);
+            widget_manager->hideWgtText   (WTOK_NAME0 +i);
+            widget_manager->hideWgtTexture(WTOK_RACER0+i);
+            continue;
         }
 
-        for(unsigned int i=0; i<m_max_entries; i++)
-    {
-                if(i<start || i>end)
-                {
-                        widget_manager->hideWgtRect   (WTOK_NAME0 +i);
-                        widget_manager->hideWgtRect   (WTOK_RACER0+i);
-                        widget_manager->hideWgtText   (WTOK_NAME0 +i);
-                        widget_manager->hideWgtTexture(WTOK_RACER0+i);
-                        continue;
-                }
-
-                // Otherwise enable the widgets again (just in case that they
-                // had been disabled before)
-                widget_manager->showWgtRect   (WTOK_NAME0 +i);
-                widget_manager->showWgtText   (WTOK_NAME0 +i);
+        // Otherwise enable the widgets again (just in case that they
+        // had been disabled before)
+        widget_manager->showWgtRect   (WTOK_NAME0 +i);
+        widget_manager->showWgtText   (WTOK_NAME0 +i);
 
         int indx = (i+m_offset)%m_index_avail_karts.size();
         indx     = m_index_avail_karts[indx];
@@ -183,15 +183,15 @@ void CharSel::updateScrollPosition()
             if(unlock_manager->isLocked(kp->getIdent())) continue;
             widget_manager->setWgtText(WTOK_NAME0 + i, kp->getName());
             widget_manager->setWgtTexture(WTOK_RACER0 + i, kp->getIconFile() );
-                        widget_manager->showWgtTexture(WTOK_RACER0 + i);
-                        widget_manager->showWgtRect(WTOK_RACER0 + i);
+            widget_manager->showWgtTexture(WTOK_RACER0 + i);
+            widget_manager->showWgtRect(WTOK_RACER0 + i);
         }
         else
         {
             const std::vector<std::string> &groups=kart_properties_manager->getAllGroups();
             widget_manager->setWgtText(WTOK_NAME0+i, groups[-indx-1]);
-                        widget_manager->hideWgtTexture(WTOK_RACER0 + i);
-                        widget_manager->hideWgtRect(WTOK_RACER0 + i);
+            widget_manager->hideWgtTexture(WTOK_RACER0 + i);
+            widget_manager->hideWgtRect(WTOK_RACER0 + i);
         }
     }   // for i
     // set the 'selection changed' flag in the widget_manager, since update 
@@ -205,7 +205,7 @@ void CharSel::updateScrollPosition()
 //-----------------------------------------------------------------------------
 void CharSel::switchGroup()
 {
-        m_index_avail_karts.clear();
+    m_index_avail_karts.clear();
     // This loop is too long (since getNumberOfKarts returns all karts in all groups),
     // but the loop is left if no more kart is found.
     const std::vector<int> &karts =
@@ -223,28 +223,28 @@ void CharSel::switchGroup()
     const std::vector<std::string> groups=kart_properties_manager->getAllGroups();
     for(int i =0; i<(int)groups.size(); i++)
     {
-                // Only add groups other than the current one
-                if(groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
+        // Only add groups other than the current one
+        if(groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
     }
     if(m_index_avail_karts.size()>=m_max_entries) 
-        {
-                m_offset          = 0;
-                widget_manager->showWgtRect(WTOK_DOWN);
-                widget_manager->showWgtText(WTOK_DOWN);
-                widget_manager->showWgtRect(WTOK_UP);
-                widget_manager->showWgtText(WTOK_UP);
-        }
-        else
-        {
-                // Less entries than maximum -> set m_offset to a negative number, so
-                // that the actual existing entries are displayed 
-                m_offset          = - (int)(m_max_entries-m_index_avail_karts.size())/2-1;
-                widget_manager->hideWgtRect(WTOK_DOWN);
-                widget_manager->hideWgtText(WTOK_DOWN);
-                widget_manager->hideWgtRect(WTOK_UP);
-                widget_manager->hideWgtText(WTOK_UP);
-        }
-        
+    {
+        m_offset          = 0;
+        widget_manager->showWgtRect(WTOK_DOWN);
+        widget_manager->showWgtText(WTOK_DOWN);
+        widget_manager->showWgtRect(WTOK_UP);
+        widget_manager->showWgtText(WTOK_UP);
+    }
+    else
+    {
+        // Less entries than maximum -> set m_offset to a negative number, so
+        // that the actual existing entries are displayed 
+        m_offset          = - (int)(m_max_entries-m_index_avail_karts.size())/2-1;
+        widget_manager->hideWgtRect(WTOK_DOWN);
+        widget_manager->hideWgtText(WTOK_DOWN);
+        widget_manager->hideWgtRect(WTOK_UP);
+        widget_manager->hideWgtText(WTOK_UP);
+    }
+
 }   // switchGroup
 
 //-----------------------------------------------------------------------------
@@ -423,7 +423,7 @@ void CharSel::handle(GameAction action, int value)
 // Function checks the vector of previously selected karts and returns true if
 // kart i is in the vector and false if it is not.
 
-bool CharSel::kartAvailable(int kart)
+bool CharSel::kartAvailable(int kartid)
 {
     if (!kart_properties_manager->m_selected_karts.empty())
     {
@@ -431,9 +431,10 @@ bool CharSel::kartAvailable(int kart)
         for (it = kart_properties_manager->m_selected_karts.begin();
              it < kart_properties_manager->m_selected_karts.end(); it++)
         {
-            if ( kart == *it)
+            if ( kartid == *it)
             return false;
-	}
+        }
     }
-    return true;
+    const KartProperties *kartprop=kart_properties_manager->getKartById(kartid);
+    return !unlock_manager->isLocked(kartprop->getIdent());
 }   // kartAvailable

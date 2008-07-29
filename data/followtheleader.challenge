@@ -1,0 +1,17 @@
+;; -*- mode: lisp -*-
+
+(challenge
+ (id            "penguinplaygroundgp")
+ (name          _("Win Penguin Playground Grand\nPrix"))
+ (description   _("Win Penguin Playground Grand\nPrix with 3 'Racer' Level AI karts."))
+ (unlock-mode  "followtheleader" _("Follow the Leader"))
+ (major        "grandprix")
+ (minor        "quickrace")
+ (gp           "penguinplayground")
+ (difficulty   "hard")
+ (karts        4)
+ (position     1)
+)
+
+;; EOF ;;
+

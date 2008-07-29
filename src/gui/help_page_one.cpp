@@ -136,7 +136,7 @@ _("If you see a button with a lock like the one to the right,\n\
 you need to complete a challenge to unlock it."));
 
     widget_manager->addImgWgt(WTOK_LOCK, 6, 8, 0);
-    widget_manager->setWgtTexture(WTOK_LOCK, "gui_help_lock.rgb", false);
+    widget_manager->setWgtLockTexture(WTOK_LOCK);
     widget_manager->breakLine();
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);

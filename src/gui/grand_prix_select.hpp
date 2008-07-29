@@ -27,11 +27,11 @@
 class GrandPrixSelect: public BaseGUI
 {
 private:
-    std::vector<CupData> m_all_cups;
-    std::vector<std::string> m_cup_tracks;
-    std::vector<int> m_track_imgs;
-    unsigned int m_curr_track_img;
-    float m_clock;
+    std::vector<std::string>  m_cup_tracks;
+    std::vector<int>          m_track_imgs;
+    std::vector<unsigned int> m_gp_index;
+    unsigned int              m_curr_track_img;
+    float                     m_clock;
 public:
     GrandPrixSelect();
     ~GrandPrixSelect();

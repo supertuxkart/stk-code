@@ -31,6 +31,7 @@ enum REWARD_TYPE
    {UNLOCK_TRACK,
     UNLOCK_GP,
     UNLOCK_MODE,
+    UNLOCK_KART,
     UNLOCK_DIFFICULTY};
 
 struct UnlockableFeature
@@ -53,18 +54,21 @@ class Challenge
     std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
              Challenge(std::string id, std::string name);
+             Challenge() {m_Id=""; m_Name="";}
     virtual ~Challenge() {};
-    const std::string& getId() const             {return m_Id;                  }
-    const std::string& getName() const           {return m_Name;                }
-    
+    const std::string& getId() const             { return m_Id;                  }
+    const std::string& getName() const           { return m_Name;                }
+    void setName(const std::string& s)           { m_Name = s;                   }
+    void setId(const std::string& s)             { m_Id = s;                     }
     void addUnlockTrackReward(std::string track_name);
     void addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name);
     void addUnlockGPReward(std::string gp_name);
     void addUnlockDifficultyReward(std::string internal_name, std::string user_name);
+    void addUnlockKartReward(std::string internal_name, std::string user_name);
     
     const std::string getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&
-          getFeatures() const                    {return m_feature;               }
+          getFeatures() const                    { return m_feature;             }
     void  setChallengeDescription(const std::string& d) 
                                                  {m_challenge_description=d;      }
     const std::string& 

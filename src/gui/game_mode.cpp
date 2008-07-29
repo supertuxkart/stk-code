@@ -104,19 +104,25 @@ GameMode::GameMode()
             widget_manager->deactivateWgt(i);
 
             widget_manager->setWgtColor(i, WGT_WHITE);
-            widget_manager->setWgtTexture(i, "gui_lock.rgb", false);
+            widget_manager->setWgtLockTexture(i);
             widget_manager->showWgtTexture(i);
         }
     }
 
-    if(unlock_manager->isLocked("followleader"))
+    if(unlock_manager->isLocked("followtheleader"))
     {
         widget_manager->hideWgtText(WTOK_FOLLOW_LEADER_SINGLE);
-        widget_manager->setWgtColor(WTOK_FOLLOW_LEADER_SINGLE, WGT_GRAY);
-        widget_manager->setWgtTexture(WTOK_FOLLOW_LEADER_SINGLE, "gui_lock.rgb", false );
+        widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER_SINGLE);
+        widget_manager->setWgtLockTexture(WTOK_FOLLOW_LEADER_SINGLE);
         widget_manager->showWgtTexture(WTOK_FOLLOW_LEADER_SINGLE);
-        widget_manager->setWgtText(WTOK_FOLLOW_LEADER_SINGLE,
-                                        _("Fulfil challenge to unlock"));
+        //widget_manager->setWgtText(WTOK_FOLLOW_LEADER_SINGLE,
+        //                                _("Fulfil challenge to unlock"));
+        widget_manager->hideWgtText(WTOK_FOLLOW_LEADER_GP);
+        widget_manager->deactivateWgt(WTOK_FOLLOW_LEADER_GP);
+        widget_manager->setWgtLockTexture(WTOK_FOLLOW_LEADER_GP);
+        widget_manager->showWgtTexture(WTOK_FOLLOW_LEADER_GP);
+        //widget_manager->setWgtText(WTOK_FOLLOW_LEADER_GP,
+        //                                _("Fulfil challenge to unlock"));
     }
 
     w=widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, HEIGHT, _("Game mode help"));
