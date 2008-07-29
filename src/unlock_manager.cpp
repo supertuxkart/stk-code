@@ -16,22 +16,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#include <set>
+#include <string>
+#include <stdio.h>
 
 #include "unlock_manager.hpp"
 #include "race_manager.hpp"
-
-#include "challenges/energy_math_class.hpp"
-#include "challenges/penguin_playground_gp.hpp"
-#include "challenges/race_track_time.hpp"
-#include "challenges/tollway_time.hpp"
-#include "challenges/jungle_follow.hpp"
-#include "challenges/energy_shifting_sands.hpp"
-#include "challenges/moon_and_back_gp.hpp"
-#include "challenges/city_time.hpp"
-#include "challenges/island_follow.hpp"
-#include "challenges/worlds_end_gp.hpp"
-#include "challenges/tollway_head2head.hpp"
+#include "file_manager.hpp"
+#include "string_utils.hpp"
 #include "user_config.hpp"
+#include "challenges/challenge_data.hpp"
 
 UnlockManager* unlock_manager=0;
 //-----------------------------------------------------------------------------
@@ -43,23 +37,87 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager=this;
 
-    // Add all challenges:
-    Challenge *c;
-    c=new EnergyMathClass(); m_all_challenges[c->getId()]=c;
-    c=new PenguinPlaygroundGP(); m_all_challenges[c->getId()]=c;
-    c=new RaceTrackTime();   m_all_challenges[c->getId()]=c;
-    c=new TollwayTime();     m_all_challenges[c->getId()]=c;
-    c=new JungleFollow();    m_all_challenges[c->getId()]=c;
-    c=new EnergyShiftingSands(); m_all_challenges[c->getId()]=c;
-    c=new MoonAndBackGP();   m_all_challenges[c->getId()]=c;
-    c=new CityTime();        m_all_challenges[c->getId()]=c;
-    c=new IslandFollow();        m_all_challenges[c->getId()]=c;
-    c=new WorldsEndGP();        m_all_challenges[c->getId()]=c;
-    c=new TollwayHead2Head(); m_all_challenges[c->getId()]=c;
-    
+    // Read challenges from .../data
+    // -----------------------------
+    std::set<std::string> result;
+    file_manager->listFiles(result, "data");
+    for(std::set<std::string>::iterator i  = result.begin();
+                                        i != result.end()  ; i++)
+    {
+        if (StringUtils::has_suffix(*i, ".challenge")) 
+            addChallenge(file_manager->getConfigFile(*i));
+    }   // for i
+
+    // Read challenges from .../data/tracks/*
+    // --------------------------------------
+    std::set<std::string> dirs;
+    file_manager->listFiles(dirs, file_manager->getTrackDir(), /*is_full_path*/ true);
+    for(std::set<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
+    {
+        if(*dir=="." || *dir=="..") continue;
+        std::string config_file;
+        try
+        {
+            // getTrackFile appends dir, so it's opening: *dir/*dir.track
+            config_file = file_manager->getTrackFile((*dir)+".track");
+        }
+        catch (std::exception& e)
+        {
+            (void)e;   // remove warning about unused variable
+            continue;
+        }
+        // Check for a challenge file
+        std::string challenge_file = 
+            StringUtils::without_extension(config_file)+".challenge";
+        FILE *f=fopen(challenge_file.c_str(), "r");
+        if(f)
+        {
+            fclose(f);
+            addChallenge(new ChallengeData(challenge_file));
+        }
+    }   // for dirs
+
+    // Load challenges from .../data/karts
+    // -----------------------------------
+    file_manager->listFiles(dirs, file_manager->getKartDir(), 
+                            /*is_full_path*/ true);
+
+    // Find out which characters are available and load them
+    for(std::set<std::string>::iterator i  = dirs.begin();
+                                        i != dirs.end();  i++)
+    {
+        std::string challenge_file;
+        try
+        {
+            challenge_file = file_manager->getKartFile((*i)+".challenge");
+        }
+        catch (std::exception& e)
+        {
+            (void)e;   // remove warning about unused variable
+            continue;
+        }
+        FILE *f=fopen(challenge_file.c_str(),"r");
+        if(!f) continue;
+        fclose(f);
+        addChallenge(new ChallengeData(challenge_file));
+    }   // for i
+
+    // Hard coded challenges can be added here.
+
     computeActive();
+
 }   // UnlockManager
 
+//-----------------------------------------------------------------------------
+void UnlockManager::addChallenge(Challenge *c)
+{
+    m_all_challenges[c->getId()]=c;
+}   // addChallenge
+//-----------------------------------------------------------------------------
+void UnlockManager::addChallenge(const std::string& filename)
+{
+    addChallenge(new ChallengeData(filename));
+}   // addChallenge
 //-----------------------------------------------------------------------------
 std::vector<const Challenge*> UnlockManager::getActiveChallenges()
 {

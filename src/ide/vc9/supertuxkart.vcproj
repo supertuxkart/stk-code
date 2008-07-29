@@ -680,6 +680,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\bowling.cpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\callback_manager.cpp"
 				>
 			</File>
@@ -713,6 +717,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\game_manager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\grand_prix_manager.cpp"
 				>
 			</File>
 			<File
@@ -857,10 +865,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\sound_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\spark.cpp"
 				>
 			</File>
 			<File
@@ -1071,43 +1075,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\challenges\city_time.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\energy_math_class.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\energy_shifting_sands.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\island_follow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\jungle_follow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\moon_and_back_gp.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\penguin_playground_gp.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\race_track_time.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\tollway_head2head.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\tollway_time.cpp"
+					RelativePath="..\..\challenges\challenge_data.cpp"
 					>
 				</File>
 				<File
@@ -1135,6 +1103,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\auto_kart.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bowling.hpp"
 				>
 			</File>
 			<File
@@ -1183,6 +1155,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\game_manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\grand_prix_manager.hpp"
 				>
 			</File>
 			<File
@@ -1359,10 +1335,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\sound_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\spark.hpp"
 				>
 			</File>
 			<File
@@ -1577,43 +1549,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\challenges\city_time.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\energy_math_class.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\energy_shifting_sands.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\island_follow.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\jungle_follow.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\moon_and_back_gp.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\penguin_playground_gp.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\race_track_time.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\tollway_head2head.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\challenges\tollway_time.hpp"
+					RelativePath="..\..\challenges\challenge_data.hpp"
 					>
 				</File>
 				<File

@@ -38,6 +38,8 @@ private:
     void       computeActive     ();
 public:
                UnlockManager    ();
+    void       addChallenge     (Challenge *c);
+    void       addChallenge     (const std::string& filename);
     void       load             (const lisp::Lisp*);
     void       save             (lisp::Writer* writer);
     std::vector<const Challenge*> 

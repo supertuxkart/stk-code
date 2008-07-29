@@ -31,6 +31,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	material_manager.cpp	   material_manager.hpp    	\
+	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \
 	attachment_manager.cpp     attachment_manager.hpp       \
 	collectable.cpp		   collectable.hpp	        \
@@ -93,17 +94,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	translation.cpp		   translation.hpp 		\
 	player.hpp		   				\
 	challenges/challenge.hpp   challenges/challenge.cpp	\
-	challenges/energy_math_class.cpp  challenges/energy_math_class.hpp\
-	challenges/penguin_playground_gp.cpp challenges/penguin_playground_gp.hpp \
-	challenges/race_track_time.cpp challenges/race_track_time.hpp\
-	challenges/tollway_time.cpp challenges/tollway_time.hpp \
-	challenges/jungle_follow.cpp challenges/jungle_follow.hpp \
-	challenges/energy_shifting_sands.cpp challenges/energy_shifting_sands.hpp \
-	challenges/moon_and_back_gp.cpp challenges/moon_and_back_gp.hpp \
-	challenges/city_time.cpp  challenges/city_time.hpp  \
-	challenges/island_follow.cpp  challenges/island_follow.hpp  \
-	challenges/worlds_end_gp.cpp challenges/worlds_end_gp.hpp  \
-	challenges/tollway_head2head.cpp  challenges/tollway_head2head.hpp  \
+	challenges/challenge_data.hpp   challenges/challenge_data.cpp	\
 	lisp/lisp.cpp		   lisp/lisp.hpp            	\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\

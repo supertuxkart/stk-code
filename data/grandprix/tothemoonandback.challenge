@@ -1,0 +1,20 @@
+;; -*- mode: lisp -*-
+
+(challenge
+ (id            "energyshiftingsands")
+ (name          _("Collect the Pharaohs Treasure"))
+ (description   _("Collect at least 9 coins\non 3 laps of Shifting Sands\nin under 2:20 minutes."))
+ (unlock-gp    "tothemoonandback")
+ (depend-on    "energymathclass" "racetracktime")
+ (major        "single")
+ (minor        "quickrace")
+ (track        "sandtrack")
+ (difficulty   "easy")
+ (karts        1)
+ (laps         3)
+ (energy       9)
+ (time       140)
+)
+
+;; EOF ;;
+

@@ -65,6 +65,7 @@
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"
+#include "grand_prix_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "scene.hpp"
 
@@ -413,6 +414,7 @@ void InitTuxkart()
     herring_manager         = new HerringManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+    grand_prix_manager      = new GrandPrixManager     ();
     track_manager->loadTrackList();
     sound_manager->addMusicToTracks();
 
@@ -424,6 +426,10 @@ void InitTuxkart()
     race_manager->setMajorMode (RaceManager::RM_SINGLE);
     race_manager->setMinorMode (RaceManager::RM_QUICK_RACE);
     race_manager->setDifficulty(RaceManager::RD_HARD);
+
+    // Consistency check for challenges, and enable all challenges
+    // that have all prerequisites fulfilled
+    grand_prix_manager->checkConsistency();
 }
 
 //=============================================================================
@@ -530,17 +536,21 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
-    if (user_config->m_crashed) user_config->m_crashed = false;
-    user_config->saveConfig();
-    delete inputDriver;
+    if(user_config)
+    {
+        // In case that abort is triggered before user_config exists
+        if (user_config->m_crashed) user_config->m_crashed = false;
+        user_config->saveConfig();
+    }
+    if(inputDriver) delete inputDriver;  // if early crash avoid delete NULL
     
-    if (user_config->m_log_errors) //close logfiles
+    if (user_config && user_config->m_log_errors) //close logfiles
     {
         fclose(stderr);
         fclose(stdout);
     }
 
-    delete highscore_manager;
+    if(highscore_manager) delete highscore_manager;
     delete_fonts();
 
     return 0 ;

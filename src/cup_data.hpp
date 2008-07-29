@@ -31,7 +31,8 @@
     of races that has to be completed one after the other */
 class CupData
 {
-    std::string m_name;         // The name of the cup
+    std::string m_name;         // The name of the cup - might be translated!
+    std::string m_id;           // Internal name of the cup, not translated
     std::string m_filename;     // Original filename, only for error handling needed
     std::string m_description;  // Description for this track
     std::string m_herring_style; // herring style which overwrites the track default
@@ -49,6 +50,7 @@ public:
     CupData        (const std::string filename);
     CupData        ()       {}; // empty for initialising
     const std::string& getName        ()        const { return m_name;          }
+    const std::string& getId          ()        const { return m_id;            }
     const std::string& getDescription ()        const { return m_description;   }
     const std::string& getHerringStyle()        const { return m_herring_style; }
     const std::string& getFilename    ()        const { return m_filename;      }
@@ -59,6 +61,7 @@ public:
     size_t             getTrackCount()           const {return m_tracks.size(); }
     const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
                                                          return m_laps[lap_index]; }
+    bool               checkConsistency();
 }
 ;   // CupData
 

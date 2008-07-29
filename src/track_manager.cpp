@@ -75,6 +75,7 @@ void TrackManager::loadTrackList ()
         }
         FILE *f=fopen(config_file.c_str(),"r");
         if(!f) continue;
+        fclose(f);
 
         Track *track = new Track(config_file);
         m_tracks.push_back(track);

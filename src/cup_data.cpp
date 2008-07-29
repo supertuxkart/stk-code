@@ -24,10 +24,13 @@
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "cup_data.hpp"
+#include "string_utils.hpp"
+#include "track_manager.hpp"
 
-CupData::CupData(const std::string filename_)
+CupData::CupData(const std::string filename)
 {
-    m_filename = filename_;
+    m_filename = filename;
+    m_id       = StringUtils::without_extension(filename);
     const lisp::Lisp* lisp = 0;
     try
     {
@@ -48,12 +51,26 @@ CupData::CupData(const std::string filename_)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while reading cup file '%s'\n", filename_.c_str());
+        fprintf(stderr, "Error while reading cup file '%s'\n", filename.c_str());
         fprintf(stderr, err.what());
         fprintf(stderr, "\n");
     }
 
     delete lisp;
 }
-
+// ----------------------------------------------------------------------------
+bool CupData::checkConsistency()
+{
+    bool correct=true;
+    for(unsigned int i=0; i<m_tracks.size(); i++)
+    {
+        if(!track_manager->getTrack(m_tracks[i]))
+        {
+            fprintf(stderr, "Grand Prix '%s': Track '%s' does not exist!",
+                    m_name.c_str(), m_tracks[i]);
+            correct=false;
+        }
+    }   // for i
+    return correct;
+}
 /* EOF */

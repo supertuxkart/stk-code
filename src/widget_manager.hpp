@@ -308,6 +308,7 @@ public:
 
     void setWgtTexture(const int TOKEN, const int TEXTURE);
     void setWgtTexture(const int TOKEN, const std::string& FILENAME, const bool is_full_path=true);
+    void setWgtLockTexture(const int token) {setWgtTexture(token, "gui_lock.rgb", false);}
     void showWgtTexture(const int TOKEN);
     void hideWgtTexture(const int TOKEN);
 
