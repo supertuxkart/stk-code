@@ -48,7 +48,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	herring_manager.cpp	   herring_manager.hpp       	\
 	explosion.cpp		   explosion.hpp            	\
 	user_config.cpp		   user_config.hpp             	\
-	cup_data.cpp   		   cup_data.hpp              	\
+	grand_prix_data.cpp   	   grand_prix_data.hpp        	\
 	kart_properties_manager.cpp kart_properties_manager.hpp \
 	projectile_manager.cpp	   projectile_manager.hpp    	\
 	kart_properties.cpp	   kart_properties.hpp       	\

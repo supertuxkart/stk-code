@@ -67,7 +67,7 @@ bool GrandPrixData::checkConsistency()
         if(!track_manager->getTrack(m_tracks[i]))
         {
             fprintf(stderr, "Grand Prix '%s': Track '%s' does not exist!",
-                    m_name.c_str(), m_tracks[i]);
+                    m_name.c_str(), m_tracks[i].c_str());
             correct=false;
         }
     }   // for i
