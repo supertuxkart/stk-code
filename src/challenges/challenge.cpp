@@ -136,7 +136,7 @@ const std::string Challenge::getUnlockedMessage() const
                 break;
             case UNLOCK_KART:
                 const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
-                    snprintf(message, 127, _("New kart\n'%s'\nnow available"), kp->getName());
+                snprintf(message, 127, _("New kart\n'%s'\nnow available"), kp->getName().c_str());
                 break;
         }   // switch
         unlocked_message += message;

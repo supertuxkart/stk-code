@@ -79,7 +79,6 @@ protected:
     float m_friction_slip;
     float m_roll_influence;
     float m_wheel_radius;
-    float m_wheel_width;
     float m_chassis_linear_damping;
     float m_chassis_angular_damping;
     float m_maximum_speed;
@@ -153,7 +152,6 @@ public:
     float getFrictionSlip           () const {return m_friction_slip;            }
     float getRollInfluence          () const {return m_roll_influence;           }
     float getWheelRadius            () const {return m_wheel_radius;             }
-    float getWheelWidth             () const {return m_wheel_width;              }
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }

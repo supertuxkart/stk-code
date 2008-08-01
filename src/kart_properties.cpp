@@ -188,7 +188,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("friction-slip",             m_friction_slip            );
     lisp->get("roll-influence",            m_roll_influence           );
     lisp->get("wheel-radius",              m_wheel_radius             );
-    lisp->get("wheel-width",               m_wheel_width              );
     lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
     lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
     lisp->get("max-speed-reverse-ratio",   m_max_speed_reverse_ratio  );
@@ -254,7 +253,6 @@ void KartProperties::init_defaults()
     m_friction_slip             = stk_config->m_friction_slip;
     m_roll_influence            = stk_config->m_roll_influence;
     m_wheel_radius              = stk_config->m_wheel_radius;
-    m_wheel_width               = stk_config->m_wheel_width;
     m_chassis_linear_damping    = stk_config->m_chassis_linear_damping;
     m_chassis_angular_damping   = stk_config->m_chassis_angular_damping;
     m_maximum_speed             = stk_config->m_maximum_speed;

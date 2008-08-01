@@ -176,12 +176,11 @@ void Kart::createPhysics(ssgEntity *obj)
     
     // Add wheels
     // ----------
-    float wheel_width     = m_kart_properties->getWheelWidth();
     float wheel_radius    = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
     Vec3  front_wheel     = m_kart_properties->getFrontWheelConnection();
     if(front_wheel.getX()==STKConfig::UNDEFINED)
-        front_wheel.setX(0.5f*kart_width-0.3f*wheel_width);
+        front_wheel.setX(0.5f*kart_width);
     if(front_wheel.getY()==STKConfig::UNDEFINED)
         front_wheel.setY(0.5f*kart_length-wheel_radius);
     if(front_wheel.getZ()==STKConfig::UNDEFINED)
@@ -203,7 +202,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // right rear wheel
     Vec3  rear_wheel = m_kart_properties->getRearWheelConnection();
     if(rear_wheel.getX()==STKConfig::UNDEFINED)
-        rear_wheel.setX(0.5f*kart_width-0.3f*wheel_width);
+        rear_wheel.setX(0.5f*kart_width);
     if(rear_wheel.getY()==STKConfig::UNDEFINED)
         rear_wheel.setY(-0.5f*kart_length+wheel_radius);
     if(rear_wheel.getZ()==STKConfig::UNDEFINED)
@@ -714,7 +713,7 @@ void Kart::draw()
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
     world->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
                                    wire_color);
-    btCylinderShapeX wheelShape( btVector3(0.3f,
+    btCylinderShapeX wheelShape( btVector3(0.1f,
                                         m_kart_properties->getWheelRadius(),
                                         m_kart_properties->getWheelRadius()));
     btVector3 wheelColor(1,0,0);
@@ -929,8 +928,8 @@ void Kart::processSkidMarks()
     assert(m_skidmark_left);
     assert(m_skidmark_right);
     const float threshold = 0.3f;
-    const float ANGLE     = 43.0f;
-    const float LENGTH    = 0.57f;
+    //FIXME    const float ANGLE     = 43.0f;
+    //FIXME    const float LENGTH    = 0.57f;
     bool skid_front = m_vehicle->getWheelInfo(0).m_skidInfo < threshold ||
                       m_vehicle->getWheelInfo(1).m_skidInfo < threshold;
     bool skid_rear  = m_vehicle->getWheelInfo(2).m_skidInfo < threshold ||

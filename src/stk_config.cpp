@@ -102,7 +102,6 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_friction_slip,             "friction-slip"              );
     CHECK_NEG(m_roll_influence,            "roll-influence"             );
     CHECK_NEG(m_wheel_radius,              "wheel-radius"               );
-    CHECK_NEG(m_wheel_width,               "wheel-width"                );
     CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
     CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
@@ -152,7 +151,7 @@ void STKConfig::init_defaults()
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = 
     m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
-    m_wheel_radius = m_wheel_width = m_wheelie_power_boost = 
+    m_wheel_radius = m_wheelie_power_boost = 
     m_chassis_linear_damping = m_chassis_angular_damping = 
     m_maximum_speed = m_suspension_rest = 
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
