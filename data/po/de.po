@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-05-29 22:36+0300\n"
-"PO-Revision-Date: 2008-05-29 22:37+0200\n"
-"Last-Translator: Dominique Leuenberger <dominique-<@antispam>@leuenberger.net>\n"
+"PO-Revision-Date: 2008-07-31 14:40+0100\n"
+"Last-Translator: Stefan Hoffmann <stefhoff@go4more.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -154,7 +154,7 @@ msgstr ""
 
 #: src/challenges/energy_shifting_sands.cpp:25
 msgid "Collect the Pharaohs Treasure"
-msgstr "Sammle den Schatz das Pharao"
+msgstr "Sammle den Schatz des Pharao's"
 
 #: src/gui/help_page_one.cpp:125
 msgid ""
@@ -163,7 +163,7 @@ msgid ""
 "after 10, 3 collectables and so on.\n"
 "Each gold coin is worth 3 silver coins, so look out for them!"
 msgstr ""
-"Das Sammeln von Münzen erhöht die Anzahl Gegenstände\n"
+"Das Sammeln von Münzen erhöht die Anzahl der Gegenstände\n"
 "die du bekommst. Nach 5 Silber-Münzen enthält jede blaue Kiste\n"
 "2 Gegenstände. Nach 10 Münzen, 3 und so weiter.\n"
 "Jede Gold-Münze hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
@@ -208,7 +208,7 @@ msgid ""
 "Created by Ingo Ruhnke,\n"
 "modified by M. Gagnon"
 msgstr ""
-"Erstell durch Ingo Ruhnke,\n"
+"Erstellt durch Ingo Ruhnke,\n"
 "bearbeitet durch M. Gagnon"
 
 #: data/tracks/fortmagma/fortmagma.track:5
@@ -294,7 +294,7 @@ msgstr ""
 
 #: src/challenges/race_track_time.cpp:26
 msgid "Finish Race track in 1:15"
-msgstr "Absolvier die Rennstrecke in 1:15"
+msgstr "Absolviere die Rennstrecke in 1:15"
 
 #: src/challenges/tollway_time.cpp:25
 msgid "Finish Tux Tollway track in 3:00"
@@ -315,7 +315,7 @@ msgstr "Schiessen"
 
 #: data/gp1.cup:5
 msgid "First grand prix, easy to get started"
-msgstr "Erster Grand rix, einfacher Einstieg"
+msgstr "Erster Grand Prix, einfacher Einstieg"
 
 #: src/gui/game_mode.cpp:68
 #: src/challenges/penguin_playground_gp.cpp:28
@@ -324,7 +324,7 @@ msgstr "Folge dem Leader"
 
 #: src/challenges/jungle_follow.cpp:25
 msgid "Follow the Leader in the Jungle"
-msgstr "Folge dem Leader in den Jungle"
+msgstr "Folge dem Leader in den Jungel"
 
 #: src/challenges/island_follow.cpp:25
 msgid ""
@@ -341,12 +341,12 @@ msgid ""
 "of the leader or the last kart is eliminated."
 msgstr ""
 "Folge dem Leader: bleib hinter dem führenden Kart.\n"
-"Wenn der Countdown Null erreicht, scheider der Kart,\n"
+"Wenn der Countdown Null erreicht, scheidet das Kart,\n"
 "der vor dem Leader ist, aus."
 
 #: src/gui/help_page_one.cpp:71
 msgid "Force your rivals bite *your* dust!"
-msgstr "Lass Deine Gegner *Deinen* Staub schlucken!"
+msgstr "Lass deine Gegner *Deinen* Staub schlucken!"
 
 #: data/tracks/fortmagma/fortmagma.track:4
 msgid "Fort Magma"
@@ -359,7 +359,7 @@ msgstr "Vier Spieler"
 #: src/gui/game_mode.cpp:80
 #: src/gui/track_sel.cpp:71
 msgid "Fulfil challenge to unlock"
-msgstr "Erfülle Herausforderung"
+msgstr "Zum Freischalten, erfülle Herausforderung"
 
 #: src/gui/config_display.cpp:76
 #: src/gui/config_display.cpp:128
@@ -387,7 +387,7 @@ msgstr "Zurück zum Hauptmenü"
 #: src/gui/help_page_three.cpp:87
 #: src/gui/help_page_one.cpp:151
 msgid "Go back to the menu"
-msgstr "Zurück zum Hauptmenü"
+msgstr "Zurück zum Menü"
 
 #: src/gui/race_gui.cpp:948
 msgid "Go!"
@@ -407,9 +407,9 @@ msgid ""
 "by racing through a group of tracks,  \n"
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
-"Grand Prix: Hol dir Sieges-Punkte\n"
+"Grand Prix: Hol dir Siegespunkte\n"
 "auf einer Strecken-Gruppe.\n"
-"Die meisten Punkte gewinnen (Bei Unentschieden der schnellste)."
+"Die meisten Punkte gewinnen (Bei Unentschieden, der schnellste)."
 
 #: src/gui/main_menu.cpp:61
 #: src/gui/race_menu.cpp:51
@@ -443,7 +443,7 @@ msgstr "Ungültig"
 
 #: src/kart.cpp:650
 msgid "Invalid short-cut!!"
-msgstr "Ungueltige Abkuerzung"
+msgstr "Ungültige Abkürzung"
 
 #: src/gui/player_controls.cpp:65
 msgid "Jump"
@@ -471,7 +471,7 @@ msgstr "Lade Rennen..."
 
 #: src/gui/player_controls.cpp:66
 msgid "Look back"
-msgstr "Zurück schauen"
+msgstr "Zurückschauen"
 
 #: src/gui/help_page_two.cpp:68
 msgid "Missile - fast stopper in a straight line"
@@ -498,7 +498,7 @@ msgid ""
 "New difficulty\n"
 "'%s'\n"
 "now available"
-msgstr "Neue schwierigkeitsstufe '%s' verfügbar"
+msgstr "Neue Schwierigkeitsstufe '%s' verfügbar"
 
 #: src/kart.cpp:407
 msgid "New fastest lap"
@@ -617,7 +617,7 @@ msgstr "Spieler-Name"
 
 #: src/gui/display_res_confirm.cpp:59
 msgid "Press <ESC> to Cancel"
-msgstr "Taste <ESC> zum Abbrechen"
+msgstr "Drücke die Taste <ESC> zum Abbrechen"
 
 #: src/gui/options.cpp:57
 #: src/gui/player_controls.cpp:112
@@ -629,7 +629,7 @@ msgstr "Taste <ESC> zum Abbrechen"
 #: src/gui/grand_prix_select.cpp:88
 #: src/gui/num_players.cpp:45
 msgid "Press <ESC> to go back"
-msgstr "Taste <ESC> um zurückzukehren"
+msgstr "Drücke die Taste <ESC> um zurückzukehren"
 
 #: src/gui/player_controls.cpp:156
 msgid "Press key"
@@ -877,7 +877,7 @@ msgid ""
 msgstr ""
 "Gewinne ein 'Folge dem Leader' Rennen\n"
 "mit 3 KI Karts\n"
-"im Jungle des Amazonas"
+"im Jungel des Amazonas"
 
 #: src/challenges/island_follow.cpp:27
 msgid ""
@@ -937,7 +937,7 @@ msgstr "Du gewinnst"
 
 #: src/gui/help_page_two.cpp:92
 msgid "Zipper - speed boost"
-msgstr "Reissverschluss - Geschwindigkeitssteigerung"
+msgstr "Zipper - Geschwindigkeitssteigerung"
 
 #: src/user_config.cpp:844
 #, c-format
@@ -962,7 +962,7 @@ msgstr "Maus Achse %d %c"
 #: src/user_config.cpp:854
 #, c-format
 msgid "mouse btn %d"
-msgstr "Maus Schalter %d"
+msgstr "Maus Taste %d"
 
 #: src/user_config.cpp:838
 #: src/user_config.cpp:883
