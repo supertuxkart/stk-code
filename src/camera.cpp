@@ -110,7 +110,15 @@ void Camera::setMode(Mode mode)
     if(m_mode==CM_CLOSEUP)
         m_distance = 2.5f;
     else
-        m_distance = m_kart->getKartProperties()->getCameraDistance();
+		{
+      m_distance = m_kart->getKartProperties()->getCameraDistance();
+
+			// In 2 and 3 player mode we have a different FOV and would not see our
+			// kart at the default distance. We use 1.5 times the distance to fix that.
+	    const int num_players = race_manager->getNumPlayers();
+			if (num_players == 2 || num_players == 3)
+				m_distance += m_distance / 2;
+		}
 }   // setMode
 Camera::Mode Camera::getMode()
 {
