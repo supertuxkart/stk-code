@@ -128,18 +128,21 @@ RaceOptions::RaceOptions()
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 10, 10 );
     widget_manager->breakLine();
 
-    //Lower buttons
-    //=============
+    // Bottom buttons
+    // ==============
     widget_manager->addTextButtonWgt( WTOK_START, 60, 7, _("Start race") );
     widget_manager->setWgtBorderPercentage( WTOK_START, 20 );
     widget_manager->setWgtBorderColor( WTOK_START, WGT_TRANS_BLUE );
     widget_manager->showWgtBorder( WTOK_START );
     widget_manager->breakLine();
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
 
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
     widget_manager->addTextButtonWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );
 
     widget_manager->layout(WGT_AREA_ALL);
+    
+    // Select 'start' by default.
+    widget_manager->setSelectedWgt( WTOK_START );
 }   // RaceOptions
 
 //-----------------------------------------------------------------------------
