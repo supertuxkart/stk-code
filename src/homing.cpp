@@ -21,6 +21,7 @@
 #include "constants.hpp"
 
 float Homing::m_st_max_distance;
+float Homing::m_st_max_distance_squared;
 float Homing::m_st_max_turn_angle;
 
 // -----------------------------------------------------------------------------
@@ -54,7 +55,11 @@ void Homing::init(const lisp::Lisp* lisp, ssgEntity *homing)
     Flyable::init(lisp, homing, COLLECT_HOMING);
     m_st_max_turn_angle = 15.0f;
     m_st_max_distance   = 20.0f;
+    m_st_max_distance_squared = 20.0f * 20.0f;
+    
     lisp->get("max-distance",    m_st_max_distance  );
+    m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
+    
     lisp->get("max-turn-angle",  m_st_max_turn_angle);
 }   // init
 
@@ -69,7 +74,7 @@ void Homing::update(float dt)
 
     getClosestKart(&kart, &minDistance, &direction);
     btTransform my_trans=getTrans();
-    if(minDistance<m_st_max_distance)   // move homing towards kart
+    if(minDistance<m_st_max_distance_squared)   // move homing towards kart
     {
         btTransform target=kart->getTrans();
         

@@ -26,8 +26,9 @@ class Bowling : public Flyable
 {
 private:
     static float m_st_max_distance;   // maximum distance for a bowling ball to be attracted
+    static float m_st_max_distance_squared;
     static float m_st_force_to_target;
-
+    
 public:
     Bowling(Kart* kart);
     static  void init(const lisp::Lisp* lisp, ssgEntity* bowling);

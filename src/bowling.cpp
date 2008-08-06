@@ -22,6 +22,7 @@
 #include "camera.hpp"
 
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
+float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
@@ -59,10 +60,13 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING)
 void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
 {
     Flyable::init(lisp, bowling, COLLECT_BOWLING);
-    m_st_max_distance    = 35.0f;
+    m_st_max_distance    = 20.0f;
+    m_st_max_distance_squared = 20.0f * 20.0f;
     m_st_force_to_target = 10.0f;
  
     lisp->get("max-distance",    m_st_max_distance   );
+    m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
+    
     lisp->get("force-to-target", m_st_force_to_target);
 }   // init
 
@@ -74,10 +78,15 @@ void Bowling::update(float dt)
     btVector3 direction;
     float minDistance;
     getClosestKart(&kart, &minDistance, &direction);
-    if(minDistance<m_st_max_distance)   // move bowling towards kart
+    if(minDistance<m_st_max_distance_squared)   // move bowling towards kart
     {
-        direction*=1/direction.length()*m_st_force_to_target;
-        m_body->applyCentralForce(direction);
+        // limit angle, so that the bowling ball does not turn
+        // around to hit a kart behind
+        if(abs(m_body->getLinearVelocity().angle(direction)) < 1.3)
+        {
+            direction*=1/direction.length()*m_st_force_to_target;
+            m_body->applyCentralForce(direction);
+        }
     }
     else
     {   // Bowling balls lose energy (e.g. when hitting the track), so increase

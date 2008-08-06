@@ -123,10 +123,12 @@ Flyable::~Flyable()
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
-void Flyable::getClosestKart(const Kart **minKart, float *minDist, btVector3 *minDelta) const
+void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared, btVector3 *minDelta) const
 {
     btTransform tProjectile=getTrans();
-    *minDist = 99999.9f;
+    
+    *minDistSquared = -1.0f;
+    
     for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
         Kart *kart = world -> getKart(i);
@@ -136,13 +138,14 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDist, btVector3 *mi
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
         float distance2 = delta.length2();
 
-        if(distance2 < *minDist)
+        if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
         {
-            *minDist  = sqrt(distance2);
+            *minDistSquared = distance2;
             *minKart  = kart;
             *minDelta = delta;
         }
     }  // for i<getNumKarts
+    
 }   // getClosestKart
 
 //-----------------------------------------------------------------------------

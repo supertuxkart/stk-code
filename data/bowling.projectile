@@ -11,9 +11,9 @@
                        ; started to be pulled back to ground
  (force-updown 1.0)    ; force pushing the spark down 
                        ; when it's too high above ground
- (force-to-target 20)  ; force with which a spark flies towards
+ (force-to-target 15)  ; force with which a spark flies towards
                        ; the nearest kart
- (max-distance 10)     ; maximum distance the spark can be away
+ (max-distance 25)     ; maximum distance the spark can be away
                        ; from a kart when accelerating towards it
 )
 
