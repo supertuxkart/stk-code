@@ -53,7 +53,7 @@ protected:
     static float      m_st_force_updown[COLLECT_MAX];  // force pushing up/down 
     static btVector3  m_st_extend[COLLECT_MAX];        // size of the model
 
-    void              getClosestKart(const Kart **minKart, float *minDist, 
+    void              getClosestKart(const Kart **minKart, float *minDistSquared, 
                                      btVector3 *minDelta) const;
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
