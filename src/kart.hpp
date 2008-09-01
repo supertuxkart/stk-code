@@ -54,7 +54,7 @@ private:
     btTransform  m_reset_transform;    // reset position
     Vec3         m_curr_track_coords;
     Vec3         m_last_track_coords;
-
+    
 protected:
     bool         m_on_road;            // true if the kart is on top of the
                                        // road path drawn by the drivelines
@@ -153,7 +153,12 @@ public:
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 
-    btTransform getKartHeading();
+    /**
+        returns a bullet transform object located at the kart's position
+        and oriented in the direction the kart is going. Can be useful
+        e.g. to calculate the starting point and direction of projectiles
+     */
+    btTransform    getKartHeading      (const float customPitch=-1);
     
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
