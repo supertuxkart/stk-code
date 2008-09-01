@@ -104,7 +104,7 @@ Kart::Kart (const std::string& kart_name, int position,
 
 // -----------------------------------------------------------------------------
 
-btTransform Kart::getKartHeading()
+btTransform Kart::getKartHeading(const float customPitch)
 {
     btTransform trans = this->getTrans();
     
@@ -115,7 +115,7 @@ btTransform Kart::getKartHeading()
     float heading=atan2(-direction.getX(), direction.getY());
     
     TerrainInfo::update(this->getXYZ());
-    float pitch = getTerrainPitch(heading);
+    float pitch = (customPitch == -1 ? getTerrainPitch(heading) : customPitch);
     
     btMatrix3x3 m;
     m.setEulerZYX(pitch, 0.0f, heading);
