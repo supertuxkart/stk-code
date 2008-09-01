@@ -53,11 +53,18 @@ protected:
     static float      m_st_force_updown[COLLECT_MAX];  // force pushing up/down 
     static btVector3  m_st_extend[COLLECT_MAX];        // size of the model
 
-    void              getClosestKart(const Kart **minKart, float *minDistSquared, 
-                                     btVector3 *minDelta) const;
+    /** Returns information on what is the closest kart and at what
+        distance it is. All 3 parameters first are of type 'out'.
+        'inFrontOf' can be set if you wish to know the closest
+        kart in front of some karts (will ignore those behind).
+        Useful e.g. for throwing projectiles in front only.
+     */
+    void              getClosestKart(Kart **minKart, float *minDistSquared, 
+                                     btVector3 *minDelta, const Kart* inFrontOf=NULL) const;
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
-                                    btCollisionShape *shape, const bool gravity=false, const bool rotates=false);
+                                    btCollisionShape *shape, const bool gravity=false,
+                                    const bool rotates=false, const btTransform* customDirection=NULL);
 public:
 
                  Flyable     (Kart* kart, CollectableType type, float mass=1.0f);
