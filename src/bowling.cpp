@@ -74,7 +74,7 @@ void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
 void Bowling::update(float dt)
 {
     Flyable::update(dt);
-    const Kart *kart=0;
+    Kart *kart=0;
     btVector3 direction;
     float minDistance;
     getClosestKart(&kart, &minDistance, &direction);
@@ -88,29 +88,29 @@ void Bowling::update(float dt)
             m_body->applyCentralForce(direction);
         }
     }
-    else
-    {   // Bowling balls lose energy (e.g. when hitting the track), so increase
-        // the speed if the ball is too slow, but only if it's not too high (if
-        // the ball is too high, it is 'pushed down', which can reduce the
-        // speed, which causes the speed to increase, which in turn causes
-        // the ball to fly higher and higher.
-        btVector3 v=m_body->getLinearVelocity();
-        btTransform trans=getTrans();
-        float hat = trans.getOrigin().getZ();
-        if (hat<= m_max_height)
-        {
-            float vlen = v.length2();
-            if(vlen<0.8*m_speed*m_speed)
-            {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
-                if(vlen==0.0f) {
-                    v    = btVector3(.5f, .5f, 0.0f);  // avoid 0 div.
-                }
-                else
-                {
-                    m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
-                }
-            }   // vlen < 0.8*m_speed*m_speed
-        }   // hat< m_max_height  
-    }   // spar lose energy
+    
+    // Bowling balls lose energy (e.g. when hitting the track), so increase
+    // the speed if the ball is too slow, but only if it's not too high (if
+    // the ball is too high, it is 'pushed down', which can reduce the
+    // speed, which causes the speed to increase, which in turn causes
+    // the ball to fly higher and higher.
+    btVector3 v=m_body->getLinearVelocity();
+    btTransform trans=getTrans();
+    float hat = trans.getOrigin().getZ();
+    if (hat<= m_max_height)
+    {
+        float vlen = v.length2();
+        if(vlen<0.8*m_speed*m_speed)
+        {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
+            if(vlen==0.0f) {
+                v    = btVector3(.5f, .5f, 0.0f);  // avoid 0 div.
+            }
+            else
+            {
+                m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
+            }
+        }   // vlen < 0.8*m_speed*m_speed
+    }   // hat< m_max_height  
+    
 }   // update
 // -----------------------------------------------------------------------------
