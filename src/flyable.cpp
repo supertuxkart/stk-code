@@ -61,10 +61,11 @@ Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable(false)
 }   // Flyable
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 velocity,
-                            btCollisionShape *shape, const bool gravity, const bool rotates)
+                            btCollisionShape *shape, const bool gravity,
+                            const bool rotates, const btTransform* customDirection)
 {
     // Get Kart heading direction
-    btTransform trans = m_owner->getKartHeading();
+    btTransform trans = ( customDirection == NULL ? m_owner->getKartHeading() : *customDirection );
 
     // Apply offset
     btTransform offset_transform;
@@ -89,7 +90,6 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     {
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
-        //else  m_body->setAngularVelocity( btVector3(5,0,0) );
     }
     m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
@@ -123,23 +123,64 @@ Flyable::~Flyable()
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
-void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared, btVector3 *minDelta) const
+void Flyable::getClosestKart(Kart **minKart, float *minDistSquared,
+                             btVector3 *minDelta, const Kart* inFrontOf) const
 {
     btTransform tProjectile=getTrans();
     
     *minDistSquared = -1.0f;
+    *minKart = NULL;
     
     for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
         Kart *kart = world -> getKart(i);
-        if(kart->isEliminated() || kart == m_owner) continue;
+        if(kart->isEliminated() || kart == m_owner || (!kart->isOnGround()) ) continue;
         btTransform t=kart->getTrans();
        
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
         float distance2 = delta.length2();
+        
+        if(inFrontOf != NULL)
+        {
+            // Ignore karts behind the current one
+            float distance =  kart->getDistanceDownTrack() - inFrontOf->getDistanceDownTrack();
+            if(distance<0) distance += world->m_track->getTrackLength();
+            
+            //std::cout << "distance for " << kart->getName().c_str() << " : " << distance << std::endl;
+            
+            if(distance > 50){ std::cout << kart->getName().c_str() << " is behind" << std::endl; continue; } 
+            
+            /*
+            // get the angle between the current kart and the target kart.
+            // ignore karts that are not within an angle range
+            
 
+            btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
+            btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
+                                        thisKartDirMatrix[1][1],
+                                        0);
+            
+            btVector3 targetLoc = inFrontOf->getTrans().getOrigin();
+            btVector3 toClosestKart(targetLoc.getX() - kart->getTrans().getOrigin().getX(),
+                                    targetLoc.getY() - kart->getTrans().getOrigin().getY(),
+                                    0);
+            float angle = toClosestKart.angle(thisKartDirVector);
+            std::cout << angle << " (angle)" << std::endl;
+            //if( angle>1.4f || angle<-1.4f )
+            //    continue;
+            */
+            /*
+            float angle = atan2(-(kart->getTrans().getOrigin().getX() - inFrontOf->getTrans().getOrigin().getX()),
+                                  kart->getTrans().getOrigin().getY() - inFrontOf->getTrans().getOrigin().getY() );
+            
+            if( angle>1.4f || angle<-1.4f )
+                continue;
+             */
+        }
+        
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
         {
+            std::cout << "keeping " << kart->getName().c_str() << " for now" << std::endl;
             *minDistSquared = distance2;
             *minKart  = kart;
             *minDelta = delta;
