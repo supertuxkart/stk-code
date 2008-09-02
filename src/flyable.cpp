@@ -123,7 +123,7 @@ Flyable::~Flyable()
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
-void Flyable::getClosestKart(Kart **minKart, float *minDistSquared,
+void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
                              btVector3 *minDelta, const Kart* inFrontOf) const
 {
     btTransform tProjectile=getTrans();

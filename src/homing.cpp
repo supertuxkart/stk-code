@@ -68,7 +68,7 @@ void Homing::update(float dt)
 {
     Flyable::update(dt);
 
-    Kart *kart=0;
+    const Kart *kart = 0;
     btVector3 direction;
     float minDistance;
 

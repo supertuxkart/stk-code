@@ -74,7 +74,7 @@ void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
 void Bowling::update(float dt)
 {
     Flyable::update(dt);
-    Kart *kart=0;
+    const Kart *kart=0;
     btVector3 direction;
     float minDistance;
     getClosestKart(&kart, &minDistance, &direction);

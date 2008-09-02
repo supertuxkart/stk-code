@@ -59,7 +59,7 @@ protected:
         kart in front of some karts (will ignore those behind).
         Useful e.g. for throwing projectiles in front only.
      */
-    void              getClosestKart(Kart **minKart, float *minDistSquared, 
+    void              getClosestKart(const Kart **minKart, float *minDistSquared, 
                                      btVector3 *minDelta, const Kart* inFrontOf=NULL) const;
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
