@@ -236,9 +236,8 @@ void PlayerKart::raceFinished(float time)
     RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
     if(m)
     {
-        m->addMessage(getPosition()==1 ? _("You won") : _("You finished") ,
+        m->addMessage(getPosition()==1 ? _("You won the race!") : _("You finished the race!") ,
                       this, 2.0f, 60);
-        m->addMessage( _("the race!"), this, 2.0f, 60);
     }
 }   // raceFinished
 

@@ -925,6 +925,7 @@ void RaceGUI::drawStatusText(const float dt)
     case World::READY_PHASE:
         {
             GLfloat const COLORS[] = { 0.9f, 0.66f, 0.62f, 1.0f };
+            //I18N: as in "ready, set, go", shown at the beginning of the race
             font_race->PrintShadow( _("Ready!"), 90,
                                    Font::CENTER_OF_SCREEN,
                                    Font::CENTER_OF_SCREEN,
@@ -934,6 +935,7 @@ void RaceGUI::drawStatusText(const float dt)
     case World::SET_PHASE:
         {
             GLfloat const COLORS[] = { 0.9f, 0.9f, 0.62f, 1.0f };
+            //I18N: as in "ready, set, go", shown at the beginning of the race
             font_race->PrintShadow( _("Set!"), 90,
                                    Font::CENTER_OF_SCREEN,
                                    Font::CENTER_OF_SCREEN,
@@ -943,6 +945,7 @@ void RaceGUI::drawStatusText(const float dt)
     case World::GO_PHASE:
         {
             GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
+            //I18N: as in "ready, set, go", shown at the beginning of the race
             font_race->PrintShadow( _("Go!"), 90, 
                                    Font::CENTER_OF_SCREEN,
                                    Font::CENTER_OF_SCREEN,

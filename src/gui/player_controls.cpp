@@ -61,9 +61,25 @@ enum WidgetTokens
 /** Limits the maximum length of the player name. */
 const size_t PlayerControls::PLAYER_NAME_MAX = 10;
 
-const char *sKartAction2String[KA_LAST+1] = {_("Left"), _("Right"), _("Accelerate"),
-                                             _("Brake"),  _("Wheelie"), _("Jump"),
-                                             _("Rescue"), _("Fire"), _("Look back") };
+
+const char *sKartAction2String[KA_LAST+1] =
+{
+     //I18N: name of controls
+     _("Left"),
+     //I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
+     _("Right"),
+     //I18N: name of controls
+     _("Accelerate"),
+     //I18N: name of controls
+     _("Brake"),  _("Wheelie"),
+    //I18N: name of controls
+     _("Jump"),
+    //I18N: name of controls
+     _("Rescue"),
+    //I18N: name of controls, like in "fire missile"
+     _("Fire"),
+     _("Look back")
+};
 
 
 PlayerControls::PlayerControls(int whichPlayer):
@@ -248,6 +264,7 @@ void PlayerControls::handle(GameAction ga, int value)
 			{
 				// Prevents zero-length names.
 				if (m_name.length() == 0)
+                    //I18N: as in 'Player 2'
 					m_name = _("Player ") + m_player_index;
 				user_config->m_player[m_player_index].setName(m_name);
 				widget_manager->setWgtText(WTOK_PLYR_NAME1, m_name.c_str());

@@ -80,6 +80,7 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 2 );
 
     char msg [MAX_MESSAGE_LENGTH];
+    //I18N: displays current resolution
     snprintf( msg, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), m_curr_width, m_curr_height );
     widget_manager->addTextWgt( WTOK_CURRENT_RES, 60, 7, msg);
 
