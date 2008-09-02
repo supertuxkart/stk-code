@@ -83,7 +83,7 @@ namespace lisp
     Lisp*
     Parser::read()
     {
-        Lisp* result;
+        Lisp* result=0;
         switch(m_token)
         {
         case Lexer::TOKEN_EOF:
