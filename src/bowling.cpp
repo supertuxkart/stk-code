@@ -82,7 +82,7 @@ void Bowling::update(float dt)
     {
         // limit angle, so that the bowling ball does not turn
         // around to hit a kart behind
-        if(abs(m_body->getLinearVelocity().angle(direction)) < 1.3)
+        if(fabs(m_body->getLinearVelocity().angle(direction)) < 1.3)
         {
             direction*=1/direction.length()*m_st_force_to_target;
             m_body->applyCentralForce(direction);
