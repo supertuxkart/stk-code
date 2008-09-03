@@ -126,7 +126,7 @@ Flyable::~Flyable()
 void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
                              btVector3 *minDelta, const Kart* inFrontOf) const
 {
-    btTransform tProjectile=getTrans();
+    btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() : getTrans());
     
     *minDistSquared = -1.0f;
     *minKart = NULL;
@@ -145,42 +145,11 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
             // Ignore karts behind the current one
             float distance =  kart->getDistanceDownTrack() - inFrontOf->getDistanceDownTrack();
             if(distance<0) distance += world->m_track->getTrackLength();
-            
-            //std::cout << "distance for " << kart->getName().c_str() << " : " << distance << std::endl;
-            
-            if(distance > 50){ std::cout << kart->getName().c_str() << " is behind" << std::endl; continue; } 
-            
-            /*
-            // get the angle between the current kart and the target kart.
-            // ignore karts that are not within an angle range
-            
-
-            btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
-            btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
-                                        thisKartDirMatrix[1][1],
-                                        0);
-            
-            btVector3 targetLoc = inFrontOf->getTrans().getOrigin();
-            btVector3 toClosestKart(targetLoc.getX() - kart->getTrans().getOrigin().getX(),
-                                    targetLoc.getY() - kart->getTrans().getOrigin().getY(),
-                                    0);
-            float angle = toClosestKart.angle(thisKartDirVector);
-            std::cout << angle << " (angle)" << std::endl;
-            //if( angle>1.4f || angle<-1.4f )
-            //    continue;
-            */
-            /*
-            float angle = atan2(-(kart->getTrans().getOrigin().getX() - inFrontOf->getTrans().getOrigin().getX()),
-                                  kart->getTrans().getOrigin().getY() - inFrontOf->getTrans().getOrigin().getY() );
-            
-            if( angle>1.4f || angle<-1.4f )
-                continue;
-             */
+            if(distance > 50){ continue; } 
         }
         
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
         {
-            std::cout << "keeping " << kart->getName().c_str() << " for now" << std::endl;
             *minDistSquared = distance2;
             *minKart  = kart;
             *minDelta = delta;
