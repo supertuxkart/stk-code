@@ -186,7 +186,7 @@ void NetworkManager::handleDisconnection(ENetEvent *event)
         return;
     }
     fprintf(stderr, "%x:%d disconnected (host id %d).\n", event->peer->address.host,
-        event->peer->address.port, (int)event->peer->data );
+	    event->peer->address.port, (int)(long)event->peer->data );
     m_num_clients--;
 }   // handleDisconnection
 
@@ -199,14 +199,14 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
     case NS_ACCEPT_CONNECTIONS:
         {
             ConnectMessage m(event->packet);
-            m_client_names[(int)event->peer->data] = m.getId();
+            m_client_names[(int)(long)event->peer->data] = m.getId();
             m_num_clients++;
             return;
         }
     case NS_CHARACTER_SELECT:
         {
             CharacterSelectedMessage m(event->packet);
-            int hostid=(int)event->peer->data;
+            int hostid=(int)(long)event->peer->data;
             assert(hostid>=1 && hostid<=m_num_clients);
             if(m_num_local_players[hostid]==-1)  // first package from that host
             {
@@ -222,8 +222,8 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             // one message from each client, and the size of the kart_info
             // array is the same as the number of all players (which does not
             // yet include the number of players on the host).
-            if(m_barrier_count = m_num_clients &&
-                m_num_all_players==m_kart_info.size())
+            if(m_barrier_count == m_num_clients &&
+	       m_num_all_players==(int)m_kart_info.size())
             {
                 // we can't send the race info yet, since the server might
                 // not yet have selected all characters!
@@ -241,6 +241,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
                 broadcastToClients(m);
             }
         }
+    default: assert(0);  // should not happen
     }   // switch m_state
 }   // handleMessageAtServer
 
@@ -268,6 +269,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             m_state = NS_RACING;
             break;
         }
+    default: assert(0);   // should not happen
     }   // switch m_state
 }   // handleMessageAtClient
 

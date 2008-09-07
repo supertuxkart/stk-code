@@ -65,7 +65,7 @@ bool GrandPrixData::checkConsistency()
     {
         try
         {
-            Track *track=track_manager->getTrack(m_tracks[i]);
+            track_manager->getTrack(m_tracks[i]);
         }
         catch(std::exception& e)
         {

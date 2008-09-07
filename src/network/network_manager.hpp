@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "network/remote_kart_info.hpp"
-#include "network/kart_packet.hpp"
 
 #ifdef HAVE_ENET
 #  include "enet/enet.h"
@@ -72,7 +71,9 @@ private:
     void         handleMessageAtServer(ENetEvent *event);
     void         handleMessageAtClient(ENetEvent *event);
     void         handleDisconnection(ENetEvent *event);
-    unsigned int getHostId(ENetPeer *p) const {return (int)p->data; }
+    // the first cast to long avoid compiler errors on 64 bit systems
+    // about lost precision, then cast long to int to get the right type
+    unsigned int getHostId(ENetPeer *p) const {return (int)(long)p->data; }
 
     void         sendToServer(Message *m);
     void         broadcastToClients(Message &m);
