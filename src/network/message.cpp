@@ -90,10 +90,16 @@ int Message::getInt()
 
 // ----------------------------------------------------------------------------
 float Message::getFloat()
-{ // ugly...
+{ 
     int i    = getInt();
-    float *f = (float*) &i;
-    return *f;
+    float f;
+    memcpy(&f, &i, sizeof(int));
+    return f;
+    // The 'obvious' way:
+    // float *f = (float*) &i;
+    // return *f;
+    // does NOT work, see http://www.velocityreviews.com/forums/showthread.php?t=537336
+    // for details
 }   // getFloat
 
 // ----------------------------------------------------------------------------
