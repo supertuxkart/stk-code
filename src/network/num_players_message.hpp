@@ -1,7 +1,7 @@
-// $Id$
+//  $Id: num_players.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2008 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,33 +17,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_PLAYER_H
-#define TUXKART_PLAYER_H
+#ifndef HEADER_NUM_PLAYERS_MESSAGE_H
+#define HEADER_NUM_PLAYERS_MESSAGE_H
 
 #include <string>
-#include "input.hpp"
-
-extern const char *sKartAction2String[KA_LAST+1];
-
-/*class for managing player name and control configuration*/
-class Player
-{
-private:
-    std::string m_name;
-    Input m_action_map[KA_LAST+1];
-    int m_last_kart_id;
-
-public:
-    Player(){}
-    Player(const std::string &name_):m_name(name_),m_last_kart_id(-1){}
-    void setName(const std::string &name_){m_name = name_;}
-
-    const std::string& getName() {return m_name;}
-
-    int getLastKartId(){ return m_last_kart_id; }
-    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
-};
-
+#include <sstream>
+#ifndef WIN32
+#  include <unistd.h>
 #endif
 
-/*EOF*/
+#include "network/message.hpp"
+#include "race_manager.hpp"
+
+class NumPlayersMessage : public Message
+{
+private:
+    int m_num_players
+public:
+                NumPlayersMessage():Message(Message::MT_CONNECT) { m_num_players=race }
+                NumPlayersMessage(ENetPacket* pkt):Message(pkt)
+                              { m_id=getString(); }
+    const std::string&
+                getNumPlayers()       { return m_num_players;      }
+};   // ConnectMessage
+#endif

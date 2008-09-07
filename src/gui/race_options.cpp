@@ -23,7 +23,6 @@
 #include "material_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
-#include "network/network_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -55,11 +54,6 @@ enum WidgetTokens
 
 RaceOptions::RaceOptions() 
 {
-    // First update the server's race_manager with the number of players
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-    {
-        network_manager->switchToReceiveKartInfo(); // NS_WAIT_FOR_KART_INFO
-    }
 
     m_difficulty=race_manager->getDifficulty();
     // FIXME: no medium AI atm
@@ -142,8 +136,7 @@ RaceOptions::RaceOptions()
     widget_manager->setWgtBorderPercentage( WTOK_START, 20 );
     widget_manager->setWgtBorderColor( WTOK_START, WGT_TRANS_BLUE );
     widget_manager->showWgtBorder( WTOK_START );
-    // Disable till all messages from the clients have arrived
-    widget_manager->deactivateWgt(WTOK_START);
+
     widget_manager->breakLine();
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
@@ -164,10 +157,6 @@ RaceOptions::~RaceOptions()
 //-----------------------------------------------------------------------------
 void RaceOptions::update(float dt)
 {
-    if(network_manager->getState()!=NetworkManager::NS_WAIT_FOR_KART_INFO)
-    {
-        widget_manager->activateWgt(WTOK_START);
-    }
     BaseGUI::update(dt);
 }   // update
 //-----------------------------------------------------------------------------
@@ -288,10 +277,6 @@ void RaceOptions::select()
         }
 
         menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        {
-            network_manager->sendRaceInformationToClients();  // NS_READY_SET_GO_BARRIER
-        }
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();

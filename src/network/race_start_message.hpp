@@ -1,7 +1,7 @@
-// $Id$
+//  $Id: race_start_message.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2008 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,33 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_PLAYER_H
-#define TUXKART_PLAYER_H
+#ifndef HEADER_RACE_START_MESSAGE_H
+#define HEADER_RACE_START_MESSAGE_H
 
-#include <string>
-#include "input.hpp"
+#include "network/message.hpp"
+#include "race_manager.hpp"
+#include "network/remote_kart_info.hpp"
 
-extern const char *sKartAction2String[KA_LAST+1];
-
-/*class for managing player name and control configuration*/
-class Player
+class RaceStartMessage : public Message
 {
 private:
-    std::string m_name;
-    Input m_action_map[KA_LAST+1];
-    int m_last_kart_id;
-
+// For now this is an empty message
 public:
-    Player(){}
-    Player(const std::string &name_):m_name(name_),m_last_kart_id(-1){}
-    void setName(const std::string &name_){m_name = name_;}
+    RaceStartMessage() : Message(Message::MT_RACE_START) 
+    {
+        allocate(0);
+    }   // RaceStartMessage
 
-    const std::string& getName() {return m_name;}
-
-    int getLastKartId(){ return m_last_kart_id; }
-    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
-};
-
+    RaceStartMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
+    {
+    }
+};   // RaceStartMessage
 #endif
-
-/*EOF*/

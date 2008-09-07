@@ -22,8 +22,10 @@
 
 class StartRaceFeedback: public BaseGUI
 {
-    enum {SRF_NETWORK_DISPLAY, SRF_NETWORK, 
-          SRF_LOADING_DISPLAY, SRF_LOADING} m_state;
+private:
+    char *m_loading_text;        // Used to have the actual text in only
+    char *m_synchronising_text;  // one place (easier to change, avoids
+                                 // multiple translations in case of typos)
 public:
     StartRaceFeedback();
     ~StartRaceFeedback();

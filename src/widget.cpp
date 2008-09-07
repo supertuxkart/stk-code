@@ -111,7 +111,7 @@ void Widget::setPosition(WidgetDirection horizontal, float percentage_horizontal
     m_percentage_x      = percentage_horizontal;
     m_widget_horizontal = w_hori;
     // If the direction is left/right of a widget, but that widget is not defined
-    // use left/right (of screen). This simplified programming, since the e.g. 
+    // use left/right (of screen). This simplifies programming, since the e.g. 
     // left-most widget will be positioned relative to the side of the screen
     if(!w_hori)
     {
@@ -149,7 +149,8 @@ void Widget::layout()
     case WGT_DIR_LEFT_WIDGET:
         m_x = m_widget_horizontal->m_x - m_width; break;
     case WGT_DIR_RIGHT_WIDGET:
-        m_x = m_widget_horizontal->m_x+m_widget_horizontal->m_width; break;
+        m_x = m_widget_horizontal->m_x+m_widget_horizontal->m_width
+            + (int)(user_config->m_width*m_percentage_x); break;
     default:
         break;
     }   // switch

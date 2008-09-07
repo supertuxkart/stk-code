@@ -1011,10 +1011,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\network_info.cpp"
-					>
-				</File>
-				<File
 					RelativePath="../../../src\gui\num_players.cpp"
 					>
 				</File>
@@ -1088,6 +1084,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\challenge_data.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_info_message.cpp"
 					>
 				</File>
 			</Filter>
@@ -1490,10 +1490,6 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\network_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\network_info.hpp"
 					>
 				</File>
 				<File

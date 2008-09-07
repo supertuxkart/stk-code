@@ -181,6 +181,7 @@ void NetworkGUI::update(float dt)
         }
         else
         {
+            network_manager->sendConnectMessage();
 	        menu_manager->popMenu();
         }
         m_state=NGS_NONE;
@@ -237,7 +238,7 @@ void NetworkGUI::inputKeyboard(SDLKey key, int unicode)
 		// For this menu only unicode translation is enabled.
 		// So we use the unicode character here, since this will
 		// take care of upper/lower case etc.
-		if (unicode && m_server_address.size() <= SERVER_NAME_MAX)
+	  if (unicode && (int)m_server_address.size() <= SERVER_NAME_MAX)
 			m_server_address += (char) unicode;
 		widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
 		break;

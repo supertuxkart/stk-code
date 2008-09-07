@@ -147,6 +147,8 @@ World::World()
                 break;
             case RaceManager::KT_GHOST:
                 break;
+            case RaceManager::KT_LEADER: 
+                break;
             }
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)
@@ -189,7 +191,7 @@ World::World()
     }
     if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
 #endif
-    network_manager->switchToReadySetGoBarrier();
+    network_manager->worldLoaded();
 }   // World
 
 //-----------------------------------------------------------------------------

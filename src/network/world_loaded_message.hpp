@@ -1,7 +1,7 @@
-// $Id$
+//  $Id: character_info_message.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2008 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,33 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_PLAYER_H
-#define TUXKART_PLAYER_H
+#ifndef HEADER_WORLD_LOADED_H
+#define HEADER_WORLD_LOADED_H
 
-#include <string>
-#include "input.hpp"
+#include "network/message.hpp"
 
-extern const char *sKartAction2String[KA_LAST+1];
-
-/*class for managing player name and control configuration*/
-class Player
+class WorldLoadedMessage : public Message
 {
-private:
-    std::string m_name;
-    Input m_action_map[KA_LAST+1];
-    int m_last_kart_id;
-
+// For now this is an empty message
 public:
-    Player(){}
-    Player(const std::string &name_):m_name(name_),m_last_kart_id(-1){}
-    void setName(const std::string &name_){m_name = name_;}
-
-    const std::string& getName() {return m_name;}
-
-    int getLastKartId(){ return m_last_kart_id; }
-    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
-};
-
+    WorldLoadedMessage()               :Message(MT_WORLD_LOADED) {allocate(0);}
+    WorldLoadedMessage(ENetPacket* pkt):Message(pkt, MT_WORLD_LOADED)     {}
+};   // WorldLoadedMessage
 #endif
-
-/*EOF*/
