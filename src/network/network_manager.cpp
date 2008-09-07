@@ -266,7 +266,7 @@ void NetworkManager::sendRaceInformationToClients()
     {
         const RemoteKartInfo& ki=race_manager->getLocalKartInfo(i);
         fprintf(stderr, "Sending kart '%s' playerid %d host %d\n",
-                ki.getKartName(), ki.getLocalPlayerId(), ki.getHostId());
+                ki.getKartName().c_str(), ki.getLocalPlayerId(), ki.getHostId());
     }   // for i
 }   // sendRaceInformationToClients
 

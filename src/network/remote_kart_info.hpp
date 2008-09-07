@@ -26,9 +26,9 @@ class RemoteKartInfo
 {
         std::string m_kart_name;
         std::string m_user_name;
-        int         m_host_id;
         int         m_local_player_id;
         int         m_global_player_id;
+        int         m_host_id;
 
 public:
          RemoteKartInfo(int player_id, const std::string& kart_name, 
@@ -51,7 +51,7 @@ public:
     int  getGlobalPlayerId() const         { return m_global_player_id;    }
     const std::string& getKartName() const {return m_kart_name;            }
     const std::string& getPlayerName() const{return m_user_name;           }
-    bool operator<(const RemoteKartInfo& other)
+    bool operator<(const RemoteKartInfo& other) const
     {
         return (m_host_id<other.m_host_id ||
                 m_host_id==other.m_host_id && m_local_player_id<other.m_local_player_id);

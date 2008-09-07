@@ -31,6 +31,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	network/network_manager.cpp network/network_manager.hpp \
+	network/network_kart.cpp   network/network_kart.hpp	\
 	network/remote_kart_info.hpp				\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
