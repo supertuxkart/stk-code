@@ -46,7 +46,10 @@ private:
     std::vector<FlyableInfo> m_flyable_info;
     /** Stores the controls of each kart at the beginning of its update(). */
     std::vector<KartControl> m_kart_controls;
-
+    /** Collision information. This vector stores information about which
+     *  kart collided with which kart or track (kartid=-1)                 */
+    std::vector<signed char> m_collision_info;
+        
     public:
         /** Initialise the global race state. */
         RaceState() : Message(MT_RACE_STATE) 
@@ -57,7 +60,24 @@ private:
         void herringCollected(int kartid, int herring_id, char add_info=-1)
         {
             m_herring_info.push_back(HerringInfo(kartid, herring_id, add_info));
-        }
+        }   // herringCollected
+        // --------------------------------------------------------------------
+        /** Collects information about collision in which at least one kart was
+         *  involved. Other collision (e.g. projectiles, moving physics) are
+         *  not needed on the client, so it's not stored at all. If a kart
+         *  track collision happens, the second kart id is -1 (necessary to 
+         *  play back sound effects). A simple int vector is used to store the 
+         *  pair of collision, so the first collision is using the index 0 and
+         *  1; the second one 2 and 3 etc.
+         *  \param kartId1 World id of the kart involved in the collision.
+         *  \param kartId2 World id of the 2nd kart involved in the collision,
+         *                 or -1 if it's the track (which is the default).
+         */
+        void addCollision(signed char kartId1, signed char kartId2=-1)
+        {
+            m_collision_info.push_back(kartId1);
+            m_collision_info.push_back(kartId2);
+        }   // addCollision
         // --------------------------------------------------------------------
         void setNumFlyables(int n) { m_flyable_info.resize(n); }
         // --------------------------------------------------------------------

@@ -21,20 +21,23 @@
 #include "ssg_help.hpp"
 #include "world.hpp"
 #include "flyable.hpp"
-
 #include "moving_physics.hpp"
 #include "user_config.hpp"
 #include "sound_manager.hpp"
 #include "material_manager.hpp"
+#include "network/race_state.hpp"
 
-/** Initialise physics. */
 // ----------------------------------------------------------------------------
-
+/** Initialise physics.
+ *  Create the bullet dynamics world.
+ */
 Physics::Physics(float gravity) : btSequentialImpulseConstraintSolver()
 {
     m_collision_conf    = new btDefaultCollisionConfiguration();
     m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
     
+    // FIXME: it might be better to use the track dimension here, but they
+    //        are not known at this stage.
     btVector3 worldMin(-1000, -1000, -1000);
     btVector3 worldMax( 1000,  1000,  1000);
     m_axis_sweep        = new btAxisSweep3(worldMin, worldMax);
@@ -63,7 +66,11 @@ Physics::~Physics()
 }   // ~Physics
 
 // -----------------------------------------------------------------------------
-//* Adds a kart to the physics engine
+/** Adds a kart to the physics engine.
+ *  This adds the rigid body, the vehicle, and the upright constraint.
+ *  \param kart The kart to add.
+ *  \param vehicle The raycast vehicle object.
+ */
 void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
 {
     m_dynamics_world->addRigidBody(kart->getBody());
@@ -73,7 +80,8 @@ void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
 
 //-----------------------------------------------------------------------------
 /** Removes a kart from the physics engine. This is used when rescuing a kart
-  * (and during cleanup).
+ *  (and during cleanup).
+ *  \param kart The kart to remove.
  */
 void Physics::removeKart(const Kart *kart)
 {
@@ -83,6 +91,9 @@ void Physics::removeKart(const Kart *kart)
 }   // removeKart
 
 //-----------------------------------------------------------------------------
+/** Updates the physics simulation and handles all collisions.
+ *  \param dt Time step.
+ */
 void Physics::update(float dt)
 {
     // Bullet can report the same collision more than once (up to 4 
@@ -105,6 +116,10 @@ void Physics::update(float dt)
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
         if(p->a->is(UserPointer::UP_KART)) {          // kart-kart collision
+            Kart *a=p->a->getPointerKart();
+            Kart *b=p->b->getPointerKart();
+            race_state->addCollision(a->getWorldKartId(),
+                                     b->getWorldKartId());
             KartKartCollision(p->a->getPointerKart(), p->b->getPointerKart());
         }  // if kart-kart collision
         else  // now the first object must be a projectile
@@ -132,8 +147,13 @@ void Physics::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Handles the special case of two karts colliding with each other
- *  If both karts have a bomb, they'll explode immediately
+/** Handles the special case of two karts colliding with each other, which means
+ *  that bombs must be passed on. If both karts have a bomb, they'll explode 
+ *  immediately. This function is called from physics::update on the server
+ *  (and if no networking is used), and from race_state on the client to replay
+ *  what happened on the server.
+ *  \param kartA First kart involved in the collision.
+ *  \param kartB Second kart involved in the collision.
  */
 void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 {
@@ -167,10 +187,15 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 
 //-----------------------------------------------------------------------------
 /** This function is called at each internal bullet timestep. It is used
-  * here to do the collision handling: using the contact manifolds after a
-  * physics time step might miss some collisions (when more than one internal
-  * time step was done, and the collision is added and removed).
-  **/
+ *  here to do the collision handling: using the contact manifolds after a
+ *  physics time step might miss some collisions (when more than one internal
+ *  time step was done, and the collision is added and removed). So this
+ *  function stores all collisions in a list, which is then handled after the
+ *  actual physics timestep. This list only stores a collision, if it's not
+ *  already in the list, so a collisions which is reported more than once is
+ *  nevertheless only handled once.
+ *  Parameters: see bullet documentation for details.
+ */
 btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                              btPersistentManifold** manifold,int numManifolds,
                              btTypedConstraint** constraints,int numConstraints,
@@ -213,21 +238,29 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
-                upB->getPointerKart()->crashed(NULL);
+            {
+                Kart *kart=upB->getPointerKart();
+                race_state->addCollision(kart->getWorldKartId());
+                kart->crashed(NULL);
+            }
         }
         // 2) object a is a kart
         // =====================
         else if(upA->is(UserPointer::UP_KART))
         {
             if(upB->is(UserPointer::UP_TRACK))
-                upA->getPointerKart()->crashed(NULL);   // Kart hit track
+            {
+                Kart *kart = upA->getPointerKart();
+                race_state->addCollision(kart->getWorldKartId());
+                kart->crashed(NULL);   // Kart hit track
+            }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 m_all_collisions.push_back(upB, upA);   // 2.1 projectile hits kart
             else if(upB->is(UserPointer::UP_KART))
                 m_all_collisions.push_back(upA, upB);   // 2.2 kart hits kart
         }
         // 3) object is a projectile
-        // ========================
+        // =========================
         else if(upA->is(UserPointer::UP_FLYABLE))
         {
             if(upB->is(UserPointer::UP_TRACK         ) ||   // 3.1) projectile hits track
@@ -252,29 +285,35 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 }   // solveGroup
 
 // -----------------------------------------------------------------------------
+/** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
-    if(user_config->m_bullet_debug)
+    if(!user_config->m_bullet_debug) return;
+
+    int num_objects = m_dynamics_world->getNumCollisionObjects();
+    for(int i=0; i<num_objects; i++)
     {
-        int num_objects = m_dynamics_world->getNumCollisionObjects();
-        for(int i=0; i<num_objects; i++)
+        btCollisionObject *obj = m_dynamics_world->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if(!body) continue;
+        float m[16];
+        btVector3 wireColor(1,0,0);
+        btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
+        if(myMotion) 
         {
-            btCollisionObject *obj = m_dynamics_world->getCollisionObjectArray()[i];
-            btRigidBody* body = btRigidBody::upcast(obj);
-            if(!body) continue;
-            float m[16];
-            btVector3 wireColor(1,0,0);
-            btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
-            if(myMotion) 
-            {
-                myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
-                debugDraw(m, obj->getCollisionShape(), wireColor);
-            }
-        }  // for i
-    }   // if m_bullet_debug
+            myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
+            debugDraw(m, obj->getCollisionShape(), wireColor);
+        }
+    }  // for i
 }   // draw
 
 // -----------------------------------------------------------------------------
+/** Helper function for Physics::draw(). It calls the shape drawer from
+ *  bullet to render the actual object.
+ *  \param m OpenGL matrix to apply.
+ *  \param s Collision shape to drwa.
+ *  \param color Colour to use.
+ */
 void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
     
 {

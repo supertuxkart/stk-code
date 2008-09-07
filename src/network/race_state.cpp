@@ -44,13 +44,15 @@ void RaceState::serialise()
 
     // 2. Add information about eaten herrings
     // ---------------------------------------
-    
-    // We can't use sizeof() here, since the data structures might be padded
     len += 1 + m_herring_info.size()* HerringInfo::getLength();
 
     // 3. Add rocket positions
     // -----------------------
     len += 2 + m_flyable_info.size()*FlyableInfo::getLength();
+
+    // 4. Add collisions
+    // =================
+    len += 1 + m_collision_info.size()*getCharLength();
 
     // Now add the data
     // ================
@@ -76,13 +78,22 @@ void RaceState::serialise()
         m_herring_info[i].serialise(this);
     }
 
-    // 4. Projectiles
+    // 3. Projectiles
     // --------------
     addShort(m_flyable_info.size());
     for(unsigned int i=0; i<m_flyable_info.size(); i++)
     {
         m_flyable_info[i].serialise(this);
     }
+
+    // 4. Collisions
+    // -------------
+    addChar(m_collision_info.size());
+    for(unsigned int i=0; i<m_collision_info.size(); i++)
+    {
+        addChar(m_collision_info[i]);
+    }
+    m_collision_info.clear();
 
 }   // serialise
 
@@ -144,6 +155,25 @@ void RaceState::receive(ENetPacket *pkt)
         FlyableInfo f(this);
         m_flyable_info[i] = f;
     }
+
+    // 4. Collisions
+    // -------------
+    unsigned int num_collisions = getChar();
+    // Collisions are stored as pairs, so handle a pair at a time
+    for(unsigned int i=0; i<num_collisions; i+=2)
+    {
+        signed char kart_id1 = getChar();
+        signed char kart_id2 = getChar();
+        if(kart_id2==-1)
+        {   // kart - track collision
+            world->getKart(kart_id1)->crashed(NULL);
+        }
+        else
+        {
+            world->getPhysics()->KartKartCollision(world->getKart(kart_id1),
+                                                   world->getKart(kart_id2));
+        }
+    }   // for(i=0; i<num_collisions; i+=2)
     clear();  // free message buffer
 
 }   // receive

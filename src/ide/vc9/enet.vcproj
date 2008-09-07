@@ -105,6 +105,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="C:\cygwin\home\joerg\nw\src\enet\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
@@ -151,35 +152,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\callbacks.c"
+				RelativePath="..\..\enet\callbacks.c"
 				>
 			</File>
 			<File
-				RelativePath="..\host.c"
+				RelativePath="..\..\enet\host.c"
 				>
 			</File>
 			<File
-				RelativePath="..\list.c"
+				RelativePath="..\..\enet\list.c"
 				>
 			</File>
 			<File
-				RelativePath="..\packet.c"
+				RelativePath="..\..\enet\packet.c"
 				>
 			</File>
 			<File
-				RelativePath="..\peer.c"
+				RelativePath="..\..\enet\peer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\protocol.c"
+				RelativePath="..\..\enet\protocol.c"
 				>
 			</File>
 			<File
-				RelativePath="..\unix.c"
+				RelativePath="..\..\enet\unix.c"
 				>
 			</File>
 			<File
-				RelativePath="..\win32.c"
+				RelativePath="..\..\enet\win32.c"
 				>
 			</File>
 		</Filter>

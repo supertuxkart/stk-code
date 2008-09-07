@@ -87,23 +87,23 @@ private:
         void push_back(const UserPointer* a, const UserPointer*b) {
             push_back(CollisionPair(a, b));
         }
-    };
+    };   // CollisionList
 
     CollisionList m_all_collisions;
-    void  KartKartCollision(Kart *ka, Kart *kb);
 
 public:
-          Physics         (float gravity);
-         ~Physics         ();
-    void  addKart         (const Kart *k, btRaycastVehicle *v);
-    void  addBody         (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
-    void  removeKart      (const Kart *k);
-    void  removeBody      (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
-    void  update          (float dt);
-    void  draw            ();
+          Physics          (float gravity);
+         ~Physics          ();
+    void  addKart          (const Kart *k, btRaycastVehicle *v);
+    void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
+    void  removeKart       (const Kart *k);
+    void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
+    void  KartKartCollision(Kart *ka, Kart *kb);
+    void  update           (float dt);
+    void  draw             ();
     btDynamicsWorld*
-          getPhysicsWorld () const {return m_dynamics_world;}
-    void  debugDraw       (float m[16], btCollisionShape *s, const btVector3 color);
+          getPhysicsWorld  () const {return m_dynamics_world;}
+    void  debugDraw        (float m[16], btCollisionShape *s, const btVector3 color);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,
