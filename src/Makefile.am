@@ -35,7 +35,8 @@ supertuxkart_SOURCES =             main.cpp  			\
         network/message.cpp             network/message.hpp			\
 	network/race_info_message.hpp   network/race_info_message.cpp		\
 	network/remote_kart_info.hpp    network/character_selected_message.hpp	\
-	network/race_start_message.hpp  network/connect_message.hpp		\
+	network/race_start_message.hpp  					\
+	network/connect_message.hpp	network/connect_message.cpp		\
 	network.num_players_message.hpp network/world_loaded_message.hpp	\
         network/connect_message.hpp     network/character_info_message.hpp	\
 	network/kart_update_message.hpp network/kart_update_message.cpp		\

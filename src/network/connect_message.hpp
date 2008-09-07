@@ -21,33 +21,18 @@
 #define HEADER_CONNECT_MESSAGE_H
 
 #include <string>
-#include <sstream>
-#ifndef WIN32
-#  include <unistd.h>
-#endif
 
 #include "network/message.hpp"
-#include "user_config.hpp"
 
 class ConnectMessage : public Message
 {
 private:
     std::string m_id;
-    void setId()
-    {
-        char hostname[256];
-        gethostname(hostname, 255);
-        const std::string& id=user_config->m_player[0].getName();
-        std::ostringstream o;
-        o << id << '@' << hostname;
-        allocate(getStringLength(o.str()));
-        addString(o.str());
-    }
+    void        setId();
 public:
-                ConnectMessage():Message(Message::MT_CONNECT) { setId(); }
-                ConnectMessage(ENetPacket* pkt):Message(pkt, MT_CONNECT)
-                              { m_id=getString(); }
+                ConnectMessage();
+                ConnectMessage(ENetPacket* pkt);
     const std::string&
-                getId()       { return m_id;      }
+                getId()       { return m_id; }
 };   // ConnectMessage
 #endif

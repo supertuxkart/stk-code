@@ -31,25 +31,32 @@ class Track;
 class TrackManager
 {
 private:
-    typedef std::vector<Track*>   Tracks;
-    Tracks        m_tracks;
+    typedef std::vector<Track*>              Tracks;
+    Tracks                                   m_tracks;
     std::map<std::string, std::vector<int> > m_groups;
     std::vector<std::string>                 m_all_groups;
+    /** Flag if this track is available or not. Tracks are set unavailable
+     *  if they are not available on all clients (applies only to network mode)
+     */
+    std::vector<bool>                        m_track_avail;
+
     void          updateGroups(const Track* track);
 
 public:
                   TrackManager();
                  ~TrackManager();
 
-    /** get TrackData by the track ident (aka filename without .track) */
     const std::vector<std::string>&
                   getAllGroups()      const { return m_all_groups;    }
     size_t        getNumberOfTracks() const { return m_tracks.size(); }
     Track        *getTrack(size_t id) const { return m_tracks[id];    }
     Track        *getTrack(const std::string& ident) const;
+    void          unavailable(const std::string &ident);
+    void          setUnavailableTracks(const std::vector<std::string> &tracks);
+    bool          isAvailable(unsigned int n) const {return m_track_avail[n];}
     const std::vector<int>& 
                   getTracksInGroup(const std::string& g) {return m_groups[g];}
- 
+    std::vector<std::string> getAllTrackIdentifiers();
     /** load all .track files from all directories */
     void          loadTrackList ();
 };

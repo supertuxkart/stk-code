@@ -146,7 +146,13 @@ public:
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 
-    btTransform getKartHeading();
+   /**
+       returns a bullet transform object located at the kart's position
+       and oriented in the direction the kart is going. Can be useful
+       e.g. to calculate the starting point and direction of projectiles
+    */
+   btTransform    getKartHeading      (const float customPitch=-1);
+
     
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
