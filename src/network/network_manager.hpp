@@ -35,8 +35,14 @@ public:
     // The mode the network manager is operating in
     enum NetworkMode {NW_SERVER, NW_CLIENT, NW_NONE};
 
-    // The current state.
-    enum NetworkState {NS_SYNCHRONISING, NS_RACING};
+    // States for the finite state machine. First for server:
+    enum NetworkState {NS_ACCEPT_CONNECTIONS, NS_KART_INFO_BARRIER,
+         // Then client only states:
+                       NS_CHARACTER_CONFIRMED, 
+                       NS_CHARACTER_REJECTED,
+                       NS_WAITING_FOR_RACE_DATA,
+         // Shared states   
+                       NS_CHARACTER_SELECT, NS_READY_SET_GO_BARRIER, NS_RACING};
 private:
 
     NetworkMode                 m_mode;
@@ -46,6 +52,8 @@ private:
     int                         m_num_clients;
     std::vector<RemoteKartInfo> m_kart_info;
     int                         m_host_id;
+    std::vector<std::string>    m_client_names;
+    int                         m_barrier_count;
 #ifdef HAVE_ENET
     ENetHost                   *m_host;
 #endif
@@ -53,20 +61,24 @@ private:
     bool         initServer();
     bool         initClient();
     void         handleNewConnection(ENetEvent *event);
-    void         handleNewMessage   (ENetEvent *event);
+    void         handleServerMessage(ENetEvent *event);
+    void         handleClientMessage(ENetEvent *event);
     void         handleDisconnection(ENetEvent *event);
+    void         testSetCharacter   (ENetEvent *event);
 
 public:
                  NetworkManager();
                 ~NetworkManager();
-    void         setMode(NetworkMode m)            {m_mode = m;           }
-    NetworkMode  getMode() const                   {return m_mode;        }
-    void         setState(NetworkState s)          {m_state = s;          }
-    NetworkState getState() const                  {return m_state;       }
-    int          getHostId() const                 {return m_host_id;     }
-    int          getNumClients() const             {return m_num_clients; }
-    void         setPort(int p)                    {m_port=p;             }
-    void         setServerIP(const std::string &s) {m_server_address=s;   }
+    void         setMode(NetworkMode m)            {m_mode = m;             }
+    NetworkMode  getMode() const                   {return m_mode;          }
+    void         setState(NetworkState s)          {m_state = s;            }
+    NetworkState getState() const                  {return m_state;         }
+    int          getHostId() const                 {return m_host_id;       }
+    unsigned int getNumClients() const             {return m_num_clients;   }
+    const std::string& 
+                 getClientName(int i) const        {return m_client_names[i];}
+    void         setPort(int p)                    {m_port=p;               }
+    void         setServerIP(const std::string &s) {m_server_address=s;     }
     void         setKartInfo(int player_id, const std::string& kart, 
                              const std::string& user="", int hostid=-1);
     bool         initialiseConnections();
@@ -75,6 +87,10 @@ public:
     void         waitForKartsInformation();
     void         sendRaceInformationToClients();
     void         waitForRaceInformation();
+    void         switchToReadySetGoBarrier();
+    void         switchToCharacterSelection();
+    void         switchToRaceDataSynchronisation();
+
 };
 
 extern NetworkManager *network_manager;

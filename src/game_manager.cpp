@@ -107,6 +107,9 @@ void GameManager::run()
         network_manager->update(dt);
         if (race_manager->raceIsActive())
         {
+            // Busy wait if race_manager is active (i.e. creating of world is done)
+            // till all clients have reached this state.
+            if(network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
             music_on = false; 
             if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),

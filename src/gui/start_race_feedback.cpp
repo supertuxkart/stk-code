@@ -30,6 +30,8 @@ enum WidgetTokens
 
 StartRaceFeedback::StartRaceFeedback()
 {
+    network_manager->switchToRaceDataSynchronisation();
+
     m_state = network_manager->getMode()==NetworkManager::NW_NONE ? SRF_LOADING : SRF_NETWORK;
 
     //Add some feedback so people know they are going to start the race
@@ -65,10 +67,17 @@ void StartRaceFeedback::update(float DELTA)
             m_state = SRF_NETWORK; 
             break;
         case SRF_NETWORK:
+            // The server only waits for one frame:
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            {
                 network_manager->sendRaceInformationToClients();
-            else
-                network_manager->waitForRaceInformation();
+                m_state = SRF_LOADING_DISPLAY;
+                widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
+                return;
+            }
+            // The client have to be busy waiting till the race data has arrived:
+            if(network_manager->getState()==NetworkManager::NS_WAITING_FOR_RACE_DATA)
+                return;
             m_state = SRF_LOADING_DISPLAY;
             widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
             break;

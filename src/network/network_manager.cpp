@@ -21,13 +21,14 @@
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
+#include "kart_properties_manager.hpp"
 
 NetworkManager* network_manager = 0;
 
 NetworkManager::NetworkManager()
 {
      m_mode           = NW_NONE;
-     m_state          = NS_SYNCHRONISING;
+     m_state          = NS_ACCEPT_CONNECTIONS;
      m_port           = 12345;
      m_server_address = "172.31.41.53";
      m_num_clients    = 0;
@@ -86,6 +87,7 @@ bool NetworkManager::initServer()
     }
 
     fprintf(stderr, "Server initialised, waiting for connections ...\n");
+    m_client_names.push_back("server");
     return true;
 #endif
 }   // initServer
@@ -145,12 +147,12 @@ bool NetworkManager::initClient()
 
     return true;
 #endif
-}  // initServer
+}  // initClient
 
 // ----------------------------------------------------------------------------
 void NetworkManager::handleNewConnection(ENetEvent *event)
 {
-    if(m_state!=NS_SYNCHRONISING)
+    if(m_state!=NS_ACCEPT_CONNECTIONS)
     {
         // We don't accept connections atm
         return;
@@ -161,13 +163,14 @@ void NetworkManager::handleNewConnection(ENetEvent *event)
              event->peer -> address.port, m_num_clients);
 
     // FIXME: send m_num_clients as hostid back to new client.
-
+    // FIXME: client should send an id as well to be displayed
+    m_client_names.push_back("client");
 }   // handleNewConnection
 
 // ----------------------------------------------------------------------------
 void NetworkManager::handleDisconnection(ENetEvent *event)
 {
-    if(m_state!=NS_SYNCHRONISING)
+    if(m_state!=NS_ACCEPT_CONNECTIONS)
     {
         fprintf(stderr, "Disconnect while in race - close your eyes and hope for the best.\n");
         return;
@@ -178,14 +181,86 @@ void NetworkManager::handleDisconnection(ENetEvent *event)
 }   // handleDisconnection
 
 // ----------------------------------------------------------------------------
-void NetworkManager::handleNewMessage(ENetEvent *event)
+void NetworkManager::handleServerMessage(ENetEvent *event)
 {
-    if(m_state==NS_SYNCHRONISING)
+    switch(m_state)
     {
+    case NS_ACCEPT_CONNECTIONS:
         fprintf(stderr, "Received a receive event while waiting for client - ignored.\n");
         return;
-    }
-}   // handleNewMessage
+    case NS_CHARACTER_SELECT:
+        {   
+            // only accept testAndSet and 'character selected' messages here.
+            // Get character from message, check if it's still available
+            int kartid=0, playerid=0, hostid=0;
+            std::string name="tuxkart", user="guest";
+            if(kart_properties_manager->testAndSetKart(kartid))
+            {
+                // send 'ok' message to client and all other clients
+                m_kart_info.push_back(RemoteKartInfo(playerid, name, user, hostid));
+            }
+            else
+            {
+                // send 'not avail' to sender
+            }
+            break;
+        }
+    case NS_READY_SET_GO_BARRIER:
+        m_barrier_count++;
+        if(m_barrier_count==m_num_clients)
+        {
+            // broadcast start message
+            m_state = NS_RACING;
+        }
+        break;
+    case NS_KART_INFO_BARRIER:
+        m_barrier_count++;
+        if(m_barrier_count==m_num_clients)
+        {
+            // broadcast start message
+            m_state = NS_RACING;
+        }
+        break;
+
+    }   // switch m_state
+}   // handleServerMessage
+
+// ----------------------------------------------------------------------------
+void NetworkManager::switchToReadySetGoBarrier()
+{
+    assert(m_state == NS_CHARACTER_SELECT);
+    m_state         = NS_READY_SET_GO_BARRIER;
+    m_barrier_count = 0;
+}   // switchToReadySetGoBarrier
+
+// ----------------------------------------------------------------------------
+void NetworkManager::switchToCharacterSelection()
+{
+    // This must be called from the network info menu, 
+    // so make sure the state is correct
+    assert(m_state == NS_ACCEPT_CONNECTIONS);
+    m_state         = NS_CHARACTER_SELECT;
+}   // switchTocharacterSelection
+
+// ----------------------------------------------------------------------------
+void NetworkManager::switchToRaceDataSynchronisation()
+{
+    assert(m_state == NS_CHARACTER_SELECT);
+    m_state         = NS_KART_INFO_BARRIER;
+    m_barrier_count = 0;
+}   // switchToRaceDataSynchronisation
+
+// ----------------------------------------------------------------------------
+void NetworkManager::handleClientMessage(ENetEvent *event)
+{
+    switch(m_state)
+    {
+    case NS_ACCEPT_CONNECTIONS:
+        fprintf(stderr, "Received a receive event while waiting for client - ignored.\n");
+        return;
+
+    }   // switch m_state
+}   // handleClientMessage
 
 // ----------------------------------------------------------------------------
 void NetworkManager::update(float dt)
@@ -202,7 +277,12 @@ void NetworkManager::update(float dt)
     switch (event.type)
     {
     case ENET_EVENT_TYPE_CONNECT:    handleNewConnection(&event); break;
-    case ENET_EVENT_TYPE_RECEIVE:    handleNewMessage(&event);    break;
+    case ENET_EVENT_TYPE_RECEIVE:
+          if(m_mode==NW_SERVER) 
+              handleServerMessage(&event);    
+          else
+              handleClientMessage(&event);
+          break;
     case ENET_EVENT_TYPE_DISCONNECT: handleDisconnection(&event); break;
     case ENET_EVENT_TYPE_NONE:       break;
     }

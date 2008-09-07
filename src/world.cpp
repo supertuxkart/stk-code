@@ -189,6 +189,7 @@ World::World()
     }
     if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
 #endif
+    network_manager->switchToReadySetGoBarrier();
 }   // World
 
 //-----------------------------------------------------------------------------

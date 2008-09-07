@@ -31,6 +31,10 @@ class KartPropertiesManager
 private:
     std::vector<std::string> m_all_groups;
     std::map<std::string, std::vector<int> > m_groups;
+	// vector containing kart numbers that have been selected in multiplayer
+	// games.  This it used to ensure the same kart can not be selected more
+	// than once.
+    std::vector<int>		 m_selected_karts;  
 protected:
     float m_max_steer_angle;
 
@@ -41,12 +45,7 @@ protected:
 public:
     KartPropertiesManager();
     ~KartPropertiesManager();
-	
-	// vector containing kart numbers that have been selected in multiplayer
-	// games.  This it used to ensure the same kart can not be selected more
-	// than once.
-    std::vector<int>		 m_selected_karts;  
-    
+	    
     const KartProperties*    getKartById            (int i) const;
     const KartProperties*    getKart                (const std::string IDENT) const;
     const int                getKartId              (const std::string IDENT) const;
@@ -58,7 +57,11 @@ public:
                              getAllGroups           () const {return m_all_groups;     }
     const std::vector<int>&  getKartsInGroup        (const std::string& g)
                                                              {return m_groups[g];      }
-
+    void clearAllSelectedKarts()                             {m_selected_karts.clear();}
+    void removeLastSelectedKart()                            {m_selected_karts.pop_back();}
+    int  getNumSelectedKarts() const                         {return m_selected_karts.size();}
+    bool kartAvailable(int kartid);
+    bool testAndSetKart(int kartid);
     /** Fill the empty positions in the given vector with random karts */
     void fillWithRandomKarts (std::vector<RemoteKartInfo>& vec);
     void removeTextures      ();

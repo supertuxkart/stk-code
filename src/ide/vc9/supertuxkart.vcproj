@@ -1007,6 +1007,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\network_info.cpp"
+					>
+				</File>
+				<File
 					RelativePath="../../../src\gui\num_players.cpp"
 					>
 				</File>
@@ -1478,6 +1482,10 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\menu_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\network_info.hpp"
 					>
 				</File>
 				<File

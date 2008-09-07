@@ -44,7 +44,8 @@ enum MenuManagerIDs
     MENUID_EXITGAME,
     MENUID_GRANDPRIXSELECT,
     MENUID_UNLOCKED_FEATURE,
-    MENUID_START_RACE_FEEDBACK,
+    MENUID_START_RACE_FEEDBACK,    // 'loading'
+    MENUID_NETWORK_INFO,           // wait for clients to connect
 
     // menu configuration
     MENUID_CONFIG_DISPLAY,

@@ -66,10 +66,10 @@ CharSel::CharSel(int whichPlayer)
     // the user is moving back through the menus and the last value in the vector
     // needs to be made available again.
     if (m_player_index == 0)
-        kart_properties_manager->m_selected_karts.clear();
+        kart_properties_manager->clearAllSelectedKarts();
 
-    if (m_player_index < (int)kart_properties_manager->m_selected_karts.size())
-        kart_properties_manager->m_selected_karts.pop_back();
+    if (m_player_index < (int)kart_properties_manager->getNumSelectedKarts())
+        kart_properties_manager->removeLastSelectedKart();
 
     char heading[MAX_MESSAGE_LENGTH];
     snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
@@ -111,7 +111,7 @@ CharSel::CharSel(int whichPlayer)
     m_current_kart = -1;
 
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
-    if( LAST_KART != -1 && kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
+    if( LAST_KART != -1 && kart_properties_manager->kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
     {
         int local_index = 0;
         for(unsigned int i=0; i<m_index_avail_karts.size(); i++)
@@ -214,7 +214,7 @@ void CharSel::switchGroup()
         kart_properties_manager->getKartsInGroup(user_config->m_kart_group);
     for(unsigned int i=0; i<karts.size(); i++)
     {   
-        if(kartAvailable(karts[i]))
+        if(kart_properties_manager->kartAvailable(karts[i]))
         {
             m_index_avail_karts.push_back(karts[i]);
         }
@@ -361,7 +361,7 @@ void CharSel::select()
         user_config->m_player[m_player_index].setLastKartId(kart_id);
         // Add selected kart (token) to selected karts vector so it cannot be
         // selected again
-        kart_properties_manager->m_selected_karts.push_back(kart_id);
+        kart_properties_manager->testAndSetKart(kart_id);
     }
 
     if (race_manager->getNumLocalPlayers() > 1)
@@ -393,6 +393,7 @@ void CharSel::select()
 
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
+        network_manager->sendKartsInformationToServer();
         menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
     }
     else
@@ -427,23 +428,3 @@ void CharSel::handle(GameAction action, int value)
     }   // if cursor down
     BaseGUI::handle(action, value);
 }   // handle
-
-//----------------------------------------------------------------------------
-// Function checks the vector of previously selected karts and returns true if
-// kart i is in the vector and false if it is not.
-
-bool CharSel::kartAvailable(int kartid)
-{
-    if (!kart_properties_manager->m_selected_karts.empty())
-    {
-        std::vector<int>::iterator it;
-        for (it = kart_properties_manager->m_selected_karts.begin();
-             it < kart_properties_manager->m_selected_karts.end(); it++)
-        {
-            if ( kartid == *it)
-            return false;
-        }
-    }
-    const KartProperties *kartprop=kart_properties_manager->getKartById(kartid);
-    return !unlock_manager->isLocked(kartprop->getIdent());
-}   // kartAvailable

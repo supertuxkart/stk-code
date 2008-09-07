@@ -38,7 +38,6 @@ private:
     unsigned int     m_num_entries;   // number of entries to display
     std::vector<int> m_index_avail_karts;
     static const unsigned int m_max_entries=7;
-    bool             kartAvailable(int kart);
     void             updateScrollPosition();
     int              computeIndent(int n) {return 40+abs((int)(m_max_entries-1)/2 - n)*3;}
     void             switchGroup();

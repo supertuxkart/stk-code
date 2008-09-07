@@ -26,6 +26,8 @@
 #include "kart_properties.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
+#include "unlock_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -158,6 +160,27 @@ int KartPropertiesManager::getKartByGroup(const std::string& group, int n) const
     }
     return -1;
 }   // getKartByGroup
+
+//-----------------------------------------------------------------------------
+bool KartPropertiesManager::testAndSetKart(int kartid)
+{
+    if(!kartAvailable(kartid)) return false;
+    m_selected_karts.push_back(kartid);
+    return true;
+}   // testAndSetKart
+
+//-----------------------------------------------------------------------------
+bool KartPropertiesManager::kartAvailable(int kartid)
+{
+    std::vector<int>::iterator it;
+    for (it = m_selected_karts.begin(); it < m_selected_karts.end(); it++)
+    {
+        if ( kartid == *it) return false;
+    }
+    const KartProperties *kartprop=getKartById(kartid);
+    if(unlock_manager->isLocked(kartprop->getIdent())) return false;
+    return true;
+}   // testAndSetKart
 
 //-----------------------------------------------------------------------------
 void KartPropertiesManager::fillWithRandomKarts(std::vector<RemoteKartInfo>& vec)

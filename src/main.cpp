@@ -536,7 +536,11 @@ int main(int argc, char *argv[] )
             fprintf(stderr, "Problems initialising network connections,\n"
                             "Running in non-network mode.\n");
         }
-        
+        // On the server start with the network information page
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        {
+            menu_manager->pushMenu(MENUID_NETWORK_INFO);
+        }
         // Not replaying
         // =============
         if(!user_config->m_profile)
