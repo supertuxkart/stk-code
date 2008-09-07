@@ -160,7 +160,7 @@ int KartPropertiesManager::getKartByGroup(const std::string& group, int n) const
 }   // getKartByGroup
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
+void KartPropertiesManager::fillWithRandomKarts(std::vector<RemoteKartInfo>& vec)
 {
     // First: set up flags (based on global kart 
     // index) for which karts are already used
@@ -172,8 +172,8 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
     std::vector<std::string> all_karts;
     for(unsigned int i=0; i<vec.size(); i++)
     {
-        if(vec[i].empty()) continue;
-        int id=getKartId(vec[i]);
+        if(vec[i].getKartName()=="") continue;
+        int id=getKartId(vec[i].getKartName());
         used[id] = true;
         count --;
     }
@@ -197,10 +197,10 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
     // there are no more karts in the current group
     for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
     {
-        if(vec[i].empty())
+        if(vec[i].getKartName()=="")
         {
             used[karts.back()] = true;
-            vec[i] = m_karts_properties[karts.back()]->getIdent();
+            vec[i] = RemoteKartInfo(m_karts_properties[karts.back()]->getIdent());
             karts.pop_back();
             count --;
         }
@@ -219,9 +219,9 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<std::string>& vec)
     // Then fill up the remaining empty spaces
     for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
     {
-        if(vec[i].empty())
+        if(vec[i].getKartName()=="")
         {
-            vec[i] = m_karts_properties[karts.back()]->getIdent();
+            vec[i] = RemoteKartInfo(m_karts_properties[karts.back()]->getIdent());
             karts.pop_back();
             count --;
         }

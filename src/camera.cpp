@@ -22,11 +22,11 @@
 #include "coord.hpp"
 #include "world.hpp"
 #include "player_kart.hpp"
-#include "track_manager.hpp"
 #include "track.hpp"
 #include "camera.hpp"
 #include "user_config.hpp"
 #include "constants.hpp"
+#include "race_manager.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)
 {

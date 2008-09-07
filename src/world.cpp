@@ -45,6 +45,8 @@
 #include "camera.hpp"
 #include "robots/default_robot.hpp"
 #include "unlock_manager.hpp"
+#include "network/network_kart.hpp"
+#include "network/network_manager.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
 #endif
@@ -103,8 +105,9 @@ World::World()
         int position = i+1;   // position start with 1
         btTransform init_pos=m_track->getStartTransform(position);
         Kart* newkart;
-        const std::string& kart_name=race_manager->getKartName(i);
-        int player_id = race_manager->getKartPlayerId(i);
+        const std::string& kart_name = race_manager->getKartName(i);
+        int local_player_id          = race_manager->getKartLocalPlayerId(i);
+        int global_player_id         = race_manager->getKartGlobalPlayerId(i);
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
@@ -113,7 +116,7 @@ World::World()
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
-                scene->createCamera(player_id, newkart);
+                scene->createCamera(local_player_id, newkart);
             }
         }
         else
@@ -122,11 +125,22 @@ World::World()
             {
             case RaceManager::KT_PLAYER:
                 newkart = new PlayerKart(kart_name, position,
-                                         &(user_config->m_player[player_id]),
-                                         init_pos, player_id);
-                m_player_karts[player_id] = (PlayerKart*)newkart;
+                                         &(user_config->m_player[local_player_id]),
+                                         init_pos, local_player_id);
+                m_player_karts[global_player_id] = (PlayerKart*)newkart;
+                m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
                 break;
             case RaceManager::KT_NETWORK_PLAYER:
+                if(network_manager->getMode()==NetworkManager::NW_SERVER)
+                {
+                    newkart = new NetworkKart(kart_name, position, init_pos,
+                                              global_player_id);
+                }
+                else
+                {
+                    newkart = new NetworkKart(kart_name, position, init_pos,
+                                              global_player_id);
+                }
                 break;
             case RaceManager::KT_AI:
                 newkart = loadRobot(kart_name, position, init_pos);

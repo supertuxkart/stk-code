@@ -38,9 +38,6 @@ NetworkManager::NetworkManager()
 	  fprintf (stderr, "An error occurred while initializing ENet.\n");
 	  exit(-1);
      }
-     // FIXME: debugging
-     m_kart_info.push_back(RemoteKartInfo("tuxkart","xx", 1));
-     m_kart_info.push_back(RemoteKartInfo("yeti",   "yy", 1));
 #endif
 }   // NetworkManager
 
@@ -211,6 +208,7 @@ void NetworkManager::update(float dt)
     }
 }   // update
 
+
 // ----------------------------------------------------------------------------
 /** Send race_manager->getNumPlayers(), the kart and the name of each
     player to the server. 
@@ -220,7 +218,7 @@ void NetworkManager::sendKartsInformationToServer()
     for(int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
     {
         fprintf(stderr, "Sending name '%s', ",user_config->m_player[i].getName().c_str());
-        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalPlayerKart(i).getKartName().c_str());
+        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalKartInfo(i).getKartName().c_str());
     }   // for i<getNumLocalPlayers
     fprintf(stderr, "Client sending kart information to server\n");
 }   // sendKartsInformationToServer
@@ -230,23 +228,32 @@ void NetworkManager::sendKartsInformationToServer()
 */
 void NetworkManager::waitForKartsInformation()
 {
+    m_kart_info.clear();
+
     fprintf(stderr, "Server receiving all kart information\n");
+    // FIXME: debugging
+    m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
+    m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
 
-    // First put the local karts into the race_manager:
+    // Get the local kart info
+    for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+        m_kart_info.push_back(race_manager->getLocalKartInfo(i));
 
-    for(unsigned int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
-    {
-        //FIXME race_manager->setPlayerKart(i, race_manager->getLocalPlayerKart(i),
-        //                            m_host_id);
-    }
-    int offset=race_manager->getNumLocalPlayers();
+    // Now sort by (hostid, playerid)
+    std::sort(m_kart_info.begin(), m_kart_info.end());
+
+    // Set the global player ID for each player
+    for(unsigned int i=0; i<m_kart_info.size(); i++)
+        m_kart_info[i].setGlobalPlayerId(i);
+
+    // FIXME: distribute m_kart_info to all clients
+
+    // Set the player kart information
+    race_manager->setNumPlayers(m_kart_info.size());
     for(unsigned int i=0; i<m_kart_info.size(); i++)
     {
-        // receive number of karts, kart name, and player name for each hosts,
-        // and put it into the race_manager data structure:
-        //FIXME race_manager->setPlayerKart(offset+i, m_kart_info[i].m_kart_name,
-                //                    m_kart_info[i].m_client_id);
-    }   // for i
+        race_manager->setPlayerKart(i, m_kart_info[i]);
+    }
 }   // waitForKartsInformation
 
 // ----------------------------------------------------------------------------
@@ -255,10 +262,11 @@ void NetworkManager::waitForKartsInformation()
 void NetworkManager::sendRaceInformationToClients()
 {
     fprintf(stderr, "server sending race_manager information to all clients\n");
-    for(unsigned i=0; i<race_manager->getNumPlayers(); i++)
+    for(unsigned i=0; i<race_manager->getNumLocalPlayers(); i++)
     {
-//        fprintf(stderr, "Sending kart '%s' host %d\n",
-//FIXME            race_manager->getKartName(i), race_manager->getHostId(i));
+        const RemoteKartInfo& ki=race_manager->getLocalKartInfo(i);
+        fprintf(stderr, "Sending kart '%s' playerid %d host %d\n",
+                ki.getKartName(), ki.getLocalPlayerId(), ki.getHostId());
     }   // for i
 }   // sendRaceInformationToClients
 

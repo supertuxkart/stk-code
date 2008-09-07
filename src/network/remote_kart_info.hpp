@@ -26,19 +26,36 @@ class RemoteKartInfo
 {
         std::string m_kart_name;
         std::string m_user_name;
-        int         m_client_id;
-        int         m_player_id;
+        int         m_host_id;
+        int         m_local_player_id;
+        int         m_global_player_id;
 
 public:
-    RemoteKartInfo(std::string kart_name, std::string user_name, int id)
-                : m_kart_name(kart_name), m_user_name(user_name), m_client_id(id) 
-    {};
-    RemoteKartInfo() {m_kart_name=""; m_user_name=""; m_client_id=-1; m_player_id=-1;}
-    void setKartName(const std::string& n) { m_kart_name = n;  }
-    void setUserName(const std::string& u) { m_user_name = u;  }
-    void setClientId(int id)               { m_client_id = id; }
-    void setPlayerId(int id)               { m_player_id = id; }
-    const std::string& getKartName() const {return m_kart_name; }
+         RemoteKartInfo(int player_id, const std::string& kart_name, 
+                        const std::string& user_name, int host_id)
+                      : m_kart_name(kart_name), m_user_name(user_name), 
+                        m_local_player_id(player_id), m_host_id(host_id) 
+                                           {};
+         RemoteKartInfo(const std::string& kart_name)
+                                           {m_kart_name=kart_name; m_user_name="";
+                                            m_host_id=-1; m_local_player_id=-1;}
+         RemoteKartInfo()                  {m_kart_name=""; m_user_name=""; 
+                                            m_host_id=-1; m_local_player_id=-1;}
+    void setKartName(const std::string& n) { m_kart_name = n;              }
+    void setUserName(const std::string& u) { m_user_name = u;              }
+    void setHostId(int id)                 { m_host_id = id;               }
+    void setLocalPlayerId(int id)          { m_local_player_id = id;       }
+    void setGlobalPlayerId(int id)         { m_global_player_id = id;      }
+    int  getHostId() const                 { return m_host_id;             }
+    int  getLocalPlayerId() const          { return m_local_player_id;     }
+    int  getGlobalPlayerId() const         { return m_global_player_id;    }
+    const std::string& getKartName() const {return m_kart_name;            }
+    const std::string& getPlayerName() const{return m_user_name;           }
+    bool operator<(const RemoteKartInfo& other)
+    {
+        return (m_host_id<other.m_host_id ||
+                m_host_id==other.m_host_id && m_local_player_id<other.m_local_player_id);
+    }
 };   // RemoteKartInfo
 
 #endif

@@ -59,14 +59,16 @@ private:
 public:
                  NetworkManager();
                 ~NetworkManager();
-    void         setMode(NetworkMode m)            {m_mode = m;          }
-    NetworkMode  getMode() const                   {return m_mode;       }
-    void         setState(NetworkState s)          {m_state = s;         }
-    NetworkState getState() const                  {return m_state;      }
-    int          getClientId() const               {return m_host_id;    }
-    int          getNumClients() const             {return m_num_clients;}
-    void         setPort(int p)                    {m_port=p;            }
-    void         setServerIP(const std::string &s) {m_server_address=s;  }
+    void         setMode(NetworkMode m)            {m_mode = m;           }
+    NetworkMode  getMode() const                   {return m_mode;        }
+    void         setState(NetworkState s)          {m_state = s;          }
+    NetworkState getState() const                  {return m_state;       }
+    int          getHostId() const                 {return m_host_id;     }
+    int          getNumClients() const             {return m_num_clients; }
+    void         setPort(int p)                    {m_port=p;             }
+    void         setServerIP(const std::string &s) {m_server_address=s;   }
+    void         setKartInfo(int player_id, const std::string& kart, 
+                             const std::string& user="", int hostid=-1);
     bool         initialiseConnections();
     void         update(float dt);
     void         sendKartsInformationToServer();

@@ -184,7 +184,7 @@ int handleCmdLine(int argc, char **argv)
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");
             if(filename!="")
             {
-                race_manager->setLocalPlayerKart(0, argv[i+1]);
+                race_manager->setLocalKartInfo(0, argv[i+1]);
                 fprintf ( stdout, "You choose to use kart '%s'.\n", argv[i+1] ) ;
             }
             else
@@ -555,7 +555,7 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setNumPlayers(1);
-            race_manager->setLocalPlayerKart(0, kart_properties_manager->getKart("tuxkart")->getIdent());
+            race_manager->setLocalKartInfo(0, kart_properties_manager->getKart("tuxkart")->getIdent());
             race_manager->setMajorMode (RaceManager::RM_SINGLE);
             race_manager->setMinorMode (RaceManager::RM_QUICK_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);

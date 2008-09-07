@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <map>
+#include "network/remote_kart_info.hpp"
 
 class KartProperties;
 
@@ -59,7 +60,7 @@ public:
                                                              {return m_groups[g];      }
 
     /** Fill the empty positions in the given vector with random karts */
-    void fillWithRandomKarts (std::vector<std::string>& vec);
+    void fillWithRandomKarts (std::vector<RemoteKartInfo>& vec);
     void removeTextures      ();
 };
 

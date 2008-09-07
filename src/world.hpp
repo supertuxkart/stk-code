@@ -21,6 +21,7 @@
 #define HEADER_WORLD_H
 
 #include <vector>
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "track.hpp"
 #include "player_kart.hpp"

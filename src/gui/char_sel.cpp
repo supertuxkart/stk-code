@@ -357,7 +357,7 @@ void CharSel::select()
     const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
     if (KP != NULL)
     {
-        race_manager->setLocalPlayerKart(m_player_index, KP->getIdent());
+        race_manager->setLocalKartInfo(m_player_index, KP->getIdent());
         user_config->m_player[m_player_index].setLastKartId(kart_id);
         // Add selected kart (token) to selected karts vector so it cannot be
         // selected again
