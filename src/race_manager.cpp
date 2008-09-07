@@ -29,7 +29,7 @@
 #include "scene.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
-
+#include "network_manager.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -67,8 +67,9 @@ void RaceManager::setLocalPlayerKart(unsigned int player, const std::string& kar
     {
         if (player >= getNumLocalPlayers())
             setNumLocalPlayers(player+1);
-        m_local_player_karts[player] = kart;
-
+        m_local_player_karts[player].setPlayerId(player);
+        m_local_player_karts[player].setKartName(kart);
+        m_local_player_karts[player].setHostId(network_manager->getHostId());
     }
     else
     {
@@ -82,18 +83,14 @@ void RaceManager::setPlayerKart(unsigned int player, const std::string& kart,
     if (player >= getNumPlayers())
         setNumPlayers(player+1);
     m_player_karts[player]  = kart;
-    m_player_names[player]  = player_name;
 }   // setPlayerKart
 
 //-----------------------------------------------------------------------------
 void RaceManager::setNumPlayers(int num)
 {
     m_player_karts.resize(num);
-    m_player_names.resize(num);
     for(PlayerKarts::iterator i = m_player_karts.begin(); i != m_player_karts.end(); ++i)
         if (i->empty()) *i = "tuxkart";
-    for(PlayerKarts::iterator i = m_player_names.begin(); i != m_player_names.end(); ++i)
-        if (i->empty()) *i = "guest";
 
 }   // setNumPlayers
 

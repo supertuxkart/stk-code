@@ -23,7 +23,7 @@
 #include "material_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

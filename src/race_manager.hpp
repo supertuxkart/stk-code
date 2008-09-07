@@ -25,6 +25,7 @@
 #include <string>
 
 #include "grand_prix_data.hpp"
+#include "network/remote_kart_info.hpp"
 
 /** The race manager has two functions:
     1) it stores information about the race the user selected (e.g. number
@@ -78,8 +79,7 @@ private:
     RaceModeType                     m_major_mode, m_minor_mode;
     typedef std::vector<std::string> PlayerKarts;
     PlayerKarts                      m_player_karts;
-    PlayerKarts                      m_local_player_karts;
-    std::vector<std::string>         m_player_names;
+    std::vector<RemoteKartInfo>      m_local_player_karts;
     std::vector<std::string>         m_tracks;
     std::vector<int>                 m_host_ids;
     std::vector<int>                 m_num_laps;
@@ -109,8 +109,8 @@ public:
     void         setPlayerKart(unsigned int player, const std::string& kart,
                                const std::string& player_name, int hostid);
     void         setLocalPlayerKart(unsigned int player, const std::string& kart);
-    const std::string& 
-                 getLocalPlayerKart(unsigned int p) const {return m_local_player_karts[p];}
+    const RemoteKartInfo& 
+        getLocalPlayerKart(unsigned int p) const {return m_local_player_karts[p];   }
     void         reset();
     void         RaceFinished(const Kart* kart, float time);
     void         setTrack(const std::string& track);

@@ -21,7 +21,7 @@
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "translation.hpp"
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 enum WidgetTokens
 {

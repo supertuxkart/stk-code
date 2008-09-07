@@ -39,8 +39,8 @@ NetworkManager::NetworkManager()
 	  exit(-1);
      }
      // FIXME: debugging
-     m_kart_info.push_back(KartInfo("tuxkart","xx", 1));
-     m_kart_info.push_back(KartInfo("yeti",   "yy", 1));
+     m_kart_info.push_back(RemoteKartInfo("tuxkart","xx", 1));
+     m_kart_info.push_back(RemoteKartInfo("yeti",   "yy", 1));
 #endif
 }   // NetworkManager
 

@@ -40,7 +40,7 @@
 #include "user_config.hpp"
 #include "scene.hpp"
 #include "history.hpp"
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 GameManager* game_manager = 0;
 
