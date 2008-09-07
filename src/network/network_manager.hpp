@@ -30,6 +30,8 @@
 #  include "enet/enet.h"
 #endif
 
+class Message;
+
 class NetworkManager
 {
 public:
@@ -37,13 +39,15 @@ public:
     enum NetworkMode {NW_SERVER, NW_CLIENT, NW_NONE};
 
     // States for the finite state machine. First for server:
-    enum NetworkState {NS_ACCEPT_CONNECTIONS, NS_WAIT_FOR_KART_INFO,
-         // Then client only states:
-                       NS_CHARACTER_CONFIRMED, 
-                       NS_CHARACTER_REJECTED,
-                       NS_WAIT_FOR_RACE_DATA,
-         // Shared states   
-                       NS_CHARACTER_SELECT, NS_READY_SET_GO_BARRIER, NS_RACING};
+    enum NetworkState {NS_NONE, 
+                       NS_ACCEPT_CONNECTIONS,              // server: accept connections
+                       NS_WAIT_FOR_AVAILABLE_CHARACTERS,   // client: wait for list
+                       NS_ALL_REMOTE_CHARACTERS_DONE,      // server: all client data received
+                       NS_WAIT_FOR_RACE_DATA,              // client: wait for race info
+                       NS_READY_SET_GO_BARRIER,            // c&s: barrier before r.s.g.
+                       NS_CHARACTER_SELECT,                // c&s: character select in progress
+                       NS_LOADING_WORLD,                   // client: loading world
+                       NS_RACING};
 private:
 
     NetworkMode                 m_mode;
@@ -52,7 +56,10 @@ private:
     std::vector<RemoteKartInfo> m_kart_info;
     int                         m_host_id;
     std::vector<std::string>    m_client_names;
+    std::vector<int>            m_num_local_players;
+    int                         m_num_all_players;
     int                         m_barrier_count;
+
 #ifdef HAVE_ENET
     ENetHost                   *m_host;    // me
     ENetPeer                   *m_server;  // (clients only)
@@ -62,11 +69,14 @@ private:
     bool         initServer();
     bool         initClient();
     void         handleNewConnection(ENetEvent *event);
-    void         handleServerMessage(ENetEvent *event);
-    void         handleClientMessage(ENetEvent *event);
+    void         handleMessageAtServer(ENetEvent *event);
+    void         handleMessageAtClient(ENetEvent *event);
     void         handleDisconnection(ENetEvent *event);
-    void         testSetCharacter   (ENetEvent *event);
+    unsigned int getHostId(ENetPeer *p) const {return (int)p->data; }
 
+    void         sendToServer(Message *m);
+    void         broadcastToClients(Message &m);
+    void         sendToClient(int id, const Message *m);
 public:
                  NetworkManager();
                 ~NetworkManager();
@@ -82,16 +92,20 @@ public:
                              const std::string& user="", int hostid=-1);
     bool         initialiseConnections();
     void         update(float dt);
-    void         sendKartsInformationToServer();
+
+    void         disableNetworking();
+    void         sendConnectMessage();  // client send initial info to server
+    void         switchToCharacterSelection();
+    void         sendCharacterSelected(int player_id);
+    void         waitForRaceInformation();
+    void         worldLoaded();
+
+// which one is actually necessary:
     void         setupPlayerKartInfo();
     void         sendRaceInformationToClients();
-    void         waitForRaceInformation();
 
-    void         switchToCharacterSelection();
-    void         switchToReceiveKartInfo();
     void         switchToRaceDataSynchronisation();
     void         switchToReadySetGoBarrier();
-
 };
 
 extern NetworkManager *network_manager;

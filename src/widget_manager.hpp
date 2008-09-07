@@ -128,8 +128,9 @@ class WidgetManager
 
     int m_default_show_track;
     int m_default_track_num;
-
+public:
     int findId(const int TOKEN) const;
+private:
 
     int calcLineWidth( const int POS );
     int calcLineHeight( const int POS );
@@ -300,7 +301,9 @@ public:
     void showWgtRect(const int TOKEN);
     // Completely hide and show a widget
     void hideWgt(const int t) {hideWgtRect(t); hideWgtText(t);}
+    void hideWgt(int t0, int t2) {for(int i=t0; i<=t2; hideWgt(i++));}
     void showWgt(const int t) {showWgtRect(t); showWgtText(t);}
+    void showWgt(int t0, int t2) {for(int i=t0; i<=t2; showWgt(i++));}
     void hideWgtRect(const int TOKEN);
 
     void setWgtBorderColor(const int TOKEN, const GLfloat* const COLOR);

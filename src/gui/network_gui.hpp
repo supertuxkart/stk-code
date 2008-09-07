@@ -28,10 +28,12 @@
 class NetworkGUI: public BaseGUI
 {
 private:
-    unsigned int m_num_clients;
-    std::string  m_server_address;
+    unsigned int          m_num_clients;
+    std::string           m_server_address;
+    enum {NGS_NONE, NGS_CONNECT_DISPLAY, NGS_CONNECT_DOIT} 
+                          m_state;
 
-	static const int SERVER_NAME_MAX;
+	static const int      SERVER_NAME_MAX;
 
     void switchToWaitForConnectionMode();
 public:

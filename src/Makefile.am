@@ -30,9 +30,14 @@ supertuxkart_SOURCES =             main.cpp  			\
 	coord.hpp						\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
-	network/network_manager.cpp network/network_manager.hpp \
-	network/network_kart.cpp   network/network_kart.hpp	\
-	network/remote_kart_info.hpp				\
+	network/network_manager.cpp     network/network_manager.hpp 		\
+	network/network_kart.cpp        network/network_kart.hpp		\
+	network/race_info_message.hpp   network/race_info_message.cpp		\
+	network/remote_kart_info.hpp    network/character_selected_message.hpp	\
+	network/race_start_message.hpp  network/connect_message.hpp		\
+	network.num_players_message.hpp network/world_loaded_message.hpp	\
+        network/connect_message.hpp     network/character_info_message.hpp	\
+        network/message.cpp             network/message.hpp			\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \
@@ -112,20 +117,19 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/track_sel.cpp	   gui/track_sel.hpp	        \
 	gui/player_controls.cpp	   gui/player_controls.hpp   	\
 	gui/config_display.cpp	   gui/config_display.hpp    	\
-	gui/display_res_confirm.cpp	gui/display_res_confirm.hpp	\
+	gui/display_res_confirm.cpp gui/display_res_confirm.hpp	\
 	gui/config_sound.cpp	   gui/config_sound.hpp    	\
 	gui/config_controls.cpp	   gui/config_controls.hpp   	\
 	gui/options.cpp		   gui/options.hpp	        \
 	gui/game_mode.cpp	   gui/game_mode.hpp	        \
-	gui/race_options.cpp   gui/race_options.hpp       	\
+	gui/race_options.cpp       gui/race_options.hpp       	\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
-	gui/start_race_feedback.cpp	   gui/start_race_feedback.hpp	\
-	gui/network_info.cpp	   gui/network_info.hpp		\
+	gui/start_race_feedback.cpp gui/start_race_feedback.hpp	\
 	gui/network_gui.cpp	   gui/network_gui.hpp		\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
-	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
-	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \
-	gui/help_page_three.cpp  gui/help_page_three.hpp 	        \
+	gui/help_page_one.cpp	   gui/help_page_one.hpp 	\
+	gui/help_page_two.cpp  	   gui/help_page_two.hpp	\
+	gui/help_page_three.cpp    gui/help_page_three.hpp	\
 	gui/credits_menu.cpp	   gui/credits_menu.hpp		\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/challenges_menu.cpp	   gui/challenges_menu.hpp	\

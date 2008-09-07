@@ -43,6 +43,10 @@ enum WidgetTokens
 
 MainMenu::MainMenu()
 {
+    // Reset the state of the network manager to none (which is correct
+    // independent if it is a client, server, or no networking
+    network_manager->setState(NetworkManager::NS_NONE);
+
     widget_manager->switchOrder();
 
     const int WIDTH=30;
@@ -79,6 +83,7 @@ MainMenu::MainMenu()
         widget_manager->hideWgtRect(WTOK_WARNING);
     }
 
+    widget_manager->activateWgt(WTOK_SINGLE);
     widget_manager->layout(WGT_AREA_ALL);
 }
 

@@ -22,6 +22,9 @@
 //This is needed in various platforms, but not all
 # include <algorithm>
 
+#define _WINSOCKAPI_
+#include "network/network_manager.hpp"
+
 #include "menu_manager.hpp"
 
 #include "main_menu.hpp"
@@ -54,7 +57,6 @@
 #include "challenges_menu.hpp"
 #include "feature_unlocked.hpp"
 #include "start_race_feedback.hpp"
-#include "network_info.hpp"
 #include "network_gui.hpp"
 
 using namespace std;
@@ -149,6 +151,11 @@ void MenuManager::update()
             {
             case MENUID_MAINMENU:
                 m_current_menu= new MainMenu();
+                // in this case the network entry can be removed, resulting
+                // in warnings etc. if the widget manager then tries to select
+                // the widget again. To avoid this, set the saved widget to NONE.
+                if(network_manager->getMode()!=NetworkManager::NW_NONE) 
+                    saved_widget=WidgetManager::WGT_NONE;
                 break;
             case MENUID_CHALLENGES:
                 m_current_menu= new ChallengesMenu();
@@ -243,9 +250,6 @@ void MenuManager::update()
                 break;
             case MENUID_NETWORK_GUI:
                 m_current_menu = new NetworkGUI();
-                break;
-            case MENUID_NETWORK_INFO:
-                m_current_menu = new NetworkInfo();
                 break;
             default:
                 break;

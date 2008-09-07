@@ -18,10 +18,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network_manager.hpp"
+#include "connect_message.hpp"
+#include "character_info_message.hpp"
+#include "character_selected_message.hpp"
+#include "race_info_message.hpp"
+#include "race_start_message.hpp"
+#include "world_loaded_message.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "kart_properties_manager.hpp"
+#include "translation.hpp"
+#include "gui/font.hpp"
 
 NetworkManager* network_manager = 0;
 
@@ -32,6 +40,7 @@ NetworkManager::NetworkManager()
 
      m_num_clients    = 0;
      m_host_id        = 0;
+
 #ifdef HAVE_ENET
      if (enet_initialize () != 0)
      {
@@ -66,8 +75,6 @@ NetworkManager::~NetworkManager()
 bool NetworkManager::initServer()
 {
 #ifdef HAVE_ENET
-     fprintf(stderr, "Initialising server, listening on %d\n", user_config->m_server_port);
-
      ENetAddress address;
      address.host = ENET_HOST_ANY;
      address.port = user_config->m_server_port;
@@ -88,7 +95,6 @@ bool NetworkManager::initServer()
     m_server = NULL;
     m_clients.push_back(NULL); // server has host_id=0, so put a dummy entry at 0 in client array
 
-    fprintf(stderr, "Server initialised, waiting for connections ...\n");
     m_client_names.push_back("server");
     return true;
 #endif
@@ -97,7 +103,6 @@ bool NetworkManager::initServer()
 // -----------------------------------------------------------------------------
 bool NetworkManager::initClient()
 {
-    fprintf(stderr, "Initialising client\n");
 #ifdef HAVE_ENET
     m_host = enet_host_create (NULL /* create a client host */,
                                1    /* only allow 1 outgoing connection */,
@@ -123,9 +128,9 @@ bool NetworkManager::initClient()
     
     if (peer == NULL)
     {
-        fprintf (stderr, 
-		  "No available peers for initiating an ENet connection.\n");
-	 return false;
+        fprintf(stderr, 
+                "No available peers for initiating an ENet connection.\n");
+        return false;
     }
     
     /* Wait up to 5 seconds for the connection attempt to succeed. */
@@ -141,50 +146,34 @@ bool NetworkManager::initClient()
                 user_config->m_server_address.c_str(), user_config->m_server_port);
         return false;
     }
-    fprintf(stderr, "Connection to %s:%d succeeded.\n", 
-             user_config->m_server_address.c_str(), user_config->m_server_port);
-
     m_server = peer;
-    if (enet_host_service(m_host, &event, 5000) > 0) 
-      if (event.type == ENET_EVENT_TYPE_RECEIVE)
-      {  
-        m_host_id = ClientHostIdPacket(event.packet).getId();
-        fprintf(stderr, "got host id %d from server\n", m_host_id);
-        return true;
-      }
-    fprintf(stderr, "didn't receive a host_id!\n");
-    return false;
+    return true;
 #endif
 }  // initClient
 
 // ----------------------------------------------------------------------------
+/** Called in case of an error, to switch back to non-networking mode.
+*/
+void NetworkManager::disableNetworking()
+{
+    m_mode=NW_NONE;
+    // FIXME: what enet data structures do we have to free/reset???
+
+}   // disableNetworking
+
+// ----------------------------------------------------------------------------
 void NetworkManager::handleNewConnection(ENetEvent *event)
 {
-    ClientHostIdPacket *msg;
-    int new_host_id;
+    // Only accept while waiting for connections
+    if(m_state!=NS_ACCEPT_CONNECTIONS) return;
 
-    if(m_state!=NS_ACCEPT_CONNECTIONS)
-    {
-        // We don't accept connections atm
-        return;
-    }
-    m_num_clients++;
-    fprintf (stderr, "A new client connected from %x:%u. Connected: %d.\n", 
-             event->peer -> address.host,
-             event->peer -> address.port, m_num_clients);
-
-    // FIXME: send m_num_clients as hostid back to new client.
-    // FIXME: client should send an id as well to be displayed
-    m_client_names.push_back("client");
-
-    // send a hostid back
-    new_host_id = m_clients.size();
-    // fprintf (stderr, "allocated client host_id as %d\n", new_host_id);
+    // The logical connection (from STK point of view) happens when
+    // the connection message is received. But for now reserve the
+    // space in the data structures (e.g. in case that two connects
+    // happen before a connect message is received
+    m_client_names.push_back("NOT SET YET");
     m_clients.push_back(event->peer);
-    msg = new ClientHostIdPacket(new_host_id);
-    msg->send(*(m_clients[new_host_id]));
-    enet_host_flush(m_host);
-    delete msg;
+    event->peer->data = (void*)int(m_clients.size()-1);  // save hostid in peer data
 
 }   // handleNewConnection
 
@@ -196,113 +185,98 @@ void NetworkManager::handleDisconnection(ENetEvent *event)
         fprintf(stderr, "Disconnect while in race - close your eyes and hope for the best.\n");
         return;
     }
-    fprintf(stderr, "%x:%d disconected.\n", event->peer->address.host,
-            event->peer->address.port );
+    fprintf(stderr, "%x:%d disconnected (host id %d).\n", event->peer->address.host,
+        event->peer->address.port, (int)event->peer->data );
     m_num_clients--;
 }   // handleDisconnection
 
 // ----------------------------------------------------------------------------
-void NetworkManager::handleServerMessage(ENetEvent *event)
+void NetworkManager::handleMessageAtServer(ENetEvent *event)
 {  // handle message at server (from client)
 
     switch(m_state)
     {
     case NS_ACCEPT_CONNECTIONS:
-        fprintf(stderr, "Received a receive event while waiting for client - ignored.\n");
-        return;
+        {
+            ConnectMessage m(event->packet);
+            m_client_names[(int)event->peer->data] = m.getId();
+            m_num_clients++;
+            return;
+        }
     case NS_CHARACTER_SELECT:
-        {   
-            // only accept testAndSet and 'character selected' messages here.
-            // Get character from message, check if it's still available
-            int kartid=0, playerid=0, hostid=0;
-            std::string name="tuxkart", user="guest";
-            if(kart_properties_manager->testAndSetKart(kartid))
+        {
+            CharacterSelectedMessage m(event->packet);
+            int hostid=(int)event->peer->data;
+            assert(hostid>=1 && hostid<=m_num_clients);
+            if(m_num_local_players[hostid]==-1)  // first package from that host
             {
-                // send 'ok' message to client and all other clients
-                m_kart_info.push_back(RemoteKartInfo(playerid, name, user, hostid));
+                m_num_local_players[hostid] = m.getNumPlayers();
+                m_num_all_players          += m.getNumPlayers();
+                // count how many hosts have sent (at least) one message
+                m_barrier_count ++;
             }
-            else
+            RemoteKartInfo ki=m.getKartInfo();
+            ki.setHostId(hostid);
+            m_kart_info.push_back(ki);
+            // See if this was the last message, i.e. we have received at least
+            // one message from each client, and the size of the kart_info
+            // array is the same as the number of all players (which does not
+            // yet include the number of players on the host).
+            if(m_barrier_count = m_num_clients &&
+                m_num_all_players==m_kart_info.size())
             {
-                // send 'not avail' to sender
+                // we can't send the race info yet, since the server might
+                // not yet have selected all characters!
+                m_state = NS_ALL_REMOTE_CHARACTERS_DONE;
             }
             break;
         }
     case NS_READY_SET_GO_BARRIER:
-        m_barrier_count++;
-        if(m_barrier_count==m_num_clients)
         {
-            // broadcast start message
-            m_state = NS_RACING;
+            m_barrier_count ++;
+            if(m_barrier_count==m_num_clients)
+            {
+                m_state = NS_RACING;
+                RaceStartMessage m;
+                broadcastToClients(m);
+            }
         }
-        break;
-    case NS_WAIT_FOR_KART_INFO:
-        m_barrier_count++;
-        // handle message, i.e. append to m_kart_info
-        if(m_barrier_count==m_num_clients)
-        {
-            // broadcast start message
-            m_state = NS_READY_SET_GO_BARRIER;
-        }
-        break;
-
     }   // switch m_state
-}   // handleServerMessage
+}   // handleMessageAtServer
 
 // ----------------------------------------------------------------------------
-void NetworkManager::switchToReadySetGoBarrier()
-{
-    if(m_num_clients==0)
-    {
-        m_state = NS_RACING;
-    }
-    else
-    {
-        m_state         = NS_READY_SET_GO_BARRIER;
-        m_barrier_count = 0;
-    }
-}   // switchToReadySetGoBarrier
-
-// ----------------------------------------------------------------------------
-void NetworkManager::switchToCharacterSelection()
-{
-    // This must be called from the network info menu, 
-    // so make sure the state is correct
-    assert(m_state == NS_ACCEPT_CONNECTIONS);
-    m_state         = NS_CHARACTER_SELECT;
-}   // switchTocharacterSelection
-
-// ----------------------------------------------------------------------------
-void NetworkManager::switchToReceiveKartInfo()
-{
-    assert(m_state == NS_CHARACTER_SELECT);
-    m_state         = NS_WAIT_FOR_KART_INFO;
-}   // switchToReceiveKartInfo
-
-// ----------------------------------------------------------------------------
-void NetworkManager::switchToRaceDataSynchronisation()
-{
-    m_state         = NS_WAIT_FOR_RACE_DATA;
-    m_barrier_count = 0;
-}   // switchToRaceDataSynchronisation
-
-// ----------------------------------------------------------------------------
-void NetworkManager::handleClientMessage(ENetEvent *event)
+void NetworkManager::handleMessageAtClient(ENetEvent *event)
 {  // handle message at client (from server)
     switch(m_state)
     {
+    case NS_WAIT_FOR_AVAILABLE_CHARACTERS:
+        {
+            CharacterInfoMessage m(event->packet);
+            // FIXME: handle list of available characters
+            m_state = NS_CHARACTER_SELECT;
+            break;
+        }
     case NS_WAIT_FOR_RACE_DATA:
-        // check if message is really race data
-        fprintf(stderr, "Client received race data\n");
-        break;
+        {
+            RaceInfoMessage m(event->packet);
+            // The constructor actually sets the information in the race manager
+            m_state = NS_LOADING_WORLD;
+            break;
+        }
+    case NS_READY_SET_GO_BARRIER:
+        {
+            m_state = NS_RACING;
+            break;
+        }
     }   // switch m_state
-}   // handleClientMessage
+}   // handleMessageAtClient
 
 // ----------------------------------------------------------------------------
 void NetworkManager::update(float dt)
 {
     if(m_mode==NW_NONE) return;
     ENetEvent event;
-    int result = enet_host_service (m_host, &event, 1);
+    int result = enet_host_service (m_host, &event, 0);
     if(result==0) return;
     if(result<0)
     {
@@ -314,60 +288,97 @@ void NetworkManager::update(float dt)
     case ENET_EVENT_TYPE_CONNECT:    handleNewConnection(&event); break;
     case ENET_EVENT_TYPE_RECEIVE:
           if(m_mode==NW_SERVER) 
-              handleServerMessage(&event);    
+              handleMessageAtServer(&event);    
           else
-              handleClientMessage(&event);
+              handleMessageAtClient(&event);
           break;
     case ENET_EVENT_TYPE_DISCONNECT: handleDisconnection(&event); break;
     case ENET_EVENT_TYPE_NONE:       break;
     }
 }   // update
 
+// ----------------------------------------------------------------------------
+void NetworkManager::broadcastToClients(Message &m)
+{
+    enet_host_broadcast(m_host, 0, m.getPacket());
+    enet_host_flush(m_host); 
+}   // broadcastToClients
 
 // ----------------------------------------------------------------------------
-/** Send race_manager->getNumPlayers(), the kart and the name of each
-    player to the server. 
-*/
-void NetworkManager::sendKartsInformationToServer()
+void NetworkManager::sendToServer(Message* m)
 {
-    LocalKartInfoPacket *msg;
-    for(int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
+    enet_peer_send(m_server, 0, m->getPacket());
+    enet_host_flush(m_host); 
+}   // sendToServer
+
+// ----------------------------------------------------------------------------
+void NetworkManager::switchToCharacterSelection()
+{
+    // This is called the first time the character selection menu is displayed
+    assert(m_state == NS_NONE);
+    if(m_mode==NW_CLIENT)
     {
-        fprintf(stderr, "Sending name '%s', ",user_config->m_player[i].getName().c_str());
-        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalKartInfo(i).getKartName().c_str());
-        msg = new LocalKartInfoPacket(user_config->m_player[i].getName(),        /* player name */
-                               race_manager->getLocalKartInfo(i).getKartName()); /* kart name */
-        msg->send(*m_server); 
-        enet_host_flush(m_host);
-        delete msg;
+        // Change state to wait for list of characters from server
+        m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
+    }
+    else
+    {   // server: create message with all valid characters
+        // ================================================
+        CharacterInfoMessage m;
+        broadcastToClients(m);
 
-    }   // for i<getNumLocalPlayers
-    fprintf(stderr, "Client sending kart information to server\n");
+        // Prepare the data structures to receive and 
+        // store information from all clients.
+        m_num_local_players.clear();
+        // Server (hostid 0) is not included in the num_clients count.  So to
+        // be able to use the hostid as index, we have to allocate one 
+        // additional element.
+        m_num_local_players.resize(m_num_clients+1, -1);
+        m_kart_info.clear();
+        m_num_all_players = 0;
+        // use barrier count to see if we had at least one message from each host
+        m_barrier_count      = 0;  
+        m_state              = NS_CHARACTER_SELECT;
+    }
+
+}   // switchTocharacterSelection
+
+// ----------------------------------------------------------------------------
+void NetworkManager::sendCharacterSelected(int player_id)
+{
+    CharacterSelectedMessage m(player_id);
+    sendToServer(&m);
+}   // sendCharacterSelected
+
+// ----------------------------------------------------------------------------
+void NetworkManager::waitForRaceInformation()
+{
     m_state = NS_WAIT_FOR_RACE_DATA;
-}   // sendKartsInformationToServer
+}   // waitForRaceInformation
 
+// ----------------------------------------------------------------------------
+void NetworkManager::worldLoaded()
+{
+    if(m_mode==NW_CLIENT)
+    {
+        WorldLoadedMessage m;
+        sendToServer(&m);
+    }
+    else if(m_mode==NW_SERVER)
+    {
+        assert(m_state=NS_READY_SET_GO_BARRIER);
+        RaceStartMessage m;
+        broadcastToClients(m);
+    }
+
+}   // worldLoaded
+
+// ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
 void NetworkManager::setupPlayerKartInfo()
 {
-    LocalKartInfoPacket *msg;
-    m_kart_info.clear();
-
-    // FIXME: debugging
-    //m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
-    //m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
-
-    // FIXME: put this into state machine
-    //if (enet_host_service(m_host, &event, 15000) > 0) 
-    //  if (event.type == ENET_EVENT_TYPE_RECEIVE)
-    //  {  
-    //    msg = new LocalKartDetails(event.packet)
-    //    m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
-    //    m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
-    //  }
-    //fprintf(stderr, "didn't receive kart info!\n");
-
     // Get the local kart info
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         m_kart_info.push_back(race_manager->getLocalKartInfo(i));
@@ -378,8 +389,6 @@ void NetworkManager::setupPlayerKartInfo()
     // Set the global player ID for each player
     for(unsigned int i=0; i<m_kart_info.size(); i++)
         m_kart_info[i].setGlobalPlayerId(i);
-
-    // FIXME: distribute m_kart_info to all clients
 
     // Set the player kart information
     race_manager->setNumPlayers(m_kart_info.size());
@@ -394,23 +403,18 @@ void NetworkManager::setupPlayerKartInfo()
 */
 void NetworkManager::sendRaceInformationToClients()
 {
-    fprintf(stderr, "server sending race_manager information to all clients\n");
-    for(unsigned i=0; i<race_manager->getNumLocalPlayers(); i++)
-    {
-        const RemoteKartInfo& ki=race_manager->getLocalKartInfo(i);
-        fprintf(stderr, "Sending kart '%s' playerid %d host %d\n",
-                ki.getKartName().c_str(), ki.getLocalPlayerId(), ki.getHostId());
-    }   // for i
-
-    // Go
-    m_state=NS_READY_SET_GO_BARRIER;
+    setupPlayerKartInfo();
+    RaceInfoMessage m(m_kart_info);
+    broadcastToClients(m);
+    m_state         = NS_READY_SET_GO_BARRIER;
+    m_barrier_count = 0;
+    if(m_num_clients==0) m_state = NS_RACING;
 }   // sendRaceInformationToClients
 
 // ----------------------------------------------------------------------------
-/** Receives and sets the race_manager information.
-*/
-void NetworkManager::waitForRaceInformation()
+void NetworkManager::sendConnectMessage()
 {
-    fprintf(stderr, "Client waiting for race information\n");
-}   // waitForRaceInformation
+    ConnectMessage msg;
+    sendToServer(&msg);
+}   // sendConnectMessage
 // ----------------------------------------------------------------------------

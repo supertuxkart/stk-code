@@ -162,6 +162,7 @@ void GameManager::run()
         #if !defined(WIN32) && !defined(__CYGWIN__)
 //                usleep(2000);
         #endif
+
             //Draw the splash screen
             glBindTexture(GL_TEXTURE_2D,TITLE_SCREEN_TEXTURE);
 

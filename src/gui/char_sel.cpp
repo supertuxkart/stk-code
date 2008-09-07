@@ -39,13 +39,13 @@
 
 enum WidgetTokens
 {
-    WTOK_TITLE,
-
-    WTOK_QUIT,
-    WTOK_EMPTY_UP,
-    WTOK_UP,
     WTOK_EMPTY_DOWN,
+    WTOK_EMPTY_UP,
+    WTOK_TITLE,
+    WTOK_UP,
     WTOK_DOWN,
+    WTOK_MESSAGE,
+    WTOK_QUIT,
     WTOK_EMPTY0 = 10,
     WTOK_NAME0  = 2000,
     WTOK_RACER0 = 3000
@@ -54,6 +54,11 @@ enum WidgetTokens
 CharSel::CharSel(int whichPlayer)
         : m_kart(0), m_player_index(whichPlayer)
 {
+    // First time this is called --> switch client and server
+    // to character barrier mode
+    if(network_manager->getState()==NetworkManager::NS_NONE)
+        network_manager->switchToCharacterSelection();
+
     // For some strange reasons plib calls makeCurrent() in ssgContext
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
@@ -106,6 +111,13 @@ CharSel::CharSel(int whichPlayer)
 
     switchGroup();  // select all karts from the currently selected group
 
+    Widget *w=widget_manager->addTextWgt(WTOK_MESSAGE, 30, 7, "");
+    w->setPosition(WGT_DIR_CENTER, 0, WGT_DIR_CENTER, 0);
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        widget_manager->setWgtText(WTOK_MESSAGE, _("Waiting for server"));
+    else
+        widget_manager->setWgtText(WTOK_MESSAGE, _("Waiting for clients"));
+
     widget_manager->layout(WGT_AREA_RGT);
 
     m_current_kart = -1;
@@ -132,10 +144,20 @@ CharSel::CharSel(int whichPlayer)
         m_offset = 0;
         switchCharacter(0);
     }
-    updateScrollPosition();
+    if(network_manager->getState()==NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS)
+    {
+        widget_manager->hideWgt(WTOK_TITLE, WTOK_DOWN);
+        // Hide all widgets except the message widget
+        for (unsigned int i = 0; i < m_max_entries; i++)
+        {
+            widget_manager->hideWgt(WTOK_NAME0+i);
+            widget_manager->hideWgt(WTOK_RACER0+i);
+        }
+    }
+    else
+        updateScrollPosition();
 
     m_clock  = 0;
-    //test
 
 }   // CharSel
 
@@ -164,17 +186,15 @@ void CharSel::updateScrollPosition()
     {
         if(i<start || i>end)
         {
-            widget_manager->hideWgtRect   (WTOK_NAME0 +i);
+            widget_manager->hideWgt       (WTOK_NAME0 +i);
             widget_manager->hideWgtRect   (WTOK_RACER0+i);
-            widget_manager->hideWgtText   (WTOK_NAME0 +i);
             widget_manager->hideWgtTexture(WTOK_RACER0+i);
             continue;
         }
 
         // Otherwise enable the widgets again (just in case that they
         // had been disabled before)
-        widget_manager->showWgtRect   (WTOK_NAME0 +i);
-        widget_manager->showWgtText   (WTOK_NAME0 +i);
+        widget_manager->showWgt(WTOK_NAME0 +i);
 
         int indx = (i+m_offset)%m_index_avail_karts.size();
         indx     = m_index_avail_karts[indx];
@@ -272,6 +292,29 @@ void CharSel::switchCharacter(int n)
 //-----------------------------------------------------------------------------
 void CharSel::update(float dt)
 {
+    // If we are still waiting in the barrier, don't do anything
+    if(network_manager->getState()==NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS) 
+    {
+        widget_manager->update(dt);
+        return;
+    }
+    static bool first=true;
+    if(first)
+    {
+        // Now hide the message window and display the widgets:
+        widget_manager->hideWgt(WTOK_MESSAGE);
+        widget_manager->showWgt(WTOK_TITLE, WTOK_EMPTY_DOWN);
+        // Hide all widgets except the message widget
+        for (unsigned int i = 0; i < m_max_entries; i++)
+        {
+            widget_manager->showWgt(WTOK_NAME0+i);
+            widget_manager->showWgt(WTOK_RACER0+i);
+        }
+        first=false;
+        updateScrollPosition();
+        return;
+    }
+
     m_clock += dt * 40.0f;
 
     if( widget_manager->selectionChanged() )
@@ -362,6 +405,8 @@ void CharSel::select()
         // Add selected kart (token) to selected karts vector so it cannot be
         // selected again
         kart_properties_manager->testAndSetKart(kart_id);
+        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+            network_manager->sendCharacterSelected(m_player_index);
     }
 
     if (race_manager->getNumLocalPlayers() > 1)
@@ -391,13 +436,19 @@ void CharSel::select()
         }
     }
 
+    // Last character selected"
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        network_manager->sendKartsInformationToServer();
+        // Switch state to wait for race information
+        network_manager->waitForRaceInformation();
         menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
     }
     else
     {
+        // The state of the server does not change now (so that it can keep
+        // on handling client selections). Waiting for all client infos
+        // happens in the start_race_feedback menu (which then triggers
+        // sending the race info).
         if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
             menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
         else
