@@ -48,7 +48,6 @@ void PlayerKart::reset()
     m_steer_val_l = 0;
     m_steer_val_r = 0;
     m_steer_val = 0;
-    m_accel_val = 0;
     m_controls.accel = 0.0;
     m_controls.brake =false;
     m_controls.fire = false;
@@ -82,11 +81,11 @@ void PlayerKart::action(KartAction action, int value)
 
         break;
     case KA_ACCEL:
-        m_accel_val = value;
+        m_controls.accel = value/32768.0f;
         break;
     case KA_BRAKE:
         if (value)
-            m_accel_val = 0;
+            m_controls.accel = 0;
         m_controls.brake = (value!=0);  // This syntax avoid visual c++ warning (when brake=value)
         break;
     case KA_WHEELIE:
@@ -149,8 +148,6 @@ void PlayerKart::steer(float dt, int steer_val)
 void PlayerKart::update(float dt)
 {
     steer(dt, m_steer_val);
-
-    m_controls.accel = m_accel_val / 32768.0f;
 
     if(world->isStartPhase())
     {

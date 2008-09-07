@@ -33,7 +33,7 @@ class Camera;
 class PlayerKart : public Kart
 {
 private:
-    int m_steer_val, m_steer_val_l, m_steer_val_r, m_accel_val;
+    int m_steer_val, m_steer_val_l, m_steer_val_r;
 
     Player *m_player;
     float   m_penalty_time;

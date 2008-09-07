@@ -44,7 +44,8 @@ RaceManager::RaceManager()
     m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
     setTrack("race");
-    setLocalPlayerKart(0, "tuxkart");
+    setNumLocalPlayers(1);
+    setLocalKartInfo(0, "tuxkart");
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -60,38 +61,31 @@ void RaceManager::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
-void RaceManager::setLocalPlayerKart(unsigned int player, const std::string& kart)
+void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki)
 {
-
-    if (player >= 0 && player < 4)
-    {
-        if (player >= getNumLocalPlayers())
-            setNumLocalPlayers(player+1);
-        m_local_player_karts[player].setPlayerId(player);
-        m_local_player_karts[player].setKartName(kart);
-        m_local_player_karts[player].setClientId(network_manager->getClientId());
-    }
-    else
-    {
-        fprintf(stderr, "Warning: player '%d' does not exists.\n", player);
-    }
-}   // setLocalPlayerKart
-//-----------------------------------------------------------------------------
-void RaceManager::setPlayerKart(unsigned int player, const std::string& kart,
-                                const std::string& player_name, int host_id)
-{
-    if (player >= getNumPlayers())
-        setNumPlayers(player+1);
-    m_player_karts[player]  = kart;
+    m_player_karts[player_id] = ki;
 }   // setPlayerKart
+
+// ----------------------------------------------------------------------------
+void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& kart)
+{
+    assert(0<=player_id && player_id <m_local_kart_info.size());
+
+    m_local_kart_info[player_id]=RemoteKartInfo(player_id, kart,
+                                                user_config->m_player[player_id].getName(),
+                                                network_manager->getMyHostId());
+}   // setLocalKartInfo
+
+//-----------------------------------------------------------------------------
+void RaceManager::setNumLocalPlayers(unsigned int n)
+{
+    m_local_kart_info.resize(n);
+}   // setNumLocalPlayers
 
 //-----------------------------------------------------------------------------
 void RaceManager::setNumPlayers(int num)
 {
     m_player_karts.resize(num);
-    for(PlayerKarts::iterator i = m_player_karts.begin(); i != m_player_karts.end(); ++i)
-        if (i->empty()) *i = "tuxkart";
-
 }   // setNumPlayers
 
 //-----------------------------------------------------------------------------
@@ -170,7 +164,6 @@ void RaceManager::startNew()
 //-----------------------------------------------------------------------------
 void RaceManager::startNextRace()
 {
-
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
 

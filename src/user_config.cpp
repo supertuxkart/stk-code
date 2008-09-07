@@ -1025,7 +1025,7 @@ ActionMap *UserConfig::newIngameActionMap()
 
     GameAction gaEnd = GA_NULL;
 
-    switch (race_manager->getNumPlayers())
+        switch (race_manager->getNumLocalPlayers())
     {
     case 1:
         gaEnd = GA_P1_LOOK_BACK; break;

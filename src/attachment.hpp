@@ -21,6 +21,8 @@
 #define HEADER_ATTACHMENT_H
 
 #include "stk_config.hpp"
+#include "utils/random_generator.hpp"
+
 class Kart;
 
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
@@ -42,6 +44,7 @@ private:
     ssgSelector    *m_holder;          // where the attachment is put on the kart
     Kart           *m_previous_owner;  // used by bombs so that it's not passed
                                        // back to previous owner
+    RandomGenerator m_random;
 public:
     Attachment(Kart* _kart);
     ~Attachment();

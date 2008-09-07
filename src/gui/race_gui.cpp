@@ -157,7 +157,7 @@ RaceGUI::handle(GameAction ga, int value)
 		int playerNo = ka / KC_COUNT;
 		ka = ka % KC_COUNT;
 		
-		world->getPlayerKart(playerNo)->action((KartAction) ka, value);
+		world->getLocalPlayerKart(playerNo)->action((KartAction) ka, value);
 		
 		return;
 	}
@@ -170,7 +170,7 @@ RaceGUI::handle(GameAction ga, int value)
 		case GA_DEBUG_ADD_BOWLING:
 			if (race_manager->getNumPlayers() ==1 )
 			{
-				Kart* kart = world->getPlayerKart(0);
+				Kart* kart = world->getLocalPlayerKart(0);
 				kart->setCollectable(COLLECT_BOWLING, 10000);
 			}
 			break;
@@ -787,7 +787,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
 {
     // Don't display laps in follow the leader mode
     if(!race_manager->raceHasLaps()) return;
-
+    if(kart->getLap()<0) return;  // don't display 'lap 0/...'
     float maxRatio = std::max(ratio_x, ratio_y);
     char str[256];
     offset_x += (int)(120*ratio_x);

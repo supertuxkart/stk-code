@@ -24,6 +24,8 @@
 #include "race_info_message.hpp"
 #include "race_start_message.hpp"
 #include "world_loaded_message.hpp"
+#include "kart_update_message.hpp"
+#include "kart_control_message.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
@@ -206,7 +208,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
     case NS_CHARACTER_SELECT:
         {
             CharacterSelectedMessage m(event->packet);
-            int hostid=(int)(long)event->peer->data;
+            unsigned int hostid=(unsigned int)(long)event->peer->data;
             assert(hostid>=1 && hostid<=m_num_clients);
             if(m_num_local_players[hostid]==-1)  // first package from that host
             {
@@ -222,7 +224,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             // one message from each client, and the size of the kart_info
             // array is the same as the number of all players (which does not
             // yet include the number of players on the host).
-            if(m_barrier_count == m_num_clients &&
+            if(m_barrier_count == (int)m_num_clients &&
 	       m_num_all_players==(int)m_kart_info.size())
             {
                 // we can't send the race info yet, since the server might
@@ -234,7 +236,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
     case NS_READY_SET_GO_BARRIER:
         {
             m_barrier_count ++;
-            if(m_barrier_count==m_num_clients)
+            if(m_barrier_count==(int)m_num_clients)
             {
                 m_state = NS_RACING;
                 RaceStartMessage m;
@@ -273,7 +275,17 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             m_state = NS_RACING;
             break;
         }
-    default: assert(0);   // should not happen
+    case NS_RACING:
+        {
+            KartUpdateMessage k(event->packet);
+            break;
+        }
+    default: 
+        {
+            printf("received unknown message: type %d\n",
+                Message::peekType(event->packet));
+         //   assert(0);   // should not happen
+        }
     }   // switch m_state
 }   // handleMessageAtClient
 
@@ -281,6 +293,10 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
 void NetworkManager::update(float dt)
 {
     if(m_mode==NW_NONE) return;
+    // Messages during racing are handled in the sendUpdates/receiveUpdate
+    // calls, so don't do anything in this case.
+    if(m_state==NS_RACING) return;
+
     ENetEvent event;
     int result = enet_host_service (m_host, &event, 0);
     if(result==0) return;
@@ -311,9 +327,9 @@ void NetworkManager::broadcastToClients(Message &m)
 }   // broadcastToClients
 
 // ----------------------------------------------------------------------------
-void NetworkManager::sendToServer(Message* m)
+void NetworkManager::sendToServer(Message &m)
 {
-    enet_peer_send(m_server, 0, m->getPacket());
+    enet_peer_send(m_server, 0, m.getPacket());
     enet_host_flush(m_host); 
 }   // sendToServer
 
@@ -330,8 +346,12 @@ void NetworkManager::switchToCharacterSelection()
     else if(m_mode==NW_SERVER)
     {   // server: create message with all valid characters
         // ================================================
-        CharacterInfoMessage m;
-        broadcastToClients(m);
+        for(unsigned int i=1; i<=m_num_clients; i++)
+        {
+            CharacterInfoMessage m(i);
+            enet_peer_send(m_clients[i], 0, m.getPacket());
+        }
+        enet_host_flush(m_host); 
 
         // Prepare the data structures to receive and 
         // store information from all clients.
@@ -340,6 +360,7 @@ void NetworkManager::switchToCharacterSelection()
         // be able to use the hostid as index, we have to allocate one 
         // additional element.
         m_num_local_players.resize(m_num_clients+1, -1);
+        m_num_local_players[0] = race_manager->getNumLocalPlayers();
         m_kart_info.clear();
         m_num_all_players = 0;
         // use barrier count to see if we had at least one message from each host
@@ -353,7 +374,7 @@ void NetworkManager::switchToCharacterSelection()
 void NetworkManager::sendCharacterSelected(int player_id)
 {
     CharacterSelectedMessage m(player_id);
-    sendToServer(&m);
+    sendToServer(m);
 }   // sendCharacterSelected
 
 // ----------------------------------------------------------------------------
@@ -368,7 +389,7 @@ void NetworkManager::worldLoaded()
     if(m_mode==NW_CLIENT)
     {
         WorldLoadedMessage m;
-        sendToServer(&m);
+        sendToServer(m);
         m_state = NS_READY_SET_GO_BARRIER;
     }
 }   // worldLoaded
@@ -386,16 +407,21 @@ void NetworkManager::setupPlayerKartInfo()
     // Now sort by (hostid, playerid)
     std::sort(m_kart_info.begin(), m_kart_info.end());
 
-    // Set the global player ID for each player
-    for(unsigned int i=0; i<m_kart_info.size(); i++)
-        m_kart_info[i].setGlobalPlayerId(i);
-
     // Set the player kart information
     race_manager->setNumPlayers(m_kart_info.size());
+
+    // Set the global player ID for each player
     for(unsigned int i=0; i<m_kart_info.size(); i++)
     {
+        m_kart_info[i].setGlobalPlayerId(i);
         race_manager->setPlayerKart(i, m_kart_info[i]);
     }
+    // Compute the id of the first kart from each host
+    m_kart_id_offset.resize(m_num_clients+1);
+    m_kart_id_offset[0]=0;
+    for(unsigned int i=1; i<=m_num_clients; i++)
+        m_kart_id_offset[i]=m_kart_id_offset[i-1]+m_num_local_players[i-1];
+
     race_manager->computeRandomKartList();
 }   // setupPlayerKartInfo
 
@@ -406,6 +432,7 @@ void NetworkManager::sendRaceInformationToClients()
 {
     if(m_mode==NW_SERVER)
     {
+        setupPlayerKartInfo();
         RaceInfoMessage m(m_kart_info);
         broadcastToClients(m);
     }
@@ -418,6 +445,96 @@ void NetworkManager::sendRaceInformationToClients()
 void NetworkManager::sendConnectMessage()
 {
     ConnectMessage msg;
-    sendToServer(&msg);
+    sendToServer(msg);
 }   // sendConnectMessage
+// ----------------------------------------------------------------------------
+/*** Send all kart controls and kart positions to all clients
+*/
+void NetworkManager::sendUpdates()
+{
+    if(m_mode==NW_SERVER)
+    {
+        KartUpdateMessage m;
+        broadcastToClients(m);
+    }
+    else
+    {
+        KartControlMessage m;
+        sendToServer(m);
+    }
+}   // sendUpdates
+
+// ----------------------------------------------------------------------------
+void NetworkManager::receiveUpdates()
+{
+    // The server receives m_num_clients messages, each client one message
+    int num_messages = m_mode==NW_SERVER ? m_num_clients : 1;
+    ENetEvent event;
+    bool correct=true;
+
+    for(int i=0; i<num_messages; i++)
+    {
+        int result = enet_host_service (m_host, &event, 0);
+        if(result<0)
+        {
+            fprintf(stderr, m_mode==NW_SERVER 
+                            ? "Error while waiting for client control - chaos will reign.\n"
+                            : "Error while waiting for server update - chaos will reign.\n");
+            correct=false;
+            continue;
+        }
+        // if no message, busy wait
+        if(result==0 || event.type==ENET_EVENT_TYPE_NONE)
+        {
+            i--;
+            continue;
+        }
+        if(event.type!=ENET_EVENT_TYPE_RECEIVE)
+        {
+            fprintf(stderr, "unexpected message, ignored.\n");
+            i--;
+            continue;
+        }
+        if(m_mode==NW_SERVER)
+        {
+            int host_id = getHostId(event.peer);
+            KartControlMessage(event.packet, host_id, m_num_local_players[host_id]);
+        }
+        else
+        {
+            KartUpdateMessage(event.packet);
+        }
+    }   // for i<num_messages
+    if(!correct)
+        fprintf(stderr, "Missing messages need to be handled!\n");
+
+}   // receiveUpdates
+
+// ----------------------------------------------------------------------------
+void NetworkManager::waitForClientData()
+{
+    ENetEvent event;
+    bool correct=true;
+    for(unsigned int i=1; i<=m_num_clients; i++)
+    {
+        int result = enet_host_service (m_host, &event, 100);
+        if(result<=0)
+        {
+            fprintf(stderr, "Error while waiting for client control - chaos will reign.\n");
+            correct=false;
+            continue;
+        }
+        if(event.type!=ENET_EVENT_TYPE_RECEIVE)
+        {
+            fprintf(stderr, "received no message - chaos will reign.\n");
+            correct=false;
+            continue;
+        }
+        int host_id = getHostId(event.peer);
+        KartControlMessage(event.packet, host_id, m_num_local_players[host_id]);
+    }
+    if(!correct)
+        fprintf(stderr, "Missing messages need to be handled!\n");
+
+}   // waitForClientData
 // ----------------------------------------------------------------------------

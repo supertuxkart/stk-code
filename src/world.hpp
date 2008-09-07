@@ -28,6 +28,9 @@
 #include "physics.hpp"
 #include "kart.hpp"
 #include "highscores.hpp"
+#include "network/network_kart.hpp"
+#include "utils/random_generator.hpp"
+
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_recorder.hpp"
    class ReplayPlayer;
@@ -80,7 +83,9 @@ public:
     void        disableRace(); // Put race into limbo phase
 
     PlayerKart *getPlayerKart(int player) const { return m_player_karts[player];   }
+    unsigned int getCurrentNumLocalPlayers() const {return m_local_player_karts.size();}
     PlayerKart *getLocalPlayerKart(int n) const { return m_local_player_karts[n];  }
+    NetworkKart*getNetworkKart(int n) const   {return m_network_karts[n];          }
     Kart       *getKart(int kartId) const     { assert(kartId >= 0 &&
                                                       kartId < int(m_kart.size()));
                                                 return m_kart[kartId];             }
@@ -103,9 +108,12 @@ public:
     void  unpause();
 
 private:
-    Karts       m_kart;
     std::vector<PlayerKart*>  m_player_karts;
     std::vector<PlayerKart*>  m_local_player_karts;
+    std::vector<NetworkKart*> m_network_karts; 
+    RandomGenerator           m_random;
+
+    Karts       m_kart;
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;

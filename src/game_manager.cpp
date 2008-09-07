@@ -105,16 +105,24 @@ void GameManager::run()
         }
 
         network_manager->update(dt);
+
         if (race_manager->raceIsActive())
         {
             // Busy wait if race_manager is active (i.e. creating of world is done)
             // till all clients have reached this state.
             if(network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
+
+            // Server: Send the current position and previous controls to all clients
+            // Client: send current controls to server
+            network_manager->sendUpdates();
             music_on = false; 
             if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
             scene->draw(world->getPhase()==World::SETUP_PHASE ? 0.0f : dt);
+
+            network_manager->receiveUpdates();
+
             if ( world->getPhase() != World::LIMBO_PHASE)
             {
                 world->update(dt);

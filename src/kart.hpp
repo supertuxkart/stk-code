@@ -26,23 +26,10 @@
 
 #include "moveable.hpp"
 #include "kart_properties.hpp"
+#include "kart_control.hpp"
 #include "attachment.hpp"
 #include "collectable.hpp"
 #include "terrain_info.hpp"
-
-struct KartControl
-{
-    float lr;
-    float accel;
-    bool  brake;
-    bool  wheelie;
-    bool  jump;
-    bool  rescue;
-    bool  fire;
-
-    KartControl() : lr(0.0f), accel(0.0f), brake(false),
-    wheelie(false), jump(false),  rescue(false), fire(false){}
-};
 
 class SkidMark;
 class Herring;
@@ -189,6 +176,8 @@ public:
     float          getWheelieSpeedBoost() const
         {return m_kart_properties->getWheelieSpeedBoost();                     }
     float          getSteerPercent  () const {return m_controls.lr;            }
+    const KartControl&
+                   getControls      () const {return m_controls;               }
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
     float          getTimeAtLap     () const {return m_time_at_last_lap;       }

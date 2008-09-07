@@ -23,11 +23,14 @@
 #define MAX_COLLECTABLES 5
 
 #include "collectable_manager.hpp"
+#include "utils/random_generator.hpp"
 
 class Kart;
 
 class Collectable
 {
+private:
+    RandomGenerator            m_random;
 protected:
     Kart*                      m_owner;
     CollectableType            m_type;

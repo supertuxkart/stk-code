@@ -51,11 +51,12 @@ private:
 
     NetworkMode                 m_mode;
     NetworkState                m_state;
-    int                         m_num_clients;
+    unsigned int                m_num_clients;
     std::vector<RemoteKartInfo> m_kart_info;
     int                         m_host_id;
     std::vector<std::string>    m_client_names;
     std::vector<int>            m_num_local_players;
+    std::vector<int>            m_kart_id_offset;    // kart id of first kart on host i
     int                         m_num_all_players;
     int                         m_barrier_count;
 
@@ -75,9 +76,8 @@ private:
     // about lost precision, then cast long to int to get the right type
     unsigned int getHostId(ENetPeer *p) const {return (int)(long)p->data; }
 
-    void         sendToServer(Message *m);
+    void         sendToServer(Message &m);
     void         broadcastToClients(Message &m);
-    void         sendToClient(int id, const Message *m);
 public:
                  NetworkManager();
                 ~NetworkManager();
@@ -85,12 +85,11 @@ public:
     NetworkMode  getMode() const                   {return m_mode;          }
     void         setState(NetworkState s)          {m_state = s;            }
     NetworkState getState() const                  {return m_state;         }
-    int          getHostId() const                 {return m_host_id;       }
+    int          getMyHostId() const               {return m_host_id;       }
+    void         setHostId(int host_id)            {m_host_id = host_id;    }
     unsigned int getNumClients() const             {return m_num_clients;   }
     const std::string& 
                  getClientName(int i) const        {return m_client_names[i];}
-    void         setKartInfo(int player_id, const std::string& kart, 
-                             const std::string& user="", int hostid=-1);
     bool         initialiseConnections();
     void         update(float dt);
 
@@ -100,13 +99,11 @@ public:
     void         sendCharacterSelected(int player_id);
     void         waitForRaceInformation();
     void         worldLoaded();
-
-// which one is actually necessary:
     void         setupPlayerKartInfo();
     void         sendRaceInformationToClients();
-
-    void         switchToRaceDataSynchronisation();
-    void         switchToReadySetGoBarrier();
+    void         sendUpdates();
+    void         receiveUpdates();
+    void         waitForClientData();
 };
 
 extern NetworkManager *network_manager;

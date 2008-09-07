@@ -32,12 +32,15 @@ supertuxkart_SOURCES =             main.cpp  			\
 	material.cpp		   material.hpp           	\
 	network/network_manager.cpp     network/network_manager.hpp 		\
 	network/network_kart.cpp        network/network_kart.hpp		\
+        network/message.cpp             network/message.hpp			\
 	network/race_info_message.hpp   network/race_info_message.cpp		\
 	network/remote_kart_info.hpp    network/character_selected_message.hpp	\
 	network/race_start_message.hpp  network/connect_message.hpp		\
 	network.num_players_message.hpp network/world_loaded_message.hpp	\
         network/connect_message.hpp     network/character_info_message.hpp	\
-        network/message.cpp             network/message.hpp			\
+	network/kart_update_message.hpp network/kart_update_message.cpp		\
+	network/kart_control_message.hpp network/kart_control_message.cpp	\
+	utils/random_genertaor.hpp	utils/random_generator.cpp		\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \
@@ -49,7 +52,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	music_information.cpp  	   music_information.hpp       	\
 	sfx_openal.cpp             sfx_openal.hpp              	\
 	smoke.cpp		   smoke.hpp			\
-	input.hpp 		   				\
+	input.hpp 		   kart_control.hpp		\
 	isect.cpp		   isect.hpp                	\
 	track.cpp		   track.hpp                	\
 	herring.cpp 		   herring.hpp              	\

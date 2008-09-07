@@ -153,7 +153,7 @@ void Collectable::hitRedHerring(int n)
     {
         const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
                                          (float)m_owner->getPosition()));
-        const int RAND_NUM = rand()%100;
+        const int RAND_NUM = m_random.get(100);
         if(RAND_NUM <= SPECIAL_PROB)
         {
             //If the driver in the first position has finished, give the driver
@@ -170,7 +170,7 @@ void Collectable::hitRedHerring(int n)
                 }
             }
 
-            m_type = rand()%(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
+            m_type = m_random.get(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
             m_number = 1;
             return;
         }
@@ -182,7 +182,7 @@ void Collectable::hitRedHerring(int n)
     CollectableType newC;
     if(!user_config->m_profile)
     {
-        newC = (CollectableType)(rand()%(COLLECT_MAX - 1 - 2) + 1);
+        newC = (CollectableType)(m_random.get(COLLECT_MAX - 1 - 2) + 1);
     }
     else
       {   // for now: no collectables when profiling

@@ -72,7 +72,7 @@ void Attachment::hitGreenHerring()
     case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getXYZ());
                        m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
                        clear();
-                       random_attachment = rand()%3;
+                       random_attachment = m_random.get(3);
                        break;
     case ATTACH_ANVIL :// if the kart already has an anvil, attach a new anvil, 
                        // and increase the overall time 
@@ -83,7 +83,7 @@ void Attachment::hitGreenHerring()
                        random_attachment = 2;  // anvil
                        leftover_time     = m_time_left;
                        break;
-    default:           random_attachment = rand()%3;
+    default:           random_attachment = m_random.get(3);
     }   // switch
 
     switch (random_attachment)
@@ -104,7 +104,7 @@ void Attachment::hitGreenHerring()
         // handled in Kart::updatePhysics
         m_kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor);
         break ;
-    }   // switch rand()%3
+    }   // switch 
 }   // hitGreenHerring
 
 //-----------------------------------------------------------------------------

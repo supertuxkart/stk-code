@@ -517,7 +517,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;HAS_GETTEXT;HAVE_ENET"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT;HAVE_ENET"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -539,7 +539,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib  enet.lib ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib enet.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
@@ -803,10 +803,6 @@
 				RelativePath="../../../src\music_ogg.cpp"
 				>
 			</File>
-                        <File
-                              RelativePath="..\..\network_manager.cpp"
-                                >
-                        </File>
 			<File
 				RelativePath="../../../src\particle_system.cpp"
 				>
@@ -1086,8 +1082,44 @@
 					RelativePath="..\..\challenges\challenge_data.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="network"
+				>
+				<File
+					RelativePath="..\..\network\kart_control_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_packet.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_update_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_kart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_manager.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\network\race_info_message.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\utils\random_generator.cpp"
 					>
 				</File>
 			</Filter>
@@ -1214,6 +1246,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\kart_control.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\kart_properties.hpp"
 				>
 			</File>
@@ -1262,10 +1298,6 @@
 				>
 			</File>
 			<File
-                              RelativePath="..\..\network_manager.hpp"
-                                >
-                        </File>
-                        <File
 				RelativePath="../../../src\no_copy.hpp"
 				>
 			</File>
@@ -1566,6 +1598,70 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\challenge_data.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="network"
+				>
+				<File
+					RelativePath="..\..\network\character_info_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\character_selected_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\connect_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_control_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_packet.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_update_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_kart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_info_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_start_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\remote_kart_info.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\world_loaded_message.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\utils\random_generator.hpp"
 					>
 				</File>
 			</Filter>

@@ -1,4 +1,4 @@
-//  $Id: character_info_message.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
+//  $Id:kart_update_message.hpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -17,25 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHARACTER_INFO_MESSAGE_H
-#define HEADER_CHARACTER_INFO_MESSAGE_H
+#ifndef HEADER_KART_UPDATE_MESSAGE_H
+#define HEADER_KART_UPDATE_MESSAGE_H
 
 #include "network/message.hpp"
 
-class CharacterInfoMessage : public Message
+class KartUpdateMessage : public Message
 {
-// Add the remote host id to this message (to avoid sending this separately)
 public:
-    CharacterInfoMessage(int hostid)     :Message(Message::MT_CHARACTER_INFO) 
-    {
-        allocate(getLength(hostid));
-        add(hostid);
-    }
-    // ------------------------------------------------------------------------
-    CharacterInfoMessage(ENetPacket* pkt):Message(pkt, MT_CHARACTER_INFO)
-    {
-        int hostid=getInt();
-        network_manager->setHostId(hostid);
-    }
-};   // CharacterInfoMessage
+    KartUpdateMessage();
+    KartUpdateMessage(ENetPacket* pkt);
+};   // KartUpdateMessage
 #endif

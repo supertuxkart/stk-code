@@ -45,7 +45,6 @@
 #include "camera.hpp"
 #include "robots/default_robot.hpp"
 #include "unlock_manager.hpp"
-#include "network/network_kart.hpp"
 #include "network/network_manager.hpp"
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
@@ -98,6 +97,7 @@ World::World()
     loadTrack() ;
 
     m_player_karts.resize(race_manager->getNumPlayers());
+    m_network_karts.resize(race_manager->getNumPlayers());
     m_local_player_karts.resize(race_manager->getNumLocalPlayers());
 
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
@@ -141,6 +141,7 @@ World::World()
                     newkart = new NetworkKart(kart_name, position, init_pos,
                                               global_player_id);
                 }
+                m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
                 break;
             case RaceManager::KT_AI:
                 newkart = loadRobot(kart_name, position, init_pos);
@@ -347,10 +348,6 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
-#ifdef DEBUG
-    // FIXME begin: for debugging only: had a bug here once, couldn't reproduce it:
-    for(unsigned int i=0; i<m_kart.size(); i++) index[i]=-1;
-#endif
     for (unsigned int i=0; i<m_kart.size(); i++ )
     {
         index[m_kart[i]->getPosition()-1] = i;
@@ -817,9 +814,7 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
     
     const int NUM_ROBOTS = 1;
 
-    srand((unsigned)std::time(0));
-
-    switch(rand() % NUM_ROBOTS)
+    switch(m_random.get(NUM_ROBOTS))
     {
         case 0:
             currentRobot = new DefaultRobot(kart_name, position, init_pos);
