@@ -25,9 +25,7 @@
 #include <assert.h>
 #include "btBulletDynamicsCommon.h"
 
-#ifdef HAVE_ENET
-#  include "enet/enet.h"
-#endif
+#include "enet/enet.h"
 
 #include "vec3.hpp"
 

@@ -107,12 +107,10 @@ void cmdLineHelp (char* invocation)
     // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
     // "                       if n<0 --> (-n) = number of laps to drive
     // "  --history            Replay history file 'history.dat'\n"
-#ifdef HAVE_ENET
     "  --server[=port]         This is the server (running on the specified port)\n"
     "  --client=ip             This is a client, connect to the specified ip address\n"
     "  --port=n                Port number to use\n"
     "  --numclients=n          Number of clients to wait for (server only)\n"
-#endif
     "  --log=terminal          Write messages to screen\n"
     "  --log=file              Write messages/warning to log files stdout.log/stderr.log\n"
     "  -h,  --help             Show this help\n"
@@ -159,26 +157,24 @@ int handleCmdLine(int argc, char **argv)
         {
             user_config->m_print_kart_sizes=true;
         }
-#ifdef HAVE_ENET
         else if(sscanf(argv[i], "--server=%d",&n)==1)
-	{
-	     network_manager->setMode(NetworkManager::NW_SERVER);
-	     user_config->m_server_port = n;
-	}
+        {
+            network_manager->setMode(NetworkManager::NW_SERVER);
+            user_config->m_server_port = n;
+        }
         else if( !strcmp(argv[i], "--server") )
-	{
-	     network_manager->setMode(NetworkManager::NW_SERVER);
-	}
+        {
+            network_manager->setMode(NetworkManager::NW_SERVER);
+        }
         else if( sscanf(argv[i], "--port=%d", &n) )
-	{
-        user_config->m_server_port=n;
-	}
+        {
+            user_config->m_server_port=n;
+        }
         else if( sscanf(argv[i], "--client=%s", s) )
-	{
-	     network_manager->setMode(NetworkManager::NW_CLIENT);
-	     user_config->m_server_address=s;
-	}
-#endif
+        {
+            network_manager->setMode(NetworkManager::NW_CLIENT);
+            user_config->m_server_address=s;
+        }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");

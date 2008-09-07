@@ -23,11 +23,10 @@
 #include <string>
 #include <vector>
 
+#include "enet/enet.h"
+
 #include "network/remote_kart_info.hpp"
 
-#ifdef HAVE_ENET
-#  include "enet/enet.h"
-#endif
 
 class Message;
 
@@ -60,11 +59,9 @@ private:
     int                         m_num_all_players;
     int                         m_barrier_count;
 
-#ifdef HAVE_ENET
     ENetHost                   *m_host;    // me
     ENetPeer                   *m_server;  // (clients only)
     std::vector<ENetPeer*>      m_clients; // (server only) pos in vector is client host_id 
-#endif
 
     bool         initServer();
     bool         initClient();

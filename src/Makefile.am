@@ -153,7 +153,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L. -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-	-lplibul -lplibssgaux $(bullet_LIBS) $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS)
+	-lplibul -lplibssgaux $(bullet_LIBS) $(enet_LIBS) $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS)
 
 .PHONY: pot
 pot:

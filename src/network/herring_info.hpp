@@ -64,3 +64,4 @@ public:
 };   // HerringInfo
 
 #endif
+

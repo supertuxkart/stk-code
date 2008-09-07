@@ -318,22 +318,6 @@ if test x$have_svnversion != xno; then
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
-dnl ================
-dnl Try to find enet
-dnl ================
-AC_SEARCH_LIBS(enet_initialize, [ enet ], have_enet_lib=yes)
-if test x$have_enet_lib = xyes; then
-   AC_DEFINE([HAVE_ENET], 1, [Defined when enet is available])
-fi
-
-# =========================
-# subst bars in Makefile.am
-# =========================
-AC_SUBST(bullet_LIBS)
-AC_SUBST(opengl_LIBS)
-AC_SUBST(openal_LIBS)
-AC_SUBST(sdl_LIBS)
-
 AC_MSG_CHECKING([for gcc -fno-regmove option ])
 
 dnl =========================
@@ -366,7 +350,42 @@ case "${host}" in
     ;;
 esac
 
+dnl ====
+dnl enet
+dnl ====
+AC_CHECK_FUNC(gethostbyaddr_r, [AC_DEFINE(HAS_GETHOSTBYADDR_R)])
+AC_CHECK_FUNC(gethostbyname_r, [AC_DEFINE(HAS_GETHOSTBYNAME_R)])
+AC_CHECK_FUNC(poll, [AC_DEFINE(HAS_POLL)])
+AC_CHECK_FUNC(fcntl, [AC_DEFINE(HAS_FCNTL)])
+AC_CHECK_FUNC(inet_pton, [AC_DEFINE(HAS_INET_PTON)])
+AC_CHECK_FUNC(inet_ntop, [AC_DEFINE(HAS_INET_NTOP)])
+
+AC_CHECK_MEMBER(struct msghdr.msg_flags, [AC_DEFINE(HAS_MSGHDR_FLAGS)], , [#include <sys/socket.h>])
+
+AC_CHECK_TYPE(socklen_t, [AC_DEFINE(HAS_SOCKLEN_T)], , 
+              #include <sys/types.h>
+              #include <sys/socket.h>
+)
+
+AC_EGREP_HEADER(MSG_MAXIOVLEN, /usr/include/sys/socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
+AC_EGREP_HEADER(MSG_MAXIOVLEN, socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
+
+CXXFLAGS="$CXXFLAGS -Ienet/include"
+enet_LIBS="-Lenet -lenet"
+SUMMARY="$SUMMARY\nUsing enet network support	."
+ENETTREE="src/enet"
+
+
+# =========================
+# subst bars in Makefile.am
+# =========================
+AC_SUBST(bullet_LIBS)
+AC_SUBST(enet_LIBS)
+AC_SUBST(opengl_LIBS)
+AC_SUBST(openal_LIBS)
+AC_SUBST(sdl_LIBS)
 AC_SUBST(BULLETTREE)
+AC_SUBST(ENETTREE)
 
 dnl ================
 dnl Create makefiles
@@ -390,6 +409,9 @@ AC_CONFIG_FILES([                   \
  src/bullet/Makefile                \
  src/bullet/src/Makefile            \
  src/bullet/Demos/OpenGL/Makefile   \
+ src/enet/Makefile                  \
+ src/enet/include/Makefile          \
+ src/enet/include/enet/Makefile
 ])
 AC_OUTPUT
 echo -e $SUMMARY

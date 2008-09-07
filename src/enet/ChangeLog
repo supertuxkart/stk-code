@@ -1,0 +1,36 @@
+ENet 1.2 (February 12, 2008):
+
+* fixed bug in VERIFY_CONNECT acknowledgement that could cause connect
+attempts to occasionally timeout
+* fixed acknowledgements to check both the outgoing and sent queues
+when removing acknowledged packets
+* fixed accidental bit rot in the MSVC project file
+* revised sequence number overflow handling to address some possible
+disconnect bugs
+* added enet_host_check_events() for getting only local queued events
+* factored out socket option setting into enet_socket_set_option() so
+that socket options are now set separately from enet_socket_create()
+
+Caveats: While this release is superficially protocol compatible with 1.1,
+differences in the sequence number overflow handling can potentially cause
+random disconnects.
+
+ENet 1.1 (June 6, 2007):
+
+* optional CRC32 just in case someone needs a stronger checksum than UDP 
+provides (--enable-crc32 configure option)
+* the size of packet headers are half the size they used to be (so less 
+overhead when sending small packets)
+* enet_peer_disconnect_later() that waits till all queued outgoing 
+packets get sent before issuing an actual disconnect
+* freeCallback field in individual packets for notification of when a 
+packet is about to be freed
+* ENET_PACKET_FLAG_NO_ALLOCATE for supplying pre-allocated data to a 
+packet (can be used in concert with freeCallback to support some custom 
+allocation schemes that the normal memory allocation callbacks would 
+normally not allow)
+* enet_address_get_host_ip() for printing address numbers
+* promoted the enet_socket_*() functions to be part of the API now
+* a few stability/crash fixes
+
+

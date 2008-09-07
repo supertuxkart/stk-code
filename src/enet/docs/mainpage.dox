@@ -1,0 +1,64 @@
+/** @mainpage enet
+ <center>http://enet.bespin.org</center>
+ <hr>
+
+ENet's purpose is to provide a relatively thin, simple and robust
+network communication layer on top of UDP (User Datagram Protocol).
+The primary feature it provides is optional reliable, in-order
+delivery of packets.
+
+ENet is NOT intended to be a general purpose high level networking
+library that handles authentication, lobbying, server discovery,
+compression, encryption and other high level, often application level
+or dependent tasks.
+
+@ref Features
+
+@ref SourceDistro
+
+@ref Installation
+
+@ref Tutorial
+
+@ref MailingList
+
+@ref FAQ
+
+@ref License
+
+ */
+
+/**
+@page SourceDistro Source Distribution
+
+You can retrieve the source to ENet by downloading it in either .tar.gz form
+or accessing the cvs distribution directly.
+
+The most recent stable release (1.2) can be downloaded <a href="http://enet.bespin.org/download/enet-1.2.tar.gz">here</a>.
+
+To access ENet via anonymous CVS, you must use the CVSROOT
+:pserver:anonymous\@bespin.org:/var/lib/cvs/enet with an empty
+password.
+
+@code
+	$ cvs -z3 -d :pserver:anonymous@bespin.org:/var/lib/cvs/enet login
+@endcode
+	Hit the return key when prompted for a password.
+@code
+	$ cvs -z3 -d :pserver:anonymous@bespin.org:/var/lib/cvs/enet co -l .
+	$ cvs -z3 co enet
+@endcode
+
+This will create a CVS directory in the current directory, and with
+the second command will proceed to check the enet module out of CVS.
+Any problems with CVS access or request for write access should be
+sent via email to @ref MailingList.
+
+*/
+
+/**
+@page MailingList ENet Mailing List
+
+The <a href="http://lists.cubik.org/mailman/listinfo/enet-discuss">enet-discuss</a> list is for discussion of ENet, including bug reports or feature requests.
+
+*/

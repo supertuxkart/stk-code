@@ -43,13 +43,11 @@ NetworkManager::NetworkManager()
      m_num_clients    = 0;
      m_host_id        = 0;
 
-#ifdef HAVE_ENET
      if (enet_initialize () != 0)
      {
 	  fprintf (stderr, "An error occurred while initializing ENet.\n");
 	  exit(-1);
      }
-#endif
 }   // NetworkManager
 
 // -----------------------------------------------------------------------------
@@ -67,16 +65,13 @@ bool NetworkManager::initialiseConnections()
 // -----------------------------------------------------------------------------
 NetworkManager::~NetworkManager()
 {
-#ifdef HAVE_ENET
      if(m_mode==NW_SERVER || m_mode==NW_CLIENT) enet_host_destroy(m_host);
      enet_deinitialize(); 
-#endif
 }   // ~NetworkManager
 
 // -----------------------------------------------------------------------------
 bool NetworkManager::initServer()
 {
-#ifdef HAVE_ENET
      ENetAddress address;
      address.host = ENET_HOST_ANY;
      address.port = user_config->m_server_port;
@@ -99,13 +94,11 @@ bool NetworkManager::initServer()
 
     m_client_names.push_back("server");
     return true;
-#endif
 }   // initServer
 
 // -----------------------------------------------------------------------------
 bool NetworkManager::initClient()
 {
-#ifdef HAVE_ENET
     m_host = enet_host_create (NULL /* create a client host */,
                                1    /* only allow 1 outgoing connection */,
                                0    /* downstream bandwidth unlimited   */,
@@ -150,7 +143,6 @@ bool NetworkManager::initClient()
     }
     m_server = peer;
     return true;
-#endif
 }  // initClient
 
 // ----------------------------------------------------------------------------

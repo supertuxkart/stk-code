@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = @BULLETTREE@ src doc data
+SUBDIRS = @BULLETTREE@ @ENETTREE@ src doc data
 
 EXTRA_DIST = README README.cygwin README.macosx README.windows ChangeLog COPYING missing
 
