@@ -66,6 +66,7 @@
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "grand_prix_manager.hpp"
+#include "network_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "scene.hpp"
 
@@ -105,6 +106,12 @@ void cmdLineHelp (char* invocation)
     // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
     // "                       if n<0 --> (-n) = number of laps to drive
     // "  --history            Replay history file 'history.dat'\n"
+#ifdef HAVE_ENET
+    "  --server[=port]         This is the server (running on the specified port)\n"
+    "  --client=ip             This is a client, connect to the specified ip address\n"
+    "  --port=n                Port number to use\n"
+    "  --numclients=n          Number of clients to wait for (server only)\n"
+#endif
     "  --log=terminal          Write messages to screen\n"
     "  --log=file              Write messages/warning to log files stdout.log/stderr.log\n"
     "  -h,  --help             Show this help\n"
@@ -118,6 +125,7 @@ void cmdLineHelp (char* invocation)
 int handleCmdLine(int argc, char **argv)
 {
     int n;
+    char s[80];
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
@@ -150,6 +158,30 @@ int handleCmdLine(int argc, char **argv)
         {
             user_config->m_print_kart_sizes=true;
         }
+#ifdef HAVE_ENET
+        else if(sscanf(argv[i], "--server=%d",&n)==1)
+	{
+	     network_manager->setMode(NetworkManager::NW_SERVER);
+	     network_manager->setPort(n);
+	}
+        else if( !strcmp(argv[i], "--server") )
+	{
+	     network_manager->setMode(NetworkManager::NW_SERVER);
+	}
+        else if( sscanf(argv[i], "--port=%d", &n) )
+	{
+	     network_manager->setPort(n);
+	}
+        else if( sscanf(argv[i], "--client=%s", s) )
+	{
+	     network_manager->setMode(NetworkManager::NW_CLIENT);
+	     network_manager->setServerIP(s);
+	}
+        else if( sscanf(argv[i], "--numclients=%d", &n) )
+	{
+	     network_manager->setNumClients(n);
+	}
+#endif
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");
@@ -415,6 +447,7 @@ void InitTuxkart()
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
+    network_manager         = new NetworkManager       ();
     track_manager->loadTrackList();
     sound_manager->addMusicToTracks();
 
@@ -500,6 +533,13 @@ int main(int argc, char *argv[] )
             // So the next line is just to make this obvious here!
             exit(-3);
         }
+
+	if(!network_manager->initialiseConnections())
+	{
+	     fprintf(stderr, "Problems initialising network connections, aborting.\n");
+	     exit(-4);
+	}
+	exit(0);
         
         // Not replaying
         // =============

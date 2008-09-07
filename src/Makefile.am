@@ -30,6 +30,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	coord.hpp						\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
+	network_manager.cpp	   network_manager.hpp		\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \

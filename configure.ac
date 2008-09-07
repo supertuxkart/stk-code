@@ -318,6 +318,13 @@ if test x$have_svnversion != xno; then
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
+dnl ================
+dnl Try to find enet
+dnl ================
+AC_SEARCH_LIBS(enet_initialize, [ enet ], have_enet_lib=yes)
+if test x$have_enet_lib = xyes; then
+   AC_DEFINE([HAVE_ENET], 1, [Defined when enet is available])
+fi
 
 # =========================
 # subst bars in Makefile.am
