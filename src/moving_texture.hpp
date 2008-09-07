@@ -21,6 +21,7 @@
 #define MOVING_TEXTURE_H
 
 #include <string>
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include <plib/ssg.h>
 #include "callback.hpp"

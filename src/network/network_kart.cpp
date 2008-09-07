@@ -38,4 +38,3 @@ void NetworkKart::setControl(const KartControl& kc)
     m_controls = kc;
 }   // setControl
 
-// ----------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#define _WINSOCKAPI_
 #include <plib/ssgAux.h>
 #include "file_manager.hpp"
 #include "loader.hpp"

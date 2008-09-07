@@ -17,6 +17,7 @@
 #ifndef HEADER_VEC3_H
 #define HEADER_VEC3_H
 
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 
 #include "LinearMath/btVector3.h"

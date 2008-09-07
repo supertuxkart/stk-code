@@ -46,7 +46,7 @@ private:
     ssgSelector*     m_explosion_model;
     bool             m_something_was_hit;
     bool             m_explosion_ended;
-    void             updateClient();
+    void             updateClient(float dt);
     void             updateServer(float dt);
 public:
                      ProjectileManager() {m_something_was_hit=false;}

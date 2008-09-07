@@ -381,13 +381,8 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             break;
         }
     }
-
-    if( m_controls.fire )
-    {
-        m_collectable.use() ;
-    }
     return;
-}
+}   // handle_items
 
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_acceleration( const float DELTA )

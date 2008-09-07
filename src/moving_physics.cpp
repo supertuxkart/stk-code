@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "moving_physics.hpp"
 #include "string_utils.hpp"

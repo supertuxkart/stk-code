@@ -21,6 +21,7 @@
 #ifndef HEADER_KART_H
 #define HEADER_KART_H
 
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "btBulletDynamicsCommon.h"
 
@@ -192,7 +193,6 @@ public:
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
-    void           updateBulletPhysics(float dt);
     void           draw             ();
     bool           isInRest         () const;
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body

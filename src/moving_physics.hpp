@@ -20,6 +20,7 @@
 #ifndef HEADER_MOVING_PHYSICS_H
 #define HEADER_MOVING_PHYSICS_H
 #include <string>
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "btBulletDynamicsCommon.h"
 #include "callback.hpp"

@@ -24,16 +24,13 @@ KartControlMessage::KartControlMessage()
                   : Message(Message::MT_KART_CONTROL)
 {
     unsigned int num_local_players = world->getCurrentNumLocalPlayers();
-    unsigned int control_size      = KartControl::getCompressedSize();
-    assert(control_size<=9);
+    unsigned int control_size      = KartControl::getLength();
     allocate(control_size*num_local_players);
     for(unsigned int i=0; i<num_local_players; i++)
     {
         const Kart *kart            = world->getLocalPlayerKart(i);
         const KartControl& controls = kart->getControls();
-        char c[9];
-        controls.compress(c);
-        addCharArray(c, control_size);
+        controls.serialise(this);
     }
 }   // KartControlMessage
 // ----------------------------------------------------------------------------
@@ -43,13 +40,9 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
                                        int num_local_players)
                   : Message(pkt, MT_KART_CONTROL)
 {
-    assert(KartControl::getCompressedSize()<=9);
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
-        char c[9];
-        getCharArray(c, KartControl::getCompressedSize());
-        KartControl kc;
-        kc.uncompress(c);
+        KartControl kc(this);
         NetworkKart *kart=world->getNetworkKart(i);
         kart->setControl(kc);
     }

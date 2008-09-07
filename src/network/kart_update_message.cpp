@@ -24,21 +24,18 @@ KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)
 {
     unsigned int num_karts = world->getCurrentNumKarts();
-    KartControl c;
+
     // Send the number of karts and for each kart the compressed 
     // control structure (3 ints) and xyz,hpr (4 floats: quaternion:
     allocate(getCharLength()+
-             num_karts*(KartControl::getCompressedSize() + getVec3Length()
+             num_karts*(KartControl::getLength() + getVec3Length()
                          +getQuaternionLength()) );
     addChar(num_karts);
     for(unsigned int i=0; i<num_karts; i++)
     {
         const Kart* kart=world->getKart(i);
         const KartControl& kc=kart->getControls();
-        assert(KartControl::getCompressedSize()<=9);
-        char compressed[9];         // avoid the new/delete overhead
-        kc.compress(compressed);
-        addCharArray(compressed, KartControl::getCompressedSize());
+        kc.serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
     }   // for i
@@ -50,12 +47,8 @@ KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
     unsigned int num_karts = getInt();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        assert(KartControl::getCompressedSize()<=9);
-        char compressed[9];   // avoid new/delete overhead
-        getCharArray(compressed, KartControl::getCompressedSize());
-        KartControl kc;
-        kc.uncompress(compressed);
         // Currently not used
+        KartControl kc(this);
         Vec3 xyz = getVec3();
         btQuaternion q = getQuaternion();
         Kart *kart = world->getKart(i);

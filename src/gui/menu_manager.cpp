@@ -22,11 +22,7 @@
 //This is needed in various platforms, but not all
 # include <algorithm>
 
-#define _WINSOCKAPI_
-#include "network/network_manager.hpp"
-
 #include "menu_manager.hpp"
-
 #include "main_menu.hpp"
 #include "char_sel.hpp"
 #include "game_mode.hpp"
@@ -58,6 +54,7 @@
 #include "feature_unlocked.hpp"
 #include "start_race_feedback.hpp"
 #include "network_gui.hpp"
+#include "network/network_manager.hpp"
 
 using namespace std;
 

@@ -83,7 +83,6 @@ void Collectable::use()
     case COLLECT_MISSILE:
         if(m_owner->isPlayerKart())
             sound_manager->playSfx(SOUND_SHOT);
-
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
@@ -147,29 +146,19 @@ void Collectable::use()
 //-----------------------------------------------------------------------------
 void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
 {
-    // On the client this is called when update information is received
-    // from the server:
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        if(m_type==COLLECT_NOTHING)
-        {
-            m_type   = (CollectableType)add_info;
-            m_number = n;
-        }
-        else if((CollectableType)add_info==m_type)
-        {
-            m_number+=n;
-            if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
-        }
-        // Ignore new collectable if it is different from the current one
-        return;
-    }
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
-
     if(m_owner->getPosition() != 1 && m_type == COLLECT_NOTHING)
     {
+        // On client: just set the value
+        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        {
+            int dummy = m_random.get(100);    // keep random numbers in sync
+            m_type    = (CollectableType)add_info;
+            m_number  = 1;
+            return;
+        }
         const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
                                          (float)m_owner->getPosition()));
         const int RAND_NUM = m_random.get(100);
@@ -185,32 +174,56 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
                 {
                     m_type = COLLECT_PARACHUTE;
                     m_number = 1;
+                    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+                    {
+                        race_state->herringCollected(m_owner->getWorldKartId(), 
+                                                     herring.getHerringId(), 
+                                                     m_type);
+                    }
                     return;
                 }
             }
 
-            m_type = m_random.get(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
+            m_type   = m_random.get(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
             m_number = 1;
+            if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            {
+                race_state->herringCollected(m_owner->getWorldKartId(), 
+                                             herring.getHerringId(), 
+                                             (char)m_type);
+            }
             return;
         }
     }
+
+
+    // If no special case is done: on the client just adjust the number
+    // dependent on the server informaion:
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        if(m_type==COLLECT_NOTHING)
+        {
+            m_type   = (CollectableType)add_info;
+            m_number = n;
+        }
+        else if((CollectableType)add_info==m_type)
+        {
+            m_number+=n;
+            if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
+        }
+        // Ignore new collectable if it is different from the current one
+        int dummy = m_random.get(100);    // keep random numbers in synch
+
+        return;
+    }   // if network client
+
+    // Otherwise (server or no network): determine collectable randomly
 
     //rand() is moduled by COLLECT_MAX - 1 - 2 because because we have to
     //exclude the anvil and the parachute, but later we have to add 1 to prevent
     //having a value of 0 since that isn't a valid collectable.
     CollectableType newC;
-    if(!user_config->m_profile)
-    {
-        newC = (CollectableType)(m_random.get(COLLECT_MAX - 1 - 2) + 1);
-    }
-    else
-      {   // for now: no collectables when profiling
-        return;
-        // No random effects when profiling!
-        static int simpleCounter=-1;
-        simpleCounter++;
-        newC = (CollectableType)(simpleCounter%(COLLECT_MAX - 1 - 2) + 1);
-    }
+    newC = (CollectableType)(m_random.get(COLLECT_MAX - 1 - 2) + 1);
     // Save the information about the collectable in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)

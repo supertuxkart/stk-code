@@ -17,13 +17,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include <math.h>
 #include <iostream>
 #define _WINSOCKAPI_
-#include "network/network_manager.hpp"
 #include <plib/ssg.h>
-#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
+#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #include "loader.hpp"
 #include "coord.hpp"
 #include "herring_manager.hpp"
@@ -45,6 +45,7 @@
 #include "smoke.hpp"
 #include "material_manager.hpp"
 #include "network/race_state.hpp"
+#include "network/network_manager.hpp"
 
 // num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
 
@@ -563,6 +564,16 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
+    // On a client fiering is done upon receiving the command from the server.
+    if ( m_controls.fire && network_manager->getMode()!=NetworkManager::NW_CLIENT 
+         && !isRescue())
+    {
+        // use() needs to be called even if there currently is no collecteable
+        // since use() can test if something needs to be switched on/off.
+        m_collectable.use() ;
+        m_controls.fire = false;
+    }
+
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's

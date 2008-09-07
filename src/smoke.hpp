@@ -20,6 +20,7 @@
 #ifndef HEADER_SMOKE_H
 #define HEADER_SMOKE_H
 
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "particle_system.hpp"
 

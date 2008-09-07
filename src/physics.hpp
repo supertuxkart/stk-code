@@ -20,10 +20,11 @@
 #ifndef HEADER_PHYSICS_H
 #define HEADER_PHYSICS_H
 
+#include <set>
+#define _WINSOCKAPI_
+#include <plib/sg.h>
 #include "kart.hpp"
 #include "flyable.hpp"
-#include <plib/sg.h>
-#include <set>
 
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"

@@ -177,10 +177,6 @@ void PlayerKart::update(float dt)
     if ( m_controls.fire && !isRescue())
     {
         if (m_collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
-        // use() needs to be called even if there currently is no collecteable
-        // since use() can test if something needs to be switched on/off.
-        m_collectable.use() ;
-        m_controls.fire = false;
     }
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like

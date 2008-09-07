@@ -186,11 +186,17 @@ void Flyable::update (float dt)
 }   // update
 
 // -----------------------------------------------------------------------------
-void Flyable::updateFromServer(const FlyableInfo &f)
+/** Updates the position of a projectile based on information received frmo the
+ *  server. 
+ */
+void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 {
     setXYZ(f.m_xyz);
     setRotation(f.m_rotation);
-    m_exploded = f.m_exploded;
+    // m_exploded is not set here, since otherwise when explode() is called,
+    // the rocket is considered to be already exploded.
+    // Update the graphical position
+    Moveable::update(dt);
 }   // updateFromServer
 
 // -----------------------------------------------------------------------------

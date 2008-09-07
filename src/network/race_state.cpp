@@ -38,7 +38,7 @@ void RaceState::serialise()
     // Send the number of karts and for each kart the compressed 
     // control structure, xyz,hpr, and speed (which is necessary to
     // display the speed, and e.g. to determine when a parachute is detached)
-    len += 1 + num_karts*(KartControl::getCompressedSize() 
+    len += 1 + num_karts*(KartControl::getLength() 
                           + getVec3Length()+getQuaternionLength()
                           + getFloatLength()) ;
 
@@ -52,11 +52,9 @@ void RaceState::serialise()
     // ----------------------------------
     len += 1 + m_new_flyable.size() * 2;
 
-    if(projectile_manager->getNumProjectiles()>0)
-        printf("rocket\n");
     // 4. Add rocket positions
     // -----------------------
-    len += 2+projectile_manager->getNumProjectiles()*FlyableInfo::getLength();
+    len += 2 + m_flyable_info.size()*FlyableInfo::getLength();
 
     // Now add the data
     // ================
@@ -65,14 +63,11 @@ void RaceState::serialise()
     // 1. Kart positions
     // -----------------
     addChar(num_karts);
-    assert(KartControl::getCompressedSize()<=9);
     for(unsigned int i=0; i<num_karts; i++)
     {
         const Kart* kart=world->getKart(i);
         const KartControl& kc=kart->getControls();
-        char compressed[9];         // avoid the new/delete overhead
-        kc.compress(compressed);
-        addCharArray(compressed, KartControl::getCompressedSize());
+        kc.serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
         addFloat(kart->getSpeed());
@@ -91,9 +86,11 @@ void RaceState::serialise()
     addChar(m_new_flyable.size());
     for(unsigned int i=0; i<m_new_flyable.size(); i++)
     {
+        printf("send new type %d\n",m_new_flyable[i].m_type);
         addChar(m_new_flyable[i].m_type);
         addChar(m_new_flyable[i].m_kart_id);
     }
+    m_new_flyable.clear();
 
     // 4. Projectiles
     // --------------
@@ -110,7 +107,6 @@ void RaceState::serialise()
 void RaceState::clear()
 {
     m_herring_info.clear();
-    m_flyable_info.clear();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -127,15 +123,15 @@ void RaceState::receive(ENetPacket *pkt)
     unsigned int num_karts = getChar();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        assert(KartControl::getCompressedSize()<=9);
-        char compressed[9];   // avoid new/delete overhead
-        getCharArray(compressed, KartControl::getCompressedSize());
-        KartControl kc;
-        kc.uncompress(compressed);
+        KartControl kc(this);
         // Currently not used!
         Vec3 xyz       = getVec3();
         btQuaternion q = getQuaternion();
         Kart *kart     = world->getKart(i);
+        // Firing needs to be done from here to guarantee that any potential
+        // new rockets are created before the update for the rockets is handled
+        if(kc.fire)
+            kart->getCollectable()->use();
         kart->setXYZ(xyz);
         kart->setRotation(q);
         kart->setSpeed(getFloat());
@@ -161,6 +157,7 @@ void RaceState::receive(ENetPacket *pkt)
     {
         char type          = getChar();
         char world_kart_id = getChar();
+        printf("Received new type %d\n",type);
         projectile_manager->newProjectile(world->getKart(world_kart_id),
                                           (CollectableType)type);
     }
@@ -170,12 +167,12 @@ void RaceState::receive(ENetPacket *pkt)
     unsigned short num_flyables = getShort();
     m_flyable_info.clear();
     m_flyable_info.resize(num_flyables);
-    for(unsigned short i=0; i<projectile_manager->getNumProjectiles(); i++)
+    for(unsigned short i=0; i<num_flyables; i++)
     {
         FlyableInfo f(this);
         m_flyable_info[i] = f;
     }
-    clear();  // free message bugger
+    clear();  // free message buffer
 
 }   // receive
 // ----------------------------------------------------------------------------

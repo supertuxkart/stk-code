@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "vec3.hpp"
 

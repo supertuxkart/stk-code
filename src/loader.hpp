@@ -20,6 +20,7 @@
 #ifndef HEADER_LOADER_H
 #define HEADER_LOADER_H
 
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include <string>
 #include <vector>

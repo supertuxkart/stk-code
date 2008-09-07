@@ -85,7 +85,7 @@ void ProjectileManager::update(float dt)
 {
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        updateClient();
+        updateClient(dt);
     }
     else
     {
@@ -146,8 +146,9 @@ void ProjectileManager::updateServer(float dt)
         if(network_manager->getMode()!=NetworkManager::NW_NONE)
         {
             race_state->setFlyableInfo(i-m_active_projectiles.begin(),
-                                       (*i)->getXYZ(), (*i)->getRotation(),
-                                       (*i)->hasHit());
+                                       FlyableInfo((*i)->getXYZ(), 
+                                                   (*i)->getRotation(),
+                                                   (*i)->hasHit())      );
         }
     }
 }   // updateServer
@@ -156,32 +157,38 @@ void ProjectileManager::updateServer(float dt)
 /** Updates all rockets and explosions on the client.
  *  updateClient takes the information in race_state and updates all rockets
  *  (i.e. position, explosion etc)                                            */
-void ProjectileManager::updateClient()
+void ProjectileManager::updateClient(float dt)
 {
     m_something_was_hit = false;
     unsigned int num_projectiles = race_state->getNumFlyables();
-    // Race_state must contain at least as many entries as the current number
-    // of projectiles. It can contain more if new projectiles have been added.
-    assert(m_active_projectiles.size()<=num_projectiles);
+    if(num_projectiles != m_active_projectiles.size())
+        fprintf(stderr, "Warning: num_projectiles %d active %d\n",num_projectiles,
+                m_active_projectiles.size());
 
-    int indx=0;
+    unsigned int indx=0;
     for(Projectiles::iterator i  = m_active_projectiles.begin();
         i != m_active_projectiles.end();   ++i, ++indx)
     {
-        const Flyable::FlyableInfo &f = race_state->getFlyable(indx);
-        (*i)->updateFromServer(f);
-        if(f.m_exploded) m_something_was_hit = true;
+        const FlyableInfo &f = race_state->getFlyable(indx);
+        (*i)->updateFromServer(f, dt);
+        if(f.m_exploded) 
+        {
+            m_something_was_hit = true;
+            (*i)->explode(NULL);
+        }
     }   // for i in m_active_projectiles
+
 }   // updateClient
 // -----------------------------------------------------------------------------
 Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
 {
     Flyable *f;
-    switch(type) {
-    case COLLECT_BOWLING: f = new Bowling(kart);   break;
-    case COLLECT_HOMING:  f = new Homing(kart);  break;
-    case COLLECT_MISSILE: f = new Missile(kart); break;
-    default:              return NULL;
+    switch(type) 
+    {
+        case COLLECT_BOWLING: f = new Bowling(kart); break;
+        case COLLECT_HOMING:  f = new Homing(kart);  break;
+        case COLLECT_MISSILE: f = new Missile(kart); break;
+        default:              return NULL;
     }
     m_active_projectiles.push_back(f);
     return f;

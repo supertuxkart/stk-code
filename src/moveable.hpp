@@ -21,6 +21,7 @@
 #ifndef HEADER_MOVEABLE_H
 #define HEADER_MOVEABLE_H
 
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "vec3.hpp"
 #include "btBulletDynamicsCommon.h"

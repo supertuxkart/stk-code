@@ -32,6 +32,9 @@ class Flyable : public Moveable, public TerrainInfo
 public:
 private:
     bool              m_has_hit_something;
+    /** This flag is used to avoid that a rocket explodes mode than once.
+     *  It can happen that more than one collision between a rocket and
+     *  a track or kart is reported by the physics.                       */   
     bool              m_exploded;
 
 protected:
@@ -74,7 +77,7 @@ public:
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
                               CollectableType type);
     virtual void update      (float);
-    void         updateFromServer(const FlyableInfo &f);
+    void         updateFromServer(const FlyableInfo &f, float dt);
 
     virtual void hitTrack    () {};
     void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
