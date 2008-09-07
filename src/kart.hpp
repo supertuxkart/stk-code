@@ -43,7 +43,7 @@ private:
     Vec3         m_curr_track_coords;
     Vec3         m_last_track_coords;
     unsigned int m_world_kart_id;      // index of kart in world
-    
+
 protected:
     bool         m_on_road;            // true if the kart is on top of the
                                        // road path drawn by the drivelines
@@ -146,12 +146,7 @@ public:
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 
-    /**
-        returns a bullet transform object located at the kart's position
-        and oriented in the direction the kart is going. Can be useful
-        e.g. to calculate the starting point and direction of projectiles
-     */
-    btTransform    getKartHeading      (const float customPitch=-1);
+    btTransform getKartHeading();
     
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
@@ -197,6 +192,9 @@ public:
     bool           isInRest         () const;
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
     float          getSpeed         () const {return m_speed;                 }
+    /** This is used on the client side only to set the speed of the kart
+     *  from the server information.                                       */
+    void           setSpeed         (float s) {m_speed = s;                   }
     float          handleWheelie    (float dt);
     float          getActualWheelForce();
     bool           isOnGround       () const;

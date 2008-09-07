@@ -516,7 +516,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include"
 				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT;HAVE_ENET"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
@@ -539,8 +539,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib enet.lib ws2_32.lib"
-				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib ws2_32.lib"
+				OutputFile="./../../../$(ProjectName)_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
 				IgnoreAllDefaultLibraries="false"
@@ -1086,6 +1086,10 @@
 			<Filter
 				Name="network"
 				>
+				<File
+					RelativePath="..\..\network\connect_message.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\network\kart_control_message.cpp"
 					>
