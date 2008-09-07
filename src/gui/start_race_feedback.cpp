@@ -54,19 +54,28 @@ void StartRaceFeedback::update(float DELTA)
 {
     widget_manager->update(0.0f);
 
-    // Now the text is being displayed, 
-    if(m_state==SRF_NETWORK)
+    // We need one call to update to display the current text. So we use a
+    // simple finite state machine to take care of one additional call:
+    switch(m_state)
     {
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-            network_manager->sendRaceInformationToClients();
-        else
-            network_manager->waitForRaceInformation();
-        m_state = SRF_LOADING;
-        widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
-    }
+        case SRF_LOADING_DISPLAY: 
+            m_state=SRF_LOADING;
+            break;
+        case SRF_NETWORK_DISPLAY: 
+            m_state = SRF_NETWORK; 
+            break;
+        case SRF_NETWORK:
+            if(network_manager->getMode()==NetworkManager::NW_SERVER)
+                network_manager->sendRaceInformationToClients();
+            else
+                network_manager->waitForRaceInformation();
+            m_state = SRF_LOADING_DISPLAY;
+            widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
+            break;
+        case SRF_LOADING:
+            race_manager->startNew();
+            break;
+    }   // switch m_state
 
-    static bool updated=false;
-    if( updated == true ) race_manager->startNew();
-    else updated = true;
-}
+}   // update
 

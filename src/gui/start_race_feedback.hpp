@@ -22,7 +22,8 @@
 
 class StartRaceFeedback: public BaseGUI
 {
-    enum {SRF_NETWORK, SRF_LOADING} m_state;
+    enum {SRF_NETWORK_DISPLAY, SRF_NETWORK, 
+          SRF_LOADING_DISPLAY, SRF_LOADING} m_state;
 public:
     StartRaceFeedback();
     ~StartRaceFeedback();
