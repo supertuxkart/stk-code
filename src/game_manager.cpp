@@ -40,6 +40,7 @@
 #include "user_config.hpp"
 #include "scene.hpp"
 #include "history.hpp"
+#include "network_manager.hpp"
 
 GameManager* game_manager = 0;
 
@@ -103,6 +104,7 @@ void GameManager::run()
 		    music_on = true;
         }
 
+        network_manager->update(dt);
         if (race_manager->raceIsActive())
         {
             music_on = false; 

@@ -126,6 +126,7 @@ void cmdLineHelp (char* invocation)
 int handleCmdLine(int argc, char **argv)
 {
     int n;
+    char s[80];
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
@@ -172,9 +173,10 @@ int handleCmdLine(int argc, char **argv)
 	{
 	     network_manager->setPort(n);
 	}
-        else if( sscanf(argv[i], "--numclients=%d", &n) )
+        else if( sscanf(argv[i], "--client=%s", s) )
 	{
-	     network_manager->setNumClients(n);
+	     network_manager->setMode(NetworkManager::NW_CLIENT);
+	     network_manager->setServerIP(s);
 	}
 #endif
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
@@ -531,7 +533,8 @@ int main(int argc, char *argv[] )
 
         if(!network_manager->initialiseConnections())
         {
-            fprintf(stderr, "Problems initialising network connections, aborting.\n");
+            fprintf(stderr, "Problems initialising network connections,\n"
+                            "Running in non-network mode.\n");
         }
         
         // Not replaying

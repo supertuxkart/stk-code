@@ -125,7 +125,7 @@ bool NetworkManager::initClient()
     if (enet_host_service (m_host, & event, 5000) > 0 &&
         event.type == ENET_EVENT_TYPE_CONNECT)
     {
-        fprintf(stderr, "Connection to %s:%d succeeded.", 
+        fprintf(stderr, "Connection to %s:%d succeeded.\n", 
                 m_server_address.c_str(), m_port);
         enet_host_service(m_host, &event, 1000);
     }
@@ -136,7 +136,7 @@ bool NetworkManager::initClient()
         /* had run out without any significant event.            */
         enet_peer_reset (peer);
 
-        fprintf(stderr, "Connection to '%s:%d' failed.",
+        fprintf(stderr, "Connection to '%s:%d' failed.\n",
 		m_server_address.c_str(), m_port);
     }
 
@@ -207,12 +207,14 @@ void NetworkManager::update(float dt)
 */
 void NetworkManager::sendKartsInformationToServer()
 {
+    fprintf(stderr, "Client sending kart information to server\n");
 }   // sendKartsInformationToServer
 // ----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
 void NetworkManager::waitForKartsInformation()
 {
+    fprintf(stderr, "Server receiving all kart information\n");
 }   // waitForKartsInformation
 
 // ----------------------------------------------------------------------------
@@ -220,6 +222,7 @@ void NetworkManager::waitForKartsInformation()
 */
 void NetworkManager::sendRaceInformationToClients()
 {
+    fprintf(stderr, "server sending race_manager information to all clients\n");
 }   // sendRaceInformationToClients
 
 // ----------------------------------------------------------------------------
@@ -227,5 +230,6 @@ void NetworkManager::sendRaceInformationToClients()
 */
 void NetworkManager::waitForRaceInformation()
 {
+    fprintf(stderr, "Client waiting for race information\n");
 }   // waitForRaceInformation
 // ----------------------------------------------------------------------------

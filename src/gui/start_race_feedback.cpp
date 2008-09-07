@@ -17,22 +17,28 @@
 
 #include <SDL/SDL.h>
 
+#include "start_race_feedback.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "translation.hpp"
-
-#include "start_race_feedback.hpp"
+#include "network_manager.hpp"
 
 enum WidgetTokens
 {
     WTOK_MSG
 };
 
-StartRaceFeedback::StartRaceFeedback() : m_updated( false )
+StartRaceFeedback::StartRaceFeedback()
 {
+    m_state = network_manager->getMode()==NetworkManager::NW_NONE ? SRF_LOADING : SRF_NETWORK;
+
     //Add some feedback so people know they are going to start the race
     widget_manager->reset();
-    widget_manager->addTextWgt( WTOK_MSG, 60, 7, _("Loading race...") );
+    if(m_state==SRF_NETWORK)
+        widget_manager->addTextWgt( WTOK_MSG, 60, 7, _("Synchronising network...") );
+    else
+        widget_manager->addTextWgt( WTOK_MSG, 60, 7, _("Loading race...") );
+
     widget_manager->layout(WGT_AREA_ALL);
 }
 
@@ -48,9 +54,19 @@ void StartRaceFeedback::update(float DELTA)
 {
     widget_manager->update(0.0f);
 
-    //I consider that in this case, a static variable is cleaner than a
-    //member variable of this class. -Coz
-    if( m_updated == true ) race_manager->startNew();
-    else m_updated = true;
+    // Now the text is being displayed, 
+    if(m_state==SRF_NETWORK)
+    {
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            network_manager->sendRaceInformationToClients();
+        else
+            network_manager->waitForRaceInformation();
+        m_state = SRF_LOADING;
+        widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
+    }
+
+    static bool updated=false;
+    if( updated == true ) race_manager->startNew();
+    else updated = true;
 }
 

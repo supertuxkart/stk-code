@@ -393,6 +393,7 @@ void CharSel::select()
 
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
+        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
     }
     else
     {
