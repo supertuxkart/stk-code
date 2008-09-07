@@ -67,7 +67,7 @@
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "grand_prix_manager.hpp"
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "scene.hpp"
 

@@ -219,7 +219,7 @@ void NetworkManager::sendKartsInformationToServer()
     for(int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
     {
         fprintf(stderr, "Sending name '%s', ",user_config->m_player[i].getName().c_str());
-        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalPlayerKart(i));
+        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalPlayerKart(i).getKartName().c_str());
     }   // for i<getNumLocalPlayers
     fprintf(stderr, "Client sending kart information to server\n");
 }   // sendKartsInformationToServer

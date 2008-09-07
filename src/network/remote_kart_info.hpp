@@ -36,8 +36,9 @@ public:
     RemoteKartInfo() {m_kart_name=""; m_user_name=""; m_client_id=-1; m_player_id=-1;}
     void setKartName(const std::string& n) { m_kart_name = n;  }
     void setUserName(const std::string& u) { m_user_name = u;  }
-    void setHostId(int id)                 { m_client_id = id; }
+    void setClientId(int id)               { m_client_id = id; }
     void setPlayerId(int id)               { m_player_id = id; }
+    const std::string& getKartName() const {return m_kart_name; }
 };   // RemoteKartInfo
 
 #endif

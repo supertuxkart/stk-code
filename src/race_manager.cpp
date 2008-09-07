@@ -29,7 +29,7 @@
 #include "scene.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -69,7 +69,7 @@ void RaceManager::setLocalPlayerKart(unsigned int player, const std::string& kar
             setNumLocalPlayers(player+1);
         m_local_player_karts[player].setPlayerId(player);
         m_local_player_karts[player].setKartName(kart);
-        m_local_player_karts[player].setHostId(network_manager->getHostId());
+        m_local_player_karts[player].setClientId(network_manager->getClientId());
     }
     else
     {
