@@ -62,8 +62,8 @@ public:
     int  getNumSelectedKarts() const                         {return m_selected_karts.size();}
     bool kartAvailable(int kartid);
     bool testAndSetKart(int kartid);
-    /** Fill the empty positions in the given vector with random karts */
-    void fillWithRandomKarts (std::vector<RemoteKartInfo>& vec);
+    std::vector<std::string> 
+         getRandomKartList(int count, RemoteKartInfoList& existing_karts);
     void removeTextures      ();
 };
 

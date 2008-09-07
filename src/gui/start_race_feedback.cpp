@@ -70,7 +70,13 @@ void StartRaceFeedback::update(float delta)
         return;
     }
 
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    if(network_manager->getMode()==NetworkManager::NW_NONE)
+    {
+        // This copies the loca lplayer information to the global
+        // player information in the race manager
+        network_manager->setupPlayerKartInfo();
+    }
+    else if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
         network_manager->sendRaceInformationToClients();
         widget_manager->setWgtText(WTOK_MSG, m_loading_text);

@@ -183,22 +183,22 @@ bool KartPropertiesManager::kartAvailable(int kartid)
 }   // testAndSetKart
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::fillWithRandomKarts(std::vector<RemoteKartInfo>& vec)
+std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
+                                                             RemoteKartInfoList& existing_karts)
 {
+    std::vector<std::string> random_karts;
+
     // First: set up flags (based on global kart 
     // index) for which karts are already used
     // -----------------------------------------
     std::vector<bool> used;
     used.resize(getNumberOfKarts(), false);
 
-    int count=vec.size();
     std::vector<std::string> all_karts;
-    for(unsigned int i=0; i<vec.size(); i++)
+    for(unsigned int i=0; i<existing_karts.size(); i++)
     {
-        if(vec[i].getKartName()=="") continue;
-        int id=getKartId(vec[i].getKartName());
+        int id=getKartId(existing_karts[i].getKartName());
         used[id] = true;
-        count --;
     }
 
     // Add karts from the current group
@@ -218,17 +218,14 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<RemoteKartInfo>& vec
 
     // Loop over all karts to fill till either all slots are filled, or
     // there are no more karts in the current group
-    for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
+    while(count>0 && karts.size()>0)
     {
-        if(vec[i].getKartName()=="")
-        {
-            used[karts.back()] = true;
-            vec[i] = RemoteKartInfo(m_karts_properties[karts.back()]->getIdent());
-            karts.pop_back();
-            count --;
-        }
+        used[karts.back()] = true;
+        random_karts.push_back(m_karts_properties[karts.back()]->getIdent());
+        karts.pop_back();
+        count --;
     }
-    if(count==0) return;
+    if(count==0) return random_karts;
 
     // Not enough karts in chosen group, so fill the rest with arbitrary karts
     // -----------------------------------------------------------------------
@@ -240,17 +237,15 @@ void KartPropertiesManager::fillWithRandomKarts(std::vector<RemoteKartInfo>& vec
     }
     std::random_shuffle(karts.begin(), karts.end());
     // Then fill up the remaining empty spaces
-    for(unsigned int i=0; i<vec.size() && count>0 && karts.size()>0; i++)
+    while(count>0 && karts.size()>0)
     {
-        if(vec[i].getKartName()=="")
-        {
-            vec[i] = RemoteKartInfo(m_karts_properties[karts.back()]->getIdent());
-            karts.pop_back();
-            count --;
-        }
+        random_karts.push_back(m_karts_properties[karts.back()]->getIdent());
+        karts.pop_back();
+        count --;
     }
-    // There should never be more karts to be selected than there are.
+    // There should always be enough karts
     assert(count==0);
-}   // fillWithRandomKarts    
+    return random_karts;
+}   // getRandomKartList    
 
 /* EOF */

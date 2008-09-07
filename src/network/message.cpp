@@ -73,7 +73,7 @@ void Message::allocate(int size)
 // ----------------------------------------------------------------------------
 bool Message::add(int data)
 {
-    if (m_pos > m_data_size) 
+    if ((int)(m_pos + sizeof(int)) > m_data_size) 
         return false;
     int l=htonl(data);
     memcpy(m_data+m_pos, &l, sizeof(int)); 
@@ -89,13 +89,6 @@ int Message::getInt()
 }   // getInt
 
 // ----------------------------------------------------------------------------
-bool Message::add(float data)
-{
-    int *dcast = (int*) &data;
-    return add(*dcast);
-}   // add<float>
-
-// ----------------------------------------------------------------------------
 float Message::getFloat()
 { // ugly...
     int i    = getInt();
@@ -107,7 +100,7 @@ float Message::getFloat()
 bool Message::add(const std::string &data)
 { 
     int len = data.size()+1;  // copy 0 end byte
-    assert(m_pos+len <=m_data_size);
+    assert((int)(m_pos+len) <=m_data_size);
     memcpy (&(m_data[m_pos]), data.c_str(), len);
     m_pos += len;
     return true;
@@ -122,3 +115,31 @@ std::string Message::getString()
     return std::string(str);
 }   // getString
 
+// ----------------------------------------------------------------------------
+int Message::getLength(const std::vector<std::string>& vs)
+{
+    int len=getLength(vs.size());
+    for(unsigned int i=0; i<vs.size(); i++)
+        len += getLength(vs[i]);
+    return len;
+}   // getLength(vector<string>)
+
+// ----------------------------------------------------------------------------
+bool Message::add(const std::vector<std::string>& vs)
+{
+    bool result = add(vs.size());
+    if(!result) return false;
+    for(unsigned int i=0; i<vs.size(); i++)
+        if(!add(vs[i])) return false;
+    return true;
+}   // add(vector<string>)
+// ----------------------------------------------------------------------------
+std::vector<std::string> Message::getStringVector()
+{
+    std::vector<std::string> vs;
+    vs.resize(getInt());
+    for(unsigned int i=0; i<vs.size(); i++)
+        vs[i]=getString();
+    return vs;
+}   // getStringVector
+// ----------------------------------------------------------------------------

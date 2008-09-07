@@ -117,6 +117,14 @@ void RaceManager::setTrack(const std::string& track)
 }   // setTrack
 
 //-----------------------------------------------------------------------------
+void RaceManager::computeRandomKartList()
+{
+    m_random_kart_list=kart_properties_manager->getRandomKartList(m_num_karts - m_player_karts.size(),
+                                                                  m_player_karts);
+
+}   // computeRandomKartList
+
+//-----------------------------------------------------------------------------
 void RaceManager::startNew()
 {
     if(m_major_mode==RM_GRAND_PRIX)   // GP: get tracks and laps from grand prix
@@ -131,30 +139,27 @@ void RaceManager::startNew()
     if((size_t)m_num_karts < m_player_karts.size()) 
         m_num_karts = (int)m_player_karts.size();
 
-    // Create the list of all kart names to use
-    // ========================================
-    std::vector<std::string> kart_names;
-    kart_names.resize(m_num_karts);
-    for(unsigned int i = 0; i < m_player_karts.size(); i++)
-    {
-        /*Players position is behind the AI in the first race*/
-        kart_names[m_num_karts-1 - i] = m_player_karts[m_player_karts.size() - 1 - i];
-    }
-    kart_properties_manager->fillWithRandomKarts(kart_names);
-
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
-    const int num_ai_karts = m_num_karts - (int)m_player_karts.size();
     m_kart_status.clear();
-    for(int i=0; i<m_num_karts; i++)
+
+    // First add the AI karts (randomly chosen)
+    // ----------------------------------------
+    for(unsigned int i=0; i<m_random_kart_list.size(); i++)
+        m_kart_status.push_back(KartStatus(m_random_kart_list[i], i, -1, -1, KT_AI));
+
+    // Then the players, which start behind the AI karts
+    // -------------------------------------------------
+    for(int i=m_player_karts.size()-1; i>=0; i--)
     {
-        // AI karts have -1 as player 
-        bool is_player = i>=num_ai_karts;   // players start at the back
-        m_kart_status.push_back(KartStatus(kart_names[i], i,
-                                           is_player ? i-num_ai_karts : -1,
-                                           is_player ? KT_PLAYER: KT_AI
+        KartType kt=(m_player_karts[i].getHostId()==network_manager->getMyHostId())
+                   ? KT_PLAYER : KT_NETWORK_PLAYER;
+        m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
+                                           m_player_karts[i].getLocalPlayerId(),
+                                           m_player_karts[i].getGlobalPlayerId(),
+                                           kt
                                            ) );
-    }   // for i<m_num_karts
+    }
 
     // Then start the race with the first track
     // ========================================

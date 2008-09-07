@@ -86,6 +86,7 @@ private:
     std::vector<int>                 m_host_ids;
     std::vector<int>                 m_num_laps;
     std::vector<int>                 m_score_for_position;
+    std::vector<std::string>         m_random_kart_list;
     int                              m_track_number;
     GrandPrixData                    m_grand_prix;
     int                              m_num_karts;
@@ -152,11 +153,15 @@ public:
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
     int          allPlayerFinished()      const {return 
                                            m_num_finished_players==m_player_karts.size();}
-    int          raceIsActive()           const { return m_active_race;             }
+    int          raceIsActive()           const { return m_active_race;                  }
+    const std::vector<std::string>&
+                 getRandomKartList()      const { return m_random_kart_list;             }
+    void         setRandomKartList(const std::vector<std::string>& rkl)
+                                                { m_random_kart_list = rkl;              }
+    void         computeRandomKartList();
 
     void         setMirror() {/*FIXME*/}
     void         setReverse(){/*FIXME*/}
-
     void startNew();         // start new race/GP/...
     void next();             // start the next race or go back to the start screen
     void rerunRace();        // Rerun the same race again

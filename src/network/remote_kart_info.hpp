@@ -58,4 +58,6 @@ public:
     }
 };   // RemoteKartInfo
 
+typedef std::vector<RemoteKartInfo> RemoteKartInfoList;
+
 #endif

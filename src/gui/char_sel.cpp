@@ -155,7 +155,10 @@ CharSel::CharSel(int whichPlayer)
         }
     }
     else
+    {
+        widget_manager->hideWgt(WTOK_MESSAGE);
         updateScrollPosition();
+    }
 
     m_clock  = 0;
 
