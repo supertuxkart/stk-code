@@ -221,7 +221,7 @@ void HerringManager::eatenHerring(int herring_id, Kart *kart,
 void  HerringManager::hitHerring(Kart* kart)
 {
     // Only do this on the server
-    if(network_manager->getMode()!=NetworkManager::NW_SERVER) return;
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
 
     for(AllHerringType::iterator i =m_all_herrings.begin();
         i!=m_all_herrings.end();  i++)

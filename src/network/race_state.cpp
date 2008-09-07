@@ -48,11 +48,7 @@ void RaceState::serialise()
     // We can't use sizeof() here, since the data structures might be padded
     len += 1 + m_herring_info.size()* HerringInfo::getLength();
 
-    // 3. Add the data about new flyables
-    // ----------------------------------
-    len += 1 + m_new_flyable.size() * 2;
-
-    // 4. Add rocket positions
+    // 3. Add rocket positions
     // -----------------------
     len += 2 + m_flyable_info.size()*FlyableInfo::getLength();
 
@@ -66,8 +62,7 @@ void RaceState::serialise()
     for(unsigned int i=0; i<num_karts; i++)
     {
         const Kart* kart=world->getKart(i);
-        const KartControl& kc=kart->getControls();
-        kc.serialise(this);
+        m_kart_controls[i].serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
         addFloat(kart->getSpeed());
@@ -81,21 +76,9 @@ void RaceState::serialise()
         m_herring_info[i].serialise(this);
     }
 
-    // 3. New projectiles
-    // ------------------
-    addChar(m_new_flyable.size());
-    for(unsigned int i=0; i<m_new_flyable.size(); i++)
-    {
-        printf("send new type %d\n",m_new_flyable[i].m_type);
-        addChar(m_new_flyable[i].m_type);
-        addChar(m_new_flyable[i].m_kart_id);
-    }
-    m_new_flyable.clear();
-
     // 4. Projectiles
     // --------------
     addShort(m_flyable_info.size());
-    // The exploded flag could be compressed by combining 8 bits into one byte
     for(unsigned int i=0; i<m_flyable_info.size(); i++)
     {
         m_flyable_info[i].serialise(this);
@@ -137,8 +120,8 @@ void RaceState::receive(ENetPacket *pkt)
         kart->setSpeed(getFloat());
     }   // for i
 
-    // Eaten herrings
-    // --------------
+    // 2. Eaten herrings
+    // -----------------
     unsigned short num_herrings=getChar();
     for(unsigned int i=0; i<num_herrings; i++)
     {
@@ -150,19 +133,8 @@ void RaceState::receive(ENetPacket *pkt)
                                           world->getKart(hi.m_kart_id),
                                           hi.m_add_info);
     }
-    // 3. New flyables
-    // ---------------
-    unsigned int new_fl = getChar();
-    for(unsigned int i=0; i<new_fl; i++)
-    {
-        char type          = getChar();
-        char world_kart_id = getChar();
-        printf("Received new type %d\n",type);
-        projectile_manager->newProjectile(world->getKart(world_kart_id),
-                                          (CollectableType)type);
-    }
 
-    // 4. Projectiles
+    // 3. Projectiles
     // --------------
     unsigned short num_flyables = getShort();
     m_flyable_info.clear();

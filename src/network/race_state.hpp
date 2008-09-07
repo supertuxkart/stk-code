@@ -25,8 +25,11 @@
 #include "network/message.hpp"
 #include "network/herring_info.hpp"
 #include "network/flyable_info.hpp"
+#include "kart_control.hpp"
 #include "herring.hpp"
 #include "flyable.hpp"
+#include "race_manager.hpp"
+#include "kart.hpp"
 
 /** This class stores the state information of a (single) race, e.g. the 
     position and orientation of karts, collisions that have happened etc.
@@ -41,31 +44,37 @@ private:
     std::vector<HerringInfo> m_herring_info;
     /** Updates about existing flyables. */
     std::vector<FlyableInfo> m_flyable_info;
-    /** List of new flyables. */
-    struct NewFlyable{
-        char m_type;
-        char m_kart_id;
-    };
-    std::vector<NewFlyable> m_new_flyable;
+    /** Stores the controls of each kart at the beginning of its update(). */
+    std::vector<KartControl> m_kart_controls;
 
     public:
-             RaceState() : Message(MT_RACE_STATE) {}
+        /** Initialise the global race state. */
+        RaceState() : Message(MT_RACE_STATE) 
+        {
+            m_kart_controls.resize(race_manager->getNumKarts());
+        }   // RaceState()
+        // --------------------------------------------------------------------
         void herringCollected(int kartid, int herring_id, char add_info=-1)
         {
             m_herring_info.push_back(HerringInfo(kartid, herring_id, add_info));
         }
+        // --------------------------------------------------------------------
         void setNumFlyables(int n) { m_flyable_info.resize(n); }
+        // --------------------------------------------------------------------
         void setFlyableInfo(int n, const FlyableInfo& fi)
         {
             m_flyable_info[n] = fi;
         }
-        void newFlyable(char type, char kartid)
+        // --------------------------------------------------------------------
+        /** Stores the current kart control (at the time kart->update() is 
+         *  called. This allows modifications of kart->m_control during the
+         *  update (e.g. see in kart::update() how firing is handled).
+         */
+        void storeKartControls(const Kart& kart) 
         {
-            NewFlyable nf;
-            nf.m_type    = type; 
-            nf.m_kart_id = kartid;
-            m_new_flyable.push_back(nf);
-        }
+            m_kart_controls[kart.getWorldKartId()] = kart.getControls();
+        }   // storeKartControls
+        // --------------------------------------------------------------------
         void serialise();
         void receive(ENetPacket *pkt);
         void clear();      // Removes all currently stored information
