@@ -85,6 +85,9 @@ bool NetworkManager::initServer()
         return false;
     }
 
+    m_server = NULL;
+    m_clients.push_back(NULL); // server has host_id=0, so put a dummy entry at 0 in client array
+
     fprintf(stderr, "Server initialised, waiting for connections ...\n");
     m_client_names.push_back("server");
     return true;
@@ -140,17 +143,26 @@ bool NetworkManager::initClient()
     }
     fprintf(stderr, "Connection to %s:%d succeeded.\n", 
              user_config->m_server_address.c_str(), user_config->m_server_port);
-    enet_host_service(m_host, &event, 1000);
-    // FIXME Receive host id from server here!!
-    m_host_id = 1;
 
-    return true;
+    m_server = peer;
+    if (enet_host_service(m_host, &event, 5000) > 0) 
+      if (event.type == ENET_EVENT_TYPE_RECEIVE)
+      {  
+        m_host_id = ClientHostIdPacket(event.packet).getId();
+        fprintf(stderr, "got host id %d from server\n", m_host_id);
+        return true;
+      }
+    fprintf(stderr, "didn't receive a host_id!\n");
+    return false;
 #endif
 }  // initClient
 
 // ----------------------------------------------------------------------------
 void NetworkManager::handleNewConnection(ENetEvent *event)
 {
+    ClientHostIdPacket *msg;
+    int new_host_id;
+
     if(m_state!=NS_ACCEPT_CONNECTIONS)
     {
         // We don't accept connections atm
@@ -164,6 +176,16 @@ void NetworkManager::handleNewConnection(ENetEvent *event)
     // FIXME: send m_num_clients as hostid back to new client.
     // FIXME: client should send an id as well to be displayed
     m_client_names.push_back("client");
+
+    // send a hostid back
+    new_host_id = m_clients.size();
+    // fprintf (stderr, "allocated client host_id as %d\n", new_host_id);
+    m_clients.push_back(event->peer);
+    msg = new ClientHostIdPacket(new_host_id);
+    msg->send(*(m_clients[new_host_id]));
+    enet_host_flush(m_host);
+    delete msg;
+
 }   // handleNewConnection
 
 // ----------------------------------------------------------------------------
@@ -181,7 +203,8 @@ void NetworkManager::handleDisconnection(ENetEvent *event)
 
 // ----------------------------------------------------------------------------
 void NetworkManager::handleServerMessage(ENetEvent *event)
-{
+{  // handle message at server (from client)
+
     switch(m_state)
     {
     case NS_ACCEPT_CONNECTIONS:
@@ -264,7 +287,7 @@ void NetworkManager::switchToRaceDataSynchronisation()
 
 // ----------------------------------------------------------------------------
 void NetworkManager::handleClientMessage(ENetEvent *event)
-{
+{  // handle message at client (from server)
     switch(m_state)
     {
     case NS_WAIT_FOR_RACE_DATA:
@@ -307,10 +330,17 @@ void NetworkManager::update(float dt)
 */
 void NetworkManager::sendKartsInformationToServer()
 {
+    LocalKartInfoPacket *msg;
     for(int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
     {
         fprintf(stderr, "Sending name '%s', ",user_config->m_player[i].getName().c_str());
         fprintf(stderr, "kart name '%s'\n", race_manager->getLocalKartInfo(i).getKartName().c_str());
+        msg = new LocalKartInfoPacket(user_config->m_player[i].getName(),        /* player name */
+                               race_manager->getLocalKartInfo(i).getKartName()); /* kart name */
+        msg->send(*m_server); 
+        enet_host_flush(m_host);
+        delete msg;
+
     }   // for i<getNumLocalPlayers
     fprintf(stderr, "Client sending kart information to server\n");
     m_state = NS_WAIT_FOR_RACE_DATA;
@@ -321,11 +351,22 @@ void NetworkManager::sendKartsInformationToServer()
 */
 void NetworkManager::setupPlayerKartInfo()
 {
+    LocalKartInfoPacket *msg;
     m_kart_info.clear();
 
     // FIXME: debugging
     //m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
     //m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
+
+    // FIXME: put this into state machine
+    //if (enet_host_service(m_host, &event, 15000) > 0) 
+    //  if (event.type == ENET_EVENT_TYPE_RECEIVE)
+    //  {  
+    //    msg = new LocalKartDetails(event.packet)
+    //    m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
+    //    m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
+    //  }
+    //fprintf(stderr, "didn't receive kart info!\n");
 
     // Get the local kart info
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)

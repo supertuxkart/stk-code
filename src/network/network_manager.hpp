@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "network/remote_kart_info.hpp"
+#include "network/kart_packet.hpp"
 
 #ifdef HAVE_ENET
 #  include "enet/enet.h"
@@ -53,7 +54,9 @@ private:
     std::vector<std::string>    m_client_names;
     int                         m_barrier_count;
 #ifdef HAVE_ENET
-    ENetHost                   *m_host;
+    ENetHost                   *m_host;    // me
+    ENetPeer                   *m_server;  // (clients only)
+    std::vector<ENetPeer*>      m_clients; // (server only) pos in vector is client host_id 
 #endif
 
     bool         initServer();

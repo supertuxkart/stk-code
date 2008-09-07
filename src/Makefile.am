@@ -121,6 +121,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/char_sel.cpp	   gui/char_sel.hpp	        \
 	gui/start_race_feedback.cpp	   gui/start_race_feedback.hpp	\
 	gui/network_info.cpp	   gui/network_info.hpp		\
+	gui/network_gui.cpp	   gui/network_gui.hpp		\
 	gui/main_menu.cpp	   gui/main_menu.hpp         	\
 	gui/help_page_one.cpp  gui/help_page_one.hpp 	        \
 	gui/help_page_two.cpp  gui/help_page_two.hpp 	        \
