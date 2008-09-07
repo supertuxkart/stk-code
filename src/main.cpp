@@ -29,6 +29,7 @@
 #  ifdef __CYGWIN__
 #    include <unistd.h>
 #  endif
+#  define _WINSOCKAPI_
 #  include <windows.h>
 #  ifdef _MSC_VER
 #    include <io.h>
@@ -125,7 +126,6 @@ void cmdLineHelp (char* invocation)
 int handleCmdLine(int argc, char **argv)
 {
     int n;
-    char s[80];
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
@@ -171,11 +171,6 @@ int handleCmdLine(int argc, char **argv)
         else if( sscanf(argv[i], "--port=%d", &n) )
 	{
 	     network_manager->setPort(n);
-	}
-        else if( sscanf(argv[i], "--client=%s", s) )
-	{
-	     network_manager->setMode(NetworkManager::NW_CLIENT);
-	     network_manager->setServerIP(s);
 	}
         else if( sscanf(argv[i], "--numclients=%d", &n) )
 	{
@@ -534,12 +529,10 @@ int main(int argc, char *argv[] )
             exit(-3);
         }
 
-	if(!network_manager->initialiseConnections())
-	{
-	     fprintf(stderr, "Problems initialising network connections, aborting.\n");
-	     exit(-4);
-	}
-	exit(0);
+        if(!network_manager->initialiseConnections())
+        {
+            fprintf(stderr, "Problems initialising network connections, aborting.\n");
+        }
         
         // Not replaying
         // =============

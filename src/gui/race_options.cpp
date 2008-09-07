@@ -23,6 +23,8 @@
 #include "material_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "network_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -53,6 +55,16 @@ enum WidgetTokens
 
 RaceOptions::RaceOptions() 
 {
+    // First update the server's race_manager with the number of players
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        network_manager->sendKartsInformationToServer();
+    }
+    else if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
+        network_manager->waitForKartsInformation();
+    }
+
     m_difficulty=race_manager->getDifficulty();
     // FIXME: no medium AI atm
     if(m_difficulty==RaceManager::RD_MEDIUM) m_difficulty=RaceManager::RD_HARD;
@@ -269,6 +281,14 @@ void RaceOptions::select()
         }
 
         menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        {
+            network_manager->sendRaceInformationToClients();
+        }
+        else if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        {
+            network_manager->waitForRaceInformation();
+        }
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();

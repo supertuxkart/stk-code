@@ -20,6 +20,8 @@
 #ifndef HEADER_HERRING_H
 #define HEADER_HERRING_H
 
+// num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
+#define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "coord.hpp"
 
@@ -27,7 +29,7 @@ class Kart;
 class ssgTransform;
 class ssgEntity;
 
-// HE_RED ust be the first, HE_SILVER the last entry. See HerringManager
+// HE_RED must be the first, HE_SILVER the last entry. See HerringManager
 enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
 
 // -----------------------------------------------------------------------------

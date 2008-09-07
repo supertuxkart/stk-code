@@ -37,7 +37,9 @@
 #else
 #  define CONFIGDIR       ".supertuxkart"
 #endif
-#include "plib/ul.h"
+// ul.h includes windows.h, so this define is necessary
+#define _WINSOCKAPI_
+#include <plib/ul.h>
 #include "file_manager.hpp"
 #include "world.hpp"
 #include "btBulletDynamicsCommon.h"

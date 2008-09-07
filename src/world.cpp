@@ -117,16 +117,21 @@ World::World()
         }
         else
         {
-            if (race_manager->isPlayer(i))
+            switch(race_manager->getKartType(i))
             {
+            case RaceManager::KT_PLAYER:
                 newkart = new PlayerKart(kart_name, position,
                                          &(user_config->m_player[player_id]),
                                          init_pos, player_id);
                 m_player_karts[player_id] = (PlayerKart*)newkart;
-            }
-            else
-            {
+                break;
+            case RaceManager::KT_NETWORK_PLAYER:
+                break;
+            case RaceManager::KT_AI:
                 newkart = loadRobot(kart_name, position, init_pos);
+                break;
+            case RaceManager::KT_GHOST:
+                break;
             }
         }   // if !user_config->m_profile
         if(user_config->m_replay_history)

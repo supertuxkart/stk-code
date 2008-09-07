@@ -144,7 +144,9 @@ void RaceManager::startNew()
         // AI karts have -1 as player 
         bool is_player = i>=num_ai_karts;   // players start at the back
         m_kart_status.push_back(KartStatus(kart_names[i], i,
-                                           is_player ? i-num_ai_karts : -1 ) );
+                                           is_player ? i-num_ai_karts : -1,
+                                           is_player ? KT_PLAYER: KT_AI
+                                           ) );
     }   // for i<m_num_karts
 
     // Then start the race with the first track

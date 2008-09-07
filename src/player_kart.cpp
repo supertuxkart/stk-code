@@ -161,13 +161,13 @@ void PlayerKart::update(float dt)
             m_penalty_time=1.0;
             // A warning gets displayed in RaceGUI
         }
-	else
+        else
         {
-	    // The call to update is necessary here (even though the kart
+            // The call to update is necessary here (even though the kart
             // shouldn't actually change) to update m_transform. Otherwise
-	    // the camera gets the wrong position. 
-	    Kart::update(dt);
-	}
+            // the camera gets the wrong position. 
+            Kart::update(dt);
+        }
         
         return;
     }

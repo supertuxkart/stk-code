@@ -517,7 +517,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;HAS_GETTEXT;HAVE_ENET"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -539,7 +539,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib  enet.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_bullet_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
@@ -605,7 +605,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
-				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
+				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT;HAVE_ENET"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -803,6 +803,10 @@
 				RelativePath="../../../src\music_ogg.cpp"
 				>
 			</File>
+                        <File
+                              RelativePath="..\..\network_manager.cpp"
+                                >
+                        </File>
 			<File
 				RelativePath="../../../src\particle_system.cpp"
 				>
@@ -1250,6 +1254,10 @@
 				>
 			</File>
 			<File
+                              RelativePath="..\..\network_manager.hpp"
+                                >
+                        </File>
+                        <File
 				RelativePath="../../../src\no_copy.hpp"
 				>
 			</File>

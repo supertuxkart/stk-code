@@ -26,6 +26,7 @@
 #include "translation.hpp"
 #include "user_config.hpp"
 #include "unlock_manager.hpp"
+#include "network_manager.hpp"
 
 enum WidgetTokens
 {
@@ -48,7 +49,8 @@ MainMenu::MainMenu()
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Multiplayer") );
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
-    if(all_challenges.size()>0)
+    // Only allow challenges if not networking for now!
+    if(all_challenges.size()>0 && network_manager->getMode()==NetworkManager::NW_NONE)
     {
         widget_manager->addTextButtonWgt( WTOK_CHALLENGES, WIDTH, 7, _("Challenges") );
     }
@@ -88,7 +90,16 @@ void MainMenu::select()
     {
     case WTOK_SINGLE:
         race_manager->setNumPlayers(1);
-        menu_manager->pushMenu(MENUID_GAMEMODE);
+        // The clients do not do any  mode selection, they go immediately
+        // to the character selection screen.
+        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        {
+            menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        }
+        else
+        {
+            menu_manager->pushMenu(MENUID_GAMEMODE);
+        }
         break;
     case WTOK_MULTI:
         menu_manager->pushMenu(MENUID_NUMPLAYERS);

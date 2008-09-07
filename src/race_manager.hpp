@@ -22,8 +22,8 @@
 
 #include <vector>
 #include <algorithm>
-
 #include <string>
+
 #include "grand_prix_data.hpp"
 
 /** The race manager has two functions:
@@ -49,7 +49,7 @@ public:
     enum RaceModeType   { RM_GRAND_PRIX, RM_SINGLE, // The two current major modes
                           RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER };
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
-
+    enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
     struct KartStatus
     {
@@ -59,13 +59,15 @@ private:
         double      m_overall_time;     // sum of times of all races
         double      m_last_time;        // needed for restart
         int         m_prev_finish_pos;  // previous finished position
+        KartType    m_kart_type;        // Kart type: AI, player, network player etc.
         int         m_player_id;        // player controling the kart, for AI: -1
 
         KartStatus(const std::string& ident, const int& prev_finish_pos, 
-                   const int& player_id) :
+                   const int& player_id, KartType kt) :
                    m_ident(ident), m_score(0), m_last_score(0), 
                    m_overall_time(0.0f), m_last_time(0.0f),
-                   m_prev_finish_pos(prev_finish_pos), m_player_id(player_id)
+                   m_prev_finish_pos(prev_finish_pos), m_kart_type(kt),
+                   m_player_id(player_id)
                 {}
         
     };   // KartStatus
@@ -139,7 +141,7 @@ public:
     int          allPlayerFinished()      const {return 
                                           m_num_finished_players==m_player_karts.size();    }
     int          raceIsActive()           const { return m_active_race;             }
-    bool         isPlayer(int kart)       const {return m_kart_status[kart].m_player_id>-1; }
+    KartType     getKartType(int kart)    const {return m_kart_status[kart].m_kart_type;    }
 
     void         setMirror() {/*FIXME*/}
     void         setReverse(){/*FIXME*/}

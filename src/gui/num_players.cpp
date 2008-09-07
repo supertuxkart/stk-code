@@ -22,6 +22,7 @@
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
+#include "network_manager.hpp"
 
 enum WidgetTokens
 {
@@ -63,7 +64,10 @@ void NumPlayers::select()
     case WTOK_PLAYER_3:
     case WTOK_PLAYER_4:
         race_manager->setNumPlayers(widget_manager->getSelectedWgt());
-        menu_manager->pushMenu(MENUID_GAMEMODE);
+        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+            menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        else
+            menu_manager->pushMenu(MENUID_GAMEMODE);
         break;
     case WTOK_QUIT:
         menu_manager->popMenu();

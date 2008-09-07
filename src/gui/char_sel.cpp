@@ -31,6 +31,8 @@
 #include "material.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "network_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -389,10 +391,16 @@ void CharSel::select()
         }
     }
 
-    if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
-        menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+    }
     else
-        menu_manager->pushMenu(MENUID_TRACKSEL);
+    {
+        if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
+            menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
+        else
+            menu_manager->pushMenu(MENUID_TRACKSEL);
+    }
 }   // select
 
 //----------------------------------------------------------------------------
