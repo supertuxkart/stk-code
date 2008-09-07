@@ -57,7 +57,7 @@ private:
     unsigned int m_pos; // simple stack counter for constructing packet data
     bool         m_needs_destroy;  // only received messages need to be destroyed
 
-protected:
+public:
     void         addInt(int data);
     void         addShort(short data);
     void         addString(const std::string &data); 
@@ -107,18 +107,18 @@ protected:
                                                    q.setZ(getFloat());
                                                    q.setW(getFloat()); 
                                                    return q;               }
-    int          getIntLength() const            { return sizeof(int);     }
-    int          getUIntLength() const           { return sizeof(int);     }
-    int          getShortLength() const          { return sizeof(short);   }
-    int          getCharLength() const           { return sizeof(char);    }
-    int          getFloatLength()                { return sizeof(float);   }
-    int          getStringLength(const std::string& s) { return s.size()+1;      }
-    int          getVec3Length()                 { return 3*sizeof(float); }
-    int          getQuaternionLength()           { return 4*sizeof(float); }
-
-    int          getStringVectorLength(const std::vector<std::string>& vs);
+    static int   getIntLength()             { return sizeof(int);     }
+    static int   getUIntLength()            { return sizeof(int);     }
+    static int   getShortLength()           { return sizeof(short);   }
+    static int   getCharLength()            { return sizeof(char);    }
+    static int   getBoolLength()            { return sizeof(char);    }
+    static int   getFloatLength()           { return sizeof(float);   }
+    static int   getStringLength(const std::string& s) { return s.size()+1;}
+    static int   getVec3Length()            { return 3*sizeof(float); }
+    static int   getQuaternionLength()      { return 4*sizeof(float); }
+    static int   getStringVectorLength(const std::vector<std::string>& vs);
 #ifndef WIN32
-    int          getSizeTLength(size_t n)        { return sizeof(int);   }
+    static int   getSizeTLength(size_t n)   { return sizeof(int);     }
 #endif
 
 public:

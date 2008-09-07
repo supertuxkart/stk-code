@@ -25,23 +25,11 @@
 #include "kart.hpp"
 #include "terrain_info.hpp"
 
+class FlyableInfo;
+
 class Flyable : public Moveable, public TerrainInfo
 {
 public:
-    /** FlyableInfo stores information for updating flyables on the clients.
-     *  It contains only the coordinates, rotation, and explosion state.    */
-    // -----------------------------------------------------------------------
-    class FlyableInfo
-    {
-    public:
-        Vec3         m_xyz;
-        btQuaternion m_rotation;
-        bool         m_exploded;
-        FlyableInfo(const Vec3& xyz, const btQuaternion &rotation, bool exploded) :
-                    m_xyz(xyz), m_rotation(rotation), m_exploded(exploded)
-                    {};
-        FlyableInfo() {};
-    };
 private:
     bool              m_has_hit_something;
     bool              m_exploded;

@@ -30,16 +30,19 @@ enum WidgetTokens
 
 StartRaceFeedback::StartRaceFeedback()
 {
+    m_is_first_frame = true;
     //Add some feedback so people know they are going to start the race
     widget_manager->reset();
     widget_manager->addTextWgt( WTOK_MSG, 60, 7, "" );
-    m_loading_text       = _("Loading race...");
-    m_synchronising_text = _("Synchronising network...");
+
+    widget_manager->setWgtText(WTOK_MSG, _("Synchronising network..."));
+
     if(network_manager->getMode()==NetworkManager::NW_NONE)
-        widget_manager->setWgtText(WTOK_MSG, m_loading_text);
-    else  // networking
-        // the state and mode are checked in update()
-        widget_manager->setWgtText(WTOK_MSG, m_synchronising_text);
+    {
+        // This copies the local player information to the global
+        // player information in the race manager.
+        network_manager->setupPlayerKartInfo();
+    }
 
     widget_manager->layout(WGT_AREA_ALL);
 }
@@ -54,6 +57,8 @@ StartRaceFeedback::~StartRaceFeedback()
 //-----------------------------------------------------------------------------
 void StartRaceFeedback::update(float delta)
 {
+    // First test if we are still waiting
+    // ===================================
 
     // If the server hasn't received all client information, keep on waiting
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
@@ -70,27 +75,24 @@ void StartRaceFeedback::update(float delta)
         return;
     }
 
-    if(network_manager->getMode()==NetworkManager::NW_NONE)
-    {
-        // This copies the loca lplayer information to the global
-        // player information in the race manager
-        network_manager->setupPlayerKartInfo();
-    }
-    else if(network_manager->getMode()==NetworkManager::NW_SERVER)
-    {
-        network_manager->sendRaceInformationToClients();
-        widget_manager->setWgtText(WTOK_MSG, m_loading_text);
-    } 
-    else if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        // Client received race information
-        widget_manager->setWgtText(WTOK_MSG, m_loading_text);
-    }
-
+    // Waiting is finished, switch to loading
+    // ======================================
+    widget_manager->setWgtText(WTOK_MSG, _("Loading race..."));
     widget_manager->update(delta);
 
-    // Pops this menu
-    race_manager->startNew();
+    // We can't do the actual loading etc. in the first call here, since then
+    // the text 'loading' would not be displayed. So a simple state variable
+    // 'is_first_frame' is used to make sure that the text is displayed 
+    // before initiating the loading of the race.
+    if(!m_is_first_frame)
+    {
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        {
+            network_manager->sendRaceInformationToClients();
+        } 
+        race_manager->startNew();
+    }
+    m_is_first_frame = false;
 
 }   // update
 

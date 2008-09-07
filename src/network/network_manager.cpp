@@ -343,16 +343,21 @@ void NetworkManager::switchToCharacterSelection()
         // Change state to wait for list of characters from server
         m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
     }
-    else if(m_mode==NW_SERVER)
-    {   // server: create message with all valid characters
-        // ================================================
-        for(unsigned int i=1; i<=m_num_clients; i++)
+    else   // Server or no network
+    {   
+        if(m_mode==NW_SERVER)
         {
-            CharacterInfoMessage m(i);
-            enet_peer_send(m_clients[i], 0, m.getPacket());
+            // server: create message with all valid characters
+            // ================================================
+            for(unsigned int i=1; i<=m_num_clients; i++)
+            {
+                CharacterInfoMessage m(i);
+                enet_peer_send(m_clients[i], 0, m.getPacket());
+            }
+            enet_host_flush(m_host); 
         }
-        enet_host_flush(m_host); 
-
+        // For server and no network:
+        // ==========================
         // Prepare the data structures to receive and 
         // store information from all clients.
         m_num_local_players.clear();

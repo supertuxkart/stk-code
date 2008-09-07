@@ -22,10 +22,8 @@
 
 class StartRaceFeedback: public BaseGUI
 {
-private:
-    char *m_loading_text;        // Used to have the actual text in only
-    char *m_synchronising_text;  // one place (easier to change, avoids
-                                 // multiple translations in case of typos)
+protected:
+    bool m_is_first_frame;
 public:
     StartRaceFeedback();
     ~StartRaceFeedback();

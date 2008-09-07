@@ -1617,6 +1617,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\network\flyable_info.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\herring_info.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\network\kart_control_message.hpp"
 					>
 				</File>

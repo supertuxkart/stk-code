@@ -19,6 +19,7 @@
 
 #include <math.h>
 
+#include "network/flyable_info.hpp"
 #include "flyable.hpp"
 #include "world.hpp"
 #include "kart.hpp"
