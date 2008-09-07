@@ -33,7 +33,6 @@ enum WidgetTokens
 
 NetworkInfo::NetworkInfo()
 {
-    //Add some feedback so people know they are going to start the race
     widget_manager->reset();
     Widget *w_prev=widget_manager->addTitleWgt( WTOK_MSG, 60, 7, _("Waiting for clients ...") );
     w_prev->setPosition(WGT_DIR_CENTER,   0.0,   NULL, 

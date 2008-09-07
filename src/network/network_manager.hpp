@@ -36,19 +36,17 @@ public:
     enum NetworkMode {NW_SERVER, NW_CLIENT, NW_NONE};
 
     // States for the finite state machine. First for server:
-    enum NetworkState {NS_ACCEPT_CONNECTIONS, NS_KART_INFO_BARRIER,
+    enum NetworkState {NS_ACCEPT_CONNECTIONS, NS_WAIT_FOR_KART_INFO,
          // Then client only states:
                        NS_CHARACTER_CONFIRMED, 
                        NS_CHARACTER_REJECTED,
-                       NS_WAITING_FOR_RACE_DATA,
+                       NS_WAIT_FOR_RACE_DATA,
          // Shared states   
                        NS_CHARACTER_SELECT, NS_READY_SET_GO_BARRIER, NS_RACING};
 private:
 
     NetworkMode                 m_mode;
     NetworkState                m_state;
-    int                         m_port;
-    std::string                 m_server_address;
     int                         m_num_clients;
     std::vector<RemoteKartInfo> m_kart_info;
     int                         m_host_id;
@@ -77,19 +75,19 @@ public:
     unsigned int getNumClients() const             {return m_num_clients;   }
     const std::string& 
                  getClientName(int i) const        {return m_client_names[i];}
-    void         setPort(int p)                    {m_port=p;               }
-    void         setServerIP(const std::string &s) {m_server_address=s;     }
     void         setKartInfo(int player_id, const std::string& kart, 
                              const std::string& user="", int hostid=-1);
     bool         initialiseConnections();
     void         update(float dt);
     void         sendKartsInformationToServer();
-    void         waitForKartsInformation();
+    void         setupPlayerKartInfo();
     void         sendRaceInformationToClients();
     void         waitForRaceInformation();
-    void         switchToReadySetGoBarrier();
+
     void         switchToCharacterSelection();
+    void         switchToReceiveKartInfo();
     void         switchToRaceDataSynchronisation();
+    void         switchToReadySetGoBarrier();
 
 };
 

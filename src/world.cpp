@@ -306,7 +306,7 @@ void World::update(float dt)
         menu_manager->pushMenu(MENUID_RACERESULT);
     }
     if(!user_config->m_replay_history) history->StoreDelta(dt);
-    m_physics->update(dt);
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT) m_physics->update(dt);
     for (int i = 0 ; i <(int) m_kart.size(); ++i)
     {
         // Update all karts that are not eliminated

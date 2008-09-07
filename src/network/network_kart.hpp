@@ -27,9 +27,9 @@ class NetworkKart : public Kart
 private:
     int m_global_player_id;     // to identify this kart to the network manager
 public:
-    NetworkKart(const std::string& kart_name, int position, 
-                const btTransform& init_transform,
-                int global_player_id);
-
+         NetworkKart(const std::string& kart_name, int position, 
+                     const btTransform& init_transform,
+                     int global_player_id);
+    void setControl(const KartControl& kc);
 };   // NetworkKart
 #endif

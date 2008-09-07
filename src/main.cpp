@@ -163,7 +163,7 @@ int handleCmdLine(int argc, char **argv)
         else if(sscanf(argv[i], "--server=%d",&n)==1)
 	{
 	     network_manager->setMode(NetworkManager::NW_SERVER);
-	     network_manager->setPort(n);
+	     user_config->m_server_port = n;
 	}
         else if( !strcmp(argv[i], "--server") )
 	{
@@ -171,12 +171,12 @@ int handleCmdLine(int argc, char **argv)
 	}
         else if( sscanf(argv[i], "--port=%d", &n) )
 	{
-	     network_manager->setPort(n);
+        user_config->m_server_port=n;
 	}
         else if( sscanf(argv[i], "--client=%s", s) )
 	{
 	     network_manager->setMode(NetworkManager::NW_CLIENT);
-	     network_manager->setServerIP(s);
+	     user_config->m_server_address=s;
 	}
 #endif
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
@@ -531,15 +531,18 @@ int main(int argc, char *argv[] )
             exit(-3);
         }
 
+        // Initialise connection in case that a command line option was set
+        // configuring a client or server. Otherwise this function does nothing
+        // here (and will be called again from the network gui).
         if(!network_manager->initialiseConnections())
         {
             fprintf(stderr, "Problems initialising network connections,\n"
                             "Running in non-network mode.\n");
         }
-        // On the server start with the network information page
+        // On the server start with the network information page for now
         if(network_manager->getMode()==NetworkManager::NW_SERVER)
         {
-            menu_manager->pushMenu(MENUID_NETWORK_INFO);
+            menu_manager->pushMenu(MENUID_NETWORK_GUI);
         }
         // Not replaying
         // =============

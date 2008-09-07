@@ -30,13 +30,11 @@ enum WidgetTokens
 
 StartRaceFeedback::StartRaceFeedback()
 {
-    network_manager->switchToRaceDataSynchronisation();
-
-    m_state = network_manager->getMode()==NetworkManager::NW_NONE ? SRF_LOADING : SRF_NETWORK;
+    m_state = SRF_NETWORK;
 
     //Add some feedback so people know they are going to start the race
     widget_manager->reset();
-    if(m_state==SRF_NETWORK)
+    if(network_manager->getMode()!=NetworkManager::NW_NONE)
         widget_manager->addTextWgt( WTOK_MSG, 60, 7, _("Synchronising network...") );
     else
         widget_manager->addTextWgt( WTOK_MSG, 60, 7, _("Loading race...") );
@@ -68,15 +66,17 @@ void StartRaceFeedback::update(float DELTA)
             break;
         case SRF_NETWORK:
             // The server only waits for one frame:
-            if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
             {
+                // Server or stand alone:
                 network_manager->sendRaceInformationToClients();
+                network_manager->setupPlayerKartInfo();
                 m_state = SRF_LOADING_DISPLAY;
                 widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );
                 return;
             }
             // The client have to be busy waiting till the race data has arrived:
-            if(network_manager->getState()==NetworkManager::NS_WAITING_FOR_RACE_DATA)
+            if(network_manager->getState()==NetworkManager::NS_WAIT_FOR_RACE_DATA)
                 return;
             m_state = SRF_LOADING_DISPLAY;
             widget_manager->setWgtText(WTOK_MSG, _("Loading race...") );

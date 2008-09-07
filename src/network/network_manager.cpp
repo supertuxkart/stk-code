@@ -29,8 +29,7 @@ NetworkManager::NetworkManager()
 {
      m_mode           = NW_NONE;
      m_state          = NS_ACCEPT_CONNECTIONS;
-     m_port           = 12345;
-     m_server_address = "172.31.41.53";
+
      m_num_clients    = 0;
      m_host_id        = 0;
 #ifdef HAVE_ENET
@@ -67,11 +66,11 @@ NetworkManager::~NetworkManager()
 bool NetworkManager::initServer()
 {
 #ifdef HAVE_ENET
-     fprintf(stderr, "Initialising server, listening on %d\n", m_port);
+     fprintf(stderr, "Initialising server, listening on %d\n", user_config->m_server_port);
 
      ENetAddress address;
      address.host = ENET_HOST_ANY;
-     address.port = m_port;
+     address.port = user_config->m_server_port;
 
      m_host = enet_host_create (& address     /* the address to bind the server host to */, 
                                 stk_config->m_max_karts /* number of connections */,
@@ -113,8 +112,8 @@ bool NetworkManager::initClient()
     ENetEvent event;
     ENetPeer *peer;
 
-    enet_address_set_host (& address, m_server_address.c_str());
-    address.port = m_port;
+    enet_address_set_host (& address, user_config->m_server_address.c_str());
+    address.port = user_config->m_server_port;
 
     /* Initiate the connection, allocating the two channels 0 and 1. */
     peer = enet_host_connect (m_host, &address, 2);    
@@ -136,11 +135,11 @@ bool NetworkManager::initClient()
         enet_peer_reset (peer);
 
         fprintf(stderr, "Connection to '%s:%d' failed.\n",
-                m_server_address.c_str(), m_port);
+                user_config->m_server_address.c_str(), user_config->m_server_port);
         return false;
     }
     fprintf(stderr, "Connection to %s:%d succeeded.\n", 
-             m_server_address.c_str(), m_port);
+             user_config->m_server_address.c_str(), user_config->m_server_port);
     enet_host_service(m_host, &event, 1000);
     // FIXME Receive host id from server here!!
     m_host_id = 1;
@@ -213,12 +212,13 @@ void NetworkManager::handleServerMessage(ENetEvent *event)
             m_state = NS_RACING;
         }
         break;
-    case NS_KART_INFO_BARRIER:
+    case NS_WAIT_FOR_KART_INFO:
         m_barrier_count++;
+        // handle message, i.e. append to m_kart_info
         if(m_barrier_count==m_num_clients)
         {
             // broadcast start message
-            m_state = NS_RACING;
+            m_state = NS_READY_SET_GO_BARRIER;
         }
         break;
 
@@ -228,9 +228,15 @@ void NetworkManager::handleServerMessage(ENetEvent *event)
 // ----------------------------------------------------------------------------
 void NetworkManager::switchToReadySetGoBarrier()
 {
-    assert(m_state == NS_CHARACTER_SELECT);
-    m_state         = NS_READY_SET_GO_BARRIER;
-    m_barrier_count = 0;
+    if(m_num_clients==0)
+    {
+        m_state = NS_RACING;
+    }
+    else
+    {
+        m_state         = NS_READY_SET_GO_BARRIER;
+        m_barrier_count = 0;
+    }
 }   // switchToReadySetGoBarrier
 
 // ----------------------------------------------------------------------------
@@ -243,10 +249,16 @@ void NetworkManager::switchToCharacterSelection()
 }   // switchTocharacterSelection
 
 // ----------------------------------------------------------------------------
-void NetworkManager::switchToRaceDataSynchronisation()
+void NetworkManager::switchToReceiveKartInfo()
 {
     assert(m_state == NS_CHARACTER_SELECT);
-    m_state         = NS_KART_INFO_BARRIER;
+    m_state         = NS_WAIT_FOR_KART_INFO;
+}   // switchToReceiveKartInfo
+
+// ----------------------------------------------------------------------------
+void NetworkManager::switchToRaceDataSynchronisation()
+{
+    m_state         = NS_WAIT_FOR_RACE_DATA;
     m_barrier_count = 0;
 }   // switchToRaceDataSynchronisation
 
@@ -255,10 +267,10 @@ void NetworkManager::handleClientMessage(ENetEvent *event)
 {
     switch(m_state)
     {
-    case NS_ACCEPT_CONNECTIONS:
-        fprintf(stderr, "Received a receive event while waiting for client - ignored.\n");
-        return;
-
+    case NS_WAIT_FOR_RACE_DATA:
+        // check if message is really race data
+        fprintf(stderr, "Client received race data\n");
+        break;
     }   // switch m_state
 }   // handleClientMessage
 
@@ -301,19 +313,19 @@ void NetworkManager::sendKartsInformationToServer()
         fprintf(stderr, "kart name '%s'\n", race_manager->getLocalKartInfo(i).getKartName().c_str());
     }   // for i<getNumLocalPlayers
     fprintf(stderr, "Client sending kart information to server\n");
+    m_state = NS_WAIT_FOR_RACE_DATA;
 }   // sendKartsInformationToServer
 
 // ----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
-void NetworkManager::waitForKartsInformation()
+void NetworkManager::setupPlayerKartInfo()
 {
     m_kart_info.clear();
 
-    fprintf(stderr, "Server receiving all kart information\n");
     // FIXME: debugging
-    m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
-    m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
+    //m_kart_info.push_back(RemoteKartInfo(0, "tuxkart","xx", 1));
+    //m_kart_info.push_back(RemoteKartInfo(1, "yetikart",   "yy", 1));
 
     // Get the local kart info
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
@@ -334,7 +346,7 @@ void NetworkManager::waitForKartsInformation()
     {
         race_manager->setPlayerKart(i, m_kart_info[i]);
     }
-}   // waitForKartsInformation
+}   // setupPlayerKartInfo
 
 // ----------------------------------------------------------------------------
 /** Sends the information from the race_manager to all clients.
@@ -348,6 +360,9 @@ void NetworkManager::sendRaceInformationToClients()
         fprintf(stderr, "Sending kart '%s' playerid %d host %d\n",
                 ki.getKartName().c_str(), ki.getLocalPlayerId(), ki.getHostId());
     }   // for i
+
+    // Go
+    m_state=NS_READY_SET_GO_BARRIER;
 }   // sendRaceInformationToClients
 
 // ----------------------------------------------------------------------------

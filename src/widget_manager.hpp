@@ -298,6 +298,9 @@ public:
     //size).
     void setWgtCornerRadius(const int TOKEN, const int RADIUS);
     void showWgtRect(const int TOKEN);
+    // Completely hide and show a widget
+    void hideWgt(const int t) {hideWgtRect(t); hideWgtText(t);}
+    void showWgt(const int t) {showWgtRect(t); showWgtText(t);}
     void hideWgtRect(const int TOKEN);
 
     void setWgtBorderColor(const int TOKEN, const GLfloat* const COLOR);

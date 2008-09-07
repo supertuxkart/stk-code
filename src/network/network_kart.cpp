@@ -18,13 +18,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network_kart.hpp"
+#include "network/network_manager.hpp"
+#include "network/network_kart.hpp"
 
+/** A network kart. On the server, it receives its control information (steering etc)
+    from the network manager.
+    */
 NetworkKart::NetworkKart(const std::string &kart_name, int position, 
                          const btTransform &init_transform, int global_player_id)
                          : Kart(kart_name, position, init_transform)
 {
     m_global_player_id = global_player_id;
 }   // NetworkKart
+
+// ----------------------------------------------------------------------------
+void NetworkKart::setControl(const KartControl& kc)
+{
+    assert(network_manager->getMode()==NetworkManager::NW_SERVER);
+    m_controls = kc;
+}   // setControl
 
 // ----------------------------------------------------------------------------

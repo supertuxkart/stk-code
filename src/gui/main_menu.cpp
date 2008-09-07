@@ -32,6 +32,7 @@ enum WidgetTokens
 {
     WTOK_SINGLE,
     WTOK_MULTI,
+    WTOK_NETWORK,
     WTOK_CHALLENGES,
     WTOK_OPTIONS,
     WTOK_QUIT,
@@ -47,6 +48,11 @@ MainMenu::MainMenu()
     const int WIDTH=30;
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Multiplayer") );
+#ifdef HAVE_ENET
+    // Only display the networking entry when not already connected.
+    if(network_manager->getMode()==NetworkManager::NW_NONE)
+        widget_manager->addTextButtonWgt( WTOK_NETWORK, WIDTH, 7, _("Networking") );
+#endif
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
     // Only allow challenges if not networking for now!
@@ -103,6 +109,9 @@ void MainMenu::select()
         break;
     case WTOK_MULTI:
         menu_manager->pushMenu(MENUID_NUMPLAYERS);
+        break;
+    case WTOK_NETWORK:
+        menu_manager->pushMenu(MENUID_NETWORK_GUI);
         break;
     case WTOK_CHALLENGES:
         menu_manager->pushMenu(MENUID_CHALLENGES);

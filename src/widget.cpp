@@ -811,13 +811,6 @@ void Widget::draw()
 
     if(m_enable_text)
     {
-        if(m_text.empty())
-        {
-            std::cerr << "Warning: widget tried to print an empty string.\n";
-            std::cerr << "(Did you set the text?)\n";
-        }
-
-
         //For multilines we have to do a *very* ugly workaround for a plib
         //bug which causes multiline strings to move to the left, at least
         //while centering, and also gives wrong values for the size of the

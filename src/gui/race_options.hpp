@@ -33,6 +33,7 @@ public:
     ~RaceOptions();
 
     void select();
+    void update(float dt);
 };
 
 #endif

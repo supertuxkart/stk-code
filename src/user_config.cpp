@@ -121,6 +121,8 @@ void UserConfig::setDefaults()
     m_log_errors       = false;
     m_kart_group       = "standard";
     m_track_group      = "standard";
+    m_server_address   = "localhost";
+    m_server_port      = 2305;
 
     if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");
@@ -444,8 +446,12 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("log-errors",       m_log_errors);
         lisp->get("kart-group",       m_kart_group);
         lisp->get("track-group",      m_track_group);
-                // Handle loading the stick config in it own method.
+        // Handle loading the stick config in it own method.
         readStickConfigs(lisp);
+
+        // Address of server
+        lisp->get("server-address",   m_server_address);
+        lisp->get("server-port",      m_server_port);
 
         // Unlock information:
         const lisp::Lisp* unlock_info = lisp->getLisp("unlock-info");
@@ -691,6 +697,10 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("kart-group", m_kart_group);
         writer->writeComment("Last selected track group");
         writer->write("track-group", m_track_group);
+        writer->writeComment("Information about last server used");
+        writer->write("server-address", m_server_address);
+        writer->write("server-port", m_server_port);
+
         writeStickConfigs(writer);
 
         // Write unlock information back

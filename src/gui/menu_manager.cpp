@@ -55,6 +55,7 @@
 #include "feature_unlocked.hpp"
 #include "start_race_feedback.hpp"
 #include "network_info.hpp"
+#include "network_gui.hpp"
 
 using namespace std;
 
@@ -239,6 +240,9 @@ void MenuManager::update()
                 break;
             case MENUID_START_RACE_FEEDBACK:
                 m_current_menu = new StartRaceFeedback();
+                break;
+            case MENUID_NETWORK_GUI:
+                m_current_menu = new NetworkGUI();
                 break;
             case MENUID_NETWORK_INFO:
                 m_current_menu = new NetworkInfo();

@@ -1007,6 +1007,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\network_gui.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\network_info.cpp"
 					>
 				</File>
@@ -1482,6 +1486,10 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\menu_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\network_gui.hpp"
 					>
 				</File>
 				<File
