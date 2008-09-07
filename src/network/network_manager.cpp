@@ -240,6 +240,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
                 RaceStartMessage m;
                 broadcastToClients(m);
             }
+            break;
         }
     default: assert(0);  // should not happen
     }   // switch m_state
@@ -266,6 +267,9 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         }
     case NS_READY_SET_GO_BARRIER:
         {
+            // Not actually needed, but the destructor of RaceStartMessage
+            // will free the memory of the event.
+            RaceStartMessage m(event->packet);
             m_state = NS_RACING;
             break;
         }
@@ -323,7 +327,7 @@ void NetworkManager::switchToCharacterSelection()
         // Change state to wait for list of characters from server
         m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
     }
-    else
+    else if(m_mode==NW_SERVER)
     {   // server: create message with all valid characters
         // ================================================
         CharacterInfoMessage m;
@@ -365,14 +369,8 @@ void NetworkManager::worldLoaded()
     {
         WorldLoadedMessage m;
         sendToServer(&m);
+        m_state = NS_READY_SET_GO_BARRIER;
     }
-    else if(m_mode==NW_SERVER)
-    {
-        assert(m_state=NS_READY_SET_GO_BARRIER);
-        RaceStartMessage m;
-        broadcastToClients(m);
-    }
-
 }   // worldLoaded
 
 // ----------------------------------------------------------------------------
@@ -398,6 +396,7 @@ void NetworkManager::setupPlayerKartInfo()
     {
         race_manager->setPlayerKart(i, m_kart_info[i]);
     }
+    race_manager->computeRandomKartList();
 }   // setupPlayerKartInfo
 
 // ----------------------------------------------------------------------------
@@ -405,9 +404,11 @@ void NetworkManager::setupPlayerKartInfo()
 */
 void NetworkManager::sendRaceInformationToClients()
 {
-    setupPlayerKartInfo();
-    RaceInfoMessage m(m_kart_info);
-    broadcastToClients(m);
+    if(m_mode==NW_SERVER)
+    {
+        RaceInfoMessage m(m_kart_info);
+        broadcastToClients(m);
+    }
     m_state         = NS_READY_SET_GO_BARRIER;
     m_barrier_count = 0;
     if(m_num_clients==0) m_state = NS_RACING;

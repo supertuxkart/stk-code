@@ -34,7 +34,7 @@ public:
         allocate(0);
     }   // RaceStartMessage
 
-    RaceStartMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
+    RaceStartMessage(ENetPacket* pkt):Message(pkt, MT_RACE_START)
     {
     }
 };   // RaceStartMessage

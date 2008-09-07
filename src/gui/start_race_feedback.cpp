@@ -70,22 +70,20 @@ void StartRaceFeedback::update(float delta)
         return;
     }
 
-    static bool first=true;
-    if(first)
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        {
-            network_manager->sendRaceInformationToClients();
-            widget_manager->setWgtText(WTOK_MSG, m_loading_text);
-        } 
-        else if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-        {
-            // Client received race information
-            widget_manager->setWgtText(WTOK_MSG, m_loading_text);
-        }
-        first=false;
+        network_manager->sendRaceInformationToClients();
+        widget_manager->setWgtText(WTOK_MSG, m_loading_text);
+    } 
+    else if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        // Client received race information
+        widget_manager->setWgtText(WTOK_MSG, m_loading_text);
     }
+
     widget_manager->update(delta);
+
+    // Pops this menu
     race_manager->startNew();
 
 }   // update

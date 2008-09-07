@@ -21,6 +21,7 @@
 #define HEADER_MESSAGE_H
 
 #include <string>
+#include <vector>
 #include <assert.h>
 
 #ifdef HAVE_ENET
@@ -46,18 +47,26 @@ private:
 
 protected:
     bool         add(int data);
+#ifndef WIN32          // on windows size_t is unsigned int
     bool         add(size_t data)       { return add((int)data); }
+#endif
     bool         add(unsigned int data) { return add((int)data); }
     bool         add(float data);
     bool         add(const std::string &data); 
+    bool         add(const std::vector<std::string>& vs);
     int          getInt(); 
     float        getFloat();
     std::string  getString();
-    int          getLength(const std::string& s) { return s.size()+1;    }
+    std::vector<std::string>
+                 getStringVector();
     int          getLength(int n)                { return sizeof(int);   }
     int          getLength(unsigned int n)       { return sizeof(int);   }
-    int          getLength(size_t n)             { return sizeof(int);   }
     int          getLength(float f)              { return sizeof(float); }
+    int          getLength(const std::string& s) { return s.size()+1;    }
+    int          getLength(const std::vector<std::string>& vs);
+#ifndef WIN32
+    int          getLength(size_t n)             { return sizeof(int);   }
+#endif
 
 public:
                  Message(MessageType m);    // create from scratch (to send)
