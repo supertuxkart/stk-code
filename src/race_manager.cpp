@@ -44,7 +44,7 @@ RaceManager::RaceManager()
     m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
     setTrack("race");
-    setPlayerKart(0, "tuxkart");
+    setLocalPlayerKart(0, "tuxkart");
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -60,31 +60,41 @@ void RaceManager::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
-void RaceManager::setPlayerKart(unsigned int player, const std::string& kart)
+void RaceManager::setLocalPlayerKart(unsigned int player, const std::string& kart)
 {
+
     if (player >= 0 && player < 4)
     {
-        if (player >= getNumPlayers())
-            setNumPlayers(player+1);
-        m_player_karts[player] = kart;
+        if (player >= getNumLocalPlayers())
+            setNumLocalPlayers(player+1);
+        m_local_player_karts[player] = kart;
+
     }
     else
     {
         fprintf(stderr, "Warning: player '%d' does not exists.\n", player);
     }
+}   // setLocalPlayerKart
+//-----------------------------------------------------------------------------
+void RaceManager::setPlayerKart(unsigned int player, const std::string& kart,
+                                const std::string& player_name, int host_id)
+{
+    if (player >= getNumPlayers())
+        setNumPlayers(player+1);
+    m_player_karts[player]  = kart;
+    m_player_names[player]  = player_name;
 }   // setPlayerKart
 
 //-----------------------------------------------------------------------------
 void RaceManager::setNumPlayers(int num)
 {
     m_player_karts.resize(num);
+    m_player_names.resize(num);
     for(PlayerKarts::iterator i = m_player_karts.begin(); i != m_player_karts.end(); ++i)
-    {
-        if (i->empty())
-        {
-            *i = "tuxkart";
-        }
-    }
+        if (i->empty()) *i = "tuxkart";
+    for(PlayerKarts::iterator i = m_player_names.begin(); i != m_player_names.end(); ++i)
+        if (i->empty()) *i = "guest";
+
 }   // setNumPlayers
 
 //-----------------------------------------------------------------------------

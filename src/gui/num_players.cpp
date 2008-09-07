@@ -63,7 +63,7 @@ void NumPlayers::select()
     case WTOK_PLAYER_2:
     case WTOK_PLAYER_3:
     case WTOK_PLAYER_4:
-        race_manager->setNumPlayers(widget_manager->getSelectedWgt());
+        race_manager->setNumLocalPlayers(widget_manager->getSelectedWgt());
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
             menu_manager->pushMenu(MENUID_CHARSEL_P1);
         else

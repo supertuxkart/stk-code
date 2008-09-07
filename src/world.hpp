@@ -78,18 +78,11 @@ public:
     void        restartRace();
     void        disableRace(); // Put race into limbo phase
 
-    PlayerKart* getPlayerKart(int player) const
-    {
-        return m_player_karts[player];
-    }
-    
-    
-    Kart* getKart(int kartId) const
-    {
-        assert(kartId >= 0 &&
-               kartId < int(m_kart.size()));
-        return m_kart[kartId];
-    }
+    PlayerKart *getPlayerKart(int player) const { return m_player_karts[player];   }
+    PlayerKart *getLocalPlayerKart(int n) const { return m_local_player_karts[n];  }
+    Kart       *getKart(int kartId) const     { assert(kartId >= 0 &&
+                                                      kartId < int(m_kart.size()));
+                                                return m_kart[kartId];             }
     unsigned int getCurrentNumKarts()  const  { return (int)m_kart.size()-
                                                           m_eliminated_karts;      }
     unsigned int getCurrentNumPlayers() const { return (int)m_player_karts.size()-
@@ -111,6 +104,7 @@ public:
 private:
     Karts       m_kart;
     std::vector<PlayerKart*>  m_player_karts;
+    std::vector<PlayerKart*>  m_local_player_karts;
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;

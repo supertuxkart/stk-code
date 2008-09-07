@@ -970,9 +970,9 @@ void RaceGUI::drawStatusText(const float dt)
     // "Go" is displayed and the race starts
     if(world->isStartPhase() || world->getTime()<1.0f)
     {
-        for(unsigned int i=0; i<race_manager->getNumPlayers(); i++)
+        for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         {
-            if(world->getPlayerKart(i)->earlyStartPenalty())
+            if(world->getLocalPlayerKart(i)->earlyStartPenalty())
             {
                 GLfloat const COLORS[] = { 0.78f, 0.025f, 0.025f, 1.0f };
                 font_race->PrintShadow( _("Penalty time!!"), 80,
@@ -984,14 +984,14 @@ void RaceGUI::drawStatusText(const float dt)
 
     float split_screen_ratio_x, split_screen_ratio_y;
     split_screen_ratio_x = split_screen_ratio_y = 1.0;
-    if(race_manager->getNumPlayers() >= 2)
+    if(race_manager->getNumLocalPlayers() >= 2)
         split_screen_ratio_y = 0.5;
-    if(race_manager->getNumPlayers() >= 3)
+    if(race_manager->getNumLocalPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
     if ( world->isRacePhase() )
     {
-        const int numPlayers = race_manager->getNumPlayers();
+        const int numPlayers = race_manager->getNumLocalPlayers();
 
         for(int pla = 0; pla < numPlayers; pla++)
         {
@@ -1025,7 +1025,7 @@ void RaceGUI::drawStatusText(const float dt)
                 offset_x = user_config->m_width/2;
             }
 
-            Kart* player_kart=world->getPlayerKart(pla);
+            Kart* player_kart=world->getLocalPlayerKart(pla);
             drawCollectableIcons(player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawEnergyMeter     (player_kart, offset_x, offset_y,

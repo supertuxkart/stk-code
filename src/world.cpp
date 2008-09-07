@@ -96,6 +96,7 @@ World::World()
     loadTrack() ;
 
     m_player_karts.resize(race_manager->getNumPlayers());
+    m_local_player_karts.resize(race_manager->getNumLocalPlayers());
 
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
@@ -103,7 +104,7 @@ World::World()
         btTransform init_pos=m_track->getStartTransform(position);
         Kart* newkart;
         const std::string& kart_name=race_manager->getKartName(i);
-        int player_id = race_manager->getkartPlayerId(i);
+        int player_id = race_manager->getKartPlayerId(i);
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart

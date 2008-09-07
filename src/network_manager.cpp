@@ -19,6 +19,8 @@
 
 #include "network_manager.hpp"
 #include "stk_config.hpp"
+#include "user_config.hpp"
+#include "race_manager.hpp"
 
 NetworkManager* network_manager = 0;
 
@@ -29,12 +31,16 @@ NetworkManager::NetworkManager()
      m_port           = 12345;
      m_server_address = "172.31.41.53";
      m_num_clients    = 0;
+     m_host_id        = 0;
 #ifdef HAVE_ENET
      if (enet_initialize () != 0)
      {
 	  fprintf (stderr, "An error occurred while initializing ENet.\n");
 	  exit(-1);
      }
+     // FIXME: debugging
+     m_kart_info.push_back(KartInfo("tuxkart","xx", 1));
+     m_kart_info.push_back(KartInfo("yeti",   "yy", 1));
 #endif
 }   // NetworkManager
 
@@ -122,14 +128,8 @@ bool NetworkManager::initClient()
     }
     
     /* Wait up to 5 seconds for the connection attempt to succeed. */
-    if (enet_host_service (m_host, & event, 5000) > 0 &&
-        event.type == ENET_EVENT_TYPE_CONNECT)
-    {
-        fprintf(stderr, "Connection to %s:%d succeeded.\n", 
-                m_server_address.c_str(), m_port);
-        enet_host_service(m_host, &event, 1000);
-    }
-    else
+    if (enet_host_service (m_host, & event, 5000) <= 0 ||
+        event.type != ENET_EVENT_TYPE_CONNECT)
     {
         /* Either the 5 seconds are up or a disconnect event was */
         /* received. Reset the peer in the event the 5 seconds   */
@@ -137,8 +137,14 @@ bool NetworkManager::initClient()
         enet_peer_reset (peer);
 
         fprintf(stderr, "Connection to '%s:%d' failed.\n",
-		m_server_address.c_str(), m_port);
+                m_server_address.c_str(), m_port);
+        return false;
     }
+    fprintf(stderr, "Connection to %s:%d succeeded.\n", 
+             m_server_address.c_str(), m_port);
+    enet_host_service(m_host, &event, 1000);
+    // FIXME Receive host id from server here!!
+    m_host_id = 1;
 
     return true;
 #endif
@@ -154,10 +160,13 @@ void NetworkManager::handleNewConnection(ENetEvent *event)
     }
     m_num_clients++;
     fprintf (stderr, "A new client connected from %x:%u. Connected: %d.\n", 
-        event->peer -> address.host,
-        event->peer -> address.port, m_num_clients);
+             event->peer -> address.host,
+             event->peer -> address.port, m_num_clients);
+
+    // FIXME: send m_num_clients as hostid back to new client.
 
 }   // handleNewConnection
+
 // ----------------------------------------------------------------------------
 void NetworkManager::handleDisconnection(ENetEvent *event)
 {
@@ -194,7 +203,7 @@ void NetworkManager::update(float dt)
     }
     switch (event.type)
     {
-    case ENET_EVENT_TYPE_CONNECT: handleNewConnection(&event);    break;
+    case ENET_EVENT_TYPE_CONNECT:    handleNewConnection(&event); break;
     case ENET_EVENT_TYPE_RECEIVE:    handleNewMessage(&event);    break;
     case ENET_EVENT_TYPE_DISCONNECT: handleDisconnection(&event); break;
     case ENET_EVENT_TYPE_NONE:       break;
@@ -207,14 +216,36 @@ void NetworkManager::update(float dt)
 */
 void NetworkManager::sendKartsInformationToServer()
 {
+    for(int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
+    {
+        fprintf(stderr, "Sending name '%s', ",user_config->m_player[i].getName().c_str());
+        fprintf(stderr, "kart name '%s'\n", race_manager->getLocalPlayerKart(i));
+    }   // for i<getNumLocalPlayers
     fprintf(stderr, "Client sending kart information to server\n");
 }   // sendKartsInformationToServer
+
 // ----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
 void NetworkManager::waitForKartsInformation()
 {
     fprintf(stderr, "Server receiving all kart information\n");
+
+    // First put the local karts into the race_manager:
+
+    for(unsigned int i=0; i<(int)race_manager->getNumLocalPlayers(); i++)
+    {
+        //FIXME race_manager->setPlayerKart(i, race_manager->getLocalPlayerKart(i),
+        //                            m_host_id);
+    }
+    int offset=race_manager->getNumLocalPlayers();
+    for(unsigned int i=0; i<m_kart_info.size(); i++)
+    {
+        // receive number of karts, kart name, and player name for each hosts,
+        // and put it into the race_manager data structure:
+        //FIXME race_manager->setPlayerKart(offset+i, m_kart_info[i].m_kart_name,
+                //                    m_kart_info[i].m_client_id);
+    }   // for i
 }   // waitForKartsInformation
 
 // ----------------------------------------------------------------------------
@@ -223,6 +254,11 @@ void NetworkManager::waitForKartsInformation()
 void NetworkManager::sendRaceInformationToClients()
 {
     fprintf(stderr, "server sending race_manager information to all clients\n");
+    for(unsigned i=0; i<race_manager->getNumPlayers(); i++)
+    {
+//        fprintf(stderr, "Sending kart '%s' host %d\n",
+//FIXME            race_manager->getKartName(i), race_manager->getHostId(i));
+    }   // for i
 }   // sendRaceInformationToClients
 
 // ----------------------------------------------------------------------------

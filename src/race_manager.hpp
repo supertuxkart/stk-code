@@ -54,6 +54,7 @@ private:
     struct KartStatus
     {
         std::string m_ident;            // The .tkkf filename without the .tkkf
+        std::string m_player_name;      // for networked karts
         int         m_score;            // score for this kart
         int         m_last_score;       // needed for restart race
         double      m_overall_time;     // sum of times of all races
@@ -77,7 +78,10 @@ private:
     RaceModeType                     m_major_mode, m_minor_mode;
     typedef std::vector<std::string> PlayerKarts;
     PlayerKarts                      m_player_karts;
+    PlayerKarts                      m_local_player_karts;
+    std::vector<std::string>         m_player_names;
     std::vector<std::string>         m_tracks;
+    std::vector<int>                 m_host_ids;
     std::vector<int>                 m_num_laps;
     std::vector<int>                 m_score_for_position;
     int                              m_track_number;
@@ -102,11 +106,16 @@ public:
     RaceManager();
     ~RaceManager();
 
-    void         setPlayerKart(unsigned int player, const std::string& kart);
-    void         setNumPlayers(int num);
+    void         setPlayerKart(unsigned int player, const std::string& kart,
+                               const std::string& player_name, int hostid);
+    void         setLocalPlayerKart(unsigned int player, const std::string& kart);
+    const std::string& 
+                 getLocalPlayerKart(unsigned int p) const {return m_local_player_karts[p];}
     void         reset();
     void         RaceFinished(const Kart* kart, float time);
     void         setTrack(const std::string& track);
+    void         setNumPlayers(int num);
+    void         setNumLocalPlayers(int num)    {m_local_player_karts.resize(num);  }
     void         setGrandPrix(const GrandPrixData &gp){ m_grand_prix = gp;          }
     void         setDifficulty(Difficulty diff);
     void         setNumLaps(int num)            { m_num_laps.clear();
@@ -119,6 +128,7 @@ public:
     RaceModeType getMinorMode()           const { return m_minor_mode;              }
     unsigned int getNumKarts()            const { return m_num_karts;               }
     unsigned int getNumPlayers()          const { return (int)m_player_karts.size();}
+    unsigned int getNumLocalPlayers()     const { return (int)m_local_player_karts.size();}
     int          getNumLaps()             const { return m_num_laps[m_track_number];}
     Difficulty   getDifficulty()          const { return m_difficulty;              }
     const std::string& 
@@ -133,7 +143,7 @@ public:
                  getHerringStyle()        const { return m_grand_prix.getHerringStyle();}
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;}
     int          getKartPrevScore(int krt)const { return m_kart_status[krt].m_last_score;}
-    int          getkartPlayerId(int krt) const { return m_kart_status[krt].m_player_id;}
+    int          getKartPlayerId(int krt) const { return m_kart_status[krt].m_player_id;}
     int          getPositionScore(int p)  const { return m_score_for_position[p-1]; }
     double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
     int          getCoinTarget()          const { return m_coin_target;             }

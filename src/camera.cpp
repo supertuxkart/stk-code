@@ -50,7 +50,7 @@ Camera::Camera(int camera_index, const Kart* kart)
 // ----------------------------------------------------------------------------
 void Camera::setScreenPosition(int camera_index)
 {
-    const int num_players = race_manager->getNumPlayers();
+    const int num_players = race_manager->getNumLocalPlayers();
     assert(camera_index >= 0 && camera_index <= 3);
 
     if (num_players == 1)

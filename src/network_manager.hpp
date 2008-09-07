@@ -21,6 +21,7 @@
 #define HEADER_NETWORK_MANAGER_H
 
 #include <string>
+#include <vector>
 
 #ifdef HAVE_ENET
 #  include "enet/enet.h"
@@ -35,13 +36,29 @@ public:
     // The current state.
     enum NetworkState {NS_SYNCHRONISING, NS_RACING};
 private:
-    NetworkMode  m_mode;
-    NetworkState m_state;
-    int          m_port;
-    std::string  m_server_address;
-    int          m_num_clients;
+
+    // A simple struct to store information 
+    class KartInfo
+    {
+    public:
+        std::string m_kart_name;
+        std::string m_user_name;
+        int         m_client_id;
+        int         m_player_id;
+        KartInfo(std::string kart_name, std::string user_name, int id)
+              : m_kart_name(kart_name), m_user_name(user_name), m_client_id(id) 
+        {};
+    };   // KartInfo
+
+    NetworkMode           m_mode;
+    NetworkState          m_state;
+    int                   m_port;
+    std::string           m_server_address;
+    int                   m_num_clients;
+    std::vector<KartInfo> m_kart_info;
+    int                   m_host_id;
 #ifdef HAVE_ENET
-    ENetHost    *m_host;
+    ENetHost             *m_host;
 #endif
 
     bool         initServer();
@@ -50,7 +67,6 @@ private:
     void         handleNewMessage   (ENetEvent *event);
     void         handleDisconnection(ENetEvent *event);
 
-
 public:
                  NetworkManager();
                 ~NetworkManager();
@@ -58,7 +74,7 @@ public:
     NetworkMode  getMode() const                   {return m_mode;       }
     void         setState(NetworkState s)          {m_state = s;         }
     NetworkState getState() const                  {return m_state;      }
-    void         setNumClients(int n)              {m_num_clients = n;   }
+    int          getHostId() const                 {return m_host_id;    }
     int          getNumClients() const             {return m_num_clients;}
     void         setPort(int p)                    {m_port=p;            }
     void         setServerIP(const std::string &s) {m_server_address=s;  }

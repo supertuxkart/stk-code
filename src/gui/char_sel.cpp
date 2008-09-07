@@ -343,28 +343,28 @@ void CharSel::select()
 
     token = (token+m_offset) % (int)m_index_avail_karts.size();
     int kart_id = m_index_avail_karts[token];
-        if(kart_id < 0) // group selected
-        {
+    if(kart_id < 0) // group selected
+    {
         user_config->m_kart_group = kart_properties_manager->getAllGroups()[-kart_id-1];
-                switchGroup();
-                // forces redraw of the model, otherwise (if m_current_kart=0) the new
-                // model would not be displayed.
-                m_current_kart = -1;
-                switchCharacter(0);
-                updateScrollPosition();
-                return;
-        }
+        switchGroup();
+        // forces redraw of the model, otherwise (if m_current_kart=0) the new
+        // model would not be displayed.
+        m_current_kart = -1;
+        switchCharacter(0);
+        updateScrollPosition();
+        return;
+    }
     const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
     if (KP != NULL)
     {
-        race_manager->setPlayerKart(m_player_index, KP->getIdent());
+        race_manager->setLocalPlayerKart(m_player_index, KP->getIdent());
         user_config->m_player[m_player_index].setLastKartId(kart_id);
         // Add selected kart (token) to selected karts vector so it cannot be
         // selected again
         kart_properties_manager->m_selected_karts.push_back(kart_id);
     }
 
-    if (race_manager->getNumPlayers() > 1)
+    if (race_manager->getNumLocalPlayers() > 1)
     {
         if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
         {
@@ -373,7 +373,7 @@ void CharSel::select()
         }
     }
 
-    if (race_manager->getNumPlayers() > 2)
+    if (race_manager->getNumLocalPlayers() > 2)
     {
         if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
         {
@@ -382,7 +382,7 @@ void CharSel::select()
         }
     }
 
-    if (race_manager->getNumPlayers() > 3)
+    if (race_manager->getNumLocalPlayers() > 3)
     {
         if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
         {

@@ -89,7 +89,7 @@ void MainMenu::select()
     switch ( widget_manager->getSelectedWgt() )
     {
     case WTOK_SINGLE:
-        race_manager->setNumPlayers(1);
+        race_manager->setNumLocalPlayers(1);
         // The clients do not do any  mode selection, they go immediately
         // to the character selection screen.
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
