@@ -18,14 +18,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network_manager.hpp"
-#include "connect_message.hpp"
-#include "character_info_message.hpp"
-#include "character_selected_message.hpp"
-#include "race_info_message.hpp"
-#include "race_start_message.hpp"
-#include "world_loaded_message.hpp"
-#include "kart_update_message.hpp"
-#include "kart_control_message.hpp"
+#include "network/connect_message.hpp"
+#include "network/character_info_message.hpp"
+#include "network/character_selected_message.hpp"
+#include "network/race_info_message.hpp"
+#include "network/race_start_message.hpp"
+#include "network/world_loaded_message.hpp"
+#include "network/race_state.hpp"
+#include "network/kart_control_message.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
@@ -277,7 +277,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         }
     case NS_RACING:
         {
-            KartUpdateMessage k(event->packet);
+            assert(false);  // should never be here while racing
             break;
         }
     default: 
@@ -454,10 +454,10 @@ void NetworkManager::sendUpdates()
 {
     if(m_mode==NW_SERVER)
     {
-        KartUpdateMessage m;
-        broadcastToClients(m);
+        race_state->serialise();
+        broadcastToClients(*race_state);
     }
-    else
+    else if(m_mode==NW_CLIENT)
     {
         KartControlMessage m;
         sendToServer(m);
@@ -467,6 +467,7 @@ void NetworkManager::sendUpdates()
 // ----------------------------------------------------------------------------
 void NetworkManager::receiveUpdates()
 {
+    if(m_mode==NW_NONE) return;   // do nothing if not networking
     // The server receives m_num_clients messages, each client one message
     int num_messages = m_mode==NW_SERVER ? m_num_clients : 1;
     ENetEvent event;
@@ -502,7 +503,7 @@ void NetworkManager::receiveUpdates()
         }
         else
         {
-            KartUpdateMessage(event.packet);
+            race_state->receive(event.packet);
         }
     }   // for i<num_messages
     if(!correct)

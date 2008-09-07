@@ -21,6 +21,7 @@
 #define HEADER_ATTACHMENT_H
 
 #include "stk_config.hpp"
+#include "herring.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
@@ -74,7 +75,13 @@ public:
                                       return m_type==ATTACH_ANVIL
                                           ?stk_config->m_anvil_speed_factor:1.0f;
                                     }
-    void  hitGreenHerring();
+    /** Randomly selects the new attachment. For a server process, the
+     *  attachment can be passed into this function.
+        \param herring The herring that was collected.
+        \param random_attachment Optional: only used on the clients, it
+                                 specifies the new attachment to use
+     */
+    void  hitGreenHerring(const Herring &herring, int random_attachment=-1);
     void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
 };

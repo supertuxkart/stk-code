@@ -20,6 +20,8 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+
+#include "network/network_manager.hpp"
 #include "user_config.hpp"
 #include "herring_manager.hpp"
 #include "file_manager.hpp"
@@ -29,6 +31,7 @@
 #include "kart.hpp"
 #include "string_utils.hpp"
 #include "translation.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
@@ -197,22 +200,36 @@ void HerringManager::setDefaultHerringStyle()
 //-----------------------------------------------------------------------------
 Herring* HerringManager::newHerring(herringType type, const Vec3& xyz)
 {
-    Herring* h = new Herring(type, xyz, m_herring_model[type]);
+    Herring* h = new Herring(type, xyz, m_herring_model[type], m_all_herrings.size());
     m_all_herrings.push_back(h);
     return h;
 }   // newHerring
 
 //-----------------------------------------------------------------------------
+/** Set a herring as eaten.
+ *  This function is called on the server when a herring is eaten, or on the
+ *  client upon receiving information about eaten herrings.                  */
+void HerringManager::eatenHerring(int herring_id, Kart *kart, 
+                                  int add_info)
+{
+    Herring *herring=m_all_herrings[herring_id];
+    herring->isEaten();
+    kart->collectedHerring(*herring, add_info);
+}   // eatenHerring
+
+//-----------------------------------------------------------------------------
 void  HerringManager::hitHerring(Kart* kart)
 {
+    // Only do this on the server
+    if(network_manager->getMode()!=NetworkManager::NW_SERVER) return;
+
     for(AllHerringType::iterator i =m_all_herrings.begin();
         i!=m_all_herrings.end();  i++)
     {
         if((*i)->wasEaten()) continue;
         if((*i)->hitKart(kart))
         {
-            (*i)->isEaten();
-            kart->collectedHerring(*i);
+            eatenHerring(i-m_all_herrings.begin(), kart);
         }   // if hit
     }   // for m_all_herrings
 }   // hitHerring

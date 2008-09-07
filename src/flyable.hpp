@@ -27,9 +27,23 @@
 
 class Flyable : public Moveable, public TerrainInfo
 {
-    sgCoord           m_last_pos;
+public:
+    /** FlyableInfo stores information for updating flyables on the clients.
+     *  It contains only the coordinates, rotation, and explosion state.    */
+    // -----------------------------------------------------------------------
+    class FlyableInfo
+    {
+    public:
+        Vec3         m_xyz;
+        btQuaternion m_rotation;
+        bool         m_exploded;
+        FlyableInfo(const Vec3& xyz, const btQuaternion &rotation, bool exploded) :
+                    m_xyz(xyz), m_rotation(rotation), m_exploded(exploded)
+                    {};
+        FlyableInfo() {};
+    };
+private:
     bool              m_has_hit_something;
-    int               m_last_radar_beep;
     bool              m_exploded;
 
 protected:
@@ -72,6 +86,7 @@ public:
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
                               CollectableType type);
     virtual void update      (float);
+    void         updateFromServer(const FlyableInfo &f);
 
     virtual void hitTrack    () {};
     void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);

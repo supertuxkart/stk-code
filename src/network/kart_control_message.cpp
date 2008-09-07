@@ -33,7 +33,7 @@ KartControlMessage::KartControlMessage()
         const KartControl& controls = kart->getControls();
         char c[9];
         controls.compress(c);
-        add(c, control_size);
+        addCharArray(c, control_size);
     }
 }   // KartControlMessage
 // ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         char c[9];
-        getChar(c, KartControl::getCompressedSize());
+        getCharArray(c, KartControl::getCompressedSize());
         KartControl kc;
         kc.uncompress(c);
         NetworkKart *kart=world->getNetworkKart(i);

@@ -28,13 +28,13 @@ class CharacterInfoMessage : public Message
 public:
     CharacterInfoMessage(int hostid)     :Message(Message::MT_CHARACTER_INFO) 
     {
-        allocate(getLength(hostid));
-        add(hostid);
+        allocate(getCharLength());
+        addChar(hostid);
     }
     // ------------------------------------------------------------------------
     CharacterInfoMessage(ENetPacket* pkt):Message(pkt, MT_CHARACTER_INFO)
     {
-        int hostid=getInt();
+        int hostid=getChar();
         network_manager->setHostId(hostid);
     }
 };   // CharacterInfoMessage

@@ -49,7 +49,6 @@ Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable(false)
 
     m_owner             = kart;
     m_has_hit_something = false;
-    m_last_radar_beep   = -1;
     m_exploded          = false;
     m_shape             = NULL;
     m_mass              = mass;
@@ -184,6 +183,14 @@ void Flyable::update (float dt)
 
     Moveable::update(dt);
 }   // update
+
+// -----------------------------------------------------------------------------
+void Flyable::updateFromServer(const FlyableInfo &f)
+{
+    setXYZ(f.m_xyz);
+    setRotation(f.m_rotation);
+    m_exploded = f.m_exploded;
+}   // updateFromServer
 
 // -----------------------------------------------------------------------------
 void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)

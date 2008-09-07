@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 #include "loader.hpp"
 #include "projectile_manager.hpp"
 #include "bowling.hpp"
@@ -81,12 +83,15 @@ void ProjectileManager::cleanup()
 /** General projectile update call. */
 void ProjectileManager::update(float dt)
 {
-    // First update all projectiles on the track
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-        i != m_active_projectiles.end(); ++i)
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        (*i)->update(dt);
+        updateClient();
     }
+    else
+    {
+        updateServer(dt);
+    }
+
     // Then check if any projectile hit something
     if(m_something_was_hit)
     {
@@ -124,6 +129,50 @@ void ProjectileManager::update(float dt)
     m_something_was_hit=false;
 }   // update
 
+// -----------------------------------------------------------------------------
+/** Updates all rockets on the server (or no networking). */
+void ProjectileManager::updateServer(float dt)
+{
+    // First update all projectiles on the track
+    if(network_manager->getMode()!=NetworkManager::NW_NONE)
+    {
+        race_state->setNumFlyables(m_active_projectiles.size());
+    }
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   ++i)
+    {
+        (*i)->update(dt);
+        // Store the state information on the server
+        if(network_manager->getMode()!=NetworkManager::NW_NONE)
+        {
+            race_state->setFlyableInfo(i-m_active_projectiles.begin(),
+                                       (*i)->getXYZ(), (*i)->getRotation(),
+                                       (*i)->hasHit());
+        }
+    }
+}   // updateServer
+
+// -----------------------------------------------------------------------------
+/** Updates all rockets and explosions on the client.
+ *  updateClient takes the information in race_state and updates all rockets
+ *  (i.e. position, explosion etc)                                            */
+void ProjectileManager::updateClient()
+{
+    m_something_was_hit = false;
+    unsigned int num_projectiles = race_state->getNumFlyables();
+    // Race_state must contain at least as many entries as the current number
+    // of projectiles. It can contain more if new projectiles have been added.
+    assert(m_active_projectiles.size()<=num_projectiles);
+
+    int indx=0;
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+        i != m_active_projectiles.end();   ++i, ++indx)
+    {
+        const Flyable::FlyableInfo &f = race_state->getFlyable(indx);
+        (*i)->updateFromServer(f);
+        if(f.m_exploded) m_something_was_hit = true;
+    }   // for i in m_active_projectiles
+}   // updateClient
 // -----------------------------------------------------------------------------
 Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
 {

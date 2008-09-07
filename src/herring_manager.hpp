@@ -64,6 +64,8 @@ public:
     void        reset           ();
     void        removeTextures  ();
     void        setUserFilename (char *s) {m_user_filename=s;}
+    void        eatenHerring    (int herring_id, Kart *kart,
+                                 int add_info=-1);
     ssgEntity*  getHerringModel (herringType type)
                                 {return m_herring_model[type];}
 };

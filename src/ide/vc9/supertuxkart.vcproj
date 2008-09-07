@@ -1091,10 +1091,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\kart_packet.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\network\kart_update_message.cpp"
 					>
 				</File>
@@ -1112,6 +1108,10 @@
 				</File>
 				<File
 					RelativePath="..\..\network\race_info_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_state.cpp"
 					>
 				</File>
 			</Filter>
@@ -1646,6 +1646,10 @@
 				</File>
 				<File
 					RelativePath="..\..\network\race_start_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_state.hpp"
 					>
 				</File>
 				<File

@@ -246,10 +246,10 @@ void PlayerKart::handleZipper()
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
-void PlayerKart::collectedHerring(Herring* herring)
+void PlayerKart::collectedHerring(const Herring &herring, int add_info)
 {
-    Kart::collectedHerring(herring);
-    sound_manager->playSfx ( ( herring->getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
+    Kart::collectedHerring(herring, add_info);
+    sound_manager->playSfx ( ( herring.getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
 }   // collectedHerring
 
 //-----------------------------------------------------------------------------

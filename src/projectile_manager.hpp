@@ -32,8 +32,8 @@ class Flyable;
 class ProjectileManager
 {
 private:
-    typedef std::vector<Flyable*> Projectiles;
-    typedef std::vector<Explosion* > Explosions;
+    typedef std::vector<Flyable*>   Projectiles;
+    typedef std::vector<Explosion*> Explosions;
 
     // The list of all active projectiles, i.e. projectiles
     // which are currently moving on the track
@@ -46,16 +46,18 @@ private:
     ssgSelector*     m_explosion_model;
     bool             m_something_was_hit;
     bool             m_explosion_ended;
-
+    void             updateClient();
+    void             updateServer(float dt);
 public:
-    ProjectileManager() {m_something_was_hit=false;};
-    ~ProjectileManager() {};
-    void             explode          () {m_something_was_hit=true;}
-    void             FinishedExplosion() {m_explosion_ended =true;}
+                     ProjectileManager() {m_something_was_hit=false;}
+                    ~ProjectileManager() {}
+    void             explode          () {m_something_was_hit=true; }
+    void             FinishedExplosion() {m_explosion_ended =true;  }
     ssgSelector*     getExplosionModel()
     {
         return (ssgSelector*)m_explosion_model->clone();
     }
+    unsigned int     getNumProjectiles() const {return m_active_explosions.size();}
     int              getProjectileId  (const std::string ident);
     void             loadData         ();
     void             cleanup          ();

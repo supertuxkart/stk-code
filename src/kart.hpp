@@ -41,6 +41,7 @@ private:
     btTransform  m_reset_transform;    // reset position
     Vec3         m_curr_track_coords;
     Vec3         m_last_track_coords;
+    unsigned int m_world_kart_id;      // index of kart in world
     
 protected:
     bool         m_on_road;            // true if the kart is on top of the
@@ -60,6 +61,8 @@ protected:
     float        m_zipper_time_left;   // zipper time left
     float        m_lap_start_time;     // Time at start of a new lap
     char         m_fastest_lap_message[255];
+    float        m_bounce_back_time;   // a short time after a collision acceleration
+                                       // is disabled to allow the karts to bounce back
 
     int          m_shortcut_sector;    // segment on which the shortcut was started
 
@@ -107,6 +110,8 @@ public:
                    Kart(const std::string& kart_name, int position, 
                         const btTransform& init_transform);
     virtual       ~Kart();
+    unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
+    void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData();
     virtual void   updateGraphics      (const Vec3& off_xyz,  const Vec3& off_hpr);
     const KartProperties* 
@@ -207,10 +212,10 @@ public:
     virtual int    isPlayerKart     () const {return 0;                        }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
-    virtual void   collectedHerring (Herring* herring);
+    virtual void   collectedHerring (const Herring &herring, int random_attachment);
     virtual void   reset            ();
     virtual void   handleZipper     ();
-    virtual void   crashed          (Kart *k) {};
+    virtual void   crashed          (Kart *k);
     virtual void   doLapCounting    ();
     virtual void   update           (float dt);
     virtual void   raceFinished     (float time);

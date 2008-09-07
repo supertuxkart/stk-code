@@ -19,6 +19,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include <iostream>
+#define _WINSOCKAPI_
+#include "network/network_manager.hpp"
 #include <plib/ssg.h>
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
@@ -42,6 +44,9 @@
 #include "translation.hpp"
 #include "smoke.hpp"
 #include "material_manager.hpp"
+#include "network/race_state.hpp"
+
+// num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
@@ -329,6 +334,7 @@ void Kart::reset()
     m_num_herrings_gobbled = 0;
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
+    m_bounce_back_time     = 0.0f;
 
     m_controls.lr          = 0.0f;
     m_controls.accel       = 0.0f;
@@ -464,19 +470,28 @@ void Kart::raceFinished(float time)
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
-void Kart::collectedHerring(Herring* herring)
+void Kart::collectedHerring(const Herring &herring, int random_attachment)
 {
-    const herringType TYPE = herring->getType();
+    const herringType type        = herring.getType();
     const int OLD_HERRING_GOBBLED = m_num_herrings_gobbled;
 
-    switch (TYPE)
+    switch (type)
     {
-    case HE_GREEN  : m_attachment.hitGreenHerring(); break;
-    case HE_SILVER : m_num_herrings_gobbled++ ;       break;
-    case HE_GOLD   : m_num_herrings_gobbled += 3 ;    break;
+    case HE_GREEN  : m_attachment.hitGreenHerring(herring);   break;
+    case HE_SILVER : m_num_herrings_gobbled++ ;               break;
+    case HE_GOLD   : m_num_herrings_gobbled += 3 ;            break;
     case HE_RED    : int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
-        m_collectable.hitRedHerring(n); break;
+                     m_collectable.hitRedHerring(n, herring); break;
     }   // switch TYPE
+
+    // Attachments and collectables are stored in the corresponding
+    // functions (hit{Red,Green}Herring), so only coins need to be
+    // stored here.
+    if(network_manager->getMode()==NetworkManager::NW_SERVER &&
+        (type==HE_SILVER || type==HE_GOLD)                       )
+    {
+        race_state->herringCollected(getWorldKartId(), herring.getHerringId());
+    }
 
     if ( m_num_herrings_gobbled > MAX_HERRING_EATEN )
         m_num_herrings_gobbled = MAX_HERRING_EATEN;
@@ -567,6 +582,7 @@ void Kart::update(float dt)
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
             world->getPhysics()->removeKart(this);
+            race_state->herringCollected(getWorldKartId(), -1, -1);
         }
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
@@ -780,13 +796,24 @@ void Kart::resetBrakes()
     for(int i=0; i<4; i++) m_vehicle->setBrake(0.0f, i);
 }   // resetBrakes
 // -----------------------------------------------------------------------------
+void Kart::crashed(Kart *k)
+{
+    // After a collision disable the engine for a short time so that karts 
+    // can 'bounce back' a bit (without this the engine force will prevent
+    // karts from bouncing back, they will instead stuck towards the obstable).
+    m_bounce_back_time = 0.5f;
+}   // crashed
+// -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
 {
+    m_bounce_back_time-=dt;
     float engine_power = getActualWheelForce() + handleWheelie(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
-    if(m_controls.accel)
-    {   // accelerating
+    if(m_controls.accel)   // accelerating
+    {   // For a short time after a collision disable the engine,
+        // so that the karts can bounce back a bit from the obstacle.
+        if(m_bounce_back_time>0.0f) engine_power = 0.0f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
     }

@@ -24,9 +24,11 @@
 #include "scene.hpp"
 #include "coord.hpp"
 
-Herring::Herring(herringType type, const Vec3& xyz, ssgEntity* model) 
+Herring::Herring(herringType type, const Vec3& xyz, ssgEntity* model,
+                 unsigned int herring_id) 
         : m_coord(xyz, Vec3(0, 0, 0))
 {
+    m_herring_id       = herring_id;
     m_type             = type;
     m_eaten            = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isEaten()

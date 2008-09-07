@@ -34,13 +34,21 @@
 // sjl: when a message is received, need to work out what kind of message it 
 // is and therefore what to do with it
 
-// Collects and serialises/deserialises kart info to send
+/** Base class to serialises/deserialises messages. 
+ *  This is the base class for all messages being exchange between client
+ *  and server. It handles the interface to enet, and adds a message type
+ *  (which is checked via an assert to help finding bugs by receiving a 
+ *  message of an incorrect type). It also takes care of endianess (though
+ *  floats are converted via a byte swap, too - so it must be guaranteed 
+ *  that the float representation between all machines is identical).
+ */
 class Message
 { 
 public:
     enum MessageType {MT_CONNECT=1, MT_CHARACTER_INFO, 
                       MT_RACE_INFO, MT_RACE_START, MT_WORLD_LOADED,
-                      MT_KART_INFO, MT_KART_CONTROL};
+                      MT_KART_INFO, MT_KART_CONTROL,
+                      MT_RACE_STATE};
 private:
     ENetPacket  *m_pkt;
     char        *m_data;
@@ -50,38 +58,42 @@ private:
     bool         m_needs_destroy;  // only received messages need to be destroyed
 
 protected:
-    bool         add(int data);
-    bool         add(const std::string &data); 
-    bool         add(const std::vector<std::string>& vs);
-    bool         add(float data)                 { return add(*(int*)&data); }
-    bool         add(char *c, unsigned int n) 
-                                                 { if((int)(m_pos+n)>m_data_size)
-                                                        return false;
+    void         addInt(int data);
+    void         addShort(short data);
+    void         addString(const std::string &data); 
+    void         addStringVector(const std::vector<std::string>& vs);
+    void         addUInt(unsigned int data)      { addInt(*(int*)&data);  }
+    void         addFloat(float data)            { addInt(*(int*)&data);  }
+    void         addBool(bool data)              { addChar(data?1:0);     }
+    void         addChar(char data)              { addCharArray((char*)&data,1);}
+    void         addCharArray(char *c, unsigned int n=1) 
+                                                 { assert((int)(m_pos+n)<=m_data_size);
                                                    memcpy(m_data+m_pos,c,n);
-                                                   m_pos+=n;
-                                                   return true;           }
+                                                   m_pos+=n;              }
 #ifndef WIN32          // on windows size_t is unsigned int
-    bool         add(size_t data)                { return add((int)data); }
+    void         addSizeT(size_t data)           { addInt((int)data);     }
 #endif
-    bool         add(unsigned int data)          { return add(*(int*)&data); }
-    bool         add(int *d, unsigned int n) 
+    void         addIntArray(int *d, unsigned int n) 
                                                  { for(unsigned int i=0; 
-                                                       i<n-1; i++)
-                                                       add(d[i]); 
-                                                   return add(d[n-1]);    }
-    bool         add(const Vec3& v)              { add(v.getX());
-                                                   add(v.getY()); 
-                                                   return add(v.getZ());  }
-    bool         add(const btQuaternion& q)      { add(q.getX()); 
-                                                   add(q.getY());
-                                                   add(q.getZ()); 
-                                                   return add(q.getW());  }
+                                                       i<n; i++)
+                                                       addInt(d[i]);      }
+    void         addVec3(const Vec3& v)          { addFloat(v.getX());
+                                                   addFloat(v.getY()); 
+                                                   addFloat(v.getZ());    }
+    void         addQuaternion(const btQuaternion& q) { addFloat(q.getX()); 
+                                                   addFloat(q.getY());
+                                                   addFloat(q.getZ()); 
+                                                   addFloat(q.getW());    }
     int          getInt(); 
+    bool         getBool()                       { return getChar()==1;   }
+    short        getShort();
     float        getFloat();
     std::string  getString();
     std::vector<std::string>
                  getStringVector();
-    void         getChar(char *c, int n)         {memcpy(c,m_data+m_pos,n);
+    char         getChar()                       {char c;getCharArray(&c,1);
+                                                  return c;               }
+    void         getCharArray(char *c, int n=1) {memcpy(c,m_data+m_pos,n);
                                                   m_pos+=n;
                                                   return;                 }
     Vec3         getVec3()                       { Vec3 v; 
@@ -95,26 +107,30 @@ protected:
                                                    q.setZ(getFloat());
                                                    q.setW(getFloat()); 
                                                    return q;               }
-    int          getLength(int n)                { return sizeof(int);     }
-    int          getLength(unsigned int n)       { return sizeof(int);     }
-    int          getLength(float f)              { return sizeof(float);   }
-    int          getLength(const std::string& s) { return s.size()+1;      }
-    int          getLength(const Vec3& v)        { return 3*sizeof(float); }
-    int          getLength(const btQuaternion &q){ return 4*sizeof(float); }
+    int          getIntLength() const            { return sizeof(int);     }
+    int          getUIntLength() const           { return sizeof(int);     }
+    int          getShortLength() const          { return sizeof(short);   }
+    int          getCharLength() const           { return sizeof(char);    }
+    int          getFloatLength()                { return sizeof(float);   }
+    int          getStringLength(const std::string& s) { return s.size()+1;      }
+    int          getVec3Length()                 { return 3*sizeof(float); }
+    int          getQuaternionLength()           { return 4*sizeof(float); }
 
-    int          getLength(const std::vector<std::string>& vs);
+    int          getStringVectorLength(const std::vector<std::string>& vs);
 #ifndef WIN32
-    int          getLength(size_t n)             { return sizeof(int);   }
+    int          getSizeTLength(size_t n)        { return sizeof(int);   }
 #endif
 
 public:
-                 Message(MessageType m);    // create from scratch (to send)
-                 Message(ENetPacket *pkt, MessageType m);  // create from (received) packet 
+                 Message(MessageType m);
+                 Message(ENetPacket *pkt, MessageType m);  
+    void         receive(ENetPacket *pkt, MessageType m);  
                 ~Message();
+    void         clear();
     void         allocate(int size);
     MessageType  getType() const   { return m_type; }
     ENetPacket*  getPacket() const { assert(m_data_size>-1); return m_pkt;   }
-    // Return the type of a message without unserialising the message
+    /** Return the type of a message without unserialising the message */
     static MessageType peekType(ENetPacket *pkt) 
                                    { return (MessageType)pkt->data[0];}
 

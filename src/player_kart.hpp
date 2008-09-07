@@ -42,27 +42,23 @@ private:
 
     void steer(float, int);
 public:
-    PlayerKart(const std::string& kart_name,
-               int position, Player *_player,
-               const btTransform& init_pos, int player_index);
+                 PlayerKart(const std::string& kart_name,
+                            int position, Player *_player,
+                            const btTransform& init_pos, int player_index);
 
-    int     earlyStartPenalty () {return m_penalty_time>0; }
-    Player* getPlayer         () {return m_player;        }
-    void    update            (float);
-    void    addMessages       ();
-    void    action            (KartAction action, int value);
-    void    crashed           (Kart *k);
-    void    handleZipper      ();
-    void    collectedHerring  (Herring* herring);
+    int          earlyStartPenalty () {return m_penalty_time>0; }
+    Player      *getPlayer         () {return m_player;        }
+    void         update            (float);
+    void         addMessages       ();
+    void         action            (KartAction action, int value);
+    void         handleZipper      ();
+    void         collectedHerring  (const Herring &herring, int add_info=-1);
+    virtual void crashed           (Kart *k);
     virtual void setPosition  (int p);
     virtual void raceFinished (float time);
-
-    int     isPlayerKart      () const {return 1;}
-    Camera* getCamera         () {return m_camera;}
-
-    void    reset();
+    int          isPlayerKart      () const {return 1;}
+    Camera*      getCamera         () {return m_camera;}
+    void         reset();
 };
 
 #endif
-
-/* EOF */

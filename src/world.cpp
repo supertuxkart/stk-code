@@ -46,6 +46,8 @@
 #include "robots/default_robot.hpp"
 #include "unlock_manager.hpp"
 #include "network/network_manager.hpp"
+#include "network/race_state.hpp"
+
 #ifdef HAVE_GHOST_REPLAY
 #  include "replay_player.hpp"
 #endif
@@ -63,6 +65,7 @@ World::World()
 {
     delete world;
     world                 = this;
+    race_state            = new RaceState();
     m_phase               = SETUP_PHASE;
     m_previous_phase      = SETUP_PHASE;  // initialise it just in case
     m_track               = NULL;
@@ -131,16 +134,8 @@ World::World()
                 m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
                 break;
             case RaceManager::KT_NETWORK_PLAYER:
-                if(network_manager->getMode()==NetworkManager::NW_SERVER)
-                {
-                    newkart = new NetworkKart(kart_name, position, init_pos,
-                                              global_player_id);
-                }
-                else
-                {
-                    newkart = new NetworkKart(kart_name, position, init_pos,
-                                              global_player_id);
-                }
+                newkart = new NetworkKart(kart_name, position, init_pos,
+                                          global_player_id);
                 m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
                 break;
             case RaceManager::KT_AI:
@@ -160,6 +155,7 @@ World::World()
 
         scene->add ( newkart -> getModelTransform() ) ;
         m_kart.push_back(newkart);
+        newkart->setWorldKartId(m_kart.size()-1);
     }  // for i
 
     resetAllKarts();
@@ -201,6 +197,7 @@ World::~World()
 #ifdef HAVE_GHOST_REPLAY
     saveReplayHumanReadable( "test" );
 #endif
+    delete race_state;
     m_track->cleanup();
     // Clear all callbacks
     callback_manager->clear(CB_TRACK);
@@ -292,6 +289,8 @@ void World::resetAllKarts()
 //-----------------------------------------------------------------------------
 void World::update(float dt)
 {
+    // Clear race state so that new information can be stored
+    race_state->clear();
     if(user_config->m_replay_history) dt=history->GetNextDelta();
     updateRaceStatus(dt);
 

@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 #include "collectable.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
@@ -143,8 +145,25 @@ void Collectable::use()
 }   // use
 
 //-----------------------------------------------------------------------------
-void Collectable::hitRedHerring(int n)
+void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
 {
+    // On the client this is called when update information is received
+    // from the server:
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        if(m_type==COLLECT_NOTHING)
+        {
+            m_type   = (CollectableType)add_info;
+            m_number = n;
+        }
+        else if((CollectableType)add_info==m_type)
+        {
+            m_number+=n;
+            if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
+        }
+        // Ignore new collectable if it is different from the current one
+        return;
+    }
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
@@ -192,6 +211,15 @@ void Collectable::hitRedHerring(int n)
         simpleCounter++;
         newC = (CollectableType)(simpleCounter%(COLLECT_MAX - 1 - 2) + 1);
     }
+    // Save the information about the collectable in the race state
+    // so that the clients can be updated.
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
+        race_state->herringCollected(m_owner->getWorldKartId(), 
+                                     herring.getHerringId(), 
+                                     newC);
+    }
+
     if(m_type==COLLECT_NOTHING)
     {
         m_type=newC;

@@ -21,15 +21,13 @@
 #include <string>
 #include <math.h>
 #include <stdexcept>
-
-
-// need a more elegant way of setting the data_size, esp when strings are being used
-
-// also, looking at how the packets are actually used, we can probably serialise as 
-// part of the constructor, it seems packets to be sent are always created in a 
-// single line
 #include <assert.h>
 
+/** Creates a message to be sent.
+ *  This only initialised the data structures, it does not reserve any memory.
+ *  A call to allocate() is therefore necessary.
+ *  \param type  The type of the message
+ */
 Message::Message(MessageType type)
 {
     assert(sizeof(int)==4);
@@ -41,7 +39,24 @@ Message::Message(MessageType type)
 }   // Message
 
 // ----------------------------------------------------------------------------
+/** Handles a received message.
+ *  The message in pkt is received, and the message type is checked.
+ *  \param pkt The ENetPacket
+ *  \param m   The type of the message. The type is checked via an assert!
+ */
+
 Message::Message(ENetPacket* pkt, MessageType m)
+{
+    receive(pkt, m);
+}
+
+// ----------------------------------------------------------------------------
+/** Loads the message in pkt, and checks for the correct message type.
+ *  Paramaters:
+ *  \param pkt The ENetPacket
+ *  \param m   The type of the message. The type is checked via an assert!
+ */
+void Message::receive(ENetPacket* pkt, MessageType m)
 {
     assert(sizeof(int)==4);
     m_pkt           = pkt;
@@ -54,13 +69,27 @@ Message::Message(ENetPacket* pkt, MessageType m)
 }  // Message
 
 // ----------------------------------------------------------------------------
+/** Frees the memory allocated for this message. */
 Message::~Message()
 {
-    if(m_needs_destroy)
-        enet_packet_destroy(m_pkt);
+    clear();
 }   // ~Message
 
 // ----------------------------------------------------------------------------
+/** Frees the memory for a received message.
+ *  Calls enet_packet_destroy if necessary (i.e. if the message was received).
+ *  The memory for a message created to be sent does not need to be freed, it 
+ *  is handled by enet. */
+void Message::clear()
+{
+    if(m_needs_destroy)
+        enet_packet_destroy(m_pkt);
+}   // clear
+
+// ----------------------------------------------------------------------------
+/** Reserves the memory for a message. 
+ *  \param size Number of bytes to reserve.
+ */
 void Message::allocate(int size)
 {
     m_data_size = size+1;
@@ -71,22 +100,48 @@ void Message::allocate(int size)
 }   // allocate
 
 // ----------------------------------------------------------------------------
-bool Message::add(int data)
+/** Adds an integer value to the message.
+ *  \param data The integer value to add.
+ */
+void Message::addInt(int data)
 {
-    if ((int)(m_pos + sizeof(int)) > m_data_size) 
-        return false;
+    assert((int)(m_pos + sizeof(int)) <= m_data_size);
     int l=htonl(data);
     memcpy(m_data+m_pos, &l, sizeof(int)); 
     m_pos+=sizeof(int);
-    return true;
-}   // add<int>
+}   // addInt
 
 // ----------------------------------------------------------------------------
+/** Extracts an integer value from a message.
+ *  \return The extracted integer.
+ */
 int Message::getInt()
 {
     m_pos+=sizeof(int);
     return ntohl(*(int*)(&m_data[m_pos-sizeof(int)]));
 }   // getInt
+
+// ----------------------------------------------------------------------------
+/** Adds a short value to the message.
+ *  \param data The integer value to add.
+ */
+void Message::addShort(short data)
+{
+    assert((int)(m_pos + sizeof(short)) <= m_data_size);
+    int l=htons(data);
+    memcpy(m_data+m_pos, &l, sizeof(short)); 
+    m_pos+=sizeof(short);
+}   // addShort
+
+// ----------------------------------------------------------------------------
+/** Extracts a short value from a message.
+ *  \return The short value.
+ */
+short Message::getShort()
+{
+    m_pos+=sizeof(short);
+    return ntohs(*(short*)(&m_data[m_pos-sizeof(short)]));
+}   // getShort
 
 // ----------------------------------------------------------------------------
 float Message::getFloat()
@@ -103,14 +158,13 @@ float Message::getFloat()
 }   // getFloat
 
 // ----------------------------------------------------------------------------
-bool Message::add(const std::string &data)
+void Message::addString(const std::string &data)
 { 
     int len = data.size()+1;  // copy 0 end byte
     assert((int)(m_pos+len) <=m_data_size);
     memcpy (&(m_data[m_pos]), data.c_str(), len);
     m_pos += len;
-    return true;
-}   // add<string>
+}   // addString
 
 // ----------------------------------------------------------------------------
 std::string Message::getString()
@@ -122,28 +176,33 @@ std::string Message::getString()
 }   // getString
 
 // ----------------------------------------------------------------------------
-int Message::getLength(const std::vector<std::string>& vs)
+/** Returns the number of bytes necessary to store a string vector.
+ *  \param vs std::vector<std::string>
+ */
+int Message::getStringVectorLength(const std::vector<std::string>& vs)
 {
-    int len=getLength(vs.size());
+    int len=getShortLength();
     for(unsigned int i=0; i<vs.size(); i++)
-        len += getLength(vs[i]);
+        len += getStringLength(vs[i]);
     return len;
-}   // getLength(vector<string>)
+}   // getStringVectorLength
 
 // ----------------------------------------------------------------------------
-bool Message::add(const std::vector<std::string>& vs)
+/** Adds a std::vector<std::string> to the message.
+ */
+void Message::addStringVector(const std::vector<std::string>& vs)
 {
-    bool result = add(vs.size());
-    if(!result) return false;
-    for(unsigned int i=0; i<vs.size(); i++)
-        if(!add(vs[i])) return false;
-    return true;
-}   // add(vector<string>)
+    assert(vs.size()<32767);
+    addShort(vs.size());
+    for(unsigned short i=0; i<vs.size(); i++)
+        addString(vs[i]);
+}   // addStringVector
+
 // ----------------------------------------------------------------------------
 std::vector<std::string> Message::getStringVector()
 {
     std::vector<std::string> vs;
-    vs.resize(getInt());
+    vs.resize(getShort());
     for(unsigned int i=0; i<vs.size(); i++)
         vs[i]=getString();
     return vs;

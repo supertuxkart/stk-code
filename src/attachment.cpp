@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 
 #include "attachment.hpp"
@@ -28,6 +29,8 @@
 #include "sound_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
+#include "network/race_state.hpp"
+#include "network/network_manager.hpp"
 
 Attachment::Attachment(Kart* _kart)
 {
@@ -62,17 +65,18 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 }   // set
 
 // -----------------------------------------------------------------------------
-void Attachment::hitGreenHerring()
+void Attachment::hitGreenHerring(const Herring &herring, int random_attachment)
 {
     if(user_config->m_profile) return;
-    int random_attachment;
     float leftover_time   = 0.0f;
+    
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getXYZ());
                        m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
                        clear();
-                       random_attachment = m_random.get(3);
+                       if(random_attachment==-1) 
+                           random_attachment = m_random.get(3);
                        break;
     case ATTACH_ANVIL :// if the kart already has an anvil, attach a new anvil, 
                        // and increase the overall time 
@@ -83,8 +87,18 @@ void Attachment::hitGreenHerring()
                        random_attachment = 2;  // anvil
                        leftover_time     = m_time_left;
                        break;
-    default:           random_attachment = m_random.get(3);
+    default:           if(random_attachment==-1)
+                           random_attachment = m_random.get(3);
     }   // switch
+
+    // Save the information about the attachment in the race state
+    // so that the clients can be updated.
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
+        race_state->herringCollected(m_kart->getWorldKartId(), 
+                                     herring.getHerringId(), 
+                                     random_attachment);
+    }
 
     switch (random_attachment)
     {

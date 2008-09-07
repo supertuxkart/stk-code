@@ -40,8 +40,8 @@ private:
         const std::string& id=user_config->m_player[0].getName();
         std::ostringstream o;
         o << id << '@' << hostname;
-        allocate(getLength(o.str()));
-        add(o.str());
+        allocate(getStringLength(o.str()));
+        addString(o.str());
     }
 public:
                 ConnectMessage():Message(Message::MT_CONNECT) { setId(); }

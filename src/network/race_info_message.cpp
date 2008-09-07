@@ -25,64 +25,62 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
                : Message(Message::MT_RACE_INFO) 
 {
     const GrandPrixData *cup=NULL;
-    int len = getLength(race_manager->getMajorMode() )
-            + getLength(race_manager->getMinorMode() )
-            + getLength(race_manager->getDifficulty())
-            + getLength(race_manager->getNumKarts()  );
+    int len = 3*getCharLength()  // major, minor, difficulty
+            + getCharLength();   // num karts
     if(race_manager->getMajorMode()==RaceManager::RM_GRAND_PRIX)
     {
         cup = race_manager->getGrandPrix();
-        len += getLength(cup->getId());
+        len += getStringLength(cup->getId());
     }
     else
     {
-        len += getLength(race_manager->getTrackName());
-        len += getLength(race_manager->getNumLaps());
+        len += getStringLength(race_manager->getTrackName());
+        len += getCharLength(); // num laps
     }
-    len += getLength(kart_info.size());
+    len += getCharLength();   // kart_info.size()
     for(unsigned int i=0; i<kart_info.size(); i++)
     {
-        len += getLength(kart_info[i].getGlobalPlayerId())
-             + getLength(kart_info[i].getHostId())
-             + getLength(kart_info[i].getKartName())
-             + getLength(kart_info[i].getLocalPlayerId())
-             + getLength(kart_info[i].getPlayerName());
+        len += getCharLength()    // kart_info[i].getGlobalPlayerId())
+             + getCharLength()    // kart_info[i].getHostId())
+             + getStringLength(kart_info[i].getKartName())
+             + getCharLength()    // kart_info[i].getLocalPlayerId())
+             + getStringLength(kart_info[i].getPlayerName());
     }
     const std::vector<std::string>& rkl=race_manager->getRandomKartList();
-    len += getLength(rkl);
+    len += getStringVectorLength(rkl);
 
     allocate(len);
-    add(race_manager->getMajorMode() );
-    add(race_manager->getMinorMode() );
-    add(race_manager->getDifficulty());
-    add(race_manager->getNumKarts()  );
+    addChar(race_manager->getMajorMode() );
+    addChar(race_manager->getMinorMode() );
+    addChar(race_manager->getDifficulty());
+    addChar(race_manager->getNumKarts()  );
     if(race_manager->getMajorMode()==RaceManager::RM_GRAND_PRIX)
-        add(cup->getName());
+        addString(cup->getName());
     else
     {
-        add(race_manager->getTrackName());
-        add(race_manager->getNumLaps());
+        addString(race_manager->getTrackName());
+        addChar(race_manager->getNumLaps());
     }
 
-    add(kart_info.size());
+    addChar(kart_info.size());
     for(unsigned int i=0; i<kart_info.size(); i++)
     {
-        add(kart_info[i].getGlobalPlayerId());
-        add(kart_info[i].getHostId());
-        add(kart_info[i].getKartName());
-        add(kart_info[i].getLocalPlayerId());
-        add(kart_info[i].getPlayerName());
+        addChar(kart_info[i].getGlobalPlayerId());
+        addChar(kart_info[i].getHostId());
+        addString(kart_info[i].getKartName());
+        addChar(kart_info[i].getLocalPlayerId());
+        addString(kart_info[i].getPlayerName());
     }
-    add(rkl);
+    addStringVector(rkl);
 }   // RaceInfoMessage
 
 // ----------------------------------------------------------------------------
 RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
 {
-    race_manager->setMajorMode ( RaceManager::RaceModeType(getInt()) );
-    race_manager->setMinorMode ( RaceManager::RaceModeType(getInt()) );
-    race_manager->setDifficulty( RaceManager::Difficulty  (getInt()) );
-    race_manager->setNumKarts  ( getInt()                            );
+    race_manager->setMajorMode ( RaceManager::RaceModeType(getChar()) );
+    race_manager->setMinorMode ( RaceManager::RaceModeType(getChar()) );
+    race_manager->setDifficulty( RaceManager::Difficulty  (getChar()) );
+    race_manager->setNumKarts  ( getChar()                            );
     if(race_manager->getMajorMode()==RaceManager::RM_GRAND_PRIX)
     {
         GrandPrixData cup;
@@ -92,18 +90,18 @@ RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
     else
     {
         race_manager->setTrack(getString());
-        race_manager->setNumLaps(getInt());
+        race_manager->setNumLaps(getChar());
     }
 
     std::vector<RemoteKartInfo> kart_info;
-    kart_info.resize(getInt());
+    kart_info.resize(getChar());
 
     for(unsigned int i=0; i<kart_info.size(); i++)
     {
-        kart_info[i].setGlobalPlayerId(getInt());
-        kart_info[i].setHostId(getInt());
+        kart_info[i].setGlobalPlayerId(getChar());
+        kart_info[i].setHostId(getChar());
         kart_info[i].setKartName(getString());
-        kart_info[i].setLocalPlayerId(getInt());
+        kart_info[i].setLocalPlayerId(getChar());
         kart_info[i].setPlayerName(getString());
     }
 

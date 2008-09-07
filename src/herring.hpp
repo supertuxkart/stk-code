@@ -30,7 +30,7 @@ class ssgTransform;
 class ssgEntity;
 
 // HE_RED must be the first, HE_SILVER the last entry. See HerringManager
-enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER };
+enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER, HE_NONE };
 
 // -----------------------------------------------------------------------------
 class Herring
@@ -42,10 +42,12 @@ private:
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // eaten herrings reappear.
     ssgTransform* m_root;         // The actual root of the herring
-
+    unsigned int  m_herring_id;   // index in herring_manager field
 public:
-                  Herring (herringType type, const Vec3& xyz, ssgEntity* model);
+                  Herring (herringType type, const Vec3& xyz, ssgEntity* model,
+                           unsigned int herring_id);
                  ~Herring ();
+    unsigned int  getHerringId() const {return m_herring_id; }
     void          update  (float delta);
     void          isEaten ();
     int           hitKart (Kart* kart );
