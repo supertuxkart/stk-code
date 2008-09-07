@@ -193,6 +193,7 @@ void NetworkManager::handleNewMessage(ENetEvent *event)
 // ----------------------------------------------------------------------------
 void NetworkManager::update(float dt)
 {
+    if(m_mode==NW_NONE) return;
     ENetEvent event;
     int result = enet_host_service (m_host, &event, 1);
     if(result==0) return;
