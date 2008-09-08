@@ -471,18 +471,18 @@ void Kart::raceFinished(float time)
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
-void Kart::collectedHerring(const Herring &herring, int random_attachment)
+void Kart::collectedHerring(const Herring &herring, int add_info)
 {
     const herringType type        = herring.getType();
     const int OLD_HERRING_GOBBLED = m_num_herrings_gobbled;
 
     switch (type)
     {
-    case HE_GREEN  : m_attachment.hitGreenHerring(herring);   break;
-    case HE_SILVER : m_num_herrings_gobbled++ ;               break;
-    case HE_GOLD   : m_num_herrings_gobbled += 3 ;            break;
+    case HE_GREEN  : m_attachment.hitGreenHerring(herring, add_info);   break;
+    case HE_SILVER : m_num_herrings_gobbled++ ;                         break;
+    case HE_GOLD   : m_num_herrings_gobbled += 3 ;                      break;
     case HE_RED    : int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
-                     m_collectable.hitRedHerring(n, herring); break;
+                     m_collectable.hitRedHerring(n, herring, add_info); break;
     }   // switch TYPE
 
     // Attachments and collectables are stored in the corresponding
@@ -564,6 +564,14 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
+    // Store the actual kart controls at the start of update in the server
+    // state. This makes it easier to reset some fields when they are not used 
+    // anymore (e.g. controls.fire).
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
+        race_state->storeKartControls(*this);
+    }
+
     // On a client fiering is done upon receiving the command from the server.
     if ( m_controls.fire && network_manager->getMode()!=NetworkManager::NW_CLIENT 
          && !isRescue())
