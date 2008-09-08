@@ -880,8 +880,10 @@ void Kart::updatePhysics (float dt)
         m_vehicle->setSteeringValue(0.0f, 1);
     }
 
-    //store current velocity
-    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    // Only compute the current speed if this is not the client. On a client the
+    // speed is actually received from the server.
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
+        m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
