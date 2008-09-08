@@ -80,6 +80,8 @@ public:
                 ~NetworkManager();
     void         setMode(NetworkMode m)            {m_mode = m;             }
     NetworkMode  getMode() const                   {return m_mode;          }
+    void         becomeServer();
+    void         becomeClient();
     void         setState(NetworkState s)          {m_state = s;            }
     NetworkState getState() const                  {return m_state;         }
     int          getMyHostId() const               {return m_host_id;       }

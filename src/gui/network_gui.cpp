@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008  Joerg Henrichs
+
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -120,8 +121,7 @@ void NetworkGUI::select()
             widget_manager->hideWgt(WTOK_CONNECT, WTOK_SERVER_ADDRESS);
             break;
         case WTOK_SERVER:
-            network_manager->setMode(NetworkManager::NW_SERVER);
-            network_manager->setState(NetworkManager::NS_ACCEPT_CONNECTIONS);
+            network_manager->becomeServer();
             widget_manager->hideWgt(WTOK_MESSAGE);
             widget_manager->resizeWgtToText(WTOK_MESSAGE);
             widget_manager->showWgt(WTOK_MESSAGE);
@@ -172,7 +172,7 @@ void NetworkGUI::update(float dt)
     // called before the blocking initialiseConnection call).
     if(m_state==NGS_CONNECT_DOIT)
     {
-        network_manager->setMode(NetworkManager::NW_CLIENT);
+        network_manager->becomeClient();
         if(!network_manager->initialiseConnections())
         {
             widget_manager->setWgtText(WTOK_MESSAGE, _("Can't connect to server"));

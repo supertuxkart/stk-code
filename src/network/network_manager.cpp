@@ -97,6 +97,8 @@ bool NetworkManager::initServer()
 }   // initServer
 
 // -----------------------------------------------------------------------------
+/** Initialises the client. This function tries to connect to the server. 
+ */
 bool NetworkManager::initClient()
 {
     m_host = enet_host_create (NULL /* create a client host */,
@@ -144,6 +146,27 @@ bool NetworkManager::initClient()
     m_server = peer;
     return true;
 }  // initClient
+
+// ----------------------------------------------------------------------------
+/** Switches the network manager to client mode. This function sets the state 
+ *  to waiting_for_chars (so that the message from the server containing all
+ *  available characters can be received).
+ */
+void NetworkManager::becomeClient()
+{
+    m_mode  = NW_CLIENT;
+    m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
+}   // becomeClient
+
+// ----------------------------------------------------------------------------
+/** Switches the network manager to server mode. This function sets the state
+ *  to accepting connections.
+ */
+void NetworkManager::becomeServer()
+{
+    m_mode  = NW_SERVER;
+    m_state = NS_ACCEPT_CONNECTIONS;
+}   // becomeServer
 
 // ----------------------------------------------------------------------------
 /** Called in case of an error, to switch back to non-networking mode.
