@@ -28,6 +28,7 @@
 
 #include "user_config.hpp"
 #include "track_manager.hpp"
+#include "kart_properties_manager.hpp"
 
 // ----------------------------------------------------------------------------
 /** Creates the connect message. It includes the id of the client (currently
@@ -37,10 +38,15 @@ ConnectMessage::ConnectMessage() : Message(MT_CONNECT)
 {
     setId();
     const std::vector<std::string> &all_tracks = 
-                                    track_manager->getAllTrackIdentifiers();
-    allocate(getStringLength(m_id) + getStringVectorLength(all_tracks));
+                               track_manager->getAllTrackIdentifiers();
+    std::vector<std::string> all_karts = 
+                               kart_properties_manager->getAllAvailableKarts();
+    all_karts.erase(all_karts.begin());
+    allocate(getStringLength(m_id) + getStringVectorLength(all_tracks)
+             + getStringVectorLength(all_karts));
     addString(m_id);
     addStringVector(all_tracks);
+    addStringVector(all_karts);
 }   // ConnectMessage
 
 // ----------------------------------------------------------------------------
@@ -53,7 +59,9 @@ ConnectMessage::ConnectMessage(ENetPacket* pkt):Message(pkt, MT_CONNECT)
 {
     m_id       = getString();
     std::vector<std::string> all_tracks = getStringVector();
+    std::vector<std::string> all_karts  = getStringVector();
     track_manager->setUnavailableTracks(all_tracks);
+    kart_properties_manager->setUnavailableKarts(all_karts);
 }   // ConnectMessage
 
 // ----------------------------------------------------------------------------

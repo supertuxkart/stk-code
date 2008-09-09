@@ -29,12 +29,15 @@ class KartProperties;
 class KartPropertiesManager
 {
 private:
-    std::vector<std::string> m_all_groups;
+    std::vector<std::string>                 m_all_groups;
     std::map<std::string, std::vector<int> > m_groups;
-	// vector containing kart numbers that have been selected in multiplayer
-	// games.  This it used to ensure the same kart can not be selected more
-	// than once.
-    std::vector<int>		 m_selected_karts;  
+	/** Vector containing kart numbers that have been selected in multiplayer
+	 * games.  This it used to ensure the same kart can not be selected more
+	 * than once. */
+    std::vector<int>		 m_selected_karts;
+    /** Contains a flag for each kart indicating wether it is available on
+     *  all clients or not. */
+    std::vector<bool>        m_kart_available;
 protected:
     float m_max_steer_angle;
 
@@ -47,8 +50,8 @@ public:
     ~KartPropertiesManager();
 	    
     const KartProperties*    getKartById            (int i) const;
-    const KartProperties*    getKart                (const std::string IDENT) const;
-    const int                getKartId              (const std::string IDENT) const;
+    const KartProperties*    getKart                (const std::string &ident) const;
+    const int                getKartId              (const std::string &ident) const;
     int                      getKartByGroup         (const std::string& group, int i) const;
     void                     loadKartData           (bool dont_load_models=false);
     const float              getMaximumSteeringAngle() const {return m_max_steer_angle;}
@@ -57,14 +60,15 @@ public:
                              getAllGroups           () const {return m_all_groups;     }
     const std::vector<int>&  getKartsInGroup        (const std::string& g)
                                                              {return m_groups[g];      }
-    void clearAllSelectedKarts()                             {m_selected_karts.clear();}
-    void removeLastSelectedKart()                            {m_selected_karts.pop_back();}
-    int  getNumSelectedKarts() const                         {return m_selected_karts.size();}
-    bool kartAvailable(int kartid);
-    bool testAndSetKart(int kartid);
-    std::vector<std::string> 
-         getRandomKartList(int count, RemoteKartInfoList& existing_karts);
-    void removeTextures      ();
+    void                     clearAllSelectedKarts()         {m_selected_karts.clear();}
+    void                     removeLastSelectedKart()        {m_selected_karts.pop_back();}
+    int                      getNumSelectedKarts() const     {return m_selected_karts.size();}
+    bool                     kartAvailable(int kartid);
+    std::vector<std::string> getAllAvailableKarts() const;
+    void                     setUnavailableKarts(std::vector<std::string>);
+    bool                     testAndSetKart(int kartid);
+    std::vector<std::string> getRandomKartList(int count, RemoteKartInfoList& existing_karts);
+    void                     removeTextures      ();
 };
 
 extern KartPropertiesManager *kart_properties_manager;

@@ -22,11 +22,14 @@
 
 #include "network/message.hpp"
 
+/** This message is sent from the server to the clients and contains the list
+ *  of available characters. Additionally, it contains the clients id.
+ */
 class CharacterInfoMessage : public Message
 {
 // Add the remote host id to this message (to avoid sending this separately)
 public:
-    CharacterInfoMessage(int hostid)     :Message(Message::MT_CHARACTER_INFO) 
+    CharacterInfoMessage(int hostid) : Message(Message::MT_CHARACTER_INFO) 
     {
         allocate(getCharLength());
         addChar(hostid);
