@@ -47,8 +47,10 @@
 class RaceManager
 {
 public:
+    /** Major and minor game modes. */
     enum RaceModeType   { RM_GRAND_PRIX, RM_SINGLE, // The two current major modes
                           RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER };
+    /** Difficulty. Atm skidding is implemented as a special difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
