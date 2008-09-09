@@ -352,7 +352,7 @@ void NetworkManager::sendToServer(Message &m)
 void NetworkManager::switchToCharacterSelection()
 {
     // This is called the first time the character selection menu is displayed
-    assert(m_state == NS_NONE);
+
     if(m_mode==NW_CLIENT)
     {
         // Change state to wait for list of characters from server
