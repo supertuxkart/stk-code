@@ -19,6 +19,8 @@
 
 #include "random_generator.hpp"
 
+#include <stdlib.h>
+
 std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
 
 RandomGenerator::RandomGenerator()
