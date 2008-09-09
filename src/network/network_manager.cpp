@@ -415,7 +415,6 @@ void NetworkManager::worldLoaded()
 }   // worldLoaded
 
 // ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
 void NetworkManager::setupPlayerKartInfo()

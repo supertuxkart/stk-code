@@ -47,15 +47,17 @@ public:
         // Piggy backing this information saves sending it as a separate 
         // message. It is actually only required in the first message
         addChar(race_manager->getNumLocalPlayers());
-    }
+    }   // CharacterSelectedMessage
+    // ------------------------------------------------------------------------
     CharacterSelectedMessage(ENetPacket* pkt):Message(pkt, MT_CHARACTER_INFO)
     {
         m_kart_info.setLocalPlayerId(getChar());
         m_kart_info.setKartName(getString());
         m_kart_info.setPlayerName(getString());
         m_num_local_players = getChar();
-    }
+    }   // CharacterSelectedMessage(EnetPacket)
+    // ------------------------------------------------------------------------
     const RemoteKartInfo& getKartInfo  () const { return m_kart_info;         }
     int                   getNumPlayers() const { return m_num_local_players; }
-};   // CharacterInfoMessage
+};   // CharacterSelectedMessage
 #endif

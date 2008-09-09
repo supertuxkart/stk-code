@@ -309,9 +309,12 @@ void CharSel::update(float dt)
     static bool first=true;
     if(first)
     {
+        // Switch group will update the list of selected karts, i.e. use the
+        // information about kart availability just received from the server
+        switchGroup();
         // Now hide the message window and display the widgets:
         widget_manager->hideWgt(WTOK_MESSAGE);
-        widget_manager->showWgt(WTOK_TITLE, WTOK_EMPTY_DOWN);
+        widget_manager->showWgt(WTOK_TITLE, WTOK_DOWN);
         // Hide all widgets except the message widget
         for (unsigned int i = 0; i < m_max_entries; i++)
         {

@@ -19,7 +19,7 @@
 
 #ifndef HEADER_CHARACTER_INFO_MESSAGE_H
 #define HEADER_CHARACTER_INFO_MESSAGE_H
-
+#include "kart_properties_manager.hpp"
 #include "network/message.hpp"
 
 /** This message is sent from the server to the clients and contains the list
@@ -31,14 +31,20 @@ class CharacterInfoMessage : public Message
 public:
     CharacterInfoMessage(int hostid) : Message(Message::MT_CHARACTER_INFO) 
     {
-        allocate(getCharLength());
+        std::vector<std::string> all_karts =
+                               kart_properties_manager->getAllAvailableKarts();
+        allocate(getCharLength()+getStringVectorLength(all_karts));
         addChar(hostid);
+        addStringVector(all_karts);
     }
     // ------------------------------------------------------------------------
     CharacterInfoMessage(ENetPacket* pkt):Message(pkt, MT_CHARACTER_INFO)
     {
         int hostid=getChar();
         network_manager->setHostId(hostid);
+        std::vector<std::string> all_karts;
+        all_karts = getStringVector();
+        kart_properties_manager->setUnavailableKarts(all_karts);
     }
 };   // CharacterInfoMessage
 #endif
