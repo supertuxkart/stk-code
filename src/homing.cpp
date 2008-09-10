@@ -64,8 +64,8 @@ Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
         
         // calculate appropriate initial up velocity so that the
         // projectile lands on the aimed kart (9.8 is the gravity)
-        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/2.5); // the division is an empirical estimation
-        up_velocity = time*9.8;
+        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/2.5f); // the division is an empirical estimation
+        up_velocity = time*9.8f;
         
         // calculate the approximate location of the aimed kart in 'time' seconds
         btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
