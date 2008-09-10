@@ -95,6 +95,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 /** Sets the number of local players playing on this computer (including
  *  split screen).
  *  \param n Number of local players.
+ */
 void RaceManager::setNumLocalPlayers(unsigned int n)
 {
     m_local_kart_info.resize(n);
