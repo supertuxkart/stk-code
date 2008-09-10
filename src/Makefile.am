@@ -37,13 +37,13 @@ supertuxkart_SOURCES =             main.cpp  			\
 	network/remote_kart_info.hpp    network/character_selected_message.hpp	\
 	network/race_start_message.hpp  					\
 	network/connect_message.hpp	network/connect_message.cpp		\
-	network.num_players_message.hpp network/world_loaded_message.hpp	\
+	network/num_players_message.hpp network/world_loaded_message.hpp	\
         network/connect_message.hpp     network/character_info_message.hpp	\
 	network/kart_update_message.hpp network/kart_update_message.cpp		\
 	network/kart_control_message.hpp network/kart_control_message.cpp	\
 	network/flyable_info.hpp	network/herring_info.hpp		\
 	network/race_state.hpp		network/race_state.cpp			\
-	utils/random_genertaor.hpp	utils/random_generator.cpp		\
+	utils/random_generator.hpp	utils/random_generator.cpp		\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \
@@ -149,6 +149,10 @@ supertuxkart_SOURCES =             main.cpp  			\
 	replay_recorder.hpp	   replay_recorder.cpp       	\
 	ide/vc8/supertuxkart.sln   ide/vc8/supertuxkart.vcproj	\
 	ide/vc8/bullet_lib.vcproj  ide/vc8/README
+	ide/vc9/supertuxkart.sln   ide/vc9/supertuxkart.vcproj	\
+	ide/vc9/bullet_lib.vcproj  ide/vc9/enet.vcproj		\
+	ide/vc9/README						\
+	Xcode/STK_XCode.xcodeproj/project/pbxproj
 
 
 # Link in the specific gcc 4.1 bug work around

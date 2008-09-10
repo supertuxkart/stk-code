@@ -394,6 +394,7 @@ AC_CONFIG_FILES([                   \
  Makefile                           \
  data/Makefile                      \
  data/fonts/Makefile                \
+ data/grandprix/Makefile            \
  data/herrings/Makefile             \
  data/karts/Makefile                \
  data/models/Makefile               \
@@ -410,8 +411,6 @@ AC_CONFIG_FILES([                   \
  src/bullet/src/Makefile            \
  src/bullet/Demos/OpenGL/Makefile   \
  src/enet/Makefile                  \
- src/enet/include/Makefile          \
- src/enet/include/enet/Makefile
 ])
 AC_OUTPUT
 echo -e $SUMMARY
