@@ -41,6 +41,9 @@ public:
                        NS_ACCEPT_CONNECTIONS,              // server: accept connections
                        NS_WAIT_FOR_AVAILABLE_CHARACTERS,   // client: wait for list
                        NS_ALL_REMOTE_CHARACTERS_DONE,      // server: all client data received
+                       NS_WAIT_FOR_KART_CONFIRMATION,      // client: wait for confirmation
+                                                           // if character selection was ok
+                       NS_KART_CONFIRMED,                  // Character was confirmed
                        NS_WAIT_FOR_RACE_DATA,              // client: wait for race info
                        NS_READY_SET_GO_BARRIER,            // c&s: barrier before r.s.g.
                        NS_CHARACTER_SELECT,                // c&s: character select in progress
@@ -62,6 +65,8 @@ private:
     ENetHost                   *m_host;    // me
     ENetPeer                   *m_server;  // (clients only)
     std::vector<ENetPeer*>      m_clients; // (server only) pos in vector is client host_id 
+    /** Name of the kart that a client is waiting for confirmation for. */
+    std::string                 m_kart_to_confirm;
 
     bool         initServer();
     bool         initClient();
@@ -78,15 +83,15 @@ private:
 public:
                  NetworkManager();
                 ~NetworkManager();
-    void         setMode(NetworkMode m)            {m_mode = m;             }
-    NetworkMode  getMode() const                   {return m_mode;          }
+    void         setMode(NetworkMode m)            {m_mode = m;              }
+    NetworkMode  getMode() const                   {return m_mode;           }
     void         becomeServer();
     void         becomeClient();
-    void         setState(NetworkState s)          {m_state = s;            }
-    NetworkState getState() const                  {return m_state;         }
-    int          getMyHostId() const               {return m_host_id;       }
-    void         setHostId(int host_id)            {m_host_id = host_id;    }
-    unsigned int getNumClients() const             {return m_num_clients;   }
+    void         setState(NetworkState s)          {m_state = s;             }
+    NetworkState getState() const                  {return m_state;          }
+    int          getMyHostId() const               {return m_host_id;        }
+    void         setHostId(int host_id)            {m_host_id = host_id;     }
+    unsigned int getNumClients() const             {return m_num_clients;    }
     const std::string& 
                  getClientName(int i) const        {return m_client_names[i];}
     bool         initialiseConnections();
@@ -95,7 +100,7 @@ public:
     void         disableNetworking();
     void         sendConnectMessage();  // client send initial info to server
     void         switchToCharacterSelection();
-    void         sendCharacterSelected(int player_id);
+    void         sendCharacterSelected(int player_id, const std::string &kartid);
     void         waitForRaceInformation();
     void         worldLoaded();
     void         setupPlayerKartInfo();
@@ -108,4 +113,3 @@ public:
 extern NetworkManager *network_manager;
 
 #endif
-

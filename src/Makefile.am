@@ -35,7 +35,7 @@ supertuxkart_SOURCES =             main.cpp  			\
         network/message.cpp             network/message.hpp			\
 	network/race_info_message.hpp   network/race_info_message.cpp		\
 	network/remote_kart_info.hpp    network/character_selected_message.hpp	\
-	network/race_start_message.hpp  					\
+	network/race_start_message.hpp  network/character_confirm_message.hpp	\
 	network/connect_message.hpp	network/connect_message.cpp		\
 	network/num_players_message.hpp network/world_loaded_message.hpp	\
         network/connect_message.hpp     network/character_info_message.hpp	\
@@ -86,8 +86,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	shadow.cpp		   shadow.hpp	        	\
 	particle_system.cpp	   particle_system.hpp       	\
 	game_manager.cpp	   game_manager.hpp        	\
-	widget_manager.cpp	   widget_manager.hpp	        \
-	widget.cpp		   widget.hpp	        	\
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
@@ -113,6 +111,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	lisp/lexer.cpp		   lisp/lexer.hpp           	\
 	lisp/parser.cpp		   lisp/parser.hpp          	\
 	lisp/writer.cpp		   lisp/writer.hpp	        \
+	gui/widget_manager.cpp	   gui/widget_manager.hpp       \
+	gui/widget.cpp		   gui/widget.hpp	        \
 	gui/menu_manager.cpp       gui/menu_manager.hpp     	\
 	gui/base_gui.cpp	   gui/base_gui.hpp	        \
 	gui/race_gui.cpp	   gui/race_gui.hpp	        \

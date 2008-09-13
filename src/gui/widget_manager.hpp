@@ -200,8 +200,11 @@ public:
     int getSelectedWgt() const { return m_selected_wgt_token; }
     void setSelectedWgt(const int TOKEN);
 
-    //Checks if the selected widget changed since the last call to update()
+    /** Checks if the selected widget changed since the last call to update() */
     bool selectionChanged() const { return m_selection_change; }
+
+    /** Forces the changed selection mode. */
+    void setSelectionChanged()    { m_selection_change = true; }
 
     /* Macro functions. They are widgets with special predefined values. */
 

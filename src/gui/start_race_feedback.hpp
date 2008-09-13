@@ -20,9 +20,18 @@
 
 #include "base_gui.hpp"
 
+/** This class is used to give feedback to the user while loading the track.
+ *  It either displays a 'Loading track' or a 'Wait for synchronisation'
+ *  message (dependent on the stage of the race manager).
+ */
 class StartRaceFeedback: public BaseGUI
 {
 protected:
+    /** Flag used to make sure that the text is actually displayed (i.e
+     *  update was called once) before loading the track - otherwise the
+     *  text is set in the widget, but not on the screen since the screen
+     *  wasn't updated.
+     */
     bool m_is_first_frame;
 public:
     StartRaceFeedback();

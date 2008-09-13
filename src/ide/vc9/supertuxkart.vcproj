@@ -916,14 +916,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\widget.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\widget_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\world.cpp"
 				>
 			</File>
@@ -1040,6 +1032,14 @@
 				</File>
 				<File
 					RelativePath="../../../src\gui\track_sel.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\widget.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\widget_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -1438,14 +1438,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\widget.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\widget_manager.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\world.hpp"
 				>
 			</File>
@@ -1564,6 +1556,14 @@
 					RelativePath="../../../src\gui\track_sel.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\widget.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\widget_manager.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="lisp"
@@ -1608,6 +1608,10 @@
 			<Filter
 				Name="network"
 				>
+				<File
+					RelativePath="..\..\network\character_confirm_message.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\network\character_info_message.hpp"
 					>

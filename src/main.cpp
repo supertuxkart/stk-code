@@ -55,7 +55,7 @@
 #include "file_manager.hpp"
 #include "loader.hpp"
 #include "game_manager.hpp"
-#include "widget_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "material_manager.hpp"
 #include "sdldrv.hpp"
 #include "callback_manager.hpp"

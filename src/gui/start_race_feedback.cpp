@@ -28,6 +28,7 @@ enum WidgetTokens
     WTOK_MSG
 };
 
+/** Constructor for feedback screen. */
 StartRaceFeedback::StartRaceFeedback()
 {
     m_is_first_frame = true;
@@ -45,16 +46,21 @@ StartRaceFeedback::StartRaceFeedback()
     }
 
     widget_manager->layout(WGT_AREA_ALL);
-}
+}   // StartRaceFeedback
 
 //-----------------------------------------------------------------------------
+/** Destructor for feedback screen.
+ */
 StartRaceFeedback::~StartRaceFeedback()
 {
     widget_manager->reset();
-}
-
+}   // ~StartRaceFeedback
 
 //-----------------------------------------------------------------------------
+/** Updates the feedback screen. Depending on the state of the network manager
+ *  it will change the displayed text.
+ *  \param delta Time step size.
+ */
 void StartRaceFeedback::update(float delta)
 {
     // First test if we are still waiting

@@ -38,7 +38,7 @@
 #include "projectile_manager.hpp"
 #include "loader.hpp"
 #include "gui/menu_manager.hpp"
-#include "widget_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "player.hpp"
 #include "gui/font.hpp"
 #include "user_config.hpp"

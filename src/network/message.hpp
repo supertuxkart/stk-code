@@ -43,9 +43,9 @@
 class Message
 { 
 public:
-    enum MessageType {MT_CONNECT=1, MT_CHARACTER_INFO, 
+    enum MessageType {MT_CONNECT=1, MT_CHARACTER_INFO, MT_CHARACTER_CONFIRM,
                       MT_RACE_INFO, MT_RACE_START, MT_WORLD_LOADED,
-                      MT_KART_INFO, MT_KART_CONTROL,
+                      MT_KART_INFO, MT_KART_CONTROL, 
                       MT_RACE_STATE};
 private:
     ENetPacket  *m_pkt;

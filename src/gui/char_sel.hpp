@@ -41,13 +41,15 @@ private:
     void             updateScrollPosition();
     int              computeIndent(int n) {return 40+abs((int)(m_max_entries-1)/2 - n)*3;}
     void             switchGroup();
+    void             nextMenu();
+    void             switchCharacter(int n);
 public:
-    CharSel(int which_player);
-    ~CharSel();
+                 CharSel(int which_player);
+                ~CharSel();
 
-    void switchCharacter(int n);
-    void update(float dt);
-    void select();
+    void         update(float dt);
+    void         select();
+    void         updateAvailableCharacters();
     virtual void handle(GameAction, int);
 };
 

@@ -17,12 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "race_manager.hpp"
+
 #include <iostream>
 
 #include "track_manager.hpp"
 #include "game_manager.hpp"
 #include "kart_properties_manager.hpp"
-#include "race_manager.hpp"
 #include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "world.hpp"
@@ -58,13 +59,12 @@ RaceManager::~RaceManager()
 }   // ~RaceManager
 
 //-----------------------------------------------------------------------------
-/** Resets the race manager.
+/** Resets the race manager. It is called by world when restarting a race.
  */
 void RaceManager::reset()
 {
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
-    m_player_karts.clear();
 }  // reset
 
 //-----------------------------------------------------------------------------

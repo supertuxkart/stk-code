@@ -225,6 +225,16 @@ bool KartPropertiesManager::kartAvailable(int kartid)
 }   // testAndSetKart
 
 //-----------------------------------------------------------------------------
+/** Sets a kart to be selected by specifying the identifier (name) of the kart.
+ *  \param kart_name Name of the kart.
+ */
+void KartPropertiesManager::selectKartName(const std::string &kart_name)
+{
+    int kart_id = getKartId(kart_name);
+    selectKart(kart_id);
+}   // selectKartName
+
+//-----------------------------------------------------------------------------
 /** Returns a list of randomly selected karts. This list firstly contains
  *  karts in the currently selected group, but which are not in the list
  *  of 'existing karts'. If not enough karts are available in the current

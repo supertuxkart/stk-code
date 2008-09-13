@@ -66,6 +66,9 @@ public:
     bool                     kartAvailable(int kartid);
     std::vector<std::string> getAllAvailableKarts() const;
     void                     setUnavailableKarts(std::vector<std::string>);
+    /** Sets a kartid to be selected (without any tests). */
+    void                     selectKart(int kartid) {m_selected_karts.push_back(kartid);}
+    void                     selectKartName(const std::string &kart_name);
     bool                     testAndSetKart(int kartid);
     std::vector<std::string> getRandomKartList(int count, RemoteKartInfoList& existing_karts);
     void                     removeTextures      ();

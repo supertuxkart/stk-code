@@ -227,17 +227,13 @@ void CharSel::updateScrollPosition()
     // set the 'selection changed' flag in the widget_manager, since update 
     // scroll position (when called on action up/down) will change the kart
     // to display, even though it's the same widget
-    int current_widget = widget_manager->getSelectedWgt();
-    widget_manager->setSelectedWgt(current_widget+1);
-    widget_manager->setSelectedWgt(current_widget);
+    widget_manager->setSelectionChanged();
 }   // updateScrollPosition
 
 //-----------------------------------------------------------------------------
 void CharSel::switchGroup()
 {
     m_index_avail_karts.clear();
-    // This loop is too long (since getNumberOfKarts returns all karts in all groups),
-    // but the loop is left if no more kart is found.
     const std::vector<int> &karts =
         kart_properties_manager->getKartsInGroup(user_config->m_kart_group);
     for(unsigned int i=0; i<karts.size(); i++)
@@ -278,6 +274,23 @@ void CharSel::switchGroup()
 }   // switchGroup
 
 //-----------------------------------------------------------------------------
+/** This forces a re-display of the available characters. It is used from the
+ *  network manager when a character confirm message is received from the 
+ *  server.
+ */
+void CharSel::updateAvailableCharacters()
+{
+    // This call computes the available characters (even though in this case
+    // the group hasn't changed. 
+    switchGroup();
+
+    // This re-displays the characters (even though the scroll position has
+    // not changed, one character might have been deleted).
+    updateScrollPosition();
+}   // updateAvailableCharacters
+
+//-----------------------------------------------------------------------------
+
 void CharSel::switchCharacter(int n)
 {
     int indx=m_index_avail_karts[n];
@@ -306,6 +319,21 @@ void CharSel::update(float dt)
         widget_manager->update(dt);
         return;
     }
+
+    // Are we still waiting for a confirmation?
+    if(network_manager->getState()==NetworkManager::NS_WAIT_FOR_KART_CONFIRMATION)
+    {
+        widget_manager->update(dt);
+        return;
+    }
+
+    // The selection was confirmed, proceed:
+    if(network_manager->getState()==NetworkManager::NS_KART_CONFIRMED)
+    {
+        nextMenu();
+        return;
+    }
+
     static bool first=true;
     if(first)
     {
@@ -372,6 +400,56 @@ void CharSel::update(float dt)
 }   // update
 
 //----------------------------------------------------------------------------
+/** Pushes the next menu onto the stack. In case of split screen that might
+ *  be another instance of the character selection menu.
+ */
+void CharSel::nextMenu()
+{
+    if(race_manager->getNumLocalPlayers() > 1 && 
+       menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
+    {
+        menu_manager->pushMenu(MENUID_CHARSEL_P2);
+        return;
+    }
+
+    if(race_manager->getNumLocalPlayers() > 2 &&
+        menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
+    {
+        menu_manager->pushMenu(MENUID_CHARSEL_P3);
+        return;
+    }
+
+    if (race_manager->getNumLocalPlayers() > 3 &&
+        menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
+    {
+        menu_manager->pushMenu(MENUID_CHARSEL_P4);
+        return;
+    }
+
+    // Last character selected
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        // Switch state to wait for race information
+        network_manager->waitForRaceInformation();
+        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
+    }
+    else
+    {
+
+        // The state of the server does not change now (so that it can keep
+        // on handling client selections). Waiting for all client infos
+        // happens in the start_race_feedback menu (which then triggers
+        // sending the race info).
+        if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
+            menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
+        else
+            menu_manager->pushMenu(MENUID_TRACKSEL);
+    }
+}   // nextMenu
+
+// ----------------------------------------------------------------------------
+/** Handles widget selection.
+ */
 void CharSel::select()
 {
     int wgt = widget_manager->getSelectedWgt();
@@ -389,6 +467,9 @@ void CharSel::select()
         updateScrollPosition();
         return;
     }
+
+    // Now it must be a character selection:
+    // -------------------------------------
     int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
     if(token<0 || token>(int)m_index_avail_karts.size())
     {
@@ -409,61 +490,19 @@ void CharSel::select()
         return;
     }
     const KartProperties* KP = kart_properties_manager->getKartById(kart_id);
-    if (KP != NULL)
-    {
-        race_manager->setLocalKartInfo(m_player_index, KP->getIdent());
-        user_config->m_player[m_player_index].setLastKartId(kart_id);
-        // Add selected kart (token) to selected karts vector so it cannot be
-        // selected again
-        kart_properties_manager->testAndSetKart(kart_id);
-        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-            network_manager->sendCharacterSelected(m_player_index);
-    }
+    if (!KP) return;
 
-    if (race_manager->getNumLocalPlayers() > 1)
+    race_manager->setLocalKartInfo(m_player_index, KP->getIdent());
+    user_config->m_player[m_player_index].setLastKartId(kart_id);
+    // Send the confirmation message to all clients.
+    network_manager->sendCharacterSelected(m_player_index,
+                                           KP->getIdent());
+    // In non-network more or on the server add selected kart (token) to 
+    // selected karts vector so it cannot be selected again
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
     {
-        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P1))
-        {
-            menu_manager->pushMenu(MENUID_CHARSEL_P2);
-            return;
-        }
-    }
-
-    if (race_manager->getNumLocalPlayers() > 2)
-    {
-        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P2))
-        {
-            menu_manager->pushMenu(MENUID_CHARSEL_P3);
-            return;
-        }
-    }
-
-    if (race_manager->getNumLocalPlayers() > 3)
-    {
-        if (menu_manager->isCurrentMenu(MENUID_CHARSEL_P3))
-        {
-            menu_manager->pushMenu(MENUID_CHARSEL_P4);
-            return;
-        }
-    }
-
-    // Last character selected"
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        // Switch state to wait for race information
-        network_manager->waitForRaceInformation();
-        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
-    }
-    else
-    {
-        // The state of the server does not change now (so that it can keep
-        // on handling client selections). Waiting for all client infos
-        // happens in the start_race_feedback menu (which then triggers
-        // sending the race info).
-        if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
-            menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
-        else
-            menu_manager->pushMenu(MENUID_TRACKSEL);
+        kart_properties_manager->selectKart(kart_id);
+        nextMenu();
     }
 }   // select
 

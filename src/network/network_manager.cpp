@@ -26,12 +26,14 @@
 #include "network/world_loaded_message.hpp"
 #include "network/race_state.hpp"
 #include "network/kart_control_message.hpp"
+#include "network/character_confirm_message.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "kart_properties_manager.hpp"
 #include "translation.hpp"
-#include "gui/font.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/char_sel.hpp"
 
 NetworkManager* network_manager = 0;
 
@@ -220,6 +222,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             m_num_clients++;
             return;
         }
+    case NS_KART_CONFIRMED:    // Fall through
     case NS_CHARACTER_SELECT:
         {
             CharacterSelectedMessage m(event->packet);
@@ -235,12 +238,22 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             RemoteKartInfo ki=m.getKartInfo();
             ki.setHostId(hostid);
             m_kart_info.push_back(ki);
+
+            int kart_id = kart_properties_manager->getKartId(ki.getKartName());
+            kart_properties_manager->testAndSetKart(kart_id);
+            CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
+            if(menu)
+                menu->updateAvailableCharacters();
+            
+            // Broadcast the information about a selected kart to all clients
+            CharacterConfirmMessage ccm(ki.getKartName(), hostid);
+            broadcastToClients(ccm);
             // See if this was the last message, i.e. we have received at least
             // one message from each client, and the size of the kart_info
             // array is the same as the number of all players (which does not
             // yet include the number of players on the host).
             if(m_barrier_count == (int)m_num_clients &&
-	       m_num_all_players==(int)m_kart_info.size())
+                m_num_all_players==(int)m_kart_info.size())
             {
                 // we can't send the race info yet, since the server might
                 // not yet have selected all characters!
@@ -275,8 +288,47 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             m_state = NS_CHARACTER_SELECT;
             break;
         }
+    case NS_CHARACTER_SELECT:  
+        {
+            CharacterConfirmMessage m(event->packet);
+            kart_properties_manager->selectKartName(m.getKartName());
+            CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
+            if(menu)
+                menu->updateAvailableCharacters();
+            break;
+        }
+    case NS_WAIT_FOR_KART_CONFIRMATION:
+        {
+            CharacterConfirmMessage m(event->packet);
+            kart_properties_manager->selectKartName(m.getKartName());
+
+            // If the current menu is the character selection menu,
+            // update the menu so that the newly taken character is removed.
+            CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
+            if(menu)
+                menu->updateAvailableCharacters();
+            // Check if we received a message about the kart we just selected.
+            // If so, the menu needs to progress, otherwise a different kart
+            // must be selected by the current player.
+            if(m.getKartName()==m_kart_to_confirm)
+            {
+                int host_id = m.getHostId();
+                m_state = (host_id == getMyHostId()) ? NS_KART_CONFIRMED
+                                                     : NS_CHARACTER_SELECT;
+            }   // m.getkartName()==m_kart_to_confirm
+            break;
+        }   // wait for kart confirmation
     case NS_WAIT_FOR_RACE_DATA:
         {
+            // It is possible that character confirm messages arrive at the 
+            // client when it has already left the character selection screen.
+            // In this case the messages can simply be ignored.
+            if(Message::peekType(event->packet)==Message::MT_CHARACTER_CONFIRM)
+            {
+                // Receiving it will automatically free the memory.
+                CharacterConfirmMessage m(event->packet);
+                return;
+            }
             RaceInfoMessage m(event->packet);
             // The constructor actually sets the information in the race manager
             m_state = NS_LOADING_WORLD;
@@ -391,10 +443,28 @@ void NetworkManager::switchToCharacterSelection()
 }   // switchTocharacterSelection
 
 // ----------------------------------------------------------------------------
-void NetworkManager::sendCharacterSelected(int player_id)
+/** Called on the client to send the data about the selected kart to the 
+ *  server and wait for confirmation.
+ *  \param player_id Local id of the player which selected the kart.
+ *  \param kart_id Identifier of the selected kart. this is used to wait till
+ *                 a message about this kart is received back from the server.
+ */
+void NetworkManager::sendCharacterSelected(int player_id, 
+                                           const std::string &kart_id)
 {
-    CharacterSelectedMessage m(player_id);
-    sendToServer(m);
+    if(m_mode==NW_SERVER)
+    {
+        CharacterConfirmMessage ccm(kart_id, getMyHostId());
+        broadcastToClients(ccm);
+    } 
+    else if(m_mode==NW_CLIENT)
+    {
+        CharacterSelectedMessage m(player_id);
+        sendToServer(m);
+        // Wait till we receive confirmation about the selected character.
+        m_state           = NS_WAIT_FOR_KART_CONFIRMATION;
+        m_kart_to_confirm = kart_id;
+    }
 }   // sendCharacterSelected
 
 // ----------------------------------------------------------------------------
