@@ -163,7 +163,7 @@ void ProjectileManager::updateClient(float dt)
     unsigned int num_projectiles = race_state->getNumFlyables();
     if(num_projectiles != m_active_projectiles.size())
         fprintf(stderr, "Warning: num_projectiles %d active %d\n",num_projectiles,
-                m_active_projectiles.size());
+                (int)m_active_projectiles.size());
 
     unsigned int indx=0;
     for(Projectiles::iterator i  = m_active_projectiles.begin();
