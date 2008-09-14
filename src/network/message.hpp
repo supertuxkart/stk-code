@@ -61,7 +61,7 @@ public:
     void         addString(const std::string &data); 
     void         addStringVector(const std::vector<std::string>& vs);
     void         addUInt(unsigned int data)      { addInt(*(int*)&data);  }
-    void         addFloat(float data)            { addInt(*(int*)&data);  }
+    void         addFloat(const float data);    
     void         addBool(bool data)              { addChar(data?1:0);     }
     void         addChar(char data)              { addCharArray((char*)&data,1);}
     void         addCharArray(char *c, unsigned int n=1) 

@@ -144,6 +144,19 @@ short Message::getShort()
 }   // getShort
 
 // ----------------------------------------------------------------------------
+/** Adds a floating point value to the message.
+ *  \param data Floating point value to add.
+ */
+void Message::addFloat(const float data)
+{
+    // The simple approach of using  addInt(*(int*)&data)
+    // does not work (at least with optimisation on certain g++ versions,
+    // see getFloat for more details)
+    int n;
+    memcpy(&n, &data, sizeof(float));
+    addInt(n);
+}   // addFloat
+// ----------------------------------------------------------------------------
 float Message::getFloat()
 { 
     int i    = getInt();
