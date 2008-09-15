@@ -85,7 +85,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	skid_mark.cpp		   skid_mark.hpp	        \
 	shadow.cpp		   shadow.hpp	        	\
 	particle_system.cpp	   particle_system.hpp       	\
-	game_manager.cpp	   game_manager.hpp        	\
+	main_loop.cpp	 	   main_loop.hpp        	\
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\

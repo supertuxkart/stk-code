@@ -604,7 +604,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include"
 				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT;HAVE_ENET"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -623,7 +623,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_bullet.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
@@ -712,10 +712,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\game_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\grand_prix_data.cpp"
 				>
 			</File>
@@ -769,6 +765,10 @@
 			</File>
 			<File
 				RelativePath="../../../src\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\main_loop.cpp"
 				>
 			</File>
 			<File
@@ -1194,10 +1194,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\game_manager.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\grand_prix_data.hpp"
 				>
 			</File>
@@ -1263,6 +1259,10 @@
 			</File>
 			<File
 				RelativePath="..\..\loader.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\main_loop.hpp"
 				>
 			</File>
 			<File

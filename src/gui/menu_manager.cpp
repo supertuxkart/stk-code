@@ -39,7 +39,7 @@
 #include "race_results_gui.hpp"
 #include "grand_prix_ending.hpp"
 #include "race_manager.hpp"
-#include "game_manager.hpp"
+#include "main_loop.hpp"
 #include "race_menu.hpp"
 #include "help_page_one.hpp"
 #include "help_page_two.hpp"
@@ -200,7 +200,7 @@ void MenuManager::update()
                 break;
             case MENUID_EXITGAME:
                 m_menu_stack.clear();
-                game_manager->abort();
+                main_loop->abort();
                 break;
 
             case MENUID_CONFIG_CONTROLS:

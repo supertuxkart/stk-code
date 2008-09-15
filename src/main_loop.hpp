@@ -1,4 +1,4 @@
-//  $Id: screen_manager.hpp 855 2006-11-17 01:50:37Z coz $
+//  $Id: main_loop.hpp 855 2006-11-17 01:50:37Z coz $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -17,13 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCREENMANAGER_H
-#define HEADER_SCREENMANAGER_H
+#ifndef HEADER_MAIN_LOOP_HPP
+#define HEADER_MAIN_LOOP_HPP
 #include <SDL/SDL_types.h>
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
-class GameManager
+class MainLoop
 {
 private:
     bool m_abort;
@@ -33,13 +33,13 @@ private:
     Uint32   m_prev_time;
 
 public:
-    GameManager();
-    ~GameManager();
+         MainLoop();
+        ~MainLoop();
     void run();
     void abort();
-};
+};   // MainLoop
 
-extern GameManager* game_manager;
+extern MainLoop* main_loop;
 
 #endif
 

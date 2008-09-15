@@ -29,7 +29,6 @@
 #include "unlock_manager.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
-#include "game_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "kart_properties.hpp"

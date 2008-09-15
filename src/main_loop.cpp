@@ -1,4 +1,4 @@
-//  $Id: screen_manager.cpp 855 2006-11-17 01:50:37Z coz $
+//  $Id: main_loop.cpp 855 2006-11-17 01:50:37Z coz $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//#include <cstdlib>
+#include "main_loop.hpp"
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -31,7 +31,6 @@
 #include <SDL/SDL.h>
 #include <assert.h>
 #include "sdldrv.hpp"
-#include "game_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "sound_manager.hpp"
 #include "material_manager.hpp"
@@ -42,23 +41,25 @@
 #include "history.hpp"
 #include "network/network_manager.hpp"
 
-GameManager* game_manager = 0;
+MainLoop* main_loop = 0;
 
-GameManager::GameManager() :
+MainLoop::MainLoop() :
 m_abort(false),
 m_frame_count(0),
 m_curr_time(m_prev_time),
 m_prev_time(SDL_GetTicks())
 {
-}  // GameManager
+}  // MainLoop
 
 //-----------------------------------------------------------------------------
-GameManager::~GameManager()
+MainLoop::~MainLoop()
 {
-}   // ~GameManager
+}   // ~MainLoop
 
 //-----------------------------------------------------------------------------
-void GameManager::run()
+/** Run the actual main loop.
+ */
+void MainLoop::run()
 {
     const GLuint TITLE_SCREEN_TEXTURE = 
         material_manager->getMaterial("st_title_screen.rgb")->getState()->getTextureHandle();
@@ -192,9 +193,11 @@ void GameManager::run()
 }   // run
 
 //-----------------------------------------------------------------------------
-void GameManager::abort()
+/** Set the abort flag, causing the mainloop to be left.
+ */
+void MainLoop::abort()
 {
     m_abort = true;
-}
+}   // abort
 
 /* EOF */

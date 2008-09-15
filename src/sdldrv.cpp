@@ -31,7 +31,7 @@
 #include "sdldrv.hpp"
 #include "material_manager.hpp"
 #include "kart_properties_manager.hpp"
-#include "game_manager.hpp"
+#include "main_loop.hpp"
 #include "herring_manager.hpp"
 #include "collectable_manager.hpp"
 #include "attachment_manager.hpp"
@@ -387,7 +387,7 @@ SDLDriver::input()
         switch(ev.type)
         {
         case SDL_QUIT:
-            game_manager->abort();
+            main_loop->abort();
             break;
 
         case SDL_KEYUP:

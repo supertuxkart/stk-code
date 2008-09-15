@@ -22,7 +22,6 @@
 #include <iostream>
 
 #include "track_manager.hpp"
-#include "game_manager.hpp"
 #include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"

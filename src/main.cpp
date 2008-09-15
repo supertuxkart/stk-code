@@ -54,7 +54,7 @@
 #include "race_manager.hpp"
 #include "file_manager.hpp"
 #include "loader.hpp"
-#include "game_manager.hpp"
+#include "main_loop.hpp"
 #include "gui/widget_manager.hpp"
 #include "material_manager.hpp"
 #include "sdldrv.hpp"
@@ -491,7 +491,7 @@ int main(int argc, char *argv[] )
         inputDriver = new SDLDriver ();
         ssgInit () ;
         
-        game_manager = new GameManager ();
+        main_loop = new MainLoop();
         // loadMaterials needs ssgLoadTextures (internally), which can
         // only be called after ssgInit (since this adds the actual file_manager)
         // so this next call can't be in InitTuxkart. And InitPlib needs
@@ -520,7 +520,7 @@ int main(int argc, char *argv[] )
             // This will setup the race manager etc.
             history->Load();
             race_manager->startNew();
-            game_manager->run();
+            main_loop->run();
             // well, actually run() will never return, since
             // it exits after replaying history (see history::GetNextDT()).
             // So the next line is just to make this obvious here!
@@ -564,7 +564,7 @@ int main(int argc, char *argv[] )
             race_manager->setDifficulty(RaceManager::RD_HARD);
             race_manager->startNew();
         }
-        game_manager->run();
+        main_loop->run();
 
     }  // try
     catch (std::exception &e)
