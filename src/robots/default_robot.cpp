@@ -505,8 +505,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
 
 
     // check if kart is stuck
-    if(getVehicle()->getRigidBody()->getLinearVelocity().length()<2.0f &&
-       !isRescue() && !world->isStartPhase())
+    if(getSpeed()<2.0f && !isRescue() && !world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
