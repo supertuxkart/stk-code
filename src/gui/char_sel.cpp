@@ -287,6 +287,8 @@ void CharSel::updateAvailableCharacters()
     // This re-displays the characters (even though the scroll position has
     // not changed, one character might have been deleted).
     updateScrollPosition();
+    // Forces a redraw of the model.
+    m_current_kart = -1;
 }   // updateAvailableCharacters
 
 //-----------------------------------------------------------------------------
