@@ -28,30 +28,50 @@
 #include "network/remote_kart_info.hpp"
 
 /** The race manager has two functions:
-    1) it stores information about the race the user selected (e.g. number
-       of karts, track, race mode etc.)
-    2) when a race is started, it creates the world, and keeps track of
-       score during the race. When a race is finished, it deletes the world,
-       and (depending on race mode) starts the next race by creating a new
-       world).
-    Information in the race manager is considered to be more static, sometimes
-    the world has similar functions showing the current state. E.g.: the
-    race manager keeps track of the number of karts with which the race was
-    started, while world keeps track of the number of karts currently in the
-    race (consider a race mode like follow the leader where karts can get
-    eliminated).
-    The race manager handles all race types as a kind of grand prix. E.g.:
-    a quick race is basically a GP with only one track (so the race manager
-    keeps track of scores even though no scores are used in a quick race)
-    **/
+ *  1) it stores information about the race the user selected (e.g. number
+ *     of karts, track, race mode etc.). Most of the values are just stored
+ *     from the menus, and just read back, except for GP mode (the race
+ *     manager stores the GP information, but World queries only track
+ *     and number of laps, so in case of GP this information is taken from
+ *     the GrandPrix object), and local player information (number of local
+ *     players, and selected karts). The local player information is read
+ *     from the NetworkManager, gathered on the server (from all clients and
+ *     the server, see NetworkManager::setupPlayerKartInfo), and then the 
+ *     combined information distributed to all RaceManagers in all clients 
+ *     and server. Even in no networking mode, the data flow is the same:
+ *     information about local players is stored here, then processed by
+ *     NetworkManager::setupPlayerKartInfo and the 'global' information about
+ *     player karts is set in the RaceManager, to be used by World later on.
+ *  2) when a race is started, it creates the world, and keeps track of
+ *     score during the race. When a race is finished, it deletes the world,
+ *     and (depending on race mode) starts the next race by creating a new
+ *     world.
+ *  Information in the RaceManager is considered to be 'more static', sometimes
+ *  the world has similar functions showing the current state. E.g.: the
+ *  race manager keeps track of the number of karts with which the race was
+ *  started, while world keeps track of the number of karts currently in the
+ *  race (consider a race mode like follow the leader where karts can get
+ *  eliminated, but still the RaceManager has to accumulate points for those
+ *  karts).
+ *  The race manager handles all race types as a kind of grand prix. E.g.:
+ *  a quick race is basically a GP with only one track (so the race manager
+ *  keeps track of scores even though no scores are used in a quick race).
+ */
 class RaceManager
 {
 public:
-    /** Major and minor game modes. */
+    /** Major and minor game modes. This type should be split into two
+     *  types: MajorRaceModeType and MinorRaceModeType. Differentiating these
+     *  two types allows a GP to consist of mixture oftime trial, crazy race,
+     *  and FollowTheLeader modes. */
     enum RaceModeType   { RM_GRAND_PRIX, RM_SINGLE, // The two current major modes
                           RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER };
     /** Difficulty. Atm skidding is implemented as a special difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
+
+    /** Different kart types: A local player, a player connected via network,
+     *  an AI kart, the leader kart (currently not used), a ghost kart 
+     *  (currently not used). */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
     struct KartStatus

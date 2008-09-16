@@ -36,8 +36,46 @@
    class ReplayPlayer;
 #endif
 
-/** This class keeps all the state of a race, scenegraph, time,
-    etc. */
+/** This class is responsible for running the actual race. A world is created
+ *  by the race manager on the start of each race (so a new world is created
+ *  for each race of a Grand Prix). It creates the 
+ *  physics, loads the track, creates all karts, and initialises the race
+ *  specific managers (HerringManager, ProjectilManager, highscores, ...).
+ *  It uses the information from the race manager to get information like
+ *  what and how many karts, track to load etc. This class does not really
+ *  know about Grand Prixs, a GP is created
+ *  It maintains the race clock, and updates all karts, herings etc. during
+ *  the race.
+ *  Special game modes (e.g. follow the leader) are currently integrated in
+ *  this world, see e.g. updateRaceStatus where the world clock behaviour
+ *  is handled differently to create the count down.
+ *  \todo The different game modes should be implemented more cleanly (instead
+ *        of being handled by if statements all over the place). E.g. world
+ *        could become a base class, from which the following classes are
+ *        created:
+ *        - LapCountingWorld:World           Adds lap counting to the world
+ *        - TimeTrialWorld:LapCountingWorld  Creates a world for time trial
+ *                                           mode.
+ *        - CrazyRaceWorld:LapCountingWorld  Creates a world for crazy race
+ *                                           (currently called quick race).
+ *        - FollowLeaderWorld:World          Creates the follow the leader mode.
+ *        - TagWorld:World                   Multi-player 'tag' like game.
+ *  Of course, other designs are possible (e.g. a mode-specific object could
+ *  be passed into the world constructor, and world just calls functions in
+ *  this object.
+ *  \todo The handling of the FollowTheLeader mode should probably be changed
+ *        as well. Currently the leader kart is anormal AI kart (so it is 
+ *        included in the number of karts selected), and this causes some 
+ *        unnecessary handling of special cases everywhere (e.g. score 
+ *        counting will subtract one from the rank, since the kart on position
+ *        1 is the leader and does not score points, and the kart on position 
+ *        2 should get the points for a kart on position 1 etc). With a 
+ *        special world for the FTL mode this could be handled better: 
+ *        creating a special kart type (see RaceManager::KartType), scoring
+ *        would be done in the mode specific world (instead of in the
+ *        RaceManager).
+ */
+
 class World
 {
 public:
