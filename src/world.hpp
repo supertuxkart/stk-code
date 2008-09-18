@@ -17,12 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_WORLD_H
-#define HEADER_WORLD_H
+#ifndef HEADER_WORLD_HPP
+#define HEADER_WORLD_HPP
 
 #include <vector>
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
+
 #include "track.hpp"
 #include "player_kart.hpp"
 #include "physics.hpp"
@@ -35,6 +36,8 @@
 #  include "replay_recorder.hpp"
    class ReplayPlayer;
 #endif
+
+class SFXBase;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
@@ -75,7 +78,6 @@
  *        would be done in the mode specific world (instead of in the
  *        RaceManager).
  */
-
 class World
 {
 public:
@@ -165,6 +167,8 @@ private:
     std::vector<float>
                 m_leader_intervals;    // time till elimination in follow leader
     bool        m_faster_music_active; // true if faster music was activated
+    SFXBase    *m_prestart_sound;
+    SFXBase    *m_start_sound;
 
     void  updateRacePosition(int k);
     void  updateHighscores  ();

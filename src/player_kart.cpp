@@ -19,7 +19,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "constants.hpp"
-#include "sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
 #include "sdldrv.hpp"
@@ -39,9 +40,30 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
     m_penalty_time = 0.0f;
     m_camera       = scene->createCamera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
+
+    m_bzzt_sound  = sfx_manager->getSfx(SFXManager::SOUND_BZZT );
+    m_beep_sound  = sfx_manager->getSfx(SFXManager::SOUND_BEEP );
+    m_crash_sound = sfx_manager->getSfx(SFXManager::SOUND_CRASH);
+    m_wee_sound   = sfx_manager->getSfx(SFXManager::SOUND_WEE  );
+    m_ugh_sound   = sfx_manager->getSfx(SFXManager::SOUND_UGH  );
+    m_grab_sound  = sfx_manager->getSfx(SFXManager::SOUND_GRAB );
+    m_full_sound  = sfx_manager->getSfx(SFXManager::SOUND_FULL );
+
     reset();
 }   // PlayerKart
 
+//-----------------------------------------------------------------------------
+PlayerKart::~PlayerKart()
+{
+    delete m_bzzt_sound;
+    delete m_beep_sound;
+    delete m_crash_sound;
+    delete m_wee_sound;
+    delete m_ugh_sound;
+    delete m_grab_sound;
+    delete m_full_sound;
+
+}
 //-----------------------------------------------------------------------------
 void PlayerKart::reset()
 {
@@ -154,8 +176,11 @@ void PlayerKart::update(float dt)
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||
            m_controls.fire|m_controls.wheelie|m_controls.jump)
         {
-            //JH Some sound here?
-            m_penalty_time=1.0;
+            if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
+            {
+                m_penalty_time=1.0;
+                m_bzzt_sound->play();
+            }
             // A warning gets displayed in RaceGUI
         }
         else
@@ -176,7 +201,8 @@ void PlayerKart::update(float dt)
 
     if ( m_controls.fire && !isRescue())
     {
-        if (m_collectable.getType()==COLLECT_NOTHING) sound_manager->playSfx(SOUND_BEEP);
+        if (m_collectable.getType()==COLLECT_NOTHING) 
+            m_beep_sound->play();
     }
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
@@ -184,11 +210,17 @@ void PlayerKart::update(float dt)
     // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls.rescue )
     {
-        sound_manager -> playSfx ( SOUND_BEEP ) ;
+        m_beep_sound->play();
         forceRescue();
         m_controls.rescue=false;
     }
-
+    // FIXME: This is the code previously done in Kart::update (for player 
+    //        karts). Does this mean that there are actually two sounds played
+    //        when rescue? beep above and bzzt her???
+    if (isRescue() && m_attachment.getType() != ATTACH_TINYTUX)
+    {
+        m_bzzt_sound->play();
+    }
     Kart::update(dt);
 }   // update
 
@@ -204,7 +236,7 @@ void PlayerKart::crashed(Kart *kart)
 
     if(world->getTime() - m_time_last_crash_sound > 0.5f) 
     {
-        sound_manager->playSfx( SOUND_CRASH );
+        m_crash_sound->play();
         m_time_last_crash_sound = world->getTime();
     }
 }   // crashed
@@ -216,12 +248,15 @@ void PlayerKart::setPosition(int p)
 {
     if(getPosition()<p)
     {
-        sound_manager->playSfx(SOUND_BEEP);
+        m_beep_sound->play();
     }
     Kart::setPosition(p);
 }   // setPosition
 
 //-----------------------------------------------------------------------------
+/** Called when a kart finishes race.
+ *  /param time Finishing time for this kart.
+ */
 void PlayerKart::raceFinished(float time)
 {
     Kart::raceFinished(time);
@@ -235,17 +270,41 @@ void PlayerKart::raceFinished(float time)
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
+/** Called when a kart hits or uses a zipper.
+ */
 void PlayerKart::handleZipper()
 {
     Kart::handleZipper();
-    sound_manager->playSfx ( SOUND_WEE );
+    m_wee_sound->play();
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
+/** Called when a kart hits a herring.
+ *  \param herring Herring that was collected.
+ *  \param add_info Additional info to be used then handling the herring. If
+ *                  this is -1 (default), the herring type is selected 
+ *                  randomly. Otherwise it contains the collectable or 
+ *                  attachment for the kart. This is used in network mode to 
+ *                  let the server determine the collectable/attachment for
+ *                  the clients.
+ */
 void PlayerKart::collectedHerring(const Herring &herring, int add_info)
 {
+    const int old_herring_gobbled = getNumHerring();
     Kart::collectedHerring(herring, add_info);
-    sound_manager->playSfx ( ( herring.getType()==HE_GREEN ) ? SOUND_UGH:SOUND_GRAB);
+
+    if(old_herring_gobbled < MAX_HERRING_EATEN &&
+       getNumHerring() == MAX_HERRING_EATEN)
+    {
+        m_full_sound->play();
+    }
+    else
+    {
+        if(herring.getType() == HE_GREEN)
+            m_ugh_sound->play();
+        else
+            m_grab_sound->play();
+    }
 }   // collectedHerring
 
 //-----------------------------------------------------------------------------

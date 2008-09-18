@@ -25,6 +25,7 @@
 #include "kart.hpp"
 #include "player.hpp"
 
+class SFXBase;
 class Player;
 class Camera;
 
@@ -40,12 +41,20 @@ private:
     float   m_time_last_crash_sound;
     Camera *m_camera;
 
+    SFXBase *m_bzzt_sound;
+    SFXBase *m_beep_sound;
+    SFXBase *m_crash_sound;
+    SFXBase *m_wee_sound;
+    SFXBase *m_ugh_sound;
+    SFXBase *m_grab_sound;
+    SFXBase *m_full_sound;
+
     void steer(float, int);
 public:
                  PlayerKart(const std::string& kart_name,
                             int position, Player *_player,
                             const btTransform& init_pos, int player_index);
-
+                ~PlayerKart        ();
     int          earlyStartPenalty () {return m_penalty_time>0; }
     Player      *getPlayer         () {return m_player;        }
     void         update            (float);

@@ -43,6 +43,13 @@ supertuxkart_SOURCES =             main.cpp  			\
 	network/kart_control_message.hpp network/kart_control_message.cpp	\
 	network/flyable_info.hpp	network/herring_info.hpp		\
 	network/race_state.hpp		network/race_state.cpp			\
+	audio/music.hpp								\
+	audio/music_information.cpp 	audio/music_information.hpp 		\
+	audio/music_ogg.cpp	   	audio/music_ogg.hpp          		\
+ 	audio/sfx_base.hpp              					\	
+	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      		\
+	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			\
+	audio/sound_manager.cpp	   	audio/sound_manager.hpp      		\
 	utils/random_generator.hpp	utils/random_generator.cpp		\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
@@ -50,10 +57,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	attachment_manager.cpp     attachment_manager.hpp       \
 	collectable.cpp		   collectable.hpp	        \
 	collectable_manager.cpp	   collectable_manager.hpp   	\
-	sound_manager.cpp	   sound_manager.hpp           	\
-	music_ogg.cpp	   	   music_ogg.hpp            	\
-	music_information.cpp  	   music_information.hpp       	\
-	sfx_openal.cpp             sfx_openal.hpp              	\
 	smoke.cpp		   smoke.hpp			\
 	input.hpp 		   kart_control.hpp		\
 	isect.cpp		   isect.hpp                	\
@@ -76,8 +79,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	string_utils.cpp	   string_utils.hpp          	\
 	track_manager.cpp	   track_manager.hpp         	\
 	world.cpp		   world.hpp                	\
-	callback.hpp		   music.hpp			\
-	sfx.hpp							\
+	callback.hpp 						\
 	moving_physics.hpp	   moving_physics.cpp		\
 	moving_texture.hpp	   moving_texture.cpp		\
 	callback_manager.cpp       callback_manager.hpp         \

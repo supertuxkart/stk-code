@@ -31,11 +31,11 @@
 #include <plib/ssg.h>
 #include <string>
 #include <vector>
-#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btTransform.h"
 #include "vec3.hpp"
 #include "material.hpp"
 #include "triangle_mesh.hpp"
-#include "music_information.hpp"
+#include "audio/music_information.hpp"
 
 class Track
 {

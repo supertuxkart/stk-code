@@ -22,16 +22,21 @@
 
 #define MAX_COLLECTABLES 5
 
-#include "collectable_manager.hpp"
+#include "collectable_manager.hpp"  // needed for collectable_type
 #include "utils/random_generator.hpp"
 
 class Kart;
 class Herring;
+class SFXBase;
 
 class Collectable
 {
 private:
     RandomGenerator            m_random;
+    SFXBase                   *m_sound_shot;
+    SFXBase                   *m_sound_use_anvil;
+    SFXBase                   *m_sound_use_parachute;
+
 protected:
     Kart*                      m_owner;
     CollectableType            m_type;
@@ -39,6 +44,7 @@ protected:
 
 public:
                     Collectable  (Kart* kart_);
+                   ~Collectable  ();
     void            set          (CollectableType _type, int n=1);
     void            reset        ();
     int             getNum       () const {return m_number;}

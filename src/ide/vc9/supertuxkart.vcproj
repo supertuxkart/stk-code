@@ -517,7 +517,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT;HAVE_ENET"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAS_GETTEXT"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -796,14 +796,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\music_information.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\music_ogg.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\particle_system.cpp"
 				>
 			</File>
@@ -848,10 +840,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\sfx_openal.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\shadow.cpp"
 				>
 			</File>
@@ -861,10 +849,6 @@
 			</File>
 			<File
 				RelativePath="..\..\smoke.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sound_manager.cpp"
 				>
 			</File>
 			<File
@@ -1127,6 +1111,30 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="audio"
+				>
+				<File
+					RelativePath="..\..\audio\music_information.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\music_ogg.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_openal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sound_manager.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1290,18 +1298,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\music.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\music_information.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\music_ogg.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\no_copy.hpp"
 				>
 			</File>
@@ -1362,14 +1358,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\sfx.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sfx_openal.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\shadow.hpp"
 				>
 			</File>
@@ -1379,10 +1367,6 @@
 			</File>
 			<File
 				RelativePath="..\..\smoke.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sound_manager.hpp"
 				>
 			</File>
 			<File
@@ -1682,6 +1666,38 @@
 				>
 				<File
 					RelativePath="..\..\utils\random_generator.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="audio"
+				>
+				<File
+					RelativePath="..\..\audio\music.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\music_information.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\music_ogg.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sfx_openal.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\sound_manager.hpp"
 					>
 				</File>
 			</Filter>

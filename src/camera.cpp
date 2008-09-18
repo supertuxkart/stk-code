@@ -199,6 +199,7 @@ void Camera::update (float dt)
     m_xyz = c.getXYZ();
     m_hpr = c.getHPR();
     m_context -> setCamera(&c.toSgCoord());
+    //sound_manager->positionListener(kart->getXYZ());
 }   // update
 
 //-----------------------------------------------------------------------------

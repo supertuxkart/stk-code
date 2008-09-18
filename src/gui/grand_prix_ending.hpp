@@ -25,21 +25,23 @@
 class ssgBranch;
 class ssgTransform;
 class ssgContext;
+class SFXBase;
 
 class GrandPrixEnd: public BaseGUI
 {
 private:
-    ssgContext* m_context;
-    ssgTransform* m_kart;
-    int m_current_kart;
-    int m_kart_name_label;
-    char* m_score;
-    float m_clock;
+    ssgContext   *m_context;
+    ssgTransform *m_kart;
+    int           m_current_kart;
+    int           m_kart_name_label;
+    char         *m_score;
+    float         m_clock;
+    SFXBase      *m_winner_sound;
+
 
 public:
-    GrandPrixEnd();
-    ~GrandPrixEnd();
-
+         GrandPrixEnd();
+        ~GrandPrixEnd();
     void update(float dt);
     void select();
 };

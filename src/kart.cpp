@@ -20,6 +20,10 @@
 
 #include <math.h>
 #include <iostream>
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf  _snprintf
+#endif
+
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
@@ -27,7 +31,6 @@
 #include "loader.hpp"
 #include "coord.hpp"
 #include "herring_manager.hpp"
-#include "sound_manager.hpp"
 #include "file_manager.hpp"
 #include "skid_mark.hpp"
 #include "user_config.hpp"
@@ -44,14 +47,11 @@
 #include "translation.hpp"
 #include "smoke.hpp"
 #include "material_manager.hpp"
+#include "audio/sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
-
-// num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf  _snprintf
-#endif
 
 
 Kart::Kart (const std::string& kart_name, int position,
@@ -104,6 +104,14 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheel_rear_l            = NULL;
     m_wheel_rear_r            = NULL;
     m_lap_start_time          = -1.0f;
+
+    m_engine_sound = sfx_manager->getSfx(SFXManager::SOUND_ENGINE);
+
+    if(!m_engine_sound)
+    {
+        fprintf(stdout, "Error: Could not allocate a sfx object for the kart. Further errors may ensue!\n");
+    }
+
     loadData();
     reset();
 }   // Kart
@@ -243,11 +251,26 @@ void Kart::createPhysics(ssgEntity *obj)
     m_uprightConstraint->setLimitSoftness(1.0f);
     m_uprightConstraint->setDamping(0.0f);
     world->getPhysics()->addKart(this, m_vehicle);
+
+    //create the engine sound
+    if(m_engine_sound)
+    {
+        m_engine_sound->speed(0.5f);
+        m_engine_sound->loop();
+        m_engine_sound->play();
+    }
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
 Kart::~Kart() 
 {
+    //stop the engine sound
+    if(m_engine_sound)
+    {
+        m_engine_sound->stop();
+    }
+    delete m_engine_sound;
+
     if(m_smokepuff) delete m_smokepuff;
     if(m_smoke_system != NULL) delete m_smoke_system;
 
@@ -473,8 +496,7 @@ void Kart::raceFinished(float time)
 //-----------------------------------------------------------------------------
 void Kart::collectedHerring(const Herring &herring, int add_info)
 {
-    const herringType type        = herring.getType();
-    const int OLD_HERRING_GOBBLED = m_num_herrings_gobbled;
+    const herringType type = herring.getType();
 
     switch (type)
     {
@@ -497,10 +519,7 @@ void Kart::collectedHerring(const Herring &herring, int add_info)
     if ( m_num_herrings_gobbled > MAX_HERRING_EATEN )
         m_num_herrings_gobbled = MAX_HERRING_EATEN;
 
-    if(OLD_HERRING_GOBBLED < m_num_herrings_gobbled &&
-       m_num_herrings_gobbled == MAX_HERRING_EATEN)
-        sound_manager->playSfx(SOUND_FULL);
-}   // hitHerring
+}   // collectedHerring
 
 //-----------------------------------------------------------------------------
 // Simulates gears
@@ -510,8 +529,11 @@ float Kart::getActualWheelForce()
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
-        if(m_speed <= m_max_speed*gear_ratio[i]) 
+        if(m_speed <= m_max_speed*gear_ratio[i])
+        {
+            m_current_gear_ratio = gear_ratio[i];
             return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]+zipperF;
+        }
     }
     return getMaxPower()+zipperF;
 
@@ -596,7 +618,6 @@ void Kart::update(float dt)
         const float rescue_height = 2.0f;
         if(m_attachment.getType() != ATTACH_TINYTUX)
         {
-            if(isPlayerKart()) sound_manager -> playSfx ( SOUND_BZZT );
             m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
@@ -920,8 +941,24 @@ void Kart::updatePhysics (float dt)
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
-}   // updatePhysics
 
+    //Change the engine sound based on kart RPM.
+    //The equation here is:
+    //         speed * gear_ratio 
+    // RPM =  --------------------
+    //           tire_diameter
+    //the magic number 1.7 is used to bring the computed gear ratio into a sensible range
+    float gear_ratio = 1.7f + (1 - m_current_gear_ratio);
+    float tire_diameter = 2;//can this be determined for each kart? Smaller tires make for higher rpm's.
+
+    m_max_gear_rpm = m_current_gear_ratio * max_speed;
+    m_rpm = ((m_speed * gear_ratio) / tire_diameter);
+    if(m_engine_sound)
+    {
+        m_engine_sound->speed((float)((m_rpm * 2) / m_max_gear_rpm));
+        //m_engine_sound->position(m_curr_track_coords);
+    }
+}   // updatePhysics
 
 //-----------------------------------------------------------------------------
 void Kart::forceRescue(bool is_shortcut)

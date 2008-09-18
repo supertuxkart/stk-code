@@ -17,14 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "grand_prix_ending.hpp"
+
 #include <sstream>
 #include <string>
 
 #include <SDL/SDL.h>
 
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "loader.hpp"
-#include "sound_manager.hpp"
-#include "grand_prix_ending.hpp"
 #include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
 #include "widget_manager.hpp"
@@ -48,10 +50,11 @@ enum WidgetTokens
     WTOK_FIRSTKART
 };
 
-
+// ----------------------------------------------------------------------------
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
 {
+    m_winner_sound = sfx_manager->getSfx(SFXManager::SOUND_WINNER);
     // for some strange reasons plib calls makeCurrent() in ssgContext
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
@@ -157,7 +160,7 @@ GrandPrixEnd::GrandPrixEnd()
     ssgEntity* kartentity = WINNING_KART->getModel();
     m_kart->addKid(kartentity);
 
-    sound_manager->playSfx(SOUND_WINNER);
+    m_winner_sound->play();
 
     m_clock = 0;
 
@@ -173,6 +176,7 @@ GrandPrixEnd::GrandPrixEnd()
 //-----------------------------------------------------------------------------
 GrandPrixEnd::~GrandPrixEnd()
 {
+    delete m_winner_sound;
     widget_manager->reset();
     ssgDeRefDelete(m_kart);
 

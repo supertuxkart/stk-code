@@ -25,7 +25,6 @@
 #include "kart.hpp"
 #include "projectile_manager.hpp"
 #include "callback_manager.hpp"
-#include "sound_manager.hpp"
 #include "scene.hpp"
 #include "ssg_help.hpp"
 

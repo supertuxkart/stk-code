@@ -26,7 +26,6 @@
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
-#include "sound_manager.hpp"
 #include "translation.hpp"
 
 enum WidgetTokens

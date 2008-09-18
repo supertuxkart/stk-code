@@ -38,7 +38,9 @@
 #include "callback_manager.hpp"
 #include "history.hpp"
 #include "constants.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "scene.hpp"
@@ -173,6 +175,9 @@ World::World()
     callback_manager->initAll();
     menu_manager->switchToRace();
 
+    m_prestart_sound = sfx_manager->getSfx(SFXManager::SOUND_PRESTART);
+    m_start_sound    = sfx_manager->getSfx(SFXManager::SOUND_START);
+
     m_track->startMusic();
 
     m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
@@ -210,6 +215,8 @@ World::~World()
     delete m_physics;
 
     sound_manager -> stopMusic();
+    delete m_prestart_sound;
+    delete m_start_sound;
 
     sgVec3 sun_pos;
     sgVec4 ambient_col, specular_col, diffuse_col;
@@ -473,13 +480,13 @@ void World::updateRaceStatus(float dt)
         // simplifies this handling
         case SETUP_PHASE:   m_clock = 0.0f;  
                             m_phase = READY_PHASE;
-                            sound_manager->playSfx(SOUND_PRESTART);
+                            m_prestart_sound->play();
                             dt = 0.0f;  // solves the problem of adding track loading time
                             return;               // loading time, don't play sound yet
         case READY_PHASE:   if(m_clock>1.0)
                             {
                                 m_phase=SET_PHASE;   
-                                sound_manager->playSfx(SOUND_PRESTART);
+                                m_prestart_sound->play();
                             }
                             m_clock += dt;
                             return;
@@ -490,7 +497,7 @@ void World::updateRaceStatus(float dt)
                                     m_clock=m_leader_intervals[0];
                                 else
                                     m_clock=0.0f;
-                                sound_manager->playSfx(SOUND_START);
+                                m_start_sound->play();
                                 // Reset the brakes now that the prestart 
                                 // phase is over (braking prevents the karts 
                                 // from sliding downhill)

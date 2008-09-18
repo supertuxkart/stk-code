@@ -17,18 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "audio/music_information.hpp"
 
 #include <stdexcept>
 
-#include "music_information.hpp"
+#include "audio/music_ogg.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "string_utils.hpp"
 #include "track_manager.hpp"
-#include "track.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
-#include "music_ogg.hpp"
+#include "track.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

@@ -39,7 +39,7 @@
 #include "user_config.hpp"
 #include "herring.hpp"
 #include "herring_manager.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
 #include "race_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -433,8 +433,9 @@ btTransform Track::getStartTransform(unsigned int pos) const {
   btTransform start;
   start.setOrigin(orig);
   start.setRotation(btQuaternion(btVector3(0, 0, 1), 
-				 pos<m_start_heading.size() 
-				 ? DEGREE_TO_RAD(m_start_heading[pos]) : 0.0f ));
+				                 pos<m_start_heading.size() 
+				                     ? DEGREE_TO_RAD(m_start_heading[pos]) 
+                                     : 0.0f ));
   return start;
 }   // getStartTransform
 

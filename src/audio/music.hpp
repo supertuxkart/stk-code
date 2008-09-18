@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MUSIC_H
-#define HEADER_MUSIC_H
+#ifndef HEADER_MUSIC_HPP
+#define HEADER_MUSIC_HPP
 
 #include <string>
 

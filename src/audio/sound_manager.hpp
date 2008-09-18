@@ -25,39 +25,31 @@
 #include <vector>
 #include <string>
 
-#include "music.hpp"
-#include "music_information.hpp"
-#include "sfx.hpp"
-
-enum enumSFX {SOUND_UGH,  SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
-              SOUND_SHOT, SOUND_WEE,   SOUND_EXPLOSION,
-              SOUND_BZZT, SOUND_BEEP,
-              SOUND_BACK_MENU, SOUND_USE_ANVIL, SOUND_USE_PARACHUTE,
-              SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL,
-              SOUND_PRESTART, SOUND_START, SOUND_MISSILE_LOCK,
-              NUM_SOUNDS};
+#include "lisp/lisp.hpp"
+#include "audio/music.hpp"
+#include "audio/music_information.hpp"
+#include "vec3.hpp"
 
 class SoundManager
 {
-private:
+private:		
+    MusicInformation        *m_current_music;
 
-    typedef std::vector<SFX*> SFXsType;
+    /** If the sound could not be initialized, e.g. if the player doesn't has
+     *  a sound card, we want to avoid anything sound related so we crash the 
+     *  game. */
+    bool                     m_initialized; 
+    std::map<std::string, MusicInformation*> 
+                             m_allMusic;
 
-    SFXsType                m_sfxs;
-    MusicInformation       *m_current_music;
-       
-    bool                    m_initialized; //If the sound could not be initialized, e.g.
-                                           //if the player doesn't has a sound card, we want
-                                           //to avoid anything sound related so we crash the game.
-    std::map<std::string,   MusicInformation*> 
-                            m_allMusic;
-    void                    loadMusicInformation();
-
+    void                     loadMusicInformation();
 public:
     SoundManager();
     virtual ~SoundManager();
 
-    void                    playSfx(unsigned int id);
+    void                    positionListener(Vec3 position);
+    bool                    sfxAllowed();
+
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
     void                    update(float dt)    {if(m_current_music)

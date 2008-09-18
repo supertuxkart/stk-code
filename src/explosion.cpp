@@ -20,9 +20,9 @@
 #include <plib/ssg.h>
 #include "explosion.hpp"
 #include "projectile_manager.hpp"
-#include "sound_manager.hpp"
 #include "scene.hpp"
-
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 
 Explosion::Explosion(const Vec3& coord) : ssgTransform()
 {
@@ -31,13 +31,20 @@ Explosion::Explosion(const Vec3& coord) : ssgTransform()
     addKid(cut);  // derefing the explosion will free the cutout
     m_seq   = projectile_manager->getExplosionModel();
     cut->addKid(m_seq);
+    m_explode_sound = sfx_manager->getSfx(SFXManager::SOUND_EXPLOSION);
     init(coord);
 }   // Explosion
 
 //-----------------------------------------------------------------------------
+Explosion::~Explosion()
+{
+    delete m_explode_sound;
+    // cut will be cleaned up when the explosion is rerefed by plib
+}
+//-----------------------------------------------------------------------------
 void Explosion::init(const Vec3& coord)
 {
-    sound_manager->playSfx( SOUND_EXPLOSION );
+    m_explode_sound->play();
 
     sgCoord c;
     c.xyz[0]=coord[0];c.xyz[1]=coord[1];c.xyz[2]=coord[2];

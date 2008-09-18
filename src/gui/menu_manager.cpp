@@ -22,57 +22,67 @@
 //This is needed in various platforms, but not all
 # include <algorithm>
 
-#include "menu_manager.hpp"
-#include "main_menu.hpp"
-#include "char_sel.hpp"
-#include "game_mode.hpp"
-#include "race_options.hpp"
-#include "options.hpp"
-#include "track_sel.hpp"
-#include "num_players.hpp"
-#include "config_controls.hpp"
-#include "config_display.hpp"
-#include "display_res_confirm.hpp"
-#include "config_sound.hpp"
-#include "player_controls.hpp"
-#include "race_gui.hpp"
-#include "race_results_gui.hpp"
-#include "grand_prix_ending.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/main_menu.hpp"
+#include "gui/char_sel.hpp"
+#include "gui/game_mode.hpp"
+#include "gui/race_options.hpp"
+#include "gui/options.hpp"
+#include "gui/track_sel.hpp"
+#include "gui/num_players.hpp"
+#include "gui/config_controls.hpp"
+#include "gui/config_display.hpp"
+#include "gui/display_res_confirm.hpp"
+#include "gui/config_sound.hpp"
+#include "gui/player_controls.hpp"
+#include "gui/race_gui.hpp"
+#include "gui/race_results_gui.hpp"
+#include "gui/grand_prix_ending.hpp"
+#include "gui/race_menu.hpp"
+#include "gui/help_page_one.hpp"
+#include "gui/help_page_two.hpp"
+#include "gui/help_page_three.hpp"
+#include "gui/credits_menu.hpp"
+#include "gui/grand_prix_select.hpp"
+#include "gui/widget_manager.hpp"
+#include "gui/challenges_menu.hpp"
+#include "gui/feature_unlocked.hpp"
+#include "gui/start_race_feedback.hpp"
+#include "gui/network_gui.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "race_manager.hpp"
-#include "main_loop.hpp"
-#include "race_menu.hpp"
-#include "help_page_one.hpp"
-#include "help_page_two.hpp"
-#include "help_page_three.hpp"
-#include "credits_menu.hpp"
-#include "grand_prix_select.hpp"
-#include "sound_manager.hpp"
 #include "sdldrv.hpp"
+#include "main_loop.hpp"
 #include "user_config.hpp"
-#include "widget_manager.hpp"
-#include "challenges_menu.hpp"
-#include "feature_unlocked.hpp"
-#include "start_race_feedback.hpp"
-#include "network_gui.hpp"
 #include "network/network_manager.hpp"
 
 using namespace std;
 
-MenuManager* menu_manager= new MenuManager();
+MenuManager* menu_manager = 0;
 
+/** Initialises the menu manager and creates the SFX objects.
+ */
 MenuManager::MenuManager()
 {
     m_current_menu = NULL;
     m_RaceGUI      = NULL;
-    m_change_menu = false;
-}
+    m_change_menu  = false;
+    m_select_sound = sfx_manager->getSfx(SFXManager::SOUND_SELECT_MENU);
+    m_back_sound   = sfx_manager->getSfx(SFXManager::SOUND_BACK_MENU);
+}   // MenuManager
 
 //-----------------------------------------------------------------------------
+/** Destroys the menu manager and frees any allocated memory.
+ */
 MenuManager::~MenuManager()
 {
     delete m_current_menu;
+    delete m_back_sound;
+    delete m_select_sound;
 }
 
+//-----------------------------------------------------------------------------
 /** Puts the given menu into the menu stack and saves the widgetToken of
   * the last selected widget for later reactivation.
   */
@@ -91,11 +101,11 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 
     if( MENUID_EXITGAME == id )
     {
-        sound_manager->playSfx(SOUND_BACK_MENU);
+        m_back_sound->play();
     }
     else
     {
-        if( !is_startup ) sound_manager->playSfx(SOUND_SELECT_MENU);
+        if(!is_startup) m_select_sound->play();
         else is_startup = false;
     }
 
@@ -113,9 +123,9 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 //-----------------------------------------------------------------------------
 void MenuManager::popMenu()
 {
-    sound_manager->playSfx(SOUND_BACK_MENU);
+    m_back_sound->play();
 
-	m_menu_stack.pop_back();
+    m_menu_stack.pop_back();
     if( m_current_menu ) m_current_menu->lockInput();
     m_change_menu = true;
 }

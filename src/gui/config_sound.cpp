@@ -22,7 +22,7 @@
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
 
 enum WidgetTokens
 {

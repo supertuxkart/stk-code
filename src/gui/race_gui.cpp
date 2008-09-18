@@ -28,7 +28,7 @@
 #include "track.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
 #include "race_manager.hpp"
 
 #undef USE_WIDGET_MANAGER

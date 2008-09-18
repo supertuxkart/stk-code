@@ -32,7 +32,7 @@
 #include <assert.h>
 #include "sdldrv.hpp"
 #include "gui/menu_manager.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
 #include "material_manager.hpp"
 #include "race_manager.hpp"
 #include "world.hpp"

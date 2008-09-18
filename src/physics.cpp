@@ -23,7 +23,6 @@
 #include "flyable.hpp"
 #include "moving_physics.hpp"
 #include "user_config.hpp"
-#include "sound_manager.hpp"
 #include "material_manager.hpp"
 #include "network/race_state.hpp"
 

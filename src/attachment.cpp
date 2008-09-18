@@ -26,7 +26,6 @@
 #include "kart.hpp"
 #include "constants.hpp"
 #include "world.hpp"
-#include "sound_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "network/race_state.hpp"

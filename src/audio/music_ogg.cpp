@@ -19,20 +19,19 @@
 
 #if HAVE_OGGVORBIS
 
+#include "audio/music_ogg.hpp"
+
 #include <stdexcept>
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #else
 #  include <AL/al.h>
 #endif
-
+// This include is important, otherwise SDL_BYTEORDER is undefined, and as a
+// result big endian will be used!
 #include <SDL/SDL_endian.h>
-#include "music_ogg.hpp"
-#include "file_manager.hpp"
+
 #include "user_config.hpp"
-
-#define BUFFER_SIZE (4096 * 8)
-
 
 MusicOggStream::MusicOggStream()
 {
@@ -40,14 +39,14 @@ MusicOggStream::MusicOggStream()
     m_soundBuffers[0]= m_soundBuffers[1]= 0;
     m_soundSource= 0;
     m_pausedMusic= true;
-}
+}   // MusicOggStream
 
 //-----------------------------------------------------------------------------
 MusicOggStream::~MusicOggStream()
 {
     if(stopMusic() == false)
-	fprintf(stderr, "WARNING: problems while stopping music.\n");
-}
+	    fprintf(stderr, "WARNING: problems while stopping music.\n");
+}   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::load(const std::string& filename)
@@ -106,7 +105,7 @@ bool MusicOggStream::load(const std::string& filename)
 
     m_error=false;
     return true;
-}
+}   // load
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::empty()
@@ -124,7 +123,7 @@ bool MusicOggStream::empty()
     }
 
     return true;
-}
+}   // empty
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::release()
@@ -148,7 +147,7 @@ bool MusicOggStream::release()
     if(!m_error) ov_clear(&m_oggStream);
 
     return true;
-}
+}   // release
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::playMusic()
@@ -168,7 +167,7 @@ bool MusicOggStream::playMusic()
     m_pausedMusic= false;
 
     return true;
-}
+}   // playMusic
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::isPlaying()
@@ -177,13 +176,13 @@ bool MusicOggStream::isPlaying()
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
 
     return (state == AL_PLAYING);
-}
+}   // isPlaying
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::stopMusic()
 {
     return (release());
-}
+}   // stopMusic
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::pauseMusic()
@@ -197,7 +196,7 @@ bool MusicOggStream::pauseMusic()
     alSourceStop(m_soundSource);
     m_pausedMusic= true;
     return true;
-}
+}   // pauseMusic
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::resumeMusic()
@@ -211,7 +210,7 @@ bool MusicOggStream::resumeMusic()
     alSourcePlay(m_soundSource);
     m_pausedMusic= false;
     return true;
-}
+}   // resumeMusic
 
 //-----------------------------------------------------------------------------
 void MusicOggStream::updateFading(float percent)
@@ -247,14 +246,12 @@ void MusicOggStream::update()
         ALuint buffer;
 
         alSourceUnqueueBuffers(m_soundSource, 1, &buffer);
-        if(check() == false)
-            return;
+        if(!check()) return;
 
         active = streamIntoBuffer(buffer);
         alSourceQueueBuffers(m_soundSource, 1, &buffer);
 
-        if(check() == false)
-            return;
+        if(!check()) return;
     }
 
     // check for underrun
@@ -275,13 +272,13 @@ void MusicOggStream::update()
         // no more data. Seek to beginning -> loop
 	    ov_time_seek(&m_oggStream, 0);
     }
-}
+}   // update
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
-    char pcm[BUFFER_SIZE];
-#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER==SDL_BIG_ENDIAN
+    char pcm[m_buffer_size];
+#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER == SDL_BIG_ENDIAN
     int  isBigEndian = 1;
 #else
     int  isBigEndian = 0;
@@ -290,9 +287,10 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
     int  portion;
     int  result;
 
-    while(size < BUFFER_SIZE)
+    while(size < m_buffer_size)
     {
-        result = ov_read(&m_oggStream, pcm + size, BUFFER_SIZE - size, isBigEndian, 2, 1, &portion);
+        result = ov_read(&m_oggStream, pcm + size, m_buffer_size - size, 
+                         isBigEndian, 2, 1, &portion);
 
         if(result > 0)
             size += result;
@@ -303,15 +301,13 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
                 break;
     }
 
-    if(size == 0)
-        return false;
-
+    if(size == 0) return false;
 
     alBufferData(buffer, nb_channels, pcm, size, m_vorbisInfo->rate);
     check();
 
     return true;
-}
+}   // streamIntoBuffer
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::check()
@@ -325,26 +321,26 @@ bool MusicOggStream::check()
     }
 
     return true;
-}
+}   // check
 
 //-----------------------------------------------------------------------------
-string MusicOggStream::errorString(int code)
+std::string MusicOggStream::errorString(int code)
 {
     switch(code)
     {
         case OV_EREAD:
-            return string("Read error from media.");
+            return std::string("Read error from media.");
         case OV_ENOTVORBIS:
-            return string("It is not Vorbis data.");
+            return std::string("It is not Vorbis data.");
         case OV_EVERSION:
-            return string("Vorbis version mismatch.");
+            return std::string("Vorbis version mismatch.");
         case OV_EBADHEADER:
-            return string("Invalid Vorbis bitstream header.");
+            return std::string("Invalid Vorbis bitstream header.");
         case OV_EFAULT:
-            return string("Internal logic fault (bug or heap/stack corruption).");
+            return std::string("Internal logic fault (bug or heap/stack corruption).");
         default:
-            return string("Unknown Vorbis error.");
+            return std::string("Unknown Vorbis error.");
     }
-}
+}   // errorString
 
 #endif // HAVE_OGGVORBIS

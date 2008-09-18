@@ -22,16 +22,18 @@
 
 #include <string>
 #include <iostream>
-using namespace std;
-
 #include <ogg/ogg.h>
-#include <vorbis/vorbisfile.h>
+// Disable warning about potential loss of precision in vorbisfile.h
+#pragma warning(disable:4244)
+#  include <vorbis/vorbisfile.h>
+#pragma warning(default:4244)
+
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #else
 #  include <AL/al.h>
 #endif
-#include "music.hpp"
+#include "audio/music.hpp"
 
 class MusicOggStream : public Music
 {
@@ -54,14 +56,14 @@ public:
 protected:
     bool empty();
     bool check();
-    string errorString(int code);
+    std::string errorString(int code);
 
 private:
     bool release();
     bool isPlaying();
     bool streamIntoBuffer(ALuint buffer);
 
-    string          m_fileName;
+    std::string     m_fileName;
     FILE*           m_oggFile;
     OggVorbis_File  m_oggStream;
     vorbis_info*    m_vorbisInfo;
@@ -72,6 +74,7 @@ private:
     ALenum nb_channels;
 
     bool m_pausedMusic;
+    static const int m_buffer_size = 4096*8;
 };
 
 #endif // HEADER_MUSICOGG_H

@@ -17,16 +17,36 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SFX_H
-#define HEADER_SFX_H
+#ifndef HEADER_SFX_OPENAL_HPP
+#define HEADER_SFX_OPENAL_HPP
 
-class SFX
+#include <assert.h>
+#ifdef __APPLE__
+#  include <OpenAL/al.h>
+#else
+#  include <AL/al.h>
+#endif
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
+
+class SFXOpenAL : public SFXBase
 {
+private:
+    unsigned int m_loaded;
+    ALuint       m_soundBuffer;   // Buffers hold sound data.
+    ALuint       m_soundSource;   // Sources are points emitting sound.
+    
 public:
-    virtual void play()= 0;
+                 SFXOpenAL(ALuint buffer);
+                ~SFXOpenAL();
+    virtual void play();
+    virtual void loop();
+    virtual void stop();
+    virtual void speed(float factor);
+    virtual void position(Vec3 position);
+    virtual int  getStatus();
+	
+};   // SFXOpenAL
 
-    virtual ~SFX() {}
-};
-
-#endif // HEADER_SFX_H
+#endif // HEADER_SFX_OPENAL_HPP
 

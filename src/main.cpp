@@ -62,7 +62,8 @@
 #include "history.hpp"
 #include "herring_manager.hpp"
 #include "attachment_manager.hpp"
-#include "sound_manager.hpp"
+#include "audio/sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "highscore_manager.hpp"
@@ -70,6 +71,7 @@
 #include "network/network_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "scene.hpp"
+#include "gui/menu_manager.hpp"
 
 // Only needed for bullet debug!
 #ifdef __APPLE__
@@ -425,7 +427,7 @@ void InitTuxkart()
     unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
     sound_manager           = new SoundManager();
-
+    sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties.
     history                 = new History              ();
@@ -452,6 +454,8 @@ void InitTuxkart()
     race_manager->setMajorMode (RaceManager::RM_SINGLE);
     race_manager->setMinorMode (RaceManager::RM_QUICK_RACE);
     race_manager->setDifficulty(RaceManager::RD_HARD);
+
+    menu_manager= new MenuManager();
 
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled

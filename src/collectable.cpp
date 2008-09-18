@@ -17,23 +17,39 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "collectable.hpp"
+
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
-#include "collectable.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "projectile_manager.hpp"
 #include "kart.hpp"
-#include "sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "world.hpp"
 #include "stk_config.hpp"
 
 //-----------------------------------------------------------------------------
 Collectable::Collectable(Kart* kart_)
 {
-    m_owner  = kart_;
+    m_owner               = kart_;
+    m_sound_shot          = sfx_manager->getSfx(SFXManager::SOUND_SHOT);
+    m_sound_use_anvil     = sfx_manager->getSfx(SFXManager::SOUND_USE_ANVIL);
+    m_sound_use_parachute = sfx_manager->getSfx(SFXManager::SOUND_USE_PARACHUTE);
     reset();
 }   // Collectable
+
+//-----------------------------------------------------------------------------
+/** Frees the memory for the sound effects.
+ */
+Collectable::~Collectable()
+{
+    delete m_sound_shot;
+    delete m_sound_use_anvil;
+    delete m_sound_use_parachute;
+
+}   // ~Collectable
 
 //-----------------------------------------------------------------------------
 void Collectable::reset()
@@ -82,7 +98,9 @@ void Collectable::use()
     case COLLECT_BOWLING:
     case COLLECT_MISSILE:
         if(m_owner->isPlayerKart())
-            sound_manager->playSfx(SOUND_SHOT);
+        {
+            m_sound_shot->play();
+        }
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
@@ -100,7 +118,9 @@ void Collectable::use()
                 kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
 
                 if(kart->isPlayerKart())
-                    sound_manager->playSfx(SOUND_USE_ANVIL);
+                {
+                    m_sound_use_anvil->play();
+                }
                 break;
             }
         }
@@ -128,7 +148,9 @@ void Collectable::use()
             }
 
             if(player_affected)
-                sound_manager->playSfx(SOUND_USE_PARACHUTE);
+            {
+                m_sound_use_parachute->play();
+            }
         }
         break;
 

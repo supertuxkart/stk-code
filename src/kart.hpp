@@ -35,6 +35,7 @@
 class SkidMark;
 class Herring;
 class Smoke;
+class SFXBase;
 
 class Kart : public TerrainInfo, public Moveable
 {
@@ -57,6 +58,7 @@ protected:
     int          m_track_sector;       // index in driveline, special values
                                        // e.g. UNKNOWN_SECTOR can be negative!
     float        m_max_speed;          // maximum speed of the kart, computed from
+    float        m_max_gear_rpm;       //maximum engine rpm's for the current gear
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
     float        m_zipper_time_left;   // zipper time left
@@ -96,11 +98,15 @@ private:
     bool                m_finished_race;
 
     float               m_speed;
+    float               m_rpm;
+    float               m_current_gear_ratio;
     bool                m_rescue;
     bool                m_eliminated;
 
+    SFXBase            *m_engine_sound;
+
 protected:
-    float               m_rescue_pitch, m_rescue_roll;
+    float                 m_rescue_pitch, m_rescue_roll;
     const KartProperties *m_kart_properties;
 
     /** Search the given branch of objects that match the wheel names

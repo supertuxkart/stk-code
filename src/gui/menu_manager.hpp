@@ -24,6 +24,8 @@
 #include "gui/race_gui.hpp"
 #include "gui/base_gui.hpp"
 
+class SFXBase;
+
 enum MenuManagerIDs
 {
     // menu
@@ -72,32 +74,33 @@ enum MenuManagerIDs
 class MenuManager
 {
 public:
-    MenuManager();
+             MenuManager();
     virtual ~MenuManager();
 
     // general functions
-    void switchToGrandPrixEnding();
-    void switchToRace();
-    void switchToMainMenu();
+    void     switchToGrandPrixEnding();
+    void     switchToRace();
+    void     switchToMainMenu();
 
     // use this function within menu classes
-    void pushMenu(MenuManagerIDs);
-    void popMenu();
-
-    int getMenuStackSize() {return (int)m_menu_stack.size();}
-
-    bool isCurrentMenu(MenuManagerIDs id) {return (m_menu_stack.back().first == id);}
-    bool isSomewhereOnStack(MenuManagerIDs id);
+    void     pushMenu(MenuManagerIDs);
+    void     popMenu();
+    int      getMenuStackSize() {return (int)m_menu_stack.size();}
+    bool     isSomewhereOnStack(MenuManagerIDs id);
+    bool     isCurrentMenu(MenuManagerIDs id)
+                                    {return (m_menu_stack.back().first == id);}
     BaseGUI* getCurrentMenu() const {return m_current_menu;}
     RaceGUI* getRaceMenu   () const {return (RaceGUI*)m_RaceGUI;}
-
-    void update();
+    void     update();
 
 private:
-    std::vector< std::pair<MenuManagerIDs, int> > m_menu_stack;
+    std::vector< std::pair<MenuManagerIDs, int> > 
+             m_menu_stack;
     BaseGUI* m_current_menu;
     BaseGUI* m_RaceGUI;
-    bool m_change_menu;
+    bool     m_change_menu;
+    SFXBase *m_back_sound;
+    SFXBase *m_select_sound;
 };
 
 extern MenuManager* menu_manager;
