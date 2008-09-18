@@ -46,7 +46,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	audio/music.hpp								\
 	audio/music_information.cpp 	audio/music_information.hpp 		\
 	audio/music_ogg.cpp	   	audio/music_ogg.hpp          		\
- 	audio/sfx_base.hpp              					\	
+ 	audio/sfx_base.hpp              					\
 	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      		\
 	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			\
 	audio/sound_manager.cpp	   	audio/sound_manager.hpp      		\
