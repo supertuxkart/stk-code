@@ -41,7 +41,6 @@ ConnectMessage::ConnectMessage() : Message(MT_CONNECT)
                                track_manager->getAllTrackIdentifiers();
     std::vector<std::string> all_karts = 
                                kart_properties_manager->getAllAvailableKarts();
-    all_karts.erase(all_karts.begin());
     allocate(getStringLength(m_id) + getStringVectorLength(all_tracks)
              + getStringVectorLength(all_karts));
     addString(m_id);
