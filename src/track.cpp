@@ -17,14 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "track.hpp"
+
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
 #define _WINSOCKAPI_
 #include <plib/ssgAux.h>
+
 #include "file_manager.hpp"
 #include "loader.hpp"
-#include "track.hpp"
 #include "string_utils.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
@@ -35,12 +37,12 @@
 #include "world.hpp"
 #include "material_manager.hpp"
 #include "isect.hpp"
-#include "ssg_help.hpp"
 #include "user_config.hpp"
 #include "herring.hpp"
 #include "herring_manager.hpp"
-#include "audio/sound_manager.hpp"
 #include "race_manager.hpp"
+#include "audio/sound_manager.hpp"
+#include "utils/ssg_help.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -1278,7 +1280,7 @@ void Track::loadTrackModel()
                 file_manager->popModelSearchPath  ();
                 throw std::runtime_error(msg);
             }
-            createDisplayLists(obj);
+            SSGHelp::createDisplayLists(obj);
             ssgRangeSelector *lod   = new ssgRangeSelector ;
             ssgTransform     *trans = new ssgTransform ( & loc ) ;
 
@@ -1307,6 +1309,9 @@ void Track::loadTrackModel()
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
+    Vec3 min, max;
+    SSGHelp::MinMax(m_model, &min, &max);
+    world->getPhysics()->init(min, max);
     createPhysicsModel();
 }   // loadTrack
 

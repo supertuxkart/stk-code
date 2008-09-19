@@ -69,9 +69,9 @@ private:
         };  //    CollisionPair
         bool operator==(const CollisionPair p) {
             return (p.a==a && p.b==b);
-        }
-    };
-
+        }   // operator==
+    };   // CollisionPair
+    // ------------------------------------------------------------------------
     // This class is the list of collision objects, where each collision
     // pair is stored as most once.
     class CollisionList : public std::vector<CollisionPair> {
@@ -88,12 +88,13 @@ private:
             push_back(CollisionPair(a, b));
         }
     };   // CollisionList
-
+    // ------------------------------------------------------------------------
     CollisionList m_all_collisions;
 
 public:
-          Physics          (float gravity);
+          Physics          ();
          ~Physics          ();
+    void  init             (const Vec3 &min_world, const Vec3 &max_world);
     void  addKart          (const Kart *k, btRaycastVehicle *v);
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
     void  removeKart       (const Kart *k);

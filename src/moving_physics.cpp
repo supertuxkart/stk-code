@@ -17,15 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "moving_physics.hpp"
+
 #include <string>
 #include <vector>
 #define _WINSOCKAPI_
 #include <plib/sg.h>
-#include "moving_physics.hpp"
+
 #include "string_utils.hpp"
 #include "world.hpp"
-#include "ssg_help.hpp"
 #include "scene.hpp"
+#include "utils/ssg_help.hpp"
 
 // -----------------------------------------------------------------------------
 MovingPhysics::MovingPhysics(const std::string data)
@@ -152,25 +154,28 @@ void MovingPhysics::init()
 
     // 3. Determine size of the object
     // -------------------------------
-    float x_min, x_max, y_min, y_max, z_min, z_max, radius;
-    MinMax(this, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    m_half_height = 0.5f*(z_max-z_min);
+    Vec3 min, max;
+    SSGHelp::MinMax(this, &min, &max);
+    Vec3 extend = max-min;
+    m_half_height = 0.5f*(extend.getZ());
     switch (m_body_type)
     {
-    case MP_CONE:   radius = 0.5f*std::max(x_max-x_min, y_max-y_min);
-                    m_shape = new btConeShapeZ(radius, z_max-z_min);
+    case MP_CONE:   {
+                    float radius = 0.5f*std::max(extend.getX(), extend.getY());
+                    m_shape = new btConeShapeZ(radius, extend.getZ());
                     setName("cone");
                     break;
-    case MP_BOX:    m_shape = new btBoxShape(btVector3(0.5f*(x_max-x_min),
-                                                       0.5f*(y_max-y_min),
-                                                       0.5f*(z_max-z_min) ) );
+                    }
+    case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
                     setName("box");
                     break;
-    case MP_SPHERE: radius = std::max(x_max-x_min, y_max-y_min);
-                    radius = 0.5f*std::max(radius, z_max-z_min);
+    case MP_SPHERE: {
+                    float radius = std::max(extend.getX(), extend.getY());
+                    radius = 0.5f*std::max(radius, extend.getZ());
                     m_shape = new btSphereShape(radius);
                     setName("sphere");
                     break;
+                    }
     case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         break;
     }

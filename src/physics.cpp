@@ -18,41 +18,46 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "physics.hpp"
-#include "ssg_help.hpp"
+
 #include "world.hpp"
 #include "flyable.hpp"
 #include "moving_physics.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "network/race_state.hpp"
+#include "utils/ssg_help.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
  *  Create the bullet dynamics world.
  */
-Physics::Physics(float gravity) : btSequentialImpulseConstraintSolver()
+Physics::Physics() : btSequentialImpulseConstraintSolver()
 {
     m_collision_conf    = new btDefaultCollisionConfiguration();
     m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
-    
-    // FIXME: it might be better to use the track dimension here, but they
-    //        are not known at this stage.
-    btVector3 worldMin(-1000, -1000, -1000);
-    btVector3 worldMax( 1000,  1000,  1000);
-    m_axis_sweep        = new btAxisSweep3(worldMin, worldMax);
+}   // Physics
+
+//-----------------------------------------------------------------------------
+/** The actual initialisation of the physics, which is called after the track
+ *  model is loaded. This allows the physics to use the actual track dimension
+ *  for the axis sweep.
+ */
+void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
+{
+    m_axis_sweep        = new btAxisSweep3(world_min, world_max);
     m_dynamics_world    = new btDiscreteDynamicsWorld(m_dispatcher, 
                                                       m_axis_sweep, 
                                                       this,
                                                       m_collision_conf);
-    m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, -gravity));
+    m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
+                                           -world->getTrack()->getGravity()));
     if(user_config->m_bullet_debug)
     {
         m_debug_drawer=new GLDebugDrawer();
         m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
         m_dynamics_world->setDebugDrawer(m_debug_drawer);
     }
-}   // Physics
-
+}   // init
 //-----------------------------------------------------------------------------
 Physics::~Physics()
 {

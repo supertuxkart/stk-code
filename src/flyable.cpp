@@ -26,7 +26,7 @@
 #include "projectile_manager.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
-#include "ssg_help.hpp"
+#include "utils/ssg_help.hpp"
 
 // static variables:
 float      Flyable::m_st_speed[COLLECT_MAX];
@@ -108,9 +108,10 @@ void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model,
     lisp->get("force-updown",    m_st_force_updown[type]);
 
     // Store the size of the model
-    float x_min, x_max, y_min, y_max, z_min, z_max;
-    MinMax(model, &x_min, &x_max, &y_min, &y_max, &z_min, &z_max);
-    m_st_extend[type] = btVector3(x_max-x_min,y_max-y_min, z_max-z_min);
+    Vec3 min, max;
+    
+    SSGHelp::MinMax(model, &min, &max);
+    m_st_extend[type] = btVector3(max-min);
     m_st_model[type]  = model;
 }   // init
 

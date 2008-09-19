@@ -93,7 +93,7 @@ World::World()
     }
 
     // Create the physics
-    m_physics = new Physics(m_track->getGravity());
+    m_physics = new Physics();
 
     assert(race_manager->getNumKarts() > 0);
 
@@ -737,6 +737,9 @@ void World::updateRacePosition ( int k )
 }   // updateRacePosition
 
 //-----------------------------------------------------------------------------
+/** Cleans up old herrings (from a previous race), removes old track specific
+ *  herring models, and loads the actual track.
+ */
 void World::loadTrack()
 {
     // remove old herrings (from previous race), and remove old

@@ -39,19 +39,19 @@
 #include "track.hpp"
 #include "world.hpp"
 #include "kart.hpp"
-#include "ssg_help.hpp"
 #include "physics.hpp"
-#include "kart_properties_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/race_gui.hpp"
 #include "translation.hpp"
 #include "smoke.hpp"
 #include "material_manager.hpp"
+#include "kart_properties_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "utils/ssg_help.hpp"
 
 
 Kart::Kart (const std::string& kart_name, int position,
@@ -1053,19 +1053,19 @@ void Kart::load_wheels(ssgBranch* branch)
         { // We found something that might be a wheel
             if (strcmp(i->getName(), "WheelFront.L") == 0)
             {
-                m_wheel_front_l = add_transform(dynamic_cast<ssgTransform*>(i));
+                m_wheel_front_l = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
             }
             else if (strcmp(i->getName(), "WheelFront.R") == 0)
             {
-                m_wheel_front_r = add_transform(dynamic_cast<ssgTransform*>(i));
+                m_wheel_front_r = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
             }
             else if (strcmp(i->getName(), "WheelRear.L") == 0)
             {
-                m_wheel_rear_l = add_transform(dynamic_cast<ssgTransform*>(i));
+                m_wheel_rear_l = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
             }
             else if (strcmp(i->getName(), "WheelRear.R") == 0)
             {
-                m_wheel_rear_r = add_transform(dynamic_cast<ssgTransform*>(i));
+                m_wheel_rear_r = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
             }
             else
             {
@@ -1109,7 +1109,7 @@ void Kart::loadData()
     // else needed to load the wheels as a separate object.
     ssgFlatten(obj);
 
-    createDisplayLists(obj);  // create all display lists
+    SSGHelp::createDisplayLists(obj);  // create all display lists
     ssgRangeSelector *lod = new ssgRangeSelector ;
 
     lod -> addKid ( obj ) ;

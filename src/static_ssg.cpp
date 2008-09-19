@@ -18,11 +18,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#include <algorithm>
+
 #include "static_ssg.hpp"
+
+#include <algorithm>
+
 #include "material_manager.hpp"
 #include "material.hpp"
-#include "ssg_help.hpp"
+#include "utils/ssg_help.hpp"
 
 #ifndef round
 # define round(x)  (floor(x+0.5f))
@@ -41,7 +44,12 @@ StaticSSG::StaticSSG(ssgEntity* start_, int nSize)
 void StaticSSG::Setup(int nSize)
 {
     // First compute the minimum and maximum x/y values of all leaves
-    MinMax(m_start, &m_x_min, &m_x_max, &m_y_min, &m_y_max);
+    Vec3 min, max;
+    SSGHelp::MinMax(m_start, &min, &max);
+    m_x_min = min.getX();
+    m_x_max = max.getX();
+    m_y_min = min.getY();
+    m_y_max = max.getY();
 
     const float RATIO = (m_x_max-m_x_min)/(m_y_max-m_y_min);
 

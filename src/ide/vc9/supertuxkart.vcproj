@@ -852,10 +852,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\ssg_help.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\static_ssg.cpp"
 				>
 			</File>
@@ -1108,6 +1104,10 @@
 				>
 				<File
 					RelativePath="..\..\utils\random_generator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\ssg_help.cpp"
 					>
 				</File>
 			</Filter>
@@ -1666,6 +1666,10 @@
 				>
 				<File
 					RelativePath="..\..\utils\random_generator.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\ssg_help.hpp"
 					>
 				</File>
 			</Filter>

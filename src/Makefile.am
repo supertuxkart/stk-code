@@ -51,6 +51,7 @@ supertuxkart_SOURCES =             main.cpp  			\
 	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			\
 	audio/sound_manager.cpp	   	audio/sound_manager.hpp      		\
 	utils/random_generator.hpp	utils/random_generator.cpp		\
+	utils/ssg_help.cpp              tuils/ssg_help.hpp                	\
 	material_manager.cpp	   material_manager.hpp    	\
 	grand_prix_manager.cpp	   grand_prix_manager.hpp	\
 	attachment.cpp		   attachment.hpp	        \
@@ -91,7 +92,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 	camera.cpp		   camera.hpp	        	\
 	sdldrv.cpp		   sdldrv.hpp	        	\
 	moveable.cpp 		   moveable.hpp             	\
-	ssg_help.cpp               ssg_help.hpp                 \
 	kart.cpp		   kart.hpp		        \
 	            		   auto_kart.hpp             	\
 	player_kart.cpp		   player_kart.hpp	        \
