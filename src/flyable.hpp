@@ -34,8 +34,12 @@ private:
     bool              m_has_hit_something;
     /** This flag is used to avoid that a rocket explodes mode than once.
      *  It can happen that more than one collision between a rocket and
-     *  a track or kart is reported by the physics.                       */   
+     *  a track or kart is reported by the physics.                        */   
     bool              m_exploded;
+    /** If this flag is set, the Z velocity of the kart will not be
+     *  adjusted in case that the objects is too high or too low above the 
+     *  terrain. Otherwise gravity will not work correctly on this object. */
+    bool              m_adjust_z_velocity;
 
 protected:
     Kart*             m_owner;              // the kart which released this flyable
@@ -74,6 +78,10 @@ public:
 
                  Flyable     (Kart* kart, CollectableType type, float mass=1.0f);
     virtual     ~Flyable     ();
+    /** Enables/disables adjusting ov velocity depending on height above 
+     *  terrain. Missiles can 'follow the terrain' with this adjustment,
+     *  but gravity will basically be disabled.                          */
+    void         setAdjustZVelocity(bool f) { m_adjust_z_velocity = f; }
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
                               CollectableType type);
     virtual void update      (float);

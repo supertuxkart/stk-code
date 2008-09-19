@@ -52,6 +52,7 @@ Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable(false)
     m_exploded          = false;
     m_shape             = NULL;
     m_mass              = mass;
+    m_adjust_z_velocity = true;
 
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
@@ -170,17 +171,19 @@ void Flyable::update (float dt)
         explode(NULL);    // flyable out of track boundary
         return;
     }
+    if(m_adjust_z_velocity)
+    {
+        float hat = pos.getZ()-getHoT();
 
-    float hat = pos.getZ()-getHoT();
-
-    // Use the Height Above Terrain to set the Z velocity.
-    // HAT is clamped by min/max height. This might be somewhat
-    // unphysical, but feels right in the game.
-    hat = std::max(std::min(hat, m_max_height) , m_min_height);
-    float delta = m_average_height - hat;
-    btVector3 v=getVelocity();
-    v.setZ(m_force_updown*delta);
-    setVelocity(v);
+        // Use the Height Above Terrain to set the Z velocity.
+        // HAT is clamped by min/max height. This might be somewhat
+        // unphysical, but feels right in the game.
+        hat = std::max(std::min(hat, m_max_height) , m_min_height);
+        float delta = m_average_height - hat;
+        btVector3 v=getVelocity();
+        v.setZ(m_force_updown*delta);
+        setVelocity(v);
+    }   // if m_adjust_z_velocity
 
     Moveable::update(dt);
 }   // update

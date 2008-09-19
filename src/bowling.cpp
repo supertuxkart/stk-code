@@ -47,7 +47,13 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING)
     }
 
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                  new btSphereShape(0.5f*m_extend.getY()), true /*gravity*/, true /*rotates*/);
+                  new btSphereShape(0.5f*m_extend.getY()), 
+                  true /*gravity*/, 
+                  true /*rotates*/);
+
+    // Do not adjust the z velociy depending on height above terrain, since
+    // this would disable gravity.
+    setAdjustZVelocity(false);
 
     // unset no_contact_response flags, so that the ball 
     // will bounce off the track
@@ -73,10 +79,10 @@ void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
 // -----------------------------------------------------------------------------
 void Bowling::update(float dt)
 {
-    Flyable::update(dt);
+    Flyable::update(dt);    
     const Kart *kart=0;
-    btVector3 direction;
-    float minDistance;
+    btVector3   direction;
+    float       minDistance;
     getClosestKart(&kart, &minDistance, &direction);
     if(minDistance<m_st_max_distance_squared)   // move bowling towards kart
     {
