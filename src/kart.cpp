@@ -955,7 +955,8 @@ void Kart::updatePhysics (float dt)
     float tire_diameter = m_kart_properties->getWheelRadius();
 
     m_max_gear_rpm = m_current_gear_ratio * max_speed;
-    m_rpm = ((m_speed * gear_ratio) / tire_diameter);
+    // 8 is magic number again.
+    m_rpm = ((m_speed * gear_ratio) / (8*tire_diameter));
     if(m_engine_sound)
     {
         m_engine_sound->speed((float)((m_rpm * 2) / m_max_gear_rpm));
