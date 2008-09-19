@@ -500,11 +500,14 @@ void Kart::collectedHerring(const Herring &herring, int add_info)
 
     switch (type)
     {
-    case HE_GREEN  : m_attachment.hitGreenHerring(herring, add_info);   break;
-    case HE_SILVER : m_num_herrings_gobbled++ ;                         break;
-    case HE_GOLD   : m_num_herrings_gobbled += 3 ;                      break;
-    case HE_RED    : int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
-                     m_collectable.hitRedHerring(n, herring, add_info); break;
+    case HE_GREEN  : m_attachment.hitGreenHerring(herring, add_info);    break;
+    case HE_SILVER : m_num_herrings_gobbled++ ;                          break;
+    case HE_GOLD   : m_num_herrings_gobbled += 3 ;                       break;
+    case HE_RED    : { 
+		         int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
+                         m_collectable.hitRedHerring(n, herring,add_info);break;
+                     }
+    default        : break;
     }   // switch TYPE
 
     // Attachments and collectables are stored in the corresponding
@@ -949,7 +952,7 @@ void Kart::updatePhysics (float dt)
     //           tire_diameter
     //the magic number 1.7 is used to bring the computed gear ratio into a sensible range
     float gear_ratio = 1.7f + (1 - m_current_gear_ratio);
-    float tire_diameter = 2;//can this be determined for each kart? Smaller tires make for higher rpm's.
+    float tire_diameter = m_kart_properties->getWheelRadius();
 
     m_max_gear_rpm = m_current_gear_ratio * max_speed;
     m_rpm = ((m_speed * gear_ratio) / tire_diameter);
