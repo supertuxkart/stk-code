@@ -139,6 +139,7 @@ World::World()
                 newkart = new NetworkKart(kart_name, position, init_pos,
                                           global_player_id);
                 m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
+                m_player_karts[global_player_id] = (PlayerKart*)newkart;
                 break;
             case RaceManager::KT_AI:
                 newkart = loadRobot(kart_name, position, init_pos);

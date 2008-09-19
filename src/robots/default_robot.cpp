@@ -31,6 +31,8 @@
 #include <plib/ssgAux.h>
 #endif
 
+#include "default_robot.hpp"
+
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
@@ -39,8 +41,7 @@
 #include "scene.hpp"
 #include "world.hpp"
 #include "race_manager.hpp"
-
-#include "default_robot.hpp"
+#include "network/network_manager.hpp"
 
 DefaultRobot::DefaultRobot(const std::string& kart_name,
                            int position, const btTransform& init_pos ) :
@@ -89,6 +90,13 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
 //line, then move forward while turning.
 void DefaultRobot::update( float delta )
 {
+    // The client does not do any AI computations.
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
+    {
+        AutoKart::update( delta );
+        return;
+    }
+
     if( world->isStartPhase())
     {
         handle_race_start();
