@@ -38,7 +38,7 @@ private:
     
 public:
                  SFXOpenAL(ALuint buffer);
-                ~SFXOpenAL();
+    virtual     ~SFXOpenAL();
     virtual void play();
     virtual void loop();
     virtual void stop();

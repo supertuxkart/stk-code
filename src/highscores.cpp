@@ -44,7 +44,9 @@ void Highscores::Read(const lisp::Lisp* const node)
 {
     node->get("track-name",     m_track               );
     node->get("number-karts",   m_number_of_karts     );
-    node->get("race-mode",      (int&)m_highscore_type);
+    int hst=0;
+    node->get("race-mode",      hst                   );
+    m_highscore_type = (HighscoreType)hst;
     node->get("difficulty",     m_difficulty          );
     node->get("number-of-laps", m_number_of_laps      );
 

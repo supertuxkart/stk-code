@@ -26,6 +26,7 @@ class SFXBase
 {
 public:
 
+    virtual ~SFXBase() {};
     virtual void play() = 0;
     virtual void loop() = 0;
     virtual void stop() = 0;

@@ -24,9 +24,13 @@
 #include <iostream>
 #include <ogg/ogg.h>
 // Disable warning about potential loss of precision in vorbisfile.h
-#pragma warning(disable:4244)
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  pragma warning(disable:4244)
+#endif
 #  include <vorbis/vorbisfile.h>
-#pragma warning(default:4244)
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  pragma warning(default:4244)
+#endif
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>

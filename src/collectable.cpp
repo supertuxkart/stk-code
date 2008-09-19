@@ -176,7 +176,7 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
         // On client: just set the value
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
         {
-            int dummy = m_random.get(100);    // keep random numbers in sync
+            m_random.get(100);    // keep random numbers in sync
             m_type    = (CollectableType)add_info;
             m_number  = 1;
             return;
@@ -234,7 +234,7 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
             if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
         }
         // Ignore new collectable if it is different from the current one
-        int dummy = m_random.get(100);    // keep random numbers in synch
+        m_random.get(100);    // keep random numbers in synch
 
         return;
     }   // if network client
