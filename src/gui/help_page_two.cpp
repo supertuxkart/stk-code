@@ -73,7 +73,7 @@ HelpPageTwo::HelpPageTwo()
         collectable_manager->getIcon(COLLECT_HOMING)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT2, 90, 12,
-        _("Homing missile - follows rivals, but is slower than the missile"));
+        _("Cake - thrown at the closest rival, best on short ranges and long straights"));
     widget_manager->setWgtRoundCorners( WTOK_TXT2, WGT_AREA_RGT );
     widget_manager->breakLine();
 
