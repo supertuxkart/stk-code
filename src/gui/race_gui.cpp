@@ -260,8 +260,9 @@ void RaceGUI::drawFPS ()
 //-----------------------------------------------------------------------------
 void RaceGUI::drawTimer ()
 {
-    if(world->getPhase()!=World::RACE_PHASE         &&
-       world->getPhase()!=World::DELAY_FINISH_PHASE   ) return;
+   // if(world->getPhase() != RACE_PHASE         &&
+   //    world->getPhase() != DELAY_FINISH_PHASE   ) return;
+    if(!world->shouldDrawTimer()) return;
     char str[256];
 
     assert(world != NULL);
@@ -922,7 +923,7 @@ void RaceGUI::drawStatusText(const float dt)
     glOrtho        ( 0, user_config->m_width, 0, user_config->m_height, 0, 100 ) ;
     switch (world->getPhase())
     {
-    case World::READY_PHASE:
+    case READY_PHASE:
         {
             GLfloat const COLORS[] = { 0.9f, 0.66f, 0.62f, 1.0f };
             //I18N: as in "ready, set, go", shown at the beginning of the race
@@ -932,7 +933,7 @@ void RaceGUI::drawStatusText(const float dt)
                                    COLORS );
         }
         break;
-    case World::SET_PHASE:
+    case SET_PHASE:
         {
             GLfloat const COLORS[] = { 0.9f, 0.9f, 0.62f, 1.0f };
             //I18N: as in "ready, set, go", shown at the beginning of the race
@@ -942,7 +943,7 @@ void RaceGUI::drawStatusText(const float dt)
                                    COLORS );
         }
         break;
-    case World::GO_PHASE:
+    case GO_PHASE:
         {
             GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
             //I18N: as in "ready, set, go", shown at the beginning of the race
@@ -968,7 +969,7 @@ void RaceGUI::drawStatusText(const float dt)
     // The penalty message needs to be displayed for up to one second
     // after the start of the race, otherwise it disappears if 
     // "Go" is displayed and the race starts
-    if(world->isStartPhase() || world->getTime()<1.0f)
+    if(world->getClock().isStartPhase() || world->getTime()<1.0f)
     {
         for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         {
@@ -989,7 +990,7 @@ void RaceGUI::drawStatusText(const float dt)
     if(race_manager->getNumLocalPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
-    if ( world->isRacePhase() )
+    if ( world->getClock().isRacePhase() )
     {
         const int numPlayers = race_manager->getNumLocalPlayers();
 

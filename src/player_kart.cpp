@@ -171,7 +171,7 @@ void PlayerKart::update(float dt)
 {
     steer(dt, m_steer_val);
 
-    if(world->isStartPhase())
+    if(world->getClock().isStartPhase())
     {
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||
            m_controls.fire|m_controls.wheelie|m_controls.jump)

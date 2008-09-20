@@ -50,35 +50,174 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 
-#ifdef HAVE_GHOST_REPLAY
-#  include "replay_player.hpp"
-#endif
-
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
 #endif
 
-World* world = 0;
 
+//-----------------------------------------------------------------------------
+Clock::Clock()
+{
+    m_mode = CHRONO;
+    m_time = 0.0f;
+    m_auxiliary_timer = 0.0f;
+    m_listener = NULL;
+    m_phase = SETUP_PHASE;
+    m_previous_phase = SETUP_PHASE;  // initialise it just in case
+    
+    // for profiling AI
+    m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
+    
+    // FIXME - is it a really good idea to reload and delete the sound every race??
+    m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
+    m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
+}
+//-----------------------------------------------------------------------------
+void Clock::reset()
+{
+    m_time = 0.0f;
+    m_auxiliary_timer = 0.0f;
+    m_phase = READY_PHASE; // FIXME - unsure
+    m_previous_phase      = SETUP_PHASE;
+}
+//-----------------------------------------------------------------------------
+Clock::~Clock()
+{
+    sfx_manager->deleteSFX(m_prestart_sound);
+    sfx_manager->deleteSFX(m_start_sound);
+}
+//-----------------------------------------------------------------------------
+void Clock::setMode(const ClockType mode, const float initial_time)
+{
+    m_mode = mode;
+    m_time = initial_time;
+}
+//-----------------------------------------------------------------------------
+void Clock::raceOver(const bool delay)
+{
+    if(m_phase == DELAY_FINISH_PHASE or m_phase == FINISH_PHASE) return; // we already know
+    
+    if(delay)
+    {
+        m_phase = DELAY_FINISH_PHASE;
+        m_auxiliary_timer = 0.0f;
+    }
+    else
+        m_phase = FINISH_PHASE;
+}
+//-----------------------------------------------------------------------------
+void Clock::updateClock(const float dt)
+{
+    switch(m_phase)
+    {
+        // Note: setup phase must be a separate phase, since the race_manager
+        // checks the phase when updating the camera: in the very first time
+        // step dt is large (it includes loading time), so the camera might
+        // tilt way too much. A separate setup phase for the first frame
+        // simplifies this handling
+        case SETUP_PHASE:
+            m_auxiliary_timer = 0.0f;  
+            m_phase = READY_PHASE;
+            m_prestart_sound->play();
+            return;               // loading time, don't play sound yet
+        case READY_PHASE:
+            if(m_auxiliary_timer>1.0)
+            {
+                m_phase=SET_PHASE;   
+                m_prestart_sound->play();
+            }
+            m_auxiliary_timer += dt;
+            return;
+        case SET_PHASE  :
+            if(m_auxiliary_timer>2.0) 
+            {
+                // set phase is over, go to the next one
+                m_phase=GO_PHASE;
+
+                m_start_sound->play();
+                
+                assert(m_listener != NULL);
+                m_listener -> onGo();
+            }
+            m_auxiliary_timer += dt;
+            return;
+        case GO_PHASE  :
+            if(m_auxiliary_timer>3.0)    // how long to display the 'go' message  
+                m_phase=RACE_PHASE;    
+            m_auxiliary_timer += dt;
+            break;
+        case DELAY_FINISH_PHASE :
+        {
+            m_auxiliary_timer += dt;
+            
+            // Nothing more to do if delay time is not over yet
+            if(m_auxiliary_timer < TIME_DELAY_TILL_FINISH) break;
+            
+            m_phase = FINISH_PHASE;
+            break;            
+        }
+        case FINISH_PHASE:
+            m_listener->onTerminate();
+            return;
+    }
+    
+    switch(m_mode)
+    {
+        case CHRONO:
+            m_time += dt;
+            break;
+        case COUNTDOWN:
+            m_time -= dt;
+            
+            if(m_time <= 0.0)
+            {
+                assert(m_listener != NULL);
+                m_listener -> countdownReachedZero();
+            }
+            
+            break;
+        default: break;
+    }
+}
+//-----------------------------------------------------------------------------
+void Clock::setTime(const float time)
+{
+    m_time = time;
+}
+//-----------------------------------------------------------------------------
+void Clock::registerEventListener(ClockListener* listener)
+{
+    m_listener = listener;
+}
+//-----------------------------------------------------------------------------
+void Clock::pause()
+{
+    m_previous_phase = m_phase;
+    m_phase = LIMBO_PHASE;
+}
+//-----------------------------------------------------------------------------
+void Clock::unpause()
+{
+    m_phase = m_previous_phase;
+}
+
+World* world = 0; // FIXME, use singleton or something instead of this global variable
+
+//-----------------------------------------------------------------------------
 World::World()
-#ifdef HAVE_GHOST_REPLAY
-, m_p_replay_player(NULL)
-#endif
 {
     delete world;
     world                 = this;
     race_state            = new RaceState();
-    m_phase               = SETUP_PHASE;
-    m_previous_phase      = SETUP_PHASE;  // initialise it just in case
     m_track               = NULL;
-    m_clock               = 0.0f;
     m_faster_music_active = false;
     m_fastest_lap         = 9999999.9f;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
-    m_leader_intervals    = stk_config->m_leader_intervals;
 
+    m_clock.setMode( CHRONO );
+    
     // Grab the track file
     try
     {
@@ -176,33 +315,14 @@ World::World()
     callback_manager->initAll();
     menu_manager->switchToRace();
 
-    m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
-    m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
-
     m_track->startMusic();
 
-    m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
-
-#ifdef HAVE_GHOST_REPLAY
-    m_replay_recorder.initRecorder( race_manager->getNumKarts() );
-
-    m_p_replay_player = new ReplayPlayer;
-    if( !loadReplayHumanReadable( "test1" ) ) 
-    {
-        delete m_p_replay_player;
-        m_p_replay_player = NULL;
-    }
-    if( m_p_replay_player ) m_p_replay_player->showReplayAt( 0.0 );
-#endif
     network_manager->worldLoaded();
 }   // World
 
 //-----------------------------------------------------------------------------
 World::~World()
 {
-#ifdef HAVE_GHOST_REPLAY
-    saveReplayHumanReadable( "test" );
-#endif
     delete race_state;
     m_track->cleanup();
     // Clear all callbacks
@@ -216,8 +336,6 @@ World::~World()
     delete m_physics;
 
     sound_manager -> stopMusic();
-    sfx_manager->deleteSFX(m_prestart_sound);
-    sfx_manager->deleteSFX(m_start_sound);
 
     sgVec3 sun_pos;
     sgVec4 ambient_col, specular_col, diffuse_col;
@@ -230,18 +348,15 @@ World::~World()
     ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffuse_col ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
-
-#ifdef HAVE_GHOST_REPLAY
-    m_replay_recorder.destroy();
-    if( m_p_replay_player )
-    {
-        m_p_replay_player->destroy();
-        delete m_p_replay_player;
-        m_p_replay_player = NULL;
-    }
-#endif
 }   // ~World
-
+//-----------------------------------------------------------------------------
+void World::terminateRace()
+{
+    m_clock.pause();
+    menu_manager->pushMenu(MENUID_RACERESULT);
+    estimateFinishTimes();
+    unlock_manager->raceFinished();
+}
 //-----------------------------------------------------------------------------
 /** Waits till each kart is resting on the ground
  *
@@ -300,21 +415,7 @@ void World::update(float dt)
     // Clear race state so that new information can be stored
     race_state->clear();
     if(user_config->m_replay_history) dt=history->GetNextDelta();
-    updateRaceStatus(dt);
 
-    if( getPhase() == FINISH_PHASE )
-    {
-        if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
-        {
-            pause();
-            menu_manager->pushMenu(MENUID_RACERESULT);
-            unlock_manager->raceFinished();
-            return;
-        }
-        updateHighscores();
-        pause();
-        menu_manager->pushMenu(MENUID_RACERESULT);
-    }
     if(!user_config->m_replay_history) history->StoreDelta(dt);
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT) m_physics->update(dt);
     for (int i = 0 ; i <(int) m_kart.size(); ++i)
@@ -335,16 +436,6 @@ void World::update(float dt)
 
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
-
-#ifdef HAVE_GHOST_REPLAY
-    // we start recording after START_PHASE, since during start-phase m_clock is incremented
-    // normally, but after switching to RACE_PHASE m_clock is set back to 0.0
-    if( m_phase == GO_PHASE ) 
-    {
-        m_replay_recorder.pushFrame();
-        if( m_p_replay_player ) m_p_replay_player->showReplayAt( m_clock );
-    }
-#endif
 }
 // ----------------------------------------------------------------------------
 void World::updateHighscores()
@@ -373,7 +464,6 @@ void World::updateHighscores()
             }
         }
 #endif
-        // FIXME: end
 
         // Only record times for player karts
         if(!m_kart[index[pos]]->isPlayerKart()) continue;
@@ -394,180 +484,6 @@ void World::updateHighscores()
     delete []index;
 }   // updateHighscores
 
-// ----------------------------------------------------------------------------
-#ifdef HAVE_GHOST_REPLAY
-bool World::saveReplayHumanReadable( std::string const &filename ) const
-{
-    std::string path;
-    path = file_manager->getReplayFile(filename+"."+ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
-
-    FILE *fd = fopen( path.c_str(), "w" );
-    if( !fd ) 
-    {
-        fprintf(stderr, "Error while opening replay file for writing '%s'\n", path.c_str());
-        return false;
-    }
-    int  nKarts = world->getNumKarts();
-    const char *version = "unknown";
-#ifdef VERSION
-    version = VERSION;
-#endif
-    fprintf(fd, "Version:  %s\n",   version);
-    fprintf(fd, "numkarts: %d\n",   m_kart.size());
-    fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
-    fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
-    fprintf(fd, "track: %s\n",      m_track->getIdent().c_str());
-
-    for(int i=0; i<race_manager->getNumKarts(); i++)
-    {
-        fprintf(fd, "model %d: %s\n", i, race_manager->getKartName(i).c_str());
-    }
-    if( !m_replay_recorder.saveReplayHumanReadable( fd ) )
-    {
-        fclose( fd ); fd = NULL;
-        return false;
-    }
-
-    fclose( fd ); fd = NULL;
-
-    return true;
-}  // saveReplayHumanReadable
-#endif  // HAVE_GHOST_REPLAY
-
-#ifdef HAVE_GHOST_REPLAY
-//-----------------------------------------------------------------------------
-bool World::loadReplayHumanReadable( std::string const &filename )
-{
-    assert( m_p_replay_player );
-    m_p_replay_player->destroy();
-
-    std::string path = file_manager->getReplayFile(filename+"."+ 
-            ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE);
-
-    try
-    {
-        path = file_manager->getPath(path.c_str());
-    }
-    catch(std::runtime_error& e)
-    {
-        fprintf( stderr, "Couldn't find replay-file: '%s'\n", path.c_str() );
-        return false;
-    }
-
-    FILE *fd = fopen( path.c_str(), "r" );
-    if( !fd ) 
-    {
-        fprintf(stderr, "Error while opening replay file for loading '%s'\n", path.c_str());
-        return false;
-    }
-
-    bool blnRet = m_p_replay_player->loadReplayHumanReadable( fd );
-
-    fclose( fd ); fd = NULL;
-
-    return blnRet;
-}  // loadReplayHumanReadable
-#endif  // HAVE_GHOST_REPLAY
-
-//-----------------------------------------------------------------------------
-
-void World::updateRaceStatus(float dt)
-{
-    switch (m_phase) {
-        // Note: setup phase must be a separate phase, since the race_manager
-        // checks the phase when updating the camera: in the very first time
-        // step dt is large (it includes loading time), so the camera might
-        // tilt way too much. A separate setup phase for the first frame
-        // simplifies this handling
-        case SETUP_PHASE:   m_clock = 0.0f;  
-                            m_phase = READY_PHASE;
-                            m_prestart_sound->play();
-                            dt = 0.0f;  // solves the problem of adding track loading time
-                            return;               // loading time, don't play sound yet
-        case READY_PHASE:   if(m_clock>1.0)
-                            {
-                                m_phase=SET_PHASE;   
-                                m_prestart_sound->play();
-                            }
-                            m_clock += dt;
-                            return;
-        case SET_PHASE  :   if(m_clock>2.0) 
-                            {
-                                m_phase=GO_PHASE;
-                                if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
-                                    m_clock=m_leader_intervals[0];
-                                else
-                                    m_clock=0.0f;
-                                m_start_sound->play();
-                                // Reset the brakes now that the prestart 
-                                // phase is over (braking prevents the karts 
-                                // from sliding downhill)
-                                for(unsigned int i=0; i<m_kart.size(); i++) 
-                                {
-                                    m_kart[i]->resetBrakes();
-                                }
-#ifdef HAVE_GHOST_REPLAY
-                                // push positions at time 0.0 to replay-data
-                                m_replay_recorder.pushFrame();
-#endif
-                            }
-                            m_clock += dt;
-                            return;
-        case GO_PHASE  :    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
-                            {
-                                // Switch to race if more than 1 second has past
-                                if(m_clock<m_leader_intervals[0]-1.0f)
-                                    m_phase=RACE_PHASE;
-                                m_clock -= dt;
-                            }
-                            else
-                            {
-                                if(m_clock>1.0)    // how long to display the 'go' message  
-                                    m_phase=RACE_PHASE;    
-                                m_clock += dt;
-                            }
-                            return;
-        case DELAY_FINISH_PHASE :
-                            {
-                                m_clock += dt;
-                                // Nothing more to do if delay time is not over yet
-                                if(m_clock - m_finish_delay_start_time 
-                                  < TIME_DELAY_TILL_FINISH) return;
-                   
-                                m_phase = FINISH_PHASE;
-                                estimateFinishTimes();
-                                unlock_manager->raceFinished();
-                                return;             
-                            }
-        default        :    break;
-    }   // switch
-
-    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
-        return updateLeaderMode(dt);
-    
-    // The status must now be race mode!
-    // =================================
-    m_clock += dt; 
-
-    // 2) A player comes in last, go immediately to finish phase
-    // =========================================================
-    if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
-    {
-        m_phase = FINISH_PHASE;
-	    if(user_config->m_profile<0) printProfileResultAndExit();
-        unlock_manager->raceFinished();
-    }   // if all karts are finished
-
-    // 3) All player karts are finished, but computer still racing
-    // ===========================================================
-    else if(race_manager->allPlayerFinished())
-    {
-        // Set delay mode to have time for camera animation, and
-        // to give the AI some time to get non-estimated timings
-        m_phase = DELAY_FINISH_PHASE;
-        m_finish_delay_start_time = m_clock;
-    }
-}  // updateRaceStatus
 
 //-----------------------------------------------------------------------------
 void World::estimateFinishTimes()
@@ -581,60 +497,6 @@ void World::estimateFinishTimes()
         }  // if !hasFinishedRace
     }   // for i
 }  // estimateFinishTimes
-
-//-----------------------------------------------------------------------------
-void World::updateLeaderMode(float dt)
-{
-    // Count 'normal' till race phase has started, then count backwards
-    if(m_phase==RACE_PHASE || m_phase==GO_PHASE)
-        m_clock -=dt;
-    else
-        m_clock +=dt;
-    if(m_clock<0.0f)
-    {
-        if(m_leader_intervals.size()>1)
-            m_leader_intervals.erase(m_leader_intervals.begin());
-        m_clock=m_leader_intervals[0];
-        int kart_number;
-        // If the leader kart is not the first kart, remove the first
-        // kart, otherwise remove the last kart.
-        int position_to_remove = m_kart[0]->getPosition()==1 
-                               ? getCurrentNumKarts() : 1;
-        for (kart_number=0; kart_number<(int)m_kart.size(); kart_number++)
-        {
-            if(m_kart[kart_number]->isEliminated()) continue;
-            if(m_kart[kart_number]->getPosition()==position_to_remove)
-                break;
-        }
-        if(kart_number==(int)m_kart.size())
-        {
-            fprintf(stderr,"Problem with removing leader: position %d not found\n",
-                position_to_remove);
-            for(int i=0; i<(int)m_kart.size(); i++)
-            {
-                fprintf(stderr,"kart %d: eliminated %d position %d\n",
-                    i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
-            }   // for i
-        }  // kart_number==m_kart.size()
-        else
-        {
-            removeKart(kart_number);
-        }
-        // The follow the leader race is over if there is only one kart left,
-        // or if all players have gone
-        if(getCurrentNumKarts()==2 ||getCurrentNumPlayers()==0)
-        {
-            // Add the results for the remaining kart
-            for(int i=1; i<(int)race_manager->getNumKarts(); i++)
-                if(!m_kart[i]->isEliminated()) 
-                    race_manager->RaceFinished(m_kart[i], m_clock);
-            m_phase=FINISH_PHASE;
-            return;
-        }
-    }   // m_clock<0
-    return;
-
-}   // updateLeaderMode
 
 //-----------------------------------------------------------------------------
 void World::printProfileResultAndExit()
@@ -694,7 +556,7 @@ void World::removeKart(int kart_number)
     // ignored in all loops). Important:world->getCurrentNumKarts() returns 
     // the number of karts still racing. This value can not be used for loops 
     // over all karts, use race_manager->getNumKarts() instead!
-    race_manager->RaceFinished(kart, m_clock);
+    race_manager->RaceFinished(kart, m_clock.getTime());
     kart->eliminate();
     m_eliminated_karts++;
 
@@ -782,23 +644,25 @@ void World::loadTrack()
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
-    m_clock               = 0.0f;
-    m_phase               = SETUP_PHASE;
-    m_previous_phase      = SETUP_PHASE;
+    m_clock.reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
-    m_leader_intervals    = stk_config->m_leader_intervals;
 
     for ( Karts::iterator i = m_kart.begin(); i != m_kart.end() ; ++i )
     {
         (*i)->reset();
     }
+    
     resetAllKarts();
-    sound_manager->stopMusic();     // Start music from beginning
+    
+    // Start music from beginning
+    sound_manager->stopMusic();
     m_track->startMusic();
+
     // Enable SFX again
     sfx_manager->resumeAll();
+
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
@@ -806,16 +670,6 @@ void World::restartRace()
 
     // Resets the cameras in case that they are pointing too steep up or down
     scene->reset();
-#ifdef HAVE_GHOST_REPLAY
-    m_replay_recorder.destroy();
-    m_replay_recorder.initRecorder( race_manager->getNumKarts() );
-
-    if( m_p_replay_player ) 
-    {
-        m_p_replay_player->reset();
-        m_p_replay_player->showReplayAt( 0.0 );
-    }
-#endif
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -845,8 +699,7 @@ void  World::pause()
 {
     sound_manager->pauseMusic();
     sfx_manager->pauseAll();
-    m_previous_phase = m_phase;
-    m_phase = LIMBO_PHASE;
+    m_clock.pause();
 }
 
 //-----------------------------------------------------------------------------
@@ -854,7 +707,7 @@ void  World::unpause()
 {
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
-    m_phase = m_previous_phase;
+    m_clock.unpause();
 }
 
 /* EOF */

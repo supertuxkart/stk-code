@@ -144,6 +144,8 @@ supertuxkart_SOURCES =             main.cpp  			\
 	gui/feature_unlocked.cpp   gui/feature_unlocked.hpp	\
 	gui/font.hpp		   gui/font.cpp                 \
 	robots/default_robot.cpp   robots/default_robot.hpp	\
+	modes/follow_the_leader.cpp modes/follow_the_leader.hpp \
+	modes/standard_race.cpp modes/standard_race.hpp \
 	replay_buffer_tpl.hpp 					\
 	replay_buffers.hpp	   replay_buffers.cpp		\
 	replay_base.hpp		   replay_base.cpp		\
@@ -161,10 +163,6 @@ supertuxkart_SOURCES =             main.cpp  			\
 supertuxkart_LDADD = -L. -lstatic_ssg \
 	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
 	-lplibul -lplibssgaux $(bullet_LIBS) $(enet_LIBS) $(opengl_LIBS)  $(sdl_LIBS) $(openal_LIBS)
-
-.PHONY: pot
-pot:
-	xgettext -o supertuxkart.pot -k_ --c++ *.?pp */*.?pp
 
 SUBDIRS = robots
 

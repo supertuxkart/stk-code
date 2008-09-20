@@ -59,9 +59,6 @@ public:
     std::string getSFXFile       (const std::string& fname) const;
     std::string getFontFile      (const std::string& fname) const;
     std::string getModelFile     (const std::string& fname) const;
-#ifdef HAVE_GHOST_REPLAY
-    std::string getReplayFile    (const std::string& fname) const;
-#endif
 
     void listFiles(std::set<std::string>& result, const std::string& dir,
                    bool is_full_path=false, bool make_full_path=false)

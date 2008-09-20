@@ -311,14 +311,6 @@ std::string FileManager::getHighscoreFile(const std::string& fname) const
 {
     return getHomeDir()+"/"+fname;
 }   // getHighscoreFile
-
-//-----------------------------------------------------------------------------
-#ifdef HAVE_GHOST_REPLAY
-std::string FileManager::getReplayFile(const std::string& fname) const
-{
-    return m_root_dir+"/replay/"+fname;
-}   // getReplayFile
-#endif
 //-----------------------------------------------------------------------------
 void FileManager::initConfigDir()
 {

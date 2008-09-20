@@ -30,6 +30,8 @@
 #include "user_config.hpp"
 #include "stk_config.hpp"
 #include "network/network_manager.hpp"
+#include "modes/standard_race.hpp"
+#include "modes/follow_the_leader.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -231,7 +233,15 @@ void RaceManager::startNextRace()
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
     // and need world to be defined.
-    new World();
+    
+    /*
+     RM_GRAND_PRIX, RM_SINGLE, 
+     RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER
+     FIXME
+     */
+    
+    if(m_minor_mode==RM_FOLLOW_LEADER) new FollowTheLeaderRace();
+    else new StandardRace();
 
     m_active_race = true;
 }   // startNextRace

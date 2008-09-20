@@ -120,11 +120,11 @@ void MainLoop::run()
             if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
-            scene->draw(world->getPhase()==World::SETUP_PHASE ? 0.0f : dt);
+            scene->draw(world->getPhase()==SETUP_PHASE ? 0.0f : dt);
 
             network_manager->receiveUpdates();
 
-            if ( world->getPhase() != World::LIMBO_PHASE)
+            if ( world->getPhase() != LIMBO_PHASE)
             {
                 world->update(dt);
 
