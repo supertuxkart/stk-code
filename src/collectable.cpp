@@ -34,9 +34,9 @@
 Collectable::Collectable(Kart* kart_)
 {
     m_owner               = kart_;
-    m_sound_shot          = sfx_manager->getSfx(SFXManager::SOUND_SHOT);
-    m_sound_use_anvil     = sfx_manager->getSfx(SFXManager::SOUND_USE_ANVIL);
-    m_sound_use_parachute = sfx_manager->getSfx(SFXManager::SOUND_USE_PARACHUTE);
+    m_sound_shot          = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
+    m_sound_use_anvil     = sfx_manager->newSFX(SFXManager::SOUND_USE_ANVIL);
+    m_sound_use_parachute = sfx_manager->newSFX(SFXManager::SOUND_USE_PARACHUTE);
     reset();
 }   // Collectable
 
@@ -45,9 +45,9 @@ Collectable::Collectable(Kart* kart_)
  */
 Collectable::~Collectable()
 {
-    delete m_sound_shot;
-    delete m_sound_use_anvil;
-    delete m_sound_use_parachute;
+    sfx_manager->deleteSFX(m_sound_shot);
+    sfx_manager->deleteSFX(m_sound_use_anvil);
+    sfx_manager->deleteSFX(m_sound_use_parachute);
 
 }   // ~Collectable
 

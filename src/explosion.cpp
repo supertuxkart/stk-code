@@ -31,14 +31,14 @@ Explosion::Explosion(const Vec3& coord) : ssgTransform()
     addKid(cut);  // derefing the explosion will free the cutout
     m_seq   = projectile_manager->getExplosionModel();
     cut->addKid(m_seq);
-    m_explode_sound = sfx_manager->getSfx(SFXManager::SOUND_EXPLOSION);
+    m_explode_sound = sfx_manager->newSFX(SFXManager::SOUND_EXPLOSION);
     init(coord);
 }   // Explosion
 
 //-----------------------------------------------------------------------------
 Explosion::~Explosion()
 {
-    delete m_explode_sound;
+    sfx_manager->deleteSFX(m_explode_sound);
     // cut will be cleaned up when the explosion is rerefed by plib
 }
 //-----------------------------------------------------------------------------

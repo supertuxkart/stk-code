@@ -172,9 +172,3 @@ void SoundManager::positionListener(Vec3 position)
 
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
 }
-
-//----------------------------------------------------------------------------
-bool SoundManager::sfxAllowed()
-{
-    return user_config->doSFX() && m_initialized;
-}   // sfxAllowed

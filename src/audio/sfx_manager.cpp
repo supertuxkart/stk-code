@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define strcasecmp _strcmpi
 #  define snprintf _snprintf
@@ -41,10 +42,14 @@
 
 SFXManager* sfx_manager= NULL;
 
+/** Initialises the SFX manager and loads the sfx from a config file.
+ */
 SFXManager::SFXManager()
 {
-    m_initialized = sound_manager->sfxAllowed();
+    // The sound manager initialises OpenAL
+    m_initialized = sound_manager->initialized();
     m_sfx_buffers.resize(NUM_SOUNDS);
+    if(!m_initialized) return;
     loadSfx();
 }  // SoundManager
 
@@ -168,11 +173,68 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
 }   // loadSingleSfx
 
 //----------------------------------------------------------------------------
-SFXBase *SFXManager::getSfx(SFXType id)
+/** Creates a new SFX object. The memory for this object is managed completely
+ *  by the SFXManager. This makes it easy to use different implementations of
+ *  SFX - since newSFX can return whatever type is used. To free the memory,
+ *  call deleteSFX().
+ *  \param id Identifier of the sound effect to create.
+ */
+SFXBase *SFXManager::newSFX(SFXType id)
 {
     SFXBase *p=new SFXOpenAL(m_sfx_buffers[id]);
+    m_all_sfx.push_back(p);
     return p;
-}   // getSfx
+}   // newSFX
+
+//----------------------------------------------------------------------------
+/** Delete a sound effect object, and removes it from the internal list of
+ *  all SFXs. This call deletes the object, and removes it from the list of
+ *  all SFXs.
+ *  \param sfx SFX object to delete.
+ */
+void SFXManager::deleteSFX(SFXBase *sfx)
+{
+    std::vector<SFXBase*>::iterator i;
+    i=std::find(m_all_sfx.begin(), m_all_sfx.end(), sfx);
+    delete sfx;
+    if(i==m_all_sfx.end())
+    {
+        fprintf(stderr, "Warning: sfx not found in list.\n");
+        return;
+    }
+
+    m_all_sfx.erase(i);
+
+}   // deleteSFX
+
+//----------------------------------------------------------------------------
+/** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
+ *  otherwise not possible to determine which SFX must be resumed (i.e. were
+ *  actually playing at the time pause was called.
+ */
+void SFXManager::pauseAll()
+{
+
+    for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
+        i!=m_all_sfx.end(); i++)
+    {
+        (*i)->pause();
+    }   // for i in m_all_sfx
+}   // pauseAll
+//----------------------------------------------------------------------------
+/** Resumes all paused SFXs.
+ */
+void SFXManager::resumeAll()
+{
+    for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
+        i!=m_all_sfx.end(); i++)
+    {
+        SFXStatus status = (*i)->getStatus();
+        // Initial happens when 
+        if(status==SFX_PAUSED || status==SFX_INITIAL)
+            (*i)->resume();
+    }   // for i in m_all_sfx
+}   // resumeAll
 
 //----------------------------------------------------------------------------
 bool SFXManager::checkError(const std::string &context)
@@ -184,7 +246,6 @@ bool SFXManager::checkError(const std::string &context)
     {
         fprintf(stdout, "SFXOpenAL OpenAL error while %s: %s\n",
             context.c_str(), SFXManager::getErrorString(error).c_str());
-        //m_loaded = 0;//prevents further usage of this sound effect
         return false;
     }
     return true;
@@ -204,3 +265,5 @@ const std::string SFXManager::getErrorString(int err)
         default:                   return std::string("UNKNOWN");
     };
 }   // getErrorString
+
+//-----------------------------------------------------------------------------

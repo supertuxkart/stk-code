@@ -54,7 +54,7 @@ enum WidgetTokens
 GrandPrixEnd::GrandPrixEnd()
         : m_kart(0)
 {
-    m_winner_sound = sfx_manager->getSfx(SFXManager::SOUND_WINNER);
+    m_winner_sound = sfx_manager->newSFX(SFXManager::SOUND_WINNER);
     // for some strange reasons plib calls makeCurrent() in ssgContext
     // constructor, so we have to save the old one here and restore it
     ssgContext* oldContext = ssgGetCurrentContext();
@@ -176,7 +176,7 @@ GrandPrixEnd::GrandPrixEnd()
 //-----------------------------------------------------------------------------
 GrandPrixEnd::~GrandPrixEnd()
 {
-    delete m_winner_sound;
+    sfx_manager->deleteSFX(m_winner_sound);
     widget_manager->reset();
     ssgDeRefDelete(m_kart);
 

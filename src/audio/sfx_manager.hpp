@@ -55,13 +55,15 @@ public:
     /** Status of a sound effect. */
     enum SFXStatus
     {
-        SFX_UNKNOWN = -1, SFX_STOPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2
+        SFX_UNKNOWN = -1, SFX_STOPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_INITIAL = 3
     };
 
 private:		
     /** The buffers for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::vector<ALuint>       m_sfx_buffers;
+    std::vector<SFXBase*>     m_all_sfx;
     bool                      m_initialized;
     void                      loadSfx();
     void                      loadSingleSfx(const lisp::Lisp *lisp, 
@@ -71,7 +73,10 @@ public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    SFXBase                 *getSfx(SFXType id);
+    SFXBase                 *newSFX(SFXType id);
+    void                     deleteSFX(SFXBase *sfx);
+    void                     pauseAll();
+    void                     resumeAll();
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
 };

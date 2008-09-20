@@ -105,7 +105,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheel_rear_r            = NULL;
     m_lap_start_time          = -1.0f;
 
-    m_engine_sound = sfx_manager->getSfx(SFXManager::SOUND_ENGINE);
+    m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE);
 
     if(!m_engine_sound)
     {
@@ -136,8 +136,9 @@ btTransform Kart::getKartHeading(const float customPitch)
     trans.setBasis(m);
     
     return trans;
-}
+}   // getKartHeading
 
+// ----------------------------------------------------------------------------
 void Kart::createPhysics(ssgEntity *obj)
 {
     // First: Create the chassis of the kart
@@ -269,7 +270,7 @@ Kart::~Kart()
     {
         m_engine_sound->stop();
     }
-    delete m_engine_sound;
+    sfx_manager->deleteSFX(m_engine_sound);
 
     if(m_smokepuff) delete m_smokepuff;
     if(m_smoke_system != NULL) delete m_smoke_system;
@@ -957,11 +958,13 @@ void Kart::updatePhysics (float dt)
     m_max_gear_rpm = m_current_gear_ratio * max_speed;
     // 8 is magic number again.
     m_rpm = ((m_speed * gear_ratio) / (8*tire_diameter));
-    if(m_engine_sound)
+    if(m_engine_sound && sfx_manager->sfxAllowed())
     {
         m_engine_sound->speed((float)((m_rpm * 2) / m_max_gear_rpm));
         //m_engine_sound->position(m_curr_track_coords);
     }
+    // FIXME: what if sfx are disabled in the option menu??
+    // The engine sound will still play!
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------

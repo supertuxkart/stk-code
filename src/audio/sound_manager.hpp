@@ -48,10 +48,9 @@ public:
     virtual ~SoundManager();
 
     void                    positionListener(Vec3 position);
-    bool                    sfxAllowed();
-
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
+    bool                    initialized() const {return m_initialized;                 }
     void                    update(float dt)    {if(m_current_music)
                                                      m_current_music->update(dt);      }
     void                    pauseMusic()        {if(m_current_music)

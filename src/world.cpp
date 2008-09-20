@@ -176,8 +176,8 @@ World::World()
     callback_manager->initAll();
     menu_manager->switchToRace();
 
-    m_prestart_sound = sfx_manager->getSfx(SFXManager::SOUND_PRESTART);
-    m_start_sound    = sfx_manager->getSfx(SFXManager::SOUND_START);
+    m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
+    m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
 
     m_track->startMusic();
 
@@ -216,8 +216,8 @@ World::~World()
     delete m_physics;
 
     sound_manager -> stopMusic();
-    delete m_prestart_sound;
-    delete m_start_sound;
+    sfx_manager->deleteSFX(m_prestart_sound);
+    sfx_manager->deleteSFX(m_start_sound);
 
     sgVec3 sun_pos;
     sgVec4 ambient_col, specular_col, diffuse_col;
@@ -797,6 +797,8 @@ void World::restartRace()
     resetAllKarts();
     sound_manager->stopMusic();     // Start music from beginning
     m_track->startMusic();
+    // Enable SFX again
+    sfx_manager->resumeAll();
     herring_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
@@ -841,7 +843,8 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 //-----------------------------------------------------------------------------
 void  World::pause()
 {
-    sound_manager -> pauseMusic() ;
+    sound_manager->pauseMusic();
+    sfx_manager->pauseAll();
     m_previous_phase = m_phase;
     m_phase = LIMBO_PHASE;
 }
@@ -849,7 +852,8 @@ void  World::pause()
 //-----------------------------------------------------------------------------
 void  World::unpause()
 {
-    sound_manager -> resumeMusic() ;
+    sound_manager->resumeMusic() ;
+    sfx_manager->resumeAll();
     m_phase = m_previous_phase;
 }
 

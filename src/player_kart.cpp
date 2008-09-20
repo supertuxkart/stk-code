@@ -41,13 +41,13 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
     m_camera       = scene->createCamera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
-    m_bzzt_sound  = sfx_manager->getSfx(SFXManager::SOUND_BZZT );
-    m_beep_sound  = sfx_manager->getSfx(SFXManager::SOUND_BEEP );
-    m_crash_sound = sfx_manager->getSfx(SFXManager::SOUND_CRASH);
-    m_wee_sound   = sfx_manager->getSfx(SFXManager::SOUND_WEE  );
-    m_ugh_sound   = sfx_manager->getSfx(SFXManager::SOUND_UGH  );
-    m_grab_sound  = sfx_manager->getSfx(SFXManager::SOUND_GRAB );
-    m_full_sound  = sfx_manager->getSfx(SFXManager::SOUND_FULL );
+    m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
+    m_beep_sound  = sfx_manager->newSFX(SFXManager::SOUND_BEEP );
+    m_crash_sound = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
+    m_wee_sound   = sfx_manager->newSFX(SFXManager::SOUND_WEE  );
+    m_ugh_sound   = sfx_manager->newSFX(SFXManager::SOUND_UGH  );
+    m_grab_sound  = sfx_manager->newSFX(SFXManager::SOUND_GRAB );
+    m_full_sound  = sfx_manager->newSFX(SFXManager::SOUND_FULL );
 
     reset();
 }   // PlayerKart
@@ -55,15 +55,15 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
 //-----------------------------------------------------------------------------
 PlayerKart::~PlayerKart()
 {
-    delete m_bzzt_sound;
-    delete m_beep_sound;
-    delete m_crash_sound;
-    delete m_wee_sound;
-    delete m_ugh_sound;
-    delete m_grab_sound;
-    delete m_full_sound;
+    sfx_manager->deleteSFX(m_bzzt_sound);
+    sfx_manager->deleteSFX(m_beep_sound);
+    sfx_manager->deleteSFX(m_crash_sound);
+    sfx_manager->deleteSFX(m_wee_sound);
+    sfx_manager->deleteSFX(m_ugh_sound);
+    sfx_manager->deleteSFX(m_grab_sound);
+    sfx_manager->deleteSFX(m_full_sound);
+}   // ~PlayerKart
 
-}
 //-----------------------------------------------------------------------------
 void PlayerKart::reset()
 {

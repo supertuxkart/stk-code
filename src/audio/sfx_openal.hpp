@@ -32,19 +32,20 @@
 class SFXOpenAL : public SFXBase
 {
 private:
-    unsigned int m_loaded;
     ALuint       m_soundBuffer;   // Buffers hold sound data.
     ALuint       m_soundSource;   // Sources are points emitting sound.
-    
+    bool         m_ok;
 public:
-                 SFXOpenAL(ALuint buffer);
-    virtual     ~SFXOpenAL();
-    virtual void play();
-    virtual void loop();
-    virtual void stop();
-    virtual void speed(float factor);
-    virtual void position(Vec3 position);
-    virtual int  getStatus();
+                                  SFXOpenAL(ALuint buffer);
+    virtual                      ~SFXOpenAL();
+    virtual void                  play();
+    virtual void                  loop();
+    virtual void                  stop();
+    virtual void                  pause();
+    virtual void                  resume();
+    virtual void                  speed(float factor);
+    virtual void                  position(Vec3 position);
+    virtual SFXManager::SFXStatus getStatus();
 	
 };   // SFXOpenAL
 

@@ -37,11 +37,11 @@
 #include "file_manager.hpp"
 #include "user_config.hpp"
 
-SFXOpenAL::SFXOpenAL(ALuint buffer)
+SFXOpenAL::SFXOpenAL(ALuint buffer) : SFXBase()
 {
     m_soundBuffer = buffer;
     m_soundSource = 0;
-    m_loaded      = 0;
+    m_ok          = false;
 
     alGenSources(1, &m_soundSource );
     if(!SFXManager::checkError("generating a source")) return;
@@ -54,21 +54,22 @@ SFXOpenAL::SFXOpenAL(ALuint buffer)
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.2f         );
     alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
 
-    m_loaded = SFXManager::checkError("setting up the source");
+    m_ok = SFXManager::checkError("setting up the source");
 }   // SFXOpenAL
 
 //-----------------------------------------------------------------------------
 SFXOpenAL::~SFXOpenAL()
 {
-    alDeleteBuffers(1, &m_soundBuffer);
     alDeleteSources(1, &m_soundSource);
-}
+}   // ~SFXOpenAL
 
 //-----------------------------------------------------------------------------
+/** Changes the pitch of a sound effect.
+ *  \param factor Speedup/slowdown between 0.5 and 2.0
+ */
 void SFXOpenAL::speed(float factor)
 {
-    if(!m_loaded)
-        return;
+    if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
@@ -81,55 +82,84 @@ void SFXOpenAL::speed(float factor)
     }
     alSourcef(m_soundSource,AL_PITCH,factor);
     SFXManager::checkError("changing the speed");
-}
+}   // speed
 
 //-----------------------------------------------------------------------------
+/** Loops this sound effect.
+ */
 void SFXOpenAL::loop()
 {
-    if(!m_loaded)
-        return;
+    if(!m_ok) return;
 
     alSourcei(m_soundSource, AL_LOOPING, AL_TRUE);
     SFXManager::checkError("looping");
-}
+}   // loop
 
 //-----------------------------------------------------------------------------
+/** Stops playing this sound effect.
+ */
 void SFXOpenAL::stop()
 {
-    if(!m_loaded)
-        return;
+    if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
     alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
     alSourceStop(m_soundSource);
     SFXManager::checkError("stoping");
-}
+}   // stop
 
 //-----------------------------------------------------------------------------
+/** Pauses a SFX that's currently played. Nothing happens it the effect is
+ *  currently not being played.
+ */
+void SFXOpenAL::pause()
+{
+    alSourcePause(m_soundSource);
+    SFXManager::checkError("pausing");
+}   // pause
+
+//-----------------------------------------------------------------------------
+/** Resumes a sound effect.
+ */
+void SFXOpenAL::resume()
+{
+    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+
+    alSourcef(m_soundSource,AL_GAIN,user_config->m_sfx_volume);
+    alSourcePlay(m_soundSource);
+    SFXManager::checkError("resuming");
+}   // resume
+
+//-----------------------------------------------------------------------------
+/** Plays this sound effect.
+ */
 void SFXOpenAL::play()
 {
-    if(!m_loaded)
-        return;
+    if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
     alSourcef(m_soundSource,AL_GAIN,user_config->m_sfx_volume);
     alSourcePlay(m_soundSource);
     SFXManager::checkError("playing");
-}
+}   // play
 
 //-----------------------------------------------------------------------------
+/** Sets the position where this sound effects is played.
+ *  \param position Position of the sound effect.
+ */
 void SFXOpenAL::position(Vec3 position)
 {
-    if(!m_loaded)
-        return;
+    if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
-    alSource3f(m_soundSource, AL_POSITION, position.getX(), position.getY(), position.getZ());
+    alSource3f(m_soundSource, AL_POSITION,
+               position.getX(), position.getY(), position.getZ());
     SFXManager::checkError("positioning");
-}
+}   // position
 
 //-----------------------------------------------------------------------------
-int SFXOpenAL::getStatus()
+/** Returns the status of this sound effect.
+ */
+SFXManager::SFXStatus SFXOpenAL::getStatus()
 {
-    if(!m_loaded)
-        return SFXManager::SFX_UNKNOWN;
+    if(!sfx_manager->sfxAllowed()||!m_ok) return SFXManager::SFX_UNKNOWN;
 
 	int state = 0;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
@@ -138,6 +168,7 @@ int SFXOpenAL::getStatus()
     case AL_STOPPED: return SFXManager::SFX_STOPED;
     case AL_PLAYING: return SFXManager::SFX_PLAYING;
     case AL_PAUSED:  return SFXManager::SFX_PAUSED;
+    case AL_INITIAL: return SFXManager::SFX_INITIAL;
     default:         return SFXManager::SFX_UNKNOWN;
     }
 }   // getStatus

@@ -68,8 +68,8 @@ MenuManager::MenuManager()
     m_current_menu = NULL;
     m_RaceGUI      = NULL;
     m_change_menu  = false;
-    m_select_sound = sfx_manager->getSfx(SFXManager::SOUND_SELECT_MENU);
-    m_back_sound   = sfx_manager->getSfx(SFXManager::SOUND_BACK_MENU);
+    m_select_sound = sfx_manager->newSFX(SFXManager::SOUND_SELECT_MENU);
+    m_back_sound   = sfx_manager->newSFX(SFXManager::SOUND_BACK_MENU);
 }   // MenuManager
 
 //-----------------------------------------------------------------------------
@@ -78,8 +78,8 @@ MenuManager::MenuManager()
 MenuManager::~MenuManager()
 {
     delete m_current_menu;
-    delete m_back_sound;
-    delete m_select_sound;
+    sfx_manager->deleteSFX(m_back_sound);
+    sfx_manager->deleteSFX(m_select_sound);
 }
 
 //-----------------------------------------------------------------------------
