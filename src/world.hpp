@@ -270,8 +270,8 @@ public:
       * The code that draws the timer should call this first to know
       * whether the game mode wants a timer drawn
       */
-    bool shouldDrawTimer() const    { return ((m_clock.getPhase() == RACE_PHASE or 
-                                               m_clock.getPhase() == DELAY_FINISH_PHASE) and
+    bool shouldDrawTimer() const    { return ((m_clock.getPhase() == RACE_PHASE || 
+                                               m_clock.getPhase() == DELAY_FINISH_PHASE) &&
                                                m_clock.getMode() != CLOCK_NONE); }
     
 

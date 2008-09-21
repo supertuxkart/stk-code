@@ -1135,6 +1135,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="modes"
+				>
+				<File
+					RelativePath="..\..\modes\follow_the_leader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\standard_race.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1702,6 +1714,18 @@
 				</File>
 				<File
 					RelativePath="..\..\audio\sound_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="modes"
+				>
+				<File
+					RelativePath="..\..\modes\follow_the_leader.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\standard_race.hpp"
 					>
 				</File>
 			</Filter>

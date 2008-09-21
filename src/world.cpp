@@ -94,7 +94,7 @@ void Clock::setMode(const ClockType mode, const float initial_time)
 //-----------------------------------------------------------------------------
 void Clock::raceOver(const bool delay)
 {
-    if(m_phase == DELAY_FINISH_PHASE or m_phase == FINISH_PHASE) return; // we already know
+    if(m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE) return; // we already know
     
     if(delay)
     {
