@@ -194,9 +194,9 @@ public:
 
 class World
 {
-protected:
+public:
     typedef std::vector<Kart*> Karts;
-    
+protected:
     std::vector<PlayerKart*>  m_player_karts;
     std::vector<PlayerKart*>  m_local_player_karts;
     std::vector<NetworkKart*> m_network_karts; 

@@ -159,6 +159,8 @@ void Clock::updateClock(const float dt)
         case FINISH_PHASE:
             m_listener->onTerminate();
             return;
+        default:   //RACE_PHASE, LIMBO_PHASEL nothing to do, but avoid a warning
+            break;
     }
     
     switch(m_mode)
@@ -256,8 +258,8 @@ World::World()
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot(kart_name, position, init_pos);
-    	    // Create a camera for the last kart (since this way more of the 
-	        // karts can be seen.
+            // Create a camera for the last kart (since this way more of the 
+            // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
                 scene->createCamera(local_player_id, newkart);
@@ -398,7 +400,7 @@ void World::resetAllKarts()
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-			    (int)(i-m_kart.begin()), m_track->getIdent().c_str());
+                            (int)(i-m_kart.begin()), m_track->getIdent().c_str());
                     exit(-1);
                 }
                 all_finished=false;
