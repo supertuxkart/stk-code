@@ -18,9 +18,9 @@
 #ifndef _standard_race_
 #define _standard_race_
 
-#include "world.hpp"
+#include "modes/world.hpp"
 
-class StandardRace : public World, public ClockListener
+class StandardRace : public World, public Clock::ClockListener
 {
 public:
     StandardRace();

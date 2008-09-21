@@ -25,9 +25,9 @@
 #include <plib/sg.h>
 
 #include "string_utils.hpp"
-#include "world.hpp"
 #include "scene.hpp"
 #include "utils/ssg_help.hpp"
+#include "modes/world.hpp"
 
 // -----------------------------------------------------------------------------
 MovingPhysics::MovingPhysics(const std::string data)
@@ -81,7 +81,7 @@ MovingPhysics::MovingPhysics(const std::string data)
 // -----------------------------------------------------------------------------
 MovingPhysics::~MovingPhysics()
 {
-    world->getPhysics()->removeBody(m_body);
+    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
     delete m_shape;
@@ -195,7 +195,7 @@ void MovingPhysics::init()
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
-    world->getPhysics()->addBody(m_body);
+    RaceManager::getWorld()->getPhysics()->addBody(m_body);
 }   // init
 
 // -----------------------------------------------------------------------------

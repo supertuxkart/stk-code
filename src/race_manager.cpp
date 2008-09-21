@@ -25,7 +25,7 @@
 #include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "scene.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
@@ -34,6 +34,33 @@
 #include "modes/follow_the_leader.hpp"
 
 RaceManager* race_manager= NULL;
+
+//-----------------------------------------------------------------------------
+World* world = NULL;
+World* RaceManager::getWorld()
+{
+    return world;
+}
+/** Call to set the world, or call setWorld(NULL) to delete the current world.
+ */
+void RaceManager::setWorld(World* world_arg)
+{
+    if(world != NULL) delete world;
+    world = world_arg;
+}
+Track* RaceManager::getTrack()
+{
+    return world->getTrack();
+}
+Kart* RaceManager::getPlayerKart(const unsigned int n)
+{
+    return world->getPlayerKart(n);
+}
+Kart* RaceManager::getKart(const unsigned int n)
+{
+    return world->getKart(n);
+}
+//-----------------------------------------------------------------------------
 
 /** Constructs the race manager.
  */
@@ -291,7 +318,7 @@ void RaceManager::exit_race()
 
 //-----------------------------------------------------------------------------
 /** A kart has finished the race at the specified time (which can be 
- *  different from world->getClock() in case of setting extrapolated arrival 
+ *  different from RaceManager::getWorld()->getClock() in case of setting extrapolated arrival 
  *  times).
  *  \param kart The kart that finished the race.
  *  \param time Time at which the kart finished the race.

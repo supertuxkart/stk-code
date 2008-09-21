@@ -29,8 +29,8 @@
 #include "material.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
-#include "world.hpp"
 #include "race_manager.hpp"
+#include "modes/world.hpp"
 
 class InputMap;
 class RaceSetup;
@@ -56,18 +56,20 @@ class RaceGUI: public BaseGUI
             m_message    = message; 
             m_font_size  = size;
             m_kart       = kart;
-            m_end_time   = time>=0.0f 
-                         ? (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER 
-                            ?world->getTime()-time
-                            :world->getTime()+time )
-                         : -1.0f;
+            World* world = RaceManager::getWorld();
+            if( time < 0.0f ) m_end_time = -1.0f;
+            else
+            {
+                m_end_time = race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER ?
+                             world->getTime()-time : world->getTime()+time;
+            }
             m_red=red; m_blue=blue; m_green=green; 
         }
         // in follow leader the clock counts backwards
-        bool done() const {return m_end_time<0 || 
-                           (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER 
-                                  ? world->getTime()<m_end_time
-                                  : world->getTime()>m_end_time);}
+        bool done() const { const int time = RaceManager::getWorld()->getTime(); // work around gcc bug (doesn't accept :: in a ?)
+                            return m_end_time<0 || 
+                            (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER ?
+                             time<m_end_time : time>m_end_time); }
     };
 public:
 

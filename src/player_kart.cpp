@@ -25,7 +25,7 @@
 #include "player.hpp"
 #include "sdldrv.hpp"
 #include "herring.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "translation.hpp"
@@ -171,7 +171,7 @@ void PlayerKart::update(float dt)
 {
     steer(dt, m_steer_val);
 
-    if(world->getClock().isStartPhase())
+    if(RaceManager::getWorld()->getClock().isStartPhase())
     {
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||
            m_controls.fire|m_controls.wheelie|m_controls.jump)
@@ -234,10 +234,10 @@ void PlayerKart::crashed(Kart *kart)
     // this, the crash sound is only played if there was at least 0.5
     // seconds since the last time it was played (for this kart)
 
-    if(world->getTime() - m_time_last_crash_sound > 0.5f) 
+    if(RaceManager::getWorld()->getTime() - m_time_last_crash_sound > 0.5f) 
     {
         m_crash_sound->play();
-        m_time_last_crash_sound = world->getTime();
+        m_time_last_crash_sound = RaceManager::getWorld()->getTime();
     }
 }   // crashed
 
@@ -324,7 +324,7 @@ void PlayerKart::addMessages()
     // ------------------------------------------------------
     if(race_manager->getDifficulty()==RaceManager::RD_EASY)
     {
-      float angle_diff = RAD_TO_DEGREE(getHPR().getHeading()) - world->m_track->m_angle[getSector()];
+      float angle_diff = RAD_TO_DEGREE(getHPR().getHeading()) - RaceManager::getTrack()->m_angle[getSector()];
         if(angle_diff > 180.0f) angle_diff -= 360.0f;
         else if (angle_diff < -180.0f) angle_diff += 360.0f;
         // Display a warning message if the kart is going back way (unless

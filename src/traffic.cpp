@@ -19,7 +19,7 @@
 
 #include "kart.hpp"
 #include "constants.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 
 inline float sgnsq ( float x ) { return ( x < 0 ) ? -(x * x) : (x * x) ; }
 
@@ -41,7 +41,7 @@ void TrafficDriver::update (float dt)
 //FIXME        m_velocity.hpr[0] = sgnsq(m_curr_track_coords[0])*12.0f ;
 
 //FIXME    m_velocity.xyz[1]  = TRAFFIC_VELOCITY ;
-//FIXME    m_velocity.xyz[2] -= world->getGravity()* dt ;
+//FIXME    m_velocity.xyz[2] -= RaceManager::getWorld()->getGravity()* dt ;
 
     if ( m_wheelie_angle != 0.0f )
         m_wheelie_angle = 0.0f ;

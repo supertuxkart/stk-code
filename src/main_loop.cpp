@@ -35,7 +35,7 @@
 #include "audio/sound_manager.hpp"
 #include "material_manager.hpp"
 #include "race_manager.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "user_config.hpp"
 #include "scene.hpp"
 #include "history.hpp"
@@ -120,18 +120,18 @@ void MainLoop::run()
             if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
-            scene->draw(world->getPhase()==SETUP_PHASE ? 0.0f : dt);
+            scene->draw(RaceManager::getWorld()->getPhase()==SETUP_PHASE ? 0.0f : dt);
 
             network_manager->receiveUpdates();
 
-            if ( world->getPhase() != LIMBO_PHASE)
+            if ( RaceManager::getWorld()->getPhase() != LIMBO_PHASE)
             {
-                world->update(dt);
+                RaceManager::getWorld()->update(dt);
 
                 if(user_config->m_profile>0)
                 {
                     m_frame_count++;
-                    if (world->getTime()>user_config->m_profile)
+                    if (RaceManager::getWorld()->getTime()>user_config->m_profile)
                     {
                         //FIXME: SDL_GetTicks() includes the loading time,
                         //so the FPS will be skewed for now.

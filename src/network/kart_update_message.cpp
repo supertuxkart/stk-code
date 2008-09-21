@@ -17,13 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "kart_update_message.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "kart.hpp"
 
 KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)
 {
-    unsigned int num_karts = world->getCurrentNumKarts();
+    unsigned int num_karts = RaceManager::getWorld()->getCurrentNumKarts();
 
     // Send the number of karts and for each kart the compressed 
     // control structure (3 ints) and xyz,hpr (4 floats: quaternion:
@@ -33,7 +33,7 @@ KartUpdateMessage::KartUpdateMessage()
     addChar(num_karts);
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart=world->getKart(i);
+        const Kart* kart = RaceManager::getKart(i);
         const KartControl& kc=kart->getControls();
         kc.serialise(this);
         addVec3(kart->getXYZ());
@@ -51,7 +51,7 @@ KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
         KartControl kc(this);
         Vec3 xyz = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart = world->getKart(i);
+        Kart *kart = RaceManager::getKart(i);
         kart->setXYZ(xyz);
         kart->setRotation(q);
     }   // for i

@@ -18,9 +18,9 @@
 #ifndef _follow_the_leader_hpp_
 #define _follow_the_leader_hpp_
 
-#include "world.hpp"
+#include "modes/world.hpp"
 
-class FollowTheLeaderRace : public World, public ClockListener
+class FollowTheLeaderRace : public World, public Clock::ClockListener
 {
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:

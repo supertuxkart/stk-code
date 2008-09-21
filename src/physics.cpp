@@ -19,13 +19,13 @@
 
 #include "physics.hpp"
 
-#include "world.hpp"
 #include "flyable.hpp"
 #include "moving_physics.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "network/race_state.hpp"
 #include "utils/ssg_help.hpp"
+#include "track.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -50,7 +50,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                                       this,
                                                       m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
-                                           -world->getTrack()->getGravity()));
+                                           -RaceManager::getTrack()->getGravity()));
     if(user_config->m_bullet_debug)
     {
         m_debug_drawer=new GLDebugDrawer();

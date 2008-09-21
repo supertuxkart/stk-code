@@ -20,21 +20,24 @@
 #include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
 
-// -----------------------------
-StandardRace::StandardRace() : World(), ClockListener()
+//-----------------------------------------------------------------------------
+StandardRace::StandardRace() : World(), Clock::ClockListener()
 {
     m_clock.registerEventListener(this);
     m_clock.setMode(CHRONO);
 }
 
-// ----------------------------
+//-----------------------------------------------------------------------------
 StandardRace::~StandardRace()
 {
 }
     
-// clock events
-void StandardRace::countdownReachedZero() { }
+#pragma mark -
+#pragma mark clock events
 
+//-----------------------------------------------------------------------------
+void StandardRace::countdownReachedZero() { }
+//-----------------------------------------------------------------------------
 void StandardRace::onGo()
 {
     // Reset the brakes now that the prestart 
@@ -45,12 +48,12 @@ void StandardRace::onGo()
         m_kart[i]->resetBrakes();
     }
 }
-
+//-----------------------------------------------------------------------------
 void StandardRace::restartRace()
 {
     World::restartRace();
 }
-
+//-----------------------------------------------------------------------------
 void StandardRace::update(float delta)
 {
     m_clock.updateClock(delta);
@@ -58,7 +61,7 @@ void StandardRace::update(float delta)
     World::update(delta);
     if(!m_clock.isRacePhase()) return;
     
-    // =========================================================
+    // All karts are finished
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
         m_clock.raceOver();
@@ -75,7 +78,7 @@ void StandardRace::update(float delta)
         m_clock.raceOver(true /* delay */);
     }
 }
-
+//-----------------------------------------------------------------------------
 void StandardRace::onTerminate()
 {
     World::terminateRace();

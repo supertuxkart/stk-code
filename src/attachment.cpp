@@ -25,7 +25,6 @@
 #include "projectile_manager.hpp"
 #include "kart.hpp"
 #include "constants.hpp"
-#include "world.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "network/race_state.hpp"

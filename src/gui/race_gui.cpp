@@ -157,7 +157,7 @@ RaceGUI::handle(GameAction ga, int value)
 		int playerNo = ka / KC_COUNT;
 		ka = ka % KC_COUNT;
 		
-		world->getLocalPlayerKart(playerNo)->action((KartAction) ka, value);
+		RaceManager::getWorld()->getLocalPlayerKart(playerNo)->action((KartAction) ka, value);
 		
 		return;
 	}
@@ -170,21 +170,21 @@ RaceGUI::handle(GameAction ga, int value)
 		case GA_DEBUG_ADD_BOWLING:
 			if (race_manager->getNumPlayers() ==1 )
 			{
-				Kart* kart = world->getLocalPlayerKart(0);
+				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
 				kart->setCollectable(COLLECT_BOWLING, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
 			if (race_manager->getNumPlayers() ==1 )
 			{
-				Kart* kart = world->getPlayerKart(0);
+				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setCollectable(COLLECT_MISSILE, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_HOMING:
 			if (race_manager->getNumPlayers() ==1 )
 			{
-				Kart* kart = world->getPlayerKart(0);
+				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setCollectable(COLLECT_HOMING, 10000);
 			}
 			break;
@@ -217,7 +217,7 @@ RaceGUI::handle(GameAction ga, int value)
 			// Fall through to put the game into pause mode.
 #endif
 		case GA_LEAVE_RACE:
-			world->pause();
+			RaceManager::getWorld()->pause();
 			menu_manager->pushMenu(MENUID_RACEMENU);
 		break;
 		case GA_DEBUG_HISTORY:
@@ -232,7 +232,6 @@ RaceGUI::handle(GameAction ga, int value)
 //-----------------------------------------------------------------------------
 void RaceGUI::update(float dt)
 {
-    assert(world != NULL);
     drawStatusText(dt);
     cleanupMessages();
 
@@ -260,14 +259,12 @@ void RaceGUI::drawFPS ()
 //-----------------------------------------------------------------------------
 void RaceGUI::drawTimer ()
 {
-   // if(world->getPhase() != RACE_PHASE         &&
-   //    world->getPhase() != DELAY_FINISH_PHASE   ) return;
-    if(!world->shouldDrawTimer()) return;
+    assert(RaceManager::getWorld() != NULL);
+    
+    if(!RaceManager::getWorld()->shouldDrawTimer()) return;
     char str[256];
-
-    assert(world != NULL);
-
-    TimeToString(world->getTime(), str);
+    
+    TimeToString(RaceManager::getWorld()->getTime(), str);
 #ifdef USE_WIDGET_MANAGER
     widget_manager->showWgtText( WTOK_CLOCK );
     widget_manager->setWgtText( WTOK_CLOCK, str );
@@ -283,17 +280,17 @@ void RaceGUI::drawTimer ()
 void RaceGUI::drawMap ()
 {
     glDisable ( GL_TEXTURE_2D ) ;
-    assert(world != NULL);
+    assert(RaceManager::getWorld() != NULL);
     int xLeft = 10;
     int yTop   =  10;
 
-    world -> m_track -> draw2Dview ( (float)xLeft,   (float)yTop   );
+    RaceManager::getTrack() -> draw2Dview ( (float)xLeft,   (float)yTop   );
 
     glBegin ( GL_QUADS ) ;
 
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
-        Kart* kart = world->getKart(i);
+        Kart* kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
         glColor3fv ( kart->getColor().toFloat());
 	const Vec3& xyz = kart->getXYZ();
@@ -301,17 +298,17 @@ void RaceGUI::drawMap ()
         /* If it's a player, draw a bigger sign */
         if (kart -> isPlayerKart ())
         {
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop+3);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop+3);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop-2);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop-2);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop+3);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop+3);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop-2);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop-2);
         }
         else
         {
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop+2);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop+2);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop-1);
-            world -> m_track->glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop-1);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop+2);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop+2);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop-1);
+            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop-1);
         }
     }
 
@@ -323,7 +320,7 @@ void RaceGUI::drawMap ()
 // Draw players position on the race
 void RaceGUI::drawPlayerIcons ()
 {
-    assert(world != NULL);
+    assert(RaceManager::getWorld() != NULL);
 
     int x = 5;
     int y;
@@ -339,7 +336,7 @@ void RaceGUI::drawPlayerIcons ()
     // might have been overtaken by now
     for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
     {
-        Kart* kart     = world->getKart(i);
+        Kart* kart     = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;
         float lap_time = kart->getTimeAtLap();
         int laps       = kart->getLap();
@@ -359,7 +356,7 @@ void RaceGUI::drawPlayerIcons ()
     int bFirst                 = 1;
     for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
     {
-        Kart* kart   = world->getKart(i);
+        Kart* kart   = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;
         int position = kart->getPosition();
         int lap      = kart->getLap();
@@ -382,7 +379,7 @@ void RaceGUI::drawPlayerIcons ()
         glDisable(GL_CULL_FACE);
 
         if(laps_of_leader>0 &&    // Display position during first lap
-           (world->getTime() - kart->getTimeAtLap()<5.0f || lap!=laps_of_leader) &&
+           (RaceManager::getWorld()->getTime() - kart->getTimeAtLap()<5.0f || lap!=laps_of_leader) &&
            race_manager->raceHasLaps())
         {  // Display for 5 seconds
             char str[256];
@@ -394,7 +391,7 @@ void RaceGUI::drawPlayerIcons ()
             else
             {
                 float timeBehind;
-                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : world->getTime())
+                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : RaceManager::getWorld()->getTime())
                     - time_of_leader;
                 str[0]='+'; str[1]=0;
                 TimeToString(timeBehind, str+1);
@@ -901,7 +898,7 @@ void RaceGUI::drawMusicDescription()
 //-----------------------------------------------------------------------------
 void RaceGUI::drawStatusText(const float dt)
 {
-    assert(world != NULL);
+    assert(RaceManager::getWorld() != NULL);
 
     glMatrixMode   ( GL_MODELVIEW ) ;
     glPushMatrix   () ;
@@ -921,7 +918,7 @@ void RaceGUI::drawStatusText(const float dt)
     glEnable       ( GL_BLEND        );
 
     glOrtho        ( 0, user_config->m_width, 0, user_config->m_height, 0, 100 ) ;
-    switch (world->getPhase())
+    switch (RaceManager::getWorld()->getPhase())
     {
     case READY_PHASE:
         {
@@ -959,21 +956,21 @@ void RaceGUI::drawStatusText(const float dt)
 
     for(int i = 0; i < 10; ++i)
     {
-        if(world->m_debug_text[i] != "")
+        if(RaceManager::getWorld()->m_debug_text[i] != "")
         {
             GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
-            font_race->Print( world->m_debug_text[i].c_str(),
+            font_race->Print( RaceManager::getWorld()->m_debug_text[i].c_str(),
                              20, 20, 200 -i*20, COLORS );
         }
     }
     // The penalty message needs to be displayed for up to one second
     // after the start of the race, otherwise it disappears if 
     // "Go" is displayed and the race starts
-    if(world->getClock().isStartPhase() || world->getTime()<1.0f)
+    if(RaceManager::getWorld()->getClock().isStartPhase() || RaceManager::getWorld()->getTime()<1.0f)
     {
         for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         {
-            if(world->getLocalPlayerKart(i)->earlyStartPenalty())
+            if(RaceManager::getWorld()->getLocalPlayerKart(i)->earlyStartPenalty())
             {
                 GLfloat const COLORS[] = { 0.78f, 0.025f, 0.025f, 1.0f };
                 font_race->PrintShadow( _("Penalty time!!"), 80,
@@ -990,7 +987,7 @@ void RaceGUI::drawStatusText(const float dt)
     if(race_manager->getNumLocalPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
-    if ( world->getClock().isRacePhase() )
+    if ( RaceManager::getWorld()->getClock().isRacePhase() )
     {
         const int numPlayers = race_manager->getNumLocalPlayers();
 
@@ -1026,7 +1023,7 @@ void RaceGUI::drawStatusText(const float dt)
                 offset_x = user_config->m_width/2;
             }
 
-            Kart* player_kart=world->getLocalPlayerKart(pla);
+            Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
             drawCollectableIcons(player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawEnergyMeter     (player_kart, offset_x, offset_y,
@@ -1043,12 +1040,12 @@ void RaceGUI::drawStatusText(const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
         }   // for pla
         drawTimer           ();
-        if(world->getTime()<TIME_MUSIC_DESCRIPTION 
+        if(RaceManager::getWorld()->getTime()<TIME_MUSIC_DESCRIPTION 
           && race_manager->getMinorMode() != RaceManager::RM_FOLLOW_LEADER)
         {
             drawMusicDescription();
         }
-        else if (world->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION 
+        else if (RaceManager::getWorld()->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION 
           && race_manager->getMinorMode()== RaceManager::RM_FOLLOW_LEADER)
             drawMusicDescription();
             

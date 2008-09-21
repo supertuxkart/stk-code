@@ -21,12 +21,13 @@
 
 #include "network/flyable_info.hpp"
 #include "flyable.hpp"
-#include "world.hpp"
 #include "kart.hpp"
 #include "projectile_manager.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
 #include "utils/ssg_help.hpp"
+#include "race_manager.hpp"
+#include "modes/world.hpp"
 
 // static variables:
 float      Flyable::m_st_speed[COLLECT_MAX];
@@ -78,7 +79,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape);
     m_user_pointer.set(this);
-    world->getPhysics()->addBody(getBody());
+    RaceManager::getWorld()->getPhysics()->addBody(getBody());
 
     if(gravity) m_body->setGravity(btVector3(0.0f, 0.0f, -9.8f));
     else m_body->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -120,7 +121,7 @@ void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model,
 Flyable::~Flyable()
 {
     if(m_shape) delete m_shape;
-    world->getPhysics()->removeBody(getBody());
+    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
@@ -134,7 +135,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     
     for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
-        Kart *kart = world -> getKart(i);
+        Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated() || kart == m_owner || (!kart->isOnGround()) ) continue;
         btTransform t=kart->getTrans();
        
@@ -145,7 +146,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         {
             // Ignore karts behind the current one
             float distance =  kart->getDistanceDownTrack() - inFrontOf->getDistanceDownTrack();
-            if(distance<0) distance += world->m_track->getTrackLength();
+            if(distance<0) distance += RaceManager::getTrack()->getTrackLength();
             if(distance > 50){ continue; } 
         }
         
@@ -220,12 +221,12 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     // The explosion is a bit higher in the air
     Vec3 pos_explosion=getXYZ();
     pos_explosion.setZ(pos_explosion.getZ()+1.2f);
-    world->getPhysics()->removeBody(getBody());
+    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
-        Kart *kart = world->getKart(i);
+        Kart *kart = RaceManager::getKart(i);
         // Handle the actual explosion. The kart that fired a flyable will 
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.

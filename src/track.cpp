@@ -34,7 +34,7 @@
 #include "translation.hpp"
 #include "scene.hpp"
 #include "moving_physics.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "material_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
@@ -1311,7 +1311,7 @@ void Track::loadTrackModel()
 
     Vec3 min, max;
     SSGHelp::MinMax(m_model, &min, &max);
-    world->getPhysics()->init(min, max);
+    RaceManager::getWorld()->getPhysics()->init(min, max);
     createPhysicsModel();
 }   // loadTrack
 
@@ -1361,7 +1361,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
         }   // AddSingleResult
     };   // myCollision
     MaterialCollision rayCallback(pos, to_pos);
-    world->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
+    RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
 
     if(!rayCallback.HasHit()) 
     {

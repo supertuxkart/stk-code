@@ -18,14 +18,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "triangle_mesh.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 
 // -----------------------------------------------------------------------------
 TriangleMesh::~TriangleMesh()
 {
     if(m_body)
     {
-        world->getPhysics()->removeBody(m_body);
+        RaceManager::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
         delete m_collision_shape;
@@ -58,7 +58,7 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state, m_collision_shape);
     m_body=new btRigidBody(info);
 
-    world->getPhysics()->addBody(m_body);
+    RaceManager::getWorld()->getPhysics()->addBody(m_body);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
     m_body->setCollisionFlags(m_body->getCollisionFlags()  | 

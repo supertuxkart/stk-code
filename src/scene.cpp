@@ -22,7 +22,7 @@
 #include "material.hpp"
 #include "camera.hpp"
 #include "track.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "user_config.hpp"
 
 #include "btBulletDynamicsCommon.h"
@@ -97,7 +97,7 @@ void Scene::draw(float dt)
 {
     glEnable ( GL_DEPTH_TEST ) ;
 
-    const Track* TRACK = world->m_track;
+    const Track* TRACK = RaceManager::getTrack();
 
     ssgGetLight ( 0 ) -> setPosition ( TRACK->getSunPos() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , TRACK->getAmbientCol()  ) ;
@@ -178,7 +178,7 @@ void Scene::draw(float dt)
             float f=2.0f;
             glFrustum(-f, f, -f, f, 1.0, 1000.0);
             
-            Vec3 xyz = world->getKart(race_manager->getNumKarts()-1)->getXYZ();
+            Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
             gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
                       xyz.getX(), xyz.getY(),     xyz.getZ(),
                       0.0f, 0.0f, 1.0f);
@@ -186,10 +186,10 @@ void Scene::draw(float dt)
             
             for (World::Karts::size_type i = 0 ; i < race_manager->getNumKarts(); ++i)
             {
-                Kart *kart=world->getKart((int)i);
+                Kart *kart=RaceManager::getKart((int)i);
                 if(!kart->isEliminated()) kart->draw();
             }
-            world->getPhysics()->draw();
+            RaceManager::getWorld()->getPhysics()->draw();
         }   //  bullet_debug
     }   // for cameras
 

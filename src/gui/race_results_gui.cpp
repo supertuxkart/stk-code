@@ -23,12 +23,12 @@
 #include "race_results_gui.hpp"
 #include "widget_manager.hpp"
 #include "kart_properties.hpp"
-#include "world.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "highscore_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "modes/world.hpp"
 
 enum WidgetTokens
 {
@@ -121,7 +121,7 @@ Widget *RaceResultsGUI::displayLeaderResults()
         }
     } while(!sorted);
     for(unsigned int i=1; i<NUM_KARTS; i++)
-        world->getKart(order[i])->setPosition(i);
+        RaceManager::getKart(order[i])->setPosition(i);
 
     Widget *w_prev=widget_manager->addTextWgt( WTOK_RESULTS, 5, 7, _("Race results") );
     widget_manager->hideWgtRect(WTOK_RESULTS);
@@ -151,7 +151,7 @@ Widget *RaceResultsGUI::displayRaceResults()
 
     for(unsigned int i=0; i < NUM_KARTS; i++)
     {
-        Kart *k = world->getKart(i);             // Display even for eliminated karts!
+        Kart *k = RaceManager::getKart(i);             // Display even for eliminated karts!
         order[k->getPosition()-1] = i;
         const std::string& s = k->getName();
         unsigned int l = (unsigned int)s.size();
@@ -168,7 +168,7 @@ Widget *RaceResultsGUI::displayRaceResults()
     widget_manager->hideWgtRect(WTOK_HIGHSCORES);
     w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
 
-    const Highscores *hs = world->getHighscores();
+    const Highscores *hs = RaceManager::getWorld()->getHighscores();
     unsigned int num_scores = hs->getNumberEntries();
     char *highscores = new char[num_scores * MAX_STR_LEN];
 
@@ -204,7 +204,7 @@ Widget *RaceResultsGUI::displayKartList(unsigned int from, unsigned int to,
     char *score = new char[(to-from+1) * MAX_STR_LEN];
     for(unsigned int i = from; i <= to; ++i)
     {
-        const Kart *KART = world->getKart(order[i]);
+        const Kart *KART = RaceManager::getKart(order[i]);
         const std::string& KART_NAME = KART->getName();
         char sTime[20];sTime[0]=0;
         const float T      = KART->getFinishTime();
@@ -265,16 +265,16 @@ void RaceResultsGUI::select()
         // 1) something was unlocked
         // 2) a Grand Prix is run
         // 3) "back to the main menu" otherwise
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         race_manager->next();
         break;
     case WTOK_RESTART_RACE:
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         menu_manager->popMenu();
         race_manager->rerunRace();
         break;
     case WTOK_SETUP_NEW_RACE:
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         race_manager->exit_race();
         menu_manager->pushMenu(MENUID_GAMEMODE);
         break;

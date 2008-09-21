@@ -22,7 +22,6 @@
 #include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "race_menu.hpp"
-#include "world.hpp"
 
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
@@ -77,13 +76,13 @@ void RaceMenu::select()
     switch (clicked_token)
     {
     case WTOK_RETURN_RACE:
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         menu_manager->popMenu();
         if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
         break;
 
     case WTOK_SETUP_NEW_RACE:
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         race_manager->exit_race();
         menu_manager->pushMenu(MENUID_CHARSEL_P1);
         break;
@@ -91,7 +90,7 @@ void RaceMenu::select()
     case WTOK_RESTART_RACE:
         menu_manager->popMenu();
         if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
-        world->restartRace();
+        RaceManager::getWorld()->restartRace();
         break;
 
     case WTOK_OPTIONS:
@@ -103,7 +102,7 @@ void RaceMenu::select()
         break;
 
     case WTOK_QUIT:
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         race_manager->exit_race();
         break;
 
@@ -121,7 +120,7 @@ void RaceMenu::handle(GameAction ga, int value)
         if (value)
             break;
 		
-        world->unpause();
+        RaceManager::getWorld()->unpause();
         menu_manager->popMenu();
         break;
 

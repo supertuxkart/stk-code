@@ -112,7 +112,6 @@
 		95F0F2C10E85C054005F6693 /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95923D6E0E808ED700388BDC /* actionmap.cpp */; };
 		95F0F2C20E85C054005F6693 /* btOdeQuickstepConstraintSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95923F160E808EDB00388BDC /* btOdeQuickstepConstraintSolver.cpp */; };
 		95F0F2C30E85C054005F6693 /* btSequentialImpulseConstraintSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95923F1D0E808EDB00388BDC /* btSequentialImpulseConstraintSolver.cpp */; };
-		95F0F2C40E85C054005F6693 /* world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959242080E808EE300388BDC /* world.cpp */; };
 		95F0F2C50E85C054005F6693 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959241900E808EE200388BDC /* particle_system.cpp */; };
 		95F0F2C60E85C054005F6693 /* network_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9592417F0E808EE200388BDC /* network_manager.cpp */; };
 		95F0F2C70E85C054005F6693 /* btPersistentManifold.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95923EFA0E808EDA00388BDC /* btPersistentManifold.cpp */; };
@@ -228,6 +227,10 @@
 		95F0F3360E85C054005F6693 /* btSphereTriangleCollisionAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95923EA30E808EDA00388BDC /* btSphereTriangleCollisionAlgorithm.cpp */; };
 		95F0F3380E85C054005F6693 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959241440E808EE100388BDC /* parser.cpp */; };
 		95F0F35D0E85C140005F6693 /* random_generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956F3FAB0E85BE0E006F93B0 /* random_generator.cpp */; };
+		95F0F36E0E85C6A6005F6693 /* clock.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F0F36C0E85C6A6005F6693 /* clock.hpp */; };
+		95F0F36F0E85C6A6005F6693 /* clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F0F36D0E85C6A6005F6693 /* clock.cpp */; };
+		95F0F3830E85C76B005F6693 /* world.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95F0F3810E85C76B005F6693 /* world.hpp */; };
+		95F0F3840E85C76B005F6693 /* world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F0F3820E85C76B005F6693 /* world.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -243,6 +246,8 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
+				95F0F36E0E85C6A6005F6693 /* clock.hpp in CopyFiles */,
+				95F0F3830E85C76B005F6693 /* world.hpp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -716,8 +721,6 @@
 		959241F70E808EE300388BDC /* user_pointer.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = user_pointer.hpp; sourceTree = "<group>"; };
 		959241FB0E808EE300388BDC /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = vec3.cpp; sourceTree = "<group>"; };
 		959241FC0E808EE300388BDC /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = vec3.hpp; sourceTree = "<group>"; };
-		959242080E808EE300388BDC /* world.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = world.cpp; sourceTree = "<group>"; };
-		959242090E808EE300388BDC /* world.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = world.hpp; sourceTree = "<group>"; };
 		95B422010E8586A900FA795B /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = music.hpp; sourceTree = "<group>"; };
 		95B422020E8586A900FA795B /* music_information.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = music_information.cpp; sourceTree = "<group>"; };
 		95B422030E8586A900FA795B /* music_information.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = music_information.hpp; sourceTree = "<group>"; };
@@ -977,6 +980,10 @@
 		95E106DB0E28F66200503124 /* btTransformUtil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = btTransformUtil.h; sourceTree = "<group>"; };
 		95E106DC0E28F66200503124 /* btTypedUserInfo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = btTypedUserInfo.h; sourceTree = "<group>"; };
 		95E106DD0E28F66200503124 /* btVector3.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = btVector3.h; sourceTree = "<group>"; };
+		95F0F36C0E85C6A6005F6693 /* clock.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = clock.hpp; path = modes/clock.hpp; sourceTree = "<group>"; };
+		95F0F36D0E85C6A6005F6693 /* clock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clock.cpp; path = modes/clock.cpp; sourceTree = "<group>"; };
+		95F0F3810E85C76B005F6693 /* world.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = world.hpp; path = modes/world.hpp; sourceTree = "<group>"; };
+		95F0F3820E85C76B005F6693 /* world.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = world.cpp; path = modes/world.cpp; sourceTree = "<group>"; };
 		95F4221E0E26DF0A00692113 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -1042,10 +1049,13 @@
 			isa = PBXGroup;
 			children = (
 				95B422000E8586A900FA795B /* audio */,
-				957B11D70E8320CD002A69EA /* follow_the_leader.hpp */,
-				957B11D80E8320CD002A69EA /* follow_the_leader.cpp */,
-				957B11B30E831DA8002A69EA /* standard_race.hpp */,
-				957B11B40E831DA8002A69EA /* standard_race.cpp */,
+				95F0F3710E85C6D3005F6693 /* modes */,
+				95923F6A0E808EDC00388BDC /* challenges */,
+				95923FD50E808EDD00388BDC /* gui */,
+				956F3FAA0E85BE0E006F93B0 /* utils */,
+				9592413F0E808EE100388BDC /* lisp */,
+				9592416F0E808EE200388BDC /* network */,
+				959241B50E808EE200388BDC /* robots */,
 				95923D6E0E808ED700388BDC /* actionmap.cpp */,
 				95923D6F0E808ED700388BDC /* actionmap.hpp */,
 				95923D710E808ED700388BDC /* attachment.cpp */,
@@ -1055,20 +1065,17 @@
 				95923D770E808ED700388BDC /* auto_kart.hpp */,
 				95923D790E808ED700388BDC /* bowling.cpp */,
 				95923D7A0E808ED700388BDC /* bowling.hpp */,
-				95923D7C0E808ED700388BDC /* bullet */,
 				95923F610E808EDB00388BDC /* callback.hpp */,
 				95923F620E808EDB00388BDC /* callback_manager.cpp */,
 				95923F630E808EDB00388BDC /* callback_manager.hpp */,
 				95923F650E808EDB00388BDC /* camera.cpp */,
 				95923F660E808EDB00388BDC /* camera.hpp */,
-				95923F6A0E808EDC00388BDC /* challenges */,
 				95923F710E808EDC00388BDC /* collectable.cpp */,
 				95923F720E808EDC00388BDC /* collectable.hpp */,
 				95923F740E808EDC00388BDC /* collectable_manager.cpp */,
 				95923F750E808EDC00388BDC /* collectable_manager.hpp */,
 				95923F7B0E808EDC00388BDC /* constants.hpp */,
 				95923F7C0E808EDC00388BDC /* coord.hpp */,
-				95923F800E808EDC00388BDC /* enet */,
 				95923FC00E808EDD00388BDC /* explosion.cpp */,
 				95923FC10E808EDD00388BDC /* explosion.hpp */,
 				95923FC40E808EDD00388BDC /* file_manager.cpp */,
@@ -1079,11 +1086,9 @@
 				95923FCE0E808EDD00388BDC /* grand_prix_data.hpp */,
 				95923FD10E808EDD00388BDC /* grand_prix_manager.cpp */,
 				95923FD20E808EDD00388BDC /* grand_prix_manager.hpp */,
-				95923FD50E808EDD00388BDC /* gui */,
 				959240150E808EDD00388BDC /* herring.cpp */,
 				959240160E808EDD00388BDC /* herring.hpp */,
 				959240180E808EDD00388BDC /* herring_manager.cpp */,
-				956F3FAA0E85BE0E006F93B0 /* utils */,
 				959240190E808EDD00388BDC /* herring_manager.hpp */,
 				9592401B0E808EDD00388BDC /* highscore_manager.cpp */,
 				9592401C0E808EDD00388BDC /* highscore_manager.hpp */,
@@ -1103,7 +1108,6 @@
 				959241360E808EE100388BDC /* kart_properties.hpp */,
 				959241380E808EE100388BDC /* kart_properties_manager.cpp */,
 				959241390E808EE100388BDC /* kart_properties_manager.hpp */,
-				9592413F0E808EE100388BDC /* lisp */,
 				959241490E808EE100388BDC /* loader.cpp */,
 				9592414A0E808EE100388BDC /* loader.hpp */,
 				9592414C0E808EE100388BDC /* main.cpp */,
@@ -1121,7 +1125,6 @@
 				959241630E808EE200388BDC /* moving_physics.hpp */,
 				959241650E808EE200388BDC /* moving_texture.cpp */,
 				959241660E808EE200388BDC /* moving_texture.hpp */,
-				9592416F0E808EE200388BDC /* network */,
 				9592418C0E808EE200388BDC /* no_copy.hpp */,
 				959241900E808EE200388BDC /* particle_system.cpp */,
 				959241910E808EE200388BDC /* particle_system.hpp */,
@@ -1143,7 +1146,6 @@
 				959241B00E808EE200388BDC /* replay_player.hpp */,
 				959241B20E808EE200388BDC /* replay_recorder.cpp */,
 				959241B30E808EE200388BDC /* replay_recorder.hpp */,
-				959241B50E808EE200388BDC /* robots */,
 				959241BD0E808EE200388BDC /* scene.cpp */,
 				959241BE0E808EE200388BDC /* scene.hpp */,
 				959241C00E808EE200388BDC /* sdldrv.cpp */,
@@ -1178,8 +1180,8 @@
 				959241F70E808EE300388BDC /* user_pointer.hpp */,
 				959241FB0E808EE300388BDC /* vec3.cpp */,
 				959241FC0E808EE300388BDC /* vec3.hpp */,
-				959242080E808EE300388BDC /* world.cpp */,
-				959242090E808EE300388BDC /* world.hpp */,
+				95923D7C0E808ED700388BDC /* bullet */,
+				95923F800E808EDC00388BDC /* enet */,
 			);
 			name = src;
 			path = ../..;
@@ -2043,6 +2045,21 @@
 			path = LinearMath;
 			sourceTree = "<group>";
 		};
+		95F0F3710E85C6D3005F6693 /* modes */ = {
+			isa = PBXGroup;
+			children = (
+				95F0F3810E85C76B005F6693 /* world.hpp */,
+				95F0F3820E85C76B005F6693 /* world.cpp */,
+				95F0F36C0E85C6A6005F6693 /* clock.hpp */,
+				95F0F36D0E85C6A6005F6693 /* clock.cpp */,
+				957B11D70E8320CD002A69EA /* follow_the_leader.hpp */,
+				957B11D80E8320CD002A69EA /* follow_the_leader.cpp */,
+				957B11B30E831DA8002A69EA /* standard_race.hpp */,
+				957B11B40E831DA8002A69EA /* standard_race.cpp */,
+			);
+			name = modes;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2189,7 +2206,6 @@
 				95F0F2C10E85C054005F6693 /* actionmap.cpp in Sources */,
 				95F0F2C20E85C054005F6693 /* btOdeQuickstepConstraintSolver.cpp in Sources */,
 				95F0F2C30E85C054005F6693 /* btSequentialImpulseConstraintSolver.cpp in Sources */,
-				95F0F2C40E85C054005F6693 /* world.cpp in Sources */,
 				95F0F2C50E85C054005F6693 /* particle_system.cpp in Sources */,
 				95F0F2C60E85C054005F6693 /* network_manager.cpp in Sources */,
 				95F0F2C70E85C054005F6693 /* btPersistentManifold.cpp in Sources */,
@@ -2305,6 +2321,8 @@
 				95F0F3360E85C054005F6693 /* btSphereTriangleCollisionAlgorithm.cpp in Sources */,
 				95F0F3380E85C054005F6693 /* parser.cpp in Sources */,
 				95F0F35D0E85C140005F6693 /* random_generator.cpp in Sources */,
+				95F0F36F0E85C6A6005F6693 /* clock.cpp in Sources */,
+				95F0F3840E85C76B005F6693 /* world.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

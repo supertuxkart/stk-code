@@ -21,7 +21,7 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "coord.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "player_kart.hpp"
 #include "track.hpp"
 #include "camera.hpp"
@@ -39,7 +39,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_hpr      = Vec3(0,0,0);
 
     // FIXME: clipping should be configurable for slower machines
-    const Track* track  = world->getTrack();
+    const Track* track  = RaceManager::getTrack();
     if (track->useFog())
         m_context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
     else
@@ -98,7 +98,7 @@ void Camera::setMode(Mode mode)
 {
     if(mode==CM_FINAL)
     {
-        const Track* track=world->getTrack();
+        const Track* track=RaceManager::getTrack();
         // If the track doesn't have a final position, ignore this mode
         if(!track->hasFinalCamera()) return;
         const float duration = 1.0f;
@@ -149,7 +149,7 @@ void Camera::update (float dt)
     // First define the position of the kart
     if(m_mode==CM_LEADER_MODE)
     {
-        kart     = world->getKart(0);
+        kart     = RaceManager::getKart(0);
         kart_hpr = kart->getHPR();
     }
     else
@@ -161,7 +161,7 @@ void Camera::update (float dt)
         kart_hpr.setRoll(0.0f);
         // Only adjust the pitch if it's not the race start, otherwise 
         // the camera will change pitch during ready-set-go.
-        if(world->getClock().isRacePhase())
+        if(RaceManager::getWorld()->getClock().isRacePhase())
         {
             // If the terrain pitch is 'significantly' different from the camera angle,
             // start adjusting the camera. This helps with steep declines, where

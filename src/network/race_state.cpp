@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "projectile_manager.hpp"
@@ -33,7 +33,7 @@ void RaceState::serialise()
 
     // 1. Add all kart information
     // ---------------------------
-    unsigned int num_karts = world->getCurrentNumKarts();
+    unsigned int num_karts = RaceManager::getWorld()->getCurrentNumKarts();
     KartControl c;
     // Send the number of karts and for each kart the compressed 
     // control structure, xyz,hpr, and speed (which is necessary to
@@ -63,7 +63,7 @@ void RaceState::serialise()
     addChar(num_karts);
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart=world->getKart(i);
+        const Kart* kart = RaceManager::getKart(i);
         m_kart_controls[i].serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
@@ -121,7 +121,7 @@ void RaceState::receive(ENetPacket *pkt)
         // Currently not used!
         Vec3 xyz       = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart     = world->getKart(i);
+        Kart *kart     = RaceManager::getKart(i);
         // Firing needs to be done from here to guarantee that any potential
         // new rockets are created before the update for the rockets is handled
         if(kc.fire)
@@ -138,10 +138,10 @@ void RaceState::receive(ENetPacket *pkt)
     {
         HerringInfo hi(this);
         if(hi.m_herring_id==-1)     // Rescue triggered
-            world->getKart(hi.m_kart_id)->forceRescue();
+            RaceManager::getKart(hi.m_kart_id)->forceRescue();
         else
             herring_manager->eatenHerring(hi.m_herring_id,
-                                          world->getKart(hi.m_kart_id),
+                                          RaceManager::getKart(hi.m_kart_id),
                                           hi.m_add_info);
     }
 
@@ -166,12 +166,12 @@ void RaceState::receive(ENetPacket *pkt)
         signed char kart_id2 = getChar();
         if(kart_id2==-1)
         {   // kart - track collision
-            world->getKart(kart_id1)->crashed(NULL);
+            RaceManager::getKart(kart_id1)->crashed(NULL);
         }
         else
         {
-            world->getPhysics()->KartKartCollision(world->getKart(kart_id1),
-                                                   world->getKart(kart_id2));
+            RaceManager::getWorld()->getPhysics()->KartKartCollision(RaceManager::getKart(kart_id1),
+                                                        RaceManager::getKart(kart_id2));
         }
     }   // for(i=0; i<num_collisions; i+=2)
     clear();  // free message buffer

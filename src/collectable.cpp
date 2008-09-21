@@ -27,7 +27,7 @@
 #include "kart.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "stk_config.hpp"
 
 //-----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void Collectable::use()
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
         {
-            Kart *kart=world->getKart(i);
+            Kart *kart=RaceManager::getKart(i);
             if(kart->isEliminated()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
@@ -135,7 +135,7 @@ void Collectable::use()
             //are in front of this one.
             for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
             {
-                Kart *kart=world->getKart(i);
+                Kart *kart=RaceManager::getKart(i);
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(m_owner->getPosition() > kart->getPosition())
                 {
@@ -181,7 +181,7 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
             m_number  = 1;
             return;
         }
-        const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
+        const int SPECIAL_PROB = (int)(15.0 / ((float)RaceManager::getWorld()->getCurrentNumKarts() /
                                          (float)m_owner->getPosition()));
         const int RAND_NUM = m_random.get(100);
         if(RAND_NUM <= SPECIAL_PROB)
@@ -190,7 +190,7 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
             //the parachute.
             for(unsigned int i=0; i < race_manager->getNumKarts(); ++i)
             {
-                Kart *kart = world->getKart(i);
+                Kart *kart = RaceManager::getKart(i);
                 if(kart->isEliminated() || kart == m_owner) continue;
                 if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {

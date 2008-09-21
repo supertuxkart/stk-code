@@ -18,7 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "history.hpp"
-#include "world.hpp"
 #include "kart.hpp"
 #include "track.hpp"
 #include "race_manager.hpp"
@@ -68,12 +67,12 @@ void History::Save()
     fprintf(fd, "numkarts: %d\n",   nKarts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
-    fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
+    fprintf(fd, "track: %s\n",      RaceManager::getTrack()->getIdent().c_str());
 
     int k;
     for(k=0; k<nKarts; k++)
     {
-        fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getName().c_str());
+        fprintf(fd, "model %d: %s\n",k, RaceManager::getKart(k)->getName().c_str());
     }
     fprintf(fd, "size:     %d\n", GetCount());
 
@@ -86,7 +85,7 @@ void History::Save()
 
     for(int k=0; k<nKarts; k++)
     {
-        Kart* kart= world->getKart(k);
+        Kart* kart= RaceManager::getKart(k);
         char s[1024];
         j = m_wrapped ? m_current : 0;
         for(int i=0; i<GetCount(); i++)

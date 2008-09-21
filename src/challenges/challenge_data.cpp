@@ -22,9 +22,10 @@
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "translation.hpp"
-#include "world.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
+#include "kart.hpp"
+#include "track.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -215,11 +216,11 @@ bool ChallengeData::raceFinished()
 
     // Single races
     // ------------
-    std::string track_name = world->getTrack()->getIdent();
+    std::string track_name = RaceManager::getTrack()->getIdent();
     if(track_name!=m_track_name                    ) return false;    // wrong track
     if((int)race_manager->getNumKarts()<m_num_karts) return false;    // not enough AI karts
 
-    Kart* kart=world->getPlayerKart(0);
+    Kart* kart = RaceManager::getPlayerKart(0);
     if(m_energy>0   && kart->getNumHerring()<m_energy) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 
@@ -246,7 +247,7 @@ bool ChallengeData::grandPrixFinished()
         race_manager->getNumKarts()   < (unsigned int)m_num_karts            ||
         race_manager->getNumPlayers() > 1) return false;
 
-    Kart* kart=world->getPlayerKart(0);
+    Kart* kart = RaceManager::getPlayerKart(0);
     if(kart->getPosition()>m_position) return false;
     return true;
 }   // grandPrixFinished

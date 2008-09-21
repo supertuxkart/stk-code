@@ -20,8 +20,8 @@
 #include "gui/menu_manager.hpp"
 #include "user_config.hpp"
 
-// -----------------------------
-FollowTheLeaderRace::FollowTheLeaderRace() : World(), ClockListener()
+//-----------------------------------------------------------------------------
+FollowTheLeaderRace::FollowTheLeaderRace() : World(), Clock::ClockListener()
 {
     m_leader_intervals    = stk_config->m_leader_intervals;
     
@@ -29,22 +29,26 @@ FollowTheLeaderRace::FollowTheLeaderRace() : World(), ClockListener()
     m_clock.setMode(COUNTDOWN, m_leader_intervals[0]);
 }
 
-// ----------------------------
+//-----------------------------------------------------------------------------
 FollowTheLeaderRace::~FollowTheLeaderRace()
 {
 }
 
+//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::restartRace()
 {
     World::restartRace();
     m_leader_intervals    = stk_config->m_leader_intervals;
 }
 
-// clock events
+#pragma mark -
+#pragma mark clock events
+
+//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::countdownReachedZero()
 {
 }
-
+//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::onGo()
 {
     // Reset the brakes now that the prestart 
@@ -55,7 +59,7 @@ void FollowTheLeaderRace::onGo()
         m_kart[i]->resetBrakes();
     }
 }
-
+//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::update(float delta)
 {
     m_clock.updateClock(delta);
@@ -107,7 +111,7 @@ void FollowTheLeaderRace::update(float delta)
         }
     }
 }
-
+//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::onTerminate()
 {
     World::terminateRace();

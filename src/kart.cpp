@@ -37,7 +37,6 @@
 #include "constants.hpp"
 #include "shadow.hpp"
 #include "track.hpp"
-#include "world.hpp"
 #include "kart.hpp"
 #include "physics.hpp"
 #include "translation.hpp"
@@ -180,7 +179,7 @@ void Kart::createPhysics(ssgEntity *obj)
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster = 
-        new btDefaultVehicleRaycaster(world->getPhysics()->getPhysicsWorld());
+        new btDefaultVehicleRaycaster(RaceManager::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btRaycastVehicle::btVehicleTuning();
 	m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
     m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
@@ -251,7 +250,7 @@ void Kart::createPhysics(ssgEntity *obj)
     m_uprightConstraint->setErp(1.0f);
     m_uprightConstraint->setLimitSoftness(1.0f);
     m_uprightConstraint->setDamping(0.0f);
-    world->getPhysics()->addKart(this, m_vehicle);
+    RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
 
     //create the engine sound
     if(m_engine_sound)
@@ -290,7 +289,7 @@ Kart::~Kart()
     if(m_skidmark_left ) delete m_skidmark_left ;
     if(m_skidmark_right) delete m_skidmark_right;
 
-    world->getPhysics()->removeKart(this);
+    RaceManager::getWorld()->getPhysics()->removeKart(this);
     delete m_vehicle;
     delete m_tuning;
     delete m_vehicle_raycaster;
@@ -305,7 +304,7 @@ Kart::~Kart()
 void Kart::eliminate()
 {
     m_eliminated = true;
-    world->getPhysics()->removeKart(this);
+    RaceManager::getWorld()->getPhysics()->removeKart(this);
 
     // make the kart invisible by placing it way under the track
     sgVec3 hell; hell[0]=0.0f; hell[1]=0.0f; hell[2] = -10000.0f;
@@ -341,7 +340,7 @@ void Kart::reset()
 {
     if(m_eliminated)
     {
-        world->getPhysics()->addKart(this, m_vehicle);
+        RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
     }
 
     m_attachment.clear();
@@ -373,14 +372,14 @@ void Kart::reset()
 
     setTrans(m_reset_transform);
 
-    world->m_track->findRoadSector(getXYZ(), &m_track_sector);
+    RaceManager::getTrack()->findRoadSector(getXYZ(), &m_track_sector);
 
     //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     //the road, so we have to use another function to find the sector.
     if (m_track_sector == Track::UNKNOWN_SECTOR )
     {
         m_on_road = false;
-        m_track_sector = world->m_track->findOutOfRoadSector(
+        m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
             getXYZ(), Track::RS_DONT_KNOW, Track::UNKNOWN_SECTOR );
     }
     else
@@ -388,7 +387,7 @@ void Kart::reset()
         m_on_road = true;
     }
 
-    world->m_track->spatialToTrack(m_curr_track_coords, getXYZ(),
+    RaceManager::getTrack()->spatialToTrack(m_curr_track_coords, getXYZ(),
                                    m_track_sector );
 
     m_vehicle->applyEngineForce (0.0f, 2);
@@ -404,7 +403,7 @@ void Kart::reset()
     // add the vehicle back into the physical world!
     if(m_rescue)
     {
-        world->getPhysics()->addKart(this, m_vehicle);
+        RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
     }
     m_rescue               = false;
     TerrainInfo::update(getXYZ());
@@ -421,7 +420,7 @@ void Kart::doLapCounting ()
         // will begin another countdown).
         if(m_race_lap+1<=race_manager->getNumLaps())
         {
-            setTimeAtLap(world->getTime());
+            setTimeAtLap(RaceManager::getWorld()->getTime());
             m_race_lap++ ;
         }
         // Race finished
@@ -429,7 +428,7 @@ void Kart::doLapCounting ()
         if(m_race_lap>=race_manager->getNumLaps() && 
             race_manager->getMinorMode()!=RaceManager::RM_FOLLOW_LEADER)
         {
-            raceFinished(world->getTime());
+            raceFinished(RaceManager::getWorld()->getTime());
         }
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
@@ -438,17 +437,17 @@ void Kart::doLapCounting ()
             float time_per_lap;
             if (m_race_lap == 1) // just completed first lap
             {
-            	time_per_lap=world->getTime();
+            	time_per_lap=RaceManager::getWorld()->getTime();
             }
             else //completing subsequent laps
             {
-            	time_per_lap=world->getTime()-m_lap_start_time;
+            	time_per_lap=RaceManager::getWorld()->getTime()-m_lap_start_time;
             }
                         
-            if(time_per_lap < world->getFastestLapTime() &&
+            if(time_per_lap < RaceManager::getWorld()->getFastestLapTime() &&
                 race_manager->raceHasLaps())
             {
-                world->setFastestLap(this, time_per_lap);
+                RaceManager::getWorld()->setFastestLap(this, time_per_lap);
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
                 if(m)
                 {
@@ -461,14 +460,14 @@ void Kart::doLapCounting ()
                     m->addMessage(m_fastest_lap_message, NULL, 
                                   2.0f, 40, 100, 210, 100);
                 }   // if m
-            }   // if time_per_lap < world->getFasterstLapTime()
+            }   // if time_per_lap < RaceManager::getWorld()->getFasterstLapTime()
             if(isPlayerKart())
             {
                 // Put in in the highscore list???
                 //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
             }
         }
-        m_lap_start_time = world->getTime();
+        m_lap_start_time = RaceManager::getWorld()->getTime();
     }
     else if ( m_curr_track_coords.getY() > 300.0f && m_last_track_coords[1] <  20.0f)
     {
@@ -479,7 +478,7 @@ void Kart::doLapCounting ()
     } else
     {   // Switch to fast music in case of follow the leader when only 3 karts are left
         if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER &&
-            world->getCurrentNumKarts()==3)  
+            RaceManager::getWorld()->getCurrentNumKarts()==3)  
         {
             sound_manager->switchToFastMusic();
         }
@@ -625,7 +624,7 @@ void Kart::update(float dt)
             m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
-            world->getPhysics()->removeKart(this);
+            RaceManager::getWorld()->getPhysics()->removeKart(this);
             race_state->herringCollected(getWorldKartId(), -1, -1);
         }
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
@@ -706,10 +705,10 @@ void Kart::update(float dt)
 
     int prev_sector = m_track_sector;
     if(!m_rescue)
-        world->m_track->findRoadSector(getXYZ(), &m_track_sector);
+        RaceManager::getTrack()->findRoadSector(getXYZ(), &m_track_sector);
 
     // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(!m_rescue && world->m_track->isShortcut(prev_sector, m_track_sector))
+    if(!m_rescue && RaceManager::getTrack()->isShortcut(prev_sector, m_track_sector))
     {
 	    forceRescue(/*is rescue*/ true);  // bring karts back to where they left the track.     
 	    if(isPlayerKart())
@@ -726,10 +725,10 @@ void Kart::update(float dt)
     {
         m_on_road = false;
         if( m_curr_track_coords[0] > 0.0 )
-            m_track_sector = world->m_track->findOutOfRoadSector(
+            m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
                getXYZ(), Track::RS_RIGHT, prev_sector );
         else
-            m_track_sector = world->m_track->findOutOfRoadSector(
+            m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
                getXYZ(), Track::RS_LEFT, prev_sector );
     }
     else
@@ -737,7 +736,7 @@ void Kart::update(float dt)
         m_on_road = true;
     }
 
-    world->m_track->spatialToTrack( m_curr_track_coords, 
+    RaceManager::getTrack()->spatialToTrack( m_curr_track_coords, 
                                     getXYZ(),
                                     m_track_sector      );
 
@@ -771,7 +770,7 @@ void Kart::draw()
     t.getOpenGLMatrix(m);
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
-    world->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
+    RaceManager::getWorld()->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
                                    wire_color);
     btCylinderShapeX wheelShape( btVector3(0.1f,
                                         m_kart_properties->getWheelRadius(),
@@ -782,7 +781,7 @@ void Kart::draw()
         m_vehicle->updateWheelTransform(i, true);
         float m[16];
         m_vehicle->getWheelInfo(i).m_worldTransform.getOpenGLMatrix(m);
-        world->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
+        RaceManager::getWorld()->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
     }
 }   // draw
 
@@ -985,9 +984,9 @@ void Kart::forceRescue(bool is_shortcut)
 void Kart::endRescue()
 {
     if ( m_track_sector > 0 ) m_track_sector-- ;
-    setXYZ( world->m_track->trackToSpatial(m_track_sector) );
+    setXYZ( RaceManager::getTrack()->trackToSpatial(m_track_sector) );
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector]) );
+                         DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[m_track_sector]) );
     setRotation(heading);
     m_rescue = false ;
 
@@ -1005,9 +1004,9 @@ void Kart::endRescue()
     // a rescue, ...
     pos.setOrigin(getXYZ()+btVector3(0, 0, 0.5f*getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-                                 DEGREE_TO_RAD(world->m_track->m_angle[m_track_sector])));
+                                 DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
-    world->getPhysics()->addKart(this, m_vehicle);
+    RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
     setTrans(pos);
 }   // endRescue
 
@@ -1179,16 +1178,16 @@ float Kart::estimateFinishTime  ()
     // higher average speed and therefore finish the race earlier 
     // than karts further behind), so the position doesn't have to
     // be updated to get the correct scoring.
-    float distance_covered  = getLap()*world->m_track->getTrackLength()
+    float distance_covered  = getLap()*RaceManager::getTrack()->getTrackLength()
                             + getDistanceDownTrack();
     // In case that a kart is rescued behind start line, or ...
     if(distance_covered<0) distance_covered =1.0f;
 
-    float average_speed     = distance_covered/world->getTime();
+    float average_speed     = distance_covered/RaceManager::getWorld()->getTime();
 
     // Finish time is the time needed for the whole race with 
     // the average speed computed above.
-    return race_manager->getNumLaps()*world->getTrack()->getTrackLength() 
+    return race_manager->getNumLaps()*RaceManager::getTrack()->getTrackLength() 
           / average_speed;
 
 }   // estimateFinishTime

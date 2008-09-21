@@ -39,7 +39,7 @@
 #include <iostream>
 #include "constants.hpp"
 #include "scene.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
 
@@ -97,7 +97,7 @@ void DefaultRobot::update( float delta )
         return;
     }
 
-    if( world->getClock().isStartPhase() )
+    if( RaceManager::getWorld()->getClock().isStartPhase() )
     {
         handle_race_start();
         AutoKart::update( delta );
@@ -155,21 +155,21 @@ void DefaultRobot::handle_braking()
 {
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
-    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER &&
-        getPosition()<world->getKart(0)->getPosition()             &&
+    if(race_manager->getMinorMode() == RaceManager::RM_FOLLOW_LEADER &&
+        getPosition() < RaceManager::getKart(0)->getPosition()             &&
         getInitialPosition()>1                                       )
     {
         m_controls.brake = true;
         return;
     }
-    const float MIN_SPEED = world->m_track->getWidth()[m_track_sector];
+    const float MIN_SPEED = RaceManager::getTrack()->getWidth()[m_track_sector];
 
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
     if ( m_crashes.m_road && m_on_road && getVelocityLC().getY() > MIN_SPEED)
     {
-        float kart_ang_diff = world->m_track->m_angle[m_track_sector] -
+        float kart_ang_diff = RaceManager::getTrack()->m_angle[m_track_sector] -
                               RAD_TO_DEGREE(getHPR().getHeading());
         kart_ang_diff = normalize_angle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
@@ -184,9 +184,8 @@ void DefaultRobot::handle_braking()
             //if the curve angle is bigger than what the kart can steer, brake
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
-            if(!(getDistanceToCenter() > world->m_track->
-                getWidth()[m_track_sector] * -CURVE_INSIDE_PERC ||
-                m_curve_angle > getMaxSteerAngle()))
+            if(!(getDistanceToCenter() > RaceManager::getTrack()->getWidth()[m_track_sector] *
+                 -CURVE_INSIDE_PERC || m_curve_angle > getMaxSteerAngle()))
             {
                 m_controls.brake = false;
                 return;
@@ -194,9 +193,8 @@ void DefaultRobot::handle_braking()
         }
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
-            if(!(getDistanceToCenter() < world->m_track->
-                getWidth()[m_track_sector] * CURVE_INSIDE_PERC ||
-                m_curve_angle < -getMaxSteerAngle()))
+            if(!(getDistanceToCenter() < RaceManager::getTrack()->getWidth()[m_track_sector] *
+                 CURVE_INSIDE_PERC || m_curve_angle < -getMaxSteerAngle()))
             {
                 m_controls.brake = false;
                 return;
@@ -206,8 +204,8 @@ void DefaultRobot::handle_braking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        float angle_adjust = world->m_track->getAIAngleAdjustment();
-        float speed_adjust = world->m_track->getAICurveSpeedAdjustment();
+        float angle_adjust = RaceManager::getTrack()->getAIAngleAdjustment();
+        float speed_adjust = RaceManager::getTrack()->getAICurveSpeedAdjustment();
         if(getVelocityLC().getY() > speed_adjust*m_curve_target_speed ||
            kart_ang_diff          > angle_adjust*MIN_TRACK_ANGLE         )
         {
@@ -226,7 +224,7 @@ void DefaultRobot::handle_braking()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_steering()
 {
-    const unsigned int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
     const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
         m_track_sector + 1 : 0;
     float steer_angle = 0.0f;
@@ -236,9 +234,9 @@ void DefaultRobot::handle_steering()
      */
     //Reaction to being outside of the road
     if( fabsf(getDistanceToCenter()) + 0.5 >
-        world->m_track->getWidth()[m_track_sector] )
+        RaceManager::getTrack()->getWidth()[m_track_sector] )
     {
-        steer_angle = steer_to_point( world->m_track->
+        steer_angle = steer_to_point( RaceManager::getTrack()->
             m_driveline[NEXT_SECTOR] );
 
 #ifdef AI_DEBUG
@@ -263,7 +261,7 @@ void DefaultRobot::handle_steering()
         }
         else
         {
-            if(getDistanceToCenter() > world->getKart(m_crashes.m_kart)->
+            if(getDistanceToCenter() > RaceManager::getKart(m_crashes.m_kart)->
                getDistanceToCenter())
             {
                 steer_angle = steer_to_angle( NEXT_SECTOR, -90.0f );
@@ -349,7 +347,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             case COLLECT_ZIPPER:
                 {
                     const float ANGLE_DIFF = fabsf( normalize_angle(
-                        world->m_track->m_angle[m_track_sector]-
+                        RaceManager::getTrack()->m_angle[m_track_sector]-
                         RAD_TO_DEGREE(getHPR().getHeading()) ) );
 
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
@@ -365,7 +363,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             case COLLECT_HOMING:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
-		  if( (getXYZ()-world->getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
+		  if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
 		      m_kart_properties->getKartLength() * 2.5f )
                     {
                         m_controls.fire = true;
@@ -414,7 +412,7 @@ void DefaultRobot::handle_acceleration( const float DELTA )
         //Find if any player is ahead of this kart
         bool player_winning = false;
         for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-            if( m_race_position > world->getPlayerKart(i)->getPosition() )
+            if( m_race_position > RaceManager::getPlayerKart(i)->getPosition() )
             {
                 player_winning = true;
                 break;
@@ -463,13 +461,13 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     {
         step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * float(i);
 
-        world->m_track->spatialToTrack(step_track_coord, step_coord,
+        RaceManager::getTrack()->spatialToTrack(step_track_coord, step_coord,
                                        m_future_sector );
 
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];
 
-        if( distance > world->m_track->getWidth()[m_track_sector] )
+        if( distance > RaceManager::getTrack()->getWidth()[m_track_sector] )
         {
             return false;
         }
@@ -513,7 +511,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
 
 
     // check if kart is stuck
-    if(getSpeed()<2.0f && !isRescue() && !world->getClock().isStartPhase())
+    if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->getClock().isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
@@ -531,7 +529,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
 //-----------------------------------------------------------------------------
 float DefaultRobot::steer_to_angle (const size_t SECTOR, const float ANGLE)
 {
-    float angle = world->m_track->m_angle[SECTOR];
+    float angle = RaceManager::getTrack()->m_angle[SECTOR];
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - RAD_TO_DEGREE(getHPR().getHeading());
@@ -577,7 +575,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 
     Vec3 vel_normal;
 	//in this func we use it as a 2d-vector, but later on it is passed
-	//to world->m_track->findRoadSector, there it is used as a 3d-vector
+	//to RaceManager::getTrack()->findRoadSector, there it is used as a 3d-vector
 	//to find distance to plane, so z must be initialized to zero
     Vec3 step_coord;
     SGfloat kart_distance;
@@ -612,19 +610,19 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const Kart* kart=world->getKart(j);
+                const Kart* kart = RaceManager::getKart(j);
                 if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
 
-		kart_distance = (step_coord-world->getKart(j)->getXYZ()).length_2d();
+		kart_distance = (step_coord - RaceManager::getKart(j)->getXYZ()).length_2d();
 
                 if( kart_distance < m_kart_properties->getKartLength() + 0.125f * i )
-                    if( getVelocityLC().getY() > world->getKart(j)->
+                    if( getVelocityLC().getY() > RaceManager::getKart(j)->
                        getVelocityLC().getY() * 0.75f ) m_crashes.m_kart = j;
             }
         }
 
         /*Find if we crash with the drivelines*/
-        world->m_track->findRoadSector(step_coord, &m_sector);
+        RaceManager::getTrack()->findRoadSector(step_coord, &m_sector);
 
 #ifdef SHOW_FUTURE_PATH
 
@@ -666,7 +664,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 
         if( m_sector == Track::UNKNOWN_SECTOR )
         {
-            m_future_sector = world->getTrack()->findOutOfRoadSector( step_coord,
+            m_future_sector = RaceManager::getTrack()->findOutOfRoadSector( step_coord,
                 Track::RS_DONT_KNOW, m_future_sector );
             m_crashes.m_road = true;
             break;
@@ -688,7 +686,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
  */
 void DefaultRobot::find_non_crashing_point( sgVec2 result )
 {
-    const unsigned int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
+    const unsigned int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
 
     unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
         m_track_sector + 1 : 0;
@@ -707,7 +705,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         target_sector = sector + 1 < DRIVELINE_SIZE ? sector + 1 : 0;
 
         //direction is a vector from our kart to the sectors we are testing
-	direction = world->m_track->m_driveline[target_sector] - getXYZ();
+	direction = RaceManager::getTrack()->m_driveline[target_sector] - getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_properties->getKartLength() );
@@ -724,17 +722,16 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         {
             step_coord = getXYZ()+direction*m_kart_properties->getKartLength() * float(i);
 
-            world->m_track->spatialToTrack( step_track_coord, step_coord,
+            RaceManager::getTrack()->spatialToTrack( step_track_coord, step_coord,
                 sector );
 
             distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
                        : -step_track_coord[0];
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_properties->getKartLength() * 0.5f > world->
-                m_track->getWidth()[sector] )
+            if ( distance + m_kart_properties->getKartLength() * 0.5f > RaceManager::getTrack()->getWidth()[sector] )
             {
-                sgCopyVec2( result, world->m_track->m_driveline[sector] );
+                sgCopyVec2( result, RaceManager::getTrack()->m_driveline[sector] );
 
 #ifdef SHOW_NON_CRASHING_POINT
                 ssgaSphere *sphere = new ssgaSphere;
@@ -819,7 +816,7 @@ int DefaultRobot::calc_steps()
     if( fabsf(m_controls.lr) > 0.95 )
     {
         const int WIDTH_STEPS = 
-            (int)( world->m_track->getWidth()[m_future_sector] 
+            (int)( RaceManager::getTrack()->getWidth()[m_future_sector] 
                    /( m_kart_properties->getKartLength() * 2.0 ) );
 
         steps += WIDTH_STEPS;
@@ -869,35 +866,36 @@ float DefaultRobot::get_approx_radius(const int START, const int END) const
 
     if(m_inner_curve == -1)
     {
+        X1 = RaceManager::getTrack()->m_left_driveline[START][0];
+        Y1 = RaceManager::getTrack()->m_left_driveline[START][1];
 
-    X1 = world->m_track->m_left_driveline[START][0];
-    Y1 = world->m_track->m_left_driveline[START][1];
+        X2 = RaceManager::getTrack()->m_left_driveline[MIDDLE][0];
+        Y2 = RaceManager::getTrack()->m_left_driveline[MIDDLE][1];
 
-    X2 = world->m_track->m_left_driveline[MIDDLE][0];
-    Y2 = world->m_track->m_left_driveline[MIDDLE][1];
-
-    X3 = world->m_track->m_left_driveline[END][0];
-    Y3 = world->m_track->m_left_driveline[END][1];
-    }else if (m_inner_curve == 0)
+        X3 = RaceManager::getTrack()->m_left_driveline[END][0];
+        Y3 = RaceManager::getTrack()->m_left_driveline[END][1];
+    }
+    else if (m_inner_curve == 0)
     {
-    X1 = world->m_track->m_driveline[START][0];
-    Y1 = world->m_track->m_driveline[START][1];
+        X1 = RaceManager::getTrack()->m_driveline[START][0];
+        Y1 = RaceManager::getTrack()->m_driveline[START][1];
 
-    X2 = world->m_track->m_driveline[MIDDLE][0];
-    Y2 = world->m_track->m_driveline[MIDDLE][1];
+        X2 = RaceManager::getTrack()->m_driveline[MIDDLE][0];
+        Y2 = RaceManager::getTrack()->m_driveline[MIDDLE][1];
 
-    X3 = world->m_track->m_driveline[END][0];
-    Y3 = world->m_track->m_driveline[END][1];
-    }else if (m_inner_curve == 1)
+        X3 = RaceManager::getTrack()->m_driveline[END][0];
+        Y3 = RaceManager::getTrack()->m_driveline[END][1];
+    }
+    else if (m_inner_curve == 1)
     {
-    X1 = world->m_track->m_right_driveline[START][0];
-    Y1 = world->m_track->m_right_driveline[START][1];
+        X1 = RaceManager::getTrack()->m_right_driveline[START][0];
+        Y1 = RaceManager::getTrack()->m_right_driveline[START][1];
 
-    X2 = world->m_track->m_right_driveline[MIDDLE][0];
-    Y2 = world->m_track->m_right_driveline[MIDDLE][1];
+        X2 = RaceManager::getTrack()->m_right_driveline[MIDDLE][0];
+        Y2 = RaceManager::getTrack()->m_right_driveline[MIDDLE][1];
 
-    X3 = world->m_track->m_right_driveline[END][0];
-    Y3 = world->m_track->m_right_driveline[END][1];
+        X3 = RaceManager::getTrack()->m_right_driveline[END][0];
+        Y3 = RaceManager::getTrack()->m_right_driveline[END][1];
     }
 
     const float A = X2 - X1;
@@ -927,7 +925,7 @@ float DefaultRobot::get_approx_radius(const int START, const int END) const
  */
 void DefaultRobot::find_curve()
 {
-    const int DRIVELINE_SIZE = (unsigned int)world->m_track->m_driveline.size();
+    const int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
     float total_dist = 0.0f;
     int next_hint = m_track_sector;
     int i;
@@ -935,14 +933,14 @@ void DefaultRobot::find_curve()
     for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
     {
         next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        total_dist += sgDistanceVec2(world->m_track->m_driveline[i], world->m_track->m_driveline[next_hint]);
+        total_dist += sgDistanceVec2(RaceManager::getTrack()->m_driveline[i], RaceManager::getTrack()->m_driveline[next_hint]);
     }
 
 
-    m_curve_angle = normalize_angle(world->m_track->m_angle[i] - world->m_track->m_angle[m_track_sector]);
+    m_curve_angle = normalize_angle(RaceManager::getTrack()->m_angle[i] - RaceManager::getTrack()->m_angle[m_track_sector]);
     m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
     // FIXME: 0.9 is the tire grip - but this was never used. For now this
     // 0.9 is left in place to reproduce the same results and AI behaviour,
     // but this function should be updated to bullet physics
-    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * world->m_track->getGravity() * 0.9f);
+    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * RaceManager::getTrack()->getGravity() * 0.9f);
 }

@@ -22,7 +22,7 @@
 #include <cassert>
 
 #include "replay_recorder.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 
 const float ReplayRecorder::REPLAY_TIME_STEP_MIN = 1.0f / (float)ReplayRecorder::REPLAY_FREQUENCY_MAX;
 
@@ -55,25 +55,25 @@ bool ReplayRecorder::initRecorder( unsigned int number_karts, size_t number_prea
 bool ReplayRecorder::pushFrame()
 {
 	// we dont record the startphase ..
-    assert( world->getPhase() != World::START_PHASE );
-    assert( world->getNumKarts() == m_ReplayBuffers.getNumberKarts() );
+    assert( RaceManager::getWorld()->getPhase() != World::START_PHASE );
+    assert( RaceManager::getWorld()->getNumKarts() == m_ReplayBuffers.getNumberKarts() );
 
     // make sure we're not under time-step-min 
     if( m_ReplayBuffers.getNumberFrames() )
     {
         ReplayFrame const *last_Frame = m_ReplayBuffers.getFrameAt( m_ReplayBuffers.getNumberFrames() - 1 );
-        if( (world->getTime() - last_Frame->time) < REPLAY_TIME_STEP_MIN ) return true;
+        if( (RaceManager::getWorld()->getTime() - last_Frame->time) < REPLAY_TIME_STEP_MIN ) return true;
     }
 
     ReplayFrame *pFrame = getNewFrame();
     if( !pFrame ) return false;
-    pFrame->time = world->getClock();
+    pFrame->time = RaceManager::getWorld()->getClock();
 
     Kart const *kart;
-    int number_karts = world->getNumKarts();
+    int number_karts = RaceManager::getWorld()->getNumKarts();
     for( int kart_index = 0; kart_index < number_karts; ++kart_index )
     {
-        kart = world->getKart( kart_index );
+        kart = RaceManager::getKart( kart_index );
         sgCopyCoord( &( pFrame->p_kart_states[ kart_index ].position ), 
                      kart->getCoord() );
     }

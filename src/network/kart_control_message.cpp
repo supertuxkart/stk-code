@@ -17,18 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "kart_control_message.hpp"
-#include "world.hpp"
+#include "modes/world.hpp"
 #include "network/network_kart.hpp"
 
 KartControlMessage::KartControlMessage()
                   : Message(Message::MT_KART_CONTROL)
 {
-    unsigned int num_local_players = world->getCurrentNumLocalPlayers();
+    unsigned int num_local_players = RaceManager::getWorld()->getCurrentNumLocalPlayers();
     unsigned int control_size      = KartControl::getLength();
     allocate(control_size*num_local_players);
     for(unsigned int i=0; i<num_local_players; i++)
     {
-        const Kart *kart            = world->getLocalPlayerKart(i);
+        const Kart *kart            = RaceManager::getWorld()->getLocalPlayerKart(i);
         const KartControl& controls = kart->getControls();
         controls.serialise(this);
     }
@@ -43,7 +43,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         KartControl kc(this);
-        NetworkKart *kart=world->getNetworkKart(i);
+        NetworkKart *kart = RaceManager::getWorld()->getNetworkKart(i);
         kart->setControl(kc);
     }
 };   // KartControlMessage

@@ -41,7 +41,6 @@
 #define _WINSOCKAPI_
 #include <plib/ul.h>
 #include "file_manager.hpp"
-#include "world.hpp"
 #include "btBulletDynamicsCommon.h"
 #include "moving_physics.hpp"
 #include "moving_texture.hpp"

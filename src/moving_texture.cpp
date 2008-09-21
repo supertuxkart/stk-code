@@ -20,8 +20,8 @@
 #include "constants.hpp"
 #include "moving_texture.hpp"
 #include "string_utils.hpp"
-#include "world.hpp"
 #include "translation.hpp"
+#include "modes/world.hpp"
 
 MovingTexture::MovingTexture(char *data, ssgBranch *branch)
 {
@@ -88,7 +88,7 @@ void MovingTexture::update(float dt)
     sgCoord add;
 
 
-    float timer = world->getTime() + m_phase ;
+    float timer = RaceManager::getWorld()->getTime() + m_phase ;
 
     if ( m_cycle != 0.0 && m_mode != MODE_FORWARD )
     {

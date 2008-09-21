@@ -36,7 +36,6 @@
 #include "kart_properties.hpp"
 #include "translation.hpp"
 #include "kart.hpp"
-#include "world.hpp"
 #include "scene.hpp"
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -167,8 +166,7 @@ GrandPrixEnd::GrandPrixEnd()
     //FIXME: this is taken from RaceMode::exit_race,
     //this should be organized better.
     scene->clear();
-    delete world;
-    world = 0;
+    RaceManager::setWorld(NULL);
     race_manager->m_active_race = false;
 
 }

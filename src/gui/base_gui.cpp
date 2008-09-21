@@ -21,7 +21,6 @@
 
 #include "base_gui.hpp"
 #include "widget_manager.hpp"
-#include "world.hpp"
 #include "menu_manager.hpp"
 void
 BaseGUI::animateWidget(const int PREV_SELECTED_WGT, const int SELECTED_WGT)
@@ -87,7 +86,7 @@ BaseGUI::handle(GameAction action, int value)
         if (menu_manager->getMenuStackSize() > 1)
         {
            if(menu_manager->isCurrentMenu(MENUID_RACEMENU))
-             world->unpause();
+             RaceManager::getWorld()->unpause();
 
            menu_manager->popMenu();
         }
