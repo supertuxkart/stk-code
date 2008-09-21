@@ -68,7 +68,6 @@ Clock::Clock()
     // for profiling AI
     m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
     
-    // FIXME - is it a really good idea to reload and delete the sound every race??
     m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
     m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
 }
