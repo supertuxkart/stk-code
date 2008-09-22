@@ -426,7 +426,7 @@ void Kart::doLapCounting ()
         // Race finished
         // =============
         if(m_race_lap>=race_manager->getNumLaps() && 
-            race_manager->getMinorMode()!=RaceManager::RM_FOLLOW_LEADER)
+            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             raceFinished(RaceManager::getWorld()->getTime());
         }
@@ -477,7 +477,7 @@ void Kart::doLapCounting ()
         m_lap_start_time = -1.0f;
     } else
     {   // Switch to fast music in case of follow the leader when only 3 karts are left
-        if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER &&
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER &&
             RaceManager::getWorld()->getCurrentNumKarts()==3)  
         {
             sound_manager->switchToFastMusic();

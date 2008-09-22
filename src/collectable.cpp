@@ -54,16 +54,9 @@ Collectable::~Collectable()
 //-----------------------------------------------------------------------------
 void Collectable::reset()
 {
-    if(race_manager->getMinorMode()==RaceManager::RM_TIME_TRIAL)
-    {
-        m_type   = COLLECT_ZIPPER;
-        m_number = race_manager->getNumLaps();
-    }
-    else
-    {
-        m_type   = COLLECT_NOTHING;
-        m_number = 0;
-    }
+    int type;
+    RaceManager::getWorld()->getDefaultCollectibles( type, m_number );
+    m_type = (CollectableType)type;
 }   // reset
 
 //-----------------------------------------------------------------------------

@@ -442,7 +442,7 @@ void CharSel::nextMenu()
         // on handling client selections). Waiting for all client infos
         // happens in the start_race_feedback menu (which then triggers
         // sending the race info).
-        if (race_manager->getMajorMode() == RaceManager::RM_GRAND_PRIX)
+        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
             menu_manager->pushMenu(MENUID_GRANDPRIXSELECT);
         else
             menu_manager->pushMenu(MENUID_TRACKSEL);

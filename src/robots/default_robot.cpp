@@ -155,7 +155,7 @@ void DefaultRobot::handle_braking()
 {
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
-    if(race_manager->getMinorMode() == RaceManager::RM_FOLLOW_LEADER &&
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
         getPosition() < RaceManager::getKart(0)->getPosition()             &&
         getInitialPosition()>1                                       )
     {

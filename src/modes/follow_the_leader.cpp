@@ -34,12 +34,6 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 {
 }
 
-//-----------------------------------------------------------------------------
-void FollowTheLeaderRace::restartRace()
-{
-    World::restartRace();
-    m_leader_intervals    = stk_config->m_leader_intervals;
-}
 
 #pragma mark -
 #pragma mark clock events
@@ -59,6 +53,15 @@ void FollowTheLeaderRace::onGo()
         m_kart[i]->resetBrakes();
     }
 }
+//-----------------------------------------------------------------------------
+void FollowTheLeaderRace::onTerminate()
+{
+    World::terminateRace();
+}
+
+#pragma mark -
+#pragma mark overridden from World
+
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::update(float delta)
 {
@@ -112,7 +115,8 @@ void FollowTheLeaderRace::update(float delta)
     }
 }
 //-----------------------------------------------------------------------------
-void FollowTheLeaderRace::onTerminate()
+void FollowTheLeaderRace::restartRace()
 {
-    World::terminateRace();
+    World::restartRace();
+    m_leader_intervals    = stk_config->m_leader_intervals;
 }

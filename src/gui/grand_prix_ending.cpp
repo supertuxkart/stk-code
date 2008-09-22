@@ -67,7 +67,7 @@ GrandPrixEnd::GrandPrixEnd()
     int *position = new int[NUM_KARTS];
     double *race_time = new double[NUM_KARTS];
     // Ignore the first kart if it's a follow-the-leader race.
-    int start=(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER) ? 1 : 0;
+    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
     for( unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id )
     {
         position[kart_id]  = kart_id;
@@ -120,7 +120,7 @@ GrandPrixEnd::GrandPrixEnd()
     for(unsigned int i=start; i < NUM_KARTS; ++i)
     {
         char sTime[20];sTime[0]=0;
-        if(race_manager->getMinorMode()!=RaceManager::RM_FOLLOW_LEADER)
+        if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
             TimeToString(race_time[i], sTime);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
             i + 1-start, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );

@@ -68,8 +68,8 @@ RaceManager::RaceManager()
 {
     m_num_karts          = user_config->m_karts;
     m_difficulty         = RD_HARD;
-    m_major_mode         = RM_SINGLE;
-    m_minor_mode         = RM_QUICK_RACE;
+    m_major_mode         = MAJOR_MODE_SINGLE;
+    m_minor_mode         = MINOR_MODE_QUICK_RACE;
     m_track_number       = 0;
     m_active_race        = false;
     m_score_for_position = stk_config->m_scores;
@@ -191,7 +191,7 @@ void RaceManager::computeRandomKartList()
  */
 void RaceManager::startNew()
 {
-    if(m_major_mode==RM_GRAND_PRIX)   // GP: get tracks and laps from grand prix
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
     {
         m_tracks   = m_grand_prix.getTracks();
         m_num_laps = m_grand_prix.getLaps();
@@ -246,7 +246,7 @@ void RaceManager::startNextRace()
     {  
         // In follow the leader mode do not change the first kart, 
         // since it's always the leader.
-        int offset = (m_minor_mode==RM_FOLLOW_LEADER) ? 1 : 0;
+        int offset = (m_minor_mode==MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
 
         std::sort(m_kart_status.begin()+offset, m_kart_status.end());
         //reverse kart order if flagged in stk_config
@@ -262,12 +262,12 @@ void RaceManager::startNextRace()
     // and need world to be defined.
     
     /*
-     RM_GRAND_PRIX, RM_SINGLE, 
-     RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER
+     MAJOR_MODE_GRAND_PRIX, MAJOR_MODE_SINGLE, 
+     MINOR_MODE_QUICK_RACE, MINOR_MODE_TIME_TRIAL, MINOR_MODE_FOLLOW_LEADER
      FIXME
      */
     
-    if(m_minor_mode==RM_FOLLOW_LEADER) new FollowTheLeaderRace();
+    if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) new FollowTheLeaderRace();
     else new StandardRace();
 
     m_active_race = true;
@@ -300,7 +300,7 @@ void RaceManager::exit_race()
 {
     // Only display the grand prix result screen if all tracks 
     // were finished, and not when a race is aborted.
-    if(m_major_mode==RM_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
         unlock_manager->grandPrixFinished();
         menu_manager->switchToGrandPrixEnding();
@@ -339,7 +339,7 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     // In follow the leader mode, kart 0 does not get any points,
     // so the position of each kart is actually one better --> decrease pos
     int pos = kart->getPosition();
-    if(m_minor_mode==RM_FOLLOW_LEADER) 
+    if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
     {
         pos--;
         // If the position is negative (i.e. follow leader and kart on 

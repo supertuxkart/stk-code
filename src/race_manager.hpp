@@ -63,12 +63,21 @@ class Track;
 class RaceManager
 {
 public:
-    /** Major and minor game modes. This type should be split into two
-     *  types: MajorRaceModeType and MinorRaceModeType. Differentiating these
-     *  two types allows a GP to consist of mixture oftime trial, crazy race,
-     *  and FollowTheLeader modes. */
-    enum RaceModeType   { RM_GRAND_PRIX, RM_SINGLE, // The two current major modes
-                          RM_QUICK_RACE, RM_TIME_TRIAL, RM_FOLLOW_LEADER };
+    /** The major types or races supported in STK
+    */
+    enum MajorRaceModeType
+    {
+        MAJOR_MODE_GRAND_PRIX,
+        MAJOR_MODE_SINGLE
+    };
+    /** Minor variants to the major types of race.
+    */
+    enum MinorRaceModeType
+    {
+        MINOR_MODE_QUICK_RACE,
+        MINOR_MODE_TIME_TRIAL,
+        MINOR_MODE_FOLLOW_LEADER
+    };
     /** Difficulty. Atm skidding is implemented as a special difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
 
@@ -103,7 +112,8 @@ private:
 
     std::vector<KartStatus>          m_kart_status;
     Difficulty                       m_difficulty;
-    RaceModeType                     m_major_mode, m_minor_mode;
+    MajorRaceModeType                m_major_mode;
+    MinorRaceModeType                m_minor_mode;
     typedef std::vector<std::string> PlayerKarts;
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
@@ -154,34 +164,37 @@ public:
     void         setDifficulty(Difficulty diff);
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
-    void         setMajorMode(RaceModeType mode){ m_major_mode = mode;              }
-    void         setMinorMode(RaceModeType mode){ m_minor_mode = mode;              }
+    void         setMajorMode(MajorRaceModeType mode)
+                                                { m_major_mode = mode;        }
+    void         setMinorMode(MinorRaceModeType mode)
+                                                { m_minor_mode = mode;       }
     void         setNumKarts(int num)           { m_num_karts = num;                }
     void         setCoinTarget(int num)         { m_coin_target = num;              }
-    RaceModeType getMajorMode()           const { return m_major_mode;              }
-    RaceModeType getMinorMode()           const { return m_minor_mode;              }
+    MajorRaceModeType
+                 getMajorMode()           const { return m_major_mode;              }
+    MinorRaceModeType
+                 getMinorMode()           const { return m_minor_mode;              }
     unsigned int getNumKarts()            const { return m_num_karts;               }
     unsigned int getNumPlayers()          const { return m_player_karts.size();     }
     int          getNumLaps()             const { return m_num_laps[m_track_number];}
     Difficulty   getDifficulty()          const { return m_difficulty;              }
-    const std::string& 
-                 getTrackName()           const { return m_tracks[m_track_number];  }
-    const GrandPrixData 
-                *getGrandPrix()           const { return &m_grand_prix;             }
+    const std::string& getTrackName()     const { return m_tracks[m_track_number];  }
+    const GrandPrixData  *getGrandPrix()  const { return &m_grand_prix;             }
     unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
-    const std::string& 
-                 getHerringStyle()        const { return m_grand_prix.getHerringStyle(); }
+    const std::string& getHerringStyle()  const { return m_grand_prix.getHerringStyle(); }
     const std::string&  
                  getKartName(int kart)    const { return m_kart_status[kart].m_ident;}
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;     }
     int          getKartPrevScore(int krt)const { return m_kart_status[krt].m_last_score;}
-    int          getKartLocalPlayerId(int k) const { return m_kart_status[k].m_local_player_id; }
-    int          getKartGlobalPlayerId(int k) const { return m_kart_status[k].m_global_player_id; }
+    int          getKartLocalPlayerId(int k)
+                                          const { return m_kart_status[k].m_local_player_id; }
+    int          getKartGlobalPlayerId(int k)
+                                          const { return m_kart_status[k].m_global_player_id; }
     double       getOverallTime(int kart) const { return m_kart_status[kart].m_overall_time;}
     KartType     getKartType(int kart)    const { return m_kart_status[kart].m_kart_type;}
     int          getCoinTarget()          const { return m_coin_target;                  }
-    bool         raceHasLaps()            const { return m_minor_mode!=RM_FOLLOW_LEADER; }
+    bool         raceHasLaps()            const { return m_minor_mode!=MINOR_MODE_FOLLOW_LEADER; }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
     int          allPlayerFinished()      const {return 
                                            m_num_finished_players==m_player_karts.size();}

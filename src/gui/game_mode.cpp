@@ -150,28 +150,28 @@ void GameMode::select()
     switch (mode)
     {
     case WTOK_QUICK_RACE_SINGLE:
-         race_manager->setMajorMode(RaceManager::RM_SINGLE);
-         race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);
          break;
     case WTOK_TIMETRIAL_SINGLE:
-         race_manager->setMajorMode(RaceManager::RM_SINGLE);
-         race_manager->setMinorMode(RaceManager::RM_TIME_TRIAL);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
          break;
     case WTOK_FOLLOW_LEADER_SINGLE:
-         race_manager->setMajorMode(RaceManager::RM_SINGLE);
-         race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
          break;
     case WTOK_QUICK_RACE_GP:
-         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
-         race_manager->setMinorMode(RaceManager::RM_QUICK_RACE);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);
          break;
     case WTOK_TIMETRIAL_GP:
-         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
-         race_manager->setMinorMode(RaceManager::RM_TIME_TRIAL);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
          break;
     case WTOK_FOLLOW_LEADER_GP:
-         race_manager->setMajorMode(RaceManager::RM_GRAND_PRIX);
-         race_manager->setMinorMode(RaceManager::RM_FOLLOW_LEADER);
+         race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+         race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
          break;
     case WTOK_HELP:
          menu_manager->pushMenu(MENUID_HELP3);

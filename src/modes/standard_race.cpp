@@ -49,6 +49,15 @@ void StandardRace::onGo()
     }
 }
 //-----------------------------------------------------------------------------
+void StandardRace::onTerminate()
+{
+    World::terminateRace();
+}
+
+#pragma mark -
+#pragma mark overridden from World
+
+//-----------------------------------------------------------------------------
 void StandardRace::restartRace()
 {
     World::restartRace();
@@ -78,8 +87,21 @@ void StandardRace::update(float delta)
         m_clock.raceOver(true /* delay */);
     }
 }
+
 //-----------------------------------------------------------------------------
-void StandardRace::onTerminate()
+void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
 {
-    World::terminateRace();
+    // in time trial mode, give zippers
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    {
+        collectible_type = COLLECT_ZIPPER;
+        amount = race_manager->getNumLaps();
+    }
+    else World::getDefaultCollectibles(collectible_type, amount);
+}
+//-----------------------------------------------------------------------------
+bool StandardRace::useRedHerring()
+{
+    // in time trial mode, don't use "red herrings"
+    return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
 }

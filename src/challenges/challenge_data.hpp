@@ -30,20 +30,20 @@
 class ChallengeData : public Challenge 
 {
 private:
-    RaceManager::RaceModeType m_major;
-    RaceManager::RaceModeType m_minor;
-    RaceManager::Difficulty   m_difficulty;
-    int                       m_num_laps;
-    int                       m_position;
-    int                       m_num_karts;
-    float                     m_time;
-    std::string               m_gp_id;
-    std::string               m_track_name;
-    int                       m_energy;
-    std::vector<std::string>  m_depends_on;
+    RaceManager::MajorRaceModeType m_major;
+    RaceManager::MinorRaceModeType m_minor;
+    RaceManager::Difficulty        m_difficulty;
+    int                            m_num_laps;
+    int                            m_position;
+    int                            m_num_karts;
+    float                          m_time;
+    std::string                    m_gp_id;
+    std::string                    m_track_name;
+    int                            m_energy;
+    std::vector<std::string>       m_depends_on;
     std::vector<UnlockableFeature> m_unlock;
 
-    std::string               m_filename;
+    std::string                    m_filename;
     void getUnlocks(const lisp::Lisp *lisp, const char* type, REWARD_TYPE reward);
     void error(const char *id);
 

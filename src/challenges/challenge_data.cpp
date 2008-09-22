@@ -35,8 +35,8 @@
 ChallengeData::ChallengeData(const std::string& filename)
 {
     m_filename    = filename;
-    m_major       = RaceManager::RM_SINGLE;
-    m_minor       = RaceManager::RM_SINGLE;
+    m_major       = RaceManager::MAJOR_MODE_SINGLE;
+    m_minor       = RaceManager::MINOR_MODE_QUICK_RACE;
     m_difficulty  = RaceManager::RD_EASY;
     m_num_laps    = -1;
     m_num_karts   = -1;
@@ -64,19 +64,19 @@ ChallengeData::ChallengeData(const std::string& filename)
     lisp->get("major", mode);
 
     if(mode=="grandprix")
-        m_major = RaceManager::RM_GRAND_PRIX;
+        m_major = RaceManager::MAJOR_MODE_GRAND_PRIX;
     else if(mode=="single")
-        m_major = RaceManager::RM_SINGLE;
+        m_major = RaceManager::MAJOR_MODE_SINGLE;
     else
         error("major");
         
-    lisp->get      ("minor",                 mode);
+    lisp->get("minor", mode);
     if(mode=="timetrial")
-        m_minor = RaceManager::RM_TIME_TRIAL;
+        m_minor = RaceManager::MINOR_MODE_TIME_TRIAL;
     else if(mode=="quickrace")
-        m_minor = RaceManager::RM_QUICK_RACE;
+        m_minor = RaceManager::MINOR_MODE_QUICK_RACE;
     else if(mode=="followtheleader")
-        m_minor = RaceManager::RM_FOLLOW_LEADER;
+        m_minor = RaceManager::MINOR_MODE_FOLLOW_LEADER;
     else
         error("minor");
     std::string s;
@@ -89,8 +89,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     if(!lisp->get("karts", m_num_karts)  ) error("karts");
     // Position is optional except in GP and FTL
     if(!lisp->get("position", m_position) && 
-        (m_minor==RaceManager::RM_FOLLOW_LEADER || 
-         m_major==RaceManager::RM_GRAND_PRIX))
+       //RaceManager::getWorld()->areKartsOrdered() ) // FIXME - order and optional are not the same thing
+        (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER || 
+         m_major==RaceManager::MAJOR_MODE_GRAND_PRIX))
                                            error("position");
     lisp->get("difficulty", s);
     if(s=="easy")
@@ -106,11 +107,11 @@ ChallengeData::ChallengeData(const std::string& filename)
     lisp->get("position",   m_position   );  // must be set
     if(m_time<0 && m_position<0) error("position/time");
     lisp->get("energy", m_energy     ); // This is optional
-    if(m_major==RaceManager::RM_SINGLE)
+    if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
         if(!lisp->get("track",  m_track_name )) error("track");
         if(!lisp->get("laps",   m_num_laps   ) && 
-           m_minor!=RaceManager::RM_FOLLOW_LEADER)
+           m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
            error("laps");        
     }
     else   // GP
@@ -187,7 +188,7 @@ void ChallengeData::getUnlocks(const lisp::Lisp *lisp, const char* type,
 void ChallengeData::setRace() const
 {
     race_manager->setMajorMode(m_major);
-    if(m_major==RaceManager::RM_SINGLE)
+    if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
         race_manager->setMinorMode(m_minor);
         race_manager->setTrack(m_track_name);
@@ -212,7 +213,7 @@ void ChallengeData::setRace() const
 bool ChallengeData::raceFinished()
 {
     // GP's use the grandPrixFinished() function, so they can't be fulfilled here.
-    if(m_major==RaceManager::RM_GRAND_PRIX) return false;
+    if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX) return false;
 
     // Single races
     // ------------
@@ -226,7 +227,7 @@ bool ChallengeData::raceFinished()
 
     // Follow the leader
     // -----------------
-    if(m_minor==RaceManager::RM_FOLLOW_LEADER)
+    if(m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
         // All possible conditions were already checked, so: must have been successful
         return true;
@@ -240,7 +241,7 @@ bool ChallengeData::raceFinished()
 // ----------------------------------------------------------------------------
 bool ChallengeData::grandPrixFinished()
 {
-    if (race_manager->getMajorMode()  != RaceManager::RM_GRAND_PRIX          ||
+    if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
         race_manager->getGrandPrix()->getId() != m_gp_id                     ||
         race_manager->getDifficulty()!= m_difficulty                         ||

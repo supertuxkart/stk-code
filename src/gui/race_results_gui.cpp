@@ -46,7 +46,7 @@ RaceResultsGUI::RaceResultsGUI()
 {
     Widget *bottom_of_list;
 
-    if(race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         bottom_of_list = displayLeaderResults();
     else
         bottom_of_list = displayRaceResults();
@@ -61,7 +61,7 @@ RaceResultsGUI::RaceResultsGUI()
     } else
     {
         Widget *w;
-        if(race_manager->getMajorMode()==RaceManager::RM_GRAND_PRIX)
+        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
         }
@@ -74,7 +74,7 @@ RaceResultsGUI::RaceResultsGUI()
         w=widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
         w->setPosition(WGT_DIR_CENTER, 0.0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
         w_prev = w;
-        if(race_manager->getMajorMode()==RaceManager::RM_SINGLE)
+        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_SINGLE)
         {
             w=widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
             w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
@@ -212,7 +212,7 @@ Widget *RaceResultsGUI::displayKartList(unsigned int from, unsigned int to,
             TimeToString(T, sTime);
 
         //This shows position + driver name + time + points earned + total points
-        if(race_manager->getMajorMode()==RaceManager::RM_GRAND_PRIX)
+        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
                 KART->getPosition(), KART_NAME.c_str(), sTime,

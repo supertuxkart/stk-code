@@ -98,6 +98,10 @@ protected:
 
     bool        m_faster_music_active; // true if faster music was activated
 
+    /** whether this kind of race orders karts from first to last
+    */
+    bool        m_order_karts;
+    
     void  updateRacePosition(int k);
     void  updateHighscores  ();
     void  loadTrack         ();
@@ -119,6 +123,10 @@ public:
     virtual void    update(float delta);
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
+    
+    /** whether this kind of race orders karts from first to last
+    */
+    bool            areKartsOrdered();
     
     PlayerKart     *getPlayerKart(int player)   const { return m_player_karts[player];      }
     unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
@@ -142,10 +150,18 @@ public:
     Phase getPhase() const                    { return m_clock.getPhase();          }
     const Clock& getClock() const             { return m_clock;                     }
     
-    /**
-      * Called when race is over and should be terminated (mostly called by the clock).
+    /** Called when race is over and should be terminated (mostly called by the clock).
       */
     void terminateRace();
+    
+    /** Called to determine the default collectibles to give each player for this
+      * kind of race. Both parameters are of 'out' type.
+      */
+    virtual void getDefaultCollectibles(int& collectible_type, int& amount );
+    
+    /** Called to determine whether this race mode uses "red herring".
+      */
+    virtual bool useRedHerring(){ return true; }
     
     void  pause();
     void  unpause();

@@ -60,7 +60,7 @@ class RaceGUI: public BaseGUI
             if( time < 0.0f ) m_end_time = -1.0f;
             else
             {
-                m_end_time = race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER ?
+                m_end_time = race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ?
                              world->getTime()-time : world->getTime()+time;
             }
             m_red=red; m_blue=blue; m_green=green; 
@@ -68,7 +68,7 @@ class RaceGUI: public BaseGUI
         // in follow leader the clock counts backwards
         bool done() const { const int time = RaceManager::getWorld()->getTime(); // work around gcc bug (doesn't accept :: in a ?)
                             return m_end_time<0 || 
-                            (race_manager->getMinorMode()==RaceManager::RM_FOLLOW_LEADER ?
+                            (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ?
                              time<m_end_time : time>m_end_time); }
     };
 public:
