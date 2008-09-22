@@ -895,10 +895,6 @@
 				RelativePath="..\..\vec3.cpp"
 				>
 			</File>
-			<File
-				RelativePath="../../../src\world.cpp"
-				>
-			</File>
 			<Filter
 				Name="gui"
 				>
@@ -1139,11 +1135,19 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\clock.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\modes\standard_race.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\world.cpp"
 					>
 				</File>
 			</Filter>
@@ -1433,10 +1437,6 @@
 				RelativePath="..\..\vec3.hpp"
 				>
 			</File>
-			<File
-				RelativePath="../../../src\world.hpp"
-				>
-			</File>
 			<Filter
 				Name="gui"
 				>
@@ -1721,11 +1721,19 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\clock.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\modes\standard_race.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\world.hpp"
 					>
 				</File>
 			</Filter>
