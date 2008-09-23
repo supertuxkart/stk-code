@@ -1764,108 +1764,24 @@ int WidgetManager::handlePointer(const int X, const int Y )
     const int NUM_WGTS = (int)m_widgets.size();
     if( NUM_WGTS < 1 ) return WGT_NONE;
 
-    //OpenGL provides a mechanism to select objects; simply 'draw' named
-    //objects, and for each non-culled visible object a 'hit' will be saved
-    //into a selection buffer. Objects are named by using OpenGL's name
-    //stack. The information in each hit is the number of names in the name
-    //stack, two hard-to-explain depth values that aren't used in this
-    //function, and the contents of the name stack at the time of the hit.
-
-    //This function loads 1 name into the stack (because if you pop an empty
-    //stack you get an error), then uses glLoadName (which is a shortcut for
-    //popping then pushing) to change the name. That means that each time a
-    //hit is recorded, only the last drawn widget will be on the name stack.
-
-    const int HIT_SIZE = 4; //1 Gluint for the number of names, 2 depth
-                            //values, and 1 for the token of the widget.
-    const int BUFFER_SIZE = HIT_SIZE * NUM_WGTS;
-
-    GLuint* select_buffer = new GLuint[BUFFER_SIZE];
-    glSelectBuffer(BUFFER_SIZE, select_buffer);
-
-    glRenderMode(GL_SELECT);
-
-    //Set the viewport to draw only what's under the mouse
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    gluPickMatrix(X, Y, 1,1,viewport);
-    glOrtho(0.0, user_config->m_width, 0.0, user_config->m_height, -1.0, 1.0);
-
-    glMatrixMode(GL_MODELVIEW);
-
-    glInitNames();
-    glPushName(WGT_NONE);
-
-    glPushMatrix();
-
     for( int i = 0; i < NUM_WGTS; ++i )
     {
         if(!(m_widgets[i].active)) continue;
-
-        glLoadName( i );
-
-        glPushMatrix();
-        m_widgets[i].widget->applyTransformations();
-        //In case this ever becomes a performance bottleneck:
-        //the m_rect_list includes texture coordinates, which are not
-        //needed for selection.
-        glCallList( m_widgets[i].widget->m_rect_list );
-        glPopMatrix();
-    }
-    glFlush();
-    glPopMatrix();
-
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glFlush();
-
-    GLuint* position = select_buffer;
-    const GLint NUM_HITS = glRenderMode(GL_RENDER);
-
-    if( NUM_HITS > 0 )
-    {
-        float dist;
-        float near_dist = 9999999.0f;
-        int curr_wgt_id;
-        int nearest_id = WGT_NONE;
-        int wgt_x_center, wgt_y_center;
-        for( int i = 0; i < NUM_HITS; ++i )
+        
+        const int offset = m_widgets[i].widget->m_radius/4;
+        
+        if(X > m_widgets[i].widget->m_x+offset &&
+           X < m_widgets[i].widget->m_x + m_widgets[i].widget->m_width-offset &&
+           Y > m_widgets[i].widget->m_y+offset &&
+           Y < m_widgets[i].widget->m_y + m_widgets[i].widget->m_height-offset)
         {
-            position += 3;
-            curr_wgt_id = *position;
-
-            wgt_x_center = m_widgets[curr_wgt_id].widget->m_x +
-                (m_widgets[i].widget->m_width / 2);
-            wgt_y_center = m_widgets[curr_wgt_id].widget->m_y +
-                (m_widgets[i].widget->m_height / 2);
-
-            //Check if it's the closest one to the mouse
-            dist = (float)( abs(X - wgt_x_center) + abs(Y - wgt_y_center));
-            if(dist < near_dist )
-            {
-                near_dist = dist;
-                nearest_id = curr_wgt_id;
-            }
-
-            ++position;
+            if(m_widgets[i].token == getSelectedWgt()) return WGT_NONE;
+            setSelectedWgtToken( m_widgets[i].token );
+            return m_selected_wgt_token;
         }
-        delete[] select_buffer;
-
-        if( m_widgets[nearest_id].token == m_selected_wgt_token )
-        {
-            return WGT_NONE;
-        }
-
-        setSelectedWgtToken( m_widgets[nearest_id].token );
-        return m_selected_wgt_token;
+        
     }
 
-    delete[] select_buffer;
     return WGT_NONE;
 }
 
