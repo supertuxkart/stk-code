@@ -26,11 +26,19 @@
 
 #include "highscores.hpp"
 #include "lisp/lisp.hpp"
+
+const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;
+
+/**
+  * This class reads and writes the 'highscores.data' file, and also takes
+  * care of dealing with new records. One 'HighscoreEntry' object is created
+  * for each highscore entry.
+  */
 class HighscoreManager
 {
 public:
 private:
-    typedef std::vector<Highscores*> type_all_scores;
+    typedef std::vector<HighscoreEntry*> type_all_scores;
     type_all_scores m_allScores;
     
     std::string m_filename;
@@ -43,10 +51,9 @@ public:
     HighscoreManager();
     ~HighscoreManager();
     void Save();
-    Highscores *getHighscores(const Highscores::HighscoreType highscore_type);
-    Highscores *addResult    (const Highscores::HighscoreType highscore_type, 
-                              const std::string kart_name, 
-                              const std::string name, const float time);
+    HighscoreEntry *getHighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
+                                      int num_karts, const RaceManager::Difficulty difficulty, 
+                                      const std::string trackName, const int number_of_laps);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

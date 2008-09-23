@@ -92,7 +92,6 @@ protected:
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;
-    Highscores* m_highscores;
     Phase       m_previous_phase;      // used during the race popup menu
     int         m_eliminated_karts;    // number of eliminated karts
     int         m_eliminated_players;  // number of eliminated players
@@ -146,7 +145,7 @@ public:
     Kart* getFastestKart() const              { return m_fastest_kart;              }
     float getFastestLapTime() const           { return m_fastest_lap;               }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time; }
-    const Highscores* getHighscores() const   { return m_highscores;                }
+    HighscoreEntry* getHighscores() const;
     float getTime() const                     { return m_clock.getTime();           }
     Phase getPhase() const                    { return m_clock.getPhase();          }
     const Clock& getClock() const             { return m_clock;                     }
@@ -164,6 +163,11 @@ public:
       */
     virtual bool useRedHerring(){ return true; }
     
+    /** Each game mode should have a unique internal code. Override
+      * this method in child classes to provide it.
+      */
+    virtual std::string getInternalCode() const = 0;
+        
     void  pause();
     void  unpause();
     

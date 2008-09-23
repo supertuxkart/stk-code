@@ -159,14 +159,6 @@ World::World()
     //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
 #endif
 
-    // FIXME - will need better way to deal with high scores if we have lots of modes
-    // and we wish to keep them modular
-    Highscores::HighscoreType hst = (race_manager->getMinorMode()==RaceManager::MINOR_MODE_TIME_TRIAL) 
-                                  ? Highscores::HST_TIMETRIAL_OVERALL_TIME
-                                  : Highscores::HST_RACE_OVERALL_TIME;
-    
-    m_highscores   = highscore_manager->getHighscores(hst);
-    
     callback_manager->initAll();
     menu_manager->switchToRace();
 
@@ -207,6 +199,7 @@ World::~World()
 //-----------------------------------------------------------------------------
 void World::terminateRace()
 {
+    updateHighscores();
     m_clock.pause();
     menu_manager->pushMenu(MENUID_RACERESULT);
     estimateFinishTimes();
@@ -293,6 +286,24 @@ void World::update(float dt)
     callback_manager->update(dt);
 }
 // ----------------------------------------------------------------------------
+HighscoreEntry* World::getHighscores() const
+{
+    const HighscoreEntry::HighscoreType type = "HST_" + getInternalCode();
+    
+    HighscoreEntry* highscores =
+        highscore_manager->getHighscoreEntry(type,
+                                             race_manager->getNumKarts(), 
+                                             race_manager->getDifficulty(),
+                                             race_manager->getTrackName(),
+                                             race_manager->getNumLaps());
+    
+    return highscores;
+}
+// ----------------------------------------------------------------------------
+/*
+ * usually called at the end of a race. Checks if the current times are worth a new
+ * score, if so it notifies the HighscoreManager so the new score is added and saved.
+ */
 void World::updateHighscores()
 {
     // Add times to highscore list. First compute the order of karts,
@@ -325,14 +336,11 @@ void World::updateHighscores()
 
         PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
 
-        Highscores::HighscoreType hst = (race_manager->getMinorMode()==
-                                         RaceManager::MINOR_MODE_TIME_TRIAL) 
-                                         ? Highscores::HST_TIMETRIAL_OVERALL_TIME
-                                         : Highscores::HST_RACE_OVERALL_TIME;
-
-        if(m_highscores->addData(hst, k->getName(),
-                                 k->getPlayer()->getName(),
-                                 k->getFinishTime())>0      )
+        HighscoreEntry* highscores = getHighscores();
+        
+        if(highscores->addData(k->getName(),
+                               k->getPlayer()->getName(),
+                               k->getFinishTime())>0 )
         {
             highscore_manager->Save();
         }

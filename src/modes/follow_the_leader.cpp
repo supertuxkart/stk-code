@@ -120,3 +120,8 @@ void FollowTheLeaderRace::restartRace()
     World::restartRace();
     m_leader_intervals    = stk_config->m_leader_intervals;
 }
+//-----------------------------------------------------------------------------
+std::string FollowTheLeaderRace::getInternalCode() const
+{
+    return "FOLLOW_LEADER";
+}

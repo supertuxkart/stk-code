@@ -36,6 +36,7 @@ public:
     virtual void restartRace();
     virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useRedHerring();
+    virtual std::string getInternalCode() const;
 };
 
 #endif

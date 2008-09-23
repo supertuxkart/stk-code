@@ -91,6 +91,7 @@ void HighscoreManager::Load()
     }
     try
     {
+        // check for opening 'highscores' nodes
         const lisp::Lisp* const node = root->getLisp("highscores");
         if(!node)
         {
@@ -98,6 +99,22 @@ void HighscoreManager::Load()
             snprintf(msg, sizeof(msg), "No 'highscore' node found.");
             throw std::runtime_error(msg);
         }
+        
+        // check file version
+        int v;
+        if (!node->get("file-version",v) || v<CURRENT_HSCORE_FILE_VERSION)
+        {
+            fprintf(stderr, "Highscore file format too old, a new one will be created.\n");
+            std::string warning = _("The highscore file was too old,\nall highscores have been erased.");
+            user_config->setWarning( warning );
+            
+            // since we haven't had the chance to load the current scores yet,
+            // calling Save() now will generate an empty file.
+            Save();
+            return;
+        }
+        
+        // get number of entries
         int n;
         if (!node->get("number-entries",n))
         {
@@ -106,6 +123,7 @@ void HighscoreManager::Load()
             throw std::runtime_error(msg);
         }
 
+        // read all entries one by one and store them in 'm_allScores'
         for(int i=0; i<n; i++)
         {
             char record_name[255];
@@ -118,11 +136,12 @@ void HighscoreManager::Load()
                          i,m_filename.c_str());
                 throw std::runtime_error(msg);
             }
-            Highscores *highscores = new Highscores();
+            HighscoreEntry *highscores = new HighscoreEntry(node_record);
             m_allScores.push_back(highscores);
-            highscores->Read(node_record);
-        }
-    fprintf(stderr, "Highscores will be saved in '%s'.\n",m_filename.c_str());
+            //highscores->Read(node_record);
+        }// next entry
+        
+        fprintf(stderr, "Highscores will be saved in '%s'.\n",m_filename.c_str());
     }
     catch(std::exception& err)
     {
@@ -144,19 +163,21 @@ void HighscoreManager::Save()
     {
         lisp::Writer writer(m_filename);
         writer.beginList("highscores");
-          writer.writeComment("Number of highscores in this file");
-          writer.write("number-entries\t",(unsigned int)m_allScores.size());
-          int record_number=0;
-          for(type_all_scores::iterator i  = m_allScores.begin(); 
-              i != m_allScores.end();  i++)
-          {
-              char record_name[255];
-              snprintf(record_name, sizeof(record_name),"record-%d\t",record_number);
-              record_number++;
-              writer.beginList(record_name);
-              (*i)->Write(&writer);
-              writer.endList(record_name);
-          }   // for i
+        writer.writeComment("File format version");
+        writer.write("file-version\t", CURRENT_HSCORE_FILE_VERSION);
+        writer.writeComment("Number of highscores in this file");
+        writer.write("number-entries\t",(unsigned int)m_allScores.size());
+        int record_number=0;
+        for(type_all_scores::iterator i  = m_allScores.begin(); 
+            i != m_allScores.end();  i++)
+        {
+            char record_name[255];
+            snprintf(record_name, sizeof(record_name),"record-%d\t",record_number);
+            record_number++;
+            writer.beginList(record_name);
+            (*i)->Write(&writer);
+            writer.endList(record_name);
+        } // next score
         writer.endList("highscores");
         m_can_write=true;
     }   // try
@@ -171,43 +192,28 @@ void HighscoreManager::Save()
 }   // Save
 
 // -----------------------------------------------------------------------------
-Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type)
+/*
+ * Returns the high scores entry for a specific type of race. Creates one if none exists yet.
+ */
+HighscoreEntry* HighscoreManager::getHighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
+                                                    int num_karts, const RaceManager::Difficulty difficulty, 
+                                                    const std::string trackName, const int number_of_laps)
 {
-    Highscores *highscores = 0;
+    HighscoreEntry *highscores = 0;
 
     // See if we already have a record for this type
-
     for(type_all_scores::iterator i  = m_allScores.begin(); 
                                   i != m_allScores.end();  i++)
     {
-        if((*i)->matches(highscore_type, race_manager->getNumKarts(), 
-                         race_manager->getDifficulty(), race_manager->getTrackName(),
-                         race_manager->getNumLaps()))
+        if((*i)->matches(highscore_type, num_karts, difficulty, trackName, number_of_laps) )
         {
+            // we found one entry for this kind of race, return it
             return (*i);
         }
     }   // for i in m_allScores
 
-    highscores = new Highscores();
+    // we don't have an entry for such a race currently. Create one.
+    highscores = new HighscoreEntry(highscore_type, num_karts, difficulty, trackName, number_of_laps);
     m_allScores.push_back(highscores);
     return highscores;
-}   // getHighscores
-
-// -----------------------------------------------------------------------------
-// Checks if the specified times needs to be put into the highscore list.
-// If it's one of the fastest HIGHSCORE_LEN results, it is put into the
-// list and the new position (1 ... HIGHSCORE_LEN) is returned, otherwise 0.
-Highscores * HighscoreManager::addResult(const Highscores::HighscoreType highscore_type, 
-                                         const std::string kart_name,
-                                         const std::string name, 
-                                         const float time)
-{
-    Highscores *highscores = getHighscores(highscore_type);
-
-    if(highscores->addData(highscore_type, kart_name, name, time) >0)
-    {
-        Save();
-    }
-    return highscores;
-}   // addResult
-// -----------------------------------------------------------------------------
+}   // getHighscoreEntry

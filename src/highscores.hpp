@@ -27,14 +27,14 @@
 #include "lisp/writer.hpp"
 #include "race_manager.hpp"
 
-class Highscores
+/**
+  * Represents one highscore entry.
+  */
+class HighscoreEntry
 {
 public:
-    enum HighscoreType {HST_UNDEFINED,
-                        HST_TIMETRIAL_FASTEST_LAP,
-                        HST_TIMETRIAL_OVERALL_TIME,
-                        HST_RACE_FASTEST_LAP,
-                        HST_RACE_OVERALL_TIME};
+    typedef std::string HighscoreType;
+    
 private:
     enum {HIGHSCORE_LEN = 3};       // It's a top 3 list
     std::string         m_track;
@@ -46,17 +46,25 @@ private:
     std::string         m_name[HIGHSCORE_LEN];
     float               m_time[HIGHSCORE_LEN];
 public:
-         Highscores();
+    /** Creates a new entry
+      */
+    HighscoreEntry (const HighscoreEntry::HighscoreType highscore_type,
+                    int num_karts, const RaceManager::Difficulty difficulty, 
+                    const std::string trackName, const int number_of_laps);
+    /** Creates an entry from a file
+     */
+    HighscoreEntry (const lisp::Lisp* const node);
+    
     void Read      (const lisp::Lisp* const node);
     void Write     (lisp::Writer* writer);
     int  matches   (HighscoreType highscore_type, int num_karts,
                     const RaceManager::Difficulty difficulty, 
-                    const std::string &track, const int number_of_laps);
-    int  addData   (const HighscoreType highscore_type, const std::string kart_name,
-                    const std::string name, const float time);
+                    const std::string track, const int number_of_laps);
+    int  addData   (const std::string& kart_name,
+                    const std::string& name, const float time);
     int  getNumberEntries() const;
     void getEntry  (int number, std::string &kart_name,
                     std::string &name, float *const time) const;
-};  // Highscores
+};  // HighscoreEntry
 
 #endif

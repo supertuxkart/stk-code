@@ -168,7 +168,7 @@ Widget *RaceResultsGUI::displayRaceResults()
     widget_manager->hideWgtRect(WTOK_HIGHSCORES);
     w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
 
-    const Highscores *hs = RaceManager::getWorld()->getHighscores();
+    const HighscoreEntry *hs = RaceManager::getWorld()->getHighscores();
     unsigned int num_scores = hs->getNumberEntries();
     char *highscores = new char[num_scores * MAX_STR_LEN];
 

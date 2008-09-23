@@ -24,28 +24,50 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-Highscores::Highscores()
+
+// -----------------------------------------------------------------------------
+HighscoreEntry::HighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
+                               int num_karts, const RaceManager::Difficulty difficulty, 
+                               const std::string trackName, const int number_of_laps)
 {
-    m_track           = ""; 
-    m_highscore_type  = HST_UNDEFINED;
-    m_number_of_karts =-1;
-    m_difficulty      = -1;
-    m_number_of_laps  = -1;
+    m_track           = trackName; 
+    m_highscore_type  = highscore_type;
+    m_number_of_karts = num_karts;
+    m_difficulty      = difficulty;
+    m_number_of_laps  = number_of_laps;
+    
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
         m_name[i]      = "";
         m_kart_name[i] = "";
         m_time[i]      = -9.9f;
     }
-}   // Highscores
-
+}
 // -----------------------------------------------------------------------------
-void Highscores::Read(const lisp::Lisp* const node)
+HighscoreEntry::HighscoreEntry(const lisp::Lisp* const node)
+{
+    m_track           = ""; 
+    m_highscore_type  = "HST_UNDEFINED";
+    m_number_of_karts = -1;
+    m_difficulty      = -1;
+    m_number_of_laps  = -1;
+    
+    for(int i=0; i<HIGHSCORE_LEN; i++) 
+    {
+        m_name[i]      = "";
+        m_kart_name[i] = "";
+        m_time[i]      = -9.9f;
+    }
+    
+    Read(node);
+}
+// -----------------------------------------------------------------------------
+void HighscoreEntry::Read(const lisp::Lisp* const node)
 {
     node->get("track-name",     m_track               );
     node->get("number-karts",   m_number_of_karts     );
-    int hst=0;
-    node->get("race-mode",      hst                   );
+    std::string hst="HST_UNDEFINED";
+    node->get("hscore-type",    hst                   );
     m_highscore_type = (HighscoreType)hst;
     node->get("difficulty",     m_difficulty          );
     node->get("number-of-laps", m_number_of_laps      );
@@ -63,12 +85,12 @@ void Highscores::Read(const lisp::Lisp* const node)
 }   // Read
 
 // -----------------------------------------------------------------------------
-void Highscores::Write(lisp::Writer *writer)
+void HighscoreEntry::Write(lisp::Writer *writer)
 {
     writer->write("track-name\t",     m_track            );
     writer->write("number-karts\t",   m_number_of_karts  );
     writer->write("difficulty\t\t",   m_difficulty       );
-    writer->write("race-mode\t\t",    m_highscore_type   );
+    writer->write("hscore-type\t\t",    m_highscore_type   );
     writer->write("number-of-laps\t", m_number_of_laps   );
     for(int j=0; j<HIGHSCORE_LEN; j++) 
     {
@@ -84,9 +106,9 @@ void Highscores::Write(lisp::Writer *writer)
 }   // Write
 
 // -----------------------------------------------------------------------------
-int Highscores::matches(HighscoreType highscore_type,
-                        int num_karts, RaceManager::Difficulty difficulty,
-                        const std::string &track, const int number_of_laps)
+int HighscoreEntry::matches(HighscoreType highscore_type,
+                            int num_karts, RaceManager::Difficulty difficulty,
+                            const std::string track, const int number_of_laps)
 {
     return (m_highscore_type  == highscore_type   &&
             m_track           == track            &&
@@ -100,8 +122,8 @@ int Highscores::matches(HighscoreType highscore_type,
  *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
  *  otherwise a 0.
  */
-int Highscores::addData(const HighscoreType highscore_type, const std::string kart_name,
-                        const std::string name, const float time)
+int HighscoreEntry::addData(const std::string& kart_name,
+                            const std::string& name, const float time)
 {
     int position=-1;
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -112,7 +134,7 @@ int Highscores::addData(const HighscoreType highscore_type, const std::string ka
             position=i;
             break;
         }
-        // Check if new entry is faster than previous entry, if so
+        // Check if new entry is faster than than in slot 'i', if so
         // move times etc and insert new entry
         if(time < m_time[i])
         {
@@ -125,12 +147,11 @@ int Highscores::addData(const HighscoreType highscore_type, const std::string ka
             position = i;
             break;
         }
-    }
+    }//next score slot
 
     if(position>=0) 
     {
         m_track               = race_manager->getTrackName();
-        m_highscore_type      = highscore_type;
         m_number_of_karts     = race_manager->getNumKarts();
         m_difficulty          = race_manager->getDifficulty();
         m_number_of_laps      = race_manager->getNumLaps();
@@ -143,7 +164,7 @@ int Highscores::addData(const HighscoreType highscore_type, const std::string ka
 
 }   // addData
 // -----------------------------------------------------------------------------
-int Highscores::getNumberEntries() const
+int HighscoreEntry::getNumberEntries() const
 {
     for(int i=HIGHSCORE_LEN-1; i>=0; i--)
     {
@@ -153,7 +174,7 @@ int Highscores::getNumberEntries() const
 }   // getNumberEntries
 
 // -----------------------------------------------------------------------------
-void Highscores::getEntry(int number, std::string &kart_name,
+void HighscoreEntry::getEntry(int number, std::string &kart_name,
                           std::string &name, float *const time) const
 {
     if(number<0 || number>getNumberEntries())

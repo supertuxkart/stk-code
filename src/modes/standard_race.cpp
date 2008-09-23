@@ -105,3 +105,11 @@ bool StandardRace::useRedHerring()
     // in time trial mode, don't use "red herrings"
     return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
 }
+//-----------------------------------------------------------------------------
+std::string StandardRace::getInternalCode() const
+{
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+        return "STD_TIMETRIAL";
+    else
+        return "STANDARD";
+}

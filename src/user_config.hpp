@@ -231,7 +231,8 @@ public:
 	bool isFixedInput(InputType, int, int, int);
     const std::string& getWarning() {return m_warning;}
     void  resetWarning() {m_warning="";}
-	
+	void  setWarning(std::string& warning) {m_warning=warning;}
+    
 	/** Creates ActionMap for use in menu mode. */
 	ActionMap *newMenuActionMap();
 	

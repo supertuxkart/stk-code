@@ -35,6 +35,7 @@ public:
     // overriding World methods
     virtual void update(float delta);
     virtual void restartRace();
+    virtual std::string getInternalCode() const;
 };
 
 
