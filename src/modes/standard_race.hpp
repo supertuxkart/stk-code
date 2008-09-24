@@ -20,6 +20,10 @@
 
 #include "modes/world.hpp"
 
+/**
+  * Represents a standard race, i.e. with a start, end and laps.
+  * Used in Grand Prix, Quick Race and Time Trial.
+  */
 class StandardRace : public World, public Clock::ClockListener
 {
 public:

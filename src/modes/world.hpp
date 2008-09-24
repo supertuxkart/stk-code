@@ -173,6 +173,8 @@ public:
       */
     virtual std::string getInternalCode() const = 0;
         
+    virtual bool useFastMusicNearEnd() const { return true; }
+    
     void  pause();
     void  unpause();
     

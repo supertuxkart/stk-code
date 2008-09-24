@@ -80,17 +80,18 @@ void FollowTheLeaderRace::update(float delta)
         // kart, otherwise remove the last kart.
         int position_to_remove = m_kart[0]->getPosition()==1 
             ? getCurrentNumKarts() : 1;
-        for (kart_number=0; kart_number<(int)m_kart.size(); kart_number++)
+        const int kart_amount = m_kart.size();
+        for (kart_number=0; kart_number<kart_amount; kart_number++)
         {
             if(m_kart[kart_number]->isEliminated()) continue;
             if(m_kart[kart_number]->getPosition()==position_to_remove)
                 break;
         }
-        if(kart_number==(int)m_kart.size())
+        if(kart_number==kart_amount)
         {
             fprintf(stderr,"Problem with removing leader: position %d not found\n",
                     position_to_remove);
-            for(int i=0; i<(int)m_kart.size(); i++)
+            for(int i=0; i<kart_amount; i++)
             {
                 fprintf(stderr,"kart %d: eliminated %d position %d\n",
                         i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());

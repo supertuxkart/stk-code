@@ -268,7 +268,8 @@ void World::update(float dt)
 
     if(!user_config->m_replay_history) history->StoreDelta(dt);
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT) m_physics->update(dt);
-    for (int i = 0 ; i <(int) m_kart.size(); ++i)
+    const int kart_amount = m_kart.size();
+    for (int i = 0 ; i < kart_amount; ++i)
     {
         // Update all karts that are not eliminated
         if(!m_kart[i]->isEliminated()) m_kart[i]->update(dt) ;
@@ -277,7 +278,7 @@ void World::update(float dt)
     projectile_manager->update(dt);
     herring_manager->update(dt);
 
-    for ( Karts::size_type i = 0 ; i < m_kart.size(); ++i)
+    for ( Karts::size_type i = 0 ; i < kart_amount; ++i)
     {
         if(m_kart[i]->isEliminated()) continue;   // ignore eliminated kart
         if(!m_kart[i]->hasFinishedRace()) updateRacePosition((int)i);
@@ -318,12 +319,13 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
-    for (unsigned int i=0; i<m_kart.size(); i++ )
+    const int kart_amount = m_kart.size();
+    for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[m_kart[i]->getPosition()-1] = i;
     }
 
-    for(unsigned int pos=0; pos<m_kart.size(); pos++)
+    for(unsigned int pos=0; pos<kart_amount; pos++)
     {
 #ifdef DEBUG
         // FIXME begin: triggered if the positions of the karts are incorrect:
@@ -358,7 +360,8 @@ void World::updateHighscores()
 //-----------------------------------------------------------------------------
 void World::estimateFinishTimes()
 {
-    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+    const int kart_amount = m_kart.size();
+    for ( Karts::size_type i = 0; i < kart_amount; ++i)
     {
         if(!m_kart[i]->hasFinishedRace())
         {
@@ -439,7 +442,8 @@ void World::updateRacePosition ( int k )
 
     /* Find position of kart 'k' */
 
-    for ( Karts::size_type j = 0 ; j < m_kart.size() ; ++j )
+    const unsigned int kart_amount = m_kart.size();
+    for ( Karts::size_type j = 0 ; j < kart_amount ; ++j )
     {
         if(int(j) == k) continue;
         if(m_kart[j]->isEliminated()) continue;   // eliminated karts   
@@ -455,14 +459,14 @@ void World::updateRacePosition ( int k )
     }
 
     m_kart[k]->setPosition(p);
-    // Switch on faster music (except in follow leader mode) if not already 
-    // done so, and the first kart is doing its last lap, and the estimated
+    // Switch on faster music if not already done so, if the
+    // first kart is doing its last lap, and if the estimated
     // remaining time is less than 30 seconds.
-    if(!m_faster_music_active                                       && 
-        m_kart[k]->getLap()==race_manager->getNumLaps()-1           && 
-        p==1                                                        &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_kart[k]->estimateFinishTime()-getTime()<30.0f                ) 
+    if(!m_faster_music_active                             && 
+        m_kart[k]->getLap()==race_manager->getNumLaps()-1 && 
+        p==1                                              &&
+        useFastMusicNearEnd()                             &&
+        m_kart[k]->estimateFinishTime()-getTime()<30.0f   ) 
     {
         sound_manager->switchToFastMusic();
         m_faster_music_active=true;

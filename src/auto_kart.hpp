@@ -31,7 +31,7 @@ class AutoKart : public Kart
                  const btTransform& init_pos) :
            Kart(kart_name, position, init_pos) {}
 
-        int  isPlayerKart() const {return 0;}
+        bool  isPlayerKart() const {return false;}
 };
 
 #endif

@@ -65,7 +65,7 @@ public:
     virtual void crashed           (Kart *k);
     virtual void setPosition  (int p);
     virtual void raceFinished (float time);
-    int          isPlayerKart      () const {return 1;}
+    bool         isPlayerKart      () const {return true;}
     Camera*      getCamera         () {return m_camera;}
     void         reset();
 };

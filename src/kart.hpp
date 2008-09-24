@@ -219,7 +219,7 @@ public:
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
-    virtual int    isPlayerKart     () const {return 0;                        }
+    virtual bool    isPlayerKart    () const {return false;                        }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
     virtual void   collectedHerring (const Herring &herring, int random_attachment);

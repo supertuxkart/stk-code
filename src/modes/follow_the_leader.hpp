@@ -36,6 +36,7 @@ public:
     virtual void update(float delta);
     virtual void restartRace();
     virtual std::string getInternalCode() const;
+    virtual bool useFastMusicNearEnd() const { return false; }
 };
 
 
