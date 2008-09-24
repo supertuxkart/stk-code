@@ -163,35 +163,39 @@ Widget *RaceResultsGUI::displayRaceResults()
                                           order, /*displayTime*/ true, 0.1f);
 
     delete[] order;
-
-    w_prev=widget_manager->addTextWgt( WTOK_HIGHSCORES, 5, 7, _("Highscores") );
-    widget_manager->hideWgtRect(WTOK_HIGHSCORES);
-    w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
-
+    
     const HighscoreEntry *hs = RaceManager::getWorld()->getHighscores();
-    unsigned int num_scores = hs->getNumberEntries();
-    char *highscores = new char[num_scores * MAX_STR_LEN];
-
-    for(unsigned int i=0; i<num_scores; i++)
+    if(hs != NULL)
     {
-        std::string kart_name, name;
-        float T;
-        hs->getEntry(i, kart_name, name, &T);
-        const int   MINS   = (int) floor ( T / 60.0 ) ;
-        const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
-        const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-        sprintf((char*)( highscores + MAX_STR_LEN * i ),
-                "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
-
-        Widget *w=widget_manager->addTextWgt(WTOK_FIRST_HIGHSCORE + i, 5, 7,
-                                             (char*)( highscores+MAX_STR_LEN*i ) );
-        w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
-        w_prev=w;
-    }
-
-    widget_manager->sameWidth(WTOK_HIGHSCORES, WTOK_FIRST_HIGHSCORE+num_scores-1);
-
-    bottom_of_list = (num_scores > NUM_KARTS) ? w_prev : bottom_of_list;
+        w_prev=widget_manager->addTextWgt( WTOK_HIGHSCORES, 5, 7, _("Highscores") );
+        widget_manager->hideWgtRect(WTOK_HIGHSCORES);
+        w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
+        
+        unsigned int num_scores = hs->getNumberEntries();
+        char *highscores = new char[num_scores * MAX_STR_LEN];
+        
+        for(unsigned int i=0; i<num_scores; i++)
+        {
+            std::string kart_name, name;
+            float T;
+            hs->getEntry(i, kart_name, name, &T);
+            const int   MINS   = (int) floor ( T / 60.0 ) ;
+            const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
+            const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
+            sprintf((char*)( highscores + MAX_STR_LEN * i ),
+                    "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
+            
+            Widget *w=widget_manager->addTextWgt(WTOK_FIRST_HIGHSCORE + i, 5, 7,
+                                                 (char*)( highscores+MAX_STR_LEN*i ) );
+            w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
+            w_prev=w;
+        } // next score
+        
+        widget_manager->sameWidth(WTOK_HIGHSCORES, WTOK_FIRST_HIGHSCORE+num_scores-1);
+        
+        bottom_of_list = (num_scores > NUM_KARTS) ? w_prev : bottom_of_list;
+    } // end if hs != NULL
+    
     return bottom_of_list;
 }  // displayRaceResults
 

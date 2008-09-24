@@ -114,6 +114,11 @@ protected:
     
     Track* m_track;
     
+    /** Whether highscores should be used for this kind of race.
+      * True by default, change to false in a child class to disable.
+      */
+    bool m_use_highscores;
+    
 public:
     /** debug text that will be overlaid to the screen */
     std::string m_debug_text[10];

@@ -71,6 +71,8 @@ World::World()
     // FIXME - not really used yet, only a placeholder to be implemented fully later
     m_order_karts = true;
     
+    m_use_highscores = true;
+    
     // Grab the track file
     try
     {
@@ -288,6 +290,8 @@ void World::update(float dt)
 // ----------------------------------------------------------------------------
 HighscoreEntry* World::getHighscores() const
 {
+    if(!m_use_highscores) return NULL;
+    
     const HighscoreEntry::HighscoreType type = "HST_" + getInternalCode();
     
     HighscoreEntry* highscores =
@@ -306,6 +310,8 @@ HighscoreEntry* World::getHighscores() const
  */
 void World::updateHighscores()
 {
+    if(!m_use_highscores) return;
+    
     // Add times to highscore list. First compute the order of karts,
     // so that the timing of the fastest kart is added first (otherwise
     // someone might get into the highscore list, only to be kicked out
