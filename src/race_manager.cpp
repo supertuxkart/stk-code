@@ -260,13 +260,6 @@ void RaceManager::startNextRace()
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
     // and need world to be defined.
-    
-    /*
-     MAJOR_MODE_GRAND_PRIX, MAJOR_MODE_SINGLE, 
-     MINOR_MODE_QUICK_RACE, MINOR_MODE_TIME_TRIAL, MINOR_MODE_FOLLOW_LEADER
-     FIXME
-     */
-    
     if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) new FollowTheLeaderRace();
     else new StandardRace();
 
