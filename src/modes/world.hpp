@@ -98,9 +98,16 @@ protected:
 
     bool        m_faster_music_active; // true if faster music was activated
 
-    /** whether this kind of race orders karts from first to last
+    /** whether this kind of race orders karts from first to last, whether
+      * you can count laps, have some sort of progression record, whether
+      * sectors and drivelines are used, etc. This will be off for e.g. battle mode.
+      */
+    bool        m_linear_race;
+    
+    /** Whether highscores should be used for this kind of race.
+        * True by default, change to false in a child class to disable.
     */
-    bool        m_order_karts;
+    bool        m_use_highscores;
     
     void  updateRacePosition(int k);
     void  updateHighscores  ();
@@ -114,10 +121,6 @@ protected:
     
     Track* m_track;
     
-    /** Whether highscores should be used for this kind of race.
-      * True by default, change to false in a child class to disable.
-      */
-    bool m_use_highscores;
     
 public:
     /** debug text that will be overlaid to the screen */
@@ -128,10 +131,6 @@ public:
     virtual void    update(float delta);
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
-    
-    /** whether this kind of race orders karts from first to last
-    */
-    bool            areKartsOrdered();
     
     PlayerKart     *getPlayerKart(int player)   const { return m_player_karts[player];      }
     unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
@@ -187,6 +186,11 @@ public:
                                                m_clock.getMode() != CLOCK_NONE); }
     
 
+    /** whether this kind of race orders karts from first to last, whether
+        * you can count laps, have some sort of progression record, whether
+        * sectors and drivelines are used, etc. This will be off for e.g. battle mode.
+        */
+    bool   isLinearRace() const     { return m_linear_race; }
 };
 
 #endif

@@ -462,7 +462,7 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
         step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * float(i);
 
         RaceManager::getTrack()->spatialToTrack(step_track_coord, step_coord,
-                                       m_future_sector );
+                                                m_future_sector );
 
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];

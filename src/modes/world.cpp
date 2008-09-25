@@ -68,8 +68,7 @@ World::World()
 
     m_clock.setMode( CHRONO );
     
-    // FIXME - not really used yet, only a placeholder to be implemented fully later
-    m_order_karts = true;
+    m_linear_race = true;
     
     m_use_highscores = true;
     

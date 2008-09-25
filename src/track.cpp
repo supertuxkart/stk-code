@@ -360,7 +360,7 @@ int Track::findOutOfRoadSector
  */
 int Track::spatialToTrack
 (
-    Vec3& dst,
+    Vec3& dst, /* out */
     const Vec3& POS,
     const int SECTOR
 ) const

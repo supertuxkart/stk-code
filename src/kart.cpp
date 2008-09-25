@@ -388,7 +388,7 @@ void Kart::reset()
     }
 
     RaceManager::getTrack()->spatialToTrack(m_curr_track_coords, getXYZ(),
-                                   m_track_sector );
+                                            m_track_sector );
 
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
@@ -410,8 +410,32 @@ void Kart::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+int Kart::getSector() const
+{
+    // this method only makes sense for linear races
+    assert(RaceManager::getWorld()->isLinearRace());
+    return m_track_sector;
+}
+//-----------------------------------------------------------------------------
+float Kart::getDistanceDownTrack() const
+{
+    // this method only makes sense for linear races
+    assert(RaceManager::getWorld()->isLinearRace());
+    return m_curr_track_coords.getY();
+}
+//-----------------------------------------------------------------------------
+float Kart::getDistanceToCenter () const
+{
+    // this method only makes sense for linear races
+    assert(RaceManager::getWorld()->isLinearRace());
+    return m_curr_track_coords.getX();
+}
+//-----------------------------------------------------------------------------
 void Kart::doLapCounting ()
 {
+    // this method only makes sense for linear races
+    assert(RaceManager::getWorld()->isLinearRace());
+    
     bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords.getY() <  20.0f;
     if ( newLap )
     {
@@ -695,7 +719,17 @@ void Kart::update(float dt)
 
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
-
+    
+    if(RaceManager::getWorld()->isLinearRace()) updateSectorProgression();
+    
+    if(!m_finished_race && RaceManager::getWorld()->isLinearRace()) doLapCounting();
+    processSkidMarks();
+}
+void Kart::updateSectorProgression()
+{
+    // this method only makes sense for linear races
+    assert(RaceManager::getWorld()->isLinearRace());
+    
     // Save the last valid sector for forced rescue on shortcuts
     if(m_track_sector  != Track::UNKNOWN_SECTOR && 
        !m_rescue                                    ) 
@@ -737,11 +771,8 @@ void Kart::update(float dt)
     }
 
     RaceManager::getTrack()->spatialToTrack( m_curr_track_coords, 
-                                    getXYZ(),
-                                    m_track_sector      );
-
-    if(!m_finished_race) doLapCounting();
-    processSkidMarks();
+                                             getXYZ(),
+                                             m_track_sector      );
 }   // update
 
 //-----------------------------------------------------------------------------

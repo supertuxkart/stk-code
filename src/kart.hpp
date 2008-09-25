@@ -112,6 +112,8 @@ protected:
     /** Search the given branch of objects that match the wheel names
         and if so assign them to wheel_* variables */
     void  load_wheels          (ssgBranch* obj);
+    
+    virtual void   doLapCounting    ();
 
 public:
                    Kart(const std::string& kart_name, int position, 
@@ -131,9 +133,12 @@ public:
                                           { m_collectable.set(t, n);             }
     virtual void   setPosition         (int p)    
                                           { m_race_position = p;                 }
-    int            getSector           () const { return m_track_sector;         }
-    float          getDistanceDownTrack() const { return m_curr_track_coords.getY(); }
-    float          getDistanceToCenter () const { return m_curr_track_coords.getX(); }
+    
+    // these methods only makes sense for linear races
+    int            getSector           () const;
+    float          getDistanceDownTrack() const;
+    float          getDistanceToCenter () const;
+    
     Attachment    *getAttachment       ()       { return &m_attachment;          }
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
                                         Kart*k=NULL)
@@ -226,8 +231,9 @@ public:
     virtual void   reset            ();
     virtual void   handleZipper     ();
     virtual void   crashed          (Kart *k);
-    virtual void   doLapCounting    ();
+    
     virtual void   update           (float dt);
+    void           updateSectorProgression();
     virtual void   raceFinished     (float time);
 };
 
