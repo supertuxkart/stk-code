@@ -132,4 +132,5 @@ KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* cal
 {
     LinearWorld::getKartsDisplayInfo(caller);
     m_kart_display_info[0].special_title = _("Leader");
+    return m_kart_display_info;
 }

@@ -36,6 +36,7 @@
 class SFXBase;
 struct KartIconDisplayInfo;
 class RaceGUI;
+class btRigidBody;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
@@ -201,7 +202,7 @@ public:
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.
       */
-    virtual void moveKartAfterRescue(Kart* kart) = 0;
+    virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body) = 0;
 };
 
 #endif

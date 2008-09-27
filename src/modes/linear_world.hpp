@@ -78,7 +78,7 @@ public:
     float           getTimeAtLapForKart(const int kart_id) const;
 
     virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
-    virtual void moveKartAfterRescue(Kart* kart);
+    virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     
     virtual void    terminateRace();
     

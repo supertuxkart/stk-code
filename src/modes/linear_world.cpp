@@ -108,15 +108,15 @@ void LinearWorld::update(float delta)
         // Check if the kart is taking a shortcut (if it's not already doing one):
         if(!kart->isRescue() && RaceManager::getTrack()->isShortcut(prev_sector, kart_info.m_track_sector))
         {
-            forceRescue(kart, kart_info, /*is rescue*/ true);  // bring karts back to where they left the track.     
+            forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.     
             if(kart->isPlayerKart())
             {
-                
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
                 // Can happen if the option menu is called
                 if(m)
                     m->addMessage(_("Invalid short-cut!!"), kart, 2.0f, 60);
             }
+            return;
         }
         
         if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR && !kart->isRescue())
@@ -413,7 +413,7 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
     kart->forceRescue();
 }
 //-----------------------------------------------------------------------------
-void LinearWorld::moveKartAfterRescue(Kart* kart)
+void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
     
@@ -423,6 +423,17 @@ void LinearWorld::moveKartAfterRescue(Kart* kart)
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
                          DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector]) );
     kart->setRotation(heading);
+    
+    // A certain epsilon is added here to the Z coordinate (0.1), in case
+    // that the drivelines are somewhat under the track. Otherwise, the
+    // kart will be placed a little bit under the track, triggering
+    // a rescue, ...
+    btTransform pos;
+    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
+    pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
+                    DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector])));
+
+    body->setCenterOfMassTransform(pos);
 }
 //-----------------------------------------------------------------------------
 /** Find the position (rank) of 'kart'

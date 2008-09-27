@@ -833,29 +833,15 @@ void Kart::forceRescue()
  */
 void Kart::endRescue()
 {
-    RaceManager::getWorld()->moveKartAfterRescue(this);
-    
     m_rescue = false ;
 
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
-    // FIXME: This code positions the kart correctly back on the track
-    // (nearest waypoint) - but if the kart is simply upside down,
-    // it feels better if the kart is left where it was. Perhaps
-    // this code should only be used if a rescue was not triggered
-    // by the kart being upside down??
-    // FIXME - why is transform set twice?
-    /*
-    btTransform pos;
-    // A certain epsilon is added here to the Z coordinate (0.1), in case
-    // that the drivelines are somewhat under the track. Otherwise, the
-    // kart will be placed a little bit under the track, triggering
-    // a rescue, ...
-    pos.setOrigin(getXYZ()+btVector3(0, 0, 0.5f*getKartHeight()+0.1f));
-    m_body->setCenterOfMassTransform(pos);
-     */
+
+    // let the mode decide where to put the kart
+    RaceManager::getWorld()->moveKartAfterRescue(this, m_body);
+    
     RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
-    //setTrans(pos);
 }   // endRescue
 
 //-----------------------------------------------------------------------------
