@@ -100,12 +100,6 @@ protected:
 
     bool        m_faster_music_active; // true if faster music was activated
 
-    /** whether this kind of race orders karts from first to last, whether
-      * you can count laps, have some sort of progression record, whether
-      * sectors and drivelines are used, etc. This will be off for e.g. battle mode.
-      */
-    bool        m_linear_race;
-    
     /** Whether highscores should be used for this kind of race.
         * True by default, change to false in a child class to disable.
     */
@@ -186,13 +180,6 @@ public:
     bool shouldDrawTimer() const    { return ((m_clock.getPhase() == RACE_PHASE ||
                                                m_clock.getPhase() == DELAY_FINISH_PHASE) &&
                                                m_clock.getMode() != CLOCK_NONE); }
-    
-
-    /** whether this kind of race orders karts from first to last, whether
-        * you can count laps, have some sort of progression record, whether
-        * sectors and drivelines are used, etc. This will be off for e.g. battle mode.
-        */
-    bool   isLinearRace() const     { return m_linear_race; }
     
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode

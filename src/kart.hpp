@@ -103,8 +103,6 @@ protected:
         and if so assign them to wheel_* variables */
     void  load_wheels          (ssgBranch* obj);
     
-    //virtual void   doLapCounting    ();
-
 public:
                    Kart(const std::string& kart_name, int position, 
                         const btTransform& init_transform);
@@ -123,11 +121,6 @@ public:
                                           { m_collectable.set(t, n);             }
     virtual void   setPosition         (int p)    
                                           { m_race_position = p;                 }
-    
-    // these methods only makes sense for linear races
-    //int            getSector           () const;
-    //float          getDistanceDownTrack() const;
-    //float          getDistanceToCenter () const;
     
     Attachment    *getAttachment       ()       { return &m_attachment;          }
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
@@ -220,7 +213,6 @@ public:
     virtual void   crashed          (Kart *k);
     
     virtual void   update           (float dt);
-    //void           updateSectorProgression();
     virtual void   raceFinished     (float time);
 };
 

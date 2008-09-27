@@ -188,7 +188,6 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
             kart_info.m_race_lap++ ;
         }
         // Race finished
-        // =============
         if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
            race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
@@ -208,6 +207,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
             	time_per_lap=RaceManager::getWorld()->getTime() - kart_info.m_lap_start_time;
             }
             
+            // if new fastest lap
             if(time_per_lap < RaceManager::getWorld()->getFastestLapTime() &&
                race_manager->raceHasLaps())
             {
@@ -226,12 +226,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
                     m->addMessage(m_fastest_lap_message, NULL, 
                                   2.0f, 40, 100, 210, 100);
                 }   // if m
-            }   // if time_per_lap < RaceManager::getWorld()->getFasterstLapTime()
-            //if(kart->isPlayerKart())
-            //{
-                // Put in in the highscore list???
-                //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
-            //}
+            } // end if new fastest lap
         }
         kart_info.m_lap_start_time = RaceManager::getWorld()->getTime();
     }
@@ -305,7 +300,6 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
         const float lap_time = getTimeAtLapForKart(kart->getWorldKartId());
         const int current_lap  = getLapForKart( kart->getWorldKartId() );
         rank_info.lap = current_lap;
-        //rank_info.rank = kart->getPosition();
         const int position = kart->getPosition();
         
         if(current_lap > laps_of_leader)
@@ -377,6 +371,7 @@ void LinearWorld::terminateRace()
         }  // if !hasFinishedRace
     }   // for i
 }
+//-----------------------------------------------------------------------------
 float LinearWorld::estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info)
 {
     // Estimate the arrival time of any karts that haven't arrived
@@ -400,6 +395,7 @@ float LinearWorld::estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info)
     
 }   // estimateFinishTime
 //-----------------------------------------------------------------------------
+// override 'forceRescue' to do some linear-race-specific actions
 void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
 {
     // If rescue is triggered while doing a shortcut, reset the kart to the
@@ -413,6 +409,8 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
     kart->forceRescue();
 }
 //-----------------------------------------------------------------------------
+/** Decide where to drop a rescued kart
+  */
 void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
@@ -436,8 +434,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     body->setCenterOfMassTransform(pos);
 }
 //-----------------------------------------------------------------------------
-/** Find the position (rank) of 'kart'
-  *
+/** Find the position (rank) of 'kart' and update it accordingly
   */
 void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
 {

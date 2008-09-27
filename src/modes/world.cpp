@@ -67,9 +67,6 @@ World::World()
     m_eliminated_players  = 0;
 
     m_clock.setMode( CHRONO );
-    
-    m_linear_race = true;
-    
     m_use_highscores = true;
     
     // Grab the track file
@@ -275,14 +272,7 @@ void World::update(float dt)
 
     projectile_manager->update(dt);
     herring_manager->update(dt);
-/*
-    for ( Karts::size_type i = 0 ; i < kart_amount; ++i)
-    {
-        if(m_kart[i]->isEliminated()) continue;   // ignore eliminated kart
-        //if(isLinearRace() && !m_kart[i]->hasFinishedRace()) updateRacePosition((int)i);
-        //if(m_kart[i]->isPlayerKart()) m_kart[i]->addMessages();   // add 'wrong direction'
-    }
-*/
+
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
 }

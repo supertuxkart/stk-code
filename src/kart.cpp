@@ -596,9 +596,6 @@ void Kart::update(float dt)
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
     
-    //if(RaceManager::getWorld()->isLinearRace()) updateSectorProgression();
-    
-    //if(!m_finished_race && RaceManager::getWorld()->isLinearRace()) doLapCounting();
     processSkidMarks();
 }
 //-----------------------------------------------------------------------------
