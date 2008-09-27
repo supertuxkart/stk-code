@@ -28,6 +28,7 @@
 #include "utils/ssg_help.hpp"
 #include "race_manager.hpp"
 #include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 
 // static variables:
 float      Flyable::m_st_speed[COLLECT_MAX];
@@ -145,9 +146,15 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         if(inFrontOf != NULL)
         {
             // Ignore karts behind the current one
-            float distance =  kart->getDistanceDownTrack() - inFrontOf->getDistanceDownTrack();
-            if(distance<0) distance += RaceManager::getTrack()->getTrackLength();
-            if(distance > 50){ continue; } 
+            // FIXME - needs an implementation that doesn't rely on drivelines
+            LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+            if(lworld != NULL)
+            {
+                float distance = lworld->getDistanceDownTrackForKart( kart->getWorldKartId() ) -
+                                 lworld->getDistanceDownTrackForKart( inFrontOf->getWorldKartId() );
+                if(distance<0) distance += RaceManager::getTrack()->getTrackLength();
+                if(distance > 50){ continue; }
+            }
         }
         
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)

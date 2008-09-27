@@ -19,9 +19,10 @@
 #include "unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "user_config.hpp"
+#include "translation.hpp"
 
 //-----------------------------------------------------------------------------
-FollowTheLeaderRace::FollowTheLeaderRace() : World(), Clock::ClockListener()
+FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld(), Clock::ClockListener()
 {
     m_leader_intervals    = stk_config->m_leader_intervals;
     
@@ -67,7 +68,7 @@ void FollowTheLeaderRace::update(float delta)
 {
     m_clock.updateClock(delta);
     
-    World::update(delta);
+    LinearWorld::update(delta);
     if(!m_clock.isRacePhase()) return;
     
     if(m_clock.getTime() < 0.0f)
@@ -125,4 +126,10 @@ void FollowTheLeaderRace::restartRace()
 std::string FollowTheLeaderRace::getInternalCode() const
 {
     return "FOLLOW_LEADER";
+}
+//-----------------------------------------------------------------------------
+KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* caller)
+{
+    LinearWorld::getKartsDisplayInfo(caller);
+    m_kart_display_info[0].special_title = _("Leader");
 }

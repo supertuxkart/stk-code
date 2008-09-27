@@ -307,34 +307,3 @@ void PlayerKart::collectedHerring(const Herring &herring, int add_info)
     }
 }   // collectedHerring
 
-//-----------------------------------------------------------------------------
-/** This function is called by world to add any messages to the race gui. This
- *  can't be done (in some cases) in the update() function, since update can be
- *  called several times per frame, resulting in messages being displayed more 
- *  than once.
- **/
-void PlayerKart::addMessages()
-{
-    RaceGUI* m=menu_manager->getRaceMenu();
-    // This can happen if the option menu is called, since the
-    // racegui gets deleted
-    if(!m) return;
-
-    // 1) check if the player is going in the wrong direction
-    // ------------------------------------------------------
-    if(race_manager->getDifficulty()==RaceManager::RD_EASY)
-    {
-      float angle_diff = RAD_TO_DEGREE(getHPR().getHeading()) - RaceManager::getTrack()->m_angle[getSector()];
-        if(angle_diff > 180.0f) angle_diff -= 360.0f;
-        else if (angle_diff < -180.0f) angle_diff += 360.0f;
-        // Display a warning message if the kart is going back way (unless
-        // the kart has already finished the race).
-        if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-            getVelocity().getY() > 0.0f  && !hasFinishedRace() )
-        {
-            m->addMessage(_("WRONG WAY!"), this, -1.0f, 60);
-        }  // if angle is too big
-    }  // if difficulty easy
-
-}   // addMessages
-/* EOF */

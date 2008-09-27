@@ -18,9 +18,9 @@
 #ifndef _follow_the_leader_hpp_
 #define _follow_the_leader_hpp_
 
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 
-class FollowTheLeaderRace : public World, public Clock::ClockListener
+class FollowTheLeaderRace : public LinearWorld, public Clock::ClockListener
 {
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
@@ -37,6 +37,7 @@ public:
     virtual void restartRace();
     virtual std::string getInternalCode() const;
     virtual bool useFastMusicNearEnd() const { return false; }
+    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
 };
 
 

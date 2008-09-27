@@ -21,7 +21,7 @@
 #include "gui/menu_manager.hpp"
 
 //-----------------------------------------------------------------------------
-StandardRace::StandardRace() : World(), Clock::ClockListener()
+StandardRace::StandardRace() : LinearWorld(), Clock::ClockListener()
 {
     m_clock.registerEventListener(this);
     m_clock.setMode(CHRONO);
@@ -67,7 +67,7 @@ void StandardRace::update(float delta)
 {
     m_clock.updateClock(delta);
     
-    World::update(delta);
+    LinearWorld::update(delta);
     if(!m_clock.isRacePhase()) return;
     
     // All karts are finished

@@ -203,7 +203,6 @@ void World::terminateRace()
     updateHighscores();
     m_clock.pause();
     menu_manager->pushMenu(MENUID_RACERESULT);
-    estimateFinishTimes();
     unlock_manager->raceFinished();
 }
 //-----------------------------------------------------------------------------
@@ -276,14 +275,14 @@ void World::update(float dt)
 
     projectile_manager->update(dt);
     herring_manager->update(dt);
-
+/*
     for ( Karts::size_type i = 0 ; i < kart_amount; ++i)
     {
         if(m_kart[i]->isEliminated()) continue;   // ignore eliminated kart
-        if(!m_kart[i]->hasFinishedRace()) updateRacePosition((int)i);
-        if(m_kart[i]->isPlayerKart()) m_kart[i]->addMessages();   // add 'wrong direction'
+        //if(isLinearRace() && !m_kart[i]->hasFinishedRace()) updateRacePosition((int)i);
+        //if(m_kart[i]->isPlayerKart()) m_kart[i]->addMessages();   // add 'wrong direction'
     }
-
+*/
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
 }
@@ -354,22 +353,6 @@ void World::updateHighscores()
     }
     delete []index;
 }   // updateHighscores
-
-
-//-----------------------------------------------------------------------------
-void World::estimateFinishTimes()
-{
-    const int kart_amount = m_kart.size();
-    for ( Karts::size_type i = 0; i < kart_amount; ++i)
-    {
-        if(!m_kart[i]->hasFinishedRace())
-        {
-            const float est_finish_time = m_kart[i]->estimateFinishTime();
-            m_kart[i]->raceFinished(est_finish_time);
-        }  // if !hasFinishedRace
-    }   // for i
-}  // estimateFinishTimes
-
 //-----------------------------------------------------------------------------
 void World::printProfileResultAndExit()
 {
@@ -433,45 +416,6 @@ void World::removeKart(int kart_number)
     m_eliminated_karts++;
 
 }   // removeKart
-
-//-----------------------------------------------------------------------------
-void World::updateRacePosition ( int k )
-{
-    int p = 1 ;
-
-    /* Find position of kart 'k' */
-
-    const unsigned int kart_amount = m_kart.size();
-    for ( Karts::size_type j = 0 ; j < kart_amount ; ++j )
-    {
-        if(int(j) == k) continue;
-        if(m_kart[j]->isEliminated()) continue;   // eliminated karts   
-
-        // Count karts ahead of the current kart, i.e. kart that are already
-        // finished (the current kart k has not yet finished!!), have done more
-        // laps, or the same number of laps, but a greater distance.
-        if (m_kart[j]->hasFinishedRace()                                           ||
-            m_kart[j]->getLap() >  m_kart[k]->getLap()                             ||
-            (m_kart[j]->getLap() == m_kart[k]->getLap() &&
-             m_kart[j]->getDistanceDownTrack() > m_kart[k]->getDistanceDownTrack()) )
-            p++ ;
-    }
-
-    m_kart[k]->setPosition(p);
-    // Switch on faster music if not already done so, if the
-    // first kart is doing its last lap, and if the estimated
-    // remaining time is less than 30 seconds.
-    if(!m_faster_music_active                             && 
-        m_kart[k]->getLap()==race_manager->getNumLaps()-1 && 
-        p==1                                              &&
-        useFastMusicNearEnd()                             &&
-        m_kart[k]->estimateFinishTime()-getTime()<30.0f   ) 
-    {
-        sound_manager->switchToFastMusic();
-        m_faster_music_active=true;
-    }
-}   // updateRacePosition
-
 //-----------------------------------------------------------------------------
 /** Cleans up old herrings (from a previous race), removes old track specific
  *  herring models, and loads the actual track.

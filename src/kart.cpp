@@ -66,7 +66,7 @@ Kart::Kart (const std::string& kart_name, int position,
 #endif
 {
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
-    m_grid_position        = position;
+   //m_grid_position        = position;
     m_initial_position     = position;
     m_num_herrings_gobbled = 0;
     m_eliminated           = false;
@@ -78,7 +78,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_exhaust_pipe         = NULL;
     m_skidmark_left        = NULL;
     m_skidmark_right       = NULL;
-    m_track_sector         = Track::UNKNOWN_SECTOR;
+    
 
     // Set position and heading:
     m_reset_transform      = init_transform;
@@ -102,7 +102,6 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheel_front_r           = NULL;
     m_wheel_rear_l            = NULL;
     m_wheel_rear_r            = NULL;
-    m_lap_start_time          = -1.0f;
 
     m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE);
 
@@ -346,10 +345,6 @@ void Kart::reset()
     m_attachment.clear();
     m_collectable.reset();
 
-    m_race_lap             = -1;
-    m_lap_start_time       = -1.0f;
-    m_time_at_last_lap     = 99999.9f;
-    m_shortcut_sector      = Track::UNKNOWN_SECTOR;
     m_race_position        = 9;
     m_finished_race        = false;
     m_eliminated           = false;
@@ -372,24 +367,6 @@ void Kart::reset()
 
     setTrans(m_reset_transform);
 
-    RaceManager::getTrack()->findRoadSector(getXYZ(), &m_track_sector);
-
-    //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
-    //the road, so we have to use another function to find the sector.
-    if (m_track_sector == Track::UNKNOWN_SECTOR )
-    {
-        m_on_road = false;
-        m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
-            getXYZ(), Track::RS_DONT_KNOW, Track::UNKNOWN_SECTOR );
-    }
-    else
-    {
-        m_on_road = true;
-    }
-
-    RaceManager::getTrack()->spatialToTrack(m_curr_track_coords, getXYZ(),
-                                            m_track_sector );
-
     m_vehicle->applyEngineForce (0.0f, 2);
     m_vehicle->applyEngineForce (0.0f, 3);
 
@@ -408,107 +385,6 @@ void Kart::reset()
     m_rescue               = false;
     TerrainInfo::update(getXYZ());
 }   // reset
-
-//-----------------------------------------------------------------------------
-int Kart::getSector() const
-{
-    // this method only makes sense for linear races
-    assert(RaceManager::getWorld()->isLinearRace());
-    return m_track_sector;
-}
-//-----------------------------------------------------------------------------
-float Kart::getDistanceDownTrack() const
-{
-    // this method only makes sense for linear races
-    assert(RaceManager::getWorld()->isLinearRace());
-    return m_curr_track_coords.getY();
-}
-//-----------------------------------------------------------------------------
-float Kart::getDistanceToCenter () const
-{
-    // this method only makes sense for linear races
-    assert(RaceManager::getWorld()->isLinearRace());
-    return m_curr_track_coords.getX();
-}
-//-----------------------------------------------------------------------------
-void Kart::doLapCounting ()
-{
-    // this method only makes sense for linear races
-    assert(RaceManager::getWorld()->isLinearRace());
-    
-    bool newLap = m_last_track_coords[1] > 300.0f && m_curr_track_coords.getY() <  20.0f;
-    if ( newLap )
-    {
-        // Only increase the lap counter and set the new time if the
-        // kart hasn't already finished the race (otherwise the race_gui
-        // will begin another countdown).
-        if(m_race_lap+1<=race_manager->getNumLaps())
-        {
-            setTimeAtLap(RaceManager::getWorld()->getTime());
-            m_race_lap++ ;
-        }
-        // Race finished
-        // =============
-        if(m_race_lap>=race_manager->getNumLaps() && 
-            race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        {
-            raceFinished(RaceManager::getWorld()->getTime());
-        }
-        // Only do timings if original time was set properly. Driving backwards
-        // over the start line will cause the lap start time to be set to -1.
-        if(m_lap_start_time>=0.0)
-        {
-            float time_per_lap;
-            if (m_race_lap == 1) // just completed first lap
-            {
-            	time_per_lap=RaceManager::getWorld()->getTime();
-            }
-            else //completing subsequent laps
-            {
-            	time_per_lap=RaceManager::getWorld()->getTime()-m_lap_start_time;
-            }
-                        
-            if(time_per_lap < RaceManager::getWorld()->getFastestLapTime() &&
-                race_manager->raceHasLaps())
-            {
-                RaceManager::getWorld()->setFastestLap(this, time_per_lap);
-                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-                if(m)
-                {
-                    m->addMessage(_("New fastest lap"), NULL, 
-                                  2.0f, 40, 100, 210, 100);
-                    char s[20];
-                    m->TimeToString(time_per_lap, s);
-                    snprintf(m_fastest_lap_message, sizeof(m_fastest_lap_message),
-                             "%s: %s",s, getName().c_str());
-                    m->addMessage(m_fastest_lap_message, NULL, 
-                                  2.0f, 40, 100, 210, 100);
-                }   // if m
-            }   // if time_per_lap < RaceManager::getWorld()->getFasterstLapTime()
-            if(isPlayerKart())
-            {
-                // Put in in the highscore list???
-                //printf("Time per lap: %s %f\n", getName().c_str(), time_per_lap);
-            }
-        }
-        m_lap_start_time = RaceManager::getWorld()->getTime();
-    }
-    else if ( m_curr_track_coords.getY() > 300.0f && m_last_track_coords[1] <  20.0f)
-    {
-        m_race_lap-- ;
-        // Prevent cheating by setting time to a negative number, indicating
-        // that the line wasn't crossed properly.
-        m_lap_start_time = -1.0f;
-    } else
-    {   // Switch to fast music in case of follow the leader when only 3 karts are left
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-            RaceManager::getWorld()->getCurrentNumKarts()==3)  
-        {
-            sound_manager->switchToFastMusic();
-        }
-    }
-}   // doLapCounting
-
 //-----------------------------------------------------------------------------
 void Kart::raceFinished(float time)
 {
@@ -660,7 +536,7 @@ void Kart::update(float dt)
     }   // if m_rescue
     m_attachment.update(dt);
 
-    /*smoke drawing control point*/
+    //smoke drawing control point
     if ( user_config->m_smoke )
     {
         if (m_smoke_system != NULL)
@@ -668,7 +544,7 @@ void Kart::update(float dt)
     }  // user_config->smoke
     updatePhysics(dt);
 
-    m_last_track_coords = m_curr_track_coords;
+    //kart_info.m_last_track_coords = kart_info.m_curr_track_coords;
 
     Moveable::update(dt);
 
@@ -720,61 +596,11 @@ void Kart::update(float dt)
     // Check if any herring was hit.
     herring_manager->hitHerring(this);
     
-    if(RaceManager::getWorld()->isLinearRace()) updateSectorProgression();
+    //if(RaceManager::getWorld()->isLinearRace()) updateSectorProgression();
     
-    if(!m_finished_race && RaceManager::getWorld()->isLinearRace()) doLapCounting();
+    //if(!m_finished_race && RaceManager::getWorld()->isLinearRace()) doLapCounting();
     processSkidMarks();
 }
-void Kart::updateSectorProgression()
-{
-    // this method only makes sense for linear races
-    assert(RaceManager::getWorld()->isLinearRace());
-    
-    // Save the last valid sector for forced rescue on shortcuts
-    if(m_track_sector  != Track::UNKNOWN_SECTOR && 
-       !m_rescue                                    ) 
-    {
-        m_shortcut_sector = m_track_sector;
-    }
-
-    int prev_sector = m_track_sector;
-    if(!m_rescue)
-        RaceManager::getTrack()->findRoadSector(getXYZ(), &m_track_sector);
-
-    // Check if the kart is taking a shortcut (if it's not already doing one):
-    if(!m_rescue && RaceManager::getTrack()->isShortcut(prev_sector, m_track_sector))
-    {
-	    forceRescue(/*is rescue*/ true);  // bring karts back to where they left the track.     
-	    if(isPlayerKart())
-        {
-            
-            RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-            // Can happen if the option menu is called
-            if(m)
-                m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);
-        }
-    }
-
-    if (m_track_sector == Track::UNKNOWN_SECTOR && !m_rescue)
-    {
-        m_on_road = false;
-        if( m_curr_track_coords[0] > 0.0 )
-            m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
-               getXYZ(), Track::RS_RIGHT, prev_sector );
-        else
-            m_track_sector = RaceManager::getTrack()->findOutOfRoadSector(
-               getXYZ(), Track::RS_LEFT, prev_sector );
-    }
-    else
-    {
-        m_on_road = true;
-    }
-
-    RaceManager::getTrack()->spatialToTrack( m_curr_track_coords, 
-                                             getXYZ(),
-                                             m_track_sector      );
-}   // update
-
 //-----------------------------------------------------------------------------
 // Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()
@@ -998,27 +824,17 @@ void Kart::updatePhysics (float dt)
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
-void Kart::forceRescue(bool is_shortcut)
+void Kart::forceRescue()
 {
     m_rescue=true;
-    // If rescue is triggered while doing a shortcut, reset the kart to the
-    // segment where the shortcut started!! And then reset the shortcut
-    // flag, so that this shortcut is not counted!
-    if(is_shortcut)
-    {
-        m_track_sector   = m_shortcut_sector;
-    } 
 }   // forceRescue
 //-----------------------------------------------------------------------------
 /** Drops a kart which was rescued back on the track.
  */
 void Kart::endRescue()
 {
-    if ( m_track_sector > 0 ) m_track_sector-- ;
-    setXYZ( RaceManager::getTrack()->trackToSpatial(m_track_sector) );
-    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[m_track_sector]) );
-    setRotation(heading);
+    RaceManager::getWorld()->moveKartAfterRescue(this);
+    
     m_rescue = false ;
 
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
@@ -1028,17 +844,18 @@ void Kart::endRescue()
     // it feels better if the kart is left where it was. Perhaps
     // this code should only be used if a rescue was not triggered
     // by the kart being upside down??
+    // FIXME - why is transform set twice?
+    /*
     btTransform pos;
     // A certain epsilon is added here to the Z coordinate (0.1), in case
     // that the drivelines are somewhat under the track. Otherwise, the
     // kart will be placed a little bit under the track, triggering
     // a rescue, ...
     pos.setOrigin(getXYZ()+btVector3(0, 0, 0.5f*getKartHeight()+0.1f));
-    pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 
-                                 DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[m_track_sector])));
     m_body->setCenterOfMassTransform(pos);
+     */
     RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
-    setTrans(pos);
+    //setTrans(pos);
 }   // endRescue
 
 //-----------------------------------------------------------------------------
@@ -1199,27 +1016,4 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));
 }   // updateGraphics
 
-//-----------------------------------------------------------------------------
-float Kart::estimateFinishTime  ()
-{
-    // Estimate the arrival time of any karts that haven't arrived
-    // yet by using their average speed up to now and the distance
-    // still to race. This approach guarantees that the order of 
-    // the karts won't change anymore (karts ahead will have a 
-    // higher average speed and therefore finish the race earlier 
-    // than karts further behind), so the position doesn't have to
-    // be updated to get the correct scoring.
-    float distance_covered  = getLap()*RaceManager::getTrack()->getTrackLength()
-                            + getDistanceDownTrack();
-    // In case that a kart is rescued behind start line, or ...
-    if(distance_covered<0) distance_covered =1.0f;
-
-    float average_speed     = distance_covered/RaceManager::getWorld()->getTime();
-
-    // Finish time is the time needed for the whole race with 
-    // the average speed computed above.
-    return race_manager->getNumLaps()*RaceManager::getTrack()->getTrackLength() 
-          / average_speed;
-
-}   // estimateFinishTime
 /* EOF */

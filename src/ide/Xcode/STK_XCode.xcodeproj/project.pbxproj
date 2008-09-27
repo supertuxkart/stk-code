@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9519653D0E8C592F001BB888 /* linear_world.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9519653B0E8C592F001BB888 /* linear_world.hpp */; };
+		9519653E0E8C592F001BB888 /* linear_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9519653C0E8C592F001BB888 /* linear_world.cpp */; };
 		95F0F25A0E85C054005F6693 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = 95923F8B0E808EDC00388BDC /* callbacks.c */; };
 		95F0F25B0E85C054005F6693 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = 95923FAF0E808EDC00388BDC /* list.c */; };
 		95F0F25C0E85C054005F6693 /* host.c in Sources */ = {isa = PBXBuildFile; fileRef = 95923F9B0E808EDC00388BDC /* host.c */; };
@@ -248,12 +250,15 @@
 			files = (
 				95F0F36E0E85C6A6005F6693 /* clock.hpp in CopyFiles */,
 				95F0F3830E85C76B005F6693 /* world.hpp in CopyFiles */,
+				9519653D0E8C592F001BB888 /* linear_world.hpp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9519653B0E8C592F001BB888 /* linear_world.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = linear_world.hpp; path = modes/linear_world.hpp; sourceTree = "<group>"; };
+		9519653C0E8C592F001BB888 /* linear_world.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = linear_world.cpp; path = modes/linear_world.cpp; sourceTree = "<group>"; };
 		956F3FAB0E85BE0E006F93B0 /* random_generator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = random_generator.cpp; sourceTree = "<group>"; };
 		956F3FAC0E85BE0E006F93B0 /* random_generator.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = random_generator.hpp; sourceTree = "<group>"; };
 		956F3FAD0E85BE0E006F93B0 /* ssg_help.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ssg_help.cpp; sourceTree = "<group>"; };
@@ -2055,6 +2060,8 @@
 				957B11D70E8320CD002A69EA /* follow_the_leader.hpp */,
 				957B11D80E8320CD002A69EA /* follow_the_leader.cpp */,
 				957B11B30E831DA8002A69EA /* standard_race.hpp */,
+				9519653B0E8C592F001BB888 /* linear_world.hpp */,
+				9519653C0E8C592F001BB888 /* linear_world.cpp */,
 				957B11B40E831DA8002A69EA /* standard_race.cpp */,
 			);
 			name = modes;
@@ -2323,6 +2330,7 @@
 				95F0F35D0E85C140005F6693 /* random_generator.cpp in Sources */,
 				95F0F36F0E85C6A6005F6693 /* clock.cpp in Sources */,
 				95F0F3840E85C76B005F6693 /* world.cpp in Sources */,
+				9519653E0E8C592F001BB888 /* linear_world.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2461,6 +2469,7 @@
 					"-lplibssgaux",
 				);
 				PRODUCT_NAME = SuperTuxKart;
+				SDKROOT = "";
 				ZERO_LINK = NO;
 			};
 			name = Release;

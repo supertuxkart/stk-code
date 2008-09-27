@@ -35,6 +35,21 @@
 class InputMap;
 class RaceSetup;
 
+/**
+  * Used to display the list of karts and their times or
+  * whatever other info is relevant to the current mode.
+  */
+struct KartIconDisplayInfo
+{
+    std::string time;
+   // int rank;
+    float r, g, b;
+    std::string special_title;
+    /** Current lap of this kart, or -1 if irrelevant
+      */
+    int lap;
+};
+
 class RaceGUI: public BaseGUI
 {
 
@@ -104,7 +119,7 @@ private:
     void drawAllMessages       (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
-    void drawPlayerIcons       ();
+    void drawPlayerIcons       (const KartIconDisplayInfo* info);
     void oldDrawPlayerIcons    ();
     void drawMap               ();
     void drawTimer             ();
@@ -122,8 +137,8 @@ private:
                                    float ratio_x, float ratio_y           );
     void drawSpeed                (Kart* kart, int offset_x, int offset_y,
                                    float ratio_x, float ratio_y           );
-    void drawLap                  (Kart* kart, int offset_x, int offset_y,
-                                   float ratio_x, float ratio_y           );
+    void drawLap                  (const KartIconDisplayInfo* info, Kart* kart, int offset_x,
+                                   int offset_y, float ratio_x, float ratio_y  );
 };
 
 #endif

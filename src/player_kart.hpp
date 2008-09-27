@@ -58,7 +58,6 @@ public:
     int          earlyStartPenalty () {return m_penalty_time>0; }
     Player      *getPlayer         () {return m_player;        }
     void         update            (float);
-    void         addMessages       ();
     void         action            (KartAction action, int value);
     void         handleZipper      ();
     void         collectedHerring  (const Herring &herring, int add_info=-1);

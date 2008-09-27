@@ -39,7 +39,7 @@
 #include <iostream>
 #include "constants.hpp"
 #include "scene.hpp"
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
 
@@ -162,14 +162,20 @@ void DefaultRobot::handle_braking()
         m_controls.brake = true;
         return;
     }
-    const float MIN_SPEED = RaceManager::getTrack()->getWidth()[m_track_sector];
+    
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
+    const float MIN_SPEED = RaceManager::getTrack()->getWidth()[kart_info.m_track_sector];
 
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if ( m_crashes.m_road && m_on_road && getVelocityLC().getY() > MIN_SPEED)
+    if ( m_crashes.m_road && kart_info.m_on_road && getVelocityLC().getY() > MIN_SPEED)
     {
-        float kart_ang_diff = RaceManager::getTrack()->m_angle[m_track_sector] -
+        float kart_ang_diff = RaceManager::getTrack()->m_angle[kart_info.m_track_sector] -
                               RAD_TO_DEGREE(getHPR().getHeading());
         kart_ang_diff = normalize_angle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
@@ -184,7 +190,7 @@ void DefaultRobot::handle_braking()
             //if the curve angle is bigger than what the kart can steer, brake
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
-            if(!(getDistanceToCenter() > RaceManager::getTrack()->getWidth()[m_track_sector] *
+            if(!(lworld->getDistanceToCenterForKart(getWorldKartId()) > RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] *
                  -CURVE_INSIDE_PERC || m_curve_angle > getMaxSteerAngle()))
             {
                 m_controls.brake = false;
@@ -193,7 +199,7 @@ void DefaultRobot::handle_braking()
         }
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
-            if(!(getDistanceToCenter() < RaceManager::getTrack()->getWidth()[m_track_sector] *
+            if(!(lworld->getDistanceToCenterForKart( getWorldKartId() ) < RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] *
                  CURVE_INSIDE_PERC || m_curve_angle < -getMaxSteerAngle()))
             {
                 m_controls.brake = false;
@@ -224,17 +230,22 @@ void DefaultRobot::handle_braking()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handle_steering()
 {
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
     const unsigned int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
-    const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
-        m_track_sector + 1 : 0;
+    const size_t NEXT_SECTOR = (unsigned int)kart_info.m_track_sector + 1 < DRIVELINE_SIZE ?
+        kart_info.m_track_sector + 1 : 0;
     float steer_angle = 0.0f;
 
     /*The AI responds based on the information we just gathered, using a
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(getDistanceToCenter()) + 0.5 >
-        RaceManager::getTrack()->getWidth()[m_track_sector] )
+    if( fabsf(lworld->getDistanceToCenterForKart( getWorldKartId() )) + 0.5 >
+        RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] )
     {
         steer_angle = steer_to_point( RaceManager::getTrack()->
             m_driveline[NEXT_SECTOR] );
@@ -261,8 +272,8 @@ void DefaultRobot::handle_steering()
         }
         else
         {
-            if(getDistanceToCenter() > RaceManager::getKart(m_crashes.m_kart)->
-               getDistanceToCenter())
+            if(lworld->getDistanceToCenterForKart( getWorldKartId() ) >
+               lworld->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
                 steer_angle = steer_to_angle( NEXT_SECTOR, -90.0f );
                 m_start_kart_crash_direction = 1;
@@ -300,7 +311,7 @@ void DefaultRobot::handle_steering()
         case FT_AVOID_TRACK_CRASH:
             if( m_crashes.m_road )
             {
-                steer_angle = steer_to_angle( m_track_sector, 0.0f );
+                steer_angle = steer_to_angle( kart_info.m_track_sector, 0.0f );
             }
             else steer_angle = 0.0f;
 
@@ -329,6 +340,11 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
         return;
     }
 
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
     m_time_since_last_shot += DELTA;
     if( m_collectable.getType() != COLLECT_NOTHING )
     {
@@ -347,7 +363,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             case COLLECT_ZIPPER:
                 {
                     const float ANGLE_DIFF = fabsf( normalize_angle(
-                        RaceManager::getTrack()->m_angle[m_track_sector]-
+                        RaceManager::getTrack()->m_angle[kart_info.m_track_sector]-
                         RAD_TO_DEGREE(getHPR().getHeading()) ) );
 
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
@@ -434,6 +450,11 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
     if( m_crashes.m_road ) return false;
     if( m_crashes.m_kart != -1 ) return false;
 
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
     //We have to be careful with normalizing, because if the source argument
     //has both the X and Y axis set to 0, it returns nan to the destiny.
     const Vec3 &VEL      = getVelocity();
@@ -467,7 +488,7 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
         distance = step_track_coord[0] > 0.0f ?  step_track_coord[0]
                    : -step_track_coord[0];
 
-        if( distance > RaceManager::getTrack()->getWidth()[m_track_sector] )
+        if( distance > RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] )
         {
             return false;
         }
@@ -688,8 +709,13 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
 {
     const unsigned int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
 
-    unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE ?
-        m_track_sector + 1 : 0;
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
+    unsigned int sector = (unsigned int)kart_info.m_track_sector + 1 < DRIVELINE_SIZE ?
+        kart_info.m_track_sector + 1 : 0;
     int target_sector;
 
     Vec3 direction;
@@ -925,22 +951,27 @@ float DefaultRobot::get_approx_radius(const int START, const int END) const
  */
 void DefaultRobot::find_curve()
 {
+    // FIXME - don't re-create everytime, store at least the lworld
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    assert(lworld != NULL);
+    KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
+    
     const int DRIVELINE_SIZE = (unsigned int)RaceManager::getTrack()->m_driveline.size();
     float total_dist = 0.0f;
-    int next_hint = m_track_sector;
+    int next_hint = kart_info.m_track_sector;
     int i;
 
-    for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
+    for(i = kart_info.m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
     {
         next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
         total_dist += sgDistanceVec2(RaceManager::getTrack()->m_driveline[i], RaceManager::getTrack()->m_driveline[next_hint]);
     }
 
 
-    m_curve_angle = normalize_angle(RaceManager::getTrack()->m_angle[i] - RaceManager::getTrack()->m_angle[m_track_sector]);
+    m_curve_angle = normalize_angle(RaceManager::getTrack()->m_angle[i] - RaceManager::getTrack()->m_angle[kart_info.m_track_sector]);
     m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
     // FIXME: 0.9 is the tire grip - but this was never used. For now this
     // 0.9 is left in place to reproduce the same results and AI behaviour,
     // but this function should be updated to bullet physics
-    m_curve_target_speed = sgSqrt(get_approx_radius(m_track_sector, i) * RaceManager::getTrack()->getGravity() * 0.9f);
+    m_curve_target_speed = sgSqrt(get_approx_radius(kart_info.m_track_sector, i) * RaceManager::getTrack()->getGravity() * 0.9f);
 }

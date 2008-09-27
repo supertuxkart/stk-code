@@ -18,13 +18,13 @@
 #ifndef _standard_race_
 #define _standard_race_
 
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 
 /**
   * Represents a standard race, i.e. with a start, end and laps.
   * Used in Grand Prix, Quick Race and Time Trial.
   */
-class StandardRace : public World, public Clock::ClockListener
+class StandardRace : public LinearWorld, public Clock::ClockListener
 {
 public:
     StandardRace();

@@ -34,6 +34,8 @@
 #include "modes/clock.hpp"
 
 class SFXBase;
+struct KartIconDisplayInfo;
+class RaceGUI;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
@@ -75,7 +77,6 @@ class SFXBase;
  *        RaceManager).
  */
 
-
 class World
 {
 public:
@@ -109,7 +110,7 @@ protected:
     */
     bool        m_use_highscores;
     
-    void  updateRacePosition(int k);
+    //void  updateRacePosition(int k);
     void  updateHighscores  ();
     void  loadTrack         ();
     void  resetAllKarts     ();
@@ -156,7 +157,7 @@ public:
     
     /** Called when race is over and should be terminated (mostly called by the clock).
       */
-    void terminateRace();
+    virtual void terminateRace();
     
     /** Called to determine the default collectibles to give each player for this
       * kind of race. Both parameters are of 'out' type.
@@ -191,6 +192,16 @@ public:
         * sectors and drivelines are used, etc. This will be off for e.g. battle mode.
         */
     bool   isLinearRace() const     { return m_linear_race; }
+    
+    /** Called by the code that draws the list of karts on the race GUI
+      * to know what needs to be drawn in the current mode
+      */
+    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller) = 0;
+    
+    /** Since each mode will have a different way of deciding where a rescued
+      * kart is dropped, this method will be called and each mode can implement it.
+      */
+    virtual void moveKartAfterRescue(Kart* kart) = 0;
 };
 
 #endif

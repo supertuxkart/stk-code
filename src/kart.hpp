@@ -41,33 +41,24 @@ class Kart : public TerrainInfo, public Moveable
 {
 private:
     btTransform  m_reset_transform;    // reset position
-    Vec3         m_curr_track_coords;
-    Vec3         m_last_track_coords;
     unsigned int m_world_kart_id;      // index of kart in world
 
 protected:
-    bool         m_on_road;            // true if the kart is on top of the
-                                       // road path drawn by the drivelines
     Attachment   m_attachment;
     Collectable  m_collectable;
-
-    int          m_grid_position;
     int          m_race_position;      // current race position (1-numKarts)
     int          m_initial_position;   // initial position of kart
+
     KartControl  m_controls;           // The position of the karts controls
-    int          m_track_sector;       // index in driveline, special values
-                                       // e.g. UNKNOWN_SECTOR can be negative!
+
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_gear_rpm;       //maximum engine rpm's for the current gear
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
     float        m_zipper_time_left;   // zipper time left
-    float        m_lap_start_time;     // Time at start of a new lap
-    char         m_fastest_lap_message[255];
+    //char         m_fastest_lap_message[255];
     float        m_bounce_back_time;   // a short time after a collision acceleration
                                        // is disabled to allow the karts to bounce back
-
-    int          m_shortcut_sector;    // segment on which the shortcut was started
 
     // physics parameters, storing it saves time
     btRaycastVehicle::btVehicleTuning  *m_tuning;
@@ -92,8 +83,7 @@ private:
     SkidMark*           m_skidmark_left;
     SkidMark*           m_skidmark_right;
 
-    int                 m_race_lap;             // number of finished(!) laps
-    float               m_time_at_last_lap;       // time at finishing last lap
+
     float               m_finish_time;
     bool                m_finished_race;
 
@@ -113,7 +103,7 @@ protected:
         and if so assign them to wheel_* variables */
     void  load_wheels          (ssgBranch* obj);
     
-    virtual void   doLapCounting    ();
+    //virtual void   doLapCounting    ();
 
 public:
                    Kart(const std::string& kart_name, int position, 
@@ -135,9 +125,9 @@ public:
                                           { m_race_position = p;                 }
     
     // these methods only makes sense for linear races
-    int            getSector           () const;
-    float          getDistanceDownTrack() const;
-    float          getDistanceToCenter () const;
+    //int            getSector           () const;
+    //float          getDistanceDownTrack() const;
+    //float          getDistanceToCenter () const;
     
     Attachment    *getAttachment       ()       { return &m_attachment;          }
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
@@ -146,13 +136,12 @@ public:
     Collectable   *getCollectable      ()       { return &m_collectable;         }
     int            getNumCollectables  () const { return  m_collectable.getNum();}
     int            getNumHerring       () const { return  m_num_herrings_gobbled;}
-    int            getLap              () const { return  m_race_lap;            }
     int            getPosition         () const { return  m_race_position;       }
     int            getInitialPosition  () const { return  m_initial_position;    }
     float          getFinishTime       () const { return  m_finish_time;         }
     bool           hasFinishedRace     () const { return  m_finished_race;       }
     void           endRescue           ();
-    float          estimateFinishTime  ();
+    //float          estimateFinishTime  ();
     void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
@@ -197,8 +186,6 @@ public:
     const KartControl&
                    getControls      () const {return m_controls;               }
     float          getMaxSpeed      () const {return m_max_speed;              }
-    void           setTimeAtLap     (float t){m_time_at_last_lap=t;            }
-    float          getTimeAtLap     () const {return m_time_at_last_lap;       }
     void           createPhysics    (ssgEntity *obj);
     float          getKartLength    () const {return m_kart_properties->getKartLength();}
     float          getKartHeight    () const {return m_kart_properties->getKartHeight();}
@@ -220,7 +207,7 @@ public:
     bool           isRescue         () const {return m_rescue;}
     void           resetBrakes      ();
     void           adjustSpeedWeight(float f);
-    void           forceRescue      (bool is_rescue=false);
+    void           forceRescue      ();
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
@@ -233,7 +220,7 @@ public:
     virtual void   crashed          (Kart *k);
     
     virtual void   update           (float dt);
-    void           updateSectorProgression();
+    //void           updateSectorProgression();
     virtual void   raceFinished     (float time);
 };
 

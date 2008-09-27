@@ -49,7 +49,7 @@ public:
     void lockInput() { m_locked = true; }
     void unlockInput() { m_locked = false; }
 
-    void  TimeToString(const double time, char *s);
+    void  TimeToString(const double time, char *s) const;
 protected:
 
     bool m_locked;

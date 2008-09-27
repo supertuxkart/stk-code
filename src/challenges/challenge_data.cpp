@@ -26,6 +26,7 @@
 #include "grand_prix_manager.hpp"
 #include "kart.hpp"
 #include "track.hpp"
+#include "modes/linear_world.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -234,7 +235,13 @@ bool ChallengeData::raceFinished()
     }
     // Quickrace / Timetrial
     // ---------------------
-    if(kart->getLap()!=m_num_laps) return false;         // wrong number of laps
+    // FIXME - encapsulate this better, each race mode needs to be able to specify
+    // its own challenges and deal with them
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    if(lworld != NULL)
+    {
+        if(lworld->getLapForKart( kart->getWorldKartId() ) != m_num_laps) return false;         // wrong number of laps
+    }
     if(m_time>0.0f && kart->getFinishTime()>m_time) return false;    // too slow
     return true;
 }   // raceFinished

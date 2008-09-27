@@ -146,6 +146,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	modes/standard_race.cpp    modes/standard_race.hpp \
 	modes/clock.cpp            modes/clock.hpp \
 	modes/world.cpp		       modes/world.hpp                	\
+	modes/linear_world.cpp     modes/linear_world.hpp  \
 	replay_buffer_tpl.hpp 					\
 	replay_buffers.hpp	       replay_buffers.cpp		\
 	replay_base.hpp		       replay_base.cpp		\

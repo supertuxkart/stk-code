@@ -318,7 +318,7 @@ void RaceGUI::drawMap ()
 
 //-----------------------------------------------------------------------------
 // Draw players position on the race
-void RaceGUI::drawPlayerIcons ()
+void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 {
     assert(RaceManager::getWorld() != NULL);
 
@@ -329,83 +329,26 @@ void RaceGUI::drawPlayerIcons ()
 
     //glEnable(GL_TEXTURE_2D);
     Material *last_players_gst = 0;
-    int   laps_of_leader       = -1;
-    float time_of_leader       = -1;
-    // Find the best time for the lap. We can't simply use
-    // the time of the kart at position 1, since the kart
-    // might have been overtaken by now
-    for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
-    {
-        Kart* kart     = RaceManager::getKart(i);
-        if(kart->isEliminated()) continue;
-        float lap_time = kart->getTimeAtLap();
-        int laps       = kart->getLap();
-
-        if(laps > laps_of_leader)
-        {
-            // more laps than current leader --> new leader and new time computation
-            laps_of_leader = laps;
-            time_of_leader = lap_time;
-        } else if(laps == laps_of_leader)
-        {
-            // Same number of laps as leader: use fastest time
-            time_of_leader=std::min(time_of_leader,lap_time);
-        }
-    }   // for i<getNumKarts
 
     int bFirst                 = 1;
-    for(unsigned int i = 0; i < race_manager->getNumKarts() ; i++)
+    const int kart_amount = race_manager->getNumKarts();
+    for(unsigned int i = 0; i < kart_amount ; i++)
     {
         Kart* kart   = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;
         int position = kart->getPosition();
-        int lap      = kart->getLap();
 
         y = user_config->m_height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
 
-        // draw text
-        GLfloat COLORS[] = {1.0f, 1.0f, 1.0f, 1.0f};
-        int numLaps = race_manager->getNumLaps();
-
-        if(lap>=numLaps)
-        {  // kart is finished, display in green
-            COLORS[1] = COLORS[2] = 0;
-        }
-        else if(lap>=0 && numLaps>1)
-        {
-            COLORS[1] = COLORS[2] = 1.0f-(float)lap/((float)numLaps-1.0f);
-        }
-
-        glDisable(GL_CULL_FACE);
-
-        if(laps_of_leader>0 &&    // Display position during first lap
-           (RaceManager::getWorld()->getTime() - kart->getTimeAtLap()<5.0f || lap!=laps_of_leader) &&
-           race_manager->raceHasLaps())
-        {  // Display for 5 seconds
-            char str[256];
-            if(position==1)
-            {
-                str[0]=' '; str[1]=0;
-                TimeToString(kart->getTimeAtLap(), str+1);
-            }
-            else
-            {
-                float timeBehind;
-                timeBehind = (lap==laps_of_leader ? kart->getTimeAtLap() : RaceManager::getWorld()->getTime())
-                    - time_of_leader;
-                str[0]='+'; str[1]=0;
-                TimeToString(timeBehind, str+1);
-            }
-            font_race->PrintShadow(str, 30, ICON_PLAYER_WIDHT+x, y+5,
-                                   COLORS);
-        }
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER && i==0)
+        GLfloat COLOR[] = {info[i].r, info[i].g, info[i].b, 1.0f};
+        font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDHT+x, y+5, COLOR);
+        
+        if(info[i].special_title.length() >0)
         {
             GLfloat const RED[] = { 1.0f, 0, 0, 1.0f};
-            font_race->PrintShadow(_("Leader"), 30, ICON_PLAYER_WIDHT+x, y+5,
-                                   RED );
+            font_race->PrintShadow(info[i].special_title.c_str(), 30, ICON_PLAYER_WIDHT+x, y+5, RED );
         }
-
+        
         glEnable(GL_CULL_FACE);
 
         bFirst = 0;
@@ -780,12 +723,15 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
-                      float ratio_x, float ratio_y           )
+void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
+                      int offset_y, float ratio_x, float ratio_y           )
 {
     // Don't display laps in follow the leader mode
     if(!race_manager->raceHasLaps()) return;
-    if(kart->getLap()<0) return;  // don't display 'lap 0/...'
+    
+    const int lap = info[kart->getWorldKartId()].lap;
+    
+    if(lap<0) return;  // don't display 'lap 0/...', or do nothing if laps are disabled (-1)
     float maxRatio = std::max(ratio_x, ratio_y);
     char str[256];
     offset_x += (int)(120*ratio_x);
@@ -802,7 +748,7 @@ void RaceGUI::drawLap(Kart* kart, int offset_x, int offset_y,
 
         offset_y -= (int)(50*ratio_y);
 
-        sprintf(str, "%d/%d", kart->getLap()<0?0:kart->getLap()+1, 
+        sprintf(str, "%d/%d", lap < 0 ? 0 : lap+1, 
                 race_manager->getNumLaps());
         font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);
     }
@@ -989,6 +935,8 @@ void RaceGUI::drawStatusText(const float dt)
 
     if ( RaceManager::getWorld()->getClock().isRacePhase() )
     {
+        KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo(this);
+        
         const int numPlayers = race_manager->getNumLocalPlayers();
 
         for(int pla = 0; pla < numPlayers; pla++)
@@ -1034,7 +982,7 @@ void RaceGUI::drawStatusText(const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawSpeed           (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
-            drawLap             (player_kart, offset_x, offset_y,
+            drawLap             (info, player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawAllMessages     (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
@@ -1051,7 +999,7 @@ void RaceGUI::drawStatusText(const float dt)
             
         drawMap             ();
         if ( user_config->m_display_fps ) drawFPS ();
-        drawPlayerIcons     ();
+        drawPlayerIcons     (info);
     }   // if RACE_PHASE
 
     glPopAttrib  () ;
