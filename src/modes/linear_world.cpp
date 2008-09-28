@@ -16,6 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
+
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
+
 #include "gui/race_gui.hpp"
  
 #include "track.hpp"
@@ -283,7 +288,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
     // Find the best time for the lap. We can't simply use
     // the time of the kart at position 1, since the kart
     // might have been overtaken by now
-    const int kart_amount = race_manager->getNumKarts();
+    const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         KartIconDisplayInfo& rank_info = m_kart_display_info[i];
@@ -361,7 +366,7 @@ void LinearWorld::terminateRace()
     
     // if some karts have not yet finished the race yet, estimate
     // their times and use these values to proceed without waiting
-    const int kart_amount = m_kart.size();
+    const unsigned int kart_amount = m_kart.size();
     for ( Karts::size_type i = 0; i < kart_amount; ++i)
     {
         if(!m_kart[i]->hasFinishedRace())
@@ -441,7 +446,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
     int p = 1 ;
     
     const unsigned int kart_amount = m_kart.size();
-    for ( int j = 0 ; j < kart_amount ; j++ )
+    for ( unsigned int j = 0 ; j < kart_amount ; j++ )
     {
         if(int(j) == kart->getWorldKartId()) continue; // don't compare a kart with itself
         if(m_kart[j]->isEliminated()) continue;   // dismiss eliminated karts   

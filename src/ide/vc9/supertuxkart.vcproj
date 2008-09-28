@@ -1143,6 +1143,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\linear_world.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\standard_race.cpp"
 					>
 				</File>
@@ -1726,6 +1730,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\follow_the_leader.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\linear_world.hpp"
 					>
 				</File>
 				<File
