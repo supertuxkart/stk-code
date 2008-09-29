@@ -29,20 +29,38 @@
 class RaceResultsGUI : public BaseGUI
 {
 private:
+    /** Widgets. WTOK_NONE is used for detecting in update when 
+     *  a selection was made (see m_selected_token).            */
+    enum WidgetTokens
+    {
+        WTOK_NONE,
+        WTOK_CONTINUE,
+        WTOK_RESTART_RACE,
+        WTOK_SETUP_NEW_RACE,
+        WTOK_RESULTS,
+        WTOK_FIRST_RESULT,
+        WTOK_FIRST_IMAGE     = 1000,
+        WTOK_HIGHSCORES      = 2000,
+        WTOK_FIRST_HIGHSCORE = 2001,
+    };
+private:
     std::vector<int> m_order;
-
+    bool             m_first_time;
+    /** The widget selected by the user, so that the right action can be done
+     *  once clients and server are synchronised. */
+    WidgetTokens     m_selected_widget;
     Widget          *displayLeaderResults();
     Widget          *displayRaceResults();
     Widget          *displayKartList(unsigned int from, unsigned int to,
                                      Widget *w_prev, int *order, bool display_time,
                                      float horizontal);
 public:
-    RaceResultsGUI();
-    ~RaceResultsGUI();
-
-    void handle(GameAction, int);
-
-    void select();
+                     RaceResultsGUI();
+                    ~RaceResultsGUI();
+    void             handle(GameAction, int);
+    void             select();
+    virtual void     update(float dt);
+    void             setSelectedWidget(int);
 };
 
 #endif

@@ -385,6 +385,7 @@ void Kart::reset()
     m_rescue               = false;
     TerrainInfo::update(getXYZ());
 }   // reset
+
 //-----------------------------------------------------------------------------
 void Kart::raceFinished(float time)
 {

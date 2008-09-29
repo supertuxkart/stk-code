@@ -1091,6 +1091,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\network\race_result_message.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\network\race_state.cpp"
 					>
 				</File>
@@ -1658,6 +1662,14 @@
 				</File>
 				<File
 					RelativePath="..\..\network\race_info_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_result_ack_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_result_message.hpp"
 					>
 				</File>
 				<File

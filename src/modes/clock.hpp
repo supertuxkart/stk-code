@@ -112,9 +112,15 @@ public:
     void reset();
     
     // Note: GO_PHASE is both: start phase and race phase
-    bool    isStartPhase() const  { return m_phase<GO_PHASE;                         }
-    bool    isRacePhase()  const  { return m_phase>=GO_PHASE && m_phase<LIMBO_PHASE; }
-    const Phase getPhase() const  { return m_phase; }
+    bool    isStartPhase() const  { return m_phase<GO_PHASE;             }
+    bool    isRacePhase()  const  { return m_phase>=GO_PHASE && 
+                                           m_phase<LIMBO_PHASE;          }
+    /** While the race menu is being displayed, m_phase is limbo, and
+     *  m_previous_phase is finish. So we have to test this case, too.  */
+    bool    isFinishPhase() const { return m_phase==FINISH_PHASE ||
+                                       (m_phase==LIMBO_PHASE &&
+                                         m_previous_phase==FINISH_PHASE);}
+    const Phase getPhase() const  { return m_phase;                      }
     
     /**
         * Call to specify what kind of clock you want. The second argument
@@ -126,7 +132,7 @@ public:
     /**
         * Call each frame, with the elapsed time as argument.
      */
-    void    updateClock(const float dt);
+    void    update(const float dt);
     
     float   getTime() const                 { return m_time; }
     void    setTime(const float time);

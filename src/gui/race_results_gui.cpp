@@ -29,21 +29,15 @@
 #include "unlock_manager.hpp"
 #include "translation.hpp"
 #include "modes/world.hpp"
-
-enum WidgetTokens
-{
-    WTOK_CONTINUE,
-    WTOK_RESTART_RACE,
-    WTOK_SETUP_NEW_RACE,
-    WTOK_RESULTS,
-    WTOK_FIRST_RESULT,
-    WTOK_FIRST_IMAGE=1000,
-    WTOK_HIGHSCORES=2000,
-    WTOK_FIRST_HIGHSCORE=2001,
-};
+#include "network/network_manager.hpp"
 
 RaceResultsGUI::RaceResultsGUI()
 {
+    m_first_time      = true;
+    m_selected_widget = WTOK_NONE;
+
+    // Switch to barrier mode: server waits for ack from each client
+    network_manager->beginRaceResultBarrier();
     Widget *bottom_of_list;
 
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -51,36 +45,45 @@ RaceResultsGUI::RaceResultsGUI()
     else
         bottom_of_list = displayRaceResults();
 
-    // If a new feature was unlocked, only offer 'continue' otherwise add the 
-    // full menu choices. The new feature menu returns to this menu, and will
-    // then display the whole menu.
-    if(unlock_manager->getUnlockedFeatures().size()>0)
+    // If it's a server, the user can only select 'ok', since the
+    // server does all the game mode selection etc.
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        Widget *w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
+        Widget *w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("OK") );
         w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.05f, bottom_of_list);
-    } else
+    }
+    else
     {
-        Widget *w;
-        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        // If a new feature was unlocked, only offer 'continue' otherwise add the 
+        // full menu choices. The new feature menu returns to this menu, and will
+        // then display the whole menu.
+        if(unlock_manager->getUnlockedFeatures().size()>0)
         {
-            w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
-        }
-        else
+            Widget *w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
+            w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.05f, bottom_of_list);
+        } else
         {
-            w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Back to the main menu"));
-        }
-        w->setPosition(WGT_DIR_CENTER, 0.0, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, bottom_of_list);
-        Widget *w_prev = w;
-        w=widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
-        w->setPosition(WGT_DIR_CENTER, 0.0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
-        w_prev = w;
-        if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_SINGLE)
-        {
-            w=widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
-            w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
-        }
-    }   // if !unlock_manager has something unlocked*/
-
+            Widget *w;
+            if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue Grand Prix"));
+            }
+            else
+            {
+                w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Back to the main menu"));
+            }
+            w->setPosition(WGT_DIR_CENTER, 0.0, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, bottom_of_list);
+            Widget *w_prev = w;
+            w=widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 60, 7, _("Race in this track again"));
+            w->setPosition(WGT_DIR_CENTER, 0.0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
+            w_prev = w;
+            if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_SINGLE)
+            {
+                w=widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 60, 7, _("Setup New Race"));
+                w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
+            }
+        }   // if !unlock_manager has something unlocked*/
+    }   // if not server
     widget_manager->layout(WGT_AREA_ALL);
 
 }   // RaceResultsGUI
@@ -252,6 +255,10 @@ RaceResultsGUI::~RaceResultsGUI()
 }   // ~RaceResultsGUI
 
 //-----------------------------------------------------------------------------
+/** If an item is selected, store the selection to be handled in the next
+ *  update call. This is necessary for network support so that the right
+ *  action is executed once clients and server are all synchronised.
+ */
 void RaceResultsGUI::select()
 {
     // Push the unlocked-feature menu in for now
@@ -262,7 +269,71 @@ void RaceResultsGUI::select()
         menu_manager->pushMenu(MENUID_UNLOCKED_FEATURE);
         return;
     }
-    switch( widget_manager->getSelectedWgt() )
+    // The selected token is saved here, which triggers a change of the text
+    // in update().
+    m_selected_widget = (WidgetTokens)widget_manager->getSelectedWgt();
+
+    // Clients send the ack to the server
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        network_manager->sendRaceResultAck();
+
+}   // select
+
+//-----------------------------------------------------------------------------
+void RaceResultsGUI::handle(GameAction ga, int value)
+{
+  // Attempts to close the menu are silently discarded
+  // since they do not make sense at this point.
+  if (ga == GA_LEAVE)
+   return;
+  else
+    BaseGUI::handle(ga, value);
+}
+//-----------------------------------------------------------------------------
+/** Sets the selected token. This is used on the clients to allow the 
+ *  NetworkManager to set the widget selected on the server. The clients will
+ *  then be able to select the correct next menu.
+ *  \param token Token to set as being selected.
+ */
+void RaceResultsGUI::setSelectedWidget(int token)
+{
+    m_selected_widget = (WidgetTokens)token;
+}   // setSelectedToken
+
+//-----------------------------------------------------------------------------
+/** This is used on the client and server to display a message while waiting
+ *  in a barrier for clients and server to ack the display.
+ */
+void RaceResultsGUI::update(float dt)
+{
+    BaseGUI::update(dt);
+    // If an item is selected (for the first time), change the text
+    // so that the user has feedback about his selection.
+    if(m_selected_widget!=WTOK_NONE && m_first_time)
+    {
+        m_first_time = false;
+        // User feedback on first selection: display message, and on the
+        // server remove unnecessary widgets.
+        widget_manager->setWgtText(WTOK_CONTINUE, _("Synchronising."));
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        {
+            widget_manager->hideWgt(WTOK_RESTART_RACE);
+            widget_manager->hideWgt(WTOK_SETUP_NEW_RACE);        
+        }
+    }   // m_selected_token defined and not first time
+
+    // Wait till the barrier is finished. On the server this is the case when
+    // the state ie MAIN_MENU, on the client when it is wait_for_available_characters.
+    if(network_manager->getState()!=NetworkManager::NS_MAIN_MENU &&
+       network_manager->getState()!=NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS ) 
+       return;
+
+    // Send selected menu to all clients
+    if(m_selected_widget!=WTOK_NONE &&
+        network_manager->getMode()==NetworkManager::NW_SERVER)
+        network_manager->sendRaceResultAck(m_selected_widget);
+
+    switch(m_selected_widget)
     {
     case WTOK_CONTINUE:
         // Gets called when:
@@ -286,17 +357,6 @@ void RaceResultsGUI::select()
     default:
         break;
     }
-}   // select
-//-----------------------------------------------------------------------------
-void
-RaceResultsGUI::handle(GameAction ga, int value)
-{
-  // Attempts to close the menu are silently discarded
-  // since they do not make sense at this point.
-  if (ga == GA_LEAVE)
-   return;
-  else
-    BaseGUI::handle(ga, value);
-}
 
+}   // update
 /* EOF */

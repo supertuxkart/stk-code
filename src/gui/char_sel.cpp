@@ -60,7 +60,8 @@ CharSel::CharSel(int whichPlayer)
     //        in the server (even when NW_NONE). This if condition
     //        needs to be checked (otherwise ghost karts and
     //        a ghost camera will appear)
-    if(network_manager->getState()==NetworkManager::NS_NONE ||
+    m_first_frame = true;
+    if(network_manager->getState()==NetworkManager::NS_MAIN_MENU ||
         network_manager->getMode()==NetworkManager::NW_NONE)
         network_manager->switchToCharacterSelection();
 
@@ -336,8 +337,7 @@ void CharSel::update(float dt)
         return;
     }
 
-    static bool first=true;
-    if(first)
+    if(m_first_frame)
     {
         // Switch group will update the list of selected karts, i.e. use the
         // information about kart availability just received from the server
@@ -351,7 +351,7 @@ void CharSel::update(float dt)
             widget_manager->showWgt(WTOK_NAME0+i);
             widget_manager->showWgt(WTOK_RACER0+i);
         }
-        first=false;
+        m_first_frame = false;
         updateScrollPosition();
         return;
     }

@@ -32,17 +32,19 @@ supertuxkart_SOURCES =     main.cpp  			\
 	material.cpp		   material.hpp           	\
 	network/network_manager.cpp      network/network_manager.hpp 		\
 	network/network_kart.cpp         network/network_kart.hpp		\
-    network/message.cpp              network/message.hpp			\
+	network/message.cpp              network/message.hpp			\
 	network/race_info_message.hpp    network/race_info_message.cpp		\
 	network/remote_kart_info.hpp     network/character_selected_message.hpp	\
 	network/race_start_message.hpp   network/character_confirm_message.hpp	\
-	network/connect_message.hpp	     network/connect_message.cpp		\
+	network/connect_message.hpp	 network/connect_message.cpp	\
 	network/num_players_message.hpp  network/world_loaded_message.hpp	\
-    network/connect_message.hpp      network/character_info_message.hpp	\
-	network/kart_update_message.hpp  network/kart_update_message.cpp		\
+	network/connect_message.hpp      network/character_info_message.hpp	\
+	network/kart_update_message.hpp  network/kart_update_message.cpp	\
 	network/kart_control_message.hpp network/kart_control_message.cpp	\
-	network/flyable_info.hpp	     network/herring_info.hpp		\
-	network/race_state.hpp		     network/race_state.cpp			\
+	network/flyable_info.hpp	 network/herring_info.hpp		\
+	network/race_state.hpp		 network/race_state.cpp			\
+	network/race_result_message.hpp	 network/race_result_message.cpp	\
+	network/race_result_ack_message						\
 	audio/music.hpp								\
 	audio/music_information.cpp audio/music_information.hpp 		\
 	audio/music_ogg.cpp	   	    audio/music_ogg.hpp          		\

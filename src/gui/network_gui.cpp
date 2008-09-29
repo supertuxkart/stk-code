@@ -140,7 +140,7 @@ void NetworkGUI::select()
                 network_manager->setMode(NetworkManager::NW_NONE);
             // Disable accepting of clients
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
-                network_manager->setState(NetworkManager::NS_NONE);
+                network_manager->setState(NetworkManager::NS_MAIN_MENU);
 			// Leave menu.
             menu_manager->popMenu();
 		

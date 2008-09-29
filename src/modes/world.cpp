@@ -257,6 +257,7 @@ void World::resetAllKarts()
 //-----------------------------------------------------------------------------
 void World::update(float dt)
 {
+    m_clock.update(dt);
     // Clear race state so that new information can be stored
     race_state->clear();
     if(user_config->m_replay_history) dt=history->GetNextDelta();
@@ -277,6 +278,14 @@ void World::update(float dt)
     callback_manager->update(dt);
 }
 // ----------------------------------------------------------------------------
+void  World::raceOver(bool delay)
+{
+    m_clock.raceOver(delay);
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        network_manager->sendRaceResults();
+}   // raceOver
+// ----------------------------------------------------------------------------
+
 HighscoreEntry* World::getHighscores() const
 {
     if(!m_use_highscores) return NULL;
@@ -307,7 +316,7 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
-    const int kart_amount = m_kart.size();
+    const unsigned int kart_amount = m_kart.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[m_kart[i]->getPosition()-1] = i;

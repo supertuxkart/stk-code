@@ -35,10 +35,10 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 {
 }
 
-
+#ifdef __APPLE__
 #pragma mark -
 #pragma mark clock events
-
+#endif
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::countdownReachedZero()
 {
@@ -60,14 +60,14 @@ void FollowTheLeaderRace::onTerminate()
     World::terminateRace();
 }
 
+#ifdef __APPLE__
 #pragma mark -
 #pragma mark overridden from World
+#endif
 
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::update(float delta)
-{
-    m_clock.updateClock(delta);
-    
+{   
     LinearWorld::update(delta);
     if(!m_clock.isRacePhase()) return;
     
@@ -111,7 +111,7 @@ void FollowTheLeaderRace::update(float delta)
                 if(!m_kart[i]->isEliminated()) 
                     race_manager->RaceFinished(m_kart[i], m_clock.getTime());
             
-            m_clock.raceOver();
+            raceOver();
             return;
         }
     }

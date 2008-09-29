@@ -27,6 +27,7 @@
 #include "gui/menu_manager.hpp"
 #include "translation.hpp"
 #include "audio/sound_manager.hpp"
+#include "network/network_manager.hpp"
 
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()
@@ -196,7 +197,11 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
            race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            kart->raceFinished(RaceManager::getWorld()->getTime());
+            // A client wait does not detect race finished by itself, it will
+            // receive a message from the server. So a client does not do
+            // anything here.
+            if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
+                kart->raceFinished(RaceManager::getWorld()->getTime());
         }
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.

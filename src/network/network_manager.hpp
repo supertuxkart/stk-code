@@ -37,7 +37,7 @@ public:
     enum NetworkMode {NW_SERVER, NW_CLIENT, NW_NONE};
 
     // States for the finite state machine. First for server:
-    enum NetworkState {NS_NONE, 
+    enum NetworkState {NS_MAIN_MENU,                       // before char sel gui
                        NS_ACCEPT_CONNECTIONS,              // server: accept connections
                        NS_WAIT_FOR_AVAILABLE_CHARACTERS,   // client: wait for list
                        NS_ALL_REMOTE_CHARACTERS_DONE,      // server: all client data received
@@ -48,7 +48,10 @@ public:
                        NS_READY_SET_GO_BARRIER,            // c&s: barrier before r.s.g.
                        NS_CHARACTER_SELECT,                // c&s: character select in progress
                        NS_LOADING_WORLD,                   // client: loading world
-                       NS_RACING};
+                       NS_RACING,
+                       NS_WAIT_FOR_RACE_RESULT,            // clients: waiting for race results
+                       NS_RACE_RESULT_BARRIER              // Wait till all ack results
+    };
 private:
 
     NetworkMode                 m_mode;
@@ -108,6 +111,9 @@ public:
     void         sendUpdates();
     void         receiveUpdates();
     void         waitForClientData();
+    void         sendRaceResults();
+    void         beginRaceResultBarrier();
+    void         sendRaceResultAck(char menu_selection=-1);
 };
 
 extern NetworkManager *network_manager;

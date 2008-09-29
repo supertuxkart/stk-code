@@ -72,7 +72,7 @@ void Clock::raceOver(const bool delay)
         m_phase = FINISH_PHASE;
 }
 //-----------------------------------------------------------------------------
-void Clock::updateClock(const float dt)
+void Clock::update(const float dt)
 {
     switch(m_phase)
     {

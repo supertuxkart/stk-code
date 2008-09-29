@@ -36,6 +36,8 @@ private:
     int              m_player_index;
     int              m_offset;        // index of first racer displayed
     unsigned int     m_num_entries;   // number of entries to display
+    /** Helps to switch off the displayed text once only. */
+    bool             m_first_frame;
     std::vector<int> m_index_avail_karts;
     static const unsigned int m_max_entries=7;
     void             updateScrollPosition();

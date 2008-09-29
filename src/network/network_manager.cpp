@@ -18,6 +18,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network_manager.hpp"
+
+#include "stk_config.hpp"
+#include "user_config.hpp"
+#include "race_manager.hpp"
+#include "kart_properties_manager.hpp"
+#include "translation.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/char_sel.hpp"
+#include "gui/race_results_gui.hpp"
+#include "modes/world.hpp"
 #include "network/connect_message.hpp"
 #include "network/character_info_message.hpp"
 #include "network/character_selected_message.hpp"
@@ -27,13 +37,8 @@
 #include "network/race_state.hpp"
 #include "network/kart_control_message.hpp"
 #include "network/character_confirm_message.hpp"
-#include "stk_config.hpp"
-#include "user_config.hpp"
-#include "race_manager.hpp"
-#include "kart_properties_manager.hpp"
-#include "translation.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/char_sel.hpp"
+#include "network/race_result_message.hpp"
+#include "network/race_result_ack_message.hpp"
 
 NetworkManager* network_manager = 0;
 
@@ -272,6 +277,22 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             }
             break;
         }
+    case NS_RACE_RESULT_BARRIER:
+        {
+            // Other message, esp. kart control, are silently ignored.
+            // FIXME: we might want to make sure that no such message actually arrives
+            if(Message::peekType(event->packet)!=Message::MT_RACE_RESULT_ACK)
+            {
+                enet_packet_destroy(event->packet);
+                return;
+            }
+            m_barrier_count++;
+            if(m_barrier_count==(int)m_num_clients)
+            {
+                m_state = NS_MAIN_MENU;
+            }
+            break;
+        }
     default: assert(0);  // should not happen
     }   // switch m_state
 }   // handleMessageAtServer
@@ -345,6 +366,16 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
     case NS_RACING:
         {
             assert(false);  // should never be here while racing
+            break;
+        }
+    case NS_RACE_RESULT_BARRIER:
+        {
+            RaceResultAckMessage message(event->packet);
+            RaceResultsGUI *menu = dynamic_cast<RaceResultsGUI*>(menu_manager->getCurrentMenu());
+            if(menu)
+                menu->setSelectedWidget(message.getSelectedMenu());
+
+            m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
             break;
         }
     default: 
@@ -592,6 +623,14 @@ void NetworkManager::receiveUpdates()
         }
         else
         {
+            // Test if it is a game over message:
+            if(Message::peekType(event.packet)==Message::MT_RACE_RESULT)
+            {
+                RaceResultMessage m(event.packet);
+                m_state = NS_WAIT_FOR_RACE_RESULT;
+                race_manager->getWorld()->raceOver();
+                return;
+            }
             race_state->receive(event.packet);
         }
     }   // for i<num_messages
@@ -628,3 +667,50 @@ void NetworkManager::waitForClientData()
 
 }   // waitForClientData
 // ----------------------------------------------------------------------------
+/** Sends the race result (kart positions and finishing times) from the server
+ *  to all clients. Clients keep on racing till they receive this message, and
+ *  will then copy the server's race results to the race manager.
+ */
+void NetworkManager::sendRaceResults()
+{
+    RaceResultMessage m;
+    broadcastToClients(m);
+}   // sendRaceResults
+
+// ----------------------------------------------------------------------------
+/** Changes the mode to wait in a barrier for all clients and the server to
+ *  acknowledge the result screen. The server waits for a message from all 
+ *  clients, upon which it sends a message to all clients. The clients wait
+ *  for this message before continuing.
+ */
+void NetworkManager::beginRaceResultBarrier()
+{
+    m_state = NS_RACE_RESULT_BARRIER;
+
+    if(m_mode==NW_SERVER)
+    {
+        m_barrier_count = 0;
+        // In case of no networking set the next state
+        if(m_num_clients == 0) m_state = NS_MAIN_MENU;
+    }
+}   // beginRaceResultBarrier
+
+// ----------------------------------------------------------------------------
+/** Sends a race 'result acknowledge' message from the clients to the server,
+ *  or from the server to the clients (in this case it contains the selected
+ *  menu choice from the server).
+ */
+void NetworkManager::sendRaceResultAck(char menu_selection)
+{
+    // Menu selection is actually not important for a client
+    RaceResultAckMessage m(menu_selection);
+    if (m_mode==NW_CLIENT)
+    {
+        sendToServer(m);
+    }
+    else
+    {
+        broadcastToClients(m);
+        m_state = NS_MAIN_MENU;
+    }
+}   // sendRaceResultAck

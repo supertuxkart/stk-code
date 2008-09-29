@@ -331,7 +331,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
     Material *last_players_gst = 0;
 
     int bFirst                 = 1;
-    const int kart_amount = race_manager->getNumKarts();
+    const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         Kart* kart   = RaceManager::getKart(i);

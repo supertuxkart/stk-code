@@ -43,10 +43,12 @@
 class Message
 { 
 public:
+    /** Contains all tags used in identifying a message. */
     enum MessageType {MT_CONNECT=1, MT_CHARACTER_INFO, MT_CHARACTER_CONFIRM,
                       MT_RACE_INFO, MT_RACE_START, MT_WORLD_LOADED,
-                      MT_KART_INFO, MT_KART_CONTROL, 
-                      MT_RACE_STATE};
+                      MT_KART_INFO, MT_KART_CONTROL, MT_RACE_STATE,
+                      MT_RACE_RESULT, MT_RACE_RESULT_ACK
+                     };
 private:
     ENetPacket  *m_pkt;
     char        *m_data;

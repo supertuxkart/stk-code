@@ -63,6 +63,8 @@ void Message::receive(ENetPacket* pkt, MessageType m)
     m_data_size     = pkt->dataLength;
     m_data          = (char*)pkt->data;
     m_type          = (MessageType)m_data[0];
+    if(m_type!=m) 
+        printf("type %d %d\n",m_type,m);
     assert(m_type==m);
     m_pos           = 1; 
     m_needs_destroy = true;

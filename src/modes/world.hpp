@@ -148,10 +148,10 @@ public:
     HighscoreEntry* getHighscores() const;
     float getTime() const                     { return m_clock.getTime();           }
     Phase getPhase() const                    { return m_clock.getPhase();          }
-    const Clock& getClock() const             { return m_clock;                     }
-    
-    /** Called when race is over and should be terminated (mostly called by the clock).
-      */
+    const Clock &getClock()                   { return m_clock;                     }
+    /** Gets called when the race is about to finish (but with the option of adding
+      * some delay to watch the end of the race. */
+    void  raceOver(bool delay=false);
     virtual void terminateRace();
     
     /** Called to determine the default collectibles to give each player for this
