@@ -316,6 +316,11 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
+    for (unsigned int i=0; i<kart_amount; i++ ) // first reset the contents of the array
+    {
+        index[i] = 999;
+    }
+    
     const unsigned int kart_amount = m_kart.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
@@ -336,6 +341,10 @@ void World::updateHighscores()
         }
 #endif
 
+        // no kart claimed to be in this position
+        // FIXME - find why after some race resets kart positions are messed up
+        if(index[pos] == 999) continue;
+        
         // Only record times for player karts
         if(!m_kart[index[pos]]->isPlayerKart()) continue;
 
