@@ -64,7 +64,7 @@ void StandardRace::onTerminate()
 //-----------------------------------------------------------------------------
 void StandardRace::restartRace()
 {
-    World::restartRace();
+    LinearWorld::restartRace();
 }
 //-----------------------------------------------------------------------------
 void StandardRace::update(float delta)

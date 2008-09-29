@@ -119,7 +119,7 @@ void FollowTheLeaderRace::update(float delta)
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::restartRace()
 {
-    World::restartRace();
+    LinearWorld::restartRace();
     m_leader_intervals    = stk_config->m_leader_intervals;
 }
 //-----------------------------------------------------------------------------

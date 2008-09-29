@@ -81,6 +81,7 @@ public:
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     
     virtual void    terminateRace();
+    virtual void    restartRace();
     
     float           estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info);
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );

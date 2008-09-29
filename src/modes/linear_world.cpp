@@ -72,6 +72,45 @@ LinearWorld::LinearWorld() : World()
     }// next kart
 }
 //-----------------------------------------------------------------------------
+void LinearWorld::restartRace()
+{
+    World::restartRace();
+    
+    const unsigned int kart_amount = m_kart.size();
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        KartInfo& info = m_kart_info[n];
+        info.m_track_sector         = Track::UNKNOWN_SECTOR;
+        info.m_lap_start_time       = -1.0f;
+        info.m_shortcut_sector      = Track::UNKNOWN_SECTOR;
+        RaceManager::getTrack()->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
+        
+        //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
+        //the road, so we have to use another function to find the sector.
+        if (info.m_track_sector == Track::UNKNOWN_SECTOR )
+        {
+            info.m_on_road = false;
+            info.m_track_sector =
+                RaceManager::getTrack()->findOutOfRoadSector(m_kart[n]->getXYZ(),
+                                                             Track::RS_DONT_KNOW,
+                                                             Track::UNKNOWN_SECTOR );
+        }
+        else
+        {
+            info.m_on_road = true;
+        }
+        
+        RaceManager::getTrack()->spatialToTrack(info.m_curr_track_coords,
+                                                m_kart[n]->getXYZ(),
+                                                info.m_track_sector );
+        
+        info.m_race_lap             = -1;
+        info.m_lap_start_time       = -1.0f;
+        info.m_time_at_last_lap     = 99999.9f;
+
+    }// next kart
+}
+//-----------------------------------------------------------------------------
 void LinearWorld::update(float delta)
 {
     // store previous kart locations
