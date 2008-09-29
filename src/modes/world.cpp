@@ -316,14 +316,11 @@ void World::updateHighscores()
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
     unsigned int *index = new unsigned int[m_kart.size()];
-    for (unsigned int i=0; i<kart_amount; i++ ) // first reset the contents of the array
-    {
-        index[i] = 999;
-    }
-    
+
     const unsigned int kart_amount = m_kart.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
+        index[i] = 999; // first reset the contents of the array
         index[m_kart[i]->getPosition()-1] = i;
     }
 
