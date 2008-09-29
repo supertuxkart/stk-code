@@ -108,7 +108,9 @@ void LinearWorld::restartRace()
         info.m_lap_start_time       = -1.0f;
         info.m_time_at_last_lap     = 99999.9f;
 
+        updateRacePosition(m_kart[n], info);
     }// next kart
+    
 }
 //-----------------------------------------------------------------------------
 void LinearWorld::update(float delta)

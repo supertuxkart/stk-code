@@ -355,8 +355,9 @@ void World::updateHighscores()
         {
             highscore_manager->Save();
         }
-    }
+    } // next position
     delete []index;
+    
 }   // updateHighscores
 //-----------------------------------------------------------------------------
 void World::printProfileResultAndExit()
