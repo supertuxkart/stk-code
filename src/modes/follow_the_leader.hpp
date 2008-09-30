@@ -25,7 +25,7 @@ class FollowTheLeaderRace : public LinearWorld, public Clock::ClockListener
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
     FollowTheLeaderRace();
-    ~FollowTheLeaderRace();
+    virtual ~FollowTheLeaderRace();
     
     // clock events
     virtual void countdownReachedZero();

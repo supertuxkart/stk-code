@@ -61,6 +61,7 @@ protected:
     
 public:
     LinearWorld();
+    virtual ~LinearWorld();
     
     /** This vector contains an 'KartInfo' struct for every kart in the race.
       * This member is not strictly private but try not to use it directly outside

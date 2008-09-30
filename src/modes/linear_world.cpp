@@ -72,6 +72,11 @@ LinearWorld::LinearWorld() : World()
     }// next kart
 }
 //-----------------------------------------------------------------------------
+LinearWorld::~LinearWorld()
+{
+    delete[] m_kart_display_info;
+}
+//-----------------------------------------------------------------------------
 void LinearWorld::restartRace()
 {
     World::restartRace();

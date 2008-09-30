@@ -28,7 +28,7 @@ class StandardRace : public LinearWorld, public Clock::ClockListener
 {
 public:
     StandardRace();
-    ~StandardRace();
+    virtual ~StandardRace();
     
     // clock events
     virtual void countdownReachedZero();
