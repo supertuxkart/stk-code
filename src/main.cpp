@@ -553,6 +553,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
+                network_manager->setupPlayerKartInfo();
                 race_manager->startNew();
             }
         }
