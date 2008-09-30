@@ -326,21 +326,21 @@ void World::updateHighscores()
 
     for(unsigned int pos=0; pos<kart_amount; pos++)
     {
-#ifdef DEBUG
-        // FIXME begin: triggered if the positions of the karts are incorrect:
-        if(index[pos]<0)
+
+        if(index[pos] == 999)
         {
+            // no kart claimed to be in this position, most likely means
+            // the kart location data is wrong
+            
+#ifdef DEBUG
             fprintf(stderr, "Error, incorrect kart positions:");
             for (unsigned int i=0; i<m_kart.size(); i++ )
             {
                 fprintf(stderr, "i=%d position %d\n",i, m_kart[i]->getPosition());
             }
-        }
 #endif
-
-        // no kart claimed to be in this position
-        // FIXME - find why after some race resets kart positions are messed up
-        if(index[pos] == 999) continue;
+            continue;
+        }
         
         // Only record times for player karts
         if(!m_kart[index[pos]]->isPlayerKart()) continue;

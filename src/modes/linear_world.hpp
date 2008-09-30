@@ -32,9 +32,9 @@ struct KartInfo
     int         m_race_lap;             // number of finished(!) laps
     float       m_time_at_last_lap;     // time at finishing last lap
     float       m_lap_start_time;       // Time at start of a new lap
-    int         m_shortcut_sector;      // segment on which the shortcut was started
     int         m_track_sector;         // index in driveline, special values
                                         // e.g. UNKNOWN_SECTOR can be negative!
+    int         m_last_valid_sector;
     Vec3        m_curr_track_coords;
     Vec3        m_last_track_coords;
     

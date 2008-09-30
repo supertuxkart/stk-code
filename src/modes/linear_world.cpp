@@ -40,8 +40,8 @@ LinearWorld::LinearWorld() : World()
     {
         KartInfo info;
         info.m_track_sector         = Track::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
         info.m_lap_start_time       = -1.0f;
-        info.m_shortcut_sector      = Track::UNKNOWN_SECTOR;
         RaceManager::getTrack()->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
@@ -81,8 +81,8 @@ void LinearWorld::restartRace()
     {
         KartInfo& info = m_kart_info[n];
         info.m_track_sector         = Track::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
         info.m_lap_start_time       = -1.0f;
-        info.m_shortcut_sector      = Track::UNKNOWN_SECTOR;
         RaceManager::getTrack()->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
@@ -129,11 +129,8 @@ void LinearWorld::update(float delta)
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        KartInfo& kart_info = m_kart_info[n];
-        Kart* kart = m_kart[n];
-        
         // ---------- update rank ------
-        if(!m_kart[n]->hasFinishedRace()) updateRacePosition(kart, kart_info);
+        if(!m_kart[n]->hasFinishedRace()) updateRacePosition(m_kart[n], m_kart_info[n]);
     }
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -141,19 +138,16 @@ void LinearWorld::update(float delta)
         Kart* kart = m_kart[n];
         
         // ---------- deal with sector data ---------
-        // Save the last valid sector for forced rescue on shortcuts
-        if(kart_info.m_track_sector  != Track::UNKNOWN_SECTOR && 
-           !kart->isRescue()                          ) 
-        {
-            kart_info.m_shortcut_sector = kart_info.m_track_sector;
-        }
         
+        // update sector variables
         int prev_sector = kart_info.m_track_sector;
+        
         if(!kart->isRescue())
             RaceManager::getTrack()->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
         
         // Check if the kart is taking a shortcut (if it's not already doing one):
-        if(!kart->isRescue() && RaceManager::getTrack()->isShortcut(prev_sector, kart_info.m_track_sector))
+        if(!kart->isRescue() && kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
+           RaceManager::getTrack()->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
         {
             forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.     
             if(kart->isPlayerKart())
@@ -166,6 +160,9 @@ void LinearWorld::update(float delta)
             return;
         }
         
+        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR && !kart->isRescue()) kart_info.m_last_valid_sector = kart_info.m_track_sector;
+        
+        // check if kart is on the road - if not, find the closest sector
         if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR && !kart->isRescue())
         {
             kart_info.m_on_road = false;
@@ -185,6 +182,7 @@ void LinearWorld::update(float delta)
             kart_info.m_on_road = true;
         }
         
+        // get position (progression) within track
         RaceManager::getTrack()->spatialToTrack( kart_info.m_curr_track_coords /* out */, 
                                                  kart->getXYZ(),
                                                  kart_info.m_track_sector      );
@@ -454,7 +452,7 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
     // flag, so that this shortcut is not counted!
     if(shortcut)
     {
-        kart_info.m_track_sector   = kart_info.m_shortcut_sector;
+        kart_info.m_track_sector   = kart_info.m_last_valid_sector;
     } 
     
     kart->forceRescue();
