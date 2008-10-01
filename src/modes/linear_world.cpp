@@ -367,7 +367,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
             time_of_leader=std::min(time_of_leader,lap_time);
         }
         
-        if(laps_of_leader>0 &&    // Display position during first lap
+        if(laps_of_leader>0 &&    // Don't compare times when crossing the start line first
            (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || current_lap!=laps_of_leader) &&
            race_manager->raceHasLaps())
         {  // Display for 5 seconds
@@ -402,7 +402,6 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
         {
             rank_info.g = rank_info.b = 1.0f-(float)kart_info.m_race_lap/((float)numLaps-1.0f);
         }
-        
     }   // next kart
     
     

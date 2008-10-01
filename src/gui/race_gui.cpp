@@ -331,6 +331,8 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
     Material *last_players_gst = 0;
 
     int bFirst                 = 1;
+    glDisable(GL_CULL_FACE);
+    
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -401,8 +403,9 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         else
             font_race->PrintShadow("th", 13, x-7+17, y-4+17);
 
-        glEnable(GL_CULL_FACE);
-    }
+    } // next kart
+    
+    glEnable(GL_CULL_FACE);
 }   // drawPlayerIcons
 
 //-----------------------------------------------------------------------------
