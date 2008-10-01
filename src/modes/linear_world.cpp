@@ -341,7 +341,6 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         KartIconDisplayInfo& rank_info = m_kart_display_info[i];
-        KartInfo& kart_info = m_kart_info[i];
         Kart* kart = m_kart[i];
         
         // reset color
@@ -354,7 +353,6 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
         const float lap_time = getTimeAtLapForKart(kart->getWorldKartId());
         const int current_lap  = getLapForKart( kart->getWorldKartId() );
         rank_info.lap = current_lap;
-        const int position = kart->getPosition();
         
         if(current_lap > laps_of_leader)
         {
@@ -366,9 +364,19 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
             // Same number of laps as leader: use fastest time
             time_of_leader=std::min(time_of_leader,lap_time);
         }
+    }
+    
+    // we now know the best time of the lap. fill the remaining bits of info
+    for(unsigned int i = 0; i < kart_amount ; i++)
+    {   
+        KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        KartInfo& kart_info = m_kart_info[i];
+        Kart* kart = m_kart[i];
+        
+        const int position = kart->getPosition();
         
         if(laps_of_leader>0 &&    // Don't compare times when crossing the start line first
-           (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || current_lap!=laps_of_leader) &&
+           (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || rank_info.lap != laps_of_leader) &&
            race_manager->raceHasLaps())
         {  // Display for 5 seconds
             char str[256];
