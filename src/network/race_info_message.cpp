@@ -55,7 +55,7 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
     addChar(race_manager->getDifficulty());
     addChar(race_manager->getNumKarts()  );
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
-        addString(cup->getName());
+        addString(cup->getId());
     else
     {
         addString(race_manager->getTrackName());
@@ -83,9 +83,8 @@ RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
     race_manager->setNumKarts  ( getChar()                            );
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        GrandPrixData cup;
-        grand_prix_manager->getGrandPrix(getString());
-        race_manager->setGrandPrix(cup);
+        const GrandPrixData *cup = grand_prix_manager->getGrandPrix(getString());
+        race_manager->setGrandPrix(*cup);
     }
     else
     {
