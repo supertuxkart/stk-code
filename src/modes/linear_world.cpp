@@ -239,7 +239,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         }
         // Race finished
         if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
-           race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+           race_manager->getMinorMode() != race_manager->raceHasLaps())
         {
             // A client wait does not detect race finished by itself, it will
             // receive a message from the server. So a client does not do
