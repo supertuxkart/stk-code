@@ -86,6 +86,8 @@ public:
     
     float           estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info);
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
+    
+    virtual bool raceHasLaps(){ return true; }
 };
 
 #endif

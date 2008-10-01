@@ -190,6 +190,10 @@ public:
       * kart is dropped, this method will be called and each mode can implement it.
       */
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body) = 0;
+    
+    /** Called when it is needed to know whether this kind of race involves counting laps.
+      */
+    virtual bool raceHasLaps() = 0;
 };
 
 #endif

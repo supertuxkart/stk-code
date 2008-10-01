@@ -239,7 +239,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         }
         // Race finished
         if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
-           race_manager->getMinorMode() != race_manager->raceHasLaps())
+           race_manager->getMinorMode() != RaceManager::getWorld()->raceHasLaps())
         {
             // A client wait does not detect race finished by itself, it will
             // receive a message from the server. So a client does not do
@@ -263,7 +263,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
             
             // if new fastest lap
             if(time_per_lap < RaceManager::getWorld()->getFastestLapTime() &&
-               race_manager->raceHasLaps())
+               RaceManager::getWorld()->raceHasLaps())
             {
                 RaceManager::getWorld()->setFastestLap(kart, time_per_lap);
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
@@ -377,7 +377,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
         
         if(laps_of_leader>0 &&    // Don't compare times when crossing the start line first
            (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || rank_info.lap != laps_of_leader) &&
-           race_manager->raceHasLaps())
+           RaceManager::getWorld()->raceHasLaps())
         {  // Display for 5 seconds
             char str[256];
             if(position==1)

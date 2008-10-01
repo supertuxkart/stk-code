@@ -730,7 +730,7 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
                       int offset_y, float ratio_x, float ratio_y           )
 {
     // Don't display laps in follow the leader mode
-    if(!race_manager->raceHasLaps()) return;
+    if(!RaceManager::getWorld()->raceHasLaps()) return;
     
     const int lap = info[kart->getWorldKartId()].lap;
     
