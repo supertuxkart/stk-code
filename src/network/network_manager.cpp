@@ -374,8 +374,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             RaceResultsGUI *menu = dynamic_cast<RaceResultsGUI*>(menu_manager->getCurrentMenu());
             if(menu)
                 menu->setSelectedWidget(message.getSelectedMenu());
-
-            m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
+            m_state = NS_RACE_RESULT_BARRIER_OVER;
             break;
         }
     default: 
@@ -556,11 +555,16 @@ void NetworkManager::sendRaceInformationToClients()
         RaceInfoMessage m(m_kart_info);
         broadcastToClients(m);
     }
+    beginReadySetGoBarrier();
+}   // sendRaceInformationToClients
+
+// ----------------------------------------------------------------------------
+void NetworkManager::beginReadySetGoBarrier()
+{
     m_state         = NS_READY_SET_GO_BARRIER;
     m_barrier_count = 0;
     if(m_num_clients==0) m_state = NS_RACING;
-}   // sendRaceInformationToClients
-
+}   // beginReadySetGoBarrier
 // ----------------------------------------------------------------------------
 void NetworkManager::sendConnectMessage()
 {
@@ -711,6 +715,5 @@ void NetworkManager::sendRaceResultAck(char menu_selection)
     else
     {
         broadcastToClients(m);
-        m_state = NS_MAIN_MENU;
     }
 }   // sendRaceResultAck

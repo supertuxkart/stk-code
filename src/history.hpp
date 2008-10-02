@@ -36,7 +36,7 @@ protected:
 
     float *     m_all_deltas;
 public:
-    History        ()             { SetSize(MAX_HISTORY);}
+          History        ()             { SetSize(MAX_HISTORY);}
     int   GetCount       ()             { return m_wrapped ? m_size : m_current+1; }
     int   GetCurrentIndex()             { return m_current;}
     int   GetSize        ()             { return m_size;  }

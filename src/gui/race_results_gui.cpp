@@ -324,14 +324,17 @@ void RaceResultsGUI::update(float dt)
 
     // Wait till the barrier is finished. On the server this is the case when
     // the state ie MAIN_MENU, on the client when it is wait_for_available_characters.
-    if(network_manager->getState()!=NetworkManager::NS_MAIN_MENU &&
-       network_manager->getState()!=NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS ) 
+    if(network_manager->getMode() !=NetworkManager::NW_NONE         &&
+       network_manager->getState()!=NetworkManager::NS_MAIN_MENU    &&
+       network_manager->getState()!=NetworkManager::NS_RACE_RESULT_BARRIER_OVER ) 
        return;
 
     // Send selected menu to all clients
     if(m_selected_widget!=WTOK_NONE &&
         network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
         network_manager->sendRaceResultAck(m_selected_widget);
+    }
 
     switch(m_selected_widget)
     {
@@ -341,9 +344,11 @@ void RaceResultsGUI::update(float dt)
         // 2) a Grand Prix is run
         // 3) "back to the main menu" otherwise
         RaceManager::getWorld()->unpause();
+        widget_manager->setWgtText(WTOK_CONTINUE, _("Loading race..."));
         race_manager->next();
         break;
     case WTOK_RESTART_RACE:
+        network_manager->setState(NetworkManager::NS_MAIN_MENU);
         RaceManager::getWorld()->unpause();
         menu_manager->popMenu();
         race_manager->rerunRace();
@@ -351,7 +356,15 @@ void RaceResultsGUI::update(float dt)
     case WTOK_SETUP_NEW_RACE:
         RaceManager::getWorld()->unpause();
         race_manager->exit_race();
-        menu_manager->pushMenu(MENUID_GAMEMODE);
+        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+        {
+            network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
+            menu_manager->pushMenu(MENUID_CHARSEL_P1);
+        }
+        else
+        {
+            menu_manager->pushMenu(MENUID_GAMEMODE);
+        }
         break;
 
     default:

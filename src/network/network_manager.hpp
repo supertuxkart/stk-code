@@ -50,7 +50,8 @@ public:
                        NS_LOADING_WORLD,                   // client: loading world
                        NS_RACING,
                        NS_WAIT_FOR_RACE_RESULT,            // clients: waiting for race results
-                       NS_RACE_RESULT_BARRIER              // Wait till all ack results
+                       NS_RACE_RESULT_BARRIER ,            // Wait till all ack results
+                       NS_RACE_RESULT_BARRIER_OVER         // Barrier is over, goto next state
     };
 private:
 
@@ -107,6 +108,7 @@ public:
     void         waitForRaceInformation();
     void         worldLoaded();
     void         setupPlayerKartInfo();
+    void         beginReadySetGoBarrier();
     void         sendRaceInformationToClients();
     void         sendUpdates();
     void         receiveUpdates();

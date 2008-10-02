@@ -277,11 +277,21 @@ void RaceManager::next()
     m_track_number++;
     if(m_track_number<(int)m_tracks.size())
     {
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            network_manager->beginReadySetGoBarrier();
+        else
+            network_manager->setState(NetworkManager::NS_WAIT_FOR_RACE_DATA);
         scene->clear();
         startNextRace();
     }
     else
     {
+        // Back to main menu. Change the state of the state of the
+        // network manager.
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+            network_manager->setState(NetworkManager::NS_MAIN_MENU);
+        else
+            network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
         exit_race();
     }
 }   // next
