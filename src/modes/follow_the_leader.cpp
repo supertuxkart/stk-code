@@ -41,6 +41,47 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::countdownReachedZero()
 {
+    if(m_leader_intervals.size()>1)
+        m_leader_intervals.erase(m_leader_intervals.begin());
+    TimedRace::setTime(m_leader_intervals[0]);
+    int kart_number;
+    // If the leader kart is not the first kart, remove the first
+    // kart, otherwise remove the last kart.
+    int position_to_remove = m_kart[0]->getPosition()==1 
+        ? getCurrentNumKarts() : 1;
+    const int kart_amount = m_kart.size();
+    for (kart_number=0; kart_number<kart_amount; kart_number++)
+    {
+        if(m_kart[kart_number]->isEliminated()) continue;
+        if(m_kart[kart_number]->getPosition()==position_to_remove)
+            break;
+    }
+    if(kart_number==kart_amount)
+    {
+        fprintf(stderr,"Problem with removing leader: position %d not found\n",
+                position_to_remove);
+        for(int i=0; i<kart_amount; i++)
+        {
+            fprintf(stderr,"kart %d: eliminated %d position %d\n",
+                    i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
+        }   // for i
+    }  // kart_number==m_kart.size()
+    else
+    {
+        removeKart(kart_number);
+    }
+    // The follow the leader race is over if there is only one kart left,
+    // or if all players have gone
+    if(getCurrentNumKarts()==2 || getCurrentNumPlayers()==0)
+    {
+        // Add the results for the remaining kart
+        for(int i=1; i<(int)race_manager->getNumKarts(); i++)
+            if(!m_kart[i]->isEliminated()) 
+                race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
+        
+        TimedRace::enterRaceOverState();
+        return;
+    }
 }
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::onGo()
@@ -69,51 +110,6 @@ void FollowTheLeaderRace::update(float delta)
 {   
     LinearWorld::update(delta);
     if(!TimedRace::isRacePhase()) return;
-    
-    if(TimedRace::getTime() < 0.0f)
-    {
-        if(m_leader_intervals.size()>1)
-            m_leader_intervals.erase(m_leader_intervals.begin());
-        TimedRace::setTime(m_leader_intervals[0]);
-        int kart_number;
-        // If the leader kart is not the first kart, remove the first
-        // kart, otherwise remove the last kart.
-        int position_to_remove = m_kart[0]->getPosition()==1 
-            ? getCurrentNumKarts() : 1;
-        const int kart_amount = m_kart.size();
-        for (kart_number=0; kart_number<kart_amount; kart_number++)
-        {
-            if(m_kart[kart_number]->isEliminated()) continue;
-            if(m_kart[kart_number]->getPosition()==position_to_remove)
-                break;
-        }
-        if(kart_number==kart_amount)
-        {
-            fprintf(stderr,"Problem with removing leader: position %d not found\n",
-                    position_to_remove);
-            for(int i=0; i<kart_amount; i++)
-            {
-                fprintf(stderr,"kart %d: eliminated %d position %d\n",
-                        i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
-            }   // for i
-        }  // kart_number==m_kart.size()
-        else
-        {
-            removeKart(kart_number);
-        }
-        // The follow the leader race is over if there is only one kart left,
-        // or if all players have gone
-        if(getCurrentNumKarts()==2 || getCurrentNumPlayers()==0)
-        {
-            // Add the results for the remaining kart
-            for(int i=1; i<(int)race_manager->getNumKarts(); i++)
-                if(!m_kart[i]->isEliminated()) 
-                    race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
-            
-            TimedRace::enterRaceOverState();
-            return;
-        }
-    }
 }
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::restartRace()
