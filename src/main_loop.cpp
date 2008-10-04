@@ -117,7 +117,7 @@ void MainLoop::run()
             // Client: send current controls to server
             // But don't do this if the race is in finish phase (otherwise 
             // messages can be mixed up in the race manager)
-            if(!race_manager->getWorld()->getClock().isFinishPhase())
+            if(!race_manager->getWorld()->isFinishPhase())
                 network_manager->sendUpdates();
             music_on = false; 
             if(user_config->m_profile) dt=1.0f/60.0f;
@@ -129,7 +129,7 @@ void MainLoop::run()
             // race results are displayed (i.e. game is in finish phase) 
             // messages must be handled by the normal update of the network 
             // manager
-            if(!race_manager->getWorld()->getClock().isFinishPhase())
+            if(!race_manager->getWorld()->isFinishPhase())
                 network_manager->receiveUpdates();
 
             if ( RaceManager::getWorld()->getPhase() != LIMBO_PHASE)

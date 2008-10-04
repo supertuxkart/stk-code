@@ -10,7 +10,7 @@
 **
 ***************************************************************************************************/
 
-// Credits: The Clock class was inspired by the Timer classes in 
+// Credits: The TimedRace class was inspired by the Timer classes in 
 // Ogre (www.ogre3d.org).
 
 #include "LinearMath/btQuickprof.h"

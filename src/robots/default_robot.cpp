@@ -97,7 +97,7 @@ void DefaultRobot::update( float delta )
         return;
     }
 
-    if( RaceManager::getWorld()->getClock().isStartPhase() )
+    if( RaceManager::getWorld()->isStartPhase() )
     {
         handle_race_start();
         AutoKart::update( delta );
@@ -532,7 +532,7 @@ void DefaultRobot::handle_rescue(const float DELTA)
 
 
     // check if kart is stuck
-    if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->getClock().isStartPhase())
+    if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)

@@ -24,7 +24,7 @@
   * Represents a standard race, i.e. with a start, end and laps.
   * Used in Grand Prix, Quick Race and Time Trial.
   */
-class StandardRace : public LinearWorld, public Clock::ClockListener
+class StandardRace : public LinearWorld
 {
 public:
     StandardRace();
@@ -33,7 +33,7 @@ public:
     // clock events
     virtual void countdownReachedZero();
     virtual void onGo();
-    virtual void onTerminate();
+    virtual void terminateRace();
     
     // overriding World methods
     virtual void update(float delta);

@@ -52,34 +52,9 @@ enum Phase {
  * A class that manages the clock (countdown, chrono, etc.) Also manages stuff
  * like the 'ready/set/go' text at the beginning or the delay at the end of a race.
  */
-class Clock
+class TimedRace
 {
-public:
-    /**
-    * abstract base class, derive from it to receive events from the clock
-     */
-    class ClockListener
-    {
-    public:
-        virtual ~ClockListener(){};
-        /*
-         * Will be called to notify your derived class that the clock,
-         * which is in COUNTDOWN mode, has reached zero.
-         */
-        virtual void countdownReachedZero() = 0;
-        
-        /*
-         * Called when the race actually starts.
-         */
-        virtual void onGo() = 0;
-        
-        /**
-            * Called when race is over and should be terminated (mostly called by the clock).
-         */
-        virtual void onTerminate() = 0;
-    };
-    
-private:
+protected:
     SFXBase    *m_prestart_sound;
     SFXBase    *m_start_sound;
     
@@ -89,14 +64,10 @@ private:
     float           m_time;
     ClockType       m_mode;
     
-    /**
-      * This object will be called to notify it of events.
-      */
-    ClockListener*  m_listener;
 
     Phase           m_phase;
     /**
-        * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
+     * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
      * This timer basically kicks in when we need to calculate non-race time like labels.
      */
     float           m_auxiliary_timer;
@@ -106,8 +77,8 @@ private:
      */
     Phase          m_previous_phase;
 public:
-    Clock();
-    ~Clock();
+    TimedRace();
+    ~TimedRace();
     
     void reset();
     
@@ -140,10 +111,26 @@ public:
     void    pause();
     void    unpause();
     
-    void    raceOver(const bool delay=false);
-    
-    void    registerEventListener(ClockListener* listener);
+    /** Gets called when the race is about to finish (but with the option of adding
+        * some delay to watch the end of the race. */
+    virtual void enterRaceOverState(const bool delay=false);
 
+    /** Called when it's really over (delay over if any)
+        */
+    virtual void terminateRace() = 0;
+    
+    /*
+     * Will be called to notify your derived class that the clock,
+     * which is in COUNTDOWN mode, has reached zero.
+     */
+    virtual void countdownReachedZero() {};
+    
+    /*
+     * Called when the race actually starts.
+     */
+    virtual void onGo() {};
+    
+    
 };
 
 

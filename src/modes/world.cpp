@@ -55,7 +55,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-World::World()
+World::World() : TimedRace()
 {
     RaceManager::setWorld(this);
     race_state            = new RaceState();
@@ -66,7 +66,7 @@ World::World()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
 
-    m_clock.setMode( CHRONO );
+    TimedRace::setMode( CHRONO );
     m_use_highscores = true;
     
     // Grab the track file
@@ -198,7 +198,7 @@ World::~World()
 void World::terminateRace()
 {
     updateHighscores();
-    m_clock.pause();
+    TimedRace::pause();
     menu_manager->pushMenu(MENUID_RACERESULT);
     unlock_manager->raceFinished();
 }
@@ -257,7 +257,7 @@ void World::resetAllKarts()
 //-----------------------------------------------------------------------------
 void World::update(float dt)
 {
-    m_clock.update(dt);
+    TimedRace::update(dt);
     // Clear race state so that new information can be stored
     race_state->clear();
     if(user_config->m_replay_history) dt=history->GetNextDelta();
@@ -277,13 +277,6 @@ void World::update(float dt)
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
 }
-// ----------------------------------------------------------------------------
-void  World::raceOver(bool delay)
-{
-    m_clock.raceOver(delay);
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        network_manager->sendRaceResults();
-}   // raceOver
 // ----------------------------------------------------------------------------
 
 HighscoreEntry* World::getHighscores() const
@@ -417,7 +410,7 @@ void World::removeKart(int kart_number)
     // ignored in all loops). Important:world->getCurrentNumKarts() returns 
     // the number of karts still racing. This value can not be used for loops 
     // over all karts, use race_manager->getNumKarts() instead!
-    race_manager->RaceFinished(kart, m_clock.getTime());
+    race_manager->RaceFinished(kart, TimedRace::getTime());
     kart->eliminate();
     m_eliminated_karts++;
 
@@ -472,7 +465,7 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
-    m_clock.reset();
+    TimedRace::reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -527,7 +520,7 @@ void  World::pause()
 {
     sound_manager->pauseMusic();
     sfx_manager->pauseAll();
-    m_clock.pause();
+    TimedRace::pause();
 }
 
 //-----------------------------------------------------------------------------
@@ -535,7 +528,7 @@ void  World::unpause()
 {
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
-    m_clock.unpause();
+    TimedRace::unpause();
 }
 
 /* EOF */

@@ -161,7 +161,7 @@ void Camera::update (float dt)
         kart_hpr.setRoll(0.0f);
         // Only adjust the pitch if it's not the race start, otherwise 
         // the camera will change pitch during ready-set-go.
-        if(RaceManager::getWorld()->getClock().isRacePhase())
+        if(RaceManager::getWorld()->isRacePhase())
         {
             // If the terrain pitch is 'significantly' different from the camera angle,
             // start adjusting the camera. This helps with steep declines, where

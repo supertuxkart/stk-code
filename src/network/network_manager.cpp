@@ -632,7 +632,7 @@ void NetworkManager::receiveUpdates()
             {
                 RaceResultMessage m(event.packet);
                 m_state = NS_WAIT_FOR_RACE_RESULT;
-                race_manager->getWorld()->raceOver();
+                race_manager->getWorld()->enterRaceOverState();
                 return;
             }
             race_state->receive(event.packet);

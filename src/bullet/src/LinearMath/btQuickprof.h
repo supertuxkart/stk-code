@@ -7,7 +7,7 @@
 **
 ***************************************************************************************************/
 
-// Credits: The Clock class was inspired by the Timer classes in 
+// Credits: The TimedRace class was inspired by the Timer classes in 
 // Ogre (www.ogre3d.org).
 
 #ifndef QUICK_PROF_H
@@ -153,7 +153,7 @@ public:
 	}
 
 	/// Returns the time in us since the last call to reset or since 
-	/// the Clock was created.
+	/// the TimedRace was created.
 	unsigned long int getTimeMicroseconds()
 	{
 #ifdef USE_WINDOWS_TIMERS

@@ -21,10 +21,9 @@
 #include "gui/menu_manager.hpp"
 
 //-----------------------------------------------------------------------------
-StandardRace::StandardRace() : LinearWorld(), Clock::ClockListener()
+StandardRace::StandardRace() : LinearWorld()
 {
-    m_clock.registerEventListener(this);
-    m_clock.setMode(CHRONO);
+    TimedRace::setMode(CHRONO);
 }
 
 //-----------------------------------------------------------------------------
@@ -32,7 +31,7 @@ StandardRace::~StandardRace()
 {
 }
     
-#ifdef __APPLE__
+#if 0
 #pragma mark -
 #pragma mark clock events
 #endif
@@ -51,12 +50,12 @@ void StandardRace::onGo()
     }
 }
 //-----------------------------------------------------------------------------
-void StandardRace::onTerminate()
+void StandardRace::terminateRace()
 {
-    World::terminateRace();
+    LinearWorld::terminateRace();
 }
 
-#ifdef __APPLE__
+#if 0
 #pragma mark -
 #pragma mark overridden from World
 #endif
@@ -70,12 +69,12 @@ void StandardRace::restartRace()
 void StandardRace::update(float delta)
 {    
     LinearWorld::update(delta);
-    if(!m_clock.isRacePhase()) return;
+    if(!TimedRace::isRacePhase()) return;
     
     // All karts are finished
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
-        raceOver();
+        TimedRace::enterRaceOverState();
 	    if(user_config->m_profile<0) printProfileResultAndExit();
         unlock_manager->raceFinished();
     }   // if all karts are finished
@@ -86,7 +85,7 @@ void StandardRace::update(float delta)
     {
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
-        raceOver(true /* delay */);
+        TimedRace::enterRaceOverState(true /* delay */);
     }
 }
 

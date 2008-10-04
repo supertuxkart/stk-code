@@ -22,12 +22,11 @@
 #include "translation.hpp"
 
 //-----------------------------------------------------------------------------
-FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld(), Clock::ClockListener()
+FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals    = stk_config->m_leader_intervals;
     
-    m_clock.registerEventListener(this);
-    m_clock.setMode(COUNTDOWN, m_leader_intervals[0]);
+    TimedRace::setMode(COUNTDOWN, m_leader_intervals[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -35,7 +34,7 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 {
 }
 
-#ifdef __APPLE__
+#if 0
 #pragma mark -
 #pragma mark clock events
 #endif
@@ -55,12 +54,12 @@ void FollowTheLeaderRace::onGo()
     }
 }
 //-----------------------------------------------------------------------------
-void FollowTheLeaderRace::onTerminate()
+void FollowTheLeaderRace::terminateRace()
 {
-    World::terminateRace();
+    LinearWorld::terminateRace();
 }
 
-#ifdef __APPLE__
+#if 0
 #pragma mark -
 #pragma mark overridden from World
 #endif
@@ -69,13 +68,13 @@ void FollowTheLeaderRace::onTerminate()
 void FollowTheLeaderRace::update(float delta)
 {   
     LinearWorld::update(delta);
-    if(!m_clock.isRacePhase()) return;
+    if(!TimedRace::isRacePhase()) return;
     
-    if(m_clock.getTime() < 0.0f)
+    if(TimedRace::getTime() < 0.0f)
     {
         if(m_leader_intervals.size()>1)
             m_leader_intervals.erase(m_leader_intervals.begin());
-        m_clock.setTime(m_leader_intervals[0]);
+        TimedRace::setTime(m_leader_intervals[0]);
         int kart_number;
         // If the leader kart is not the first kart, remove the first
         // kart, otherwise remove the last kart.
@@ -109,9 +108,9 @@ void FollowTheLeaderRace::update(float delta)
             // Add the results for the remaining kart
             for(int i=1; i<(int)race_manager->getNumKarts(); i++)
                 if(!m_kart[i]->isEliminated()) 
-                    race_manager->RaceFinished(m_kart[i], m_clock.getTime());
+                    race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
             
-            raceOver();
+            TimedRace::enterRaceOverState();
             return;
         }
     }

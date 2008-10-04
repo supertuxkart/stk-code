@@ -20,7 +20,7 @@
 
 #include "modes/linear_world.hpp"
 
-class FollowTheLeaderRace : public LinearWorld, public Clock::ClockListener
+class FollowTheLeaderRace : public LinearWorld
 {
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
@@ -30,7 +30,7 @@ public:
     // clock events
     virtual void countdownReachedZero();
     virtual void onGo();
-    virtual void onTerminate();
+    virtual void terminateRace();
     
     // overriding World methods
     virtual void update(float delta);

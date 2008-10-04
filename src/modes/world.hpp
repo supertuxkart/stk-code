@@ -78,7 +78,7 @@ class btRigidBody;
  *        RaceManager).
  */
 
-class World
+class World : public TimedRace
 {
 public:
     typedef std::vector<Kart*> Karts;
@@ -89,7 +89,6 @@ protected:
     std::vector<NetworkKart*> m_network_karts; 
     RandomGenerator           m_random;
 
-    Clock       m_clock;
     Karts       m_kart;
     Physics*    m_physics;
     float       m_fastest_lap;
@@ -146,12 +145,9 @@ public:
     float getFastestLapTime() const           { return m_fastest_lap;               }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time; }
     HighscoreEntry* getHighscores() const;
-    float getTime() const                     { return m_clock.getTime();           }
-    Phase getPhase() const                    { return m_clock.getPhase();          }
-    const Clock &getClock()                   { return m_clock;                     }
-    /** Gets called when the race is about to finish (but with the option of adding
-      * some delay to watch the end of the race. */
-    void  raceOver(bool delay=false);
+    float getTime() const                     { return TimedRace::getTime();           }
+    Phase getPhase() const                    { return TimedRace::getPhase();          }
+
     virtual void terminateRace();
     
     /** Called to determine the default collectibles to give each player for this
@@ -177,9 +173,9 @@ public:
       * The code that draws the timer should call this first to know
       * whether the game mode wants a timer drawn
       */
-    bool shouldDrawTimer() const    { return ((m_clock.getPhase() == RACE_PHASE ||
-                                               m_clock.getPhase() == DELAY_FINISH_PHASE) &&
-                                               m_clock.getMode() != CLOCK_NONE); }
+    bool shouldDrawTimer() const    { return ((TimedRace::getPhase() == RACE_PHASE ||
+                                               TimedRace::getPhase() == DELAY_FINISH_PHASE) &&
+                                               TimedRace::getMode() != CLOCK_NONE); }
     
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode

@@ -915,7 +915,7 @@ void RaceGUI::drawStatusText(const float dt)
     // The penalty message needs to be displayed for up to one second
     // after the start of the race, otherwise it disappears if 
     // "Go" is displayed and the race starts
-    if(RaceManager::getWorld()->getClock().isStartPhase() || RaceManager::getWorld()->getTime()<1.0f)
+    if(RaceManager::getWorld()->isStartPhase() || RaceManager::getWorld()->getTime()<1.0f)
     {
         for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         {
@@ -936,7 +936,7 @@ void RaceGUI::drawStatusText(const float dt)
     if(race_manager->getNumLocalPlayers() >= 3)
         split_screen_ratio_x = 0.5;
 
-    if ( RaceManager::getWorld()->getClock().isRacePhase() )
+    if ( RaceManager::getWorld()->isRacePhase() )
     {
         KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo(this);
         

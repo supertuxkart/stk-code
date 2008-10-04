@@ -20,14 +20,15 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 
 //-----------------------------------------------------------------------------
-Clock::Clock()
+TimedRace::TimedRace()
 {
     m_mode = CHRONO;
     m_time = 0.0f;
     m_auxiliary_timer = 0.0f;
-    m_listener = NULL;
     m_phase = SETUP_PHASE;
     m_previous_phase = SETUP_PHASE;  // initialise it just in case
     
@@ -39,7 +40,7 @@ Clock::Clock()
     m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
 }
 //-----------------------------------------------------------------------------
-void Clock::reset()
+void TimedRace::reset()
 {
     m_time = 0.0f;
     m_auxiliary_timer = 0.0f;
@@ -47,19 +48,19 @@ void Clock::reset()
     m_previous_phase      = SETUP_PHASE;
 }
 //-----------------------------------------------------------------------------
-Clock::~Clock()
+TimedRace::~TimedRace()
 {
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
 }
 //-----------------------------------------------------------------------------
-void Clock::setMode(const ClockType mode, const float initial_time)
+void TimedRace::setMode(const ClockType mode, const float initial_time)
 {
     m_mode = mode;
     m_time = initial_time;
 }
 //-----------------------------------------------------------------------------
-void Clock::raceOver(const bool delay)
+void TimedRace::enterRaceOverState(const bool delay)
 {
     if(m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE) return; // we already know
     
@@ -70,9 +71,12 @@ void Clock::raceOver(const bool delay)
     }
     else
         m_phase = FINISH_PHASE;
+    
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        network_manager->sendRaceResults();
 }
 //-----------------------------------------------------------------------------
-void Clock::update(const float dt)
+void TimedRace::update(const float dt)
 {
     switch(m_phase)
     {
@@ -102,8 +106,8 @@ void Clock::update(const float dt)
                 
                 m_start_sound->play();
                 
-                assert(m_listener != NULL);
-                m_listener -> onGo();
+                // event
+                onGo();
             }
             m_auxiliary_timer += dt;
             return;
@@ -123,7 +127,8 @@ void Clock::update(const float dt)
             break;            
         }
         case FINISH_PHASE:
-            m_listener->onTerminate();
+            // event
+            terminateRace();
             return;
     }
     
@@ -137,8 +142,8 @@ void Clock::update(const float dt)
             
             if(m_time <= 0.0)
             {
-                assert(m_listener != NULL);
-                m_listener -> countdownReachedZero();
+                // event
+                countdownReachedZero();
             }
                 
                 break;
@@ -146,23 +151,18 @@ void Clock::update(const float dt)
     }
 }
 //-----------------------------------------------------------------------------
-void Clock::setTime(const float time)
+void TimedRace::setTime(const float time)
 {
     m_time = time;
 }
 //-----------------------------------------------------------------------------
-void Clock::registerEventListener(ClockListener* listener)
-{
-    m_listener = listener;
-}
-//-----------------------------------------------------------------------------
-void Clock::pause()
+void TimedRace::pause()
 {
     m_previous_phase = m_phase;
     m_phase = LIMBO_PHASE;
 }
 //-----------------------------------------------------------------------------
-void Clock::unpause()
+void TimedRace::unpause()
 {
     m_phase = m_previous_phase;
 }
