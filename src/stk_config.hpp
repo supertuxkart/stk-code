@@ -41,7 +41,7 @@ public:
     float m_zipper_time;             // duration a zipper is active
     float m_zipper_force;            // additional force added to the acceleration
     float m_zipper_speed_gain;       // initial one time speed gain
-    float m_shortcut_segments;       // skipping more than this number of segments is
+    float m_shortcut_length;       // skipping more than this number of segments is
                                      // considered to be a shortcut
     float m_explosion_impulse;       // impulse affecting each non-hit kart
     float m_explosion_impulse_objects;// impulse of explosion on moving objects, e.g. road cones, ...

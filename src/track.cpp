@@ -450,12 +450,14 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
 {
     // If the kart was off the road, don't do any shortcuts
     if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
-    unsigned int distance_sectors = abs(OLDSEC-NEWSEC);
-    // Handle 'wrap around': if the distance is more than half the 
-    // number of driveline points, assume it's a 'wrap around'
-    if(2*distance_sectors > (unsigned int)m_driveline.size())
-        distance_sectors = (unsigned int)m_driveline.size() - distance_sectors;
-    return (distance_sectors>stk_config->m_shortcut_segments);
+    int distance_sectors = m_distance_from_start[std::max(NEWSEC, OLDSEC)] - m_distance_from_start[std::min(NEWSEC, OLDSEC)];
+    
+    // Handle 'warp around'
+    const int track_length = m_distance_from_start[m_driveline.size()-1];
+    if( distance_sectors < 0 ) distance_sectors += track_length;
+    else if( distance_sectors > track_length/2) distance_sectors -= track_length;
+    
+    return (distance_sectors > stk_config->m_shortcut_length);
 }   // isShortcut
 
 //-----------------------------------------------------------------------------

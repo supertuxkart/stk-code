@@ -27,8 +27,8 @@
  (zipper-force             250.0 )  ;; additional zipper force
  (zipper-speed-gain          4.5 )  ;; one time additional speed  
 
- (shortcut-skipped-segments  5   )  ;; skipping more than this number of segments
-                                    ;; is considered to be a shortcut
+ (shortcut-length           120  )  ;; leaving the road and coming back on it more than
+                                    ;; 120 'meters" later is considered to be a shortcut
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
  (explosion-impulse-objects 500.0  )  ;; explosion impulse for physics objects (smaller
                                     ;; else a cone e.g. will be pushed way too far)

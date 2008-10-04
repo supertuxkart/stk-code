@@ -477,6 +477,9 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
     
     if ( info.m_track_sector > 0 ) info.m_track_sector-- ;
+    info.m_last_valid_sector = info.m_track_sector;
+    if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
+        
     kart->setXYZ( RaceManager::getTrack()->trackToSpatial(info.m_track_sector) );
     
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
@@ -493,6 +496,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
                     DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector])));
 
     body->setCenterOfMassTransform(pos);
+    
 }
 //-----------------------------------------------------------------------------
 /** Find the position (rank) of 'kart' and update it accordingly
