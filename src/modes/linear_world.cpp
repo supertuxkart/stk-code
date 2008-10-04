@@ -290,13 +290,6 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         // Prevent cheating by setting time to a negative number, indicating
         // that the line wasn't crossed properly.
         kart_info.m_lap_start_time = -1.0f;
-    } else
-    {   // Switch to fast music in case of follow the leader when only 3 karts are left
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-           RaceManager::getWorld()->getCurrentNumKarts()==3)  
-        {
-            sound_manager->switchToFastMusic();
-        }
     }
 }   // doLapCounting
 //-----------------------------------------------------------------------------

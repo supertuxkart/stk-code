@@ -20,6 +20,7 @@
 #include "gui/menu_manager.hpp"
 #include "user_config.hpp"
 #include "translation.hpp"
+#include "audio/sound_manager.hpp"
 
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
@@ -70,6 +71,11 @@ void FollowTheLeaderRace::countdownReachedZero()
     {
         removeKart(kart_number);
     }
+    
+    // almost over, use fast music
+    if(getCurrentNumKarts()==3)  
+        sound_manager->switchToFastMusic();
+    
     // The follow the leader race is over if there is only one kart left,
     // or if all players have gone
     if(getCurrentNumKarts()==2 || getCurrentNumPlayers()==0)
