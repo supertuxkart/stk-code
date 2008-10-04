@@ -31,7 +31,6 @@ public:
     virtual ~StandardRace();
     
     // clock events
-    virtual void countdownReachedZero();
     virtual void onGo();
     virtual void terminateRace();
     

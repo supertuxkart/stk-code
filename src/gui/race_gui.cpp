@@ -233,7 +233,7 @@ RaceGUI::handle(GameAction ga, int value)
 void RaceGUI::update(float dt)
 {
     drawStatusText(dt);
-    cleanupMessages();
+    cleanupMessages(dt);
 
     BaseGUI::update( dt );
 }   // update
@@ -759,16 +759,16 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
 
 //-----------------------------------------------------------------------------
 /** Removes messages which have been displayed long enough. This function
- *  must be called after drawAllMessages, otherwise messages which are onlu
+ *  must be called after drawAllMessages, otherwise messages which are only
  *  displayed once will not be drawn!
  **/
 
-void RaceGUI::cleanupMessages()
+void RaceGUI::cleanupMessages(const float dt)
 {
     AllMessageType::iterator p =m_messages.begin(); 
     while(p!=m_messages.end())
     {
-        if((*p).done())
+        if((*p).done(dt))
         {
             p = m_messages.erase(p);
         }
@@ -989,20 +989,22 @@ void RaceGUI::drawStatusText(const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawAllMessages     (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
-        }   // for pla
-        drawTimer           ();
-        if(RaceManager::getWorld()->getTime()<TIME_MUSIC_DESCRIPTION 
-          && race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        }   // next player
+        
+        drawTimer();
+        
+        if(RaceManager::getWorld()->getPhase() == GO_PHASE ||
+           RaceManager::getWorld()->getPhase() == MUSIC_PHASE)
         {
             drawMusicDescription();
         }
-        else if (RaceManager::getWorld()->getTime()>stk_config->m_leader_intervals[0]-TIME_MUSIC_DESCRIPTION 
-          && race_manager->getMinorMode()== RaceManager::MINOR_MODE_FOLLOW_LEADER)
-            drawMusicDescription();
+
             
-        drawMap             ();
-        if ( user_config->m_display_fps ) drawFPS ();
-        drawPlayerIcons     (info);
+        drawMap();
+        if ( user_config->m_display_fps ) drawFPS();
+        
+        drawPlayerIcons(info);
+        
     }   // if RACE_PHASE
 
     glPopAttrib  () ;

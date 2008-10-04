@@ -57,7 +57,7 @@ class RaceGUI: public BaseGUI
     {
      public:
         std::string m_message;            // message to display
-        float       m_end_time;           // end time for the message (-1 if once only)
+        float       m_remaining_time;     // time remaining before removing this message from screen
         int         m_red,m_blue,m_green; // colour
         int         m_font_size;          // size
         Kart        *m_kart;
@@ -71,20 +71,19 @@ class RaceGUI: public BaseGUI
             m_message    = message; 
             m_font_size  = size;
             m_kart       = kart;
-            World* world = RaceManager::getWorld();
-            if( time < 0.0f ) m_end_time = -1.0f;
+            if( time < 0.0f ) m_remaining_time = -1.0f;
             else
             {
-                m_end_time = race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ?
-                             world->getTime()-time : world->getTime()+time;
+                m_remaining_time = time;
             }
             m_red=red; m_blue=blue; m_green=green; 
         }
         // in follow leader the clock counts backwards
-        bool done() const { const int time = (int)RaceManager::getWorld()->getTime(); // work around gcc bug (doesn't accept :: in a ?)
-                            return m_end_time<0.0f || 
-                            (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ?
-                             time<m_end_time : time>m_end_time); }
+        bool done(const float dt)
+        {
+            m_remaining_time -= dt;
+            return m_remaining_time < 0;
+        }
     };
 public:
 
@@ -125,7 +124,7 @@ private:
     void drawTimer             ();
     void drawFPS               ();
     void drawMusicDescription  ();
-    void cleanupMessages       ();
+    void cleanupMessages       (const float dt);
 
     /* Text drawing */
     /** Draw text to screen.

@@ -66,7 +66,7 @@ World::World() : TimedRace()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
 
-    TimedRace::setMode( CHRONO );
+    TimedRace::setClockMode( CHRONO );
     m_use_highscores = true;
     
     // Grab the track file

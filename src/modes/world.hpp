@@ -173,9 +173,8 @@ public:
       * The code that draws the timer should call this first to know
       * whether the game mode wants a timer drawn
       */
-    bool shouldDrawTimer() const    { return ((TimedRace::getPhase() == RACE_PHASE ||
-                                               TimedRace::getPhase() == DELAY_FINISH_PHASE) &&
-                                               TimedRace::getMode() != CLOCK_NONE); }
+    bool shouldDrawTimer() const    { return TimedRace::isRacePhase() &&
+                                             TimedRace::getClockMode() != CLOCK_NONE; }
     
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode

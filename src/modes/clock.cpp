@@ -54,7 +54,7 @@ TimedRace::~TimedRace()
     sfx_manager->deleteSFX(m_start_sound);
 }
 //-----------------------------------------------------------------------------
-void TimedRace::setMode(const ClockType mode, const float initial_time)
+void TimedRace::setClockMode(const ClockType mode, const float initial_time)
 {
     m_mode = mode;
     m_time = initial_time;
@@ -113,7 +113,12 @@ void TimedRace::update(const float dt)
             return;
         case GO_PHASE  :
             if(m_auxiliary_timer>3.0)    // how long to display the 'go' message  
-                m_phase=RACE_PHASE;    
+                m_phase=MUSIC_PHASE;    
+            m_auxiliary_timer += dt;
+            break;
+        case MUSIC_PHASE:
+            if(m_auxiliary_timer>TIME_MUSIC_DESCRIPTION)    // how long to display the 'music' message  
+                m_phase=RACE_PHASE;  
             m_auxiliary_timer += dt;
             break;
         case DELAY_FINISH_PHASE :

@@ -36,6 +36,8 @@ enum Phase {
     SET_PHASE,
     // 'Go' is displayed, but this is already race phase
     GO_PHASE,
+    // Race is started, 'go' is gone, but music name is still there
+    MUSIC_PHASE,
     // the actual race has started, no ready/set/go is displayed anymore
     RACE_PHASE,
     // All players have finished, now wait a certain amount of time for AI
@@ -85,21 +87,21 @@ public:
     // Note: GO_PHASE is both: start phase and race phase
     bool    isStartPhase() const  { return m_phase<GO_PHASE;             }
     bool    isRacePhase()  const  { return m_phase>=GO_PHASE && 
-                                           m_phase<LIMBO_PHASE;          }
+                                           m_phase<FINISH_PHASE;          }
     /** While the race menu is being displayed, m_phase is limbo, and
      *  m_previous_phase is finish. So we have to test this case, too.  */
     bool    isFinishPhase() const { return m_phase==FINISH_PHASE ||
-                                       (m_phase==LIMBO_PHASE &&
-                                         m_previous_phase==FINISH_PHASE);}
+                                          (m_phase==LIMBO_PHASE &&
+                                           m_previous_phase==FINISH_PHASE);}
     const Phase getPhase() const  { return m_phase;                      }
     
     /**
-        * Call to specify what kind of clock you want. The second argument
+     * Call to specify what kind of clock you want. The second argument
      * can be used to specify the initial time value (especially useful
                                                       * for countdowns)
      */
-    void    setMode(const ClockType mode, const float initial_time=0.0f);
-    int     getMode() const { return m_mode; }
+    void    setClockMode(const ClockType mode, const float initial_time=0.0f);
+    int     getClockMode() const { return m_mode; }
     /**
         * Call each frame, with the elapsed time as argument.
      */

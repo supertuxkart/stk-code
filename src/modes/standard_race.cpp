@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
 {
-    TimedRace::setMode(CHRONO);
+    TimedRace::setClockMode(CHRONO);
 }
 
 //-----------------------------------------------------------------------------
@@ -36,8 +36,6 @@ StandardRace::~StandardRace()
 #pragma mark clock events
 #endif
 
-//-----------------------------------------------------------------------------
-void StandardRace::countdownReachedZero() { }
 //-----------------------------------------------------------------------------
 void StandardRace::onGo()
 {
