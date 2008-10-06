@@ -17,13 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CONSTANTS_H
-#define HEADER_CONSTANTS_H
+#ifndef HEADER_CONSTANTS_HPP
+#define HEADER_CONSTANTS_HPP
 
-
-#define MAX_HISTORY            50000   /* number of history events                */
-#define TIME_DELAY_TILL_FINISH  10.0f  /* time after all player karts finish      */
-#define TIME_MUSIC_DESCRIPTION  10.0f  /* duration music description is displayed */
 /*
   All final units are in meters (or meters/sec or meters/sec^2)
   and degrees (or degrees/sec).

@@ -60,23 +60,37 @@ public:
     {
         m->addFloat(lr);
         m->addFloat(accel);
-        m->addChar(  brake   ?  1 : 0
-                   + wheelie ?  2 : 0
-                   + jump    ?  4 : 0
-                   + rescue  ?  8 : 0
-                   + fire    ? 16 : 0);
+        m->addChar(getButtonsCompressed());
     }   // compress
     // ------------------------------------------------------------------------
     void uncompress(char *c)
     {
         lr      = ((float*)c)[0];  
         accel   = ((float*)c)[1];
-        brake   = (c[8] &  1) != 0;
-        wheelie = (c[8] &  2) != 0;
-        jump    = (c[8] &  4) != 0;
-        rescue  = (c[8] &  8) != 0;
-        fire    = (c[8] & 16) != 0;
+        setButtonsCompressed(c[8]);
     }   // uncompress
+    // ------------------------------------------------------------------------
+    /** Compresses all buttons into a single integer value. */
+    char getButtonsCompressed() const
+    {
+        return  brake   ?  1 : 0
+              + wheelie ?  2 : 0
+              + jump    ?  4 : 0
+              + rescue  ?  8 : 0
+              + fire    ? 16 : 0;
+    }   // getButtonsCompressed
+    // ------------------------------------------------------------------------
+    /** Sets the buttons from a compressed representation.
+     *  /param c Character containing the compressed representation.
+     */
+    void setButtonsCompressed(char c)
+    {
+        brake   = (c &  1) != 0;
+        wheelie = (c &  2) != 0;
+        jump    = (c &  4) != 0;
+        rescue  = (c &  8) != 0;
+        fire    = (c & 16) != 0;
+    }   // setButtonsCompressed
 };
 
 #endif

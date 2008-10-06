@@ -43,18 +43,16 @@ private:
     Vec3          m_hpr;
 protected:
     UserPointer   m_user_pointer;
-    sgVec4*       m_normal_hot;      /* plane on which HOT was computed             */
-    Material*     m_material_hot;    /* Material at HOT                             */
-    ssgTransform* m_model_transform;            // The transform where the model is under
-    ssgTransform* m_shadow;
+    sgVec4       *m_normal_hot;      /* plane on which HOT was computed             */
+    Material     *m_material_hot;    /* Material at HOT                             */
+    ssgTransform *m_model_transform;            // The transform where the model is under
+    ssgTransform *m_shadow;
     int           m_first_time ;
-    sgCoord*      m_history_velocity;
-    sgCoord*      m_history_position;
-    btRigidBody*          m_body;
-    btDefaultMotionState* m_motion_state;
+    btRigidBody  *m_body;
+    btDefaultMotionState *m_motion_state;
 public:
 
-    Moveable (bool bHasHistory=false);
+    Moveable ();
     virtual ~Moveable();
 
     ssgTransform* getModelTransform()          {return m_model_transform;          }
@@ -77,8 +75,6 @@ public:
     virtual void  handleZipper ()              {};
     virtual void  reset        ();
     virtual void  update       (float dt) ;
-    void          WriteHistory (char* s, int kartNumber, int indx);
-    void          ReadHistory  (char* s, int kartNumber, int indx);
     btRigidBody*  getBody   () const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape);

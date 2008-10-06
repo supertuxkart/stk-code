@@ -109,6 +109,9 @@ void cmdLineHelp (char* invocation)
     // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
     // "                       if n<0 --> (-n) = number of laps to drive
     // "  --history            Replay history file 'history.dat'\n"
+    // "  --history=n          Replay history file 'history.dat' using mode:\n"
+    // "                       n=1: use recorded positions\n"
+    // "                       n=2: use recorded key strokes\n"
     "  --server[=port]         This is the server (running on the specified port)\n"
     "  --client=ip             This is a client, connect to the specified ip address\n"
     "  --port=n                Port number to use\n"
@@ -374,7 +377,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--log=file"))
         {
             user_config->m_log_errors=true;
-        }else if( sscanf(argv[i], "--profile=%d",  &n)==1)
+        } else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
             user_config->m_profile=n;
 	    if(n<0) 
@@ -392,9 +395,13 @@ int handleCmdLine(int argc, char **argv)
         {
             user_config->m_profile=20;
         }
+        else if( sscanf(argv[i], "--history=%d",  &n)==1)
+        {
+            history->doReplayHistory( (History::HistoryReplayMode)n);
+        }
         else if( !strcmp(argv[i], "--history") )
         {
-            user_config->m_replay_history=true;
+            history->doReplayHistory(History::HISTORY_POSITION);
         }
         else if( !strcmp(argv[i], "--herring") && i+1<argc )
         {
@@ -519,7 +526,7 @@ int main(int argc, char *argv[] )
 
         // Replay a race
         // =============
-        if(user_config->m_replay_history)
+        if(history->replayHistory())
         {
             // This will setup the race manager etc.
             history->Load();

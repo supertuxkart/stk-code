@@ -37,7 +37,7 @@ void STKConfig::load(const std::string filename)
     // Check that all necessary values are indeed set 
     // -----------------------------------------------
 
-#define CHECK_NEG(  a,strA) if(a==UNDEFINED) {                         \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
     }
@@ -67,6 +67,11 @@ void STKConfig::load(const std::string filename)
     if(m_leader_intervals.size()==0)
     {
         fprintf(stderr,"No follow leader interval(s) defined in stk_config");
+        exit(-1);
+    }
+    if(m_menu_background.size()==0)
+    {
+        fprintf(stderr,"No menu background defined in stk_config");
         exit(-1);
     }
     CHECK_NEG(m_max_karts,               "max-karts"                    );
@@ -127,6 +132,9 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
     CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
     CHECK_NEG(m_camera_distance,           "camera-distance"            );
+    CHECK_NEG(m_max_history,               "max-history"                );
+    CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
+    CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
 
 }   // load
 
@@ -147,7 +155,7 @@ void STKConfig::init_defaults()
     m_wheelie_restore_rate = m_wheelie_speed_boost = 
     m_bomb_time = m_bomb_time_increase= m_anvil_time = 
     m_zipper_time = m_zipper_force = m_zipper_speed_gain = 
-    m_shortcut_length =
+    m_shortcut_length = m_music_credit_time = m_delay_finish_time =
     //bullet physics data
     m_suspension_stiffness = m_wheel_damping_relaxation = 
     m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
@@ -164,6 +172,7 @@ void STKConfig::init_defaults()
     m_rear_wheel_connection  = Vec3(UNDEFINED);
     m_max_karts              = -100;
     m_grid_order             = -100;
+    m_max_history            = -100;
     m_title_music            = NULL;
     m_scores.clear();
     m_leader_intervals.clear();
@@ -193,7 +202,11 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts                );
     lisp->get("grid-order",                   m_grid_order               );
-    lisp->getVector("scores",                 m_scores);
+    lisp->getVector("scores",                 m_scores                   );
+    lisp->get("max-history",                  m_max_history              );
+    lisp->get("delay-finish-time",            m_delay_finish_time        );
+    lisp->get("music-credit-time",            m_music_credit_time        );
+    lisp->get("menu-background",              m_menu_background          );
     std::string title_music;
     lisp->get("title-music",                  title_music                );
     m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));

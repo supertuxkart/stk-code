@@ -178,6 +178,8 @@ public:
     float          getSteerPercent  () const {return m_controls.lr;            }
     const KartControl&
                    getControls      () const {return m_controls;               }
+    /** Sets the kart controls. Used e.g. by replaying history. */
+    void           setControls(const KartControl &c) { m_controls = c;         }
     float          getMaxSpeed      () const {return m_max_speed;              }
     void           createPhysics    (ssgEntity *obj);
     float          getKartLength    () const {return m_kart_properties->getKartLength();}

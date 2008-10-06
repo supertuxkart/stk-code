@@ -21,39 +21,61 @@
 #define HEADER_STKCONFIG_H
 
 #include "kart_properties.hpp"
-#include "lisp/lisp.hpp"
 
+class Lisp;
 class MusicInformation;
 
+/** Global STK configuration information. Parameters here can be tuned without
+ *  recompilation, but the user shouldn't actually modify them. It also
+ *  includes the list of default kart physics parameters which are used for
+ *  each kart (but which can be overwritten for each kart, too).
+ */
 class STKConfig : public KartProperties
 {
 public:
     static float UNDEFINED;
-    float m_anvil_weight;            // Additional kart weight if anvil is attached
-    float m_anvil_speed_factor;      // To decrease speed once when attached
-    float m_parachute_friction;      // Increased air friction when parachute
-    float m_parachute_done_fraction; // fraction of speed when lost will detach parachute
-    float m_parachute_time;          // time a parachute is active
-    float m_parachute_time_other;    // time a parachute attached to other karts is active
-    float m_bomb_time;               // time before a bomb explodes
-    float m_bomb_time_increase;      // time added to bomb timer when it's passed on
-    float m_anvil_time;              // time an anvil is active
-    float m_zipper_time;             // duration a zipper is active
-    float m_zipper_force;            // additional force added to the acceleration
-    float m_zipper_speed_gain;       // initial one time speed gain
-    float m_shortcut_length;       // skipping more than this number of segments is
-                                     // considered to be a shortcut
-    float m_explosion_impulse;       // impulse affecting each non-hit kart
-    float m_explosion_impulse_objects;// impulse of explosion on moving objects, e.g. road cones, ...
-    int   m_max_karts;               // maximum number of karts
-    int   m_grid_order;              // whether grand prix grid is in point or reverse point order
+    float m_anvil_weight;            /**<Additional kart weight if anvil is 
+                                         attached.                           */
+    float m_anvil_speed_factor;      /**<Speed decrease when attached first. */
+    float m_parachute_friction;      /**<Increased parachute air friction.   */
+    float m_parachute_done_fraction; /**<Fraction of speed when lost will 
+                                         detach parachute.                   */
+    float m_parachute_time;          /**<Time a parachute is active.         */
+    float m_parachute_time_other;    /**<Time a parachute attached to other 
+                                         karts is active.                    */
+    float m_bomb_time;               /**<Time before a bomb explodes.        */
+    float m_bomb_time_increase;      /**<Time added to bomb timer when it's 
+                                         passed on.                          */
+    float m_anvil_time;              /**<Time an anvil is active.            */
+    float m_zipper_time;             /**<Duration a zipper is active.        */
+    float m_zipper_force;            /**<Additional force added to the 
+                                         acceleration.                       */
+    float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
+    float m_shortcut_length;         /**<Skipping more than this distance
+                                         in segments triggers a shortcut.    */
+    float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
+    float m_explosion_impulse_objects;/**<Impulse of explosion on moving 
+                                         objects, e.g. road cones, ...       */
+    float m_delay_finish_time;       /**<Delay after a race finished before
+                                         the results are displayed.          */
+    float m_music_credit_time;       /**<Time the music credits are
+                                         displayed.                          */
+    int   m_max_karts;               /**<Maximum number of karts.            */
+    int   m_grid_order;              /**<Whether grand prix grid is in point
+                                         or reverse point order.             */
+    int   m_max_history;             /**<Maximum number of frames to save in
+                                         a history files.                    */
+
     std::vector<float> 
-          m_leader_intervals;        // interval in follow the leader till last kart is reomved
-    std::vector<int> m_scores;       // scores depending on position
+          m_leader_intervals;        /**<Interval in follow the leader till 
+                                         last kart is reomved.               */
+    std::vector<int> m_scores;       /**<Scores depending on position.       */
 
-    MusicInformation* m_title_music;  // filename of the title music to play
+    MusicInformation* m_title_music; /**<Filename of the title music to play.*/
+    std::string m_menu_background;   /**<Picture used as menu background.    */
 
-    STKConfig() : KartProperties() {};
+    /** Empty constructor. The actual work is done in load. */
+         STKConfig() : KartProperties() {};
     void init_defaults    ();
     void getAllData       (const lisp::Lisp* lisp);
     void load             (const std::string filename);

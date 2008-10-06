@@ -39,7 +39,7 @@ float      Flyable::m_st_force_updown[COLLECT_MAX];
 btVector3  Flyable::m_st_extend[COLLECT_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable(false)
+Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable()
 {
     // get the appropriate data from the static fields
     m_speed             = m_st_speed[type];

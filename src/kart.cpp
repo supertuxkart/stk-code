@@ -53,14 +53,16 @@
 #include "utils/ssg_help.hpp"
 
 
-Kart::Kart (const std::string& kart_name, int position,
-            const btTransform& init_transform) 
-    : TerrainInfo(1),
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
 #endif
-       Moveable(true), m_attachment(this), m_collectable(this)
+
+Kart::Kart (const std::string& kart_name, int position,
+            const btTransform& init_transform) 
+     : TerrainInfo(1),
+       Moveable(), m_attachment(this), m_collectable(this)
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
 #endif

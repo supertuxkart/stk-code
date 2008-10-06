@@ -117,7 +117,8 @@ void TimedRace::update(const float dt)
             m_auxiliary_timer += dt;
             break;
         case MUSIC_PHASE:
-            if(m_auxiliary_timer>TIME_MUSIC_DESCRIPTION)    // how long to display the 'music' message  
+            // how long to display the 'music' message
+            if(m_auxiliary_timer>stk_config->m_music_credit_time)
                 m_phase=RACE_PHASE;  
             m_auxiliary_timer += dt;
             break;
@@ -126,7 +127,7 @@ void TimedRace::update(const float dt)
             m_auxiliary_timer += dt;
             
             // Nothing more to do if delay time is not over yet
-            if(m_auxiliary_timer < TIME_DELAY_TILL_FINISH) break;
+            if(m_auxiliary_timer < stk_config->m_delay_finish_time) break;
             
             m_phase = FINISH_PHASE;
             break;            

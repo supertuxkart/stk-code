@@ -22,9 +22,8 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "user_config.hpp"
-#include "history.hpp"
 
-Moveable::Moveable (bool bHasHistory)
+Moveable::Moveable()
 {
     m_body            = 0;
     m_motion_state    = 0;
@@ -33,17 +32,6 @@ Moveable::Moveable (bool bHasHistory)
     m_model_transform = new ssgTransform();
 
     m_model_transform->ref();
-
-    if(bHasHistory)
-    {
-        m_history_velocity = new sgCoord[history->GetSize()];
-        m_history_position = new sgCoord[history->GetSize()];
-    }
-    else
-    {
-        m_history_velocity = NULL;
-        m_history_position = NULL;
-    }
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -52,11 +40,6 @@ Moveable::~Moveable()
     // The body is being removed from the world in kart/projectile
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
-    if(m_history_velocity)
-    {
-        delete [] m_history_velocity;
-        delete [] m_history_position;
-    }
     // FIXME what about model?
 }   // ~Moveable
 
@@ -106,52 +89,6 @@ void Moveable::update (float dt)
     m_velocityLC = getVelocity()*getTrans().getBasis();
     m_hpr.setHPR(m_transform.getBasis());
 
-    if(m_history_velocity)
-    {
-        if(user_config->m_replay_history)
-        {
-            sgCoord tmp;
-            sgCopyCoord(&tmp, &(m_history_velocity[history->GetCurrentIndex()]));
-
-#undef IGNORE_Z_IN_HISTORY
-#ifdef IGNORE_Z_IN_HISTORY
-            const float DUMMY=m_velocity.xyz[2];
-            sgCopyCoord(&m_velocity, &tmp);
-            m_velocity.xyz[2]=DUMMY;
-#else
-            m_velocityLC.setValue(tmp.xyz[0],tmp.xyz[1],tmp.xyz[2]);
-#endif
-        }
-        else
-        {
-            m_history_velocity[history->GetCurrentIndex()].xyz[0]=m_velocityLC.getX();
-            m_history_velocity[history->GetCurrentIndex()].xyz[1]=m_velocityLC.getY();
-            m_history_velocity[history->GetCurrentIndex()].xyz[2]=m_velocityLC.getZ();
-        }
-    }   // if m_history_velocity
-
-    if(m_history_position)
-    {
-        if(user_config->m_replay_history)
-        {
-            sgCoord tmp;
-            sgCopyCoord(&tmp, &(m_history_position[history->GetCurrentIndex()]));
-            Vec3 hpr(tmp.hpr);
-            hpr.degreeToRad();
-            btMatrix3x3 rotation;
-            rotation.setEulerZYX(hpr.getPitch(), hpr.getRoll(), hpr.getHeading());
-            m_transform.setBasis(rotation);
-            m_transform.setOrigin(Vec3(tmp.xyz));
-
-        }
-        else
-        {
-            Coord c(m_transform);
-            sgCopyCoord(&(m_history_position[history->GetCurrentIndex()]), &c.toSgCoord());
-        }
-    }   // if m_history_position
-
-
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;
 }   // update
@@ -166,46 +103,3 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     m_model_transform->setTransform(&c);
 }   // updateGraphics
 
-//-----------------------------------------------------------------------------
-void Moveable::WriteHistory(char* s, int kartNumber, int indx)
-{
-    sprintf(s, "Kart %d: v=%f,%f,%f,%f,%f,%f, p=%f,%f,%f,%f,%f,%f", kartNumber,
-            m_history_velocity[indx].xyz[0],
-            m_history_velocity[indx].xyz[1],
-            m_history_velocity[indx].xyz[2],
-            m_history_velocity[indx].hpr[0],
-            m_history_velocity[indx].hpr[1],
-            m_history_velocity[indx].hpr[2],
-            m_history_position[indx].xyz[0],
-            m_history_position[indx].xyz[1],
-            m_history_position[indx].xyz[2],
-            m_history_position[indx].hpr[0],
-            m_history_position[indx].hpr[1],
-            m_history_position[indx].hpr[2]);
-}   // WriteHistory
-
-//-----------------------------------------------------------------------------
-void Moveable::ReadHistory(char* s, int kartNumber, int indx)
-{
-    int k;
-    sscanf(s, "Kart %d: v=%f,%f,%f,%f,%f,%f, p=%f,%f,%f,%f,%f,%f", &k,
-           m_history_velocity[indx].xyz+0,
-           m_history_velocity[indx].xyz+1,
-           m_history_velocity[indx].xyz+2,
-           m_history_velocity[indx].hpr+0,
-           m_history_velocity[indx].hpr+1,
-           m_history_velocity[indx].hpr+2,
-           m_history_position[indx].xyz+0,
-           m_history_position[indx].xyz+1,
-           m_history_position[indx].xyz+2,
-           m_history_position[indx].hpr+0,
-           m_history_position[indx].hpr+1,
-           m_history_position[indx].hpr+2);
-    if(k!=kartNumber)
-    {
-        fprintf(stderr,"WARNING: tried reading data for kart %d, found:\n",
-                kartNumber);
-        fprintf(stderr,"%s\n",s);
-        exit(-2);
-    }
-}   // ReadHistory

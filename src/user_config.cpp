@@ -109,7 +109,6 @@ void UserConfig::setDefaults()
     m_max_fps          = 120;
     m_sfx_volume       = 1.0f;
     m_use_kph          = false;
-    m_replay_history   = false;
     m_width            = 800;
     m_height           = 600;
     m_prev_width           = m_width;

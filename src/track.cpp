@@ -444,16 +444,17 @@ btTransform Track::getStartTransform(unsigned int pos) const {
 //-----------------------------------------------------------------------------
 /** Determines if a kart moving from sector OLDSEC to sector NEWSEC
  *  would be taking a shortcut, i.e. if the distance is larger
- *  than a certain detla
+ *  than a certain delta
  */
 bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
 {
     // If the kart was off the road, don't do any shortcuts
     if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
-    int distance_sectors = m_distance_from_start[std::max(NEWSEC, OLDSEC)] - m_distance_from_start[std::min(NEWSEC, OLDSEC)];
+    int distance_sectors = (int)(m_distance_from_start[std::max(NEWSEC, OLDSEC)] -
+                                 m_distance_from_start[std::min(NEWSEC, OLDSEC)]  );
     
     // Handle 'warp around'
-    const int track_length = m_distance_from_start[m_driveline.size()-1];
+    const int track_length = (int)m_distance_from_start[m_driveline.size()-1];
     if( distance_sectors < 0 ) distance_sectors += track_length;
     else if( distance_sectors > track_length/2) distance_sectors -= track_length;
     

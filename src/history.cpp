@@ -18,45 +18,136 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "history.hpp"
+
+#include <stdio.h>
+
 #include "kart.hpp"
 #include "track.hpp"
 #include "race_manager.hpp"
+#include "modes/world.hpp"
+#include "network/network_manager.hpp"
 
 History* history = 0;
 
-void History::SetSize(int n)
+//-----------------------------------------------------------------------------
+/** Initialises the history object and sets the mode to none. 
+ */
+History::History()
 {
-    m_size      = n;
-    m_all_deltas  = new float[m_size];
-    m_current    = -1;
-    m_wrapped    = false;
+    m_replay_mode = HISTORY_NONE;
 }   // History
 
 //-----------------------------------------------------------------------------
-void History::StoreDelta(float delta)
+/** Starts replay from the history file in the current directory.
+ */
+void History::startReplay()
 {
-    this->m_current++;
-    if(m_current>=m_size)
+    Load();
+}   // initReplay
+
+//-----------------------------------------------------------------------------
+/** Initialise the history for a new recording. It especially allocates memory
+ *  to store the history.
+ */
+void History::initRecording()
+{
+    allocateMemory(stk_config->m_max_history);
+    m_current = -1;
+    m_wrapped = false;
+    m_size    = 0;
+}   // initRecording
+
+//-----------------------------------------------------------------------------
+/** Allocates memory for the history. This is used when recording as well
+ *  as when replaying (since in replay the data is read into memory first).
+ *  \param number_of_frames Maximum number of frames to store.
+ */
+void History::allocateMemory(int number_of_frames)
+{
+    m_all_deltas.resize   (number_of_frames);
+    m_all_controls.resize (number_of_frames*race_manager->getNumKarts());
+    m_all_xyz.resize      (number_of_frames*race_manager->getNumKarts());
+    m_all_rotations.resize(number_of_frames*race_manager->getNumKarts());
+}   // allocateMemory
+
+//-----------------------------------------------------------------------------
+/** Depending on mode either saves the data for the current time step, or 
+ *  replays the data. 
+ *  /param dt Time step.
+ */
+void History::update(float dt)
+{
+    if(m_replay_mode==HISTORY_NONE)
+        updateSaving(dt);
+    else
+        updateReplay(dt);
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Saves the current history.
+ *  \param dt Time step size.
+ */
+void History::updateSaving(float dt)
+{
+    m_current++;
+    if(m_current>=(int)m_all_deltas.size())
     {
         m_wrapped = true;
         m_current = 0;
     }
-    m_all_deltas[m_current] = delta;
-}   // StoreDT
+    else
+    {
+        m_size ++;
+    }
+    m_all_deltas[m_current] = dt;
+
+    unsigned int max_num_karts = race_manager->getNumKarts();
+    // n<=max_num_karts, e.g. if karts are eliminated
+    unsigned int n     = race_manager->getNumKarts();
+
+    for(unsigned int i=0; i<n; i++)
+    {
+        unsigned int index=m_current*max_num_karts+i;
+        const Kart *kart = RaceManager::getKart(i);
+        m_all_controls[index]  = kart->getControls();
+        m_all_xyz[index]       = kart->getXYZ();
+        m_all_rotations[index] = kart->getRotation();
+    }   // for i
+}   // updateSaving
 
 //-----------------------------------------------------------------------------
-float History::GetNextDelta()
+/** Sets the kart position and controls to the recorded history value.
+ *  \param dt Time step size.
+ */
+void History::updateReplay(float dt)
 {
     m_current++;
-    if(m_current>=m_size)
+    if(m_current>=(int)m_all_deltas.size())
     {
-        fprintf(stderr,"History: finished.\n");
-        exit(-3);
+        printf("Replay finished.\n");
+        exit(2);
     }
-    return m_all_deltas[m_current];
-}   // GetNextDT
+    unsigned int num_karts = race_manager->getNumKarts();
+    for(unsigned k=0; k<num_karts; k++)
+    {
+        Kart *kart = RaceManager::getKart(k);
+        unsigned int index=m_current*num_karts+k;
+        if(m_replay_mode==HISTORY_POSITION)
+        {
+            kart->setXYZ(m_all_xyz[index]);
+            kart->setRotation(m_all_rotations[index]);
+        }
+        else
+        {
+            kart->setControls(m_all_controls[index]);
+        }
+    }
+}   // updateReplay
 
 //-----------------------------------------------------------------------------
+/** Saves the history stored in the internal data structures into a file called
+ *  history.dat.
+ */
 void History::Save()
 {
     FILE *fd = fopen("history.dat","w");
@@ -72,12 +163,12 @@ void History::Save()
     int k;
     for(k=0; k<nKarts; k++)
     {
-        fprintf(fd, "model %d: %s\n",k, RaceManager::getKart(k)->getName().c_str());
+        fprintf(fd, "model %d: %s\n",k, RaceManager::getKart(k)->getIdent().c_str());
     }
-    fprintf(fd, "size:     %d\n", GetCount());
+    fprintf(fd, "size:     %d\n", m_size);
 
     int j = m_wrapped ? m_current : 0;
-    for(int i=0; i<GetCount(); i++)
+    for(int i=0; i<m_size; i++)
     {
         fprintf(fd, "delta: %f\n",m_all_deltas[i]);
         j=(j+1)%m_size;
@@ -86,12 +177,19 @@ void History::Save()
     for(int k=0; k<nKarts; k++)
     {
         Kart* kart= RaceManager::getKart(k);
-        char s[1024];
         j = m_wrapped ? m_current : 0;
-        for(int i=0; i<GetCount(); i++)
+        for(int i=0; i<m_size; i++)
         {
-            kart->WriteHistory(s, k, j);
-            fprintf(fd, "%s\n",s);
+            // FIXME: kart number is not really necessary
+            fprintf(fd, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
+                    k,
+                    m_all_controls[j].lr,
+                    m_all_controls[j].accel,
+                    m_all_controls[j].getButtonsCompressed(),
+                    m_all_xyz[j].getX(), m_all_xyz[j].getY(),
+                    m_all_xyz[j].getZ(),
+                    m_all_rotations[j].getX(), m_all_rotations[j].getY(),
+                    m_all_rotations[j].getZ(), m_all_rotations[j].getW()  );
             j=(j+1)%m_size;
         }   // for i
     }   // for k
@@ -100,13 +198,15 @@ void History::Save()
 }   // Save
 
 //-----------------------------------------------------------------------------
+/** Loads a history from history.dat in the current directory.
+ */
 void History::Load()
 {
     char s[1024], s1[1024];
-    int  n, numKarts;
-    m_fd = fopen("history.dat","r");
+    int  n;
+    FILE *fd = fopen("history.dat","r");
 
-    fgets(s, 1023, m_fd);
+    fgets(s, 1023, fd);
     if(sscanf(s,"Version: %s",s1)!=1)
     {
         fprintf(stderr, "WARNING: no Version information found in history file.\n");
@@ -119,15 +219,16 @@ void History::Load()
         fprintf(stderr, "         tuxracer version is '%s'\n",VERSION);
     }
 #endif
-    fgets(s, 1023, m_fd);
-    if(sscanf(s, "numkarts: %d",&numKarts)!=1)
+    fgets(s, 1023, fd);
+    unsigned int num_karts;
+    if(sscanf(s, "numkarts: %d",&num_karts)!=1)
     {
         fprintf(stderr,"WARNING: No number of karts found in history file.\n");
         exit(-2);
     }
-    race_manager->setNumKarts(numKarts);
+    race_manager->setNumKarts(num_karts);
 
-    fgets(s, 1023, m_fd);
+    fgets(s, 1023, fd);
     if(sscanf(s, "numplayers: %d",&n)!=1)
     {
         fprintf(stderr,"WARNING: No number of players found in history file.\n");
@@ -135,7 +236,7 @@ void History::Load()
     }
     race_manager->setNumPlayers(n);
 
-    fgets(s, 1023, m_fd);
+    fgets(s, 1023, fd);
     if(sscanf(s, "difficulty: %d",&n)!=1)
     {
         fprintf(stderr,"WARNING: No difficulty found in history file.\n");
@@ -143,7 +244,7 @@ void History::Load()
     }
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
-    fgets(s, 1023, m_fd);
+    fgets(s, 1023, fd);
     if(sscanf(s, "track: %s",s1)!=1)
     {
         fprintf(stderr,"WARNING: Track not found in history file.\n");
@@ -153,40 +254,58 @@ void History::Load()
     // the racing phase can switch to 'ending'
     race_manager->setNumLaps(10);
 
-    for(int i=0; i<numKarts; i++)
+    for(unsigned int i=0; i<num_karts; i++)
     {
-        fgets(s, 1023, m_fd);
+        fgets(s, 1023, fd);
         if(sscanf(s, "model %d: %s",&n, s1)!=2)
         {
             fprintf(stderr,"WARNING: No model information for kart %d found.\n",
                     i);
             exit(-2);
         }
+        if(i<race_manager->getNumPlayers())
+        {
+            race_manager->setLocalKartInfo(i, s1);
+        }
     }   // for i<nKarts
-    // JH: The model information is currently ignored
-    fgets(s, 1023, m_fd);
-    if(sscanf(s,"size: %d",&n)!=1)
+    // FIXME: The model information is currently ignored
+    fgets(s, 1023, fd);
+    if(sscanf(s,"size: %d",&m_size)!=1)
     {
         fprintf(stderr,"WARNING: Number of records not found in history file.\n");
         exit(-2);
     }
-    SetSize(n);
-    for(int i=0; i<m_size; i++)
-    {
-        fgets(s, 1023, m_fd);
-        sscanf(s, "delta: %f\n",m_all_deltas+i);
-    }
+    allocateMemory(m_size);
     m_current = -1;
-}   // Load
 
-//-----------------------------------------------------------------------------
-void History::LoadKartData(Kart* k, int kartNumber)
-{
-    char s[1024];
     for(int i=0; i<m_size; i++)
     {
-        fgets(s, 1023, m_fd);
-        k->ReadHistory(s, kartNumber, i);
-    }   // for i<m_current
-}   // LoadKartData
+        fgets(s, 1023, fd);
+        sscanf(s, "delta: %f\n",&m_all_deltas[i]);
+    }
+
+    for(unsigned int k=0; k<num_karts; k++)
+    {
+        int j=0;
+        for(int i=0; i<m_size; i++)
+        {
+            fgets(s, 1023, fd);
+            int buttonsCompressed;
+            float x,y,z,rx,ry,rz,rw;
+            sscanf(s, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
+                    &j, 
+                    &m_all_controls[i].lr,
+                    &m_all_controls[i].accel,
+                    &buttonsCompressed,
+                    &x, &y, &z, &rx, &ry, &rz, &rw);
+            m_all_xyz[i]       = Vec3(x,y,z);
+            m_all_rotations[i] = btQuaternion(rx,ry,rz,rw);
+            m_all_controls[i].setButtonsCompressed(char(buttonsCompressed));
+        }   // for i
+    }   // for k
+    fprintf(fd, "History file end.\n");
+    fclose(fd);
+    network_manager->setupPlayerKartInfo();
+
+}   // Load
 

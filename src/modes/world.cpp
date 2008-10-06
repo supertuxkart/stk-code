@@ -140,10 +140,7 @@ World::World() : TimedRace()
                 break;
             }
         }   // if !user_config->m_profile
-        if(user_config->m_replay_history)
-        {
-            history->LoadKartData(newkart, i);
-        }
+
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
         scene->add ( newkart -> getModelTransform() ) ;
@@ -162,6 +159,7 @@ World::World() : TimedRace()
 
     m_track->startMusic();
 
+    if(!history->replayHistory()) history->initRecording();
     network_manager->worldLoaded();
 }   // World
 
@@ -257,13 +255,17 @@ void World::resetAllKarts()
 //-----------------------------------------------------------------------------
 void World::update(float dt)
 {
+    if(history->replayHistory()) dt=history->getNextDelta();
     TimedRace::update(dt);
     // Clear race state so that new information can be stored
     race_state->clear();
-    if(user_config->m_replay_history) dt=history->GetNextDelta();
 
-    if(!user_config->m_replay_history) history->StoreDelta(dt);
-    if(network_manager->getMode()!=NetworkManager::NW_CLIENT) m_physics->update(dt);
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
+        !history->dontDoPhysics())
+    {
+        m_physics->update(dt);
+    }
+
     const int kart_amount = m_kart.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {

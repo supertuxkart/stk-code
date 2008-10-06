@@ -180,7 +180,6 @@ public:
     std::string m_track_group;     // Track group used last
     std::string m_server_address;
     int         m_server_port;
-    bool        m_replay_history;
     bool        m_use_kph;
     int         m_width;
     int         m_height;

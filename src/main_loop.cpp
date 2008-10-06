@@ -62,7 +62,7 @@ MainLoop::~MainLoop()
 void MainLoop::run()
 {
     const GLuint TITLE_SCREEN_TEXTURE = 
-        material_manager->getMaterial("st_title_screen.rgb")->getState()->getTextureHandle();
+        material_manager->getMaterial(stk_config->m_menu_background)->getState()->getTextureHandle();
        
     bool music_on = false;
     m_curr_time = SDL_GetTicks();
@@ -134,6 +134,7 @@ void MainLoop::run()
 
             if ( RaceManager::getWorld()->getPhase() != LIMBO_PHASE)
             {
+                history->update(dt);
                 RaceManager::getWorld()->update(dt);
 
                 if(user_config->m_profile>0)
@@ -146,7 +147,7 @@ void MainLoop::run()
                         printf("Number of frames: %d time %f, Average FPS: %f\n",
                                m_frame_count, SDL_GetTicks() * 0.001,
                                (float)m_frame_count/(SDL_GetTicks() * 0.001));
-                        if(!user_config->m_replay_history) history->Save();
+                        if(!history->replayHistory()) history->Save();
                         std::exit(-2);
                     }   // if profile finished
                 }   // if m_profile

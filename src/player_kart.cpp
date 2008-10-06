@@ -21,6 +21,7 @@
 #include "constants.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "history.hpp"
 #include "player_kart.hpp"
 #include "player.hpp"
 #include "sdldrv.hpp"
@@ -169,7 +170,11 @@ void PlayerKart::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 void PlayerKart::update(float dt)
 {
-    steer(dt, m_steer_val);
+    // Don't do steering if it's replay. In position only replay it doesn't 
+    // matter, but if it's physics replay the gradual steering causes 
+    // incorrect results, since the stored values are already adjusted.
+    if(!history->replayHistory())
+        steer(dt, m_steer_val);
 
     if(RaceManager::getWorld()->isStartPhase())
     {

@@ -10,6 +10,10 @@
 				    ;; points 1st, 0 is least points
 				    ;; 1st
  (title-music              "main_theme.music")
+ (menu-background          "st_title_screen.rgb")
+ (max-history              10000)   ;; maximum number of history frames.
+ (delay-finish-time           10)   ;; delay till race results are displayed.
+ (music-credit-time           10)   ;; time for which the music credits are displayed.
 
  ;; Attachment related parameters
  ;; -----------------------------
