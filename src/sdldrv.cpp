@@ -58,8 +58,11 @@ SDLDriver::SDLDriver()
 	: sensedInput(0), actionMap(0), mainSurface(0), flags(0), stickInfos(0),
 	mode(BOOTSTRAP), mouseValX(0), mouseValY(0)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER);
-
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
+    {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+        exit(1);
+    }
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -248,6 +251,13 @@ SDLDriver::setVideoMode(bool resetTextures)
     //Is SDL_FreeSurface necessary? SDL wiki says not??
     SDL_FreeSurface(mainSurface);
     mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
+
+    if (!mainSurface)
+    {
+        fprintf(stderr, "SDL_SetVideoMode (%dx%d) failed: %s\n",
+                user_config->m_width, user_config->m_height, SDL_GetError());
+        exit(1);
+    }
 
 #if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
