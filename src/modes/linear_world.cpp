@@ -501,7 +501,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
     const unsigned int kart_amount = m_kart.size();
     for ( unsigned int j = 0 ; j < kart_amount ; j++ )
     {
-        if(int(j) == kart->getWorldKartId()) continue; // don't compare a kart with itself
+        if(j == kart->getWorldKartId()) continue; // don't compare a kart with itself
         if(m_kart[j]->isEliminated()) continue;   // dismiss eliminated karts   
         
         // Count karts ahead of the current kart, i.e. kart that are already

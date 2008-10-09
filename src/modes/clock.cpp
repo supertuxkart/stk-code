@@ -136,6 +136,7 @@ void TimedRace::update(const float dt)
             // event
             terminateRace();
             return;
+        default: break;  // default for RACE_PHASE, LIMBO_PHASE
     }
     
     switch(m_mode)

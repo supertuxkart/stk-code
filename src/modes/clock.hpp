@@ -80,7 +80,7 @@ protected:
     Phase          m_previous_phase;
 public:
     TimedRace();
-    ~TimedRace();
+    virtual ~TimedRace();
     
     void reset();
     
