@@ -106,6 +106,8 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheel_rear_r            = NULL;
 
     m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE);
+    m_beep_sound = sfx_manager->newSFX(SFXManager::SOUND_BEEP);
+    m_crash_sound = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
 
     if(!m_engine_sound)
     {
@@ -271,6 +273,9 @@ Kart::~Kart()
         m_engine_sound->stop();
     }
     sfx_manager->deleteSFX(m_engine_sound);
+    sfx_manager->deleteSFX(m_beep_sound);
+    sfx_manager->deleteSFX(m_crash_sound);
+    
 
     if(m_smokepuff) delete m_smokepuff;
     if(m_smoke_system != NULL) delete m_smoke_system;
@@ -551,6 +556,10 @@ void Kart::update(float dt)
 
     Moveable::update(dt);
 
+    m_engine_sound->position(getXYZ());
+    m_beep_sound->position(getXYZ());
+    m_crash_sound->position(getXYZ());
+
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
     if((fabs(getHPR().getRoll())>60 && fabs(getSpeed())<3.0f) )
     {
@@ -600,6 +609,7 @@ void Kart::update(float dt)
     herring_manager->hitHerring(this);
     
     processSkidMarks();
+
 }
 //-----------------------------------------------------------------------------
 // Set zipper time, and apply one time additional speed boost
@@ -701,8 +711,19 @@ void Kart::crashed(Kart *k)
     // After a collision disable the engine for a short time so that karts 
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
-    m_bounce_back_time = 0.5f;
+    if(m_bounce_back_time<=0.0f)
+    {
+        m_crash_sound->play();
+        m_bounce_back_time = 0.5f;
+    }
 }   // crashed
+
+// -----------------------------------------------------------------------------
+void Kart::beep()
+{
+    m_beep_sound->play();
+} // beep
+
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
 {
@@ -817,10 +838,9 @@ void Kart::updatePhysics (float dt)
     if(m_engine_sound && sfx_manager->sfxAllowed())
     {
         m_engine_sound->speed((float)((m_rpm * 2) / m_max_gear_rpm));
-        //m_engine_sound->position(m_curr_track_coords);
+        m_engine_sound->position(getXYZ());
     }
-    // FIXME: what if sfx are disabled in the option menu??
-    // The engine sound will still play!
+   
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------

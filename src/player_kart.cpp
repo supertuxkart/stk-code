@@ -43,8 +43,6 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
-    m_beep_sound  = sfx_manager->newSFX(SFXManager::SOUND_BEEP );
-    m_crash_sound = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
     m_wee_sound   = sfx_manager->newSFX(SFXManager::SOUND_WEE  );
     m_ugh_sound   = sfx_manager->newSFX(SFXManager::SOUND_UGH  );
     m_grab_sound  = sfx_manager->newSFX(SFXManager::SOUND_GRAB );
@@ -57,8 +55,6 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
 PlayerKart::~PlayerKart()
 {
     sfx_manager->deleteSFX(m_bzzt_sound);
-    sfx_manager->deleteSFX(m_beep_sound);
-    sfx_manager->deleteSFX(m_crash_sound);
     sfx_manager->deleteSFX(m_wee_sound);
     sfx_manager->deleteSFX(m_ugh_sound);
     sfx_manager->deleteSFX(m_grab_sound);
@@ -77,7 +73,6 @@ void PlayerKart::reset()
     m_controls.wheelie = false;
     m_controls.jump = false;
     m_penalty_time = 0;
-    m_time_last_crash_sound = -10.0f;
     Kart::reset();
     m_camera->reset();
 }   // reset
@@ -176,6 +171,13 @@ void PlayerKart::update(float dt)
     if(!history->replayHistory())
         steer(dt, m_steer_val);
 
+    //position the generic sounds at the kart's position
+    m_bzzt_sound->position(getXYZ());
+    m_wee_sound->position(getXYZ());
+    m_ugh_sound->position(getXYZ());
+    m_grab_sound->position(getXYZ());
+    m_full_sound->position(getXYZ());
+
     if(RaceManager::getWorld()->isStartPhase())
     {
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||
@@ -207,7 +209,7 @@ void PlayerKart::update(float dt)
     if ( m_controls.fire && !isRescue())
     {
         if (m_collectable.getType()==COLLECT_NOTHING) 
-            m_beep_sound->play();
+            Kart::beep();
     }
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
@@ -215,7 +217,7 @@ void PlayerKart::update(float dt)
     // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls.rescue )
     {
-        m_beep_sound->play();
+        //m_beep_sound->play();
         forceRescue();
         m_controls.rescue=false;
     }
@@ -233,17 +235,6 @@ void PlayerKart::update(float dt)
 void PlayerKart::crashed(Kart *kart)
 {
     Kart::crashed(kart);
-    // A collision is usually reported several times, even when hitting
-    // something only once. This results in a kind of 'machine gun'
-    // noise by playing the crash sound over and over again. To prevent
-    // this, the crash sound is only played if there was at least 0.5
-    // seconds since the last time it was played (for this kart)
-
-    if(RaceManager::getWorld()->getTime() - m_time_last_crash_sound > 0.5f) 
-    {
-        m_crash_sound->play();
-        m_time_last_crash_sound = RaceManager::getWorld()->getTime();
-    }
 }   // crashed
 
 //-----------------------------------------------------------------------------
@@ -253,7 +244,17 @@ void PlayerKart::setPosition(int p)
 {
     if(getPosition()<p)
     {
-        m_beep_sound->play();
+        //have the kart that did the passing beep.
+        //I'm not sure if this method of finding the passing kart is fail-safe.
+        for(unsigned int i = 0 ; i < race_manager->getNumKarts(); i++ )
+        {
+            Kart *kart = RaceManager::getWorld()->getKart(i);
+            if(kart->getPosition() == p + 1)
+            {
+                kart->beep();
+                break;
+            }
+        }
     }
     Kart::setPosition(p);
 }   // setPosition

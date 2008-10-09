@@ -36,7 +36,7 @@ class SFXBase
 {
 public:
     virtual           ~SFXBase()                       {}
-    void               position(const Vec3 &position)  {};
+    virtual void       position(const Vec3 &position) = 0;
     virtual void       loop()              = 0;
     virtual void       play()              = 0;
     virtual void       stop()              = 0;

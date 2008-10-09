@@ -44,6 +44,7 @@ Explosion::~Explosion()
 //-----------------------------------------------------------------------------
 void Explosion::init(const Vec3& coord)
 {
+    m_explode_sound->position(coord);
     m_explode_sound->play();
 
     sgCoord c;
@@ -55,16 +56,20 @@ void Explosion::init(const Vec3& coord)
 }
 
 //-----------------------------------------------------------------------------
-void Explosion::update (float dt)
+void Explosion::update(float dt)
 {
-
-    if ( ++m_step >= m_seq->getNumKids() )
+    if(++m_step >= m_seq->getNumKids())
     {
-        scene->remove((ssgTransform*)this);
-        projectile_manager->FinishedExplosion();
-        return ;
+        //be sure that the sound is not prematurely stopped
+        if(m_explode_sound->getStatus() != SFXManager::SFX_PLAYING)
+        {
+            scene->remove((ssgTransform*)this);
+            projectile_manager->FinishedExplosion();
+            return;
+        }
     }
-
-    m_seq -> selectStep ( m_step ) ;
-
+    else
+    {
+        m_seq->selectStep(m_step);
+    }
 }

@@ -28,6 +28,7 @@
 #include "user_config.hpp"
 #include "constants.hpp"
 #include "race_manager.hpp"
+#include "audio/sound_manager.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)
 {
@@ -47,6 +48,12 @@ Camera::Camera(int camera_index, const Kart* kart)
 
     setScreenPosition(camera_index);
 }   // Camera
+
+// ----------------------------------------------------------------------------
+Camera::~Camera()
+{
+    reset();
+}
 
 // ----------------------------------------------------------------------------
 void Camera::setScreenPosition(int camera_index)
@@ -136,6 +143,7 @@ void Camera::reset()
     m_last_pitch = 0.0f;
     m_xyz        = m_kart->getXYZ();
     m_hpr        = Vec3(0,0,0);
+    sound_manager->positionListener(m_xyz, m_xyz);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -199,7 +207,7 @@ void Camera::update (float dt)
     m_xyz = c.getXYZ();
     m_hpr = c.getHPR();
     m_context -> setCamera(&c.toSgCoord());
-    //sound_manager->positionListener(kart->getXYZ());
+    sound_manager->positionListener(m_xyz, kart_xyz - m_xyz);
 }   // update
 
 //-----------------------------------------------------------------------------

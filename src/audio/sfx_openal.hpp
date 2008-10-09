@@ -44,7 +44,7 @@ public:
     virtual void                  pause();
     virtual void                  resume();
     virtual void                  speed(float factor);
-    virtual void                  position(Vec3 position);
+    virtual void                  position(const Vec3 &position);
     virtual SFXManager::SFXStatus getStatus();
 	
 };   // SFXOpenAL

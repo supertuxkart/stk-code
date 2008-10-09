@@ -46,13 +46,12 @@ SFXOpenAL::SFXOpenAL(ALuint buffer) : SFXBase()
     alGenSources(1, &m_soundSource );
     if(!SFXManager::checkError("generating a source")) return;
 
-    // not 3D yet
     alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
-    alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 5.0);
+    alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.2f         );
-    alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.1f         );
+    alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE     );//sound position is *not* relative to the camera. 
 
     m_ok = SFXManager::checkError("setting up the source");
 }   // SFXOpenAL
@@ -145,12 +144,12 @@ void SFXOpenAL::play()
 /** Sets the position where this sound effects is played.
  *  \param position Position of the sound effect.
  */
-void SFXOpenAL::position(Vec3 position)
+void SFXOpenAL::position(const Vec3 &position)
 {
     if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
     alSource3f(m_soundSource, AL_POSITION,
-               position.getX(), position.getY(), position.getZ());
+               (float)position.getX(), (float)position.getY(), (float)position.getZ());
     SFXManager::checkError("positioning");
 }   // position
 

@@ -38,12 +38,9 @@ private:
 
     Player *m_player;
     float   m_penalty_time;
-    float   m_time_last_crash_sound;
     Camera *m_camera;
 
     SFXBase *m_bzzt_sound;
-    SFXBase *m_beep_sound;
-    SFXBase *m_crash_sound;
     SFXBase *m_wee_sound;
     SFXBase *m_ugh_sound;
     SFXBase *m_grab_sound;

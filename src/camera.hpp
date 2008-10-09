@@ -58,6 +58,7 @@ private:
     void finalCamera      (float dt);   // handle the final camera
 public:
          Camera           (int camera_index, const Kart* kart);
+        ~Camera           ();
     void setMode          (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
     void setScreenPosition(int pos);

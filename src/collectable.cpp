@@ -90,10 +90,8 @@ void Collectable::use()
     case COLLECT_HOMING:
     case COLLECT_BOWLING:
     case COLLECT_MISSILE:
-        if(m_owner->isPlayerKart())
-        {
-            m_sound_shot->play();
-        }
+        m_sound_shot->position(m_owner->getXYZ());
+        m_sound_shot->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
@@ -109,11 +107,8 @@ void Collectable::use()
             {
                 kart->attach(ATTACH_ANVIL, stk_config->m_anvil_time);
                 kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
-
-                if(kart->isPlayerKart())
-                {
-                    m_sound_use_anvil->play();
-                }
+                m_sound_use_anvil->position(m_owner->getXYZ());
+                m_sound_use_anvil->play();
                 break;
             }
         }
@@ -122,7 +117,7 @@ void Collectable::use()
 
     case COLLECT_PARACHUTE:
         {
-            bool player_affected = false;
+            Kart* player_kart = NULL;
             //Attach a parachutte(that last as twice as the
             //one from the bananas) to all the karts that
             //are in front of this one.
@@ -135,13 +130,13 @@ void Collectable::use()
                     kart->attach(ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
 
                     if(kart->isPlayerKart())
-                        player_affected = true;
+                        player_kart = kart;
                 }
-
             }
 
-            if(player_affected)
+            if(player_kart)
             {
+                m_sound_use_parachute->position(player_kart->getXYZ());
                 m_sound_use_parachute->play();
             }
         }

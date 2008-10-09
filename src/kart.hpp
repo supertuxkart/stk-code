@@ -94,6 +94,8 @@ private:
     bool                m_eliminated;
 
     SFXBase            *m_engine_sound;
+    SFXBase            *m_beep_sound;
+    SFXBase            *m_crash_sound;
 
 protected:
     float                 m_rescue_pitch, m_rescue_roll;
@@ -216,6 +218,7 @@ public:
     
     virtual void   update           (float dt);
     virtual void   raceFinished     (float time);
+    void           beep             ();
 };
 
 

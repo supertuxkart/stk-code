@@ -166,9 +166,20 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 }   // SoundManager
 
 //----------------------------------------------------------------------------
-void SoundManager::positionListener(Vec3 position)
+void SoundManager::positionListener(Vec3 position, Vec3 front)
 {
     if(!user_config->doSFX() || !m_initialized) return;
 
+    //forward vector
+    listenerVec[0] = front.getX(); 
+    listenerVec[1] = front.getY();
+    listenerVec[2] = front.getZ(); 
+    //up vector
+    listenerVec[3] = 0; 
+    listenerVec[4] = 0;
+    listenerVec[5] = 1;
+
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
+    alListenerfv(AL_ORIENTATION, listenerVec);
 }
+

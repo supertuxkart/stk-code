@@ -184,7 +184,7 @@ void Scene::draw(float dt)
                       0.0f, 0.0f, 1.0f);
             glMatrixMode(GL_MODELVIEW);
             
-            for (World::Karts::size_type i = 0 ; i < race_manager->getNumKarts(); ++i)
+            for (int i = 0 ; i < race_manager->getNumKarts(); ++i)
             {
                 Kart *kart=RaceManager::getKart((int)i);
                 if(!kart->isEliminated()) kart->draw();
