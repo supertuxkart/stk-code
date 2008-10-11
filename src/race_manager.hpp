@@ -70,14 +70,25 @@ public:
         MAJOR_MODE_GRAND_PRIX,
         MAJOR_MODE_SINGLE
     };
+    
+    // quick method to tell the difference between battle modes and race modes
+    // think of it like a bitmask, but done in decimal to avoid endianness issues
+#define LINEAR_RACE(ID, COUNT_LAPSES) (1000+ID+100*COUNT_LAPSES)
+#define BATTLE_ARENA(ID) (2000+ID)
     /** Minor variants to the major types of race.
-    */
+      * Make sure to use the 'LINEAR_RACE/BATTLE_ARENA' macros
+      */
     enum MinorRaceModeType
     {
-        MINOR_MODE_QUICK_RACE,
-        MINOR_MODE_TIME_TRIAL,
-        MINOR_MODE_FOLLOW_LEADER
+        MINOR_MODE_QUICK_RACE    = LINEAR_RACE(0, true),
+        MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
+        MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
+        
+        MINOR_MODE_LAST_ALIVE    = BATTLE_ARENA(0)
     };
+#undef LINEAR_RACE
+#undef BATTLE_ARENA
+    
     /** Difficulty. Atm skidding is implemented as a special difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
 
@@ -210,6 +221,36 @@ public:
     void next();             // start the next race or go back to the start screen
     void rerunRace();        // Rerun the same race again
     void exit_race();        // exit a race (and don't start the next one)
+    
+    /** get information about given mode (returns true if 'mode' is of linear races type)
+        info is stored in its ID for conveniance, see the macros above for exact meaning
+        */
+    static bool isLinearRaceMode(const MinorRaceModeType type)
+    {
+        const int id = (int)type;
+        if(id > 999 && id < 2000) return true;
+        else return false;
+    }
+    /** get information about given mode (returns true if 'mode' is of battle type)
+        info is stored in its ID for conveniance, see the macros above for exact meaning
+        */
+    static bool isBattleMode(const MinorRaceModeType type)
+    {
+        const int id = (int)type;
+        if(id >= 2000) return true;
+        else return false;
+    }
+    /** get information about given mode (returns true if 'mode' requires lap counting)
+        info is stored in its ID for conveniance, see the macros above for exact meaning
+        */
+    static bool modeHasLaps(const MinorRaceModeType type)
+    {
+        if(isBattleMode(type)) return false;
+        const int id = (int)type;
+        const int answer = (id-1000)/100;
+        return (bool)answer;
+    }
+
 };
 
 extern RaceManager *race_manager;

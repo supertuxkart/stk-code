@@ -120,7 +120,7 @@ GrandPrixEnd::GrandPrixEnd()
     for(unsigned int i=start; i < NUM_KARTS; ++i)
     {
         char sTime[20];sTime[0]=0;
-        if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if(race_manager->getWorld()->getClockMode()==CHRONO)
             TimeToString(race_time[i], sTime);
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
             i + 1-start, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
@@ -131,7 +131,7 @@ GrandPrixEnd::GrandPrixEnd()
         widget_manager->setWgtText(WTOK_FIRSTKART + i,
             (char*)(m_score + MAX_STR_LEN * i));
         widget_manager->setWgtTextSize(WTOK_FIRSTKART + i, WGT_FNT_SML);
-    widget_manager->breakLine();
+        widget_manager->breakLine();
     }
     const std::string KART_NAME = race_manager->getKartName(position[start]);
     const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);

@@ -110,7 +110,7 @@ RaceOptions::RaceOptions()
     // Number of laps
     // ==============
     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX   &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER   )
+        RaceManager::modeHasLaps( race_manager->getMinorMode() ) )
     {
         widget_manager->addTextWgt( WTOK_LAPS_TITLE, DESC_WIDTH, 7, _("Number of laps") );
         widget_manager->hideWgtRect(WTOK_LAPS_TITLE);
@@ -271,7 +271,7 @@ void RaceOptions::select()
         race_manager->setNumKarts(m_num_karts);
 
         if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
-            race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER    )
+            RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
         {
             race_manager->setNumLaps( m_num_laps );
         }
