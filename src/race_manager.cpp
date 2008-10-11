@@ -261,8 +261,9 @@ void RaceManager::startNextRace()
     // handling of objects which get created in the constructor
     // and need world to be defined.
     if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) new FollowTheLeaderRace();
-    else new StandardRace();
-
+    else if(m_minor_mode==MINOR_MODE_QUICK_RACE || m_minor_mode==MINOR_MODE_TIME_TRIAL) new StandardRace();
+    else{ fprintf(stderr,"Could not create given race mode\n"); assert(0); }
+    
     m_active_race = true;
 }   // startNextRace
 
