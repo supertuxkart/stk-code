@@ -98,7 +98,7 @@ World::World() : TimedRace()
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         int position = i+1;   // position start with 1
-        btTransform init_pos=m_track->getStartTransform(position);
+        btTransform init_pos=m_track->getStartTransform(i);
         Kart* newkart;
         const std::string& kart_name = race_manager->getKartName(i);
         int local_player_id          = race_manager->getKartLocalPlayerId(i);

@@ -32,12 +32,13 @@ enum WidgetTokens
     WTOK_QUICK_RACE_SINGLE,
     WTOK_TIMETRIAL_SINGLE,
     WTOK_FOLLOW_LEADER_SINGLE,
-
+    WTOK_3_STRIKES_SINGLE,
+    
     WTOK_TITLE_GP, 
     WTOK_QUICK_RACE_GP,
     WTOK_TIMETRIAL_GP,
     WTOK_FOLLOW_LEADER_GP,
-
+    
     WTOK_HELP,
     WTOK_QUIT
 };
@@ -47,51 +48,63 @@ GameMode::GameMode()
     const int HEIGHT = 7;
     const int WIDTH  = 5;
     
+    const WidgetDirection column_1_dir = WGT_DIR_FROM_LEFT;
+    const float column_1_loc = 0.1f;
+    
+    const WidgetDirection column_2_dir = WGT_DIR_FROM_RIGHT;
+    const float column_2_loc = 0.1f;
+    
     // First the single race events
     // ============================
     Widget *w=widget_manager->addTextWgt(WTOK_TITLE_SINGLE, WIDTH,
                                          HEIGHT, _("Single Race"));
     widget_manager->hideWgtRect(WTOK_TITLE_SINGLE);
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+    w->setPosition(column_1_dir, column_1_loc, NULL,
                    WGT_DIR_FROM_TOP,  0.2f, NULL);
     Widget *w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_QUICK_RACE_SINGLE, WIDTH, HEIGHT,
                                        _("Quick Race"));
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+    w->setPosition(column_1_dir, column_1_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
     w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_TIMETRIAL_SINGLE, WIDTH, HEIGHT,
                                        _("Time Trial"));
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+    w->setPosition(column_1_dir, column_1_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
     w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_FOLLOW_LEADER_SINGLE, WIDTH, HEIGHT,
                                        _("Follow the Leader"));
-    w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL,
+    w->setPosition(column_1_dir, column_1_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
-    widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_FOLLOW_LEADER_SINGLE);
+    w_prev=w;
+    w=widget_manager->addTextButtonWgt(WTOK_3_STRIKES_SINGLE, WIDTH, HEIGHT,
+                                       _("3 Strikes Battle"));
+    w->setPosition(column_1_dir, column_1_loc, NULL,
+                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+    w_prev=w;
+    widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_3_STRIKES_SINGLE);
 
     // Then the GPs
     // ============
     w=widget_manager->addTextWgt(WTOK_TITLE_GP, WIDTH,
                                  HEIGHT, _("Grand Prix"));
     widget_manager->hideWgtRect(WTOK_TITLE_GP);
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+    w->setPosition(column_2_dir, column_2_loc, NULL,
                    WGT_DIR_FROM_TOP,  0.2f, NULL);
     w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_QUICK_RACE_GP, WIDTH, HEIGHT,
                                        _("Quick Race"));
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+    w->setPosition(column_2_dir, column_2_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
     w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_TIMETRIAL_GP, WIDTH, HEIGHT,
                                        _("Time Trial"));
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+    w->setPosition(column_2_dir, column_2_loc, NULL,
                    WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
     w_prev=w;
     w=widget_manager->addTextButtonWgt(WTOK_FOLLOW_LEADER_GP, WIDTH, HEIGHT,
                                        _("Follow the Leader"));
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL,
+    w->setPosition(column_2_dir, column_2_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
     w_prev=w;
     widget_manager->sameWidth(WTOK_TITLE_GP, WTOK_FOLLOW_LEADER_GP);
@@ -125,11 +138,14 @@ GameMode::GameMode()
         //                                _("Fulfil challenge to unlock"));
     }
 
+
+    // help
     w=widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, HEIGHT, _("Game mode help"));
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
     w->setPosition(WGT_DIR_CENTER, 0.0f, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, w_prev);
     w_prev=w;
 
+    // return button
     w=widget_manager->addTextButtonWgt(WTOK_QUIT, WIDTH, HEIGHT, _("Press <ESC> to go back"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
     w->setPosition(WGT_DIR_CENTER, 0.0f, NULL, WGT_DIR_FROM_BOTTOM, 0.0f, w_prev);
@@ -161,6 +177,10 @@ void GameMode::select()
          race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
          race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
          break;
+    case WTOK_3_STRIKES_SINGLE:
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        break;
     case WTOK_QUICK_RACE_GP:
          race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
          race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);

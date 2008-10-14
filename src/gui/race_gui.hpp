@@ -42,7 +42,6 @@ class RaceSetup;
 struct KartIconDisplayInfo
 {
     std::string time;
-   // int rank;
     float r, g, b;
     std::string special_title;
     /** Current lap of this kart, or -1 if irrelevant

@@ -32,6 +32,7 @@
 #include "network/network_manager.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/three_strikes_battle.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -262,6 +263,7 @@ void RaceManager::startNextRace()
     // and need world to be defined.
     if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) new FollowTheLeaderRace();
     else if(m_minor_mode==MINOR_MODE_QUICK_RACE || m_minor_mode==MINOR_MODE_TIME_TRIAL) new StandardRace();
+    else if(m_minor_mode==MINOR_MODE_3_STRIKES) new ThreeStrikesBattle();
     else{ fprintf(stderr,"Could not create given race mode\n"); assert(0); }
     
     m_active_race = true;

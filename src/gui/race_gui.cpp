@@ -279,6 +279,9 @@ void RaceGUI::drawTimer ()
 
 void RaceGUI::drawMap ()
 {
+    // arenas currently don't have a map.
+    if(RaceManager::getTrack()->isArena()) return;
+    
     glDisable ( GL_TEXTURE_2D ) ;
     assert(RaceManager::getWorld() != NULL);
     int xLeft = 10;
@@ -338,9 +341,9 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
     {
         Kart* kart   = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;
-        int position = kart->getPosition();
+        const int position = kart->getPosition();
 
-        y = user_config->m_height*3/4-20 - ((position-1)*(ICON_PLAYER_WIDHT+2));
+        y = user_config->m_height*3/4-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDHT+2));
 
         GLfloat COLOR[] = {info[i].r, info[i].g, info[i].b, 1.0f};
         font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDHT+x, y+5, COLOR);
@@ -390,19 +393,21 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         glDisable(GL_CULL_FACE);
         char str[256];
 
-        sprintf(str, "%d", kart->getPosition());
-        font_race->PrintShadow(str, 33, x-7, y-4);
-
-        // FIXME: translation
-        if (kart->getPosition() == 1)
-            font_race->PrintShadow("st", 13, x-7+17, y-4+17);
-        else if (kart->getPosition() == 2)
-            font_race->PrintShadow("nd", 13, x-7+17, y-4+17);
-        else if (kart->getPosition() == 3)
-            font_race->PrintShadow("rd", 13, x-7+17, y-4+17);
-        else
-            font_race->PrintShadow("th", 13, x-7+17, y-4+17);
-
+        if(position != -1)
+        {
+            sprintf(str, "%d", position);
+            font_race->PrintShadow(str, 33, x-7, y-4);
+            
+            // FIXME: translation
+            if (kart->getPosition() == 1)
+                font_race->PrintShadow("st", 13, x-7+17, y-4+17);
+            else if (kart->getPosition() == 2)
+                font_race->PrintShadow("nd", 13, x-7+17, y-4+17);
+            else if (kart->getPosition() == 3)
+                font_race->PrintShadow("rd", 13, x-7+17, y-4+17);
+            else
+                font_race->PrintShadow("th", 13, x-7+17, y-4+17);
+        }
     } // next kart
     
     glEnable(GL_CULL_FACE);
@@ -633,7 +638,11 @@ void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
 void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
                            float ratio_x, float ratio_y           )
 {
-
+    // arenas don't have a position (rank)
+    if(RaceManager::getTrack()->isArena()) return;
+    
+    if(kart->getPosition() == -1) return;
+    
     char str[256];
     offset_x += (int)((user_config->m_width-110)*ratio_x);
     offset_y += (int)(140*ratio_y);

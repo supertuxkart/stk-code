@@ -84,7 +84,7 @@ public:
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
         
-        MINOR_MODE_LAST_ALIVE    = BATTLE_ARENA(0)
+        MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0)
     };
 #undef LINEAR_RACE
 #undef BATTLE_ARENA

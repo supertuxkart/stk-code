@@ -67,7 +67,7 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_screenshot       = "";
     m_top_view         = "";
     m_has_final_camera = false;
-
+    m_is_arena         = false;
     loadTrack(m_filename);
     loadDriveline();
 
@@ -419,26 +419,38 @@ const Vec3& Track::trackToSpatial(const int SECTOR ) const
 
 //-----------------------------------------------------------------------------
 /** Returns the start coordinates for a kart on a given position pos
-    (with 0<=pos).
- */
-btTransform Track::getStartTransform(unsigned int pos) const {
-  // Bug fix/workaround: sometimes the first kart would be too close
-  // to the first driveline point and not to the last one -->
-  // This kart would not get any lap counting done in the first
-  // lap! Therefor -1.5 is subtracted from the y position - which
-  // is a somewhat arbitrary value.
-  Vec3 orig;
-  pos--;        // adjust from "1 to n" index to "0 to n-1"
-  orig.setX( pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f) );
-  orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f          );
-  orig.setZ( pos<m_start_z.size() ? m_start_z[pos] : 1.0f                    );
-  btTransform start;
-  start.setOrigin(orig);
-  start.setRotation(btQuaternion(btVector3(0, 0, 1), 
-				                 pos<m_start_heading.size() 
-				                     ? DEGREE_TO_RAD(m_start_heading[pos]) 
-                                     : 0.0f ));
-  return start;
+    (with pos ranging from 0 to kart_num-1).
+*/
+btTransform Track::getStartTransform(unsigned int pos) const
+{
+
+    Vec3 orig;
+    
+    if(isArena())
+    {
+        assert(pos < m_start_positions.size());
+        orig.setX( m_start_positions[pos][0] );
+        orig.setY( m_start_positions[pos][1] );
+        orig.setZ( m_start_positions[pos][2] );
+    }
+    else
+    {
+        // Bug fix/workaround: sometimes the first kart would be too close
+        // to the first driveline point and not to the last one -->
+        // This kart would not get any lap counting done in the first
+        // lap! Therefor -1.5 is subtracted from the y position - which
+        // is a somewhat arbitrary value.
+        orig.setX( pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f) );
+        orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f          );
+        orig.setZ( pos<m_start_z.size() ? m_start_z[pos] : 1.0f                    );
+    }
+    btTransform start;
+    start.setOrigin(orig);
+    start.setRotation(btQuaternion(btVector3(0, 0, 1), 
+                                   pos<m_start_heading.size() 
+                                   ? DEGREE_TO_RAD(m_start_heading[pos]) 
+                                   : 0.0f ));
+    return start;
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
@@ -845,6 +857,7 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("sun-specular",          m_specular_col);
     LISP->get      ("sun-diffuse",           m_diffuse_col);
     LISP->get      ("gravity",               m_gravity);
+    LISP->get      ("arena",                 m_is_arena);
     LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
     LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
     LISP->getVector("groups",                m_groups);
@@ -1164,7 +1177,7 @@ void Track::loadTrackModel()
         int need_hat = false ;
         int fit_skin = false ;
         char fname [ 1024 ] ;
-        sgCoord loc ;
+        sgCoord loc;
         sgZeroVec3 ( loc.xyz ) ;
         sgZeroVec3 ( loc.hpr ) ;
 
@@ -1179,6 +1192,11 @@ void Track::loadTrackModel()
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
         {
             herring_command (&loc.xyz, htype, true) ;
+        }
+        else if ( sscanf ( s, "START,%f,%f,%f",
+                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
+        {
+            m_start_positions.push_back(Vec3(loc.xyz[0], loc.xyz[1], loc.xyz[2]));
         }
         else if ( s[0] == '\"' )
         {

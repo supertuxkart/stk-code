@@ -115,7 +115,7 @@ std::vector<std::string> TrackManager::getAllTrackIdentifiers()
 }   // getAllTrackNames
 
 //-----------------------------------------------------------------------------
-/** Loads all track from the track directory (data/track).
+/** Loads all tracks from the track directory (data/track).
  */
 void TrackManager::loadTrackList ()
 {
@@ -155,11 +155,19 @@ void TrackManager::loadTrackList ()
 void TrackManager::updateGroups(const Track* track)
 {
     const std::vector<std::string>& new_groups = track->getGroups();
-    for(unsigned int i=0; i<new_groups.size(); i++)
+    const bool isArena = track->isArena();
+    
+    const unsigned int groups_amount = new_groups.size();
+    for(unsigned int i=0; i<groups_amount; i++)
     {
-        if(m_groups.find(new_groups[i])==m_groups.end())
+        // if we didn't yet have this group in memory, add it to the global list
+        if(m_groups.find(new_groups[i])==m_groups.end() &&
+           m_arena_groups.find(new_groups[i])==m_arena_groups.end())
             m_all_groups.push_back(new_groups[i]);
-	m_groups[new_groups[i]].push_back(m_tracks.size()-1);
+        
+        // add this track to its group
+        if(isArena) m_arena_groups[new_groups[i]].push_back(m_tracks.size()-1);
+        else m_groups[new_groups[i]].push_back(m_tracks.size()-1);
     }
 }   // updateGroups
 

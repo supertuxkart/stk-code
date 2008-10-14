@@ -34,6 +34,7 @@ private:
     typedef std::vector<Track*>              Tracks;
     Tracks                                   m_tracks;
     std::map<std::string, std::vector<int> > m_groups;
+    std::map<std::string, std::vector<int> > m_arena_groups;
     std::vector<std::string>                 m_all_groups;
     /** Flag if this track is available or not. Tracks are set unavailable
      *  if they are not available on all clients (applies only to network mode)
@@ -56,6 +57,8 @@ public:
     bool          isAvailable(unsigned int n) const {return m_track_avail[n];}
     const std::vector<int>& 
                   getTracksInGroup(const std::string& g) {return m_groups[g];}
+    const std::vector<int>& 
+        getArenasInGroup(const std::string& g) {return m_arena_groups[g];}
     std::vector<std::string> getAllTrackIdentifiers();
     /** load all .track files from all directories */
     void          loadTrackList ();

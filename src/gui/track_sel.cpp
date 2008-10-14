@@ -150,6 +150,8 @@ void TrackSel::switchGroup()
     m_index_avail_tracks.clear();
 
     const std::vector<int> &tracks = 
+        RaceManager::isBattleMode( race_manager->getMinorMode() ) ?
+                            track_manager->getArenasInGroup(user_config->m_track_group) :
                             track_manager->getTracksInGroup(user_config->m_track_group);
 
     for(unsigned int i=0; i<tracks.size(); i++)
@@ -163,7 +165,8 @@ void TrackSel::switchGroup()
     // Now add the groups, indicated by a negative number as kart index
     // ----------------------------------------------------------------
     const std::vector<std::string>& groups=track_manager->getAllGroups();
-    for(int i =0; i<(int)groups.size(); i++)
+    const int group_size = (int)groups.size();
+    for(int i =0; i<group_size; i++)
     {
         // Only add groups other than the current one
         if(groups[i]!=user_config->m_track_group) m_index_avail_tracks.push_back(-i-1);

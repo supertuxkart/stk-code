@@ -104,7 +104,6 @@ protected:
     */
     bool        m_use_highscores;
     
-    //void  updateRacePosition(int k);
     void  updateHighscores  ();
     void  loadTrack         ();
     void  resetAllKarts     ();

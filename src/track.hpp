@@ -62,6 +62,8 @@ private:
     bool                     m_has_final_camera;
     Vec3                     m_camera_final_position;
     Vec3                     m_camera_final_hpr;
+    bool                     m_is_arena;
+    
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -104,7 +106,10 @@ public:
     std::vector<SGfloat> m_distance_from_start;
     std::vector<SGfloat> m_path_width;
     std::vector<SGfloat> m_angle;
-
+    
+    /** Start positions for arenas (unused in linear races) */
+    std::vector<Vec3>   m_start_positions;
+    
 	//Left and Right drivelines for overhead map rendering.
 	//(Should probably be private as they are only use internally right now)
     std::vector<Vec3> m_left_driveline;
@@ -126,6 +131,7 @@ public:
                        Track             (std::string filename,float w=100,
                                           float h=100, bool stretch=1);
                       ~Track             ();
+    bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
     void               addDebugToScene   (int type                    ) const;
     void               draw2Dview        (float x_offset,

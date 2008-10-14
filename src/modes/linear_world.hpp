@@ -58,7 +58,8 @@ protected:
     void            forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut);
     
     void            doLapCounting ( KartInfo& kart_info, Kart* kart );
-    
+    float           estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info);
+    void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
 public:
     LinearWorld();
     virtual ~LinearWorld();
@@ -84,8 +85,6 @@ public:
     virtual void    terminateRace();
     virtual void    restartRace();
     
-    float           estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info);
-    void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
     
     virtual bool raceHasLaps(){ return true; }
 };
