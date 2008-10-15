@@ -17,6 +17,7 @@
 
 #include "modes/three_strikes_battle.hpp"
 #include "gui/race_gui.hpp"
+#include "audio/sound_manager.hpp"
 
 #include <string>
 
@@ -44,11 +45,11 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         // no positions in this mode
         m_kart[n]->setPosition(-1);
     }// next kart
-    
-    // TODO - implement
 }
+
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
+    delete[] m_kart_display_info;
 }
 
 
@@ -64,9 +65,25 @@ void ThreeStrikesBattle::onGo()
 }
 void ThreeStrikesBattle::terminateRace()
 {
-    // TODO - implement
+    World::terminateRace();
 }
 
+void ThreeStrikesBattle::kartHit(const int kart_id)
+{
+    assert(kart_id >= 0);
+    assert(kart_id < m_kart.size());
+    
+    // make kart lose a life
+    m_kart_info[kart_id].m_lives --;
+    
+    // check if kart is 'dead'
+    if(m_kart_info[kart_id].m_lives < 1)
+        removeKart(kart_id);
+    
+    // almost over, use fast music
+    if(getCurrentNumKarts()==2)  
+        sound_manager->switchToFastMusic();
+}
 std::string ThreeStrikesBattle::getInternalCode() const
 {
     return "BATTLE_3_STRIKES";
@@ -74,9 +91,29 @@ std::string ThreeStrikesBattle::getInternalCode() const
 void ThreeStrikesBattle::update(float delta)
 {
     World::update(delta);
+
+    // check if over
+    if(getCurrentNumKarts()==1 || getCurrentNumPlayers()==0)
+    {
+        // Add the results for the remaining kart
+        for(int i=1; i<(int)race_manager->getNumKarts(); i++)
+            if(!m_kart[i]->isEliminated()) 
+                race_manager->RaceFinished(m_kart[i], -1);
+    
+        TimedRace::enterRaceOverState();
+        return;
+    }
 }
 void ThreeStrikesBattle::restartRace()
 {
+    World::restartRace();
+    
+    const unsigned int kart_amount = m_kart.size();
+    
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        m_kart_info[n].m_lives         = 3;
+    }// next kart
 }
 //void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
 
@@ -151,10 +188,9 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     
     kart->setXYZ( Vec3(RaceManager::getTrack()->m_start_positions[closest_id_found]) );
     
-    // FIXME - implement heading
-   // btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-   //                      DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector]) );
-   // kart->setRotation(heading);
+    // FIXME - implement correct heading
+    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */ );
+    kart->setRotation(heading);
     
     // A certain epsilon is added here to the Z coordinate (0.1), in case
     // that the points are somewhat under the track. Otherwise, the
@@ -162,8 +198,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     // a rescue, ...
     btTransform pos;
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
-    //pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
-    //                             DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector])));
+    pos.setRotation( btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */) );
     
     body->setCenterOfMassTransform(pos);
     

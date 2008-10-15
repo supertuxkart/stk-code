@@ -241,6 +241,10 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
         {
             // Set a flag it if was a direct hit.
             kart->handleExplosion(getXYZ(), kart==kart_hit);
+            if(kart==kart_hit && RaceManager::getTrack()->isArena())
+            {
+                RaceManager::getWorld()->kartHit(kart->getWorldKartId());
+            }
         }
     }
     callback_manager->handleExplosion(pos_explosion, moving_physics);

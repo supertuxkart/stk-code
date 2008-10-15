@@ -57,6 +57,8 @@ public:
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     
     virtual std::string getInternalCode() const;
+    
+    virtual void kartHit(const int kart_id);
 };
 
 

@@ -188,6 +188,10 @@ public:
     /** Called when it is needed to know whether this kind of race involves counting laps.
       */
     virtual bool raceHasLaps() = 0;
+    
+    /** Called when a kart was hit by a projectile
+     */
+    virtual void kartHit(const int kart_id) {};
 };
 
 #endif
