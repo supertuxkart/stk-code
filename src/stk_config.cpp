@@ -18,21 +18,50 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stk_config.hpp"
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
+
 #include "file_manager.hpp"
+#include "lisp/parser.hpp"
+#include "translation.hpp"
 #include "audio/music_information.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;
 
 //-----------------------------------------------------------------------------
-void STKConfig::load(const std::string filename)
+/** Loads the stk configuration file. After loading it checks if all necessary
+ *  values are actually defined, otherwise an error message is printed and STK
+ *  is aborted.
+ *  /param filename Name of the configuration file to load.
+ */
+void STKConfig::load(const std::string &filename)
 {
+    const lisp::Lisp* root = 0;
 
-    // Use the kart properties loader to read in the default kart
-    // values, but don't try to load any models or materials       */
-    KartProperties::load(filename, "config",
-                        /*dont_load_models   */ true,
-                        /*dont_load_materials*/ true  );
+    try
+    {
+        lisp::Parser parser;
+        root = parser.parse(filename);
+
+        const lisp::Lisp* const LISP = root->getLisp("config");
+        if(!LISP)
+        {
+            char msg[MAX_ERROR_MESSAGE_LENGTH];
+            snprintf(msg, sizeof(msg), "No 'config' node found.");
+            throw std::runtime_error(msg);
+        }
+        getAllData(LISP);
+    }
+    catch(std::exception& err)
+    {
+        fprintf(stderr, "Error while parsing KartProperties '%s':\n", 
+                filename.c_str());
+        fprintf(stderr, err.what());
+        fprintf(stderr, "\n");
+    }
+    delete root;
 
     // Check that all necessary values are indeed set 
     // -----------------------------------------------
@@ -40,23 +69,6 @@ void STKConfig::load(const std::string filename)
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
         fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
                 strA,filename.c_str());exit(-1);                       \
-    }
-    if(m_gear_switch_ratio.size()==0)
-    {
-        fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
-                filename.c_str());
-        exit(-1);
-    }
-    if(m_gear_power_increase.size()==0)
-    {
-        fprintf(stderr,"Missing default value for 'gear-power-increase' in '%s'.\n",
-                filename.c_str());
-        exit(-1);
-    }
-    if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
-        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase");
-        fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
-        exit(-1);
     }
 
     if(m_scores.size()==0 || (int)m_scores.size()!=m_max_karts)
@@ -74,46 +86,12 @@ void STKConfig::load(const std::string filename)
         fprintf(stderr,"No menu background defined in stk_config");
         exit(-1);
     }
-    CHECK_NEG(m_max_karts,               "max-karts"                    );
-    CHECK_NEG(m_grid_order,              "grid-order"                   );
-
-    CHECK_NEG(m_mass,                    "mass"                         );
-    CHECK_NEG(m_wheel_base,              "wheel-base"                   );
-    CHECK_NEG(m_engine_power,            "engine-power"                 );
-    CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
-    CHECK_NEG(m_angle_at_min,            "min-speed-angle"              );
-    CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
-    CHECK_NEG(m_angle_at_max,            "max-speed-angle"              );
-    CHECK_NEG(m_brake_factor,            "brake-factor"                 );
-
-    CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
-    CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
-    CHECK_NEG(m_wheelie_pitch_rate,      "wheelie-pitch-rate"           );
-    CHECK_NEG(m_wheelie_restore_rate,    "wheelie-restore-rate"         );
-    CHECK_NEG(m_wheelie_speed_boost,     "wheelie-speed-boost"          );
-    CHECK_NEG(m_wheelie_power_boost,     "wheelie-power-boost"          );
-
+    CHECK_NEG(m_max_karts,                 "max-karts"                  );
+    CHECK_NEG(m_grid_order,                "grid-order"                 );
     CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
     CHECK_NEG(m_parachute_done_fraction,   "parachute-done-fraction"    );
     CHECK_NEG(m_parachute_time,            "parachute-time"             );
     CHECK_NEG(m_parachute_time_other,      "parachute-time-other"       );
-
-    CHECK_NEG(m_time_full_steer,           "time-full-steer"            );
-
-    //bullet physics data
-    CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );
-    CHECK_NEG(m_wheel_damping_relaxation,  "wheel-damping-relaxation"   );
-    CHECK_NEG(m_wheel_damping_compression, "wheel-damping-compression"  );
-    CHECK_NEG(m_friction_slip,             "friction-slip"              );
-    CHECK_NEG(m_roll_influence,            "roll-influence"             );
-    CHECK_NEG(m_wheel_radius,              "wheel-radius"               );
-    CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
-    CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
-    CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
-    CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
-    CHECK_NEG(m_gravity_center_shift[0],   "gravity-center-shift"       );
-    CHECK_NEG(m_gravity_center_shift[1],   "gravity-center-shift"       );
-    CHECK_NEG(m_gravity_center_shift[2],   "gravity-center-shift"       );
     CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
     CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
@@ -122,21 +100,12 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_shortcut_length,           "shortcut-length"            );
-    CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
-    CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
-    CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
-    CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
-    CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
-    CHECK_NEG(m_track_connection_accel,    "track-connection-force"     );
-    CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
-    CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
-    CHECK_NEG(m_camera_distance,           "camera-distance"            );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
-
+    m_kart_properties.checkAllSet(filename);
 }   // load
 
 // -----------------------------------------------------------------------------
@@ -146,40 +115,28 @@ void STKConfig::load(const std::string filename)
  */
 void STKConfig::init_defaults()
 {
-    m_wheel_base   = m_mass = 
-    m_min_speed_turn = m_angle_at_min = m_max_speed_turn = m_angle_at_max = 
-    m_anvil_weight    = m_parachute_friction =
-    m_parachute_time = m_parachute_done_fraction = m_parachute_time_other = 
-    m_engine_power = m_brake_factor =
-    m_anvil_speed_factor = m_time_full_steer = m_wheelie_max_pitch =
-    m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = 
-    m_wheelie_restore_rate = m_wheelie_speed_boost = 
-    m_bomb_time = m_bomb_time_increase= m_anvil_time = 
-    m_zipper_time = m_zipper_force = m_zipper_speed_gain = 
-    m_shortcut_length = m_music_credit_time = m_delay_finish_time =
-    //bullet physics data
-    m_suspension_stiffness = m_wheel_damping_relaxation = 
-    m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
-    m_wheel_radius = m_wheelie_power_boost = 
-    m_chassis_linear_damping = m_chassis_angular_damping = 
-    m_maximum_speed = m_suspension_rest = 
-    m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
-    m_explosion_impulse_objects = m_upright_tolerance = m_upright_max_force =
-	m_suspension_travel_cm = m_track_connection_accel = 
-    // Camera
-    m_camera_max_accel = m_camera_max_brake = m_camera_distance = UNDEFINED;
-    m_gravity_center_shift   = Vec3(UNDEFINED);
-    m_front_wheel_connection = Vec3(UNDEFINED);
-    m_rear_wheel_connection  = Vec3(UNDEFINED);
-    m_max_karts              = -100;
-    m_grid_order             = -100;
-    m_max_history            = -100;
-    m_title_music            = NULL;
+    m_anvil_weight             = m_parachute_friction        = 
+        m_parachute_time       = m_parachute_done_fraction   = 
+        m_parachute_time_other = m_anvil_speed_factor        =
+        m_bomb_time            = m_bomb_time_increase        =
+        m_anvil_time           = m_zipper_time               =
+        m_zipper_force         = m_zipper_speed_gain         =
+        m_explosion_impulse    = m_explosion_impulse_objects = 
+        m_shortcut_length      = m_music_credit_time         =
+        m_delay_finish_time    =
+        UNDEFINED;
+    m_max_karts                = -100;
+    m_grid_order               = -100;
+    m_max_history              = -100;
+    m_title_music              = NULL;
     m_scores.clear();
     m_leader_intervals.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
+/** Extracts the actual information from a lisp file.
+ *  \param lisp Pointer to the lisp data structure.
+ */
 void STKConfig::getAllData(const lisp::Lisp* lisp)
 {
 
@@ -214,5 +171,6 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
 
     // Get the default KartProperties
     // ------------------------------
-    KartProperties::getAllData(lisp->getLisp("kart-defaults"));
+    m_kart_properties.getAllData(lisp->getLisp("kart-defaults"));
+
 }   // getAllData

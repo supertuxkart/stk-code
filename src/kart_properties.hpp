@@ -33,7 +33,7 @@ class ssgEntity;
  *  identifier, physical properties etc. It is atm also the base class for
  *  STKConfig, which stores the default values for all physics constants.
  */
-class KartProperties : public NoCopy
+class KartProperties
 {
 private:
 
@@ -41,6 +41,7 @@ private:
     ssgEntity               *m_model;          /**< The 3d model of the kart.*/
     std::vector<std::string> m_groups;         /**< List of all groups the kart
                                                     belongs to. */
+    static float UNDEFINED;
 
 protected:
     // Display and gui
@@ -127,17 +128,15 @@ protected:
 
 
 public:
-                  KartProperties   ();
-    virtual      ~KartProperties    ();
+          KartProperties    ();
+         ~KartProperties    ();
+    void  getAllData        (const lisp::Lisp* lisp);
+    void  load              (const std::string &filename,
+                             const std::string &node="tuxkart-kart",
+                             bool dont_load_models=false);
+    void  checkAllSet(const std::string &filename);
 
-    virtual void  init_defaults     ();
-    virtual void  getAllData        (const lisp::Lisp* lisp);
-    virtual void  load              (const std::string filename,
-                                     const std::string node="tuxkart-kart",
-                                     bool dont_load_models=false,
-                                     bool dont_load_materials=false);
     float getMaxSteerAngle          (float speed) const;
-
     Material*     getIconMaterial   () const {return m_icon_material;          }
     ssgEntity*    getModel          () const {return m_model;                  }
     const std::string& getName      () const {return m_name;                   }
@@ -181,7 +180,7 @@ public:
     float getJumpVelocity           () const {return m_jump_velocity;            }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }
-    float getTrackConnectionForce   () const {return m_track_connection_accel;   }
+    float getTrackConnectionAccel   () const {return m_track_connection_accel;   }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 

@@ -37,23 +37,67 @@
 #  define snprintf _snprintf
 #endif
 
-// This constructor would be a bit more useful, nicer, if we could call
-// init_defaults() and load from here. Unfortunately, this object is used
-// as a base class for STKConfig, which has to overwrite
-// init_defaults() and getAllData(). But during the call of this constructor,
-// the STKConfig object does not (yet) exist, so the overwriting
-// functions do NOT get called, only the virtual functions here would be
-// called. Therefore, a two step initialisation is necessary: the constructor
-// doing not much, but then in load the overwriting functions can be used.
+float KartProperties::UNDEFINED = -99.9f;
+
+/** The constructor initialises all values with invalid values. It can later
+ *  then be checked (for STKConfig) that all values are indeed defined.
+ *  Otherwise the defaults are taken from STKConfig (and since they are all
+ *  defined, it is guaranteed that each kart has well defined physics values.
+ */
 KartProperties::KartProperties() : m_icon_material(0), m_model(0)
-{}   // KartProperties
+{
+    m_name          = "Tux";
+    m_ident         = "tux";
+    m_model_file    = "tuxkart.ac";
+    m_icon_file     = "tuxicon.png";
+    m_shadow_file   = "tuxkartshadow.png";
+    m_groups.clear();
+
+    // Set all other values to undefined, so that it can later be tested
+    // if everything is defined properly.
+    m_wheel_base = m_mass = m_min_speed_turn = m_angle_at_min = 
+        m_max_speed_turn = m_angle_at_max = m_engine_power = m_brake_factor =
+        m_time_full_steer = m_wheelie_max_pitch = m_wheelie_max_speed_ratio = 
+        m_wheelie_pitch_rate = m_wheelie_restore_rate = m_wheelie_speed_boost =
+        m_suspension_stiffness = m_wheel_damping_relaxation = 
+        m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
+        m_wheel_radius = m_wheelie_power_boost = m_chassis_linear_damping = 
+        m_chassis_angular_damping = m_maximum_speed = m_suspension_rest = 
+        m_max_speed_reverse_ratio = m_jump_velocity = m_upright_tolerance = 
+        m_upright_max_force = m_suspension_travel_cm = m_mass = 
+        m_track_connection_accel = m_wheel_base = m_min_speed_turn = 
+        m_angle_at_min = m_max_speed_turn = m_angle_at_max = m_engine_power =
+        m_brake_factor = m_time_full_steer = m_wheelie_max_pitch = 
+        m_wheelie_max_speed_ratio = m_wheelie_pitch_rate = m_wheel_radius = 
+        m_wheelie_restore_rate = m_wheelie_speed_boost = m_maximum_speed = 
+        m_suspension_stiffness = m_wheel_damping_relaxation = m_jump_velocity =
+        m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
+        m_wheelie_power_boost = m_chassis_linear_damping = m_suspension_rest =
+        m_chassis_angular_damping = m_max_speed_reverse_ratio = 
+        m_upright_tolerance = m_upright_max_force = m_suspension_travel_cm = 
+        m_track_connection_accel = m_camera_max_accel = m_camera_max_brake = 
+        m_camera_distance = UNDEFINED;
+    m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_front_wheel_connection = Vec3(UNDEFINED);
+    m_rear_wheel_connection  = Vec3(UNDEFINED);
+    m_color.setValue(1.0f, 0.0f, 0.0f);
+
+}   // KartProperties
 
 //-----------------------------------------------------------------------------
-void KartProperties::load(const std::string filename, const std::string node,
-                          bool dont_load_models, bool dont_load_materials)
+/** Loads the kart properties from a file.
+ *  \param filename Filename to load.
+ *  \param node Name of the lisp node to load the data from 
+ *              (default: tuxkart-kart)
+ *  \param dont_load_models If set does not load the actual kart models, used
+ *              when only printing kart information to stdout.
+ */
+void KartProperties::load(const std::string &filename, const std::string &node,
+                          bool dont_load_models)
 {
 
-    init_defaults();
+   // Get the default values from STKConfig:
+   *this = stk_config->getDefaultKartProperties();
 
     const lisp::Lisp* root = 0;
     m_ident = StringUtils::basename(StringUtils::without_extension(filename));
@@ -81,17 +125,20 @@ void KartProperties::load(const std::string filename, const std::string node,
     }
     delete root;
 
-    if(!dont_load_materials)
-    {
-        // Load material
-        std::string materials_file = file_manager->getKartFile("materials.dat",getIdent());
-        file_manager->pushModelSearchPath(file_manager->getKartFile("", getIdent()));
-        file_manager->pushTextureSearchPath(file_manager->getKartFile("", getIdent()));
+    // Set a default group (that has to happen after init_default and load)
+    if(m_groups.size()==0)
+        m_groups.push_back("standard");
 
-        // addShared makes sure that these textures/material infos stay in memory
-        material_manager->addSharedMaterial(materials_file);
-        m_icon_material = material_manager->getMaterial(m_icon_file);
-    }
+
+    // Load material
+    std::string materials_file = file_manager->getKartFile("materials.dat",getIdent());
+    file_manager->pushModelSearchPath(file_manager->getKartFile("", getIdent()));
+    file_manager->pushTextureSearchPath(file_manager->getKartFile("", getIdent()));
+
+    // addShared makes sure that these textures/material infos stay in memory
+    material_manager->addSharedMaterial(materials_file);
+    m_icon_material = material_manager->getMaterial(m_icon_file);
+
     // Load model, except when called as part of --list-karts
     if(m_model_file.length()>0 && !dont_load_models)
     {
@@ -116,19 +163,88 @@ void KartProperties::load(const std::string filename, const std::string node,
                    m_kart_width, m_kart_length, m_kart_height);
         m_model->ref();
     }  // if
-    if(!dont_load_materials)
-    {
-        file_manager->popTextureSearchPath();
-        file_manager->popModelSearchPath();
-    }
+
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath();
 
 }   // load
 
 //-----------------------------------------------------------------------------
+/** Destructor, dereferences the kart model. */
 KartProperties::~KartProperties()
 {
     ssgDeRefDelete(m_model);
 }   // ~KartProperties
+
+//-----------------------------------------------------------------------------
+/** Checks if all necessary physics values are indeed defines. This helps
+ *  finding bugs early, e.g. missing default in stk_config.dat file.
+ */
+void KartProperties::checkAllSet(const std::string &filename)
+{
+        if(m_gear_switch_ratio.size()==0)
+    {
+        fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
+                filename.c_str());
+        exit(-1);
+    }
+    if(m_gear_power_increase.size()==0)
+    {
+        fprintf(stderr,"Missing default value for 'gear-power-increase' in '%s'.\n",
+                filename.c_str());
+        exit(-1);
+    }
+    if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
+        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase");
+        fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
+        exit(-1);
+    }
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
+        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
+                strA,filename.c_str());exit(-1);                       \
+    }
+
+    CHECK_NEG(m_mass,                    "mass"                         );
+    CHECK_NEG(m_wheel_base,              "wheel-base"                   );
+    CHECK_NEG(m_engine_power,            "engine-power"                 );
+    CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
+    CHECK_NEG(m_angle_at_min,            "min-speed-angle"              );
+    CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
+    CHECK_NEG(m_angle_at_max,            "max-speed-angle"              );
+    CHECK_NEG(m_brake_factor,            "brake-factor"                 );
+    CHECK_NEG(m_time_full_steer,           "time-full-steer"            );
+
+    CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
+    CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
+    CHECK_NEG(m_wheelie_pitch_rate,      "wheelie-pitch-rate"           );
+    CHECK_NEG(m_wheelie_restore_rate,    "wheelie-restore-rate"         );
+    CHECK_NEG(m_wheelie_speed_boost,     "wheelie-speed-boost"          );
+    CHECK_NEG(m_wheelie_power_boost,     "wheelie-power-boost"          );
+    //bullet physics data
+    CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );
+    CHECK_NEG(m_wheel_damping_relaxation,  "wheel-damping-relaxation"   );
+    CHECK_NEG(m_wheel_damping_compression, "wheel-damping-compression"  );
+    CHECK_NEG(m_friction_slip,             "friction-slip"              );
+    CHECK_NEG(m_roll_influence,            "roll-influence"             );
+    CHECK_NEG(m_wheel_radius,              "wheel-radius"               );
+    CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
+    CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
+    CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
+    CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
+    CHECK_NEG(m_gravity_center_shift[0],   "gravity-center-shift"       );
+    CHECK_NEG(m_gravity_center_shift[1],   "gravity-center-shift"       );
+    CHECK_NEG(m_gravity_center_shift[2],   "gravity-center-shift"       );
+    CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
+    CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
+    CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
+    CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
+    CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
+    CHECK_NEG(m_track_connection_accel,    "track-connection-accel"     );
+    CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
+    CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
+    CHECK_NEG(m_camera_distance,           "camera-distance"            );
+
+}   // checkAllSet
 
 //-----------------------------------------------------------------------------
 void KartProperties::getAllData(const lisp::Lisp* lisp)
@@ -201,10 +317,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("jump-velocity",             m_jump_velocity            );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
-    lisp->get("track-connection-force",    m_track_connection_accel   );
+    lisp->get("track-connection-accel",    m_track_connection_accel   );
     lisp->getVector("groups",              m_groups                   );
-    if(m_groups.size()==0)
-        m_groups.push_back("standard");
 
     // getVector appends to existing vectors, so a new one must be used to load
     std::vector<float> temp;
@@ -220,64 +334,6 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("camera-distance",              m_camera_distance );
 
 }   // getAllData
-
-//-----------------------------------------------------------------------------
-void KartProperties::init_defaults()
-{
-
-    m_name          = "Tux";
-    m_ident         = "tux";
-    m_model_file    = "tuxkart.ac";
-    m_icon_file     = "tuxicon.png";
-    m_shadow_file   = "tuxkartshadow.png";
-    m_groups.clear();
-
-    m_color.setValue(1.0f, 0.0f, 0.0f);
-
-    m_kart_width                = 1.0f;
-    m_kart_length               = 1.5f;
-    m_wheel_base                = stk_config->m_wheel_base;
-    m_engine_power              = stk_config->m_engine_power;
-    m_time_full_steer           = stk_config->m_time_full_steer;
-    m_brake_factor              = stk_config->m_brake_factor;
-    m_mass                      = stk_config->m_mass;
-    m_wheelie_max_speed_ratio   = stk_config->m_wheelie_max_speed_ratio;
-    m_wheelie_max_pitch         = stk_config->m_wheelie_max_pitch;
-    m_wheelie_pitch_rate        = stk_config->m_wheelie_pitch_rate;
-    m_wheelie_restore_rate      = stk_config->m_wheelie_restore_rate;
-    m_wheelie_speed_boost       = stk_config->m_wheelie_speed_boost;
-    m_wheelie_power_boost       = stk_config->m_wheelie_power_boost;
-
-    //bullet physics data
-    m_suspension_stiffness      = stk_config->m_suspension_stiffness;
-    m_wheel_damping_relaxation  = stk_config->m_wheel_damping_relaxation;
-    m_wheel_damping_compression = stk_config->m_wheel_damping_compression;
-    m_friction_slip             = stk_config->m_friction_slip;
-    m_roll_influence            = stk_config->m_roll_influence;
-    m_wheel_radius              = stk_config->m_wheel_radius;
-    m_chassis_linear_damping    = stk_config->m_chassis_linear_damping;
-    m_chassis_angular_damping   = stk_config->m_chassis_angular_damping;
-    m_maximum_speed             = stk_config->m_maximum_speed;
-    m_max_speed_reverse_ratio   = stk_config->m_max_speed_reverse_ratio;
-    m_gravity_center_shift      = stk_config->m_gravity_center_shift;
-    m_front_wheel_connection    = stk_config->m_front_wheel_connection;
-    m_rear_wheel_connection     = stk_config->m_rear_wheel_connection;
-    m_suspension_rest           = stk_config->m_suspension_rest;
-    m_suspension_travel_cm      = stk_config->m_suspension_travel_cm;
-    m_jump_velocity             = stk_config->m_jump_velocity;
-    m_gear_switch_ratio         = stk_config->m_gear_switch_ratio;
-    m_gear_power_increase       = stk_config->m_gear_power_increase;
-    m_upright_tolerance         = stk_config->getUprightTolerance();
-    m_upright_max_force         = stk_config->getUprightMaxForce();
-    m_track_connection_accel    = 0.0f; //FIXME
-    m_camera_max_accel          = stk_config->getCameraMaxAccel();
-    m_camera_max_brake          = stk_config->getCameraMaxBrake();
-    m_camera_distance           = stk_config->getCameraDistance();
-    m_min_speed_turn            = stk_config->m_min_speed_turn;
-    m_angle_at_min              = stk_config->m_angle_at_min;
-    m_max_speed_turn            = stk_config->m_max_speed_turn;
-    m_angle_at_max              = stk_config->m_angle_at_max;
-}   // init_defaults
 
 // ----------------------------------------------------------------------------
 float KartProperties::getMaxSteerAngle(float speed) const

@@ -185,7 +185,8 @@ void Kart::createPhysics(ssgEntity *obj)
         new btDefaultVehicleRaycaster(RaceManager::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btKart::btVehicleTuning();
 	m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
-    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster);
+    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster,
+                           m_kart_properties->getTrackConnectionAccel());
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -616,8 +617,8 @@ void Kart::update(float dt)
     herring_manager->hitHerring(this);
     
     processSkidMarks();
-}
 
+}
 //-----------------------------------------------------------------------------
 // Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()

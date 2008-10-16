@@ -30,8 +30,10 @@ class MusicInformation;
  *  includes the list of default kart physics parameters which are used for
  *  each kart (but which can be overwritten for each kart, too).
  */
-class STKConfig : public KartProperties
+class STKConfig 
 {
+protected:
+    KartProperties  m_kart_properties; /**< Default kart properties. */
 public:
     static float UNDEFINED;
     float m_anvil_weight;            /**<Additional kart weight if anvil is 
@@ -69,16 +71,22 @@ public:
     std::vector<float> 
           m_leader_intervals;        /**<Interval in follow the leader till 
                                          last kart is reomved.               */
-    std::vector<int> m_scores;       /**<Scores depending on position.       */
+    std::vector<int>
+          m_scores;                  /**<Scores depending on position.       */
 
-    MusicInformation* m_title_music; /**<Filename of the title music to play.*/
-    std::string m_menu_background;   /**<Picture used as menu background.    */
+    MusicInformation 
+         *m_title_music;             /**<Filename of the title music to play.*/
+    std::string 
+          m_menu_background;         /**<Picture used as menu background.    */
 
     /** Empty constructor. The actual work is done in load. */
-         STKConfig() : KartProperties() {};
+         STKConfig() {};
     void init_defaults    ();
     void getAllData       (const lisp::Lisp* lisp);
-    void load             (const std::string filename);
+    void load             (const std::string &filename);
+    /** Returns the default kart properties for each kart. */
+    const KartProperties &
+         getDefaultKartProperties() const {return m_kart_properties; }
 }
 ;   // STKConfig
 

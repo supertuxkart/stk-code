@@ -29,9 +29,11 @@ btScalar calcRollingFriction(btWheelContactPoint& contactPoint);
 
 static btRigidBody s_fixedObject( 0,0,0);
 
-btKart::btKart(const btVehicleTuning& tuning,btRigidBody* chassis,	btVehicleRaycaster* raycaster )
+btKart::btKart(const btVehicleTuning& tuning,btRigidBody* chassis,	
+               btVehicleRaycaster* raycaster, float track_connect_accel )
 : btRaycastVehicle(tuning, chassis, raycaster)
 {
+    m_track_connect_accel = track_connect_accel;
 }
 
 // ----------------------------------------------------------------------------
@@ -47,7 +49,8 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
 	
 	btScalar depth          = -1;
 
-	btScalar raylen         = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius;
+	btScalar raylen         = wheel.getSuspensionRestLength()+wheel.m_wheelsRadius+
+                              wheel.m_maxSuspensionTravelCm*0.01f;
 
 	btVector3 rayvector     = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
 	const btVector3& source = wheel.m_raycastInfo.m_hardPointWS;
@@ -120,6 +123,7 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
 		wheel.m_suspensionRelativeVelocity = btScalar(0.0);
 		wheel.m_raycastInfo.m_contactNormalWS = - wheel.m_raycastInfo.m_wheelDirectionWS;
 		wheel.m_clippedInvContactDotSuspension = btScalar(1.0);
+
 	}
 
 	return depth;
@@ -161,22 +165,25 @@ void btKart::updateVehicle( btScalar step )
 		depth = rayCast( m_wheelInfo[i]);
 	}
 
-	updateSuspension(step);
-
-    // A very unphysical thing to handle slopes that are a bit too steep
-    // or uneven (resulting in only one wheel on the ground)
-    // If only the front or only the rear wheels are on the ground, add
-    // a force pulling the axis down (towards the ground). Note that it
-    // is already guaranteed that either both or no wheels on one axis
-    // are on the ground, so we have to test only one of the wheels
-    for(int i=0; i<m_wheelInfo.size(); i++)
+    // Work around: make sure that either both wheels on one axis
+    // are on ground, or none of them. This avoids the problem of
+    // the kart suddenly getting additional angular velocity because
+    // e.g. only one rear wheel is on the ground.
+    for(i=0; i<4; i+=2)
     {
-        if(!(m_wheelInfo[i].m_raycastInfo.m_isInContact) )
+        if(m_wheelInfo[i].m_raycastInfo.m_isInContact &&
+           !(m_wheelInfo[i+1].m_raycastInfo.m_isInContact))
         {
-            btScalar mass=1.0f/m_chassisBody->getInvMass();
-            m_wheelInfo[i].m_wheelsSuspensionForce = -2.0f*mass;
+            m_wheelInfo[i+1].m_raycastInfo = m_wheelInfo[i].m_raycastInfo;
         }
-    }
+        if(!(m_wheelInfo[i].m_raycastInfo.m_isInContact) &&
+           m_wheelInfo[i+1].m_raycastInfo.m_isInContact)
+        {
+           m_wheelInfo[i].m_raycastInfo = m_wheelInfo[i+1].m_raycastInfo;
+        }
+    }   // for i=0; i<4; i+=2
+
+	updateSuspension(step);
 	
 	for (i=0;i<m_wheelInfo.size();i++)
 	{
@@ -287,7 +294,13 @@ void btKart::updateSuspension(btScalar deltaTime)
 		}
 		else
 		{
-			wheel_info.m_wheelsSuspensionForce = btScalar(0.0);
+            // A very unphysical thing to handle slopes that are a bit too steep
+            // or uneven (resulting in only one wheel on the ground)
+            // If only the front or only the rear wheels are on the ground, add
+            // a force pulling the axis down (towards the ground). Note that it
+            // is already guaranteed that either both or no wheels on one axis
+            // are on the ground, so we have to test only one of the wheels
+            wheel_info.m_wheelsSuspensionForce = -m_track_connect_accel*chassisMass ;
 		}
     }   // for w_it<number of wheels
 
