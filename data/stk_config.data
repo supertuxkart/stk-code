@@ -80,7 +80,7 @@
    (front-wheel-connection   0.38 0.6 0)
    (rear-wheel-connection    0.38 -0.6 0)
    (suspension-rest           0.2  )
-	(suspension-travel-cm    500    )
+   (suspension-travel-cm     19    )
 
    ;; The z-axis velocity set when a jump is initiated. This will cause the
    ;; kart to start rising, till it is pulled back by gravity. A higher value
@@ -98,6 +98,7 @@
    (gear-power-increase    2.2      1.7      1.3)
    (upright-tolerance         0.2)
    (upright-max-force         30)
+   (track-connection-force     2)
    (camera-max-accel          10)
    (camera-max-brake          10)
    (camera-distance           3.5) 

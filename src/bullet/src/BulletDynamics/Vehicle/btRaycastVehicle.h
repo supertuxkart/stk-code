@@ -23,7 +23,7 @@ class btVehicleTuning;
 ///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
 class btRaycastVehicle : public btTypedConstraint
 {
-
+protected:
 		btAlignedObjectArray<btVector3>	m_forwardWS;
 		btAlignedObjectArray<btVector3>	m_axle;
 		btAlignedObjectArray<btScalar>	m_forwardImpulse;
@@ -49,7 +49,9 @@ public:
 			btScalar	m_frictionSlip;
 
 		};
-private:
+
+    // FIXME: can this protected become private again??
+protected:
 
 	btScalar	m_tau;
 	btScalar	m_damping;

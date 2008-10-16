@@ -61,11 +61,11 @@ protected:
                                        // is disabled to allow the karts to bounce back
 
     // physics parameters, storing it saves time
-    btRaycastVehicle::btVehicleTuning  *m_tuning;
+    btKart::btVehicleTuning           *m_tuning;
     btCompoundShape                    m_kart_chassis;
-    btVehicleRaycaster                 *m_vehicle_raycaster;
-    btRaycastVehicle                   *m_vehicle;
-    btUprightConstraint                *m_uprightConstraint;
+    btVehicleRaycaster                *m_vehicle_raycaster;
+    btKart                            *m_vehicle;
+    btUprightConstraint               *m_uprightConstraint;
 
 private:
     int                 m_num_herrings_gobbled;
@@ -187,7 +187,7 @@ public:
     float          getKartLength    () const {return m_kart_properties->getKartLength();}
     float          getKartHeight    () const {return m_kart_properties->getKartHeight();}
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
-    btRaycastVehicle *getVehicle    () const {return m_vehicle;                }
+    btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           draw             ();
     bool           isInRest         () const;

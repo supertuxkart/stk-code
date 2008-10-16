@@ -248,7 +248,7 @@ public:
         if(isBattleMode(type)) return false;
         const int id = (int)type;
         const int answer = (id-1000)/100;
-        return (bool)answer;
+        return answer!=0;
     }
 
 };

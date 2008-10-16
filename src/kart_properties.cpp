@@ -201,6 +201,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("jump-velocity",             m_jump_velocity            );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
+    lisp->get("track-connection-force",    m_track_connection_accel   );
     lisp->getVector("groups",              m_groups                   );
     if(m_groups.size()==0)
         m_groups.push_back("standard");
@@ -268,6 +269,7 @@ void KartProperties::init_defaults()
     m_gear_power_increase       = stk_config->m_gear_power_increase;
     m_upright_tolerance         = stk_config->getUprightTolerance();
     m_upright_max_force         = stk_config->getUprightMaxForce();
+    m_track_connection_accel    = 0.0f; //FIXME
     m_camera_max_accel          = stk_config->getCameraMaxAccel();
     m_camera_max_brake          = stk_config->getCameraMaxBrake();
     m_camera_distance           = stk_config->getCameraDistance();

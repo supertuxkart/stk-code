@@ -121,7 +121,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_zipper_time,               "zipper-time"                );
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
-    CHECK_NEG(m_shortcut_length,           "shortcut-length"  );
+    CHECK_NEG(m_shortcut_length,           "shortcut-length"            );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
@@ -129,6 +129,7 @@ void STKConfig::load(const std::string filename)
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
     CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
+    CHECK_NEG(m_track_connection_accel,    "track-connection-force"     );
     CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
     CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
     CHECK_NEG(m_camera_distance,           "camera-distance"            );
@@ -164,7 +165,7 @@ void STKConfig::init_defaults()
     m_maximum_speed = m_suspension_rest = 
     m_max_speed_reverse_ratio = m_explosion_impulse = m_jump_velocity = 
     m_explosion_impulse_objects = m_upright_tolerance = m_upright_max_force =
-	m_suspension_travel_cm =
+	m_suspension_travel_cm = m_track_connection_accel = 
     // Camera
     m_camera_max_accel = m_camera_max_brake = m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);

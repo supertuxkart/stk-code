@@ -1155,6 +1155,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\three_strikes_battle.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\world.cpp"
 					>
 				</File>
@@ -1750,6 +1754,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\standard_race.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\three_strikes_battle.hpp"
 					>
 				</File>
 				<File

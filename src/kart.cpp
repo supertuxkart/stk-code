@@ -183,9 +183,9 @@ void Kart::createPhysics(ssgEntity *obj)
     // -------------------------
     m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(RaceManager::getWorld()->getPhysics()->getPhysicsWorld());
-    m_tuning  = new btRaycastVehicle::btVehicleTuning();
+    m_tuning  = new btKart::btVehicleTuning();
 	m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
-    m_vehicle = new btRaycastVehicle(*m_tuning, m_body, m_vehicle_raycaster);
+    m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster);
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -468,7 +468,7 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         btVector3 diff((float)(rand()%16/16), (float)(rand()%16/16), 2.0f);
         diff.normalize();
         diff*=stk_config->m_explosion_impulse/5.0f;
-        this->m_uprightConstraint->setDisableTime(10.0f);
+        m_uprightConstraint->setDisableTime(10.0f);
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
         getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(float(rand()%32*5),
                                                                    float(rand()%32*5),
@@ -514,6 +514,13 @@ void Kart::update(float dt)
         m_collectable.use() ;
         m_controls.fire = false;
     }
+
+    // Only use the upright constraint if the kart is in the air!
+    if(isOnGround())
+        m_uprightConstraint->setLimit(M_PI);
+    else
+        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
+
 
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
@@ -609,8 +616,8 @@ void Kart::update(float dt)
     herring_manager->hitHerring(this);
     
     processSkidMarks();
-
 }
+
 //-----------------------------------------------------------------------------
 // Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()

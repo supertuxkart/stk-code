@@ -520,6 +520,10 @@
 					Name="Vehicle"
 					>
 					<File
+						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btKart.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp"
 						>
 					</File>
@@ -1117,6 +1121,10 @@
 				<Filter
 					Name="Vehicle"
 					>
+					<File
+						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btKart.h"
+						>
+					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btRaycastVehicle.h"
 						>

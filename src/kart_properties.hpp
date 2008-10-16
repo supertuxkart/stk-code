@@ -29,46 +29,61 @@
 class Material;
 class ssgEntity;
 
+/** This class stores the properties of a kart. This includes size, name, 
+ *  identifier, physical properties etc. It is atm also the base class for
+ *  STKConfig, which stores the default values for all physics constants.
+ */
 class KartProperties : public NoCopy
 {
 private:
 
-    Material                *m_icon_material;
-    ssgEntity               *m_model;
-    std::vector<std::string> m_groups;  // list of all groups the kart belongs to
+    Material                *m_icon_material;  /**< The icon texture to use. */
+    ssgEntity               *m_model;          /**< The 3d model of the kart.*/
+    std::vector<std::string> m_groups;         /**< List of all groups the kart
+                                                    belongs to. */
 
 protected:
     // Display and gui
     // --------------- 
-    std::string m_name;         // The human readable Name of the karts driver
-    std::string m_ident;        // The computer readable-name of the karts driver
-    std::string m_model_file;   // Filename of 3d model that is used for kart
-    std::string m_icon_file;    // Filename of icon that represents the kart in
-                                // the statusbar and the character select screen
-    std::string m_shadow_file;  // Filename of the image file that contains the
-                                // shadow for this kart
-    Vec3 m_color;               // Color the represents the kart in the status
-                                // bar and on the track-view
+    std::string m_name;         /**< The human readable Name of the kart
+                                 *   driver. */
+    std::string m_ident;        /**< The computer readable-name of the kart
+                                 *   driver. */
+    std::string m_model_file;   /**< Filename of 3d model that is used for 
+                                 *   kart.*/
+    std::string m_icon_file;    /**< Filename of icon that represents the kart
+                                 *   in the statusbar and the character select
+                                 *   screen. */
+    std::string m_shadow_file;  /**< Filename of the image file that contains 
+                                 *   the shadow for this kart. */
+    Vec3 m_color;               /**< Color the represents the kart in the status
+                                 *   bar and on the track-view. */
 
     // Physic properties
     // -----------------
-    float m_kart_width;               // width of kart
-    float m_kart_length;              // length of kart
-    float m_kart_height;              // height of kart
-    float m_mass;                     // weight of kart
-    float m_wheel_base;               // distance between front and read wheels
-    float m_engine_power;             // maximum force from engine
-    float m_brake_factor;             // braking factor * engine_power = braking force
-    float m_time_full_steer;          // time for player karts to reach full steer angle
-    float m_wheelie_max_speed_ratio;  // percentage of maximum speed for wheelies
-    float m_wheelie_max_pitch;        // maximum pitch for wheelies
-    float m_wheelie_pitch_rate;       // rate/sec with which kart goes up
-    float m_wheelie_restore_rate;     // rate/sec with which kart does down
-    float m_wheelie_speed_boost;      // speed boost while doing a wheelie
-    float m_wheelie_power_boost;      // increase in engine power
+    float m_kart_width;               /**< Width of kart.  */
+    float m_kart_length;              /**< Length of kart. */
+    float m_kart_height;              /**< Height of kart. */
+    float m_mass;                     /**< Weight of kart.  */
+    float m_wheel_base;               /**< Distance between front and rear 
+                                       *   wheels. */
+    float m_engine_power;             /**< Maximum force from engine. */
+    float m_brake_factor;             /**< Braking factor * engine_power = 
+                                       *   braking force. */
+    float m_time_full_steer;          /**< Time for player karts to reach full
+                                       *   steer angle. */
+    float m_wheelie_max_speed_ratio;  /**< Percentage of maximum speed for 
+                                       *   wheelies. */
+    float m_wheelie_max_pitch;        /**< Maximum pitch for wheelies. */
+    float m_wheelie_pitch_rate;       /**< Rate/sec with which kart goes up. */
+    float m_wheelie_restore_rate;     /**< Rate/sec with which kart does down.*/
+    float m_wheelie_speed_boost;      /**< Speed boost while doing a wheelie. */
+    float m_wheelie_power_boost;      /**< Increase in engine power. */
 
-    float m_min_speed_turn, m_angle_at_min;  // speed dependent steering: max 
-    float m_max_speed_turn, m_angle_at_max;  // turn angle at lowest speed etc
+    float m_min_speed_turn, m_angle_at_min;  /**< Speed dependent steering: 
+                                              *   maximum speed to use. */
+    float m_max_speed_turn, m_angle_at_max;  /**< Turn angle at lowest speed 
+                                              *   etc. */
     float m_speed_angle_increase;
 
     // bullet physics data 
@@ -83,10 +98,13 @@ protected:
     float m_chassis_angular_damping;
     float m_maximum_speed;
     float m_max_speed_reverse_ratio;
-    Vec3  m_gravity_center_shift;    // shift of center of gravity
-    Vec3  m_front_wheel_connection;  // connection point relative to center of
-    Vec3  m_rear_wheel_connection;   // gravity for front and rear right wheels
-                                     // (X is mirrored for left wheels)
+    Vec3  m_gravity_center_shift;    /**< Shift of center of gravity. */
+    Vec3  m_front_wheel_connection;  /**< Connection point relative to center of */
+    Vec3  m_rear_wheel_connection;   /**< Gravity for front and rear right wheels
+                                      *  (X is mirrored for left wheels). */
+    float m_track_connection_accel;  /**< Artifical acceleration that pulls a 
+                                      *   kart down onto the track if one axis
+                                      *   loses contact with the track. */
     float m_suspension_rest;
 	float m_suspension_travel_cm;
     float m_jump_velocity;            // z velocity set when jumping
@@ -98,18 +116,18 @@ protected:
     float m_camera_max_accel;         // maximum acceleration of camera
     float m_camera_max_brake;         // maximum braking of camera
     float m_camera_distance;          // distance of normal camera from kart
-    //
-    // The following two vectors define at what ratio of the maximum speed what
-    // gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
-    //                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
-    // The next vector contains the increase in max power (to simulate different
-    // gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
-    std::vector<float> m_gear_switch_ratio;
-    std::vector<float> m_gear_power_increase;
+    
+    /** The following two vectors define at what ratio of the maximum speed what
+     * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
+     *                         0.5  means: if speed <=0.5 *maxSpeed --> gear 2
+     * The next vector contains the increase in max power (to simulate different
+     * gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1 */
+    std::vector<float> m_gear_switch_ratio,
+                       m_gear_power_increase;
 
 
 public:
-    KartProperties   ();
+                  KartProperties   ();
     virtual      ~KartProperties    ();
 
     virtual void  init_defaults     ();
@@ -163,6 +181,7 @@ public:
     float getJumpVelocity           () const {return m_jump_velocity;            }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }
+    float getTrackConnectionForce   () const {return m_track_connection_accel;   }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 

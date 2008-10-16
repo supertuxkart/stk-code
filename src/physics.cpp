@@ -75,7 +75,7 @@ Physics::~Physics()
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
-void Physics::addKart(const Kart *kart, btRaycastVehicle *vehicle)
+void Physics::addKart(const Kart *kart, btKart *vehicle)
 {
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(vehicle);

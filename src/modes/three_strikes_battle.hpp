@@ -23,7 +23,7 @@
 #include "modes/world.hpp"
 #include <string>
 
-class KartIconDisplayInfo;
+struct KartIconDisplayInfo;
 
 struct BattleInfo
 {

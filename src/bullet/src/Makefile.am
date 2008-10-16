@@ -212,6 +212,8 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/Dynamics/btSimpleDynamicsWorld.cpp			 \
 	BulletDynamics/Dynamics/btSimpleDynamicsWorld.h				 \
 	BulletDynamics/Dynamics/Bullet-C-API.cpp				 \
+	BulletDynamics/Vehicle/btKart.cpp					 \
+	BulletDynamics/Vehicle/btKart.h						 \
 	BulletDynamics/Vehicle/btRaycastVehicle.cpp				 \
 	BulletDynamics/Vehicle/btRaycastVehicle.h				 \
 	BulletDynamics/Vehicle/btVehicleRaycaster.h				 \

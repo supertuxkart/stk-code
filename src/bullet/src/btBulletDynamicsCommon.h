@@ -39,6 +39,7 @@ subject to the following restrictions:
 
 ///Vehicle simulation, with wheel contact simulated by raycasts
 #include "BulletDynamics/Vehicle/btRaycastVehicle.h"
+#include "BulletDynamics/Vehicle/btKart.h"
 
 
 
