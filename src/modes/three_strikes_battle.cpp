@@ -21,6 +21,7 @@
 
 #include <string>
 
+//-----------------------------------------------------------------------------
 ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
     TimedRace::setClockMode(CHRONO);
@@ -46,13 +47,12 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         m_kart[n]->setPosition(-1);
     }// next kart
 }
-
+//-----------------------------------------------------------------------------
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     delete[] m_kart_display_info;
 }
-
-
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::onGo()
 {
     // Reset the brakes now that the prestart 
@@ -63,11 +63,12 @@ void ThreeStrikesBattle::onGo()
         m_kart[i]->resetBrakes();
     }
 }
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::terminateRace()
 {
     World::terminateRace();
 }
-
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
     assert(kart_id >= 0);
@@ -84,10 +85,12 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     if(getCurrentNumKarts()==2)  
         sound_manager->switchToFastMusic();
 }
+//-----------------------------------------------------------------------------
 std::string ThreeStrikesBattle::getInternalCode() const
 {
     return "BATTLE_3_STRIKES";
 }
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::update(float delta)
 {
     World::update(delta);
@@ -104,6 +107,7 @@ void ThreeStrikesBattle::update(float delta)
         return;
     }
 }
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()
 {
     World::restartRace();
@@ -116,7 +120,7 @@ void ThreeStrikesBattle::restartRace()
     }// next kart
 }
 //void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
-
+//-----------------------------------------------------------------------------
 KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* caller)
 {
     const unsigned int kart_amount = race_manager->getNumKarts();
@@ -159,7 +163,7 @@ KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* call
     
     return m_kart_display_info;
 }
-
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     // find closest point to drop kart on
@@ -202,4 +206,15 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     
     body->setCenterOfMassTransform(pos);
     
+}
+//-----------------------------------------------------------------------------
+void ThreeStrikesBattle::raceResultOrder( int* order )
+{
+    // FIXME - implement properly
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+
+    for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
+    {
+        order[kart_id]     = kart_id;
+    }
 }

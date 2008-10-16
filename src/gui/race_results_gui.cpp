@@ -40,10 +40,7 @@ RaceResultsGUI::RaceResultsGUI()
     network_manager->beginRaceResultBarrier();
     Widget *bottom_of_list;
 
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        bottom_of_list = displayLeaderResults();
-    else
-        bottom_of_list = displayRaceResults();
+    bottom_of_list = displayRaceResults();
 
     // If it's a server, the user can only select 'ok', since the
     // server does all the game mode selection etc.
@@ -89,6 +86,7 @@ RaceResultsGUI::RaceResultsGUI()
 }   // RaceResultsGUI
 
 // ----------------------------------------------------------------------------
+#if 0
 Widget *RaceResultsGUI::displayLeaderResults()
 {
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -138,6 +136,7 @@ Widget *RaceResultsGUI::displayLeaderResults()
     delete []race_time;
     return w_prev;
 }   // displayLeaderResults
+#endif
 // ----------------------------------------------------------------------------
 
 Widget *RaceResultsGUI::displayRaceResults()
@@ -145,25 +144,25 @@ Widget *RaceResultsGUI::displayRaceResults()
     Widget *w_prev=widget_manager->addTextWgt( WTOK_RESULTS, 5, 7, _("Race results") );
     widget_manager->hideWgtRect(WTOK_RESULTS);
     w_prev->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
-
+    
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
 
     int*  order = new int [NUM_KARTS];
+    RaceManager::getWorld()->raceResultOrder( order );
+    
     unsigned int max_name_len = 1;
 
     for(unsigned int i=0; i < NUM_KARTS; i++)
     {
         Kart *k = RaceManager::getKart(i);             // Display even for eliminated karts!
-        order[k->getPosition()-1] = i;
         const std::string& s = k->getName();
         unsigned int l = (unsigned int)s.size();
         if(l>max_name_len) max_name_len = l;
     }   // for i
 
     // save bottom of result list for later
-    Widget *bottom_of_list=displayKartList(0, NUM_KARTS-1, w_prev, 
-                                          order, /*displayTime*/ true, 0.1f);
+    Widget *bottom_of_list=displayKartList(w_prev, order, 0.1f);
 
     delete[] order;
     
@@ -203,14 +202,18 @@ Widget *RaceResultsGUI::displayRaceResults()
 }  // displayRaceResults
 
 //-----------------------------------------------------------------------------
-Widget *RaceResultsGUI::displayKartList(unsigned int from, unsigned int to, 
-                                        Widget *w_prev, int *order, 
-                                        bool display_time, float horizontal)
+Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizontal)
 {
+    const bool display_time = RaceManager::getWorld()->getClockMode() == CHRONO;
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    
     const int MAX_STR_LEN=60;
-    char *score = new char[(to-from+1) * MAX_STR_LEN];
-    for(unsigned int i = from; i <= to; ++i)
+    char *score = new char[NUM_KARTS * MAX_STR_LEN];
+    int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
+    for(unsigned int i = 0; i < NUM_KARTS; ++i)
     {
+        if(order[i] == -1) continue;
+        
         const Kart *KART = RaceManager::getKart(order[i]);
         const std::string& KART_NAME = KART->getName();
         char sTime[20];sTime[0]=0;
@@ -232,19 +235,21 @@ Widget *RaceResultsGUI::displayKartList(unsigned int from, unsigned int to,
                     KART->getPosition(), KART_NAME.c_str(), sTime);
         }
 
-        Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + i, 7, 7,
+        Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + kart_id, 7, 7,
                                        KART->getKartProperties()->getIconFile() );
-        widget_manager->deactivateWgt(WTOK_FIRST_IMAGE+i);
+        widget_manager->deactivateWgt(WTOK_FIRST_IMAGE+kart_id);
 
         image->setPosition(WGT_DIR_FROM_LEFT, horizontal, NULL, 
                            WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
-        Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + i, 5, 7,
+        Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + kart_id, 5, 7,
                                              (char*)(score + MAX_STR_LEN * i) );
         w->setPosition(WGT_DIR_RIGHT_WIDGET, 0.1f, image,
                        WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
         w_prev=w;
+        
+        kart_id++;
     }
-    widget_manager->sameWidth(WTOK_FIRST_RESULT+from, WTOK_FIRST_RESULT+to);
+    widget_manager->sameWidth(WTOK_FIRST_RESULT, WTOK_FIRST_RESULT+kart_id-1);
     return w_prev;
 }   // displayKartList
 

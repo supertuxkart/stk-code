@@ -425,6 +425,14 @@ void LinearWorld::terminateRace()
         }  // if !hasFinishedRace
     }   // for i
 }
+void LinearWorld::raceResultOrder( int* order )
+{
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    for(unsigned int i=0; i < NUM_KARTS; i++)
+    {
+        order[RaceManager::getKart(i)->getPosition()-1] = i; // even for eliminated karts
+    }
+}
 //-----------------------------------------------------------------------------
 float LinearWorld::estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info)
 {

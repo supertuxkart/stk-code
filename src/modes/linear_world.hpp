@@ -85,8 +85,11 @@ public:
     virtual void    terminateRace();
     virtual void    restartRace();
     
-    
     virtual bool raceHasLaps(){ return true; }
+    
+    /** Called by the race result GUI at the end of the race to know the final order
+        (fill in the 'order' array) */
+    virtual void raceResultOrder( int* order );
 };
 
 #endif

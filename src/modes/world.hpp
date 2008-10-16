@@ -192,6 +192,10 @@ public:
     /** Called when a kart was hit by a projectile
      */
     virtual void kartHit(const int kart_id) {};
+    
+    /** Called by the race result GUI at the end of the race to know the final order
+        (fill in the 'order' array) */
+    virtual void raceResultOrder( int* order ) = 0;
 };
 
 #endif

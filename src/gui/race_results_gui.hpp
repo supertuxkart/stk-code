@@ -49,11 +49,8 @@ private:
     /** The widget selected by the user, so that the right action can be done
      *  once clients and server are synchronised. */
     WidgetTokens     m_selected_widget;
-    Widget          *displayLeaderResults();
     Widget          *displayRaceResults();
-    Widget          *displayKartList(unsigned int from, unsigned int to,
-                                     Widget *w_prev, int *order, bool display_time,
-                                     float horizontal);
+    Widget          *displayKartList(Widget *w_prev, int *order, float horizontal);
 public:
                      RaceResultsGUI();
                     ~RaceResultsGUI();

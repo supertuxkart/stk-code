@@ -106,6 +106,7 @@ void FollowTheLeaderRace::terminateRace()
     LinearWorld::terminateRace();
 }
 
+
 #if 0
 #pragma mark -
 #pragma mark overridden from World
@@ -133,4 +134,46 @@ KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* cal
     LinearWorld::getKartsDisplayInfo(caller);
     m_kart_display_info[0].special_title = _("Leader");
     return m_kart_display_info;
+}
+//-----------------------------------------------------------------------------
+
+void FollowTheLeaderRace::raceResultOrder( int* order )
+{
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    
+    int *scores       = new int[NUM_KARTS];
+    double *race_time = new double[NUM_KARTS];
+    
+    // Ignore kart 0, since it was the leader
+    order[0] = -1;
+    for( unsigned int kart_id = 1; kart_id < NUM_KARTS; ++kart_id )
+    {
+        order[kart_id]     = kart_id;
+        scores[kart_id]    = race_manager->getKartScore(kart_id);
+        race_time[kart_id] = race_manager->getOverallTime(kart_id);
+    }
+    
+    //Bubblesort
+    bool sorted;
+    do
+    {
+        sorted = true;
+        for( unsigned int i = 1; i < NUM_KARTS - 1; ++i )
+        {
+            if( scores[order[i]] < scores[order[i+1]] || 
+                (scores[order[i]] == scores[order[i+1]] 
+                 && race_time[order[i]] > race_time[order[i+1]]) )
+            {
+                int tmp     = order[i];
+                order[i]    = order[i+1];
+                order[i+1]  = tmp;
+                sorted      = false;
+            }
+        }
+    } while(!sorted);
+    for(unsigned int i=1; i<NUM_KARTS; i++)
+        RaceManager::getKart(order[i])->setPosition(i);
+    
+    delete []scores;
+    delete []race_time;
 }
