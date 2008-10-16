@@ -10,6 +10,8 @@
 		95065F6A0E9127B800B2C509 /* race_result_message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95065F690E9127B700B2C509 /* race_result_message.cpp */; };
 		9519653D0E8C592F001BB888 /* linear_world.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9519653B0E8C592F001BB888 /* linear_world.hpp */; };
 		9519653E0E8C592F001BB888 /* linear_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9519653C0E8C592F001BB888 /* linear_world.cpp */; };
+		952A48440EA6C3690022262C /* btKart.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 952A48420EA6C3690022262C /* btKart.h */; };
+		952A48450EA6C3690022262C /* btKart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A48430EA6C3690022262C /* btKart.cpp */; };
 		957A12BE0EA4271500E46BFD /* three_strikes_battle.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 957A12BC0EA4271500E46BFD /* three_strikes_battle.hpp */; };
 		957A12BF0EA4271500E46BFD /* three_strikes_battle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957A12BD0EA4271500E46BFD /* three_strikes_battle.cpp */; };
 		95F0F25A0E85C054005F6693 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = 95923F8B0E808EDC00388BDC /* callbacks.c */; };
@@ -255,6 +257,7 @@
 				95F0F3830E85C76B005F6693 /* world.hpp in CopyFiles */,
 				9519653D0E8C592F001BB888 /* linear_world.hpp in CopyFiles */,
 				957A12BE0EA4271500E46BFD /* three_strikes_battle.hpp in CopyFiles */,
+				952A48440EA6C3690022262C /* btKart.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -264,6 +267,8 @@
 		95065F690E9127B700B2C509 /* race_result_message.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = race_result_message.cpp; sourceTree = "<group>"; };
 		9519653B0E8C592F001BB888 /* linear_world.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = linear_world.hpp; path = modes/linear_world.hpp; sourceTree = "<group>"; };
 		9519653C0E8C592F001BB888 /* linear_world.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = linear_world.cpp; path = modes/linear_world.cpp; sourceTree = "<group>"; };
+		952A48420EA6C3690022262C /* btKart.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = btKart.h; sourceTree = "<group>"; };
+		952A48430EA6C3690022262C /* btKart.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = btKart.cpp; sourceTree = "<group>"; };
 		956F3FAB0E85BE0E006F93B0 /* random_generator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = random_generator.cpp; sourceTree = "<group>"; };
 		956F3FAC0E85BE0E006F93B0 /* random_generator.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = random_generator.hpp; sourceTree = "<group>"; };
 		956F3FAD0E85BE0E006F93B0 /* ssg_help.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ssg_help.cpp; sourceTree = "<group>"; };
@@ -1482,6 +1487,8 @@
 				95923F390E808EDB00388BDC /* btVehicleRaycaster.h */,
 				95923F3A0E808EDB00388BDC /* btWheelInfo.cpp */,
 				95923F3B0E808EDB00388BDC /* btWheelInfo.h */,
+				952A48420EA6C3690022262C /* btKart.h */,
+				952A48430EA6C3690022262C /* btKart.cpp */,
 			);
 			path = Vehicle;
 			sourceTree = "<group>";
@@ -2343,6 +2350,7 @@
 				9519653E0E8C592F001BB888 /* linear_world.cpp in Sources */,
 				95065F6A0E9127B800B2C509 /* race_result_message.cpp in Sources */,
 				957A12BF0EA4271500E46BFD /* three_strikes_battle.cpp in Sources */,
+				952A48450EA6C3690022262C /* btKart.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
