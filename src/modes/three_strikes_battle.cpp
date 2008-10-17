@@ -72,7 +72,7 @@ void ThreeStrikesBattle::terminateRace()
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
     assert(kart_id >= 0);
-    assert(kart_id < m_kart.size());
+    assert(kart_id < (int)m_kart.size());
     
     // make kart lose a life
     m_kart_info[kart_id].m_lives --;
@@ -140,7 +140,7 @@ KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* call
                 break;
             case 2:
                 rank_info.r = 1.0;
-                rank_info.g = 0.9;
+                rank_info.g = 0.9f;
                 rank_info.b = 0.0;
                 break;
             case 1:
@@ -172,15 +172,15 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     
     int smallest_distance_found = -1, closest_id_found = -1;
     
-    const int kart_x = kart->getXYZ()[0];
-    const int kart_y = kart->getXYZ()[1];
+    const int kart_x = (int)(kart->getXYZ()[0]);
+    const int kart_y = (int)(kart->getXYZ()[1]);
     
     for(int n=0; n<start_spots_amount; n++)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
-        const int dist_n = abs(kart_x - RaceManager::getTrack()->m_start_positions[n][0]) +
-                           abs(kart_y - RaceManager::getTrack()->m_start_positions[n][1]);
+        const int dist_n = abs((int)(kart_x - RaceManager::getTrack()->m_start_positions[n][0])) +
+                           abs((int)(kart_y - RaceManager::getTrack()->m_start_positions[n][1]));
         if(dist_n < smallest_distance_found || closest_id_found == -1)
         {
             closest_id_found = n;
