@@ -82,8 +82,11 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         removeKart(kart_id);
     
     // almost over, use fast music
-    if(getCurrentNumKarts()==2)  
+    if(getCurrentNumKarts()==2 && m_faster_music_active==false)  
+    {
         sound_manager->switchToFastMusic();
+        m_faster_music_active = true;
+    }
 }
 //-----------------------------------------------------------------------------
 std::string ThreeStrikesBattle::getInternalCode() const
@@ -99,11 +102,12 @@ void ThreeStrikesBattle::update(float delta)
     if(getCurrentNumKarts()==1 || getCurrentNumPlayers()==0)
     {
         // Add the results for the remaining kart
-        for(int i=1; i<(int)race_manager->getNumKarts(); i++)
+        for(int i=0; i<(int)race_manager->getNumKarts(); i++)
             if(!m_kart[i]->isEliminated()) 
-                race_manager->RaceFinished(m_kart[i], -1);
+                race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
     
-        TimedRace::enterRaceOverState();
+        if(!RaceManager::getWorld()->isFinishPhase())
+            TimedRace::enterRaceOverState();
         return;
     }
 }
@@ -117,6 +121,9 @@ void ThreeStrikesBattle::restartRace()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         m_kart_info[n].m_lives         = 3;
+        
+        // no positions in this mode
+        m_kart[n]->setPosition(-1);
     }// next kart
 }
 //void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
@@ -216,5 +223,6 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
     for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
     {
         order[kart_id]     = kart_id;
+        m_kart[kart_id]->setPosition(kart_id+1);
     }
 }

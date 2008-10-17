@@ -86,58 +86,6 @@ RaceResultsGUI::RaceResultsGUI()
 }   // RaceResultsGUI
 
 // ----------------------------------------------------------------------------
-#if 0
-Widget *RaceResultsGUI::displayLeaderResults()
-{
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
-
-    int *scores       = new int[NUM_KARTS];
-    int *order        = new int[NUM_KARTS];
-    double *race_time = new double[NUM_KARTS];
-
-    // Ignore kart 0, since it was the leader
-    for( unsigned int kart_id = 1; kart_id < NUM_KARTS; ++kart_id )
-    {
-        order[kart_id]  = kart_id;
-        scores[kart_id]    = race_manager->getKartScore(kart_id);
-        race_time[kart_id] = race_manager->getOverallTime(kart_id);
-    }
-
-    //Bubblesort
-    bool sorted;
-    do
-    {
-        sorted = true;
-        for( unsigned int i = 1; i < NUM_KARTS - 1; ++i )
-        {
-            if( scores[order[i]] < scores[order[i+1]] || 
-                (scores[order[i]] == scores[order[i+1]] 
-                 && race_time[order[i]] > race_time[order[i+1]]) )
-            {
-                int tmp     = order[i];
-                order[i]    = order[i+1];
-                order[i+1]  = tmp;
-                sorted      = false;
-            }
-        }
-    } while(!sorted);
-    for(unsigned int i=1; i<NUM_KARTS; i++)
-        RaceManager::getKart(order[i])->setPosition(i);
-
-    Widget *w_prev=widget_manager->addTextWgt( WTOK_RESULTS, 5, 7, _("Race results") );
-    widget_manager->hideWgtRect(WTOK_RESULTS);
-    w_prev->setPosition(WGT_DIR_CENTER, 0.0f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
-
-    w_prev = displayKartList(1, NUM_KARTS-1, w_prev, order,
-                            /* display time*/ false, 0.3f);
-
-    delete []order;
-    delete []scores;
-    delete []race_time;
-    return w_prev;
-}   // displayLeaderResults
-#endif
-// ----------------------------------------------------------------------------
 
 Widget *RaceResultsGUI::displayRaceResults()
 {
