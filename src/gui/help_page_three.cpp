@@ -71,9 +71,9 @@ most points wins (shortest time in case of a tie!)          "));
     if(!unlock_manager->isLocked("followleader"))
     {
         widget_manager->addTextWgt( WTOK_TXT4, 100, 15,
-            _("Follow the leader: Stay behind the leader kart.                 \n\
-When the countdown reaches zero, a kart ahead\n\
-of the leader or the last kart is eliminated."));
+            _("Follow the leader: run for second place, as first ahead leader, \n\
+or last in race track if none ahead, will be disqualified\n\
+every time the counter hits zero"));
         widget_manager->setWgtTextSize( WTOK_TXT4, WGT_FNT_SML );
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 13 );
     }
