@@ -26,13 +26,6 @@ float Homing::m_st_max_distance;
 float Homing::m_st_max_distance_squared;
 float Homing::m_st_max_turn_angle;
 
-// -----------------------------------------------------------------------------
-/** A homing missile is handled as a kinematic object, since this simplifies
- *  computation of turning (otherwise rotational forces would have to be 
- *  applied). As a result, the mass must be zero, and linear velocity of the
- *  body can not be set (asserts in bullet). So this object implements its
- *  own setting/getting of velocity, to be able to use flyables functions.
- */
 Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
 {
     m_target = NULL;
