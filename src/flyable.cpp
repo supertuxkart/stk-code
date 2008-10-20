@@ -146,15 +146,14 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         if(inFrontOf != NULL)
         {
             // Ignore karts behind the current one
-            // FIXME - needs an implementation that doesn't rely on drivelines
-            LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
-            if(lworld != NULL)
-            {
-                float distance = lworld->getDistanceDownTrackForKart( kart->getWorldKartId() ) -
-                                 lworld->getDistanceDownTrackForKart( inFrontOf->getWorldKartId() );
-                if(distance<0) distance += RaceManager::getTrack()->getTrackLength();
-                if(distance > 50){ continue; }
-            }
+            btVector3 to_target = inFrontOf->getXYZ()-kart->getXYZ();
+            const float distance = to_target.length();
+            if(distance > 50) continue; // kart too far, don't aim at it
+            
+            float angle = to_target.angle(-inFrontOf->getVelocity());
+            
+            if(fabsf(angle) > 1) continue;
+            
         }
         
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
