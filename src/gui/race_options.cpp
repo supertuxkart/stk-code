@@ -75,38 +75,44 @@ RaceOptions::RaceOptions()
 
     // Difficulty
     // ==========
-    widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, DESC_WIDTH, 7, _("Difficulty") );
-    widget_manager->hideWgtRect(WTOK_DIFFICULTY_TITLE);
-    widget_manager->setWgtTextSize(WTOK_DIFFICULTY_TITLE, WGT_FNT_LRG);
-    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, " < " );
-
-    widget_manager->addTextWgt( WTOK_DIFFICULTY, ITEM_WIDTH, 7, getDifficultyString(m_difficulty));
-    widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );
-    widget_manager->showWgtBorder( WTOK_DIFFICULTY );
-    widget_manager->hideWgtRect( WTOK_DIFFICULTY );
-
-    widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 3, 7, " > " );
-
-    widget_manager->breakLine();
-
-    // Number of karts
-    // ===============
-    widget_manager->addTextWgt( WTOK_KARTS_TITLE, DESC_WIDTH, 7, _("Number of karts") );
-    widget_manager->hideWgtRect(WTOK_KARTS_TITLE);
-    widget_manager->setWgtTextSize(WTOK_KARTS_TITLE, WGT_FNT_LRG);
-    widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, " < " );
-
-    char string_num_karts[MAX_MESSAGE_LENGTH];
-    snprintf(string_num_karts, MAX_MESSAGE_LENGTH, "%d", m_num_karts);
-    widget_manager->addTextWgt( WTOK_KARTS, ITEM_WIDTH, 7, string_num_karts );
-    widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
-    widget_manager->showWgtBorder( WTOK_KARTS );
-    widget_manager->hideWgtRect( WTOK_KARTS );
-
-    widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 3, 7, " > " );
-
-    widget_manager->breakLine();
-
+    // if there is no AI, no point asking for its difficulty...
+    // There's also no point asking the player for the amount of karts
+    // since tt will always be the same as the number of human players
+    if(!RaceManager::isBattleMode( race_manager->getMinorMode() ))
+    {
+        widget_manager->addTextWgt( WTOK_DIFFICULTY_TITLE, DESC_WIDTH, 7, _("Difficulty") );
+        widget_manager->hideWgtRect(WTOK_DIFFICULTY_TITLE);
+        widget_manager->setWgtTextSize(WTOK_DIFFICULTY_TITLE, WGT_FNT_LRG);
+        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_DOWN, 3, 7, " < " );
+        
+        widget_manager->addTextWgt( WTOK_DIFFICULTY, ITEM_WIDTH, 7, getDifficultyString(m_difficulty));
+        widget_manager->setWgtBorderPercentage( WTOK_DIFFICULTY, 10 );
+        widget_manager->showWgtBorder( WTOK_DIFFICULTY );
+        widget_manager->hideWgtRect( WTOK_DIFFICULTY );
+        
+        widget_manager->addTextButtonWgt( WTOK_DIFFICULTY_UP, 3, 7, " > " );
+        
+        widget_manager->breakLine();
+        
+        // Number of karts
+        // ===============
+        widget_manager->addTextWgt( WTOK_KARTS_TITLE, DESC_WIDTH, 7, _("Number of karts") );
+        widget_manager->hideWgtRect(WTOK_KARTS_TITLE);
+        widget_manager->setWgtTextSize(WTOK_KARTS_TITLE, WGT_FNT_LRG);
+        widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, " < " );
+        
+        char string_num_karts[MAX_MESSAGE_LENGTH];
+        snprintf(string_num_karts, MAX_MESSAGE_LENGTH, "%d", m_num_karts);
+        widget_manager->addTextWgt( WTOK_KARTS, ITEM_WIDTH, 7, string_num_karts );
+        widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
+        widget_manager->showWgtBorder( WTOK_KARTS );
+        widget_manager->hideWgtRect( WTOK_KARTS );
+        
+        widget_manager->addTextButtonWgt( WTOK_KARTS_UP, 3, 7, " > " );
+        
+        widget_manager->breakLine();
+    }
+    
     // Number of laps
     // ==============
     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX   &&
@@ -146,6 +152,11 @@ RaceOptions::RaceOptions()
     
     // Select 'start' by default.
     widget_manager->setSelectedWgt( WTOK_START );
+    
+    // hack. in battle mode this screen is totally useless. so I'm calling 'select'
+    // to select the start button, so the screen is entirely skipped (FIXME - find cleaner way)
+    if(RaceManager::isBattleMode( race_manager->getMinorMode() )) select();
+        
 }   // RaceOptions
 
 //-----------------------------------------------------------------------------
@@ -268,7 +279,13 @@ void RaceOptions::select()
             race_manager->setDifficulty( RaceManager::RD_EASY );
         }
 
-        race_manager->setNumKarts(m_num_karts);
+        // if there is no AI, there's no point asking the player for the amount of karts.
+        // It will always be the same as the number of human players
+        if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
+            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+        else
+            race_manager->setNumKarts(m_num_karts);
+            
 
         if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
             RaceManager::modeHasLaps( race_manager->getMinorMode() )    )

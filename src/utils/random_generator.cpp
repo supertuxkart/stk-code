@@ -28,6 +28,7 @@ RandomGenerator::RandomGenerator()
     m_a = 1103515245;
     m_c = 12345;    
     m_all_random_generators.push_back(this);
+    m_random_value = 3141591;
 }   // RandomGenerator
 
 // ----------------------------------------------------------------------------
@@ -62,7 +63,7 @@ void RandomGenerator::seed(int s)
 int RandomGenerator::get(int n)
 {
     m_random_value = m_random_value*m_a+m_c;
-    return m_random_value % n;
+    return (m_random_value >> 8) % n;
 }   // get
 
 // ----------------------------------------------------------------------------
