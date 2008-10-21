@@ -337,8 +337,9 @@ void World::updateHighscores()
             continue;
         }
         
-        // Only record times for player karts
-        if(!m_kart[index[pos]]->isPlayerKart()) continue;
+        // Only record times for player karts and only if they finished the race
+        if(!m_kart[index[pos]]->isPlayerKart()) continue; 
+        if (!m_kart[index[pos]]->hasFinishedRace()) continue;
 
         PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
 
