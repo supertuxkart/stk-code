@@ -84,6 +84,12 @@ GameMode::GameMode()
     w_prev=w;
     widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_3_STRIKES_SINGLE);
 
+    // don't activate battle mode in single-player mode
+    if(race_manager->getNumLocalPlayers()==1)
+        widget_manager->deactivateWgt(WTOK_3_STRIKES_SINGLE);
+    else
+        widget_manager->activateWgt(WTOK_3_STRIKES_SINGLE);
+    
     // Then the GPs
     // ============
     w=widget_manager->addTextWgt(WTOK_TITLE_GP, WIDTH,
