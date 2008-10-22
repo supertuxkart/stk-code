@@ -84,7 +84,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     assert(kart_id < (int)m_kart.size());
     
     // make kart lose a life
-    m_kart_info[kart_id].m_lives -= 3;
+    m_kart_info[kart_id].m_lives--;
     
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
