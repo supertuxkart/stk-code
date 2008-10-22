@@ -3,8 +3,8 @@
 (supertuxkart-grand-prix
  (name _("All tracks"))
  (description _("All tracks included in SuperTuxKart"))
- (tracks "beach" "startrack" "lighthouse" "jungle" "volcano" "islandtrack" "sandtrack" "fortmagma" "snowtuxpeak" "crescentcrossing" "olivermath" "race" "city" "canyon" "subseatrack" "tuxtrack")
- (laps      2         3            4          3        3           2             3           3            3              2               4         5     2       2          3            2)
+ (tracks "beach" "startrack" "lighthouse" "jungle" "volcano" "islandtrack" "sandtrack" "fortmagma" "snowtuxpeak" "crescentcrossing" "olivermath" "racetrack" "city" "canyon" "subseatrack" "tuxtrack")
+ (laps      2         3            4          3        3           2             3           3            3              2               4            3        2       2          3            2)
 )
 
 ;; EOF ;;
