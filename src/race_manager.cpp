@@ -354,6 +354,9 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
         if(pos<=0) pos=stk_config->m_max_karts;
     }
 
+    assert(pos-1 >= 0);
+    assert(pos-1 < m_kart_status.size());
+
     m_kart_status[i].m_score        += m_score_for_position[pos-1];
     m_kart_status[i].m_last_score    = m_score_for_position[pos-1];
     m_kart_status[i].m_overall_time += time;

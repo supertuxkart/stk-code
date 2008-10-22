@@ -25,6 +25,7 @@
 ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
     TimedRace::setClockMode(CHRONO);
+    m_use_highscores = false;
     
     // FIXME - disable AI karts in the GUI
     if(race_manager->getNumKarts() > race_manager->getNumPlayers())
@@ -66,6 +67,14 @@ void ThreeStrikesBattle::onGo()
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::terminateRace()
 {
+    // give a fake rank to each kart to avoid crashes
+    // FIXME - implement properly, and don't duplicate like now
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
+    {
+        m_kart[kart_id]->setPosition(kart_id+1);
+    }
+    
     World::terminateRace();
 }
 //-----------------------------------------------------------------------------
@@ -75,11 +84,21 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     assert(kart_id < (int)m_kart.size());
     
     // make kart lose a life
-    m_kart_info[kart_id].m_lives --;
+    m_kart_info[kart_id].m_lives -= 3;
     
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
+    {
+        // give a fake rank to each kart to avoid crashes
+        // FIXME - implement properly, and don't duplicate like now
+        const unsigned int NUM_KARTS = race_manager->getNumKarts();
+        for( unsigned int n = 0; n < NUM_KARTS; ++n )
+        {
+            m_kart[n]->setPosition(n+1);
+        }
+        
         removeKart(kart_id);
+    }
     
     // almost over, use fast music
     if(getCurrentNumKarts()==2 && m_faster_music_active==false)  
@@ -217,7 +236,8 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::raceResultOrder( int* order )
 {
-    // FIXME - implement properly
+    // give fake rank to karts
+    // FIXME - implement properly, and don't duplicate like now
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
 
     for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )

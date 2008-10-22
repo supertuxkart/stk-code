@@ -316,7 +316,12 @@ void World::updateHighscores()
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[i] = 999; // first reset the contents of the array
-        index[m_kart[i]->getPosition()-1] = i;
+    }
+    for (unsigned int i=0; i<kart_amount; i++ )
+    {
+        const int pos = m_kart[i]->getPosition()-1;
+        if(pos < 0 || pos >= kart_amount) continue; // wrong position
+        index[pos] = i;
     }
 
     for(unsigned int pos=0; pos<kart_amount; pos++)
@@ -341,6 +346,8 @@ void World::updateHighscores()
         if(!m_kart[index[pos]]->isPlayerKart()) continue; 
         if (!m_kart[index[pos]]->hasFinishedRace()) continue;
 
+        assert(index[pos] >= 0);
+        assert(index[pos] < m_kart.size());
         PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
 
         HighscoreEntry* highscores = getHighscores();
