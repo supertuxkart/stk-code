@@ -27,7 +27,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
     TimedRace::setClockMode(CHRONO);
     m_use_highscores = false;
     
-    // FIXME - disable AI karts in the GUI
+    // check for possible problems if AI karts were incorrectly added
     if(race_manager->getNumKarts() > race_manager->getNumPlayers())
     {
         fprintf(stderr, "No AI exists for this game mode");
@@ -114,7 +114,7 @@ std::string ThreeStrikesBattle::getInternalCode() const
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::updateKartRanks()
 {
-    // sort karts by their times then give eacg one its position.
+    // sort karts by their times then give each one its position.
     // in battle-mode, long time = good (meaning he survived longer)
     
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -137,9 +137,8 @@ void ThreeStrikesBattle::updateKartRanks()
             
             // if next kart survived longer...
             if( next_karts_time > this_karts_time) swap = true;
-            // if next has more lives...
-            else if(!m_kart[n]->hasFinishedRace() && !m_kart[karts_list[n+1]]->hasFinishedRace() &&
-                    m_kart_info[karts_list[n+1]].m_lives > m_kart_info[karts_list[n]].m_lives) swap = true;
+            // if next kart has more lives...
+            else if(m_kart_info[karts_list[n+1]].m_lives > m_kart_info[karts_list[n]].m_lives) swap = true;
 
             if(swap)
             {
