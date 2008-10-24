@@ -119,7 +119,7 @@ void ThreeStrikesBattle::updateKartRanks()
     
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
     
-    int karts_list[NUM_KARTS];
+    int *karts_list = new int[NUM_KARTS];
     for( unsigned int n = 0; n < NUM_KARTS; ++n ) karts_list[n] = n;
     
     bool sorted=false;
@@ -149,12 +149,13 @@ void ThreeStrikesBattle::updateKartRanks()
                 break;
             }
         }
-    }while(!sorted);
+    } while(!sorted);
     
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
         m_kart[ karts_list[n] ]->setPosition( n+1 );
     }
+    delete [] karts_list;
 }
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::update(float delta)
