@@ -25,6 +25,7 @@
 #include "translation.hpp"
 #include "user_config.hpp"
 #include "unlock_manager.hpp"
+#include "network/network_manager.hpp"
 
 enum WidgetTokens
 {
@@ -85,7 +86,8 @@ GameMode::GameMode()
     widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_3_STRIKES_SINGLE);
 
     // don't activate battle mode in single-player mode
-    if(race_manager->getNumLocalPlayers()==1)
+    if(race_manager->getNumLocalPlayers()==1 && 
+        network_manager->getMode()==NetworkManager::NW_NONE)
         widget_manager->deactivateWgt(WTOK_3_STRIKES_SINGLE);
     else
         widget_manager->activateWgt(WTOK_3_STRIKES_SINGLE);
