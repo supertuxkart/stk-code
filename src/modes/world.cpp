@@ -320,7 +320,7 @@ void World::updateHighscores()
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         const int pos = m_kart[i]->getPosition()-1;
-        if(pos < 0 || pos >= kart_amount) continue; // wrong position
+        if(pos < 0 || pos >= (int)kart_amount) continue; // wrong position
         index[pos] = i;
     }
 
