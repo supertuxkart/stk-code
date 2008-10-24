@@ -24,9 +24,6 @@ Damien
 Maik Semder (Ikework)
 - Bug fixes
 
-Marianne Gagnon (Auria)
-- Bug fixes
-
 Patrick Ammann
 - OpenAL support
 - Bug fixes
@@ -71,6 +68,7 @@ Thomas Oppl
 - 'Canyon' track
 - 'City' track
 - New 'racetrack' track
+- New banana model
 
 Christian Framing 
 - Updated EvilTux kart
