@@ -25,7 +25,8 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
                : Message(Message::MT_RACE_INFO) 
 {
     const GrandPrixData *cup=NULL;
-    int len = 3*getCharLength()  // major, minor, difficulty
+    int len = 2*getCharLength()  // major, difficulty
+            + getIntLength()     // minor - which is too big for a char/short!
             + getCharLength();   // num karts
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -51,7 +52,7 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
 
     allocate(len);
     addChar(race_manager->getMajorMode() );
-    addChar(race_manager->getMinorMode() );
+    addInt (race_manager->getMinorMode() );
     addChar(race_manager->getDifficulty());
     addChar(race_manager->getNumKarts()  );
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -78,9 +79,9 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
 RaceInfoMessage::RaceInfoMessage(ENetPacket* pkt):Message(pkt, MT_RACE_INFO)
 {
     race_manager->setMajorMode ( RaceManager::MajorRaceModeType(getChar()) );
-    race_manager->setMinorMode ( RaceManager::MinorRaceModeType(getChar()) );
-    race_manager->setDifficulty( RaceManager::Difficulty  (getChar()) );
-    race_manager->setNumKarts  ( getChar()                            );
+    race_manager->setMinorMode ( RaceManager::MinorRaceModeType(getInt())  );
+    race_manager->setDifficulty( RaceManager::Difficulty  (getChar())      );
+    race_manager->setNumKarts  ( getChar()                                 );
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         const GrandPrixData *cup = grand_prix_manager->getGrandPrix(getString());
