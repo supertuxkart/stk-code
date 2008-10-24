@@ -102,14 +102,14 @@ NetworkGUI::~NetworkGUI()
 void NetworkGUI::select()
 {
     const int selected = widget_manager->getSelectedWgt();
-	switch (selected)
-	{
-		case WTOK_SERVER_ADDRESS:
-			// Switch to typing in the address of the server
-			widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
+    switch (selected)
+    {
+        case WTOK_SERVER_ADDRESS:
+            // Switch to typing in the address of the server
+            widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
             inputDriver->setMode(SDLDriver::LOWLEVEL);
-        	break;
-		case WTOK_CONNECT:
+            break;
+        case WTOK_CONNECT:
             // If we could connect here, no message could be displayed since
             // glflush isn't called. So we only set a message for the network
             // manager to display, and set the state so that the actual
@@ -119,6 +119,7 @@ void NetworkGUI::select()
             widget_manager->resizeWgtToText(WTOK_MESSAGE);
             widget_manager->showWgt(WTOK_MESSAGE);
             widget_manager->hideWgt(WTOK_CONNECT, WTOK_SERVER_ADDRESS);
+            widget_manager->hideWgt(WTOK_QUIT);
             break;
         case WTOK_SERVER:
             network_manager->becomeServer();
@@ -135,17 +136,17 @@ void NetworkGUI::select()
             switchToWaitForConnectionMode();
             break;
         case WTOK_QUIT:
-            // Don't do networking if no clients are connected
-            if(network_manager->getNumClients()==0)
-                network_manager->setMode(NetworkManager::NW_NONE);
             // Disable accepting of clients
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
                 network_manager->setState(NetworkManager::NS_MAIN_MENU);
-			// Leave menu.
+            // Don't do networking if no clients are connected
+            if(network_manager->getNumClients()==0)
+                network_manager->disableNetworking();
+            // Leave menu.
             menu_manager->popMenu();
-		
-			break;
-	}
+
+            break;
+    }
 }   // select
 
 //-----------------------------------------------------------------------------
@@ -177,12 +178,13 @@ void NetworkGUI::update(float dt)
         {
             widget_manager->setWgtText(WTOK_MESSAGE, _("Can't connect to server"));
             widget_manager->resizeWgtToText(WTOK_MESSAGE);
+            widget_manager->showWgt(WTOK_QUIT);
             network_manager->disableNetworking();
         }
         else
         {
             network_manager->sendConnectMessage();
-	        menu_manager->popMenu();
+            menu_manager->popMenu();
         }
         m_state=NGS_NONE;
     }
@@ -205,60 +207,60 @@ void NetworkGUI::update(float dt)
 //-----------------------------------------------------------------------------
 void NetworkGUI::inputKeyboard(SDLKey key, int unicode)
 {
-	switch (key)
-	{
-	case SDLK_RSHIFT:
-	case SDLK_LSHIFT:
-		// Ignore shift, otherwise shift will disable input
-		// (making it impossible to enter upper case characters)
-	case SDLK_SPACE:
-		// Ignore space to prevent invisible names.
-			
-		// Note: This will never happen as long as SPACE has a mapping which
-		// causes GA_ENTER and therefore finishes the typing. Please leave this
-		// because I am not sure whether this is good behavior (that SPACE
-		// cannot reach inputKeyboard()) and with some changes to the input
-		// driver this code has suddenly a useful effect.
-	case SDLK_KP_ENTER:
-	case SDLK_RETURN:
-	case SDLK_ESCAPE:
-		// Ignore some control keys. What they could provide is implemented
-		// in the handle() method.
-		return;
-	case SDLK_BACKSPACE:
-		// Handle backspace.
-		if (m_server_address.size() >=1)
-			m_server_address.erase(m_server_address.size()-1, 1);
-		
-		widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
-		break;
-		break;
-	default:
-		// Adds the character to the name.
-		// For this menu only unicode translation is enabled.
-		// So we use the unicode character here, since this will
-		// take care of upper/lower case etc.
-	  if (unicode && (int)m_server_address.size() <= SERVER_NAME_MAX)
-			m_server_address += (char) unicode;
-		widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
-		break;
-	}
+    switch (key)
+    {
+    case SDLK_RSHIFT:
+    case SDLK_LSHIFT:
+        // Ignore shift, otherwise shift will disable input
+        // (making it impossible to enter upper case characters)
+    case SDLK_SPACE:
+        // Ignore space to prevent invisible names.
+            
+        // Note: This will never happen as long as SPACE has a mapping which
+        // causes GA_ENTER and therefore finishes the typing. Please leave this
+        // because I am not sure whether this is good behavior (that SPACE
+        // cannot reach inputKeyboard()) and with some changes to the input
+        // driver this code has suddenly a useful effect.
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_ESCAPE:
+        // Ignore some control keys. What they could provide is implemented
+        // in the handle() method.
+        return;
+    case SDLK_BACKSPACE:
+        // Handle backspace.
+        if (m_server_address.size() >=1)
+            m_server_address.erase(m_server_address.size()-1, 1);
+        
+        widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
+        break;
+        break;
+    default:
+        // Adds the character to the name.
+        // For this menu only unicode translation is enabled.
+        // So we use the unicode character here, since this will
+        // take care of upper/lower case etc.
+      if (unicode && (int)m_server_address.size() <= SERVER_NAME_MAX)
+            m_server_address += (char) unicode;
+        widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
+        break;
+    }
 
 }
 //-----------------------------------------------------------------------------
 void NetworkGUI::handle(GameAction ga, int value)
 {
-	if (value)
-		return;
-	
-	switch (ga)
-	{
-		case GA_ENTER:
-			// If the user is typing her name this will be finished at this
-			// point.
+    if (value)
+        return;
+    
+    switch (ga)
+    {
+        case GA_ENTER:
+            // If the user is typing her name this will be finished at this
+            // point.
             if (inputDriver->isInMode(SDLDriver::LOWLEVEL))
-			{
-				// Prevents zero-length names.
+            {
+                // Prevents zero-length names.
                 if (m_server_address.length() == 0)
                     m_server_address = "localhost:2305";
                 std::vector<std::string> sl=StringUtils::split(m_server_address,':');
@@ -274,29 +276,29 @@ void NetworkGUI::handle(GameAction ga, int value)
                     s<<m_server_address<<":"<<user_config->m_server_port;
                     m_server_address=s.str();
                 }
-				widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
+                widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
 
                 inputDriver->setMode(SDLDriver::MENU);
-			}
-			else
-				select();
-			break;
-		case GA_LEAVE:
-			// If the user is typing her name this will be cancelled at this
-			// point.
+            }
+            else
+                select();
+            break;
+        case GA_LEAVE:
+            // If the user is typing her name this will be cancelled at this
+            // point.
             if (inputDriver->isInMode(SDLDriver::LOWLEVEL))
-			{
+            {
                 std::ostringstream s;
                 s<<user_config->m_server_address<<":"<<user_config->m_server_port;
                 m_server_address=s.str();
-				widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
+                widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
 
                 inputDriver->setMode(SDLDriver::MENU);
-				break;
-			}
-			// Fall through to reach the usual GA_LEAVE code (leave menu).
-		default:
-			BaseGUI::handle(ga, value);
-	}
-	
+                break;
+            }
+            // Fall through to reach the usual GA_LEAVE code (leave menu).
+        default:
+            BaseGUI::handle(ga, value);
+    }
+    
 }

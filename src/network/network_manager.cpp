@@ -46,6 +46,7 @@ NetworkManager::NetworkManager()
 {
      m_mode           = NW_NONE;
      m_state          = NS_ACCEPT_CONNECTIONS;
+     m_host           = NULL;
 
      m_num_clients    = 0;
      m_host_id        = 0;
@@ -181,7 +182,12 @@ void NetworkManager::becomeServer()
 void NetworkManager::disableNetworking()
 {
     m_mode=NW_NONE;
-    // FIXME: what enet data structures do we have to free/reset???
+    if (m_host != NULL)
+    {
+        enet_host_destroy(m_host);
+        m_host = NULL;
+    }
+    // FIXME: what other enet data structures do we have to free/reset???
 
 }   // disableNetworking
 
