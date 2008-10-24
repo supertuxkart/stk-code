@@ -52,20 +52,17 @@
 
 class ActionMap;
 
-/*class for managing general tuxkart configuration data*/
+/** Class for managing general STK user configuration data. */
 class UserConfig
 {
 public:
-		
+    /** Stores information about joystick and gamepads. */
 	class StickConfig
 	{
 	public:
-		std::string &id;
-	
-		int preferredIndex;
-				
-		int deadzone;
-			
+		std::string &m_id;
+		int          m_preferredIndex;
+		int          m_deadzone;
 		StickConfig(std::string &);
 				
 	};
@@ -80,6 +77,7 @@ private:
 		Input *inputs;
 	} InputMapEntry;
 		
+    /** Filename of the user config file. */
     std::string m_filename;
 	
 	/** Stores the GameAction->Input mappings in a way that is suitable for

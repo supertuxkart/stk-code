@@ -29,74 +29,56 @@
 
 class ActionMap;
 
-enum MouseState { INITIAL, MOVED, RESET_NEEDED }; 
-
-enum InputDriverMode {
-	MENU = 0,
-	INGAME,
-	INPUT_SENSE,
-	LOWLEVEL,
-	BOOTSTRAP
-};
-
+/** Class to handle SDL. 
+ */
 class SDLDriver
 {
-	class StickInfo {
+public:
+    enum InputDriverMode {
+        MENU = 0,
+        INGAME,
+        INPUT_SENSE,
+        LOWLEVEL,
+        BOOTSTRAP
+    };
+
+private:
+    class StickInfo {
 	public:
-		SDL_Joystick *sdlJoystick;
-
-		std::string *id;
-				
-		int deadzone;
-		
-		int index;
-		
-		AxisDirection *prevAxisDirections;
-
+		SDL_Joystick  *m_sdlJoystick;
+		std::string    m_id;
+  	    int            m_deadzone;
+		int            m_index;
+		AxisDirection *m_prevAxisDirections;
 		StickInfo(int);
-				
 		~StickInfo();
-	};
+	};   // Stickinfo
 
-	Input *sensedInput;
-	ActionMap *actionMap;
-	
-	SDL_Surface *mainSurface;
-	long flags;
-
-	StickInfo **stickInfos;
-		
+	Input          *sensedInput;
+	ActionMap      *actionMap;
+	SDL_Surface    *mainSurface;
+	long            flags;
+	StickInfo     **stickInfos;
 	InputDriverMode mode;
 	
 	/* Helper values to store and track the relative mouse movements. If these
 	* values exceed the deadzone value the input is reported to the game. This
   	* makes the mouse behave like an analog axis on a gamepad/joystick.
 	*/
-	int mouseValX;
-	int mouseValY;
+	int    mouseValX, mouseValY;
 	
-	void showPointer();
-	
-	void hidePointer();
-	
-	void input(InputType, int, int, int, int);
-	
+	void   showPointer();
+	void   hidePointer();
+	void   input(InputType, int, int, int, int);
 public:
-	SDLDriver();
-	~SDLDriver();
-			
-	void initStickInfos();
-
-	void toggleFullscreen(bool resetTextures=1);
-		
-	void setVideoMode(bool resetTextures=1);
-
-	void input();
-
-	void setMode(InputDriverMode);
-		
-	bool isInMode(InputDriverMode);
-
+	       SDLDriver();
+          ~SDLDriver();
+	void   initStickInfos();
+	void   toggleFullscreen(bool resetTextures=1);
+	void   setVideoMode(bool resetTextures=1);
+	void   input();
+	void   setMode(InputDriverMode);		
+	bool   isInMode(InputDriverMode);
 	Input &getSensedInput();
 };
 

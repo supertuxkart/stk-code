@@ -107,7 +107,7 @@ void NetworkGUI::select()
 		case WTOK_SERVER_ADDRESS:
 			// Switch to typing in the address of the server
 			widget_manager->setWgtText(WTOK_SERVER_ADDRESS, (m_server_address + "<").c_str());
-			inputDriver->setMode(LOWLEVEL);
+            inputDriver->setMode(SDLDriver::LOWLEVEL);
         	break;
 		case WTOK_CONNECT:
             // If we could connect here, no message could be displayed since
@@ -256,7 +256,7 @@ void NetworkGUI::handle(GameAction ga, int value)
 		case GA_ENTER:
 			// If the user is typing her name this will be finished at this
 			// point.
-			if (inputDriver->isInMode(LOWLEVEL))
+            if (inputDriver->isInMode(SDLDriver::LOWLEVEL))
 			{
 				// Prevents zero-length names.
                 if (m_server_address.length() == 0)
@@ -276,7 +276,7 @@ void NetworkGUI::handle(GameAction ga, int value)
                 }
 				widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
 
-				inputDriver->setMode(MENU);
+                inputDriver->setMode(SDLDriver::MENU);
 			}
 			else
 				select();
@@ -284,14 +284,14 @@ void NetworkGUI::handle(GameAction ga, int value)
 		case GA_LEAVE:
 			// If the user is typing her name this will be cancelled at this
 			// point.
-			if (inputDriver->isInMode(LOWLEVEL))
+            if (inputDriver->isInMode(SDLDriver::LOWLEVEL))
 			{
                 std::ostringstream s;
                 s<<user_config->m_server_address<<":"<<user_config->m_server_port;
                 m_server_address=s.str();
 				widget_manager->setWgtText(WTOK_SERVER_ADDRESS, m_server_address.c_str());
 
-				inputDriver->setMode(MENU);
+                inputDriver->setMode(SDLDriver::MENU);
 				break;
 			}
 			// Fall through to reach the usual GA_LEAVE code (leave menu).

@@ -355,7 +355,7 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     }
 
     assert(pos-1 >= 0);
-    assert(pos-1 < m_kart_status.size());
+    assert(pos-1 < (int)m_kart_status.size());
 
     m_kart_status[i].m_score        += m_score_for_position[pos-1];
     m_kart_status[i].m_last_score    = m_score_for_position[pos-1];

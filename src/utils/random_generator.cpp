@@ -53,7 +53,7 @@ void RandomGenerator::seedAll(std::vector<int> all_seeds)
     }
 }   // seed
 
-// -------------------q---------------------------------------------------------
+// ----------------------------------------------------------------------------
 void RandomGenerator::seed(int s)
 {
     m_random_value = s;
@@ -63,6 +63,10 @@ void RandomGenerator::seed(int s)
 int RandomGenerator::get(int n)
 {
     m_random_value = m_random_value*m_a+m_c;
+    // Note: the lower bits can have a very short cycle, e.g. for n = 4 the
+    // cycle length is 4, meaning that the same sequence 1,2,3,4 is repeated
+    // over and over again. The higher bits are more random, so the lower
+    // 8 bits are discarded.
     return (m_random_value >> 8) % n;
 }   // get
 

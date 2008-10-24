@@ -547,8 +547,8 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
 
                 StickConfig *sc = new StickConfig(*id);
 
-                screader->get("preferredIndex", sc->preferredIndex);
-                screader->get("deadzone", sc->deadzone);
+                screader->get("preferredIndex", sc->m_preferredIndex);
+                screader->get("deadzone", sc->m_deadzone);
 
                 m_stickconfigs.push_back(sc);
             }
@@ -768,10 +768,10 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
 
         writer->beginList(temp);
 
-        writer->write("id", sc->id);
-        writer->write("preferredIndex", sc->preferredIndex);
+        writer->write("id",             sc->m_id);
+        writer->write("preferredIndex", sc->m_preferredIndex);
         writer->writeComment("0 means that the default deadzone value is used.");
-        writer->write("deadzone", sc->deadzone);
+        writer->write("deadzone",       sc->m_deadzone);
 
         writer->endList(temp);
     }
@@ -1083,7 +1083,7 @@ const std::vector<UserConfig::StickConfig *> *UserConfig::getStickConfigs() cons
 // -----------------------------------------------------------------------------
 
 UserConfig::StickConfig::StickConfig(string &newId)
-                        : id(newId)
+                        : m_id(newId)
 {
         // Nothing else to do.
 }

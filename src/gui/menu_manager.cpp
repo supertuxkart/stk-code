@@ -142,7 +142,7 @@ void MenuManager::update()
             && m_current_menu == m_RaceGUI)
         {
             m_RaceGUI = 0;
-            inputDriver->setMode(MENU);
+            inputDriver->setMode(SDLDriver::MENU);
         }
 
         delete m_current_menu;
@@ -192,7 +192,7 @@ void MenuManager::update()
                 m_current_menu= new NumPlayers();
                 break;
             case MENUID_RACE:
-                inputDriver->setMode(INGAME);
+                inputDriver->setMode(SDLDriver::INGAME);
                 m_current_menu = new RaceGUI();
                 m_RaceGUI      = m_current_menu;
                 break;
