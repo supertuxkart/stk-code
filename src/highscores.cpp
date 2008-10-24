@@ -183,6 +183,7 @@ void HighscoreEntry::getEntry(int number, std::string &kart_name,
         fprintf(stderr,"number %d, but %d entries are defined\n",number,
                 getNumberEntries());
         fprintf(stderr, "This error can be ignored, but no highscores are available\n");
+        return;
     }
     kart_name = m_kart_name[number];
     name      = m_name[number];

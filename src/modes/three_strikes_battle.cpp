@@ -129,9 +129,9 @@ void ThreeStrikesBattle::updateKartRanks()
         for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
         {
             const int this_karts_time = m_kart[karts_list[n]]->hasFinishedRace() ?
-                m_kart[karts_list[n]]->getFinishTime() : TimedRace::getTime();
+                (int)m_kart[karts_list[n]]->getFinishTime() : (int)TimedRace::getTime();
             const int next_karts_time = m_kart[karts_list[n+1]]->hasFinishedRace() ?
-                m_kart[karts_list[n+1]]->getFinishTime() : TimedRace::getTime();
+                (int)m_kart[karts_list[n+1]]->getFinishTime() : (int)TimedRace::getTime();
 
             bool swap = false;
             
