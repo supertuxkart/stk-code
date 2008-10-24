@@ -67,14 +67,7 @@ void ThreeStrikesBattle::onGo()
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::terminateRace()
 {
-    // give a fake rank to each kart to avoid crashes
-    // FIXME - implement properly, and don't duplicate like now
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
-    for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
-    {
-        m_kart[kart_id]->setPosition(kart_id+1);
-    }
-    
+    updateKartRanks();
     World::terminateRace();
 }
 //-----------------------------------------------------------------------------
@@ -86,17 +79,11 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
     
+    updateKartRanks();
+        
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
     {
-        // give a fake rank to each kart to avoid crashes
-        // FIXME - implement properly, and don't duplicate like now
-        const unsigned int NUM_KARTS = race_manager->getNumKarts();
-        for( unsigned int n = 0; n < NUM_KARTS; ++n )
-        {
-            m_kart[n]->setPosition(n+1);
-        }
-        
         removeKart(kart_id);
     }
     
@@ -111,6 +98,52 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
 std::string ThreeStrikesBattle::getInternalCode() const
 {
     return "BATTLE_3_STRIKES";
+}
+//-----------------------------------------------------------------------------
+void ThreeStrikesBattle::updateKartRanks()
+{
+    // sort karts by their times then give eacg one its position.
+    // in battle-mode, long time = good (meaning he survived longer)
+    
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    
+    int karts_list[NUM_KARTS];
+    for( unsigned int n = 0; n < NUM_KARTS; ++n ) karts_list[n] = n;
+    
+    bool sorted=false;
+    do
+    {
+        sorted = true;
+        for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
+        {
+            const int this_karts_time = m_kart[karts_list[n]]->hasFinishedRace() ?
+                m_kart[karts_list[n]]->getFinishTime() : TimedRace::getTime();
+            const int next_karts_time = m_kart[karts_list[n+1]]->hasFinishedRace() ?
+                m_kart[karts_list[n+1]]->getFinishTime() : TimedRace::getTime();
+
+            bool swap = false;
+            
+            // if next kart survived longer...
+            if( next_karts_time > this_karts_time) swap = true;
+            // if next has more lives...
+            else if(!m_kart[n]->hasFinishedRace() && !m_kart[karts_list[n+1]]->hasFinishedRace() &&
+                    m_kart_info[karts_list[n+1]].m_lives > m_kart_info[karts_list[n]].m_lives) swap = true;
+
+            if(swap)
+            {
+                int tmp = karts_list[n+1];
+                karts_list[n+1] = karts_list[n];
+                karts_list[n] = tmp;
+                sorted = false;
+                break;
+            }
+        }
+    }while(!sorted);
+    
+    for( unsigned int n = 0; n < NUM_KARTS; ++n )
+    {
+        m_kart[ karts_list[n] ]->setPosition( n+1 );
+    }
 }
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::update(float delta)
@@ -236,13 +269,11 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::raceResultOrder( int* order )
 {
-    // give fake rank to karts
-    // FIXME - implement properly, and don't duplicate like now
+    updateKartRanks();
+    
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
-
     for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
     {
-        order[kart_id]     = kart_id;
-        m_kart[kart_id]->setPosition(kart_id+1);
+        order[kart_id] = m_kart[kart_id]->getPosition() - 1;
     }
 }
