@@ -68,6 +68,17 @@ void ThreeStrikesBattle::onGo()
 void ThreeStrikesBattle::terminateRace()
 {
     updateKartRanks();
+    
+    // if some karts have not yet finished yet
+    const unsigned int kart_amount = m_kart.size();
+    for ( Karts::size_type i = 0; i < kart_amount; ++i)
+    {
+        if(!m_kart[i]->hasFinishedRace())
+        {
+            m_kart[i]->raceFinished(TimedRace::getTime());
+        }  // if !hasFinishedRace
+    }   // for i
+    
     World::terminateRace();
 }
 //-----------------------------------------------------------------------------
@@ -84,6 +95,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
     {
+        m_kart[kart_id]->raceFinished(TimedRace::getTime());
         removeKart(kart_id);
     }
     

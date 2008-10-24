@@ -162,10 +162,11 @@ Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizo
     {
         if(order[i] == -1) continue;
         
-        const Kart *KART = RaceManager::getKart(order[i]);
-        const std::string& KART_NAME = KART->getName();
+        const Kart *current_kart = RaceManager::getKart(order[i]);
+        const std::string& kart_name = current_kart->getName();
         char sTime[20];sTime[0]=0;
-        const float T      = KART->getFinishTime();
+        const float T      = current_kart->getFinishTime();
+
         if(display_time)
             TimeToString(T, sTime);
 
@@ -173,18 +174,18 @@ Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizo
         if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s +%d %d",
-                KART->getPosition(), KART_NAME.c_str(), sTime,
+                current_kart->getPosition(), kart_name.c_str(), sTime,
                 race_manager->getKartPrevScore(order[i]),
                 race_manager->getKartScore(order[i]));
         }
         else
         {
             sprintf((char*)(score + MAX_STR_LEN * i), "%d. %s %s",
-                    KART->getPosition(), KART_NAME.c_str(), sTime);
+                    current_kart->getPosition(), kart_name.c_str(), sTime);
         }
 
         Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + kart_id, 7, 7,
-                                       KART->getKartProperties()->getIconFile() );
+                                       current_kart->getKartProperties()->getIconFile() );
         widget_manager->deactivateWgt(WTOK_FIRST_IMAGE+kart_id);
 
         image->setPosition(WGT_DIR_FROM_LEFT, horizontal, NULL, 
