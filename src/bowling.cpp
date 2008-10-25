@@ -26,7 +26,7 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING)
+Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING, 10.0f /* mass */)
 {
     float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
     
