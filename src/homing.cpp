@@ -129,27 +129,40 @@ void Homing::update(float dt)
     
     if(m_target != NULL)
     {
+        // correct direction to do towards aimed kart
         btTransform my_trans = getTrans();
         btTransform target   = m_target->getTrans();
         
-        //btVector3 ideal_direction = target.getOrigin() - my_trans.getOrigin();
-        //const btVector3& actual_direction = m_body -> getLinearVelocity();
+        btVector3 ideal_direction = target.getOrigin() - my_trans.getOrigin();
+        ideal_direction.normalize();
+        
+        const btVector3& actual_direction = m_body -> getLinearVelocity();
 
+        ideal_direction.setInterpolate3(actual_direction.normalized(), ideal_direction, dt);
+        
+        const int current_xy_speed = sqrt( actual_direction.getX()*actual_direction.getX() +
+                                           actual_direction.getY()*actual_direction.getY());
+        
+        m_body->setLinearVelocity( btVector3(ideal_direction.getX()*current_xy_speed,
+                                             ideal_direction.getY()*current_xy_speed,
+                                             actual_direction.getZ()) );
+        
         /*
         // pull towards aimed kart
         btVector3 pullForce = target.getOrigin() - my_trans.getOrigin();
         pullForce.setZ(0);
-        pullForce *= 70;
-        m_body->applyCentralForce( pullForce );
+        pullForce.normalize();
+        pullForce *= 10;
+        m_body->applyCentralImpulse( pullForce );
         */
-        
+        /*
         // if over aimed kart, pull down
         if(fabsf(my_trans.getOrigin().getX() - target.getOrigin().getX()) < 5.0 &&
            fabsf(my_trans.getOrigin().getY() - target.getOrigin().getY()) < 5.0)
         {
             m_body->applyCentralForce( btVector3(0, 0, -20.0f) );
         }
-        
+        */
     }
     
     Flyable::update(dt);
