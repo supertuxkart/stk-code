@@ -283,9 +283,12 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
 {
     updateKartRanks();
     
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
-    for( unsigned int kart_id = 0; kart_id < NUM_KARTS; ++kart_id )
+    const unsigned int num_karts = race_manager->getNumKarts();
+    for( unsigned int kart_id = 0; kart_id < num_karts; ++kart_id )
     {
-        order[kart_id] = m_kart[kart_id]->getPosition() - 1;
+        const int pos = m_kart[kart_id]->getPosition() - 1;
+        assert(pos >= 0);
+        assert(pos < num_karts);
+        order[pos] = kart_id;
     }
 }
