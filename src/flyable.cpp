@@ -146,14 +146,19 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         if(inFrontOf != NULL)
         {
             // Ignore karts behind the current one
-            btVector3 to_target = inFrontOf->getXYZ()-kart->getXYZ();
+            btVector3 to_target = kart->getXYZ() - inFrontOf->getXYZ();
             const float distance = to_target.length();
             if(distance > 50) continue; // kart too far, don't aim at it
             
-            float angle = to_target.angle(-inFrontOf->getVelocity());
+            btTransform trans = inFrontOf->getTrans();
+            // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
+            btVector3 direction(trans.getBasis()[0][1],
+                                trans.getBasis()[1][1],
+                                trans.getBasis()[2][1]);
+            
+            float angle = to_target.angle(direction);
             
             if(fabsf(angle) > 1) continue;
-            
         }
         
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
