@@ -129,7 +129,7 @@ void Homing::update(float dt)
     
     if(m_target != NULL)
     {
-        // correct direction to do towards aimed kart
+        // correct direction to go towards aimed kart
         btTransform my_trans = getTrans();
         btTransform target   = m_target->getTrans();
         
