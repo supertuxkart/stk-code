@@ -140,8 +140,8 @@ void Homing::update(float dt)
 
         ideal_direction.setInterpolate3(actual_direction.normalized(), ideal_direction, dt);
         
-        const int current_xy_speed = sqrt( actual_direction.getX()*actual_direction.getX() +
-                                           actual_direction.getY()*actual_direction.getY());
+        const int current_xy_speed = (int)sqrt( actual_direction.getX()*actual_direction.getX() +
+                                                actual_direction.getY()*actual_direction.getY());
         
         m_body->setLinearVelocity( btVector3(ideal_direction.getX()*current_xy_speed,
                                              ideal_direction.getY()*current_xy_speed,

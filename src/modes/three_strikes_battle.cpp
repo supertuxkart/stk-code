@@ -288,7 +288,7 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
     {
         const int pos = m_kart[kart_id]->getPosition() - 1;
         assert(pos >= 0);
-        assert(pos < num_karts);
+        assert(pos < (int)num_karts);
         order[pos] = kart_id;
     }
 }
