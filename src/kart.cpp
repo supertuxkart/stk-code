@@ -259,7 +259,7 @@ void Kart::createPhysics(ssgEntity *obj)
     //create the engine sound
     if(m_engine_sound)
     {
-        m_engine_sound->speed(0.5f);
+        m_engine_sound->speed(0.6f);
         m_engine_sound->loop();
         m_engine_sound->play();
     }
@@ -831,21 +831,10 @@ void Kart::updatePhysics (float dt)
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
 
-    //Change the engine sound based on kart RPM.
-    //The equation here is:
-    //         speed * gear_ratio 
-    // RPM =  --------------------
-    //           tire_diameter
-    //the magic number 1.7 is used to bring the computed gear ratio into a sensible range
-    float gear_ratio = 1.7f + (1 - m_current_gear_ratio);
-    float tire_diameter = m_kart_properties->getWheelRadius();
-
-    m_max_gear_rpm = m_current_gear_ratio * max_speed;
-    // 8 is magic number again.
-    m_rpm = ((m_speed * gear_ratio) / (8*tire_diameter));
+    // when going faster, use higher pitch for engine
     if(m_engine_sound && sfx_manager->sfxAllowed())
     {
-        m_engine_sound->speed((float)((m_rpm * 2) / m_max_gear_rpm));
+        m_engine_sound->speed(0.6 + (float)(m_speed / max_speed)*0.7f);
         m_engine_sound->position(getXYZ());
     }
    
