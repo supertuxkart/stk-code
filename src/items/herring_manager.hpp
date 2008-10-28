@@ -23,7 +23,7 @@
 
 #include <vector>
 #include <map>
-#include "herring.hpp"
+#include "items/herring.hpp"
 #include "lisp/lisp.hpp"
 
 class Kart;

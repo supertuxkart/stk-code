@@ -17,13 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "collectable.hpp"
+#include "items/collectable.hpp"
 
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "projectile_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "kart.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"

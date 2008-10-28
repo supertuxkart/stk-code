@@ -21,7 +21,7 @@
 #define HEADER_ATTACHMENT_H
 
 #include "stk_config.hpp"
-#include "herring.hpp"
+#include "items/herring.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;

@@ -23,7 +23,7 @@
 #include <vector>
 #include <plib/ssg.h>
 #include "vec3.hpp"
-#include "collectable_manager.hpp"
+#include "items/collectable_manager.hpp"
 
 class Kart;
 class Explosion;

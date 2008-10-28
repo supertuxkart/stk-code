@@ -22,7 +22,7 @@
 #include "network/flyable_info.hpp"
 #include "flyable.hpp"
 #include "kart.hpp"
-#include "projectile_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
 #include "utils/ssg_help.hpp"

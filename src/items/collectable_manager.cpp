@@ -19,14 +19,14 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "collectable_manager.hpp"
+#include "items/collectable_manager.hpp"
 #include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
-#include "bowling.hpp"
+#include "items/bowling.hpp"
 #include "missile.hpp"
-#include "homing.hpp"
+#include "items/homing.hpp"
 #include "loader.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

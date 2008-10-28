@@ -20,13 +20,13 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "loader.hpp"
-#include "projectile_manager.hpp"
-#include "bowling.hpp"
+#include "items/projectile_manager.hpp"
+#include "items/bowling.hpp"
 #include "missile.hpp"
-#include "homing.hpp"
+#include "items/homing.hpp"
 #include "explosion.hpp"
-#include "collectable_manager.hpp"
-#include "collectable.hpp"
+#include "items/collectable_manager.hpp"
+#include "items/collectable.hpp"
 #include "scene.hpp"
 
 static ssgSelector *find_selector ( ssgBranch *b );

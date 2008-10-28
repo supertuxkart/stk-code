@@ -20,7 +20,7 @@
 #define HEADER_ATTACHMENT_MANAGER_H
 
 #include <plib/ssg.h>
-#include "attachment.hpp"
+#include "items/attachment.hpp"
 
 class AttachmentManager
 {

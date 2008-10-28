@@ -56,21 +56,24 @@ supertuxkart_SOURCES =     main.cpp  			\
 	utils/ssg_help.cpp          utils/ssg_help.hpp                	\
 	material_manager.cpp	    material_manager.hpp    	\
 	grand_prix_manager.cpp	    grand_prix_manager.hpp	\
-	attachment.cpp		        attachment.hpp	        \
-	attachment_manager.cpp      attachment_manager.hpp       \
-	collectable.cpp		        collectable.hpp	        \
-	collectable_manager.cpp	    collectable_manager.hpp   	\
+	items/attachment.cpp		   items/attachment.hpp	        \
+	items/attachment_manager.cpp   items/attachment_manager.hpp       \
+	items/collectable.cpp		   items/collectable.hpp	        \
+	items/collectable_manager.cpp  items/collectable_manager.hpp   	\
+	items/herring.cpp 		       items/herring.hpp              	\
+	items/herring_manager.cpp	   items/herring_manager.hpp       	\
+	items/projectile_manager.cpp   items/projectile_manager.hpp    	\
+	items/missile.cpp		       items/missile.hpp			\
+	items/homing.cpp		       items/homing.hpp			\
+	items/bowling.cpp		       items/bowling.hpp			\
 	smoke.cpp		       smoke.hpp			\
 	input.hpp 		       kart_control.hpp		\
 	isect.cpp		       isect.hpp                	\
 	track.cpp		       track.hpp                	\
-	herring.cpp 		   herring.hpp              	\
-	herring_manager.cpp	   herring_manager.hpp       	\
 	explosion.cpp		   explosion.hpp            	\
 	user_config.cpp		   user_config.hpp             	\
 	grand_prix_data.cpp    grand_prix_data.hpp        	\
 	kart_properties_manager.cpp kart_properties_manager.hpp \
-	projectile_manager.cpp projectile_manager.hpp    	\
 	kart_properties.cpp	   kart_properties.hpp       	\
 	stk_config.cpp		   stk_config.hpp    		\
 	highscores.cpp		   highscores.hpp		\
@@ -99,9 +102,6 @@ supertuxkart_SOURCES =     main.cpp  			\
 	terrain_info.cpp	   terrain_info.hpp		\
     triangle_mesh.cpp	   triangle_mesh.hpp		\
 	flyable.cpp		       flyable.hpp			\
-	missile.cpp		       missile.hpp			\
-	homing.cpp		       homing.hpp			\
-	bowling.cpp		       bowling.hpp			\
 	history.cpp		       history.hpp	        	\
 	scene.hpp		       scene.cpp			\
 	no_copy.hpp	           constants.hpp 		\

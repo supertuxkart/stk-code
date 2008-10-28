@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "bowling.hpp"
+#include "items/bowling.hpp"
 #include "player_kart.hpp"
 #include "camera.hpp"
 

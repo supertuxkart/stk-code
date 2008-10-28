@@ -19,7 +19,7 @@
 
 #include <plib/ssg.h>
 #include "explosion.hpp"
-#include "projectile_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "scene.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"

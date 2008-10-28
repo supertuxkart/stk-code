@@ -22,7 +22,7 @@
 
 #define MAX_COLLECTABLES 5
 
-#include "collectable_manager.hpp"  // needed for collectable_type
+#include "items/collectable_manager.hpp"  // needed for collectable_type
 #include "utils/random_generator.hpp"
 
 class Kart;

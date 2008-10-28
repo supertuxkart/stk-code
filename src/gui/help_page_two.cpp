@@ -23,7 +23,7 @@
 #include "menu_manager.hpp"
 #include "user_config.hpp"
 #include "player.hpp"
-#include "collectable_manager.hpp"
+#include "items/collectable_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
 

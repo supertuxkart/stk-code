@@ -20,9 +20,9 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
-#include "attachment.hpp"
-#include "attachment_manager.hpp"
-#include "projectile_manager.hpp"
+#include "items/attachment.hpp"
+#include "items/attachment_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "kart.hpp"
 #include "constants.hpp"
 #include "stk_config.hpp"

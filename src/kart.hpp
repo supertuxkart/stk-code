@@ -28,8 +28,8 @@
 #include "moveable.hpp"
 #include "kart_properties.hpp"
 #include "kart_control.hpp"
-#include "attachment.hpp"
-#include "collectable.hpp"
+#include "items/attachment.hpp"
+#include "items/collectable.hpp"
 #include "terrain_info.hpp"
 
 class SkidMark;
