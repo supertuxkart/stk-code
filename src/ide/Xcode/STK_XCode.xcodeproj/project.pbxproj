@@ -488,8 +488,6 @@
 		95B0D3C80EB69DE0001A0D06 /* replay_recorder.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE9A0EB69DDA001A0D06 /* replay_recorder.hpp */; };
 		95B0D3C90EB69DE0001A0D06 /* default_robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE9C0EB69DDA001A0D06 /* default_robot.cpp */; };
 		95B0D3CA0EB69DE0001A0D06 /* default_robot.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE9D0EB69DDA001A0D06 /* default_robot.hpp */; };
-		95B0D3CB0EB69DE0001A0D06 /* empty_robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE9E0EB69DDA001A0D06 /* empty_robot.cpp */; };
-		95B0D3CC0EB69DE0001A0D06 /* empty_robot.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE9F0EB69DDA001A0D06 /* empty_robot.hpp */; };
 		95B0D3D00EB69DE0001A0D06 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEA30EB69DDA001A0D06 /* scene.cpp */; };
 		95B0D3D10EB69DE0001A0D06 /* scene.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEA40EB69DDA001A0D06 /* scene.hpp */; };
 		95B0D3D20EB69DE0001A0D06 /* sdldrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEA50EB69DDA001A0D06 /* sdldrv.cpp */; };
@@ -512,7 +510,6 @@
 		95B0D3E40EB69DE0001A0D06 /* track.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEB70EB69DDA001A0D06 /* track.hpp */; };
 		95B0D3E50EB69DE0001A0D06 /* track_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEB80EB69DDA001A0D06 /* track_manager.cpp */; };
 		95B0D3E60EB69DE0001A0D06 /* track_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEB90EB69DDA001A0D06 /* track_manager.hpp */; };
-		95B0D3E70EB69DE0001A0D06 /* traffic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEBA0EB69DDA001A0D06 /* traffic.cpp */; };
 		95B0D3E80EB69DE0001A0D06 /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEBB0EB69DDA001A0D06 /* translation.cpp */; };
 		95B0D3E90EB69DE0001A0D06 /* translation.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEBC0EB69DDA001A0D06 /* translation.hpp */; };
 		95B0D3EA0EB69DE0001A0D06 /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEBD0EB69DDA001A0D06 /* triangle_mesh.cpp */; };
@@ -816,7 +813,6 @@
 				95B0D3C60EB69DE0001A0D06 /* replay_player.hpp in CopyFiles */,
 				95B0D3C80EB69DE0001A0D06 /* replay_recorder.hpp in CopyFiles */,
 				95B0D3CA0EB69DE0001A0D06 /* default_robot.hpp in CopyFiles */,
-				95B0D3CC0EB69DE0001A0D06 /* empty_robot.hpp in CopyFiles */,
 				95B0D3D10EB69DE0001A0D06 /* scene.hpp in CopyFiles */,
 				95B0D3D30EB69DE0001A0D06 /* sdldrv.hpp in CopyFiles */,
 				95B0D3D50EB69DE0001A0D06 /* shadow.hpp in CopyFiles */,
@@ -3003,7 +2999,6 @@
 				95B0D3C50EB69DE0001A0D06 /* replay_player.cpp in Sources */,
 				95B0D3C70EB69DE0001A0D06 /* replay_recorder.cpp in Sources */,
 				95B0D3C90EB69DE0001A0D06 /* default_robot.cpp in Sources */,
-				95B0D3CB0EB69DE0001A0D06 /* empty_robot.cpp in Sources */,
 				95B0D3D00EB69DE0001A0D06 /* scene.cpp in Sources */,
 				95B0D3D20EB69DE0001A0D06 /* sdldrv.cpp in Sources */,
 				95B0D3D40EB69DE0001A0D06 /* shadow.cpp in Sources */,
@@ -3015,7 +3010,6 @@
 				95B0D3E10EB69DE0001A0D06 /* terrain_info.cpp in Sources */,
 				95B0D3E30EB69DE0001A0D06 /* track.cpp in Sources */,
 				95B0D3E50EB69DE0001A0D06 /* track_manager.cpp in Sources */,
-				95B0D3E70EB69DE0001A0D06 /* traffic.cpp in Sources */,
 				95B0D3E80EB69DE0001A0D06 /* translation.cpp in Sources */,
 				95B0D3EA0EB69DE0001A0D06 /* triangle_mesh.cpp in Sources */,
 				95B0D3EC0EB69DE0001A0D06 /* unlock_manager.cpp in Sources */,
