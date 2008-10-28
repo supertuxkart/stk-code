@@ -624,7 +624,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib ws2_32.lib"
-				OutputFile="./../../../$(ProjectName)_bullet.exe"
+				OutputFile="./../../../$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
 				IgnoreDefaultLibraryNames="libcmt.lib"
@@ -672,31 +672,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\attachment.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\attachment_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\bowling.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\callback_manager.cpp"
 				>
 			</File>
 			<File
 				RelativePath="../../../src\camera.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\collectable.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\collectable_manager.cpp"
 				>
 			</File>
 			<File
@@ -720,14 +700,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\herring.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\herring_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\highscore_manager.cpp"
 				>
 			</File>
@@ -737,10 +709,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\homing.cpp"
 				>
 			</File>
 			<File
@@ -780,10 +748,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\missile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\moveable.cpp"
 				>
 			</File>
@@ -805,10 +769,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\player_kart.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\projectile_manager.cpp"
 				>
 			</File>
 			<File
@@ -1163,6 +1123,50 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="items"
+				>
+				<File
+					RelativePath="..\..\items\attachment.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\attachment_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\bowling.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\collectable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\collectable_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\herring.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\herring_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\homing.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\missile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\projectile_manager.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1170,23 +1174,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\actionmap.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\attachment.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\attachment_manager.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\auto_kart.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\bowling.hpp"
 				>
 			</File>
 			<File
@@ -1199,14 +1187,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\camera.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\collectable.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\collectable_manager.hpp"
 				>
 			</File>
 			<File
@@ -1246,10 +1226,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\herring.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\herring_manager.hpp"
 				>
 			</File>
@@ -1263,10 +1239,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\homing.hpp"
 				>
 			</File>
 			<File
@@ -1310,10 +1282,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\missile.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\moveable.hpp"
 				>
 			</File>
@@ -1347,10 +1315,6 @@
 			</File>
 			<File
 				RelativePath="..\..\position.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\projectile_manager.hpp"
 				>
 			</File>
 			<File
@@ -1762,6 +1726,50 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\world.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="items"
+				>
+				<File
+					RelativePath="..\..\items\attachment.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\attachment_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\bowling.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\collectable.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\collectable_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\herring.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\herring_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\homing.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\missile.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\projectile_manager.hpp"
 					>
 				</File>
 			</Filter>
