@@ -48,7 +48,7 @@ public:
     void      popTempMaterial  ();
 };
 
-//extern ssgState *fuzzy_gst, *herringbones_gst;
+extern ssgState *fuzzy_gst;//, *herringbones_gst;
 
 ssgState *getAppState ( char *fname ) ;
 extern MaterialManager *material_manager;

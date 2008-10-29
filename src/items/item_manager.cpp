@@ -75,7 +75,7 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
     ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
 
     gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-    //gs -> setState ( fuzzy_gst ) ;
+    gs -> setState ( fuzzy_gst ) ;
     sh -> addKid ( gs ) ;
     sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }   // Shadow
