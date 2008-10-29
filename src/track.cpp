@@ -58,7 +58,7 @@ const int   Track::UNKNOWN_SECTOR  = -1;
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
     m_filename         = filename_;
-    m_herring_style    = "";
+    m_item_style    = "";
     m_track_2d_width   = w;
     m_track_2d_height  = h;
     m_do_stretch       = stretch;
@@ -839,7 +839,7 @@ void Track::loadTrack(std::string filename_)
     std::vector<std::string> filenames;
     LISP->getVector("music",                 filenames);
     getMusicInformation(filenames, m_music);
-    LISP->get      ("herring",               m_herring_style);
+    LISP->get      ("item",                  m_item_style);
     LISP->get      ("screenshot",            m_screenshot);
     LISP->get      ("topview",               m_top_view);
     LISP->get      ("sky-color",             m_sky_color);
@@ -1186,12 +1186,12 @@ void Track::loadTrackModel()
         if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
                       &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
         {
-            herring_command(&loc.xyz, htype, false) ;
+            item_command(&loc.xyz, htype, false) ;
         }
         else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
         {
-            herring_command (&loc.xyz, htype, true) ;
+            item_command (&loc.xyz, htype, true) ;
         }
         else if ( sscanf ( s, "START,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
@@ -1337,26 +1337,26 @@ void Track::loadTrackModel()
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
-void Track::herring_command (sgVec3 *xyz, char htype, int bNeedHeight )
+void Track::item_command (sgVec3 *xyz, char htype, int bNeedHeight )
 {
 
-    // if only 2d coordinates are given, let the herring fall from very heigh
+    // if only 2d coordinates are given, let the item fall from very high
     if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
-    // Even if 3d data are given, make sure that the herring is on the ground
+    // Even if 3d data are given, make sure that the item is on the ground
     (*xyz)[2] = getHeight ( m_model, *xyz ) + 0.06f;
-    herringType type=HE_GREEN;
-    if ( htype=='Y' || htype=='y' ) { type = HE_GOLD   ;}
-    if ( htype=='G' || htype=='g' ) { type = HE_GREEN  ;}
-    if ( htype=='R' || htype=='r' ) { type = HE_RED    ;}
-    if ( htype=='S' || htype=='s' ) { type = HE_SILVER ;}
+    ItemType type=ITEM_BANANA;
+    if ( htype=='Y' || htype=='y' ) { type = ITEM_GOLD_COIN   ;}
+    if ( htype=='G' || htype=='g' ) { type = ITEM_BANANA  ;}
+    if ( htype=='R' || htype=='r' ) { type = ITEM_BONUS_BOX    ;}
+    if ( htype=='S' || htype=='s' ) { type = ITEM_SILVER_COIN ;}
 
-    // Time trial does not have any red herrings
-    if(type==HE_RED && !RaceManager::getWorld()->useRedHerring()) 
+    // Some modes (e.g. time trial) don't have any bonus boxes
+    if(type==ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 
         return;
     Vec3 loc((*xyz));
-    herring_manager->newHerring(type, loc);
-}   // herring_command
+    item_manager->newItem(type, loc);
+}   // item_command
 
 // ----------------------------------------------------------------------------
 void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 

@@ -33,7 +33,7 @@
 #include "terrain_info.hpp"
 
 class SkidMark;
-class Herring;
+class Item;
 class Smoke;
 class SFXBase;
 
@@ -68,7 +68,7 @@ protected:
     btUprightConstraint               *m_uprightConstraint;
 
 private:
-    int                 m_num_herrings_gobbled;
+    int                 m_num_items_collected;
     ssgSimpleState*     m_smokepuff;
     // don't delete the following 2 vars (they're kids in the hirarchy)
     Smoke              *m_smoke_system;
@@ -130,7 +130,7 @@ public:
                                           { m_attachment.set(t, time_left, k);   }
     Collectable   *getCollectable      ()       { return &m_collectable;         }
     int            getNumCollectables  () const { return  m_collectable.getNum();}
-    int            getNumHerring       () const { return  m_num_herrings_gobbled;}
+    int            getNumItems       () const { return  m_num_items_collected;}
     int            getPosition         () const { return  m_race_position;       }
     int            getInitialPosition  () const { return  m_initial_position;    }
     float          getFinishTime       () const { return  m_finish_time;         }
@@ -211,7 +211,7 @@ public:
     virtual bool    isPlayerKart    () const {return false;                        }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
-    virtual void   collectedHerring (const Herring &herring, int random_attachment);
+    virtual void   collectedItem    (const Item &item, int random_attachment);
     virtual void   reset            ();
     virtual void   handleZipper     ();
     virtual void   crashed          (Kart *k);

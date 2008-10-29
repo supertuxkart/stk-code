@@ -99,7 +99,7 @@ void cmdLineHelp (char* invocation)
     //FIXME"     --players n             Define number of players to between 1 and 4.\n"
     //FIXME     "  --reverse               Enable reverse mode\n"
     //FIXME     "  --mirror                Enable mirror mode (when supported)\n"
-    "       --herring STYLE    Use STYLE as your herring style\n"
+    "       --item STYLE       Use STYLE as your item style\n"
     "  -f,  --fullscreen       Fullscreen display\n"
     "  -w,  --windowed         Windowed display (default)\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200)\n"
@@ -403,9 +403,9 @@ int handleCmdLine(int argc, char **argv)
         {
             history->doReplayHistory(History::HISTORY_POSITION);
         }
-        else if( !strcmp(argv[i], "--herring") && i+1<argc )
+        else if( !strcmp(argv[i], "--item") && i+1<argc )
         {
-            herring_manager->setUserFilename(argv[i+1]);
+            item_manager->setUserFilename(argv[i+1]);
         }
         else
         {
@@ -445,7 +445,7 @@ void InitTuxkart()
     projectile_manager      = new ProjectileManager    ();
     collectable_manager     = new CollectableManager   ();
     callback_manager        = new CallbackManager      ();
-    herring_manager         = new HerringManager       ();
+    item_manager         = new ItemManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
@@ -512,7 +512,7 @@ int main(int argc, char *argv[] )
         kart_properties_manager -> loadKartData       ();
         projectile_manager      -> loadData           ();
         collectable_manager     -> loadCollectables   ();
-        herring_manager         -> loadDefaultHerrings();
+        item_manager         -> loadDefaultItems();
         attachment_manager      -> loadModels         ();
         scene = new Scene();
 

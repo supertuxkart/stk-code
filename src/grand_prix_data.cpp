@@ -45,7 +45,7 @@ GrandPrixData::GrandPrixData(const std::string filename)
 
         lisp->get      ("name",        m_name        );
         lisp->get      ("description", m_description );
-        lisp->get      ("herring",     m_herring_style);
+        lisp->get      ("item",        m_item_style);
         lisp->getVector("tracks",      m_tracks      );
         lisp->getVector("laps",        m_laps        );
     }

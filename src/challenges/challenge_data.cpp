@@ -223,7 +223,7 @@ bool ChallengeData::raceFinished()
     if((int)race_manager->getNumKarts()<m_num_karts) return false;    // not enough AI karts
 
     Kart* kart = RaceManager::getPlayerKart(0);
-    if(m_energy>0   && kart->getNumHerring()<m_energy) return false;  // not enough energy
+    if(m_energy>0   && kart->getNumItems()<m_energy) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 
     // Follow the leader

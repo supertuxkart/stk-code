@@ -206,10 +206,10 @@ std::string FileManager::getKartDir() const
 }   // getKartDir
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getHerringDir() const
+std::string FileManager::getItemsDir() const
 {
-    return m_root_dir+"/data/herrings";
-}   // getHerringDir
+    return m_root_dir+"/data/items";
+}   // getItemsDir
 //-----------------------------------------------------------------------------
 std::string FileManager::getTranslationDir() const
 {
@@ -253,9 +253,9 @@ std::string FileManager::getConfigFile(const std::string& fname) const
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getHerringFile(const std::string& fname) const
+std::string FileManager::getItemFile(const std::string& fname) const
 {
-    return getHerringDir()+"/"+fname;
+    return getItemsDir()+"/"+fname;
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------

@@ -28,7 +28,7 @@ class Material;
 class ssgEntity;
 
 // The anvil and parachute must be at the end of the enum, and the
-// zipper just before them (see collectable::hitRedHerring).
+// zipper just before them (see collectable::hitBonusBox).
 enum CollectableType {COLLECT_NOTHING,
                       COLLECT_MISSILE, COLLECT_CAKE,
                       COLLECT_BOWLING, COLLECT_ZIPPER,

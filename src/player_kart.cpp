@@ -285,31 +285,32 @@ void PlayerKart::handleZipper()
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
-/** Called when a kart hits a herring.
- *  \param herring Herring that was collected.
- *  \param add_info Additional info to be used then handling the herring. If
- *                  this is -1 (default), the herring type is selected 
+/** Called when a kart hits an item.
+ *  \param item Item that was collected.
+ *  \param add_info Additional info to be used then handling the item. If
+ *                  this is -1 (default), the item type is selected 
  *                  randomly. Otherwise it contains the collectable or 
  *                  attachment for the kart. This is used in network mode to 
  *                  let the server determine the collectable/attachment for
  *                  the clients.
  */
-void PlayerKart::collectedHerring(const Herring &herring, int add_info)
+void PlayerKart::collectedItem(const Item &item, int add_info)
 {
-    const int old_herring_gobbled = getNumHerring();
-    Kart::collectedHerring(herring, add_info);
+    // FIXME - how does the old item relate to the total amount of items?
+    const int old_item_collected = getNumItems();
+    Kart::collectedItem(item, add_info);
 
-    if(old_herring_gobbled < MAX_HERRING_EATEN &&
-       getNumHerring() == MAX_HERRING_EATEN)
+    if(old_item_collected < MAX_ITEMS_COLLECTED &&
+       getNumItems() == MAX_ITEMS_COLLECTED)
     {
         m_full_sound->play();
     }
     else
     {
-        if(herring.getType() == HE_GREEN)
+        if(item.getType() == ITEM_BANANA)
             m_ugh_sound->play();
         else
             m_grab_sound->play();
     }
-}   // collectedHerring
+}   // collectedItem
 

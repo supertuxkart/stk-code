@@ -77,25 +77,25 @@ HelpPageOne::HelpPageOne()
     widget_manager->breakLine();
 
     /*Rotating 3D models*/
-	ssgEntity* hm = herring_manager->getHerringModel(HE_RED);
+	ssgEntity* hm = item_manager->getItemModel(ITEM_BONUS_BOX);
     ssgDeRefDelete(m_box);
     m_box = new ssgTransform;
     m_box->ref();
     m_box->addKid(hm);
 
-    hm = herring_manager->getHerringModel(HE_SILVER);
+    hm = item_manager->getItemModel(ITEM_SILVER_COIN);
     ssgDeRefDelete(m_silver_coin);
     m_silver_coin = new ssgTransform;
     m_silver_coin->ref();
     m_silver_coin->addKid(hm);
 
-    hm = herring_manager->getHerringModel(HE_GOLD);
+    hm = item_manager->getItemModel(ITEM_GOLD_COIN);
     ssgDeRefDelete(m_gold_coin);
     m_gold_coin = new ssgTransform;
     m_gold_coin->ref();
     m_gold_coin->addKid(hm);
 
-    hm = herring_manager->getHerringModel(HE_GREEN);
+    hm = item_manager->getItemModel(ITEM_BANANA);
     ssgDeRefDelete(m_banana);
     m_banana = new ssgTransform;
     m_banana->ref();

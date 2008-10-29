@@ -23,30 +23,30 @@
 #include "scene.hpp"
 #include "coord.hpp"
 
-Herring::Herring(herringType type, const Vec3& xyz, ssgEntity* model,
-                 unsigned int herring_id) 
+Item::Item(ItemType type, const Vec3& xyz, ssgEntity* model,
+                 unsigned int item_id) 
         : m_coord(xyz, Vec3(0, 0, 0))
 {
-    m_herring_id       = herring_id;
+    m_item_id       = item_id;
     m_type             = type;
     m_eaten            = false;
-    m_time_till_return = 0.0f;  // not strictly necessary, see isEaten()
+    m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
     m_root             = new ssgTransform();
     m_root->ref();
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
     scene->add(m_root);
 
-}   // Herring
+}   // Item
 
 //-----------------------------------------------------------------------------
-Herring::~Herring()
+Item::~Item()
 {
     ssgDeRefDelete(m_root);
-}   // ~Herring
+}   // ~Item
 
 //-----------------------------------------------------------------------------
-void Herring::reset()
+void Item::reset()
 {
     m_eaten            = false;
     m_time_till_return = 0.0f;
@@ -54,13 +54,13 @@ void Herring::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-int Herring::hitKart(Kart* kart)
+int Item::hitKart(Kart* kart)
 {
     return (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
 }   // hitKart
 
 //-----------------------------------------------------------------------------
-void Herring::update(float delta)
+void Item::update(float delta)
 {
     if(m_eaten)
     {
@@ -90,7 +90,7 @@ void Herring::update(float delta)
 }   // update
 
 //-----------------------------------------------------------------------------
-void Herring::isEaten()
+void Item::isCollected()
 {
     m_eaten            = true;
     m_time_till_return = 2.0f;

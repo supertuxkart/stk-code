@@ -171,7 +171,7 @@ public:
     bool        m_skidding;
     float       m_sfx_volume;
     int         m_max_fps;
-    std::string m_herring_style;
+    std::string m_item_style;
     std::string m_username;
     std::string m_background_music;
     std::string m_kart_group;      // Kart group used last

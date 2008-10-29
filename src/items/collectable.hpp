@@ -26,7 +26,7 @@
 #include "utils/random_generator.hpp"
 
 class Kart;
-class Herring;
+class Item;
 class SFXBase;
 
 class Collectable
@@ -49,7 +49,7 @@ public:
     void            reset        ();
     int             getNum       () const {return m_number;}
     CollectableType getType      () const {return m_type;  }
-    void            hitRedHerring(int n, const Herring &herring, int newC=-1);
+    void            hitBonusBox  (int n, const Item &item, int newC=-1);
     Material*       getIcon      ();
     void            use          ();
 };

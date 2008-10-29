@@ -99,9 +99,9 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
     else World::getDefaultCollectibles(collectible_type, amount);
 }
 //-----------------------------------------------------------------------------
-bool StandardRace::useRedHerring()
+bool StandardRace::enableBonusBoxes()
 {
-    // in time trial mode, don't use "red herrings"
+    // in time trial mode, don't use bonus boxes
     return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
 }
 //-----------------------------------------------------------------------------

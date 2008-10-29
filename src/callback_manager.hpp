@@ -30,7 +30,7 @@
 // gets loaded once, and deleted at the end (and when switching windows /
 // fullscreen). Sinace it's not much overhead, a separate class is provided
 // for every model that might contain a callback.
-enum CallbackType { CB_COLLECTABLE, CB_ATTACHMENT, CB_EXPLOSION, CB_HERRING,
+enum CallbackType { CB_COLLECTABLE, CB_ATTACHMENT, CB_EXPLOSION, CB_ITEM,
                     CB_KART,        CB_TRACK,      CB_MAX                    };
 
 class CallbackManager

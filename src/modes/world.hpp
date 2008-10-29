@@ -42,7 +42,7 @@ class btRigidBody;
  *  by the race manager on the start of each race (so a new world is created
  *  for each race of a Grand Prix). It creates the 
  *  physics, loads the track, creates all karts, and initialises the race
- *  specific managers (HerringManager, ProjectilManager, highscores, ...).
+ *  specific managers (ItemManager, ProjectilManager, highscores, ...).
  *  It uses the information from the race manager to get information like
  *  what and how many karts, track to load etc. This class does not really
  *  know about Grand Prixs, a GP is created
@@ -154,9 +154,9 @@ public:
       */
     virtual void getDefaultCollectibles(int& collectible_type, int& amount );
     
-    /** Called to determine whether this race mode uses "red herring".
+    /** Called to determine whether this race mode uses bonus boxes.
       */
-    virtual bool useRedHerring(){ return true; }
+    virtual bool enableBonusBoxes(){ return true; }
     
     /** Each game mode should have a unique internal code. Override
       * this method in child classes to provide it.

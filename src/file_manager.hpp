@@ -43,7 +43,7 @@ public:
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;
     std::string getKartDir       () const;
-    std::string getHerringDir    () const;
+    std::string getItemsDir    () const;
     std::string getTranslationDir() const;
     std::vector<std::string>getMusicDirs() const;
     std::string getTextureFile   (const std::string& fname) const;
@@ -54,7 +54,7 @@ public:
     std::string getConfigFile    (const std::string& fname) const;
     std::string getHighscoreFile (const std::string& fname) const;
     std::string getLogFile       (const std::string& fname) const;
-    std::string getHerringFile   (const std::string& fname) const;
+    std::string getItemFile      (const std::string& fname) const;
     std::string getMusicFile     (const std::string& fname) const;
     std::string getSFXFile       (const std::string& fname) const;
     std::string getFontFile      (const std::string& fname) const;

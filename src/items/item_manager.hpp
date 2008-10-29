@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HERRINGMANAGER_H
-#define HEADER_HERRINGMANAGER_H
+#ifndef HEADER_ITEMMANAGER_H
+#define HEADER_ITEMMANAGER_H
 
 
 #include <vector>
@@ -29,48 +29,47 @@
 class Kart;
 class ssgEntity;
 
-class HerringManager
+class ItemManager
 {
 
 private:
-    // The vector of all herrings of the current track
-    typedef std::vector<Herring*> AllHerringType;
-    AllHerringType m_all_herrings;
+    // The vector of all items of the current track
+    typedef std::vector<Item*> AllItemTypes;
+    AllItemTypes m_all_items;
 
-    // This stores all herring models defined in the models/herring
-    // subdirectory.
-    ssgEntity *m_herring_model[HE_SILVER+1];
+    // This stores all item models
+    ssgEntity *m_item_model[ITEM_SILVER_COIN+1];
 
     // This is the active model. It gets determined by first loading the
     // default, then track models, user models, grand prix models. This means that
-    // a herring style specified in a track overwrites a command line option.
+    // an item style specified in a track overwrites a command line option.
     std::map<std::string,ssgEntity*> m_all_models;
 
     std::string m_user_filename;
-    void CreateDefaultHerring(sgVec3 colour, std::string name);
-    void setDefaultHerringStyle();
-    void setHerring(const lisp::Lisp *herring_node, const char *colour,
-                    herringType type);
+    void createDefaultItem(sgVec3 colour, std::string name);
+    void setDefaultItemStyle();
+    void setItem(const lisp::Lisp *item_node, const char *colour,
+                 ItemType type);
 
 public:
-    HerringManager();
-    ~HerringManager();
-    void        loadDefaultHerrings();
-    void        loadHerringStyle(const std::string filename);
-    Herring*    newHerring      (herringType type, const Vec3& xyz);
+    ItemManager();
+    ~ItemManager();
+    void        loadDefaultItems();
+    void        loadItemStyle   (const std::string filename);
+    Item*       newItem         (ItemType type, const Vec3& xyz);
     void        update          (float delta);
-    void        hitHerring      (Kart* kart);
+    void        hitItem         (Kart* kart);
     void        cleanup         ();
     void        reset           ();
     void        removeTextures  ();
     void        setUserFilename (char *s) {m_user_filename=s;}
-    void        eatenHerring    (int herring_id, Kart *kart,
+    void        collectedItem   (int item_id, Kart *kart,
                                  int add_info=-1);
-    ssgEntity*  getHerringModel (herringType type)
-                                {return m_herring_model[type];}
+    ssgEntity*  getItemModel (ItemType type)
+                                {return m_item_model[type];}
 };
 
-extern HerringManager* herring_manager;
+extern ItemManager* item_manager;
 
 
 #endif

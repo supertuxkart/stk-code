@@ -63,7 +63,7 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 }   // set
 
 // -----------------------------------------------------------------------------
-void Attachment::hitGreenHerring(const Herring &herring, int random_attachment)
+void Attachment::hitBanana(const Item &item, int random_attachment)
 {
     if(user_config->m_profile) return;
     float leftover_time   = 0.0f;
@@ -93,8 +93,8 @@ void Attachment::hitGreenHerring(const Herring &herring, int random_attachment)
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
-        race_state->herringCollected(m_kart->getWorldKartId(), 
-                                     herring.getHerringId(), 
+        race_state->itemCollected(m_kart->getWorldKartId(), 
+                                     item.getItemId(), 
                                      random_attachment);
     }
 
@@ -117,7 +117,7 @@ void Attachment::hitGreenHerring(const Herring &herring, int random_attachment)
         m_kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor);
         break ;
     }   // switch 
-}   // hitGreenHerring
+}   // hitBanana
 
 //-----------------------------------------------------------------------------
 //** Moves a bomb from kart FROM to kart TO.

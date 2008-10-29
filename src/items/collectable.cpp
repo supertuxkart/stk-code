@@ -154,7 +154,7 @@ void Collectable::use()
 }   // use
 
 //-----------------------------------------------------------------------------
-void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
+void Collectable::hitBonusBox(int n, const Item &item, int add_info)
 {
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
@@ -186,9 +186,9 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
                     m_number = 1;
                     if(network_manager->getMode()==NetworkManager::NW_SERVER)
                     {
-                        race_state->herringCollected(m_owner->getWorldKartId(), 
-                                                     herring.getHerringId(), 
-                                                     m_type);
+                        race_state->itemCollected(m_owner->getWorldKartId(), 
+                                                  item.getItemId(), 
+                                                  m_type);
                     }
                     return;
                 }
@@ -198,9 +198,9 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
             m_number = 1;
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
             {
-                race_state->herringCollected(m_owner->getWorldKartId(), 
-                                             herring.getHerringId(), 
-                                             (char)m_type);
+                race_state->itemCollected(m_owner->getWorldKartId(), 
+                                          item.getItemId(), 
+                                          (char)m_type);
             }
             return;
         }
@@ -238,9 +238,9 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
-        race_state->herringCollected(m_owner->getWorldKartId(), 
-                                     herring.getHerringId(), 
-                                     newC);
+        race_state->itemCollected(m_owner->getWorldKartId(), 
+                                  item.getItemId(), 
+                                  newC);
     }
 
     if(m_type==COLLECT_NOTHING)
@@ -254,4 +254,4 @@ void Collectable::hitRedHerring(int n, const Herring &herring, int add_info)
         if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
     }
     // Ignore new collectable if it is different from the current one
-}   // hitRedHerring
+}   // hitBonusBox

@@ -70,7 +70,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
    //m_grid_position        = position;
     m_initial_position     = position;
-    m_num_herrings_gobbled = 0;
+    m_num_items_collected = 0;
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -358,7 +358,7 @@ void Kart::reset()
     m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
-    m_num_herrings_gobbled = 0;
+    m_num_items_collected = 0;
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
     m_bounce_back_time     = 0.0f;
@@ -403,35 +403,35 @@ void Kart::raceFinished(float time)
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
-void Kart::collectedHerring(const Herring &herring, int add_info)
+void Kart::collectedItem(const Item &item, int add_info)
 {
-    const herringType type = herring.getType();
+    const ItemType type = item.getType();
 
     switch (type)
     {
-    case HE_GREEN  : m_attachment.hitGreenHerring(herring, add_info);    break;
-    case HE_SILVER : m_num_herrings_gobbled++ ;                          break;
-    case HE_GOLD   : m_num_herrings_gobbled += 3 ;                       break;
-    case HE_RED    : { 
-		         int n=1 + 4*getNumHerring() / MAX_HERRING_EATEN;
-                         m_collectable.hitRedHerring(n, herring,add_info);break;
+    case ITEM_BANANA  : m_attachment.hitBanana(item, add_info);    break;
+    case ITEM_SILVER_COIN : m_num_items_collected++ ;                          break;
+    case ITEM_GOLD_COIN   : m_num_items_collected += 3 ;                       break;
+    case ITEM_BONUS_BOX    : { 
+		         int n=1 + 4*getNumItems() / MAX_ITEMS_COLLECTED;
+                         m_collectable.hitBonusBox(n, item,add_info);break;
                      }
     default        : break;
     }   // switch TYPE
 
     // Attachments and collectables are stored in the corresponding
-    // functions (hit{Red,Green}Herring), so only coins need to be
+    // functions (hit{Red,Green}Item), so only coins need to be
     // stored here.
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
-        (type==HE_SILVER || type==HE_GOLD)                       )
+        (type==ITEM_SILVER_COIN || type==ITEM_GOLD_COIN)                       )
     {
-        race_state->herringCollected(getWorldKartId(), herring.getHerringId());
+        race_state->itemCollected(getWorldKartId(), item.getItemId());
     }
 
-    if ( m_num_herrings_gobbled > MAX_HERRING_EATEN )
-        m_num_herrings_gobbled = MAX_HERRING_EATEN;
+    if ( m_num_items_collected > MAX_ITEMS_COLLECTED )
+        m_num_items_collected = MAX_ITEMS_COLLECTED;
 
-}   // collectedHerring
+}   // collectedItem
 
 //-----------------------------------------------------------------------------
 // Simulates gears
@@ -541,7 +541,7 @@ void Kart::update(float dt)
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
             RaceManager::getWorld()->getPhysics()->removeKart(this);
-            race_state->herringCollected(getWorldKartId(), -1, -1);
+            race_state->itemCollected(getWorldKartId(), -1, -1);
         }
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
@@ -613,8 +613,8 @@ void Kart::update(float dt)
         } // neither reset nor zipper material
     }   // if there is material
 
-    // Check if any herring was hit.
-    herring_manager->hitHerring(this);
+    // Check if any item was hit.
+    item_manager->hitItem(this);
     
     processSkidMarks();
 

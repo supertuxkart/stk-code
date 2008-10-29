@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
-(herring
+(item
   (gold   "goldcoin"  )
   (silver "silvercoin")
   (green  "banana"    )

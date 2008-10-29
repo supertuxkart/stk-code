@@ -19,38 +19,38 @@
 
 #ifndef HEADER_HERRING_INFO_HPP
 #define HEADER_HERRING_INFO_HPP
-/** Class used to transfer information about collected herrings from
+/** Class used to transfer information about collected items from
 *  server to client.
 */
-class HerringInfo
+class ItemInfo
 {
 public:
-    /** Kart id (in world) of the kart collecting the herring. */
+    /** Kart id (in world) of the kart collecting the item. */
     unsigned char   m_kart_id;
-    /** Index of the collected herring. This is set to -1 if a kart
+    /** Index of the collected item. This is set to -1 if a kart
      *  triggers a rescue (i.e. attaches the butterfly).]
      */
-    short           m_herring_id;
-    /** Additional info used, depending on herring type. This is usually
-     *  the type of the collected herring.
+    short           m_item_id;
+    /** Additional info used, depending on item type. This is usually
+     *  the type of the collected item.
      */
     char            m_add_info;
 
     /** Constructor to initialise all fields. */
-    HerringInfo(int kart, int herring, char add_info) :
-        m_kart_id(kart), m_herring_id(herring),
+    ItemInfo(int kart, int item, char add_info) :
+        m_kart_id(kart), m_item_id(item),
         m_add_info(add_info)  
     {}
     // -------------------------------------------------------------
-    /** Construct HerringInfo from a message (which is unpacked). */
-    HerringInfo(Message *m)
+    /** Construct ItemInfo from a message (which is unpacked). */
+    ItemInfo(Message *m)
     {
         m_kart_id    = m->getChar();
-        m_herring_id = m->getShort();
+        m_item_id = m->getShort();
         m_add_info   = m->getChar();
     }
     // -------------------------------------------------------------
-    /*** Returns size in bytes necessary to store HerringInfo. */
+    /*** Returns size in bytes necessary to store ItemInfo. */
     static int getLength() {return 2*Message::getCharLength()
                                  +   Message::getShortLength();}
     // -------------------------------------------------------------
@@ -58,10 +58,10 @@ public:
     void serialise(Message *m)
     {
         m->addChar(m_kart_id);
-        m->addShort(m_herring_id);
+        m->addShort(m_item_id);
         m->addChar(m_add_info);
     }   // serialise
-};   // HerringInfo
+};   // ItemInfo
 
 #endif
 

@@ -50,7 +50,7 @@ public:
     virtual void update(float delta);
     virtual void restartRace();
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    //virtual bool useRedHerring();
+    //virtual bool enableBonusBoxes();
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
     virtual bool raceHasLaps(){ return false; }

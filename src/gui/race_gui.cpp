@@ -463,8 +463,8 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
                                 float ratio_x, float ratio_y             )
 {
-    float state = (float)(player_kart->getNumHerring()) /
-                  MAX_HERRING_EATEN;
+    float state = (float)(player_kart->getNumItems()) /
+                  MAX_ITEMS_COLLECTED;
     int x = (int)((user_config->m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;
     int w = (int)(16 * ratio_x);
@@ -472,10 +472,10 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
     int wl = (int)(ratio_x);
     if(wl < 1)
         wl = 1;
-    const int GRADS = (int)(MAX_HERRING_EATEN/5);  // each graduation equals 5 herring
+    const int GRADS = (int)(MAX_ITEMS_COLLECTED/5);  // each graduation equals 5 items
     int gh = (int)(h/GRADS);  //graduation height
     float coin_target = (float)race_manager->getCoinTarget();
-    int th = (int)(h*(coin_target/MAX_HERRING_EATEN));
+    int th = (int)(h*(coin_target/MAX_ITEMS_COLLECTED));
 
     glDisable(GL_TEXTURE_2D);
     // Draw a Meter border

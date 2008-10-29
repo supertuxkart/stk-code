@@ -57,10 +57,10 @@ public:
     void         update            (float);
     void         action            (KartAction action, int value);
     void         handleZipper      ();
-    void         collectedHerring  (const Herring &herring, int add_info=-1);
+    void         collectedItem     (const Item &item, int add_info=-1);
     virtual void crashed           (Kart *k);
-    virtual void setPosition  (int p);
-    virtual void raceFinished (float time);
+    virtual void setPosition       (int p);
+    virtual void raceFinished      (float time);
     bool         isPlayerKart      () const {return true;}
     Camera*      getCamera         () {return m_camera;}
     void         reset();

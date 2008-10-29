@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HERRING_H
-#define HEADER_HERRING_H
+#ifndef HEADER_ITEM_H
+#define HEADER_ITEM_H
 
 // num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
 #define _WINSOCKAPI_
@@ -29,33 +29,33 @@ class Kart;
 class ssgTransform;
 class ssgEntity;
 
-// HE_RED must be the first, HE_SILVER the last entry. See HerringManager
-enum herringType { HE_RED, HE_GREEN, HE_GOLD, HE_SILVER, HE_NONE };
+// ITEM_BONUS_BOX must be the first, ITEM_SILVER_COIN the last entry. See ItemManager
+enum ItemType { ITEM_BONUS_BOX, ITEM_BANANA, ITEM_GOLD_COIN, ITEM_SILVER_COIN, ITEM_NONE };
 
 // -----------------------------------------------------------------------------
-class Herring
+class Item
 {
 private:
-    herringType   m_type;         // Herring type
-    bool          m_eaten;        // true if herring  was eaten & is not displayed
-    float         m_time_till_return;  // time till an eaten herring reappears
+    ItemType      m_type;         // Item type
+    bool          m_eaten;        // true if item was collected & is not displayed
+    float         m_time_till_return;  // time till a collected item reappears
     Coord         m_coord;        // Original coordinates, used mainly when
-                                  // eaten herrings reappear.
-    ssgTransform* m_root;         // The actual root of the herring
-    unsigned int  m_herring_id;   // index in herring_manager field
+                                  // collected items reappear.
+    ssgTransform* m_root;         // The actual root of the item
+    unsigned int  m_item_id;      // index in item_manager field
 public:
-                  Herring (herringType type, const Vec3& xyz, ssgEntity* model,
-                           unsigned int herring_id);
-                 ~Herring ();
-    unsigned int  getHerringId() const {return m_herring_id; }
+                  Item (ItemType type, const Vec3& xyz, ssgEntity* model,
+                           unsigned int item_id);
+                 ~Item ();
+    unsigned int  getItemId() const {return m_item_id; }
     void          update  (float delta);
-    void          isEaten ();
+    void          isCollected ();
     int           hitKart (Kart* kart );
     void          reset   ();
     ssgTransform* getRoot () const {return m_root;}
-    herringType   getType () const {return m_type;}
+    ItemType   getType () const {return m_type;}
     bool          wasEaten() const {return m_eaten;}
 }
-;   // class Herring
+;   // class Item
 
 #endif

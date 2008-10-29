@@ -35,7 +35,7 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-/** Simple shadow class, only used here for default herrings. */
+/** Simple shadow class, only used here for default items. */
 class Shadow
 {
     ssgBranch *sh ;
@@ -75,63 +75,63 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
     ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
 
     gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-    gs -> setState ( fuzzy_gst ) ;
+    //gs -> setState ( fuzzy_gst ) ;
     sh -> addKid ( gs ) ;
     sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }   // Shadow
 
 //=============================================================================
-HerringManager* herring_manager;
+ItemManager* item_manager;
 typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
 
-HerringManager::HerringManager()
+ItemManager::ItemManager()
 {
     m_all_models.clear();
-    // The actual loading is done in loadDefaultHerrings
-}   // HerringManager
+    // The actual loading is done in loadDefaultItems
+}   // ItemManager
 
 //-----------------------------------------------------------------------------
-void HerringManager::removeTextures()
+void ItemManager::removeTextures()
 {
-    for(AllHerringType::iterator i =m_all_herrings.begin();
-        i!=m_all_herrings.end();  i++)
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
     {
         delete *i;
     }
-    m_all_herrings.clear();
+    m_all_items.clear();
 
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
         ssgDeRefDelete(i->second);
     }
     m_all_models.clear();
-    callback_manager->clear(CB_HERRING);
+    callback_manager->clear(CB_ITEM);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
-HerringManager::~HerringManager()
+ItemManager::~ItemManager()
 {
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
         ssgDeRefDelete(i->second);
     }
-}   // ~HerringManager
+}   // ~ItemManager
 
 //-----------------------------------------------------------------------------
-void HerringManager::loadDefaultHerrings()
+void ItemManager::loadDefaultItems()
 {
     // Load all models. This can't be done in the constructor, 
     // since the file_manager isn't ready at that stage.
     // -------------------------------------------------------
     std::set<std::string> files;
-    file_manager->listFiles(files, file_manager->getHerringDir(),
+    file_manager->listFiles(files, file_manager->getItemsDir(),
                             /*is_full_path*/true, 
                             /*make_full_path*/true);
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
-            ssgEntity*  h         = loader->load(*i, CB_HERRING, 
+            ssgEntity*  h         = loader->load(*i, CB_ITEM, 
                                                  /*optimise*/true, 
                                                  /*full_path*/true);
             std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
@@ -143,16 +143,16 @@ void HerringManager::loadDefaultHerrings()
 
     // Load the old, internal only models
     // ----------------------------------
-    sgVec3 yellow = { 1.0f, 1.0f, 0.4f }; CreateDefaultHerring(yellow, "OLD_GOLD"  );
-    sgVec3 cyan   = { 0.4f, 1.0f, 1.0f }; CreateDefaultHerring(cyan  , "OLD_SILVER");
-    sgVec3 red    = { 0.8f, 0.0f, 0.0f }; CreateDefaultHerring(red   , "OLD_RED"   );
-    sgVec3 green  = { 0.0f, 0.8f, 0.0f }; CreateDefaultHerring(green , "OLD_GREEN" );
+    sgVec3 yellow = { 1.0f, 1.0f, 0.4f }; createDefaultItem(yellow, "OLD_GOLD"  );
+    sgVec3 cyan   = { 0.4f, 1.0f, 1.0f }; createDefaultItem(cyan  , "OLD_SILVER");
+    sgVec3 red    = { 0.8f, 0.0f, 0.0f }; createDefaultItem(red   , "OLD_RED"   );
+    sgVec3 green  = { 0.0f, 0.8f, 0.0f }; createDefaultItem(green , "OLD_GREEN" );
 
-    setDefaultHerringStyle();
-}   // loadDefaultHerrings
+    setDefaultItemStyle();
+}   // loadDefaultItems
 
 //-----------------------------------------------------------------------------
-void HerringManager::setDefaultHerringStyle()
+void ItemManager::setDefaultItemStyle()
 {
     // This should go in an internal, system wide configuration file
     const std::string DEFAULT_NAMES[4] = {"bonusblock", "banana",
@@ -160,17 +160,17 @@ void HerringManager::setDefaultHerringStyle()
 
     bool bError=0;
     char msg[MAX_ERROR_MESSAGE_LENGTH];
-    for(int i=HE_RED; i<=HE_SILVER; i++)
+    for(int i=ITEM_BONUS_BOX; i<=ITEM_SILVER_COIN; i++)
     {
-        m_herring_model[i] = m_all_models[DEFAULT_NAMES[i]];
-        if(!m_herring_model[i])
+        m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
+        if(!m_item_model[i])
         {
             snprintf(msg, sizeof(msg), 
-                     "Herring model '%s' is missing (see herring_manager)!\n",
+                     "Item model '%s' is missing (see item_manager)!\n",
                      DEFAULT_NAMES[i].c_str());
             bError=1;
             break;
-        }   // if !m_herring_model
+        }   // if !m_item_model
     }   // for i
     if(bError)
     {
@@ -185,7 +185,7 @@ void HerringManager::setDefaultHerringStyle()
                 }
                 else
                 {
-                    fprintf(stderr, "   %s in models/herrings/%s.ac.\n",
+                    fprintf(stderr, "   %s in %s.ac.\n",
                             i->first.c_str(),
                             i->first.c_str());
                 }
@@ -195,85 +195,86 @@ void HerringManager::setDefaultHerringStyle()
         exit(-1);
     }   // if bError
 
-}   // setDefaultHerringStyle
+}   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
-Herring* HerringManager::newHerring(herringType type, const Vec3& xyz)
+Item* ItemManager::newItem(ItemType type, const Vec3& xyz)
 {
-    Herring* h = new Herring(type, xyz, m_herring_model[type], m_all_herrings.size());
-    m_all_herrings.push_back(h);
+    Item* h = new Item(type, xyz, m_item_model[type], m_all_items.size());
+    m_all_items.push_back(h);
     return h;
-}   // newHerring
+}   // newItem
 
 //-----------------------------------------------------------------------------
-/** Set a herring as eaten.
- *  This function is called on the server when a herring is eaten, or on the
- *  client upon receiving information about eaten herrings.                  */
-void HerringManager::eatenHerring(int herring_id, Kart *kart, 
-                                  int add_info)
+/** Set an item as collected.
+ *  This function is called on the server when an item is collected, or on the
+ *  client upon receiving information about collected items.                  */
+void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
 {
-    Herring *herring=m_all_herrings[herring_id];
-    herring->isEaten();
-    kart->collectedHerring(*herring, add_info);
-}   // eatenHerring
+    Item *item=m_all_items[item_id];
+    item->isCollected();
+    kart->collectedItem(*item, add_info);
+}   // collectedItem
 
 //-----------------------------------------------------------------------------
-void  HerringManager::hitHerring(Kart* kart)
+void  ItemManager::hitItem(Kart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
 
-    for(AllHerringType::iterator i =m_all_herrings.begin();
-        i!=m_all_herrings.end();  i++)
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
     {
         if((*i)->wasEaten()) continue;
         if((*i)->hitKart(kart))
         {
-            eatenHerring(i-m_all_herrings.begin(), kart);
+            collectedItem(i-m_all_items.begin(), kart);
         }   // if hit
-    }   // for m_all_herrings
-}   // hitHerring
+    }   // for m_all_items
+}   // hitItem
 
 //-----------------------------------------------------------------------------
-/** Remove all herring instances, and the track specific models. This is used
+/** Remove all item instances, and the track specific models. This is used
  *  just before a new track is loaded and a race is started.
  */
-void HerringManager::cleanup()
+void ItemManager::cleanup()
 {
-    for(AllHerringType::iterator i =m_all_herrings.begin();
-        i!=m_all_herrings.end();  i++)
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
     {
         delete *i;
     }
-    m_all_herrings.clear();
+    m_all_items.clear();
 
-    setDefaultHerringStyle();
+    setDefaultItemStyle();
 
+    // FIXME - this seems outdated
+    
     // Then load the default style from the user_config file
     // -----------------------------------------------------
-    // This way if a herring is not defined in the herringstyle-file, the
+    // This way if an item is not defined in the item-style-file, the
     // default (i.e. old herring) is used.
     try
     {
         // FIXME: This should go in a system-wide configuration file,
         //        and only one of this and the hard-coded settings in
-        //        setDefaultHerringStyle are necessary!!!
-        loadHerringStyle(user_config->m_herring_style);
+        //        setDefaultItemStyle are necessary!!!
+        loadItemStyle(user_config->m_item_style);
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,"The herring style '%s' in your configuration file does not exist.\nIt is ignored.\n",
-                user_config->m_herring_style.c_str());
-        user_config->m_herring_style="";
+        fprintf(stderr,"The item style '%s' in your configuration file does not exist.\nIt is ignored.\n",
+                user_config->m_item_style.c_str());
+        user_config->m_item_style="";
     }
 
     try
     {
-        loadHerringStyle(m_user_filename);
+        loadItemStyle(m_user_filename);
     }
     catch(std::runtime_error)
     {
-        fprintf(stderr,"The herring style '%s' specified on the command line does not exist.\nIt is ignored.\n",
+        fprintf(stderr,"The item style '%s' specified on the command line does not exist.\nIt is ignored.\n",
                 m_user_filename.c_str());
         m_user_filename="";  // reset to avoid further warnings.
     }
@@ -281,30 +282,30 @@ void HerringManager::cleanup()
 }   // cleanup
 
 //-----------------------------------------------------------------------------
-/** Remove all herring instances, and the track specific models. This is used
+/** Remove all item instances, and the track specific models. This is used
  * just before a new track is loaded and a race is started
  */
-void HerringManager::reset()
+void ItemManager::reset()
 {
-    for(AllHerringType::iterator i =m_all_herrings.begin();
-        i!=m_all_herrings.end();  i++)
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
     {
         (*i)->reset();
     }  // for i
 }   // reset
 
 //-----------------------------------------------------------------------------
-void HerringManager::update(float delta)
+void ItemManager::update(float delta)
 {
-    for(AllHerringType::iterator i =m_all_herrings.begin();
-        i!=m_all_herrings.end();  i++)
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
     {
         (*i)->update(delta);
-    }   // for m_all_herrings
+    }   // for m_all_items
 }   // delta
 
 //-----------------------------------------------------------------------------
-void HerringManager::CreateDefaultHerring(sgVec3 colour, std::string name)
+void ItemManager::createDefaultItem(sgVec3 colour, std::string name)
 {
     ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
     ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
@@ -332,7 +333,8 @@ void HerringManager::CreateDefaultHerring(sgVec3 colour, std::string name)
 
     ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
 
-    gset->setState(material_manager->getMaterial("herring.rgb")->getState()) ;
+    // FIXME - this method seems outdated
+    //gset->setState(material_manager->getMaterial("herring.rgb")->getState()) ;
 
     Shadow* sh = new Shadow ( -0.5f, 0.5f, -0.25f, 0.25f ) ;
 
@@ -343,42 +345,42 @@ void HerringManager::CreateDefaultHerring(sgVec3 colour, std::string name)
     tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
     m_all_models[name] = tr;
 
-}   // CreateDefaultHerring
+}   // createDefaultItem
 
 //-----------------------------------------------------------------------------
-void HerringManager::loadHerringStyle(const std::string filename)
+void ItemManager::loadItemStyle(const std::string filename)
 {
     if(filename.length()==0) return;
     const lisp::Lisp* root = 0;
     lisp::Parser parser;
     
-    root = parser.parse(file_manager->getConfigFile(filename + ".herring"));
+    root = parser.parse(file_manager->getConfigFile(filename + ".items"));
 
-    const lisp::Lisp* herring_node = root->getLisp("herring");
-    if(!herring_node)
+    const lisp::Lisp* item_node = root->getLisp("item");
+    if(!item_node)
     {
         char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "Couldn't load map '%s': no herring node.",
+        snprintf(msg, sizeof(msg), "Couldn't load map '%s': no item node.",
                  filename.c_str());
 	delete root;
         throw std::runtime_error(msg);
         delete root;
     }
-    setHerring(herring_node, "red",   HE_RED   );
-    setHerring(herring_node, "green", HE_GREEN );
-    setHerring(herring_node, "gold"  ,HE_GOLD  );
-    setHerring(herring_node, "silver",HE_SILVER);
+    setItem(item_node, "red",   ITEM_BONUS_BOX   );
+    setItem(item_node, "green", ITEM_BANANA );
+    setItem(item_node, "gold"  ,ITEM_GOLD_COIN  );
+    setItem(item_node, "silver",ITEM_SILVER_COIN);
     delete root;
-}   // loadHerringStyle
+}   // loadItemStyle
 
 //-----------------------------------------------------------------------------
-void HerringManager::setHerring(const lisp::Lisp *herring_node,
-                                const char *colour, herringType type)
+void ItemManager::setItem(const lisp::Lisp *item_node,
+                                const char *colour, ItemType type)
 {
     std::string name;
-    herring_node->get(colour, name);
+    item_node->get(colour, name);
     if(name.size()>0)
     {
-        m_herring_model[type]=m_all_models[name];
+        m_item_model[type]=m_all_models[name];
     }
-}   // setHerring
+}   // setItem

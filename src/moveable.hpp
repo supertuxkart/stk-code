@@ -32,7 +32,7 @@ class Material;
 /* Limits of Kart performance */
 #define CRASH_PITCH          -45.0f
 
-#define MAX_HERRING_EATEN    20
+#define MAX_ITEMS_COLLECTED    20
 
 
 class Moveable 

@@ -274,7 +274,7 @@ void World::update(float dt)
     }
 
     projectile_manager->update(dt);
-    herring_manager->update(dt);
+    item_manager->update(dt);
 
     /* Routine stuff we do even when paused */
     callback_manager->update(dt);
@@ -426,25 +426,25 @@ void World::removeKart(int kart_number)
 
 }   // removeKart
 //-----------------------------------------------------------------------------
-/** Cleans up old herrings (from a previous race), removes old track specific
- *  herring models, and loads the actual track.
+/** Cleans up old items (from a previous race), removes old track specific
+ *  item models, and loads the actual track.
  */
 void World::loadTrack()
 {
-    // remove old herrings (from previous race), and remove old
-    // track specific herring models
-    herring_manager->cleanup();
+    // remove old items (from previous race), and remove old
+    // track specific item models
+    item_manager->cleanup();
     if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         try
         {
-            herring_manager->loadHerringStyle(race_manager->getHerringStyle());
+            item_manager->loadItemStyle(race_manager->getItemStyle());
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The grand prix '%s' contains an invalid herring style '%s'.\n",
+            fprintf(stderr, "The grand prix '%s' contains an invalid item style '%s'.\n",
                     race_manager->getGrandPrix()->getName().c_str(),
-                    race_manager->getHerringStyle().c_str());
+                    race_manager->getItemStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
                     race_manager->getGrandPrix()->getFilename().c_str());
         }
@@ -453,12 +453,12 @@ void World::loadTrack()
     {
         try
         {
-            herring_manager->loadHerringStyle(m_track->getHerringStyle());
+            item_manager->loadItemStyle(m_track->getItemStyle());
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The track '%s' contains an invalid herring style '%s'.\n",
-                    m_track->getName(), m_track->getHerringStyle().c_str());
+            fprintf(stderr, "The track '%s' contains an invalid item style '%s'.\n",
+                    m_track->getName(), m_track->getItemStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
                     m_track->getFilename().c_str());
         }
@@ -494,7 +494,7 @@ void World::restartRace()
     // Enable SFX again
     sfx_manager->resumeAll();
 
-    herring_manager->reset();
+    item_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
     callback_manager->reset();

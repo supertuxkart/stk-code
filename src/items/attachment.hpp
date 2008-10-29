@@ -24,7 +24,7 @@
 #include "utils/random_generator.hpp"
 
 class Kart;
-class Herring;
+class Item;
 
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
 // and TINYTUX being the last one. So if new elemts are added, make sure
@@ -77,11 +77,11 @@ public:
                                     }
     /** Randomly selects the new attachment. For a server process, the
      *  attachment can be passed into this function.
-        \param herring The herring that was collected.
+        \param item The item that was collected.
         \param random_attachment Optional: only used on the clients, it
                                  specifies the new attachment to use
      */
-    void  hitGreenHerring(const Herring &herring, int random_attachment=-1);
+    void  hitBanana(const Item &item, int random_attachment=-1);
     void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
 };

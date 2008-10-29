@@ -42,9 +42,9 @@ void RaceState::serialise()
                           + getVec3Length()+getQuaternionLength()
                           + getFloatLength()) ;
 
-    // 2. Add information about eaten herrings
+    // 2. Add information about collected items
     // ---------------------------------------
-    len += 1 + m_herring_info.size()* HerringInfo::getLength();
+    len += 1 + m_item_info.size()* ItemInfo::getLength();
 
     // 3. Add rocket positions
     // -----------------------
@@ -70,12 +70,12 @@ void RaceState::serialise()
         addFloat(kart->getSpeed());
     }   // for i
 
-    // 2. Eaten herrings
+    // 2. Collected items
     // -----------------
-    addChar(m_herring_info.size());
-    for(unsigned int i=0; i<m_herring_info.size(); i++)
+    addChar(m_item_info.size());
+    for(unsigned int i=0; i<m_item_info.size(); i++)
     {
-        m_herring_info[i].serialise(this);
+        m_item_info[i].serialise(this);
     }
 
     // 3. Projectiles
@@ -100,7 +100,7 @@ void RaceState::serialise()
 // ----------------------------------------------------------------------------
 void RaceState::clear()
 {
-    m_herring_info.clear();
+    m_item_info.clear();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -131,16 +131,16 @@ void RaceState::receive(ENetPacket *pkt)
         kart->setSpeed(getFloat());
     }   // for i
 
-    // 2. Eaten herrings
+    // 2. Collected Items
     // -----------------
-    unsigned short num_herrings=getChar();
-    for(unsigned int i=0; i<num_herrings; i++)
+    unsigned short num_items=getChar();
+    for(unsigned int i=0; i<num_items; i++)
     {
-        HerringInfo hi(this);
-        if(hi.m_herring_id==-1)     // Rescue triggered
+        ItemInfo hi(this);
+        if(hi.m_item_id==-1)     // Rescue triggered
             RaceManager::getKart(hi.m_kart_id)->forceRescue();
         else
-            herring_manager->eatenHerring(hi.m_herring_id,
+            item_manager->collectedItem(hi.m_item_id,
                                           RaceManager::getKart(hi.m_kart_id),
                                           hi.m_add_info);
     }

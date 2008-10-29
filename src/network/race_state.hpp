@@ -40,8 +40,8 @@ class RaceState : public Message
 {
 private:
 
-    /** Updates about collected herrings. */
-    std::vector<HerringInfo> m_herring_info;
+    /** Updates about collected items. */
+    std::vector<ItemInfo> m_item_info;
     /** Updates about existing flyables. */
     std::vector<FlyableInfo> m_flyable_info;
     /** Stores the controls of each kart at the beginning of its update(). */
@@ -57,10 +57,10 @@ private:
             m_kart_controls.resize(race_manager->getNumKarts());
         }   // RaceState()
         // --------------------------------------------------------------------
-        void herringCollected(int kartid, int herring_id, char add_info=-1)
+        void itemCollected(int kartid, int item_id, char add_info=-1)
         {
-            m_herring_info.push_back(HerringInfo(kartid, herring_id, add_info));
-        }   // herringCollected
+            m_item_info.push_back(ItemInfo(kartid, item_id, add_info));
+        }   // itemCollected
         // --------------------------------------------------------------------
         /** Collects information about collision in which at least one kart was
          *  involved. Other collision (e.g. projectiles, moving physics) are
