@@ -185,7 +185,7 @@ RaceGUI::handle(GameAction ga, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setCollectable(COLLECT_HOMING, 10000);
+				kart->setCollectable(COLLECT_CAKE, 10000);
 			}
 			break;
 		case GA_DEBUG_TOGGLE_FPS:

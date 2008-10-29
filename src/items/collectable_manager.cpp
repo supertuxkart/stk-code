@@ -26,7 +26,7 @@
 #include "translation.hpp"
 #include "items/bowling.hpp"
 #include "missile.hpp"
-#include "items/homing.hpp"
+#include "items/cake.hpp"
 #include "loader.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -45,7 +45,7 @@ initCollectableType ict[]=
     {COLLECT_ZIPPER,    "zipper.collectable"       },
     {COLLECT_BOWLING,   "bowling.projectile"         },
     {COLLECT_MISSILE,   "missile.projectile"       },
-    {COLLECT_HOMING,    "homingmissile.projectile" },
+    {COLLECT_CAKE,      "cake.projectile" },
     {COLLECT_ANVIL,     "anvil.collectable"        },
     {COLLECT_PARACHUTE, "parachute.collectable"    },
     {COLLECT_MAX,       ""                         },
@@ -139,8 +139,8 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
              Bowling::init  (lisp, m_all_models[collectType]); break;
         case COLLECT_MISSILE:        
              Missile::init(lisp, m_all_models[collectType]); break;
-        case COLLECT_HOMING: 
-             Homing::init (lisp, m_all_models[collectType]); break;
+        case COLLECT_CAKE: 
+             Cake::init (lisp, m_all_models[collectType]); break;
         default:;
     }   // switch
 

@@ -376,7 +376,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 break;
 
             case COLLECT_MISSILE:
-            case COLLECT_HOMING:
+            case COLLECT_CAKE:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
 		  if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >

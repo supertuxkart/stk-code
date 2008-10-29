@@ -30,7 +30,7 @@ class ssgEntity;
 // The anvil and parachute must be at the end of the enum, and the
 // zipper just before them (see collectable::hitRedHerring).
 enum CollectableType {COLLECT_NOTHING,
-                      COLLECT_MISSILE, COLLECT_HOMING,
+                      COLLECT_MISSILE, COLLECT_CAKE,
                       COLLECT_BOWLING, COLLECT_ZIPPER,
                       COLLECT_PARACHUTE, COLLECT_ANVIL,
                       COLLECT_MAX};

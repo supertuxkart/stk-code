@@ -23,7 +23,7 @@
 #include "items/projectile_manager.hpp"
 #include "items/bowling.hpp"
 #include "missile.hpp"
-#include "items/homing.hpp"
+#include "items/cake.hpp"
 #include "explosion.hpp"
 #include "items/collectable_manager.hpp"
 #include "items/collectable.hpp"
@@ -186,7 +186,7 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
     switch(type) 
     {
         case COLLECT_BOWLING: f = new Bowling(kart); break;
-        case COLLECT_HOMING:  f = new Homing(kart);  break;
+        case COLLECT_CAKE:    f = new Cake(kart);  break;
         case COLLECT_MISSILE: f = new Missile(kart); break;
         default:              return NULL;
     }

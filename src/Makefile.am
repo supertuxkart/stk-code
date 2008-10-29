@@ -49,25 +49,25 @@ supertuxkart_SOURCES =     main.cpp  			\
 	audio/music_information.cpp audio/music_information.hpp 		\
 	audio/music_ogg.cpp	   	    audio/music_ogg.hpp          		\
  	audio/sfx_base.hpp              					\
-	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      		\
-	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			\
-	audio/sound_manager.cpp	   	audio/sound_manager.hpp      		\
-	utils/random_generator.hpp	utils/random_generator.cpp		\
-	utils/ssg_help.cpp          utils/ssg_help.hpp                	\
-	material_manager.cpp	    material_manager.hpp    	\
-	grand_prix_manager.cpp	    grand_prix_manager.hpp	\
-	items/attachment.cpp		   items/attachment.hpp	        \
-	items/attachment_manager.cpp   items/attachment_manager.hpp       \
-	items/collectable.cpp		   items/collectable.hpp	        \
-	items/collectable_manager.cpp  items/collectable_manager.hpp   	\
-	items/herring.cpp 		       items/herring.hpp              	\
-	items/herring_manager.cpp	   items/herring_manager.hpp       	\
-	items/projectile_manager.cpp   items/projectile_manager.hpp    	\
-	items/missile.cpp		       items/missile.hpp			\
-	items/homing.cpp		       items/homing.hpp			\
-	items/bowling.cpp		       items/bowling.hpp			\
-	smoke.cpp		       smoke.hpp			\
-	input.hpp 		       kart_control.hpp		\
+	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      		 \
+	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			 \
+	audio/sound_manager.cpp	   	audio/sound_manager.hpp      	 \
+	utils/random_generator.hpp	utils/random_generator.cpp		 \
+	utils/ssg_help.cpp          utils/ssg_help.hpp               \
+	material_manager.cpp	    material_manager.hpp    	     \
+	grand_prix_manager.cpp	    grand_prix_manager.hpp	         \
+	items/attachment.cpp		   items/attachment.hpp	         \
+	items/attachment_manager.cpp   items/attachment_manager.hpp  \
+	items/collectable.cpp		   items/collectable.hpp	     \
+	items/collectable_manager.cpp  items/collectable_manager.hpp \
+	items/herring.cpp 		       items/herring.hpp             \
+	items/herring_manager.cpp	   items/herring_manager.hpp     \
+	items/projectile_manager.cpp   items/projectile_manager.hpp  \
+	items/missile.cpp		       items/missile.hpp			 \
+	items/cake.cpp		           items/cake.hpp			     \
+	items/bowling.cpp		       items/bowling.hpp			 \
+	smoke.cpp		       smoke.hpp			        \
+	input.hpp 		       kart_control.hpp		        \
 	isect.cpp		       isect.hpp                	\
 	track.cpp		       track.hpp                	\
 	explosion.cpp		   explosion.hpp            	\
@@ -75,37 +75,37 @@ supertuxkart_SOURCES =     main.cpp  			\
 	grand_prix_data.cpp    grand_prix_data.hpp        	\
 	kart_properties_manager.cpp kart_properties_manager.hpp \
 	kart_properties.cpp	   kart_properties.hpp       	\
-	stk_config.cpp		   stk_config.hpp    		\
-	highscores.cpp		   highscores.hpp		\
-	highscore_manager.cpp  highscore_manager.hpp	\
-	unlock_manager.cpp	   unlock_manager.hpp		\
+	stk_config.cpp		   stk_config.hpp    		    \
+	highscores.cpp		   highscores.hpp		        \
+	highscore_manager.cpp  highscore_manager.hpp	    \
+	unlock_manager.cpp	   unlock_manager.hpp		    \
 	file_manager.cpp       file_manager.hpp           	\
-	loader.cpp		       loader.hpp			\
+	loader.cpp		       loader.hpp			        \
 	race_manager.cpp	   race_manager.hpp          	\
 	string_utils.cpp	   string_utils.hpp          	\
 	track_manager.cpp	   track_manager.hpp         	\
-	callback.hpp 						\
-	moving_physics.hpp	   moving_physics.cpp		\
-	moving_texture.hpp	   moving_texture.cpp		\
+	callback.hpp 						                \
+	moving_physics.hpp	   moving_physics.cpp		    \
+	moving_texture.hpp	   moving_texture.cpp		    \
 	callback_manager.cpp   callback_manager.hpp         \
 	physics.cpp            physics.hpp                  \
-	skid_mark.cpp		   skid_mark.hpp	        \
-	shadow.cpp		       shadow.hpp	        	\
+	skid_mark.cpp		   skid_mark.hpp	            \
+	shadow.cpp		       shadow.hpp	        	    \
 	particle_system.cpp	   particle_system.hpp       	\
-	main_loop.cpp	 	   main_loop.hpp        	\
-	camera.cpp		       camera.hpp	        	\
-	sdldrv.cpp		       sdldrv.hpp	        	\
+	main_loop.cpp	 	   main_loop.hpp        	    \
+	camera.cpp		       camera.hpp	        	    \
+	sdldrv.cpp		       sdldrv.hpp	        	    \
 	moveable.cpp 		   moveable.hpp             	\
-	kart.cpp		       kart.hpp		        \
+	kart.cpp		       kart.hpp		                \
 	user_pointer.hpp	   auto_kart.hpp             	\
-	player_kart.cpp		   player_kart.hpp	        \
-	terrain_info.cpp	   terrain_info.hpp		\
-    triangle_mesh.cpp	   triangle_mesh.hpp		\
-	flyable.cpp		       flyable.hpp			\
-	history.cpp		       history.hpp	        	\
-	scene.hpp		       scene.cpp			\
-	no_copy.hpp	           constants.hpp 		\
-	translation.cpp		   translation.hpp 		\
+	player_kart.cpp		   player_kart.hpp	            \
+	terrain_info.cpp	   terrain_info.hpp		        \
+    triangle_mesh.cpp	   triangle_mesh.hpp		    \
+	flyable.cpp		       flyable.hpp			        \
+	history.cpp		       history.hpp	        	    \
+	scene.hpp		       scene.cpp			        \
+	no_copy.hpp	           constants.hpp 		        \
+	translation.cpp		   translation.hpp 		        \
 	player.hpp		   				\
 	challenges/challenge.hpp      challenges/challenge.cpp	\
 	challenges/challenge_data.hpp challenges/challenge_data.cpp	\

@@ -17,16 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "items/homing.hpp"
+#include "items/cake.hpp"
 #include "constants.hpp"
 
 #include <iostream>
 
-float Homing::m_st_max_distance;
-float Homing::m_st_max_distance_squared;
-float Homing::m_st_max_turn_angle;
+float Cake::m_st_max_distance;
+float Cake::m_st_max_distance_squared;
+float Cake::m_st_max_turn_angle;
 
-Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
+Cake::Cake (Kart *kart) : Flyable(kart, COLLECT_CAKE)
 {
     m_target = NULL;
     
@@ -107,12 +107,12 @@ Homing::Homing (Kart *kart) : Flyable(kart, COLLECT_HOMING)
     
     m_body->applyTorque( btVector3(5,-3,7) );
     
-}   // Homing
+}   // Cake
 
 // -----------------------------------------------------------------------------
-void Homing::init(const lisp::Lisp* lisp, ssgEntity *homing)
+void Cake::init(const lisp::Lisp* lisp, ssgEntity *cake_model)
 {
-    Flyable::init(lisp, homing, COLLECT_HOMING);
+    Flyable::init(lisp, cake_model, COLLECT_CAKE);
     m_st_max_turn_angle = 15.0f;
     m_st_max_distance   = 80.0f;
     m_st_max_distance_squared = 80.0f * 80.0f;
@@ -124,7 +124,7 @@ void Homing::init(const lisp::Lisp* lisp, ssgEntity *homing)
 }   // init
 
 // -----------------------------------------------------------------------------
-void Homing::update(float dt)
+void Cake::update(float dt)
 {
     
     if(m_target != NULL)

@@ -87,7 +87,7 @@ void Collectable::use()
     {
     case COLLECT_ZIPPER:   m_owner->handleZipper();
         break ;
-    case COLLECT_HOMING:
+    case COLLECT_CAKE:
     case COLLECT_BOWLING:
     case COLLECT_MISSILE:
         m_sound_shot->position(m_owner->getXYZ());

@@ -17,12 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HOMING_H
-#define HEADER_HOMING_H
+#ifndef HEADER_CAKE_H
+#define HEADER_CAKE_H
 
 #include "flyable.hpp"
 
-class Homing : public Flyable
+class Cake : public Flyable
 {
 private:
     static float m_st_max_distance;    // maximum distance for a missile to be attracted
@@ -35,8 +35,8 @@ private:
     Kart*        m_target;            // which kart is targeted by this
                                       // projectile (NULL if none)
 public:
-    Homing (Kart *kart);
-    static  void init     (const lisp::Lisp* lisp, ssgEntity* homing);
+    Cake (Kart *kart);
+    static  void init     (const lisp::Lisp* lisp, ssgEntity* cake_model);
     virtual void update   (float dt);
     virtual void hitTrack ()                      { explode(NULL);           }
     // Kinematic objects are not allowed to have a velocity (assertion in 
@@ -44,6 +44,6 @@ public:
     virtual const btVector3 &getVelocity() const  {return m_initial_velocity;}
     virtual void  setVelocity(const btVector3& v) {m_initial_velocity=v;     }
 
-};   // Homing
+};   // Cake
 
 #endif

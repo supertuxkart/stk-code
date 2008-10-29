@@ -70,7 +70,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG2, 10, 12,
-        collectable_manager->getIcon(COLLECT_HOMING)->getState()->getTextureHandle());
+        collectable_manager->getIcon(COLLECT_CAKE)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT2, 90, 12,
         _("Cake - thrown at the closest rival,\nbest on short ranges and long straights"));
