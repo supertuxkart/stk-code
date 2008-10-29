@@ -1139,6 +1139,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\cake.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\collectable.cpp"
 					>
 				</File>
@@ -1147,15 +1151,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\items\herring.cpp"
+					RelativePath="..\..\items\item.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\items\herring_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\items\homing.cpp"
+					RelativePath="..\..\items\item_manager.cpp"
 					>
 				</File>
 				<File
@@ -1745,6 +1745,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\cake.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\collectable.hpp"
 					>
 				</File>
@@ -1753,15 +1757,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\items\herring.hpp"
+					RelativePath="..\..\items\item.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\items\herring_manager.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\items\homing.hpp"
+					RelativePath="..\..\items\item_manager.hpp"
 					>
 				</File>
 				<File
