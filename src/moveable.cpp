@@ -22,6 +22,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "user_config.hpp"
+#include "coord.hpp"
 
 Moveable::Moveable()
 {

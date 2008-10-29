@@ -21,10 +21,10 @@
 #define HEADER_ATTACHMENT_H
 
 #include "stk_config.hpp"
-#include "items/item.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
+class Herring;
 
 // Some loop in Attachment.cpp depend on PARACHUTE being the first element,
 // and TINYTUX being the last one. So if new elemts are added, make sure
