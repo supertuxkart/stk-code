@@ -23,7 +23,7 @@
 
 #include "network/network_manager.hpp"
 #include "user_config.hpp"
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 #include "file_manager.hpp"
 #include "loader.hpp"
 #include "material_manager.hpp"

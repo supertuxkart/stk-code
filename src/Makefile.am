@@ -60,8 +60,8 @@ supertuxkart_SOURCES =     main.cpp  			\
 	items/attachment_manager.cpp   items/attachment_manager.hpp  \
 	items/collectable.cpp		   items/collectable.hpp	     \
 	items/collectable_manager.cpp  items/collectable_manager.hpp \
-	items/herring.cpp 		       items/herring.hpp             \
-	items/herring_manager.cpp	   items/herring_manager.hpp     \
+	items/item.cpp 		           items/item.hpp                \
+	items/item_manager.cpp	       items/item_manager.hpp        \
 	items/projectile_manager.cpp   items/projectile_manager.hpp  \
 	items/missile.cpp		       items/missile.hpp			 \
 	items/cake.cpp		           items/cake.hpp			     \

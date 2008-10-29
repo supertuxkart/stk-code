@@ -30,7 +30,7 @@
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #include "loader.hpp"
 #include "coord.hpp"
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 #include "file_manager.hpp"
 #include "skid_mark.hpp"
 #include "user_config.hpp"

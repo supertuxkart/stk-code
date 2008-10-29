@@ -24,7 +24,7 @@
 #include <ctime>
 
 #include "modes/world.hpp"
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "file_manager.hpp"

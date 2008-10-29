@@ -34,7 +34,7 @@
 #include "material_manager.hpp"
 #include "kart_properties_manager.hpp"
 #include "main_loop.hpp"
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 #include "items/collectable_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"

@@ -26,7 +26,7 @@
 #include "network/herring_info.hpp"
 #include "network/flyable_info.hpp"
 #include "kart_control.hpp"
-#include "items/herring.hpp"
+#include "items/item.hpp"
 #include "flyable.hpp"
 #include "race_manager.hpp"
 #include "kart.hpp"

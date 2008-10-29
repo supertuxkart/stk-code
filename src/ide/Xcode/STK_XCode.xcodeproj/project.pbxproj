@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		95090A490EB7EA960048841A /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95090A450EB7EA960048841A /* item.cpp */; };
+		95090A4A0EB7EA960048841A /* item.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95090A460EB7EA960048841A /* item.hpp */; };
+		95090A4B0EB7EA960048841A /* item_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95090A470EB7EA960048841A /* item_manager.hpp */; };
+		95090A4C0EB7EA960048841A /* item_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95090A480EB7EA960048841A /* item_manager.cpp */; };
 		9518C11D0EB7AF7A00952372 /* cake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9518C11B0EB7AF7A00952372 /* cake.cpp */; };
 		9518C11E0EB7AF7A00952372 /* cake.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9518C11C0EB7AF7A00952372 /* cake.hpp */; };
 		95B0CF470EB69DDA001A0D06 /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0C9E90EB69DCE001A0D06 /* actionmap.cpp */; };
@@ -389,10 +393,6 @@
 		95B0D35F0EB69DDF001A0D06 /* collectable.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE2E0EB69DD9001A0D06 /* collectable.hpp */; };
 		95B0D3600EB69DDF001A0D06 /* collectable_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE2F0EB69DD9001A0D06 /* collectable_manager.cpp */; };
 		95B0D3610EB69DDF001A0D06 /* collectable_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE300EB69DD9001A0D06 /* collectable_manager.hpp */; };
-		95B0D3620EB69DDF001A0D06 /* herring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE310EB69DD9001A0D06 /* herring.cpp */; };
-		95B0D3630EB69DDF001A0D06 /* herring.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE320EB69DD9001A0D06 /* herring.hpp */; };
-		95B0D3640EB69DDF001A0D06 /* herring_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE330EB69DD9001A0D06 /* herring_manager.cpp */; };
-		95B0D3650EB69DDF001A0D06 /* herring_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE340EB69DD9001A0D06 /* herring_manager.hpp */; };
 		95B0D3680EB69DDF001A0D06 /* missile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE370EB69DD9001A0D06 /* missile.cpp */; };
 		95B0D3690EB69DDF001A0D06 /* missile.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE380EB69DD9001A0D06 /* missile.hpp */; };
 		95B0D36A0EB69DDF001A0D06 /* projectile_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE390EB69DD9001A0D06 /* projectile_manager.cpp */; };
@@ -756,8 +756,6 @@
 				95B0D35D0EB69DDF001A0D06 /* bowling.hpp in CopyFiles */,
 				95B0D35F0EB69DDF001A0D06 /* collectable.hpp in CopyFiles */,
 				95B0D3610EB69DDF001A0D06 /* collectable_manager.hpp in CopyFiles */,
-				95B0D3630EB69DDF001A0D06 /* herring.hpp in CopyFiles */,
-				95B0D3650EB69DDF001A0D06 /* herring_manager.hpp in CopyFiles */,
 				95B0D3690EB69DDF001A0D06 /* missile.hpp in CopyFiles */,
 				95B0D36B0EB69DDF001A0D06 /* projectile_manager.hpp in CopyFiles */,
 				95B0D36E0EB69DDF001A0D06 /* kart.hpp in CopyFiles */,
@@ -832,12 +830,18 @@
 				95B0D3F40EB69DE0001A0D06 /* ssg_help.hpp in CopyFiles */,
 				95B0D3F60EB69DE0001A0D06 /* vec3.hpp in CopyFiles */,
 				9518C11E0EB7AF7A00952372 /* cake.hpp in CopyFiles */,
+				95090A4A0EB7EA960048841A /* item.hpp in CopyFiles */,
+				95090A4B0EB7EA960048841A /* item_manager.hpp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		95090A450EB7EA960048841A /* item.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = item.cpp; sourceTree = "<group>"; };
+		95090A460EB7EA960048841A /* item.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = item.hpp; sourceTree = "<group>"; };
+		95090A470EB7EA960048841A /* item_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = item_manager.hpp; sourceTree = "<group>"; };
+		95090A480EB7EA960048841A /* item_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = item_manager.cpp; sourceTree = "<group>"; };
 		9518C11B0EB7AF7A00952372 /* cake.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cake.cpp; sourceTree = "<group>"; };
 		9518C11C0EB7AF7A00952372 /* cake.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = cake.hpp; sourceTree = "<group>"; };
 		95B0C9E90EB69DCE001A0D06 /* actionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = actionmap.cpp; sourceTree = "<group>"; };
@@ -1220,10 +1224,6 @@
 		95B0CE2E0EB69DD9001A0D06 /* collectable.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = collectable.hpp; sourceTree = "<group>"; };
 		95B0CE2F0EB69DD9001A0D06 /* collectable_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = collectable_manager.cpp; sourceTree = "<group>"; };
 		95B0CE300EB69DD9001A0D06 /* collectable_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = collectable_manager.hpp; sourceTree = "<group>"; };
-		95B0CE310EB69DD9001A0D06 /* herring.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = herring.cpp; sourceTree = "<group>"; };
-		95B0CE320EB69DD9001A0D06 /* herring.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = herring.hpp; sourceTree = "<group>"; };
-		95B0CE330EB69DD9001A0D06 /* herring_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = herring_manager.cpp; sourceTree = "<group>"; };
-		95B0CE340EB69DD9001A0D06 /* herring_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = herring_manager.hpp; sourceTree = "<group>"; };
 		95B0CE370EB69DD9001A0D06 /* missile.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = missile.cpp; sourceTree = "<group>"; };
 		95B0CE380EB69DD9001A0D06 /* missile.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = missile.hpp; sourceTree = "<group>"; };
 		95B0CE390EB69DD9001A0D06 /* projectile_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = projectile_manager.cpp; sourceTree = "<group>"; };
@@ -2302,10 +2302,10 @@
 				95B0CE2E0EB69DD9001A0D06 /* collectable.hpp */,
 				95B0CE2F0EB69DD9001A0D06 /* collectable_manager.cpp */,
 				95B0CE300EB69DD9001A0D06 /* collectable_manager.hpp */,
-				95B0CE310EB69DD9001A0D06 /* herring.cpp */,
-				95B0CE320EB69DD9001A0D06 /* herring.hpp */,
-				95B0CE330EB69DD9001A0D06 /* herring_manager.cpp */,
-				95B0CE340EB69DD9001A0D06 /* herring_manager.hpp */,
+				95090A450EB7EA960048841A /* item.cpp */,
+				95090A460EB7EA960048841A /* item.hpp */,
+				95090A470EB7EA960048841A /* item_manager.hpp */,
+				95090A480EB7EA960048841A /* item_manager.cpp */,
 				95B0CE370EB69DD9001A0D06 /* missile.cpp */,
 				95B0CE380EB69DD9001A0D06 /* missile.hpp */,
 				95B0CE390EB69DD9001A0D06 /* projectile_manager.cpp */,
@@ -2955,8 +2955,6 @@
 				95B0D35C0EB69DDF001A0D06 /* bowling.cpp in Sources */,
 				95B0D35E0EB69DDF001A0D06 /* collectable.cpp in Sources */,
 				95B0D3600EB69DDF001A0D06 /* collectable_manager.cpp in Sources */,
-				95B0D3620EB69DDF001A0D06 /* herring.cpp in Sources */,
-				95B0D3640EB69DDF001A0D06 /* herring_manager.cpp in Sources */,
 				95B0D3680EB69DDF001A0D06 /* missile.cpp in Sources */,
 				95B0D36A0EB69DDF001A0D06 /* projectile_manager.cpp in Sources */,
 				95B0D36C0EB69DDF001A0D06 /* kart.cpp in Sources */,
@@ -3017,6 +3015,8 @@
 				95B0D3F30EB69DE0001A0D06 /* ssg_help.cpp in Sources */,
 				95B0D3F50EB69DE0001A0D06 /* vec3.cpp in Sources */,
 				9518C11D0EB7AF7A00952372 /* cake.cpp in Sources */,
+				95090A490EB7EA960048841A /* item.cpp in Sources */,
+				95090A4C0EB7EA960048841A /* item_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

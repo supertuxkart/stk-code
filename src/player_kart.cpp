@@ -25,7 +25,7 @@
 #include "player_kart.hpp"
 #include "player.hpp"
 #include "sdldrv.hpp"
-#include "items/herring.hpp"
+#include "items/item.hpp"
 #include "modes/world.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"

@@ -60,7 +60,7 @@
 #include "sdldrv.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"

@@ -176,7 +176,7 @@ void History::Save()
 
     for(int k=0; k<nKarts; k++)
     {
-        Kart* kart= RaceManager::getKart(k);
+        //Kart* kart= RaceManager::getKart(k);
         j = m_wrapped ? m_current : 0;
         for(int i=0; i<m_size; i++)
         {

@@ -25,7 +25,7 @@
 #include <vector>
 #include <cassert>
 
-#include "items/herring_manager.hpp"
+#include "items/item_manager.hpp"
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
     of races that has to be completed one after the other */
