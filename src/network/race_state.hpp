@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "network/message.hpp"
-#include "network/herring_info.hpp"
+#include "network/item_info.hpp"
 #include "network/flyable_info.hpp"
 #include "kart_control.hpp"
 #include "items/item.hpp"

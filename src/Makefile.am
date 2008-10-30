@@ -41,8 +41,8 @@ supertuxkart_SOURCES =     main.cpp  			\
 	network/connect_message.hpp      network/character_info_message.hpp	\
 	network/kart_update_message.hpp  network/kart_update_message.cpp	\
 	network/kart_control_message.hpp network/kart_control_message.cpp	\
-	network/flyable_info.hpp	 network/herring_info.hpp		\
-	network/race_state.hpp		 network/race_state.cpp			\
+	network/flyable_info.hpp	     network/item_info.hpp		\
+	network/race_state.hpp		     network/race_state.cpp			\
 	network/race_result_message.hpp	 network/race_result_message.cpp	\
 	network/race_result_ack_message						\
 	audio/music.hpp								\

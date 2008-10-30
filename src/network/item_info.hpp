@@ -1,4 +1,4 @@
-//  $Id: herring_info.hpp 1284 2007-11-08 12:31:54Z hikerstk $
+//  $Id: item_info.hpp 1284 2007-11-08 12:31:54Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HERRING_INFO_HPP
-#define HEADER_HERRING_INFO_HPP
+#ifndef HEADER_ITEM_INFO_HPP
+#define HEADER_ITEM_INFO_HPP
 /** Class used to transfer information about collected items from
 *  server to client.
 */
