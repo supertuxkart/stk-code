@@ -3,8 +3,8 @@
 (supertuxkart-grand-prix
  (name _("At world's end"))
  (description _("Last grand prix, longer and harder"))
- (tracks "fortmagma" "canyon" "subseatrack" "volcano" "snowtuxpeak")
- (laps       3           2       3             3           3)
+ (tracks "fortmagma" "canyon" "subseatrack"  "snowtuxpeak" "racetrack")
+ (laps       3           2       3                 3           3)
 )
 
 ;; EOF ;;
