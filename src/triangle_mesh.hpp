@@ -23,7 +23,8 @@
 #include <vector>
 #include "user_pointer.hpp"
 #include "btBulletDynamicsCommon.h"
-#include "material.hpp"
+
+class Material;
 
 /** A special class to store a triangle mesh with a separate material
  *  per triangle.

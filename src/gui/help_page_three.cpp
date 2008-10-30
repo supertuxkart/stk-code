@@ -19,12 +19,7 @@
 
 #include "help_page_three.hpp"
 #include "widget_manager.hpp"
-#include "race_manager.hpp"
 #include "menu_manager.hpp"
-#include "user_config.hpp"
-#include "player.hpp"
-#include "items/collectable_manager.hpp"
-#include "material.hpp"
 #include "translation.hpp"
 #include "unlock_manager.hpp"
 
