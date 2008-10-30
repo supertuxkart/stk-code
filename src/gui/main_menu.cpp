@@ -47,7 +47,7 @@ MainMenu::MainMenu()
 
     const int WIDTH=30;
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
-    widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Multiplayer") );
+    widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Splitscreen") );
 
     // Only display the networking entry when not already connected.
     if(network_manager->getMode()==NetworkManager::NW_NONE)
