@@ -208,7 +208,7 @@ void PlayerKart::update(float dt)
 
     if ( m_controls.fire && !isRescue())
     {
-        if (m_collectable.getType()==COLLECT_NOTHING) 
+        if (m_powerup.getType()==POWERUP_NOTHING) 
             Kart::beep();
     }
 
@@ -289,9 +289,9 @@ void PlayerKart::handleZipper()
  *  \param item Item that was collected.
  *  \param add_info Additional info to be used then handling the item. If
  *                  this is -1 (default), the item type is selected 
- *                  randomly. Otherwise it contains the collectable or 
+ *                  randomly. Otherwise it contains the powerup or 
  *                  attachment for the kart. This is used in network mode to 
- *                  let the server determine the collectable/attachment for
+ *                  let the server determine the powerup/attachment for
  *                  the clients.
  */
 void PlayerKart::collectedItem(const Item &item, int add_info)

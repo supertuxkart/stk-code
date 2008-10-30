@@ -469,7 +469,7 @@ void World::loadTrack()
 //-----------------------------------------------------------------------------
 void World::getDefaultCollectibles(int& collectible_type, int& amount )
 {
-    collectible_type = COLLECT_NOTHING;
+    collectible_type = POWERUP_NOTHING;
     amount = 0;
 }
 //-----------------------------------------------------------------------------

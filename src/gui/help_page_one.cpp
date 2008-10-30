@@ -118,9 +118,9 @@ get stuck or fall too far, use the rescue button to get back on track."));
     widget_manager->breakLine();
 
     widget_manager->addTextWgt(WTOK_MSG6, 100, 17,
-_("Collecting coins increases the number of collectables you receive.\n\
-After 5 silver coins, each blue box will yield 2 collectables,\nafter 10,\
- 3 collectables and so on.\nEach gold coin is worth 3 silver coins, \
+_("Collecting coins increases the number of powerups you receive.\n\
+After 5 silver coins, each blue box will yield 2 powerups,\nafter 10,\
+ 3 powerups and so on.\nEach gold coin is worth 3 silver coins, \
 so look out for them!"));
     widget_manager->setWgtResizeToText( WTOK_MSG6, false);
     widget_manager->breakLine();

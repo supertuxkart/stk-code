@@ -17,19 +17,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_COLLECTABLE_H
-#define HEADER_COLLECTABLE_H
+#ifndef HEADER_POWERUP_H
+#define HEADER_POWERUP_H
 
-#define MAX_COLLECTABLES 5
+#define MAX_POWERUPS 5
 
-#include "items/collectable_manager.hpp"  // needed for collectable_type
+#include "items/powerup_manager.hpp"  // needed for powerup_type
 #include "utils/random_generator.hpp"
 
 class Kart;
 class Item;
 class SFXBase;
 
-class Collectable
+class Powerup
 {
 private:
     RandomGenerator            m_random;
@@ -39,16 +39,16 @@ private:
 
 protected:
     Kart*                      m_owner;
-    CollectableType            m_type;
+    PowerupType                m_type;
     int                        m_number;
 
 public:
-                    Collectable  (Kart* kart_);
-                   ~Collectable  ();
-    void            set          (CollectableType _type, int n=1);
+                    Powerup  (Kart* kart_);
+                   ~Powerup  ();
+    void            set          (PowerupType _type, int n=1);
     void            reset        ();
     int             getNum       () const {return m_number;}
-    CollectableType getType      () const {return m_type;  }
+    PowerupType     getType      () const {return m_type;  }
     void            hitBonusBox  (int n, const Item &item, int newC=-1);
     Material*       getIcon      ();
     void            use          ();

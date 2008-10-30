@@ -21,7 +21,7 @@
 #include "constants.hpp"
 
 // -----------------------------------------------------------------------------
-Missile::Missile(Kart *kart) : Flyable(kart, COLLECT_MISSILE)
+Missile::Missile(Kart *kart) : Flyable(kart, POWERUP_MISSILE)
 {
     float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
     createPhysics(y_offset, btVector3(0.0f, m_speed, 0.0f),
@@ -31,7 +31,7 @@ Missile::Missile(Kart *kart) : Flyable(kart, COLLECT_MISSILE)
 // -----------------------------------------------------------------------------
 void Missile::init(const lisp::Lisp* lisp, ssgEntity *missile)
 {
-    Flyable::init(lisp, missile, COLLECT_MISSILE);
+    Flyable::init(lisp, missile, POWERUP_MISSILE);
 }   // init
 
 // -----------------------------------------------------------------------------

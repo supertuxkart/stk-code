@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_COLLECTABLEMANAGER_H
-#define HEADER_COLLECTABLEMANAGER_H
+#ifndef HEADER_POWERUPMANAGER_H
+#define HEADER_POWERUPMANAGER_H
 
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
@@ -28,27 +28,27 @@ class Material;
 class ssgEntity;
 
 // The anvil and parachute must be at the end of the enum, and the
-// zipper just before them (see collectable::hitBonusBox).
-enum CollectableType {COLLECT_NOTHING,
-                      COLLECT_MISSILE, COLLECT_CAKE,
-                      COLLECT_BOWLING, COLLECT_ZIPPER,
-                      COLLECT_PARACHUTE, COLLECT_ANVIL,
-                      COLLECT_MAX};
+// zipper just before them (see Powerup::hitBonusBox).
+enum PowerupType {POWERUP_NOTHING,
+                  POWERUP_MISSILE, POWERUP_CAKE,
+                  POWERUP_BOWLING, POWERUP_ZIPPER,
+                  POWERUP_PARACHUTE, POWERUP_ANVIL,
+                  POWERUP_MAX};
 
-class CollectableManager
+class PowerupManager
 {
 protected:
-    Material*    m_all_icons [COLLECT_MAX];
-    float        m_all_max_distance[COLLECT_MAX];    // if a target is closer than this
-    float        m_all_force_to_target[COLLECT_MAX]; // apply this force to move towards
+    Material*    m_all_icons [POWERUP_MAX];
+    float        m_all_max_distance[POWERUP_MAX];    // if a target is closer than this
+    float        m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
                                                      // the target
-    float        m_all_max_turn_angle[COLLECT_MAX];  // maximum turn angle for homing
-    ssgEntity*   m_all_models[COLLECT_MAX];
-    btVector3    m_all_extends[COLLECT_MAX];
+    float        m_all_max_turn_angle[POWERUP_MAX];  // maximum turn angle for homing
+    ssgEntity*   m_all_models[POWERUP_MAX];
+    btVector3    m_all_extends[POWERUP_MAX];
     void         LoadNode       (const lisp::Lisp* lisp, int collectType);
 public:
-    CollectableManager           ();
-    void         loadCollectables();
+    PowerupManager           ();
+    void         loadPowerups();
     void         removeTextures  ();
     void         Load            (int collectType, const char* filename);
     Material*    getIcon         (int type) const {return m_all_icons [type];      }
@@ -59,6 +59,6 @@ public:
     const btVector3& getExtend   (int type) const {return m_all_extends[type];     }
 };
 
-extern CollectableManager* collectable_manager;
+extern PowerupManager* powerup_manager;
 
 #endif

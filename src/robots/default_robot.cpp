@@ -346,7 +346,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
     KartInfo& kart_info = lworld->m_kart_info[ getWorldKartId() ];
     
     m_time_since_last_shot += DELTA;
-    if( m_collectable.getType() != COLLECT_NOTHING )
+    if( m_powerup.getType() != POWERUP_NOTHING )
     {
         switch( m_item_tactic )
         {
@@ -358,9 +358,9 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
             }
             break;
         case IT_CALCULATE:
-            switch( m_collectable.getType() )
+            switch( m_powerup.getType() )
             {
-            case COLLECT_ZIPPER:
+            case POWERUP_ZIPPER:
                 {
                     const float ANGLE_DIFF = fabsf( normalize_angle(
                         RaceManager::getTrack()->m_angle[kart_info.m_track_sector]-
@@ -375,8 +375,8 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 }
                 break;
 
-            case COLLECT_MISSILE:
-            case COLLECT_CAKE:
+            case POWERUP_MISSILE:
+            case POWERUP_CAKE:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
 		  if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
@@ -388,7 +388,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 }
                 break;
 
-            case COLLECT_BOWLING:
+            case POWERUP_BOWLING:
                 if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
                 {
                     m_controls.fire = true;

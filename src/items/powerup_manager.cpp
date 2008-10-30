@@ -19,7 +19,7 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "items/collectable_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
@@ -35,38 +35,38 @@
 
 typedef struct
 {
-    CollectableType collectable;
+    PowerupType powerup;
     const char*const dataFile;
 }
-initCollectableType;
+initPowerupType;
 
-initCollectableType ict[]=
+initPowerupType ict[]=
 {
-    {COLLECT_ZIPPER,    "zipper.collectable"       },
-    {COLLECT_BOWLING,   "bowling.projectile"         },
-    {COLLECT_MISSILE,   "missile.projectile"       },
-    {COLLECT_CAKE,      "cake.projectile" },
-    {COLLECT_ANVIL,     "anvil.collectable"        },
-    {COLLECT_PARACHUTE, "parachute.collectable"    },
-    {COLLECT_MAX,       ""                         },
+    {POWERUP_ZIPPER,    "zipper.collectable"       },
+    {POWERUP_BOWLING,   "bowling.projectile"         },
+    {POWERUP_MISSILE,   "missile.projectile"       },
+    {POWERUP_CAKE,      "cake.projectile" },
+    {POWERUP_ANVIL,     "anvil.collectable"        },
+    {POWERUP_PARACHUTE, "parachute.collectable"    },
+    {POWERUP_MAX,       ""                         },
 };
 
-CollectableManager* collectable_manager=0;
+PowerupManager* powerup_manager=0;
 
 //-----------------------------------------------------------------------------
-CollectableManager::CollectableManager()
+PowerupManager::PowerupManager()
 {
-    for(int i=0; i<COLLECT_MAX; i++)
+    for(int i=0; i<POWERUP_MAX; i++)
     {
         m_all_models[i] = (ssgEntity*)NULL;
         m_all_icons[i]  = (Material*)NULL;
     }
-}   // CollectableManager
+}   // PowerupManager
 
 //-----------------------------------------------------------------------------
-void CollectableManager::removeTextures()
+void PowerupManager::removeTextures()
 {
-    for(int i=0; i<COLLECT_MAX; i++)
+    for(int i=0; i<POWERUP_MAX; i++)
     {
         if(m_all_icons [i]) ssgDeRefDelete(m_all_icons [i]->getState());
         if(m_all_models[i]) ssgDeRefDelete(m_all_models[i]            );
@@ -76,16 +76,16 @@ void CollectableManager::removeTextures()
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
-void CollectableManager::loadCollectables()
+void PowerupManager::loadPowerups()
 {
-    for(int i=0; ict[i].collectable != COLLECT_MAX; i++)
+    for(int i=0; ict[i].powerup != POWERUP_MAX; i++)
     {
-        Load(ict[i].collectable, ict[i].dataFile);
+        Load(ict[i].powerup, ict[i].dataFile);
     }
-}  // loadCollectables
+}  // loadPowerups
 
 //-----------------------------------------------------------------------------
-void CollectableManager::Load(int collectType, const char* filename)
+void PowerupManager::Load(int collectType, const char* filename)
 {
     const lisp::Lisp* ROOT = 0;
 
@@ -109,7 +109,7 @@ void CollectableManager::Load(int collectType, const char* filename)
 }   // Load
 
 //-----------------------------------------------------------------------------
-void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
+void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 {
     std::string sName, sModel, sIconFile; 
     lisp->get("name",            sName                              );
@@ -133,13 +133,13 @@ void CollectableManager::LoadNode(const lisp::Lisp* lisp, int collectType )
         m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
     }
 
-    // Load special attributes for certain collectables
+    // Load special attributes for certain powerups
     switch (collectType) {
-        case COLLECT_BOWLING:          
+        case POWERUP_BOWLING:          
              Bowling::init  (lisp, m_all_models[collectType]); break;
-        case COLLECT_MISSILE:        
+        case POWERUP_MISSILE:        
              Missile::init(lisp, m_all_models[collectType]); break;
-        case COLLECT_CAKE: 
+        case POWERUP_CAKE: 
              Cake::init (lisp, m_all_models[collectType]); break;
         default:;
     }   // switch

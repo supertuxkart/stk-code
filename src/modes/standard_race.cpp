@@ -93,7 +93,7 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
     // in time trial mode, give zippers
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        collectible_type = COLLECT_ZIPPER;
+        collectible_type = POWERUP_ZIPPER;
         amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);

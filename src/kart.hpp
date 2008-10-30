@@ -29,7 +29,7 @@
 #include "kart_properties.hpp"
 #include "kart_control.hpp"
 #include "items/attachment.hpp"
-#include "items/collectable.hpp"
+#include "items/powerup.hpp"
 #include "terrain_info.hpp"
 
 class SkidMark;
@@ -45,7 +45,7 @@ private:
 
 protected:
     Attachment   m_attachment;
-    Collectable  m_collectable;
+    Powerup  m_powerup;
     int          m_race_position;      // current race position (1-numKarts)
     int          m_initial_position;   // initial position of kart
 
@@ -119,8 +119,8 @@ public:
                                           { m_kart_properties=kp;                }
     void           attach              (attachmentType attachment_, float time)
                                           { m_attachment.set(attachment_, time); }
-    void           setCollectable      (CollectableType t, int n)
-                                          { m_collectable.set(t, n);             }
+    void           setPowerup      (PowerupType t, int n)
+                                          { m_powerup.set(t, n);             }
     virtual void   setPosition         (int p)    
                                           { m_race_position = p;                 }
     
@@ -128,8 +128,8 @@ public:
     void           setAttachmentType   (attachmentType t, float time_left=0.0f,
                                         Kart*k=NULL)
                                           { m_attachment.set(t, time_left, k);   }
-    Collectable   *getCollectable      ()       { return &m_collectable;         }
-    int            getNumCollectables  () const { return  m_collectable.getNum();}
+    Powerup   *getPowerup      ()       { return &m_powerup;         }
+    int            getNumPowerup  () const { return  m_powerup.getNum();}
     int            getNumItems       () const { return  m_num_items_collected;}
     int            getPosition         () const { return  m_race_position;       }
     int            getInitialPosition  () const { return  m_initial_position;    }

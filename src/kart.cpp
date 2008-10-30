@@ -61,7 +61,7 @@
 Kart::Kart (const std::string& kart_name, int position,
             const btTransform& init_transform) 
      : TerrainInfo(1),
-       Moveable(), m_attachment(this), m_collectable(this)
+       Moveable(), m_attachment(this), m_powerup(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
@@ -351,7 +351,7 @@ void Kart::reset()
     }
 
     m_attachment.clear();
-    m_collectable.reset();
+    m_powerup.reset();
 
     m_race_position        = 9;
     m_finished_race        = false;
@@ -414,12 +414,12 @@ void Kart::collectedItem(const Item &item, int add_info)
     case ITEM_GOLD_COIN   : m_num_items_collected += 3 ;                       break;
     case ITEM_BONUS_BOX    : { 
 		         int n=1 + 4*getNumItems() / MAX_ITEMS_COLLECTED;
-                         m_collectable.hitBonusBox(n, item,add_info);break;
+                         m_powerup.hitBonusBox(n, item,add_info);break;
                      }
     default        : break;
     }   // switch TYPE
 
-    // Attachments and collectables are stored in the corresponding
+    // Attachments and powerups are stored in the corresponding
     // functions (hit{Red,Green}Item), so only coins need to be
     // stored here.
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
@@ -512,7 +512,7 @@ void Kart::update(float dt)
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
-        m_collectable.use() ;
+        m_powerup.use() ;
         m_controls.fire = false;
     }
 

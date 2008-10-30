@@ -25,8 +25,8 @@
 #include "missile.hpp"
 #include "items/cake.hpp"
 #include "explosion.hpp"
-#include "items/collectable_manager.hpp"
-#include "items/collectable.hpp"
+#include "items/powerup_manager.hpp"
+#include "items/powerup.hpp"
 #include "scene.hpp"
 
 static ssgSelector *find_selector ( ssgBranch *b );
@@ -37,7 +37,7 @@ void ProjectileManager::loadData()
 {
 
     // Load the explosion model and find the actual selector branch in it.
-    // Only the explosion model is loaded here, see collectable_manager.
+    // Only the explosion model is loaded here, see powerup_manager.
     m_explosion_model = find_selector((ssgBranch*)loader->load("explode.ac",
                                    CB_EXPLOSION) );
     m_explosion_model->ref();
@@ -55,7 +55,7 @@ void ProjectileManager::removeTextures()
     cleanup();
     ssgDeRefDelete(m_explosion_model);
     // Only the explosion is here, all other models are actually managed
-    // by collectable_manager.
+    // by powerup_manager.
     callback_manager->clear(CB_EXPLOSION);
 }   // removeTextures
 
@@ -180,14 +180,14 @@ void ProjectileManager::updateClient(float dt)
 
 }   // updateClient
 // -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(Kart *kart, CollectableType type)
+Flyable *ProjectileManager::newProjectile(Kart *kart, PowerupType type)
 {
     Flyable *f;
     switch(type) 
     {
-        case COLLECT_BOWLING: f = new Bowling(kart); break;
-        case COLLECT_CAKE:    f = new Cake(kart);  break;
-        case COLLECT_MISSILE: f = new Missile(kart); break;
+        case POWERUP_BOWLING: f = new Bowling(kart); break;
+        case POWERUP_CAKE:    f = new Cake(kart);  break;
+        case POWERUP_MISSILE: f = new Missile(kart); break;
         default:              return NULL;
     }
     m_active_projectiles.push_back(f);

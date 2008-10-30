@@ -26,7 +26,7 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING, 50.0f /* mass */)
+Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
 {
     float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
     
@@ -65,7 +65,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, COLLECT_BOWLING, 50.0f /* mass */)
 // -----------------------------------------------------------------------------
 void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
 {
-    Flyable::init(lisp, bowling, COLLECT_BOWLING);
+    Flyable::init(lisp, bowling, POWERUP_BOWLING);
     m_st_max_distance    = 20.0f;
     m_st_max_distance_squared = 20.0f * 20.0f;
     m_st_force_to_target = 10.0f;

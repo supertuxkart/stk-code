@@ -171,21 +171,21 @@ RaceGUI::handle(GameAction ga, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
-				kart->setCollectable(COLLECT_BOWLING, 10000);
+				kart->setPowerup(POWERUP_BOWLING, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setCollectable(COLLECT_MISSILE, 10000);
+				kart->setPowerup(POWERUP_MISSILE, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_HOMING:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setCollectable(COLLECT_CAKE, 10000);
+				kart->setPowerup(POWERUP_CAKE, 10000);
 			}
 			break;
 		case GA_DEBUG_TOGGLE_FPS:
@@ -414,22 +414,22 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 }   // drawPlayerIcons
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
+void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
                                      int offset_y, float ratio_x,
                                      float ratio_y                    )
 {
     // If player doesn't have anything, do nothing.
-    Collectable* collectable=player_kart->getCollectable();
-    if(collectable->getType() == COLLECT_NOTHING) return;
+    Powerup* powerup=player_kart->getPowerup();
+    if(powerup->getType() == POWERUP_NOTHING) return;
 
     // Originally the hardcoded sizes were 320-32 and 400
     int x1 = (int)((user_config->m_width/2-32) * ratio_x) + offset_x ;
     int y1 = (int)(user_config->m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
-    collectable->getIcon()->apply();
+    powerup->getIcon()->apply();
 
-    int n  = player_kart->getNumCollectables() ;
+    int n  = player_kart->getNumPowerup() ;
 
     if ( n > 5 ) n = 5 ;
     if ( n < 1 ) n = 1 ;
@@ -446,7 +446,7 @@ void RaceGUI::drawCollectableIcons ( Kart* player_kart, int offset_x,
     }   // for i
     glEnd () ;
 
-}   // drawCollectableIcons
+}   // drawPowerupIcons
 
 //-----------------------------------------------------------------------------
 /* Energy meter that gets filled with coins */
@@ -984,7 +984,7 @@ void RaceGUI::drawStatusText(const float dt)
             }
 
             Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
-            drawCollectableIcons(player_kart, offset_x, offset_y,
+            drawPowerupIcons(player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawEnergyMeter     (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );

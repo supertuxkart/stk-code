@@ -58,8 +58,8 @@ supertuxkart_SOURCES =     main.cpp  			\
 	grand_prix_manager.cpp	    grand_prix_manager.hpp	         \
 	items/attachment.cpp		   items/attachment.hpp	         \
 	items/attachment_manager.cpp   items/attachment_manager.hpp  \
-	items/collectable.cpp		   items/collectable.hpp	     \
-	items/collectable_manager.cpp  items/collectable_manager.hpp \
+	items/powerup.cpp		       items/powerup.hpp	     \
+	items/powerup_manager.cpp      items/powerup_manager.hpp \
 	items/item.cpp 		           items/item.hpp                \
 	items/item_manager.cpp	       items/item_manager.hpp        \
 	items/projectile_manager.cpp   items/projectile_manager.hpp  \

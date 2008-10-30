@@ -31,15 +31,15 @@
 #include "modes/linear_world.hpp"
 
 // static variables:
-float      Flyable::m_st_speed[COLLECT_MAX];
-ssgEntity* Flyable::m_st_model[COLLECT_MAX];
-float      Flyable::m_st_min_height[COLLECT_MAX];
-float      Flyable::m_st_max_height[COLLECT_MAX];
-float      Flyable::m_st_force_updown[COLLECT_MAX];
-btVector3  Flyable::m_st_extend[COLLECT_MAX];
+float      Flyable::m_st_speed[POWERUP_MAX];
+ssgEntity* Flyable::m_st_model[POWERUP_MAX];
+float      Flyable::m_st_min_height[POWERUP_MAX];
+float      Flyable::m_st_max_height[POWERUP_MAX];
+float      Flyable::m_st_force_updown[POWERUP_MAX];
+btVector3  Flyable::m_st_extend[POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(Kart *kart, CollectableType type, float mass) : Moveable()
+Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 {
     // get the appropriate data from the static fields
     m_speed             = m_st_speed[type];
@@ -99,7 +99,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
 
 // -----------------------------------------------------------------------------
 void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model, 
-                   CollectableType type)
+                   PowerupType type)
 {
     m_st_speed[type]        = 25.0f;
     m_st_max_height[type]   = 1.0f;

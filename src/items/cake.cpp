@@ -26,7 +26,7 @@ float Cake::m_st_max_distance;
 float Cake::m_st_max_distance_squared;
 float Cake::m_st_max_turn_angle;
 
-Cake::Cake (Kart *kart) : Flyable(kart, COLLECT_CAKE)
+Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 {
     m_target = NULL;
     
@@ -112,7 +112,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, COLLECT_CAKE)
 // -----------------------------------------------------------------------------
 void Cake::init(const lisp::Lisp* lisp, ssgEntity *cake_model)
 {
-    Flyable::init(lisp, cake_model, COLLECT_CAKE);
+    Flyable::init(lisp, cake_model, POWERUP_CAKE);
     m_st_max_turn_angle = 15.0f;
     m_st_max_distance   = 80.0f;
     m_st_max_distance_squared = 80.0f * 80.0f;

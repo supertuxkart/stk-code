@@ -55,12 +55,12 @@ protected:
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
     // for bowling balls, missiles, ...
-    static float      m_st_speed[COLLECT_MAX];         // Speed of the projectile
-    static ssgEntity* m_st_model[COLLECT_MAX];         // 3d model
-    static float      m_st_min_height[COLLECT_MAX];    // min height above track
-    static float      m_st_max_height[COLLECT_MAX];    // max height above track
-    static float      m_st_force_updown[COLLECT_MAX];  // force pushing up/down 
-    static btVector3  m_st_extend[COLLECT_MAX];        // size of the model
+    static float      m_st_speed[POWERUP_MAX];         // Speed of the projectile
+    static ssgEntity* m_st_model[POWERUP_MAX];         // 3d model
+    static float      m_st_min_height[POWERUP_MAX];    // min height above track
+    static float      m_st_max_height[POWERUP_MAX];    // max height above track
+    static float      m_st_force_updown[POWERUP_MAX];  // force pushing up/down 
+    static btVector3  m_st_extend[POWERUP_MAX];        // size of the model
 
     /** Returns information on what is the closest kart and at what
         distance it is. All 3 parameters first are of type 'out'.
@@ -76,14 +76,14 @@ protected:
                                     const bool rotates=false, const btTransform* customDirection=NULL);
 public:
 
-                 Flyable     (Kart* kart, CollectableType type, float mass=1.0f);
+                 Flyable     (Kart* kart, PowerupType type, float mass=1.0f);
     virtual     ~Flyable     ();
     /** Enables/disables adjusting ov velocity depending on height above 
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
      *  but gravity will basically be disabled.                          */
     void         setAdjustZVelocity(bool f) { m_adjust_z_velocity = f; }
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
-                              CollectableType type);
+                              PowerupType type);
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);
 

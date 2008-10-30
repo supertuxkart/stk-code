@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "items/collectable.hpp"
+#include "items/powerup.hpp"
 
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
@@ -31,36 +31,36 @@
 #include "stk_config.hpp"
 
 //-----------------------------------------------------------------------------
-Collectable::Collectable(Kart* kart_)
+Powerup::Powerup(Kart* kart_)
 {
     m_owner               = kart_;
     m_sound_shot          = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
     m_sound_use_anvil     = sfx_manager->newSFX(SFXManager::SOUND_USE_ANVIL);
     m_sound_use_parachute = sfx_manager->newSFX(SFXManager::SOUND_USE_PARACHUTE);
     reset();
-}   // Collectable
+}   // Powerup
 
 //-----------------------------------------------------------------------------
 /** Frees the memory for the sound effects.
  */
-Collectable::~Collectable()
+Powerup::~Powerup()
 {
     sfx_manager->deleteSFX(m_sound_shot);
     sfx_manager->deleteSFX(m_sound_use_anvil);
     sfx_manager->deleteSFX(m_sound_use_parachute);
 
-}   // ~Collectable
+}   // ~Powerup
 
 //-----------------------------------------------------------------------------
-void Collectable::reset()
+void Powerup::reset()
 {
     int type;
     RaceManager::getWorld()->getDefaultCollectibles( type, m_number );
-    m_type = (CollectableType)type;
+    m_type = (PowerupType)type;
 }   // reset
 
 //-----------------------------------------------------------------------------
-void Collectable::set(CollectableType type, int n)
+void Powerup::set(PowerupType type, int n)
 {
     if (m_type==type)
     {
@@ -72,30 +72,30 @@ void Collectable::set(CollectableType type, int n)
 }  // set
 
 //-----------------------------------------------------------------------------
-Material *Collectable::getIcon()
+Material *Powerup::getIcon()
 {
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
-    return collectable_manager->getIcon(m_type);
+    return powerup_manager->getIcon(m_type);
 }
 
 //-----------------------------------------------------------------------------
-void Collectable::use()
+void Powerup::use()
 {
     m_number--;
     switch (m_type)
     {
-    case COLLECT_ZIPPER:   m_owner->handleZipper();
+    case POWERUP_ZIPPER:   m_owner->handleZipper();
         break ;
-    case COLLECT_CAKE:
-    case COLLECT_BOWLING:
-    case COLLECT_MISSILE:
+    case POWERUP_CAKE:
+    case POWERUP_BOWLING:
+    case POWERUP_MISSILE:
         m_sound_shot->position(m_owner->getXYZ());
         m_sound_shot->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
-    case COLLECT_ANVIL:
+    case POWERUP_ANVIL:
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
@@ -115,7 +115,7 @@ void Collectable::use()
 
         break;
 
-    case COLLECT_PARACHUTE:
+    case POWERUP_PARACHUTE:
         {
             Kart* player_kart = NULL;
             //Attach a parachutte(that last as twice as the
@@ -142,30 +142,30 @@ void Collectable::use()
         }
         break;
 
-    case COLLECT_NOTHING:
+    case POWERUP_NOTHING:
     default :              break ;
     }
 
     if ( m_number <= 0 )
     {
         m_number = 0;
-        m_type   = COLLECT_NOTHING;
+        m_type   = POWERUP_NOTHING;
     }
 }   // use
 
 //-----------------------------------------------------------------------------
-void Collectable::hitBonusBox(int n, const Item &item, int add_info)
+void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
-    if(m_owner->getPosition() != 1 && m_type == COLLECT_NOTHING)
+    if(m_owner->getPosition() != 1 && m_type == POWERUP_NOTHING)
     {
         // On client: just set the value
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
         {
             m_random.get(100);    // keep random numbers in sync
-            m_type    = (CollectableType)add_info;
+            m_type    = (PowerupType)add_info;
             m_number  = 1;
             return;
         }
@@ -182,7 +182,7 @@ void Collectable::hitBonusBox(int n, const Item &item, int add_info)
                 if(kart->isEliminated() || kart == m_owner) continue;
                 if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {
-                    m_type = COLLECT_PARACHUTE;
+                    m_type = POWERUP_PARACHUTE;
                     m_number = 1;
                     if(network_manager->getMode()==NetworkManager::NW_SERVER)
                     {
@@ -194,7 +194,7 @@ void Collectable::hitBonusBox(int n, const Item &item, int add_info)
                 }
             }
 
-            m_type   = m_random.get(2) == 0 ? COLLECT_ANVIL : COLLECT_PARACHUTE;
+            m_type   = m_random.get(2) == 0 ? POWERUP_ANVIL : POWERUP_PARACHUTE;
             m_number = 1;
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
             {
@@ -211,30 +211,30 @@ void Collectable::hitBonusBox(int n, const Item &item, int add_info)
     // dependent on the server informaion:
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        if(m_type==COLLECT_NOTHING)
+        if(m_type==POWERUP_NOTHING)
         {
-            m_type   = (CollectableType)add_info;
+            m_type   = (PowerupType)add_info;
             m_number = n;
         }
-        else if((CollectableType)add_info==m_type)
+        else if((PowerupType)add_info==m_type)
         {
             m_number+=n;
-            if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
+            if(m_number > MAX_POWERUPS) m_number = MAX_POWERUPS;
         }
-        // Ignore new collectable if it is different from the current one
+        // Ignore new powerup if it is different from the current one
         m_random.get(100);    // keep random numbers in synch
 
         return;
     }   // if network client
 
-    // Otherwise (server or no network): determine collectable randomly
+    // Otherwise (server or no network): determine powerup randomly
 
-    //rand() is moduled by COLLECT_MAX - 1 - 2 because because we have to
+    //rand() is moduled by POWERUP_MAX - 1 - 2 because because we have to
     //exclude the anvil and the parachute, but later we have to add 1 to prevent
-    //having a value of 0 since that isn't a valid collectable.
-    CollectableType newC;
-    newC = (CollectableType)(m_random.get(COLLECT_MAX - 1 - 2) + 1);
-    // Save the information about the collectable in the race state
+    //having a value of 0 since that isn't a valid powerup.
+    PowerupType newC;
+    newC = (PowerupType)(m_random.get(POWERUP_MAX - 1 - 2) + 1);
+    // Save the information about the powerup in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
@@ -243,7 +243,7 @@ void Collectable::hitBonusBox(int n, const Item &item, int add_info)
                                   newC);
     }
 
-    if(m_type==COLLECT_NOTHING)
+    if(m_type==POWERUP_NOTHING)
     {
         m_type=newC;
         m_number = n;
@@ -251,7 +251,7 @@ void Collectable::hitBonusBox(int n, const Item &item, int add_info)
     else if(newC==m_type)
     {
         m_number+=n;
-        if(m_number > MAX_COLLECTABLES) m_number = MAX_COLLECTABLES;
+        if(m_number > MAX_POWERUPS) m_number = MAX_POWERUPS;
     }
-    // Ignore new collectable if it is different from the current one
+    // Ignore new powerup if it is different from the current one
 }   // hitBonusBox

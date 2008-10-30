@@ -35,7 +35,7 @@
 #include "kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "items/item_manager.hpp"
-#include "items/collectable_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "loader.hpp"
@@ -316,12 +316,12 @@ void SDLDriver::setVideoMode(bool resetTextures)
         projectile_manager      -> removeTextures();
         item_manager         -> removeTextures();
         kart_properties_manager -> removeTextures();
-        collectable_manager     -> removeTextures();
+        powerup_manager     -> removeTextures();
 
         material_manager->reInit();
 
 
-        collectable_manager     -> loadCollectables();
+        powerup_manager     -> loadPowerups();
         kart_properties_manager -> loadKartData();
         item_manager         -> loadDefaultItems();
         projectile_manager      -> loadData();

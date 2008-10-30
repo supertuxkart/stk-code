@@ -23,7 +23,7 @@
 #include <vector>
 #include <plib/ssg.h>
 #include "vec3.hpp"
-#include "items/collectable_manager.hpp"
+#include "items/powerup_manager.hpp"
 
 class Kart;
 class Explosion;
@@ -62,7 +62,7 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Flyable*         newProjectile    (Kart *kart, CollectableType type);
+    Flyable*         newProjectile    (Kart *kart, PowerupType type);
     Explosion*       newExplosion     (const Vec3& coord);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();

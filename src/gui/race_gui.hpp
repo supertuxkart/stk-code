@@ -111,7 +111,7 @@ private:
     void drawEnergyMeter       (Kart *player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
-    void drawCollectableIcons  (Kart* player_kart,
+    void drawPowerupIcons  (Kart* player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
     void drawAllMessages       (Kart* player_kart,

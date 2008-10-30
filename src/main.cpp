@@ -443,7 +443,7 @@ void InitTuxkart()
     stk_config              = new STKConfig            ();
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
-    collectable_manager     = new CollectableManager   ();
+    powerup_manager     = new PowerupManager   ();
     callback_manager        = new CallbackManager      ();
     item_manager         = new ItemManager       ();
     attachment_manager      = new AttachmentManager    ();
@@ -511,7 +511,7 @@ int main(int argc, char *argv[] )
         material_manager        -> loadMaterial       ();
         kart_properties_manager -> loadKartData       ();
         projectile_manager      -> loadData           ();
-        collectable_manager     -> loadCollectables   ();
+        powerup_manager     -> loadPowerups   ();
         item_manager         -> loadDefaultItems();
         attachment_manager      -> loadModels         ();
         scene = new Scene();

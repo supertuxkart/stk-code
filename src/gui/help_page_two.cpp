@@ -20,6 +20,7 @@
 #include "help_page_two.hpp"
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
+
 #include "translation.hpp"
 
 enum WidgetTokens
@@ -53,11 +54,11 @@ HelpPageTwo::HelpPageTwo()
     );
 
     widget_manager->addTextWgt( WTOK_MSG, 100, 7,
-        _("To help you win, there are certain collectables you can grab:"));
+        _("To help you win, there are certain powerups you can grab:"));
     widget_manager->breakLine();
 
     widget_manager->addImgWgt( WTOK_IMG1, 10, 12,
-        collectable_manager->getIcon(COLLECT_MISSILE)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_MISSILE)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt( WTOK_TXT1, 90, 12,
         _("Missile - fast stopper in a straight line"));
@@ -65,7 +66,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG2, 10, 12,
-        collectable_manager->getIcon(COLLECT_CAKE)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_CAKE)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT2, 90, 12,
         _("Cake - thrown at the closest rival,\nbest on short ranges and long straights"));
@@ -73,7 +74,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG3, 10, 12,
-        collectable_manager->getIcon(COLLECT_BOWLING)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_BOWLING)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT3, 90, 12,
         _("Bowling Ball - bounces off walls. If you are looking back,\nit will be thrown backwards."));
@@ -81,7 +82,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG4, 10, 12,
-        collectable_manager->getIcon(COLLECT_ZIPPER)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_ZIPPER)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT4, 90, 12,
         _("Zipper - speed boost"));
@@ -89,7 +90,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG5, 10, 12,
-        collectable_manager->getIcon(COLLECT_PARACHUTE)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_PARACHUTE)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT5, 90, 12,
         _("Parachute - slows down all karts in a better position!"));
@@ -97,7 +98,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt(WTOK_IMG6, 10, 12,
-        collectable_manager->getIcon(COLLECT_ANVIL)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_ANVIL)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt(WTOK_TXT6, 90, 12,
         _("Anvil - slows down greatly the kart in the first position"));
