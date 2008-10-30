@@ -24,7 +24,6 @@
 
 float Cake::m_st_max_distance;
 float Cake::m_st_max_distance_squared;
-float Cake::m_st_max_turn_angle;
 
 Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 {
@@ -53,8 +52,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     if(closest_kart != NULL && kartDistSquared < m_st_max_distance_squared && m_speed>closest_kart->getSpeed())
     {
         m_target = (Kart*)closest_kart;
-        //std::cout << "aiming at " << closest_kart->getName().c_str() << std::endl;
-        
+
         // calculate appropriate initial up velocity so that the
         // projectile lands on the aimed kart (9.8 is the gravity)
         const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/2.5f); // the division is an empirical estimation
@@ -86,14 +84,6 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
         // kart is too far to be hit. so throw the projectile in a generic way,
         // straight ahead, without trying to hit anything in particular
         trans = kart->getKartHeading(pitch);
-        /*
-        std::cout << "Using generic direction because ";
-        
-        if(closest_kart == NULL) std::cout << "no closest kart was found ";
-        else if(!(kartDistSquared < m_st_max_distance_squared)) std::cout <<  closest_kart->getName().c_str() << " is too far : " << sqrt(kartDistSquared) << " (" << kartDistSquared << ")";
-        if(closest_kart != NULL && !(m_speed>closest_kart->getSpeed())) std::cout << "kart is too fast ";
-        std::cout << std::endl;
-        */
     }
     
 
@@ -101,8 +91,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     
     createPhysics(y_offset, m_initial_velocity, 
                   new btCylinderShape(0.5f*m_extend), true /* gravity */, true /* rotation */, &trans);
-   // m_body->setCollisionFlags(m_body->getCollisionFlags()           |
-   //                           btCollisionObject::CF_KINEMATIC_OBJECT );
+
     m_body->setActivationState(DISABLE_DEACTIVATION);
     
     m_body->applyTorque( btVector3(5,-3,7) );
@@ -113,14 +102,11 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 void Cake::init(const lisp::Lisp* lisp, ssgEntity *cake_model)
 {
     Flyable::init(lisp, cake_model, POWERUP_CAKE);
-    m_st_max_turn_angle = 15.0f;
     m_st_max_distance   = 80.0f;
     m_st_max_distance_squared = 80.0f * 80.0f;
     
     lisp->get("max-distance",    m_st_max_distance  );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
-    
-    lisp->get("max-turn-angle",  m_st_max_turn_angle);
 }   // init
 
 // -----------------------------------------------------------------------------
