@@ -395,7 +395,7 @@ AC_CONFIG_FILES([                   \
  data/Makefile                      \
  data/fonts/Makefile                \
  data/grandprix/Makefile            \
- data/herrings/Makefile             \
+ data/items/Makefile                \
  data/karts/Makefile                \
  data/models/Makefile               \
  data/music/Makefile                \
