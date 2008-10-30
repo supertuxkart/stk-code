@@ -153,7 +153,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         ssgStripify(m_model);
         Vec3 min, max;
         SSGHelp::MinMax(m_model, &min, &max);
-        m_kart_width  = max.getX()-min.getY();
+        m_kart_width  = max.getX()-min.getX();
         m_kart_length = max.getY()-min.getY();
         m_kart_height = max.getZ()-min.getZ();
 
