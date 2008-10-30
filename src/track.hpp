@@ -195,7 +195,7 @@ public:
 
 private:
     void  loadTrack                      (std::string filename);
-    void  item_command                (sgVec3 *xyz, char htype, int bNeedHeight);
+    void  item_command                   (sgVec3 *xyz, int item_type, int bNeedHeight);
     void  loadDriveline                  ();
     void  readDrivelineFromFile          (std::vector<Vec3>& line,
                                          const std::string& file_ext      );
