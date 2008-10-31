@@ -225,7 +225,7 @@ void  ItemManager::hitItem(Kart* kart)
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        if((*i)->wasEaten()) continue;
+        if((*i)->wasCollected()) continue;
         if((*i)->hitKart(kart))
         {
             collectedItem(i-m_all_items.begin(), kart);

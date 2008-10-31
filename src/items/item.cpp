@@ -27,9 +27,9 @@ Item::Item(ItemType type, const Vec3& xyz, ssgEntity* model,
                  unsigned int item_id) 
         : m_coord(xyz, Vec3(0, 0, 0))
 {
-    m_item_id       = item_id;
+    m_item_id          = item_id;
     m_type             = type;
-    m_eaten            = false;
+    m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
     m_root             = new ssgTransform();
     m_root->ref();
@@ -48,7 +48,7 @@ Item::~Item()
 //-----------------------------------------------------------------------------
 void Item::reset()
 {
-    m_eaten            = false;
+    m_collected        = false;
     m_time_till_return = 0.0f;
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 }   // reset
@@ -62,7 +62,7 @@ int Item::hitKart(Kart* kart)
 //-----------------------------------------------------------------------------
 void Item::update(float delta)
 {
-    if(m_eaten)
+    if(m_collected)
     {
         m_time_till_return -= delta;
         if ( m_time_till_return > 0 )
@@ -75,14 +75,14 @@ void Item::update(float delta)
         }
         else
         {
-            m_eaten    = false;
+            m_collected    = false;
             m_coord.setHPR(Vec3(0.0f));
             m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
         }   // T>0
 
     }
     else
-    {   // not m_eaten
+    {   // not m_collected
         Vec3 rotation(delta*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
@@ -92,7 +92,7 @@ void Item::update(float delta)
 //-----------------------------------------------------------------------------
 void Item::isCollected()
 {
-    m_eaten            = true;
+    m_collected            = true;
     m_time_till_return = 2.0f;
 }
 

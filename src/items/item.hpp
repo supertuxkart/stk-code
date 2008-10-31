@@ -37,7 +37,7 @@ class Item
 {
 private:
     ItemType      m_type;         // Item type
-    bool          m_eaten;        // true if item was collected & is not displayed
+    bool          m_collected;        // true if item was collected & is not displayed
     float         m_time_till_return;  // time till a collected item reappears
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // collected items reappear.
@@ -54,7 +54,7 @@ public:
     void          reset   ();
     ssgTransform* getRoot () const {return m_root;}
     ItemType   getType () const {return m_type;}
-    bool          wasEaten() const {return m_eaten;}
+    bool          wasCollected() const {return m_collected;}
 }
 ;   // class Item
 
