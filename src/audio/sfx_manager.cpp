@@ -39,6 +39,7 @@
 #include "user_config.hpp"
 #include "file_manager.hpp"
 #include "translation.hpp"
+#include "race_manager.hpp"
 
 SFXManager* sfx_manager= NULL;
 
@@ -49,6 +50,9 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = sound_manager->initialized();
     m_sfx_buffers.resize(NUM_SOUNDS);
+    m_sfx_positional.resize(NUM_SOUNDS);
+    m_sfx_rolloff.resize(NUM_SOUNDS);
+    m_sfx_gain.resize(NUM_SOUNDS);
     if(!m_initialized) return;
     loadSfx();
 }  // SoundManager
@@ -119,8 +123,17 @@ void SFXManager::loadSfx()
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
                                const char *name, SFXType item)
 {
-    std::string wav;
-    lisp->get(name, wav);
+    const lisp::Lisp* sfxLisp = lisp->getLisp(name);
+    std::string wav; float rolloff = 0.1f; float gain = 1.0f; int positional = 0;
+
+    sfxLisp->get("filename",    wav         );
+    sfxLisp->get("roll-off",    rolloff     );
+    sfxLisp->get("positional",  positional  );
+    sfxLisp->get("volume",      gain        );
+
+    m_sfx_rolloff[item] = rolloff;
+    m_sfx_positional[item] = positional;
+    m_sfx_gain[item] = gain;
 
     std::string path = file_manager->getSFXFile(wav);
 
@@ -181,7 +194,11 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
  */
 SFXBase *SFXManager::newSFX(SFXType id)
 {
-    SFXBase *p=new SFXOpenAL(m_sfx_buffers[id]);
+    bool positional = false;
+    if(race_manager->getNumLocalPlayers() < 2)
+        positional = (bool)m_sfx_positional[id];
+
+    SFXBase *p=new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
     m_all_sfx.push_back(p);
     return p;
 }   // newSFX

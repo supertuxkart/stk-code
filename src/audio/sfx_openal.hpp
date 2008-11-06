@@ -35,8 +35,9 @@ private:
     ALuint       m_soundBuffer;   // Buffers hold sound data.
     ALuint       m_soundSource;   // Sources are points emitting sound.
     bool         m_ok;
+    bool         m_positional;
 public:
-                                  SFXOpenAL(ALuint buffer);
+                                  SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain);
     virtual                      ~SFXOpenAL();
     virtual void                  play();
     virtual void                  loop();

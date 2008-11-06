@@ -63,6 +63,9 @@ private:
     /** The buffers for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::vector<ALuint>       m_sfx_buffers;
+    std::vector<int>          m_sfx_positional;
+    std::vector<float>        m_sfx_rolloff;
+    std::vector<float>        m_sfx_gain;
     std::vector<SFXBase*>     m_all_sfx;
     bool                      m_initialized;
     void                      loadSfx();

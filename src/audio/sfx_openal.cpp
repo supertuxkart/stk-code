@@ -37,11 +37,12 @@
 #include "file_manager.hpp"
 #include "user_config.hpp"
 
-SFXOpenAL::SFXOpenAL(ALuint buffer) : SFXBase()
+SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) : SFXBase()
 {
     m_soundBuffer = buffer;
     m_soundSource = 0;
     m_ok          = false;
+    m_positional  = false;
 
     alGenSources(1, &m_soundSource );
     if(!SFXManager::checkError("generating a source")) return;
@@ -50,9 +51,14 @@ SFXOpenAL::SFXOpenAL(ALuint buffer) : SFXBase()
     alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.1f         );
-    alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE     );//sound position is *not* relative to the camera. 
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff      );
+    alSourcef (m_soundSource, AL_GAIN,            gain         );
+    if(positional)
+       alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
+    else
+       alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
 
+    m_positional = positional;
     m_ok = SFXManager::checkError("setting up the source");
 }   // SFXOpenAL
 
@@ -146,7 +152,7 @@ void SFXOpenAL::play()
  */
 void SFXOpenAL::position(const Vec3 &position)
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+    if(!sfx_manager->sfxAllowed()||!m_ok||!m_positional) return;
 
     alSource3f(m_soundSource, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());

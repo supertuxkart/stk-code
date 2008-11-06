@@ -249,12 +249,18 @@ void MusicOggStream::update()
         if(!check()) return;
 
         active = streamIntoBuffer(buffer);
-        alSourceQueueBuffers(m_soundSource, 1, &buffer);
+        if(!active)
+        {
+            // no more data. Seek to beginning (causes the sound to loop)
+	        ov_time_seek(&m_oggStream, 0);
+            active = streamIntoBuffer(buffer);//now there really should be data
+            //fprintf(stdout,"Music buffer under-run.\n");
+        }
 
+        alSourceQueueBuffers(m_soundSource, 1, &buffer);
         if(!check()) return;
     }
 
-    // check for underrun
     if (active)
     {
         // we have data, so we should be playing...
@@ -262,15 +268,14 @@ void MusicOggStream::update()
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-	        fprintf(stderr,"WARNING: Alsa source state: %d\n", state);
+	        fprintf(stderr,"WARNING: Music not playing when it should be. Source state: %d\n", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }
     }
     else
     {
-        // no more data. Seek to beginning -> loop
-	    ov_time_seek(&m_oggStream, 0);
+        fprintf(stderr,"WARNING: Attempt to stream music into buffer failed twice in a row.\n");
     }
 }   // update
 

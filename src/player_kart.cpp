@@ -171,13 +171,6 @@ void PlayerKart::update(float dt)
     if(!history->replayHistory())
         steer(dt, m_steer_val);
 
-    //position the generic sounds at the kart's position
-    m_bzzt_sound->position(getXYZ());
-    m_wee_sound->position(getXYZ());
-    m_ugh_sound->position(getXYZ());
-    m_grab_sound->position(getXYZ());
-    m_full_sound->position(getXYZ());
-
     if(RaceManager::getWorld()->isStartPhase())
     {
         if(m_controls.accel!=0.0 || m_controls.brake!=false ||

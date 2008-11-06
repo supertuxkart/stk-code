@@ -207,7 +207,8 @@ void Camera::update (float dt)
     m_xyz = c.getXYZ();
     m_hpr = c.getHPR();
     m_context -> setCamera(&c.toSgCoord());
-    sound_manager->positionListener(m_xyz, kart_xyz - m_xyz);
+    if(race_manager->getNumLocalPlayers() < 2)
+        sound_manager->positionListener(m_xyz, kart_xyz - m_xyz);
 }   // update
 
 //-----------------------------------------------------------------------------
