@@ -196,7 +196,7 @@ SFXBase *SFXManager::newSFX(SFXType id)
 {
     bool positional = false;
     if(race_manager->getNumLocalPlayers() < 2)
-        positional = (bool)m_sfx_positional[id];
+        positional = m_sfx_positional[id]!=0;
 
     SFXBase *p=new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
     m_all_sfx.push_back(p);
