@@ -24,6 +24,7 @@
 #include "network/network_manager.hpp"
 #include "user_config.hpp"
 #include "items/item_manager.hpp"
+#include "items/bubblegumitem.hpp"
 #include "file_manager.hpp"
 #include "loader.hpp"
 #include "material_manager.hpp"
@@ -155,12 +156,16 @@ void ItemManager::loadDefaultItems()
 void ItemManager::setDefaultItemStyle()
 {
     // This should go in an internal, system wide configuration file
-    const std::string DEFAULT_NAMES[4] = {"bonusblock", "banana",
-                                   "goldcoin",   "silvercoin"};
+    std::string DEFAULT_NAMES[ITEM_LAST - ITEM_FIRST - 1];
+    DEFAULT_NAMES[ITEM_BONUS_BOX]   = "bonusblock";
+    DEFAULT_NAMES[ITEM_BANANA]      = "banana";
+    DEFAULT_NAMES[ITEM_GOLD_COIN]   = "goldcoin";
+    DEFAULT_NAMES[ITEM_SILVER_COIN] = "silvercoin";
+    DEFAULT_NAMES[ITEM_BUBBLEGUM]   = "bubblegum";
 
     bool bError=0;
     char msg[MAX_ERROR_MESSAGE_LENGTH];
-    for(int i=ITEM_BONUS_BOX; i<=ITEM_SILVER_COIN; i++)
+    for(int i=ITEM_FIRST+1; i<ITEM_LAST; i++)
     {
         m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
         if(!m_item_model[i])
@@ -198,9 +203,16 @@ void ItemManager::setDefaultItemStyle()
 }   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
-Item* ItemManager::newItem(ItemType type, const Vec3& xyz)
+Item* ItemManager::newItem(ItemType type, const Vec3& xyz, Kart* parent)
 {
-    Item* h = new Item(type, xyz, m_item_model[type], m_all_items.size());
+    Item* h;
+    if(type == ITEM_BUBBLEGUM)
+        h = new BubbleGumItem(type, xyz, m_item_model[type], m_all_items.size());
+    else
+        h = new Item(type, xyz, m_item_model[type], m_all_items.size());
+    
+    if(parent != NULL) h->setParent(parent);
+    
     m_all_items.push_back(h);
     return h;
 }   // newItem

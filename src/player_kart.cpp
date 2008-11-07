@@ -300,7 +300,7 @@ void PlayerKart::collectedItem(const Item &item, int add_info)
     }
     else
     {
-        if(item.getType() == ITEM_BANANA)
+        if(item.getType() == ITEM_BANANA || item.getType() == ITEM_BUBBLEGUM)
             m_ugh_sound->play();
         else
             m_grab_sound->play();

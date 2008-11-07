@@ -36,6 +36,10 @@ Item::Item(ItemType type, const Vec3& xyz, ssgEntity* model,
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
     scene->add(m_root);
+    m_rotate = true;
+    
+    m_parent = NULL;
+    m_immunity_timer = 0;
 
 }   // Item
 
@@ -52,16 +56,25 @@ void Item::reset()
     m_time_till_return = 0.0f;
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 }   // reset
-
 //-----------------------------------------------------------------------------
-int Item::hitKart(Kart* kart)
+void Item::setParent(Kart* parent)
 {
+    m_parent = parent;
+    m_immunity_timer = 1.5f;
+}
+//-----------------------------------------------------------------------------
+bool Item::hitKart(Kart* kart)
+{
+    if(m_immunity_timer > 0) return false;
+    
     return (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
 }   // hitKart
 
 //-----------------------------------------------------------------------------
 void Item::update(float delta)
 {
+    if(m_parent != NULL && m_immunity_timer > 0) m_immunity_timer -= delta;
+    
     if(m_collected)
     {
         m_time_till_return -= delta;
@@ -83,6 +96,9 @@ void Item::update(float delta)
     }
     else
     {   // not m_collected
+        
+        if(!m_rotate) return;
+        // have it rotate
         Vec3 rotation(delta*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));

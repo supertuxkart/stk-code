@@ -58,10 +58,10 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     widget_manager->addImgWgt( WTOK_IMG1, 10, 12,
-        powerup_manager->getIcon(POWERUP_MISSILE)->getState()->getTextureHandle());
+        powerup_manager->getIcon(POWERUP_BUBBLEGUM)->getState()->getTextureHandle());
 
     widget_manager->addTextWgt( WTOK_TXT1, 90, 12,
-        _("Missile - fast stopper in a straight line"));
+        _("BubbleGum - leave a sticky pink puddle behind you"));
     widget_manager->setWgtRoundCorners( WTOK_TXT1, WGT_AREA_RGT );
     widget_manager->breakLine();
 

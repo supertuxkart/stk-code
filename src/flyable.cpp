@@ -22,6 +22,7 @@
 #include "network/flyable_info.hpp"
 #include "flyable.hpp"
 #include "kart.hpp"
+#include "track.hpp"
 #include "items/projectile_manager.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
@@ -96,7 +97,6 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     m_body->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 }   // createPhysics
-
 // -----------------------------------------------------------------------------
 void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model, 
                    PowerupType type)

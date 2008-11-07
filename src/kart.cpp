@@ -370,6 +370,10 @@ void Kart::collectedItem(const Item &item, int add_info)
 		         int n=1 + 4*getNumItems() / MAX_ITEMS_COLLECTED;
                          m_powerup.hitBonusBox(n, item,add_info);break;
                      }
+    case ITEM_BUBBLEGUM:
+        // skid
+        m_body->setAngularVelocity( btVector3(0,0,4) );
+        break;
     default        : break;
     }   // switch TYPE
 

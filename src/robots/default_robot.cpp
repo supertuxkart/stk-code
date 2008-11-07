@@ -376,7 +376,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 }
                 break;
 
-            case POWERUP_MISSILE:
+            case POWERUP_BUBBLEGUM:
             case POWERUP_CAKE:
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {

@@ -2,7 +2,7 @@
 
 (tuxkart-collectable
  (name "missile")
- (model "missile.ac")
+ (model "../items/bubblegum.ac")
  (icon  "missile.rgb")
  (speed 50.0)
  (min-height 0.3)

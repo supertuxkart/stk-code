@@ -56,7 +56,7 @@ public:
     ~ItemManager();
     void        loadDefaultItems();
     void        loadItemStyle   (const std::string filename);
-    Item*       newItem         (ItemType type, const Vec3& xyz);
+    Item*       newItem         (ItemType type, const Vec3& xyz, Kart* parent=NULL);
     void        update          (float delta);
     void        hitItem         (Kart* kart);
     void        cleanup         ();

@@ -24,8 +24,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "translation.hpp"
-#include "items/bowling.hpp"
-#include "missile.hpp"
+#include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "loader.hpp"
 
@@ -44,7 +43,7 @@ initPowerupType ict[]=
 {
     {POWERUP_ZIPPER,    "zipper.collectable"       },
     {POWERUP_BOWLING,   "bowling.projectile"         },
-    {POWERUP_MISSILE,   "missile.projectile"       },
+    {POWERUP_BUBBLEGUM,   "missile.projectile"       },
     {POWERUP_CAKE,      "cake.projectile" },
     {POWERUP_ANVIL,     "anvil.collectable"        },
     {POWERUP_PARACHUTE, "parachute.collectable"    },
@@ -137,8 +136,8 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     switch (collectType) {
         case POWERUP_BOWLING:          
              Bowling::init  (lisp, m_all_models[collectType]); break;
-        case POWERUP_MISSILE:        
-             Missile::init(lisp, m_all_models[collectType]); break;
+        //case POWERUP_BUBBLEGUM:        
+        //     BubbleGum::init(lisp, m_all_models[collectType]); break;
         case POWERUP_CAKE: 
              Cake::init (lisp, m_all_models[collectType]); break;
         default:;

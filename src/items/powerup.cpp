@@ -89,13 +89,32 @@ void Powerup::use()
         break ;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
-    case POWERUP_MISSILE:
+    
         m_sound_shot->position(m_owner->getXYZ());
         m_sound_shot->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
-
+        
+    case POWERUP_BUBBLEGUM:
+        {
+        m_sound_shot->position(m_owner->getXYZ());
+        m_sound_shot->play();
+        btVector3 pos = m_owner->getXYZ();
+        float z_coord = Track::NOHIT;
+        Vec3 unused; const Material* unused2;
+        
+        RaceManager::getTrack()->getTerrainInfo(pos, &z_coord, &unused, &unused2);
+        
+        assert(z_coord != Track::NOHIT);
+        
+        pos.setZ(z_coord-0.05f);
+        
+        item_manager->newItem(ITEM_BUBBLEGUM, pos, m_owner);
+        }
+        break;
+        
     case POWERUP_ANVIL:
+        
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)

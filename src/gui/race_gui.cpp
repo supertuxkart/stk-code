@@ -178,7 +178,7 @@ RaceGUI::handle(GameAction ga, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setPowerup(POWERUP_MISSILE, 10000);
+				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
 			}
 			break;
 		case GA_DEBUG_ADD_HOMING:

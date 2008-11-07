@@ -70,6 +70,7 @@ protected:
      */
     void              getClosestKart(const Kart **minKart, float *minDistSquared, 
                                      btVector3 *minDelta, const Kart* inFrontOf=NULL) const;
+    /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
                                     btCollisionShape *shape, const bool gravity=false,

@@ -29,13 +29,23 @@ class Kart;
 class ssgTransform;
 class ssgEntity;
 
-// ITEM_BONUS_BOX must be the first, ITEM_SILVER_COIN the last entry. See ItemManager
-enum ItemType { ITEM_BONUS_BOX, ITEM_BANANA, ITEM_GOLD_COIN, ITEM_SILVER_COIN, ITEM_NONE };
+enum ItemType
+{
+    ITEM_FIRST = -1,
+    
+    ITEM_BONUS_BOX = 0,
+    ITEM_BANANA,
+    ITEM_GOLD_COIN,
+    ITEM_SILVER_COIN,
+    ITEM_BUBBLEGUM,
+    
+    ITEM_LAST
+};
 
 // -----------------------------------------------------------------------------
 class Item
 {
-private:
+protected:
     ItemType      m_type;         // Item type
     bool          m_collected;        // true if item was collected & is not displayed
     float         m_time_till_return;  // time till a collected item reappears
@@ -43,6 +53,12 @@ private:
                                   // collected items reappear.
     ssgTransform* m_root;         // The actual root of the item
     unsigned int  m_item_id;      // index in item_manager field
+
+    bool          m_rotate;       // set to false if item should not rotate
+    
+    Kart*         m_parent;        // optional, if item was placed by a kart, a timer
+    float         m_immunity_timer; // can be used so it's not hit by its own item
+    
 public:
                   Item (ItemType type, const Vec3& xyz, ssgEntity* model,
                            unsigned int item_id);
@@ -50,11 +66,13 @@ public:
     unsigned int  getItemId() const {return m_item_id; }
     void          update  (float delta);
     void          isCollected ();
-    int           hitKart (Kart* kart );
+    bool          hitKart (Kart* kart );
     void          reset   ();
     ssgTransform* getRoot () const {return m_root;}
-    ItemType   getType () const {return m_type;}
+    ItemType      getType () const {return m_type;}
     bool          wasCollected() const {return m_collected;}
+    
+    void          setParent(Kart* parent);
 }
 ;   // class Item
 
