@@ -60,6 +60,18 @@ SFXManager::SFXManager()
 //-----------------------------------------------------------------------------
 SFXManager::~SFXManager()
 {
+    //make sure there aren't any stray sfx's sitting around anywhere
+    for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
+        i!=m_all_sfx.end(); i++)
+    {
+        delete (*i);
+    }   // for i in m_all_sfx
+
+    //the unbuffer all of the buffers
+    for(unsigned int ii = 0; ii != m_sfx_buffers.size(); ii++)
+    {
+        alDeleteBuffers(1, &(m_sfx_buffers[ii]));
+    } 
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------

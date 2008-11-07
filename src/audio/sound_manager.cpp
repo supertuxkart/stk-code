@@ -79,6 +79,8 @@ SoundManager::SoundManager()
 //-----------------------------------------------------------------------------
 SoundManager::~SoundManager()
 {
+    stopMusic();
+
     if(m_initialized)
     {
         ALCcontext* context = alcGetCurrentContext();

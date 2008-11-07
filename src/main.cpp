@@ -470,6 +470,35 @@ void InitTuxkart()
 }
 
 //=============================================================================
+void CleanTuxKart()
+{
+    //delete in reverse order of what they were created in.
+    //see InitTuxkart()
+    if(menu_manager)            delete menu_manager;
+    if(race_manager)            delete race_manager;
+    if(network_manager)         delete network_manager;
+    if(grand_prix_manager)      delete grand_prix_manager;
+    if(highscore_manager)       delete highscore_manager;
+    if(attachment_manager)      delete attachment_manager;
+    if(item_manager)            delete item_manager;
+  //if(delete callback_manager) delete callback_manager; //segfaults if uncommented
+    if(powerup_manager)         delete powerup_manager;   
+    if(projectile_manager)      delete projectile_manager;
+    if(kart_properties_manager) delete kart_properties_manager;
+    if(stk_config)              delete stk_config;
+    if(track_manager)           delete track_manager;
+    if(material_manager)        delete material_manager;
+    if(history)                 delete history;
+    if(sfx_manager)             delete sfx_manager;
+    if(sound_manager)           delete sound_manager;
+    if(user_config)             delete user_config;
+    if(unlock_manager)          delete unlock_manager;
+    if(loader)                  delete loader;
+    if(translations)            delete translations;
+    if(file_manager)            delete file_manager;
+}
+
+//=============================================================================
 
 int main(int argc, char *argv[] ) 
 {
@@ -601,8 +630,9 @@ int main(int argc, char *argv[] )
         fclose(stdout);
     }
 
-    if(highscore_manager) delete highscore_manager;
     delete_fonts();
+
+    CleanTuxKart();
 
     return 0 ;
 }
