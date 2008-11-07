@@ -19,7 +19,7 @@
 #ifndef HEADER_DEFAULT_H
 #define HEADER_DEFAULT_H
 
-#include "auto_kart.hpp"
+#include "karts/auto_kart.hpp"
 
 class DefaultRobot : public AutoKart
 {

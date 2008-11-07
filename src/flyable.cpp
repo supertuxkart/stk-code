@@ -19,17 +19,17 @@
 
 #include <math.h>
 
-#include "network/flyable_info.hpp"
 #include "flyable.hpp"
-#include "kart.hpp"
 #include "track.hpp"
-#include "items/projectile_manager.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
-#include "utils/ssg_help.hpp"
 #include "race_manager.hpp"
+#include "items/projectile_manager.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "modes/linear_world.hpp"
+#include "network/flyable_info.hpp"
+#include "utils/ssg_help.hpp"
 
 // static variables:
 float      Flyable::m_st_speed[POWERUP_MAX];

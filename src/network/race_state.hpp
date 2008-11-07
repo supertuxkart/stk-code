@@ -22,14 +22,14 @@
 
 #include <vector>
 
+#include "flyable.hpp"
+#include "race_manager.hpp"
+#include "karts/kart.hpp"
+#include "karts/kart_control.hpp"
+#include "items/item.hpp"
 #include "network/message.hpp"
 #include "network/item_info.hpp"
 #include "network/flyable_info.hpp"
-#include "kart_control.hpp"
-#include "items/item.hpp"
-#include "flyable.hpp"
-#include "race_manager.hpp"
-#include "kart.hpp"
 
 /** This class stores the state information of a (single) race, e.g. the 
     position and orientation of karts, collisions that have happened etc.

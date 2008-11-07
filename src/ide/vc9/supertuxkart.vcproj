@@ -716,18 +716,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\kart.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\kart_properties.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\kart_properties_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\loader.cpp"
 				>
 			</File>
@@ -748,10 +736,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\moveable.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\moving_physics.cpp"
 				>
 			</File>
@@ -761,10 +745,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\particle_system.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\player_kart.cpp"
 				>
 			</File>
 			<File
@@ -1135,6 +1115,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\bubblegumitem.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\cake.cpp"
 					>
 				</File>
@@ -1144,10 +1128,6 @@
 				</File>
 				<File
 					RelativePath="..\..\items\item_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\items\missile.cpp"
 					>
 				</File>
 				<File
@@ -1175,7 +1155,27 @@
 				Name="karts"
 				>
 				<File
+					RelativePath="..\..\karts\kart.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\kart_model.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_properties.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_properties_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\moveable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\player_kart.cpp"
 					>
 				</File>
 			</Filter>
@@ -1185,10 +1185,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="../../../src\auto_kart.hpp"
-				>
-			</File>
 			<File
 				RelativePath="../../../src\callback.hpp"
 				>
@@ -1262,22 +1258,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\kart.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\kart_control.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\kart_properties.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\kart_properties_manager.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\loader.hpp"
 				>
 			</File>
@@ -1291,10 +1271,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\material_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\moveable.hpp"
 				>
 			</File>
 			<File
@@ -1315,10 +1291,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\player.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\player_kart.hpp"
 				>
 			</File>
 			<File
@@ -1753,6 +1725,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\bubblegumitem.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\cake.hpp"
 					>
 				</File>
@@ -1762,10 +1738,6 @@
 				</File>
 				<File
 					RelativePath="..\..\items\item_manager.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\items\missile.hpp"
 					>
 				</File>
 				<File
@@ -1797,7 +1769,35 @@
 				Name="karts"
 				>
 				<File
+					RelativePath="..\..\karts\auto_kart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_control.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\kart_model.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_properties.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_properties_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\moveable.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\player_kart.hpp"
 					>
 				</File>
 			</Filter>

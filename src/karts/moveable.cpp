@@ -18,11 +18,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "player_kart.hpp"
+#include "karts/moveable.hpp"
+
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "user_config.hpp"
 #include "coord.hpp"
+#include "karts/player_kart.hpp"
 
 Moveable::Moveable()
 {

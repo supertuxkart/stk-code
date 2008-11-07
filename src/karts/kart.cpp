@@ -18,6 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "karts/kart.hpp"
+
 #include <math.h>
 #include <iostream>
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -37,17 +39,16 @@
 #include "constants.hpp"
 #include "shadow.hpp"
 #include "track.hpp"
-#include "kart.hpp"
 #include "translation.hpp"
 #include "smoke.hpp"
 #include "material_manager.hpp"
-#include "kart_properties_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "physics/physics.hpp"

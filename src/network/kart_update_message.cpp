@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "kart_update_message.hpp"
 #include "modes/world.hpp"
-#include "kart.hpp"
+#include "karts/kart.hpp"
 
 KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)

@@ -22,13 +22,13 @@
 
 #include "race_results_gui.hpp"
 #include "widget_manager.hpp"
-#include "kart_properties.hpp"
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "highscore_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
 #include "modes/world.hpp"
+#include "karts/kart_properties.hpp"
 #include "network/network_manager.hpp"
 
 RaceResultsGUI::RaceResultsGUI()

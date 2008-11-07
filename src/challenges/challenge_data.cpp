@@ -16,16 +16,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#include "challenges/challenge_data.hpp"
+
 #include <stdexcept>
 
-#include "challenges/challenge_data.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
+#include "track.hpp"
 #include "translation.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
-#include "kart.hpp"
-#include "track.hpp"
+#include "karts/kart.hpp"
+#include "lisp/lisp.hpp"
+#include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

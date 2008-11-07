@@ -22,8 +22,8 @@
 #ifndef HEADER_PLAYERKART_H
 #define HEADER_PLAYERKART_H
 
-#include "kart.hpp"
 #include "player.hpp"
+#include "karts/kart.hpp"
 
 class SFXBase;
 class Player;

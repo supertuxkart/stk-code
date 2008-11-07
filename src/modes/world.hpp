@@ -25,10 +25,10 @@
 #include <plib/ssg.h>
 
 #include "track.hpp"
-#include "player_kart.hpp"
-#include "physics/physics.hpp"
-#include "kart.hpp"
 #include "highscores.hpp"
+#include "karts/kart.hpp"
+#include "karts/player_kart.hpp"
+#include "physics/physics.hpp"
 #include "network/network_kart.hpp"
 #include "utils/random_generator.hpp"
 #include "modes/clock.hpp"

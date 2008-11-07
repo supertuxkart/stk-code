@@ -21,6 +21,7 @@
 #define HEADER_MATERIAL_H
 
 #include <string>
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 
 class Material

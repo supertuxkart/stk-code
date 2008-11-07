@@ -22,13 +22,13 @@
 #include <plib/ssg.h>
 #include "coord.hpp"
 #include "modes/world.hpp"
-#include "player_kart.hpp"
 #include "track.hpp"
 #include "camera.hpp"
 #include "user_config.hpp"
 #include "constants.hpp"
 #include "race_manager.hpp"
 #include "audio/sound_manager.hpp"
+#include "karts/player_kart.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)
 {

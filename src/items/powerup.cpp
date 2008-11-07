@@ -19,16 +19,16 @@
 
 #include "items/powerup.hpp"
 
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "items/projectile_manager.hpp"
-#include "kart.hpp"
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
-#include "modes/world.hpp"
 #include "stk_config.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
+#include "items/projectile_manager.hpp"
+#include "karts/kart.hpp"
+#include "modes/world.hpp"
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 
 //-----------------------------------------------------------------------------
 Powerup::Powerup(Kart* kart_)

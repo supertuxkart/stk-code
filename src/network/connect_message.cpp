@@ -28,7 +28,7 @@
 
 #include "user_config.hpp"
 #include "track_manager.hpp"
-#include "kart_properties_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 
 // ----------------------------------------------------------------------------
 /** Creates the connect message. It includes the id of the client (currently

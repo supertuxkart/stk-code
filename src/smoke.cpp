@@ -19,8 +19,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "smoke.hpp"
-#include "kart.hpp"
 #include "constants.hpp"
+#include "karts/kart.hpp"
 
 Smoke::Smoke(Kart* kart_,
                                        int num, float _create_rate, int _ttf,

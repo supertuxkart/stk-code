@@ -18,20 +18,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "karts/player_kart.hpp"
+
 #include "constants.hpp"
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
 #include "history.hpp"
-#include "player_kart.hpp"
 #include "player.hpp"
 #include "sdldrv.hpp"
-#include "items/item.hpp"
-#include "modes/world.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/race_gui.hpp"
 #include "translation.hpp"
 #include "scene.hpp"
 #include "camera.hpp"
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
+#include "items/item.hpp"
+#include "modes/world.hpp"
 
 PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *player,
                        const btTransform& init_pos, int player_index) :

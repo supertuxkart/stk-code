@@ -28,19 +28,19 @@
 #include <SDL/SDL.h>
 
 #include "loader.hpp"
-#include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
-#include "kart_properties.hpp"
 #include "translation.hpp"
-#include "kart.hpp"
 #include "scene.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 
 enum WidgetTokens
 {

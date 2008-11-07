@@ -22,13 +22,13 @@
 #include <iostream>
 
 #include "track_manager.hpp"
-#include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
-#include "gui/menu_manager.hpp"
 #include "modes/world.hpp"
 #include "scene.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
+#include "gui/menu_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/follow_the_leader.hpp"

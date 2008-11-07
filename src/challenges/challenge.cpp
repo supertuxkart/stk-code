@@ -21,9 +21,9 @@
 #include "challenges/challenge.hpp"
 #include "race_manager.hpp"
 #include "track_manager.hpp"
-#include "kart_properties_manager.hpp"
-#include "kart_properties.hpp"
 #include "track.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "karts/kart_properties.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

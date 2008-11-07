@@ -21,17 +21,17 @@
 #include <string>
 
 #include "char_sel.hpp"
-#include "kart_properties_manager.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
-#include "kart_properties.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

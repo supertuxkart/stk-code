@@ -20,7 +20,7 @@
 #ifndef HEADER_NETWORK_KART_H
 #define HEADER_NETWORK_KART_H
 
-#include "kart.hpp"
+#include "karts/kart.hpp"
 
 class NetworkKart : public Kart
 {

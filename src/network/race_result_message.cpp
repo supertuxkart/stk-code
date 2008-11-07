@@ -20,8 +20,8 @@
 #include "network/race_result_message.hpp"
 
 #include "race_manager.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "kart.hpp"
 
 /** Creates a message containing the finishing time and rank of each kart. 
  *  This message is serialised so that it can be sent.

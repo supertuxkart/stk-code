@@ -17,11 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "vec3.hpp"
 #include "items/item.hpp"
-#include "kart.hpp"
+
+#include "vec3.hpp"
 #include "scene.hpp"
 #include "coord.hpp"
+#include "karts/kart.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, ssgEntity* model,
                  unsigned int item_id) 

@@ -20,7 +20,7 @@
 #ifndef HEADER_STKCONFIG_H
 #define HEADER_STKCONFIG_H
 
-#include "kart_properties.hpp"
+#include "karts/kart_properties.hpp"
 
 class Lisp;
 class MusicInformation;

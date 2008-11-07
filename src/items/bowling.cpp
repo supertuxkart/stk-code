@@ -17,9 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "items/bowling.hpp"
-#include "player_kart.hpp"
 #include "camera.hpp"
+#include "items/bowling.hpp"
+#include "karts/player_kart.hpp"
 
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
 float Bowling::m_st_max_distance_squared;

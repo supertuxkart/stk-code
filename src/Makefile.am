@@ -41,41 +41,45 @@ supertuxkart_SOURCES =     main.cpp  			\
 	network/connect_message.hpp      network/character_info_message.hpp	\
 	network/kart_update_message.hpp  network/kart_update_message.cpp	\
 	network/kart_control_message.hpp network/kart_control_message.cpp	\
-	network/flyable_info.hpp	     network/item_info.hpp		\
-	network/race_state.hpp		     network/race_state.cpp			\
+	network/flyable_info.hpp	 network/item_info.hpp                  \
+	network/race_state.hpp		 network/race_state.cpp			\
 	network/race_result_message.hpp	 network/race_result_message.cpp	\
 	network/race_result_ack_message						\
 	audio/music.hpp								\
 	audio/music_information.cpp audio/music_information.hpp 		\
-	audio/music_ogg.cpp	   	    audio/music_ogg.hpp          		\
+	audio/music_ogg.cpp	   	    audio/music_ogg.hpp          	\
  	audio/sfx_base.hpp              					\
-	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      		 \
-	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp			 \
-	audio/sound_manager.cpp	   	audio/sound_manager.hpp      	 \
-	utils/random_generator.hpp	utils/random_generator.cpp		 \
-	utils/ssg_help.cpp          utils/ssg_help.hpp               \
-	material_manager.cpp	    material_manager.hpp    	     \
-	grand_prix_manager.cpp	    grand_prix_manager.hpp	         \
-	items/attachment.cpp		   items/attachment.hpp	         \
-	items/attachment_manager.cpp   items/attachment_manager.hpp  \
-	items/powerup.cpp		       items/powerup.hpp	         \
-	items/powerup_manager.cpp      items/powerup_manager.hpp     \
-	items/item.cpp 		           items/item.hpp                \
-	items/item_manager.cpp	       items/item_manager.hpp        \
-	items/projectile_manager.cpp   items/projectile_manager.hpp  \
-	items/bubblegumitem.cpp		   items/bubblegumitem.hpp		 \
-	items/cake.cpp		           items/cake.hpp			     \
-	items/bowling.cpp		       items/bowling.hpp			 \
-	karts/kart_model.cpp           karts/kart_model.hpp            \
+	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      	        \
+	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp		        \
+	audio/sound_manager.cpp	   	audio/sound_manager.hpp      	        \
+	utils/random_generator.hpp	utils/random_generator.cpp	        \
+	utils/ssg_help.cpp          utils/ssg_help.hpp                          \
+	material_manager.cpp	    material_manager.hpp    	                \
+	grand_prix_manager.cpp	    grand_prix_manager.hpp	                \
+	items/attachment.cpp	           items/attachment.hpp	                \
+	items/attachment_manager.cpp       items/attachment_manager.hpp         \
+	items/powerup.cpp	           items/powerup.hpp	                \
+	items/powerup_manager.cpp          items/powerup_manager.hpp            \
+	items/item.cpp 		           items/item.hpp                       \
+	items/item_manager.cpp             items/item_manager.hpp               \
+	items/projectile_manager.cpp       items/projectile_manager.hpp         \
+	items/bubblegumitem.cpp	           items/bubblegumitem.hpp		\
+	items/cake.cpp		           items/cake.hpp		        \
+	items/bowling.cpp		   items/bowling.hpp	                \
+        karts/auto_kart.hpp                karts/kart_control.hpp               \
+	karts/kart.cpp		           karts/kart.hpp		        \
+	karts/kart_model.cpp               karts/kart_model.hpp                 \
+	karts/kart_properties.cpp	   karts/kart_properties.hpp            \
+	karts/kart_properties_manager.cpp  karts/kart_properties_manager.hpp    \
+	karts/moveable.cpp 		   karts/moveable.hpp                   \
+	karts/player_kart.cpp		   karts/player_kart.hpp	        \
 	smoke.cpp		       smoke.hpp			        \
-	input.hpp 		       kart_control.hpp		        \
+	input.hpp 		              \
 	isect.cpp		       isect.hpp                	\
 	track.cpp		       track.hpp                	\
 	explosion.cpp		   explosion.hpp            	\
 	user_config.cpp		   user_config.hpp             	\
 	grand_prix_data.cpp    grand_prix_data.hpp        	\
-	kart_properties_manager.cpp kart_properties_manager.hpp \
-	kart_properties.cpp	   kart_properties.hpp       	\
 	stk_config.cpp		   stk_config.hpp    		    \
 	highscores.cpp		   highscores.hpp		        \
 	highscore_manager.cpp  highscore_manager.hpp	    \
@@ -95,12 +99,9 @@ supertuxkart_SOURCES =     main.cpp  			\
 	main_loop.cpp	 	   main_loop.hpp        	    \
 	camera.cpp		       camera.hpp	        	    \
 	sdldrv.cpp		       sdldrv.hpp	        	    \
-	moveable.cpp 		   moveable.hpp             	\
-	kart.cpp		       kart.hpp		                \
-	user_pointer.hpp	   auto_kart.hpp             	\
-	player_kart.cpp		   player_kart.hpp	            \
+	user_pointer.hpp	                	\
 	terrain_info.cpp	   terrain_info.hpp		        \
-    triangle_mesh.cpp	   triangle_mesh.hpp		    \
+        triangle_mesh.cpp	   triangle_mesh.hpp		    \
 	flyable.cpp		       flyable.hpp			        \
 	history.cpp		       history.hpp	        	    \
 	scene.hpp		       scene.cpp			        \

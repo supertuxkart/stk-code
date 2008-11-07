@@ -32,18 +32,18 @@
 #include "actionmap.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
-#include "kart_properties_manager.hpp"
 #include "main_loop.hpp"
-#include "items/item_manager.hpp"
-#include "items/powerup_manager.hpp"
-#include "items/attachment_manager.hpp"
-#include "items/projectile_manager.hpp"
 #include "loader.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
 #include "gui/font.hpp"
+#include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
+#include "items/attachment_manager.hpp"
+#include "items/projectile_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 
 #define DEADZONE_MOUSE        150
 #define DEADZONE_MOUSE_SENSE  200

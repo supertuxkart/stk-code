@@ -19,7 +19,8 @@
 
 #ifndef HEADER_CHARACTER_INFO_MESSAGE_H
 #define HEADER_CHARACTER_INFO_MESSAGE_H
-#include "kart_properties_manager.hpp"
+
+#include "karts/kart_properties_manager.hpp"
 #include "network/message.hpp"
 
 /** This message is sent from the server to the clients and contains the list

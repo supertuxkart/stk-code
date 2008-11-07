@@ -25,11 +25,11 @@
 #include <vector>
 
 #include "base_gui.hpp"
-#include "kart.hpp"
 #include "material.hpp"
-#include "player_kart.hpp"
 #include "player.hpp"
 #include "race_manager.hpp"
+#include "karts/kart.hpp"
+#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 
 class InputMap;

@@ -25,13 +25,13 @@
 #include <plib/sg.h>
 #include "btBulletDynamicsCommon.h"
 
-#include "moveable.hpp"
-#include "kart_properties.hpp"
-#include "kart_control.hpp"
+#include "terrain_info.hpp"
+#include "karts/moveable.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_control.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/kart_model.hpp"
-#include "terrain_info.hpp"
 
 class SkidMark;
 class Item;

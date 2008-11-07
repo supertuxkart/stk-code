@@ -21,9 +21,9 @@
 
 #include <stdio.h>
 
-#include "kart.hpp"
 #include "track.hpp"
 #include "race_manager.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 

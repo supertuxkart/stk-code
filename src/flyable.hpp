@@ -20,10 +20,10 @@
 #ifndef HEADER_FLYABLE_H
 #define HEADER_FLYABLE_H
 
-#include "moveable.hpp"
 #include "moving_physics.hpp"
-#include "kart.hpp"
 #include "terrain_info.hpp"
+#include "karts/kart.hpp"
+#include "karts/moveable.hpp"
 
 class FlyableInfo;
 
