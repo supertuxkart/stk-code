@@ -30,6 +30,7 @@
 #include "kart_control.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
+#include "karts/kart_model.hpp"
 #include "terrain_info.hpp"
 
 class SkidMark;
@@ -42,6 +43,7 @@ class Kart : public TerrainInfo, public Moveable
 private:
     btTransform  m_reset_transform;    // reset position
     unsigned int m_world_kart_id;      // index of kart in world
+    float        m_skidding;           /**< Accumulated skidding factor. */
 
 protected:
     Attachment   m_attachment;
@@ -56,7 +58,6 @@ protected:
     float        m_max_speed_reverse_ratio;
     float        m_wheelie_angle;
     float        m_zipper_time_left;   // zipper time left
-    //char         m_fastest_lap_message[255];
     float        m_bounce_back_time;   // a short time after a collision acceleration
                                        // is disabled to allow the karts to bounce back
 
@@ -75,10 +76,11 @@ private:
     ssgTransform*       m_exhaust_pipe;
 
     float               m_wheel_rotation;
-    ssgTransform*       m_wheel_front_l;
-    ssgTransform*       m_wheel_front_r;
-    ssgTransform*       m_wheel_rear_l;
-    ssgTransform*       m_wheel_rear_r;
+    /** For each wheel it stores the suspension length after the karts are at 
+     *  the start position, i.e. the suspension will be somewhat compressed.
+     *  The bullet suspensionRestLength is the value when the suspension is not
+     *  at all compressed. */
+    float               m_default_suspension_length[4];
 
     SkidMark*           m_skidmark_left;
     SkidMark*           m_skidmark_right;
@@ -101,9 +103,6 @@ protected:
     float                 m_rescue_pitch, m_rescue_roll;
     const KartProperties *m_kart_properties;
 
-    /** Search the given branch of objects that match the wheel names
-        and if so assign them to wheel_* variables */
-    void  load_wheels          (ssgBranch* obj);
     
 public:
                    Kart(const std::string& kart_name, int position, 
@@ -161,7 +160,6 @@ public:
     float          getMaxPower      () const {return m_kart_properties->getMaxPower();}
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
-    float          getWheelBase     () const {return m_kart_properties->getWheelBase();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
     float          getMaxSteerAngle () const
                        {return m_kart_properties->getMaxSteerAngle(getSpeed());}
@@ -183,12 +181,16 @@ public:
     /** Sets the kart controls. Used e.g. by replaying history. */
     void           setControls(const KartControl &c) { m_controls = c;         }
     float          getMaxSpeed      () const {return m_max_speed;              }
-    void           createPhysics    (ssgEntity *obj);
-    float          getKartLength    () const {return m_kart_properties->getKartLength();}
-    float          getKartHeight    () const {return m_kart_properties->getKartHeight();}
+    /** Returns the length of the kart. */
+    float          getKartLength    () const
+                   {return m_kart_properties->getKartModel()->getLength();     }
+    /** Returns the height of the kart. */
+    float          getKartHeight    () const 
+                   {return m_kart_properties->getKartModel()->getHeight();     }
     float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
+    void           createPhysics    ();
     void           draw             ();
     bool           isInRest         () const;
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
@@ -196,6 +198,7 @@ public:
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
     void           setSpeed         (float s) {m_speed = s;                   }
+    void           setSuspensionLength();
     float          handleWheelie    (float dt);
     float          getActualWheelForce();
     bool           isOnGround       () const;

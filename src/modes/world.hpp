@@ -26,7 +26,7 @@
 
 #include "track.hpp"
 #include "player_kart.hpp"
-#include "physics.hpp"
+#include "physics/physics.hpp"
 #include "kart.hpp"
 #include "highscores.hpp"
 #include "network/network_kart.hpp"

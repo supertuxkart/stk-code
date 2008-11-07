@@ -188,7 +188,7 @@ void Camera::update (float dt)
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
     bool reverse = m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
-    Vec3 cam_rel_pos(0.f, -m_distance, reverse ? 0.75f : 1.5f) ;
+    Vec3 cam_rel_pos(0.f, -m_distance, reverse ? 0.75f : 1.5f);
 
     // Set the camera rotation
     // -----------------------

@@ -46,6 +46,7 @@
    (corn-f                   4   )
    (corn-r                   4   )
    (wheelie-max-speed-ratio  0.7 ) ;; percentage of max speed for wheelies to work
+   (gravity-center-shift  0 0 0.3)
    (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
    (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
    (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
@@ -63,7 +64,7 @@
    ;; allows for tighter turns at lower speeds
    (min-speed-angle           0 19)
    (max-speed-angle          12  6.4)
-	(engine-power            400    )
+   (engine-power            400    )
    (mass                    225    )
    (suspension-stiffness     48.0  )
    (wheel-damping-relaxation 20    )
@@ -76,9 +77,6 @@
    (chassis-angular-damping   0.2  )
    (maximum-speed            22.22 ) ;; = 80 km/h
    (max-speed-reverse-ratio   0.2  ) ;; percentage of max speed for reverse gear
-   (gravity-center-shift      0.0 0.0 0.3  ) ;; Shift center of gravity
-   (front-wheel-connection   0.38 0.6 0)
-   (rear-wheel-connection    0.38 -0.6 0)
    (suspension-rest           0.2  )
    (suspension-travel-cm     19    )
 
@@ -93,7 +91,12 @@
    ;;                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
    ;; The next vector contains the increase in max power (to simulate different
    ;; gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
-	;;                     | first  | second |  third |
+   ;;                     | first  | second |  third |
+   (wheel-front-right (physics-position  0.38  0.6 0))
+   (wheel-front-left  (physics-position -0.38  0.6 0))
+   (wheel-rear-right  (physics-position  0.38 -0.6 0))
+   (wheel-rear-left   (physics-position -0.38 -0.6 0))
+
    (gear-switch-ratio          0.25      0.7      1.0)
    (gear-power-increase    2.2      1.7      1.3)
    (upright-tolerance         0.2)

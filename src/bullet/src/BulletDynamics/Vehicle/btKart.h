@@ -26,11 +26,13 @@ class btKart : public btRaycastVehicle
 {
 	void         defaultInit(const btVehicleTuning& tuning);
     btScalar     m_track_connect_accel;
+    btScalar     m_skidding_factor;
 public:
 	             btKart(const btVehicleTuning& tuning,btRigidBody* chassis,	
                         btVehicleRaycaster* raycaster, float track_connect_accel );
 	virtual     ~btKart() ;
 	btScalar     rayCast(btWheelInfo& wheel);
+    void         setSkidding(btScalar sf)     { m_skidding_factor = sf; }
 	virtual void updateVehicle(btScalar step);
 	void         resetSuspension();
 	void	     setRaycastWheelInfo(int wheelIndex , bool isInContact, 

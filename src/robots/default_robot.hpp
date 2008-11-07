@@ -98,6 +98,9 @@ private:
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
+    /** Length of the kart, storing it here saves many function calls. */
+    float m_kart_length;
+
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
      *variable, except handle_race_start() that isn't associated with any

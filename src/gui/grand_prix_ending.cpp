@@ -21,11 +21,12 @@
 
 #include <sstream>
 #include <string>
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 #include <SDL/SDL.h>
 
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
 #include "loader.hpp"
 #include "kart_properties_manager.hpp"
 #include "unlock_manager.hpp"
@@ -37,9 +38,9 @@
 #include "translation.hpp"
 #include "kart.hpp"
 #include "scene.hpp"
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
+#include "karts/kart_model.hpp"
 
 enum WidgetTokens
 {
@@ -156,8 +157,8 @@ GrandPrixEnd::GrandPrixEnd()
 
     m_kart = new ssgTransform;
     m_kart->ref();
-    ssgEntity* kartentity = WINNING_KART->getModel();
-    m_kart->addKid(kartentity);
+    KartModel* kartentity = WINNING_KART->getKartModel();
+    m_kart->addKid(kartentity->getRoot());
 
     m_winner_sound->play();
 

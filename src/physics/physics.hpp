@@ -21,14 +21,18 @@
 #define HEADER_PHYSICS_H
 
 #include <set>
+#include <vector>
 #define _WINSOCKAPI_
 #include <plib/sg.h>
-#include "kart.hpp"
-#include "flyable.hpp"
 
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+
+#include "user_pointer.hpp"
+#include "vec3.hpp"
+
+class Kart;
 
 class Physics : public btSequentialImpulseConstraintSolver
 {
@@ -54,7 +58,7 @@ private:
 
     class CollisionPair {
     public:
-        const UserPointer*    a, *b;
+        const UserPointer *a, *b;
        
         // The entries in Collision Pairs are sorted: if a projectile
         // is included, it's always 'a'. If only two karts are reported

@@ -22,9 +22,10 @@
 
 #include <string>
 #include <vector>
+#include "plib/ssg.h"
 #include "vec3.hpp"
+#include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
-#include "no_copy.hpp"
 
 class Material;
 class ssgEntity;
@@ -38,7 +39,10 @@ class KartProperties
 private:
 
     Material                *m_icon_material;  /**< The icon texture to use. */
-    ssgEntity               *m_model;          /**< The 3d model of the kart.*/
+    /** The kart model and wheels. It is mutable since the wheels of the
+     *  KartModel can rotate and turn, but otherwise the kart_properties 
+     *  object is const. */
+    mutable KartModel        m_kart_model;
     std::vector<std::string> m_groups;         /**< List of all groups the kart
                                                     belongs to. */
     static float UNDEFINED;
@@ -50,8 +54,6 @@ protected:
                                  *   driver. */
     std::string m_ident;        /**< The computer readable-name of the kart
                                  *   driver. */
-    std::string m_model_file;   /**< Filename of 3d model that is used for 
-                                 *   kart.*/
     std::string m_icon_file;    /**< Filename of icon that represents the kart
                                  *   in the statusbar and the character select
                                  *   screen. */
@@ -62,12 +64,7 @@ protected:
 
     // Physic properties
     // -----------------
-    float m_kart_width;               /**< Width of kart.  */
-    float m_kart_length;              /**< Length of kart. */
-    float m_kart_height;              /**< Height of kart. */
     float m_mass;                     /**< Weight of kart.  */
-    float m_wheel_base;               /**< Distance between front and rear 
-                                       *   wheels. */
     float m_engine_power;             /**< Maximum force from engine. */
     float m_brake_factor;             /**< Braking factor * engine_power = 
                                        *   braking force. */
@@ -87,6 +84,14 @@ protected:
                                               *   etc. */
     float m_speed_angle_increase;
 
+    ssgEntity  *m_wheel_model[4];      /**< The four wheel models.           */
+    std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */
+                                       /**  Radius of the graphical wheels.  */
+    float       m_wheel_graphics_radius[4];  
+    ssgTransform 
+               *m_wheel_transform[4];  /**< The transform for the wheels, used
+                                        *   to rotate the wheels and display
+                                        *   the suspension in the race.      */
     // bullet physics data 
     // -------------------
     float m_suspension_stiffness;
@@ -100,9 +105,6 @@ protected:
     float m_maximum_speed;
     float m_max_speed_reverse_ratio;
     Vec3  m_gravity_center_shift;    /**< Shift of center of gravity. */
-    Vec3  m_front_wheel_connection;  /**< Connection point relative to center of */
-    Vec3  m_rear_wheel_connection;   /**< Gravity for front and rear right wheels
-                                      *  (X is mirrored for left wheels). */
     float m_track_connection_accel;  /**< Artifical acceleration that pulls a 
                                       *   kart down onto the track if one axis
                                       *   loses contact with the track. */
@@ -138,7 +140,8 @@ public:
 
     float getMaxSteerAngle          (float speed) const;
     Material*     getIconMaterial   () const {return m_icon_material;          }
-    ssgEntity*    getModel          () const {return m_model;                  }
+    /** Returns a pointer to the KartModel object. */
+    KartModel*    getKartModel      () const {return &m_kart_model;            }
     const std::string& getName      () const {return m_name;                   }
     const std::string& getIdent     () const {return m_ident;                  }
     const std::string& getShadowFile() const {return m_shadow_file;            }
@@ -147,13 +150,9 @@ public:
     const std::vector<std::string>&
                   getGroups         () const {return m_groups;                   }
     float getMass                   () const {return m_mass;                     }
-    float getKartLength             () const {return m_kart_length;              }
-    float getKartWidth              () const {return m_kart_width;               }
-    float getKartHeight             () const {return m_kart_height;              }
     float getMaxPower               () const {return m_engine_power;             }
     float getTimeFullSteer          () const {return m_time_full_steer;          }
     float getBrakeFactor            () const {return m_brake_factor;             }
-    float getWheelBase              () const {return m_wheel_base;               }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
     float getWheelieMaxSpeedRatio   () const {return m_wheelie_max_speed_ratio;  }
     float getWheelieMaxPitch        () const {return m_wheelie_max_pitch;        }
@@ -173,8 +172,6 @@ public:
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }
     const Vec3& getGravityCenterShift() const {return m_gravity_center_shift;    }
-    const Vec3& getFrontWheelConnection()const {return m_front_wheel_connection; }
-    const Vec3& getRearWheelConnection()const {return m_rear_wheel_connection;   }
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }

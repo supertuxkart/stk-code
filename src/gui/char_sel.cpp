@@ -31,6 +31,7 @@
 #include "material.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "karts/kart_model.hpp"
 #include "network/network_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -242,6 +243,7 @@ void CharSel::switchGroup()
         if(kart_properties_manager->kartAvailable(karts[i]))
         {
             m_index_avail_karts.push_back(karts[i]);
+            kart_properties_manager->getKartById(karts[i])->getKartModel()->resetWheels();
         }
     }
 
@@ -307,9 +309,9 @@ void CharSel::switchCharacter(int n)
         ssgDeRefDelete(m_kart);
         m_kart = new ssgTransform;
         m_kart->ref();
-        ssgEntity* kartentity = kp->getModel();
+        KartModel* kartentity = kp->getKartModel();
 
-        m_kart->addKid(kartentity);
+        m_kart->addKid(kartentity->getRoot());
     }
 }   // switchCharacter
 

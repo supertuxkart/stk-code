@@ -17,12 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "physics.hpp"
+#include "physics/physics.hpp"
 
-#include "flyable.hpp"
-#include "moving_physics.hpp"
 #include "user_config.hpp"
-#include "material_manager.hpp"
 #include "network/race_state.hpp"
 #include "utils/ssg_help.hpp"
 #include "track.hpp"

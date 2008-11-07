@@ -46,7 +46,7 @@ Moveable::~Moveable()
 
 //-----------------------------------------------------------------------------
 // The reset position must be set before calling reset
-void Moveable::reset ()
+void Moveable::reset()
 {
     m_material_hot     = NULL;
     m_normal_hot       = NULL;
@@ -66,7 +66,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
-    m_motion_state = new btDefaultMotionState(trans);
+    m_motion_state = new KartMotionState(trans);
 
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
     info.m_restitution=0.5f;
@@ -84,7 +84,18 @@ void Moveable::createBody(float mass, btTransform& trans,
 }   // createBody
 
 //-----------------------------------------------------------------------------
-void Moveable::update (float dt)
+/** Places this moveable at a certain location and stores this transform in
+ *  this Moveable, so that it can be accessed easily.
+ *  \param t New transform for this moveable.
+ */
+void Moveable::setTrans(const btTransform &t)
+{
+    m_transform=t;
+    m_motion_state->setWorldTransform(t);
+}   // setTrans
+
+//-----------------------------------------------------------------------------
+void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*getTrans().getBasis();

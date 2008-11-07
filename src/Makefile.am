@@ -66,6 +66,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	items/missile.cpp		       items/missile.hpp			 \
 	items/cake.cpp		           items/cake.hpp			     \
 	items/bowling.cpp		       items/bowling.hpp			 \
+	karts/kart_model.cpp           karts/kart_model.hpp            \
 	smoke.cpp		       smoke.hpp			        \
 	input.hpp 		       kart_control.hpp		        \
 	isect.cpp		       isect.hpp                	\
@@ -88,7 +89,6 @@ supertuxkart_SOURCES =     main.cpp  			\
 	moving_physics.hpp	   moving_physics.cpp		    \
 	moving_texture.hpp	   moving_texture.cpp		    \
 	callback_manager.cpp   callback_manager.hpp         \
-	physics.cpp            physics.hpp                  \
 	skid_mark.cpp		   skid_mark.hpp	            \
 	shadow.cpp		       shadow.hpp	        	    \
 	particle_system.cpp	   particle_system.hpp       	\
@@ -142,19 +142,21 @@ supertuxkart_SOURCES =     main.cpp  			\
 	gui/grand_prix_select.cpp  gui/grand_prix_select.hpp    \
 	gui/challenges_menu.cpp	   gui/challenges_menu.hpp	\
 	gui/feature_unlocked.cpp   gui/feature_unlocked.hpp	\
-	gui/font.hpp		       gui/font.cpp                 \
+	gui/font.hpp		   gui/font.cpp                 \
+	physics/physics.cpp        physics/physics.hpp          \
+        physics/kart_motion_state.hpp                           \
 	robots/default_robot.cpp   robots/default_robot.hpp	\
 	modes/follow_the_leader.cpp modes/follow_the_leader.hpp \
-	modes/standard_race.cpp    modes/standard_race.hpp \
-	modes/clock.cpp            modes/clock.hpp \
-	modes/world.cpp		       modes/world.hpp                	\
-	modes/linear_world.cpp     modes/linear_world.hpp  \
+	modes/standard_race.cpp    modes/standard_race.hpp      \
+	modes/clock.cpp            modes/clock.hpp              \
+	modes/world.cpp		   modes/world.hpp           	\
+	modes/linear_world.cpp     modes/linear_world.hpp       \
 	modes/three_strikes_battle.cpp modes/three_strikes_battle.hpp \
 	replay_buffer_tpl.hpp 					\
-	replay_buffers.hpp	       replay_buffers.cpp		\
-	replay_base.hpp		       replay_base.cpp		\
+	replay_buffers.hpp	   replay_buffers.cpp		\
+	replay_base.hpp            replay_base.cpp		\
 	replay_player.hpp          replay_player.cpp		\
-	replay_recorder.hpp	       replay_recorder.cpp       	\
+	replay_recorder.hpp	   replay_recorder.cpp       	\
 	ide/vc8/supertuxkart.sln   ide/vc8/supertuxkart.vcproj	\
 	ide/vc8/bullet_lib.vcproj  ide/vc8/README \
 	ide/vc9/supertuxkart.sln   ide/vc9/supertuxkart.vcproj	\

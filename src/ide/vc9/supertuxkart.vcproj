@@ -764,10 +764,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\physics.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\player_kart.cpp"
 				>
 			</File>
@@ -1167,6 +1163,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="physics"
+				>
+				<File
+					RelativePath="..\..\physics\physics.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="karts"
+				>
+				<File
+					RelativePath="..\..\karts\kart_model.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1299,10 +1311,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\particle_system.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\physics.hpp"
 				>
 			</File>
 			<File
@@ -1770,6 +1778,26 @@
 				</File>
 				<File
 					RelativePath="..\..\items\projectile_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="physics"
+				>
+				<File
+					RelativePath="..\..\physics\kart_motion_state.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\physics.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="karts"
+				>
+				<File
+					RelativePath="..\..\karts\kart_model.hpp"
 					>
 				</File>
 			</Filter>

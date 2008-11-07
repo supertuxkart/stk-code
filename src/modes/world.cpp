@@ -250,6 +250,11 @@ void World::resetAllKarts()
         }
     }   // while
 
+    // Now store the current (i.e. in rest) suspension length for each kart,
+    // so that the karts can visualise the suspension.
+    for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+        (*i)->setSuspensionLength();
+
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------

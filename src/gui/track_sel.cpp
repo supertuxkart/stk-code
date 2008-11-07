@@ -24,10 +24,9 @@
 #include "track.hpp"
 #include "menu_manager.hpp"
 #include "user_config.hpp"
-#include "material.hpp"
-#include "material_manager.hpp"
-#include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "unlock_manager.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif

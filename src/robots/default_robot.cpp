@@ -48,6 +48,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
     AutoKart( kart_name, position, init_pos )
 {
     reset();
+    m_kart_length = m_kart_properties->getKartModel()->getLength();
 
     switch( race_manager->getDifficulty())
     {
@@ -380,7 +381,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
                 {
 		  if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
-		      m_kart_properties->getKartLength() * 2.5f )
+		      m_kart_length * 2.5f )
                     {
                         m_controls.fire = true;
                         m_time_since_last_shot = 0.0f;
@@ -476,11 +477,11 @@ bool DefaultRobot::do_wheelie ( const int STEPS )
        is less accurate than calling findRoadSector(), but a lot faster.
      */
     const int WHEELIE_STEPS = int(( getVelocityLC().getY() * CHECK_DIST )/
-        m_kart_properties->getKartLength() );
+                                   m_kart_length );
 
     for( int i = WHEELIE_STEPS; i > STEPS - 1; --i )
     {
-        step_coord = getXYZ()+vel_normal* m_kart_properties->getKartLength() * float(i);
+        step_coord = getXYZ()+vel_normal* m_kart_length * float(i);
 
         RaceManager::getTrack()->spatialToTrack(step_track_coord, step_coord,
                                                 m_future_sector );
@@ -622,7 +623,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 
     for(int i = 1; STEPS > i; ++i)
     {
-	step_coord = pos + vel_normal* m_kart_properties->getKartLength() * float(i);
+	step_coord = pos + vel_normal* m_kart_length * float(i);
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet
@@ -636,7 +637,7 @@ void DefaultRobot::check_crashes( const int STEPS, const Vec3& pos )
 
 		kart_distance = (step_coord - RaceManager::getKart(j)->getXYZ()).length_2d();
 
-                if( kart_distance < m_kart_properties->getKartLength() + 0.125f * i )
+                if( kart_distance < m_kart_length + 0.125f * i )
                     if( getVelocityLC().getY() > RaceManager::getKart(j)->
                        getVelocityLC().getY() * 0.75f ) m_crashes.m_kart = j;
             }
@@ -734,7 +735,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
 	direction = RaceManager::getTrack()->m_driveline[target_sector] - getXYZ();
 
         float len=direction.length_2d();
-        steps = int( len / m_kart_properties->getKartLength() );
+        steps = int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
         //Protection against having vel_normal with nan values
@@ -746,7 +747,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
         //Test if we crash if we drive towards the target sector
         for( int i = 2; i < steps; ++i )
         {
-            step_coord = getXYZ()+direction*m_kart_properties->getKartLength() * float(i);
+            step_coord = getXYZ()+direction*m_kart_length * float(i);
 
             RaceManager::getTrack()->spatialToTrack( step_track_coord, step_coord,
                 sector );
@@ -755,7 +756,7 @@ void DefaultRobot::find_non_crashing_point( sgVec2 result )
                        : -step_track_coord[0];
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_properties->getKartLength() * 0.5f > RaceManager::getTrack()->getWidth()[sector] )
+            if ( distance + m_kart_length * 0.5f > RaceManager::getTrack()->getWidth()[sector] )
             {
                 sgCopyVec2( result, RaceManager::getTrack()->m_driveline[sector] );
 
@@ -834,7 +835,7 @@ inline float DefaultRobot::normalize_angle( float angle )
  */
 int DefaultRobot::calc_steps()
 {
-    int steps = int( getVelocityLC().getY() / m_kart_properties->getKartLength() );
+    int steps = int( getVelocityLC().getY() / m_kart_length );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -843,7 +844,7 @@ int DefaultRobot::calc_steps()
     {
         const int WIDTH_STEPS = 
             (int)( RaceManager::getTrack()->getWidth()[m_future_sector] 
-                   /( m_kart_properties->getKartLength() * 2.0 ) );
+                   /( m_kart_length * 2.0 ) );
 
         steps += WIDTH_STEPS;
     }

@@ -26,6 +26,7 @@
 #include "vec3.hpp"
 #include "btBulletDynamicsCommon.h"
 #include "user_pointer.hpp"
+#include "physics/kart_motion_state.hpp"
 
 class Material;
 
@@ -38,18 +39,18 @@ class Material;
 class Moveable 
 {
 private:
-    btVector3     m_velocityLC;      /* velocity in kart coordinates                */
-    btTransform   m_transform;
-    Vec3          m_hpr;
+    btVector3        m_velocityLC;      /* velocity in kart coordinates                */
+    btTransform      m_transform;
+    Vec3             m_hpr;
 protected:
-    UserPointer   m_user_pointer;
-    sgVec4       *m_normal_hot;      /* plane on which HOT was computed             */
-    Material     *m_material_hot;    /* Material at HOT                             */
-    ssgTransform *m_model_transform;            // The transform where the model is under
-    ssgTransform *m_shadow;
-    int           m_first_time ;
-    btRigidBody  *m_body;
-    btDefaultMotionState *m_motion_state;
+    UserPointer      m_user_pointer;
+    sgVec4          *m_normal_hot;      /* plane on which HOT was computed             */
+    Material        *m_material_hot;    /* Material at HOT                             */
+    ssgTransform    *m_model_transform;            // The transform where the model is under
+    ssgTransform    *m_shadow;
+    int              m_first_time ;
+    btRigidBody     *m_body;
+    KartMotionState *m_motion_state;
 public:
 
     Moveable ();
@@ -79,7 +80,7 @@ public:
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape);
     const btTransform&  getTrans() const {return m_transform;}
-    void          setTrans  (const btTransform& t){m_transform=t;m_motion_state->setWorldTransform(t);}
+    void          setTrans  (const btTransform& t);
 }
 ;   // class Moveable
 

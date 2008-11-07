@@ -38,18 +38,19 @@
 #include "shadow.hpp"
 #include "track.hpp"
 #include "kart.hpp"
-#include "physics.hpp"
 #include "translation.hpp"
 #include "smoke.hpp"
 #include "material_manager.hpp"
 #include "kart_properties_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/race_gui.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
+#include "karts/kart_model.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "physics/physics.hpp"
 #include "utils/ssg_help.hpp"
 
 
@@ -100,14 +101,9 @@ Kart::Kart (const std::string& kart_name, int position,
     m_rescue                  = false;
     m_wheel_rotation          = 0;
 
-    m_wheel_front_l           = NULL;
-    m_wheel_front_r           = NULL;
-    m_wheel_rear_l            = NULL;
-    m_wheel_rear_r            = NULL;
-
     m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE);
-    m_beep_sound = sfx_manager->newSFX(SFXManager::SOUND_BEEP);
-    m_crash_sound = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
+    m_beep_sound   = sfx_manager->newSFX(SFXManager::SOUND_BEEP);
+    m_crash_sound  = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
 
     if(!m_engine_sound)
     {
@@ -141,14 +137,14 @@ btTransform Kart::getKartHeading(const float customPitch)
 }   // getKartHeading
 
 // ----------------------------------------------------------------------------
-void Kart::createPhysics(ssgEntity *obj)
+void Kart::createPhysics()
 {
     // First: Create the chassis of the kart
     // -------------------------------------
-
-    float kart_width  = m_kart_properties->getKartWidth();
-    float kart_length = m_kart_properties->getKartLength();
-    float kart_height = m_kart_properties->getKartHeight();
+    const KartModel *km = m_kart_properties->getKartModel();
+    float kart_width  = km->getWidth();
+    float kart_length = km->getLength();
+    float kart_height = km->getHeight();
 
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
                                                  0.5f*kart_length,
@@ -158,7 +154,6 @@ void Kart::createPhysics(ssgEntity *obj)
     // Shift center of gravity downwards, so that the kart 
     // won't topple over too easy. 
     shiftCenterOfGravity.setOrigin(getGravityCenterShift());
-
     m_kart_chassis.addChildShape(shiftCenterOfGravity, shape);
 
     // Set mass and inertia
@@ -196,47 +191,16 @@ void Kart::createPhysics(ssgEntity *obj)
     // ----------
     float wheel_radius    = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
-    Vec3  front_wheel     = m_kart_properties->getFrontWheelConnection();
-    if(front_wheel.getX()==STKConfig::UNDEFINED)
-        front_wheel.setX(0.5f*kart_width);
-    if(front_wheel.getY()==STKConfig::UNDEFINED)
-        front_wheel.setY(0.5f*kart_length-wheel_radius);
-    if(front_wheel.getZ()==STKConfig::UNDEFINED)
-        front_wheel.setZ(0);
+
     btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
     btVector3 wheel_axle(1.0f,0.0f,0.0f);
 
-    // right front wheel
-    m_vehicle->addWheel(front_wheel, wheel_direction, wheel_axle,
-                        suspension_rest, wheel_radius, *m_tuning,
-                        /* isFrontWheel: */ true);
-
-    // left front wheel: mirror X axis
-    front_wheel.setX(-front_wheel.getX());
-    m_vehicle->addWheel(front_wheel, wheel_direction, wheel_axle,
-                        suspension_rest, wheel_radius, *m_tuning,
-                        /* isFrontWheel: */ true);
-
-    // right rear wheel
-    Vec3  rear_wheel = m_kart_properties->getRearWheelConnection();
-    if(rear_wheel.getX()==STKConfig::UNDEFINED)
-        rear_wheel.setX(0.5f*kart_width);
-    if(rear_wheel.getY()==STKConfig::UNDEFINED)
-        rear_wheel.setY(-0.5f*kart_length+wheel_radius);
-    if(rear_wheel.getZ()==STKConfig::UNDEFINED)
-        rear_wheel.setZ(0);
-    m_vehicle->addWheel(rear_wheel, wheel_direction, wheel_axle,
-                        suspension_rest, wheel_radius, *m_tuning,
-                        /* isFrontWheel: */ false);
-
-    // left rear wheel: mirror X axis
-    rear_wheel.setX(-rear_wheel.getX());
-    m_vehicle->addWheel(rear_wheel, wheel_direction, wheel_axle,
-                        suspension_rest, wheel_radius, *m_tuning,
-                        /* isFrontWheel: */ false);
-
-    for(int i=0; i<m_vehicle->getNumWheels(); i++)
+    for(unsigned int i=0; i<4; i++)
     {
+        bool is_front_wheel = i<2;
+        m_vehicle->addWheel(m_kart_properties->getKartModel()->getWheelPhysicsPosition(i), 
+                            wheel_direction, wheel_axle, suspension_rest,
+                            wheel_radius, *m_tuning, is_front_wheel);
         btWheelInfo& wheel               = m_vehicle->getWheelInfo(i);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
         wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
@@ -281,17 +245,7 @@ Kart::~Kart()
     if(m_smokepuff) delete m_smokepuff;
     if(m_smoke_system != NULL) delete m_smoke_system;
 
-    sgMat4 wheel_steer;
-    sgMakeIdentMat4(wheel_steer);
-    if (m_wheel_front_l) m_wheel_front_l->setTransform(wheel_steer);
-    if (m_wheel_front_r) m_wheel_front_r->setTransform(wheel_steer);
-
-
     ssgDeRefDelete(m_shadow);
-    ssgDeRefDelete(m_wheel_front_l);
-    ssgDeRefDelete(m_wheel_front_r);
-    ssgDeRefDelete(m_wheel_rear_l);
-    ssgDeRefDelete(m_wheel_rear_r);
 
     if(m_skidmark_left ) delete m_skidmark_left ;
     if(m_skidmark_right) delete m_skidmark_right;
@@ -617,8 +571,8 @@ void Kart::update(float dt)
     item_manager->hitItem(this);
     
     processSkidMarks();
+}   // update
 
-}
 //-----------------------------------------------------------------------------
 // Set zipper time, and apply one time additional speed boost
 void Kart::handleZipper()
@@ -645,8 +599,8 @@ void Kart::draw()
     t.getOpenGLMatrix(m);
 
     btVector3 wire_color(0.5f, 0.5f, 0.5f);
-    RaceManager::getWorld()->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
-                                   wire_color);
+    //RaceManager::getWorld()->getPhysics()->debugDraw(m, m_body->getCollisionShape(), 
+    //                               wire_color);
     btCylinderShapeX wheelShape( btVector3(0.1f,
                                         m_kart_properties->getWheelRadius(),
                                         m_kart_properties->getWheelRadius()));
@@ -834,7 +788,7 @@ void Kart::updatePhysics (float dt)
     // when going faster, use higher pitch for engine
     if(m_engine_sound && sfx_manager->sfxAllowed())
     {
-        m_engine_sound->speed(0.6 + (float)(m_speed / max_speed)*0.7f);
+        m_engine_sound->speed(0.6f + (float)(m_speed / max_speed)*0.7f);
         m_engine_sound->position(getXYZ());
     }
    
@@ -900,44 +854,6 @@ void Kart::processSkidMarks()
 }   // processSkidMarks
 
 //-----------------------------------------------------------------------------
-void Kart::load_wheels(ssgBranch* branch)
-{
-    if (!branch) return;
-
-    for(ssgEntity* i = branch->getKid(0); i != NULL; i = branch->getNextKid())
-    {
-        if (i->getName())
-        { // We found something that might be a wheel
-            if (strcmp(i->getName(), "WheelFront.L") == 0)
-            {
-                m_wheel_front_l = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
-            }
-            else if (strcmp(i->getName(), "WheelFront.R") == 0)
-            {
-                m_wheel_front_r = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
-            }
-            else if (strcmp(i->getName(), "WheelRear.L") == 0)
-            {
-                m_wheel_rear_l = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
-            }
-            else if (strcmp(i->getName(), "WheelRear.R") == 0)
-            {
-                m_wheel_rear_r = SSGHelp::add_transform(dynamic_cast<ssgTransform*>(i));
-            }
-            else
-            {
-                // Wasn't a wheel, continue searching
-                load_wheels(dynamic_cast<ssgBranch*>(i));
-            }
-        }
-        else
-        { // Can't be a wheel,continue searching
-            load_wheels(dynamic_cast<ssgBranch*>(i));
-        }
-    }   // for i
-}   // load_wheels
-
-//-----------------------------------------------------------------------------
 void Kart::loadData()
 {
     float r [ 2 ] = { -10.0f, 100.0f } ;
@@ -956,15 +872,8 @@ void Kart::loadData()
     m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
     m_smokepuff -> setShininess      (  0 ) ;
 
-    ssgEntity *obj = m_kart_properties->getModel();
-    createPhysics(obj);
-
-    load_wheels(dynamic_cast<ssgBranch*>(obj));
-
-    // Optimize the model, this can't be done while loading the model
-    // because it seems that it removes the name of the wheels or something
-    // else needed to load the wheels as a separate object.
-    ssgFlatten(obj);
+    ssgEntity *obj = m_kart_properties->getKartModel()->getRoot();
+    createPhysics();
 
     SSGHelp::createDisplayLists(obj);  // create all display lists
     ssgRangeSelector *lod = new ssgRangeSelector ;
@@ -972,7 +881,7 @@ void Kart::loadData()
     lod -> addKid ( obj ) ;
     lod -> setRanges ( r, 2 ) ;
 
-    this-> getModelTransform() -> addKid ( lod ) ;
+    getModelTransform() -> addKid ( lod ) ;
 
     // Attach Particle System
     //JH  sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
@@ -994,29 +903,49 @@ void Kart::loadData()
 }   // loadData
 
 //-----------------------------------------------------------------------------
+/** Stores the current suspension length. This function is called from world 
+ *  after all karts are in resting position (see World::resetAllKarts), so
+ *  that the default suspension rest length can be stored. This is then used
+ *  later to move the wheels depending on actual suspension, so that when
+ *  a kart is in rest, the wheels are at the position at which they were 
+ *  modelled.
+ */
+void Kart::setSuspensionLength()
+{
+    for(unsigned int i=0; i<4; i++)
+    {
+        m_default_suspension_length[i] =
+            m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+    }   // for i
+}   // setSuspensionLength
+//-----------------------------------------------------------------------------
 void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 {
-    sgMat4 wheel_front;
-    sgMat4 wheel_steer;
-    sgMat4 wheel_rot;
-
-    sgMakeRotMat4( wheel_rot, 0, RAD_TO_DEGREE(-m_wheel_rotation), 0);
-    sgMakeRotMat4( wheel_steer, m_controls.lr * 30.0f , 0, 0);
-
-    sgMultMat4(wheel_front, wheel_steer, wheel_rot);
-
-    if (m_wheel_front_l) m_wheel_front_l->setTransform(wheel_front);
-    if (m_wheel_front_r) m_wheel_front_r->setTransform(wheel_front);
-
-    if (m_wheel_rear_l) m_wheel_rear_l->setTransform(wheel_rot);
-    if (m_wheel_rear_r) m_wheel_rear_r->setTransform(wheel_rot);
+    float wheel_z_axis[4];
+    KartModel *kart_model = m_kart_properties->getKartModel();
+    for(unsigned int i=0; i<4; i++)
+    {
+        // The wheel z-position has to be set relative to the center of mass
+        // of the kart! Center of mass plus connection point is where the 
+        // suspension is attached, subtracting from this the current extension
+        // of the suspension gives the location of the center of the wheel,
+        // which is then adjusted by the difference of physical wheel radius
+        // and graphical wheel radius to give the center of the graphical wheel
+        wheel_z_axis[i] = m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getZ()
+                        - (m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength
+                           - m_default_suspension_length[i])
+                        - (m_vehicle->getWheelInfo(i).m_wheelsRadius
+                           - kart_model->getWheelGraphicsRadius(i));
+    }
+    kart_model->adjustWheels(m_wheel_rotation, m_controls.lr*30.0f,
+                             wheel_z_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
-    center_shift.setZ(-center_shift.getZ()
+    center_shift.setZ(center_shift.getZ()-getKartHeight()*0.5f
+                      - kart_model->getZOffset()
                       + 0.3f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle))) );
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
-    
-    Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));
+    Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));   
 }   // updateGraphics
 
 /* EOF */
