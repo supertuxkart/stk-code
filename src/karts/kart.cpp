@@ -365,15 +365,15 @@ void Kart::collectedItem(const Item &item, int add_info)
     switch (type)
     {
     case ITEM_BANANA  : m_attachment.hitBanana(item, add_info);    break;
-    case ITEM_SILVER_COIN : m_num_items_collected++ ;                          break;
-    case ITEM_GOLD_COIN   : m_num_items_collected += 3 ;                       break;
+    case ITEM_SILVER_COIN : m_num_items_collected++ ;              break;
+    case ITEM_GOLD_COIN   : m_num_items_collected += 3 ;           break;
     case ITEM_BONUS_BOX    : { 
 		         int n=1 + 4*getNumItems() / MAX_ITEMS_COLLECTED;
-                         m_powerup.hitBonusBox(n, item,add_info);break;
+                         m_powerup.hitBonusBox(n, item,add_info);  break;
                      }
     case ITEM_BUBBLEGUM:
-        // skid
-        m_body->setAngularVelocity( btVector3(0,0,4) );
+        // slow down
+        m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
         break;
     default        : break;
     }   // switch TYPE

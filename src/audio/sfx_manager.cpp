@@ -100,6 +100,7 @@ void SFXManager::loadSfx()
         throw std::runtime_error(msg);
     }
     loadSingleSfx(lisp, "ugh",           SOUND_UGH          );
+    loadSingleSfx(lisp, "skid",          SOUND_SKID         );
     loadSingleSfx(lisp, "winner",        SOUND_WINNER       );
     loadSingleSfx(lisp, "crash",         SOUND_CRASH        );
     loadSingleSfx(lisp, "grab",          SOUND_GRAB         );
