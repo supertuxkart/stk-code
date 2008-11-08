@@ -55,6 +55,7 @@ public:
     virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
+    virtual bool acceptPowerup(const int type) const;
     
     virtual std::string getInternalCode() const;
     

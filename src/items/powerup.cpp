@@ -252,7 +252,13 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     //exclude the anvil and the parachute, but later we have to add 1 to prevent
     //having a value of 0 since that isn't a valid powerup.
     PowerupType newC;
-    newC = (PowerupType)(m_random.get(POWERUP_MAX - 1 - 2) + 1);
+    while(true)
+    {
+        newC = (PowerupType)(m_random.get(POWERUP_MAX - 1 - 2) + 1);
+        // allow the game mode to allow or disallow this type of powerup
+        if(race_manager->getWorld()->acceptPowerup(newC)) break;
+    }
+    
     // Save the information about the powerup in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)

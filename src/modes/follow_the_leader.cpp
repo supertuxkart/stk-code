@@ -21,6 +21,7 @@
 #include "user_config.hpp"
 #include "translation.hpp"
 #include "audio/sound_manager.hpp"
+#include "items/powerup_manager.hpp"
 
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
@@ -136,7 +137,6 @@ KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* cal
     return m_kart_display_info;
 }
 //-----------------------------------------------------------------------------
-
 void FollowTheLeaderRace::raceResultOrder( int* order )
 {
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -176,4 +176,13 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     
     delete []scores;
     delete []race_time;
+}
+//-----------------------------------------------------------------------------
+bool FollowTheLeaderRace::acceptPowerup(const int type) const
+{
+    // anvil makes no sense in FTL, the leader is supposed to stay first,
+    // you don't want to stop him
+    if(type == POWERUP_ANVIL) return false;
+    
+    return true;
 }
