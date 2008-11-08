@@ -53,7 +53,7 @@
 #include "network/network_manager.hpp"
 #include "physics/physics.hpp"
 #include "utils/ssg_help.hpp"
-
+#include "audio/sfx_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
@@ -711,14 +711,24 @@ void Kart::updatePhysics (float dt)
     else
     {   // not accelerating
         if(m_controls.brake)
-        {   // braking or moving backwards
+        {   // check if the player is currently only slowing down or moving backwards
             if(m_speed > 0.f)
             {   // going forward, apply brake force
                 m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 2);
                 m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 3);
+                m_skid_sound->position( getXYZ() );
+                if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
+                {
+                    m_skid_sound->loop();
+                    m_skid_sound->play();
+                }
             }
             else
-            {   // going backward, apply reverse gear ratio
+            {
+                // no braking sound
+                if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING) m_skid_sound->stop();
+                
+                // going backward, apply reverse gear ratio
                 if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
                     m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
@@ -732,7 +742,11 @@ void Kart::updatePhysics (float dt)
             }
         }
         else
-        {   // lift the foot from throttle, brakes with 10% engine_power
+        {
+            // not braking, stop sound
+            if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING) m_skid_sound->stop();
+            
+            // lift the foot from throttle, brakes with 10% engine_power
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
         }
