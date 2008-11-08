@@ -248,9 +248,9 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 
     // Otherwise (server or no network): determine powerup randomly
 
-    //rand() is moduled by POWERUP_MAX - 1 - 2 because because we have to
-    //exclude the anvil and the parachute, but later we have to add 1 to prevent
-    //having a value of 0 since that isn't a valid powerup.
+    //(POWERUP_MAX - 1) is the last valid id. We substract 2 because because we have to
+    //exclude the anvil and the parachute which are handled above, but later we
+    //have to add 1 to prevent having a value of 0 since that isn't a valid powerup.
     PowerupType newC;
     while(true)
     {

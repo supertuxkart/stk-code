@@ -32,7 +32,7 @@ class ssgEntity;
 enum PowerupType {POWERUP_NOTHING,
                   POWERUP_BUBBLEGUM, POWERUP_CAKE,
                   POWERUP_BOWLING, POWERUP_ZIPPER,
-                  POWERUP_PARACHUTE, POWERUP_ANVIL,
+                  POWERUP_PARACHUTE, POWERUP_ANVIL, //powerup.cpp assumes these two come last
                   POWERUP_MAX};
 
 class PowerupManager
