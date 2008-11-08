@@ -114,8 +114,12 @@ ItemManager::~ItemManager()
 {
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
-        ssgDeRefDelete(i->second);
+        // We can't use ssgDeRefDelete here, since then the object would be
+        // freed, and when m_all_models is deleted, we have invalid memory
+        // accesses.
+        i->second->deRef();
     }
+    m_all_models.clear();
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
