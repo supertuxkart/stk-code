@@ -102,8 +102,6 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
 //-----------------------------------------------------------------------------
 bool StandardRace::enableBonusBoxes()
 {
-    printf("StandardRace::enableBonusBoxes() -- are we in time trial? %i \n", (race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL) );
-    
     // in time trial mode, don't use bonus boxes
     return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
 }
