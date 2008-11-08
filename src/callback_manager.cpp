@@ -47,8 +47,8 @@ CallbackManager::~CallbackManager()
             {
                 delete *c;
             }
-            m_allCallbacks[i].clear();
         }   // for c in m_allCallbacks[i]
+        m_allCallbacks[i].clear();
     }   // for i <CB_MAX
 }   // ~CallbackManager
 

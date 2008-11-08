@@ -481,7 +481,7 @@ void CleanTuxKart()
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
     if(item_manager)            delete item_manager;
-  //if(delete callback_manager) delete callback_manager; //segfaults if uncommented
+    if(callback_manager)        delete callback_manager;
     if(powerup_manager)         delete powerup_manager;   
     if(projectile_manager)      delete projectile_manager;
     if(kart_properties_manager) delete kart_properties_manager;
