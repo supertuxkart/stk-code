@@ -27,10 +27,12 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
     TimedRace::setClockMode(CHRONO);
     m_use_highscores = false;
     
+    World::init();
+    
     // check for possible problems if AI karts were incorrectly added
     if(race_manager->getNumKarts() > race_manager->getNumPlayers())
     {
-        fprintf(stderr, "No AI exists for this game mode");
+        fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
  

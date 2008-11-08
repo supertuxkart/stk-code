@@ -32,6 +32,10 @@
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()
 {
+}
+void LinearWorld::init()
+{
+    World::init();
     const unsigned int kart_amount = m_kart.size();
     
     m_kart_display_info = new KartIconDisplayInfo[kart_amount];

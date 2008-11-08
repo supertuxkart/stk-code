@@ -62,6 +62,10 @@ protected:
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
 public:
     LinearWorld();
+    /** call just after instanciating. can't be moved to the contructor as child
+        classes must be instanciated, otherwise polymorphism will fail and the
+        results will be incorrect */
+    void init();
     virtual ~LinearWorld();
     
     /** This vector contains an 'KartInfo' struct for every kart in the race.
@@ -86,6 +90,7 @@ public:
     virtual void    restartRace();
     
     virtual bool raceHasLaps(){ return true; }
+    virtual bool enableBonusBoxes(){ return true; }
     
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */

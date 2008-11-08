@@ -57,6 +57,9 @@
 //-----------------------------------------------------------------------------
 World::World() : TimedRace()
 {
+}
+void World::init()
+{
     RaceManager::setWorld(this);
     race_state            = new RaceState();
     m_track               = NULL;

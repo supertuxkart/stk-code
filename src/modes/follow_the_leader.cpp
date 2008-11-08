@@ -26,8 +26,8 @@
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals    = stk_config->m_leader_intervals;
-    
     TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    LinearWorld::init();
 }
 
 //-----------------------------------------------------------------------------

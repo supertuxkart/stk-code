@@ -121,6 +121,11 @@ public:
     std::string m_debug_text[10];
     
     World();
+    /** call just after instanciating. can't be moved to the contructor as child
+        classes must be instanciated, otherwise polymorphism will fail and the
+        results will be incorrect */
+    void init();
+    
     virtual         ~World();
     virtual void    update(float delta);
     virtual void    restartRace();
