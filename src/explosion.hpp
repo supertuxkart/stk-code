@@ -28,7 +28,9 @@ class SFXBase;
 class Explosion : public ssgTransform
 {
 private:
-    SFXBase* m_explode_sound;
+    SFXBase*    m_explode_sound;
+    bool        m_has_ended;
+
 public:
     int m_step ;
     ssgSelector  *m_seq ;
@@ -37,8 +39,8 @@ public:
         ~Explosion();
     void init     (const Vec3& coord);
     void update   (float delta_t);
-    int  inUse    () {return (m_step >= 0);                 }
-    bool hasEnded () {return m_step >= m_seq->getNumKids(); }
+    int  inUse    () { return (m_step >= 0); }
+    bool hasEnded () { return  m_has_ended;  }
 
 } ;
 

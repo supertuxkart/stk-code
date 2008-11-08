@@ -53,23 +53,32 @@ void Explosion::init(const Vec3& coord)
     setTransform(&c);
     m_step = -1;
     scene->add(this);
+    m_has_ended = false;
 }
 
 //-----------------------------------------------------------------------------
 void Explosion::update(float dt)
 {
+    //fprintf(stderr, "Explosion: update: ");
     if(++m_step >= m_seq->getNumKids())
     {
         //be sure that the sound is not prematurely stopped
         if(m_explode_sound->getStatus() != SFXManager::SFX_PLAYING)
         {
+            //fprintf(stderr, "Sound finished. Removing.\n");
             scene->remove((ssgTransform*)this);
             projectile_manager->FinishedExplosion();
+            m_has_ended = true;
             return;
+        }
+        else
+        {
+            //fprintf(stderr, "Waiting for sound to finish.\n");
         }
     }
     else
     {
+        //fprintf(stderr, "Step.\n");
         m_seq->selectStep(m_step);
     }
 }

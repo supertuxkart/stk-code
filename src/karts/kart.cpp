@@ -102,9 +102,10 @@ Kart::Kart (const std::string& kart_name, int position,
     m_rescue                  = false;
     m_wheel_rotation          = 0;
 
-    m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE);
-    m_beep_sound   = sfx_manager->newSFX(SFXManager::SOUND_BEEP);
-    m_crash_sound  = sfx_manager->newSFX(SFXManager::SOUND_CRASH);
+    m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE );
+    m_beep_sound   = sfx_manager->newSFX(SFXManager::SOUND_BEEP   );
+    m_crash_sound  = sfx_manager->newSFX(SFXManager::SOUND_CRASH  );
+    m_skid_sound   = sfx_manager->newSFX(SFXManager::SOUND_SKID   );
 
     if(!m_engine_sound)
     {
@@ -238,10 +239,10 @@ Kart::~Kart()
     {
         m_engine_sound->stop();
     }
-    sfx_manager->deleteSFX(m_engine_sound);
-    sfx_manager->deleteSFX(m_beep_sound);
-    sfx_manager->deleteSFX(m_crash_sound);
-    
+    sfx_manager->deleteSFX(m_engine_sound );
+    sfx_manager->deleteSFX(m_beep_sound   );
+    sfx_manager->deleteSFX(m_crash_sound  );
+    sfx_manager->deleteSFX(m_skid_sound   );
 
     if(m_smokepuff) delete m_smokepuff;
     if(m_smoke_system != NULL) delete m_smoke_system;
@@ -374,6 +375,7 @@ void Kart::collectedItem(const Item &item, int add_info)
     case ITEM_BUBBLEGUM:
         // slow down
         m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
+        m_skid_sound->play();
         break;
     default        : break;
     }   // switch TYPE
@@ -523,9 +525,10 @@ void Kart::update(float dt)
 
     Moveable::update(dt);
 
-    m_engine_sound->position(getXYZ());
-    m_beep_sound->position(getXYZ());
-    m_crash_sound->position(getXYZ());
+    m_engine_sound->position ( getXYZ() );
+    m_beep_sound->position   ( getXYZ() );
+    m_crash_sound->position  ( getXYZ() );
+    m_skid_sound->position   ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
     if((fabs(getHPR().getRoll())>60 && fabs(getSpeed())<3.0f) )

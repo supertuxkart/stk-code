@@ -46,7 +46,6 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
     m_wee_sound   = sfx_manager->newSFX(SFXManager::SOUND_WEE  );
     m_ugh_sound   = sfx_manager->newSFX(SFXManager::SOUND_UGH  );
-    m_skid_sound  = sfx_manager->newSFX(SFXManager::SOUND_SKID );
     m_grab_sound  = sfx_manager->newSFX(SFXManager::SOUND_GRAB );
     m_full_sound  = sfx_manager->newSFX(SFXManager::SOUND_FULL );
 
@@ -59,7 +58,6 @@ PlayerKart::~PlayerKart()
     sfx_manager->deleteSFX(m_bzzt_sound);
     sfx_manager->deleteSFX(m_wee_sound );
     sfx_manager->deleteSFX(m_ugh_sound );
-    sfx_manager->deleteSFX(m_skid_sound);
     sfx_manager->deleteSFX(m_grab_sound);
     sfx_manager->deleteSFX(m_full_sound);
 }   // ~PlayerKart
@@ -303,16 +301,19 @@ void PlayerKart::collectedItem(const Item &item, int add_info)
     }
     else
     {
-        if(item.getType() == ITEM_BANANA || item.getType() == ITEM_BUBBLEGUM)
-            m_ugh_sound->play();
-        else
-            m_grab_sound->play();
-
-        if(item.getType() == ITEM_BUBBLEGUM)
+        switch(item.getType())
         {
-            m_skid_sound->position( getXYZ() );
-            m_skid_sound->play();
-        }
+            case ITEM_BANANA:
+                m_ugh_sound->play();
+                break;
+            case ITEM_BUBBLEGUM:
+                //The skid sound is played by the kart class. Do nothing here.
+                //See Kart::collectedItem()
+                break;
+            default:
+                m_grab_sound->play();
+                break; 
+        }           
     }
 }   // collectedItem
 
