@@ -94,6 +94,7 @@ private:
     float               m_current_gear_ratio;
     bool                m_rescue;
     bool                m_eliminated;
+    bool                m_reverse_allowed;
 
     SFXBase            *m_engine_sound;
     SFXBase            *m_beep_sound;

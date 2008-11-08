@@ -707,38 +707,54 @@ void Kart::updatePhysics (float dt)
         if(m_bounce_back_time>0.0f) engine_power = 0.0f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
+        m_reverse_allowed = true;
+        resetBrakes();
     }
     else
     {   // not accelerating
         if(m_controls.brake)
         {   // check if the player is currently only slowing down or moving backwards
-            if(m_speed > 0.f)
-            {   // going forward, apply brake force
-                m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 2);
-                m_vehicle->applyEngineForce(-getBrakeFactor()*engine_power, 3);
+            if(m_speed > 1.0f)
+            {   // going forward
+                m_vehicle->applyEngineForce(0.f, 2);//engine off
+                m_vehicle->applyEngineForce(0.f, 3);
+
+                //apply the brakes
+                for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor() * 4.0f, i);
+
                 m_skid_sound->position( getXYZ() );
                 if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
                 {
                     m_skid_sound->loop();
                     m_skid_sound->play();
                 }
+                m_reverse_allowed = false;
             }
             else
             {
                 // no braking sound
                 if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING) m_skid_sound->stop();
                 
-                // going backward, apply reverse gear ratio
-                if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
+                if(m_reverse_allowed)
                 {
-                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
-                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
-                }
+                    // going backward, apply reverse gear ratio
+                    if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
+                    {
+                        m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
+                        m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
+                    }
+                    else
+                    {
+                        m_vehicle->applyEngineForce(0.f, 2);
+                        m_vehicle->applyEngineForce(0.f, 3);
+                    }
+                } 
                 else
                 {
-                    m_vehicle->applyEngineForce(0.f, 2);
-                    m_vehicle->applyEngineForce(0.f, 3);
-                }
+                     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
+                     m_vehicle->applyEngineForce(0.f, 2);
+                     m_vehicle->applyEngineForce(0.f, 3);
+                }           
             }
         }
         else
@@ -749,6 +765,9 @@ void Kart::updatePhysics (float dt)
             // lift the foot from throttle, brakes with 10% engine_power
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
+
+            resetBrakes();
+            m_reverse_allowed = true;
         }
     }
 
