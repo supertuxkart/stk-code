@@ -46,7 +46,12 @@ KartPropertiesManager::~KartPropertiesManager()
 {
     for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
-        delete *i;
+    {
+       delete *i;
+       // Set the entry in the kart properties vector to 0, otherwise
+       // memory errors happen.
+       m_karts_properties[i-m_karts_properties.begin()] = NULL;
+    }
 }   // ~KartPropertiesManager
 
 //-----------------------------------------------------------------------------

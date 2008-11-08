@@ -65,10 +65,11 @@ void KartModel::loadInfo(const lisp::Lisp* lisp)
  */
 KartModel::~KartModel()
 {
+    // This automatically frees the wheels and the kart model.
+    // m_root can be zero in case of STKConfig, which has a kart_properties
+    // attribute (for the default values) as well.
+    if(m_root) m_root->removeAllKids();
     ssgDeRefDelete(m_root);
-    for(unsigned int i=0; i<4; i++)  
-        if(m_wheel_model[i]) ssgDeRefDelete(m_wheel_model[i]);
-
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
