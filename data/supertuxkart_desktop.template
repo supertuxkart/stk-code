@@ -1,3 +1,4 @@
+
 [Desktop Entry]
 Encoding=UTF-8
 Name=Supertuxkart
@@ -13,3 +14,4 @@ StartupNotify=false
 Type=Application
 TryExec=PREFIX/games/supertuxkart
 Categories=Game;ArcadeGame
+GenericName=
