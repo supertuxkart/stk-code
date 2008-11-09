@@ -766,7 +766,8 @@ void Kart::updatePhysics (float dt)
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
 
-            resetBrakes();
+            if(!RaceManager::getWorld()->isStartPhase())
+                resetBrakes();
             m_reverse_allowed = true;
         }
     }
