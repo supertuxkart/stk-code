@@ -121,8 +121,12 @@ GrandPrixEnd::GrandPrixEnd()
     for(unsigned int i=start; i < NUM_KARTS; ++i)
     {
         char sTime[20];sTime[0]=0;
-        if(race_manager->getWorld()->getClockMode()==CHRONO)
+        //if(race_manager->getWorld()->getClockMode()==CHRONO)
+        
+        if(RaceManager::isLinearRaceMode(race_manager->getMinorMode()) &&
+           RaceManager::modeHasLaps(race_manager->getMinorMode()) )
             TimeToString(race_time[i], sTime);
+            
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
             i + 1-start, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
 
