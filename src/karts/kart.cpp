@@ -200,10 +200,10 @@ void Kart::createPhysics()
     for(unsigned int i=0; i<4; i++)
     {
         bool is_front_wheel = i<2;
-        m_vehicle->addWheel(m_kart_properties->getKartModel()->getWheelPhysicsPosition(i), 
+        btWheelInfo& wheel = m_vehicle->addWheel(
+                            m_kart_properties->getKartModel()->getWheelPhysicsPosition(i), 
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, *m_tuning, is_front_wheel);
-        btWheelInfo& wheel               = m_vehicle->getWheelInfo(i);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
         wheel.m_wheelsDampingRelaxation  = m_kart_properties->getWheelDampingRelaxation();
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
@@ -967,25 +967,21 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     KartModel *kart_model = m_kart_properties->getKartModel();
     for(unsigned int i=0; i<4; i++)
     {
-        // The wheel z-position has to be set relative to the center of mass
-        // of the kart! Center of mass plus connection point is where the 
-        // suspension is attached, subtracting from this the current extension
-        // of the suspension gives the location of the center of the wheel,
-        // which is then adjusted by the difference of physical wheel radius
-        // and graphical wheel radius to give the center of the graphical wheel
-        wheel_z_axis[i] = m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getZ()
-                        - (m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength
-                           - m_default_suspension_length[i])
-                        - (m_vehicle->getWheelInfo(i).m_wheelsRadius
-                           - kart_model->getWheelGraphicsRadius(i));
+        // Set the suspension length
+        wheel_z_axis[i] = m_default_suspension_length[i]
+                        - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
     kart_model->adjustWheels(m_wheel_rotation, m_controls.lr*30.0f,
                              wheel_z_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
-    center_shift.setZ(center_shift.getZ()-getKartHeight()*0.5f
-                      - kart_model->getZOffset()
-                      + 0.3f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle))) );
+    float X = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getZ()
+            - m_default_suspension_length[0]
+            - m_vehicle->getWheelInfo(0).m_wheelsRadius
+            - (kart_model->getWheelGraphicsRadius(0)
+               -kart_model->getWheelGraphicsPosition(0).getZ() )
+            + getKartLength()*0.5f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle)));
+    center_shift.setZ(X);
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
     Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));   
 }   // updateGraphics

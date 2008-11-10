@@ -37,6 +37,7 @@ KartModel::KartModel()
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
         m_wheel_physics_position[i]  = Vec3(UNDEFINED);
+        m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
     }
     m_wheel_filename[0] = "wheel-front-right.ac";
@@ -93,6 +94,9 @@ void KartModel::loadModels()
     m_kart_width  = max.getX()-min.getX();
     m_kart_length = max.getY()-min.getY();
     m_kart_height = max.getZ()-min.getZ();
+    sgVec3 move_kart_to_0_z;
+    sgSetVec3(move_kart_to_0_z, 0, 0, m_z_offset);
+    m_root->setTransform(move_kart_to_0_z);
 
     // Now set default some default parameters (if not defined) that 
     // depend on the size of the kart model (wheel position, center
@@ -129,7 +133,7 @@ void KartModel::loadModels()
 
             Vec3 min_wheel, max_wheel;
             SSGHelp::MinMax(m_wheel_model[i], &min_wheel, &max_wheel);
-            m_wheel_graphics_radius[i] = max_wheel.getZ()-min_wheel.getZ();
+            m_wheel_graphics_radius[i] = (max_wheel.getZ()-min_wheel.getZ())*0.5f;
             sgMat4 wheel_loc;
             sgVec3 hpr;
             sgZeroVec3(hpr);
