@@ -53,36 +53,6 @@ namespace SSGHelp
 
     }  // createDisplayLists
 
-    // -------------------------------------------------------------------------
-    /** Adds a transform node to the branch.
-     *
-     *  Creates a new ssgTransform node to which all children of the branch are
-     *  added. The new ssgTransform is then set as the only child of the
-     *  branch.
-     *  \param branch The branch to which a transform node is added.
-     */
-    ssgTransform* add_transform(ssgBranch* branch)
-    {
-        if (!branch) return 0;
-
-        ssgTransform* transform = new ssgTransform;
-        transform->ref();
-        for(ssgEntity* i = branch->getKid(0); i != NULL; 
-                       i = branch->getNextKid())
-        {
-            transform->addKid(i);
-        }
-
-        branch->removeAllKids();
-        branch->addKid(transform);
-
-        // Set some user data, so that the wheel isn't ssgFlatten()'ed
-        branch->setUserData(new ssgBase());
-        transform->setUserData(new ssgBase());
-
-        return transform;
-    }   // add_transform
-
     // ------------------------------------------------------------------------
     /** Recursively prints a model.
      *

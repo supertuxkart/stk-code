@@ -27,7 +27,6 @@
 namespace SSGHelp {
     //* Several useful functions which don't fit anywhere else
     void          createDisplayLists(ssgEntity *entity);
-    ssgTransform* add_transform     (ssgBranch* branch);
     void          print_model       (ssgEntity *entity, const int indent,
                                      const int maxLevel);
     void          MinMax            (const ssgEntity *p,
