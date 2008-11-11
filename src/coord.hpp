@@ -26,13 +26,20 @@
 #include "constants.hpp"
 #include "LinearMath/btTransform.h"
 
+/** A class that stores a translation and rotation. It is used to convert
+ *  between bullet data structures and the data structure for the graphics.
+ */
 class Coord
 {
 private:
+    /** Translation. */
     Vec3       m_xyz;
+    /** Rotation as Eulerian HPR value. */
     Vec3       m_hpr;
+    /** The correspondig plib data structure. */
     sgCoord    m_coord;
 
+    /** Sets the sgCoord data structures (and converts radians to degrees). */
     void setSgCoord()
     {
         sgSetCoord(&m_coord, m_xyz.toFloat(), m_hpr.toFloat());
@@ -44,6 +51,10 @@ private:
     }
 
 public:
+    /** Constructor.
+     *  \param xyz Translation.
+     *  \param hpr Rotation.
+     */
     Coord(const Vec3& xyz, const Vec3& hpr)
     {
         m_xyz = xyz;
@@ -51,6 +62,10 @@ public:
         setSgCoord();
     }   // Coord
     // ------------------------------------------------------------------------
+    /** Constructor based on a bullet transformation (which is a translation
+     *  and rotation as well).
+     *  \param t The bullet transform.
+     */
     Coord(const btTransform& t)
     {
         m_xyz = t.getOrigin();
@@ -58,10 +73,22 @@ public:
         setSgCoord();
     }   // Coord
     // ------------------------------------------------------------------------
+    /** Default constructor. Sets xyz and hpr to 0. */
+    Coord()
+    {
+        m_xyz = Vec3(0.0f);
+        m_hpr = Vec3(0.0f);
+    }
+    // ------------------------------------------------------------------------
+    /** Returns the corresponding plib data structure. */
     const sgCoord& toSgCoord() const     { return m_coord;          }
+    /** Returns the translation. */
     const Vec3&    getXYZ()    const     { return m_xyz;            }
+    /** Returns heading, pitch, rolll. */
     const Vec3&    getHPR()    const     { return m_hpr;            }
+    /** Sets hpr. \param a Heading, pitch and roll. */
     void           setHPR(const Vec3& a) { m_hpr = a; setSgCoord(); }
+    /** Sets xyz. \param a Coordinates. */
     void           setXYZ(const Vec3& a) { m_xyz = a; setSgCoord(); }
 };   // Coord
 

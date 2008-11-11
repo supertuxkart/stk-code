@@ -23,10 +23,13 @@
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
 
+/** A wrapper around bullets btVector3 to include conventient conversion
+ *  functions (e.g. between btVector3 and the graphics specific 3d vector). */
 class Vec3 : public btVector3
 {
 private:
     inline float clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
+    void           setPitchRoll(const Vec3 &normal);
 public:
                    inline Vec3(sgVec3 a) : btVector3(a[0], a[1], a[2]) {}
                    inline Vec3(const btVector3& a) : btVector3(a)      {}
@@ -34,6 +37,14 @@ public:
                    inline Vec3(float x, float y, float z) 
                                                    : btVector3(x,y,z)  {}
                    inline Vec3(float x)            : btVector3(x,x,x)  {}
+                   /** Sets the heading, and computes pitch and roll dependent
+                    *  on the normal it is displayed on.
+                    *  \param heading The heading to set.
+                    *  \param normal The normal from which pitch and roll
+                              should be computed. */
+                   inline Vec3(float heading, const Vec3& normal)
+                                                   {m_x=heading;
+                                                    setPitchRoll(normal);}
 
     void                  setHPR(const btMatrix3x3& m);
     inline const float    operator[](int n) const         {return *(&m_x+n); }
@@ -48,12 +59,18 @@ public:
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
-    // Helper functions to treat this vec3 as a 2d vector:
+    /** Helper functions to treat this vec3 as a 2d vector. This returns the
+     *  square of the length of the first 2 dimensions. */
     float          length2_2d()                    {return m_x*m_x + m_y*m_y;}
+    /** Returns the length of the vector. */
     float          length_2d()                     {return sqrt(m_x*m_x + m_y*m_y);}
+    /** Sets this = max(this, a) componentwise.
+     *  \param Vector to compare with. */
     void           max(const Vec3& a)              {if(a.getX()>m_x) m_x=a.getX();
                                                     if(a.getY()>m_y) m_y=a.getY();
                                                     if(a.getZ()>m_z) m_z=a.getZ();}
+    /** Sets this = min(this, a) componentwise.
+     *  \param a Vector to compare with. */
     void           min(const Vec3& a)              {if(a.getX()<m_x) m_x=a.getX();
                                                     if(a.getY()<m_y) m_y=a.getY();
                                                     if(a.getZ()<m_z) m_z=a.getZ();}

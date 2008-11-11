@@ -1192,7 +1192,7 @@ void Track::loadTrackModel()
             if ( htype=='G' || htype=='g' ) { type = ITEM_BANANA  ;}
             if ( htype=='R' || htype=='r' ) { type = ITEM_BONUS_BOX    ;}
             if ( htype=='S' || htype=='s' ) { type = ITEM_SILVER_COIN ;}
-            item_command(&loc.xyz, type, false) ;
+            itemCommand(&loc.xyz, type, false) ;
         }
         else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
@@ -1202,52 +1202,52 @@ void Track::loadTrackModel()
             if ( htype=='G' || htype=='g' ) { type = ITEM_BANANA  ;}
             if ( htype=='R' || htype=='r' ) { type = ITEM_BONUS_BOX    ;}
             if ( htype=='S' || htype=='s' ) { type = ITEM_SILVER_COIN ;}
-            item_command (&loc.xyz, type, true) ;
+            itemCommand (&loc.xyz, type, true) ;
         }
         /* and now the new names */
         else if ( sscanf ( s, "BBOX,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            item_command(&loc.xyz, ITEM_BONUS_BOX, false);
+            itemCommand(&loc.xyz, ITEM_BONUS_BOX, false);
         }
         else if ( sscanf ( s, "BBOX,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            item_command(&loc.xyz, ITEM_BONUS_BOX, true);
+            itemCommand(&loc.xyz, ITEM_BONUS_BOX, true);
         }
         
         else if ( sscanf ( s, "BANA,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            item_command(&loc.xyz, ITEM_BANANA, false);
+            itemCommand(&loc.xyz, ITEM_BANANA, false);
         }
         
         else if ( sscanf ( s, "BANA,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            item_command(&loc.xyz, ITEM_BANANA, true);
+            itemCommand(&loc.xyz, ITEM_BANANA, true);
         }
         
         else if ( sscanf ( s, "COIN,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            item_command(&loc.xyz, ITEM_SILVER_COIN, false);
+            itemCommand(&loc.xyz, ITEM_SILVER_COIN, false);
         }
         else if ( sscanf ( s, "COIN,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            item_command(&loc.xyz, ITEM_SILVER_COIN, true);
+            itemCommand(&loc.xyz, ITEM_SILVER_COIN, true);
         }
         
         else if ( sscanf ( s, "GOLD,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            item_command(&loc.xyz, ITEM_GOLD_COIN, false);
+            itemCommand(&loc.xyz, ITEM_GOLD_COIN, false);
         }
         else if ( sscanf ( s, "GOLD,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            item_command(&loc.xyz, ITEM_GOLD_COIN, true);
+            itemCommand(&loc.xyz, ITEM_GOLD_COIN, true);
         }
         
         else if ( sscanf ( s, "START,%f,%f,%f",
@@ -1394,21 +1394,26 @@ void Track::loadTrackModel()
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
-void Track::item_command (sgVec3 *xyz, int type, int bNeedHeight )
+void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
 {
 
     // if only 2d coordinates are given, let the item fall from very high
     if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
     // Even if 3d data are given, make sure that the item is on the ground
-    (*xyz)[2] = getHeight ( m_model, *xyz ) + 0.06f;
+    (*xyz)[2] = getHeight( m_model, *xyz ) + 0.06f;
 
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 
         return;
     Vec3 loc((*xyz));
-    item_manager->newItem((ItemType)type, loc);
-}   // item_command
+
+    // Don't tilt the items, since otherwise the rotation will look odd,
+    // i.e. the items will not rotate around the normal, but 'wobble'
+    // around.
+    Vec3 normal(0, 0, 0.0f);
+    item_manager->newItem((ItemType)type, loc, normal);
+}   // itemCommand
 
 // ----------------------------------------------------------------------------
 void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 

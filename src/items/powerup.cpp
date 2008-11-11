@@ -101,15 +101,15 @@ void Powerup::use()
         m_sound_shot->play();
         btVector3 pos = m_owner->getXYZ();
         float z_coord = Track::NOHIT;
-        Vec3 unused; const Material* unused2;
-        
-        RaceManager::getTrack()->getTerrainInfo(pos, &z_coord, &unused, &unused2);
-        
+        Vec3 normal;
+        const Material* unused2;        
+        RaceManager::getTrack()->getTerrainInfo(pos, &z_coord, &normal, &unused2);
+        normal.normalize();
         assert(z_coord != Track::NOHIT);
         
         pos.setZ(z_coord-0.05f);
         
-        item_manager->newItem(ITEM_BUBBLEGUM, pos, m_owner);
+        item_manager->newItem(ITEM_BUBBLEGUM, pos, normal, m_owner);
         }
         break;
         

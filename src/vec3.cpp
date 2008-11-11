@@ -83,3 +83,22 @@ void Vec3::degreeToRad()
 }   // degreeToRad
 
 // ----------------------------------------------------------------------------
+/** Sets the pitch and the roll of this vector to follow the normal given. The
+ *  heading is taken from this vector.
+ *  \param normal The normal vector to which pitch and roll should be aligned.
+ */
+void Vec3::setPitchRoll(const Vec3 &normal)
+{
+    const float X =-sin(m_x);
+    const float Y = cos(m_x);
+    // Compute the angle between the normal of the plane and the line to
+    // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
+    // simplifying the computation of the scalar product.
+    float pitch = ( normal.getX()*X + normal.getY()*Y );  // use ( x,y,0)
+    float roll  = (-normal.getX()*Y + normal.getY()*X );  // use (-y,x,0)
+
+    // The actual angle computed above is between the normal and the (x,y,0)
+    // line, so to compute the actual angles 90 degrees must be subtracted.
+    m_y = acosf(pitch) - NINETY_DEGREE_RAD;
+    m_z = acosf(roll)  - NINETY_DEGREE_RAD;
+}   // setPitchRoll

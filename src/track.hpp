@@ -195,10 +195,10 @@ public:
 
 private:
     void  loadTrack                      (std::string filename);
-    void  item_command                   (sgVec3 *xyz, int item_type, int bNeedHeight);
+    void  itemCommand                    (sgVec3 *xyz, int item_type, int bNeedHeight);
     void  loadDriveline                  ();
     void  readDrivelineFromFile          (std::vector<Vec3>& line,
-                                         const std::string& file_ext      );
+                                         const std::string& file_ext);
     void  convertTrackToBullet           (ssgEntity *track, sgMat4 m);
 
     float pointSideToLine(const Vec3& L1, const Vec3& L2,

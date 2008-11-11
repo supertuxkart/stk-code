@@ -19,8 +19,9 @@
 
 #include "items/bubblegumitem.hpp"
 
-BubbleGumItem::BubbleGumItem(ItemType type, const Vec3& xyz, ssgEntity* model,
-                             unsigned int item_id) : Item(type, xyz, model, item_id)
+BubbleGumItem::BubbleGumItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
+                             ssgEntity* model, unsigned int item_id) 
+             : Item(type, xyz, normal, model, item_id)
 {
     m_rotate = false;
 }   // BubbleGumItem

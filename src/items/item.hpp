@@ -60,8 +60,8 @@ protected:
     float         m_immunity_timer; // can be used so it's not hit by its own item
     
 public:
-                  Item (ItemType type, const Vec3& xyz, ssgEntity* model,
-                           unsigned int item_id);
+                  Item (ItemType type, const Vec3& xyz, const Vec3& normal,
+                        ssgEntity* model, unsigned int item_id);
                  ~Item ();
     unsigned int  getItemId() const {return m_item_id; }
     void          update  (float delta);

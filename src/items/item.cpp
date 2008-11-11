@@ -24,10 +24,12 @@
 #include "coord.hpp"
 #include "karts/kart.hpp"
 
-Item::Item(ItemType type, const Vec3& xyz, ssgEntity* model,
-                 unsigned int item_id) 
-        : m_coord(xyz, Vec3(0, 0, 0))
+Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
+           ssgEntity* model, unsigned int item_id)
 {
+    // Sets heading to 0, and sets pitch and roll depending on the normal. */
+    Vec3  hpr          = Vec3(0, normal);
+    m_coord            = Coord(xyz, hpr);
     m_item_id          = item_id;
     m_type             = type;
     m_collected        = false;

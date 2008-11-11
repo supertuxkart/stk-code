@@ -26,8 +26,9 @@
 class BubbleGumItem : public Item
 {
 public:
-                  BubbleGumItem (ItemType type, const Vec3& xyz, ssgEntity* model,
-                           unsigned int item_id);
+                  BubbleGumItem (ItemType type, const Vec3& xyz, 
+                                 const Vec3 &normal, ssgEntity* model,
+                                 unsigned int item_id);
                  ~BubbleGumItem ();
 }
 ;   // class Item

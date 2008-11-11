@@ -207,13 +207,16 @@ void ItemManager::setDefaultItemStyle()
 }   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
-Item* ItemManager::newItem(ItemType type, const Vec3& xyz, Kart* parent)
+Item* ItemManager::newItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
+                           Kart* parent)
 {
     Item* h;
     if(type == ITEM_BUBBLEGUM)
-        h = new BubbleGumItem(type, xyz, m_item_model[type], m_all_items.size());
+        h = new BubbleGumItem(type, xyz, normal, m_item_model[type], 
+                              m_all_items.size());
     else
-        h = new Item(type, xyz, m_item_model[type], m_all_items.size());
+        h = new Item(type, xyz, normal, m_item_model[type],
+                     m_all_items.size());
     
     if(parent != NULL) h->setParent(parent);
     
