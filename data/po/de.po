@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-11 02:49+0100\n"
-"PO-Revision-Date: 2008-11-11 03:09+0100\n"
+"PO-Revision-Date: 2008-11-11 14:44+0100\n"
 "Last-Translator: Constantin Pelikan <constantin.pelikan@rub.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: src/gui/config_display.cpp:386
 #, c-format
 msgid "%dx%d Blacklisted"
-msgstr "%dx%d zur schwarzen Liste hinzugefü"
+msgstr "%dx%d zur schwarzen Liste hinzugefügt"
 
 #: src/modes/world.cpp:411
 #, c-format
@@ -79,7 +79,7 @@ msgid ""
 msgstr ""
 "Bei hohen Geschwindigkeiten hilft der Kickstart beim schnelleren Voran-\n"
 "kommen auf der Strecke. Allerdings kann dann nicht gelenkt werden. Wenn\n"
-"du stecken bleibst, oder ür die Fahrbahn hinausschiesst, benutze einfach\n"
+"du stecken bleibst, oder über die Fahrbahn hinausschiesst, benutze einfach\n"
 "den Rettungsknopf um wieder auf die Fahrbahn zu kommen."
 
 #: data/grandprix/atworldsend.grandprix:4
@@ -93,11 +93,11 @@ msgstr "Halte dich von Bananen fern"
 #: src/gui/race_results_gui.cpp:70
 #: src/gui/grand_prix_ending.cpp:157
 msgid "Back to the main menu"
-msgstr "Zurü zum Hauptmen"
+msgstr "Zurück zum Hauptmenü"
 
 #: src/gui/help_page_two.cpp:118
 msgid "Back to the menu"
-msgstr "Zurü zum Men"
+msgstr "Zurück zum Menü"
 
 #: src/gui/network_gui.cpp:60
 msgid "Become server"
@@ -109,7 +109,7 @@ msgid ""
 "it will be thrown backwards."
 msgstr ""
 "Bowling Ball - prallt von Wänden ab.\n"
-" Wird nach hinten geworfen,wenn nach hinten geschaut wird."
+" Wird nach hinten geworfen, wenn nach hinten geschaut wird."
 
 #. I18N: name of controls
 #: src/gui/player_controls.cpp:74
@@ -125,8 +125,8 @@ msgid ""
 "Cake - thrown at the closest rival,\n"
 "best on short ranges and long straights"
 msgstr ""
-"Kuchen - wird auf den naechsten Gegner geworfen.\n"
-"Funktionier auf kurze Distanzen und bei geraden Strecken am Besten."
+"Kuchen - wird auf den nächsten Gegner geworfen.\n"
+"Funktioniert auf kurze Distanzen und bei geraden Strecken am Besten."
 
 #: src/gui/network_gui.cpp:179
 msgid "Can't connect to server"
@@ -165,7 +165,7 @@ msgid ""
 "Oliver's Math Class\n"
 "in under 1 minute."
 msgstr ""
-"Sammle mindestens 6 Mü-Punkte\n"
+"Sammle mindestens 6 Münz-Punkte\n"
 "in drei Runden in\n"
 "Oliver's Mathe-Klasse\n"
 "in weniger als 1 Minute."
@@ -195,7 +195,7 @@ msgstr ""
 "Das Sammeln von Münzen erhöht die Anzahl der Gegenstände\n"
 "die du bekommst. Nach 5 Silber-Münzen enthält jede blaue Kiste\n"
 "2 Gegenstände. Nach 10 Münzen, 3 und so weiter.\n"
-"Jede Gold-Müe hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
+"Jede Gold-Münze hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
 
 #: data/grandprix/alltracks.challenge:6
 msgid ""
@@ -413,12 +413,12 @@ msgstr "Spiel-Modi"
 #: src/gui/credits_menu.cpp:75
 #: src/gui/challenges_menu.cpp:52
 msgid "Go back to the main menu"
-msgstr "Zurü zum Hauptmen"
+msgstr "Zurück zum Hauptmenü"
 
 #: src/gui/help_page_three.cpp:82
 #: src/gui/help_page_one.cpp:147
 msgid "Go back to the menu"
-msgstr "Zurü zum Men"
+msgstr "Zurück zum Menü"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/gui/race_gui.cpp:905
@@ -457,7 +457,7 @@ msgid ""
 "you need to complete a challenge to unlock it."
 msgstr ""
 "Wenn du einen Knopf mit einem Schloss wie dem rechts siehst,\n"
-"musst du eie Herausforderung erfüen, um es zu öffnen."
+"musst du eine Herausforderung erfüllen, um es zu öffnen."
 
 #: src/gui/config_display.cpp:88
 msgid "Increase Resolution"
@@ -466,11 +466,11 @@ msgstr "Auflösung erhöhen"
 #: src/user_config.cpp:876
 #, c-format
 msgid "Invalid"
-msgstr "Ungüig"
+msgstr "Ungültig"
 
 #: src/modes/linear_world.cpp:167
 msgid "Invalid short-cut!!"
-msgstr "Ungüige Abküung"
+msgstr "Ungültige Abkürzung"
 
 #. I18N: name of controls
 #: src/gui/player_controls.cpp:76
@@ -483,7 +483,7 @@ msgstr ""
 "Das Sammeln von Münzen erhöt die Anzahl der Gegenstände\n"
 "die du bekommst. Nach 5 Silber-Münzen enthält jede blaue Kiste\n"
 "2 Gegenstände. Nach 10 Münzen, 3 und so weiter.\n"
-"Jede Gold-Müe hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
+"Jede Gold-Münze hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
 
 #: src/gui/race_gui.cpp:759
 msgid "Lap"
@@ -509,7 +509,7 @@ msgstr "Lade Rennen..."
 
 #: src/gui/player_controls.cpp:81
 msgid "Look back"
-msgstr "Zurüschauen"
+msgstr "Zurückschauen"
 
 #: src/gui/main_menu.cpp:54
 msgid "Networking"
@@ -524,7 +524,7 @@ msgstr "Neue Funktion freigeschaltet"
 msgid ""
 "New Grand Prix '%s'\n"
 "now available"
-msgstr "Neuer Grand Prix '%s' verfüar"
+msgstr "Neuer Grand Prix '%s' verfügbar"
 
 #: src/challenges/challenge.cpp:136
 #, c-format
@@ -532,7 +532,7 @@ msgid ""
 "New difficulty\n"
 "'%s'\n"
 "now available"
-msgstr "Neue Schwierigkeitsstufe '%s' verfüar"
+msgstr "Neue Schwierigkeitsstufe '%s' verfügbar"
 
 #: src/modes/linear_world.cpp:276
 msgid "New fastest lap"
@@ -544,7 +544,7 @@ msgid ""
 "New game mode\n"
 "'%s'\n"
 "now available"
-msgstr "Neuer Spielmodus '%s' verfüar"
+msgstr "Neuer Spielmodus '%s' verfügbar"
 
 #: src/challenges/challenge.cpp:140
 #, c-format
@@ -555,14 +555,14 @@ msgid ""
 msgstr ""
 "Neues Kart\n"
 " '%s' \n"
-"verfüar"
+"verfügbar"
 
 #: src/challenges/challenge.cpp:126
 #, c-format
 msgid ""
 "New track '%s'\n"
 "now available"
-msgstr "Neue Strecke '%s' verfüar"
+msgstr "Neue Strecke '%s' verfügbar"
 
 #: src/gui/help_page_two.cpp:114
 #: src/gui/help_page_one.cpp:143
@@ -667,7 +667,7 @@ msgstr "Urzeitliche Insel"
 
 #: src/gui/display_res_confirm.cpp:59
 msgid "Press <ESC> to Cancel"
-msgstr "Drüe die Taste <ESC> zum Abbrechen"
+msgstr "Drücke die Taste <ESC> zum Abbrechen"
 
 #: src/gui/num_players.cpp:46
 #: src/gui/player_controls.cpp:128
@@ -680,11 +680,11 @@ msgstr "Drüe die Taste <ESC> zum Abbrechen"
 #: src/gui/game_mode.cpp:157
 #: src/gui/config_sound.cpp:63
 msgid "Press <ESC> to go back"
-msgstr "Drüe die Taste <ESC> um zurüzukehren"
+msgstr "Drücke die Taste <ESC> um zurückzukehren"
 
 #: src/gui/player_controls.cpp:172
 msgid "Press key"
-msgstr "Taste drüen"
+msgstr "Taste drücken"
 
 #: src/gui/help_page_three.cpp:78
 msgid "Previous help screen"
@@ -701,7 +701,7 @@ msgstr "Schnelle Runde"
 
 #: src/gui/help_page_three.cpp:57
 msgid "Quick race: Pick a single track, shortest time wins.         "
-msgstr "Schnelles Rennen: Wähle eine Strecke, küeste Zeit gewinnt."
+msgstr "Schnelles Rennen: Wähle eine Strecke, kürzeste Zeit gewinnt."
 
 #: src/gui/main_menu.cpp:64
 msgid "Quit"
@@ -709,7 +709,7 @@ msgstr "Beenden"
 
 #: src/gui/race_gui.cpp:697
 msgid "REV"
-msgstr "Rüwärts"
+msgstr "Rückwärts"
 
 #: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
@@ -743,7 +743,7 @@ msgstr "Rennen neu starten"
 
 #: src/gui/race_menu.cpp:47
 msgid "Return To Race"
-msgstr "Zurü zum Rennen"
+msgstr "Zurück zum Rennen"
 
 #. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
 #: src/gui/player_controls.cpp:70
@@ -835,7 +835,7 @@ msgid ""
 "The current key bindings can be seen/changed in the\n"
 "Options->Player Config menu."
 msgstr ""
-"Die aktuellen Tastenzuweisungen können im Menu\n"
+"Die aktuellen Tastenzuweisungen können im Menü\n"
 "Optionen->Spieler Konfiguration eingesehen/geändert werden."
 
 #: src/highscore_manager.cpp:108
@@ -874,11 +874,11 @@ msgstr "Gegen die Uhr: ein schnelles Rennen, aber ohne Gegenstände."
 
 #: src/gui/help_page_two.cpp:57
 msgid "To help you win, there are certain powerups you can grab:"
-msgstr "Um dich beim Gewinnen ein wenig zu unterstüen, gibt es kleine Hilfen zum Aufsammeln:"
+msgstr "Um dich beim Gewinnen ein wenig zu unterstützen, gibt es kleine Hilfen zum Aufsammeln:"
 
 #: data/grandprix/tothemoonandback.grandprix:4
 msgid "To the Moon and Back"
-msgstr "Zum Mond und zurü"
+msgstr "Zum Mond und zurück"
 
 #: src/gui/config_sound.cpp:45
 #: src/gui/config_sound.cpp:90
@@ -948,7 +948,7 @@ msgid ""
 "Grand Prix"
 msgstr ""
 "Gewinne den Grand Prix\n"
-"'Zum Mond und zurü'"
+"'Zum Mond und zurück'"
 
 #: data/tracks/fortmagma/fortmagma.challenge:6
 msgid ""
@@ -978,14 +978,14 @@ msgid ""
 msgstr ""
 "Gewinne ein 'Folge dem Leader' Rennen\n"
 "mit 3 Computer-Gegnern\n"
-"auf einer Wüen-Insel"
+"auf einer Wüsten-Insel"
 
 #: data/tracks/fortmagma/fortmagma.challenge:5
 msgid ""
 "Win a Head to Head on\n"
 "Tux Tollway"
 msgstr ""
-"Gewinn ein Kopf-an-Kopf\n"
+"Gewinn ein Kopf-an-Kopf-Rennen\n"
 "auf Tux's Zollstrasse"
 
 #: data/grandprix/alltracks.challenge:5
@@ -1002,7 +1002,7 @@ msgid ""
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
 msgstr ""
-"Gewinne den 'Zum Mond und zurü'\n"
+"Gewinne den 'Zum Mond und zurück'\n"
 "Grand Prix mit 3 KI Karts\n"
 "der Stufe 'Rennfahrer'"
 
@@ -1085,7 +1085,7 @@ msgstr "nicht definiert"
 #~ msgid "Volcano"
 #~ msgstr "Vulkan"
 #~ msgid "Fulfil challenge to unlock"
-#~ msgstr "Zum Freischalten, erfüe Herausforderung"
+#~ msgstr "Zum Freischalten, erfülle Herausforderung"
 #~ msgid "You won"
 #~ msgstr "Du gewinnst"
 #~ msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
@@ -1095,7 +1095,7 @@ msgstr "nicht definiert"
 #~ msgid "Result"
 #~ msgstr "Ergebnis"
 #~ msgid "Check the current key bindings for the first player"
-#~ msgstr "Ãberprü die Tastenbelegung füden ersten Spieler:"
+#~ msgstr "Überprüfe die Tastenbelegung für den ersten Spieler:"
 #~ msgid ""
 #~ "Created by Oliver & Steve Baker,\n"
 #~ " modified by M. Gagnon"
