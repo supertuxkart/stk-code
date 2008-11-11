@@ -30,8 +30,12 @@
 #else
 #  include <direct.h>
 #endif
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 #include <SDL/SDL.h>
+#define _WINSOCKAPI_
 #include <plib/ul.h>
 
 #include "actionmap.hpp"
@@ -43,12 +47,6 @@
 #include "unlock_manager.hpp"
 #include "race_manager.hpp"
 #include "file_manager.hpp"
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
-
-using namespace std;
-using namespace lisp;
 
 UserConfig *user_config;
 
@@ -527,7 +525,7 @@ void UserConfig::loadConfig(const std::string& filename)
 
 void UserConfig::readStickConfigs(const lisp::Lisp *r)
 {
-    string temp;
+    std::string temp;
     int count = 0;
 
     const lisp::Lisp *scsreader = r->getLisp("stick-configs");
@@ -542,10 +540,10 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
             const lisp::Lisp *screader = scsreader->getLisp(temp);
             if (screader)
             {
-                string *id = new string();
-                screader->get("id", *id);
+                std::string id;
+                screader->get("id", id);
 
-                StickConfig *sc = new StickConfig(*id);
+                StickConfig *sc = new StickConfig(id);
 
                 screader->get("preferredIndex", sc->m_preferredIndex);
                 screader->get("deadzone", sc->m_deadzone);
@@ -569,9 +567,9 @@ void UserConfig::readPlayerInput(const lisp::Lisp *r, const char *node,
 void UserConfig::readInput(const lisp::Lisp* r, const char *node,
                            GameAction action)
 {
-    string inputTypeName;
+    std::string inputTypeName;
 
-    const Lisp* nodeReader = r->getLisp(node);
+    const lisp::Lisp* nodeReader = r->getLisp(node);
     if (!nodeReader)
         return;
 
@@ -649,7 +647,7 @@ void UserConfig::saveConfig(const std::string& filename)
     // and we can exit here without any further messages.
     if (DIR_EXIST == 0) return;
 
-    Writer *writer = new Writer(filename);
+    lisp::Writer *writer = new lisp::Writer(filename);
     try
     {
         writer->beginList("tuxkart-config");
@@ -753,7 +751,7 @@ void UserConfig::saveConfig(const std::string& filename)
 void UserConfig::writeStickConfigs(lisp::Writer *writer)
 {
     int count = 0;
-    string temp;
+    std::string temp;
 
     writer->beginList("stick-configs");
 
@@ -882,24 +880,24 @@ std::string UserConfig::getInputAsString(Input &input)
 }   // GetKeyAsString
 
 // -----------------------------------------------------------------------------
-string UserConfig::getMappingAsString(GameAction ga)
+std::string UserConfig::getMappingAsString(GameAction ga)
 {
     if (inputMap[ga].count &&
         inputMap[ga].inputs[0].type)
     {
-        stringstream s;
+        std::stringstream s;
         s << getInputAsString(inputMap[ga].inputs[0]);
 
         return s.str();
     }
     else
     {
-        return string(_("not set"));
+        return std::string(_("not set"));
     }
 }   // getMappingAsString
 
 // -----------------------------------------------------------------------------
-string UserConfig::getMappingAsString(int playerIndex, KartAction ka)
+std::string UserConfig::getMappingAsString(int playerIndex, KartAction ka)
 {
     return getMappingAsString((GameAction) (GA_FIRST_KARTACTION
                                             + playerIndex * KC_COUNT + ka) );
@@ -1082,7 +1080,7 @@ const std::vector<UserConfig::StickConfig *> *UserConfig::getStickConfigs() cons
 }   // getStickConfigs
 // -----------------------------------------------------------------------------
 
-UserConfig::StickConfig::StickConfig(string &newId)
+UserConfig::StickConfig::StickConfig(const std::string &newId)
                         : m_id(newId)
 {
         // Nothing else to do.

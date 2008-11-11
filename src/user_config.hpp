@@ -60,10 +60,10 @@ public:
 	class StickConfig
 	{
 	public:
-		std::string &m_id;
+		std::string  m_id;
 		int          m_preferredIndex;
 		int          m_deadzone;
-		StickConfig(std::string &);
+		StickConfig(const std::string &id);
 				
 	};
 
