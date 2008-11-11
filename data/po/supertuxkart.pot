@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-08 11:56-0500\n"
+"POT-Creation-Date: 2008-11-11 02:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgstr ""
 msgid "Avoid bananas"
 msgstr ""
 
-#: src/gui/grand_prix_ending.cpp:153 src/gui/race_results_gui.cpp:70
+#: src/gui/race_results_gui.cpp:70 src/gui/grand_prix_ending.cpp:157
 msgid "Back to the main menu"
 msgstr ""
 
@@ -195,15 +195,15 @@ msgid "Confirm Resolution Within 5 Seconds"
 msgstr ""
 
 #: src/gui/network_gui.cpp:56
-msgid "Connect to server:"
+msgid "Connect to server"
 msgstr ""
 
 #: src/gui/network_gui.cpp:155
 msgid "Connected:"
 msgstr ""
 
-#: src/gui/feature_unlocked.cpp:47 src/gui/grand_prix_ending.cpp:149
-#: src/gui/race_results_gui.cpp:59
+#: src/gui/feature_unlocked.cpp:47 src/gui/race_results_gui.cpp:59
+#: src/gui/grand_prix_ending.cpp:153
 msgid "Continue"
 msgstr ""
 
@@ -217,9 +217,9 @@ msgid ""
 "modified by M. Gagnon"
 msgstr ""
 
-#: data/tracks/fortmagma/fortmagma.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
 #: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+#: data/tracks/sandtrack/sandtrack.track:5
+#: data/tracks/fortmagma/fortmagma.track:5
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
@@ -361,11 +361,11 @@ msgstr ""
 msgid "Game modes"
 msgstr ""
 
-#: src/gui/challenges_menu.cpp:52 src/gui/credits_menu.cpp:75
+#: src/gui/credits_menu.cpp:75 src/gui/challenges_menu.cpp:52
 msgid "Go back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:147 src/gui/help_page_three.cpp:82
+#: src/gui/help_page_three.cpp:82 src/gui/help_page_one.cpp:147
 msgid "Go back to the menu"
 msgstr ""
 
@@ -389,7 +389,7 @@ msgid ""
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
 
-#: src/gui/main_menu.cpp:68 src/gui/race_menu.cpp:49
+#: src/gui/race_menu.cpp:49 src/gui/main_menu.cpp:68
 msgid "Help"
 msgstr ""
 
@@ -419,6 +419,10 @@ msgstr ""
 #. I18N: name of controls
 #: src/gui/player_controls.cpp:76
 msgid "Jump"
+msgstr ""
+
+#: data/tracks/castle/castle.track:4
+msgid "King Weird's Castle"
 msgstr ""
 
 #: src/gui/race_gui.cpp:759
@@ -496,7 +500,7 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:143 src/gui/help_page_two.cpp:114
+#: src/gui/help_page_two.cpp:114 src/gui/help_page_one.cpp:143
 msgid "Next help screen"
 msgstr ""
 
@@ -532,7 +536,7 @@ msgstr ""
 msgid "On the Beach"
 msgstr ""
 
-#: src/gui/main_menu.cpp:63 src/gui/options.cpp:40 src/gui/race_menu.cpp:48
+#: src/gui/race_menu.cpp:48 src/gui/options.cpp:40 src/gui/main_menu.cpp:63
 msgid "Options"
 msgstr ""
 
@@ -594,11 +598,11 @@ msgstr ""
 msgid "Press <ESC> to Cancel"
 msgstr ""
 
-#: src/gui/config_controls.cpp:52 src/gui/config_display.cpp:102
-#: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:157
+#: src/gui/num_players.cpp:46 src/gui/player_controls.cpp:128
+#: src/gui/race_options.cpp:149 src/gui/config_controls.cpp:52
+#: src/gui/config_display.cpp:102 src/gui/options.cpp:57
 #: src/gui/grand_prix_select.cpp:80 src/gui/network_gui.cpp:79
-#: src/gui/num_players.cpp:46 src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:128 src/gui/race_options.cpp:149
+#: src/gui/game_mode.cpp:157 src/gui/config_sound.cpp:63
 msgid "Press <ESC> to go back"
 msgstr ""
 
@@ -891,6 +895,10 @@ msgstr ""
 
 #: src/gui/config_display.cpp:71
 msgid "Window mode"
+msgstr ""
+
+#: data/tracks/xr591/xr591.track:4
+msgid "XR591"
 msgstr ""
 
 #: src/karts/player_kart.cpp:267

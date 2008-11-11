@@ -6,377 +6,86 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Supertuxkart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-08 11:56-0500\n"
-"PO-Revision-Date: 2008-11-09 21:39+0100\n"
-"Last-Translator: Dominique Leuenberger <dominique@leuenberger.net>\n"
+"POT-Creation-Date: 2008-11-11 02:43+0100\n"
+"PO-Revision-Date: 2008-11-11 02:44+0100\n"
+"Last-Translator: Constantin Pelikan <constantin.pelikan@rub.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-SearchPath-0: /home/dominique/Documents/src/svn/supertuxkart\n"
+"X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart\n"
 
-#: src/gui/config_display.cpp:386
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/highscore_manager.cpp:108
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+"Die Bestenliste war zu alt,\n"
+" alle Platzierungen wurden geloescht."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:500
+msgid "Old config file found, check your key bindings!"
+msgstr "Alte Einstellungsdatei gefunden, prÃ¼fe die Tastenbelegungen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:853
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:897
 #, c-format
-msgid "%dx%d Blacklisted"
-msgstr "%dx%d zur schwarzen Liste hinzugefügt"
+msgid "not set"
+msgstr "nicht definiert"
 
-#: src/modes/world.cpp:411
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:859
 #, c-format
-msgid ""
-"'%s' has\n"
-"been eliminated."
-msgstr ""
-"'%s' ist\n"
-"ausgeschieden."
+msgid "joy %d axis %d  %c"
+msgstr "Joystick %d Achse %d  %c"
 
-#: src/gui/game_mode.cpp:82
-msgid "3 Strikes Battle"
-msgstr "3 Treffer Kampf"
-
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:72
-msgid "Accelerate"
-msgstr "Beschleunigen"
-
-#: src/gui/challenges_menu.cpp:36
-msgid "Active Challenges"
-msgstr "Aktuelle Herausforderungen"
-
-#: data/grandprix/alltracks.grandprix:4
-msgid "All tracks"
-msgstr "Alle Strecken"
-
-#: data/grandprix/alltracks.grandprix:5
-msgid "All tracks included in SuperTuxKart"
-msgstr "Alle in SuperTuxKart enthaltene Strecken"
-
-#: data/tracks/jungle/jungle.track:4
-msgid "Amazonian Journey"
-msgstr "Reise durch den Amazonas"
-
-#: src/gui/help_page_two.cpp:104
-msgid "Anvil - slows down greatly the kart in the first position"
-msgstr "Amboss - Bremst das Kart an erster Position sehr stark"
-
-#: src/gui/config_display.cpp:93
-msgid "Apply "
-msgstr "Anwenden"
-
-#: src/gui/config_display.cpp:352
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:863
 #, c-format
-msgid "Apply %dx%d"
-msgstr "%dx%d bestätigen"
+msgid "joy %d btn %d"
+msgstr "Joystick %d Knopf %d"
 
-#: data/tracks/lighthouse/lighthouse.track:4
-msgid "Around the Lighthouse"
-msgstr "Um den Leuchtturm"
-
-#: src/gui/help_page_one.cpp:106
-msgid ""
-"At high speeds wheelies drive you faster, but you can't steer. If you\n"
-"get stuck or fall too far, use the rescue button to get back on track."
-msgstr ""
-"Bei hohen Geschwindigkeiten hilft der Kickstart beim schnelleren Voran-\n"
-"kommen auf der Strecke. Allerdings kann dann nicht gelenkt werden. Wenn\n"
-"du stecken bleibst, oder über die Fahrbahn hinausschiesst, benutze einfach\n"
-"den Rettungsknopf um wieder auf die Fahrbahn zu kommen."
-
-#: data/grandprix/atworldsend.grandprix:4
-msgid "At world's end"
-msgstr "Am Ende der Welt"
-
-#: src/gui/help_page_one.cpp:72
-msgid "Avoid bananas"
-msgstr "Halte dich von Bananen fern"
-
-#: src/gui/grand_prix_ending.cpp:153
-#: src/gui/race_results_gui.cpp:70
-msgid "Back to the main menu"
-msgstr "Zurück zum Hauptmenü"
-
-#: src/gui/help_page_two.cpp:118
-msgid "Back to the menu"
-msgstr "Zurück zum Menü"
-
-#: src/gui/network_gui.cpp:60
-msgid "Become server"
-msgstr "Netzwerkspiel erstellen"
-
-#: src/gui/help_page_two.cpp:80
-msgid ""
-"Bowling Ball - bounces off walls. If you are looking back,\n"
-"it will be thrown backwards."
-msgstr ""
-"Bowling Ball - prallt von Wänden ab.\n"
-" Wird nach hinten geworfen,wenn nach hinten geschaut wird."
-
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:74
-msgid "Brake"
-msgstr "Bremsen"
-
-#: src/gui/help_page_two.cpp:64
-msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr "Kaugummi - Hinterlasse einen klebrigen rosa Klumpen"
-
-#: src/gui/help_page_two.cpp:72
-msgid ""
-"Cake - thrown at the closest rival,\n"
-"best on short ranges and long straights"
-msgstr ""
-"Kuchen - Wirf ihn nach deinemnächstgelegenen Gegner.\n"
-"Am besten bei kurzen Distanzenund langen Geraden."
-
-#: src/gui/network_gui.cpp:179
-msgid "Can't connect to server"
-msgstr "Verbindung zu Server gescheitert"
-
-#: data/tracks/canyon/canyon.track:4
-msgid "Canyon"
-msgstr "Canyon"
-
-#: src/gui/main_menu.cpp:60
-msgid "Challenges"
-msgstr "Herausforderungen"
-
-#: src/gui/player_controls.cpp:90
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:866
 #, c-format
-msgid "Choose your controls, %s"
-msgstr "Wähle die Steuerungsart, %s"
+msgid "joy %d hat %d"
+msgstr "Joystick %d Richtungstasten %d"
 
-#: data/tracks/city/city.track:4
-msgid "City"
-msgstr "Stadt"
-
-#: src/gui/config_display.cpp:98
-msgid "Clear from Blacklist"
-msgstr "Aus der schwarzen Liste löschen"
-
-#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
-msgid "Collect Coins in Math Class"
-msgstr "Sammle Münzen im Klassenzimmer"
-
-#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
-msgid ""
-"Collect at least 6 points\n"
-"worth of coins\n"
-"on three laps of\n"
-"Oliver's Math Class\n"
-"in under 1 minute."
-msgstr ""
-"Sammle mindestens 6 Münz-Punkte\n"
-"in drei Runden in\n"
-"Oliver's Mathe-Klasse\n"
-"in weniger als 1 Minute."
-
-#: data/grandprix/tothemoonandback.challenge:6
-msgid ""
-"Collect at least 9 coins\n"
-"on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
-msgstr ""
-"Sammle mindestens 9 Münzen\n"
-"in 3 Runden im Treibsand\n"
-"in weniger als 2:20 Minuten."
-
-#: data/grandprix/tothemoonandback.challenge:5
-msgid "Collect the Pharaohs Treasure"
-msgstr "Sammle den Schatz des Pharao's"
-
-#: src/gui/help_page_one.cpp:121
-msgid ""
-"Collecting coins increases the number of powerups you receive.\n"
-"After 5 silver coins, each blue box will yield 2 powerups,\n"
-"after 10, 3 powerups and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
-msgstr ""
-"Das Sammeln von Münzen erhöht die Anzahl der Gegenstände,\n"
-"die du bekommst. Nach 5 Silber-Münzen enthält jede blaue Kiste\n"
-"2 Gegenstände. Nach 10 Münzen, 3 und so weiter.\n"
-"Jede Gold-Münze hat den Wert von 3 Silber-Münzen, halte also die Augen auf!"
-
-#: data/grandprix/alltracks.challenge:6
-msgid ""
-"Come first in the At World's End\n"
-"Grand Prix with 3 'Racer'\n"
-"Level AI karts."
-msgstr ""
-"Werde Erster beim Grand Prix\n"
-"'Am Ende der Welt'\n"
-"mit 3 'Rennfahrer' KI Karts."
-
-#: src/gui/display_res_confirm.cpp:55
-msgid "Confirm Resolution"
-msgstr "Auflösung bestätigen"
-
-#: src/gui/display_res_confirm.cpp:109
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:869
 #, c-format
-msgid "Confirm Resolution Within %d Seconds"
-msgstr "Auflösung innerhalb %d Sekunden bestätigen"
+msgid "mouse btn %d"
+msgstr "Maus Taste %d"
 
-#: src/gui/display_res_confirm.cpp:51
-msgid "Confirm Resolution Within 5 Seconds"
-msgstr "Auflösung innerhalb 5 Sekunden bestätigen"
-
-#: src/gui/network_gui.cpp:56
-msgid "Connect to server:"
-msgstr "Zu Server verbinden"
-
-#: src/gui/network_gui.cpp:155
-msgid "Connected:"
-msgstr "Verbunden mit"
-
-#: src/gui/feature_unlocked.cpp:47
-#: src/gui/grand_prix_ending.cpp:149
-#: src/gui/race_results_gui.cpp:59
-msgid "Continue"
-msgstr "Weiter"
-
-#: src/gui/race_results_gui.cpp:66
-msgid "Continue Grand Prix"
-msgstr "Grand Prix fortsetzen"
-
-#: data/tracks/beach/beach.track:5
-#: data/tracks/lighthouse/lighthouse.track:5
-msgid ""
-"Created by Ingo Ruhnke,\n"
-"modified by M. Gagnon"
-msgstr ""
-"Erstellt durch Ingo Ruhnke,\n"
-"bearbeitet durch M. Gagnon"
-
-#: data/tracks/fortmagma/fortmagma.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
-msgid ""
-"Created by Oliver & Steve Baker\n"
-"modified by Marianne Gagnon"
-msgstr ""
-"Erstellt durch Oliver & Steve Baker\n"
-"bearbeitet durch Marianne Gagnon"
-
-#: src/gui/main_menu.cpp:71
-msgid "Credits"
-msgstr "Mitwirkende"
-
-#: data/tracks/crescentcrossing/crescentcrossing.track:4
-msgid "Crescent Crossing"
-msgstr "Kreuzende Halbmonde"
-
-#. I18N: displays current resolution
-#: src/gui/config_display.cpp:84
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:872
 #, c-format
-msgid "Current: %dx%d"
-msgstr "Aktuell: %dx%d"
+msgid "mouse axis %d %c"
+msgstr "Maus Achse %d %c"
 
-#: src/gui/config_display.cpp:90
-msgid "Decrease Resolution"
-msgstr "Auflösung verringern"
-
-#: src/gui/race_options.cpp:83
-msgid "Difficulty"
-msgstr "Schwierigkeit"
-
-#: src/gui/options.cpp:49
-msgid "Display"
-msgstr "Anzeigeoptionen"
-
-#: src/gui/config_display.cpp:55
-msgid "Display Settings"
-msgstr "Grafikeinstellungen"
-
-#: src/gui/race_options.cpp:311
-msgid "Driver"
-msgstr "Fahrer"
-
-#: src/gui/config_controls.cpp:43
-msgid "Edit controls for who?"
-msgstr "Steuerung für welchen Spieler einstellen?"
-
-#: src/gui/race_menu.cpp:58
-msgid "Exit Race"
-msgstr "Rennen beenden"
-
-#: data/tracks/jungle/jungle.challenge:6
-msgid ""
-"Finish 3 laps in the Race track\n"
-"with 3 AI karts\n"
-"in under 1:15 minutes."
-msgstr ""
-"Absolviere 3 Runden auf der Rennstrecke\n"
-"mit 3 KI Karts\n"
-"in weniger als 1:15 Minuten"
-
-#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
-msgid ""
-"Finish 3 laps on the City track\n"
-"with 3 AI karts\n"
-"in under 5:20 minutes."
-msgstr ""
-"Absolviere 3 Runden in der Stadt\n"
-"mit 3 Computer-Gegnern\n"
-"in weniger als 5:20 Minuten"
-
-#: data/tracks/canyon/canyon.challenge:6
-msgid ""
-"Finish 3 laps on the Tux Tollway\n"
-"track with 3 AI karts\n"
-"in under 3:00 minutes."
-msgstr ""
-"Beende 3 Runden auf Tux' Zollstrasse\n"
-"mit 3 KI Karts\n"
-"in weniger als 3 Minuten"
-
-#: data/tracks/jungle/jungle.challenge:5
-msgid "Finish Race track in 1:15"
-msgstr "Absolviere die Rennstrecke in 1:15"
-
-#: data/tracks/canyon/canyon.challenge:5
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "Beende Tux' Zollstrasse in 3:00"
-
-#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
-msgid "Finish the City track in 5:20"
-msgstr "Beende die Stadt-Strecke in weniger als 5:20"
-
-#: src/gui/race_gui.cpp:754
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/user_config.cpp:876
 #, c-format
-msgid "Finished"
-msgstr "Beendet"
+msgid "Invalid"
+msgstr "UngÃ¼ltig"
 
-#. I18N: name of controls, like in "fire missile"
-#: src/gui/player_controls.cpp:80
-msgid "Fire"
-msgstr "Schiessen"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:42
+msgid "Game modes"
+msgstr "Spiel-Modi"
 
-#: data/grandprix/penguinplayground.grandprix:5
-msgid "First grand prix, easy to get started"
-msgstr "Erster Grand Prix, einfacher Einstieg"
-
-#: src/gui/game_mode.cpp:77
-#: src/gui/game_mode.cpp:114
-#: data/followtheleader.challenge:7
-msgid "Follow the Leader"
-msgstr "Folge dem Leader"
-
-#: data/tracks/city/city.challenge:5
-msgid "Follow the Leader in the Jungle"
-msgstr "Folge dem Leader in den Jungel"
-
-#: data/grandprix/atworldsend.challenge:5
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:49
 msgid ""
-"Follow the Leader on a\n"
-"Desert Island"
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
 msgstr ""
-"Folge dem Leader auf einer\n"
-"Wüsten-Insel"
+"Grand Prix: Hol dir Siegespunkte auf einer Reihe von Strecken.\n"
+"Die meisten Punkte gewinnen. Bei Gleichstand zÃ¤hlt die Zeit."
 
-#: src/gui/help_page_three.cpp:69
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:57
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr "Schnelles Rennen: WÃ¤hle eine Strecke, kÃ¼rzeste Zeit gewinnt."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:62
+msgid "Time Trial: As quick race, but no items.                       "
+msgstr "Gegen die Uhr: ein schnelles Rennen, aber ohne GegenstÃ¤nde."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:69
 msgid ""
 "Follow the leader: run for second place, as first ahead leader, \n"
 "or last in race track if none ahead, will be disqualified\n"
@@ -386,161 +95,629 @@ msgstr ""
 " vor dem Leader oder der letze dahinter disqualifiziert wird\n"
 "wenn der Zaehler Null erreicht."
 
-#: src/gui/help_page_one.cpp:67
-msgid "Force your rivals bite *your* dust!"
-msgstr "Lass deine Gegner *Deinen* Staub schlucken!"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:78
+msgid "Previous help screen"
+msgstr "Voriger Hilfe-Bildschirm"
 
-#: data/tracks/fortmagma/fortmagma.track:4
-msgid "Fort Magma"
-msgstr "Fort Magma"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_three.cpp:82
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:147
+msgid "Go back to the menu"
+msgstr "ZurÃ¼ck zum MenÃ¼"
 
-#: src/gui/num_players.cpp:41
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/num_players.cpp:39
+msgid "Two Players"
+msgstr "Zwei Spieler"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/num_players.cpp:40
+msgid "Three Players"
+msgstr "Drei Spieler"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/num_players.cpp:41
 msgid "Four Players"
 msgstr "Vier Spieler"
 
-#: src/gui/config_display.cpp:76
-#: src/gui/config_display.cpp:129
-#: src/gui/config_display.cpp:184
-msgid "Fullscreen mode"
-msgstr "Vollbildmodus"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/num_players.cpp:46
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:128
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:149
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:52
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:102
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/options.cpp:57
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_select.cpp:80
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:79
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:157
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:63
+msgid "Press <ESC> to go back"
+msgstr "DrÃ¼cke die Taste <ESC> um zurÃ¼ckzukehren"
 
-#: src/gui/game_mode.cpp:151
-msgid "Game mode help"
-msgstr "Hilfe zu den Spiel-Modi"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:45
+msgid "Paused"
+msgstr "Pause"
 
-#: src/gui/help_page_three.cpp:42
-msgid "Game modes"
-msgstr "Spiel-Modi"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:47
+msgid "Return To Race"
+msgstr "ZurÃ¼ck zum Rennen"
 
-#: src/gui/challenges_menu.cpp:52
-#: src/gui/credits_menu.cpp:75
-msgid "Go back to the main menu"
-msgstr "Zurück zum Hauptmenü"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:48
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/options.cpp:40
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:63
+msgid "Options"
+msgstr "Einstellungen"
 
-#: src/gui/help_page_one.cpp:147
-#: src/gui/help_page_three.cpp:82
-msgid "Go back to the menu"
-msgstr "Zurück zum Menü"
-
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:905
-msgid "Go!"
-msgstr "Los!"
-
-#: src/gui/help_page_one.cpp:71
-msgid "Grab blue boxes and coins"
-msgstr "Sammle blaue Kisten und Münzen"
-
-#: src/gui/game_mode.cpp:98
-msgid "Grand Prix"
-msgstr "Grand Prix"
-
-#: src/gui/help_page_three.cpp:49
-msgid ""
-"Grand Prix: Win victory points \n"
-"by racing through a group of tracks,  \n"
-"most points wins (shortest time in case of a tie!)          "
-msgstr ""
-"Grand Prix: Hol dir Siegespunkte auf einer Reihe von Strecken.\n"
-"Die meisten Punkte gewinnen. Bei Gleichstand zählt die Zeit."
-
-#: src/gui/main_menu.cpp:68
-#: src/gui/race_menu.cpp:49
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:49
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:68
 msgid "Help"
 msgstr "Hilfe"
 
-#: src/gui/race_results_gui.cpp:120
-msgid "Highscores"
-msgstr "Rangliste"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:50
+msgid "Restart Race"
+msgstr "Rennen neu starten"
 
-#: src/gui/help_page_one.cpp:131
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:55
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:79
+msgid "Setup New Race"
+msgstr "Neues Rennen konfigurieren"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_menu.cpp:58
+msgid "Exit Race"
+msgstr "Rennen beenden"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:57
+msgid "To help you win, there are certain powerups you can grab:"
+msgstr "Um dich beim Gewinnen ein wenig zu unterstÃ¼tzen, gibt es kleine Hilfen zum Aufsammeln:"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:64
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr "Kaugummi - Hinterlasse einen klebrigen rosa Klumpen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:72
+msgid ""
+"Cake - thrown at the closest rival,\n"
+"best on short ranges and long straights"
+msgstr ""
+"Kuchen - wird auf den naechsten Gegner geworfen.\n"
+"Funktionier auf kurze Distanzen und bei geraden Strecken am Besten."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:80
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back,\n"
+"it will be thrown backwards."
+msgstr ""
+"Bowling Ball - prallt von WÃ¤nden ab.\n"
+" Wird nach hinten geworfen,wenn nach hinten geschaut wird."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:88
+msgid "Zipper - speed boost"
+msgstr "Zipper - Geschwindigkeitssteigerung"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:96
+msgid "Parachute - slows down all karts in a better position!"
+msgstr "Fallschirm - Bremst alle vorrausfahrenden Karts ab!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:104
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr "Amboss - Bremst das Kart an erster Position sehr stark"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:110
+msgid "Previous screen"
+msgstr "Voriger Bildschirm"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:114
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:143
+msgid "Next help screen"
+msgstr "NÃ¤chster Hilfe-Bildschirm"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_two.cpp:118
+msgid "Back to the menu"
+msgstr "ZurÃ¼ck zum MenÃ¼"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/credits_menu.cpp:75
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/challenges_menu.cpp:52
+msgid "Go back to the main menu"
+msgstr "ZurÃ¼ck zum HauptmenÃ¼"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:697
+msgid "REV"
+msgstr "RÃ¼ckwÃ¤rts"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:754
+#, c-format
+msgid "Finished"
+msgstr "Beendet"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:759
+msgid "Lap"
+msgstr "Runde"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:885
+msgid "Ready!"
+msgstr "Achtung!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:895
+msgid "Set!"
+msgstr "Fertig?"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:905
+msgid "Go!"
+msgstr "Los!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_gui.cpp:934
+msgid "Penalty time!!"
+msgstr "Strafzeit!!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/display_res_confirm.cpp:51
+msgid "Confirm Resolution Within 5 Seconds"
+msgstr "AuflÃ¶sung innerhalb 5 Sekunden bestÃ¤tigen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/display_res_confirm.cpp:55
+msgid "Confirm Resolution"
+msgstr "AuflÃ¶sung bestÃ¤tigen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/display_res_confirm.cpp:59
+msgid "Press <ESC> to Cancel"
+msgstr "DrÃ¼cke die Taste <ESC> zum Abbrechen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/display_res_confirm.cpp:109
+#, c-format
+msgid "Confirm Resolution Within %d Seconds"
+msgstr "AuflÃ¶sung innerhalb %d Sekunden bestÃ¤tigen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/feature_unlocked.cpp:37
+msgid "New Feature Unlocked"
+msgstr "Neue Funktion freigeschaltet"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/feature_unlocked.cpp:47
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:59
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_ending.cpp:153
+msgid "Continue"
+msgstr "Weiter"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:68
+msgid "Left"
+msgstr "Links"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:70
+msgid "Right"
+msgstr "Rechts"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:72
+msgid "Accelerate"
+msgstr "Beschleunigen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:74
+msgid "Brake"
+msgstr "Bremsen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:74
+msgid "Wheelie"
+msgstr "Kickstart"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:76
+msgid "Jump"
+msgstr "Sprung"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:78
+msgid "Rescue"
+msgstr "Retten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:80
+msgid "Fire"
+msgstr "Schiessen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:81
+msgid "Look back"
+msgstr "ZurÃ¼ckschauen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:90
+#, c-format
+msgid "Choose your controls, %s"
+msgstr "WÃ¤hle die Steuerungsart, %s"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:96
+msgid "Player name"
+msgstr "Spieler-Name"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:172
+msgid "Press key"
+msgstr "Taste drÃ¼cken"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/player_controls.cpp:268
+msgid "Player "
+msgstr "Spieler"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:83
+msgid "Difficulty"
+msgstr "Schwierigkeit"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:99
+msgid "Number of karts"
+msgstr "Anzahl der Karts"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:121
+msgid "Number of laps"
+msgstr "Anzahl der Runden"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:141
+msgid "Start race"
+msgstr "Rennen starten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:310
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:314
+msgid "Novice"
+msgstr "FahranfÃ¤nger"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:311
+msgid "Driver"
+msgstr "Fahrer"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:312
+msgid "Racer"
+msgstr "Rennfahrer"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_options.cpp:313
+msgid "Skidding Preview"
+msgstr "Schleuder-Vorschau"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:67
+msgid "Force your rivals bite *your* dust!"
+msgstr "Lass deine Gegner *Deinen* Staub schlucken!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:71
+msgid "Grab blue boxes and coins"
+msgstr "Sammle blaue Kisten und MÃ¼nzen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:72
+msgid "Avoid bananas"
+msgstr "Halte dich von Bananen fern"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:106
+msgid ""
+"At high speeds wheelies drive you faster, but you can't steer. If you\n"
+"get stuck or fall too far, use the rescue button to get back on track."
+msgstr ""
+"Bei hohen Geschwindigkeiten hilft der Kickstart beim schnelleren Voran-\n"
+"kommen auf der Strecke. Allerdings kann dann nicht gelenkt werden. Wenn\n"
+"du stecken bleibst, oder Ã¼ber die Fahrbahn hinausschiesst, benutze einfach\n"
+"den Rettungsknopf um wieder auf die Fahrbahn zu kommen."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:115
+msgid ""
+"The current key bindings can be seen/changed in the\n"
+"Options->Player Config menu."
+msgstr ""
+"Die aktuellen Tastenzuweisungen kÃ¶nnen im Menu\n"
+"Optionen->Spieler Konfiguration eingesehen/geÃ¤ndert werden."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:121
+#, fuzzy
+msgid ""
+"Collecting coins increases the number of powerups you receive.\n"
+"After 5 silver coins, each blue box will yield 2 powerups,\n"
+"after 10, 3 powerups and so on.\n"
+"Each gold coin is worth 3 silver coins, so look out for them!"
+msgstr ""
+"Das Sammeln von MÃ¼nzen erhÃ¶ht die Anzahl der GegenstÃ¤nde\n"
+"die du bekommst. Nach 5 Silber-MÃ¼nzen enthÃ¤lt jede blaue Kiste\n"
+"2 GegenstÃ¤nde. Nach 10 MÃ¼nzen, 3 und so weiter.\n"
+"Jede Gold-MÃ¼nze hat den Wert von 3 Silber-MÃ¼nzen, halte also die Augen auf!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/help_page_one.cpp:131
 msgid ""
 "If you see a button with a lock like the one to the right,\n"
 "you need to complete a challenge to unlock it."
 msgstr ""
 "Wenn du einen Knopf mit einem Schloss wie dem rechts siehst,\n"
-"musst du eie Herausforderung erfüllen, um es zu öffnen."
+"musst du eie Herausforderung erfÃ¼llen, um es zu Ã¶ffnen."
 
-#: src/gui/config_display.cpp:88
-msgid "Increase Resolution"
-msgstr "Auflösung erhöhen"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:43
+msgid "Edit controls for who?"
+msgstr "Steuerung fÃ¼r welchen Spieler einstellen?"
 
-#: src/user_config.cpp:876
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:45
+msgid "Player 1"
+msgstr "Spieler 1"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:46
+msgid "Player 2"
+msgstr "Spieler 2"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:47
+msgid "Player 3"
+msgstr "Spieler 3"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_controls.cpp:48
+msgid "Player 4"
+msgstr "Spieler 4"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/challenges_menu.cpp:36
+msgid "Active Challenges"
+msgstr "Aktuelle Herausforderungen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:55
+msgid "Display Settings"
+msgstr "Grafikeinstellungen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:71
+msgid "Window mode"
+msgstr "Fenstermodus"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:76
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:129
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:184
+msgid "Fullscreen mode"
+msgstr "Vollbildmodus"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:84
 #, c-format
-msgid "Invalid"
-msgstr "Ungültig"
+msgid "Current: %dx%d"
+msgstr "Aktuell: %dx%d"
 
-#: src/modes/linear_world.cpp:167
-msgid "Invalid short-cut!!"
-msgstr "Ungültige Abkürzung"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:88
+msgid "Increase Resolution"
+msgstr "AuflÃ¶sung erhÃ¶hen"
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:76
-msgid "Jump"
-msgstr "Sprung"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:90
+msgid "Decrease Resolution"
+msgstr "AuflÃ¶sung verringern"
 
-#: src/gui/race_gui.cpp:759
-msgid "Lap"
-msgstr "Runde"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:93
+msgid "Apply "
+msgstr "Anwenden"
 
-#: data/grandprix/atworldsend.grandprix:5
-msgid "Last grand prix, longer and harder"
-msgstr "Letzter Grand Prix, länger und schwieriger"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:98
+msgid "Clear from Blacklist"
+msgstr "Aus der schwarzen Liste lÃ¶schen"
 
-#: src/modes/follow_the_leader.cpp:136
-msgid "Leader"
-msgstr "Leader"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:352
+#, c-format
+msgid "Apply %dx%d"
+msgstr "%dx%d bestÃ¤tigen"
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:68
-msgid "Left"
-msgstr "Links"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_display.cpp:386
+#, c-format
+msgid "%dx%d Blacklisted"
+msgstr "%dx%d zur schwarzen Liste hinzugefÃ¼gt"
 
-#: src/gui/race_results_gui.cpp:301
-#: src/gui/start_race_feedback.cpp:86
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/options.cpp:41
+msgid "Player Config"
+msgstr "Spieler Konfiguration"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/options.cpp:49
+msgid "Display"
+msgstr "Anzeigeoptionen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/options.cpp:52
+msgid "Sound"
+msgstr "LautstÃ¤rke"
+
+# I'd suggest to address the player to perform an action at the beginning of the sentence here.
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/char_sel.cpp:87
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr "Spieler %d, wÃ¤hle einen Fahrer"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/char_sel.cpp:124
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:118
+msgid "Waiting for server"
+msgstr "Warte auf Server"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/char_sel.cpp:126
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:162
+msgid "Waiting for clients"
+msgstr "Warte auf Clients"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_select.cpp:63
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_select.cpp:69
+msgid "No Grand Prix selected"
+msgstr "Kein Grand Prix gewÃ¤hlt"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:52
+msgid "Select network mode"
+msgstr "Waehle Netzwerkmodus"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:56
+#, fuzzy
+msgid "Connect to server"
+msgstr "Zu Server verbinden"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:60
+msgid "Become server"
+msgstr "Netzwerkspiel erstellen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:155
+msgid "Connected:"
+msgstr "Verbunden mit"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:158
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:49
+msgid "OK"
+msgstr "OK"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/network_gui.cpp:179
+msgid "Can't connect to server"
+msgstr "Verbindung zu Server gescheitert"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:66
+msgid "Continue Grand Prix"
+msgstr "Grand Prix fortsetzen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:70
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_ending.cpp:157
+msgid "Back to the main menu"
+msgstr "ZurÃ¼ck zum HauptmenÃ¼"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:74
+msgid "Race in this track again"
+msgstr "Diese Runde nochmal fahren"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:92
+msgid "Race results"
+msgstr "Rennergebnisse"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:120
+msgid "Highscores"
+msgstr "Rangliste"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:271
+msgid "Synchronising."
+msgstr "Synchronisiere."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/race_results_gui.cpp:301
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Lade Rennen..."
 
-#: src/gui/player_controls.cpp:81
-msgid "Look back"
-msgstr "Zurückschauen"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:49
+msgid "Single Player"
+msgstr "Einzelspieler"
 
-#: src/gui/main_menu.cpp:54
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:50
+msgid "Splitscreen"
+msgstr "Splitscreen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:54
 msgid "Networking"
 msgstr "Netzwerk"
 
-#: src/gui/feature_unlocked.cpp:37
-msgid "New Feature Unlocked"
-msgstr "Neue Funktion freigeschaltet"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:60
+msgid "Challenges"
+msgstr "Herausforderungen"
 
-#: src/challenges/challenge.cpp:133
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:64
+msgid "Quit"
+msgstr "Beenden"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/main_menu.cpp:71
+msgid "Credits"
+msgstr "Mitwirkende"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:61
+msgid "Single Race"
+msgstr "Einzerennen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:67
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:104
+msgid "Quick Race"
+msgstr "Schnelle Runde"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:72
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:109
+msgid "Time Trial"
+msgstr "Gegen die Zeit"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:77
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:114
+msgid "Follow the Leader"
+msgstr "Folge dem Leader"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:82
+msgid "3 Strikes Battle"
+msgstr "3 Treffer Kampf"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:98
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/game_mode.cpp:151
+msgid "Game mode help"
+msgstr "Hilfe zu den Spiel-Modi"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:40
+msgid "Sound Settings"
+msgstr "Musikeinstellungen"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:45
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:90
+msgid "Turn off music"
+msgstr "Musik ausschalten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:49
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:84
+msgid "Turn on music"
+msgstr "Musik einschalten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:54
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:103
+msgid "Turn off sound effects"
+msgstr "GerÃ¤uscheffekte ausschalten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:58
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/config_sound.cpp:98
+msgid "Turn on sound effects"
+msgstr "GerÃ¤uscheffekte einschalten"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/grand_prix_ending.cpp:111
 #, c-format
-msgid ""
-"New Grand Prix '%s'\n"
-"now available"
-msgstr "Neuer Grand Prix '%s' verfügbar"
+msgid "The winner is %s!"
+msgstr "Gewonnen hat %s!"
 
-#: src/challenges/challenge.cpp:136
-#, c-format
-msgid ""
-"New difficulty\n"
-"'%s'\n"
-"now available"
-msgstr "Neue Schwierigkeitsstufe '%s' verfügbar"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/gui/start_race_feedback.cpp:39
+msgid "Synchronising network..."
+msgstr "Synchronisiere Netzwerk..."
 
-#: src/modes/linear_world.cpp:276
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/follow_the_leader.cpp:136
+msgid "Leader"
+msgstr "Leader"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/linear_world.cpp:167
+msgid "Invalid short-cut!!"
+msgstr "UngÃ¼ltige AbkÃ¼rzung"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/linear_world.cpp:220
+msgid "WRONG WAY!"
+msgstr "Falsche Richtung!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/linear_world.cpp:276
 msgid "New fastest lap"
 msgstr "Neue schnellste Runde"
 
-#: src/challenges/challenge.cpp:130
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/world.cpp:406
+msgid ""
+"You have been\n"
+"eliminated!"
+msgstr ""
+"Du bist\n"
+"ausgeschieden!"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/modes/world.cpp:411
+#, c-format
+msgid ""
+"'%s' has\n"
+"been eliminated."
+msgstr ""
+"'%s' ist\n"
+"ausgeschieden."
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/challenges/challenge.cpp:126
+#, c-format
+msgid ""
+"New track '%s'\n"
+"now available"
+msgstr "Neue Strecke '%s' verfÃ¼gbar"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/challenges/challenge.cpp:130
 #, c-format
 msgid ""
 "New game mode\n"
 "'%s'\n"
 "now available"
-msgstr "Neuer Spielmodus '%s' verfügbar"
+msgstr "Neuer Spielmodus '%s' verfÃ¼gbar"
 
-#: src/challenges/challenge.cpp:140
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/challenges/challenge.cpp:133
+#, c-format
+msgid ""
+"New Grand Prix '%s'\n"
+"now available"
+msgstr "Neuer Grand Prix '%s' verfÃ¼gbar"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/challenges/challenge.cpp:136
+#, c-format
+msgid ""
+"New difficulty\n"
+"'%s'\n"
+"now available"
+msgstr "Neue Schwierigkeitsstufe '%s' verfÃ¼gbar"
+
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New kart\n"
@@ -549,517 +726,221 @@ msgid ""
 msgstr ""
 "Neues Kart\n"
 " '%s' \n"
-"verfügbar"
+"verfÃ¼gbar"
 
-#: src/challenges/challenge.cpp:126
-#, c-format
-msgid ""
-"New track '%s'\n"
-"now available"
-msgstr "Neue Strecke '%s' verfügbar"
-
-#: src/gui/help_page_one.cpp:143
-#: src/gui/help_page_two.cpp:114
-msgid "Next help screen"
-msgstr "Nächster Hilfe-Bildschirm"
-
-#: src/gui/grand_prix_select.cpp:63
-#: src/gui/grand_prix_select.cpp:69
-msgid "No Grand Prix selected"
-msgstr "Kein Grand Prix gewählt"
-
-#: src/gui/race_options.cpp:310
-#: src/gui/race_options.cpp:314
-msgid "Novice"
-msgstr "Fahranfänger"
-
-#: src/gui/race_options.cpp:99
-msgid "Number of karts"
-msgstr "Anzahl der Karts"
-
-#: src/gui/race_options.cpp:121
-msgid "Number of laps"
-msgstr "Anzahl der Runden"
-
-#: src/gui/network_gui.cpp:158
-#: src/gui/race_results_gui.cpp:49
-msgid "OK"
-msgstr "OK"
-
-#: src/user_config.cpp:500
-msgid "Old config file found, check your key bindings!"
-msgstr "Alte Einstellungsdatei gefunden, prüfe die Tastenbelegungen"
-
-#: data/tracks/olivermath/olivermath.track:4
-msgid "Oliver's Math Class"
-msgstr "Oliver's Mathestunde"
-
-#: data/tracks/beach/beach.track:4
-msgid "On the Beach"
-msgstr "Am Strand"
-
-#: src/gui/main_menu.cpp:63
-#: src/gui/options.cpp:40
-#: src/gui/race_menu.cpp:48
-msgid "Options"
-msgstr "Einstellungen"
-
-#: src/gui/help_page_two.cpp:96
-msgid "Parachute - slows down all karts in a better position!"
-msgstr "Fallschirm - Bremst alle vorrausfahrenden Karts ab!"
-
-#: src/gui/race_menu.cpp:45
-msgid "Paused"
-msgstr "Pause"
-
-#: src/gui/race_gui.cpp:934
-msgid "Penalty time!!"
-msgstr "Strafzeit!!"
-
-#: data/grandprix/penguinplayground.grandprix:4
-msgid "Penguin Playground"
-msgstr "Pinguin Spielplatz"
-
-#. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:268
-msgid "Player "
-msgstr "Spieler"
-
-# I'd suggest to address the player to perform an action at the beginning of the sentence here.
-#: src/gui/char_sel.cpp:87
-#, c-format
-msgid "Player %d, choose a driver"
-msgstr "Spieler %d, wähle einen Fahrer"
-
-#: src/gui/config_controls.cpp:45
-msgid "Player 1"
-msgstr "Spieler 1"
-
-#: src/gui/config_controls.cpp:46
-msgid "Player 2"
-msgstr "Spieler 2"
-
-#: src/gui/config_controls.cpp:47
-msgid "Player 3"
-msgstr "Spieler 3"
-
-#: src/gui/config_controls.cpp:48
-msgid "Player 4"
-msgstr "Spieler 4"
-
-#: src/gui/options.cpp:41
-msgid "Player Config"
-msgstr "Spieler Konfiguration"
-
-#: src/gui/player_controls.cpp:96
-msgid "Player name"
-msgstr "Spieler-Name"
-
-#: data/tracks/prehistoric/prehistoric.track:4
-msgid "Prehistoric Island"
-msgstr "Urzeitliche Insel"
-
-#: src/gui/display_res_confirm.cpp:59
-msgid "Press <ESC> to Cancel"
-msgstr "Drücke die Taste <ESC> zum Abbrechen"
-
-#: src/gui/config_controls.cpp:52
-#: src/gui/config_display.cpp:102
-#: src/gui/config_sound.cpp:63
-#: src/gui/game_mode.cpp:157
-#: src/gui/grand_prix_select.cpp:80
-#: src/gui/network_gui.cpp:79
-#: src/gui/num_players.cpp:46
-#: src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:128
-#: src/gui/race_options.cpp:149
-msgid "Press <ESC> to go back"
-msgstr "Drücke die Taste <ESC> um zurückzukehren"
-
-#: src/gui/player_controls.cpp:172
-msgid "Press key"
-msgstr "Taste drücken"
-
-#: src/gui/help_page_three.cpp:78
-msgid "Previous help screen"
-msgstr "Voriger Hilfe-Bildschirm"
-
-#: src/gui/help_page_two.cpp:110
-msgid "Previous screen"
-msgstr "Voriger Bildschirm"
-
-#: src/gui/game_mode.cpp:67
-#: src/gui/game_mode.cpp:104
-msgid "Quick Race"
-msgstr "Schnelle Runde"
-
-#: src/gui/help_page_three.cpp:57
-msgid "Quick race: Pick a single track, shortest time wins.         "
-msgstr "Schnelles Rennen: Wähle eine Strecke, kürzeste Zeit gewinnt."
-
-#: src/gui/main_menu.cpp:64
-msgid "Quit"
-msgstr "Beenden"
-
-#: src/gui/race_gui.cpp:697
-msgid "REV"
-msgstr "Rückwärts"
-
-#: src/gui/race_results_gui.cpp:74
-msgid "Race in this track again"
-msgstr "Diese Runde nochmal fahren"
-
-#: src/gui/race_results_gui.cpp:92
-msgid "Race results"
-msgstr "Rennergebnisse"
-
-#: src/gui/race_options.cpp:312
-msgid "Racer"
-msgstr "Rennfahrer"
-
-#: data/tracks/racetrack/racetrack.track:4
-msgid "Racetrack"
-msgstr "Rennstrecke"
-
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:885
-msgid "Ready!"
-msgstr "Achtung!"
-
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:78
-msgid "Rescue"
-msgstr "Retten"
-
-#: src/gui/race_menu.cpp:50
-msgid "Restart Race"
-msgstr "Rennen neu starten"
-
-#: src/gui/race_menu.cpp:47
-msgid "Return To Race"
-msgstr "Zurück zum Rennen"
-
-#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
-#: src/gui/player_controls.cpp:70
-msgid "Right"
-msgstr "Rechts"
-
-#: data/grandprix/tothemoonandback.grandprix:5
-msgid "Second grand prix"
-msgstr "Zweiter Grand Prix"
-
-#: src/gui/network_gui.cpp:52
-msgid "Select network mode"
-msgstr "Waehle Netzwerkmodus"
-
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:895
-msgid "Set!"
-msgstr "Fertig?"
-
-#: src/gui/race_menu.cpp:55
-#: src/gui/race_results_gui.cpp:79
-msgid "Setup New Race"
-msgstr "Neues Rennen konfigurieren"
-
-#: data/tracks/sandtrack/sandtrack.track:4
-msgid "Shifting Sands"
-msgstr "Treibsand"
-
-#: src/gui/main_menu.cpp:49
-msgid "Single Player"
-msgstr "Einzelspieler"
-
-#: src/gui/game_mode.cpp:61
-msgid "Single Race"
-msgstr "Einzerennen"
-
-#: src/gui/race_options.cpp:313
-#: data/grandprix/alltracks.challenge:8
-msgid "Skidding Preview"
-msgstr "Schleuder-Vorschau"
-
-#: data/grandprix/snagdrive.grandprix:4
-msgid "Snag Drive"
-msgstr "Snag Drive"
-
-#: data/tracks/snowmountain/snowmountain.track:4
-msgid "Snow Mountain"
-msgstr "Verschneiter Berg"
-
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
-msgid "SnowTux Peak"
-msgstr "SnowTux Peak"
-
-#: src/gui/options.cpp:52
-msgid "Sound"
-msgstr "Lautstärke"
-
-#: src/gui/config_sound.cpp:40
-msgid "Sound Settings"
-msgstr "Musikeinstellungen"
-
-#: src/gui/main_menu.cpp:50
-msgid "Splitscreen"
-msgstr "Splitscreen"
-
-#: data/tracks/startrack/startrack.track:4
-msgid "Star Track"
-msgstr "Stern-Piste"
-
-#: src/gui/race_options.cpp:141
-msgid "Start race"
-msgstr "Rennen starten"
-
-#: src/gui/start_race_feedback.cpp:39
-msgid "Synchronising network..."
-msgstr "Synchronisiere Netzwerk..."
-
-#: src/gui/race_results_gui.cpp:271
-msgid "Synchronising."
-msgstr "Synchronisiere."
-
-#: data/tracks/islandtrack/islandtrack.track:4
-msgid "The Island"
-msgstr "Die Insel"
-
-#: src/gui/help_page_one.cpp:115
-msgid ""
-"The current key bindings can be seen/changed in the\n"
-"Options->Player Config menu."
-msgstr ""
-"Die aktuellen Tastenzuweisungen können im Menu\n"
-"Optionen->Spieler Konfiguration eingesehen/geändert werden."
-
-#: src/highscore_manager.cpp:108
-msgid ""
-"The highscore file was too old,\n"
-"all highscores have been erased."
-msgstr ""
-"Die Bestenliste war zu alt,\n"
-" alle Platzierungen wurden geloescht."
-
-#: data/tracks/mines/mines.track:4
-msgid "The old mine"
-msgstr "Die alte Mine"
-
-#: src/gui/grand_prix_ending.cpp:111
-#, c-format
-msgid "The winner is %s!"
-msgstr "Gewonnen hat %s!"
-
-#: data/grandprix/snagdrive.grandprix:5
-msgid "Third grand prix"
-msgstr "Dritter Grand Prix"
-
-#: src/gui/num_players.cpp:40
-msgid "Three Players"
-msgstr "Drei Spieler"
-
-#: src/gui/game_mode.cpp:72
-#: src/gui/game_mode.cpp:109
-msgid "Time Trial"
-msgstr "Gegen die Zeit"
-
-#: src/gui/help_page_three.cpp:62
-msgid "Time Trial: As quick race, but no items.                       "
-msgstr "Gegen die Uhr: ein schnelles Rennen, aber ohne Gegenstände."
-
-#: src/gui/help_page_two.cpp:57
-msgid "To help you win, there are certain powerups you can grab:"
-msgstr "Um dich beim Gewinnen ein wenig zu unterstützen, gibt es kleine Hilfen zum Aufsammeln:"
-
-#: data/grandprix/tothemoonandback.grandprix:4
-msgid "To the Moon and Back"
-msgstr "Zum Mond und zurück"
-
-#: src/gui/config_sound.cpp:45
-#: src/gui/config_sound.cpp:90
-msgid "Turn off music"
-msgstr "Musik ausschalten"
-
-#: src/gui/config_sound.cpp:54
-#: src/gui/config_sound.cpp:103
-msgid "Turn off sound effects"
-msgstr "Geräuscheffekte ausschalten"
-
-#: src/gui/config_sound.cpp:49
-#: src/gui/config_sound.cpp:84
-msgid "Turn on music"
-msgstr "Musik einschalten"
-
-#: src/gui/config_sound.cpp:58
-#: src/gui/config_sound.cpp:98
-msgid "Turn on sound effects"
-msgstr "Geräuscheffekte einschalten"
-
-#: data/tracks/tuxtrack/tuxtrack.track:4
-msgid "Tux Tollway"
-msgstr "Tux' Zollstrasse"
-
-#: src/gui/num_players.cpp:39
-msgid "Two Players"
-msgstr "Zwei Spieler"
-
-#: src/modes/linear_world.cpp:220
-msgid "WRONG WAY!"
-msgstr "Falsche Richtung!"
-
-#: src/gui/char_sel.cpp:126
-#: src/gui/network_gui.cpp:162
-msgid "Waiting for clients"
-msgstr "Warte auf Clients"
-
-#: src/gui/char_sel.cpp:124
-#: src/gui/network_gui.cpp:118
-msgid "Waiting for server"
-msgstr "Warte auf Server"
-
-#: src/gui/player_controls.cpp:74
-msgid "Wheelie"
-msgstr "Kickstart"
-
-#: data/followtheleader.challenge:5
-msgid ""
-"Win Penguin Playground Grand\n"
-"Prix"
-msgstr ""
-"Gewinne den 'Pinguin Spielplatz'\n"
-"Grand Prix"
-
-#: data/followtheleader.challenge:6
-msgid ""
-"Win Penguin Playground Grand\n"
-"Prix with 3 'Racer' Level AI karts."
-msgstr ""
-"Gewinne den 'Pinguin Spielplatz' Grand Prix\n"
-"mit 3 KI Karts der Stufe 'Rennfahrer'"
-
-#: data/grandprix/snagdrive.challenge:5
-msgid ""
-"Win To the Moon and Back\n"
-"Grand Prix"
-msgstr ""
-"Gewinne den Grand Prix\n"
-"'Zum Mond und zurück'"
-
-#: data/tracks/fortmagma/fortmagma.challenge:6
-msgid ""
-"Win a 1 lap Head to Head\n"
-"on Tux Tollway against 1 'Racer'\n"
-"level AI kart."
-msgstr ""
-"Gewinne ein Ein-Runden Kopf-an-Kopf-Rennen\n"
-"auf Tux' Zollstrasse gegen einen KI Kart\n"
-"der Stufe 'Rennfahrer'"
-
-#: data/tracks/city/city.challenge:6
-msgid ""
-"Win a Follow the Leader race\n"
-"with 3 AI karts\n"
-"in the Amazonian Jungle."
-msgstr ""
-"Gewinne ein 'Folge dem Leader' Rennen\n"
-"mit 3 KI Karts\n"
-"im Jungel des Amazonas"
-
-#: data/grandprix/atworldsend.challenge:6
-msgid ""
-"Win a Follow the Leader race\n"
-"with 3 AI karts\n"
-"on a Desert Island."
-msgstr ""
-"Gewinne ein 'Folge dem Leader' Rennen\n"
-"mit 3 Computer-Gegnern\n"
-"auf einer Wüsten-Insel"
-
-#: data/tracks/fortmagma/fortmagma.challenge:5
-msgid ""
-"Win a Head to Head on\n"
-"Tux Tollway"
-msgstr ""
-"Gewinn ein Kopf-an-Kopf\n"
-"auf Tux's Zollstrasse"
-
-#: data/grandprix/alltracks.challenge:5
-msgid ""
-"Win the At World's End\n"
-"Grand Prix"
-msgstr ""
-"Gewinne den Grand Prix\n"
-"Am Ende der Welt"
-
-#: data/grandprix/snagdrive.challenge:6
-msgid ""
-"Win the To the Moon and Back\n"
-"Grand Prix with 3 'Racer'\n"
-"Level AI karts."
-msgstr ""
-"Gewinne den 'Zum Mond und zurück'\n"
-"Grand Prix mit 3 KI Karts\n"
-"der Stufe 'Rennfahrer'"
-
-#: src/gui/config_display.cpp:71
-msgid "Window mode"
-msgstr "Fenstermodus"
-
-#: src/karts/player_kart.cpp:267
-msgid "You finished the race!"
-msgstr "Du hast das Rennen beendet!"
-
-#: src/modes/world.cpp:406
-msgid ""
-"You have been\n"
-"eliminated!"
-msgstr ""
-"Du bist\n"
-"ausgeschieden!"
-
-#: src/karts/player_kart.cpp:267
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/karts/player_kart.cpp:267
 msgid "You won the race!"
 msgstr "Du hast das Rennen gewonnen!"
 
-#: src/gui/help_page_two.cpp:88
-msgid "Zipper - speed boost"
-msgstr "Zipper - Geschwindigkeitssteigerung"
+#: /home/constantin/Medien/projekte/stk/svn-vanilla/supertuxkart/src/karts/player_kart.cpp:267
+msgid "You finished the race!"
+msgstr "Du hast das Rennen beendet!"
 
-#: src/user_config.cpp:859
-#, c-format
-msgid "joy %d axis %d  %c"
-msgstr "Joystick %d Achse %d  %c"
+#~ msgid "Racetrack"
+#~ msgstr "Rennstrecke"
+#~ msgid "All tracks"
+#~ msgstr "Alle Strecken"
+#~ msgid "All tracks included in SuperTuxKart"
+#~ msgstr "Alle in SuperTuxKart enthaltene Strecken"
+#~ msgid "Amazonian Journey"
+#~ msgstr "Reise durch den Amazonas"
+#~ msgid "Around the Lighthouse"
+#~ msgstr "Um den Leuchtturm"
+#~ msgid "At world's end"
+#~ msgstr "Am Ende der Welt"
+#~ msgid "Canyon"
+#~ msgstr "Canyon"
+#~ msgid "City"
+#~ msgstr "Stadt"
+#~ msgid "Collect Coins in Math Class"
+#~ msgstr "Sammle MÃ¼nzen im Klassenzimmer"
+#~ msgid ""
+#~ "Collect at least 6 points\n"
+#~ "worth of coins\n"
+#~ "on three laps of\n"
+#~ "Oliver's Math Class\n"
+#~ "in under 1 minute."
+#~ msgstr ""
+#~ "Sammle mindestens 6 MÃ¼nz-Punkte\n"
+#~ "in drei Runden in\n"
+#~ "Oliver's Mathe-Klasse\n"
+#~ "in weniger als 1 Minute."
+#~ msgid ""
+#~ "Collect at least 9 coins\n"
+#~ "on 3 laps of Shifting Sands\n"
+#~ "in under 2:20 minutes."
+#~ msgstr ""
+#~ "Sammle mindestens 9 MÃ¼nzen\n"
+#~ "in 3 Runden im Treibsand\n"
+#~ "in weniger als 2:20 Minuten."
+#~ msgid "Collect the Pharaohs Treasure"
+#~ msgstr "Sammle den Schatz des Pharao's"
+#~ msgid ""
+#~ "Come first in the At World's End\n"
+#~ "Grand Prix with 3 'Racer'\n"
+#~ "Level AI karts."
+#~ msgstr ""
+#~ "Werde Erster beim Grand Prix\n"
+#~ "'Am Ende der Welt'\n"
+#~ "mit 3 'Rennfahrer' KI Karts."
+#~ msgid ""
+#~ "Created by Ingo Ruhnke,\n"
+#~ "modified by M. Gagnon"
+#~ msgstr ""
+#~ "Erstellt durch Ingo Ruhnke,\n"
+#~ "bearbeitet durch M. Gagnon"
+#~ msgid ""
+#~ "Created by Oliver & Steve Baker\n"
+#~ "modified by Marianne Gagnon"
+#~ msgstr ""
+#~ "Erstellt durch Oliver & Steve Baker\n"
+#~ "bearbeitet durch Marianne Gagnon"
+#~ msgid "Crescent Crossing"
+#~ msgstr "Kreuzende Halbmonde"
+#~ msgid ""
+#~ "Finish 3 laps in the Race track\n"
+#~ "with 3 AI karts\n"
+#~ "in under 1:15 minutes."
+#~ msgstr ""
+#~ "Absolviere 3 Runden auf der Rennstrecke\n"
+#~ "mit 3 KI Karts\n"
+#~ "in weniger als 1:15 Minuten"
+#~ msgid ""
+#~ "Finish 3 laps on the City track\n"
+#~ "with 3 AI karts\n"
+#~ "in under 5:20 minutes."
+#~ msgstr ""
+#~ "Absolviere 3 Runden in der Stadt\n"
+#~ "mit 3 Computer-Gegnern\n"
+#~ "in weniger als 5:20 Minuten"
+#~ msgid ""
+#~ "Finish 3 laps on the Tux Tollway\n"
+#~ "track with 3 AI karts\n"
+#~ "in under 3:00 minutes."
+#~ msgstr ""
+#~ "Beende 3 Runden auf Tux' Zollstrasse\n"
+#~ "mit 3 KI Karts\n"
+#~ "in weniger als 3 Minuten"
+#~ msgid "Finish Race track in 1:15"
+#~ msgstr "Absolviere die Rennstrecke in 1:15"
+#~ msgid "Finish Tux Tollway track in 3:00"
+#~ msgstr "Beende Tux' Zollstrasse in 3:00"
+#~ msgid "Finish the City track in 5:20"
+#~ msgstr "Beende die Stadt-Strecke in weniger als 5:20"
+#~ msgid "First grand prix, easy to get started"
+#~ msgstr "Erster Grand Prix, einfacher Einstieg"
+#~ msgid "Follow the Leader in the Jungle"
+#~ msgstr "Folge dem Leader in den Jungel"
+#~ msgid ""
+#~ "Follow the Leader on a\n"
+#~ "Desert Island"
+#~ msgstr ""
+#~ "Folge dem Leader auf einer\n"
+#~ "WÃ¼sten-Insel"
+#~ msgid "Fort Magma"
+#~ msgstr "Fort Magma"
+#~ msgid "Last grand prix, longer and harder"
+#~ msgstr "Letzter Grand Prix, lÃ¤nger und schwieriger"
+#~ msgid "Oliver's Math Class"
+#~ msgstr "Oliver's Mathestunde"
+#~ msgid "On the Beach"
+#~ msgstr "Am Strand"
+#~ msgid "Penguin Playground"
+#~ msgstr "Pinguin Spielplatz"
+#~ msgid "Prehistoric Island"
+#~ msgstr "Urzeitliche Insel"
 
-#: src/user_config.cpp:863
-#, c-format
-msgid "joy %d btn %d"
-msgstr "Joystick %d Knopf %d"
-
-#: src/user_config.cpp:866
-#, c-format
-msgid "joy %d hat %d"
-msgstr "Joystick %d Richtungstasten %d"
-
-#: src/user_config.cpp:872
-#, c-format
-msgid "mouse axis %d %c"
-msgstr "Maus Achse %d %c"
-
-#: src/user_config.cpp:869
-#, c-format
-msgid "mouse btn %d"
-msgstr "Maus Taste %d"
-
-#: src/user_config.cpp:853
-#: src/user_config.cpp:897
-#, c-format
-msgid "not set"
-msgstr "nicht definiert"
-
+#, fuzzy
+#~ msgid "Second grand prix"
+#~ msgstr "Zweiter Grand Prix"
+#~ msgid "Shifting Sands"
+#~ msgstr "Treibsand"
+#~ msgid "Snag Drive"
+#~ msgstr "Snag Drive"
+#~ msgid "Snow Mountain"
+#~ msgstr "Verschneiter Berg"
+#~ msgid "SnowTux Peak"
+#~ msgstr "SnowTux Peak"
+#~ msgid "Star Track"
+#~ msgstr "Stern-Piste"
+#~ msgid "The Island"
+#~ msgstr "Die Insel"
+#~ msgid "The old mine"
+#~ msgstr "Die alte Mine"
+#~ msgid "Third grand prix"
+#~ msgstr "Dritter Grand Prix"
+#~ msgid "To the Moon and Back"
+#~ msgstr "Zum Mond und zurÃ¼ck"
+#~ msgid "Tux Tollway"
+#~ msgstr "Tux' Zollstrasse"
+#~ msgid ""
+#~ "Win Penguin Playground Grand\n"
+#~ "Prix"
+#~ msgstr ""
+#~ "Gewinne den 'Pinguin Spielplatz'\n"
+#~ "Grand Prix"
+#~ msgid ""
+#~ "Win Penguin Playground Grand\n"
+#~ "Prix with 3 'Racer' Level AI karts."
+#~ msgstr ""
+#~ "Gewinne den 'Pinguin Spielplatz' Grand Prix\n"
+#~ "mit 3 KI Karts der Stufe 'Rennfahrer'"
+#~ msgid ""
+#~ "Win To the Moon and Back\n"
+#~ "Grand Prix"
+#~ msgstr ""
+#~ "Gewinne den Grand Prix\n"
+#~ "'Zum Mond und zurÃ¼ck'"
+#~ msgid ""
+#~ "Win a 1 lap Head to Head\n"
+#~ "on Tux Tollway against 1 'Racer'\n"
+#~ "level AI kart."
+#~ msgstr ""
+#~ "Gewinne ein Ein-Runden Kopf-an-Kopf-Rennen\n"
+#~ "auf Tux' Zollstrasse gegen einen KI Kart\n"
+#~ "der Stufe 'Rennfahrer'"
+#~ msgid ""
+#~ "Win a Follow the Leader race\n"
+#~ "with 3 AI karts\n"
+#~ "in the Amazonian Jungle."
+#~ msgstr ""
+#~ "Gewinne ein 'Folge dem Leader' Rennen\n"
+#~ "mit 3 KI Karts\n"
+#~ "im Jungel des Amazonas"
+#~ msgid ""
+#~ "Win a Follow the Leader race\n"
+#~ "with 3 AI karts\n"
+#~ "on a Desert Island."
+#~ msgstr ""
+#~ "Gewinne ein 'Folge dem Leader' Rennen\n"
+#~ "mit 3 Computer-Gegnern\n"
+#~ "auf einer WÃ¼sten-Insel"
+#~ msgid ""
+#~ "Win a Head to Head on\n"
+#~ "Tux Tollway"
+#~ msgstr ""
+#~ "Gewinn ein Kopf-an-Kopf\n"
+#~ "auf Tux's Zollstrasse"
+#~ msgid ""
+#~ "Win the At World's End\n"
+#~ "Grand Prix"
+#~ msgstr ""
+#~ "Gewinne den Grand Prix\n"
+#~ "Am Ende der Welt"
+#~ msgid ""
+#~ "Win the To the Moon and Back\n"
+#~ "Grand Prix with 3 'Racer'\n"
+#~ "Level AI karts."
+#~ msgstr ""
+#~ "Gewinne den 'Zum Mond und zurÃ¼ck'\n"
+#~ "Grand Prix mit 3 KI Karts\n"
+#~ "der Stufe 'Rennfahrer'"
 #~ msgid ""
 #~ "Follow the leader: Stay behind the leader kart.                 \n"
 #~ "When the countdown reaches zero, a kart ahead\n"
 #~ "of the leader or the last kart is eliminated."
 #~ msgstr ""
-#~ "Folge dem Leader: bleib hinter dem führenden Kart.\n"
+#~ "Folge dem Leader: bleib hinter dem fÃ¼hrenden Kart.\n"
 #~ "Wenn der Countdown Null erreicht, scheidet das Kart,\n"
 #~ "der vor dem Leader ist, aus."
 #~ msgid "Homing missile - follows rivals, but is slower than the missile"
@@ -1074,17 +955,17 @@ msgstr "nicht definiert"
 #~ msgid "Volcano"
 #~ msgstr "Vulkan"
 #~ msgid "Fulfil challenge to unlock"
-#~ msgstr "Zum Freischalten, erfülle Herausforderung"
+#~ msgstr "Zum Freischalten, erfÃ¼lle Herausforderung"
 #~ msgid "You won"
 #~ msgstr "Du gewinnst"
 #~ msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
-#~ msgstr "Haariger Blubber/Blitz - sehr langsam, aber prallt von Wänden ab"
+#~ msgstr "Haariger Blubber/Blitz - sehr langsam, aber prallt von WÃ¤nden ab"
 #~ msgid "No track selected"
-#~ msgstr "Keine Strecke gewählt"
+#~ msgstr "Keine Strecke gewÃ¤hlt"
 #~ msgid "Result"
 #~ msgstr "Ergebnis"
 #~ msgid "Check the current key bindings for the first player"
-#~ msgstr "Überprüfe die Tastenbelegung für den ersten Spieler:"
+#~ msgstr "ÃberprÃ¼fe die Tastenbelegung fÃ¼r den ersten Spieler:"
 #~ msgid ""
 #~ "Created by Oliver & Steve Baker,\n"
 #~ " modified by M. Gagnon"
@@ -1100,9 +981,9 @@ msgstr "nicht definiert"
 #~ msgid "Little Volcano"
 #~ msgstr "Kleiner Vulkan"
 #~ msgid "Choose a Grand Prix"
-#~ msgstr "Wähle einen Grand Prix"
+#~ msgstr "WÃ¤hle einen Grand Prix"
 #~ msgid "Choose a Race Mode"
-#~ msgstr "Wähle einen Renn-Modus"
+#~ msgstr "WÃ¤hle einen Renn-Modus"
 #~ msgid "Choose a track"
-#~ msgstr "Wähle eine Strecke"
+#~ msgstr "WÃ¤hle eine Strecke"
 

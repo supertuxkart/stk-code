@@ -53,7 +53,7 @@ NetworkGUI::NetworkGUI()
     widget_manager->hideWgtRect(WTOK_TITLE);
     w->setPosition(WGT_DIR_CENTER, 0.0, WGT_DIR_FROM_TOP, 0.15f);
 
-    Widget *w_prev=widget_manager->addTextButtonWgt( WTOK_CONNECT, 30, 7, _("Connect to server:") );
+    Widget *w_prev=widget_manager->addTextButtonWgt( WTOK_CONNECT, 30, 7, _("Connect to server") );
     widget_manager->resizeWgtToText(WTOK_CONNECT);
     w_prev->setPosition(WGT_DIR_FROM_LEFT, 0.05f, WGT_DIR_FROM_TOP, 0.25f);
 
