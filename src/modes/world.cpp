@@ -169,6 +169,7 @@ void World::init()
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    item_manager->cleanup();
     delete race_state;
     m_track->cleanup();
     // Clear all callbacks

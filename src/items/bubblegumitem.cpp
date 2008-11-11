@@ -21,15 +21,25 @@
 
 BubbleGumItem::BubbleGumItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
                              ssgEntity* model, unsigned int item_id) 
-             : Item(type, xyz, normal, model, item_id)
+             : Item(type, xyz, normal, model, item_id,
+                    /* rotate */ false)
 {
-    m_rotate = false;
 }   // BubbleGumItem
 
 //-----------------------------------------------------------------------------
 BubbleGumItem::~BubbleGumItem()
 {
-
 }   // ~BubbleGumItem
 
 //-----------------------------------------------------------------------------
+/** Is called when the item is hit by a kart. The bubble gum item then
+ *  inactivates itself for 0.5 seconds, but disables the reappearing of
+ *  the bubble gum.
+ */
+void BubbleGumItem::isCollected(float t)
+{
+    deactivate(0.5);
+    // Set the time till reappear to -1 seconds --> the item will 
+    // reappear immediately.
+    Item::isCollected(-1);
+}   // isCollected

@@ -24,8 +24,8 @@
 #define _WINSOCKAPI_
 #include <plib/sg.h>
 #include "coord.hpp"
+#include "karts/kart.hpp"
 
-class Kart;
 class ssgTransform;
 class ssgEntity;
 
@@ -45,7 +45,7 @@ enum ItemType
 // -----------------------------------------------------------------------------
 class Item
 {
-protected:
+private:
     ItemType      m_type;         // Item type
     bool          m_collected;        // true if item was collected & is not displayed
     float         m_time_till_return;  // time till a collected item reappears
@@ -57,23 +57,40 @@ protected:
     bool          m_rotate;       // set to false if item should not rotate
     
     Kart*         m_parent;        // optional, if item was placed by a kart, a timer
-    float         m_immunity_timer; // can be used so it's not hit by its own item
+    float         m_deactive_time; // can be used so it's not hit by its own item
     
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
-                        ssgEntity* model, unsigned int item_id);
+                        ssgEntity* model, unsigned int item_id,
+                        bool rotate=true);
                  ~Item ();
-    unsigned int  getItemId() const {return m_item_id; }
     void          update  (float delta);
-    void          isCollected ();
-    bool          hitKart (Kart* kart );
-    void          reset   ();
-    ssgTransform* getRoot () const {return m_root;}
-    ItemType      getType () const {return m_type;}
-    bool          wasCollected() const {return m_collected;}
-    
+    virtual void  isCollected(float t=2.0f);
+    // ------------------------------------------------------------------------
+    /** Returns true if the Kart is close enough to hit this item, and
+     *  the item is not deactivated anymore.
+     *  \param kart Kart to test.
+     */
+    bool hitKart (Kart* kart ) const
+    {
+        return m_deactive_time <=0 &&
+               (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
+    }   // hitKart
+
+    // ------------------------------------------------------------------------
+    /** Deactivates the item for a certain amount of time. It is used to
+     *  prevent bubble gum from hitting a kart over and over again (in each
+     *  frame) by giving it time to drive away.
+     *  \param t Time the item is deactivated.
+     */
+    void          deactivate(float t)  { m_deactive_time=t; }
+    // ------------------------------------------------------------------------
+    unsigned int  getItemId()    const { return m_item_id;  }
+    ssgTransform* getRoot()      const { return m_root;     }
+    ItemType      getType()      const { return m_type;     }
+    bool          wasCollected() const { return m_collected;}    
     void          setParent(Kart* parent);
-}
-;   // class Item
+    void          reset();
+};   // class Item
 
 #endif

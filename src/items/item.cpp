@@ -25,8 +25,11 @@
 #include "karts/kart.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           ssgEntity* model, unsigned int item_id)
+           ssgEntity* model, unsigned int item_id, bool rotate)
 {
+    m_rotate           = rotate;
+    m_parent           = NULL;
+    m_deactive_time    = 0;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
     m_coord            = Coord(xyz, hpr);
@@ -39,16 +42,12 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
     scene->add(m_root);
-    m_rotate = true;
-    
-    m_parent = NULL;
-    m_immunity_timer = 0;
-
 }   // Item
 
 //-----------------------------------------------------------------------------
 Item::~Item()
 {
+    scene->remove(m_root);
     ssgDeRefDelete(m_root);
 }   // ~Item
 
@@ -57,26 +56,20 @@ void Item::reset()
 {
     m_collected        = false;
     m_time_till_return = 0.0f;
+    m_deactive_time    = 0.0f;
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 }   // reset
 //-----------------------------------------------------------------------------
 void Item::setParent(Kart* parent)
 {
-    m_parent = parent;
-    m_immunity_timer = 1.5f;
+    m_parent        = parent;
+    m_deactive_time = 1.5f;
 }
-//-----------------------------------------------------------------------------
-bool Item::hitKart(Kart* kart)
-{
-    if(m_immunity_timer > 0) return false;
-    
-    return (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
-}   // hitKart
 
 //-----------------------------------------------------------------------------
 void Item::update(float delta)
 {
-    if(m_parent != NULL && m_immunity_timer > 0) m_immunity_timer -= delta;
+    if(m_parent != NULL && m_deactive_time > 0) m_deactive_time -= delta;
     
     if(m_collected)
     {
@@ -92,7 +85,6 @@ void Item::update(float delta)
         else
         {
             m_collected    = false;
-            m_coord.setHPR(Vec3(0.0f));
             m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
         }   // T>0
 
@@ -109,9 +101,15 @@ void Item::update(float delta)
 }   // update
 
 //-----------------------------------------------------------------------------
-void Item::isCollected()
+/** Is called when the item is hit by a kart.  It sets the flag that the item
+ *  has been collected, and the time to return to the parameter. 
+ *  \param t Time till the object reappears (defaults to 2 seconds).
+ */
+void Item::isCollected(float t)
 {
-    m_collected            = true;
-    m_time_till_return = 2.0f;
+    m_collected        = true;
+    // Note if the time is negative, in update the m_collected flag will
+    // be automatically set to false again.
+    m_time_till_return = t;
 }
 

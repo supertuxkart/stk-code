@@ -306,10 +306,22 @@ void ItemManager::cleanup()
  */
 void ItemManager::reset()
 {
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+    std::vector<AllItemTypes::iterator> to_delete;
+    AllItemTypes::iterator i=m_all_items.begin();
+    while(i!=m_all_items.end())
     {
-        (*i)->reset();
+        if((*i)->getType()==ITEM_BUBBLEGUM)
+        {
+            BubbleGumItem *b=static_cast<BubbleGumItem*>(*i);
+            AllItemTypes::iterator i_next = m_all_items.erase(i); 
+            delete b;
+            i = i_next;
+        }
+        else
+        {
+            (*i)->reset();
+            i++;
+        }
     }  // for i
 }   // reset
 
