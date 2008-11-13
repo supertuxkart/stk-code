@@ -77,7 +77,7 @@ RaceManager::RaceManager()
     m_coin_target        = 0;
     setTrack("race");
     setNumLocalPlayers(1);
-    setLocalKartInfo(0, "tuxkart");
+    setLocalKartInfo(0, "tux");
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
