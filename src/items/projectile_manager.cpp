@@ -23,6 +23,7 @@
 #include "items/projectile_manager.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
+#include "items/plunger.hpp"
 #include "explosion.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
@@ -185,6 +186,7 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, PowerupType type)
     switch(type) 
     {
         case POWERUP_BOWLING: f = new Bowling(kart); break;
+        case POWERUP_PLUNGER: f = new Plunger(kart); break;
         case POWERUP_CAKE:    f = new Cake(kart);  break;
        // case POWERUP_BUBBLEGUM: f = new BubbleGum(kart); break;
         default:              return NULL;

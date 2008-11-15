@@ -17,11 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "missile.hpp"
+#include "items/plunger.hpp"
 #include "constants.hpp"
 
 // -----------------------------------------------------------------------------
-Missile::Missile(Kart *kart) : Flyable(kart, POWERUP_MISSILE)
+Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 {
     float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
     createPhysics(y_offset, btVector3(0.0f, m_speed, 0.0f),
@@ -29,13 +29,13 @@ Missile::Missile(Kart *kart) : Flyable(kart, POWERUP_MISSILE)
 }   // Missile
 
 // -----------------------------------------------------------------------------
-void Missile::init(const lisp::Lisp* lisp, ssgEntity *missile)
+void Plunger::init(const lisp::Lisp* lisp, ssgEntity *missile)
 {
-    Flyable::init(lisp, missile, POWERUP_MISSILE);
+    Flyable::init(lisp, missile, POWERUP_PLUNGER);
 }   // init
 
 // -----------------------------------------------------------------------------
-void Missile::update(float dt)
+void Plunger::update(float dt)
 {
     Flyable::update(dt);
 }   // update

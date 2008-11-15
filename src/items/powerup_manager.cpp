@@ -26,6 +26,7 @@
 #include "translation.hpp"
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
+#include "items/plunger.hpp"
 #include "loader.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -47,6 +48,7 @@ initPowerupType ict[]=
     {POWERUP_CAKE,      "cake.projectile"          },
     {POWERUP_ANVIL,     "anvil.collectable"        },
     {POWERUP_PARACHUTE, "parachute.collectable"    },
+    {POWERUP_PLUNGER,   "plunger.projectile"       },
     {POWERUP_MAX,       ""                         },
 };
 
@@ -136,6 +138,8 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     switch (collectType) {
         case POWERUP_BOWLING:          
              Bowling::init  (lisp, m_all_models[collectType]); break;
+        case POWERUP_PLUNGER:          
+             Plunger::init  (lisp, m_all_models[collectType]); break;
         //case POWERUP_BUBBLEGUM:        
         //     BubbleGum::init(lisp, m_all_models[collectType]); break;
         case POWERUP_CAKE: 

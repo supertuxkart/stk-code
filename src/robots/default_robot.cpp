@@ -390,6 +390,7 @@ void DefaultRobot::handle_items( const float DELTA, const int STEPS )
                 break;
 
             case POWERUP_BOWLING:
+            case POWERUP_PLUNGER:
                 if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
                 {
                     m_controls.fire = true;

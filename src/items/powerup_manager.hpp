@@ -31,7 +31,7 @@ class ssgEntity;
 // zipper just before them (see Powerup::hitBonusBox).
 enum PowerupType {POWERUP_NOTHING,
                   POWERUP_BUBBLEGUM, POWERUP_CAKE,
-                  POWERUP_BOWLING, POWERUP_ZIPPER,
+                  POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
                   POWERUP_PARACHUTE, POWERUP_ANVIL, //powerup.cpp assumes these two come last
                   POWERUP_MAX};
 

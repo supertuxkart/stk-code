@@ -89,7 +89,8 @@ void Powerup::use()
         break ;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
-    
+    case POWERUP_PLUNGER:
+        
         m_sound_shot->position(m_owner->getXYZ());
         m_sound_shot->play();
         projectile_manager->newProjectile(m_owner, m_type);

@@ -22,13 +22,12 @@
 
 #include "flyable.hpp"
 
-class Missile : public Flyable
+class Plunger : public Flyable
 {
 public:
-    Missile(Kart *kart);
+    Plunger(Kart *kart);
     static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
     virtual void update   (float dt);
-    virtual void hitTrack ()             { explode(NULL); }
 
 };   // Missile
 
