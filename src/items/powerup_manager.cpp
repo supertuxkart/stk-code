@@ -42,9 +42,9 @@ initPowerupType;
 initPowerupType ict[]=
 {
     {POWERUP_ZIPPER,    "zipper.collectable"       },
-    {POWERUP_BOWLING,   "bowling.projectile"         },
-    {POWERUP_BUBBLEGUM,   "missile.projectile"       },
-    {POWERUP_CAKE,      "cake.projectile" },
+    {POWERUP_BOWLING,   "bowling.projectile"       },
+    {POWERUP_BUBBLEGUM, "bubblegum.projectile"     },
+    {POWERUP_CAKE,      "cake.projectile"          },
     {POWERUP_ANVIL,     "anvil.collectable"        },
     {POWERUP_PARACHUTE, "parachute.collectable"    },
     {POWERUP_MAX,       ""                         },

@@ -63,7 +63,7 @@ public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
                         ssgEntity* model, unsigned int item_id,
                         bool rotate=true);
-                 ~Item ();
+    virtual       ~Item ();
     void          update  (float delta);
     virtual void  isCollected(float t=2.0f);
     // ------------------------------------------------------------------------
