@@ -129,7 +129,6 @@ void SFXOpenAL::resume()
 {
     if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
-    alSourcef(m_soundSource,AL_GAIN,user_config->m_sfx_volume);
     alSourcePlay(m_soundSource);
     SFXManager::checkError("resuming");
 }   // resume
@@ -141,7 +140,6 @@ void SFXOpenAL::play()
 {
     if(!sfx_manager->sfxAllowed()||!m_ok) return;
 
-    alSourcef(m_soundSource,AL_GAIN,user_config->m_sfx_volume);
     alSourcePlay(m_soundSource);
     SFXManager::checkError("playing");
 }   // play
