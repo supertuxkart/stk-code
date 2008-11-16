@@ -7,7 +7,7 @@ OBJECT poly
 name "Bowling ball"
 data 12
 Bowling ball
-texture "bowling.png"
+texture "bowling.rgb"
 texrep 1 1
 crease 30.000000
 numvert 162
