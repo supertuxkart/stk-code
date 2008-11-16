@@ -1,9 +1,9 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-collectable
- (name  "homing")
- (model "homingmissile.ac")
- (icon  "homingmissile.rgb")
+ (name  "cake")
+ (model "cake.ac")
+ (icon  "cakeicon.rgb")
  (speed          50.0)
  (min-height      0.2)
  (max-height      1.0)
