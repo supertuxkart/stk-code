@@ -1131,6 +1131,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\plunger.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\powerup.cpp"
 					>
 				</File>
@@ -1738,6 +1742,10 @@
 				</File>
 				<File
 					RelativePath="..\..\items\item_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\plunger.hpp"
 					>
 				</File>
 				<File
