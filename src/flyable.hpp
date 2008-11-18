@@ -74,7 +74,8 @@ protected:
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
                                     btCollisionShape *shape, const bool gravity=false,
-                                    const bool rotates=false, const btTransform* customDirection=NULL);
+                                    const bool rotates=false, const bool turn_around=false, 
+                                    const btTransform* customDirection=NULL);
 public:
 
                  Flyable     (Kart* kart, PowerupType type, float mass=1.0f);

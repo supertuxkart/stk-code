@@ -19,19 +19,27 @@
 
 #include "items/plunger.hpp"
 #include "constants.hpp"
+#include "coord.hpp"
+#include "karts/player_kart.hpp"
+#include "camera.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 {
-    float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
-    createPhysics(y_offset, btVector3(0.0f, m_speed, 0.0f),
-                  new btCylinderShape(0.5f*m_extend));
-}   // Missile
+    float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
+    
+    // if the kart is looking backwards, release from the back
+    PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
+    const bool reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
+    
+    createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
+                  new btCylinderShape(0.5f*m_extend), false, false, reverse_mode );
+}   // Plunger
 
 // -----------------------------------------------------------------------------
-void Plunger::init(const lisp::Lisp* lisp, ssgEntity *missile)
+void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
 {
-    Flyable::init(lisp, missile, POWERUP_PLUNGER);
+    Flyable::init(lisp, plunger_model, POWERUP_PLUNGER);
 }   // init
 
 // -----------------------------------------------------------------------------

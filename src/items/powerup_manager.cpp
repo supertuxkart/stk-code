@@ -140,8 +140,6 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
              Bowling::init  (lisp, m_all_models[collectType]); break;
         case POWERUP_PLUNGER:          
              Plunger::init  (lisp, m_all_models[collectType]); break;
-        //case POWERUP_BUBBLEGUM:        
-        //     BubbleGum::init(lisp, m_all_models[collectType]); break;
         case POWERUP_CAKE: 
              Cake::init (lisp, m_all_models[collectType]); break;
         default:;

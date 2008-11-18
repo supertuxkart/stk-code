@@ -65,7 +65,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 velocity,
                             btCollisionShape *shape, const bool gravity,
-                            const bool rotates, const btTransform* customDirection)
+                            const bool rotates, const bool turn_around, const btTransform* customDirection)
 {
     // Get Kart heading direction
     btTransform trans = ( customDirection == NULL ? m_owner->getKartHeading() : *customDirection );
@@ -76,6 +76,16 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     btVector3 offset=btVector3(0,y_offset,m_average_height);
     offset_transform.setOrigin(offset);
         
+    // turn around
+    if(turn_around)
+    {
+        btTransform turn_around_trans;
+        //turn_around_trans.setOrigin(trans.getOrigin());
+        turn_around_trans.setIdentity();
+        turn_around_trans.setRotation(btQuaternion(btVector3(0, 0, 1), M_PI));
+        trans  *= turn_around_trans;
+    }
+    
     trans  *= offset_transform;
 
     m_shape = shape;
