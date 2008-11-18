@@ -90,7 +90,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     m_initial_velocity = btVector3(0.0f, m_speed, up_velocity);
     
     createPhysics(y_offset, m_initial_velocity, 
-                  new btCylinderShape(0.5f*m_extend), true /* gravity */, true /* rotation */, &trans);
+                  new btCylinderShape(0.5f*m_extend), true /* gravity */,
+                  true /* rotation */, false /* backwards */, &trans);
 
     m_body->setActivationState(DISABLE_DEACTIVATION);
     
