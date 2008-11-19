@@ -46,7 +46,15 @@
    (corn-f                   4   )
    (corn-r                   4   )
    (wheelie-max-speed-ratio  0.7 ) ;; percentage of max speed for wheelies to work
-   (gravity-center-shift  0 0 0.3)
+
+   ;; Shift of the chassis with regards to the center of mass. E.g. with the
+   ;; the value commented out below the chassis will be 30 cm higher than the
+   ;; center of mass - or the center of mass will be 30 cm lower than the
+   ;; middle of the chassis. So this effectively lowers the center of mass,
+   ;; making the kart more stable and less likely to topple over.
+   ;; Default (if nothing is defined here) is that the center of the mass is
+   ;; at the very bottom of the chassis!
+   ;;(gravity-center-shift  0 0 0.3)
    (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
    (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
    (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down

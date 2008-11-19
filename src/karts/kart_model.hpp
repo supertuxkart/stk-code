@@ -113,6 +113,6 @@ public:
     void  adjustWheels(float rotation, float steer,
                        const float suspension[4]);
     void  resetWheels();
-
+    void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
 };   // KartModel
 #endif

@@ -138,13 +138,15 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     if(!dont_load_models)
     {
         m_kart_model.loadModels();
-        if(m_gravity_center_shift.getX()==UNDEFINED) 
+        if(m_gravity_center_shift.getX()==UNDEFINED)
+        {
             m_gravity_center_shift.setX(0);
-        if(m_gravity_center_shift.getY()==UNDEFINED) 
             m_gravity_center_shift.setY(0);
-        // Default: center at the very bottom of the kart.
-        if(m_gravity_center_shift.getZ()==UNDEFINED) 
+            // Default: center at the very bottom of the kart.
             m_gravity_center_shift.setZ(m_kart_model.getHeight()*0.5f);
+        }
+        m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
+                                               m_wheel_radius);
         // Useful when tweaking kart parameters
         if(user_config->m_print_kart_sizes)
             printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(), 

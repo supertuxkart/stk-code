@@ -833,7 +833,22 @@ void Kart::updatePhysics (float dt)
         m_engine_sound->speed(0.6f + (float)(m_speed / max_speed)*0.7f);
         m_engine_sound->position(getXYZ());
     }
-   
+#ifdef XX   
+    printf("forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
+       ,m_vehicle->m_forwardImpulse[0]
+       ,m_vehicle->m_forwardImpulse[1]
+       ,m_vehicle->m_forwardImpulse[2]
+       ,m_vehicle->m_forwardImpulse[3]
+       ,m_vehicle->m_sideImpulse[0]
+       ,m_vehicle->m_sideImpulse[1]
+       ,m_vehicle->m_sideImpulse[2]
+       ,m_vehicle->m_sideImpulse[3]
+       ,m_body->getAngularVelocity().getX()
+       ,m_body->getAngularVelocity().getY()
+       ,m_body->getAngularVelocity().getZ()
+       ,getHPR().getHeading()
+       );
+#endif
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------

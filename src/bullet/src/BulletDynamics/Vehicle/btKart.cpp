@@ -461,7 +461,8 @@ void	btKart::updateFriction(btScalar	timeStep)
 
             if (m_forwardImpulse[wheel] != btScalar(0.))
             {
-                m_chassisBody->applyImpulse(m_forwardWS[wheel]*(m_forwardImpulse[wheel]),rel_pos);
+                m_chassisBody->applyImpulse(m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
+                                            btVector3(0,0,0));
             }
             if (m_sideImpulse[wheel] != btScalar(0.))
             {

@@ -29,7 +29,6 @@ float KartModel::UNDEFINED = -99.9f;
 
 /** The constructor reads the model file name and wheel specification from the
  *  kart config file.
- *  \param lisp Lisp object of the kart config file.
  */
 KartModel::KartModel()
 {
@@ -104,16 +103,14 @@ void KartModel::loadModels()
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_graphics_position[i].getX()==UNDEFINED)
-            m_wheel_graphics_position[i].setX(  ( i==1||i==3) 
-            ? -0.5f*m_kart_width
-            : 0.5f*m_kart_width  );
-        if(m_wheel_graphics_position[i].getY()==STKConfig::UNDEFINED)
-            m_wheel_graphics_position[i].setY((i<2) ? 0.5f*m_kart_length
-            :-0.5f*m_kart_length);
-        if(m_wheel_graphics_position[i].getZ()==STKConfig::UNDEFINED)
+        {
+            m_wheel_graphics_position[i].setX( ( i==1||i==3) 
+                                               ? -0.5f*m_kart_width
+                                               :  0.5f*m_kart_width  );
+            m_wheel_graphics_position[i].setY( (i<2) ?  0.5f*m_kart_length
+                                                     : -0.5f*m_kart_length);
             m_wheel_graphics_position[i].setZ(0);
-        if(m_wheel_physics_position[i].getX()==UNDEFINED)
-            m_wheel_physics_position[i] = m_wheel_graphics_position[i];
+        }
     }
 
     // Load the wheel models. This can't be done early, since the default
@@ -175,6 +172,35 @@ void KartModel::loadWheelInfo(const lisp::Lisp* const lisp,
     wheel->get("position",         m_wheel_graphics_position[index]);
     wheel->get("physics-position", m_wheel_physics_position[index] );
 }   // loadWheelInfo
+
+// ----------------------------------------------------------------------------
+/** Sets the default position for the physical wheels if they are not defined
+ *  in the data file. The default position is to have the wheels at the corner
+ *  of the chassis. But since the position is relative to the center of mass,
+ *  this must be specified.
+ *  \param center_shift Amount the kart chassis is moved relative to the center
+ *                      of mass.
+ *  \param wheel_radius Radius of the physics wheels.
+ */
+void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
+                                           float wheel_radius)
+{
+    for(unsigned int i=0; i<4; i++)
+    {
+        if(m_wheel_physics_position[i].getX()==UNDEFINED)
+        {
+            m_wheel_physics_position[i].setX( ( i==1||i==3) 
+                                               ? -0.5f*m_kart_width
+                                               :  0.5f*m_kart_width
+                                               +center_shift.getX(  ));
+            m_wheel_physics_position[i].setY( (0.5f*m_kart_length-wheel_radius)
+                                              * ( (i<2) ? 1 : -1)
+                                               +center_shift.getY());
+            m_wheel_physics_position[i].setZ(0);
+        }   // if physics position is not defined
+    }
+
+}   // setDefaultPhysicsPosition
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
