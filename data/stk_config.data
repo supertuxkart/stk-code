@@ -92,10 +92,13 @@
    ;; The next vector contains the increase in max power (to simulate different
    ;; gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
    ;;                     | first  | second |  third |
-   (wheel-front-right (physics-position  0.38  0.6 0))
-   (wheel-front-left  (physics-position -0.38  0.6 0))
-   (wheel-rear-right  (physics-position  0.38 -0.6 0))
-   (wheel-rear-left   (physics-position -0.38 -0.6 0))
+   ;; The position of the physics raycast wheels relative to the center of 
+   ;; gravity. Default is to use the corners of the chassis to attach the
+   ;; wheels to.
+   ;;(wheel-front-right (physics-position  0.38  0.6 0))
+   ;;(wheel-front-left  (physics-position -0.38  0.6 0))
+   ;;(wheel-rear-right  (physics-position  0.38 -0.6 0))
+   ;;(wheel-rear-left   (physics-position -0.38 -0.6 0))
 
    (gear-switch-ratio          0.25      0.7      1.0)
    (gear-power-increase    2.2      1.7      1.3)
