@@ -42,7 +42,8 @@ public:
     void      reInit           ();
     int       addEntity        (Material *m);
     Material *getMaterial      (ssgLeaf *lf);
-    Material *getMaterial      (const std::string& t, bool is_full_path=false);
+    Material *getMaterial      (const std::string& t, bool is_full_path=false,
+                                bool make_permanent=false);
     void      addSharedMaterial(const std::string& filename);
     bool      pushTempMaterial (const std::string& filename);
     void      popTempMaterial  ();

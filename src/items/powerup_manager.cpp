@@ -118,7 +118,9 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     lisp->get("icon",            sIconFile                          );
  
     // load material
-    m_all_icons[collectType] = material_manager->getMaterial(sIconFile);
+    m_all_icons[collectType] = material_manager->getMaterial(sIconFile,
+                                                     /* full_path */    false,
+                                                     /*make_permanent */ true);
     m_all_icons[collectType]->getState()->ref();
 
     if(sModel!="")

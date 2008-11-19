@@ -195,8 +195,22 @@ Material *MaterialManager::getMaterial ( ssgLeaf *l )
 }   // getMaterial
 
 //-----------------------------------------------------------------------------
+/** Returns the material of a given name, if it doesn't exist, it is loaded.
+ *  Materials that are just loaded are not permanent, and so get deleted after
+ *  a race (this is used to load temporary, track specific materials). To make
+ *  material permanent, make_permanent must be set to true. This is used for
+ *  the powerup_manager, since not all icons for the powerups are listed in the
+ *  materials.dat file, causing the missing ones to be temporary only (and
+ *  then get deleted after one race, causing the powerup_manager to have 
+ *  invalid pointers.
+ *  \param fname  Name of the material.
+ *  \param is_full_path True if the name includes the path (defaults to false)
+ *  \param make_permanent True if this material should be kept in memory 
+ *                        (defaults to false)
+ */
 Material *MaterialManager::getMaterial(const std::string& fname, 
-                                       bool is_full_path )
+                                       bool is_full_path,
+                                       bool make_permanent)
 {
     if(fname=="")
     {
@@ -220,7 +234,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     // Add the new material
     Material* m=new Material(fname,"", (int)m_materials.size(), is_full_path);
     m_materials.push_back(m);
-
+    if(make_permanent) m_shared_material_index = (int)m_materials.size();
     return m ;
 }   // getMaterial
 
