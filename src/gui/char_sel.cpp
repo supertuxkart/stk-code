@@ -132,17 +132,7 @@ CharSel::CharSel(int whichPlayer)
     const int LAST_KART = user_config->m_player[m_player_index].getLastKartId();
     if( LAST_KART != -1 && kart_properties_manager->kartAvailable(LAST_KART))// is LAST_KART not in vector of selected karts
     {
-        int local_index = 0;
-        for(unsigned int i=0; i<m_index_avail_karts.size(); i++)
-        {
-            if(m_index_avail_karts[i]==LAST_KART) 
-            {
-                local_index = i;
-                break;
-            }
-        }
-        m_offset = local_index - m_max_entries/2;
-        if(m_offset<0) m_offset+=(int)m_index_avail_karts.size();
+        int local_index = computeOffset();
         widget_manager->setSelectedWgt(WTOK_NAME0 +(m_max_entries-1)/2);
         switchCharacter(local_index);
     }
@@ -344,6 +334,12 @@ void CharSel::update(float dt)
         // Switch group will update the list of selected karts, i.e. use the
         // information about kart availability just received from the server
         switchGroup();
+
+        // Now try to select the previously selected kart again (in network
+        // karts might be removed if they are not available on all computers,
+        // so we have to recompute offset)
+        computeOffset();
+
         // Now hide the message window and display the widgets:
         widget_manager->hideWgt(WTOK_MESSAGE);
         widget_manager->showWgt(WTOK_TITLE, WTOK_DOWN);
@@ -402,6 +398,27 @@ void CharSel::update(float dt)
 
     widget_manager->update(dt);
 }   // update
+
+//----------------------------------------------------------------------------
+/** This computes m_offset so that the previously selected kart is selected
+ *  by default.
+ */
+int CharSel::computeOffset()
+{
+    int local_index = 0;
+    int last_kart = user_config->m_player[m_player_index].getLastKartId();
+    for(unsigned int i=0; i<m_index_avail_karts.size(); i++)
+    {
+        if(m_index_avail_karts[i]==last_kart)
+        {
+            local_index = i;
+            break;
+        }
+    }
+    m_offset = local_index - m_max_entries/2;
+    if(m_offset<0) m_offset+=(int)m_index_avail_karts.size();
+    return local_index;
+}   // recmoputeOffset
 
 //----------------------------------------------------------------------------
 /** Pushes the next menu onto the stack. In case of split screen that might

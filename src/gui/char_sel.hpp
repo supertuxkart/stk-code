@@ -45,6 +45,7 @@ private:
     void             switchGroup();
     void             nextMenu();
     void             switchCharacter(int n);
+    int              computeOffset();
 public:
                  CharSel(int which_player);
                 ~CharSel();
