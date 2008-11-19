@@ -159,11 +159,16 @@ void KartModel::loadWheelInfo(const lisp::Lisp* const lisp,
                               const std::string &wheel_name, int index)
 {
     const lisp::Lisp* const wheel = lisp->getLisp(wheel_name);
-    if(!wheel) 
+    if(!wheel)
     {
-        fprintf(stderr, "Missing wheel information '%s' for model '%s'.\n",
+        // Only print the warning if a model filename is given. Otherwise the
+        // stk_config file is read (which has no model information).
+        if(m_model_filename!="")
+        {
+            fprintf(stderr, "Missing wheel information '%s' for model '%s'.\n",
                 wheel_name.c_str(), m_model_filename.c_str());
-        fprintf(stderr, "This can be ignored, but the wheels will not rotate.\n");
+            fprintf(stderr, "This can be ignored, but the wheels will not rotate.\n");
+        }
         return;
     }
     wheel->get("model",            m_wheel_filename[index]         );
