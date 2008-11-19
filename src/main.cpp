@@ -559,6 +559,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
+            network_manager->setupPlayerKartInfo();
             race_manager->startNew();
             main_loop->run();
             // well, actually run() will never return, since
