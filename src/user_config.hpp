@@ -174,8 +174,9 @@ public:
     std::string m_item_style;
     std::string m_username;
     std::string m_background_music;
-    std::string m_kart_group;      // Kart group used last
-    std::string m_track_group;     // Track group used last
+    std::string m_kart_group;      //< Kart group used last
+    std::string m_track_group;     //< Track group used last
+    std::string m_last_track;      //< name of the last track used
     std::string m_server_address;
     int         m_server_port;
     bool        m_use_kph;

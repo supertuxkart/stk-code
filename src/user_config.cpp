@@ -109,15 +109,16 @@ void UserConfig::setDefaults()
     m_use_kph          = false;
     m_width            = 800;
     m_height           = 600;
-    m_prev_width           = m_width;
-    m_prev_height          = m_height;
-    m_prev_windowed        = false;
-    m_crashed              = false;
+    m_prev_width       = m_width;
+    m_prev_height      = m_height;
+    m_prev_windowed    = false;
+    m_crashed          = false;
     m_blacklist_res.clear();
     m_karts            = 4;
     m_log_errors       = false;
     m_kart_group       = "standard";
     m_track_group      = "standard";
+    m_last_track       = "jungle";
     m_server_address   = "localhost";
     m_server_port      = 2305;
 
@@ -443,6 +444,7 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("log-errors",       m_log_errors);
         lisp->get("kart-group",       m_kart_group);
         lisp->get("track-group",      m_track_group);
+        lisp->get("last-track",       m_last_track);
         // Handle loading the stick config in it own method.
         readStickConfigs(lisp);
 
@@ -694,6 +696,8 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("kart-group", m_kart_group);
         writer->writeComment("Last selected track group");
         writer->write("track-group", m_track_group);
+        writer->writeComment("Last track played");
+        writer->write("last-track", m_last_track);
         writer->writeComment("Information about last server used");
         writer->write("server-address", m_server_address);
         writer->write("server-port", m_server_port);

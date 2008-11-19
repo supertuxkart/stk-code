@@ -85,8 +85,17 @@ TrackSel::TrackSel()
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_FROM_BOTTOM, 0.0f, prev_widget);
 
     m_offset        = 0;
-    m_current_track = -1;
     switchGroup();
+    m_current_track = -1;
+    for(unsigned int i=0; i<m_index_avail_tracks.size(); i++)
+    {
+        if(track_manager->getTrack(m_index_avail_tracks[i])->getIdent()==
+            user_config->m_last_track)
+        {
+            m_offset = i-m_max_entries/2;
+            break;
+        }
+    }
     updateScrollPosition();
 
     widget_manager->layout(WGT_AREA_TOP);
@@ -351,6 +360,7 @@ void TrackSel::select()
     }
 
     const Track* TRACK = track_manager->getTrack(m_index_avail_tracks[track_number]);
+    user_config->m_last_track = TRACK->getIdent();
     bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
 
     if( isAvailable )
