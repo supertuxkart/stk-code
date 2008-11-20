@@ -16,7 +16,7 @@ libbulletmath_a_SOURCES	= \
 	LinearMath/btVector3.h			LinearMath/btHashMap.h		 \
 	LinearMath/btConvexHull.cpp		LinearMath/btConvexHull.h
 
-libbulletcollision_a_SOURCES := \
+libbulletcollision_a_SOURCES = \
 	btBulletCollisionCommon.h						 \
 	BulletCollision/BroadphaseCollision/btAxisSweep3.cpp			 \
 	BulletCollision/BroadphaseCollision/btAxisSweep3.h			 \

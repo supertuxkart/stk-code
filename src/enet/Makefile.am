@@ -11,5 +11,5 @@ libenet_a_SOURCES = host.c list.c callbacks.c packet.c peer.c protocol.c unix.c 
 	include/enet/protocol.h \
 	include/enet/enet.h 
 
-INCLUDES = -Iinclude/
+AM_CPPFLAGS = -I$(srcdir)/include/
 

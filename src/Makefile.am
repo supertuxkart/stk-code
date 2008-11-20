@@ -23,7 +23,7 @@ noinst_LIBRARIES         =  libstatic_ssg.a
 libstatic_ssg_a_SOURCES  = static_ssg.cpp static_ssg.hpp
 libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 
-AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\""
+AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\"" -I$(srcdir)/bullet/src/ -I$(srcdir)/enet/include/
 
 supertuxkart_SOURCES =     main.cpp  			\
 	vec3.cpp		       vec3.hpp			\
@@ -165,7 +165,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	ide/vc9/bullet_lib.vcproj  ide/vc9/enet.vcproj		\
 	ide/vc9/README						\
 	Xcode/STK_XCode.xcodeproj/project/pbxproj
-
+#Is this the right place for those non-source files ?
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = -L. -lstatic_ssg \

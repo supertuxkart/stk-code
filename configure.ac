@@ -337,7 +337,6 @@ dnl ==============
 dnl Bullet physics
 dnl ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
-CXXFLAGS="$CXXFLAGS -Ibullet/src"
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
 
@@ -370,7 +369,6 @@ AC_CHECK_TYPE(socklen_t, [AC_DEFINE(HAS_SOCKLEN_T)], ,
 AC_EGREP_HEADER(MSG_MAXIOVLEN, /usr/include/sys/socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
 AC_EGREP_HEADER(MSG_MAXIOVLEN, socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
 
-CXXFLAGS="$CXXFLAGS -Ienet/include"
 enet_LIBS="-Lenet -lenet"
 SUMMARY="$SUMMARY\nUsing enet network support	."
 ENETTREE="src/enet"
