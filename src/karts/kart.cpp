@@ -784,7 +784,7 @@ void Kart::updatePhysics (float dt)
     }
     if(m_wheelie_angle<=0.0f)
     {
-        const float steering = DEGREE_TO_RAD(getMaxSteerAngle()) * m_controls.lr;
+        const float steering = getMaxSteerAngle() * m_controls.lr;
         m_vehicle->setSteeringValue(steering, 0);
         m_vehicle->setSteeringValue(steering, 1);
     } 

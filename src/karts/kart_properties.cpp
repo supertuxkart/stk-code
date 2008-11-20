@@ -147,6 +147,17 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         }
         m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
                                                m_wheel_radius);
+        float wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
+                                 -m_kart_model.getWheelPhysicsPosition(2).getY());
+        m_angle_at_min = asinf(wheel_base/m_min_radius);
+        m_angle_at_max = asinf(wheel_base/m_max_radius);
+        if(m_max_speed_turn == m_min_speed_turn)
+            m_speed_angle_increase = 0.0;
+        else
+            m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
+                                   / (m_max_speed_turn - m_min_speed_turn);
+
+
         // Useful when tweaking kart parameters
         if(user_config->m_print_kart_sizes)
             printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(), 
@@ -175,7 +186,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("mass",                       m_mass);
 
     std::vector<float> v;
-    if(lisp->getVector("max-speed-angle",      v))
+    if(lisp->getVector("max-speed-radius",      v))
     {
         if(v.size()!=2)
             printf("Incorrect max-speed-angle specifications for kart '%s'\n",
@@ -183,11 +194,11 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
         else
         {
             m_max_speed_turn = v[0];
-            m_angle_at_max   = v[1];
+            m_max_radius     = v[1];
         }
     }
     v.clear();
-    if(lisp->getVector("min-speed-angle",      v))
+    if(lisp->getVector("min-speed-radius",      v))
     {
         if(v.size()!=2)
             printf("Incorrect min-speed-angle specifications for kart '%s'\n",
@@ -195,14 +206,9 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
         else
         {
             m_min_speed_turn = v[0];
-            m_angle_at_min   = v[1];
+            m_min_radius     = v[1];
         }
     }
-    if(m_max_speed_turn == m_min_speed_turn)
-        m_speed_angle_increase = 0.0;
-    else
-        m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-                               / (m_max_speed_turn - m_min_speed_turn);
                              
     lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio );
     lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch       );
@@ -279,9 +285,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_mass,                    "mass"                         );
     CHECK_NEG(m_engine_power,            "engine-power"                 );
     CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
-    CHECK_NEG(m_angle_at_min,            "min-speed-angle"              );
+    CHECK_NEG(m_min_radius,              "min-speed-angle"              );
     CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
-    CHECK_NEG(m_angle_at_max,            "max-speed-angle"              );
+    CHECK_NEG(m_max_radius,              "max-speed-angle"              );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
     CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
 

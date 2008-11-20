@@ -46,6 +46,7 @@ private:
     std::vector<std::string> m_groups;         /**< List of all groups the kart
                                                     belongs to. */
     static float UNDEFINED;
+    float m_speed_angle_increase;     /**< Increase of turn angle with speed. */
 
 protected:
     // Display and gui
@@ -78,11 +79,16 @@ protected:
     float m_wheelie_speed_boost;      /**< Speed boost while doing a wheelie. */
     float m_wheelie_power_boost;      /**< Increase in engine power. */
 
-    float m_min_speed_turn, m_angle_at_min;  /**< Speed dependent steering: 
-                                              *   maximum speed to use. */
-    float m_max_speed_turn, m_angle_at_max;  /**< Turn angle at lowest speed 
-                                              *   etc. */
-    float m_speed_angle_increase;
+    float m_min_speed_turn,           /**< Speed for smallest turn radius. */
+          m_angle_at_min,             /**< Steering angle for minimal turn 
+                                           radius. Computed from radius and
+                                           kart length. */
+          m_min_radius;               /**< Smallest turn radius. */
+    float m_max_speed_turn,           /**< Speed for largest turn radius. */
+          m_angle_at_max,             /**< Steering angle for maximum turn 
+                                           radius. Computed from radius and
+                                           kart length. */
+          m_max_radius;               /**< Largest turn radius. */
 
     ssgEntity  *m_wheel_model[4];      /**< The four wheel models.           */
     std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */

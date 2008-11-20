@@ -66,12 +66,16 @@
 
    ;; Bullet physics attributes
    (brake-factor              2.75 )
-   ;; Defines the (maximum) steering angle at a lowest speed (19 degrees at
-   ;; speed 0) and at high speed (6.4 degrees at speed 12 m/s). Maximum
+   ;; Defines the smallest turn radius at lowest speed (4.64 m at
+   ;; speed 0) and at high speed (13.5 m at speed 12 m/s). Maximum
    ;; steering angles for speeds in between will be interpolated. This 
-   ;; allows for tighter turns at lower speeds
-   (min-speed-angle           0 19)
-   (max-speed-angle          12  6.4)
+   ;; allows for tighter turns at lower speeds. The actual steering
+   ;; angle is dependent on the wheel base of the kart:
+   ;; radius = wheel_base/sin(steering_angle)
+   ;; By specifying the radius the steering behaviour can be defined
+   ;; independent of the kart size.
+   (min-speed-radius          0 19  )
+   (max-speed-radius         12  6.4)
    (engine-power            400    )
    (mass                    225    )
    (suspension-stiffness     48.0  )

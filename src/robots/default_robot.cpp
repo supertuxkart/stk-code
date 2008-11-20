@@ -192,7 +192,7 @@ void DefaultRobot::handle_braking()
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
             if(!(lworld->getDistanceToCenterForKart(getWorldKartId()) > RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] *
-                 -CURVE_INSIDE_PERC || m_curve_angle > getMaxSteerAngle()))
+                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE(getMaxSteerAngle())))
             {
                 m_controls.brake = false;
                 return;
@@ -201,7 +201,7 @@ void DefaultRobot::handle_braking()
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
             if(!(lworld->getDistanceToCenterForKart( getWorldKartId() ) < RaceManager::getTrack()->getWidth()[kart_info.m_track_sector] *
-                 CURVE_INSIDE_PERC || m_curve_angle < -getMaxSteerAngle()))
+                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE(getMaxSteerAngle())))
             {
                 m_controls.brake = false;
                 return;
@@ -859,7 +859,7 @@ int DefaultRobot::calc_steps()
  */
 float DefaultRobot::angle_to_control( float angle ) const
 {
-    angle *= 180.0f / ( getMaxSteerAngle() * M_PI ) ;
+    angle = angle / getMaxSteerAngle();
 
     if(angle > 1.0f) return 1.0f;
     else if(angle < -1.0f) return -1.0f;
