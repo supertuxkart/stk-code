@@ -25,7 +25,6 @@
 #include "race_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 
 History* history = 0;
 
@@ -305,7 +304,5 @@ void History::Load()
     }   // for k
     fprintf(fd, "History file end.\n");
     fclose(fd);
-    network_manager->setupPlayerKartInfo();
-
 }   // Load
 
