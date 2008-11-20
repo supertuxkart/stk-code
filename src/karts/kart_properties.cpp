@@ -71,6 +71,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_color.setValue(1.0f, 0.0f, 0.0f);
+    m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -184,6 +185,17 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("time-full-steer",            m_time_full_steer);
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
+
+    std::string sfx_type_string;
+    lisp->get("engine-sound",                 sfx_type_string);
+    if(sfx_type_string == "large")
+    {
+        m_engine_sfx_type = SFXManager::SOUND_ENGINE_LARGE;
+    }
+    else if(sfx_type_string == "small")
+    {
+        m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
+    }
 
     std::vector<float> v;
     if(lisp->getVector("max-speed-radius",      v))

@@ -130,7 +130,8 @@ void SFXManager::loadSfx()
     loadSingleSfx(lisp, "prestart",      SOUND_PRESTART     );
     loadSingleSfx(lisp, "start",         SOUND_START        );
     loadSingleSfx(lisp, "missile_lock",  SOUND_MISSILE_LOCK );
-    loadSingleSfx(lisp, "engine",        SOUND_ENGINE       );
+    loadSingleSfx(lisp, "engine_small",  SOUND_ENGINE_SMALL );
+    loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE );
 }   // loadSfx
 //----------------------------------------------------------------------------
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 

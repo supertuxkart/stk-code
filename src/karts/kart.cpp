@@ -102,10 +102,10 @@ Kart::Kart (const std::string& kart_name, int position,
     m_rescue                  = false;
     m_wheel_rotation          = 0;
 
-    m_engine_sound = sfx_manager->newSFX(SFXManager::SOUND_ENGINE );
-    m_beep_sound   = sfx_manager->newSFX(SFXManager::SOUND_BEEP   );
-    m_crash_sound  = sfx_manager->newSFX(SFXManager::SOUND_CRASH  );
-    m_skid_sound   = sfx_manager->newSFX(SFXManager::SOUND_SKID   );
+    m_engine_sound = sfx_manager->newSFX(m_kart_properties->getEngineSfxType());
+    m_beep_sound   = sfx_manager->newSFX(  SFXManager::SOUND_BEEP             );
+    m_crash_sound  = sfx_manager->newSFX(  SFXManager::SOUND_CRASH            );
+    m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
 
     if(!m_engine_sound)
     {

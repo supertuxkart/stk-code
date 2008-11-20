@@ -26,6 +26,7 @@
 #include "vec3.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
+#include "audio/sfx_manager.hpp"
 
 class Material;
 class ssgEntity;
@@ -98,6 +99,8 @@ protected:
                *m_wheel_transform[4];  /**< The transform for the wheels, used
                                         *   to rotate the wheels and display
                                         *   the suspension in the race.      */
+    SFXManager::SFXType m_engine_sfx_type;
+
     // bullet physics data 
     // -------------------
     float m_suspension_stiffness;
@@ -166,6 +169,8 @@ public:
     float getWheelieRestoreRate     () const {return m_wheelie_restore_rate;     }
     float getWheelieSpeedBoost      () const {return m_wheelie_speed_boost;      }
     float getWheeliePowerBoost      () const {return m_wheelie_power_boost;      }
+    SFXManager::SFXType getEngineSfxType() 
+                                       const {return m_engine_sfx_type;          }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }
