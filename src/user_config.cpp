@@ -685,9 +685,6 @@ void UserConfig::saveConfig(const std::string& filename)
 
         writer->writeComment("number of karts. -1 means use all");
         writer->write("karts\t", m_karts);
-
-        writer->writeComment("number of karts. -1 means use all");
-        writer->write("karts\t", m_karts);
         
         writer->writeComment("error logging to log (true) or stderr (false)");
         writer->write("log-errors\t", m_log_errors);
