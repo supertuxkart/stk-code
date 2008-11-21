@@ -69,7 +69,6 @@ void KartPropertiesManager::removeTextures()
 //-----------------------------------------------------------------------------
 void KartPropertiesManager::loadKartData(bool dont_load_models)
 {
-    m_max_steer_angle = -1.0f;
     std::set<std::string> result;
     file_manager->listFiles(result, file_manager->getKartDir(), 
                             /*is_full_path*/ true);
@@ -95,10 +94,6 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
         kp->load(kart_file, "tuxkart-kart", dont_load_models);
         m_karts_properties.push_back(kp);
         m_kart_available.push_back(true);
-        if(kp->getMaxSteerAngle(0) > m_max_steer_angle)
-        {
-            m_max_steer_angle = kp->getMaxSteerAngle(0);
-        }
         const std::vector<std::string>& groups=kp->getGroups();
         for(unsigned int g=0; g<groups.size(); g++)
         {

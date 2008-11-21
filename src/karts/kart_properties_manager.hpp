@@ -39,7 +39,6 @@ private:
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 protected:
-    float m_max_steer_angle;
 
     typedef std::vector<KartProperties*> KartPropertiesVector;
     /** All available kart configurations */
@@ -54,7 +53,6 @@ public:
     const int                getKartId              (const std::string &ident) const;
     int                      getKartByGroup         (const std::string& group, int i) const;
     void                     loadKartData           (bool dont_load_models=false);
-    const float              getMaximumSteeringAngle() const {return m_max_steer_angle;}
     const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
     const std::vector<std::string>& 
                              getAllGroups           () const {return m_all_groups;     }
