@@ -74,8 +74,8 @@
    ;; radius = wheel_base/sin(steering_angle)
    ;; By specifying the radius the steering behaviour can be defined
    ;; independent of the kart size.
-   (min-speed-radius          0 19  )
-   (max-speed-radius         12  6.4)
+   (min-speed-radius          0   4.64)
+   (max-speed-radius         12  13.5)
    (engine-power            400    )
    (mass                    225    )
    (suspension-stiffness     48.0  )
