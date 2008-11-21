@@ -196,7 +196,10 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
             m_wheel_physics_position[i].setY( (0.5f*m_kart_length-wheel_radius)
                                               * ( (i<2) ? 1 : -1)
                                                +center_shift.getY());
-            m_wheel_physics_position[i].setZ(0);
+            // Set the connection point so that a maximum compressed wheel
+            // (susp. length=0) will still poke a little bit out under the 
+            // kart
+            m_wheel_physics_position[i].setZ(wheel_radius-0.05);
         }   // if physics position is not defined
     }
 
