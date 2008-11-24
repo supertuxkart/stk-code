@@ -1028,7 +1028,7 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
-    float offset_heading = getSteerPercent()*0.15f*3.1415926f * speed_ratio * m_skidding;
+    float offset_heading = getSteerPercent()*0.05f*3.1415926f * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(center_shift, Vec3(offset_heading, offset_pitch, 0));
 }   // updateGraphics
 
