@@ -463,7 +463,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
                                 float ratio_x, float ratio_y             )
 {
-    float state = (float)(player_kart->getEnergy()) /
+    float state = (float)(player_kart->getNumItems()) /
                   MAX_ITEMS_COLLECTED;
     int x = (int)((user_config->m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;

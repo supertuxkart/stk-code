@@ -565,15 +565,6 @@ void Kart::update(float dt)
         // track again)
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper();
-        else if(user_config->m_skidding)  // set friction otherwise if it's enabled
-        {
-            for(int i=0; i<m_vehicle->getNumWheels(); i++)
-            {
-                // terrain dependent friction
-                m_vehicle->getWheelInfo(i).m_frictionSlip = 
-                                getFrictionSlip() * material->getFriction();
-            }   // for i<getNumWheels
-        } // neither reset nor zipper material
     }   // if there is material
 
     // Check if any item was hit.
