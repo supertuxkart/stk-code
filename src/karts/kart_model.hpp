@@ -59,8 +59,16 @@ private:
      *  from the graphical position. */
     Vec3          m_wheel_physics_position[4]; 
 
-    /**  Radius of the graphical wheels.  */
+    /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
+
+    /** Minimum suspension length. If the displayed suspension is
+     *  shorter than this, the wheel would look wrong. */
+    float         m_min_suspension[4];
+
+    /** Maximum suspension length. If the displayed suspension is
+     *  any longer, the wheel would look too far away from the chassis. */
+    float         m_max_suspension[4];
 
     /** The transform for the wheels, used to rotate the wheels and display
      *  the suspension in the race.      */

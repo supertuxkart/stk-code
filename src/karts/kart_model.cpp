@@ -38,6 +38,8 @@ KartModel::KartModel()
         m_wheel_physics_position[i]  = Vec3(UNDEFINED);
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
+        m_min_suspension[i]          = -99.9f;
+        m_max_suspension[i]          =  99.9f;
     }
     m_wheel_filename[0] = "wheel-front-right.ac";
     m_wheel_filename[1] = "wheel-front-left.ac";
@@ -171,6 +173,8 @@ void KartModel::loadWheelInfo(const lisp::Lisp* const lisp,
     wheel->get("model",            m_wheel_filename[index]         );
     wheel->get("position",         m_wheel_graphics_position[index]);
     wheel->get("physics-position", m_wheel_physics_position[index] );
+    wheel->get("min-suspension",   m_min_suspension[index]         );
+    wheel->get("max-suspension",   m_max_suspension[index]         );
 }   // loadWheelInfo
 
 // ----------------------------------------------------------------------------
@@ -199,7 +203,7 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
             // Set the connection point so that a maximum compressed wheel
             // (susp. length=0) will still poke a little bit out under the 
             // kart
-            m_wheel_physics_position[i].setZ(wheel_radius-0.05);
+            m_wheel_physics_position[i].setZ(wheel_radius-0.05f);
         }   // if physics position is not defined
     }
 
@@ -218,24 +222,34 @@ void KartModel::adjustWheels(float rotation, float steer,
     sgMat4 wheel_steer;
     sgMat4 wheel_rot;
 
+    float clamped_suspension[4];
+    // Clamp suspension to minimum and maximum suspension length, so that
+    // the graphical wheel models don't look too wrong.
+    for(unsigned int i=0; i<4; i++)
+    {
+        clamped_suspension[i] = std::min(std::max(suspension[i],
+                                                  m_min_suspension[i]),
+                                         m_max_suspension[i]);
+    }   // for i<4
+
     sgMakeRotMat4( wheel_rot,   0,      RAD_TO_DEGREE(-rotation), 0);
     sgMakeRotMat4( wheel_steer, steer , 0,                        0);
     sgMultMat4(wheel_front, wheel_steer, wheel_rot);
 
     sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
-    wheel_front[3][2] += suspension[0];
+    wheel_front[3][2] += clamped_suspension[0];
     m_wheel_transform[0]->setTransform(wheel_front);
 
     sgCopyVec3(wheel_front[3], m_wheel_graphics_position[1].toFloat());
-    wheel_front[3][2] += suspension[1];
+    wheel_front[3][2] += clamped_suspension[1];
     m_wheel_transform[1]->setTransform(wheel_front);
 
     sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[2].toFloat());
-    wheel_rot[3][2] += suspension[2];
+    wheel_rot[3][2] += clamped_suspension[2];
     m_wheel_transform[2]->setTransform(wheel_rot);
 
     sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[3].toFloat());
-    wheel_rot[3][2] += suspension[3];
+    wheel_rot[3][2] += clamped_suspension[3];
     m_wheel_transform[3]->setTransform(wheel_rot);
 
 }   // adjustWheels
