@@ -318,6 +318,7 @@ void Kart::reset()
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
     m_bounce_back_time     = 0.0f;
+    m_skidding             = 1.0f;
 
     m_controls.lr          = 0.0f;
     m_controls.accel       = 0.0f;
@@ -771,7 +772,7 @@ void Kart::updatePhysics (float dt)
             m_reverse_allowed = true;
         }
     }
-
+#ifdef ENABLE_JUMP
     if(m_controls.jump && isOnGround())
     { 
       //Vector3 impulse(0.0f, 0.0f, 10.0f);
@@ -782,9 +783,35 @@ void Kart::updatePhysics (float dt)
         getBody()->setLinearVelocity( velocity );
 
     }
+#endif
     if(m_wheelie_angle<=0.0f)
     {
-        const float steering = getMaxSteerAngle() * m_controls.lr;
+
+       if(m_controls.jump)
+       {
+           m_skidding*= 1.05f;
+           if(m_skidding>2.0f) m_skidding=2.0f;
+           //btVector3 v=m_body->getAngularVelocity();
+           //v.setZ(v.getZ()*m_skidding);
+           //btVector3 t(0,0,m_skidding);
+           //m_body->applyTorqueImpulse(t);
+           //m_body->setAngularVelocity(v);
+       }
+       else if(m_skidding>1.0f)
+       {
+           m_skidding *= 0.95f;
+           if(m_skidding<1.0f) m_skidding=1.0f;
+       }
+       if(m_skidding>1.0f)
+       {
+           m_skid_sound->play();
+       }
+       else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+       {
+           m_skid_sound->stop();
+       }
+       float steering = getMaxSteerAngle() * m_controls.lr*m_skidding;
+
         m_vehicle->setSteeringValue(steering, 0);
         m_vehicle->setSteeringValue(steering, 1);
     } 
@@ -998,7 +1025,11 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
             + getKartLength()*0.5f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle)));
     center_shift.setZ(X);
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
-    Moveable::updateGraphics(center_shift, Vec3(0, offset_pitch, 0));   
+
+
+    float speed_ratio    = getSpeed()/getMaxSpeed();
+    float offset_heading = getSteerPercent()*0.15f*3.1415926f * speed_ratio * m_skidding;
+    Moveable::updateGraphics(center_shift, Vec3(offset_heading, offset_pitch, 0));
 }   // updateGraphics
 
 /* EOF */
