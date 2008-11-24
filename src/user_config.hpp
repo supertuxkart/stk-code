@@ -168,7 +168,6 @@ public:
     int         m_profile;         // Positive number: time in seconds, neg: # laps. (used to profile AI)
     bool        m_print_kart_sizes; // print all kart sizes
                                    // 0 if no profiling. Never saved in config file!
-    bool        m_skidding;
     float       m_sfx_volume;
     int         m_max_fps;
     std::string m_item_style;

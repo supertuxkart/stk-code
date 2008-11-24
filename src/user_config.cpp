@@ -103,7 +103,6 @@ void UserConfig::setDefaults()
     m_background_music = "";
     m_profile          = 0;
     m_print_kart_sizes = false;
-    m_skidding         = false;
     m_max_fps          = 120;
     m_sfx_volume       = 1.0f;
     m_use_kph          = false;
@@ -440,11 +439,10 @@ void UserConfig::loadConfig(const std::string& filename)
         /*get number of karts*/
         lisp->get("karts",            m_karts);
 
-        //get whether to log errors to file
-        lisp->get("log-errors",       m_log_errors);
         lisp->get("kart-group",       m_kart_group);
         lisp->get("track-group",      m_track_group);
         lisp->get("last-track",       m_last_track);
+
         // Handle loading the stick config in it own method.
         readStickConfigs(lisp);
 
@@ -674,30 +672,27 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("sfx-volume", m_sfx_volume);
 
         writer->writeComment("screen resolution and windowing mode");
-        writer->write("width\t", m_width);
-        writer->write("height\t", m_height);
-        writer->write("prev_width\t", m_prev_width);
-        writer->write("prev_height\t", m_prev_height);
-        writer->write("prev_windowed\t", m_prev_windowed);
+        writer->write("width\t",          m_width);
+        writer->write("height\t",         m_height);
+        writer->write("prev_width\t",     m_prev_width);
+        writer->write("prev_height\t",    m_prev_height);
+        writer->write("prev_windowed\t",  m_prev_windowed);
         writer->write("crash_detected\t", m_crashed);
-        writer->write("blacklisted_resolutions\t", m_blacklist_res);
-        writer->write("fullscreen\t", m_fullscreen);
+        writer->write("blacklisted_resolutions\t", 
+                                          m_blacklist_res);
+        writer->write("fullscreen\t",     m_fullscreen);
 
         writer->writeComment("number of karts. -1 means use all");
-        writer->write("karts\t", m_karts);
-        
-        writer->writeComment("error logging to log (true) or stderr (false)");
-        writer->write("log-errors\t", m_log_errors);
-                
+        writer->write("karts\t",          m_karts);
         writer->writeComment("Last selected kart group");
-        writer->write("kart-group", m_kart_group);
+        writer->write("kart-group",       m_kart_group);
         writer->writeComment("Last selected track group");
-        writer->write("track-group", m_track_group);
+        writer->write("track-group",      m_track_group);
         writer->writeComment("Last track played");
-        writer->write("last-track", m_last_track);
+        writer->write("last-track",       m_last_track);
         writer->writeComment("Information about last server used");
-        writer->write("server-address", m_server_address);
-        writer->write("server-port", m_server_port);
+        writer->write("server-address",   m_server_address);
+        writer->write("server-port",      m_server_port);
 
         writeStickConfigs(writer);
 
