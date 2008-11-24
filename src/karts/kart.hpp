@@ -69,7 +69,8 @@ protected:
     btUprightConstraint               *m_uprightConstraint;
 
 private:
-    int                 m_num_items_collected;
+    /** The amount of energy collected bu hitting coins. */
+    float               m_collected_energy;
     ssgSimpleState*     m_smokepuff;
     // don't delete the following 2 vars (they're kids in the hirarchy)
     Smoke              *m_smoke_system;
@@ -131,7 +132,7 @@ public:
                                           { m_attachment.set(t, time_left, k);   }
     Powerup       *getPowerup          ()       { return &m_powerup;         }
     int            getNumPowerup       () const { return  m_powerup.getNum();}
-    int            getNumItems         () const { return  m_num_items_collected;}
+    float          getEnergy           () const { return  m_collected_energy;}
     int            getPosition         () const { return  m_race_position;       }
     int            getInitialPosition  () const { return  m_initial_position;    }
     float          getFinishTime       () const { return  m_finish_time;         }

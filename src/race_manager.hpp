@@ -89,8 +89,8 @@ public:
 #undef LINEAR_RACE
 #undef BATTLE_ARENA
     
-    /** Difficulty. Atm skidding is implemented as a special difficulty. */
-    enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD, RD_SKIDDING };
+    /** Difficulty. */
+    enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD };
 
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart 

@@ -67,6 +67,13 @@ public:
                                          or reverse point order.             */
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
+    /** Gaming style: in wheelie, karts can do wheelies, collected coins
+     *  increase the number of items you get. With nitro, collected coins
+     *  can be used as a speed boost (nitro), but no wheelies are possible.
+     */
+    enum GameStyle {GS_WHEELIE, GS_NITRO};
+
+    GameStyle   m_game_style;        /**< Gamestyle: wheelies or nitro       */
 
     std::vector<float> 
           m_leader_intervals;        /**<Interval in follow the leader till 

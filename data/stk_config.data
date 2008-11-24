@@ -11,6 +11,7 @@
 				    ;; 1st
  (title-music              "main_theme.music")
  (menu-background          "st_title_screen.rgb")
+ (game-style               "wheelie") ;; "wheelie" or "nitro"
  (max-history              10000)   ;; maximum number of history frames.
  (delay-finish-time           10)   ;; delay till race results are displayed.
  (music-credit-time           10)   ;; time for which the music credits are displayed.
@@ -45,7 +46,6 @@
    (time-full-steer          0.3 )
    (corn-f                   4   )
    (corn-r                   4   )
-   (wheelie-max-speed-ratio  0.7 ) ;; percentage of max speed for wheelies to work
 
    ;; Shift of the chassis with regards to the center of mass. E.g. with the
    ;; the value commented out below the chassis will be 30 cm higher than the
@@ -55,6 +55,8 @@
    ;; Default (if nothing is defined here) is that the center of the mass is
    ;; at the very bottom of the chassis!
    ;;(gravity-center-shift  0 0 0.3)
+
+   (wheelie-max-speed-ratio  0.5 ) ;; percentage of max speed for wheelies to work
    (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
    (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
    (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
@@ -62,7 +64,7 @@
    (wheelie-lean-recovery    1 )
    (wheelie-balance-recovery 2 )
    (wheelie-step             1 )
-   (wheelie-power-boost      1 )   ;; increase in engine power, i.e. 1=plus 100%
+   (wheelie-power-boost      3 )   ;; increase in engine power, i.e. 1=plus 100%
 
    ;; Bullet physics attributes
    (brake-factor              2.75 )
@@ -86,8 +88,8 @@
    (wheel-radius              0.25 )
    (wheel-width               0.3  )
    (chassis-linear-damping    0.2  )
-   (chassis-angular-damping   0.2  )
-   (maximum-speed            22.22 ) ;; = 80 km/h
+   (chassis-angular-damping  30.2  )
+   (maximum-speed            32.22 ) ;; = 80 km/h
    (max-speed-reverse-ratio   0.2  ) ;; percentage of max speed for reverse gear
    (suspension-rest           0.2  )
    (suspension-travel-cm     19    )

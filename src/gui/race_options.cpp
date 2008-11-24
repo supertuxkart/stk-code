@@ -176,9 +176,9 @@ void RaceOptions::select()
     switch ( widget_manager->getSelectedWgt() )
     {
         case WTOK_DIFFICULTY_UP:
-            if( m_difficulty == RaceManager::RD_HARD && !unlock_manager->isLocked("skidding"))
+            if( m_difficulty == RaceManager::RD_HARD )
             {
-                m_difficulty = RaceManager::RD_SKIDDING;
+                m_difficulty = RaceManager::RD_EASY;
             }
             else if( m_difficulty == RaceManager::RD_MEDIUM )
             {
@@ -198,12 +198,7 @@ void RaceOptions::select()
             break;
 
         case WTOK_DIFFICULTY_DOWN:
-            if( m_difficulty == RaceManager::RD_SKIDDING )
-            {
-                m_difficulty = RaceManager::RD_HARD;
-            }
-
-            else if( m_difficulty == RaceManager::RD_HARD )
+            if( m_difficulty == RaceManager::RD_HARD )
             {
 //TEMP: done just for the release after 0.4 because of AI problems
 #if ENABLE_MEDIUM_AI
@@ -270,7 +265,7 @@ void RaceOptions::select()
 
     case WTOK_START:
         if( m_difficulty >= RaceManager::RD_EASY &&
-            m_difficulty <= RaceManager::RD_SKIDDING)
+            m_difficulty <= RaceManager::RD_HARD)
         {
             race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
         }
@@ -310,7 +305,6 @@ const char *RaceOptions::getDifficultyString(int difficulty) const
     case RaceManager::RD_EASY:     return _("Novice");
     case RaceManager::RD_MEDIUM:   return _("Driver");
     case RaceManager::RD_HARD:     return _("Racer" );
-    case RaceManager::RD_SKIDDING: return _("Skidding Preview");
     default:                       return _("Novice");
 
     }   // switch

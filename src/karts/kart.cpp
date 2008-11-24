@@ -72,7 +72,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
    //m_grid_position        = position;
     m_initial_position     = position;
-    m_num_items_collected = 0;
+    m_collected_energy     = 0;
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
@@ -314,7 +314,7 @@ void Kart::reset()
     m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
-    m_num_items_collected = 0;
+    m_collected_energy     = 0;
     m_wheel_rotation       = 0;
     m_wheelie_angle        = 0.0f;
     m_bounce_back_time     = 0.0f;
@@ -366,13 +366,19 @@ void Kart::collectedItem(const Item &item, int add_info)
 
     switch (type)
     {
-    case ITEM_BANANA  : m_attachment.hitBanana(item, add_info);    break;
-    case ITEM_SILVER_COIN : m_num_items_collected++ ;              break;
-    case ITEM_GOLD_COIN   : m_num_items_collected += 3 ;           break;
-    case ITEM_BONUS_BOX    : { 
-		         int n=1 + 4*getNumItems() / MAX_ITEMS_COLLECTED;
-                         m_powerup.hitBonusBox(n, item,add_info);  break;
-                     }
+    case ITEM_BANANA      : m_attachment.hitBanana(item, add_info); break;
+    case ITEM_SILVER_COIN : m_collected_energy++ ;                  break;
+    case ITEM_GOLD_COIN   : m_collected_energy += 3 ;               break;
+    case ITEM_BONUS_BOX   : 
+        { 
+            // In wheelie style, karts get more items depending on energy,
+            // in nitro mode it's only one item.
+            int n = (int)(stk_config->m_game_style==STKConfig::GS_WHEELIE
+                           ? 1 + 4*getEnergy() / MAX_ITEMS_COLLECTED
+                           : 1);
+            m_powerup.hitBonusBox(n, item,add_info);   
+            break;
+        }
     case ITEM_BUBBLEGUM:
         // slow down
         m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
@@ -390,8 +396,8 @@ void Kart::collectedItem(const Item &item, int add_info)
         race_state->itemCollected(getWorldKartId(), item.getItemId());
     }
 
-    if ( m_num_items_collected > MAX_ITEMS_COLLECTED )
-        m_num_items_collected = MAX_ITEMS_COLLECTED;
+    if ( m_collected_energy > MAX_ITEMS_COLLECTED )
+        m_collected_energy = MAX_ITEMS_COLLECTED;
 
 }   // collectedItem
 
@@ -574,7 +580,8 @@ void Kart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-// Set zipper time, and apply one time additional speed boost
+/** Sets zipper time, and apply one time additional speed boost.
+ */
 void Kart::handleZipper()
 {
     // Ignore a zipper that's activated while braking
@@ -616,10 +623,23 @@ void Kart::draw()
 
 // -----------------------------------------------------------------------------
 /** Returned an additional engine power boost when doing a wheele.
-***/
+ *  \param dt Time step size.
+ */
 
 float Kart::handleWheelie(float dt)
 {
+    // For now: handle nitro mode here:
+    if(stk_config->m_game_style==STKConfig::GS_NITRO)
+    {
+        if(!m_controls.wheelie) return 0.0;
+        m_collected_energy -= dt;
+        if(m_collected_energy<0)
+        {
+            m_collected_energy = 0;
+            return 0.0;
+        }
+        return m_kart_properties->getWheeliePowerBoost() * getMaxPower();
+    }
     // Handle wheelies
     // ===============
     if ( m_controls.wheelie && 
@@ -644,14 +664,6 @@ float Kart::handleWheelie(float dt)
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
         return 0.0f;
     }
-
-    const btTransform& chassisTrans = getTrans();
-    btVector3 targetUp(0.0f, 0.0f, 1.0f);
-    btVector3 forwardW (chassisTrans.getBasis()[0][1],
-                        chassisTrans.getBasis()[1][1],
-                        chassisTrans.getBasis()[2][1]);
-    btVector3 crossProd = targetUp.cross(forwardW);
-    crossProd.normalize();
 
     return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
           * m_wheelie_angle/getWheelieMaxPitch();

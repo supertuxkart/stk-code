@@ -291,11 +291,11 @@ void PlayerKart::handleZipper()
 void PlayerKart::collectedItem(const Item &item, int add_info)
 {
     // FIXME - how does the old item relate to the total amount of items?
-    const int old_item_collected = getNumItems();
+    const float old_energy= getEnergy();
     Kart::collectedItem(item, add_info);
 
-    if(old_item_collected < MAX_ITEMS_COLLECTED &&
-       getNumItems() == MAX_ITEMS_COLLECTED)
+    if(old_energy < MAX_ITEMS_COLLECTED &&
+       getEnergy() == MAX_ITEMS_COLLECTED)
     {
         m_full_sound->play();
     }

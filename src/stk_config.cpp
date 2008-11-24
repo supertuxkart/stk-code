@@ -132,6 +132,7 @@ void STKConfig::init_defaults()
     m_grid_order               = -100;
     m_max_history              = -100;
     m_title_music              = NULL;
+    m_game_style               = GS_WHEELIE;
     m_scores.clear();
     m_leader_intervals.clear();
 }   // init_defaults
@@ -171,6 +172,19 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     std::string title_music;
     lisp->get("title-music",                  title_music                );
     m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));
+    std::string style;
+    if(lisp->get("game-style", style))
+    {
+        if(style=="wheelie")
+            m_game_style = GS_WHEELIE;
+        else if(style=="nitro")
+            m_game_style = GS_NITRO;
+        else
+        {
+            fprintf(stderr, "Invalid value of game style: '%s'\n", style.c_str());
+            exit(-1);
+        }
+    }   // if game-style
 
     // Get the default KartProperties
     // ------------------------------

@@ -463,7 +463,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
                                 float ratio_x, float ratio_y             )
 {
-    float state = (float)(player_kart->getNumItems()) /
+    float state = (float)(player_kart->getEnergy()) /
                   MAX_ITEMS_COLLECTED;
     int x = (int)((user_config->m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;
@@ -699,7 +699,8 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
                                offset_y+(int)(10*minRatio));
     else
     {
-        if ( speed >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )
+        if (stk_config->m_game_style==STKConfig::GS_WHEELIE && 
+            speed >= kart->getMaxSpeed()*kart->getWheelieMaxSpeedRatio() )
         {
             font_race->PrintShadow("l", (int)(60*minRatio), 
                                    offset_x+(int)(70*minRatio), offset_y);
