@@ -725,20 +725,12 @@ void Kart::updatePhysics (float dt)
 
                 //apply the brakes
                 for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor() * 4.0f, i);
-
-                m_skid_sound->position( getXYZ() );
-                if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
-                {
-                    m_skid_sound->loop();
-                    m_skid_sound->play();
-                }
+                m_skidding*= 1.08f;//skid a little when the brakes are hit (just enough to make the skiding sound)
+                if(m_skidding>2.0f) m_skidding=2.0f;
                 m_reverse_allowed = false;
             }
             else
             {
-                // no braking sound
-                if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING) m_skid_sound->stop();
-                
                 if(m_reverse_allowed)
                 {
                     // going backward, apply reverse gear ratio
@@ -763,9 +755,6 @@ void Kart::updatePhysics (float dt)
         }
         else
         {
-            // not braking, stop sound
-            if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING) m_skid_sound->stop();
-            
             // lift the foot from throttle, brakes with 10% engine_power
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
@@ -807,7 +796,8 @@ void Kart::updatePhysics (float dt)
        }
        if(m_skidding>1.0f)
        {
-           m_skid_sound->play();
+            if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
+                m_skid_sound->play();
        }
        else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
        {

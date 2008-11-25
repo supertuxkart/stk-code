@@ -245,7 +245,6 @@ void SFXManager::deleteSFX(SFXBase *sfx)
  */
 void SFXManager::pauseAll()
 {
-
     for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
         i!=m_all_sfx.end(); i++)
     {
@@ -262,7 +261,7 @@ void SFXManager::resumeAll()
     {
         SFXStatus status = (*i)->getStatus();
         // Initial happens when 
-        if(status==SFX_PAUSED || status==SFX_INITIAL)
+        if(status==SFX_PAUSED)
             (*i)->resume();
     }   // for i in m_all_sfx
 }   // resumeAll
