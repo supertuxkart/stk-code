@@ -11,7 +11,7 @@
 				    ;; 1st
  (title-music              "main_theme.music")
  (menu-background          "st_title_screen.rgb")
- (game-style               "wheelie") ;; "wheelie" or "nitro"
+ (game-style               "nitro") ;; "wheelie" or "nitro"
  (max-history              10000)   ;; maximum number of history frames.
  (delay-finish-time           10)   ;; delay till race results are displayed.
  (music-credit-time           10)   ;; time for which the music credits are displayed.
