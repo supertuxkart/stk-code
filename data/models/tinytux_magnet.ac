@@ -4,6 +4,7 @@ MATERIAL "ac3dmat1" rgb 1 1 1  amb 1 1 1  emis 1 1 1  spec 0 0 0  shi 0  trans 0
 MATERIAL "ac3dmat1" rgb 0.545 0.545 0.545  amb 0 0 0  emis 0 0 0  spec 1 1 1  shi 61  trans 0
 MATERIAL "ac3dmat2" rgb 1 0 0  amb 1 0 0  emis 0 0 0  spec 1 1 1  shi 66  trans 0
 OBJECT world
+loc 0 2 0
 kids 4
 OBJECT group
 name "group"
@@ -21,7 +22,7 @@ kids 6
 OBJECT poly
 name "wings"
 loc -0.0833333 0 -0.0833333
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.6 0.5 -0.245333
 0 0.5 -0.0453331
@@ -48,7 +49,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.6 0.5 -0.5
 -0.1 0.5 -0.145333
@@ -75,7 +76,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.5 0.5 -0.6
 -0.1 0.5 -0.145333
@@ -102,7 +103,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.4 0.5 -0.7
 -0.1 0.5 -0.145333
@@ -129,7 +130,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.3 0.5 -0.8
 -0.1 0.5 -0.145333
@@ -156,7 +157,7 @@ kids 0
 OBJECT poly
 name "wings"
 loc 0.0166667 0 0.0166667
-texture "../images/butterfly.rgb"
+texture "butterfly.rgb"
 numvert 6
 -0.2 0.5 -0.953198
 -0.1 0.5 -0.145333
@@ -183,7 +184,7 @@ kids 0
 OBJECT poly
 name "body"
 loc -0.0416667 -0.025 -0.0416667
-texture "../images/tinytux.rgb"
+texture "tinytux.rgb"
 numvert 4
 -0.3 0.25 0
 0.3 0.25 0
@@ -667,7 +668,7 @@ name "rect"
 loc 0 0.25 -1.85
 data 14
 @autotex Y=2.0
-texture "../images/bzzt.rgb"
+texture "bzzt.rgb"
 numvert 8
 1.7 -3.25 2.55
 0.154546 -3.25 3.05
