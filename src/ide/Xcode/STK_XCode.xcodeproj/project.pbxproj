@@ -3052,8 +3052,10 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3067,15 +3069,6 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_9)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/enet\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_9 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/enet\"";
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-DHAVE_OGGVORBIS",
@@ -3118,6 +3111,7 @@
 				);
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";
+				WARNING_CFLAGS = "";
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -3127,7 +3121,9 @@
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3141,15 +3137,6 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_9)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/enet\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_9 = "\"$(SYSTEM_DEVELOPER_DIR)/games/supertuxkart2/src/enet\"";
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-DHAVE_OGGVORBIS",
@@ -3192,6 +3179,10 @@
 				);
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";
+				WARNING_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+				);
 				ZERO_LINK = NO;
 			};
 			name = Release;
