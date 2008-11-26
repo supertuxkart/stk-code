@@ -35,7 +35,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     // collide with the track. By setting the mass to 1, collisions happen.
     // (if bullet is compiled with _DEBUG, a warning will be printed the first
     // time a homing-track collision happens).
-    float y_offset=kart->getKartLength()+2.0f*m_extend.getY();
+    float y_offset=kart->getKartLength()/2.0f + m_extend.getY()/2.0f;
     
     float up_velocity = m_speed/7.0f;
     

@@ -40,7 +40,7 @@ private:
      *  adjusted in case that the objects is too high or too low above the 
      *  terrain. Otherwise gravity will not work correctly on this object. */
     bool              m_adjust_z_velocity;
-
+	
 protected:
     Kart*             m_owner;              // the kart which released this flyable
     btCollisionShape *m_shape;
@@ -62,6 +62,17 @@ protected:
     static float      m_st_force_updown[POWERUP_MAX];  // force pushing up/down 
     static btVector3  m_st_extend[POWERUP_MAX];        // size of the model
 
+	/** time since thrown. used so a kart can't hit himself when trying something,
+	    and also to put some time limit to some collectibles */
+	float			  m_time_since_thrown;
+	
+	/** set to something > -1 if this flyable should auto-destrcut after a while */
+	float			  m_max_lifespan;
+	
+	/** if set to true, the kart that throwns this flyable can't collide with it
+	    for a short time */
+	bool			  m_owner_has_temporary_immunity;
+	
     /** Returns information on what is the closest kart and at what
         distance it is. All 3 parameters first are of type 'out'.
         'inFrontOf' can be set if you wish to know the closest

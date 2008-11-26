@@ -28,7 +28,7 @@ float Bowling::m_st_force_to_target;
 // -----------------------------------------------------------------------------
 Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
 {
-    float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
+    float y_offset = 0.5f*kart->getKartLength() + m_extend.getY()/2.0f;
     
     // if the kart is looking backwards, release from the back
     PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
@@ -60,6 +60,10 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
     int flag = getBody()->getCollisionFlags();
     flag = flag & (~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
     getBody()->setCollisionFlags(flag);
+	
+	// should not live forever, auto-destruct after 20 seconds
+	m_max_lifespan = 20;
+	
 }   // Bowling
 
 // -----------------------------------------------------------------------------

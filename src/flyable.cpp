@@ -57,6 +57,10 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     m_mass              = mass;
     m_adjust_z_velocity = true;
 
+	m_time_since_thrown = 0;
+	m_owner_has_temporary_immunity = true;
+	m_max_lifespan = -1;
+	
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
@@ -184,6 +188,9 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
 //-----------------------------------------------------------------------------
 void Flyable::update (float dt)
 {
+	m_time_since_thrown += dt;
+	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) explode(NULL);
+	
     if(m_exploded) return;
 	
     Vec3 pos=getBody()->getWorldTransform().getOrigin();
@@ -229,6 +236,9 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
 {
 	if(m_exploded) return;
 
+	// the owner of this flyable should not be hit by his own flyable
+	if(m_owner_has_temporary_immunity && kart_hit == m_owner && m_time_since_thrown < 2.0f) return;
+	
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.

@@ -26,7 +26,7 @@
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 {
-    float y_offset = 0.5f*kart->getKartLength()+2.0f*m_extend.getY();
+    float y_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getY();
     
     // if the kart is looking backwards, release from the back
     PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
