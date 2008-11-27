@@ -96,6 +96,7 @@ void MainMenu::select()
     {
     case WTOK_SINGLE:
         race_manager->setNumLocalPlayers(1);
+		race_manager->setNumPlayers(1); // reset since this is used to determine the minimum number of players
         // The clients do not do any  mode selection, they go immediately
         // to the character selection screen.
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
