@@ -122,7 +122,9 @@ void FollowTheLeaderRace::update(float delta)
 void FollowTheLeaderRace::restartRace()
 {
     LinearWorld::restartRace();
+	m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
+	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }
 //-----------------------------------------------------------------------------
 std::string FollowTheLeaderRace::getInternalCode() const
