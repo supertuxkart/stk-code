@@ -1146,6 +1146,10 @@
 					RelativePath="..\..\items\projectile_manager.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\items\rubber_band.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="physics"
@@ -1758,6 +1762,10 @@
 				</File>
 				<File
 					RelativePath="..\..\items\projectile_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\items\rubber_band.hpp"
 					>
 				</File>
 			</Filter>

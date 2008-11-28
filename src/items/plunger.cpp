@@ -18,10 +18,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "items/plunger.hpp"
+
 #include "constants.hpp"
 #include "coord.hpp"
-#include "karts/player_kart.hpp"
 #include "camera.hpp"
+#include "items/rubber_band.hpp"
+#include "karts/player_kart.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
@@ -34,7 +36,16 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
                   new btCylinderShape(0.5f*m_extend), false, false, reverse_mode );
+    m_rubber_band = new RubberBand(this, *kart);
+    m_rubber_band->ref();
 }   // Plunger
+
+// -----------------------------------------------------------------------------
+Plunger::~Plunger()
+{
+    m_rubber_band->removeFromScene();
+    ssgDeRefDelete(m_rubber_band);
+}   // ~Plunger
 
 // -----------------------------------------------------------------------------
 void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
@@ -46,5 +57,6 @@ void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
 void Plunger::update(float dt)
 {
     Flyable::update(dt);
+    m_rubber_band->update(dt);
 }   // update
 // -----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-//  $Id: missile.hpp 1284 2007-11-08 12:31:54Z hikerstk $
+//  $Id: rubber_band.hpp 2458 2008-11-15 02:12:28Z auria $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2008 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,23 +17,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MISSILE_H
-#define HEADER_MISSILE_H
+#ifndef HEADER_RUBBER_BAND_HPP
+#define HEADER_RUBBER_BAND_HPP
 
-#include "flyable.hpp"
+/** This class is used together with the pluger to display a rubber band from
+ *  the shooting kart to the plunger.
+ */
+#define _WINSOCKAPI_
+#include <plib/ssg.h>
 
-class RubberBand;
+class Kart;
+class Plunger;
 
-class Plunger : public Flyable
+class RubberBand : public ssgVtxTable
 {
 private:
-    RubberBand *m_rubber_band;
+    Plunger        *m_plunger;
+    const Kart     &m_kart;
+    ssgSimpleState *m_state;
+
 public:
-                 Plunger(Kart *kart);
-                ~Plunger();
-    static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
-    virtual void update   (float dt);
-
-};   // Missile
-
+         RubberBand(Plunger *plunger, const Kart &kart);
+    void update(float dt);
+    void removeFromScene();
+};   // RubberBand
 #endif
