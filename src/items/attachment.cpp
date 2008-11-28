@@ -39,7 +39,7 @@ Attachment::Attachment(Kart* _kart)
     m_previous_owner = NULL;
     m_kart->getModelTransform()->addKid(m_holder);
 
-    for(int i=ATTACH_PARACHUTE; i<=ATTACH_TINYTUX; i++)
+    for(int i=ATTACH_FIRST; i<ATTACH_MAX; i++)
     {
         ssgEntity *p=attachment_manager->getModel((attachmentType)i);
         m_holder->addKid(p);
@@ -56,6 +56,7 @@ Attachment::~Attachment()
 //-----------------------------------------------------------------------------
 void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 {
+    clear();
     m_holder->selectStep(_type);
     m_type           = _type;
     m_time_left      = time;
@@ -63,58 +64,82 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
 }   // set
 
 // -----------------------------------------------------------------------------
-void Attachment::hitBanana(const Item &item, int random_attachment)
+/** Removes any attachement currently on the kart. As for the anvil attachment,
+ *  takes care of resetting the owner kart's physics structures to account for
+ *  the updated mass.
+ */
+void Attachment::clear()
+{
+    m_type=ATTACH_NOTHING; 
+    m_time_left=0.0;
+    m_holder->select(0);
+
+    // Resets the weight of the kart if the previous attachment affected it 
+    // (e.g. anvil). This must be done *after* setting m_type to
+    // ATTACH_NOTHING in order to reset the physics parameters.
+    m_kart->updatedWeight();
+}   // clear
+
+// -----------------------------------------------------------------------------
+void Attachment::hitBanana(const Item &item, int new_attachment)
 {
     if(user_config->m_profile) return;
     float leftover_time   = 0.0f;
     
     switch(getType())   // If there already is an attachment, make it worse :)
     {
-    case ATTACH_BOMB:  projectile_manager->newExplosion(m_kart->getXYZ());
-                       m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
-                       clear();
-                       if(random_attachment==-1) 
-                           random_attachment = m_random.get(3);
-                       break;
-    case ATTACH_ANVIL :// if the kart already has an anvil, attach a new anvil, 
-                       // and increase the overall time 
-                       random_attachment = 2;
-                       leftover_time     = m_time_left;
-                       break;
+    case ATTACH_BOMB:
+        projectile_manager->newExplosion(m_kart->getXYZ());
+        m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
+        clear();
+        if(new_attachment==-1) 
+            new_attachment = m_random.get(3);
+        break;
+    case ATTACH_ANVIL:
+        // if the kart already has an anvil, attach a new anvil, 
+        // and increase the overall time 
+        new_attachment = 2;
+        leftover_time     = m_time_left;
+        break;
     case ATTACH_PARACHUTE:
-                       random_attachment = 2;  // anvil
-                       leftover_time     = m_time_left;
-                       break;
-    default:           if(random_attachment==-1)
-                           random_attachment = m_random.get(3);
+        new_attachment = 2;  // anvil
+        leftover_time     = m_time_left;
+        break;
+    default:
+        if(new_attachment==-1)
+            new_attachment = m_random.get(3);
     }   // switch
 
     // Save the information about the attachment in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
     {
-        race_state->itemCollected(m_kart->getWorldKartId(), 
-                                     item.getItemId(), 
-                                     random_attachment);
+        race_state->itemCollected(m_kart->getWorldKartId(),
+                                  item.getItemId(),
+                                  new_attachment);
     }
 
-    switch (random_attachment)
+    switch (new_attachment)
     {
-    case 0: set( ATTACH_PARACHUTE, stk_config->m_parachute_time+leftover_time);
+    case 0: 
+        set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
         m_initial_speed = m_kart->getSpeed();
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 1: set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
+    case 1:
+        set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
-    case 2: set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
+    case 2:
+        set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         // Reduce speed once (see description above), all other changes are
         // handled in Kart::updatePhysics
-        m_kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor);
+        m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+        m_kart->updatedWeight();
         break ;
     }   // switch 
 }   // hitBanana
@@ -137,40 +162,35 @@ void Attachment::update(float dt)
 
     switch (m_type)
     {
-    case ATTACH_PARACHUTE: // Partly handled in Kart::updatePhysics
-                           // Otherwise: disable if a certain percantage of
-                           // initial speed was lost
-                           if(m_kart->getSpeed()<=
-                               m_initial_speed*stk_config->m_parachute_done_fraction)
-                           {
-                                   m_time_left = -1;
-                           }
-                           break;
+    case ATTACH_PARACHUTE:
+        // Partly handled in Kart::updatePhysics
+        // Otherwise: disable if a certain percantage of
+        // initial speed was lost
+        if(m_kart->getSpeed()<=
+           m_initial_speed*stk_config->m_parachute_done_fraction)
+        {
+            m_time_left = -1;
+        }
+        break;
     case ATTACH_ANVIL:     // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
-    case ATTACH_MAX:       break;
-    case ATTACH_BOMB:      if(m_time_left<=0.0) 
-                           {
-                               projectile_manager->newExplosion(m_kart->getXYZ());
-                               m_kart->handleExplosion(m_kart->getXYZ(), 
-                                                       /*direct_hit*/ true);
-                           }
-                           break;
-    case ATTACH_TINYTUX:   if(m_time_left<=0.0) m_kart->endRescue();
-                           break;
+    case ATTACH_MAX:
+        break;
+    case ATTACH_BOMB:
+        if(m_time_left<=0.0) 
+        {
+            projectile_manager->newExplosion(m_kart->getXYZ());
+            m_kart->handleExplosion(m_kart->getXYZ(), 
+                                    /*direct_hit*/ true);
+        }
+        break;
+    case ATTACH_TINYTUX:
+        if(m_time_left<=0.0) m_kart->endRescue();
+        break;
     }   // switch
 
     // Detach attachment if its time is up.
     if ( m_time_left <= 0.0f)
-    {
-        if(m_type==ATTACH_ANVIL) 
-        {
-            // Resets the weight, and multiplies the velocity by 1.0, 
-            // i.e. no change of velocity.
-            m_kart->getAttachment()->clear();
-            m_kart->adjustSpeedWeight(1.0f);
-        }
         clear();
-    }   // if m_time_left<0
 }   // update
 //-----------------------------------------------------------------------------

@@ -126,7 +126,8 @@ void Powerup::use()
             if(kart->getPosition() == 1)
             {
                 kart->attach(ATTACH_ANVIL, stk_config->m_anvil_time);
-                kart->adjustSpeedWeight(stk_config->m_anvil_speed_factor*0.5f);
+                kart->updatedWeight();
+                kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
                 m_sound_use_anvil->position(m_owner->getXYZ());
                 m_sound_use_anvil->play();
                 break;

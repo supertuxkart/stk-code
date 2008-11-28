@@ -158,7 +158,7 @@ public:
     float          getMass          () const
     {
         return m_kart_properties->getMass()
-               + m_attachment.WeightAdjust();
+               + m_attachment.weightAdjust();
     }
     float          getMaxPower      () const {return m_kart_properties->getMaxPower();}
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
@@ -209,7 +209,8 @@ public:
     void           eliminate        ();
     bool           isRescue         () const {return m_rescue;}
     void           resetBrakes      ();
-    void           adjustSpeedWeight(float f);
+    void           adjustSpeed      (float f);
+    void           updatedWeight    ();
     void           forceRescue      ();
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
     const std::string& getName      () const {return m_kart_properties->getName();}

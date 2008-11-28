@@ -26,13 +26,19 @@
 class Kart;
 class Item;
 
-// Some loop in Attachment.cpp depend on PARACHUTE being the first element,
-// and TINYTUX being the last one. So if new elemts are added, make sure
-// to add them in between those values.
-enum attachmentType { ATTACH_PARACHUTE,
-                      ATTACH_BOMB,
-                      ATTACH_ANVIL, ATTACH_TINYTUX,
-                      ATTACH_MAX, ATTACH_NOTHING};
+// Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
+// So if new elements are added, make sure to add them in between those values.
+// Also, please note that Attachment::Attachment relies on ATTACH_FIRST being 0.
+enum attachmentType
+{
+    ATTACH_FIRST = 0,
+    ATTACH_PARACHUTE = 0,
+    ATTACH_BOMB,
+    ATTACH_ANVIL,
+    ATTACH_TINYTUX,
+    ATTACH_MAX,
+    ATTACH_NOTHING
+};
 
 
 class Attachment
@@ -52,36 +58,34 @@ public:
 
     void set (attachmentType _type, float time, Kart *previous_kart=NULL);
     void set (attachmentType _type) { set(_type, m_time_left); }
-    void clear ()                   {
-                                      m_type=ATTACH_NOTHING; 
-                                      m_time_left=0.0;
-                                      m_holder->select(0);
-                                    }
+    void clear ();
     attachmentType getType () const { return m_type;           }
     float getTimeLeft      () const { return m_time_left;      }
     void setTimeLeft       (float t){ m_time_left = t;         }
     Kart* getPreviousOwner () const { return m_previous_owner; }
-    float WeightAdjust     () const {
+
+    float weightAdjust     () const {
                                       return m_type==ATTACH_ANVIL
                                           ?stk_config->m_anvil_weight:0.0f;
                                     }
 
-    float AirResistanceAdjust () const {
+    float airResistanceAdjust () const {
                                       return m_type==ATTACH_PARACHUTE
                                           ?stk_config->m_parachute_friction:0.0f;
                                     }
 
-    float SpeedAdjust () const      {
+    float speedAdjust () const      {
                                       return m_type==ATTACH_ANVIL
                                           ?stk_config->m_anvil_speed_factor:1.0f;
                                     }
+
     /** Randomly selects the new attachment. For a server process, the
      *  attachment can be passed into this function.
         \param item The item that was collected.
-        \param random_attachment Optional: only used on the clients, it
-                                 specifies the new attachment to use
+        \param new_attachment Optional: only used on the clients, it
+                              specifies the new attachment to use
      */
-    void  hitBanana(const Item &item, int random_attachment=-1);
+    void  hitBanana(const Item &item, int new_attachment=-1);
     void  update (float dt);
     void  moveBombFromTo(Kart *from, Kart *to);
 };

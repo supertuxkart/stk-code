@@ -181,7 +181,7 @@ void Kart::createPhysics()
     m_vehicle_raycaster = 
         new btDefaultVehicleRaycaster(RaceManager::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btKart::btVehicleTuning();
-	m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
+        m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
     m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster,
                            m_kart_properties->getTrackConnectionAccel());
 
@@ -285,18 +285,28 @@ bool Kart::isInRest() const
 }  // isInRest
 
 //-----------------------------------------------------------------------------
-/** Modifies the physics parameter to simulate an attached anvil.
- *  The velocity is multiplicated by f, and the mass of the kart is increased.
+/** Multiplies the velocity of the kart by a factor f (both linear
+ *  and angular). This is used by anvils, which suddenly slow down the kart
+ *  when they are attached.
  */
-void Kart::adjustSpeedWeight(float f)
+void Kart::adjustSpeed(float f)
 {
     m_body->setLinearVelocity(m_body->getLinearVelocity()*f);
+    m_body->setAngularVelocity(m_body->getAngularVelocity()*f);
+}   // adjustSpeed
+
+//-----------------------------------------------------------------------------
+/** This method is to be called every time the mass of the kart is updated,
+ *  which includes attaching an anvil to the kart (and detaching).
+ */
+void Kart::updatedWeight()
+{
     // getMass returns the mass increased by the attachment
     btVector3 inertia;
     float m=getMass();
     m_kart_chassis.calculateLocalInertia(m, inertia);
     m_body->setMassProps(m, inertia);
-}   // adjustSpeedWeight
+}   // updatedWeight
 
 //-----------------------------------------------------------------------------
 void Kart::reset()
@@ -911,7 +921,7 @@ void Kart::processSkidMarks()
     {
         if(isOnGround())
         {
-	  //FIXME: no getCoord anymore  m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
+          //FIXME: no getCoord anymore  m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
           //FIXME  m_skidmark_right->add(*getCoord(),  ANGLE, LENGTH);            
         }
         else
