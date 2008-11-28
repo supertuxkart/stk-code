@@ -68,6 +68,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
+    m_transform = trans;
     m_motion_state = new KartMotionState(trans);
 
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
