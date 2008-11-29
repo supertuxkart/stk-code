@@ -530,6 +530,7 @@
 		95B0D3F40EB69DE0001A0D06 /* ssg_help.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEC80EB69DDA001A0D06 /* ssg_help.hpp */; };
 		95B0D3F50EB69DE0001A0D06 /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEC90EB69DDA001A0D06 /* vec3.cpp */; };
 		95B0D3F60EB69DE0001A0D06 /* vec3.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CECA0EB69DDA001A0D06 /* vec3.hpp */; };
+		95C239160EE0C41C00F2071A /* rubber_band.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C239140EE0C41C00F2071A /* rubber_band.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -1373,6 +1374,8 @@
 		95B0CEC90EB69DDA001A0D06 /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = ../../vec3.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CECA0EB69DDA001A0D06 /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../vec3.hpp; sourceTree = SOURCE_ROOT; };
 		95B0D4090EB6A160001A0D06 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
+		95C239140EE0C41C00F2071A /* rubber_band.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rubber_band.cpp; path = games/supertuxkart/src/items/rubber_band.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C239150EE0C41C00F2071A /* rubber_band.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rubber_band.hpp; path = games/supertuxkart/src/items/rubber_band.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -2321,6 +2324,8 @@
 		95B0CE260EB69DD9001A0D06 /* items */ = {
 			isa = PBXGroup;
 			children = (
+				95C239140EE0C41C00F2071A /* rubber_band.cpp */,
+				95C239150EE0C41C00F2071A /* rubber_band.hpp */,
 				957F71250ECE6BB9007C99DE /* plunger.cpp */,
 				957F71260ECE6BBA007C99DE /* plunger.hpp */,
 				951DF9B30EC2899200F18CE6 /* bubblegumitem.cpp */,
@@ -3039,6 +3044,7 @@
 				9522900A0EC4E1D80090E50F /* moveable.cpp in Sources */,
 				9522900C0EC4E1D80090E50F /* player_kart.cpp in Sources */,
 				957F71270ECE6BBA007C99DE /* plunger.cpp in Sources */,
+				95C239160EE0C41C00F2071A /* rubber_band.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
