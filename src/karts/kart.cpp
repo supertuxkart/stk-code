@@ -721,14 +721,13 @@ void Kart::updatePhysics (float dt)
         if(m_bounce_back_time>0.0f) engine_power = 0.0f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
-        m_reverse_allowed = true;
-        resetBrakes();
+        
     }
     else
     {   // not accelerating
         if(m_controls.brake)
         {   // check if the player is currently only slowing down or moving backwards
-            if(m_speed > 1.0f)
+            if(m_speed > 0.0f)
             {   // going forward
                 m_vehicle->applyEngineForce(0.f, 2);//engine off
                 m_vehicle->applyEngineForce(0.f, 3);
@@ -737,30 +736,21 @@ void Kart::updatePhysics (float dt)
                 for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor() * 4.0f, i);
                 m_skidding*= 1.08f;//skid a little when the brakes are hit (just enough to make the skiding sound)
                 if(m_skidding>2.0f) m_skidding=2.0f;
-                m_reverse_allowed = false;
             }
             else
             {
-                if(m_reverse_allowed)
+                resetBrakes();
+                // going backward, apply reverse gear ratio
+                if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
-                    // going backward, apply reverse gear ratio
-                    if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
-                    {
-                        m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
-                        m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
-                    }
-                    else
-                    {
-                        m_vehicle->applyEngineForce(0.f, 2);
-                        m_vehicle->applyEngineForce(0.f, 3);
-                    }
-                } 
+                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
+                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
+                }
                 else
                 {
-                     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
-                     m_vehicle->applyEngineForce(0.f, 2);
-                     m_vehicle->applyEngineForce(0.f, 3);
-                }           
+                    m_vehicle->applyEngineForce(0.f, 2);
+                    m_vehicle->applyEngineForce(0.f, 3);
+                }     
             }
         }
         else
@@ -771,7 +761,6 @@ void Kart::updatePhysics (float dt)
 
             if(!RaceManager::getWorld()->isStartPhase())
                 resetBrakes();
-            m_reverse_allowed = true;
         }
     }
 #ifdef ENABLE_JUMP
