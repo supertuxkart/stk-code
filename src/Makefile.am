@@ -97,7 +97,6 @@ supertuxkart_SOURCES =     main.cpp  			\
 	moving_physics.hpp	   moving_physics.cpp		    \
 	moving_texture.hpp	   moving_texture.cpp		    \
 	callback_manager.cpp   callback_manager.hpp         \
-	skid_mark.cpp		   skid_mark.hpp	            \
 	shadow.cpp		       shadow.hpp	        	    \
 	particle_system.cpp	   particle_system.hpp       	\
 	main_loop.cpp	 	   main_loop.hpp        	    \
