@@ -81,15 +81,30 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns the corresponding plib data structure. */
-    const sgCoord& toSgCoord() const     { return m_coord;          }
+    const sgCoord& toSgCoord()  const     { return m_coord;            }
     /** Returns the translation. */
-    const Vec3&    getXYZ()    const     { return m_xyz;            }
+    const Vec3&    getXYZ()     const     { return m_xyz;              }
     /** Returns heading, pitch, rolll. */
-    const Vec3&    getHPR()    const     { return m_hpr;            }
+    const Vec3&    getHPR()     const     { return m_hpr;              }
+    /** Returns X. */
+    float          getX()       const     { return m_xyz.getX();       }
+    /** Returns Y. */
+    float          getY()       const     { return m_xyz.getY();       }
+    /** Returns Z. */
+    float          getZ()       const     { return m_xyz.getZ();       }
+    /** Returns the heading. */
+    float          getHeading() const     { return m_hpr.getHeading(); }
+
     /** Sets hpr. \param a Heading, pitch and roll. */
-    void           setHPR(const Vec3& a) { m_hpr = a; setSgCoord(); }
+    void           setHPR(const Vec3& a)  { m_hpr = a; setSgCoord();   }
     /** Sets xyz. \param a Coordinates. */
-    void           setXYZ(const Vec3& a) { m_xyz = a; setSgCoord(); }
+    void           setXYZ(const Vec3& a)  { m_xyz = a; setSgCoord();   }
+    /** Sets X. \param x New X value. */
+    void           setX(float x)          { m_xyz.setX(x);             }
+    /** Sets Y. \param y New Y value. */
+    void           setY(float y)          { m_xyz.setY(y);             }
+    /** Sets Z. \param z New Z value. */
+    void           setZ(float z)          { m_xyz.setZ(z);             }
 };   // Coord
 
 #endif

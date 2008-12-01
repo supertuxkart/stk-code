@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <plib/ssg.h>
+#include "coord.hpp"
 
 class SkidMark
 {
@@ -31,10 +32,10 @@ private:
 public:
     SkidMark(float angle_sign);
     ~SkidMark();
-    void add           (const sgCoord& coord,  // Add a position where the skidmark is
+    void add           (const Coord& coord,  // Add a position where the skidmark is
                         float angle,
                         float length); 
-    void addBreak      (const sgCoord& coord, //Begin or finish an skidmark
+    void addBreak      (const Coord& coord, //Begin or finish an skidmark
                         float angle, 
                         float length);  
     bool wasSkidMarking() const;
@@ -51,10 +52,10 @@ class SkidMarkPos : public ssgVtxTable
                       float global_track_offset);
         ~SkidMarkPos ();
         void recalcBSphere();
-        void add          (const sgCoord& coord,  // Add a position where the skidmark is
+        void add          (const Coord& coord,  // Add a position where the skidmark is
                            float angle,
                            float length);
-        void addEnd       (const sgCoord& coord);
+        void addEnd       (const Coord& coord);
     private:
         float m_track_offset;                 // Amount of which the skidmark is lifted
         // above the track to avoid z-buffer errors

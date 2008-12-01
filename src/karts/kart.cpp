@@ -893,34 +893,28 @@ void Kart::endRescue()
 //-----------------------------------------------------------------------------
 void Kart::processSkidMarks()
 {
-    // FIXME: disable skidmarks for now, they currently look ugly, and are
-    //        sometimes hovering in the air
-    return;
-    assert(m_skidmark_left);
-    assert(m_skidmark_right);
     const float threshold = 0.3f;
-    //FIXME    const float ANGLE     = 43.0f;
-    //FIXME    const float LENGTH    = 0.57f;
-    if(m_controls.jump)
+    const float ANGLE     = 43.0f;
+    const float LENGTH    = 0.57f;
+    if(m_skidding>1 && isOnGround())
     {
-        if(isOnGround())
-        {
-          //FIXME: no getCoord anymore  m_skidmark_left ->add(*getCoord(),  ANGLE, LENGTH);
-          //FIXME  m_skidmark_right->add(*getCoord(),  ANGLE, LENGTH);            
-        }
-        else
-        {   // not on ground
-            //FIXME m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
-            //FIRME m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
-        }   // on ground
+        Coord coord(getXYZ(), getHPR());
+        coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
+        m_skidmark_right->add(coord,  ANGLE, LENGTH);            
+        coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
+        m_skidmark_left ->add(coord,  ANGLE, LENGTH);
     }
     else
-    {   // !skid_rear && !skid_front    
-        //FIXME if(m_skidmark_left->wasSkidMarking())
-        //FIXME     m_skidmark_left->addBreak(*getCoord(),  ANGLE, LENGTH);
-
-        //FIXME if(m_skidmark_right->wasSkidMarking())
-        //FIXME    m_skidmark_right->addBreak(*getCoord(), ANGLE, LENGTH);
+    {   
+        // Either both sides are skidding, or none at all
+        if(m_skidmark_left->wasSkidMarking())
+        {
+            Coord coord(getXYZ(), getHPR());
+            coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
+            m_skidmark_right->addBreak(coord, ANGLE, LENGTH);
+            coord.setZ(getVehicle()->getWheelInfo(3).m_raycastInfo.m_contactPointWS.getZ());
+            m_skidmark_left ->addBreak(coord,  ANGLE, LENGTH);
+        }
     }
 }   // processSkidMarks
 
@@ -974,6 +968,7 @@ void Kart::setSuspensionLength()
             m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }   // for i
 }   // setSuspensionLength
+
 //-----------------------------------------------------------------------------
 void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 {
