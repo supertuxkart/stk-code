@@ -443,9 +443,9 @@ void InitTuxkart()
     stk_config              = new STKConfig            ();
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
-    powerup_manager     = new PowerupManager   ();
+    powerup_manager         = new PowerupManager   ();
     callback_manager        = new CallbackManager      ();
-    item_manager         = new ItemManager       ();
+    item_manager            = new ItemManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
