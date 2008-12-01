@@ -744,10 +744,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\particle_system.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\race_manager.cpp"
 				>
 			</File>
@@ -777,10 +773,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\shadow.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\smoke.cpp"
 				>
 			</File>
 			<File
@@ -1191,7 +1183,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\particle_system.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\skid_mark.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\smoke.cpp"
 					>
 				</File>
 			</Filter>
@@ -1298,10 +1298,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\particle_system.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\player.hpp"
 				>
 			</File>
@@ -1343,10 +1339,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\shadow.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\smoke.hpp"
 				>
 			</File>
 			<File
@@ -1833,7 +1825,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\particle_system.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\skid_mark.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\smoke.hpp"
 					>
 				</File>
 			</Filter>

@@ -22,9 +22,10 @@
 #define HEADER_COORD_H
 #include <plib/sg.h>
 
-#include "vec3.hpp"
-#include "constants.hpp"
 #include "LinearMath/btTransform.h"
+
+#include "constants.hpp"
+#include "utils/vec3.hpp"
 
 /** A class that stores a translation and rotation. It is used to convert
  *  between bullet data structures and the data structure for the graphics.

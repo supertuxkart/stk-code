@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "vec3.hpp"
+#include "utils/vec3.hpp"
 #include "constants.hpp"
 
 void Vec3::setHPR(const btMatrix3x3& m)

@@ -57,7 +57,9 @@ supertuxkart_SOURCES =     main.cpp  			\
 	material_manager.cpp            material_manager.hpp  	                \
 	grand_prix_manager.cpp	       grand_prix_manager.hpp	                \
         graphics/nitro.cpp             graphics/nitro.hpp                       \
+	graphics/particle_system.cpp   graphics/particle_system.hpp       	\
         graphics/skid_mark.cpp         graphics/skid_mark.hpp                   \
+	graphics.smoke.cpp	       graphics/.smoke.hpp		        \
 	items/attachment.cpp	       items/attachment.hpp	                \
 	items/attachment_manager.cpp   items/attachment_manager.hpp             \
 	items/powerup.cpp              items/powerup.hpp	                \
@@ -77,7 +79,6 @@ supertuxkart_SOURCES =     main.cpp  			\
 	karts/kart_properties_manager.cpp  karts/kart_properties_manager.hpp    \
 	karts/moveable.cpp 		       karts/moveable.hpp                   \
 	karts/player_kart.cpp		   karts/player_kart.hpp	            \
-	smoke.cpp		       smoke.hpp			        \
 	input.hpp 		              \
 	isect.cpp		       isect.hpp                	\
 	track.cpp		       track.hpp                	\
@@ -98,7 +99,6 @@ supertuxkart_SOURCES =     main.cpp  			\
 	moving_texture.hpp	   moving_texture.cpp		    \
 	callback_manager.cpp   callback_manager.hpp         \
 	shadow.cpp		       shadow.hpp	        	    \
-	particle_system.cpp	   particle_system.hpp       	\
 	main_loop.cpp	 	   main_loop.hpp        	    \
 	camera.cpp		       camera.hpp	        	    \
 	sdldrv.cpp		       sdldrv.hpp	        	    \
