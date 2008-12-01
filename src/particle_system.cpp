@@ -223,12 +223,12 @@ void ParticleSystem::update ( float t )
     // center to get the correct maximum distance, which is the radius).
     Vec3 center = 0.5*(xyz_min+xyz_max);
     bsphere.setCenter(center.toFloat());
-    float radius = xyz_max.getX() - xyz_min.getX();
-    radius  = std::max(radius, xyz_max.getY() - xyz_min.getY());
-    radius  = std::max(radius, xyz_max.getZ() - xyz_min.getZ());
-    if(radius<0) radius = 0;  // happens if no particles exist.
+    float diameter = xyz_max.getX() - xyz_min.getX();
+    diameter = std::max(diameter, xyz_max.getY() - xyz_min.getY());
+    diameter = std::max(diameter, xyz_max.getZ() - xyz_min.getZ());
+    if(diameter<0) diameter= 0;  // happens if no particles exist.
     // add the size of the actual quad to the radius on both ends
-    bsphere.setRadius((radius+2*m_size)*1.733f);   // 1.733 approx. sqrt(3)
+    bsphere.setRadius((diameter*0.5f+2*m_size)*1.733f);   // 1.733 approx. sqrt(3)
     bsphere_is_invalid = 0;
 }   // update
 
