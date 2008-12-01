@@ -168,7 +168,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 }   // SoundManager
 
 //----------------------------------------------------------------------------
-void SoundManager::positionListener(Vec3 position, Vec3 front)
+void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
     if(!user_config->doSFX() || !m_initialized) return;
 

@@ -26,8 +26,6 @@ libstatic_ssg_a_CXXFLAGS = @NOREGMOVE@
 AM_CPPFLAGS=-DSUPERTUXKART_DATADIR="\"$(datadir)/games/@PACKAGE@/\"" -I$(srcdir)/bullet/src/ -I$(srcdir)/enet/include/
 
 supertuxkart_SOURCES =     main.cpp  			\
-	vec3.cpp		       vec3.hpp			\
-	coord.hpp						\
 	actionmap.cpp		   actionmap.hpp		\
 	material.cpp		   material.hpp           	\
 	network/network_manager.cpp      network/network_manager.hpp 		\
@@ -52,9 +50,11 @@ supertuxkart_SOURCES =     main.cpp  			\
 	audio/sfx_manager.cpp	   	audio/sfx_manager.hpp      	        \
 	audio/sfx_openal.cpp	   	audio/sfx_openal.hpp		        \
 	audio/sound_manager.cpp	   	audio/sound_manager.hpp      	        \
+	utils/coord.hpp                                                         \
 	utils/random_generator.hpp	utils/random_generator.cpp	        \
-	utils/ssg_help.cpp          utils/ssg_help.hpp                          \
-	material_manager.cpp	    material_manager.hpp    	                \
+	utils/ssg_help.cpp              utils/ssg_help.hpp                      \
+	utils/vec3.cpp                  utils/vec3.hpp	                        \
+	material_manager.cpp            material_manager.hpp  	                \
 	grand_prix_manager.cpp	       grand_prix_manager.hpp	                \
         graphics/nitro.cpp             graphics/nitro.hpp                       \
         graphics/skid_mark.cpp         graphics/skid_mark.hpp                   \

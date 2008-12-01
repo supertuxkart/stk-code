@@ -30,8 +30,8 @@
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
 #include "user_pointer.hpp"
-#include "vec3.hpp"
 
+class Vec3;
 class Kart;
 
 class Physics : public btSequentialImpulseConstraintSolver

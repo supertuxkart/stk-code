@@ -24,7 +24,7 @@
 #include <vector>
 #define _WINSOCKAPI_
 #include <plib/sg.h>
-#include "vec3.hpp"
+#include "utils/vec3.hpp"
 
 namespace lisp
 {

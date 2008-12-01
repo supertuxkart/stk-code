@@ -23,8 +23,8 @@
 // num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
 #define _WINSOCKAPI_
 #include <plib/sg.h>
-#include "coord.hpp"
 #include "karts/kart.hpp"
+#include "utils/coord.hpp"
 
 class ssgTransform;
 class ssgEntity;

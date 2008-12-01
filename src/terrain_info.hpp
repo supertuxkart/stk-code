@@ -20,8 +20,8 @@
 #ifndef HEADER_TERRAIN_INFO_H
 #define HEADER_TERRAIN_INFO_H
 
-#include "vec3.hpp"
 #include "material.hpp"
+#include "utils/vec3.hpp"
 
 /** This class stores information about the triangle that's under an object, i.e.:
  *  the normal, a pointer to the material, and the height above th

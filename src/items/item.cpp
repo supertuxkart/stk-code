@@ -19,10 +19,10 @@
 
 #include "items/item.hpp"
 
-#include "vec3.hpp"
 #include "scene.hpp"
-#include "coord.hpp"
 #include "karts/kart.hpp"
+#include "utils/coord.hpp"
+#include "utils/vec3.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            ssgEntity* model, unsigned int item_id, bool rotate)

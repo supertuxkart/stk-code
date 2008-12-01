@@ -28,7 +28,8 @@
 #include "lisp/lisp.hpp"
 #include "audio/music.hpp"
 #include "audio/music_information.hpp"
-#include "vec3.hpp"
+
+class Vec3;
 
 class SoundManager
 {
@@ -48,7 +49,7 @@ public:
     SoundManager();
     virtual ~SoundManager();
 
-    void                    positionListener(Vec3 position, Vec3 front);
+    void                    positionListener(const Vec3 &position, const Vec3 &front);
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
     bool                    initialized() const {return m_initialized;                 }

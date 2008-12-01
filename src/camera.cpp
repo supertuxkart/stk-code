@@ -20,7 +20,6 @@
 
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
-#include "coord.hpp"
 #include "modes/world.hpp"
 #include "track.hpp"
 #include "camera.hpp"
@@ -29,6 +28,7 @@
 #include "race_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "karts/player_kart.hpp"
+#include "utils/coord.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)
 {

@@ -31,7 +31,6 @@
 
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 #include "loader.hpp"
-#include "coord.hpp"
 #include "items/item_manager.hpp"
 #include "file_manager.hpp"
 #include "user_config.hpp"
@@ -53,6 +52,7 @@
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "physics/physics.hpp"
+#include "utils/coord.hpp"
 #include "utils/ssg_help.hpp"
 #include "audio/sfx_manager.hpp"
 

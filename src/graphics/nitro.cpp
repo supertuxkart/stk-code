@@ -74,7 +74,7 @@ void Nitro::particle_create(int, Particle *p)
     p->m_time_to_live = 0.8f;
 
     Vec3 xyz       = m_kart->getXYZ();
-    const Vec3 vel = -m_kart->getVelocity()*0.2;
+    const Vec3 vel = -m_kart->getVelocity()*0.2f;
     sgCopyVec3(p->m_vel, vel.toFloat());
     sgCopyVec3(p->m_pos, xyz.toFloat());
     p->m_vel[0] += cos(DEGREE_TO_RAD(rand()% 10));

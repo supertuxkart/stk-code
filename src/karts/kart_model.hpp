@@ -26,8 +26,8 @@
 #include <plib/ssg.h>
 
 #include "no_copy.hpp"
-#include "vec3.hpp"
 #include "lisp/lisp.hpp"
+#include "utils/vec3.hpp"
 
 /** This class stores a 3D kart model. It takes especially care of attaching
  *  the wheels, which are loaded as separate objects. The wheels can turn

@@ -23,8 +23,8 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "user_config.hpp"
-#include "coord.hpp"
 #include "karts/player_kart.hpp"
+#include "utils/coord.hpp"
 
 Moveable::Moveable()
 {

@@ -23,10 +23,10 @@
 
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
-#include "vec3.hpp"
 #include "btBulletDynamicsCommon.h"
 #include "user_pointer.hpp"
 #include "physics/kart_motion_state.hpp"
+#include "utils/vec3.hpp"
 
 class Material;
 

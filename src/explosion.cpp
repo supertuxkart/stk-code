@@ -23,6 +23,7 @@
 #include "scene.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "utils/vec3.hpp"
 
 Explosion::Explosion(const Vec3& coord) : ssgTransform()
 {

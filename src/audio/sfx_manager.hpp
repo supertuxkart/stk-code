@@ -30,7 +30,7 @@
 #include <SDL/SDL_endian.h>
 
 #include "lisp/lisp.hpp"
-#include "vec3.hpp"
+#include "utils/vec3.hpp"
 
 class SFXBase;
 

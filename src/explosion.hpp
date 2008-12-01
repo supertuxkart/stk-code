@@ -21,8 +21,8 @@
 #define HEADER_EXPLOSION_H
 
 #include <plib/sg.h>
-#include "vec3.hpp"
 
+class Vec3;
 class SFXBase;
 
 class Explosion : public ssgTransform

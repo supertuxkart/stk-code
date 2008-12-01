@@ -20,7 +20,6 @@
 #include "items/plunger.hpp"
 
 #include "constants.hpp"
-#include "coord.hpp"
 #include "camera.hpp"
 #include "items/rubber_band.hpp"
 #include "karts/player_kart.hpp"

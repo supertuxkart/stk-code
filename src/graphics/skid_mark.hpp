@@ -17,13 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SKIDMARK_CXX
-#define HEADER_SKIDMARK_CXX
+#ifndef HEADER_SKID_MARK_HPP
+#define HEADER_SKID_MARK_HPP
 
 #include <vector>
 
 #include <plib/ssg.h>
-#include "coord.hpp"
+
+class Coord;
 
 class SkidMark
 {

@@ -32,10 +32,10 @@
 #include <string>
 #include <vector>
 #include "LinearMath/btTransform.h"
-#include "vec3.hpp"
 #include "material.hpp"
 #include "triangle_mesh.hpp"
 #include "audio/music_information.hpp"
+#include "utils/vec3.hpp"
 
 class Track
 {

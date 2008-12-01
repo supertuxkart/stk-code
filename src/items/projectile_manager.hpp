@@ -22,9 +22,9 @@
 
 #include <vector>
 #include <plib/ssg.h>
-#include "vec3.hpp"
 #include "items/powerup_manager.hpp"
 
+class Vec3;
 class Kart;
 class Explosion;
 class Flyable;

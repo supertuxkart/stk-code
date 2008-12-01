@@ -22,7 +22,7 @@
 #ifndef HEADER_CAMERA_H
 #define HEADER_CAMERA_H
 
-#include "vec3.hpp"
+#include "utils/vec3.hpp"
 
 class ssgContext;
 class Kart;

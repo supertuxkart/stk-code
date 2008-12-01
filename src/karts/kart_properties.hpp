@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 #include "plib/ssg.h"
-#include "vec3.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
 #include "audio/sfx_manager.hpp"
+#include "utils/vec3.hpp"
 
 class Material;
 class ssgEntity;

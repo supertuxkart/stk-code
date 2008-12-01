@@ -19,6 +19,7 @@
 
 #include "scene.hpp"
 #include "skid_mark.hpp"
+#include "utils/coord.hpp"
 
 float SkidMark::m_global_track_offset = 0.005f;
 

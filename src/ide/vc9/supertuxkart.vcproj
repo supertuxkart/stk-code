@@ -823,10 +823,6 @@
 				RelativePath="../../../src\user_config.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\vec3.cpp"
-				>
-			</File>
 			<Filter
 				Name="gui"
 				>
@@ -1042,6 +1038,10 @@
 					RelativePath="..\..\utils\ssg_help.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\utils\vec3.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="audio"
@@ -1215,10 +1215,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\constants.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\coord.hpp"
 				>
 			</File>
 			<File
@@ -1653,11 +1649,19 @@
 				Name="utils"
 				>
 				<File
+					RelativePath="..\..\utils\coord.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\random_generator.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\utils\ssg_help.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\vec3.hpp"
 					>
 				</File>
 			</Filter>

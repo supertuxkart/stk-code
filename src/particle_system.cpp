@@ -23,8 +23,8 @@
 #include "particle_system.hpp"
 
 #include <algorithm>
-#include "vec3.hpp"
 #include "scene.hpp"
+#include "utils/vec3.hpp"
 
 ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
         : ssgVtxTable(GL_QUADS,

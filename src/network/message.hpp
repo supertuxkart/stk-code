@@ -27,7 +27,7 @@
 
 #include "enet/enet.h"
 
-#include "vec3.hpp"
+#include "utils/vec3.hpp"
 
 // sjl: when a message is received, need to work out what kind of message it 
 // is and therefore what to do with it
