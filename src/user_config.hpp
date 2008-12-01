@@ -163,7 +163,7 @@ public:
     bool        m_bullet_debug;
     bool        m_fullscreen;
     bool        m_no_start_screen;
-    bool        m_smoke;
+    bool        m_graphical_effects;
     bool        m_display_fps;
     int         m_profile;         // Positive number: time in seconds, neg: # laps. (used to profile AI)
     bool        m_print_kart_sizes; // print all kart sizes

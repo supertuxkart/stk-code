@@ -1,8 +1,7 @@
-
-//  $Id: dust_cloud.cpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: nitro.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2008  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,54 +17,55 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "smoke.hpp"
+#include "graphics/nitro.hpp"
 #include "constants.hpp"
 #include "material_manager.hpp"
 #include "karts/kart.hpp"
 
-Smoke::Smoke(Kart* kart)
-        : ParticleSystem(200, 0.0f, true, 0.75f),
+Nitro::Nitro(Kart* kart)
+        : ParticleSystem(200, 0.0f, true, 0.5f),
         m_kart(kart)
 {
 #ifdef DEBUG
-    setName("smoke");
+    setName("nitro");
 #endif
     bsphere.setCenter(0, 0, 0);
     bsphere.setRadius(1000.0f);
     dirtyBSphere();
 
-    m_smokepuff = new ssgSimpleState ();
-    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
-    m_smokepuff -> setTranslucent    () ;
-    m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
-    m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
-    m_smokepuff -> disable           ( GL_CULL_FACE ) ;
-    m_smokepuff -> enable            ( GL_BLEND ) ;
-    m_smokepuff -> enable            ( GL_LIGHTING ) ;
-    m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
-    m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setShininess      (  0 ) ;
-    m_smokepuff->ref();
+    m_nitro_fire = new ssgSimpleState ();
+    m_nitro_fire->setTexture(material_manager->getMaterial("flames.rgb")->getState()->getTexture());
+    m_nitro_fire -> setTranslucent    () ;
+    m_nitro_fire -> enable            ( GL_TEXTURE_2D ) ;
+    m_nitro_fire -> setShadeModel     ( GL_SMOOTH ) ;
+    m_nitro_fire -> disable           ( GL_CULL_FACE ) ;
+    m_nitro_fire -> enable            ( GL_BLEND ) ;
+    m_nitro_fire -> enable            ( GL_LIGHTING ) ;
+    m_nitro_fire -> setColourMaterial ( GL_EMISSION ) ;
+    m_nitro_fire -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
+    m_nitro_fire -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
+    m_nitro_fire -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
+    m_nitro_fire -> setShininess      (  0 ) ;
+    m_nitro_fire->ref();
 
-    setState(m_smokepuff);
+    setState(m_nitro_fire);
 
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
-Smoke::~Smoke()
+Nitro::~Nitro()
 {
-    ssgDeRefDelete(m_smokepuff);
-}   // ~Smoke
+    ssgDeRefDelete(m_nitro_fire);
+}   // ~Nitro
+
 //-----------------------------------------------------------------------------
-void Smoke::update(float t)
+void Nitro::update(float t)
 {
     ParticleSystem::update(t);
 }   // update
 
 //-----------------------------------------------------------------------------
-void Smoke::particle_create(int, Particle *p)
+void Nitro::particle_create(int, Particle *p)
 {
     sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
     sgSetVec3(p->m_vel, 0, 0, 0 );
@@ -73,24 +73,21 @@ void Smoke::particle_create(int, Particle *p)
     p->m_size         = 0.5f;
     p->m_time_to_live = 0.8f;
 
-    // The origin of the smoke depends on the turn direction: either rear
-    // left or rear right wheel - use the outer one.
-    int wheel_number = m_kart->getSteerPercent()>0 ? 2 : 3;
-    Vec3 xyz=m_kart->getVehicle()->getWheelInfo(wheel_number).m_raycastInfo.m_contactPointWS;
-
-    sgCopyVec3 (p->m_pos, xyz.toFloat());
-    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[2] += sin(DEGREE_TO_RAD(rand()%100));
-
-    bsphere.setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
+    Vec3 xyz       = m_kart->getXYZ();
+    const Vec3 vel = -m_kart->getVelocity()*0.2;
+    sgCopyVec3(p->m_vel, vel.toFloat());
+    sgCopyVec3(p->m_pos, xyz.toFloat());
+    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()% 10));
+    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()% 80));
+    p->m_vel[2] = 0;
 }   // particle_create
 
 //-----------------------------------------------------------------------------
-void Smoke::particle_update(float delta, int,
+void Nitro::particle_update(float delta, int,
                             Particle * particle)
 {
     particle->m_size    -= delta*.2f;
     particle->m_col[3]  -= delta * 2.0f;
 }  // particle_update
+
 

@@ -89,37 +89,37 @@ void UserConfig::setFilename()
 void UserConfig::setDefaults()
 {
     setFilename();
-    m_warning          = "";
-    m_keyboard_debug   = false;
-    m_track_debug      = 0;
-    m_bullet_debug     = false;
-    m_fullscreen       = false;
-    m_no_start_screen  = false;
-    m_sfx              = UC_ENABLE;
-    m_music            = UC_ENABLE;
-    m_smoke            = false;
-    m_display_fps      = false;
-    m_item_style       = "items";
-    m_background_music = "";
-    m_profile          = 0;
-    m_print_kart_sizes = false;
-    m_max_fps          = 120;
-    m_sfx_volume       = 1.0f;
-    m_use_kph          = false;
-    m_width            = 800;
-    m_height           = 600;
-    m_prev_width       = m_width;
-    m_prev_height      = m_height;
-    m_prev_windowed    = false;
-    m_crashed          = false;
+    m_warning           = "";
+    m_keyboard_debug    = false;
+    m_track_debug       = 0;
+    m_bullet_debug      = false;
+    m_fullscreen        = false;
+    m_no_start_screen   = false;
+    m_sfx               = UC_ENABLE;
+    m_music             = UC_ENABLE;
+    m_graphical_effects = true;
+    m_display_fps       = false;
+    m_item_style        = "items";
+    m_background_music  = "";
+    m_profile           = 0;
+    m_print_kart_sizes  = false;
+    m_max_fps           = 120;
+    m_sfx_volume        = 1.0f;
+    m_use_kph           = false;
+    m_width             = 800;
+    m_height            = 600;
+    m_prev_width        = m_width;
+    m_prev_height       = m_height;
+    m_prev_windowed     = false;
+    m_crashed           = false;
     m_blacklist_res.clear();
-    m_karts            = 4;
-    m_log_errors       = false;
-    m_kart_group       = "standard";
-    m_track_group      = "standard";
-    m_last_track       = "jungle";
-    m_server_address   = "localhost";
-    m_server_port      = 2305;
+    m_karts             = 4;
+    m_log_errors        = false;
+    m_kart_group        = "standard";
+    m_track_group       = "standard";
+    m_last_track        = "jungle";
+    m_server_address    = "localhost";
+    m_server_port       = 2305;
 
     if(getenv("USERNAME")!=NULL)        // for windows
         m_username=getenv("USERNAME");
@@ -417,7 +417,7 @@ void UserConfig::loadConfig(const std::string& filename)
         bool doMusic=false;                              // avoid warning
         lisp->get("music",            doMusic);
         m_music = doMusic ? UC_ENABLE : UC_DISABLE;
-        lisp->get("smoke",            m_smoke);
+        lisp->get("graphical-effects",m_graphical_effects);
         lisp->get("displayFPS",       m_display_fps);
         lisp->get("itemStyle",        m_item_style);
         lisp->get("background-music", m_background_music);
@@ -657,7 +657,7 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->writeComment("the following options can be set to #t or #f:");
         writer->write("sfx\t",   !(m_sfx==UC_DISABLE));
         writer->write("music\t", !(m_music==UC_DISABLE));
-        writer->write("smoke\t", m_smoke);
+        writer->write("graphical-effects\t", m_graphical_effects);
         writer->writeComment("Display frame per seconds");
         writer->write("displayFPS\t", m_display_fps);
         writer->writeComment("Name of the .items file to use.");

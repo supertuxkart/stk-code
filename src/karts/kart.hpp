@@ -36,6 +36,7 @@
 class SkidMark;
 class Item;
 class Smoke;
+class Nitro;
 class SFXBase;
 
 class Kart : public TerrainInfo, public Moveable
@@ -72,8 +73,11 @@ private:
     /** The amount of energy collected bu hitting coins. */
     float               m_collected_energy;
 
-    // don't delete the following 2 vars (they're kids in the hirarchy)
+    /** Smoke from skidding. */
     Smoke              *m_smoke_system;
+
+    /** Fire when using a nitro. */
+    Nitro              *m_nitro;
 
     float               m_wheel_rotation;
     /** For each wheel it stores the suspension length after the karts are at 

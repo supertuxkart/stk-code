@@ -55,7 +55,9 @@ supertuxkart_SOURCES =     main.cpp  			\
 	utils/random_generator.hpp	utils/random_generator.cpp	        \
 	utils/ssg_help.cpp          utils/ssg_help.hpp                          \
 	material_manager.cpp	    material_manager.hpp    	                \
-	grand_prix_manager.cpp	    grand_prix_manager.hpp	                \
+	grand_prix_manager.cpp	       grand_prix_manager.hpp	                \
+        graphics/nitro.cpp             graphics/nitro.hpp                       \
+        graphics/skid_mark.cpp         graphics/skid_mark.hpp                   \
 	items/attachment.cpp	       items/attachment.hpp	                \
 	items/attachment_manager.cpp   items/attachment_manager.hpp             \
 	items/powerup.cpp              items/powerup.hpp	                \

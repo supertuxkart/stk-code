@@ -780,10 +780,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\skid_mark.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\smoke.cpp"
 				>
 			</File>
@@ -1187,6 +1183,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="graphics"
+				>
+				<File
+					RelativePath="..\..\graphics\nitro.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\skid_mark.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1339,10 +1347,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\shadow.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\skid_mark.hpp"
 				>
 			</File>
 			<File
@@ -1814,6 +1818,18 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\player_kart.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="graphics"
+				>
+				<File
+					RelativePath="..\..\graphics\nitro.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\skid_mark.hpp"
 					>
 				</File>
 			</Filter>

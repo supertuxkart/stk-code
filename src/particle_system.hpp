@@ -18,6 +18,8 @@
      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
      For further information visit http://plib.sourceforge.net                  */
+#ifndef PARTICLE_SYSTEM_HPP
+#define PARTICLE_SYSTEM_HPP
 
 #include <plib/ssg.h>
 
@@ -87,7 +89,7 @@ public:
 
     virtual void particle_create( int index, Particle *p ) = 0;
     virtual void particle_update( float deltaTime, int index, Particle *p ) = 0;
-    virtual void particle_delete( int index, Particle* p ) = 0;
+    virtual void particle_delete( int index, Particle* p ) {};
 
     void init(int initial_num);
     void recalcBSphere();
@@ -103,5 +105,5 @@ public:
     int getNumParticles       () const { return m_num_particles ; }
     int getNumActiveParticles () const { return m_num_active    ; }
 } ;
-
+#endif
 /* EOF */

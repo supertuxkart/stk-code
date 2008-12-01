@@ -34,7 +34,6 @@
 #include "coord.hpp"
 #include "items/item_manager.hpp"
 #include "file_manager.hpp"
-#include "skid_mark.hpp"
 #include "user_config.hpp"
 #include "constants.hpp"
 #include "shadow.hpp"
@@ -45,6 +44,8 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "graphics/nitro.hpp"
+#include "graphics/skid_mark.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "karts/kart_model.hpp"
@@ -77,6 +78,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_finish_time          = 0.0f;
     m_wheelie_angle        = 0.0f;
     m_smoke_system         = NULL;
+    m_nitro                = NULL;
     m_skidmark_left        = NULL;
     m_skidmark_right       = NULL;
     
@@ -242,6 +244,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
 
     if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
+    if(m_nitro)        ssgDeRefDelete(m_nitro);
 
     ssgDeRefDelete(m_shadow);
 
@@ -527,11 +530,11 @@ void Kart::update(float dt)
     m_attachment.update(dt);
 
     //smoke drawing control point
-    if ( user_config->m_smoke )
+    if ( user_config->m_graphical_effects )
     {
-        if (m_smoke_system != NULL)
-            m_smoke_system->update (dt);
-    }  // user_config->smoke
+        m_smoke_system->update(dt);
+        m_nitro->update(dt);
+    }  // user_config->m_graphical_effects
     updatePhysics(dt);
 
     //kart_info.m_last_track_coords = kart_info.m_curr_track_coords;
@@ -898,11 +901,7 @@ void Kart::processSkidMarks()
     const float threshold = 0.3f;
     //FIXME    const float ANGLE     = 43.0f;
     //FIXME    const float LENGTH    = 0.57f;
-    bool skid_front = m_vehicle->getWheelInfo(0).m_skidInfo < threshold ||
-                      m_vehicle->getWheelInfo(1).m_skidInfo < threshold;
-    bool skid_rear  = m_vehicle->getWheelInfo(2).m_skidInfo < threshold ||
-                      m_vehicle->getWheelInfo(3).m_skidInfo < threshold;
-    if(skid_rear || skid_front)
+    if(m_controls.jump)
     {
         if(isOnGround())
         {
@@ -947,7 +946,9 @@ void Kart::loadData()
 
     m_smoke_system = new Smoke(this);
     m_smoke_system->ref();
-    scene->add(m_smoke_system);
+
+    m_nitro = new Nitro(this);
+    m_nitro->ref();
 
     m_skidmark_left  = new SkidMark(/* angle sign */ -1);
     m_skidmark_right = new SkidMark(/* angle sign */  1);
@@ -999,6 +1000,9 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 
     if(m_smoke_system)
         m_smoke_system->setCreationRate((m_skidding-1)*100.0f);
+    if(m_nitro)
+        m_nitro->setCreationRate(m_controls.wheelie && m_collected_energy>0
+                                 ? getSpeed() : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*0.05f*3.1415926f * speed_ratio * m_skidding*m_skidding;

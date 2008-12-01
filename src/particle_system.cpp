@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include "vec3.hpp"
+#include "scene.hpp"
 
 ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
         : ssgVtxTable(GL_QUADS,
@@ -67,6 +68,7 @@ ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
   }
 
   m_num_active = 0 ;
+  scene->add(this);
 }   // ParticleSystem
 
 //-----------------------------------------------------------------------------
