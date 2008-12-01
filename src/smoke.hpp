@@ -29,11 +29,13 @@ class Kart;
 class Smoke : public ParticleSystem
 {
 private:
-    Kart* m_kart;
-
+    /** The kart to which this smoke belongs. */
+    Kart           *m_kart;
+    /** The texture to use. */
+    ssgSimpleState *m_smokepuff;
 public:
-                 Smoke(Kart* kart, int num, float _create_rate,
-                                 int _turn_to_face, float sz, float bsphere_size);
+                 Smoke          (Kart* kart);
+                ~Smoke          ();
     virtual void update         (float t                                        );
     virtual void particle_create(int index, Particle* p                         );
     virtual void particle_update(float deltaTime, int index, Particle *p        );

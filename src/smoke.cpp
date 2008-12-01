@@ -20,81 +20,83 @@
 
 #include "smoke.hpp"
 #include "constants.hpp"
+#include "material_manager.hpp"
 #include "karts/kart.hpp"
 
-Smoke::Smoke(Kart* kart_,
-                                       int num, float _create_rate, int _ttf,
-                                       float sz, float bsphere_size)
-        : ParticleSystem (num, _create_rate, _ttf, sz, bsphere_size),
-        m_kart(kart_)
+Smoke::Smoke(Kart* kart)
+        : ParticleSystem(200, 0.0f, true, 0.75f),
+        m_kart(kart)
 {
-    getBSphere () -> setCenter ( 0, 0, 0 ) ;
-    getBSphere () -> setRadius ( 1000.0f ) ;
+#ifdef DEBUG
+    setName("smoke");
+#endif
+    bsphere.setCenter(0, 0, 0);
+    bsphere.setRadius(1000.0f);
     dirtyBSphere();
+
+    m_smokepuff = new ssgSimpleState ();
+    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
+    m_smokepuff -> setTranslucent    () ;
+    m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
+    m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
+    m_smokepuff -> disable           ( GL_CULL_FACE ) ;
+    m_smokepuff -> enable            ( GL_BLEND ) ;
+    m_smokepuff -> enable            ( GL_LIGHTING ) ;
+    m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
+    m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
+    m_smokepuff -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
+    m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
+    m_smokepuff -> setShininess      (  0 ) ;
+    m_smokepuff->ref();
+
+    setState(m_smokepuff);
+
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
-void Smoke::update ( float t )
+Smoke::~Smoke()
 {
-#if 0
-    std::cout << "BSphere: r:" << getBSphere()->radius
-    << " ("  << getBSphere()->center[0]
-    << ", "  << getBSphere()->center[1]
-    << ", "  << getBSphere()->center[2]
-    << ")"
-    << std::endl;
-#endif
-    getBSphere () -> setRadius ( 1000.0f ) ;
+    ssgDeRefDelete(m_smokepuff);
+}   // ~Smoke
+//-----------------------------------------------------------------------------
+void Smoke::update(float t)
+{
+    bsphere.setRadius(1000.0f);
     ParticleSystem::update(t);
 }   // update
 
 //-----------------------------------------------------------------------------
 void Smoke::particle_create(int, Particle *p)
 {
-    sgSetVec4 ( p -> m_col, 1, 1, 1, 1 ) ; /* initially white */
-    sgSetVec3 ( p -> m_pos, 0, 0, 0 ) ;    /* start off on the ground */
-    sgSetVec3 ( p -> m_vel, 0, 0, 0 ) ;
-    sgSetVec3 ( p -> m_acc, 0, 0, 2.0f ) ; /* Gravity */
-    p -> m_size = .5f;
-    p -> m_time_to_live = 0.5 ;            /* Droplets evaporate after 5 seconds */
+    sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
+    sgSetVec3(p->m_vel, 0, 0, 0 );
+    sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
+    p->m_size         = 0.5f;
+    p->m_time_to_live = 0.8f;
 
-    const Vec3& hpr = m_kart->getHPR();
-    const Vec3& xyz = m_kart->getXYZ();
-    const btVector3 VEL = m_kart->getVelocity();
-
-    const float X_DIRECTION = cos (hpr.getHeading() - M_PI*0.5f); // Point at the rear
-    const float Y_DIRECTION = sin (hpr.getHeading() - M_PI*0.5f); // Point at the rear
+    // The origin of the smoke depends on the turn direction: either rear
+    // left or rear right wheel - use the outer one.
+    int wheel_number = m_kart->getSteerPercent()>0 ? 2 : 3;
+    Vec3 xyz=m_kart->getVehicle()->getWheelInfo(wheel_number).m_raycastInfo.m_contactPointWS;
 
     sgCopyVec3 (p->m_pos, xyz.toFloat());
+    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()%180));
+    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()%180));
+    p->m_vel[2] += sin(DEGREE_TO_RAD(rand()%100));
 
-    p->m_pos[0] += X_DIRECTION * 0.7f;
-    p->m_pos[1] += Y_DIRECTION * 0.7f;
-
-    const float ABS_VEL = sqrt((VEL.getX() * VEL.getX()) + (VEL.getY() * VEL.getY()));
-
-    p->m_vel[0] = X_DIRECTION * -ABS_VEL/2;
-    p->m_vel[1] = Y_DIRECTION * -ABS_VEL/2;
-
-    p->m_vel[0] += sgCos ((float)(rand()%180));
-    p->m_vel[1] += sgSin ((float)(rand()%180));
-    p->m_vel[2] += sgSin ((float)(rand()%100));
-
-    getBSphere()->setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
+    bsphere.setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
 }   // particle_create
 
 //-----------------------------------------------------------------------------
-void Smoke::particle_update (float delta, int,
-        Particle * particle)
+void Smoke::particle_update(float delta, int,
+                            Particle * particle)
 {
-    particle->m_size    += delta*2.0f;
+    particle->m_size    -= delta*.2f;
     particle->m_col[3]  -= delta * 2.0f;
-
-    particle->m_pos[0] += particle->m_vel[0] * delta;
-    particle->m_pos[1] += particle->m_vel[1] * delta;
-    particle->m_pos[2] += particle->m_vel[2] * delta;
 }  // particle_update
 
 //-----------------------------------------------------------------------------
 void Smoke::particle_delete (int , Particle* )
-{}   // particle_delete
+{
+}   // particle_delete
 

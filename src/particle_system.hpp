@@ -21,6 +21,10 @@
 
 #include <plib/ssg.h>
 
+/** This is basically the ssgaParticle, but this implementation supports
+ *  methods to be used to create, update and delete the objects instead
+ *  of function pointer as the original plib.
+ */
 class Particle
 {
 public:
@@ -56,7 +60,10 @@ public:
 } ;
 
 
-class ParticleSystem ;
+/** This is basically the ssgaParticleSystem, but this implementation supports
+ *  methods to be used to create, update and delete the objects instead
+ *  of function pointer as the original plib.
+ */
 
 class ParticleSystem : public ssgVtxTable
 {
@@ -74,7 +81,7 @@ class ParticleSystem : public ssgVtxTable
 public:
 
     ParticleSystem ( int num, float _create_rate, int _turn_to_face,
-                     float sz, float bsphere_size);
+                     float sz);
     virtual ~ParticleSystem () ;
     virtual void update ( float t ) ;
 

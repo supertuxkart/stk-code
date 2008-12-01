@@ -71,10 +71,9 @@ protected:
 private:
     /** The amount of energy collected bu hitting coins. */
     float               m_collected_energy;
-    ssgSimpleState*     m_smokepuff;
+
     // don't delete the following 2 vars (they're kids in the hirarchy)
     Smoke              *m_smoke_system;
-    ssgTransform*       m_exhaust_pipe;
 
     float               m_wheel_rotation;
     /** For each wheel it stores the suspension length after the karts are at 

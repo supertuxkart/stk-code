@@ -70,16 +70,13 @@ Kart::Kart (const std::string& kart_name, int position,
 #endif
 {
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
-   //m_grid_position        = position;
     m_initial_position     = position;
     m_collected_energy     = 0;
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_wheelie_angle        = 0.0f;
-    m_smokepuff            = NULL;
     m_smoke_system         = NULL;
-    m_exhaust_pipe         = NULL;
     m_skidmark_left        = NULL;
     m_skidmark_right       = NULL;
     
@@ -244,8 +241,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
 
-    if(m_smokepuff) delete m_smokepuff;
-    if(m_smoke_system != NULL) delete m_smoke_system;
+    if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
 
     ssgDeRefDelete(m_shadow);
 
@@ -930,23 +926,11 @@ void Kart::processSkidMarks()
 }   // processSkidMarks
 
 //-----------------------------------------------------------------------------
+#include <scene.hpp>
 void Kart::loadData()
 {
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
-    m_smokepuff = new ssgSimpleState ();
-    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
-    m_smokepuff -> setTranslucent    () ;
-    m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
-    m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
-    m_smokepuff -> enable            ( GL_CULL_FACE ) ;
-    m_smokepuff -> enable            ( GL_BLEND ) ;
-    m_smokepuff -> enable            ( GL_LIGHTING ) ;
-    m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
-    m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setShininess      (  0 ) ;
 
     ssgEntity *obj = m_kart_properties->getKartModel()->getRoot();
     createPhysics();
@@ -960,16 +944,11 @@ void Kart::loadData()
     getModelTransform() -> addKid ( lod ) ;
 
     // Attach Particle System
-    //JH  sgCoord pipe_pos = {{0, 0, .3}, {0, 0, 0}} ;
-    m_smoke_system = new Smoke(this, 50, 100.0f, true, 0.35f, 1000);
-    m_smoke_system -> init(5);
-    //JH      m_smoke_system -> setState (getMaterial ("smoke.png")-> getState() );
-    //m_smoke_system -> setState ( m_smokepuff ) ;
-    //      m_exhaust_pipe = new ssgTransform (&pipe_pos);
-    //      m_exhaust_pipe -> addKid (m_smoke_system) ;
-    //      comp_model-> addKid (m_exhaust_pipe) ;
 
-    // 
+    m_smoke_system = new Smoke(this);
+    m_smoke_system->ref();
+    scene->add(m_smoke_system);
+
     m_skidmark_left  = new SkidMark(/* angle sign */ -1);
     m_skidmark_right = new SkidMark(/* angle sign */  1);
 
@@ -1018,6 +997,8 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     center_shift.setZ(X);
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
 
+    if(m_smoke_system)
+        m_smoke_system->setCreationRate((m_skidding-1)*100.0f);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*0.05f*3.1415926f * speed_ratio * m_skidding*m_skidding;

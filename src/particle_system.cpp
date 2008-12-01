@@ -22,64 +22,71 @@
 
 #include "particle_system.hpp"
 
-ParticleSystem::ParticleSystem ( int num, float _create_rate, int _ttf,
-                                 float sz, float bsphere_size)
-        : ssgVtxTable ( GL_QUADS,
-            new ssgVertexArray   ( num * 4 /*, new sgVec3 [ num * 4 ]*/ ),
-            new ssgNormalArray   ( num * 4 /*, new sgVec3 [ num * 4 ]*/ ),
-            new ssgTexCoordArray ( num * 4 /*, new sgVec2 [ num * 4 ]*/ ),
-            new ssgColourArray   ( num * 4 /*, new sgVec4 [ num * 4 ]*/ )
-            )
+#include <algorithm>
+#include "vec3.hpp"
+
+ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
+        : ssgVtxTable(GL_QUADS,
+                      new ssgVertexArray  (num*4, new sgVec3[num*4] ),
+                      new ssgNormalArray  (num*4, new sgVec3[num*4] ),
+                      new ssgTexCoordArray(num*4, new sgVec2[num*4] ),
+                      new ssgColourArray  (num*4, new sgVec4[num*4] )
+                     )
 {
-    m_turn_to_face = _ttf ;
+#ifdef DEBUG
+    setName("particle-system");
+#endif
+    m_turn_to_face = ttf;
     m_create_error = 0 ;
-    m_create_rate = _create_rate ;
+    m_create_rate  = create_rate;
+    m_size         = sz;
 
-    m_size = sz ;
-
-    bsphere . setRadius ( bsphere_size ) ;
-    bsphere . setCenter ( 0, 0, 0 ) ;
+    bsphere.setRadius(100);  // a better value is computed in update
+    bsphere.setCenter(0, 0, 0);
 
     m_num_particles = num ;
     m_num_verts     = num * 4 ;
 
-    m_particles = new Particle [ num ] ;
+    m_particles = new Particle[num];
 
     int i ;
 
     for ( i = 0 ; i < m_num_verts ; i++ )
     {
-        sgSetVec3  ( getNormal ( i ), 0, -1, 0 ) ;
-        sgSetVec4  ( getColour ( i ), 1, 1, 1, 1 ) ;
-        sgZeroVec3 ( getVertex ( i ) ) ;
-    }
+        sgSetVec3 (getNormal(i), 0, -1, 0   );
+        sgSetVec4 (getColour(i), 1, 1, 1, 1 );
+        sgZeroVec3(getVertex(i)             );
+  }
 
-    for ( i = 0 ; i < m_num_particles ; i++ )
-    {
-        sgSetVec2 ( getTexCoord ( i*4+0 ), 0, 0 ) ;
-        sgSetVec2 ( getTexCoord ( i*4+1 ), 1, 0 ) ;
-        sgSetVec2 ( getTexCoord ( i*4+2 ), 1, 1 ) ;
-        sgSetVec2 ( getTexCoord ( i*4+3 ), 0, 1 ) ;
-    }
+  for ( i = 0 ; i < m_num_particles ; i++ )
+  {
+    sgSetVec2(getTexCoord(i*4+0), 0, 0 );
+    sgSetVec2(getTexCoord(i*4+1), 1, 0 );
+    sgSetVec2(getTexCoord(i*4+2), 1, 1 );
+    sgSetVec2(getTexCoord(i*4+3), 0, 1 );
+  }
 
-    m_num_active = 0 ;
-}
+  m_num_active = 0 ;
+}   // ParticleSystem
 
 //-----------------------------------------------------------------------------
-void
-ParticleSystem::init(int initial_num)
+void ParticleSystem::init(int initial_num)
 {
     for ( int i = 0 ; i < initial_num ; i++ )
         particle_create(i, & m_particles [ i ] ) ;
-}
+}   // init
 
 //-----------------------------------------------------------------------------
-void
-ParticleSystem::recalcBSphere()
+/** Update the bounding sphere for this particle system. This function is only 
+ *  called during setup, from then on the bounding sphere is always updated
+ *  during update(), and so the correct value is always set. So no actual
+ *  computation is done here.
+ */
+void ParticleSystem::recalcBSphere()
 {
-    bsphere . setRadius ( 1000.0f ) ;
-    bsphere . setCenter ( 0, 0, 0 ) ;
-}
+    bsphere.setRadius( 1000.0f );
+    bsphere.setCenter( 0, 0, 0 );
+}   // recalcBSphere
 
 //-----------------------------------------------------------------------------
 void ParticleSystem::draw_geometry ()
@@ -144,13 +151,12 @@ void ParticleSystem::draw_geometry ()
     {
         glDisable   ( GL_CULL_FACE ) ;
         glDepthMask ( 0 ) ;
-
         ssgVtxTable::draw_geometry () ;
 
         glDepthMask ( 1 ) ;
         glEnable ( GL_CULL_FACE ) ;
     }
-}
+}   // draw_geometry
 
 //-----------------------------------------------------------------------------
 ParticleSystem::~ParticleSystem ()
@@ -159,7 +165,7 @@ ParticleSystem::~ParticleSystem ()
     // the functions are virtual (illegal in destructor)
 
     delete[] m_particles ;
-}
+}   // ~ParticleSystem
 
 //-----------------------------------------------------------------------------
 void ParticleSystem::update ( float t )
@@ -178,8 +184,10 @@ void ParticleSystem::update ( float t )
             particle_update( t, i, & m_particles [ i ] ) ;
         }
 
+    Vec3 xyz_min(10000), xyz_max(-10000);
     /* Check for death of particles */
     for ( i = 0 ; i < m_num_particles ; i++ )
+    {
         if ( m_particles [ i ] . m_time_to_live <= 0.0 )
         {
             particle_delete ( i, & m_particles [ i ] ) ;
@@ -190,13 +198,39 @@ void ParticleSystem::update ( float t )
             {
                 particle_create( i, & m_particles [ i ] ) ;
                 m_create_error -= 1.0f ;
+                Vec3 p(m_particles[i].m_pos);
+                xyz_min.min(p);
+                xyz_max.max(p);
             }
         }
-        else
+        else   // m_time_to_live >0
         {
             m_num_active++ ;
+            Vec3 p(m_particles[i].m_pos);
+            xyz_min.min(p);
+            xyz_max.max(p);
         }
-}
+    }   // for i
+
+    // Update the bounding sphere
+    // ==========================
+    // Determine a bounding sphere by taking the medium of min and max as the
+    // center. Then use the longest distance along one axis(!) to get a maxium
+    // boundary box - the radius of a boundary sphere can then be estimated to
+    // be less then sqrt(x*x+y*y+z*z) = sqrt(3*max(x,y,z)^2) = max(xyz)*sqrt(3)
+    // (This avoids more expensive computations for the distance of each 
+    // particle: a 2nd loop to determine the distance of each particle to the
+    // center to get the correct maximum distance, which is the radius).
+    Vec3 center = 0.5*(xyz_min+xyz_max);
+    bsphere.setCenter(center.toFloat());
+    float radius = xyz_max.getX() - xyz_min.getX();
+    radius  = std::max(radius, xyz_max.getY() - xyz_min.getY());
+    radius  = std::max(radius, xyz_max.getZ() - xyz_min.getZ());
+    if(radius<0) radius = 0;  // happens if no particles exist.
+    // add the size of the actual quad to the radius on both ends
+    bsphere.setRadius((radius+2*m_size)*1.733f);   // 1.733 approx. sqrt(3)
+    bsphere_is_invalid = 0;
+}   // update
 
 /* EOF */
 
