@@ -61,9 +61,9 @@ public:
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
-    float          length2_2d()                    {return m_x*m_x + m_y*m_y;}
+    float          length2_2d() const              {return m_x*m_x + m_y*m_y;}
     /** Returns the length of the vector. */
-    float          length_2d()                     {return sqrt(m_x*m_x + m_y*m_y);}
+    float          length_2d()  const              {return sqrt(m_x*m_x + m_y*m_y);}
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */
     void           max(const Vec3& a)              {if(a.getX()>m_x) m_x=a.getX();
