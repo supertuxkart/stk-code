@@ -34,7 +34,7 @@ Nitro::Nitro(Kart* kart)
     dirtyBSphere();
 
     m_nitro_fire = new ssgSimpleState ();
-    m_nitro_fire->setTexture(material_manager->getMaterial("flames.rgb")->getState()->getTexture());
+    m_nitro_fire->setTexture(material_manager->getMaterial("fireparticle.rgb")->getState()->getTexture());
     m_nitro_fire -> setTranslucent    () ;
     m_nitro_fire -> enable            ( GL_TEXTURE_2D ) ;
     m_nitro_fire -> setShadeModel     ( GL_SMOOTH ) ;
