@@ -97,9 +97,6 @@ RaceGUI::RaceGUI()
     m_pos_string[9] = "9th";
     m_pos_string[10] = "10th";
 
-    //FIXME: Temporary, we need a better icon here
-    m_steering_wheel_icon = material_manager->getMaterial("wheel.rgb");
-    m_steering_wheel_icon->getState()->disable(GL_CULL_FACE);
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
     m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");

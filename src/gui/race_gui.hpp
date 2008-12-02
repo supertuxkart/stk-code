@@ -96,14 +96,13 @@ public:
                     int red=255, int green=0, int blue=255);
 
 private:
-    ulClock     m_fps_timer;
-    int         m_fps_counter;
-    char        m_fps_string[10];
-    const char* m_pos_string [11];
-    Material*   m_steering_wheel_icon;
-    Material*   m_speed_back_icon;
-    Material* m_speed_fore_icon;
-    typedef   std::vector<TimedMessage> AllMessageType;
+    ulClock        m_fps_timer;
+    int            m_fps_counter;
+    char           m_fps_string[10];
+    const char    *m_pos_string [11];
+    Material      *m_speed_back_icon;
+    Material      *m_speed_fore_icon;
+    typedef        std::vector<TimedMessage> AllMessageType;
     AllMessageType m_messages;
 
     /* Display informat on screen */
