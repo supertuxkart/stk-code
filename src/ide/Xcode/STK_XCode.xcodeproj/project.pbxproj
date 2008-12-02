@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9506014A0EE5FD82005FFC63 /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950601490EE5FD82005FFC63 /* skid_marks.cpp */; };
 		95090A490EB7EA960048841A /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95090A450EB7EA960048841A /* item.cpp */; };
 		95090A4A0EB7EA960048841A /* item.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95090A460EB7EA960048841A /* item.hpp */; };
 		95090A4B0EB7EA960048841A /* item_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95090A470EB7EA960048841A /* item_manager.hpp */; };
@@ -35,7 +36,6 @@
 		957F71270ECE6BBA007C99DE /* plunger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 957F71250ECE6BB9007C99DE /* plunger.cpp */; };
 		957F71280ECE6BBA007C99DE /* plunger.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 957F71260ECE6BBA007C99DE /* plunger.hpp */; };
 		9588B35D0EE441B80007A94F /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9588B3590EE441B80007A94F /* nitro.cpp */; };
-		9588B35E0EE441B80007A94F /* skid_mark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9588B35B0EE441B80007A94F /* skid_mark.cpp */; };
 		958EEFB60EB93C03005F6F70 /* item_info.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 958EEFB50EB93C03005F6F70 /* item_info.hpp */; };
 		958EF0130EB94819005F6F70 /* powerup_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958EF00F0EB94818005F6F70 /* powerup_manager.cpp */; };
 		958EF0140EB94819005F6F70 /* powerup_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 958EF0100EB94819005F6F70 /* powerup_manager.hpp */; };
@@ -838,6 +838,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		950601480EE5FD82005FFC63 /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = games/supertuxkart/src/graphics/skid_marks.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950601490EE5FD82005FFC63 /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = games/supertuxkart/src/graphics/skid_marks.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95090A450EB7EA960048841A /* item.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = item.cpp; path = ../../items/item.cpp; sourceTree = SOURCE_ROOT; };
 		95090A460EB7EA960048841A /* item.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = item.hpp; path = ../../items/item.hpp; sourceTree = SOURCE_ROOT; };
 		95090A470EB7EA960048841A /* item_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = item_manager.hpp; path = ../../items/item_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -867,8 +869,6 @@
 		957F71260ECE6BBA007C99DE /* plunger.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; path = plunger.hpp; sourceTree = "<group>"; };
 		9588B3590EE441B80007A94F /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = games/supertuxkart/src/graphics/nitro.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9588B35A0EE441B80007A94F /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = games/supertuxkart/src/graphics/nitro.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		9588B35B0EE441B80007A94F /* skid_mark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_mark.cpp; path = games/supertuxkart/src/graphics/skid_mark.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		9588B35C0EE441B80007A94F /* skid_mark.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_mark.hpp; path = games/supertuxkart/src/graphics/skid_mark.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		958EEFB50EB93C03005F6F70 /* item_info.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = item_info.hpp; path = ../../network/item_info.hpp; sourceTree = SOURCE_ROOT; };
 		958EF00F0EB94818005F6F70 /* powerup_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = powerup_manager.cpp; path = ../../items/powerup_manager.cpp; sourceTree = SOURCE_ROOT; };
 		958EF0100EB94819005F6F70 /* powerup_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = powerup_manager.hpp; path = ../../items/powerup_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1678,14 +1678,14 @@
 		9588B3580EE441B80007A94F /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				950601480EE5FD82005FFC63 /* skid_marks.hpp */,
+				950601490EE5FD82005FFC63 /* skid_marks.cpp */,
 				95CDF2210EE4B2B400830348 /* particle_system.hpp */,
 				95CDF2220EE4B2B400830348 /* particle_system.cpp */,
 				95CDF21E0EE4B2A600830348 /* smoke.hpp */,
 				95CDF21F0EE4B2A600830348 /* smoke.cpp */,
 				9588B3590EE441B80007A94F /* nitro.cpp */,
 				9588B35A0EE441B80007A94F /* nitro.hpp */,
-				9588B35B0EE441B80007A94F /* skid_mark.cpp */,
-				9588B35C0EE441B80007A94F /* skid_mark.hpp */,
 			);
 			name = graphics;
 			path = games/supertuxkart/src/graphics;
@@ -3046,10 +3046,10 @@
 				957F71270ECE6BBA007C99DE /* plunger.cpp in Sources */,
 				95C239160EE0C41C00F2071A /* rubber_band.cpp in Sources */,
 				9588B35D0EE441B80007A94F /* nitro.cpp in Sources */,
-				9588B35E0EE441B80007A94F /* skid_mark.cpp in Sources */,
 				95CDF2200EE4B2A600830348 /* smoke.cpp in Sources */,
 				95CDF2230EE4B2B400830348 /* particle_system.cpp in Sources */,
 				95CDF2270EE4B2CB00830348 /* vec3.cpp in Sources */,
+				9506014A0EE5FD82005FFC63 /* skid_marks.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
