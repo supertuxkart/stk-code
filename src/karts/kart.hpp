@@ -33,7 +33,7 @@
 #include "items/powerup.hpp"
 #include "karts/kart_model.hpp"
 
-class SkidMark;
+class SkidMarks;
 class Item;
 class Smoke;
 class Nitro;
@@ -86,9 +86,8 @@ private:
      *  at all compressed. */
     float               m_default_suspension_length[4];
 
-    SkidMark*           m_skidmark_left;
-    SkidMark*           m_skidmark_right;
-
+    /** The skidmarks object for this kart. */
+    SkidMarks*          m_skidmarks;
 
     float               m_finish_time;
     bool                m_finished_race;
@@ -140,8 +139,6 @@ public:
     float          getFinishTime       () const { return  m_finish_time;         }
     bool           hasFinishedRace     () const { return  m_finished_race;       }
     void           endRescue           ();
-    //float          estimateFinishTime  ();
-    void           processSkidMarks    ();
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 

@@ -43,7 +43,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "graphics/nitro.hpp"
-#include "graphics/skid_mark.hpp"
+#include "graphics/skid_marks.hpp"
 #include "graphics/smoke.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
@@ -79,9 +79,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheelie_angle        = 0.0f;
     m_smoke_system         = NULL;
     m_nitro                = NULL;
-    m_skidmark_left        = NULL;
-    m_skidmark_right       = NULL;
-    
+    m_skidmarks            = NULL;
 
     // Set position and heading:
     m_reset_transform      = init_transform;
@@ -248,8 +246,7 @@ Kart::~Kart()
 
     ssgDeRefDelete(m_shadow);
 
-    if(m_skidmark_left ) delete m_skidmark_left ;
-    if(m_skidmark_right) delete m_skidmark_right;
+    if(m_skidmarks) delete m_skidmarks ;
 
     RaceManager::getWorld()->getPhysics()->removeKart(this);
     delete m_vehicle;
@@ -584,8 +581,7 @@ void Kart::update(float dt)
 
     // Check if any item was hit.
     item_manager->hitItem(this);
-    
-    processSkidMarks();
+    m_skidmarks->update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -891,34 +887,6 @@ void Kart::endRescue()
 }   // endRescue
 
 //-----------------------------------------------------------------------------
-void Kart::processSkidMarks()
-{
-    const float threshold = 0.3f;
-    const float ANGLE     = 43.0f;
-    const float LENGTH    = 0.57f;
-    if(m_skidding>1 && isOnGround())
-    {
-        Coord coord(getXYZ(), getHPR());
-        coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
-        m_skidmark_right->add(coord,  ANGLE, LENGTH);            
-        coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
-        m_skidmark_left ->add(coord,  ANGLE, LENGTH);
-    }
-    else
-    {   
-        // Either both sides are skidding, or none at all
-        if(m_skidmark_left->wasSkidMarking())
-        {
-            Coord coord(getXYZ(), getHPR());
-            coord.setZ(getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getZ());
-            m_skidmark_right->addBreak(coord, ANGLE, LENGTH);
-            coord.setZ(getVehicle()->getWheelInfo(3).m_raycastInfo.m_contactPointWS.getZ());
-            m_skidmark_left ->addBreak(coord,  ANGLE, LENGTH);
-        }
-    }
-}   // processSkidMarks
-
-//-----------------------------------------------------------------------------
 #include <scene.hpp>
 void Kart::loadData()
 {
@@ -937,15 +905,12 @@ void Kart::loadData()
     getModelTransform() -> addKid ( lod ) ;
 
     // Attach Particle System
-
     m_smoke_system = new Smoke(this);
     m_smoke_system->ref();
-
     m_nitro = new Nitro(this);
     m_nitro->ref();
 
-    m_skidmark_left  = new SkidMark(/* angle sign */ -1);
-    m_skidmark_right = new SkidMark(/* angle sign */  1);
+    m_skidmarks  = new SkidMarks(*this);
 
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();

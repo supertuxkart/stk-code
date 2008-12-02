@@ -58,7 +58,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	grand_prix_manager.cpp	       grand_prix_manager.hpp	                \
         graphics/nitro.cpp             graphics/nitro.hpp                       \
 	graphics/particle_system.cpp   graphics/particle_system.hpp       	\
-        graphics/skid_mark.cpp         graphics/skid_mark.hpp                   \
+        graphics/skid_marks.cpp        graphics/skid_marks.hpp                  \
 	graphics/smoke.cpp	       graphics/smoke.hpp                       \
 	items/attachment.cpp	       items/attachment.hpp	                \
 	items/attachment_manager.cpp   items/attachment_manager.hpp             \

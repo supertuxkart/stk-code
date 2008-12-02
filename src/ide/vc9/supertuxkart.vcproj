@@ -1187,7 +1187,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\skid_mark.cpp"
+					RelativePath="..\..\graphics\skid_marks.cpp"
 					>
 				</File>
 				<File
@@ -1829,7 +1829,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\skid_mark.hpp"
+					RelativePath="..\..\graphics\skid_marks.hpp"
 					>
 				</File>
 				<File
