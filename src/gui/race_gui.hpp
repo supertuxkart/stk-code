@@ -124,15 +124,6 @@ private:
     void drawFPS               ();
     void drawMusicDescription  ();
     void cleanupMessages       (const float dt);
-
-    /* Text drawing */
-    /** Draw text to screen.
-        scale_x and scale_y could be used to a simple resize (e.g. for multiplayer
-        split screens, though, currently, we reduce fonts size to half).        */
-    void drawSteering             (Kart* kart, int offset_x, int offset_y,
-                                   float ratio_x, float ratio_y           );
-    void drawPosition             (Kart* kart, int offset_x, int offset_y,
-                                   float ratio_x, float ratio_y           );
     void drawSpeed                (Kart* kart, int offset_x, int offset_y,
                                    float ratio_x, float ratio_y           );
     void drawLap                  (const KartIconDisplayInfo* info, Kart* kart, int offset_x,

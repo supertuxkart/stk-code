@@ -595,75 +595,6 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
     glEnable(GL_TEXTURE_2D);
 }   // drawEnergyMeter
 
-
-//-----------------------------------------------------------------------------
-void RaceGUI::drawSteering(Kart* kart, int offset_x, int offset_y,
-                           float ratio_x, float ratio_y           )
-{
-
-    float minRatio = std::min(ratio_x, ratio_y);
-#define WHEELWIDTH 64
-    int width  = (int)(WHEELWIDTH*minRatio);
-    int height = (int)(WHEELWIDTH*minRatio);
-    offset_x += (int)((user_config->m_width-160)*ratio_x) - width;
-    offset_y += (int)(6*ratio_y);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    // for now we display the maximum steering as a 45 degree angle.
-    // One the steering angle for all karts are fixed, this should be
-    // changed, so that the user gets feedback about how much steering
-    // is currently done, since it will vary from kart to kart.
-    float displayedAngle = 45.0f * kart->getSteerPercent();
-
-    int tw = width/2; int th = height/2;
-    glTranslatef( (float)(offset_x+tw), (float)(offset_y+th), 0.0f);
-    glRotatef(displayedAngle, 0.0f, 0.0f, 1.0f);
-    glTranslatef((float)(-offset_x-tw), (float)(-offset_y-th), 0.0f);
-
-    m_steering_wheel_icon->getState()->force();
-    glBegin ( GL_QUADS ) ;
-    glColor4f    ( 1, 1, 1, 1 ) ;
-    glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-    glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-    glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-    glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
-
-    glPopMatrix();
-} // drawSteering
-
-//-----------------------------------------------------------------------------
-void RaceGUI::drawPosition(Kart* kart, int offset_x, int offset_y,
-                           float ratio_x, float ratio_y           )
-{
-    // arenas don't have a position (rank)
-    if(RaceManager::getTrack()->isArena()) return;
-    
-    if(kart->getPosition() == -1) return;
-    
-    char str[256];
-    offset_x += (int)((user_config->m_width-110)*ratio_x);
-    offset_y += (int)(140*ratio_y);
-
-    sprintf(str, "%d", kart->getPosition());
-    font_race->PrintShadow(str, (int)(100*ratio_y), offset_x, offset_y);
-
-    offset_x += (int)(50*ratio_x);
-    offset_y += (int)(50*ratio_y);
-
-    // FIXME: translation
-    if (kart->getPosition() == 1)
-        font_race->PrintShadow("st", (int)(40*ratio_y), offset_x, offset_y);
-    else if (kart->getPosition() == 2)
-        font_race->PrintShadow("nd", (int)(40*ratio_y), offset_x, offset_y);
-    else if (kart->getPosition() == 3)
-        font_race->PrintShadow("rd", (int)(40*ratio_y), offset_x, offset_y);
-    else
-        font_race->PrintShadow("th", (int)(40*ratio_y), offset_x, offset_y);
-} // drawPosition
-
 //-----------------------------------------------------------------------------
 void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
                         float ratio_x, float ratio_y           )
@@ -678,6 +609,9 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 
     glMatrixMode(GL_MODELVIEW);
     m_speed_back_icon->getState()->force();
+    // If the colour isn't set, the speedometer is blended with the last
+    // used colour.
+    glColor4f(1,1,1,1);
     glBegin ( GL_QUADS ) ;
     glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
     glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
@@ -988,10 +922,6 @@ void RaceGUI::drawStatusText(const float dt)
             drawPowerupIcons(player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawEnergyMeter     (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawSteering        (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawPosition        (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawSpeed           (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
