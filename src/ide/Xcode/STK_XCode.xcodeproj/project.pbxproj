@@ -314,7 +314,6 @@
 		95B0D1360EB69DDC001A0D06 /* challenge_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CBEA0EB69DD2001A0D06 /* challenge_data.cpp */; };
 		95B0D1370EB69DDC001A0D06 /* challenge_data.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CBEB0EB69DD2001A0D06 /* challenge_data.hpp */; };
 		95B0D1380EB69DDC001A0D06 /* constants.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CBEC0EB69DD2001A0D06 /* constants.hpp */; };
-		95B0D1390EB69DDC001A0D06 /* coord.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CBED0EB69DD2001A0D06 /* coord.hpp */; };
 		95B0D1440EB69DDC001A0D06 /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CBFA0EB69DD2001A0D06 /* callbacks.c */; };
 		95B0D1530EB69DDC001A0D06 /* host.c in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CC0A0EB69DD2001A0D06 /* host.c */; };
 		95B0D1550EB69DDC001A0D06 /* callbacks.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CC0E0EB69DD2001A0D06 /* callbacks.h */; };
@@ -479,8 +478,6 @@
 		95B0D3B40EB69DDF001A0D06 /* remote_kart_info.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE860EB69DDA001A0D06 /* remote_kart_info.hpp */; };
 		95B0D3B50EB69DE0001A0D06 /* world_loaded_message.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE870EB69DDA001A0D06 /* world_loaded_message.hpp */; };
 		95B0D3B60EB69DE0001A0D06 /* no_copy.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE880EB69DDA001A0D06 /* no_copy.hpp */; };
-		95B0D3B70EB69DE0001A0D06 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE890EB69DDA001A0D06 /* particle_system.cpp */; };
-		95B0D3B80EB69DE0001A0D06 /* particle_system.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE8A0EB69DDA001A0D06 /* particle_system.hpp */; };
 		95B0D3BB0EB69DE0001A0D06 /* player.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE8D0EB69DDA001A0D06 /* player.hpp */; };
 		95B0D3BE0EB69DE0001A0D06 /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CE900EB69DDA001A0D06 /* race_manager.cpp */; };
 		95B0D3BF0EB69DE0001A0D06 /* race_manager.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CE910EB69DDA001A0D06 /* race_manager.hpp */; };
@@ -501,8 +498,6 @@
 		95B0D3D30EB69DE0001A0D06 /* sdldrv.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEA60EB69DDA001A0D06 /* sdldrv.hpp */; };
 		95B0D3D40EB69DE0001A0D06 /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEA70EB69DDA001A0D06 /* shadow.cpp */; };
 		95B0D3D50EB69DE0001A0D06 /* shadow.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEA80EB69DDA001A0D06 /* shadow.hpp */; };
-		95B0D3D90EB69DE0001A0D06 /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEAC0EB69DDA001A0D06 /* smoke.cpp */; };
-		95B0D3DA0EB69DE0001A0D06 /* smoke.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEAD0EB69DDA001A0D06 /* smoke.hpp */; };
 		95B0D3DB0EB69DE0001A0D06 /* static_ssg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEAE0EB69DDA001A0D06 /* static_ssg.cpp */; };
 		95B0D3DC0EB69DE0001A0D06 /* static_ssg.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEAF0EB69DDA001A0D06 /* static_ssg.hpp */; };
 		95B0D3DD0EB69DE0001A0D06 /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEB00EB69DDA001A0D06 /* stk_config.cpp */; };
@@ -528,9 +523,10 @@
 		95B0D3F20EB69DE0001A0D06 /* random_generator.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEC60EB69DDA001A0D06 /* random_generator.hpp */; };
 		95B0D3F30EB69DE0001A0D06 /* ssg_help.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEC70EB69DDA001A0D06 /* ssg_help.cpp */; };
 		95B0D3F40EB69DE0001A0D06 /* ssg_help.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CEC80EB69DDA001A0D06 /* ssg_help.hpp */; };
-		95B0D3F50EB69DE0001A0D06 /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B0CEC90EB69DDA001A0D06 /* vec3.cpp */; };
-		95B0D3F60EB69DE0001A0D06 /* vec3.hpp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 95B0CECA0EB69DDA001A0D06 /* vec3.hpp */; };
 		95C239160EE0C41C00F2071A /* rubber_band.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C239140EE0C41C00F2071A /* rubber_band.cpp */; };
+		95CDF2200EE4B2A600830348 /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF21F0EE4B2A600830348 /* smoke.cpp */; };
+		95CDF2230EE4B2B400830348 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF2220EE4B2B400830348 /* particle_system.cpp */; };
+		95CDF2270EE4B2CB00830348 /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF2250EE4B2CB00830348 /* vec3.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -707,7 +703,6 @@
 				95B0D1350EB69DDC001A0D06 /* challenge.hpp in CopyFiles */,
 				95B0D1370EB69DDC001A0D06 /* challenge_data.hpp in CopyFiles */,
 				95B0D1380EB69DDC001A0D06 /* constants.hpp in CopyFiles */,
-				95B0D1390EB69DDC001A0D06 /* coord.hpp in CopyFiles */,
 				95B0D1550EB69DDC001A0D06 /* callbacks.h in CopyFiles */,
 				95B0D1560EB69DDC001A0D06 /* enet.h in CopyFiles */,
 				95B0D1570EB69DDC001A0D06 /* list.h in CopyFiles */,
@@ -795,7 +790,6 @@
 				95B0D3B40EB69DDF001A0D06 /* remote_kart_info.hpp in CopyFiles */,
 				95B0D3B50EB69DE0001A0D06 /* world_loaded_message.hpp in CopyFiles */,
 				95B0D3B60EB69DE0001A0D06 /* no_copy.hpp in CopyFiles */,
-				95B0D3B80EB69DE0001A0D06 /* particle_system.hpp in CopyFiles */,
 				95B0D3BB0EB69DE0001A0D06 /* player.hpp in CopyFiles */,
 				95B0D3BF0EB69DE0001A0D06 /* race_manager.hpp in CopyFiles */,
 				95B0D3C10EB69DE0001A0D06 /* replay_base.hpp in CopyFiles */,
@@ -807,7 +801,6 @@
 				95B0D3D10EB69DE0001A0D06 /* scene.hpp in CopyFiles */,
 				95B0D3D30EB69DE0001A0D06 /* sdldrv.hpp in CopyFiles */,
 				95B0D3D50EB69DE0001A0D06 /* shadow.hpp in CopyFiles */,
-				95B0D3DA0EB69DE0001A0D06 /* smoke.hpp in CopyFiles */,
 				95B0D3DC0EB69DE0001A0D06 /* static_ssg.hpp in CopyFiles */,
 				95B0D3DE0EB69DE0001A0D06 /* stk_config.hpp in CopyFiles */,
 				95B0D3E00EB69DE0001A0D06 /* string_utils.hpp in CopyFiles */,
@@ -821,7 +814,6 @@
 				95B0D3F00EB69DE0001A0D06 /* user_pointer.hpp in CopyFiles */,
 				95B0D3F20EB69DE0001A0D06 /* random_generator.hpp in CopyFiles */,
 				95B0D3F40EB69DE0001A0D06 /* ssg_help.hpp in CopyFiles */,
-				95B0D3F60EB69DE0001A0D06 /* vec3.hpp in CopyFiles */,
 				9518C11E0EB7AF7A00952372 /* cake.hpp in CopyFiles */,
 				95090A4A0EB7EA960048841A /* item.hpp in CopyFiles */,
 				95090A4B0EB7EA960048841A /* item_manager.hpp in CopyFiles */,
@@ -1155,7 +1147,6 @@
 		95B0CBEA0EB69DD2001A0D06 /* challenge_data.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = challenge_data.cpp; path = ../../challenges/challenge_data.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CBEB0EB69DD2001A0D06 /* challenge_data.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = challenge_data.hpp; path = ../../challenges/challenge_data.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CBEC0EB69DD2001A0D06 /* constants.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = constants.hpp; path = ../../constants.hpp; sourceTree = SOURCE_ROOT; };
-		95B0CBED0EB69DD2001A0D06 /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = ../../coord.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CBFA0EB69DD2001A0D06 /* callbacks.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = callbacks.c; path = ../../enet/callbacks.c; sourceTree = SOURCE_ROOT; };
 		95B0CC0A0EB69DD2001A0D06 /* host.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = host.c; path = ../../enet/host.c; sourceTree = SOURCE_ROOT; };
 		95B0CC0E0EB69DD2001A0D06 /* callbacks.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = callbacks.h; path = ../../enet/include/enet/callbacks.h; sourceTree = SOURCE_ROOT; };
@@ -1320,8 +1311,6 @@
 		95B0CE860EB69DDA001A0D06 /* remote_kart_info.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = remote_kart_info.hpp; path = ../../network/remote_kart_info.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CE870EB69DDA001A0D06 /* world_loaded_message.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = world_loaded_message.hpp; path = ../../network/world_loaded_message.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CE880EB69DDA001A0D06 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../no_copy.hpp; sourceTree = SOURCE_ROOT; };
-		95B0CE890EB69DDA001A0D06 /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = ../../particle_system.cpp; sourceTree = SOURCE_ROOT; };
-		95B0CE8A0EB69DDA001A0D06 /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = ../../particle_system.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CE8D0EB69DDA001A0D06 /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../player.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CE900EB69DDA001A0D06 /* race_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = race_manager.cpp; path = ../../race_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CE910EB69DDA001A0D06 /* race_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = race_manager.hpp; path = ../../race_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1344,8 +1333,6 @@
 		95B0CEA60EB69DDA001A0D06 /* sdldrv.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = sdldrv.hpp; path = ../../sdldrv.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CEA70EB69DDA001A0D06 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../shadow.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CEA80EB69DDA001A0D06 /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../shadow.hpp; sourceTree = SOURCE_ROOT; };
-		95B0CEAC0EB69DDA001A0D06 /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../smoke.cpp; sourceTree = SOURCE_ROOT; };
-		95B0CEAD0EB69DDA001A0D06 /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../smoke.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CEAE0EB69DDA001A0D06 /* static_ssg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = static_ssg.cpp; path = ../../static_ssg.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CEAF0EB69DDA001A0D06 /* static_ssg.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = static_ssg.hpp; path = ../../static_ssg.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CEB00EB69DDA001A0D06 /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../stk_config.cpp; sourceTree = SOURCE_ROOT; };
@@ -1372,11 +1359,16 @@
 		95B0CEC60EB69DDA001A0D06 /* random_generator.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = random_generator.hpp; path = ../../utils/random_generator.hpp; sourceTree = SOURCE_ROOT; };
 		95B0CEC70EB69DDA001A0D06 /* ssg_help.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ssg_help.cpp; path = ../../utils/ssg_help.cpp; sourceTree = SOURCE_ROOT; };
 		95B0CEC80EB69DDA001A0D06 /* ssg_help.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = ssg_help.hpp; path = ../../utils/ssg_help.hpp; sourceTree = SOURCE_ROOT; };
-		95B0CEC90EB69DDA001A0D06 /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = ../../vec3.cpp; sourceTree = SOURCE_ROOT; };
-		95B0CECA0EB69DDA001A0D06 /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../vec3.hpp; sourceTree = SOURCE_ROOT; };
 		95B0D4090EB6A160001A0D06 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
 		95C239140EE0C41C00F2071A /* rubber_band.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rubber_band.cpp; path = games/supertuxkart/src/items/rubber_band.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C239150EE0C41C00F2071A /* rubber_band.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rubber_band.hpp; path = games/supertuxkart/src/items/rubber_band.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF21E0EE4B2A600830348 /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = games/supertuxkart/src/graphics/smoke.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF21F0EE4B2A600830348 /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = games/supertuxkart/src/graphics/smoke.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF2210EE4B2B400830348 /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = games/supertuxkart/src/graphics/particle_system.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF2220EE4B2B400830348 /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = games/supertuxkart/src/graphics/particle_system.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF2240EE4B2CB00830348 /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = games/supertuxkart/src/utils/vec3.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF2250EE4B2CB00830348 /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = games/supertuxkart/src/utils/vec3.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CDF2260EE4B2CB00830348 /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = games/supertuxkart/src/utils/coord.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -1686,6 +1678,10 @@
 		9588B3580EE441B80007A94F /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				95CDF2210EE4B2B400830348 /* particle_system.hpp */,
+				95CDF2220EE4B2B400830348 /* particle_system.cpp */,
+				95CDF21E0EE4B2A600830348 /* smoke.hpp */,
+				95CDF21F0EE4B2A600830348 /* smoke.cpp */,
 				9588B3590EE441B80007A94F /* nitro.cpp */,
 				9588B35A0EE441B80007A94F /* nitro.hpp */,
 				9588B35B0EE441B80007A94F /* skid_mark.cpp */,
@@ -1720,7 +1716,6 @@
 				95B0CBE50EB69DD2001A0D06 /* camera.cpp */,
 				95B0CBE60EB69DD2001A0D06 /* camera.hpp */,
 				95B0CBEC0EB69DD2001A0D06 /* constants.hpp */,
-				95B0CBED0EB69DD2001A0D06 /* coord.hpp */,
 				95B0CC2C0EB69DD2001A0D06 /* explosion.cpp */,
 				95B0CC2D0EB69DD2001A0D06 /* explosion.hpp */,
 				95B0CC2E0EB69DD2001A0D06 /* file_manager.cpp */,
@@ -1754,8 +1749,6 @@
 				95B0CE690EB69DD9001A0D06 /* moving_texture.cpp */,
 				95B0CE6A0EB69DD9001A0D06 /* moving_texture.hpp */,
 				95B0CE880EB69DDA001A0D06 /* no_copy.hpp */,
-				95B0CE890EB69DDA001A0D06 /* particle_system.cpp */,
-				95B0CE8A0EB69DDA001A0D06 /* particle_system.hpp */,
 				95B0CE8D0EB69DDA001A0D06 /* player.hpp */,
 				95B0CE900EB69DDA001A0D06 /* race_manager.cpp */,
 				95B0CE910EB69DDA001A0D06 /* race_manager.hpp */,
@@ -1774,8 +1767,6 @@
 				95B0CEA60EB69DDA001A0D06 /* sdldrv.hpp */,
 				95B0CEA70EB69DDA001A0D06 /* shadow.cpp */,
 				95B0CEA80EB69DDA001A0D06 /* shadow.hpp */,
-				95B0CEAC0EB69DDA001A0D06 /* smoke.cpp */,
-				95B0CEAD0EB69DDA001A0D06 /* smoke.hpp */,
 				95B0CEAE0EB69DDA001A0D06 /* static_ssg.cpp */,
 				95B0CEAF0EB69DDA001A0D06 /* static_ssg.hpp */,
 				95B0CEB00EB69DDA001A0D06 /* stk_config.cpp */,
@@ -1798,8 +1789,6 @@
 				95B0CEC10EB69DDA001A0D06 /* user_config.cpp */,
 				95B0CEC20EB69DDA001A0D06 /* user_config.hpp */,
 				95B0CEC30EB69DDA001A0D06 /* user_pointer.hpp */,
-				95B0CEC90EB69DDA001A0D06 /* vec3.cpp */,
-				95B0CECA0EB69DDA001A0D06 /* vec3.hpp */,
 			);
 			name = src;
 			path = ../..;
@@ -2447,6 +2436,9 @@
 		95B0CEC40EB69DDA001A0D06 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				95CDF2240EE4B2CB00830348 /* vec3.hpp */,
+				95CDF2250EE4B2CB00830348 /* vec3.cpp */,
+				95CDF2260EE4B2CB00830348 /* coord.hpp */,
 				95B0CEC50EB69DDA001A0D06 /* random_generator.cpp */,
 				95B0CEC60EB69DDA001A0D06 /* random_generator.hpp */,
 				95B0CEC70EB69DDA001A0D06 /* ssg_help.cpp */,
@@ -3017,7 +3009,6 @@
 				95B0D3AC0EB69DDF001A0D06 /* race_info_message.cpp in Sources */,
 				95B0D3AF0EB69DDF001A0D06 /* race_result_message.cpp in Sources */,
 				95B0D3B20EB69DDF001A0D06 /* race_state.cpp in Sources */,
-				95B0D3B70EB69DE0001A0D06 /* particle_system.cpp in Sources */,
 				95B0D3BE0EB69DE0001A0D06 /* race_manager.cpp in Sources */,
 				95B0D3C00EB69DE0001A0D06 /* replay_base.cpp in Sources */,
 				95B0D3C30EB69DE0001A0D06 /* replay_buffers.cpp in Sources */,
@@ -3027,7 +3018,6 @@
 				95B0D3D00EB69DE0001A0D06 /* scene.cpp in Sources */,
 				95B0D3D20EB69DE0001A0D06 /* sdldrv.cpp in Sources */,
 				95B0D3D40EB69DE0001A0D06 /* shadow.cpp in Sources */,
-				95B0D3D90EB69DE0001A0D06 /* smoke.cpp in Sources */,
 				95B0D3DB0EB69DE0001A0D06 /* static_ssg.cpp in Sources */,
 				95B0D3DD0EB69DE0001A0D06 /* stk_config.cpp in Sources */,
 				95B0D3DF0EB69DE0001A0D06 /* string_utils.cpp in Sources */,
@@ -3040,7 +3030,6 @@
 				95B0D3EE0EB69DE0001A0D06 /* user_config.cpp in Sources */,
 				95B0D3F10EB69DE0001A0D06 /* random_generator.cpp in Sources */,
 				95B0D3F30EB69DE0001A0D06 /* ssg_help.cpp in Sources */,
-				95B0D3F50EB69DE0001A0D06 /* vec3.cpp in Sources */,
 				9518C11D0EB7AF7A00952372 /* cake.cpp in Sources */,
 				95090A490EB7EA960048841A /* item.cpp in Sources */,
 				95090A4C0EB7EA960048841A /* item_manager.cpp in Sources */,
@@ -3058,6 +3047,9 @@
 				95C239160EE0C41C00F2071A /* rubber_band.cpp in Sources */,
 				9588B35D0EE441B80007A94F /* nitro.cpp in Sources */,
 				9588B35E0EE441B80007A94F /* skid_mark.cpp in Sources */,
+				95CDF2200EE4B2A600830348 /* smoke.cpp in Sources */,
+				95CDF2230EE4B2B400830348 /* particle_system.cpp in Sources */,
+				95CDF2270EE4B2CB00830348 /* vec3.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
