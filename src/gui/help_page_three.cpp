@@ -59,21 +59,21 @@ most points wins (shortest time in case of a tie!)          "));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
     widget_manager->addTextWgt( WTOK_TXT3, 100, 15,
-        _("Time Trial: As quick race, but no items.                       "));
+        _("Time Trial: Contains no powerups, so only your driving skills matter!"));
         widget_manager->setWgtTextSize( WTOK_TXT3, WGT_FNT_SML );
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
 
     if(!unlock_manager->isLocked("followleader"))
     {
         widget_manager->addTextWgt( WTOK_TXT4, 100, 15,
-            _("Follow the leader: run for second place, as first ahead leader, \n\
-or last in race track if none ahead, will be disqualified\n\
-every time the counter hits zero"));
+            _("Follow the leader: run for second place, as the last kart\nwill be disqualified every time the counter hits zero.\n Beware : going in front of the leader will get you eliminated too!"));
         widget_manager->setWgtTextSize( WTOK_TXT4, WGT_FNT_SML );
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 13 );
     }
     
     /*Buttons at the bottom*/
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 7);
+    widget_manager->switchOrder();
     widget_manager->addTextButtonWgt( WTOK_SECOND_PAGE, 30, 7,
         _("< Back"));
     widget_manager->setWgtTextSize( WTOK_SECOND_PAGE, WGT_FNT_SML );
@@ -81,7 +81,8 @@ every time the counter hits zero"));
     widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7,
         _("Back to the menu"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
-
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 30, 7);
+    
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpMenu
 

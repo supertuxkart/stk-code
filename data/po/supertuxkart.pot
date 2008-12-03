@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-03 11:59-0500\n"
+"POT-Creation-Date: 2008-12-03 12:05-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -328,9 +328,9 @@ msgstr ""
 
 #: src/gui/help_page_three.cpp:69
 msgid ""
-"Follow the leader: run for second place, as first ahead leader, \n"
-"or last in race track if none ahead, will be disqualified\n"
-"every time the counter hits zero"
+"Follow the leader: run for second place, as the last kart\n"
+"will be disqualified every time the counter hits zero.\n"
+" Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
 
 #: src/gui/help_page_one.cpp:67
@@ -778,7 +778,7 @@ msgid "Time Trial"
 msgstr ""
 
 #: src/gui/help_page_three.cpp:62
-msgid "Time Trial: As quick race, but no items.                       "
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
 #: src/gui/help_page_two.cpp:58
