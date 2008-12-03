@@ -104,6 +104,8 @@ public:
     void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
     bool         hasHit      () { return m_has_hit_something; }
     void         reset       () { Moveable::reset(); }
+	
+	virtual int getExplosionSound() const { return SFXManager::SOUND_EXPLOSION; }
 };   // Flyable
 
 #endif

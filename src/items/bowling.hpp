@@ -34,6 +34,8 @@ public:
     static  void init(const lisp::Lisp* lisp, ssgEntity* bowling);
     virtual void update(float dt);
     
+	int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }
+	
 };   // Bowling
 
 #endif

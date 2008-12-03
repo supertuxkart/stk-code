@@ -25,14 +25,14 @@
 #include "audio/sfx_manager.hpp"
 #include "utils/vec3.hpp"
 
-Explosion::Explosion(const Vec3& coord) : ssgTransform()
+Explosion::Explosion(const Vec3& coord, const int explosion_sound) : ssgTransform()
 {
     this->ref();
     ssgCutout *cut = new ssgCutout();
     addKid(cut);  // derefing the explosion will free the cutout
     m_seq   = projectile_manager->getExplosionModel();
     cut->addKid(m_seq);
-    m_explode_sound = sfx_manager->newSFX(SFXManager::SOUND_EXPLOSION);
+    m_explode_sound = sfx_manager->newSFX( (SFXManager::SFXType)explosion_sound );
     init(coord);
 }   // Explosion
 

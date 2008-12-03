@@ -35,7 +35,7 @@ public:
     int m_step ;
     ssgSelector  *m_seq ;
 
-         Explosion(const Vec3& coord);
+         Explosion(const Vec3& coord, const int explosion_sound);
         ~Explosion();
     void init     (const Vec3& coord);
     void update   (float delta_t);

@@ -23,6 +23,7 @@
 #include <vector>
 #include <plib/ssg.h>
 #include "items/powerup_manager.hpp"
+#include "audio/sfx_manager.hpp"
 
 class Vec3;
 class Kart;
@@ -63,7 +64,7 @@ public:
     void             cleanup          ();
     void             update           (float dt);
     Flyable*         newProjectile    (Kart *kart, PowerupType type);
-    Explosion*       newExplosion     (const Vec3& coord);
+    Explosion*       newExplosion     (const Vec3& coord, const int explosion_sound=(SFXManager::SFXType)SFXManager::SOUND_EXPLOSION);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
 };

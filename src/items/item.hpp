@@ -66,6 +66,7 @@ public:
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  isCollected(float t=2.0f);
+	
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, and
      *  the item is not deactivated anymore.
