@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-11 02:49+0100\n"
+"POT-Creation-Date: 2008-12-03 11:55-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "%dx%d Blacklisted"
 msgstr ""
 
-#: src/modes/world.cpp:411
+#: src/modes/world.cpp:412
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -30,6 +30,10 @@ msgstr ""
 
 #: src/gui/game_mode.cpp:82
 msgid "3 Strikes Battle"
+msgstr ""
+
+#: src/gui/help_page_three.cpp:78 src/gui/help_page_two.cpp:128
+msgid "< Back"
 msgstr ""
 
 #. I18N: name of controls
@@ -53,7 +57,7 @@ msgstr ""
 msgid "Amazonian Journey"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:104
+#: src/gui/help_page_two.cpp:111
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr ""
 
@@ -70,12 +74,6 @@ msgstr ""
 msgid "Around the Lighthouse"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:106
-msgid ""
-"At high speeds wheelies drive you faster, but you can't steer. If you\n"
-"get stuck or fall too far, use the rescue button to get back on track."
-msgstr ""
-
 #: data/grandprix/atworldsend.grandprix:4
 msgid "At world's end"
 msgstr ""
@@ -84,11 +82,12 @@ msgstr ""
 msgid "Avoid bananas"
 msgstr ""
 
-#: src/gui/race_results_gui.cpp:70 src/gui/grand_prix_ending.cpp:157
+#: src/gui/grand_prix_ending.cpp:157 src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:118
+#: src/gui/help_page_one.cpp:143 src/gui/help_page_three.cpp:82
+#: src/gui/help_page_two.cpp:131
 msgid "Back to the menu"
 msgstr ""
 
@@ -96,7 +95,7 @@ msgstr ""
 msgid "Become server"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:80
+#: src/gui/help_page_two.cpp:84
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back,\n"
 "it will be thrown backwards."
@@ -107,11 +106,11 @@ msgstr ""
 msgid "Brake"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:64
+#: src/gui/help_page_two.cpp:66
 msgid "BubbleGum - leave a sticky pink puddle behind you"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:72
+#: src/gui/help_page_two.cpp:75
 msgid ""
 "Cake - thrown at the closest rival,\n"
 "best on short ranges and long straights"
@@ -168,10 +167,9 @@ msgstr ""
 
 #: src/gui/help_page_one.cpp:121
 msgid ""
-"Collecting coins increases the number of powerups you receive.\n"
-"After 5 silver coins, each blue box will yield 2 powerups,\n"
-"after 10, 3 powerups and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
+"Collecting nitro allows you to get speed boosts whenever you\n"
+"wish by pressing the appropriate key. You can see your\n"
+"current level of nitro in the bar at the right of the game screen."
 msgstr ""
 
 #: data/grandprix/alltracks.challenge:6
@@ -202,8 +200,8 @@ msgstr ""
 msgid "Connected:"
 msgstr ""
 
-#: src/gui/feature_unlocked.cpp:47 src/gui/race_results_gui.cpp:59
-#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/feature_unlocked.cpp:47 src/gui/grand_prix_ending.cpp:153
+#: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr ""
 
@@ -217,9 +215,9 @@ msgid ""
 "modified by M. Gagnon"
 msgstr ""
 
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
 #: data/tracks/fortmagma/fortmagma.track:5
+#: data/tracks/sandtrack/sandtrack.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
@@ -255,7 +253,7 @@ msgstr ""
 msgid "Display Settings"
 msgstr ""
 
-#: src/gui/race_options.cpp:311
+#: src/gui/race_options.cpp:306
 msgid "Driver"
 msgstr ""
 
@@ -269,9 +267,9 @@ msgstr ""
 
 #: data/tracks/jungle/jungle.challenge:6
 msgid ""
-"Finish 3 laps in the Race track\n"
+"Finish 3 laps in Racetrack\n"
 "with 3 AI karts\n"
-"in under 1:15 minutes."
+"in under 2:15 minutes."
 msgstr ""
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
@@ -289,7 +287,7 @@ msgid ""
 msgstr ""
 
 #: data/tracks/jungle/jungle.challenge:5
-msgid "Finish Race track in 1:15"
+msgid "Finish Race track in 2:15"
 msgstr ""
 
 #: data/tracks/canyon/canyon.challenge:5
@@ -300,7 +298,7 @@ msgstr ""
 msgid "Finish the City track in 5:20"
 msgstr ""
 
-#: src/gui/race_gui.cpp:754
+#: src/gui/race_gui.cpp:686
 #, c-format
 msgid "Finished"
 msgstr ""
@@ -361,16 +359,12 @@ msgstr ""
 msgid "Game modes"
 msgstr ""
 
-#: src/gui/credits_menu.cpp:75 src/gui/challenges_menu.cpp:52
+#: src/gui/challenges_menu.cpp:52 src/gui/credits_menu.cpp:75
 msgid "Go back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:82 src/gui/help_page_one.cpp:147
-msgid "Go back to the menu"
-msgstr ""
-
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:905
+#: src/gui/race_gui.cpp:837
 msgid "Go!"
 msgstr ""
 
@@ -389,7 +383,7 @@ msgid ""
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
 
-#: src/gui/race_menu.cpp:49 src/gui/main_menu.cpp:68
+#: src/gui/main_menu.cpp:68 src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr ""
 
@@ -397,7 +391,7 @@ msgstr ""
 msgid "Highscores"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:131
+#: src/gui/help_page_one.cpp:128
 msgid ""
 "If you see a button with a lock like the one to the right,\n"
 "you need to complete a challenge to unlock it."
@@ -407,7 +401,7 @@ msgstr ""
 msgid "Increase Resolution"
 msgstr ""
 
-#: src/user_config.cpp:876
+#: src/user_config.cpp:870
 #, c-format
 msgid "Invalid"
 msgstr ""
@@ -425,7 +419,7 @@ msgstr ""
 msgid "King Weird's Castle"
 msgstr ""
 
-#: src/gui/race_gui.cpp:759
+#: src/gui/race_gui.cpp:691
 msgid "Lap"
 msgstr ""
 
@@ -433,7 +427,7 @@ msgstr ""
 msgid "Last grand prix, longer and harder"
 msgstr ""
 
-#: src/modes/follow_the_leader.cpp:136
+#: src/modes/follow_the_leader.cpp:138
 msgid "Leader"
 msgstr ""
 
@@ -500,15 +494,15 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:114 src/gui/help_page_one.cpp:143
-msgid "Next help screen"
+#: src/gui/help_page_one.cpp:146 src/gui/help_page_two.cpp:134
+msgid "Next >"
 msgstr ""
 
 #: src/gui/grand_prix_select.cpp:63 src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
 msgstr ""
 
-#: src/gui/race_options.cpp:310 src/gui/race_options.cpp:314
+#: src/gui/race_options.cpp:305 src/gui/race_options.cpp:308
 msgid "Novice"
 msgstr ""
 
@@ -524,7 +518,7 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: src/user_config.cpp:500
+#: src/user_config.cpp:498
 msgid "Old config file found, check your key bindings!"
 msgstr ""
 
@@ -536,11 +530,11 @@ msgstr ""
 msgid "On the Beach"
 msgstr ""
 
-#: src/gui/race_menu.cpp:48 src/gui/options.cpp:40 src/gui/main_menu.cpp:63
+#: src/gui/main_menu.cpp:63 src/gui/options.cpp:40 src/gui/race_menu.cpp:48
 msgid "Options"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:96
+#: src/gui/help_page_two.cpp:102
 msgid "Parachute - slows down all karts in a better position!"
 msgstr ""
 
@@ -548,7 +542,7 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-#: src/gui/race_gui.cpp:934
+#: src/gui/race_gui.cpp:866
 msgid "Penalty time!!"
 msgstr ""
 
@@ -590,6 +584,12 @@ msgstr ""
 msgid "Player name"
 msgstr ""
 
+#: src/gui/help_page_two.cpp:120
+msgid ""
+"Plunger - throw straight to pull an opponent back,\n"
+"or throw while looking back to make one lose sight!"
+msgstr ""
+
 #: data/tracks/prehistoric/prehistoric.track:4
 msgid "Prehistoric Island"
 msgstr ""
@@ -598,24 +598,16 @@ msgstr ""
 msgid "Press <ESC> to Cancel"
 msgstr ""
 
-#: src/gui/num_players.cpp:46 src/gui/player_controls.cpp:128
-#: src/gui/race_options.cpp:149 src/gui/config_controls.cpp:52
-#: src/gui/config_display.cpp:102 src/gui/options.cpp:57
+#: src/gui/config_controls.cpp:52 src/gui/config_display.cpp:102
+#: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:157
 #: src/gui/grand_prix_select.cpp:80 src/gui/network_gui.cpp:79
-#: src/gui/game_mode.cpp:157 src/gui/config_sound.cpp:63
+#: src/gui/num_players.cpp:46 src/gui/options.cpp:57
+#: src/gui/player_controls.cpp:128 src/gui/race_options.cpp:149
 msgid "Press <ESC> to go back"
 msgstr ""
 
 #: src/gui/player_controls.cpp:172
 msgid "Press key"
-msgstr ""
-
-#: src/gui/help_page_three.cpp:78
-msgid "Previous help screen"
-msgstr ""
-
-#: src/gui/help_page_two.cpp:110
-msgid "Previous screen"
 msgstr ""
 
 #: src/gui/game_mode.cpp:67 src/gui/game_mode.cpp:104
@@ -630,7 +622,7 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: src/gui/race_gui.cpp:697
+#: src/gui/race_gui.cpp:628
 msgid "REV"
 msgstr ""
 
@@ -642,7 +634,7 @@ msgstr ""
 msgid "Race results"
 msgstr ""
 
-#: src/gui/race_options.cpp:312
+#: src/gui/race_options.cpp:307
 msgid "Racer"
 msgstr ""
 
@@ -651,7 +643,7 @@ msgid "Racetrack"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:885
+#: src/gui/race_gui.cpp:817
 msgid "Ready!"
 msgstr ""
 
@@ -682,7 +674,7 @@ msgid "Select network mode"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:895
+#: src/gui/race_gui.cpp:827
 msgid "Set!"
 msgstr ""
 
@@ -702,7 +694,7 @@ msgstr ""
 msgid "Single Race"
 msgstr ""
 
-#: src/gui/race_options.cpp:313 data/grandprix/alltracks.challenge:8
+#: data/grandprix/alltracks.challenge:8
 msgid "Skidding Preview"
 msgstr ""
 
@@ -787,7 +779,7 @@ msgstr ""
 msgid "Time Trial: As quick race, but no items.                       "
 msgstr ""
 
-#: src/gui/help_page_two.cpp:57
+#: src/gui/help_page_two.cpp:58
 msgid "To help you win, there are certain powerups you can grab:"
 msgstr ""
 
@@ -905,7 +897,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/modes/world.cpp:406
+#: src/modes/world.cpp:407
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -915,36 +907,36 @@ msgstr ""
 msgid "You won the race!"
 msgstr ""
 
-#: src/gui/help_page_two.cpp:88
+#: src/gui/help_page_two.cpp:93
 msgid "Zipper - speed boost"
 msgstr ""
 
-#: src/user_config.cpp:859
+#: src/user_config.cpp:853
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr ""
 
-#: src/user_config.cpp:863
+#: src/user_config.cpp:857
 #, c-format
 msgid "joy %d btn %d"
 msgstr ""
 
-#: src/user_config.cpp:866
+#: src/user_config.cpp:860
 #, c-format
 msgid "joy %d hat %d"
 msgstr ""
 
-#: src/user_config.cpp:872
+#: src/user_config.cpp:866
 #, c-format
 msgid "mouse axis %d %c"
 msgstr ""
 
-#: src/user_config.cpp:869
+#: src/user_config.cpp:863
 #, c-format
 msgid "mouse btn %d"
 msgstr ""
 
-#: src/user_config.cpp:853 src/user_config.cpp:897
+#: src/user_config.cpp:847 src/user_config.cpp:891
 #, c-format
 msgid "not set"
 msgstr ""

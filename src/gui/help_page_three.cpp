@@ -72,14 +72,14 @@ every time the counter hits zero"));
         widget_manager->setWgtTextSize( WTOK_TXT4, WGT_FNT_SML );
         widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 13 );
     }
-
+    
     /*Buttons at the bottom*/
-    widget_manager->addTextButtonWgt( WTOK_SECOND_PAGE, 25, 7,
-        _("Previous help screen"));
+    widget_manager->addTextButtonWgt( WTOK_SECOND_PAGE, 30, 7,
+        _("< Back"));
     widget_manager->setWgtTextSize( WTOK_SECOND_PAGE, WGT_FNT_SML );
 
     widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7,
-        _("Go back to the menu"));
+        _("Back to the menu"));
     widget_manager->setWgtTextSize( WTOK_QUIT, WGT_FNT_SML );
 
     widget_manager->layout( WGT_AREA_TOP );

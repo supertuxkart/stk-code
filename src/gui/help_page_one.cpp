@@ -100,13 +100,13 @@ HelpPageOne::HelpPageOne()
     /*Empty widget to cover the space for the 3D models*/
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 15);
     widget_manager->breakLine();
-
+/*
     widget_manager->addTextWgt(WTOK_MSG4, 100, 13,
 //Next line starts at column 0 to avoid spaces in the GUI
 _("At high speeds wheelies drive you faster, but you can't steer. If you\n\
 get stuck or fall too far, use the rescue button to get back on track."));
     widget_manager->setWgtResizeToText( WTOK_MSG4, false );
-    widget_manager->breakLine();
+    widget_manager->breakLine();*/
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
@@ -118,10 +118,7 @@ get stuck or fall too far, use the rescue button to get back on track."));
     widget_manager->breakLine();
 
     widget_manager->addTextWgt(WTOK_MSG6, 100, 17,
-_("Collecting coins increases the number of powerups you receive.\n\
-After 5 silver coins, each blue box will yield 2 powerups,\nafter 10,\
- 3 powerups and so on.\nEach gold coin is worth 3 silver coins, \
-so look out for them!"));
+_("Collecting nitro allows you to get speed boosts whenever you\nwish by pressing the appropriate key. You can see your\ncurrent level of nitro in the bar at the right of the game screen."));
     widget_manager->setWgtResizeToText( WTOK_MSG6, false);
     widget_manager->breakLine();
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
@@ -139,12 +136,14 @@ you need to complete a challenge to unlock it."));
     widget_manager->breakLine();
 
     /*Buttons at the bottom*/
-    widget_manager->addTextButtonWgt(WTOK_SECOND_PAGE, 20, 7,
-        _("Next help screen"));
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 25);
     widget_manager->breakLine();
-
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 30, 7);
     widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
-        _("Go back to the menu"));
+                                     _("Back to the menu"));
+    
+    widget_manager->addTextButtonWgt(WTOK_SECOND_PAGE, 30, 7,
+        _("Next >"));
 
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpPageOne

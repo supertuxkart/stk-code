@@ -33,7 +33,8 @@ enum WidgetTokens
     WTOK_IMG4, WTOK_TXT4,
     WTOK_IMG5, WTOK_TXT5,
     WTOK_IMG6, WTOK_TXT6,
-
+    WTOK_IMG7, WTOK_TXT7,
+    
     WTOK_FIRST_PAGE,
     WTOK_THIRD_PAGE,
     WTOK_QUIT
@@ -57,6 +58,7 @@ HelpPageTwo::HelpPageTwo()
         _("To help you win, there are certain powerups you can grab:"));
     widget_manager->breakLine();
 
+    // ------ bubble gum -----
     widget_manager->addImgWgt( WTOK_IMG1, 10, 12,
         powerup_manager->getIcon(POWERUP_BUBBLEGUM)->getState()->getTextureHandle());
 
@@ -65,6 +67,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->setWgtRoundCorners( WTOK_TXT1, WGT_AREA_RGT );
     widget_manager->breakLine();
 
+    // ------ cakes -----
     widget_manager->addImgWgt(WTOK_IMG2, 10, 12,
         powerup_manager->getIcon(POWERUP_CAKE)->getState()->getTextureHandle());
 
@@ -72,7 +75,8 @@ HelpPageTwo::HelpPageTwo()
         _("Cake - thrown at the closest rival,\nbest on short ranges and long straights"));
     widget_manager->setWgtRoundCorners( WTOK_TXT2, WGT_AREA_RGT );
     widget_manager->breakLine();
-
+    
+    // ------ bowling balls -----
     widget_manager->addImgWgt(WTOK_IMG3, 10, 12,
         powerup_manager->getIcon(POWERUP_BOWLING)->getState()->getTextureHandle());
 
@@ -81,6 +85,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->setWgtRoundCorners( WTOK_TXT3, WGT_AREA_RGT );
     widget_manager->breakLine();
 
+    // ------ zipper -----
     widget_manager->addImgWgt(WTOK_IMG4, 10, 12,
         powerup_manager->getIcon(POWERUP_ZIPPER)->getState()->getTextureHandle());
 
@@ -89,6 +94,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->setWgtRoundCorners(WTOK_TXT4, WGT_AREA_RGT);
     widget_manager->breakLine();
 
+    // ------ parachute -----
     widget_manager->addImgWgt(WTOK_IMG5, 10, 12,
         powerup_manager->getIcon(POWERUP_PARACHUTE)->getState()->getTextureHandle());
 
@@ -97,6 +103,7 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->setWgtRoundCorners(WTOK_TXT5, WGT_AREA_RGT);
     widget_manager->breakLine();
 
+    // ------ anvil -----
     widget_manager->addImgWgt(WTOK_IMG6, 10, 12,
         powerup_manager->getIcon(POWERUP_ANVIL)->getState()->getTextureHandle());
 
@@ -105,18 +112,27 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->setWgtRoundCorners(WTOK_TXT6, WGT_AREA_RGT);
     widget_manager->breakLine();
 
-    /*Buttons at the bottom*/
-    widget_manager->addTextButtonWgt(WTOK_FIRST_PAGE, 40, 7,
-        _("Previous screen"));
+    // ------ plunger -----
+    widget_manager->addImgWgt(WTOK_IMG7, 10, 12,
+                              powerup_manager->getIcon(POWERUP_PLUNGER)->getState()->getTextureHandle());
+    
+    widget_manager->addTextWgt(WTOK_TXT7, 90, 12,
+                               _("Plunger - throw straight to pull an opponent back,\nor throw while looking back to make one lose sight!"));
+    widget_manager->setWgtRoundCorners( WTOK_TXT7, WGT_AREA_RGT );
     widget_manager->breakLine();
 
-    widget_manager->addTextButtonWgt(WTOK_THIRD_PAGE, 40, 7,
-        _("Next help screen"));
+    /*Buttons at the bottom*/
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 2);
     widget_manager->breakLine();
+    widget_manager->addTextButtonWgt(WTOK_FIRST_PAGE, 30, 7,
+        _("< Back"));
 
     widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
         _("Back to the menu"));
 
+    widget_manager->addTextButtonWgt(WTOK_THIRD_PAGE, 30, 7,
+                                     _("Next >"));
+    
     widget_manager->layout( WGT_AREA_TOP );
 }   // HelpMenu
 
