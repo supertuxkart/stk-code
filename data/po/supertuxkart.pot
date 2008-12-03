@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-03 11:55-0500\n"
+"POT-Creation-Date: 2008-12-03 11:59-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,8 +101,7 @@ msgid ""
 "it will be thrown backwards."
 msgstr ""
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:74
+#: src/gui/player_controls.cpp:72
 msgid "Brake"
 msgstr ""
 
@@ -128,7 +127,7 @@ msgstr ""
 msgid "Challenges"
 msgstr ""
 
-#: src/gui/player_controls.cpp:90
+#: src/gui/player_controls.cpp:85
 #, c-format
 msgid "Choose your controls, %s"
 msgstr ""
@@ -304,7 +303,7 @@ msgid "Finished"
 msgstr ""
 
 #. I18N: name of controls, like in "fire missile"
-#: src/gui/player_controls.cpp:80
+#: src/gui/player_controls.cpp:74
 msgid "Fire"
 msgstr ""
 
@@ -410,11 +409,6 @@ msgstr ""
 msgid "Invalid short-cut!!"
 msgstr ""
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:76
-msgid "Jump"
-msgstr ""
-
 #: data/tracks/castle/castle.track:4
 msgid "King Weird's Castle"
 msgstr ""
@@ -440,7 +434,8 @@ msgstr ""
 msgid "Loading race..."
 msgstr ""
 
-#: src/gui/player_controls.cpp:81
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:76
 msgid "Look back"
 msgstr ""
 
@@ -498,6 +493,10 @@ msgstr ""
 msgid "Next >"
 msgstr ""
 
+#: src/gui/player_controls.cpp:72
+msgid "Nitro"
+msgstr ""
+
 #: src/gui/grand_prix_select.cpp:63 src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
 msgstr ""
@@ -551,7 +550,7 @@ msgid "Penguin Playground"
 msgstr ""
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:268
+#: src/gui/player_controls.cpp:263
 msgid "Player "
 msgstr ""
 
@@ -580,7 +579,7 @@ msgstr ""
 msgid "Player Config"
 msgstr ""
 
-#: src/gui/player_controls.cpp:96
+#: src/gui/player_controls.cpp:91
 msgid "Player name"
 msgstr ""
 
@@ -602,11 +601,11 @@ msgstr ""
 #: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:157
 #: src/gui/grand_prix_select.cpp:80 src/gui/network_gui.cpp:79
 #: src/gui/num_players.cpp:46 src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:128 src/gui/race_options.cpp:149
+#: src/gui/player_controls.cpp:123 src/gui/race_options.cpp:149
 msgid "Press <ESC> to go back"
 msgstr ""
 
-#: src/gui/player_controls.cpp:172
+#: src/gui/player_controls.cpp:167
 msgid "Press key"
 msgstr ""
 
@@ -647,8 +646,7 @@ msgstr ""
 msgid "Ready!"
 msgstr ""
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:78
+#: src/gui/player_controls.cpp:72
 msgid "Rescue"
 msgstr ""
 
@@ -680,6 +678,10 @@ msgstr ""
 
 #: src/gui/race_menu.cpp:55 src/gui/race_results_gui.cpp:79
 msgid "Setup New Race"
+msgstr ""
+
+#: src/gui/player_controls.cpp:72
+msgid "Sharp Turn"
 msgstr ""
 
 #: data/tracks/sandtrack/sandtrack.track:4
@@ -821,10 +823,6 @@ msgstr ""
 
 #: src/gui/char_sel.cpp:124 src/gui/network_gui.cpp:118
 msgid "Waiting for server"
-msgstr ""
-
-#: src/gui/player_controls.cpp:74
-msgid "Wheelie"
 msgstr ""
 
 #: data/followtheleader.challenge:5

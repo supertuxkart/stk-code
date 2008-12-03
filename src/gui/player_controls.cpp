@@ -69,15 +69,10 @@ const char *sKartAction2String[KA_LAST+1] =
      //I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
      _("Right"),
      //I18N: name of controls
-     _("Accelerate"),
-     //I18N: name of controls
-     _("Brake"),  _("Wheelie"),
-    //I18N: name of controls
-     _("Jump"),
-    //I18N: name of controls
-     _("Rescue"),
+     _("Accelerate"), _("Brake"),  _("Nitro"), _("Sharp Turn"), _("Rescue"),
     //I18N: name of controls, like in "fire missile"
      _("Fire"),
+    //I18N: name of controls
      _("Look back")
 };
 
