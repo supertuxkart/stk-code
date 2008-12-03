@@ -33,14 +33,12 @@ class Powerup
 {
 private:
     RandomGenerator            m_random;
-    SFXBase                   *m_sound_shot;
-    SFXBase                   *m_sound_use_anvil;
-    SFXBase                   *m_sound_use_parachute;
-
-protected:
-    Kart*                      m_owner;
+    SFXBase                   *m_sound_use;
     PowerupType                m_type;
     int                        m_number;
+	
+protected:
+    Kart*                      m_owner;
 
 public:
                     Powerup  (Kart* kart_);

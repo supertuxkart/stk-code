@@ -111,27 +111,29 @@ void SFXManager::loadSfx()
         snprintf(msg, sizeof(msg), "No sfx-config node");
         throw std::runtime_error(msg);
     }
-    loadSingleSfx(lisp, "ugh",           SOUND_UGH          );
-    loadSingleSfx(lisp, "skid",          SOUND_SKID         );
-    loadSingleSfx(lisp, "winner",        SOUND_WINNER       );
-    loadSingleSfx(lisp, "crash",         SOUND_CRASH        );
-    loadSingleSfx(lisp, "grab",          SOUND_GRAB         );
-    loadSingleSfx(lisp, "shot",          SOUND_SHOT         );
-    loadSingleSfx(lisp, "wee",           SOUND_WEE          );
-    loadSingleSfx(lisp, "explosion",     SOUND_EXPLOSION    );
-    loadSingleSfx(lisp, "bzzt",          SOUND_BZZT         );
-    loadSingleSfx(lisp, "beep",          SOUND_BEEP         );
-    loadSingleSfx(lisp, "back_menu",     SOUND_BACK_MENU    );
-    loadSingleSfx(lisp, "use_anvil",     SOUND_USE_ANVIL    );
-    loadSingleSfx(lisp, "use_parachute", SOUND_USE_PARACHUTE);
-    loadSingleSfx(lisp, "select_menu",   SOUND_SELECT_MENU  );
-    loadSingleSfx(lisp, "move_menu",     SOUND_MOVE_MENU    );
-    loadSingleSfx(lisp, "full",          SOUND_FULL         );
-    loadSingleSfx(lisp, "prestart",      SOUND_PRESTART     );
-    loadSingleSfx(lisp, "start",         SOUND_START        );
-    loadSingleSfx(lisp, "missile_lock",  SOUND_MISSILE_LOCK );
-    loadSingleSfx(lisp, "engine_small",  SOUND_ENGINE_SMALL );
-    loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE );
+    loadSingleSfx(lisp, "ugh",           SOUND_UGH            );
+    loadSingleSfx(lisp, "skid",          SOUND_SKID           );
+	loadSingleSfx(lisp, "bowling_roll",  SOUND_BOWLING_ROLL   );
+	loadSingleSfx(lisp, "bowling_strike",SOUND_BOWLING_STRIKE );
+    loadSingleSfx(lisp, "winner",        SOUND_WINNER         );
+    loadSingleSfx(lisp, "crash",         SOUND_CRASH          );
+    loadSingleSfx(lisp, "grab",          SOUND_GRAB           );
+    loadSingleSfx(lisp, "shot",          SOUND_SHOT           );
+    loadSingleSfx(lisp, "wee",           SOUND_WEE            );
+    loadSingleSfx(lisp, "explosion",     SOUND_EXPLOSION      );
+    loadSingleSfx(lisp, "bzzt",          SOUND_BZZT           );
+    loadSingleSfx(lisp, "beep",          SOUND_BEEP           );
+    loadSingleSfx(lisp, "back_menu",     SOUND_BACK_MENU      );
+    loadSingleSfx(lisp, "use_anvil",     SOUND_USE_ANVIL      );
+    loadSingleSfx(lisp, "use_parachute", SOUND_USE_PARACHUTE  );
+    loadSingleSfx(lisp, "select_menu",   SOUND_SELECT_MENU    );
+    loadSingleSfx(lisp, "move_menu",     SOUND_MOVE_MENU      );
+    loadSingleSfx(lisp, "full",          SOUND_FULL           );
+    loadSingleSfx(lisp, "prestart",      SOUND_PRESTART       );
+    loadSingleSfx(lisp, "start",         SOUND_START          );
+    loadSingleSfx(lisp, "missile_lock",  SOUND_MISSILE_LOCK   );
+    loadSingleSfx(lisp, "engine_small",  SOUND_ENGINE_SMALL   );
+    loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE   );
 }   // loadSfx
 //----------------------------------------------------------------------------
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 

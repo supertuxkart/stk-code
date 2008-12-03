@@ -34,9 +34,7 @@
 Powerup::Powerup(Kart* kart_)
 {
     m_owner               = kart_;
-    m_sound_shot          = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
-    m_sound_use_anvil     = sfx_manager->newSFX(SFXManager::SOUND_USE_ANVIL);
-    m_sound_use_parachute = sfx_manager->newSFX(SFXManager::SOUND_USE_PARACHUTE);
+	m_sound_use			  = NULL;
     reset();
 }   // Powerup
 
@@ -45,18 +43,15 @@ Powerup::Powerup(Kart* kart_)
  */
 Powerup::~Powerup()
 {
-    sfx_manager->deleteSFX(m_sound_shot);
-    sfx_manager->deleteSFX(m_sound_use_anvil);
-    sfx_manager->deleteSFX(m_sound_use_parachute);
-
+    sfx_manager->deleteSFX(m_sound_use);
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
 void Powerup::reset()
 {
-    int type;
-    RaceManager::getWorld()->getDefaultCollectibles( type, m_number );
-    m_type = (PowerupType)type;
+    int type, number;
+    RaceManager::getWorld()->getDefaultCollectibles( type, number );
+	set( (PowerupType)type, number );
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -69,6 +64,39 @@ void Powerup::set(PowerupType type, int n)
     }
     m_type=type;
     m_number=n;
+	
+	if(m_sound_use != NULL)
+	{
+		sfx_manager->deleteSFX(m_sound_use);
+		m_sound_use = NULL;
+	}
+	
+	switch (m_type)
+    {
+		case POWERUP_ZIPPER:
+			break ;
+			
+		case POWERUP_BOWLING:
+			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_BOWLING_ROLL);
+			break ;
+			
+		case POWERUP_ANVIL:
+			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_USE_ANVIL);
+			break;
+			
+		case POWERUP_PARACHUTE:
+			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_USE_PARACHUTE);
+			break;
+			
+		case POWERUP_NOTHING:
+		case POWERUP_CAKE:
+		case POWERUP_PLUNGER:
+		case POWERUP_BUBBLEGUM:
+		default :
+			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
+			break ;
+    }
+	
 }  // set
 
 //-----------------------------------------------------------------------------
@@ -82,6 +110,9 @@ Material *Powerup::getIcon()
 //-----------------------------------------------------------------------------
 void Powerup::use()
 {
+	// FIXME - for some collectibles, set() is never called
+	if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
+	
     m_number--;
     switch (m_type)
     {
@@ -91,15 +122,15 @@ void Powerup::use()
     case POWERUP_BOWLING:
     case POWERUP_PLUNGER:
         
-        m_sound_shot->position(m_owner->getXYZ());
-        m_sound_shot->play();
+        m_sound_use->position(m_owner->getXYZ());
+        m_sound_use->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
         
     case POWERUP_BUBBLEGUM:
         {
-        m_sound_shot->position(m_owner->getXYZ());
-        m_sound_shot->play();
+        m_sound_use->position(m_owner->getXYZ());
+        m_sound_use->play();
         btVector3 pos = m_owner->getXYZ();
         float z_coord = Track::NOHIT;
         Vec3 normal;
@@ -128,8 +159,8 @@ void Powerup::use()
                 kart->attach(ATTACH_ANVIL, stk_config->m_anvil_time);
                 kart->updatedWeight();
                 kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
-                m_sound_use_anvil->position(m_owner->getXYZ());
-                m_sound_use_anvil->play();
+                m_sound_use->position(m_owner->getXYZ());
+                m_sound_use->play();
                 break;
             }
         }
@@ -157,8 +188,8 @@ void Powerup::use()
 
             if(player_kart)
             {
-                m_sound_use_parachute->position(player_kart->getXYZ());
-                m_sound_use_parachute->play();
+                m_sound_use->position(player_kart->getXYZ());
+                m_sound_use->play();
             }
         }
         break;
@@ -186,8 +217,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
         {
             m_random.get(100);    // keep random numbers in sync
-            m_type    = (PowerupType)add_info;
-            m_number  = 1;
+			set( (PowerupType)add_info, 1);
             return;
         }
         const int SPECIAL_PROB = (int)(15.0 / ((float)RaceManager::getWorld()->getCurrentNumKarts() /
@@ -203,8 +233,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
                 if(kart->isEliminated() || kart == m_owner) continue;
                 if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {
-                    m_type = POWERUP_PARACHUTE;
-                    m_number = 1;
+					set(POWERUP_PARACHUTE, 1);
                     if(network_manager->getMode()==NetworkManager::NW_SERVER)
                     {
                         race_state->itemCollected(m_owner->getWorldKartId(), 
@@ -215,8 +244,8 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
                 }
             }
 
-            m_type   = m_random.get(2) == 0 ? POWERUP_ANVIL : POWERUP_PARACHUTE;
-            m_number = 1;
+			set( (m_random.get(2) == 0 ? POWERUP_ANVIL : POWERUP_PARACHUTE), 1 );
+
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
             {
                 race_state->itemCollected(m_owner->getWorldKartId(), 
@@ -234,8 +263,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     {
         if(m_type==POWERUP_NOTHING)
         {
-            m_type   = (PowerupType)add_info;
-            m_number = n;
+			set( (PowerupType)add_info, n  );
         }
         else if((PowerupType)add_info==m_type)
         {
@@ -272,8 +300,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 
     if(m_type==POWERUP_NOTHING)
     {
-        m_type=newC;
-        m_number = n;
+		set( newC, n );
     }
     else if(newC==m_type)
     {
