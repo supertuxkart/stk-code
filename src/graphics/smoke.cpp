@@ -73,9 +73,9 @@ void Smoke::particle_create(int, Particle *p)
     p->m_size         = 0.5f;
     p->m_time_to_live = 0.8f;
 
-    // The origin of the smoke depends on the turn direction: either rear
-    // left or rear right wheel - use the outer one.
-    int wheel_number = m_kart->getSteerPercent()>0 ? 2 : 3;
+    // Change from left to right wheel and back for each new particle
+    static int wheel_number = 2;
+    wheel_number            = 5 - wheel_number;
     Vec3 xyz=m_kart->getVehicle()->getWheelInfo(wheel_number).m_raycastInfo.m_contactPointWS;
 
     sgCopyVec3 (p->m_pos, xyz.toFloat());
