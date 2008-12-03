@@ -77,8 +77,8 @@ void Nitro::particle_create(int, Particle *p)
     const Vec3 vel = -m_kart->getVelocity()*0.2f;
     sgCopyVec3(p->m_vel, vel.toFloat());
     sgCopyVec3(p->m_pos, xyz.toFloat());
-    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()% 10));
-    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()% 80));
+    p->m_vel[0] += 2*cos(DEGREE_TO_RAD(rand()% 180));
+    p->m_vel[1] += 2*sin(DEGREE_TO_RAD(rand()% 180));
     p->m_vel[2] = 0;
 }   // particle_create
 
