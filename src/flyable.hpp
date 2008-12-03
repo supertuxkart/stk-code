@@ -102,7 +102,7 @@ public:
 
     virtual void hitTrack    () {};
     void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
-    bool         hasHit      ()               { return m_has_hit_something; }
+    bool         hasHit      () { return m_has_hit_something; }
     void         reset       () { Moveable::reset(); }
 };   // Flyable
 

@@ -33,7 +33,8 @@ public:
                 ~Plunger();
     static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
     virtual void update   (float dt);
+    virtual void hitTrack () { explode(NULL); }
 
-};   // Missile
+};   // Plunger
 
 #endif

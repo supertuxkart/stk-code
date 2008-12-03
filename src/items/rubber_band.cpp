@@ -86,27 +86,29 @@ void RubberBand::removeFromScene()
  */
 void RubberBand::update(float dt)
 {
-    const Vec3 &p=m_plunger->getXYZ();
-    const Vec3 &k=m_kart.getXYZ();
+    // Don't do anything for plungers who already hit something.
+    if(m_plunger->hasHit()) return; 
 
-    Vec3 diff=p-k;
+    const Vec3 &p = m_plunger->getXYZ();
+    const Vec3 &k = m_kart.getXYZ();
 
-    // See if anything hits the rubber band, but only if there is a certain 
-    // distance between plunger and kart. Otherwise the raycast will either
-    // hit the kart or the plunger.
-    if(diff.length2()>2.0f)
+    btCollisionWorld::ClosestRayResultCallback ray_callback(k, p);
+    // Disable raycast collision detection for this plunger and this kart!
+    short int old_plunger_group = m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
+    short int old_kart_group    = m_kart.getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
+    m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    m_kart.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+
+    // Do the raycast
+    RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
+                                                                      ray_callback);
+    // Reset collision groups
+    m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
+    m_kart.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
+    if(ray_callback.HasHit())
     {
-        diff.normalize();
-        const Vec3 from=k+diff;  // this could be made dependent on kart length
-        const Vec3 to = p-diff;
-        btCollisionWorld::ClosestRayResultCallback ray_callback(from, to);
-        RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(from, 
-                                                              to, ray_callback);
-        if(ray_callback.HasHit())
-        {
-            m_plunger->explode(NULL);
-            return;
-        }
+        m_plunger->explode(NULL);
+        return;
     }
 
     // Otherwise set the new coordinates for the plunger and the kart:
