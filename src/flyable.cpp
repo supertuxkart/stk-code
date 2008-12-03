@@ -68,7 +68,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 }   // Flyable
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 velocity,
-                            btCollisionShape *shape, const bool gravity,
+                            btCollisionShape *shape, const float gravity,
                             const bool rotates, const bool turn_around, const btTransform* customDirection)
 {
     // Get Kart heading direction
@@ -97,8 +97,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 velocity,
     m_user_pointer.set(this);
     RaceManager::getWorld()->getPhysics()->addBody(getBody());
 
-    if(gravity) m_body->setGravity(btVector3(0.0f, 0.0f, -9.8f));
-    else m_body->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+    m_body->setGravity(btVector3(0.0f, 0.0f, gravity));
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;

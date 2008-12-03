@@ -34,7 +34,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     const bool reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
     
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                  new btCylinderShape(0.5f*m_extend), false, false, reverse_mode );
+                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, reverse_mode );
     m_rubber_band = new RubberBand(this, *kart);
     m_rubber_band->ref();
 }   // Plunger

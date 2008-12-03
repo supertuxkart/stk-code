@@ -84,7 +84,7 @@ protected:
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,
-                                    btCollisionShape *shape, const bool gravity=false,
+                                    btCollisionShape *shape, const float gravity=0.0f,
                                     const bool rotates=false, const bool turn_around=false, 
                                     const btTransform* customDirection=NULL);
 public:
