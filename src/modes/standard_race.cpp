@@ -98,9 +98,6 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
         amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
-	
-	collectible_type = POWERUP_BOWLING;
-	amount = 5;
 }
 //-----------------------------------------------------------------------------
 bool StandardRace::enableBonusBoxes()
