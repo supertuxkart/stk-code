@@ -131,17 +131,17 @@ void Physics::update(float dt)
             }
             else if(p->b->is(UserPointer::UP_MOVING_PHYSICS))
             {
-                p->a->getPointerFlyable()->explode(NULL, p->b->getPointerMovingPhysics());
+                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerMovingPhysics());
 
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
             {
-                p->a->getPointerFlyable()->explode(p->b->getPointerKart());
+                p->a->getPointerFlyable()->hit(p->b->getPointerKart());
             }
             else                                     // projectile hits projectile
             {
-                p->a->getPointerFlyable()->explode(NULL);
-                p->b->getPointerFlyable()->explode(NULL);
+                p->a->getPointerFlyable()->hit(NULL);
+                p->b->getPointerFlyable()->hit(NULL);
             }
         }
     }  // for all p in m_all_collisions

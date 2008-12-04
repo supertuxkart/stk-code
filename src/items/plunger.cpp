@@ -21,8 +21,12 @@
 
 #include "constants.hpp"
 #include "camera.hpp"
+#include "race_manager.hpp"
+#include "scene.hpp"
 #include "items/rubber_band.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
+#include "modes/world.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
@@ -37,6 +41,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
                   new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, reverse_mode );
     m_rubber_band = new RubberBand(this, *kart);
     m_rubber_band->ref();
+    m_keep_alive = -1;
 }   // Plunger
 
 // -----------------------------------------------------------------------------
@@ -55,7 +60,72 @@ void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
 // -----------------------------------------------------------------------------
 void Plunger::update(float dt)
 {
+    // In keep-alive mode, just update the rubber band
+    if(m_keep_alive >= 0)
+    {
+        m_keep_alive -= dt;
+        if(m_keep_alive<=0)
+        {
+            setHasHit();
+            projectile_manager->notifyRemove();
+            ssgTransform *m = getModelTransform();
+            m->removeAllKids();
+            scene->remove(m);
+        }
+        m_rubber_band->update(dt);
+        return;
+    }
+
+    // Else: update the flyable and rubber band
     Flyable::update(dt);
     m_rubber_band->update(dt);
 }   // update
+
+// -----------------------------------------------------------------------------
+/** Virtual function called when the plunger hits something.
+ *  The plunger is special in that it is not deleted when hitting an object.
+ *  Instead it stays around (though not as a graphical or physical object)
+ *  till the rubber band expires.
+ *  \param kart Pointer to the kart hit (NULL if not a kart).
+ *  \param mp  Pointer to MovingPhysics object if hit (NULL otherwise).
+ */
+void Plunger::hit(Kart *kart, MovingPhysics *mp)
+{
+    if(isOwnerImmunity(kart)) return;
+
+    m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
+
+    // Make this object invisible by placing it faaar down. Not that if this
+    // objects is simply removed from the scene graph, it might be auto-deleted
+    // because the ref count reaches zero.
+    Vec3 hell(0, 0, -10000);
+    getModelTransform()->setTransform(hell.toFloat());
+    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+    
+    if(kart)
+    {
+        m_rubber_band->hit(kart);
+        return;
+    }
+    else if(mp)
+    {
+        Vec3 pos(mp->getBody()->getWorldTransform().getOrigin());
+        m_rubber_band->hit(NULL, &pos);
+    }
+    else
+    {
+        m_rubber_band->hit(NULL, &(getXYZ()));
+    }
+
+}   // hit
+
+// -----------------------------------------------------------------------------
+/** Called when the plunger hits the track. In this case, notify the rubber
+ *  band, and remove the plunger (but keep it alive). 
+ */
+void Plunger::hitTrack()
+{
+    hit(NULL, NULL);
+}   // hitTrack
+
 // -----------------------------------------------------------------------------

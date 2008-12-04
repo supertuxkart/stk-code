@@ -222,7 +222,7 @@ void MovingPhysics::reset()
 }   // reset 
 
 // -----------------------------------------------------------------------------
-void MovingPhysics::handleExplosion(const btVector3& pos, bool direct_hit) {
+void MovingPhysics::handleExplosion(const Vec3& pos, bool direct_hit) {
     if(direct_hit) {
         btVector3 impulse(0.0f, 0.0f, stk_config->m_explosion_impulse_objects);
         m_body->applyCentralImpulse(impulse);

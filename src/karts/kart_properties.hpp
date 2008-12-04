@@ -52,17 +52,17 @@ private:
 protected:
     // Display and gui
     // --------------- 
-    std::string m_name;         /**< The human readable Name of the kart
-                                 *   driver. */
-    std::string m_ident;        /**< The computer readable-name of the kart
-                                 *   driver. */
-    std::string m_icon_file;    /**< Filename of icon that represents the kart
-                                 *   in the statusbar and the character select
-                                 *   screen. */
-    std::string m_shadow_file;  /**< Filename of the image file that contains 
-                                 *   the shadow for this kart. */
-    Vec3 m_color;               /**< Color the represents the kart in the status
-                                 *   bar and on the track-view. */
+    std::string m_name;               /**< The human readable Name of the kart
+                                       *   driver. */
+    std::string m_ident;              /**< The computer readable-name of the
+                                       *   kart driver. */
+    std::string m_icon_file;          /**< Filename of icon that represents the 
+                                       *   kart in the statusbar and the 
+                                       *   character select screen. */
+    std::string m_shadow_file;        /**< Filename of the image file that 
+                                       *   contains the shadow for this kart.*/
+    Vec3 m_color;                     /**< Color the represents the kart in the
+                                       *   status bar and on the track-view. */
 
     // Physic properties
     // -----------------
@@ -99,7 +99,11 @@ protected:
                *m_wheel_transform[4];  /**< The transform for the wheels, used
                                         *   to rotate the wheels and display
                                         *   the suspension in the race.      */
-    SFXManager::SFXType m_engine_sfx_type;
+    float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
+    float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
+    float       m_rubber_band_duration;/**< Duration a rubber band works.    */
+
+    SFXManager::SFXType m_engine_sfx_type; /**< Engine sound effect.         */
 
     // bullet physics data 
     // -------------------
@@ -182,13 +186,19 @@ public:
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }
-    const Vec3& getGravityCenterShift() const {return m_gravity_center_shift;    }
+    const Vec3&getGravityCenterShift() const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }
     float getTrackConnectionAccel   () const {return m_track_connection_accel;   }
+    /** Returns the maximum length of a rubber band before it breaks. */
+    float getRubberBandMaxLength    () const {return m_rubber_band_max_length;   }
+    /** Returns force a rubber band has when attached to a kart. */
+    float getRubberBandForce        () const {return m_rubber_band_force;        }
+    /** Returns the duration a rubber band is active for. */
+    float getRubberBandDuration     () const {return m_rubber_band_duration;     }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 

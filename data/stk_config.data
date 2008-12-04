@@ -35,7 +35,7 @@
  (shortcut-length           120  )  ;; leaving the road and coming back on it more than
                                     ;; 120 'meters" later is considered to be a shortcut
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
- (explosion-impulse-objects 500.0  )  ;; explosion impulse for physics objects (smaller
+ (explosion-impulse-objects 500.0)  ;; explosion impulse for physics objects (smaller
                                     ;; else a cone e.g. will be pushed way too far)
 
  ;; The following files are the defaults for karts
@@ -119,6 +119,9 @@
    (upright-tolerance         0.2)
    (upright-max-force         30)
    (track-connection-accel     2)
+   (rubber-band-max-length    50)  ;; Maximum length of rubber band
+   (rubber-band-force       1500)  ;; Force a plunger/rubber band applies to the kart(s).
+   (rubber-band-duration       1)  ;; Duration a rubber band acts.
    (camera-max-accel          10)
    (camera-max-brake          10)
    (camera-distance           3.5) 

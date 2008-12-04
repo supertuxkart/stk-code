@@ -26,19 +26,36 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
+#include "utils/vec3.hpp"
 class Kart;
 class Plunger;
 
 class RubberBand : public ssgVtxTable
 {
 private:
+    enum {RB_TO_PLUNGER,         /**< Rubber band is attached to plunger.    */
+          RB_TO_KART,            /**< Rubber band is attached to a kart hit. */
+          RB_TO_TRACK}           /**< Rubber band is attached to track.      */
+                    m_attached_state;
+    /** True if plunger was fired backwards. */
+    bool            m_is_backward; 
+    /** If rubber band is attached to track, the coordinates. */
+    Vec3            m_hit_position;
+    /** The plunger the rubber band is attached to. */
     Plunger        *m_plunger;
-    const Kart     &m_kart;
+    /** The kart who shot this plunger. */
+    const Kart     &m_owner;
+    /** The kart a plunger might have hit. */
+    Kart           *m_hit_kart;
+    /** State for rubber band. */
     ssgSimpleState *m_state;
+
+    void checkForHit(const Vec3 &k, const Vec3 &p);
 
 public:
          RubberBand(Plunger *plunger, const Kart &kart);
     void update(float dt);
     void removeFromScene();
+    void hit(Kart *kart_hit, const Vec3 *track_xyz=NULL);
 };   // RubberBand
 #endif

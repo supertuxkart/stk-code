@@ -23,18 +23,31 @@
 #include "flyable.hpp"
 
 class RubberBand;
+class Kart;
+class MovingPhysics;
 
 class Plunger : public Flyable
 {
 private:
-    RubberBand *m_rubber_band;
+    /** The rubber band attached to a plunger. */
+    RubberBand  *m_rubber_band;
+    /** Timer to keep the plunger alive while the rubber band is working. */
+    float        m_keep_alive;
+
 public:
                  Plunger(Kart *kart);
                 ~Plunger();
     static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
+    /** Sets the keep-alive value. Setting it to 0 will remove the plunger
+     *  at the next update - which is used if the rubber band snaps. 
+     */
+    void         setKeepAlive(float t) {m_keep_alive = t;}
     virtual void update   (float dt);
-    virtual void hitTrack () { explode(NULL); }
+    virtual void hitTrack ();
+    virtual void hit      (Kart *kart, MovingPhysics *mp=NULL);
 
+    /** A plunger does not explode if it is removed. */
+    virtual bool needsExplosion() const {return false;}
 };   // Plunger
 
 #endif

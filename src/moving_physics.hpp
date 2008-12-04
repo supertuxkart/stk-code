@@ -26,6 +26,8 @@
 #include "callback.hpp"
 #include "user_pointer.hpp"
 
+class Vec3;
+
 class MovingPhysics : public ssgTransform, public Callback
 {
 public:
@@ -46,8 +48,9 @@ public:
     void update             (float dt);
     void         init       ();
     virtual void reset      ();
-    const char  *getTypeName()          {return "moving physics";}
-    virtual void handleExplosion(const btVector3& pos, bool directHit);
+    btRigidBody *getBody    ()          { return m_body;           }
+    const char  *getTypeName()          { return "moving physics"; }
+    virtual void handleExplosion(const Vec3& pos, bool directHit);
 };  // MovingPhysics
 
 #endif

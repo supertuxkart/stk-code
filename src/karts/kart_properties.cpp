@@ -65,8 +65,10 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_chassis_angular_damping = m_maximum_speed = m_suspension_rest = 
         m_max_speed_reverse_ratio = m_jump_velocity = m_upright_tolerance = 
         m_upright_max_force = m_suspension_travel_cm = 
-        m_track_connection_accel = m_min_speed_turn = 
-        m_angle_at_min = m_max_speed_turn = m_angle_at_max =
+        m_track_connection_accel = m_min_speed_turn = m_angle_at_min = 
+        m_max_speed_turn = m_angle_at_max =
+        m_rubber_band_max_length = m_rubber_band_force = 
+        m_rubber_band_duration =
         m_camera_max_accel = m_camera_max_brake = 
         m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -247,6 +249,10 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
     lisp->get("track-connection-accel",    m_track_connection_accel   );
+    lisp->get("rubber-band-max-length",    m_rubber_band_max_length   );
+    lisp->get("rubber-band-force",         m_rubber_band_force        );
+    lisp->get("rubber-band-duration",      m_rubber_band_duration     );
+
     lisp->getVector("groups",              m_groups                   );
 
     // getVector appends to existing vectors, so a new one must be used to load
@@ -326,6 +332,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
     CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
     CHECK_NEG(m_track_connection_accel,    "track-connection-accel"     );
+    CHECK_NEG(m_rubber_band_max_length,    "rubber-band-max-length"     );
+    CHECK_NEG(m_rubber_band_force,         "rubber-band-force"          );
+    CHECK_NEG(m_rubber_band_duration,      "rubber-band-duration"       );
     CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
     CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
     CHECK_NEG(m_camera_distance,           "camera-distance"            );

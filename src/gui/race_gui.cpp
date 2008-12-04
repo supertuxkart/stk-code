@@ -172,7 +172,7 @@ RaceGUI::handle(GameAction ga, int value)
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
-			if (race_manager->getNumPlayers() ==1 )
+//FIXME			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setPowerup(POWERUP_PLUNGER, 10000);

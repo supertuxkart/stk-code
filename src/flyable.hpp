@@ -22,10 +22,12 @@
 
 #include "moving_physics.hpp"
 #include "terrain_info.hpp"
-#include "karts/kart.hpp"
+#include "audio/sfx_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 
 class FlyableInfo;
+class Kart;
 
 class Flyable : public Moveable, public TerrainInfo
 {
@@ -101,11 +103,17 @@ public:
     void         updateFromServer(const FlyableInfo &f, float dt);
 
     virtual void hitTrack    () {};
-    void         explode     (Kart* kart, MovingPhysics* moving_physics=NULL);
+    virtual void hit         (Kart* kart, MovingPhysics* moving_physics=NULL);
     bool         hasHit      () { return m_has_hit_something; }
-    void         reset       () { Moveable::reset(); }
-	
-	virtual int getExplosionSound() const { return SFXManager::SOUND_EXPLOSION; }
+    /** Indicates that something was hit and that this object must 
+     *  be removed. */
+    void         setHasHit   () { m_has_hit_something = true; }
+    void         reset       () { Moveable::reset();          }
+	bool         isOwnerImmunity(const Kart *kart_hit) const;
+	virtual int  getExplosionSound() const { return SFXManager::SOUND_EXPLOSION; }
+    /** Indicates if an explosion needs to be added if this flyable 
+      * is removed. */
+    virtual bool needsExplosion() const {return true;}
 };   // Flyable
 
 #endif

@@ -52,7 +52,8 @@ private:
 public:
                      ProjectileManager() {m_something_was_hit=false;}
                     ~ProjectileManager() {}
-    void             explode          () {m_something_was_hit=true; }
+    /** Notifies the projectile manager that something needs to be removed. */
+    void             notifyRemove     () {m_something_was_hit=true; }
     void             FinishedExplosion() {m_explosion_ended =true;  }
     ssgSelector*     getExplosionModel()
     {

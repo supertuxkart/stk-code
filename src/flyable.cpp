@@ -188,7 +188,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
 void Flyable::update (float dt)
 {
 	m_time_since_thrown += dt;
-	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) explode(NULL);
+	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);
 	
     if(m_exploded) return;
 	
@@ -196,7 +196,7 @@ void Flyable::update (float dt)
     TerrainInfo::update(pos);
     if(getHoT()==Track::NOHIT) 
     {
-        explode(NULL);    // flyable out of track boundary
+        hit(NULL);    // flyable out of track boundary
         return;
     }
     if(m_adjust_z_velocity)
@@ -231,17 +231,27 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 }   // updateFromServer
 
 // -----------------------------------------------------------------------------
-void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
+/** Returns true if the item hit the kart who shot it (to avoid that an item
+ *  that's too close to the shoter hits the shoter).
+ *  \param kart Kart who was hit.
+ */
+bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 {
-	if(m_exploded) return;
+	return m_owner_has_temporary_immunity && 
+           kart_hit == m_owner            && 
+           m_time_since_thrown < 2.0f;
+}   // isOwnerImmunity
 
+// -----------------------------------------------------------------------------
+void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
+{
 	// the owner of this flyable should not be hit by his own flyable
-	if(m_owner_has_temporary_immunity && kart_hit == m_owner && m_time_since_thrown < 2.0f) return;
+	if(m_exploded || isOwnerImmunity(kart_hit)) return;
 	
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.
-    projectile_manager->explode();
+    projectile_manager->notifyRemove();
 
     // Now remove this projectile from the graph:
     ssgTransform *m = getModelTransform();
@@ -254,6 +264,10 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
     RaceManager::getWorld()->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
+    if(!needsExplosion()) return;
+
+    // Apply explosion effect
+    // ----------------------
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
         Kart *kart = RaceManager::getKart(i);
@@ -271,6 +285,6 @@ void Flyable::explode(Kart *kart_hit, MovingPhysics* moving_physics)
         }
     }
     callback_manager->handleExplosion(pos_explosion, moving_physics);
-}   // explode
+}   // hit
 
 /* EOF */

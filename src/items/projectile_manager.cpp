@@ -99,7 +99,10 @@ void ProjectileManager::update(float dt)
         while(p!=m_active_projectiles.end())
         {
             if(! (*p)->hasHit()) { p++; continue; }
-            newExplosion((*p)->getXYZ(), (*p)->getExplosionSound() );
+            if((*p)->needsExplosion())
+            {
+                newExplosion((*p)->getXYZ(), (*p)->getExplosionSound() );
+            }
             Flyable *f=*p;
             Projectiles::iterator pNext=m_active_projectiles.erase(p);  // returns the next element
             delete f;
@@ -174,7 +177,7 @@ void ProjectileManager::updateClient(float dt)
         if(f.m_exploded) 
         {
             m_something_was_hit = true;
-            (*i)->explode(NULL);
+            (*i)->hit(NULL);
         }
     }   // for i in m_active_projectiles
 
