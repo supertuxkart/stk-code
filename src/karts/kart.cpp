@@ -962,7 +962,7 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         m_smoke_system->setCreationRate((m_skidding-1)*100.0f);
     if(m_nitro)
         m_nitro->setCreationRate(m_controls.wheelie && m_collected_energy>0
-                                 ? getSpeed() : 0);
+                                 ? getSpeed()*5.0f : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*0.05f*3.1415926f * speed_ratio * m_skidding*m_skidding;
