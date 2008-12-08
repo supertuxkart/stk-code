@@ -106,6 +106,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
+    CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     m_kart_properties.checkAllSet(filename);
@@ -131,6 +132,7 @@ void STKConfig::init_defaults()
     m_max_karts                = -100;
     m_grid_order               = -100;
     m_max_history              = -100;
+    m_max_skidmarks            = -100;
     m_title_music              = NULL;
     m_game_style               = GS_WHEELIE;
     m_scores.clear();
@@ -166,6 +168,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("grid-order",                   m_grid_order               );
     lisp->getVector("scores",                 m_scores                   );
     lisp->get("max-history",                  m_max_history              );
+    lisp->get("max-skidmarks",                m_max_skidmarks            );
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->get("menu-background",              m_menu_background          );

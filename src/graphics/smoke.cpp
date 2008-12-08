@@ -71,7 +71,7 @@ void Smoke::particle_create(int, Particle *p)
     sgSetVec3(p->m_vel, 0, 0, 0 );
     sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
     p->m_size         = 0.5f;
-    p->m_time_to_live = 0.8f;
+    p->m_time_to_live = 0.4f;
 
     // Change from left to right wheel and back for each new particle
     static int wheel_number = 2;

@@ -342,6 +342,7 @@ void Kart::reset()
     m_vehicle->applyEngineForce (0.0f, 3);
 
     Moveable::reset();
+    m_skidmarks->reset();
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
@@ -887,7 +888,7 @@ void Kart::endRescue()
 }   // endRescue
 
 //-----------------------------------------------------------------------------
-#include <scene.hpp>
+
 void Kart::loadData()
 {
     float r [ 2 ] = { -10.0f, 100.0f } ;
@@ -959,7 +960,10 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
 
     if(m_smoke_system)
-        m_smoke_system->setCreationRate((m_skidding-1)*100.0f);
+    {
+        float f = fabsf(m_controls.lr) > 0.8 ? 50.0f : 0.0f;
+        m_smoke_system->setCreationRate((m_skidding-1)*f);
+    }
     if(m_nitro)
         m_nitro->setCreationRate(m_controls.wheelie && m_collected_energy>0
                                  ? getSpeed()*5.0f : 0);

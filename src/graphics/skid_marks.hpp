@@ -39,30 +39,29 @@ private:
     bool         m_skid_marking;
                  /** Reduce effect of Z-fighting. */
     float        m_width;
+                 /** Index of current (last added) skid mark quad. */
+    int          m_current;
 
     class SkidMarkQuads : public ssgVtxTable
     {
     public:
-        SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
-                       ssgSimpleState *state);
-        ~SkidMarkQuads();
+            SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
+                           ssgSimpleState *state);
         void recalcBSphere();
         void add          (const Vec3 &left,
                            const Vec3 &right);
-    private:
-        float m_track_offset;                 // Amount of which the skidmark is lifted
-        // above the track to avoid z-buffer errors
     };  // SkidMarkQuads
 
     /** Two skidmark objects for the left and right wheel. */
     std::vector <SkidMarkQuads *> m_left, m_right;
-    ssgSimpleState             *m_skid_state;
+    /** The state for colour etc. */
+    ssgSimpleState               *m_skid_state;
 
 public:
          SkidMarks(const Kart& kart, float width=0.2f);
         ~SkidMarks();
     void update  (float dt); 
-
+    void reset();
 };   // SkidMarks
 
 #endif

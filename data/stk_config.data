@@ -13,6 +13,7 @@
  (menu-background          "st_title_screen.rgb")
  (game-style               "nitro") ;; "wheelie" or "nitro"
  (max-history              10000)   ;; maximum number of history frames.
+ (max-skidmarks              100)   ;; max. number of skidmarks per kart.
  (delay-finish-time           10)   ;; delay till race results are displayed.
  (music-credit-time           10)   ;; time for which the music credits are displayed.
 

@@ -27,33 +27,42 @@
 /** Initialises empty skid marks. */
 SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 {
-    m_width               = width;
-    m_skid_state          = new ssgSimpleState();
+    m_width        = width;
+    m_skid_state   = new ssgSimpleState();
     m_skid_state->ref();
     m_skid_state->enable(GL_BLEND);
-    //This is just for the skidmarks, so the ones drawn when the kart is in
-    //reverse get drawn
-//    m_skid_state -> disable (GL_CULL_FACE);
     m_skid_marking = false;
+    m_current      = -1;
 }   // SkidMark
 
 //-----------------------------------------------------------------------------
+/** Removes all skid marks from the scene graph and frees the state. */
 SkidMarks::~SkidMarks()
 {
-#ifdef NOTYET
-    if(!m_skid_marks.empty())
-    {
-        const unsigned int SIZE = (unsigned int)m_skid_marks.size() -1;
-        for(unsigned int i = 0; i < SIZE; ++i)
-        {
-            ssgDeRefDelete(m_skid_marks[i]);
-        }   // for
-    }   // if !empty
+    reset();  // remove all skid marks
     ssgDeRefDelete(m_skid_state);
-#endif
 }   // ~SkidMarks
 
 //-----------------------------------------------------------------------------
+/** Removes all skid marks, called when a race is restarted.
+ */
+void SkidMarks::reset()
+{
+    for(unsigned int i=0; i<m_left.size(); i++)
+    {
+        scene->remove(m_left[i]);
+        scene->remove(m_right[i]);
+    }
+    m_left.clear();
+    m_right.clear();
+    m_skid_marking = false;
+}   // reset
+
+//-----------------------------------------------------------------------------
+/** Either adds to an existing skid mark quad, or (if the kart is skidding) 
+ *  starts a new skid mark quad.
+ *  \param dt Time step.
+ */
 void SkidMarks::update(float dt)
 {
     if(m_skid_marking)
@@ -65,8 +74,6 @@ void SkidMarks::update(float dt)
         const btWheelInfo::RaycastInfo raycast_left = 
             m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
         Vec3 delta = raycast_right.m_contactPointWS - raycast_left.m_contactPointWS;
-
-        int current=m_left.size()-1;
 
         // We were skid marking, but not anymore (either because the 
         // wheels don't touch the ground, or the kart has stopped 
@@ -80,8 +87,8 @@ void SkidMarks::update(float dt)
             delta.length2()<0.0001)
         {
             m_skid_marking = false;
-            m_left[current]->makeDList();
-            m_right[current]->makeDList();
+            m_left[m_current]->makeDList();
+            m_right[m_current]->makeDList();
             return;
         }
 
@@ -91,10 +98,10 @@ void SkidMarks::update(float dt)
         delta.normalize();
         delta *= m_width;
         
-        m_left [current]->add(raycast_left.m_contactPointWS,
-                              raycast_left.m_contactPointWS + delta);
-        m_right[current]->add(raycast_right.m_contactPointWS-delta,
-                              raycast_right.m_contactPointWS);
+        m_left [m_current]->add(raycast_left.m_contactPointWS,
+                                raycast_left.m_contactPointWS + delta);
+        m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
+                                raycast_right.m_contactPointWS);
 
         return;
     }
@@ -108,6 +115,7 @@ void SkidMarks::update(float dt)
         m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;  
     // No skidmarking if wheels don't have contact
     if(!raycast_right.m_isInContact) return;
+
     const btWheelInfo::RaycastInfo raycast_left = 
         m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
 
@@ -123,13 +131,28 @@ void SkidMarks::update(float dt)
                                          raycast_left.m_contactPointWS + delta,
                                          m_skid_state);
     scene->add(smq_left);
-    m_left.push_back(smq_left);
     SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS
                                                   - delta,
                                                   raycast_right.m_contactPointWS,
                                                   m_skid_state);
     scene->add(smq_right);
-    m_right.push_back(smq_right);
+    m_current++;
+    if(m_current>=stk_config->m_max_skidmarks)
+        m_current = 0;
+    if(m_current>=(int)m_left.size())
+    {
+        m_left. push_back(smq_left );
+        m_right.push_back(smq_right);
+    }
+    else
+    {
+        scene->remove(m_left [m_current]);
+        scene->remove(m_right[m_current]);
+        m_left [m_current] = smq_left;
+        m_right[m_current] = smq_right;
+    }
+
+
     m_skid_marking = true;
 
 }   // update
@@ -147,10 +170,6 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
     add(left, right);
 }   // SkidMarkQuads
 
-
-//-----------------------------------------------------------------------------
-SkidMarks::SkidMarkQuads::~SkidMarkQuads()
-{}   // ~SkidMarkPos
 
 //-----------------------------------------------------------------------------
 void SkidMarks::SkidMarkQuads::recalcBSphere()
