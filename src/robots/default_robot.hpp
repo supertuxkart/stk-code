@@ -21,6 +21,10 @@
 
 #include "karts/auto_kart.hpp"
 
+class Track;
+class LinearWorld;
+class TrackInfo;
+
 class DefaultRobot : public AutoKart
 {
 private:
@@ -94,6 +98,15 @@ private:
     float m_curve_target_speed;
     float m_curve_angle;
 
+    /** Keep a pointer to the track to reduce calls */
+    Track       *m_track;
+
+    /** Keep a pointer to world. */
+    LinearWorld *m_world;
+    /** Cache kart_info.m_track_sector. */
+    int   m_track_sector;
+
+
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -101,42 +114,48 @@ private:
     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
 
+    /** All AIs share the track info object, so that its information needs 
+     *  only to be computed once. */
+    static const TrackInfo *m_track_info;
+    /** This counts how many AIs have a pointer to the TrackInfo object. If
+     *  this number reaches zero, the shared TrackInfo object is 
+     *  deallocated. */
+    static int m_num_of_track_info_instances;
+
+    int  m_sector;
+
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
      *variable, except handle_race_start() that isn't associated with any
      *specific action (more like, associated with inaction).
      */
-    void handle_race_start();
-    void handle_acceleration(const float DELTA);
-    void handle_steering();
-    void handle_items(const float DELTA, const int STEPS);
-    void handle_rescue(const float DELTA);
-    void handle_braking();
-    void handle_wheelie(const int STEPS);
+    void  handleRaceStart();
+    void  handleAcceleration(const float DELTA);
+    void  handleSteering();
+    void  handleItems(const float DELTA, const int STEPS);
+    void  handleRescue(const float DELTA);
+    void  handleBraking();
 
     /*Lower level functions not called directly from update()*/
-    float steer_to_angle(const size_t SECTOR, const float ANGLE);
-    float steer_to_point(const sgVec2 POINT);
+    float steerToAngle(const size_t SECTOR, const float ANGLE);
+    float steerToPoint(const sgVec2 POINT);
 
-    bool do_wheelie(const int STEPS);
-    void check_crashes(const int STEPS, const Vec3& pos);
-    void find_non_crashing_point(sgVec2 result);
+    void  checkCrashes(const int STEPS, const Vec3& pos);
+    void  findNonCrashingPoint(sgVec2 result);
 
-    float normalize_angle (float angle);
-    int calc_steps();
-
-    float angle_to_control(float angle) const;
-    float get_approx_radius(const int START, const int END) const;
-    void find_curve();
-    int m_sector;
+    float normalizeAngle(float angle);
+    int   calcSteps();
+    float angleToControl(float angle) const;
+    float getApproxRadius(const int START, const int END) const;
+    void  findCurve();
 
 public:
-    DefaultRobot(const std::string& kart_name, int position,
-                 const btTransform& init_pos);
-
-    void update      (float delta) ;
-    void reset       ();
-    virtual void crashed(Kart *k) {if(k) m_collided = true;};
+                 DefaultRobot(const std::string& kart_name, int position,
+                              const btTransform& init_pos, const Track *track);
+                ~DefaultRobot();
+    void         update      (float delta) ;
+    void         reset       ();
+    virtual void crashed     (Kart *k) {if(k) m_collided = true;};
 };
 
 #endif

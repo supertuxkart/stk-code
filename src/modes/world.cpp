@@ -109,7 +109,7 @@ void World::init()
         if(user_config->m_profile)
         {
             // In profile mode, load only the old kart
-            newkart = new DefaultRobot(kart_name, position, init_pos);
+            newkart = new DefaultRobot(kart_name, position, init_pos, m_track);
     	    // Create a camera for the last kart (since this way more of the 
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
@@ -523,11 +523,11 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
     switch(m_random.get(NUM_ROBOTS))
     {
         case 0:
-            currentRobot = new DefaultRobot(kart_name, position, init_pos);
+            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
             break;
         default:
             std::cerr << "Warning: Unknown robot, using default." << std::endl;
-            currentRobot = new DefaultRobot(kart_name, position, init_pos);
+            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
             break;
     }
     

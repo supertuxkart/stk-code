@@ -147,9 +147,10 @@ supertuxkart_SOURCES =     main.cpp  			\
 	gui/challenges_menu.cpp	   gui/challenges_menu.hpp	\
 	gui/feature_unlocked.cpp   gui/feature_unlocked.hpp	\
 	gui/font.hpp		   gui/font.cpp                 \
-	physics/physics.cpp        physics/physics.hpp          \
+        physics/physics.cpp        physics/physics.hpp          \
         physics/kart_motion_state.hpp                           \
-	robots/default_robot.cpp   robots/default_robot.hpp	\
+        robots/default_robot.cpp   robots/default_robot.hpp     \
+        robots/track_info.cpp      robots/track_info.hpp        \
 	modes/follow_the_leader.cpp modes/follow_the_leader.hpp \
 	modes/standard_race.cpp    modes/standard_race.hpp      \
 	modes/clock.cpp            modes/clock.hpp              \

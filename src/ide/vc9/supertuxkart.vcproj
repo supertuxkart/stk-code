@@ -966,6 +966,10 @@
 					RelativePath="../../../src\robots\default_robot.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\robots\track_info.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="challenges"
@@ -1542,6 +1546,10 @@
 				>
 				<File
 					RelativePath="../../../src\robots\default_robot.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\robots\track_info.hpp"
 					>
 				</File>
 			</Filter>

@@ -72,7 +72,6 @@ void LinearWorld::init()
         info.m_time_at_last_lap     = 99999.9f;
         
         m_kart_info.push_back(info);
-        
     }// next kart
 }
 //-----------------------------------------------------------------------------
@@ -488,7 +487,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     kart->setXYZ( RaceManager::getTrack()->trackToSpatial(info.m_track_sector) );
     
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector]) );
+                         RaceManager::getTrack()->m_angle[info.m_track_sector] );
     kart->setRotation(heading);
     
     // A certain epsilon is added here to the Z coordinate (0.1), in case
@@ -498,11 +497,12 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     btTransform pos;
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
-                    DEGREE_TO_RAD(RaceManager::getTrack()->m_angle[info.m_track_sector])));
+                    RaceManager::getTrack()->m_angle[info.m_track_sector]));
 
     body->setCenterOfMassTransform(pos);
     
-}
+}   // moveKartAfterRescue
+
 //-----------------------------------------------------------------------------
 /** Find the position (rank) of 'kart' and update it accordingly
   */

@@ -54,11 +54,6 @@ private:
     ssgBranch*               m_model;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
-    // The next two variables are for AI improvements: the AI sometimes does
-    // not estimate curve speed and/or angle correctly, resulting in too much
-    // braking. These factors are used to adjust this.
-    float                    m_AI_angle_adjustment;
-    float                    m_AI_curve_speed_adjustment;
     bool                     m_has_final_camera;
     Vec3                     m_camera_final_position;
     Vec3                     m_camera_final_hpr;
@@ -170,8 +165,6 @@ public:
     const float&  getFogDensity          () const {return m_fog_density;        }
     const float&  getFogStart            () const {return m_fog_start;          }
     const float&  getFogEnd              () const {return m_fog_end;            }
-    const float&  getAIAngleAdjustment   () const {return m_AI_angle_adjustment;}
-    const float&  getAICurveSpeedAdjustment() const {return m_AI_curve_speed_adjustment;}
     const sgVec4& getSkyColor            () const {return m_sky_color;          }
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }

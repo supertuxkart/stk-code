@@ -809,8 +809,6 @@ void Track::loadTrack(std::string filename_)
     m_fog_start                 = 0.0f;
     m_fog_end                   = 1000.0f;
     m_gravity                   = 9.80665f;
-    m_AI_angle_adjustment       = 1.0f;
-    m_AI_curve_speed_adjustment = 1.0f;
 
     sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
     sgSetVec4 ( m_sky_color,     0.3f, 0.7f, 0.9f, 1.0f );
@@ -858,8 +856,6 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("sun-diffuse",           m_diffuse_col);
     LISP->get      ("gravity",               m_gravity);
     LISP->get      ("arena",                 m_is_arena);
-    LISP->get      ("AI-angle-adjust",       m_AI_angle_adjustment);
-    LISP->get      ("AI-curve-speed-adjust", m_AI_curve_speed_adjustment);
     LISP->getVector("groups",                m_groups);
     if(m_groups.size()==0)
         m_groups.push_back("standard");
@@ -935,19 +931,13 @@ Track::loadDriveline()
         m_path_width.push_back(width);
     }
 
-    size_t next;
-    float adjacent_line, opposite_line;
-    SGfloat theta;
-
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
-        next = i + 1 >= DRIVELINE_SIZE ? 0 : i + 1;
-        adjacent_line = m_driveline[next].getX() - m_driveline[i].getX();
-        opposite_line = m_driveline[next].getY() - m_driveline[i].getY();
+        unsigned int next = i + 1 >= DRIVELINE_SIZE ? 0 : i + 1;
+        float dx = m_driveline[next].getX() - m_driveline[i].getX();
+        float dy = m_driveline[next].getY() - m_driveline[i].getY();
 
-        theta = sgATan(opposite_line/adjacent_line);
-        theta += adjacent_line < 0.0f ? 90.0f : -90.0f;
-
+        float theta = -atan2(dx, dy);
         m_angle.push_back(theta);
     }
 
