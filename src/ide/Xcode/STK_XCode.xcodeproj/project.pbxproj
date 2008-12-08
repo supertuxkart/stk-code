@@ -527,6 +527,7 @@
 		95CDF2200EE4B2A600830348 /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF21F0EE4B2A600830348 /* smoke.cpp */; };
 		95CDF2230EE4B2B400830348 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF2220EE4B2B400830348 /* particle_system.cpp */; };
 		95CDF2270EE4B2CB00830348 /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CDF2250EE4B2CB00830348 /* vec3.cpp */; };
+		95E05F580EECB1100072E0B6 /* track_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E05F570EECB1100072E0B6 /* track_info.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -1369,6 +1370,8 @@
 		95CDF2240EE4B2CB00830348 /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = games/supertuxkart/src/utils/vec3.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95CDF2250EE4B2CB00830348 /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = games/supertuxkart/src/utils/vec3.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95CDF2260EE4B2CB00830348 /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = games/supertuxkart/src/utils/coord.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95E05F560EECB1100072E0B6 /* track_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info.hpp; path = games/supertuxkart/src/robots/track_info.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95E05F570EECB1100072E0B6 /* track_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info.cpp; path = games/supertuxkart/src/robots/track_info.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -2425,6 +2428,8 @@
 		95B0CE9B0EB69DDA001A0D06 /* robots */ = {
 			isa = PBXGroup;
 			children = (
+				95E05F560EECB1100072E0B6 /* track_info.hpp */,
+				95E05F570EECB1100072E0B6 /* track_info.cpp */,
 				95B0CE9C0EB69DDA001A0D06 /* default_robot.cpp */,
 				95B0CE9D0EB69DDA001A0D06 /* default_robot.hpp */,
 				95B0CE9E0EB69DDA001A0D06 /* empty_robot.cpp */,
@@ -3050,6 +3055,7 @@
 				95CDF2230EE4B2B400830348 /* particle_system.cpp in Sources */,
 				95CDF2270EE4B2CB00830348 /* vec3.cpp in Sources */,
 				9506014A0EE5FD82005FFC63 /* skid_marks.cpp in Sources */,
+				95E05F580EECB1100072E0B6 /* track_info.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
