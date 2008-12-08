@@ -135,10 +135,18 @@ void LinearWorld::update(float delta)
 
     // ------------- do stuff specific to this subtype of race -----
     
-    for(unsigned int n=0; n<kart_amount; n++)
+    for(unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
-        if(!m_kart[n]->hasFinishedRace()) updateRacePosition(m_kart[n], m_kart_info[n]);
+        if(!m_kart[i]->hasFinishedRace()) 
+        {
+            updateRacePosition(m_kart[i], m_kart_info[i]);
+            // During the last lap update the estimated finish time.
+            // This is used to play the faster music, and by the AI
+            if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
+                m_kart_info[i].m_estimated_finish =
+                    estimateFinishTimeForKart(m_kart[i]);
+        }
     }
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -321,6 +329,16 @@ void LinearWorld::setTimeAtLapForKart(float t, const int kart_id)
     m_kart_info[kart_id].m_time_at_last_lap=t;
 }
 //-----------------------------------------------------------------------------
+/** Returns the estimated finishing time. Only valid during the last lap!
+ *  \param kart_id Id of the kart.
+ */
+float LinearWorld::getEstimatedFinishTime(const int kart_id) const
+{
+    assert(m_kart_info[kart_id].m_race_lap == race_manager->getNumLaps()-1);
+    return m_kart_info[kart_id].m_estimated_finish;
+}   // getEstimatedFinishTime
+
+//-----------------------------------------------------------------------------
 float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_time_at_last_lap;
@@ -423,7 +441,7 @@ void LinearWorld::terminateRace()
     {
         if(!m_kart[i]->hasFinishedRace())
         {
-            const float est_finish_time = estimateFinishTimeForKart(m_kart[i], m_kart_info[i]);
+            const float est_finish_time = m_kart_info[i].m_estimated_finish;
             m_kart[i]->raceFinished(est_finish_time);
         }  // if !hasFinishedRace
     }   // for i
@@ -437,7 +455,7 @@ void LinearWorld::raceResultOrder( int* order )
     }
 }
 //-----------------------------------------------------------------------------
-float LinearWorld::estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info)
+float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 {
     // Estimate the arrival time of any karts that haven't arrived
     // yet by using their average speed up to now and the distance
@@ -446,6 +464,7 @@ float LinearWorld::estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info)
     // higher average speed and therefore finish the race earlier 
     // than karts further behind), so the position doesn't have to
     // be updated to get the correct scoring.
+    const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
     float distance_covered  = kart_info.m_race_lap * RaceManager::getTrack()->getTrackLength()
         + getDistanceDownTrackForKart(kart->getWorldKartId());
     // In case that a kart is rescued behind start line, or ...
@@ -535,11 +554,11 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
     // Switch on faster music if not already done so, if the
     // first kart is doing its last lap, and if the estimated
     // remaining time is less than 30 seconds.
-    if(!m_faster_music_active                           && 
+    if(!m_faster_music_active                                  && 
        kart_info.m_race_lap == race_manager->getNumLaps()-1    && 
-       p==1                                             &&
-       useFastMusicNearEnd()                            &&
-       estimateFinishTimeForKart( kart, m_kart_info[kart->getWorldKartId()] )-getTime()<30.0f   ) 
+       p==1                                                    &&
+       useFastMusicNearEnd()                                   &&
+       kart_info.m_estimated_finish - getTime() < 30.0f              )
     {
         sound_manager->switchToFastMusic();
         m_faster_music_active=true;

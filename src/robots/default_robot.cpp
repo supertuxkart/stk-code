@@ -28,6 +28,7 @@
 //won't be erased the next time the function is called.
 #define SHOW_NON_CRASHING_POINT //If defined, draws a green sphere where the
 //n farthest non-crashing point is.
+#define _WINSOCKAPI_
 #include <plib/ssgAux.h>
 #endif
 
@@ -72,24 +73,31 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_item_tactic        = IT_TEN_SECONDS;
         m_max_start_delay    = 0.5f;
         m_min_steps          = 0;
+        m_skidding_threshold = 4.0f;
         break;
     case RaceManager::RD_MEDIUM:
-        m_wait_for_players = true;
+        m_wait_for_players   = true;
         m_max_handicap_accel = 0.95f;
-        m_fallback_tactic = FT_PARALLEL;
-        m_item_tactic = IT_CALCULATE;
-        m_max_start_delay = 0.4f;
-        m_min_steps = 1;
+        m_fallback_tactic    = FT_PARALLEL;
+        m_item_tactic        = IT_CALCULATE;
+        m_max_start_delay    = 0.4f;
+        m_min_steps          = 1;
+        m_skidding_threshold = 2.0f;
         break;
     case RaceManager::RD_HARD:
-        m_wait_for_players = false;
+        m_wait_for_players   = false;
         m_max_handicap_accel = 1.0f;
-        m_fallback_tactic = FT_FAREST_POINT;
-        m_item_tactic = IT_CALCULATE;
-        m_max_start_delay = 0.1f;
-        m_min_steps = 2;
+        m_fallback_tactic    = FT_FAREST_POINT;
+        m_item_tactic        = IT_CALCULATE;
+        m_max_start_delay    = 0.1f;
+        m_min_steps          = 2;
+        m_skidding_threshold = 1.3f;
         break;
     }
+    static int count =0;
+    m_skidding_threshold = count==0?4.0f: 1.3f;
+    count = 1-count;
+
 }   // DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -155,6 +163,7 @@ void DefaultRobot::update( float delta )
     handleItems( delta, steps );
     handleRescue( delta );
     handleBraking();
+    handleNitro();
 
     /*And obviously general kart stuff*/
     AutoKart::update( delta );
@@ -293,6 +302,7 @@ void DefaultRobot::handleSteering()
     }
     else
     {
+        m_start_kart_crash_direction = 0;
         switch( m_fallback_tactic )
         {
         case FT_FAREST_POINT:
@@ -326,8 +336,7 @@ void DefaultRobot::handleSteering()
     if (fabsf(steer_angle) < 2.0f*3.1415/180.0f)
         steer_angle = 0.f;
 
-    m_controls.lr   = angleToControl( steer_angle );
-    m_controls.jump = fabsf(m_controls.lr)>0.99;
+    setSteering(steer_angle);
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -462,7 +471,7 @@ void DefaultRobot::handleRescue(const float DELTA)
     //TODO: check if we collided against a dynamic object (ej.:kart) or
     //against the track's static object.
     //The m_crash_time measures if a kart has been crashing for too long
-
+#ifdef RESCUE_IF_CRASHES_WITH_KARTS
     m_crash_time += (m_collided && isOnGround()) ? 3.0f * DELTA : -0.25f * DELTA;
     if( m_crash_time < 0.0f ) m_crash_time = 0.0f;
 
@@ -472,7 +481,7 @@ void DefaultRobot::handleRescue(const float DELTA)
         forceRescue();
         m_crash_time = 0.0f;
     }
-
+#endif
 
     // check if kart is stuck
     if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->isStartPhase())
@@ -489,6 +498,92 @@ void DefaultRobot::handleRescue(const float DELTA)
         m_time_since_stuck = 0.0f;
     }
 }   // handleRescue
+
+//-----------------------------------------------------------------------------
+/** Decides wether to use nitro or not.
+ */
+void DefaultRobot::handleNitro()
+{
+    m_controls.wheelie = false;
+    // Don't use nitro if the kart doesn't have any, is not on ground,
+    if(getEnergy()==0 || !isOnGround() || hasFinishedRace() ) return;
+
+    // If a parachute or anvil is attached, the nitro doesn't give much
+    // benefit. Better wait till later.
+    const bool has_slowdown_attachment = 
+                                   m_attachment.getType()==ATTACH_PARACHUTE ||
+                                   m_attachment.getType()==ATTACH_ANVIL;
+    if(has_slowdown_attachment) return;
+
+    // If the kart is very slow (e.g. after rescue), use nitro
+    if(getSpeed()<5)
+    {
+        m_controls.wheelie = true;
+        return;
+    }
+
+    // If this kart is the last kart, and we have enough 
+    // (i.e. more than 2) nitro, use it.
+    // -------------------------------------------------
+    const unsigned int num_karts = race_manager->getNumKarts();
+    if(getPosition()== num_karts && getEnergy()>2.0f)
+    {
+        m_controls.wheelie = true;
+        return;
+    }
+
+    // On the last track shortly before the finishing line, use nitro 
+    // anyway. Since the kart is faster with nitro, estimate a 30% time
+    // decrease.
+    if(m_world->getLapForKart(getWorldKartId())==race_manager->getNumLaps()-1)
+    {
+        float finish = m_world->getEstimatedFinishTime(getWorldKartId());
+        if( 1.3f*getEnergy() >= finish - m_world->getTime() )
+        {
+            m_controls.wheelie = true;
+            printf("lasp lap --> nitro.\n");
+            return;
+        }
+    }
+
+    const float my_dist = m_world->getDistanceDownTrackForKart(getWorldKartId());
+    // A kart within this distance is considered to be overtaking (or to be
+    // overtaken).
+    const float overtake_distance = 10.0f;
+    for(unsigned int i=0; i<num_karts; i++)
+    {
+        Kart *kart = RaceManager::getKart(i);
+        if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
+
+        float dist = m_world->getDistanceDownTrackForKart(i);
+
+        // Kart too far behind to be a risk
+        if(dist+overtake_distance<my_dist) continue;
+
+        // Kart too far ahead to try overtake
+        if(dist-overtake_distance>my_dist) continue;
+
+        // Kart behind might overtake this kart
+        // ------------------------------------
+        if(dist<my_dist)
+        {
+            // Kart behind is slower than this kart - no need to use nitro
+            if(kart->getSpeed() < getSpeed()) continue;
+
+            // Nitro doesn't give much benefit - better wait and
+            // see if we can re-overtake once the attachment is gone
+            m_controls.wheelie = true;
+            return;
+        }
+
+        // Now there is a kart close ahead, try overtaking
+        // -----------------------------------------------
+        if(kart->getSpeed()+5.0f > getSpeed())
+        {
+            m_controls.wheelie = true;
+        }
+    }
+}   // handleNitro
 
 //-----------------------------------------------------------------------------
 float DefaultRobot::steerToAngle (const size_t SECTOR, const float ANGLE)
@@ -541,14 +636,12 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
     const Vec3 &VEL = getVelocity();
     vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
     float len=vel_normal.length();
-    if(len>0.0f)
-    {
-        vel_normal/=len;
-    }
-    else
-    {
-        vel_normal.setValue(0.0, 0.0, 0.0);
-    }
+    // If the velocity is zero, no sense in checking for crashes in time
+    if(len==0) return;
+
+    // Time it takes to drive for m_kart_length units.
+    float dt = m_kart_length / len; 
+    vel_normal/=len;
 
     for(int i = 1; STEPS > i; ++i)
     {
@@ -563,12 +656,13 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
             {
                 const Kart* kart = RaceManager::getKart(j);
                 if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
+                const Kart *other_kart = RaceManager::getKart(j);
+                Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
+                kart_distance = (step_coord - other_kart_xyz).length_2d();
 
-                kart_distance = (step_coord - RaceManager::getKart(j)->getXYZ()).length_2d();
-
-                if( kart_distance < m_kart_length + 0.125f * i )
-                    if( getVelocityLC().getY() > RaceManager::getKart(j)->
-                       getVelocityLC().getY() * 0.75f ) m_crashes.m_kart = j;
+                if( kart_distance < m_kart_length &&
+                    getVelocityLC().getY() > other_kart->getVelocityLC().getY())
+                    m_crashes.m_kart = j;
             }
         }
 
@@ -592,7 +686,7 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
         center[1] = step_coord[1];
         center[2] = pos[2];
         sphere->setCenter( center );
-        sphere->setSize( m_kart_properties->getKartLength() );
+        sphere->setSize( m_kart_properties->getKartModel()->getLength() );
         if( m_sector == Track::UNKNOWN_SECTOR )
         {
             sgVec4 colour;
@@ -696,7 +790,7 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
                 sgVec3 center;
                 center[0] = result[0];
                 center[1] = result[1];
-                center[2] = m_curr_pos.xyz[2];
+                center[2] = getXYZ().getZ();
                 sphere->setCenter( center );
                 sphere->setSize( 0.5f );
 
@@ -777,18 +871,18 @@ int DefaultRobot::calcSteps()
 }   // calcSteps
 
 //-----------------------------------------------------------------------------
-/** Translates coordinates from an angle(in degrees) to values within the range
- *  of -1.0 to 1.0 to use the same format as the KartControl::lr variable.
+/** Converts the steering angle to a lr steering in the range of -1 to 1. 
+ *  If the steering angle is too great, it will also trigger skidding.
  */
-float DefaultRobot::angleToControl( float angle ) const
+void DefaultRobot::setSteering( float angle )
 {
     angle = angle / getMaxSteerAngle();
+    m_controls.jump = fabsf(angle)>m_skidding_threshold;
 
-    if(angle > 1.0f) return 1.0f;
-    else if(angle < -1.0f) return -1.0f;
-
-    return angle;
-}   // angleToControl
+    if     (angle >  1.0f) m_controls.lr =  1.0f;
+    else if(angle < -1.0f) m_controls.lr = -1.0f;
+    else                   m_controls.lr = angle;
+}   // setSteering
 
 //-----------------------------------------------------------------------------
 /** Finds the approximate radius of a track's curve. It needs two arguments,

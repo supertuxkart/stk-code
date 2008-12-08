@@ -29,11 +29,13 @@ class RaceGUI;
   */
 struct KartInfo
 {
-    int         m_race_lap;             // number of finished(!) laps
-    float       m_time_at_last_lap;     // time at finishing last lap
-    float       m_lap_start_time;       // Time at start of a new lap
-    int         m_track_sector;         // index in driveline, special values
-                                        // e.g. UNKNOWN_SECTOR can be negative!
+    int         m_race_lap;             /**<Number of finished(!) laps. */
+    float       m_time_at_last_lap;     /**<Time at finishing last lap. */
+    float       m_lap_start_time;       /**<Time at start of a new lap. */
+    float       m_estimated_finish;     /**<During last lap only:
+                                         *  estimated finishing time!   */
+    int         m_track_sector;         /**<Index in driveline, special values
+                                         * e.g. UNKNOWN_SECTOR can be negative!*/
     int         m_last_valid_sector;
     Vec3        m_curr_track_coords;
     Vec3        m_last_track_coords;
@@ -58,7 +60,7 @@ protected:
     void            forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut);
     
     void            doLapCounting ( KartInfo& kart_info, Kart* kart );
-    float           estimateFinishTimeForKart  (Kart* kart, KartInfo& kart_info);
+    float           estimateFinishTimeForKart(Kart* kart);
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
 public:
     LinearWorld();
@@ -79,6 +81,7 @@ public:
     int             getSectorForKart(const int kart_id) const;
     float           getDistanceDownTrackForKart(const int kart_id) const;
     float           getDistanceToCenterForKart(const int kart_id) const;
+    float           getEstimatedFinishTime(const int kart_id) const;
     int             getLapForKart(const int kart_id) const;
     void            setTimeAtLapForKart(float t, const int kart_id);
     float           getTimeAtLapForKart(const int kart_id) const;

@@ -122,6 +122,12 @@ private:
      *  deallocated. */
     static int m_num_of_track_info_instances;
 
+    /** The minimum steering angle at which the AI adds skidding. Lower values
+     *  tend to improve the line the AI is driving. This is used to adjust for
+     *  different AI levels.
+     */
+    float m_skidding_threshold;
+
     int  m_sector;
 
     /*Functions called directly from update(). They all represent an action
@@ -135,6 +141,7 @@ private:
     void  handleItems(const float DELTA, const int STEPS);
     void  handleRescue(const float DELTA);
     void  handleBraking();
+    void  handleNitro();
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
@@ -145,7 +152,7 @@ private:
 
     float normalizeAngle(float angle);
     int   calcSteps();
-    float angleToControl(float angle) const;
+    void  setSteering(float angle);
     float getApproxRadius(const int START, const int END) const;
     void  findCurve();
 
