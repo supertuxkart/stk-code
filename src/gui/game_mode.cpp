@@ -78,19 +78,20 @@ GameMode::GameMode()
     w->setPosition(column_1_dir, column_1_loc, NULL,
                    WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
     w_prev=w;
-    w=widget_manager->addTextButtonWgt(WTOK_3_STRIKES_SINGLE, WIDTH, HEIGHT,
-                                       _("3 Strikes Battle"));
-    w->setPosition(column_1_dir, column_1_loc, NULL,
-                   WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
-    w_prev=w;
-    widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_3_STRIKES_SINGLE);
-
+    
     // don't activate battle mode in single-player mode
-    if(race_manager->getNumLocalPlayers()==1 && 
-        network_manager->getMode()==NetworkManager::NW_NONE)
-        widget_manager->deactivateWgt(WTOK_3_STRIKES_SINGLE);
+    if(race_manager->getNumLocalPlayers()>1 ||
+       network_manager->getMode()!=NetworkManager::NW_NONE)
+    {
+        w=widget_manager->addTextButtonWgt(WTOK_3_STRIKES_SINGLE, WIDTH, HEIGHT,
+                                           _("3 Strikes Battle"));
+        w->setPosition(column_1_dir, column_1_loc, NULL,
+                       WGT_DIR_UNDER_WIDGET,  0.0f, w_prev);
+        w_prev=w;
+        widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_3_STRIKES_SINGLE);
+    }
     else
-        widget_manager->activateWgt(WTOK_3_STRIKES_SINGLE);
+        widget_manager->sameWidth(WTOK_TITLE_SINGLE, WTOK_FOLLOW_LEADER_SINGLE);
     
     // Then the GPs
     // ============
