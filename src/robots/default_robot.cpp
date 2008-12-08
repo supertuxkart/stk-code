@@ -94,10 +94,6 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_skidding_threshold = 1.3f;
         break;
     }
-    static int count =0;
-    m_skidding_threshold = count==0?4.0f: 1.3f;
-    count = 1-count;
-
 }   // DefaultRobot
 
 //-----------------------------------------------------------------------------
