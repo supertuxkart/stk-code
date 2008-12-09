@@ -596,14 +596,13 @@ int main(int argc, char *argv[] )
         }
         else  // profile
         {
-
             // Profiling
             // =========
-            race_manager->setNumPlayers(1);
             race_manager->setLocalKartInfo(0, kart_properties_manager->getKart("tux")->getIdent());
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
+            network_manager->setupPlayerKartInfo();
             race_manager->startNew();
         }
         main_loop->run();

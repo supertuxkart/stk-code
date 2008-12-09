@@ -115,6 +115,7 @@ void World::init()
             if(i==race_manager->getNumKarts()-1) 
             {
                 scene->createCamera(local_player_id, newkart);
+                m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
             }
         }
         else
