@@ -551,14 +551,13 @@ void Kart::update(float dt)
     }
 
     btTransform trans=getTrans();
-    // Add a certain epsilon (0.2) to the height of the kart. This avoids
+    // Add a certain epsilon (0.3) to the height of the kart. This avoids
     // problems of the ray being cast from under the track (which happened
-    // e.g. on tux tollway when jumping down from the ramp).
-    // FIXME: this should be more thoroughly fixed, the constant is probably
-    // dependent on the wheel size, suspension data etc.: when jumping,
-    // the wheel suspension will be fully compressed, resulting in the
-    // ray to start too low (under the track).
-    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.2f);
+    // e.g. on tux tollway when jumping down from the ramp, when the chassis
+    // partly tunnels through the track). While tunneling should not be 
+    // happening (since Z velocity is clamped), the epsilon is left in place
+    // just to be on the safe side (it will not hit the chassis itself).
+    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.3f);
     // These values cause the track not to be hit in tuxtrack. I leave
     // them in as a test case if additional debugging should be needed.
     // Note: it might be that the kart chassis is actually 'in' the track,
