@@ -522,7 +522,7 @@ void DefaultRobot::handleNitro()
     // (i.e. more than 2) nitro, use it.
     // -------------------------------------------------
     const unsigned int num_karts = race_manager->getNumKarts();
-    if(getPosition()== num_karts && getEnergy()>2.0f)
+    if(getPosition()== (int)num_karts && getEnergy()>2.0f)
     {
         m_controls.wheelie = true;
         return;

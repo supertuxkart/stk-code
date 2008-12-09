@@ -302,3 +302,4 @@ bool ThreeStrikesBattle::acceptPowerup(const int type) const
     
     return true;
 }
+

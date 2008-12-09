@@ -36,10 +36,10 @@ void TrackInfo::setupSteerInfo()
     // direction changes from either straight to curve or the other way round.
     int i = 0;
     int num_drivelines  = m_track->m_driveline.size();
-    float current_angle = m_track->m_angle[i];
+    // not ready yet float current_angle = m_track->m_angle[i];
     while(i<num_drivelines)
     {
-        DirectionType dir = computeDirection(i);
+      // not ready yetDirectionType dir = computeDirection(i);
         i++;
     }
 }   // setupSteerInfo
