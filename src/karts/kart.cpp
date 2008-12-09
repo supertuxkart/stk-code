@@ -559,7 +559,13 @@ void Kart::update(float dt)
     // the wheel suspension will be fully compressed, resulting in the
     // ray to start too low (under the track).
     Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.2f);
-    //btVector3 pos_plus_epsilon (-56.6874237, -137.48851, -3.06826854);
+    // These values cause the track not to be hit in tuxtrack. I leave
+    // them in as a test case if additional debugging should be needed.
+    // Note: it might be that the kart chassis is actually 'in' the track,
+    // i.e. it's a tunneling problem!
+    //btVector3 pos_plus_epsilon (-54.449902, -139.99402, -3.4524240);
+    // motionstate:               -52.449902, -139.99402, -3.6524241
+    // collision object           -52.221024, -139.99614, -3.5276926
     TerrainInfo::update(pos_plus_epsilon);
 
     const Material* material=getMaterial();
@@ -838,6 +844,23 @@ void Kart::updatePhysics (float dt)
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
 
     }
+
+    // To avoid tunneling (which can happen on long falls), clamp the
+    // velocity in Z direction. Tunneling can happen if the Z velocity
+    // is larger than the maximum suspension travel (per frame), since then
+    // the wheel suspension can not stop/slow down the fall (though I am
+    // not sure if this is enough in all cases!). So the speed is limited
+    // to suspensionTravel / dt with dt = 1/60 (since this is the dt
+    // bullet is using).
+    const Vec3 &v = m_body->getLinearVelocity();
+    if(v.getZ() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
+    {
+        Vec3 v_clamped = v;
+        // clamp the speed to 99% of the maxium falling speed.
+        v_clamped.setZ(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
+        m_body->setLinearVelocity(v_clamped);
+    }
+
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
