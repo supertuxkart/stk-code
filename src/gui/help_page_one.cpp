@@ -22,6 +22,7 @@
 #include "menu_manager.hpp"
 #include "user_config.hpp"
 #include "translation.hpp"
+#include "items/item_manager.hpp"
 
 enum WidgetTokens
 {

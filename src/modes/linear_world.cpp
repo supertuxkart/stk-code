@@ -23,6 +23,7 @@
 
 #include "gui/race_gui.hpp"
  
+#include "constants.hpp"
 #include "track.hpp"
 #include "gui/menu_manager.hpp"
 #include "translation.hpp"

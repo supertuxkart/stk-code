@@ -24,6 +24,7 @@
 #include "sdldrv.hpp"
 
 #include "user_config.hpp"
+#include "constants.hpp"
 #include "history.hpp"
 #include "track.hpp"
 #include "material_manager.hpp"

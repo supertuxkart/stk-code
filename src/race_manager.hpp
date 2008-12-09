@@ -29,6 +29,7 @@
 
 class World;
 class Track;
+class Kart;
 
 /** The race manager has two functions:
  *  1) it stores information about the race the user selected (e.g. number
@@ -149,7 +150,7 @@ private:
     }
 
 public:
-    bool                             m_active_race; //True if there is a race
+    bool   m_active_race; //True if there is a race
 
     static World* getWorld();
     static void setWorld(World* world);

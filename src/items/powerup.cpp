@@ -24,6 +24,7 @@
 #include "stk_config.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"

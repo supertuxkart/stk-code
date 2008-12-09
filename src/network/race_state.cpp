@@ -20,6 +20,7 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 
 RaceState *race_state=NULL;

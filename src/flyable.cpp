@@ -21,6 +21,7 @@
 
 #include "flyable.hpp"
 #include "track.hpp"
+#include "constants.hpp"
 #include "callback_manager.hpp"
 #include "scene.hpp"
 #include "race_manager.hpp"

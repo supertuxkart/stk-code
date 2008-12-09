@@ -26,6 +26,7 @@
 
 #include "string_utils.hpp"
 #include "scene.hpp"
+#include "utils/coord.hpp"
 #include "utils/ssg_help.hpp"
 #include "modes/world.hpp"
 
