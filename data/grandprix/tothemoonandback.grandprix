@@ -3,8 +3,8 @@
 (supertuxkart-grand-prix
  (name _("To the Moon and Back"))
  (description _("Second grand prix"))
- (tracks "beach" "startrack" "jungle" "lighthouse")
- (laps      2       3           2         4)
+ (tracks "lighthouse" "startrack" "xr591" "beach")
+ (laps      4           3           3        2 )
 )
 
 ;; EOF ;;
