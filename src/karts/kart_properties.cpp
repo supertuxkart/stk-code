@@ -59,7 +59,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_max_speed_turn = m_angle_at_max = m_engine_power = m_brake_factor =
         m_time_full_steer = m_wheelie_max_pitch = m_wheelie_max_speed_ratio = 
         m_wheelie_pitch_rate = m_wheelie_restore_rate = m_wheelie_speed_boost =
-        m_suspension_stiffness = m_wheel_damping_relaxation = 
+        m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
         m_wheel_radius = m_wheelie_power_boost = m_chassis_linear_damping = 
         m_chassis_angular_damping = m_maximum_speed = m_suspension_rest = 
@@ -68,7 +68,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min = 
         m_max_speed_turn = m_angle_at_max =
         m_rubber_band_max_length = m_rubber_band_force = 
-        m_rubber_band_duration =
+        m_rubber_band_duration = 
         m_camera_max_accel = m_camera_max_brake = 
         m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -150,10 +150,10 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         }
         m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
                                                m_wheel_radius);
-        float wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
-                                 -m_kart_model.getWheelPhysicsPosition(2).getY());
-        m_angle_at_min = asinf(wheel_base/m_min_radius);
-        m_angle_at_max = asinf(wheel_base/m_max_radius);
+        m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
+                             -m_kart_model.getWheelPhysicsPosition(2).getY());
+        m_angle_at_min = asinf(m_wheel_base/m_min_radius);
+        m_angle_at_max = asinf(m_wheel_base/m_max_radius);
         if(m_max_speed_turn == m_min_speed_turn)
             m_speed_angle_increase = 0.0;
         else
@@ -322,6 +322,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_friction_slip,             "friction-slip"              );
     CHECK_NEG(m_roll_influence,            "roll-influence"             );
     CHECK_NEG(m_wheel_radius,              "wheel-radius"               );
+    // Don't check m_wheel_base here, it is computed later!
     CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
     CHECK_NEG(m_maximum_speed,             "maximum-speed"              );

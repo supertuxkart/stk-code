@@ -1,6 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
 //  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
+//  Copyright (C) 2008      Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -113,20 +114,20 @@ DefaultRobot::~DefaultRobot()
 //-----------------------------------------------------------------------------
 //TODO: if the AI is crashing constantly, make it move backwards in a straight
 //line, then move forward while turning.
-void DefaultRobot::update( float delta )
+void DefaultRobot::update(float dt)
 {
     m_track_sector = m_world->m_kart_info[ getWorldKartId() ].m_track_sector;
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
     {
-        AutoKart::update( delta );
+        AutoKart::update(dt);
         return;
     }
 
     if( RaceManager::getWorld()->isStartPhase() )
     {
         handleRaceStart();
-        AutoKart::update( delta );
+        AutoKart::update(dt);
         return;
     }
 
@@ -154,15 +155,15 @@ void DefaultRobot::update( float delta )
     findCurve();
 
     /*Response handling functions*/
-    handleAcceleration( delta );
-    handleSteering();
-    handleItems( delta, steps );
-    handleRescue( delta );
+    handleAcceleration(dt);
+    handleSteering(dt);
+    handleItems(dt, steps);
+    handleRescue(dt);
     handleBraking();
     handleNitro();
 
     /*And obviously general kart stuff*/
-    AutoKart::update( delta );
+    AutoKart::update(dt);
     m_collided = false;
 }   // update
 
@@ -237,7 +238,7 @@ void DefaultRobot::handleBraking()
 }   // handleBraking
 
 //-----------------------------------------------------------------------------
-void DefaultRobot::handleSteering()
+void DefaultRobot::handleSteering(float dt)
 {
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
     const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE 
@@ -248,11 +249,10 @@ void DefaultRobot::handleSteering()
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5 >
+    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5f >
         m_track->getWidth()[m_track_sector] )
     {
-        steer_angle = steerToPoint( m_track->
-            m_driveline[NEXT_SECTOR] );
+        steer_angle = steerToPoint( m_track->m_driveline[NEXT_SECTOR], dt );
 
 #ifdef AI_DEBUG
         std::cout << "- Outside of road: steer to center point." <<
@@ -305,7 +305,7 @@ void DefaultRobot::handleSteering()
             {
                 sgVec2 straight_point;
                 findNonCrashingPoint( straight_point );
-                steer_angle = steerToPoint( straight_point );
+                steer_angle = steerToPoint(straight_point, dt);
             }
             break;
 
@@ -537,7 +537,6 @@ void DefaultRobot::handleNitro()
         if( 1.3f*getEnergy() >= finish - m_world->getTime() )
         {
             m_controls.wheelie = true;
-            printf("lasp lap --> nitro.\n");
             return;
         }
     }
@@ -596,13 +595,52 @@ float DefaultRobot::steerToAngle (const size_t SECTOR, const float ANGLE)
 }   // steerToAngle
 
 //-----------------------------------------------------------------------------
-float DefaultRobot::steerToPoint( const sgVec2 POINT )
+/** Computes the steering angle to reach a certain point. Note that the
+ *  steering angle depends on the velocity of the kart (simple setting the
+ *  steering angle towards the angle the point has is not correct: a slower
+ *  kart will obviously turn less in one time step than a faster kart).
+ *  \param point Point to steer towards.
+ *  \param dt    Time step.
+ */
+float DefaultRobot::steerToPoint(const sgVec2 point, float dt)
 {
-    const float dx    = POINT[0] - getXYZ().getX();
-    const float dy    = POINT[1] - getXYZ().getY();
-    float theta       = -atan2(dx, dy);
-    float steer_angle = theta - getHPR().getHeading();
-    steer_angle       = normalizeAngle(steer_angle);
+    // No sense steering if we are not driving.
+    if(getSpeed()==0) return 0.0f;
+    const float dx        = point[0] - getXYZ().getX();
+    const float dy        = point[1] - getXYZ().getY();
+    /** Angle from the kart position to the point in world coordinates. */
+    float theta           = -atan2(dx, dy);
+
+    // Angle is the point is relative to the heading - but take the current
+    // angular velocity into account, too. The value is multiplied by two
+    // to avoid 'oversteering' - experimentally found.
+    float angle_2_point   = theta - getHPR().getHeading() 
+                                  - dt*m_body->getAngularVelocity().getZ()*2.0f;
+    angle_2_point         = normalizeAngle(angle_2_point);
+    if(fabsf(angle_2_point)<0.1) return 0.0f;
+
+    /** To understand this code, consider how a given steering angle determines
+     *  the angle the kart is facing after one timestep:
+     *  sin(steer_angle) = wheel_base / radius;  --> compute radius of turn
+     *  circumference    = radius * 2 * M_PI;    --> circumference of turn circle
+     *  The kart drives dt*V units during a timestep of size dt. So the ratio
+     *  of the driven distance to the circumference is the same as the angle
+     *  the whole circle, or:
+     *  angle / (2*M_PI) = dt*V / circumference
+     *  Reversly, if the angle to drive to is given, the circumference can be
+     *  computed, and from that the turn radius, and then the steer angle.
+     *  (note: the 2*M_PI can be removed from the computations)
+     */
+    float radius          = dt*getSpeed()/angle_2_point;
+    float sin_steer_angle = m_kart_properties->getWheelBase()/radius;
+#ifdef DEBUG_OUTPUT
+    printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
+        theta, angle_2_point, m_body->getAngularVelocity().getZ(),
+        radius, sin_steer_angle);
+#endif
+    if(sin_steer_angle <= -1.0f) return -getMaxSteerAngle()*m_skidding_threshold;
+    if(sin_steer_angle >=  1.0f) return  getMaxSteerAngle()*m_skidding_threshold;
+    float steer_angle     = asin(sin_steer_angle);    
     return steer_angle;
 }   // steerToPoint
 
@@ -665,6 +703,7 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
         /*Find if we crash with the drivelines*/
         m_track->findRoadSector(step_coord, &m_sector);
 
+#undef SHOW_FUTURE_PATH
 #ifdef SHOW_FUTURE_PATH
 
         ssgaSphere *sphere = new ssgaSphere;
@@ -873,7 +912,7 @@ int DefaultRobot::calcSteps()
 void DefaultRobot::setSteering( float angle )
 {
     angle = angle / getMaxSteerAngle();
-    m_controls.jump = fabsf(angle)>m_skidding_threshold;
+    m_controls.jump = fabsf(angle)>=m_skidding_threshold;
 
     if     (angle >  1.0f) m_controls.lr =  1.0f;
     else if(angle < -1.0f) m_controls.lr = -1.0f;

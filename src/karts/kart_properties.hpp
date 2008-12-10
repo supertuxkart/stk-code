@@ -102,6 +102,7 @@ protected:
     float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
+    float       m_wheel_base;          /**< Wheel base of the kart.          */
 
     SFXManager::SFXType m_engine_sfx_type; /**< Engine sound effect.         */
 
@@ -183,6 +184,7 @@ public:
     float getFrictionSlip           () const {return m_friction_slip;            }
     float getRollInfluence          () const {return m_roll_influence;           }
     float getWheelRadius            () const {return m_wheel_radius;             }
+    float getWheelBase              () const {return m_wheel_base;               }
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     float getMaximumSpeed           () const {return m_maximum_speed;            }

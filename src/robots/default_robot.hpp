@@ -137,7 +137,7 @@ private:
      */
     void  handleRaceStart();
     void  handleAcceleration(const float DELTA);
-    void  handleSteering();
+    void  handleSteering(float dt);
     void  handleItems(const float DELTA, const int STEPS);
     void  handleRescue(const float DELTA);
     void  handleBraking();
@@ -145,7 +145,7 @@ private:
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const sgVec2 POINT);
+    float steerToPoint(const sgVec2 point, float dt);
 
     void  checkCrashes(const int STEPS, const Vec3& pos);
     void  findNonCrashingPoint(sgVec2 result);
