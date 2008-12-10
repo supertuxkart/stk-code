@@ -401,8 +401,19 @@ void SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
         }
         else if (ga != GA_NULL)
         {
+            if(type==IT_MOUSEBUTTON)
+            {
+                // If a mouse button is pressed, make sure that the
+                // widget the mouse is on is actually highlighted (since
+                // the highlighted widget is selected!)
+                int x, y;
+                SDL_GetMouseState( &x, &y );
+                y = SDL_GetVideoSurface()->h - y;
+                menu->inputPointer( x, y );
+            }
+
             // Lets the currently active menu handle the GameAction.
-        menu->handle(ga, value);
+            menu->handle(ga, value);
          }
     }   // menu!=NULL
 }   // input
