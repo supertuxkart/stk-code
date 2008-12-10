@@ -35,7 +35,8 @@ FeatureUnlocked::FeatureUnlocked()
     widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 10,
         _("New Feature Unlocked"));
-
+    widget_manager->hideWgtRect(WTOK_TITLE);
+    
     m_new_features=unlock_manager->getUnlockedFeatures();
     assert(m_new_features.size()>0);
     unlock_manager->clearUnlocked();

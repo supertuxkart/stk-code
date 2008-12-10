@@ -87,6 +87,7 @@ CharSel::CharSel(int whichPlayer)
     snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
              m_player_index + 1);
     widget_manager->addTitleWgt( WTOK_TITLE, 100, 10, heading );
+    widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->breakLine();
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 2);

@@ -34,6 +34,7 @@ enum WidgetTokens
 ChallengesMenu::ChallengesMenu()
 {
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 10, _("Active Challenges"));
+    widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->breakLine();
 
     m_all_challenges=unlock_manager->getActiveChallenges();

@@ -53,7 +53,8 @@ ConfigDisplay::ConfigDisplay()
 
     widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Display Settings"));
-
+    widget_manager->hideWgtRect(WTOK_TITLE);
+    
     if( isBlacklisted( m_curr_width, m_curr_height ))
     {
         widget_manager->addEmptyWgt( WTOK_FULLSCREEN, 1, 7);

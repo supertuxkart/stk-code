@@ -38,6 +38,7 @@ Options::Options()
 {
     widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 45, 7, _("Options") );
+    widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->addTextButtonWgt( WTOK_CONTROLS, 45, 7, _("Player Config") );
 
     // Don't display the fullscreen menu when called from within the race.

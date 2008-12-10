@@ -38,6 +38,7 @@ ConfigSound::ConfigSound()
 {
     widget_manager->switchOrder();
     widget_manager->addTitleWgt(WTOK_TITLE, 50, 7, _("Sound Settings"));
+    widget_manager->hideWgtRect(WTOK_TITLE);
 
     widget_manager->setInitialActivationState(true);
     if( user_config->doMusic() )

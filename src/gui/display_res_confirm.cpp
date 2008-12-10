@@ -49,7 +49,8 @@ DisplayResConfirm::DisplayResConfirm( const bool FROM_WINDOW_ ) :
     widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 70, 7,
         _("Confirm Resolution Within 5 Seconds"));
-
+    widget_manager->hideWgtRect(WTOK_TITLE);
+    
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 40, 2);
 
     widget_manager->addTextButtonWgt( WTOK_APPLY_RES, 40, 7, _("Confirm Resolution") );

@@ -41,7 +41,8 @@ ConfigControls::ConfigControls()
 {
     widget_manager->switchOrder();
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, _("Edit controls for who?"));
-
+    widget_manager->hideWgtRect(WTOK_TITLE);
+    
     widget_manager->addTextButtonWgt( WTOK_PLYR1 , 60, 7, _("Player 1"));
     widget_manager->addTextButtonWgt( WTOK_PLYR2 , 60, 7, _("Player 2"));
     widget_manager->addTextButtonWgt( WTOK_PLYR3 , 60, 7, _("Player 3"));
