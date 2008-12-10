@@ -40,6 +40,9 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     
     float up_velocity = m_speed/7.0f;
     
+    // give a speed proportinal to kart speed
+    m_speed = 25.0f + kart->getSpeed()/25.0f * m_speed;
+    
     btTransform trans = kart->getTrans();
     
     const float pitch = 0.0f; //getTerrainPitch(heading);
@@ -56,7 +59,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 
         // calculate appropriate initial up velocity so that the
         // projectile lands on the aimed kart (9.8 is the gravity)
-        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/2.5f); // the division is an empirical estimation
+        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/1.6f); // the division is an empirical estimation
         up_velocity = time*9.8f;
         
         // calculate the approximate location of the aimed kart in 'time' seconds
