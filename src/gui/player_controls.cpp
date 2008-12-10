@@ -86,6 +86,7 @@ PlayerControls::PlayerControls(int whichPlayer):
             user_config->m_player[m_player_index].getName().c_str() );
 
     widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, heading );
+    widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->breakLine();
 
     widget_manager->addTextWgt( WTOK_PLYR_NAME0, 30, 7, _("Player name") );

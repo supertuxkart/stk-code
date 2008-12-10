@@ -80,6 +80,10 @@ BaseGUI::handle(GameAction action, int value)
 		widget_manager->decreaseScrollSpeed(true);
 		break;
     case GA_ENTER:
+        int x, y;
+        SDL_GetMouseState( &x, &y );
+        y = SDL_GetVideoSurface()->h - y;
+        inputPointer( x, y );
         select();
         break;
     case GA_LEAVE:
