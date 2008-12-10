@@ -4,7 +4,7 @@
  (name _("Penguin Playground"))
  (description _("First grand prix, easy to get started"))
  (tracks "tuxtrack" "mines" "olivermath" "jungle")
- (laps      3          3          4)        2
+ (laps      3          3          4        2 )
 )
 
 ;; EOF ;;
