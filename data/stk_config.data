@@ -86,7 +86,7 @@
    (wheel-damping-relaxation 20    )
    (wheel-damping-compression 4.4  )
    (friction-slip      10000000    )
-   (roll-influence            0.1  )
+   (roll-influence            0.03 )
    (wheel-radius              0.25 )
    (wheel-width               0.3  )
    (chassis-linear-damping    0.2  )
