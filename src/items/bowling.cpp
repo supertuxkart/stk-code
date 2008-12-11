@@ -43,7 +43,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
         /* make it go faster when throwing forward
            so the player doesn't catch up with the ball
            and explode by touching it */
-        m_speed *= 3;
+        m_speed = kart->getSpeed() + m_speed;
     }
 
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
