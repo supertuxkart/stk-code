@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 #include "plib/ssg.h"
+
+#include "race_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
 #include "audio/sfx_manager.hpp"
@@ -67,19 +69,12 @@ protected:
     // Physic properties
     // -----------------
     float m_mass;                     /**< Weight of kart.  */
-    float m_engine_power;             /**< Maximum force from engine. */
+    float m_engine_power[3];          /**< Maximum force from engine for each 
+                                       *   difficulty. */
     float m_brake_factor;             /**< Braking factor * engine_power = 
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
-    float m_wheelie_max_speed_ratio;  /**< Percentage of maximum speed for 
-                                       *   wheelies. */
-    float m_wheelie_max_pitch;        /**< Maximum pitch for wheelies. */
-    float m_wheelie_pitch_rate;       /**< Rate/sec with which kart goes up. */
-    float m_wheelie_restore_rate;     /**< Rate/sec with which kart does down.*/
-    float m_wheelie_speed_boost;      /**< Speed boost while doing a wheelie. */
-    float m_wheelie_power_boost;      /**< Increase in engine power. */
-
     float m_min_speed_turn,           /**< Speed for smallest turn radius. */
           m_angle_at_min,             /**< Steering angle for minimal turn 
                                            radius. Computed from radius and
@@ -103,8 +98,9 @@ protected:
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
     float       m_wheel_base;          /**< Wheel base of the kart.          */
-
-    SFXManager::SFXType m_engine_sfx_type; /**< Engine sound effect.         */
+    float       m_nitro_power_boost;   /**< Nitro power boost.               */
+    SFXManager::SFXType 
+                m_engine_sfx_type;     /**< Engine sound effect.         */
 
     // bullet physics data 
     // -------------------
@@ -116,7 +112,7 @@ protected:
     float m_wheel_radius;
     float m_chassis_linear_damping;
     float m_chassis_angular_damping;
-    float m_maximum_speed;
+    float m_max_speed[3];
     float m_max_speed_reverse_ratio;
     Vec3  m_gravity_center_shift;    /**< Shift of center of gravity. */
     float m_track_connection_accel;  /**< Artifical acceleration that pulls a 
@@ -164,16 +160,10 @@ public:
     const std::vector<std::string>&
                   getGroups         () const {return m_groups;                   }
     float getMass                   () const {return m_mass;                     }
-    float getMaxPower               () const {return m_engine_power;             }
+    float getMaxPower               () const {return m_engine_power[race_manager->getDifficulty()];}
     float getTimeFullSteer          () const {return m_time_full_steer;          }
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
-    float getWheelieMaxSpeedRatio   () const {return m_wheelie_max_speed_ratio;  }
-    float getWheelieMaxPitch        () const {return m_wheelie_max_pitch;        }
-    float getWheeliePitchRate       () const {return m_wheelie_pitch_rate;       }
-    float getWheelieRestoreRate     () const {return m_wheelie_restore_rate;     }
-    float getWheelieSpeedBoost      () const {return m_wheelie_speed_boost;      }
-    float getWheeliePowerBoost      () const {return m_wheelie_power_boost;      }
     SFXManager::SFXType getEngineSfxType() 
                                        const {return m_engine_sfx_type;          }
 
@@ -187,7 +177,11 @@ public:
     float getWheelBase              () const {return m_wheel_base;               }
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
-    float getMaximumSpeed           () const {return m_maximum_speed;            }
+    /** Returns the maximum speed dependent on the difficult level. */
+    float getMaxSpeed               () const {return 
+                                      m_max_speed[race_manager->getDifficulty()];}
+    /** Returns the nitro power boost. */
+    float getNitroPowerBoost        () const {return m_nitro_power_boost;        }
     const Vec3&getGravityCenterShift() const {return m_gravity_center_shift;     }
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }

@@ -186,13 +186,7 @@ void RaceOptions::select()
             }
             else if( m_difficulty == RaceManager::RD_EASY )
             {
-//TEMP: done just for the release after 0.4 because of AI problems
-#undef ENABLE_MEDIUM_AI
-#if ENABLE_MEDIUM_AI
                 m_difficulty = RaceManager::RD_MEDIUM;
-#else
-                m_difficulty = RaceManager::RD_HARD;
-#endif
             }
             widget_manager->setWgtText( WTOK_DIFFICULTY, getDifficultyString(m_difficulty) );
             break;
@@ -200,18 +194,18 @@ void RaceOptions::select()
         case WTOK_DIFFICULTY_DOWN:
             if( m_difficulty == RaceManager::RD_HARD )
             {
-//TEMP: done just for the release after 0.4 because of AI problems
-#if ENABLE_MEDIUM_AI
                 m_difficulty = RaceManager::RD_MEDIUM;
-#else
-                m_difficulty = RaceManager::RD_EASY;
-#endif
             }
             else if( m_difficulty == RaceManager::RD_MEDIUM )
             {
                 m_difficulty = RaceManager::RD_EASY;
-            }
-            widget_manager->setWgtText( WTOK_DIFFICULTY, getDifficultyString(m_difficulty) );
+            } 
+            else if( m_difficulty == RaceManager::RD_EASY )
+            {
+                m_difficulty = RaceManager::RD_HARD;
+            } 
+            widget_manager->setWgtText( WTOK_DIFFICULTY, 
+                                        getDifficultyString(m_difficulty) );
 
             break;
 

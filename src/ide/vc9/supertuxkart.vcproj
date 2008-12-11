@@ -984,46 +984,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="network"
-				>
-				<File
-					RelativePath="..\..\network\connect_message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\kart_control_message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\kart_update_message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\network_kart.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\network_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\race_info_message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\race_result_message.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\race_state.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="utils"
 				>
 				<File
@@ -1196,6 +1156,46 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\smoke.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="network"
+				>
+				<File
+					RelativePath="..\..\network\connect_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_control_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\kart_update_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_kart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\network_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_info_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_result_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\race_state.cpp"
 					>
 				</File>
 			</Filter>

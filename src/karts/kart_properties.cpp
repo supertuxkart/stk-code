@@ -56,13 +56,14 @@ KartProperties::KartProperties() : m_icon_material(0)
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
     m_mass = m_min_speed_turn = m_angle_at_min = 
-        m_max_speed_turn = m_angle_at_max = m_engine_power = m_brake_factor =
-        m_time_full_steer = m_wheelie_max_pitch = m_wheelie_max_speed_ratio = 
-        m_wheelie_pitch_rate = m_wheelie_restore_rate = m_wheelie_speed_boost =
+        m_max_speed_turn = m_angle_at_max = m_brake_factor =
+        m_engine_power[0] = m_engine_power[1] = m_engine_power[2] = 
+        m_max_speed[0] = m_max_speed[1] = m_max_speed[2] = 
+        m_time_full_steer = m_nitro_power_boost =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
-        m_wheel_radius = m_wheelie_power_boost = m_chassis_linear_damping = 
-        m_chassis_angular_damping = m_maximum_speed = m_suspension_rest = 
+        m_wheel_radius = m_chassis_linear_damping = 
+        m_chassis_angular_damping = m_suspension_rest = 
         m_max_speed_reverse_ratio = m_jump_velocity = m_upright_tolerance = 
         m_upright_max_force = m_suspension_travel_cm = 
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min = 
@@ -224,12 +225,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
         }
     }
                              
-    lisp->get("wheelie-max-speed-ratio", m_wheelie_max_speed_ratio );
-    lisp->get("wheelie-max-pitch",       m_wheelie_max_pitch       );
-    lisp->get("wheelie-pitch-rate",      m_wheelie_pitch_rate      );
-    lisp->get("wheelie-restore-rate",    m_wheelie_restore_rate    );
-    lisp->get("wheelie-speed-boost",     m_wheelie_speed_boost     );
-    lisp->get("wheelie-power-boost",     m_wheelie_power_boost     );
+    lisp->get("nitro-power-boost",         m_nitro_power_boost       );
 
     //bullet physics data
     lisp->get("suspension-stiffness",      m_suspension_stiffness     );
@@ -241,7 +237,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
     lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
     lisp->get("max-speed-reverse-ratio",   m_max_speed_reverse_ratio  );
-    lisp->get("maximum-speed",             m_maximum_speed            );
+    lisp->get("max-speed",                 m_max_speed                );
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
@@ -301,7 +297,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     }
 
     CHECK_NEG(m_mass,                    "mass"                         );
-    CHECK_NEG(m_engine_power,            "engine-power"                 );
+    CHECK_NEG(m_engine_power[0],         "engine-power[0]"              );
+    CHECK_NEG(m_engine_power[1],         "engine-power[1]"              );
+    CHECK_NEG(m_engine_power[2],         "engine-power[2]"              );
     CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
     CHECK_NEG(m_min_radius,              "min-speed-angle"              );
     CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
@@ -309,12 +307,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
     CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
 
-    CHECK_NEG(m_wheelie_max_speed_ratio, "wheelie-max-speed-ratio"      );
-    CHECK_NEG(m_wheelie_max_pitch,       "wheelie-max-pitch"            );
-    CHECK_NEG(m_wheelie_pitch_rate,      "wheelie-pitch-rate"           );
-    CHECK_NEG(m_wheelie_restore_rate,    "wheelie-restore-rate"         );
-    CHECK_NEG(m_wheelie_speed_boost,     "wheelie-speed-boost"          );
-    CHECK_NEG(m_wheelie_power_boost,     "wheelie-power-boost"          );
     //bullet physics data
     CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );
     CHECK_NEG(m_wheel_damping_relaxation,  "wheel-damping-relaxation"   );
@@ -325,7 +317,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     // Don't check m_wheel_base here, it is computed later!
     CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
     CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
-    CHECK_NEG(m_maximum_speed,             "maximum-speed"              );
+    CHECK_NEG(m_max_speed[0],              "maximum-speed[0]"           );
+    CHECK_NEG(m_max_speed[1],              "maximum-speed[1]"           );
+    CHECK_NEG(m_max_speed[2],              "maximum-speed[2]"           );
     CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );

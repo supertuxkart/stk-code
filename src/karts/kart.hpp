@@ -167,16 +167,6 @@ public:
                        {return m_kart_properties->getMaxSteerAngle(getSpeed());}
     const Vec3&    getGravityCenterShift   () const
         {return m_kart_properties->getGravityCenterShift();                    }
-    float          getWheelieMaxSpeedRatio () const
-        {return m_kart_properties->getWheelieMaxSpeedRatio();                  }
-    float          getWheelieMaxPitch  () const
-        {return m_kart_properties->getWheelieMaxPitch();                       }
-    float          getWheeliePitchRate () const
-        {return m_kart_properties->getWheeliePitchRate();                      }
-    float          getWheelieRestoreRate() const
-        {return m_kart_properties->getWheelieRestoreRate();                    }
-    float          getWheelieSpeedBoost() const
-        {return m_kart_properties->getWheelieSpeedBoost();                     }
     float          getSteerPercent  () const {return m_controls.lr;            }
     const KartControl&
                    getControls      () const {return m_controls;               }
@@ -201,7 +191,7 @@ public:
      *  from the server information.                                       */
     void           setSpeed         (float s) {m_speed = s;                   }
     void           setSuspensionLength();
-    float          handleWheelie    (float dt);
+    float          handleNitro      (float dt);
     float          getActualWheelForce();
     bool           isOnGround       () const;
     bool           isEliminated     () const {return m_eliminated;}

@@ -87,7 +87,7 @@ Kart::Kart (const std::string& kart_name, int position,
     // Neglecting the roll resistance (which is small for high speeds compared
     // to the air resistance), maximum speed is reached when the engine
     // power equals the air resistance force, resulting in this formula:
-    m_max_speed               = m_kart_properties->getMaximumSpeed();
+    m_max_speed               = m_kart_properties->getMaxSpeed();
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
 
@@ -633,52 +633,21 @@ void Kart::draw()
 }   // draw
 
 // -----------------------------------------------------------------------------
-/** Returned an additional engine power boost when doing a wheele.
+/** Returned an additional engine power boost when using nitro.
  *  \param dt Time step size.
  */
-
-float Kart::handleWheelie(float dt)
+float Kart::handleNitro(float dt)
 {
-    // For now: handle nitro mode here:
-    if(stk_config->m_game_style==STKConfig::GS_NITRO)
+    if(!m_controls.wheelie) return 0.0;
+    m_collected_energy -= dt;
+    if(m_collected_energy<0)
     {
-        if(!m_controls.wheelie) return 0.0;
-        m_collected_energy -= dt;
-        if(m_collected_energy<0)
-        {
-            m_collected_energy = 0;
-            return 0.0;
-        }
-        return m_kart_properties->getWheeliePowerBoost() * getMaxPower();
+        m_collected_energy = 0;
+        return 0.0;
     }
-    // Handle wheelies
-    // ===============
-    if ( m_controls.wheelie && 
-         m_speed >= getMaxSpeed()*getWheelieMaxSpeedRatio())
-    {
-        // Disable the upright constraint, since it will otherwise
-        // work against the wheelie
-        m_uprightConstraint->setLimit(M_PI);
+    return m_kart_properties->getNitroPowerBoost() * getMaxPower();
 
-        if ( m_wheelie_angle < getWheelieMaxPitch() )
-            m_wheelie_angle += getWheeliePitchRate() * dt;
-        else
-            m_wheelie_angle = getWheelieMaxPitch();
-    }
-    else if ( m_wheelie_angle > 0.0f )
-    {
-        m_wheelie_angle -= getWheelieRestoreRate() * dt;
-        if ( m_wheelie_angle <= 0.0f ) m_wheelie_angle = 0.0f ;
-    }
-    if(m_wheelie_angle <=0.0f) 
-    {
-        m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-        return 0.0f;
-    }
-
-    return m_kart_properties->getWheeliePowerBoost() * getMaxPower()
-          * m_wheelie_angle/getWheelieMaxPitch();
-}   // handleWheelie
+}   // handleNitro
 
 // -----------------------------------------------------------------------------
 /** This function is called when the race starts. Up to then all brakes are
@@ -713,7 +682,7 @@ void Kart::beep()
 void Kart::updatePhysics (float dt) 
 {
     m_bounce_back_time-=dt;
-    float engine_power = getActualWheelForce() + handleWheelie(dt);
+    float engine_power = getActualWheelForce() + handleNitro(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
     if(m_controls.accel)   // accelerating
@@ -830,7 +799,7 @@ void Kart::updatePhysics (float dt)
         m_speed *= -1.f;
 
     //cap at maximum velocity
-    const float max_speed = m_kart_properties->getMaximumSpeed();
+    const float max_speed = m_kart_properties->getMaxSpeed();
     if ( m_speed >  max_speed )
     {
         const float velocity_ratio = max_speed/m_speed;

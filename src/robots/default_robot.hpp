@@ -38,6 +38,8 @@ private:
                         //crashing with the track.
     };
 
+    /** How the AI uses nitro. */
+    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_level;
     enum ItemTactic
     {
         IT_TEN_SECONDS, //Fire after 10 seconds have passed, since the item
@@ -73,7 +75,7 @@ private:
                                       //mostly on straight lines and on curves
                                       //that re too small to need special
                                       //handling.
-    bool m_use_wheelies; //Is the AI allowed to use wheelies?
+    
     float m_wheelie_check_dist; //How far to check for the space needed for
                                 //wheelies, in percentage. Used only when
                                 //m_use_wheelies == true.

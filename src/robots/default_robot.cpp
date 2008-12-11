@@ -75,15 +75,17 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_max_start_delay    = 0.5f;
         m_min_steps          = 0;
         m_skidding_threshold = 4.0f;
+        m_nitro_level        = NITRO_NONE;
         break;
     case RaceManager::RD_MEDIUM:
         m_wait_for_players   = true;
         m_max_handicap_accel = 0.95f;
-        m_fallback_tactic    = FT_PARALLEL;
+        m_fallback_tactic    = FT_FAREST_POINT;
         m_item_tactic        = IT_CALCULATE;
         m_max_start_delay    = 0.4f;
         m_min_steps          = 1;
         m_skidding_threshold = 2.0f;
+        m_nitro_level        = NITRO_SOME;
         break;
     case RaceManager::RD_HARD:
         m_wait_for_players   = false;
@@ -93,6 +95,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_max_start_delay    = 0.1f;
         m_min_steps          = 2;
         m_skidding_threshold = 1.3f;
+        m_nitro_level        = NITRO_ALL;
         break;
     }
 }   // DefaultRobot
@@ -464,21 +467,6 @@ void DefaultRobot::handleRaceStart()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handleRescue(const float DELTA)
 {
-    //TODO: check if we collided against a dynamic object (ej.:kart) or
-    //against the track's static object.
-    //The m_crash_time measures if a kart has been crashing for too long
-#ifdef RESCUE_IF_CRASHES_WITH_KARTS
-    m_crash_time += (m_collided && isOnGround()) ? 3.0f * DELTA : -0.25f * DELTA;
-    if( m_crash_time < 0.0f ) m_crash_time = 0.0f;
-
-    //Reaction to being stuck
-    if( m_crash_time > 3.0f )
-    {
-        forceRescue();
-        m_crash_time = 0.0f;
-    }
-#endif
-
     // check if kart is stuck
     if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->isStartPhase())
     {
@@ -502,7 +490,8 @@ void DefaultRobot::handleNitro()
 {
     m_controls.wheelie = false;
     // Don't use nitro if the kart doesn't have any, is not on ground,
-    if(getEnergy()==0 || !isOnGround() || hasFinishedRace() ) return;
+    if(getEnergy()==0            || !isOnGround() || 
+       m_nitro_level==NITRO_NONE || hasFinishedRace() ) return;
 
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
@@ -531,7 +520,8 @@ void DefaultRobot::handleNitro()
     // On the last track shortly before the finishing line, use nitro 
     // anyway. Since the kart is faster with nitro, estimate a 30% time
     // decrease.
-    if(m_world->getLapForKart(getWorldKartId())==race_manager->getNumLaps()-1)
+    if(m_world->getLapForKart(getWorldKartId())==race_manager->getNumLaps()-1 &&
+        m_nitro_level == NITRO_ALL)
     {
         float finish = m_world->getEstimatedFinishTime(getWorldKartId());
         if( 1.3f*getEnergy() >= finish - m_world->getTime() )
@@ -565,9 +555,8 @@ void DefaultRobot::handleNitro()
             // Kart behind is slower than this kart - no need to use nitro
             if(kart->getSpeed() < getSpeed()) continue;
 
-            // Nitro doesn't give much benefit - better wait and
-            // see if we can re-overtake once the attachment is gone
-            m_controls.wheelie = true;
+            // Only prevent overtaking on highest level
+            m_controls.wheelie = m_nitro_level==NITRO_ALL;
             return;
         }
 

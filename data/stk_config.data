@@ -35,7 +35,7 @@
 
  (shortcut-length           120  )  ;; leaving the road and coming back on it more than
                                     ;; x 'meters" later is considered to be a shortcut
- (enable_networking          #f  )
+ (enable_networking          #f  )  ;; For now disable networking
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
  (explosion-impulse-objects 500.0)  ;; explosion impulse for physics objects (smaller
                                     ;; else a cone e.g. will be pushed way too far)
@@ -58,15 +58,7 @@
    ;; at the very bottom of the chassis!
    ;;(gravity-center-shift  0 0 0.3)
 
-   (wheelie-max-speed-ratio  0.5 ) ;; percentage of max speed for wheelies to work
-   (wheelie-max-pitch       45.0 ) ;; maximum pitch to use when doing a wheelie
-   (wheelie-pitch-rate      60.0 ) ;; rate/sec with which the kart goes up
-   (wheelie-restore-rate    90.0 ) ;; rate/sec with which the kart does down
-   (wheelie-speed-boost     10.0 ) ;; speed boost while doing a wheelie
-   (wheelie-lean-recovery    1 )
-   (wheelie-balance-recovery 2 )
-   (wheelie-step             1 )
-   (wheelie-power-boost      3 )   ;; increase in engine power, i.e. 1=plus 100%
+   (nitro-power-boost      3 )   ;; increase in engine power, i.e. 1=plus 100%
 
    ;; Bullet physics attributes
    (brake-factor              2.75 )
@@ -80,7 +72,12 @@
    ;; independent of the kart size.
    (min-speed-radius          0   4.64)
    (max-speed-radius         12  13.5)
-   (engine-power            400    )
+   ;; Different engine powers for different difficulties:
+   ;; hard, medium, low level order!
+   (engine-power        400 300  200    )
+   ;; Different maximum speed for different difficulties:
+   ;; hard, medium, low level order!
+   (max-speed           32.22 25 20 ) ;; = 116 90 72 km/h
    (mass                    225    )
    (suspension-stiffness     48.0  )
    (wheel-damping-relaxation 20    )
@@ -91,7 +88,6 @@
    (wheel-width               0.3  )
    (chassis-linear-damping    0.2  )
    (chassis-angular-damping  30.2  )
-   (maximum-speed            32.22 ) ;; = 80 km/h
    (max-speed-reverse-ratio   0.2  ) ;; percentage of max speed for reverse gear
    (suspension-rest           0.2  )
    (suspension-travel-cm     19    )
