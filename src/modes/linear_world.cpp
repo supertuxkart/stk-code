@@ -145,8 +145,7 @@ void LinearWorld::update(float delta)
             // During the last lap update the estimated finish time.
             // This is used to play the faster music, and by the AI
             if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
-                m_kart_info[i].m_estimated_finish =
-                    estimateFinishTimeForKart(m_kart[i]);
+                m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_kart[i]);
         }
     }
     for(unsigned int n=0; n<kart_amount; n++)
@@ -477,12 +476,12 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     // In case that a kart is rescued behind start line, or ...
     if(distance_covered<0) distance_covered =1.0f;
     
-    float average_speed     = distance_covered/RaceManager::getWorld()->getTime();
+    const float full_distance = race_manager->getNumLaps()*RaceManager::getTrack()->getTrackLength();
+    const float average_speed = distance_covered/RaceManager::getWorld()->getTime();
     
     // Finish time is the time needed for the whole race with 
     // the average speed computed above.
-    return race_manager->getNumLaps()*RaceManager::getTrack()->getTrackLength() 
-        / average_speed;
+    return getTime() + (full_distance - distance_covered)  / average_speed;
     
 }   // estimateFinishTime
 //-----------------------------------------------------------------------------
@@ -576,6 +575,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
        kart_info.m_race_lap == race_manager->getNumLaps()-1    && 
        p==1                                                    &&
        useFastMusicNearEnd()                                   &&
+       kart_info.m_estimated_finish > 0                        &&
        kart_info.m_estimated_finish - getTime() < 30.0f              )
     {
         sound_manager->switchToFastMusic();
