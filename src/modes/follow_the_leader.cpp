@@ -194,3 +194,4 @@ bool FollowTheLeaderRace::acceptPowerup(const int type) const
     
     return true;
 }
+
