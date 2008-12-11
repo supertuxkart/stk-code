@@ -68,6 +68,9 @@ public:
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
+    
+    bool  m_enable_networking;
+    
     /** Gaming style: in wheelie, karts can do wheelies, collected coins
      *  increase the number of items you get. With nitro, collected coins
      *  can be used as a speed boost (nitro), but no wheelies are possible.

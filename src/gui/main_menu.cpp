@@ -49,8 +49,8 @@ MainMenu::MainMenu()
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Splitscreen") );
 
-    // Only display the networking entry when not already connected.
-    if(network_manager->getMode()==NetworkManager::NW_NONE)
+    // Only display the networking entry when not already connected (and networking is enabled)
+    if(network_manager->getMode()==NetworkManager::NW_NONE && stk_config->m_enable_networking)
         widget_manager->addTextButtonWgt( WTOK_NETWORK, WIDTH, 7, _("Networking") );
 
     std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();

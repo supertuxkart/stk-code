@@ -134,6 +134,7 @@ void STKConfig::init_defaults()
     m_max_history              = -100;
     m_max_skidmarks            = -100;
     m_title_music              = NULL;
+    m_enable_networking        = true;
     m_game_style               = GS_WHEELIE;
     m_scores.clear();
     m_leader_intervals.clear();
@@ -172,6 +173,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->get("menu-background",              m_menu_background          );
+    lisp->get("enable_networking",            m_enable_networking        );
     std::string title_music;
     lisp->get("title-music",                  title_music                );
     m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));
