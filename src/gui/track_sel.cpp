@@ -49,33 +49,36 @@ TrackSel::TrackSel()
 {
     const int HEIGHT = 10;
 
+    const float arrows_x = 0.15f;
+    
     Widget *prev_widget=NULL, *w;
     w = widget_manager->addTextButtonWgt(WTOK_UP, 20, HEIGHT/2, "^");
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.05f, WGT_DIR_UNDER_WIDGET, 0.08f);
+    w->setPosition(WGT_DIR_FROM_RIGHT, arrows_x, WGT_DIR_UNDER_WIDGET, 0.12f);
     prev_widget = w;
     for (unsigned int i = 0; i <m_max_entries; i++)
     {
-        int offset = (m_max_entries-1)/2-abs((int)(i-(m_max_entries-1)/2))+1;
-        w = widget_manager->addTextButtonWgt(WTOK_TRACK0+i, 30, HEIGHT, "");
+        float offset = (float)(m_max_entries-1)/2.0f+(float)abs((int)(i-(m_max_entries-1)/2))*0.7f+1.0f;
+        w = widget_manager->addTextButtonWgt(WTOK_TRACK0+i, 40, HEIGHT, "");
         widget_manager->setWgtTextSize(WTOK_TRACK0+i, WGT_FNT_SML);
-        w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset, NULL, 
+        w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset-0.12, NULL, 
                        WGT_DIR_UNDER_WIDGET, 0.f, prev_widget);
         prev_widget = w;
     }   // for i
     widget_manager->sameWidth(WTOK_TRACK0, WTOK_TRACK0+m_max_entries-1);
 
     w = widget_manager->addTextButtonWgt(WTOK_DOWN, 20, HEIGHT/2, "v");
-    w->setPosition(WGT_DIR_FROM_RIGHT, 0.05f, NULL, WGT_DIR_UNDER_WIDGET, 0, prev_widget);
+    w->setPosition(WGT_DIR_FROM_RIGHT, arrows_x, NULL, WGT_DIR_UNDER_WIDGET, 0, prev_widget);
 
-    w = widget_manager->addImgWgt(WTOK_IMG0, 35, 35, 0);
+    w = widget_manager->addImgWgt(WTOK_IMG0, 35, 29, 0);
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, WGT_DIR_FROM_TOP, 0.2f);
     prev_widget = w;
     w = widget_manager->addImgWgt(WTOK_IMG1, 35, 35, 0);
     w->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET,0, prev_widget);
     prev_widget = w;
-    w = widget_manager->addTextWgt(WTOK_AUTHOR, 50, 9, "" );
+    w = widget_manager->addTextWgt(WTOK_AUTHOR, 60, 9, "" );
     widget_manager->setWgtResizeToText(WTOK_AUTHOR, true);
-
+    widget_manager->hideWgtRect(WTOK_AUTHOR);
+    
     // Loop through all tracks to determine the longest description
     for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
     {
@@ -224,6 +227,8 @@ void TrackSel::displayImages(int selected_track)
     widget_manager->showWgtRect(WTOK_AUTHOR);
     widget_manager->showWgtText(WTOK_AUTHOR);
 
+    widget_manager->hideWgtRect(WTOK_AUTHOR);
+    
     const Track* TRACK = track_manager->getTrack(selected_track);
     bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
 
@@ -234,6 +239,7 @@ void TrackSel::displayImages(int selected_track)
         if(description!="")
         {
             widget_manager->setWgtText( WTOK_AUTHOR, TRACK->getDescription() );
+            widget_manager->hideWgtRect(WTOK_AUTHOR);
         }
         else
         {

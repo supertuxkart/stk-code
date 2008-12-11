@@ -232,7 +232,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
     delete sfx;
     if(i==m_all_sfx.end())
     {
-        fprintf(stderr, "Warning: sfx not found in list.\n");
+        fprintf(stderr, "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
         return;
     }
 
