@@ -102,6 +102,7 @@ private:
     SFXBase            *m_beep_sound;
     SFXBase            *m_crash_sound;
     SFXBase            *m_skid_sound;
+    float               m_time_last_crash;
 
 protected:
     float                 m_rescue_pitch, m_rescue_roll;

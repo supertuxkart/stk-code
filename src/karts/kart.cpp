@@ -325,6 +325,7 @@ void Kart::reset()
     m_wheelie_angle        = 0.0f;
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
+    m_time_last_crash      = 0.0f;
 
     m_controls.lr          = 0.0f;
     m_controls.accel       = 0.0f;
@@ -662,12 +663,23 @@ void Kart::resetBrakes()
 // -----------------------------------------------------------------------------
 void Kart::crashed(Kart *k)
 {
+    /** If a kart is crashing against the track, the collision is often 
+     *  reported more than once, resulting in a machine gun effect, and too
+     *  long disabling of the engine. Therefore, this reaction is disabled 
+     *  for 0.5 seconds after a crash.
+     */
+    if(RaceManager::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
+
+    m_time_last_crash = RaceManager::getWorld()->getTime();
     // After a collision disable the engine for a short time so that karts 
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
     if(m_bounce_back_time<=0.0f)
     {
-        m_crash_sound->play();
+        // In case that the sfx is longer than 0.5 seconds, only play it if
+        // it's not already playing.
+        if(!m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
+            m_crash_sound->play();
         m_bounce_back_time = 0.1f;
     }
 }   // crashed
