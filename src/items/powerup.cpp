@@ -50,6 +50,9 @@ Powerup::~Powerup()
 //-----------------------------------------------------------------------------
 void Powerup::reset()
 {
+    m_type = POWERUP_NOTHING;
+    m_number = 0;
+    
     int type, number;
     RaceManager::getWorld()->getDefaultCollectibles( type, number );
 	set( (PowerupType)type, number );

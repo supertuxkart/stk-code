@@ -96,6 +96,7 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
     {
         collectible_type = POWERUP_ZIPPER;
         amount = race_manager->getNumLaps();
+        printf("laps : %i\n", race_manager->getNumLaps());
     }
     else World::getDefaultCollectibles(collectible_type, amount);
 }
