@@ -45,7 +45,7 @@
  (kart-defaults
    (wheel-base               1.2 )
    (heightCOG                0.2 )
-   (time-full-steer          0.3 )
+   (time-full-steer          0.15 )
    (corn-f                   4   )
    (corn-r                   4   )
 
@@ -70,8 +70,8 @@
    ;; radius = wheel_base/sin(steering_angle)
    ;; By specifying the radius the steering behaviour can be defined
    ;; independent of the kart size.
-   (min-speed-radius          0   4.64)
-   (max-speed-radius         12  13.5)
+   (min-speed-radius          0   6.64)
+   (max-speed-radius         15  21.5)
    ;; Different engine powers for different difficulties:
    ;; hard, medium, low level order!
    (engine-power        400 300  200    )
