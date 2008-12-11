@@ -92,10 +92,13 @@ void Powerup::set(PowerupType type, int n)
 			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_USE_PARACHUTE);
 			break;
 			
+        case POWERUP_BUBBLEGUM:
+			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_GOO);
+			break ;
+            
 		case POWERUP_NOTHING:
 		case POWERUP_CAKE:
 		case POWERUP_PLUNGER:
-		case POWERUP_BUBBLEGUM:
 		default :
 			m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
 			break ;

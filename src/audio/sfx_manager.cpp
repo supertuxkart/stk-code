@@ -118,6 +118,7 @@ void SFXManager::loadSfx()
     loadSingleSfx(lisp, "winner",        SOUND_WINNER         );
     loadSingleSfx(lisp, "crash",         SOUND_CRASH          );
     loadSingleSfx(lisp, "grab",          SOUND_GRAB           );
+    loadSingleSfx(lisp, "goo",           SOUND_GOO            );
     loadSingleSfx(lisp, "shot",          SOUND_SHOT           );
     loadSingleSfx(lisp, "wee",           SOUND_WEE            );
     loadSingleSfx(lisp, "explosion",     SOUND_EXPLOSION      );
