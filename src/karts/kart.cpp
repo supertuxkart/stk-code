@@ -668,7 +668,7 @@ void Kart::crashed(Kart *k)
     if(m_bounce_back_time<=0.0f)
     {
         m_crash_sound->play();
-        m_bounce_back_time = 0.5f;
+        m_bounce_back_time = 0.1f;
     }
 }   // crashed
 
@@ -752,11 +752,6 @@ void Kart::updatePhysics (float dt)
        {
            m_skidding*= 1.05f;
            if(m_skidding>2.0f) m_skidding=2.0f;
-           //btVector3 v=m_body->getAngularVelocity();
-           //v.setZ(v.getZ()*m_skidding);
-           //btVector3 t(0,0,m_skidding);
-           //m_body->applyTorqueImpulse(t);
-           //m_body->setAngularVelocity(v);
        }
        else if(m_skidding>1.0f)
        {
