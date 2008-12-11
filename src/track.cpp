@@ -468,7 +468,10 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
     // Handle 'warp around'
     const int track_length = (int)m_distance_from_start[m_driveline.size()-1];
     if( distance_sectors < 0 ) distance_sectors += track_length;
-    else if( distance_sectors > track_length/2) distance_sectors -= track_length;
+    //else if( distance_sectors > track_length*3.0f/4.0f) distance_sectors -= track_length;
+    
+    if(std::max(NEWSEC, OLDSEC) > (int)RaceManager::getTrack()->m_distance_from_start.size()-6 &&
+       std::min(NEWSEC, OLDSEC) < 6) distance_sectors -= track_length; // crossed start line
     
     return (distance_sectors > stk_config->m_shortcut_length);
 }   // isShortcut

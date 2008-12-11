@@ -177,7 +177,12 @@ void LinearWorld::update(float delta)
             return;
         }
         
-        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR && !kart->isRescue()) kart_info.m_last_valid_sector = kart_info.m_track_sector;
+        
+        // --------- do lap counting ------
+        doLapCounting(kart_info, kart);
+        
+        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR && !kart->isRescue())
+            kart_info.m_last_valid_sector = kart_info.m_track_sector;
         
         // check if kart is on the road - if not, find the closest sector
         if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR && !kart->isRescue())
@@ -230,15 +235,16 @@ void LinearWorld::update(float delta)
             }  // if difficulty easy
         }// end if is player kart
         
-        // --------- do lap counting ------
-        doLapCounting(kart_info, kart);
     }// next kart
 }
 //-----------------------------------------------------------------------------
 void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
 {
-    bool newLap = kart_info.m_last_track_coords[1]     > 300.0f  &&
-                  kart_info.m_curr_track_coords.getY() <  20.0f;
+    //bool newLap = kart_info.m_last_track_coords[1]     > 300.0f  &&
+    //              kart_info.m_curr_track_coords.getY() <  20.0f;
+    
+    const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
+                        kart_info.m_track_sector == 0;
     if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
@@ -488,7 +494,15 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
     // flag, so that this shortcut is not counted!
     if(shortcut)
     {
-        kart_info.m_track_sector   = kart_info.m_last_valid_sector;
+        const bool warp_around = kart_info.m_last_valid_sector == 0;
+        kart_info.m_track_sector   = kart_info.m_last_valid_sector+1; // add one because 'moveKartAfterRescue' removes 1
+        
+        // don't let kart get a new free lap cause he was dropped at begin line...
+        if(warp_around)
+        {
+            kart_info.m_race_lap--;
+            kart_info.m_lap_start_time = -1; // invalidate time so he doesn't get a best time
+        }
     } 
     
     kart->forceRescue();
@@ -500,6 +514,9 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
     
+    // FIXME - removing 1 here makes it less likely to fall in a rescue loop since the kart
+    // moves back on each attempt. This is still a weak hack. Also some other code depends
+    // on 1 being substracted, like 'forceRescue'
     if ( info.m_track_sector > 0 ) info.m_track_sector-- ;
     info.m_last_valid_sector = info.m_track_sector;
     if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
