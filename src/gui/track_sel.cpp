@@ -60,7 +60,7 @@ TrackSel::TrackSel()
         float offset = (float)(m_max_entries-1)/2.0f+(float)abs((int)(i-(m_max_entries-1)/2))*0.7f+1.0f;
         w = widget_manager->addTextButtonWgt(WTOK_TRACK0+i, 40, HEIGHT, "");
         widget_manager->setWgtTextSize(WTOK_TRACK0+i, WGT_FNT_SML);
-        w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset-0.12, NULL, 
+        w->setPosition(WGT_DIR_FROM_RIGHT, 0.03f*offset-0.12f, NULL, 
                        WGT_DIR_UNDER_WIDGET, 0.f, prev_widget);
         prev_widget = w;
     }   // for i
