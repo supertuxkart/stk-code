@@ -73,6 +73,9 @@ RaceOptions::RaceOptions()
     const int DESC_WIDTH=48;
     const int ITEM_WIDTH=35;
 
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 10, 20);
+    widget_manager->breakLine();
+    
     // Difficulty
     // ==========
     // if there is no AI, no point asking for its difficulty...
@@ -145,7 +148,9 @@ RaceOptions::RaceOptions()
 
     widget_manager->breakLine();
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 1, 10);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 10, 30);
+    widget_manager->breakLine();
+    
     widget_manager->addTextButtonWgt( WTOK_QUIT, 60, 7, _("Press <ESC> to go back") );
 
     widget_manager->layout(WGT_AREA_ALL);
