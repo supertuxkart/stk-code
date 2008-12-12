@@ -57,14 +57,13 @@ CharSel::CharSel(int whichPlayer)
 {
     // First time this is called --> switch client and server
     // to character barrier mode
-    // FIXME: switchTo ... must be called to clean the kart_info
-    //        in the server (even when NW_NONE). This if condition
-    //        needs to be checked (otherwise ghost karts and
-    //        a ghost camera will appear)
+    // initCharacter ... must be called to clean the kart_info
+    // in the server (even when NW_NONE), otherwise ghost karts
+    // etc. can appear.
     m_first_frame = true;
     if(network_manager->getState()==NetworkManager::NS_MAIN_MENU ||
         network_manager->getMode()==NetworkManager::NW_NONE)
-        network_manager->switchToCharacterSelection();
+        network_manager->initCharacterDataStructures();
 
     // For some strange reasons plib calls makeCurrent() in ssgContext
     // constructor, so we have to save the old one here and restore it

@@ -103,7 +103,7 @@ public:
 
     void         disableNetworking();
     void         sendConnectMessage();  // client send initial info to server
-    void         switchToCharacterSelection();
+    void         initCharacterDataStructures();
     void         sendCharacterSelected(int player_id, const std::string &kartid);
     void         waitForRaceInformation();
     void         worldLoaded();

@@ -437,7 +437,10 @@ void NetworkManager::sendToServer(Message &m)
 }   // sendToServer
 
 // ----------------------------------------------------------------------------
-void NetworkManager::switchToCharacterSelection()
+/** Cleans up character related data structures. Must be called before any
+ *  character related data is set.
+ */
+void NetworkManager::initCharacterDataStructures()
 {
     // This is called the first time the character selection menu is displayed
 

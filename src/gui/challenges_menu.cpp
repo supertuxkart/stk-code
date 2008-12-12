@@ -17,11 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "gui/challenges_menu.hpp"
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
 #include "unlock_manager.hpp"
 #include "translation.hpp"
+#include "gui/challenges_menu.hpp"
+#include "network/network_manager.hpp"
 
 enum WidgetTokens
 {
@@ -84,6 +85,7 @@ void ChallengesMenu::select()
     int n=widget_manager->getSelectedWgt()-WTOK_CHALLENGES;
     if(n>=0 && n<(int)m_all_challenges.size())
     {
+        network_manager->initCharacterDataStructures();
         m_all_challenges[n]->setRace();
         menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
     }
