@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-03 12:05-0500\n"
+"POT-Creation-Date: 2008-12-11 20:58-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/gui/config_display.cpp:386
+#: src/gui/config_display.cpp:387
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr ""
 
-#: src/modes/world.cpp:412
+#: src/modes/world.cpp:413
 #, c-format
 msgid ""
 "'%s' has\n"
 "been eliminated."
 msgstr ""
 
-#: src/gui/game_mode.cpp:82
+#: src/gui/game_mode.cpp:87
 msgid "3 Strikes Battle"
 msgstr ""
 
@@ -61,11 +61,11 @@ msgstr ""
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr ""
 
-#: src/gui/config_display.cpp:93
+#: src/gui/config_display.cpp:94
 msgid "Apply "
 msgstr ""
 
-#: src/gui/config_display.cpp:352
+#: src/gui/config_display.cpp:353
 #, c-format
 msgid "Apply %dx%d"
 msgstr ""
@@ -78,7 +78,7 @@ msgstr ""
 msgid "At world's end"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:72
+#: src/gui/help_page_one.cpp:74
 msgid "Avoid bananas"
 msgstr ""
 
@@ -86,7 +86,7 @@ msgstr ""
 msgid "Back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:143 src/gui/help_page_three.cpp:82
+#: src/gui/help_page_one.cpp:153 src/gui/help_page_three.cpp:82
 #: src/gui/help_page_two.cpp:131
 msgid "Back to the menu"
 msgstr ""
@@ -136,7 +136,7 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#: src/gui/config_display.cpp:98
+#: src/gui/config_display.cpp:99
 msgid "Clear from Blacklist"
 msgstr ""
 
@@ -164,7 +164,7 @@ msgstr ""
 msgid "Collect the Pharaohs Treasure"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:121
+#: src/gui/help_page_one.cpp:123
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you\n"
 "wish by pressing the appropriate key. You can see your\n"
@@ -178,11 +178,11 @@ msgid ""
 "Level AI karts."
 msgstr ""
 
-#: src/gui/display_res_confirm.cpp:55
+#: src/gui/display_res_confirm.cpp:56
 msgid "Confirm Resolution"
 msgstr ""
 
-#: src/gui/display_res_confirm.cpp:109
+#: src/gui/display_res_confirm.cpp:110
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
 msgstr ""
@@ -199,7 +199,7 @@ msgstr ""
 msgid "Connected:"
 msgstr ""
 
-#: src/gui/feature_unlocked.cpp:47 src/gui/grand_prix_ending.cpp:153
+#: src/gui/feature_unlocked.cpp:48 src/gui/grand_prix_ending.cpp:153
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr ""
@@ -222,6 +222,10 @@ msgid ""
 "modified by Marianne Gagnon"
 msgstr ""
 
+#: data/tracks/skyline/skyline.track:5
+msgid "Created by Robert Howie"
+msgstr ""
+
 #: src/gui/main_menu.cpp:71
 msgid "Credits"
 msgstr ""
@@ -231,12 +235,12 @@ msgid "Crescent Crossing"
 msgstr ""
 
 #. I18N: displays current resolution
-#: src/gui/config_display.cpp:84
+#: src/gui/config_display.cpp:85
 #, c-format
 msgid "Current: %dx%d"
 msgstr ""
 
-#: src/gui/config_display.cpp:90
+#: src/gui/config_display.cpp:91
 msgid "Decrease Resolution"
 msgstr ""
 
@@ -244,7 +248,7 @@ msgstr ""
 msgid "Difficulty"
 msgstr ""
 
-#: src/gui/options.cpp:49
+#: src/gui/options.cpp:50
 msgid "Display"
 msgstr ""
 
@@ -252,7 +256,7 @@ msgstr ""
 msgid "Display Settings"
 msgstr ""
 
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:300
 msgid "Driver"
 msgstr ""
 
@@ -297,7 +301,7 @@ msgstr ""
 msgid "Finish the City track in 5:20"
 msgstr ""
 
-#: src/gui/race_gui.cpp:686
+#: src/gui/race_gui.cpp:677
 #, c-format
 msgid "Finished"
 msgstr ""
@@ -311,7 +315,7 @@ msgstr ""
 msgid "First grand prix, easy to get started"
 msgstr ""
 
-#: src/gui/game_mode.cpp:77 src/gui/game_mode.cpp:114
+#: src/gui/game_mode.cpp:77 src/gui/game_mode.cpp:115
 #: data/followtheleader.challenge:7
 msgid "Follow the Leader"
 msgstr ""
@@ -333,7 +337,7 @@ msgid ""
 " Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:67
+#: src/gui/help_page_one.cpp:69
 msgid "Force your rivals bite *your* dust!"
 msgstr ""
 
@@ -345,12 +349,12 @@ msgstr ""
 msgid "Four Players"
 msgstr ""
 
-#: src/gui/config_display.cpp:76 src/gui/config_display.cpp:129
-#: src/gui/config_display.cpp:184
+#: src/gui/config_display.cpp:77 src/gui/config_display.cpp:130
+#: src/gui/config_display.cpp:185
 msgid "Fullscreen mode"
 msgstr ""
 
-#: src/gui/game_mode.cpp:151
+#: src/gui/game_mode.cpp:152
 msgid "Game mode help"
 msgstr ""
 
@@ -358,20 +362,20 @@ msgstr ""
 msgid "Game modes"
 msgstr ""
 
-#: src/gui/challenges_menu.cpp:52 src/gui/credits_menu.cpp:75
+#: src/gui/challenges_menu.cpp:53 src/gui/credits_menu.cpp:75
 msgid "Go back to the main menu"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:837
+#: src/gui/race_gui.cpp:828
 msgid "Go!"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:71
+#: src/gui/help_page_one.cpp:73
 msgid "Grab blue boxes and coins"
 msgstr ""
 
-#: src/gui/game_mode.cpp:98
+#: src/gui/game_mode.cpp:99
 msgid "Grand Prix"
 msgstr ""
 
@@ -390,13 +394,13 @@ msgstr ""
 msgid "Highscores"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:128
+#: src/gui/help_page_one.cpp:130
 msgid ""
 "If you see a button with a lock like the one to the right,\n"
 "you need to complete a challenge to unlock it."
 msgstr ""
 
-#: src/gui/config_display.cpp:88
+#: src/gui/config_display.cpp:89
 msgid "Increase Resolution"
 msgstr ""
 
@@ -405,7 +409,7 @@ msgstr ""
 msgid "Invalid"
 msgstr ""
 
-#: src/modes/linear_world.cpp:167
+#: src/modes/linear_world.cpp:174
 msgid "Invalid short-cut!!"
 msgstr ""
 
@@ -413,7 +417,7 @@ msgstr ""
 msgid "King Weird's Castle"
 msgstr ""
 
-#: src/gui/race_gui.cpp:691
+#: src/gui/race_gui.cpp:682
 msgid "Lap"
 msgstr ""
 
@@ -462,7 +466,7 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/modes/linear_world.cpp:276
+#: src/modes/linear_world.cpp:289
 msgid "New fastest lap"
 msgstr ""
 
@@ -489,7 +493,7 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:146 src/gui/help_page_two.cpp:134
+#: src/gui/help_page_one.cpp:156 src/gui/help_page_two.cpp:134
 msgid "Next >"
 msgstr ""
 
@@ -501,7 +505,7 @@ msgstr ""
 msgid "No Grand Prix selected"
 msgstr ""
 
-#: src/gui/race_options.cpp:305 src/gui/race_options.cpp:308
+#: src/gui/race_options.cpp:299 src/gui/race_options.cpp:302
 msgid "Novice"
 msgstr ""
 
@@ -541,7 +545,7 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-#: src/gui/race_gui.cpp:866
+#: src/gui/race_gui.cpp:857
 msgid "Penalty time!!"
 msgstr ""
 
@@ -550,7 +554,7 @@ msgid "Penguin Playground"
 msgstr ""
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:263
+#: src/gui/player_controls.cpp:264
 msgid "Player "
 msgstr ""
 
@@ -559,27 +563,27 @@ msgstr ""
 msgid "Player %d, choose a driver"
 msgstr ""
 
-#: src/gui/config_controls.cpp:45
+#: src/gui/config_controls.cpp:46
 msgid "Player 1"
 msgstr ""
 
-#: src/gui/config_controls.cpp:46
+#: src/gui/config_controls.cpp:47
 msgid "Player 2"
 msgstr ""
 
-#: src/gui/config_controls.cpp:47
+#: src/gui/config_controls.cpp:48
 msgid "Player 3"
 msgstr ""
 
-#: src/gui/config_controls.cpp:48
+#: src/gui/config_controls.cpp:49
 msgid "Player 4"
 msgstr ""
 
-#: src/gui/options.cpp:41
+#: src/gui/options.cpp:42
 msgid "Player Config"
 msgstr ""
 
-#: src/gui/player_controls.cpp:91
+#: src/gui/player_controls.cpp:92
 msgid "Player name"
 msgstr ""
 
@@ -593,23 +597,23 @@ msgstr ""
 msgid "Prehistoric Island"
 msgstr ""
 
-#: src/gui/display_res_confirm.cpp:59
+#: src/gui/display_res_confirm.cpp:60
 msgid "Press <ESC> to Cancel"
 msgstr ""
 
-#: src/gui/config_controls.cpp:52 src/gui/config_display.cpp:102
-#: src/gui/config_sound.cpp:63 src/gui/game_mode.cpp:157
+#: src/gui/config_controls.cpp:53 src/gui/config_display.cpp:103
+#: src/gui/config_sound.cpp:64 src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80 src/gui/network_gui.cpp:79
-#: src/gui/num_players.cpp:46 src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:123 src/gui/race_options.cpp:149
+#: src/gui/num_players.cpp:46 src/gui/options.cpp:58
+#: src/gui/player_controls.cpp:124 src/gui/race_options.cpp:149
 msgid "Press <ESC> to go back"
 msgstr ""
 
-#: src/gui/player_controls.cpp:167
+#: src/gui/player_controls.cpp:168
 msgid "Press key"
 msgstr ""
 
-#: src/gui/game_mode.cpp:67 src/gui/game_mode.cpp:104
+#: src/gui/game_mode.cpp:67 src/gui/game_mode.cpp:105
 msgid "Quick Race"
 msgstr ""
 
@@ -621,7 +625,7 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: src/gui/race_gui.cpp:628
+#: src/gui/race_gui.cpp:629
 msgid "REV"
 msgstr ""
 
@@ -633,7 +637,7 @@ msgstr ""
 msgid "Race results"
 msgstr ""
 
-#: src/gui/race_options.cpp:307
+#: src/gui/race_options.cpp:301
 msgid "Racer"
 msgstr ""
 
@@ -642,7 +646,7 @@ msgid "Racetrack"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:817
+#: src/gui/race_gui.cpp:808
 msgid "Ready!"
 msgstr ""
 
@@ -672,7 +676,7 @@ msgid "Select network mode"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:827
+#: src/gui/race_gui.cpp:818
 msgid "Set!"
 msgstr ""
 
@@ -700,6 +704,10 @@ msgstr ""
 msgid "Skidding Preview"
 msgstr ""
 
+#: data/tracks/skyline/skyline.track:4
+msgid "Skyline"
+msgstr ""
+
 #: data/grandprix/snagdrive.grandprix:4
 msgid "Snag Drive"
 msgstr ""
@@ -712,7 +720,7 @@ msgstr ""
 msgid "SnowTux Peak"
 msgstr ""
 
-#: src/gui/options.cpp:52
+#: src/gui/options.cpp:53
 msgid "Sound"
 msgstr ""
 
@@ -740,11 +748,17 @@ msgstr ""
 msgid "Synchronising."
 msgstr ""
 
+#: src/gui/help_page_one.cpp:145
+msgid ""
+"The 'sharp turn' key allows you to do sharpen turns\n"
+"and have better control in tight curves"
+msgstr ""
+
 #: data/tracks/islandtrack/islandtrack.track:4
 msgid "The Island"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:115
+#: src/gui/help_page_one.cpp:117
 msgid ""
 "The current key bindings can be seen/changed in the\n"
 "Options->Player Config menu."
@@ -773,7 +787,7 @@ msgstr ""
 msgid "Three Players"
 msgstr ""
 
-#: src/gui/game_mode.cpp:72 src/gui/game_mode.cpp:109
+#: src/gui/game_mode.cpp:72 src/gui/game_mode.cpp:110
 msgid "Time Trial"
 msgstr ""
 
@@ -789,19 +803,19 @@ msgstr ""
 msgid "To the Moon and Back"
 msgstr ""
 
-#: src/gui/config_sound.cpp:45 src/gui/config_sound.cpp:90
+#: src/gui/config_sound.cpp:46 src/gui/config_sound.cpp:91
 msgid "Turn off music"
 msgstr ""
 
-#: src/gui/config_sound.cpp:54 src/gui/config_sound.cpp:103
+#: src/gui/config_sound.cpp:55 src/gui/config_sound.cpp:104
 msgid "Turn off sound effects"
 msgstr ""
 
-#: src/gui/config_sound.cpp:49 src/gui/config_sound.cpp:84
+#: src/gui/config_sound.cpp:50 src/gui/config_sound.cpp:85
 msgid "Turn on music"
 msgstr ""
 
-#: src/gui/config_sound.cpp:58 src/gui/config_sound.cpp:98
+#: src/gui/config_sound.cpp:59 src/gui/config_sound.cpp:99
 msgid "Turn on sound effects"
 msgstr ""
 
@@ -813,15 +827,15 @@ msgstr ""
 msgid "Two Players"
 msgstr ""
 
-#: src/modes/linear_world.cpp:220
+#: src/modes/linear_world.cpp:232
 msgid "WRONG WAY!"
 msgstr ""
 
-#: src/gui/char_sel.cpp:126 src/gui/network_gui.cpp:162
+#: src/gui/char_sel.cpp:127 src/gui/network_gui.cpp:162
 msgid "Waiting for clients"
 msgstr ""
 
-#: src/gui/char_sel.cpp:124 src/gui/network_gui.cpp:118
+#: src/gui/char_sel.cpp:125 src/gui/network_gui.cpp:118
 msgid "Waiting for server"
 msgstr ""
 
@@ -883,7 +897,7 @@ msgid ""
 "Level AI karts."
 msgstr ""
 
-#: src/gui/config_display.cpp:71
+#: src/gui/config_display.cpp:72
 msgid "Window mode"
 msgstr ""
 
@@ -895,7 +909,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/modes/world.cpp:407
+#: src/modes/world.cpp:408
 msgid ""
 "You have been\n"
 "eliminated!"

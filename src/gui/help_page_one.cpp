@@ -33,7 +33,8 @@ enum WidgetTokens
     WTOK_MSG5,
     WTOK_MSG6,
     WTOK_MSG7,
-
+    WTOK_MSG8,
+    
     WTOK_LOCK,
 
     WTOK_SECOND_PAGE,
@@ -129,13 +130,21 @@ _("Collecting nitro allows you to get speed boosts whenever you\nwish by pressin
 _("If you see a button with a lock like the one to the right,\n\
 you need to complete a challenge to unlock it."));
 
-    widget_manager->addImgWgt(WTOK_LOCK, 6, 8, 0);
+    widget_manager->addImgWgt(WTOK_LOCK, 20, 8, 0);
     widget_manager->setWgtLockTexture(WTOK_LOCK);
     widget_manager->breakLine();
 
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
     widget_manager->breakLine();
 
+    
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1);
+    widget_manager->breakLine();
+    
+    widget_manager->addTextWgt(WTOK_MSG8, 87, 8,
+                               _("The 'sharp turn' key allows you to do sharpen turns\nand have better control in tight curves"));
+    widget_manager->breakLine();
+    
     /*Buttons at the bottom*/
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 25);
     widget_manager->breakLine();
