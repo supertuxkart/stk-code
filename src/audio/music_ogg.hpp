@@ -49,7 +49,7 @@ public:
     virtual void updateFading(float percent);
     virtual void updateFaster(float percent, float max_pitch);
 
-    virtual bool load(const std::string& filename);
+    virtual bool load(const std::string& filename, float gain);
 
     virtual bool playMusic();
     virtual bool stopMusic();

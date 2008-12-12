@@ -34,6 +34,7 @@ private:
     std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
     int                      m_numLoops;
+    float                    m_gain;
     float                    m_faster_time;    // Either time for fading faster
                                                // music in, or time to change pitch
     float                    m_max_pitch;      // maximum pitch for faster music

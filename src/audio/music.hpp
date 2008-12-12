@@ -25,7 +25,8 @@
 class Music
 {
 public:
-    virtual bool load        (const std::string& filename) = 0;
+    virtual bool load        (const std::string& filename,
+                              float gain                 ) = 0;
     virtual bool playMusic   ()                            = 0;
     virtual bool stopMusic   ()                            = 0;
     virtual bool pauseMusic  ()                            = 0;

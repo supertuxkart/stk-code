@@ -49,7 +49,7 @@ MusicOggStream::~MusicOggStream()
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
-bool MusicOggStream::load(const std::string& filename)
+bool MusicOggStream::load(const std::string& filename, float gain)
 {
     m_error = true;
     m_fileName = filename;
@@ -94,6 +94,7 @@ bool MusicOggStream::load(const std::string& filename)
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.0          );
+    alSourcef (m_soundSource, AL_GAIN,            gain         );
     alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
 
     m_error=false;

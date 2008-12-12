@@ -45,6 +45,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_fast_music      = NULL;
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
+    m_gain            = 1.0f;
 
     if(StringUtils::extension(filename)!="music")
     {
@@ -84,6 +85,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     LISP->get      ("faster-time", m_faster_time    );
     LISP->get      ("max-pitch",   m_max_pitch      );
     LISP->getVector("tracks",      m_all_tracks     );
+    LISP->get      ("gain",        m_gain           );
 
     // Get the path from the filename and add it to the ogg filename
     std::string path=StringUtils::path(filename);
@@ -127,7 +129,7 @@ void MusicInformation::startMusic()
     }
     m_normal_music = new MusicOggStream();
 
-    if((m_normal_music->load(m_normal_filename)) == false)
+    if((m_normal_music->load(m_normal_filename, m_gain)) == false)
     {
         delete m_normal_music;
         m_normal_music=0;
@@ -154,7 +156,7 @@ void MusicInformation::startMusic()
     }
     m_fast_music= new MusicOggStream();
 
-    if((m_fast_music->load(m_fast_filename)) == false)
+    if((m_fast_music->load(m_fast_filename, m_gain)) == false)
     {
         delete m_fast_music;
         m_fast_music=0;
