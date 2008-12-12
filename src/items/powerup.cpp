@@ -44,7 +44,7 @@ Powerup::Powerup(Kart* kart_)
  */
 Powerup::~Powerup()
 {
-    sfx_manager->deleteSFX(m_sound_use);
+    if(m_sound_use) sfx_manager->deleteSFX(m_sound_use);
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
