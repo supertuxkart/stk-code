@@ -45,8 +45,12 @@ MainMenu::MainMenu()
 {
     widget_manager->switchOrder();
 
+    // Only allow challenges if not networking for now!
+    std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
+    const bool challenges_active = all_challenges.size()>0 && network_manager->getMode()==NetworkManager::NW_NONE;
+    
     const int WIDTH=30;
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 30 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, challenges_active ? 23 : 30 );
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Splitscreen") );
 
@@ -54,12 +58,8 @@ MainMenu::MainMenu()
     if(network_manager->getMode()==NetworkManager::NW_NONE && stk_config->m_enable_networking)
         widget_manager->addTextButtonWgt( WTOK_NETWORK, WIDTH, 7, _("Networking") );
 
-    std::vector<const Challenge*> all_challenges=unlock_manager->getActiveChallenges();
-    // Only allow challenges if not networking for now!
-    if(all_challenges.size()>0 && network_manager->getMode()==NetworkManager::NW_NONE)
-    {
+    if(challenges_active)
         widget_manager->addTextButtonWgt( WTOK_CHALLENGES, WIDTH, 7, _("Challenges") );
-    }
 
     widget_manager->addTextButtonWgt( WTOK_OPTIONS, WIDTH, 7, _("Options") );
     widget_manager->addTextButtonWgt( WTOK_QUIT, WIDTH, 7, _("Quit") );
