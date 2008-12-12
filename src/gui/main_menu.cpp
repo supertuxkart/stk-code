@@ -46,6 +46,7 @@ MainMenu::MainMenu()
     widget_manager->switchOrder();
 
     const int WIDTH=30;
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 30 );
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Splitscreen") );
 
@@ -63,7 +64,7 @@ MainMenu::MainMenu()
     widget_manager->addTextButtonWgt( WTOK_OPTIONS, WIDTH, 7, _("Options") );
     widget_manager->addTextButtonWgt( WTOK_QUIT, WIDTH, 7, _("Quit") );
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 7 );
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 27 );
 
     widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, 7, _("Help") );
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
@@ -77,7 +78,7 @@ MainMenu::MainMenu()
         widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
         widget_manager->hideWgtRect(WTOK_WARNING);
     }
-
+    
     widget_manager->activateWgt(WTOK_SINGLE);
     widget_manager->layout(WGT_AREA_ALL);
 }
