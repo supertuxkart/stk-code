@@ -137,6 +137,10 @@ void SoundManager::addMusicToTracks()
 //-----------------------------------------------------------------------------
 void SoundManager::startMusic(MusicInformation* mi)
 {
+    // It is possible here that startMusic() will be called without first calling stopMusic().
+    // This would cause a memory leak by overwriting m_current_music without first releasing it's resources. 
+    // Guard against this here by making sure that stopMusic() is called before starting new music.
+    stopMusic();
     m_current_music = mi;
     
     if(!mi || !user_config->doMusic() || !m_initialized) return;

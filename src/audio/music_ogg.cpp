@@ -52,16 +52,9 @@ MusicOggStream::~MusicOggStream()
 bool MusicOggStream::load(const std::string& filename)
 {
     m_error = true;
-    if(!release())
-    {
-        user_config->setMusic(UserConfig::UC_TEMPORARY_DISABLE);
-        fprintf(stderr,"Problems oggStream:release. Disabling music.\n");
-        return false;
-    }
-
     m_fileName = filename;
-    if(m_fileName=="") return false;
-    
+    if(m_fileName=="") return false;  
+
     m_oggFile = fopen(m_fileName.c_str(), "rb");
 
     if(!m_oggFile)
