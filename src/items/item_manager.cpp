@@ -103,7 +103,7 @@ void ItemManager::removeTextures()
 
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
-        ssgDeRefDelete(i->second);
+        i->second->deRef();
     }
     m_all_models.clear();
     callback_manager->clear(CB_ITEM);
