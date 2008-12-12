@@ -68,9 +68,13 @@ CreditsMenu::CreditsMenu()
     //FIXME: maybe I should make scroll names more consistent
     widget_manager->enableWgtScroll( WTOK_CREDITS );
     widget_manager->setWgtYScrollPos( WTOK_CREDITS, WGT_SCROLL_START_BOTTOM );
+    widget_manager->setWgtCornerRadius( WTOK_CREDITS, 1);
+    widget_manager->showWgtBorder( WTOK_CREDITS );
+    widget_manager->setWgtBorderColor( WTOK_CREDITS, WGT_TRANS_GREEN );
+    widget_manager->setWgtBorderPercentage( WTOK_CREDITS, 2);
     widget_manager->setWgtYScrollSpeed( WTOK_CREDITS, -80 );
     widget_manager->breakLine();
-
+    
     widget_manager->addTextButtonWgt( WTOK_QUIT, 40, 7,
         _("Go back to the main menu"));
 
