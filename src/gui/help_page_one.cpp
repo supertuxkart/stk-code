@@ -146,7 +146,7 @@ you need to complete a challenge to unlock it."));
     widget_manager->breakLine();
     
     /*Buttons at the bottom*/
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 25);
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 16);
     widget_manager->breakLine();
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 30, 7);
     widget_manager->addTextButtonWgt(WTOK_QUIT, 40, 7,
