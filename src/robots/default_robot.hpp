@@ -108,7 +108,7 @@ private:
     /** Cache kart_info.m_track_sector. */
     int   m_track_sector;
 
-
+    
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -116,6 +116,8 @@ private:
     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
 
+    /** Cache width of kart. */
+    float m_kart_width;
     /** All AIs share the track info object, so that its information needs 
      *  only to be computed once. */
     static const TrackInfo *m_track_info;
@@ -154,7 +156,7 @@ private:
 
     float normalizeAngle(float angle);
     int   calcSteps();
-    void  setSteering(float angle);
+    void  setSteering(float angle, float dt);
     float getApproxRadius(const int START, const int END) const;
     void  findCurve();
 

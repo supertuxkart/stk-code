@@ -75,6 +75,9 @@ protected:
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
+    float m_time_full_steer_ai;       /**< Time for  AI karts to reach full
+                                       *   steer angle (used to reduce shaking
+                                       *   of karts). */
     float m_min_speed_turn,           /**< Speed for smallest turn radius. */
           m_angle_at_min,             /**< Steering angle for minimal turn 
                                            radius. Computed from radius and
@@ -162,6 +165,7 @@ public:
     float getMass                   () const {return m_mass;                     }
     float getMaxPower               () const {return m_engine_power[race_manager->getDifficulty()];}
     float getTimeFullSteer          () const {return m_time_full_steer;          }
+    float getTimeFullSteerAI        () const {return m_time_full_steer_ai;       }
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
     SFXManager::SFXType getEngineSfxType() 

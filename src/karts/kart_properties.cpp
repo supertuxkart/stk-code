@@ -59,7 +59,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_max_speed_turn = m_angle_at_max = m_brake_factor =
         m_engine_power[0] = m_engine_power[1] = m_engine_power[2] = 
         m_max_speed[0] = m_max_speed[1] = m_max_speed[2] = 
-        m_time_full_steer = m_nitro_power_boost =
+        m_time_full_steer = m_time_full_steer_ai = m_nitro_power_boost =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
         m_wheel_radius = m_chassis_linear_damping = 
@@ -186,6 +186,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
 
     lisp->get("engine-power",               m_engine_power);
     lisp->get("time-full-steer",            m_time_full_steer);
+    lisp->get("time-full-steer-ai",         m_time_full_steer_ai);
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
 
@@ -306,6 +307,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_max_radius,              "max-speed-angle"              );
     CHECK_NEG(m_brake_factor,            "brake-factor"                 );
     CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
+    CHECK_NEG(m_time_full_steer_ai,      "time-full-steer-ai"           );
 
     //bullet physics data
     CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );

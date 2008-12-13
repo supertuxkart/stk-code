@@ -61,6 +61,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
     }
     reset();
     m_kart_length = m_kart_properties->getKartModel()->getLength();
+    m_kart_width  = m_kart_properties->getKartModel()->getWidth();
     m_track = RaceManager::getTrack();
     m_world = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
     assert(m_world != NULL);
@@ -80,6 +81,9 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
     case RaceManager::RD_MEDIUM:
         m_wait_for_players   = true;
         m_max_handicap_accel = 0.95f;
+        // FT_PARALLEL had problems on some tracks when suddenly a smaller 
+        // section occurred (e.g. bridge in stone track): the AI would drive
+        // over and over into the river
         m_fallback_tactic    = FT_FAREST_POINT;
         m_item_tactic        = IT_CALCULATE;
         m_max_start_delay    = 0.4f;
@@ -332,10 +336,10 @@ void DefaultRobot::handleSteering(float dt)
 
     }
     // avoid steer vibrations
-    if (fabsf(steer_angle) < 2.0f*3.1415/180.0f)
-        steer_angle = 0.f;
+    //if (fabsf(steer_angle) < 1.0f*3.1415/180.0f)
+    //    steer_angle = 0.f;
 
-    setSteering(steer_angle);
+    setSteering(steer_angle, dt);
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -570,7 +574,7 @@ void DefaultRobot::handleNitro()
 }   // handleNitro
 
 //-----------------------------------------------------------------------------
-float DefaultRobot::steerToAngle (const size_t SECTOR, const float ANGLE)
+float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
 {
     float angle = m_track->m_angle[SECTOR];
 
@@ -798,7 +802,7 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
                        : -step_track_coord[0];
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_length * 0.5f > m_track->getWidth()[sector] )
+            if ( distance + m_kart_width * 0.5f > m_track->getWidth()[sector] )
             {
                 sgCopyVec2( result, m_track->m_driveline[sector] );
 
@@ -896,16 +900,36 @@ int DefaultRobot::calcSteps()
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1. 
- *  If the steering angle is too great, it will also trigger skidding.
+ *  If the steering angle is too great, it will also trigger skidding. This 
+ *  function uses a 'time till full steer' value specifying the time it takes
+ *  for the wheel to reach full left/right steering similar to player karts 
+ *  when using a digital input device. This is done to remove shaking of
+ *  AI karts (which happens when the kart frequently changes the direction
+ *  of a turn). The parameter is defined in the kart properties.
+ *  \param angle Steering angle.
+ *  \param dt Time step.
  */
-void DefaultRobot::setSteering( float angle )
+void DefaultRobot::setSteering(float angle, float dt)
 {
-    angle = angle / getMaxSteerAngle();
-    m_controls.jump = fabsf(angle)>=m_skidding_threshold;
+    float steer_fraction = angle / getMaxSteerAngle();
+    m_controls.jump      = fabsf(steer_fraction)>=m_skidding_threshold;
+    float old_lr         = m_controls.lr;
 
-    if     (angle >  1.0f) m_controls.lr =  1.0f;
-    else if(angle < -1.0f) m_controls.lr = -1.0f;
-    else                   m_controls.lr = angle;
+    if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
+    else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
+
+    // The AI has its own 'time full steer' value (which is the time
+    float max_steer_change = dt/m_kart_properties->getTimeFullSteerAI();
+    if(old_lr < steer_fraction)
+    {
+        m_controls.lr = (old_lr+max_steer_change > steer_fraction) 
+                      ? steer_fraction : old_lr+max_steer_change;
+    }
+    else
+    {
+        m_controls.lr = (old_lr-max_steer_change < steer_fraction) 
+                      ? steer_fraction : old_lr-max_steer_change;
+    }
 }   // setSteering
 
 //-----------------------------------------------------------------------------

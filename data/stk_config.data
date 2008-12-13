@@ -46,6 +46,13 @@
    (wheel-base               1.2 )
    (heightCOG                0.2 )
    (time-full-steer          0.15 )
+   ;; Time for the AI to go from neutral steering to extreme
+   ;; left (or right). This can be used to reduce 'shaking' of
+   ;; AI karts caused by changing steering direction too often.
+   ;; A value of 1/maxFPS / 2 will guarantee that the wheel can
+   ;; go from -1 to +1 steering in one frame, basically 
+   ;; disabling this mechanism.
+   (time-full-steer-ai       0.004)  ;; Disabled for now.
    (corn-f                   4   )
    (corn-r                   4   )
 
