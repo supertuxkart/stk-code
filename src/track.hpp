@@ -106,7 +106,7 @@ public:
     std::vector<Vec3>   m_start_positions;
     
 	//Left and Right drivelines for overhead map rendering.
-	//(Should probably be private as they are only use internally right now)
+	//(Should probably be private as they are only used internally right now)
     std::vector<Vec3> m_left_driveline;
     std::vector<Vec3> m_right_driveline;
 

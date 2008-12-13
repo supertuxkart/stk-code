@@ -435,13 +435,17 @@ btTransform Track::getStartTransform(unsigned int pos) const
     }
     else
     {
-        // Bug fix/workaround: sometimes the first kart would be too close
+        // sometimes the first kart would be too close
         // to the first driveline point and not to the last one -->
         // This kart would not get any lap counting done in the first
-        // lap! Therefor -1.5 is subtracted from the y position - which
-        // is a somewhat arbitrary value.
+        // lap! Therefore an offset is substracted from its Y location,
+        // and this offset is calculated based on the drivelines
+        float offset = 1.5f;
+        if(m_left_driveline[0].getY() > 0 || m_right_driveline[0].getY() > 0)
+            offset += std::max(m_left_driveline[0].getY(), m_left_driveline[0].getY());
+        
         orig.setX( pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f) );
-        orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f          );
+        orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-offset        );
         orig.setZ( pos<m_start_z.size() ? m_start_z[pos] : 1.0f                    );
     }
     btTransform start;

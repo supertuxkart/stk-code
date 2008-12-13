@@ -253,6 +253,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         {
             setTimeAtLapForKart( RaceManager::getWorld()->getTime(), kart->getWorldKartId() );
             kart_info.m_race_lap++ ;
+            printf("lap = %i\n", kart_info.m_race_lap);
         }
         // Race finished
         if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
