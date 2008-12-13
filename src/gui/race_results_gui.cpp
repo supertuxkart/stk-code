@@ -47,7 +47,7 @@ RaceResultsGUI::RaceResultsGUI()
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
         Widget *w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("OK") );
-        w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.05f, bottom_of_list);
+        w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, bottom_of_list);
     }
     else
     {
@@ -57,7 +57,7 @@ RaceResultsGUI::RaceResultsGUI()
         if(unlock_manager->getUnlockedFeatures().size()>0)
         {
             Widget *w=widget_manager->addTextButtonWgt( WTOK_CONTINUE, 60, 7, _("Continue") );
-            w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.05f, bottom_of_list);
+            w->setPosition(WGT_DIR_CENTER, 0, NULL, WGT_DIR_UNDER_WIDGET, 0.1f, bottom_of_list);
         } else
         {
             Widget *w;
@@ -91,7 +91,7 @@ Widget *RaceResultsGUI::displayRaceResults()
 {
     Widget *w_prev=widget_manager->addTextWgt( WTOK_RESULTS, 5, 7, _("Race results") );
     widget_manager->hideWgtRect(WTOK_RESULTS);
-    w_prev->setPosition(WGT_DIR_FROM_LEFT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
+    w_prev->setPosition(WGT_DIR_FROM_LEFT, 0.01f, NULL, WGT_DIR_FROM_TOP, 0.01f, NULL);
     
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -110,7 +110,7 @@ Widget *RaceResultsGUI::displayRaceResults()
     }   // for i
 
     // save bottom of result list for later
-    Widget *bottom_of_list=displayKartList(w_prev, order, 0.1f);
+    Widget *bottom_of_list=displayKartList(w_prev, order, 0.01f);
 
     delete[] order;
     
@@ -119,7 +119,7 @@ Widget *RaceResultsGUI::displayRaceResults()
     {
         w_prev=widget_manager->addTextWgt( WTOK_HIGHSCORES, 5, 7, _("Highscores") );
         widget_manager->hideWgtRect(WTOK_HIGHSCORES);
-        w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_FROM_TOP, 0.1f, NULL);
+        w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.01f, NULL, WGT_DIR_FROM_TOP, 0.01f, NULL);
         
         unsigned int num_scores = hs->getNumberEntries();
         char *highscores = new char[num_scores * MAX_STR_LEN];
@@ -137,7 +137,7 @@ Widget *RaceResultsGUI::displayRaceResults()
             
             Widget *w=widget_manager->addTextWgt(WTOK_FIRST_HIGHSCORE + i, 5, 7,
                                                  (char*)( highscores+MAX_STR_LEN*i ) );
-            w->setPosition(WGT_DIR_FROM_RIGHT, 0.1f, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
+            w->setPosition(WGT_DIR_FROM_RIGHT, 0.05f, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
             w_prev=w;
         } // next score
         
@@ -192,7 +192,7 @@ Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizo
                            WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
         Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + kart_id, 5, 7,
                                              (char*)(score + MAX_STR_LEN * i) );
-        w->setPosition(WGT_DIR_RIGHT_WIDGET, 0.1f, image,
+        w->setPosition(WGT_DIR_RIGHT_WIDGET, 0.0f, image,
                        WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
         w_prev=w;
         
