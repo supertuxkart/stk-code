@@ -3108,7 +3108,10 @@
 					"-DHAS_INET_PTON=1",
 					"-DHAS_INET_NTOP=1",
 					"-DHAS_MSGHDR_FLAGS=1",
+					"-DHAS_GETTEXT=1",
+					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 				);
+				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
 					"-L/usr/local/lib",
 					"-lSDL",
@@ -3125,6 +3128,7 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
+					"-lintl",
 				);
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";
