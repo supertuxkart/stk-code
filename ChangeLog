@@ -1,3 +1,16 @@
+SuperTuxKart 0.6
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* New improved physics and kart handling
+* Added sharp turns and nitro speed boost (removed wheelies and jump)
+* Totally rewrote powerups : plunger, bowling ball, cake, bubblegum
+* New and improved tracks : skyline, snow mountain, race track, space track, old mine, XR591
+* New game mode : 3-Strikes Battle
+* Major improvements to AI
+* New/improved karts (and removed some old ones)
+* Improved user interface
+* Fully positional audio with OpenAL
+* New music
+
 SuperTuxKart 0.5 (May 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, 
