@@ -218,7 +218,9 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
-    if(m_owner->getPosition() != 1 && m_type == POWERUP_NOTHING)
+    if(m_owner->getPosition() != 1 && m_type == POWERUP_NOTHING &&
+       race_manager->getWorld()->acceptPowerup(POWERUP_PARACHUTE) &&
+       race_manager->getWorld()->acceptPowerup(POWERUP_ANVIL))
     {
         // On client: just set the value
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
