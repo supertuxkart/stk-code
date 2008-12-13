@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-12 20:58-0500\n"
+"POT-Creation-Date: 2008-12-12 21:08-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -226,10 +226,6 @@ msgstr ""
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
-msgstr ""
-
-#: data/tracks/skyline/skyline.track:5
-msgid "Created by Robert Howie"
 msgstr ""
 
 #: src/gui/main_menu.cpp:72
@@ -756,7 +752,7 @@ msgstr ""
 
 #: src/gui/help_page_one.cpp:145
 msgid ""
-"The 'sharp turn' key allows you to do sharpen turns\n"
+"The 'sharp turn' key allows you to do sharp turns\n"
 "and have better control in tight curves"
 msgstr ""
 

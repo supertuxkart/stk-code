@@ -142,7 +142,7 @@ you need to complete a challenge to unlock it."));
     widget_manager->breakLine();
     
     widget_manager->addTextWgt(WTOK_MSG8, 87, 8,
-                               _("The 'sharp turn' key allows you to do sharpen turns\nand have better control in tight curves"));
+                               _("The 'sharp turn' key allows you to do sharp turns\nand have better control in tight curves"));
     widget_manager->breakLine();
     
     /*Buttons at the bottom*/
