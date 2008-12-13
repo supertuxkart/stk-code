@@ -678,7 +678,7 @@ void Kart::crashed(Kart *k)
     {
         // In case that the sfx is longer than 0.5 seconds, only play it if
         // it's not already playing.
-        if(!m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
+        if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
             m_crash_sound->play();
         m_bounce_back_time = 0.1f;
     }
