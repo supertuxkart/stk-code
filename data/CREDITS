@@ -12,11 +12,14 @@ Marianne Gagnon (Auria)
 
 Eduardo Hernandez Munoz (Coz) (retired)
 
-Programming
------------
+Additional Programming
+----------------------
+
+Stepehen Dunn
+- Work on Audio
 
 Canarix
-- User interface
+- Original user interface
 
 Damien
 - Ogg vorbis support
@@ -74,11 +77,26 @@ Thomas Oppl
 Christian Framing 
 - Updated EvilTux kart
 
+Minibjorn
+- Bowling Ball model
+- Cake model
+- Plunger model
+
+Ivar ten Cate
+- Old mine track
+
+Robert Howie
+- Skyline Track
+
+Canis Lupus
+- Snow Mountain track
+- XR591 track
+
 Audio art
 ---------
 
 Weirwood
-- Super TuxKart music theme
+- old Super TuxKart music theme
 - 'Kart grand prix' song
 
 Asha B.
@@ -99,12 +117,25 @@ Paul Esra Martin (P@ule)
 Stephan Wiefling
 - Menu sounds
 
-Atheal Washington
-- Jungle music
+Marianne Gagnon (Auria)
+- Jungle song
+
+Matt Thomas
+- Boom-boom-boom song
+- TK2 song
+- TK5 song
+
+Other music (not specifically created for STK):
+- Brad Sucks for 'Out of it'
+- ChillCarrier for 'Druckverlust'
+- Deff Syndicate for 'hip hop 1'
+- Alessandro Bottura for 'MayDay Mayhem'
+- Speedsound for 'Sky Vibe - High Frequency'
+- Daniel Bautista for 'Symphony No. 5'
 
 Translations
 ------------
-German: Dominique Leuenberger, Stefan von Halenbach
+German: Dominique Leuenberger, Stefan von Halenbach, Constantin Pelikan
 French: Marianne Gagnon (Auria)
 Dutch:  Frans van Rijn (Asciimonster)
 Spanish: David Ballesteros Mayo (Dividio)
@@ -115,30 +146,9 @@ Romanian: Marina Muncescu
 Mac OS X port
 -------------
 
-Cherryprice
-- Mac OS X artwork & documentation
-
-Nuke
-- Mac OS X port & package creation
-- Mac OS X artwork & documentation
-
-Florian
-- Mac OS X port & package creation
-
-JPenguin
-- Mac OS X port & package creation
-
 Marianne Gagnon (Auria)
-- Mac OS X port & package creation
-
-TinGamer
-- Mac OS X port & package creation
-
-Xeno74
-- Mac OS X port & package creation
-- Mac-Linux-PPC port & package creation
-- Mac OS X artwork & documentation
-
+    with additional involvement from
+    Cherryprice, Nuke, Florian, JPenguin, TinGamer, Xeno74
 
 Testing
 -------
@@ -194,8 +204,6 @@ Willian Padovani Germano
 
 Original Tuxkart
 ------------------
-Matt Thomas
-- Music
 
 Steve Baker, Oliver Baker
 Website: http://www.sjbaker.org/
