@@ -31,7 +31,8 @@ enum WidgetTokens
     WTOK_TXT2,
     WTOK_TXT3,
     WTOK_TXT4,
-
+    WTOK_TXT5,
+    
     WTOK_SECOND_PAGE,
     WTOK_QUIT
 };
@@ -68,11 +69,15 @@ most points wins (shortest time in case of a tie!)          "));
         widget_manager->addTextWgt( WTOK_TXT4, 100, 15,
             _("Follow the leader: run for second place, as the last kart\nwill be disqualified every time the counter hits zero.\n Beware : going in front of the leader will get you eliminated too!"));
         widget_manager->setWgtTextSize( WTOK_TXT4, WGT_FNT_SML );
-        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 13 );
+        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 1 );
     }
+    widget_manager->addTextWgt( WTOK_TXT5, 100, 15,
+                               _("3 Strikes Battle : only in multiplayer games.\nHit others with weapons until they lose all their lives."));
+    widget_manager->setWgtTextSize( WTOK_TXT5, WGT_FNT_SML );
+    
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 4 );
     
     /*Buttons at the bottom*/
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 100, 7);
     widget_manager->switchOrder();
     widget_manager->addTextButtonWgt( WTOK_SECOND_PAGE, 30, 7,
         _("< Back"));

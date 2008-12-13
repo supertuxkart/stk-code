@@ -405,15 +405,15 @@ void ConfigDisplay::loadDefaultModes()
 {
     m_sizes.clear();
 
-    m_sizes.push_back( std::pair <int, int> (800, 600) );
-    m_sizes.push_back( std::pair <int, int> (1024, 768) );
-    m_sizes.push_back( std::pair <int, int> (1152, 864) );
-    m_sizes.push_back( std::pair <int, int> (1280, 768) );
-    m_sizes.push_back( std::pair <int, int> (1280, 800) );
-    m_sizes.push_back( std::pair <int, int> (1280, 960) );
-    m_sizes.push_back( std::pair <int, int> (1280, 1024) );
-    m_sizes.push_back( std::pair <int, int> (1440, 900) );
-    m_sizes.push_back( std::pair <int, int> (1680, 1050) );
-    m_sizes.push_back( std::pair <int, int> (1920, 1200) );
+    m_sizes.push_back( std::pair <int, int> (800, 600) );  // 4:3
+    m_sizes.push_back( std::pair <int, int> (1024, 768) ); // 4:3
+    m_sizes.push_back( std::pair <int, int> (1152, 864) ); // 4:3
+    m_sizes.push_back( std::pair <int, int> (1280, 768) ); // 5:3
+    m_sizes.push_back( std::pair <int, int> (1280, 800) ); // 8:5
+    m_sizes.push_back( std::pair <int, int> (1280, 960) ); // 4:3
+    m_sizes.push_back( std::pair <int, int> (1280, 1024) );// 5:4
+    m_sizes.push_back( std::pair <int, int> (1440, 900) ); // 8:5
+    m_sizes.push_back( std::pair <int, int> (1680, 1050) );// 8:5
+    m_sizes.push_back( std::pair <int, int> (1920, 1200) );// 8:5
 };
 

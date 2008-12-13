@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-11 20:58-0500\n"
+"POT-Creation-Date: 2008-12-12 20:58-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,13 @@ msgstr ""
 msgid "3 Strikes Battle"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:78 src/gui/help_page_two.cpp:128
+#: src/gui/help_page_three.cpp:75
+msgid ""
+"3 Strikes Battle : only in multiplayer games.\n"
+"Hit others with weapons until they lose all their lives."
+msgstr ""
+
+#: src/gui/help_page_three.cpp:83 src/gui/help_page_two.cpp:128
 msgid "< Back"
 msgstr ""
 
@@ -41,7 +47,7 @@ msgstr ""
 msgid "Accelerate"
 msgstr ""
 
-#: src/gui/challenges_menu.cpp:36
+#: src/gui/challenges_menu.cpp:37
 msgid "Active Challenges"
 msgstr ""
 
@@ -86,7 +92,7 @@ msgstr ""
 msgid "Back to the main menu"
 msgstr ""
 
-#: src/gui/help_page_one.cpp:153 src/gui/help_page_three.cpp:82
+#: src/gui/help_page_one.cpp:153 src/gui/help_page_three.cpp:87
 #: src/gui/help_page_two.cpp:131
 msgid "Back to the menu"
 msgstr ""
@@ -123,7 +129,7 @@ msgstr ""
 msgid "Canyon"
 msgstr ""
 
-#: src/gui/main_menu.cpp:60
+#: src/gui/main_menu.cpp:62
 msgid "Challenges"
 msgstr ""
 
@@ -226,7 +232,7 @@ msgstr ""
 msgid "Created by Robert Howie"
 msgstr ""
 
-#: src/gui/main_menu.cpp:71
+#: src/gui/main_menu.cpp:72
 msgid "Credits"
 msgstr ""
 
@@ -244,7 +250,7 @@ msgstr ""
 msgid "Decrease Resolution"
 msgstr ""
 
-#: src/gui/race_options.cpp:83
+#: src/gui/race_options.cpp:86
 msgid "Difficulty"
 msgstr ""
 
@@ -256,7 +262,7 @@ msgstr ""
 msgid "Display Settings"
 msgstr ""
 
-#: src/gui/race_options.cpp:300
+#: src/gui/race_options.cpp:305
 msgid "Driver"
 msgstr ""
 
@@ -330,7 +336,7 @@ msgid ""
 "Desert Island"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:69
+#: src/gui/help_page_three.cpp:70
 msgid ""
 "Follow the leader: run for second place, as the last kart\n"
 "will be disqualified every time the counter hits zero.\n"
@@ -358,11 +364,11 @@ msgstr ""
 msgid "Game mode help"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:42
+#: src/gui/help_page_three.cpp:43
 msgid "Game modes"
 msgstr ""
 
-#: src/gui/challenges_menu.cpp:53 src/gui/credits_menu.cpp:75
+#: src/gui/challenges_menu.cpp:54 src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr ""
 
@@ -379,14 +385,14 @@ msgstr ""
 msgid "Grand Prix"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:49
+#: src/gui/help_page_three.cpp:50
 msgid ""
 "Grand Prix: Win victory points \n"
 "by racing through a group of tracks,  \n"
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
 
-#: src/gui/main_menu.cpp:68 src/gui/race_menu.cpp:49
+#: src/gui/main_menu.cpp:69 src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr ""
 
@@ -443,7 +449,7 @@ msgstr ""
 msgid "Look back"
 msgstr ""
 
-#: src/gui/main_menu.cpp:54
+#: src/gui/main_menu.cpp:59
 msgid "Networking"
 msgstr ""
 
@@ -505,15 +511,15 @@ msgstr ""
 msgid "No Grand Prix selected"
 msgstr ""
 
-#: src/gui/race_options.cpp:299 src/gui/race_options.cpp:302
+#: src/gui/race_options.cpp:304 src/gui/race_options.cpp:307
 msgid "Novice"
 msgstr ""
 
-#: src/gui/race_options.cpp:99
+#: src/gui/race_options.cpp:102
 msgid "Number of karts"
 msgstr ""
 
-#: src/gui/race_options.cpp:121
+#: src/gui/race_options.cpp:124
 msgid "Number of laps"
 msgstr ""
 
@@ -533,7 +539,7 @@ msgstr ""
 msgid "On the Beach"
 msgstr ""
 
-#: src/gui/main_menu.cpp:63 src/gui/options.cpp:40 src/gui/race_menu.cpp:48
+#: src/gui/main_menu.cpp:64 src/gui/options.cpp:40 src/gui/race_menu.cpp:48
 msgid "Options"
 msgstr ""
 
@@ -558,7 +564,7 @@ msgstr ""
 msgid "Player "
 msgstr ""
 
-#: src/gui/char_sel.cpp:87
+#: src/gui/char_sel.cpp:86
 #, c-format
 msgid "Player %d, choose a driver"
 msgstr ""
@@ -605,7 +611,7 @@ msgstr ""
 #: src/gui/config_sound.cpp:64 src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80 src/gui/network_gui.cpp:79
 #: src/gui/num_players.cpp:46 src/gui/options.cpp:58
-#: src/gui/player_controls.cpp:124 src/gui/race_options.cpp:149
+#: src/gui/player_controls.cpp:124 src/gui/race_options.cpp:154
 msgid "Press <ESC> to go back"
 msgstr ""
 
@@ -617,11 +623,11 @@ msgstr ""
 msgid "Quick Race"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:57
+#: src/gui/help_page_three.cpp:58
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr ""
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:65
 msgid "Quit"
 msgstr ""
 
@@ -637,7 +643,7 @@ msgstr ""
 msgid "Race results"
 msgstr ""
 
-#: src/gui/race_options.cpp:301
+#: src/gui/race_options.cpp:306
 msgid "Racer"
 msgstr ""
 
@@ -692,7 +698,7 @@ msgstr ""
 msgid "Shifting Sands"
 msgstr ""
 
-#: src/gui/main_menu.cpp:49
+#: src/gui/main_menu.cpp:54
 msgid "Single Player"
 msgstr ""
 
@@ -728,7 +734,7 @@ msgstr ""
 msgid "Sound Settings"
 msgstr ""
 
-#: src/gui/main_menu.cpp:50
+#: src/gui/main_menu.cpp:55
 msgid "Splitscreen"
 msgstr ""
 
@@ -736,7 +742,7 @@ msgstr ""
 msgid "Star Track"
 msgstr ""
 
-#: src/gui/race_options.cpp:141
+#: src/gui/race_options.cpp:144
 msgid "Start race"
 msgstr ""
 
@@ -791,7 +797,7 @@ msgstr ""
 msgid "Time Trial"
 msgstr ""
 
-#: src/gui/help_page_three.cpp:62
+#: src/gui/help_page_three.cpp:63
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
@@ -831,11 +837,11 @@ msgstr ""
 msgid "WRONG WAY!"
 msgstr ""
 
-#: src/gui/char_sel.cpp:127 src/gui/network_gui.cpp:162
+#: src/gui/char_sel.cpp:126 src/gui/network_gui.cpp:162
 msgid "Waiting for clients"
 msgstr ""
 
-#: src/gui/char_sel.cpp:125 src/gui/network_gui.cpp:118
+#: src/gui/char_sel.cpp:124 src/gui/network_gui.cpp:118
 msgid "Waiting for server"
 msgstr ""
 
