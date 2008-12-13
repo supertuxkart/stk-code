@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-12 21:08-0500\n"
-"PO-Revision-Date: 2008-12-12 21:10-0500\n"
+"PO-Revision-Date: 2008-12-12 21:23-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgid ""
 "Hit others with weapons until they lose all their lives."
 msgstr ""
 "Combat '3 prises' : seulement dans les jeux multijoueurs.\n"
-"Utilise des armes pour faire leurs vies à tes opposants!"
+"Utilise des armes pour faire perdre leurs vies à tes rivaux!"
 
 #: src/gui/help_page_three.cpp:83
 #: src/gui/help_page_two.cpp:128
@@ -225,7 +225,6 @@ msgid "Connect to server"
 msgstr "Se connecter au serveur"
 
 #: src/gui/network_gui.cpp:155
-#, fuzzy
 msgid "Connected:"
 msgstr "Connecté:"
 
@@ -662,7 +661,6 @@ msgid "Player name"
 msgstr "Nom du joueur"
 
 #: src/gui/help_page_two.cpp:120
-#, fuzzy
 msgid ""
 "Plunger - throw straight to pull an opponent back,\n"
 "or throw while looking back to make one lose sight!"
@@ -769,7 +767,6 @@ msgid "Setup New Race"
 msgstr "Nouvelle course"
 
 #: src/gui/player_controls.cpp:72
-#, fuzzy
 msgid "Sharp Turn"
 msgstr "Virage brusque"
 
@@ -782,7 +779,6 @@ msgid "Single Player"
 msgstr "Jeu solo"
 
 #: src/gui/game_mode.cpp:61
-#, fuzzy
 msgid "Single Race"
 msgstr "Une course"
 
@@ -827,12 +823,10 @@ msgid "Start race"
 msgstr "Commencer la course"
 
 #: src/gui/start_race_feedback.cpp:39
-#, fuzzy
 msgid "Synchronising network..."
 msgstr "Synchronisation du réseau..."
 
 #: src/gui/race_results_gui.cpp:271
-#, fuzzy
 msgid "Synchronising."
 msgstr "Synchronisation..."
 
@@ -937,7 +931,6 @@ msgstr "En attente de clients"
 
 #: src/gui/char_sel.cpp:124
 #: src/gui/network_gui.cpp:118
-#, fuzzy
 msgid "Waiting for server"
 msgstr "En attente du serveur"
 
