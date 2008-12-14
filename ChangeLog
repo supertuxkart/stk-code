@@ -1,15 +1,23 @@
 SuperTuxKart 0.6
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * New improved physics and kart handling
-* Added sharp turns and nitro speed boost (removed wheelies and jump)
-* Totally rewrote powerups : plunger, bowling ball, cake, bubblegum
-* New and improved tracks : skyline, snow mountain, race track, space track, old mine, XR591
+* Added sharp turns and nitro speed boost (replacing wheelies and jump)
+* Totally rewrote powerups (plunger, bowling ball, cake, bubblegum) and new look for bananas
+* New and improved tracks  : skyline, snow mountain, race track, space track, old mine, XR591
 * New game mode : 3-Strikes Battle
 * Major improvements to AI
-* New/improved karts (and removed some old ones)
+* New/improved karts (and removed some old ones) : wilber, eviltux, hexley
 * Improved user interface
+* Karts now have a visible suspension effect
 * Fully positional audio with OpenAL
-* New music
+* New music and sound effects (including engine, braking and skidding sounds)
+* Better support for mods and add-ons (kart and track groups)
+* New/updated translations (ga fi de nl sl fr it es ro sv)
+* Allowed 'Grand Prix's of Time Trial, Follow the Leader, or any other mode
+* Challenges are now specified and config files, and are thus easy to create by users
+* Improved shortcut-detection
+* Initial work towards networking (disabled and hidden by default)
+* Bug fixes and code refactor/cleanup/documentation
 
 SuperTuxKart 0.5 (May 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
