@@ -402,7 +402,6 @@ AC_CONFIG_FILES([                   \
  data/textures/Makefile             \
  data/tracks/Makefile               \
  doc/Makefile                       \
- doc/players_manual/Makefile        \
  src/Makefile                       \
  src/robots/Makefile                \
  src/bullet/Makefile                \
