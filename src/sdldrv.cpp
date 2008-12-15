@@ -381,6 +381,14 @@ void SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
         // Act different in input sensing mode.
         if (mode == INPUT_SENSE)
         {
+            // Input sensing should be canceled.
+            if (ga == GA_LEAVE && sensedInput->type==IT_KEYBOARD)
+            {
+                menu->handle(GA_SENSE_CANCEL, value);
+            }
+            // Stores the sensed input when the button/key/axes/<whatever> is
+            // released only and is not used in a fixed mapping.
+            else if (!(value || user_config->isFixedInput(type, id0, id1, id2)))
             {
                 sensedInput->type = type;
                 sensedInput->id0 = id0;
