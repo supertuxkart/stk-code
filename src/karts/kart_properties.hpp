@@ -127,6 +127,15 @@ protected:
     float m_upright_tolerance;
     float m_upright_max_force;
 
+    float m_skid_visual;              /**< Additional rotation of 3d model
+                                       *   when skidding. */
+    float m_skid_max;                 /**< Maximal increase of steering when
+                                       *   skidding. */
+    float m_skid_increase;            /**< Skidding is multiplied by this when
+                                       *   skidding to increase to 
+                                       *   m_skid_increase. */
+    float m_skid_decrease;            /**< Skidding is multiplied by this when
+                                       *   not skidding to decrease to 1.0. */
     // Camera related setting
     // ----------------------
     float m_camera_max_accel;         // maximum acceleration of camera
@@ -199,6 +208,16 @@ public:
     float getRubberBandForce        () const {return m_rubber_band_force;        }
     /** Returns the duration a rubber band is active for. */
     float getRubberBandDuration     () const {return m_rubber_band_duration;     }
+    /** Returns additional rotation of 3d model when skidding. */
+    float getSkidVisual             () const {return m_skid_visual;              }
+    /** Returns the maximum factor by which the steering angle can be increased. */
+    float getMaxSkid                () const {return m_skid_max;                 }
+    /** Returns the factor by which m_skidding is multiplied when the kart is 
+     *  skidding to increase it to the maximum. */
+    float getSkidIncrease           () const {return m_skid_increase;            }
+    /** Returns the factor by which m_skidding is multiplied when the kart is 
+     *  not skidding to decrease it back to 1.0f . */
+    float getSkidDecrease           () const {return m_skid_decrease;            }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 

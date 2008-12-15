@@ -762,12 +762,13 @@ void Kart::updatePhysics (float dt)
 
        if(m_controls.jump)
        {
-           m_skidding*= 1.05f;
-           if(m_skidding>2.0f) m_skidding=2.0f;
+           m_skidding*= m_kart_properties->getSkidIncrease();
+           if(m_skidding>m_kart_properties->getMaxSkid())
+               m_skidding=m_kart_properties->getMaxSkid();
        }
        else if(m_skidding>1.0f)
        {
-           m_skidding *= 0.95f;
+           m_skidding *= m_kart_properties->getSkidDecrease();
            if(m_skidding<1.0f) m_skidding=1.0f;
        }
        if(m_skidding>1.0f)
@@ -967,7 +968,8 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
                                  ? getSpeed()*5.0f : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
-    float offset_heading = getSteerPercent()*0.05f*3.1415926f * speed_ratio * m_skidding*m_skidding;
+    float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
+                         * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(center_shift, Vec3(offset_heading, offset_pitch, 0));
 }   // updateGraphics
 
