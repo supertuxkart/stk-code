@@ -148,6 +148,20 @@ void LinearWorld::update(float delta)
                 m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_kart[i]);
         }
     }
+#ifdef SPECIAL_POSITION_DEBUG
+    int xx[10];
+    for(int i=0; i<10; i++) xx[i]=-99;
+    for(unsigned int i=0; i<kart_amount; i++)
+    {
+        if(xx[m_kart[i]->getPosition()]!=-99)
+        {
+            printf("Error\n");
+            exit(-1);
+        }
+        xx[m_kart[i]->getPosition()]=i;
+    }
+#endif
+
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo& kart_info = m_kart_info[n];
@@ -239,11 +253,12 @@ void LinearWorld::update(float delta)
 //-----------------------------------------------------------------------------
 void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
 {
-    //bool newLap = kart_info.m_last_track_coords[1]     > 300.0f  &&
-    //              kart_info.m_curr_track_coords.getY() <  20.0f;
+    bool newLap = kart_info.m_last_track_coords[1]     > 300.0f  &&
+                  kart_info.m_curr_track_coords.getY() <  20.0f;
     
-    const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
-                        kart_info.m_track_sector == 0;
+//    This fails if a kart skips a sector (or comes from the outside of the drivelines)
+//    const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
+//                        kart_info.m_track_sector == 0;
     if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
