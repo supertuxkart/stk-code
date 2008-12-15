@@ -191,9 +191,6 @@ void LinearWorld::update(float delta)
         }
         
         
-        // --------- do lap counting ------
-        doLapCounting(kart_info, kart);
-        
         if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR && !kart->isRescue())
             kart_info.m_last_valid_sector = kart_info.m_track_sector;
         
@@ -221,6 +218,9 @@ void LinearWorld::update(float delta)
         RaceManager::getTrack()->spatialToTrack( kart_info.m_curr_track_coords /* out */, 
                                                  kart->getXYZ(),
                                                  kart_info.m_track_sector      );
+        
+        // --------- do lap counting ------
+        doLapCounting(kart_info, kart);
         
         // ------- check the kart isn't going in the wrong way ------
         // only relevant for player karts
@@ -253,12 +253,12 @@ void LinearWorld::update(float delta)
 //-----------------------------------------------------------------------------
 void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
 {
-    bool newLap = kart_info.m_last_track_coords[1]     > 300.0f  &&
+    bool newLap = kart_info.m_last_track_coords.getY() > 300.0f && 
                   kart_info.m_curr_track_coords.getY() <  20.0f;
     
-//    This fails if a kart skips a sector (or comes from the outside of the drivelines)
-//    const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
-//                        kart_info.m_track_sector == 0;
+    //    This fails if a kart skips a sector (or comes from the outside of the drivelines)
+    //const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
+    //                    kart_info.m_track_sector == 0;
     if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
@@ -316,7 +316,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         }
         kart_info.m_lap_start_time = RaceManager::getWorld()->getTime();
     }
-    else if ( kart_info.m_curr_track_coords.getY() > 300.0f && kart_info.m_last_track_coords[1] <  20.0f)
+    else if ( kart_info.m_curr_track_coords.getY() > 300.0f && kart_info.m_last_track_coords.getY() <  20.0f)
     {
         kart_info.m_race_lap-- ;
         // Prevent cheating by setting time to a negative number, indicating
