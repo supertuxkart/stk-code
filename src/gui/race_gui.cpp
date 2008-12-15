@@ -750,7 +750,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
  **/
-void RaceGUI::addMessage(const char *msg, Kart *kart, float time, 
+void RaceGUI::addMessage(const char *msg, const Kart *kart, float time, 
                          int font_size, int red, int green, int blue)
 {
     m_messages.push_back(TimedMessage(msg, kart, time, font_size, red, green, blue));
