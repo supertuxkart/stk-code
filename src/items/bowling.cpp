@@ -40,7 +40,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
     }
     else
     {
-        int min_speed = m_speed*4;
+        float min_speed = m_speed*4.0f;
         /* make it go faster when throwing forward
            so the player doesn't catch up with the ball
            and explode by touching it */
