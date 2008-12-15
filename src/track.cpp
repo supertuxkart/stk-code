@@ -285,11 +285,10 @@ int Track::findOutOfRoadSector
     //find a better way of handling the shortcuts, and maybe a better way of
     //calculating the distance.
     float nearest_dist = 9999999;
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
+    const int DRIVELINE_SIZE = (int)m_left_driveline.size();
 
     int begin_sector = 0;
-    int end_sector = DRIVELINE_SIZE - 1;
-
+    int count      = DRIVELINE_SIZE;
     if(CURR_SECTOR != UNKNOWN_SECTOR )
     {
         const int LIMIT = 10; //The limit prevents shortcuts
@@ -298,50 +297,42 @@ int Track::findOutOfRoadSector
             begin_sector = DRIVELINE_SIZE - 1 + CURR_SECTOR - LIMIT;
         }
         else begin_sector = CURR_SECTOR - LIMIT;
-
-        if( CURR_SECTOR + LIMIT > (int)DRIVELINE_SIZE - 1 )
-        {
-            end_sector = CURR_SECTOR + LIMIT - DRIVELINE_SIZE;
-        }
-        else end_sector = CURR_SECTOR + LIMIT;
+        count = 2*LIMIT;
     }
 
     sgLineSegment3 line_seg;
     int next_sector;
-    for (int i = begin_sector ; i != end_sector ; i = next_sector )
+    for(int j=0; j<count; j++)
     {
-        next_sector = i + 1 == (int)DRIVELINE_SIZE ? 0 : i + 1;
+        next_sector  = begin_sector+1 == DRIVELINE_SIZE ? 0 : begin_sector+1;
 
         if( SIDE != RS_RIGHT)
         {
-            sgCopyVec3( line_seg.a, m_left_driveline[i].toFloat() );
+            sgCopyVec3( line_seg.a, m_left_driveline[begin_sector].toFloat() );
             sgCopyVec3( line_seg.b, m_left_driveline[next_sector].toFloat() );
-
-	    dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
-
+            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
             if ( dist < nearest_dist )
             {
                 nearest_dist = dist;
-                sector = i ;
+                sector       = begin_sector;
             }
-        }
+        }   // SIDE != RS_RIGHT
 
         if( SIDE != RS_LEFT )
         {
-            sgCopyVec3( line_seg.a, m_right_driveline[i].toFloat() );
+            sgCopyVec3( line_seg.a, m_right_driveline[begin_sector].toFloat() );
             sgCopyVec3( line_seg.b, m_right_driveline[next_sector].toFloat() );
-
-	    dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
-
+            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
             if ( dist < nearest_dist )
             {
                 nearest_dist = dist;
-                sector = i ;
+                sector       = begin_sector;
             }
-        }
-    }   // for i
+        }   // SIDE != RS_LEFT
+        begin_sector = next_sector;
+    }   // for j
 
-    if(sector==UNKNOWN_SECTOR)
+    if(sector==UNKNOWN_SECTOR || sector >=DRIVELINE_SIZE)
     {
         printf("unknown sector found.\n");
     }
