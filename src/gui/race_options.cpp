@@ -252,8 +252,7 @@ void RaceOptions::select()
         case WTOK_LAPS_DOWN:
             {
                 m_num_laps--;
-                printf("fixme: numlaps=0\n");
-                if(m_num_laps<0) m_num_laps=10;
+                if(m_num_laps<1) m_num_laps=10;
 
                 char label[ MAX_MESSAGE_LENGTH ];
                 snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );
