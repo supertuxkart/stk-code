@@ -26,8 +26,9 @@
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
-    m_leader_intervals    = stk_config->m_leader_intervals;
+    m_leader_intervals = stk_config->m_leader_intervals;
     LinearWorld::init();
+    m_use_highscores   = false;  // disable high scores
 	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }
 
