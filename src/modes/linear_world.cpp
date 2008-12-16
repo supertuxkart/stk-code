@@ -283,9 +283,11 @@ void LinearWorld::update(float delta)
 //-----------------------------------------------------------------------------
 void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
 {
-    bool newLap = kart_info.m_last_track_coords.getY() > 300.0f && 
-                  kart_info.m_curr_track_coords.getY() <  20.0f;
-    
+    const float delta=20.0f;
+    float track_length = m_track->getTrackLength();
+    bool newLap = kart_info.m_last_track_coords.getY() > track_length-delta && 
+                  kart_info.m_curr_track_coords.getY() <  delta;
+  
     //    This fails if a kart skips a sector (or comes from the outside of the drivelines)
     //const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
     //                    kart_info.m_track_sector == 0;
@@ -346,7 +348,8 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         }
         kart_info.m_lap_start_time = RaceManager::getWorld()->getTime();
     }
-    else if ( kart_info.m_curr_track_coords.getY() > 300.0f && kart_info.m_last_track_coords.getY() <  20.0f)
+    else if ( kart_info.m_curr_track_coords.getY() > track_length-delta &&
+              kart_info.m_last_track_coords.getY() <  delta)
     {
         kart_info.m_race_lap-- ;
         // Prevent cheating by setting time to a negative number, indicating
