@@ -163,8 +163,8 @@ void ItemManager::setDefaultItemStyle()
     std::string DEFAULT_NAMES[ITEM_LAST - ITEM_FIRST - 1];
     DEFAULT_NAMES[ITEM_BONUS_BOX]   = "bonusblock";
     DEFAULT_NAMES[ITEM_BANANA]      = "banana";
-    DEFAULT_NAMES[ITEM_GOLD_COIN]   = "goldcoin";
-    DEFAULT_NAMES[ITEM_SILVER_COIN] = "silvercoin";
+    DEFAULT_NAMES[ITEM_GOLD_COIN]   = "nitrotank-big";
+    DEFAULT_NAMES[ITEM_SILVER_COIN] = "nitrotank-small";
     DEFAULT_NAMES[ITEM_BUBBLEGUM]   = "bubblegum";
 
     bool bError=0;
