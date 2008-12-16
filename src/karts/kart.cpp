@@ -571,7 +571,9 @@ void Kart::update(float dt)
     const Material* material=getMaterial();
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
-        forceRescue();    
+        // let kart fall a bit before rescuing
+        if( abs( getXYZ().getZ() - RaceManager::getTrack()->m_left_driveline[0].getZ() ) > 17)
+            forceRescue();    
     } 
     else if(material)
     {
