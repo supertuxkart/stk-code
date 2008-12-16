@@ -5,7 +5,6 @@
  (name          _("Win the At World's End\nGrand Prix"))
  (description   _("Come first in the At World's End\nGrand Prix with 3 'Racer'\nLevel AI karts."))
  (unlock-gp    "alltracks")
- (unlock-difficulty "skidding" _("Skidding Preview"))
  (depend-on    "islandfollow")
  (major        "grandprix")
  (minor        "quickrace")
