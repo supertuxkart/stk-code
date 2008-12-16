@@ -197,7 +197,7 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
     normals->add(normal);normals->add(normal);
     
     sgVec4 colour;
-    sgSetVec4(colour, 0.07f, 0.07f, 0.07f, 0.8f);
+    sgSetVec4(colour, 0.00f, 0.00f, 0.00f, 0.5f);
     colours->add(colour); colours->add(colour);
 
     dirtyBSphere();
