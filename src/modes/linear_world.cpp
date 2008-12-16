@@ -192,7 +192,10 @@ void LinearWorld::update(float delta)
         }
         else
         {
-            kart_info.m_on_road = true;
+            // Preserve on_road flag in case of rescue. This allows to pick
+            // a different rescue position for karts being off road.
+            if(!kart->isRescue()) 
+                kart_info.m_on_road = true;
         }
         
         if(!kart->isRescue())
@@ -561,7 +564,16 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
 void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
-    
+
+    // If the kart is off road, rescue it to the last valid track position 
+    // instead of the current one (since the sector might be determined by 
+    // being closest to it, which allows shortcuts like drive towards another
+    // part of the lap, press rescue, and be rescued to this other part of
+    // the track (example: math class, drive towards the left after start,
+    // when hitting the books, press rescue --> you are rescued to the
+    // end of the track).
+    if(!info.m_on_road)
+        info.m_track_sector = info.m_last_valid_sector;
     // FIXME - removing 1 here makes it less likely to fall in a rescue loop since the kart
     // moves back on each attempt. This is still a weak hack. Also some other code depends
     // on 1 being substracted, like 'forceRescue'
