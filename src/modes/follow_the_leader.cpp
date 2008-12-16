@@ -71,6 +71,9 @@ void FollowTheLeaderRace::countdownReachedZero()
     }  // kart_number==m_kart.size()
     else
     {
+        // In case that the kart on position 1 was removed, we have to set
+        // the correct position (which equals the remaining number of karts).
+        m_kart[kart_number]->setPosition(getCurrentNumKarts());
         removeKart(kart_number);
     }
     
