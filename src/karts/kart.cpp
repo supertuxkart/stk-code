@@ -704,6 +704,15 @@ void Kart::updatePhysics (float dt)
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
         
+        
+        if(m_speed < 0.0f)
+        {
+            // let a player going backwards accelerate quickly (e.g. if a player hits a
+            // wall, he needs to be able to start again quickly after going backwards)
+            m_vehicle->applyEngineForce(engine_power*5, 2);
+            m_vehicle->applyEngineForce(engine_power*5, 3);
+        }
+        
     }
     else
     {   // not accelerating
@@ -722,17 +731,23 @@ void Kart::updatePhysics (float dt)
             else
             {
                 resetBrakes();
-                // going backward, apply reverse gear ratio
+                // going backward, apply reverse gear ratio (unless he goes too fast backwards)
                 if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
-                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 2);
-                    m_vehicle->applyEngineForce(-engine_power*m_controls.brake, 3);
+                    if(m_controls.brake)
+                    {
+                        // the backwards acceleration is artificially increased to allow
+                        // players to get "unstuck" quicker if they hit e.g. a wall
+                        m_vehicle->applyEngineForce(-engine_power*2.5, 2);
+                        m_vehicle->applyEngineForce(-engine_power*2.5, 3);
+                    }
                 }
                 else
                 {
                     m_vehicle->applyEngineForce(0.f, 2);
                     m_vehicle->applyEngineForce(0.f, 3);
-                }     
+                }    
+                
             }
         }
         else
