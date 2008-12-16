@@ -72,7 +72,7 @@
                                  ;; in each frame.
    (skid-decrease        0.95)   ;; Multiplicative decrease of skidding factor
                                  ;; in each frame.
-   (skid-max             2.0 )   ;; Maximum skidding factor = maximum increase
+   (skid-max             2.5 )   ;; Maximum skidding factor = maximum increase
                                  ;; of steering angle.
    (skid-visual          0.16)   ;; Additional graphical rotation of kart.
 

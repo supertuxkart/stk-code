@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-12 21:08-0500\n"
+"POT-Creation-Date: 2008-12-15 21:33-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,23 +147,7 @@ msgid "Clear from Blacklist"
 msgstr ""
 
 #: data/tracks/crescentcrossing/crescentcrossing.challenge:5
-msgid "Collect Coins in Math Class"
-msgstr ""
-
-#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
-msgid ""
-"Collect at least 6 points\n"
-"worth of coins\n"
-"on three laps of\n"
-"Oliver's Math Class\n"
-"in under 1 minute."
-msgstr ""
-
-#: data/grandprix/tothemoonandback.challenge:6
-msgid ""
-"Collect at least 9 coins\n"
-"on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
+msgid "Collect Nitro in Math Class"
 msgstr ""
 
 #: data/grandprix/tothemoonandback.challenge:5
@@ -258,7 +242,7 @@ msgstr ""
 msgid "Display Settings"
 msgstr ""
 
-#: src/gui/race_options.cpp:305
+#: src/gui/race_options.cpp:304
 msgid "Driver"
 msgstr ""
 
@@ -273,15 +257,15 @@ msgstr ""
 #: data/tracks/jungle/jungle.challenge:6
 msgid ""
 "Finish 3 laps in Racetrack\n"
-"with 3 AI karts\n"
-"in under 2:15 minutes."
+"with 3 easy AI karts\n"
+"in under 2:40 minutes."
 msgstr ""
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
 msgid ""
 "Finish 3 laps on the City track\n"
 "with 3 AI karts\n"
-"in under 5:20 minutes."
+"in under 4:20 minutes."
 msgstr ""
 
 #: data/tracks/canyon/canyon.challenge:6
@@ -292,7 +276,7 @@ msgid ""
 msgstr ""
 
 #: data/tracks/jungle/jungle.challenge:5
-msgid "Finish Race track in 2:15"
+msgid "Finish Race track in 2:40"
 msgstr ""
 
 #: data/tracks/canyon/canyon.challenge:5
@@ -300,12 +284,27 @@ msgid "Finish Tux Tollway track in 3:00"
 msgstr ""
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
-msgid "Finish the City track in 5:20"
+msgid "Finish the City track in 4:20"
+msgstr ""
+
+#: data/grandprix/tothemoonandback.challenge:6
+msgid ""
+"Finish with at least 9 nitro \n"
+"points on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
 msgstr ""
 
 #: src/gui/race_gui.cpp:677
 #, c-format
 msgid "Finished"
+msgstr ""
+
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
+msgid ""
+"Finsih with at least 6 points\n"
+" of intro on three laps of\n"
+"Oliver's Math Class\n"
+"in under 52 seconds."
 msgstr ""
 
 #. I18N: name of controls, like in "fire missile"
@@ -411,7 +410,7 @@ msgstr ""
 msgid "Invalid"
 msgstr ""
 
-#: src/modes/linear_world.cpp:174
+#: src/modes/linear_world.cpp:171
 msgid "Invalid short-cut!!"
 msgstr ""
 
@@ -468,7 +467,7 @@ msgid ""
 "now available"
 msgstr ""
 
-#: src/modes/linear_world.cpp:289
+#: src/modes/linear_world.cpp:339
 msgid "New fastest lap"
 msgstr ""
 
@@ -507,7 +506,7 @@ msgstr ""
 msgid "No Grand Prix selected"
 msgstr ""
 
-#: src/gui/race_options.cpp:304 src/gui/race_options.cpp:307
+#: src/gui/race_options.cpp:303 src/gui/race_options.cpp:306
 msgid "Novice"
 msgstr ""
 
@@ -639,7 +638,7 @@ msgstr ""
 msgid "Race results"
 msgstr ""
 
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:305
 msgid "Racer"
 msgstr ""
 
@@ -700,10 +699,6 @@ msgstr ""
 
 #: src/gui/game_mode.cpp:61
 msgid "Single Race"
-msgstr ""
-
-#: data/grandprix/alltracks.challenge:8
-msgid "Skidding Preview"
 msgstr ""
 
 #: data/tracks/skyline/skyline.track:4
@@ -829,7 +824,7 @@ msgstr ""
 msgid "Two Players"
 msgstr ""
 
-#: src/modes/linear_world.cpp:232
+#: src/modes/linear_world.cpp:278
 msgid "WRONG WAY!"
 msgstr ""
 
