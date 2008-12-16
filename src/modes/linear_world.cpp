@@ -49,7 +49,7 @@ void LinearWorld::init()
         info.m_track_sector         = Track::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
         info.m_lap_start_time       = -1.0f;
-        RaceManager::getTrack()->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
+        m_track->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
@@ -57,18 +57,18 @@ void LinearWorld::init()
         {
             info.m_on_road = false;
             info.m_track_sector =
-                RaceManager::getTrack()->findOutOfRoadSector(m_kart[n]->getXYZ(),
-                                                             Track::RS_DONT_KNOW,
-                                                             Track::UNKNOWN_SECTOR );
+                m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
+                                             Track::RS_DONT_KNOW,
+                                             Track::UNKNOWN_SECTOR );
         }
         else
         {
             info.m_on_road = true;
         }
         
-        RaceManager::getTrack()->spatialToTrack(info.m_curr_track_coords,
-                                                m_kart[n]->getXYZ(),
-                                                info.m_track_sector );
+        m_track->spatialToTrack(info.m_curr_track_coords,
+                                m_kart[n]->getXYZ(),
+                                info.m_track_sector );
 
         // Init the last track coords so that no new lap (or undoing
         // a lap) is counted in the first doLapCounting call.
@@ -100,8 +100,8 @@ void LinearWorld::restartRace()
         info.m_track_sector         = Track::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
         info.m_lap_start_time       = -1.0f;
-        RaceManager::getTrack()->findRoadSector(m_kart[n]->getXYZ(), 
-                                                &info.m_track_sector);
+        m_track->findRoadSector(m_kart[n]->getXYZ(), 
+                                &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
@@ -109,18 +109,18 @@ void LinearWorld::restartRace()
         {
             info.m_on_road = false;
             info.m_track_sector =
-                RaceManager::getTrack()->findOutOfRoadSector(m_kart[n]->getXYZ(),
-                                                             Track::RS_DONT_KNOW,
-                                                             Track::UNKNOWN_SECTOR );
+                m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
+                                             Track::RS_DONT_KNOW,
+                                             Track::UNKNOWN_SECTOR );
         }
         else
         {
             info.m_on_road = true;
         }
         
-        RaceManager::getTrack()->spatialToTrack(info.m_curr_track_coords,
-                                                m_kart[n]->getXYZ(),
-                                                info.m_track_sector );
+        m_track->spatialToTrack(info.m_curr_track_coords,
+                                m_kart[n]->getXYZ(),
+                                info.m_track_sector );
         // This assignmet is important, otherwise (depending on previous
         // value of m_last_track_coors) a lap could be counted as 'undone',
         // decreasing the number of laps to -2.
@@ -155,12 +155,12 @@ void LinearWorld::update(float delta)
         int prev_sector = kart_info.m_track_sector;
         
         if(!kart->isRescue())
-            RaceManager::getTrack()->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
+            m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
         
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
         if(!kart->isRescue() && kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
-           RaceManager::getTrack()->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
+           m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
         {
             forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.     
             if(kart->isPlayerKart())
@@ -181,14 +181,14 @@ void LinearWorld::update(float delta)
             kart_info.m_on_road = false;
             if( kart_info.m_curr_track_coords[0] > 0.0 )
                 kart_info.m_track_sector =
-                    RaceManager::getTrack()->findOutOfRoadSector( kart->getXYZ(),
-                                                                  Track::RS_RIGHT,
-                                                                  prev_sector );
+                    m_track->findOutOfRoadSector( kart->getXYZ(),
+                                                  Track::RS_RIGHT,
+                                                  prev_sector );
             else
                 kart_info.m_track_sector =
-                    RaceManager::getTrack()->findOutOfRoadSector( kart->getXYZ(),
-                                                                  Track::RS_LEFT,
-                                                                  prev_sector );
+                    m_track->findOutOfRoadSector( kart->getXYZ(),
+                                                  Track::RS_LEFT,
+                                                  prev_sector );
         }
         else
         {
@@ -202,9 +202,9 @@ void LinearWorld::update(float delta)
         {
             // Update track coords (=progression)
             m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
-            RaceManager::getTrack()->spatialToTrack(kart_info.m_curr_track_coords, 
-                                                    kart->getXYZ(),
-                                                    kart_info.m_track_sector    );
+            m_track->spatialToTrack(kart_info.m_curr_track_coords, 
+                                    kart->getXYZ(),
+                                     kart_info.m_track_sector    );
         }
         
         // Lap counting, based on the new position, but only if the kart
@@ -221,7 +221,7 @@ void LinearWorld::update(float delta)
     for(unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
-        if(!m_kart[i]->hasFinishedRace()) 
+        if(!m_kart[i]->hasFinishedRace() && !m_kart[i]->isEliminated()) 
         {
             updateRacePosition(m_kart[i], m_kart_info[i]);
             // During the last lap update the estimated finish time.
@@ -267,7 +267,7 @@ void LinearWorld::update(float delta)
             if(race_manager->getDifficulty()==RaceManager::RD_EASY)
             {
                 float angle_diff = RAD_TO_DEGREE(kart->getHPR().getHeading()) -
-                                   RaceManager::getTrack()->m_angle[m_kart_info[n].m_track_sector];
+                                   m_track->m_angle[m_kart_info[n].m_track_sector];
                 if(angle_diff > 180.0f) angle_diff -= 360.0f;
                 else if (angle_diff < -180.0f) angle_diff += 360.0f;
                 // Display a warning message if the kart is going back way (unless
@@ -292,7 +292,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
                   kart_info.m_curr_track_coords.getY() <  delta;
   
     //    This fails if a kart skips a sector (or comes from the outside of the drivelines)
-    //const bool newLap = kart_info.m_last_valid_sector == (int)RaceManager::getTrack()->m_distance_from_start.size()-1 &&
+    //const bool newLap = kart_info.m_last_valid_sector == (int)m_track->m_distance_from_start.size()-1 &&
     //                    kart_info.m_track_sector == 0;
     if ( newLap )
     {
@@ -301,18 +301,17 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
         // will begin another countdown).
         if(kart_info.m_race_lap+1 <= race_manager->getNumLaps())
         {
-            setTimeAtLapForKart( RaceManager::getWorld()->getTime(), kart->getWorldKartId() );
+            setTimeAtLapForKart(getTime(), kart->getWorldKartId() );
             kart_info.m_race_lap++ ;
         }
         // Race finished
-        if(kart_info.m_race_lap >= race_manager->getNumLaps() && 
-           RaceManager::getWorld()->raceHasLaps())
+        if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
         {
             // A client wait does not detect race finished by itself, it will
             // receive a message from the server. So a client does not do
             // anything here.
             if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-                kart->raceFinished(RaceManager::getWorld()->getTime());
+                kart->raceFinished(getTime());
         }
         // Only do timings if original time was set properly. Driving backwards
         // over the start line will cause the lap start time to be set to -1.
@@ -321,18 +320,17 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
             float time_per_lap;
             if (kart_info.m_race_lap == 1) // just completed first lap
             {
-            	time_per_lap=RaceManager::getWorld()->getTime();
+            	time_per_lap=getTime();
             }
             else //completing subsequent laps
             {
-            	time_per_lap=RaceManager::getWorld()->getTime() - kart_info.m_lap_start_time;
+            	time_per_lap=getTime() - kart_info.m_lap_start_time;
             }
             
             // if new fastest lap
-            if(time_per_lap < RaceManager::getWorld()->getFastestLapTime() &&
-               RaceManager::getWorld()->raceHasLaps())
+            if(time_per_lap < getFastestLapTime() && raceHasLaps())
             {
-                RaceManager::getWorld()->setFastestLap(kart, time_per_lap);
+                setFastestLap(kart, time_per_lap);
                 RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
                 if(m)
                 {
@@ -349,7 +347,7 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
                 }   // if m
             } // end if new fastest lap
         }
-        kart_info.m_lap_start_time = RaceManager::getWorld()->getTime();
+        kart_info.m_lap_start_time = getTime();
     }
     else if ( kart_info.m_curr_track_coords.getY() > track_length-delta &&
               kart_info.m_last_track_coords.getY() <  delta)
@@ -449,7 +447,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
         
         if(laps_of_leader>0 &&    // Don't compare times when crossing the start line first
            (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || rank_info.lap != laps_of_leader) &&
-           RaceManager::getWorld()->raceHasLaps())
+           raceHasLaps())
         {  // Display for 5 seconds
             char str[256];
             if(position==1)
@@ -460,8 +458,10 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
             else
             {
                 float timeBehind;
-                timeBehind = (kart_info.m_race_lap==laps_of_leader ? getTimeAtLapForKart(kart->getWorldKartId()) : RaceManager::getWorld()->getTime())
-                    - time_of_leader;
+                timeBehind = (kart_info.m_race_lap==laps_of_leader 
+                                ? getTimeAtLapForKart(kart->getWorldKartId()) 
+                                : getTime())
+                           - time_of_leader;
                 str[0]='+'; str[1]=0;
                 caller->TimeToString(timeBehind, str+1);
             }
@@ -503,7 +503,9 @@ void LinearWorld::terminateRace()
             m_kart[i]->raceFinished(est_finish_time);
         }  // if !hasFinishedRace
     }   // for i
-}
+}   // terminateRace
+
+// ----------------------------------------------------------------------------
 void LinearWorld::raceResultOrder( int* order )
 {
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -523,13 +525,13 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     // than karts further behind), so the position doesn't have to
     // be updated to get the correct scoring.
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
-    float distance_covered  = kart_info.m_race_lap * RaceManager::getTrack()->getTrackLength()
+    float distance_covered  = kart_info.m_race_lap * m_track->getTrackLength()
         + getDistanceDownTrackForKart(kart->getWorldKartId());
     // In case that a kart is rescued behind start line, or ...
     if(distance_covered<0) distance_covered =1.0f;
     
-    const float full_distance = race_manager->getNumLaps()*RaceManager::getTrack()->getTrackLength();
-    const float average_speed = distance_covered/RaceManager::getWorld()->getTime();
+    const float full_distance = race_manager->getNumLaps()*m_track->getTrackLength();
+    const float average_speed = distance_covered/getTime();
     
     // Finish time is the time needed for the whole race with 
     // the average speed computed above.
@@ -581,10 +583,10 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     info.m_last_valid_sector = info.m_track_sector;
     if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
         
-    kart->setXYZ( RaceManager::getTrack()->trackToSpatial(info.m_track_sector) );
+    kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
     
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         RaceManager::getTrack()->m_angle[info.m_track_sector] );
+                         m_track->m_angle[info.m_track_sector] );
     kart->setRotation(heading);
     
     // A certain epsilon is added here to the Z coordinate (0.1), in case
@@ -594,7 +596,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     btTransform pos;
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
-                    RaceManager::getTrack()->m_angle[info.m_track_sector]));
+                    m_track->m_angle[info.m_track_sector]));
 
     body->setCenterOfMassTransform(pos);
     
