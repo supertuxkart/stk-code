@@ -363,27 +363,32 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
 int LinearWorld::getSectorForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_track_sector;
-}
+}   // getSectorForKart
+
 //-----------------------------------------------------------------------------
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_curr_track_coords.getY();
-}
+}   // getDistanceDownTrackForKart
+
 //-----------------------------------------------------------------------------
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_curr_track_coords.getX();
-}
+}   // getDistanceToCenterForKart
+
 //-----------------------------------------------------------------------------
 int LinearWorld::getLapForKart(const int kart_id) const
 {
     return  m_kart_info[kart_id].m_race_lap;
-}
+}   // getLapForKart
+
 //-----------------------------------------------------------------------------
 void LinearWorld::setTimeAtLapForKart(float t, const int kart_id)
 {
     m_kart_info[kart_id].m_time_at_last_lap=t;
-}
+}   // setTimeAtLapForKart
+
 //-----------------------------------------------------------------------------
 /** Returns the estimated finishing time. Only valid during the last lap!
  *  \param kart_id Id of the kart.
@@ -398,7 +403,8 @@ float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_time_at_last_lap;
-}
+}   // getTimeAtLapForKart
+
 //-----------------------------------------------------------------------------
 KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
 {
@@ -486,7 +492,8 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
     
     
     return m_kart_display_info;
-}
+}   // getKartsDisplayInfo
+
 //-----------------------------------------------------------------------------
 void LinearWorld::terminateRace()
 {
@@ -497,7 +504,8 @@ void LinearWorld::terminateRace()
     const unsigned int kart_amount = m_kart.size();
     for ( Karts::size_type i = 0; i < kart_amount; ++i)
     {
-        if(!m_kart[i]->hasFinishedRace())
+        // Eliminated karts have already called raceFinished.
+        if(!m_kart[i]->hasFinishedRace() && !m_kart[i]->isEliminated())
         {
             const float est_finish_time = m_kart_info[i].m_estimated_finish;
             m_kart[i]->raceFinished(est_finish_time);
@@ -513,7 +521,8 @@ void LinearWorld::raceResultOrder( int* order )
     {
         order[RaceManager::getKart(i)->getPosition()-1] = i; // even for eliminated karts
     }
-}
+}   // raceResultOrder
+
 //-----------------------------------------------------------------------------
 float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 {
