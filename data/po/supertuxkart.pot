@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-15 21:33-0500\n"
+"POT-Creation-Date: 2008-12-16 15:52+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -373,7 +373,7 @@ msgid "Go!"
 msgstr ""
 
 #: src/gui/help_page_one.cpp:73
-msgid "Grab blue boxes and coins"
+msgid "Grab blue boxes and nitro"
 msgstr ""
 
 #: src/gui/game_mode.cpp:99
@@ -426,7 +426,7 @@ msgstr ""
 msgid "Last grand prix, longer and harder"
 msgstr ""
 
-#: src/modes/follow_the_leader.cpp:138
+#: src/modes/follow_the_leader.cpp:139
 msgid "Leader"
 msgstr ""
 
@@ -628,6 +628,10 @@ msgstr ""
 
 #: src/gui/race_gui.cpp:629
 msgid "REV"
+msgstr ""
+
+#: data/tracks/race/race.track:4
+msgid "Race Track"
 msgstr ""
 
 #: src/gui/race_results_gui.cpp:74

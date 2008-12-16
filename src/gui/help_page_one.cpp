@@ -70,7 +70,7 @@ HelpPageOne::HelpPageOne()
     widget_manager->breakLine();
 
     widget_manager->addTextWgt( WTOK_MSG2, 60, 7,
-        _("Grab blue boxes and coins") );
+        _("Grab blue boxes and nitro") );
     widget_manager->addTextWgt( WTOK_MSG3, 30, 7, _("Avoid bananas") );
     widget_manager->breakLine();
 
