@@ -1,8 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (item
-  (gold   "goldcoin"  )
-  (silver "silvercoin")
+  (gold   "nitrotank-small"  )
+  (silver "nitrotank-big")
   (green  "banana"    )
   (red    "bonusblock")
 )
