@@ -55,7 +55,7 @@ public:
     virtual bool stopMusic();
     virtual bool pauseMusic();
     virtual bool resumeMusic();
-    virtual bool volumeMusic (float gain);
+    virtual void volumeMusic (float gain);
 
 protected:
     bool empty();

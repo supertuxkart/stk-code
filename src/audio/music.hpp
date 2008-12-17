@@ -30,7 +30,7 @@ public:
     virtual bool stopMusic   ()                            = 0;
     virtual bool pauseMusic  ()                            = 0;
     virtual bool resumeMusic ()                            = 0;
-    virtual bool volumeMusic (float gain)                  = 0;
+    virtual void volumeMusic (float gain)                  = 0;
     virtual void updateFading(float percent)               = 0;
     virtual void updateFaster(float percent, float pitch)  = 0;
     virtual void update      ()                            = 0;

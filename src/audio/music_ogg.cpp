@@ -207,7 +207,7 @@ bool MusicOggStream::resumeMusic()
 }   // resumeMusic
 
 //-----------------------------------------------------------------------------
-bool MusicOggStream::volumeMusic(float gain)
+void MusicOggStream::volumeMusic(float gain)
 {
     alSourcef(m_soundSource, AL_GAIN, gain);
 } // volumeMusic
