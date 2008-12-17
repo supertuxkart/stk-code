@@ -46,6 +46,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;
+    m_adjustedGain    = 1.0f;
 
     if(StringUtils::extension(filename)!="music")
     {
@@ -86,6 +87,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     LISP->get      ("max-pitch",   m_max_pitch      );
     LISP->getVector("tracks",      m_all_tracks     );
     LISP->get      ("gain",        m_gain           );
+    m_adjustedGain = m_gain;
 
     // Get the path from the filename and add it to the ogg filename
     std::string path=StringUtils::path(filename);
@@ -129,7 +131,7 @@ void MusicInformation::startMusic()
     }
     m_normal_music = new MusicOggStream();
 
-    if((m_normal_music->load(m_normal_filename, m_gain)) == false)
+    if((m_normal_music->load(m_normal_filename)) == false)
     {
         delete m_normal_music;
         m_normal_music=0;
@@ -137,6 +139,7 @@ void MusicInformation::startMusic()
                 m_normal_filename.c_str());
         return;
     }
+    m_normal_music->volumeMusic(m_adjustedGain);
     m_normal_music->playMusic();
 
     // Then (if available) load the music for the last track
@@ -156,7 +159,7 @@ void MusicInformation::startMusic()
     }
     m_fast_music= new MusicOggStream();
 
-    if((m_fast_music->load(m_fast_filename, m_gain)) == false)
+    if((m_fast_music->load(m_fast_filename)) == false)
     {
         delete m_fast_music;
         m_fast_music=0;
@@ -164,6 +167,7 @@ void MusicInformation::startMusic()
                 m_fast_filename.c_str());
         return;
     }
+    m_fast_music->volumeMusic(m_adjustedGain);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
@@ -245,6 +249,14 @@ void MusicInformation::resumeMusic()
     if (m_normal_music != NULL) m_normal_music->resumeMusic();
     if (m_fast_music   != NULL) m_fast_music->resumeMusic();
 }   // resumeMusic
+
+//-----------------------------------------------------------------------------
+void MusicInformation::volumeMusic(float gain)
+{
+    m_adjustedGain = m_gain * gain;
+    if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjustedGain);
+    if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjustedGain);
+} // volumeMusic
 
 //-----------------------------------------------------------------------------
 void MusicInformation::switchToFastMusic()

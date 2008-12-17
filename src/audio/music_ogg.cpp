@@ -49,7 +49,7 @@ MusicOggStream::~MusicOggStream()
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
-bool MusicOggStream::load(const std::string& filename, float gain)
+bool MusicOggStream::load(const std::string& filename)
 {
     m_error = true;
     m_fileName = filename;
@@ -94,7 +94,7 @@ bool MusicOggStream::load(const std::string& filename, float gain)
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  0.0          );
-    alSourcef (m_soundSource, AL_GAIN,            gain         );
+    alSourcef (m_soundSource, AL_GAIN,            1.0          );
     alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE      );
 
     m_error=false;
@@ -205,6 +205,12 @@ bool MusicOggStream::resumeMusic()
     m_pausedMusic= false;
     return true;
 }   // resumeMusic
+
+//-----------------------------------------------------------------------------
+bool MusicOggStream::volumeMusic(float gain)
+{
+    alSourcef(m_soundSource, AL_GAIN, gain);
+} // volumeMusic
 
 //-----------------------------------------------------------------------------
 void MusicOggStream::updateFading(float percent)

@@ -44,7 +44,9 @@ private:
                              m_allMusic;
 
     void                     loadMusicInformation();
-    float                    listenerVec[6];
+    float                    m_listenerVec[6];
+    float                    m_masterGain;
+
 public:
     SoundManager();
     virtual ~SoundManager();
@@ -61,6 +63,7 @@ public:
                                                      m_current_music->resumeMusic();   }
     void                    switchToFastMusic() {if(m_current_music)
                                                     m_current_music->switchToFastMusic();}
+    void                    setMasterMusicVolume(float gain);
     MusicInformation       *getCurrentMusic() {return m_current_music; }    
     MusicInformation       *getMusicInformation(const std::string& filename);
     void                    loadMusicFromOneDir(const std::string& dir);

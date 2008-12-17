@@ -47,6 +47,7 @@ SoundManager* sound_manager= NULL;
 SoundManager::SoundManager()
 {
     m_current_music= NULL;
+    setMasterMusicVolume(0.7);
 
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
@@ -145,6 +146,7 @@ void SoundManager::startMusic(MusicInformation* mi)
     
     if(!mi || !user_config->doMusic() || !m_initialized) return;
     
+    mi->volumeMusic(m_masterGain);
     mi->startMusic();
 }   // startMusic
 
@@ -153,6 +155,18 @@ void SoundManager::stopMusic()
 {
     if(m_current_music) m_current_music->stopMusic();
 }   // stopMusic
+
+//-----------------------------------------------------------------------------
+void SoundManager::setMasterMusicVolume(float gain)
+{
+    if(gain > 1.0)
+        gain = 1.0f;
+    if(gain < 0.0f)
+        gain = 0.0f;
+
+    m_masterGain = gain;
+    if(m_current_music) m_current_music->volumeMusic(m_masterGain);
+}
 
 //-----------------------------------------------------------------------------
 MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
@@ -168,6 +182,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
         mi = new MusicInformation(filename);
         m_allMusic[basename] = mi;
     }
+    mi->volumeMusic(m_masterGain);
     return mi;
 }   // SoundManager
 
@@ -177,15 +192,15 @@ void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
     if(!user_config->doSFX() || !m_initialized) return;
 
     //forward vector
-    listenerVec[0] = front.getX(); 
-    listenerVec[1] = front.getY();
-    listenerVec[2] = front.getZ(); 
+    m_listenerVec[0] = front.getX(); 
+    m_listenerVec[1] = front.getY();
+    m_listenerVec[2] = front.getZ(); 
     //up vector
-    listenerVec[3] = 0; 
-    listenerVec[4] = 0;
-    listenerVec[5] = 1;
+    m_listenerVec[3] = 0; 
+    m_listenerVec[4] = 0;
+    m_listenerVec[5] = 1;
 
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
-    alListenerfv(AL_ORIENTATION, listenerVec);
+    alListenerfv(AL_ORIENTATION, m_listenerVec);
 }
 

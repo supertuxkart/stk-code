@@ -25,12 +25,12 @@
 class Music
 {
 public:
-    virtual bool load        (const std::string& filename,
-                              float gain                 ) = 0;
+    virtual bool load        (const std::string& filename) = 0;
     virtual bool playMusic   ()                            = 0;
     virtual bool stopMusic   ()                            = 0;
     virtual bool pauseMusic  ()                            = 0;
     virtual bool resumeMusic ()                            = 0;
+    virtual bool volumeMusic (float gain)                  = 0;
     virtual void updateFading(float percent)               = 0;
     virtual void updateFaster(float percent, float pitch)  = 0;
     virtual void update      ()                            = 0;
