@@ -4,7 +4,7 @@
   (gold   "nitrotank-big"  )
   (silver "nitrotank-small")
   (green  "warning"    )
-  (red    "bonusblock")
+  (red    "bonusblock2")
 )
 
 ;; EOF ;;
