@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart svn revision 2201\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-27 20:38-0400\n"
-"PO-Revision-Date: 2008-08-12 00:27+0100\n"
-"Last-Translator: Niklas <master_niklas@hotmail.com>\n"
+"POT-Creation-Date: 2008-12-16 15:52+1100\n"
+"PO-Revision-Date: 2008-12-18 11:58+0100\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -12,12 +12,12 @@ msgstr ""
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
 
-#: src/gui/config_display.cpp:385
+#: src/gui/config_display.cpp:387
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d svartlistad"
 
-#: src/world.cpp:650
+#: src/modes/world.cpp:413
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -26,19 +26,38 @@ msgstr ""
 "'%s' har\n"
 "eliminerats"
 
-#: src/gui/player_controls.cpp:64
+#: src/gui/game_mode.cpp:87
+msgid "3 Strikes Battle"
+msgstr "3 Strikes Battle"
+
+#: src/gui/help_page_three.cpp:75
+msgid ""
+"3 Strikes Battle : only in multiplayer games.\n"
+"Hit others with weapons until they lose all their lives."
+msgstr ""
+"3 Strikes Battle : bara i flerspelarläge.\n"
+"Använd vapen för att träffa andra tills\n"
+"de förlorar alla sina liv."
+
+#: src/gui/help_page_three.cpp:83
+#: src/gui/help_page_two.cpp:128
+msgid "< Back"
+msgstr "< Tillbaka"
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:72
 msgid "Accelerate"
 msgstr "Gasa"
 
-#: src/gui/challenges_menu.cpp:36
+#: src/gui/challenges_menu.cpp:37
 msgid "Active Challenges"
 msgstr "Aktiva utmaningar"
 
-#: data/all.cup:4
+#: data/grandprix/alltracks.grandprix:4
 msgid "All tracks"
 msgstr "Alla banor"
 
-#: data/all.cup:5
+#: data/grandprix/alltracks.grandprix:5
 msgid "All tracks included in SuperTuxKart"
 msgstr "Alla banor inkluderade i SuperTuxKart"
 
@@ -46,15 +65,15 @@ msgstr "Alla banor inkluderade i SuperTuxKart"
 msgid "Amazonian Journey"
 msgstr "Amasonresa"
 
-#: src/gui/help_page_two.cpp:108
+#: src/gui/help_page_two.cpp:111
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Städ - saktar ned den ledande gokarten väldigt mycket"
 
-#: src/gui/config_display.cpp:92
+#: src/gui/config_display.cpp:94
 msgid "Apply "
 msgstr "Applicera"
 
-#: src/gui/config_display.cpp:351
+#: src/gui/config_display.cpp:353
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Applicera %dx%d"
@@ -63,32 +82,28 @@ msgstr "Applicera %dx%d"
 msgid "Around the Lighthouse"
 msgstr "Omkring fyren"
 
-#: src/gui/help_page_one.cpp:110
-msgid ""
-"At high speeds wheelies drive you faster, but you can't steer. If you\n"
-"get stuck or fall too far, use the rescue button to get back on track."
-msgstr ""
-"Vid höga hastigheter gör stegringar att du kör fortare, men kan inte styra.\n"
-"Om du fastnar eller faller för långt använd då räddningsknappen för att ta \n"
-"dig tillbaka på banan."
-
-#: src/challenges/worlds_end_gp.cpp:56
-#: data/gp4.cup:4
+#: data/grandprix/atworldsend.grandprix:4
 msgid "At world's end"
 msgstr "Vid världens ände"
 
-#: src/gui/help_page_one.cpp:76
+#: src/gui/help_page_one.cpp:74
 msgid "Avoid bananas"
 msgstr "Undvik bananer"
 
-#: src/gui/grand_prix_ending.cpp:151
+#: src/gui/grand_prix_ending.cpp:157
 #: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Tillbaka till huvudmenyn"
 
-#: src/gui/help_page_two.cpp:122
+#: src/gui/help_page_one.cpp:153
+#: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_two.cpp:131
 msgid "Back to the menu"
 msgstr "Tillbaka till menyn"
+
+#: src/gui/network_gui.cpp:60
+msgid "Become server"
+msgstr "Bli server"
 
 #: src/gui/help_page_two.cpp:84
 msgid ""
@@ -98,19 +113,35 @@ msgstr ""
 "Bowlingklot - studsar på väggar. Om du tittar bakåt\n"
 "kommer det kastas i den riktningen."
 
-#: src/gui/player_controls.cpp:65
+#: src/gui/player_controls.cpp:72
 msgid "Brake"
 msgstr "Bromsa"
+
+#: src/gui/help_page_two.cpp:66
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr "Tuggummi - lämna en klibbig rosa röra bakom dig"
+
+#: src/gui/help_page_two.cpp:75
+msgid ""
+"Cake - thrown at the closest rival,\n"
+"best on short ranges and long straights"
+msgstr ""
+"Tårta - kastas på den närmaste motståndaren,\n"
+"effektivast på kort håll och långa raksträckor"
+
+#: src/gui/network_gui.cpp:179
+msgid "Can't connect to server"
+msgstr "Kan inte ansluta till server"
 
 #: data/tracks/canyon/canyon.track:4
 msgid "Canyon"
 msgstr "Ravin"
 
-#: src/gui/main_menu.cpp:53
+#: src/gui/main_menu.cpp:62
 msgid "Challenges"
 msgstr "Utmaningar"
 
-#: src/gui/player_controls.cpp:74
+#: src/gui/player_controls.cpp:85
 #, c-format
 msgid "Choose your controls, %s"
 msgstr "Välj dina kontroller, %s"
@@ -119,65 +150,40 @@ msgstr "Välj dina kontroller, %s"
 msgid "City"
 msgstr "Stad"
 
-#: src/gui/config_display.cpp:97
+#: src/gui/config_display.cpp:99
 msgid "Clear from Blacklist"
 msgstr "Ta bort från svartlista"
 
-#: src/challenges/energy_math_class.cpp:26
-msgid "Collect Coins in Math Class"
-msgstr "Samla mynt i matematikklass"
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
+msgid "Collect Nitro in Math Class"
+msgstr "Samla nitroglycerin i matematikklass"
 
-#: src/challenges/energy_math_class.cpp:28
-msgid ""
-"Collect at least 6 points\n"
-"worth of coins\n"
-"on three laps of\n"
-"Oliver's Math Class\n"
-"in under 1 minute."
-msgstr ""
-"Samla minst sex mynt\n"
-"på tre varv\n"
-"under en minut på\n"
-"Olivers matematikklass."
-
-#: src/challenges/energy_shifting_sands.cpp:27
-msgid ""
-"Collect at least 9 coins\n"
-"on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
-msgstr ""
-"Samla minst nio mynt\n"
-"på tre varv på Sand & pyramider\n"
-"inom 2:20 minuter."
-
-#: src/challenges/energy_shifting_sands.cpp:25
+#: data/grandprix/tothemoonandback.challenge:5
 msgid "Collect the Pharaohs Treasure"
 msgstr "Samla faraonens skatt"
 
-#: src/gui/help_page_one.cpp:125
+#: src/gui/help_page_one.cpp:123
 msgid ""
-"Collecting coins increases the number of collectables you receive.\n"
-"After 5 silver coins, each blue box will yield 2 collectables,\n"
-"after 10, 3 collectables and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
+"Collecting nitro allows you to get speed boosts whenever you\n"
+"wish by pressing the appropriate key. You can see your\n"
+"current level of nitro in the bar at the right of the game screen."
 msgstr ""
-"Att samla mynt ökar antalet samlarföremål du får.\n"
-"Efter fem silvermynt kommer varje blå låda generera två\n"
-"samlarföremål, efter tio tre samlarföremål och så vidare.\n"
-"Varje guldmynt är värt tre silvermynt, så håll utkik efter dem!"
+"Genom att samla nitroglycerin kan du öka farten när du\n"
+"vill genom att trycka på rätt knapp. Du kan see din\n"
+"nuvarande nivå av nitroglycerin i mätaren till höger på spelskärmen."
 
-#: src/challenges/worlds_end_gp.cpp:27
+#: data/grandprix/alltracks.challenge:6
 msgid ""
 "Come first in the At World's End\n"
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
-msgstr "Kom först i grand prix-tävlingen på Vid världens ände med tre AI-motståndare på 'racer'nivå."
+msgstr "Kom först i grand prix-tävlingen på Vid världens ände mot tre AI-motståndare på 'racer'-nivå."
 
-#: src/gui/display_res_confirm.cpp:55
+#: src/gui/display_res_confirm.cpp:56
 msgid "Confirm Resolution"
 msgstr "Bekräfta skärmupplösning"
 
-#: src/gui/display_res_confirm.cpp:109
+#: src/gui/display_res_confirm.cpp:110
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
 msgstr "Bekräfta skärmupplösning inom %d sekunder"
@@ -186,8 +192,16 @@ msgstr "Bekräfta skärmupplösning inom %d sekunder"
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr "Bekräfta skärmupplösning inom fem sekunder"
 
-#: src/gui/feature_unlocked.cpp:47
-#: src/gui/grand_prix_ending.cpp:147
+#: src/gui/network_gui.cpp:56
+msgid "Connect to server"
+msgstr "Anslut till server "
+
+#: src/gui/network_gui.cpp:155
+msgid "Connected:"
+msgstr "Ansluten:"
+
+#: src/gui/feature_unlocked.cpp:48
+#: src/gui/grand_prix_ending.cpp:153
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Fortsätt"
@@ -215,7 +229,7 @@ msgstr ""
 "Skapad av Oliver & Steve Baker,\n"
 "modifierad av Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:72
 msgid "Credits"
 msgstr "Upphovsmän"
 
@@ -223,20 +237,21 @@ msgstr "Upphovsmän"
 msgid "Crescent Crossing"
 msgstr "Kyrkogård"
 
-#: src/gui/config_display.cpp:83
+#. I18N: displays current resolution
+#: src/gui/config_display.cpp:85
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Nuvarande: %dx%d"
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:91
 msgid "Decrease Resolution"
 msgstr "Minska skärmupplösning"
 
-#: src/gui/race_options.cpp:76
+#: src/gui/race_options.cpp:86
 msgid "Difficulty"
 msgstr "Svårighetsgrad"
 
-#: src/gui/options.cpp:49
+#: src/gui/options.cpp:50
 msgid "Display"
 msgstr "Skärm"
 
@@ -244,7 +259,7 @@ msgstr "Skärm"
 msgid "Display Settings"
 msgstr "Skärminställningar"
 
-#: src/gui/race_options.cpp:282
+#: src/gui/race_options.cpp:304
 msgid "Driver"
 msgstr "Förare"
 
@@ -252,74 +267,98 @@ msgstr "Förare"
 msgid "Edit controls for who?"
 msgstr "Redigera kontroller för vem?"
 
-#: src/gui/race_menu.cpp:60
+#: src/gui/race_menu.cpp:58
 msgid "Exit Race"
 msgstr "Avsluta lopp"
 
-#: src/challenges/race_track_time.cpp:28
+#: data/tracks/jungle/jungle.challenge:6
 msgid ""
-"Finish 3 laps in the Race track\n"
-"with 3 AI karts\n"
-"in under 1:15 minutes."
+"Finish 3 laps in Racetrack\n"
+"with 3 easy AI karts\n"
+"in under 2:40 minutes."
 msgstr ""
 "Klara tre varv på Racerbanan\n"
-"med tre AI-motståndare under 1:15 minuter."
+"mot tre lätta AI-motståndare\n"
+"inom 2:40 minuter."
 
-#: src/challenges/city_time.cpp:27
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
 msgid ""
 "Finish 3 laps on the City track\n"
 "with 3 AI karts\n"
-"in under 5:20 minutes."
+"in under 4:20 minutes."
 msgstr ""
 "Klara tre varv på Stadsbanan\n"
-"med tre AI-motståndare under 5:20 minuter."
+"mot tre AI-motståndare\n"
+"inom 4:20 minuter."
 
-#: src/challenges/tollway_time.cpp:27
+#: data/tracks/canyon/canyon.challenge:6
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
 "in under 3:00 minutes."
 msgstr ""
 "Klara tre varv på Tux Tollway\n"
-"-banan med tre AI-motståndare\n"
-"på under tre minuter."
+"-banan mot tre AI-motståndare\n"
+"inom tre minuter."
 
-#: src/challenges/race_track_time.cpp:26
-msgid "Finish Race track in 1:15"
-msgstr "Klara Racerbanan på 1:15 minuter"
+#: data/tracks/jungle/jungle.challenge:5
+msgid "Finish Race track in 2:40"
+msgstr "Klara Racerbanan på 2:40 minuter"
 
-#: src/challenges/tollway_time.cpp:25
+#: data/tracks/canyon/canyon.challenge:5
 msgid "Finish Tux Tollway track in 3:00"
 msgstr "Klara Tux Tollway-banan på tre minuter."
 
-#: src/challenges/city_time.cpp:25
-msgid "Finish the City track in 5:20"
-msgstr "Klara Stadsbanan på 5:20 minuter"
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
+msgid "Finish the City track in 4:20"
+msgstr "Klara Stadsbanan på 4:20 minuter"
 
-#: src/gui/race_gui.cpp:798
+#: data/grandprix/tothemoonandback.challenge:6
+msgid ""
+"Finish with at least 9 nitro \n"
+"points on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Klara tre varv på Sand & pyramider\n"
+"med minst nio nitroglyceringpoäng\n"
+"inom 2:20 minuter."
+
+#: src/gui/race_gui.cpp:677
 #, c-format
 msgid "Finished"
 msgstr "Avklarat"
 
-#: src/gui/player_controls.cpp:66
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
+msgid ""
+"Finsih with at least 6 points\n"
+" of intro on three laps of\n"
+"Oliver's Math Class\n"
+"in under 52 seconds."
+msgstr ""
+"Klara tre varv på Olivers matematikklass\n"
+"med minst sex nitroglyceringpoäng\n"
+"inom 52 sekunder."
+
+#. I18N: name of controls, like in "fire missile"
+#: src/gui/player_controls.cpp:74
 msgid "Fire"
 msgstr "Skjut"
 
-#: data/gp1.cup:5
+#: data/grandprix/penguinplayground.grandprix:5
 msgid "First grand prix, easy to get started"
 msgstr "Första grand prix-tävlingen, lätt att börja med"
 
-#: src/challenges/penguin_playground_gp.cpp:28
-#: src/gui/game_mode.cpp:69
-#: src/gui/game_mode.cpp:93
+#: src/gui/game_mode.cpp:77
+#: src/gui/game_mode.cpp:115
+#: data/followtheleader.challenge:7
 msgid "Follow the Leader"
 msgstr "Följ ledaren"
 
-#: src/challenges/jungle_follow.cpp:25
+#: data/tracks/city/city.challenge:5
 msgid "Follow the Leader in the Jungle"
 msgstr "Följ ledaren i Djungeln"
 
-#: src/challenges/island_follow.cpp:25
+#: data/grandprix/atworldsend.challenge:5
 msgid ""
 "Follow the Leader on a\n"
 "Desert Island"
@@ -327,17 +366,16 @@ msgstr ""
 "Följ ledaren på en\n"
 "Ökenö"
 
-#: src/gui/help_page_three.cpp:74
+#: src/gui/help_page_three.cpp:70
 msgid ""
-"Follow the leader: Stay behind the leader kart.                 \n"
-"When the countdown reaches zero, a kart ahead\n"
-"of the leader or the last kart is eliminated."
+"Follow the leader: run for second place, as the last kart\n"
+"will be disqualified every time the counter hits zero.\n"
+" Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
-"Följ ledaren: Håll dig bakom den ledande gokarten.\n"
-"När nedräkningen når noll kommer en gokart framför\n"
-"ledaren eller den sista gokarten att elimineras."
+"Följ ledaren: sikta på att komma tvåa eftersom den sista gokarten kommer diskvalificeras varje gång räknaren når noll.\n"
+" Se upp : kör du framför ledaren kommer du även då att elimineras! "
 
-#: src/gui/help_page_one.cpp:71
+#: src/gui/help_page_one.cpp:69
 msgid "Force your rivals bite *your* dust!"
 msgstr "Tvinga dina motståndare att bita *ditt* gräs!"
 
@@ -345,51 +383,43 @@ msgstr "Tvinga dina motståndare att bita *ditt* gräs!"
 msgid "Fort Magma"
 msgstr "Fort magma"
 
-#: src/gui/num_players.cpp:40
+#: src/gui/num_players.cpp:41
 msgid "Four Players"
 msgstr "Fyra spelare"
 
-#: src/gui/game_mode.cpp:119
-msgid "Fulfil challenge to unlock"
-msgstr "Utför utmaning för att låsa upp"
-
-#: src/gui/config_display.cpp:76
-#: src/gui/config_display.cpp:128
-#: src/gui/config_display.cpp:183
+#: src/gui/config_display.cpp:77
+#: src/gui/config_display.cpp:130
+#: src/gui/config_display.cpp:185
 msgid "Fullscreen mode"
 msgstr "Helskärmsläge"
 
-#: src/gui/game_mode.cpp:122
+#: src/gui/game_mode.cpp:152
 msgid "Game mode help"
 msgstr "Information om spelsätt"
 
-#: src/gui/help_page_three.cpp:47
+#: src/gui/help_page_three.cpp:43
 msgid "Game modes"
 msgstr "Spelsätt"
 
-#: src/gui/challenges_menu.cpp:51
-#: src/gui/credits_menu.cpp:75
+#: src/gui/challenges_menu.cpp:54
+#: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Gå tillbaka till huvudmenyn"
 
-#: src/gui/help_page_one.cpp:151
-#: src/gui/help_page_three.cpp:87
-msgid "Go back to the menu"
-msgstr "Gå tillbaka till menyn"
-
-#: src/gui/race_gui.cpp:946
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:828
 msgid "Go!"
 msgstr "Gå!"
 
-#: src/gui/help_page_one.cpp:75
-msgid "Grab blue boxes and coins"
-msgstr "Ta blåa lådor och mynt"
+#: src/gui/help_page_one.cpp:73
+msgid "Grab blue boxes and nitro"
+msgstr "Ta blåa lådor och nitroglycerin"
 
-#: src/gui/game_mode.cpp:77
+#: src/gui/game_mode.cpp:99
 msgid "Grand Prix"
 msgstr "Grand prix-tävling"
 
-#: src/gui/help_page_three.cpp:54
+#: src/gui/help_page_three.cpp:50
 msgid ""
 "Grand Prix: Win victory points \n"
 "by racing through a group of tracks,  \n"
@@ -399,20 +429,16 @@ msgstr ""
 "genom att köra ett gäng banor, \n"
 "flest poäng vinner (snabbast tid om det blir lika!)"
 
-#: src/gui/main_menu.cpp:61
-#: src/gui/race_menu.cpp:51
+#: src/gui/main_menu.cpp:69
+#: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Hjälp"
 
-#: src/gui/race_results_gui.cpp:167
+#: src/gui/race_results_gui.cpp:120
 msgid "Highscores"
 msgstr "Topplista"
 
-#: src/gui/help_page_two.cpp:76
-msgid "Homing missile - follows rivals, but is slower than the missile"
-msgstr "Målsökande missil - följer rivaler, men är långsammare än missilen"
-
-#: src/gui/help_page_one.cpp:135
+#: src/gui/help_page_one.cpp:130
 msgid ""
 "If you see a button with a lock like the one to the right,\n"
 "you need to complete a challenge to unlock it."
@@ -420,69 +446,68 @@ msgstr ""
 "Om du ser en knapp med ett lås lik den till höger\n"
 "behöver du klara en utmaning för att låsa upp den."
 
-#: src/gui/config_display.cpp:87
+#: src/gui/config_display.cpp:89
 msgid "Increase Resolution"
 msgstr "Öka skärmupplösning"
 
-#: src/user_config.cpp:872
+#: src/user_config.cpp:870
 #, c-format
 msgid "Invalid"
 msgstr "Ogiltig"
 
-#: src/kart.cpp:662
+#: src/modes/linear_world.cpp:171
 msgid "Invalid short-cut!!"
 msgstr "Ogiltig genväg!!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Jump"
-msgstr "Hoppa"
+#: data/tracks/castle/castle.track:4
+msgid "King Weird's Castle"
+msgstr "Kung Weirds slott"
 
-#: src/gui/race_gui.cpp:803
+#: src/gui/race_gui.cpp:682
 msgid "Lap"
 msgstr "Varv"
 
-#: data/gp4.cup:5
+#: data/grandprix/atworldsend.grandprix:5
 msgid "Last grand prix, longer and harder"
 msgstr "Sista grand prix-tävlingen, längre och svårare"
 
-#: src/gui/race_gui.cpp:407
+#: src/modes/follow_the_leader.cpp:139
 msgid "Leader"
 msgstr "Ledare"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:68
 msgid "Left"
 msgstr "Vänster"
 
-#: src/gui/start_race_feedback.cpp:35
+#: src/gui/race_results_gui.cpp:301
+#: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Laddar lopp..."
 
-#: src/gui/player_controls.cpp:66
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:76
 msgid "Look back"
 msgstr "Titta bakåt"
 
-#: src/gui/help_page_two.cpp:68
-msgid "Missile - fast stopper in a straight line"
-msgstr "Missil - en rak snabbmissil"
-
-#: src/gui/main_menu.cpp:48
-msgid "Multiplayer"
-msgstr "Flerspelarläge"
+#: src/gui/main_menu.cpp:59
+msgid "Networking"
+msgstr "Nätverkar"
 
 #: src/gui/feature_unlocked.cpp:37
 msgid "New Feature Unlocked"
 msgstr "Ny finess upplåst"
 
-#: src/challenges/challenge.cpp:121
+#: src/challenges/challenge.cpp:133
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
 "now available"
 msgstr ""
 "Ny grand prix-tävling '%s'\n"
-"nu tillgänglig"
+"är nu tillgänglig"
 
-#: src/challenges/challenge.cpp:124
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -493,11 +518,11 @@ msgstr ""
 "'%s'\n"
 "är nu tillgänglig"
 
-#: src/kart.cpp:425
+#: src/modes/linear_world.cpp:339
 msgid "New fastest lap"
 msgstr "Nytt snabbaste varv"
 
-#: src/challenges/challenge.cpp:118
+#: src/challenges/challenge.cpp:130
 #, c-format
 msgid ""
 "New game mode\n"
@@ -508,7 +533,17 @@ msgstr ""
 "'%s'\n"
 "är nu tillgängligt"
 
-#: src/challenges/challenge.cpp:114
+#: src/challenges/challenge.cpp:140
+#, c-format
+msgid ""
+"New kart\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Ny gokart '%s'\n"
+"är nu tillgänglig"
+
+#: src/challenges/challenge.cpp:126
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -517,30 +552,39 @@ msgstr ""
 "Ny bana '%s'\n"
 "är nu tillgänglig"
 
-#: src/gui/help_page_one.cpp:147
-#: src/gui/help_page_two.cpp:118
-msgid "Next help screen"
-msgstr "Nästa hjälpskärm"
+#: src/gui/help_page_one.cpp:156
+#: src/gui/help_page_two.cpp:134
+msgid "Next >"
+msgstr "Nästa >"
 
-#: src/gui/grand_prix_select.cpp:71
-#: src/gui/grand_prix_select.cpp:77
+#: src/gui/player_controls.cpp:72
+msgid "Nitro"
+msgstr "Nitroglycerin"
+
+#: src/gui/grand_prix_select.cpp:63
+#: src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
 msgstr "Ingen grand prix-tävling vald"
 
-#: src/gui/race_options.cpp:281
-#: src/gui/race_options.cpp:285
+#: src/gui/race_options.cpp:303
+#: src/gui/race_options.cpp:306
 msgid "Novice"
 msgstr "Nybörjare"
 
-#: src/gui/race_options.cpp:92
+#: src/gui/race_options.cpp:102
 msgid "Number of karts"
 msgstr "Antal gokarter"
 
-#: src/gui/race_options.cpp:113
+#: src/gui/race_options.cpp:124
 msgid "Number of laps"
 msgstr "Antal varv"
 
-#: src/user_config.cpp:495
+#: src/gui/network_gui.cpp:158
+#: src/gui/race_results_gui.cpp:49
+msgid "OK"
+msgstr "OK"
+
+#: src/user_config.cpp:498
 msgid "Old config file found, check your key bindings!"
 msgstr "Gammal konfigureringsfil hittad, kontrollera dina tangentkontroller"
 
@@ -552,104 +596,110 @@ msgstr "Olivers matematikklass"
 msgid "On the Beach"
 msgstr "På stranden"
 
-#: src/gui/main_menu.cpp:56
+#: src/gui/main_menu.cpp:64
 #: src/gui/options.cpp:40
-#: src/gui/race_menu.cpp:50
+#: src/gui/race_menu.cpp:48
 msgid "Options"
 msgstr "Inställningar"
 
-#: src/gui/help_page_two.cpp:100
+#: src/gui/help_page_two.cpp:102
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Fallskärm - saktar ned alla gokarter som ligger före dig!"
 
-#: src/gui/race_menu.cpp:47
+#: src/gui/race_menu.cpp:45
 msgid "Paused"
 msgstr "Pausat"
 
-#: src/gui/race_gui.cpp:975
+#: src/gui/race_gui.cpp:857
 msgid "Penalty time!!"
 msgstr "Strafftid!!"
 
-#: src/challenges/penguin_playground_gp.cpp:48
-#: data/gp1.cup:4
+#: data/grandprix/penguinplayground.grandprix:4
 msgid "Penguin Playground"
 msgstr "Pingvinens lekplats"
 
-#: src/gui/player_controls.cpp:251
+#. I18N: as in 'Player 2'
+#: src/gui/player_controls.cpp:264
 msgid "Player "
 msgstr "Spelare"
 
-#: src/gui/char_sel.cpp:73
+#: src/gui/char_sel.cpp:86
 #, c-format
 msgid "Player %d, choose a driver"
 msgstr "Spelare %d, välj en förare"
 
-#: src/gui/config_controls.cpp:45
+#: src/gui/config_controls.cpp:46
 msgid "Player 1"
 msgstr "Spelare 1"
 
-#: src/gui/config_controls.cpp:46
+#: src/gui/config_controls.cpp:47
 msgid "Player 2"
 msgstr "Spelare 2"
 
-#: src/gui/config_controls.cpp:47
+#: src/gui/config_controls.cpp:48
 msgid "Player 3"
 msgstr "Spelare 3"
 
-#: src/gui/config_controls.cpp:48
+#: src/gui/config_controls.cpp:49
 msgid "Player 4"
 msgstr "Spelare 4"
 
-#: src/gui/options.cpp:41
+#: src/gui/options.cpp:42
 msgid "Player Config"
 msgstr "Konfigurera spelare"
 
-#: src/gui/player_controls.cpp:80
+#: src/gui/player_controls.cpp:92
 msgid "Player name"
 msgstr "Spelares namn"
 
-#: src/gui/display_res_confirm.cpp:59
+#: src/gui/help_page_two.cpp:120
+msgid ""
+"Plunger - throw straight to pull an opponent back,\n"
+"or throw while looking back to make one lose sight!"
+msgstr ""
+"Plunger - kasta rakt för att dra en motståndare bakåt,\n"
+"eller kasta genom att titta bakåt för att få någon att\n"
+"tappa sikte!"
+
+#: data/tracks/prehistoric/prehistoric.track:4
+msgid "Prehistoric Island"
+msgstr "Förhistorisk ö"
+
+#: src/gui/display_res_confirm.cpp:60
 msgid "Press <ESC> to Cancel"
 msgstr "Tryck <ESC> för att avbryta"
 
-#: src/gui/config_controls.cpp:52
-#: src/gui/config_display.cpp:101
-#: src/gui/config_sound.cpp:63
-#: src/gui/game_mode.cpp:127
-#: src/gui/grand_prix_select.cpp:88
-#: src/gui/num_players.cpp:45
-#: src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:140
+#: src/gui/config_controls.cpp:53
+#: src/gui/config_display.cpp:103
+#: src/gui/config_sound.cpp:64
+#: src/gui/game_mode.cpp:158
+#: src/gui/grand_prix_select.cpp:80
+#: src/gui/network_gui.cpp:79
+#: src/gui/num_players.cpp:46
+#: src/gui/options.cpp:58
+#: src/gui/player_controls.cpp:124
+#: src/gui/race_options.cpp:154
 msgid "Press <ESC> to go back"
 msgstr "Tryck <ESC> för att gå tillbaka"
 
-#: src/gui/player_controls.cpp:156
+#: src/gui/player_controls.cpp:168
 msgid "Press key"
 msgstr "Tryck knapp"
 
-#: src/gui/help_page_three.cpp:83
-msgid "Previous help screen"
-msgstr "Föregående hjälpskärm"
-
-#: src/gui/help_page_two.cpp:114
-msgid "Previous screen"
-msgstr "Föregående skärm"
-
-#: src/gui/game_mode.cpp:59
-#: src/gui/game_mode.cpp:83
+#: src/gui/game_mode.cpp:67
+#: src/gui/game_mode.cpp:105
 msgid "Quick Race"
 msgstr "Snabblopp"
 
-#: src/gui/help_page_three.cpp:62
+#: src/gui/help_page_three.cpp:58
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Snabblopp: Välj en enda bana, snabbast tid vinner."
 
-#: src/gui/main_menu.cpp:57
+#: src/gui/main_menu.cpp:65
 msgid "Quit"
 msgstr "Avsluta"
 
-#: src/gui/race_gui.cpp:744
+#: src/gui/race_gui.cpp:629
 msgid "REV"
 msgstr "Backar"
 
@@ -659,75 +709,93 @@ msgstr "Racerbana"
 
 #: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
-msgstr "Kör denna bana igen"
+msgstr "Kör ett lopp på denna bana igen"
 
-#: src/gui/race_results_gui.cpp:126
-#: src/gui/race_results_gui.cpp:142
+#: src/gui/race_results_gui.cpp:92
 msgid "Race results"
 msgstr "Loppresultat"
 
-#: src/gui/race_options.cpp:283
+#: src/gui/race_options.cpp:305
 msgid "Racer"
 msgstr "Racer"
 
-#: src/gui/race_gui.cpp:928
+#: data/tracks/racetrack/racetrack.track:4
+msgid "Racetrack"
+msgstr "Racerbana "
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:808
 msgid "Ready!"
 msgstr "Klara!"
 
-#: src/gui/player_controls.cpp:66
+#: src/gui/player_controls.cpp:72
 msgid "Rescue"
 msgstr "Rädda"
 
-#: src/gui/race_menu.cpp:52
+#: src/gui/race_menu.cpp:50
 msgid "Restart Race"
-msgstr "Starta om bana"
+msgstr "Starta om lopp"
 
-#: src/gui/race_menu.cpp:49
+#: src/gui/race_menu.cpp:47
 msgid "Return To Race"
-msgstr "Återvänd till bana"
+msgstr "Återvänd till lopp"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
+#: src/gui/player_controls.cpp:70
 msgid "Right"
 msgstr "Höger"
 
-#: data/gp2.cup:5
+#: data/grandprix/tothemoonandback.grandprix:5
 msgid "Second grand prix"
 msgstr "Andra grand prix-tävlingen"
 
-#: src/gui/race_gui.cpp:937
+#: src/gui/network_gui.cpp:52
+msgid "Select network mode"
+msgstr "Välj nätverksläge"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:818
 msgid "Set!"
 msgstr "Färdiga!"
 
-#: src/gui/race_menu.cpp:57
+#: src/gui/race_menu.cpp:55
 #: src/gui/race_results_gui.cpp:79
 msgid "Setup New Race"
 msgstr "Ordna ett nytt lopp"
+
+#: src/gui/player_controls.cpp:72
+msgid "Sharp Turn"
+msgstr "Skarp sväng"
 
 #: data/tracks/sandtrack/sandtrack.track:4
 msgid "Shifting Sands"
 msgstr "Sand & pyramider"
 
-#: src/gui/main_menu.cpp:47
+#: src/gui/main_menu.cpp:54
 msgid "Single Player"
 msgstr "Enspelarläge"
 
-#: src/gui/game_mode.cpp:53
+#: src/gui/game_mode.cpp:61
 msgid "Single Race"
 msgstr "Enkellopp"
 
-#: src/gui/race_options.cpp:284
-msgid "Skidding Preview"
-msgstr "Sladdningsförhandstitt"
+#: data/tracks/skyline/skyline.track:4
+msgid "Skyline"
+msgstr "Skyline"
 
-#: data/gp3.cup:4
+#: data/grandprix/snagdrive.grandprix:4
 msgid "Snag Drive"
 msgstr "Snag Drive"
+
+#: data/tracks/snowmountain/snowmountain.track:4
+msgid "Snow Mountain"
+msgstr "Snöberg"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.track:4
 msgid "SnowTux Peak"
 msgstr "Tux snötopp"
 
-#: src/gui/options.cpp:52
+#: src/gui/options.cpp:53
 msgid "Sound"
 msgstr "Ljud"
 
@@ -735,23 +803,39 @@ msgstr "Ljud"
 msgid "Sound Settings"
 msgstr "Ljudinställningar"
 
+#: src/gui/main_menu.cpp:55
+msgid "Splitscreen"
+msgstr "Delad skärm"
+
 #: data/tracks/startrack/startrack.track:4
 msgid "Star Track"
 msgstr "Stjärnbana"
 
-#: src/gui/race_options.cpp:133
+#: src/gui/race_options.cpp:144
 msgid "Start race"
 msgstr "Starta lopp"
 
-#: data/tracks/subseatrack/subseatrack.track:4
-msgid "Sub Sea"
-msgstr "Under vatten"
+#: src/gui/start_race_feedback.cpp:39
+msgid "Synchronising network..."
+msgstr "Synkroniserar nätverk..."
+
+#: src/gui/race_results_gui.cpp:271
+msgid "Synchronising."
+msgstr "Synkroniserar."
+
+#: src/gui/help_page_one.cpp:145
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns\n"
+"and have better control in tight curves"
+msgstr ""
+"Knappen 'skarp sväng' tillåter dig att svänga skarpt\n"
+"och du får bättre kontroll i snäva kurvor"
 
 #: data/tracks/islandtrack/islandtrack.track:4
 msgid "The Island"
 msgstr "Ön"
 
-#: src/gui/help_page_one.cpp:119
+#: src/gui/help_page_one.cpp:117
 msgid ""
 "The current key bindings can be seen/changed in the\n"
 "Options->Player Config menu."
@@ -759,54 +843,65 @@ msgstr ""
 "De nuvarande tangentkontrollerna kan ses/förändras i\n"
 "menyn Inställningar->Konfigurera spelare."
 
-#: src/gui/grand_prix_ending.cpp:109
+#: src/highscore_manager.cpp:108
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+"Filen för topplista var för gammal,\n"
+" alla rekord har raderats."
+
+#: data/tracks/mines/mines.track:4
+msgid "The old mine"
+msgstr "Den gamla gruvan"
+
+#: src/gui/grand_prix_ending.cpp:111
 #, c-format
 msgid "The winner is %s!"
 msgstr "Vinnaren är %s!"
 
-#: data/gp3.cup:5
+#: data/grandprix/snagdrive.grandprix:5
 msgid "Third grand prix"
 msgstr "Tredje grand prix-tävlingen"
 
-#: src/gui/num_players.cpp:39
+#: src/gui/num_players.cpp:40
 msgid "Three Players"
 msgstr "Tre spelare"
 
-#: src/gui/game_mode.cpp:64
-#: src/gui/game_mode.cpp:88
+#: src/gui/game_mode.cpp:72
+#: src/gui/game_mode.cpp:110
 msgid "Time Trial"
 msgstr "Tidsförsök"
 
-#: src/gui/help_page_three.cpp:67
-msgid "Time Trial: As quick race, but no items.                       "
-msgstr "Tidsförsök: Som snabblopp, men inga föremål"
+#: src/gui/help_page_three.cpp:63
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr "Tidsförsök: innehåller inga powerups så endast dina färdigheter som förare räknas!"
 
-#: src/gui/help_page_two.cpp:61
-msgid "To help you win, there are certain collectables you can grab:"
-msgstr "För att hjälpa dig att vinna finns det vissa samlarföremål du kan ta:"
+#: src/gui/help_page_two.cpp:58
+msgid "To help you win, there are certain powerups you can grab:"
+msgstr "För att hjälpa dig att vinna finns det vissa powerups du kan ta:"
 
-#: src/challenges/moon_and_back_gp.cpp:51
-#: data/gp2.cup:4
+#: data/grandprix/tothemoonandback.grandprix:4
 msgid "To the Moon and Back"
 msgstr "Till månen och tillbaka"
 
-#: src/gui/config_sound.cpp:45
-#: src/gui/config_sound.cpp:90
+#: src/gui/config_sound.cpp:46
+#: src/gui/config_sound.cpp:91
 msgid "Turn off music"
 msgstr "Stäng av musik"
 
-#: src/gui/config_sound.cpp:54
-#: src/gui/config_sound.cpp:103
+#: src/gui/config_sound.cpp:55
+#: src/gui/config_sound.cpp:104
 msgid "Turn off sound effects"
 msgstr "Stäng av ljudeffekter"
 
-#: src/gui/config_sound.cpp:49
-#: src/gui/config_sound.cpp:84
+#: src/gui/config_sound.cpp:50
+#: src/gui/config_sound.cpp:85
 msgid "Turn on music"
 msgstr "Slå på musik"
 
-#: src/gui/config_sound.cpp:58
-#: src/gui/config_sound.cpp:98
+#: src/gui/config_sound.cpp:59
+#: src/gui/config_sound.cpp:99
 msgid "Turn on sound effects"
 msgstr "Slå på ljudeffekter"
 
@@ -814,23 +909,25 @@ msgstr "Slå på ljudeffekter"
 msgid "Tux Tollway"
 msgstr "Tux Tollway"
 
-#: src/gui/num_players.cpp:38
+#: src/gui/num_players.cpp:39
 msgid "Two Players"
 msgstr "Två spelare"
 
-#: data/tracks/volcano/volcano.track:4
-msgid "Volcano"
-msgstr "Vulkan"
-
-#: src/player_kart.cpp:284
+#: src/modes/linear_world.cpp:278
 msgid "WRONG WAY!"
 msgstr "FEL VÄG!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Wheelie"
-msgstr "Stegring"
+#: src/gui/char_sel.cpp:126
+#: src/gui/network_gui.cpp:162
+msgid "Waiting for clients"
+msgstr "Väntar på klienter"
 
-#: src/challenges/penguin_playground_gp.cpp:25
+#: src/gui/char_sel.cpp:124
+#: src/gui/network_gui.cpp:118
+msgid "Waiting for server"
+msgstr "Väntar på server"
+
+#: data/followtheleader.challenge:5
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix"
@@ -838,16 +935,16 @@ msgstr ""
 "Vinn grand prix-tävlingen\n"
 "på Pingvinens lekplats"
 
-#: src/challenges/penguin_playground_gp.cpp:27
+#: data/followtheleader.challenge:6
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix with 3 'Racer' Level AI karts."
 msgstr ""
 "Vinn grand prix-tävlingen\n"
-"på Pingvinens lekplats med\n"
-"tre AI-motståndare på 'racer'nivå."
+"på Pingvinens lekplats mot\n"
+"tre AI-motståndare på 'racer'-nivå."
 
-#: src/challenges/moon_and_back_gp.cpp:25
+#: data/grandprix/snagdrive.challenge:5
 msgid ""
 "Win To the Moon and Back\n"
 "Grand Prix"
@@ -855,7 +952,7 @@ msgstr ""
 "Vinn grand prix-tävlingen på\n"
 "Till månen och tillbaka"
 
-#: src/challenges/tollway_head2head.cpp:27
+#: data/tracks/fortmagma/fortmagma.challenge:6
 msgid ""
 "Win a 1 lap Head to Head\n"
 "on Tux Tollway against 1 'Racer'\n"
@@ -863,29 +960,29 @@ msgid ""
 msgstr ""
 "Vinn ett Head to Head-varv\n"
 "på Tux Tollway mot en\n"
-"AI-motståndare på 'racer'nivå."
+"AI-motståndare på 'racer'-nivå."
 
-#: src/challenges/jungle_follow.cpp:27
+#: data/tracks/city/city.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
 "in the Amazonian Jungle."
 msgstr ""
 "Vinn ett Följ ledaren-lopp\n"
-"med tre AI-motståndare\n"
+"mot tre AI-motståndare\n"
 "på Amasondjungeln."
 
-#: src/challenges/island_follow.cpp:27
+#: data/grandprix/atworldsend.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
 "on a Desert Island."
 msgstr ""
 "Vinn ett Följ ledaren-lopp\n"
-"med tre AI-motståndare\n"
+"mot tre AI-motståndare\n"
 "på en Ökenö."
 
-#: src/challenges/tollway_head2head.cpp:25
+#: data/tracks/fortmagma/fortmagma.challenge:5
 msgid ""
 "Win a Head to Head on\n"
 "Tux Tollway"
@@ -893,7 +990,7 @@ msgstr ""
 "Vinn ett Head to Head-lopp\n"
 "på Tux Tollway"
 
-#: src/challenges/worlds_end_gp.cpp:25
+#: data/grandprix/alltracks.challenge:5
 msgid ""
 "Win the At World's End\n"
 "Grand Prix"
@@ -901,25 +998,29 @@ msgstr ""
 "Vinn grand prix-tävlingen\n"
 "på Vid världens ände"
 
-#: src/challenges/moon_and_back_gp.cpp:27
+#: data/grandprix/snagdrive.challenge:6
 msgid ""
 "Win the To the Moon and Back\n"
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
 msgstr ""
 "Vinn grand prix-tävlingen på\n"
-"Till månen och tillbaka med\n"
-"tre AI-motståndare på 'racer'nivå."
+"Till månen och tillbaka mot\n"
+"tre AI-motståndare på 'racer'-nivå."
 
-#: src/gui/config_display.cpp:71
+#: src/gui/config_display.cpp:72
 msgid "Window mode"
 msgstr "Fönsterläge"
 
-#: src/player_kart.cpp:239
-msgid "You finished"
-msgstr "Du kom i mål"
+#: data/tracks/xr591/xr591.track:4
+msgid "XR591"
+msgstr "XR591"
 
-#: src/world.cpp:645
+#: src/karts/player_kart.cpp:267
+msgid "You finished the race!"
+msgstr "Du kom i mål!"
+
+#: src/modes/world.cpp:408
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -927,49 +1028,102 @@ msgstr ""
 "Du har blivit\n"
 "eliminerad!"
 
-#: src/player_kart.cpp:239
-msgid "You won"
-msgstr "Du vann"
+#: src/karts/player_kart.cpp:267
+msgid "You won the race!"
+msgstr "Du vann loppet!"
 
-#: src/gui/help_page_two.cpp:92
+#: src/gui/help_page_two.cpp:93
 msgid "Zipper - speed boost"
-msgstr "Zipper - hastighetsökare"
+msgstr "Zipper - ökar farten"
 
-#: src/user_config.cpp:855
+#: src/user_config.cpp:853
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joy %d axek %d  %c"
 
-#: src/user_config.cpp:859
+#: src/user_config.cpp:857
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joy %d btn %d"
 
-#: src/user_config.cpp:862
+#: src/user_config.cpp:860
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joy %d hat %d"
 
-#: src/user_config.cpp:868
+#: src/user_config.cpp:866
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "musaxel  %d %c"
 
-#: src/user_config.cpp:865
+#: src/user_config.cpp:863
 #, c-format
 msgid "mouse btn %d"
 msgstr "mus btn %d"
 
-#: src/user_config.cpp:849
-#: src/user_config.cpp:894
+#: src/user_config.cpp:847
+#: src/user_config.cpp:891
 #, c-format
 msgid "not set"
 msgstr "inte konfigurerat"
 
-#: src/player_kart.cpp:241
-msgid "the race!"
-msgstr "loppet!"
-
+#~ msgid ""
+#~ "At high speeds wheelies drive you faster, but you can't steer. If you\n"
+#~ "get stuck or fall too far, use the rescue button to get back on track."
+#~ msgstr ""
+#~ "Vid höga hastigheter gör stegringar att du kör fortare, men kan inte "
+#~ "styra.\n"
+#~ "Om du fastnar eller faller för långt använd då räddningsknappen för att "
+#~ "ta \n"
+#~ "dig tillbaka på banan."
+#~ msgid ""
+#~ "Collecting coins increases the number of collectables you receive.\n"
+#~ "After 5 silver coins, each blue box will yield 2 collectables,\n"
+#~ "after 10, 3 collectables and so on.\n"
+#~ "Each gold coin is worth 3 silver coins, so look out for them!"
+#~ msgstr ""
+#~ "Att samla mynt ökar antalet samlarföremål du får.\n"
+#~ "Efter fem silvermynt kommer varje blå låda generera två\n"
+#~ "samlarföremål, efter tio tre samlarföremål och så vidare.\n"
+#~ "Varje guldmynt är värt tre silvermynt, så håll utkik efter dem!"
+#~ msgid ""
+#~ "Follow the leader: Stay behind the leader kart.                 \n"
+#~ "When the countdown reaches zero, a kart ahead\n"
+#~ "of the leader or the last kart is eliminated."
+#~ msgstr ""
+#~ "Följ ledaren: Håll dig bakom den ledande gokarten.\n"
+#~ "När nedräkningen når noll kommer en gokart framför\n"
+#~ "ledaren eller den sista gokarten att elimineras."
+#~ msgid "Fulfil challenge to unlock"
+#~ msgstr "Utför utmaning för att låsa upp"
+#~ msgid "Go back to the menu"
+#~ msgstr "Gå tillbaka till menyn"
+#~ msgid "Homing missile - follows rivals, but is slower than the missile"
+#~ msgstr "Målsökande missil - följer rivaler, men är långsammare än missilen"
+#~ msgid "Jump"
+#~ msgstr "Hoppa"
+#~ msgid "Missile - fast stopper in a straight line"
+#~ msgstr "Missil - en rak snabbmissil"
+#~ msgid "Multiplayer"
+#~ msgstr "Flerspelarläge"
+#~ msgid "Next help screen"
+#~ msgstr "Nästa hjälpskärm"
+#~ msgid "Previous help screen"
+#~ msgstr "Föregående hjälpskärm"
+#~ msgid "Previous screen"
+#~ msgstr "Föregående skärm"
+#~ msgid "Skidding Preview"
+#~ msgstr "Sladdningsförhandstitt"
+#~ msgid "Sub Sea"
+#~ msgstr "Under vatten"
+#~ msgid "Time Trial: As quick race, but no items.                       "
+#~ msgstr "Tidsförsök: Som snabblopp, men inga föremål"
+#~ msgid "Volcano"
+#~ msgstr "Vulkan"
+#~ msgid "Wheelie"
+#~ msgstr "Stegring"
+#~ msgid "You won"
+#~ msgstr "Du vann"
 #~ msgid "Check the current key bindings for the first player"
 #~ msgstr "Kontrollera den första spelarens aktuella tangentkontroller"
 #~ msgid "Choose a Grand Prix"
