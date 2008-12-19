@@ -50,7 +50,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
 
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
                   new btSphereShape(0.5f*m_extend.getY()), 
-                  -20.0f /*gravity*/, 
+                  -70.0f /*gravity*/, 
                   true /*rotates*/);
 
     // Do not adjust the z velociy depending on height above terrain, since
