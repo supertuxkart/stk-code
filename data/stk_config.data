@@ -45,7 +45,7 @@
  (kart-defaults
    (wheel-base               1.2 )
    (heightCOG                0.2 )
-   (time-full-steer          0.15 )
+   (time-full-steer          0.25 )
    ;; Time for the AI to go from neutral steering to extreme
    ;; left (or right). This can be used to reduce 'shaking' of
    ;; AI karts caused by changing steering direction too often.
@@ -90,10 +90,10 @@
    (max-speed-radius         15  21.5)
    ;; Different engine powers for different difficulties:
    ;; hard, medium, low level order!
-   (engine-power        400 300  200    )
+   (engine-power        400 400  400    )
    ;; Different maximum speed for different difficulties:
    ;; hard, medium, low level order!
-   (max-speed           32.22 25 20 ) ;; = 116 90 72 km/h
+   (max-speed           32.22 31 30 ) ;; = 116 ? ? km/h
    (mass                    225    )
    (suspension-stiffness     48.0  )
    (wheel-damping-relaxation 20    )
