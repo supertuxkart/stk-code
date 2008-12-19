@@ -741,8 +741,8 @@ void Kart::updatePhysics (float dt)
                     {
                         // the backwards acceleration is artificially increased to allow
                         // players to get "unstuck" quicker if they hit e.g. a wall
-                        m_vehicle->applyEngineForce(-engine_power*2.5, 2);
-                        m_vehicle->applyEngineForce(-engine_power*2.5, 3);
+                        m_vehicle->applyEngineForce(-engine_power*2.5f, 2);
+                        m_vehicle->applyEngineForce(-engine_power*2.5f, 3);
                     }
                 }
                 else
