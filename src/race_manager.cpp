@@ -322,17 +322,7 @@ void RaceManager::exit_race()
  */
 void RaceManager::RaceFinished(const Kart *kart, float time)
 {
-    unsigned i;
-    for(i=0; i<m_kart_status.size(); i++)
-    {
-        if(kart->getIdent()==m_kart_status[i].m_ident) break;
-    }   // for i
-    if(i>=m_kart_status.size())
-    {
-        fprintf(stderr, "Kart '%s' not found. Ignored.\n",kart->getName().c_str());
-        return;
-    }
-
+    unsigned int id = kart->getWorldKartId();
     // In follow the leader mode, kart 0 does not get any points,
     // so the position of each kart is actually one better --> decrease pos
     int pos = kart->getPosition();
@@ -340,10 +330,10 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     assert(pos-1 >= 0);
     assert(pos-1 < (int)m_kart_status.size());
 
-    m_kart_status[i].m_score        += m_score_for_position[pos-1];
-    m_kart_status[i].m_last_score    = m_score_for_position[pos-1];
-    m_kart_status[i].m_overall_time += time;
-    m_kart_status[i].m_last_time     = time;
+    m_kart_status[id].m_score        += m_score_for_position[pos-1];
+    m_kart_status[id].m_last_score    = m_score_for_position[pos-1];
+    m_kart_status[id].m_overall_time += time;
+    m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
     if(kart->isPlayerKart()) m_num_finished_players++;
 }   // raceFinished
