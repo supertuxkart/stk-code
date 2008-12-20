@@ -28,14 +28,14 @@ msgstr ""
 
 #: src/gui/game_mode.cpp:87
 msgid "3 Strikes Battle"
-msgstr "Batalha de 3 Ataques"
+msgstr "Batalha de 3 Vidas"
 
 #: src/gui/help_page_three.cpp:75
 msgid ""
 "3 Strikes Battle : only in multiplayer games.\n"
 "Hit others with weapons until they lose all their lives."
 msgstr ""
-"Batalha de 3 Ataques: só para mais de um jogador.\n"
+"Batalha de 3 Vidas: só para mais de um jogador.\n"
 "Acerte os outros com armas até que eles percam todas as vidas."
 
 #: src/gui/help_page_three.cpp:83
@@ -58,7 +58,7 @@ msgstr "Todas as pistas"
 
 #: data/grandprix/alltracks.grandprix:5
 msgid "All tracks included in SuperTuxKart"
-msgstr "Todas as pistas incluídas no SuperTuxKart"
+msgstr "Todas as pistas inclusas no SuperTuxKart"
 
 #: data/tracks/jungle/jungle.track:4
 msgid "Amazonian Journey"
@@ -126,7 +126,7 @@ msgid ""
 "best on short ranges and long straights"
 msgstr ""
 "Bolo - é jogado no rival mais próximo\n"
-"funciona melhor com distâncias pequenas e longas retas"
+"funciona melhor em distâncias pequenas e longas retas"
 
 #: src/gui/network_gui.cpp:179
 msgid "Can't connect to server"
@@ -263,7 +263,7 @@ msgstr "Opções de Vídeo"
 
 #: src/gui/race_options.cpp:304
 msgid "Driver"
-msgstr "Corredor"
+msgstr "Motorista"
 
 #: src/gui/config_controls.cpp:43
 msgid "Edit controls for who?"
@@ -280,7 +280,7 @@ msgid ""
 "in under 2:40 minutes."
 msgstr ""
 "Termine 3 voltas na Pista de Corrida\n"
-"contra 3 computadores de dificuldade \"Fácil\"\n"
+"contra 3 computadores fáceis\n"
 "em menos de 2:40 minutos"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
@@ -787,7 +787,7 @@ msgstr "Skyline"
 
 #: data/grandprix/snagdrive.grandprix:4
 msgid "Snag Drive"
-msgstr "Corrida de Obstáculos"
+msgstr "Caminho das Armadilhas"
 
 #: data/tracks/snowmountain/snowmountain.track:4
 msgid "Snow Mountain"
