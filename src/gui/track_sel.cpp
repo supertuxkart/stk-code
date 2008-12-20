@@ -139,8 +139,10 @@ void TrackSel::updateScrollPosition()
         widget_manager->activateWgt(WTOK_TRACK0+i);
         widget_manager->showWgtRect(WTOK_TRACK0+i);
         widget_manager->showWgtText(WTOK_TRACK0+i);
-        int indx = (i+m_offset)%m_index_avail_tracks.size();
-        indx     = m_index_avail_tracks[indx];
+        
+        int i_with_scrolling = i+m_offset;
+        if(i_with_scrolling < 0) i_with_scrolling += m_index_avail_tracks.size();
+        int indx = m_index_avail_tracks[ i_with_scrolling%m_index_avail_tracks.size() ];
         if(indx>=0)
         {
             const Track *track = track_manager->getTrack(indx);
