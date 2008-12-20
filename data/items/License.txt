@@ -1,6 +1,6 @@
 All models are released under GPL except :
 
-* bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac
+* bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac, giftbox.ac
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
 
