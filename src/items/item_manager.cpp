@@ -159,9 +159,9 @@ void ItemManager::loadDefaultItems()
 //-----------------------------------------------------------------------------
 void ItemManager::setDefaultItemStyle()
 {
-    // This should go in an internal, system wide configuration file
+    // FIXME - This should go in an internal, system wide configuration file
     std::string DEFAULT_NAMES[ITEM_LAST - ITEM_FIRST - 1];
-    DEFAULT_NAMES[ITEM_BONUS_BOX]   = "bonusblock";
+    DEFAULT_NAMES[ITEM_BONUS_BOX]   = "gift-box";
     DEFAULT_NAMES[ITEM_BANANA]      = "banana";
     DEFAULT_NAMES[ITEM_GOLD_COIN]   = "nitrotank-big";
     DEFAULT_NAMES[ITEM_SILVER_COIN] = "nitrotank-small";
