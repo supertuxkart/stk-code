@@ -3,7 +3,7 @@
 (item
   (gold   "nitrotank-big"  )
   (silver "nitrotank-small")
-  (green  "banana"    )
+  (green  "warning"    )
   (red    "gift-box")
 )
 
