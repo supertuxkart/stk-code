@@ -307,7 +307,9 @@ void Kart::updatedWeight()
 //-----------------------------------------------------------------------------
 void Kart::reset()
 {
-    if(m_eliminated)
+    // If the kart was eliminated or rescued, the body was removed from the
+    // physics world. add it again.
+    if(m_eliminated || m_rescue)
     {
         RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
     }
@@ -318,6 +320,7 @@ void Kart::reset()
     m_race_position        = 9;
     m_finished_race        = false;
     m_eliminated           = false;
+    m_rescue               = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
@@ -349,13 +352,6 @@ void Kart::reset()
         m_vehicle->updateWheelTransform(j, true);
     }
 
-    // if the kart was being rescued when a restart is called,
-    // add the vehicle back into the physical world!
-    if(m_rescue)
-    {
-        RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
-    }
-    m_rescue               = false;
     TerrainInfo::update(getXYZ());
 }   // reset
 
