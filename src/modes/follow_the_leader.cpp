@@ -85,11 +85,8 @@ void FollowTheLeaderRace::countdownReachedZero()
     // or if all players have gone
     if(getCurrentNumKarts()==2 || getCurrentNumPlayers()==0)
     {
-        // Add the results for the remaining kart
-        for(int i=1; i<(int)race_manager->getNumKarts(); i++)
-            if(!m_kart[i]->isEliminated()) 
-                race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
-        
+        // Note: LinearWorld::terminateRace adds the scores for all remaining
+        // karts in the race.
         TimedRace::enterRaceOverState();
         return;
     }
