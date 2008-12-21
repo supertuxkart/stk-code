@@ -148,35 +148,29 @@ void LinearWorld::update(float delta)
     {
         KartInfo& kart_info = m_kart_info[n];
         Kart* kart = m_kart[n];
-        
+
+        // Nothing to do for karts that are currently being rescued.
+        if(kart->isRescue()) continue;
+
         // ---------- deal with sector data ---------
         
         // update sector variables
         int prev_sector = kart_info.m_track_sector;
-        
-        if(!kart->isRescue())
-            m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
+        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
         
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
-        if(!kart->isRescue() && kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
+        if(kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
            m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
         {
-            forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.     
-            if(kart->isPlayerKart())
-            {
-                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
-                // Can happen if the option menu is called
-                if(m)
-                    m->addMessage(_("Invalid short-cut!!"), kart, 2.0f, 60);
-            }
+            forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.
         }
                 
-        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR && !kart->isRescue())
+        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR)
             kart_info.m_last_valid_sector = kart_info.m_track_sector;
         
         // check if kart is on the road - if not, find the closest sector
-        if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR && !kart->isRescue())
+        if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR)
         {
             kart_info.m_on_road = false;
             if( kart_info.m_curr_track_coords[0] > 0.0 )
@@ -192,21 +186,15 @@ void LinearWorld::update(float delta)
         }
         else
         {
-            // Preserve on_road flag in case of rescue. This allows to pick
-            // a different rescue position for karts being off road.
-            if(!kart->isRescue()) 
-                kart_info.m_on_road = true;
+            kart_info.m_on_road = true;
         }
         
-        if(!kart->isRescue())
-        {
-            // Update track coords (=progression)
-            m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
-            m_track->spatialToTrack(kart_info.m_curr_track_coords, 
-                                    kart->getXYZ(),
-                                     kart_info.m_track_sector    );
-        }
-        
+        // Update track coords (=progression)
+        m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
+        m_track->spatialToTrack(kart_info.m_curr_track_coords, 
+                                kart->getXYZ(),
+                                kart_info.m_track_sector    );
+
         // Lap counting, based on the new position, but only if the kart
         // hasn't finished the race (otherwise it would be counted more than
         // once for the number of finished karts).
@@ -565,7 +553,8 @@ void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
             kart_info.m_race_lap--;
             kart_info.m_lap_start_time = -1; // invalidate time so he doesn't get a best time
         }
-    } 
+        kart->doingShortcut();
+    }   // if shortcut
     
     kart->forceRescue();
 }

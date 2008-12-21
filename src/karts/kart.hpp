@@ -206,6 +206,10 @@ public:
     const std::string& getName      () const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     virtual bool    isPlayerKart    () const {return false;                        }
+    /** Called by world in case of the kart taking a shortcut. The player kart
+     *  will display a message in this case, default behaviour is to do nothing.
+     */
+    virtual void    doingShortcut() {};
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
     virtual void   collectedItem    (const Item &item, int random_attachment);
